@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My Website</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Add your custom CSS styles here */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      background-color: #333;
+      height: 60px;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 15px;
+      transition: background-color 0.3s;
+    }
+
+    .navbar a:hover {
+      background-color: #555;
+    }
+
+    .navbar a.active {
+      background-color: #1abc9c;
+    }
+
+    .navbar .home-icon {
+      width: 30px;
+      height: 30px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 68.57L64 256h48v160h96V320h96v96h96V256h48z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3Cpath d='M256 68.57l192 187.43v-74.71L256 0 64 181.29v74.71z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3C/svg%3E");
+      background-size: cover;
+    }
+
+    .content {
+      padding: 20px;
+    }
+  </style>
+  <script>
+    // Add your custom JavaScript code here
+    window.addEventListener("DOMContentLoaded", function() {
+      // Get all the links in the navbar
+      var links = document.querySelectorAll(".navbar a");
+      // Loop through the links and add click event listeners
+      for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", function(event) {
+          // Prevent the default behavior of the link
+          event.preventDefault();
+          // Remove the active class from all the links
+          for (var j = 0; j < links.length; j++) {
+            links[j].classList.remove("active");
+          }
+          // Add the active class to the clicked link
+          this.classList.add("active");
+          // Update the content based on the link href
+          var href = this.getAttribute("href");
+          var content = document.querySelector(".content");
+          content.innerHTML = "<h1>" + href + "</h1><p>Some content for " + href + "</p>";
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="navbar">
+    <a href="Home" class="home-icon active"></a>
+    <a href="Projects">Projects</a>
+    <a href="Experiments">Experiments</a>
+    <a href="About">About</a>
+  </div>
+  <div class="content">
+    <h1>Home</h1>
+    <p>Some content for Home</p>
+  </div>
+</body>
+</html>
