@@ -36,8 +36,9 @@
     .navbar .home-icon {
       width: 30px;
       height: 30px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 68.57L64 256h48v160h96V320h96v96h96V256h48z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3Cpath d='M256 68.57l192 187.43v-74.71L256 0 64 181.29v74.71z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3C/svg%3E");
-      background-size: cover;
+      /* Remove the background-image property */
+      /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 68.57L64 256h48v160h96V320h96v96h96V256h48z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3Cpath d='M256 68.57l192 187.43v-74.71L256 0 64 181.29v74.71z' fill='none' stroke='white' stroke-linejoin='round' stroke-width='32'/%3E%3C/svg%3E"); */
+      /* background-size: cover; */
     }
 
     .content {
@@ -54,6 +55,28 @@
       object-fit: cover;
       z-index: -1;
       display: none;
+    }
+
+    /* Style the sound icon element to position it at the top left corner and make it clickable */
+    .sound-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .sound-icon:hover {
+      opacity: 1;
+    }
+
+    /* Style the home icon element to make it visible and match the size of the previous icon */
+    .home-icon i {
+      color: white;
+      font-size: 30px;
+      line-height: 30px;
     }
   </style>
   <script>
@@ -89,24 +112,55 @@
       video.style.display = "block";
       // Hide the home page content element
       home.style.display = "none";
+      // Add a variable to keep track of the loop count
+      var loopCount = 0;
       // Add an event listener for when the video ends
       video.addEventListener("ended", function() {
-        // Hide the video element
-        video.style.display = "none";
-        // Show the home page content element
-        home.style.display = "block";
+        // Increment the loop count
+        loopCount++;
+        // If the loop count is 1, switch to the home page content
+        if (loopCount == 1) {
+          // Hide the video element
+          video.style.display = "none";
+          // Show the home page content element
+          home.style.display = "block";
+        } else {
+          // Otherwise, replay the video
+          video.play();
+        }
+      });
+
+      // Get the sound icon element
+      var icon = document.querySelector(".sound-icon");
+      // Add a click event listener to the icon element
+      icon.addEventListener("click", function() {
+        // Check the muted property of the video element
+        if (video.muted) {
+          // If the video is muted, unmute it and change the icon class
+          video.muted = false;
+          icon.className = "fa fa-volume-up fa-5x";
+        } else {
+          // If the video is not muted, mute it and change the icon class
+          video.muted = true;
+          icon.className = "fa fa-volume-mute fa-5x";
+        }
       });
     });
   </script>
 </head>
 <body>
   <div class="navbar">
-    <a href="Home" class="home-icon active"></a>
+    <!-- Add an icon element inside the home link element -->
+    <a href="Home" class="home-icon active"><i class="fa fa-home"></i></a>
     <a href="Projects">Projects</a>
     <a href="Experiments">Experiments</a>
     <a href="About">About</a>
   </div>
   <div class="content">
+    <!-- Add a div element with a sound icon inside -->
+    <div class="sound-icon">
+      <i class="fa fa-volume-up fa-5x"></i>
+    </div>
     <!-- Add a video element with the source of your video file -->
     <video src="assets/Mv1.mp4" muted loop></video>
     <h1>Home</h1>
