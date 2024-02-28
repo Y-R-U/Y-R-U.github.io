@@ -43,6 +43,18 @@
     .content {
       padding: 20px;
     }
+
+    /* Style the video element to fill the screen and hide the controls */
+    .content video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      display: none;
+    }
   </style>
   <script>
     // Add your custom JavaScript code here
@@ -66,6 +78,24 @@
           content.innerHTML = "<h1>" + href + "</h1><p>Some content for " + href + "</p>";
         });
       }
+
+      // Get the video element
+      var video = document.querySelector(".content video");
+      // Get the home page content element
+      var home = document.querySelector(".content h1");
+      // Play the video when the page loads
+      video.play();
+      // Show the video element
+      video.style.display = "block";
+      // Hide the home page content element
+      home.style.display = "none";
+      // Add an event listener for when the video ends
+      video.addEventListener("ended", function() {
+        // Hide the video element
+        video.style.display = "none";
+        // Show the home page content element
+        home.style.display = "block";
+      });
     });
   </script>
 </head>
@@ -77,6 +107,8 @@
     <a href="About">About</a>
   </div>
   <div class="content">
+    <!-- Add a video element with the source of your video file -->
+    <video src="assets/Mv1.mp4" muted loop></video>
     <h1>Home</h1>
     <p>Some content for Home</p>
   </div>
