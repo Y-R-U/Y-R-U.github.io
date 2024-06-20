@@ -123,7 +123,7 @@ async function cmp(input) {
 
 function dcmp() {
  d=async()=>{
-  base64String=localStorage.pLst;
+  base64String=localStorage.pLst||{};
   if (base64String[0] === '{') return base64String; //Already decompressed!
   c=Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
   b=new Blob([c]);
