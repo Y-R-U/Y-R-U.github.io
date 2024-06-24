@@ -1,139 +1,165 @@
-
-<html><head><style>.bt{position:absolute;top:0px;left:15px;background-color:#FFF;}.bt2{left:60px;}.bt3{left:200px;}.bt4{left:280px;}</style><script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();eruda.position({x:-20,y:-20})</script></head>
+<html><head>
+ <style>
+  .bt{position:absolute;top:0px;left:15px;background-color:#FFF;}.bt2{left:60px;}.bt3{left:200px;}.bt4{left:280px;}
+  iframe{resize:vertical;min-height: 350px;height:50%;border:2px solid;width:100%;}button{width:98%;display:block;}
+  section {float:left;width:5%;transition:width 0.5s ease;height:100vh; }
+  section:focus-within, .lf{width:90%;}section:not(:focus-within):not(.lf){width:5%;}
+  .editor-container { height: calc(100% - 50px); } /* Adjusting for button height */
+ </style>
+ <script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();eruda.position({ x: -20, y: -20 })</script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
+</head>
 <body id="b"></body>
 <script>
+    b.onload = function() {
+        H = (O, S) => O.innerHTML += S;
+        function s() { ifr.srcdoc = t2.getValue() + "<script src='https://cdn.jsdelivr.net/npm/eruda'><\/script><script>eruda.init();<\/script><script>" + t0.getValue() + "<\/script><style>" + t1.getValue(); }
+        H(b, "<iframe id=ifr></iframe>");
+        for (i = 3; i--;) H(b, "<section id=s" + i + "><div class='editor-container' id=t" + i + "></div><button id=b" + i + ">" + ["View Full Screen", "View Source Code", "Download"][i] + "</button></section>");
+        H(b, "<div class='bt' id=lp>Load</div><div class='bt bt2' id=sp>Save</div><div class='bt bt3' id=ep>Export</div><input type=file class='bt bt4' id=ip accept='.json'>");
+        
+        e = document.querySelectorAll(".editor-container");
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' } });
+        window.MonacoEnvironment = { getWorkerUrl: () => 'data:text/javascript;base64,' + btoa("importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/base/worker/workerMain.js');") };
 
-b.onload =function(){
- H=(O,S)=>O.innerHTML+=S
- function s(){ifr.srcdoc=t2[v="value"]+"<script src='https://cdn.jsdelivr.net/npm/eruda'><\/script><script>eruda.init();<\/script><script>" + t0[v] + "<\/script><style>" + t1[v]; }
-H(b,"<iframe id=ifr></iframe><style>textarea,iframe{resize:vertical;min-height:350px;height:50%;border:2px solid}textarea,button{width:98%}iframe{width:100%}button{display:block}section{float:left;width:10%;transition:width 0.5s ease;}section:focus-within,.lf{width:80%};section:not(:focus-within):not(.lf){width:10%}")
- for(i=3;i--;)H(b,"<section id=s"+i+"><textarea id=t"+i+" placeholder="+["JS","CSS","HTML"][i]+"></textarea><button id=b"+i+">"+["View Full Screen","View Source Code","Download"][i]+"</button>")
-H(b,"<div class='bt' id=lp>Load</div><div class='bt bt2' id=sp>Save</div><div class='bt bt3' id=ep>Export</div><input type=file class='bt bt4' id=ip accept='.json'>")
-e=document.querySelectorAll("textarea");
- t=e[0];n=e[1];r=e[2];
- t.value=localStorage.a0;n.value=localStorage.a1;r.value=localStorage.a2;
- b.oninput=function(){s();};
- t.onchange=function(){localStorage.a0=this.value;};
- n.onchange=function(){localStorage.a1=this.value;};
- r.onchange=function(){localStorage.a2=this.value;};
- s();
- b0.onclick=function(){window.open("data:text/html","_blank").document.write(ifr.srcdoc);};
- b1.onclick=function(){window.open(URL.createObjectURL(new Blob([ifr.srcdoc],{type:"text/plain"})),"_blank");};
- b2.onclick=function(){window.location="data:application/octet-stream,"+ifr.srcdoc;};
- const st=document.querySelectorAll('section');
- document.querySelectorAll('section').forEach(s=>{s.addEventListener('focusin',function(){st.forEach(s=>s.classList.remove('lf'));this.classList.add('lf');});});
+        let editors = [];
+        require(['vs/editor/editor.main'], () => {
+            editors = [monaco.editor.create(e[0], { value: localStorage.a0 || '', language: 'javascript', automaticLayout: true }),
+                       monaco.editor.create(e[1], { value: localStorage.a1 || '', language: 'css', automaticLayout: true }),
+                       monaco.editor.create(e[2], { value: localStorage.a2 || '', language: 'html', automaticLayout: true })];
+            [t, n, r] = editors;
 
-  lp.onclick=function(){
-   dcmp().then(decompressed => {
-    const pLst = JSON.parse(decompressed || '{}');
-    let pNames=Object.keys(pLst).join(", ");
-    let loadProj=prompt(`Load Name [${pNames}]%#:`);
-    if(loadProj){
-      let [pName, version]=loadProj.split('%');
-      if(pLst[pName]){
-        let ver=parseInt(version)||0;
-        if(pLst[pName][ver]){
-          sp.innerHTML="Save ("+pName+")";
-          t.value=pLst[pName][ver].js;
-          n.value=pLst[pName][ver].css;
-          r.value=pLst[pName][ver].html;
-          s();
-        } else {
-          alert("Version not found.");
-        }
-      } else {
-        alert("Project not found.");
-      }
+            editors.forEach((editor, i) => {
+                editor.onDidChangeModelContent(() => {
+                    localStorage['a' + i] = editor.getValue();
+                    s();
+                });
+            });
+            s();
+        });
+
+        b0.onclick = () => window.open("data:text/html", "_blank").document.write(ifr.srcdoc);
+        b1.onclick = () => window.open(URL.createObjectURL(new Blob([ifr.srcdoc], { type: "text/plain" })), "_blank");
+        b2.onclick = () => window.location = "data:application/octet-stream," + ifr.srcdoc;
+
+        const st = document.querySelectorAll('section');
+        st.forEach(s => {
+            s.addEventListener('focusin', function() {
+                st.forEach(s => s.classList.remove('lf'));
+                this.classList.add('lf');
+                editors.forEach(editor => editor.layout()); // Update layout of all editors on section focus
+            });
+        });
+
+        lp.onclick = function() {
+            dcmp().then(decompressed => {
+                const pLst = JSON.parse(decompressed || '{}');
+                let pNames = Object.keys(pLst).join(", ");
+                let loadProj = prompt(`Load Name [${pNames}]%#:`);
+                if (loadProj) {
+                    let [pName, version] = loadProj.split('%');
+                    if (pLst[pName]) {
+                        let ver = parseInt(version) || 0;
+                        if (pLst[pName][ver]) {
+                            sp.innerHTML = "Save (" + pName + ")";
+                            t.setValue(pLst[pName][ver].js);
+                            n.setValue(pLst[pName][ver].css);
+                            r.setValue(pLst[pName][ver].html);
+                            s();
+                        } else {
+                            alert("Version not found.");
+                        }
+                    } else {
+                        alert("Project not found.");
+                    }
+                }
+            });
+        };
+
+        sp.onclick = function() {
+            dcmp().then(decompressed => {
+                let pLst = JSON.parse(decompressed || '{}');
+                let pNames = "<new>, " + Object.keys(pLst).join(", ");
+                let pName = prompt(`Save Name [${pNames}]%delete:`, sp.innerHTML?.split(" ")[1]?.replace(/[()]/g, ""));
+                if (pName) {
+                    if (pName.includes('%delete')) {
+                        let delProj = pName.split('%')[0];
+                        if (pLst[delProj]) {
+                            delete pLst[delProj];
+                            cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
+                            alert("Project deleted!");
+                        } else {
+                            alert("Project not found.");
+                        }
+                    } else {
+                        if (pName === "new") pName = prompt("Enter new project name:");
+                        if (pName) {
+                            sp.innerHTML = "Save (" + pName.split('%')[0] + ")";
+                            let projData = { js: t.getValue(), css: n.getValue(), html: r.getValue(), timestamp: Date.now() };
+                            if (!pLst[pName]) pLst[pName] = [];
+                            pLst[pName].unshift(projData);
+                            if (pLst[pName].length > 10) pLst[pName].pop();
+                            cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
+                            alert("Project saved!");
+                        }
+                    }
+                }
+            });
+        };
+
+        ep.onclick = function() {
+            const url = URL.createObjectURL(new Blob([localStorage.pLst], { type: 'application/json' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pLst.json'; // Set the desired filename here
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        ip.onchange = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contents = e.target.result;
+                    try {
+                        const importedProjList = contents; // const importedProjList = JSON.parse(contents);
+                        localStorage.pLst = contents;
+                        alert("Project list imported successfully!");
+                        location.reload(); // Reload the page to apply the imported project list
+                    } catch (err) {
+                        alert("Failed to import project list. Invalid JSON format.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
     }
-   });
-  };
-  
-  sp.onclick = function() {
-   dcmp().then(decompressed => {
-    let pLst = JSON.parse(decompressed || '{}');
-    let pNames = "<new>, " + Object.keys(pLst).join(", ");
-    let pName = prompt(`Save Name [${pNames}]%delete:`, sp.innerHTML?.split(" ")[1]?.replace(/[()]/g, ""));
-    if (pName) {
-      if (pName.includes('%delete')) {
-        let delProj = pName.split('%')[0];
-        if (pLst[delProj]) {
-          delete pLst[delProj];
-          cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
-          alert("Project deleted!");
-        } else {
-          alert("Project not found.");
-        }
-      } else {
-        if (pName === "new") pName = prompt("Enter new project name:");
-        if (pName) {
-          sp.innerHTML = "Save (" + pName.split('%')[0] + ")";
-          let projData = { js: t.value, css: n.value, html: r.value, timestamp: Date.now() };
-          if (!pLst[pName]) pLst[pName] = [];
-          pLst[pName].unshift(projData);
-          if (pLst[pName].length > 10) pLst[pName].pop();
-          cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
-          alert("Project saved!");
-        }
-      }
+
+    async function cmp(input) {
+        b = new Blob([input], { type: 'text/plain' });
+        r = b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
+        chunks = [];
+        while (true) { const { done, value } = await r.read(); if (done) break; chunks.push(value); }
+        c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
+        base64String = btoa(String.fromCharCode.apply(null, c));
+        localStorage.pLst = base64String;
+        console.log('BASE64 length: ' + base64String.length);
     }
-   });
- };
 
-  //ep.onclick=function(){window.location="data:application/octet-stream,"+localStorage.pLst}; // Does not handle #
- ep.onclick = function() {
-  const url = URL.createObjectURL(new Blob([localStorage.pLst], { type: 'application/json' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'pLst.json'; // Set the desired filename here
-  a.click();
-  URL.revokeObjectURL(url);
- };
-
- ip.onchange = function(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const contents = e.target.result;
-      try {
-        const importedProjList = contents; // const importedProjList = JSON.parse(contents);
-        localStorage.pLst=contents;
-        alert("Project list imported successfully!");
-        location.reload(); // Reload the page to apply the imported project list
-      } catch (err) {
-        alert("Failed to import project list. Invalid JSON format.");
-      }
-    };
-    reader.readAsText(file);
-  }
- };
-
-}
-
-async function cmp(input) {
- b=new Blob([input], {type: 'text/plain'});
- r=b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
- chunks=[];
- while (true){const {done,value}=await r.read();if(done)break;chunks.push(value);}
- c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
- base64String = btoa(String.fromCharCode.apply(null, c));
- localStorage.pLst=base64String;
- console.log('BASE64 length: '+base64String.length);
-}
-
-function dcmp() {
- d=async()=>{
-  base64String=localStorage.pLst||'{}';
-  if (base64String[0] === '{') return base64String; //Already decompressed!
-  c=Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
-  b=new Blob([c]);
-  ds=b.stream().pipeThrough(new DecompressionStream('gzip'));
-  dt=await new Response(ds).text();
-  console.log('decompress string length: '+dt.length);
-  return dt
- }
- return d()
-}
-
+    function dcmp() {
+        d = async () => {
+            base64String = localStorage.pLst || "{}";
+            if (base64String[0] === '{') return base64String; //Already decompressed!
+            c = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+            b = new Blob([c]);
+            ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
+            dt = await new Response(ds).text();
+            console.log('decompress string length: ' + dt.length);
+            return dt
+        }
+        return d()
+    }
 </script>
-</body></html>
+</body>
+</html>
