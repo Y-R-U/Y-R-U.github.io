@@ -1,10 +1,10 @@
 <html><head>
  <style>
   .bt{position:absolute;top:0px;left:15px;background-color:#FFF;}.bt2{left:60px;}.bt3{left:200px;}.bt4{left:280px;}
-  iframe{resize:vertical;min-height: 350px;height:50%;border:2px solid;width:100%;}button{width:98%;display:block;}
-  section {float:left;width:5%;transition:width 0.5s ease;height:100vh; }
+  iframe{resize:vertical;min-height:350px;height:50%;border:2px solid;width:100%;}button{width:98%;display:block;}
+  section{float:left;width:5%;transition:width 0.5s ease;height:100vh;}
   section:focus-within, .lf{width:90%;}section:not(:focus-within):not(.lf){width:5%;}
-  .editor-container { height: calc(100% - 50px); } /* Adjusting for button height */
+  .meditor{height:calc(100% - 50px);} /* Adjusting for button height */
  </style>
  <script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();eruda.position({ x: -20, y: -20 })</script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
@@ -13,12 +13,12 @@
 <script>
     b.onload = function() {
         H = (O, S) => O.innerHTML += S;
-        function s() { ifr.srcdoc = t2.getValue() + "<script src='https://cdn.jsdelivr.net/npm/eruda'><\/script><script>eruda.init();<\/script><script>" + t0.getValue() + "<\/script><style>" + t1.getValue(); }
+        function s() { ifr.srcdoc = localStorage.a0 + "<script src='https://cdn.jsdelivr.net/npm/eruda'><\/script><script>eruda.init();<\/script><script>" + localStorage.a1 + "<\/script><style>" + localStorage.a2 }
         H(b, "<iframe id=ifr></iframe>");
-        for (i = 3; i--;) H(b, "<section id=s" + i + "><div class='editor-container' id=t" + i + "></div><button id=b" + i + ">" + ["View Full Screen", "View Source Code", "Download"][i] + "</button></section>");
+        for (i = 3; i--;) H(b, "<section id=s" + i + "><div class='meditor' id=t" + i + "></div><button id=b" + i + ">" + ["View Full Screen", "View Source Code", "Download"][i] + "</button></section>");
         H(b, "<div class='bt' id=lp>Load</div><div class='bt bt2' id=sp>Save</div><div class='bt bt3' id=ep>Export</div><input type=file class='bt bt4' id=ip accept='.json'>");
         
-        e = document.querySelectorAll(".editor-container");
+        e = document.querySelectorAll(".meditor");
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' } });
         window.MonacoEnvironment = { getWorkerUrl: () => 'data:text/javascript;base64,' + btoa("importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/base/worker/workerMain.js');") };
 
@@ -31,7 +31,7 @@
 
             editors.forEach((editor, i) => {
                 editor.onDidChangeModelContent(() => {
-                    localStorage['a' + i] = editor.getValue();
+                    localStorage['a' + i] = editor.getValue()||'';
                     s();
                 });
             });
