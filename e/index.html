@@ -95,7 +95,7 @@
                         if (pName === "new") pName = prompt("Enter new project name:");
                         if (pName) {
                             sp.innerHTML = "Save (" + pName.split('%')[0] + ")";
-                            let projData = { js: t.getValue(), css: n.getValue(), html: r.getValue(), timestamp: Date.now() };
+                            let projData = { js: t?.getValue(), css: n?.getValue(), html: r?.getValue(), timestamp: Date.now() };
                             if (!pLst[pName]) pLst[pName] = [];
                             pLst[pName].unshift(projData);
                             if (pLst[pName].length > 10) pLst[pName].pop();
