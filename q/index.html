@@ -6,7 +6,8 @@
 <title>qTracker</title>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 <style>
-body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10px;font-size:14px}#goal-display a{cursor:pointer;color:blue;text-decoration:underline}#entry-list{position:fixed;top:50px;right:10px;font-size:12px}#main-view{margin:20px}#dialog-form{display:none}.ui-dialog-buttonset button.add-new{float:left}.ui-dialog-buttonset button.delete-entry{float:left}.ui-dialog-buttonset button.wipe-data{float:left}#import-file{display:none}#links{position:fixed;top:10px;left:50%;transform:translateX(-50%);font-size:14px}#links a{cursor:pointer;color:blue;text-decoration:underline;margin-left:10px}
+body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10px;font-size:14px}#goal-display a{cursor:pointer;color:blue;text-decoration:underline}#entry-list{position:fixed;top:50px;right:10px;font-size:12px}#main-view{margin:20px}#dialog-form{display:none}.ui-dialog-buttonset button.add-new{float:left}.ui-dialog-buttonset button.delete-entry{float:left}.ui-dialog-buttonset button.wipe-data{float:left}#import-file{display:none}#links{position:fixed;top:10px;left:10px;font-size:14px}#links a{cursor:pointer;color:blue;text-decoration:underline;margin-right:10px}#add-entry{display:none;margin-top:10px}
+@media (max-width: 768px) { .ui-dialog{top:20px !important} }
 </style>
 </head>
 <body>
@@ -17,7 +18,7 @@ body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10
 </div>
 <div id="goal-display"></div>
 <div id="entry-list"></div>
-<div id="main-view"><button id="add-entry" style="display:none;">Add Entry</button></div>
+<div id="main-view"><button id="add-entry">Add Entry</button></div>
 <div id="dialog-form" title="Add Goal / Add Entry">
 <form>
 <label for="name">Name</label><input type="text" id="name" class="text ui-widget-content ui-corner-all"><br>
