@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>qTracker</title>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<style>
+body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10px;font-size:14px}#goal-display a{cursor:pointer;color:blue;text-decoration:underline}#entry-list{position:fixed;top:50px;right:10px;font-size:12px}#main-view{margin:20px}#dialog-form{display:none}.ui-dialog-buttonset button.add-new{float:left}.ui-dialog-buttonset button.delete-entry{float:left}.ui-dialog-buttonset button.wipe-data{float:left}#import-file{display:none}#links{position:fixed;top:10px;left:50%;transform:translateX(-50%);font-size:14px}#links a{cursor:pointer;color:blue;text-decoration:underline;margin-left:10px}
+</style>
+</head>
+<body>
+<div id="links">
+<a id="export-data">Export</a>
+<a id="import-data">Import</a>
+<input type="file" id="import-file" accept=".json">
+</div>
+<div id="goal-display"></div>
+<div id="entry-list"></div>
+<div id="main-view"><button id="add-entry" style="display:none;">Add Entry</button></div>
+<div id="dialog-form" title="Add Goal / Add Entry">
+<form>
+<label for="name">Name</label><input type="text" id="name" class="text ui-widget-content ui-corner-all"><br>
+<label for="number">Number</label><input type="number" id="number" class="text ui-widget-content ui-corner-all"><br>
+<label for="date">Date</label><input type="text" id="date" class="text ui-widget-content ui-corner-all">
+</form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// **DECLARE
+var qtk=localStorage.qtk?JSON.parse(localStorage.qtk):null,editingIndex=null,editingGoal=false;
+// **END DECLARE
+// **FUNCTIONS
+function saveQtk(){localStorage.qtk=JSON.stringify(qtk)}
+function updateGoalDisplay(){
+if(qtk&&qtk.goal){$('#goal-display').html(`Goal: ${qtk.goal.name} (${qtk.goal.number}) by ${qtk.goal.date} <a onclick="openGoalForm(true)">edit</a>`);$('#add-entry').show();showEntries()}
+else{$('#goal-display').html('');$('#add-entry').hide()}
+}
+function showEntries(){
+if(qtk&&qtk.entries){let html='';qtk.entries.slice().reverse().forEach((e,i)=>{html+=`<div onclick="editEntry(${qtk.entries.length-1-i})">${e.name}(${e.number}):${e.date}</div>`});$('#entry-list').html(html)}
+else{$('#entry-list').html('')}
+}
+function openGoalForm(editing){
+editingGoal=editing;$('#dialog-form').dialog('option','title',editing?'Edit Goal':'Add Goal');
+$('.add-new').hide();$('.delete-entry').hide();$('.wipe-data').show();
+editingIndex=null;if(editing&&qtk&&qtk.goal){$('#name').val(qtk.goal.name);$('#number').val(qtk.goal.number);$('#date').val(qtk.goal.date)}else{$('#name').val('');$('#number').val('');$('#date').val('')}
+$('#dialog-form').dialog('open')}
+function openEntryForm(data){
+editingGoal=false;$('#dialog-form').dialog('option','title',data?'Edit Entry':'Add Entry');
+$('.add-new').show();$('.delete-entry').show();$('.wipe-data').hide();
+editingIndex=data?data.index:null;$('#name').val(data?data.name:'');$('#number').val(data?data.number:'');$('#date').val(data?data.date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}));$('#dialog-form').dialog('open')}
+function editEntry(index){let e=qtk.entries[index];openEntryForm({...e,index})}
+function deleteEntry(){
+if(confirm('Are you sure you want to delete this entry?')){
+qtk.entries.splice(editingIndex,1);saveQtk();updateGoalDisplay();$('#dialog-form').dialog('close')}}
+function exportData(){
+let dataStr=JSON.stringify(qtk);let dataBlob=new Blob([dataStr],{type:'application/json'});let url=URL.createObjectURL(dataBlob);let a=document.createElement('a');a.href=url;a.download='qtk_data.json';document.body.appendChild(a);a.click();document.body.removeChild(a)}
+function importData(event){
+let file=event.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=function(e){
+try{
+let data=JSON.parse(e.target.result);qtk=data;saveQtk();updateGoalDisplay();location.reload()}
+catch(error){alert('Invalid JSON file')}}
+reader.readAsText(file)}
+$(function(){
+$('#date').datepicker({dateFormat:'dd-M-yy'});$('#dialog-form').dialog({autoOpen:false,modal:true,buttons:[
+{class:'delete-entry',text:'Delete',click:deleteEntry},
+{class:'add-new',text:'Add New',click:function(){
+$('#date').val(new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}));editingIndex=null}},
+{class:'wipe-data',text:'Wipe Data',click:function(){
+if(confirm('Are you sure you want to wipe all data?')){qtk=null;localStorage.removeItem('qtk');updateGoalDisplay();location.reload()}}},
+{text:'Save',click:function(){
+let name=$('#name').val(),number=$('#number').val(),date=$('#date').val();
+if(editingGoal){
+qtk.goal={name,number,date}
+}else{
+if(editingIndex===null){
+if(!qtk){qtk={goal:{},entries:[]}}
+if(!qtk.goal.name){qtk.goal={name,number,date};updateGoalDisplay()}else{if(!qtk.entries)qtk.entries=[];qtk.entries.push({name,number,date})}
+}else{qtk.entries[editingIndex]={name,number,date}}
+}
+saveQtk();updateGoalDisplay();$(this).dialog('close')}}]})
+if(!qtk||!qtk.goal.name){openGoalForm(false)}else{updateGoalDisplay()}
+$('#add-entry').click(()=>{openEntryForm()})
+$('#export-data').click(exportData);$('#import-data').click(()=>$('#import-file').click());$('#import-file').change(importData)
+})
+// **END FUNCTIONS
+</script>
+</body>
+</html>
