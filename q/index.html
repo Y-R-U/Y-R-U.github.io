@@ -6,8 +6,7 @@
 <title>qTracker</title>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 <style>
-body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10px;font-size:14px}#goal-display a{cursor:pointer;color:blue;text-decoration:underline}#entry-list{position:fixed;top:50px;right:10px;font-size:12px}#main-view{margin:20px}#dialog-form{display:none}.ui-dialog-buttonset button.add-new{float:left}.ui-dialog-buttonset button.delete-entry{float:left}.ui-dialog-buttonset button.wipe-data{float:left}#import-file{display:none}#links{position:fixed;top:10px;left:10px;font-size:14px}#links a{cursor:pointer;color:blue;text-decoration:underline;margin-right:10px}#add-entry{display:none;margin-top:10px}
-@media (max-width: 768px) { .ui-dialog{top:20px !important} }
+body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10px;font-size:14px}#goal-display a{cursor:pointer;color:blue;text-decoration:underline}#entry-list{position:fixed;top:50px;right:10px;font-size:12px}#main-view{margin:20px}#dialog-form{display:none}.ui-dialog-buttonset button.add-new{float:left}.ui-dialog-buttonset button.delete-entry{float:left}.ui-dialog-buttonset button.wipe-data{float:left}#import-file{display:none}#links{position:fixed;top:10px;left:10px;font-size:14px}#links a{cursor:pointer;color:blue;text-decoration:underline;margin-right:10px}#add-entry{display:none;margin-top:10px}#progress-gauge,#progress-line-chart{margin-top:20px;width:100%;max-width:400px;max-height:300px} @media (max-width: 768px) { .ui-dialog{top:20px !important} }
 </style>
 </head>
 <body>
@@ -18,7 +17,11 @@ body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10
 </div>
 <div id="goal-display"></div>
 <div id="entry-list"></div>
-<div id="main-view"><button id="add-entry">Add Entry</button></div>
+<div id="main-view">
+<button id="add-entry">Add Entry</button>
+<canvas id="progress-gauge"></canvas>
+<canvas id="progress-line-chart"></canvas>
+</div>
 <div id="dialog-form" title="Add Goal / Add Entry">
 <form>
 <label for="name">Name</label><input type="text" id="name" class="text ui-widget-content ui-corner-all"><br>
@@ -36,7 +39,7 @@ var qtk=localStorage.qtk?JSON.parse(localStorage.qtk):null,editingIndex=null,edi
 // **FUNCTIONS
 function saveQtk(){localStorage.qtk=JSON.stringify(qtk)}
 function updateGoalDisplay(){
-if(qtk&&qtk.goal){$('#goal-display').html(`Goal: ${qtk.goal.name} (${qtk.goal.number}) by ${qtk.goal.date} <a onclick="openGoalForm(true)">edit</a>`);$('#add-entry').show();showEntries()}
+if(qtk&&qtk.goal){$('#goal-display').html(`Goal: ${qtk.goal.name} (${qtk.goal.number}) by ${qtk.goal.date} <a onclick="openGoalForm(true)">edit</a>`);$('#add-entry').show();showEntries();updateCharts()}
 else{$('#goal-display').html('');$('#add-entry').hide()}
 }
 function showEntries(){
@@ -64,6 +67,15 @@ try{
 let data=JSON.parse(e.target.result);qtk=data;saveQtk();updateGoalDisplay();location.reload()}
 catch(error){alert('Invalid JSON file')}}
 reader.readAsText(file)}
+// Chart.js functions
+function updateCharts(){
+if(!qtk||!qtk.goal||!qtk.entries)return;let totalProgress=qtk.entries.reduce((sum,entry)=>sum+parseFloat(entry.number),0);let goalNumber=parseFloat(qtk.goal.number);let progressPercentage=(totalProgress/goalNumber)*100;createGauge(progressPercentage);createLineChart()}
+function createGauge(progressPercentage){
+let ctx=document.getElementById('progress-gauge').getContext('2d');if(window.gaugeChart)window.gaugeChart.destroy();window.gaugeChart=new Chart(ctx,{type:'doughnut',data:{labels:['Progress','Remaining'],datasets:[{data:[progressPercentage,100-progressPercentage],backgroundColor:['#4caf50','#d32f2f'],borderWidth:1}]},options:{responsive:true,cutout:'70%',plugins:{tooltip:{enabled:false},doughnutlabel:{labels:[{text:`${Math.round(progressPercentage)}%`,font:{size:'20'}}]}}}})
+}
+function createLineChart(){
+let ctx=document.getElementById('progress-line-chart').getContext('2d');if(window.lineChart)window.lineChart.destroy();let dates=qtk.entries.map(entry=>entry.date);let numbers=qtk.entries.map(entry=>parseFloat(entry.number));let cumulativeNumbers=[];numbers.reduce((a,b,i)=>(cumulativeNumbers[i]=a+b,a+b),0);let avgRate=cumulativeNumbers[cumulativeNumbers.length-1]/cumulativeNumbers.length;let goalNumber=parseFloat(qtk.goal.number);let goalDate=new Date(qtk.goal.date);let currentDate=new Date();let projectedDates=[];let projectedProgress=[];for(let d=new Date(currentDate);d<=goalDate;d.setDate(d.getDate()+1)){projectedDates.push(new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}));projectedProgress.push(avgRate*(projectedDates.length-1))}window.lineChart=new Chart(ctx,{type:'line',data:{labels:dates.concat(projectedDates),datasets:[{label:'Actual Progress',data:cumulativeNumbers,borderColor:'#4caf50',fill:false},{label:'Projected Progress',data:cumulativeNumbers.concat(projectedProgress),borderColor:'#ff9800',fill:false,dash:[5,5]}]},options:{responsive:true,scales:{x:{display:true},y:{display:true}}}})
+}
 $(function(){
 $('#date').datepicker({dateFormat:'dd-M-yy'});$('#dialog-form').dialog({autoOpen:false,modal:true,buttons:[
 {class:'delete-entry',text:'Delete',click:deleteEntry},
