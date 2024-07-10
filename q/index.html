@@ -14,7 +14,7 @@ body{font-family:Arial,sans-serif}#goal-display{position:fixed;top:10px;right:10
 <div id="links">
 <a id="export-data">Export</a>
 <a id="import-data">Import</a>
-<input type="file" id="import-file" accept=".json">
+<input type="file" id="import-file" accept=".txt">
 </div>
 <div id="goal-display"></div>
 <div id="entry-list"></div>
@@ -57,7 +57,7 @@ function deleteEntry(){
 if(confirm('Are you sure you want to delete this entry?')){
 qtk.entries.splice(editingIndex,1);saveQtk();updateGoalDisplay();$('#dialog-form').dialog('close')}}
 function exportData(){
-let dataStr=JSON.stringify(qtk);let dataBlob=new Blob([dataStr],{type:'application/json'});let url=URL.createObjectURL(dataBlob);let a=document.createElement('a');a.href=url;a.download='qtk_data.json';document.body.appendChild(a);a.click();document.body.removeChild(a)}
+let dataStr=JSON.stringify(qtk);let dataBlob=new Blob([dataStr],{type:'text/plain'});let url=URL.createObjectURL(dataBlob);let a=document.createElement('a');a.href=url;a.download='qtk_data.txt';document.body.appendChild(a);a.click();document.body.removeChild(a)}
 function importData(event){
 let file=event.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=function(e){
 try{
