@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Image Editor</title>
+<style>
+canvas {border: 1px solid #ccc; display: block; margin: 10px auto;}
+#tools, #layers-panel {margin-bottom: 15px;}
+#layers-panel {border: 1px solid #000; padding: 10px; width: 200px;}
+#color-picker, #fill-checkbox {margin: 5px;}
+ul#layer-list {list-style-type: none; padding: 0;}
+ul#layer-list li {padding: 5px; background: #f0f0f0; margin: 5px 0; cursor: pointer; position: relative;}
+ul#layer-list li.selected {background-color: #d0e0ff;}
+ul#layer-list li button {position: absolute; right: 5px; top: 5px;}
+.tool-btn {margin: 5px;}
+.tool-btn.active {background-color: #d0e0ff;}
+.selection-box {border: 1px dashed black; background-color: rgba(0, 0, 0, 0.2); position: absolute; cursor: move;}
+</style>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+<div id="tools">
+  <button id="new-layer-btn">New Layer</button>
+  <button class="tool-btn active" id="select-btn">Select</button>
+  <button class="tool-btn" id="draw-btn">Draw</button>
+  <button class="tool-btn" id="line-btn">Line</button>
+  <button class="tool-btn" id="square-btn">Square</button>
+  <button class="tool-btn" id="rect-btn">Rectangle</button>
+  <button class="tool-btn" id="circle-btn">Circle</button>
+  <input type="color" id="color-picker" value="#000000">
+  <input type="checkbox" id="fill-checkbox"> Fill Shape
+</div>
+
+<div id="layers-panel">
+  <h3>Layers</h3>
+  <ul id="layer-list"></ul>
+</div>
+
+<canvas id="editor" width="800" height="600"></canvas>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function() {
+  let layers = [];
+  let currentLayer = null;
+  let tool = 'select'; // Default tool is "Select"
+  let isDrawing = false;
+  let isFill = false;
+  let color = $('#color-picker').val();
+  let canvas = $('#editor')[0];
+  let ctx = canvas.getContext('2d');
+  let startX, startY, selectedItem = null;
+  let freehandPath = [];
+  let isDragging = false;
+
+  $('#color-picker').on('input', function() {color = $(this).val();});
+  $('#fill-checkbox').on('change', function() {isFill = $(this).is(':checked');});
+
+  $('.tool-btn').click(function() {
+    tool = this.id.replace('-btn', '');
+    $('.tool-btn').removeClass('active');
+    $(this).addClass('active');
+    selectedItem = null;
+  });
+
+  $('#new-layer-btn').click(function() {
+    addLayer();
+  });
+
+  $('#editor').mousedown(function(e) {
+    if (currentLayer && tool !== 'select') {
+      isDrawing = true;
+      let pos = getMousePosition(e);
+      startX = pos.x;
+      startY = pos.y;
+      if (tool === 'draw') {
+        freehandPath = [{x: startX, y: startY}];
+        currentLayer.items.push({tool: 'draw', path: [...freehandPath], color: color});
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+      }
+    } else if (currentLayer && tool === 'select') {
+      let pos = getMousePosition(e);
+      selectItem(pos.x, pos.y);
+    }
+  });
+
+  $('#editor').mousemove(function(e) {
+    if (isDrawing && currentLayer) {
+      let pos = getMousePosition(e);
+      if (tool === 'draw') {
+        ctx.lineTo(pos.x, pos.y);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        freehandPath.push({x: pos.x, y: pos.y});
+        currentLayer.items[currentLayer.items.length - 1].path = [...freehandPath];
+      } else {
+        redrawCanvas();
+        drawShape(startX, startY, pos.x, pos.y);
+      }
+    }
+  });
+
+  $('#editor').mouseup(function(e) {
+    if (isDrawing && currentLayer && tool !== 'select') {
+      isDrawing = false;
+      let pos = getMousePosition(e);
+      if (tool === 'draw') {
+        freehandPath.push({x: pos.x, y: pos.y});
+      } else {
+        addShapeToLayer(startX, startY, pos.x, pos.y);
+      }
+      redrawCanvas();
+    }
+  });
+
+  $(document).on('paste', function(e) {
+    let items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (let index in items) {
+      let item = items[index];
+      if (item.kind === 'file') {
+        let blob = item.getAsFile();
+        let reader = new FileReader();
+        reader.onload = function(event) {
+          let img = new Image();
+          img.onload = function() {
+            addImageToLayer(img);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  });
+
+  function addShapeToLayer(x1, y1, x2, y2) {
+    let shape = {tool, x1, y1, x2, y2, color, isFill};
+    currentLayer.items.push({...shape});
+    redrawCanvas();
+  }
+
+  function addImageToLayer(image) {
+    let shape = {tool: 'image', image: image, x1: 0, y1: 0, x2: image.width, y2: image.height};
+    currentLayer.items.push({...shape});
+    redrawCanvas();
+  }
+
+  function drawShape(x1, y1, x2, y2, item = null) {
+    let toolToDraw = item ? item.tool : tool;
+    let itemColor = item ? item.color : color;
+    let itemFill = item ? item.isFill : isFill;
+    ctx.strokeStyle = itemColor;
+    ctx.fillStyle = itemColor;
+    ctx.beginPath();
+
+    if (toolToDraw === 'line') {
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    } else if (toolToDraw === 'square') {
+      let size = Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1));
+      if (itemFill) ctx.fillRect(x1, y1, size, size);
+      else ctx.strokeRect(x1, y1, size, size);
+    } else if (toolToDraw === 'rect') {
+      if (itemFill) ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+      else ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    } else if (toolToDraw === 'circle') {
+      let radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
+      if (itemFill) ctx.fill();
+      else ctx.stroke();
+    } else if (toolToDraw === 'image') {
+      ctx.drawImage(item.image, x1, y1, x2 - x1, y2 - y1);
+    } else if (toolToDraw === 'draw' && item) {
+      ctx.beginPath();
+      ctx.moveTo(item.path[0].x, item.path[0].y);
+      for (let point of item.path) {
+        ctx.lineTo(point.x, point.y);
+      }
+      ctx.strokeStyle = itemColor;
+      ctx.stroke();
+    }
+  }
+
+  function redrawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    layers.forEach(layer => {
+      layer.items.forEach(shape => {
+        drawShape(shape.x1, shape.y1, shape.x2, shape.y2, shape);
+      });
+    });
+    if (selectedItem) drawSelectionBox(selectedItem);
+  }
+
+  function selectItem(x, y) {
+    selectedItem = null;
+    let foundItem = false;
+    for (let i = layers.length - 1; i >= 0; i--) {
+      let layer = layers[i];
+      for (let j = layer.items.length - 1; j >= 0; j--) {
+        let item = layer.items[j];
+        if (isInsideItem(x, y, item)) {
+          selectedItem = item;
+          tool = 'select'; // Stay in select mode
+          $('#select-btn').addClass('active');
+          $('#color-picker').val(item.color);
+          $('#fill-checkbox').prop('checked', item.isFill);
+          foundItem = true;
+          setupResizableAndDraggable(item);
+          break;
+        }
+      }
+      if (foundItem) break;
+    }
+    redrawCanvas();
+  }
+
+  function setupResizableAndDraggable(item) {
+    const tempDiv = $('<div class="selection-box"></div>');
+    const width = item.x2 - item.x1;
+    const height = item.y2 - item.y1;
+    tempDiv.css({
+      position: 'absolute',
+      left: item.x1 + 'px',
+      top: item.y1 + 'px',
+      width: width + 'px',
+      height: height + 'px'
+    });
+    
+    $('body').append(tempDiv);
+
+    // Make the selection box resizable and draggable
+    tempDiv.resizable({
+      handles: 'n, e, s, w, ne, nw, se, sw',
+      resize: function(event, ui) {
+        const newWidth = ui.size.width;
+        const newHeight = ui.size.height;
+        item.x2 = item.x1 + newWidth;
+        item.y2 = item.y1 + newHeight;
+        redrawCanvas();
+      }
+    }).draggable({
+      drag: function(event, ui) {
+        const newX = ui.position.left;
+        const newY = ui.position.top;
+        item.x1 = newX;
+        item.y1 = newY;
+        item.x2 = newX + width;
+        item.y2 = newY + height;
+        redrawCanvas();
+      },
+      stop: function() {
+        $(this).remove();
+      }
+    });
+  }
+
+  function isInsideItem(x, y, item) {
+    if (item.tool === 'line') {
+      return Math.abs((y - item.y1) / (x - item.x1) - (item.y2 - item.y1) / (item.x2 - item.x1)) < 0.1;
+    } else if (item.tool === 'rect' || item.tool === 'square') {
+      return x >= item.x1 && x <= item.x2 && y >= item.y1 && y <= item.y2;
+    } else if (item.tool === 'circle') {
+      let radius = Math.sqrt(Math.pow(item.x2 - item.x1, 2) + Math.pow(item.y2 - item.y1, 2));
+      return Math.sqrt(Math.pow(x - item.x1, 2) + Math.pow(y - item.y1, 2)) <= radius;
+    } else if (item.tool === 'image') {
+      return x >= item.x1 && x <= item.x2 && y >= item.y1 && y <= item.y2;
+    } else if (item.tool === 'draw') {
+      return item.path.some(p => Math.abs(x - p.x) < 5 && Math.abs(y - p.y) < 5);
+    }
+    return false;
+  }
+
+  function drawSelectionBox(item) {
+    ctx.save();
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6]);
+    ctx.strokeRect(item.x1, item.y1, item.x2 - item.x1, item.y2 - item.y1);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(item.x1, item.y1, item.x2 - item.x1, item.y2 - item.y1);
+    ctx.restore();
+  }
+
+  $('#layer-list').sortable({
+    update: function(event, ui) {
+      let sortedIDs = $(this).sortable('toArray', {attribute: 'data-id'});
+      layers = sortedIDs.map(id => layers.find(layer => layer.id === parseInt(id)));
+      redrawCanvas();
+    }
+  });
+
+  function addLayer() {
+    let layer = {id: layers.length, items: []};
+    layers.push(layer);
+    currentLayer = layer;
+    updateLayerList();
+    redrawCanvas();
+  }
+
+  function updateLayerList() {
+    let list = $('#layer-list');
+    list.empty();
+    layers.forEach(layer => {
+      let li = $('<li>').attr('data-id', layer.id).text('Layer ' + (layer.id + 1)).click(() => selectLayer(layer));
+      let deleteBtn = $('<button>').text('x').click(function(e) {
+        e.stopPropagation();
+        deleteLayer(layer);
+      });
+      li.append(deleteBtn);
+      if (layer === currentLayer) li.addClass('selected');
+      list.append(li);
+    });
+  }
+
+  function selectLayer(layer) {
+    currentLayer = layer;
+    updateLayerList();
+  }
+
+  function deleteLayer(layer) {
+    if (confirm('Delete this layer?')) {
+      layers = layers.filter(l => l !== layer);
+      currentLayer = layers.length ? layers[layers.length - 1] : null;
+      updateLayerList();
+      redrawCanvas();
+    }
+  }
+
+  function getMousePosition(e) {
+    let rect = canvas.getBoundingClientRect();
+    return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+  }
+
+  addLayer();
+});
+</script>
+</body>
+</html>
