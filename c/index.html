@@ -24,7 +24,7 @@
 
         const params = new URLSearchParams(window.location.search);
         const content = params.get("code");
-        if (content) { document.getElementById("t2").textContent = decodeURIComponent(content); }
+        if (content) { t2.setValue = decodeURIComponent(content); }
 
         let editors = [];
         require(['vs/editor/editor.main'], () => {
