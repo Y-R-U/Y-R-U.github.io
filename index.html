@@ -106,11 +106,22 @@
           var other = document.querySelector(".other");
 
 
-          if (href !='Home') {
+          if (href !='Projects') {
             content.className = "content hide";
             other.className = "other";
-            other.innerHTML = "<h1>" + href + "</h1><p>Some content for " + href + " 2</p>";
-          }else {
+            other.innerHTML = "<h1>" + href + "</h1><p><a href='/m/'>Mobile HTML / JS editor</a> - Similar to jsfiddle/jsbin etc.</p>"
+                                            +      "<p><a href='/m/'>Desktop HTML / JS editor</a>  - Similar to jsfiddle/jsbin etc.</p>"
+                                            +      "<p><a href='/s/'>AI created</a> - Snake Game.</p>";
+          else if (href =='Experiments') {
+
+            content.className = "content hide";
+            other.className = "other";
+            other.innerHTML = "<h1>" + href + "</h1><p><a href='/d/'>Paste and Draw</a> - fast edit an image on a mac: mostly AI created</p>";
+          else if (href =='About') {
+            content.className = "content hide";
+            other.className = "other";
+            other.innerHTML = "<h1>" + href + "</h1><p>Home Page Video best viewed on Portrait Mobile, or re-size browser to approx 16:9 scale</p>";
+          else if (href =='Home') {
             content.className = "content";
             other.className = "other hide";
             //video.muted=false;
