@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Snake Game</title>
+<style>
+  body {
+    background: #333;
+    color: #eee;
+    font-family: sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  #game-container {
+    margin: 20px auto;
+    display: block;
+    position: relative;
+  }
+
+  #score {
+    margin: 10px;
+    font-size: 20px;
+  }
+
+  #mode-buttons {
+    margin: 10px;
+  }
+
+  button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background: #555;
+    color: #eee;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background: #666;
+  }
+</style>
+</head>
+<body>
+<h1>Snake Game</h1>
+<div id="score">Score: 0</div>
+<div id="mode-buttons">
+  <button id="singleBtn">SINGLE</button>
+  <button id="enemyAIBtn">ENEMYAI</button>
+</div>
+<canvas id="game" width="600" height="400"></canvas>
+
+<script>
+(() => {
+  // ==========================
+  // CONFIGURABLE CONSTANTS
+  // ==========================
+  const CELL_SIZE = 20;          // Size of each cell in the grid
+  const INITIAL_SPEED = 150;     // Update speed in ms (lower is faster)
+  const FOOD_COUNT = 3;          // How many foods on the board at once
+  const RESPAWN_TIME = 5000;     // Respawn time in ms for crashed snakes in ENEMYAI mode
+  const SCORE_PER_FOOD = 10;     // Points gained per food eaten
+  const CRASH_PENALTY = 50;      // Points lost when a snake crashes
+  const SPAWN_COUNTDOWN = 3;     // 3-second countdown on spawn/respawn
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const scoreDisplay = document.getElementById('score');
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const COLS = Math.floor(width / CELL_SIZE);
+  const ROWS = Math.floor(height / CELL_SIZE);
+
+  let gameInterval = null;
+  let mode = null; // 'SINGLE' or 'ENEMYAI'
+
+  // Directions
+  const DIRECTIONS = {
+    ArrowUp: {x:0, y:-1},
+    ArrowDown: {x:0, y:1},
+    ArrowLeft: {x:-1, y:0},
+    ArrowRight: {x:1, y:0}
+  };
+
+  class Snake {
+    constructor(color, x, y, length=5, humanControlled=true) {
+      this.color = color;
+      this.segments = [];
+      for (let i = 0; i < length; i++) {
+        this.segments.push({x: x - i, y: y});
+      }
+      this.direction = {x:1, y:0}; // start moving right
+      this.alive = true;
+      this.humanControlled = humanControlled;
+      this.respawning = false;
+      this.spawnCountdown = SPAWN_COUNTDOWN; // on creation or respawn
+      this.lastCountdownTime = performance.now();
+    }
+
+    changeDirection(dir) {
+      // Prevent reversing direction directly
+      if ((dir.x === -this.direction.x && dir.x !== 0) || (dir.y === -this.direction.y && dir.y !== 0)) {
+        return;
+      }
+      this.direction = dir;
+    }
+
+    update() {
+      if (!this.alive || this.respawning) return;
+      // If spawn countdown is not finished, do not move yet
+      if (this.spawnCountdown > 0) return;
+
+      const head = this.getHead();
+      const newHead = {x: head.x + this.direction.x, y: head.y + this.direction.y};
+      this.segments.unshift(newHead);
+      this.segments.pop();
+    }
+
+    grow() {
+      // Add a segment at the tail
+      const tail = this.segments[this.segments.length - 1];
+      this.segments.push({x: tail.x, y: tail.y});
+    }
+
+    getHead() {
+      return this.segments[0];
+    }
+
+    checkCollisionWithWalls() {
+      const head = this.getHead();
+      if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+        return true;
+      }
+      return false;
+    }
+
+    checkCollisionWithSelf() {
+      const head = this.getHead();
+      for (let i = 1; i < this.segments.length; i++) {
+        if (this.segments[i].x === head.x && this.segments[i].y === head.y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    draw(ctx) {
+      if (!this.alive && !this.respawning) return; 
+      ctx.fillStyle = this.color;
+      for (let seg of this.segments) {
+        drawCell(seg.x, seg.y, ctx, this.color);
+      }
+
+      // If countdown is active, draw it on the head
+      if (this.spawnCountdown > 0) {
+        const head = this.getHead();
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Arial';
+        const text = this.spawnCountdown.toString();
+        const textWidth = ctx.measureText(text).width;
+        ctx.fillText(text, head.x * CELL_SIZE + CELL_SIZE/2 - textWidth/2, head.y * CELL_SIZE + CELL_SIZE/2 + 6);
+      }
+    }
+
+    updateSpawnCountdown() {
+      if (this.spawnCountdown <= 0) return;
+      let now = performance.now();
+      // Decrease countdown every second
+      if (now - this.lastCountdownTime >= 1000) {
+        this.spawnCountdown--;
+        this.lastCountdownTime = now;
+      }
+    }
+  }
+
+  class EnemySnake extends Snake {
+    constructor(color, x, y, length=5) {
+      super(color, x, y, length, false);
+      this.initialReactionDelay = Math.random() * 2000 + 500; // random initial delay
+      this.reactionTime = Math.random() * 500; // random reaction time for direction change
+      this.lastDecisionTime = performance.now();
+    }
+
+    aiUpdate(foods) {
+      if (!this.alive || this.respawning) return;
+      if (this.spawnCountdown > 0) return; // don't move or decide direction during countdown
+
+      const now = performance.now();
+      // Only decide direction after initial delay and reaction time
+      if (now - this.lastDecisionTime < this.initialReactionDelay + this.reactionTime) {
+        return;
+      }
+
+      this.lastDecisionTime = now;
+      // Simple AI: move towards the closest food
+      let head = this.getHead();
+      let closestFood = null;
+      let closestDist = Infinity;
+      for (let f of foods) {
+        const dist = (f.x - head.x)**2 + (f.y - head.y)**2;
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestFood = f;
+        }
+      }
+
+      if (closestFood) {
+        // Try to move closer to food
+        let dx = closestFood.x - head.x;
+        let dy = closestFood.y - head.y;
+
+        let dirX = 0;
+        let dirY = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+          dirX = dx > 0 ? 1 : -1;
+        } else {
+          dirY = dy > 0 ? 1 : -1;
+        }
+
+        // Attempt to avoid immediate self-collision by checking the next cell
+        // Random reaction might fail sometimes
+        const testHead = {x: head.x + dirX, y: head.y + dirY};
+        if (this.wouldCollideWithSelf(testHead) || this.wouldCollideWithWall(testHead)) {
+          // Try another direction randomly
+          const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+          let chosen = this.direction;
+          for (let d of dirs) {
+            const altHead = {x: head.x + d.x, y: head.y + d.y};
+            if (!this.wouldCollideWithSelf(altHead) && !this.wouldCollideWithWall(altHead)) {
+              chosen = d;
+              break;
+            }
+          }
+          this.direction = chosen;
+        } else {
+          this.direction = {x: dirX, y: dirY};
+        }
+      }
+    }
+
+    wouldCollideWithSelf(pos) {
+      for (let i = 0; i < this.segments.length; i++) {
+        if (this.segments[i].x === pos.x && this.segments[i].y === pos.y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    wouldCollideWithWall(pos) {
+      return (pos.x < 0 || pos.x >= COLS || pos.y < 0 || pos.y >= ROWS);
+    }
+  }
+
+  class Food {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+    }
+
+    draw(ctx) {
+      drawCell(this.x, this.y, ctx, 'red');
+    }
+  }
+
+  // Draw a cell
+  function drawCell(x, y, ctx, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+  }
+
+  // Game variables
+  let playerSnake;
+  let enemySnake;
+  let foods = [];
+  let playerScore = 0;
+  let enemyScore = 0;
+  let gameOver = false;
+
+  // Event listeners
+  document.addEventListener('keydown', (e) => {
+    if (!playerSnake || !playerSnake.alive || !playerSnake.humanControlled) return;
+    if (DIRECTIONS[e.key]) {
+      playerSnake.changeDirection(DIRECTIONS[e.key]);
+    }
+  });
+
+  document.getElementById('singleBtn').addEventListener('click', () => {
+    startGame('SINGLE');
+  });
+  document.getElementById('enemyAIBtn').addEventListener('click', () => {
+    startGame('ENEMYAI');
+  });
+
+  function startGame(selectedMode) {
+    mode = selectedMode;
+    playerScore = 0;
+    enemyScore = 0;
+    updateScoreDisplay();
+    gameOver = false;
+
+    // Initialize snakes and foods
+    playerSnake = new Snake('lime', Math.floor(COLS/4), Math.floor(ROWS/2), 5, true);
+    if (mode === 'ENEMYAI') {
+      enemySnake = new EnemySnake('yellow', Math.floor(3*COLS/4), Math.floor(ROWS/2), 5);
+    } else {
+      enemySnake = null;
+    }
+
+    // Generate foods
+    foods = [];
+    for (let i = 0; i < FOOD_COUNT; i++) {
+      foods.push(generateFood());
+    }
+
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(gameLoop, INITIAL_SPEED);
+  }
+
+  function gameLoop() {
+    update();
+    draw();
+  }
+
+  function update() {
+    if (gameOver && mode === 'SINGLE') return;
+
+    // Update spawn countdowns if any
+    if (playerSnake && (playerSnake.alive || playerSnake.respawning)) {
+      playerSnake.updateSpawnCountdown();
+    }
+    if (enemySnake && (enemySnake.alive || enemySnake.respawning)) {
+      enemySnake.updateSpawnCountdown();
+    }
+
+    if (enemySnake && enemySnake.alive && enemySnake.spawnCountdown <= 0) {
+      enemySnake.aiUpdate(foods);
+    }
+
+    if (playerSnake && playerSnake.alive) playerSnake.update();
+    if (enemySnake && enemySnake.alive) enemySnake.update();
+
+    // Check collisions for player snake
+    if (playerSnake && playerSnake.alive && playerSnake.spawnCountdown <= 0) {
+      if (playerSnake.checkCollisionWithWalls() || playerSnake.checkCollisionWithSelf()) {
+        handleCrash(playerSnake);
+      }
+    }
+
+    // Check collisions for enemy snake
+    if (enemySnake && enemySnake.alive && enemySnake.spawnCountdown <= 0) {
+      if (enemySnake.checkCollisionWithWalls() || enemySnake.checkCollisionWithSelf()) {
+        handleCrash(enemySnake);
+      }
+    }
+
+    // Check if snakes eat food
+    handleFoodEating(playerSnake);
+    if (enemySnake) handleFoodEating(enemySnake);
+
+    // In SINGLE mode, if player is dead => game over
+    if (mode === 'SINGLE' && playerSnake && !playerSnake.alive) {
+      gameOver = true;
+    }
+  }
+
+  function handleCrash(snake) {
+    if (mode === 'SINGLE') {
+      // Game over directly
+      snake.alive = false;
+      return;
+    } else {
+      // ENEMYAI mode: apply penalty, respawn after delay
+      if (snake.humanControlled) {
+        playerScore -= CRASH_PENALTY;
+      } else {
+        enemyScore -= CRASH_PENALTY;
+      }
+      updateScoreDisplay();
+      snake.alive = false;
+      snake.respawning = true;
+      setTimeout(() => {
+        respawnSnake(snake);
+      }, RESPAWN_TIME);
+    }
+  }
+
+  function respawnSnake(snake) {
+    snake.respawning = false;
+    snake.segments = [];
+    if (snake.humanControlled) {
+      let x = Math.floor(COLS/4);
+      let y = Math.floor(ROWS/2);
+      for (let i = 0; i < 5; i++) {
+        snake.segments.push({x: x - i, y: y});
+      }
+      snake.direction = {x:1,y:0};
+    } else {
+      let x = Math.floor(3*COLS/4);
+      let y = Math.floor(ROWS/2);
+      for (let i = 0; i < 5; i++) {
+        snake.segments.push({x: x - i, y: y});
+      }
+      snake.direction = {x:1,y:0};
+      snake.initialReactionDelay = Math.random() * 2000 + 500;
+      snake.reactionTime = Math.random() * 500;
+      snake.lastDecisionTime = performance.now();
+    }
+    snake.alive = true;
+    snake.spawnCountdown = SPAWN_COUNTDOWN;
+    snake.lastCountdownTime = performance.now();
+  }
+
+  function handleFoodEating(snake) {
+    if (!snake || !snake.alive || snake.spawnCountdown > 0) return;
+    const head = snake.getHead();
+    for (let i = 0; i < foods.length; i++) {
+      if (foods[i].x === head.x && foods[i].y === head.y) {
+        // Eat food
+        snake.grow();
+        foods[i] = generateFood();
+
+        // Increase score accordingly
+        if (snake.humanControlled) {
+          playerScore += SCORE_PER_FOOD;
+        } else {
+          enemyScore += SCORE_PER_FOOD;
+        }
+        updateScoreDisplay();
+      }
+    }
+  }
+
+  function generateFood() {
+    let x, y;
+    let occupied = true;
+    while (occupied) {
+      x = Math.floor(Math.random() * COLS);
+      y = Math.floor(Math.random() * ROWS);
+      occupied = isCellOccupied(x,y);
+    }
+    return new Food(x, y);
+  }
+
+  function isCellOccupied(x, y) {
+    // Check player snake
+    if (playerSnake && playerSnake.alive) {
+      for (let seg of playerSnake.segments) {
+        if (seg.x === x && seg.y === y) return true;
+      }
+    }
+    // Check enemy snake
+    if (enemySnake && enemySnake.alive) {
+      for (let seg of enemySnake.segments) {
+        if (seg.x === x && seg.y === y) return true;
+      }
+    }
+    return false;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw background grid (optional)
+    drawGrid();
+
+    // Draw foods
+    for (let f of foods) {
+      f.draw(ctx);
+    }
+
+    // Draw snakes
+    if (playerSnake) playerSnake.draw(ctx);
+    if (enemySnake) enemySnake.draw(ctx);
+
+    // If gameOver and SINGLE mode, show message
+    if (gameOver && mode === 'SINGLE') {
+      ctx.fillStyle = 'white';
+      ctx.font = '30px Arial';
+      ctx.fillText('GAME OVER', width/2 - 80, height/2);
+    }
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = '#444';
+    for (let i = 0; i <= COLS; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i*CELL_SIZE, 0);
+      ctx.lineTo(i*CELL_SIZE, height);
+      ctx.stroke();
+    }
+    for (let j = 0; j <= ROWS; j++) {
+      ctx.beginPath();
+      ctx.moveTo(0, j*CELL_SIZE);
+      ctx.lineTo(width, j*CELL_SIZE);
+      ctx.stroke();
+    }
+  }
+
+  function updateScoreDisplay() {
+    if (mode === 'SINGLE') {
+      scoreDisplay.textContent = `Score: ${playerScore}`;
+    } else {
+      // Two scores in ENEMYAI mode
+      scoreDisplay.textContent = `Player: ${playerScore} | Enemy: ${enemyScore}`;
+    }
+  }
+})();
+</script>
+</body>
+</html>
