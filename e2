@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Compact Editor</title>
+<style>
+  html, body {margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; box-sizing:border-box;}
+  #topBox, #lowerBox {width:100%; position:relative; border:1px solid #ccc;}
+  #topBox {height:50%;}
+  #lowerBox {height:50%;}
+  .topMenu, .lowerMenu {position:absolute; top:0; left:0; right:0; height:30px; line-height:30px; background:#eee; border-bottom:1px solid #ccc; padding:0 5px; box-sizing:border-box;}
+  .topMenu button, .lowerMenu button {margin-right:5px; border:none; background:none; cursor:pointer; font-size:14px;}
+  .active {color:#aaf;}
+  .editors textarea {width:100%; height:100%; box-sizing:border-box; font-family:monospace; font-size:14px; resize:none; padding:5px; border:0;}
+</style>
+</head>
+<body>
+<div id="topBox">
+  <div class="topMenu">
+    <button id="btnL">LOAD</button>
+    <button id="btnS">SAVE</button>
+    <button id="btnE">EXPORT</button>
+    <button id="btnI">IMPORT</button>
+    <span id="restoreSpan" style="float:right; display:none;">
+      <button id="btnRestore">50</button>
+    </span>
+  </div>
+  <iframe id="preview" style="position:absolute; top:30px; bottom:0; left:0; right:0; border:0;"></iframe>
+</div>
+<div id="lowerBox">
+  <div class="lowerMenu">
+    <button id="btnHTML" class="active">HTML</button>
+    <button id="btnJS">JS</button>
+    <button id="btnCSS">CSS</button>
+    <button id="btn100">100</button>
+    <button id="btn70">70</button>
+    <button id="btn50" class="active">50</button>
+    <button id="btn30">30</button>
+    <button id="btn00">00</button>
+  </div>
+  <div class="editors" style="position:absolute; top:30px; bottom:0; left:0; right:0;">
+    <textarea id="iHTML"></textarea>
+    <textarea id="iJS" style="display:none;"></textarea>
+    <textarea id="iCSS" style="display:none;"></textarea>
+  </div>
+</div>
+<script>
+var htmlCode = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'>\n<style>body{font-family:sans-serif;}</style>\n</head>\n<body>\n<h1>Hello</h1>\n<script>console.log('Hello');</"+"script>\n</body>\n</html>";
+var jsCode = "";
+var cssCode = "";
+var activeTab = "HTML";
+function updatePreview(){
+  var doc = preview.contentDocument;
+  doc.open(); doc.write(htmlCode); doc.close();
+}
+iHTML.value = htmlCode;
+iJS.value = jsCode;
+iCSS.value = cssCode;
+updatePreview();
+btnL.onclick = function(){ alert("LOAD"); };
+btnS.onclick = function(){ alert("SAVE"); };
+btnE.onclick = function(){ alert("EXPORT"); };
+btnI.onclick = function(){ alert("IMPORT"); };
+btnRestore.onclick = function(){ setLayout("50"); };
+btnHTML.onclick = function(){
+  activeTab = "HTML";
+  iHTML.style.display = "block"; iJS.style.display = "none"; iCSS.style.display = "none";
+  btnHTML.classList.add("active"); btnJS.classList.remove("active"); btnCSS.classList.remove("active");
+};
+btnJS.onclick = function(){
+  activeTab = "JS";
+  iHTML.style.display = "none"; iJS.style.display = "block"; iCSS.style.display = "none";
+  btnJS.classList.add("active"); btnHTML.classList.remove("active"); btnCSS.classList.remove("active");
+};
+btnCSS.onclick = function(){
+  activeTab = "CSS";
+  iHTML.style.display = "none"; iJS.style.display = "none"; iCSS.style.display = "block";
+  btnCSS.classList.add("active"); btnHTML.classList.remove("active"); btnJS.classList.remove("active");
+};
+function setLayout(percent){
+  if(percent==="00"){ lowerBox.style.height = "0"; topBox.style.height = "100%"; restoreSpan.style.display = "inline";}
+  else {            lowerBox.style.height = percent+"%"; topBox.style.height = (100 - parseInt(percent,10))+"%"; restoreSpan.style.display = "none";}
+  [btn100, btn70, btn50, btn30, btn00].forEach(function(btn){ btn.classList.remove("active"); });
+  if(percent==="100") btn100.classList.add("active");
+  else if(percent==="70") btn70.classList.add("active");
+  else if(percent==="50") btn50.classList.add("active");
+  else if(percent==="30") btn30.classList.add("active");
+  else if(percent==="00") btn00.classList.add("active");
+}
+btn100.onclick = function(){ setLayout("100"); };
+btn70.onclick = function(){ setLayout("70"); };
+btn50.onclick = function(){ setLayout("50"); };
+btn30.onclick = function(){ setLayout("30"); };
+btn00.onclick = function(){ setLayout("00"); };
+
+iHTML.oninput = function(){
+  htmlCode = this.value;
+  var s =htmlCode.match(/<style>([\s\S]*?)<\/style>/i);   if(s){cssCode=s[1];iCSS.value=cssCode;}
+  var sc=htmlCode.match(/<script>([\s\S]*?)<\/script>/i); if(sc){jsCode=sc[1];iJS.value=jsCode;}
+  updatePreview();
+};
+iJS.oninput = function(){
+  jsCode = this.value;
+  if(/<script>[\s\S]*?<\/script>/i.test(htmlCode))htmlCode=htmlCode.replace(/<script>[\s\S]*?<\/script>/i,`<script>${jsCode}<`+'/script>');
+  else htmlCode += `<script>${jsCode}`;
+  iHTML.value = htmlCode;
+  updatePreview();
+};
+iCSS.oninput = function(){
+  cssCode = this.value;
+  if(/<style>[\s\S]*?<\/style>/i.test(htmlCode))htmlCode=htmlCode.replace(/<style>[\s\S]*?<\/style>/i,`<style>${cssCode}<`+'/style>');
+  else htmlCode = `<style>${cssCode}\n` + htmlCode;
+  iHTML.value = htmlCode;
+  updatePreview();
+};
+
+</script>
+</body>
+</html>
