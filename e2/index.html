@@ -24,10 +24,14 @@
 </div>
 <div id="lowerBox">
   <div class="lowerMenu">
-    <button id="btnHTML" class="active">HTML</button> <button id="btnJS">JS</button> <button id="btnCSS">CSS</button><button id="btn100">100</button><button id="btn90">90</button><button id="btn80">80</button><button id="btn70">70</button><button id="btn50" class="active">50</button><button id="btn30">30</button><button id="btn00">00</button>
+    <button id="btnHTML" class="active">HTML</button> <button id="btnJS">JS</button> <button id="btnCSS">CSS</button><button id="btn100">100</button><button id="btn90">90</button><button id="btn80">80</button><button id="btn70">70</button><button id="btn50" class="active">50</button><button id="btn30">30</button><button id="btn00">00</button><button id="btnConsole">Console</button>
   </div>
   <div class="editors" style="position:absolute; top:30px; bottom:0; left:0; right:0;">
     <textarea id="iHTML"></textarea><textarea id="iJS" style="display:none;"></textarea><textarea id="iCSS" style="display:none;"></textarea>
+    <div id="consoleDiv" style="display:none; position:absolute; top:0; bottom:0; left:0; right:0; padding:5px; box-sizing:border-box;">
+      <textarea id="oConsole" style="width:100%;height:80%;resize:none;" readonly></textarea>
+      <div style="display:flex; margin-top:5px;"><input id="consoleInput" type="text" style="flex:1;" /><button id="btnRun">RUN</button></div>
+    </div>
   </div>
 </div>
 <script>
@@ -49,20 +53,54 @@ btnS.onclick = function(){ alert("SAVE"); };
 btnE.onclick = function(){ alert("EXPORT"); };
 btnI.onclick = function(){ alert("IMPORT"); };
 btnRestore.onclick = function(){ setLayout("50"); };
+btnConsole.onclick = function(){
+  iHTML.style.display = iJS.style.display = iCSS.style.display = "none";
+  consoleDiv.style.display = "block";btnHTML.classList.remove("active");btnJS.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.add("active");
+};
+btnRun.onclick = function(){
+  var cmd = consoleInput.value; oConsole.value += "> " + cmd + "\n";
+  try { var result = eval(cmd); if(result !== undefined) oConsole.value += result + "\n"; } catch(e) { oConsole.value += "Error: " + e.message + "\n"; }
+  oConsole.scrollTop = oConsole.scrollHeight; consoleInput.value = "";
+};
+
+var iframeConsole = preview.contentWindow.console;
+var oldILog = iframeConsole.log, oldIError = iframeConsole.error, oldIWarn = iframeConsole.warn;
+iframeConsole.log = function(){
+  oldILog.apply(iframeConsole, arguments);
+  oConsole.value += Array.from(arguments).join(" ") + "\n";
+};
+iframeConsole.error = function(){
+  oldIError.apply(iframeConsole, arguments);
+  oConsole.value += "Error: " + Array.from(arguments).join(" ") + "\n";
+};
+iframeConsole.warn = function(){
+  oldIWarn.apply(iframeConsole, arguments);
+  oConsole.value += "Warning: " + Array.from(arguments).join(" ") + "\n";
+};
+preview.onload = function(){
+  preview.contentWindow.onerror = function(message, source, lineno, colno, error) {
+    oConsole.value += "Iframe Error: " + message + " (" + source + ":" + lineno + ")\n";
+    oConsole.scrollTop = oConsole.scrollHeight;
+    return false;
+  };
+};
+
+  
+  
 btnHTML.onclick = function(){
   activeTab = "HTML";
-  iHTML.style.display = "block"; iJS.style.display = "none"; iCSS.style.display = "none";
-  btnHTML.classList.add("active"); btnJS.classList.remove("active"); btnCSS.classList.remove("active");
+  iHTML.style.display="block";iJS.style.display="none";iCSS.style.display="none";consoleDiv.style.display = "none";
+  btnHTML.classList.add("active"); btnJS.classList.remove("active"); btnCSS.classList.remove("active");btnConsole.classList.remove("active");
 };
 btnJS.onclick = function(){
   activeTab = "JS";
-  iHTML.style.display = "none"; iJS.style.display = "block"; iCSS.style.display = "none";
-  btnJS.classList.add("active"); btnHTML.classList.remove("active"); btnCSS.classList.remove("active");
+  iHTML.style.display="none";iJS.style.display="block";iCSS.style.display="none";consoleDiv.style.display = "none";
+  btnJS.classList.add("active");btnHTML.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.remove("active");
 };
 btnCSS.onclick = function(){
   activeTab = "CSS";
-  iHTML.style.display = "none"; iJS.style.display = "none"; iCSS.style.display = "block";
-  btnCSS.classList.add("active"); btnHTML.classList.remove("active"); btnJS.classList.remove("active");
+  iHTML.style.display="none";iJS.style.display="none";iCSS.style.display="block";consoleDiv.style.display = "none";
+  btnCSS.classList.add("active");btnHTML.classList.remove("active");btnJS.classList.remove("active");btnConsole.classList.remove("active");
 };
 function setLayout(percent){
   if(percent==="00"){ lowerBox.style.height = "0"; topBox.style.height = "100%"; restoreSpan.style.display = "inline";}
