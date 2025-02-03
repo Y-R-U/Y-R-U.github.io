@@ -33,6 +33,8 @@
     <button id="btnJS">JS</button>
     <button id="btnCSS">CSS</button>
     <button id="btn100">100</button>
+    <button id="btn90">90</button>
+    <button id="btn80">80</button>
     <button id="btn70">70</button>
     <button id="btn50" class="active">50</button>
     <button id="btn30">30</button>
@@ -80,18 +82,15 @@ btnCSS.onclick = function(){
 function setLayout(percent){
   if(percent==="00"){ lowerBox.style.height = "0"; topBox.style.height = "100%"; restoreSpan.style.display = "inline";}
   else {            lowerBox.style.height = percent+"%"; topBox.style.height = (100 - parseInt(percent,10))+"%"; restoreSpan.style.display = "none";}
-  [btn100, btn70, btn50, btn30, btn00].forEach(function(btn){ btn.classList.remove("active"); });
+  [btn100,btn90,btn80,btn70,btn50,btn30,btn00].forEach(function(btn){ btn.classList.remove("active"); });
   if(percent==="100") btn100.classList.add("active");
-  else if(percent==="70") btn70.classList.add("active");
-  else if(percent==="50") btn50.classList.add("active");
-  else if(percent==="30") btn30.classList.add("active");
-  else if(percent==="00") btn00.classList.add("active");
+  else if(percent==="90") btn90.classList.add("active");else if(percent==="80") btn80.classList.add("active");
+  else if(percent==="70") btn70.classList.add("active");else if(percent==="50") btn50.classList.add("active");
+  else if(percent==="30") btn30.classList.add("active");else if(percent==="00") btn00.classList.add("active");
 }
-btn100.onclick = function(){ setLayout("100"); };
-btn70.onclick = function(){ setLayout("70"); };
-btn50.onclick = function(){ setLayout("50"); };
-btn30.onclick = function(){ setLayout("30"); };
-btn00.onclick = function(){ setLayout("00"); };
+btn100.onclick= function(){setLayout("100");};
+btn90.onclick = function(){setLayout("90"); }; btn80.onclick = function(){ setLayout("80"); }; btn70.onclick = function(){ setLayout("70"); };
+btn50.onclick = function(){setLayout("50"); }; btn30.onclick = function(){ setLayout("30"); }; btn00.onclick = function(){ setLayout("00"); };
 
 iHTML.oninput = function(){
   htmlCode = this.value;
