@@ -36,8 +36,9 @@ var jsCode = "";
 var cssCode = "";
 var activeTab = "HTML";
 function updatePreview(){
-  var doc = preview.contentDocument;
-  doc.open(); doc.write(htmlCode); doc.close();
+  preview.srcdoc=htmlCode;
+  //var doc = preview.contentDocument;
+  //doc.open(); doc.write(htmlCode); doc.close();
 }
 iHTML.value = htmlCode;
 iJS.value = jsCode;
