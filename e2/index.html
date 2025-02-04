@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Compact Editor</title>
+<title>AB Edit</title>
 <style>
   html, body {margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; box-sizing:border-box;}
   #topBox, #lowerBox {width:100%; position:relative; border:1px solid #ccc;}
@@ -19,7 +19,7 @@
 <div id="topBox">
   <div class="topMenu">
     <button id="btnL">LOAD</button><div id="popL" style="display:none;position:absolute;background:#fff;border:1px solid #ccc;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;"></div>
-    <button id="btnS">SAVE</button><button id="btnE">EXPORT</button><button id="btnI">IMPORT</button>
+    <button id="btnS">SAVE</button><button id="btnE">EXPORT</button><button id="btnI">IMPORT</button><input type="file" id="fInput" style="display:none;" />
     <span id="restoreSpan" style="float:right;display:none;"><button id="btnRestore">50</button></span>
   </div>
   <iframe id="preview" style="position:absolute;top:30px;border:0;width:100%;height:100%"></iframe>
@@ -202,7 +202,10 @@ btnE.onclick = function() {
     a.click();
     URL.revokeObjectURL(url);
 };
-btnI.onchange = function(event) {
+btnI.onclick = function(event) {
+    fInput.click();
+};
+fInput.onchange = function(event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -298,7 +301,7 @@ function dcmp() {
         ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
         dt = await new Response(ds).text();
         //console.log('decompress string length: ' + dt.length);
-        console.log(dt);
+        //console.log(dt);
         if (dt.length != prevLength){ appendToConsole('sys', 'decompress string length: ' + dt.length); prevLength = dt.length }
         return dt
     }
