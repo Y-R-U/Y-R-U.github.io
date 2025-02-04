@@ -17,7 +17,8 @@
 <body>
 <div id="topBox">
   <div class="topMenu">
-    <button id="btnL">LOAD</button><button id="btnS">SAVE</button><button id="btnE">EXPORT</button><button id="btnI">IMPORT</button>
+    <button id="btnL">LOAD</button><div id="popL" style="display:none;position:absolute;background:#fff;border:1px solid #ccc;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;"></div>
+    <button id="btnS">SAVE</button><button id="btnE">EXPORT</button><button id="btnI">IMPORT</button>
     <span id="restoreSpan" style="float:right;display:none;"><button id="btnRestore">50</button></span>
   </div>
   <iframe id="preview" style="position:absolute;top:30px;border:0;width:100%;height:100%"></iframe>
@@ -29,66 +30,63 @@
   <div class="editors" style="position:absolute; top:30px; bottom:0; left:0; right:0;">
     <textarea id="iHTML"></textarea><textarea id="iJS" style="display:none;"></textarea><textarea id="iCSS" style="display:none;"></textarea>
     <div id="consoleDiv" style="display:none; position:absolute; top:0; bottom:0; left:0; right:0; padding:5px; box-sizing:border-box;">
-      <textarea id="oConsole" style="width:100%;height:80%;resize:none;" readonly></textarea>
-      <div style="display:flex; margin-top:5px;"><input id="iConsole" type="text" style="flex:1;" /><button id="btnRun">RUN</button></div>
+        <div id="oConsole" style="width:100%; height:80%; background:#000; color:#fff; padding:5px; overflow-y:scroll; font-family:monospace;"></div>
+      <div style="display:flex; margin-top:5px;"><input id="iConsole" type="text" style="flex:1;" /><button id="btnRun">RUN</button><button id="btnClear">CLEAR</button></div>
     </div>
   </div>
 </div>
 <script>
-var htmlCode = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'>\n<style>body{font-family:sans-serif;}</style>\n</head>\n<body>\n<h1>Hello</h1>\n<script>console.log('Hello');</"+"script>\n</body>\n</html>";
+var htmlCode = "<html>\n<head>\n<style>\n\n</style>\n</head>\n<body>\n\n<h1>...Ready...</h1>\n\n<script>\n\n</"+"script>\n</body>\n</html>";
 var jsCode = "";
 var cssCode = "";
 var activeTab = "HTML";
-function updatePreview(){
-  preview.srcdoc=htmlCode;
-  //var doc = preview.contentDocument;
-  //doc.open(); doc.write(htmlCode); doc.close();
+function updatePreview(){ preview.srcdoc=htmlCode.replace('<script>', '<script>'+dbgCde()); }
+function dbgCde(){
+    return `
+        function sendToParent(type, content) { window.parent.postMessage({ type, content }, '*'); }
+        ['log', 'warn', 'error', 'info'].forEach(method => { // Override console methods
+            const originalMethod=console[method];console[method]=function(...args){sendToParent(method,args.join(' '));originalMethod.apply(console,args);};
+        });
+        // Capture unhandled errors
+        window.onerror=function(message,source,lineno,colno,error){sendToParent('error', message + ' at ' + source + ':' + lineno + ':' + colno);};
+        console.log('Debugging Console Setup Complete...');
+    `;
 }
+
+function appendToConsole(type, message) {
+    const msgElement = document.createElement('div'); msgElement.textContent = `[${type.toUpperCase()}]: ${message}`;
+    if (type === 'error') {       msgElement.style.color = 'red';/*Add * Ind:*/if (!document.getElementById('cErrInd')){const errInd=document.createElement('span');errInd.id='cErrInd';errInd.textContent='*';errInd.style.color='red';errInd.style.marginLeft='-10px';btnConsole.parentNode.insertBefore(errInd, btnConsole.nextSibling);}
+    } else if (type === 'warn') { msgElement.style.color = 'orange';
+    } else if (type === 'sys')  { msgElement.style.color = 'green';
+    } else {                      msgElement.style.color = 'white';
+    }
+    oConsole.appendChild(msgElement); oConsole.scrollTop = oConsole.scrollHeight;  // Auto-scroll to the bottom
+}
+window.addEventListener('message', (event) => { 
+    if (event.data && event.data.type && event.data.content) {
+        const { type, content } = event.data; appendToConsole(type, content);  // Pass type and content separately
+    }
+});
+
 iHTML.value = htmlCode;
 iJS.value = jsCode;
 iCSS.value = cssCode;
 updatePreview();
-btnL.onclick = function(){ alert("LOAD"); };
-btnS.onclick = function(){ alert("SAVE"); };
-btnE.onclick = function(){ alert("EXPORT"); };
-btnI.onclick = function(){ alert("IMPORT"); };
+
 btnRestore.onclick = function(){ setLayout("50"); };
 btnConsole.onclick = function(){
   iHTML.style.display = iJS.style.display = iCSS.style.display = "none";
   consoleDiv.style.display = "block";btnHTML.classList.remove("active");btnJS.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.add("active");
 };
 function runCommand(){
-  var cmd=iConsole.value;oConsole.value+="> "+cmd+"\n";
-  try {/*Execute in iframe context */var result=preview.contentWindow.eval(cmd);if(result!==undefined)oConsole.value+=result+"\n";}catch(e){oConsole.value+="Error: "+e.message+"\n";}
+  var cmd=iConsole.value;oConsole.value+="> "+cmd+"\n";/*Execute below in iframe context */
+  try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)oConsole.value+=result+"\n";}catch(e){oConsole.value+="Error: "+e.message+"\n";}
   oConsole.scrollTop=oConsole.scrollHeight;iConsole.value="";
 }
 btnRun.onclick = runCommand;
+btnClear.onclick = function() { oConsole.innerHTML = '';if (cErrInd) { cErrInd.remove(); } };
 iConsole.onkeydown = function(e){if(e.key==="Enter"){e.preventDefault();runCommand();}}
 
-  
-preview.onload = function(){
-  var iConsole = preview.contentWindow.console;
-  var oldLog = iConsole.log, oldError = iConsole.error, oldWarn = iConsole.warn;
-  iConsole.log = function(){
-    oldLog.apply(iConsole, arguments);
-    oConsole.value += Array.from(arguments).join(" ") + "\n";
-  };
-  iConsole.error = function(){
-    oldError.apply(iConsole, arguments);
-    oConsole.value += "Error: " + Array.from(arguments).join(" ") + "\n";
-  };
-  iConsole.warn = function(){
-    oldWarn.apply(iConsole, arguments);
-    oConsole.value += "Warning: " + Array.from(arguments).join(" ") + "\n";
-  };
-  preview.contentWindow.onerror = function(message, source, lineno, colno, error) {
-    oConsole.value += "Iframe Error: " + message + " (" + source + ":" + lineno + ")\n";
-    oConsole.scrollTop = oConsole.scrollHeight;
-    return false;
-  };
-};
-  
-  
 btnHTML.onclick = function(){
   activeTab = "HTML";
   iHTML.style.display="block";iJS.style.display="none";iCSS.style.display="none";consoleDiv.style.display = "none";
@@ -138,6 +136,172 @@ iCSS.oninput = function(){
   updatePreview();
 };
 iHTML.oninput();
+
+
+btnL.onclick = function() {
+    dcmp().then(decompressed => {
+        const pLst = JSON.parse(decompressed || '{}');
+        showLoadPop(pLst);
+    /*    
+        let pNames = Object.keys(pLst).join(", ");
+        let loadProj = prompt(`Load Name [${pNames}]%#:`);
+        if (loadProj) {
+            let [pName, version] = loadProj.split('%');
+            if (pLst[pName]) {
+                let ver = parseInt(version) || 0;
+                if (pLst[pName][ver]) {
+                    btnS.innerHTML = "SAVE (" + pName + ")";
+                    iHTML.value = pLst[pName][ver].js;
+                    iHTML.oninput();
+                } else {
+                    alert("Version not found.");
+                }
+            } else {
+                alert("Project not found.");
+            }
+        }
+    */
+    });
+};
+btnS.onclick = function() {
+    dcmp().then(decompressed => {
+        let pLst = JSON.parse(decompressed || '{}');
+        let pNames = "<new>, " + Object.keys(pLst).join(", ");
+        let pName = prompt(`Save Name [${pNames}]%delete:`, btnS.innerHTML?.split(" ")[1]?.replace(/[()]/g, ""));
+        if (pName) {
+            if (pName.includes('%delete')) {
+                let delProj = pName.split('%')[0];
+                if (pLst[delProj]) {
+                    delete pLst[delProj];
+                    cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
+                    alert("Project deleted!");
+                } else {
+                    alert("Project not found.");
+                }
+            } else {
+                if (pName === "new") pName = prompt("Enter new project name:");
+                if (pName) {
+                    btnS.innerHTML = "SAVE (" + pName.split('%')[0] + ")";
+                    let projData = { js: iHTML.value, css: '', html: '', timestamp: Date.now() };
+                    if (!pLst[pName]) pLst[pName] = [];
+                    pLst[pName].unshift(projData);
+                    if (pLst[pName].length > 10) pLst[pName].pop();
+                    cmp(JSON.stringify(pLst)); //localStorage.pLst=JSON.stringify(pLst);
+                    alert("Project saved!");
+                }
+            }
+        }
+    });
+};
+btnE.onclick = function() {
+    const url = URL.createObjectURL(new Blob([localStorage.pLst], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pLst.json'; // Set the desired filename here
+    a.click();
+    URL.revokeObjectURL(url);
+};
+btnI.onchange = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const contents = e.target.result;
+            try {
+                const importedProjList = contents; // const importedProjList = JSON.parse(contents);
+                localStorage.pLst = contents;
+                alert("Project list imported successfully!");
+                location.reload(); // Reload the page to apply the imported project list
+            } catch (err) {
+                alert("Failed to import project list. Invalid JSON format.");
+            }
+        };
+        reader.readAsText(file);
+    }
+};
+
+
+function showLoadPop(savedProjects) {
+    const popup = popL;  // Using 'popL' instead of getElementById
+    popup.innerHTML = ''; // Clear previous content
+
+    // Populate the popup with project names and versions
+    for (const projectName in savedProjects) {
+        const versions = savedProjects[projectName];
+        
+        // Create a container for each project
+        const projectContainer = document.createElement('div');
+        projectContainer.style.marginBottom = '5px';
+
+        // Create project name element (clicking it loads the most recent version)
+        const projectNameElem = document.createElement('span');
+        projectNameElem.textContent = projectName;
+        projectNameElem.style.cursor = 'pointer';
+        projectNameElem.style.fontWeight = 'bold';
+        projectNameElem.onclick = () => loadProject(savedProjects, projectName, 0);  // Load the most recent version (index 0)
+        projectContainer.appendChild(projectNameElem);
+
+        // Add version numbers if there are multiple versions
+        if (versions.length > 1) {
+            for (let i = 1; i < versions.length; i++) {
+                const versionButton = document.createElement('button');
+                versionButton.textContent = `[${i + 1}]`;  // Display version number starting from 2
+                versionButton.style.marginLeft = '0px';
+                versionButton.style.cursor = 'pointer';
+                versionButton.onclick = () => loadProject(savedProjects, projectName, i);  // Load specific version
+                projectContainer.appendChild(versionButton);
+            }
+        }
+        popup.appendChild(projectContainer);
+    }
+
+    // Position the popup under the Load button
+    const rect = btnL.getBoundingClientRect(); popup.style.left = `${rect.left}px`; popup.style.top = `${rect.bottom + window.scrollY}px`;
+
+    // Toggle popup visibility
+    popup.style.display = (popup.style.display === 'none') ? 'block' : 'none';
+}
+
+// Function to load a specific project version (only the JS content)
+function loadProject(savedProjects, projectName, versionIndex) {
+    const projectData = savedProjects[projectName][versionIndex]; iHTML.value = projectData.js || '';
+    iHTML.oninput(); popL.style.display = 'none';
+}
+
+// Hide popup if clicked outside
+document.addEventListener('click', (event) => {
+    if (!btnL.contains(event.target) && !popL.contains(event.target)) { popL.style.display = 'none'; }
+});
+
+
+
+async function cmp(input) {
+    b = new Blob([input], { type: 'text/plain' });
+    r = b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
+    chunks = [];
+    while (true) { const { done, value } = await r.read(); if (done) break; chunks.push(value); }
+    c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
+    base64String = btoa(String.fromCharCode.apply(null, c));
+    localStorage.pLst = base64String;
+    console.log('BASE64 length: ' + base64String.length);
+    appendToConsole('sys', `JSON STR Length: ${input.length}, BASE64 length: ${base64String.length}`)
+}
+var prevLength = 0;
+function dcmp() {
+    d = async () => {
+        base64String = localStorage.pLst || "{}";
+        if (base64String[0] === '{') return base64String; //Already decompressed!
+        c = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+        b = new Blob([c]);
+        ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
+        dt = await new Response(ds).text();
+        //console.log('decompress string length: ' + dt.length);
+        console.log(dt);
+        if (dt.length != prevLength){ appendToConsole('sys', 'decompress string length: ' + dt.length); prevLength = dt.length }
+        return dt
+    }
+    return d()
+}
 </script>
 </body>
 </html>
