@@ -80,9 +80,9 @@ btnConsole.onclick = function(){
   consoleDiv.style.display = "block";btnHTML.classList.remove("active");btnJS.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.add("active");
 };
 function runCommand(){
-  var cmd=iConsole.value;oConsole.value+="> "+cmd+"\n";/*Execute below in iframe context */
-  try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)oConsole.value+=result+"\n";}catch(e){oConsole.value+="Error: "+e.message+"\n";}
-  oConsole.scrollTop=oConsole.scrollHeight;iConsole.value="";
+  var cmd=iConsole.value;appendToConsole('sys', "> "+cmd);/*Execute below in iframe context */
+  try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)appendToConsole('sys', result);}catch(e){appendToConsole('sys', "Error: "+e.message);}
+  iConsole.value="";
 }
 btnRun.onclick = runCommand;
 btnClear.onclick = function() { oConsole.innerHTML = '';if (cErrInd) { cErrInd.remove(); } };
@@ -228,58 +228,43 @@ fInput.onchange = function(event) {
 function showLoadPop(savedProjects) {
     const popup = popL;  // Using 'popL' instead of getElementById
     popup.innerHTML = ''; // Clear previous content
-
-    // Populate the popup with project names and versions
-    for (const projectName in savedProjects) {
+    for (const projectName in savedProjects) { // Populate the popup with project names and versions
         const versions = savedProjects[projectName];
-        
-        // Create a container for each project
-        const projectContainer = document.createElement('div');
+        const projectContainer = document.createElement('div'); // Create a container for each project
         projectContainer.style.marginBottom = '5px';
-
-        // Create project name element (clicking it loads the most recent version)
-        const projectNameElem = document.createElement('span');
+        const projectNameElem = document.createElement('span'); // Create project name element (clicking it loads the most recent version)
         projectNameElem.textContent = projectName;
         projectNameElem.style.cursor = 'pointer';
         projectNameElem.style.fontWeight = 'bold';
         projectNameElem.style.marginRight = '5px';
         projectNameElem.onclick = () => loadProject(savedProjects, projectName, 0);  // Load the most recent version (index 0)
         projectContainer.appendChild(projectNameElem);
-
-        // Add version numbers if there are multiple versions
-        if (versions.length > 1) {
+        if (versions.length > 1) { // Add version numbers if there are multiple versions
             for (let i = 1; i < versions.length; i++) {
                 const versionButton = document.createElement('button');
                 versionButton.textContent = `[${i + 1}]`;  // Display version number starting from 2
                 versionButton.style.marginLeft = '5px';
                 versionButton.style.cursor = 'pointer';
                 versionButton.onclick = () => loadProject(savedProjects, projectName, i);  // Load specific version
-                btnS.innerHTML = "SAVE (" + projectName + ")";
                 projectContainer.appendChild(versionButton);
             }
         }
         popup.appendChild(projectContainer);
     }
-
     // Position the popup under the Load button
     const rect = btnL.getBoundingClientRect(); popup.style.left = `${rect.left}px`; popup.style.top = `${rect.bottom + window.scrollY}px`;
-
     // Toggle popup visibility
     popup.style.display = (popup.style.display === 'none') ? 'block' : 'none';
 }
-
 // Function to load a specific project version (only the JS content)
 function loadProject(savedProjects, projectName, versionIndex) {
     const projectData = savedProjects[projectName][versionIndex]; iHTML.value = projectData.js || '';
+    btnS.innerHTML = "SAVE (" + projectName + ")";
     iHTML.oninput(); popL.style.display = 'none';
 }
-
+  
 // Hide popup if clicked outside
-document.addEventListener('click', (event) => {
-    if (!btnL.contains(event.target) && !popL.contains(event.target)) { popL.style.display = 'none'; }
-});
-
-
+document.addEventListener('click', (event) => { if (!btnL.contains(event.target) && !popL.contains(event.target)) { popL.style.display = 'none'; } });
 
 async function cmp(input) {
     b = new Blob([input], { type: 'text/plain' });
