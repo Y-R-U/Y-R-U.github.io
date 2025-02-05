@@ -32,10 +32,7 @@
     <textarea id="iHTML"></textarea><textarea id="iJS" style="display:none;"></textarea><textarea id="iCSS" style="display:none;"></textarea>
     <div id="consoleDiv" style="display:none; position:absolute; top:0; bottom:0; left:0; right:0; padding:5px; box-sizing:border-box;">
         <div id="oConsole" style="width:100%; height:80%; background:#000; color:#fff; padding:5px; overflow-y:scroll; font-family:monospace;"></div>
-      <div style="display:flex; margin-top:5px;">
-        <div id="commandHistory" style="max-height:150px;overflow-y:auto;background:rgba(0,0,0,0.05);border:1px solid #ccc;margin-bottom:5px;padding:5px;"></div>
-        <input id="iConsole" type="text" style="flex:1;" /><button id="btnRun">RUN</button><button id="btnClear">CLEAR</button>
-      </div>
+      <div style="display:flex; margin-top:5px;"><input id="iConsole" type="text" style="flex:1;" /><button id="btnRun">RUN</button><button id="btnClear">CLEAR</button></div>
     </div>
   </div>
 </div>
@@ -60,10 +57,9 @@ function dbgCde(){
 let commandHistory = []; let historyIndex = -1; const maxHistory = 15;
 // Load command history from localStorage on page load
 dcmp().then(decompressed => {
-    const pLst = JSON.parse(decompressed || '{}');
+    let pLst = JSON.parse(decompressed || '{}');
     if (pLst['SYS_CONSOLE'] && pLst['SYS_CONSOLE'][0]) {
         commandHistory = pLst['SYS_CONSOLE'][0].js || [];
-        renderCommandHistory();  // Render history on page load
     }
 });
 
@@ -95,7 +91,7 @@ btnConsole.onclick = function(){
 function runCommand(){
   var cmd=iConsole.value;appendToConsole('sys', "> "+cmd);/*Execute below in iframe context */
   try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)appendToConsole('sys', result);}catch(e){appendToConsole('sys', "Error: "+e.message);}
-  saveCommandToHistory(cmd); renderCommandHistory(); // Save command to history
+  saveCommandToHistory(cmd); // Save command to history
   iConsole.value="";
 }
 btnRun.onclick = runCommand;
@@ -103,6 +99,8 @@ btnClear.onclick = function() { oConsole.innerHTML = '';if (cErrInd) { cErrInd.r
 iConsole.onkeydown = function(e){if(e.key==="Enter"){e.preventDefault();runCommand();}}
 
 function saveCommandToHistory(cmd) {
+  dcmp().then(decompressed => {
+    let pLst = JSON.parse(decompressed || '{}');
     if (commandHistory[0] !== cmd) {  // Avoid duplicate consecutive commands
         commandHistory.unshift(cmd);
         if (commandHistory.length > maxHistory) commandHistory.pop();
@@ -116,6 +114,7 @@ function saveCommandToHistory(cmd) {
       
         cmp(JSON.stringify(pLst));  // Compress and save to localStorage
     }
+  });
 }
 
 // Navigate command history with up arrow
@@ -138,24 +137,6 @@ iConsole.addEventListener('keydown', (e) => {
     }
 });
 
-// Render command history list for mobile (above iConsole)
-function renderCommandHistory() {
-    const historyContainer = document.getElementById('commandHistory');
-    historyContainer.innerHTML = '';  // Clear previous history
-    commandHistory.slice(0, maxHistory).forEach((cmd, index) => {
-        const cmdElem = document.createElement('div');
-        cmdElem.textContent = cmd;
-        cmdElem.style.fontSize = '20px';
-        cmdElem.style.opacity = '0.7';
-        cmdElem.style.cursor = 'pointer';
-        cmdElem.style.padding = '2px 5px';
-        cmdElem.style.borderBottom = '1px solid #ddd';
-        
-        // Load command into iConsole when clicked
-        cmdElem.onclick = () => { iConsole.value = cmd; iConsole.focus(); };
-        historyContainer.appendChild(cmdElem);
-    });
-}
 
 btnHTML.onclick = function(){
   activeTab = "HTML";
