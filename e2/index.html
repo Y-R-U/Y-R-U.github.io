@@ -90,7 +90,7 @@ btnConsole.onclick = function(){
 };
 function runCommand(){
   var cmd=iConsole.value;appendToConsole('sys', "> "+cmd);/*Execute below in iframe context */
-  try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)appendToConsole('sys', result);}catch(e){appendToConsole('sys', "Error: "+e.message);}
+  try {var result=preview.contentWindow.eval(cmd);if(result!==undefined)appendToConsole('log', result);}catch(e){appendToConsole('error', "Error: "+e.message);}
   saveCommandToHistory(cmd); // Save command to history
   iConsole.value="";
 }
