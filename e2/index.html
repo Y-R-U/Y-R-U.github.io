@@ -254,6 +254,7 @@ function showLoadPop(savedProjects) {
                 versionButton.style.marginLeft = '5px';
                 versionButton.style.cursor = 'pointer';
                 versionButton.onclick = () => loadProject(savedProjects, projectName, i);  // Load specific version
+                btnS.innerHTML = "SAVE (" + projectName + ")";
                 projectContainer.appendChild(versionButton);
             }
         }
@@ -288,8 +289,8 @@ async function cmp(input) {
     c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
     base64String = btoa(String.fromCharCode.apply(null, c));
     localStorage.pLst = base64String;
-    console.log('BASE64 length: ' + base64String.length);
-    appendToConsole('sys', `JSON STR Length: ${input.length}, BASE64 length: ${base64String.length}`)
+    //console.log('BASE64 length: ' + base64String.length);
+    appendToConsole('sys', `JSON STR.length: ${input.length}, B64.length: ${base64String.length}`)
 }
 var prevLength = 0;
 function dcmp() {
@@ -302,7 +303,7 @@ function dcmp() {
         dt = await new Response(ds).text();
         //console.log('decompress string length: ' + dt.length);
         //console.log(dt);
-        if (dt.length != prevLength){ appendToConsole('sys', 'decompress string length: ' + dt.length); prevLength = dt.length }
+        if (dt.length != prevLength){ appendToConsole('sys', `STR.length: ${dt.length}, B64.length: ${base64String.length}`); prevLength = dt.length; }
         return dt
     }
     return d()
