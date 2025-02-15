@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AB Edit</title>
+    <!-- Load Ace from CDN (latest ace-builds from jsDelivr) -->
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.38.0/src-min-noconflict/ace.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: sans-serif;
+        box-sizing: border-box;
+      }
+      #topBox, #lowerBox {
+        width: 100%;
+        position: relative;
+        border: 1px solid #ccc;
+      }
+      #topBox { height: 50%; }
+      #lowerBox { height: 50%; }
+      .topMenu, .lowerMenu {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        line-height: 30px;
+        background: #eee;
+        border-bottom: 1px solid #ccc;
+        padding: 0 5px;
+        box-sizing: border-box;
+      }
+      .topMenu button, .lowerMenu button {
+        margin-right: 5px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .active { color: #aaf; }
+      /* Hide original textarea styling */
+      .editors div {
+        width: 100%;
+        height: 100%;
+      }
+      @media (pointer: coarse) {
+        button, #popL span, #popL button { font-size: 28px !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="topBox">
+      <div class="topMenu">
+        <button id="btnL">LOAD</button>
+        <div id="popL" style="display:none;position:absolute;background:#fff;border:1px solid #ccc;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;"></div>
+        <button id="btnS">SAVE</button>
+        <button id="btnE">EXPORT</button>
+        <button id="btnI">IMPORT</button>
+        <input type="file" id="fInput" style="display:none;" />
+        <span id="restoreSpan" style="float:right;display:none;">
+          <button id="btnRestore">50</button>
+        </span>
+      </div>
+      <iframe id="preview" style="position:absolute;top:30px;border:0;width:100%;height:100%"></iframe>
+    </div>
+    <div id="lowerBox">
+      <div class="lowerMenu">
+        <button id="btnHTML" class="active">HTML</button>
+        <button id="btnJS">JS</button>
+        <button id="btnCSS">CSS</button>
+        <button id="btn100">100</button>
+        <button id="btn90">90</button>
+        <button id="btn80">80</button>
+        <button id="btn70">70</button>
+        <button id="btn50" class="active">50</button>
+        <button id="btn30">30</button>
+        <button id="btn00">00</button>
+        <button id="btnConsole">Console</button>
+      </div>
+      <div class="editors" style="position:absolute; top:30px; bottom:0; left:0; right:0;">
+        <!-- Replace textareas with divs for Ace -->
+        <div id="iHTML"></div>
+        <div id="iJS" style="display:none;"></div>
+        <div id="iCSS" style="display:none;"></div>
+        <div id="consoleDiv" style="display:none; position:absolute; top:0; bottom:0; left:0; right:0; padding:5px; box-sizing:border-box;">
+          <div id="oConsole" style="width:100%; height:80%; background:#000; color:#fff; padding:5px; overflow-y:scroll; font-family:monospace;"></div>
+          <div style="display:flex; margin-top:5px;">
+            <input id="iConsole" type="text" style="flex:1;" />
+            <button id="btnRun">RUN</button>
+            <button id="btnClear">CLEAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Initial code variables
+      var htmlCode = "<html>\n<head>\n<style>\n\n</style>\n</head>\n<body>\n\n<h1>...Ready...</h1>\n\n<script>\n\n</"+"script>\n</body>\n</html>";
+      var jsCode = "";
+      var cssCode = "";
+      var activeTab = "HTML";
+      
+      function updatePreview(){
+        preview.srcdoc = htmlCode.replace('<script>', '<script>' + dbgCde());
+      }
+      function dbgCde(){
+        return `
+          function sendToParent(type, content) { window.parent.postMessage({ type, content }, '*'); }
+          ['log', 'warn', 'error', 'info'].forEach(method => {
+              const originalMethod = console[method];
+              console[method] = function(...args){
+                sendToParent(method, args.join(' '));
+                originalMethod.apply(console, args);
+              };
+          });
+          window.onerror = function(message, source, lineno, colno, error){
+              sendToParent('error', message + ' at ' + source + ':' + lineno + ':' + colno);
+          };
+          console.log('Debugging Console Setup Complete...');
+        `;
+      }
+      
+      let commandHistory = []; let historyIndex = -1; const maxHistory = 15;
+      dcmp().then(decompressed => {
+        let pLst = JSON.parse(decompressed || '{}');
+        if (pLst['SYS_CONSOLE'] && pLst['SYS_CONSOLE'][0]) {
+          commandHistory = pLst['SYS_CONSOLE'][0].js || [];
+        }
+      });
+      function appendToConsole(type, message){
+        const msgElement = document.createElement('div');
+        msgElement.textContent = `[${type.toUpperCase()}]: ${message}`;
+        if(type==='error'){
+          msgElement.style.color='red';
+          if(!document.getElementById('cErrInd')){
+            const errInd = document.createElement('span');
+            errInd.id = 'cErrInd';
+            errInd.textContent = '*';
+            errInd.style.color = 'red';
+            errInd.style.marginLeft = '-10px';
+            btnConsole.parentNode.insertBefore(errInd, btnConsole.nextSibling);
+          }
+        } else if(type==='warn'){
+          msgElement.style.color='orange';
+        } else if(type==='sys'){
+          msgElement.style.color='green';
+        } else {
+          msgElement.style.color='white';
+        }
+        oConsole.appendChild(msgElement);
+        oConsole.scrollTop = oConsole.scrollHeight;
+      }
+      window.addEventListener('message', (event)=>{
+        if(event.data && event.data.type && event.data.content){
+          const { type, content } = event.data;
+          appendToConsole(type, content);
+        }
+      });
+      
+      // Replace global element references with explicit queries
+      var preview = document.getElementById("preview");
+      var popL = document.getElementById("popL");
+      var btnL = document.getElementById("btnL");
+      var btnS = document.getElementById("btnS");
+      var btnE = document.getElementById("btnE");
+      var btnI = document.getElementById("btnI");
+      var fInput = document.getElementById("fInput");
+      var btnRestore = document.getElementById("btnRestore");
+      var btnHTML = document.getElementById("btnHTML");
+      var btnJS = document.getElementById("btnJS");
+      var btnCSS = document.getElementById("btnCSS");
+      var btnConsole = document.getElementById("btnConsole");
+      var btn100 = document.getElementById("btn100");
+      var btn90 = document.getElementById("btn90");
+      var btn80 = document.getElementById("btn80");
+      var btn70 = document.getElementById("btn70");
+      var btn50 = document.getElementById("btn50");
+      var btn30 = document.getElementById("btn30");
+      var btn00 = document.getElementById("btn00");
+      var consoleDiv = document.getElementById("consoleDiv");
+      var oConsole = document.getElementById("oConsole");
+      var iConsole = document.getElementById("iConsole");
+
+      // Grab the div containers for Ace editors
+      var iHTMLDiv = document.getElementById("iHTML");
+      var iJSDiv = document.getElementById("iJS");
+      var iCSSDiv = document.getElementById("iCSS");
+      
+      // Create Ace editors
+      var editorHTML = ace.edit("iHTML");
+      var editorJS   = ace.edit("iJS");
+      var editorCSS  = ace.edit("iCSS");
+      
+      // Set themes and modes
+      editorHTML.setTheme("ace/theme/monokai");
+      editorHTML.session.setMode("ace/mode/html");
+      editorJS.setTheme("ace/theme/monokai");
+      editorJS.session.setMode("ace/mode/javascript");
+      editorCSS.setTheme("ace/theme/monokai");
+      editorCSS.session.setMode("ace/mode/css");
+      
+      // Flag to prevent recursive updates
+      var isUpdating = false;
+      
+      // Sync editor changes with global code variables
+      editorHTML.session.on('change', function(){
+        if(isUpdating) return;
+        isUpdating = true;
+        htmlCode = editorHTML.getValue();
+        var s = htmlCode.match(/<style>([\s\S]*?)<\/style>/i);
+        if(s){
+          cssCode = s[1];
+          editorCSS.setValue(cssCode, -1);
+        }
+        var sc = htmlCode.match(/<script>([\s\S]*?)<\/script>/i);
+        if(sc){
+          jsCode = sc[1];
+          editorJS.setValue(jsCode, -1);
+        }
+        updatePreview();
+        isUpdating = false;
+      });
+      
+      editorJS.session.on('change', function(){
+        if(isUpdating) return;
+        isUpdating = true;
+        jsCode = editorJS.getValue();
+        if(/<script>[\s\S]*?<\/script>/i.test(htmlCode)){
+          htmlCode = htmlCode.replace(/<script>[\s\S]*?<\/script>/i, `<script>${jsCode}<${'/'}script>`);
+        } else {
+          htmlCode += `<script>${jsCode}<${'/'}script>`;
+        }
+        editorHTML.setValue(htmlCode, -1);
+        updatePreview();
+        isUpdating = false;
+      });
+      
+      editorCSS.session.on('change', function(){
+        if(isUpdating) return;
+        isUpdating = true;
+        cssCode = editorCSS.getValue();
+        if(/<style>[\s\S]*?<\/style>/i.test(htmlCode)){
+          htmlCode = htmlCode.replace(/<style>[\s\S]*?<\/style>/i, `<style>${cssCode}<${'/'}style>`);
+        } else {
+          htmlCode = `<style>${cssCode}<${'/'}style>` + htmlCode;
+        }
+        editorHTML.setValue(htmlCode, -1);
+        updatePreview();
+        isUpdating = false;
+      });
+      
+      // Initialize editors with starting code
+      editorHTML.setValue(htmlCode, -1);
+      editorJS.setValue(jsCode, -1);
+      editorCSS.setValue(cssCode, -1);
+      updatePreview();
+      
+      // Console command handling
+      let saveCommandToHistory = function(cmd){
+        dcmp().then(decompressed => {
+          let pLst = JSON.parse(decompressed || '{}');
+          if(commandHistory[0] !== cmd){
+            commandHistory.unshift(cmd);
+            if(commandHistory.length > maxHistory) commandHistory.pop();
+            const pName = 'SYS_CONSOLE';
+            const projData = { js: [...commandHistory], css: '', html: '', timestamp: Date.now() };
+            if(!pLst[pName]) pLst[pName] = [];
+            pLst[pName].unshift(projData);
+            if(pLst[pName].length > 100) pLst[pName].pop();
+            cmp(JSON.stringify(pLst));
+          }
+        });
+      };
+      
+      iConsole.onkeydown = function(e){
+        if(e.key==="Enter"){
+          e.preventDefault();
+          runCommand();
+        }
+      };
+      function runCommand(){
+        var cmd = iConsole.value;
+        appendToConsole('sys', "> " + cmd);
+        try{
+          var result = preview.contentWindow.eval(cmd);
+          if(result!==undefined) appendToConsole('log', result);
+        } catch(e){
+          appendToConsole('error', "Error: " + e.message);
+        }
+        saveCommandToHistory(cmd);
+        iConsole.value = "";
+      }
+      document.getElementById("btnRun").onclick = runCommand;
+      document.getElementById("btnClear").onclick = function(){
+        oConsole.innerHTML = '';
+        if(document.getElementById('cErrInd')) document.getElementById('cErrInd').remove();
+      };
+      
+      // Tab switching
+      btnHTML.onclick = function(){
+        activeTab = "HTML";
+        iHTMLDiv.style.display = "block";
+        iJSDiv.style.display = "none";
+        iCSSDiv.style.display = "none";
+        consoleDiv.style.display = "none";
+        btnHTML.classList.add("active");
+        btnJS.classList.remove("active");
+        btnCSS.classList.remove("active");
+        btnConsole.classList.remove("active");
+      };
+      btnJS.onclick = function(){
+        activeTab = "JS";
+        iHTMLDiv.style.display = "none";
+        iJSDiv.style.display = "block";
+        iCSSDiv.style.display = "none";
+        consoleDiv.style.display = "none";
+        btnJS.classList.add("active");
+        btnHTML.classList.remove("active");
+        btnCSS.classList.remove("active");
+        btnConsole.classList.remove("active");
+      };
+      btnCSS.onclick = function(){
+        activeTab = "CSS";
+        iHTMLDiv.style.display = "none";
+        iJSDiv.style.display = "none";
+        iCSSDiv.style.display = "block";
+        consoleDiv.style.display = "none";
+        btnCSS.classList.add("active");
+        btnHTML.classList.remove("active");
+        btnJS.classList.remove("active");
+        btnConsole.classList.remove("active");
+      };
+      btnConsole.onclick = function(){
+        iHTMLDiv.style.display = iJSDiv.style.display = iCSSDiv.style.display = "none";
+        consoleDiv.style.display = "block";
+        btnHTML.classList.remove("active");
+        btnJS.classList.remove("active");
+        btnCSS.classList.remove("active");
+        btnConsole.classList.add("active");
+      };
+      
+      function setLayout(percent){
+        if(percent==="00"){
+          lowerBox.style.height = "0";
+          topBox.style.height = "100%";
+          restoreSpan.style.display = "inline";
+        } else {
+          lowerBox.style.height = percent + "%";
+          topBox.style.height = (100 - parseInt(percent,10)) + "%";
+          restoreSpan.style.display = "none";
+        }
+        [btn100, btn90, btn80, btn70, btn50, btn30, btn00].forEach(function(btn){
+          btn.classList.remove("active");
+        });
+        if(percent==="100") btn100.classList.add("active");
+        else if(percent==="90") btn90.classList.add("active");
+        else if(percent==="80") btn80.classList.add("active");
+        else if(percent==="70") btn70.classList.add("active");
+        else if(percent==="50") btn50.classList.add("active");
+        else if(percent==="30") btn30.classList.add("active");
+        else if(percent==="00") btn00.classList.add("active");
+      }
+      btn100.onclick = function(){ setLayout("100"); };
+      btn90.onclick  = function(){ setLayout("90"); };
+      btn80.onclick  = function(){ setLayout("80"); };
+      btn70.onclick  = function(){ setLayout("70"); };
+      btn50.onclick  = function(){ setLayout("50"); };
+      btn30.onclick  = function(){ setLayout("30"); };
+      btn00.onclick  = function(){ setLayout("00"); };
+
+      // Save and Load functions updated to use editorHTML.getValue()
+      btnS.onclick = function(){
+        dcmp().then(decompressed => {
+          let pLst = JSON.parse(decompressed || '{}');
+          let pNames = "<new>, " + Object.keys(pLst).join(", ");
+          let pName = prompt(`Save Name [${pNames}]%delete:`, btnS.innerHTML?.split(" ")[1]?.replace(/[()]/g, ""));
+          if(pName){
+            if(pName.includes('%delete')){
+              let delProj = pName.split('%')[0];
+              if(pLst[delProj]){
+                delete pLst[delProj];
+                cmp(JSON.stringify(pLst));
+                alert("Project deleted!");
+              } else {
+                alert("Project not found.");
+              }
+            } else {
+              if(pName==="new") pName = prompt("Enter new project name:");
+              if(pName){
+                btnS.innerHTML = "SAVE (" + pName.split('%')[0] + ")";
+                let projData = { js: editorHTML.getValue(), css: '', html: '', timestamp: Date.now() };
+                if(!pLst[pName]) pLst[pName] = [];
+                pLst[pName].unshift(projData);
+                if(pLst[pName].length > 10) pLst[pName].pop();
+                cmp(JSON.stringify(pLst));
+                alert("Project saved!");
+              }
+            }
+          }
+        });
+      };
+      
+      btnL.onclick = function(){
+        dcmp().then(decompressed => {
+          const pLst = JSON.parse(decompressed || '{}');
+          showLoadPop(pLst);
+        });
+      };
+      
+      function loadProject(savedProjects, projectName, versionIndex){
+        const projectData = savedProjects[projectName][versionIndex];
+        editorHTML.setValue(projectData.js || '', -1);
+        btnS.innerHTML = "SAVE (" + projectName + ")";
+        updatePreview();
+        popL.style.display = 'none';
+      }
+      
+      function showLoadPop(savedProjects){
+        const popup = popL;
+        popup.innerHTML = '';
+        for(const projectName in savedProjects){
+          const versions = savedProjects[projectName];
+          const projectContainer = document.createElement('div');
+          projectContainer.style.marginBottom = '5px';
+          const projectNameElem = document.createElement('span');
+          projectNameElem.textContent = projectName;
+          projectNameElem.style.cursor = 'pointer';
+          projectNameElem.style.fontWeight = 'bold';
+          projectNameElem.style.marginRight = '5px';
+          projectNameElem.onclick = () => loadProject(savedProjects, projectName, 0);
+          projectContainer.appendChild(projectNameElem);
+          if(versions.length > 1){
+            for(let i = 1; i < versions.length; i++){
+              const versionButton = document.createElement('button');
+              versionButton.textContent = `[${i+1}]`;
+              versionButton.style.marginLeft = '5px';
+              versionButton.style.cursor = 'pointer';
+              versionButton.onclick = () => loadProject(savedProjects, projectName, i);
+              projectContainer.appendChild(versionButton);
+            }
+          }
+          popup.appendChild(projectContainer);
+        }
+        const rect = btnL.getBoundingClientRect();
+        popup.style.left = rect.left + "px";
+        popup.style.top = (rect.bottom + window.scrollY) + "px";
+        popup.style.display = (popup.style.display === 'none') ? 'block' : 'none';
+      }
+      
+      document.addEventListener('click', function(event){
+        if(!btnL.contains(event.target) && !popL.contains(event.target)){
+          popL.style.display = 'none';
+        }
+      });
+      
+      async function cmp(input){
+        let b = new Blob([input], { type: 'text/plain' });
+        let r = b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
+        let chunks = [];
+        while(true){
+          const { done, value } = await r.read();
+          if(done) break;
+          chunks.push(value);
+        }
+        let c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
+        let base64String = btoa(String.fromCharCode.apply(null, c));
+        localStorage.pLst = base64String;
+        appendToConsole('sys', `JSON STR.length: ${input.length}, B64.length: ${base64String.length}`);
+      }
+      
+      var prevLength = 0;
+      function dcmp(){
+        return (async () => {
+          let base64String = localStorage.pLst || "{}";
+          if(base64String[0] === '{') return base64String;
+          let c = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+          let b = new Blob([c]);
+          let ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
+          let dt = await new Response(ds).text();
+          if(dt.length != prevLength){
+            appendToConsole('sys', `STR.length: ${dt.length}, B64.length: ${base64String.length}`);
+            prevLength = dt.length;
+          }
+          return dt;
+        })();
+      }
+    </script>
+  </body>
+</html>
