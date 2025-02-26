@@ -2,18 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>AB Edit</title>
-    <!-- Load Ace from CDN (latest ace-builds from jsDelivr) -->
-    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.38.0/src-min-noconflict/ace.js"></script>
+    <title>Monaco Editor: HTML/JS/CSS with Top Bar (Load using projectData.js)</title>
+    <!-- Load Monaco Editor from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
     <style>
       html, body {
         margin: 0;
         padding: 0;
         height: 100%;
-        overflow: hidden;
         font-family: sans-serif;
         box-sizing: border-box;
       }
+      /* Top and lower panels */
       #topBox, #lowerBox {
         width: 100%;
         position: relative;
@@ -21,6 +21,7 @@
       }
       #topBox { height: 50%; }
       #lowerBox { height: 50%; }
+      /* Top menu styling */
       .topMenu, .lowerMenu {
         position: absolute;
         top: 0;
@@ -41,31 +42,85 @@
         font-size: 14px;
       }
       .active { color: #aaf; }
-      /* Hide original textarea styling */
-      .editors div {
+      /* Preview iframe fills topBox below the menu */
+      #preview {
+        position: absolute;
+        top: 30px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: none;
+        height: 100%;
+        width: 100%;
+      }
+      /* Editors container fills lowerBox below the menu */
+      .editors {
+        position: absolute;
+        top: 30px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .editors > div {
         width: 100%;
         height: 100%;
       }
+      /* Console container */
+      #consoleDiv {
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+      #oConsole {
+        width: 100%;
+        height: 80%;
+        background: #000;
+        color: #fff;
+        padding: 5px;
+        overflow-y: scroll;
+        font-family: monospace;
+      }
+      /* Project load popup */
+      #popL {
+        display: none;
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      /* Hide file input */
+      #fInput { display: none; }
+      /* Restore button styling */
+      #restoreSpan { float: right; display: none; }
       @media (pointer: coarse) {
         button, #popL span, #popL button { font-size: 28px !important; }
       }
     </style>
   </head>
   <body>
+    <!-- Top Panel: Top Menu & Preview -->
     <div id="topBox">
       <div class="topMenu">
         <button id="btnL">LOAD</button>
-        <div id="popL" style="display:none;position:absolute;background:#fff;border:1px solid #ccc;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;"></div>
+        <div id="popL"></div>
         <button id="btnS">SAVE</button>
         <button id="btnE">EXPORT</button>
         <button id="btnI">IMPORT</button>
-        <input type="file" id="fInput" style="display:none;" />
-        <span id="restoreSpan" style="float:right;display:none;">
+        <input type="file" id="fInput" />
+        <span id="restoreSpan">
           <button id="btnRestore">50</button>
         </span>
       </div>
-      <iframe id="preview" style="position:absolute;top:30px;border:0;width:100%;height:100%"></iframe>
+      <iframe id="preview"></iframe>
     </div>
+    <!-- Lower Panel: Editors & Tabs -->
     <div id="lowerBox">
       <div class="lowerMenu">
         <button id="btnHTML" class="active">HTML</button>
@@ -77,16 +132,17 @@
         <button id="btn70">70</button>
         <button id="btn50" class="active">50</button>
         <button id="btn30">30</button>
+        <button id="btn20">20</button>
+        <button id="btn10">10</button>
         <button id="btn00">00</button>
         <button id="btnConsole">Console</button>
       </div>
-      <div class="editors" style="position:absolute; top:30px; bottom:0; left:0; right:0;">
-        <!-- Replace textareas with divs for Ace -->
+      <div class="editors">
         <div id="iHTML"></div>
         <div id="iJS" style="display:none;"></div>
         <div id="iCSS" style="display:none;"></div>
-        <div id="consoleDiv" style="display:none; position:absolute; top:0; bottom:0; left:0; right:0; padding:5px; box-sizing:border-box;">
-          <div id="oConsole" style="width:100%; height:80%; background:#000; color:#fff; padding:5px; overflow-y:scroll; font-family:monospace;"></div>
+        <div id="consoleDiv" style="display:none;">
+          <div id="oConsole"></div>
           <div style="display:flex; margin-top:5px;">
             <input id="iConsole" type="text" style="flex:1;" />
             <button id="btnRun">RUN</button>
@@ -96,44 +152,48 @@
       </div>
     </div>
     <script>
-      // Initial code variables
-      var htmlCode = "<html>\n<head>\n<style>\n\n</style>\n</head>\n<body>\n\n<h1>...Ready...</h1>\n\n<script>\n\n</"+"script>\n</body>\n</html>";
+      // Global code variables.
+      // Note: We “split” closing tags (e.g. <"+" /script>) to avoid HTML parser issues.
+      var htmlCode = "<html>\n<head>\n<style>\n\n</style>\n</head>\n<body>\n\n<h1>...Ready...</h1>\n\n<script>\n\n<" + "/script>\n</body>\n</html>";
       var jsCode = "";
       var cssCode = "";
       var activeTab = "HTML";
       
+      // Update the preview iframe.
       function updatePreview(){
         preview.srcdoc = htmlCode.replace('<script>', '<script>' + dbgCde());
       }
+      // Debugging setup string.
       function dbgCde(){
         return `
           function sendToParent(type, content) { window.parent.postMessage({ type, content }, '*'); }
           ['log', 'warn', 'error', 'info'].forEach(method => {
-              const originalMethod = console[method];
-              console[method] = function(...args){
-                sendToParent(method, args.join(' '));
-                originalMethod.apply(console, args);
-              };
+            const originalMethod = console[method];
+            console[method] = function(...args){
+              sendToParent(method, args.join(' '));
+              originalMethod.apply(console, args);
+            };
           });
           window.onerror = function(message, source, lineno, colno, error){
-              sendToParent('error', message + ' at ' + source + ':' + lineno + ':' + colno);
+            sendToParent('error', message + ' at ' + source + ':' + lineno + ':' + colno);
           };
-          console.log('Debugging Console Setup Complete...');
         `;
       }
       
-      let commandHistory = []; let historyIndex = -1; const maxHistory = 15;
-      dcmp().then(decompressed => {
+    let commandHistory = []; let historyIndex = -1; const maxHistory = 15;
+    // Load command history from localStorage on page load
+    dcmp().then(decompressed => {
         let pLst = JSON.parse(decompressed || '{}');
         if (pLst['SYS_CONSOLE'] && pLst['SYS_CONSOLE'][0]) {
-          commandHistory = pLst['SYS_CONSOLE'][0].js || [];
+            commandHistory = pLst['SYS_CONSOLE'][0].js || [];
         }
-      });
+    });
+
       function appendToConsole(type, message){
         const msgElement = document.createElement('div');
         msgElement.textContent = `[${type.toUpperCase()}]: ${message}`;
         if(type==='error'){
-          msgElement.style.color='red';
+          msgElement.style.color = 'red';
           if(!document.getElementById('cErrInd')){
             const errInd = document.createElement('span');
             errInd.id = 'cErrInd';
@@ -143,23 +203,23 @@
             btnConsole.parentNode.insertBefore(errInd, btnConsole.nextSibling);
           }
         } else if(type==='warn'){
-          msgElement.style.color='orange';
+          msgElement.style.color = 'orange';
         } else if(type==='sys'){
-          msgElement.style.color='green';
+          msgElement.style.color = 'green';
         } else {
-          msgElement.style.color='white';
+          msgElement.style.color = 'white';
         }
         oConsole.appendChild(msgElement);
         oConsole.scrollTop = oConsole.scrollHeight;
       }
-      window.addEventListener('message', (event)=>{
+      window.addEventListener('message', (event) => {
         if(event.data && event.data.type && event.data.content){
           const { type, content } = event.data;
           appendToConsole(type, content);
         }
       });
       
-      // Replace global element references with explicit queries
+      // Global element references.
       var preview = document.getElementById("preview");
       var popL = document.getElementById("popL");
       var btnL = document.getElementById("btnL");
@@ -178,204 +238,158 @@
       var btn70 = document.getElementById("btn70");
       var btn50 = document.getElementById("btn50");
       var btn30 = document.getElementById("btn30");
+      var btn20 = document.getElementById("btn20");
+      var btn10 = document.getElementById("btn10");
       var btn00 = document.getElementById("btn00");
       var consoleDiv = document.getElementById("consoleDiv");
       var oConsole = document.getElementById("oConsole");
       var iConsole = document.getElementById("iConsole");
-
-      // Grab the div containers for Ace editors
+      
+      // Editor container references.
       var iHTMLDiv = document.getElementById("iHTML");
       var iJSDiv = document.getElementById("iJS");
       var iCSSDiv = document.getElementById("iCSS");
       
-      // Create Ace editors
-      var editorHTML = ace.edit("iHTML");
-      var editorJS   = ace.edit("iJS");
-      var editorCSS  = ace.edit("iCSS");
-      
-      // Set themes and modes
-      editorHTML.setTheme("ace/theme/monokai");
-      editorHTML.session.setMode("ace/mode/html");
-      editorJS.setTheme("ace/theme/monokai");
-      editorJS.session.setMode("ace/mode/javascript");
-      editorCSS.setTheme("ace/theme/monokai");
-      editorCSS.session.setMode("ace/mode/css");
-      
-      // Flag to prevent recursive updates
+      // Global Monaco editor variables.
+      var editorHTML, editorJS, editorCSS;
       var isUpdating = false;
       
-      // Sync editor changes with global code variables
-      editorHTML.session.on('change', function(){
-        if(isUpdating) return;
-        isUpdating = true;
-        htmlCode = editorHTML.getValue();
-        var s = htmlCode.match(/<style>([\s\S]*?)<\/style>/i);
-        if(s){
-          cssCode = s[1];
-          editorCSS.setValue(cssCode, -1);
-        }
-        var sc = htmlCode.match(/<script>([\s\S]*?)<\/script>/i);
-        if(sc){
-          jsCode = sc[1];
-          editorJS.setValue(jsCode, -1);
-        }
-        updatePreview();
-        isUpdating = false;
-      });
-      
-      editorJS.session.on('change', function(){
-        if(isUpdating) return;
-        isUpdating = true;
-        jsCode = editorJS.getValue();
-        if(/<script>[\s\S]*?<\/script>/i.test(htmlCode)){
-          htmlCode = htmlCode.replace(/<script>[\s\S]*?<\/script>/i, `<script>${jsCode}<${'/'}script>`);
-        } else {
-          htmlCode += `<script>${jsCode}<${'/'}script>`;
-        }
-        editorHTML.setValue(htmlCode, -1);
-        updatePreview();
-        isUpdating = false;
-      });
-      
-      editorCSS.session.on('change', function(){
-        if(isUpdating) return;
-        isUpdating = true;
-        cssCode = editorCSS.getValue();
-        if(/<style>[\s\S]*?<\/style>/i.test(htmlCode)){
-          htmlCode = htmlCode.replace(/<style>[\s\S]*?<\/style>/i, `<style>${cssCode}<${'/'}style>`);
-        } else {
-          htmlCode = `<style>${cssCode}<${'/'}style>` + htmlCode;
-        }
-        editorHTML.setValue(htmlCode, -1);
-        updatePreview();
-        isUpdating = false;
-      });
-      
-      // Initialize editors with starting code
-      editorHTML.setValue(htmlCode, -1);
-      editorJS.setValue(jsCode, -1);
-      editorCSS.setValue(cssCode, -1);
-      updatePreview();
-      
-      // Console command handling
-      let saveCommandToHistory = function(cmd){
-        dcmp().then(decompressed => {
-          let pLst = JSON.parse(decompressed || '{}');
-          if(commandHistory[0] !== cmd){
-            commandHistory.unshift(cmd);
-            if(commandHistory.length > maxHistory) commandHistory.pop();
-            const pName = 'SYS_CONSOLE';
-            const projData = { js: [...commandHistory], css: '', html: '', timestamp: Date.now() };
-            if(!pLst[pName]) pLst[pName] = [];
-            pLst[pName].unshift(projData);
-            if(pLst[pName].length > 100) pLst[pName].pop();
-            cmp(JSON.stringify(pLst));
-          }
-        });
-      };
-      
-      iConsole.onkeydown = function(e){
-        if(e.key==="Enter"){
-          e.preventDefault();
-          runCommand();
+      // Configure Monaco AMD loader and custom worker URL.
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs' }});
+      window.MonacoEnvironment = {
+        getWorkerUrl: function(workerId, label) {
+          return URL.createObjectURL(new Blob([`
+            self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/' };
+            importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/base/worker/workerMain.js');
+          `], { type: 'text/javascript' }));
         }
       };
-      function runCommand(){
-        var cmd = iConsole.value;
-        appendToConsole('sys', "> " + cmd);
-        try{
-          var result = preview.contentWindow.eval(cmd);
-          if(result!==undefined) appendToConsole('log', result);
-        } catch(e){
-          appendToConsole('error', "Error: " + e.message);
-        }
-        saveCommandToHistory(cmd);
-        iConsole.value = "";
-      }
-      document.getElementById("btnRun").onclick = runCommand;
-      document.getElementById("btnClear").onclick = function(){
-        oConsole.innerHTML = '';
-        if(document.getElementById('cErrInd')) document.getElementById('cErrInd').remove();
-      };
-      
-      // Tab switching
-      btnHTML.onclick = function(){
-        activeTab = "HTML";
-        iHTMLDiv.style.display = "block";
-        iJSDiv.style.display = "none";
-        iCSSDiv.style.display = "none";
-        consoleDiv.style.display = "none";
-        btnHTML.classList.add("active");
-        btnJS.classList.remove("active");
-        btnCSS.classList.remove("active");
-        btnConsole.classList.remove("active");
-      };
-      btnJS.onclick = function(){
-        activeTab = "JS";
-        iHTMLDiv.style.display = "none";
-        iJSDiv.style.display = "block";
-        iCSSDiv.style.display = "none";
-        consoleDiv.style.display = "none";
-        btnJS.classList.add("active");
-        btnHTML.classList.remove("active");
-        btnCSS.classList.remove("active");
-        btnConsole.classList.remove("active");
-      };
-      btnCSS.onclick = function(){
-        activeTab = "CSS";
-        iHTMLDiv.style.display = "none";
-        iJSDiv.style.display = "none";
-        iCSSDiv.style.display = "block";
-        consoleDiv.style.display = "none";
-        btnCSS.classList.add("active");
-        btnHTML.classList.remove("active");
-        btnJS.classList.remove("active");
-        btnConsole.classList.remove("active");
-      };
-      btnConsole.onclick = function(){
-        iHTMLDiv.style.display = iJSDiv.style.display = iCSSDiv.style.display = "none";
-        consoleDiv.style.display = "block";
-        btnHTML.classList.remove("active");
-        btnJS.classList.remove("active");
-        btnCSS.classList.remove("active");
-        btnConsole.classList.add("active");
-      };
-      
-      function setLayout(percent){
-        if(percent==="00"){
-          lowerBox.style.height = "0";
-          topBox.style.height = "100%";
-          restoreSpan.style.display = "inline";
-        } else {
-          lowerBox.style.height = percent + "%";
-          topBox.style.height = (100 - parseInt(percent,10)) + "%";
-          restoreSpan.style.display = "none";
-        }
-        [btn100, btn90, btn80, btn70, btn50, btn30, btn00].forEach(function(btn){
-          btn.classList.remove("active");
-        });
-        if(percent==="100") btn100.classList.add("active");
-        else if(percent==="90") btn90.classList.add("active");
-        else if(percent==="80") btn80.classList.add("active");
-        else if(percent==="70") btn70.classList.add("active");
-        else if(percent==="50") btn50.classList.add("active");
-        else if(percent==="30") btn30.classList.add("active");
-        else if(percent==="00") btn00.classList.add("active");
-      }
-      btn100.onclick = function(){ setLayout("100"); };
-      btn90.onclick  = function(){ setLayout("90"); };
-      btn80.onclick  = function(){ setLayout("80"); };
-      btn70.onclick  = function(){ setLayout("70"); };
-      btn50.onclick  = function(){ setLayout("50"); };
-      btn30.onclick  = function(){ setLayout("30"); };
-      btn00.onclick  = function(){ setLayout("00"); };
 
-      // Save and Load functions updated to use editorHTML.getValue()
+      // Load Monaco and create three editor instances.
+      require(["vs/editor/editor.main"], function () {
+          editorHTML = monaco.editor.create(iHTMLDiv, {
+              value: htmlCode,
+              language: "html",
+              theme: "vs-dark",
+              automaticLayout: true
+          });
+          editorJS = monaco.editor.create(iJSDiv, {
+              value: jsCode,
+              language: "javascript",
+              theme: "vs-dark",
+              automaticLayout: true
+          });
+          editorCSS = monaco.editor.create(iCSSDiv, {
+              value: cssCode,
+              language: "css",
+              theme: "vs-dark",
+              automaticLayout: true
+          });
+          
+          // Sync changes from the HTML editor.
+          editorHTML.onDidChangeModelContent(function(){
+              if(isUpdating) return;
+              isUpdating = true;
+              htmlCode = editorHTML.getValue();
+              var s = htmlCode.match(/<style>([\s\S]*?)<\/style>/i);
+              if(s){
+                cssCode = s[1];
+                editorCSS.setValue(cssCode);
+              }
+              var sc = htmlCode.match(/<script>([\s\S]*?)<\/script>/i);
+              if(sc){
+                jsCode = sc[1];
+                editorJS.setValue(jsCode);
+              }
+              updatePreview();
+              isUpdating = false;
+          });
+          
+          // Sync changes from the JS editor.
+          editorJS.onDidChangeModelContent(function(){
+              if(isUpdating) return;
+              isUpdating = true;
+              jsCode = editorJS.getValue();
+              if(/<script>[\s\S]*?<\/script>/i.test(htmlCode)){
+                htmlCode = htmlCode.replace(/<script>[\s\S]*?<\/script>/i, `<script>${jsCode}<${'/'}script>`);
+              } else {
+                htmlCode += `<script>${jsCode}<${'/'}script>`;
+              }
+              editorHTML.setValue(htmlCode);
+              updatePreview();
+              isUpdating = false;
+          });
+          
+          // Sync changes from the CSS editor.
+          editorCSS.onDidChangeModelContent(function(){
+              if(isUpdating) return;
+              isUpdating = true;
+              cssCode = editorCSS.getValue();
+              if(/<style>[\s\S]*?<\/style>/i.test(htmlCode)){
+                htmlCode = htmlCode.replace(/<style>([\s\S]*?)<\/style>/i, `<style>${cssCode}<${'/'}style>`);
+              } else {
+                htmlCode = `<style>${cssCode}<${'/'}style>` + htmlCode;
+              }
+              editorHTML.setValue(htmlCode);
+              updatePreview();
+              isUpdating = false;
+          });
+          
+          updatePreview();
+      });
+
+      // -------------------
+      // Top Bar Functionality
+      // -------------------
+
+      // Compression: compress and save project list to localStorage.
+      async function cmp(input){
+        let b = new Blob([input], { type: 'text/plain' });
+        let r = b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
+        let chunks = [];
+        while(true){
+          const { done, value } = await r.read();
+          if(done) break;
+          chunks.push(value);
+        }
+        let c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
+        let base64String = btoa(String.fromCharCode.apply(null, c));
+        localStorage.pLst = base64String;
+        appendToConsole('sys', `JSON STR.length: ${input.length}, B64.length: ${base64String.length}`);
+      }
+
+      var prevLength = 0;
+      // Decompression: retrieve project list from localStorage.
+      function dcmp(){
+        return (async () => {
+          let base64String = localStorage.pLst || "{}";
+          if(base64String[0] === '{') return base64String;
+          let c = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+          let b = new Blob([c]);
+          let ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
+          let dt = await new Response(ds).text();
+          if(dt.length != prevLength){
+            appendToConsole('sys', `STR.length: ${dt.length}, B64.length: ${base64String.length}`);
+            prevLength = dt.length;
+          }
+          return dt;
+        })();
+      }
+
+      // LOAD: show project list popup.
+      btnL.onclick = function(){
+        dcmp().then(decompressed => {
+          const pLst = JSON.parse(decompressed || '{}');
+          showLoadPop(pLst);
+        });
+      };
+
+      // SAVE: prompt for project name and save current project.
       btnS.onclick = function(){
         dcmp().then(decompressed => {
           let pLst = JSON.parse(decompressed || '{}');
           let pNames = "<new>, " + Object.keys(pLst).join(", ");
-          let pName = prompt(`Save Name [${pNames}]%delete:`, btnS.innerHTML?.split(" ")[1]?.replace(/[()]/g, ""));
+          let pName = prompt(`Save Name [${pNames}]%delete:`, btnS.innerHTML.split(" ")[1]?.replace(/[()]/g, ""));
           if(pName){
             if(pName.includes('%delete')){
               let delProj = pName.split('%')[0];
@@ -390,7 +404,10 @@
               if(pName==="new") pName = prompt("Enter new project name:");
               if(pName){
                 btnS.innerHTML = "SAVE (" + pName.split('%')[0] + ")";
-                let projData = { js: editorHTML.getValue(), css: '', html: '', timestamp: Date.now() };
+                let projData = { 
+                  js: editorHTML.getValue(), // Use the HTML editor's value as the full project code.
+                  css: '', html: '', timestamp: Date.now() 
+                };
                 if(!pLst[pName]) pLst[pName] = [];
                 pLst[pName].unshift(projData);
                 if(pLst[pName].length > 10) pLst[pName].pop();
@@ -401,25 +418,46 @@
           }
         });
       };
-      
-      btnL.onclick = function(){
-        dcmp().then(decompressed => {
-          const pLst = JSON.parse(decompressed || '{}');
-          showLoadPop(pLst);
-        });
+
+      btnE.onclick = function() {
+        const url = URL.createObjectURL(new Blob([localStorage.pLst], { type: 'application/json' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pLst.json'; // Set the desired filename here
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    btnI.onclick = function(){
+        fInput.click();
+    };
+    fInput.onchange = function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const contents = e.target.result;
+                try {
+                    const importedProjList = contents; // const importedProjList = JSON.parse(contents);
+                    localStorage.pLst = contents;
+                    alert("Project list imported successfully!");
+                    location.reload(); // Reload the page to apply the imported project list
+                } catch (err) {
+                    alert("Failed to import project list. Invalid JSON format.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+
+      // Restore: used when layout "00" collapses the lower panel.
+      btnRestore.onclick = function(){
+         setLayout("50");
       };
-      
-      function loadProject(savedProjects, projectName, versionIndex){
-        const projectData = savedProjects[projectName][versionIndex];
-        editorHTML.setValue(projectData.js || '', -1);
-        btnS.innerHTML = "SAVE (" + projectName + ")";
-        updatePreview();
-        popL.style.display = 'none';
-      }
-      
+
+      // Show project load popup.
       function showLoadPop(savedProjects){
-        const popup = popL;
-        popup.innerHTML = '';
+        popL.innerHTML = '';
         for(const projectName in savedProjects){
           const versions = savedProjects[projectName];
           const projectContainer = document.createElement('div');
@@ -441,51 +479,155 @@
               projectContainer.appendChild(versionButton);
             }
           }
-          popup.appendChild(projectContainer);
+          popL.appendChild(projectContainer);
         }
         const rect = btnL.getBoundingClientRect();
-        popup.style.left = rect.left + "px";
-        popup.style.top = (rect.bottom + window.scrollY) + "px";
-        popup.style.display = (popup.style.display === 'none') ? 'block' : 'none';
+        popL.style.left = rect.left + "px";
+        popL.style.top = (rect.bottom + window.scrollY) + "px";
+        popL.style.display = (popL.style.display === 'none') ? 'block' : 'none';
       }
       
+      // Load a selected project.
+      // This function uses only projectData.js (the full project code) to update the HTML editor.
+      function loadProject(savedProjects, projectName, versionIndex){
+        const projectData = savedProjects[projectName][versionIndex];
+        editorHTML.setValue(Array.isArray(projectData.js) ? projectData.js.join('<BR>') : (projectData.js || ''), -1);
+        btnS.innerHTML = "SAVE (" + projectName + ")";
+        updatePreview();
+        popL.style.display = 'none';
+      }
+
+      // -------------------
+      // Tab Switching & Layout
+      // -------------------
+      btnHTML.onclick = function(){
+          activeTab = "HTML";
+          iHTMLDiv.style.display = "block";
+          iJSDiv.style.display = "none";
+          iCSSDiv.style.display = "none";
+          consoleDiv.style.display = "none";
+          btnHTML.classList.add("active");
+          btnJS.classList.remove("active");
+          btnCSS.classList.remove("active");
+          btnConsole.classList.remove("active");
+          if(editorHTML) editorHTML.layout();
+      };
+      btnJS.onclick = function(){
+          activeTab = "JS";
+          iHTMLDiv.style.display = "none";
+          iJSDiv.style.display = "block";
+          iCSSDiv.style.display = "none";
+          consoleDiv.style.display = "none";
+          btnJS.classList.add("active");
+          btnHTML.classList.remove("active");
+          btnCSS.classList.remove("active");
+          btnConsole.classList.remove("active");
+          if(editorJS) editorJS.layout();
+      };
+      btnCSS.onclick = function(){
+          activeTab = "CSS";
+          iHTMLDiv.style.display = "none";
+          iJSDiv.style.display = "none";
+          iCSSDiv.style.display = "block";
+          consoleDiv.style.display = "none";
+          btnCSS.classList.add("active");
+          btnHTML.classList.remove("active");
+          btnJS.classList.remove("active");
+          btnConsole.classList.remove("active");
+          if(editorCSS) editorCSS.layout();
+      };
+      btnConsole.onclick = function(){
+          iHTMLDiv.style.display = iJSDiv.style.display = iCSSDiv.style.display = "none";
+          consoleDiv.style.display = "block";
+          btnHTML.classList.remove("active");
+          btnJS.classList.remove("active");
+          btnCSS.classList.remove("active");
+          btnConsole.classList.add("active");
+      };
+      
+      // Layout buttons: adjust the heights of top and lower panels.
+      function setLayout(percent){
+          var lowerBox = document.getElementById("lowerBox");
+          var topBox = document.getElementById("topBox");
+          if(percent === "00"){
+              lowerBox.style.height = "0";
+              topBox.style.height = "100%";
+              document.getElementById("restoreSpan").style.display = "inline";
+          } else {
+              lowerBox.style.height = percent + "%";
+              topBox.style.height = (100 - parseInt(percent, 10)) + "%";
+              document.getElementById("restoreSpan").style.display = "none";
+          }
+          [btn100, btn90, btn80, btn70, btn50, btn30, btn20, btn10, btn00].forEach(function(btn){
+              btn.classList.remove("active");
+          });
+          if(percent==="100") btn100.classList.add("active");
+          else if(percent==="90") btn90.classList.add("active");
+          else if(percent==="80") btn80.classList.add("active");
+          else if(percent==="70") btn70.classList.add("active");
+          else if(percent==="50") btn50.classList.add("active");
+          else if(percent==="30") btn30.classList.add("active");
+          else if(percent==="20") btn20.classList.add("active");
+          else if(percent==="10") btn10.classList.add("active");
+          else if(percent==="00") btn00.classList.add("active");
+          if(editorHTML) editorHTML.layout();
+          if(editorJS) editorJS.layout();
+          if(editorCSS) editorCSS.layout();
+      }
+      btn100.onclick = function(){ setLayout("100"); };
+      btn90.onclick  = function(){ setLayout("90"); };
+      btn80.onclick  = function(){ setLayout("80"); };
+      btn70.onclick  = function(){ setLayout("70"); };
+      btn50.onclick  = function(){ setLayout("50"); };
+      btn30.onclick  = function(){ setLayout("30"); };
+      btn20.onclick  = function(){ setLayout("20"); };
+      btn10.onclick  = function(){ setLayout("10"); };
+      btn00.onclick  = function(){ setLayout("00"); };
+
+      // Console command handling.
+      iConsole.onkeydown = function(e){
+        if(e.key==="Enter"){
+          e.preventDefault();
+          runCommand();
+        }
+      };
+      function runCommand(){
+        var cmd = iConsole.value;
+        appendToConsole('sys', "> " + cmd);
+        try{
+          var result = preview.contentWindow.eval(cmd);
+          if(result!==undefined) appendToConsole('log', result);
+        } catch(e){
+          appendToConsole('error', "Error: " + e.message);
+        }
+        // Save command to history.
+        dcmp().then(decompressed => {
+          let pLst = JSON.parse(decompressed || '{}');
+          if(commandHistory[0] !== cmd){
+            commandHistory.unshift(cmd);
+            if(commandHistory.length > maxHistory) commandHistory.pop();
+            const pName = 'SYS_CONSOLE';
+            const projData = { js: [...commandHistory], css: '', html: '', timestamp: Date.now() };
+            if(!pLst[pName]) pLst[pName] = [];
+            pLst[pName].unshift(projData);
+            if(pLst[pName].length > 100) pLst[pName].pop();
+            cmp(JSON.stringify(pLst));
+          }
+        });
+        iConsole.value = "";
+      }
+      document.getElementById("btnRun").onclick = runCommand;
+      document.getElementById("btnClear").onclick = function(){
+        oConsole.innerHTML = '';
+        if(document.getElementById('cErrInd')) document.getElementById('cErrInd').remove();
+      };
+
+      // Hide load popup if clicking outside.
       document.addEventListener('click', function(event){
         if(!btnL.contains(event.target) && !popL.contains(event.target)){
           popL.style.display = 'none';
         }
       });
-      
-      async function cmp(input){
-        let b = new Blob([input], { type: 'text/plain' });
-        let r = b.stream().pipeThrough(new CompressionStream('gzip')).getReader();
-        let chunks = [];
-        while(true){
-          const { done, value } = await r.read();
-          if(done) break;
-          chunks.push(value);
-        }
-        let c = new Uint8Array(chunks.reduce((acc, val) => [...acc, ...val], []));
-        let base64String = btoa(String.fromCharCode.apply(null, c));
-        localStorage.pLst = base64String;
-        appendToConsole('sys', `JSON STR.length: ${input.length}, B64.length: ${base64String.length}`);
-      }
-      
-      var prevLength = 0;
-      function dcmp(){
-        return (async () => {
-          let base64String = localStorage.pLst || "{}";
-          if(base64String[0] === '{') return base64String;
-          let c = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
-          let b = new Blob([c]);
-          let ds = b.stream().pipeThrough(new DecompressionStream('gzip'));
-          let dt = await new Response(ds).text();
-          if(dt.length != prevLength){
-            appendToConsole('sys', `STR.length: ${dt.length}, B64.length: ${base64String.length}`);
-            prevLength = dt.length;
-          }
-          return dt;
-        })();
-      }
     </script>
   </body>
 </html>
