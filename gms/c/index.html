@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Legends CCG</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --card-width: 70px; --card-height: 100px; --primary-color: #2a4d69; --secondary-color: #e76f51; --accent-color: #f4a261; --text-color: #e9c46a; --bg-color: #264653; }
+        body { font-family: 'Arial', sans-serif; background-color: var(--bg-color); color: var(--text-color); height: 100vh; touch-action: manipulation; user-select: none; overflow: hidden; }
+        .game-container { display: flex; flex-direction: column; height: calc(100vh - 20px); max-width: 100%; margin: 0 auto; position: relative; padding-bottom: 20px; }
+        
+        .status-bar { display: flex; justify-content: space-between; padding: 10px; background-color: rgba(0,0,0,0.5); z-index: 10; }
+        .player-stats, .opponent-stats { display: flex; align-items: center; }
+        .health, .mana { display: flex; align-items: center; margin-right: 10px; }
+        .health::before, .mana::before { content: ''; display: inline-block; width: 15px; height: 15px; margin-right: 5px; border-radius: 50%; }
+        .health::before { background-color: #e63946; }
+        .mana::before { background-color: #457b9d; }
+        
+        .opponent-area, .player-area { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px; position: relative; }
+        .opponent-area { justify-content: flex-start; }
+        .player-area { justify-content: flex-end; }
+        
+        .battlefield { flex: 2; display: flex; flex-direction: column; padding: 15px; }
+        .opponent-field, .player-field { flex: 1; display: flex; justify-content: center; gap: 10px; min-height: 110px; }
+        .field-divider { height: 2px; background-color: var(--accent-color); margin: 10px 0; box-shadow: 0 0 5px var(--accent-color); }
+        
+        .card-slot { width: var(--card-width); height: var(--card-height); border: 1px dashed rgba(255,255,255,0.3); border-radius: 5px; display: flex; justify-content: center; align-items: center; }
+        
+        .hand { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; padding: 10px; width: 100%; }
+        
+        .card { width: var(--card-width); height: var(--card-height); background-color: var(--primary-color); border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card.selected { transform: translateY(-10px); box-shadow: 0 10px 15px rgba(0,0,0,0.4), 0 0 10px var(--accent-color); }
+        .card.played { transform: scale(0.95); }
+        
+        .card-frame { width: 100%; height: 50%; background-color: #ddd; position: relative; overflow: hidden; }
+        .card-image { width: 100%; height: 100%; object-fit: cover; }
+        .card-name { font-size: 8px; font-weight: bold; padding: 2px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-description { font-size: 6px; padding: 2px; height: 24px; overflow: hidden; }
+        .card-stats { display: flex; justify-content: space-between; position: absolute; bottom: 2px; left: 5px; right: 5px; font-size: 10px; font-weight: bold; }
+        .card-attack { color: #e63946; }
+        .card-health { color: #2a9d8f; }
+        
+        .deck, .discard { position: absolute; width: 40px; height: 60px; background-color: var(--primary-color); border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); bottom: 25px; display: flex; justify-content: center; align-items: center; font-size: 8px; }
+        .deck { right: 10px; }
+        .discard { left: 10px; }
+        .card-count { position: absolute; top: -5px; right: -5px; background-color: var(--secondary-color); border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; justify-content: center; align-items: center; }
+        
+        .turn-indicator { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px; font-size: 14px; z-index: 100; opacity: 0; transition: opacity 0.5s ease; }
+        .turn-indicator.visible { opacity: 1; }
+        
+        .game-messages { position: absolute; width: 80%; max-width: 300px; bottom: 120px; left: 50%; transform: translateX(-50%); background-color: rgba(0,0,0,0.7); border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; z-index: 50; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .game-messages.visible { opacity: 1; }
+        
+        .end-turn-btn { background-color: var(--secondary-color); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; position: absolute; bottom: 20px; right: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        
+        .attack-animation { position: absolute; pointer-events: none; width: 100px; height: 100px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L80,80 M20,80 L80,20" stroke="white" stroke-width="5" stroke-linecap="round"/></svg>'); background-size: contain; opacity: 0; z-index: 100; }
+        .damage-animation { position: absolute; pointer-events: none; width: 50px; height: 50px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="5" fill="red"/><circle cx="40" cy="10" r="3" fill="red"/><circle cx="60" cy="30" r="7" fill="red"/><circle cx="80" cy="15" r="4" fill="red"/><circle cx="30" cy="50" r="6" fill="red"/><circle cx="70" cy="60" r="5" fill="red"/><circle cx="50" cy="80" r="8" fill="red"/><circle cx="15" cy="70" r="4" fill="red"/><circle cx="85" cy="75" r="7" fill="red"/></svg>'); background-size: contain; opacity: 0; z-index: 100; }
+        
+        @media (min-width: 768px) {
+            :root { --card-width: 100px; --card-height: 140px; }
+            .card-name { font-size: 12px; }
+            .card-description { font-size: 8px; height: 40px; }
+            .card-stats { font-size: 12px; }
+            .deck, .discard { width: 60px; height: 80px; font-size: 10px; }
+        }
+        
+        @keyframes cardGlow {
+            0% { box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 5px 15px var(--accent-color), 0 0 20px var(--accent-color); }
+            100% { box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        }
+        
+        @keyframes attackSlash {
+            0% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(0deg); }
+            100% { opacity: 0; transform: scale(1.5) rotate(0deg); }
+        }
+        
+        @keyframes damageEffect {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+        
+        .animate-attack { animation: attackSlash 0.5s ease-out forwards; }
+        .animate-damage { animation: damageEffect 0.5s ease-out forwards; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="status-bar">
+            <div class="opponent-stats">
+                <div class="health">20</div>
+                <div class="mana">5/5</div>
+            </div>
+            <div class="player-stats">
+                <div class="health">20</div>
+                <div class="mana">5/5</div>
+            </div>
+        </div>
+        
+        <div class="opponent-area">
+            <div class="hand" id="opponent-hand">
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Card Back" class="card-image">
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Card Back" class="card-image">
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Card Back" class="card-image">
+                    </div>
+                </div>
+            </div>
+            <div class="deck">
+                <span>DECK</span>
+                <div class="card-count">15</div>
+            </div>
+            <div class="discard">
+                <span>DISC</span>
+                <div class="card-count">0</div>
+            </div>
+        </div>
+        
+        <div class="battlefield">
+            <div class="opponent-field">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+            </div>
+            <div class="field-divider"></div>
+            <div class="player-field">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+            </div>
+        </div>
+        
+        <div class="player-area">
+            <div class="hand" id="player-hand">
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Creature" class="card-image">
+                    </div>
+                    <div class="card-name">Fire Dragon</div>
+                    <div class="card-description">Deals 1 damage to all enemy units when played.</div>
+                    <div class="card-stats">
+                        <span class="card-attack">3</span>
+                        <span class="card-health">2</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Creature" class="card-image">
+                    </div>
+                    <div class="card-name">Water Elemental</div>
+                    <div class="card-description">Restore 1 health to all friendly units.</div>
+                    <div class="card-stats">
+                        <span class="card-attack">2</span>
+                        <span class="card-health">4</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Spell" class="card-image">
+                    </div>
+                    <div class="card-name">Lightning Bolt</div>
+                    <div class="card-description">Deal 3 damage to an enemy unit.</div>
+                    <div class="card-stats">
+                        <span class="card-attack">0</span>
+                        <span class="card-health">0</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Creature" class="card-image">
+                    </div>
+                    <div class="card-name">Earth Golem</div>
+                    <div class="card-description">Taunt. Enemy units must attack this first.</div>
+                    <div class="card-stats">
+                        <span class="card-attack">1</span>
+                        <span class="card-health">6</span>
+                    </div>
+                </div>
+            </div>
+            <div class="deck">
+                <span>DECK</span>
+                <div class="card-count">10</div>
+            </div>
+            <div class="discard">
+                <span>DISC</span>
+                <div class="card-count">0</div>
+            </div>
+            <button class="end-turn-btn">END TURN</button>
+        </div>
+        
+        <div class="turn-indicator">YOUR TURN</div>
+        <div class="game-messages">Card played successfully!</div>
+        
+        <div class="attack-animation"></div>
+        <div class="damage-animation"></div>
+    </div>
+
+    <script>
+        // Game State Management
+        const gameState = {
+            playerHealth: 20,
+            playerMana: 5,
+            playerMaxMana: 5,
+            opponentHealth: 20,
+            opponentMana: 5,
+            opponentMaxMana: 5,
+            playerDeck: [],
+            opponentDeck: [],
+            playerHand: [],
+            opponentHand: [],
+            playerField: [],
+            opponentField: [],
+            playerDiscard: [],
+            opponentDiscard: [],
+            currentTurn: 'player',
+            selectedCard: null,
+            targetSlot: null
+        };
+
+        // Card Data Structure
+        class Card {
+            constructor(id, name, type, cost, attack, health, description, imageUrl, effect) {
+                this.id = id;
+                this.name = name;
+                this.type = type;
+                this.cost = cost;
+                this.attack = attack;
+                this.health = health;
+                this.description = description;
+                this.imageUrl = imageUrl;
+                this.effect = effect;
+                this.canAttack = false;
+            }
+        }
+
+        // Sample Card Data
+        const cardData = [
+            { id: 1, name: "Fire Dragon", type: "creature", cost: 5, attack: 3, health: 2, description: "Deals 1 damage to all enemy units when played.", imageUrl: "/api/placeholder/70/50", effect: "damageAll" },
+            { id: 2, name: "Water Elemental", type: "creature", cost: 4, attack: 2, health: 4, description: "Restore 1 health to all friendly units.", imageUrl: "/api/placeholder/70/50", effect: "healAll" },
+            { id: 3, name: "Lightning Bolt", type: "spell", cost: 3, attack: 0, health: 0, description: "Deal 3 damage to an enemy unit.", imageUrl: "/api/placeholder/70/50", effect: "targetDamage" },
+            { id: 4, name: "Earth Golem", type: "creature", cost: 3, attack: 1, health: 6, description: "Taunt. Enemy units must attack this first.", imageUrl: "/api/placeholder/70/50", effect: "taunt" },
+            { id: 5, name: "Shadow Assassin", type: "creature", cost: 2, attack: 4, health: 1, description: "Can attack immediately when played.", imageUrl: "/api/placeholder/70/50", effect: "charge" },
+            { id: 6, name: "Healing Rain", type: "spell", cost: 2, attack: 0, health: 0, description: "Restore 4 health to your hero.", imageUrl: "/api/placeholder/70/50", effect: "healHero" },
+            { id: 7, name: "Stone Giant", type: "creature", cost: 7, attack: 5, health: 5, description: "Destroys any creature it damages.", imageUrl: "/api/placeholder/70/50", effect: "deathtouch" },
+            { id: 8, name: "Nature's Blessing", type: "spell", cost: 1, attack: 0, health: 0, description: "Give a friendly creature +2/+2.", imageUrl: "/api/placeholder/70/50", effect: "buff" },
+            { id: 9, name: "Time Warp", type: "spell", cost: 6, attack: 0, health: 0, description: "Take an extra turn after this one.", imageUrl: "/api/placeholder/70/50", effect: "extraTurn" },
+            { id: 10, name: "Mana Crystal", type: "artifact", cost: 0, attack: 0, health: 1, description: "Gain an extra mana crystal this turn only.", imageUrl: "/api/placeholder/70/50", effect: "tempMana" }
+        ];
+
+        // Card Interaction Logic
+        function selectCard(cardElement) {
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => card.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            gameState.selectedCard = cardElement;
+        }
+
+        function playCard(cardElement, slotElement) {
+            if (!gameState.selectedCard || gameState.playerMana < 1) return;
+            cardElement.classList.add('played');
+            const cardRect = cardElement.getBoundingClientRect();
+            const slotRect = slotElement.getBoundingClientRect();
+            const translateX = slotRect.left - cardRect.left + (slotRect.width - cardRect.width) / 2;
+            const translateY = slotRect.top - cardRect.top + (slotRect.height - cardRect.height) / 2;
+            cardElement.style.transform = `translate(${translateX}px, ${translateY}px)`;
+            setTimeout(() => {
+                slotElement.appendChild(cardElement);
+                cardElement.style.transform = '';
+                cardElement.classList.remove('selected', 'played');
+            }, 300);
+            gameState.playerMana--;
+            updateStats();
+            showMessage('Card played successfully!');
+        }
+
+        function attackCard(attackerElement, targetElement) {
+            const attackAnim = document.querySelector('.attack-animation');
+            const damageAnim = document.querySelector('.damage-animation');
+            const attackerRect = attackerElement.getBoundingClientRect();
+            const targetRect = targetElement.getBoundingClientRect();
+            attackAnim.style.left = `${(attackerRect.left + targetRect.left) / 2}px`;
+            attackAnim.style.top = `${(attackerRect.top + targetRect.top) / 2}px`;
+            attackAnim.classList.add('animate-attack');
+            setTimeout(() => {
+                damageAnim.style.left = `${targetRect.left + targetRect.width / 4}px`;
+                damageAnim.style.top = `${targetRect.top + targetRect.height / 4}px`;
+                damageAnim.classList.add('animate-damage');
+            }, 250);
+            setTimeout(() => {
+                attackAnim.classList.remove('animate-attack');
+                damageAnim.classList.remove('animate-damage');
+            }, 800);
+        }
+
+        // Game Mechanics
+        function startTurn(player) {
+            gameState.currentTurn = player;
+            const turnIndicator = document.querySelector('.turn-indicator');
+            turnIndicator.textContent = player === 'player' ? 'YOUR TURN' : 'OPPONENT\'S TURN';
+            turnIndicator.classList.add('visible');
+            setTimeout(() => {
+                turnIndicator.classList.remove('visible');
+            }, 1500);
+            if (player === 'player') {
+                drawCard('player');
+                if (gameState.playerMaxMana < 10) gameState.playerMaxMana++;
+                gameState.playerMana = gameState.playerMaxMana;
+                updateStats();
+            } else {
+                drawCard('opponent');
+                if (gameState.opponentMaxMana < 10) gameState.opponentMaxMana++;
+                gameState.opponentMana = gameState.opponentMaxMana;
+                updateStats();
+                setTimeout(playOpponentTurn, 1000);
+            }
+        }
+
+        function endTurn() {
+            startTurn(gameState.currentTurn === 'player' ? 'opponent' : 'player');
+        }
+
+        function drawCard(player) {
+            if (player === 'player') {
+                if (gameState.playerDeck.length === 0) {
+                    gameState.playerHealth -= 1;
+                    showMessage("No cards left! You take 1 damage.");
+                    updateStats();
+                    return;
+                }
+                
+                const drawnCard = gameState.playerDeck.pop();
+                gameState.playerHand.push(drawnCard);
+                
+                // Update the UI
+                const playerHandElement = document.getElementById('player-hand');
+                const newCardElement = createCardElement(drawnCard);
+                playerHandElement.appendChild(newCardElement);
+                
+                // Add event listener
+                newCardElement.addEventListener('click', () => selectCard(newCardElement));
+                
+                // Update deck count
+                document.querySelector('.player-area .deck .card-count').textContent = gameState.playerDeck.length;
+            } else {
+                if (gameState.opponentDeck.length === 0) {
+                    gameState.opponentHealth -= 1;
+                    showMessage("Opponent has no cards left! They take 1 damage.");
+                    updateStats();
+                    return;
+                }
+                
+                const drawnCard = gameState.opponentDeck.pop();
+                gameState.opponentHand.push(drawnCard);
+                
+                // Update the UI (back of card for opponent)
+                const opponentHandElement = document.getElementById('opponent-hand');
+                const newCardElement = document.createElement('div');
+                newCardElement.className = 'card';
+                newCardElement.innerHTML = `
+                    <div class="card-frame">
+                        <img src="/api/placeholder/70/50" alt="Card Back" class="card-image">
+                    </div>
+                `;
+                opponentHandElement.appendChild(newCardElement);
+                
+                // Update deck count
+                document.querySelector('.opponent-area .deck .card-count').textContent = gameState.opponentDeck.length;
+            }
+        }
+
+        function updateStats() {
+            document.querySelector('.player-stats .health').textContent = gameState.playerHealth;
+            document.querySelector('.player-stats .mana').textContent = `${gameState.playerMana}/${gameState.playerMaxMana}`;
+            document.querySelector('.opponent-stats .health').textContent = gameState.opponentHealth;
+            document.querySelector('.opponent-stats .mana').textContent = `${gameState.opponentMana}/${gameState.opponentMaxMana}`;
+        }
+
+        function showMessage(message) {
+            const messageElement = document.querySelector('.game-messages');
+            messageElement.textContent = message;
+            messageElement.classList.add('visible');
+            setTimeout(() => {
+                messageElement.classList.remove('visible');
+            }, 2000);
+        }
+
+        // AI Opponent
+        function playOpponentTurn() {
+            // Basic AI logic - play a random card if possible
+            if (gameState.opponentHand.length > 0 && gameState.opponentMana > 0) {
+                // Find empty slots on opponent field
+                const emptySlots = document.querySelectorAll('.opponent-field .card-slot:empty');
+                
+                if (emptySlots.length > 0) {
+                    // Select a random card from opponent's hand
+                    const randomCardIndex = Math.floor(Math.random() * gameState.opponentHand.length);
+                    const randomCard = gameState.opponentHand[randomCardIndex];
+                    
+                    // Check if opponent has enough mana
+                    if (randomCard.cost <= gameState.opponentMana) {
+                        // Select a random empty slot
+                        const randomSlotIndex = Math.floor(Math.random() * emptySlots.length);
+                        const targetSlot = emptySlots[randomSlotIndex];
+                        
+                        // Play the card
+                        gameState.opponentMana -= randomCard.cost;
+                        updateStats();
+                        
+                        // Create and place card
+                        const cardElement = createCardElement(randomCard);
+                        
+                        // Animation setup
+                        const sourceElement = document.querySelector('#opponent-hand .card');
+                        const sourceRect = sourceElement.getBoundingClientRect();
+                        const targetRect = targetSlot.getBoundingClientRect();
+                        
+                        // Position card absolutely during animation
+                        cardElement.style.position = 'absolute';
+                        cardElement.style.top = sourceRect.top + 'px';
+                        cardElement.style.left = sourceRect.left + 'px';
+                        cardElement.style.zIndex = '100';
+                        document.body.appendChild(cardElement);
+                        
+                        // Trigger animation
+                        setTimeout(() => {
+                            cardElement.style.transition = 'all 0.5s ease';
+                            cardElement.style.top = targetRect.top + 'px';
+                            cardElement.style.left = targetRect.left + 'px';
+                        }, 100);
+                        
+                        // Complete the move
+                        setTimeout(() => {
+                            cardElement.style.position = '';
+                            cardElement.style.top = '';
+                            cardElement.style.left = '';
+                            cardElement.style.zIndex = '';
+                            targetSlot.appendChild(cardElement);
+                            
+                            // Remove the card from hand
+                            gameState.opponentHand.splice(randomCardIndex, 1);
+                            document.querySelector('#opponent-hand .card').remove();
+                            
+                            showMessage("Opponent played " + randomCard.name);
+                        }, 600);
+                        
+                        // Wait before ending turn
+                        setTimeout(endTurn, 1500);
+                        return;
+                    }
+                }
+            }
+            
+            // If no card was played, just end turn
+            setTimeout(endTurn, 1000);
+        }
+        
+        // Helper function to create card elements
+        function createCardElement(cardData) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.dataset.cardId = cardData.id;
+            
+            cardElement.innerHTML = `
+                <div class="card-frame">
+                    <img src="${cardData.imageUrl}" alt="${cardData.name}" class="card-image">
+                </div>
+                <div class="card-name">${cardData.name}</div>
+                <div class="card-description">${cardData.description}</div>
+                <div class="card-stats">
+                    <span class="card-attack">${cardData.attack}</span>
+                    <span class="card-health">${cardData.health}</span>
+                </div>
+            `;
+            
+            return cardElement;
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const playerCards = document.querySelectorAll('#player-hand .card');
+            const cardSlots = document.querySelectorAll('.player-field .card-slot');
+            const endTurnBtn = document.querySelector('.end-turn-btn');
+            
+            playerCards.forEach(card => {
+                card.addEventListener('click', () => selectCard(card));
+            });
+            
+            cardSlots.forEach(slot => {
+                slot.addEventListener('click', () => {
+                    if (gameState.selectedCard) {
+                        playCard(gameState.selectedCard, slot);
+                    }
+                });
+            });
+            
+            endTurnBtn.addEventListener('click', endTurn);
+            
+            // Initialize game
+            initializeGame();
+        });
+        
+        // Game Initialization
+        function initializeGame() {
+            // Initialize player deck
+            gameState.playerDeck = [];
+            for (let i = 0; i < 20; i++) {
+                const randomCardIndex = Math.floor(Math.random() * cardData.length);
+                const cardCopy = { ...cardData[randomCardIndex] };
+                gameState.playerDeck.push(cardCopy);
+            }
+            
+            // Initialize opponent deck
+            gameState.opponentDeck = [];
+            for (let i = 0; i < 20; i++) {
+                const randomCardIndex = Math.floor(Math.random() * cardData.length);
+                const cardCopy = { ...cardData[randomCardIndex] };
+                gameState.opponentDeck.push(cardCopy);
+            }
+            
+            // Shuffle decks
+            gameState.playerDeck = shuffleArray(gameState.playerDeck);
+            gameState.opponentDeck = shuffleArray(gameState.opponentDeck);
+            
+            // Update deck counts
+            document.querySelector('.player-area .deck .card-count').textContent = gameState.playerDeck.length;
+            document.querySelector('.opponent-area .deck .card-count').textContent = gameState.opponentDeck.length;
+            
+            // Initial hands
+            // Clear existing demo cards
+            document.getElementById('player-hand').innerHTML = '';
+            document.getElementById('opponent-hand').innerHTML = '';
+            
+            // Draw starting hands
+            for (let i = 0; i < 4; i++) {
+                drawCard('player');
+                drawCard('opponent');
+            }
+            
+            // Start the game
+            startTurn('player');
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
