@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoalTracker</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"><\/script>');
+</script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<script>
+window.jQuery.ui || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"><\/script>');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;background:#f5f7fa;color:#333}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+.header{background:#3f51b5;color:white;padding:15px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.header h1{margin:0;font-size:24px;display:inline-block}
+.controls{float:right}
+.controls a,.controls button{background:none;border:none;color:white;cursor:pointer;margin-left:15px;font-size:14px;text-decoration:none}
+.controls button{padding:5px 10px;background:rgba(255,255,255,0.2);border-radius:4px}
+.controls button:hover{background:rgba(255,255,255,0.3)}
+#goal-summary{background:white;margin:20px 0;padding:20px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);display:flex;justify-content:space-between;align-items:center}
+#goal-summary .goal-info{flex:3}
+#goal-summary .goal-progress{flex:1;text-align:right}
+#goal-summary h2{margin:0 0 5px 0;color:#3f51b5;font-size:20px}
+#goal-summary p{margin:0;color:#666}
+.goal-progress .percentage{font-size:32px;font-weight:bold;color:#4caf50}
+#charts-container{display:flex;flex-wrap:wrap;justify-content:space-between;margin-bottom:20px}
+.chart-card{flex:1 1 45%;min-width:300px;background:white;border-radius:8px;padding:20px;margin:10px;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+.chart-card h3{margin-top:0;color:#555}
+#entries-container{background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.12);margin-bottom:20px}
+#entries-container h3{margin-top:0;color:#555}
+#entries-table{width:100%;border-collapse:collapse}
+#entries-table th{text-align:left;padding:10px;border-bottom:2px solid #eee;color:#666}
+#entries-table td{padding:10px;border-bottom:1px solid #eee}
+#entries-table tr:hover{background:#f9f9f9;cursor:pointer}
+.entry-action{color:#3f51b5;cursor:pointer;margin-left:10px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-bottom:20px}
+.stat-card{background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.12);text-align:center}
+.stat-card .stat-value{font-size:24px;font-weight:bold;margin:10px 0;color:#3f51b5}
+.stat-card .stat-label{color:#666;font-size:14px}
+.ui-dialog{border-radius:8px;padding:0;box-shadow:0 5px 15px rgba(0,0,0,0.3)}
+.ui-dialog .ui-dialog-titlebar{background:#3f51b5;color:white;border:none;border-radius:8px 8px 0 0;padding:15px}
+.ui-dialog .ui-dialog-content{padding:20px}
+.ui-dialog .ui-dialog-buttonpane{border-top:1px solid #eee;padding:15px;margin-top:0}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;margin-bottom:5px;color:#555}
+.form-group input,.form-group select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
+.form-group .helper-text{font-size:12px;color:#666;margin-top:5px}
+.button-group{display:flex;gap:10px}
+.button-group button{flex:1}
+.danger-button{background:#f44336!important;color:white!important}
+.hidden{display:none}
+.empty-state{text-align:center;padding:40px 20px;color:#999}
+.empty-state p{margin:10px 0 20px 0}
+.empty-state button{background:#3f51b5;color:white;border:none;padding:10px 20px;border-radius:4px;cursor:pointer}
+.progress-bar-container{width:100%;background:#e0e0e0;border-radius:4px;height:8px;margin-top:10px}
+.progress-bar{height:100%;border-radius:4px;transition:width 0.5s ease-in-out}
+.progress-up{background:#4caf50}
+.progress-down{background:#ff9800}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;margin-right:5px}
+.tag-up{background:#e8f5e9;color:#2e7d32}
+.tag-down{background:#fff3e0;color:#e65100}
+#loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;z-index:1000}
+#loading-spinner{border:5px solid #f3f3f3;border-top:5px solid #3f51b5;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@media (max-width:768px){
+  #goal-summary{flex-direction:column;text-align:center}
+  #goal-summary .goal-progress{margin-top:15px}
+  .chart-card{flex:1 1 100%}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  #entries-table .optional-column{display:none}
+}
+</style>
+</head>
+<body>
+<div id="loading">
+  <div id="loading-spinner"></div>
+</div>
+
+<div class="header">
+  <div class="container">
+    <h1>GoalTracker</h1>
+    <div class="controls">
+      <a id="export-data">Export</a>
+      <a id="import-data">Import</a>
+      <input type="file" id="import-file" class="hidden" accept=".txt">
+      <button id="add-entry-btn">Add Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="main-content">
+  <!-- This will be populated dynamically -->
+</div>
+
+<!-- Goal Form Dialog -->
+<div id="goal-form" title="Set Your Goal" class="hidden">
+  <form>
+    <div class="form-group">
+      <label for="goal-name">What's your goal?</label>
+      <input type="text" id="goal-name" placeholder="E.g., Lose weight, Run distance, Save money">
+    </div>
+    <div class="form-group">
+      <label for="goal-target">Target value</label>
+      <input type="number" id="goal-target" step="any">
+    </div>
+    <div class="form-group">
+      <label for="goal-unit">Unit</label>
+      <input type="text" id="goal-unit" placeholder="kg, km, $, etc.">
+    </div>
+    <div class="form-group">
+      <label for="goal-date">Target date</label>
+      <input type="text" id="goal-date">
+    </div>
+    <div class="form-group">
+      <label for="goal-direction">Direction</label>
+      <select id="goal-direction">
+        <option value="up">Count up (0 → target)</option>
+        <option value="down">Count down (starting value → 0)</option>
+      </select>
+      <div class="helper-text">Are you trying to increase something or decrease it?</div>
+    </div>
+    <div class="form-group">
+      <label for="goal-starting">Starting value</label>
+      <input type="number" id="goal-starting" step="any" value="0">
+    </div>
+  </form>
+</div>
+
+<!-- Entry Form Dialog -->
+<div id="entry-form" title="Add Progress Entry" class="hidden">
+  <form>
+    <div class="form-group">
+      <label for="entry-name">Description</label>
+      <input type="text" id="entry-name" placeholder="E.g., Morning workout, Saved from salary">
+    </div>
+    <div class="form-group">
+      <label for="entry-value">Value</label>
+      <input type="number" id="entry-value" step="any">
+      <div class="helper-text" id="entry-value-helper"></div>
+    </div>
+    <div class="form-group">
+      <label for="entry-date">Date</label>
+      <input type="text" id="entry-date">
+    </div>
+    <div class="form-group">
+      <label for="entry-notes">Notes (optional)</label>
+      <input type="text" id="entry-notes" placeholder="Any additional details">
+    </div>
+  </form>
+</div>
+
+<script>
+// Wait for jQuery and all dependencies to load
+function initApp() {
+  // Data structure
+  var db = {
+    goal: null,
+    entries: [],
+    settings: {
+      theme: 'light',
+      dateFormat: 'dd-M-yy'
+    }
+  };
+
+  // Helper functions
+  function saveData(){localStorage.setItem('goaltracker',JSON.stringify(db))}
+  function loadData(){
+    const savedData=localStorage.getItem('goaltracker');
+    if(savedData){
+      try{db=JSON.parse(savedData)}catch(e){console.error('Failed to parse saved data',e)}
+    }
+  }
+  function formatDate(date){return $.datepicker.formatDate(db.settings.dateFormat,new Date(date))}
+  function parseDate(dateStr){return $.datepicker.parseDate(db.settings.dateFormat,dateStr)}
+  function calculateProgress(){
+    if(!db.goal)return{current:0,percentage:0,remaining:0};
+    let totalValue=parseFloat(db.goal.starting||0);
+    if(db.entries.length>0){
+      totalValue=db.entries.reduce((sum,entry)=>sum+parseFloat(entry.value),totalValue);
+    }
+    let target=parseFloat(db.goal.target);
+    let percentage,remaining;
+    if(db.goal.direction==='down'){
+      percentage=(1-(totalValue/parseFloat(db.goal.starting||target)))*100;
+      remaining=totalValue;
+    }else{
+      percentage=(totalValue/target)*100;
+      remaining=target-totalValue;
+    }
+    percentage=Math.min(100,Math.max(0,percentage));
+    return{current:totalValue,percentage,remaining};
+  }
+  function calculateStats(){
+    if(!db.goal||!db.entries.length)return{};
+    const entries=db.entries.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const avgValue=entries.reduce((sum,entry)=>sum+parseFloat(entry.value),0)/entries.length;
+    const firstEntry=new Date(entries[0].date);
+    const lastEntry=new Date(entries[entries.length-1].date);
+    const daysPassed=Math.max(1,Math.round((lastEntry-firstEntry)/(1000*60*60*24)));
+    const targetDate=new Date(db.goal.date);
+    const daysRemaining=Math.max(0,Math.round((targetDate-new Date())/(1000*60*60*24)));
+    const daysTotal=Math.round((targetDate-firstEntry)/(1000*60*60*24));
+    const progress=calculateProgress();
+    let dailyAvg=entries.reduce((sum,entry)=>sum+parseFloat(entry.value),0)/daysPassed;
+    let requiredDaily;
+    if(db.goal.direction==='down'){
+      requiredDaily=progress.remaining/daysRemaining;
+    }else{
+      requiredDaily=progress.remaining/daysRemaining;
+    }
+    if(!isFinite(requiredDaily))requiredDaily=0;
+    return{
+      avgValue:avgValue.toFixed(2),
+      dailyAvg:dailyAvg.toFixed(2),
+      requiredDaily:requiredDaily.toFixed(2),
+      daysTotal,
+      daysPassed,
+      daysRemaining,
+      completionPercentage:Math.min(100,(daysPassed/daysTotal)*100).toFixed(1)
+    };
+  }
+  function getProgressColor(percentage){
+    if(percentage<33)return'#f44336';
+    if(percentage<66)return'#ff9800';
+    return'#4caf50';
+  }
+
+  // UI Rendering
+  function renderEmptyState(){
+    $('#main-content').html(`
+      <div class="empty-state">
+        <h2>Welcome to GoalTracker!</h2>
+        <p>Start by setting a goal you want to achieve.</p>
+        <button id="set-goal-btn">Set a Goal</button>
+      </div>
+    `);
+    $('#set-goal-btn').click(()=>openGoalForm());
+  }
+  function renderMainView(){
+    if(!db.goal){
+      renderEmptyState();
+      return;
+    }
+    const progress=calculateProgress();
+    const stats=calculateStats();
+    const directionTag=db.goal.direction==='up'?'<span class="tag tag-up">Counting Up</span>':'<span class="tag tag-down">Counting Down</span>';
+    // Prepare main UI
+    let html=`
+      <div id="goal-summary">
+        <div class="goal-info">
+          <h2>${db.goal.name} ${directionTag}</h2>
+          <p>Target: ${db.goal.target} ${db.goal.unit} by ${formatDate(db.goal.date)}</p>
+          <div class="progress-bar-container">
+            <div class="progress-bar progress-${db.goal.direction}" style="width:${progress.percentage}%"></div>
+          </div>
+        </div>
+        <div class="goal-progress">
+          <div class="percentage">${progress.percentage.toFixed(1)}%</div>
+          <p>
+            ${db.goal.direction==='up'?
+              `${progress.current.toFixed(1)} of ${db.goal.target} ${db.goal.unit}`:
+              `${progress.current.toFixed(1)} of 0 ${db.goal.unit}`}
+          </p>
+          <a id="edit-goal">Edit Goal</a>
+        </div>
+      </div>`;
+    
+    // Stats cards
+    if(db.entries.length>0){
+      html+=`
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Days Remaining</div>
+          <div class="stat-value">${stats.daysRemaining}</div>
+          <div class="stat-label">of ${stats.daysTotal} days (${stats.completionPercentage}%)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Average Entry</div>
+          <div class="stat-value">${stats.avgValue}</div>
+          <div class="stat-label">${db.goal.unit} per entry</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Daily Average</div>
+          <div class="stat-value">${stats.dailyAvg}</div>
+          <div class="stat-label">${db.goal.unit} per day</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Required Daily</div>
+          <div class="stat-value">${stats.requiredDaily}</div>
+          <div class="stat-label">${db.goal.unit} per day needed</div>
+        </div>
+      </div>`;
+    }
+    
+    // Charts
+    html+=`
+      <div id="charts-container">
+        <div class="chart-card">
+          <h3>Progress Over Time</h3>
+          <canvas id="line-chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Completion Status</h3>
+          <canvas id="progress-chart"></canvas>
+        </div>
+      </div>`;
+    
+    // Entries
+    html+=`
+      <div id="entries-container">
+        <h3>Progress Entries <small>(${db.entries.length})</small></h3>
+        ${db.entries.length===0?'<p>No entries yet. Add your first progress entry to start tracking.</p>':''}
+        ${db.entries.length>0?`
+          <table id="entries-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Value</th>
+                <th class="optional-column">Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${db.entries.slice().reverse().map((entry,idx)=>`
+                <tr data-id="${db.entries.length-1-idx}">
+                  <td>${formatDate(entry.date)}</td>
+                  <td>${entry.name}</td>
+                  <td>${parseFloat(entry.value).toFixed(2)} ${db.goal.unit}</td>
+                  <td class="optional-column">${entry.notes||''}</td>
+                  <td>
+                    <span class="entry-action edit-entry">Edit</span>
+                    <span class="entry-action delete-entry">Delete</span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `:''}
+      </div>`;
+    
+    $('#main-content').html(html);
+    
+    // Attach event handlers
+    $('#edit-goal').click(()=>openGoalForm(true));
+    $('.edit-entry').click(function(e){
+      e.stopPropagation();
+      const id=$(this).closest('tr').data('id');
+      openEntryForm(id);
+    });
+    $('.delete-entry').click(function(e){
+      e.stopPropagation();
+      const id=$(this).closest('tr').data('id');
+      if(confirm('Are you sure you want to delete this entry?')){
+        db.entries.splice(id,1);
+        saveData();
+        renderMainView();
+      }
+    });
+    $('#entries-table tbody tr').click(function(){
+      const id=$(this).data('id');
+      openEntryForm(id);
+    });
+    
+    if(db.entries.length>0){
+      renderCharts();
+    }
+  }
+  function renderCharts(){
+    const entries=db.entries.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    
+    // Line chart
+    const lineCtx=document.getElementById('line-chart').getContext('2d');
+    let cumulativeValue=parseFloat(db.goal.starting||0);
+    const lineData={
+      labels:entries.map(e=>formatDate(e.date)),
+      datasets:[{
+        label:'Actual Progress',
+        data:entries.map(e=>{
+          cumulativeValue+=(db.goal.direction==='down'?-1:1)*parseFloat(e.value);
+          return db.goal.direction==='down'?
+            (1-(cumulativeValue/parseFloat(db.goal.starting)))*100:
+            (cumulativeValue/parseFloat(db.goal.target))*100;
+        }),
+        borderColor:'#3f51b5',
+        backgroundColor:'rgba(63,81,181,0.1)',
+        fill:true,
+        tension:0.1
+      }]
+    };
+    if(window.lineChart) {
+      window.lineChart.destroy();
+    }
+    window.lineChart = new Chart(lineCtx,{
+      type:'line',
+      data:lineData,
+      options:{
+        responsive:true,
+        scales:{
+          y:{
+            beginAtZero:true,
+            max:100,
+            title:{
+              display:true,
+              text:'Completion Percentage'
+            },
+            ticks:{
+              callback:function(value){return value+'%'}
+            }
+          }
+        },
+        plugins:{
+          tooltip:{
+            callbacks:{
+              label:function(context){
+                return context.parsed.y.toFixed(1)+'% complete';
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // Progress Chart (Doughnut)
+    const progress=calculateProgress();
+    const progressCtx=document.getElementById('progress-chart').getContext('2d');
+    const progressData={
+      labels:['Completed','Remaining'],
+      datasets:[{
+        data:[progress.percentage,100-progress.percentage],
+        backgroundColor:[getProgressColor(progress.percentage),'#e0e0e0'],
+        borderWidth:0
+      }]
+    };
+    if(window.progressChart) {
+      window.progressChart.destroy();
+    }
+    window.progressChart = new Chart(progressCtx,{
+      type:'doughnut',
+      data:progressData,
+      options:{
+        responsive:true,
+        cutout:'70%',
+        plugins:{
+          tooltip:{
+            callbacks:{
+              label:function(context){
+                return context.label+': '+context.parsed.toFixed(1)+'%';
+              }
+            }
+          }
+        }
+      },
+      plugins:[{
+        id:'centerText',
+        beforeDraw:function(chart){
+          const width=chart.width;
+          const height=chart.height;
+          const ctx=chart.ctx;
+          ctx.restore();
+          const fontSize=16;
+          ctx.font=fontSize+'px sans-serif';
+          ctx.textBaseline='middle';
+          ctx.fillStyle='#333';
+          const text=progress.percentage.toFixed(1)+'%';
+          const textX=(width-ctx.measureText(text).width)/2;
+          const textY=height/2;
+          ctx.fillText(text,textX,textY);
+          ctx.save();
+        }
+      }]
+    });
+  }
+
+  // Dialog Forms
+  function openGoalForm(editing=false){
+    if(editing&&db.goal){
+      $('#goal-name').val(db.goal.name);
+      $('#goal-target').val(db.goal.target);
+      $('#goal-unit').val(db.goal.unit);
+      $('#goal-date').val(formatDate(db.goal.date));
+      $('#goal-direction').val(db.goal.direction);
+      $('#goal-starting').val(db.goal.starting);
+    }else{
+      $('#goal-name').val('');
+      $('#goal-target').val('');
+      $('#goal-unit').val('');
+      $('#goal-date').val(formatDate(new Date()));
+      $('#goal-direction').val('up');
+      $('#goal-starting').val('0');
+    }
+    $('#goal-form').dialog({
+      width:400,
+      modal:true,
+      buttons:[
+        {
+          text:'Cancel',
+          class:'ui-button',
+          click:function(){$(this).dialog('close')}
+        },
+        {
+          text:editing?'Delete Goal':'Clear',
+          class:'ui-button danger-button',
+          click:function(){
+            if(editing){
+              if(confirm('Are you sure you want to delete this goal and all progress data?')){
+                db={
+                  goal:null,
+                  entries:[],
+                  settings:db.settings
+                };
+                saveData();
+                renderMainView();
+                $(this).dialog('close');
+              }
+            }else{
+              $('#goal-name').val('');
+              $('#goal-target').val('');
+              $('#goal-unit').val('');
+            }
+          }
+        },
+        {
+          text:'Save',
+          class:'ui-button ui-button-primary',
+          click:function(){
+            const name=$('#goal-name').val();
+            const target=$('#goal-target').val();
+            const unit=$('#goal-unit').val();
+            const date=$('#goal-date').val();
+            const direction=$('#goal-direction').val();
+            const starting=$('#goal-starting').val();
+            
+            // Validation
+            if(!name||!target||!date){
+              alert('Please fill all required fields');
+              return;
+            }
+            
+            if(!db.goal){
+              db.goal={};
+              db.entries=[];
+            }
+            
+            db.goal={
+              name,
+              target,
+              unit,
+              date,
+              direction,
+              starting
+            };
+            
+            saveData();
+            renderMainView();
+            $(this).dialog('close');
+          }
+        }
+      ]
+    });
+  }
+  function openEntryForm(entryIndex=null){
+    const editing=entryIndex!==null;
+    const entry=editing?db.entries[entryIndex]:null;
+    
+    if(editing){
+      $('#entry-name').val(entry.name);
+      $('#entry-value').val(entry.value);
+      $('#entry-date').val(formatDate(entry.date));
+      $('#entry-notes').val(entry.notes||'');
+    }else{
+      $('#entry-name').val('');
+      $('#entry-value').val('');
+      $('#entry-date').val(formatDate(new Date()));
+      $('#entry-notes').val('');
+    }
+    
+    $('#entry-value-helper').html(`Enter the ${db.goal.direction==='down'?'decrease':'increase'} in ${db.goal.unit}`);
+    
+    $('#entry-form').dialog({
+      width:400,
+      modal:true,
+      buttons:[
+        {
+          text:'Cancel',
+          class:'ui-button',
+          click:function(){$(this).dialog('close')}
+        },
+        editing?{
+          text:'Delete',
+          class:'ui-button danger-button',
+          click:function(){
+            if(confirm('Are you sure you want to delete this entry?')){
+              db.entries.splice(entryIndex,1);
+              saveData();
+              renderMainView();
+              $(this).dialog('close');
+            }
+          }
+        }:null,
+        {
+          text:'Save',
+          class:'ui-button ui-button-primary',
+          click:function(){
+            const name=$('#entry-name').val();
+            const value=$('#entry-value').val();
+            const date=$('#entry-date').val();
+            const notes=$('#entry-notes').val();
+            
+            // Validation
+            if(!name||!value||!date){
+              alert('Please fill all required fields');
+              return;
+            }
+            
+            const entryData={
+              name,
+              value:parseFloat(value),
+              date:parseDate(date),
+              notes
+            };
+            
+            if(editing){
+              db.entries[entryIndex]=entryData;
+            }else{
+              db.entries.push(entryData);
+            }
+            
+            saveData();
+            renderMainView();
+            $(this).dialog('close');
+          }
+        }
+      ].filter(Boolean)
+    });
+  }
+
+  // Import/Export
+  function exportData(){
+    const dataStr=JSON.stringify(db);
+    const dataBlob=new Blob([dataStr],{type:'text/plain'});
+    const url=URL.createObjectURL(dataBlob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='goaltracker_data.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  function importData(event){
+    const file=event.target.files[0];
+    if(!file)return;
+    
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const importedData=JSON.parse(e.target.result);
+        if(confirm('Import this data? This will replace your current goal and entries.')){
+          db=importedData;
+          saveData();
+          renderMainView();
+        }
+      }catch(error){
+        alert('Invalid data file');
+      }
+    };
+    
+    reader.readAsText(file);
+  }
+
+  // Initialize the app
+  function init() {
+    // Setup datepickers
+    $('#goal-date, #entry-date').datepicker({dateFormat:db.settings.dateFormat});
+
+    // Load saved data
+    loadData();
+    
+    // Render main view
+    renderMainView();
+    
+    // Hide loading screen
+    $('#loading').fadeOut();
+    
+    // Attach global event handlers
+    $('#add-entry-btn').click(function() {
+      if(db.goal) {
+        openEntryForm();
+      } else {
+        alert('Please set a goal first');
+      }
+    });
+    
+    $('#export-data').click(exportData);
+    $('#import-data').click(function() {
+      $('#import-file').click();
+    });
+    $('#import-file').change(importData);
+  }
+
+  // Start the app
+  init();
+}
+
+// Helper function to check if jQuery is available
+function checkJQueryAndInit() {
+  if (window.jQuery && window.jQuery.ui && window.Chart) {
+    // All required libraries are loaded
+    initApp();
+  } else {
+    // Still waiting for libraries
+    setTimeout(checkJQueryAndInit, 100);
+  }
+}
+
+// Start checking when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+  checkJQueryAndInit();
+});
+</script>
+</body>
+</html>
