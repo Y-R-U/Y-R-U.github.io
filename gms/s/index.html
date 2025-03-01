@@ -1,516 +1,1321 @@
-<!DOCTYPE html>
+ 
+<!DOCTYPE html> 
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Snake Game</title>
-<style>
-  body {
-    background: #333;
-    color: #eee;
-    font-family: sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-  }
-
-  #game-container {
-    margin: 20px auto;
-    display: block;
-    position: relative;
-  }
-
-  #score {
-    margin: 10px;
-    font-size: 20px;
-  }
-
-  #mode-buttons {
-    margin: 10px;
-  }
-
-  button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    background: #555;
-    color: #eee;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-  }
-
-  button:hover {
-    background: #666;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Battle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+            color: white;
+        }
+        
+        #game-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #1E1E1E;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .score-display {
+            position: absolute;
+            top: 10px;
+            padding: 5px 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        #player-score {
+            left: 10px;
+            color: #4CAF50;
+        }
+        
+        #enemy-score {
+            right: 10px;
+            color: #F44336;
+        }
+        
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            pointer-events: auto;
+            display: none;
+        }
+        
+        #game-over h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FF5722;
+        }
+        
+        #game-over p {
+            margin-bottom: 15px;
+        }
+        
+        #restart-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #restart-button:hover {
+            background-color: #45a049;
+        }
+        
+        #power-up-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .power-up-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .power-up-timer {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            transform-origin: left;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        
+        .control-button {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            user-select: none;
+        }
+        
+        #enemy-toggle {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            pointer-events: auto;
+        }
+        
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+        
+        #start-screen h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+        }
+        
+        #start-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        #start-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .game-instructions {
+            max-width: 600px;
+            text-align: center;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        
+        .power-up-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .power-up-item {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .power-up-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        @media (orientation: landscape) {
+            #start-screen .power-up-list {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            #start-screen h1 {
+                font-size: 2em;
+            }
+            
+            #start-button {
+                padding: 12px 24px;
+                font-size: 1.2em;
+            }
+            
+            .game-instructions {
+                font-size: 0.9em;
+            }
+        }
+        
+        /* D-pad styles for mobile */
+        #d-pad {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 150px;
+            height: 150px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            pointer-events: auto;
+        }
+        
+        .d-pad-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            user-select: none;
+        }
+        
+        #up-button {
+            grid-column: 2;
+            grid-row: 1;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        #left-button {
+            grid-column: 1;
+            grid-row: 2;
+            border-radius: 5px 0 0 5px;
+        }
+        
+        #center-button {
+            grid-column: 2;
+            grid-row: 2;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        #right-button {
+            grid-column: 3;
+            grid-row: 2;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        #down-button {
+            grid-column: 2;
+            grid-row: 3;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        /* Button icons */
+        .icon {
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-<h1>Snake Game</h1>
-<div id="score">Score: 0</div>
-<div id="mode-buttons">
-  <button id="singleBtn">SINGLE</button>
-  <button id="enemyAIBtn">ENEMYAI</button>
-</div>
-<canvas id="game" width="600" height="400"></canvas>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="ui-overlay">
+            <div id="player-score" class="score-display">Score: 0</div>
+            <div id="enemy-score" class="score-display">Enemy: 0</div>
+            
+            <button id="enemy-toggle">Enemy AI: ON</button>
+            
+            <div id="power-up-indicator"></div>
+            
+            <div id="d-pad">
+                <div id="up-button" class="d-pad-button">↑</div>
+                <div id="left-button" class="d-pad-button">←</div>
+                <div id="center-button" class="d-pad-button"></div>
+                <div id="right-button" class="d-pad-button">→</div>
+                <div id="down-button" class="d-pad-button">↓</div>
+            </div>
+            
+            <div id="game-over">
+                <h2>Game Over</h2>
+                <p id="final-score">Your Score: 0</p>
+                <p id="game-result"></p>
+                <button id="restart-button">Play Again</button>
+            </div>
+            
+            <div id="start-screen">
+                <h1>SNAKE BATTLE</h1>
+                <div class="game-instructions">
+                    <p>Navigate your snake to collect food and power-ups while avoiding collisions.</p>
+                    <div class="power-up-list">
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: red;"></div>
+                            <span>Food (+1 Length)</span>
+                        </div>
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: cyan;"></div>
+                            <span>Freeze Enemy (3s)</span>
+                        </div>
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: yellow;"></div>
+                            <span>Speed Boost (5s)</span>
+                        </div>
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: purple;"></div>
+                            <span>Shield (8s)</span>
+                        </div>
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: orange;"></div>
+                            <span>Laser (5 shots)</span>
+                        </div>
+                        <div class="power-up-item">
+                            <div class="power-up-color" style="background-color: lime;"></div>
+                            <span>Ghost (5s)</span>
+                        </div>
+                    </div>
+                    <p>Use arrow keys, WASD, or the on-screen controls to move</p>
+                </div>
+                <button id="start-button">START GAME</button>
+            </div>
+        </div>
+    </div>
 
-<script>
-(() => {
-  // ==========================
-  // CONFIGURABLE CONSTANTS
-  // ==========================
-  const CELL_SIZE = 20;          // Size of each cell in the grid
-  const INITIAL_SPEED = 150;     // Update speed in ms (lower is faster)
-  const FOOD_COUNT = 3;          // How many foods on the board at once
-  const RESPAWN_TIME = 5000;     // Respawn time in ms for crashed snakes in ENEMYAI mode
-  const SCORE_PER_FOOD = 10;     // Points gained per food eaten
-  const CRASH_PENALTY = 50;      // Points lost when a snake crashes
-  const SPAWN_COUNTDOWN = 3;     // 3-second countdown on spawn/respawn
-
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  const scoreDisplay = document.getElementById('score');
-
-  const width = canvas.width;
-  const height = canvas.height;
-  const COLS = Math.floor(width / CELL_SIZE);
-  const ROWS = Math.floor(height / CELL_SIZE);
-
-  let gameInterval = null;
-  let mode = null; // 'SINGLE' or 'ENEMYAI'
-
-  // Directions
-  const DIRECTIONS = {
-    ArrowUp: {x:0, y:-1},
-    ArrowDown: {x:0, y:1},
-    ArrowLeft: {x:-1, y:0},
-    ArrowRight: {x:1, y:0}
-  };
-
-  class Snake {
-    constructor(color, x, y, length=5, humanControlled=true) {
-      this.color = color;
-      this.segments = [];
-      for (let i = 0; i < length; i++) {
-        this.segments.push({x: x - i, y: y});
-      }
-      this.direction = {x:1, y:0}; // start moving right
-      this.alive = true;
-      this.humanControlled = humanControlled;
-      this.respawning = false;
-      this.spawnCountdown = SPAWN_COUNTDOWN; // on creation or respawn
-      this.lastCountdownTime = performance.now();
-    }
-
-    changeDirection(dir) {
-      // Prevent reversing direction directly
-      if ((dir.x === -this.direction.x && dir.x !== 0) || (dir.y === -this.direction.y && dir.y !== 0)) {
-        return;
-      }
-      this.direction = dir;
-    }
-
-    update() {
-      if (!this.alive || this.respawning) return;
-      // If spawn countdown is not finished, do not move yet
-      if (this.spawnCountdown > 0) return;
-
-      const head = this.getHead();
-      const newHead = {x: head.x + this.direction.x, y: head.y + this.direction.y};
-      this.segments.unshift(newHead);
-      this.segments.pop();
-    }
-
-    grow() {
-      // Add a segment at the tail
-      const tail = this.segments[this.segments.length - 1];
-      this.segments.push({x: tail.x, y: tail.y});
-    }
-
-    getHead() {
-      return this.segments[0];
-    }
-
-    checkCollisionWithWalls() {
-      const head = this.getHead();
-      if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
-        return true;
-      }
-      return false;
-    }
-
-    checkCollisionWithSelf() {
-      const head = this.getHead();
-      for (let i = 1; i < this.segments.length; i++) {
-        if (this.segments[i].x === head.x && this.segments[i].y === head.y) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    draw(ctx) {
-      if (!this.alive && !this.respawning) return; 
-      ctx.fillStyle = this.color;
-      for (let seg of this.segments) {
-        drawCell(seg.x, seg.y, ctx, this.color);
-      }
-
-      // If countdown is active, draw it on the head
-      if (this.spawnCountdown > 0) {
-        const head = this.getHead();
-        ctx.fillStyle = 'white';
-        ctx.font = '16px Arial';
-        const text = this.spawnCountdown.toString();
-        const textWidth = ctx.measureText(text).width;
-        ctx.fillText(text, head.x * CELL_SIZE + CELL_SIZE/2 - textWidth/2, head.y * CELL_SIZE + CELL_SIZE/2 + 6);
-      }
-    }
-
-    updateSpawnCountdown() {
-      if (this.spawnCountdown <= 0) return;
-      let now = performance.now();
-      // Decrease countdown every second
-      if (now - this.lastCountdownTime >= 1000) {
-        this.spawnCountdown--;
-        this.lastCountdownTime = now;
-      }
-    }
-  }
-
-  class EnemySnake extends Snake {
-    constructor(color, x, y, length=5) {
-      super(color, x, y, length, false);
-      this.initialReactionDelay = Math.random() * 2000 + 500; // random initial delay
-      this.reactionTime = Math.random() * 500; // random reaction time for direction change
-      this.lastDecisionTime = performance.now();
-    }
-
-    aiUpdate(foods) {
-      if (!this.alive || this.respawning) return;
-      if (this.spawnCountdown > 0) return; // don't move or decide direction during countdown
-
-      const now = performance.now();
-      // Only decide direction after initial delay and reaction time
-      if (now - this.lastDecisionTime < this.initialReactionDelay + this.reactionTime) {
-        return;
-      }
-
-      this.lastDecisionTime = now;
-      // Simple AI: move towards the closest food
-      let head = this.getHead();
-      let closestFood = null;
-      let closestDist = Infinity;
-      for (let f of foods) {
-        const dist = (f.x - head.x)**2 + (f.y - head.y)**2;
-        if (dist < closestDist) {
-          closestDist = dist;
-          closestFood = f;
-        }
-      }
-
-      if (closestFood) {
-        // Try to move closer to food
-        let dx = closestFood.x - head.x;
-        let dy = closestFood.y - head.y;
-
-        let dirX = 0;
-        let dirY = 0;
-
-        if (Math.abs(dx) > Math.abs(dy)) {
-          dirX = dx > 0 ? 1 : -1;
-        } else {
-          dirY = dy > 0 ? 1 : -1;
-        }
-
-        // Attempt to avoid immediate self-collision by checking the next cell
-        // Random reaction might fail sometimes
-        const testHead = {x: head.x + dirX, y: head.y + dirY};
-        if (this.wouldCollideWithSelf(testHead) || this.wouldCollideWithWall(testHead)) {
-          // Try another direction randomly
-          const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
-          let chosen = this.direction;
-          for (let d of dirs) {
-            const altHead = {x: head.x + d.x, y: head.y + d.y};
-            if (!this.wouldCollideWithSelf(altHead) && !this.wouldCollideWithWall(altHead)) {
-              chosen = d;
-              break;
+    <script>
+        // Game settings and variables
+        const CELL_SIZE = 20;
+        const GRID_COLOR = "#2A2A2A";
+        const FOOD_COLOR = "#FF0000";
+        const PLAYER_COLOR = "#4CAF50";
+        const ENEMY_COLOR = "#F44336";
+        const INITIAL_SPEED = 150; // ms delay between updates (lower = faster)
+        
+        // Power-ups
+        const POWER_UPS = [
+            { 
+                name: "freeze", 
+                color: "#00FFFF", 
+                chance: 0.1, 
+                duration: 3000,
+                description: "Freeze Enemy",
+                icon: "❄️" 
+            },
+            { 
+                name: "speed", 
+                color: "#FFFF00", 
+                chance: 0.1, 
+                duration: 5000,
+                description: "Speed Boost",
+                icon: "⚡" 
+            },
+            { 
+                name: "laser", 
+                color: "#FF8C00", 
+                chance: 0.08, 
+                shots: 5,
+                description: "Laser",
+                icon: "🔫" 
+            },
+            { 
+                name: "shield", 
+                color: "#9932CC", 
+                chance: 0.1, 
+                duration: 8000,
+                description: "Shield",
+                icon: "🛡️" 
+            },
+            { 
+                name: "ghost", 
+                color: "#32CD32", 
+                chance: 0.08, 
+                duration: 5000,
+                description: "Ghost Mode",
+                icon: "👻" 
             }
-          }
-          this.direction = chosen;
-        } else {
-          this.direction = {x: dirX, y: dirY};
+        ];
+        
+        // Game state
+        let gridWidth, gridHeight;
+        let player, enemy;
+        let food = null;
+        let activePowerUps = [];
+        let gameLoop;
+        let isGameOver = false;
+        let isGameStarted = false;
+        let isEnemyEnabled = true;
+        let playerScore = 0;
+        let enemyScore = 0;
+        let activePlayerPowerUps = {};
+        let activeLasers = [];
+        let nextPowerUpTime = 0;
+        
+        // Get elements
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const playerScoreDisplay = document.getElementById('player-score');
+        const enemyScoreDisplay = document.getElementById('enemy-score');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const gameResultDisplay = document.getElementById('game-result');
+        const restartButton = document.getElementById('restart-button');
+        const enemyToggle = document.getElementById('enemy-toggle');
+        const powerUpIndicator = document.getElementById('power-up-indicator');
+        const startScreen = document.getElementById('start-screen');
+        const startButton = document.getElementById('start-button');
+        
+        // Direction constants
+        const DIRECTIONS = {
+            UP: { x: 0, y: -1 },
+            DOWN: { x: 0, y: 1 },
+            LEFT: { x: -1, y: 0 },
+            RIGHT: { x: 1, y: 0 }
+        };
+        
+        // Initialize canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Calculate grid dimensions
+            gridWidth = Math.floor(canvas.width / CELL_SIZE);
+            gridHeight = Math.floor(canvas.height / CELL_SIZE);
+            
+            // Redraw if game is active
+            if (isGameStarted && !isGameOver) {
+                drawGame();
+            }
         }
-      }
-    }
-
-    wouldCollideWithSelf(pos) {
-      for (let i = 0; i < this.segments.length; i++) {
-        if (this.segments[i].x === pos.x && this.segments[i].y === pos.y) {
-          return true;
+        
+        // Initialize the game
+        function initGame() {
+            // Reset game state
+            player = {
+                body: [
+                    { x: Math.floor(gridWidth / 4), y: Math.floor(gridHeight / 2) }
+                ],
+                direction: DIRECTIONS.RIGHT,
+                nextDirection: DIRECTIONS.RIGHT,
+                speed: INITIAL_SPEED,
+                baseSpeed: INITIAL_SPEED,
+                color: PLAYER_COLOR
+            };
+            
+            enemy = {
+                body: [
+                    { x: Math.floor(gridWidth * 3 / 4), y: Math.floor(gridHeight / 2) }
+                ],
+                direction: DIRECTIONS.LEFT,
+                nextDirection: DIRECTIONS.LEFT,
+                speed: INITIAL_SPEED * 1.2, // Enemy slightly slower
+                baseSpeed: INITIAL_SPEED * 1.2,
+                lastUpdate: 0,
+                color: ENEMY_COLOR,
+                frozen: false
+            };
+            
+            food = null;
+            activePowerUps = [];
+            activeLasers = [];
+            activePlayerPowerUps = {};
+            playerScore = 0;
+            enemyScore = 0;
+            isGameOver = false;
+            nextPowerUpTime = performance.now() + 5000; // First power-up after 5 seconds
+            
+            // Update score displays
+            updateScores();
+            
+            // Generate initial food
+            generateFood();
+            
+            // Clear power-up indicators
+            powerUpIndicator.innerHTML = '';
+            
+            // Start game loop
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(updateGame, player.speed);
+            
+            // Hide game over screen if visible
+            gameOverScreen.style.display = 'none';
         }
-      }
-      return false;
-    }
-
-    wouldCollideWithWall(pos) {
-      return (pos.x < 0 || pos.x >= COLS || pos.y < 0 || pos.y >= ROWS);
-    }
-  }
-
-  class Food {
-    constructor(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    draw(ctx) {
-      drawCell(this.x, this.y, ctx, 'red');
-    }
-  }
-
-  // Draw a cell
-  function drawCell(x, y, ctx, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
-  }
-
-  // Game variables
-  let playerSnake;
-  let enemySnake;
-  let foods = [];
-  let playerScore = 0;
-  let enemyScore = 0;
-  let gameOver = false;
-
-  // Event listeners
-  document.addEventListener('keydown', (e) => {
-    if (!playerSnake || !playerSnake.alive || !playerSnake.humanControlled) return;
-    if (DIRECTIONS[e.key]) {
-      playerSnake.changeDirection(DIRECTIONS[e.key]);
-    }
-  });
-
-  document.getElementById('singleBtn').addEventListener('click', () => {
-    startGame('SINGLE');
-  });
-  document.getElementById('enemyAIBtn').addEventListener('click', () => {
-    startGame('ENEMYAI');
-  });
-
-  function startGame(selectedMode) {
-    mode = selectedMode;
-    playerScore = 0;
-    enemyScore = 0;
-    updateScoreDisplay();
-    gameOver = false;
-
-    // Initialize snakes and foods
-    playerSnake = new Snake('lime', Math.floor(COLS/4), Math.floor(ROWS/2), 5, true);
-    if (mode === 'ENEMYAI') {
-      enemySnake = new EnemySnake('yellow', Math.floor(3*COLS/4), Math.floor(ROWS/2), 5);
-    } else {
-      enemySnake = null;
-    }
-
-    // Generate foods
-    foods = [];
-    for (let i = 0; i < FOOD_COUNT; i++) {
-      foods.push(generateFood());
-    }
-
-    if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(gameLoop, INITIAL_SPEED);
-  }
-
-  function gameLoop() {
-    update();
-    draw();
-  }
-
-  function update() {
-    if (gameOver && mode === 'SINGLE') return;
-
-    // Update spawn countdowns if any
-    if (playerSnake && (playerSnake.alive || playerSnake.respawning)) {
-      playerSnake.updateSpawnCountdown();
-    }
-    if (enemySnake && (enemySnake.alive || enemySnake.respawning)) {
-      enemySnake.updateSpawnCountdown();
-    }
-
-    if (enemySnake && enemySnake.alive && enemySnake.spawnCountdown <= 0) {
-      enemySnake.aiUpdate(foods);
-    }
-
-    if (playerSnake && playerSnake.alive) playerSnake.update();
-    if (enemySnake && enemySnake.alive) enemySnake.update();
-
-    // Check collisions for player snake
-    if (playerSnake && playerSnake.alive && playerSnake.spawnCountdown <= 0) {
-      if (playerSnake.checkCollisionWithWalls() || playerSnake.checkCollisionWithSelf()) {
-        handleCrash(playerSnake);
-      }
-    }
-
-    // Check collisions for enemy snake
-    if (enemySnake && enemySnake.alive && enemySnake.spawnCountdown <= 0) {
-      if (enemySnake.checkCollisionWithWalls() || enemySnake.checkCollisionWithSelf()) {
-        handleCrash(enemySnake);
-      }
-    }
-
-    // Check if snakes eat food
-    handleFoodEating(playerSnake);
-    if (enemySnake) handleFoodEating(enemySnake);
-
-    // In SINGLE mode, if player is dead => game over
-    if (mode === 'SINGLE' && playerSnake && !playerSnake.alive) {
-      gameOver = true;
-    }
-  }
-
-  function handleCrash(snake) {
-    if (mode === 'SINGLE') {
-      // Game over directly
-      snake.alive = false;
-      return;
-    } else {
-      // ENEMYAI mode: apply penalty, respawn after delay
-      if (snake.humanControlled) {
-        playerScore -= CRASH_PENALTY;
-      } else {
-        enemyScore -= CRASH_PENALTY;
-      }
-      updateScoreDisplay();
-      snake.alive = false;
-      snake.respawning = true;
-      setTimeout(() => {
-        respawnSnake(snake);
-      }, RESPAWN_TIME);
-    }
-  }
-
-  function respawnSnake(snake) {
-    snake.respawning = false;
-    snake.segments = [];
-    if (snake.humanControlled) {
-      let x = Math.floor(COLS/4);
-      let y = Math.floor(ROWS/2);
-      for (let i = 0; i < 5; i++) {
-        snake.segments.push({x: x - i, y: y});
-      }
-      snake.direction = {x:1,y:0};
-    } else {
-      let x = Math.floor(3*COLS/4);
-      let y = Math.floor(ROWS/2);
-      for (let i = 0; i < 5; i++) {
-        snake.segments.push({x: x - i, y: y});
-      }
-      snake.direction = {x:1,y:0};
-      snake.initialReactionDelay = Math.random() * 2000 + 500;
-      snake.reactionTime = Math.random() * 500;
-      snake.lastDecisionTime = performance.now();
-    }
-    snake.alive = true;
-    snake.spawnCountdown = SPAWN_COUNTDOWN;
-    snake.lastCountdownTime = performance.now();
-  }
-
-  function handleFoodEating(snake) {
-    if (!snake || !snake.alive || snake.spawnCountdown > 0) return;
-    const head = snake.getHead();
-    for (let i = 0; i < foods.length; i++) {
-      if (foods[i].x === head.x && foods[i].y === head.y) {
-        // Eat food
-        snake.grow();
-        foods[i] = generateFood();
-
-        // Increase score accordingly
-        if (snake.humanControlled) {
-          playerScore += SCORE_PER_FOOD;
-        } else {
-          enemyScore += SCORE_PER_FOOD;
+        
+        // Update score displays
+        function updateScores() {
+            playerScoreDisplay.textContent = `Score: ${playerScore}`;
+            if (isEnemyEnabled) {
+                enemyScoreDisplay.textContent = `Enemy: ${enemyScore}`;
+                enemyScoreDisplay.style.display = 'block';
+            } else {
+                enemyScoreDisplay.style.display = 'none';
+            }
         }
-        updateScoreDisplay();
-      }
-    }
-  }
+        
+        // Generate food at random position
+        function generateFood() {
+            let position;
+            do {
+                position = {
+                    x: Math.floor(Math.random() * gridWidth),
+                    y: Math.floor(Math.random() * gridHeight)
+                };
+            } while (isPositionOccupied(position));
+            
+            food = { 
+                position: position, 
+                color: FOOD_COLOR,
+                type: 'food'
+            };
+        }
+        
+        // Generate a power-up
+        function generatePowerUp() {
+            // Only have a few power-ups at once
+            if (activePowerUps.length >= 3) return;
+            
+            // Decide which power-up to spawn based on chances
+            const roll = Math.random();
+            let cumulativeChance = 0;
+            
+            let selectedPowerUp = null;
+            for (const powerUp of POWER_UPS) {
+                cumulativeChance += powerUp.chance;
+                if (roll < cumulativeChance) {
+                    selectedPowerUp = powerUp;
+                    break;
+                }
+            }
+            
+            if (!selectedPowerUp) return;
+            
+            // Find a free position
+            let position;
+            do {
+                position = {
+                    x: Math.floor(Math.random() * gridWidth),
+                    y: Math.floor(Math.random() * gridHeight)
+                };
+            } while (isPositionOccupied(position));
+            
+            // Create the power-up
+            const powerUp = {
+                position: position,
+                color: selectedPowerUp.color,
+                type: 'powerUp',
+                name: selectedPowerUp.name,
+                createdAt: performance.now(),
+                duration: selectedPowerUp.duration,
+                shots: selectedPowerUp.shots,
+                icon: selectedPowerUp.icon
+            };
+            
+            activePowerUps.push(powerUp);
+            
+            // Set next power-up time (random between 5-15 seconds)
+            nextPowerUpTime = performance.now() + 5000 + Math.random() * 10000;
+        }
+        
+        // Check if a position is occupied by snake or items
+        function isPositionOccupied(position) {
+            // Check player body
+            for (const segment of player.body) {
+                if (segment.x === position.x && segment.y === position.y) {
+                    return true;
+                }
+            }
+            
+            // Check enemy body if enabled
+            if (isEnemyEnabled) {
+                for (const segment of enemy.body) {
+                    if (segment.x === position.x && segment.y === position.y) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Check food
+            if (food && food.position.x === position.x && food.position.y === position.y) {
+                return true;
+            }
+            
+            // Check power-ups
+            for (const powerUp of activePowerUps) {
+                if (powerUp.position.x === position.x && powerUp.position.y === position.y) {
+                    return true;
+                }
+            }
+            
+            // Check lasers
+            for (const laser of activeLasers) {
+                if (laser.position.x === position.x && laser.position.y === position.y) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Move the player's snake
+        function movePlayer() {
+            // Update direction
+            player.direction = player.nextDirection;
+            
+            // Calculate new head position
+            const head = { ...player.body[0] };
+            head.x += player.direction.x;
+            head.y += player.direction.y;
+            
+            // Wrap around screen edges
+            if (head.x < 0) head.x = gridWidth - 1;
+            if (head.x >= gridWidth) head.x = 0;
+            if (head.y < 0) head.y = gridHeight - 1;
+            if (head.y >= gridHeight) head.y = 0;
+            
+            // Check for collisions with self
+            if (!activePlayerPowerUps.ghost && !activePlayerPowerUps.shield) {
+                for (let i = 0; i < player.body.length; i++) {
+                    if (player.body[i].x === head.x && player.body[i].y === head.y) {
+                        endGame("You collided with yourself!");
+                        return;
+                    }
+                }
+            }
+            
+            // Check for collisions with enemy
+            if (isEnemyEnabled && !activePlayerPowerUps.ghost && !activePlayerPowerUps.shield) {
+                for (const segment of enemy.body) {
+                    if (segment.x === head.x && segment.y === head.y) {
+                        endGame("You collided with the enemy snake!");
+                        return;
+                    }
+                }
+            }
+            
+            // Add new head
+            player.body.unshift(head);
+            
+            // Check for food collision
+            let ate = false;
+            if (food && head.x === food.position.x && head.y === food.position.y) {
+                playerScore++;
+                updateScores();
+                generateFood();
+                ate = true;
+            }
+            
+            // Check for power-up collision
+            for (let i = 0; i < activePowerUps.length; i++) {
+                const powerUp = activePowerUps[i];
+                if (head.x === powerUp.position.x && head.y === powerUp.position.y) {
+                    activatePowerUp(powerUp);
+                    activePowerUps.splice(i, 1);
+                    ate = true;
+                    break;
+                }
+            }
+            
+            // If didn't eat, remove tail
+            if (!ate) {
+                player.body.pop();
+            }
+        }
+        
+        // Move the enemy AI
+        function moveEnemy() {
+            // Skip if enemy is disabled or frozen
+            if (!isEnemyEnabled || enemy.frozen) return;
+            
+            // AI logic for choosing direction
+            const head = { ...enemy.body[0] };
+            const possibleDirections = [];
+            
+            // Check all four directions
+            for (const [key, dir] of Object.entries(DIRECTIONS)) {
+                // Skip opposite direction to current
+                if (dir.x === -enemy.direction.x && dir.y === -enemy.direction.y) continue;
+                
+                const newPos = {
+                    x: (head.x + dir.x + gridWidth) % gridWidth,
+                    y: (head.y + dir.y + gridHeight) % gridHeight
+                };
+                
+                // Check if position would cause a collision with self
+                let selfCollision = false;
+                for (const segment of enemy.body) {
+                    if (segment.x === newPos.x && segment.y === newPos.y) {
+                        selfCollision = true;
+                        break;
+                    }
+                }
+                
+                // Check if position would cause a collision with player if player has shield
+                let playerCollision = false;
+                if (!activePlayerPowerUps.ghost) {
+                    for (const segment of player.body) {
+                        if (segment.x === newPos.x && segment.y === newPos.y) {
+                            playerCollision = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Check for laser collision
+                let laserCollision = false;
+                for (const laser of activeLasers) {
+                    if (laser.position.x === newPos.x && laser.position.y === newPos.y) {
+                        laserCollision = true;
+                        break;
+                    }
+                }
+                
+                if (!selfCollision && !playerCollision && !laserCollision) {
+                    // Calculate distance to food
+                    let distance = 0;
+                    if (food) {
+                        distance = Math.abs(newPos.x - food.position.x) + Math.abs(newPos.y - food.position.y);
+                    }
+                    
+                    // Add to possible directions with priority
+                    possibleDirections.push({
+                        dir: dir,
+                        distance: distance
+                    });
+                }
+            }
+            
+            // Sort by distance to food (ascending)
+            possibleDirections.sort((a, b) => a.distance - b.distance);
+            
+            // If we have valid directions, choose the best one
+            if (possibleDirections.length > 0) {
+                // 80% chance to choose best direction, 20% to choose random
+                if (Math.random() < 0.8 || possibleDirections.length === 1) {
+                    enemy.nextDirection = possibleDirections[0].dir;
+                } else {
+                    const randomIndex = Math.floor(Math.random() * possibleDirections.length);
+                    enemy.nextDirection = possibleDirections[randomIndex].dir;
+                }
+            } else {
+                // If no good moves, try to find any move that doesn't kill immediately
+                for (const [key, dir] of Object.entries(DIRECTIONS)) {
+                    const newPos = {
+                        x: (head.x + dir.x + gridWidth) % gridWidth,
+                        y: (head.y + dir.y + gridHeight) % gridHeight
+                    };
+                    
+                    // Check if head would hit body segment (not including tail which will move)
+                    let collision = false;
+                    for (let i = 0; i < enemy.body.length - 1; i++) {
+                        if (enemy.body[i].x === newPos.x && enemy.body[i].y === newPos.y) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!collision) {
+                        enemy.nextDirection = dir;
+                        break;
+                    }
+                }
+            }
+            
+            // Update direction
+            enemy.direction = enemy.nextDirection;
+            
+            // Calculate new head position
+            const newHead = { ...head };
+            newHead.x += enemy.direction.x;
+            newHead.y += enemy.direction.y;
+            
+            // Wrap around screen edges
+            if (newHead.x < 0) newHead.x = gridWidth - 1;
+            if (newHead.x >= gridWidth) newHead.x = 0;
+            if (newHead.y < 0) newHead.y = gridHeight - 1;
+            if (newHead.y >= gridHeight) newHead.y = 0;
+            
+            // Check for collisions with self
+            for (let i = 0; i < enemy.body.length; i++) {
+                if (enemy.body[i].x === newHead.x && enemy.body[i].y === newHead.y) {
+                    endGame("The enemy collided with itself! You win!");
+                    return;
+                }
+            }
+            
+            // Check for collisions with player
+            if (!activePlayerPowerUps.ghost) {
+                for (const segment of player.body) {
+                    if (segment.x === newHead.x && segment.y === newHead.y) {
+                        if (activePlayerPowerUps.shield) {
+                            // Player is shielded, enemy is destroyed
+                            endGame("Your shield destroyed the enemy! You win!");
+                        } else {
+                            // Normal collision
+                            endGame("The enemy snake collided with you!");
+                        }
+                        return;
+                    }
+                }
+            }
+            
+            // Check for laser collisions
+            for (let i = 0; i < activeLasers.length; i++) {
+                const laser = activeLasers[i];
+                if (laser.position.x === newHead.x && laser.position.y === newHead.y) {
+                    endGame("Your laser hit the enemy! You win!");
+                    return;
+                }
+            }
+            
+            // Add new head
+            enemy.body.unshift(newHead);
+            
+            // Check for food collision
+            let ate = false;
+            if (food && newHead.x === food.position.x && newHead.y === food.position.y) {
+                enemyScore++;
+                updateScores();
+                generateFood();
+                ate = true;
+            }
+            
+            // If didn't eat, remove tail
+            if (!ate) {
+                enemy.body.pop();
+            }
+        }
+        
+        // Activate a power-up
+        function activatePowerUp(powerUp) {
+            const now = performance.now();
+            
+            switch (powerUp.name) {
+                case 'freeze':
+                    enemy.frozen = true;
+                    activePlayerPowerUps.freeze = {
+                        startTime: now,
+                        endTime: now + powerUp.duration
+                    };
+                    addPowerUpIndicator('freeze', powerUp.color, powerUp.icon, powerUp.duration);
+                    setTimeout(() => {
+                        enemy.frozen = false;
+                        delete activePlayerPowerUps.freeze;
+                    }, powerUp.duration);
+                    break;
+                    
+                case 'speed':
+                    const oldSpeed = player.speed;
+                    player.speed = player.baseSpeed / 2; // Double speed
+                    
+                    // Reset game loop with new speed
+                    clearInterval(gameLoop);
+                    gameLoop = setInterval(updateGame, player.speed);
+                    
+                    activePlayerPowerUps.speed = {
+                        startTime: now,
+                        endTime: now + powerUp.duration
+                    };
+                    
+                    addPowerUpIndicator('speed', powerUp.color, powerUp.icon, powerUp.duration);
+                    
+                    setTimeout(() => {
+                        player.speed = player.baseSpeed;
+                        clearInterval(gameLoop);
+                        gameLoop = setInterval(updateGame, player.speed);
+                        delete activePlayerPowerUps.speed;
+                    }, powerUp.duration);
+                    break;
+                    
+                case 'laser':
+                    activePlayerPowerUps.laser = {
+                        startTime: now,
+                        shots: powerUp.shots
+                    };
+                    
+                    addPowerUpIndicator('laser', powerUp.color, powerUp.icon);
+                    
+                    // Enable firing lasers with space bar
+                    break;
+                    
+                case 'shield':
+                    activePlayerPowerUps.shield = {
+                        startTime: now,
+                        endTime: now + powerUp.duration
+                    };
+                    
+                    addPowerUpIndicator('shield', powerUp.color, powerUp.icon, powerUp.duration);
+                    
+                    setTimeout(() => {
+                        delete activePlayerPowerUps.shield;
+                    }, powerUp.duration);
+                    break;
+                    
+                case 'ghost':
+                    activePlayerPowerUps.ghost = {
+                        startTime: now,
+                        endTime: now + powerUp.duration
+                    };
+                    
+                    addPowerUpIndicator('ghost', powerUp.color, powerUp.icon, powerUp.duration);
+                    
+                    setTimeout(() => {
+                        delete activePlayerPowerUps.ghost;
+                    }, powerUp.duration);
+                    break;
+// -- 0000000000000000
+// -- 0000000000000000
+}
+        }
+        
+        function addPowerUpIndicator(name, color, icon, duration = 0) {
+            const indicator = document.createElement('div');
+            indicator.className = 'power-up-icon';
+            indicator.style.backgroundColor = color;
+            indicator.innerHTML = icon;
+            indicator.dataset.name = name;
+            
+            if (duration) {
+                const timer = document.createElement('div');
+                timer.className = 'power-up-timer';
+                indicator.appendChild(timer);
+                
+                const startTime = performance.now();
+                const endTime = startTime + duration;
+                
+                const updateTimer = () => {
+                    const now = performance.now();
+                    const remaining = Math.max(0, endTime - now);
+                    const progress = remaining / duration;
+                    
+                    timer.style.transform = `scaleX(${progress})`;
+                    
+                    if (progress > 0) {
+                        requestAnimationFrame(updateTimer);
+                    } else {
+                        indicator.remove();
+                    }
+                };
+                
+                requestAnimationFrame(updateTimer);
+            } else if (name === 'laser') {
+                indicator.dataset.shots = activePlayerPowerUps.laser.shots;
+                indicator.innerText = activePlayerPowerUps.laser.shots;
+            }
+            
+            powerUpIndicator.appendChild(indicator);
+        }
+        
+        function fireLaser() {
+            if (!activePlayerPowerUps.laser || activePlayerPowerUps.laser.shots <= 0) return;
+            
+            const head = player.body[0];
+            const directions = [
+                DIRECTIONS.UP,
+                DIRECTIONS.RIGHT,
+                DIRECTIONS.DOWN,
+                DIRECTIONS.LEFT
+            ];
+            
+            for (const dir of directions) {
+                let position = { x: head.x, y: head.y };
+                
+                const laser = {
+                    position: { ...position },
+                    direction: dir,
+                    color: "#FF8C00",
+                    createdAt: performance.now()
+                };
+                
+                activeLasers.push(laser);
+            }
+            
+            activePlayerPowerUps.laser.shots--;
+            
+            const indicator = document.querySelector(`.power-up-icon[data-name="laser"]`);
+            if (indicator) {
+                indicator.dataset.shots = activePlayerPowerUps.laser.shots;
+                indicator.innerText = activePlayerPowerUps.laser.shots;
+                
+                if (activePlayerPowerUps.laser.shots <= 0) {
+                    setTimeout(() => {
+                        indicator.remove();
+                        delete activePlayerPowerUps.laser;
+                    }, 1000);
+                }
+            }
+        }
+        
+        function updateLasers() {
+            const now = performance.now();
+            
+            for (let i = activeLasers.length - 1; i >= 0; i--) {
+                const laser = activeLasers[i];
+                
+                laser.position.x += laser.direction.x;
+                laser.position.y += laser.direction.y;
+                
+                if (laser.position.x < 0 || laser.position.x >= gridWidth ||
+                    laser.position.y < 0 || laser.position.y >= gridHeight) {
+                    activeLasers.splice(i, 1);
+                    continue;
+                }
+                
+                if (isEnemyEnabled) {
+                    for (const segment of enemy.body) {
+                        if (segment.x === laser.position.x && segment.y === laser.position.y) {
+                            endGame("Your laser hit the enemy! You win!");
+                            return;
+                        }
+                    }
+                }
+                
+                if (now - laser.createdAt > 2000) {
+                    activeLasers.splice(i, 1);
+                }
+            }
+        }
+        
+        function updateGame() {
+            if (isGameOver) return;
+            
+            movePlayer();
+            
+            if (isEnemyEnabled) {
+                moveEnemy();
+            }
+            
+            updateLasers();
+            
+            const now = performance.now();
+            if (now >= nextPowerUpTime) {
+                generatePowerUp();
+            }
+            
+            drawGame();
+        }
+        
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawGrid();
+            
+            if (food) {
+                drawObject(food.position.x, food.position.y, food.color);
+            }
+            
+            for (const powerUp of activePowerUps) {
+                drawObject(powerUp.position.x, powerUp.position.y, powerUp.color);
+            }
+            
+            for (const laser of activeLasers) {
+                drawObject(laser.position.x, laser.position.y, laser.color);
+            }
+            
+            let playerHeadColor = player.color;
+            let playerBodyColor = player.color;
+            
+            if (activePlayerPowerUps.ghost) {
+                playerBodyColor = "rgba(76, 175, 80, 0.5)";
+                playerHeadColor = "rgba(76, 175, 80, 0.8)";
+            } else if (activePlayerPowerUps.shield) {
+                playerHeadColor = "#9932CC";
+            }
+            
+            for (let i = 0; i < player.body.length; i++) {
+                const color = i === 0 ? playerHeadColor : playerBodyColor;
+                drawObject(player.body[i].x, player.body[i].y, color);
+            }
+            
+            if (isEnemyEnabled) {
+                let enemyColor = enemy.color;
+                if (enemy.frozen) {
+                    enemyColor = "#00FFFF";
+                }
+                
+                for (let i = 0; i < enemy.body.length; i++) {
+                    const color = i === 0 ? enemyColor : enemy.color;
+                    drawObject(enemy.body[i].x, enemy.body[i].y, color);
+                }
+            }
+        }
+        
+        function drawGrid() {
+            ctx.strokeStyle = GRID_COLOR;
+            ctx.lineWidth = 0.5;
+            
+            for (let x = 0; x <= gridWidth; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x * CELL_SIZE, 0);
+                ctx.lineTo(x * CELL_SIZE, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y <= gridHeight; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * CELL_SIZE);
+                ctx.lineTo(canvas.width, y * CELL_SIZE);
+                ctx.stroke();
+            }
+        }
+        
+        function drawObject(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        
+        function endGame(message) {
+            isGameOver = true;
+            clearInterval(gameLoop);
+            
+            finalScoreDisplay.textContent = `Your Score: ${playerScore}`;
+            
+            if (isEnemyEnabled) {
+                if (playerScore > enemyScore) {
+                    gameResultDisplay.textContent = `You won! (Enemy: ${enemyScore})`;
+                } else if (playerScore < enemyScore) {
+                    gameResultDisplay.textContent = `You lost! (Enemy: ${enemyScore})`;
+                } else {
+                    gameResultDisplay.textContent = `It's a tie! (Enemy: ${enemyScore})`;
+                }
+            } else {
+                gameResultDisplay.textContent = message;
+            }
+            
+            gameOverScreen.style.display = 'block';
+        }
+        
+        function handleKeyDown(e) {
+            if (isGameOver || !isGameStarted) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    if (player.direction !== DIRECTIONS.DOWN) {
+                        player.nextDirection = DIRECTIONS.UP;
+                    }
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    if (player.direction !== DIRECTIONS.UP) {
+                        player.nextDirection = DIRECTIONS.DOWN;
+                    }
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    if (player.direction !== DIRECTIONS.RIGHT) {
+                        player.nextDirection = DIRECTIONS.LEFT;
+                    }
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    if (player.direction !== DIRECTIONS.LEFT) {
+                        player.nextDirection = DIRECTIONS.RIGHT;
+                    }
+                    break;
+                case ' ':
+                    fireLaser();
+                    break;
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (isGameOver || !isGameStarted) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const head = player.body[0];
+            const headX = head.x * CELL_SIZE + CELL_SIZE / 2;
+            const headY = head.y * CELL_SIZE + CELL_SIZE / 2;
+            
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+            
+            const diffX = touchX - headX;
+            const diffY = touchY - headY;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && player.direction !== DIRECTIONS.LEFT) {
+                    player.nextDirection = DIRECTIONS.RIGHT;
+                } else if (diffX < 0 && player.direction !== DIRECTIONS.RIGHT) {
+                    player.nextDirection = DIRECTIONS.LEFT;
+                }
+            } else {
+                if (diffY > 0 && player.direction !== DIRECTIONS.UP) {
+                    player.nextDirection = DIRECTIONS.DOWN;
+                } else if (diffY < 0 && player.direction !== DIRECTIONS.DOWN) {
+                    player.nextDirection = DIRECTIONS.UP;
+                }
+            }
+        }
+        
+        function handleTouchStart(e) {
+            if (isGameOver || !isGameStarted) return;
+            
+            const touch = e.touches[0];
+            const head = player.body[0];
+            const headX = head.x * CELL_SIZE + CELL_SIZE / 2;
+            const headY = head.y * CELL_SIZE + CELL_SIZE / 2;
+            
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+            
+            const diffX = touchX - headX;
+            const diffY = touchY - headY;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && player.direction !== DIRECTIONS.LEFT) {
+                    player.nextDirection = DIRECTIONS.RIGHT;
+                } else if (diffX < 0 && player.direction !== DIRECTIONS.RIGHT) {
+                    player.nextDirection = DIRECTIONS.LEFT;
+                }
+            } else {
+                if (diffY > 0 && player.direction !== DIRECTIONS.UP) {
+                    player.nextDirection = DIRECTIONS.DOWN;
+                } else if (diffY < 0 && player.direction !== DIRECTIONS.DOWN) {
+                    player.nextDirection = DIRECTIONS.UP;
+                }
+            }
+            
+            if (activePlayerPowerUps.laser && activePlayerPowerUps.laser.shots > 0) {
+                if (e.touches.length === 2) {
+                    fireLaser();
+                }
+            }
+        }
+        
+        enemyToggle.addEventListener('click', () => {
+            isEnemyEnabled = !isEnemyEnabled;
+            enemyToggle.textContent = `Enemy AI: ${isEnemyEnabled ? 'ON' : 'OFF'}`;
+            updateScores();
+        });
+        
+        restartButton.addEventListener('click', () => {
+            initGame();
+        });
+        
+        startButton.addEventListener('click', () => {
+            isGameStarted = true;
+            startScreen.style.display = 'none';
+            initGame();
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('keydown', handleKeyDown);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        
+        resizeCanvas();
+        drawGame();
 
-  function generateFood() {
-    let x, y;
-    let occupied = true;
-    while (occupied) {
-      x = Math.floor(Math.random() * COLS);
-      y = Math.floor(Math.random() * ROWS);
-      occupied = isCellOccupied(x,y);
-    }
-    return new Food(x, y);
-  }
-
-  function isCellOccupied(x, y) {
-    // Check player snake
-    if (playerSnake && playerSnake.alive) {
-      for (let seg of playerSnake.segments) {
-        if (seg.x === x && seg.y === y) return true;
-      }
-    }
-    // Check enemy snake
-    if (enemySnake && enemySnake.alive) {
-      for (let seg of enemySnake.segments) {
-        if (seg.x === x && seg.y === y) return true;
-      }
-    }
-    return false;
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, width, height);
-
-    // Draw background grid (optional)
-    drawGrid();
-
-    // Draw foods
-    for (let f of foods) {
-      f.draw(ctx);
-    }
-
-    // Draw snakes
-    if (playerSnake) playerSnake.draw(ctx);
-    if (enemySnake) enemySnake.draw(ctx);
-
-    // If gameOver and SINGLE mode, show message
-    if (gameOver && mode === 'SINGLE') {
-      ctx.fillStyle = 'white';
-      ctx.font = '30px Arial';
-      ctx.fillText('GAME OVER', width/2 - 80, height/2);
-    }
-  }
-
-  function drawGrid() {
-    ctx.strokeStyle = '#444';
-    for (let i = 0; i <= COLS; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i*CELL_SIZE, 0);
-      ctx.lineTo(i*CELL_SIZE, height);
-      ctx.stroke();
-    }
-    for (let j = 0; j <= ROWS; j++) {
-      ctx.beginPath();
-      ctx.moveTo(0, j*CELL_SIZE);
-      ctx.lineTo(width, j*CELL_SIZE);
-      ctx.stroke();
-    }
-  }
-
-  function updateScoreDisplay() {
-    if (mode === 'SINGLE') {
-      scoreDisplay.textContent = `Score: ${playerScore}`;
-    } else {
-      // Two scores in ENEMYAI mode
-      scoreDisplay.textContent = `Player: ${playerScore} | Enemy: ${enemyScore}`;
-    }
-  }
-})();
-</script>
-</body>
+    </script>
+  </body>
 </html>
