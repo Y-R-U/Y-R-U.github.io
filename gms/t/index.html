@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Desert Throw</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; overflow: hidden; touch-action: none; }
+        html, body { width: 100%; height: 100%; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script>
+        const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0xE5CCA0, resolution: window.devicePixelRatio || 1, autoDensity: true, resizeTo: window });
+        document.body.appendChild(app.view);
+        
+        const gameWorld = new PIXI.Container();
+        app.stage.addChild(gameWorld);
+        
+        const uiContainer = new PIXI.Container();
+        app.stage.addChild(uiContainer);
+
+        const gameState = { isAiming: false, hasThrown: false, isDragging: false, dragStartX: 0, dragStartY: 0, dragEndX: 0, dragEndY: 0, angle: 45, power: 0, maxPower: 100, worldWidth: app.screen.width * 10, currentLevel: 1, currentGoal: 100, resetTimerId: null, resetInProgress: false, lives: 5, score: 0, highScore: 0, highScoreLevel: 1, gameOver: false };
+
+        const levelObjects = { cacti: [], rocks: [] };
+
+        const thrower = new PIXI.Graphics();
+        thrower.beginFill(0x8B4513);
+        thrower.drawRect(-15, -30, 30, 60);
+        thrower.endFill();
+        thrower.position.set(100, app.screen.height - 100);
+
+        const object = new PIXI.Graphics();
+        object.beginFill(0xC19A6B);
+        object.drawCircle(0, 0, 15);
+        object.endFill();
+        object.position.set(thrower.x + 20, thrower.y - 20);
+
+        const aimLine = new PIXI.Graphics();
+        const powerIndicator = new PIXI.Graphics();
+        
+        const groundLine = new PIXI.Graphics();
+        groundLine.lineStyle(2, 0x8B4513, 1);
+        groundLine.moveTo(0, app.screen.height - 100);
+        groundLine.lineTo(gameState.worldWidth, app.screen.height - 100);
+
+        const goalLine = new PIXI.Graphics();
+        
+        const distanceText = new PIXI.Text('Distance: 0m', { fontFamily: 'Arial', fontSize: 16, fill: 0x8B4513 });
+        distanceText.position.set(app.screen.width - 200, 50);
+        uiContainer.addChild(distanceText);
+
+        const levelText = new PIXI.Text('Level: 1 | Goal: 100m', { fontFamily: 'Arial', fontSize: 16, fill: 0x8B4513 });
+        levelText.position.set(10, 10);
+        uiContainer.addChild(levelText);
+
+        const livesText = new PIXI.Text('Lives: 5', { fontFamily: 'Arial', fontSize: 16, fill: 0x8B4513 });
+        livesText.position.set(10, 30);
+        uiContainer.addChild(livesText);
+
+        const scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 16, fill: 0x8B4513 });
+        scoreText.position.set(app.screen.width - 150, 10);
+        uiContainer.addChild(scoreText);
+
+        const highScoreText = new PIXI.Text('High Score: 0 (Level 1)', { fontFamily: 'Arial', fontSize: 14, fill: 0x8B4513 });
+        highScoreText.position.set(app.screen.width / 2 - 100, 15);
+        uiContainer.addChild(highScoreText);
+
+        const instructionsText = new PIXI.Text('Drag to aim and throw', { fontFamily: 'Arial', fontSize: 16, fill: 0x8B4513 });
+        instructionsText.anchor.set(0.5);
+        instructionsText.position.set(app.screen.width / 2, 50);
+        uiContainer.addChild(instructionsText);
+
+        const gameOverContainer = new PIXI.Container();
+        gameOverContainer.visible = false;
+        uiContainer.addChild(gameOverContainer);
+
+        const gameOverBg = new PIXI.Graphics();
+        gameOverBg.beginFill(0x000000, 0.7);
+        gameOverBg.drawRect(0, 0, app.screen.width, app.screen.height);
+        gameOverBg.endFill();
+        gameOverContainer.addChild(gameOverBg);
+
+        const gameOverText = new PIXI.Text('GAME OVER', { fontFamily: 'Arial', fontSize: 48, fontWeight: 'bold', fill: 0xFF0000 });
+        gameOverText.anchor.set(0.5);
+        gameOverText.position.set(app.screen.width / 2, app.screen.height / 3);
+        gameOverContainer.addChild(gameOverText);
+
+        const finalScoreText = new PIXI.Text('', { fontFamily: 'Arial', fontSize: 32, fill: 0xFFFFFF });
+        finalScoreText.anchor.set(0.5);
+        finalScoreText.position.set(app.screen.width / 2, app.screen.height / 2);
+        gameOverContainer.addChild(finalScoreText);
+
+        const restartButton = new PIXI.Graphics();
+        restartButton.beginFill(0x8B4513);
+        restartButton.drawRoundedRect(0, 0, 200, 50, 10);
+        restartButton.endFill();
+        restartButton.position.set(app.screen.width / 2 - 100, app.screen.height * 2 / 3);
+        restartButton.interactive = true;
+        restartButton.buttonMode = true;
+        restartButton.on('pointerdown', () => { startNewGame(); });
+        
+        const restartText = new PIXI.Text('PLAY AGAIN', { fontFamily: 'Arial', fontSize: 24, fontWeight: 'bold', fill: 0xFFFFFF });
+        restartText.anchor.set(0.5);
+        restartText.position.set(restartButton.width / 2, restartButton.height / 2);
+        restartButton.addChild(restartText);
+        
+        gameOverContainer.addChild(restartButton);
+
+        gameWorld.addChild(groundLine);
+        gameWorld.addChild(thrower);
+        gameWorld.addChild(object);
+        gameWorld.addChild(aimLine);
+        gameWorld.addChild(powerIndicator);
+        gameWorld.addChild(goalLine);
+
+        let velocityX = 0, velocityY = 0;
+        const gravity = 0.5, friction = 0.98;
+        let distance = 0, stopped = false;
+
+        function generateLevel() {
+            levelObjects.cacti.forEach(cactus => gameWorld.removeChild(cactus));
+            levelObjects.rocks.forEach(rock => gameWorld.removeChild(rock));
+            levelObjects.cacti = [];
+            levelObjects.rocks = [];
+            
+            goalLine.clear();
+            goalLine.lineStyle(3, 0xFF0000, 1);
+            const goalX = thrower.x + gameState.currentGoal * 10;
+            goalLine.moveTo(goalX, app.screen.height - 150);
+            goalLine.lineTo(goalX, app.screen.height - 50);
+            
+            const goalTextSprite = new PIXI.Text('GOAL', { fontFamily: 'Arial', fontSize: 18, fontWeight: 'bold', fill: 0xFF0000 });
+            goalTextSprite.anchor.set(0.5, 0);
+            goalTextSprite.position.set(goalX, app.screen.height - 180);
+            goalLine.addChild(goalTextSprite);
+            
+            const cactiCount = 5 + Math.floor(gameState.currentLevel / 2);
+            for (let i = 0; i < cactiCount; i++) {
+                const cactus = new PIXI.Graphics();
+                cactus.beginFill(0x2E8B57);
+                
+                const height = 30 + Math.random() * 40;
+                const width = 8 + Math.random() * 8;
+                
+                cactus.drawRect(-width/2, -height, width, height);
+                
+                if (Math.random() > 0.5) cactus.drawRect(-width/2 - width, -height + height * 0.3, width, width/2);
+                if (Math.random() > 0.5) cactus.drawRect(width/2, -height + height * 0.5, width, width/2);
+                
+                cactus.endFill();
+                
+                const minX = 300 + (gameState.worldWidth - 800) * (i / cactiCount);
+                const maxX = 300 + (gameState.worldWidth - 800) * ((i + 1) / cactiCount);
+                const xPos = minX + Math.random() * (maxX - minX);
+                
+                if (Math.abs(xPos - goalX) < 50) continue;
+                
+                cactus.position.set(xPos, app.screen.height - 100);
+                cactus.originalHeight = height;
+                cactus.width = width;
+                cactus.broken = false;
+                
+                gameWorld.addChild(cactus);
+                levelObjects.cacti.push(cactus);
+            }
+            
+            const rocksCount = 3 + Math.floor(gameState.currentLevel / 3);
+            for (let i = 0; i < rocksCount; i++) {
+                const rock = new PIXI.Graphics();
+                rock.beginFill(0x888888);
+                
+                const size = 10 + Math.random() * 15;
+                
+                rock.moveTo(0, -size);
+                rock.lineTo(size, -size * 0.5);
+                rock.lineTo(size * 0.8, size * 0.6);
+                rock.lineTo(0, size);
+                rock.lineTo(-size * 0.7, size * 0.5);
+                rock.lineTo(-size, -size * 0.3);
+                rock.lineTo(0, -size);
+                rock.endFill();
+                
+                const minX = 300 + (gameState.worldWidth - 800) * (i / rocksCount);
+                const maxX = 300 + (gameState.worldWidth - 800) * ((i + 1) / rocksCount);
+                const xPos = minX + Math.random() * (maxX - minX);
+                
+                if (Math.abs(xPos - goalX) < 50) continue;
+                
+                rock.position.set(xPos, app.screen.height - 100 - size * 0.7);
+                rock.size = size;
+                rock.hit = false;
+                
+                gameWorld.addChild(rock);
+                levelObjects.rocks.push(rock);
+            }
+            
+            updateGameTexts();
+        }
+
+        function updateGameTexts() {
+            levelText.text = `Level: ${gameState.currentLevel} | Goal: ${gameState.currentGoal}m`;
+            livesText.text = `Lives: ${gameState.lives}`;
+            scoreText.text = `Score: ${gameState.score}`;
+            highScoreText.text = `High Score: ${gameState.highScore} (Level ${gameState.highScoreLevel})`;
+        }
+
+        app.ticker.add((delta) => {
+            if (gameState.isDragging) updateAimLine();
+            if (gameState.hasThrown && !gameState.resetInProgress) {
+                updateProjectile(delta);
+                updateCamera();
+                checkCollisions();
+            }
+        });
+
+        function updateAimLine() {
+            const dx = gameState.dragStartX - gameState.dragEndX;
+            const dy = gameState.dragStartY - gameState.dragEndY;
+            
+            const dragDistance = Math.sqrt(dx * dx + dy * dy);
+            gameState.power = Math.min(gameState.maxPower, dragDistance);
+            gameState.angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            
+            aimLine.clear();
+            aimLine.lineStyle(2, 0xFF0000, 1);
+            aimLine.moveTo(thrower.x + 20, thrower.y - 20);
+            
+            const radians = gameState.angle * (Math.PI / 180);
+            const length = gameState.power;
+            const endX = Math.cos(radians) * length;
+            const endY = Math.sin(radians) * length;
+            
+            aimLine.lineTo(thrower.x + 20 - endX, thrower.y - 20 - endY);
+            
+            powerIndicator.clear();
+            powerIndicator.beginFill(0xFF0000);
+            powerIndicator.drawCircle(thrower.x + 20 - endX, thrower.y - 20 - endY, 5);
+            powerIndicator.endFill();
+        }
+        
+        function checkCollisions() {
+            const objectRadius = 15;
+            
+            levelObjects.cacti.forEach(cactus => {
+                if (cactus.broken) return;
+                
+                const dx = object.x - cactus.x;
+                const dy = object.y - cactus.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < objectRadius + cactus.width) {
+                    const collisionHeight = cactus.y - object.y;
+                    
+                    if (collisionHeight <= cactus.originalHeight / 2) {
+                        velocityX = 0;
+                        velocityY = 0;
+                        stopped = true;
+                        
+                        if (dx > 0) object.x = cactus.x + cactus.width/2 + objectRadius;
+                        else object.x = cactus.x - cactus.width/2 - objectRadius;
+
+                        loseLife("Stuck on cactus!");
+                    } else {
+                        cactus.clear();
+                        cactus.beginFill(0x2E8B57);
+                        cactus.drawRect(-cactus.width/2, -cactus.originalHeight/2, cactus.width, cactus.originalHeight/2);
+                        cactus.endFill();
+                        cactus.broken = true;
+                        
+                        velocityX *= 0.7;
+                        
+                        gameState.score += 25;
+                        scoreText.text = `Score: ${gameState.score}`;
+                    }
+                }
+            });
+            
+            levelObjects.rocks.forEach(rock => {
+                if (rock.hit) return;
+                
+                const dx = object.x - rock.x;
+                const dy = object.y - rock.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < objectRadius + rock.size) {
+                    velocityX *= 1.5;
+                    velocityY = -Math.abs(velocityY) - 5;
+                    
+                    rock.hit = true;
+                    rock.tint = 0x666666;
+                    
+                    gameState.score += 50;
+                    scoreText.text = `Score: ${gameState.score}`;
+                    
+                    const speedLines = new PIXI.Graphics();
+                    speedLines.lineStyle(2, 0xFFFFFF, 0.8);
+                    for (let i = 0; i < 5; i++) {
+                        const length = 20 + Math.random() * 20;
+                        const angle = Math.random() * Math.PI;
+                        speedLines.moveTo(rock.x, rock.y);
+                        speedLines.lineTo(rock.x + Math.cos(angle) * length, rock.y + Math.sin(angle) * length);
+                    }
+                    gameWorld.addChild(speedLines);
+                    
+                    setTimeout(() => { gameWorld.removeChild(speedLines); }, 500);
+                }
+            });
+            
+            const goalX = thrower.x + gameState.currentGoal * 10;
+            if (object.x >= goalX && !stopped) {
+                const levelCompleteText = new PIXI.Text('LEVEL COMPLETE!', {
+                    fontFamily: 'Arial', fontSize: 36, fontWeight: 'bold', fill: 0x009900
+                });
+                levelCompleteText.anchor.set(0.5);
+                levelCompleteText.position.set(app.screen.width / 2, app.screen.height / 2);
+                uiContainer.addChild(levelCompleteText);
+                
+                velocityX = 0;
+                velocityY = 0;
+                gameState.resetInProgress = true;
+                
+                gameState.score += gameState.currentLevel * 100;
+                scoreText.text = `Score: ${gameState.score}`;
+                
+                updateHighScore();
+                
+                setTimeout(() => {
+                    uiContainer.removeChild(levelCompleteText);
+                    advanceLevel();
+                }, 2000);
+            }
+        }
+        
+        function updateHighScore() {
+            if (gameState.score > gameState.highScore) {
+                gameState.highScore = gameState.score;
+                gameState.highScoreLevel = gameState.currentLevel;
+                highScoreText.text = `High Score: ${gameState.highScore} (Level ${gameState.highScoreLevel})`;
+            }
+        }
+        
+        function loseLife(reason) {
+            gameState.lives--;
+            livesText.text = `Lives: ${gameState.lives}`;
+            
+            const reasonText = new PIXI.Text(reason, {
+                fontFamily: 'Arial', fontSize: 20, fontWeight: 'bold', fill: 0xFF0000
+            });
+            reasonText.anchor.set(0.5);
+            reasonText.position.set(app.screen.width / 2, app.screen.height / 2 - 40);
+            uiContainer.addChild(reasonText);
+            
+            if (gameState.lives <= 0) {
+                setTimeout(() => {
+                    uiContainer.removeChild(reasonText);
+                    showGameOver();
+                }, 2000);
+            } else {
+                gameState.resetInProgress = true;
+                setTimeout(() => {
+                    uiContainer.removeChild(reasonText);
+                    resetGame();
+                }, 2000);
+            }
+        }
+        
+        function showGameOver() {
+            updateHighScore();
+            finalScoreText.text = `Final Score: ${gameState.score}\nHigh Score: ${gameState.highScore}`;
+            gameState.gameOver = true;
+            gameOverContainer.visible = true;
+        }
+        
+        function startNewGame() {
+            gameState.currentLevel = 1;
+            gameState.currentGoal = 100;
+            gameState.lives = 5;
+            gameState.score = 0;
+            gameState.gameOver = false;
+            gameOverContainer.visible = false;
+            resetGame();
+        }
+        
+        function advanceLevel() {
+            gameState.currentLevel++;
+            gameState.currentGoal += 50;
+            resetGame();
+        }
+        
+        function updateProjectile(delta) {
+            if (stopped) return;
+            
+            velocityY += gravity * delta;
+            object.x += velocityX * delta;
+            object.y += velocityY * delta;
+            
+            if (object.y > app.screen.height - 100 - object.height / 2) {
+                object.y = app.screen.height - 100 - object.height / 2;
+                velocityY = -velocityY * 0.6;
+                velocityX *= friction;
+                
+                if (Math.abs(velocityX) < 0.5 && Math.abs(velocityY) < 0.5) {
+                    velocityX = 0;
+                    velocityY = 0;
+                    stopped = true;
+                    
+                    if (!gameState.resetInProgress) {
+                        gameState.resetInProgress = true;
+                        gameState.resetTimerId = setTimeout(() => { resetGame(); }, 2000);
+                    }
+                }
+            }
+            
+            if (object.x > gameState.worldWidth || object.y > app.screen.height * 2) {
+                if (!gameState.resetInProgress) loseLife("Out of bounds!");
+            }
+        }
+        
+        function updateCamera() {
+            const targetX = -object.x + app.screen.width / 2;
+            const cameraX = Math.min(0, Math.max(targetX, -gameState.worldWidth + app.screen.width));
+            gameWorld.x = cameraX;
+            distance = Math.round((object.x - thrower.x) / 10);
+            distanceText.text = `Distance: ${distance}m`;
+        }
+        
+        function throwObject() {
+            const radians = gameState.angle * (Math.PI / 180);
+            const power = gameState.power / 5;
+            
+            velocityX = -Math.cos(radians) * power;
+            velocityY = -Math.sin(radians) * power;
+            
+            gameState.hasThrown = true;
+            gameState.isDragging = false;
+            stopped = false;
+            
+            aimLine.clear();
+            powerIndicator.clear();
+        }
+        
+        function resetGame() {
+            if (gameState.resetTimerId) {
+                clearTimeout(gameState.resetTimerId);
+                gameState.resetTimerId = null;
+            }
+            
+            object.position.set(thrower.x + 20, thrower.y - 20);
+            velocityX = 0;
+            velocityY = 0;
+            gameState.power = 0;
+            gameState.angle = 45;
+            gameState.hasThrown = false;
+            gameState.resetInProgress = false;
+            stopped = false;
+            
+            gameWorld.x = 0;
+            instructionsText.visible = true;
+            generateLevel();
+        }
+        
+        app.view.addEventListener('touchstart', handleTouchStart);
+        app.view.addEventListener('touchmove', handleTouchMove);
+        app.view.addEventListener('touchend', handleTouchEnd);
+        app.view.addEventListener('mousedown', handleMouseDown);
+        app.view.addEventListener('mousemove', handleMouseMove);
+        app.view.addEventListener('mouseup', handleMouseUp);
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            if (!gameState.hasThrown && !gameState.resetInProgress && !gameState.gameOver) {
+                gameState.isDragging = true;
+                gameState.dragStartX = e.touches[0].clientX;
+                gameState.dragStartY = e.touches[0].clientY;
+                gameState.dragEndX = e.touches[0].clientX;
+                gameState.dragEndY = e.touches[0].clientY;
+                instructionsText.visible = false;
+            }
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (gameState.isDragging) {
+                gameState.dragEndX = e.touches[0].clientX;
+                gameState.dragEndY = e.touches[0].clientY;
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (gameState.isDragging) throwObject();
+        }
+        
+        function handleMouseDown(e) {
+            if (!gameState.hasThrown && !gameState.resetInProgress && !gameState.gameOver) {
+                gameState.isDragging = true;
+                gameState.dragStartX = e.clientX;
+                gameState.dragStartY = e.clientY;
+                gameState.dragEndX = e.clientX;
+                gameState.dragEndY = e.clientY;
+                instructionsText.visible = false;
+            }
+        }
+        
+        function handleMouseMove(e) {
+            if (gameState.isDragging) {
+                gameState.dragEndX = e.clientX;
+                gameState.dragEndY = e.clientY;
+            }
+        }
+        
+        function handleMouseUp() {
+            if (gameState.isDragging) throwObject();
+        }
+        
+        function handleResize() {
+            groundLine.clear();
+            groundLine.lineStyle(2, 0x8B4513, 1);
+            groundLine.moveTo(0, app.screen.height - 100);
+            groundLine.lineTo(gameState.worldWidth, app.screen.height - 100);
+            
+            thrower.position.set(100, app.screen.height - 100);
+            
+            if (!gameState.hasThrown) object.position.set(thrower.x + 20, thrower.y - 20);
+            
+            distanceText.position.set(app.screen.width - 150, 50);
+            instructionsText.position.set(app.screen.width / 2, 50);
+            levelText.position.set(10, 10);
+            livesText.position.set(10, 30);
+            scoreText.position.set(app.screen.width - 150, 10);
+            highScoreText.position.set(app.screen.width / 2 - 90, 15);
+            fullscreenButton.position.set(app.screen.width - 50, 10);
+            
+            gameOverBg.clear();
+            gameOverBg.beginFill(0x000000, 0.7);
+            gameOverBg.drawRect(0, 0, app.screen.width, app.screen.height);
+            gameOverBg.endFill();
+            
+            gameOverText.position.set(app.screen.width / 2, app.screen.height / 3);
+            finalScoreText.position.set(app.screen.width / 2, app.screen.height / 2);
+            restartButton.position.set(app.screen.width / 2 - 100, app.screen.height * 2 / 3);
+            
+            levelObjects.cacti.forEach(cactus => { cactus.position.y = app.screen.height - 100; });
+            levelObjects.rocks.forEach(rock => { rock.position.y = app.screen.height - 100 - rock.size * 0.7; });
+            
+            const goalX = thrower.x + gameState.currentGoal * 10;
+            goalLine.clear();
+            goalLine.lineStyle(3, 0xFF0000, 1);
+            goalLine.moveTo(goalX, app.screen.height - 150);
+            goalLine.lineTo(goalX, app.screen.height - 50);
+            goalLine.getChildAt(0).position.set(goalX, app.screen.height - 180);
+        }
+        
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', () => { setTimeout(handleResize, 100); });
+        
+        // Fullscreen button
+        const fullscreenButton = new PIXI.Graphics();
+        fullscreenButton.beginFill(0x8B4513, 0.7);
+        fullscreenButton.drawRoundedRect(0, 0, 40, 40, 5);
+        fullscreenButton.endFill();
+        fullscreenButton.position.set(app.screen.width - 50, 10);
+        fullscreenButton.interactive = true;
+        fullscreenButton.buttonMode = true;
+        
+        // Fullscreen icon
+        const fsIcon = new PIXI.Graphics();
+        fsIcon.lineStyle(3, 0xFFFFFF);
+        fsIcon.drawRect(8, 8, 24, 24);
+        fsIcon.moveTo(14, 14);
+        fsIcon.lineTo(14, 8);
+        fsIcon.moveTo(14, 14);
+        fsIcon.lineTo(8, 14);
+        fsIcon.moveTo(26, 26);
+        fsIcon.lineTo(26, 32);
+        fsIcon.moveTo(26, 26);
+        fsIcon.lineTo(32, 26);
+        fullscreenButton.addChild(fsIcon);
+        
+        fullscreenButton.on('pointerdown', () => {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+                else if (document.documentElement.msRequestFullscreen) document.documentElement.msRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+        });
+        
+        uiContainer.addChild(fullscreenButton);
+        
+        app.renderer.on('resize', handleResize);
+        
+        generateLevel();
+    </script>
+</body>
+</html>
