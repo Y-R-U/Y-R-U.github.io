@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Storybook Adventure</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; height: 100vh; }
+        #game-container { display: grid; height: 100vh; grid-template-columns: 0fr 1fr 0fr; grid-template-rows: 1fr auto; transition: all 0.5s ease; }
+        #main-panel { grid-column: 2; grid-row: 1 / span 2; position: relative; overflow: hidden; background-color: #3E2723; z-index: 5; }
+        #text-area { grid-column: 1 / span 3; grid-row: 2; padding: 1.5rem; background: rgba(0, 0, 0, 0.7); color: white; min-height: 25vh; max-height: 40vh; position: relative; z-index: 10; transition: all 0.3s ease; overflow-y: auto; }
+        .side-panel { background: #111; color: white; width: 25vw; height: 100%; overflow: auto; transition: transform 0.5s ease; padding: 1rem; position: relative; }
+        #left-panel { grid-column: 1; grid-row: 1; }
+        #right-panel { grid-column: 3; grid-row: 1; }
+        .close-panel { position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.2); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+        .panel-toggle { position: absolute; top: 20px; background: rgba(0, 0, 0, 0.7); color: white; border: none; padding: 0.7rem; z-index: 10; cursor: pointer; border-radius: 5px; }
+        #toggle-left { left: 20px; }
+        #toggle-right { right: 20px; }
+        .control-button { background: rgba(0, 0, 0, 0.7); color: white; border: none; padding: 0.5rem; border-radius: 5px; margin: 0.5rem; cursor: pointer; }
+        #text-toggle { position: absolute; top: 10px; right: 20px; z-index: 1000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .text-minimized #text-area { transform: translateY(calc(100% - 60px)); }
+        #story-text { margin-bottom: 1.5rem; line-height: 1.6; font-size: 1.1rem; }
+        #choices { display: flex; flex-direction: column; gap: 0.8rem; }
+        .choice { padding: 0.8rem 1.2rem; border: none; border-radius: 4px; background: #333; color: white; cursor: pointer; transition: all 0.3s ease; text-align: left; }
+        .choice.good { border-left: 4px solid #4caf50; }
+        .choice.neutral { border-left: 4px solid #2196f3; }
+        .choice.bad { border-left: 4px solid #f44336; }
+        .choice:hover { background: #444; }
+        #scene-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        #scene-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; }
+        .title { margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .detail-item { margin-bottom: 0.8rem; }
+        .personality-meter { margin-top: 1rem; height: 1rem; background: #333; border-radius: 5px; overflow: hidden; }
+        .personality-fill { height: 100%; width: 50%; background: linear-gradient(to right, #f44336, #2196f3, #4caf50); transition: width 0.5s ease; }
+        
+        /* Portrait mode styles - only applied in portrait */
+        @media (max-width: 768px) and (orientation: portrait) {
+            #game-container { grid-template-columns: 1fr; }
+            #main-panel { grid-column: 1; }
+            #text-area { grid-column: 1; }
+            .side-panel { position: fixed; top: 0; height: 100%; width: 80vw; z-index: 100; }
+            #left-panel { left: 0; transform: translateX(-100%); }
+            #right-panel { right: 0; transform: translateX(100%); }
+            .panel-open-left #left-panel { transform: translateX(0); }
+            .panel-open-right #right-panel { transform: translateX(0); }
+            .panel-backdrop { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 99; cursor: pointer; }
+            .panel-open-left .panel-backdrop, .panel-open-right .panel-backdrop { display: block; }
+            /* Show panel toggle buttons only in portrait mode */
+            .panel-toggle { display: block; }
+        }
+        
+        /* Landscape mode styles */
+        @media (orientation: landscape) {
+            /* Hide panel toggle buttons and close buttons in landscape mode */
+            .panel-toggle, .close-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="panel-backdrop" onclick="closePanels()"></div>
+    <div id="game-container">
+        <div id="left-panel" class="side-panel">
+            <button class="close-panel" onclick="closeLeftPanel()">✕</button>
+            <h2 class="title">Character</h2>
+            <div class="detail-item">
+                <h3>Personality</h3>
+                <div class="personality-meter">
+                    <div id="personality-fill" class="personality-fill"></div>
+                </div>
+                <p id="personality-text">Neutral</p>
+            </div>
+            <div class="detail-item">
+                <h3>Achievements</h3>
+                <ul id="achievements-list">
+                    <li>Started your journey</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="main-panel">
+            <button id="toggle-left" class="panel-toggle" onclick="openLeftPanel()">☰</button>
+            <button id="toggle-right" class="panel-toggle" onclick="openRightPanel()">☰</button>
+            <img id="scene-image" src="" alt="Story scene">
+            <video id="scene-video" loop autoplay muted></video>
+        </div>
+        
+        <div id="right-panel" class="side-panel">
+            <button class="close-panel" onclick="closeRightPanel()">✕</button>
+            <h2 class="title">Journal</h2>
+            <div id="journal-entries"></div>
+            <button id="fullscreen-toggle" class="control-button" onclick="toggleFullscreen()">Enter Fullscreen</button>
+        </div>
+        
+        <div id="text-area">
+            <button id="text-toggle" class="control-button" onclick="toggleTextArea()">▼</button>
+            <p id="story-text"></p>
+            <div id="choices"></div>
+        </div>
+    </div>
+
+    <script>
+        // Story data structure
+        const storyData = {
+            scenes: [
+                {
+                    id: "1",
+                    image: "assets/forest_path.jpg",
+                    video: "",
+                    text: "The forest path stretches before you, dappled sunlight filtering through ancient trees. Something about this place feels both welcoming and mysterious. A sense of adventure fills your heart as you consider your first steps into this unknown world.",
+                    choices: [
+                        { text: "Proceed cautiously, staying alert for any dangers", nextScene: "2", type: "neutral" },
+                        { text: "Stride confidently forward, eager to discover what lies ahead", nextScene: "2", type: "good" },
+                        { text: "Look for shortcuts or hidden paths that others might miss", nextScene: "2", type: "bad" }
+                    ],
+                    journalEntry: "I found myself at the entrance to a mysterious forest. The journey begins..."
+                },
+                {
+                    id: "2",
+                    image: "assets/ancient_ruins.jpg",
+                    video: "",
+                    text: "After walking for what seems like hours, you discover ancient stone ruins emerging from the forest floor. Moss-covered pillars frame a central altar, where a faint blue light pulses rhythmically. There's something captivating about its glow.",
+                    choices: [
+                        { text: "Approach carefully and examine the ruins without touching anything", nextScene: "3", type: "neutral" },
+                        { text: "Place your hand on the altar, feeling drawn to connect with its energy", nextScene: "3", type: "good" },
+                        { text: "Search the ruins for anything valuable or useful you can take", nextScene: "3", type: "bad" }
+                    ],
+                    journalEntry: "I've discovered ancient ruins deep in the forest. The blue light emanating from the central altar seems to call to me..."
+                },
+                {
+                    id: "3",
+                    image: "assets/guardian_appears.jpg",
+                    video: "assets/guardian_appears.mp4",
+                    text: "As you consider your next move, the blue light intensifies. Mist swirls around the altar, coalescing into a translucent figure. The Guardian of the Forest materializes before you, ancient eyes studying your intentions.",
+                    choices: [
+                        { text: "Ask what this place is and why you were drawn here", nextScene: "4", type: "neutral" },
+                        { text: "Bow respectfully and offer to help with whatever task is needed", nextScene: "3.1", type: "good" },
+                        { text: "Demand to know what power the guardian is protecting and how to obtain it", nextScene: "3.2", type: "bad" }
+                    ],
+                    journalEntry: "A mystical guardian has appeared! Its form made of light and mist, it seems to be evaluating me."
+                },
+                {
+                    id: "3.1",
+                    image: "assets/guardian_pleased.jpg",
+                    video: "",
+                    text: "The Guardian's expression softens, clearly pleased by your respectful approach. 'Few who find these ruins show such reverence,' it says in a voice like rustling leaves. 'Perhaps you are the one we have waited for.' The Guardian gestures, and a small seedling appears floating in the air before you.",
+                    choices: [
+                        { text: "Accept the seedling with gratitude", nextScene: "4", type: "good" },
+                        { text: "Ask what the seedling is before accepting", nextScene: "4", type: "neutral" },
+                        { text: "Take the seedling but remain skeptical of the Guardian's intentions", nextScene: "4", type: "neutral" }
+                    ],
+                    journalEntry: "The Guardian has given me a mysterious seedling. It seems important somehow."
+                },
+                {
+                    id: "3.2",
+                    image: "assets/guardian_displeased.jpg",
+                    video: "",
+                    text: "The Guardian's form darkens, storm clouds seemingly brewing within its translucent body. 'Many come seeking only power,' it intones disapprovingly. 'The forest tests all who enter. It gives according to one's heart.' The ground trembles slightly beneath your feet, roots momentarily emerging from the soil around you.",
+                    choices: [
+                        { text: "Apologize and adopt a more respectful tone", nextScene: "4", type: "neutral" },
+                        { text: "Stand your ground - power isn't inherently evil", nextScene: "4", type: "bad" },
+                        { text: "Back away slowly, looking for an escape route", nextScene: "4", type: "bad" }
+                    ],
+                    journalEntry: "The Guardian seemed upset by my approach. The forest itself seemed to respond to its mood."
+                },
+                {
+                    id: "4",
+                    image: "assets/forest_crossroads.jpg",
+                    video: "",
+                    text: "The Guardian dissipates into mist, leaving you alone once more. As you leave the ruins, you come to a crossroads. Three paths lie before you: one bathed in sunlight leading toward mountains, another disappearing into deeper forest, and a third descending into a misty valley.",
+                    choices: [
+                        { text: "Take the sunny path toward the mountains", nextScene: "5", type: "good" },
+                        { text: "Follow the path into the deeper forest", nextScene: "5", type: "neutral" },
+                        { text: "Descend into the misty valley", nextScene: "5", type: "bad" }
+                    ],
+                    journalEntry: "After my encounter with the Guardian, I've reached a crossroads. The path I choose feels significant."
+                }
+            ]
+        };
+
+        // Game state
+        let currentScene = "1";
+        let personalityScore = 50;
+        let isLeftPanelOpen = false;
+        let isRightPanelOpen = false;
+
+        // UI control functions
+        function openLeftPanel() {
+            document.getElementById("game-container").classList.add("panel-open-left");
+            document.getElementById("toggle-left").style.display = "none";
+            isLeftPanelOpen = true;
+        }
+
+        function openRightPanel() {
+            document.getElementById("game-container").classList.add("panel-open-right");
+            document.getElementById("toggle-right").style.display = "none";
+            isRightPanelOpen = true;
+        }
+
+        function closeLeftPanel() {
+            document.getElementById("game-container").classList.remove("panel-open-left");
+            document.getElementById("toggle-left").style.display = "block";
+            isLeftPanelOpen = false;
+        }
+
+        function closeRightPanel() {
+            document.getElementById("game-container").classList.remove("panel-open-right");
+            document.getElementById("toggle-right").style.display = "block";
+            isRightPanelOpen = false;
+        }
+
+        function closePanels() {
+            closeLeftPanel();
+            closeRightPanel();
+        }
+
+        function toggleTextArea() {
+            document.body.classList.toggle("text-minimized");
+            const btn = document.getElementById("text-toggle");
+            btn.textContent = document.body.classList.contains("text-minimized") ? "▲" : "▼";
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                document.getElementById("fullscreen-toggle").textContent = "Exit Fullscreen";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    document.getElementById("fullscreen-toggle").textContent = "Enter Fullscreen";
+                }
+            }
+        }
+
+        // Game logic functions
+        function updatePersonality(choice) {
+            switch(choice.type) {
+                case "good": personalityScore = Math.min(personalityScore + 5, 100); break;
+                case "bad": personalityScore = Math.max(personalityScore - 5, 0); break;
+            }
+            document.getElementById("personality-fill").style.width = `${personalityScore}%`;
+            
+            let personalityText = "Neutral";
+            if (personalityScore > 70) personalityText = "Good";
+            else if (personalityScore < 30) personalityText = "Bad";
+            document.getElementById("personality-text").textContent = personalityText;
+        }
+
+        function loadScene(sceneId) {
+            const scene = storyData.scenes.find(s => s.id === sceneId);
+            document.getElementById("scene-image").src = scene.image;
+            
+            const video = document.getElementById("scene-video");
+            if (scene.video) {
+                video.src = scene.video;
+                video.style.display = "block";
+            } else {
+                video.style.display = "none";
+                video.src = "";
+            }
+            
+            document.getElementById("story-text").textContent = scene.text;
+            
+            const choicesEl = document.getElementById("choices");
+            choicesEl.innerHTML = "";
+            scene.choices.forEach(choice => {
+                const btn = document.createElement("button");
+                btn.textContent = choice.text;
+                btn.classList.add("choice", choice.type);
+                btn.addEventListener("click", () => {
+                    updatePersonality(choice);
+                    loadScene(choice.nextScene);
+                    
+                    if (scene.journalEntry) {
+                        const entry = document.createElement("div");
+                        entry.classList.add("detail-item");
+                        entry.innerHTML = `<h3>${scene.id}</h3><p>${scene.journalEntry}</p>`;
+                        document.getElementById("journal-entries").prepend(entry);
+                    }
+                });
+                choicesEl.appendChild(btn);
+            });
+        }
+
+        // Handle orientation changes and resizing
+        function handleResize() {
+            // Reset all panel states regardless of orientation
+            document.getElementById("game-container").classList.remove("panel-open-left", "panel-open-right");
+            isLeftPanelOpen = false;
+            isRightPanelOpen = false;
+            
+            // Force proper button visibility in landscape mode when panels are closed
+            if (window.innerWidth > window.innerHeight) {
+                // Hide both panel toggle buttons in landscape mode
+                document.getElementById("toggle-left").style.display = "none";
+                document.getElementById("toggle-right").style.display = "none";
+            } else {
+                // In portrait mode, show the toggle buttons when panels are closed
+                document.getElementById("toggle-left").style.display = "block";
+                document.getElementById("toggle-right").style.display = "block";
+            }
+        }
+
+        // Initialize after DOM is loaded
+        window.onload = function() {
+            loadScene(currentScene);
+            
+            // Reset panel states and close any open panels
+            document.getElementById("game-container").classList.remove("panel-open-left", "panel-open-right");
+            isLeftPanelOpen = false;
+            isRightPanelOpen = false;
+            
+            // Set initial button visibility based on orientation
+            if (window.innerWidth > window.innerHeight) {
+                // Hide both panel toggle buttons in landscape mode
+                document.getElementById("toggle-left").style.display = "none";
+                document.getElementById("toggle-right").style.display = "none";
+            } else {
+                // In portrait mode, show the toggle buttons
+                document.getElementById("toggle-left").style.display = "block";
+                document.getElementById("toggle-right").style.display = "block";
+            }
+            
+            // Event listeners
+            window.addEventListener("resize", handleResize);
+            window.addEventListener("orientationchange", handleResize);
+            document.addEventListener("fullscreenchange", () => {
+                document.getElementById("fullscreen-toggle").textContent = 
+                    document.fullscreenElement ? "Exit Fullscreen" : "Enter Fullscreen";
+            });
+        };
+    </script>
+</body>
+</html>
