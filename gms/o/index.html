@@ -35,7 +35,7 @@
         .detail-item { margin-bottom: 0.8rem; }
         .personality-meter { margin-top: 1rem; height: 1rem; background: #333; border-radius: 5px; overflow: hidden; }
         .personality-fill { height: 100%; width: 50%; background: linear-gradient(to right, #f44336, #2196f3, #4caf50); transition: width 0.5s ease; }
-        #cache-status { position: absolute; bottom: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
+        #cache-status { background: rgba(0, 0, 0, 0.3); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; margin-top: 1rem; }
         
         @media (max-width: 768px) and (orientation: portrait) {
             #game-container { grid-template-columns: 1fr; }
@@ -83,7 +83,7 @@
             <img id="scene-image" src="" alt="Story scene">
             <video id="scene-video" loop autoplay muted></video>
             <button id="expand-button" class="control-button" onclick="expandTextArea()">▲</button>
-            <div id="cache-status">Cache 0/0/0</div>
+
         </div>
         
         <div id="right-panel" class="side-panel">
@@ -91,6 +91,7 @@
             <h2 class="title">Journal</h2>
             <div id="journal-entries"></div>
             <button id="fullscreen-toggle" class="control-button" onclick="toggleFullscreen()">Enter Fullscreen</button>
+            <div id="cache-status">Cache 0/0/0</div>
         </div>
         
         <div id="text-area">
@@ -275,17 +276,11 @@
         }
 
         function toggleTextArea() {
-            if (document.body.classList.contains("text-minimized")) {
-                document.body.classList.remove("text-minimized");
-                document.body.classList.add("text-hidden");
-                setTimeout(() => {
-                    document.getElementById("text-area").style.display = "none";
-                    document.getElementById("expand-button").style.display = "flex";
-                }, 300);
-            } else {
-                document.body.classList.add("text-minimized");
-                document.getElementById("text-toggle").textContent = "▲";
-            }
+            document.body.classList.add("text-hidden");
+            setTimeout(() => {
+                document.getElementById("text-area").style.display = "none";
+                document.getElementById("expand-button").style.display = "flex";
+            }, 300);
         }
         
         function expandTextArea() {
