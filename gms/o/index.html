@@ -104,82 +104,566 @@
 
     <script>
         const storyData = {
-            scenes: [
-                {
-                    id: "1",
-                    image: "assets/forest_path.png",
-                    video: "",
-                    text: "The forest path stretches before you, dappled sunlight filtering through ancient trees. Something about this place feels both welcoming and mysterious. A sense of adventure fills your heart as you consider your first steps into this unknown world.",
-                    choices: [
-                        { text: "Proceed cautiously, staying alert for any dangers", nextScene: "2", type: "neutral" },
-                        { text: "Stride confidently forward, eager to discover what lies ahead", nextScene: "2", type: "good" },
-                        { text: "Look for shortcuts or hidden paths that others might miss", nextScene: "2", type: "bad" }
-                    ],
-                    journalEntry: "I found myself at the entrance to a mysterious forest. The journey begins..."
-                },
-                {
-                    id: "2",
-                    image: "assets/ancient_ruins.png",
-                    video: "",
-                    text: "After walking for what seems like hours, you discover ancient stone ruins emerging from the forest floor. Moss-covered pillars frame a central altar, where a faint blue light pulses rhythmically. There's something captivating about its glow.",
-                    choices: [
-                        { text: "Approach carefully and examine the ruins without touching anything", nextScene: "3", type: "neutral" },
-                        { text: "Place your hand on the altar, feeling drawn to connect with its energy", nextScene: "3", type: "good" },
-                        { text: "Search the ruins for anything valuable or useful you can take", nextScene: "3", type: "bad" }
-                    ],
-                    journalEntry: "I've discovered ancient ruins deep in the forest. The blue light emanating from the central altar seems to call to me..."
-                },
-                {
-                    id: "3",
-                    image: "assets/guardian.png",
-                    video: "assets/guardian.mp4",
-                    text: "As you consider your next move, the blue light intensifies. Mist swirls around the altar, coalescing into a translucent figure. The Guardian of the Forest materializes before you, ancient eyes studying your intentions.",
-                    choices: [
-                        { text: "Ask what this place is and why you were drawn here", nextScene: "4", type: "neutral" },
-                        { text: "Bow respectfully and offer to help with whatever task is needed", nextScene: "3.1", type: "good" },
-                        { text: "Demand to know what power the guardian is protecting and how to obtain it", nextScene: "3.2", type: "bad" }
-                    ],
-                    journalEntry: "A mystical guardian has appeared! Its form made of light and mist, it seems to be evaluating me."
-                },
-                {
-                    id: "3.1",
-                    image: "assets/guardian_pleased.jpg",
-                    video: "",
-                    text: "The Guardian's expression softens, clearly pleased by your respectful approach. 'Few who find these ruins show such reverence,' it says in a voice like rustling leaves. 'Perhaps you are the one we have waited for.' The Guardian gestures, and a small seedling appears floating in the air before you.",
-                    choices: [
-                        { text: "Accept the seedling with gratitude", nextScene: "4", type: "good" },
-                        { text: "Ask what the seedling is before accepting", nextScene: "4", type: "neutral" },
-                        { text: "Take the seedling but remain skeptical of the Guardian's intentions", nextScene: "4", type: "neutral" }
-                    ],
-                    journalEntry: "The Guardian has given me a mysterious seedling. It seems important somehow."
-                },
-                {
-                    id: "3.2",
-                    image: "assets/guardian_displeased.jpg",
-                    video: "",
-                    text: "The Guardian's form darkens, storm clouds seemingly brewing within its translucent body. 'Many come seeking only power,' it intones disapprovingly. 'The forest tests all who enter. It gives according to one's heart.' The ground trembles slightly beneath your feet, roots momentarily emerging from the soil around you.",
-                    choices: [
-                        { text: "Apologize and adopt a more respectful tone", nextScene: "4", type: "neutral" },
-                        { text: "Stand your ground - power isn't inherently evil", nextScene: "4", type: "bad" },
-                        { text: "Back away slowly, looking for an escape route", nextScene: "4", type: "bad" }
-                    ],
-                    journalEntry: "The Guardian seemed upset by my approach. The forest itself seemed to respond to its mood."
-                },
-                {
-                    id: "4",
-                    image: "assets/forest_crossroads.jpg",
-                    video: "",
-                    text: "The Guardian dissipates into mist, leaving you alone once more. As you leave the ruins, you come to a crossroads. Three paths lie before you: one bathed in sunlight leading toward mountains, another disappearing into deeper forest, and a third descending into a misty valley.",
-                    choices: [
-                        { text: "Take the sunny path toward the mountains", nextScene: "5", type: "good" },
-                        { text: "Follow the path into the deeper forest", nextScene: "5", type: "neutral" },
-                        { text: "Descend into the misty valley", nextScene: "5", type: "bad" }
-                    ],
-                    journalEntry: "After my encounter with the Guardian, I've reached a crossroads. The path I choose feels significant."
-                }
-            ]
-        };
+    scenes: [
+        // Main storyline (chronological order)
+        {
+            id: "1",
+            image: "assets/park_entrance.jpg",
+            video: "",
+            text: "It's a perfect day for a walk in the park. The sun is shining, birds are singing, and your brown chihuahua, Max, is happily trotting alongside you. The two of you often come here - it's your weekend ritual, a small moment of peace in an otherwise busy life.",
+            choices: [
+                { text: "Follow the main path through the park", nextScene: "2", type: "neutral" },
+                { text: "Let Max lead the way", nextScene: "2", type: "good" },
+                { text: "Take a shortcut through the less traveled areas", nextScene: "2", type: "neutral" }
+            ],
+            journalEntry: "Another beautiful day at the park with Max. Nothing out of the ordinary, just the way I like it."
+        },
+        {
+            id: "2",
+            image: "assets/park_secluded.jpg",
+            video: "",
+            text: "As you wander deeper into the park, you find yourself in a more secluded area. Suddenly, Max stops and perks up his ears. He stares intently at something ahead - a subtle, barely noticeable shimmer in the air near a cluster of trees. It's so faint you might have missed it entirely if not for Max's reaction.",
+            choices: [
+                { text: "Hold Max's leash tighter and investigate carefully", nextScene: "3", type: "neutral" },
+                { text: "Call Max back and try to distract him", nextScene: "3", type: "good" },
+                { text: "Let go of the leash so you can both explore", nextScene: "3", type: "bad" }
+            ],
+            journalEntry: "Max noticed something strange in the park today - some kind of shimmer in the air. I've never seen anything like it before."
+        },
+        {
+            id: "3",
+            image: "assets/dog_running.jpg",
+            video: "assets/dog_running.mp4",
+            text: "Before you can fully react, Max suddenly bolts forward with unexpected strength, pulling the leash from your grasp. He races toward the strange shimmer, barking excitedly. As he reaches the distortion, something impossible happens - Max seems to pass through it, his form blurring for an instant before he vanishes completely from sight.",
+            choices: [
+                { text: "Call out for Max and look around frantically", nextScene: "4", type: "neutral" },
+                { text: "Cautiously approach the spot where Max disappeared", nextScene: "4", type: "good" },
+                { text: "Rush headlong toward the shimmer without hesitation", nextScene: "4", type: "bad" }
+            ],
+            journalEntry: "Max disappeared! He ran toward some kind of distortion in the air and just... vanished. I'm terrified of what might have happened to him."
+        },
+        {
+            id: "4",
+            image: "assets/shimmer_close.jpg",
+            video: "assets/shimmer_effect.mp4",
+            text: "Your heart pounding, you approach the spot where Max vanished. The shimmer becomes more visible as you get closer - a subtle ripple in reality, like heat rising from pavement but with an eerie blue tint. There's no sign of Max anywhere, and no one else seems to be around to help.",
+            choices: [
+                { text: "Reach out and touch the shimmer", nextScene: "5", type: "neutral" },
+                { text: "Throw a nearby stick into the shimmer to test it", nextScene: "5", type: "good" },
+                { text: "Step into the shimmer without hesitation", nextScene: "5", type: "bad" }
+            ],
+            journalEntry: "I found what Max disappeared into - some kind of distortion, a ripple in the air. I have to find out what happened to him, no matter what."
+        },
+        {
+            id: "5",
+            image: "assets/reality_shift.jpg",
+            video: "assets/reality_shift.mp4",
+            text: "The moment you interact with the shimmer, a blinding flash engulfs your vision. You feel a strange sensation, as if your body is being pulled in all directions at once. When your vision clears, you're standing in what appears to be the same spot in the park, but everything has changed dramatically.",
+            choices: [
+                { text: "Stand still and try to process what just happened", nextScene: "6", type: "neutral" },
+                { text: "Call out for Max immediately", nextScene: "6", type: "good" },
+                { text: "Check yourself for any changes or injuries", nextScene: "6", type: "neutral" }
+            ],
+            journalEntry: "Something impossible just happened. The entire world around me has changed in an instant. Everything looks... futuristic. Where am I? What happened? And where is Max?"
+        },
+        {
+            id: "6",
+            image: "assets/futuristic_park.jpg",
+            video: "",
+            text: "The trees now have glowing blue lines running along their trunks. The park benches are sleek, curved metal with no visible supports. The path beneath your feet pulses with subtle light. In the distance, you see impossible towers stretching into the sky, and vehicles that seem to float above the ground. Then, you spot something familiar - a small brown chihuahua being picked up by someone in a uniform.",
+            choices: [
+                { text: "Shout 'That's my dog!' and run toward them", nextScene: "7", type: "bad" },
+                { text: "Approach cautiously and assess the situation", nextScene: "7", type: "neutral" },
+                { text: "Hide and observe what they do with the dog", nextScene: "7", type: "good" }
+            ],
+            journalEntry: "This place looks like the park but... transformed. Everything is futuristic, like something out of a sci-fi movie. And I just saw Max! Someone in a uniform was taking him away!"
+        },
+        {
+            id: "7",
+            image: "assets/officer_dog.jpg",
+            video: "",
+            text: "As you approach, you see the person in uniform scanning Max with a handheld device that projects holographic data into the air. 'Unregistered organic entity detected. No biosync chip found. Proceeding with standard containment protocol,' they say into a wrist device. They place Max in a floating containment unit that hovers at waist height.",
+            choices: [
+                { text: "Explain that Max is your dog and you're looking for him", nextScene: "8", type: "neutral" },
+                { text: "Offer to complete whatever registration is necessary", nextScene: "8", type: "good" },
+                { text: "Try to grab the containment unit when they're not looking", nextScene: "8", type: "bad" }
+            ],
+            journalEntry: "Some kind of officer was scanning Max with futuristic technology. They called him an 'unregistered organic entity' and put him in a floating container. I need to get him back!"
+        },
+        {
+            id: "8",
+            image: "assets/officer_confrontation.jpg",
+            video: "",
+            text: "The officer looks at you with surprise. 'Citizen, this unregistered organic was roaming freely in a public space. All companion entities require proper registration and biosync implants as per City Ordinance 422-B.' They study you more carefully. 'Your citizen ID isn't broadcasting. Are you experiencing a sync malfunction?'",
+            choices: [
+                { text: "Admit you're confused and ask for help understanding where you are", nextScene: "9", type: "good" },
+                { text: "Pretend you know what they're talking about to avoid suspicion", nextScene: "9", type: "neutral" },
+                { text: "Demand your rights and insist they return your dog", nextScene: "9", type: "bad" }
+            ],
+            journalEntry: "I tried talking to the officer taking Max. Apparently all 'companion entities' need registration and implants here. They also noticed something odd about me - my 'citizen ID' isn't 'broadcasting.' Nothing makes sense."
+        },
+        {
+            id: "9",
+            image: "assets/transport_vehicle.jpg",
+            video: "assets/transport_departure.mp4",
+            text: "Before your conversation can continue, a sleek hovering vehicle descends nearby. 'Processing transport has arrived,' the officer says. 'Your case will be handled at Central Processing.' They begin moving toward the vehicle with Max's container. 'You should report to a Citizen Services kiosk to resolve your sync issues,' they call back to you as they load Max into the vehicle.",
+            choices: [
+                { text: "Ask where Central Processing is located", nextScene: "10", type: "neutral" },
+                { text: "Beg them to let you accompany Max", nextScene: "10", type: "good" },
+                { text: "Try to jump into the transport vehicle", nextScene: "10", type: "bad" }
+            ],
+            journalEntry: "They're taking Max away to something called 'Central Processing.' I'm losing him again! I need to find this place and get him back."
+        },
+        {
+            id: "10",
+            image: "assets/park_exit_futuristic.jpg",
+            video: "",
+            text: "The transport vehicle rises silently into the air and speeds away, leaving you alone in this strange version of the park. You notice people walking around, all seemingly unbothered by the fantastical technology surrounding them. Many have subtle glowing implants visible on their temples or wrists. On the edge of the park, you see an information terminal with a pulsing blue light.",
+            choices: [
+                { text: "Approach the information terminal to learn more", nextScene: "11", type: "neutral" },
+                { text: "Ask a passerby for help finding Central Processing", nextScene: "11", type: "good" },
+                { text: "Follow the direction the transport vehicle went", nextScene: "11", type: "bad" }
+            ],
+            journalEntry: "I'm stranded in this bizarre future version of my world. Everyone here seems to have implants and accepts all this advanced technology as normal. I need to figure out where they took Max."
+        },
+        {
+            id: "11",
+            image: "assets/city_vista.jpg",
+            video: "assets/city_vista.mp4",
+            text: "As you leave the park, the full scope of this new reality hits you. A sprawling cyber city stretches in all directions - towering spires connected by transparent tubes with vehicles racing through them, holographic advertisements floating in mid-air, and crowds of people with various technological augmentations. It's both beautiful and overwhelming.",
+            choices: [
+                { text: "Find a Citizen Services kiosk as the officer suggested", nextScene: "12", type: "good" },
+                { text: "Look for public transportation to Central Processing", nextScene: "12", type: "neutral" },
+                { text: "Search for someone who looks out of place like you", nextScene: "12", type: "bad" }
+            ],
+            journalEntry: "I've stepped into what looks like a completely different world - a futuristic cyber city unlike anything I've ever seen. Somehow I need to navigate this place to find Max."
+        },
+        {
+            id: "12",
+            image: "assets/citizen_services.jpg",
+            video: "",
+            text: "You locate a Citizen Services kiosk - a sleek pod with a holographic interface floating in front of it. 'Welcome, citizen,' an AI voice greets you. 'Please place your palm on the scanner for identification.' There's no one else around, just this automated system waiting for your input.",
+            choices: [
+                { text: "Place your palm on the scanner", nextScene: "13", type: "neutral" },
+                { text: "Ask about Central Processing without scanning", nextScene: "13", type: "good" },
+                { text: "Try to hack or override the system somehow", nextScene: "13", type: "bad" }
+            ],
+            journalEntry: "I found a Citizen Services kiosk. It's asking me to scan my palm for identification, but I have no idea what will happen if I do that."
+        },
+        {
+            id: "13",
+            image: "assets/system_error.jpg",
+            video: "assets/system_scan.mp4",
+            text: "After you interact with the kiosk, it produces a series of error messages: 'ERROR: No citizen profile detected. ERROR: Biological signature unknown to system. ERROR: Temporal anomaly detected.' The holographic display flashes red briefly before switching to a different screen. 'Emergency protocol activated. Please remain at this location. A Temporal Integrity officer has been dispatched to your location.'",
+            choices: [
+                { text: "Wait for the officer to arrive as instructed", nextScene: "14", type: "good" },
+                { text: "Ask the kiosk for more information about temporal anomalies", nextScene: "14", type: "neutral" },
+                { text: "Leave quickly before the officer arrives", nextScene: "14", type: "bad" }
+            ],
+            journalEntry: "The system doesn't recognize me! It called me a 'temporal anomaly' and now someone called a Temporal Integrity officer is coming. Am I in the future? Some parallel world?"
+        },
+        {
+            id: "14",
+            image: "assets/temporal_officer.jpg",
+            video: "",
+            text: "A sleek black vehicle descends rapidly from above, and a person in a distinctive uniform with silver accents steps out. 'Remain calm,' they say, scanning you with a handheld device. 'Our systems detected a Class 3 temporal displacement. You've transitioned through a rift, haven't you?' They look at their device. 'And it appears an organic entity crossed over just before you.'",
+            choices: [
+                { text: "Explain about Max and ask for help finding him", nextScene: "15", type: "good" },
+                { text: "Ask what they mean by 'temporal displacement' and 'rift'", nextScene: "15", type: "neutral" },
+                { text: "Demand to know if they're responsible for the rift", nextScene: "15", type: "bad" }
+            ],
+            journalEntry: "A 'Temporal Integrity officer' found me. They seem to know what happened - something about a 'temporal displacement' and a 'rift.' They also know about Max crossing over before me."
+        },
+        {
+            id: "15",
+            image: "assets/temporal_headquarters.jpg",
+            video: "assets/headquarters_approach.mp4",
+            text: "The officer escorts you to their vehicle. 'I'm taking you to Temporal Integrity headquarters. We need to properly document your case, and...' they pause, checking their device again, 'we can help locate your companion entity. It would have been taken to Central Processing, but once we confirm your status, we can redirect it.' The vehicle rises smoothly into the air, joining streams of traffic flowing between the towering structures.",
+            choices: [
+                { text: "Thank them and cooperate fully", nextScene: "16", type: "good" },
+                { text: "Ask more questions about this world during the journey", nextScene: "16", type: "neutral" },
+                { text: "Watch carefully for any signs they might be lying", nextScene: "16", type: "bad" }
+            ],
+            journalEntry: "I'm being taken to Temporal Integrity headquarters, wherever that is. The officer says they can help me find Max after they 'document my case.' At least I have a lead now."
+        },
+        {
+            id: "16",
+            image: "assets/temporal_office.jpg",
+            video: "",
+            text: "At Temporal Integrity headquarters, you're led to an office high above the city. Through the window, you can see the vast cyber metropolis stretching to the horizon. 'Rifts have been appearing more frequently,' explains the officer. 'Objects, animals, occasionally people cross over from parallel realities or timelines. Your case is... interesting. Both you and your companion entity crossed completely intact.'",
+            choices: [
+                { text: "Ask if there's a way to return to your own reality", nextScene: "17", type: "neutral" },
+                { text: "Focus on finding Max first before anything else", nextScene: "17", type: "good" },
+                { text: "Ask what makes your case different from others", nextScene: "17", type: "bad" }
+            ],
+            journalEntry: "At Temporal Integrity headquarters, they explained that 'rifts' between realities have been appearing. People, animals, and objects sometimes cross through them. Apparently Max and I are unusual cases because we crossed 'completely intact.'"
+        },
+        {
+            id: "17",
+            image: "assets/holographic_display.jpg",
+            video: "assets/data_scan.mp4",
+            text: "The officer activates a holographic display showing various data streams and images. 'We've located your companion entity at Central Processing. However, there's a complication.' The display shows Max in a high-tech facility. 'As an unregistered organic entity with temporal anomaly characteristics, it's been flagged for research. The Science Directorate has authority in these cases.'",
+            choices: [
+                { text: "Insist that Max is your pet and should be returned immediately", nextScene: "18", type: "neutral" },
+                { text: "Ask what kind of research they intend to conduct", nextScene: "18", type: "good" },
+                { text: "Threaten to cause problems if Max isn't released", nextScene: "18", type: "bad" }
+            ],
+            journalEntry: "They found Max! He's at Central Processing, but now there's a problem. Because he's a 'temporal anomaly,' something called the Science Directorate wants to keep him for research. I need to get him back."
+        },
+        {
+            id: "18",
+            image: "assets/city_transit.jpg",
+            video: "",
+            text: "After a lengthy discussion, the officer makes a decision. 'I'll escort you to Central Processing. I can't promise immediate release of your companion entity, but your presence as its primary temporal associate may influence the process.' You board a high-speed transit system that races through the city in transparent tubes, offering breathtaking views of this futuristic world.",
+            choices: [
+                { text: "Thank the officer for their help and cooperation", nextScene: "19", type: "good" },
+                { text: "Observe the city carefully during transit", nextScene: "19", type: "neutral" },
+                { text: "Plan how you might take Max by force if necessary", nextScene: "19", type: "bad" }
+            ],
+            journalEntry: "We're heading to Central Processing to try to get Max back. The officer is helping me, but it sounds like the Science Directorate might not want to give him up easily."
+        },
+        {
+            id: "19",
+            image: "assets/central_processing.jpg",
+            video: "assets/approach_facility.mp4",
+            text: "Central Processing is an imposing structure of glass and metal, with various sections dedicated to different functions. The officer leads you to a secure area labeled 'Anomalous Entities.' Through a transparent barrier, you finally see Max in a comfortable but clearly contained environment. He appears unharmed and actually quite content, playing with some kind of advanced toy.",
+            choices: [
+                { text: "Feel relieved that Max appears safe and well-treated", nextScene: "20", type: "good" },
+                { text: "Analyze the security and containment systems", nextScene: "20", type: "neutral" },
+                { text: "Demand immediate access to Max", nextScene: "20", type: "bad" }
+            ],
+            journalEntry: "We've reached Central Processing, and I can see Max! He's in some kind of containment area but seems unharmed. In fact, he looks surprisingly happy."
+        },
+        {
+            id: "20",
+            image: "assets/science_director.jpg",
+            video: "",
+            text: "A person in a white lab coat approaches. 'I'm Dr. Vex, Deputy Science Director,' they introduce themselves. 'Your case is fascinating. Both you and the canine crossed through a rift completely intact, with minimal quantum degradation.' They gesture to Max. 'We've discovered the canine has unique properties - it seems to be generating a small but stable rift signature. This could be crucial to understanding the increasing rift phenomenon affecting our city.'",
+            choices: [
+                { text: "Ask what exactly they mean by 'rift signature'", nextScene: "21", type: "neutral" },
+                { text: "Express concern for Max's wellbeing during any research", nextScene: "21", type: "good" },
+                { text: "Refuse to let them keep Max for any reason", nextScene: "21", type: "bad" }
+            ],
+            journalEntry: "I met Dr. Vex from the Science Directorate. They claim Max is 'generating a small but stable rift signature' - whatever that means. They want to study him to understand the 'rift phenomenon' affecting the city."
+        },
+        {
+            id: "21",
+            image: "assets/city_alert.jpg",
+            video: "assets/alert_system.mp4",
+            text: "Before Dr. Vex can continue, an alarm sounds throughout the facility. Holographic alerts appear in the air showing various locations in the city where glowing rifts similar to the one you encountered are appearing. 'It's happening again,' Dr. Vex says urgently. 'Rift cascade event in progress.' The Temporal officer looks concerned. 'Multiple rifts citywide, largest concentration we've ever recorded.'",
+            choices: [
+                { text: "Ask how you can help with the situation", nextScene: "22", type: "good" },
+                { text: "Use the distraction to try to reach Max", nextScene: "22", type: "neutral" },
+                { text: "Suggest the rifts might be a way back to your reality", nextScene: "22", type: "bad" }
+            ],
+            journalEntry: "Some kind of emergency is happening! Rifts like the one I came through are appearing all over the city. Everyone seems very concerned about a 'rift cascade event.'"
+        },
+        {
+            id: "22",
+            image: "assets/lab_max.jpg",
+            video: "",
+            text: "In the midst of the emergency, Dr. Vex makes a surprising decision. 'We need to reunite you with your canine. Our readings suggest your quantum signatures are entangled. Together, you might help us understand how to stabilize these rifts.' They authorize your entry into Max's containment area. The moment Max sees you, he bounds over with excited yips and jumps, clearly overjoyed to be reunited.",
+            choices: [
+                { text: "Embrace Max and comfort him", nextScene: "23", type: "good" },
+                { text: "Check Max carefully for any changes or implants", nextScene: "23", type: "neutral" },
+                { text: "Keep Max close, ready to run if necessary", nextScene: "23", type: "bad" }
+            ],
+            journalEntry: "I've been reunited with Max! Dr. Vex thinks our 'quantum signatures' are connected somehow, and that together we might help with the rift situation. Max seems completely fine and is so happy to see me!"
+        },
+        {
+            id: "23",
+            image: "assets/decision_room.jpg",
+            video: "assets/rift_stabilizer.mp4",
+            text: "You're quickly escorted with Max to a high-tech laboratory where scientists are monitoring the growing rift activity. 'We have a theory,' Dr. Vex explains, indicating a complex device. 'This prototype rift stabilizer could potentially close the rifts, but it requires a quantum signature to calibrate to. As temporal anomalies yourselves, you and your canine might provide that signature.' The Temporal officer adds, 'The choice is yours, but the situation is becoming critical.'",
+            choices: [
+                { text: "Agree to help with the stabilizer, putting the city's safety first", nextScene: "24", type: "good" },
+                { text: "Ask for more details about the risks involved", nextScene: "24", type: "neutral" },
+                { text: "Refuse to participate unless guaranteed a way home", nextScene: "24", type: "bad" }
+            ],
+            journalEntry: "They want Max and me to help with some 'rift stabilizer' device that might close all the rifts appearing around the city. The situation seems serious, but I don't know what risks might be involved."
+        },
+        {
+            id: "24",
+            image: "assets/control_center.jpg",
+            video: "",
+            text: "The situation escalates as reports come in of structural damage throughout the city from expanding rifts. Dr. Vex explains, 'The stabilizer has three possible configurations. We can try to close all rifts completely, which may trap you here permanently. We can selectively close only dangerous rifts, leaving some stable ones open. Or we can attempt to redirect all rift energy to create a single stable passage, but this risks accelerating the cascading effect.'",
+            choices: [
+                { text: "Choose to close all rifts, ensuring the city's safety", nextScene: "25.1", type: "good" },
+                { text: "Choose to selectively close only dangerous rifts", nextScene: "25.2", type: "neutral" },
+                { text: "Choose to create a single stable passage", nextScene: "25.3", type: "bad" }
+            ],
+            journalEntry: "The rift situation is getting worse. I have to make a crucial decision about how to configure the stabilizer - close all rifts, close only dangerous ones, or create a single passage. Each option has different consequences for both this city and my chances of getting home."
+        },
+        
+        // Branching paths based on personality
+        {
+            id: "25.1",
+            image: "assets/stabilizer_good.jpg",
+            video: "assets/stabilizer_activation_good.mp4",
+            text: "You choose to close all rifts, prioritizing the safety of everyone in this city even if it means you may never return home. With Max at your side, you allow the scientists to calibrate the stabilizer to your shared quantum signature. The device powers up, emitting pulses of energy that spread throughout the city. Monitors show rifts beginning to close one by one as the stabilizer creates a resonance pattern that seals the dimensional barriers.",
+            choices: [
+                { text: "Hold Max close as you watch the rifts close", nextScene: "26.1", type: "good" },
+                { text: "Ask if there's anything else you can do to help", nextScene: "26.1", type: "good" },
+                { text: "Wonder silently if you've made the right choice", nextScene: "26.1", type: "good" }
+            ],
+            journalEntry: "I chose to close all the rifts, even though it might mean never going home. The safety of all these people had to come first. The stabilizer is working - the rifts are closing throughout the city."
+        },
+        {
+            id: "25.2",
+            image: "assets/stabilizer_neutral.jpg",
+            video: "assets/stabilizer_activation_neutral.mp4",
+            text: "You opt for the balanced approach, choosing to close only the dangerous rifts while leaving stable ones intact. This might preserve both the city's safety and your potential path home. The calibration process is more complex, requiring precise adjustments as Max stays surprisingly calm beside you. The stabilizer activates with a subtle hum, sending targeted energy pulses that identify and seal only the unstable rifts while preserving the stable ones.",
+            choices: [
+                { text: "Monitor the stability readings of the remaining rifts", nextScene: "26.2", type: "neutral" },
+                { text: "Ask which rifts might lead back to your reality", nextScene: "26.2", type: "neutral" },
+                { text: "Pet Max reassuringly as the process continues", nextScene: "26.2", type: "neutral" }
+            ],
+            journalEntry: "I chose the middle path - closing the dangerous rifts while keeping stable ones open. It seems to be working, bringing the situation under control while possibly leaving a way home."
+        },
+        {
+            id: "25.3",
+            image: "assets/stabilizer_bad.jpg",
+            video: "assets/stabilizer_activation_bad.mp4",
+            text: "You decide to consolidate all rift energy into creating a single stable passage - your best chance of returning home. Despite warnings of the risks, the scientists proceed with your choice. The stabilizer begins drawing energy from rifts across the city, channeling it toward a central location. Alarms sound as energy levels spike beyond predicted parameters. 'The cascade is accelerating,' Dr. Vex warns as the lab equipment starts to overload from the dimensional energy being redirected.",
+            choices: [
+                { text: "Hold onto Max and prepare to make a run for the forming passage", nextScene: "26.3", type: "bad" },
+                { text: "Ask if they can abort the process before it's too late", nextScene: "26.3", type: "bad" },
+                { text: "Stand your ground, insisting they complete the process", nextScene: "26.3", type: "bad" }
+            ],
+            journalEntry: "I chose to create a single stable passage home, despite the risks. The process is more volatile than they predicted - alarms are going off everywhere, and the stabilizer seems to be struggling with the energy levels."
+        },
+        {
+            id: "26.1",
+            image: "assets/city_aftermath_good.jpg",
+            video: "assets/celebration.mp4",
+            text: "The stabilizer completes its work, and the monitors confirm all rifts have been sealed. The immediate danger has passed. Dr. Vex approaches with a mix of gratitude and sympathy. 'You've saved countless lives today. While we can't send you back to your original reality, we can offer you citizenship and integration into our society.' The Temporal officer adds, 'Your unique perspective could be invaluable to us. And of course, your companion entity - Max - would be officially registered to you.'",
+            choices: [
+                { text: "Accept their offer with grace, ready to build a new life here", nextScene: "27.1", type: "good" },
+                { text: "Ask what role you might play in this new world", nextScene: "27.1", type: "good" },
+                { text: "Look out at the city, now your new home", nextScene: "27.1", type: "good" }
+            ],
+            journalEntry: "It's done - all the rifts are closed, and the city is safe. I can't go home, but I've been offered a place in this society. A new beginning for Max and me in this incredible future world."
+        },
+        {
+            id: "26.2",
+            image: "assets/city_aftermath_neutral.jpg",
+            video: "assets/stabilized_rift.mp4",
+            text: "The stabilization process completes with partial success. The dangerous rifts have been closed, while a few stable ones remain. The scientists monitor these carefully, mapping their quantum signatures. 'This one,' Dr. Vex points to a reading, 'matches your signature pattern. It likely connects to your reality, but it's fluctuating. We could attempt to stabilize it for a crossing, but we can't guarantee success. Alternatively, you could stay here - we would welcome your unique perspective.'",
+            choices: [
+                { text: "Ask about the chances of making it home safely", nextScene: "27.2", type: "neutral" },
+                { text: "Consider the opportunities of living in this advanced world", nextScene: "27.2", type: "neutral" },
+                { text: "Look down at Max, considering what's best for both of you", nextScene: "27.2", type: "neutral" }
+            ],
+            journalEntry: "The city is safer now, with only stable rifts remaining. They've identified one that might lead back to my reality, but crossing would be risky. I have a real choice to make - try to go home, or start a new life in this fascinating world."
+        },
+        // Scene 26.3 continuation (it was cut off in the original)
+{
+    id: "26.3",
+    image: "assets/city_aftermath_bad.jpg",
+    video: "assets/rift_instability.mp4",
+    text: "The stabilizer struggles to contain the immense energy being channeled. Sections of the lab begin to glitch in and out of reality as the dimensional barriers weaken. A massive rift forms in the center of the room, crackling with chaotic energy. 'It's destabilizing!' Dr. Vex shouts over the alarms. 'If you're going to cross, it has to be now, but we don't know exactly where it leads! The entire network is in flux!'",
+    choices: [
+        { text: "Grab Max and leap into the rift, taking your chance", nextScene: "27.3", type: "bad" },
+        { text: "Ask if there's any way to better stabilize it first", nextScene: "27.3", type: "bad" },
+        { text: "Decide the risk is too great and back away from the rift", nextScene: "27.3", type: "bad" }
+    ],
+    journalEntry: "Everything's falling apart! The energy from all the rifts has created one massive, unstable portal. It might be my only chance to get home, but there's no telling where it actually leads or if we'd survive the crossing."
+},
 
+// Good Ending Path
+{
+    id: "27.1",
+    image: "assets/integration_ceremony.jpg",
+    video: "",
+    text: "Weeks later, you stand in the Grand Civic Hall for your official citizenship ceremony. Max, now sporting a sleek collar with integrated tech that marks him as a registered companion, sits proudly at your side. Dr. Vex and the Temporal officer attend as your sponsors. 'Your sacrifice and choice to prioritize the greater good exemplifies the highest values of our society,' announces the City Administrator as they present you with your citizen credentials.",
+    choices: [
+        { text: "Express gratitude for being welcomed into this new world", nextScene: "28.1", type: "good" },
+        { text: "Acknowledge that sometimes loss leads to unexpected new beginnings", nextScene: "28.1", type: "good" },
+        { text: "Share your hopes to contribute positively to this society", nextScene: "28.1", type: "good" }
+    ],
+    journalEntry: "Today I became an official citizen of this futuristic world. It's strange to think I'll never see my old home again, but looking at the remarkable city around me and the people who've accepted us, I feel a sense of belonging I didn't expect."
+},
+{
+    id: "28.1",
+    image: "assets/new_home_good.jpg",
+    video: "assets/city_vista_good.mp4",
+    text: "Six months later, you've fully integrated into society. Your apartment overlooks a verdant section of the city where nature and technology exist in harmony - a project you helped develop by sharing your unique perspective as someone who remembers a simpler relationship with the natural world. Max has become something of a local celebrity, the 'quantum dog' who helped save the city, and your neighbors dote on him.",
+    choices: [
+        { text: "Reflect on how far you've come since that day in the park", nextScene: "29.1", type: "good" },
+        { text: "Appreciate the balance of old and new in your life", nextScene: "29.1", type: "good" },
+        { text: "Feel proud of the positive impact you've had on this world", nextScene: "29.1", type: "good" }
+    ],
+    journalEntry: "Half a year in this new world, and it's starting to truly feel like home. My work helping integrate natural elements into the city design has been meaningful. Max loves our new life - especially all the attention he gets from everyone who knows his story."
+},
+{
+    id: "29.1",
+    image: "assets/final_good.jpg",
+    video: "assets/harmony_scene.mp4",
+    text: "Today marks the opening of the city's first Quantum Park - a green space that incorporates elements from multiple realities, created in honor of those who crossed through rifts. As a consultant on the project, you cut the ribbon while Max barks excitedly beside you. The park includes a memorial to all those displaced by the rifts and a statue featuring a human and dog that bears a striking resemblance to you and Max. 'You've helped us remember what we almost lost in our pursuit of progress,' Dr. Vex tells you. 'Your perspective changed everything.'",
+    choices: [
+        { text: "Feel a profound sense of peace with your new purpose", nextScene: "30", type: "good" },
+        { text: "Think of your old home with fondness but no regret", nextScene: "30", type: "good" },
+        { text: "Kneel down to tell Max, 'We're home now'", nextScene: "30", type: "good" }
+    ],
+    journalEntry: "The Quantum Park opened today - a project that means everything to me. It honors all who crossed realities and helps bring nature back to this technological world. I still think of my old life sometimes, but when I see how Max and I have helped shape this city for the better, I know we're exactly where we're meant to be."
+},
+
+// Neutral Ending Path
+{
+    id: "27.2",
+    image: "assets/rift_study.jpg",
+    video: "",
+    text: "Over the next few weeks, you work with Dr. Vex's team to study the stable rift that might lead home. 'It's fluctuating, but in a predictable pattern,' a scientist explains. 'We can attempt to strengthen it during a peak stability window, but there would be approximately a 70% chance of successful crossing.' You've been given temporary quarters in the meantime, and Max has adapted well to his new surroundings, enjoying the advanced toys and treats.",
+    choices: [
+        { text: "Ask about what would happen in the 30% failure scenario", nextScene: "28.2", type: "neutral" },
+        { text: "Inquire what your life could be like if you stayed", nextScene: "28.2", type: "neutral" },
+        { text: "See how Max responds to approaching the stable rift", nextScene: "28.2", type: "neutral" }
+    ],
+    journalEntry: "We've been studying the rift that might lead home. The scientists think they can strengthen it, giving me a 70% chance of getting back safely. But I've started to wonder if going back is what I really want. Max seems happy here, and this world has so much to offer."
+},
+{
+    id: "28.2",
+    image: "assets/decision_moment.jpg",
+    video: "assets/portal_fluctuation.mp4",
+    text: "The day of decision arrives. The stable rift has been reinforced and monitored for an optimal crossing window. 'The choice is entirely yours,' Dr. Vex says. 'We can attempt to send you home now, with the risks that entails. Or, if you prefer, you can stay and become a bridge between our understanding of reality and yours.' The Temporal officer adds, 'Your insights have already proven valuable. You would have a place here.' Max looks up at you, trusting whatever decision you make.",
+    choices: [
+        { text: "Choose to risk the crossing and return home", nextScene: "29.21", type: "neutral" },
+        { text: "Decide to stay in this new reality", nextScene: "29.22", type: "neutral" },
+        { text: "Ask for more time to decide", nextScene: "29.23", type: "neutral" }
+    ],
+    journalEntry: "Today I have to choose - try to go home through the stabilized rift, or stay in this future world. Both paths have their appeal and their risks. Max seems content either way, trusting me completely. It's the hardest decision I've ever had to make."
+},
+{
+    id: "29.21",
+    image: "assets/return_home.jpg",
+    video: "assets/portal_crossing.mp4",
+    text: "You decide to return home. The scientists activate the stabilizer at full power, creating a carefully controlled corridor through the reinforced rift. 'Remember, it will close behind you permanently,' Dr. Vex reminds you. With Max in your arms, you take a deep breath and step through. There's a moment of disorientation, a rush of sensations, and then... you find yourself back in the park where it all began. It looks exactly as you left it, as if no time has passed at all.",
+    choices: [
+        { text: "Look around to confirm you're truly home", nextScene: "30", type: "neutral" },
+        { text: "Check Max to make sure he's okay", nextScene: "30", type: "neutral" },
+        { text: "Feel a mix of relief and nostalgia for what you left behind", nextScene: "30", type: "neutral" }
+    ],
+    journalEntry: "We made it back! The park looks exactly the same, as if we never left. Part of me will always wonder about the world and people we left behind, but being home again with Max feels right. Still, I know I'll never look at reality quite the same way again."
+},
+{
+    id: "29.22",
+    image: "assets/new_home_neutral.jpg",
+    video: "",
+    text: "You choose to stay. As the rift is allowed to naturally close, you feel a strange sense of finality and peace. 'Welcome home,' Dr. Vex says with genuine warmth. In the months that follow, you find your place in this new world. Your unique perspective makes you valuable as a consultant for various civic projects. Max receives his official companion registration and thrives in your new apartment with its spectacular view of the cyber city that gradually becomes more familiar than strange.",
+    choices: [
+        { text: "Begin writing a journal of your experiences between worlds", nextScene: "30", type: "neutral" },
+        { text: "Take Max for a walk in a tech-enhanced park, now a familiar routine", nextScene: "30", type: "neutral" },
+        { text: "Look toward the future with anticipation rather than regret", nextScene: "30", type: "neutral" }
+    ],
+    journalEntry: "I chose to stay in this new world. As strange as it once seemed, it's becoming home now. My work helping integrate my perspective on nature and simplicity into this technological society has been fulfilling. Max adapted faster than I did - he loves the automated fetch machines in the park!"
+},
+{
+    id: "29.23",
+    image: "assets/monitoring_station.jpg",
+    video: "",
+    text: "You ask for more time, and they understand. Over the following months, you live between worlds - studying the stable rift while integrating into society. You discover that the rift follows cycles, occasionally offering glimpses of your home reality. During one such window, you're able to send a small object through - a message in a bottle of sorts. Weeks later, incredibly, a response comes back. A connection maintained across realities becomes your unique purpose, with Max always faithfully by your side.",
+    choices: [
+        { text: "Establish yourself as a bridge between worlds", nextScene: "30", type: "neutral" },
+        { text: "Create a shared knowledge database of both realities", nextScene: "30", type: "neutral" },
+        { text: "Feel fortunate to have the best of both worlds", nextScene: "30", type: "neutral" }
+    ],
+    journalEntry: "I found a third option - neither staying completely nor going back entirely. I've become a bridge between realities, maintaining a connection through the stable rift. It's a unique role that only someone like me could fill, and it gives me purpose. Max seems to enjoy our unusual life between worlds."
+},
+
+// Bad Ending Path
+{
+    id: "27.3",
+    image: "assets/reality_fracture.jpg",
+    video: "assets/chaotic_crossing.mp4",
+    text: "The lab begins to physically break apart as reality itself fractures around the destabilized rift. With alarms blaring and equipment exploding, you make your choice. Clutching Max tightly, you move toward the swirling vortex of energy. 'It's collapsing!' someone shouts behind you. With no time left to reconsider, you leap into the rift. The sensation is like being pulled in every direction at once while simultaneously compressed to a single point.",
+    choices: [
+        { text: "Hold onto Max with all your strength", nextScene: "28.3", type: "bad" },
+        { text: "Close your eyes and hope for the best", nextScene: "28.3", type: "bad" },
+        { text: "Try to mentally focus on your home reality", nextScene: "28.3", type: "bad" }
+    ],
+    journalEntry: "Everything was falling apart! I took Max and jumped into the destabilized rift. I don't know if we'll survive or where we'll end up, but there was no other choice. The sensation of crossing is impossible to describe - like being everywhere and nowhere at once."
+},
+{
+    id: "28.3",
+    image: "assets/between_realities.jpg",
+    video: "assets/reality_flux.mp4",
+    text: "You exist in a state beyond normal space or time, tumbling through what feels like an infinite void filled with fragments of different realities. Glimpses of worlds flash past - some familiar, others utterly alien. Max whimpers in your arms, his fur sometimes glowing with the same energy that surrounds you both. You seem to be caught in a space between realities, neither fully in one world nor another.",
+    choices: [
+        { text: "Focus your thoughts on your original home", nextScene: "29.3", type: "bad" },
+        { text: "Attempt to guide yourself toward any stable reality", nextScene: "29.3", type: "bad" },
+        { text: "Comfort Max as you continue drifting", nextScene: "29.3", type: "bad" }
+    ],
+    journalEntry: "We're lost in some kind of space between realities. I can see fragments of different worlds all around us, but we're not fully in any of them. Max is scared, and I don't know how to get us out of this. Are we trapped here forever?"
+},
+{
+    id: "29.3",
+    image: "assets/reality_mosaic.jpg",
+    video: "assets/final_shift.mp4",
+    text: "After what could be moments or eternities, something changes. The chaotic energy around you begins to coalesce, responding to some combination of your will and Max's unusual quantum signature. Reality starts to reform, but not as a single coherent world. Instead, you find yourself in a patchwork place - a mosaic of fragments from different realities stitched together. Parts of your home world exist alongside elements of the cyber city and other places you don't recognize.",
+    choices: [
+        { text: "Explore this strange composite reality with Max", nextScene: "30", type: "bad" },
+        { text: "Look for others who might be trapped here too", nextScene: "30", type: "bad" },
+        { text: "Wonder if you can reshape this reality with your thoughts", nextScene: "30", type: "bad" }
+    ],
+    journalEntry: "We've emerged somewhere impossible - a place made of pieces of different realities all mixed together. I can see parts of home, parts of the cyber city, and things I've never seen before. Somehow, Max and I have become reality drifters, existing in a place between worlds that seems to respond to our thoughts and feelings."
+},
+
+// Final scene - convergence point after all endings
+{
+    id: "30",
+    image: "assets/final_reflection.jpg",
+    video: "assets/ending_scene.mp4",
+    text: "As you reflect on the incredible journey that began with a simple walk in the park, you understand that life can change in an instant, opening doors to possibilities you never imagined. Max looks up at you with the same loving trust he's always had, a constant companion across realities. Whatever world you now call home, the bond between you remains the strongest constant in an ever-changing universe.",
+    choices: [
+        { text: "Embrace your new reality and the adventures it holds", nextScene: "credits", type: "neutral" },
+        { text: "Kneel down to pet Max, grateful for his unwavering companionship", nextScene: "credits", type: "good" },
+        { text: "Look toward the horizon, wondering what other realities might exist", nextScene: "credits", type: "bad" }
+    ],
+    journalEntry: "It's hard to believe everything that's happened since that ordinary day in the park. Life can change in an instant, opening doors to worlds you never knew existed. Through it all, Max has been my constant companion. Whatever reality we call home now, I'm grateful for this journey and the bond we share."
+},
+
+// Credits scene
+{
+    id: "credits",
+    image: "assets/credits_background.jpg",
+    video: "assets/credits_roll.mp4",
+    text: "Thank you for playing Quantum Collar! Your choices shaped a unique journey across realities. Final Personality Score: The choices you made throughout your adventure revealed your true character when faced with extraordinary circumstances.",
+    choices: [
+        { text: "Play Again", nextScene: "1", type: "neutral" },
+        { text: "View Journal", nextScene: "journal", type: "neutral" },
+        { text: "Exit Game", nextScene: "exit", type: "neutral" }
+    ],
+    journalEntry: "End of Journey: Quantum Collar complete. Final personality alignment determined by the choices made throughout this extraordinary adventure across realities."
+},
+
+// Special journal review scene
+{
+    id: "journal",
+    image: "assets/journal_background.jpg",
+    video: "",
+    text: "Your journey across realities has been recorded in this journal. Each entry captures a moment in your extraordinary adventure with Max, from that fateful day in the park to wherever your path has led you. These memories tell a story unique to your choices and experiences.",
+    choices: [
+        { text: "Return to Credits", nextScene: "credits", type: "neutral" },
+        { text: "Play Again", nextScene: "1", type: "neutral" },
+        { text: "Exit Game", nextScene: "exit", type: "neutral" }
+    ],
+    journalEntry: "Journal Review: A collection of memories from an impossible journey across realities."
+},
+
+// Exit confirmation
+{
+    id: "exit",
+    image: "assets/exit_screen.jpg",
+    video: "",
+    text: "Thank you for playing Quantum Collar. Your journey with Max across realities has come to an end, but perhaps one day you'll return to explore different paths and discover new possibilities.",
+    choices: [
+        { text: "Return to Game", nextScene: "credits", type: "neutral" },
+        { text: "Confirm Exit", nextScene: "close", type: "neutral" }
+    ],
+    journalEntry: ""
+};
+
+            
         let currentScene = "1";
         let personalityScore = 50;
         let isLeftPanelOpen = false;
