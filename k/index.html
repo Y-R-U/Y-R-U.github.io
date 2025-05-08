@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>K-Hydro Track</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --card-bg: #ffffff; /* Used for modal, header, table container */
+            --border-color: #d1d9e6;
+            --primary-color: #007bff;
+            --primary-text-color: #ffffff;
+            --danger-color: #dc3545;
+            --success-color: #28a745; /* For 'Completed' status */
+            --active-color: #17a2b8;  /* For 'Active' status, if needed, or use primary */
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --table-header-bg: #e9ecef;
+            --table-row-hover-bg: #f8f9fa;
+            --table-border-color: #dee2e6;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a2e;
+            --text-color: #e0e0e0;
+            --card-bg: #24243e;
+            --border-color: #3a3a5e;
+            --primary-color: #5a9bff;
+            --primary-text-color: #1a1a2e;
+            --danger-color: #ff5a5f;
+            --success-color: #4caf50;
+            --active-color: #20c997;
+            --input-bg: #3a3a5e;
+            --input-border: #505070;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --table-header-bg: #2c2c4a;
+            --table-row-hover-bg: #303050;
+            --table-border-color: #404060;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
+            line-height: 1.6; padding: 10px; transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container { max-width: 95%; margin: 0 auto; }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 10px; background-color: var(--card-bg);
+            border-radius: 8px; box-shadow: 0 2px 4px var(--shadow-color);
+        }
+        header h1 { font-size: 1.6em; color: var(--primary-color); }
+
+        button, input[type="submit"], input[type="file"]::file-selector-button {
+            padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;
+            font-size: 0.9em; font-weight: bold; transition: background-color 0.2s; margin: 3px;
+        }
+        button.primary, input[type="submit"] { background-color: var(--primary-color); color: var(--primary-text-color); }
+        button.primary:hover { opacity: 0.9; }
+        button.danger { background-color: var(--danger-color); color: var(--primary-text-color); }
+        button.danger:hover { opacity: 0.9; }
+        button.success { background-color: var(--success-color); color: var(--primary-text-color); }
+        button.icon-btn { background: none; border: none; font-size: 1.3em; padding: 5px; color: var(--text-color); }
+
+        input[type="text"], input[type="number"], input[type="date"], textarea, select {
+            width: calc(100% - 22px); padding: 10px; margin-bottom: 10px;
+            border: 1px solid var(--input-border); border-radius: 5px;
+            background-color: var(--input-bg); color: var(--text-color); font-size: 1em;
+        }
+        input[type="range"] { width: calc(100% - 22px); }
+        .inline-edit {
+            padding: 5px; margin: 0; font-size: inherit; width: 100%; min-width: 100px;
+            border: 1px solid transparent; background-color: transparent; color: inherit;
+        }
+        .inline-edit:focus { border: 1px solid var(--primary-color); background-color: var(--input-bg); }
+
+        .table-container {
+            width: 100%; overflow-x: auto; background-color: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            box-shadow: 0 2px 4px var(--shadow-color); margin-bottom: 20px;
+        }
+        #plantTable { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        #plantTable th, #plantTable td {
+            padding: 8px 6px; text-align: left;
+            border-bottom: 1px solid var(--table-border-color); white-space: nowrap;
+        }
+        #plantTable th {
+            background-color: var(--table-header-bg); font-weight: bold;
+            cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 10;
+        }
+        #plantTable th .sort-arrow { font-size: 0.8em; margin-left: 4px; }
+        #plantTable tbody tr:hover { background-color: var(--table-row-hover-bg); }
+        #plantTable td.actions-cell button { font-size: 0.8em; padding: 4px 6px; margin: 2px; }
+        
+        .status-cell { cursor: pointer; font-weight: bold; }
+        .status-completed { color: var(--success-color); }
+        .status-active { color: var(--active-color); } /* Using a distinct active color */
+
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: var(--card-bg); margin: 5% auto; /* Reduced top margin */ padding: 20px;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            width: 90%; max-width: 500px; /* Slightly wider for details modal */
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        .modal-content h3 { margin-bottom: 15px; color: var(--primary-color); }
+        .close-btn {
+            color: var(--text-color); float: right; font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .close-btn:hover, .close-btn:focus { opacity: 0.7; }
+
+        #fileImport { display: none; }
+
+        .stats-section {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; margin-bottom: 15px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+        .stats-section h3 { margin-bottom: 10px; color: var(--primary-color); }
+
+        .plant-photos-container img {
+            max-width: 60px; max-height: 60px; border-radius: 4px; margin: 3px;
+            border: 1px solid var(--border-color); object-fit: cover; display: inline-block;
+        }
+        #detailsNotesDisplay, #detailsEntryLogContainer {
+             white-space: pre-wrap; background-color: var(--input-bg); 
+             padding: 8px; border-radius: 4px; margin-bottom:10px; 
+             border: 1px solid var(--input-border); max-height: 150px; overflow-y: auto;
+        }
+        #detailsEntryLogContainer ul { list-style-type: none; padding-left: 0; }
+        #detailsEntryLogContainer li { margin-bottom: 5px; font-size: 0.9em; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; }
+        #detailsEntryLogContainer li:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>K-Hydro Track</h1>
+            <div>
+                <button id="darkModeToggle" class="icon-btn">🌙</button>
+                <button id="exportDataBtn" class="primary">Export</button>
+                <label for="fileImport" class="primary" style="display: inline-block; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Import</label>
+                <input type="file" id="fileImport" accept=".json">
+            </div>
+        </header>
+
+        <button id="showAddPlantModalBtn" class="primary" style="width: 100%; margin-bottom: 20px; padding: 12px;">+ Add New Plant</button>
+
+        <div class="table-container">
+            <table id="plantTable">
+                <thead>
+                    <tr>
+                        <th data-sort="name">Name <span class="sort-arrow"></span></th>
+                        <th data-sort="startDate">Start Date <span class="sort-arrow"></span></th>
+                        <th data-sort="initialVolume">Initial Vol (L) <span class="sort-arrow"></span></th>
+                        <th data-sort="totalNutrientVolume">Total Nutrient (L @100%) <span class="sort-arrow"></span></th>
+                        <th data-sort="harvest">Harvest (g) <span class="sort-arrow"></span></th>
+                        <th data-sort="status">Status <span class="sort-arrow"></span></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="plantTableBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="stats-section">
+            <h3>Overall Statistics</h3>
+            <p>Total Plants: <span id="totalPlantsStat">0</span></p>
+            <p>Total Nutrient Used (All, @100%): <span id="overallNutrientUsedStat">0</span> L</p>
+            <p>Total Harvested (All Plants): <span id="overallHarvestStat">0</span> g</p>
+        </div>
+    </div>
+
+    <!-- Add Plant Modal -->
+    <div id="addPlantModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="addPlantModal">×</span>
+            <h3>Add New Plant</h3>
+            <form id="addPlantForm">
+                <label for="newPlantName">Plant Name:</label>
+                <input type="text" id="newPlantName" required>
+                <label for="newInitialVolume">Initial Volume (Liters):</label>
+                <input type="number" id="newInitialVolume" step="0.1" min="0" required>
+                <label for="newStartDate">Start Date:</label>
+                <input type="date" id="newStartDate" required>
+                <button type="submit" class="primary">Add Plant</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Log Entry Modal -->
+    <div id="logEntryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="logEntryModal">×</span>
+            <h3 id="logEntryModalTitle">Log Entry for Plant</h3>
+            <form id="logEntryForm">
+                <input type="hidden" id="logEntryPlantId">
+                
+                <label for="logWaterVolume">Volume Added (Liters):</label>
+                <input type="number" id="logWaterVolume" step="0.1" min="0" placeholder="Optional, e.g., 0.5">
+                
+                <label for="logNutrientConcentration">Nutrient Concentration (%):</label>
+                <input type="range" id="logNutrientConcentration" min="0" max="100" value="100" step="1">
+                <span id="logNutrientConcValue">100%</span>
+
+                <label for="logHarvestWeight" style="margin-top:15px; display:block;">Harvest Weight (grams):</label>
+                <input type="number" id="logHarvestWeight" step="1" min="0" placeholder="Optional, e.g., 50">
+                
+                <button type="submit" class="primary">Log Entry</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Plant Details Modal -->
+    <div id="plantDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="plantDetailsModal">×</span>
+            <h3 id="detailsModalPlantName">Plant Details</h3>
+            <input type="hidden" id="detailsPlantId">
+            <p><strong>Start Date:</strong> <span id="detailsStartDate"></span></p>
+            <p><strong>Initial Volume:</strong> <span id="detailsInitialVolume"></span> L (at 100% nutrients assumed)</p>
+            <p><strong>Total Added Water:</strong> <span id="detailsTotalAddedWater"></span> L</p>
+            <p><strong>Total Nutrient (equiv. @100%):</strong> <span id="detailsTotalNutrientVolume"></span> L</p>
+            <p><strong>Total Harvest:</strong> <span id="detailsTotalHarvest"></span> g</p>
+            
+            <h4>Entry Log:</h4>
+            <div id="detailsEntryLogContainer"></div>
+
+            <h4>Notes:</h4>
+            <div id="detailsNotesDisplay"></div>
+            <button id="detailsEditNotesBtn" class="primary" style="margin-bottom:10px;">📝 Edit Notes</button>
+            
+            <h4>Photos:</h4>
+            <div id="detailsPhotosContainer" class="plant-photos-container" style="margin-bottom:10px;"></div>
+            <button id="detailsAddPhotoBtn" class="primary">📸 Add Photo</button>
+            
+            <!-- Removed Complete button from here, as status is toggled in table -->
+        </div>
+    </div>
+
+    <!-- Notes Modal (reused) -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="notesModal">×</span>
+            <h3>Plant Notes</h3>
+            <form id="notesForm">
+                <input type="hidden" id="notesPlantId">
+                <textarea id="plantNotesText" rows="5" placeholder="Enter observations..."></textarea>
+                <button type="submit" class="primary">Save Notes</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Photo Modal (reused) -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="photoModal">×</span>
+            <h3>Add Photo</h3>
+            <form id="photoForm">
+                <input type="hidden" id="photoPlantId">
+                <label for="plantPhotoFile">Select or Take Photo:</label>
+                <input type="file" id="plantPhotoFile" accept="image/*" required>
+                <button type="submit" class="primary">Add Photo</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+$(document).ready(function() {
+    let plants = [];
+    let currentSort = { column: 'startDate', direction: 'desc' }; 
+
+    // --- UTILITY FUNCTIONS ---
+    function formatDateForDisplay(dateString) {
+        if (!dateString) return 'N/A';
+        const [year, month, day] = dateString.split('-');
+        const date = new Date(year, month - 1, day);
+        return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    
+    function formatDateTimeForLog(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDateForInput(dateString) { return dateString || getISODate(); }
+    function getISODate(date = new Date()) { return date.toISOString().split('T')[0]; }
+    function getISODateTime(date = new Date()) { return date.toISOString(); } // For log entry timestamp
+    function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
+
+    // --- LOCALSTORAGE FUNCTIONS ---
+    function saveData() {
+        localStorage.setItem('kHydroPlants', JSON.stringify(plants));
+        localStorage.setItem('kHydroDarkMode', $('body').hasClass('dark-mode'));
+    }
+
+    function loadData() {
+        const storedPlants = localStorage.getItem('kHydroPlants');
+        if (storedPlants) {
+            plants = JSON.parse(storedPlants);
+            plants.forEach(p => { 
+                if (!p.waterLog) p.waterLog = [];
+                if (!p.harvests) p.harvests = [];
+                if (!p.photos) p.photos = [];
+                if (typeof p.isCompleted === 'undefined') p.isCompleted = false;
+                if (typeof p.initialVolume === 'string') p.initialVolume = parseFloat(p.initialVolume);
+                // Ensure log entries have a proper date for sorting
+                p.waterLog.forEach(log => { if (!log.date) log.date = getISODateTime(new Date(0)); }); // Fallback for old data
+                p.harvests.forEach(log => { if (!log.date) log.date = getISODateTime(new Date(0)); });
+            });
+        }
+        if (localStorage.getItem('kHydroDarkMode') === 'true') {
+            $('body').addClass('dark-mode');
+            $('#darkModeToggle').text('☀️');
+        }
+        renderPlantTable();
+        updateOverallStats();
+    }
+
+    // --- MODAL HANDLING ---
+    function openModal(modalId) { $('#' + modalId).fadeIn(200); }
+    function closeModal(modalId) { $('#' + modalId).fadeOut(200); }
+    $('.close-btn').on('click', function() { closeModal($(this).data('modal-id')); });
+    $(window).on('click', function(event) {
+        if ($(event.target).hasClass('modal')) { $(event.target).fadeOut(200); }
+    });
+
+    // --- DARK MODE ---
+    $('#darkModeToggle').on('click', function() {
+        $('body').toggleClass('dark-mode');
+        $(this).text($('body').hasClass('dark-mode') ? '☀️' : '🌙');
+        saveData(); renderPlantTable(); 
+    });
+
+    // --- PLANT CALCULATIONS ---
+    function calculatePlantStats(plant) {
+        let totalAddedWaterVolume = 0;
+        let totalNutrientUnitsFromAdded = 0; // Sum of (volume * concentration/100) for ADDED water
+        (plant.waterLog || []).forEach(log => {
+            const vol = parseFloat(log.volumeAdded || 0);
+            const conc = parseFloat(log.nutrientConcentration || 0);
+            totalAddedWaterVolume += vol;
+            totalNutrientUnitsFromAdded += vol * (conc / 100);
+        });
+
+        // Initial volume is assumed to be at 100% nutrient strength
+        const initialNutrientUnits = parseFloat(plant.initialVolume || 0);
+        const totalNutrientVolumeEquivalent = initialNutrientUnits + totalNutrientUnitsFromAdded;
+
+        let totalHarvestWeight = 0;
+        (plant.harvests || []).forEach(harvest => { totalHarvestWeight += parseFloat(harvest.weight || 0); });
+
+        return {
+            totalAddedWaterVolume: totalAddedWaterVolume.toFixed(1),
+            totalNutrientVolumeEquivalent: totalNutrientVolumeEquivalent.toFixed(1), // L at 100%
+            totalHarvestWeight: totalHarvestWeight.toFixed(0)
+        };
+    }
+
+    // --- TABLE RENDERING & SORTING ---
+    function renderPlantTable() {
+        const tableBody = $('#plantTableBody');
+        tableBody.empty();
+
+        plants.sort((a, b) => {
+            let valA, valB;
+            const statsA = calculatePlantStats(a);
+            const statsB = calculatePlantStats(b);
+
+            switch (currentSort.column) {
+                case 'name': valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); break;
+                case 'startDate': valA = new Date(a.startDate); valB = new Date(b.startDate); break;
+                case 'initialVolume': valA = parseFloat(a.initialVolume); valB = parseFloat(b.initialVolume); break;
+                case 'totalNutrientVolume': valA = parseFloat(statsA.totalNutrientVolumeEquivalent); valB = parseFloat(statsB.totalNutrientVolumeEquivalent); break;
+                case 'harvest': valA = parseFloat(statsA.totalHarvestWeight); valB = parseFloat(statsB.totalHarvestWeight); break;
+                case 'status': valA = a.isCompleted; valB = b.isCompleted; break;
+                default: valA = a[currentSort.column]; valB = b[currentSort.column];
+            }
+            
+            let comparison = 0;
+            if (valA > valB) comparison = 1; 
+            else if (valA < valB) comparison = -1;
+            return currentSort.direction === 'asc' ? comparison : comparison * -1;
+        });
+
+        $('#plantTable thead th').each(function() {
+            const th = $(this);
+            th.find('.sort-arrow').text(th.data('sort') === currentSort.column ? (currentSort.direction === 'asc' ? '▲' : '▼') : '');
+            th.css('background-color', $('body').hasClass('dark-mode') ? 'var(--table-header-bg)' : '');
+        });
+
+        if (plants.length === 0) {
+            tableBody.html('<tr><td colspan="7" style="text-align:center; color:var(--text-color); padding: 20px;">No plants yet. Get growing!</td></tr>');
+        } else {
+            plants.forEach(plant => {
+                const stats = calculatePlantStats(plant);
+                const statusText = plant.isCompleted ? 'Completed' : 'Active';
+                const statusClass = plant.isCompleted ? 'status-completed' : 'status-active';
+
+                const rowHtml = `
+                    <tr data-id="${plant.id}" class="${plant.isCompleted ? 'row-completed' : ''}">
+                        <td><input type="text" class="inline-edit plant-name-edit" value="${plant.name}" data-id="${plant.id}" title="Edit Name"></td>
+                        <td><input type="date" class="inline-edit plant-start-date-edit" value="${formatDateForInput(plant.startDate)}" data-id="${plant.id}" title="Edit Start Date"></td>
+                        <td>${plant.initialVolume}</td>
+                        <td>${stats.totalNutrientVolumeEquivalent}</td>
+                        <td>${stats.totalHarvestWeight}</td>
+                        <td class="status-cell ${statusClass}" data-id="${plant.id}" title="Click to toggle status">${statusText}</td>
+                        <td class="actions-cell">
+                            <button class="log-entry-btn primary" data-id="${plant.id}" title="Log Water/Harvest">📝 Log</button>
+                            <button class="details-btn" data-id="${plant.id}" title="View Details">ℹ️ Details</button>
+                            <button class="delete-plant-btn danger" data-id="${plant.id}" title="Delete Plant">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(rowHtml);
+            });
+        }
+        updateOverallStats();
+    }
+
+    $('#plantTable thead').on('click', 'th[data-sort]', function() {
+        const newSortColumn = $(this).data('sort');
+        if (currentSort.column === newSortColumn) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = newSortColumn;
+            currentSort.direction = ['startDate', 'initialVolume', 'totalNutrientVolume', 'harvest'].includes(newSortColumn) ? 'desc' : 'asc';
+        }
+        renderPlantTable();
+    });
+    
+    $(document).on('change', '.plant-name-edit', function() {
+        const plantId = $(this).data('id'); const newName = $(this).val();
+        const plant = plants.find(p => p.id === plantId);
+        if (plant && plant.name !== newName) { plant.name = newName; saveData(); if (currentSort.column === 'name') renderPlantTable(); }
+    });
+    
+    $(document).on('change', '.plant-start-date-edit', function() {
+        const plantId = $(this).data('id'); const newStartDate = $(this).val();
+        const plant = plants.find(p => p.id === plantId);
+        if (plant && plant.startDate !== newStartDate) { plant.startDate = newStartDate; saveData(); if (currentSort.column === 'startDate') renderPlantTable(); }
+    });
+
+    // Toggle status by clicking status cell
+    $(document).on('click', '.status-cell', function() {
+        const plantId = $(this).data('id');
+        const plant = plants.find(p => p.id === plantId);
+        if (plant) {
+            plant.isCompleted = !plant.isCompleted;
+            saveData();
+            renderPlantTable(); // Re-render to update status text, class, and potentially sort order
+        }
+    });
+
+    function updateOverallStats() {
+        $('#totalPlantsStat').text(plants.length);
+        let overallNutrient = 0;
+        let overallHarvest = 0;
+        plants.forEach(plant => {
+            const stats = calculatePlantStats(plant);
+            overallNutrient += parseFloat(stats.totalNutrientVolumeEquivalent);
+            overallHarvest += parseFloat(stats.totalHarvestWeight);
+        });
+        $('#overallNutrientUsedStat').text(overallNutrient.toFixed(1));
+        $('#overallHarvestStat').text(overallHarvest.toFixed(0));
+    }
+
+    // --- EVENT HANDLERS ---
+    $('#showAddPlantModalBtn').on('click', function() {
+        $('#addPlantForm')[0].reset(); $('#newStartDate').val(getISODate());
+        openModal('addPlantModal'); $('#newPlantName').focus();
+    });
+
+    $('#addPlantForm').on('submit', function(e) {
+        e.preventDefault();
+        plants.push({
+            id: generateId(), name: $('#newPlantName').val(),
+            initialVolume: parseFloat($('#newInitialVolume').val()), startDate: $('#newStartDate').val(),
+            waterLog: [], harvests: [], notes: '', photos: [], isCompleted: false
+        });
+        saveData(); renderPlantTable(); closeModal('addPlantModal');
+    });
+
+    $(document).on('click', '.delete-plant-btn', function() {
+        const plantId = $(this).data('id');
+        if (confirm('Delete this plant and all its data?')) {
+            plants = plants.filter(p => p.id !== plantId);
+            saveData(); renderPlantTable();
+        }
+    });
+
+    $(document).on('click', '.log-entry-btn', function() {
+        const plantId = $(this).data('id'); const plant = plants.find(p => p.id === plantId);
+        if(plant){
+            $('#logEntryPlantId').val(plantId); $('#logEntryModalTitle').text(`Log Entry for: ${plant.name}`);
+            $('#logEntryForm')[0].reset(); $('#logNutrientConcentration').val(100); $('#logNutrientConcValue').text('100%');
+            openModal('logEntryModal'); $('#logWaterVolume').focus();
+        }
+    });
+    
+    $('#logNutrientConcentration').on('input', function() { $('#logNutrientConcValue').text($(this).val() + '%'); });
+
+    $('#logEntryForm').on('submit', function(e) {
+        e.preventDefault();
+        const plantId = $('#logEntryPlantId').val(); const plant = plants.find(p => p.id === plantId);
+        if (plant) {
+            const waterVolume = parseFloat($('#logWaterVolume').val());
+            const nutrientConc = parseInt($('#logNutrientConcentration').val());
+            const harvestWeight = parseFloat($('#logHarvestWeight').val());
+            let entryMade = false;
+            const entryDate = getISODateTime(); // Use a consistent timestamp for this entry
+
+            if (!isNaN(waterVolume) && waterVolume > 0) {
+                plant.waterLog.push({ date: entryDate, volumeAdded: waterVolume, nutrientConcentration: nutrientConc });
+                entryMade = true;
+            }
+            if (!isNaN(harvestWeight) && $('#logHarvestWeight').val().trim() !== '') { // Allow 0g harvest
+                plant.harvests.push({ date: entryDate, weight: harvestWeight });
+                entryMade = true;
+            }
+
+            if(entryMade){ saveData(); renderPlantTable(); }
+            closeModal('logEntryModal');
+        }
+    });
+    
+    $(document).on('click', '.details-btn', function() {
+        const plantId = $(this).data('id');
+        const plant = plants.find(p => p.id === plantId);
+        if (plant) {
+            const stats = calculatePlantStats(plant);
+            $('#detailsPlantId').val(plant.id);
+            $('#detailsModalPlantName').text(plant.name);
+            $('#detailsStartDate').text(formatDateForDisplay(plant.startDate));
+            $('#detailsInitialVolume').text(plant.initialVolume);
+            $('#detailsTotalAddedWater').text(stats.totalAddedWaterVolume);
+            $('#detailsTotalNutrientVolume').text(stats.totalNutrientVolumeEquivalent);
+            $('#detailsTotalHarvest').text(stats.totalHarvestWeight);
+            $('#detailsNotesDisplay').text(plant.notes || 'No notes yet.');
+            
+            const photosContainer = $('#detailsPhotosContainer').empty();
+            if (plant.photos && plant.photos.length > 0) {
+                plant.photos.forEach(photoDataUrl => photosContainer.append(`<img src="${photoDataUrl}" alt="Plant photo">`));
+            } else {
+                photosContainer.append('<p style="font-style:italic; font-size:0.9em;">No photos yet.</p>');
+            }
+
+            // Populate Entry Log
+            const entryLogContainer = $('#detailsEntryLogContainer').empty();
+            const allEntries = [];
+            (plant.waterLog || []).forEach(log => allEntries.push({type: 'Water', ...log}));
+            (plant.harvests || []).forEach(log => allEntries.push({type: 'Harvest', ...log}));
+            
+            allEntries.sort((a,b) => new Date(a.date) - new Date(b.date)); // Sort chronologically
+
+            if (allEntries.length > 0) {
+                const ul = $('<ul></ul>');
+                allEntries.forEach(entry => {
+                    let entryText = `${formatDateTimeForLog(entry.date)}: `;
+                    if (entry.type === 'Water') {
+                        entryText += `Added ${entry.volumeAdded}L water @ ${entry.nutrientConcentration}% nutrients.`;
+                    } else if (entry.type === 'Harvest') {
+                        entryText += `Harvested ${entry.weight}g.`;
+                    }
+                    ul.append($('<li></li>').text(entryText));
+                });
+                entryLogContainer.append(ul);
+            } else {
+                entryLogContainer.append('<p style="font-style:italic; font-size:0.9em;">No entries logged yet.</p>');
+            }
+            openModal('plantDetailsModal');
+        }
+    });
+
+    $('#detailsEditNotesBtn').on('click', function() {
+        const plantId = $('#detailsPlantId').val(); const plant = plants.find(p => p.id === plantId);
+        if (plant) {
+            $('#notesPlantId').val(plantId); $('#plantNotesText').val(plant.notes);
+            openModal('notesModal'); $('#plantNotesText').focus();
+        }
+    });
+
+    $('#detailsAddPhotoBtn').on('click', function() {
+        $('#photoPlantId').val($('#detailsPlantId').val());
+        $('#plantPhotoFile').val(''); openModal('photoModal');
+    });
+    
+    $('#notesForm').on('submit', function(e) {
+        e.preventDefault();
+        const plantId = $('#notesPlantId').val(); const plant = plants.find(p => p.id === plantId);
+        if (plant) {
+            plant.notes = $('#plantNotesText').val(); saveData(); closeModal('notesModal');
+            if ($('#plantDetailsModal').is(':visible') && $('#detailsPlantId').val() === plantId) {
+                $('#detailsNotesDisplay').text(plant.notes || 'No notes yet.');
+            }
+        }
+    });
+
+    $('#photoForm').on('submit', function(e) {
+        e.preventDefault();
+        const plantId = $('#photoPlantId').val(); const fileInput = document.getElementById('plantPhotoFile');
+        const plant = plants.find(p => p.id === plantId);
+        if (plant && fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                plant.photos.push(event.target.result); saveData(); closeModal('photoModal');
+                if ($('#plantDetailsModal').is(':visible') && $('#detailsPlantId').val() === plantId) {
+                    const photosContainer = $('#detailsPhotosContainer');
+                    if (photosContainer.find('p').length > 0 && plant.photos.length === 1) photosContainer.empty();
+                    photosContainer.append(`<img src="${event.target.result}" alt="Plant photo">`);
+                }
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    });
+
+    // --- DATA EXPORT/IMPORT ---
+    $('#exportDataBtn').on('click', function() {
+        if (plants.length === 0) { alert('No data to export.'); return; }
+        const dataStr = JSON.stringify(plants, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const exportFileDefaultName = `k-hydro-track-backup-${getISODate()}.json`;
+        $('<a>', { href: dataUri, download: exportFileDefaultName })[0].click();
+    });
+
+    $('#fileImport').on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedPlants = JSON.parse(e.target.result);
+                    if (Array.isArray(importedPlants)) {
+                        if (confirm(`Import ${importedPlants.length} plants? This will overwrite current data.`)) {
+                            plants = importedPlants;
+                            plants.forEach(p => { 
+                                if (!p.waterLog) p.waterLog = [];
+                                if (!p.harvests) p.harvests = [];
+                                if (!p.photos) p.photos = [];
+                                if (typeof p.isCompleted === 'undefined') p.isCompleted = false;
+                                if (typeof p.initialVolume === 'string') p.initialVolume = parseFloat(p.initialVolume);
+                                p.waterLog.forEach(log => { if (!log.date) log.date = getISODateTime(new Date(0)); });
+                                p.harvests.forEach(log => { if (!log.date) log.date = getISODateTime(new Date(0)); });
+                            });
+                            saveData(); renderPlantTable(); alert('Data imported!');
+                        }
+                    } else { alert('Invalid file: Not a JSON array.'); }
+                } catch (error) { alert('Error parsing file: ' + error.message); }
+                finally { $('#fileImport').val(''); }
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    // --- INITIAL LOAD ---
+    loadData();
+});
+</script>
+</body>
+</html>
