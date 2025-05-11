@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Manager Sim</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .main-panel {
+            flex: 3;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .side-panel {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-width: 300px;
+        }
+
+        h1, h2, h3 {
+            color: #444;
+            text-align: center;
+        }
+
+        #world-map {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Adjust columns as needed */
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kingdom-cell {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #e9f5ff;
+            transition: background-color 0.3s;
+        }
+
+        .kingdom-cell:hover {
+            background-color: #d0e8ff;
+        }
+
+        .kingdom-cell.player {
+            background-color: #c8e6c9; /* Green for player */
+        }
+        .kingdom-cell.player:hover {
+            background-color: #a5d6a7;
+        }
+
+        .kingdom-cell.at-war { background-color: #ffcdd2; } /* Red for war */
+        .kingdom-cell.tension { background-color: #ffecb3; } /* Yellow for tension */
+        .kingdom-cell.friendly { background-color: #c8e6c9; } /* Light green for friendly */
+
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .action-group {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .action-group h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: #555;
+            text-align: left;
+        }
+
+        #player-kingdom-name-input-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #player-kingdom-name-input-container div {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #player-kingdom-name-input-container input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 200px;
+        }
+
+        .stat-item {
+            margin-bottom: 8px;
+        }
+        .stat-item strong {
+            color: #0056b3;
+        }
+
+        #message-log {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 0.9em;
+        }
+        #message-log p {
+            margin: 5px 0;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 3px;
+        }
+        #message-log p:last-child {
+            border-bottom: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+        }
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="player-kingdom-name-input-container">
+        <div>
+            <h2>Enter Your Kingdom's Name:</h2>
+            <input type="text" id="playerKingdomNameInput" value="New Haven">
+            <button onclick="submitKingdomName()">Start Game</button>
+        </div>
+    </div>
+
+    <div class="game-container" style="display:none;">
+        <div class="main-panel">
+            <h1>Kingdom Management Sim</h1>
+            <div id="game-status">
+                <p>Season: <span id="current-season">Spring</span> | Year: <span id="current-year">1</span> | Actions Remaining: <span id="actions-remaining">3</span></p>
+            </div>
+            
+            <h2>World Map</h2>
+            <div id="world-map">
+                </div>
+
+            <button onclick="endTurn()">End Season</button>
+            <button onclick="saveGame()">Save Game</button>
+            <button onclick="loadGamePrompt()">Load Game</button>
+
+            <div id="message-log">
+                <p>Welcome, ruler! May your kingdom prosper.</p>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div id="kingdom-info-panel">
+                <h2>Kingdom Information</h2>
+                <p>Click on a kingdom to see its details and interact.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="spy-report-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('spy-report-modal')">&times;</span>
+            <h3>Spy Report</h3>
+            <div id="spy-report-content"></div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- GAME STATE ---
+        let kingdoms = {};
+        let playerKingdomName = "Player Kingdom";
+        const seasons = ["Spring", "Summer", "Fall", "Winter"];
+        let currentSeasonIndex = 0;
+        let currentYear = 1;
+        const ACTIONS_PER_SEASON = 3;
+        let actionsRemaining = ACTIONS_PER_SEASON;
+        let selectedKingdom = null; // For displaying info in the side panel
+
+        // --- INITIAL KINGDOM DATA ---
+        const initialKingdomsData = [
+            { name: "PlayerKingdomPlaceholder", isPlayer: true, icon: "👑", economy: { agriculture: 2, trade: 2, mining: 2, overall: 2 }, military: { armySize: 3, fortifications: 3, overall: 3 }, population: 3, culture: 2, technology: 1, internalZones: { farms: 1, markets: 1, mines: 1, housing: 1, roads: 0}, relations: {} },
+            { name: "Armath", icon: "🏰", economy: { agriculture: 5, trade: 6, mining: 4, overall: 5 }, military: { armySize: 6, fortifications: 5, overall: 6 }, population: 6, culture: 4, technology: 3, relations: {} },
+            { name: "Belroth", icon: "🏞️", economy: { agriculture: 4, trade: 3, mining: 5, overall: 4 }, military: { armySize: 5, fortifications: 4, overall: 5 }, population: 5, culture: 3, technology: 2, relations: {} },
+            { name: "Caldora", icon: "🏛️", economy: { agriculture: 6, trade: 7, mining: 5, overall: 6 }, military: { armySize: 7, fortifications: 6, overall: 7 }, population: 7, culture: 5, technology: 4, relations: {} },
+            { name: "Dreston", icon: "🌲", economy: { agriculture: 3, trade: 2, mining: 2, overall: 3 }, military: { armySize: 2, fortifications: 3, overall: 2 }, population: 4, culture: 2, technology: 1, relations: {} },
+            { name: "Valoria", icon: "⚔️", economy: { agriculture: 4, trade: 4, mining: 3, overall: 4 }, military: { armySize: 7, fortifications: 5, overall: 6 }, population: 5, culture: 3, technology: 2, relations: {} },
+        ];
+
+        // --- UTILITY FUNCTIONS ---
+        function logMessage(message, type = "info") {
+            const log = document.getElementById('message-log');
+            const p = document.createElement('p');
+            let prefix = "";
+            if (type === "event") prefix = "✨ EVENT: ";
+            if (type === "action") prefix = "🔧 ACTION: ";
+            if (type === "diplomacy") prefix = "🕊️ DIPLOMACY: ";
+            if (type === "war") prefix = "⚔️ WAR: ";
+            if (type === "economy") prefix = "💰 ECONOMY: ";
+            if (type === "military_player") prefix = "🛡️ MILITARY: ";
+            p.innerHTML = `${prefix}${message}`;
+            log.insertBefore(p, log.firstChild); // Add new messages to the top
+            if (log.children.length > 20) { // Limit log size
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        function updateOverallStats(kingdom) {
+            kingdom.economy.overall = Math.round((kingdom.economy.agriculture + kingdom.economy.trade + kingdom.economy.mining) / 3 * 10) / 10;
+            kingdom.military.overall = Math.round((kingdom.military.armySize + kingdom.military.fortifications) / 2 * 10) / 10;
+            // Ensure stats don't go below 0 or above a soft cap (e.g., 15, can be expanded by tech/events later)
+            const cap = (stat) => Math.max(0, Math.min(stat, 15));
+            kingdom.economy.agriculture = cap(kingdom.economy.agriculture);
+            kingdom.economy.trade = cap(kingdom.economy.trade);
+            kingdom.economy.mining = cap(kingdom.economy.mining);
+            kingdom.military.armySize = cap(kingdom.military.armySize);
+            kingdom.military.fortifications = cap(kingdom.military.fortifications);
+            kingdom.population = cap(kingdom.population);
+            kingdom.culture = cap(kingdom.culture);
+        }
+
+        function getRelationStatus(kingdom1Name, kingdom2Name) {
+            if (!kingdoms[kingdom1Name] || !kingdoms[kingdom1Name].relations[kingdom2Name]) return "Neutral";
+            return kingdoms[kingdom1Name].relations[kingdom2Name];
+        }
+
+        function setRelationStatus(kingdom1Name, kingdom2Name, status) {
+            if (kingdoms[kingdom1Name] && kingdoms[kingdom2Name]) {
+                kingdoms[kingdom1Name].relations[kingdom2Name] = status;
+                kingdoms[kingdom2Name].relations[kingdom1Name] = status; // Mutual relations
+                logMessage(`${kingdom1Name} and ${kingdom2Name} are now ${status}.`, "diplomacy");
+            }
+            renderWorldMap(); // Re-render map to show relation colors
+        }
+
+        // --- UI RENDERING ---
+        function renderWorldMap() {
+            const mapDiv = document.getElementById('world-map');
+            mapDiv.innerHTML = '';
+            Object.values(kingdoms).forEach(k => {
+                const cell = document.createElement('div');
+                cell.classList.add('kingdom-cell');
+                cell.innerHTML = `${k.icon} ${k.name}<br><small>Pop: ${k.population}, Eco: ${k.economy.overall}, Mil: ${k.military.overall}</small>`;
+                cell.onclick = () => selectKingdom(k.name);
+                if (k.isPlayer) {
+                    cell.classList.add('player');
+                } else {
+                    const relationWithPlayer = getRelationStatus(playerKingdomName, k.name);
+                    if (relationWithPlayer === "At War") cell.classList.add('at-war');
+                    else if (relationWithPlayer === "Tension") cell.classList.add('tension');
+                    else if (relationWithPlayer === "Friendly") cell.classList.add('friendly');
+                }
+                mapDiv.appendChild(cell);
+            });
+        }
+
+        function renderPlayerStats() {
+            const player = kingdoms[playerKingdomName];
+            if (!player) return;
+            // This function can be expanded if there's a dedicated panel for player stats.
+            // For now, player stats are visible when clicking their own kingdom.
+        }
+
+        function renderKingdomInfoPanel(kingdomName) {
+            const panel = document.getElementById('kingdom-info-panel');
+            const kingdom = kingdoms[kingdomName];
+            if (!kingdom) {
+                panel.innerHTML = '<h2>Kingdom Information</h2><p>Error: Kingdom not found.</p>';
+                return;
+            }
+
+            selectedKingdom = kingdomName; // Update selected kingdom
+
+            let html = `<h2>${kingdom.icon} ${kingdom.name} ${kingdom.isPlayer ? "(Your Kingdom)" : ""}</h2>`;
+            html += `<div class="stat-item"><strong>Population:</strong> ${kingdom.population.toFixed(1)}</div>`;
+            html += `<div class="stat-item"><strong>Culture:</strong> ${kingdom.culture.toFixed(1)}</div>`;
+            html += `<div class="stat-item"><strong>Technology:</strong> ${kingdom.technology.toFixed(1)}</div>`;
+            
+            html += `<h3>Economy (Overall: ${kingdom.economy.overall.toFixed(1)})</h3>`;
+            html += `<div class="stat-item">Agriculture: ${kingdom.economy.agriculture.toFixed(1)}</div>`;
+            html += `<div class="stat-item">Trade: ${kingdom.economy.trade.toFixed(1)}</div>`;
+            html += `<div class="stat-item">Mining: ${kingdom.economy.mining.toFixed(1)}</div>`;
+
+            html += `<h3>Military (Overall: ${kingdom.military.overall.toFixed(1)})</h3>`;
+            html += `<div class="stat-item">Army Size: ${kingdom.military.armySize.toFixed(1)}</div>`;
+            html += `<div class="stat-item">Fortifications: ${kingdom.military.fortifications.toFixed(1)}</div>`;
+
+            if (kingdom.isPlayer) {
+                html += `<h3>Internal Development</h3>`;
+                html += `<div class="action-group"><h3>Economy 💰</h3>`;
+                html += `<button onclick="performPlayerAction('buildFarms')">Build Farms 🌾 (+Agi, ${kingdom.internalZones.farms}/5)</button>`;
+                html += `<button onclick="performPlayerAction('buildMarkets')">Build Markets 🛒 (+Trade, ${kingdom.internalZones.markets}/5)</button>`;
+                html += `<button onclick="performPlayerAction('developMines')">Develop Mines ⛏️ (+Mining, ${kingdom.internalZones.mines}/5)</button>`;
+                html += `</div>`;
+
+                html += `<div class="action-group"><h3>Military 🛡️</h3>`;
+                html += `<button onclick="performPlayerAction('recruitTroops')">Recruit Troops (+Army)</button>`;
+                html += `<button onclick="performPlayerAction('upgradeFortifications')">Upgrade Forts 🏰 (+Forts)</button>`;
+                html += `</div>`;
+
+                html += `<div class="action-group"><h3>Population & Culture 🧑‍🤝‍🧑</h3>`;
+                html += `<button onclick="performPlayerAction('improveHousing')">Improve Housing 🏠 (+Pop, ${kingdom.internalZones.housing}/5)</button>`;
+                html += `<button onclick="performPlayerAction('sponsorFestivals')">Sponsor Festivals 🎉 (+Culture)</button>`;
+                html += `</div>`;
+                
+                html += `<div class="action-group"><h3>Infrastructure & Policies 📜</h3>`;
+                html += `<button onclick="performPlayerAction('buildRoads')">Build Roads 🛣️ (+Trade, ${kingdom.internalZones.roads}/3)</button>`;
+                html += `<button onclick="performPlayerAction('adjustTaxes')">Adjust Taxes (Effect TBD)</button>`;
+                // html += `<button onclick="performPlayerAction('expandTerritory')">Expand Territory (Unlock Zones - TBD)</button>`;
+                html += `</div>`;
+
+            } else {
+                const relation = getRelationStatus(playerKingdomName, kingdomName);
+                html += `<h3>Relations with You: ${relation}</h3>`;
+                html += `<div class="action-group"><h3>Diplomacy 🕊️</h3>`;
+                html += `<button onclick="performNeighborAction('sendEnvoy', '${kingdomName}')">Send Envoy (Improve Relations)</button>`;
+                html += `<button onclick="performNeighborAction('offerTradeAgreement', '${kingdomName}')">Offer Trade Agreement</button>`;
+                html += `<button onclick="performNeighborAction('sendThreat', '${kingdomName}')">Send Threat (Worsen Relations)</button>`;
+                html += `<button onclick="performNeighborAction('declareWar', '${kingdomName}')" ${relation === "At War" ? "disabled" : ""}>Declare War ⚔️</button>`;
+                html += `</div>`;
+
+                html += `<div class="action-group"><h3>Espionage 👁️</h3>`;
+                html += `<button onclick="performNeighborAction('spy', '${kingdomName}')">Spy (Reveal Stats)</button>`;
+                html += `<button onclick="performNeighborAction('sabotage', '${kingdomName}')">Sabotage Economy/Military</button>`;
+                html += `</div>`;
+                
+                html += `<div class="action-group"><h3>Military Actions ⚔️</h3>`;
+                html += `<button onclick="performNeighborAction('attack', '${kingdomName}')" ${relation !== "Tension" && relation !== "At War" ? "disabled" : ""}>Attack</button>`;
+                html += `</div>`;
+                // Trade actions can be added here too
+            }
+            panel.innerHTML = html;
+            updateActionButtons();
+        }
+
+        function updateGameStatusDisplay() {
+            document.getElementById('current-season').textContent = seasons[currentSeasonIndex];
+            document.getElementById('current-year').textContent = currentYear;
+            document.getElementById('actions-remaining').textContent = actionsRemaining;
+            updateActionButtons();
+        }
+
+        function updateActionButtons() {
+            const buttons = document.querySelectorAll('.side-panel button');
+            buttons.forEach(button => {
+                if (actionsRemaining <= 0 && !button.textContent.toLowerCase().includes("end season")) {
+                    button.disabled = true;
+                } else {
+                    // Re-enable based on specific conditions if any (e.g., war declaration)
+                    const kingdomName = button.onclick?.toString().match(/'([^']+)'/)?.[1];
+                    if (kingdomName && selectedKingdom) {
+                         const relation = getRelationStatus(playerKingdomName, selectedKingdom);
+                         if (button.textContent.toLowerCase().includes("declare war")) {
+                             button.disabled = (relation === "At War" || actionsRemaining <= 0);
+                         } else if (button.textContent.toLowerCase().includes("attack")) {
+                             button.disabled = ((relation !== "Tension" && relation !== "At War") || actionsRemaining <= 0);
+                         } else if (actionsRemaining > 0) {
+                             button.disabled = false;
+                         }
+                    } else if (actionsRemaining > 0) {
+                        button.disabled = false;
+                    }
+                }
+            });
+             // Special case for player actions if no kingdom selected or player kingdom selected
+            if (!selectedKingdom || kingdoms[selectedKingdom]?.isPlayer) {
+                document.querySelectorAll('.side-panel .action-group button').forEach(btn => {
+                    btn.disabled = actionsRemaining <= 0;
+                });
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+
+        // --- GAME LOGIC ---
+        function submitKingdomName() {
+            const nameInput = document.getElementById('playerKingdomNameInput');
+            playerKingdomName = nameInput.value.trim() || "Player Kingdom";
+            if (playerKingdomName.length > 20) playerKingdomName = playerKingdomName.substring(0,20);
+            
+            document.getElementById('player-kingdom-name-input-container').style.display = 'none';
+            document.querySelector('.game-container').style.display = 'flex';
+            initializeGame();
+        }
+
+        function initializeGame(loadData = null) {
+            if (loadData) {
+                kingdoms = loadData.kingdoms;
+                playerKingdomName = loadData.playerKingdomName;
+                currentSeasonIndex = loadData.currentSeasonIndex;
+                currentYear = loadData.currentYear;
+                actionsRemaining = loadData.actionsRemaining;
+                logMessage("Game loaded successfully!");
+            } else {
+                kingdoms = {};
+                initialKingdomsData.forEach(data => {
+                    const newKingdom = JSON.parse(JSON.stringify(data)); // Deep copy
+                    if (newKingdom.isPlayer) {
+                        newKingdom.name = playerKingdomName;
+                    }
+                    kingdoms[newKingdom.name] = newKingdom;
+                });
+
+                // Initialize relations (all neutral to start, except player)
+                const allNames = Object.keys(kingdoms);
+                allNames.forEach(k1Name => {
+                    kingdoms[k1Name].relations = {}; // Reset relations object
+                    allNames.forEach(k2Name => {
+                        if (k1Name !== k2Name) {
+                            kingdoms[k1Name].relations[k2Name] = "Neutral";
+                        }
+                    });
+                });
+                logMessage(`Your kingdom, ${playerKingdomName}, has been established!`, "info");
+            }
+
+            Object.values(kingdoms).forEach(updateOverallStats);
+            renderWorldMap();
+            updateGameStatusDisplay();
+            selectKingdom(playerKingdomName); // Select player kingdom by default
+        }
+
+        function selectKingdom(kingdomName) {
+            renderKingdomInfoPanel(kingdomName);
+        }
+
+        function performPlayerAction(actionType) {
+            if (actionsRemaining <= 0) {
+                alert("No actions remaining this season.");
+                return;
+            }
+            const player = kingdoms[playerKingdomName];
+            let actionTaken = false;
+            let cost = 1; // Most actions cost 1, can be adjusted
+
+            switch (actionType) {
+                case 'buildFarms':
+                    if (player.internalZones.farms < 5) {
+                        player.economy.agriculture += 0.5;
+                        player.internalZones.farms++;
+                        logMessage("Farms expanded, agriculture potential increased.", "economy");
+                        actionTaken = true;
+                    } else { logMessage("Farms are fully developed.", "info"); }
+                    break;
+                case 'buildMarkets':
+                     if (player.internalZones.markets < 5) {
+                        player.economy.trade += 0.5;
+                        player.internalZones.markets++;
+                        logMessage("Markets expanded, trade income increased.", "economy");
+                        actionTaken = true;
+                    } else { logMessage("Markets are fully developed.", "info"); }
+                    break;
+                case 'developMines':
+                     if (player.internalZones.mines < 5) {
+                        player.economy.mining += 0.5;
+                        player.internalZones.mines++;
+                        logMessage("Mines developed, resource extraction increased.", "economy");
+                        actionTaken = true;
+                    } else { logMessage("Mines are fully developed.", "info"); }
+                    break;
+                case 'recruitTroops':
+                    player.military.armySize += 0.5;
+                    player.population -= 0.1; // Recruiting costs some pop
+                    logMessage("New troops recruited to bolster the army.", "military_player");
+                    actionTaken = true;
+                    break;
+                case 'upgradeFortifications':
+                    player.military.fortifications += 0.5;
+                    logMessage("Kingdom fortifications have been upgraded.", "military_player");
+                    actionTaken = true;
+                    break;
+                case 'improveHousing':
+                     if (player.internalZones.housing < 5) {
+                        player.population += 0.3;
+                        player.internalZones.housing++;
+                        logMessage("Housing improved, population capacity increased.", "info");
+                        actionTaken = true;
+                    } else { logMessage("Housing is fully developed.", "info"); }
+                    break;
+                case 'sponsorFestivals':
+                    player.culture += 0.5;
+                    player.economy.trade -= 0.1; // Festivals cost a bit
+                    logMessage("A grand festival was held, improving cultural prestige.", "info");
+                    actionTaken = true;
+                    break;
+                case 'buildRoads':
+                    if (player.internalZones.roads < 3) {
+                        player.economy.trade += 0.3; // Roads boost trade
+                        player.internalZones.roads++;
+                        logMessage("New roads constructed, improving trade routes.", "economy");
+                        actionTaken = true;
+                    } else { logMessage("Road network is fully developed.", "info"); }
+                    break;
+                case 'adjustTaxes':
+                    // Placeholder - this would need more UI (e.g., low, medium, high tax levels)
+                    // And effects on happiness, economy, rebellion risk.
+                    logMessage("Tax policies reviewed. (Effect TBD)", "info");
+                    actionTaken = true; // For now, counts as an action.
+                    break;
+                default:
+                    alert("Unknown player action.");
+                    return;
+            }
+
+            if (actionTaken) {
+                actionsRemaining -= cost;
+                updateOverallStats(player);
+                renderKingdomInfoPanel(playerKingdomName); // Re-render player panel
+                updateGameStatusDisplay();
+            }
+        }
+
+        function performNeighborAction(actionType, targetKingdomName) {
+            if (actionsRemaining <= 0) {
+                alert("No actions remaining this season.");
+                return;
+            }
+            const player = kingdoms[playerKingdomName];
+            const target = kingdoms[targetKingdomName];
+            if (!target) { alert("Target kingdom not found."); return; }
+
+            let actionTaken = false;
+            let cost = 1;
+
+            switch (actionType) {
+                case 'sendEnvoy':
+                    const currentRelationEnvoy = getRelationStatus(playerKingdomName, targetKingdomName);
+                    if (currentRelationEnvoy === "At War") { logMessage(`Cannot send envoy to ${targetKingdomName} while at war.`, "diplomacy"); break;}
+                    if (currentRelationEnvoy === "Friendly") { player.culture += 0.1; target.culture += 0.1; logMessage(`Envoy to ${targetKingdomName} warmly received, strengthening cultural ties.`, "diplomacy");}
+                    else if (currentRelationEnvoy === "Tension") { setRelationStatus(playerKingdomName, targetKingdomName, "Neutral"); }
+                    else { setRelationStatus(playerKingdomName, targetKingdomName, "Friendly"); }
+                    actionTaken = true;
+                    break;
+                case 'offerTradeAgreement':
+                    const currentRelationTrade = getRelationStatus(playerKingdomName, targetKingdomName);
+                    if (currentRelationTrade === "At War" || currentRelationTrade === "Tension") {
+                        logMessage(`Cannot offer trade agreement to ${targetKingdomName} due to poor relations.`, "diplomacy");
+                    } else {
+                        player.economy.trade += 0.2;
+                        target.economy.trade += 0.2;
+                        logMessage(`Trade agreement established with ${targetKingdomName}, boosting both economies.`, "economy");
+                        actionTaken = true;
+                        if (currentRelationTrade === "Neutral") setRelationStatus(playerKingdomName, targetKingdomName, "Friendly");
+                    }
+                    break;
+                case 'sendThreat':
+                    const currentRelationThreat = getRelationStatus(playerKingdomName, targetKingdomName);
+                    if (currentRelationThreat === "At War") { logMessage(`Threats are meaningless to ${targetKingdomName}, you are already at war.`, "diplomacy"); break;}
+                    if (currentRelationThreat === "Friendly") { setRelationStatus(playerKingdomName, targetKingdomName, "Neutral"); }
+                    else if (currentRelationThreat === "Neutral") { setRelationStatus(playerKingdomName, targetKingdomName, "Tension"); }
+                    else { /* Tension remains tension, or could escalate to war if conditions met */ 
+                        logMessage(`Your threat further strains relations with ${targetKingdomName}.`, "diplomacy");
+                    }
+                    actionTaken = true;
+                    break;
+                case 'declareWar':
+                    if (getRelationStatus(playerKingdomName, targetKingdomName) === "At War") {
+                        logMessage(`You are already at war with ${targetKingdomName}.`, "war");
+                    } else {
+                        setRelationStatus(playerKingdomName, targetKingdomName, "At War");
+                        logMessage(`WAR DECLARED on ${targetKingdomName}! Prepare for battle!`, "war");
+                        actionTaken = true;
+                    }
+                    break;
+                case 'spy':
+                    // Simple spy: reveal full stats
+                    const spyReportDiv = document.getElementById('spy-report-content');
+                    spyReportDiv.innerHTML = `
+                        <p><strong>Target:</strong> ${target.name}</p>
+                        <p><strong>Population:</strong> ${target.population.toFixed(1)}</p>
+                        <p><strong>Culture:</strong> ${target.culture.toFixed(1)}</p>
+                        <p><strong>Economy Overall:</strong> ${target.economy.overall.toFixed(1)}</p>
+                        <ul>
+                            <li>Agriculture: ${target.economy.agriculture.toFixed(1)}</li>
+                            <li>Trade: ${target.economy.trade.toFixed(1)}</li>
+                            <li>Mining: ${target.economy.mining.toFixed(1)}</li>
+                        </ul>
+                        <p><strong>Military Overall:</strong> ${target.military.overall.toFixed(1)}</p>
+                        <ul>
+                            <li>Army Size: ${target.military.armySize.toFixed(1)}</li>
+                            <li>Fortifications: ${target.military.fortifications.toFixed(1)}</li>
+                        </ul>
+                    `;
+                    openModal('spy-report-modal');
+                    logMessage(`Spy sent to ${targetKingdomName}. Report received.`, "info");
+                    actionTaken = true;
+                    break;
+                case 'sabotage':
+                    if (Math.random() < 0.6) { // 60% success chance for sabotage
+                        const whatToSabotage = Math.random();
+                        if (whatToSabotage < 0.5) { // Sabotage economy
+                            target.economy.agriculture = Math.max(0, target.economy.agriculture - 0.5);
+                            target.economy.trade = Math.max(0, target.economy.trade - 0.5);
+                            logMessage(`Successfully sabotaged ${targetKingdomName}'s economy!`, "info");
+                        } else { // Sabotage military
+                            target.military.armySize = Math.max(0, target.military.armySize - 0.5);
+                            target.military.fortifications = Math.max(0, target.military.fortifications - 0.3);
+                            logMessage(`Successfully sabotaged ${targetKingdomName}'s military!`, "info");
+                        }
+                        updateOverallStats(target);
+                    } else {
+                        logMessage(`Sabotage mission against ${targetKingdomName} failed! Your spy was caught. Relations worsened.`, "info");
+                        const rel = getRelationStatus(playerKingdomName, targetKingdomName);
+                        if (rel === "Friendly") setRelationStatus(playerKingdomName, targetKingdomName, "Neutral");
+                        else if (rel === "Neutral") setRelationStatus(playerKingdomName, targetKingdomName, "Tension");
+                    }
+                    actionTaken = true;
+                    break;
+                case 'attack':
+                    const relationAttack = getRelationStatus(playerKingdomName, targetKingdomName);
+                    if (relationAttack !== "Tension" && relationAttack !== "At War") {
+                        logMessage(`Cannot attack ${targetKingdomName} without heightened tensions or war.`, "war");
+                        break;
+                    }
+                    // Simple combat
+                    let playerAttackPower = player.military.armySize * (1 + player.technology * 0.05);
+                    let targetDefensePower = target.military.armySize + target.military.fortifications * 0.5;
+                    
+                    logMessage(`Attacking ${targetKingdomName} (Your Mil: ${player.military.overall.toFixed(1)} vs Theirs: ${target.military.overall.toFixed(1)})`, "war");
+
+                    if (playerAttackPower > targetDefensePower) {
+                        const damageToTarget = Math.min(target.military.armySize, (playerAttackPower - targetDefensePower) * 0.2 + 0.3);
+                        const damageToPlayer = Math.min(player.military.armySize, targetDefensePower * 0.1 + 0.1);
+                        target.military.armySize -= damageToTarget;
+                        player.military.armySize -= damageToPlayer;
+                        target.population -= damageToTarget * 0.1; // Civilian casualties
+                        logMessage(`VICTORY! You dealt ${damageToTarget.toFixed(1)} losses to ${targetKingdomName}'s army and took ${damageToPlayer.toFixed(1)} losses.`, "war");
+                        if (target.military.armySize <= 0.1) {
+                            logMessage(`${targetKingdomName} has been decimated! Their lands are open for the taking (Expansion feature TBD).`, "war");
+                            target.population = Math.max(0.5, target.population * 0.5); // Significant pop loss
+                            // Could add annexation/vassalization here in a more complex game
+                            setRelationStatus(playerKingdomName, targetKingdomName, "Neutral"); // War ends in devastation
+                        }
+                    } else {
+                        const damageToPlayer = Math.min(player.military.armySize, (targetDefensePower - playerAttackPower) * 0.2 + 0.3);
+                        const damageToTarget = Math.min(target.military.armySize, playerAttackPower * 0.1 + 0.1);
+                        player.military.armySize -= damageToPlayer;
+                        target.military.armySize -= damageToTarget;
+                        logMessage(`DEFEAT! Your attack was repelled. You took ${damageToPlayer.toFixed(1)} losses and dealt ${damageToTarget.toFixed(1)} to ${targetKingdomName}.`, "war");
+                    }
+                    updateOverallStats(player);
+                    updateOverallStats(target);
+                    actionTaken = true;
+                    if (relationAttack === "Tension") setRelationStatus(playerKingdomName, targetKingdomName, "At War"); // Attacking in tension leads to war
+                    break;
+
+                default:
+                    alert("Unknown neighbor action.");
+                    return;
+            }
+
+            if (actionTaken) {
+                actionsRemaining -= cost;
+                renderKingdomInfoPanel(targetKingdomName); // Re-render target panel
+                renderWorldMap(); // Update map for relation changes
+                updateGameStatusDisplay();
+            }
+        }
+
+        function endTurn() {
+            currentSeasonIndex = (currentSeasonIndex + 1) % seasons.length;
+            if (currentSeasonIndex === 0) {
+                currentYear++;
+                logMessage(`A new year begins: ${currentYear}!`, "info");
+            }
+            actionsRemaining = ACTIONS_PER_SEASON;
+
+            logMessage(`Season changed to ${seasons[currentSeasonIndex]}, ${currentYear}.`, "info");
+
+            // AI Kingdom Actions (simple) & Relation changes
+            Object.values(kingdoms).forEach(k => {
+                if (!k.isPlayer) {
+                    // Simple AI: improve a random stat slightly or react to player
+                    if (Math.random() < 0.3) { // 30% chance to improve something
+                        const improvementType = Math.random();
+                        if (improvementType < 0.33) k.economy.agriculture += 0.1;
+                        else if (improvementType < 0.66) k.military.armySize += 0.1;
+                        else k.population += 0.1;
+                        updateOverallStats(k);
+                    }
+
+                    // Relation changes based on player strength or past actions
+                    const relationWithPlayer = getRelationStatus(k.name, playerKingdomName);
+                    const playerKingdom = kingdoms[playerKingdomName];
+                    if (playerKingdom.military.overall > k.military.overall + 3 && relationWithPlayer === "Neutral" && Math.random() < 0.1) {
+                        setRelationStatus(k.name, playerKingdomName, "Tension");
+                        logMessage(`${k.name} is growing wary of ${playerKingdomName}'s strength.`, "diplomacy");
+                    }
+                    if (relationWithPlayer === "Tension" && Math.random() < 0.15) { // Chance to escalate tension to war if AI is aggressive or feels threatened
+                         if (k.military.overall > playerKingdom.military.overall || (playerKingdom.military.overall < 2 && k.military.overall > 3) ) {
+                            setRelationStatus(k.name, playerKingdomName, "At War");
+                            logMessage(`${k.name} has declared WAR on ${playerKingdomName}!`, "war");
+                         }
+                    }
+                     if (relationWithPlayer === "Friendly" && Math.random() < 0.05) { // Small chance for friendly relations to cool to neutral
+                        setRelationStatus(k.name, playerKingdomName, "Neutral");
+                        logMessage(`Relations between ${playerKingdomName} and ${k.name} have cooled to Neutral.`, "diplomacy");
+                    }
+                }
+            });
+
+            triggerRandomEvents();
+            updateOverallStats(kingdoms[playerKingdomName]); // Player stats might be affected by events
+            
+            renderWorldMap();
+            updateGameStatusDisplay();
+            if (selectedKingdom) renderKingdomInfoPanel(selectedKingdom); // Refresh panel if a kingdom is selected
+            else renderKingdomInfoPanel(playerKingdomName); // Or default to player
+
+            checkGameOver();
+        }
+
+        function triggerRandomEvents() {
+            const eventRoll = Math.random();
+            let eventOccurred = false;
+
+            // Determine target: Player or a random AI kingdom
+            let targetKingdomName = playerKingdomName;
+            if (Math.random() > 0.5) { // 50% chance event affects an AI kingdom
+                const aiKingdoms = Object.values(kingdoms).filter(k => !k.isPlayer);
+                if (aiKingdoms.length > 0) {
+                    targetKingdomName = aiKingdoms[Math.floor(Math.random() * aiKingdoms.length)].name;
+                }
+            }
+            const target = kingdoms[targetKingdomName];
+
+            if (eventRoll < 0.08) { // 8% Plague
+                target.population = Math.max(0.5, target.population * (0.9 - Math.random() * 0.2)); // 10-30% pop loss
+                target.economy.agriculture *= 0.9;
+                logMessage(`A deadly plague has struck ${target.name}, decimating the population and hindering agriculture!`, "event");
+                eventOccurred = true;
+            } else if (eventRoll < 0.18) { // 10% Bountiful Harvest
+                target.economy.agriculture += (target.economy.agriculture * 0.2 + 0.5);
+                target.population += 0.2;
+                logMessage(`A bountiful harvest in ${target.name} blesses the land with abundance! Economy and population grow.`, "event");
+                eventOccurred = true;
+            } else if (eventRoll < 0.25) { // 7% Border Raids
+                if (target.military.armySize > 0.5) {
+                    target.military.armySize = Math.max(0, target.military.armySize - (0.3 + Math.random() * 0.3));
+                    target.economy.trade *= 0.95;
+                    logMessage(`Border raids plague ${target.name}! Army size reduced and trade disrupted.`, "event");
+                } else {
+                    target.population = Math.max(0.5, target.population - 0.2);
+                    logMessage(`Raiders pillage the undefended borders of ${target.name}, harming the populace!`, "event");
+                }
+                eventOccurred = true;
+            }
+            // Add more events: Rebellions, Refugees, Natural Disaster
+
+            if (eventOccurred) {
+                updateOverallStats(target);
+                if (target.isPlayer) renderPlayerStats(); // Update player stats display if affected
+            }
+        }
+        
+        function checkGameOver() {
+            const player = kingdoms[playerKingdomName];
+            if (player.population <= 0.1) {
+                alert("Game Over! Your kingdom has collapsed due to lack of population.");
+                logMessage("GAME OVER: Your kingdom's population has vanished.", "war");
+                disableAllActions();
+            }
+            // Add other game over conditions: e.g., conquered by all neighbors, massive debt for too long.
+        }
+
+        function disableAllActions() {
+            actionsRemaining = 0;
+            updateGameStatusDisplay(); // Disables buttons via updateActionButtons
+            document.querySelector('button[onclick="endTurn()"]').disabled = true;
+        }
+
+        // --- SAVE/LOAD ---
+        function saveGame() {
+            const gameState = {
+                kingdoms: kingdoms,
+                playerKingdomName: playerKingdomName,
+                currentSeasonIndex: currentSeasonIndex,
+                currentYear: currentYear,
+                actionsRemaining: actionsRemaining,
+                messageLog: document.getElementById('message-log').innerHTML
+            };
+            localStorage.setItem('kingdomSimSave', JSON.stringify(gameState));
+            logMessage("Game Saved!", "info");
+            alert("Game Saved!");
+        }
+
+        function loadGamePrompt() {
+            if (localStorage.getItem('kingdomSimSave')) {
+                if (confirm("Load saved game? Any unsaved progress will be lost.")) {
+                    loadGame();
+                }
+            } else {
+                alert("No saved game found.");
+            }
+        }
+
+        function loadGame() {
+            const savedState = localStorage.getItem('kingdomSimSave');
+            if (savedState) {
+                const gameState = JSON.parse(savedState);
+                // Need to re-assign methods or re-initialize objects if they have complex types
+                // For this simple structure, direct assignment might be okay, but beware of lost prototypes for complex objects.
+                // A safer way for kingdoms might be to re-initialize them from the loaded data.
+                
+                // Simple re-init for kingdoms to ensure structure
+                const loadedKingdoms = gameState.kingdoms;
+                kingdoms = {}; // Clear current kingdoms
+                Object.keys(loadedKingdoms).forEach(kName => {
+                    kingdoms[kName] = JSON.parse(JSON.stringify(loadedKingdoms[kName])); // Deep copy
+                });
+
+                initializeGame(gameState); // Use a modified init that takes loaded data
+                document.getElementById('message-log').innerHTML = gameState.messageLog || "<p>Log loaded.</p>";
+
+            } else {
+                alert("No saved game found to load.");
+            }
+        }
+
+
+        // --- INITIALIZE ---
+        // Game initialization is deferred until player enters name.
+        // initializeGame(); // Call this after player names their kingdom
+    </script>
+
+</body>
+</html>
