@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kingdom Management</title>
+  <style>
+    * {margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+    body {background: #f0e6d2; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem;}
+    header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;}
+    .stats {display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-bottom: 1rem;}
+    .stat-box {background: #e0d6c2; padding: 0.5rem; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+    .map-container {display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;}
+    .map-row {display: flex; gap: 10px; justify-content: center;}
+    .kingdom {width: 80px; height: 80px; display: flex; justify-content: center; align-items: center; background: #d0c6b2; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; font-size: 0.8rem; text-align: center;}
+    .kingdom:hover {transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
+    .kingdom.player {background: #a0d6f2;}
+    .kingdom.peace {border: 2px solid #6ab04c;}
+    .kingdom.tension {border: 2px solid #f0932b;}
+    .kingdom.war {border: 2px solid #eb4d4b;}
+    .season-info {text-align: center; margin-bottom: 1rem;}
+    .actions {display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;}
+    button {padding: 0.4rem 0.8rem; background: #7f6b4e; color: white; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;}
+    button:hover {background: #5f4b2e;}
+    button:disabled {background: #ccc; cursor: not-allowed;}
+    .panel {position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 10; width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto; display: none;}
+    .panel h2 {margin-bottom: 1rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;}
+    .panel-actions {display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;}
+    .backdrop {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5; display: none;}
+    .event-log {height: 100px; overflow-y: auto; background: #fff; padding: 0.5rem; margin-bottom: 1rem; border-radius: 4px;}
+    .relationship {font-size: 0.7rem; position: absolute; top: 5px; right: 5px;}
+    .internal-zone {width: 60px; height: 60px; background: #c0b6a2; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;}
+    .internal-zone:hover {transform: scale(1.05);}
+    .progress-bar {height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 2px; overflow: hidden;}
+    .progress-value {height: 100%; background: #6ab04c;}
+    table {width: 100%; border-collapse: collapse; margin-bottom: 1rem;}
+    table td, table th {padding: 0.3rem; border-bottom: 1px solid #ddd; text-align: left;}
+    .alert {padding: 1rem; background: #ffeaa7; border-radius: 4px; margin-bottom: 1rem; display: none;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kingdom Management</h1>
+    <div>
+      <button id="next-turn">Next Season</button>
+      <button id="save-game">Save</button>
+      <button id="load-game">Load</button>
+    </div>
+  </header>
+  
+  <div class="alert" id="event-alert"></div>
+  
+  <div class="season-info">
+    <h2><span id="season">Spring</span>, Year <span id="year">1</span></h2>
+    <p>Actions Remaining: <span id="actions-remaining">3</span></p>
+  </div>
+  
+  <div class="stats" id="player-stats"></div>
+  
+  <div class="event-log" id="event-log"></div>
+  
+  <div class="map-container" id="world-map"></div>
+  
+  <div class="backdrop" id="backdrop"></div>
+  
+  <div class="panel" id="kingdom-panel">
+    <h2 id="panel-title">Kingdom Name</h2>
+    <div id="panel-content"></div>
+    <div class="panel-actions" id="panel-actions"></div>
+    <button id="close-panel">Close</button>
+  </div>
+
+  <script>
+    // Game state
+    let gameState = {
+      player: { name: "", economy: 2, military: 3, population: 3, culture: 2, actions: 3, internalZones: ['capital', 'farms', 'mines', 'barracks'] },
+      kingdoms: [
+        { id: 'armath', name: 'Kingdom of Armath', economy: 5, military: 6, population: 6, culture: 4, relation: 'peace', position: {x: 1, y: 0} },
+        { id: 'belroth', name: 'Kingdom of Belroth', economy: 4, military: 5, population: 5, culture: 3, relation: 'peace', position: {x: 0, y: 1} },
+        { id: 'caldora', name: 'Kingdom of Caldora', economy: 6, military: 7, population: 7, culture: 5, relation: 'peace', position: {x: 2, y: 1} },
+        { id: 'dreston', name: 'Kingdom of Dreston', economy: 3, military: 2, population: 4, culture: 2, relation: 'peace', position: {x: 1, y: 2} }
+      ],
+      season: 0, // 0: Spring, 1: Summer, 2: Fall, 3: Winter
+      year: 1,
+      events: []
+    };
+
+    // Constants
+    const SEASONS = ['Spring', 'Summer', 'Fall', 'Winter'];
+    const STATS = ['Economy', 'Military', 'Population', 'Culture'];
+    const RELATIONS = ['peace', 'tension', 'war'];
+    const EVENTS = [
+      { name: 'Plague', desc: 'A plague has struck your kingdom!', effect: (k) => { k.population = Math.max(1, k.population - 2); return `Population -2`; } },
+      { name: 'Bountiful Harvest', desc: 'Your farmers have produced a bountiful harvest!', effect: (k) => { k.economy += 1; return `Economy +1`; } },
+      { name: 'Border Raids', desc: 'Raiders have attacked your borders!', effect: (k) => { k.military = Math.max(1, k.military - 1); return `Military -1`; } },
+      { name: 'Rebellion', desc: 'A rebellion has broken out in your kingdom!', effect: (k) => { k.population = Math.max(1, k.population - 1); k.military = Math.max(1, k.military - 1); return `Population -1, Military -1`; } },
+      { name: 'Refugees', desc: 'Refugees from neighboring lands have arrived!', effect: (k) => { k.population += 1; k.economy = Math.max(1, k.economy - 1); return `Population +1, Economy -1`; } },
+      { name: 'Natural Disaster', desc: 'A natural disaster has struck your kingdom!', effect: (k) => { k.economy = Math.max(1, k.economy - 2); return `Economy -2`; } }
+    ];
+
+    // Elements
+    const worldMap = document.getElementById('world-map');
+    const playerStats = document.getElementById('player-stats');
+    const eventLog = document.getElementById('event-log');
+    const kingdom_panel = document.getElementById('kingdom-panel');
+    const panel_title = document.getElementById('panel-title');
+    const panel_content = document.getElementById('panel-content');
+    const panel_actions = document.getElementById('panel-actions');
+    const backdrop = document.getElementById('backdrop');
+    const close_panel = document.getElementById('close-panel');
+    const next_turn = document.getElementById('next-turn');
+    const season = document.getElementById('season');
+    const year = document.getElementById('year');
+    const actions_remaining = document.getElementById('actions-remaining');
+    const event_alert = document.getElementById('event-alert');
+    const save_game = document.getElementById('save-game');
+    const load_game = document.getElementById('load-game');
+
+    // Initialize game
+    function initGame() {
+      const playerName = prompt('Enter your kingdom name:') || 'Your Kingdom';
+      gameState.player.name = playerName;
+      updateUI();
+      renderMap();
+    }
+
+    // Update UI elements based on game state
+    function updateUI() {
+      // Update season and year display
+      season.textContent = SEASONS[gameState.season];
+      year.textContent = gameState.year;
+      actions_remaining.textContent = gameState.player.actions;
+      
+      // Update player stats
+      playerStats.innerHTML = '';
+      STATS.forEach(stat => {
+        const value = gameState.player[stat.toLowerCase()];
+        const statBox = document.createElement('div');
+        statBox.className = 'stat-box';
+        statBox.innerHTML = `<h3>${stat}</h3>
+          <div class="progress-bar"><div class="progress-value" style="width: ${value * 10}%"></div></div>
+          <p>${value}/10</p>`;
+        playerStats.appendChild(statBox);
+      });
+    }
+
+    // Render world map
+    function renderMap() {
+      worldMap.innerHTML = '';
+      
+      // Create a 3x3 grid map
+      for (let y = 0; y < 3; y++) {
+        const row = document.createElement('div');
+        row.className = 'map-row';
+        
+        for (let x = 0; x < 3; x++) {
+          // Check if this position has a kingdom
+          const kingdom = gameState.kingdoms.find(k => k.position.x === x && k.position.y === y);
+          
+          // Place player in the middle
+          const isPlayer = x === 1 && y === 1;
+          
+          const cell = document.createElement('div');
+          cell.className = `kingdom ${isPlayer ? 'player' : kingdom ? kingdom.relation : ''}`;
+          
+          if (isPlayer) {
+            cell.textContent = gameState.player.name;
+            cell.onclick = () => showPlayerPanel();
+          } else if (kingdom) {
+            cell.textContent = kingdom.name;
+            cell.innerHTML += `<span class="relationship">⬤</span>`;
+            cell.onclick = () => showKingdomPanel(kingdom);
+          } else {
+            cell.style.visibility = 'hidden';
+          }
+          
+          row.appendChild(cell);
+        }
+        
+        worldMap.appendChild(row);
+      }
+    }
+
+    // Show panel for player's kingdom
+    function showPlayerPanel() {
+      panel_title.textContent = gameState.player.name;
+      
+      let content = '<h3>Internal Management</h3>';
+      content += '<div class="map-row" style="margin-top: 1rem">';
+      
+      // Show internal zones
+      gameState.player.internalZones.forEach(zone => {
+        content += `<div class="internal-zone" onclick="manageZone('${zone}')">${zone.charAt(0).toUpperCase() + zone.slice(1)}</div>`;
+      });
+      
+      content += '</div>';
+      
+      panel_content.innerHTML = content;
+      panel_actions.innerHTML = '';
+      
+      // Add expand territory button if player has enough resources
+      if (gameState.player.economy >= 3 && gameState.player.internalZones.length < 6) {
+        const expandBtn = document.createElement('button');
+        expandBtn.textContent = 'Expand Territory (1 Action)';
+        expandBtn.onclick = expandTerritory;
+        panel_actions.appendChild(expandBtn);
+      }
+      
+      openPanel();
+    }
+
+    // Show kingdom panel
+    function showKingdomPanel(kingdom) {
+      panel_title.textContent = kingdom.name;
+      
+      let content = '<table>';
+      STATS.forEach(stat => {
+        content += `<tr><td>${stat}</td><td>${kingdom[stat.toLowerCase()]}/10</td></tr>`;
+      });
+      content += `<tr><td>Relations</td><td>${kingdom.relation.charAt(0).toUpperCase() + kingdom.relation.slice(1)}</td></tr>`;
+      content += '</table>';
+      
+      panel_content.innerHTML = content;
+      panel_actions.innerHTML = '';
+      
+      // Add diplomatic actions based on current relation
+      if (kingdom.relation === 'peace') {
+        addActionButton('Propose Alliance (1 Action)', () => diplomacy(kingdom, 'alliance'));
+        addActionButton('Send Threat (1 Action)', () => diplomacy(kingdom, 'threat'));
+      } else if (kingdom.relation === 'tension') {
+        addActionButton('Improve Relations (1 Action)', () => diplomacy(kingdom, 'improve'));
+        addActionButton('Declare War (1 Action)', () => diplomacy(kingdom, 'war'));
+      } else if (kingdom.relation === 'war') {
+        addActionButton('Sue for Peace (1 Action)', () => diplomacy(kingdom, 'peace'));
+        addActionButton('Attack (1 Action)', () => attack(kingdom));
+      }
+      
+      // Add trade options (available in peace and tension)
+      if (kingdom.relation !== 'war') {
+        addActionButton('Offer Trade (1 Action)', () => trade(kingdom));
+      }
+      
+      // Add espionage options
+      addActionButton('Spy (1 Action)', () => spy(kingdom));
+      
+      openPanel();
+    }
+
+    function addActionButton(text, onclick) {
+      const btn = document.createElement('button');
+      btn.textContent = text;
+      btn.onclick = onclick;
+      if (gameState.player.actions <= 0) btn.disabled = true;
+      panel_actions.appendChild(btn);
+    }
+
+    // Diplomatic actions
+    function diplomacy(kingdom, action) {
+      useAction();
+      
+      switch(action) {
+        case 'alliance':
+          if (Math.random() < 0.3 + (gameState.player.culture / 20)) {
+            logEvent(`${kingdom.name} accepted your alliance proposal!`);
+          } else {
+            logEvent(`${kingdom.name} rejected your alliance proposal.`);
+          }
+          break;
+        case 'threat':
+          if (gameState.player.military > kingdom.military) {
+            logEvent(`${kingdom.name} was intimidated by your threat!`);
+            kingdom.relation = 'tension';
+          } else {
+            logEvent(`${kingdom.name} laughed at your threat.`);
+          }
+          break;
+        case 'improve':
+          if (Math.random() < 0.5) {
+            logEvent(`Relations with ${kingdom.name} have improved.`);
+            kingdom.relation = 'peace';
+          } else {
+            logEvent(`${kingdom.name} is still wary of your kingdom.`);
+          }
+          break;
+        case 'war':
+          logEvent(`You have declared war on ${kingdom.name}!`);
+          kingdom.relation = 'war';
+          break;
+        case 'peace':
+          if (gameState.player.military < kingdom.military || Math.random() < 0.7) {
+            logEvent(`${kingdom.name} has accepted your peace offer.`);
+            kingdom.relation = 'tension';
+          } else {
+            logEvent(`${kingdom.name} rejected your peace offer.`);
+          }
+          break;
+      }
+      
+      closePanel();
+      renderMap();
+    }
+
+    // Trade action
+    function trade(kingdom) {
+      useAction();
+      const economyBoost = Math.floor(Math.random() * 2) + 1;
+      gameState.player.economy = Math.min(10, gameState.player.economy + economyBoost);
+      logEvent(`Trade established with ${kingdom.name}. Economy +${economyBoost}`);
+      closePanel();
+      updateUI();
+    }
+
+    // Spy action
+    function spy(kingdom) {
+      useAction();
+      const spySuccess = Math.random() < 0.6;
+      
+      if (spySuccess) {
+        let report = `Spy Report from ${kingdom.name}:\n`;
+        STATS.forEach(stat => {
+          report += `${stat}: ${kingdom[stat.toLowerCase()]}/10\n`;
+        });
+        report += `Military Plans: ${Math.random() < 0.3 ? 'Preparing for war!' : 'No immediate threats.'}`;
+        alert(report);
+      } else {
+        logEvent(`Your spy was caught in ${kingdom.name}! Relations have worsened.`);
+        if (kingdom.relation === 'peace') kingdom.relation = 'tension';
+        else if (kingdom.relation === 'tension') kingdom.relation = 'war';
+      }
+      
+      closePanel();
+      renderMap();
+    }
+
+    // Attack action
+    function attack(kingdom) {
+      useAction();
+      
+      const playerStr = gameState.player.military;
+      const kingdomStr = kingdom.military;
+      
+      if (playerStr > kingdomStr) {
+        const damage = Math.floor(Math.random() * 2) + 1;
+        kingdom.military = Math.max(1, kingdom.military - damage);
+        kingdom.economy = Math.max(1, kingdom.economy - 1);
+        logEvent(`Victory! Your forces defeated ${kingdom.name}. Their Military -${damage}, Economy -1`);
+      } else {
+        const damage = Math.floor(Math.random() * 2) + 1;
+        gameState.player.military = Math.max(1, gameState.player.military - damage);
+        logEvent(`Defeat! ${kingdom.name} repelled your attack. Your Military -${damage}`);
+      }
+      
+      closePanel();
+      updateUI();
+    }
+
+    // Manage zone
+    function manageZone(zone) {
+      if (gameState.player.actions <= 0) {
+        alert('No actions remaining this season!');
+        return;
+      }
+      
+      switch(zone) {
+        case 'capital':
+          if (confirm('Enact policy changes? (Increases Culture)')) {
+            useAction();
+            gameState.player.culture = Math.min(10, gameState.player.culture + 1);
+            logEvent('You enacted new policies. Culture +1');
+          }
+          break;
+        case 'farms':
+          if (confirm('Develop farms? (Increases Economy)')) {
+            useAction();
+            gameState.player.economy = Math.min(10, gameState.player.economy + 1);
+            logEvent('You developed your farms. Economy +1');
+          }
+          break;
+        case 'mines':
+          if (confirm('Expand mines? (Increases Economy)')) {
+            useAction();
+            gameState.player.economy = Math.min(10, gameState.player.economy + 1);
+            logEvent('You expanded your mines. Economy +1');
+          }
+          break;
+        case 'barracks':
+          if (confirm('Train troops? (Increases Military)')) {
+            useAction();
+            gameState.player.military = Math.min(10, gameState.player.military + 1);
+            logEvent('You trained more troops. Military +1');
+          }
+          break;
+        default:
+          if (confirm(`Develop ${zone}? (General improvement)`)) {
+            useAction();
+            const randomStat = STATS[Math.floor(Math.random() * STATS.length)].toLowerCase();
+            gameState.player[randomStat] = Math.min(10, gameState.player[randomStat] + 1);
+            logEvent(`You developed ${zone}. ${randomStat.charAt(0).toUpperCase() + randomStat.slice(1)} +1`);
+          }
+      }
+      
+      closePanel();
+      updateUI();
+    }
+
+    // Expand territory
+    function expandTerritory() {
+      if (gameState.player.economy < 3) {
+        alert('Not enough economy to expand territory!');
+        return;
+      }
+      
+      useAction();
+      gameState.player.economy = Math.max(1, gameState.player.economy - 1);
+      
+      const newZones = ['village', 'forest', 'hills', 'coast', 'plains'];
+      const availableZones = newZones.filter(z => !gameState.player.internalZones.includes(z));
+      
+      if (availableZones.length > 0) {
+        const newZone = availableZones[Math.floor(Math.random() * availableZones.length)];
+        gameState.player.internalZones.push(newZone);
+        logEvent(`You expanded your territory! New zone: ${newZone}`);
+      }
+      
+      closePanel();
+      updateUI();
+      showPlayerPanel(); // Refresh panel to show new zone
+    }
+
+    // Use an action
+    function useAction() {
+      gameState.player.actions--;
+      updateUI();
+    }
+
+    // Log an event
+    function logEvent(message) {
+      const timestamp = `[${SEASONS[gameState.season]}, Year ${gameState.year}]`;
+      const entry = document.createElement('div');
+      entry.textContent = `${timestamp} ${message}`;
+      eventLog.prepend(entry);
+      gameState.events.push(message);
+    }
+
+    // Show a random event alert
+    function showEventAlert(event, target) {
+      event_alert.style.display = 'block';
+      event_alert.innerHTML = `<strong>${event.name}:</strong> ${event.desc}<br>${event.effect(target)}`;
+      
+      setTimeout(() => {
+        event_alert.style.display = 'none';
+      }, 5000);
+    }
+
+    // Handle random events
+    function processRandomEvents() {
+      // Player random event (33% chance each season)
+      if (Math.random() < 0.33) {
+        const randomEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+        logEvent(`${randomEvent.name}: ${randomEvent.effect(gameState.player)}`);
+        showEventAlert(randomEvent, gameState.player);
+      }
+      
+      // Kingdom random events (20% chance for each kingdom)
+      gameState.kingdoms.forEach(kingdom => {
+        if (Math.random() < 0.2) {
+          const randomEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+          logEvent(`${kingdom.name} suffered ${randomEvent.name.toLowerCase()}`);
+        }
+      });
+    }
+
+    // Process kingdom decisions
+    function processKingdomDecisions() {
+      gameState.kingdoms.forEach(kingdom => {
+        // Kingdoms may change relations based on player strength
+        if (kingdom.relation === 'peace' && gameState.player.military > kingdom.military * 1.5) {
+          if (Math.random() < 0.3) {
+            kingdom.relation = 'tension';
+            logEvent(`${kingdom.name} is concerned about your growing military power. Relations deteriorated.`);
+          }
+        }
+        
+        // Stronger kingdoms might become aggressive
+        if (kingdom.relation === 'tension' && kingdom.military > gameState.player.military * 1.5) {
+          if (Math.random() < 0.2) {
+            kingdom.relation = 'war';
+            logEvent(`${kingdom.name} has declared war on your kingdom!`);
+          }
+        }
+        
+        // War consequences
+        if (kingdom.relation === 'war') {
+          if (Math.random() < 0.5) {
+            const damage = Math.floor(Math.random() * 2) + 1;
+            gameState.player.military = Math.max(1, gameState.player.military - damage);
+            logEvent(`${kingdom.name} attacked your borders! Military -${damage}`);
+          }
+        }
+      });
+    }
+
+    // Advance to next season
+    function nextTurn() {
+      gameState.season = (gameState.season + 1) % 4;
+      if (gameState.season === 0) { // New year
+        gameState.year++;
+      }
+      
+      gameState.player.actions = 3; // Reset actions
+      
+      // Process events and kingdom decisions
+      processRandomEvents();
+      processKingdomDecisions();
+      
+      updateUI();
+      renderMap();
+    }
+
+    // Panel controls
+    function openPanel() {
+      kingdom_panel.style.display = 'block';
+      backdrop.style.display = 'block';
+    }
+
+    function closePanel() {
+      kingdom_panel.style.display = 'none';
+      backdrop.style.display = 'none';
+    }
+
+    // Save and load
+    function saveGame() {
+      localStorage.setItem('kingdomGame', JSON.stringify(gameState));
+      alert('Game saved!');
+    }
+
+    function loadGame() {
+      const savedGame = localStorage.getItem('kingdomGame');
+      if (savedGame) {
+        gameState = JSON.parse(savedGame);
+        updateUI();
+        renderMap();
+        alert('Game loaded!');
+      } else {
+        alert('No saved game found!');
+      }
+    }
+
+    // Event listeners
+    close_panel.addEventListener('click', closePanel);
+    next_turn.addEventListener('click', nextTurn);
+    save_game.addEventListener('click', saveGame);
+    load_game.addEventListener('click', loadGame);
+
+    // Initialize the game
+    initGame();
+
+    // Make functions available globally
+    window.showKingdomPanel = showKingdomPanel;
+    window.showPlayerPanel = showPlayerPanel;
+    window.manageZone = manageZone;
+    window.diplomacy = diplomacy;
+    window.trade = trade;
+    window.spy = spy;
+    window.attack = attack;
+    window.expandTerritory = expandTerritory;
+  </script>
+</body>
+</html>
