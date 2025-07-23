@@ -23,13 +23,7 @@ function showErrorScreen(message) {
     `;
 }
 
-window.addEventListener('beforeunload', (e) => {
-    if (game && game.gameState === 'playing') {
-        e.preventDefault();
-        e.returnValue = 'Are you sure you want to leave? Your race progress will be lost.';
-        return e.returnValue;
-    }
-});
+// Removed beforeunload handler that was causing mobile issues
 
 document.addEventListener('visibilitychange', () => {
     if (game && game.gameState === 'playing') {

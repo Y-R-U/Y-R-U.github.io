@@ -3,10 +3,35 @@ class InputManager {
         this.keys = {};
         this.touches = {};
         this.gamepad = null;
+        this.joystick = null;
+        this.joystickInput = { x: 0, y: 0 };
         
         this.setupKeyboard();
         this.setupTouch();
         this.setupGamepad();
+        this.setupVirtualJoystick();
+    }
+    
+    setupVirtualJoystick() {
+        if (Utils.isMobile()) {
+            const container = document.getElementById('joystickContainer');
+            if (container) {
+                this.joystick = new VirtualJoystick(container, {
+                    size: 120,
+                    fadeOnIdle: true
+                });
+                
+                this.joystick.on('move', (state) => {
+                    this.joystickInput.x = state.normalizedX;
+                    this.joystickInput.y = state.normalizedY;
+                });
+                
+                this.joystick.on('end', () => {
+                    this.joystickInput.x = 0;
+                    this.joystickInput.y = 0;
+                });
+            }
+        }
     }
     
     setupKeyboard() {
@@ -23,8 +48,6 @@ class InputManager {
     
     setupTouch() {
         const buttons = {
-            leftBtn: 'left',
-            rightBtn: 'right',
             gasBtn: 'gas',
             brakeBtn: 'brake'
         };
@@ -55,6 +78,11 @@ class InputManager {
                     this.touches[action] = false;
                     btn.style.transform = 'scale(1)';
                 });
+                
+                // Prevent context menu on long press
+                btn.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
             }
         });
     }
@@ -78,12 +106,6 @@ class InputManager {
     
     isPressed(action) {
         switch (action) {
-            case 'left':
-                return this.keys['arrowleft'] || this.keys['a'] || this.touches.left || 
-                       (this.gamepad && this.gamepad.axes[0] < -0.3);
-            case 'right':
-                return this.keys['arrowright'] || this.keys['d'] || this.touches.right || 
-                       (this.gamepad && this.gamepad.axes[0] > 0.3);
             case 'gas':
                 return this.keys['arrowup'] || this.keys['w'] || this.keys[' '] || this.touches.gas || 
                        (this.gamepad && (this.gamepad.buttons[0].pressed || this.gamepad.axes[1] < -0.3));
@@ -97,11 +119,19 @@ class InputManager {
     
     getSteeringInput() {
         let steering = 0;
-        if (this.isPressed('left')) steering -= 1;
-        if (this.isPressed('right')) steering += 1;
         
+        // Keyboard input
+        if (this.keys['arrowleft'] || this.keys['a']) steering -= 1;
+        if (this.keys['arrowright'] || this.keys['d']) steering += 1;
+        
+        // Gamepad input
         if (this.gamepad && Math.abs(this.gamepad.axes[0]) > 0.1) {
             steering = this.gamepad.axes[0];
+        }
+        
+        // Virtual joystick input (mobile)
+        if (this.joystick && Math.abs(this.joystickInput.x) > 0.1) {
+            steering = this.joystickInput.x;
         }
         
         return Utils.clamp(steering, -1, 1);

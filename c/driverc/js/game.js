@@ -158,6 +158,10 @@ class Game {
         
         if (Utils.isMobile()) {
             document.getElementById('controls').style.display = 'flex';
+            document.getElementById('joystickContainer').style.display = 'block';
+        } else {
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('joystickContainer').style.display = 'none';
         }
         
         this.gameLoop();
@@ -175,6 +179,7 @@ class Game {
     finishRace() {
         this.gameState = 'finished';
         document.getElementById('controls').style.display = 'none';
+        document.getElementById('joystickContainer').style.display = 'none';
         
         document.getElementById('finalTime').textContent = Utils.formatTime(this.totalRaceTime);
         document.getElementById('bestLap').textContent = Utils.formatTime(this.car.bestLapTime);
