@@ -2,10 +2,10 @@ class Track {
     constructor() {
         this.tiles = [];
         this.checkpoints = [];
-        this.startPosition = { x: 800, y: 600 };
-        this.tileSize = 128; // Doubled from 64
-        this.width = 40; // Doubled from 20
-        this.height = 30; // Doubled from 15
+        this.startPosition = { x: 1600, y: 1200 };
+        this.tileSize = 128;
+        this.width = 80; // Quadrupled from original 20
+        this.height = 60; // Quadrupled from original 15
         
         this.generateTrack();
     }
@@ -35,7 +35,7 @@ class Track {
     setupCheckpoints() {
         const centerX = this.width / 2;
         const centerY = this.height / 2;
-        const radius = 8; // Doubled for larger track
+        const radius = 16; // Increased for much larger track
         
         for (let i = 0; i < 8; i++) {
             const angle = (i / 8) * Math.PI * 2;
@@ -54,8 +54,8 @@ class Track {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 const worldPos = Utils.worldToIso(x, y);
-                const renderX = worldPos.x + 800; // Adjusted for larger map
-                const renderY = worldPos.y + 400; // Adjusted for larger map
+                const renderX = worldPos.x + 1600; // Adjusted for much larger map
+                const renderY = worldPos.y + 800; // Adjusted for much larger map
                 
                 if (!camera.isVisible(renderX, renderY, this.tileSize, this.tileSize)) {
                     continue;

@@ -8,8 +8,8 @@ class Car {
         this.acceleration = 250; // Increased for better responsiveness
         this.friction = 75; // Increased proportionally
         this.turnSpeed = 2.5; // Slightly increased for better handling
-        this.width = 48; // Increased from 32
-        this.height = 24; // Increased from 16
+        this.width = 24; // Reduced for better scale
+        this.height = 12; // Reduced for better scale
         
         this.velocity = { x: 0, y: 0 };
         this.drift = 0;
@@ -167,7 +167,7 @@ class Car {
         if (assetManager) {
             const carSprite = assetManager.getCarSprite(this.angle);
             if (carSprite) {
-                const scale = 1.5; // Increased from 0.8 to 1.5 for better visibility
+                const scale = 0.6; // Reduced for better proportion
                 const width = carSprite.width * scale;
                 const height = carSprite.height * scale;
                 

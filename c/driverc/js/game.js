@@ -5,7 +5,7 @@ class Game {
         this.input = new InputManager();
         this.camera = new Camera(this.canvas);
         this.track = new Track();
-        this.car = new Car(800, 600); // Adjusted for larger map
+        this.car = new Car(1600, 1200); // Adjusted for much larger map
         this.assetManager = new AssetManager();
         
         this.gameState = 'menu'; // menu, playing, paused, finished
@@ -153,7 +153,7 @@ class Game {
         
         this.gameState = 'playing';
         this.totalRaceTime = 0;
-        this.car.reset(800, 600); // Adjusted for larger map
+        this.car.reset(1600, 1200); // Adjusted for much larger map
         this.track.resetCheckpoints();
         
         if (Utils.isMobile()) {

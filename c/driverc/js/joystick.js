@@ -56,7 +56,8 @@ class VirtualJoystick {
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            opacity: ${this.options.alwaysVisible ? '1' : '0.3'};
+            opacity: 1;
+            visibility: visible;
         `;
         
         // Stick (inner circle)
@@ -180,12 +181,15 @@ class VirtualJoystick {
     
     show() {
         this.baseElement.style.opacity = '1';
-        this.baseElement.style.transform = 'scale(1)';
+        this.baseElement.style.visibility = 'visible';
+        this.baseElement.style.transform = 'translate(-50%, -50%) scale(1)';
     }
     
     hide() {
-        this.baseElement.style.opacity = '0.3';
-        this.baseElement.style.transform = 'scale(0.8)';
+        // Don't actually hide on mobile, just make slightly transparent
+        this.baseElement.style.opacity = '0.7';
+        this.baseElement.style.visibility = 'visible';
+        this.baseElement.style.transform = 'translate(-50%, -50%) scale(0.9)';
     }
     
     getState() {
