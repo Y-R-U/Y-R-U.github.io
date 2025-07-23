@@ -18,7 +18,8 @@ class InputManager {
             if (container) {
                 this.joystick = new VirtualJoystick(container, {
                     size: 120,
-                    fadeOnIdle: true
+                    fadeOnIdle: false,
+                    alwaysVisible: true
                 });
                 
                 this.joystick.on('move', (state) => {

@@ -5,6 +5,7 @@ class VirtualJoystick {
             size: options.size || 120,
             threshold: options.threshold || 10,
             fadeOnIdle: options.fadeOnIdle !== false,
+            alwaysVisible: options.alwaysVisible || false,
             ...options
         };
         
@@ -30,7 +31,12 @@ class VirtualJoystick {
     init() {
         this.createElements();
         this.bindEvents();
-        this.hide();
+        
+        if (this.options.alwaysVisible) {
+            this.show();
+        } else {
+            this.hide();
+        }
     }
     
     createElements() {
@@ -42,11 +48,15 @@ class VirtualJoystick {
             width: ${this.options.size}px;
             height: ${this.options.size}px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(10px);
-            pointer-events: none;
+            pointer-events: all;
             z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: ${this.options.alwaysVisible ? '1' : '0.3'};
         `;
         
         // Stick (inner circle)
@@ -76,11 +86,7 @@ class VirtualJoystick {
             const touch = e.touches ? e.touches[0] : e;
             
             this.pressed = true;
-            this.baseX = touch.clientX - this.options.size / 2;
-            this.baseY = touch.clientY - this.options.size / 2;
-            
             this.show();
-            this.positionBase(this.baseX, this.baseY);
             this.updateStick(touch.clientX, touch.clientY);
             
             this.trigger('start', this.getState());
@@ -117,24 +123,33 @@ class VirtualJoystick {
         };
         
         // Touch events
-        this.container.addEventListener('touchstart', handleStart, { passive: false });
+        this.baseElement.addEventListener('touchstart', handleStart, { passive: false });
         document.addEventListener('touchmove', handleMove, { passive: false });
         document.addEventListener('touchend', handleEnd, { passive: false });
+        document.addEventListener('touchcancel', handleEnd, { passive: false });
         
         // Mouse events for desktop testing
-        this.container.addEventListener('mousedown', handleStart);
+        this.baseElement.addEventListener('mousedown', handleStart);
         document.addEventListener('mousemove', handleMove);
         document.addEventListener('mouseup', handleEnd);
+        
+        // Prevent context menu
+        this.baseElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
     }
     
     positionBase(x, y) {
         this.baseElement.style.left = x + 'px';
         this.baseElement.style.top = y + 'px';
+        this.baseElement.style.transform = 'none'; // Remove centering transform when positioning
     }
     
     updateStick(touchX, touchY) {
-        const centerX = this.baseX + this.options.size / 2;
-        const centerY = this.baseY + this.options.size / 2;
+        // Get container rect and calculate relative position
+        const containerRect = this.container.getBoundingClientRect();
+        const centerX = containerRect.left + containerRect.width / 2;
+        const centerY = containerRect.top + containerRect.height / 2;
         
         this.deltaX = touchX - centerX;
         this.deltaY = touchY - centerY;
