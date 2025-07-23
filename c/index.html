@@ -90,9 +90,8 @@
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
             gap: 30px;
-            height: 100%;
+            align-items: start;
         }
         
         .projects-list {
@@ -110,6 +109,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
         }
         
         .project-card:hover {
@@ -262,9 +263,7 @@
             
             .projects-grid {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto;
                 gap: 20px;
-                height: auto;
             }
             
             .project-card {
