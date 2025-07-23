@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Shooter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        #gameScreen {
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 600px;
+            background: linear-gradient(180deg, #001122 0%, #000033 100%);
+            cursor: crosshair;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 20;
+        }
+        
+        #gameOverScreen {
+            display: none;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 32px; }
+            p { font-size: 18px; }
+            #ui { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <svg id="gameScreen" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+        
+        <div id="ui">
+            <div>Score: <span id="score">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+        </div>
+        
+        <div id="startScreen">
+            <h1>Hi, Simple Shooter</h1>
+            <p>Tap to aim and shoot</p>
+            <p>Tap anywhere to start</p>
+        </div>
+        
+        <div id="gameOverScreen">
+            <h1>Game Over</h1>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p>Tap to restart</p>
+        </div>
+    </div>
+
+    <script>
+        class SimpleShooter {
+            constructor() {
+                this.svg = document.getElementById('gameScreen');
+                this.startScreen = document.getElementById('startScreen');
+                this.gameOverScreen = document.getElementById('gameOverScreen');
+                this.scoreElement = document.getElementById('score');
+                this.levelElement = document.getElementById('level');
+                this.finalScoreElement = document.getElementById('finalScore');
+                
+                this.gameState = 'start';
+                this.score = 0;
+                this.level = 1;
+                this.enemies = [];
+                this.bullets = [];
+                this.turret = { x: 400, y: 550, angle: 0 };
+                this.enemySpeed = 1;
+                this.enemyCount = 4;
+                
+                this.init();
+            }
+            
+            init() {
+                this.createTurret();
+                this.setupEventListeners();
+                this.gameLoop();
+            }
+            
+            setupEventListeners() {
+                const handleClick = (e) => {
+                    if (this.gameState === 'start') {
+                        this.startGame();
+                    } else if (this.gameState === 'gameOver') {
+                        this.restartGame();
+                    } else if (this.gameState === 'playing') {
+                        this.handleShoot(e);
+                    }
+                };
+                
+                const handleTouch = (e) => {
+                    e.preventDefault();
+                    handleClick(e.touches[0]);
+                };
+                
+                this.svg.addEventListener('click', handleClick);
+                this.svg.addEventListener('touchstart', handleTouch);
+                
+                this.startScreen.addEventListener('click', handleClick);
+                this.startScreen.addEventListener('touchstart', handleTouch);
+                
+                this.gameOverScreen.addEventListener('click', handleClick);
+                this.gameOverScreen.addEventListener('touchstart', handleTouch);
+            }
+            
+            createTurret() {
+                const turretGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                turretGroup.id = 'turret';
+                turretGroup.setAttribute('transform', `translate(${this.turret.x}, ${this.turret.y})`);
+                
+                const base = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                base.setAttribute('cx', '0');
+                base.setAttribute('cy', '0');
+                base.setAttribute('r', '20');
+                base.setAttribute('fill', '#4a9eff');
+                base.setAttribute('filter', 'url(#glow)');
+                
+                const barrel = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                barrel.id = 'barrel';
+                barrel.setAttribute('x', '-3');
+                barrel.setAttribute('y', '-30');
+                barrel.setAttribute('width', '6');
+                barrel.setAttribute('height', '30');
+                barrel.setAttribute('fill', '#ffffff');
+                barrel.setAttribute('filter', 'url(#glow)');
+                
+                turretGroup.appendChild(base);
+                turretGroup.appendChild(barrel);
+                this.svg.appendChild(turretGroup);
+            }
+            
+            startGame() {
+                this.gameState = 'playing';
+                this.startScreen.style.display = 'none';
+                this.spawnEnemies();
+            }
+            
+            restartGame() {
+                this.gameState = 'playing';
+                this.gameOverScreen.style.display = 'none';
+                this.score = 0;
+                this.level = 1;
+                this.enemySpeed = 1;
+                this.enemyCount = 4;
+                this.enemies = [];
+                this.bullets = [];
+                this.updateUI();
+                this.clearSVG();
+                this.createTurret();
+                this.spawnEnemies();
+            }
+            
+            handleShoot(e) {
+                const rect = this.svg.getBoundingClientRect();
+                const scaleX = 800 / rect.width;
+                const scaleY = 600 / rect.height;
+                const targetX = (e.clientX - rect.left) * scaleX;
+                const targetY = (e.clientY - rect.top) * scaleY;
+                
+                const dx = targetX - this.turret.x;
+                const dy = targetY - this.turret.y;
+                const angle = Math.atan2(dy, dx);
+                
+                this.turret.angle = angle;
+                this.updateTurretRotation();
+                this.createBullet(angle);
+            }
+            
+            updateTurretRotation() {
+                const turretElement = document.getElementById('turret');
+                const degrees = (this.turret.angle * 180 / Math.PI) + 90;
+                turretElement.setAttribute('transform', 
+                    `translate(${this.turret.x}, ${this.turret.y}) rotate(${degrees})`);
+            }
+            
+            createBullet(angle) {
+                const bullet = {
+                    x: this.turret.x,
+                    y: this.turret.y,
+                    vx: Math.cos(angle) * 8,
+                    vy: Math.sin(angle) * 8,
+                    element: null
+                };
+                
+                const bulletElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                bulletElement.setAttribute('cx', bullet.x);
+                bulletElement.setAttribute('cy', bullet.y);
+                bulletElement.setAttribute('r', '3');
+                bulletElement.setAttribute('fill', '#ffff00');
+                bulletElement.setAttribute('filter', 'url(#glow)');
+                bulletElement.classList.add('bullet');
+                
+                bullet.element = bulletElement;
+                this.bullets.push(bullet);
+                this.svg.appendChild(bulletElement);
+            }
+            
+            spawnEnemies() {
+                for (let i = 0; i < this.enemyCount; i++) {
+                    const enemy = {
+                        x: Math.random() * 700 + 50,
+                        y: Math.random() * 100 + 50,
+                        vx: (Math.random() - 0.5) * this.enemySpeed,
+                        vy: Math.random() * this.enemySpeed + 0.5,
+                        element: null
+                    };
+                    
+                    const enemyElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    enemyElement.setAttribute('points', '0,-15 -10,10 10,10');
+                    enemyElement.setAttribute('fill', '#ff4444');
+                    enemyElement.setAttribute('filter', 'url(#glow)');
+                    enemyElement.setAttribute('transform', `translate(${enemy.x}, ${enemy.y})`);
+                    enemyElement.classList.add('enemy');
+                    
+                    enemy.element = enemyElement;
+                    this.enemies.push(enemy);
+                    this.svg.appendChild(enemyElement);
+                }
+            }
+            
+            updateBullets() {
+                this.bullets = this.bullets.filter(bullet => {
+                    bullet.x += bullet.vx;
+                    bullet.y += bullet.vy;
+                    
+                    if (bullet.x < 0 || bullet.x > 800 || bullet.y < 0 || bullet.y > 600) {
+                        bullet.element.remove();
+                        return false;
+                    }
+                    
+                    bullet.element.setAttribute('cx', bullet.x);
+                    bullet.element.setAttribute('cy', bullet.y);
+                    return true;
+                });
+            }
+            
+            updateEnemies() {
+                this.enemies.forEach(enemy => {
+                    enemy.x += enemy.vx;
+                    enemy.y += enemy.vy;
+                    
+                    if (enemy.x < 0 || enemy.x > 800) enemy.vx *= -1;
+                    if (enemy.y > 500) {
+                        this.gameOver();
+                        return;
+                    }
+                    
+                    enemy.element.setAttribute('transform', `translate(${enemy.x}, ${enemy.y})`);
+                });
+            }
+            
+            checkCollisions() {
+                this.bullets.forEach((bullet, bulletIndex) => {
+                    this.enemies.forEach((enemy, enemyIndex) => {
+                        const dx = bullet.x - enemy.x;
+                        const dy = bullet.y - enemy.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 20) {
+                            bullet.element.remove();
+                            enemy.element.remove();
+                            this.bullets.splice(bulletIndex, 1);
+                            this.enemies.splice(enemyIndex, 1);
+                            this.score += 10;
+                            this.updateUI();
+                        }
+                    });
+                });
+                
+                if (this.enemies.length === 0) {
+                    this.nextLevel();
+                }
+            }
+            
+            nextLevel() {
+                this.level++;
+                this.enemyCount++;
+                this.enemySpeed += 0.3;
+                this.spawnEnemies();
+                this.updateUI();
+            }
+            
+            gameOver() {
+                this.gameState = 'gameOver';
+                this.finalScoreElement.textContent = this.score;
+                this.gameOverScreen.style.display = 'flex';
+            }
+            
+            updateUI() {
+                this.scoreElement.textContent = this.score;
+                this.levelElement.textContent = this.level;
+            }
+            
+            clearSVG() {
+                const elements = this.svg.querySelectorAll('.bullet, .enemy');
+                elements.forEach(el => el.remove());
+            }
+            
+            gameLoop() {
+                if (this.gameState === 'playing') {
+                    this.updateBullets();
+                    this.updateEnemies();
+                    this.checkCollisions();
+                }
+                requestAnimationFrame(() => this.gameLoop());
+            }
+        }
+        
+        new SimpleShooter();
+    </script>
+</body>
+</html>
