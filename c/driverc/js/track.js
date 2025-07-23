@@ -2,10 +2,10 @@ class Track {
     constructor() {
         this.tiles = [];
         this.checkpoints = [];
-        this.startPosition = { x: 400, y: 300 };
-        this.tileSize = 64;
-        this.width = 20;
-        this.height = 15;
+        this.startPosition = { x: 800, y: 600 };
+        this.tileSize = 128; // Doubled from 64
+        this.width = 40; // Doubled from 20
+        this.height = 30; // Doubled from 15
         
         this.generateTrack();
     }
@@ -35,7 +35,7 @@ class Track {
     setupCheckpoints() {
         const centerX = this.width / 2;
         const centerY = this.height / 2;
-        const radius = 4;
+        const radius = 8; // Doubled for larger track
         
         for (let i = 0; i < 8; i++) {
             const angle = (i / 8) * Math.PI * 2;
@@ -54,8 +54,8 @@ class Track {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 const worldPos = Utils.worldToIso(x, y);
-                const renderX = worldPos.x + 400;
-                const renderY = worldPos.y + 200;
+                const renderX = worldPos.x + 800; // Adjusted for larger map
+                const renderY = worldPos.y + 400; // Adjusted for larger map
                 
                 if (!camera.isVisible(renderX, renderY, this.tileSize, this.tileSize)) {
                     continue;
@@ -77,36 +77,38 @@ class Track {
             case 'road':
                 const roadSprite = assetManager?.getImage(`road_straight_${direction}`);
                 if (roadSprite) {
-                    ctx.drawImage(roadSprite, x, y);
+                    // Scale the road sprite to match new tile size
+                    ctx.drawImage(roadSprite, x, y, this.tileSize, this.tileSize/2);
                 } else {
                     // Fallback
                     ctx.fillStyle = '#555555';
-                    this.drawIsometricTile(ctx, x, y, 64, 32);
+                    this.drawIsometricTile(ctx, x, y, this.tileSize, this.tileSize/2);
                     ctx.fillStyle = '#777777';
-                    this.drawIsometricTile(ctx, x + 4, y + 2, 56, 28);
+                    this.drawIsometricTile(ctx, x + 8, y + 4, this.tileSize-16, this.tileSize/2-8);
                 }
                 break;
                 
             case 'grass':
                 const grassSprite = assetManager?.getImage(`grass_${direction}`);
                 if (grassSprite) {
-                    ctx.drawImage(grassSprite, x, y);
+                    // Scale the grass sprite to match new tile size
+                    ctx.drawImage(grassSprite, x, y, this.tileSize, this.tileSize/2);
                 } else {
                     // Fallback
                     ctx.fillStyle = '#4CAF50';
-                    this.drawIsometricTile(ctx, x, y, 64, 32);
+                    this.drawIsometricTile(ctx, x, y, this.tileSize, this.tileSize/2);
                 }
                 break;
                 
             case 'tree':
                 const grassTreeSprite = assetManager?.getImage(`grass_${direction}`);
                 if (grassTreeSprite) {
-                    ctx.drawImage(grassTreeSprite, x, y);
+                    ctx.drawImage(grassTreeSprite, x, y, this.tileSize, this.tileSize/2);
                 }
                 
                 const pylonSprite = assetManager?.getImage(`pylon_${direction}`);
                 if (pylonSprite) {
-                    ctx.drawImage(pylonSprite, x, y);
+                    ctx.drawImage(pylonSprite, x, y, this.tileSize, this.tileSize/2);
                 } else {
                     // Fallback tree
                     ctx.fillStyle = '#8D6E63';
@@ -156,7 +158,7 @@ class Track {
             ctx.lineWidth = 3;
             ctx.setLineDash([5, 5]);
             
-            const size = 30;
+            const size = 60; // Doubled for larger scale
             ctx.strokeRect(
                 checkpoint.x - size / 2,
                 checkpoint.y - size / 2,
@@ -195,7 +197,7 @@ class Track {
             if (checkpoint.passed) continue;
             
             const distance = Utils.distance(x, y, checkpoint.x, checkpoint.y);
-            if (distance < 30) {
+            if (distance < 60) { // Doubled checkpoint size for larger scale
                 checkpoint.passed = true;
                 return i;
             }

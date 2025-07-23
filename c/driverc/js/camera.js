@@ -18,9 +18,9 @@ class Camera {
         this.x = Utils.lerp(this.x, this.targetX, this.smoothing);
         this.y = Utils.lerp(this.y, this.targetY, this.smoothing);
         
-        const baseZoom = Math.min(this.canvas.width / 1200, this.canvas.height / 800);
-        const speedZoom = 1 - (speed * 0.0005);
-        this.targetZoom = Utils.clamp(baseZoom * speedZoom, 0.5, 2);
+        const baseZoom = Math.min(this.canvas.width / 2400, this.canvas.height / 1600); // Adjusted for larger map
+        const speedZoom = 1 - (speed * 0.0003); // Reduced speed zoom effect
+        this.targetZoom = Utils.clamp(baseZoom * speedZoom, 0.3, 1.5); // Adjusted zoom limits
         
         this.zoom = Utils.lerp(this.zoom, this.targetZoom, this.zoomSmoothing);
     }

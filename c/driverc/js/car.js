@@ -4,12 +4,12 @@ class Car {
         this.y = y;
         this.angle = 0;
         this.speed = 0;
-        this.maxSpeed = 300;
-        this.acceleration = 200;
-        this.friction = 50;
-        this.turnSpeed = 2;
-        this.width = 32;
-        this.height = 16;
+        this.maxSpeed = 400; // Increased for larger map
+        this.acceleration = 250; // Increased for better responsiveness
+        this.friction = 75; // Increased proportionally
+        this.turnSpeed = 2.5; // Slightly increased for better handling
+        this.width = 48; // Increased from 32
+        this.height = 24; // Increased from 16
         
         this.velocity = { x: 0, y: 0 };
         this.drift = 0;
@@ -68,7 +68,7 @@ class Car {
         this.x += this.velocity.x * deltaTime;
         this.y += this.velocity.y * deltaTime;
         
-        if (Math.abs(this.speed) > 150) {
+        if (Math.abs(this.speed) > 200) { // Adjusted threshold for larger scale
             this.addSkidMark();
         }
     }
@@ -107,8 +107,8 @@ class Car {
                 
                 const bounceX = Math.cos(this.angle + Math.PI);
                 const bounceY = Math.sin(this.angle + Math.PI);
-                this.x += bounceX * 5;
-                this.y += bounceY * 5;
+                this.x += bounceX * 10; // Doubled bounce distance
+                this.y += bounceY * 10;
                 break;
             }
         }
@@ -167,7 +167,7 @@ class Car {
         if (assetManager) {
             const carSprite = assetManager.getCarSprite(this.angle);
             if (carSprite) {
-                const scale = 0.8;
+                const scale = 1.5; // Increased from 0.8 to 1.5 for better visibility
                 const width = carSprite.width * scale;
                 const height = carSprite.height * scale;
                 
