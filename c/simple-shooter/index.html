@@ -139,6 +139,9 @@
                 this.enemySpeed = 1;
                 this.enemyCount = 4;
                 this.gameOverDelay = false;
+                this.isHolding = false;
+                this.shootInterval = null;
+                this.lastShootTarget = { x: 0, y: 0 };
                 
                 this.init();
             }
@@ -155,24 +158,56 @@
                         this.startGame();
                     } else if (this.gameState === 'gameOver' && !this.gameOverDelay) {
                         this.restartGame();
-                    } else if (this.gameState === 'playing') {
-                        this.handleShoot(e);
                     }
                 };
                 
-                const handleTouch = (e) => {
-                    e.preventDefault();
-                    handleClick(e.touches[0]);
+                const handleMouseDown = (e) => {
+                    if (this.gameState === 'playing') {
+                        this.startShooting(e);
+                    } else {
+                        handleClick(e);
+                    }
                 };
                 
-                this.svg.addEventListener('click', handleClick);
-                this.svg.addEventListener('touchstart', handleTouch);
+                const handleMouseUp = (e) => {
+                    if (this.gameState === 'playing') {
+                        this.stopShooting();
+                    }
+                };
+                
+                const handleTouchStart = (e) => {
+                    e.preventDefault();
+                    if (this.gameState === 'playing') {
+                        this.startShooting(e.touches[0]);
+                    } else {
+                        handleClick(e.touches[0]);
+                    }
+                };
+                
+                const handleTouchEnd = (e) => {
+                    e.preventDefault();
+                    if (this.gameState === 'playing') {
+                        this.stopShooting();
+                    }
+                };
+                
+                this.svg.addEventListener('mousedown', handleMouseDown);
+                this.svg.addEventListener('mouseup', handleMouseUp);
+                this.svg.addEventListener('mouseleave', handleMouseUp);
+                this.svg.addEventListener('touchstart', handleTouchStart);
+                this.svg.addEventListener('touchend', handleTouchEnd);
                 
                 this.startScreen.addEventListener('click', handleClick);
-                this.startScreen.addEventListener('touchstart', handleTouch);
+                this.startScreen.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleClick(e.touches[0]);
+                });
                 
                 this.gameOverScreen.addEventListener('click', handleClick);
-                this.gameOverScreen.addEventListener('touchstart', handleTouch);
+                this.gameOverScreen.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleClick(e.touches[0]);
+                });
             }
             
             createTurret() {
@@ -212,6 +247,8 @@
                 this.gameOverScreen.style.display = 'none';
                 this.gameOverScreen.classList.remove('disabled');
                 this.gameOverDelay = false;
+                this.isHolding = false;
+                this.shootInterval = null;
                 this.score = 0;
                 this.level = 1;
                 this.enemySpeed = 1;
@@ -238,6 +275,34 @@
                 this.turret.angle = angle;
                 this.updateTurretRotation();
                 this.createBullet(angle);
+            }
+            
+            startShooting(e) {
+                if (this.isHolding) return;
+                
+                this.isHolding = true;
+                this.handleShoot(e);
+                
+                this.lastShootTarget.x = e.clientX;
+                this.lastShootTarget.y = e.clientY;
+                
+                this.shootInterval = setInterval(() => {
+                    if (this.gameState === 'playing') {
+                        const fakeEvent = {
+                            clientX: this.lastShootTarget.x,
+                            clientY: this.lastShootTarget.y
+                        };
+                        this.handleShoot(fakeEvent);
+                    }
+                }, 150);
+            }
+            
+            stopShooting() {
+                this.isHolding = false;
+                if (this.shootInterval) {
+                    clearInterval(this.shootInterval);
+                    this.shootInterval = null;
+                }
             }
             
             updateTurretRotation() {
@@ -356,6 +421,7 @@
             
             gameOver() {
                 this.gameState = 'gameOver';
+                this.stopShooting();
                 this.finalScoreElement.textContent = this.score;
                 this.gameOverScreen.style.display = 'flex';
                 this.gameOverScreen.classList.add('disabled');

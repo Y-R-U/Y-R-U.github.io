@@ -101,10 +101,6 @@
             backdrop-filter: blur(10px);
         }
         
-        .projects-list.active {
-            display: block !important;
-        }
-        
         .project-card {
             background: rgba(255,255,255,0.95);
             border-radius: 15px;
@@ -331,7 +327,7 @@
     <script>
         function showGrid() {
             document.getElementById('gridView').style.display = 'grid';
-            document.getElementById('listView').classList.remove('active');
+            document.getElementById('listView').style.display = 'none';
             
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -339,7 +335,7 @@
         
         function showList() {
             document.getElementById('gridView').style.display = 'none';
-            document.getElementById('listView').classList.add('active');
+            document.getElementById('listView').style.display = 'block';
             
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
