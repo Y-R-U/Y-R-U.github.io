@@ -89,8 +89,10 @@
         
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
             gap: 30px;
+            height: 100%;
         }
         
         .projects-list {
@@ -123,12 +125,16 @@
             margin-bottom: 20px;
             overflow: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .project-screenshot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
         }
         
         .screenshot-placeholder {
@@ -214,7 +220,7 @@
         .list-screenshot img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
         
         .list-content {
@@ -256,7 +262,9 @@
             
             .projects-grid {
                 grid-template-columns: 1fr;
+                grid-template-rows: auto;
                 gap: 20px;
+                height: auto;
             }
             
             .project-card {

@@ -35,6 +35,8 @@
             max-height: 600px;
             background: linear-gradient(180deg, #001122 0%, #000033 100%);
             cursor: crosshair;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.1);
         }
         
         #ui {
@@ -169,6 +171,12 @@
                     }
                 };
                 
+                const handleMouseMove = (e) => {
+                    if (this.gameState === 'playing' && this.isHolding) {
+                        this.updateAim(e);
+                    }
+                };
+                
                 const handleMouseUp = (e) => {
                     if (this.gameState === 'playing') {
                         this.stopShooting();
@@ -184,6 +192,13 @@
                     }
                 };
                 
+                const handleTouchMove = (e) => {
+                    e.preventDefault();
+                    if (this.gameState === 'playing' && this.isHolding) {
+                        this.updateAim(e.touches[0]);
+                    }
+                };
+                
                 const handleTouchEnd = (e) => {
                     e.preventDefault();
                     if (this.gameState === 'playing') {
@@ -192,9 +207,11 @@
                 };
                 
                 this.svg.addEventListener('mousedown', handleMouseDown);
+                this.svg.addEventListener('mousemove', handleMouseMove);
                 this.svg.addEventListener('mouseup', handleMouseUp);
                 this.svg.addEventListener('mouseleave', handleMouseUp);
                 this.svg.addEventListener('touchstart', handleTouchStart);
+                this.svg.addEventListener('touchmove', handleTouchMove);
                 this.svg.addEventListener('touchend', handleTouchEnd);
                 
                 this.startScreen.addEventListener('click', handleClick);
@@ -282,9 +299,7 @@
                 
                 this.isHolding = true;
                 this.handleShoot(e);
-                
-                this.lastShootTarget.x = e.clientX;
-                this.lastShootTarget.y = e.clientY;
+                this.updateAim(e);
                 
                 this.shootInterval = setInterval(() => {
                     if (this.gameState === 'playing') {
@@ -295,6 +310,24 @@
                         this.handleShoot(fakeEvent);
                     }
                 }, 150);
+            }
+            
+            updateAim(e) {
+                this.lastShootTarget.x = e.clientX;
+                this.lastShootTarget.y = e.clientY;
+                
+                const rect = this.svg.getBoundingClientRect();
+                const scaleX = 800 / rect.width;
+                const scaleY = 600 / rect.height;
+                const targetX = (e.clientX - rect.left) * scaleX;
+                const targetY = (e.clientY - rect.top) * scaleY;
+                
+                const dx = targetX - this.turret.x;
+                const dy = targetY - this.turret.y;
+                const angle = Math.atan2(dy, dx);
+                
+                this.turret.angle = angle;
+                this.updateTurretRotation();
             }
             
             stopShooting() {
@@ -396,6 +429,7 @@
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         
                         if (distance < 20) {
+                            this.createExplosion(enemy.x, enemy.y);
                             bullet.element.remove();
                             enemy.element.remove();
                             this.bullets.splice(bulletIndex, 1);
@@ -438,8 +472,33 @@
                 this.levelElement.textContent = this.level;
             }
             
+            createExplosion(x, y) {
+                const explosion = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                explosion.setAttribute('cx', x);
+                explosion.setAttribute('cy', y);
+                explosion.setAttribute('r', '0');
+                explosion.setAttribute('fill', '#ffaa00');
+                explosion.setAttribute('filter', 'url(#glow)');
+                explosion.classList.add('explosion');
+                this.svg.appendChild(explosion);
+                
+                let size = 0;
+                const animate = () => {
+                    size += 3;
+                    explosion.setAttribute('r', size);
+                    explosion.setAttribute('fill-opacity', Math.max(0, 1 - size / 30));
+                    
+                    if (size < 30) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        explosion.remove();
+                    }
+                };
+                requestAnimationFrame(animate);
+            }
+            
             clearSVG() {
-                const elements = this.svg.querySelectorAll('.bullet, .enemy');
+                const elements = this.svg.querySelectorAll('.bullet, .enemy, .explosion');
                 elements.forEach(el => el.remove());
             }
             
