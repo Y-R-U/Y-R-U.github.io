@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriverC - Isometric Racing</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div id="hud">
+                <div class="hud-item">
+                    <span class="label">Speed:</span>
+                    <span id="speed">0</span> km/h
+                </div>
+                <div class="hud-item">
+                    <span class="label">Lap:</span>
+                    <span id="lap">1</span>/3
+                </div>
+                <div class="hud-item">
+                    <span class="label">Time:</span>
+                    <span id="time">00:00</span>
+                </div>
+            </div>
+            
+            <div id="controls" class="mobile-controls">
+                <div class="control-group">
+                    <button id="leftBtn" class="control-btn">←</button>
+                    <div class="control-spacer"></div>
+                    <button id="rightBtn" class="control-btn">→</button>
+                </div>
+                <div class="control-group">
+                    <button id="brakeBtn" class="control-btn brake">Brake</button>
+                    <button id="gasBtn" class="control-btn gas">Gas</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="startScreen" class="screen">
+            <h1>DriverC</h1>
+            <p>Isometric Racing Game</p>
+            <div class="start-options">
+                <button id="startRace" class="menu-btn">Start Race</button>
+                <button id="instructions" class="menu-btn">Instructions</button>
+            </div>
+        </div>
+        
+        <div id="instructionsScreen" class="screen" style="display: none;">
+            <h2>How to Play</h2>
+            <div class="instructions">
+                <p><strong>Desktop:</strong></p>
+                <ul>
+                    <li>Arrow Keys or WASD to steer</li>
+                    <li>Space or Up Arrow for gas</li>
+                    <li>Ctrl or Down Arrow for brake</li>
+                </ul>
+                <p><strong>Mobile:</strong></p>
+                <ul>
+                    <li>Use on-screen controls</li>
+                    <li>Tilt device for steering (optional)</li>
+                </ul>
+                <p><strong>Goal:</strong> Complete 3 laps as fast as possible!</p>
+            </div>
+            <button id="backBtn" class="menu-btn">Back</button>
+        </div>
+        
+        <div id="gameOverScreen" class="screen" style="display: none;">
+            <h2>Race Complete!</h2>
+            <div id="results">
+                <p>Final Time: <span id="finalTime">00:00</span></p>
+                <p>Best Lap: <span id="bestLap">00:00</span></p>
+            </div>
+            <button id="restartBtn" class="menu-btn">Race Again</button>
+        </div>
+        
+        <div id="loadingScreen" class="screen" style="display: none;">
+            <h2>Loading Assets...</h2>
+            <div class="loading-bar">
+                <div id="loadingProgress" class="loading-fill"></div>
+            </div>
+            <p id="loadingText">Loading game assets...</p>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/track.js"></script>
+    <script src="js/car.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

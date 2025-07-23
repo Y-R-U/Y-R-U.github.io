@@ -1,0 +1,296 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+}
+
+#gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameCanvas {
+    background: #87CEEB;
+    border: 2px solid #34495e;
+    border-radius: 8px;
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+#ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.hud-item {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.label {
+    color: #bdc3c7;
+}
+
+.mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: auto;
+}
+
+.control-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.control-spacer {
+    width: 60px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(52, 73, 94, 0.8);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.control-btn:hover {
+    background: rgba(52, 73, 94, 0.9);
+    transform: scale(1.05);
+}
+
+.control-btn:active {
+    background: rgba(52, 73, 94, 1);
+    transform: scale(0.95);
+}
+
+.control-btn.gas {
+    background: rgba(46, 204, 113, 0.8);
+}
+
+.control-btn.gas:hover {
+    background: rgba(46, 204, 113, 0.9);
+}
+
+.control-btn.brake {
+    background: rgba(231, 76, 60, 0.8);
+}
+
+.control-btn.brake:hover {
+    background: rgba(231, 76, 60, 0.9);
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.screen h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.screen h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.screen p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #bdc3c7;
+}
+
+.start-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.menu-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.menu-btn:active {
+    transform: translateY(0);
+}
+
+.instructions {
+    text-align: left;
+    max-width: 400px;
+    margin-bottom: 30px;
+}
+
+.instructions ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin: 5px 0;
+}
+
+#results {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+}
+
+#results p {
+    margin: 10px 0;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.loading-fill {
+    height: 100%;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Desktop-specific styles */
+@media (min-width: 768px) {
+    .mobile-controls {
+        display: none;
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+    .screen h1 {
+        font-size: 2.5rem;
+    }
+    
+    .screen h2 {
+        font-size: 2rem;
+    }
+    
+    .hud {
+        top: 10px;
+        left: 10px;
+    }
+    
+    .hud-item {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .mobile-controls {
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .control-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
+    }
+    
+    .control-spacer {
+        width: 40px;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    .mobile-controls {
+        bottom: 5px;
+        right: 5px;
+    }
+    
+    .control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 14px;
+    }
+    
+    .hud {
+        top: 5px;
+        left: 5px;
+    }
+}
