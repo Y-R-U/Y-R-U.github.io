@@ -155,7 +155,7 @@
   const rtcConfig = (() => {
     const servers = [{ urls: ["stun:stun.l.google.com:19302"] }];
     if (TURN_URL && TURN_USER && TURN_PASS) servers.push({ urls: [TURN_URL], username: TURN_USER, credential: TURN_PASS });
-    return { iceServers: servers /*, iceTransportPolicy: "all" (default) */ };
+    return { iceServers: servers };
   })();
 
   function candType(c){ if(!c||!c.candidate) return "?"; const m=c.candidate.match(/ typ (\w+) /); return m?m[1]:"?"; } // host|srflx|relay
@@ -180,7 +180,6 @@
   }
 
   async function periodicStats(pc, role, until="connected"){
-    // Poll getStats a few times to explain what’s going on.
     let tries = 0;
     const timer = setInterval(async () => {
       tries++;
@@ -192,7 +191,6 @@
         if (r.type === "candidate-pair" && r.selected) selected = r;
       });
       if (!selected && transports.length) {
-        // try to resolve by id
         stats.forEach(r => { if(r.type==="candidate-pair" && transports.includes(r.id)) selected = r; });
       }
       if (selected) {
@@ -311,7 +309,18 @@
     if(state.isHost){ printChat(state.me.name,txt,true); broadcast(state.me.id,{t:"chat",id:state.me.id,name:state.me.name,text:txt}); }
     else{ const host=state.peers.get("host"); if(host?.dc?.readyState==="open"){ host.dc.send(JSON.stringify({t:"chat",id:state.me.id,name:state.me.name,text:txt})); printChat("(me)",txt,true);} else info("Not connected yet."); }
   }
-  $("renameBtn").onclick=()=>{ const n=prompt("Enter new display name:",state.me.name||""); if(!n) return; state.me.name=n; rosterRender(); if(state.isHost) broadcast(state.me.id,{t:"rename",id:state.me.id,name:n}); else { const host=state.peers.get("host"); host?.dc?.send(JSON.stringify({t:"rename",id:state.me.id,name:n}); } };
+  $("renameBtn").onclick = () => {
+    const n = prompt("Enter new display name:", state.me.name || "");
+    if (!n) return;
+    state.me.name = n;
+    rosterRender();
+    if (state.isHost) {
+      broadcast(state.me.id, { t: "rename", id: state.me.id, name: n });
+    } else {
+      const host = state.peers.get("host");
+      host?.dc?.send(JSON.stringify({ t: "rename", id: state.me.id, name: n }));
+    }
+  };
 
   // ---------- UI wiring ----------
   $("startNewBtn").onclick = async () => {
@@ -381,7 +390,7 @@
       info("Host view restored.");
       if (TURN_URL && TURN_USER && TURN_PASS) info("TURN is enabled in this build.");
       else info("TURN not configured (STUN only). Some networks may fail.");
-      if(encoded){ // auto-apply Answer Link
+      if(encoded){
         try{
           const obj=b64.dec(decodeURIComponent(encoded));
           if(obj.kind==="answer"){
