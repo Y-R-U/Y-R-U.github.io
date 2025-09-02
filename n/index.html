@@ -1,0 +1,196 @@
+
+(() => {
+  // ---------- Utilities ----------
+  const $ = id => document.getElementById(id);
+  const b64 = {
+    enc: obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj)))),
+    dec: str => JSON.parse(decodeURIComponent(escape(atob(str))))
+  };
+  const genKey = () => Math.random().toString(36).slice(2,10).toUpperCase();
+  const genId  = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const url = new URL(window.location.href);
+  const qs  = k => url.searchParams.get(k);
+  const setStatus = s => $("statusBadge") && ($("statusBadge").textContent = s);
+  const setJoinStatus = s => $("joinStatus") && ($("joinStatus").textContent = s);
+  function show(ids){ const want=Array.isArray(ids)?ids:[ids]; for(const id of ["landingPanel","hostPanel","joinPanel","chatPanel"]) $(id).style.display=want.includes(id)?"":"none"; }
+  const logEl = $("log");
+  function log(msg, cls=""){ const p=document.createElement("div"); p.className="msg "+cls; p.innerHTML=msg; logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight; }
+  const escapeHtml = s => s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function copyText(text){ navigator.clipboard.writeText(text).then(()=>log('<span class="muted">Copied to clipboard.</span>','msg sys')).catch(()=>prompt("Copy:",text)); }
+
+  // ---------- App State ----------
+  const state = {
+    isHost:false,
+    me:{ id:genId(), name:"" },
+    roomKey:genKey(), roomName:"",
+    peers:new Map(), closed:false
+  };
+
+  // ---------- Roster ----------
+  const roster = new Map();
+  function rosterRender(){ const el=$("roster"); if(!el) return; el.innerHTML=""; el.appendChild(chip(state.me.name||"(me)")); for(const [id,name] of roster.entries()) el.appendChild(chip(name)); function chip(n){const s=document.createElement("span"); s.className="chip"; s.textContent=n; return s;} }
+  function rosterSet(list){ roster.clear(); for(const p of list) roster.set(p.id,p.name); rosterRender(); }
+  function rosterAdd(id,name){ roster.set(id,name); rosterRender(); }
+  function rosterDel(id){ roster.delete(id); rosterRender(); }
+  function rosterRename(id,name){ roster.set(id,name); rosterRender(); }
+
+  // ---------- WebRTC ----------
+  const rtcConfig = { iceServers:[{urls:["stun:stun.l.google.com:19302"]}] };
+
+  async function waitIceComplete(pc){
+    if(pc.iceGatheringState==="complete") return;
+    await new Promise(res=>pc.addEventListener("icegatheringstatechange",function f(){ if(pc.iceGatheringState==="complete"){ pc.removeEventListener("icegatheringstatechange",f); res(); } }));
+  }
+
+  function wireDataChannel(dc){
+    dc.onopen=()=>{ const hello={t:"hello",from:state.me.id,name:state.me.name,host:state.isHost,room:state.roomKey}; dc.send(JSON.stringify(hello)); state.isHost?log("Peer connecting…","msg sys"):log("Connected to host.","msg sys"); };
+    dc.onmessage=(ev)=>{
+      const msg=JSON.parse(ev.data);
+      if(msg.t==="hello"){
+        if(state.isHost){
+          // bind pending to real peer
+          const entry=[...state.peers.entries()].find(([_,v])=>v.dc===dc||v.pc?.sctp===dc?.sctp);
+          if(entry){ const [tmp,p]=entry; state.peers.delete(tmp); state.peers.set(msg.from,{...p,name:msg.name,role:"guest",dc}); rosterRender(); log(`<span class="muted">Joined:</span> <b>${escapeHtml(msg.name)}</b>`,"msg sys");
+            const rosterMsg={t:"roster",host:state.me,peers:[...state.peers.entries()].filter(([id,p])=>id!==msg.from && p.role!=="guest-pending").map(([id,p])=>({id,name:p.name}))};
+            dc.send(JSON.stringify(rosterMsg));
+            broadcast(msg.from,{t:"joined",id:msg.from,name:msg.name});
+          }
+        } else {
+          const host=state.peers.get("host"); if(host) host.dc=dc;
+        }
+      } else if(msg.t==="roster"){ rosterSet(msg.peers);
+      } else if(msg.t==="joined"){ rosterAdd(msg.id,msg.name);
+      } else if(msg.t==="left"){ rosterDel(msg.id);
+      } else if(msg.t==="rename"){ rosterRename(msg.id,msg.name);
+      } else if(msg.t==="chat"){
+        if(!state.isHost){ printChat(msg.id===state.me.id?"(me)":msg.name,msg.text,msg.id===state.me.id); }
+        else{ broadcast(msg.id,msg); printChat(msg.name,msg.text,false); }
+      } else if(msg.t==="closed"){ state.closed=true; setJoinStatus && setJoinStatus("Closed by host"); log('<span class="muted">Chat closed by host.</span>',"msg sys"); }
+    };
+  }
+
+  function broadcast(fromId,payload){
+    for(const [pid,p] of state.peers.entries()){
+      if(!p.dc || p.dc.readyState!=="open") continue;
+      if(pid===fromId) continue;
+      p.dc.send(JSON.stringify(payload));
+    }
+  }
+
+  async function hostCreateInvite(inviteId){
+    const pc=new RTCPeerConnection(rtcConfig);
+    const dc=pc.createDataChannel("chat",{ordered:true});
+    wireDataChannel(dc);
+    pc.onconnectionstatechange=()=>{ if(pc.connectionState==="failed"||pc.connectionState==="disconnected"){ for(const [pid,p] of state.peers.entries()){ if(p.pc===pc){ state.peers.delete(pid); rosterRender(); log(`Peer <b>${escapeHtml(p.name||pid)}</b> disconnected.`,"msg sys"); }}}};
+    const offer=await pc.createOffer(); await pc.setLocalDescription(offer); await waitIceComplete(pc);
+    localStorage.setItem(`invite:${inviteId}`, JSON.stringify({inviteId,roomKey:state.roomKey,sdp:pc.localDescription,ts:Date.now()}));
+    state.peers.set(inviteId,{pc,dc,name:"(connecting…)",role:"guest-pending"});
+    return pc.localDescription;
+  }
+
+  async function hostApplyAnswer(inviteId,answer){ const p=state.peers.get(inviteId); if(!p) throw new Error("No pending invite in this tab"); await p.pc.setRemoteDescription(answer); }
+
+  async function joinWithOffer(inviteId,offer){
+    const pc=new RTCPeerConnection(rtcConfig);
+    pc.ondatachannel=e=>wireDataChannel(e.channel);
+    pc.onconnectionstatechange=()=>{ if(pc.connectionState==="failed"||pc.connectionState==="disconnected"){ setJoinStatus("Disconnected"); log('<span class="muted">Disconnected from host.</span>',"msg sys"); } };
+    await pc.setRemoteDescription(offer);
+    const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); await waitIceComplete(pc);
+    state.peers.set("host",{pc,dc:null,name:"(host)",role:"host"});
+    return pc.localDescription;
+  }
+
+  // ---------- Chat send/rename ----------
+  function printChat(who,text,isMe=false){ log(`<span class="who${isMe?' me':''}"><b>${escapeHtml(who)}</b>:</span> ${escapeHtml(text)}`,"msg"); }
+  function sendChat(){
+    const txt=$("messageInput").value.trim(); if(!txt) return; $("messageInput").value="";
+    if(state.isHost){ printChat(state.me.name,txt,true); broadcast(state.me.id,{t:"chat",id:state.me.id,name:state.me.name,text:txt}); }
+    else{ const host=state.peers.get("host"); if(host?.dc?.readyState==="open"){ host.dc.send(JSON.stringify({t:"chat",id:state.me.id,name:state.me.name,text:txt})); printChat("(me)",txt,true); } else log('<span class="muted">Not connected.</span>',"msg sys"); }
+  }
+
+  // ---------- UI wiring ----------
+  $("sendBtn").onclick=sendChat;
+  $("messageInput").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
+  $("renameBtn").onclick=()=>{ const n=prompt("Enter new display name:",state.me.name||""); if(!n) return; state.me.name=n; rosterRender(); if(state.isHost) broadcast(state.me.id,{t:"rename",id:state.me.id,name:n}); else{ const host=state.peers.get("host"); host?.dc?.send(JSON.stringify({t:"rename",id:state.me.id,name:n})); } };
+
+  $("startNewBtn").onclick=async ()=>{
+    state.isHost=true; state.roomKey=genKey(); state.roomName=$("landingName").value.trim()||"My Chat"; state.me.name=$("landingDisplay").value.trim()||"Host";
+    $("roomKey").textContent=`Room ${state.roomKey}`; $("roomNamePill").textContent=state.roomName;
+    $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
+    show(["hostPanel","chatPanel"]);
+    $("landingPanel").style.display="none";
+    rosterRender(); setStatus("Waiting for peers…");
+    log('<span class="muted">Chat created.</span> Share an invite link or code.',"msg sys");
+    history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`);
+  };
+
+  $("inviteLinkBtn").onclick=async ()=>{
+    const inviteId=genId(); const offer=await hostCreateInvite(inviteId);
+    const payload={v:1,kind:"offer",invite:inviteId,room:state.roomKey,title:state.roomName,sdp:offer};
+    // show answer code input for the host (only needed for code-join)
+    $("answerCodeRow").style.display="";
+    const link=location.origin+location.pathname+"?join=1&data="+encodeURIComponent(b64.enc(payload));
+    copyText(link); setStatus("Invite ready"); log("Invite link copied.","msg sys");
+  };
+
+  $("inviteCodeBtn").onclick=async ()=>{
+    const inviteId=genId(); const offer=await hostCreateInvite(inviteId);
+    const payload={v:1,kind:"offer",invite:inviteId,room:state.roomKey,title:state.roomName,sdp:offer};
+    $("answerCodeRow").style.display="";
+    const code=b64.enc(payload);
+    copyText(code); setStatus("Invite ready (code)"); log("Invite code copied.","msg sys");
+  };
+
+  $("applyAnswerCodeBtn").onclick=async ()=>{
+    try{
+      const obj=b64.dec($("answerCodeInput").value.trim());
+      if(obj.kind!=="answer") throw new Error("Not an Answer Code");
+      await hostApplyAnswer(obj.invite,obj.sdp);
+      log("Answer applied. Peer should connect shortly.","msg sys");
+      $("answerCodeInput").value="";
+    }catch(e){ alert("Failed to apply answer: "+e.message); }
+  };
+
+  $("openInviteBtn").onclick=()=>{ const link=$("landingInvite").value.trim(); if(link) window.location.href=link; };
+
+  $("joinWithCodeBtn").onclick=async ()=>{
+    try{
+      const obj=b64.dec($("inviteCodeIn").value.trim());
+      if(obj.kind!=="offer") throw new Error("Not an Invite Code");
+      startJoinFlow(obj);
+    }catch(e){ alert("Invalid code: "+e.message); }
+  };
+
+  $("closeBtn").onclick=()=>{ state.closed=true; broadcast(state.me.id,{t:"closed"}); for(const [id,p] of state.peers.entries()){ try{p.dc?.close(); p.pc?.close();}catch{} state.peers.delete(id);} roster.clear(); rosterRender(); setStatus("Closed"); log('<span class="muted">Chat closed.</span>',"msg sys"); };
+
+  // ---------- Boot via URL or Code ----------
+  (async function boot(){
+    const encoded=qs("data"), isJoin=qs("join"), hostFlag=qs("host"), room=qs("room"), title=qs("title")||"", name=qs("name")||"";
+    if(hostFlag){
+      state.isHost=true; show(["hostPanel","chatPanel"]);
+      $("roomKey").textContent=`Room ${room||"?"}`; $("roomNamePill").textContent=decodeURIComponent(title||"");
+      $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
+      state.roomKey=room||state.roomKey; state.roomName=decodeURIComponent(title||""); state.me.name=decodeURIComponent(name||"");
+      setStatus("Waiting for peers…"); rosterRender(); return;
+    }
+    if(isJoin && encoded){
+      startJoinFlow(b64.dec(decodeURIComponent(encoded)));
+    }
+  })();
+
+  async function startJoinFlow(obj){
+    if(!obj || obj.kind!=="offer"){ show("landingPanel"); return; }
+    state.isHost=false; state.roomKey=obj.room; state.roomName=obj.title||"";
+    $("joinRoomKey").textContent=`Room ${state.roomKey}`; $("joinRoomName").textContent=state.roomName;
+    show(["joinPanel","chatPanel"]);
+    const storedName=localStorage.getItem("webrtc-name")||""; $("joinerName").value=storedName||""; state.me.name=storedName||("Guest-"+Math.random().toString(36).slice(2,6).toUpperCase()); localStorage.setItem("webrtc-name",state.me.name);
+    setJoinStatus("Connecting…");
+    const answer=await joinWithOffer(obj.invite,obj.sdp);
+    const ansPayload={v:1,kind:"answer",invite:obj.invite,room:state.roomKey,sdp:answer};
+    $("answerOut").value=b64.enc(ansPayload);
+    $("copyAnswerCodeBtn").onclick=()=>copyText($("answerOut").value);
+    const ansLink=location.origin+location.pathname+"?data="+encodeURIComponent(b64.enc(ansPayload));
+    $("copyAnswerLinkBtn").onclick=()=>copyText(ansLink);
+    $("joinerName").addEventListener("change",()=>{ state.me.name=$("joinerName").value.trim()||state.me.name; localStorage.setItem("webrtc-name",state.me.name); const host=state.peers.get("host"); host?.dc?.readyState==="open" && host.dc.send(JSON.stringify({t:"rename",id:state.me.id,name:state.me.name})); });
+  }
+})();
