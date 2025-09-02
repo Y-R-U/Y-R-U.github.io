@@ -1,4 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>P2P Chat – Serverless (WebRTC)</title>
+<style>
+  :root { --bg:#0b0f14; --fg:#e7edf3; --muted:#9fb0c3; --card:#121923; --accent:#5ec5ff; --warn:#ffb86b; --err:#ff6b6b; }
+  html,body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;margin:0}
+  .wrap{max-width:920px;margin:24px auto;padding:0 16px}
+  h1{font-size:22px;margin:0 0 12px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .col{display:flex;flex-direction:column;gap:10px}
+  .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  input[type=text]{background:#0e1621;border:1px solid #1c2a3a;color:var(--fg);border-radius:10px;padding:10px 12px;width:100%}
+  button{background:#162434;color:var(--fg);border:1px solid #274663;border-radius:10px;padding:9px 12px;cursor:pointer}
+  button.primary{background:var(--accent);color:#04121d;border:none}
+  button.warn{background:var(--warn);color:#130c00;border:none}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .pill{padding:6px 10px;border-radius:999px;background:#0e1621;border:1px solid #25374c;color:var(--muted);font-size:12px}
+  .muted{color:var(--muted)}
+  .log{background:#0e1621;border:1px solid #1c2a3a;border-radius:10px;padding:10px;height:320px;overflow:auto}
+  .msg{margin:0 0 8px}
+  .msg.me .who{color:var(--accent)}
+  .msg.sys{color:var(--muted);font-style:italic}
+  .roster{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:#0e1621;border:1px solid #1c2a3a;padding:6px 10px;border-radius:999px}
+  .sep{height:1px;background:#1c2a3a;margin:8px 0 12px}
+  .small{font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>P2P Chat – Serverless</h1>
+  <div class="muted" style="margin:-6px 0 16px">WebRTC data channels, link **or code** signaling. Host relays to all peers. STUN only.</div>
 
+  <!-- Host controls (compact) -->
+  <div id="hostPanel" class="card" style="display:none">
+    <div class="row" style="align-items:baseline">
+      <span class="pill">Host</span>
+      <span id="roomKey" class="pill"></span>
+      <span id="roomNamePill" class="pill"></span>
+      <span id="statusBadge" class="pill">Idle</span>
+      <div class="row" style="margin-left:auto;gap:8px">
+        <button id="inviteLinkBtn" disabled>Copy Invite Link</button>
+        <button id="inviteCodeBtn" disabled>Copy Invite Code</button>
+        <button id="closeBtn" class="warn" disabled>Close Chat</button>
+      </div>
+    </div>
+    <div id="answerCodeRow" class="row" style="margin-top:8px;display:none">
+      <input id="answerCodeInput" type="text" placeholder="Paste Answer Code here…">
+      <button id="applyAnswerCodeBtn">Apply Answer Code</button>
+      <span class="muted small">Only needed if the joiner used a code (not a link).</span>
+    </div>
+  </div>
+
+  <!-- Joiner panel -->
+  <div id="joinPanel" class="card" style="display:none">
+    <div class="row" style="align-items:baseline">
+      <span class="pill">Join</span>
+      <span id="joinRoomKey" class="pill"></span>
+      <span id="joinRoomName" class="pill"></span>
+      <span id="joinStatus" class="pill" style="margin-left:auto">Connecting…</span>
+    </div>
+    <div class="row">
+      <div class="col" style="min-width:220px;max-width:320px">
+        <input id="joinerName" type="text" placeholder="Your display name">
+      </div>
+      <div class="col" style="min-width:260px">
+        <input id="answerOut" type="text" readonly placeholder="Answer Code will appear here">
+        <div class="row">
+          <button id="copyAnswerCodeBtn">Copy Answer Code</button>
+          <button id="copyAnswerLinkBtn">Copy Answer Link</button>
+        </div>
+        <div class="small muted">Send one of these back to the host.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chatPanel" class="card" style="display:none">
+    <div class="row">
+      <div class="roster" id="roster"></div>
+    </div>
+    <div class="sep"></div>
+    <div id="log" class="log"></div>
+    <div class="row" style="margin-top:10px">
+      <input id="messageInput" type="text" placeholder="Type message… (Enter to send)">
+      <button id="sendBtn">Send</button>
+      <button id="renameBtn">Rename</button>
+    </div>
+  </div>
+
+  <!-- Landing -->
+  <div id="landingPanel" class="card">
+    <div class="row">
+      <div class="col grow" style="min-width:320px">
+        <div class="small muted">Start a new chat</div>
+        <input id="landingName" type="text" placeholder="Chat name">
+        <input id="landingDisplay" type="text" placeholder="Your display name">
+        <button id="startNewBtn" class="primary">Start New Chat</button>
+      </div>
+      <div class="col grow" style="min-width:320px">
+        <div class="small muted">Join with link or code</div>
+        <input id="landingInvite" type="text" placeholder="Paste Invite Link here (or switch to code below)">
+        <div class="row">
+          <button id="openInviteBtn">Open Link</button>
+          <span class="small muted">or</span>
+          <input id="inviteCodeIn" type="text" placeholder="Paste Invite Code here">
+          <button id="joinWithCodeBtn">Join with Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="small muted">Notes: Without TURN, some corporate/hotel networks may fail to connect. Everything is end-to-end encrypted.</p>
+</div>
+
+<script>
 (() => {
   // ---------- Utilities ----------
   const $ = id => document.getElementById(id);
@@ -194,3 +312,6 @@
     $("joinerName").addEventListener("change",()=>{ state.me.name=$("joinerName").value.trim()||state.me.name; localStorage.setItem("webrtc-name",state.me.name); const host=state.peers.get("host"); host?.dc?.readyState==="open" && host.dc.send(JSON.stringify({t:"rename",id:state.me.id,name:state.me.name})); });
   }
 })();
+</script>
+</body>
+</html>
