@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>P2P Chat – Serverless (with diagnostics)</title>
+<title>P2P Chat — Serverless (deep diagnostics)</title>
 <style>
   :root { --bg:#0b0f14; --fg:#e7edf3; --muted:#9fb0c3; --card:#121923; --accent:#5ec5ff; --warn:#ffb86b; --err:#ff6b6b; }
   html,body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;margin:0}
@@ -19,7 +19,7 @@
   button:disabled{opacity:.6;cursor:not-allowed}
   .pill{padding:6px 10px;border-radius:999px;background:#0e1621;border:1px solid #25374c;color:var(--muted);font-size:12px}
   .muted{color:var(--muted)}
-  .log{background:#0e1621;border:1px solid #1c2a3a;border-radius:10px;padding:10px;height:340px;overflow:auto}
+  .log{background:#0e1621;border:1px solid #1c2a3a;border-radius:10px;padding:10px;height:360px;overflow:auto}
   .msg{margin:0 0 8px}
   .msg.sys{color:var(--muted);font-style:italic}
   .msg.err{color:var(--err)}
@@ -31,10 +31,12 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>P2P Chat – Serverless</h1>
-  <div class="muted" style="margin:-6px 0 16px">WebRTC data channels; link <b>or</b> code signaling. STUN only (no TURN). <span id="ver" class="small"></span></div>
+  <h1>P2P Chat — Serverless</h1>
+  <div class="muted" style="margin:-6px 0 16px">
+    WebRTC data channels; link <b>or</b> code signaling. STUN by default (TURN optional). <span id="ver" class="small"></span>
+  </div>
 
-  <!-- Host controls (compact) -->
+  <!-- Host controls -->
   <div id="hostPanel" class="card" style="display:none">
     <div class="row" style="align-items:baseline">
       <span class="pill">Host</span>
@@ -50,11 +52,11 @@
     <div id="answerCodeRow" class="row" style="margin-top:8px;display:none">
       <input id="answerCodeInput" type="text" placeholder="Paste Answer Code here…">
       <button id="applyAnswerCodeBtn">Apply Answer Code</button>
-      <span class="muted small">Only needed if the joiner used a code (not a link).</span>
+      <span class="muted small">Needed if the joiner used a code. If they used a link, the host should open the Answer Link.</span>
     </div>
   </div>
 
-  <!-- Joiner panel -->
+  <!-- Joiner controls -->
   <div id="joinPanel" class="card" style="display:none">
     <div class="row" style="align-items:baseline">
       <span class="pill">Join</span>
@@ -72,16 +74,14 @@
           <button id="copyAnswerCodeBtn">Copy Answer Code</button>
           <button id="copyAnswerLinkBtn">Copy Answer Link</button>
         </div>
-        <div class="small muted">Send one of these back to the host.</div>
+        <div class="small muted">Send one of these back to the host. They must apply it.</div>
       </div>
     </div>
   </div>
 
   <!-- Chat -->
   <div id="chatPanel" class="card" style="display:none">
-    <div class="row">
-      <div class="roster" id="roster"></div>
-    </div>
+    <div class="row"><div class="roster" id="roster"></div></div>
     <div class="sep"></div>
     <div id="log" class="log"></div>
     <div class="row" style="margin-top:10px">
@@ -113,69 +113,52 @@
     </div>
   </div>
 
-  <p class="small muted">If it stalls at “Waiting for host…” the host must open the Answer Link (or paste Answer Code). Some networks block STUN; try another network or add TURN.</p>
+  <p class="small muted">If it stalls or fails, check the log below for ICE details. Without TURN some networks can’t connect.</p>
 </div>
 
 <script>
 (() => {
-  // -------------------- version --------------------
-  const VERSION = "diag-1.1";
-  document.getElementById("ver").textContent = `v${VERSION}`;
+  // ======== Optional TURN (fill in if you have one; otherwise leave empty) ========
+  const TURN_URL  = "";   // e.g., "turn:turn.example.com:3478"
+  const TURN_USER = "";   // e.g., "user"
+  const TURN_PASS = "";   // e.g., "pass"
 
-  // -------------------- utilities --------------------
+  const VERSION = "diag-2.0"; document.getElementById("ver").textContent = `v${VERSION}`;
+
+  // ---------- utils ----------
   const $ = id => document.getElementById(id);
-  const b64 = {
-    enc: obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj)))),
-    dec: str => JSON.parse(decodeURIComponent(escape(atob(str))))
-  };
+  const b64 = { enc: o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))), dec: s => JSON.parse(decodeURIComponent(escape(atob(s)))) };
   const genKey = () => Math.random().toString(36).slice(2,10).toUpperCase();
   const genId  = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
   const url = new URL(window.location.href);
   const qs  = k => url.searchParams.get(k);
-  function show(ids){ const want=Array.isArray(ids)?ids:[ids]; for (const id of ["landingPanel","hostPanel","joinPanel","chatPanel"]) $(id).style.display = want.includes(id) ? "" : "none"; }
-
+  function show(ids){ const want=Array.isArray(ids)?ids:[ids]; for(const id of ["landingPanel","hostPanel","joinPanel","chatPanel"]) $(id).style.display = want.includes(id) ? "" : "none"; }
   const logEl = $("log");
   function log(msg, cls=""){ const p=document.createElement("div"); p.className="msg "+cls; p.innerHTML=msg; logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight; }
-  function info(msg){ log(`<span class="muted">${msg}</span>`, "msg sys"); }
-  function error(msg){ log(`<span class="err">❌ ${msg}</span>`, "msg err"); }
-  function copyText(text){ navigator.clipboard.writeText(text).then(()=>info("Copied to clipboard.")).catch(()=>prompt("Copy:", text)); }
-  function escapeHtml(s){ return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
+  const info = m => log(`<span class="muted">${m}</span>`,"msg sys");
+  const error = m => log(`<span class="err">❌ ${m}</span>`,"msg err");
+  function copyText(t){ navigator.clipboard.writeText(t).then(()=>info("Copied to clipboard.")).catch(()=>prompt("Copy:", t)); }
+  const esc = s => s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const setStatus = s => $("statusBadge") && ($("statusBadge").textContent = s);
   const setJoinStatus = s => $("joinStatus") && ($("joinStatus").textContent = s);
 
-  // -------------------- state --------------------
-  const state = {
-    isHost:false,
-    me:{ id:genId(), name:"" },
-    roomKey:genKey(), roomName:"",
-    peers:new Map(), closed:false
-  };
-
-  // -------------------- roster --------------------
+  // ---------- state ----------
+  const state = { isHost:false, me:{ id:genId(), name:"" }, roomKey:genKey(), roomName:"", peers:new Map(), closed:false };
   const roster = new Map();
-  function rosterRender(){ const el=$("roster"); if(!el) return; el.innerHTML=""; el.appendChild(chip(state.me.name||"(me)")); for(const [id,name] of roster.entries()) el.appendChild(chip(name)); function chip(n){ const s=document.createElement("span"); s.className="chip"; s.textContent=n; return s; } }
+  function rosterRender(){ const el=$("roster"); if(!el) return; el.innerHTML=""; el.appendChild(chip(state.me.name||"(me)")); for(const [id,name] of roster.entries()) el.appendChild(chip(name)); function chip(n){const s=document.createElement("span"); s.className="chip"; s.textContent=n; return s;} }
   function rosterSet(list){ roster.clear(); for(const p of list) roster.set(p.id,p.name); rosterRender(); }
   function rosterAdd(id,name){ roster.set(id,name); rosterRender(); }
   function rosterDel(id){ roster.delete(id); rosterRender(); }
   function rosterRename(id,name){ roster.set(id,name); rosterRender(); }
 
-  // -------------------- diagnostics helpers --------------------
-  function candidateType(c){
-    if (!c || !c.candidate) return "?";
-    const m = c.candidate.match(/ typ (\w+) /);
-    return m ? m[1] : "?"; // host | srflx | relay
-  }
-  function logState(pc, label){
-    info(`[${label}] iceGathering=${pc.iceGatheringState}, iceConnection=${pc.iceConnectionState}, connection=${pc.connectionState}`);
-  }
-  function armTimeout(name, ms, onfire){
-    const id = setTimeout(onfire, ms);
-    return () => clearTimeout(id);
-  }
+  // ---------- diagnostics helpers ----------
+  const rtcConfig = (() => {
+    const servers = [{ urls: ["stun:stun.l.google.com:19302"] }];
+    if (TURN_URL && TURN_USER && TURN_PASS) servers.push({ urls: [TURN_URL], username: TURN_USER, credential: TURN_PASS });
+    return { iceServers: servers /*, iceTransportPolicy: "all" (default) */ };
+  })();
 
-  // -------------------- WebRTC --------------------
-  const rtcConfig = { iceServers:[{urls:["stun:stun.l.google.com:19302"]}] };
+  function candType(c){ if(!c||!c.candidate) return "?"; const m=c.candidate.match(/ typ (\w+) /); return m?m[1]:"?"; } // host|srflx|relay
 
   async function waitIceComplete(pc){
     if(pc.iceGatheringState==="complete") return;
@@ -186,125 +169,132 @@
     });
   }
 
-  function wireDiagnostics(pc, roleLabel){
-    pc.onicecandidate = (e) => {
-      if (e.candidate) info(`[${roleLabel}] ICE candidate (${candidateType(e.candidate)})`);
-      else info(`[${roleLabel}] ICE gathering complete`);
-    };
+  function wireDiag(pc, role){
+    pc.onicecandidate = e => { if(e.candidate) info(`[${role}] ICE candidate (${candType(e.candidate)})`); else info(`[${role}] ICE gathering complete`); };
+    pc.onicecandidateerror = e => error(`[${role}] onicecandidateerror: ${e.errorText || e.errorCode || "unknown"}`);
     pc.oniceconnectionstatechange = () => {
-      info(`[${roleLabel}] iceConnectionState → ${pc.iceConnectionState}`);
-      if (pc.iceConnectionState === "failed") {
-        error(`[${roleLabel}] ICE failed. This often means NAT/firewall blocked P2P (try different networks or add TURN).`);
-      } else if (pc.iceConnectionState === "disconnected") {
-        info(`[${roleLabel}] ICE disconnected (temporary network issue or host didn’t apply the matching Answer).`);
-      }
+      info(`[${role}] iceConnectionState → ${pc.iceConnectionState}`);
+      if (pc.iceConnectionState === "failed") error(`[${role}] ICE failed — NAT/firewall likely blocked P2P (try another network or enable TURN).`);
     };
-    pc.onconnectionstatechange = () => {
-      info(`[${roleLabel}] connectionState → ${pc.connectionState}`);
-      if (pc.connectionState === "connected") info(`[${roleLabel}] data channel should open shortly.`);
-      if (pc.connectionState === "failed") error(`[${roleLabel}] PeerConnection failed.`);
-    };
+    pc.onconnectionstatechange = () => info(`[${role}] connectionState → ${pc.connectionState}`);
   }
 
-  function wireDataChannel(dc){
+  async function periodicStats(pc, role, until="connected"){
+    // Poll getStats a few times to explain what’s going on.
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries++;
+      const stats = await pc.getStats().catch(()=>null);
+      if (!stats) return;
+      let selected, transports = [];
+      stats.forEach(r => {
+        if (r.type === "transport" && r.selectedCandidatePairId) transports.push(r.selectedCandidatePairId);
+        if (r.type === "candidate-pair" && r.selected) selected = r;
+      });
+      if (!selected && transports.length) {
+        // try to resolve by id
+        stats.forEach(r => { if(r.type==="candidate-pair" && transports.includes(r.id)) selected = r; });
+      }
+      if (selected) {
+        const local = stats.get(selected.localCandidateId);
+        const remote = stats.get(selected.remoteCandidateId);
+        info(`[${role}] Selected pair: ${local?.candidateType || "?"} ↔ ${remote?.candidateType || "?"} (state=${selected.state}, nominated=${selected.nominated})`);
+      } else {
+        info(`[${role}] No selected ICE pair yet.`);
+      }
+      if (tries >= 8 || pc.connectionState === until) clearInterval(timer);
+    }, 2500);
+  }
+
+  function wireDC(dc){
     dc.onopen = () => {
       info(`DataChannel open.`);
-      const hello = {t:"hello",from:state.me.id,name:state.me.name,host:state.isHost,room:state.roomKey};
-      try { dc.send(JSON.stringify(hello)); } catch(e){ error(`Send hello failed: ${e.message}`); }
+      try { dc.send(JSON.stringify({t:"hello",from:state.me.id,name:state.me.name,host:state.isHost,room:state.roomKey})); } catch(e){ error(`Send hello failed: ${e.message}`); }
     };
-    dc.onmessage = (ev) => {
-      let msg;
-      try { msg = JSON.parse(ev.data); } catch { return; }
-      if(msg.t==="hello"){
+    dc.onmessage = ev => {
+      let m; try{ m=JSON.parse(ev.data); }catch{return;}
+      if(m.t==="hello"){
         if(state.isHost){
           const entry=[...state.peers.entries()].find(([_,v])=>v.dc===dc || v.pc?.sctp===dc?.sctp);
           if(entry){
             const [tmp,p]=entry;
             state.peers.delete(tmp);
-            state.peers.set(msg.from,{...p,name:msg.name,role:"guest",dc});
+            state.peers.set(m.from,{...p,name:m.name,role:"guest",dc});
             rosterRender();
-            info(`Joined: ${escapeHtml(msg.name)}`);
-            const rosterMsg={t:"roster",host:state.me,peers:[...state.peers.entries()].filter(([id,p])=>id!==msg.from && p.role!=="guest-pending").map(([id,p])=>({id,name:p.name}))};
+            info(`Joined: ${esc(m.name)}`);
+            const rosterMsg={t:"roster",host:state.me,peers:[...state.peers.entries()].filter(([id,p])=>id!==m.from && p.role!=="guest-pending").map(([id,p])=>({id,name:p.name}))};
             try { dc.send(JSON.stringify(rosterMsg)); } catch(e){ error(`Send roster failed: ${e.message}`); }
-            broadcast(msg.from,{t:"joined",id:msg.from,name:msg.name});
+            broadcast(m.from,{t:"joined",id:m.from,name:m.name});
           }
         } else {
-          const host=state.peers.get("host"); if(host) host.dc=dc;
+          const host=state.peers.get("host"); if(host) host.dc = dc;
         }
-      } else if(msg.t==="roster"){ rosterSet(msg.peers);
-      } else if(msg.t==="joined"){ rosterAdd(msg.id,msg.name);
-      } else if(msg.t==="left"){ rosterDel(msg.id);
-      } else if(msg.t==="rename"){ rosterRename(msg.id,msg.name);
-      } else if(msg.t==="chat"){
-        if(!state.isHost){ printChat(msg.id===state.me.id?"(me)":msg.name,msg.text,msg.id===state.me.id); }
-        else{ broadcast(msg.id,msg); printChat(msg.name,msg.text,false); }
-      } else if(msg.t==="closed"){ state.closed=true; setJoinStatus("Closed by host"); info("Chat closed by host."); }
+      } else if(m.t==="roster"){ rosterSet(m.peers);
+      } else if(m.t==="joined"){ rosterAdd(m.id,m.name);
+      } else if(m.t==="left"){ rosterDel(m.id);
+      } else if(m.t==="rename"){ rosterRename(m.id,m.name);
+      } else if(m.t==="chat"){ if(!state.isHost){ printChat(m.id===state.me.id?"(me)":m.name,m.text,m.id===state.me.id);} else { broadcast(m.id,m); printChat(m.name,m.text,false);} }
     };
     dc.onclose = () => info("DataChannel closed.");
-    dc.onerror = (e) => error(`DataChannel error: ${e.message || e}`);
+    dc.onerror = e => error(`DataChannel error: ${e.message || e}`);
   }
 
   function broadcast(fromId,payload){
     for(const [pid,p] of state.peers.entries()){
       if(!p.dc || p.dc.readyState!=="open") continue;
       if(pid===fromId) continue;
-      try { p.dc.send(JSON.stringify(payload)); } catch(e){ error(`Broadcast to ${pid} failed: ${e.message}`); }
+      try { p.dc.send(JSON.stringify(payload)); } catch(e){ error(`Broadcast failed: ${e.message}`); }
     }
   }
 
-  // Host creates an offer for one invite
+  // ---------- Host: create offer for an invite ----------
   async function hostCreateInvite(inviteId){
     const pc = new RTCPeerConnection(rtcConfig);
-    wireDiagnostics(pc, "HOST");
+    wireDiag(pc,"HOST");
+    periodicStats(pc,"HOST");
     const dc = pc.createDataChannel("chat",{ordered:true});
-    wireDataChannel(dc);
+    wireDC(dc);
     pc.onconnectionstatechange = () => {
-      info(`[HOST] connectionState → ${pc.connectionState}`);
-      if (pc.connectionState==="failed" || pc.connectionState==="disconnected"){
-        for(const [pid,p] of state.peers.entries()){
-          if(p.pc===pc){ state.peers.delete(pid); rosterRender(); info(`Pending peer (${escapeHtml(p.name||pid)}) disconnected.`); }
-        }
+      if (pc.connectionState==="failed"||pc.connectionState==="disconnected"){
+        for(const [pid,p] of state.peers.entries()){ if(p.pc===pc){ state.peers.delete(pid); rosterRender(); info(`Pending peer ${esc(p.name||pid)} disconnected.`); } }
       }
     };
-    const offer = await pc.createOffer().catch(e => { error(`createOffer failed: ${e.message}`); throw e; });
-    await pc.setLocalDescription(offer).catch(e => { error(`setLocalDescription(offer) failed: ${e.message}`); throw e; });
-    wireDiagnostics(pc,"HOST"); // in case state changed
+    const offer = await pc.createOffer().catch(e=>{ error(`createOffer failed: ${e.message}`); throw e; });
+    await pc.setLocalDescription(offer).catch(e=>{ error(`setLocalDescription(offer) failed: ${e.message}`); throw e; });
     info("Offer created; gathering ICE…");
     await waitIceComplete(pc);
-    info("Offer ready (ICE complete). Ask a joiner to use this invite (link or code).");
-
-    // store pending invite so an Answer Link opened later can find it
+    info("Offer ready.");
     localStorage.setItem(`invite:${inviteId}`, JSON.stringify({inviteId,roomKey:state.roomKey,sdp:pc.localDescription,ts:Date.now()}));
-
     state.peers.set(inviteId,{pc,dc,name:"(connecting…)",role:"guest-pending"});
     rosterRender();
     return pc.localDescription;
   }
 
-  // Host applies a joiner's answer
+  // ---------- Host: apply joiner answer ----------
   async function hostApplyAnswer(inviteId, answer){
     const p = state.peers.get(inviteId);
-    if(!p){ error("No pending invite found that matches this Answer. Did you generate a new invite since?"); throw new Error("No pending invite"); }
+    if(!p){ error("No matching pending invite for this Answer (maybe you generated a new invite?)."); throw new Error("no pending invite"); }
     info("Applying Answer from joiner…");
-    await p.pc.setRemoteDescription(answer).catch(e => { error(`setRemoteDescription(answer) failed: ${e.message}`); throw e; });
+    await p.pc.setRemoteDescription(answer).catch(e=>{ error(`setRemoteDescription(answer) failed: ${e.message}`); throw e; });
+    periodicStats(p.pc,"HOST");
     info("Answer applied. Waiting for ICE to connect…");
   }
 
-  // Joiner consumes the host's offer
+  // ---------- Joiner: accept offer and create answer ----------
   async function joinWithOffer(inviteId, offer){
     const pc = new RTCPeerConnection(rtcConfig);
-    wireDiagnostics(pc, "JOIN");
-    pc.ondatachannel = e => { wireDataChannel(e.channel); };
+    wireDiag(pc,"JOIN");
+    periodicStats(pc,"JOIN");
+    pc.ondatachannel = e => wireDC(e.channel);
     pc.onconnectionstatechange = () => {
-      info(`[JOIN] connectionState → ${pc.connectionState}`);
-      if (pc.connectionState==="connecting") setJoinStatus("Waiting for host to apply your answer…");
-      if (pc.connectionState==="connected") setJoinStatus("Connected");
-      if (pc.connectionState==="failed" || pc.connectionState==="disconnected") setJoinStatus("Connection failed/disconnected");
+      if(pc.connectionState==="connecting") setJoinStatus("Waiting for host to apply your answer…");
+      if(pc.connectionState==="connected") setJoinStatus("Connected");
+      if(pc.connectionState==="failed" || pc.connectionState==="disconnected") setJoinStatus("Connection failed/disconnected");
     };
-    await pc.setRemoteDescription(offer).catch(e => { error(`setRemoteDescription(offer) failed: ${e.message}`); throw e; });
+    await pc.setRemoteDescription(offer).catch(e=>{ error(`setRemoteDescription(offer) failed: ${e.message}`); throw e; });
     info("Creating Answer…");
-    const answer = await pc.createAnswer().catch(e => { error(`createAnswer failed: ${e.message}`); throw e; });
-    await pc.setLocalDescription(answer).catch(e => { error(`setLocalDescription(answer) failed: ${e.message}`); throw e; });
+    const answer = await pc.createAnswer().catch(e=>{ error(`createAnswer failed: ${e.message}`); throw e; });
+    await pc.setLocalDescription(answer).catch(e=>{ error(`setLocalDescription(answer) failed: ${e.message}`); throw e; });
     info("Answer created; gathering ICE…");
     await waitIceComplete(pc);
     info("Answer ready. Send Answer Link/Code to host and wait for them to apply it.");
@@ -312,44 +302,27 @@
     return pc.localDescription;
   }
 
-  // -------------------- chat send/rename --------------------
+  // ---------- Chat ----------
   $("sendBtn").onclick = sendChat;
   $("messageInput").addEventListener("keydown", e => { if(e.key==="Enter") sendChat(); });
-  function printChat(who,text,isMe=false){ log(`<span class="who${isMe?' me':''}"><b>${escapeHtml(who)}</b>:</span> ${escapeHtml(text)}`); }
+  function printChat(who,text,isMe=false){ log(`<span class="who${isMe?' me':''}"><b>${esc(who)}</b>:</span> ${esc(text)}`); }
   function sendChat(){
-    const txt = $("messageInput").value.trim(); if(!txt) return; $("messageInput").value="";
+    const txt=$("messageInput").value.trim(); if(!txt) return; $("messageInput").value="";
     if(state.isHost){ printChat(state.me.name,txt,true); broadcast(state.me.id,{t:"chat",id:state.me.id,name:state.me.name,text:txt}); }
-    else{
-      const host=state.peers.get("host");
-      if(host?.dc?.readyState==="open"){ host.dc.send(JSON.stringify({t:"chat",id:state.me.id,name:state.me.name,text:txt})); printChat("(me)",txt,true); }
-      else info("Not connected yet.");
-    }
+    else{ const host=state.peers.get("host"); if(host?.dc?.readyState==="open"){ host.dc.send(JSON.stringify({t:"chat",id:state.me.id,name:state.me.name,text:txt})); printChat("(me)",txt,true);} else info("Not connected yet."); }
   }
-  $("renameBtn").onclick = () => {
-    const n = prompt("Enter new display name:", state.me.name || "");
-    if(!n) return; state.me.name = n; rosterRender();
-    if(state.isHost) broadcast(state.me.id,{t:"rename",id:state.me.id,name:n});
-    else{ const host=state.peers.get("host"); host?.dc?.send(JSON.stringify({t:"rename",id:state.me.id,name:n})); }
-  };
+  $("renameBtn").onclick=()=>{ const n=prompt("Enter new display name:",state.me.name||""); if(!n) return; state.me.name=n; rosterRender(); if(state.isHost) broadcast(state.me.id,{t:"rename",id:state.me.id,name:n}); else { const host=state.peers.get("host"); host?.dc?.send(JSON.stringify({t:"rename",id:state.me.id,name:n}); } };
 
-  // -------------------- UI: start / invite / close --------------------
+  // ---------- UI wiring ----------
   $("startNewBtn").onclick = async () => {
-    // start host
-    state.isHost = true;
-    state.roomKey = genKey();
-    state.roomName = $("landingName").value.trim() || "My Chat";
-    state.me.name = $("landingDisplay").value.trim() || "Host";
-    $("roomKey").textContent = `Room ${state.roomKey}`;
-    $("roomNamePill").textContent = state.roomName;
-    $("inviteLinkBtn").disabled = false;
-    $("inviteCodeBtn").disabled = false;
-    $("closeBtn").disabled = false;
-    show(["hostPanel","chatPanel"]);
-    $("landingPanel").style.display="none";
-    rosterRender();
-    setStatus("Waiting for peers…");
+    state.isHost=true; state.roomKey=genKey(); state.roomName=$("landingName").value.trim()||"My Chat"; state.me.name=$("landingDisplay").value.trim()||"Host";
+    $("roomKey").textContent=`Room ${state.roomKey}`; $("roomNamePill").textContent=state.roomName;
+    $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
+    show(["hostPanel","chatPanel"]); $("landingPanel").style.display="none"; rosterRender(); setStatus("Waiting for peers…");
     info("Chat created. Use Copy Invite Link or Copy Invite Code.");
     history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`);
+    if (TURN_URL && TURN_USER && TURN_PASS) info("TURN is enabled in this build.");
+    else info("TURN not configured (STUN only). Some networks may fail.");
   };
 
   $("inviteLinkBtn").onclick = async () => {
@@ -360,9 +333,8 @@
     const link = location.origin + location.pathname + "?join=1&data=" + encodeURIComponent(b64.enc(payload));
     copyText(link);
     setStatus("Invite ready (link)");
-    info("Invite Link copied. Ask joiner to open it, then send back the Answer Link (host should open it).");
-    // safety timer: if answer not applied in 90s, remind
-    armTimeout("host-wait-answer", 90000, ()=>info("Still waiting for an Answer. Generate a fresh invite if needed."));
+    info("Invite Link copied. Joiner must open it, then send back the Answer Link (host should open it).");
+    setTimeout(()=>info("Reminder: host must apply the Answer (open Answer Link or paste Answer Code)."), 15000);
   };
 
   $("inviteCodeBtn").onclick = async () => {
@@ -380,108 +352,64 @@
       const obj = b64.dec($("answerCodeInput").value.trim());
       if(obj.kind!=="answer") throw new Error("Not an Answer Code");
       await hostApplyAnswer(obj.invite, obj.sdp);
-      info("Answer applied. If it doesn’t connect within ~20s, try a new invite or another network.");
-      $("answerCodeInput").value = "";
-    }catch(e){ error("Failed to apply answer: " + e.message); }
+      info("Answer applied. If not connected in ~20s, try a new invite, different networks, or TURN.");
+      $("answerCodeInput").value="";
+    } catch(e){ error("Failed to apply answer: "+e.message); }
   };
 
-  $("openInviteBtn").onclick = () => {
-    const link = $("landingInvite").value.trim();
-    if(link) window.location.href = link;
-  };
-
+  $("openInviteBtn").onclick = () => { const link=$("landingInvite").value.trim(); if(link) window.location.href = link; };
   $("joinWithCodeBtn").onclick = async () => {
-    try{
-      const obj = b64.dec($("inviteCodeIn").value.trim());
-      if(obj.kind!=="offer") throw new Error("Not an Invite Code");
-      startJoinFlow(obj);
-    }catch(e){ error("Invalid code: " + e.message); }
+    try{ const obj=b64.dec($("inviteCodeIn").value.trim()); if(obj.kind!=="offer") throw new Error("Not an Invite Code"); startJoinFlow(obj); }
+    catch(e){ error("Invalid code: "+e.message); }
   };
 
   $("closeBtn").onclick = () => {
-    state.closed = true;
-    broadcast(state.me.id,{t:"closed"});
-    for(const [id,p] of state.peers.entries()){ try{p.dc?.close(); p.pc?.close();}catch{} state.peers.delete(id); }
-    roster.clear(); rosterRender();
-    setStatus("Closed");
-    info("Chat closed.");
+    state.closed = true; broadcast(state.me.id,{t:"closed"});
+    for (const [id,p] of state.peers.entries()) { try{p.dc?.close(); p.pc?.close();}catch{} state.peers.delete(id); }
+    roster.clear(); rosterRender(); setStatus("Closed"); info("Chat closed.");
   };
 
-  // -------------------- boot via URL or Code --------------------
+  // ---------- Boot via URL/query ----------
   (async function boot(){
-    const encoded = qs("data"), isJoin = qs("join"), hostFlag = qs("host"),
-          room = qs("room"), title = qs("title")||"", name = qs("name")||"";
-
+    const encoded=qs("data"), isJoin=qs("join"), hostFlag=qs("host"), room=qs("room"), title=qs("title")||"", name=qs("name")||"";
     if(hostFlag){
-      state.isHost = true;
-      show(["hostPanel","chatPanel"]);
-      $("roomKey").textContent = `Room ${room||"?"}`;
-      $("roomNamePill").textContent = decodeURIComponent(title||"");
-      $("inviteLinkBtn").disabled = false;
-      $("inviteCodeBtn").disabled = false;
-      $("closeBtn").disabled = false;
-      state.roomKey = room || state.roomKey;
-      state.roomName = decodeURIComponent(title||"");
-      state.me.name = decodeURIComponent(name||"");
-      setStatus("Waiting for peers…");
-      rosterRender();
+      state.isHost=true; show(["hostPanel","chatPanel"]);
+      $("roomKey").textContent=`Room ${room||"?"}`; $("roomNamePill").textContent=decodeURIComponent(title||"");
+      $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
+      state.roomKey=room||state.roomKey; state.roomName=decodeURIComponent(title||""); state.me.name=decodeURIComponent(name||"");
+      rosterRender(); setStatus("Waiting for peers…");
       info("Host view restored.");
-      // If this URL is actually an Answer Link, auto-apply it (host-only convenience)
-      if (encoded) {
+      if (TURN_URL && TURN_USER && TURN_PASS) info("TURN is enabled in this build.");
+      else info("TURN not configured (STUN only). Some networks may fail.");
+      if(encoded){ // auto-apply Answer Link
         try{
-          const obj = b64.dec(decodeURIComponent(encoded));
-          if (obj.kind === "answer") {
-            const saved = JSON.parse(localStorage.getItem(`invite:${obj.invite}`) || "null");
-            if (!saved) error("This Answer does not match a pending invite in this browser/tab.");
-            else {
-              info("Auto-applying Answer from link…");
-              await hostApplyAnswer(obj.invite, obj.sdp);
-              info("Answer auto-applied from link.");
-              setTimeout(()=>history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`), 1200);
-            }
+          const obj=b64.dec(decodeURIComponent(encoded));
+          if(obj.kind==="answer"){
+            const saved=JSON.parse(localStorage.getItem(`invite:${obj.invite}`)||"null");
+            if(!saved) error("This Answer doesn't match any pending invite in this tab.");
+            else { info("Auto-applying Answer from link…"); await hostApplyAnswer(obj.invite,obj.sdp); info("Answer auto-applied."); setTimeout(()=>history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`), 1200); }
           }
-        } catch(e){ error("Failed to auto-apply Answer from link: " + e.message); }
+        }catch(e){ error("Failed to auto-apply Answer from link: "+e.message); }
       }
       return;
     }
-
-    if(isJoin && encoded){
-      try {
-        const obj = b64.dec(decodeURIComponent(encoded));
-        startJoinFlow(obj);
-      } catch(e){
-        error("Bad invite link: " + e.message);
-      }
-    }
+    if(isJoin && encoded){ try{ startJoinFlow(b64.dec(decodeURIComponent(encoded))); } catch(e){ error("Bad invite link: "+e.message); } }
   })();
 
   async function startJoinFlow(obj){
     if(!obj || obj.kind!=="offer"){ show("landingPanel"); return; }
     state.isHost=false; state.roomKey=obj.room; state.roomName=obj.title||"";
-    $("joinRoomKey").textContent=`Room ${state.roomKey}`;
-    $("joinRoomName").textContent=state.roomName;
+    $("joinRoomKey").textContent=`Room ${state.roomKey}`; $("joinRoomName").textContent=state.roomName;
     show(["joinPanel","chatPanel"]);
-    const storedName = localStorage.getItem("webrtc-name") || "";
-    $("joinerName").value = storedName || "";
-    state.me.name = storedName || ("Guest-"+Math.random().toString(36).slice(2,6).toUpperCase());
-    localStorage.setItem("webrtc-name", state.me.name);
-
+    const storedName=localStorage.getItem("webrtc-name")||""; $("joinerName").value=storedName||""; state.me.name=storedName||("Guest-"+Math.random().toString(36).slice(2,6).toUpperCase()); localStorage.setItem("webrtc-name",state.me.name);
     setJoinStatus("Connecting… (creating answer)");
-    const answer = await joinWithOffer(obj.invite, obj.sdp);
-    const ansPayload = {v:1,kind:"answer",invite:obj.invite,room:state.roomKey,sdp:answer};
-    $("answerOut").value = b64.enc(ansPayload);
-    $("copyAnswerCodeBtn").onclick = ()=>copyText($("answerOut").value);
-    const ansLink = location.origin + location.pathname + "?data=" + encodeURIComponent(b64.enc(ansPayload)) + `&host=1&room=${encodeURIComponent(state.roomKey)}&title=${encodeURIComponent(state.roomName)}&name=${encodeURIComponent(state.me.name)}`;
-    $("copyAnswerLinkBtn").onclick = ()=>copyText(ansLink);
-    info("Answer ready. Send the Answer Code (or Link) to the host. Then wait for them to apply it.");
-    // remind after 60s if host hasn't applied
-    armTimeout("join-wait", 60000, ()=>info("Still waiting for host to apply your Answer…"));
-    $("joinerName").addEventListener("change", ()=>{
-      state.me.name = $("joinerName").value.trim() || state.me.name;
-      localStorage.setItem("webrtc-name", state.me.name);
-      const host = state.peers.get("host");
-      host?.dc?.readyState==="open" && host.dc.send(JSON.stringify({t:"rename",id:state.me.id,name:state.me.name}));
-    });
+    const answer=await joinWithOffer(obj.invite,obj.sdp);
+    const ansPayload={v:1,kind:"answer",invite:obj.invite,room:state.roomKey,sdp:answer};
+    $("answerOut").value=b64.enc(ansPayload);
+    $("copyAnswerCodeBtn").onclick=()=>copyText($("answerOut").value);
+    const ansLink=location.origin+location.pathname+"?data="+encodeURIComponent(b64.enc(ansPayload)) + `&host=1&room=${encodeURIComponent(state.roomKey)}&title=${encodeURIComponent(state.roomName)}&name=${encodeURIComponent(state.me.name)}`;
+    $("copyAnswerLinkBtn").onclick=()=>copyText(ansLink);
+    info("Answer ready. Send the Answer Link/Code to the host. Then wait for them to apply it.");
   }
 })();
 </script>
