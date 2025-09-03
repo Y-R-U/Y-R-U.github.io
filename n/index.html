@@ -1,440 +1,128 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>P2P Chat — STUN‑first (multi‑STUN)</title>
-<style>
-  :root { --bg:#0b0f14; --fg:#e7edf3; --muted:#9fb0c3; --card:#121923; --accent:#5ec5ff; --warn:#ffb86b; --err:#ff6b6b; }
-  html,body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;margin:0}
-  .wrap{max-width:920px;margin:24px auto;padding:0 16px}
-  h1{font-size:22px;margin:0 0 12px}
-  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .col{display:flex;flex-direction:column;gap:10px}
-  .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  input[type=text]{background:#0e1621;border:1px solid #1c2a3a;color:var(--fg);border-radius:10px;padding:10px 12px;width:100%}
-  button{background:#162434;color:var(--fg);border:1px solid #274663;border-radius:10px;padding:9px 12px;cursor:pointer}
-  button.primary{background:var(--accent);color:#04121d;border:none}
-  button.warn{background:var(--warn);color:#130c00;border:none}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  .pill{padding:6px 10px;border-radius:999px;background:#0e1621;border:1px solid #25374c;color:var(--muted);font-size:12px}
-  .muted{color:var(--muted)}
-  .log{background:#0e1621;border:1px solid #1c2a3a;border-radius:10px;padding:10px;height:360px;overflow:auto}
-  .msg{margin:0 0 8px}
-  .msg.sys{color:var(--muted);font-style:italic}
-  .msg.err{color:var(--err)}
-  .roster{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:#0e1621;border:1px solid #1c2a3a;padding:6px 10px;border-radius:999px}
-  .sep{height:1px;background:#1c2a3a;margin:8px 0 12px}
-  .small{font-size:12px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebRTC STUN Peer Test (manual copy/paste)</title>
+  <style>
+    body { margin:0; font:14px system-ui, sans-serif; background:#0b1220; color:#e8eef9; }
+    header { padding:10px; display:flex; flex-wrap:wrap; gap:8px; border-bottom:1px solid #1e2a44; }
+    input, textarea { background:#0e172a; color:#e8eef9; border:1px solid #1e2a44; border-radius:6px; padding:6px; }
+    textarea { width:100%; resize:vertical; min-height:80px; font-family:monospace; }
+    button { background:#15233d; color:#e8eef9; border:1px solid #29406e; border-radius:6px; padding:6px 10px; cursor:pointer; }
+    main { padding:10px; }
+    .log { background:#0c1426; border:1px solid #1e2a44; border-radius:8px; padding:10px; min-height:50vh; font-family:monospace; font-size:12px; white-space:pre-wrap; overflow:auto; }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>P2P Chat — STUN‑first</h1>
-  <div class="muted" style="margin:-6px 0 16px">
-    WebRTC data channels; link <b>or</b> code signaling. Uses multiple public <b>STUN</b> servers by default (TURN optional). <span id="ver" class="small"></span>
-  </div>
-
-  <!-- Host controls -->
-  <div id="hostPanel" class="card" style="display:none">
-    <div class="row" style="align-items:baseline">
-      <span class="pill">Host</span>
-      <span id="roomKey" class="pill"></span>
-      <span id="roomNamePill" class="pill"></span>
-      <span id="statusBadge" class="pill">Idle</span>
-      <div class="row" style="margin-left:auto;gap:8px">
-        <button id="inviteLinkBtn" disabled>Copy Invite Link</button>
-        <button id="inviteCodeBtn" disabled>Copy Invite Code</button>
-        <button id="closeBtn" class="warn" disabled>Close Chat</button>
-      </div>
-    </div>
-    <div id="answerCodeRow" class="row" style="margin-top:8px;display:none">
-      <input id="answerCodeInput" type="text" placeholder="Paste Answer Code here…">
-      <button id="applyAnswerCodeBtn">Apply Answer Code</button>
-      <span class="muted small">Needed if the joiner used a code. If they used a link, the host should open the Answer Link.</span>
-    </div>
-  </div>
-
-  <!-- Joiner controls -->
-  <div id="joinPanel" class="card" style="display:none">
-    <div class="row" style="align-items:baseline">
-      <span class="pill">Join</span>
-      <span id="joinRoomKey" class="pill"></span>
-      <span id="joinRoomName" class="pill"></span>
-      <span id="joinStatus" class="pill" style="margin-left:auto">Connecting…</span>
-    </div>
-    <div class="row">
-      <div class="col" style="min-width:200px;max-width:260px">
-        <input id="joinerName" type="text" placeholder="Your display name">
-      </div>
-      <div class="col" style="min-width:260px">
-        <input id="answerOut" type="text" readonly placeholder="Answer Code will appear here">
-        <div class="row">
-          <button id="copyAnswerCodeBtn">Copy Answer Code</button>
-          <button id="copyAnswerLinkBtn">Copy Answer Link</button>
-        </div>
-        <div class="small muted">Send one of these back to the host. They must apply it.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Chat -->
-  <div id="chatPanel" class="card" style="display:none">
-    <div class="row"><div class="roster" id="roster"></div></div>
-    <div class="sep"></div>
+  <header>
+    <input id="name" type="text" placeholder="Your name" />
+    <button id="randName">Set User_SS</button>
+    <button id="btnCreateOffer">Creator: Create Offer</button>
+    <button id="btnSetOfferCreateAnswer">User: Set Remote Offer → Create Answer</button>
+    <button id="btnSetAnswer">Creator: Set Remote Answer</button>
+    <button id="btnCopyOut">Copy Out</button>
+    <button id="btnPasteIn">Paste In</button>
+    <button id="btnReset">Reset</button>
+  </header>
+  <main>
+    <h3>Signal to Send</h3>
+    <textarea id="signalOut"></textarea>
+    <h3>Signal from Other</h3>
+    <textarea id="signalIn"></textarea>
+    <h3>Logs</h3>
     <div id="log" class="log"></div>
-    <div class="row" style="margin-top:10px">
-      <input id="messageInput" type="text" placeholder="Type message… (Enter to send)">
-      <button id="sendBtn">Send</button>
-      <button id="renameBtn">Rename</button>
-    </div>
-  </div>
+  </main>
+  <script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const logEl = $("log");
+    function log(msg){
+      const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.textContent += line + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(line);
+    }
 
-  <!-- Landing -->
-  <div id="landingPanel" class="card">
-    <div class="row">
-      <div class="col grow" style="min-width:320px">
-        <div class="small muted">Start a new chat</div>
-        <input id="landingName" type="text" placeholder="Chat name">
-        <input id="landingDisplay" type="text" placeholder="Your display name">
-        <button id="startNewBtn" class="primary">Start New Chat</button>
-      </div>
-      <div class="col grow" style="min-width:320px">
-        <div class="small muted">Join with link or code</div>
-        <input id="landingInvite" type="text" placeholder="Paste Invite Link here (or switch to code below)">
-        <div class="row">
-          <button id="openInviteBtn">Open Link</button>
-          <span class="small muted">or</span>
-          <input id="inviteCodeIn" type="text" placeholder="Paste Invite Code here">
-          <button id="joinWithCodeBtn">Join with Code</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    let pc, dc;
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ];
 
-  <p class="small muted">This build is STUN‑first. If a direct path can’t be found, it will fail unless TURN is configured. Check the log for candidate types (host/srflx/relay).</p>
-</div>
+    function newPC(){
+      pc = new RTCPeerConnection({iceServers});
+      pc.onicecandidate = e => {
+        if(e.candidate){ log("ICE candidate: "+e.candidate.candidate); }
+        else { log("ICE candidate gathering complete"); updateSignalOut(); dumpCandidates(); }
+      };
+      pc.onicecandidateerror = e => {
+        log(`ICE candidate ERROR: ${e.errorText||e.errorCode}`);
+      };
+      pc.oniceconnectionstatechange = ()=>{ log("iceConnectionState → "+pc.iceConnectionState); };
+      pc.onconnectionstatechange = ()=>{ log("connectionState → "+pc.connectionState); };
+      pc.onsignalingstatechange = ()=>{ log("signalingState → "+pc.signalingState); };
+      pc.ondatachannel = ev=>{ dc=ev.channel; bindDC(); log("Got DataChannel"); };
+    }
 
-<script>
-(() => {
-  // ======== NEW: Multi‑STUN defaults + optional TURN ========
-  // You can override via URL like: ?stun=stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302
-  const DEFAULT_STUNS = [
-    "stun:stun.l.google.com:19302",
-    "stun:stun1.l.google.com:19302",
-    "stun:stun2.l.google.com:19302",
-    "stun:stun3.l.google.com:19302",
-    "stun:stun4.l.google.com:19302",
-    "stun:global.stun.twilio.com:3478"
-  ];
+    function bindDC(){
+      dc.onopen=()=>log("DataChannel open");
+      dc.onmessage=e=>log("Message: "+e.data);
+      dc.onclose=()=>log("DataChannel closed");
+      dc.onerror=e=>log("DataChannel error: "+e.message);
+    }
 
-  const url = new URL(window.location.href);
-  const qs  = k => url.searchParams.get(k);
-  const customStuns = (qs("stun")||"").split(",").map(s => s.trim()).filter(Boolean);
+    function stringify(desc){ return JSON.stringify({type:desc.type,sdp:desc.sdp}); }
+    function parse(text){ return new RTCSessionDescription(JSON.parse(text)); }
+    function updateSignalOut(){ if(pc.localDescription) $("signalOut").value=stringify(pc.localDescription); }
 
-  // Optional TURN (leave empty for STUN‑only). You can also inject via query params for quick tests.
-  const TURN_URL  = qs("turn")  || "";   // e.g., "turn:relay.metered.live:80"
-  const TURN_USER = qs("tuser") || "";   // e.g., "user"
-  const TURN_PASS = qs("tpass") || "";   // e.g., "pass"
+    async function waitIce(){
+      if(pc.iceGatheringState==="complete") return;
+      await new Promise(r=>{ pc.addEventListener("icegatheringstatechange",()=>{ if(pc.iceGatheringState==="complete") r(); }); });
+    }
 
-  const VERSION = "stun-first-2.1"; document.getElementById("ver").textContent = `v${VERSION}`;
+    async function dumpCandidates(){
+      try {
+        const stats=await pc.getStats();
+        stats.forEach(r=>{ if(r.type==="local-candidate"){ log(`Local candidate: type=${r.candidateType} ip=${r.ip||r.address} port=${r.port}`); } });
+      }catch(e){ log("dumpCandidates error: "+e.message); }
+    }
 
-  // ---------- utils ----------
-  const $ = id => document.getElementById(id);
-  const b64 = { enc: o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))), dec: s => JSON.parse(decodeURIComponent(escape(atob(s)))) };
-  const genKey = () => Math.random().toString(36).slice(2,10).toUpperCase();
-  const genId  = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
-  function show(ids){ const want=Array.isArray(ids)?ids:[ids]; for(const id of ["landingPanel","hostPanel","joinPanel","chatPanel"]) $(id).style.display = want.includes(id) ? "" : "none"; }
-  const logEl = $("log");
-  function log(msg, cls=""){ const p=document.createElement("div"); p.className="msg "+cls; p.innerHTML=msg; logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight; }
-  const info = m => log(`<span class="muted">${m}</span>`,`msg sys`);
-  const error = m => log(`<span class="err">❌ ${m}</span>`,`msg err`);
-  function copyText(t){ navigator.clipboard.writeText(t).then(()=>info("Copied to clipboard.")).catch(()=>prompt("Copy:", t)); }
-  const esc = s => s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
-  const setStatus = s => $("statusBadge") && ($("statusBadge").textContent = s);
-  const setJoinStatus = s => $("joinStatus") && ($("joinStatus").textContent = s);
+    $("btnCreateOffer").onclick=async()=>{
+      newPC();
+      dc=pc.createDataChannel("test");
+      bindDC();
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await waitIce();
+      updateSignalOut();
+      log("Offer created");
+    };
 
-  // ---------- state ----------
-  const state = { isHost:false, me:{ id:genId(), name:"" }, roomKey:genKey(), roomName:"", peers:new Map(), closed:false };
-  const roster = new Map();
-  function rosterRender(){ const el=$("roster"); if(!el) return; el.innerHTML=""; el.appendChild(chip(state.me.name||"(me)")); for(const [id,name] of roster.entries()) el.appendChild(chip(name)); function chip(n){const s=document.createElement("span"); s.className="chip"; s.textContent=n; return s;} }
-  function rosterSet(list){ roster.clear(); for(const p of list) roster.set(p.id,p.name); rosterRender(); }
-  function rosterAdd(id,name){ roster.set(id,name); rosterRender(); }
-  function rosterDel(id){ roster.delete(id); rosterRender(); }
-  function rosterRename(id,name){ roster.set(id,name); rosterRender(); }
+    $("btnSetOfferCreateAnswer").onclick=async()=>{
+      newPC();
+      const remote=parse($("signalIn").value);
+      await pc.setRemoteDescription(remote);
+      const ans=await pc.createAnswer();
+      await pc.setLocalDescription(ans);
+      await waitIce();
+      updateSignalOut();
+      log("Answer created");
+    };
 
-  // ---------- diagnostics helpers ----------
-  const rtcConfig = (() => {
-    const stunUrls = (customStuns.length ? customStuns : DEFAULT_STUNS);
-    const servers = [ { urls: stunUrls } ];
-    if (TURN_URL && TURN_USER && TURN_PASS) servers.push({ urls: [TURN_URL], username: TURN_USER, credential: TURN_PASS });
-    return { iceServers: servers /*, iceTransportPolicy: "all"*/ };
+    $("btnSetAnswer").onclick=async()=>{
+      const remote=parse($("signalIn").value);
+      await pc.setRemoteDescription(remote);
+      log("Answer set");
+    };
+
+    $("btnCopyOut").onclick=()=>{ navigator.clipboard.writeText($("signalOut").value); };
+    $("btnPasteIn").onclick=async()=>{ $("signalIn").value=await navigator.clipboard.readText(); };
+    $("btnReset").onclick=()=>{ if(pc){pc.close();} pc=null; dc=null; $("signalOut").value=""; $("signalIn").value=""; log("Reset"); };
+    $("randName").onclick=()=>{ $("name").value="User_"+(Math.floor(Date.now()/1000)%60); };
+
+    log("Loaded");
   })();
-
-  function candType(c){ if(!c||!c.candidate) return "?"; const m=c.candidate.match(/ typ (\w+) /); return m?m[1]:"?"; } // host|srflx|relay
-
-  async function waitIceComplete(pc){
-    if(pc.iceGatheringState==="complete") return;
-    await new Promise(res=>{
-      pc.addEventListener("icegatheringstatechange", function f(){
-        if(pc.iceGatheringState==="complete"){ pc.removeEventListener("icegatheringstatechange", f); res(); }
-      });
-    });
-  }
-
-  function wireDiag(pc, role){
-    pc.onicecandidate = e => { if(e.candidate) info(`[${role}] ICE candidate (${candType(e.candidate)})`); else info(`[${role}] ICE gathering complete`); };
-    pc.onicecandidateerror = e => error(`[${role}] onicecandidateerror: ${e.errorText || e.errorCode || "unknown"}`);
-    pc.oniceconnectionstatechange = () => {
-      info(`[${role}] iceConnectionState → ${pc.iceConnectionState}`);
-      if (pc.iceConnectionState === "failed") error(`[${role}] ICE failed — this network likely blocks P2P. Configure TURN or try another network.`);
-    };
-    pc.onconnectionstatechange = () => info(`[${role}] connectionState → ${pc.connectionState}`);
-  }
-
-  async function periodicStats(pc, role, until="connected"){
-    let tries = 0;
-    const timer = setInterval(async () => {
-      tries++;
-      const stats = await pc.getStats().catch(()=>null);
-      if (!stats) return;
-      let selected, transports = [];
-      stats.forEach(r => {
-        if (r.type === "transport" && r.selectedCandidatePairId) transports.push(r.selectedCandidatePairId);
-        if (r.type === "candidate-pair" && r.selected) selected = r;
-      });
-      if (!selected && transports.length) {
-        stats.forEach(r => { if(r.type==="candidate-pair" && transports.includes(r.id)) selected = r; });
-      }
-      if (selected) {
-        const local = stats.get(selected.localCandidateId);
-        const remote = stats.get(selected.remoteCandidateId);
-        info(`[${role}] Selected pair: ${local?.candidateType || "?"} ↔ ${remote?.candidateType || "?"} (state=${selected.state}, nominated=${selected.nominated})`);
-      } else {
-        info(`[${role}] No selected ICE pair yet.`);
-      }
-      if (tries >= 8 || pc.connectionState === until) clearInterval(timer);
-    }, 2500);
-  }
-
-  function wireDC(dc){
-    dc.onopen = () => {
-      info(`DataChannel open.`);
-      try { dc.send(JSON.stringify({t:"hello",from:state.me.id,name:state.me.name,host:state.isHost,room:state.roomKey})); } catch(e){ error(`Send hello failed: ${e.message}`); }
-    };
-    dc.onmessage = ev => {
-      let m; try{ m=JSON.parse(ev.data); }catch{return;}
-      if(m.t==="hello"){
-        if(state.isHost){
-          const entry=[...state.peers.entries()].find(([_,v])=>v.dc===dc || v.pc?.sctp===dc?.sctp);
-          if(entry){
-            const [tmp,p]=entry;
-            state.peers.delete(tmp);
-            state.peers.set(m.from,{...p,name:m.name,role:"guest",dc});
-            rosterRender();
-            info(`Joined: ${esc(m.name)}`);
-            const rosterMsg={t:"roster",host:state.me,peers:[...state.peers.entries()].filter(([id,p])=>id!==m.from && p.role!=="guest-pending").map(([id,p])=>({id,name:p.name}))};
-            try { dc.send(JSON.stringify(rosterMsg)); } catch(e){ error(`Send roster failed: ${e.message}`); }
-            broadcast(m.from,{t:"joined",id:m.from,name:m.name});
-          }
-        } else {
-          const host=state.peers.get("host"); if(host) host.dc = dc;
-        }
-      } else if(m.t==="roster"){ rosterSet(m.peers);
-      } else if(m.t==="joined"){ rosterAdd(m.id,m.name);
-      } else if(m.t==="left"){ rosterDel(m.id);
-      } else if(m.t==="rename"){ rosterRename(m.id,m.name);
-      } else if(m.t==="chat"){ if(!state.isHost){ printChat(m.id===state.me.id?"(me)":m.name,m.text,m.id===state.me.id);} else { broadcast(m.id,m); printChat(m.name,m.text,false);} }
-    };
-    dc.onclose = () => info("DataChannel closed.");
-    dc.onerror = e => error(`DataChannel error: ${e.message || e}`);
-  }
-
-  function broadcast(fromId,payload){
-    for(const [pid,p] of state.peers.entries()){
-      if(!p.dc || p.dc.readyState!=="open") continue;
-      if(pid===fromId) continue;
-      try { p.dc.send(JSON.stringify(payload)); } catch(e){ error(`Broadcast failed: ${e.message}`); }
-    }
-  }
-
-  // ---------- Host: create offer for an invite ----------
-  async function hostCreateInvite(inviteId){
-    const pc = new RTCPeerConnection(rtcConfig);
-    wireDiag(pc,"HOST");
-    periodicStats(pc,"HOST");
-    const dc = pc.createDataChannel("chat",{ordered:true});
-    wireDC(dc);
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState==="failed"||pc.connectionState==="disconnected"){
-        for(const [pid,p] of state.peers.entries()){ if(p.pc===pc){ state.peers.delete(pid); rosterRender(); info(`Pending peer ${esc(p.name||pid)} disconnected.`); } }
-      }
-    };
-    const offer = await pc.createOffer().catch(e=>{ error(`createOffer failed: ${e.message}`); throw e; });
-    await pc.setLocalDescription(offer).catch(e=>{ error(`setLocalDescription(offer) failed: ${e.message}`); throw e; });
-    info("Offer created; gathering ICE…");
-    await waitIceComplete(pc);
-    info("Offer ready.");
-    localStorage.setItem(`invite:${inviteId}`, JSON.stringify({inviteId,roomKey:state.roomKey,sdp:pc.localDescription,ts:Date.now()}));
-    state.peers.set(inviteId,{pc,dc,name:"(connecting…)",role:"guest-pending"});
-    rosterRender();
-    return pc.localDescription;
-  }
-
-  // ---------- Host: apply joiner answer ----------
-  async function hostApplyAnswer(inviteId, answer){
-    const p = state.peers.get(inviteId);
-    if(!p){ error("No matching pending invite for this Answer (maybe you generated a new invite?)."); throw new Error("no pending invite"); }
-    info("Applying Answer from joiner…");
-    await p.pc.setRemoteDescription(answer).catch(e=>{ error(`setRemoteDescription(answer) failed: ${e.message}`); throw e; });
-    periodicStats(p.pc,"HOST");
-    info("Answer applied. Waiting for ICE to connect…");
-  }
-
-  // ---------- Joiner: accept offer and create answer ----------
-  async function joinWithOffer(inviteId, offer){
-    const pc = new RTCPeerConnection(rtcConfig);
-    wireDiag(pc,"JOIN");
-    periodicStats(pc,"JOIN");
-    pc.ondatachannel = e => wireDC(e.channel);
-    pc.onconnectionstatechange = () => {
-      if(pc.connectionState==="connecting") setJoinStatus("Waiting for host to apply your answer…");
-      if(pc.connectionState==="connected") setJoinStatus("Connected");
-      if(pc.connectionState==="failed" || pc.connectionState==="disconnected") setJoinStatus("Connection failed/disconnected");
-    };
-    await pc.setRemoteDescription(offer).catch(e=>{ error(`setRemoteDescription(offer) failed: ${e.message}`); throw e; });
-    info("Creating Answer…");
-    const answer = await pc.createAnswer().catch(e=>{ error(`createAnswer failed: ${e.message}`); throw e; });
-    await pc.setLocalDescription(answer).catch(e=>{ error(`setLocalDescription(answer) failed: ${e.message}`); throw e; });
-    info("Answer created; gathering ICE…");
-    await waitIceComplete(pc);
-    info("Answer ready. Send Answer Link/Code to host and wait for them to apply it.");
-    state.peers.set("host",{pc,dc:null,name:"(host)",role:"host"});
-    return pc.localDescription;
-  }
-
-  // ---------- Chat ----------
-  $("sendBtn").onclick = sendChat;
-  $("messageInput").addEventListener("keydown", e => { if(e.key==="Enter") sendChat(); });
-  function printChat(who,text,isMe=false){ log(`<span class="who${isMe?' me':''}"><b>${esc(who)}</b>:</span> ${esc(text)}`); }
-  function sendChat(){
-    const txt=$("messageInput").value.trim(); if(!txt) return; $("messageInput").value="";
-    if(state.isHost){ printChat(state.me.name,txt,true); broadcast(state.me.id,{t:"chat",id:state.me.id,name:state.me.name,text:txt}); }
-    else{ const host=state.peers.get("host"); if(host?.dc?.readyState==="open"){ host.dc.send(JSON.stringify({t:"chat",id:state.me.id,name:state.me.name,text:txt})); printChat("(me)",txt,true);} else info("Not connected yet."); }
-  }
-  $("renameBtn").onclick = () => {
-    const n = prompt("Enter new display name:", state.me.name || "");
-    if (!n) return;
-    state.me.name = n;
-    rosterRender();
-    if (state.isHost) {
-      broadcast(state.me.id, { t: "rename", id: state.me.id, name: n });
-    } else {
-      const host = state.peers.get("host");
-      host?.dc?.send(JSON.stringify({ t: "rename", id: state.me.id, name: n }));
-    }
-  };
-
-  // ---------- UI wiring ----------
-  $("startNewBtn").onclick = async () => {
-    state.isHost=true; state.roomKey=genKey(); state.roomName=$("landingName").value.trim()||"My Chat"; state.me.name=$("landingDisplay").value.trim()||"Host";
-    $("roomKey").textContent=`Room ${state.roomKey}`; $("roomNamePill").textContent=state.roomName;
-    $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
-    show(["hostPanel","chatPanel"]); $("landingPanel").style.display="none"; rosterRender(); setStatus("Waiting for peers…");
-    info("Chat created. Use Copy Invite Link or Copy Invite Code.");
-    history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`);
-    if (TURN_URL && TURN_USER && TURN_PASS) info("TURN is enabled (fallback available).");
-    else info("TURN not configured — STUN‑only. Some networks may fail.");
-  };
-
-  $("inviteLinkBtn").onclick = async () => {
-    const inviteId = genId();
-    const offer = await hostCreateInvite(inviteId);
-    $("answerCodeRow").style.display = "";
-    const payload = {v:1,kind:"offer",invite:inviteId,room:state.roomKey,title:state.roomName,sdp:offer};
-    const link = location.origin + location.pathname + "?join=1&data=" + encodeURIComponent(b64.enc(payload));
-    copyText(link);
-    setStatus("Invite ready (link)");
-    info("Invite Link copied. Joiner must open it, then send back the Answer Link (host should open it).");
-    setTimeout(()=>info("Reminder: host must apply the Answer (open Answer Link or paste Answer Code)."), 15000);
-  };
-
-  $("inviteCodeBtn").onclick = async () => {
-    const inviteId = genId();
-    const offer = await hostCreateInvite(inviteId);
-    $("answerCodeRow").style.display = "";
-    const payload = {v:1,kind:"offer",invite:inviteId,room:state.roomKey,title:state.roomName,sdp:offer};
-    copyText(b64.enc(payload));
-    setStatus("Invite ready (code)");
-    info("Invite Code copied. Joiner will return an Answer Code; paste it here and click Apply.");
-  };
-
-  $("applyAnswerCodeBtn").onclick = async () => {
-    try{
-      const obj = b64.dec($("answerCodeInput").value.trim());
-      if(obj.kind!=="answer") throw new Error("Not an Answer Code");
-      await hostApplyAnswer(obj.invite, obj.sdp);
-      info("Answer applied. If not connected in ~20s, try a new invite, different networks, or enable TURN.");
-      $("answerCodeInput").value="";
-    } catch(e){ error("Failed to apply answer: "+e.message); }
-  };
-
-  $("openInviteBtn").onclick = () => { const link=$("landingInvite").value.trim(); if(link) window.location.href = link; };
-  $("joinWithCodeBtn").onclick = async () => {
-    try{ const obj=b64.dec($("inviteCodeIn").value.trim()); if(obj.kind!=="offer") throw new Error("Not an Invite Code"); startJoinFlow(obj); }
-    catch(e){ error("Invalid code: "+e.message); }
-  };
-
-  $("closeBtn").onclick = () => {
-    state.closed = true; broadcast(state.me.id,{t:"closed"});
-    for (const [id,p] of state.peers.entries()) { try{p.dc?.close(); p.pc?.close();}catch{} state.peers.delete(id); }
-    roster.clear(); rosterRender(); setStatus("Closed"); info("Chat closed.");
-  };
-
-  // ---------- Boot via URL/query ----------
-  (async function boot(){
-    const encoded=qs("data"), isJoin=qs("join"), hostFlag=qs("host"), room=qs("room"), title=qs("title")||"", name=qs("name")||"";
-    if(hostFlag){
-      state.isHost=true; show(["hostPanel","chatPanel"]);
-      $("roomKey").textContent=`Room ${room||"?"}`; $("roomNamePill").textContent=decodeURIComponent(title||"");
-      $("inviteLinkBtn").disabled=false; $("inviteCodeBtn").disabled=false; $("closeBtn").disabled=false;
-      state.roomKey=room||state.roomKey; state.roomName=decodeURIComponent(title||""); state.me.name=decodeURIComponent(name||"");
-      rosterRender(); setStatus("Waiting for peers…");
-      info("Host view restored.");
-      if (TURN_URL && TURN_USER && TURN_PASS) info("TURN is enabled (fallback available).");
-      else info("TURN not configured — STUN‑only.");
-      if(encoded){
-        try{
-          const obj=b64.dec(decodeURIComponent(encoded));
-          if(obj.kind==="answer"){
-            const saved=JSON.parse(localStorage.getItem(`invite:${obj.invite}`)||"null");
-            if(!saved) error("This Answer doesn't match any pending invite in this tab.");
-            else { info("Auto-applying Answer from link…"); await hostApplyAnswer(obj.invite,obj.sdp); info("Answer auto-applied."); setTimeout(()=>history.replaceState({}, "", location.pathname+`?room=${state.roomKey}&host=1&name=${encodeURIComponent(state.me.name)}&title=${encodeURIComponent(state.roomName)}`), 1200); }
-          }
-        }catch(e){ error("Failed to auto-apply Answer from link: "+e.message); }
-      }
-      return;
-    }
-    if(isJoin && encoded){ try{ startJoinFlow(b64.dec(decodeURIComponent(encoded))); } catch(e){ error("Bad invite link: "+e.message); } }
-  })();
-
-  async function startJoinFlow(obj){
-    if(!obj || obj.kind!=="offer"){ show("landingPanel"); return; }
-    state.isHost=false; state.roomKey=obj.room; state.roomName=obj.title||"";
-    $("joinRoomKey").textContent=`Room ${state.roomKey}`; $("joinRoomName").textContent=state.roomName;
-    show(["joinPanel","chatPanel"]);
-    const storedName=localStorage.getItem("webrtc-name")||""; $("joinerName").value=storedName||""; state.me.name=storedName||("Guest-"+Math.random().toString(36).slice(2,6).toUpperCase()); localStorage.setItem("webrtc-name",state.me.name);
-    setJoinStatus("Connecting… (creating answer)");
-    const answer=await joinWithOffer(obj.invite,obj.sdp);
-    const ansPayload={v:1,kind:"answer",invite:obj.invite,room:state.roomKey,sdp:answer};
-    $("answerOut").value=b64.enc(ansPayload);
-    $("copyAnswerCodeBtn").onclick=()=>copyText($("answerOut").value);
-    const ansLink=location.origin+location.pathname+"?data="+encodeURIComponent(b64.enc(ansPayload)) + `&host=1&room=${encodeURIComponent(state.roomKey)}&title=${encodeURIComponent(state.roomName)}&name=${encodeURIComponent(state.me.name)}`;
-    $("copyAnswerLinkBtn").onclick=()=>copyText(ansLink);
-    info("Answer ready. Send the Answer Link/Code to the host. Then wait for them to apply it.");
-  }
-})();
-</script>
+  </script>
 </body>
 </html>
