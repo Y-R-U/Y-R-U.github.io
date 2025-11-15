@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AB Edit</title>
+<style>
+html,body{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;box-sizing:border-box}
+#topBox,#lowerBox{width:100%;position:relative;border:1px solid #ccc}
+#topBox{height:50%}
+#lowerBox{height:50%}
+.topMenu,.lowerMenu{position:absolute;top:0;left:0;right:0;height:30px;line-height:30px;background:#eee;border-bottom:1px solid #ccc;padding:0 5px;box-sizing:border-box}
+.topMenu button,.lowerMenu button{margin-right:5px;border:none;background:none;cursor:pointer;font-size:14px}
+.active{color:#aaf}
+.editors textarea{width:100%;height:100%;box-sizing:border-box;font-family:monospace;font-size:14px;resize:none;padding:5px;border:0}
+@media (pointer:coarse){button{font-size:28px!important}}
+#projOverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:2000;display:none}
+#projPanel{position:absolute;top:0;right:0;bottom:0;left:auto;transform:none;width:min(420px,100%);background:#fff;border-left:1px solid #ccc;box-shadow:-2px 0 6px rgba(0,0,0,.4);box-sizing:border-box;padding:6px;display:flex;flex-direction:column}
+#projTree div{font-size:13px;padding:2px 0}
+#projTree .selRow{background:#def}
+#projTree button{font-size:11px;margin-left:2px;border:0;background:#eee;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="topBox">
+  <div class="topMenu">
+    <button id="btnL">LOAD</button>
+    <button id="btnS">SAVE</button><button id="btnE">EXPORT</button><button id="btnI">IMPORT</button><input type="file" id="fInput" style="display:none">
+    <span id="restoreSpan" style="float:right;display:none"><button id="btnRestore">50</button></span>
+  </div>
+  <iframe id="preview" style="position:absolute;top:30px;border:0;width:100%;height:100%"></iframe>
+</div>
+<div id="lowerBox">
+  <div class="lowerMenu">
+    <button id="btnHTML" class="active">HTML</button><button id="btnJS">JS</button><button id="btnCSS">CSS</button><button id="btn100">100</button><button id="btn90">90</button><button id="btn80">80</button><button id="btn70">70</button><button id="btn50" class="active">50</button><button id="btn30">30</button><button id="btn00">00</button><button id="btnConsole">Console</button>
+  </div>
+  <div class="editors" style="position:absolute;top:30px;bottom:0;left:0;right:0">
+    <textarea id="iHTML"></textarea><textarea id="iJS" style="display:none"></textarea><textarea id="iCSS" style="display:none"></textarea>
+    <div id="consoleDiv" style="display:none;position:absolute;top:0;bottom:0;left:0;right:0;padding:5px;box-sizing:border-box">
+      <div id="oConsole" style="width:100%;height:80%;background:#000;color:#fff;padding:5px;overflow-y:scroll;font-family:monospace"></div>
+      <div style="display:flex;margin-top:5px"><input id="iConsole" type="text" style="flex:1"><button id="btnRun">RUN</button><button id="btnClear">CLEAR</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="projOverlay">
+  <div id="projPanel">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span id="projTitle" style="flex:1;font-weight:bold;font-size:14px"></span>
+      <button id="projClose">X</button>
+    </div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <div id="projTree" style="flex:1;overflow:auto;border:1px solid #ddd;padding:2px 4px;margin-bottom:4px"></div>
+      <div style="font-size:12px;margin-bottom:4px">Level1 / Level2 / Save</div>
+      <input id="projL1" placeholder="Level 1" style="margin-bottom:2px;font-size:13px">
+      <input id="projL2" placeholder="Level 2" style="margin-bottom:2px;font-size:13px">
+      <input id="projName" placeholder="Save name" style="margin-bottom:4px;font-size:13px">
+      <div id="projModeInfo" style="font-size:12px;color:#555;margin-bottom:4px"></div>
+      <button id="projActionBtn" style="margin-bottom:4px">OK</button>
+      <div id="projHint" style="font-size:11px;color:#777;margin-top:auto"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var htmlCode="<html>\n<head>\n<style>\n\n</style>\n</head>\n<body>\n\n<h1>...Ready...</h1>\n\n<script>\n\n</"+"script>\n</body>\n</html>",jsCode="",cssCode="",activeTab="HTML",currentPath="";
+function updatePreview(){preview.srcdoc=htmlCode.replace("<script>","<script>"+dbgCde())}
+function dbgCde(){return"\n        function sendToParent(type, content) { window.parent.postMessage({ type, content }, '*'); }\n        ['log', 'warn', 'error', 'info'].forEach(method => {\n            const originalMethod=console[method];console[method]=function(...args){sendToParent(method,args.join(' '));originalMethod.apply(console,args);};\n        });\n        window.onerror=function(message,source,lineno,colno,error){sendToParent('error', message + ' at ' + source + ':' + lineno + ':' + colno);};\n        console.log('Debugging Console Setup Complete...');\n    "}
+let commandHistory=[],historyIndex=-1,maxHistory=15;
+dcmp().then(function(decompressed){let pLst=JSON.parse(decompressed||"{}");if(pLst.SYS_CONSOLE&&pLst.SYS_CONSOLE[0])commandHistory=pLst.SYS_CONSOLE[0].js||[]});
+function appendToConsole(type,message){const m=document.createElement("div");m.textContent="["+type.toUpperCase()+"]: "+message;if(type==="error"){m.style.color="red";if(!document.getElementById("cErrInd")){const e=document.createElement("span");e.id="cErrInd";e.textContent="*";e.style.color="red";e.style.marginLeft="-10px";btnConsole.parentNode.insertBefore(e,btnConsole.nextSibling)}}else if(type==="warn")m.style.color="orange";else if(type==="sys")m.style.color="green";else m.style.color="white";oConsole.appendChild(m);oConsole.scrollTop=oConsole.scrollHeight}
+window.addEventListener("message",function(event){if(event.data&&event.data.type&&event.data.content){const t=event.data;appendToConsole(t.type,t.content)}});
+
+iHTML.value=htmlCode;iJS.value=jsCode;iCSS.value=cssCode;updatePreview();
+
+btnRestore.onclick=function(){setLayout("50")};
+btnConsole.onclick=function(){iHTML.style.display=iJS.style.display=iCSS.style.display="none";consoleDiv.style.display="block";btnHTML.classList.remove("active");btnJS.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.add("active")};
+function runCommand(){var cmd=iConsole.value;appendToConsole("sys","> "+cmd);try{var r=preview.contentWindow.eval(cmd);if(r!==undefined)appendToConsole("log",r)}catch(e){appendToConsole("error","Error: "+e.message)}saveCommandToHistory(cmd);iConsole.value=""}
+btnRun.onclick=runCommand;
+btnClear.onclick=function(){oConsole.innerHTML="";var e=document.getElementById("cErrInd");if(e)e.remove()};
+iConsole.onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();runCommand()}};
+function saveCommandToHistory(cmd){dcmp().then(function(decompressed){let pLst=JSON.parse(decompressed||"{}");if(commandHistory[0]!==cmd){commandHistory.unshift(cmd);if(commandHistory.length>maxHistory)commandHistory.pop();const pName="SYS_CONSOLE",projData={js:[...commandHistory],css:"",html:"",timestamp:Date.now()};if(!pLst[pName])pLst[pName]=[];pLst[pName].unshift(projData);if(pLst[pName].length>100)pLst[pName].pop();cmp(JSON.stringify(pLst))}})}
+iConsole.addEventListener("keydown",function(e){if(e.key==="ArrowUp"){e.preventDefault();if(historyIndex<commandHistory.length-1){historyIndex++;iConsole.value=commandHistory[historyIndex]}}else if(e.key==="ArrowDown"){e.preventDefault();if(historyIndex>0){historyIndex--;iConsole.value=commandHistory[historyIndex]}else{historyIndex=-1;iConsole.value=""}}});
+
+btnHTML.onclick=function(){activeTab="HTML";iHTML.style.display="block";iJS.style.display="none";iCSS.style.display="none";consoleDiv.style.display="none";btnHTML.classList.add("active");btnJS.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.remove("active")};
+btnJS.onclick=function(){activeTab="JS";iHTML.style.display="none";iJS.style.display="block";iCSS.style.display="none";consoleDiv.style.display="none";btnJS.classList.add("active");btnHTML.classList.remove("active");btnCSS.classList.remove("active");btnConsole.classList.remove("active")};
+btnCSS.onclick=function(){activeTab="CSS";iHTML.style.display="none";iJS.style.display="none";iCSS.style.display="block";consoleDiv.style.display="none";btnCSS.classList.add("active");btnHTML.classList.remove("active");btnJS.classList.remove("active");btnConsole.classList.remove("active")};
+
+function setLayout(p){if(p==="00"){lowerBox.style.height="0";topBox.style.height="100%";restoreSpan.style.display="inline"}else{lowerBox.style.height=p+"%";topBox.style.height=(100-parseInt(p,10))+"%";restoreSpan.style.display="none"}[btn100,btn90,btn80,btn70,btn50,btn30,btn00].forEach(function(b){b.classList.remove("active")});if(p==="100")btn100.classList.add("active");else if(p==="90")btn90.classList.add("active");else if(p==="80")btn80.classList.add("active");else if(p==="70")btn70.classList.add("active");else if(p==="50")btn50.classList.add("active");else if(p==="30")btn30.classList.add("active");else if(p==="00")btn00.classList.add("active")}
+btn100.onclick=function(){setLayout("100")};btn90.onclick=function(){setLayout("90")};btn80.onclick=function(){setLayout("80")};btn70.onclick=function(){setLayout("70")};btn50.onclick=function(){setLayout("50")};btn30.onclick=function(){setLayout("30")};btn00.onclick=function(){setLayout("00")};
+
+iHTML.oninput=function(){htmlCode=this.value;var s=htmlCode.match(/<style>([\s\S]*?)<\/style>/i);if(s){cssCode=s[1];iCSS.value=cssCode}var sc=htmlCode.match(/<script>([\s\S]*?)<\/script>/i);if(sc){jsCode=sc[1];iJS.value=jsCode}updatePreview()};
+iJS.oninput=function(){jsCode=this.value;if(/<script>[\s\S]*?<\/script>/i.test(htmlCode))htmlCode=htmlCode.replace(/<script>[\s\S]*?<\/script>/i,"<script>"+jsCode+"<"+"/script>");else htmlCode+="<script>"+jsCode;iHTML.value=htmlCode;updatePreview()};
+iCSS.oninput=function(){cssCode=this.value;if(/<style>[\s\S]*?<\/style>/i.test(htmlCode))htmlCode=htmlCode.replace(/<style>[\s\S]*?<\/style>/i,"<style>"+cssCode+"<"+"/style>");else htmlCode="<style>"+cssCode+"\n"+htmlCode;iHTML.value=htmlCode;updatePreview()};
+iHTML.oninput();
+
+var projTreeData=[],projTreeDiv=document.getElementById("projTree"),projOverlay=document.getElementById("projOverlay"),projTitle=document.getElementById("projTitle"),projClose=document.getElementById("projClose"),projL1=document.getElementById("projL1"),projL2=document.getElementById("projL2"),projName=document.getElementById("projName"),projModeInfo=document.getElementById("projModeInfo"),projActionBtn=document.getElementById("projActionBtn"),projHint=document.getElementById("projHint");
+var projMode="load",selectedPathStr="",pendingMovePath="";
+function escHtml(s){return(s||"").replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function buildProjTree(pLst){var tree=[];function g1(name){var n=tree.find(function(x){return x.name===name});if(!n){n={name:name||"Root",children:[]};tree.push(n)}return n}function g2(parent,name){var n=parent.children.find(function(x){return x.name===name});if(!n){n={name:name||"Default",children:[]};parent.children.push(n)}return n}for(const key in pLst){if(key==="SYS_CONSOLE")continue;var parts=key.split("/"),l1=parts[0]||"Root",l2=parts[1]||"Default",nm=parts[2]||parts[parts.length-1]||key,L1=g1(l1),L2=g2(L1,l2);L2.children.push({name:nm,versions:pLst[key]||[]})}return tree}
+function flattenProjTree(oldP){var out={};if(oldP.SYS_CONSOLE)out.SYS_CONSOLE=oldP.SYS_CONSOLE;projTreeData.forEach(function(L1){L1.children.forEach(function(L2){L2.children.forEach(function(S){var key=(L1.name||"Root")+"/"+(L2.name||"Default")+"/"+(S.name||"Untitled");out[key]=S.versions||[]})})});return out}
+function renderProjTree(){var h="";projTreeData.forEach(function(L1,i){var p1=i+"|-1|-1";h+='<div data-p="'+p1+'" class="l1Row'+(selectedPathStr===p1?" selRow":"")+'"><b>'+escHtml(L1.name)+'</b> <button data-act="sel" data-p="'+p1+'">S</button><button data-act="ren" data-p="'+p1+'">R</button><button data-act="up" data-p="'+p1+'">↑</button><button data-act="down" data-p="'+p1+'">↓</button></div>';L1.children.forEach(function(L2,j){var p2=i+"|"+j+"|-1";h+='<div data-p="'+p2+'" class="l2Row'+(selectedPathStr===p2?" selRow":"")+'" style="margin-left:12px">'+escHtml(L2.name)+' <button data-act="sel" data-p="'+p2+'">S</button><button data-act="ren" data-p="'+p2+'">R</button><button data-act="up" data-p="'+p2+'">↑</button><button data-act="down" data-p="'+p2+'">↓</button><button data-act="move" data-p="'+p2+'">M</button></div>';L2.children.forEach(function(S,k){var p3=i+"|"+j+"|"+k;h+='<div data-p="'+p3+'" class="svRow'+(selectedPathStr===p3?" selRow":"")+'" style="margin-left:24px">'+escHtml(S.name)+" ("+S.versions.length+') <button data-act="load" data-p="'+p3+'">L</button><button data-act="sel" data-p="'+p3+'">S</button><button data-act="ren" data-p="'+p3+'">R</button><button data-act="up" data-p="'+p3+'">↑</button><button data-act="down" data-p="'+p3+'">↓</button><button data-act="move" data-p="'+p3+'">M</button></div>'})})});projTreeDiv.innerHTML=h||'<div style="font-size:12px;color:#666">No projects yet.</div>'}
+projTreeDiv.onclick=function(e){var act=e.target.dataset.act,p=e.target.dataset.p;if(!act||!p)return;var parts=p.split("|").map(function(x){return parseInt(x,10)}),i=parts[0],j=parts[1],k=parts[2];if(pendingMovePath&&act==="sel"){doMove(pendingMovePath,p);return}if(act==="sel"){selectedPathStr=p;renderProjTree();fillInputsFromPath(i,j,k)}else if(act==="load"){if(projMode==="load")loadFromPath(i,j,k);else{selectedPathStr=p;renderProjTree();fillInputsFromPath(i,j,k)}}else if(act==="ren")renameNode(i,j,k);else if(act==="up"||act==="down")reorderNode(i,j,k,act==="up"?-1:1);else if(act==="move"){pendingMovePath=p;projHint.textContent=(k>=0?"Select target Level2 row":"Select target Level1 row")+" to move."}};
+function fillInputsFromPath(i,j,k){var L1=projTreeData[i];if(!L1)return;var L2=j>=0?L1.children[j]:null,S=k>=0&&L2?L2.children[k]:null;projL1.value=L1.name||"";projL2.value=L2?L2.name:"";projName.value=S?S.name:"";var pathStr=(projL1.value||"?")+" / "+(projL2.value||"?")+(S?" / "+(projName.value||"?"):"");projModeInfo.textContent="Selected: "+pathStr}
+function renameNode(i,j,k){if(i<0)return;if(k>=0){var S=projTreeData[i].children[j].children[k],nn=prompt("Rename save:",S.name);if(!nn)return;S.name=nn}else if(j>=0){var L2=projTreeData[i].children[j],nn2=prompt("Rename Level2:",L2.name);if(!nn2)return;L2.name=nn2}else{var L1=projTreeData[i],nn3=prompt("Rename Level1:",L1.name);if(!nn3)return;L1.name=nn3}persistTreeAndRerender()}
+function reorderNode(i,j,k,dir){var arr,idx;if(k>=0){arr=projTreeData[i].children[j].children;idx=k}else if(j>=0){arr=projTreeData[i].children;idx=j}else{arr=projTreeData;idx=i}var ni=idx+dir;if(ni<0||ni>=arr.length)return;var tmp=arr[idx];arr[idx]=arr[ni];arr[ni]=tmp;persistTreeAndRerender()}
+function doMove(fromStr,toStr){var a=fromStr.split("|").map(function(x){return parseInt(x,10)}),b=toStr.split("|").map(function(x){return parseInt(x,10)}),fi=a[0],fj=a[1],fk=a[2],ti=b[0],tj=b[1],tk=b[2];if(fk>=0){if(!(tj>=0&&tk==-1)){projHint.textContent="Leaf moves onto Level2 rows only.";pendingMovePath="";return}var srcL1=projTreeData[fi],srcL2=srcL1.children[fj],leaf=srcL2.children.splice(fk,1)[0],dstL1=projTreeData[ti],dstL2=dstL1.children[tj];dstL2.children.push(leaf)}else if(fj>=0){if(!(tj==-1&&tk==-1)){projHint.textContent="Level2 moves onto Level1 rows.";pendingMovePath="";return}var sL1=projTreeData[fi],node=sL1.children.splice(fj,1)[0],dL1=projTreeData[ti];dL1.children.push(node)}else{projHint.textContent="Level1 can be reordered with ↑/↓.";pendingMovePath="";return}pendingMovePath="";projHint.textContent="Moved.";persistTreeAndRerender()}
+function persistTreeAndRerender(){dcmp().then(function(t){var oldP=JSON.parse(t||"{}"),newP=flattenProjTree(oldP);cmp(JSON.stringify(newP));renderProjTree()})}
+function loadFromPath(i,j,k){var L1=projTreeData[i];if(!L1)return;var L2=L1.children[j];if(!L2)return;var S=L2.children[k];if(!S)return;var latest=S.versions&&S.versions[0]||{js:""};iHTML.value=latest.js||"";iHTML.oninput();currentPath=L1.name+"/"+L2.name+"/"+S.name;btnS.innerHTML="SAVE ("+currentPath+")";closeProjOverlay()}
+function openProjOverlay(mode){projMode=mode;projOverlay.style.display="block";projTitle.textContent=mode==="load"?"Load Project":"Save Project";projActionBtn.textContent=mode==="load"?"Load selected (or click L)":"Save current here";projHint.textContent=mode==="load"?"Click L on a save row or use 'Load selected'.":"Pick/create parents and name, then save.";selectedPathStr="";pendingMovePath="";dcmp().then(function(t){var pLst=JSON.parse(t||"{}");projTreeData=buildProjTree(pLst);renderProjTree();if(mode==="save"){if(currentPath){var parts=currentPath.split("/");projL1.value=parts[0]||"";projL2.value=parts[1]||"";projName.value=parts[2]||"";projModeInfo.textContent="Current: "+currentPath}else{projL1.value="";projL2.value="";projName.value="";projModeInfo.textContent="New project: choose names."}}else{projL1.value="";projL2.value="";projName.value="";projModeInfo.textContent="Select a save to load."}})}
+function closeProjOverlay(){projOverlay.style.display="none"}
+projClose.onclick=closeProjOverlay;
+projActionBtn.onclick=function(){if(projMode==="load"){if(!selectedPathStr){alert("Select a save row first (S/L).");return}var p=selectedPathStr.split("|").map(function(x){return parseInt(x,10)});if(p[2]<0){alert("Select a save row (leaf), not just a parent.");return}loadFromPath(p[0],p[1],p[2])}else{var l1=projL1.value.trim(),l2=projL2.value.trim(),nm=projName.value.trim();if(!l1||!l2||!nm){alert("Fill Level1, Level2 and save name.");return}saveProjectAt(l1,l2,nm)}};
+function saveProjectAt(l1,l2,nm){dcmp().then(function(t){var pLst=JSON.parse(t||"{}"),key=l1+"/"+l2+"/"+nm,projData={js:iHTML.value,css:"",html:"",timestamp:Date.now()};if(!pLst[key])pLst[key]=[];pLst[key].unshift(projData);if(pLst[key].length>10)pLst[key].pop();cmp(JSON.stringify(pLst));currentPath=key;btnS.innerHTML="SAVE ("+currentPath+")";alert("Project saved!");closeProjOverlay()})}
+
+btnL.onclick=function(){openProjOverlay("load")};
+btnS.onclick=function(){openProjOverlay("save")};
+btnE.onclick=function(){const url=URL.createObjectURL(new Blob([localStorage.pLst||"{}"],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="pLst.json";a.click();URL.revokeObjectURL(url)};
+btnI.onclick=function(){fInput.click()};
+fInput.onchange=function(event){const file=event.target.files[0];if(file){const reader=new FileReader();reader.onload=function(e){const contents=e.target.result;try{localStorage.pLst=contents;alert("Project list imported successfully!");location.reload()}catch(err){alert("Failed to import project list.")}};reader.readAsText(file)}};
+
+async function cmp(input){b=new Blob([input],{type:"text/plain"});r=b.stream().pipeThrough(new CompressionStream("gzip")).getReader();chunks=[];while(true){const o=await r.read();if(o.done)break;chunks.push(o.value)}c=new Uint8Array(chunks.reduce(function(acc,val){return acc.concat(Array.from(val))},[]));base64String=btoa(String.fromCharCode.apply(null,c));localStorage.pLst=base64String;appendToConsole("sys","JSON STR.length: "+input.length+", B64.length: "+base64String.length)}
+var prevLength=0;
+function dcmp(){d=async function(){base64String=localStorage.pLst||"{}";if(base64String[0]==="{")return base64String;c=Uint8Array.from(atob(base64String),function(ch){return ch.charCodeAt(0)});b=new Blob([c]);ds=b.stream().pipeThrough(new DecompressionStream("gzip"));dt=await new Response(ds).text();if(dt.length!=prevLength){appendToConsole("sys","STR.length: "+dt.length+", B64.length: "+base64String.length);prevLength=dt.length}return dt};return d()}
+</script>
+</body>
+</html>
