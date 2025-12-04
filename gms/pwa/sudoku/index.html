@@ -118,9 +118,7 @@ e.preventDefault();
 this.deferredPrompt = e;
 });
 document.getElementById('installBtn').addEventListener('click', () => this.installApp());
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('data:text/javascript;base64,' + btoa('self.addEventListener("install",e=>{e.waitUntil(caches.open("sudoku-v1").then(cache=>cache.addAll(["/"])))});self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(response=>response||fetch(e.request)))});')).catch(() => {});
-}
+if ('serviceWorker' in navigator) {navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered', reg)).catch(err => console.log('SW failed', err));}
 }
 createGrid() {
 const gridEl = document.getElementById('grid');
