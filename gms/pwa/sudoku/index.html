@@ -49,7 +49,7 @@ h1{text-align:center;color:#4a90e2;font-size:clamp(1.5rem,5vw,2.5rem);text-shado
 .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
 .control-btn{padding:10px 20px;border:2px solid #666;background:white;color:#666;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s;}
 .control-btn:hover{background:#666;color:white;transform:translateY(-2px);}
-.install-btn{background:#4caf50;color:white;border:2px solid #4caf50;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;display:block;}
+.install-btn{background:#4caf50;color:white;border:2px solid #4caf50;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;display:none;}
 .install-btn:hover{background:#45a049;transform:translateY(-2px);box-shadow:0 4px 12px rgba(76,175,80,0.3);}
 </style>
 </head>
@@ -97,12 +97,13 @@ this.lastNumber = 0;
 this.history = [];
 this.stats = JSON.parse(localStorage.getItem('sudokuStats')) || {easy: 0, medium: 0, hard: 0};
 this.deferredPrompt = null;
+this.checkPWAInstalled();
 this.init();
 }
 init() {
 this.updateStats();
 this.createGrid();
-this.newGame();
+this.loadGame();
 document.querySelectorAll('.diff-btn').forEach(btn => {
 btn.addEventListener('click', () => this.changeDifficulty(btn.dataset.level));
 });
@@ -116,6 +117,7 @@ if (e.target.id === 'popup') this.closePopup();
 window.addEventListener('beforeinstallprompt', (e) => {
 e.preventDefault();
 this.deferredPrompt = e;
+document.getElementById('installBtn').style.display = 'block';
 });
 document.getElementById('installBtn').addEventListener('click', () => this.installApp());
 if ('serviceWorker' in navigator) {navigator.serviceWorker.register('/gms/pwa/sudoku/sw.js').then(reg => console.log('SW registered', reg)).catch(err => console.log('SW failed', err));}
@@ -209,6 +211,7 @@ for (let j = 0; j < 9; j++) {
 if (this.grid[i][j] !== 0) this.given[i][j] = true;
 }
 }
+this.saveGame();
 this.render();
 this.hideMessage();
 }
@@ -262,6 +265,7 @@ if (this.given[row][col]) return;
 this.history.push({index: this.selected, value: this.grid[row][col]});
 this.grid[row][col] = num;
 this.lastNumber = num;
+this.saveGame();
 this.closePopup();
 this.render();
 if (this.isComplete()) {
@@ -275,6 +279,7 @@ const col = this.selected % 9;
 if (this.given[row][col]) return;
 this.history.push({index: this.selected, value: this.grid[row][col]});
 this.grid[row][col] = 0;
+this.saveGame();
 this.closePopup();
 this.render();
 }
@@ -285,6 +290,7 @@ const row = Math.floor(last.index / 9);
 const col = last.index % 9;
 this.grid[row][col] = last.value;
 this.selected = last.index;
+this.saveGame();
 this.render();
 }
 isComplete() {
@@ -296,19 +302,12 @@ if (this.grid[i][j] === 0) return false;
 return true;
 }
 checkSolution() {
-let correct = true;
-for (let i = 0; i < 9; i++) {
-for (let j = 0; j < 9; j++) {
-if (this.grid[i][j] !== this.solution[i][j]) {
-correct = false;
-break;
-}
-}
-}
-if (correct) {
+const isValidSolution = this.isValidCompleteSolution();
+if (isValidSolution) {
 this.stats[this.level]++;
 localStorage.setItem('sudokuStats', JSON.stringify(this.stats));
 this.updateStats();
+this.clearSavedGame();
 this.showMessage('🎉 Congratulations! You solved it!', 'success');
 setTimeout(() => this.newGame(), 3000);
 } else {
@@ -357,6 +356,77 @@ this.deferredPrompt = null;
 } else {
 this.showMessage('ℹ️ To install: On iOS use Share > Add to Home Screen. On Android use browser menu > Install App.', 'success');
 setTimeout(() => this.hideMessage(), 5000);
+}
+}
+saveGame() {
+const gameState = {
+grid: this.grid,
+solution: this.solution,
+given: this.given,
+level: this.level,
+history: this.history,
+selected: this.selected,
+lastNumber: this.lastNumber
+};
+localStorage.setItem('sudokuGame', JSON.stringify(gameState));
+}
+loadGame() {
+const saved = localStorage.getItem('sudokuGame');
+if (saved) {
+try {
+const gameState = JSON.parse(saved);
+this.grid = gameState.grid;
+this.solution = gameState.solution;
+this.given = gameState.given;
+this.level = gameState.level;
+this.history = gameState.history || [];
+this.selected = gameState.selected;
+this.lastNumber = gameState.lastNumber || 0;
+document.querySelectorAll('.diff-btn').forEach(btn => {
+btn.classList.toggle('active', btn.dataset.level === this.level);
+});
+this.render();
+} catch (e) {
+console.error('Failed to load game', e);
+this.newGame();
+}
+} else {
+this.newGame();
+}
+}
+clearSavedGame() {
+localStorage.removeItem('sudokuGame');
+}
+isValidCompleteSolution() {
+for (let i = 0; i < 9; i++) {
+const row = new Set();
+const col = new Set();
+for (let j = 0; j < 9; j++) {
+if (this.grid[i][j] < 1 || this.grid[i][j] > 9) return false;
+if (row.has(this.grid[i][j])) return false;
+row.add(this.grid[i][j]);
+if (this.grid[j][i] < 1 || this.grid[j][i] > 9) return false;
+if (col.has(this.grid[j][i])) return false;
+col.add(this.grid[j][i]);
+}
+}
+for (let boxRow = 0; boxRow < 3; boxRow++) {
+for (let boxCol = 0; boxCol < 3; boxCol++) {
+const box = new Set();
+for (let i = 0; i < 3; i++) {
+for (let j = 0; j < 3; j++) {
+const val = this.grid[boxRow * 3 + i][boxCol * 3 + j];
+if (box.has(val)) return false;
+box.add(val);
+}
+}
+}
+}
+return true;
+}
+checkPWAInstalled() {
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+document.getElementById('installBtn').style.display = 'none';
 }
 }
 render() {
