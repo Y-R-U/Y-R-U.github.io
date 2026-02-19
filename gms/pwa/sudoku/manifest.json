@@ -2,16 +2,19 @@
   "name": "Sudoku Game",
   "short_name": "Sudoku",
   "description": "Play Sudoku on your device",
+  "id": "/gms/pwa/sudoku/",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "background_color": "#667eea",
   "theme_color": "#4a90e2",
   "icons": [
     {
       "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
