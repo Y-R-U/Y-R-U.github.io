@@ -1,0 +1,41 @@
+Site folder summary for Y-R-U.github.io (generated 2026-02-19)
+================================================================
+
+ROOT FILES
+----------
+index.html  - Main landing page "My Cyber Website"
+i2.html     - Alternate version of the main landing page
+
+TOP-LEVEL FOLDERS
+-----------------
+assets/     - Shared media assets (video files, e.g. Mv1.mp4)
+c/          - Claude Code projects folder; contains DriverC (isometric racing game) and Simple Shooter, with an index linking all sub-projects
+d/          - Image Editor web app for editing images in-browser
+e/          - Monaco-based live HTML/JS/CSS code editor with project save/load and preview
+e2/         - Enhanced Monaco Editor (loads projects via projectData.js, compressed storage)
+gms/        - Games collection: Asteroids, Snake Battle, Pocket Legends CCG, Kingdom Management x2, Desert Throw, Interactive Storybook, Sudoku PWA, and a Tululoo-engine game (gms/z)
+k/          - K-Hydro Track: hydration/water-intake tracking app
+m/          - Minimal textarea-based live HTML/JS/CSS code editor with project save/load
+m2/         - AB Edit: code editor with HTML/JS/CSS tabs (index.html) and a companion T.html view
+n/          - WebRTC STUN peer connection test tool using manual copy/paste signaling
+q/          - GoalTracker: goal-setting and progress tracking app (also has qTracker v1 at v1.html)
+t5/         - Dante's Top 5 Review: ranked list-making and review app
+
+GMS SUB-FOLDERS
+---------------
+gms/a/      - Mobile Asteroids game
+gms/assets/ - Shared sprite/tilemap assets for games (spaceships, tiles, bitmaps)
+gms/c/      - Pocket Legends CCG (collectible card game)
+gms/k/kc/   - Kingdom Management (city/kingdom management sim)
+gms/k/kg/   - Kingdom Manager Sim (alternative kingdom sim)
+gms/o/      - Interactive Storybook Adventure
+gms/pwa/sudoku/ - Sudoku PWA (Progressive Web App with manifest and service worker)
+gms/s/      - Snake Battle game
+gms/t/      - Desert Throw game
+gms/z/      - Tululoo game engine exported game (action/arcade)
+
+AI FOLDERS (this area)
+-----------------------
+ai/knowledge/       - Notes and summaries I've gathered about this project
+ai/knowledge/skills/- Skills and techniques I've picked up
+ai/projects/        - Working area for code projects, stories, and other creative work
