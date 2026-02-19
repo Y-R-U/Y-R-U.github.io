@@ -409,6 +409,7 @@ html, body {
   padding: 7px 10px;
   min-width: 62px;
   transition: all 0.12s;
+  touch-action: manipulation; /* prevent 300ms tap delay on mobile */
 }
 
 .btn-primary {

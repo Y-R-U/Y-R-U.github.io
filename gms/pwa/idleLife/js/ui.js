@@ -181,15 +181,17 @@ const UI = (() => {
 
       // Hire buttons
       card.querySelectorAll('.btn-hire').forEach(btn => {
-        btn.addEventListener('click', () => {
+        const doHire = () => {
           const count = parseInt(btn.dataset.count);
           const result = Game.hireWorker(btn.dataset.job, count);
           if (!result) {
             btn.classList.add('shake');
             setTimeout(() => btn.classList.remove('shake'), 400);
           }
-        });
-        btn.addEventListener('touchend', e => e.preventDefault());
+        };
+        btn.addEventListener('click', doHire);
+        // touchend: call action and prevent duplicate click from firing
+        btn.addEventListener('touchend', e => { e.preventDefault(); doHire(); });
       });
 
       container.appendChild(card);
