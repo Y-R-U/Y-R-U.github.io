@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#08091a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Life Idle" />
+  <meta name="description" content="Life Idle — Tap your way from street sweeper to global mogul!" />
+
+  <title>Life Idle</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── Header ── -->
+  <header id="header">
+    <div id="balance-row">
+      <span id="balance">$0</span>
+      <span id="income-rate">+$0/sec</span>
+    </div>
+    <div id="stats-mini">
+      <span id="total-earned">Total: $0</span>
+      <span id="click-power">Tap: $1</span>
+    </div>
+    <div id="active-event-label" class="hidden"></div>
+  </header>
+
+  <!-- ── Main Tap / Click Area ── -->
+  <main id="click-area">
+    <div id="character-container">
+      <div id="character">
+        <div id="character-sprite">🧹</div>
+        <div id="click-hint">TAP TO EARN</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Random Event Scrolling Banner ── -->
+  <div id="event-banner" class="hidden">
+    <div id="event-text"></div>
+  </div>
+
+  <!-- ── Tab Navigation ── -->
+  <nav id="tab-nav">
+    <button class="tab-btn active" data-tab="work">
+      <span>💼</span>WORK
+    </button>
+    <button class="tab-btn" data-tab="business">
+      <span>🏢</span>BIZ
+    </button>
+    <button class="tab-btn" data-tab="upgrades">
+      <span>⬆️</span>UPGRADES
+    </button>
+    <button class="tab-btn" data-tab="stats">
+      <span>📊</span>STATS
+    </button>
+  </nav>
+
+  <!-- ── Tab Content Panels ── -->
+  <section id="tab-content">
+    <div id="tab-work" class="tab-panel">
+      <div class="empty-msg">🧹 Tap to earn your first coins!</div>
+    </div>
+    <div id="tab-business" class="tab-panel hidden">
+      <div class="empty-msg">🏗️ Keep earning to unlock businesses!</div>
+    </div>
+    <div id="tab-upgrades" class="tab-panel hidden">
+      <div class="empty-msg">⬆️ Upgrades unlock as you earn more!</div>
+    </div>
+    <div id="tab-stats" class="tab-panel hidden">
+      <div class="empty-msg">📊 Loading stats...</div>
+    </div>
+  </section>
+
+</div><!-- #app -->
+
+<!-- Scripts (load order matters) -->
+<script src="js/config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/events.js"></script>
+
+<script>
+// ── Bootstrap ─────────────────────────────────────────────
+
+// Compute and set tab-content height dynamically so flex works on all devices
+function setTabContentHeight() {
+  const app = document.getElementById('app');
+  const header = document.getElementById('header');
+  const clickArea = document.getElementById('click-area');
+  const eventBanner = document.getElementById('event-banner');
+  const tabNav = document.getElementById('tab-nav');
+  const tabContent = document.getElementById('tab-content');
+
+  // Target: 38% of viewport for click area, rest for panels
+  const appH = app.clientHeight;
+  const headerH = header.offsetHeight;
+  const navH = tabNav.offsetHeight;
+  const bannerH = eventBanner.classList.contains('hidden') ? 0 : eventBanner.offsetHeight;
+
+  // Give click area ~40% of remaining space
+  const remaining = appH - headerH - navH - bannerH;
+  const clickH = Math.max(160, Math.min(220, remaining * 0.42));
+  clickArea.style.height = clickH + 'px';
+  clickArea.style.flex = '0 0 ' + clickH + 'px';
+
+  const panelH = appH - headerH - clickH - navH - bannerH;
+  tabContent.style.height = Math.max(200, panelH) + 'px';
+}
+
+window.addEventListener('resize', setTabContentHeight);
+window.addEventListener('orientationchange', () => setTimeout(setTabContentHeight, 300));
+
+// Tap / click handler on character circle
+document.getElementById('character').addEventListener('click', function(e) {
+  e.preventDefault();
+  Game.handleClick(e.clientX, e.clientY);
+});
+document.getElementById('character').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  Game.handleClick(t.clientX, t.clientY);
+});
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+
+// Start the game
+document.addEventListener('DOMContentLoaded', () => {
+  setTabContentHeight();
+  UI.init();
+  Game.init();
+
+  // Refresh active panel every 2 seconds so button affordability stays current
+  setInterval(() => UI.render(), 2000);
+});
+</script>
+
+</body>
+</html>
