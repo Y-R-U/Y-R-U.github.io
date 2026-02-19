@@ -78,14 +78,15 @@ const Game = (() => {
       else eventGlobalMult *= ev.multiplier;
     }
 
-    // Click power (global event mult applies here too — e.g. investment boosts taps)
-    let cp = state.baseClickPower * derived.clickMultiplier * eventClickMult;
-    // Add bonus from hired workers
+    // Click power — multiplier applies to the FULL total (base + all worker bonuses)
+    // so upgrades feel impactful whether you have workers or not
+    let cp_workers = 0;
     for (const job of JOBS) {
       const count = state.jobs[job.id] || 0;
-      cp += count * job.clickBonus * (derived.jobMultipliers[job.id] || 1);
+      cp_workers += count * job.clickBonus * (derived.jobMultipliers[job.id] || 1);
     }
-    derived.clickPower = cp * eventGlobalMult;
+    derived.clickPower =
+      (state.baseClickPower + cp_workers) * derived.clickMultiplier * eventClickMult * eventGlobalMult;
 
     // Income per second
     let ips = 0;
