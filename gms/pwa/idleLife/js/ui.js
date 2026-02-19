@@ -13,19 +13,29 @@ const UI = (() => {
   const fmtC = n => Game.fmtCurrency(n);
 
   // ── Header ────────────────────────────────────────────────
+  let _lastClickPower = -1;
   function updateHeader() {
     const { state, derived } = Game;
     $('balance').textContent = fmtC(state.coins);
     $('income-rate').textContent = `+${fmtC(derived.incomePerSec)}/sec`;
     $('total-earned').textContent = `Total: ${fmtC(state.totalEarned)}`;
-    $('click-power').textContent = `Tap: ${fmtC(derived.clickPower)}`;
+
+    // Flash tap-power display when it changes
+    const cpEl = $('click-power');
+    const newCp = derived.clickPower;
+    cpEl.textContent = `Tap: ${fmtC(newCp)}`;
+    if (_lastClickPower >= 0 && Math.abs(newCp - _lastClickPower) > 0.01) {
+      cpEl.classList.remove('tap-flash');
+      void cpEl.offsetWidth; // force reflow to restart animation
+      cpEl.classList.add('tap-flash');
+    }
+    _lastClickPower = newCp;
 
     // Update character
     const stage = Game.getCharacterStage();
     const sprite = $('character-sprite');
     if (SPRITE.exists) {
-      // Use spritesheet
-      const col = 0; // character column
+      const col = 0;
       const stageIdx = CHARACTER_STAGES.indexOf(stage);
       sprite.style.backgroundImage = `url(${SPRITE.path})`;
       sprite.style.backgroundPosition =
@@ -38,14 +48,14 @@ const UI = (() => {
       sprite.style.backgroundImage = '';
     }
 
-    // Update event timers in banner if active
+    // Active event countdown
     const now = Date.now();
     const events = Game.state.activeEvents;
     if (events.length > 0) {
       const ev = events[0];
       const remaining = Math.max(0, Math.ceil((ev.expiresAt - now) / 1000));
       $('active-event-label').textContent =
-        `⚡ Boost active: ${ev.multiplier}× income — ${remaining}s remaining`;
+        `⚡ Boost active: ${ev.multiplier}× — ${remaining}s remaining`;
       $('active-event-label').classList.remove('hidden');
     } else {
       $('active-event-label').classList.add('hidden');
@@ -54,22 +64,23 @@ const UI = (() => {
 
   // ── Coin particle ─────────────────────────────────────────
   function spawnCoinParticle(x, y, label) {
+    const area = $('click-area');
+    const rect = area.getBoundingClientRect();
+
     const el = document.createElement('div');
     el.className = 'coin-particle';
     el.textContent = label;
-    // Position relative to click area
-    const area = $('click-area');
-    const rect = area.getBoundingClientRect();
     el.style.left = (x - rect.left) + 'px';
     el.style.top  = (y - rect.top) + 'px';
     area.appendChild(el);
-    // Also spawn a small coin emoji
+
     const coin = document.createElement('div');
     coin.className = 'coin-emoji';
     coin.textContent = '🪙';
     coin.style.left = (x - rect.left + (Math.random() * 40 - 20)) + 'px';
     coin.style.top  = (y - rect.top) + 'px';
     area.appendChild(coin);
+
     setTimeout(() => { el.remove(); coin.remove(); }, 900);
   }
 
@@ -101,13 +112,13 @@ const UI = (() => {
           <div class="modal-amount">${fmtFn(amount)}</div>
           <p class="modal-sub">earned offline</p>
         </div>
-        <button class="modal-btn" id="modal-close">Collect!</button>
+        <button type="button" class="modal-btn" id="modal-close">Collect!</button>
       </div>`;
     document.body.appendChild(modal);
     document.getElementById('modal-close').onclick = () => modal.remove();
   }
 
-  // ── Sprite helper for icons ───────────────────────────────
+  // ── Sprite helper ─────────────────────────────────────────
   function iconEl(row, col, emoji) {
     if (SPRITE.exists) {
       const d = document.createElement('div');
@@ -131,8 +142,95 @@ const UI = (() => {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
         btn.classList.add('active');
         $(`tab-${btn.dataset.tab}`).classList.remove('hidden');
+        render();
       });
     });
+  }
+
+  // ── Event delegation helpers ──────────────────────────────
+  // Fire the action, show feedback. Works via delegation so btn reference
+  // never goes stale and there's no double-fire from touch+click.
+  let _lastActionMs = 0; // debounce: ignore duplicate events < 100ms apart
+
+  function delegatedHire(btn) {
+    const now = Date.now();
+    if (now - _lastActionMs < 100) return; // swallow duplicate touch+click
+    _lastActionMs = now;
+
+    const jobId = btn.dataset.job;
+    const count = parseInt(btn.dataset.count, 10);
+    const job   = JOBS.find(j => j.id === jobId);
+    if (!job) return;
+
+    if (Game.hireWorker(jobId, count)) {
+      const label = count > 1 ? `${count}× ${job.name}` : job.name;
+      showToast(`Hired ${label}! ${job.emoji}`, 'gold');
+    } else {
+      const cost = Game.jobBulkCost(job, count);
+      const diff = cost - Game.state.coins;
+      showToast(`Need ${fmtC(diff)} more to hire ${job.name}`, 'info');
+      btn.classList.add('shake');
+      setTimeout(() => btn.classList.remove('shake'), 400);
+    }
+  }
+
+  function delegatedBiz(btn) {
+    const now = Date.now();
+    if (now - _lastActionMs < 100) return;
+    _lastActionMs = now;
+
+    const bizId = btn.dataset.biz;
+    const biz   = BUSINESSES.find(b => b.id === bizId);
+    if (!biz) return;
+
+    if (Game.levelUpBusiness(bizId)) {
+      const lvl = Game.state.businesses[bizId];
+      showToast(`${biz.name} ${lvl === 1 ? 'built' : `upgraded to Lv.${lvl}`}! ${biz.emoji}`, 'gold');
+    } else {
+      const cost = Game.bizLevelCost(biz);
+      const diff = cost - Game.state.coins;
+      showToast(`Need ${fmtC(diff)} more for ${biz.name}`, 'info');
+    }
+  }
+
+  function delegatedUpgrade(btn) {
+    const now = Date.now();
+    if (now - _lastActionMs < 100) return;
+    _lastActionMs = now;
+
+    const upgId = btn.dataset.upg;
+    const upg   = UPGRADES.find(u => u.id === upgId);
+    if (!upg) return;
+
+    if (Game.purchaseUpgrade(upgId)) {
+      showToast(`${upg.emoji} ${upg.name} purchased!`, 'gold');
+    } else {
+      const diff = upg.cost - Game.state.coins;
+      showToast(`Need ${fmtC(diff)} more for ${upg.name}`, 'info');
+    }
+  }
+
+  // Attach ONE persistent delegate listener to each panel container.
+  // These survive innerHTML resets because the containers themselves are static.
+  function initPanelDelegates() {
+    function attachDelegate(containerId, selector, action) {
+      const container = $(containerId);
+      const handle = e => {
+        const btn = e.target.closest(selector);
+        if (btn) action(btn);
+      };
+      // Both click (desktop) and touchend (mobile).
+      // We debounce via _lastActionMs so only one fires per tap.
+      container.addEventListener('click',    handle);
+      container.addEventListener('touchend', e => {
+        const btn = e.target.closest(selector);
+        if (btn) { e.preventDefault(); action(btn); }
+      });
+    }
+
+    attachDelegate('tab-work',     '.btn-hire',             delegatedHire);
+    attachDelegate('tab-business', '.btn-buy[data-biz]',    delegatedBiz);
+    attachDelegate('tab-upgrades', '.btn-buy[data-upg]',    delegatedUpgrade);
   }
 
   // ── Jobs panel ────────────────────────────────────────────
@@ -152,11 +250,13 @@ const UI = (() => {
       const cost10 = Game.jobBulkCost(job, 10);
       const incomeEach = job.incomePerWorker * (derived.jobMultipliers[job.id] || 1)
                          * derived.globalMultiplier;
-      const canAfford1 = state.coins >= cost1;
+      const canAfford1  = state.coins >= cost1;
       const canAfford10 = state.coins >= cost10;
 
       const card = document.createElement('div');
       card.className = 'card job-card' + (owned > 0 ? ' owned' : '');
+      // NOTE: type="button" on every button prevents accidental submit behaviour.
+      // No JS event listeners here — handled via event delegation in initPanelDelegates().
       card.innerHTML = `
         <div class="card-icon"></div>
         <div class="card-info">
@@ -164,41 +264,31 @@ const UI = (() => {
           <div class="card-desc">${job.description}</div>
           <div class="card-stats">
             <span class="stat-workers">👷 ${owned}</span>
-            <span class="stat-income">+${Game.fmtCurrency(incomeEach)}/s each</span>
+            <span class="stat-income">+${fmtC(incomeEach)}/s each</span>
           </div>
         </div>
         <div class="card-actions">
-          <button class="btn-hire btn-primary ${canAfford1 ? '' : 'disabled'}" data-job="${job.id}" data-count="1">
-            Hire<br><small>${Game.fmtCurrency(cost1)}</small>
+          <button type="button"
+            class="btn-hire btn-primary ${canAfford1 ? 'affordable' : 'unaffordable'}"
+            data-job="${job.id}" data-count="1">
+            Hire<br><small>${fmtC(cost1)}</small>
           </button>
-          <button class="btn-hire btn-secondary ${canAfford10 ? '' : 'disabled'}" data-job="${job.id}" data-count="10">
-            ×10<br><small>${Game.fmtCurrency(cost10)}</small>
+          <button type="button"
+            class="btn-hire btn-secondary ${canAfford10 ? 'affordable' : 'unaffordable'}"
+            data-job="${job.id}" data-count="10">
+            ×10<br><small>${fmtC(cost10)}</small>
           </button>
         </div>`;
 
-      // Insert icon
-      card.querySelector('.card-icon').appendChild(iconEl(job.spriteRow, job.spriteCol, job.emoji));
-
-      // Hire buttons
-      card.querySelectorAll('.btn-hire').forEach(btn => {
-        const doHire = () => {
-          const count = parseInt(btn.dataset.count);
-          const result = Game.hireWorker(btn.dataset.job, count);
-          if (!result) {
-            btn.classList.add('shake');
-            setTimeout(() => btn.classList.remove('shake'), 400);
-          }
-        };
-        btn.addEventListener('click', doHire);
-        // touchend: call action and prevent duplicate click from firing
-        btn.addEventListener('touchend', e => { e.preventDefault(); doHire(); });
-      });
-
+      card.querySelector('.card-icon').appendChild(
+        iconEl(job.spriteRow, job.spriteCol, job.emoji)
+      );
       container.appendChild(card);
     }
 
     if (!anyVisible) {
-      container.innerHTML = '<div class="empty-msg">🧹 Start tapping to earn your first coins!</div>';
+      container.innerHTML =
+        '<div class="empty-msg">🧹 Start tapping to earn your first coins!</div>';
     }
   }
 
@@ -224,7 +314,6 @@ const UI = (() => {
           * (derived.bizMultipliers[biz.id] || 1)
           * derived.globalMultiplier;
 
-      // Tier header
       if (biz.tier !== lastTier) {
         const tierEl = document.createElement('div');
         tierEl.className = 'tier-header';
@@ -240,41 +329,35 @@ const UI = (() => {
         <div class="card-info">
           <div class="card-name">${biz.name}
             ${level > 0 ? `<span class="level-badge">Lv.${level}</span>` : ''}
-            ${maxed ? `<span class="maxed-badge">MAX</span>` : ''}
+            ${maxed     ? `<span class="maxed-badge">MAX</span>` : ''}
           </div>
           <div class="card-desc">${biz.description}</div>
           <div class="card-stats">
-            ${level > 0 ? `<span class="stat-income">+${Game.fmtCurrency(incomeNow)}/s</span>` : ''}
-            ${!maxed ? `<span class="stat-next">${level === 0 ? 'Build' : 'Upgrade'}: ${Game.fmtCurrency(cost)}</span>` : ''}
+            ${level > 0 ? `<span class="stat-income">+${fmtC(incomeNow)}/s</span>` : ''}
+            ${!maxed    ? `<span class="stat-next">${level === 0 ? 'Build' : 'Upgrade'}: ${fmtC(cost)}</span>` : ''}
           </div>
         </div>
         <div class="card-actions">
           ${maxed
-            ? `<button class="btn-maxed" disabled>MAXED</button>`
-            : `<button class="btn-buy btn-primary ${canAfford ? '' : 'disabled'}" data-biz="${biz.id}">
+            ? `<button type="button" class="btn-maxed" disabled>MAXED</button>`
+            : `<button type="button"
+                class="btn-buy btn-primary ${canAfford ? 'affordable' : 'unaffordable'}"
+                data-biz="${biz.id}">
                 ${level === 0 ? 'Build' : 'Level Up'}<br>
-                <small>${Game.fmtCurrency(cost)}</small>
+                <small>${fmtC(cost)}</small>
               </button>`
           }
         </div>`;
 
-      card.querySelector('.card-icon').appendChild(iconEl(biz.spriteRow, biz.spriteCol, biz.emoji));
-
-      if (!maxed) {
-        card.querySelector('.btn-buy').addEventListener('click', () => {
-          const result = Game.levelUpBusiness(biz.id);
-          if (!result) {
-            card.classList.add('shake');
-            setTimeout(() => card.classList.remove('shake'), 400);
-          }
-        });
-      }
-
+      card.querySelector('.card-icon').appendChild(
+        iconEl(biz.spriteRow, biz.spriteCol, biz.emoji)
+      );
       container.appendChild(card);
     }
 
     if (!anyVisible) {
-      container.innerHTML = `<div class="empty-msg">🏗️ Keep earning to unlock businesses!<br><small>First unlocks at ${Game.fmtCurrency(BUSINESSES[0].unlockAt)} total earned</small></div>`;
+      container.innerHTML = `<div class="empty-msg">🏗️ Keep earning to unlock businesses!<br>
+        <small>First unlocks at ${fmtC(BUSINESSES[0].unlockAt)} total earned</small></div>`;
     }
   }
 
@@ -290,7 +373,8 @@ const UI = (() => {
     const owned = UPGRADES.filter(u => state.upgrades.has(u.id));
 
     if (available.length === 0 && owned.length === 0) {
-      container.innerHTML = `<div class="empty-msg">⬆️ Upgrades unlock as you earn more.<br><small>Keep tapping!</small></div>`;
+      container.innerHTML =
+        `<div class="empty-msg">⬆️ Upgrades unlock as you earn more.<br><small>Keep tapping!</small></div>`;
       return;
     }
 
@@ -311,13 +395,12 @@ const UI = (() => {
             <div class="card-desc">${upg.description}</div>
           </div>
           <div class="card-actions">
-            <button class="btn-buy btn-primary ${canAfford ? '' : 'disabled'}" data-upg="${upg.id}">
-              Buy<br><small>${Game.fmtCurrency(upg.cost)}</small>
+            <button type="button"
+              class="btn-buy btn-primary ${canAfford ? 'affordable' : 'unaffordable'}"
+              data-upg="${upg.id}">
+              Buy<br><small>${fmtC(upg.cost)}</small>
             </button>
           </div>`;
-        card.querySelector('.btn-buy').addEventListener('click', () => {
-          Game.purchaseUpgrade(upg.id);
-        });
         container.appendChild(card);
       }
     }
@@ -347,7 +430,6 @@ const UI = (() => {
     const container = $('tab-stats');
     const { state, derived } = Game;
     const stage = Game.getCharacterStage();
-
     const totalWorkers = JOBS.reduce((s, j) => s + (state.jobs[j.id] || 0), 0);
     const totalBiz = BUSINESSES.filter(b => (state.businesses[b.id] || 0) > 0).length;
 
@@ -356,10 +438,10 @@ const UI = (() => {
         <div class="stats-title">📊 Your Empire</div>
         <div class="stats-grid">
           <div class="stat-row"><span>Status</span><span>${stage.label}</span></div>
-          <div class="stat-row"><span>Balance</span><span>${Game.fmtCurrency(state.coins)}</span></div>
-          <div class="stat-row"><span>Total Earned</span><span>${Game.fmtCurrency(state.totalEarned)}</span></div>
-          <div class="stat-row"><span>Income /sec</span><span>${Game.fmtCurrency(derived.incomePerSec)}</span></div>
-          <div class="stat-row"><span>Tap Power</span><span>${Game.fmtCurrency(derived.clickPower)}</span></div>
+          <div class="stat-row"><span>Balance</span><span>${fmtC(state.coins)}</span></div>
+          <div class="stat-row"><span>Total Earned</span><span>${fmtC(state.totalEarned)}</span></div>
+          <div class="stat-row"><span>Income /sec</span><span>${fmtC(derived.incomePerSec)}</span></div>
+          <div class="stat-row"><span>Tap Power</span><span>${fmtC(derived.clickPower)}</span></div>
           <div class="stat-row"><span>Workers Hired</span><span>${totalWorkers}</span></div>
           <div class="stat-row"><span>Businesses Owned</span><span>${totalBiz}</span></div>
           <div class="stat-row"><span>Upgrades</span><span>${state.upgrades.size} / ${UPGRADES.length}</span></div>
@@ -368,10 +450,12 @@ const UI = (() => {
         <div class="stats-workforce">
           <div class="stats-title" style="margin-top:16px">👷 Workforce</div>
           ${JOBS.filter(j => (state.jobs[j.id] || 0) > 0)
-            .map(j => `<div class="stat-row"><span>${j.emoji} ${j.name}</span><span>${state.jobs[j.id]}</span></div>`)
+            .map(j => `<div class="stat-row">
+              <span>${j.emoji} ${j.name}</span>
+              <span>${state.jobs[j.id]}</span></div>`)
             .join('') || '<div class="stat-row muted"><span>No workers yet</span></div>'}
         </div>
-        <button class="btn-reset" id="btn-reset">🗑️ Reset Game</button>
+        <button type="button" class="btn-reset" id="btn-reset">🗑️ Reset Game</button>
       </div>`;
 
     document.getElementById('btn-reset').addEventListener('click', () => {
@@ -381,26 +465,23 @@ const UI = (() => {
 
   // ── Full render ───────────────────────────────────────────
   function render() {
-    const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'work';
+    const activeTab =
+      document.querySelector('.tab-btn.active')?.dataset.tab || 'work';
     switch (activeTab) {
-      case 'work':     renderJobs(); break;
+      case 'work':     renderJobs();      break;
       case 'business': renderBusinesses(); break;
-      case 'upgrades': renderUpgrades(); break;
-      case 'stats':    renderStats(); break;
+      case 'upgrades': renderUpgrades();   break;
+      case 'stats':    renderStats();      break;
     }
     updateHeader();
-  }
-
-  // Render current tab when switching
-  function initTabRender() {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => render());
-    });
   }
 
   return {
     updateHeader, spawnCoinParticle, showToast,
     showOfflineModal, render,
-    init() { initTabs(); initTabRender(); }
+    init() {
+      initTabs();
+      initPanelDelegates();
+    }
   };
 })();

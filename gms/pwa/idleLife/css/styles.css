@@ -418,11 +418,19 @@ html, body {
   box-shadow: 0 2px 10px rgba(255,165,0,0.3);
 }
 .btn-primary:active { transform: scale(0.94); }
-.btn-primary.disabled {
+/* affordable = can buy right now — subtle pulse glow */
+.btn-primary.affordable {
+  animation: btn-pulse 2s ease-in-out infinite;
+}
+@keyframes btn-pulse {
+  0%,100% { box-shadow: 0 2px 10px rgba(255,165,0,0.3); }
+  50%      { box-shadow: 0 2px 18px rgba(255,215,0,0.75); }
+}
+.btn-primary.unaffordable {
   background: var(--bg-card2);
   color: var(--text-dim);
   box-shadow: none;
-  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .btn-secondary {
@@ -431,11 +439,11 @@ html, body {
   border: 1px solid rgba(79,99,200,0.4);
 }
 .btn-secondary:active { transform: scale(0.94); }
-.btn-secondary.disabled {
+.btn-secondary.unaffordable {
   background: transparent;
   color: var(--text-dim);
   border-color: var(--text-dim);
-  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .btn-maxed {
@@ -627,6 +635,15 @@ html, body {
   cursor: pointer;
 }
 .modal-btn:active { transform: scale(0.97); }
+
+/* ── Tap-power flash (fires when click power changes) ── */
+@keyframes tap-power-flash {
+  0%   { color: var(--text-muted); transform: scale(1); }
+  25%  { color: var(--accent-gold); transform: scale(1.25); }
+  60%  { color: var(--accent-green); transform: scale(1.1); }
+  100% { color: var(--text-muted); transform: scale(1); }
+}
+.tap-flash { animation: tap-power-flash 0.6s ease-out forwards; }
 
 /* ── Shake animation ── */
 @keyframes shake {
