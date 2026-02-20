@@ -301,6 +301,7 @@ const Game = (() => {
   return {
     get state() { return state; },
     get derived() { return derived; },
+    recalcDerived,
     fmt, fmtCurrency,
     jobHireCost, jobBulkCost, bizLevelCost,
     handleClick, hireWorker, levelUpBusiness, purchaseUpgrade,

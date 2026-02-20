@@ -113,7 +113,8 @@ describe('Number formatting (fmt / fmtCurrency)', () => {
   });
   it('formats integers ≥100 without decimals', () => {
     expect(Game.fmt(100)).toBe('100');
-    expect(Game.fmt(9999)).toBe('9,999');
+    expect(Game.fmt(999)).toBe('999');  // 999 < 1000 so no suffix
+    expect(Game.fmt(9999)).toBe('10.00K'); // 9999 >= 1000 so K suffix
   });
   it('uses K suffix at 1,000', () => {
     expect(Game.fmt(1000)).toContain('K');
@@ -221,7 +222,7 @@ describe('Hire workers', () => {
     Game.state.jobs       = {};
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
-    // manually recalc baseline
+    Game.recalcDerived();
     const before = Game.derived.incomePerSec;
     Game.hireWorker('sweeper', 1);
     expect(Game.derived.incomePerSec).toBeGreaterThan(before);
@@ -238,9 +239,8 @@ describe('Click power', () => {
     Game.state.jobs       = {};
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
-    // Force recalc
     Game.state.baseClickPower = 1;
-    // Simulate recalc inline
+    Game.recalcDerived();
     expect(Game.derived.clickPower).toBeCloseTo(1, 4);
   });
 
@@ -248,13 +248,10 @@ describe('Click power', () => {
     Game.state.jobs       = { sweeper: 10 };  // 10 × 0.5 bonus = 5 extra
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
-    // Force a recalc without upgrades
-    Game.state.upgrades = new Set();
-    Game.hireWorker; // just to reference it so no lint error
-    // Manually trigger recalc via purchaseUpgrade side-effect:
     // Give enough coins and totalEarned for click_1 (cost $100, unlockAt 0)
     Game.state.coins = 100;
     Game.state.totalEarned = 100;
+    Game.recalcDerived();
     const powerBefore = Game.derived.clickPower;
     Game.purchaseUpgrade('click_1'); // 2× upgrade
     const powerAfter  = Game.derived.clickPower;
@@ -269,6 +266,7 @@ describe('Click power', () => {
     Game.state.activeEvents = [];
     Game.state.coins      = 6e6;
     Game.state.totalEarned = 6e6;
+    Game.recalcDerived();
     const before = Game.derived.clickPower; // = 1 (base)
     Game.purchaseUpgrade('click_4'); // 5× at $5M
     const after = Game.derived.clickPower;
@@ -281,6 +279,7 @@ describe('Click power', () => {
     Game.state.activeEvents = [];
     Game.state.coins      = 200;
     Game.state.totalEarned = 200;
+    Game.recalcDerived();
     // Base(1) + workers(2) = 3, then 2× upgrade → 6
     Game.purchaseUpgrade('click_1'); // costs $100
     // click_2 costs $5000, can't afford yet — just check click_1 applied to total
@@ -328,6 +327,7 @@ describe('Upgrades', () => {
     Game.state.activeEvents = [];
     Game.state.coins      = 2e10;
     Game.state.totalEarned = 2e10;
+    Game.recalcDerived();
     const before = Game.derived.incomePerSec;
     Game.purchaseUpgrade('global_1'); // 2× all income
     expect(Game.derived.incomePerSec).toBeCloseTo(before * 2, 4);
@@ -347,8 +347,10 @@ describe('Businesses', () => {
     Game.state.coins      = ft.baseCost * 2;
     Game.state.totalEarned = ft.baseCost * 2;
     Game.state.businesses = {};
+    Game.state.jobs       = {};
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
+    Game.recalcDerived();
     const before = Game.derived.incomePerSec;
     const ok = Game.levelUpBusiness('food_truck');
     expect(ok).toBeTrue();
@@ -376,8 +378,10 @@ describe('Businesses', () => {
   it('income grows with level (compounding)', () => {
     const ft = BUSINESSES.find(b => b.id === 'food_truck');
     Game.state.businesses  = { food_truck: 1 };
+    Game.state.jobs        = {};
     Game.state.upgrades    = new Set();
     Game.state.activeEvents = [];
+    Game.recalcDerived();
     const inc1 = Game.derived.incomePerSec;
     Game.state.coins = 1e15; Game.state.totalEarned = 1e15;
     Game.levelUpBusiness('food_truck');
@@ -392,8 +396,9 @@ describe('Event system', () => {
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
     Game.state.baseClickPower = 1;
+    Game.recalcDerived();
     const before = Game.derived.clickPower;
-    Game.applyEvent({ id: 'test_ev', multiplier: 3, duration: 300 });
+    Game.applyEvent({ id: 'test_ev', multiplier: 3, duration: 300, label: 'Test Event!' });
     expect(Game.derived.clickPower).toBeCloseTo(before * 3, 4);
   });
 
@@ -401,8 +406,9 @@ describe('Event system', () => {
     Game.state.jobs       = { sweeper: 5 };
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
+    Game.recalcDerived();
     const before = Game.derived.incomePerSec;
-    Game.applyEvent({ id: 'test_ev2', multiplier: 2, duration: 60 });
+    Game.applyEvent({ id: 'test_ev2', multiplier: 2, duration: 60, label: 'Test Event!' });
     expect(Game.derived.incomePerSec).toBeCloseTo(before * 2, 4);
   });
 
@@ -410,9 +416,10 @@ describe('Event system', () => {
     Game.state.jobs       = { sweeper: 5 };
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
+    Game.recalcDerived();
     const cpBefore  = Game.derived.clickPower;
     const ipsBefore = Game.derived.incomePerSec;
-    Game.applyEvent({ id: 'test_ev3', multiplier: 3, type: 'click', duration: 120 });
+    Game.applyEvent({ id: 'test_ev3', multiplier: 3, type: 'click', duration: 120, label: 'Test Event!' });
     expect(Game.derived.clickPower).toBeCloseTo(cpBefore * 3, 4);
     expect(Game.derived.incomePerSec).toBeCloseTo(ipsBefore, 4); // unchanged
   });
@@ -421,6 +428,7 @@ describe('Event system', () => {
     Game.state.jobs       = { sweeper: 10 };
     Game.state.upgrades   = new Set();
     Game.state.activeEvents = [];
+    Game.recalcDerived();
     const ips    = Game.derived.incomePerSec;
     const before = Game.state.coins;
     Game.applyEvent({ id: 'tax_break', bonusMultiplier: 60, duration: 0 });
