@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4af0b0">
+  <meta name="description" content="RCELL — Immune Defence Roguelite. Control a white blood cell and defend against pathogens.">
+
+  <!-- PWA Meta -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RCELL">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./assets/icons/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/icon.svg">
+
+  <title>RCELL — Immune Defence</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #050d1a;
+      font-family: 'Nunito', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #gameCanvas {
+      display: block;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Safe area padding for notched phones */
+    #gameCanvas {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Loading screen */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #050d1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.5s;
+    }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+
+    .loading-cell {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid #4af0b0;
+      animation: pulse 1.2s ease-in-out infinite;
+      box-shadow: 0 0 20px #4af0b0;
+      margin-bottom: 24px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.6; }
+    }
+
+    .loading-text {
+      color: #4af0b0;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 4px;
+    }
+
+    .loading-sub {
+      color: rgba(255,255,255,0.4);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading">
+    <div class="loading-cell"></div>
+    <div class="loading-text">RCELL</div>
+    <div class="loading-sub">Initialising immune response...</div>
+  </div>
+
+  <!-- Main game canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- === Utility modules (no dependencies) === -->
+  <script src="./src/utils/math.js"></script>
+  <script src="./src/utils/pool.js"></script>
+  <script src="./src/utils/storage.js"></script>
+
+  <!-- === Systems === -->
+  <script src="./src/systems/collision.js"></script>
+  <script src="./src/systems/xp.js"></script>
+  <script src="./src/systems/audio.js"></script>
+
+  <!-- === Entities === -->
+  <script src="./src/entities/projectiles.js"></script>
+  <script src="./src/entities/pickups.js"></script>
+  <script src="./src/entities/enemies.js"></script>
+  <script src="./src/entities/player.js"></script>
+
+  <!-- === Upgrades === -->
+  <script src="./src/upgrades/ingame.js"></script>
+  <script src="./src/upgrades/meta.js"></script>
+  <script src="./src/upgrades/upgrade-ui.js"></script>
+
+  <!-- === Wave system === -->
+  <script src="./src/systems/waves.js"></script>
+
+  <!-- === UI === -->
+  <script src="./src/ui/hud.js"></script>
+  <script src="./src/ui/screens.js"></script>
+  <script src="./src/ui/meta-screen.js"></script>
+
+  <!-- === Core === -->
+  <script src="./src/renderer.js"></script>
+  <script src="./src/game.js"></script>
+
+  <!-- === Bootstrap (async) === -->
+  <script src="./src/main.js"></script>
+
+  <!-- Hide loading screen once fonts & scripts loaded -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loading = document.getElementById('loading');
+        if (loading) loading.classList.add('hidden');
+        setTimeout(() => { if (loading) loading.remove(); }, 600);
+      }, 400);
+    });
+  </script>
+</body>
+</html>

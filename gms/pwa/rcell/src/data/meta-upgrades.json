@@ -1,0 +1,284 @@
+{
+  "branches": [
+    {
+      "id": "nucleus",
+      "name": "Nucleus",
+      "emoji": "🧬",
+      "description": "Core Stats",
+      "color": "#4af0b0",
+      "nodes": [
+        {
+          "id": "base_hp",
+          "name": "Base HP",
+          "description": "+15 max HP per run",
+          "cost": 2,
+          "requires": [],
+          "effect": { "stat": "maxHp", "op": "add", "value": 15 },
+          "position": { "x": 0, "y": 0 }
+        },
+        {
+          "id": "hp_regen",
+          "name": "HP Regen",
+          "description": "+1 HP/s passive regen",
+          "cost": 3,
+          "requires": ["base_hp"],
+          "effect": { "stat": "hpRegen", "op": "add", "value": 1 },
+          "position": { "x": 0, "y": 1 }
+        },
+        {
+          "id": "cell_size_down",
+          "name": "Compact Cell",
+          "description": "-10% hitbox size",
+          "cost": 3,
+          "requires": ["hp_regen"],
+          "effect": { "stat": "radiusMultiplier", "op": "multiply", "value": 0.9 },
+          "position": { "x": 0, "y": 2 }
+        },
+        {
+          "id": "mitochondria",
+          "name": "Mitochondria",
+          "description": "+25% energy capacity (dash charges)",
+          "cost": 4,
+          "requires": ["cell_size_down"],
+          "effect": { "stat": "energyCap", "op": "multiply", "value": 1.25 },
+          "position": { "x": 0, "y": 3 }
+        },
+        {
+          "id": "nuclear_pore",
+          "name": "Nuclear Pore",
+          "description": "Start each run with 1 random in-game upgrade",
+          "cost": 5,
+          "requires": ["mitochondria"],
+          "effect": { "stat": "startUpgrades", "op": "add", "value": 1 },
+          "position": { "x": 0, "y": 4 }
+        },
+        {
+          "id": "stem_origin",
+          "name": "Stem Origin",
+          "description": "Unlock Helper Cell companion",
+          "cost": 8,
+          "requires": ["nuclear_pore"],
+          "effect": { "stat": "helperCellUnlocked", "op": "set", "value": true },
+          "position": { "x": 0, "y": 5 }
+        }
+      ]
+    },
+    {
+      "id": "cytoplasm",
+      "name": "Cytoplasm",
+      "emoji": "⚔️",
+      "description": "Offensive Power",
+      "color": "#ff4466",
+      "nodes": [
+        {
+          "id": "antibody_speed",
+          "name": "Antibody Speed",
+          "description": "+15% projectile speed",
+          "cost": 2,
+          "requires": [],
+          "effect": { "stat": "projectileSpeed", "op": "multiply", "value": 1.15 },
+          "position": { "x": 1, "y": 0 }
+        },
+        {
+          "id": "igg_base",
+          "name": "IgG Base",
+          "description": "+1 base damage per projectile",
+          "cost": 2,
+          "requires": ["antibody_speed"],
+          "effect": { "stat": "damage", "op": "add", "value": 1 },
+          "position": { "x": 1, "y": 1 }
+        },
+        {
+          "id": "granule_capacity",
+          "name": "Granule Capacity",
+          "description": "+1 base projectile count",
+          "cost": 4,
+          "requires": ["igg_base"],
+          "effect": { "stat": "projectileCount", "op": "add", "value": 1 },
+          "position": { "x": 1, "y": 2 }
+        },
+        {
+          "id": "perforin_unlock",
+          "name": "Perforin Shot",
+          "description": "Unlock piercing perforin shot type",
+          "cost": 5,
+          "requires": ["granule_capacity"],
+          "effect": { "stat": "perforinUnlocked", "op": "set", "value": true },
+          "position": { "x": 1, "y": 3 }
+        },
+        {
+          "id": "nk_lineage",
+          "name": "NK Lineage",
+          "description": "NK crit active from game start",
+          "cost": 6,
+          "requires": ["perforin_unlock"],
+          "effect": { "stat": "startWithNkCrit", "op": "set", "value": true },
+          "position": { "x": 1, "y": 4 }
+        },
+        {
+          "id": "cytokine_storm",
+          "name": "Cytokine Storm",
+          "description": "Wave 5+ gain periodic AoE",
+          "cost": 8,
+          "requires": ["nk_lineage"],
+          "effect": { "stat": "cytokineStorm", "op": "set", "value": true },
+          "position": { "x": 1, "y": 5 }
+        }
+      ]
+    },
+    {
+      "id": "membrane",
+      "name": "Membrane",
+      "emoji": "🛡️",
+      "description": "Defensive Systems",
+      "color": "#44aaff",
+      "nodes": [
+        {
+          "id": "lipid_bilayer",
+          "name": "Lipid Bilayer",
+          "description": "+10% damage reduction",
+          "cost": 2,
+          "requires": [],
+          "effect": { "stat": "damageReduction", "op": "add", "value": 0.1 },
+          "position": { "x": 2, "y": 0 }
+        },
+        {
+          "id": "glycoprotein_coat",
+          "name": "Glycoprotein Coat",
+          "description": "Enemies move 15% slower",
+          "cost": 3,
+          "requires": ["lipid_bilayer"],
+          "effect": { "stat": "enemySpeedReduction", "op": "add", "value": 0.15 },
+          "position": { "x": 2, "y": 1 }
+        },
+        {
+          "id": "mhc_display",
+          "name": "MHC Display",
+          "description": "Enemies target you less aggressively",
+          "cost": 4,
+          "requires": ["glycoprotein_coat"],
+          "effect": { "stat": "aggroReduction", "op": "set", "value": true },
+          "position": { "x": 2, "y": 2 }
+        },
+        {
+          "id": "apoptosis_delay",
+          "name": "Apoptosis Delay",
+          "description": "+2 lives per run",
+          "cost": 5,
+          "requires": ["mhc_display"],
+          "effect": { "stat": "lives", "op": "add", "value": 2 },
+          "position": { "x": 2, "y": 3 }
+        },
+        {
+          "id": "immortalized_line",
+          "name": "Immortalized Line",
+          "description": "Start runs with Cytokine Shield",
+          "cost": 8,
+          "requires": ["apoptosis_delay"],
+          "effect": { "stat": "startWithShield", "op": "set", "value": true },
+          "position": { "x": 2, "y": 4 }
+        }
+      ]
+    },
+    {
+      "id": "lab",
+      "name": "Lab",
+      "emoji": "🧪",
+      "description": "Utility Systems",
+      "color": "#ffd166",
+      "nodes": [
+        {
+          "id": "dna_efficiency",
+          "name": "DNA Efficiency",
+          "description": "-15% meta upgrade cost",
+          "cost": 2,
+          "requires": [],
+          "effect": { "stat": "metaCostReduction", "op": "add", "value": 0.15 },
+          "position": { "x": 3, "y": 0 }
+        },
+        {
+          "id": "petri_expansion",
+          "name": "Petri Expansion",
+          "description": "Larger arena (25% bigger)",
+          "cost": 3,
+          "requires": ["dna_efficiency"],
+          "effect": { "stat": "arenaScale", "op": "multiply", "value": 1.25 },
+          "position": { "x": 3, "y": 1 }
+        },
+        {
+          "id": "mutation_rate",
+          "name": "Mutation Rate",
+          "description": "+1 reroll per in-game upgrade pick",
+          "cost": 4,
+          "requires": ["petri_expansion"],
+          "effect": { "stat": "rerolls", "op": "add", "value": 1 },
+          "position": { "x": 3, "y": 2 }
+        },
+        {
+          "id": "culture_medium",
+          "name": "Culture Medium",
+          "description": "Pickups worth +25% more",
+          "cost": 4,
+          "requires": ["mutation_rate"],
+          "effect": { "stat": "pickupValueMultiplier", "op": "multiply", "value": 1.25 },
+          "position": { "x": 3, "y": 3 }
+        },
+        {
+          "id": "gene_therapy",
+          "name": "Gene Therapy",
+          "description": "Reset 1 upgrade branch once per run",
+          "cost": 6,
+          "requires": ["culture_medium"],
+          "effect": { "stat": "geneTherapy", "op": "set", "value": true },
+          "position": { "x": 3, "y": 4 }
+        }
+      ]
+    },
+    {
+      "id": "evolution",
+      "name": "Evolution",
+      "emoji": "⚡",
+      "description": "Prestige (unlocks after first win)",
+      "color": "#a78bfa",
+      "requiresWin": true,
+      "nodes": [
+        {
+          "id": "viral_integration",
+          "name": "Viral Integration",
+          "description": "Start with random Tier 2 in-game upgrade",
+          "cost": 5,
+          "requires": [],
+          "effect": { "stat": "startWithTier2Upgrade", "op": "set", "value": true },
+          "position": { "x": 4, "y": 0 }
+        },
+        {
+          "id": "horizontal_transfer",
+          "name": "Horizontal Transfer",
+          "description": "Steal 1 enemy ability on boss kill",
+          "cost": 8,
+          "requires": ["viral_integration"],
+          "effect": { "stat": "stealBossAbility", "op": "set", "value": true },
+          "position": { "x": 4, "y": 1 }
+        },
+        {
+          "id": "eukaryote_ascension",
+          "name": "Eukaryote Ascension",
+          "description": "+1 upgrade choice permanently",
+          "cost": 10,
+          "requires": ["horizontal_transfer"],
+          "effect": { "stat": "upgradeChoices", "op": "add", "value": 1 },
+          "position": { "x": 4, "y": 2 }
+        },
+        {
+          "id": "omega_cell",
+          "name": "Omega Cell",
+          "description": "Unlock Macrophage mode: larger, slower, massive AoE",
+          "cost": 15,
+          "requires": ["eukaryote_ascension"],
+          "effect": { "stat": "macrophageModeUnlocked", "op": "set", "value": true },
+          "position": { "x": 4, "y": 3 }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RCELL — Auto Test Runner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #050d1a;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #4af0b0;
+      font-size: 22px;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+    }
+    .subtitle {
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      margin-bottom: 24px;
+    }
+    .summary {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .summary.pass { background: rgba(74,240,176,0.12); border: 1px solid #4af0b0; color: #4af0b0; }
+    .summary.fail { background: rgba(255,68,102,0.12); border: 1px solid #ff4466; color: #ff4466; }
+    .summary.running { background: rgba(255,209,102,0.08); border: 1px solid #ffd166; color: #ffd166; }
+    .suite {
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .suite-header {
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      font-size: 13px;
+      font-weight: bold;
+      color: #a78bfa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .suite-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .suite-badge.pass { background: rgba(74,240,176,0.2); color: #4af0b0; }
+    .suite-badge.fail { background: rgba(255,68,102,0.2); color: #ff4466; }
+    .test-list { list-style: none; }
+    .test-item {
+      padding: 7px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .test-item:hover { background: rgba(255,255,255,0.02); }
+    .test-icon { width: 18px; flex-shrink: 0; margin-top: 1px; }
+    .pass-icon { color: #4af0b0; }
+    .fail-icon { color: #ff4466; }
+    .test-name { flex: 1; }
+    .test-error {
+      color: #ff6688;
+      font-size: 11px;
+      margin-top: 3px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4af0b0;
+      transition: width 0.3s;
+    }
+    .run-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: rgba(74,240,176,0.15);
+      border: 1px solid #4af0b0;
+      color: #4af0b0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .run-btn:hover { background: rgba(74,240,176,0.25); }
+    .hidden { display: none; }
+    #output { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>⚗ RCELL TEST RUNNER</h1>
+  <p class="subtitle">Autonomous browser-based test suite — no dependencies</p>
+
+  <button class="run-btn" onclick="runAllTests()">▶ Run All Tests</button>
+
+  <div id="summary" class="summary running hidden">Loading...</div>
+  <div class="progress-bar hidden" id="progressBar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div id="output"></div>
+
+  <!-- === Test Framework === -->
+  <script>
+    // Minimal test framework — assert(cond, label)
+    const TestRunner = (() => {
+      const suites = [];
+      let totalPassed = 0, totalFailed = 0;
+
+      function assert(condition, label) {
+        if (!condition) throw new Error(label || 'Assertion failed');
+      }
+
+      function suite(name) {
+        const tests = [];
+        let beforeFn = null;
+
+        const s = {
+          name,
+          before(fn) { beforeFn = fn; },
+          test(label, fn) { tests.push({ label, fn }); },
+          async run() {
+            if (beforeFn) await beforeFn();
+            const results = [];
+            for (const t of tests) {
+              let passed = false, error = null;
+              try {
+                await t.fn();
+                passed = true;
+              } catch (e) {
+                error = e.message || String(e);
+              }
+              results.push({ label: t.label, passed, error });
+              if (passed) totalPassed++; else totalFailed++;
+            }
+            s.results = results;
+            return results;
+          }
+        };
+        suites.push(s);
+        return s;
+      }
+
+      function getSuites() { return suites; }
+      function getStats() { return { totalPassed, totalFailed, total: totalPassed + totalFailed }; }
+      function reset() { suites.length = 0; totalPassed = 0; totalFailed = 0; }
+
+      return { suite, assert, getSuites, getStats, reset };
+    })();
+
+    // Global assert shortcut
+    function assert(condition, label) { TestRunner.assert(condition, label); }
+  </script>
+
+  <!-- === Game modules (must be loaded in dependency order) === -->
+  <script src="../src/utils/math.js"></script>
+  <script src="../src/utils/pool.js"></script>
+  <script src="../src/utils/storage.js"></script>
+  <script src="../src/systems/collision.js"></script>
+  <script src="../src/systems/xp.js"></script>
+  <script src="../src/systems/audio.js"></script>
+  <script src="../src/entities/projectiles.js"></script>
+  <script src="../src/entities/pickups.js"></script>
+  <script src="../src/entities/enemies.js"></script>
+  <script src="../src/entities/player.js"></script>
+  <script src="../src/upgrades/ingame.js"></script>
+  <script src="../src/upgrades/meta.js"></script>
+  <script src="../src/systems/waves.js"></script>
+
+  <!-- Load JSON data inline for tests -->
+  <script>
+    // Fetch JSON data before running tests
+    let ENEMY_DATA, INGAME_DATA, META_DATA;
+
+    async function loadTestData() {
+      try {
+        const [eRes, iRes, mRes] = await Promise.all([
+          fetch('../src/data/enemies.json'),
+          fetch('../src/data/ingame-upgrades.json'),
+          fetch('../src/data/meta-upgrades.json')
+        ]);
+        ENEMY_DATA = await eRes.json();
+        INGAME_DATA = await iRes.json();
+        META_DATA = await mRes.json();
+
+        // Pre-load into modules
+        Enemies.loadDefs(ENEMY_DATA.enemies);
+        InGameUpgrades.loadData(INGAME_DATA.upgrades);
+        MetaUpgrades.loadData(META_DATA);
+        Waves.init(400, 800, () => {});
+      } catch(e) {
+        console.warn('Could not load JSON data:', e);
+        ENEMY_DATA = { enemies: [] };
+        INGAME_DATA = { upgrades: [] };
+        META_DATA = { branches: [] };
+      }
+    }
+  </script>
+
+  <!-- Test files -->
+  <script src="./test-utils.js"></script>
+  <script src="./test-collision.js"></script>
+  <script src="./test-enemies.js"></script>
+  <script src="./test-waves.js"></script>
+  <script src="./test-upgrades.js"></script>
+  <script src="./test-meta.js"></script>
+
+  <!-- Runner UI -->
+  <script>
+    async function runAllTests() {
+      const summaryEl = document.getElementById('summary');
+      const outputEl = document.getElementById('output');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+
+      summaryEl.className = 'summary running';
+      summaryEl.textContent = '⏳ Running tests...';
+      summaryEl.classList.remove('hidden');
+      progressBar.classList.remove('hidden');
+      outputEl.innerHTML = '';
+
+      // Reset and reload data
+      TestRunner.reset();
+      await loadTestData();
+
+      // Re-source test files by reloading them dynamically
+      // (since TestRunner.reset() cleared suites, we need to re-register)
+      const testFiles = ['test-utils.js','test-collision.js','test-enemies.js','test-waves.js','test-upgrades.js','test-meta.js'];
+
+      for (const file of testFiles) {
+        await new Promise((resolve) => {
+          const s = document.createElement('script');
+          s.src = './' + file + '?t=' + Date.now();
+          s.onload = resolve;
+          s.onerror = resolve;
+          document.head.appendChild(s);
+        });
+      }
+
+      // Wait a tick for suites to register
+      await new Promise(r => setTimeout(r, 50));
+
+      const suites = TestRunner.getSuites();
+      const total = suites.reduce((n, s) => n + s.results?.length || 0, 0);
+      let done = 0;
+
+      for (const s of suites) {
+        if (!s.results) await s.run();
+        done += s.results.length;
+        progressFill.style.width = (done / Math.max(1, total) * 100) + '%';
+        renderSuite(s, outputEl);
+      }
+
+      // Final stats
+      const stats = TestRunner.getStats();
+      const allPassed = stats.totalFailed === 0;
+      summaryEl.className = 'summary ' + (allPassed ? 'pass' : 'fail');
+      summaryEl.textContent = allPassed
+        ? `✓ All ${stats.totalPassed} tests passed`
+        : `✗ ${stats.totalFailed} failed / ${stats.total} total`;
+
+      progressFill.style.width = '100%';
+      progressFill.style.background = allPassed ? '#4af0b0' : '#ff4466';
+    }
+
+    function renderSuite(suite, container) {
+      const results = suite.results || [];
+      const passed = results.filter(r => r.passed).length;
+      const failed = results.length - passed;
+      const allPass = failed === 0;
+
+      const div = document.createElement('div');
+      div.className = 'suite';
+
+      const header = document.createElement('div');
+      header.className = 'suite-header';
+      header.innerHTML = `
+        <span>${suite.name}</span>
+        <span class="suite-badge ${allPass ? 'pass' : 'fail'}">${passed}/${results.length}</span>
+      `;
+      div.appendChild(header);
+
+      const list = document.createElement('ul');
+      list.className = 'test-list';
+
+      results.forEach(r => {
+        const li = document.createElement('li');
+        li.className = 'test-item';
+        li.innerHTML = `
+          <span class="test-icon ${r.passed ? 'pass-icon' : 'fail-icon'}">${r.passed ? '✓' : '✗'}</span>
+          <div class="test-name">
+            ${r.label}
+            ${!r.passed && r.error ? `<div class="test-error">${r.error}</div>` : ''}
+          </div>
+        `;
+        list.appendChild(li);
+      });
+
+      div.appendChild(list);
+      container.appendChild(div);
+    }
+
+    // Auto-run on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(runAllTests, 300);
+    });
+  </script>
+</body>
+</html>
