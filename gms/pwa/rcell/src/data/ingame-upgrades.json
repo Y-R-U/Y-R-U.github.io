@@ -1,0 +1,319 @@
+{
+  "upgrades": [
+    {
+      "id": "antibody_burst",
+      "name": "Antibody Burst",
+      "description": "+1 projectile fired simultaneously",
+      "category": "offensive",
+      "icon": "💊",
+      "effect": { "stat": "projectileCount", "op": "add", "value": 1 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "igm_spread",
+      "name": "IgM Spread",
+      "description": "Projectiles fan out ±15°",
+      "category": "offensive",
+      "icon": "🔱",
+      "effect": { "stat": "spreadAngle", "op": "add", "value": 15 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "cytotoxin_coat",
+      "name": "Cytotoxin Coat",
+      "description": "Adds poison DoT (5 dmg/s, 3s)",
+      "category": "offensive",
+      "icon": "☣",
+      "effect": { "stat": "poisonDamage", "op": "add", "value": 5, "poisonDuration": 3 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "complement_chain",
+      "name": "Complement Chain",
+      "description": "Projectiles chain to 1 nearby enemy",
+      "category": "offensive",
+      "icon": "⛓",
+      "effect": { "stat": "chainCount", "op": "add", "value": 1 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "nk_strike",
+      "name": "NK Strike",
+      "description": "10% chance for 3× crit",
+      "category": "offensive",
+      "icon": "⚡",
+      "effect": { "stat": "critChance", "op": "add", "value": 0.1, "critMultiplier": 3 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "opsonin_mark",
+      "name": "Opsonin Mark",
+      "description": "Marked enemies take +25% damage",
+      "category": "offensive",
+      "icon": "🎯",
+      "effect": { "stat": "markDamageBonus", "op": "add", "value": 0.25 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "interferon_wave",
+      "name": "Interferon Wave",
+      "description": "Periodic AoE burst every 8s",
+      "category": "offensive",
+      "icon": "🌊",
+      "effect": { "stat": "aoeInterval", "op": "set", "value": 8000, "aoeDamage": 20, "aoeRadius": 100 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "rapid_mitosis",
+      "name": "Rapid Mitosis",
+      "description": "+30% fire rate",
+      "category": "offensive",
+      "icon": "🔄",
+      "effect": { "stat": "fireRateMultiplier", "op": "multiply", "value": 0.7 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "heavy_immunoglobulin",
+      "name": "Heavy IgG",
+      "description": "+50% projectile size, +25% damage",
+      "category": "offensive",
+      "icon": "💉",
+      "effect": { "stat": "projectileSize", "op": "multiply", "value": 1.5, "damage": 1.25 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "lysozyme_field",
+      "name": "Lysozyme Field",
+      "description": "Passive aura deals 3 dmg/s in radius",
+      "category": "offensive",
+      "icon": "🔮",
+      "effect": { "stat": "auraDamage", "op": "add", "value": 3, "auraRadius": 80 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "phagocyte_slam",
+      "name": "Phagocyte Slam",
+      "description": "Dash deals damage (triggers on move)",
+      "category": "offensive",
+      "icon": "💥",
+      "effect": { "stat": "dashDamage", "op": "add", "value": 25 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "mast_cell_bomb",
+      "name": "Mast Cell Bomb",
+      "description": "On kill: 15% chance to explode",
+      "category": "offensive",
+      "icon": "💣",
+      "effect": { "stat": "killExplosionChance", "op": "add", "value": 0.15, "explosionDamage": 30, "explosionRadius": 80 },
+      "color": "#4af0b0"
+    },
+    {
+      "id": "membrane_tough",
+      "name": "Tough Membrane",
+      "description": "+20 max HP",
+      "category": "defensive",
+      "icon": "🛡",
+      "effect": { "stat": "maxHp", "op": "add", "value": 20 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "regen_factor",
+      "name": "Regeneration Factor",
+      "description": "+2 HP/sec",
+      "category": "defensive",
+      "icon": "💚",
+      "effect": { "stat": "hpRegen", "op": "add", "value": 2 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "cytokine_shield",
+      "name": "Cytokine Shield",
+      "description": "Absorb next 3 hits (refreshes each wave)",
+      "category": "defensive",
+      "icon": "🔵",
+      "effect": { "stat": "shieldCharges", "op": "add", "value": 3 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "fibrin_net",
+      "name": "Fibrin Net",
+      "description": "Enemies in radius slow 40%",
+      "category": "defensive",
+      "icon": "🕸",
+      "effect": { "stat": "slowAuraRadius", "op": "add", "value": 100, "slowAmount": 0.4 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "heat_shock",
+      "name": "Heat Shock Protein",
+      "description": "20% chance to fully negate hit",
+      "category": "defensive",
+      "icon": "🔥",
+      "effect": { "stat": "dodgeChance", "op": "add", "value": 0.2 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "adhesion_molecule",
+      "name": "Adhesion Molecule",
+      "description": "Reduce knockback, +10% DR",
+      "category": "defensive",
+      "icon": "🔗",
+      "effect": { "stat": "damageReduction", "op": "add", "value": 0.1, "knockbackReduction": 0.5 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "superoxide_burst",
+      "name": "Superoxide Burst",
+      "description": "On hit: brief repel pulse",
+      "category": "defensive",
+      "icon": "✨",
+      "effect": { "stat": "repelOnHit", "op": "set", "value": true, "repelForce": 200, "repelRadius": 80 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "coagulation_clot",
+      "name": "Coagulation Clot",
+      "description": "Leave damaging clot trail when moving",
+      "category": "defensive",
+      "icon": "🩸",
+      "effect": { "stat": "clotTrail", "op": "set", "value": true, "clotDamage": 8, "clotDuration": 2 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "toll_receptor",
+      "name": "Toll-Like Receptor",
+      "description": "Reveal enemy weak points (+15% dmg to revealed)",
+      "category": "defensive",
+      "icon": "👁",
+      "effect": { "stat": "weakPointDamage", "op": "add", "value": 0.15, "revealsWeakPoints": true },
+      "color": "#44aaff"
+    },
+    {
+      "id": "phagocyte_armor",
+      "name": "Phagocytic Armor",
+      "description": "Gain 1 armour per 5 kills (max 5)",
+      "category": "defensive",
+      "icon": "⚔",
+      "effect": { "stat": "killArmor", "op": "set", "value": true, "killsPerArmor": 5, "maxArmor": 5 },
+      "color": "#44aaff"
+    },
+    {
+      "id": "pseudopod_speed",
+      "name": "Pseudopod Extension",
+      "description": "+20% move speed",
+      "category": "mobility",
+      "icon": "🏃",
+      "effect": { "stat": "speedMultiplier", "op": "multiply", "value": 1.2 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "chemotaxis_sense",
+      "name": "Chemotaxis",
+      "description": "Auto-navigate toward nearest enemy cluster",
+      "category": "mobility",
+      "icon": "🧭",
+      "effect": { "stat": "chemotaxis", "op": "set", "value": true },
+      "color": "#ffd166"
+    },
+    {
+      "id": "diapedesis",
+      "name": "Diapedesis",
+      "description": "Dash through enemies, dealing damage",
+      "category": "mobility",
+      "icon": "💨",
+      "effect": { "stat": "dashDamageThrough", "op": "set", "value": true, "dashDamage": 20, "dashCooldown": 3000 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "receptor_boost",
+      "name": "Receptor Upregulation",
+      "description": "XP pickup radius +50%",
+      "category": "mobility",
+      "icon": "🧲",
+      "effect": { "stat": "pickupRadius", "op": "multiply", "value": 1.5 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "amoeboid_form",
+      "name": "Amoeboid Form",
+      "description": "Size reduced 25%, harder to hit",
+      "category": "mobility",
+      "icon": "🔻",
+      "effect": { "stat": "radiusMultiplier", "op": "multiply", "value": 0.75 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "membrane_flux",
+      "name": "Membrane Flux",
+      "description": "Phasing: briefly pass through projectiles (5s cd)",
+      "category": "mobility",
+      "icon": "👻",
+      "effect": { "stat": "phaseCooldown", "op": "set", "value": 5000, "phaseDuration": 1500 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "vascular_current",
+      "name": "Vascular Current",
+      "description": "Random speed boost bursts",
+      "category": "mobility",
+      "icon": "⚡",
+      "effect": { "stat": "speedBurst", "op": "set", "value": true, "burstMultiplier": 2, "burstInterval": 5000, "burstDuration": 1000 },
+      "color": "#ffd166"
+    },
+    {
+      "id": "macrophage_memory",
+      "name": "Macrophage Memory",
+      "description": "Duplicated upgrade = +50% effect instead",
+      "category": "utility",
+      "icon": "🧠",
+      "effect": { "stat": "macrophageMemory", "op": "set", "value": true },
+      "color": "#a78bfa"
+    },
+    {
+      "id": "adaptive_immune",
+      "name": "Adaptive Response",
+      "description": "Each wave survived: +5% all stats",
+      "category": "utility",
+      "icon": "📈",
+      "effect": { "stat": "waveStatBonus", "op": "add", "value": 0.05 },
+      "color": "#a78bfa"
+    },
+    {
+      "id": "exosome_burst",
+      "name": "Exosome Burst",
+      "description": "On level-up: AoE damage pulse",
+      "category": "utility",
+      "icon": "💫",
+      "effect": { "stat": "levelUpAoe", "op": "set", "value": true, "levelUpAoeDamage": 40, "levelUpAoeRadius": 120 },
+      "color": "#a78bfa"
+    },
+    {
+      "id": "stem_cell_call",
+      "name": "Stem Cell Reinforcement",
+      "description": "Spawn 1 helper cell (autoattacks)",
+      "category": "utility",
+      "icon": "🤝",
+      "effect": { "stat": "helperCells", "op": "add", "value": 1 },
+      "color": "#a78bfa"
+    },
+    {
+      "id": "regulatory_t",
+      "name": "Regulatory T-Cell",
+      "description": "Convert 20% excess XP to healing",
+      "category": "utility",
+      "icon": "💜",
+      "effect": { "stat": "xpToHeal", "op": "add", "value": 0.2 },
+      "color": "#a78bfa"
+    },
+    {
+      "id": "clonal_expansion",
+      "name": "Clonal Expansion",
+      "description": "Next upgrade pick shows 5 cards instead of 3",
+      "category": "utility",
+      "icon": "🃏",
+      "effect": { "stat": "nextPickCount", "op": "add", "value": 2 },
+      "color": "#a78bfa"
+    }
+  ]
+}

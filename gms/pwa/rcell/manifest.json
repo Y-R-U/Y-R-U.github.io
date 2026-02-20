@@ -1,0 +1,23 @@
+{
+  "name": "RCELL — Immune Defence Roguelite",
+  "short_name": "RCELL",
+  "description": "A biopunk roguelite where you control a white blood cell defending against pathogens.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050d1a",
+  "theme_color": "#4af0b0",
+  "lang": "en",
+  "categories": ["games"],
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

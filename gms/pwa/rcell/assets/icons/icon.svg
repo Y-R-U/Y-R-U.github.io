@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a1f3a"/>
+      <stop offset="100%" stop-color="#050d1a"/>
+    </radialGradient>
+    <radialGradient id="cellGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4af0b0" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#4af0b0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  <!-- Glow halo -->
+  <circle cx="256" cy="256" r="200" fill="url(#cellGlow)"/>
+  <!-- Cell membrane (wobbly circle approximated) -->
+  <path d="M256,96 C312,88 368,128 392,176 C420,232 416,300 392,344 C364,392 308,424 256,424 C200,424 144,392 116,344 C88,296 92,228 116,176 C140,120 200,104 256,96Z"
+        fill="rgba(74,240,176,0.12)" stroke="#4af0b0" stroke-width="6" filter="url(#glow)"/>
+  <!-- Nucleus -->
+  <ellipse cx="256" cy="256" rx="72" ry="68" fill="rgba(74,240,176,0.3)" stroke="#4af0b0" stroke-width="4"/>
+  <!-- Cytoplasm granules -->
+  <circle cx="192" cy="210" r="14" fill="rgba(74,240,176,0.4)"/>
+  <circle cx="316" cy="220" r="11" fill="rgba(74,240,176,0.35)"/>
+  <circle cx="200" cy="304" r="12" fill="rgba(74,240,176,0.35)"/>
+  <circle cx="316" cy="296" r="10" fill="rgba(74,240,176,0.3)"/>
+  <!-- Pathogen hint (red dot) -->
+  <circle cx="380" cy="160" r="22" fill="rgba(255,68,102,0.7)" stroke="#ff4466" stroke-width="2"/>
+  <circle cx="380" cy="160" r="8" fill="#ff4466"/>
+  <!-- DNA text hint -->
+  <text x="256" y="480" font-family="'Exo 2', Arial, sans-serif" font-size="48" font-weight="bold"
+        fill="#4af0b0" text-anchor="middle" opacity="0.8">RCELL</text>
+</svg>
