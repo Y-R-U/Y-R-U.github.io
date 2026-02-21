@@ -177,7 +177,7 @@
       "description": "Leave damaging clot trail when moving",
       "category": "defensive",
       "icon": "🩸",
-      "effect": { "stat": "clotTrail", "op": "set", "value": true, "clotDamage": 8, "clotDuration": 2 },
+      "effect": { "stat": "clotTrail", "op": "set", "value": true, "clotDamage": 0.8, "clotDuration": 1.5 },
       "color": "#44aaff"
     },
     {

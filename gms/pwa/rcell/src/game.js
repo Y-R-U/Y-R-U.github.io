@@ -34,6 +34,7 @@ const Game = (() => {
   // Touch state
   let touchActive = false;
   let touchX = 0, touchY = 0;
+  let touchStartY = 0; // for meta-screen swipe scrolling
 
   function init(canvasEl) {
     canvas = canvasEl;
@@ -53,6 +54,9 @@ const Game = (() => {
     canvas.addEventListener('mousemove', onMouseMove);
     canvas.addEventListener('mouseup', onMouseUp);
     canvas.addEventListener('click', onCanvasClick);
+
+    // Scroll support for meta screen
+    canvas.addEventListener('wheel', onWheel, { passive: false });
 
     // Load save
     saveData = Storage.loadOrDefault();
@@ -92,16 +96,27 @@ const Game = (() => {
     const pos = normalizeTouch(e.touches[0]);
     touchActive = true;
     touchX = pos.x; touchY = pos.y;
+    touchStartY = pos.y;
     handleInput(pos.x, pos.y, 'start');
   }
   function onTouchMove(e) {
     e.preventDefault();
     const pos = normalizeTouch(e.touches[0]);
+    if (gameState === 'meta') {
+      const dy = pos.y - touchY;
+      MetaScreen.handleScroll(dy);
+    }
     touchX = pos.x; touchY = pos.y;
     if (gameState === 'playing') Player.setTarget(pos.x, pos.y);
   }
   function onTouchEnd(e) {
     touchActive = false;
+  }
+  function onWheel(e) {
+    e.preventDefault();
+    if (gameState === 'meta') {
+      MetaScreen.handleScroll(-e.deltaY * 0.5);
+    }
   }
   function onMouseDown(e) {
     const pos = { x: e.offsetX, y: e.offsetY };
@@ -125,19 +140,19 @@ const Game = (() => {
     if (gameState === 'menu') {
       const action = Screens.mainMenu.handleTap(x, y);
       if (action === 'play') startRun();
-      else if (action === 'meta') { gameState = 'meta'; }
+      else if (action === 'meta') { MetaScreen.resetScroll(); gameState = 'meta'; }
     } else if (gameState === 'levelup') {
       const handled = UpgradeUI.handleTap(x, y, canvasW, canvasH);
       if (!handled) return;
     } else if (gameState === 'death') {
       const action = Screens.deathScreen.handleTap(x, y);
       if (action === 'retry') startRun();
-      else if (action === 'meta') gameState = 'meta';
+      else if (action === 'meta') { MetaScreen.resetScroll(); gameState = 'meta'; }
       else if (action === 'menu') gameState = 'menu';
     } else if (gameState === 'win') {
       const action = Screens.winScreen.handleTap(x, y);
       if (action === 'retry') startRun();
-      else if (action === 'meta') gameState = 'meta';
+      else if (action === 'meta') { MetaScreen.resetScroll(); gameState = 'meta'; }
     } else if (gameState === 'meta') {
       const action = MetaScreen.handleTap(x, y, saveData);
       if (action === 'back') gameState = 'menu';
@@ -157,8 +172,10 @@ const Game = (() => {
   }
 
   function startRun() {
-    // Apply meta stats to player
-    const metaStats = MetaUpgrades.applyMetaToPlayerStats({});
+    // Must pass BASE_STATS as seed — multiply-ops otherwise start from 1
+    // (e.g. antibody_speed × 1.15 = 1.15 instead of 300 × 1.15 = 345),
+    // producing near-zero projectile speeds (the "stationary mines" bug).
+    const metaStats = MetaUpgrades.applyMetaToPlayerStats(Player.getBaseStats());
     const playerState = Player.init(metaStats);
 
     // Place player at center
@@ -309,8 +326,8 @@ const Game = (() => {
     waveTransitionAlpha = 1;
     waveTransitionTimer = 2;
 
-    if (waveIndex === 9) Audio.sfx.bossSpawn();
-    else Audio.sfx.waveStart();
+    if (Waves.isBossWave()) try { Audio.sfx.bossSpawn(); } catch (e) {}
+    else try { Audio.sfx.waveStart(); } catch (e) {}
   }
 
   function endRun(won) {

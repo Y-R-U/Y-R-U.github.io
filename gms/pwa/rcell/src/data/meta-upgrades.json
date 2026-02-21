@@ -267,6 +267,42 @@
           "requires": ["apoptosis_delay"],
           "effect": { "stat": "startWithShield", "op": "set", "value": true },
           "position": { "x": 2, "y": 4 }
+        },
+        {
+          "id": "fibrinogen_1",
+          "name": "Fibrinogen I",
+          "description": "Blood trail deals +0.4 dmg/s (stacks with in-game upgrade)",
+          "cost": 8,
+          "requires": ["lipid_bilayer"],
+          "effect": { "stat": "clotDamage", "op": "add", "value": 0.4 },
+          "position": { "x": 2, "y": 4.7 }
+        },
+        {
+          "id": "fibrinogen_2",
+          "name": "Fibrinogen II",
+          "description": "Blood trail deals +0.8 dmg/s",
+          "cost": 18,
+          "requires": ["fibrinogen_1"],
+          "effect": { "stat": "clotDamage", "op": "add", "value": 0.8 },
+          "position": { "x": 2, "y": 5.4 }
+        },
+        {
+          "id": "fibrinogen_3",
+          "name": "Fibrinogen III",
+          "description": "Blood trail deals +1.5 dmg/s",
+          "cost": 35,
+          "requires": ["fibrinogen_2"],
+          "effect": { "stat": "clotDamage", "op": "add", "value": 1.5 },
+          "position": { "x": 2, "y": 6.1 }
+        },
+        {
+          "id": "fibrinogen_4",
+          "name": "Fibrinogen IV",
+          "description": "Blood trail deals +3.0 dmg/s",
+          "cost": 65,
+          "requires": ["fibrinogen_3"],
+          "effect": { "stat": "clotDamage", "op": "add", "value": 3.0 },
+          "position": { "x": 2, "y": 6.8 }
         }
       ]
     },
