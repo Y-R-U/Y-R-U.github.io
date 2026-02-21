@@ -158,20 +158,32 @@ const Player = (() => {
       aoeTimer -= dt * 1000;
     }
 
-    // Phase timer
+    // Phase timer — auto-triggers when membrane_flux upgrade is active and cooldown has expired
     if (isPhasing) {
       phaseTimer -= dt * 1000;
       if (phaseTimer <= 0) {
         isPhasing = false;
-        phaseTimer = state.phaseCooldown;
+        phaseTimer = state.phaseCooldown;  // start cooldown
       }
     } else if (phaseTimer > 0) {
       phaseTimer -= dt * 1000;
+      if (phaseTimer <= 0 && hasUpgrade('membrane_flux')) {
+        // Cooldown expired — immediately begin next phase
+        isPhasing = true;
+        phaseTimer = state.phaseDuration;
+      }
+    } else if (hasUpgrade('membrane_flux')) {
+      // First trigger (phaseTimer starts at 0)
+      isPhasing = true;
+      phaseTimer = state.phaseDuration;
     }
 
-    // Speed burst timer
+    // Speed burst timer — cycles: active[0 → -burstDuration] then cooldown[-burstDuration → -(burstDuration+burstInterval)]
     if (state.speedBurst) {
       burstTimer -= dt * 1000;
+      if (burstTimer < -(state.burstDuration + state.burstInterval)) {
+        burstTimer = 0;
+      }
     }
 
     // Update clot trails
@@ -231,7 +243,7 @@ const Player = (() => {
     dmg = Math.ceil(dmg);
 
     state.hp -= dmg;
-    invincibleTimer = INVINCIBLE_DURATION;
+    if (dmg > 0) invincibleTimer = INVINCIBLE_DURATION;
 
     if (state.hp <= 0) {
       state.hp = 0;

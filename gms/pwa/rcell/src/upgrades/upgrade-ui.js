@@ -5,6 +5,8 @@ const UpgradeUI = (() => {
   let visible = false;
   let rerollsLeft = 0;
   let animT = 0;
+  let lockTimer = 0;        // seconds remaining before taps are accepted
+  const LOCK_DURATION = 1.0; // 1 second lock after screen opens
   const CARD_W = 260;
   const CARD_H = 160;
   const CARD_GAP = 16;
@@ -27,6 +29,7 @@ const UpgradeUI = (() => {
     visible = true;
     rerollsLeft = rerolls || 0;
     animT = 0;
+    lockTimer = LOCK_DURATION;
   }
 
   function hide() {
@@ -39,6 +42,7 @@ const UpgradeUI = (() => {
   function draw(ctx, canvasW, canvasH, dt) {
     if (!visible) return;
     animT = Math.min(1, animT + dt * 4);
+    if (lockTimer > 0) lockTimer = Math.max(0, lockTimer - dt);
     const alpha = animT;
 
     // Dim backdrop
@@ -60,6 +64,15 @@ const UpgradeUI = (() => {
       const r = rects[i];
       drawCard(ctx, upgrade, r, i);
     });
+
+    // Lock indicator — fades out as the lock expires
+    if (lockTimer > 0) {
+      const lockPct = lockTimer / LOCK_DURATION;
+      ctx.fillStyle = `rgba(255,209,102,${0.7 * lockPct})`;
+      ctx.font = `bold ${14 + 4 * lockPct}px "Exo 2", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('tap to select…', canvasW / 2, canvasH * 0.12 + 28);
+    }
 
     // Reroll button
     if (rerollsLeft > 0) {
@@ -165,6 +178,7 @@ const UpgradeUI = (() => {
 
   function handleTap(tapX, tapY, canvasW, canvasH) {
     if (!visible) return false;
+    if (lockTimer > 0) return false;  // too soon — ignore accidental taps
     const rects = getCardRects(currentPicks.length, canvasW, canvasH);
 
     for (let i = 0; i < rects.length; i++) {
