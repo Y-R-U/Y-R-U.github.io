@@ -31,7 +31,7 @@ const Waves = (() => {
 
     // === WAVES 11–14 : Late Game — HP/damage scales every wave ===
     // Wave 11
-    { spawns: [{ id: 'bacteria_cocci', count: 15, interval: 800 }, { id: 'bacteria_rod', count: 8, interval: 1100 }, { id: 'virus_corona', count: 4, interval: 2500 }, { id: 'fungi_spore', count: 4, interval: 2000 }] },
+    { spawns: [{ id: 'bacteria_cocci', count: 15, interval: 800 }, { id: 'bacteria_rod', count: 8, interval: 1100 }, { id: 'virus_corona', count: 4, interval: 2500 }, { id: 'fungus_spore', count: 4, interval: 2000 }] },
     // Wave 12
     { spawns: [{ id: 'prion_cluster', count: 4, interval: 3500 }, { id: 'superbug', count: 4, interval: 4500 }, { id: 'bacteria_spiral', count: 8, interval: 1500 }, { id: 'parasite_hook', count: 6, interval: 2000 }] },
     // Wave 13

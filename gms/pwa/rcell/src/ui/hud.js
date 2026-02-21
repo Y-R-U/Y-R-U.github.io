@@ -141,8 +141,10 @@ const HUD = (() => {
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.font = '18px "Nunito", sans-serif';
-    if (waveNum === 9) {
-      ctx.fillText('FINAL BOSS', canvasW / 2, canvasH / 2 + 36);
+    const BOSS_WAVE_INDICES = new Set([9, 14, 19, 24]);
+    if (BOSS_WAVE_INDICES.has(waveNum)) {
+      const label = waveNum === 24 ? 'FINAL BOSS' : 'BOSS ENCOUNTER';
+      ctx.fillText(label, canvasW / 2, canvasH / 2 + 36);
     }
     ctx.restore();
   }
