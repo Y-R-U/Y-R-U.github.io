@@ -212,6 +212,17 @@ const Enemies = (() => {
         e.x += (dx / d) * spd * dt;
         e.y += (dy / d) * spd * dt;
         e.minionTimer -= dt * 1000;
+        // Spawn minions when timer fires
+        if (e.minionTimer <= 0 && e.minionId) {
+          e.minionTimer = e.minionInterval;
+          const minionCount = 3;
+          for (let m = 0; m < minionCount; m++) {
+            const a = (m / minionCount) * Math.PI * 2;
+            const mx = e.x + Math.cos(a) * (e.radius + 20);
+            const my = e.y + Math.sin(a) * (e.radius + 20);
+            createEnemy(e.minionId, mx, my);
+          }
+        }
         // Growing over time
         if (e.growthRate > 0 && e.radius < e.maxRadius) {
           e.radius = Math.min(e.maxRadius, e.radius + e.growthRate * dt * 60);

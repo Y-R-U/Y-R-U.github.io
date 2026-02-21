@@ -9,45 +9,72 @@
       "nodes": [
         {
           "id": "base_hp",
-          "name": "Base HP",
+          "name": "Base HP I",
           "description": "+15 max HP per run",
-          "cost": 2,
+          "cost": 4,
           "requires": [],
           "effect": { "stat": "maxHp", "op": "add", "value": 15 },
           "position": { "x": 0, "y": 0 }
         },
         {
+          "id": "base_hp_2",
+          "name": "Base HP II",
+          "description": "+20 max HP per run",
+          "cost": 8,
+          "requires": ["base_hp"],
+          "effect": { "stat": "maxHp", "op": "add", "value": 20 },
+          "position": { "x": 0, "y": 0.5 }
+        },
+        {
+          "id": "base_hp_3",
+          "name": "Base HP III",
+          "description": "+30 max HP per run",
+          "cost": 16,
+          "requires": ["base_hp_2"],
+          "effect": { "stat": "maxHp", "op": "add", "value": 30 },
+          "position": { "x": 0, "y": 1 }
+        },
+        {
           "id": "hp_regen",
-          "name": "HP Regen",
+          "name": "HP Regen I",
           "description": "+1 HP/s passive regen",
-          "cost": 3,
+          "cost": 6,
           "requires": ["base_hp"],
           "effect": { "stat": "hpRegen", "op": "add", "value": 1 },
-          "position": { "x": 0, "y": 1 }
+          "position": { "x": 0, "y": 1.6 }
+        },
+        {
+          "id": "hp_regen_2",
+          "name": "HP Regen II",
+          "description": "+2 HP/s passive regen",
+          "cost": 14,
+          "requires": ["hp_regen"],
+          "effect": { "stat": "hpRegen", "op": "add", "value": 2 },
+          "position": { "x": 0, "y": 2.1 }
         },
         {
           "id": "cell_size_down",
           "name": "Compact Cell",
           "description": "-10% hitbox size",
-          "cost": 3,
+          "cost": 8,
           "requires": ["hp_regen"],
           "effect": { "stat": "radiusMultiplier", "op": "multiply", "value": 0.9 },
-          "position": { "x": 0, "y": 2 }
+          "position": { "x": 0, "y": 2.7 }
         },
         {
           "id": "mitochondria",
           "name": "Mitochondria",
-          "description": "+25% energy capacity (dash charges)",
-          "cost": 4,
+          "description": "+25% energy capacity",
+          "cost": 10,
           "requires": ["cell_size_down"],
           "effect": { "stat": "energyCap", "op": "multiply", "value": 1.25 },
-          "position": { "x": 0, "y": 3 }
+          "position": { "x": 0, "y": 3.3 }
         },
         {
           "id": "nuclear_pore",
           "name": "Nuclear Pore",
           "description": "Start each run with 1 random in-game upgrade",
-          "cost": 5,
+          "cost": 18,
           "requires": ["mitochondria"],
           "effect": { "stat": "startUpgrades", "op": "add", "value": 1 },
           "position": { "x": 0, "y": 4 }
@@ -56,7 +83,7 @@
           "id": "stem_origin",
           "name": "Stem Origin",
           "description": "Unlock Helper Cell companion",
-          "cost": 8,
+          "cost": 28,
           "requires": ["nuclear_pore"],
           "effect": { "stat": "helperCellUnlocked", "op": "set", "value": true },
           "position": { "x": 0, "y": 5 }
@@ -72,54 +99,90 @@
       "nodes": [
         {
           "id": "antibody_speed",
-          "name": "Antibody Speed",
+          "name": "Antibody Speed I",
           "description": "+15% projectile speed",
-          "cost": 2,
+          "cost": 4,
           "requires": [],
           "effect": { "stat": "projectileSpeed", "op": "multiply", "value": 1.15 },
           "position": { "x": 1, "y": 0 }
         },
         {
-          "id": "igg_base",
-          "name": "IgG Base",
-          "description": "+1 base damage per projectile",
-          "cost": 2,
+          "id": "antibody_speed_2",
+          "name": "Antibody Speed II",
+          "description": "+20% projectile speed",
+          "cost": 10,
           "requires": ["antibody_speed"],
-          "effect": { "stat": "damage", "op": "add", "value": 1 },
+          "effect": { "stat": "projectileSpeed", "op": "multiply", "value": 1.2 },
+          "position": { "x": 1, "y": 0.5 }
+        },
+        {
+          "id": "antibody_speed_3",
+          "name": "Antibody Speed III",
+          "description": "+25% projectile speed",
+          "cost": 20,
+          "requires": ["antibody_speed_2"],
+          "effect": { "stat": "projectileSpeed", "op": "multiply", "value": 1.25 },
           "position": { "x": 1, "y": 1 }
+        },
+        {
+          "id": "igg_base",
+          "name": "IgG Damage I",
+          "description": "+2 base damage per projectile",
+          "cost": 5,
+          "requires": ["antibody_speed"],
+          "effect": { "stat": "damage", "op": "add", "value": 2 },
+          "position": { "x": 1, "y": 1.6 }
+        },
+        {
+          "id": "igg_base_2",
+          "name": "IgG Damage II",
+          "description": "+3 base damage per projectile",
+          "cost": 12,
+          "requires": ["igg_base"],
+          "effect": { "stat": "damage", "op": "add", "value": 3 },
+          "position": { "x": 1, "y": 2.1 }
+        },
+        {
+          "id": "igg_base_3",
+          "name": "IgG Damage III",
+          "description": "+5 base damage per projectile",
+          "cost": 25,
+          "requires": ["igg_base_2"],
+          "effect": { "stat": "damage", "op": "add", "value": 5 },
+          "position": { "x": 1, "y": 2.6 }
         },
         {
           "id": "granule_capacity",
           "name": "Granule Capacity",
           "description": "+1 base projectile count",
-          "cost": 4,
+          "cost": 15,
           "requires": ["igg_base"],
           "effect": { "stat": "projectileCount", "op": "add", "value": 1 },
-          "position": { "x": 1, "y": 2 }
+          "position": { "x": 1, "y": 3.2 }
         },
         {
           "id": "perforin_unlock",
           "name": "Perforin Shot",
           "description": "Unlock piercing perforin shot type",
-          "cost": 5,
+          "cost": 20,
           "requires": ["granule_capacity"],
           "effect": { "stat": "perforinUnlocked", "op": "set", "value": true },
-          "position": { "x": 1, "y": 3 }
+          "position": { "x": 1, "y": 3.8 }
         },
         {
           "id": "nk_lineage",
           "name": "NK Lineage",
           "description": "NK crit active from game start",
-          "cost": 6,
+          "cost": 25,
           "requires": ["perforin_unlock"],
           "effect": { "stat": "startWithNkCrit", "op": "set", "value": true },
-          "position": { "x": 1, "y": 4 }
+          "position": { "x": 1, "y": 4.4 }
         },
         {
           "id": "cytokine_storm",
           "name": "Cytokine Storm",
           "description": "Wave 5+ gain periodic AoE",
-          "cost": 8,
+          "cost": 35,
           "requires": ["nk_lineage"],
           "effect": { "stat": "cytokineStorm", "op": "set", "value": true },
           "position": { "x": 1, "y": 5 }
@@ -135,45 +198,72 @@
       "nodes": [
         {
           "id": "lipid_bilayer",
-          "name": "Lipid Bilayer",
-          "description": "+10% damage reduction",
-          "cost": 2,
+          "name": "Lipid Bilayer I",
+          "description": "+8% damage reduction",
+          "cost": 4,
           "requires": [],
-          "effect": { "stat": "damageReduction", "op": "add", "value": 0.1 },
+          "effect": { "stat": "damageReduction", "op": "add", "value": 0.08 },
           "position": { "x": 2, "y": 0 }
         },
         {
+          "id": "lipid_bilayer_2",
+          "name": "Lipid Bilayer II",
+          "description": "+10% damage reduction",
+          "cost": 10,
+          "requires": ["lipid_bilayer"],
+          "effect": { "stat": "damageReduction", "op": "add", "value": 0.1 },
+          "position": { "x": 2, "y": 0.5 }
+        },
+        {
+          "id": "lipid_bilayer_3",
+          "name": "Lipid Bilayer III",
+          "description": "+12% damage reduction",
+          "cost": 22,
+          "requires": ["lipid_bilayer_2"],
+          "effect": { "stat": "damageReduction", "op": "add", "value": 0.12 },
+          "position": { "x": 2, "y": 1 }
+        },
+        {
           "id": "glycoprotein_coat",
-          "name": "Glycoprotein Coat",
+          "name": "Glycoprotein Coat I",
           "description": "Enemies move 15% slower",
-          "cost": 3,
+          "cost": 8,
           "requires": ["lipid_bilayer"],
           "effect": { "stat": "enemySpeedReduction", "op": "add", "value": 0.15 },
-          "position": { "x": 2, "y": 1 }
+          "position": { "x": 2, "y": 1.6 }
+        },
+        {
+          "id": "glycoprotein_coat_2",
+          "name": "Glycoprotein Coat II",
+          "description": "Enemies move 10% slower",
+          "cost": 18,
+          "requires": ["glycoprotein_coat"],
+          "effect": { "stat": "enemySpeedReduction", "op": "add", "value": 0.1 },
+          "position": { "x": 2, "y": 2.1 }
         },
         {
           "id": "mhc_display",
           "name": "MHC Display",
           "description": "Enemies target you less aggressively",
-          "cost": 4,
+          "cost": 14,
           "requires": ["glycoprotein_coat"],
           "effect": { "stat": "aggroReduction", "op": "set", "value": true },
-          "position": { "x": 2, "y": 2 }
+          "position": { "x": 2, "y": 2.7 }
         },
         {
           "id": "apoptosis_delay",
           "name": "Apoptosis Delay",
           "description": "+2 lives per run",
-          "cost": 5,
+          "cost": 20,
           "requires": ["mhc_display"],
           "effect": { "stat": "lives", "op": "add", "value": 2 },
-          "position": { "x": 2, "y": 3 }
+          "position": { "x": 2, "y": 3.3 }
         },
         {
           "id": "immortalized_line",
           "name": "Immortalized Line",
           "description": "Start runs with Cytokine Shield",
-          "cost": 8,
+          "cost": 35,
           "requires": ["apoptosis_delay"],
           "effect": { "stat": "startWithShield", "op": "set", "value": true },
           "position": { "x": 2, "y": 4 }
@@ -189,37 +279,55 @@
       "nodes": [
         {
           "id": "dna_efficiency",
-          "name": "DNA Efficiency",
-          "description": "-15% meta upgrade cost",
-          "cost": 2,
+          "name": "DNA Efficiency I",
+          "description": "-10% meta upgrade cost",
+          "cost": 5,
           "requires": [],
-          "effect": { "stat": "metaCostReduction", "op": "add", "value": 0.15 },
+          "effect": { "stat": "metaCostReduction", "op": "add", "value": 0.1 },
           "position": { "x": 3, "y": 0 }
+        },
+        {
+          "id": "dna_efficiency_2",
+          "name": "DNA Efficiency II",
+          "description": "-10% meta upgrade cost",
+          "cost": 14,
+          "requires": ["dna_efficiency"],
+          "effect": { "stat": "metaCostReduction", "op": "add", "value": 0.1 },
+          "position": { "x": 3, "y": 0.5 }
         },
         {
           "id": "petri_expansion",
           "name": "Petri Expansion",
           "description": "Larger arena (25% bigger)",
-          "cost": 3,
+          "cost": 10,
           "requires": ["dna_efficiency"],
           "effect": { "stat": "arenaScale", "op": "multiply", "value": 1.25 },
-          "position": { "x": 3, "y": 1 }
+          "position": { "x": 3, "y": 1.1 }
         },
         {
           "id": "mutation_rate",
           "name": "Mutation Rate",
           "description": "+1 reroll per in-game upgrade pick",
-          "cost": 4,
+          "cost": 16,
           "requires": ["petri_expansion"],
           "effect": { "stat": "rerolls", "op": "add", "value": 1 },
-          "position": { "x": 3, "y": 2 }
+          "position": { "x": 3, "y": 1.8 }
         },
         {
           "id": "culture_medium",
-          "name": "Culture Medium",
-          "description": "Pickups worth +25% more",
-          "cost": 4,
+          "name": "Culture Medium I",
+          "description": "Pickups worth +20% more",
+          "cost": 12,
           "requires": ["mutation_rate"],
+          "effect": { "stat": "pickupValueMultiplier", "op": "multiply", "value": 1.2 },
+          "position": { "x": 3, "y": 2.5 }
+        },
+        {
+          "id": "culture_medium_2",
+          "name": "Culture Medium II",
+          "description": "Pickups worth +25% more",
+          "cost": 28,
+          "requires": ["culture_medium"],
           "effect": { "stat": "pickupValueMultiplier", "op": "multiply", "value": 1.25 },
           "position": { "x": 3, "y": 3 }
         },
@@ -227,10 +335,28 @@
           "id": "gene_therapy",
           "name": "Gene Therapy",
           "description": "Reset 1 upgrade branch once per run",
-          "cost": 6,
+          "cost": 22,
           "requires": ["culture_medium"],
           "effect": { "stat": "geneTherapy", "op": "set", "value": true },
-          "position": { "x": 3, "y": 4 }
+          "position": { "x": 3, "y": 3.7 }
+        },
+        {
+          "id": "move_speed_meta",
+          "name": "Cytoskeletal Drive I",
+          "description": "+10% movement speed",
+          "cost": 6,
+          "requires": ["dna_efficiency"],
+          "effect": { "stat": "speedMultiplier", "op": "multiply", "value": 1.1 },
+          "position": { "x": 3, "y": 4.4 }
+        },
+        {
+          "id": "move_speed_meta_2",
+          "name": "Cytoskeletal Drive II",
+          "description": "+12% movement speed",
+          "cost": 16,
+          "requires": ["move_speed_meta"],
+          "effect": { "stat": "speedMultiplier", "op": "multiply", "value": 1.12 },
+          "position": { "x": 3, "y": 5 }
         }
       ]
     },
@@ -246,7 +372,7 @@
           "id": "viral_integration",
           "name": "Viral Integration",
           "description": "Start with random Tier 2 in-game upgrade",
-          "cost": 5,
+          "cost": 20,
           "requires": [],
           "effect": { "stat": "startWithTier2Upgrade", "op": "set", "value": true },
           "position": { "x": 4, "y": 0 }
@@ -255,7 +381,7 @@
           "id": "horizontal_transfer",
           "name": "Horizontal Transfer",
           "description": "Steal 1 enemy ability on boss kill",
-          "cost": 8,
+          "cost": 35,
           "requires": ["viral_integration"],
           "effect": { "stat": "stealBossAbility", "op": "set", "value": true },
           "position": { "x": 4, "y": 1 }
@@ -264,7 +390,7 @@
           "id": "eukaryote_ascension",
           "name": "Eukaryote Ascension",
           "description": "+1 upgrade choice permanently",
-          "cost": 10,
+          "cost": 45,
           "requires": ["horizontal_transfer"],
           "effect": { "stat": "upgradeChoices", "op": "add", "value": 1 },
           "position": { "x": 4, "y": 2 }
@@ -273,10 +399,37 @@
           "id": "omega_cell",
           "name": "Omega Cell",
           "description": "Unlock Macrophage mode: larger, slower, massive AoE",
-          "cost": 15,
+          "cost": 70,
           "requires": ["eukaryote_ascension"],
           "effect": { "stat": "macrophageModeUnlocked", "op": "set", "value": true },
           "position": { "x": 4, "y": 3 }
+        },
+        {
+          "id": "fire_rate_meta",
+          "name": "Hypermutation I",
+          "description": "+8% fire rate",
+          "cost": 12,
+          "requires": ["viral_integration"],
+          "effect": { "stat": "fireRateMultiplier", "op": "multiply", "value": 0.92 },
+          "position": { "x": 4, "y": 3.7 }
+        },
+        {
+          "id": "fire_rate_meta_2",
+          "name": "Hypermutation II",
+          "description": "+10% fire rate",
+          "cost": 28,
+          "requires": ["fire_rate_meta"],
+          "effect": { "stat": "fireRateMultiplier", "op": "multiply", "value": 0.9 },
+          "position": { "x": 4, "y": 4.4 }
+        },
+        {
+          "id": "fire_rate_meta_3",
+          "name": "Hypermutation III",
+          "description": "+12% fire rate",
+          "cost": 55,
+          "requires": ["fire_rate_meta_2"],
+          "effect": { "stat": "fireRateMultiplier", "op": "multiply", "value": 0.88 },
+          "position": { "x": 4, "y": 5 }
         }
       ]
     }

@@ -208,6 +208,7 @@ const Game = (() => {
     damageNumbers = [];
     nextPickCount = 3;
     rerolls = MetaUpgrades.getMetaStat('rerolls');
+    Screens.resetFireworks();
 
     Waves.startWave(0);
     waveTransitionAlpha = 1;
@@ -270,6 +271,9 @@ const Game = (() => {
   }
 
   function onWaveComplete(waveIdx) {
+    // Guard: ignore stale callbacks if game is no longer in play
+    if (gameState !== 'playing' && gameState !== 'levelup') return;
+
     const pState = Player.getState();
 
     // Refresh shield
@@ -291,6 +295,13 @@ const Game = (() => {
       return;
     }
 
+    // Safety: if config is somehow missing, treat as win rather than hanging
+    if (!Waves.getConfig(waveIndex)) {
+      console.warn('[RCELL] No wave config for index', waveIndex, '— forcing win');
+      endRun(true);
+      return;
+    }
+
     // Spawn health pickup
     Pickups.spawnHealth(canvasW / 2 + (Math.random() - 0.5) * 100, canvasH / 2 + (Math.random() - 0.5) * 100, 25);
 
@@ -304,25 +315,32 @@ const Game = (() => {
 
   function endRun(won) {
     const pState = Player.getState();
-    const dnaEarned = Math.floor(score / 100) + waveIndex * 3 + (won ? 20 : 0);
+    // DNA formula: score/200 + wave*2 + win bonus — scaled down to make upgrades matter
+    const dnaEarned = Math.floor(score / 200) + waveIndex * 2 + (won ? 10 : 0);
 
-    saveData.dnaPoints += dnaEarned;
-    saveData.totalKills = (saveData.totalKills || 0) + (pState ? pState.kills : 0);
-    if (waveIndex > saveData.bestWave) saveData.bestWave = waveIndex;
-    if (won) saveData.hasWon = true;
-    Storage.save(saveData);
-
+    // Set game state FIRST — prevents the level-11 freeze if storage throws below
     if (won) {
       Screens.winScreen.score = score;
       Screens.winScreen.dnaEarned = dnaEarned;
       gameState = 'win';
-      Audio.sfx.win();
+      try { Audio.sfx.win(); } catch (e) { /* audio failure is non-fatal */ }
     } else {
       Screens.deathScreen.waveReached = waveIndex;
       Screens.deathScreen.score = score;
       Screens.deathScreen.dnaEarned = dnaEarned;
       gameState = 'death';
-      Audio.sfx.playerDie();
+      try { Audio.sfx.playerDie(); } catch (e) { /* audio failure is non-fatal */ }
+    }
+
+    // Persist — wrapped so a storage failure can't leave the game in a broken state
+    try {
+      saveData.dnaPoints += dnaEarned;
+      saveData.totalKills = (saveData.totalKills || 0) + (pState ? pState.kills : 0);
+      if (waveIndex > saveData.bestWave) saveData.bestWave = waveIndex;
+      if (won) saveData.hasWon = true;
+      Storage.save(saveData);
+    } catch (e) {
+      console.error('[RCELL] Failed to save run data:', e);
     }
   }
 
@@ -679,10 +697,49 @@ const Game = (() => {
     }
   }
 
+  // Error recovery state
+  let errorState = null;
+  let errorOverlayTimer = 0;
+  let consecutiveErrors = 0;
+
   function startLoop() {
     running = true;
     lastTime = performance.now();
     rafId = requestAnimationFrame(loop);
+  }
+
+  function showErrorOverlay(err) {
+    if (!ctx) return;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+    ctx.fillStyle = '#ff4466';
+    ctx.font = 'bold 18px "Exo 2", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Error — Auto-recovering...', canvasW / 2, canvasH / 2 - 30);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '12px monospace';
+    const msg = String(err && err.message ? err.message : err).slice(0, 80);
+    ctx.fillText(msg, canvasW / 2, canvasH / 2 + 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '11px "Nunito", sans-serif';
+    ctx.fillText('Tap to return to menu', canvasW / 2, canvasH / 2 + 30);
+    ctx.restore();
+  }
+
+  function attemptErrorRecovery(err) {
+    console.error('[RCELL] Game error:', err);
+    consecutiveErrors++;
+    errorState = err;
+    errorOverlayTimer = 3; // show overlay for 3 seconds before auto-recovering
+
+    if (consecutiveErrors >= 5) {
+      // Too many errors in a row — force back to menu
+      console.error('[RCELL] Too many consecutive errors, forcing menu state');
+      gameState = 'menu';
+      consecutiveErrors = 0;
+      errorState = null;
+    }
   }
 
   function loop(timestamp) {
@@ -691,17 +748,38 @@ const Game = (() => {
     const dt = Math.min((timestamp - lastTime) / 1000, 0.05);
     lastTime = timestamp;
 
-    if (gameState === 'playing' || gameState === 'levelup') {
-      if (gameState === 'playing') {
-        accumulator += dt;
-        while (accumulator >= FIXED_STEP) {
-          update(FIXED_STEP);
-          accumulator -= FIXED_STEP;
+    try {
+      if (errorState) {
+        // Show error overlay and count down recovery
+        errorOverlayTimer -= dt;
+        showErrorOverlay(errorState);
+        if (errorOverlayTimer <= 0) {
+          errorState = null;
+          // Recover: if we were playing, go back to menu to avoid cascade
+          if (gameState === 'playing' || gameState === 'levelup') {
+            gameState = 'menu';
+          }
+        }
+        rafId = requestAnimationFrame(loop);
+        return;
+      }
+
+      if (gameState === 'playing' || gameState === 'levelup') {
+        if (gameState === 'playing') {
+          accumulator += dt;
+          while (accumulator >= FIXED_STEP) {
+            update(FIXED_STEP);
+            accumulator -= FIXED_STEP;
+          }
         }
       }
+
+      render(timestamp);
+      consecutiveErrors = 0; // reset on successful frame
+    } catch (err) {
+      attemptErrorRecovery(err);
     }
 
-    render(timestamp);
     rafId = requestAnimationFrame(loop);
   }
 
