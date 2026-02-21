@@ -1,26 +1,26 @@
 // waves.js — Wave/stage progression
 const Waves = (() => {
   const WAVE_CONFIGS = [
-    // Wave 1
-    { spawns: [{ id: 'bacteria_cocci', count: 6, interval: 2000 }], special: 'tutorial' },
-    // Wave 2
-    { spawns: [{ id: 'bacteria_cocci', count: 5, interval: 1800 }, { id: 'bacteria_rod', count: 3, interval: 2500 }] },
-    // Wave 3
-    { spawns: [{ id: 'bacteria_cocci', count: 6, interval: 1600 }, { id: 'bacteria_rod', count: 3, interval: 2000 }, { id: 'virus_basic', count: 3, interval: 2200 }], elite: true },
-    // Wave 4
-    { spawns: [{ id: 'bacteria_cocci', count: 8, interval: 1500 }, { id: 'bacteria_rod', count: 4, interval: 1800 }, { id: 'virus_basic', count: 4, interval: 2000 }], miniBoss: 'bacteria_cocci' },
-    // Wave 5
-    { spawns: [{ id: 'bacteria_cocci', count: 5, interval: 1500 }, { id: 'fungus_spore', count: 3, interval: 3000 }, { id: 'bacteria_spiral', count: 3, interval: 2500 }] },
-    // Wave 6
-    { spawns: [{ id: 'bacteria_rod', count: 4, interval: 1600 }, { id: 'fungus_spore', count: 3, interval: 2500 }, { id: 'virus_corona', count: 2, interval: 5000 }, { id: 'parasite_hook', count: 2, interval: 3000 }] },
-    // Wave 7
-    { spawns: [{ id: 'bacteria_cocci', count: 10, interval: 1000 }, { id: 'parasite_hook', count: 4, interval: 2500 }, { id: 'bacteria_spiral', count: 4, interval: 2000 }] },
-    // Wave 8
-    { spawns: [{ id: 'prion_cluster', count: 2, interval: 5000 }, { id: 'superbug', count: 2, interval: 6000 }, { id: 'virus_corona', count: 3, interval: 3000 }, { id: 'fungus_spore', count: 4, interval: 2500 }] },
-    // Wave 9
-    { spawns: [{ id: 'bacteria_cocci', count: 8, interval: 1000 }, { id: 'bacteria_rod', count: 5, interval: 1400 }, { id: 'virus_basic', count: 5, interval: 1500 }, { id: 'prion_cluster', count: 2, interval: 5000 }, { id: 'superbug', count: 2, interval: 6000 }] },
-    // Wave 10 — Boss
-    { spawns: [{ id: 'boss_cancer', count: 1, interval: 0 }], isBossWave: true, special: 'boss' }
+    // Wave 1 — Tutorial: modest pressure, but more than before
+    { spawns: [{ id: 'bacteria_cocci', count: 8, interval: 1800 }, { id: 'bacteria_rod', count: 2, interval: 2500 }], special: 'tutorial' },
+    // Wave 2 — Mixed tier-1
+    { spawns: [{ id: 'bacteria_cocci', count: 8, interval: 1600 }, { id: 'bacteria_rod', count: 4, interval: 2200 }, { id: 'virus_basic', count: 3, interval: 2000 }] },
+    // Wave 3 — Faster, first tier-2 intro
+    { spawns: [{ id: 'bacteria_cocci', count: 10, interval: 1400 }, { id: 'bacteria_rod', count: 4, interval: 1800 }, { id: 'virus_basic', count: 4, interval: 1800 }, { id: 'fungus_spore', count: 2, interval: 4000 }], elite: true },
+    // Wave 4 — Tier-2 pressure starts
+    { spawns: [{ id: 'bacteria_cocci', count: 10, interval: 1300 }, { id: 'bacteria_rod', count: 5, interval: 1600 }, { id: 'fungus_spore', count: 3, interval: 3000 }, { id: 'parasite_hook', count: 2, interval: 3500 }] },
+    // Wave 5 — Spiral + hook swarm
+    { spawns: [{ id: 'bacteria_cocci', count: 8, interval: 1200 }, { id: 'fungus_spore', count: 4, interval: 2500 }, { id: 'bacteria_spiral', count: 5, interval: 2000 }, { id: 'parasite_hook', count: 3, interval: 2800 }] },
+    // Wave 6 — Shooters enter, heavy pressure
+    { spawns: [{ id: 'bacteria_rod', count: 6, interval: 1400 }, { id: 'fungus_spore', count: 4, interval: 2200 }, { id: 'virus_corona', count: 3, interval: 4000 }, { id: 'parasite_hook', count: 4, interval: 2500 }, { id: 'bacteria_spiral', count: 4, interval: 2000 }] },
+    // Wave 7 — Swarm + tier-2 mix
+    { spawns: [{ id: 'bacteria_cocci', count: 14, interval: 900 }, { id: 'parasite_hook', count: 5, interval: 2200 }, { id: 'bacteria_spiral', count: 5, interval: 1800 }, { id: 'virus_corona', count: 3, interval: 3500 }] },
+    // Wave 8 — Tier-3 debut, brutal combo
+    { spawns: [{ id: 'prion_cluster', count: 3, interval: 4000 }, { id: 'superbug', count: 3, interval: 5000 }, { id: 'virus_corona', count: 4, interval: 2800 }, { id: 'fungus_spore', count: 5, interval: 2200 }, { id: 'bacteria_spiral', count: 5, interval: 1600 }] },
+    // Wave 9 — All types, relentless
+    { spawns: [{ id: 'bacteria_cocci', count: 12, interval: 900 }, { id: 'bacteria_rod', count: 6, interval: 1200 }, { id: 'virus_basic', count: 6, interval: 1200 }, { id: 'prion_cluster', count: 3, interval: 4000 }, { id: 'superbug', count: 3, interval: 5000 }, { id: 'virus_corona', count: 3, interval: 3000 }] },
+    // Wave 10 — Boss + opening minion wave
+    { spawns: [{ id: 'bacteria_cocci', count: 6, interval: 1000 }, { id: 'boss_cancer', count: 1, interval: 0 }], isBossWave: true, special: 'boss' }
   ];
 
   let currentWave = 0;

@@ -3,6 +3,68 @@ const Screens = (() => {
   let animT = 0;
   let bgParticles = [];
 
+  // Celebratory firework particles for win screen
+  let fireworkParticles = [];
+  let fireworkTimer = 0;
+
+  function spawnFirework(canvasW, canvasH) {
+    const cx = canvasW * (0.2 + Math.random() * 0.6);
+    const cy = canvasH * (0.15 + Math.random() * 0.5);
+    const hue = Math.random() * 360;
+    const color = `hsl(${hue},90%,65%)`;
+    const count = 14 + Math.floor(Math.random() * 8);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
+      const spd = 60 + Math.random() * 80;
+      fireworkParticles.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        color,
+        alpha: 1,
+        radius: 2 + Math.random() * 2,
+        life: 0.8 + Math.random() * 0.4
+      });
+    }
+  }
+
+  function updateFireworks(dt, canvasW, canvasH) {
+    fireworkTimer -= dt;
+    if (fireworkTimer <= 0) {
+      fireworkTimer = 0.5 + Math.random() * 0.7;
+      spawnFirework(canvasW, canvasH);
+    }
+    for (let i = fireworkParticles.length - 1; i >= 0; i--) {
+      const p = fireworkParticles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 40 * dt; // gravity
+      p.vx *= 0.97;
+      p.life -= dt;
+      p.alpha = Math.max(0, p.life);
+      if (p.life <= 0) fireworkParticles.splice(i, 1);
+    }
+  }
+
+  function drawFireworks(ctx) {
+    fireworkParticles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function resetFireworks() {
+    fireworkParticles = [];
+    fireworkTimer = 0;
+  }
+
   function initParticles(canvasW, canvasH) {
     bgParticles = [];
     for (let i = 0; i < 30; i++) {
@@ -163,6 +225,8 @@ const Screens = (() => {
     waveReached: 0,
     score: 0,
     draw(ctx, canvasW, canvasH, t) {
+      // Animate background particles (fix: was missing)
+      updateParticles(0.016, canvasW, canvasH);
       drawBg(ctx, canvasW, canvasH, t);
 
       // Red tint overlay
@@ -228,7 +292,12 @@ const Screens = (() => {
     score: 0,
     dnaEarned: 0,
     draw(ctx, canvasW, canvasH, t) {
+      // Animate background particles (fix: was missing, causing "frozen shots" visual)
+      updateParticles(0.016, canvasW, canvasH);
       drawBg(ctx, canvasW, canvasH, t);
+      // Celebratory fireworks
+      updateFireworks(0.016, canvasW, canvasH);
+      drawFireworks(ctx);
       ctx.textAlign = 'center';
 
       ctx.fillStyle = '#ffd166';
@@ -270,5 +339,5 @@ const Screens = (() => {
     }
   };
 
-  return { mainMenu, deathScreen, winScreen, initParticles, updateParticles, drawBg };
+  return { mainMenu, deathScreen, winScreen, initParticles, updateParticles, drawBg, resetFireworks };
 })();
