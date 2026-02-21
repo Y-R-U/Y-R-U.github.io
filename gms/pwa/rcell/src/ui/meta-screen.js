@@ -199,8 +199,15 @@ const MetaScreen = (() => {
   }
 
   function handleScroll(dy) {
-    scrollY = Math.min(0, scrollY + dy);
+    const branches = MetaUpgrades.getBranches();
+    let maxNodes = 0;
+    branches.forEach(b => { if (b.nodes.length > maxNodes) maxNodes = b.nodes.length; });
+    const contentH = 110 + maxNodes * NODE_GAP_Y + 80;
+    const minScrollY = Math.min(0, -(contentH - 520));
+    scrollY = Math.min(0, Math.max(minScrollY, scrollY + dy));
   }
 
-  return { draw, handleTap, handleScroll };
+  function resetScroll() { scrollY = 0; }
+
+  return { draw, handleTap, handleScroll, resetScroll };
 })();

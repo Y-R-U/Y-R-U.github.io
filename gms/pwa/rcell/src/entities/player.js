@@ -82,6 +82,8 @@ const Player = (() => {
   const INVINCIBLE_DURATION = 800;
   let wobblePhase = 0;
 
+  function getBaseStats() { return { ...BASE_STATS }; }
+
   function init(metaStats = {}) {
     state = Object.assign({}, BASE_STATS, metaStats);
     state.hp = state.maxHp;
@@ -290,8 +292,9 @@ const Player = (() => {
     if (effect.repelForce !== undefined) state.repelForce = effect.repelForce;
     if (effect.repelRadius !== undefined) state.repelRadius = effect.repelRadius;
     if (effect.slowAmount !== undefined) state.slowAmount = effect.slowAmount;
-    if (effect.clotDamage !== undefined) state.clotDamage = effect.clotDamage;
-    if (effect.clotDuration !== undefined) state.clotDuration = effect.clotDuration;
+    // clotDamage: ADD rather than SET so meta bonuses already on state are preserved
+    if (effect.clotDamage !== undefined) state.clotDamage = (state.clotDamage || 0) + effect.clotDamage;
+    if (effect.clotDuration !== undefined) state.clotDuration = Math.max(state.clotDuration || 0, effect.clotDuration);
     if (effect.dashCooldown !== undefined) state.dashCooldown = effect.dashCooldown;
     if (effect.phaseCooldown !== undefined) state.phaseCooldown = effect.phaseCooldown;
     if (effect.phaseDuration !== undefined) state.phaseDuration = effect.phaseDuration;
@@ -342,7 +345,7 @@ const Player = (() => {
   }
 
   return {
-    init, getState, getRadius, getEffectiveFireRate, setTarget, update,
+    init, getBaseStats, getState, getRadius, getEffectiveFireRate, setTarget, update,
     canShoot, resetShootTimer, canAoe, resetAoeTimer,
     takeDamage, heal, onKill, isPlayerDead, isInvincible, getIsPhasing,
     getWobblePhase, getClotTrails, applyUpgrade, hasUpgrade, getUpgradeCount,
