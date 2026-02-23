@@ -8,32 +8,41 @@ export class Player {
     const st = getState();
     this.x = st.player.x;
     this.y = st.player.y;
-    this.glyph = '@';
-    this.color = '#00ff00';
+    this.glyph   = '@';
+    this.color   = '#00ff00';
     this.bgColor = '#003300';
     this.visible = true;
-    this.type = 'player';
-    this.hp = st.player.hp;
-    this.maxHp = st.player.maxHp;
+    this.type    = 'player';
+    this.hp      = st.player.hp;
+    this.maxHp   = st.player.maxHp;
     this.targeted = false;
-    this.speed = 0.06; // tiles per frame (base)
   }
 
   update(worldMap) {
     const { vx, vy } = getVelocity();
-    const spd = this.speed;
-    const nx = this.x + vx * spd;
-    const ny = this.y + vy * spd;
 
-    // Collision check
-    if (worldMap && worldMap.isWalkable(nx, this.y)) this.x = nx;
-    if (worldMap && worldMap.isWalkable(this.x, ny)) this.y = ny;
+    // Velocity from input.js is already in tiles/frame — apply directly
+    if (vx !== 0 || vy !== 0) {
+      const nx = this.x + vx;
+      const ny = this.y + vy;
 
-    // Clamp to map
-    this.x = Math.max(0.5, Math.min(worldMap ? worldMap.width  - 0.5 : this.x, this.x));
-    this.y = Math.max(0.5, Math.min(worldMap ? worldMap.height - 0.5 : this.y, this.y));
+      // Separate X and Y collision so player can slide along walls
+      if (worldMap) {
+        if (worldMap.isWalkable(nx, this.y)) this.x = nx;
+        if (worldMap.isWalkable(this.x, ny)) this.y = ny;
+      } else {
+        this.x = nx;
+        this.y = ny;
+      }
 
-    // Sync to global state
+      // Clamp to map bounds
+      const mapW = worldMap ? worldMap.width  : 80;
+      const mapH = worldMap ? worldMap.height : 80;
+      this.x = Math.max(0.5, Math.min(mapW  - 0.5, this.x));
+      this.y = Math.max(0.5, Math.min(mapH - 0.5, this.y));
+    }
+
+    // Sync to global state every frame
     const st = getState();
     st.player.x = this.x;
     st.player.y = this.y;
@@ -44,6 +53,10 @@ export class Player {
     this.hp    = st.player.hp;
     this.maxHp = calcMaxHp();
     st.player.maxHp = this.maxHp;
+    if (this.hp <= 0) {
+      st.player.hp = this.maxHp;
+      this.hp = this.maxHp;
+    }
   }
 
   heal(amount) {
@@ -53,12 +66,12 @@ export class Player {
   }
 
   takeDamage(amount) {
-    const st = getState();
-    const defBonus  = getEquipBonus('def');
-    const buffDef   = getBuffBonus('def');
-    const defSkill  = st.player.skills.defence?.level || 1;
-    const totalDef  = defSkill + defBonus + buffDef;
-    const reduced   = Math.max(1, amount - Math.floor(totalDef * 0.5));
+    const defBonus = getEquipBonus('def');
+    const buffDef  = getBuffBonus('def');
+    const st       = getState();
+    const defSkill = st.player.skills.defence?.level || 1;
+    const totalDef = defSkill + defBonus + buffDef;
+    const reduced  = Math.max(1, amount - Math.floor(totalDef * 0.5));
     st.player.hp = Math.max(0, st.player.hp - reduced);
     this.hp = st.player.hp;
     return reduced;
@@ -69,15 +82,15 @@ export class Player {
   }
 
   getAttackStat() {
-    const st = getState();
-    const lvl    = st.player.skills.attack?.level || 1;
-    const equip  = getEquipBonus('atk');
-    const buff   = getBuffBonus('atk');
+    const st    = getState();
+    const lvl   = st.player.skills.attack?.level || 1;
+    const equip = getEquipBonus('atk');
+    const buff  = getBuffBonus('atk');
     return lvl + equip + buff;
   }
 
   getDefenceStat() {
-    const st = getState();
+    const st    = getState();
     const lvl   = st.player.skills.defence?.level || 1;
     const equip = getEquipBonus('def');
     const buff  = getBuffBonus('def');
