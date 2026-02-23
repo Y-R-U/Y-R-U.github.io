@@ -1,8 +1,8 @@
 // ===== CRPG: Lands of Ascii — Main Entry Point =====
 import { ITEMS, DUNGEONS, TILES, TOWNS, NPCS } from './config.js';
 import { getState, loadGame, saveGame, setItemsRef, calcMaxHp } from './state.js';
-import { initRenderer, resizeCanvas, updateCamera, draw, worldToScreen, screenToWorld } from './engine/renderer.js';
-import { initInput, update as updateInput, getVelocity } from './engine/input.js';
+import { initRenderer, resizeCanvas, updateCamera, draw, worldToScreen, screenToWorld, setJoystickHintFn } from './engine/renderer.js';
+import { initInput, update as updateInput, getVelocity, drawJoystickHint, setScreenToWorld } from './engine/input.js';
 import { update as updateParticles, getParticles } from './engine/particles.js';
 import { resumeCtx } from './engine/audio.js';
 import { WorldMap } from './world/map.js';
@@ -66,6 +66,8 @@ async function boot() {
 
   // Init engine
   initRenderer();
+  setJoystickHintFn(drawJoystickHint);
+  setScreenToWorld(screenToWorld);
   initInput(onTap);
   initHUD();
   initMenuNav();

@@ -1,6 +1,9 @@
 // ===== Canvas Tile Renderer =====
 import { TILE_SIZE, TILE_CHARS, TILE_COLORS, TILE_WALKABLE, TILES } from '../config.js';
 import { getState } from '../state.js';
+// joystick hint drawn lazily to avoid circular import
+let _drawJoystickHint = null;
+export function setJoystickHintFn(fn) { _drawJoystickHint = fn; }
 
 let canvas, ctx, minimapCanvas, minimapCtx;
 let camX = 0, camY = 0; // camera top-left in tile coords
@@ -14,14 +17,19 @@ export function initRenderer() {
   minimapCanvas = document.getElementById('minimap-canvas');
   minimapCtx = minimapCanvas.getContext('2d');
 
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  // Delay first resize by one rAF to ensure the flex layout has settled
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+  });
 }
 
 export function resizeCanvas() {
   const wrap = document.getElementById('canvas-wrap');
-  const w = wrap.clientWidth;
-  const h = wrap.clientHeight;
+  // Use offsetWidth/Height as fallback if clientWidth is 0
+  const w = wrap.clientWidth  || wrap.offsetWidth  || window.innerWidth;
+  const h = wrap.clientHeight || wrap.offsetHeight || Math.floor(window.innerHeight * 0.55);
+  if (w < 10 || h < 10) return; // layout not ready yet
   canvas.width  = w;
   canvas.height = h;
   minimapCanvas.width  = 80;
@@ -64,6 +72,7 @@ export function draw(worldMap, entities, particles, isDungeon) {
   drawTiles(worldMap, isDungeon);
   drawEntities(entities);
   drawParticlesOnCanvas(particles);
+  if (_drawJoystickHint) _drawJoystickHint(ctx);
   drawMinimap(worldMap, entities, isDungeon);
 }
 
