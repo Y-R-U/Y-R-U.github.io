@@ -1,26 +1,26 @@
 // ===== CRPG: Lands of Ascii — Main Entry Point =====
-import { ITEMS, DUNGEONS, TILES, TOWNS, NPCS } from './config.js';
+import { ITEMS, DUNGEONS, TILES, TOWNS } from './config.js';
 import { getState, loadGame, saveGame, setItemsRef, calcMaxHp } from './state.js';
-import { initRenderer, resizeCanvas, updateCamera, draw, worldToScreen, screenToWorld, setJoystickHintFn } from './engine/renderer.js';
-import { initInput, update as updateInput, getVelocity, drawJoystickHint, setScreenToWorld } from './engine/input.js';
+import { initRenderer, updateCamera, draw, screenToWorld, setDestMarker } from './engine/renderer.js';
+import { initInput, setScreenToWorld } from './engine/input.js';
 import { update as updateParticles, getParticles } from './engine/particles.js';
 import { resumeCtx } from './engine/audio.js';
+import { findPath, smoothPath } from './engine/pathfinder.js';
 import { WorldMap } from './world/map.js';
 import { DungeonState } from './world/dungeon.js';
 import { Spawner } from './world/spawner.js';
 import { NpcManager } from './world/npc.js';
 import { Player } from './entities/player.js';
 import { Enemy } from './entities/enemy.js';
-import { update as updateCombat, setTarget, getTarget, clearTarget } from './entities/combat.js';
+import { update as updateCombat, setTarget, clearTarget } from './entities/combat.js';
 import { setLevelUpCallback } from './skills/skillEngine.js';
 import { useItem } from './skills/tasks.js';
 import { initHUD, updateHUD, flashBoss, fadeToBlack } from './ui/hud.js';
 import { initMenuNav, switchTab, showDialogue, initDialogueModal } from './ui/menuNav.js';
 import { initDungeonModal, showDungeonModal } from './ui/dungeonEntry.js';
 import { renderSkillsPanel } from './ui/skillsPanel.js';
-import { renderInventory } from './ui/inventory.js';
 
-// ===== Test harness wiring =====
+// Test harness
 import { TestRunner } from './tests/testRunner.js';
 import { registerSkillTests }     from './tests/test.skills.js';
 import { registerCombatTests }    from './tests/test.combat.js';
@@ -29,68 +29,57 @@ import { registerInventoryTests } from './tests/test.inventory.js';
 import { registerStateTests }     from './tests/test.state.js';
 import { registerMapTests }       from './tests/test.map.js';
 
-// ===== Game state =====
-let worldMap   = null;
-let spawner    = null;
-let npcMgr     = null;
-let player     = null;
-let dungeon    = null;   // active DungeonState or null
-let lastUpdate = 0;
-let gameRunning = true;
+// ===== Module-level game state =====
+let worldMap    = null;
+let spawner     = null;
+let npcMgr      = null;
+let player      = null;
+let dungeon     = null;   // active DungeonState or null
+let lastUpdate  = 0;
 
 // ===== Boot =====
 async function boot() {
-  // Register service worker
   if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('./sw.js');
-    } catch(e) { /* non-fatal */ }
+    try { await navigator.serviceWorker.register('./sw.js'); } catch(e) {}
   }
 
-  // Load or fresh start
   setItemsRef(ITEMS);
   const loaded = loadGame();
   const st = getState();
+  if (loaded) st.player.maxHp = calcMaxHp();
 
-  if (loaded) {
-    // Restore maxHp
-    st.player.maxHp = calcMaxHp();
-  }
-
-  // Build world
+  // Build world objects
   worldMap = new WorldMap(st.world.seed);
   spawner  = new Spawner();
   npcMgr   = new NpcManager();
   player   = new Player();
   player.syncFromState();
 
-  // Init engine
+  // Engine init
   initRenderer();
-  setJoystickHintFn(drawJoystickHint);
-  setScreenToWorld(screenToWorld);
+  setScreenToWorld(screenToWorld);   // break the circular renderer↔input dep
   initInput(onTap);
+
+  // UI init
   initHUD();
   initMenuNav();
   initDungeonModal();
   initDialogueModal();
 
-  // Level-up callback → refresh UI
+  // Level-up → refresh HUD and skills panel if visible
   setLevelUpCallback((skillId, newLevel) => {
     updateHUD();
-    // If skills panel is open, re-render it
-    const skillsPanel = document.getElementById('panel-skills');
-    if (skillsPanel && !skillsPanel.classList.contains('hidden')) {
-      renderSkillsPanel();
-    }
+    const panel = document.getElementById('panel-skills');
+    if (panel && !panel.classList.contains('hidden')) renderSkillsPanel();
   });
 
-  // Item use event (from inventory popup)
+  // Inventory "use item" event
   window.addEventListener('crpg:useItem', (e) => {
     useItem(e.detail.itemId, player);
     updateHUD();
   });
 
-  // Test runner wiring
+  // Test runner
   const runner = new TestRunner();
   registerSkillTests(runner);
   registerCombatTests(runner);
@@ -100,183 +89,223 @@ async function boot() {
   registerMapTests(runner);
 
   document.getElementById('btn-run-tests')?.addEventListener('click', async () => {
-    const results = document.getElementById('test-results');
-    if (results) results.innerHTML = '<div style="color:#888">Running…</div>';
+    const el = document.getElementById('test-results');
+    if (el) el.innerHTML = '<div style="color:#888">Running…</div>';
     await runner.runAll();
-    runner.renderToElement(results);
+    runner.renderToElement(el);
   });
 
-  // Auto-run tests if ?debug=tests
   const params = new URLSearchParams(window.location.search);
   if (params.get('debug') === 'tests') {
     setTimeout(async () => {
       await runner.runAll();
-      const results = document.getElementById('test-results');
-      if (results) runner.renderToElement(results);
+      const el = document.getElementById('test-results');
+      if (el) runner.renderToElement(el);
     }, 500);
   }
 
-  // First-time show map tab
   switchTab('map');
-
-  // Start loop
   requestAnimationFrame(gameLoop);
 }
 
 // ===== Game Loop =====
 function gameLoop(now) {
-  if (!gameRunning) return;
-  const dt = Math.min(now - (lastUpdate || now), 100); // cap at 100ms
+  const dt = Math.min(now - (lastUpdate || now), 100);
   lastUpdate = now;
 
-  updateInput();
   resumeCtx();
 
   const st = getState();
 
+  // Push destination marker to renderer each frame
+  setDestMarker(player.destMarker);
+
   if (st.player.inDungeon && dungeon) {
-    // ===== DUNGEON MODE =====
+    // ── DUNGEON MODE ──
     player.update(dungeon.map);
     updateCamera(player.x, player.y);
 
-    // Update enemies
     for (const e of dungeon.enemies) {
       if (!e.dead) e.update(player, dt * 0.06, dungeon.map);
     }
 
-    // Combat
     updateCombat(player, dungeon.enemies, now);
 
-    // Check boss spawn
+    // Stop walking toward an enemy once combat is in range
+    if (player.destMarker && _combatTarget && !_combatTarget.dead) {
+      const d = _combatTarget.distTo(player);
+      if (d <= player.getAggroRadius()) player.stopPath();
+    }
+
     if (dungeon.checkBossSpawn(Enemy)) {
       flashBoss();
       import('./engine/audio.js').then(a => a.playBoss());
     }
 
-    // Check dungeon cleared
     if (dungeon.checkCleared()) {
-      // Unlock exit
-      setTimeout(() => {
-        showFloatMsg('DUNGEON CLEARED! Exit unlocked.', '#4ecca3');
-      }, 200);
+      showFloatMsg('DUNGEON CLEARED! Exit unlocked.', '#4ecca3');
     }
 
-    // Check player on exit tile
-    const etx = dungeon.map.exitTile.x;
-    const ety = dungeon.map.exitTile.y;
+    // Player stepped on exit
+    const ex = dungeon.map.exitTile.x, ey = dungeon.map.exitTile.y;
     if (!dungeon.map.exitLocked &&
-        Math.floor(player.x) === etx && Math.floor(player.y) === ety) {
+        Math.floor(player.x) === ex && Math.floor(player.y) === ey) {
       exitDungeon();
     }
 
-    // Check player death
     if (player.isDead()) onPlayerDeath();
 
-    // Draw dungeon
-    const allEntities = [
-      { ...player, type: 'player' },
-      ...dungeon.enemies.filter(e => !e.dead),
-    ];
-    draw(dungeon.map, allEntities, getParticles(), true);
+    draw(dungeon.map,
+      [{ ...player, type:'player' }, ...dungeon.enemies.filter(e => !e.dead)],
+      getParticles());
 
   } else {
-    // ===== WORLD MODE =====
+    // ── WORLD MODE ──
     player.update(worldMap);
     updateCamera(player.x, player.y);
 
-    // Spawner
     spawner.update(now);
 
-    // Update enemy AI
     for (const e of spawner.getEnemies()) {
       if (!e.dead) e.update(player, dt * 0.06, worldMap);
     }
 
-    // Combat
     updateCombat(player, spawner.getEnemies(), now);
 
-    // Check player death
-    if (player.isDead()) onPlayerDeath();
-
-    // Check dungeon entrance
-    const px = Math.floor(player.x);
-    const py = Math.floor(player.y);
-    const tile = worldMap.get(px, py);
-    if (tile === TILES.DUNGEON) {
-      const dungeonId = getDungeonAtTile(px, py);
-      if (dungeonId) onDungeonEntrance(dungeonId);
+    // Stop walking toward an enemy once in combat range
+    if (_combatTarget && !_combatTarget.dead) {
+      if (_combatTarget.distTo(player) <= player.getAggroRadius()) player.stopPath();
     }
 
-    // Draw world
-    const allEntities = [
-      { ...player, type: 'player' },
-      ...spawner.getEnemies().filter(e => !e.dead),
-      ...npcMgr.getNpcs(),
-    ];
-    draw(worldMap, allEntities, getParticles(), false);
+    if (player.isDead()) onPlayerDeath();
+
+    // Walk onto dungeon entrance tile
+    const ptx = Math.floor(player.x), pty = Math.floor(player.y);
+    if (worldMap.get(ptx, pty) === TILES.DUNGEON) {
+      const did = getDungeonAtTile(ptx, pty);
+      if (did) onDungeonEntrance(did);
+    }
+
+    draw(worldMap,
+      [{ ...player, type:'player' }, ...spawner.getEnemies().filter(e => !e.dead), ...npcMgr.getNpcs()],
+      getParticles());
   }
 
   updateParticles(dt * 0.06);
   updateHUD();
-  syncPlayerState();
+
+  // Keep player object in sync with persistent state
+  const st2 = getState();
+  player.hp    = st2.player.hp;
+  player.maxHp = st2.player.maxHp;
 
   requestAnimationFrame(gameLoop);
 }
 
-// ===== Tap Handler =====
-function onTap(wx, wy, sx, sy) {
-  resumeCtx();
-  const st = getState();
+// ===== Tap / Click Handler =====
+// Priority: NPC > enemy (walk + target) > dungeon entrance > walkable tile (walk)
+let _combatTarget = null;
 
+function onTap(wx, wy) {
+  resumeCtx();
+  const st  = getState();
+  const tx  = Math.floor(wx);
+  const ty  = Math.floor(wy);
+  const map = st.player.inDungeon ? dungeon?.map : worldMap;
+  if (!map) return;
+
+  // ── Dungeon mode ──
   if (st.player.inDungeon && dungeon) {
-    // Tap enemy in dungeon
-    const tx = Math.floor(wx);
-    const ty = Math.floor(wy);
     const enemy = dungeon.enemies.find(e =>
       !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
     );
-    if (enemy) { setTarget(enemy); return; }
+    if (enemy) {
+      _setTargetAndWalk(enemy, map);
+      return;
+    }
+    // Walk to tapped tile
+    _walkTo(wx, wy, map);
+    return;
+  }
 
+  // ── World mode ──
+
+  // NPC — open dialogue (no pathfinding needed, works at any distance)
+  const npc = npcMgr.getNpcNear(wx, wy, 1.5);
+  if (npc) {
+    showDialogue(npc);
+    return;
+  }
+
+  // Enemy — walk toward and target
+  const enemy = spawner.getEnemies().find(e =>
+    !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
+  );
+  if (enemy) {
+    _setTargetAndWalk(enemy, map);
+    return;
+  }
+
+  // Dungeon entrance glyph — walk to it
+  if (worldMap.get(tx, ty) === TILES.DUNGEON) {
+    _walkTo(wx, wy, map);
+    return;
+  }
+
+  // Water tile adjacent to player — fish
+  if (worldMap.get(tx, ty) === TILES.WATER) {
+    const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 3) {
+      import('./skills/tasks.js').then(m => m.tryFish('shrimp', player));
+      return;
+    }
+  }
+
+  // Tree tile adjacent to player — chop
+  if (worldMap.get(tx, ty) === TILES.TREE) {
+    const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 3) {
+      import('./skills/tasks.js').then(m => m.tryChop('oak', player));
+      return;
+    }
+  }
+
+  // Default: walk to tapped location
+  _walkTo(wx, wy, map);
+}
+
+function _walkTo(wx, wy, map) {
+  _combatTarget = null;
+  const path = findPath(map, player.x, player.y, wx, wy);
+  if (path !== null) {
+    const smoothed = smoothPath(path);
+    const dest = { x: Math.floor(wx) + 0.5, y: Math.floor(wy) + 0.5 };
+    player.setPath(smoothed, dest);
   } else {
-    // Tap NPC
-    const npc = npcMgr.getNpcNear(wx, wy, 1.2);
-    if (npc) { showDialogue(npc); return; }
+    showFloatMsg('Can\'t reach that spot.', '#888');
+  }
+}
 
-    // Tap enemy
-    const tx = Math.floor(wx);
-    const ty = Math.floor(wy);
-    const enemy = spawner.getEnemies().find(e =>
-      !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
-    );
-    if (enemy) { setTarget(enemy); return; }
-
-    // Tap water tile near player (fishing prompt)
-    const tile = worldMap.get(tx, ty);
-    if (tile === TILES.WATER) {
-      const dx = tx - player.x, dy = ty - player.y;
-      if (Math.sqrt(dx*dx + dy*dy) < 2.5) {
-        import('./skills/tasks.js').then(m => m.tryFish('shrimp', player));
-        return;
-      }
-    }
-
-    // Tap tree tile (woodcutting prompt)
-    if (tile === TILES.TREE) {
-      const dx = tx - player.x, dy = ty - player.y;
-      if (Math.sqrt(dx*dx + dy*dy) < 2.5) {
-        import('./skills/tasks.js').then(m => m.tryChop('oak', player));
-        return;
-      }
-    }
+function _setTargetAndWalk(enemy, map) {
+  _combatTarget = enemy;
+  setTarget(enemy);
+  // Walk to a tile adjacent to the enemy
+  const path = findPath(map, player.x, player.y, enemy.x, enemy.y);
+  if (path !== null) {
+    // Drop last step so we stop next to the enemy, not on top
+    const smoothed = smoothPath(path);
+    if (smoothed.length > 1) smoothed.pop();
+    player.setPath(smoothed, { x: enemy.x, y: enemy.y });
   }
 }
 
 // ===== Dungeon Entry / Exit =====
 let _pendingDungeon = null;
+
 function onDungeonEntrance(dungeonId) {
   if (_pendingDungeon === dungeonId) return;
   _pendingDungeon = dungeonId;
-
+  player.stopPath();
   showDungeonModal(dungeonId,
     () => enterDungeon(dungeonId),
     () => { _pendingDungeon = null; }
@@ -286,65 +315,59 @@ function onDungeonEntrance(dungeonId) {
 function enterDungeon(dungeonId) {
   _pendingDungeon = null;
   const st = getState();
-
   fadeToBlack(() => {
     dungeon = new DungeonState(dungeonId);
     dungeon.spawnEnemies(Enemy);
-
     player.x = dungeon.playerX;
     player.y = dungeon.playerY;
+    player.stopPath();
     st.player.x = player.x;
     st.player.y = player.y;
     st.player.inDungeon = true;
     st.player.dungeonId = dungeonId;
-
     clearTarget();
+    _combatTarget = null;
     import('./engine/audio.js').then(a => a.playDungeon());
   });
 }
 
 function exitDungeon() {
-  const st = getState();
   if (!dungeon) return;
-
-  // Set dungeon cooldown
-  const now = Date.now();
-  st.world.dungeonCooldowns[dungeon.dungeonId] = now + 600000; // 10 min
-
+  const st = getState();
+  st.world.dungeonCooldowns[dungeon.dungeonId] = Date.now() + 600000;
   fadeToBlack(() => {
-    const exitX = DUNGEONS[dungeon.dungeonId]?.entrance.wx ?? 20;
-    const exitY = DUNGEONS[dungeon.dungeonId]?.entrance.wy ?? 40;
-
-    player.x = exitX + 0.5;
-    player.y = exitY + 1.5;
+    const entrance = DUNGEONS[dungeon.dungeonId]?.entrance;
+    player.x = (entrance?.wx ?? 20) + 0.5;
+    player.y = (entrance?.wy ?? 40) + 1.5;
+    player.stopPath();
     st.player.x = player.x;
     st.player.y = player.y;
     st.player.inDungeon = false;
     st.player.dungeonId = null;
-
     dungeon = null;
     clearTarget();
+    _combatTarget = null;
     saveGame();
   });
 }
 
 // ===== Player Death =====
 function onPlayerDeath() {
-  const st = getState();
-  // Respawn at Ashvale with 50% HP
+  const st   = getState();
   const town = TOWNS.ashvale;
-  player.x = town.cx + 0.5;
-  player.y = town.cy + 0.5;
-  st.player.x = player.x;
-  st.player.y = player.y;
+  player.x   = town.cx + 0.5;
+  player.y   = town.cy + 0.5;
+  player.stopPath();
+  st.player.x  = player.x;
+  st.player.y  = player.y;
   st.player.hp = Math.floor(st.player.maxHp * 0.5);
-  player.hp = st.player.hp;
+  player.hp    = st.player.hp;
   st.player.inDungeon = false;
   st.player.dungeonId = null;
   dungeon = null;
   clearTarget();
-
-  showFloatMsg('You have died! Respawned at Ashvale.', '#e94560');
+  _combatTarget = null;
+  showFloatMsg('You died! Respawned at Ashvale.', '#e94560');
   saveGame();
 }
 
@@ -357,26 +380,20 @@ function getDungeonAtTile(tx, ty) {
 }
 
 function showFloatMsg(msg, color) {
-  // Simple overlay message
   const layer = document.getElementById('float-layer');
   if (!layer) return;
   const el = document.createElement('div');
   el.style.cssText = `
-    position:absolute;top:40%;left:50%;transform:translateX(-50%);
-    background:rgba(0,0,0,0.8);border:1px solid ${color};
-    color:${color};padding:10px 16px;border-radius:6px;
+    position:absolute;top:38%;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);border:1px solid ${color};
+    color:${color};padding:10px 18px;border-radius:6px;
     font-family:monospace;font-size:13px;text-align:center;
-    animation:floatUp 3s ease-out forwards;white-space:nowrap;
+    white-space:nowrap;pointer-events:none;
+    animation:floatUp 3s ease-out forwards;
   `;
   el.textContent = msg;
   layer.appendChild(el);
   setTimeout(() => el.remove(), 3100);
-}
-
-function syncPlayerState() {
-  const st = getState();
-  player.hp    = st.player.hp;
-  player.maxHp = st.player.maxHp;
 }
 
 // ===== Start =====

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crpg-v2';
+const CACHE_NAME = 'crpg-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './js/main.js',
   './js/config.js',
   './js/state.js',
+  './js/engine/pathfinder.js',
   './js/engine/renderer.js',
   './js/engine/input.js',
   './js/engine/particles.js',
