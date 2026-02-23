@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f3460">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CRPG">
+  <title>CRPG: Lands of Ascii</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- HUD Top Bar -->
+    <div id="hud-top">
+      <div id="hud-stats">
+        <div class="stat-row">
+          <span class="stat-label">HP</span>
+          <div class="bar-wrap"><div id="hp-bar" class="bar hp-bar"></div></div>
+          <span id="hp-text" class="stat-val">100/100</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">XP</span>
+          <div class="bar-wrap"><div id="xp-bar" class="bar xp-bar"></div></div>
+          <span id="xp-text" class="stat-val">Lv 1</span>
+        </div>
+      </div>
+      <div id="hud-gold">
+        <span class="gold-icon">Au</span>
+        <span id="gold-text">0</span>
+      </div>
+    </div>
+
+    <!-- Game Canvas Area -->
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+      <canvas id="minimap-canvas"></canvas>
+      <!-- Floating combat text layer -->
+      <div id="float-layer"></div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav">
+      <button class="nav-btn active" data-panel="map" id="nav-map">
+        <span class="nav-icon">&#9776;</span>
+        <span class="nav-label">MAP</span>
+      </button>
+      <button class="nav-btn" data-panel="skills" id="nav-skills">
+        <span class="nav-icon">&#9733;</span>
+        <span class="nav-label">SKILLS</span>
+      </button>
+      <button class="nav-btn" data-panel="inventory" id="nav-inv">
+        <span class="nav-icon">&#9798;</span>
+        <span class="nav-label">INV</span>
+      </button>
+      <button class="nav-btn" data-panel="menu" id="nav-menu">
+        <span class="nav-icon">&#9881;</span>
+        <span class="nav-label">MENU</span>
+      </button>
+    </nav>
+
+    <!-- Panels (shown/hidden via nav) -->
+    <div id="panel-skills" class="side-panel hidden">
+      <div class="panel-header">Skills</div>
+      <div id="skills-list" class="panel-content"></div>
+    </div>
+
+    <div id="panel-inventory" class="side-panel hidden">
+      <div class="panel-header">Inventory</div>
+      <div class="panel-content">
+        <div class="inv-section-label">EQUIPPED</div>
+        <div id="equip-grid" class="equip-grid"></div>
+        <div class="inv-section-label">BACKPACK</div>
+        <div id="backpack-grid" class="backpack-grid"></div>
+      </div>
+    </div>
+
+    <div id="panel-menu" class="side-panel hidden">
+      <div class="panel-header">Menu</div>
+      <div class="panel-content">
+        <button class="menu-btn" id="btn-save">Save Game</button>
+        <button class="menu-btn" id="btn-load">Load Game</button>
+        <button class="menu-btn danger" id="btn-reset">New Game</button>
+        <div id="menu-version" class="menu-info">CRPG: Lands of Ascii v1.0</div>
+        <div id="debug-info" class="menu-info debug-only hidden"></div>
+        <button class="menu-btn debug-only hidden" id="btn-tests">Run Tests</button>
+      </div>
+    </div>
+
+    <!-- Dungeon Entry Modal -->
+    <div id="dungeon-modal" class="modal hidden">
+      <div class="modal-box">
+        <div id="dungeon-modal-title" class="modal-title">Dungeon Name</div>
+        <div id="dungeon-modal-stars" class="modal-stars"></div>
+        <div id="dungeon-modal-info" class="modal-info"></div>
+        <div class="modal-btns">
+          <button id="btn-dungeon-enter" class="modal-btn enter-btn">ENTER</button>
+          <button id="btn-dungeon-flee" class="modal-btn flee-btn">FLEE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loot Popup -->
+    <div id="loot-popup" class="loot-popup hidden">
+      <div id="loot-content"></div>
+    </div>
+
+    <!-- NPC Dialogue -->
+    <div id="dialogue-modal" class="modal hidden">
+      <div class="modal-box">
+        <div id="dialogue-npc-name" class="modal-title"></div>
+        <div id="dialogue-text" class="dialogue-text"></div>
+        <button id="btn-dialogue-close" class="modal-btn enter-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- Item Info Popup -->
+    <div id="item-popup" class="item-popup hidden">
+      <div id="item-popup-content"></div>
+    </div>
+
+    <!-- Test Results Panel -->
+    <div id="test-panel" class="side-panel hidden">
+      <div class="panel-header">Test Results <button id="btn-run-tests" class="small-btn">Run</button></div>
+      <div id="test-results" class="panel-content test-results"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
