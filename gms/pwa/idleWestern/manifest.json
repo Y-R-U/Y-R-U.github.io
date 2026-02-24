@@ -1,0 +1,22 @@
+{
+  "name": "Idle Western",
+  "short_name": "IdleWestern",
+  "description": "Build your frontier empire from the ground up!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a0e05",
+  "theme_color": "#8B4513",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

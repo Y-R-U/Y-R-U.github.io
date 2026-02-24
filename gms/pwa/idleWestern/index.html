@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#8B4513">
+  <meta name="description" content="Build your frontier empire from the ground up!">
+  <title>Idle Western</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="img/icon-192.png">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header id="game-header">
+    <div class="header-left">
+      <button id="settings-btn" class="icon-btn" aria-label="Settings">&equiv;</button>
+      <div class="header-title">IDLE WESTERN</div>
+    </div>
+    <div class="header-right">
+      <div class="header-coins" id="header-coins">$0</div>
+      <div class="header-ips" id="header-ips">Tap to earn!</div>
+    </div>
+  </header>
+
+  <!-- Active Buff Bar -->
+  <div id="buff-bar" class="buff-bar hidden"></div>
+
+  <!-- Scene Area (tap zone + events) -->
+  <div id="scene-area" class="scene-area">
+    <div class="scene-sky"></div>
+    <div class="scene-mountains"></div>
+    <div class="scene-ground">
+      <div class="cactus cactus-1">&#127797;</div>
+      <div class="cactus cactus-2">&#127797;</div>
+    </div>
+    <div class="scene-tap-hint" id="tap-hint">
+      <div class="tap-hint-icon">&#128176;</div>
+      <div class="tap-hint-text">Tap here to earn coins!</div>
+    </div>
+    <div id="effects-layer" class="effects-layer"></div>
+  </div>
+
+  <!-- Tab Content -->
+  <div id="tab-content" class="tab-content"></div>
+
+  <!-- Bottom Nav -->
+  <nav id="bottom-nav" class="bottom-nav">
+    <button class="tab-btn active" data-tab="jobs">
+      <span class="tab-icon">&#128188;</span>
+      <span class="tab-label">Jobs</span>
+    </button>
+    <button class="tab-btn" data-tab="upgrades">
+      <span class="tab-icon">&#11014;&#65039;</span>
+      <span class="tab-label">Upgrades</span>
+    </button>
+    <button class="tab-btn" data-tab="prestige">
+      <span class="tab-icon">&#11088;</span>
+      <span class="tab-label">Move West</span>
+    </button>
+    <button class="tab-btn" data-tab="achievements">
+      <span class="tab-icon">&#127942;</span>
+      <span class="tab-label">Awards</span>
+    </button>
+  </nav>
+
+  <!-- Settings Panel (slide-in) -->
+  <div id="settings-panel" class="settings-panel">
+    <div class="settings-header">
+      <h2>Settings</h2>
+      <button id="settings-close" class="icon-btn">&times;</button>
+    </div>
+    <div class="settings-body">
+      <button id="save-btn" class="settings-action-btn">&#128190; Save Game</button>
+      <button id="reset-btn" class="settings-action-btn danger">&#128465;&#65039; Reset All Progress</button>
+      <div class="settings-info">
+        <p>Auto-saves every 30 seconds</p>
+        <p>Idle Western v1.0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (order matters) -->
+  <script src="js/utils.js"></script>
+  <script src="js/gameData.js"></script>
+  <script src="js/gameState.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
