@@ -1,21 +1,26 @@
 // ============================================================
-// LIFE IDLE - Storage Module
+// LIFE IDLE - Storage Module  v2.0
 // Save / load game state via localStorage
 // ============================================================
 
-const SAVE_KEY = 'lifeIdle_v1';
+const SAVE_KEY = 'lifeIdle_v2';
 const AUTOSAVE_INTERVAL = 30000; // 30 seconds
 
 const Storage = (() => {
   function save(state) {
     try {
       const payload = {
-        coins: state.coins,
-        totalEarned: state.totalEarned,
-        clickPower: state.clickPower,
-        jobs: state.jobs,           // { [id]: workersHired }
-        businesses: state.businesses, // { [id]: level }
-        upgrades: state.upgrades,   // Set -> Array for JSON
+        coins:         state.coins,
+        totalEarned:   state.totalEarned,
+        jobs:          state.jobs,
+        businesses:    state.businesses,
+        upgrades:      [...(state.upgrades instanceof Set ? state.upgrades : new Set(state.upgrades || []))],
+        // Prestige & meta (persist across prestige resets)
+        prestigeLevel:  state.prestigeLevel  || 0,
+        prestigePoints: state.prestigePoints || 0,
+        lifetimeCoins:  state.lifetimeCoins  || 0,
+        totalTaps:      state.totalTaps      || 0,
+        achievements:   [...(state.achievements instanceof Set ? state.achievements : new Set(state.achievements || []))],
         lastSave: Date.now()
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
@@ -29,8 +34,9 @@ const Storage = (() => {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return null;
       const data = JSON.parse(raw);
-      // Restore Set
-      data.upgrades = new Set(data.upgrades || []);
+      // Restore Sets
+      data.upgrades     = new Set(data.upgrades     || []);
+      data.achievements = new Set(data.achievements || []);
       return data;
     } catch (e) {
       console.warn('Load failed:', e);

@@ -3,7 +3,7 @@
 // Cache-first strategy for offline play
 // ============================================================
 
-const CACHE_NAME = 'life-idle-v3'; // bump to force-evict any cached pre-fix files
+const CACHE_NAME = 'life-idle-v4'; // bump to force-evict any cached pre-fix files
 
 const PRECACHE = [
   './',

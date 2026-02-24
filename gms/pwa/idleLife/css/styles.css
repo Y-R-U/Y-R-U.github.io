@@ -674,3 +674,240 @@ html, body {
   #character-sprite { font-size: 3rem; }
   .tab-btn { font-size: 0.6rem; }
 }
+
+/* ── Prestige Header Badge ── */
+.prestige-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--accent-gold);
+  text-align: center;
+  animation: prestige-flash 1s ease-in-out infinite;
+  padding: 1px 0;
+}
+.prestige-badge.hidden { display: none; }
+@keyframes prestige-flash {
+  0%,100% { opacity: 1; text-shadow: 0 0 8px rgba(255,215,0,0.8); }
+  50%      { opacity: 0.6; text-shadow: none; }
+}
+
+#prestige-mult {
+  color: var(--accent-purple);
+  font-weight: 700;
+}
+#prestige-mult.hidden { display: none; }
+
+/* ── Prestige Tab ── */
+.prestige-card {
+  background: linear-gradient(135deg, #1e1050 0%, #150d3a 100%);
+  border: 1px solid rgba(179,157,219,0.35);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+  box-shadow: 0 0 24px rgba(179,157,219,0.15);
+}
+.prestige-hdr {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.prestige-star-icon { font-size: 2.2rem; margin: 4px 0; line-height: 1; }
+.prestige-level-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+}
+.prestige-sub-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.prestige-mult-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+.prestige-mult-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  text-shadow: 0 0 12px rgba(179,157,219,0.5);
+}
+.prestige-mult-lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.prestige-info-block {
+  background: rgba(21,24,64,0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 8px 0;
+  text-align: left;
+}
+.pi-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  padding: 3px 0;
+  color: var(--text-muted);
+}
+.pi-row span:last-child { color: var(--text-primary); font-weight: 600; }
+.pi-green span:last-child { color: var(--accent-green); }
+.pi-highlight span:last-child { color: var(--accent-gold); }
+
+/* Prestige progress bar */
+.prestige-progress-wrap {
+  background: rgba(21,24,64,0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 8px 0;
+}
+.prestige-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.prestige-progress-track {
+  height: 8px;
+  background: var(--bg-card);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.prestige-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.prestige-pct {
+  text-align: right;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Prestige CTA button */
+.btn-prestige {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+  transition: all 0.15s;
+  animation: prestige-btn-pulse 2s ease-in-out infinite;
+}
+.btn-prestige:active { transform: scale(0.96); }
+@keyframes prestige-btn-pulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(168,85,247,0.4); }
+  50%      { box-shadow: 0 4px 32px rgba(168,85,247,0.75); }
+}
+
+.prestige-locked {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
+.prestige-locked strong { color: var(--text-muted); display: block; margin-bottom: 6px; }
+
+/* ── Achievements ── */
+.ach-section-hdr {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 0 6px;
+  text-align: center;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ach-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.ach-earned {
+  background: var(--bg-card2);
+  border-color: rgba(0,230,118,0.4);
+  box-shadow: 0 0 10px rgba(0,230,118,0.1);
+}
+.ach-locked {
+  opacity: 0.55;
+}
+.ach-emoji { font-size: 1.5rem; line-height: 1; }
+.ach-body { flex: 1; min-width: 0; }
+.ach-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ach-earned .ach-name { color: var(--accent-green); }
+.ach-desc {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.ach-check {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: 0.65rem;
+  color: var(--accent-green);
+}
+
+/* ── Toast variants for prestige/achievement ── */
+.toast-prestige {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  background: #150e2a;
+}
+.toast-achievement {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: #0a1f14;
+}
+
+/* ── Tier color accents for Space / Galactic businesses ── */
+.tier-space   { color: var(--accent-blue); }
+.tier-galactic { color: var(--accent-purple); }
