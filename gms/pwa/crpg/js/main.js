@@ -277,12 +277,14 @@ function onTap(wx, wy) {
 function _walkTo(wx, wy, map) {
   _combatTarget = null;
   const path = findPath(map, player.x, player.y, wx, wy);
-  if (path !== null) {
+  if (path === null) {
+    showFloatMsg('Can\'t reach that spot.', '#888');
+  } else if (path.length === 0) {
+    // Already standing on the tapped tile — nothing to do
+  } else {
     const smoothed = smoothPath(path);
     const dest = { x: Math.floor(wx) + 0.5, y: Math.floor(wy) + 0.5 };
     player.setPath(smoothed, dest);
-  } else {
-    showFloatMsg('Can\'t reach that spot.', '#888');
   }
 }
 

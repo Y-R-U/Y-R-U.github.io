@@ -73,6 +73,51 @@ export function registerMapTests(runner) {
     });
   });
 
+  runner.describe('Map: Movement / Pathfinding', (it) => {
+    it('Ashvale spawn tile (20,40) is walkable', async () => {
+      const { WorldMap } = await import('../world/map.js');
+      const map = new WorldMap(12345);
+      assert(map.isWalkable(20, 40), 'Spawn tile (20,40) must be walkable');
+    });
+    it('findPath returns non-null from spawn tile to nearby tile', async () => {
+      const { WorldMap } = await import('../world/map.js');
+      const { findPath } = await import('../engine/pathfinder.js');
+      const map = new WorldMap(12345);
+      const path = findPath(map, 20.5, 40.5, 24, 40);
+      assert(path !== null, 'Path from spawn to (24,40) should exist');
+    });
+    it('findPath returns [] when start equals goal', async () => {
+      const { WorldMap } = await import('../world/map.js');
+      const { findPath } = await import('../engine/pathfinder.js');
+      const map = new WorldMap(12345);
+      const path = findPath(map, 20.5, 40.5, 20, 40);
+      assert(Array.isArray(path) && path.length === 0,
+        'Path to own tile should be empty array, not null');
+    });
+    it('findPath returns null for unreachable tile', async () => {
+      const { WorldMap } = await import('../world/map.js');
+      const { findPath } = await import('../engine/pathfinder.js');
+      const map = new WorldMap(12345);
+      // Force a solid wall tile and try to path into it
+      const path = findPath(map, 20.5, 40.5, -5, -5);
+      assert(path === null, 'Path to out-of-bounds tile should be null');
+    });
+    it('player can walk from spawn towards east via setPath', async () => {
+      const { WorldMap } = await import('../world/map.js');
+      const { findPath, smoothPath } = await import('../engine/pathfinder.js');
+      const { Player } = await import('../entities/player.js');
+      const map = new WorldMap(12345);
+      const p = new Player();
+      p.x = 20.5; p.y = 40.5;
+      const path = findPath(map, p.x, p.y, 24, 40);
+      assert(path !== null && path.length > 0, 'Expected a walkable path east of spawn');
+      p.setPath(smoothPath(path), { x: 24.5, y: 40.5 });
+      // Simulate ~200 frames of movement
+      for (let i = 0; i < 200; i++) p.update(map);
+      assert(p.x > 22, `Player should have moved east; got x=${p.x.toFixed(2)}`);
+    });
+  });
+
   runner.describe('Map: Enemy Spawn Zones', (it) => {
     it('no enemy spawns within town radius (zone check)', async () => {
       const { Spawner } = await import('../world/spawner.js');
