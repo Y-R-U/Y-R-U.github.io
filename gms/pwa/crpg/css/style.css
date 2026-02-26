@@ -409,6 +409,39 @@ html, body {
   line-height: 1.6; margin-bottom: 16px;
 }
 
+/* ===== SHOP ===== */
+.dialogue-shop {
+  margin: 10px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  border-top: 1px solid #333;
+  padding-top: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.shop-gold-info {
+  font-size: 10px; color: var(--gold);
+  text-align: right; margin-bottom: 6px;
+}
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.shop-glyph { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.shop-name  { flex: 1; font-size: 11px; color: var(--text); }
+.shop-price { font-size: 11px; color: var(--gold); flex-shrink: 0; white-space: nowrap; }
+.shop-buy-btn {
+  font-family: var(--font); font-size: 10px;
+  background: #2a7a2a; border: none; color: #fff;
+  border-radius: 3px; padding: 4px 8px; cursor: pointer;
+  flex-shrink: 0; min-width: 36px; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.shop-buy-btn:active { opacity: 0.7; }
+.shop-buy-btn.cant-afford { background: #555; color: var(--dim); }
+
 /* ===== LOOT POPUP ===== */
 .loot-popup {
   position: absolute;
