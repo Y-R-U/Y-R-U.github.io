@@ -91,14 +91,80 @@ import('../state.js').then(m => { _stateRef = m; });
 
 // NPC Dialogue modal
 export function showDialogue(npc) {
-  const modal = document.getElementById('dialogue-modal');
-  const nameEl = document.getElementById('dialogue-npc-name');
-  const textEl = document.getElementById('dialogue-text');
+  const modal    = document.getElementById('dialogue-modal');
+  const nameEl   = document.getElementById('dialogue-npc-name');
+  const textEl   = document.getElementById('dialogue-text');
+  const shopEl   = document.getElementById('dialogue-shop');
+  const tradeBtn = document.getElementById('btn-dialogue-trade');
   if (!modal || !nameEl || !textEl) return;
 
   nameEl.textContent = npc.name;
   textEl.textContent = npc.dialogue || '...';
+
+  // Reset shop area each time the modal opens
+  if (shopEl)   { shopEl.innerHTML = ''; shopEl.classList.add('hidden'); }
+  if (tradeBtn) {
+    if (npc.shop && npc.shop.length) {
+      tradeBtn.classList.remove('hidden');
+      tradeBtn.textContent = 'Trade';
+      tradeBtn.onclick = () => _toggleShop(npc, shopEl, tradeBtn);
+    } else {
+      tradeBtn.classList.add('hidden');
+      tradeBtn.onclick = null;
+    }
+  }
+
   modal.classList.remove('hidden');
+}
+
+function _toggleShop(npc, shopEl, tradeBtn) {
+  if (!shopEl.classList.contains('hidden')) {
+    shopEl.classList.add('hidden');
+    tradeBtn.textContent = 'Trade';
+    return;
+  }
+  tradeBtn.textContent = 'Hide Shop';
+  shopEl.classList.remove('hidden');
+  _renderShopItems(npc, shopEl);
+}
+
+function _renderShopItems(npc, container) {
+  Promise.all([
+    import('../config.js'),
+    import('../state.js'),
+  ]).then(([{ ITEMS }, { getState, addToBackpack }]) => {
+    const st = getState();
+
+    function rebuild() {
+      container.innerHTML =
+        `<div class="shop-gold-info">Your gold: <b>${st.player.gold} Au</b></div>` +
+        npc.shop.map(itemId => {
+          const item = ITEMS[itemId];
+          if (!item) return '';
+          const canAfford = st.player.gold >= item.value;
+          return `<div class="shop-item">
+            <span class="shop-glyph">${item.emoji || item.glyph}</span>
+            <span class="shop-name">${item.name}</span>
+            <span class="shop-price">${item.value}&nbsp;Au</span>
+            <button class="shop-buy-btn${canAfford ? '' : ' cant-afford'}"
+                    data-id="${itemId}" data-price="${item.value}">Buy</button>
+          </div>`;
+        }).join('');
+
+      container.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id    = btn.dataset.id;
+          const price = Number(btn.dataset.price);
+          if (st.player.gold < price) return;
+          st.player.gold -= price;
+          addToBackpack(id, 1);
+          rebuild();   // refresh gold display + affordability highlights
+        });
+      });
+    }
+
+    rebuild();
+  });
 }
 
 export function initDialogueModal() {

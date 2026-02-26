@@ -37,6 +37,10 @@ let player      = null;
 let dungeon     = null;   // active DungeonState or null
 let lastUpdate  = 0;
 
+// Passive regen: 1 hp / 5 s base, +1 per 20 hitpoints levels
+const REGEN_MS = 5000;
+let _lastRegen  = 0;
+
 // ===== Boot =====
 async function boot() {
   if ('serviceWorker' in navigator) {
@@ -191,6 +195,17 @@ function gameLoop(now) {
       getParticles());
   }
 
+  // Passive HP regen
+  if (now - _lastRegen >= REGEN_MS) {
+    _lastRegen = now;
+    const st = getState();
+    if (st.player.hp > 0 && st.player.hp < st.player.maxHp) {
+      const hpLvl   = st.player.skills?.hitpoints?.level || 1;
+      const regenAmt = 1 + Math.floor(hpLvl / 20);   // 1 base + 1 extra per 20 hp levels
+      player.heal(regenAmt);
+    }
+  }
+
   updateParticles(dt * 0.06);
   updateHUD();
 
@@ -303,14 +318,32 @@ function _setTargetAndWalk(enemy, map) {
 
 // ===== Dungeon Entry / Exit =====
 let _pendingDungeon = null;
+let _fleeCooldown   = 0;   // unix ms — don't re-trigger dungeon prompt during this window
 
 function onDungeonEntrance(dungeonId) {
   if (_pendingDungeon === dungeonId) return;
+  if (Date.now() < _fleeCooldown) return;      // still within flee cooldown
   _pendingDungeon = dungeonId;
   player.stopPath();
   showDungeonModal(dungeonId,
     () => enterDungeon(dungeonId),
-    () => { _pendingDungeon = null; }
+    () => {
+      _pendingDungeon = null;
+      _fleeCooldown   = Date.now() + 3000;      // 3 s before prompt can re-fire
+      // Nudge player one tile south so they leave the dungeon entrance tile
+      const cfg = DUNGEONS[dungeonId];
+      if (cfg) {
+        const ex = cfg.entrance.wx, ey = cfg.entrance.wy;
+        const dirs = [{x:0,y:1},{x:0,y:-1},{x:1,y:0},{x:-1,y:0}];
+        for (const d of dirs) {
+          if (worldMap.isWalkable(ex + d.x, ey + d.y)) {
+            player.x = ex + d.x + 0.5;
+            player.y = ey + d.y + 0.5;
+            break;
+          }
+        }
+      }
+    }
   );
 }
 

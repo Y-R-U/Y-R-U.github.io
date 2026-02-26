@@ -10,6 +10,7 @@ export class Player {
     this.x = st.player.x;
     this.y = st.player.y;
     this.glyph    = '@';
+    this.emoji    = '🧙';
     this.color    = '#00ff00';
     this.bgColor  = '#003300';
     this.visible  = true;

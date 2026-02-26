@@ -162,10 +162,16 @@ function drawEntities(entities) {
     ctx.fillStyle = e.bgColor || '#333';
     ctx.fillRect(sx, sy, ts, ts);
 
-    // Glyph
-    ctx.fillStyle = e.color || '#fff';
-    ctx.font = `bold ${ts - 2}px 'Courier New', monospace`;
-    ctx.fillText(e.glyph, sx + ts / 2, sy + ts / 2 + 1);
+    // Glyph or emoji
+    if (e.emoji) {
+      // Use system color-emoji font; avoid bold which breaks some platforms
+      ctx.font = `${ts - 1}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
+      ctx.fillText(e.emoji, sx + ts / 2, sy + ts / 2 + 1);
+    } else {
+      ctx.fillStyle = e.color || '#fff';
+      ctx.font = `bold ${ts - 2}px 'Courier New', monospace`;
+      ctx.fillText(e.glyph || '?', sx + ts / 2, sy + ts / 2 + 1);
+    }
 
     // HP bar for enemies and NPCs (not player)
     if (e.hp !== undefined && e.maxHp !== undefined && e.type !== 'player' && e.maxHp < 9999) {

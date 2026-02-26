@@ -41,123 +41,123 @@ export const SKILLS = {
 // ===== ENEMIES =====
 export const ENEMIES = {
   rat: {
-    id:'rat', glyph:'r', color:'#8B4513', name:'Giant Rat',
+    id:'rat', glyph:'r', emoji:'🐀', color:'#8B4513', name:'Giant Rat',
     hp:8, atk:2, def:0, xp:5, gold:[1,3],
     zone:'ashvale', speed:1.2, aggroRng:3,
     loot: [{id:'rat_pelt',chance:0.2}]
   },
   goblin: {
-    id:'goblin', glyph:'g', color:'#4CAF50', name:'Goblin',
+    id:'goblin', glyph:'g', emoji:'👺', color:'#4CAF50', name:'Goblin',
     hp:18, atk:5, def:2, xp:12, gold:[3,8],
     zone:'goblin_plains', speed:1.0, aggroRng:4,
     loot: [{id:'bronze_sword',chance:0.05},{id:'leather_cap',chance:0.04}]
   },
   goblin_archer: {
-    id:'goblin_archer', glyph:'g', color:'#FFEB3B', name:'Goblin Archer',
+    id:'goblin_archer', glyph:'g', emoji:'🏹', color:'#FFEB3B', name:'Goblin Archer',
     hp:15, atk:6, def:1, xp:15, gold:[4,10],
     zone:'goblin_plains', speed:1.0, aggroRng:5, ranged:true,
     loot: [{id:'arrows',chance:0.3}]
   },
   wolf: {
-    id:'wolf', glyph:'w', color:'#9E9E9E', name:'Wolf',
+    id:'wolf', glyph:'w', emoji:'🐺', color:'#9E9E9E', name:'Wolf',
     hp:22, atk:7, def:3, xp:18, gold:[0,2],
     zone:'dark_forest', speed:1.4, aggroRng:5,
     loot: [{id:'wolf_pelt',chance:0.4}]
   },
   bandit: {
-    id:'bandit', glyph:'b', color:'#e94560', name:'Bandit',
+    id:'bandit', glyph:'b', emoji:'😈', color:'#e94560', name:'Bandit',
     hp:30, atk:9, def:5, xp:25, gold:[10,20],
     zone:'dark_forest', speed:1.0, aggroRng:4,
     loot: [{id:'iron_sword',chance:0.06},{id:'health_potion',chance:0.1}]
   },
   skeleton: {
-    id:'skeleton', glyph:'s', color:'#ECEFF1', name:'Skeleton',
+    id:'skeleton', glyph:'s', emoji:'💀', color:'#ECEFF1', name:'Skeleton',
     hp:25, atk:8, def:6, xp:28, gold:[2,5],
     zone:'haunted_moor', speed:0.9, aggroRng:4,
     loot: [{id:'bones',chance:0.6},{id:'iron_sword',chance:0.05}]
   },
   ghost: {
-    id:'ghost', glyph:'G', color:'#80DEEA', name:'Ghost',
+    id:'ghost', glyph:'G', emoji:'👻', color:'#80DEEA', name:'Ghost',
     hp:20, atk:12, def:10, xp:35, gold:[0,0],
     zone:'haunted_moor', speed:0.8, aggroRng:5,
     loot: [{id:'ecto_token',chance:0.5}]
   },
   troll: {
-    id:'troll', glyph:'T', color:'#5D4037', name:'Hill Troll',
+    id:'troll', glyph:'T', emoji:'👹', color:'#5D4037', name:'Hill Troll',
     hp:55, atk:14, def:8, xp:50, gold:[15,30],
     zone:'mountain_pass', speed:0.7, aggroRng:3,
     loot: [{id:'troll_hide',chance:0.3},{id:'steel_sword',chance:0.04}]
   },
   ice_wraith: {
-    id:'ice_wraith', glyph:'I', color:'#E3F2FD', name:'Ice Wraith',
+    id:'ice_wraith', glyph:'I', emoji:'❄️', color:'#E3F2FD', name:'Ice Wraith',
     hp:40, atk:18, def:12, xp:60, gold:[5,10],
     zone:'ice_wastes', speed:0.9, aggroRng:5,
     loot: [{id:'ice_shard',chance:0.4}]
   },
   dark_knight: {
-    id:'dark_knight', glyph:'K', color:'#9C27B0', name:'Dark Knight',
+    id:'dark_knight', glyph:'K', emoji:'🗡️', color:'#9C27B0', name:'Dark Knight',
     hp:80, atk:22, def:18, xp:90, gold:[30,60],
     zone:'skull_crypt', speed:0.9, aggroRng:4,
     loot: [{id:'mithril_sword',chance:0.05},{id:'plate_chest',chance:0.04}]
   },
   // Dungeon enemies
   cave_bat: {
-    id:'cave_bat', glyph:'^', color:'#424242', name:'Cave Bat',
+    id:'cave_bat', glyph:'^', emoji:'🦇', color:'#424242', name:'Cave Bat',
     hp:10, atk:4, def:1, xp:6, gold:[0,1],
     zone:'dungeon', speed:1.6, aggroRng:5,
     loot: []
   },
   goblin_shaman: {
-    id:'goblin_shaman', glyph:'G', color:'#4CAF50', name:'Goblin Shaman',
+    id:'goblin_shaman', glyph:'G', emoji:'🔮', color:'#4CAF50', name:'Goblin Shaman',
     hp:28, atk:10, def:3, xp:22, gold:[5,12],
     zone:'dungeon', speed:0.9, aggroRng:5, magic:true,
     loot: [{id:'rune_shard',chance:0.2}]
   },
   zombie: {
-    id:'zombie', glyph:'z', color:'#388E3C', name:'Zombie',
+    id:'zombie', glyph:'z', emoji:'🧟', color:'#388E3C', name:'Zombie',
     hp:35, atk:11, def:4, xp:30, gold:[2,6],
     zone:'dungeon', speed:0.7, aggroRng:3,
     loot: [{id:'bones',chance:0.4}]
   },
   wraith_lord: {
-    id:'wraith_lord', glyph:'W', color:'#5C6BC0', name:'Wraith Lord',
+    id:'wraith_lord', glyph:'W', emoji:'👻', color:'#5C6BC0', name:'Wraith Lord',
     hp:60, atk:16, def:9, xp:65, gold:[10,25],
     zone:'dungeon', speed:0.8, aggroRng:5, drains:true,
     loot: [{id:'dark_robe',chance:0.1}]
   },
   frost_elemental: {
-    id:'frost_elemental', glyph:'E', color:'#80DEEA', name:'Frost Elemental',
+    id:'frost_elemental', glyph:'E', emoji:'🌨️', color:'#80DEEA', name:'Frost Elemental',
     hp:70, atk:20, def:14, xp:80, gold:[8,18],
     zone:'dungeon', speed:0.85, aggroRng:5, aoe:true,
     loot: [{id:'frost_essence',chance:0.3}]
   },
   dragonling: {
-    id:'dragonling', glyph:'d', color:'#FF8F00', name:'Dragonling',
+    id:'dragonling', glyph:'d', emoji:'🐲', color:'#FF8F00', name:'Dragonling',
     hp:90, atk:24, def:16, xp:100, gold:[20,40],
     zone:'dungeon', speed:1.1, aggroRng:5, fire:true,
     loot: [{id:'dragon_scale',chance:0.15}]
   },
   // Bosses
   warchief_grax: {
-    id:'warchief_grax', glyph:'G', color:'#e94560', name:'Warchief Grax',
+    id:'warchief_grax', glyph:'G', emoji:'👹', color:'#e94560', name:'Warchief Grax',
     hp:150, atk:18, def:12, xp:500, gold:[50,100],
     boss:true, summons:['goblin','goblin'],
     loot: [{id:'warchief_helm',chance:1},{id:'gold_chunk',chance:1}]
   },
   lich_malgrath: {
-    id:'lich_malgrath', glyph:'L', color:'#9C27B0', name:'Lich Malgrath',
+    id:'lich_malgrath', glyph:'L', emoji:'☠️', color:'#9C27B0', name:'Lich Malgrath',
     hp:220, atk:28, def:18, xp:800, gold:[80,150],
     boss:true, summons:['skeleton','skeleton'],
     loot: [{id:'lich_staff',chance:1}]
   },
   glacius: {
-    id:'glacius', glyph:'F', color:'#E3F2FD', name:'Glacius the Frozen',
+    id:'glacius', glyph:'F', emoji:'❄️', color:'#E3F2FD', name:'Glacius the Frozen',
     hp:300, atk:35, def:22, xp:1200, gold:[120,200],
     boss:true, aoe:true,
     loot: [{id:'frost_crown',chance:1}]
   },
   ignaroth: {
-    id:'ignaroth', glyph:'D', color:'#FF8F00', name:'Ignaroth the Ancient',
+    id:'ignaroth', glyph:'D', emoji:'🐉', color:'#FF8F00', name:'Ignaroth the Ancient',
     hp:500, atk:50, def:30, xp:2000, gold:[300,500],
     boss:true, fire:true, enrageHp:0.25,
     loot: [{id:'dragon_scale_set',chance:1}]
@@ -223,76 +223,76 @@ export const TOWNS = {
 // ===== NPCs =====
 export const NPCS = {
   aldric: {
-    id:'aldric', name:'Aldric the Smith', glyph:'A', color:'#f5a623',
+    id:'aldric', name:'Aldric the Smith', glyph:'A', emoji:'🔨', color:'#f5a623',
     tx:19, ty:39,
     dialogue:"Greetings, adventurer! I sell the finest weapons in Ashvale. Need iron or bronze gear? I'm your man.",
     shop: ['bronze_sword','iron_sword','iron_shield','bronze_armour'],
   },
   mara: {
-    id:'mara', name:'Mara the Merchant', glyph:'M', color:'#c0c0c0',
+    id:'mara', name:'Mara the Merchant', glyph:'M', emoji:'🛒', color:'#c0c0c0',
     tx:21, ty:40,
     dialogue:"Welcome to Mara's General Store! Food, tools, and supplies for the discerning adventurer.",
     shop: ['shrimp','trout','health_potion','fishing_rod'],
   },
   finn: {
-    id:'finn', name:'Old Finn', glyph:'F', color:'#4fc3f7',
+    id:'finn', name:'Old Finn', glyph:'F', emoji:'🎣', color:'#4fc3f7',
     tx:19, ty:41,
     dialogue:"The coastal waters are teeming with fish, if ye know where to look. Buy a rod and try yer luck!",
     shop: ['fishing_rod','shrimp'],
     trainer: 'fishing',
   },
   brynn: {
-    id:'brynn', name:'Guard Captain Brynn', glyph:'B', color:'#e94560',
+    id:'brynn', name:'Guard Captain Brynn', glyph:'B', emoji:'💂', color:'#e94560',
     tx:22, ty:39,
     dialogue:"Stay within town walls if you value your life. The Goblin Warren to the east is dangerous — but worth the risk for seasoned fighters.",
   },
   theron: {
-    id:'theron', name:'Theron Ironhand', glyph:'T', color:'#f5a623',
+    id:'theron', name:'Theron Ironhand', glyph:'T', emoji:'⚒️', color:'#f5a623',
     tx:54, ty:24,
     dialogue:"Mithril is the finest metal in the land. Train your Smithing and I'll teach you to forge it.",
     shop: ['steel_sword','mithril_sword','plate_chest','plate_legs'],
     trainer: 'smithing',
   },
   yaleth: {
-    id:'yaleth', name:'Sister Yaleth', glyph:'Y', color:'#4ecca3',
+    id:'yaleth', name:'Sister Yaleth', glyph:'Y', emoji:'✨', color:'#4ecca3',
     tx:56, ty:25,
     dialogue:"May the light guide you. I sell potions to help the wounded. Stay safe out there.",
     shop: ['health_potion','strength_potion','defence_potion'],
   },
   dax: {
-    id:'dax', name:'Ranger Dax', glyph:'D', color:'#a5d6a7',
+    id:'dax', name:'Ranger Dax', glyph:'D', emoji:'🏹', color:'#a5d6a7',
     tx:54, ty:26,
     dialogue:"A ranged fighter never has to get their hands dirty. Shortbow, longbow — I have them all.",
     shop: ['shortbow','longbow','arrows'],
     trainer: 'ranged',
   },
   voss: {
-    id:'voss', name:'Guildmaster Voss', glyph:'V', color:'#ce93d8',
+    id:'voss', name:'Guildmaster Voss', glyph:'V', emoji:'📜', color:'#ce93d8',
     tx:56, ty:24,
     dialogue:"The Adventurers' Guild tracks all skill achievements. Keep training and your name will echo through the ages.",
   },
   ceel: {
-    id:'ceel', name:'Harbormaster Ceel', glyph:'C', color:'#4fc3f7',
+    id:'ceel', name:'Harbormaster Ceel', glyph:'C', emoji:'⚓', color:'#4fc3f7',
     tx:19, ty:64,
     dialogue:"Ironport is the gateway to the deep sea. With the right fishing level, the oceans will give up their secrets.",
     trainer: 'fishing',
   },
   lenne: {
-    id:'lenne', name:'Crafter Lenne', glyph:'L', color:'#ce93d8',
+    id:'lenne', name:'Crafter Lenne', glyph:'L', emoji:'🧵', color:'#ce93d8',
     tx:21, ty:65,
     dialogue:"Dragonhide armour is the finest leather work. If you can get the scales, I can teach you to craft it.",
     shop: ['leather_armour','hard_leather_body','crafting_kit'],
     trainer: 'crafting',
   },
   zephyr: {
-    id:'zephyr', name:'Zephyr the Mage', glyph:'Z', color:'#4fc3f7',
+    id:'zephyr', name:'Zephyr the Mage', glyph:'Z', emoji:'🔮', color:'#4fc3f7',
     tx:20, ty:66,
     dialogue:"Magic is the great equalizer. Buy runes from me and learn to harness the elements.",
     shop: ['fire_staff','rune_shard','mana_potion'],
     trainer: 'magic',
   },
   shade: {
-    id:'shade', name:'Shade', glyph:'S', color:'#555',
+    id:'shade', name:'Shade', glyph:'S', emoji:'🕵️', color:'#555',
     tx:22, ty:65,
     dialogue:"...You weren't supposed to see me. But since you're here — I can teach you the ways of shadow.",
     trainer: 'stealth',
