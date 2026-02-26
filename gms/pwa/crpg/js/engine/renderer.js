@@ -7,6 +7,7 @@ let camX = 0, camY = 0; // camera top-left in tile coords (float)
 let vpW = 0, vpH = 0;   // viewport size in tiles
 
 const LERP_SPEED = 0.12;
+let _cameraSnapped = false;   // true after first valid snap
 
 // Destination marker — set by main.js each frame
 let _destMarker = null;  // { x, y } in tile coords
@@ -45,8 +46,15 @@ export function updateCamera(px, py) {
   const h = canvas.height || 400;
   const targetX = px - (w / TILE_SIZE) / 2;
   const targetY = py - (h / TILE_SIZE) / 2;
-  camX += (targetX - camX) * LERP_SPEED;
-  camY += (targetY - camY) * LERP_SPEED;
+  // Snap instantly on the first frame where the canvas is properly sized
+  if (!_cameraSnapped && canvas.width > 0) {
+    camX = targetX;
+    camY = targetY;
+    _cameraSnapped = true;
+  } else {
+    camX += (targetX - camX) * LERP_SPEED;
+    camY += (targetY - camY) * LERP_SPEED;
+  }
 }
 
 export function worldToScreen(tx, ty) {

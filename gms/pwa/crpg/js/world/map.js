@@ -70,8 +70,8 @@ export class WorldMap {
       }
     }
 
-    // 7. Rivers
-    this._drawRiver(20, 0, 20, 40, rng);
+    // 7. Rivers — stop river 6 tiles north of Ashvale (20,40) to avoid blocking spawn
+    this._drawRiver(20, 0, 20, 34, rng);
     this._drawRiver(40, 78, 55, 40, rng);
 
     // 8. Roads between towns
@@ -147,6 +147,13 @@ export class WorldMap {
       }
       // Door
       this.set(bx + 1, by + 2, TILES.DOOR);
+    }
+    // Force-clear the walkable core around the town centre (overrides any water)
+    for (let y = cy - 2; y <= cy + 2; y++) {
+      for (let x = cx - 2; x <= cx + 2; x++) {
+        const t = this.get(x, y);
+        if (t !== TILES.BUILDING && t !== TILES.DOOR) this.set(x, y, TILES.ROAD);
+      }
     }
   }
 
