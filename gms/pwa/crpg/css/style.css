@@ -487,6 +487,45 @@ html, body {
 .item-popup-btn:active { opacity: 0.8; }
 .item-popup-btn.danger { background: var(--danger); }
 
+/* ===== MONSTER INFO POPUP ===== */
+.monster-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--panel-bg);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px 12px;
+  min-width: 190px;
+  z-index: 55;
+  animation: popIn 0.2s ease-out;
+}
+.monster-info.hidden { display: none; }
+.mi-name {
+  font-size: 15px; font-weight: bold; color: var(--white);
+  text-align: center; margin-bottom: 8px;
+}
+.mi-hp-wrap { margin-bottom: 6px; }
+.mi-hp-bar-bg {
+  height: 8px; background: rgba(0,0,0,0.5);
+  border: 1px solid #333; border-radius: 4px; overflow: hidden;
+}
+.mi-hp-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.mi-hp-text { font-size: 10px; color: var(--dim); text-align: right; margin-top: 2px; }
+.mi-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4px 10px; font-size: 11px; color: var(--dim); margin: 8px 0;
+}
+.mi-stats b { color: var(--white); }
+.mi-close-btn {
+  width: 100%; padding: 7px; font-family: var(--font); font-size: 11px;
+  background: var(--danger); border: none; color: #fff;
+  border-radius: 4px; cursor: pointer; margin-top: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.mi-close-btn:active { opacity: 0.8; }
+
 /* ===== TEST PANEL ===== */
 .test-results { font-size: 11px; }
 .test-suite { margin-bottom: 12px; }
