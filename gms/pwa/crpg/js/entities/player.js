@@ -110,6 +110,11 @@ export class Player {
     return (st.player.skills.attack?.level || 1) + getEquipBonus('atk') + getBuffBonus('atk');
   }
 
+  getStrengthStat() {
+    const st = getState();
+    return (st.player.skills.strength?.level || 1) + getEquipBonus('str') + getBuffBonus('str');
+  }
+
   getDefenceStat() {
     const st = getState();
     return (st.player.skills.defence?.level || 1) + getEquipBonus('def') + getBuffBonus('def');

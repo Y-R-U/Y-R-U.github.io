@@ -1,7 +1,7 @@
 // ===== Skill Tasks (gathering, crafting, etc.) =====
 import { SKILL_TASKS, ITEMS } from '../config.js';
 import { doSkillAction, isTaskUnlocked } from './skillEngine.js';
-import { addToBackpack, hasItem, removeFromBackpack } from '../state.js';
+import { addToBackpack, hasItem, removeFromBackpack, addBuff } from '../state.js';
 import { showXP, showFloatText } from '../engine/particles.js';
 import { playPickup } from '../engine/audio.js';
 
@@ -92,7 +92,6 @@ export function tryCook(taskId, player) {
 // ===== Use consumable item =====
 export function useItem(itemId, player) {
   if (!hasItem(itemId)) return false;
-  const { ITEMS } = _items;
   const item = ITEMS[itemId];
   if (!item) return false;
 
@@ -106,23 +105,22 @@ export function useItem(itemId, player) {
     }
   }
   if (item.type === 'potion' && item.buffAtk) {
-    const { addBuff } = _stateRef;
     addBuff('str_pot', 'atk', item.buffAtk, item.buffDur || 60);
     removeFromBackpack(itemId, 1);
     showFloatText(player.x, player.y, `+${item.buffAtk} ATK`, '#FF8F00');
     return true;
   }
   if (item.type === 'potion' && item.buffDef) {
-    const { addBuff } = _stateRef;
     addBuff('def_pot', 'def', item.buffDef, item.buffDur || 60);
     removeFromBackpack(itemId, 1);
     showFloatText(player.x, player.y, `+${item.buffDef} DEF`, '#4ecca3');
     return true;
   }
+  if (item.type === 'potion' && item.mana) {
+    addBuff('mana_pot', 'mag', item.mana, item.buffDur || 60);
+    removeFromBackpack(itemId, 1);
+    showFloatText(player.x, player.y, `+${item.mana} MAG`, '#4fc3f7');
+    return true;
+  }
   return false;
 }
-
-let _items = { ITEMS: {} };
-let _stateRef = {};
-import('../config.js').then(m => { _items.ITEMS = m.ITEMS; });
-import('../state.js').then(m => { _stateRef = m; });
