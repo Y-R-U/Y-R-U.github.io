@@ -8,6 +8,7 @@ export class Enemy {
     this.id       = `${typeId}_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
     this.name     = def.name;
     this.glyph    = def.glyph;
+    this.emoji    = def.emoji || null;
     this.color    = def.color;
     this.bgColor  = '#1a0a0a';
     this.x        = x;

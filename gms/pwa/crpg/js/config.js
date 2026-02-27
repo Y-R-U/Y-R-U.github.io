@@ -25,6 +25,7 @@ export function totalXpForLevel(n) {
 // ===== SKILLS =====
 export const SKILLS = {
   attack:      { id: 'attack',      name: 'Attack',      glyph: 'A', color: '#e94560' },
+  strength:    { id: 'strength',    name: 'Strength',    glyph: 'S', color: '#FF8F00' },
   defence:     { id: 'defence',     name: 'Defence',     glyph: 'D', color: '#4ecca3' },
   hitpoints:   { id: 'hitpoints',   name: 'Hitpoints',   glyph: 'H', color: '#e94560' },
   magic:       { id: 'magic',       name: 'Magic',       glyph: 'M', color: '#4fc3f7' },
@@ -312,11 +313,11 @@ export const ITEMS = {
   mana_potion:   { id:'mana_potion',   name:'Mana Potion',    glyph:'!', color:'#4fc3f7', type:'potion',  mana:30,  stackable:true,  value:60  },
 
   // Weapons
-  bronze_sword:  { id:'bronze_sword',  name:'Bronze Sword',   glyph:'/', color:'#8D6E63', type:'weapon', slot:'weapon', atkBonus:3,  reqAtk:1,  value:40  },
-  iron_sword:    { id:'iron_sword',    name:'Iron Sword',     glyph:'/', color:'#9E9E9E', type:'weapon', slot:'weapon', atkBonus:7,  reqAtk:5,  value:120 },
-  steel_sword:   { id:'steel_sword',   name:'Steel Sword',    glyph:'/', color:'#78909C', type:'weapon', slot:'weapon', atkBonus:13, reqAtk:20, value:300 },
-  mithril_sword: { id:'mithril_sword', name:'Mithril Sword',  glyph:'/', color:'#4ecca3', type:'weapon', slot:'weapon', atkBonus:22, reqAtk:40, value:800 },
-  dragon_sword:  { id:'dragon_sword',  name:'Dragon Sword',   glyph:'/', color:'#FF8F00', type:'weapon', slot:'weapon', atkBonus:35, reqAtk:60, value:5000},
+  bronze_sword:  { id:'bronze_sword',  name:'Bronze Sword',   glyph:'/', color:'#8D6E63', type:'weapon', slot:'weapon', atkBonus:3,  strBonus:2,  reqAtk:1,  reqStr:1,  value:40  },
+  iron_sword:    { id:'iron_sword',    name:'Iron Sword',     glyph:'/', color:'#9E9E9E', type:'weapon', slot:'weapon', atkBonus:7,  strBonus:6,  reqAtk:5,  reqStr:5,  value:120 },
+  steel_sword:   { id:'steel_sword',   name:'Steel Sword',    glyph:'/', color:'#78909C', type:'weapon', slot:'weapon', atkBonus:13, strBonus:12, reqAtk:20, reqStr:20, value:300 },
+  mithril_sword: { id:'mithril_sword', name:'Mithril Sword',  glyph:'/', color:'#4ecca3', type:'weapon', slot:'weapon', atkBonus:22, strBonus:20, reqAtk:40, reqStr:40, value:800 },
+  dragon_sword:  { id:'dragon_sword',  name:'Dragon Sword',   glyph:'/', color:'#FF8F00', type:'weapon', slot:'weapon', atkBonus:35, strBonus:33, reqAtk:60, reqStr:60, value:5000},
   shortbow:      { id:'shortbow',      name:'Shortbow',       glyph:')', color:'#8D6E63', type:'weapon', slot:'weapon', rngBonus:5,  reqRng:10, value:100 },
   longbow:       { id:'longbow',       name:'Longbow',        glyph:')', color:'#6D4C41', type:'weapon', slot:'weapon', rngBonus:15, reqRng:30, value:400 },
   fire_staff:    { id:'fire_staff',    name:'Fire Staff',     glyph:'|', color:'#FF5722', type:'weapon', slot:'weapon', magBonus:18, reqMag:20, value:600 },
@@ -335,6 +336,7 @@ export const ITEMS = {
   hard_leather_body:{ id:'hard_leather_body', name:'Hard Leather Body', glyph:']', color:'#6D4C41', type:'armour', slot:'chest', defBonus:4, reqDef:10, value:150 },
   iron_platebody:{ id:'iron_platebody',name:'Iron Platebody', glyph:']', color:'#9E9E9E', type:'armour', slot:'chest', defBonus:5,  reqDef:5,  value:200 },
   plate_chest:   { id:'plate_chest',   name:'Plate Chest',    glyph:']', color:'#607D8B', type:'armour', slot:'chest', defBonus:11, reqDef:40, value:1200},
+  plate_legs:    { id:'plate_legs',    name:'Plate Legs',     glyph:']', color:'#607D8B', type:'armour', slot:'legs',  defBonus:9,  reqDef:40, value:900 },
 
   // Shields
   iron_shield:   { id:'iron_shield',   name:'Iron Shield',    glyph:')', color:'#9E9E9E', type:'shield', slot:'offhand', defBonus:4, reqDef:5,  value:100 },

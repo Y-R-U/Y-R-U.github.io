@@ -117,13 +117,14 @@ export function setSkillLevel(id, level) {
 // ===== Combat Level calc (RS-style) =====
 export function calcCombatLevel() {
   const s = _state.player.skills;
-  const atk  = (s.attack?.level  || 1);
-  const def  = (s.defence?.level || 1);
+  const atk  = (s.attack?.level   || 1);
+  const str  = (s.strength?.level || 1);
+  const def  = (s.defence?.level  || 1);
   const hp   = (s.hitpoints?.level || 1);
-  const mag  = (s.magic?.level   || 1);
-  const rng  = (s.ranged?.level  || 1);
+  const mag  = (s.magic?.level    || 1);
+  const rng  = (s.ranged?.level   || 1);
   return Math.max(1, Math.floor(
-    (atk + def + hp) / 3 + Math.max(mag, rng) / 6
+    (atk + str + def + hp) / 4 + Math.max(mag, rng) / 6
   ));
 }
 
@@ -223,6 +224,7 @@ export function getEquipBonus(stat) {
     const item = _getItemDef(slot.id);
     if (!item) continue;
     if (stat === 'atk' && item.atkBonus) total += item.atkBonus;
+    if (stat === 'str' && item.strBonus) total += item.strBonus;
     if (stat === 'def' && item.defBonus) total += item.defBonus;
     if (stat === 'mag' && item.magBonus) total += item.magBonus;
     if (stat === 'rng' && item.rngBonus) total += item.rngBonus;

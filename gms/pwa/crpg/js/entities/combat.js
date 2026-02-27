@@ -72,7 +72,8 @@ function _doPlayerAttack(player, enemy) {
   // Determine attack type based on equipped weapon
   const weapon = st.inventory.equipped.weapon;
   let atkType = 'melee';
-  let atkStat = player.getAttackStat();
+  let atkStat = player.getAttackStat();   // accuracy
+  let strStat = player.getStrengthStat(); // max hit (melee only)
 
   if (weapon) {
     const { ITEMS } = _lazyItems();
@@ -83,7 +84,7 @@ function _doPlayerAttack(player, enemy) {
     }
   }
 
-  // Miss chance
+  // Miss chance (based on attack/accuracy stat)
   const missChance = Math.max(0, 0.15 - atkSkill * 0.002);
   if (Math.random() < missChance) {
     showDamage(enemy.x, enemy.y, 'MISS');
@@ -101,8 +102,13 @@ function _doPlayerAttack(player, enemy) {
     }
   }
 
-  // Damage
-  const raw = (atkStat * (0.8 + Math.random() * 0.4)) - enemy.def;
+  // Damage — melee uses strength for max hit; ranged/magic use their skill stat
+  let raw;
+  if (atkType === 'melee') {
+    raw = (strStat * (0.8 + Math.random() * 0.4)) - enemy.def;
+  } else {
+    raw = (atkStat * (0.8 + Math.random() * 0.4)) - enemy.def;
+  }
   const dmg = Math.max(1, Math.floor(raw));
 
   enemy.takeDamage(dmg);
@@ -112,11 +118,12 @@ function _doPlayerAttack(player, enemy) {
   else spawnHit(enemy.x, enemy.y);
   playHit();
 
-  // Award XP
+  // Award XP per hit
   const xpMulti = Math.max(1, Math.floor(dmg * 0.1));
   if (atkType === 'melee') {
-    awardXP('attack',    Math.floor(enemy.xp * 0.06 * xpMulti), player);
-    awardXP('hitpoints', Math.floor(enemy.xp * 0.04 * xpMulti), player);
+    awardXP('attack',    Math.floor(enemy.xp * 0.04 * xpMulti), player);
+    awardXP('strength',  Math.floor(enemy.xp * 0.04 * xpMulti), player);
+    awardXP('hitpoints', Math.floor(enemy.xp * 0.02 * xpMulti), player);
   } else if (atkType === 'ranged') {
     awardXP('ranged',    Math.floor(enemy.xp * 0.06 * xpMulti), player);
     awardXP('hitpoints', Math.floor(enemy.xp * 0.04 * xpMulti), player);
@@ -167,7 +174,8 @@ async function _onEnemyKill(enemy, atkType, player) {
   // XP on kill
   const killXP = enemy.xp;
   if (atkType === 'melee') {
-    awardXP('attack',    Math.floor(killXP * 0.6), player);
+    awardXP('attack',    Math.floor(killXP * 0.3), player);
+    awardXP('strength',  Math.floor(killXP * 0.3), player);
     awardXP('hitpoints', Math.floor(killXP * 0.4), player);
   } else if (atkType === 'ranged') {
     awardXP('ranged',    Math.floor(killXP * 0.6), player);
