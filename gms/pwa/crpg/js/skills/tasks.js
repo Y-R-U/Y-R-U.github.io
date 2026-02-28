@@ -1,6 +1,6 @@
 // ===== Skill Tasks (gathering, crafting, etc.) =====
 import { SKILL_TASKS, ITEMS } from '../config.js';
-import { doSkillAction, isTaskUnlocked } from './skillEngine.js';
+import { doSkillAction, isTaskUnlocked, awardXP } from './skillEngine.js';
 import { addToBackpack, hasItem, removeFromBackpack, addBuff, getState, setSkillLevel } from '../state.js';
 import { showXP, showFloatText } from '../engine/particles.js';
 import { playPickup } from '../engine/audio.js';
@@ -101,6 +101,8 @@ export function useItem(itemId, player) {
       player.heal(hp);
       removeFromBackpack(itemId, 1);
       showFloatText(player.x, player.y, `+${hp} HP`, '#5f5');
+      // Food gives cooking XP (eating = you prepared it)
+      if (item.type === 'food') awardXP('cooking', hp, player);
       return true;
     }
   }

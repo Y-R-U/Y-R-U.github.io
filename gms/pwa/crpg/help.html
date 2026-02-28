@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+  <title>CRPG: Lands of Ascii — Help &amp; Guide</title>
+  <style>
+    :root {
+      --bg:      #0f3460;
+      --panel:   #16213e;
+      --accent:  #4ecca3;
+      --gold:    #f5a623;
+      --danger:  #e94560;
+      --text:    #ccc;
+      --white:   #fff;
+      --dim:     #888;
+      --font:    'Courier New', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.7;
+      padding: 0 0 40px 0;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 3px solid var(--accent);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    header h1 {
+      color: var(--white);
+      font-size: 15px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .toc {
+      background: var(--panel);
+      border-bottom: 1px solid #1e3a5f;
+      padding: 10px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+    }
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .toc a:hover { text-decoration: underline; }
+    section {
+      padding: 18px 18px 8px;
+      border-bottom: 1px solid #1e3a5f;
+    }
+    h2 {
+      color: var(--accent);
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #1e3a5f;
+    }
+    h3 {
+      color: var(--gold);
+      font-size: 12px;
+      margin: 12px 0 6px;
+      text-transform: uppercase;
+    }
+    p { margin-bottom: 8px; }
+    ul, ol { margin: 6px 0 10px 18px; }
+    li { margin-bottom: 4px; }
+    .tip {
+      background: rgba(78, 204, 163, 0.08);
+      border-left: 3px solid var(--accent);
+      padding: 8px 12px;
+      margin: 8px 0;
+      border-radius: 0 4px 4px 0;
+      font-size: 12px;
+    }
+    .warn {
+      background: rgba(233, 69, 96, 0.08);
+      border-left: 3px solid var(--danger);
+      padding: 8px 12px;
+      margin: 8px 0;
+      border-radius: 0 4px 4px 0;
+      font-size: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 11px;
+    }
+    th {
+      background: #1e3a5f;
+      color: var(--accent);
+      padding: 5px 8px;
+      text-align: left;
+    }
+    td { padding: 4px 8px; border-bottom: 1px solid #1e3a5f; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: bold;
+      background: var(--accent);
+      color: #000;
+      margin-right: 4px;
+    }
+    .badge.gold  { background: var(--gold); }
+    .badge.red   { background: var(--danger); color: #fff; }
+    .badge.grey  { background: #555; color: #aaa; }
+    .skill-icon { font-size: 16px; margin-right: 4px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">← Back to Game</a>
+  <h1>Help &amp; Guide — CRPG: Lands of Ascii</h1>
+</header>
+
+<div class="toc">
+  <a href="#intro">Intro</a>
+  <a href="#controls">Controls</a>
+  <a href="#combat">Combat</a>
+  <a href="#gathering">Gathering Skills</a>
+  <a href="#fishing">Fishing</a>
+  <a href="#woodcutting">Woodcutting</a>
+  <a href="#mining">Mining</a>
+  <a href="#cooking">Cooking</a>
+  <a href="#dungeons">Dungeons</a>
+  <a href="#trading">Trading &amp; Shops</a>
+  <a href="#potions">Potions</a>
+  <a href="#tips">Tips</a>
+</div>
+
+<section id="intro">
+  <h2>Introduction</h2>
+  <p>
+    <strong style="color:var(--white)">CRPG: Lands of Ascii</strong> is a mobile-first RPG inspired by classic
+    tile-based games. Explore three towns, battle monsters in the wild, clear dungeons,
+    gather resources, and level up 13 skills.
+  </p>
+  <div class="tip">This game auto-saves on every level-up. Use the <strong>Save</strong> button in the
+  Menu tab to save manually at any time.</div>
+</section>
+
+<section id="controls">
+  <h2>Controls</h2>
+  <h3>Movement</h3>
+  <ul>
+    <li><strong>Tap / Click</strong> any walkable tile to walk there automatically.</li>
+    <li>Your character navigates around obstacles using pathfinding.</li>
+    <li><strong>Mountain tiles</strong> (grey ^ peaks) are passable but slow you to 35% speed.</li>
+  </ul>
+  <h3>Attacking</h3>
+  <ul>
+    <li><strong>Tap an enemy</strong> to target it and walk toward it — combat starts automatically when in range.</li>
+    <li><strong>Tap the same enemy again</strong> (while it is your target) to view its stats card.</li>
+    <li><strong>Long-press / hold (0.6s)</strong> any enemy tile to open its stat card directly.</li>
+  </ul>
+  <h3>Gathering</h3>
+  <ul>
+    <li><strong>Tap a Water tile</strong> (~ waves) adjacent to you to fish.</li>
+    <li><strong>Tap a Tree tile</strong> (T) adjacent to you to chop wood.</li>
+    <li><strong>Tap a Stone tile</strong> (# grey rock) adjacent to you to mine ore.</li>
+    <li><strong>Tap a Building or Door</strong> (= or +) adjacent to you in a town to cook food in your backpack.</li>
+  </ul>
+  <h3>Inventory</h3>
+  <ul>
+    <li>Open the <strong>INV</strong> tab to see equipped gear and your 28-slot backpack.</li>
+    <li>Tap any item to open its popup: <em>Equip / Use / Sell / Drop</em>.</li>
+    <li>Stacked consumables (food, potions) stay open after each use so you can keep eating.</li>
+  </ul>
+</section>
+
+<section id="combat">
+  <h2>Combat Skills</h2>
+  <p>Combat uses three separate skills — just like classic RS-style:</p>
+  <table>
+    <tr><th>Skill</th><th>Affects</th><th>How to train</th></tr>
+    <tr><td>⚔️ Attack</td><td>Accuracy (chance to hit)</td><td>Deal melee damage</td></tr>
+    <tr><td>💪 Strength</td><td>Max hit (damage ceiling)</td><td>Deal melee damage</td></tr>
+    <tr><td>🛡️ Defence</td><td>Damage reduction</td><td>3 ways — see below</td></tr>
+    <tr><td>❤️ Hitpoints</td><td>Max HP (+10 per 10 levels)</td><td>Any combat</td></tr>
+    <tr><td>🏹 Ranged</td><td>Accuracy &amp; damage (bow)</td><td>Equip a bow, attack</td></tr>
+    <tr><td>🔮 Magic</td><td>Accuracy &amp; damage (staff)</td><td>Equip a staff, attack</td></tr>
+  </table>
+
+  <h3>Defence XP — Three Ways</h3>
+  <ul>
+    <li><span class="badge grey">Slow</span> +1 XP every time you land a hit on any enemy.</li>
+    <li><span class="badge">Fast</span> +5 XP when you successfully block with a shield equipped.</li>
+    <li><span class="badge gold">Fastest</span> XP proportional to damage taken when an enemy hits you.</li>
+  </ul>
+  <div class="tip">Equip a shield (offhand slot) to unlock blocking and speed up Defence training significantly.</div>
+
+  <h3>Weapons &amp; Armour Requirements</h3>
+  <p>All gear has low requirements so you can equip it early:</p>
+  <table>
+    <tr><th>Item</th><th>Req</th></tr>
+    <tr><td>Bronze Sword</td><td>Atk 1 / Str 1</td></tr>
+    <tr><td>Iron Sword</td><td>Atk 1 / Str 1</td></tr>
+    <tr><td>Steel Sword</td><td>Atk 5 / Str 5</td></tr>
+    <tr><td>Mithril Sword</td><td>Atk 10 / Str 10</td></tr>
+    <tr><td>Dragon Sword</td><td>Atk 15 / Str 15</td></tr>
+    <tr><td>Iron / Plate armour</td><td>Def 1–10</td></tr>
+  </table>
+</section>
+
+<section id="gathering">
+  <h2>Gathering Skills Overview</h2>
+  <p>All gathering skills work the same way: <strong>stand adjacent to the resource tile and tap it</strong>.
+  The game automatically picks the best resource tier for your current level.</p>
+  <div class="tip">Your character stays in place when gathering — you do NOT need to path to the tile first.</div>
+</section>
+
+<section id="fishing">
+  <h2>🎣 Fishing</h2>
+  <p>Fish from any <strong>Water (~) tile</strong> that is within 3 tiles of you.</p>
+  <ul>
+    <li>You must have a <strong>Fishing Rod</strong> in your backpack (buy from Mara or Old Finn in Ashvale).</li>
+    <li>Tap the water tile to fish one catch of the best fish available for your level.</li>
+  </ul>
+  <table>
+    <tr><th>Fish</th><th>Fishing Level</th><th>Heal</th><th>XP</th></tr>
+    <tr><td>Shrimp</td><td>1</td><td>+5 HP</td><td>10</td></tr>
+    <tr><td>Trout</td><td>20</td><td>+15 HP</td><td>50</td></tr>
+    <tr><td>Lobster</td><td>40</td><td>+30 HP</td><td>90</td></tr>
+    <tr><td>Shark</td><td>70</td><td>+50 HP</td><td>110</td></tr>
+  </table>
+  <div class="tip">Coastal waters are near Ironport (south). Shrimp spots are plentiful near Ashvale's river.</div>
+</section>
+
+<section id="woodcutting">
+  <h2>🌲 Woodcutting</h2>
+  <p>Chop from any <strong>Tree (T) tile</strong> that is within 3 tiles of you. No tool required.</p>
+  <table>
+    <tr><th>Log</th><th>WC Level</th><th>XP</th><th>Value</th></tr>
+    <tr><td>Oak Log</td><td>1</td><td>25</td><td>5g</td></tr>
+    <tr><td>Willow Log</td><td>20</td><td>68</td><td>15g</td></tr>
+    <tr><td>Maple Log</td><td>40</td><td>100</td><td>30g</td></tr>
+    <tr><td>Yew Log</td><td>70</td><td>175</td><td>70g</td></tr>
+    <tr><td>Magic Log</td><td>85</td><td>250</td><td>200g</td></tr>
+  </table>
+  <p>Logs are currently sell-only materials. Smithing and Crafting will use them in a future update.</p>
+</section>
+
+<section id="mining">
+  <h2>⛏️ Mining</h2>
+  <p>Mine from any <strong>Stone (#) tile</strong> that is within 3 tiles of you. No pickaxe required.</p>
+  <table>
+    <tr><th>Ore</th><th>Mining Level</th><th>XP</th><th>Value</th></tr>
+    <tr><td>Copper Ore</td><td>1</td><td>18</td><td>5g</td></tr>
+    <tr><td>Iron Ore</td><td>15</td><td>35</td><td>12g</td></tr>
+    <tr><td>Gold Ore</td><td>30</td><td>65</td><td>30g</td></tr>
+    <tr><td>Mithril Ore</td><td>50</td><td>120</td><td>80g</td></tr>
+    <tr><td>Runite Ore</td><td>85</td><td>250</td><td>200g</td></tr>
+  </table>
+  <div class="tip">Stone tiles are common in the Haunted Moor and Mountain Pass areas.</div>
+</section>
+
+<section id="cooking">
+  <h2>🍳 Cooking</h2>
+  <p>Cook food by <strong>tapping a Building (=) or Door (+) tile</strong> adjacent to you in any town.
+  The game cooks the best food available for your cooking level from your backpack.</p>
+  <table>
+    <tr><th>Food</th><th>Cooking Level</th><th>XP</th></tr>
+    <tr><td>Shrimp</td><td>1</td><td>30</td></tr>
+    <tr><td>Trout</td><td>15</td><td>70</td></tr>
+    <tr><td>Lobster</td><td>30</td><td>120</td></tr>
+    <tr><td>Shark</td><td>70</td><td>210</td></tr>
+  </table>
+  <div class="tip">Eating food also grants small cooking XP — think of it as "you prepared it before eating".</div>
+  <div class="warn">You need the raw food in your backpack. The town kitchens do the rest.</div>
+</section>
+
+<section id="dungeons">
+  <h2>⚔️ Dungeons</h2>
+  <p>Dungeons are marked with a <strong>&gt; tile</strong> on the world map. Walk on one to get the entry prompt.</p>
+
+  <h3>How Dungeons Work</h3>
+  <ol>
+    <li>Kill all regular enemies to spawn the <strong>boss</strong> (gold star ★).</li>
+    <li>Kill the boss to <strong>unlock the exit</strong> (&lt; tile in top-centre).</li>
+    <li>Walk onto the exit tile to leave with your loot.</li>
+  </ol>
+
+  <h3>Flee</h3>
+  <p>Tap <strong>FLEE</strong> in the entry prompt to leave safely (3-second cooldown before the prompt can re-appear).</p>
+
+  <h3>Dungeons by Difficulty</h3>
+  <table>
+    <tr><th>Dungeon</th><th>Enemies</th><th>Boss</th><th>Reward</th></tr>
+    <tr><td>Goblin Warren</td><td>Goblins</td><td>Goblin King</td><td>Common–Uncommon</td></tr>
+    <tr><td>Bone Crypt</td><td>Skeletons, Ghosts</td><td>Lich</td><td>Uncommon–Rare</td></tr>
+    <tr><td>Ice Cavern</td><td>Ice Wraiths</td><td>Frost Lich</td><td>Rare</td></tr>
+    <tr><td>Dragon Lair</td><td>Dark Knights, Dragonlings</td><td>Ignaroth</td><td>Legendary</td></tr>
+  </table>
+</section>
+
+<section id="trading">
+  <h2>🛒 Trading</h2>
+  <p>Talk to any NPC with a <strong>Trade</strong> button to open their shop. Buy items with gold (Au).
+  Sell items from your inventory at 50% value using the <strong>Sell</strong> button in the item popup.</p>
+
+  <h3>Town Shops</h3>
+  <table>
+    <tr><th>NPC</th><th>Town</th><th>Sells</th></tr>
+    <tr><td>🔨 Aldric the Smith</td><td>Ashvale</td><td>Bronze sword, Iron sword, Iron shield, Armour</td></tr>
+    <tr><td>🛒 Mara the Merchant</td><td>Ashvale</td><td>Food, Potions, Fishing rod, Str Scroll</td></tr>
+    <tr><td>🎣 Old Finn</td><td>Ashvale</td><td>Fishing rod, Shrimp</td></tr>
+  </table>
+  <p>Cresthold and Ironport have additional merchants with higher-tier goods.</p>
+</section>
+
+<section id="potions">
+  <h2>🧪 Potions</h2>
+  <table>
+    <tr><th>Potion</th><th>Effect</th><th>Duration</th><th>Stacks?</th></tr>
+    <tr><td>Health Potion</td><td>+40 HP instantly</td><td>—</td><td>—</td></tr>
+    <tr><td>Strength Potion</td><td>+5 Strength</td><td>5 minutes</td><td>Yes — extra doses add +4 min &amp; +1 Str</td></tr>
+    <tr><td>Defence Potion</td><td>+5 Defence</td><td>5 minutes</td><td>—</td></tr>
+    <tr><td>Mana Potion</td><td>+30 Magic</td><td>5 minutes</td><td>—</td></tr>
+    <tr><td>Str Scroll</td><td>+1 Strength (permanent)</td><td>Forever</td><td>Each scroll stacks</td></tr>
+  </table>
+  <div class="tip">Str Scrolls are sold by Mara at 500g each — great permanent investment once you have gold.</div>
+</section>
+
+<section id="tips">
+  <h2>💡 Tips &amp; Tricks</h2>
+  <ul>
+    <li>HP regenerates automatically — 1 HP every 5 seconds (faster at high Hitpoints levels).</li>
+    <li>Equip a shield in the offhand slot to unlock blocking and speed up Defence training.</li>
+    <li>Monster loot scales with enemy strength — harder enemies drop better tier items.</li>
+    <li>Bosses always drop a Rare or Legendary item.</li>
+    <li>Use the <strong>🏠 Teleport Home</strong> button in the Menu tab to return to Ashvale from anywhere.</li>
+    <li>Long-press any enemy to see its ATK, DEF, XP, and gold drop before committing to a fight.</li>
+    <li>Mountain tiles slow you — stay on roads when possible for faster travel.</li>
+    <li>Fishing, Woodcutting, and Mining all auto-select the best tier for your current level.</li>
+  </ul>
+
+  <h3>Coming Soon</h3>
+  <ul>
+    <li><span class="badge grey">Smithing</span> — Smelt ores into bars and forge weapons at anvils.</li>
+    <li><span class="badge grey">Crafting</span> — Craft gear and tools from materials.</li>
+    <li><span class="badge grey">Stealth</span> — Sneak past enemies and unlock new areas.</li>
+  </ul>
+</section>
+
+</body>
+</html>

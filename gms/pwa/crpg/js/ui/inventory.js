@@ -141,8 +141,16 @@ function _showItemPopup(itemId, source, sourceIndex) {
   document.getElementById('ipop-use')?.addEventListener('click', () => {
     if (!_currentItemPopup) return;
     window.dispatchEvent(new CustomEvent('crpg:useItem', { detail: { itemId } }));
-    closeItemPopup();
     renderInventory();
+    // Keep popup open if the item still exists in backpack (stackables with qty > 0)
+    const st2 = getState();
+    const remaining = st2.inventory.backpack.find(s => s && s.id === itemId && s.qty > 0);
+    if (remaining) {
+      const newIdx = st2.inventory.backpack.findIndex(s => s && s.id === itemId);
+      _showItemPopup(itemId, 'backpack', newIdx >= 0 ? newIdx : sourceIndex);
+    } else {
+      closeItemPopup();
+    }
   });
 
   document.getElementById('ipop-sell')?.addEventListener('click', () => {
