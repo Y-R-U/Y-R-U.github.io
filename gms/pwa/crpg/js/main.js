@@ -80,6 +80,26 @@ async function boot() {
   // Monster info close button
   document.getElementById('btn-monster-close')?.addEventListener('click', closeMonsterInfo);
 
+  // Home button — teleport to Ashvale
+  document.getElementById('btn-home')?.addEventListener('click', () => {
+    if (!confirm('Teleport back to Ashvale?')) return;
+    const stHome = getState();
+    if (stHome.player.inDungeon) {
+      stHome.player.inDungeon = false;
+      stHome.player.dungeonId = null;
+      dungeon = null;
+      clearTarget();
+      _combatTarget = null;
+    }
+    const town = TOWNS.ashvale;
+    player.x = town.cx + 0.5;
+    player.y = town.cy + 0.5;
+    player.stopPath();
+    stHome.player.x = player.x;
+    stHome.player.y = player.y;
+    switchTab('map');
+  });
+
   // Inventory "use item" event
   window.addEventListener('crpg:useItem', (e) => {
     useItem(e.detail.itemId, player);
@@ -234,31 +254,28 @@ function onTap(wx, wy) {
 
   // ── Dungeon mode ──
   if (st.player.inDungeon && dungeon) {
+    // Use world-coordinate range check so the full sprite tile is clickable
     const enemy = dungeon.enemies.find(e =>
-      !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
+      !e.dead && wx >= e.x && wx < e.x + 1 && wy >= e.y && wy < e.y + 1
     );
     if (enemy) {
       if (enemy === _combatTarget) { showMonsterInfo(enemy); return; }
       _setTargetAndWalk(enemy, map);
       return;
     }
-    // Walk to tapped tile
     _walkTo(wx, wy, map);
     return;
   }
 
   // ── World mode ──
 
-  // NPC — open dialogue (no pathfinding needed, works at any distance)
+  // NPC — open dialogue
   const npc = npcMgr.getNpcNear(wx, wy, 1.5);
-  if (npc) {
-    showDialogue(npc);
-    return;
-  }
+  if (npc) { showDialogue(npc); return; }
 
   // Enemy — tap once to target+walk, tap again while targeted to see stats
   const enemy = spawner.getEnemies().find(e =>
-    !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
+    !e.dead && wx >= e.x && wx < e.x + 1 && wy >= e.y && wy < e.y + 1
   );
   if (enemy) {
     if (enemy === _combatTarget) { showMonsterInfo(enemy); return; }
@@ -266,26 +283,52 @@ function onTap(wx, wy) {
     return;
   }
 
-  // Dungeon entrance glyph — walk to it
+  // Dungeon entrance — walk to it
   if (worldMap.get(tx, ty) === TILES.DUNGEON) {
     _walkTo(wx, wy, map);
     return;
   }
 
-  // Water tile adjacent to player — fish
+  // Water tile adjacent to player — fish (picks best tier for fishing level)
   if (worldMap.get(tx, ty) === TILES.WATER) {
     const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
     if (Math.sqrt(dx*dx + dy*dy) < 3) {
-      import('./skills/tasks.js').then(m => m.tryFish('shrimp', player));
+      const fishLvl = st.player.skills.fishing?.level || 1;
+      const fishTask = fishLvl >= 70 ? 'shark' : fishLvl >= 40 ? 'lobster' : fishLvl >= 20 ? 'trout' : 'shrimp';
+      import('./skills/tasks.js').then(m => m.tryFish(fishTask, player));
       return;
     }
   }
 
-  // Tree tile adjacent to player — chop
+  // Tree tile adjacent to player — chop (picks best tier for WC level)
   if (worldMap.get(tx, ty) === TILES.TREE) {
     const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
     if (Math.sqrt(dx*dx + dy*dy) < 3) {
-      import('./skills/tasks.js').then(m => m.tryChop('oak', player));
+      const wcLvl = st.player.skills.woodcutting?.level || 1;
+      const wcTask = wcLvl >= 85 ? 'magic' : wcLvl >= 70 ? 'yew' : wcLvl >= 40 ? 'maple' : wcLvl >= 20 ? 'willow' : 'oak';
+      import('./skills/tasks.js').then(m => m.tryChop(wcTask, player));
+      return;
+    }
+  }
+
+  // Stone tile adjacent to player — mine (picks best tier for mining level)
+  if (worldMap.get(tx, ty) === TILES.STONE) {
+    const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 3) {
+      const mineLvl = st.player.skills.mining?.level || 1;
+      const mineTask = mineLvl >= 85 ? 'runite_ore' : mineLvl >= 50 ? 'mithril_ore' : mineLvl >= 30 ? 'gold_ore' : mineLvl >= 15 ? 'iron_ore' : 'copper_ore';
+      import('./skills/tasks.js').then(m => m.tryMine(mineTask, player));
+      return;
+    }
+  }
+
+  // Building/door adjacent to player — cook (train cooking at town buildings)
+  if (worldMap.get(tx, ty) === TILES.BUILDING || worldMap.get(tx, ty) === TILES.DOOR) {
+    const dx = tx + 0.5 - player.x, dy = ty + 0.5 - player.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 3) {
+      const cookLvl = st.player.skills.cooking?.level || 1;
+      const cookTask = cookLvl >= 70 ? 'cook_shark' : cookLvl >= 30 ? 'cook_lobster' : cookLvl >= 15 ? 'cook_trout' : 'cook_shrimp';
+      import('./skills/tasks.js').then(m => m.tryCook(cookTask, player));
       return;
     }
   }
@@ -323,12 +366,27 @@ function _setTargetAndWalk(enemy, map) {
 
 // ===== Long-press: show monster stat popup =====
 function onHold(wx, wy) {
-  const st  = getState();
-  const tx  = Math.floor(wx), ty = Math.floor(wy);
+  const st      = getState();
   const enemies = st.player.inDungeon ? dungeon?.enemies : spawner.getEnemies();
   if (!enemies) return;
-  const enemy = enemies.find(e => !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty);
+  const enemy = enemies.find(e =>
+    !e.dead && wx >= e.x && wx < e.x + 1 && wy >= e.y && wy < e.y + 1
+  );
   if (enemy) showMonsterInfo(enemy);
+}
+
+// Find nearest walkable tile to (cx,cy) — used for safe dungeon exit/flee placement
+function _findSafeSpawn(cx, cy, map) {
+  const tx = Math.floor(cx), ty = Math.floor(cy);
+  for (let r = 0; r <= 6; r++) {
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (r > 0 && Math.abs(dx) !== r && Math.abs(dy) !== r) continue;
+        if (map.isWalkable(tx + dx, ty + dy)) return { x: tx + dx + 0.5, y: ty + dy + 0.5 };
+      }
+    }
+  }
+  return { x: cx, y: cy };
 }
 
 function showMonsterInfo(enemy) {
@@ -370,12 +428,13 @@ function onDungeonEntrance(dungeonId) {
     () => enterDungeon(dungeonId),
     () => {
       _pendingDungeon = null;
-      _fleeCooldown   = Date.now() + 3000;      // 3 s before prompt can re-fire
-      // Move player one tile south of entrance (same placement as exitDungeon)
+      _fleeCooldown   = Date.now() + 3000;
+      // Place player at the nearest safe tile south of entrance
       const cfg = DUNGEONS[dungeonId];
       if (cfg) {
-        player.x = cfg.entrance.wx + 0.5;
-        player.y = cfg.entrance.wy + 1.5;
+        const safe = _findSafeSpawn(cfg.entrance.wx + 0.5, cfg.entrance.wy + 1.5, worldMap);
+        player.x = safe.x;
+        player.y = safe.y;
       }
     }
   );
@@ -407,8 +466,11 @@ function exitDungeon() {
   st.world.dungeonCooldowns[dungeon.dungeonId] = Date.now() + 600000;
   fadeToBlack(() => {
     const entrance = DUNGEONS[dungeon.dungeonId]?.entrance;
-    player.x = (entrance?.wx ?? 20) + 0.5;
-    player.y = (entrance?.wy ?? 40) + 1.5;
+    const rawX = (entrance?.wx ?? 20) + 0.5;
+    const rawY = (entrance?.wy ?? 40) + 1.5;
+    const safe = _findSafeSpawn(rawX, rawY, worldMap);
+    player.x = safe.x;
+    player.y = safe.y;
     player.stopPath();
     st.player.x = player.x;
     st.player.y = player.y;

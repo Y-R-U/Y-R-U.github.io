@@ -359,6 +359,20 @@ export const ITEMS = {
   arrows:      { id:'arrows',      name:'Arrows',      glyph:'|', color:'#8D6E63', type:'ammo',    stackable:true, value:1   },
   fishing_rod: { id:'fishing_rod', name:'Fishing Rod', glyph:'/', color:'#8D6E63', type:'tool',    value:20  },
   crafting_kit:{ id:'crafting_kit',name:'Crafting Kit',glyph:'+', color:'#ce93d8', type:'tool',    value:50  },
+
+  // Mining ores (stackable raw materials)
+  copper_ore:  { id:'copper_ore',  name:'Copper Ore',  glyph:'o', color:'#b87333', type:'material', stackable:true, value:5   },
+  iron_ore:    { id:'iron_ore',    name:'Iron Ore',    glyph:'o', color:'#9E9E9E', type:'material', stackable:true, value:12  },
+  gold_ore:    { id:'gold_ore',    name:'Gold Ore',    glyph:'o', color:'#f5a623', type:'material', stackable:true, value:30  },
+  mithril_ore: { id:'mithril_ore', name:'Mithril Ore', glyph:'o', color:'#4ecca3', type:'material', stackable:true, value:80  },
+  runite_ore:  { id:'runite_ore',  name:'Runite Ore',  glyph:'o', color:'#e94560', type:'material', stackable:true, value:200 },
+
+  // Woodcutting logs (stackable raw materials)
+  oak_log:     { id:'oak_log',     name:'Oak Log',     glyph:'l', color:'#8D6E63', type:'material', stackable:true, value:5   },
+  willow_log:  { id:'willow_log',  name:'Willow Log',  glyph:'l', color:'#a5d6a7', type:'material', stackable:true, value:15  },
+  maple_log:   { id:'maple_log',   name:'Maple Log',   glyph:'l', color:'#FF8F00', type:'material', stackable:true, value:30  },
+  yew_log:     { id:'yew_log',     name:'Yew Log',     glyph:'l', color:'#4ecca3', type:'material', stackable:true, value:70  },
+  magic_log:   { id:'magic_log',   name:'Magic Log',   glyph:'l', color:'#9C27B0', type:'material', stackable:true, value:200 },
 };
 
 // ===== TILE TYPES =====
@@ -418,7 +432,7 @@ export const TILE_WALKABLE = {
   [4]: true,
   [5]: true,
   [6]: true,
-  [7]: false,
+  [7]: true,    // MOUNTAIN: passable but slow (player.js applies 0.35× speed)
   [8]: true,
   [9]: false,
   [10]:true,

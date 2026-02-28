@@ -1,6 +1,6 @@
 // ===== Player Entity — path-following movement =====
 import { getState, getEquipBonus, getBuffBonus, calcMaxHp } from '../state.js';
-import { AGGRO_RADIUS } from '../config.js';
+import { AGGRO_RADIUS, TILES } from '../config.js';
 
 const MOVE_SPEED = 0.085; // tiles per frame  (~5 tiles/sec at 60fps)
 
@@ -43,15 +43,19 @@ export class Player {
       const dy   = wp.y - this.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist <= MOVE_SPEED) {
+      // Mountain tiles slow movement to 35% speed
+      const curTile = worldMap ? worldMap.get(Math.floor(this.x), Math.floor(this.y)) : 0;
+      const speed   = curTile === TILES.MOUNTAIN ? MOVE_SPEED * 0.35 : MOVE_SPEED;
+
+      if (dist <= speed) {
         // Snap to waypoint and advance
         this.x = wp.x;
         this.y = wp.y;
         this.path.shift();
         if (this.path.length === 0) this.destMarker = null;
       } else {
-        const nx = this.x + (dx / dist) * MOVE_SPEED;
-        const ny = this.y + (dy / dist) * MOVE_SPEED;
+        const nx = this.x + (dx / dist) * speed;
+        const ny = this.y + (dy / dist) * speed;
 
         if (worldMap) {
           const canX = worldMap.isWalkable(nx, this.y);
