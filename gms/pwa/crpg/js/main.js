@@ -62,7 +62,7 @@ async function boot() {
   // Engine init
   initRenderer();
   setScreenToWorld(screenToWorld);   // break the circular renderer↔input dep
-  initInput(onTap);
+  initInput(onTap, onHold);
 
   // UI init
   initHUD();
@@ -76,6 +76,9 @@ async function boot() {
     const panel = document.getElementById('panel-skills');
     if (panel && !panel.classList.contains('hidden')) renderSkillsPanel();
   });
+
+  // Monster info close button
+  document.getElementById('btn-monster-close')?.addEventListener('click', closeMonsterInfo);
 
   // Inventory "use item" event
   window.addEventListener('crpg:useItem', (e) => {
@@ -235,6 +238,7 @@ function onTap(wx, wy) {
       !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
     );
     if (enemy) {
+      if (enemy === _combatTarget) { showMonsterInfo(enemy); return; }
       _setTargetAndWalk(enemy, map);
       return;
     }
@@ -252,11 +256,12 @@ function onTap(wx, wy) {
     return;
   }
 
-  // Enemy — walk toward and target
+  // Enemy — tap once to target+walk, tap again while targeted to see stats
   const enemy = spawner.getEnemies().find(e =>
     !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty
   );
   if (enemy) {
+    if (enemy === _combatTarget) { showMonsterInfo(enemy); return; }
     _setTargetAndWalk(enemy, map);
     return;
   }
@@ -316,6 +321,42 @@ function _setTargetAndWalk(enemy, map) {
   }
 }
 
+// ===== Long-press: show monster stat popup =====
+function onHold(wx, wy) {
+  const st  = getState();
+  const tx  = Math.floor(wx), ty = Math.floor(wy);
+  const enemies = st.player.inDungeon ? dungeon?.enemies : spawner.getEnemies();
+  if (!enemies) return;
+  const enemy = enemies.find(e => !e.dead && Math.floor(e.x) === tx && Math.floor(e.y) === ty);
+  if (enemy) showMonsterInfo(enemy);
+}
+
+function showMonsterInfo(enemy) {
+  const popup = document.getElementById('monster-info');
+  if (!popup) return;
+  const hpPct    = Math.max(0, Math.min(100, (enemy.hp / enemy.maxHp) * 100));
+  const hpColor  = hpPct > 50 ? '#4ecca3' : hpPct > 25 ? '#f5a623' : '#e94560';
+  const goldMin  = enemy.gold?.[0] ?? 0;
+  const goldMax  = enemy.gold?.[1] ?? 0;
+  const nameEl   = popup.querySelector('#mi-name');
+  const hpBar    = popup.querySelector('#mi-hp-bar');
+  const hpTxt    = popup.querySelector('#mi-hp-text');
+  const statsEl  = popup.querySelector('#mi-stats');
+  if (nameEl)  nameEl.textContent  = `${enemy.emoji || enemy.glyph} ${enemy.name}`;
+  if (hpBar)   { hpBar.style.width = hpPct + '%'; hpBar.style.background = hpColor; }
+  if (hpTxt)   hpTxt.textContent   = `${Math.max(0, Math.floor(enemy.hp))} / ${enemy.maxHp}`;
+  if (statsEl) statsEl.innerHTML   =
+    `<div>⚔️ ATK <b>${enemy.atk}</b></div>` +
+    `<div>🛡️ DEF <b>${enemy.def}</b></div>` +
+    `<div>⭐ XP  <b>${enemy.xp}</b></div>` +
+    `<div>💰 Gold <b>${goldMin}–${goldMax}</b></div>`;
+  popup.classList.remove('hidden');
+}
+
+function closeMonsterInfo() {
+  document.getElementById('monster-info')?.classList.add('hidden');
+}
+
 // ===== Dungeon Entry / Exit =====
 let _pendingDungeon = null;
 let _fleeCooldown   = 0;   // unix ms — don't re-trigger dungeon prompt during this window
@@ -330,25 +371,18 @@ function onDungeonEntrance(dungeonId) {
     () => {
       _pendingDungeon = null;
       _fleeCooldown   = Date.now() + 3000;      // 3 s before prompt can re-fire
-      // Nudge player one tile south so they leave the dungeon entrance tile
+      // Move player one tile south of entrance (same placement as exitDungeon)
       const cfg = DUNGEONS[dungeonId];
       if (cfg) {
-        const ex = cfg.entrance.wx, ey = cfg.entrance.wy;
-        const dirs = [{x:0,y:1},{x:0,y:-1},{x:1,y:0},{x:-1,y:0}];
-        for (const d of dirs) {
-          if (worldMap.isWalkable(ex + d.x, ey + d.y)) {
-            player.x = ex + d.x + 0.5;
-            player.y = ey + d.y + 0.5;
-            break;
-          }
-        }
+        player.x = cfg.entrance.wx + 0.5;
+        player.y = cfg.entrance.wy + 1.5;
       }
     }
   );
 }
 
 function enterDungeon(dungeonId) {
-  _pendingDungeon = null;
+  // _pendingDungeon stays set until we're fully inside — prevents double modal during fade
   const st = getState();
   fadeToBlack(() => {
     dungeon = new DungeonState(dungeonId);
@@ -360,6 +394,7 @@ function enterDungeon(dungeonId) {
     st.player.y = player.y;
     st.player.inDungeon = true;
     st.player.dungeonId = dungeonId;
+    _pendingDungeon = null;   // safe to clear now — game loop won't call onDungeonEntrance
     clearTarget();
     _combatTarget = null;
     import('./engine/audio.js').then(a => a.playDungeon());

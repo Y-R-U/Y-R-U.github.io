@@ -1,7 +1,7 @@
 // ===== Skill Tasks (gathering, crafting, etc.) =====
 import { SKILL_TASKS, ITEMS } from '../config.js';
 import { doSkillAction, isTaskUnlocked } from './skillEngine.js';
-import { addToBackpack, hasItem, removeFromBackpack, addBuff } from '../state.js';
+import { addToBackpack, hasItem, removeFromBackpack, addBuff, getState, setSkillLevel } from '../state.js';
 import { showXP, showFloatText } from '../engine/particles.js';
 import { playPickup } from '../engine/audio.js';
 
@@ -104,23 +104,53 @@ export function useItem(itemId, player) {
       return true;
     }
   }
+
+  // Strength potion — timed +str buff, stackable: extra dose extends timer +4min and +1 str
+  if (item.type === 'potion' && item.buffStr) {
+    const st  = getState();
+    const now = Date.now();
+    const existing = st.player.buffs.find(b => b.id === 'str_pot' && b.endsAt > now);
+    removeFromBackpack(itemId, 1);
+    if (existing) {
+      existing.endsAt  += 240000;  // +4 minutes
+      existing.amount  += 1;
+      const minsLeft = Math.ceil((existing.endsAt - now) / 60000);
+      showFloatText(player.x, player.y, `STR +${existing.amount} (${minsLeft}m)`, '#FF8F00');
+    } else {
+      addBuff('str_pot', 'str', item.buffStr, item.buffDur || 300);
+      showFloatText(player.x, player.y, `+${item.buffStr} STR (5min)`, '#FF8F00');
+    }
+    return true;
+  }
+
   if (item.type === 'potion' && item.buffAtk) {
-    addBuff('str_pot', 'atk', item.buffAtk, item.buffDur || 60);
+    addBuff('atk_pot', 'atk', item.buffAtk, item.buffDur || 300);
     removeFromBackpack(itemId, 1);
     showFloatText(player.x, player.y, `+${item.buffAtk} ATK`, '#FF8F00');
     return true;
   }
   if (item.type === 'potion' && item.buffDef) {
-    addBuff('def_pot', 'def', item.buffDef, item.buffDur || 60);
+    addBuff('def_pot', 'def', item.buffDef, item.buffDur || 300);
     removeFromBackpack(itemId, 1);
     showFloatText(player.x, player.y, `+${item.buffDef} DEF`, '#4ecca3');
     return true;
   }
   if (item.type === 'potion' && item.mana) {
-    addBuff('mana_pot', 'mag', item.mana, item.buffDur || 60);
+    addBuff('mana_pot', 'mag', item.mana, item.buffDur || 300);
     removeFromBackpack(itemId, 1);
     showFloatText(player.x, player.y, `+${item.mana} MAG`, '#4fc3f7');
     return true;
   }
+
+  // Str Scroll — permanent +1 strength level
+  if (item.permStr) {
+    const st  = getState();
+    const cur = st.player.skills.strength?.level || 1;
+    setSkillLevel('strength', cur + item.permStr);
+    removeFromBackpack(itemId, 1);
+    showFloatText(player.x, player.y, `STR permanently +${item.permStr}!`, '#FF6500');
+    return true;
+  }
+
   return false;
 }

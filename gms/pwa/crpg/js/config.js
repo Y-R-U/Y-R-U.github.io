@@ -232,8 +232,8 @@ export const NPCS = {
   mara: {
     id:'mara', name:'Mara the Merchant', glyph:'M', emoji:'🛒', color:'#c0c0c0',
     tx:21, ty:40,
-    dialogue:"Welcome to Mara's General Store! Food, tools, and supplies for the discerning adventurer.",
-    shop: ['shrimp','trout','health_potion','fishing_rod'],
+    dialogue:"Welcome to Mara's General Store! Food, potions, and supplies for the discerning adventurer.",
+    shop: ['shrimp','trout','health_potion','fishing_rod','strength_potion','defence_potion','str_scroll'],
   },
   finn: {
     id:'finn', name:'Old Finn', glyph:'F', emoji:'🎣', color:'#4fc3f7',
@@ -308,39 +308,40 @@ export const ITEMS = {
   lobster:       { id:'lobster',       name:'Lobster',         glyph:'~', color:'#e94560', type:'food',    heal:30,  stackable:true,  value:30  },
   shark:         { id:'shark',         name:'Shark',           glyph:'~', color:'#546E7A', type:'food',    heal:50,  stackable:true,  value:60  },
   health_potion: { id:'health_potion', name:'Health Potion',   glyph:'!', color:'#e94560', type:'potion',  heal:40,  stackable:true,  value:50  },
-  strength_potion:{ id:'strength_potion', name:'Str Potion',  glyph:'!', color:'#FF8F00', type:'potion',  buffAtk:5, buffDur:60, stackable:true, value:80 },
-  defence_potion:{ id:'defence_potion', name:'Def Potion',    glyph:'!', color:'#4ecca3', type:'potion',  buffDef:5, buffDur:60, stackable:true, value:80 },
+  strength_potion:{ id:'strength_potion', name:'Str Potion',  glyph:'!', color:'#FF8F00', type:'potion',  buffStr:5, buffDur:300, stackable:true, value:80 },
+  defence_potion:{ id:'defence_potion', name:'Def Potion',    glyph:'!', color:'#4ecca3', type:'potion',  buffDef:5, buffDur:300, stackable:true, value:80 },
   mana_potion:   { id:'mana_potion',   name:'Mana Potion',    glyph:'!', color:'#4fc3f7', type:'potion',  mana:30,  stackable:true,  value:60  },
+  str_scroll:    { id:'str_scroll',    name:'Str Scroll',     glyph:'!', color:'#FF6500', type:'potion',  permStr:1, stackable:false, value:500 },
 
   // Weapons
   bronze_sword:  { id:'bronze_sword',  name:'Bronze Sword',   glyph:'/', color:'#8D6E63', type:'weapon', slot:'weapon', atkBonus:3,  strBonus:2,  reqAtk:1,  reqStr:1,  value:40  },
-  iron_sword:    { id:'iron_sword',    name:'Iron Sword',     glyph:'/', color:'#9E9E9E', type:'weapon', slot:'weapon', atkBonus:7,  strBonus:6,  reqAtk:5,  reqStr:5,  value:120 },
-  steel_sword:   { id:'steel_sword',   name:'Steel Sword',    glyph:'/', color:'#78909C', type:'weapon', slot:'weapon', atkBonus:13, strBonus:12, reqAtk:20, reqStr:20, value:300 },
-  mithril_sword: { id:'mithril_sword', name:'Mithril Sword',  glyph:'/', color:'#4ecca3', type:'weapon', slot:'weapon', atkBonus:22, strBonus:20, reqAtk:40, reqStr:40, value:800 },
-  dragon_sword:  { id:'dragon_sword',  name:'Dragon Sword',   glyph:'/', color:'#FF8F00', type:'weapon', slot:'weapon', atkBonus:35, strBonus:33, reqAtk:60, reqStr:60, value:5000},
-  shortbow:      { id:'shortbow',      name:'Shortbow',       glyph:')', color:'#8D6E63', type:'weapon', slot:'weapon', rngBonus:5,  reqRng:10, value:100 },
-  longbow:       { id:'longbow',       name:'Longbow',        glyph:')', color:'#6D4C41', type:'weapon', slot:'weapon', rngBonus:15, reqRng:30, value:400 },
-  fire_staff:    { id:'fire_staff',    name:'Fire Staff',     glyph:'|', color:'#FF5722', type:'weapon', slot:'weapon', magBonus:18, reqMag:20, value:600 },
-  lich_staff:    { id:'lich_staff',    name:'Lich Staff',     glyph:'|', color:'#9C27B0', type:'weapon', slot:'weapon', magBonus:30, reqMag:40, value:3000},
+  iron_sword:    { id:'iron_sword',    name:'Iron Sword',     glyph:'/', color:'#9E9E9E', type:'weapon', slot:'weapon', atkBonus:7,  strBonus:6,  reqAtk:1,  reqStr:1,  value:120 },
+  steel_sword:   { id:'steel_sword',   name:'Steel Sword',    glyph:'/', color:'#78909C', type:'weapon', slot:'weapon', atkBonus:13, strBonus:12, reqAtk:5,  reqStr:5,  value:300 },
+  mithril_sword: { id:'mithril_sword', name:'Mithril Sword',  glyph:'/', color:'#4ecca3', type:'weapon', slot:'weapon', atkBonus:22, strBonus:20, reqAtk:10, reqStr:10, value:800 },
+  dragon_sword:  { id:'dragon_sword',  name:'Dragon Sword',   glyph:'/', color:'#FF8F00', type:'weapon', slot:'weapon', atkBonus:35, strBonus:33, reqAtk:15, reqStr:15, value:5000},
+  shortbow:      { id:'shortbow',      name:'Shortbow',       glyph:')', color:'#8D6E63', type:'weapon', slot:'weapon', rngBonus:5,  reqRng:3,  value:100 },
+  longbow:       { id:'longbow',       name:'Longbow',        glyph:')', color:'#6D4C41', type:'weapon', slot:'weapon', rngBonus:15, reqRng:8,  value:400 },
+  fire_staff:    { id:'fire_staff',    name:'Fire Staff',     glyph:'|', color:'#FF5722', type:'weapon', slot:'weapon', magBonus:18, reqMag:5,  value:600 },
+  lich_staff:    { id:'lich_staff',    name:'Lich Staff',     glyph:'|', color:'#9C27B0', type:'weapon', slot:'weapon', magBonus:30, reqMag:10, value:3000},
 
   // Armour — head
   leather_cap:   { id:'leather_cap',   name:'Leather Cap',    glyph:'[', color:'#8D6E63', type:'armour', slot:'head', defBonus:1, reqDef:1,  value:30  },
-  iron_helm:     { id:'iron_helm',     name:'Iron Helm',      glyph:'[', color:'#9E9E9E', type:'armour', slot:'head', defBonus:3, reqDef:5,  value:80  },
-  plate_helm:    { id:'plate_helm',    name:'Plate Helm',     glyph:'[', color:'#607D8B', type:'armour', slot:'head', defBonus:8, reqDef:40, value:500 },
+  iron_helm:     { id:'iron_helm',     name:'Iron Helm',      glyph:'[', color:'#9E9E9E', type:'armour', slot:'head', defBonus:3, reqDef:1,  value:80  },
+  plate_helm:    { id:'plate_helm',    name:'Plate Helm',     glyph:'[', color:'#607D8B', type:'armour', slot:'head', defBonus:8, reqDef:10, value:500 },
   warchief_helm: { id:'warchief_helm', name:'Warchief Helm',  glyph:'[', color:'#e94560', type:'armour', slot:'head', defBonus:8, special:'intimidate', value:1500 },
   frost_crown:   { id:'frost_crown',   name:'Frost Crown',    glyph:'[', color:'#80DEEA', type:'armour', slot:'head', defBonus:12, special:'freeze', value:4000 },
 
   // Armour — chest
   bronze_armour: { id:'bronze_armour', name:'Bronze Armour',  glyph:']', color:'#8D6E63', type:'armour', slot:'chest', defBonus:2,  reqDef:1,  value:60  },
   leather_armour:{ id:'leather_armour',name:'Leather Armour', glyph:']', color:'#8D6E63', type:'armour', slot:'chest', defBonus:2,  reqDef:1,  value:50  },
-  hard_leather_body:{ id:'hard_leather_body', name:'Hard Leather Body', glyph:']', color:'#6D4C41', type:'armour', slot:'chest', defBonus:4, reqDef:10, value:150 },
-  iron_platebody:{ id:'iron_platebody',name:'Iron Platebody', glyph:']', color:'#9E9E9E', type:'armour', slot:'chest', defBonus:5,  reqDef:5,  value:200 },
-  plate_chest:   { id:'plate_chest',   name:'Plate Chest',    glyph:']', color:'#607D8B', type:'armour', slot:'chest', defBonus:11, reqDef:40, value:1200},
-  plate_legs:    { id:'plate_legs',    name:'Plate Legs',     glyph:']', color:'#607D8B', type:'armour', slot:'legs',  defBonus:9,  reqDef:40, value:900 },
+  hard_leather_body:{ id:'hard_leather_body', name:'Hard Leather Body', glyph:']', color:'#6D4C41', type:'armour', slot:'chest', defBonus:4, reqDef:3,  value:150 },
+  iron_platebody:{ id:'iron_platebody',name:'Iron Platebody', glyph:']', color:'#9E9E9E', type:'armour', slot:'chest', defBonus:5,  reqDef:1,  value:200 },
+  plate_chest:   { id:'plate_chest',   name:'Plate Chest',    glyph:']', color:'#607D8B', type:'armour', slot:'chest', defBonus:11, reqDef:10, value:1200},
+  plate_legs:    { id:'plate_legs',    name:'Plate Legs',     glyph:']', color:'#607D8B', type:'armour', slot:'legs',  defBonus:9,  reqDef:10, value:900 },
 
   // Shields
-  iron_shield:   { id:'iron_shield',   name:'Iron Shield',    glyph:')', color:'#9E9E9E', type:'shield', slot:'offhand', defBonus:4, reqDef:5,  value:100 },
-  steel_shield:  { id:'steel_shield',  name:'Steel Shield',   glyph:')', color:'#78909C', type:'shield', slot:'offhand', defBonus:7, reqDef:20, value:250 },
+  iron_shield:   { id:'iron_shield',   name:'Iron Shield',    glyph:')', color:'#9E9E9E', type:'shield', slot:'offhand', defBonus:4, reqDef:1,  value:100 },
+  steel_shield:  { id:'steel_shield',  name:'Steel Shield',   glyph:')', color:'#78909C', type:'shield', slot:'offhand', defBonus:7, reqDef:5,  value:250 },
 
   // Special drops
   rat_pelt:    { id:'rat_pelt',    name:'Rat Pelt',    glyph:'%', color:'#8D6E63', type:'material', stackable:true, value:3   },
@@ -350,7 +351,7 @@ export const ITEMS = {
   troll_hide:  { id:'troll_hide',  name:'Troll Hide',  glyph:'%', color:'#5D4037', type:'material', stackable:true, value:30  },
   ice_shard:   { id:'ice_shard',   name:'Ice Shard',   glyph:'*', color:'#80DEEA', type:'material', stackable:true, value:25  },
   rune_shard:  { id:'rune_shard',  name:'Rune Shard',  glyph:'*', color:'#4ecca3', type:'material', stackable:true, value:40  },
-  dark_robe:   { id:'dark_robe',   name:'Dark Robe',   glyph:']', color:'#9C27B0', type:'armour', slot:'chest', defBonus:5, magBonus:8, reqMag:20, value:800 },
+  dark_robe:   { id:'dark_robe',   name:'Dark Robe',   glyph:']', color:'#9C27B0', type:'armour', slot:'chest', defBonus:5, magBonus:8, reqMag:5,  value:800 },
   frost_essence:{ id:'frost_essence', name:'Frost Essence', glyph:'*', color:'#80DEEA', type:'material', stackable:true, value:50  },
   dragon_scale: { id:'dragon_scale',  name:'Dragon Scale',  glyph:'%', color:'#FF8F00', type:'material', stackable:true, value:200 },
   dragon_scale_set:{ id:'dragon_scale_set', name:'Dragon Scale Set', glyph:'@', color:'#FF8F00', type:'armour', slot:'chest', defBonus:20, special:'dragon_power', value:15000 },

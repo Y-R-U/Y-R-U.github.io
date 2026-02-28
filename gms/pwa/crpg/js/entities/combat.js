@@ -98,9 +98,13 @@ function _doPlayerAttack(player, enemy) {
     const blockChance = Math.min(0.30, defSkill * 0.003);
     if (Math.random() < blockChance) {
       showDamage(enemy.x, enemy.y, 'BLOCK');
+      awardXP('defence', 5, player);   // blocking trains defence faster
       return;
     }
   }
+
+  // Small passive defence XP on any successful attack (slow training)
+  awardXP('defence', 1, player);
 
   // Damage — melee uses strength for max hit; ranged/magic use their skill stat
   let raw;
@@ -148,8 +152,8 @@ function _doEnemyAttack(enemy, player) {
   const reduced = player.takeDamage(atkStat);
   showDamage(player.x, player.y, reduced);
 
-  // Defence XP for taking hits
-  awardXP('defence', Math.max(1, Math.floor(reduced * 0.1)), player);
+  // Defence XP for taking hits — faster than passive (taking damage = active defence training)
+  awardXP('defence', Math.max(2, Math.floor(reduced * 0.2)), player);
 
   // Draining effect
   if (enemy.drains) {
