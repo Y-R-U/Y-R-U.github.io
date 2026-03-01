@@ -31,8 +31,10 @@
     <div id="stats-mini">
       <span id="total-earned">Total: $0</span>
       <span id="click-power">Tap: $1</span>
+      <span id="prestige-mult" class="hidden"></span>
     </div>
     <div id="active-event-label" class="hidden"></div>
+    <div id="prestige-badge" class="prestige-badge hidden">✨ PRESTIGE READY</div>
   </header>
 
   <!-- ── Main Tap / Click Area ── -->
@@ -61,6 +63,9 @@
     <button class="tab-btn" data-tab="upgrades">
       <span>⬆️</span>UPGRADES
     </button>
+    <button class="tab-btn" data-tab="prestige">
+      <span>✨</span>PRESTIGE
+    </button>
     <button class="tab-btn" data-tab="stats">
       <span>📊</span>STATS
     </button>
@@ -76,6 +81,9 @@
     </div>
     <div id="tab-upgrades" class="tab-panel hidden">
       <div class="empty-msg">⬆️ Upgrades unlock as you earn more!</div>
+    </div>
+    <div id="tab-prestige" class="tab-panel hidden">
+      <div class="empty-msg">✨ Loading prestige...</div>
     </div>
     <div id="tab-stats" class="tab-panel hidden">
       <div class="empty-msg">📊 Loading stats...</div>
