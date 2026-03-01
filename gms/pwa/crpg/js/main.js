@@ -182,9 +182,12 @@ function gameLoop(now) {
 
     if (player.isDead()) onPlayerDeath();
 
-    draw(dungeon.map,
-      [{ ...player, type:'player' }, ...dungeon.enemies.filter(e => !e.dead)],
-      getParticles());
+    // Guard: onPlayerDeath() nulls dungeon — skip draw this frame, world renders next frame
+    if (dungeon) {
+      draw(dungeon.map,
+        [{ ...player, type:'player' }, ...dungeon.enemies.filter(e => !e.dead)],
+        getParticles());
+    }
 
   } else {
     // ── WORLD MODE ──

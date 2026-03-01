@@ -2,6 +2,11 @@
 import { SKILLS, SKILL_LEVEL_CAP, xpForLevel } from '../config.js';
 import { getState } from '../state.js';
 
+// Maps skill ID → buff stat key used in player.buffs
+const SKILL_TO_BUFF_STAT = {
+  attack: 'atk', strength: 'str', defence: 'def', magic: 'mag', ranged: 'rng',
+};
+
 export function renderSkillsPanel() {
   const list = document.getElementById('skills-list');
   if (!list) return;
@@ -16,6 +21,14 @@ export function renderSkillsPanel() {
     const needed = level < SKILL_LEVEL_CAP ? xpForLevel(level) : 0;
     const pct    = level >= SKILL_LEVEL_CAP ? 100 : Math.min(100, (xp / needed) * 100);
 
+    // Check for active buff on this skill
+    const buffStat  = SKILL_TO_BUFF_STAT[id];
+    const now       = Date.now();
+    const activeBuff = buffStat
+      ? (st.player.buffs || []).find(b => b.stat === buffStat && b.endsAt > now)
+      : null;
+    const minsLeft = activeBuff ? Math.ceil((activeBuff.endsAt - now) / 60000) : 0;
+
     const row = document.createElement('div');
     row.className = 'skill-row';
     row.innerHTML = `
@@ -27,7 +40,10 @@ export function renderSkillsPanel() {
         </div>
         <div class="skill-xp-text">${xp.toLocaleString()} / ${needed.toLocaleString()} XP</div>
       </div>
-      <div class="skill-level" style="color:${def.color}">${level}</div>
+      <div class="skill-level" style="color:${activeBuff ? '#f5a623' : def.color}">
+        ${level}
+        ${activeBuff ? `<div class="skill-boost-tag">+${activeBuff.amount} (${minsLeft}m)</div>` : ''}
+      </div>
     `;
     list.appendChild(row);
   }

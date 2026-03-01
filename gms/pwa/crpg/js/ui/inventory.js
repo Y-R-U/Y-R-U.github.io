@@ -163,8 +163,15 @@ function _showItemPopup(itemId, source, sourceIndex) {
       bpSlot.qty = (bpSlot.qty || 1) - 1;
       if (bpSlot.qty <= 0) st.inventory.backpack[sourceIndex] = null;
     }
-    closeItemPopup();
     renderInventory();
+    const st2 = getState();
+    const remaining = st2.inventory.backpack.find(s => s && s.id === itemId && s.qty > 0);
+    if (remaining) {
+      const newIdx = st2.inventory.backpack.findIndex(s => s && s.id === itemId);
+      _showItemPopup(itemId, 'backpack', newIdx >= 0 ? newIdx : sourceIndex);
+    } else {
+      closeItemPopup();
+    }
   });
 
   document.getElementById('ipop-drop')?.addEventListener('click', () => {
@@ -175,8 +182,15 @@ function _showItemPopup(itemId, source, sourceIndex) {
       bpSlot.qty = (bpSlot.qty || 1) - 1;
       if (bpSlot.qty <= 0) st.inventory.backpack[sourceIndex] = null;
     }
-    closeItemPopup();
     renderInventory();
+    const st2 = getState();
+    const remaining = st2.inventory.backpack.find(s => s && s.id === itemId && s.qty > 0);
+    if (remaining) {
+      const newIdx = st2.inventory.backpack.findIndex(s => s && s.id === itemId);
+      _showItemPopup(itemId, 'backpack', newIdx >= 0 ? newIdx : sourceIndex);
+    } else {
+      closeItemPopup();
+    }
   });
 }
 

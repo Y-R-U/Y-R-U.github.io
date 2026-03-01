@@ -265,7 +265,11 @@ html, body {
 .skill-xp-text { font-size: 9px; color: var(--dim); margin-top: 1px; }
 .skill-level {
   font-size: 14px; font-weight: bold; color: var(--gold);
-  width: 28px; text-align: right; flex-shrink: 0;
+  width: 42px; text-align: right; flex-shrink: 0;
+}
+.skill-boost-tag {
+  font-size: 8px; font-weight: normal; color: #f5a623;
+  line-height: 1.2; white-space: nowrap;
 }
 
 /* ===== INVENTORY PANEL ===== */
@@ -300,8 +304,8 @@ html, body {
 }
 .equip-slot.has-item { border-color: var(--silver); color: var(--white); }
 .equip-slot:active { background: rgba(255,255,255,0.1); }
-.slot-label { font-size: 8px; color: var(--dim); margin-top: 2px; }
-.slot-item-glyph { font-size: 18px; line-height: 1; }
+.slot-label { font-size: 10px; color: var(--dim); margin-top: 2px; }
+.slot-item-glyph { font-size: 20px; line-height: 1; }
 
 .backpack-grid {
   display: grid;
@@ -326,11 +330,11 @@ html, body {
 }
 .inv-slot.has-item { border-color: #555; }
 .inv-slot:active { background: rgba(255,255,255,0.07); }
-.inv-item-glyph { font-size: 16px; line-height: 1; }
-.inv-item-name { font-size: 7px; color: var(--dim); text-align: center; line-height: 1.2; }
+.inv-item-glyph { font-size: 20px; line-height: 1; }
+.inv-item-name { font-size: 9px; color: var(--dim); text-align: center; line-height: 1.2; }
 .inv-item-qty {
   position: absolute; bottom: 1px; right: 3px;
-  font-size: 8px; color: var(--gold);
+  font-size: 10px; color: var(--gold);
 }
 
 /* ===== MENU PANEL ===== */
