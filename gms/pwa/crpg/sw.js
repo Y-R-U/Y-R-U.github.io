@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crpg-v8';
+const CACHE_NAME = 'crpg-v10';
 const ASSETS = [
   './',
   './index.html',

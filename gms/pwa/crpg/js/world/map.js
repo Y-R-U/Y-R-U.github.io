@@ -121,7 +121,7 @@ export class WorldMap {
     let x = x0, y = y0;
     while (x !== x1 || y !== y1) {
       const t = this.get(x, y);
-      if (t !== TILES.WATER && t !== TILES.MOUNTAIN) this.set(x, y, TILES.ROAD);
+      if (t !== TILES.WATER) this.set(x, y, TILES.ROAD);
       if (Math.abs(x - x1) > Math.abs(y - y1)) x += Math.sign(x1 - x);
       else y += Math.sign(y1 - y);
     }

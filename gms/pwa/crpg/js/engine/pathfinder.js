@@ -13,7 +13,7 @@ function heuristic(ax, ay, bx, by) {
  *  gx/gy  — goal position  (float tile coords, will be floored)
  *  maxNodes — bail out after this many nodes to keep it real-time safe
  */
-export function findPath(map, sx, sy, gx, gy, maxNodes = 1200) {
+export function findPath(map, sx, sy, gx, gy, maxNodes = 8000) {
   sx = Math.floor(sx);
   sy = Math.floor(sy);
   gx = Math.floor(gx);
