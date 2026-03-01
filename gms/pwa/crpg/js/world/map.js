@@ -89,6 +89,12 @@ export class WorldMap {
       this.set(d.entrance.wx, d.entrance.wy, TILES.DUNGEON);
     }
 
+    // 10b. Carve a road corridor to Dragon Lair — sits inside impassable ice-wastes stone
+    // Connect (72,55) south to open grass at y=59 so pathfinder can route in from below
+    for (let cy = 56; cy <= 59; cy++) {
+      if (this.get(72, cy) !== TILES.WATER) this.set(72, cy, TILES.ROAD);
+    }
+
     // 11. Goblin plains (middle-bottom)
     for (let y = 45; y < 72; y++) {
       for (let x = 28; x < 60; x++) {
