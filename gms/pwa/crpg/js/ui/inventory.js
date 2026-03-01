@@ -138,7 +138,8 @@ function _showItemPopup(itemId, source, sourceIndex) {
     renderInventory();
   });
 
-  document.getElementById('ipop-use')?.addEventListener('click', () => {
+  document.getElementById('ipop-use')?.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (!_currentItemPopup) return;
     window.dispatchEvent(new CustomEvent('crpg:useItem', { detail: { itemId } }));
     renderInventory();
@@ -153,7 +154,8 @@ function _showItemPopup(itemId, source, sourceIndex) {
     }
   });
 
-  document.getElementById('ipop-sell')?.addEventListener('click', () => {
+  document.getElementById('ipop-sell')?.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (!_currentItemPopup) return;
     const st         = getState();
     const sellPrice  = Math.floor((item.value || 0) * 0.5);
@@ -174,7 +176,8 @@ function _showItemPopup(itemId, source, sourceIndex) {
     }
   });
 
-  document.getElementById('ipop-drop')?.addEventListener('click', () => {
+  document.getElementById('ipop-drop')?.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (!_currentItemPopup) return;
     const st     = getState();
     const bpSlot = st.inventory.backpack[sourceIndex];
