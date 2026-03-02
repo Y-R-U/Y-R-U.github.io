@@ -1,0 +1,8 @@
+{
+  "name": "orpg",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -p 3099 --no-clipboard"
+  }
+}

@@ -1,0 +1,300 @@
+ORPG - Single-player Diablo/RuneScape browser dungeon crawler
+PWA with Canvas 2D procedural rendering, ES Modules (no bundler), mobile-first
+
+============================
+FILE STRUCTURE
+============================
+gms/pwa/orpg/
+  index.html           - Entry point, loads game.css + main.js (module)
+  manifest.json        - PWA manifest, portrait orientation
+  sw.js                - Service worker, cache-first strategy
+  css/game.css         - Mobile-first responsive CSS (flex column layout, desktop sidebar at 768px+)
+  js/
+    config.js          - All constants, data tables, item/monster/fish definitions
+    engine.js          - Input, camera, particles, procedural audio (Web Audio API)
+    world.js           - Dungeon room generation (22x16 tile grid)
+    entities.js        - Player (skills, inventory, equipment) and Monster (AI states)
+    systems.js         - Combat, fishing, cooking, wave spawner
+    renderer.js        - Canvas 2D rendering (tiles, entities, lighting, effects)
+    ui.js              - HTML-based HUD, tab panels, menus, notifications
+    main.js            - Game class, game loop, initialization, input dispatch
+
+============================
+GAME OVERVIEW
+============================
+- Player explores a single dungeon room, killing waves of progressively harder monsters
+- RuneScape-style XP system (levels 1-99, exponential XP table)
+- Skills: attack, strength, defense, hitpoints, fishing, cooking
+- Equipment tiers: bronze, iron, steel, mithril, adamant, rune, dragon
+- Fishing: find rod, fish at water spots, cook at campfire, eat to heal HP
+- Inventory: 28 slots, stackable items ({id, count} format), equipment doesn't stack
+- Mobile: tap=move/attack, long-press=interact, action bar buttons (fish/cook/eat/pickup)
+- Desktop: WASD/arrows movement, mouse click, number keys 1-9 for quick eat
+- Auto-saves to localStorage every 30 seconds
+
+============================
+config.js - Constants & Data
+============================
+TILE_SIZE = 32
+ROOM_W = 22, ROOM_H = 16
+CANVAS_W = 704, CANVAS_H = 512
+INVENTORY_SIZE = 28
+
+TILE {}                              - Tile type enum (FLOOR, WALL, WATER, CAMPFIRE, FISHING_SPOT, PILLAR, RUBBLE)
+SKILL {}                             - Skill name enum (ATTACK, STRENGTH, DEFENSE, HITPOINTS, FISHING, COOKING)
+SKILL_LIST []                        - Ordered array of all skill names
+SKILL_COLORS {}                      - Color per skill for UI
+SKILL_ICONS {}                       - Short label per skill (ATK, STR, etc.)
+EQUIP_SLOT {}                        - Equipment slot names (WEAPON, SHIELD, HELMET, BODY, LEGS)
+ITEM_TYPE {}                         - Item type enum (WEAPON, SHIELD, ..., FISH_RAW, FISH_COOKED, FISH_BURNT, FISHING_ROD)
+METAL_TIERS []                       - Ordered tier names: bronze through dragon
+METAL_COLORS {}                      - {primary, secondary, highlight} per tier for rendering
+ITEMS {}                             - All item definitions. Equipment generated from METAL_TIERS. Fish registered from FISH dict.
+FISH {}                              - Fish definitions: levelRequired, xp, cookLevel, cookXp, healAmount, burnStop
+MONSTERS {}                          - Monster definitions: stats, aggro/attack ranges, loot tables
+WAVE_CONFIG []                       - Wave ranges: which monsters spawn at which wave numbers
+XP_TABLE []                          - Precomputed XP thresholds for levels 0-99
+
+xpForLevel(level) -> number          - Compute XP needed for a level
+levelForXp(xp) -> number             - Derive level from total XP
+isStackable(itemId) -> bool          - Returns false for equipment, true for everything else
+getAvailableFish(fishingLevel) -> []  - Fish keys the player can catch at their level
+
+============================
+engine.js - Input, Camera, Particles, Audio
+============================
+class Input(canvas)
+  keys {}                            - Currently pressed keys
+  consumeClick() -> {x,y}|null       - Returns and clears pending mouse click in canvas coords
+  consumeRightClick() -> bool        - Returns and clears pending right click
+  isDown(key) -> bool                - Check if key is currently held
+  clear()                            - Reset click/rightClick state
+
+class Camera(width, height)
+  x, y                               - World-space offset
+  follow(entity, worldW, worldH)     - Center on entity, clamp to world bounds
+  shake(intensity, duration)          - Start screen shake
+  update(dt)                          - Decay shake
+  screenX(worldX), screenY(worldY)   - Convert world to screen coordinates
+
+class ParticleSystem()
+  emit(x, y, options)                - Spawn particles (count, color, spread, decay, gravity)
+  emitText(x, y, text, color, size)  - Spawn floating text (damage numbers, XP drops)
+  update(dt)                          - Advance all particles, remove dead ones
+  draw(ctx, camera)                   - Render particles to canvas
+
+class Audio()
+  init()                              - Create AudioContext
+  playHit()                           - Attack sound
+  playKill()                          - Monster death sound
+  playLevelUp()                       - Level up fanfare (3-note arpeggio)
+  playFish()                          - Catch fish sound
+  playCook()                          - Cook sound
+  playEat()                           - Eat sound
+  playPickup()                        - Item pickup sound
+  playWaveStart()                     - New wave alert (4-note sequence)
+
+============================
+world.js - Dungeon Generation
+============================
+class DungeonRoom()
+  tiles [][]                          - 2D tile grid (ROOM_H x ROOM_W)
+  spawnPoints []                      - Valid monster spawn positions (right half of room)
+  fishingSpots []                     - Tiles adjacent to water
+  campfirePos {x,y}                   - Campfire tile coordinates
+  groundItems []                      - Items on the floor ({id, x, y, spawnTime})
+
+  generate()                          - Build room: walls, pillars, rubble, water pool, fishing spot, campfire, spawn points
+  isWalkable(tileX, tileY) -> bool    - True for floor/rubble/campfire/fishing_spot
+  getTileAt(worldX, worldY) -> TILE   - Get tile type at world pixel coordinates
+  getPlayerStart() -> {x,y}          - Bottom-left area start position (world coords)
+  addGroundItem(itemId, worldX, worldY) - Drop item on floor
+  pickupGroundItem(worldX, worldY, range) -> itemId|null - Pick up nearest ground item
+  getGroundItemAt(worldX, worldY, range) -> groundItem|null - Get ground item info without removing
+
+============================
+entities.js - Player & Monster
+============================
+class Entity(x, y)
+  x, y, w, h                         - Position and size (w/h = TILE_SIZE - 4)
+  centerX, centerY                    - Center point (getters)
+  speed, facing, animTime             - Movement speed, direction (-1/1), animation timer
+  alive, hitFlash                     - Life state and damage flash timer
+  targetX, targetY                    - Movement destination (null = idle)
+  distanceTo(other) -> number         - Distance between entity centers
+  moveToward(tx, ty, room)            - Step toward target with tile collision checking
+  update(dt)                          - Advance animation, decay hitFlash
+
+class Player extends Entity(x, y)
+  xp {}                               - XP per skill. HP starts at level 10.
+  hp, maxHp                           - Current/max hitpoints (maxHp = hitpoints level)
+  attackTarget, lastAttackTime        - Current combat target and attack cooldown
+  attackSpeed = 2400                  - ms between attacks
+  inCombat, combatTimer               - Combat state (5s out-of-combat timeout)
+  equipment {}                        - Keyed by EQUIP_SLOT, values are itemId strings or null
+  inventory []                        - Array(28) of {id: string, count: number} | null
+  activity, activityProgress          - Current skill activity ('fishing'|'cooking'|null) and timer
+
+  getLevel(skill) -> number           - Derive level from XP
+  getCombatLevel() -> number          - Calculated combat level
+  getAttackBonus() -> number          - Bonus from equipped weapon
+  getStrengthBonus() -> number        - Bonus from equipped weapon
+  getDefenseBonus() -> number         - Sum of defense bonuses from shield/helmet/body/legs
+  addXp(skill, amount) -> newLevel|0  - Add XP, returns new level if leveled up
+  heal(amount)                        - Restore HP up to maxHp
+  takeDamage(amount)                  - Reduce HP, set alive=false if <= 0
+
+  addToInventory(itemId, amount=1) -> slotIndex|-1  - Stack if stackable, else find empty slot
+  removeFromInventory(slot, amount=1) -> itemId|null - Remove amount from slot, null slot if empty
+  removeAllFromSlot(slot) -> {id,count}|null         - Remove entire stack
+  hasItem(itemId) -> bool             - Check if any slot contains item
+  hasItemOfType(type) -> bool         - Check if any slot has item of given ITEM_TYPE
+  findItemSlot(itemId) -> index|-1    - First slot index with matching itemId
+  findItemSlotOfType(type) -> index|-1 - First slot with matching ITEM_TYPE
+  countItem(itemId) -> number         - Total count across all slots
+  getSlotItemId(slot) -> string|null  - Get item id at slot
+  getSlotCount(slot) -> number        - Get stack count at slot
+  inventoryFull() -> bool             - True if no null slots
+  equipItem(slot) -> bool             - Equip item from inventory slot, swap with current
+  unequipItem(eqSlot) -> bool         - Move equipment to inventory
+  startFishing(), startCooking()      - Begin skill activity
+  stopActivity()                      - Cancel current activity
+  getEquipmentTier() -> string|null   - Metal tier of equipped weapon for rendering
+  serialize() -> object               - Save state (xp, hp, equipment, inventory)
+  deserialize(data)                   - Load state, migrates old string[] inventory format
+
+class Monster extends Entity(type, x, y, waveBonus=0)
+  type, name, level                   - Monster identity
+  attack, strength, defense           - Combat stats (scaled by waveBonus)
+  maxHp, hp                           - Health (scaled by waveBonus)
+  aggroRange, attackRange             - Engagement distances (in world pixels)
+  attackSpeed, xpMultiplier           - Attack cooldown and XP reward multiplier
+  loot []                             - Weighted loot table [{id, weight}]
+  state                               - AI state: 'idle' | 'chase' | 'attack'
+
+  takeDamage(amount)                  - Reduce HP, die if <= 0
+  update(dt, room, player)            - AI state machine: idle wander -> chase -> attack
+  rollLoot() -> itemId|null           - Weighted random loot roll on death
+
+============================
+systems.js - Game Systems
+============================
+class CombatSystem(game)
+  rollAccuracy(attackerAtk, defenderDef) -> bool    - Hit chance calculation
+  rollDamage(strength, strengthBonus) -> number     - Random damage roll
+  playerAttack(player, monster, now) -> {hit, damage, levelUps[]}|null - Execute player attack, grant XP
+  monsterAttack(monster, player, now) -> {hit, damage}|null           - Execute monster attack
+
+class FishingSystem(game)
+  fishingTime = 3000                  - ms per catch attempt
+  canFish(player) -> bool             - Has fishing rod in inventory or equipped
+  isNearFishingSpot(player, room) -> bool - Adjacent tile is WATER or FISHING_SPOT
+  update(player, dt) -> {success, fish?, xp?, levelUp?, message?}|null - Tick fishing, catch fish
+
+class CookingSystem(game)
+  cookTime = 2000                     - ms per cook attempt
+  canCook(player) -> bool             - Has raw fish in inventory
+  isNearCampfire(player, room) -> bool - Adjacent tile is CAMPFIRE
+  update(player, dt) -> {success, burned?, fish?, xp?, levelUp?, message?}|null - Tick cooking
+
+class WaveSpawner(game)
+  currentWave, totalKills             - Progress tracking
+  waveDelay = 3000                    - ms between waves
+  checkWaveClear(monsters) -> bool    - All monsters dead
+  startNextWave(room) -> Monster[]    - Spawn next wave of monsters
+  update(dt, monsters) -> bool        - Returns true when a new wave should spawn
+
+============================
+renderer.js - Canvas 2D Rendering
+============================
+class Renderer(canvas)
+  time                                - Animation timer
+  clear()                             - Fill canvas black
+  drawRoom(room, camera)              - Render visible tiles (cached tile sprites)
+  drawWater(ctx, x, y)               - Animated water waves
+  drawCampfire(ctx, x, y)            - Animated campfire with flames and glow
+  drawPlayer(player, camera)          - Player sprite with equipment-colored armor, animation
+  drawMonster(monster, camera)        - Monster sprite by type + health bar + level
+  drawGroundItems(room, camera)       - Glowing item dots with name labels
+  drawLighting(player, camera, room)  - Radial fog of war from player + campfire light
+  update(dt)                          - Advance animation timer
+
+Private monster draw methods: _drawRat, _drawGoblin, _drawSkeleton, _drawZombie, _drawDarkWizard, _drawDarkKnight, _drawDemon
+
+Utility: mulberry32(seed) - Seeded PRNG for deterministic tile variations
+Tile cache: Pre-rendered floor/wall/pillar/rubble/fishing_spot variants
+
+============================
+ui.js - HTML-based UI
+============================
+class GameUI(game)
+  activeTab                           - Current panel: 'inventory' | 'skills' | 'equipment'
+  messages []                         - Message log entries
+
+  switchTab(tab)                      - Switch active panel tab
+  updatePanel()                       - Re-render active panel content
+  renderInventory()                   - Build inventory grid HTML with click/long-press/context-menu handlers
+  renderSkills()                      - Build skills list with XP bars
+  renderEquipment()                   - Build equipment slots + stats summary, click to unequip
+  onInventoryClick(slot)              - Auto-use: equip equipment, eat cooked fish, or select
+  showContextMenu(slot, x, y)         - Right-click/long-press menu: Equip/Eat/Drop/Drop All/Cancel
+  updateHUD()                         - Update HP orb, wave info, combat level
+  addMessage(text, color='#ccc')      - Add to message log (last 5 shown)
+  showNotification(text, duration)    - Centered popup for level ups, wave starts
+  showDeathScreen() / hideDeathScreen() - Death overlay toggle
+  update(dt)                          - Called each frame (updates HUD + panel)
+
+============================
+main.js - Game Loop & Initialization
+============================
+class Game()
+  canvas, renderer, input, camera     - Core systems
+  particles, audio                    - Effects systems
+  room, player, monsters []           - Game world state
+  combat, fishing, cooking            - Game logic systems
+  waveSpawner                         - Wave progression
+  ui                                  - UI manager
+
+  setupCanvas()                       - Responsive canvas sizing (max 55% viewport height)
+  setupTouchControls()                - Touch start/move/end with 500ms long press detection
+  handleTap(screenX, screenY)         - Tap monster=attack, ground item=pickup, floor=move
+  handleLongPress(screenX, screenY)   - Long press: fish at water, cook at campfire, else pickup
+  init()                              - Place player, init audio, load save, start game loop
+  gameLoop(timestamp)                 - requestAnimationFrame loop, cap dt at 50ms
+  update(dt)                          - Tick all systems: input, player, combat, fishing, cooking, waves, camera, particles, UI
+  render()                            - Draw room, items, monsters, player, lighting, particles, minimap
+  handleKeyboardInput(dt)             - WASD/arrows movement, mouse clicks, number keys 1-9 eat, escape cancel
+
+  tryFish()                           - Validate and start fishing activity
+  tryCook()                           - Validate and start cooking activity
+  tryEat()                            - Find and eat first cooked fish in inventory
+  tryPickup()                         - Pick up nearest ground item
+  getMonsterAt(worldX, worldY) -> Monster|null - Hit test for clicking monsters
+
+  onMonsterKill(monster)              - Grant kill count, drop loot, death particles
+  onLevelUp(skill, level)             - Show notification, play sound, gold particles
+  onPlayerDeath()                     - Show death screen
+  respawn()                           - Reset player, clear inventory, new room, wave 0
+
+  saveGame()                          - Serialize to localStorage('orpg_save')
+  loadGame()                          - Deserialize from localStorage
+  drawMinimap()                       - 3px-per-tile minimap overlay (bottom-left)
+
+Boot: window.DOMContentLoaded -> new Game()
+
+============================
+KEY DATA FORMATS
+============================
+Inventory slot: { id: string, count: number } | null
+Equipment: { weapon: itemId|null, shield: ..., helmet: ..., body: ..., legs: ... }
+Ground item: { id: string, x: number, y: number, spawnTime: number }
+Save format: { player: { xp, hp, equipment, inventory }, wave, kills, timestamp }
+Monster loot: [{ id: string, weight: number }]
+Item def: { id, name, type, ...typeSpecificFields }
+Fish def: { id, name, levelRequired, xp, cookLevel, cookXp, healAmount, burnStop }
+
+============================
+DEV SERVER
+============================
+npm start -> http-server on port 3099
+Launch config in .claude/launch.json as "orpg-dev"
