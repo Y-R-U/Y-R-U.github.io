@@ -1,0 +1,308 @@
+CRPG: Lands of Ascii — AI Reference File
+=========================================
+Refer to this file first before reading source files.
+Last updated: 2026-03-01
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Mobile-first tile-based RPG PWA. Pure ES6 modules, canvas rendering, no frameworks.
+Entry: index.html → js/main.js
+Service worker: sw.js (bump CACHE_NAME version string on every deploy)
+Map: 80×80 tiles, TILE_SIZE=16px. Player glyph '@', enemies/NPCs have glyph+emoji.
+Coordinate system: float tile coords (e.g. 20.5, 40.5). Floor to get tile index.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE MAP  (path → purpose)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+js/config.js          — ALL game data constants (tiles, items, enemies, dungeons, skills, towns, npcs)
+js/state.js           — Singleton game state + save/load (localStorage key 'crpg_save_v1')
+js/main.js            — Boot + 60fps game loop (world mode & dungeon mode)
+js/entities/player.js — Player class: movement, stats, path following
+js/entities/enemy.js  — Enemy class: AI state machine (idle/aggro/return)
+js/entities/combat.js — Combat tick: attack, XP, miss/block, auto-target
+js/entities/loot.js   — Loot roll on enemy kill (fixed table + tier bonus)
+js/world/map.js       — WorldMap class: procedural generation + isWalkable
+js/world/dungeon.js   — DungeonMap + DungeonState: room gen, enemy spawn, boss/exit
+js/world/spawner.js   — World enemy spawner (zones, respawn timers)
+js/world/npc.js       — NpcManager: NPC positions, proximity lookup
+js/engine/renderer.js — Canvas draw: tiles, entities, particles, minimap, camera
+js/engine/input.js    — Tap/hold/mouse input → world coords
+js/engine/pathfinder.js — A* findPath + smoothPath (maxNodes=8000)
+js/engine/particles.js — Pool-based particle system (damage floats, XP, death)
+js/engine/audio.js    — Sound effects (hit, miss, death, levelup, boss, dungeon)
+js/skills/skillEngine.js — XP award, level-up logic, skill tasks
+js/skills/tasks.js    — Gathering actions: mine/fish/chop/cook/useItem
+js/ui/hud.js          — HP/XP/gold bar updates, boss flash, fade-to-black
+js/ui/menuNav.js      — Nav buttons, tab switching, NPC dialogue modal
+js/ui/inventory.js    — Equipment grid + backpack grid + item popup (equip/use/sell/drop)
+js/ui/dungeonEntry.js — Dungeon info modal (enter/flee)
+js/ui/skillsPanel.js  — Skills panel: XP bars, levels, buff indicators
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TILE IDs  (config.js: TILES, TILE_WALKABLE, TILE_CHARS, TILE_COLORS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+0  GRASS     walkable   '.'
+1  WATER     NOT        '~'
+2  STONE     NOT        '#'   ← ice wastes & moor use this; NOT walkable
+3  TREE      NOT        'T'
+4  DOOR      walkable   '+'
+5  DUNGEON   walkable   '>'
+6  SAND      walkable   ':'
+7  MOUNTAIN  walkable   '^'   ← passable, 0.35× speed (player.js update())
+8  ROAD      walkable   '='
+9  BUILDING  NOT        '■'
+10 FLOOR     walkable   '·'   (dungeon floor)
+11 WALL      NOT        '█'   (dungeon wall)
+12 EXIT      walkable   '<'   (dungeon exit, locked until boss dies)
+
+GOTCHA: STONE (2) is NOT walkable. Large stone-covered regions (ice wastes, moor)
+block pathing. Any dungeon in those regions needs an explicit road corridor carved
+in map.js _generate() after step 10. Dragon Lair at (72,55) already has one.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEY CONSTANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WORLD_W / WORLD_H   = 80 × 80 tiles
+TILE_SIZE           = 16 px
+COMBAT_TICK_MS      = 600 ms
+AGGRO_RADIUS        = 4 tiles (+ ranged_level/20)
+MOVE_SPEED          = 0.085 tiles/frame  (~5 tiles/sec at 60fps)
+MOUNTAIN_SLOW       = 0.35×
+BACKPACK_SLOTS      = 28
+SKILL_LEVEL_CAP     = 99
+XP formula          = floor(300 × 1.12^level)  per level threshold
+Miss chance         = 15% − (attack_level × 0.002)
+Block chance        = def_level × 0.003  (shield equipped → +5 def XP)
+Sell price          = floor(item.value × 0.5)
+HP regen            = 1 HP / 5s + 1 per 20 hitpoints levels
+Death respawn       = Ashvale (20,40) at 50% maxHp
+maxHp formula       = 100 + floor((hp_level−1)/10) × 10
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GAME STATE SHAPE  (state.js getState())
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{
+  player: {
+    x, y,          // float tile coords
+    hp, maxHp,
+    gold,
+    skills: { skillId: {level, xp} },  // all 13 skills
+    buffs:  [ {id, stat, amount, endsAt} ],
+    inDungeon: bool, dungeonId: str|null
+  },
+  inventory: {
+    equipped: { head, chest, legs, hands, feet, ring, amulet, weapon, offhand },
+    backpack: Array(28)  // each slot: {id, qty} | null
+  },
+  world: {
+    seed,
+    time,
+    dungeonCooldowns: { dungeonId: timestampMs }
+  },
+  flags: { debugMode, newGame }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATE.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+getState()                        → raw state object (mutate directly for simple changes)
+saveGame() / loadGame() / resetGame()
+getSkill(id)                      → {level, xp}
+setSkillXP(id, xp) / setSkillLevel(id, level)
+calcCombatLevel()                 → RS-style: (atk+str+def+hp)/4 + max(mag,rng)/6
+calcMaxHp()
+addBuff(id, stat, amount, durSec) → pushes timed buff
+getBuffBonus(stat)                → sum of active buffs for stat
+addToBackpack(itemId, qty)        → true on success
+removeFromBackpack(itemId, qty)
+hasItem(itemId, qty)
+getEquipped(slot)                 → {id, qty} | null
+equipItem(itemDef, slot)
+unequipItem(slot)
+getEquipBonus(stat)               → sum of equipped item bonuses for stat
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PLAYER.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+new Player(state)
+player.update(worldMap)           → advances path, applies mountain slow, syncs state
+player.setPath(waypoints, dest)   → begin moving along A* result
+player.stopPath()
+player.heal(amount) / takeDamage(amount)  → damage reduced by 0.5×defence
+player.isDead()
+player.getAttackStat() / getStrengthStat() / getDefenceStat()  → level + equip + buffs
+player.isMoving()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMBAT.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+setTarget(enemy) / getTarget() / clearTarget()
+update(player, enemies, nowMs)    → main combat tick (auto-target, attack, counter, XP, loot)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RENDERER.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+initRenderer() / resizeCanvas()
+updateCamera(px, py)              → smooth LERP follow (LERP_SPEED=0.12)
+worldToScreen(tx, ty)             → {x, y} pixel coords
+screenToWorld(sx, sy)             → {x, y} float tile coords
+draw(worldMap, entities, particles)  → full frame render
+setDestMarker(marker)             → blinking teal destination square
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PATHFINDER.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+findPath(map, sx, sy, gx, gy, maxNodes=8000)
+  → array of {x, y} tile-centre waypoints, or null (no path / over node limit)
+  → if goal not walkable, snaps to nearest walkable within radius 3
+smoothPath(path)                  → removes collinear middle points
+
+GOTCHA: Returns null if maxNodes exceeded — caller shows "Can't reach that spot".
+The 80×80 map has 6400 tiles; 8000 nodes handles worst-case mountain routes.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTICLES.JS FUNCTION STUBS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+showDamage(wx, wy, dmg)           → red float number
+showHeal(wx, wy, hp)              → green float
+showXP(wx, wy, xp, skillName)     → cyan float
+showGold(wx, wy, gold)            → yellow float
+spawnHit / spawnMagicHit / spawnDeath(wx,wy,glyph,color)
+spawnLevelUp(wx, wy)              → starburst + float text
+update(dt) / getParticles()       → pool of 200 max
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MAP GENERATION ORDER  (map.js _generate)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1.  Grass base fill
+2.  Dark forest trees     x:2-30,  y:2-35   (top-left)
+3.  Haunted moor stone    x:32-58, y:5-38   (middle)
+4.  Mountain pass         x:56-78, y:2-30   (top-right, MOUNTAIN + STONE)
+5.  Ice wastes stone      x:58-78, y:28-58  (right side, STONE — NOT walkable!)
+6.  Coastal water         x:2-18,  y:58-78  (bottom-left)
+7.  Rivers                vertical Ashvale (x=20, y=0→34), diagonal Ironport
+8.  Roads                 Ashvale↔Cresthold, Ashvale↔Ironport, Cresthold→mountain pass
+    NOTE: _drawRoad skips WATER only (mountains are paved through)
+9.  Towns                 Ashvale(20,40), Cresthold(55,25), Ironport(20,65)
+10. Dungeon entrances     place DUNGEON tile at each entrance
+10b.Dragon Lair corridor  road from (72,56)→(72,59) to exit ice wastes stone
+11. Goblin plains scatter x:28-60, y:45-72
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DUNGEONS  (config.js DUNGEONS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+goblin_warren  entrance (18,55)  stars:2  recLvl:10  boss: warchief_grax
+skull_crypt    entrance (52,42)  stars:3  recLvl:25  boss: lich_malgrath
+frostdeep      entrance (65,28)  stars:4  recLvl:40  boss: glacius        ← in mountain pass
+dragon_lair    entrance (72,55)  stars:5  recLvl:60  boss: ignaroth       ← in ice wastes (needs corridor)
+
+Dungeon interior: 20×15, carved room, pillar obstacles, 20 random enemy spawns.
+Exit tile locked until boss dies (DungeonState.checkCleared()).
+Cooldown after completion stored in state.world.dungeonCooldowns.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOWNS & NPCs  (config.js TOWNS, NPCS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ashvale   (20,40)  Aldric(smith), Mara(merchant), Old Finn(fisher), Brynn(guard)
+cresthold (55,25)  Theron(smithing trainer), Sister Yaleth(healer), Dax(ranged), Voss(guild)
+ironport  (20,65)  Ceel(fisher), Crafter Lenne, Zephyr(mage), Shade(stealth trainer)
+
+NPC object: { id, name, glyph, emoji, color, bgColor, tx, ty, dialogue, shop:[itemIds], trainer:skillId }
+Proximity: npcManager.getNpcNear(tx, ty, radius=1.5)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ITEMS  (config.js ITEMS — 60+ items)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Structure: { id, name, glyph, emoji, color,
+  type: 'weapon'|'armour'|'food'|'potion'|'material'|'tool',
+  slot: 'weapon'|'offhand'|'head'|'chest'|'legs'|'hands'|'feet'|'ring'|'amulet',
+  atkBonus, strBonus, defBonus, magBonus, rngBonus,   // equip bonuses
+  reqAtk, reqStr, reqDef, reqMag, reqRng,              // skill requirements
+  heal, buffStr, buffDef, buffAtk, mana, permStr,      // consumable effects
+  stackable: bool, value: int                          // gold value (sell = 50%)
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SKILLS  (13 total, config.js SKILLS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Combat:    attack, strength, defence, hitpoints, magic, ranged
+Gathering: mining, fishing, woodcutting, cooking
+Future:    smithing, crafting, stealth
+
+XP threshold per level: floor(300 × 1.12^level). Cap: 99.
+Hitpoints special: every 10 levels → +10 maxHp.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPAWN ZONES  (config.js SPAWN_ZONES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ashvale       [5,30,30,50]   rat
+goblin_plains [30,45,60,70]  goblin, goblin_archer
+dark_forest   [5,10,30,30]   wolf, bandit
+haunted_moor  [35,10,55,35]  skeleton, ghost
+mountain_pass [55,10,75,30]  troll
+ice_wastes    [60,30,78,55]  ice_wraith
+skull_crypt   [45,35,60,50]  dark_knight
+Max 4 per zone, respawn every ~30s. Town safe radius=14 tiles (no spawn).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MAIN LOOP  (main.js gameLoop)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Both modes each frame:
+  particles.update → hud.update → player state sync → HP regen
+
+World mode:
+  player.update → spawner.update → enemies.update → combat.update
+  → dungeon entrance check → draw(worldMap, allEntities)
+
+Dungeon mode:
+  player.update → dungeonState enemies update → combat.update
+  → boss spawn check → cleared check → exit tile check → draw(dungeonMap, ...)
+
+Tap handler priority: NPC click > enemy target > dungeon entrance > resource gather > pathfind
+Hold handler (600ms): show monster info popup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVENT WIRING & CROSS-FILE PATTERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Custom DOM event  'crpg:useItem'  → fired by inventory.js, caught in main.js
+  detail: { itemId }  → calls tasks.useItem(itemId, player)
+
+Callbacks (avoid circular imports):
+  skillEngine.setLevelUpCallback(fn)  → main sets fn to refresh HUD + skills panel
+  input.setScreenToWorld(fn)          → main injects renderer.screenToWorld
+
+Direct state mutation is fine: getState().player.gold += n  (no reducer pattern)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMMON GOTCHAS & PATTERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Bump sw.js CACHE_NAME (crpg-vN) on every deploy or browser won't reload assets.
+
+2. STONE tiles (id=2) are NOT walkable. Any content placed in ice wastes or moor
+   needs a road corridor carved in map.js _generate() after dungeon placement.
+
+3. Item popup re-opens after use/sell by calling _showItemPopup() which replaces
+   innerHTML — use e.stopPropagation() on all action buttons or document click
+   handler will close the popup immediately.
+
+4. Pathfinder returns null for 2 reasons: (a) truly unreachable, (b) maxNodes hit.
+   If a new area seems unreachable, first check TILE_WALKABLE for tiles in that zone.
+
+5. float tile coords: player/enemy x,y are floats. Use Math.floor() for tile lookup.
+   Waypoints returned by findPath are tile-centre (+0.5).
+
+6. Equipment bonuses are NOT in state directly — call getEquipBonus(stat) or
+   player.getAttackStat() etc. which sum state + equip + buffs.
+
+7. Dungeon generation is deterministic per dungeonId (no seed), always same layout.
+   Exit tile starts as WALL and only becomes EXIT when boss dies.
+
+8. Adding a new dungeon: add to config.js DUNGEONS, add entrance point, add enemies
+   to ENEMIES, check if entrance is in a stone/non-walkable zone → carve corridor.
+
+9. Adding a new item: add to config.js ITEMS with full structure. If stackable=true,
+   backpack qty stacks. Consumables need type:'food'|'potion' for Use button to show.
+
+10. NPC shops defined in config.js NPCS as shop:[itemId, ...]. Trading handled in
+    menuNav.js showDialogue() — sell-to-NPC and buy from NPC both available.
