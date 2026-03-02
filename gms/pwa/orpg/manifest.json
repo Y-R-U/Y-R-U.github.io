@@ -1,0 +1,11 @@
+{
+  "name": "Dungeon ORPG",
+  "short_name": "ORPG",
+  "description": "A single-player dungeon RPG with combat, fishing, and cooking.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a12",
+  "theme_color": "#0a0a12",
+  "icons": []
+}
