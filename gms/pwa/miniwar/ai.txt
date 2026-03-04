@@ -1,0 +1,101 @@
+MINI WAR - Project Overview for AI Assistants
+==============================================
+
+Game: "Mini War" - An Age of War-style PWA mobile-first portrait game.
+Theme: Post-AI-wars micro nations battling each other.
+Tech: Pure HTML/JS/CSS, no frameworks, procedural canvas graphics, Web Audio API for SFX.
+
+DIRECTORY STRUCTURE
+-------------------
+miniwar/
+  index.html          - Main HTML with all panel overlays (intro, settings, evolve, ageup, victory, defeat)
+  manifest.json       - PWA manifest
+  sw.js               - Service worker for offline caching
+  css/
+    style.css         - All styles: HUD, panels, toggles, animations, mobile-first layout
+  js/
+    config.js         - CONFIG object: ages, units, enemies, evolve upgrades, tuning constants
+    graphics.js       - Graphics module: canvas init, background rendering (5 themes), sprite drawing, particles
+    audio.js          - AudioManager module: Web Audio synthesized SFX (hit, shoot, explosion, death, victory, defeat, special), music player
+    units.js          - Units module: unit creation, movement/targeting AI, combat, projectiles, particles, damage numbers
+    ui.js             - UI module: HUD updates, panel show/hide, unit bar building, cooldown tracking
+    game.js           - Game module: state management, game loop, AI spawning, evolve/prestige, save/load, wave progression
+    app.js            - Entry point: loading screen, boot sequence, PWA registration, touch prevention
+  icons/
+    icon-192.png      - PWA icon 192x192
+    icon-512.png      - PWA icon 512x512
+  music/              - Empty folder. Place theme1.mp3 through theme5.mp3 here for background music per age.
+
+KEY MODULES & FUNCTIONS
+-----------------------
+
+CONFIG (js/config.js):
+  CONFIG.AGES[]             - 5 ages: Scavenger Era, Militia Age, Industrial Era, Tech Revolution, Neo Dominion. Each has units[], bgTheme, ageUpCost.
+  CONFIG.ENEMY_NATIONS[]    - Array of {name, short, color} for enemy nations (CSA, NAZ, BRT, FRK, CND, JPC, IND, BRZ, GRM, MEX, KRN, ITP, CHP, RSN, SWD).
+  CONFIG.EVOLVE_UPGRADES[]  - 6 prestige upgrades: Gold Rush, Fortify, War Doctrine, Swift March, Tactics, Artillery.
+
+Graphics (js/graphics.js):
+  init(canvas)              - Initialize canvas, set up resize handler.
+  drawBackground(theme, ageIndex) - Render cached themed background (wasteland/settlement/industrial/tech/neo).
+  drawBase(x, y, hp, maxHp, isPlayer, age) - Draw base building, adapts visual per age.
+  drawUnit(unit, time)      - Draw animated unit sprite based on type (melee/ranged/tank/siege).
+  drawProjectile(proj)      - Draw bullet/cannonball/plasma projectile with trail.
+  drawParticle(p)           - Draw a single particle (circle or rect with alpha).
+  drawSpecialAttack(x, progress) - Draw expanding shockwave ring effect.
+  drawDamageNumber(dn)      - Draw floating damage number text.
+  getUnitIcon(unitDef, isPlayer) - Returns a small canvas with unit icon for HUD buttons, cached.
+
+AudioManager (js/audio.js):
+  playHit/playShoot/playExplosion/playDeath/playVictory/playDefeat/playSpecial() - Synthesized sound effects via Web Audio API oscillators and noise buffers.
+  playThemeMusic(themeIndex) - Loads music/theme{N}.mp3 if it exists, loops it. Silently fails if file missing.
+  setSoundEnabled(bool) / setMusicEnabled(bool) - Toggle audio.
+
+Units (js/units.js):
+  createUnit(unitDef, isPlayer, ageIndex, evolveBonus, waveScale) - Instantiate a unit with scaled stats.
+  update(units, allUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt) - Move units, find targets, trigger attacks.
+  findTarget(unit, allUnits, playerBase, enemyBase) - Returns closest enemy unit or enemy base.
+  performAttack(attacker, target, projectiles, particles, damageNumbers, time) - Melee=instant damage, ranged=spawn projectile.
+  applyDamage(target, damage, particles, damageNumbers, time) - Apply damage to unit or base, spawn particles and damage numbers.
+  killUnit(unit, particles, time) - Set unit to dying state, spawn death particles.
+  updateProjectiles(...) - Move projectiles toward targets, apply damage on hit.
+  updateParticles(particles, dt) / updateDamageNumbers(damageNumbers, dt) - Animate and remove expired.
+
+UI (js/ui.js):
+  init()                    - Wire up all button event listeners.
+  showIntro()               - Show nation naming intro panel.
+  buildUnitBar(age)         - Populate bottom HUD with unit spawn buttons for given age.
+  updateCooldowns(time)     - Update visual cooldown overlays on unit buttons.
+  setUnitCooldown(unitId, time) / isUnitOnCooldown(unitId, time) - Track spawn cooldowns.
+  updateHUD(state)          - Update all HUD displays (gold, xp, age, wave, HP bars, special cooldown).
+  showVictory(rewards) / showDefeat() - Show result panels.
+  openEvolvePanel() / openAgeUpPanel() - Build and show evolve/ageup panels.
+
+Game (js/game.js):
+  startGame(nationName)     - Initialize state (loading evolve data from save), start game loop.
+  initBattle()              - Reset battlefield, pick random enemy, set base HPs scaled by wave/evolve.
+  gameLoop(time)            - Main requestAnimationFrame loop: update + render.
+  update(time, dt)          - Gold income, AI spawning, unit/projectile updates, kill rewards, win/loss checks.
+  render(time)              - Draw background, bases, units, projectiles, particles, effects, damage numbers.
+  spawnPlayerUnit(unitIndex) - Spawn a player unit (checks gold and cooldown).
+  spawnEnemyUnit(time)      - AI spawns a random enemy unit scaled by wave.
+  doSpecialAttack()         - AoE damage to enemy units near center + base damage.
+  doAgeUp()                 - Advance to next age (costs gold).
+  doEvolve()                - Prestige reset: gain evolve points, restart from age 1.
+  calcEvolvePointGain()     - Returns EP earned based on wave reached and current age.
+  buyEvolveUpgrade(id, cost) - Purchase a permanent evolve upgrade.
+  nextWave() / retryBattle() - Post-battle flow.
+
+GAME MECHANICS SUMMARY
+-----------------------
+- Player taps unit buttons to spawn troops that march right toward the enemy base.
+- Enemy AI spawns units that march left toward the player's base.
+- Units auto-target closest enemy or enemy base. Melee = instant hit, Ranged = projectile.
+- Kill enemies for gold and XP. Gold also passively earned per second.
+- Age Up (5 ages) unlocks new unit types; costs gold.
+- Special Attack: AoE nuke on cooldown (15s).
+- Win: destroy enemy base. Lose: your base destroyed.
+- Waves get progressively harder (HP and ATK scale per wave).
+- Evolve (prestige): reset all progress, earn Evolve Points based on wave/age. EP buy permanent upgrades (gold income, base HP, unit atk/speed, XP gain, special damage).
+- Save/load via localStorage (persists evolve data across sessions).
+- Sound: Web Audio synthesized. Music: optional mp3 files in music/ folder.
+- No alerts or prompts - all UI is custom panel overlays.
