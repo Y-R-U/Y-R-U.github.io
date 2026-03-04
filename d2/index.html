@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Editor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #1e1e1e;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+  }
+
+  /* Top toolbar */
+  #top-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #2d2d2d;
+    border-bottom: 1px solid #404040;
+    min-height: 40px;
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  #top-bar > * { flex-shrink: 0; }
+
+  #top-bar .separator {
+    width: 1px;
+    height: 24px;
+    background: #555;
+    margin: 0 4px;
+  }
+
+  .tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .tool-btn:hover { background: #3a3a3a; }
+  .tool-btn.active { background: #0066cc; color: #fff; border-color: #0088ff; }
+
+  .tool-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .color-well {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .color-well input[type="color"] {
+    position: absolute;
+    top: -4px; left: -4px;
+    width: 36px; height: 36px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+  }
+  .color-well.no-fill {
+    background: repeating-linear-gradient(45deg, #666, #666 3px, #999 3px, #999 6px) !important;
+  }
+  .color-well.no-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom right, transparent 45%, #ff4444 45%, #ff4444 55%, transparent 55%);
+  }
+
+  .prop-label {
+    font-size: 11px;
+    color: #999;
+    margin-right: 2px;
+  }
+
+  .prop-slider {
+    width: 60px;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #555;
+    border-radius: 2px;
+    outline: none;
+  }
+  .prop-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+  }
+
+  .prop-value {
+    font-size: 11px;
+    color: #aaa;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .toolbar-spacer { flex: 1; min-width: 8px; }
+
+  #btn-export {
+    padding: 4px 12px;
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    height: 28px;
+  }
+  #btn-export:hover { background: #0077ee; }
+
+  #btn-undo, #btn-redo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  #btn-undo:hover, #btn-redo:hover { background: #3a3a3a; color: #ccc; }
+  #btn-undo:disabled, #btn-redo:disabled { color: #555; cursor: default; }
+  #btn-undo:disabled:hover, #btn-redo:disabled:hover { background: transparent; }
+
+  /* Main area */
+  #main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Right sidebar for layers */
+  #layer-sidebar {
+    width: 220px;
+    background: #2d2d2d;
+    border-left: 1px solid #404040;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  #layer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid #404040;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #999;
+  }
+
+  #btn-add-layer {
+    width: 24px; height: 24px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #btn-add-layer:hover { background: #3a3a3a; }
+
+  #layer-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+
+  .layer-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.1s;
+    font-size: 13px;
+  }
+  .layer-item:hover { background: #353535; }
+  .layer-item.active {
+    background: #353535;
+    border-left-color: #0066cc;
+  }
+  .layer-item.drag-over { border-top: 2px solid #0066cc; }
+
+  .layer-visibility {
+    width: 20px; height: 20px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .layer-visibility:hover { background: #444; }
+  .layer-visibility.hidden { color: #555; }
+
+  .layer-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .layer-name-input {
+    flex: 1;
+    min-width: 0;
+    background: #444;
+    border: 1px solid #0066cc;
+    color: #e0e0e0;
+    padding: 1px 4px;
+    font-size: 13px;
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .layer-delete {
+    width: 20px; height: 20px;
+    border: none;
+    background: transparent;
+    color: #777;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .layer-item:hover .layer-delete { opacity: 1; }
+  .layer-delete:hover { background: #cc3333; color: #fff; }
+
+  /* Canvas area */
+  #canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #2a2a2a;
+    /* subtle checkerboard for transparency */
+    background-image:
+      linear-gradient(45deg, #262626 25%, transparent 25%),
+      linear-gradient(-45deg, #262626 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #262626 75%),
+      linear-gradient(-45deg, transparent 75%, #262626 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  }
+
+  #canvas-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  #canvas-main, #canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #canvas-overlay {
+    z-index: 1;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #777; }
+
+  /* Tooltip */
+  .tool-btn[title]::after { font-size: 11px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    #layer-sidebar { width: 160px; }
+    .prop-slider { width: 40px; }
+  }
+  @media (max-width: 500px) {
+    #layer-sidebar { width: 120px; }
+    .prop-label { display: none; }
+    .separator { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Toolbar -->
+<div id="top-bar">
+  <!-- Tool buttons -->
+  <button class="tool-btn active" data-tool="select" title="Select (V)">
+    <svg viewBox="0 0 24 24"><path d="M4 4l7 18 3-7 7-3z"/></svg>
+  </button>
+  <button class="tool-btn" data-tool="draw" title="Draw (D)">
+    <svg viewBox="0 0 24 24"><path d="M3 21c0 0 4-1 6-3s10-10 10-10l-4-4S5 14 3 16s-3 6-3 6z"/><path d="M15 4l4 4"/></svg>
+  </button>
+
+  <div class="separator"></div>
+
+  <button class="tool-btn" data-tool="rect" title="Rectangle (R)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/></svg>
+  </button>
+  <button class="tool-btn" data-tool="ellipse" title="Ellipse (E)">
+    <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="7"/></svg>
+  </button>
+  <button class="tool-btn" data-tool="line" title="Line (L)">
+    <svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4"/></svg>
+  </button>
+  <button class="tool-btn" data-tool="arrow" title="Arrow (A)">
+    <svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4"/><polyline points="14,4 20,4 20,10"/></svg>
+  </button>
+
+  <div class="separator"></div>
+
+  <!-- Stroke color -->
+  <span class="prop-label">Stroke</span>
+  <div class="color-well" id="stroke-color-well" style="background:#000000">
+    <input type="color" id="stroke-color" value="#000000">
+  </div>
+
+  <!-- Fill color -->
+  <span class="prop-label">Fill</span>
+  <div class="color-well no-fill" id="fill-color-well">
+    <input type="color" id="fill-color" value="#ffffff">
+  </div>
+  <button class="tool-btn" id="toggle-fill" title="Toggle fill" style="width:20px;height:20px;font-size:11px;border:none;">
+    <span style="font-size:11px">&#8709;</span>
+  </button>
+
+  <div class="separator"></div>
+
+  <!-- Stroke width -->
+  <span class="prop-label">Width</span>
+  <input type="range" class="prop-slider" id="stroke-width" min="1" max="20" value="2">
+  <span class="prop-value" id="stroke-width-val">2</span>
+
+  <div class="separator"></div>
+
+  <!-- Undo / Redo -->
+  <button id="btn-undo" title="Undo (Cmd+Z)" disabled>&#x21A9;</button>
+  <button id="btn-redo" title="Redo (Cmd+Shift+Z)" disabled>&#x21AA;</button>
+
+  <!-- Spacer + Export -->
+  <div class="toolbar-spacer"></div>
+  <button id="btn-export">Export PNG</button>
+</div>
+
+<!-- Main area: canvas + layers -->
+<div id="main">
+  <div id="canvas-area">
+    <div id="canvas-container">
+      <canvas id="canvas-main"></canvas>
+      <canvas id="canvas-overlay"></canvas>
+    </div>
+  </div>
+  <div id="layer-sidebar">
+    <div id="layer-header">
+      <span>Layers</span>
+      <button id="btn-add-layer" title="Add layer">+</button>
+    </div>
+    <div id="layer-list"></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

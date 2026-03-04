@@ -1,0 +1,203 @@
+================================================================================
+AI CONTEXT FILE - Image Editor v2 (d2/)
+================================================================================
+Read this file first to understand the codebase without reading all source files.
+Last updated: 2026-03-04
+
+================================================================================
+ARCHITECTURE OVERVIEW
+================================================================================
+
+Pure ES module app (no build tools, no frameworks, no jQuery).
+Two-canvas rendering system for performance.
+State-based undo/redo via deep cloning layers.
+All shapes are plain data objects (serializable JSON).
+
+================================================================================
+FILE STRUCTURE
+================================================================================
+
+d2/
+  index.html              -- HTML shell + all CSS (no inline JS)
+  ai.txt                  -- This file
+  js/
+    app.js                -- Bootstrap: creates state, renderer, tools, UI, starts render loop
+    state.js              -- Central state store with event emitter pattern
+    history.js            -- Undo/redo via state snapshots (max 50 steps)
+    renderer.js           -- Two-canvas renderer (main + overlay)
+    event-handler.js      -- Mouse/keyboard/paste event dispatch
+    tools/
+      select-tool.js      -- Select, move, resize shapes via canvas-drawn handles
+      draw-tool.js        -- Freehand drawing with path simplification
+      rect-tool.js        -- Rectangle (Shift = square)
+      ellipse-tool.js     -- Ellipse (Shift = circle)
+      line-tool.js        -- Line and Arrow (Shift = 45-degree snap)
+    shapes/
+      registry.js         -- Maps shape type string -> renderer object
+      utils.js            -- Shared geometry: pointToSegmentDist, normalizeRect, transformBounds
+      rect.js             -- Rectangle: draw, hitTest, getBounds, transformByHandle
+      ellipse.js          -- Ellipse: same interface
+      line.js             -- Line: same + getHandlePositions (endpoint handles), translate
+      arrow.js            -- Arrow: same as line + arrowhead drawing
+      path.js             -- Freehand path: same + simplify (Ramer-Douglas-Peucker)
+      image.js            -- Pasted image: same + lazy _imageElement cache from dataUrl
+    ui/
+      toolbar.js          -- Tool buttons, color pickers, stroke width, undo/redo, export
+      layer-panel.js       -- Layer list: drag reorder, visibility toggle, rename, delete
+
+================================================================================
+KEY DATA STRUCTURES
+================================================================================
+
+--- Shape (plain object, stored in layer.shapes[]) ---
+
+All shapes have: id, type, opacity
+Bounding-box shapes (rect, ellipse, image): x, y, width, height
+Line-type shapes (line, arrow): x1, y1, x2, y2
+Path shapes: points [{x,y}, ...]
+Rect/Ellipse also have: strokeColor, fillColor, strokeWidth
+Line/Arrow also have: strokeColor, strokeWidth
+Image also has: dataUrl (string), _imageElement (transient, not serialized)
+Path also has: _bounds (transient cache, not serialized)
+
+--- Layer (plain object, stored in state.layers[]) ---
+
+{
+  id: string,          // 'layer_<timestamp>_<counter>'
+  name: string,        // 'Layer 1', etc.
+  visible: boolean,    // eye icon toggle
+  shapes: Shape[],     // ordered bottom to top
+}
+
+--- State (singleton, created by createState()) ---
+
+{
+  layers: Layer[],              // ordered bottom to top
+  activeLayerId: string|null,   // which layer receives new shapes
+  selectedShapeIds: string[],   // currently selected shape IDs
+  activeTool: string,           // 'select'|'draw'|'rect'|'ellipse'|'line'|'arrow'
+  strokeColor: string,          // hex color for new shapes
+  fillColor: string|null,       // null = no fill
+  strokeWidth: number,          // 1-20
+}
+
+Events emitted by state:
+  'tool-changed'       -- active tool changed
+  'layers-changed'     -- layer added/deleted/reordered/visibility toggled
+  'shapes-changed'     -- shape added/deleted/modified
+  'selection-changed'  -- selected shape(s) changed
+  'history-changed'    -- undo/redo stack changed
+
+================================================================================
+RENDERING PIPELINE
+================================================================================
+
+Two canvases stacked via z-index:
+  #canvas-main    -- All committed shapes from visible layers (redrawn on state change)
+  #canvas-overlay -- Live preview during drawing + selection handles (redrawn per frame)
+
+Render loop (requestAnimationFrame):
+  if mainDirty:   renderer.renderMain(state)     -- clears, draws white bg, draws all layers
+  if overlayDirty: renderer.renderOverlay(state, previewShape) -- clears, draws preview + handles
+
+DPR-aware: canvases use devicePixelRatio scaling. CSS size != canvas pixel size.
+Export creates a separate 1x canvas to avoid DPR-scaled output.
+
+================================================================================
+TOOL INTERFACE
+================================================================================
+
+Every tool object must implement:
+  name: string
+  cursor: string                              -- CSS cursor
+  onActivate(state): void
+  onDeactivate(state): void
+  onMouseDown(event, state, canvasPos, history): void
+  onMouseMove(event, state, canvasPos): boolean  -- return true if main canvas needs redraw
+  onMouseUp(event, state, canvasPos, history): void
+  getPreviewShape(): Shape|null               -- shape to render on overlay during drawing
+
+After drawing a shape, tools set state.activeTool = 'select' and emit 'tool-changed'
+to auto-switch to select mode so the new shape can be immediately moved/resized.
+
+================================================================================
+SHAPE RENDERER INTERFACE
+================================================================================
+
+Every shape renderer (in shapes/*.js) must implement:
+  draw(ctx, shape): void                     -- render shape to a 2D canvas context
+  hitTest(shape, px, py): boolean            -- is point (px,py) on/in the shape?
+  getBounds(shape): {x, y, width, height}    -- bounding box
+  transformByHandle(shape, handleId, dx, dy): Shape  -- return new shape data
+
+Line-type shapes additionally implement:
+  getHandlePositions(shape): [{id, x, y, cursor}]  -- endpoint handles
+  translate(shape, dx, dy): Shape                   -- move entire shape
+
+Handle IDs for bounding-box shapes: 'nw','n','ne','e','se','s','sw','w'
+Handle IDs for line-type shapes: 'p1','p2'
+
+================================================================================
+UNDO/REDO
+================================================================================
+
+history.push()  -- snapshot current layers (called BEFORE mutation)
+history.undo()  -- restore previous snapshot, save current to redo stack
+history.redo()  -- restore next snapshot, save current to undo stack
+
+Snapshots are deep clones of state.layers via JSON.parse(JSON.stringify(...)).
+Transient properties (_imageElement, _bounds) are excluded and rebuilt on restore.
+Max 50 undo steps.
+
+================================================================================
+KEYBOARD SHORTCUTS
+================================================================================
+
+Cmd/Ctrl+Z        -- Undo
+Cmd/Ctrl+Shift+Z  -- Redo
+Delete/Backspace   -- Delete selected shape
+Escape             -- Deselect
+V                  -- Select tool
+D                  -- Draw tool
+R                  -- Rectangle tool
+E                  -- Ellipse tool
+L                  -- Line tool
+A                  -- Arrow tool
+Shift (during draw) -- Constrain: square, circle, 45-degree snap
+
+================================================================================
+CLIPBOARD PASTE
+================================================================================
+
+Listens for 'paste' event on document.
+Reads clipboard items for image/* files.
+Converts blob to dataUrl via FileReader.
+Creates Image element, adds to active layer as ImageShape.
+Auto-selects the pasted image.
+
+================================================================================
+COMMON MODIFICATION PATTERNS
+================================================================================
+
+To add a new shape type:
+  1. Add type constant to ShapeType in state.js
+  2. Create shapes/newtype.js implementing draw/hitTest/getBounds/transformByHandle
+  3. Register in shapes/registry.js
+  4. Create tools/newtype-tool.js implementing the tool interface
+  5. Register tool in app.js tools map
+  6. Add button to index.html toolbar
+
+To add a new tool property (e.g., opacity slider):
+  1. Add property to state object in state.js
+  2. Add UI control in index.html
+  3. Wire up in ui/toolbar.js (input event -> state, selection-changed -> input)
+  4. Use property in tool build() functions when creating shapes
+  5. Use property in shape renderer draw() functions
+
+To modify selection behavior:
+  Edit tools/select-tool.js - all selection logic is in _hitTestShapeHandles()
+  and _hitTestAllShapes(). Move/resize logic is in onMouseMove().
+
+To change rendering:
+  Edit renderer.js - renderMain() for committed state, renderOverlay() for interactive.
+  _drawSelectionHandles() controls selection box appearance.
