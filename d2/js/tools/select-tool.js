@@ -2,6 +2,15 @@
 import { getShapeRenderer, isLineType } from '../shapes/registry.js';
 import { getHandlePositions, hitTestHandle } from '../renderer.js';
 
+// Clone shape data, stripping transient DOM/cache properties so they
+// don't clobber the real ones when Object.assign'd back during resize.
+function cloneShapeData(shape) {
+  return JSON.parse(JSON.stringify(shape, (key, val) => {
+    if (key === '_imageElement' || key === '_bounds') return undefined;
+    return val;
+  }));
+}
+
 export function createSelectTool() {
   let mode = null;         // 'moving' | 'resizing' | null
   let startPos = null;
@@ -63,7 +72,7 @@ export function createSelectTool() {
         activeHandle = handle;
         startPos = pos;
         const found = state.findShapeById(state.selectedShapeIds[0]);
-        originalShape = JSON.parse(JSON.stringify(found.shape));
+        originalShape = cloneShapeData(found.shape);
         targetShapeId = found.shape.id;
         history.push();
         return;

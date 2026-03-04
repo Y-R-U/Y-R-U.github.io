@@ -32,6 +32,7 @@ d2/
       rect-tool.js        -- Rectangle (Shift = square)
       ellipse-tool.js     -- Ellipse (Shift = circle)
       line-tool.js        -- Line and Arrow (Shift = 45-degree snap)
+      text-tool.js        -- Text box (drag to define, inline editing overlay)
     shapes/
       registry.js         -- Maps shape type string -> renderer object
       utils.js            -- Shared geometry: pointToSegmentDist, normalizeRect, transformBounds
@@ -41,6 +42,7 @@ d2/
       arrow.js            -- Arrow: same as line + arrowhead drawing
       path.js             -- Freehand path: same + simplify (Ramer-Douglas-Peucker)
       image.js            -- Pasted image: same + lazy _imageElement cache from dataUrl
+      text.js             -- Text box: draw with word-wrap, font scaling on resize
     ui/
       toolbar.js          -- Tool buttons, color pickers, stroke width, undo/redo, export
       layer-panel.js       -- Layer list: drag reorder, visibility toggle, rename, delete
@@ -58,6 +60,8 @@ Path shapes: points [{x,y}, ...]
 Rect/Ellipse also have: strokeColor, fillColor, strokeWidth
 Line/Arrow also have: strokeColor, strokeWidth
 Image also has: dataUrl (string), _imageElement (transient, not serialized)
+Text also has: text (string), fontSize (number, scales with resize)
+  - strokeColor = text color (1st color picker), fillColor = background color (2nd color picker)
 Path also has: _bounds (transient cache, not serialized)
 
 --- Layer (plain object, stored in state.layers[]) ---
@@ -75,7 +79,7 @@ Path also has: _bounds (transient cache, not serialized)
   layers: Layer[],              // ordered bottom to top
   activeLayerId: string|null,   // which layer receives new shapes
   selectedShapeIds: string[],   // currently selected shape IDs
-  activeTool: string,           // 'select'|'draw'|'rect'|'ellipse'|'line'|'arrow'
+  activeTool: string,           // 'select'|'draw'|'rect'|'ellipse'|'line'|'arrow'|'text'
   strokeColor: string,          // hex color for new shapes
   fillColor: string|null,       // null = no fill
   strokeWidth: number,          // 1-20
@@ -87,6 +91,7 @@ Events emitted by state:
   'shapes-changed'     -- shape added/deleted/modified
   'selection-changed'  -- selected shape(s) changed
   'history-changed'    -- undo/redo stack changed
+  'start-text-edit'    -- triggers inline text editing overlay (shapeId as data)
 
 ================================================================================
 RENDERING PIPELINE
@@ -163,7 +168,9 @@ R                  -- Rectangle tool
 E                  -- Ellipse tool
 L                  -- Line tool
 A                  -- Arrow tool
+T                  -- Text tool
 Shift (during draw) -- Constrain: square, circle, 45-degree snap
+Double-click       -- Edit text shape (opens inline textarea overlay)
 
 ================================================================================
 CLIPBOARD PASTE

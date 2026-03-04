@@ -6,6 +6,7 @@ import { LineShape } from './line.js';
 import { ArrowShape } from './arrow.js';
 import { PathShape } from './path.js';
 import { ImageShape } from './image.js';
+import { TextShape } from './text.js';
 
 const registry = {
   [ShapeType.RECT]: RectShape,
@@ -14,6 +15,7 @@ const registry = {
   [ShapeType.ARROW]: ArrowShape,
   [ShapeType.PATH]: PathShape,
   [ShapeType.IMAGE]: ImageShape,
+  [ShapeType.TEXT]: TextShape,
 };
 
 export function getShapeRenderer(type) {
