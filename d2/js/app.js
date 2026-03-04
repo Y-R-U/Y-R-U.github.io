@@ -8,6 +8,7 @@ import { createDrawTool } from './tools/draw-tool.js';
 import { createRectTool } from './tools/rect-tool.js';
 import { createEllipseTool } from './tools/ellipse-tool.js';
 import { createLineTool } from './tools/line-tool.js';
+import { createTextTool } from './tools/text-tool.js';
 import { ShapeType } from './state.js';
 import { setupToolbar } from './ui/toolbar.js';
 import { setupLayerPanel } from './ui/layer-panel.js';
@@ -41,6 +42,7 @@ const tools = {
   ellipse: createEllipseTool(),
   line: createLineTool(ShapeType.LINE),
   arrow: createLineTool(ShapeType.ARROW),
+  text: createTextTool(),
 };
 
 // Setup event handling

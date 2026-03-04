@@ -12,6 +12,7 @@ export const ShapeType = {
   ARROW: 'arrow',
   PATH: 'path',
   IMAGE: 'image',
+  TEXT: 'text',
 };
 
 export function createState() {
