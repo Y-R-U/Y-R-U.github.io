@@ -64,6 +64,7 @@ const Game = (() => {
       ageIndex: 0,
       wave: 1,
       battleWave: 1,
+      wavesWon: 0,
       evolvePoints: saved ? saved.evolvePoints : 0,
       evolveLevels: saved ? { ...saved.evolveLevels } : {},
       totalEvolves: saved ? saved.totalEvolves : 0,
@@ -98,7 +99,7 @@ const Game = (() => {
     const hpBonus = 1 + (state.evolveLevels.ep_hp || 0) * 0.15;
     const baseHp = CONFIG.BASE_HP * hpBonus;
     const waveMultiplier = Math.pow(CONFIG.WAVE_HP_SCALE, state.wave - 1);
-    const enemyHpTotal = CONFIG.BASE_HP * waveMultiplier * 1.2;
+    const enemyHpTotal = CONFIG.BASE_HP * waveMultiplier;
 
     state.playerBaseHp = Math.round(baseHp);
     state.playerBaseMaxHp = Math.round(baseHp);
@@ -126,8 +127,11 @@ const Game = (() => {
     specialEffects = [];
 
     // AI settings scale with wave
-    aiSpawnInterval = Math.max(1200, 3000 - state.wave * 100);
-    aiNextSpawnTime = performance.now() + 2000;
+    aiSpawnInterval = Math.max(
+      CONFIG.AI_MIN_INTERVAL,
+      CONFIG.AI_BASE_INTERVAL - state.wave * CONFIG.AI_INTERVAL_REDUCTION_PER_WAVE
+    );
+    aiNextSpawnTime = performance.now() + CONFIG.AI_INITIAL_DELAY;
     lastGoldTick = performance.now();
 
     state.battleWave = 1;
@@ -150,10 +154,11 @@ const Game = (() => {
   }
 
   function update(time, dt) {
-    // Gold income
+    // Gold income (scales slightly with wave and age)
     if (time - lastGoldTick >= 1000) {
       const goldMult = 1 + (state.evolveLevels.ep_gold || 0) * 0.20;
-      state.gold += CONFIG.GOLD_PER_SECOND * goldMult;
+      const waveBonus = 1 + (state.wave - 1) * 0.08 + state.ageIndex * 0.15;
+      state.gold += CONFIG.GOLD_PER_SECOND * goldMult * waveBonus;
       lastGoldTick = time;
     }
 
@@ -174,15 +179,15 @@ const Game = (() => {
       aiNextSpawnTime = time + aiSpawnInterval * variance;
     }
 
-    // Merge all units for targeting
-    const allUnits = [...playerUnits, ...enemyUnits];
+    // Build live unit list getter for cross-side targeting
+    const getAllUnits = () => [...playerUnits, ...enemyUnits];
 
-    // Update units (pass allUnits for cross-side targeting)
-    Units.update(playerUnits, allUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt);
-    Units.update(enemyUnits, allUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt);
+    // Update units (pass enemy list directly for targeting)
+    Units.update(playerUnits, enemyUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt);
+    Units.update(enemyUnits, playerUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt);
 
     // Update projectiles
-    Units.updateProjectiles(projectiles, allUnits, playerBase, enemyBase, particles, damageNumbers, time, dt);
+    Units.updateProjectiles(projectiles, getAllUnits(), playerBase, enemyBase, particles, damageNumbers, time, dt);
 
     // Update particles
     Units.updateParticles(particles, dt);
@@ -205,7 +210,7 @@ const Game = (() => {
         u.rewardGiven = true;
         const xpMult = 1 + (state.evolveLevels.ep_xp || 0) * 0.25;
         state.xp += CONFIG.XP_PER_KILL * xpMult;
-        state.gold += CONFIG.GOLD_PER_KILL_BASE + state.wave;
+        state.gold += CONFIG.GOLD_PER_KILL_BASE + state.wave * 2;
 
         // Level up check
         while (state.xp >= state.xpToNext) {
@@ -297,8 +302,13 @@ const Game = (() => {
   }
 
   function spawnEnemyUnit(time) {
-    // Pick random unit from current age (enemy scales with wave)
-    const ageIdx = Math.min(state.ageIndex, CONFIG.AGES.length - 1);
+    // Enemy age scales: match player age, or advance based on wave
+    // Every 5 waves, enemies can be one age higher (capped by player age + 1)
+    const waveAge = Math.floor((state.wave - 1) / 5);
+    const ageIdx = Math.min(
+      Math.max(state.ageIndex, waveAge),
+      CONFIG.AGES.length - 1
+    );
     const age = CONFIG.AGES[ageIdx];
     const unitDef = age.units[Math.floor(Math.random() * age.units.length)];
 
@@ -366,7 +376,6 @@ const Game = (() => {
 
     state.evolvePoints += epGain;
     state.totalEvolves++;
-    save();
 
     // Reset game progress but keep evolve
     state.gold = CONFIG.STARTING_GOLD;
@@ -374,17 +383,23 @@ const Game = (() => {
     state.level = 1;
     state.ageIndex = 0;
     state.wave = 1;
+    state.wavesWon = 0;
     state.xpToNext = 100;
     state.specialCooldownLeft = 0;
+    state.paused = false;
 
+    save();
     initBattle();
     UI.buildUnitBar(0);
     AudioManager.playThemeMusic(0);
   }
 
   function calcEvolvePointGain() {
-    // Based on wave reached and age
-    return Math.max(1, Math.floor(state.wave * 0.5) + state.ageIndex);
+    // Only earn EP from waves you've actually won this run
+    if (state.wavesWon <= 0) return 0;
+    const waveBonus = Math.floor(state.wavesWon * 0.7);
+    const ageBonus = state.ageIndex * 2;
+    return Math.max(1, waveBonus + ageBonus);
   }
 
   function buyEvolveUpgrade(id, cost) {
@@ -401,8 +416,9 @@ const Game = (() => {
 
   function onVictory() {
     state.paused = true;
-    const goldReward = CONFIG.WAVE_GOLD_REWARD + state.wave * 15;
-    const xpReward = 30 + state.wave * 10;
+    state.wavesWon++;
+    const goldReward = CONFIG.WAVE_GOLD_REWARD + state.wave * 20 + state.ageIndex * 30;
+    const xpReward = 30 + state.wave * 12 + state.ageIndex * 15;
     const xpMult = 1 + (state.evolveLevels.ep_xp || 0) * 0.25;
 
     state.gold += goldReward;
@@ -433,7 +449,7 @@ const Game = (() => {
 
   function retryBattle() {
     state.paused = false;
-    state.gold = CONFIG.STARTING_GOLD + state.wave * 5;
+    state.gold = CONFIG.STARTING_GOLD + state.wave * 10;
     initBattle();
   }
 

@@ -33,7 +33,7 @@ const Units = (() => {
     };
   }
 
-  function update(units, allUnits, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt) {
+  function update(units, enemyList, playerBase, enemyBase, projectiles, particles, damageNumbers, time, dt) {
     for (let i = units.length - 1; i >= 0; i--) {
       const u = units[i];
 
@@ -44,8 +44,8 @@ const Units = (() => {
         continue;
       }
 
-      // Find target (search all units for cross-side targeting)
-      u.target = findTarget(u, allUnits, playerBase, enemyBase);
+      // Find target (search enemy list for cross-side targeting)
+      u.target = findTarget(u, enemyList, playerBase, enemyBase);
 
       if (u.target) {
         const targetX = u.target.isBase ? u.target.x : u.target.x;
@@ -59,16 +59,16 @@ const Units = (() => {
             performAttack(u, u.target, projectiles, particles, damageNumbers, time);
           }
         } else {
-          // Move toward target
+          // Move toward target (not hardcoded direction!)
           u.state = 'moving';
-          const dir = u.isPlayer ? 1 : -1;
+          const dir = targetX > u.x ? 1 : -1;
           u.x += u.speed * dir * (dt / 16);
         }
       } else {
-        // Move forward
+        // No target - move toward enemy base
         u.state = 'moving';
-        const dir = u.isPlayer ? 1 : -1;
-        u.x += u.speed * dir * (dt / 16);
+        const defaultDir = u.isPlayer ? 1 : -1;
+        u.x += u.speed * defaultDir * (dt / 16);
       }
 
       // Clamp to screen
@@ -76,13 +76,12 @@ const Units = (() => {
     }
   }
 
-  function findTarget(unit, allUnits, playerBase, enemyBase) {
+  function findTarget(unit, enemyList, playerBase, enemyBase) {
     let closest = null;
     let closestDist = Infinity;
 
-    // Find closest enemy unit
-    for (const other of allUnits) {
-      if (other.isPlayer === unit.isPlayer) continue;
+    // Find closest enemy unit from the opposite side's list
+    for (const other of enemyList) {
       if (other.state === 'dying') continue;
 
       const dist = Math.abs(unit.x - other.x);
@@ -92,7 +91,7 @@ const Units = (() => {
       }
     }
 
-    // Check base
+    // Check enemy base
     const enemyBaseTarget = unit.isPlayer ? enemyBase : playerBase;
     const baseDist = Math.abs(unit.x - enemyBaseTarget.x);
     if (baseDist < closestDist) {

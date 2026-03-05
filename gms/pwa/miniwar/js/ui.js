@@ -184,6 +184,10 @@ const UI = (() => {
       specialBtn.querySelector('.action-label').textContent = 'Special';
     }
 
+    // Evolve button - only enabled when you have waves won
+    const evolveBtn = document.getElementById('btn-evolve');
+    evolveBtn.disabled = (state.wavesWon || 0) <= 0;
+
     // Age up button
     const ageBtn = document.getElementById('btn-upgrade');
     const canAgeUp = state.ageIndex < CONFIG.AGES.length - 1;
@@ -257,6 +261,15 @@ const UI = (() => {
   }
 
   function showDefeat() {
+    const epGain = Game.calcEvolvePointGain();
+    const evolveBtn = document.getElementById('btn-defeat-evolve');
+    if (epGain > 0) {
+      evolveBtn.textContent = `Evolve (+${epGain} EP)`;
+      evolveBtn.disabled = false;
+    } else {
+      evolveBtn.textContent = 'Evolve (win first!)';
+      evolveBtn.disabled = true;
+    }
     showPanel('defeat-panel');
     AudioManager.playDefeat();
   }
