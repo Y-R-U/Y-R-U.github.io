@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head><title>Icon Generator</title></head>
+<body>
+<canvas id="c192" width="192" height="192"></canvas>
+<canvas id="c512" width="512" height="512"></canvas>
+<script>
+function drawIcon(canvas) {
+    const ctx = canvas.getContext('2d');
+    const s = canvas.width;
+    const r = s * 0.15;
+
+    // Background
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(s - r, 0);
+    ctx.quadraticCurveTo(s, 0, s, r);
+    ctx.lineTo(s, s - r);
+    ctx.quadraticCurveTo(s, s, s - r, s);
+    ctx.lineTo(r, s);
+    ctx.quadraticCurveTo(0, s, 0, s - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, 0, s, s);
+    grad.addColorStop(0, '#1a1a2e');
+    grad.addColorStop(1, '#16213e');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Die
+    const dieSize = s * 0.45;
+    const dx = (s - dieSize) / 2;
+    const dy = s * 0.12;
+    const dr = dieSize * 0.12;
+
+    ctx.beginPath();
+    ctx.moveTo(dx + dr, dy);
+    ctx.lineTo(dx + dieSize - dr, dy);
+    ctx.quadraticCurveTo(dx + dieSize, dy, dx + dieSize, dy + dr);
+    ctx.lineTo(dx + dieSize, dy + dieSize - dr);
+    ctx.quadraticCurveTo(dx + dieSize, dy + dieSize, dx + dieSize - dr, dy + dieSize);
+    ctx.lineTo(dx + dr, dy + dieSize);
+    ctx.quadraticCurveTo(dx, dy + dieSize, dx, dy + dieSize - dr);
+    ctx.lineTo(dx, dy + dr);
+    ctx.quadraticCurveTo(dx, dy, dx + dr, dy);
+    ctx.closePath();
+
+    const dieGrad = ctx.createLinearGradient(dx, dy, dx + dieSize, dy + dieSize);
+    dieGrad.addColorStop(0, '#fff');
+    dieGrad.addColorStop(1, '#e0e0e0');
+    ctx.fillStyle = dieGrad;
+    ctx.fill();
+
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = s * 0.05;
+    ctx.shadowOffsetY = s * 0.02;
+
+    // Dots for 5
+    ctx.fillStyle = '#e94560';
+    ctx.shadowColor = 'transparent';
+    const dotR = dieSize * 0.07;
+    const pad = dieSize * 0.25;
+    const cx = dx + dieSize / 2;
+    const cy = dy + dieSize / 2;
+    const dots = [
+        [dx + pad, dy + pad],
+        [dx + dieSize - pad, dy + pad],
+        [cx, cy],
+        [dx + pad, dy + dieSize - pad],
+        [dx + dieSize - pad, dy + dieSize - pad]
+    ];
+    dots.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, dotR, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Text
+    ctx.font = `bold ${s * 0.18}px 'Segoe UI', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText('DICEY', s / 2, s * 0.82);
+}
+
+drawIcon(document.getElementById('c192'));
+drawIcon(document.getElementById('c512'));
+
+// Download links
+['c192', 'c512'].forEach(id => {
+    const c = document.getElementById(id);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = `icon-${c.width}.png`;
+    a.textContent = `Download ${c.width}`;
+    document.body.appendChild(a);
+    document.body.appendChild(document.createElement('br'));
+});
+</script>
+</body>
+</html>
