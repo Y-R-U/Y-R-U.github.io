@@ -4,7 +4,11 @@ const UI = (() => {
 
   function init() {
     // Settings panel
-    document.getElementById('btn-settings').addEventListener('click', () => showPanel('settings-panel'));
+    document.getElementById('btn-settings').addEventListener('click', () => {
+      document.getElementById('debug-start-gold').value = CONFIG.STARTING_GOLD;
+      document.getElementById('debug-gold-sec').value = CONFIG.GOLD_PER_SECOND;
+      showPanel('settings-panel');
+    });
     document.getElementById('btn-close-settings').addEventListener('click', () => hidePanel('settings-panel'));
 
     // Sound toggles
@@ -57,6 +61,25 @@ const UI = (() => {
     document.getElementById('btn-defeat-evolve').addEventListener('click', () => {
       hidePanel('defeat-panel');
       openEvolvePanel();
+    });
+
+    // Debug panel
+    const debugStartGold = document.getElementById('debug-start-gold');
+    const debugGoldSec = document.getElementById('debug-gold-sec');
+    debugStartGold.value = CONFIG.STARTING_GOLD;
+    debugGoldSec.value = CONFIG.GOLD_PER_SECOND;
+
+    debugStartGold.addEventListener('change', () => {
+      CONFIG.STARTING_GOLD = Number(debugStartGold.value) || 50;
+    });
+    debugGoldSec.addEventListener('change', () => {
+      CONFIG.GOLD_PER_SECOND = Number(debugGoldSec.value) || 3;
+    });
+
+    document.getElementById('btn-debug-reset').addEventListener('click', () => {
+      localStorage.removeItem('miniwar_save');
+      hidePanel('settings-panel');
+      Game.startGame(Game.getState().nationName || 'Nova Republic');
     });
   }
 
