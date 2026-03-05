@@ -22,7 +22,7 @@ const Units = (() => {
       hp: Math.round(unitDef.hp * hpScale),
       maxHp: Math.round(unitDef.hp * hpScale),
       atk: Math.round(unitDef.atk * atkMult * atkScale),
-      speed: unitDef.speed * speedMult * Graphics.getScale() * 0.7,
+      speed: unitDef.speed * speedMult * Graphics.getScale() * 0.35,
       range: unitDef.range * Graphics.getScale() * 0.5,
       type: unitDef.type,
       state: 'moving',       // moving | attacking | dying
