@@ -64,6 +64,7 @@ const Game = (() => {
       ageIndex: 0,
       wave: 1,
       battleWave: 1,
+      wavesWon: 0,
       evolvePoints: saved ? saved.evolvePoints : 0,
       evolveLevels: saved ? { ...saved.evolveLevels } : {},
       totalEvolves: saved ? saved.totalEvolves : 0,
@@ -375,7 +376,6 @@ const Game = (() => {
 
     state.evolvePoints += epGain;
     state.totalEvolves++;
-    save();
 
     // Reset game progress but keep evolve
     state.gold = CONFIG.STARTING_GOLD;
@@ -383,17 +383,21 @@ const Game = (() => {
     state.level = 1;
     state.ageIndex = 0;
     state.wave = 1;
+    state.wavesWon = 0;
     state.xpToNext = 100;
     state.specialCooldownLeft = 0;
+    state.paused = false;
 
+    save();
     initBattle();
     UI.buildUnitBar(0);
     AudioManager.playThemeMusic(0);
   }
 
   function calcEvolvePointGain() {
-    // Based on wave reached and age. Always at least 1 so losing early still gives progress.
-    const waveBonus = Math.floor(state.wave * 0.7);
+    // Only earn EP from waves you've actually won this run
+    if (state.wavesWon <= 0) return 0;
+    const waveBonus = Math.floor(state.wavesWon * 0.7);
     const ageBonus = state.ageIndex * 2;
     return Math.max(1, waveBonus + ageBonus);
   }
@@ -412,6 +416,7 @@ const Game = (() => {
 
   function onVictory() {
     state.paused = true;
+    state.wavesWon++;
     const goldReward = CONFIG.WAVE_GOLD_REWARD + state.wave * 20 + state.ageIndex * 30;
     const xpReward = 30 + state.wave * 12 + state.ageIndex * 15;
     const xpMult = 1 + (state.evolveLevels.ep_xp || 0) * 0.25;
