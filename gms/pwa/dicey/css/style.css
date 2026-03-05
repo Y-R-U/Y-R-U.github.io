@@ -470,10 +470,10 @@ html, body {
 }
 
 #dice-action-row {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
 }
 
 #dice-area {
@@ -486,10 +486,14 @@ html, body {
 }
 
 #action-area {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
     gap: 6px;
+    z-index: 2;
 }
 
 .btn-roll {
