@@ -257,6 +257,9 @@ const UI = (() => {
   }
 
   function showDefeat() {
+    const epGain = Game.calcEvolvePointGain();
+    const evolveBtn = document.getElementById('btn-defeat-evolve');
+    evolveBtn.textContent = `Evolve (+${epGain} EP)`;
     showPanel('defeat-panel');
     AudioManager.playDefeat();
   }
