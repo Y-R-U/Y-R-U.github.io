@@ -7,6 +7,7 @@ const titleInput = document.getElementById('editor-title');
 const contentEl = document.getElementById('editor-content');
 const saveIndicator = document.getElementById('save-indicator');
 const deleteBtn = document.getElementById('editor-delete');
+const backBtn = document.getElementById('editor-back');
 const fontSizeSelect = document.getElementById('tool-fontsize');
 const fontColorInput = document.getElementById('tool-fontcolor');
 const checklistBtn = document.getElementById('tool-checklist');
@@ -72,6 +73,60 @@ contentEl.addEventListener('paste', (e) => {
   document.execCommand('insertText', false, text);
 });
 
+// Enter key in checkbox/radio lists
+contentEl.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+
+  const node = sel.anchorNode;
+  const checkRow = node?.closest?.('.fn-check') || node?.parentElement?.closest?.('.fn-check');
+  const radioRow = node?.closest?.('.fn-radio') || node?.parentElement?.closest?.('.fn-radio');
+  const row = checkRow || radioRow;
+  if (!row) return;
+
+  e.preventDefault();
+
+  // Get the text content after the toggle span
+  const toggle = row.querySelector('.fn-cb, .fn-rd');
+  const textContent = row.textContent.replace(toggle?.textContent || '', '').trim();
+
+  if (!textContent) {
+    // Empty entry: remove the row and insert a plain line break
+    const br = document.createElement('br');
+    row.parentNode.insertBefore(br, row.nextSibling);
+    row.remove();
+    // Place cursor after the br
+    const range = document.createRange();
+    range.setStartAfter(br);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    // Create a new entry of the same type
+    const isCheck = !!checkRow;
+    const newRow = document.createElement('div');
+    newRow.className = isCheck ? 'fn-check' : 'fn-radio';
+    const span = document.createElement('span');
+    span.className = isCheck ? 'fn-cb' : 'fn-rd';
+    span.dataset.checked = 'false';
+    span.contentEditable = 'false';
+    span.innerHTML = isCheck ? '&#9744;' : '&#9675;';
+    newRow.appendChild(span);
+    newRow.appendChild(document.createTextNode('\u00A0'));
+    row.parentNode.insertBefore(newRow, row.nextSibling);
+    // Place cursor in the new row after the span
+    const range = document.createRange();
+    range.setStart(newRow.lastChild, 1);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  if (debouncedSave) debouncedSave();
+});
+
 // Delete / Cancel
 deleteBtn.addEventListener('click', async () => {
   if (!currentItem) return;
@@ -89,6 +144,12 @@ deleteBtn.addEventListener('click', async () => {
     store.remove(currentItem.id);
     navigateBack();
   }
+});
+
+// Back button
+backBtn.addEventListener('click', () => {
+  if (debouncedSave) debouncedSave.flush();
+  navigateBack();
 });
 
 function navigateBack() {
