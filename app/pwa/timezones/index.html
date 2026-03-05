@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6366f1">
+<title>TimeZones</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f1f5f9; --bg2: #ffffff; --text: #0f172a; --text2: #475569;
+  --border: rgba(0,0,0,0.08); --card-bg: rgba(255,255,255,0.7);
+  --accent: #6366f1; --accent2: #818cf8; --accent-soft: rgba(99,102,241,0.1);
+  --shadow: 0 4px 24px rgba(0,0,0,0.06); --shadow-lg: 0 8px 40px rgba(0,0,0,0.1);
+  --radius: 20px; --radius-sm: 12px;
+  --day-start: #fef3c7; --day-end: #fde68a;
+  --night-start: #1e1b4b; --night-end: #312e81;
+  --dawn-start: #fecaca; --dawn-end: #fbbf24;
+  --dusk-start: #c084fc; --dusk-end: #6366f1;
+  --green: #22c55e; --green-soft: rgba(34,197,94,0.15);
+  --red: #ef4444; --red-soft: rgba(239,68,68,0.1);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a; --bg2: #1e293b; --text: #f1f5f9; --text2: #94a3b8;
+  --border: rgba(255,255,255,0.08); --card-bg: rgba(30,41,59,0.7);
+  --shadow: 0 4px 24px rgba(0,0,0,0.2); --shadow-lg: 0 8px 40px rgba(0,0,0,0.3);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100dvh; transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+header {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  background: rgba(99,102,241,0.05); border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo svg { width: 32px; height: 32px; }
+.logo h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+.header-actions { display: flex; gap: 8px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--card-bg);
+  color: var(--text); font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+.btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.btn-primary {
+  background: var(--accent); color: white; border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent2); }
+.btn-icon {
+  padding: 8px; width: 36px; height: 36px; justify-content: center;
+}
+.btn-danger { color: var(--red); }
+.btn-danger:hover { background: var(--red-soft); border-color: var(--red); }
+
+/* Main */
+main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 120px; }
+
+/* Section Labels */
+.section-label {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text2); margin-bottom: 12px;
+}
+
+/* Clock Grid */
+.clock-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; margin-bottom: 32px;
+}
+@media (min-width: 768px) {
+  .clock-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+@media (min-width: 1080px) {
+  .clock-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Clock Card */
+.clock-card {
+  position: relative; border-radius: var(--radius); overflow: hidden;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  padding: 20px; transition: all 0.3s; cursor: default;
+}
+.clock-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.clock-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+
+.clock-card.is-day { background: linear-gradient(135deg, rgba(254,243,199,0.3), rgba(253,230,138,0.15)); }
+.clock-card.is-night { background: linear-gradient(135deg, rgba(30,27,75,0.4), rgba(49,46,129,0.25)); }
+.clock-card.is-dawn { background: linear-gradient(135deg, rgba(254,202,202,0.3), rgba(251,191,36,0.15)); }
+.clock-card.is-dusk { background: linear-gradient(135deg, rgba(192,132,252,0.3), rgba(99,102,241,0.15)); }
+
+[data-theme="dark"] .clock-card.is-day { background: linear-gradient(135deg, rgba(254,243,199,0.08), rgba(253,230,138,0.04)); }
+[data-theme="dark"] .clock-card.is-night { background: linear-gradient(135deg, rgba(30,27,75,0.6), rgba(49,46,129,0.3)); }
+[data-theme="dark"] .clock-card.is-dawn { background: linear-gradient(135deg, rgba(254,202,202,0.08), rgba(251,191,36,0.04)); }
+[data-theme="dark"] .clock-card.is-dusk { background: linear-gradient(135deg, rgba(192,132,252,0.1), rgba(99,102,241,0.06)); }
+
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.card-identity { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.875rem; color: white; flex-shrink: 0;
+}
+.card-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-city { font-size: 0.8rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.you-badge {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 0.6rem; font-weight: 700; background: var(--accent);
+  color: white; padding: 3px 8px; border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+.card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+.clock-card:hover .card-actions { opacity: 1; }
+
+.time-display { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.time-seconds { font-size: 1rem; font-weight: 400; color: var(--text2); }
+.time-ampm { font-size: 1rem; font-weight: 500; margin-left: 4px; }
+
+.card-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.meta-item { font-size: 0.75rem; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+.meta-offset {
+  font-weight: 600; padding: 2px 8px; border-radius: 6px;
+  font-size: 0.7rem;
+}
+.meta-offset.ahead { background: var(--green-soft); color: var(--green); }
+.meta-offset.behind { background: var(--red-soft); color: var(--red); }
+.meta-offset.same { background: var(--accent-soft); color: var(--accent); }
+
+.day-indicator {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+}
+.day-indicator.day { background: #facc15; box-shadow: 0 0 6px rgba(250,204,21,0.5); }
+.day-indicator.night { background: #818cf8; box-shadow: 0 0 6px rgba(129,140,248,0.5); }
+.day-indicator.dawn { background: #fb923c; box-shadow: 0 0 6px rgba(251,146,60,0.5); }
+.day-indicator.dusk { background: #c084fc; box-shadow: 0 0 6px rgba(192,132,252,0.5); }
+
+/* Empty State */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text2);
+}
+.empty-state svg { width: 80px; height: 80px; opacity: 0.3; margin-bottom: 16px; }
+.empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: 0.9rem; margin-bottom: 24px; }
+
+/* Meeting Planner */
+.meeting-planner {
+  background: var(--card-bg); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 24px;
+  backdrop-filter: blur(12px); box-shadow: var(--shadow);
+  display: none;
+}
+.meeting-planner.visible { display: block; }
+.meeting-planner h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.planner-row { margin-bottom: 12px; }
+.planner-label {
+  font-size: 0.75rem; font-weight: 500; color: var(--text2); margin-bottom: 4px;
+  display: flex; justify-content: space-between;
+}
+.planner-bar-container { position: relative; height: 32px; border-radius: 8px; overflow: hidden; background: var(--border); }
+.planner-bar {
+  position: absolute; top: 0; height: 100%; display: flex; align-items: center;
+}
+.hour-block {
+  flex: 1; height: 100%; position: relative; border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; color: transparent; transition: background 0.2s;
+}
+.hour-block.work { background: var(--green-soft); }
+.hour-block.overlap { background: var(--green); color: white; font-weight: 600; font-size: 0.6rem; }
+.hour-block:hover { opacity: 0.8; }
+
+.hour-labels { display: flex; margin-top: 2px; }
+.hour-labels span { flex: 1; text-align: center; font-size: 0.55rem; color: var(--text2); }
+
+.overlap-summary {
+  margin-top: 16px; padding: 12px; border-radius: var(--radius-sm);
+  background: var(--green-soft); font-size: 0.85rem; font-weight: 500;
+}
+.overlap-summary.no-overlap { background: var(--red-soft); color: var(--red); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px); z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; visibility: hidden; transition: all 0.3s;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--bg2); border-radius: var(--radius);
+  padding: 28px; width: 100%; max-width: 440px;
+  box-shadow: var(--shadow-lg); transform: translateY(20px); transition: transform 0.3s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 6px; color: var(--text2); }
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); font-size: 0.9rem; outline: none; transition: border 0.2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+
+.search-results {
+  max-height: 180px; overflow-y: auto; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); margin-top: 4px; background: var(--bg2);
+}
+.search-results:empty { display: none; }
+.search-result-item {
+  padding: 10px 14px; cursor: pointer; font-size: 0.85rem;
+  border-bottom: 1px solid var(--border); transition: background 0.15s;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--accent-soft); }
+.search-result-item .tz-name { font-weight: 500; }
+.search-result-item .tz-offset { color: var(--text2); font-size: 0.75rem; margin-left: 8px; }
+
+.color-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-swatch {
+  width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; transition: all 0.2s;
+}
+.color-swatch.selected { border-color: var(--text); transform: scale(1.15); }
+
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+
+/* Floating Action Button */
+.fab {
+  position: fixed; bottom: 24px; right: 24px; z-index: 50;
+  width: 56px; height: 56px; border-radius: 16px;
+  background: var(--accent); color: white; border: none;
+  box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+  cursor: pointer; transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+.fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(99,102,241,0.5); }
+.fab svg { width: 24px; height: 24px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--text); color: var(--bg); padding: 12px 20px;
+  border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 500;
+  z-index: 300; opacity: 0; transition: all 0.3s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .time-display { font-size: 1.75rem; }
+  .clock-card { padding: 14px; }
+  .card-actions { opacity: 1; }
+  header { padding: 12px 16px; }
+  main { padding: 12px 12px 120px; }
+  .header-actions .btn:not(.btn-icon) span { display: none; }
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.clock-card { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <svg viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="14" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="16" y1="16" x2="16" y2="7" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="16" y1="16" x2="23" y2="19" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="2" fill="var(--accent)"/>
+      </svg>
+      <h1>TimeZones</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-icon" id="themeToggle" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <button class="btn" id="meetingBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>Meeting Planner</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="worldSection">
+    <div class="section-label">World Clocks</div>
+    <div class="clock-grid" id="clockGrid"></div>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+    <h3>No world clocks yet</h3>
+    <p>Add cities or people to track their local time</p>
+    <button class="btn btn-primary" onclick="openModal()">Add Your First Clock</button>
+  </div>
+
+  <div class="meeting-planner" id="meetingPlanner">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Meeting Planner
+    </h3>
+    <p style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">Click clock cards to select zones, then find the best meeting time.</p>
+    <div id="plannerContent"></div>
+  </div>
+</main>
+
+<button class="fab" onclick="openModal()" title="Add clock">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add Clock</h2>
+    <div class="form-group">
+      <label>Search City / Timezone</label>
+      <input type="text" id="tzSearch" placeholder="e.g. Tokyo, London, New York..." autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="form-group" id="selectedTzGroup" style="display:none">
+      <label>Selected Timezone</label>
+      <input type="text" id="selectedTz" readonly style="background:var(--accent-soft);font-weight:500">
+    </div>
+    <div class="form-group">
+      <label>Person Name (optional)</label>
+      <input type="text" id="personName" placeholder="e.g. Sarah, Team Lead...">
+    </div>
+    <div class="form-group">
+      <label>Color</label>
+      <div class="color-picker" id="colorPicker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveClock()">Add Clock</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const CITY_ALIASES = {
+  'America/New_York': ['Atlanta','Miami','Boston','Philadelphia','Charlotte','Orlando','Tampa','Detroit','Pittsburgh','Cleveland','Jacksonville','Raleigh','Durham','Richmond','Baltimore','Washington DC','DC'],
+  'America/Chicago': ['Dallas','Houston','San Antonio','Austin','Memphis','Nashville','Milwaukee','Minneapolis','St Louis','New Orleans','Oklahoma City','Omaha','Kansas City','Madison'],
+  'America/Denver': ['Salt Lake City','Albuquerque','Colorado Springs','Boise','Helena','Tucson'],
+  'America/Los_Angeles': ['San Francisco','Seattle','Portland','San Diego','Las Vegas','Sacramento','Fresno','Oakland','Pasadena','Silicon Valley'],
+  'America/Phoenix': ['Scottsdale','Mesa','Tempe','Chandler','Gilbert','Glendale AZ'],
+  'America/Anchorage': ['Fairbanks','Juneau'],
+  'Pacific/Honolulu': ['Maui','Oahu','Waikiki'],
+  'Europe/London': ['Edinburgh','Manchester','Birmingham UK','Belfast','Glasgow','Liverpool','Bristol','Leeds','Cardiff'],
+  'Europe/Paris': ['Lyon','Marseille','Nice','Toulouse','Bordeaux','Strasbourg','Nantes','Lille'],
+  'Europe/Berlin': ['Munich','Hamburg','Frankfurt','Cologne','Stuttgart','Dusseldorf','Hannover','Leipzig','Dresden','Nuremberg'],
+  'Europe/Madrid': ['Barcelona','Valencia','Seville','Malaga','Bilbao','Granada'],
+  'Europe/Rome': ['Milan','Naples','Florence','Venice','Turin','Bologna','Genoa','Palermo'],
+  'Europe/Amsterdam': ['Rotterdam','The Hague','Utrecht'],
+  'Europe/Brussels': ['Antwerp','Ghent','Bruges'],
+  'Europe/Zurich': ['Geneva','Basel','Bern','Lausanne'],
+  'Europe/Vienna': ['Graz','Salzburg','Innsbruck'],
+  'Europe/Stockholm': ['Gothenburg','Malmo','Uppsala'],
+  'Europe/Oslo': ['Bergen','Trondheim','Stavanger'],
+  'Europe/Copenhagen': ['Aarhus','Odense'],
+  'Europe/Helsinki': ['Tampere','Espoo','Turku'],
+  'Europe/Warsaw': ['Krakow','Wroclaw','Gdansk','Poznan','Lodz'],
+  'Europe/Prague': ['Brno','Ostrava','Pilsen'],
+  'Europe/Budapest': ['Debrecen','Szeged'],
+  'Europe/Bucharest': ['Cluj','Timisoara','Brasov','Iasi','Constanta'],
+  'Europe/Athens': ['Thessaloniki','Patras','Heraklion','Crete'],
+  'Europe/Moscow': ['Saint Petersburg','St Petersburg','Novosibirsk','Yekaterinburg','Kazan','Sochi'],
+  'Europe/Istanbul': ['Ankara','Izmir','Antalya','Bursa'],
+  'Asia/Dubai': ['Abu Dhabi','Sharjah','Muscat'],
+  'Asia/Riyadh': ['Jeddah','Mecca','Medina'],
+  'Asia/Kolkata': ['Mumbai','Bombay','Delhi','New Delhi','Bangalore','Bengaluru','Chennai','Hyderabad','Pune','Ahmedabad','Jaipur','Lucknow','Kanpur','Nagpur','Indore','Bhopal','Patna','Vadodara','Goa','Kochi','Chandigarh','Gurgaon','Noida'],
+  'Asia/Karachi': ['Lahore','Islamabad','Faisalabad','Rawalpindi'],
+  'Asia/Dhaka': ['Chittagong','Khulna','Rajshahi'],
+  'Asia/Bangkok': ['Phuket','Chiang Mai','Pattaya'],
+  'Asia/Singapore': ['Kuala Lumpur','Penang','Johor Bahru'],
+  'Asia/Ho_Chi_Minh': ['Hanoi','Da Nang','Ho Chi Minh City','Saigon'],
+  'Asia/Jakarta': ['Surabaya','Bandung','Medan','Bali'],
+  'Asia/Shanghai': ['Beijing','Shenzhen','Guangzhou','Chengdu','Wuhan','Hangzhou','Nanjing','Xian','Tianjin','Dongguan','Chongqing','Suzhou','Qingdao','Dalian'],
+  'Asia/Tokyo': ['Osaka','Kyoto','Yokohama','Nagoya','Sapporo','Kobe','Fukuoka','Hiroshima'],
+  'Asia/Seoul': ['Busan','Incheon','Daegu','Daejeon','Gwangju'],
+  'Asia/Taipei': ['Kaohsiung','Taichung','Tainan'],
+  'Australia/Sydney': ['Melbourne','Canberra','Gold Coast','Wollongong','Newcastle AU'],
+  'Australia/Brisbane': ['Cairns','Townsville','Sunshine Coast'],
+  'Australia/Perth': ['Fremantle'],
+  'Australia/Adelaide': ['Darwin'],
+  'Pacific/Auckland': ['Wellington','Christchurch','Hamilton NZ','Queenstown'],
+  'America/Sao_Paulo': ['Rio de Janeiro','Rio','Brasilia','Belo Horizonte','Salvador','Curitiba','Recife','Fortaleza'],
+  'America/Argentina/Buenos_Aires': ['Cordoba','Rosario','Mendoza'],
+  'America/Bogota': ['Medellin','Cali','Cartagena','Barranquilla'],
+  'America/Lima': ['Arequipa','Cusco','Trujillo'],
+  'America/Santiago': ['Valparaiso','Concepcion'],
+  'America/Mexico_City': ['Guadalajara','Monterrey','Puebla','Tijuana','Cancun','Merida'],
+  'America/Toronto': ['Montreal','Ottawa','Quebec City','Hamilton','Mississauga','Brampton','Markham','Kitchener','Windsor'],
+  'America/Vancouver': ['Victoria BC','Surrey BC','Burnaby','Whistler'],
+  'America/Edmonton': ['Calgary','Red Deer','Lethbridge','Banff'],
+  'America/Winnipeg': ['Regina','Saskatoon','Thunder Bay'],
+  'America/Halifax': ['Fredericton','Moncton','Saint John NB','Charlottetown'],
+  'Africa/Cairo': ['Alexandria','Giza','Luxor','Aswan'],
+  'Africa/Lagos': ['Abuja','Ibadan','Port Harcourt','Kano'],
+  'Africa/Johannesburg': ['Cape Town','Durban','Pretoria','Soweto'],
+  'Africa/Nairobi': ['Mombasa','Kisumu','Dar es Salaam','Addis Ababa','Kampala'],
+  'Africa/Casablanca': ['Rabat','Marrakech','Fez','Tangier'],
+};
+
+const TIMEZONE_DATA = (() => {
+  const zones = Intl.supportedValuesOf('timeZone');
+  const entries = [];
+
+  // Build reverse alias map: alias -> [{tz, alias}]
+  const aliasMap = {};
+  for (const [tz, aliases] of Object.entries(CITY_ALIASES)) {
+    for (const alias of aliases) {
+      aliasMap[alias.toLowerCase()] = { tz, alias };
+    }
+  }
+
+  zones.forEach(tz => {
+    const parts = tz.split('/');
+    const city = (parts[parts.length - 1] || '').replace(/_/g, ' ');
+    const region = parts[0] || '';
+    let offset;
+    try {
+      const now = new Date();
+      const str = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+      const match = str.match(/GMT([+-]\d{1,2}(?::\d{2})?)/);
+      offset = match ? match[1] : '+0';
+    } catch { offset = ''; }
+    entries.push({ tz, city, region, offset, label: `${city} (${region})`, alias: '' });
+
+    // Add alias entries for this timezone
+    if (CITY_ALIASES[tz]) {
+      for (const alias of CITY_ALIASES[tz]) {
+        entries.push({ tz, city: alias, region, offset, label: `${alias} (${region})`, alias });
+      }
+    }
+  });
+
+  return entries;
+})();
+
+const COLORS = ['#6366f1','#ec4899','#f59e0b','#22c55e','#06b6d4','#8b5cf6','#ef4444','#14b8a6','#f97316','#64748b'];
+
+let clocks = JSON.parse(localStorage.getItem('tz_clocks') || '[]');
+let editingId = null;
+let selectedColor = COLORS[0];
+let selectedTz = null;
+let selectedCity = null;
+let meetingMode = false;
+let selectedForMeeting = new Set();
+
+// ============================================================
+// THEME
+// ============================================================
+const getSystemTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+let theme = localStorage.getItem('tz_theme') || getSystemTheme();
+document.documentElement.setAttribute('data-theme', theme);
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('tz_theme', theme);
+  updateThemeIcon();
+});
+
+function updateThemeIcon() {
+  const btn = document.getElementById('themeToggle');
+  btn.innerHTML = theme === 'dark'
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+}
+updateThemeIcon();
+
+// ============================================================
+// TIME HELPERS
+// ============================================================
+function getTimeInZone(tz) {
+  const now = new Date();
+  const str = now.toLocaleString('en-US', { timeZone: tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const [h, m, s] = str.split(':').map(Number);
+  return { h, m, s, now };
+}
+
+function getDateInZone(tz) {
+  return new Date().toLocaleDateString('en-US', { timeZone: tz, weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function getOffsetDiff(tz) {
+  const now = new Date();
+  const local = now.getTime() + now.getTimezoneOffset() * 60000;
+  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+  const parts = fmt.formatToParts(now);
+  const tzPart = parts.find(p => p.type === 'timeZoneName');
+  const match = tzPart?.value?.match(/GMT([+-]?\d{1,2}(?::(\d{2}))?)/);
+  if (!match) return 0;
+  const hrs = parseInt(match[1]);
+  const mins = parseInt(match[2] || '0');
+  const remoteOffset = (hrs * 60 + (hrs < 0 ? -mins : mins));
+
+  const localFmt = new Intl.DateTimeFormat('en-US', { timeZoneName: 'shortOffset' });
+  const localParts = localFmt.formatToParts(now);
+  const localTzPart = localParts.find(p => p.type === 'timeZoneName');
+  const localMatch = localTzPart?.value?.match(/GMT([+-]?\d{1,2}(?::(\d{2}))?)/);
+  if (!localMatch) return remoteOffset;
+  const localHrs = parseInt(localMatch[1]);
+  const localMins = parseInt(localMatch[2] || '0');
+  const localOff = (localHrs * 60 + (localHrs < 0 ? -localMins : localMins));
+
+  return remoteOffset - localOff;
+}
+
+function getTimePeriod(h) {
+  if (h >= 6 && h < 8) return 'dawn';
+  if (h >= 8 && h < 18) return 'day';
+  if (h >= 18 && h < 20) return 'dusk';
+  return 'night';
+}
+
+function formatOffset(diffMins) {
+  const hrs = Math.abs(diffMins) / 60;
+  const wholeH = Math.floor(hrs);
+  const mins = Math.abs(diffMins) % 60;
+  let label = '';
+  if (wholeH > 0) label += `${wholeH}h`;
+  if (mins > 0) label += `${mins}m`;
+  if (!label) return { text: 'Same time', cls: 'same' };
+  if (diffMins > 0) return { text: `+${label} ahead`, cls: 'ahead' };
+  return { text: `-${label} behind`, cls: 'behind' };
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderClocks() {
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const grid = document.getElementById('clockGrid');
+  const empty = document.getElementById('emptyState');
+  const worldSection = document.getElementById('worldSection');
+
+  // Local card always first, then world clocks
+  const localCard = renderCard({ id: 'local', tz: localTz, person: '', color: COLORS[0] }, true);
+  worldSection.style.display = 'block';
+
+  if (clocks.length === 0) {
+    grid.innerHTML = localCard;
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = localCard + clocks.map(c => renderCard(c, false)).join('');
+  }
+
+  // Attach click handlers for meeting mode
+  document.querySelectorAll('.clock-card[data-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      if (!meetingMode) return;
+      const id = card.dataset.id;
+      if (selectedForMeeting.has(id)) {
+        selectedForMeeting.delete(id);
+        card.classList.remove('selected');
+      } else {
+        selectedForMeeting.add(id);
+        card.classList.add('selected');
+      }
+      renderMeetingPlanner();
+    });
+  });
+}
+
+function renderCard(clock, isLocal) {
+  const { h, m, s } = getTimeInZone(clock.tz);
+  const period = getTimePeriod(h);
+  const date = getDateInZone(clock.tz);
+  const diffMins = isLocal ? 0 : getOffsetDiff(clock.tz);
+  const offset = formatOffset(diffMins);
+  const cityName = clock.city || clock.tz.split('/').pop().replace(/_/g, ' ');
+  const initial = clock.person ? clock.person[0].toUpperCase() : cityName[0].toUpperCase();
+  const h12 = h % 12 || 12;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const selected = meetingMode && selectedForMeeting.has(clock.id) ? ' selected' : '';
+
+  return `
+    <div class="clock-card is-${period}${selected}" data-id="${clock.id}" data-tz="${clock.tz}">
+      ${isLocal ? '<span class="you-badge">YOUR TIME</span>' : ''}
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="avatar" style="background:${clock.color || COLORS[0]}">${initial}</div>
+          <div>
+            <div class="card-name">${clock.person || cityName}</div>
+            <div class="card-city">${clock.person ? cityName : clock.tz.split('/').pop().replace(/_/g, ' ')}${clock.city && !clock.person ? ' (' + clock.tz.split('/')[0] + ')' : ''}</div>
+          </div>
+        </div>
+        ${!isLocal ? `
+        <div class="card-actions">
+          <button class="btn btn-icon" onclick="event.stopPropagation();editClock('${clock.id}')" title="Edit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-icon btn-danger" onclick="event.stopPropagation();deleteClock('${clock.id}')" title="Delete">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>` : ''}
+      </div>
+      <div class="time-display">${h12}:${String(m).padStart(2,'0')}<span class="time-seconds">:${String(s).padStart(2,'0')}</span><span class="time-ampm">${ampm}</span></div>
+      <div class="card-meta">
+        <span class="meta-item"><span class="day-indicator ${period}"></span> ${date}</span>
+        ${!isLocal ? `<span class="meta-offset ${offset.cls}">${offset.text}</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// MEETING PLANNER
+// ============================================================
+document.getElementById('meetingBtn').addEventListener('click', () => {
+  meetingMode = !meetingMode;
+  const planner = document.getElementById('meetingPlanner');
+  const btn = document.getElementById('meetingBtn');
+  if (meetingMode) {
+    planner.classList.add('visible');
+    btn.classList.add('btn-primary');
+    selectedForMeeting.clear();
+    // Auto-select local
+    selectedForMeeting.add('local');
+    showToast('Click on clock cards to select zones');
+  } else {
+    planner.classList.remove('visible');
+    btn.classList.remove('btn-primary');
+    selectedForMeeting.clear();
+  }
+  renderClocks();
+  renderMeetingPlanner();
+});
+
+function renderMeetingPlanner() {
+  const content = document.getElementById('plannerContent');
+  const zones = [];
+
+  selectedForMeeting.forEach(id => {
+    if (id === 'local') {
+      zones.push({ tz: Intl.DateTimeFormat().resolvedOptions().timeZone, label: 'You', color: COLORS[0] });
+    } else {
+      const c = clocks.find(c => c.id === id);
+      if (c) zones.push({ tz: c.tz, label: c.person || c.tz.split('/').pop().replace(/_/g,' '), color: c.color });
+    }
+  });
+
+  if (zones.length < 2) {
+    content.innerHTML = '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:20px">Select at least 2 clocks to find meeting overlap</p>';
+    return;
+  }
+
+  let html = '';
+  const hourLabels = Array.from({length:24}, (_,i) => i);
+
+  // For each zone, compute working hours in UTC
+  const workingHoursUTC = zones.map(z => {
+    const now = new Date();
+    const offsetDiff = getOffsetDiff(z.tz);
+    const localOffset = -now.getTimezoneOffset();
+    const zoneOffset = localOffset + offsetDiff;
+    const workStart = ((9 * 60 - zoneOffset) + 1440) % 1440;
+    const workEnd = ((17 * 60 - zoneOffset) + 1440) % 1440;
+    return { ...z, workStart, workEnd };
+  });
+
+  // Render bars
+  zones.forEach((z, idx) => {
+    const { h } = getTimeInZone(z.tz);
+    html += `<div class="planner-row">`;
+    html += `<div class="planner-label"><span style="color:${z.color};font-weight:600">${z.label}</span><span>Now: ${h}:00</span></div>`;
+    html += `<div class="planner-bar-container"><div class="planner-bar" style="width:100%;display:flex">`;
+    for (let i = 0; i < 24; i++) {
+      // Convert this hour in local user time to the zone's time
+      const offsetDiff = getOffsetDiff(z.tz);
+      const zoneHour = ((i * 60 + offsetDiff) / 60 + 24) % 24;
+      const isWork = zoneHour >= 9 && zoneHour < 17;
+      html += `<div class="hour-block${isWork ? ' work' : ''}" title="${z.label}: ${Math.floor(zoneHour)}:00">${Math.floor(zoneHour)}</div>`;
+    }
+    html += `</div></div>`;
+    html += `<div class="hour-labels">${hourLabels.map(h => `<span>${h}</span>`).join('')}</div>`;
+    html += `</div>`;
+  });
+
+  // Find overlap (hours where ALL zones are 9-17)
+  const overlapHours = [];
+  for (let i = 0; i < 24; i++) {
+    let allWork = true;
+    zones.forEach(z => {
+      const offsetDiff = getOffsetDiff(z.tz);
+      const zoneHour = ((i * 60 + offsetDiff) / 60 + 24) % 24;
+      if (zoneHour < 9 || zoneHour >= 17) allWork = false;
+    });
+    if (allWork) overlapHours.push(i);
+  }
+
+  // Overlap bar
+  html += `<div class="planner-row"><div class="planner-label"><span style="font-weight:600;color:var(--green)">Overlap</span></div>`;
+  html += `<div class="planner-bar-container"><div class="planner-bar" style="width:100%;display:flex">`;
+  for (let i = 0; i < 24; i++) {
+    const isOverlap = overlapHours.includes(i);
+    const h12 = i % 12 || 12;
+    const ampm = i >= 12 ? 'p' : 'a';
+    html += `<div class="hour-block${isOverlap ? ' overlap' : ''}">${isOverlap ? h12+ampm : ''}</div>`;
+  }
+  html += `</div></div>`;
+  html += `<div class="hour-labels">${hourLabels.map(h => `<span>${h}</span>`).join('')}</div></div>`;
+
+  if (overlapHours.length > 0) {
+    const start = overlapHours[0];
+    const end = overlapHours[overlapHours.length - 1] + 1;
+    const s12 = start % 12 || 12;
+    const e12 = end % 12 || 12;
+    html += `<div class="overlap-summary">Best meeting window: <strong>${s12}${start>=12?'PM':'AM'} - ${e12}${end>=12?'PM':'AM'}</strong> your time (${overlapHours.length}h overlap)</div>`;
+  } else {
+    html += `<div class="overlap-summary no-overlap">No overlapping working hours found. Consider async communication.</div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// MODAL / CRUD
+// ============================================================
+function openModal(id) {
+  editingId = id || null;
+  const overlay = document.getElementById('modalOverlay');
+  document.getElementById('modalTitle').textContent = id ? 'Edit Clock' : 'Add Clock';
+  document.getElementById('saveBtn').textContent = id ? 'Save' : 'Add Clock';
+
+  // Reset
+  document.getElementById('tzSearch').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('selectedTzGroup').style.display = 'none';
+  document.getElementById('personName').value = '';
+  selectedTz = null;
+  selectedCity = null;
+  selectedColor = COLORS[0];
+
+  // Prefill if editing
+  if (id) {
+    const c = clocks.find(c => c.id === id);
+    if (c) {
+      selectedTz = c.tz;
+      selectedCity = c.city || null;
+      document.getElementById('selectedTz').value = c.city ? `${c.city} (${c.tz})` : c.tz;
+      document.getElementById('selectedTzGroup').style.display = 'block';
+      document.getElementById('personName').value = c.person || '';
+      selectedColor = c.color || COLORS[0];
+    }
+  }
+
+  renderColorPicker();
+  overlay.classList.add('open');
+  setTimeout(() => document.getElementById('tzSearch').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+}
+
+function renderColorPicker() {
+  const picker = document.getElementById('colorPicker');
+  picker.innerHTML = COLORS.map(c =>
+    `<div class="color-swatch${c === selectedColor ? ' selected' : ''}" style="background:${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectColor(c) {
+  selectedColor = c;
+  renderColorPicker();
+}
+
+// Search
+document.getElementById('tzSearch').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  const results = document.getElementById('searchResults');
+  if (q.length < 2) { results.innerHTML = ''; return; }
+
+  const matches = TIMEZONE_DATA
+    .filter(t => t.city.toLowerCase().includes(q) || t.tz.toLowerCase().includes(q) || t.region.toLowerCase().includes(q))
+    .slice(0, 12);
+
+  // Deduplicate by tz+city, prioritize alias matches
+  const seen = new Set();
+  const dedupMatches = matches.filter(t => {
+    const key = t.tz + '|' + t.city;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  results.innerHTML = dedupMatches.map(t =>
+    `<div class="search-result-item" onclick="selectTimezone('${t.tz}', '${t.city.replace(/'/g, "\\'")}')">
+      <span class="tz-name">${t.city}</span>
+      <span class="tz-offset">${t.tz} (GMT${t.offset})</span>
+    </div>`
+  ).join('');
+});
+
+function selectTimezone(tz, city) {
+  selectedTz = tz;
+  selectedCity = city || null;
+  document.getElementById('selectedTz').value = city ? `${city} (${tz})` : tz;
+  document.getElementById('selectedTzGroup').style.display = 'block';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('tzSearch').value = '';
+  document.getElementById('personName').focus();
+}
+
+function saveClock() {
+  if (!selectedTz) { showToast('Please select a timezone'); return; }
+
+  if (editingId) {
+    const idx = clocks.findIndex(c => c.id === editingId);
+    if (idx >= 0) {
+      clocks[idx].tz = selectedTz;
+      clocks[idx].city = selectedCity || '';
+      clocks[idx].person = document.getElementById('personName').value.trim();
+      clocks[idx].color = selectedColor;
+    }
+    showToast('Clock updated');
+  } else {
+    clocks.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      tz: selectedTz,
+      city: selectedCity || '',
+      person: document.getElementById('personName').value.trim(),
+      color: selectedColor,
+    });
+    showToast('Clock added');
+  }
+
+  save();
+  closeModal();
+  renderClocks();
+}
+
+function editClock(id) { openModal(id); }
+
+function deleteClock(id) {
+  clocks = clocks.filter(c => c.id !== id);
+  selectedForMeeting.delete(id);
+  save();
+  renderClocks();
+  if (meetingMode) renderMeetingPlanner();
+  showToast('Clock removed');
+}
+
+function save() { localStorage.setItem('tz_clocks', JSON.stringify(clocks)); }
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// LIVE UPDATE
+// ============================================================
+setInterval(() => {
+  document.querySelectorAll('.clock-card').forEach(card => {
+    const tz = card.dataset.tz;
+    if (!tz) return;
+    const { h, m, s } = getTimeInZone(tz);
+    const period = getTimePeriod(h);
+    const h12 = h % 12 || 12;
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const timeEl = card.querySelector('.time-display');
+    if (timeEl) {
+      timeEl.innerHTML = `${h12}:${String(m).padStart(2,'0')}<span class="time-seconds">:${String(s).padStart(2,'0')}</span><span class="time-ampm">${ampm}</span>`;
+    }
+    // Update period class
+    card.classList.remove('is-day','is-night','is-dawn','is-dusk');
+    card.classList.add(`is-${period}`);
+    // Update indicator
+    const dot = card.querySelector('.day-indicator');
+    if (dot) { dot.className = `day-indicator ${period}`; }
+  });
+}, 1000);
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Escape to close
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+renderClocks();
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
