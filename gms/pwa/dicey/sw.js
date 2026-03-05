@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dicey-v1';
+const CACHE_NAME = 'dicey-v2';
 const ASSETS = [
     './',
     './index.html',

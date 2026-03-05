@@ -559,5 +559,150 @@ const UI = {
             }
             moneyEl.textContent = p.bankrupt ? '💀' : Utils.formatMoney(p.money);
         });
+    },
+
+    // Owned property cards strip below board
+    updateCardsStrip(gameState, playerIndex) {
+        const strip = document.getElementById('cards-strip');
+        const scroll = document.getElementById('cards-scroll');
+        if (!strip || !scroll) return;
+
+        // Gather all properties owned by this player
+        const owned = [];
+        Utils.BOARD_SPACES.forEach((space, idx) => {
+            const prop = gameState.properties[idx];
+            if (prop && prop.owner === playerIndex) {
+                owned.push({ space, idx, prop });
+            }
+        });
+
+        if (owned.length === 0) {
+            strip.classList.remove('has-cards');
+            scroll.innerHTML = '';
+            return;
+        }
+
+        strip.classList.add('has-cards');
+
+        // Sort by group then price
+        owned.sort((a, b) => {
+            const ga = a.space.group !== undefined ? a.space.group : 99;
+            const gb = b.space.group !== undefined ? b.space.group : 99;
+            if (ga !== gb) return ga - gb;
+            return (a.space.price || 0) - (b.space.price || 0);
+        });
+
+        scroll.innerHTML = owned.map(o => {
+            const color = o.space.color || (o.space.type === 'railroad' ? '#95a5a6' : '#3498db');
+            const housesText = o.prop.houses > 0
+                ? (o.prop.houses >= 5 ? '🏨' : '🏠'.repeat(o.prop.houses))
+                : '';
+            return `<div class="mini-card" data-space-idx="${o.idx}">
+                <div class="mini-card-color" style="background:${color}"></div>
+                <div class="mini-card-name">${o.space.name}</div>
+                ${housesText ? `<div class="mini-card-houses">${housesText}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        // Click handlers on mini cards
+        scroll.querySelectorAll('.mini-card').forEach(card => {
+            card.addEventListener('click', () => {
+                AudioManager.playSfx('click');
+                const idx = parseInt(card.dataset.spaceIdx);
+                this.showPropertyDetailPanel(idx, gameState);
+            });
+        });
+    },
+
+    // Large property detail card panel (click from board or cards strip)
+    showPropertyDetailPanel(spaceIdx, gameState) {
+        const space = Utils.BOARD_SPACES[spaceIdx];
+        if (!space) return;
+
+        const prop = gameState.properties[spaceIdx];
+        const color = space.color || (space.type === 'railroad' ? '#95a5a6' : '#3498db');
+
+        let ownerHtml = '';
+        if (prop && prop.owner !== null) {
+            const ownerColor = Utils.PLAYER_COLORS[prop.owner];
+            const ownerName = Utils.PLAYER_NAMES[prop.owner];
+            ownerHtml = `
+                <div class="detail-card-owner">
+                    <div class="detail-owner-dot" style="background:${ownerColor}"></div>
+                    <span>Owned by <strong style="color:${ownerColor}">${ownerName}</strong></span>
+                </div>`;
+        } else {
+            ownerHtml = `
+                <div class="detail-card-owner" style="opacity:0.5;">
+                    <span>Unowned</span>
+                </div>`;
+        }
+
+        // Build rent table
+        let rentHtml = '';
+        if (space.type === 'property' && space.rent) {
+            const labels = ['Base rent', '1 House', '2 Houses', '3 Houses', '4 Houses', 'Hotel'];
+            const currentLevel = prop ? prop.houses : -1;
+            rentHtml = `<table class="detail-rent-table">
+                ${space.rent.map((r, i) => `
+                    <tr class="${i === currentLevel ? 'current-level' : ''}">
+                        <td>${labels[i]}</td>
+                        <td>${Utils.formatMoney(r)}${i === 0 ? ' *' : ''}</td>
+                    </tr>`).join('')}
+            </table>
+            <p style="font-size:11px;color:var(--text-dark);margin-top:6px;">* Doubled with monopoly (no houses)</p>
+            <div class="detail-card-divider"></div>
+            <p style="font-size:13px;color:var(--text-dim);">Build cost: <strong style="color:var(--gold)">${Utils.formatMoney(Math.floor(space.price / 2))}</strong> per house</p>`;
+        } else if (space.type === 'railroad') {
+            const labels = ['1 Railroad', '2 Railroads', '3 Railroads', '4 Railroads'];
+            const rrCount = prop && prop.owner !== null
+                ? Utils.BOARD_SPACES.filter((s, i) => s.type === 'railroad' && gameState.properties[i]?.owner === prop.owner).length
+                : 0;
+            rentHtml = `<table class="detail-rent-table">
+                ${space.rent.map((r, i) => `
+                    <tr class="${i === rrCount - 1 ? 'current-level' : ''}">
+                        <td>${labels[i]}</td>
+                        <td>${Utils.formatMoney(r)}</td>
+                    </tr>`).join('')}
+            </table>`;
+        } else if (space.type === 'utility') {
+            rentHtml = `<table class="detail-rent-table">
+                <tr><td>1 Utility owned</td><td>4x dice roll</td></tr>
+                <tr><td>2 Utilities owned</td><td>10x dice roll</td></tr>
+            </table>`;
+        }
+
+        // Houses display
+        let housesDisplay = '';
+        if (prop && prop.houses > 0 && space.type === 'property') {
+            if (prop.houses >= 5) {
+                housesDisplay = '<span style="font-size:18px;">🏨</span> <span style="color:var(--accent);font-weight:700;">Hotel</span>';
+            } else {
+                housesDisplay = '<span style="font-size:16px;">' + '🏠'.repeat(prop.houses) + '</span> <span style="color:var(--green);font-weight:600;">' + prop.houses + ' House' + (prop.houses > 1 ? 's' : '') + '</span>';
+            }
+        }
+
+        const html = `
+            <div class="panel">
+                <div class="panel-header" style="padding:0;">
+                    <button class="panel-close" style="top:8px;right:8px;z-index:2;">&times;</button>
+                </div>
+                <div class="panel-body" style="padding-top:0;">
+                    <div class="detail-card">
+                        <div class="detail-card-banner" style="background:${color}"></div>
+                        <div class="detail-card-body">
+                            <div class="detail-card-name">${space.name}</div>
+                            <div class="detail-card-type">${space.type === 'property' ? 'Property' : space.type === 'railroad' ? 'Railroad' : 'Utility'}</div>
+                            <div class="detail-card-price">Purchase: ${Utils.formatMoney(space.price)}</div>
+                            ${housesDisplay ? `<div style="margin-bottom:10px;">${housesDisplay}</div>` : ''}
+                            <div class="detail-card-divider"></div>
+                            ${rentHtml}
+                            ${ownerHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        this.showPanel(html);
     }
 };
