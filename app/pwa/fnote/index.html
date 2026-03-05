@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Fast Notes</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="dark"] {
+      --bg: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-card: #24243e;
+      --bg-card-hover: #2e2e4e;
+      --bg-input: #1e1e38;
+      --text: #e0e0e0;
+      --text-dim: #888;
+      --text-muted: #555;
+      --accent: #4a9eff;
+      --accent-hover: #6bb3ff;
+      --danger: #ff4d6a;
+      --danger-hover: #ff6b84;
+      --border: #333;
+      --shadow: rgba(0,0,0,0.4);
+      --overlay: rgba(0,0,0,0.6);
+      --card-new-bg: #1e3a5f;
+      --card-new-border: #4a9eff;
+      --save-color: #4cdf8b;
+      --toolbar-bg: #20203a;
+    }
+
+    [data-theme="light"] {
+      --bg: #f0f2f5;
+      --bg-secondary: #e4e6eb;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f5f5f5;
+      --bg-input: #ffffff;
+      --text: #1a1a2e;
+      --text-dim: #666;
+      --text-muted: #999;
+      --accent: #2070cc;
+      --accent-hover: #1a5fad;
+      --danger: #d93050;
+      --danger-hover: #c02040;
+      --border: #d0d0d0;
+      --shadow: rgba(0,0,0,0.1);
+      --overlay: rgba(0,0,0,0.4);
+      --card-new-bg: #e8f2ff;
+      --card-new-border: #2070cc;
+      --save-color: #28a060;
+      --toolbar-bg: #e8e8ee;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #app {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .view { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .view.active { display: flex; }
+
+    /* ===== HOME VIEW ===== */
+    .home-header {
+      min-height: 18vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 16px 20px 8px;
+      flex-shrink: 0;
+    }
+
+    .home-title {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .btn-settings {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+    .btn-settings:hover { color: var(--text); background: var(--bg-card); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 0 20px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      min-height: 0;
+    }
+    .breadcrumbs:empty { display: none; }
+    .breadcrumbs a {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .breadcrumbs a:hover { text-decoration: underline; }
+    .breadcrumbs .sep { color: var(--text-muted); margin: 0 2px; }
+    .breadcrumbs .current { color: var(--text); }
+
+    /* Card Grid */
+    .card-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      align-content: start;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (min-width: 600px) {
+      .card-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 8px 20px 24px; }
+    }
+    @media (orientation: landscape) and (max-height: 500px) {
+      .home-header { min-height: 10vh; padding: 8px 20px 4px; }
+      .card-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      min-height: 90px;
+      overflow: hidden;
+    }
+    .card:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
+    .card:active { transform: scale(0.97); }
+
+    .card-new {
+      background: var(--card-new-bg);
+      border: 2px dashed var(--card-new-border);
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .card-new .card-icon { font-size: 1.8rem; color: var(--accent); }
+    .card-new .card-label { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+    }
+
+    .card-date {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      margin-top: auto;
+    }
+
+    .card-folder-icon {
+      font-size: 1.2rem;
+      margin-bottom: 2px;
+    }
+
+    /* ===== EDITOR VIEW ===== */
+    .editor-topline {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px 8px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .editor-title-input {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid var(--border);
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 6px 2px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .editor-title-input:focus { border-color: var(--accent); }
+    .editor-title-input::placeholder { color: var(--text-muted); }
+
+    .save-indicator {
+      font-size: 0.75rem;
+      color: var(--save-color);
+      opacity: 0;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .save-indicator.flash {
+      animation: saveFlash 1.5s ease-out forwards;
+    }
+    @keyframes saveFlash {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+    .icon-btn:hover { color: var(--danger); background: rgba(255,77,106,0.1); }
+
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      padding: 4px 16px 8px;
+      gap: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      background: var(--toolbar-bg);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tool-select {
+      background: var(--bg-input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .tool-color {
+      width: 30px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--bg-input);
+      padding: 2px;
+    }
+
+    .tool-btn {
+      background: var(--bg-input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1;
+    }
+    .tool-btn:hover { border-color: var(--accent); background: var(--bg-card); }
+
+    .editor-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      outline: none;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      -webkit-overflow-scrolling: touch;
+      caret-color: var(--accent);
+    }
+    .editor-content:empty::before {
+      content: 'Start typing...';
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Checkbox & radio in editor */
+    .fn-check, .fn-radio { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+    .fn-cb, .fn-rd {
+      cursor: pointer;
+      user-select: none;
+      font-size: 1.1rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.2em;
+    }
+    .fn-cb:hover, .fn-rd:hover { opacity: 0.8; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: var(--overlay);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: modalFadeIn 0.15s ease-out;
+    }
+    .modal-overlay.active { display: flex; }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 8px 32px var(--shadow);
+      animation: modalSlideIn 0.2s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(20px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .modal-body {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .modal-body:empty { display: none; margin: 0; }
+
+    .modal-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      margin-bottom: 16px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      font-family: inherit;
+    }
+    .modal-btn:active { transform: scale(0.96); }
+
+    .modal-btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+    .modal-btn-secondary:hover { background: var(--bg-card-hover); }
+
+    .modal-btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .modal-btn-primary:hover { background: var(--accent-hover); }
+
+    .modal-btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .modal-btn-danger:hover { background: var(--danger-hover); }
+
+    .modal-btn-choice {
+      flex: 1;
+      background: var(--bg-input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .modal-btn-choice:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+
+    /* ===== SETTINGS POPUP ===== */
+    .settings-section {
+      margin-bottom: 16px;
+    }
+    .settings-section:last-child { margin-bottom: 0; }
+
+    .settings-label {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle-track {
+      width: 44px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+      border: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .toggle-track.on { background: var(--accent); }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle-track.on::after { transform: translateX(20px); }
+
+    .settings-btn {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text);
+      font-family: inherit;
+      transition: background 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .settings-btn:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ===== SAFE AREA ===== */
+    @supports (padding: env(safe-area-inset-top)) {
+      .home-header { padding-top: calc(16px + env(safe-area-inset-top)); }
+      .editor-topline { padding-top: calc(12px + env(safe-area-inset-top)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="view-home" class="view active">
+      <div class="home-header">
+        <h1 class="home-title">Fast Notes</h1>
+        <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
+      </div>
+      <div id="breadcrumbs" class="breadcrumbs"></div>
+      <div id="card-grid" class="card-grid"></div>
+    </div>
+
+    <div id="view-editor" class="view">
+      <div class="editor-topline">
+        <input id="editor-title" class="editor-title-input" type="text" placeholder="New Note" autocomplete="off" />
+        <span id="save-indicator" class="save-indicator">Saved</span>
+        <button id="editor-delete" class="icon-btn" title="Delete">&#128465;</button>
+      </div>
+      <div class="editor-toolbar">
+        <select id="tool-fontsize" class="tool-select" title="Font Size">
+          <option value="2">Small</option>
+          <option value="3" selected>Normal</option>
+          <option value="5">Large</option>
+          <option value="7">Huge</option>
+        </select>
+        <input type="color" id="tool-fontcolor" class="tool-color" value="#e0e0e0" title="Text Color" />
+        <button id="tool-checklist" class="tool-btn" title="Add Checkbox">&#9745;</button>
+        <button id="tool-radiolist" class="tool-btn" title="Add Radio">&#9673;</button>
+      </div>
+      <div id="editor-content" class="editor-content" contenteditable="true"></div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+      <div id="modal-card" class="modal-card"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

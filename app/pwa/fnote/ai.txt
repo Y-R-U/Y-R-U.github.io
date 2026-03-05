@@ -1,0 +1,91 @@
+Fast Notes PWA - AI Reference File
+====================================
+
+## File Structure
+app/pwa/fnote/
+  index.html          - Single HTML file with all markup + inline CSS (dark/light themes via CSS vars)
+  manifest.json       - PWA manifest with inline SVG icon
+  sw.js               - Service worker, cache-first strategy
+  ai.txt              - This file
+  js/
+    app.js            - Bootstrap / entry point
+    store.js          - localStorage CRUD layer
+    router.js         - Hash-based routing
+    home.js           - Home screen: card grid, breadcrumbs, new-note flow
+    editor.js         - Note editor: contentEditable, toolbar, auto-save
+    settings.js       - Settings popup (theme toggle, export/import)
+    modal.js          - Custom modal/popup system (replaces alert/prompt/confirm)
+    theme.js          - Dark/light theme switching
+    utils.js          - Shared utilities
+
+## localStorage Schema
+- `fnote_items`: JSON array of items:
+  { id, type:"note"|"folder", title, content (HTML string), parentId (null=root), createdAt, updatedAt }
+- `fnote_settings`: { theme: "dark"|"light" }
+  Items stored as flat array. Children found via filter(parentId). Breadcrumbs built by walking parentId chain.
+
+## Routing (hash-based)
+- #/              → Home (root items)
+- #/folder/{id}   → Home (folder contents)
+- #/note/{id}     → Note editor
+
+## Functions by File
+
+### js/utils.js
+- generateId(prefix='n') - returns "{prefix}_{timestamp}_{counter}"
+- formatShortDate(timestamp) - "12:30p" for today, "Mar 5" same year, "3/5/25" otherwise
+- debounce(fn, ms) - returns debounced fn with .cancel() and .flush()
+- stripHtml(html) - returns plain text from HTML string
+
+### js/store.js
+- getAll() - returns all items array
+- getById(id) - returns single item or null
+- getChildren(parentId) - returns items filtered by parentId, sorted by updatedAt desc
+- getBreadcrumbs(id) - returns array of {id, title} from root to item
+- save(item) - upsert item, sets updatedAt
+- remove(id) - removes item and all descendants recursively
+- create(type, parentId=null) - creates skeleton item, saves, returns it
+- getSettings() - returns settings object (default: {theme:'dark'})
+- saveSettings(settings) - writes settings to localStorage
+- exportAll() - returns JSON string of {items, settings}
+- importAll(jsonString) - validates and overwrites both localStorage keys
+
+### js/modal.js
+- showModal({title, message, inputs, buttons}) - generic modal, returns Promise
+- modalAlert(message, title) - single OK button
+- modalConfirm(message, title) - Cancel/Confirm, resolves boolean
+- modalPrompt(message, placeholder, title) - text input + Cancel/OK, resolves string|null
+- modalChoice(title, choices) - array of choice buttons, resolves chosen label
+
+### js/theme.js
+- applyTheme(theme) - sets data-theme attribute and meta theme-color
+- toggleTheme() - flips theme, saves to store, applies, returns new theme
+- initTheme() - reads settings and applies saved theme
+
+### js/router.js
+- onRoute(handler) - registers route change handler, receives {name, params}
+- navigate(hash) - sets location.hash
+- init() - starts listening to hashchange, resolves current route
+
+### js/home.js
+- renderHome(parentId) - renders breadcrumbs + card grid for given parent (null=root)
+
+### js/editor.js
+- renderEditor(noteId) - loads note into editor view
+- flushSave() - immediately saves any pending debounced changes
+
+### js/settings.js
+- openSettings(onRefresh) - opens settings modal with theme toggle, export/import buttons
+
+### js/app.js
+- Entry point. Initializes theme, router, wires views, registers service worker.
+- settingsBtn click handler calls openSettings()
+- Route handler switches between home/editor views
+
+## Key Design Notes
+- contentEditable + document.execCommand for rich text (paste strips formatting)
+- Checkbox/radio use custom spans with data-checked, contenteditable="false" on toggles
+- Auto-save debounced at 800ms with "Saved" flash indicator
+- Cards grid: 3 columns on mobile, auto-fill on wider screens
+- Folders can nest inside folders (parentId chain)
+- Delete button acts as cancel for new empty notes
