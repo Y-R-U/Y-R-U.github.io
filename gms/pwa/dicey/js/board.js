@@ -18,6 +18,28 @@ const BoardRenderer = {
         this.ctx = canvas.getContext('2d');
         this.resize();
         window.addEventListener('resize', () => this.resize());
+
+        // Click handler - detect which space was tapped
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = this.boardPx / rect.width;
+            const scaleY = this.boardPx / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            for (let i = 0; i < 32; i++) {
+                const pos = this.spacePositions[i];
+                if (!pos) continue;
+                if (x >= pos.x && x <= pos.x + pos.w && y >= pos.y && y <= pos.y + pos.h) {
+                    const space = this.spaces[i];
+                    if (space && (space.type === 'property' || space.type === 'railroad' || space.type === 'utility')) {
+                        AudioManager.playSfx('click');
+                        UI.showPropertyDetailPanel(i, Game.state);
+                    }
+                    break;
+                }
+            }
+        });
     },
 
     resize() {

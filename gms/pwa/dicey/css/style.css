@@ -311,16 +311,169 @@ html, body {
     border-radius: var(--radius);
 }
 
+/* Cards Strip (owned properties below board) */
+#cards-strip {
+    padding: 0 8px;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 5;
+    display: none;
+}
+#cards-strip.has-cards {
+    display: block;
+    padding: 4px 8px 2px;
+}
+
+#cards-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+}
+#cards-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.mini-card {
+    flex-shrink: 0;
+    width: 52px;
+    height: 44px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-left: -10px;
+    position: relative;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+}
+.mini-card:first-child {
+    margin-left: 0;
+}
+.mini-card:active {
+    transform: scale(1.15) translateY(-4px);
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.mini-card-color {
+    height: 8px;
+    flex-shrink: 0;
+}
+.mini-card-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 1px 2px;
+    line-height: 1.1;
+}
+.mini-card-houses {
+    font-size: 6px;
+    text-align: center;
+    padding-bottom: 2px;
+    line-height: 1;
+    color: var(--green);
+}
+
+/* Large property detail card */
+.detail-card {
+    background: rgba(0,0,0,0.25);
+    border-radius: var(--radius);
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+}
+.detail-card-banner {
+    height: 14px;
+}
+.detail-card-body {
+    padding: 16px 20px;
+}
+.detail-card-name {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+.detail-card-type {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+.detail-card-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 12px;
+}
+.detail-card-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 10px 0;
+}
+.detail-rent-table {
+    width: 100%;
+    font-size: 13px;
+}
+.detail-rent-table td {
+    padding: 4px 0;
+}
+.detail-rent-table td:first-child {
+    color: var(--text-dim);
+}
+.detail-rent-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: var(--text);
+}
+.detail-rent-table tr.current-level td {
+    color: var(--gold);
+    font-weight: 700;
+}
+.detail-card-owner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    font-size: 14px;
+}
+.detail-owner-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
 /* Bottom HUD */
 #bottom-hud {
-    padding: 8px 12px 16px;
+    padding: 6px 12px 16px;
     background: linear-gradient(0deg, rgba(22,33,62,0.95), rgba(22,33,62,0.7));
     backdrop-filter: blur(8px);
     z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+#dice-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 #dice-area {
@@ -334,14 +487,20 @@ html, body {
 
 #action-area {
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
 }
 
 .btn-roll {
-    min-width: 180px;
-    font-size: 18px;
-    padding: 14px 36px;
+    min-width: 130px;
+    font-size: 16px;
+    padding: 12px 20px;
+}
+
+#btn-build {
+    font-size: 13px;
+    padding: 8px 16px;
 }
 
 #player-bar {

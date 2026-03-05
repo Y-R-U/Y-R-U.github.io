@@ -70,6 +70,7 @@ const Game = {
         rollBtn.disabled = false;
         rollBtn.onclick = async () => {
             rollBtn.disabled = true;
+            this.hideBuildButton();
             if (player.inJail) {
                 await this.handleJail(player);
             } else {
@@ -78,13 +79,14 @@ const Game = {
         };
 
         // Build button (only show if player has buildable properties)
-        this.showBuildButton(player);
+        this.refreshBuildButton(player);
+
+        // Update owned cards strip
+        UI.updateCardsStrip(this.state, player.index);
     },
 
-    showBuildButton(player) {
-        // Remove existing build button
-        const existing = document.getElementById('btn-build');
-        if (existing) existing.remove();
+    refreshBuildButton(player) {
+        const btn = document.getElementById('btn-build');
 
         // Check if player has buildable properties
         const hasBuildable = Utils.BOARD_SPACES.some((space, idx) => {
@@ -100,10 +102,7 @@ const Game = {
         });
 
         if (hasBuildable) {
-            const btn = document.createElement('button');
-            btn.id = 'btn-build';
-            btn.className = 'btn btn-gold btn-small';
-            btn.textContent = '🏗️ Build';
+            btn.style.display = '';
             btn.onclick = async () => {
                 const ownedIdxs = Utils.BOARD_SPACES.map((s, i) => i)
                     .filter(i => this.state.properties[i]?.owner === player.index);
@@ -112,12 +111,18 @@ const Game = {
                     this.buildHouse(player, buildIdx);
                     BoardRenderer.draw(this.state);
                     UI.updateHUD(this.state);
-                    // Refresh build button
-                    this.showBuildButton(player);
+                    UI.updateCardsStrip(this.state, player.index);
+                    this.refreshBuildButton(player);
                 }
             };
-            document.getElementById('action-area').appendChild(btn);
+        } else {
+            btn.style.display = 'none';
         }
+    },
+
+    hideBuildButton() {
+        const btn = document.getElementById('btn-build');
+        if (btn) btn.style.display = 'none';
     },
 
     buildHouse(player, spaceIdx) {
@@ -194,11 +199,14 @@ const Game = {
             let buildIdx = AI.chooseBuild(player, this.state);
             while (buildIdx !== null) {
                 this.buildHouse(player, buildIdx);
+                BoardRenderer.draw(this.state);
                 await Utils.wait(300);
                 buildIdx = AI.chooseBuild(player, this.state);
             }
         }
 
+        // Update cards strip for human player after any changes
+        UI.updateCardsStrip(this.state, 0);
         this.nextPlayer();
     },
 
@@ -293,6 +301,7 @@ const Game = {
                     prop.owner = player.index;
                     AudioManager.playSfx('buy');
                     UI.showToast(`${Utils.PLAYER_NAMES[player.index]} bought ${space.name}!`);
+                    UI.updateCardsStrip(this.state, 0);
                 } else {
                     UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed on ${space.name}`);
                 }
@@ -302,6 +311,7 @@ const Game = {
                     player.money -= space.price;
                     prop.owner = player.index;
                     UI.showToast(`You bought ${space.name}!`);
+                    UI.updateCardsStrip(this.state, 0);
                 }
             }
         } else if (prop.owner !== player.index) {
@@ -568,9 +578,7 @@ const Game = {
     },
 
     nextPlayer() {
-        // Remove build button
-        const buildBtn = document.getElementById('btn-build');
-        if (buildBtn) buildBtn.remove();
+        this.hideBuildButton();
 
         if (this.state.gameOver) return;
 

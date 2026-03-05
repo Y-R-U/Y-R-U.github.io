@@ -60,13 +60,21 @@
                 <canvas id="board-canvas"></canvas>
             </div>
 
+            <!-- Owned property cards strip -->
+            <div id="cards-strip">
+                <div id="cards-scroll"></div>
+            </div>
+
             <!-- Bottom HUD -->
             <div id="bottom-hud">
-                <div id="dice-area">
-                    <canvas id="dice-canvas" width="140" height="70"></canvas>
-                </div>
-                <div id="action-area">
-                    <button id="btn-roll" class="btn btn-primary btn-roll">Roll Dice</button>
+                <div id="dice-action-row">
+                    <div id="dice-area">
+                        <canvas id="dice-canvas" width="140" height="70"></canvas>
+                    </div>
+                    <div id="action-area">
+                        <button id="btn-roll" class="btn btn-primary btn-roll">Roll Dice</button>
+                        <button id="btn-build" class="btn btn-gold btn-small" style="display:none;">🏗️ Build</button>
+                    </div>
                 </div>
                 <div id="player-bar">
                     <div class="player-pip" data-player="0"></div>
