@@ -1,0 +1,29 @@
+name: Deploy fnote to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/pwa/fnote/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 923cdf859ffb1c6b2d38f267d9521078
+          projectName: fnote
+          directory: app/pwa/fnote
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
