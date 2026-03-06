@@ -5,82 +5,83 @@ Fast Notes PWA - AI Reference File
 app/pwa/fnote/
   index.html          - Single HTML file with all markup + inline CSS (dark/light themes via CSS vars)
   manifest.json       - PWA manifest with inline SVG icon
-  sw.js               - Service worker, cache-first strategy
+  sw.js               - Service worker (fnote-v2), cache-first; skips /api/ routes
   ai.txt              - This file
+  functions/
+    api/
+      notes.js        - Cloudflare Pages Function: GET/POST /api/notes?user=<username>
+                        Reads/writes from KV binding FNOTE_DATA under key "fnote:<username>"
+                        Keeps KV credentials server-side — frontend never sees them
   js/
-    app.js            - Bootstrap / entry point
-    store.js          - localStorage CRUD layer
+    app.js            - Bootstrap / entry point (checks for username; shows login or app)
+    auth.js           - Username helpers: get/set/clear/sanitize/validate (localStorage key: fnote_username)
+    store.js          - localStorage CRUD layer + cloud sync (initSync, syncFromCloud, _pushToCloud)
     router.js         - Hash-based routing
     home.js           - Home screen: card grid, breadcrumbs, new-note flow
     editor.js         - Note editor: contentEditable, toolbar, auto-save
-    settings.js       - Settings popup (theme toggle, export/import)
+    settings.js       - Settings popup (theme toggle, Account/switch-user section, export/import)
     modal.js          - Custom modal/popup system (replaces alert/prompt/confirm)
     theme.js          - Dark/light theme switching
     utils.js          - Shared utilities
 
 ## localStorage Schema
-- `fnote_items`: JSON array of items:
-  { id, type:"note"|"folder", title, content (HTML string), parentId (null=root), createdAt, updatedAt }
+- `fnote_username`: string — the chosen username (set at login, cleared on switch)
+- `fnote_items`:    JSON array of items:
+    { id, type:"note"|"folder", title, content (HTML string),
+      parentId (null=root), createdAt, updatedAt }
 - `fnote_settings`: { theme: "dark"|"light" }
-  Items stored as flat array. Children found via filter(parentId). Breadcrumbs built by walking parentId chain.
+
+## Cloud Storage (Cloudflare KV)
+- KV namespace: FNOTE_DATA  (bound to Cloudflare Pages project as env var FNOTE_DATA)
+- Keys: "fnote:<username>"  →  JSON string:  { "items": [...] }
+- API endpoint exposed by Pages Function:
+    GET  /api/notes?user=<username>  →  { items: [...] }
+    POST /api/notes?user=<username>  body: { items: [...] }  →  { ok: true }
+- Username validation: /^[a-z0-9_-]{2,30}$/
+
+## Sync Strategy
+1. On login / app start: syncFromCloud() fetches remote items and merges with local.
+   Merge rule: for each item id, keep the version with the higher updatedAt timestamp.
+2. On every local write (save / remove / importAll): _pushToCloud() fire-and-forgets the full items array.
+3. Offline: writes succeed locally; next load re-syncs and pushes accumulated changes.
 
 ## Routing (hash-based)
 - #/              → Home (root items)
 - #/folder/{id}   → Home (folder contents)
 - #/note/{id}     → Note editor
 
+## Views
+- login   - shown first-visit; username input panel; sets fnote_username then calls initApp()
+- home    - card grid (includes sync-dot status indicator top-left)
+- editor  - note editor
+
 ## Functions by File
 
-### js/utils.js
-- generateId(prefix='n') - returns "{prefix}_{timestamp}_{counter}"
-- formatShortDate(timestamp) - "12:30p" for today, "Mar 5" same year, "3/5/25" otherwise
-- debounce(fn, ms) - returns debounced fn with .cancel() and .flush()
-- stripHtml(html) - returns plain text from HTML string
+### js/auth.js
+- getUsername()           - returns stored username or null
+- setUsername(name)       - saves to localStorage
+- clearUsername()         - removes from localStorage (triggers reload → login screen)
+- sanitizeUsername(raw)   - strips invalid chars, lowercases, max 30
+- isValidUsername(name)   - returns bool; /^[a-z0-9_-]{2,30}$/
 
-### js/store.js
-- getAll() - returns all items array
-- getById(id) - returns single item or null
-- getChildren(parentId) - returns items filtered by parentId, sorted by updatedAt desc
-- getBreadcrumbs(id) - returns array of {id, title} from root to item
-- save(item) - upsert item, sets updatedAt
-- remove(id) - removes item and all descendants recursively
-- create(type, parentId=null) - creates skeleton item, saves, returns it
-- getSettings() - returns settings object (default: {theme:'dark'})
-- saveSettings(settings) - writes settings to localStorage
-- exportAll() - returns JSON string of {items, settings}
-- importAll(jsonString) - validates and overwrites both localStorage keys
+### js/store.js  (new exports)
+- initSync(username)      - call once after login; tells store which user to push to
+- syncFromCloud()         - async; fetches, merges, pushes back if needed; returns merged array
+  (all original exports unchanged: getAll, getById, getChildren, getBreadcrumbs, save, remove,
+   create, getSettings, saveSettings, exportAll, importAll)
 
-### js/modal.js
-- showModal({title, message, inputs, buttons}) - generic modal, returns Promise
-- modalAlert(message, title) - single OK button
-- modalConfirm(message, title) - Cancel/Confirm, resolves boolean
-- modalPrompt(message, placeholder, title) - text input + Cancel/OK, resolves string|null
-- modalChoice(title, choices) - array of choice buttons, resolves chosen label
-
-### js/theme.js
-- applyTheme(theme) - sets data-theme attribute and meta theme-color
-- toggleTheme() - flips theme, saves to store, applies, returns new theme
-- initTheme() - reads settings and applies saved theme
-
-### js/router.js
-- onRoute(handler) - registers route change handler, receives {name, params}
-- navigate(hash) - sets location.hash
-- init() - starts listening to hashchange, resolves current route
-
-### js/home.js
-- renderHome(parentId) - renders breadcrumbs + card grid for given parent (null=root)
-
-### js/editor.js
-- renderEditor(noteId) - loads note into editor view
-- flushSave() - immediately saves any pending debounced changes
-
-### js/settings.js
-- openSettings(onRefresh) - opens settings modal with theme toggle, export/import buttons
+### js/settings.js  (signature change)
+- openSettings(username, onRefresh)  - username shown as @user with Switch User button
 
 ### js/app.js
-- Entry point. Initializes theme, router, wires views, registers service worker.
-- settingsBtn click handler calls openSettings()
-- Route handler switches between home/editor views
+- Entry point. Checks getUsername():
+    - No username → initLogin() → shows login view, wires input + button
+    - Has username → initApp(username) → initSync, initTheme, router, syncFromCloud
+
+### functions/api/notes.js  (Cloudflare Pages Function)
+- onRequestGet    - GET  /api/notes?user=<u>  returns KV data or {"items":[]}
+- onRequestPost   - POST /api/notes?user=<u>  writes body to KV
+- onRequestOptions - CORS preflight
 
 ## Key Design Notes
 - contentEditable + document.execCommand for rich text (paste strips formatting)
@@ -89,3 +90,4 @@ app/pwa/fnote/
 - Cards grid: 3 columns on mobile, auto-fill on wider screens
 - Folders can nest inside folders (parentId chain)
 - Delete button acts as cancel for new empty notes
+- sync-dot in home header top-left: grey=idle, blue-pulse=syncing, green=synced, red=error

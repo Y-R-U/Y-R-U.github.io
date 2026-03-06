@@ -517,13 +517,159 @@
     @supports (padding: env(safe-area-inset-top)) {
       .home-header { padding-top: calc(16px + env(safe-area-inset-top)); }
       .editor-topline { padding-top: calc(12px + env(safe-area-inset-top)); }
+      .login-wrap { padding-top: calc(24px + env(safe-area-inset-top)); }
+    }
+
+    /* ===== LOGIN VIEW ===== */
+    .login-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 28px 32px;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 12px 48px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      animation: loginSlide 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes loginSlide {
+      from { transform: translateY(28px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .login-icon {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .login-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .login-subtitle {
+      font-size: 0.83rem;
+      color: var(--text-dim);
+      text-align: center;
+      line-height: 1.55;
+      margin: 0 0 6px;
+    }
+
+    .login-field { width: 100%; }
+
+    .login-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .login-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,158,255,0.15); }
+    .login-input.valid   { border-color: var(--save-color); }
+    .login-input.invalid { border-color: var(--danger); }
+
+    .login-hint {
+      font-size: 0.71rem;
+      color: var(--text-muted);
+      margin-top: 7px;
+      text-align: center;
+    }
+
+    .login-error {
+      font-size: 0.75rem;
+      color: var(--danger);
+      margin-top: 5px;
+      text-align: center;
+      min-height: 1.1em;
+    }
+
+    .login-btn {
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s, opacity 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .login-btn:hover:not(:disabled) { background: var(--accent-hover); }
+    .login-btn:active:not(:disabled) { transform: scale(0.97); }
+    .login-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* sync status dot in home header */
+    .sync-dot {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.4s;
+    }
+    .sync-dot.syncing { background: var(--accent); animation: syncPulse 1s ease-in-out infinite; }
+    .sync-dot.synced  { background: var(--save-color); }
+    .sync-dot.error   { background: var(--danger); }
+    @keyframes syncPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <div id="view-home" class="view active">
+
+    <!-- LOGIN VIEW — shown on first visit until a username is chosen -->
+    <div id="view-login" class="view">
+      <div class="login-wrap">
+        <div class="login-card">
+          <div class="login-icon">📝</div>
+          <h1 class="login-title">Fast Notes</h1>
+          <p class="login-subtitle">Choose a username to sync your notes across all your devices.</p>
+          <div class="login-field">
+            <input id="login-username" class="login-input" type="text"
+                   placeholder="username" autocomplete="username"
+                   autocorrect="off" autocapitalize="none" spellcheck="false" maxlength="30" />
+            <div class="login-hint">Letters, numbers, - _ &nbsp;·&nbsp; 2–30 chars</div>
+            <div id="login-error" class="login-error"></div>
+          </div>
+          <button id="login-btn" class="login-btn" disabled>Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-home" class="view">
       <div class="home-header">
+        <span id="sync-dot" class="sync-dot" title="Sync status"></span>
         <h1 class="home-title">Fast Notes</h1>
         <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
       </div>

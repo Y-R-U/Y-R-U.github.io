@@ -1,10 +1,10 @@
 import * as store from './store.js';
 import { getSettings, saveSettings } from './store.js';
 import { toggleTheme } from './theme.js';
-import { showModal } from './modal.js';
-import { modalAlert } from './modal.js';
+import { showModal, modalAlert, modalConfirm } from './modal.js';
+import { clearUsername } from './auth.js';
 
-export function openSettings(onRefresh) {
+export function openSettings(username, onRefresh) {
   const settings = getSettings();
   const isDark = settings.theme === 'dark';
 
@@ -42,6 +42,43 @@ export function openSettings(onRefresh) {
   themeRow.appendChild(toggle);
   themeSection.appendChild(themeRow);
   card.appendChild(themeSection);
+
+  // Account / Sync section
+  if (username) {
+    const syncSection = document.createElement('div');
+    syncSection.className = 'settings-section';
+
+    const syncLabel = document.createElement('div');
+    syncLabel.className = 'settings-label';
+    syncLabel.textContent = 'Account';
+    syncSection.appendChild(syncLabel);
+
+    const syncRow = document.createElement('div');
+    syncRow.className = 'settings-row';
+
+    const userBadge = document.createElement('span');
+    userBadge.style.cssText = 'font-size:0.88rem;color:var(--text);font-weight:500;';
+    userBadge.textContent = `@${username}`;
+    syncRow.appendChild(userBadge);
+
+    const switchBtn = document.createElement('button');
+    switchBtn.className = 'modal-btn modal-btn-secondary';
+    switchBtn.style.cssText = 'font-size:0.75rem;padding:5px 10px;';
+    switchBtn.textContent = 'Switch User';
+    switchBtn.addEventListener('click', async () => {
+      const ok = await modalConfirm(
+        'Your notes are saved to the cloud and will be here when you log back in.',
+        'Switch User?'
+      );
+      if (ok) {
+        clearUsername();
+        location.reload();
+      }
+    });
+    syncRow.appendChild(switchBtn);
+    syncSection.appendChild(syncRow);
+    card.appendChild(syncSection);
+  }
 
   // Export section
   const exportSection = document.createElement('div');

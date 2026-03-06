@@ -1,7 +1,77 @@
 import { generateId } from './utils.js';
 
-const ITEMS_KEY = 'fnote_items';
+const ITEMS_KEY    = 'fnote_items';
 const SETTINGS_KEY = 'fnote_settings';
+const API_BASE     = '/api/notes';
+
+// Set by initSync() once the user logs in.
+let _username = null;
+
+// ─── Sync API ────────────────────────────────────────────────────────────────
+
+/** Call this right after the user supplies a username. */
+export function initSync(username) {
+  _username = username;
+}
+
+/**
+ * Fetch remote notes, merge with local (latest updatedAt wins per item id),
+ * persist the merged result locally, and push it back if anything changed.
+ * Safe to call in the background — never throws.
+ */
+export async function syncFromCloud() {
+  if (!_username) return;
+  try {
+    const res = await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`);
+    if (!res.ok) return;
+    const remote = await res.json();
+    const remoteItems = Array.isArray(remote.items) ? remote.items : [];
+
+    const local = readItems();
+    const merged = mergeItems(local, remoteItems);
+
+    // Write merged to local storage directly (skip cloud push to avoid loop)
+    localStorage.setItem(ITEMS_KEY, JSON.stringify(merged));
+
+    // Push merged back only if remote was missing something
+    if (merged.length !== remoteItems.length ||
+        merged.some((m, i) => !remoteItems[i] || m.updatedAt !== remoteItems[i].updatedAt)) {
+      _pushToCloud(merged);
+    }
+
+    return merged;
+  } catch {
+    // Offline or network error — continue with local data
+  }
+}
+
+/** Fire-and-forget push to cloud. */
+async function _pushToCloud(items) {
+  if (!_username) return;
+  try {
+    await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    });
+  } catch {
+    // Offline — local data is safe; sync will reconcile on next load
+  }
+}
+
+/** Merge two item arrays. For each id, keep the item with the higher updatedAt. */
+function mergeItems(local, remote) {
+  const map = new Map();
+  [...local, ...remote].forEach(item => {
+    const existing = map.get(item.id);
+    if (!existing || item.updatedAt > existing.updatedAt) {
+      map.set(item.id, item);
+    }
+  });
+  return Array.from(map.values());
+}
+
+// ─── localStorage helpers ─────────────────────────────────────────────────────
 
 function readItems() {
   try {
@@ -13,7 +83,11 @@ function readItems() {
 
 function writeItems(items) {
   localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
+  // Push to cloud in the background after every local write
+  _pushToCloud(items);
 }
+
+// ─── Public CRUD (unchanged interface) ───────────────────────────────────────
 
 export function getAll() {
   return readItems();
@@ -84,6 +158,8 @@ export function create(type, parentId = null) {
   return item;
 }
 
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
 export function getSettings() {
   try {
     return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || { theme: 'dark' };
@@ -95,6 +171,8 @@ export function getSettings() {
 export function saveSettings(settings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
+
+// ─── Export / Import ─────────────────────────────────────────────────────────
 
 export function exportAll() {
   return JSON.stringify({
