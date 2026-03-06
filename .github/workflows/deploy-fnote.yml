@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'app/pwa/fnote/**'
+      - '.github/workflows/deploy-fnote.yml'
 
 jobs:
   deploy:
