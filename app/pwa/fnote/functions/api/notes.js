@@ -49,7 +49,7 @@ export async function onRequestGet({ request, env }) {
   const user = new URL(request.url).searchParams.get('user');
   if (!user || !USER_RE.test(user)) return badUser();
 
-  await env.DB.exec(CREATE_TABLE);
+  await env.DB.prepare(CREATE_TABLE).run();
 
   const row = await env.DB
     .prepare('SELECT json_text FROM notes WHERE web_project = ? AND username = ?')
@@ -73,7 +73,7 @@ export async function onRequestPost({ request, env }) {
     return jsonResp({ error: 'Invalid JSON: ' + err.message }, 400);
   }
 
-  await env.DB.exec(CREATE_TABLE);
+  await env.DB.prepare(CREATE_TABLE).run();
   await env.DB
     .prepare('INSERT OR REPLACE INTO notes (web_project, username, json_text, updated_at) VALUES (?, ?, ?, ?)')
     .bind(PROJECT, user, body, Date.now())
