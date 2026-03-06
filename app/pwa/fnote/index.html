@@ -666,6 +666,82 @@
       0%, 100% { opacity: 1; }
       50%       { opacity: 0.35; }
     }
+
+    /* ===== DRAG & DROP ===== */
+    .card {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .card.dragging {
+      opacity: 0.3;
+      transform: scale(0.96);
+    }
+    .card.drop-target {
+      border-color: var(--accent) !important;
+      background: var(--card-new-bg) !important;
+      box-shadow: 0 0 0 2px var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 6px 24px var(--shadow);
+      max-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transform: rotate(-3deg);
+    }
+
+    #drag-cancel {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 9998;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 2px 14px rgba(255,77,106,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s, background 0.15s, color 0.15s, outline 0.1s;
+      white-space: nowrap;
+    }
+    #drag-cancel.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #drag-cancel.drop-target {
+      background: #fff;
+      color: var(--danger);
+      outline: 3px solid var(--danger);
+    }
+
+    /* Breadcrumbs become bigger drop zones during drag */
+    body.drag-active .breadcrumb-drop {
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .breadcrumb-drop.drop-target {
+      background: rgba(74,158,255,0.18) !important;
+      color: var(--accent) !important;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -724,6 +800,9 @@
     <div id="modal-overlay" class="modal-overlay">
       <div id="modal-card" class="modal-card"></div>
     </div>
+
+    <!-- Drag cancel — shown only while dragging -->
+    <button id="drag-cancel">✕ Cancel</button>
   </div>
 
   <script type="module" src="js/app.js"></script>
