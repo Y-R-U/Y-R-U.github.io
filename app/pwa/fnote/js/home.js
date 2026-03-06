@@ -1,7 +1,7 @@
 import * as store from './store.js';
 import { navigate } from './router.js';
 import { formatShortDate, stripHtml } from './utils.js';
-import { modalChoice, modalPrompt } from './modal.js';
+import { modalChoice, modalPrompt, modalConfirm, showModal } from './modal.js';
 
 const gridEl = document.getElementById('card-grid');
 const breadcrumbsEl = document.getElementById('breadcrumbs');
@@ -64,6 +64,17 @@ function renderCards(parentId) {
       icon.className = 'card-folder-icon';
       icon.textContent = '\uD83D\uDCC1';
       card.appendChild(icon);
+
+      // Edit icon — opens rename/delete panel
+      const editBtn = document.createElement('button');
+      editBtn.className = 'folder-edit-btn';
+      editBtn.textContent = '✏';
+      editBtn.title = 'Rename or delete folder';
+      editBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await handleFolderEdit(item, parentId);
+      });
+      card.appendChild(editBtn);
     }
 
     const title = document.createElement('div');
@@ -93,6 +104,36 @@ function renderCards(parentId) {
 
     gridEl.appendChild(card);
   });
+}
+
+async function handleFolderEdit(folder, parentId) {
+  const result = await showModal({
+    title: 'Edit Folder',
+    inputs: [{ placeholder: 'Folder name', value: folder.title || '' }],
+    buttons: [
+      { label: 'Cancel', class: 'modal-btn-secondary', value: null },
+      { label: 'Delete', class: 'modal-btn-danger',    value: '__delete__' },
+      { label: 'Rename', class: 'modal-btn-primary',   value: '__input__' },
+    ],
+  });
+
+  if (result === '__delete__') {
+    const confirmed = await modalConfirm(
+      `Delete "${folder.title || 'Untitled'}" and everything inside it?`,
+      'Delete Folder'
+    );
+    if (confirmed) {
+      store.remove(folder.id);
+      renderHome(parentId);
+    }
+  } else if (result && result !== null) {
+    const newName = result.trim();
+    if (newName && newName !== folder.title) {
+      folder.title = newName;
+      store.save(folder);
+      renderHome(parentId);
+    }
+  }
 }
 
 async function handleNewNote(parentId) {
