@@ -522,24 +522,27 @@ function getDateInZone(tz) {
 
 function getOffsetDiff(tz) {
   const now = new Date();
-  const local = now.getTime() + now.getTimezoneOffset() * 60000;
   const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
   const parts = fmt.formatToParts(now);
   const tzPart = parts.find(p => p.type === 'timeZoneName');
   const match = tzPart?.value?.match(/GMT([+-]?\d{1,2}(?::(\d{2}))?)/);
-  if (!match) return 0;
-  const hrs = parseInt(match[1]);
-  const mins = parseInt(match[2] || '0');
-  const remoteOffset = (hrs * 60 + (hrs < 0 ? -mins : mins));
+  let remoteOffset = 0;
+  if (match) {
+    const hrs = parseInt(match[1]);
+    const mins = parseInt(match[2] || '0');
+    remoteOffset = hrs * 60 + (hrs < 0 ? -mins : mins);
+  }
 
   const localFmt = new Intl.DateTimeFormat('en-US', { timeZoneName: 'shortOffset' });
   const localParts = localFmt.formatToParts(now);
   const localTzPart = localParts.find(p => p.type === 'timeZoneName');
   const localMatch = localTzPart?.value?.match(/GMT([+-]?\d{1,2}(?::(\d{2}))?)/);
-  if (!localMatch) return remoteOffset;
-  const localHrs = parseInt(localMatch[1]);
-  const localMins = parseInt(localMatch[2] || '0');
-  const localOff = (localHrs * 60 + (localHrs < 0 ? -localMins : localMins));
+  let localOff = 0;
+  if (localMatch) {
+    const localHrs = parseInt(localMatch[1]);
+    const localMins = parseInt(localMatch[2] || '0');
+    localOff = localHrs * 60 + (localHrs < 0 ? -localMins : localMins);
+  }
 
   return remoteOffset - localOff;
 }
