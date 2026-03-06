@@ -18,12 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: 923cdf859ffb1c6b2d38f267d9521078
-          projectName: fnote
-          directory: app/pwa/fnote
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          node-version: '20'
+
+      - name: Deploy to Cloudflare Pages
+        run: npx wrangler pages deploy app/pwa/fnote --project-name fnote --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 923cdf859ffb1c6b2d38f267d9521078
