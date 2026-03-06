@@ -1,18 +1,20 @@
-const CACHE_NAME = 'fnote-v5';
+const CACHE_NAME = 'fnote-v6';
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './js/app.js',
-  './js/auth.js',
-  './js/store.js',
-  './js/router.js',
-  './js/home.js',
-  './js/editor.js',
-  './js/settings.js',
-  './js/modal.js',
-  './js/theme.js',
-  './js/utils.js',
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/js/app.js',
+  '/js/auth.js',
+  '/js/store.js',
+  '/js/router.js',
+  '/js/home.js',
+  '/js/editor.js',
+  '/js/settings.js',
+  '/js/modal.js',
+  '/js/theme.js',
+  '/js/utils.js',
 ];
 
 self.addEventListener('install', (e) => {
