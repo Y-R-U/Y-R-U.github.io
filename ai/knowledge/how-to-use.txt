@@ -5,10 +5,11 @@ It tells you where to find context quickly without reading every source file.
 
 ---
 
-## Step 1 — Site Overview
-Read: ai/knowledge/sitesum.txt
+## Step 1 — Orient Yourself (only if needed)
+If the task gives you a specific project path → skip this step entirely.
+If you're unsure where to look → read ai/knowledge/sitesum.txt first.
   - Lists every top-level folder and what it contains
-  - Use this to orient yourself before touching any code
+  - Use it only when you need to find where something lives
 
 ---
 
@@ -71,11 +72,16 @@ Or more generally:
 
 ---
 
-## Summary Prompt Pattern (use this to start any session)
-  "Read ai/knowledge/how-to-use.txt to orient yourself, then [task description]."
+## Summary Prompt Patterns
 
-This one line causes Claude to read the site overview, find the relevant ai.txt,
-and check for applicable skills — giving full context with minimal back-and-forth.
+When you know the project path:
+  "Read ai/knowledge/how-to-use.txt, then work on [project path] — [task]."
+  → Reads the guide, goes straight to that project's ai.txt and relevant skills.
+  → Does NOT read sitesum.txt (not needed).
+
+When you don't know where to start:
+  "Read ai/knowledge/how-to-use.txt to orient yourself, then [task description]."
+  → Reads sitesum.txt first to find the right project, then ai.txt, then skills.
 
 ---
 
