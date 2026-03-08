@@ -31,7 +31,12 @@ const Board = (() => {
         finish:   { bg: '#1a2060', border: '#ffd700' },
     };
 
+    let boundHandlers = {};
+
     function init(canvasEl, container) {
+        // Clean up previous listeners if re-initializing
+        cleanupInputs();
+
         canvas = canvasEl;
         containerEl = container;
         ctx = canvas.getContext('2d');
@@ -87,23 +92,22 @@ const Board = (() => {
     }
 
     function setupInputs() {
-        // Touch/Mouse drag
-        canvas.addEventListener('pointerdown', (e) => {
+        boundHandlers.pointerdown = (e) => {
             isDragging = true;
             dragStartX = e.clientX;
             dragStartY = e.clientY;
             dragPanStartX = panX;
             dragPanStartY = panY;
             canvas.setPointerCapture(e.pointerId);
-        });
-        canvas.addEventListener('pointermove', (e) => {
+        };
+        boundHandlers.pointermove = (e) => {
             if (!isDragging) return;
             const dx = e.clientX - dragStartX;
             const dy = e.clientY - dragStartY;
             targetPanX = dragPanStartX + dx;
             targetPanY = dragPanStartY + dy;
-        });
-        canvas.addEventListener('pointerup', (e) => {
+        };
+        boundHandlers.pointerup = (e) => {
             if (isDragging) {
                 const dx = Math.abs(e.clientX - dragStartX);
                 const dy = Math.abs(e.clientY - dragStartY);
@@ -112,18 +116,16 @@ const Board = (() => {
                 }
             }
             isDragging = false;
-        });
-
-        // Pinch zoom
-        canvas.addEventListener('touchstart', (e) => {
+        };
+        boundHandlers.touchstart = (e) => {
             if (e.touches.length === 2) {
                 lastPinchDist = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
             }
-        }, { passive: true });
-        canvas.addEventListener('touchmove', (e) => {
+        };
+        boundHandlers.touchmove = (e) => {
             if (e.touches.length === 2) {
                 e.preventDefault();
                 const dist = Math.hypot(
@@ -136,14 +138,33 @@ const Board = (() => {
                 }
                 lastPinchDist = dist;
             }
-        }, { passive: false });
-
-        // Mouse wheel zoom
-        canvas.addEventListener('wheel', (e) => {
+        };
+        boundHandlers.touchend = () => { lastPinchDist = 0; };
+        boundHandlers.wheel = (e) => {
             e.preventDefault();
             const factor = e.deltaY > 0 ? 0.9 : 1.1;
             setZoom(targetZoom * factor);
-        }, { passive: false });
+        };
+
+        canvas.addEventListener('pointerdown', boundHandlers.pointerdown);
+        canvas.addEventListener('pointermove', boundHandlers.pointermove);
+        canvas.addEventListener('pointerup', boundHandlers.pointerup);
+        canvas.addEventListener('touchstart', boundHandlers.touchstart, { passive: true });
+        canvas.addEventListener('touchmove', boundHandlers.touchmove, { passive: false });
+        canvas.addEventListener('touchend', boundHandlers.touchend, { passive: true });
+        canvas.addEventListener('wheel', boundHandlers.wheel, { passive: false });
+    }
+
+    function cleanupInputs() {
+        if (!canvas) return;
+        if (boundHandlers.pointerdown) canvas.removeEventListener('pointerdown', boundHandlers.pointerdown);
+        if (boundHandlers.pointermove) canvas.removeEventListener('pointermove', boundHandlers.pointermove);
+        if (boundHandlers.pointerup) canvas.removeEventListener('pointerup', boundHandlers.pointerup);
+        if (boundHandlers.touchstart) canvas.removeEventListener('touchstart', boundHandlers.touchstart);
+        if (boundHandlers.touchmove) canvas.removeEventListener('touchmove', boundHandlers.touchmove);
+        if (boundHandlers.touchend) canvas.removeEventListener('touchend', boundHandlers.touchend);
+        if (boundHandlers.wheel) canvas.removeEventListener('wheel', boundHandlers.wheel);
+        boundHandlers = {};
     }
 
     function handleClick(e) {
@@ -431,6 +452,7 @@ const Board = (() => {
             cancelAnimationFrame(animFrame);
             animFrame = null;
         }
+        cleanupInputs();
     }
 
     return {

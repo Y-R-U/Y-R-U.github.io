@@ -164,7 +164,7 @@ const Game = (() => {
 
         // Apply square effect
         const sq = squares[targetIdx];
-        const result = Effects.applyEffect(null, p, sq.effect);
+        const result = Effects.applyEffect(p, sq.effect);
 
         UI.updatePlayerStats(players, currentPlayerIndex, boardSize);
 
@@ -210,10 +210,14 @@ const Game = (() => {
                     p.finishOrder = finishCount;
                     finishCount++;
                     UI.showToast(`${p.name} reaches the finish!`, 'positive');
+                    Audio.sfxWin();
                     if (finishCount >= players.length - 1) {
                         setTimeout(() => endGame(), 1500);
                         return;
                     }
+                    processing = false;
+                    setTimeout(() => nextPlayer(), 1000);
+                    return;
                 }
                 processing = false;
                 setTimeout(() => nextPlayer(), 600);
@@ -372,7 +376,6 @@ const Game = (() => {
         }
 
         UI.showScreen('screen-results');
-        Storage.clearGame();
     }
 
     // Expose doRoll to be called from UI

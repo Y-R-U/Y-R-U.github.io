@@ -71,7 +71,22 @@ const UI = (() => {
     }
 
     function showHowToPlay() {
-        const html = `
+        showOverlay(buildGuideHTML());
+        document.getElementById('panel-close').addEventListener('click', hideOverlay);
+    }
+
+    function showHowToPlayWithCallback(onDone) {
+        const html = buildGuideHTML();
+        showOverlay(html);
+        overlay.onclick = null;
+        document.getElementById('panel-close').addEventListener('click', () => {
+            hideOverlay();
+            if (onDone) onDone();
+        });
+    }
+
+    function buildGuideHTML() {
+        return `
             <div class="panel-header">
                 <h2 class="panel-title">How to Play</h2>
                 <button class="panel-close" id="panel-close">&times;</button>
@@ -141,8 +156,6 @@ const UI = (() => {
                 </ul>
             </div>
         `;
-        showOverlay(html);
-        document.getElementById('panel-close').addEventListener('click', hideOverlay);
     }
 
     function showWelcomeGuide(onContinue) {
@@ -167,15 +180,7 @@ const UI = (() => {
             hideOverlay();
             Storage.setSeenGuide();
             setTimeout(() => {
-                showHowToPlay();
-                // After closing guide, continue
-                const closeBtn = document.getElementById('panel-close');
-                const origClose = closeBtn.onclick;
-                closeBtn.onclick = null;
-                closeBtn.addEventListener('click', () => {
-                    hideOverlay();
-                    if (onContinue) onContinue();
-                });
+                showHowToPlayWithCallback(onContinue);
             }, 100);
         });
         document.getElementById('btn-no-guide').addEventListener('click', () => {

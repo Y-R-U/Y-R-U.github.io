@@ -75,7 +75,7 @@ const Effects = (() => {
         return squares;
     }
 
-    function applyEffect(game, player, effect) {
+    function applyEffect(player, effect) {
         const result = { message: '', toastType: 'info', extraAction: null };
 
         if (player.shield && effect.category === 'negative') {

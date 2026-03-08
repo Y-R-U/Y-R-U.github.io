@@ -17,7 +17,7 @@ const AI = (() => {
             const sq = squares[idx];
             let score = idx * 0.5; // Base: prefer moving further forward
 
-            if (!sq || !sq.effect) { bestIdx = idx; continue; }
+            if (!sq || !sq.effect) continue;
 
             const eff = sq.effect;
 

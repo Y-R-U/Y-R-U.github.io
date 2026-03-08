@@ -6,7 +6,6 @@ const PLAYER_COLORS = [
     '#a855f7', // purple
     '#00e676', // green
 ];
-const PLAYER_EMOJIS = ['🏃', '🤖', '🤖', '🤖'];
 
 class Player {
     constructor(index, name, isHuman = false) {
@@ -29,7 +28,7 @@ class Player {
     getEffectiveRoll(rawRoll) {
         let result = rawRoll + this.permBonus + this.tempBonus;
         if (this.doubleNext) {
-            result = rawRoll * 2 + this.permBonus;
+            result = (rawRoll + this.tempBonus) * 2 + this.permBonus;
             this.doubleNext = false;
         }
         this.tempBonus = 0;

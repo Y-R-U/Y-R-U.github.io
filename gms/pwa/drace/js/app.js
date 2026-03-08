@@ -9,9 +9,16 @@
     Audio.init();
 
     // Title particles
+    let particleResizeHandler = null;
+
     function initParticles() {
         const canvas = document.getElementById('title-particles');
         if (!canvas) return;
+
+        // Stop previous instance if any
+        if (canvas._stopParticles) canvas._stopParticles();
+        if (particleResizeHandler) window.removeEventListener('resize', particleResizeHandler);
+
         const ctx = canvas.getContext('2d');
         let particles = [];
         let w, h;
@@ -21,6 +28,7 @@
             h = canvas.height = canvas.parentElement.clientHeight;
         }
         resize();
+        particleResizeHandler = resize;
         window.addEventListener('resize', resize);
 
         class Particle {
@@ -58,14 +66,18 @@
         }
         animate();
 
-        // Expose cleanup
-        canvas._stopParticles = () => { running = false; };
+        canvas._stopParticles = () => {
+            running = false;
+            if (particleResizeHandler) {
+                window.removeEventListener('resize', particleResizeHandler);
+                particleResizeHandler = null;
+            }
+        };
     }
     initParticles();
 
     // --- Navigation / Buttons ---
     const btnNewGame = document.getElementById('btn-new-game');
-    const btnContinue = document.getElementById('btn-continue');
     const btnBackSetup = document.getElementById('btn-back-setup');
     const btnStartGame = document.getElementById('btn-start-game');
     const btnRoll = document.getElementById('btn-roll');
@@ -83,12 +95,6 @@
         UI.showScreen('screen-setup');
         UI.setupAIPreview(selectedPlayerCount);
     });
-
-    // Continue (if saved game exists)
-    // For now, just show button if we had a save
-    if (Storage.loadGame()) {
-        btnContinue.style.display = 'inline-flex';
-    }
 
     // Back to title
     btnBackSetup.addEventListener('click', () => {
