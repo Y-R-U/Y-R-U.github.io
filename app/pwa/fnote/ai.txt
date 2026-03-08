@@ -91,3 +91,15 @@ app/pwa/fnote/
 - Folders can nest inside folders (parentId chain)
 - Delete button acts as cancel for new empty notes
 - sync-dot in home header top-left: grey=idle, blue-pulse=syncing, green=synced, red=error
+
+## Drag & Drop (home.js)
+- Pointer Events API; different initiation strategy per pointer type:
+  - Mouse: drag activates once pointer moves > DRAG_THRESHOLD (10px) after pointerdown
+  - Touch: long-press (500ms, LONG_PRESS_MS) required before drag activates;
+    if finger moves > DRAG_THRESHOLD before timer fires, timer is cancelled and
+    the gesture is treated as a scroll (no drag initiated)
+- `touch-action: pan-y` on .card normally; `touch-action: none` via body.drag-active once drag is live
+- .card.long-press-pending class added on touch pointerdown → pulsing accent border gives
+  visual feedback that the hold is being recognised; removed when timer fires or is cancelled
+- Ghost label (position: fixed, pointer-events: none) follows pointer once drag is active
+- #drag-cancel button appears (top-left) during drag; breadcrumb links become drop zones
