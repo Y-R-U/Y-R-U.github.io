@@ -1,0 +1,243 @@
+Cloudflare D1 (SQLite) Storage Skill
+======================================
+Reusable pattern for any PWA/web project on this site.
+Shared single table across all projects — each project is isolated by its PROJECT name.
+
+## The Core Concept
+One Cloudflare D1 database, one table, many projects.
+Rows keyed by (project_name, username) → stores arbitrary JSON per user per project.
+
+## Table Schema
+```sql
+CREATE TABLE IF NOT EXISTS notes (
+  web_project TEXT    NOT NULL,   -- <project name>  e.g. 'fnote', 'myapp'
+  username    TEXT    NOT NULL,   -- <user name>      e.g. 'alice'
+  json_text   TEXT    NOT NULL,   -- <user project json data>  any JSON string
+  updated_at  INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (web_project, username)
+);
+```
+The three variable columns for any project:
+- web_project = short slug for your project (set as PROJECT constant in the function)
+- username    = the end user's chosen username (passed as ?user= query param)
+- json_text   = whatever JSON blob your project needs to persist per user
+
+Auto-created on first request — no migration step needed.
+
+---
+
+## Backend: Cloudflare Pages Function Template
+Place at: `functions/api/<endpoint-name>.js`
+Cloudflare binding required: D1 database bound as `DB` in Pages project settings.
+
+```js
+// Cloudflare Pages Function — /api/<endpoint-name>
+// D1 binding: DB
+//
+// GET  /api/<endpoint>?user=<username>  → { items: [...] }  (or your data shape)
+// POST /api/<endpoint>?user=<username>  body: { items: [...] }  → { ok: true }
+// OPTIONS                               → CORS preflight
+
+const CORS = {
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+const USER_RE = /^[a-z0-9_-]{2,30}$/;
+const PROJECT = '<your-project-slug>';   // ← CHANGE THIS per project
+
+const CREATE_TABLE = `CREATE TABLE IF NOT EXISTS notes (
+  web_project TEXT    NOT NULL,
+  username    TEXT    NOT NULL,
+  json_text   TEXT    NOT NULL,
+  updated_at  INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (web_project, username)
+)`;
+
+function jsonResp(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  });
+}
+
+function badUser() {
+  return jsonResp({ error: 'Invalid or missing user parameter' }, 400);
+}
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
+export async function onRequestGet({ request, env }) {
+  const user = new URL(request.url).searchParams.get('user');
+  if (!user || !USER_RE.test(user)) return badUser();
+
+  await env.DB.prepare(CREATE_TABLE).run();
+
+  const row = await env.DB
+    .prepare('SELECT json_text FROM notes WHERE web_project = ? AND username = ?')
+    .bind(PROJECT, user)
+    .first();
+
+  // Return raw json_text string (it is already valid JSON), or empty default
+  return new Response(row?.json_text ?? '{"items":[]}', {
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  });
+}
+
+export async function onRequestPost({ request, env }) {
+  const user = new URL(request.url).searchParams.get('user');
+  if (!user || !USER_RE.test(user)) return badUser();
+
+  const body = await request.text();
+  try {
+    const parsed = JSON.parse(body);
+    // Validate the expected shape — adjust for your project's data structure:
+    if (!Array.isArray(parsed.items)) throw new Error('items must be an array');
+  } catch (err) {
+    return jsonResp({ error: 'Invalid JSON: ' + err.message }, 400);
+  }
+
+  await env.DB.prepare(CREATE_TABLE).run();
+  await env.DB
+    .prepare('INSERT OR REPLACE INTO notes (web_project, username, json_text, updated_at) VALUES (?, ?, ?, ?)')
+    .bind(PROJECT, user, body, Date.now())
+    .run();
+
+  return jsonResp({ ok: true });
+}
+```
+
+---
+
+## Frontend: Sync Pattern (JS module)
+This is the pattern used in fnote/js/store.js — adapt for your project's data shape.
+localStorage key naming convention: `<project>_items`, `<project>_settings`, etc.
+
+```js
+const ITEMS_KEY = '<project>_items';    // ← change prefix to your project slug
+const API_BASE  = '/api/<endpoint>';    // ← match your Pages Function path
+
+let _username = null;
+
+/** Call once after user logs in / provides username. */
+export function initSync(username) {
+  _username = username;
+}
+
+/**
+ * Fetch remote data, merge with local (latest updatedAt wins per item id),
+ * persist merged result, push back to cloud if anything changed.
+ * Never throws — safe to call in the background.
+ */
+export async function syncFromCloud() {
+  if (!_username) return;
+  try {
+    const res = await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`);
+    if (!res.ok) return;
+    const remote = await res.json();
+    const remoteItems = Array.isArray(remote.items) ? remote.items : [];
+
+    const local = readItems();
+    const merged = mergeItems(local, remoteItems);
+
+    localStorage.setItem(ITEMS_KEY, JSON.stringify(merged));
+
+    // Push merged back only if remote was stale
+    const remoteNeedsUpdate = merged.length !== remoteItems.length ||
+      merged.some((m, i) => !remoteItems[i] || m.updatedAt !== remoteItems[i].updatedAt);
+    if (remoteNeedsUpdate) _pushToCloud(merged);
+
+    return merged;
+  } catch {
+    // Offline — local data is safe, will reconcile on next load
+  }
+}
+
+/** Fire-and-forget push to cloud. */
+async function _pushToCloud(items) {
+  if (!_username) return;
+  try {
+    await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    });
+  } catch { /* offline */ }
+}
+
+/** Merge: for each item id, keep the version with higher updatedAt. */
+function mergeItems(local, remote) {
+  const map = new Map();
+  [...local, ...remote].forEach(item => {
+    const existing = map.get(item.id);
+    if (!existing || item.updatedAt > existing.updatedAt) map.set(item.id, item);
+  });
+  return Array.from(map.values());
+}
+
+function readItems() {
+  try { return JSON.parse(localStorage.getItem(ITEMS_KEY)) || []; }
+  catch { return []; }
+}
+
+function writeItems(items) {
+  localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
+  _pushToCloud(items);  // push on every local write
+}
+```
+
+---
+
+## Cloudflare Setup (one-time per site)
+1. Create a D1 database in Cloudflare dashboard (or via Wrangler):
+   `wrangler d1 create <db-name>`
+2. In Cloudflare Pages project settings → Functions → D1 database bindings:
+   - Variable name: `DB`
+   - Database: select the database you created
+3. No manual table creation needed — the Pages Function runs CREATE TABLE IF NOT EXISTS
+   on every request (idempotent, cached by D1).
+4. The same DB binding and same `notes` table is shared by all projects on the same
+   Pages project. Each project is isolated by its unique `web_project` slug.
+
+---
+
+## Username Validation Rule (shared across all projects)
+```
+/^[a-z0-9_-]{2,30}$/
+```
+Sanitize on input: strip invalid chars, lowercase, max 30 chars.
+Store in localStorage as `<project>_username`.
+
+---
+
+## When Adapting for a New Project
+1. Copy `functions/api/notes.js` from fnote → rename to your endpoint
+2. Change `const PROJECT = 'fnote'` to your project's slug
+3. Adjust the POST body validation to match your data shape
+4. In your frontend store module, update ITEMS_KEY prefix and API_BASE path
+5. Call initSync(username) after login, syncFromCloud() on app start
+6. Call writeItems() (or your equivalent) on every local data mutation
+
+---
+
+## Data Shape Convention
+The json_text column holds a JSON string. The fnote convention is { "items": [...] }
+where each item has: { id, type, title, content, parentId, createdAt, updatedAt }.
+For other projects, the shape can be anything — just ensure:
+- Each item has a unique `id` field
+- Each item has an `updatedAt` (timestamp ms) for merge resolution
+- The top-level object has an `items` array (keeps the API consistent)
+
+---
+
+## Example: Adding This to a New Project (checklist)
+[ ] Create functions/api/<name>.js — copy template above, set PROJECT slug
+[ ] Add D1 binding DB in Cloudflare Pages settings (reuse existing DB if same Pages project)
+[ ] Add username login step in your app (localStorage: <project>_username)
+[ ] Import initSync, syncFromCloud into your app entry point
+[ ] Wire writeItems to push on every mutation
+[ ] Test offline: writes to localStorage, syncs on reconnect
+[ ] Create an ai.txt in your project folder (see ai/knowledge/how-to-use.txt)
