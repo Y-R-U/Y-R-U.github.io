@@ -1,0 +1,91 @@
+AI Knowledge System — How to Use
+==================================
+Read this file at the start of any session working on Y-R-U.github.io.
+It tells you where to find context quickly without reading every source file.
+
+---
+
+## Step 1 — Site Overview
+Read: ai/knowledge/sitesum.txt
+  - Lists every top-level folder and what it contains
+  - Use this to orient yourself before touching any code
+
+---
+
+## Step 2 — Find the Project's ai.txt
+Before reading source files, look for an ai.txt in the project folder.
+Convention: <project-root>/ai.txt   (e.g. app/pwa/fnote/ai.txt)
+
+An ai.txt is a compact reference file that describes:
+  - File/folder structure of that project
+  - Key data schemas (localStorage, API, database)
+  - Function signatures and which file each lives in
+  - Design decisions and non-obvious behaviour
+  - Anything an AI needs to make correct edits without reading every file
+
+If an ai.txt exists → read it first. It replaces the need to read most source files.
+If no ai.txt exists → read the source files, then consider writing one (see below).
+
+---
+
+## Step 3 — Check the Skills Folder
+Read relevant files from: ai/knowledge/skills/
+
+Available skills:
+  cloudflare-d1-storage.txt  - Shared D1 SQLite storage pattern for any project.
+                               Backend Pages Function template + frontend sync pattern.
+                               Use when adding cloud save/load to any PWA on this site.
+
+Skills are reusable, project-agnostic patterns. Apply them instead of reinventing
+the same solution. When in doubt, check here before writing new infrastructure.
+
+---
+
+## How to Write a Good ai.txt (for new projects)
+Place it at: <project-folder>/ai.txt
+
+Include:
+  1. Project name and one-line description
+  2. File/folder tree with one-line note per file
+  3. All data schemas (localStorage keys + shapes, API endpoints, DB columns)
+  4. Key function signatures and which file they live in
+  5. Any non-obvious design decisions or gotchas
+  6. Cross-references to skills used (e.g. "uses cloudflare-d1-storage skill")
+
+Keep it updated when making significant changes. It is the single source of truth
+for AI sessions — an outdated ai.txt is worse than none.
+
+---
+
+## How to Use Skills in a Prompt
+To use the cloudflare-d1-storage skill for a new project, prompt like this:
+
+  "Read ai/knowledge/skills/cloudflare-d1-storage.txt and apply it to [project name].
+   The project slug is '[slug]', the data shape is { items: [...] } where each item has
+   [describe fields]. Create the Pages Function at functions/api/[name].js and add
+   the frontend sync module at js/store.js."
+
+Or more generally:
+  "Read ai/knowledge/how-to-use.txt, then read the ai.txt for [project],
+   then [describe what you want to do]."
+
+---
+
+## Summary Prompt Pattern (use this to start any session)
+  "Read ai/knowledge/how-to-use.txt to orient yourself, then [task description]."
+
+This one line causes Claude to read the site overview, find the relevant ai.txt,
+and check for applicable skills — giving full context with minimal back-and-forth.
+
+---
+
+## Adding New Skills
+When you find yourself writing the same infrastructure pattern a second time,
+extract it to ai/knowledge/skills/<descriptive-name>.txt.
+
+A good skill file includes:
+  - What problem it solves (one paragraph)
+  - The complete, copy-paste-ready code template with ← CHANGE THIS markers
+  - Setup/configuration steps
+  - A checklist for adapting it to a new project
+  - Any conventions or constraints (e.g. username validation regex)
