@@ -3,8 +3,9 @@ import { onRoute, init as initRouter } from './router.js';
 import { renderHome } from './home.js';
 import { renderEditor, flushSave } from './editor.js';
 import { openSettings } from './settings.js';
-import { getUsername, setUsername, sanitizeUsername, isValidUsername } from './auth.js';
+import { getUsername, setUsername, sanitizeUsername, isValidUsername, clearUsername, getRecentUsernames, removeRecentUsername } from './auth.js';
 import { initSync, syncFromCloud } from './store.js';
+import { modalConfirm } from './modal.js';
 
 const viewLogin  = document.getElementById('view-login');
 const viewHome   = document.getElementById('view-home');
@@ -57,6 +58,77 @@ function initApp(username) {
   document.getElementById('btn-settings').addEventListener('click', () => {
     openSettings(username, () => renderHome(currentParentId));
   });
+
+  // ── User chip + popup ────────────────────────────────────────────────────
+  const btnUser       = document.getElementById('btn-user');
+  const userPopup     = document.getElementById('user-popup');
+  const userLogoutBtn = document.getElementById('user-logout-btn');
+
+  btnUser.textContent = `@${username}`;
+  btnUser.title       = `@${username}`;
+  btnUser.hidden      = false;
+
+  // Build / rebuild the recent-users section of the popup
+  function renderUserPopup() {
+    document.getElementById('user-popup-name').textContent = `@${username}`;
+    const recentsEl = document.getElementById('user-popup-recents');
+    recentsEl.innerHTML = '';
+
+    const others = getRecentUsernames().filter(u => u !== username);
+    if (others.length === 0) return;
+
+    const label = document.createElement('div');
+    label.className = 'user-popup-recents-label';
+    label.textContent = 'Switch to';
+    recentsEl.appendChild(label);
+
+    others.forEach(name => {
+      const row = document.createElement('div');
+      row.className = 'user-popup-recent-item';
+
+      const nameBtn = document.createElement('button');
+      nameBtn.className = 'user-popup-recent-name';
+      nameBtn.textContent = `@${name}`;
+      nameBtn.addEventListener('click', () => {
+        setUsername(name);   // also adds to recents list
+        location.reload();
+      });
+
+      const rmBtn = document.createElement('button');
+      rmBtn.className = 'user-popup-recent-rm';
+      rmBtn.textContent = '×';
+      rmBtn.title = `Remove @${name} from history`;
+      rmBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeRecentUsername(name);
+        renderUserPopup();
+      });
+
+      row.appendChild(nameBtn);
+      row.appendChild(rmBtn);
+      recentsEl.appendChild(row);
+    });
+  }
+
+  btnUser.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const opening = userPopup.hidden;
+    userPopup.hidden = !opening;
+    if (opening) renderUserPopup();  // refresh list each time it opens
+  });
+
+  userLogoutBtn.addEventListener('click', async () => {
+    userPopup.hidden = true;
+    const ok = await modalConfirm(
+      'Your notes are saved to the cloud and will be here when you log back in.',
+      'Switch User?'
+    );
+    if (ok) { clearUsername(); location.reload(); }
+  });
+
+  // Close popup when clicking anywhere else
+  document.addEventListener('click', () => { userPopup.hidden = true; });
+  userPopup.addEventListener('click', (e) => e.stopPropagation());
 
   initRouter();
 

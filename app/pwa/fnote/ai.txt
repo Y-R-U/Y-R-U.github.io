@@ -92,6 +92,19 @@ app/pwa/fnote/
 - Delete button acts as cancel for new empty notes
 - sync-dot in home header top-left: grey=idle, blue-pulse=syncing, green=synced, red=error
 
+## User Header Chip & Recent Usernames
+- #btn-user pill button in home header (top-right, left of ⚙) shows @currentUsername
+- Clicking it opens #user-popup floating card with:
+    1. @currentUsername header
+    2. "Switch to" recent-users list (other usernames from history):
+       - Click a name → setUsername(name) + reload (no confirm; deliberate click)
+       - Click × → removeRecentUsername(name) + re-render the list
+    3. "Switch User" button → modalConfirm then clearUsername() + reload (enter any username)
+- Recent usernames stored in localStorage key `fnote_recent_users` (JSON array, max 10)
+  - Managed in auth.js: getRecentUsernames(), removeRecentUsername(name)
+  - setUsername() auto-adds to recents (deduped, most-recent first)
+- Popup closes on any outside click
+
 ## Drag & Drop (home.js)
 - Pointer Events API; different initiation strategy per pointer type:
   - Mouse: drag activates once pointer moves > DRAG_THRESHOLD (10px) after pointerdown
