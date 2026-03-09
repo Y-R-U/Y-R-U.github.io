@@ -230,6 +230,8 @@ function domToText(node) {
   }
   return out;
 }
+
+function flashBtn(btn) {
   btn.style.borderColor = 'var(--accent)';
   setTimeout(() => { btn.style.borderColor = ''; }, 800);
 }
