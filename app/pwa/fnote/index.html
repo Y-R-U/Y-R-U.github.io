@@ -92,10 +92,16 @@
       color: var(--text);
     }
 
-    .btn-settings {
+    .header-actions {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-settings {
       background: none;
       border: none;
       color: var(--text-dim);
@@ -109,9 +115,6 @@
     .btn-settings:hover { color: var(--text); background: var(--bg-card); }
 
     .btn-user {
-      position: absolute;
-      top: 16px;
-      right: 58px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text-dim);
@@ -126,7 +129,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       transition: color 0.2s, background 0.2s, border-color 0.2s;
-      line-height: 1.4;
+      line-height: 1;
     }
     .btn-user:hover { color: var(--text); border-color: var(--accent); }
 
@@ -902,8 +905,10 @@
       <div class="home-header">
         <span id="sync-dot" class="sync-dot" title="Sync status"></span>
         <h1 class="home-title">Fast Notes</h1>
-        <button id="btn-user" class="btn-user" hidden></button>
-        <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
+        <div class="header-actions">
+          <button id="btn-user" class="btn-user" hidden></button>
+          <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
+        </div>
       </div>
       <div id="breadcrumbs" class="breadcrumbs"></div>
       <div id="card-grid" class="card-grid"></div>
