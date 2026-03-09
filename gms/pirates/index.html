@@ -542,7 +542,7 @@
             let alphaDiff = targetAlpha - camera.alpha;
             while (alphaDiff > Math.PI) alphaDiff -= Math.PI * 2;
             while (alphaDiff < -Math.PI) alphaDiff += Math.PI * 2;
-            camera.alpha += alphaDiff * Math.min(1, dt * 0.7);
+            camera.alpha += alphaDiff * Math.min(1, dt * 2.5);
 
             // ---- Player auto-shoot ----
             playerShootTimer -= dt;
