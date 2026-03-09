@@ -43,3 +43,22 @@ export function sanitizeUsername(raw) {
 export function isValidUsername(name) {
   return /^[a-z0-9_-]{2,30}$/.test(name);
 }
+
+const PATHS_KEY = 'fnote_user_paths';
+
+function _getPaths() {
+  try { return JSON.parse(localStorage.getItem(PATHS_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+/** Persist the current URL hash for a given user. */
+export function saveUserPath(name, hash) {
+  const paths = _getPaths();
+  paths[name] = hash || '#/';
+  localStorage.setItem(PATHS_KEY, JSON.stringify(paths));
+}
+
+/** Retrieve the last-visited hash for a given user (defaults to '#/'). */
+export function getUserPath(name) {
+  return _getPaths()[name] || '#/';
+}

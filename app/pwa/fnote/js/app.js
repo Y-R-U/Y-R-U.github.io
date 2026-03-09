@@ -3,7 +3,7 @@ import { onRoute, init as initRouter } from './router.js';
 import { renderHome } from './home.js';
 import { renderEditor, flushSave } from './editor.js';
 import { openSettings } from './settings.js';
-import { getUsername, setUsername, sanitizeUsername, isValidUsername, clearUsername, getRecentUsernames, removeRecentUsername } from './auth.js';
+import { getUsername, setUsername, sanitizeUsername, isValidUsername, clearUsername, getRecentUsernames, removeRecentUsername, saveUserPath, getUserPath } from './auth.js';
 import { initSync, syncFromCloud, clearLocalItems } from './store.js';
 
 const viewLogin  = document.getElementById('view-login');
@@ -89,8 +89,10 @@ function initApp(username) {
       nameBtn.className = 'user-popup-recent-name';
       nameBtn.textContent = `@${name}`;
       nameBtn.addEventListener('click', () => {
+        saveUserPath(username, location.hash);  // remember where current user was
         clearLocalItems();   // don't leak current user's notes into the new user
         setUsername(name);   // also adds to recents list
+        location.hash = getUserPath(name);      // restore where target user was
         location.reload();
       });
 
