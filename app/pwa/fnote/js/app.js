@@ -4,8 +4,7 @@ import { renderHome } from './home.js';
 import { renderEditor, flushSave } from './editor.js';
 import { openSettings } from './settings.js';
 import { getUsername, setUsername, sanitizeUsername, isValidUsername, clearUsername, getRecentUsernames, removeRecentUsername } from './auth.js';
-import { initSync, syncFromCloud } from './store.js';
-import { modalConfirm } from './modal.js';
+import { initSync, syncFromCloud, clearLocalItems } from './store.js';
 
 const viewLogin  = document.getElementById('view-login');
 const viewHome   = document.getElementById('view-home');
@@ -90,6 +89,7 @@ function initApp(username) {
       nameBtn.className = 'user-popup-recent-name';
       nameBtn.textContent = `@${name}`;
       nameBtn.addEventListener('click', () => {
+        clearLocalItems();   // don't leak current user's notes into the new user
         setUsername(name);   // also adds to recents list
         location.reload();
       });
@@ -117,13 +117,11 @@ function initApp(username) {
     if (opening) renderUserPopup();  // refresh list each time it opens
   });
 
-  userLogoutBtn.addEventListener('click', async () => {
+  userLogoutBtn.addEventListener('click', () => {
     userPopup.hidden = true;
-    const ok = await modalConfirm(
-      'Your notes are saved to the cloud and will be here when you log back in.',
-      'Switch User?'
-    );
-    if (ok) { clearUsername(); location.reload(); }
+    clearLocalItems();
+    clearUsername();
+    location.reload();
   });
 
   // Close popup when clicking anywhere else
