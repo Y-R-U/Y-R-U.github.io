@@ -118,28 +118,23 @@ class ShipController {
         canvas.addEventListener("pointercancel", end);
     }
 
-    /** Call once per frame. dt = seconds elapsed. time = total elapsed seconds. */
+    /** Call once per frame. dt = seconds elapsed. */
     update(dt) {
-        const prevAngle = this.angle;
+        // Tank controls: x = turn rate, y = throttle.
+        // Works correctly with a camera-behind follow-cam (no feedback loop).
+        const TURN_SPEED = Math.PI * 1.4; // rad/s at full deflection
 
         if (this._dir.x !== 0 || this._dir.y !== 0) {
-            // Map joystick screen-up → forward (world-space doesn't depend on camera)
-            const target  = this.angle + Math.atan2(this._dir.x, -this._dir.y);
-            let diff = target - this.angle;
-            while (diff >  Math.PI) diff -= Math.PI * 2;
-            while (diff < -Math.PI) diff += Math.PI * 2;
-            this.angle += diff * Math.min(1, dt * 4);
-            this.velocity = this.speed;
+            this.angle    += this._dir.x * TURN_SPEED * dt;
+            const throttle = Math.max(0, -this._dir.y); // only forward (y=-1 = full ahead)
+            this.velocity  += (throttle * this.speed - this.velocity) * Math.min(1, dt * 5);
         } else {
-            this.velocity *= 0.95;
-            if (this.velocity < 0.1) this.velocity = 0;
+            this.velocity *= Math.pow(0.05, dt); // fast coast-to-stop
+            if (this.velocity < 0.05) this.velocity = 0;
         }
 
-        // Track turn rate for visual tilt
-        let angleDelta = this.angle - prevAngle;
-        while (angleDelta >  Math.PI) angleDelta -= Math.PI * 2;
-        while (angleDelta < -Math.PI) angleDelta += Math.PI * 2;
-        this.turnRate += (angleDelta / Math.max(dt, 0.001) - this.turnRate) * Math.min(1, dt * 8);
+        // Smooth turn-rate for visual hull tilt
+        this.turnRate += (this._dir.x - this.turnRate) * Math.min(1, dt * 6);
 
         if (this.velocity > 0) {
             this.position.x += Math.sin(this.angle) * this.velocity * dt;
