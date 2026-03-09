@@ -40,6 +40,15 @@
             background: #e8d5a3; border-radius: 4px;
             transition: width 0.3s;
         }
+        #compass {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 120px;
+            height: 120px;
+            z-index: 20;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -48,6 +57,7 @@
         <p>Loading assets...</p>
         <div class="bar-wrap"><div class="bar-fill" id="loadBar"></div></div>
     </div>
+    <canvas id="compass" width="120" height="120"></canvas>
     <canvas id="renderCanvas"></canvas>
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -392,6 +402,82 @@
             return Math.sqrt(dx * dx + dz * dz);
         }
 
+        // ---- Compass HUD ----
+        const compassCanvas = document.getElementById("compass");
+        const compassCtx    = compassCanvas.getContext("2d");
+        const CX = 60, CY = 60, CR = 48; // center and radius
+
+        function drawCompass(shipAngle, camAlpha) {
+            const ctx = compassCtx;
+            ctx.clearRect(0, 0, 120, 120);
+
+            // Background circle
+            ctx.beginPath();
+            ctx.arc(CX, CY, CR, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0,0,0,0.45)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.6)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Cardinal labels (game: +Z = North, +X = East)
+            ctx.font = "bold 12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#fff";
+            ctx.fillText("N", CX, CY - CR + 12);
+            ctx.fillText("S", CX, CY + CR - 12);
+            ctx.fillText("E", CX + CR - 12, CY);
+            ctx.fillText("W", CX - CR + 12, CY);
+
+            // Ship heading arrow (RED)
+            // shipAngle: 0 = +Z (north on compass = up)
+            // On 2D canvas: up = -Y. So compass angle = -shipAngle
+            // Movement direction: (sin(shipAngle), cos(shipAngle)) in world XZ
+            // On compass: X_screen = sin(shipAngle), Y_screen = -cos(shipAngle)
+            const bowX = CX + Math.sin(shipAngle) * (CR - 18);
+            const bowY = CY - Math.cos(shipAngle) * (CR - 18);
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.lineTo(bowX, bowY);
+            ctx.strokeStyle = "#ff3333";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            // Arrowhead
+            const aLen = 8, aAng = 0.4;
+            const bAng = Math.atan2(bowY - CY, bowX - CX);
+            ctx.beginPath();
+            ctx.moveTo(bowX, bowY);
+            ctx.lineTo(bowX - Math.cos(bAng - aAng) * aLen, bowY - Math.sin(bAng - aAng) * aLen);
+            ctx.moveTo(bowX, bowY);
+            ctx.lineTo(bowX - Math.cos(bAng + aAng) * aLen, bowY - Math.sin(bAng + aAng) * aLen);
+            ctx.stroke();
+            // Label
+            ctx.fillStyle = "#ff3333";
+            ctx.font = "bold 10px sans-serif";
+            ctx.fillText("BOW", bowX + Math.sin(shipAngle) * 2, bowY - Math.cos(shipAngle) * 2);
+
+            // Camera "from" direction (BLUE) — where the camera IS, relative to target
+            // Camera offset: x = r*sin(b)*cos(alpha), z = r*sin(b)*sin(alpha)
+            // On compass: camFromX_screen = cos(alpha), camFromY_screen = -sin(alpha)
+            const camFromX = CX + Math.cos(camAlpha) * (CR - 22);
+            const camFromY = CY - Math.sin(camAlpha) * (CR - 22);
+            ctx.beginPath();
+            ctx.arc(camFromX, camFromY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#3399ff";
+            ctx.fill();
+            ctx.fillStyle = "#3399ff";
+            ctx.font = "bold 9px sans-serif";
+            ctx.fillText("CAM", camFromX, camFromY - 9);
+
+            // Angle readout
+            ctx.fillStyle = "#fff";
+            ctx.font = "10px monospace";
+            const sDeg = ((shipAngle * 180 / Math.PI) % 360 + 360) % 360;
+            const cDeg = ((camAlpha * 180 / Math.PI) % 360 + 360) % 360;
+            ctx.fillText("S:" + sDeg.toFixed(0) + " C:" + cDeg.toFixed(0), CX, CY + CR + 8);
+        }
+
         // ---- Game loop ----
         let gameReady = false;
         let time = 0;
@@ -512,6 +598,9 @@
                     explosions.splice(i, 1);
                 }
             }
+
+            // ---- Draw compass ----
+            drawCompass(shipCtrl.angle, camera.alpha);
         });
 
         // ---- Init ----
