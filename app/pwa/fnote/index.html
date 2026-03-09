@@ -174,6 +174,55 @@
       background: rgba(255, 77, 106, 0.08);
     }
 
+    /* Recent-users list inside popup */
+    .user-popup-recents-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 8px 0 4px;
+    }
+    .user-popup-recent-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .user-popup-recent-name {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.84rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: left;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .user-popup-recent-name:hover { background: var(--bg-card-hover); color: var(--text); }
+    .user-popup-recent-rm {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 5px;
+      transition: color 0.12s, background 0.12s;
+      flex-shrink: 0;
+    }
+    .user-popup-recent-rm:hover { color: var(--danger); background: rgba(255,77,106,0.1); }
+    /* Add a divider gap before the Switch User button when recents exist */
+    #user-popup-recents:not(:empty) { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
     /* Breadcrumbs */
     .breadcrumbs {
       padding: 0 20px 8px;
@@ -891,6 +940,7 @@
     <!-- User popup — shown when clicking the @username chip -->
     <div id="user-popup" class="user-popup" hidden>
       <div id="user-popup-name" class="user-popup-name"></div>
+      <div id="user-popup-recents"></div>
       <button id="user-logout-btn" class="user-popup-btn">Switch User</button>
     </div>
   </div>
