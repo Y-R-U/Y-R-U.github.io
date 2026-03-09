@@ -202,17 +202,34 @@ copyTextBtn.addEventListener('click', () => {
   clone.querySelectorAll('.fn-rd').forEach(rd => {
     rd.replaceWith(rd.dataset.checked === 'true' ? '(*)' : '( )');
   });
-  navigator.clipboard.writeText(clone.innerText || clone.textContent);
+  navigator.clipboard.writeText(domToText(clone).trim());
   flashBtn(copyTextBtn);
 });
 
 // Toolbar: Copy as HTML
 copyHtmlBtn.addEventListener('click', () => {
-  navigator.clipboard.writeText(contentEl.innerHTML);
+  const pretty = contentEl.innerHTML
+    .replace(/(<\/(?:div|p|h[1-6]|li|ul|ol|blockquote)>)/gi, '$1\n')
+    .replace(/<br\s*\/?>/gi, '<br>\n')
+    .trim();
+  navigator.clipboard.writeText(pretty);
   flashBtn(copyHtmlBtn);
 });
 
-function flashBtn(btn) {
+function domToText(node) {
+  let out = '';
+  for (const child of node.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      out += child.textContent;
+    } else if (child.nodeName === 'BR') {
+      out += '\n';
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      out += domToText(child);
+      if (/^(DIV|P|H[1-6]|LI|BLOCKQUOTE)$/.test(child.nodeName)) out += '\n';
+    }
+  }
+  return out;
+}
   btn.style.borderColor = 'var(--accent)';
   setTimeout(() => { btn.style.borderColor = ''; }, 800);
 }
