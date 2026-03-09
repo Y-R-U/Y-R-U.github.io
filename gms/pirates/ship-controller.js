@@ -33,6 +33,7 @@ class ShipController {
         this._center       = { x: 0, y: 0 };
         this._dir          = { x: 0, y: 0 };
         this._pointerId    = -1;
+        this.enabled       = true;  // when false, joystick won't activate
 
         this._buildJoystickUI();
         this._bindEvents();
@@ -76,7 +77,7 @@ class ShipController {
 
         canvas.addEventListener("pointerdown", (e) => {
             // Only start joystick on single-touch (pinch handled externally)
-            if (!this._active) {
+            if (!this._active && this.enabled) {
                 this._active    = true;
                 this._pointerId = e.pointerId;
                 this._center    = { x: e.clientX, y: e.clientY };

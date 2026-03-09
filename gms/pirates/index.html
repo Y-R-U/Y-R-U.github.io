@@ -49,6 +49,35 @@
             z-index: 20;
             pointer-events: none;
         }
+        #modeBtn {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            z-index: 20;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.7);
+            font: bold 13px sans-serif;
+            color: #fff;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        #modeBtn.helm {
+            background: rgba(200,60,60,0.7);
+            border-color: #ff6666;
+        }
+        #modeBtn.pan {
+            background: rgba(60,120,200,0.7);
+            border-color: #66aaff;
+        }
     </style>
 </head>
 <body>
@@ -58,6 +87,7 @@
         <div class="bar-wrap"><div class="bar-fill" id="loadBar"></div></div>
     </div>
     <canvas id="compass" width="120" height="120"></canvas>
+    <button id="modeBtn" class="helm">HELM</button>
     <canvas id="renderCanvas"></canvas>
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -151,6 +181,50 @@
         };
         canvas.addEventListener("pointerup",     endPinch, { capture: true });
         canvas.addEventListener("pointercancel", endPinch, { capture: true });
+
+        // ---- HELM / PAN mode toggle ----
+        let helmMode = true;  // true = steer ship, false = pan camera
+        const modeBtn = document.getElementById("modeBtn");
+
+        // Pan state (for PAN mode — drag to rotate camera around ship)
+        let panActive    = false;
+        let panPointerId = -1;
+        let panStartX    = 0;
+        let panStartAlpha = 0;
+
+        modeBtn.addEventListener("click", () => {
+            helmMode = !helmMode;
+            modeBtn.textContent = helmMode ? "HELM" : "PAN";
+            modeBtn.className   = helmMode ? "helm" : "pan";
+            // Enable/disable joystick
+            shipCtrl.enabled = helmMode;
+            if (!helmMode) shipCtrl.cancelInput();
+            // Reset pan state
+            panActive = false;
+        });
+
+        // Pan handlers — only active when helmMode is false
+        canvas.addEventListener("pointerdown", (e) => {
+            if (helmMode || pinchActive) return;
+            if (Object.keys(pinchPointers).length >= 2) return;
+            panActive     = true;
+            panPointerId  = e.pointerId;
+            panStartX     = e.clientX;
+            panStartAlpha = camera.alpha;
+        });
+
+        canvas.addEventListener("pointermove", (e) => {
+            if (!panActive || e.pointerId !== panPointerId || pinchActive) return;
+            const dx = e.clientX - panStartX;
+            // Drag sensitivity: pixels → radians
+            camera.alpha = panStartAlpha + dx * 0.008;
+        });
+
+        const endPan = (e) => {
+            if (e.pointerId === panPointerId) panActive = false;
+        };
+        canvas.addEventListener("pointerup",     endPan);
+        canvas.addEventListener("pointercancel", endPan);
 
         // ---- Lights ----
         const sun = new BABYLON.DirectionalLight("sun", new BABYLON.Vector3(-0.5, -1, 0.5), scene);
@@ -501,12 +575,15 @@
                 playerShip.rotation.z = turnTilt + Math.sin(time * 2) * 0.02;
             }
 
-            // ---- Camera: follow ship, locked isometric angle behind ship ----
+            // ---- Camera ----
+            // Always track the ship position
             camera.target.x = playerPos.x;
             camera.target.z = playerPos.z;
             camera.target.y = 0.5;
-            // alpha rotates so we're always looking from behind the ship
-            camera.alpha = -shipCtrl.angle - Math.PI / 2;
+            // In HELM mode: lock camera behind ship. In PAN mode: user drags to rotate.
+            if (helmMode) {
+                camera.alpha = -shipCtrl.angle - Math.PI / 2;
+            }
 
             // ---- Player auto-shoot ----
             playerShootTimer -= dt;
