@@ -576,14 +576,12 @@
             }
 
             // ---- Camera ----
-            // Always track the ship position
+            // Always track the ship position. Camera angle never auto-rotates.
+            // HELM mode: joystick steers ship, camera stays fixed.
+            // PAN mode: drag rotates camera, ship coasts.
             camera.target.x = playerPos.x;
             camera.target.z = playerPos.z;
             camera.target.y = 0.5;
-            // In HELM mode: lock camera behind ship. In PAN mode: user drags to rotate.
-            if (helmMode) {
-                camera.alpha = -shipCtrl.angle - Math.PI / 2;
-            }
 
             // ---- Player auto-shoot ----
             playerShootTimer -= dt;
