@@ -3,8 +3,9 @@ import { onRoute, init as initRouter } from './router.js';
 import { renderHome } from './home.js';
 import { renderEditor, flushSave } from './editor.js';
 import { openSettings } from './settings.js';
-import { getUsername, setUsername, sanitizeUsername, isValidUsername } from './auth.js';
+import { getUsername, setUsername, sanitizeUsername, isValidUsername, clearUsername } from './auth.js';
 import { initSync, syncFromCloud } from './store.js';
+import { modalConfirm } from './modal.js';
 
 const viewLogin  = document.getElementById('view-login');
 const viewHome   = document.getElementById('view-home');
@@ -57,6 +58,35 @@ function initApp(username) {
   document.getElementById('btn-settings').addEventListener('click', () => {
     openSettings(username, () => renderHome(currentParentId));
   });
+
+  // ── User chip + popup ────────────────────────────────────────────────────
+  const btnUser       = document.getElementById('btn-user');
+  const userPopup     = document.getElementById('user-popup');
+  const userPopupName = document.getElementById('user-popup-name');
+  const userLogoutBtn = document.getElementById('user-logout-btn');
+
+  btnUser.textContent = `@${username}`;
+  btnUser.title       = `@${username}`;
+  btnUser.hidden      = false;
+  userPopupName.textContent = `@${username}`;
+
+  btnUser.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userPopup.hidden = !userPopup.hidden;
+  });
+
+  userLogoutBtn.addEventListener('click', async () => {
+    userPopup.hidden = true;
+    const ok = await modalConfirm(
+      'Your notes are saved to the cloud and will be here when you log back in.',
+      'Switch User?'
+    );
+    if (ok) { clearUsername(); location.reload(); }
+  });
+
+  // Close popup when clicking anywhere else
+  document.addEventListener('click', () => { userPopup.hidden = true; });
+  userPopup.addEventListener('click', (e) => e.stopPropagation());
 
   initRouter();
 

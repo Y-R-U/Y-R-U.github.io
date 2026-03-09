@@ -108,6 +108,72 @@
     }
     .btn-settings:hover { color: var(--text); background: var(--bg-card); }
 
+    .btn-user {
+      position: absolute;
+      top: 16px;
+      right: 58px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.76rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 20px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+      line-height: 1.4;
+    }
+    .btn-user:hover { color: var(--text); border-color: var(--accent); }
+
+    .user-popup {
+      position: fixed;
+      top: 54px;
+      right: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 6px 28px var(--shadow);
+      z-index: 600;
+      min-width: 160px;
+      animation: userPopupIn 0.14s ease-out;
+    }
+    @keyframes userPopupIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    .user-popup-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .user-popup-btn {
+      width: 100%;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 7px 12px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .user-popup-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(255, 77, 106, 0.08);
+    }
+
     /* Breadcrumbs */
     .breadcrumbs {
       padding: 0 20px 8px;
@@ -787,6 +853,7 @@
       <div class="home-header">
         <span id="sync-dot" class="sync-dot" title="Sync status"></span>
         <h1 class="home-title">Fast Notes</h1>
+        <button id="btn-user" class="btn-user" hidden></button>
         <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
       </div>
       <div id="breadcrumbs" class="breadcrumbs"></div>
@@ -820,6 +887,12 @@
 
     <!-- Drag cancel — shown only while dragging -->
     <button id="drag-cancel">✕ Cancel</button>
+
+    <!-- User popup — shown when clicking the @username chip -->
+    <div id="user-popup" class="user-popup" hidden>
+      <div id="user-popup-name" class="user-popup-name"></div>
+      <button id="user-logout-btn" class="user-popup-btn">Switch User</button>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
