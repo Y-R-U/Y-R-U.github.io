@@ -79,7 +79,7 @@
         scene.fogColor = new BABYLON.Color3(0.53, 0.77, 0.92);
 
         // ---- Camera (Diablo-style: high angle, behind ship) ----
-        const camera = new BABYLON.ArcRotateCamera("cam", -Math.PI / 2, Math.PI / 3.8, 45, BABYLON.Vector3.Zero(), scene);
+        const camera = new BABYLON.ArcRotateCamera("cam", Math.PI / 2, Math.PI / 3.8, 45, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.4;
         camera.upperBetaLimit = Math.PI / 2.8;
         camera.lowerRadiusLimit = 20;
@@ -538,7 +538,7 @@
             camera.target.z += (playerPos.z - camera.target.z) * Math.min(1, dt * 3);
             camera.target.y = 0.5;
             // Smoothly rotate camera to stay behind the ship
-            let targetAlpha = -playerAngle - Math.PI / 2;
+            let targetAlpha = -playerAngle + Math.PI / 2;
             let alphaDiff = targetAlpha - camera.alpha;
             while (alphaDiff > Math.PI) alphaDiff -= Math.PI * 2;
             while (alphaDiff < -Math.PI) alphaDiff += Math.PI * 2;
