@@ -53,121 +53,171 @@
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="ship-controller.js"></script>
     <script>
     (function() {
-        const ASSET_PATH = "../assets/pirate-kit/";
-        const WATER_SIZE = 200;
-        const ISLAND_RADIUS = 18;
-        const AI_SHIP_COUNT = 6;
-        const PLAYER_SPEED = 8;
-        const AI_SPEED_MIN = 2;
-        const AI_SPEED_MAX = 4;
-        const SHOOT_RANGE = 25;
-        const SHOOT_COOLDOWN = 2.5;
-        const CANNONBALL_SPEED = 18;
+        const ASSET_PATH        = "../assets/pirate-kit/";
+        const WATER_SIZE        = 200;
+        const ISLAND_RADIUS     = 18;
+        const AI_SHIP_COUNT     = 6;
+        const PLAYER_SPEED      = 8;
+        const AI_SPEED_MIN      = 2;
+        const AI_SPEED_MAX      = 4;
+        const SHOOT_RANGE       = 25;
+        const SHOOT_COOLDOWN    = 2.5;
+        const CANNONBALL_SPEED  = 18;
         const CANNONBALL_LIFETIME = 1.5;
+
+        // Camera isometric config
+        const CAM_BETA    = Math.PI / 4;    // ~45° — true isometric high angle
+        const CAM_RADIUS  = 80;             // zoomed out
+        const CAM_RADIUS_MIN = 30;
+        const CAM_RADIUS_MAX = 130;
 
         const canvas = document.getElementById("renderCanvas");
         const engine = new BABYLON.Engine(canvas, true, { stencil: true });
-        const scene = new BABYLON.Scene(engine);
+        const scene  = new BABYLON.Scene(engine);
 
         // ---- Sky color ----
-        scene.clearColor = new BABYLON.Color4(0.53, 0.77, 0.92, 1);
+        scene.clearColor  = new BABYLON.Color4(0.53, 0.77, 0.92, 1);
         scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.35);
-        scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-        scene.fogDensity = 0.006;
-        scene.fogColor = new BABYLON.Color3(0.53, 0.77, 0.92);
+        scene.fogMode     = BABYLON.Scene.FOGMODE_EXP2;
+        scene.fogDensity  = 0.004;
+        scene.fogColor    = new BABYLON.Color3(0.53, 0.77, 0.92);
 
-        // ---- Camera (locked behind ship, Diablo-style high angle) ----
-        const camera = new BABYLON.ArcRotateCamera("cam", -Math.PI / 2, Math.PI / 3.8, 55, BABYLON.Vector3.Zero(), scene);
-        camera.lowerBetaLimit = 0.4;
-        camera.upperBetaLimit = Math.PI / 2.8;
-        camera.lowerRadiusLimit = 20;
-        camera.upperRadiusLimit = 80;
-        camera.attachControl(canvas, false);
-        // Remove default pointer input so joystick works, but we'll add pinch zoom
-        camera.inputs.removeByType("ArcRotateCameraPointersInput");
+        // ---- Camera — locked isometric, NO user rotation, pinch-zoom only ----
+        const camera = new BABYLON.ArcRotateCamera("cam",
+            -Math.PI / 2, CAM_BETA, CAM_RADIUS,
+            BABYLON.Vector3.Zero(), scene);
+        camera.lowerBetaLimit   = CAM_BETA;   // lock vertical angle
+        camera.upperBetaLimit   = CAM_BETA;   // lock vertical angle
+        camera.lowerRadiusLimit = CAM_RADIUS_MIN;
+        camera.upperRadiusLimit = CAM_RADIUS_MAX;
+        // Strip ALL default inputs — camera is driven purely by code + pinch
+        camera.inputs.clear();
+
+        // ---- Pinch-zoom only ----
+        let pinchPointers    = {};
+        let pinchActive      = false;
+        let pinchStartDist   = 0;
+        let pinchStartRadius = 0;
+
+        function getPinchDist() {
+            const pts = Object.values(pinchPointers);
+            if (pts.length < 2) return 0;
+            const dx = pts[0].x - pts[1].x;
+            const dy = pts[0].y - pts[1].y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        canvas.addEventListener("pointerdown", (e) => {
+            pinchPointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+            if (Object.keys(pinchPointers).length === 2) {
+                pinchActive      = true;
+                pinchStartDist   = getPinchDist();
+                pinchStartRadius = camera.radius;
+                // Cancel joystick while pinching
+                shipCtrl.cancelInput();
+            }
+        }, { capture: true });
+
+        canvas.addEventListener("pointermove", (e) => {
+            if (pinchPointers[e.pointerId]) {
+                pinchPointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+            }
+            if (pinchActive && Object.keys(pinchPointers).length >= 2) {
+                const dist = getPinchDist();
+                if (pinchStartDist > 0) {
+                    const scale = pinchStartDist / dist;
+                    camera.radius = Math.max(CAM_RADIUS_MIN,
+                        Math.min(CAM_RADIUS_MAX, pinchStartRadius * scale));
+                }
+            }
+        }, { capture: true });
+
+        const endPinch = (e) => {
+            delete pinchPointers[e.pointerId];
+            if (Object.keys(pinchPointers).length < 2) pinchActive = false;
+        };
+        canvas.addEventListener("pointerup",     endPinch, { capture: true });
+        canvas.addEventListener("pointercancel", endPinch, { capture: true });
 
         // ---- Lights ----
         const sun = new BABYLON.DirectionalLight("sun", new BABYLON.Vector3(-0.5, -1, 0.5), scene);
         sun.intensity = 1.5;
-        sun.diffuse = new BABYLON.Color3(1, 0.95, 0.85);
+        sun.diffuse   = new BABYLON.Color3(1, 0.95, 0.85);
         const ambient = new BABYLON.HemisphericLight("ambient", new BABYLON.Vector3(0, 1, 0), scene);
-        ambient.intensity = 0.5;
+        ambient.intensity   = 0.5;
         ambient.groundColor = new BABYLON.Color3(0.2, 0.3, 0.4);
 
-        // ---- Water (lowered so island sand is visible) ----
-        const waterMesh = BABYLON.MeshBuilder.CreateGround("water", { width: WATER_SIZE, height: WATER_SIZE, subdivisions: 64 }, scene);
+        // ---- Water ----
+        const waterMesh = BABYLON.MeshBuilder.CreateGround("water",
+            { width: WATER_SIZE, height: WATER_SIZE, subdivisions: 64 }, scene);
         const waterMat = new BABYLON.WaterMaterial("waterMat", scene, new BABYLON.Vector2(512, 512));
         waterMat.backFaceCulling = true;
-        waterMat.bumpTexture = new BABYLON.Texture("../assets/pirate-kit/waterbump.png", scene);
-        waterMat.windForce = -5;
-        waterMat.waveHeight = 0.3;
-        waterMat.waveLength = 0.3;
-        waterMat.waterColor = new BABYLON.Color3(0.1, 0.3, 0.5);
+        waterMat.bumpTexture     = new BABYLON.Texture("../assets/pirate-kit/waterbump.png", scene);
+        waterMat.windForce       = -5;
+        waterMat.waveHeight      = 0.3;
+        waterMat.waveLength      = 0.3;
+        waterMat.waterColor      = new BABYLON.Color3(0.1, 0.3, 0.5);
         waterMat.colorBlendFactor = 0.3;
-        waterMat.bumpHeight = 0.1;
-        waterMat.windDirection = new BABYLON.Vector2(1, 1);
-        waterMesh.material = waterMat;
-        waterMesh.position.y = -0.8;
+        waterMat.bumpHeight      = 0.1;
+        waterMat.windDirection   = new BABYLON.Vector2(1, 1);
+        waterMesh.material       = waterMat;
+        waterMesh.position.y     = -0.8;
 
         // Skybox for water reflections
-        const skybox = BABYLON.MeshBuilder.CreateBox("skybox", { size: 500 }, scene);
-        const skyMat = new BABYLON.StandardMaterial("skyMat", scene);
+        const skybox  = BABYLON.MeshBuilder.CreateBox("skybox", { size: 500 }, scene);
+        const skyMat  = new BABYLON.StandardMaterial("skyMat", scene);
         skyMat.backFaceCulling = false;
         skyMat.disableLighting = true;
-        skyMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        skyMat.specularColor = new BABYLON.Color3(0, 0, 0);
-        skyMat.emissiveColor = new BABYLON.Color3(0.53, 0.77, 0.92);
-        skybox.material = skyMat;
+        skyMat.diffuseColor    = new BABYLON.Color3(0, 0, 0);
+        skyMat.specularColor   = new BABYLON.Color3(0, 0, 0);
+        skyMat.emissiveColor   = new BABYLON.Color3(0.53, 0.77, 0.92);
+        skybox.material        = skyMat;
         skybox.infiniteDistance = true;
         waterMat.addToRenderList(skybox);
 
-        // ---- Island (raised so sand is clearly above water) ----
+        // ---- Island ----
         const islandMesh = BABYLON.MeshBuilder.CreateCylinder("island", {
-            height: 3, diameterTop: ISLAND_RADIUS * 2, diameterBottom: ISLAND_RADIUS * 2.4,
-            tessellation: 32
+            height: 3, diameterTop: ISLAND_RADIUS * 2, diameterBottom: ISLAND_RADIUS * 2.4, tessellation: 32
         }, scene);
         islandMesh.position.y = -1.2;
         const islandMat = new BABYLON.StandardMaterial("islandMat", scene);
-        islandMat.diffuseColor = new BABYLON.Color3(0.88, 0.78, 0.58);
+        islandMat.diffuseColor  = new BABYLON.Color3(0.88, 0.78, 0.58);
         islandMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-        islandMesh.material = islandMat;
+        islandMesh.material     = islandMat;
         waterMat.addToRenderList(islandMesh);
 
-        // Sandy beach ring
         const beachRing = BABYLON.MeshBuilder.CreateCylinder("beach", {
-            height: 0.15, diameterTop: ISLAND_RADIUS * 2.1, diameterBottom: ISLAND_RADIUS * 2.2,
-            tessellation: 32
+            height: 0.15, diameterTop: ISLAND_RADIUS * 2.1, diameterBottom: ISLAND_RADIUS * 2.2, tessellation: 32
         }, scene);
         beachRing.position.y = 0.15;
         const beachMat = new BABYLON.StandardMaterial("beachMat", scene);
-        beachMat.diffuseColor = new BABYLON.Color3(0.93, 0.85, 0.65);
+        beachMat.diffuseColor  = new BABYLON.Color3(0.93, 0.85, 0.65);
         beachMat.specularColor = BABYLON.Color3.Black();
-        beachRing.material = beachMat;
+        beachRing.material     = beachMat;
         waterMat.addToRenderList(beachRing);
 
-        // Green grass center
         const grassPatch = BABYLON.MeshBuilder.CreateCylinder("grass", {
             height: 0.15, diameter: ISLAND_RADIUS * 1.3, tessellation: 32
         }, scene);
         grassPatch.position.y = 0.25;
         const grassMat = new BABYLON.StandardMaterial("grassMat", scene);
-        grassMat.diffuseColor = new BABYLON.Color3(0.35, 0.6, 0.25);
+        grassMat.diffuseColor  = new BABYLON.Color3(0.35, 0.6, 0.25);
         grassMat.specularColor = BABYLON.Color3.Black();
-        grassPatch.material = grassMat;
+        grassPatch.material    = grassMat;
         waterMat.addToRenderList(grassPatch);
 
         // ---- Asset loading ----
         const modelCache = {};
         let totalToLoad = 0;
-        let loaded = 0;
-        const loadBar = document.getElementById("loadBar");
+        let loaded      = 0;
+        const loadBar   = document.getElementById("loadBar");
 
         function updateProgress() {
             loaded++;
-            const pct = Math.min(100, Math.round((loaded / totalToLoad) * 100));
-            loadBar.style.width = pct + "%";
+            loadBar.style.width = Math.min(100, Math.round((loaded / totalToLoad) * 100)) + "%";
         }
 
         function loadModel(name) {
@@ -189,10 +239,10 @@
         function instantiateModel(name, pos, rotY, scale) {
             const src = modelCache[name];
             if (!src) return null;
-            const instance = src.instantiateHierarchy(null, {doNotInstantiate: false});
+            const instance = src.instantiateHierarchy(null, { doNotInstantiate: false });
             if (!instance) return null;
             instance.setEnabled(true);
-            instance.position = pos || BABYLON.Vector3.Zero();
+            instance.position   = pos || BABYLON.Vector3.Zero();
             instance.rotation.y = rotY || 0;
             if (scale != null) instance.scaling = new BABYLON.Vector3(scale, scale, scale);
             instance.getChildMeshes().forEach(m => waterMat.addToRenderList(m));
@@ -208,149 +258,38 @@
         ];
         totalToLoad = modelsToLoad.length;
 
-        // ---- Player state ----
-        let playerShip = null;
-        let playerAngle = 0;
-        let playerSpeed = 0;
-        let playerTurnRate = 0;
+        // ---- Ship controller ----
+        const shipCtrl = new ShipController(canvas, {
+            speed:        PLAYER_SPEED,
+            waterSize:    WATER_SIZE,
+            islandRadius: ISLAND_RADIUS,
+            startPos:     new BABYLON.Vector3(ISLAND_RADIUS + 10, 0, 0)
+        });
+
+        let playerShip      = null;
         let playerShootTimer = 0;
-        let playerPos = new BABYLON.Vector3(ISLAND_RADIUS + 10, 0, 0);
-
-        // ---- Joystick state ----
-        let joystickActive = false;
-        let joystickCenter = { x: 0, y: 0 };
-        let joystickDir = { x: 0, y: 0 };
-        let joystickPointerId = -1;
-
-        // ---- Pinch zoom state ----
-        let pinchActive = false;
-        let pinchStartDist = 0;
-        let pinchStartRadius = 0;
-        let pinchPointers = {};
-
-        // ---- Touch / pointer controls ----
-        const joystickOuter = document.createElement("div");
-        joystickOuter.style.cssText = "position:absolute;width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);pointer-events:none;display:none;transform:translate(-50%,-50%);z-index:10;";
-        document.body.appendChild(joystickOuter);
-
-        const joystickInner = document.createElement("div");
-        joystickInner.style.cssText = "position:absolute;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.6);pointer-events:none;display:none;transform:translate(-50%,-50%);z-index:11;";
-        document.body.appendChild(joystickInner);
-
-        function getPinchDist() {
-            const pts = Object.values(pinchPointers);
-            if (pts.length < 2) return 0;
-            const dx = pts[0].x - pts[1].x;
-            const dy = pts[0].y - pts[1].y;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-
-        canvas.addEventListener("pointerdown", (e) => {
-            pinchPointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-
-            // Start pinch if two fingers
-            if (Object.keys(pinchPointers).length === 2) {
-                pinchActive = true;
-                pinchStartDist = getPinchDist();
-                pinchStartRadius = camera.radius;
-                // Cancel joystick if it was active
-                if (joystickActive) {
-                    joystickActive = false;
-                    joystickPointerId = -1;
-                    joystickDir = { x: 0, y: 0 };
-                    joystickOuter.style.display = "none";
-                    joystickInner.style.display = "none";
-                }
-                return;
-            }
-
-            // Single finger - joystick
-            if (!joystickActive && Object.keys(pinchPointers).length === 1) {
-                joystickActive = true;
-                joystickPointerId = e.pointerId;
-                joystickCenter = { x: e.clientX, y: e.clientY };
-                joystickDir = { x: 0, y: 0 };
-                joystickOuter.style.display = "block";
-                joystickOuter.style.left = e.clientX + "px";
-                joystickOuter.style.top = e.clientY + "px";
-                joystickInner.style.display = "block";
-                joystickInner.style.left = e.clientX + "px";
-                joystickInner.style.top = e.clientY + "px";
-                canvas.setPointerCapture(e.pointerId);
-            }
-        });
-
-        canvas.addEventListener("pointermove", (e) => {
-            if (pinchPointers[e.pointerId]) {
-                pinchPointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-            }
-
-            // Handle pinch zoom
-            if (pinchActive && Object.keys(pinchPointers).length >= 2) {
-                const dist = getPinchDist();
-                if (pinchStartDist > 0) {
-                    const scale = pinchStartDist / dist;
-                    camera.radius = Math.max(camera.lowerRadiusLimit, Math.min(camera.upperRadiusLimit, pinchStartRadius * scale));
-                }
-                return;
-            }
-
-            // Handle joystick
-            if (!joystickActive || e.pointerId !== joystickPointerId) return;
-            const dx = e.clientX - joystickCenter.x;
-            const dy = e.clientY - joystickCenter.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const maxR = 50;
-            const clampDist = Math.min(dist, maxR);
-            const angle = Math.atan2(dy, dx);
-            const cx = joystickCenter.x + Math.cos(angle) * clampDist;
-            const cy = joystickCenter.y + Math.sin(angle) * clampDist;
-            joystickInner.style.left = cx + "px";
-            joystickInner.style.top = cy + "px";
-            if (dist > 8) {
-                joystickDir = { x: Math.cos(angle), y: Math.sin(angle) };
-            } else {
-                joystickDir = { x: 0, y: 0 };
-            }
-        });
-
-        const endPointer = (e) => {
-            delete pinchPointers[e.pointerId];
-            if (Object.keys(pinchPointers).length < 2) {
-                pinchActive = false;
-            }
-            if (e.pointerId === joystickPointerId) {
-                joystickActive = false;
-                joystickPointerId = -1;
-                joystickDir = { x: 0, y: 0 };
-                joystickOuter.style.display = "none";
-                joystickInner.style.display = "none";
-            }
-        };
-        canvas.addEventListener("pointerup", endPointer);
-        canvas.addEventListener("pointercancel", endPointer);
 
         // ---- AI Ships ----
-        const aiShips = [];
+        const aiShips      = [];
         const aiShipModels = ["ship-small", "ship-medium", "ship-large", "ship-ghost"];
 
         function spawnAIShip() {
             const modelName = aiShipModels[Math.floor(Math.random() * aiShipModels.length)];
             const angle = Math.random() * Math.PI * 2;
-            const dist = ISLAND_RADIUS + 8 + Math.random() * 40;
-            const pos = new BABYLON.Vector3(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
+            const dist  = ISLAND_RADIUS + 8 + Math.random() * 40;
+            const pos   = new BABYLON.Vector3(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
             const heading = Math.random() * Math.PI * 2;
-            const speed = AI_SPEED_MIN + Math.random() * (AI_SPEED_MAX - AI_SPEED_MIN);
-            const ship = instantiateModel(modelName, pos, heading, 1);
+            const speed   = AI_SPEED_MIN + Math.random() * (AI_SPEED_MAX - AI_SPEED_MIN);
+            const ship    = instantiateModel(modelName, pos, heading, 1);
             if (!ship) return;
             aiShips.push({
-                mesh: ship,
-                heading: heading,
-                speed: speed,
-                turnTimer: Math.random() * 5,
+                mesh:         ship,
+                heading:      heading,
+                speed:        speed,
+                turnTimer:    Math.random() * 5,
                 turnInterval: 3 + Math.random() * 5,
                 targetHeading: heading,
-                shootTimer: Math.random() * SHOOT_COOLDOWN
+                shootTimer:   Math.random() * SHOOT_COOLDOWN
             });
         }
 
@@ -360,114 +299,93 @@
             for (let i = 0; i < 6; i++) {
                 const a = Math.random() * Math.PI * 2;
                 const r = 3 + Math.random() * (ISLAND_RADIUS * 0.6 - 3);
-                const p = new BABYLON.Vector3(Math.cos(a) * r, 0.3, Math.sin(a) * r);
-                instantiateModel(palmTypes[Math.floor(Math.random() * palmTypes.length)], p, Math.random() * Math.PI * 2, 1);
+                instantiateModel(palmTypes[Math.floor(Math.random() * palmTypes.length)],
+                    new BABYLON.Vector3(Math.cos(a) * r, 0.3, Math.sin(a) * r),
+                    Math.random() * Math.PI * 2, 1);
             }
             const rockTypes = ["rocks-sand-a", "rocks-sand-b"];
             for (let i = 0; i < 4; i++) {
                 const a = Math.random() * Math.PI * 2;
                 const r = ISLAND_RADIUS * 0.85 + Math.random() * 2;
-                const p = new BABYLON.Vector3(Math.cos(a) * r, 0.2, Math.sin(a) * r);
-                instantiateModel(rockTypes[i % 2], p, Math.random() * Math.PI * 2, 1);
+                instantiateModel(rockTypes[i % 2],
+                    new BABYLON.Vector3(Math.cos(a) * r, 0.2, Math.sin(a) * r),
+                    Math.random() * Math.PI * 2, 1);
             }
             for (let i = 0; i < 3; i++) {
                 const a = Math.random() * Math.PI * 2;
                 const r = 2 + Math.random() * (ISLAND_RADIUS * 0.5);
-                const p = new BABYLON.Vector3(Math.cos(a) * r, 0.4, Math.sin(a) * r);
-                instantiateModel(i < 2 ? "barrel" : "crate", p, Math.random() * Math.PI * 2, 1);
+                instantiateModel(i < 2 ? "barrel" : "crate",
+                    new BABYLON.Vector3(Math.cos(a) * r, 0.4, Math.sin(a) * r),
+                    Math.random() * Math.PI * 2, 1);
             }
             const wa = Math.random() * Math.PI * 2;
-            const wr = ISLAND_RADIUS * 0.9;
-            instantiateModel("ship-wreck", new BABYLON.Vector3(Math.cos(wa) * wr, -0.2, Math.sin(wa) * wr), wa + Math.PI / 2, 1);
+            instantiateModel("ship-wreck",
+                new BABYLON.Vector3(Math.cos(wa) * ISLAND_RADIUS * 0.9, -0.2, Math.sin(wa) * ISLAND_RADIUS * 0.9),
+                wa + Math.PI / 2, 1);
         }
 
         // ---- Cannonball & explosion system ----
         const cannonballs = [];
-        const explosions = [];
+        const explosions  = [];
 
         function fireCannonball(fromPos, targetPos, fromAngle) {
             const ball = BABYLON.MeshBuilder.CreateSphere("cb", { diameter: 0.4 }, scene);
-            const mat = new BABYLON.StandardMaterial("cbMat", scene);
-            mat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+            const mat  = new BABYLON.StandardMaterial("cbMat", scene);
+            mat.diffuseColor  = new BABYLON.Color3(0.15, 0.15, 0.15);
             mat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
-            ball.material = mat;
+            ball.material     = mat;
 
-            // Fire from side of ship (port or starboard toward target)
             const toTarget = targetPos.subtract(fromPos);
-            const crossY = Math.sin(fromAngle) * toTarget.z - Math.cos(fromAngle) * toTarget.x;
-            const sideOffset = crossY > 0 ? 1.5 : -1.5;
-            const startX = fromPos.x + Math.cos(fromAngle) * sideOffset;
-            const startZ = fromPos.z - Math.sin(fromAngle) * sideOffset;
-            ball.position = new BABYLON.Vector3(startX, 1.2, startZ);
+            const crossY   = Math.sin(fromAngle) * toTarget.z - Math.cos(fromAngle) * toTarget.x;
+            const sideOff  = crossY > 0 ? 1.5 : -1.5;
+            const startX   = fromPos.x + Math.cos(fromAngle) * sideOff;
+            const startZ   = fromPos.z - Math.sin(fromAngle) * sideOff;
+            ball.position   = new BABYLON.Vector3(startX, 1.2, startZ);
 
-            const dx = targetPos.x - startX;
-            const dz = targetPos.z - startZ;
+            const dx   = targetPos.x - startX;
+            const dz   = targetPos.z - startZ;
             const dist = Math.sqrt(dx * dx + dz * dz);
-            const dir = new BABYLON.Vector3(dx / dist, 0, dz / dist);
-
+            const dir  = new BABYLON.Vector3(dx / dist, 0, dz / dist);
             waterMat.addToRenderList(ball);
 
-            cannonballs.push({
-                mesh: ball,
-                dir: dir,
-                speed: CANNONBALL_SPEED,
-                life: CANNONBALL_LIFETIME,
-                startY: 1.2,
-                totalDist: dist,
-                traveled: 0
-            });
+            cannonballs.push({ mesh: ball, dir, speed: CANNONBALL_SPEED,
+                life: CANNONBALL_LIFETIME, startY: 1.2, totalDist: dist, traveled: 0 });
         }
 
         function spawnExplosion(pos) {
-            // Particle system for explosion
             const ps = new BABYLON.ParticleSystem("explosion", 60, scene);
             ps.emitter = pos.clone();
             ps.createPointEmitter(new BABYLON.Vector3(-1, 1, -1), new BABYLON.Vector3(1, 3, 1));
-
             ps.particleTexture = new BABYLON.Texture("../assets/pirate-kit/particle.png", scene);
-
-            ps.color1 = new BABYLON.Color4(1, 0.8, 0.2, 1);
-            ps.color2 = new BABYLON.Color4(1, 0.4, 0.1, 1);
+            ps.color1    = new BABYLON.Color4(1, 0.8, 0.2, 1);
+            ps.color2    = new BABYLON.Color4(1, 0.4, 0.1, 1);
             ps.colorDead = new BABYLON.Color4(0.3, 0.3, 0.3, 0);
-            ps.minSize = 0.4;
-            ps.maxSize = 1.2;
-            ps.minLifeTime = 0.3;
-            ps.maxLifeTime = 0.8;
+            ps.minSize = 0.4; ps.maxSize = 1.2;
+            ps.minLifeTime = 0.3; ps.maxLifeTime = 0.8;
             ps.emitRate = 200;
-            ps.minEmitPower = 2;
-            ps.maxEmitPower = 5;
+            ps.minEmitPower = 2; ps.maxEmitPower = 5;
             ps.updateSpeed = 0.02;
             ps.gravity = new BABYLON.Vector3(0, -5, 0);
             ps.start();
 
-            // Water splash ring
-            const splash = BABYLON.MeshBuilder.CreateTorus("splash", { diameter: 0.5, thickness: 0.15, tessellation: 16 }, scene);
+            const splash    = BABYLON.MeshBuilder.CreateTorus("splash",
+                { diameter: 0.5, thickness: 0.15, tessellation: 16 }, scene);
             splash.position = pos.clone();
             splash.position.y = 0;
             const splashMat = new BABYLON.StandardMaterial("splashMat", scene);
-            splashMat.diffuseColor = new BABYLON.Color3(0.8, 0.9, 1);
-            splashMat.alpha = 0.7;
+            splashMat.diffuseColor  = new BABYLON.Color3(0.8, 0.9, 1);
+            splashMat.alpha         = 0.7;
             splashMat.emissiveColor = new BABYLON.Color3(0.4, 0.5, 0.6);
-            splash.material = splashMat;
+            splash.material         = splashMat;
             waterMat.addToRenderList(splash);
-
-            explosions.push({
-                ps: ps,
-                splash: splash,
-                life: 1.0,
-                maxLife: 1.0
-            });
-
-            // Stop emitting after a short burst
+            explosions.push({ ps, splash, life: 1.0, maxLife: 1.0 });
             setTimeout(() => ps.stop(), 150);
         }
 
-        // ---- Bob animation helper ----
         function bobY(time, offset) {
             return Math.sin(time * 1.5 + offset) * 0.15 - 0.4;
         }
 
-        // ---- Utility ----
         function shipDist(posA, posB) {
             const dx = posA.x - posB.x;
             const dz = posA.z - posB.z;
@@ -483,71 +401,38 @@
             const dt = engine.getDeltaTime() / 1000;
             time += dt;
 
-            // ---- Player movement ----
-            const prevAngle = playerAngle;
-            if (joystickDir.x !== 0 || joystickDir.y !== 0) {
-                // Ship-relative: up=forward, left=turn left, right=turn right (no camera dependency)
-                const targetAngle = playerAngle + Math.atan2(joystickDir.x, -joystickDir.y);
-                let angleDiff = targetAngle - playerAngle;
-                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-                playerAngle += angleDiff * Math.min(1, dt * 4);
-                playerSpeed = PLAYER_SPEED;
-            } else {
-                playerSpeed *= 0.95;
-                if (playerSpeed < 0.1) playerSpeed = 0;
-            }
+            // ---- Update ship controller ----
+            shipCtrl.update(dt);
+            const playerPos = shipCtrl.position;
 
-            // Track turn rate for visual tilt
-            let angleDelta = playerAngle - prevAngle;
-            while (angleDelta > Math.PI) angleDelta -= Math.PI * 2;
-            while (angleDelta < -Math.PI) angleDelta += Math.PI * 2;
-            playerTurnRate += (angleDelta / Math.max(dt, 0.001) - playerTurnRate) * Math.min(1, dt * 8);
-
-            if (playerSpeed > 0) {
-                playerPos.x += Math.sin(playerAngle) * playerSpeed * dt;
-                playerPos.z += Math.cos(playerAngle) * playerSpeed * dt;
-                const halfW = WATER_SIZE / 2 - 5;
-                playerPos.x = Math.max(-halfW, Math.min(halfW, playerPos.x));
-                playerPos.z = Math.max(-halfW, Math.min(halfW, playerPos.z));
-                const distToIsland = Math.sqrt(playerPos.x * playerPos.x + playerPos.z * playerPos.z);
-                if (distToIsland < ISLAND_RADIUS + 2) {
-                    const pushAngle = Math.atan2(playerPos.x, playerPos.z);
-                    playerPos.x = Math.sin(pushAngle) * (ISLAND_RADIUS + 2);
-                    playerPos.z = Math.cos(pushAngle) * (ISLAND_RADIUS + 2);
-                }
-            }
-
+            // Apply to mesh
             if (playerShip) {
                 playerShip.position.x = playerPos.x;
                 playerShip.position.z = playerPos.z;
                 playerShip.position.y = bobY(time, 0);
-                playerShip.rotation.y = playerAngle + Math.PI;
-                // Tilt when turning (roll) + gentle wave roll
-                const turnTilt = Math.max(-0.25, Math.min(0.25, playerTurnRate * 0.15));
+                playerShip.rotation.y = shipCtrl.angle + Math.PI;
+                const turnTilt = Math.max(-0.25, Math.min(0.25, shipCtrl.turnRate * 0.15));
                 playerShip.rotation.z = turnTilt + Math.sin(time * 2) * 0.02;
             }
 
-            // ---- Camera locked behind the ship ----
+            // ---- Camera: follow ship, locked isometric angle behind ship ----
             camera.target.x = playerPos.x;
             camera.target.z = playerPos.z;
             camera.target.y = 0.5;
-            camera.alpha = -playerAngle - Math.PI / 2;
+            // alpha rotates so we're always looking from behind the ship
+            camera.alpha = -shipCtrl.angle - Math.PI / 2;
 
             // ---- Player auto-shoot ----
             playerShootTimer -= dt;
             if (playerShootTimer <= 0) {
-                let closestAI = null;
+                let closestAI   = null;
                 let closestDist = SHOOT_RANGE;
                 aiShips.forEach(ai => {
                     const d = shipDist(playerPos, ai.mesh.position);
-                    if (d < closestDist) {
-                        closestDist = d;
-                        closestAI = ai;
-                    }
+                    if (d < closestDist) { closestDist = d; closestAI = ai; }
                 });
                 if (closestAI) {
-                    fireCannonball(playerPos, closestAI.mesh.position, playerAngle);
+                    fireCannonball(playerPos, closestAI.mesh.position, shipCtrl.angle);
                     playerShootTimer = SHOOT_COOLDOWN;
                 }
             }
@@ -556,19 +441,18 @@
             aiShips.forEach((ai, idx) => {
                 ai.turnTimer += dt;
                 if (ai.turnTimer > ai.turnInterval) {
-                    ai.turnTimer = 0;
+                    ai.turnTimer    = 0;
                     ai.turnInterval = 3 + Math.random() * 5;
                     ai.targetHeading += (Math.random() - 0.5) * Math.PI;
                 }
                 let hDiff = ai.targetHeading - ai.heading;
-                while (hDiff > Math.PI) hDiff -= Math.PI * 2;
+                while (hDiff >  Math.PI) hDiff -= Math.PI * 2;
                 while (hDiff < -Math.PI) hDiff += Math.PI * 2;
                 const prevH = ai.heading;
                 ai.heading += hDiff * Math.min(1, dt * 1.5);
 
                 const ax = ai.mesh.position.x + Math.sin(ai.heading) * ai.speed * dt;
                 const az = ai.mesh.position.z + Math.cos(ai.heading) * ai.speed * dt;
-
                 const halfW = WATER_SIZE / 2 - 10;
                 if (Math.abs(ax) > halfW || Math.abs(az) > halfW) {
                     ai.targetHeading = Math.atan2(-ax, -az);
@@ -582,12 +466,10 @@
                 ai.mesh.position.z = Math.max(-halfW, Math.min(halfW, az));
                 ai.mesh.position.y = bobY(time, idx * 1.3);
                 ai.mesh.rotation.y = ai.heading + Math.PI;
-                // AI turn tilt
                 const aiTurnRate = (ai.heading - prevH) / Math.max(dt, 0.001);
-                const aiTilt = Math.max(-0.2, Math.min(0.2, aiTurnRate * 0.12));
-                ai.mesh.rotation.z = aiTilt + Math.sin(time * 2 + idx) * 0.02;
+                ai.mesh.rotation.z = Math.max(-0.2, Math.min(0.2, aiTurnRate * 0.12))
+                    + Math.sin(time * 2 + idx) * 0.02;
 
-                // AI auto-shoot at player
                 ai.shootTimer -= dt;
                 if (ai.shootTimer <= 0) {
                     const d = shipDist(ai.mesh.position, playerPos);
@@ -600,17 +482,15 @@
                 }
             });
 
-            // ---- Update cannonballs ----
+            // ---- Cannonballs ----
             for (let i = cannonballs.length - 1; i >= 0; i--) {
                 const cb = cannonballs[i];
-                cb.life -= dt;
+                cb.life     -= dt;
                 cb.traveled += cb.speed * dt;
                 cb.mesh.position.x += cb.dir.x * cb.speed * dt;
                 cb.mesh.position.z += cb.dir.z * cb.speed * dt;
-                // Arc trajectory
                 const progress = cb.traveled / cb.totalDist;
                 cb.mesh.position.y = cb.startY + Math.sin(progress * Math.PI) * 3 - progress * cb.startY;
-
                 if (cb.life <= 0 || progress >= 1) {
                     spawnExplosion(cb.mesh.position);
                     cb.mesh.dispose();
@@ -618,14 +498,13 @@
                 }
             }
 
-            // ---- Update explosions ----
+            // ---- Explosions ----
             for (let i = explosions.length - 1; i >= 0; i--) {
                 const ex = explosions[i];
                 ex.life -= dt;
                 const t = 1 - ex.life / ex.maxLife;
-                // Expand splash ring
                 const s = 1 + t * 4;
-                ex.splash.scaling = new BABYLON.Vector3(s, 1, s);
+                ex.splash.scaling      = new BABYLON.Vector3(s, 1, s);
                 ex.splash.material.alpha = 0.7 * (1 - t);
                 if (ex.life <= 0) {
                     ex.ps.dispose();
@@ -638,17 +517,14 @@
         // ---- Init ----
         async function init() {
             await Promise.all(modelsToLoad.map(m => loadModel(m)));
-
-            playerShip = instantiateModel("ship-pirate-small", playerPos.clone(), 0, 1);
+            playerShip = instantiateModel("ship-pirate-small", shipCtrl.position.clone(), 0, 1);
             for (let i = 0; i < AI_SHIP_COUNT; i++) spawnAIShip();
             placeIslandDecorations();
-
             document.getElementById("loading").style.display = "none";
             gameReady = true;
         }
 
         init();
-
         engine.runRenderLoop(() => scene.render());
         window.addEventListener("resize", () => engine.resize());
     })();
