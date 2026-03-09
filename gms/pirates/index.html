@@ -486,13 +486,8 @@
             // ---- Player movement ----
             const prevAngle = playerAngle;
             if (joystickDir.x !== 0 || joystickDir.y !== 0) {
-                // Transform joystick direction by camera rotation so left=left, right=right on screen
-                const camRot = camera.alpha + Math.PI / 2;
-                const cosC = Math.cos(camRot);
-                const sinC = Math.sin(camRot);
-                const worldX = joystickDir.x * cosC - joystickDir.y * sinC;
-                const worldZ = joystickDir.x * sinC + joystickDir.y * cosC;
-                const targetAngle = Math.atan2(-worldX, -worldZ);
+                // Direct mapping: up=forward, left=left, right=right (camera stays behind so this works)
+                const targetAngle = Math.atan2(joystickDir.x, -joystickDir.y);
                 let angleDiff = targetAngle - playerAngle;
                 while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
                 while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
