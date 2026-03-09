@@ -87,6 +87,12 @@ function writeItems(items) {
   _pushToCloud(items);
 }
 
+/** Clear the local note cache. Call before switching to a different user so
+ *  syncFromCloud() starts from an empty slate and doesn't merge stale data. */
+export function clearLocalItems() {
+  localStorage.removeItem(ITEMS_KEY);
+}
+
 // ─── Public CRUD (unchanged interface) ───────────────────────────────────────
 
 export function getAll() {
