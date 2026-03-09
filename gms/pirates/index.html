@@ -78,8 +78,8 @@
         scene.fogDensity = 0.006;
         scene.fogColor = new BABYLON.Color3(0.53, 0.77, 0.92);
 
-        // ---- Camera (Diablo-style: high angle, behind ship) ----
-        const camera = new BABYLON.ArcRotateCamera("cam", Math.PI / 2, Math.PI / 3.8, 45, BABYLON.Vector3.Zero(), scene);
+        // ---- Camera (locked behind ship, Diablo-style high angle) ----
+        const camera = new BABYLON.ArcRotateCamera("cam", -Math.PI / 2, Math.PI / 3.8, 55, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.4;
         camera.upperBetaLimit = Math.PI / 2.8;
         camera.lowerRadiusLimit = 20;
@@ -486,8 +486,8 @@
             // ---- Player movement ----
             const prevAngle = playerAngle;
             if (joystickDir.x !== 0 || joystickDir.y !== 0) {
-                // Direct mapping: up=forward, left=left, right=right (camera stays behind so this works)
-                const targetAngle = Math.atan2(joystickDir.x, -joystickDir.y);
+                // Ship-relative: up=forward, left=turn left, right=turn right (no camera dependency)
+                const targetAngle = playerAngle + Math.atan2(joystickDir.x, -joystickDir.y);
                 let angleDiff = targetAngle - playerAngle;
                 while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
                 while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
@@ -522,22 +522,17 @@
                 playerShip.position.x = playerPos.x;
                 playerShip.position.z = playerPos.z;
                 playerShip.position.y = bobY(time, 0);
-                playerShip.rotation.y = playerAngle;
+                playerShip.rotation.y = playerAngle + Math.PI;
                 // Tilt when turning (roll) + gentle wave roll
                 const turnTilt = Math.max(-0.25, Math.min(0.25, playerTurnRate * 0.15));
                 playerShip.rotation.z = turnTilt + Math.sin(time * 2) * 0.02;
             }
 
-            // ---- Camera follow (behind the ship, Diablo-style) ----
-            camera.target.x += (playerPos.x - camera.target.x) * Math.min(1, dt * 3);
-            camera.target.z += (playerPos.z - camera.target.z) * Math.min(1, dt * 3);
+            // ---- Camera locked behind the ship ----
+            camera.target.x = playerPos.x;
+            camera.target.z = playerPos.z;
             camera.target.y = 0.5;
-            // Smoothly rotate camera to stay behind the ship
-            let targetAlpha = -playerAngle + Math.PI / 2;
-            let alphaDiff = targetAlpha - camera.alpha;
-            while (alphaDiff > Math.PI) alphaDiff -= Math.PI * 2;
-            while (alphaDiff < -Math.PI) alphaDiff += Math.PI * 2;
-            camera.alpha += alphaDiff * Math.min(1, dt * 2.5);
+            camera.alpha = -playerAngle - Math.PI / 2;
 
             // ---- Player auto-shoot ----
             playerShootTimer -= dt;
@@ -586,7 +581,7 @@
                 ai.mesh.position.x = Math.max(-halfW, Math.min(halfW, ax));
                 ai.mesh.position.z = Math.max(-halfW, Math.min(halfW, az));
                 ai.mesh.position.y = bobY(time, idx * 1.3);
-                ai.mesh.rotation.y = ai.heading;
+                ai.mesh.rotation.y = ai.heading + Math.PI;
                 // AI turn tilt
                 const aiTurnRate = (ai.heading - prevH) / Math.max(dt, 0.001);
                 const aiTilt = Math.max(-0.2, Math.min(0.2, aiTurnRate * 0.12));
