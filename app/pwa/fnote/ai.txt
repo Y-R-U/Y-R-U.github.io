@@ -87,6 +87,10 @@ app/pwa/fnote/
 - contentEditable + document.execCommand for rich text (paste strips formatting)
 - Checkbox/radio use custom spans with data-checked, contenteditable="false" on toggles
 - Auto-save debounced at 800ms with "Saved" flash indicator
+- Editor toolbar has two copy buttons (right-aligned via .tool-copy-group / margin-left:auto):
+    #tool-copy-text  — copies note content as plain text; .fn-cb → [ ]/[x], .fn-rd → ( )/(*)
+    #tool-copy-html  — copies contentEl.innerHTML verbatim
+    Both flash their border accent colour for 800ms as visual confirmation
 - Cards grid: 3 columns on mobile, auto-fill on wider screens
 - Folders can nest inside folders (parentId chain)
 - Delete button acts as cancel for new empty notes

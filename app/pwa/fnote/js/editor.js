@@ -10,8 +10,10 @@ const deleteBtn = document.getElementById('editor-delete');
 const backBtn = document.getElementById('editor-back');
 const fontSizeSelect = document.getElementById('tool-fontsize');
 const fontColorInput = document.getElementById('tool-fontcolor');
-const checklistBtn = document.getElementById('tool-checklist');
-const radiolistBtn = document.getElementById('tool-radiolist');
+const checklistBtn  = document.getElementById('tool-checklist');
+const radiolistBtn  = document.getElementById('tool-radiolist');
+const copyTextBtn   = document.getElementById('tool-copy-text');
+const copyHtmlBtn   = document.getElementById('tool-copy-html');
 
 let currentItem = null;
 let isNew = false;
@@ -190,6 +192,30 @@ radiolistBtn.addEventListener('click', () => {
   contentEl.focus();
   if (debouncedSave) debouncedSave();
 });
+
+// Toolbar: Copy as plain text
+copyTextBtn.addEventListener('click', () => {
+  const clone = contentEl.cloneNode(true);
+  clone.querySelectorAll('.fn-cb').forEach(cb => {
+    cb.replaceWith(cb.dataset.checked === 'true' ? '[x]' : '[ ]');
+  });
+  clone.querySelectorAll('.fn-rd').forEach(rd => {
+    rd.replaceWith(rd.dataset.checked === 'true' ? '(*)' : '( )');
+  });
+  navigator.clipboard.writeText(clone.innerText || clone.textContent);
+  flashBtn(copyTextBtn);
+});
+
+// Toolbar: Copy as HTML
+copyHtmlBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(contentEl.innerHTML);
+  flashBtn(copyHtmlBtn);
+});
+
+function flashBtn(btn) {
+  btn.style.borderColor = 'var(--accent)';
+  setTimeout(() => { btn.style.borderColor = ''; }, 800);
+}
 
 // Checkbox/Radio click toggling
 contentEl.addEventListener('click', (e) => {

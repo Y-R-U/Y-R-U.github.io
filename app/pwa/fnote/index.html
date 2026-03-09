@@ -444,6 +444,12 @@
     }
     .tool-btn:hover { border-color: var(--accent); background: var(--bg-card); }
 
+    .tool-copy-group {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+
     .editor-content {
       flex: 1;
       overflow-y: auto;
@@ -931,6 +937,10 @@
         <input type="color" id="tool-fontcolor" class="tool-color" value="#e0e0e0" title="Text Color" />
         <button id="tool-checklist" class="tool-btn" title="Add Checkbox">&#9745;</button>
         <button id="tool-radiolist" class="tool-btn" title="Add Radio">&#9673;</button>
+        <div class="tool-copy-group">
+          <button id="tool-copy-text" class="tool-btn" title="Copy as plain text">&#10697;</button>
+          <button id="tool-copy-html" class="tool-btn" title="Copy as HTML">&lt;/&gt;</button>
+        </div>
       </div>
       <div id="editor-content" class="editor-content" contenteditable="true"></div>
     </div>
