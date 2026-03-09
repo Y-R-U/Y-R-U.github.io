@@ -570,7 +570,7 @@
                 playerShip.position.x = playerPos.x;
                 playerShip.position.z = playerPos.z;
                 playerShip.position.y = bobY(time, 0);
-                playerShip.rotation.y = shipCtrl.angle + Math.PI;
+                playerShip.rotation.y = shipCtrl.angle;
                 const turnTilt = Math.max(-0.25, Math.min(0.25, shipCtrl.turnRate * 0.15));
                 playerShip.rotation.z = turnTilt + Math.sin(time * 2) * 0.02;
             }
@@ -626,7 +626,7 @@
                 ai.mesh.position.x = Math.max(-halfW, Math.min(halfW, ax));
                 ai.mesh.position.z = Math.max(-halfW, Math.min(halfW, az));
                 ai.mesh.position.y = bobY(time, idx * 1.3);
-                ai.mesh.rotation.y = ai.heading + Math.PI;
+                ai.mesh.rotation.y = ai.heading;
                 const aiTurnRate = (ai.heading - prevH) / Math.max(dt, 0.001);
                 ai.mesh.rotation.z = Math.max(-0.2, Math.min(0.2, aiTurnRate * 0.12))
                     + Math.sin(time * 2 + idx) * 0.02;
