@@ -412,6 +412,73 @@
       border-radius: 8px;
     }
 
+    /* ─── ABOUT PAGE ─── */
+    .about-container {
+      display: flex;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    .about-panel {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(0,255,252,0.3);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 0 30px rgba(0,255,252,0.1), inset 0 0 40px rgba(0,255,252,0.02);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .about-panel h1 {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--cyber-accent);
+      margin: 0 0 24px;
+      text-shadow: 0 0 15px var(--cyber-accent);
+    }
+
+    .about-section {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0,255,252,0.1);
+    }
+
+    .about-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .about-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      color: var(--cyber-primary);
+      margin: 0 0 10px;
+      text-shadow: 0 0 8px var(--cyber-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .about-icon { opacity: 0.7; font-size: 16px; }
+
+    .about-section p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: #b8b8b8;
+      line-height: 1.7;
+      margin: 0 0 10px;
+    }
+
+    .about-section p:last-child { margin-bottom: 0; }
+
+    .highlight {
+      color: var(--cyber-primary);
+      text-shadow: 0 0 4px var(--cyber-primary);
+    }
+
+    .highlight-alt {
+      color: var(--cyber-secondary);
+      text-shadow: 0 0 4px var(--cyber-secondary);
+    }
+
     /* ─── GLITCH TEXT ─── */
     .glitch-text {
       position: relative;
@@ -468,6 +535,7 @@
   <div class="navbar">
     <a href="#home" class="home-icon active" data-page="home"><i class="fas fa-home"></i></a>
     <a href="#projects" data-page="projects">Projects</a>
+    <a href="#about" data-page="about">About</a>
   </div>
 
   <!-- HOME PAGE -->
@@ -478,6 +546,33 @@
     <video src="assets/Mv1.mp4" muted loop></video>
     <div class="home-hero">
       <h1 class="glitch-text">Welcome to Cyber Space</h1>
+    </div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div id="about-page" class="page">
+    <div class="about-container">
+      <div class="about-panel">
+        <h1 class="glitch-text">About</h1>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-code"></i></span> The Project</h2>
+          <p>This site is a growing collection of apps, games, and experiments — all built to explore what's possible when a developer teams up with AI coding agents.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-robot"></i></span> Built With AI</h2>
+          <p>Every project here was created through collaboration with Claude AI. Earlier projects (2024–2025) were built with <span class="highlight">Claude Sonnet 4</span>, while newer work in 2026 uses <span class="highlight-alt">Claude Sonnet / Opus 4.6</span>.</p>
+          <p>The developer describes the idea, the AI writes the code, and together they iterate until it works. It's a new way to build software — conversational, fast, and surprisingly powerful.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-flask"></i></span> Why?</h2>
+          <p>To push the boundaries of AI-assisted development. Each project is an experiment: How complex can you go? How fast can you ship? What happens when you let the AI drive?</p>
+          <p>From simple editors to 3D pirate games, from PWAs to kingdom sims — the answer is: further than you'd think.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-tv"></i></span> Best Viewed</h2>
+          <p>Home page video is best viewed in portrait on mobile, or resize your browser to approximately 16:9. Projects work on both desktop and mobile.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -547,8 +642,8 @@
       { name: "Storybook Adventure", path: "/gms/o/", screenshot: "storybook", category: "game",
         desc: "Interactive storybook adventure with branching narratives, expandable panels, and dynamic storytelling.",
         date: "2025-03-03" },
-      { name: "Tululoo Game", path: "/gms/z/", screenshot: "tululoo", category: "game",
-        desc: "Action/arcade game built with the Tululoo game engine. Fast-paced gameplay with sprite-based graphics.",
+      { name: "Zombie Horde", path: "/gms/z/", screenshot: "tululoo", category: "game",
+        desc: "Top-down zombie action game built with the Tululoo engine. Clear each level and rack up your highest score.",
         date: "2026-02-05" },
       { name: "Kingdom City", path: "/gms/k/kc/", screenshot: "kingdom-city", category: "game",
         desc: "Rule a kingdom: manage zones, trade with neighbors, engage in diplomacy and warfare.",
@@ -631,6 +726,7 @@
           : projects.filter(p => p.category === filter);
 
         filtered.forEach((p, i) => grid.appendChild(buildCard(p, i)));
+        attachFlipListeners();
       }, existing.length > 0 ? 250 : 0);
     }
 
@@ -638,51 +734,40 @@
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-    // Desktop: mouseenter flips to back, mouseleave flips to front
-    // But we wait for the flip animation to complete before allowing unflip
-    if (hasHover) {
-      document.addEventListener('mouseenter', function(e) {
-        const wrapper = e.target.closest('.card-wrapper');
-        if (!wrapper) return;
+    // Attach hover listeners directly to each card wrapper after rendering
+    function attachFlipListeners() {
+      if (!hasHover) return;
+      document.querySelectorAll('.card-wrapper').forEach(wrapper => {
+        if (wrapper._flipBound) return; // don't double-bind
+        wrapper._flipBound = true;
         const card = wrapper.querySelector('.card');
-        if (!card || card.classList.contains('flipped')) return;
-        card.classList.add('flipped');
-        card.dataset.hoverFlipped = '1';
-      }, true);
 
-      document.addEventListener('mouseleave', function(e) {
-        const wrapper = e.target.closest('.card-wrapper');
-        if (!wrapper) return;
-        const card = wrapper.querySelector('.card');
-        if (!card || card.dataset.hoverFlipped !== '1') return;
+        wrapper.addEventListener('mouseenter', () => {
+          if (card._leaving) { clearTimeout(card._leaving); card._leaving = null; }
+          if (!card.classList.contains('flipped')) {
+            card.classList.add('flipped');
+            card._flipTime = Date.now();
+          }
+        });
 
-        // Wait for the flip-in to finish (600ms transition) before allowing flip-back
-        const elapsed = Date.now() - (parseInt(card.dataset.flipTime) || 0);
-        const delay = Math.max(0, 600 - elapsed);
-
-        setTimeout(() => {
-          card.classList.remove('flipped');
-          delete card.dataset.hoverFlipped;
-        }, delay);
-      }, true);
-
-      // Track when flip starts
-      document.addEventListener('mouseenter', function(e) {
-        const wrapper = e.target.closest('.card-wrapper');
-        if (!wrapper) return;
-        const card = wrapper.querySelector('.card');
-        if (card) card.dataset.flipTime = Date.now();
-      }, true);
+        wrapper.addEventListener('mouseleave', () => {
+          if (!card.classList.contains('flipped')) return;
+          // Ensure the flip-in animation finishes before flipping back
+          const elapsed = Date.now() - (card._flipTime || 0);
+          const delay = Math.max(0, 600 - elapsed);
+          card._leaving = setTimeout(() => {
+            card.classList.remove('flipped');
+            card._leaving = null;
+          }, delay);
+        });
+      });
     }
 
     // Touch: tap to toggle flip
     document.addEventListener('click', function(e) {
       const card = e.target.closest('.card');
       if (!card) return;
-
-      // If clicking the launch link, let it navigate
       if (e.target.closest('.card-back-link')) return;
-
       if (isTouch && !hasHover) {
         e.preventDefault();
         card.classList.toggle('flipped');
