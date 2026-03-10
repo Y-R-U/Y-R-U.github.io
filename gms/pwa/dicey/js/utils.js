@@ -1,5 +1,6 @@
 /* ============================================
-   DICEY - Utility Functions
+   DICEY - Utility Functions & Game Data
+   Skills-based board game
    ============================================ */
 
 const Utils = {
@@ -23,17 +24,8 @@ const Utils = {
         return '$' + amount.toLocaleString();
     },
 
-    lerp(a, b, t) {
-        return a + (b - a) * t;
-    },
-
-    easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    },
-
-    easeInOutQuad(t) {
-        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    },
+    lerp(a, b, t) { return a + (b - a) * t; },
+    easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); },
 
     wait(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -51,71 +43,121 @@ const Utils = {
     PLAYER_COLORS: ['#3498db', '#e94560', '#2ecc71', '#f39c12'],
     PLAYER_NAMES: ['You', 'Ruby', 'Jade', 'Amber'],
     PLAYER_TOKENS: ['🎩', '🚗', '🐱', '🌟'],
+    STARTING_MONEY: 1500,
+    STARTING_SHIELDS: 4,
+    MAX_ROUNDS: 30,
 
+    // ---- SKILL DEFINITIONS ----
+    // Each skill has: id, name, type (attack/defense), price, icon, color, desc, effectDesc
+    SKILLS: {
+        pickpocket:   { id: 'pickpocket',   name: 'Pickpocket',    type: 'attack',  price: 100, icon: '🤏', color: '#e74c3c', desc: 'Steal money equal to dice roll × $100 from the victim.' },
+        ambush:       { id: 'ambush',       name: 'Ambush',        type: 'attack',  price: 150, icon: '⚔️', color: '#c0392b', desc: 'Steal a random skill from the victim. If they have none, steal $200.' },
+        sabotage:     { id: 'sabotage',     name: 'Sabotage',      type: 'attack',  price: 120, icon: '💣', color: '#e67e22', desc: 'Victim loses half their cash (rounded down to nearest $50).' },
+        shakedown:    { id: 'shakedown',    name: 'Shakedown',     type: 'attack',  price: 180, icon: '🔪', color: '#d35400', desc: 'Steal a Shield Card from the victim. If none left, steal $300.' },
+        jinx:         { id: 'jinx',         name: 'Jinx',          type: 'attack',  price: 80,  icon: '🧿', color: '#8e44ad', desc: 'Send the victim directly to Jail. Do not pass GO.' },
+        taxman:       { id: 'taxman',       name: 'Tax Collector', type: 'attack',  price: 200, icon: '📋', color: '#e74c3c', desc: 'Victim pays tax: $50 for each skill they own.' },
+        bodyguard:    { id: 'bodyguard',    name: 'Bodyguard',     type: 'defense', price: 100, icon: '🛡️', color: '#2980b9', desc: 'Passive: When you land on an attack, reduce damage by 50%.' },
+        goldmine:     { id: 'goldmine',     name: 'Gold Mine',     type: 'defense', price: 150, icon: '⛏️', color: '#f39c12', desc: 'Each time you pass GO, collect an extra $100 per Gold Mine owned.' },
+        healer:       { id: 'healer',       name: 'Healer',        type: 'defense', price: 120, icon: '💊', color: '#27ae60', desc: 'When an opponent lands here, YOU gain $150 instead of attacking.' },
+        forge:        { id: 'forge',        name: 'Shield Forge',  type: 'defense', price: 200, icon: '🔨', color: '#2ecc71', desc: 'Each time you pass GO, gain 1 extra Shield Card (max 6).' },
+        tollbooth:    { id: 'tollbooth',    name: 'Toll Booth',    type: 'attack',  price: 130, icon: '🚧', color: '#e74c3c', desc: 'Victim pays a flat $200 toll to the skill owner.' },
+        mirror:       { id: 'mirror',       name: 'Mirror Shield', type: 'defense', price: 160, icon: '🪞', color: '#3498db', desc: 'Passive: 30% chance to reflect an attack back at the attacker.' },
+        vault:        { id: 'vault',        name: 'Vault',         type: 'defense', price: 140, icon: '🏦', color: '#2c3e50', desc: 'Passive: Your money cannot drop below $100 from attacks.' },
+        bounty:       { id: 'bounty',       name: 'Bounty Hunter', type: 'attack',  price: 170, icon: '🎯', color: '#c0392b', desc: 'Steal $100 from the victim for each skill they own.' },
+    },
+
+    // Board: 32 spaces. Corners at 0, 8, 16, 24
+    // Skill spaces reference a skill ID
     BOARD_SPACES: [
-        // Bottom row right-to-left: indices 0-7 (0=GO corner)
-        { type: 'go', name: 'GO', desc: 'Collect $200' },                                                              // 0 corner
-        { type: 'property', name: 'Elm Street', color: '#8B4513', group: 0, price: 60, rent: [4, 20, 60, 180, 320, 450] },  // 1
-        { type: 'chest', name: 'Community', desc: 'Draw a card' },                                                      // 2
-        { type: 'property', name: 'Oak Avenue', color: '#8B4513', group: 0, price: 80, rent: [6, 30, 90, 270, 400, 550] },  // 3
-        { type: 'tax', name: 'Income Tax', desc: 'Pay $200', amount: 200 },                                             // 4
-        { type: 'railroad', name: 'North Rail', price: 200, rent: [25, 50, 100, 200] },                                 // 5
-        { type: 'property', name: 'Pine Road', color: '#00CED1', group: 1, price: 100, rent: [8, 40, 100, 300, 450, 600] },// 6
-        { type: 'chance', name: 'Chance', desc: 'Draw a card' },                                                        // 7
-        // Left column bottom-to-top: indices 8-15 (8=Jail corner)
-        { type: 'jail', name: 'Jail', desc: 'Just Visiting' },                                                          // 8 corner
-        { type: 'property', name: 'Maple Lane', color: '#00CED1', group: 1, price: 120, rent: [10, 50, 150, 450, 625, 750] },// 9
-        { type: 'property', name: 'Cedar Drive', color: '#00CED1', group: 1, price: 140, rent: [12, 60, 180, 500, 700, 900] },//10
-        { type: 'property', name: 'Rose Way', color: '#FF69B4', group: 2, price: 160, rent: [14, 70, 200, 550, 750, 950] },// 11
-        { type: 'utility', name: 'Power Co.', price: 150 },                                                             // 12
-        { type: 'property', name: 'Lily Path', color: '#FF69B4', group: 2, price: 180, rent: [16, 80, 220, 600, 800, 1000] },//13
-        { type: 'property', name: 'Daisy Court', color: '#FF69B4', group: 2, price: 200, rent: [18, 90, 250, 700, 875, 1050] },//14
-        { type: 'railroad', name: 'East Rail', price: 200, rent: [25, 50, 100, 200] },                                 // 15
-        // Top row left-to-right: indices 16-23 (16=Free Parking corner)
-        { type: 'parking', name: 'Free Parking', desc: 'Take a break' },                                               // 16 corner
-        { type: 'property', name: 'King Blvd', color: '#FF8C00', group: 3, price: 220, rent: [20, 100, 300, 750, 925, 1100] },//17
-        { type: 'chest', name: 'Community', desc: 'Draw a card' },                                                      // 18
-        { type: 'property', name: 'Queen Ave', color: '#FF8C00', group: 3, price: 240, rent: [22, 110, 330, 800, 975, 1150] },//19
-        { type: 'property', name: 'Duke Street', color: '#FF8C00', group: 3, price: 260, rent: [24, 120, 360, 850, 1025, 1200] },//20
-        { type: 'chance', name: 'Chance', desc: 'Draw a card' },                                                        // 21
-        { type: 'property', name: 'Grand Pl.', color: '#E74C3C', group: 4, price: 280, rent: [26, 130, 390, 900, 1100, 1275] },//22
-        { type: 'railroad', name: 'South Rail', price: 200, rent: [25, 50, 100, 200] },                                // 23
-        // Right column top-to-bottom: indices 24-31 (24=Go To Jail corner)
-        { type: 'goToJail', name: 'Go To Jail', desc: 'Go directly to Jail!' },                                        // 24 corner
-        { type: 'property', name: 'Royal Rd', color: '#E74C3C', group: 4, price: 300, rent: [28, 150, 450, 1000, 1200, 1400] },//25
-        { type: 'property', name: 'Crown Hill', color: '#E74C3C', group: 4, price: 320, rent: [30, 160, 480, 1050, 1250, 1450] },//26
-        { type: 'chest', name: 'Community', desc: 'Draw a card' },                                                      // 27
-        { type: 'property', name: 'Pearl Lane', color: '#9B59B6', group: 5, price: 350, rent: [35, 175, 500, 1100, 1300, 1500] },//28
-        { type: 'property', name: 'Diamond St', color: '#9B59B6', group: 5, price: 380, rent: [40, 200, 600, 1400, 1700, 2000] },//29
-        { type: 'tax', name: 'Luxury Tax', desc: 'Pay $150', amount: 150 },                                            // 30
-        { type: 'property', name: 'Gold Blvd', color: '#F5C518', group: 6, price: 400, rent: [50, 200, 600, 1400, 1700, 2000] },//31
+        // Bottom row (right to left): 0-7
+        { type: 'go', name: 'GO', desc: 'Collect $200' },                                    // 0 corner
+        { type: 'skill', skillId: 'pickpocket' },                                             // 1
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 2
+        { type: 'skill', skillId: 'bodyguard' },                                              // 3
+        { type: 'tax', name: 'Toll Gate', desc: 'Pay $150', amount: 150 },                    // 4
+        { type: 'skill', skillId: 'goldmine' },                                               // 5
+        { type: 'skill', skillId: 'ambush' },                                                 // 6
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 7
+        // Left column (bottom to top): 8-15
+        { type: 'jail', name: 'Jail', desc: 'Just Visiting' },                                // 8 corner
+        { type: 'skill', skillId: 'sabotage' },                                               // 9
+        { type: 'skill', skillId: 'healer' },                                                 // 10
+        { type: 'skill', skillId: 'shakedown' },                                              // 11
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 12
+        { type: 'skill', skillId: 'forge' },                                                  // 13
+        { type: 'skill', skillId: 'jinx' },                                                   // 14
+        { type: 'skill', skillId: 'tollbooth' },                                              // 15
+        // Top row (left to right): 16-23
+        { type: 'rest', name: 'Rest Stop', desc: 'Recover 1 Shield' },                        // 16 corner
+        { type: 'skill', skillId: 'taxman' },                                                 // 17
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 18
+        { type: 'skill', skillId: 'mirror' },                                                 // 19
+        { type: 'tax', name: 'Black Market', desc: 'Pay $200', amount: 200 },                 // 20
+        { type: 'skill', skillId: 'vault' },                                                  // 21
+        { type: 'skill', skillId: 'bounty' },                                                 // 22
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 23
+        // Right column (top to bottom): 24-31
+        { type: 'goToJail', name: 'Go To Jail', desc: 'Go directly to Jail!' },               // 24 corner
+        { type: 'skill', skillId: 'pickpocket' },                                             // 25
+        { type: 'skill', skillId: 'bodyguard' },                                              // 26
+        { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 27
+        { type: 'skill', skillId: 'goldmine' },                                               // 28
+        { type: 'skill', skillId: 'ambush' },                                                 // 29
+        { type: 'skill', skillId: 'healer' },                                                 // 30
+        { type: 'skill', skillId: 'sabotage' },                                               // 31
     ],
 
-    CHANCE_CARDS: [
+    // Fate cards replace chance/community
+    FATE_CARDS: [
         { text: 'Advance to GO! Collect $200.', action: 'moveTo', value: 0 },
-        { text: 'Bank pays you a dividend of $50.', action: 'gain', value: 50 },
+        { text: 'A mysterious benefactor gives you $200!', action: 'gain', value: 200 },
         { text: 'Go back 3 spaces.', action: 'moveBack', value: 3 },
-        { text: 'Go directly to Jail!', action: 'goJail' },
-        { text: 'Pay poor tax of $15.', action: 'pay', value: 15 },
-        { text: 'Your investment matured! Collect $150.', action: 'gain', value: 150 },
-        { text: 'You won a crossword competition! Collect $100.', action: 'gain', value: 100 },
-        { text: 'Speeding fine! Pay $50.', action: 'pay', value: 50 },
-        { text: 'Advance to nearest Railroad.', action: 'nearestRail' },
-        { text: 'Building repairs: Pay $25 per house.', action: 'payPerHouse', value: 25 },
+        { text: 'Caught trespassing! Go directly to Jail.', action: 'goJail' },
+        { text: 'Found a lost wallet! Collect $100.', action: 'gain', value: 100 },
+        { text: 'Equipment repair costs. Pay $75.', action: 'pay', value: 75 },
+        { text: 'Won a tournament! Collect $150.', action: 'gain', value: 150 },
+        { text: 'Bribed a guard. Pay $50.', action: 'pay', value: 50 },
+        { text: 'Shield reinforcement! Gain 1 Shield Card.', action: 'gainShield', value: 1 },
+        { text: 'Ambushed on the road! Lose 1 Shield Card.', action: 'loseShield', value: 1 },
+        { text: 'Merchant discount! Your next skill purchase is half price.', action: 'discount' },
+        { text: 'Pickpocketed! Lose $100.', action: 'pay', value: 100 },
+        { text: 'Tax refund! Collect $50 per skill you own.', action: 'gainPerSkill', value: 50 },
+        { text: 'Advance to Rest Stop.', action: 'moveTo', value: 16 },
     ],
 
-    CHEST_CARDS: [
-        { text: 'Bank error in your favor! Collect $200.', action: 'gain', value: 200 },
-        { text: 'Doctor\'s fees. Pay $50.', action: 'pay', value: 50 },
-        { text: 'From sale of stock, you get $45.', action: 'gain', value: 45 },
-        { text: 'Go directly to Jail!', action: 'goJail' },
-        { text: 'Holiday fund matures! Collect $100.', action: 'gain', value: 100 },
-        { text: 'Income tax refund. Collect $20.', action: 'gain', value: 20 },
-        { text: 'Life insurance matures. Collect $100.', action: 'gain', value: 100 },
-        { text: 'Hospital fees. Pay $100.', action: 'pay', value: 100 },
-        { text: 'School fees. Pay $50.', action: 'pay', value: 50 },
-        { text: 'You inherit $100!', action: 'gain', value: 100 },
-    ],
+    getSkillForSpace(spaceIdx) {
+        const space = this.BOARD_SPACES[spaceIdx];
+        if (!space || space.type !== 'skill') return null;
+        return this.SKILLS[space.skillId] || null;
+    },
 
-    GROUP_SIZES: { 0: 2, 1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+    getSpaceName(spaceIdx) {
+        const space = this.BOARD_SPACES[spaceIdx];
+        if (!space) return '???';
+        if (space.type === 'skill') {
+            const skill = this.SKILLS[space.skillId];
+            return skill ? skill.name : '???';
+        }
+        return space.name;
+    },
+
+    getSpaceColor(spaceIdx) {
+        const space = this.BOARD_SPACES[spaceIdx];
+        if (!space) return '#555';
+        if (space.type === 'skill') {
+            const skill = this.SKILLS[space.skillId];
+            return skill ? skill.color : '#555';
+        }
+        return '#555';
+    },
+
+    getSpaceIcon(spaceIdx) {
+        const space = this.BOARD_SPACES[spaceIdx];
+        if (!space) return '?';
+        if (space.type === 'skill') {
+            const skill = this.SKILLS[space.skillId];
+            return skill ? skill.icon : '?';
+        }
+        return '';
+    }
 };
