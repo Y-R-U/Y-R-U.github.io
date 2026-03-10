@@ -238,12 +238,6 @@
 
     .card.flipped { transform: rotateY(180deg); }
 
-    /* Desktop: hover to flip */
-    @media (hover: hover) and (pointer: fine) {
-      .card:hover { transform: rotateY(180deg); }
-      .card.flipped:hover { transform: rotateY(180deg); }
-    }
-
     .card-face {
       position: absolute;
       inset: 0;
@@ -640,7 +634,48 @@
       }, existing.length > 0 ? 250 : 0);
     }
 
-    // ─── TOUCH FLIP SUPPORT ───
+    // ─── FLIP LOGIC ───
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // Desktop: mouseenter flips to back, mouseleave flips to front
+    // But we wait for the flip animation to complete before allowing unflip
+    if (hasHover) {
+      document.addEventListener('mouseenter', function(e) {
+        const wrapper = e.target.closest('.card-wrapper');
+        if (!wrapper) return;
+        const card = wrapper.querySelector('.card');
+        if (!card || card.classList.contains('flipped')) return;
+        card.classList.add('flipped');
+        card.dataset.hoverFlipped = '1';
+      }, true);
+
+      document.addEventListener('mouseleave', function(e) {
+        const wrapper = e.target.closest('.card-wrapper');
+        if (!wrapper) return;
+        const card = wrapper.querySelector('.card');
+        if (!card || card.dataset.hoverFlipped !== '1') return;
+
+        // Wait for the flip-in to finish (600ms transition) before allowing flip-back
+        const elapsed = Date.now() - (parseInt(card.dataset.flipTime) || 0);
+        const delay = Math.max(0, 600 - elapsed);
+
+        setTimeout(() => {
+          card.classList.remove('flipped');
+          delete card.dataset.hoverFlipped;
+        }, delay);
+      }, true);
+
+      // Track when flip starts
+      document.addEventListener('mouseenter', function(e) {
+        const wrapper = e.target.closest('.card-wrapper');
+        if (!wrapper) return;
+        const card = wrapper.querySelector('.card');
+        if (card) card.dataset.flipTime = Date.now();
+      }, true);
+    }
+
+    // Touch: tap to toggle flip
     document.addEventListener('click', function(e) {
       const card = e.target.closest('.card');
       if (!card) return;
@@ -648,9 +683,7 @@
       // If clicking the launch link, let it navigate
       if (e.target.closest('.card-back-link')) return;
 
-      // Only flip via tap on touch devices
-      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (isTouch) {
+      if (isTouch && !hasHover) {
         e.preventDefault();
         card.classList.toggle('flipped');
       }
