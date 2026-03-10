@@ -1,36 +1,35 @@
 /* ============================================
    DICEY - Game Logic & State Management
+   Skills-based board game
    ============================================ */
 
 const Game = {
     state: null,
     running: false,
-    animating: false,
 
     createInitialState() {
-        const properties = {};
+        const skills = {};
         Utils.BOARD_SPACES.forEach((space, i) => {
-            if (space.type === 'property' || space.type === 'railroad' || space.type === 'utility') {
-                properties[i] = { owner: null, houses: 0 };
+            if (space.type === 'skill') {
+                skills[i] = { owner: null };
             }
         });
 
         return {
             players: [
-                { index: 0, money: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: false },
-                { index: 1, money: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true },
-                { index: 2, money: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true },
-                { index: 3, money: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true },
+                { index: 0, money: Utils.STARTING_MONEY, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: false, shields: Utils.STARTING_SHIELDS, discount: false },
+                { index: 1, money: Utils.STARTING_MONEY, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true,  shields: Utils.STARTING_SHIELDS, discount: false },
+                { index: 2, money: Utils.STARTING_MONEY, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true,  shields: Utils.STARTING_SHIELDS, discount: false },
+                { index: 3, money: Utils.STARTING_MONEY, position: 0, inJail: false, jailTurns: 0, bankrupt: false, doublesCount: 0, isAI: true,  shields: Utils.STARTING_SHIELDS, discount: false },
             ],
-            properties,
+            skills,
             currentPlayer: 0,
             round: 1,
-            maxRounds: 30,
-            chanceCards: Utils.shuffle([...Utils.CHANCE_CARDS]),
-            chestCards: Utils.shuffle([...Utils.CHEST_CARDS]),
-            chanceIdx: 0,
-            chestIdx: 0,
+            maxRounds: Utils.MAX_ROUNDS,
+            fateCards: Utils.shuffle([...Utils.FATE_CARDS]),
+            fateIdx: 0,
             gameOver: false,
+            lastRoll: null,
         };
     },
 
@@ -42,6 +41,34 @@ const Game = {
     getActiveCount() {
         return this.state.players.filter(p => !p.bankrupt).length;
     },
+
+    getPlayerSkillCount(playerIdx) {
+        return Object.values(this.state.skills).filter(s => s.owner === playerIdx).length;
+    },
+
+    getPlayerSkills(playerIdx) {
+        const result = [];
+        for (const [idx, s] of Object.entries(this.state.skills)) {
+            if (s.owner === playerIdx) {
+                result.push({ spaceIdx: parseInt(idx), skill: Utils.getSkillForSpace(parseInt(idx)) });
+            }
+        }
+        return result;
+    },
+
+    hasPassiveSkill(playerIdx, skillId) {
+        return Object.entries(this.state.skills).some(([idx, s]) => {
+            return s.owner === playerIdx && Utils.BOARD_SPACES[parseInt(idx)]?.skillId === skillId;
+        });
+    },
+
+    countOwnedSkillById(playerIdx, skillId) {
+        return Object.entries(this.state.skills).filter(([idx, s]) => {
+            return s.owner === playerIdx && Utils.BOARD_SPACES[parseInt(idx)]?.skillId === skillId;
+        }).length;
+    },
+
+    // ---- TURN MANAGEMENT ----
 
     async startTurn() {
         if (this.state.gameOver) return;
@@ -55,6 +82,7 @@ const Game = {
         player.doublesCount = 0;
         UI.updateHUD(this.state);
         BoardRenderer.draw(this.state);
+        UI.updateCardsStrip(this.state, 0);
 
         if (player.isAI) {
             await this.doAITurn(player);
@@ -70,95 +98,38 @@ const Game = {
         rollBtn.disabled = false;
         rollBtn.onclick = async () => {
             rollBtn.disabled = true;
-            this.hideBuildButton();
             if (player.inJail) {
                 await this.handleJail(player);
             } else {
                 await this.doRoll(player);
             }
         };
-
-        // Build button (only show if player has buildable properties)
-        this.refreshBuildButton(player);
-
-        // Update owned cards strip
         UI.updateCardsStrip(this.state, player.index);
     },
 
-    refreshBuildButton(player) {
-        const btn = document.getElementById('btn-build');
-
-        // Check if player has buildable properties
-        const hasBuildable = Utils.BOARD_SPACES.some((space, idx) => {
-            if (space.type !== 'property') return false;
-            const prop = this.state.properties[idx];
-            if (!prop || prop.owner !== player.index || prop.houses >= 5) return false;
-            const group = space.group;
-            const groupSpaces = Utils.BOARD_SPACES.map((s, i) => ({ s, i }))
-                .filter(o => o.s.group === group && o.s.type === 'property');
-            const ownsAll = groupSpaces.every(o => this.state.properties[o.i]?.owner === player.index);
-            const cost = Math.floor(space.price / 2);
-            return ownsAll && player.money >= cost;
-        });
-
-        if (hasBuildable) {
-            btn.style.display = '';
-            btn.onclick = async () => {
-                const ownedIdxs = Utils.BOARD_SPACES.map((s, i) => i)
-                    .filter(i => this.state.properties[i]?.owner === player.index);
-                const buildIdx = await UI.showBuildPanel(player, ownedIdxs, this.state);
-                if (buildIdx !== null) {
-                    this.buildHouse(player, buildIdx);
-                    BoardRenderer.draw(this.state);
-                    UI.updateHUD(this.state);
-                    UI.updateCardsStrip(this.state, player.index);
-                    this.refreshBuildButton(player);
-                }
-            };
-        } else {
-            btn.style.display = 'none';
-        }
-    },
-
-    hideBuildButton() {
-        const btn = document.getElementById('btn-build');
-        if (btn) btn.style.display = 'none';
-    },
-
-    buildHouse(player, spaceIdx) {
-        const space = Utils.BOARD_SPACES[spaceIdx];
-        const prop = this.state.properties[spaceIdx];
-        const cost = Math.floor(space.price / 2);
-        player.money -= cost;
-        prop.houses++;
-        UI.showToast(`Built on ${space.name}! (${prop.houses < 5 ? prop.houses + ' houses' : 'Hotel'})`);
-    },
+    // ---- DICE ROLLING ----
 
     async doRoll(player) {
-        // Animate dice
         const diceCanvas = document.getElementById('dice-canvas');
         const dctx = diceCanvas.getContext('2d');
 
-        // Rolling animation
         AudioManager.playSfx('roll');
-        const frames = 15;
-        for (let i = 0; i < frames; i++) {
+        for (let i = 0; i < 15; i++) {
             Sprites.drawDicePair(dctx, diceCanvas.width, diceCanvas.height, null, null, true);
             await Utils.wait(50);
         }
 
         const roll = Utils.rollDice();
+        this.state.lastRoll = roll;
         Sprites.drawDicePair(dctx, diceCanvas.width, diceCanvas.height, roll.d1, roll.d2);
 
-        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled ${roll.d1} + ${roll.d2} = ${roll.total}${roll.doubles ? ' (Doubles!)' : ''}`);
-
+        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled ${roll.d1}+${roll.d2} = ${roll.total}${roll.doubles ? ' Doubles!' : ''}`);
         await Utils.wait(600);
 
-        // Check for triple doubles
         if (roll.doubles) {
             player.doublesCount++;
             if (player.doublesCount >= 3) {
-                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled 3 doubles - Go to Jail!`);
+                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled 3 doubles — Jail!`);
                 await Utils.wait(600);
                 this.sendToJail(player);
                 BoardRenderer.draw(this.state);
@@ -167,13 +138,9 @@ const Game = {
             }
         }
 
-        // Move player
         await this.movePlayer(player, roll.total);
-
-        // Handle landing
         await this.handleLanding(player);
 
-        // Check bankruptcy
         if (player.bankrupt) {
             UI.showToast(`${Utils.PLAYER_NAMES[player.index]} is bankrupt!`);
             await Utils.wait(800);
@@ -182,7 +149,6 @@ const Game = {
             return;
         }
 
-        // Doubles = another turn
         if (roll.doubles && !player.inJail && !player.bankrupt) {
             UI.showToast('Doubles! Roll again!');
             await Utils.wait(500);
@@ -194,71 +160,63 @@ const Game = {
             return;
         }
 
-        // AI building phase
-        if (player.isAI) {
-            let buildIdx = AI.chooseBuild(player, this.state);
-            while (buildIdx !== null) {
-                this.buildHouse(player, buildIdx);
-                BoardRenderer.draw(this.state);
-                await Utils.wait(300);
-                buildIdx = AI.chooseBuild(player, this.state);
-            }
-        }
-
-        // Update cards strip for human player after any changes
         UI.updateCardsStrip(this.state, 0);
         this.nextPlayer();
     },
 
-    async movePlayer(player, spaces) {
-        const totalSpaces = 32;
-        const startPos = player.position;
+    // ---- MOVEMENT ----
 
-        // Animate step by step
+    async movePlayer(player, spaces) {
         for (let i = 0; i < spaces; i++) {
-            player.position = (player.position + 1) % totalSpaces;
+            player.position = (player.position + 1) % 32;
             BoardRenderer.draw(this.state);
             await Utils.wait(100);
 
-            // Passed GO
             if (player.position === 0 && i < spaces - 1) {
-                player.money += 200;
-                AudioManager.playSfx('coin');
-                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed GO! +$200`);
-                UI.updateHUD(this.state);
+                this.passGo(player);
             }
         }
 
-        // Landed on GO
         if (player.position === 0 && spaces > 0) {
-            player.money += 200;
-            AudioManager.playSfx('coin');
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} landed on GO! +$200`);
-            UI.updateHUD(this.state);
+            this.passGo(player);
         }
 
         BoardRenderer.draw(this.state);
         UI.updateHUD(this.state);
     },
 
+    passGo(player) {
+        let bonus = 200;
+        const goldmineCount = this.countOwnedSkillById(player.index, 'goldmine');
+        bonus += goldmineCount * 100;
+
+        const forgeCount = this.countOwnedSkillById(player.index, 'forge');
+        if (forgeCount > 0 && player.shields < 6) {
+            player.shields = Math.min(6, player.shields + forgeCount);
+            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} forged ${forgeCount} Shield${forgeCount > 1 ? 's' : ''}!`);
+        }
+
+        player.money += bonus;
+        AudioManager.playSfx('coin');
+        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed GO! +${Utils.formatMoney(bonus)}`);
+        UI.updateHUD(this.state);
+    },
+
+    // ---- LANDING HANDLER ----
+
     async handleLanding(player) {
         const space = Utils.BOARD_SPACES[player.position];
         if (!space) return;
 
         switch (space.type) {
-            case 'property':
-            case 'railroad':
-            case 'utility':
-                await this.handlePropertyLanding(player, space, player.position);
+            case 'skill':
+                await this.handleSkillLanding(player, player.position);
                 break;
             case 'tax':
                 await this.handleTax(player, space);
                 break;
-            case 'chance':
-                await this.handleCard(player, 'chance');
-                break;
-            case 'chest':
-                await this.handleCard(player, 'chest');
+            case 'fate':
+                await this.handleFate(player);
                 break;
             case 'goToJail':
                 UI.showToast(`${Utils.PLAYER_NAMES[player.index]} goes to Jail!`);
@@ -267,175 +225,379 @@ const Game = {
                 AudioManager.playSfx('jail');
                 BoardRenderer.draw(this.state);
                 break;
+            case 'rest':
+                if (player.shields < 6) {
+                    player.shields++;
+                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rests and recovers a Shield! (${player.shields})`);
+                    AudioManager.playSfx('coin');
+                } else {
+                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rests. Shields already full!`);
+                }
+                UI.updateHUD(this.state);
+                break;
             case 'jail':
-                // Just visiting
-                break;
-            case 'parking':
-                // Free parking - nothing happens
-                break;
             case 'go':
-                // Already handled in movePlayer
                 break;
         }
     },
 
-    async handlePropertyLanding(player, space, spaceIdx) {
-        const prop = this.state.properties[spaceIdx];
-        if (!prop) return;
+    // ---- SKILL LANDING ----
 
-        if (prop.owner === null) {
-            // Unowned - offer to buy
-            const canAfford = player.money >= space.price;
+    async handleSkillLanding(player, spaceIdx) {
+        const skillSlot = this.state.skills[spaceIdx];
+        const skill = Utils.getSkillForSpace(spaceIdx);
+        if (!skillSlot || !skill) return;
+
+        if (skillSlot.owner === null) {
+            // Unowned — offer to buy
+            let price = skill.price;
+            if (player.discount) {
+                price = Math.floor(price / 2);
+                player.discount = false;
+            }
+            const canAfford = player.money >= price;
 
             if (player.isAI) {
                 await AI.delay();
-                let shouldBuy;
-                if (space.type === 'property') {
-                    shouldBuy = AI.shouldBuy(player, space, this.state) && canAfford;
-                } else {
-                    shouldBuy = AI.shouldBuySpecial(player, space, this.state) && canAfford;
-                }
-
-                if (shouldBuy) {
-                    player.money -= space.price;
-                    prop.owner = player.index;
+                if (AI.shouldBuySkill(player, skill, price, this.state)) {
+                    player.money -= price;
+                    skillSlot.owner = player.index;
                     AudioManager.playSfx('buy');
-                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} bought ${space.name}!`);
-                    UI.updateCardsStrip(this.state, 0);
+                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} learned ${skill.name}!`);
                 } else {
-                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed on ${space.name}`);
+                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed on ${skill.name}`);
                 }
             } else {
-                const choice = await UI.showPropertyPanel(space, spaceIdx, player, canAfford);
+                const choice = await UI.showSkillBuyPanel(skill, spaceIdx, player, canAfford, price);
                 if (choice === 'buy') {
-                    player.money -= space.price;
-                    prop.owner = player.index;
-                    UI.showToast(`You bought ${space.name}!`);
-                    UI.updateCardsStrip(this.state, 0);
+                    player.money -= price;
+                    skillSlot.owner = player.index;
+                    UI.showToast(`You learned ${skill.name}!`);
+                    AudioManager.playSfx('buy');
                 }
             }
-        } else if (prop.owner !== player.index) {
-            // Owned by someone else - pay rent
-            const owner = this.state.players[prop.owner];
-            if (owner.bankrupt || owner.inJail) return; // No rent if owner is bankrupt or in jail
+        } else if (skillSlot.owner !== player.index) {
+            // Owned by opponent — trigger skill effect
+            const owner = this.state.players[skillSlot.owner];
+            if (owner.bankrupt) return;
 
-            let rent = this.calculateRent(space, spaceIdx, prop);
-
-            if (player.isAI) {
-                await AI.delay();
-                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} pays ${Utils.formatMoney(rent)} to ${Utils.PLAYER_NAMES[owner.index]}`);
-            } else {
-                await UI.showRentPanel(space, prop.owner, rent);
+            // Defense skill: healer gives owner money instead of attacking
+            if (skill.id === 'healer') {
+                owner.money += 150;
+                AudioManager.playSfx('coin');
+                if (player.isAI) {
+                    UI.showToast(`${Utils.PLAYER_NAMES[owner.index]}'s Healer earns them $150`);
+                    await AI.delay();
+                } else {
+                    await UI.showSkillEffectPanel(skill, owner.index, `${Utils.PLAYER_NAMES[owner.index]}'s Healer activates!\nThey gain $150.`, '#27ae60');
+                }
+                UI.updateHUD(this.state);
+                return;
             }
 
-            this.transferMoney(player, owner, rent);
+            // Check if victim can use a shield
+            const canShield = player.shields > 0;
+            let useShield = false;
+
+            if (canShield) {
+                if (player.isAI) {
+                    useShield = AI.shouldUseShield(player, skill, this.state);
+                    await AI.delay();
+                    if (useShield) {
+                        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} used a Shield Card to block ${skill.name}!`);
+                    }
+                } else {
+                    useShield = await UI.showShieldPrompt(skill, owner.index, player);
+                }
+            }
+
+            if (useShield) {
+                player.shields--;
+                AudioManager.playSfx('click');
+                UI.updateHUD(this.state);
+                BoardRenderer.draw(this.state);
+                return;
+            }
+
+            // No shields & no cards → must surrender a skill if they have one
+            if (player.shields <= 0 && this.getPlayerSkillCount(player.index) > 0) {
+                let surrendered = false;
+                if (player.isAI) {
+                    const mySkills = this.getPlayerSkills(player.index);
+                    if (mySkills.length > 0) {
+                        const give = mySkills[Utils.rand(0, mySkills.length - 1)];
+                        this.state.skills[give.spaceIdx].owner = owner.index;
+                        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} surrenders ${give.skill.name} to ${Utils.PLAYER_NAMES[owner.index]}!`);
+                        surrendered = true;
+                    }
+                    await AI.delay();
+                } else {
+                    const mySkills = this.getPlayerSkills(player.index);
+                    if (mySkills.length > 0) {
+                        const chosenIdx = await UI.showSurrenderSkillPanel(player, mySkills, owner.index);
+                        if (chosenIdx !== null) {
+                            this.state.skills[chosenIdx].owner = owner.index;
+                            const sk = Utils.getSkillForSpace(chosenIdx);
+                            UI.showToast(`You surrendered ${sk.name} to ${Utils.PLAYER_NAMES[owner.index]}!`);
+                            surrendered = true;
+                        }
+                    }
+                }
+                if (surrendered) {
+                    AudioManager.playSfx('pay');
+                    UI.updateHUD(this.state);
+                    BoardRenderer.draw(this.state);
+                    return;
+                }
+            }
+
+            // Check passive defenses
+            let damageMultiplier = 1;
+            if (this.hasPassiveSkill(player.index, 'bodyguard')) {
+                damageMultiplier = 0.5;
+            }
+
+            // Mirror shield check
+            if (this.hasPassiveSkill(player.index, 'mirror') && Math.random() < 0.3) {
+                // Reflect! Swap attacker/victim
+                if (!player.isAI) {
+                    await UI.showSkillEffectPanel(skill, player.index, `🪞 Mirror Shield reflects ${skill.name} back at ${Utils.PLAYER_NAMES[owner.index]}!`, '#3498db');
+                } else {
+                    UI.showToast(`${Utils.PLAYER_NAMES[player.index]}'s Mirror reflects ${skill.name}!`);
+                    await AI.delay();
+                }
+                await this.executeSkillEffect(skill, owner, player, damageMultiplier);
+                UI.updateHUD(this.state);
+                BoardRenderer.draw(this.state);
+                return;
+            }
+
+            // Execute the skill effect on the victim
+            await this.executeSkillEffect(skill, player, owner, damageMultiplier);
+            UI.updateHUD(this.state);
+            BoardRenderer.draw(this.state);
         }
+        // Landing on own skill — nothing happens
 
         UI.updateHUD(this.state);
         BoardRenderer.draw(this.state);
     },
 
-    calculateRent(space, spaceIdx, prop) {
-        if (space.type === 'railroad') {
-            // Count railroads owned by same owner
-            const count = Utils.BOARD_SPACES
-                .map((s, i) => ({ s, i }))
-                .filter(o => o.s.type === 'railroad' && this.state.properties[o.i]?.owner === prop.owner)
-                .length;
-            return space.rent[count - 1] || 25;
-        }
+    // ---- SKILL EFFECTS ----
 
-        if (space.type === 'utility') {
-            // Utility rent = dice roll * multiplier
-            const utilCount = Utils.BOARD_SPACES
-                .map((s, i) => ({ s, i }))
-                .filter(o => o.s.type === 'utility' && this.state.properties[o.i]?.owner === prop.owner)
-                .length;
-            const roll = Utils.rollDice();
-            return roll.total * (utilCount === 2 ? 10 : 4);
-        }
+    async executeSkillEffect(skill, victim, attacker, damageMultiplier) {
+        const roll = this.state.lastRoll || Utils.rollDice();
 
-        if (space.type === 'property') {
-            const baseRent = space.rent[prop.houses] || space.rent[0];
-
-            // Check if owner has monopoly (all in group)
-            if (prop.houses === 0) {
-                const group = space.group;
-                const groupSpaces = Utils.BOARD_SPACES.map((s, i) => ({ s, i }))
-                    .filter(o => o.s.group === group && o.s.type === 'property');
-                const ownsAll = groupSpaces.every(o => this.state.properties[o.i]?.owner === prop.owner);
-                if (ownsAll) return baseRent * 2;
+        switch (skill.id) {
+            case 'pickpocket': {
+                let steal = roll.total * 100;
+                steal = Math.floor(steal * damageMultiplier);
+                steal = this.clampSteal(victim, steal);
+                victim.money -= steal;
+                attacker.money += steal;
+                AudioManager.playSfx('pay');
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, `${Utils.PLAYER_NAMES[attacker.index]}'s Pickpocket steals ${Utils.formatMoney(steal)}!`, '#e74c3c');
+                } else {
+                    UI.showToast(`${skill.icon} Pickpocket! ${Utils.PLAYER_NAMES[victim.index]} loses ${Utils.formatMoney(steal)}`);
+                    await AI.delay();
+                }
+                break;
             }
-            return baseRent;
-        }
-
-        return 0;
-    },
-
-    transferMoney(from, to, amount) {
-        const actual = Math.min(from.money, amount);
-        from.money -= actual;
-        to.money += actual;
-
-        if (from.money <= 0) {
-            from.money = 0;
-            this.goBankrupt(from);
-        }
-    },
-
-    goBankrupt(player) {
-        player.bankrupt = true;
-        // Return all properties
-        for (const [idx, prop] of Object.entries(this.state.properties)) {
-            if (prop.owner === player.index) {
-                prop.owner = null;
-                prop.houses = 0;
+            case 'ambush': {
+                const victimSkills = this.getPlayerSkills(victim.index);
+                if (victimSkills.length > 0) {
+                    const stolen = victimSkills[Utils.rand(0, victimSkills.length - 1)];
+                    this.state.skills[stolen.spaceIdx].owner = attacker.index;
+                    const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Ambush steals ${stolen.skill.name}!`;
+                    if (!victim.isAI) {
+                        await UI.showSkillEffectPanel(skill, attacker.index, msg, '#c0392b');
+                    } else {
+                        UI.showToast(`${skill.icon} ${msg}`);
+                        await AI.delay();
+                    }
+                } else {
+                    let steal = Math.floor(200 * damageMultiplier);
+                    steal = this.clampSteal(victim, steal);
+                    victim.money -= steal;
+                    attacker.money += steal;
+                    AudioManager.playSfx('pay');
+                    if (!victim.isAI) {
+                        await UI.showSkillEffectPanel(skill, attacker.index, `${Utils.PLAYER_NAMES[attacker.index]}'s Ambush takes ${Utils.formatMoney(steal)}!`, '#c0392b');
+                    } else {
+                        UI.showToast(`${skill.icon} Ambush! ${Utils.PLAYER_NAMES[victim.index]} loses ${Utils.formatMoney(steal)}`);
+                        await AI.delay();
+                    }
+                }
+                break;
             }
+            case 'sabotage': {
+                let loss = Math.floor(victim.money / 2);
+                loss = Math.floor(loss / 50) * 50;
+                loss = Math.floor(loss * damageMultiplier);
+                loss = this.clampSteal(victim, loss);
+                victim.money -= loss;
+                AudioManager.playSfx('pay');
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Sabotage destroys ${Utils.formatMoney(loss)}!`;
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, msg, '#e67e22');
+                } else {
+                    UI.showToast(`${skill.icon} ${msg}`);
+                    await AI.delay();
+                }
+                break;
+            }
+            case 'shakedown': {
+                if (victim.shields > 0) {
+                    victim.shields--;
+                    attacker.shields = Math.min(6, attacker.shields + 1);
+                    const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Shakedown steals a Shield Card!`;
+                    if (!victim.isAI) {
+                        await UI.showSkillEffectPanel(skill, attacker.index, msg, '#d35400');
+                    } else {
+                        UI.showToast(`${skill.icon} ${msg}`);
+                        await AI.delay();
+                    }
+                } else {
+                    let steal = Math.floor(300 * damageMultiplier);
+                    steal = this.clampSteal(victim, steal);
+                    victim.money -= steal;
+                    attacker.money += steal;
+                    AudioManager.playSfx('pay');
+                    const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Shakedown takes ${Utils.formatMoney(steal)}!`;
+                    if (!victim.isAI) {
+                        await UI.showSkillEffectPanel(skill, attacker.index, msg, '#d35400');
+                    } else {
+                        UI.showToast(`${skill.icon} ${msg}`);
+                        await AI.delay();
+                    }
+                }
+                break;
+            }
+            case 'jinx': {
+                this.sendToJail(victim);
+                AudioManager.playSfx('jail');
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Jinx sends ${Utils.PLAYER_NAMES[victim.index]} to Jail!`;
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, msg, '#8e44ad');
+                } else {
+                    UI.showToast(`${skill.icon} ${msg}`);
+                    await AI.delay();
+                }
+                break;
+            }
+            case 'taxman': {
+                const victimSkillCount = this.getPlayerSkillCount(victim.index);
+                let tax = victimSkillCount * 50;
+                tax = Math.floor(tax * damageMultiplier);
+                tax = this.clampSteal(victim, tax);
+                victim.money -= tax;
+                attacker.money += tax;
+                AudioManager.playSfx('pay');
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Tax Collector levies ${Utils.formatMoney(tax)}! (${victimSkillCount} skills)`;
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, msg, '#e74c3c');
+                } else {
+                    UI.showToast(`${skill.icon} ${msg}`);
+                    await AI.delay();
+                }
+                break;
+            }
+            case 'tollbooth': {
+                let toll = Math.floor(200 * damageMultiplier);
+                toll = this.clampSteal(victim, toll);
+                victim.money -= toll;
+                attacker.money += toll;
+                AudioManager.playSfx('pay');
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Toll Booth charges ${Utils.formatMoney(toll)}!`;
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, msg, '#e74c3c');
+                } else {
+                    UI.showToast(`${skill.icon} ${msg}`);
+                    await AI.delay();
+                }
+                break;
+            }
+            case 'bounty': {
+                const count = this.getPlayerSkillCount(victim.index);
+                let bountyAmt = count * 100;
+                bountyAmt = Math.floor(bountyAmt * damageMultiplier);
+                bountyAmt = this.clampSteal(victim, bountyAmt);
+                victim.money -= bountyAmt;
+                attacker.money += bountyAmt;
+                AudioManager.playSfx('pay');
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Bounty Hunter collects ${Utils.formatMoney(bountyAmt)}!`;
+                if (!victim.isAI) {
+                    await UI.showSkillEffectPanel(skill, attacker.index, msg, '#c0392b');
+                } else {
+                    UI.showToast(`${skill.icon} ${msg}`);
+                    await AI.delay();
+                }
+                break;
+            }
+            default:
+                break;
         }
-        AudioManager.playSfx('pay');
+
+        this.checkBankruptcy(victim);
     },
+
+    clampSteal(victim, amount) {
+        // Vault passive: money can't drop below $100
+        if (this.hasPassiveSkill(victim.index, 'vault')) {
+            const maxSteal = Math.max(0, victim.money - 100);
+            return Math.min(amount, maxSteal);
+        }
+        return Math.min(amount, victim.money);
+    },
+
+    checkBankruptcy(player) {
+        if (player.money <= 0 && this.getPlayerSkillCount(player.index) === 0 && player.shields <= 0) {
+            player.money = 0;
+            player.bankrupt = true;
+            for (const [idx, s] of Object.entries(this.state.skills)) {
+                if (s.owner === player.index) s.owner = null;
+            }
+            AudioManager.playSfx('pay');
+        }
+    },
+
+    // ---- TAX ----
 
     async handleTax(player, space) {
         if (player.isAI) {
             await AI.delay();
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} pays ${Utils.formatMoney(space.amount)} tax`);
+            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} pays ${Utils.formatMoney(space.amount)}`);
         } else {
             await UI.showTaxPanel(space);
         }
-
         player.money -= space.amount;
-        if (player.money <= 0) {
-            player.money = 0;
-            this.goBankrupt(player);
-        }
+        if (player.money < 0) player.money = 0;
+        this.checkBankruptcy(player);
         AudioManager.playSfx('pay');
         UI.updateHUD(this.state);
     },
 
-    async handleCard(player, type) {
-        let card;
-        if (type === 'chance') {
-            card = this.state.chanceCards[this.state.chanceIdx];
-            this.state.chanceIdx = (this.state.chanceIdx + 1) % this.state.chanceCards.length;
-        } else {
-            card = this.state.chestCards[this.state.chestIdx];
-            this.state.chestIdx = (this.state.chestIdx + 1) % this.state.chestCards.length;
-        }
+    // ---- FATE CARDS ----
+
+    async handleFate(player) {
+        const card = this.state.fateCards[this.state.fateIdx];
+        this.state.fateIdx = (this.state.fateIdx + 1) % this.state.fateCards.length;
 
         if (player.isAI) {
             await AI.delay();
             UI.showToast(`${Utils.PLAYER_NAMES[player.index]}: ${card.text}`);
             await Utils.wait(800);
         } else {
-            await UI.showCardPanel(type, card);
+            await UI.showFatePanel(card);
         }
 
-        await this.executeCard(player, card);
+        await this.executeFate(player, card);
         UI.updateHUD(this.state);
         BoardRenderer.draw(this.state);
     },
 
-    async executeCard(player, card) {
+    async executeFate(player, card) {
         switch (card.action) {
             case 'gain':
                 player.money += card.value;
@@ -443,16 +605,12 @@ const Game = {
                 break;
             case 'pay':
                 player.money -= card.value;
-                if (player.money <= 0) { player.money = 0; this.goBankrupt(player); }
+                if (player.money < 0) player.money = 0;
+                this.checkBankruptcy(player);
                 AudioManager.playSfx('pay');
                 break;
             case 'moveTo':
-                const oldPos = player.position;
-                if (card.value <= player.position) {
-                    // Passed GO
-                    player.money += 200;
-                    AudioManager.playSfx('coin');
-                }
+                if (card.value <= player.position) player.money += 200;
                 player.position = card.value;
                 BoardRenderer.draw(this.state);
                 await this.handleLanding(player);
@@ -466,41 +624,36 @@ const Game = {
                 this.sendToJail(player);
                 AudioManager.playSfx('jail');
                 break;
-            case 'nearestRail':
-                // Find nearest railroad
-                const railIndices = Utils.BOARD_SPACES.map((s, i) => s.type === 'railroad' ? i : -1).filter(i => i >= 0);
-                let nearest = railIndices[0];
-                for (const ri of railIndices) {
-                    if (ri > player.position) { nearest = ri; break; }
-                }
-                if (nearest <= player.position) player.money += 200; // Passed GO
-                player.position = nearest;
-                BoardRenderer.draw(this.state);
-                await this.handleLanding(player);
+            case 'gainShield':
+                player.shields = Math.min(6, player.shields + card.value);
+                AudioManager.playSfx('coin');
                 break;
-            case 'payPerHouse':
-                let totalHouses = 0;
-                for (const [idx, prop] of Object.entries(this.state.properties)) {
-                    if (prop.owner === player.index) totalHouses += prop.houses;
-                }
-                const amount = totalHouses * card.value;
-                player.money -= amount;
-                if (player.money <= 0) { player.money = 0; this.goBankrupt(player); }
-                if (amount > 0) UI.showToast(`Paid ${Utils.formatMoney(amount)} for ${totalHouses} houses`);
+            case 'loseShield':
+                player.shields = Math.max(0, player.shields - card.value);
                 AudioManager.playSfx('pay');
+                break;
+            case 'discount':
+                player.discount = true;
+                AudioManager.playSfx('coin');
+                break;
+            case 'gainPerSkill':
+                const count = this.getPlayerSkillCount(player.index);
+                player.money += count * card.value;
+                AudioManager.playSfx('coin');
                 break;
         }
     },
 
+    // ---- JAIL ----
+
     sendToJail(player) {
-        player.position = 8; // Jail is at index 8 (bottom-left corner)
+        player.position = 8;
         player.inJail = true;
         player.jailTurns = 0;
     },
 
     async handleJail(player) {
         let decision;
-
         if (player.isAI) {
             await AI.delay();
             decision = AI.jailDecision(player);
@@ -520,12 +673,10 @@ const Game = {
             return;
         }
 
-        // Try rolling doubles
         const diceCanvas = document.getElementById('dice-canvas');
         const dctx = diceCanvas.getContext('2d');
         AudioManager.playSfx('roll');
-        const frames = 12;
-        for (let i = 0; i < frames; i++) {
+        for (let i = 0; i < 12; i++) {
             Sprites.drawDicePair(dctx, diceCanvas.width, diceCanvas.height, null, null, true);
             await Utils.wait(50);
         }
@@ -536,53 +687,49 @@ const Game = {
         if (roll.doubles) {
             player.inJail = false;
             player.jailTurns = 0;
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled doubles and escaped jail!`);
+            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled doubles and escaped!`);
             await Utils.wait(600);
+            this.state.lastRoll = roll;
             await this.movePlayer(player, roll.total);
             await this.handleLanding(player);
         } else {
             player.jailTurns++;
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} didn't roll doubles (${roll.d1}, ${roll.d2})`);
-
+            UI.showToast(`No doubles (${roll.d1}, ${roll.d2})`);
             if (player.jailTurns >= 3) {
-                // Force pay
                 player.money -= 50;
                 player.inJail = false;
                 player.jailTurns = 0;
-                UI.showToast('Forced to pay $50 bail after 3 failed attempts');
-                if (player.money <= 0) { player.money = 0; this.goBankrupt(player); }
+                if (player.money < 0) player.money = 0;
+                this.checkBankruptcy(player);
+                UI.showToast('Forced to pay $50 bail');
                 await Utils.wait(500);
+                this.state.lastRoll = roll;
                 await this.movePlayer(player, roll.total);
                 await this.handleLanding(player);
             }
         }
 
         UI.updateHUD(this.state);
-
-        if (player.bankrupt) {
-            if (this.checkGameEnd()) return;
-        }
-
+        if (player.bankrupt && this.checkGameEnd()) return;
         this.nextPlayer();
     },
 
+    // ---- AI TURN ----
+
     async doAITurn(player) {
         await Utils.wait(400);
-
         if (player.inJail) {
             await this.handleJail(player);
             return;
         }
-
         await this.doRoll(player);
     },
 
-    nextPlayer() {
-        this.hideBuildButton();
+    // ---- TURN FLOW ----
 
+    nextPlayer() {
         if (this.state.gameOver) return;
 
-        // Find next active player
         let next = (this.state.currentPlayer + 1) % 4;
         let safety = 0;
         while (this.state.players[next].bankrupt && safety < 4) {
@@ -590,7 +737,6 @@ const Game = {
             safety++;
         }
 
-        // Check for new round
         if (next <= this.state.currentPlayer) {
             this.state.round++;
             if (this.state.round > this.state.maxRounds) {
@@ -600,16 +746,12 @@ const Game = {
         }
 
         this.state.currentPlayer = next;
-
         if (this.checkGameEnd()) return;
-
-        // Start next turn
         setTimeout(() => this.startTurn(), 300);
     },
 
     checkGameEnd() {
-        const active = this.getActiveCount();
-        if (active <= 1) {
+        if (this.getActiveCount() <= 1) {
             this.endGame();
             return true;
         }
@@ -620,8 +762,6 @@ const Game = {
         this.state.gameOver = true;
         this.running = false;
         AudioManager.playSfx('win');
-        setTimeout(() => {
-            UI.showGameOver(this.state.players);
-        }, 500);
+        setTimeout(() => UI.showGameOver(this.state.players, this.state), 500);
     }
 };

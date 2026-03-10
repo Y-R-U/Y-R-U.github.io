@@ -1,0 +1,53 @@
+DICEY - Skills & Strategy Board Game
+=====================================
+
+A PWA mobile-first portrait board game at /gms/pwa/dicey/
+
+CONCEPT:
+- Single player + 3 AI opponents on a 32-space top-down board
+- Skills-based game (NOT Monopoly properties) — players buy attack/defense skills
+- Shield Card system for blocking attacks
+- Canvas-rendered board with DPR support
+- Web Audio API synthesized SFX, optional MP3 music from /music/ folder
+
+GAME MECHANICS:
+- 14 unique skills (8 attack, 6 defense) replace all properties
+- Attack skills: Pickpocket, Ambush, Sabotage, Shakedown, Jinx, Tax Collector, Toll Booth, Bounty Hunter
+- Defense skills: Bodyguard, Gold Mine, Healer, Shield Forge, Mirror Shield, Vault
+- Each player starts with $1500 and 4 Shield Cards
+- Landing on opponent's attack skill triggers the effect (steal money, steal skills, send to jail, etc.)
+- Players can use a Shield Card to block attacks
+- If no shields AND no money, player must surrender a skill
+- Passive defenses: Bodyguard halves damage, Mirror 30% reflect, Vault protects last $100
+- Gold Mine: +$100 per mine when passing GO
+- Shield Forge: +1 shield when passing GO
+- Rest Stop (corner 16): recover 1 shield
+- Fate cards replace Chance/Community Chest
+- 30-round game, highest net worth wins
+
+BOARD LAYOUT (32 spaces, 8 per side):
+- Corner 0: GO (collect $200)
+- Corner 8: Jail
+- Corner 16: Rest Stop (recover shield)
+- Corner 24: Go To Jail
+
+FILE STRUCTURE:
+- index.html — game shell, screens, HUD
+- css/style.css — all styles
+- js/utils.js — constants, skill definitions, board layout, fate cards, helpers
+- js/audio.js — Web Audio SFX + graceful MP3 music discovery
+- js/sprites.js — canvas drawing (dice, tokens, space icons)
+- js/board.js — board renderer (top-down view, click-to-inspect)
+- js/ui.js — all panels/overlays (buy, effect, shield prompt, surrender, how-to-play, settings)
+- js/ai.js — AI decision logic (buy, shield, jail)
+- js/game.js — core game loop, skill effects, turn flow
+- js/app.js — entry point, title screen, event wiring
+- sw.js — service worker (cache-first, skip music)
+- manifest.json — PWA manifest (portrait orientation)
+
+UI NOTES:
+- No alerts or prompts — all interaction via styled overlay panels
+- Settings cog (top right) opens settings + how-to-play guide
+- Cards strip below board shows owned skills (stacked, clickable)
+- Top HUD shows current player avatar, money, shields, round counter
+- Bottom HUD has dice display with overlaid roll button
