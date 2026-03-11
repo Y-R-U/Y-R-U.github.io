@@ -1,0 +1,64 @@
+Transport Empire - Idle Clicker Game
+=====================================
+Mobile-first PWA idle clicker with Babylon.js 3D scene, 8 transport routes,
+upgrades, prestige system, achievements, and random events.
+
+DIRECTORY STRUCTURE
+-------------------
+index.html          - Main HTML shell with all CSS and UI structure
+manifest.json       - PWA manifest for installability
+sw.js               - Service worker for offline caching
+js/utils.js         - formatMoney(n), formatNum(n), formatTime(s), showToast(msg, type)
+js/config.js        - All game data: BUSINESS_DEFS, UPGRADE_DEFS, ACHIEVEMENT_DEFS, EVENT_DEFS, PRESTIGE_UPGRADES, SAVE_KEY
+js/state.js         - Game state object and persistence: createDefaultState(), saveGame(), loadGame(), exportSave(), importSave(str), hardReset(), calculateOfflineEarnings()
+js/economy.js       - Economy calculations (all pure functions reading game state)
+js/audio.js         - AudioSystem object: init(), playMusic(), stopMusic(), playSfx(type), resume()
+js/scene.js         - SceneManager object: Babylon.js scene setup, vehicle loading, route switching
+js/events.js        - Random event system: scheduleNextEvent(), checkEvent(), triggerEvent(evt), applyEventReward(evt)
+js/actions.js       - Player actions: collectBusiness(bizId) - manual collect for unmanaged routes, buyBusiness(bizId), buyBusinessBulk(bizId,count), unlockBusiness(bizId), buyUpgrade(upgradeId), buyPrestigeUpgrade(puId), doPrestige(), viewRoute(idx), checkAchievements()
+js/ui.js            - UI object: rendering for all panels (businesses, upgrades, prestige, achievements, stats), modal management, click overlay
+js/main.js          - Game loop (gameLoop), PWA install handling, init() bootstrap
+assets/vehicles/    - Kenney car-kit GLB models (truck, van, delivery, etc.)
+assets/characters/  - Kenney mini-character GLB models
+music/              - Background music tracks (theme1-5.mp3)
+icons/              - PWA icons (192px, 512px)
+
+KEY FUNCTIONS (js/economy.js)
+-----------------------------
+getClickValue()              - Current click earning with all multipliers
+getBizEarning(bizId)         - Earnings per trip for a business route
+getBizTime(bizId)            - Time per trip in seconds for a business route
+getBizCost(bizId)            - Cost to buy next level of a route
+getBulkCost(bizId, count)    - Cost to buy N levels at once
+hasManager(bizId)            - Whether auto-collect manager is purchased for route
+getTotalPerSec()             - Total passive income per second across all managed routes
+getPrestigePointsEarnable()  - Empire Points earnable on prestige (sqrt of totalEarned/1M)
+getStats()                   - Returns {totalEarned, totalClicks, totalPrestiges, unlockedCount, maxLevel, upgradeCount, eventsCaught}
+getPrestigeEarningMul()      - Prestige earning multiplier (1 + level * 0.25)
+getPrestigeSpeedMul()        - Prestige speed multiplier (1 - level * 0.10)
+getPrestigeClickMul()        - Prestige click multiplier (1 + level * 0.50)
+getPrestigeStartMoney()      - Starting cash after prestige (level * 500)
+getPrestigeCostMul()         - Prestige cost reduction (1 - level * 0.05)
+
+GAME FLOW
+---------
+1. Player taps to earn initial money
+2. Buy first route (Quarry Run, free unlock) to start transport
+3. Buy manager upgrade to auto-collect route earnings
+4. Unlock more routes, buy upgrades for speed/earnings multipliers
+5. Random events appear every 30-90s, tap banner to claim bonus
+6. Prestige resets progress for Empire Points (permanent multipliers)
+7. Achievements unlock based on milestones
+
+BUSINESS ROUTES (8 total)
+-------------------------
+quarry(free) -> farm($500) -> factory($5K) -> oil($50K) -> tech($500K) -> luxury($10M) -> military($200M) -> space($10B)
+
+SAVE SYSTEM
+-----------
+Auto-saves every 15s to localStorage. Supports export/import via base64.
+Offline earnings calculated at 50% efficiency, max 8 hours.
+
+SCRIPT LOAD ORDER (index.html)
+------------------------------
+utils -> config -> state -> economy -> audio -> scene -> events -> actions -> ui -> main
