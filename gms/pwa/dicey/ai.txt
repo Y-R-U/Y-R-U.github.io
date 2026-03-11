@@ -15,31 +15,36 @@ GAME MECHANICS:
 - Attack skills: Pickpocket, Ambush, Sabotage, Shakedown, Jinx, Tax Collector, Toll Booth, Bounty Hunter
 - Defense skills: Bodyguard, Gold Mine, Healer, Shield Forge, Mirror Shield, Vault
 - Each player starts with $1500 and 4 Shield Cards
-- Landing on opponent's attack skill triggers the effect (steal money, steal skills, send to jail, etc.)
+- Landing on opponent's attack skill triggers the effect (steal money, steal skills, send to hospital, etc.)
 - Players can use a Shield Card to block attacks
 - If no shields AND no money, player must surrender a skill
 - Passive defenses: Bodyguard halves damage, Mirror 30% reflect, Vault protects last $100
-- Gold Mine: +$100 per mine when passing GO
-- Shield Forge: +1 shield when passing GO
+- Gold Mine: +$100 per mine when passing START
+- Shield Forge: +1 shield when passing START
 - Rest Stop (corner 16): recover 1 shield
-- Fate cards replace Chance/Community Chest
+- Fate cards: shuffled deck of ~14 random events (documented in How-to-Play guide)
 - 30-round game, highest net worth wins
 
 BOARD LAYOUT (32 spaces, 8 per side):
-- Corner 0: GO (collect $200)
-- Corner 8: Jail
+- Corner 0: START (collect $200, arrow points left ←)
+- Corner 8: Hospital (was Jail — same mechanics, themed as injury/recovery)
 - Corner 16: Rest Stop (recover shield)
-- Corner 24: Go To Jail
+- Corner 24: Injury (was Go To Jail — sends player to Hospital)
+
+MOVEMENT & ANIMATION:
+- Player movement: 200ms per step (half normal speed for readability)
+- Board zooms 1.35x toward moving player during movement, then zooms back out
+- Roll button hidden by default, shown only on human player's turn, hidden on click
 
 FILE STRUCTURE:
-- index.html — game shell, screens, HUD
-- css/style.css — all styles
+- index.html — game shell, screens, HUD (roll button hidden by default)
+- css/style.css — all styles (guide-skill-row, shield prompt, surrender list, etc.)
 - js/utils.js — constants, skill definitions, board layout, fate cards, helpers
 - js/audio.js — Web Audio SFX + graceful MP3 music discovery
-- js/sprites.js — canvas drawing (dice, tokens, space icons)
-- js/board.js — board renderer (top-down view, click-to-inspect)
-- js/ui.js — all panels/overlays (buy, effect, shield prompt, surrender, how-to-play, settings)
-- js/ai.js — AI decision logic (buy, shield, jail)
+- js/sprites.js — canvas drawing (dice, tokens, space icons: START/Hospital/Injury/Rest/Fate)
+- js/board.js — board renderer (top-down view, click-to-inspect, zoom in/out methods)
+- js/ui.js — all panels/overlays (buy, effect, shield prompt, surrender, how-to-play w/ fate docs, settings)
+- js/ai.js — AI decision logic (buy, shield, hospital)
 - js/game.js — core game loop, skill effects, turn flow
 - js/app.js — entry point, title screen, event wiring
 - sw.js — service worker (cache-first, skip music)
@@ -48,6 +53,7 @@ FILE STRUCTURE:
 UI NOTES:
 - No alerts or prompts — all interaction via styled overlay panels
 - Settings cog (top right) opens settings + how-to-play guide
+- How-to-play includes: rules, all skills with descriptions, all Fate cards listed, board space legend
 - Cards strip below board shows owned skills (stacked, clickable)
 - Top HUD shows current player avatar, money, shields, round counter
-- Bottom HUD has dice display with overlaid roll button
+- Bottom HUD has dice display with overlaid roll button (only visible on player's turn)
