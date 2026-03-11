@@ -220,9 +220,12 @@ const BoardRenderer = {
     },
 
     drawPlayers(ctx, gameState) {
+        const anim = this._animToken;
         const posGroups = {};
         gameState.players.forEach((p, i) => {
             if (p.bankrupt) return;
+            // Skip the animating player from normal grouping
+            if (anim && anim.playerIndex === i) return;
             if (!posGroups[p.position]) posGroups[p.position] = [];
             posGroups[p.position].push(i);
         });
@@ -241,12 +244,53 @@ const BoardRenderer = {
                 Sprites.drawToken(ctx, cx + Math.cos(angle) * spread, cy + Math.sin(angle) * spread, tokenR, pi, Utils.PLAYER_TOKENS[pi]);
             });
         }
+
+        // Draw animating player at interpolated position
+        if (anim) {
+            const refPos = this.spacePositions[0];
+            const tokenR = Math.min(refPos.w, refPos.h) * 0.17;
+            Sprites.drawToken(ctx, anim.x, anim.y, tokenR, anim.playerIndex, Utils.PLAYER_TOKENS[anim.playerIndex]);
+        }
     },
+
+    // Animation state for smooth token movement
+    _animToken: null,  // { playerIndex, x, y } when animating
 
     getSpaceCenter(index) {
         const pos = this.spacePositions[index];
         if (!pos) return { x: 0, y: 0 };
         return { x: pos.x + pos.w / 2, y: pos.y + pos.h / 2 };
+    },
+
+    // Smoothly slide a token from one space to the next over `duration` ms
+    animateStep(playerIndex, fromIdx, toIdx, duration, gameState) {
+        return new Promise(resolve => {
+            const from = this.getSpaceCenter(fromIdx);
+            const to = this.getSpaceCenter(toIdx);
+            const start = performance.now();
+
+            const tick = (now) => {
+                const elapsed = now - start;
+                const t = Math.min(elapsed / duration, 1);
+                const eased = Utils.easeOutCubic(t);
+
+                this._animToken = {
+                    playerIndex,
+                    x: Utils.lerp(from.x, to.x, eased),
+                    y: Utils.lerp(from.y, to.y, eased)
+                };
+
+                this.draw(gameState);
+
+                if (t < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    this._animToken = null;
+                    resolve();
+                }
+            };
+            requestAnimationFrame(tick);
+        });
     },
 
     zoomToSpace(index, scale = 1.35) {

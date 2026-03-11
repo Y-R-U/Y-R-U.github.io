@@ -172,13 +172,19 @@ const Game = {
     async movePlayer(player, spaces) {
         // Zoom toward the player's current position
         BoardRenderer.zoomToSpace(player.position);
-        await Utils.wait(350);
+        await Utils.wait(250);
 
         for (let i = 0; i < spaces; i++) {
-            player.position = (player.position + 1) % 32;
-            BoardRenderer.zoomToSpace(player.position);
+            const fromIdx = player.position;
+            const toIdx = (player.position + 1) % 32;
+
+            // Update zoom target to the next space
+            BoardRenderer.zoomToSpace(toIdx);
+
+            // Smoothly slide the token from current to next space
+            await BoardRenderer.animateStep(player.index, fromIdx, toIdx, 180, this.state);
+            player.position = toIdx;
             BoardRenderer.draw(this.state);
-            await Utils.wait(200);
 
             if (player.position === 0 && i < spaces - 1) {
                 this.passGo(player);
