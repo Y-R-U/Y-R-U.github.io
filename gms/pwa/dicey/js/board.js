@@ -247,5 +247,23 @@ const BoardRenderer = {
         const pos = this.spacePositions[index];
         if (!pos) return { x: 0, y: 0 };
         return { x: pos.x + pos.w / 2, y: pos.y + pos.h / 2 };
+    },
+
+    zoomToSpace(index, scale = 1.35) {
+        const center = this.getSpaceCenter(index);
+        const canvas = this.canvas;
+        const rect = canvas.getBoundingClientRect();
+        // Compute percentage offsets for transform-origin
+        const pctX = (center.x / this.boardPx) * 100;
+        const pctY = (center.y / this.boardPx) * 100;
+        canvas.style.transformOrigin = `${pctX}% ${pctY}%`;
+        canvas.style.transition = 'transform 0.35s ease-out';
+        canvas.style.transform = `scale(${scale})`;
+    },
+
+    zoomReset() {
+        const canvas = this.canvas;
+        canvas.style.transition = 'transform 0.4s ease-in-out';
+        canvas.style.transform = 'scale(1)';
     }
 };
