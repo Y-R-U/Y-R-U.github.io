@@ -167,10 +167,15 @@ const Game = {
     // ---- MOVEMENT ----
 
     async movePlayer(player, spaces) {
+        // Zoom toward the player's current position
+        BoardRenderer.zoomToSpace(player.position);
+        await Utils.wait(350);
+
         for (let i = 0; i < spaces; i++) {
             player.position = (player.position + 1) % 32;
+            BoardRenderer.zoomToSpace(player.position);
             BoardRenderer.draw(this.state);
-            await Utils.wait(100);
+            await Utils.wait(200);
 
             if (player.position === 0 && i < spaces - 1) {
                 this.passGo(player);
@@ -180,6 +185,11 @@ const Game = {
         if (player.position === 0 && spaces > 0) {
             this.passGo(player);
         }
+
+        // Brief pause at destination then zoom back out
+        await Utils.wait(300);
+        BoardRenderer.zoomReset();
+        await Utils.wait(400);
 
         BoardRenderer.draw(this.state);
         UI.updateHUD(this.state);
