@@ -1,53 +1,204 @@
 DICEY - Skills & Strategy Board Game
 =====================================
+PWA mobile-first portrait board game at /gms/pwa/dicey/
+Single player + 3 AI on a 32-space top-down canvas board.
 
-A PWA mobile-first portrait board game at /gms/pwa/dicey/
+=====================================
+ARCHITECTURE & GLOBALS
+=====================================
+All code uses global objects (no modules/bundler):
+  Utils, AudioManager, Sprites, BoardRenderer, UI, AI, Game, App
+Load order in index.html: utils → audio → sprites → board → ui → ai → game → app
 
-CONCEPT:
-- Single player + 3 AI opponents on a 32-space top-down board
-- Skills-based game (NOT Monopoly properties) — players buy attack/defense skills
-- Shield Card system for blocking attacks
-- Canvas-rendered board with DPR support
-- Web Audio API synthesized SFX, optional MP3 music from /music/ folder
+=====================================
+GAME STATE (Game.state)
+=====================================
+{
+  players: [{ index, money, position, inJail, jailTurns, bankrupt,
+              doublesCount, isAI, shields, discount }],  // 4 players, index 0 = human
+  skills: { [spaceIdx]: { owner: playerIdx|null } },     // only skill-type spaces have entries
+  currentPlayer: 0-3,
+  round: 1..maxRounds,
+  maxRounds: 30,
+  fateCards: [...],   // shuffled copy of Utils.FATE_CARDS
+  fateIdx: 0,
+  gameOver: false,
+  lastRoll: { d1, d2, total, doubles }
+}
 
-GAME MECHANICS:
-- 14 unique skills (8 attack, 6 defense) replace all properties
-- Attack skills: Pickpocket, Ambush, Sabotage, Shakedown, Jinx, Tax Collector, Toll Booth, Bounty Hunter
-- Defense skills: Bodyguard, Gold Mine, Healer, Shield Forge, Mirror Shield, Vault
-- Each player starts with $1500 and 4 Shield Cards
-- Landing on opponent's attack skill triggers the effect (steal money, steal skills, send to jail, etc.)
-- Players can use a Shield Card to block attacks
-- If no shields AND no money, player must surrender a skill
-- Passive defenses: Bodyguard halves damage, Mirror 30% reflect, Vault protects last $100
-- Gold Mine: +$100 per mine when passing GO
-- Shield Forge: +1 shield when passing GO
-- Rest Stop (corner 16): recover 1 shield
-- Fate cards replace Chance/Community Chest
-- 30-round game, highest net worth wins
+=====================================
+BOARD LAYOUT (32 spaces, 8 per side)
+=====================================
+Corners: 0=START, 8=Hospital, 16=Rest Stop, 24=Injury
+Internal types still use: 'go', 'jail', 'rest', 'goToJail' (display names differ)
+Other space types: 'skill', 'fate', 'tax'
+Each skill space has { type:'skill', skillId:'pickpocket' } referencing Utils.SKILLS
 
-BOARD LAYOUT (32 spaces, 8 per side):
-- Corner 0: GO (collect $200)
-- Corner 8: Jail
-- Corner 16: Rest Stop (recover shield)
-- Corner 24: Go To Jail
+Board direction: clockwise. Bottom row right→left, left col bottom→top,
+top row left→right, right col top→bottom.
 
-FILE STRUCTURE:
-- index.html — game shell, screens, HUD
-- css/style.css — all styles
-- js/utils.js — constants, skill definitions, board layout, fate cards, helpers
-- js/audio.js — Web Audio SFX + graceful MP3 music discovery
-- js/sprites.js — canvas drawing (dice, tokens, space icons)
-- js/board.js — board renderer (top-down view, click-to-inspect)
-- js/ui.js — all panels/overlays (buy, effect, shield prompt, surrender, how-to-play, settings)
-- js/ai.js — AI decision logic (buy, shield, jail)
-- js/game.js — core game loop, skill effects, turn flow
-- js/app.js — entry point, title screen, event wiring
-- sw.js — service worker (cache-first, skip music)
-- manifest.json — PWA manifest (portrait orientation)
+=====================================
+SKILL SYSTEM
+=====================================
+14 skills in Utils.SKILLS (keyed by id):
+  ATTACK (8): pickpocket, ambush, sabotage, shakedown, jinx, taxman, tollbooth, bounty
+  DEFENSE (6): bodyguard, goldmine, healer, forge, mirror, vault
 
-UI NOTES:
-- No alerts or prompts — all interaction via styled overlay panels
-- Settings cog (top right) opens settings + how-to-play guide
-- Cards strip below board shows owned skills (stacked, clickable)
-- Top HUD shows current player avatar, money, shields, round counter
-- Bottom HUD has dice display with overlaid roll button
+Skill schema: { id, name, type:'attack'|'defense', price, icon, color, desc }
+
+Passive defenses (checked automatically, not triggered by landing):
+  - bodyguard: damageMultiplier = 0.5
+  - mirror: 30% chance reflect attack back at attacker
+  - vault: clampSteal() prevents money dropping below $100
+
+Scaling bonuses on passing START:
+  - goldmine: +$100 per mine owned
+  - forge: +1 shield per forge owned (max 6 shields)
+
+Shield Cards: start with 4, max 6. Block attacks. If 0 shields + 0 money → surrender a skill.
+
+=====================================
+FATE CARDS
+=====================================
+14 cards in Utils.FATE_CARDS, shuffled at game start.
+Actions: gain, pay, moveTo, moveBack, goJail, gainShield, loseShield, discount, gainPerSkill
+Listed in How-to-Play guide.
+
+=====================================
+FILE → FUNCTION MAP
+=====================================
+
+js/utils.js — Constants & helpers
+  Utils.rand(min, max), rollDie(), rollDice() → {d1,d2,total,doubles}
+  Utils.formatMoney(n), wait(ms), shuffle(arr), lerp(), easeOutCubic()
+  Utils.SKILLS, BOARD_SPACES[0..31], FATE_CARDS
+  Utils.getSkillForSpace(idx), getSpaceName(idx), getSpaceColor(idx), getSpaceIcon(idx)
+  Constants: PLAYER_COLORS, PLAYER_NAMES, PLAYER_TOKENS, STARTING_MONEY=1500,
+             STARTING_SHIELDS=4, MAX_ROUNDS=30
+
+js/game.js — Core game loop (Game object)
+  Game.init() — creates initial state
+  Game.startTurn() — routes to AI or human
+  Game.enableRoll(player) — shows roll button, hides on click
+  Game.doRoll(player) — dice animation, movement, landing, doubles logic
+  Game.movePlayer(player, spaces) — step-by-step movement with zoom (200ms/step)
+  Game.passGo(player) — $200 + goldmine/forge bonuses
+  Game.handleLanding(player) — routes to skill/tax/fate/injury/rest handlers
+  Game.handleSkillLanding(player, spaceIdx) — buy unowned or trigger owned skill
+  Game.executeSkillEffect(skill, victim, attacker, damageMultiplier) — all 8 attack effects
+  Game.clampSteal(victim, amount) — respects vault passive
+  Game.checkBankruptcy(player) — money=0 + no skills + no shields = bankrupt
+  Game.handleTax(player, space), handleFate(player), executeFate(player, card)
+  Game.sendToJail(player) — sets position=8, inJail=true
+  Game.handleJail(player) — pay $50 or roll doubles, 3 attempts then forced pay
+  Game.doAITurn(player), nextPlayer(), checkGameEnd(), endGame()
+  Helpers: getActiveCount(), getPlayerSkillCount(idx), getPlayerSkills(idx),
+           hasPassiveSkill(idx, skillId), countOwnedSkillById(idx, skillId)
+
+js/ui.js — All panels & overlays (UI object)
+  UI.init() — caches overlay/panel DOM refs
+  UI.showPanel(html, opts) → panelEl  |  opts: {modal, noClose, onClose}
+  UI.hidePanel()
+  UI.showToast(message, duration=2500)
+  UI.showSettings() — sound/music toggles + how-to-play link
+  UI.showHowToPlay(opts) — full guide: rules, all skills, all fate cards, tips
+  UI.showWelcomePrompt(onDone) — first-game modal
+  UI.showSkillBuyPanel(skill, spaceIdx, player, canAfford, price) → Promise<'buy'|'pass'>
+  UI.showSkillEffectPanel(skill, attackerIdx, message, color) → Promise<void>
+  UI.showShieldPrompt(skill, attackerIdx, player) → Promise<boolean>
+  UI.showSurrenderSkillPanel(player, skills, attackerIdx) → Promise<spaceIdx|null>
+  UI.showFatePanel(card) → Promise<void>
+  UI.showJailPanel(player, canPay) → Promise<'roll'|'pay'>  (displayed as "Hospital")
+  UI.showTaxPanel(space) → Promise<void>
+  UI.showGameOver(players, gameState)
+  UI.showSkillDetailPanel(spaceIdx, gameState) — click-to-inspect from board/strip
+  UI.updateCardsStrip(gameState, playerIndex) — owned skills below board
+  UI.updateHUD(gameState) — top bar + player pips
+
+js/board.js — Canvas board renderer (BoardRenderer object)
+  BoardRenderer.init(canvas) — resize, layout calc, click handler for skill inspect
+  BoardRenderer.resize() — DPR-aware canvas sizing
+  BoardRenderer.calculateLayout() — positions all 32 spaces (corners larger)
+  BoardRenderer.draw(gameState) — full board redraw
+  BoardRenderer.drawCenter(ctx, bpx) — "DICEY" watermark
+  BoardRenderer.drawSpace(ctx, index, gameState) — skill color strip, icon, ownership dot
+  BoardRenderer.drawPlayers(ctx, gameState) — tokens with stacking
+  BoardRenderer.getSpaceCenter(index) → {x,y}
+  BoardRenderer.zoomToSpace(index, scale=1.35) — CSS transform zoom during movement
+  BoardRenderer.zoomReset() — smooth zoom back to 1x
+
+js/sprites.js — Canvas drawing helpers (Sprites object)
+  Sprites.roundRect(ctx, x,y,w,h,r)
+  Sprites.drawDie(ctx, x,y, size, value)
+  Sprites.drawDicePair(ctx, w,h, d1,d2, rolling)
+  Sprites.drawTitleDice(ctx, w,h, frame)
+  Sprites.drawToken(ctx, x,y, radius, playerIndex, token)
+  Sprites.drawSpaceIcon(ctx, x,y, size, type) — handles: go, jail, rest, fate, tax, goToJail
+  Sprites.drawPlayerAvatar(canvas, playerIndex)
+  Standalone: shadeColor(color, percent), lightenColor(color, percent)
+
+js/audio.js — Sound & music (AudioManager object)
+  AudioManager.init() — loads prefs from localStorage, discovers music files
+  AudioManager.discoverMusic() — HEAD requests for music/theme1..10.mp3
+  AudioManager.playMusic(), stopMusic(), toggleMusic() → bool
+  AudioManager.toggleSfx() → bool
+  AudioManager.playSfx(type) — Web Audio synth. Types: roll, coin, buy, pay, jail, win, click
+
+js/ai.js — AI decisions (AI object)
+  AI.shouldBuySkill(player, skill, price, gameState) → bool
+  AI.shouldUseShield(player, skill, gameState) → bool
+  AI.jailDecision(player) → 'roll'|'pay'
+  AI.delay() → Promise (500-1000ms)
+
+js/app.js — Entry point (App object)
+  App.init() — boot AudioManager, UI, title screen, service worker
+  App.setupTitleScreen() — animated dice canvas
+  App.setupEventListeners() — new game, how-to-play, settings buttons
+  App.startNewGame() — switches screens, inits Game + Board, starts music
+
+=====================================
+DISPLAY NAME vs INTERNAL TYPE
+=====================================
+  "START"    → type: 'go'        (corner 0)
+  "Hospital" → type: 'jail'      (corner 8) — recovery mechanic, NOT prison
+  "Rest Stop"→ type: 'rest'      (corner 16)
+  "Injury"   → type: 'goToJail'  (corner 24) — sends to Hospital
+  "Fate"     → type: 'fate'
+  UI says "Hospital/Injury/treatment" but code vars still say jail/sendToJail/inJail
+
+=====================================
+UI PATTERNS
+=====================================
+- No alerts/prompts — all via styled overlay panels
+- Panels return Promises for user choices (buy/pass, shield/hit, roll/pay, etc.)
+- Settings cog (top right) → settings panel → how-to-play sub-panel
+- Roll button: hidden by default, shown via enableRoll(), hidden on click
+- Cards strip below board: stacked mini-cards, click to inspect
+- Movement: 200ms/step, board zooms 1.35x toward player, zooms back after landing
+
+=====================================
+CSS CLASSES OF NOTE
+=====================================
+.guide-skill-row, .guide-skill-icon — how-to-play skill entries
+.mini-card, .mini-card-color, .mini-card-name, .mini-card-type — owned skill strip
+.detail-card, .detail-card-banner, .detail-card-body — large skill inspect panel
+.surrender-skill-btn — skill surrender list items
+.shield-prompt-row — shield use/decline buttons
+.panel, .panel-header, .panel-body, .panel-footer — all overlay panels
+.setting-row, .toggle — settings panel rows
+
+=====================================
+PWA
+=====================================
+- manifest.json: portrait orientation, standalone display
+- sw.js: cache-first (CACHE_NAME = 'dicey-v5'), skips /music/ requests
+- Music: optional mp3s at music/theme1..5.mp3, discovered via HEAD requests
+
+=====================================
+HOW TO ASK FOR ai.txt IN FUTURE PROJECTS
+=====================================
+"Create an ai.txt that maps every file's purpose, lists all exported/global
+functions with their signatures and return types, documents the main state
+shape, and notes any display-name vs internal-name mismatches. The goal is
+for a future AI session to find the right function to modify without reading
+every source file."

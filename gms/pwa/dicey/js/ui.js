@@ -119,7 +119,7 @@ const UI = {
                         <h3>🎲 Your Turn</h3>
                         <div class="guide-step"><div class="guide-num">1</div><div class="guide-text">Tap <strong>Roll Dice</strong> to move around the board.</div></div>
                         <div class="guide-step"><div class="guide-num">2</div><div class="guide-text">Land on a skill space to <strong>buy it</strong> or trigger its effect.</div></div>
-                        <div class="guide-step"><div class="guide-num">3</div><div class="guide-text"><strong>Doubles</strong> = extra turn. Three doubles in a row = Jail!</div></div>
+                        <div class="guide-step"><div class="guide-num">3</div><div class="guide-text"><strong>Doubles</strong> = extra turn. Three doubles in a row = Injury!</div></div>
                     </div>
                     <div class="panel-section">
                         <h3>🛡️ Shield Cards</h3>
@@ -140,18 +140,24 @@ const UI = {
                     <div class="panel-section">
                         <h3>📋 Other Spaces</h3>
                         <div class="guide-icon-row">
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#2ecc71"></div> GO — Collect $200+</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#2ecc71"></div> START — Collect $200+</div>
                             <div class="guide-icon-item"><div class="gi-color" style="background:#9b59b6"></div> Fate — Random event</div>
                             <div class="guide-icon-item"><div class="gi-color" style="background:#f39c12"></div> Rest Stop — +1 Shield</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#95a5a6"></div> Jail — Visit or stuck</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Toll/Market — Pay tax</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Hospital — Recover here</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Injury — Sent to Hospital</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e67e22"></div> Toll/Market — Pay tax</div>
                         </div>
+                    </div>
+                    <div class="panel-section">
+                        <h3>🔮 Fate Cards</h3>
+                        <p style="margin-bottom:8px;">Landing on a Fate space draws a random card from the shuffled deck:</p>
+                        ${Utils.FATE_CARDS.map(c => '<div style="font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);">• ' + c.text + '</div>').join('')}
                     </div>
                     <div class="panel-section">
                         <h3>💡 Tips</h3>
                         <p>• Bodyguard halves all attack damage — great first buy<br>
                         • Gold Mine stacks — 2 mines = +$200 extra at GO<br>
-                        • Save shields for devastating attacks like Ambush & Jinx<br>
+                        • Save shields for devastating attacks like Ambush & Jinx (Injury)<br>
                         • Vault protects your last $100 from any attack</p>
                     </div>
                 </div>
@@ -333,9 +339,9 @@ const UI = {
         return new Promise(resolve => {
             const html = `
                 <div class="panel">
-                    <div class="panel-header"><h2>🔒 In Jail!</h2><p class="panel-subtitle">Attempt ${player.jailTurns + 1} of 3</p></div>
+                    <div class="panel-header"><h2>🏥 In Hospital!</h2><p class="panel-subtitle">Recovery attempt ${player.jailTurns + 1} of 3</p></div>
                     <div class="panel-body" style="text-align:center;">
-                        <p style="color:var(--text-dim);font-size:14px;">Roll doubles to escape, or pay $50 bail.</p>
+                        <p style="color:var(--text-dim);font-size:14px;">Roll doubles to recover, or pay $50 for treatment.</p>
                     </div>
                     <div class="panel-footer">
                         <button class="btn btn-primary" id="btn-jail-roll">Roll Dice</button>

@@ -149,38 +149,30 @@ const Sprites = {
 
         switch (type) {
             case 'go':
-                ctx.font = `bold ${size * 0.5}px sans-serif`;
+                ctx.font = `bold ${size * 0.32}px sans-serif`;
                 ctx.fillStyle = '#2ecc71';
-                ctx.fillText('GO', x, y - size * 0.1);
-                // Arrow
+                ctx.fillText('START', x, y - size * 0.1);
+                // Arrow pointing left (←)
                 ctx.fillStyle = '#2ecc71';
                 ctx.beginPath();
-                ctx.moveTo(x - size * 0.25, y + size * 0.2);
-                ctx.lineTo(x + size * 0.15, y + size * 0.2);
-                ctx.lineTo(x + size * 0.15, y + size * 0.12);
-                ctx.lineTo(x + size * 0.3, y + size * 0.25);
-                ctx.lineTo(x + size * 0.15, y + size * 0.38);
-                ctx.lineTo(x + size * 0.15, y + size * 0.3);
-                ctx.lineTo(x - size * 0.25, y + size * 0.3);
+                ctx.moveTo(x + size * 0.25, y + size * 0.2);
+                ctx.lineTo(x - size * 0.15, y + size * 0.2);
+                ctx.lineTo(x - size * 0.15, y + size * 0.12);
+                ctx.lineTo(x - size * 0.3, y + size * 0.25);
+                ctx.lineTo(x - size * 0.15, y + size * 0.38);
+                ctx.lineTo(x - size * 0.15, y + size * 0.3);
+                ctx.lineTo(x + size * 0.25, y + size * 0.3);
                 ctx.closePath();
                 ctx.fill();
                 break;
 
             case 'jail':
-                // Bars
-                ctx.strokeStyle = '#95a5a6';
-                ctx.lineWidth = 2;
-                for (let i = -1; i <= 1; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(x + i * size * 0.15, y - size * 0.25);
-                    ctx.lineTo(x + i * size * 0.15, y + size * 0.25);
-                    ctx.stroke();
-                }
-                ctx.strokeStyle = '#95a5a6';
-                ctx.beginPath();
-                ctx.moveTo(x - size * 0.22, y);
-                ctx.lineTo(x + size * 0.22, y);
-                ctx.stroke();
+                // Hospital - cross icon
+                ctx.font = `${size * 0.4}px sans-serif`;
+                ctx.fillText('🏥', x, y - size * 0.08);
+                ctx.font = `bold ${size * 0.13}px sans-serif`;
+                ctx.fillStyle = '#e74c3c';
+                ctx.fillText('HOSPITAL', x, y + size * 0.2);
                 break;
 
             case 'rest':
@@ -211,13 +203,11 @@ const Sprites = {
                 break;
 
             case 'goToJail':
-                ctx.font = `bold ${size * 0.22}px sans-serif`;
+                ctx.font = `${size * 0.35}px sans-serif`;
+                ctx.fillText('🤕', x, y - size * 0.08);
+                ctx.font = `bold ${size * 0.17}px sans-serif`;
                 ctx.fillStyle = '#e74c3c';
-                ctx.fillText('GO TO', x, y - size * 0.12);
-                ctx.fillText('JAIL', x, y + size * 0.12);
-                // Handcuff icon
-                ctx.font = `${size * 0.3}px sans-serif`;
-                ctx.fillText('👮', x, y + size * 0.35);
+                ctx.fillText('INJURY', x, y + size * 0.22);
                 break;
         }
 

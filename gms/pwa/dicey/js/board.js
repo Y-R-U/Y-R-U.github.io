@@ -11,6 +11,7 @@ const BoardRenderer = {
     cellSize: 0,
     boardPx: 0,
     cornerSize: 0,
+    ZOOM_SCALE: 1.35,
 
     init(canvas) {
         this.canvas = canvas;
@@ -46,11 +47,14 @@ const BoardRenderer = {
         const size = Math.min(maxW, maxH);
 
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = size * dpr;
-        this.canvas.height = size * dpr;
+        // Render at zoom-scale resolution so zoomed view shows native pixels
+        // and default view is a clean downsample (both sharp)
+        const renderScale = dpr * this.ZOOM_SCALE;
+        this.canvas.width = size * renderScale;
+        this.canvas.height = size * renderScale;
         this.canvas.style.width = size + 'px';
         this.canvas.style.height = size + 'px';
-        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
 
         this.boardPx = size;
         this.calculateLayout();
@@ -220,9 +224,12 @@ const BoardRenderer = {
     },
 
     drawPlayers(ctx, gameState) {
+        const anim = this._animToken;
         const posGroups = {};
         gameState.players.forEach((p, i) => {
             if (p.bankrupt) return;
+            // Skip the animating player from normal grouping
+            if (anim && anim.playerIndex === i) return;
             if (!posGroups[p.position]) posGroups[p.position] = [];
             posGroups[p.position].push(i);
         });
@@ -241,7 +248,17 @@ const BoardRenderer = {
                 Sprites.drawToken(ctx, cx + Math.cos(angle) * spread, cy + Math.sin(angle) * spread, tokenR, pi, Utils.PLAYER_TOKENS[pi]);
             });
         }
+
+        // Draw animating player at interpolated position
+        if (anim) {
+            const refPos = this.spacePositions[0];
+            const tokenR = Math.min(refPos.w, refPos.h) * 0.17;
+            Sprites.drawToken(ctx, anim.x, anim.y, tokenR, anim.playerIndex, Utils.PLAYER_TOKENS[anim.playerIndex]);
+        }
     },
+
+    // Animation state for smooth token movement
+    _animToken: null,  // { playerIndex, x, y } when animating
 
     getSpaceCenter(index) {
         const pos = this.spacePositions[index];
@@ -249,16 +266,46 @@ const BoardRenderer = {
         return { x: pos.x + pos.w / 2, y: pos.y + pos.h / 2 };
     },
 
-    zoomToSpace(index, scale = 1.35) {
+    // Smoothly slide a token from one space to the next over `duration` ms
+    animateStep(playerIndex, fromIdx, toIdx, duration, gameState) {
+        return new Promise(resolve => {
+            const from = this.getSpaceCenter(fromIdx);
+            const to = this.getSpaceCenter(toIdx);
+            const start = performance.now();
+
+            const tick = (now) => {
+                const elapsed = now - start;
+                const t = Math.min(elapsed / duration, 1);
+                const eased = Utils.easeOutCubic(t);
+
+                this._animToken = {
+                    playerIndex,
+                    x: Utils.lerp(from.x, to.x, eased),
+                    y: Utils.lerp(from.y, to.y, eased)
+                };
+
+                this.draw(gameState);
+
+                if (t < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    this._animToken = null;
+                    resolve();
+                }
+            };
+            requestAnimationFrame(tick);
+        });
+    },
+
+    zoomToSpace(index) {
         const center = this.getSpaceCenter(index);
         const canvas = this.canvas;
-        const rect = canvas.getBoundingClientRect();
         // Compute percentage offsets for transform-origin
         const pctX = (center.x / this.boardPx) * 100;
         const pctY = (center.y / this.boardPx) * 100;
         canvas.style.transformOrigin = `${pctX}% ${pctY}%`;
         canvas.style.transition = 'transform 0.35s ease-out';
-        canvas.style.transform = `scale(${scale})`;
+        canvas.style.transform = `scale(${this.ZOOM_SCALE})`;
     },
 
     zoomReset() {

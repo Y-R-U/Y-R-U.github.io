@@ -97,6 +97,7 @@ const Game = {
         rollBtn.textContent = player.inJail ? 'In Jail...' : 'Roll Dice';
         rollBtn.disabled = false;
         rollBtn.onclick = async () => {
+            rollBtn.style.display = 'none';
             rollBtn.disabled = true;
             if (player.inJail) {
                 await this.handleJail(player);
@@ -129,7 +130,7 @@ const Game = {
         if (roll.doubles) {
             player.doublesCount++;
             if (player.doublesCount >= 3) {
-                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled 3 doubles — Jail!`);
+                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled 3 doubles — Injured!`);
                 await Utils.wait(600);
                 this.sendToJail(player);
                 BoardRenderer.draw(this.state);
@@ -160,6 +161,8 @@ const Game = {
             return;
         }
 
+        // Hide roll button at end of turn
+        document.getElementById('btn-roll').style.display = 'none';
         UI.updateCardsStrip(this.state, 0);
         this.nextPlayer();
     },
@@ -169,13 +172,19 @@ const Game = {
     async movePlayer(player, spaces) {
         // Zoom toward the player's current position
         BoardRenderer.zoomToSpace(player.position);
-        await Utils.wait(350);
+        await Utils.wait(250);
 
         for (let i = 0; i < spaces; i++) {
-            player.position = (player.position + 1) % 32;
-            BoardRenderer.zoomToSpace(player.position);
+            const fromIdx = player.position;
+            const toIdx = (player.position + 1) % 32;
+
+            // Update zoom target to the next space
+            BoardRenderer.zoomToSpace(toIdx);
+
+            // Smoothly slide the token from current to next space
+            await BoardRenderer.animateStep(player.index, fromIdx, toIdx, 180, this.state);
+            player.position = toIdx;
             BoardRenderer.draw(this.state);
-            await Utils.wait(200);
 
             if (player.position === 0 && i < spaces - 1) {
                 this.passGo(player);
@@ -208,7 +217,7 @@ const Game = {
 
         player.money += bonus;
         AudioManager.playSfx('coin');
-        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed GO! +${Utils.formatMoney(bonus)}`);
+        UI.showToast(`${Utils.PLAYER_NAMES[player.index]} passed START! +${Utils.formatMoney(bonus)}`);
         UI.updateHUD(this.state);
     },
 
@@ -229,7 +238,7 @@ const Game = {
                 await this.handleFate(player);
                 break;
             case 'goToJail':
-                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} goes to Jail!`);
+                UI.showToast(`${Utils.PLAYER_NAMES[player.index]} is injured! Off to Hospital!`);
                 await Utils.wait(600);
                 this.sendToJail(player);
                 AudioManager.playSfx('jail');
@@ -487,7 +496,7 @@ const Game = {
             case 'jinx': {
                 this.sendToJail(victim);
                 AudioManager.playSfx('jail');
-                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Jinx sends ${Utils.PLAYER_NAMES[victim.index]} to Jail!`;
+                const msg = `${Utils.PLAYER_NAMES[attacker.index]}'s Jinx injures ${Utils.PLAYER_NAMES[victim.index]}! Off to Hospital!`;
                 if (!victim.isAI) {
                     await UI.showSkillEffectPanel(skill, attacker.index, msg, '#8e44ad');
                 } else {
@@ -667,7 +676,7 @@ const Game = {
         if (player.isAI) {
             await AI.delay();
             decision = AI.jailDecision(player);
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} ${decision === 'pay' ? 'pays bail' : 'tries to roll doubles'}`);
+            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} ${decision === 'pay' ? 'pays treatment' : 'tries to roll doubles'}`);
             await Utils.wait(500);
         } else {
             decision = await UI.showJailPanel(player, player.money >= 50);
@@ -697,7 +706,7 @@ const Game = {
         if (roll.doubles) {
             player.inJail = false;
             player.jailTurns = 0;
-            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled doubles and escaped!`);
+            UI.showToast(`${Utils.PLAYER_NAMES[player.index]} rolled doubles and recovered!`);
             await Utils.wait(600);
             this.state.lastRoll = roll;
             await this.movePlayer(player, roll.total);
@@ -711,7 +720,7 @@ const Game = {
                 player.jailTurns = 0;
                 if (player.money < 0) player.money = 0;
                 this.checkBankruptcy(player);
-                UI.showToast('Forced to pay $50 bail');
+                UI.showToast('Forced to pay $50 treatment');
                 await Utils.wait(500);
                 this.state.lastRoll = roll;
                 await this.movePlayer(player, roll.total);

@@ -54,7 +54,7 @@ const Utils = {
         ambush:       { id: 'ambush',       name: 'Ambush',        type: 'attack',  price: 150, icon: '⚔️', color: '#c0392b', desc: 'Steal a random skill from the victim. If they have none, steal $200.' },
         sabotage:     { id: 'sabotage',     name: 'Sabotage',      type: 'attack',  price: 120, icon: '💣', color: '#e67e22', desc: 'Victim loses half their cash (rounded down to nearest $50).' },
         shakedown:    { id: 'shakedown',    name: 'Shakedown',     type: 'attack',  price: 180, icon: '🔪', color: '#d35400', desc: 'Steal a Shield Card from the victim. If none left, steal $300.' },
-        jinx:         { id: 'jinx',         name: 'Jinx',          type: 'attack',  price: 80,  icon: '🧿', color: '#8e44ad', desc: 'Send the victim directly to Jail. Do not pass GO.' },
+        jinx:         { id: 'jinx',         name: 'Jinx',          type: 'attack',  price: 80,  icon: '🧿', color: '#8e44ad', desc: 'Injure the victim — sent directly to Hospital. Do not pass START.' },
         taxman:       { id: 'taxman',       name: 'Tax Collector', type: 'attack',  price: 200, icon: '📋', color: '#e74c3c', desc: 'Victim pays tax: $50 for each skill they own.' },
         bodyguard:    { id: 'bodyguard',    name: 'Bodyguard',     type: 'defense', price: 100, icon: '🛡️', color: '#2980b9', desc: 'Passive: When you land on an attack, reduce damage by 50%.' },
         goldmine:     { id: 'goldmine',     name: 'Gold Mine',     type: 'defense', price: 150, icon: '⛏️', color: '#f39c12', desc: 'Each time you pass GO, collect an extra $100 per Gold Mine owned.' },
@@ -70,7 +70,7 @@ const Utils = {
     // Skill spaces reference a skill ID
     BOARD_SPACES: [
         // Bottom row (right to left): 0-7
-        { type: 'go', name: 'GO', desc: 'Collect $200' },                                    // 0 corner
+        { type: 'go', name: 'START', desc: 'Collect $200' },                                   // 0 corner
         { type: 'skill', skillId: 'pickpocket' },                                             // 1
         { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 2
         { type: 'skill', skillId: 'bodyguard' },                                              // 3
@@ -79,7 +79,7 @@ const Utils = {
         { type: 'skill', skillId: 'ambush' },                                                 // 6
         { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 7
         // Left column (bottom to top): 8-15
-        { type: 'jail', name: 'Jail', desc: 'Just Visiting' },                                // 8 corner
+        { type: 'jail', name: 'Hospital', desc: 'Just Visiting' },                             // 8 corner
         { type: 'skill', skillId: 'sabotage' },                                               // 9
         { type: 'skill', skillId: 'healer' },                                                 // 10
         { type: 'skill', skillId: 'shakedown' },                                              // 11
@@ -97,7 +97,7 @@ const Utils = {
         { type: 'skill', skillId: 'bounty' },                                                 // 22
         { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 23
         // Right column (top to bottom): 24-31
-        { type: 'goToJail', name: 'Go To Jail', desc: 'Go directly to Jail!' },               // 24 corner
+        { type: 'goToJail', name: 'Injury', desc: 'Go directly to Hospital!' },               // 24 corner
         { type: 'skill', skillId: 'pickpocket' },                                             // 25
         { type: 'skill', skillId: 'bodyguard' },                                              // 26
         { type: 'fate', name: 'Fate', desc: 'Draw a fate card' },                             // 27
@@ -109,10 +109,10 @@ const Utils = {
 
     // Fate cards replace chance/community
     FATE_CARDS: [
-        { text: 'Advance to GO! Collect $200.', action: 'moveTo', value: 0 },
+        { text: 'Advance to START! Collect $200.', action: 'moveTo', value: 0 },
         { text: 'A mysterious benefactor gives you $200!', action: 'gain', value: 200 },
         { text: 'Go back 3 spaces.', action: 'moveBack', value: 3 },
-        { text: 'Caught trespassing! Go directly to Jail.', action: 'goJail' },
+        { text: 'Suffered an injury! Go directly to Hospital.', action: 'goJail' },
         { text: 'Found a lost wallet! Collect $100.', action: 'gain', value: 100 },
         { text: 'Equipment repair costs. Pay $75.', action: 'pay', value: 75 },
         { text: 'Won a tournament! Collect $150.', action: 'gain', value: 150 },
