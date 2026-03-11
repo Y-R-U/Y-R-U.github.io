@@ -11,6 +11,7 @@ const BoardRenderer = {
     cellSize: 0,
     boardPx: 0,
     cornerSize: 0,
+    ZOOM_SCALE: 1.35,
 
     init(canvas) {
         this.canvas = canvas;
@@ -46,11 +47,14 @@ const BoardRenderer = {
         const size = Math.min(maxW, maxH);
 
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = size * dpr;
-        this.canvas.height = size * dpr;
+        // Render at zoom-scale resolution so zoomed view shows native pixels
+        // and default view is a clean downsample (both sharp)
+        const renderScale = dpr * this.ZOOM_SCALE;
+        this.canvas.width = size * renderScale;
+        this.canvas.height = size * renderScale;
         this.canvas.style.width = size + 'px';
         this.canvas.style.height = size + 'px';
-        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
 
         this.boardPx = size;
         this.calculateLayout();
@@ -293,16 +297,15 @@ const BoardRenderer = {
         });
     },
 
-    zoomToSpace(index, scale = 1.35) {
+    zoomToSpace(index) {
         const center = this.getSpaceCenter(index);
         const canvas = this.canvas;
-        const rect = canvas.getBoundingClientRect();
         // Compute percentage offsets for transform-origin
         const pctX = (center.x / this.boardPx) * 100;
         const pctY = (center.y / this.boardPx) * 100;
         canvas.style.transformOrigin = `${pctX}% ${pctY}%`;
         canvas.style.transition = 'transform 0.35s ease-out';
-        canvas.style.transform = `scale(${scale})`;
+        canvas.style.transform = `scale(${this.ZOOM_SCALE})`;
     },
 
     zoomReset() {
