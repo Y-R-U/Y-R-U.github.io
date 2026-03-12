@@ -1,7 +1,7 @@
 // Service Worker for Sudoku PWA
 // Strategy: Cache-first with background update (stale-while-revalidate)
 
-const CACHE_NAME = 'sudoku-v2';
+const CACHE_NAME = 'sudoku-v3';
 const APP_SHELL = [
   './',
   './index.html',
