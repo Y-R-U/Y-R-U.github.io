@@ -1,0 +1,248 @@
+================================================================================
+Idle Transport Empire - AI Documentation
+================================================================================
+Built with Babylon.js 8.x, vanilla JS, HTML5/CSS3
+PWA-enabled mobile-first idle clicker game
+
+================================================================================
+PROJECT STRUCTURE
+================================================================================
+
+index.html          - Main HTML + all CSS (inline styles, dark theme)
+manifest.json       - PWA manifest (standalone, portrait)
+sw.js               - Service worker (cache-first local, network-first CDN)
+
+js/
+  config.js         - Game definitions (routes, upgrades, achievements, events)
+  state.js          - Game state management, save/load, import/export
+  economy.js        - Economy engine (costs, earnings, prestige multipliers)
+  scene.js          - Babylon.js 3D scene (rooms, vehicles, camera, scrolling)
+  ui.js             - UI manager (tabs, modals, route cards, progress bars)
+  actions.js        - Player actions (buy, collect, prestige, achievements)
+  events.js         - Random events system (30-90s interval)
+  audio.js          - Music rotation + Web Audio API synthesized SFX
+  utils.js          - Utility functions (formatting, toasts, modals, math)
+  main.js           - Game loop, PWA install, tutorial, bootstrap
+
+assets/
+  vehicles/         - 18 GLB vehicle models (Kenney car-kit)
+    Textures/       - colormap.png shared texture for all GLBs
+  characters/       - 2 GLB character models (Kenney mini-characters)
+  space/            - 6 GLB space props (Kenney space-kit)
+
+icons/              - PWA icons (192x192, 512x512)
+music/              - Background music tracks (theme1-5.mp3)
+
+================================================================================
+ARCHITECTURE
+================================================================================
+
+Game Loop (main.js gameLoop):
+  - Ticks route progress (dt accumulation)
+  - Managed routes auto-collect, unmanaged wait for player tap
+  - Updates Scene.update(dt) for vehicle animation + camera smoothing
+  - Renders UI at 4Hz (HUD, bars, bonus bar) and 1Hz (full pane)
+  - Auto-saves every 15 seconds
+
+State (state.js):
+  - Global G object holds all game state
+  - localStorage persistence with JSON serialization
+  - Base64 export/import for cloud saves
+  - Offline earnings (50% efficiency, 8hr cap)
+
+Economy (economy.js):
+  - Exponential cost scaling: baseCost * costMul^level * prestigeCostMul
+  - Prestige multipliers: earnings, speed, click, start money, cost reduction
+  - Vehicle count scales with level: 1/10/25/50 -> 1/2/3/4 trucks
+  - Bonus stacking from events (time-limited multipliers)
+
+Scene (scene.js):
+  - ArcRotateCamera front-facing cross-section (Fallout Shelter style)
+  - Rooms stacked vertically with ROOM_HEIGHT + ROOM_GAP spacing
+  - Each room: back wall, floor, ceiling beam, road surface, dashed lines,
+    source/destination buildings with roofs + doors, accent markers, props
+  - GLB vehicle loading with clone-based spawning
+  - Touch scroll with momentum + mouse wheel support
+  - Tap-to-earn on viewport with floating earn numbers
+
+================================================================================
+FUNCTION REFERENCE
+================================================================================
+
+-- config.js --
+ROUTES[]              - Array of route definitions
+  .id                 - Unique identifier (mine, farm, factory, etc.)
+  .name               - Display name
+  .icon               - Emoji icon
+  .from / .to         - Source and destination names
+  .desc               - Description text
+  .baseEarn           - Base earnings per delivery
+  .baseTime           - Base time per delivery (seconds)
+  .baseCost           - Base cost for first level
+  .costMul            - Cost multiplier per level (exponential)
+  .unlockCost         - Cost to unlock this route
+  .vehicle            - GLB filename for 3D model
+  .roomColor[]        - RGB array for back wall color
+  .floorColor[]       - RGB array for floor color
+  .accentColor[]      - RGB array for accent/building color
+
+UPGRADES[]            - Array of upgrade definitions
+  .id                 - Unique identifier
+  .name / .icon       - Display name and emoji
+  .desc               - Description text
+  .type               - click | speed | earn | manager
+  .mul                - Multiplier value
+  .target             - Route id, 'all', or array of route ids
+  .cost               - Purchase price
+
+ACHIEVEMENTS[]        - Array of achievement definitions
+  .id / .name / .icon - Identifiers
+  .desc               - Description
+  .check(stats)       - Function returning boolean
+
+EVENTS[]              - Array of random event definitions
+  .text / .icon       - Display text and emoji
+  .dur                - Banner display duration (seconds)
+  .effect             - cash | earn | speed | click
+  .mul                - Effect multiplier
+  .bonusDur           - Duration for timed bonuses (seconds)
+
+PRESTIGE_DEFS[]       - Array of prestige upgrade definitions
+  .id / .name         - Identifiers
+  .desc               - Description
+  .cost               - EP cost per level
+  .max                - Maximum level
+
+Scene constants:
+  ROOM_WIDTH    = 22
+  ROOM_HEIGHT   = 3.2
+  ROOM_GAP      = 0.3
+  ROOM_DEPTH    = 5
+  ROAD_START_X  = -8
+  ROAD_END_X    = 8
+
+-- state.js --
+newState()            - Returns fresh game state object
+saveGame()            - Serializes G to localStorage
+loadGame()            - Deserializes from localStorage, returns bool
+exportSave()          - Returns base64 string of save data
+importSave(data)      - Imports base64 save string, returns bool
+hardReset()           - Clears all progress
+calcOfflineEarnings() - Calculates earnings since last online (50% rate, 8hr cap)
+
+-- economy.js --
+pLv(id)               - Get prestige upgrade level for given id
+pEarnMul()            - Prestige earning multiplier (1 + level * 0.25)
+pSpeedMul()           - Prestige speed multiplier (1 - level * 0.10, min 0.1)
+pClickMul()           - Prestige click multiplier (1 + level * 0.50)
+pStartMoney()         - Prestige starting money (level * 500)
+pCostMul()            - Prestige cost reduction (1 - level * 0.05, min 0.5)
+getClickVal()         - Current click value with all multipliers
+getRouteEarn(rid)     - Route earnings with upgrades + prestige + bonuses
+getRouteTime(rid)     - Route time with upgrades + prestige + bonuses (min 0.5s)
+getRouteCost(rid)     - Cost for next level of route
+getBulkCost(rid, n)   - Cost for buying n levels at once
+hasManager(rid)       - Whether route has a manager upgrade purchased
+getPerSec()           - Total per-second income from all managed routes
+getPrestigeEarnable() - EP earnable = floor(sqrt(totalEarned / 1M))
+getStats()            - Returns object with all tracked statistics
+getVehicleCount(lv)   - Vehicle count for level: 0/1/2/3/4
+
+-- scene.js --
+Scene.init()                    - Initialize Babylon engine, scene, camera, lights
+Scene.buildAllRooms()           - Build/rebuild all room geometry
+Scene.loadVehicle(filename)     - Load GLB vehicle model (async, cached)
+Scene.loadRouteVehicles()       - Load all needed vehicle GLBs (async)
+Scene.spawnVehiclesForRoom(room)- Create vehicle clones for a room
+Scene.refreshRoomVehicles()     - Respawn vehicles for all rooms
+Scene.update(dt)                - Per-frame update (camera, vehicle animation)
+Scene.scrollToRoom(idx)         - Scroll camera to show specific room
+Scene.rebuildScene()            - Full rebuild (rooms + vehicles) after changes
+
+-- ui.js --
+UI.init()               - Bind tabs, modals, settings
+UI.updateHUD()          - Update money, per-sec, prestige points, tap prompt
+UI.updateBars()         - Update route progress bars (called at 4Hz)
+UI.updateBonusBar()     - Update active bonus display
+UI.fullRender()         - Full UI refresh (settings + HUD + active pane)
+UI.renderPane()         - Render current active tab
+UI.renderRoutes()       - Render routes tab with cards, progress, buy buttons
+UI.renderUpgrades()     - Render upgrades tab with purchase cards
+UI.renderPrestige()     - Render prestige tab with EP, upgrades, bonuses
+UI.renderAchieve()      - Render achievements tab with unlock status
+UI.renderStats()        - Render stats modal content
+UI.showConfirm(t,m,cb)  - Show confirmation modal
+
+-- actions.js --
+collectRoute(rid)       - Collect earnings from a ready route
+buyRoute(rid)           - Buy one level for a route
+buyRouteBulk(rid, n)    - Buy n levels for a route
+unlockRoute(rid)        - Unlock a new route
+buyUpgrade(uid)         - Purchase an upgrade
+buyPrestigeUpg(pid)     - Purchase a prestige upgrade
+doPrestige()            - Trigger prestige reset with confirmation
+selectRoute(idx)        - Select and scroll to a route
+checkAchievements()     - Check and award any newly earned achievements
+
+-- events.js --
+scheduleEvent()         - Schedule next random event (30-90s from now)
+tickEvents()            - Check if event should fire (called from game loop)
+fireEvent(evt)          - Display event banner with countdown
+applyEvent(evt)         - Apply event effect (cash bonus or timed multiplier)
+
+-- audio.js --
+Audio.init()            - Probe available music files, setup AudioContext
+Audio.resume()          - Resume AudioContext on first user interaction
+Audio.playMusic()       - Start playing random music track
+Audio.stopMusic()       - Stop current music
+Audio.setMusicVol(v)    - Set music volume (0-1)
+Audio.sfx(name)         - Play synthesized sound effect
+  Sounds: click, buy, earn, prestige, achievement, event
+
+-- utils.js --
+fmtMoney(n)             - Format number as money ($1.23, $50.0K, $1.2M, etc.)
+fmtNum(n)               - Format number without $ prefix
+fmtTime(s)              - Format seconds as time string (3s, 2m 30s, 1h 5m)
+showToast(msg, type)    - Show temporary toast notification
+openModal(id)           - Open modal by element id
+closeModal(id)          - Close modal by element id
+lerp(a, b, t)           - Linear interpolation
+clamp(v, min, max)      - Clamp value to range
+
+-- main.js --
+gameLoop()              - Main requestAnimationFrame loop
+init()                  - Bootstrap: load save, init systems, show loading bar
+
+================================================================================
+GAME DESIGN
+================================================================================
+
+8 Routes (in unlock order):
+  1. Mine Haul       - Mine to Smelter         (truck.glb)
+  2. Farm Delivery   - Farm to Market           (van.glb)
+  3. Factory Line    - Factory to Warehouse     (delivery.glb)
+  4. Oil Pipeline    - Refinery to Gas Station  (truck-flat.glb)
+  5. Tech Express    - Lab to Data Center       (sedan-sports.glb)
+  6. Luxury Courier  - Boutique to Mansion      (suv-luxury.glb)
+  7. Military Supply - Base to Outpost          (ambulance.glb)
+  8. Space Freight   - Launchpad to Station     (race-future.glb)
+
+20 Upgrades (4 categories):
+  - 4 Click upgrades (2x, 3x, 5x, 10x multipliers)
+  - 4 Speed upgrades (0.8x time multipliers)
+  - 4 Earning upgrades (2x, 3x multipliers)
+  - 8 Manager upgrades (one per route, enables auto-collection)
+
+5 Prestige Upgrades (with max levels):
+  - Earnings Boost (max 10) - +25% per level
+  - Speed Boost (max 8) - -10% time per level
+  - Click Power (max 10) - +50% per level
+  - Start Capital (max 5) - +$500 per level
+  - Cost Reduction (max 10) - -5% costs per level
+
+20 Achievements (milestone-based):
+  - Earning milestones, route counts, click counts, level milestones, etc.
+
+Random Events (30-90s interval):
+  - Bonus Truck (cash), Ad Deal (2x earn), Gold Rush (cash)
+  - VIP Client (3x earn), Turbo (3x speed), Click Frenzy (5x click)
