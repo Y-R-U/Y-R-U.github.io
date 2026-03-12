@@ -1,0 +1,115 @@
+# Sudoku PWA – AI Context File
+# Read this file at the start of a session instead of re-reading all source files.
+# Path: gms/pwa/sudoku/
+
+## FILE STRUCTURE
+gms/pwa/sudoku/
+├── index.html          – Single-page app shell; all CSS is inline (lines 11-151); HTML body lines 153-296
+├── manifest.json       – PWA manifest (name, icons, display:standalone, theme:#4a90e2)
+├── sw.js               – Service worker; cache-first strategy; cache key 'sudoku-v2'
+├── icon-512.png        – App icon
+├── js/
+│   ├── game.js         – SudokuGame class (main controller, ~491 lines)
+│   ├── engine.js       – SudokuEngine class (puzzle gen & validation, ~151 lines)
+│   ├── panels.js       – PanelManager class (settings/stats/help overlays, ~105 lines)
+│   └── audio.js        – AudioManager class (music + Web Audio SFX, ~158 lines)
+└── music/
+    └── .gitkeep        – Placeholder; add theme1.mp3–theme10.mp3 here for background music
+
+## CSS KEY CLASSES (index.html inline styles)
+.container          – White card, max-width 600px, flex column, gap 12px
+.header             – Flex row; h1 centered; .header-icons abs-right (stats + settings buttons)
+.difficulty         – CSS grid 3×2 (grid-template-columns:repeat(3,1fr)); 6 diff buttons
+.diff-btn           – Difficulty button; 14px vertical padding; min-height 48px; uppercase
+.diff-btn.active    – Blue fill (#4a90e2) when selected
+.message            – Status bar; hidden by default; .error (red) / .success (green)
+.game-container     – aspect-ratio:1; holds .grid
+.grid               – CSS grid 9×9; border 3px #333; thick borders on box edges via nth-child
+.cell               – Sudoku cell; .given (grey bg), .filled (blue text), .selected (blue ring),
+                      .conflict (red bg), .same-number-highlight (yellow bg)
+.cell-notes         – 3×3 absolute overlay inside a cell for pencil marks
+.popup              – Full-screen overlay for number/note picker (position:fixed, z-index:1000)
+.panel-overlay      – Full-screen overlay for settings/stats/help (z-index:2000)
+
+## LOCALSTORAGE KEYS
+'sudokuGame2'       – Serialized game state (grid, solution, given, level, history, notes, stats)
+'sudokuAudio'       – Audio settings (music: bool, sound: bool)
+
+## js/game.js – SudokuGame
+State: this.grid[81], this.solution[81], this.given[81], this.level (string),
+       this.history[], this.notes{index:[pos]}, this.stats{level:count}
+
+constructor()                     – Init state + new SudokuEngine / AudioManager / PanelManager
+init()                            – Bind all event listeners, createGrid(), loadGame()
+createGrid()                      – Build 81 .cell divs with click + long-press handlers
+newGame()                         – engine.generatePuzzle(level) → reset state → render()
+changeDifficulty(level)           – Set this.level, toggle .active on buttons, newGame()
+selectCell(index)                 – Select cell; auto-fill last number if valid; else showPopup()
+showPopup()                       – Render 3×3 number picker or note-position picker into #popup
+closePopup()                      – Hide popup, resetNotesUI()
+toggleNotesMode()                 – Flip this.notesMode; update Notes button style
+selectNotePosition(pos)           – Store note position, switch popup to number-pick phase
+placeNote(num)                    – Add num at note position in this.notes[cell]; render()
+clearNote(pos)                    – Remove note entry; render()
+resetNotesUI()                    – Clear notePhase / selectedNotePos state
+placeNumber(num)                  – Write to grid, push history, render(), checkSolution()
+handleClear()                     – Clear selected cell value or toggle note-clear mode
+undo()                            – Pop history, restore grid entry, render()
+isComplete()                      – Returns bool: all 81 cells non-zero
+checkSolution()                   – engine.isValidCompleteSolution() → update stats, audio, message
+confirmRestart()                  – window.confirm → newGame() with same level
+confirmNewGame()                  – window.confirm → changeDifficulty('easy') or chosen level
+render()                          – Update all cell DOM: classes, text, notes sub-grid
+showMessage(text, type)           – Show .message div with 'success'|'error' class
+hideMessage()                     – Add .hidden to .message
+installApp()                      – Trigger deferred beforeinstallprompt
+checkPWAInstalled()               – Hide #installBtn if standalone or iOS installed
+saveGame()                        – JSON.stringify state → localStorage['sudokuGame2']
+loadGame()                        – Parse localStorage or call newGame()
+clearSavedGame()                  – Remove 'sudokuGame2' from localStorage
+
+## js/engine.js – SudokuEngine
+generateSolution()                – Returns filled valid 9×9 grid (array[81])
+fillGrid(grid, row=0, col=0)      – Recursive backtracking with shuffled candidates
+isValid(grid, row, col, num)      – Check row + col + 3×3 box for conflicts
+countSolutions(grid, limit=2)     – Count solutions, early-exit at limit (for uniqueness check)
+hasUniqueSolution(grid)           – Returns bool: exactly 1 solution
+generatePuzzle(level)             – Remove cells per level, ensure unique solution;
+                                    returns {grid, solution, given}
+                                    Removals: basic=25, simple=30, easy=35, medium=45, hard=55, crazy=60
+isValidCompleteSolution(grid)     – Full validation of completed board
+canPlaceNumber(grid, row, col, num) – Fast box-only check (used for auto-fill hint)
+shuffle(arr)                      – Fisher-Yates in-place shuffle
+
+## js/panels.js – PanelManager
+constructor(audioManager)         – Store ref, init all three panels
+initSettingsPanel()               – Bind open/close + music/sound toggles + how-to-play btn
+openSettings() / closeSettings()  – Toggle #settingsOverlay .active
+initStatsPanel()                  – Bind open/close
+openStats() / closeStats()        – Toggle #statsOverlay .active
+renderStats()                     – Fill #statsGrid with per-difficulty win cards + total
+initHelpPanel()                   – Bind open/close
+openHelp() / closeHelp()          – Toggle #helpOverlay .active
+
+Difficulty colors in stats:
+  Basic=#43a047  Simple=#66bb6a  Easy=#4a90e2  Medium=#ffa726  Hard=#ef5350  Crazy=#ab47bc
+
+## js/audio.js – AudioManager
+constructor()                     – Init music/sound bools, trackIndex, AudioContext
+loadSettings() / saveSettings()   – Read/write 'sudokuAudio' in localStorage
+checkAvailableTracks()            – HEAD-probe ./music/theme1-10.mp3; store available list
+setMusic(enabled)                 – Enable/disable; calls playNextTrack() or stopMusic()
+playNextTrack()                   – Cycle available tracks at volume 0.4; auto-advance on end
+stopMusic()                       – Pause + clear this.currentAudio
+setSound(enabled)                 – Enable/disable SFX
+playSound(name)                   – Web Audio synth: 'place'(600Hz,80ms) 'error'(200Hz sawtooth,250ms)
+                                    'win'(3-note melody 523→659→784Hz) 'click'(800Hz,40ms)
+resumeIfNeeded()                  – Resume AudioContext after user gesture (autoplay policy)
+
+## NOTES / GOTCHAS
+- Game state key is 'sudokuGame2' (v2, not v1) to avoid stale saved-game conflicts
+- Service worker cache key is 'sudoku-v2'; bump version string in sw.js when deploying updates
+- Notes are stored as this.notes[cellIndex] = Set of positions (1-9) mapped to numbers
+- Auto-fill: tapping empty cell after placing a number tries canPlaceNumber() box-only check
+- Long-press threshold: 500ms (defined in createGrid event handlers in game.js)
+- CSS nth-child selectors draw the 3×3 box borders without JavaScript
