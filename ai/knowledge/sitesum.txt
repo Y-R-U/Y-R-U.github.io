@@ -38,9 +38,17 @@ gms/o/      - Interactive Storybook Adventure
 gms/pwa/sudoku/ - Sudoku PWA (Progressive Web App with manifest and service worker)
 gms/pirates/    - 3D isometric pirate ship game (Babylon.js) with islands, water effects, and AI enemy ships
 gms/pwa/sudoku/ - Sudoku PWA with three difficulty levels, notes, undo, win detection, offline play
+gms/pwa/crpg/   - Lands of Ascii: retro console RPG with dungeon exploration and turn-based combat
+gms/pwa/dicey/  - Dicey: Monopoly-inspired board game with 2-4 players and AI opponents
+gms/pwa/drace/  - DRace: strategic dice-race battle game
+gms/pwa/idleLife/ - Life Idle: idle clicker career progression game
+gms/pwa/idleWestern/ - Idle Western: Western-themed idle frontier empire builder
+gms/pwa/miniwar/ - Mini War: real-time strategy battle with unit evolution and age progression
+gms/pwa/orpg/   - Dungeon ORPG: multiplayer online dungeon crawler
+gms/pwa/rcell/  - RCELL: roguelite bullet-hell immune defence game
 gms/s/      - Snake Battle game
 gms/t/      - Desert Throw game
-gms/z/      - Tululoo game engine exported game (action/arcade)
+gms/z/      - Tululoo game engine zombie action game (sprite sheet mode)
 
 C/ SUB-FOLDERS
 --------------
