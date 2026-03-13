@@ -1,0 +1,20 @@
+{
+  "name": "K-Hydro Track",
+  "short_name": "K-Hydro",
+  "description": "Track your hydroponic plants — water, nutrients, harvests, and more.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b5e20",
+  "theme_color": "#1b5e20",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"]
+}
