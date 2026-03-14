@@ -10,6 +10,8 @@ const App = (() => {
   let lastUIUpdate = 0;
   let achievementCheckTimer = 0;
   let tabRefreshTimer = 0;
+  let bgVideoCheckTimer = 0;
+  let lastBgVideoIndex = -1;
 
   function init() {
     // Initialize all systems
@@ -36,19 +38,89 @@ const App = (() => {
     // Start ambient effects
     Effects.startAmbientDust();
 
+    // Initialize background video system
+    initBackgroundVideo();
+
     // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        // Try relative path for non-root deployments
-        navigator.serviceWorker.register('./sw.js').catch(err => {
-          console.log('SW registration failed:', err);
-        });
+      navigator.serviceWorker.register('./sw.js').catch(err => {
+        console.log('SW registration failed:', err);
       });
+    }
+
+    // Show story intro for new games (no save data existed)
+    const state = GameState.getState();
+    if (!state.storyShown) {
+      Story.start();
     }
 
     // Start game loop
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
+  }
+
+  function initBackgroundVideo() {
+    const scene = document.getElementById('scene-area');
+    const video = document.createElement('video');
+    video.id = 'bg-video';
+    video.className = 'bg-video hidden';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    scene.insertBefore(video, scene.firstChild);
+    updateBackgroundVideo();
+  }
+
+  function updateBackgroundVideo() {
+    const state = GameState.getState();
+    // Count how many business types are owned
+    let typesOwned = 0;
+    for (const biz of GameData.BUSINESSES) {
+      if ((state.businesses[biz.id]?.owned || 0) > 0) typesOwned++;
+    }
+    // theme0.mp4 = no businesses, theme1.mp4 = 1 biz, ... theme10.mp4 = all 10
+    const videoIndex = typesOwned;
+    if (videoIndex === lastBgVideoIndex) return;
+    lastBgVideoIndex = videoIndex;
+
+    const video = document.getElementById('bg-video');
+    if (!video) return;
+
+    // Try mp4, then webm
+    const basePath = 'video/theme' + videoIndex;
+    const tryLoad = (ext) => {
+      return new Promise((resolve) => {
+        const testVideo = document.createElement('video');
+        testVideo.preload = 'metadata';
+        testVideo.onloadedmetadata = () => resolve(basePath + '.' + ext);
+        testVideo.onerror = () => resolve(null);
+        testVideo.src = basePath + '.' + ext;
+      });
+    };
+
+    tryLoad('mp4').then(src => {
+      if (src) return src;
+      return tryLoad('webm');
+    }).then(src => {
+      if (src) {
+        video.src = src;
+        video.classList.remove('hidden');
+        video.play().catch(() => {});
+        // Hide CSS background elements when video is active
+        document.querySelector('.scene-sky')?.classList.add('hidden');
+        document.querySelector('.scene-mountains')?.classList.add('hidden');
+        document.querySelector('.scene-ground')?.classList.add('hidden');
+      } else {
+        video.classList.add('hidden');
+        video.removeAttribute('src');
+        // Show CSS background when no video
+        document.querySelector('.scene-sky')?.classList.remove('hidden');
+        document.querySelector('.scene-mountains')?.classList.remove('hidden');
+        document.querySelector('.scene-ground')?.classList.remove('hidden');
+      }
+    });
   }
 
   function gameLoop(timestamp) {
@@ -91,10 +163,17 @@ const App = (() => {
       achievementCheckTimer = 0;
     }
 
+    // Check background video every 5 seconds
+    bgVideoCheckTimer += delta;
+    if (bgVideoCheckTimer >= 5000) {
+      updateBackgroundVideo();
+      bgVideoCheckTimer = 0;
+    }
+
     requestAnimationFrame(gameLoop);
   }
 
-  return { init };
+  return { init, updateBackgroundVideo };
 })();
 
 // Boot when DOM is ready

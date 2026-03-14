@@ -5,20 +5,47 @@
 const Events = (() => {
   let sceneEl = null;
   const timers = {}; // next spawn time for each event
+  const EVENT_GRACE_PERIOD = 120000; // 2 minutes no events at start
+  let sessionStart = 0;
 
   function init() {
     sceneEl = document.getElementById('scene-area');
-    // Initialize timers with random initial delays
+    sessionStart = Date.now();
+    // Initialize timers: first events start after the 2-minute grace period
     for (const ev of GameData.EVENTS) {
-      timers[ev.id] = Date.now() + Utils.randInt(ev.minInterval, ev.maxInterval) * 1000;
+      timers[ev.id] = sessionStart + EVENT_GRACE_PERIOD + Utils.randInt(ev.minInterval, ev.maxInterval) * 1000;
     }
+  }
+
+  function getActiveEventCount() {
+    if (!sceneEl) return 0;
+    return sceneEl.querySelectorAll('.random-event').length;
+  }
+
+  function getMaxEvents() {
+    const state = GameState.getState();
+    let typesOwned = 0;
+    for (const biz of GameData.BUSINESSES) {
+      if ((state.businesses[biz.id]?.owned || 0) > 0) typesOwned++;
+    }
+    return typesOwned * 2;
   }
 
   function update() {
     const now = Date.now();
+
+    // No events during grace period
+    if (now - sessionStart < EVENT_GRACE_PERIOD) return;
+
+    // Cap simultaneous events to businesses * 2
+    const maxEvents = getMaxEvents();
+    if (maxEvents <= 0) return; // No businesses = no events
+
     for (const ev of GameData.EVENTS) {
       if (now >= timers[ev.id]) {
-        spawnEvent(ev);
+        if (getActiveEventCount() < maxEvents) {
+          spawnEvent(ev);
+        }
         timers[ev.id] = now + Utils.randInt(ev.minInterval, ev.maxInterval) * 1000;
       }
     }

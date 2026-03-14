@@ -40,6 +40,9 @@ const GameState = (() => {
       lastTick: Date.now(),
       gameStarted: Date.now(),
 
+      // Story
+      storyShown: false,
+
       // Buy mode
       buyMode: 1, // 1, 10, or -1 for max
 
@@ -193,6 +196,33 @@ const GameState = (() => {
     return total * getPrestigeMultiplier();
   }
 
+  /**
+   * Get the offline earnings business multiplier.
+   * Formula: numBusinessTypesOwned + sum of floor(highestBizLevel / 100) bonuses
+   * e.g. highest biz at level 300: mult = numBiz + (1 + 2 + 3) = numBiz + 6
+   * At level 100: numBiz + 1, at 200: numBiz + 3, at 300: numBiz + 6
+   */
+  function getOfflineBusinessMultiplier() {
+    let typesOwned = 0;
+    let highestLevel = 0;
+    for (const biz of GameData.BUSINESSES) {
+      const owned = state.businesses[biz.id]?.owned || 0;
+      if (owned > 0) typesOwned++;
+      if (owned > highestLevel) highestLevel = owned;
+    }
+    if (typesOwned === 0) return 1;
+
+    // Cumulative bonus from highest business: for each 100 mark, add that mark/100
+    // lvl 300 -> 1 + 2 + 3 = 6
+    let levelBonus = 0;
+    const hundreds = Math.floor(highestLevel / 100);
+    for (let i = 1; i <= hundreds; i++) {
+      levelBonus += i;
+    }
+
+    return typesOwned + levelBonus;
+  }
+
   function calcOfflineEarnings() {
     const now = Date.now();
     const elapsed = Math.min(
@@ -203,7 +233,8 @@ const GameState = (() => {
     if (elapsed < 5) return 0; // Less than 5 seconds, not worth showing
 
     const income = getBaseIncomePerSec() * OFFLINE_RATE;
-    return income * elapsed;
+    const bizMult = getOfflineBusinessMultiplier();
+    return income * elapsed * bizMult;
   }
 
   function doTick(deltaMs) {
@@ -348,6 +379,7 @@ const GameState = (() => {
     resetForPrestige, calcPrestigeStars, getPrestigeMultiplier,
     getBuffMultiplier, addBuff, cleanExpiredBuffs,
     getTapValue, getBusinessIncome, getTotalIncomePerSec, getBaseIncomePerSec,
+    getOfflineBusinessMultiplier,
     calcOfflineEarnings, doTick, tap,
     buyBusiness, getMaxBuyable, buyTapUpgrade,
     isBusinessUnlocked, isBusinessVisible,

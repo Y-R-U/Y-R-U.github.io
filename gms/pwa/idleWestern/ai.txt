@@ -1,0 +1,411 @@
+================================================================================
+AI.TXT - Idle Western Codebase Map
+================================================================================
+PURPOSE: Let a future AI session find the right function to modify without
+reading every source file. Covers file purposes, global functions with
+signatures/return types, state shape, and naming mismatches.
+
+================================================================================
+FILE MAP
+================================================================================
+
+index.html
+  Entry point HTML. Defines the DOM skeleton:
+  - #game-header (coins display, settings button)
+  - #buff-bar (active buff indicators)
+  - #scene-area (tap zone, CSS landscape, background video, event icons, effects)
+  - #tab-content (dynamically rendered tab panels)
+  - #bottom-nav (4 tab buttons: Jobs, Upgrades, Move West, Awards)
+  - #settings-panel (save/reset overlay)
+  Script load order: utils -> gameData -> gameState -> effects -> events -> story -> ui -> app
+
+manifest.json
+  PWA manifest. display:standalone, scope:"./", start_url:"./index.html".
+  id:"idle-western-pwa". Icons: img/icon-192.png, img/icon-512.png.
+
+sw.js
+  Service worker. Cache name "idle-western-v2". Caches all app assets.
+  Video files (.mp4/.webm) bypass cache (network-only).
+
+css/style.css
+  All styling. CSS variables in :root. Major sections:
+  - Header, buff bar, scene area (sky/mountains/ground via CSS clip-path)
+  - Random event animations (tumbleweed, dustdevil, nugget, wanted, snakeoil)
+  - Tab content (business rows, upgrade rows, prestige panel, achievements)
+  - Toast, offline overlay, achievement popup
+  - Background video (.bg-video), story overlay, offline multiplier display
+  - Media queries for scene height and desktop centering
+
+================================================================================
+JS MODULES (all IIFE singletons on window)
+================================================================================
+
+--- js/utils.js ---
+  Module: Utils
+  Pure utility functions, no state.
+
+  Utils.formatNumber(n: number) -> string
+    Abbreviates large numbers: 1500 -> "1.50K", 1e9 -> "1.00B"
+
+  Utils.formatCoins(n: number) -> string
+    Adds "$" prefix. Handles sub-1, sub-1000, and abbreviated.
+
+  Utils.formatTime(seconds: number) -> string
+    "30s", "2m 15s", "1h 30m"
+
+  Utils.randInt(min: number, max: number) -> number
+    Inclusive random integer.
+
+  Utils.randFloat(min: number, max: number) -> number
+    Random float in [min, max).
+
+  Utils.lerp(a: number, b: number, t: number) -> number
+  Utils.clamp(v: number, min: number, max: number) -> number
+
+--- js/gameData.js ---
+  Module: GameData
+  Static game configuration. No runtime state.
+
+  GameData.BUSINESSES: Array<BusinessDef>
+    10 entries. Fields: id, name, icon, desc, baseCost, baseIncome, unlockCost, costMult
+    IDs: stable, prospector, store, saloon, ranch, sheriff, bank, mine, railroad, oil
+    NOTE: "mine" in code = "Mining Co." in display name
+    NOTE: "oil" in code = "Oil Derrick" in display name
+    NOTE: "store" in code = "General Store" in display name
+    NOTE: "sheriff" in code = "Sheriff's Office" in display name
+
+  GameData.MILESTONES: Array<{count, mult, label}>
+    Thresholds: 10(2x), 25(2x), 50(3x), 100(4x), 200(4x), 300(5x), 500(10x)
+    Cumulative max: 9600x at 500+
+
+  GameData.TAP_UPGRADES: Array<{id, name, cost, mult, icon, desc}>
+    6 one-time purchases. IDs: tap1..tap6
+    Combined max multiplier: 2*2*3*3*5*5 = 900x
+
+  GameData.EVENTS: Array<EventDef>
+    5 event types. Fields: id, name, icon, desc, effect, mult, duration,
+    screenTime, minInterval, maxInterval, cssClass
+    IDs: tumbleweed, nugget, wanted, dustdevil, snakeoil
+    Effects: income_mult, instant_income, tap_mult
+    NOTE: snakeoil mult is 0 in definition (randomized 2-10 at spawn time in events.js)
+
+  GameData.ACHIEVEMENTS: Array<{id, name, desc, icon}>
+    14 achievements. IDs: first_tap, first_hire, earn_1k, earn_1m, earn_1b,
+    own_saloon, own_railroad, own_oil, prestige_1, prestige_5,
+    tap_1000, tap_10000, event_10, all_biz
+
+  GameData.getBusinessCost(biz: BusinessDef, owned: number) -> number
+    Formula: floor(baseCost * costMult^owned)
+
+  GameData.getBusinessCostN(biz: BusinessDef, owned: number, n: number) -> number
+    Sum of costs for n purchases starting at current owned.
+
+  GameData.getMilestoneMultiplier(owned: number) -> number
+    Product of all milestone multipliers where owned >= threshold.
+
+--- js/gameState.js ---
+  Module: GameState
+  Central state manager. Owns the save data.
+
+  Constants:
+    SAVE_KEY = 'idleWestern_save'
+    SAVE_INTERVAL = 30000 (30s)
+    OFFLINE_CAP_HOURS = 8
+    OFFLINE_RATE = 0.5 (50% of active rate)
+
+  GameState.init() -> state object
+    Loads from localStorage, fills missing fields, starts auto-save.
+
+  GameState.save() -> void
+    Persists state to localStorage.
+
+  GameState.getState() -> state object (mutable reference!)
+    Direct access to the live state. Callers mutate it directly.
+
+  GameState.hardReset() -> void
+    Wipes all progress. Used by settings reset button.
+
+  GameState.resetForPrestige() -> boolean
+    Prestige reset. Returns false if 0 stars available.
+    Preserves: pioneerStars, totalPrestiges, lifetimeEarned, achievements, storyShown.
+
+  GameState.calcPrestigeStars() -> number
+    Formula: floor(sqrt(totalEarned / 1,000,000))
+
+  GameState.getPrestigeMultiplier() -> number
+    Formula: 1 + (pioneerStars * 0.05)
+
+  GameState.getBuffMultiplier(effectType: string) -> number
+    Multiplicative product of all active buffs of given type.
+
+  GameState.addBuff(id: string, effect: string, mult: number, durationSec: number) -> void
+  GameState.cleanExpiredBuffs() -> void
+
+  GameState.getTapValue() -> number
+    base tapValue * prestige mult * tap_mult buffs
+
+  GameState.getBusinessIncome(bizDef: BusinessDef) -> number
+    baseIncome * owned * milestoneMultiplier (before prestige/buffs)
+
+  GameState.getTotalIncomePerSec() -> number
+    Sum of all business income * prestige * income_mult buffs
+
+  GameState.getBaseIncomePerSec() -> number
+    Sum of all business income * prestige (no buffs). Used for offline calc.
+
+  GameState.getOfflineBusinessMultiplier() -> number
+    Formula: typesOwned + sum(1..floor(highestBizLevel/100))
+    e.g. 10 biz types, highest at lvl 300 -> 10 + (1+2+3) = 16x
+
+  GameState.calcOfflineEarnings() -> number
+    baseIncome * 0.5 * elapsed(capped 8h) * offlineBusinessMultiplier
+    Returns 0 if elapsed < 5s.
+
+  GameState.doTick(deltaMs: number) -> void
+    Adds passive income for one tick. Updates lastTick. Cleans expired buffs.
+
+  GameState.tap() -> number
+    Adds tap value to coins/totalEarned/lifetimeEarned. Returns value earned.
+
+  GameState.buyBusiness(bizId: string, count: number) -> boolean
+  GameState.getMaxBuyable(bizId: string) -> number
+  GameState.buyTapUpgrade(upgradeId: string) -> boolean
+
+  GameState.isBusinessUnlocked(bizDef: BusinessDef) -> boolean
+    True if totalEarned >= unlockCost OR already owns at least one.
+
+  GameState.isBusinessVisible(bizDef: BusinessDef) -> boolean
+    True if unlocked, or if the previous-tier business is owned.
+
+  GameState.checkAchievements() -> string[]
+    Returns array of newly unlocked achievement IDs.
+
+--- js/effects.js ---
+  Module: Effects
+  Visual feedback animations. Requires #effects-layer in DOM.
+
+  Effects.init() -> void
+    Caches the effects-layer element.
+
+  Effects.coinFlyUp(x: number, y: number, value: number) -> void
+    "+$X" text that floats up and fades.
+
+  Effects.tapRipple(x: number, y: number) -> void
+    Expanding gold circle at tap point.
+
+  Effects.dustParticle() -> void
+    Single ambient dust mote. Called on interval.
+
+  Effects.showAchievement(name: string, icon: string) -> void
+    Top-center popup with icon and name. Auto-hides in 3s.
+
+  Effects.showOfflineEarnings(amount: number) -> void
+    Modal overlay showing earnings while away + empire bonus multiplier.
+
+  Effects.startAmbientDust() -> void
+    Starts 800ms interval spawning dust particles.
+
+  Effects.stopAmbientDust() -> void
+
+--- js/events.js ---
+  Module: Events
+  Random event spawning and management.
+
+  Constants:
+    EVENT_GRACE_PERIOD = 120000 (2 minutes, no events at session start)
+
+  Events.init() -> void
+    Sets session start time. Initializes all event timers to fire after grace period.
+
+  Events.update() -> void
+    Called every frame. Checks timers, spawns events if:
+    - Past the 2-minute grace period
+    - Active event count < (business types owned * 2)
+    - Individual event timer has expired
+
+  Internal: spawnEvent(evDef) -> void
+    Creates DOM element in scene-area with positioning and click handlers.
+
+  Internal: activateEvent(evDef, el) -> void
+    Applies buff/instant income, increments eventsClicked, shows toast.
+    NOTE: snakeoil mult is randomized here (2-10), not in gameData.
+
+  Internal: getActiveEventCount() -> number
+    Counts .random-event elements currently in scene.
+
+  Internal: getMaxEvents() -> number
+    Returns business types owned * 2.
+
+--- js/story.js ---
+  Module: Story
+  Intro story popup sequence with optional video support.
+
+  Story.start() -> void
+    Shows intro story messages if state.storyShown is false.
+    Messages are shown as modal dialogs over the game.
+    Between messages, if a video file exists (video/storyN.mp4 or .webm),
+    the video plays in the overlay before the next message appears.
+    Tapping the video skips it.
+    On completion, sets state.storyShown = true.
+
+  Video file expectations:
+    Story videos: video/story1.mp4, video/story2.mp4, video/story3.mp4 (or .webm)
+    Background videos: video/theme0.mp4 through video/theme10.mp4 (or .webm)
+      theme0 = no businesses, theme1 = 1 biz type owned, ... theme10 = all 10
+
+--- js/ui.js ---
+  Module: UI
+  DOM rendering and user interaction.
+
+  UI.init() -> void
+    Binds tabs, binds scene tap handler, renders initial tab.
+
+  UI.updateHeader() -> void
+    Updates coin count, income/sec, and buff bar.
+
+  UI.renderTab() -> void
+    Clears and re-renders the current tab panel.
+
+  UI.showToast(message: string) -> void
+    Short notification at bottom of screen. 3s auto-hide.
+
+  UI.initSettings() -> void
+    Binds settings panel open/close, save button, reset button.
+
+  Internal: handleTap(x, y) -> void
+    Calls GameState.tap(), shows coin fly-up and ripple, hides tap hint.
+
+  Internal: renderJobsTab(container) -> void
+    Buy mode selector + business list with buy buttons.
+
+  Internal: renderUpgradesTab(container) -> void
+    Tap upgrades + business milestone dots.
+
+  Internal: renderPrestigeTab(container) -> void
+    Pioneer star stats + "Move West" button with confirm dialog.
+
+  Internal: renderAchievementsTab(container) -> void
+    Achievement list with locked/unlocked states.
+
+  Internal: updateBuffBar() -> void
+    Shows active buff pills with countdown timers.
+
+--- js/app.js ---
+  Module: App
+  Entry point. Owns the game loop and system initialization.
+
+  App.init() -> void
+    Boot sequence: GameState -> Effects -> Events -> UI -> offline earnings ->
+    ambient dust -> background video -> service worker -> story intro -> game loop
+
+  App.updateBackgroundVideo() -> void
+    Checks video/themeN.mp4/.webm where N = business types owned.
+    If found, replaces CSS sky/mountains/ground with video.
+    If not found, shows CSS background.
+
+  Internal: gameLoop(timestamp) -> void
+    requestAnimationFrame loop. Runs at ~60fps.
+    - doTick at 30fps (33ms fixed step)
+    - Events.update() every frame
+    - UI.updateHeader() at 4fps (250ms)
+    - UI.renderTab() every 2s (affordability refresh)
+    - checkAchievements every 2s
+    - updateBackgroundVideo every 5s
+
+================================================================================
+STATE SHAPE (localStorage key: "idleWestern_save")
+================================================================================
+
+{
+  coins: number,               // Current balance
+  totalEarned: number,         // Lifetime this prestige run
+  totalTaps: number,           // Tap counter
+  tapValue: number,            // Base tap multiplier (upgraded by tap upgrades)
+  tapUpgradesBought: string[], // IDs of purchased tap upgrades
+
+  businesses: {                // Keyed by business ID
+    [bizId]: { owned: number }
+  },
+
+  pioneerStars: number,        // Prestige currency (persists across prestiges)
+  totalPrestiges: number,      // Counter (persists across prestiges)
+  lifetimeEarned: number,      // Never resets, even on prestige
+
+  buffs: [{                    // Active temporary multipliers
+    id: string,                // Event ID that created it
+    effect: string,            // "income_mult" | "tap_mult"
+    mult: number,              // Multiplier value
+    endsAt: number             // Date.now() timestamp when expires
+  }],
+
+  achievements: string[],      // Unlocked achievement IDs
+  eventsClicked: number,       // Total events caught
+
+  lastSave: number,            // Timestamp
+  lastTick: number,            // Timestamp (used for offline earnings calc)
+  gameStarted: number,         // Timestamp
+
+  storyShown: boolean,         // Whether intro story has been shown
+
+  buyMode: number,             // 1, 10, or -1 (max)
+  version: number              // Save format version (currently 1)
+}
+
+================================================================================
+DISPLAY NAME vs INTERNAL ID MISMATCHES
+================================================================================
+
+Internal ID    | Display Name      | Notes
+---------------|-------------------|----------------------------------------
+stable         | Stable Hand       | Business
+prospector     | Prospector        |
+store          | General Store     |
+saloon         | Saloon            |
+ranch          | Ranch             |
+sheriff        | Sheriff's Office  |
+bank           | Bank              |
+mine           | Mining Co.        | "mine" not "mining"
+railroad       | Railroad          |
+oil            | Oil Derrick       | "oil" not "oilderrick"
+tumbleweed     | Tumbleweed        | Event
+nugget         | Gold Nugget       | Event
+wanted         | Wanted Poster     | Event
+dustdevil      | Dust Devil        | Event
+snakeoil       | Snake Oil Salesman| Event, mult randomized at spawn not in def
+tap1..tap6     | Sturdy Gloves..   | Tap upgrades, sequential IDs
+first_tap etc  | Howdy Partner etc | Achievements
+buyMode -1     | "Max"             | UI shows "Max", stored as -1
+
+================================================================================
+VIDEO FILE CONVENTIONS
+================================================================================
+
+Directory: video/
+
+Story cutscene videos (played during intro):
+  video/story1.mp4  (or .webm) - After message 2 "Starting From Nothing"
+  video/story2.mp4  (or .webm) - After message 3 "Odd Jobs"
+  video/story3.mp4  (or .webm) - After message 4 "Build Your Empire"
+
+Background theme videos (loop in scene area, replacing CSS landscape):
+  video/theme0.mp4  (or .webm) - No businesses owned (intro state)
+  video/theme1.mp4  (or .webm) - 1 business type owned
+  video/theme2.mp4  (or .webm) - 2 business types owned
+  ...
+  video/theme10.mp4 (or .webm) - All 10 business types owned
+
+Video specs for background videos:
+  - Dimensions: 480x220 pixels (max scene area size)
+  - Aspect ratio: ~2.18:1 (wide landscape)
+  - Format: MP4 (H.264) preferred, WebM (VP9) as fallback
+  - Must loop seamlessly (the player sets loop=true)
+  - Will be covered by: click effects, event icons, dust particles, tap hint
+    (all have pointer-events:none or z-index above video)
+  - Video is object-fit:cover, so slightly larger videos will be cropped to fit
+  - Keep file size small (< 2MB each) since they're not cached by service worker
+
+Story cutscene videos:
+  - Displayed centered in the story overlay (max 90% width, 70vh height)
+  - Any aspect ratio works (will be contained, not cropped)
+  - Tap/click on video skips to next story message
+  - If file doesn't exist, story continues without it (graceful fallback)
