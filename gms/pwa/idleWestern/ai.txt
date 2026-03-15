@@ -238,20 +238,18 @@ JS MODULES (all IIFE singletons on window)
 
 --- js/story.js ---
   Module: Story
-  Intro story popup sequence with optional video support.
+  Intro story popup sequence with video support.
 
   Story.start() -> void
     Shows intro story messages if state.storyShown is false.
-    Messages are shown as modal dialogs over the game.
-    Between messages, if a video file exists (video/storyN.mp4 or .webm),
-    the video plays in the overlay before the next message appears.
-    Tapping the video skips it.
-    On completion, sets state.storyShown = true.
+    Overlay is positioned BELOW the scene area so the video in the
+    scene is visible while reading the story text.
+    When a message has a video property, it calls App.playSceneVideo()
+    to start looping that video in the scene area immediately.
+    On completion, calls App.clearStoryVideo() to hand back to theme system.
 
-  Video file expectations:
-    Story videos: video/story1.mp4, video/story2.mp4, video/story3.mp4 (or .webm)
-    Background videos: video/theme0.mp4 through video/theme10.mp4 (or .webm)
-      theme0 = no businesses, theme1 = 1 biz type owned, ... theme10 = all 10
+  Story.isActive() -> boolean
+    Returns true while the intro sequence is running.
 
 --- js/ui.js ---
   Module: UI
@@ -292,16 +290,31 @@ JS MODULES (all IIFE singletons on window)
 
 --- js/app.js ---
   Module: App
-  Entry point. Owns the game loop and system initialization.
+  Entry point. Owns the game loop, the single bg-video element in scene-area,
+  and system initialization.
 
   App.init() -> void
     Boot sequence: GameState -> Effects -> Events -> UI -> offline earnings ->
-    ambient dust -> background video -> service worker -> story intro -> game loop
+    ambient dust -> scene video element -> preload videos -> service worker ->
+    story intro (or theme video) -> game loop
 
-  App.updateBackgroundVideo() -> void
-    Checks video/themeN.mp4/.webm where N = business types owned.
-    If found, replaces CSS sky/mountains/ground with video.
-    If not found, shows CSS background.
+  App.playSceneVideo(name: string) -> void
+    Play video/{name}.mp4 (or .webm) looping in the scene-area bg-video.
+    Used by Story.js for story cutscenes.  Video keeps looping until
+    replaced by another call or by clearStoryVideo().
+
+  App.clearStoryVideo() -> void
+    Hands video ownership back to the theme system.  Forces an immediate
+    re-evaluation of which theme video to show.
+
+  App.updateThemeVideo() -> void
+    Picks video/themeN.mp4/.webm where N = business types owned.
+    No-ops while the story owns the video.
+    If the file doesn't exist, falls back to CSS landscape.
+
+  Internal: preloadVideos() -> void
+    Creates <link rel="preload"> for every story and theme video
+    (mp4 + webm variants). 404s are silently cleaned up.
 
   Internal: gameLoop(timestamp) -> void
     requestAnimationFrame loop. Runs at ~60fps.
@@ -310,7 +323,7 @@ JS MODULES (all IIFE singletons on window)
     - UI.updateHeader() at 4fps (250ms)
     - UI.renderTab() every 2s (affordability refresh)
     - checkAchievements every 2s
-    - updateBackgroundVideo every 5s
+    - updateThemeVideo every 5s (only when story isn't active)
 
 ================================================================================
 STATE SHAPE (localStorage key: "idleWestern_save")
@@ -381,31 +394,31 @@ VIDEO FILE CONVENTIONS
 ================================================================================
 
 Directory: video/
+ALL videos play in the scene-area bg-video element (top section).
+ALL videos loop endlessly until replaced by the next video.
+Story overlay sits BELOW the scene so the video is always visible.
 
-Story cutscene videos (played during intro):
-  video/story1.mp4  (or .webm) - After message 2 "Starting From Nothing"
-  video/story2.mp4  (or .webm) - After message 3 "Odd Jobs"
-  video/story3.mp4  (or .webm) - After message 4 "Build Your Empire"
+Story cutscene videos (loop in scene area during intro):
+  video/story0.mp4  (or .webm) - With message 1 "The Frontier Awaits"
+  video/story1.mp4  (or .webm) - With message 2 "Starting From Nothing"
+  video/story2.mp4  (or .webm) - With message 3 "Odd Jobs"
+  video/story3.mp4  (or .webm) - With message 4 "Build Your Empire"
 
-Background theme videos (loop in scene area, replacing CSS landscape):
+Background theme videos (loop in scene area during gameplay):
   video/theme0.mp4  (or .webm) - No businesses owned (intro state)
   video/theme1.mp4  (or .webm) - 1 business type owned
   video/theme2.mp4  (or .webm) - 2 business types owned
   ...
   video/theme10.mp4 (or .webm) - All 10 business types owned
 
-Video specs for background videos:
+Video specs (same for ALL videos, story and theme):
   - Dimensions: 480x220 pixels (max scene area size)
   - Aspect ratio: ~2.18:1 (wide landscape)
   - Format: MP4 (H.264) preferred, WebM (VP9) as fallback
-  - Must loop seamlessly (the player sets loop=true)
+  - Must loop seamlessly (the player sets loop=true, muted=true)
   - Will be covered by: click effects, event icons, dust particles, tap hint
     (all have pointer-events:none or z-index above video)
   - Video is object-fit:cover, so slightly larger videos will be cropped to fit
   - Keep file size small (< 2MB each) since they're not cached by service worker
-
-Story cutscene videos:
-  - Displayed centered in the story overlay (max 90% width, 70vh height)
-  - Any aspect ratio works (will be contained, not cropped)
-  - Tap/click on video skips to next story message
-  - If file doesn't exist, story continues without it (graceful fallback)
+  - Page attempts to preload all video files on init (404s cleaned up silently)
+  - If a video file doesn't exist, the previous video (or CSS bg) stays

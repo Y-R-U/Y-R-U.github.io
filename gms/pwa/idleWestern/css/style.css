@@ -1102,11 +1102,17 @@ body {
   font-weight: bold;
 }
 
-/* --- Story Overlay --- */
+/* --- Story Overlay (below scene area so video is visible) --- */
 .story-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
+  /* Sits below header + scene; covers tab-content and nav */
+  top: calc(var(--header-h) + var(--scene-h) + var(--safe-top));
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: rgba(0,0,0,0.88);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1122,7 +1128,7 @@ body {
   background: linear-gradient(180deg, var(--paper), var(--paper-dark));
   border: 3px solid var(--gold);
   border-radius: 16px;
-  padding: 28px 24px;
+  padding: 24px 20px;
   text-align: center;
   max-width: 320px;
   width: 90%;
@@ -1136,23 +1142,23 @@ body {
 }
 
 .story-icon {
-  font-size: 48px;
-  margin-bottom: 8px;
+  font-size: 40px;
+  margin-bottom: 6px;
 }
 
 .story-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: var(--wood-dark);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   letter-spacing: 1px;
 }
 
 .story-text {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 20px;
+  line-height: 1.5;
+  margin-bottom: 16px;
 }
 
 .story-btn {
@@ -1160,8 +1166,8 @@ body {
   color: var(--wood-dark);
   border: none;
   border-radius: 10px;
-  padding: 12px 36px;
-  font-size: 16px;
+  padding: 10px 32px;
+  font-size: 15px;
   font-weight: bold;
   font-family: inherit;
   cursor: pointer;
@@ -1171,12 +1177,4 @@ body {
 
 .story-btn:active {
   transform: scale(0.96);
-}
-
-.story-video {
-  max-width: 90%;
-  max-height: 70vh;
-  border-radius: 12px;
-  border: 2px solid var(--gold-dark);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }

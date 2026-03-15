@@ -1,11 +1,15 @@
 /**
- * story.js - Intro story sequence with optional video support
+ * story.js - Intro story sequence with video support
  *
- * Story messages are shown as popup dialogs at game start.
- * Between messages, if video/story{N}.mp4 (or .webm) exists,
- * the video is played in the scene area before continuing.
+ * Story popups appear BELOW the scene area so the player can
+ * see any video playing in the scene while reading the text.
  *
- * Background theme videos (video/theme0-10.mp4) are handled by app.js.
+ * Videos tagged on a message start looping in the scene-area
+ * bg-video element when that message is shown (not after clicking
+ * Continue). They keep looping until the next video replaces them.
+ *
+ * Background theme videos (video/theme0-10.mp4) are handled by app.js
+ * and resume automatically when the story ends.
  */
 
 const Story = (() => {
@@ -14,13 +18,14 @@ const Story = (() => {
     {
       title: 'The Frontier Awaits',
       text: "The year is 1849. You've just arrived at a dusty frontier town with nothing but the clothes on your back and big dreams of fortune.",
-      icon: '\uD83C\uDF05'
+      icon: '\uD83C\uDF05',
+      video: 'story0' // optional intro video
     },
     {
       title: 'Starting From Nothing',
       text: "You're an early pioneer with big dreams, but no cash. The townsfolk eye you with suspicion \u2014 another drifter chasing gold.",
       icon: '\uD83E\uDD20',
-      video: 'story1' // Will check for video/story1.mp4 or .webm
+      video: 'story1'
     },
     {
       title: 'Odd Jobs',
@@ -43,16 +48,20 @@ const Story = (() => {
 
   let overlay = null;
   let currentIndex = 0;
-  let sceneVideo = null;
+  let active = false;
 
   function start() {
     const state = GameState.getState();
-    // Only show once per save
     if (state.storyShown) return;
 
+    active = true;
     currentIndex = 0;
     createOverlay();
     showMessage(currentIndex);
+  }
+
+  function isActive() {
+    return active;
   }
 
   function createOverlay() {
@@ -66,7 +75,6 @@ const Story = (() => {
         <div class="story-text" id="story-text"></div>
         <button class="story-btn" id="story-btn">Continue</button>
       </div>
-      <video class="story-video hidden" id="story-video" playsinline webkit-playsinline></video>
     `;
     document.body.appendChild(overlay);
 
@@ -80,89 +88,32 @@ const Story = (() => {
     }
 
     const msg = MESSAGES[index];
-    const box = document.getElementById('story-box');
-    const video = document.getElementById('story-video');
-
-    // Show the dialog box, hide video
-    box.classList.remove('hidden');
-    video.classList.add('hidden');
-    video.pause();
-    video.removeAttribute('src');
 
     document.getElementById('story-icon').textContent = msg.icon;
     document.getElementById('story-title').textContent = msg.title;
     document.getElementById('story-text').textContent = msg.text;
-  }
 
-  function advance() {
-    const msg = MESSAGES[currentIndex];
-
-    // Check if this message has a video to play before moving to next
+    // If this message has a video, play it looping in the scene area
     if (msg.video) {
-      tryPlayVideo(msg.video, () => {
-        currentIndex++;
-        showMessage(currentIndex);
-      });
-    } else {
-      currentIndex++;
-      showMessage(currentIndex);
+      App.playSceneVideo(msg.video);
     }
   }
 
-  function tryPlayVideo(videoName, onComplete) {
-    const basePath = 'video/' + videoName;
-
-    // Try mp4 first, then webm
-    tryVideoSrc(basePath + '.mp4').then(src => {
-      if (src) return src;
-      return tryVideoSrc(basePath + '.webm');
-    }).then(src => {
-      if (!src) {
-        // No video found, just continue
-        onComplete();
-        return;
-      }
-
-      const box = document.getElementById('story-box');
-      const video = document.getElementById('story-video');
-
-      // Hide dialog, show video
-      box.classList.add('hidden');
-      video.classList.remove('hidden');
-      video.src = src;
-      video.play().catch(() => {
-        // Autoplay blocked, skip video
-        onComplete();
-        return;
-      });
-
-      video.onended = () => {
-        onComplete();
-      };
-
-      // Also allow tap/click to skip video
-      video.onclick = () => {
-        video.pause();
-        onComplete();
-      };
-    });
-  }
-
-  function tryVideoSrc(src) {
-    return new Promise((resolve) => {
-      const testVideo = document.createElement('video');
-      testVideo.preload = 'metadata';
-      testVideo.onloadedmetadata = () => resolve(src);
-      testVideo.onerror = () => resolve(null);
-      testVideo.src = src;
-    });
+  function advance() {
+    currentIndex++;
+    showMessage(currentIndex);
   }
 
   function finish() {
+    active = false;
+
     // Mark story as shown
     const state = GameState.getState();
     state.storyShown = true;
     GameState.save();
+
+    // Clear any story video and hand control back to theme system
+    App.clearStoryVideo();
 
     // Remove overlay with fade
     if (overlay) {
@@ -174,5 +125,5 @@ const Story = (() => {
     }
   }
 
-  return { start };
+  return { start, isActive };
 })();

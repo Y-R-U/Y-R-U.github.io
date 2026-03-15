@@ -1,23 +1,32 @@
 /**
  * app.js - Entry point, game loop, initialization
+ *
+ * Owns the single bg-video element in scene-area.
+ * Story.js and the theme system both funnel through
+ * playSceneVideo() / clearStoryVideo() to avoid conflicts.
  */
 
 const App = (() => {
   let lastTime = 0;
   let tickAccumulator = 0;
   const TICK_RATE = 1000 / 30; // 30fps for logic
-  const UI_UPDATE_RATE = 250; // Update header 4x/sec
+  const UI_UPDATE_RATE = 250;  // Update header 4x/sec
   let lastUIUpdate = 0;
   let achievementCheckTimer = 0;
   let tabRefreshTimer = 0;
   let bgVideoCheckTimer = 0;
-  let lastBgVideoIndex = -1;
+  let lastThemeVideoIndex = -1;
+
+  // Track what's currently driving the video: 'story' | 'theme' | null
+  let videoOwner = null;
+  // Currently loaded video src so we don't reload the same file
+  let currentVideoSrc = null;
+
+  // ── Lifecycle ────────────────────────────────────────────
 
   function init() {
-    // Initialize all systems
     GameState.init();
 
-    // Check for offline earnings before UI shows
     const offlineEarnings = GameState.calcOfflineEarnings();
 
     Effects.init();
@@ -26,7 +35,6 @@ const App = (() => {
     UI.initSettings();
     UI.updateHeader();
 
-    // Show offline earnings if significant
     if (offlineEarnings > 0) {
       const state = GameState.getState();
       state.coins += offlineEarnings;
@@ -35,11 +43,13 @@ const App = (() => {
       Effects.showOfflineEarnings(offlineEarnings);
     }
 
-    // Start ambient effects
     Effects.startAmbientDust();
 
-    // Initialize background video system
-    initBackgroundVideo();
+    // Create the single bg-video element inside scene-area
+    initSceneVideo();
+
+    // Preload video files in the background
+    preloadVideos();
 
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -48,18 +58,22 @@ const App = (() => {
       });
     }
 
-    // Show story intro for new games (no save data existed)
+    // Show story intro for new games
     const state = GameState.getState();
     if (!state.storyShown) {
       Story.start();
+    } else {
+      // No story – go straight to theme video
+      updateThemeVideo();
     }
 
-    // Start game loop
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
   }
 
-  function initBackgroundVideo() {
+  // ── Scene video element ──────────────────────────────────
+
+  function initSceneVideo() {
     const scene = document.getElementById('scene-area');
     const video = document.createElement('video');
     video.id = 'bg-video';
@@ -70,110 +84,192 @@ const App = (() => {
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
     scene.insertBefore(video, scene.firstChild);
-    updateBackgroundVideo();
   }
 
-  function updateBackgroundVideo() {
+  // ── Preload videos ───────────────────────────────────────
+
+  function preloadVideos() {
+    // Story videos: story0 – story3
+    for (let i = 0; i <= 3; i++) {
+      preloadOne('video/story' + i + '.mp4');
+      preloadOne('video/story' + i + '.webm');
+    }
+    // Theme videos: theme0 – theme10
+    for (let i = 0; i <= 10; i++) {
+      preloadOne('video/theme' + i + '.mp4');
+      preloadOne('video/theme' + i + '.webm');
+    }
+  }
+
+  function preloadOne(href) {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'video';
+    link.href = href;
+    // Silently fail for missing files (404s are expected)
+    link.onerror = () => link.remove();
+    document.head.appendChild(link);
+  }
+
+  // ── Public: play a named video in the scene area (loop) ──
+
+  /**
+   * Play video/{name}.mp4 (or .webm) in the scene bg-video.
+   * Called by Story.js for story cutscenes.
+   * The video loops until replaced by another playSceneVideo
+   * call or by clearStoryVideo().
+   */
+  function playSceneVideo(name) {
+    videoOwner = 'story';
+    const basePath = 'video/' + name;
+    resolveVideoSrc(basePath).then(src => {
+      if (src) {
+        setSceneVideoSrc(src);
+      }
+      // If file doesn't exist, leave the current video (or CSS bg) as-is
+    });
+  }
+
+  /**
+   * Called when the story finishes.  Hands control back to the
+   * theme-video system so it can show the correct theme video.
+   */
+  function clearStoryVideo() {
+    videoOwner = null;
+    lastThemeVideoIndex = -1; // force re-evaluation
+    updateThemeVideo();
+  }
+
+  // ── Theme video (business-count driven) ──────────────────
+
+  function updateThemeVideo() {
+    // Don't override if the story currently owns the video
+    if (videoOwner === 'story') return;
+
     const state = GameState.getState();
-    // Count how many business types are owned
     let typesOwned = 0;
     for (const biz of GameData.BUSINESSES) {
       if ((state.businesses[biz.id]?.owned || 0) > 0) typesOwned++;
     }
-    // theme0.mp4 = no businesses, theme1.mp4 = 1 biz, ... theme10.mp4 = all 10
-    const videoIndex = typesOwned;
-    if (videoIndex === lastBgVideoIndex) return;
-    lastBgVideoIndex = videoIndex;
 
-    const video = document.getElementById('bg-video');
-    if (!video) return;
+    const idx = typesOwned;
+    if (idx === lastThemeVideoIndex) return;
+    lastThemeVideoIndex = idx;
 
-    // Try mp4, then webm
-    const basePath = 'video/theme' + videoIndex;
-    const tryLoad = (ext) => {
-      return new Promise((resolve) => {
-        const testVideo = document.createElement('video');
-        testVideo.preload = 'metadata';
-        testVideo.onloadedmetadata = () => resolve(basePath + '.' + ext);
-        testVideo.onerror = () => resolve(null);
-        testVideo.src = basePath + '.' + ext;
-      });
-    };
-
-    tryLoad('mp4').then(src => {
-      if (src) return src;
-      return tryLoad('webm');
-    }).then(src => {
+    videoOwner = 'theme';
+    const basePath = 'video/theme' + idx;
+    resolveVideoSrc(basePath).then(src => {
+      // Only apply if we're still the owner (story may have started)
+      if (videoOwner !== 'theme') return;
       if (src) {
-        video.src = src;
-        video.classList.remove('hidden');
-        video.play().catch(() => {});
-        // Hide CSS background elements when video is active
-        document.querySelector('.scene-sky')?.classList.add('hidden');
-        document.querySelector('.scene-mountains')?.classList.add('hidden');
-        document.querySelector('.scene-ground')?.classList.add('hidden');
+        setSceneVideoSrc(src);
       } else {
-        video.classList.add('hidden');
-        video.removeAttribute('src');
-        // Show CSS background when no video
-        document.querySelector('.scene-sky')?.classList.remove('hidden');
-        document.querySelector('.scene-mountains')?.classList.remove('hidden');
-        document.querySelector('.scene-ground')?.classList.remove('hidden');
+        hideSceneVideo();
       }
     });
   }
+
+  // ── Internal helpers ─────────────────────────────────────
+
+  /**
+   * Try basePath.mp4 then basePath.webm.
+   * Resolves with a valid src string, or null.
+   */
+  function resolveVideoSrc(basePath) {
+    return tryVideoFile(basePath + '.mp4').then(src => {
+      if (src) return src;
+      return tryVideoFile(basePath + '.webm');
+    });
+  }
+
+  function tryVideoFile(src) {
+    return new Promise(resolve => {
+      const v = document.createElement('video');
+      v.preload = 'metadata';
+      v.onloadedmetadata = () => resolve(src);
+      v.onerror = () => resolve(null);
+      v.src = src;
+    });
+  }
+
+  function setSceneVideoSrc(src) {
+    const video = document.getElementById('bg-video');
+    if (!video) return;
+    // Avoid reloading the same file
+    if (src === currentVideoSrc) return;
+    currentVideoSrc = src;
+
+    video.src = src;
+    video.classList.remove('hidden');
+    video.play().catch(() => {});
+
+    // Hide CSS background
+    document.querySelector('.scene-sky')?.classList.add('hidden');
+    document.querySelector('.scene-mountains')?.classList.add('hidden');
+    document.querySelector('.scene-ground')?.classList.add('hidden');
+  }
+
+  function hideSceneVideo() {
+    const video = document.getElementById('bg-video');
+    if (!video) return;
+    video.pause();
+    video.removeAttribute('src');
+    video.load(); // reset
+    video.classList.add('hidden');
+    currentVideoSrc = null;
+
+    // Restore CSS background
+    document.querySelector('.scene-sky')?.classList.remove('hidden');
+    document.querySelector('.scene-mountains')?.classList.remove('hidden');
+    document.querySelector('.scene-ground')?.classList.remove('hidden');
+  }
+
+  // ── Game loop ────────────────────────────────────────────
 
   function gameLoop(timestamp) {
     const delta = timestamp - lastTime;
     lastTime = timestamp;
 
-    // Accumulate time for fixed-step logic
     tickAccumulator += delta;
     while (tickAccumulator >= TICK_RATE) {
       GameState.doTick(TICK_RATE);
       tickAccumulator -= TICK_RATE;
     }
 
-    // Update events
     Events.update();
 
-    // Update UI periodically (not every frame)
     if (timestamp - lastUIUpdate >= UI_UPDATE_RATE) {
       UI.updateHeader();
       lastUIUpdate = timestamp;
     }
 
-    // Refresh active tab every 2 seconds to update affordability
     tabRefreshTimer += delta;
     if (tabRefreshTimer >= 2000) {
       UI.renderTab();
       tabRefreshTimer = 0;
     }
 
-    // Check achievements less frequently
     achievementCheckTimer += delta;
     if (achievementCheckTimer >= 2000) {
       const newAchievements = GameState.checkAchievements();
       for (const id of newAchievements) {
         const ach = GameData.ACHIEVEMENTS.find(a => a.id === id);
-        if (ach) {
-          Effects.showAchievement(ach.name, ach.icon);
-        }
+        if (ach) Effects.showAchievement(ach.name, ach.icon);
       }
       achievementCheckTimer = 0;
     }
 
-    // Check background video every 5 seconds
+    // Check theme video periodically (only when story isn't active)
     bgVideoCheckTimer += delta;
     if (bgVideoCheckTimer >= 5000) {
-      updateBackgroundVideo();
+      updateThemeVideo();
       bgVideoCheckTimer = 0;
     }
 
     requestAnimationFrame(gameLoop);
   }
 
-  return { init, updateBackgroundVideo };
+  return { init, playSceneVideo, clearStoryVideo, updateThemeVideo };
 })();
 
 // Boot when DOM is ready
