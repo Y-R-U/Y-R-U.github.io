@@ -11,11 +11,12 @@ FILE MAP
 
 index.html
   Entry point HTML. Defines the DOM skeleton:
-  - #game-header (coins display, settings button)
+  - #splash-screen (loading screen, visible before JS loads, removed after boot)
+  - #game-header (coins display, settings button) — starts hidden
   - #buff-bar (active buff indicators)
-  - #scene-area (tap zone, CSS landscape, background video, event icons, effects)
-  - #tab-content (dynamically rendered tab panels)
-  - #bottom-nav (4 tab buttons: Jobs, Upgrades, Move West, Awards)
+  - #scene-area (tap zone, CSS landscape, background video, event icons, effects) — starts hidden
+  - #tab-content (dynamically rendered tab panels) — starts hidden
+  - #bottom-nav (4 tab buttons: Jobs, Upgrades, Move West, Awards) — starts hidden
   - #settings-panel (save/reset overlay)
   Script load order: utils -> gameData -> gameState -> effects -> events -> story -> ui -> app
 
@@ -24,7 +25,7 @@ manifest.json
   id:"idle-western-pwa". Icons: img/icon-192.png, img/icon-512.png.
 
 sw.js
-  Service worker. Cache name "idle-western-v2". Caches all app assets.
+  Service worker. Cache name "idle-western-v3". Caches all app assets.
   Video files (.mp4/.webm) bypass cache (network-only).
 
 css/style.css
@@ -34,6 +35,7 @@ css/style.css
   - Tab content (business rows, upgrade rows, prestige panel, achievements)
   - Toast, offline overlay, achievement popup
   - Background video (.bg-video), story overlay, offline multiplier display
+  - Splash screen (.splash-screen), difficulty overlay (.difficulty-overlay)
   - Media queries for scene height and desktop centering
 
 ================================================================================
@@ -65,6 +67,15 @@ JS MODULES (all IIFE singletons on window)
 --- js/gameData.js ---
   Module: GameData
   Static game configuration. No runtime state.
+
+  GameData.DIFFICULTY_CONFIG: { [key]: DifficultyDef }
+    Three difficulty modes. Keys: easy, medium, hard
+    Fields: label, incomeMult, tapMult, icon, desc, warning, unlockRequires
+    easy:   incomeMult=100, tapMult=100, unlockRequires=null
+    medium: incomeMult=10,  tapMult=10,  unlockRequires='easy'
+    hard:   incomeMult=1,   tapMult=1,   unlockRequires='medium'
+    NOTE: Adjust incomeMult/tapMult to rebalance difficulty.
+    NOTE: Costs/unlockCosts are NOT scaled — only income and tap values change.
 
   GameData.BUSINESSES: Array<BusinessDef>
     10 entries. Fields: id, name, icon, desc, baseCost, baseIncome, unlockCost, costMult
@@ -109,12 +120,14 @@ JS MODULES (all IIFE singletons on window)
 
   Constants:
     SAVE_KEY = 'idleWestern_save'
+    COMPLETIONS_KEY = 'idleWestern_completions'
     SAVE_INTERVAL = 30000 (30s)
     OFFLINE_CAP_HOURS = 8
     OFFLINE_RATE = 0.5 (50% of active rate)
 
   GameState.init() -> state object
     Loads from localStorage, fills missing fields, starts auto-save.
+    Migration: old saves with progress but no difficulty → set difficulty='hard'.
 
   GameState.save() -> void
     Persists state to localStorage.
@@ -123,11 +136,12 @@ JS MODULES (all IIFE singletons on window)
     Direct access to the live state. Callers mutate it directly.
 
   GameState.hardReset() -> void
-    Wipes all progress. Used by settings reset button.
+    Wipes all progress. Resets difficulty to null (so player picks again).
+    Does NOT clear completions (separate localStorage key).
 
   GameState.resetForPrestige() -> boolean
     Prestige reset. Returns false if 0 stars available.
-    Preserves: pioneerStars, totalPrestiges, lifetimeEarned, achievements, storyShown.
+    Preserves: pioneerStars, totalPrestiges, lifetimeEarned, achievements, storyShown, difficulty.
 
   GameState.calcPrestigeStars() -> number
     Formula: floor(sqrt(totalEarned / 1,000,000))
@@ -141,17 +155,35 @@ JS MODULES (all IIFE singletons on window)
   GameState.addBuff(id: string, effect: string, mult: number, durationSec: number) -> void
   GameState.cleanExpiredBuffs() -> void
 
+  GameState.getDifficultyConfig() -> DifficultyDef
+    Returns config for current difficulty. Falls back to 'hard' if null.
+
+  GameState.getDifficultyIncomeMult() -> number
+    Income multiplier from difficulty (100/10/1).
+
+  GameState.getDifficultyTapMult() -> number
+    Tap multiplier from difficulty (100/10/1).
+
+  GameState.getCompletions() -> { easy: bool, medium: bool, hard: bool }
+    Reads from separate localStorage key 'idleWestern_completions'.
+
+  GameState.saveCompletion(difficulty: string) -> void
+    Marks a difficulty as completed in localStorage.
+
+  GameState.isDifficultyUnlocked(diffKey: string) -> boolean
+    True if unlockRequires is null or the required difficulty is completed.
+
   GameState.getTapValue() -> number
-    base tapValue * prestige mult * tap_mult buffs
+    base tapValue * prestige mult * tap_mult buffs * difficulty tap mult
 
   GameState.getBusinessIncome(bizDef: BusinessDef) -> number
-    baseIncome * owned * milestoneMultiplier (before prestige/buffs)
+    baseIncome * owned * milestoneMultiplier (before prestige/buffs/difficulty)
 
   GameState.getTotalIncomePerSec() -> number
-    Sum of all business income * prestige * income_mult buffs
+    Sum of all business income * prestige * income_mult buffs * difficulty income mult
 
   GameState.getBaseIncomePerSec() -> number
-    Sum of all business income * prestige (no buffs). Used for offline calc.
+    Sum of all business income * prestige * difficulty income mult (no buffs).
 
   GameState.getOfflineBusinessMultiplier() -> number
     Formula: typesOwned + sum(1..floor(highestBizLevel/100))
@@ -179,6 +211,7 @@ JS MODULES (all IIFE singletons on window)
 
   GameState.checkAchievements() -> string[]
     Returns array of newly unlocked achievement IDs.
+    When 'all_biz' is unlocked, also calls saveCompletion() for current difficulty.
 
 --- js/effects.js ---
   Module: Effects
@@ -291,12 +324,34 @@ JS MODULES (all IIFE singletons on window)
 --- js/app.js ---
   Module: App
   Entry point. Owns the game loop, the single bg-video element in scene-area,
-  and system initialization.
+  splash screen, difficulty selection, and system initialization.
 
-  App.init() -> void
-    Boot sequence: GameState -> Effects -> Events -> UI -> offline earnings ->
-    ambient dust -> scene video element -> preload videos -> service worker ->
-    story intro (or theme video) -> game loop
+  Boot flow:
+    DOMContentLoaded -> App.boot() -> preload first video (5s timeout) ->
+    afterSplash() -> showDifficultySelect() (if new) -> startGame() ->
+    story (if new) -> game loop
+
+  App.boot() -> void
+    Entry point called on DOMContentLoaded.
+    1. Calls GameState.init() to load save data
+    2. Determines first video to preload (story0 for new, themeN for returning)
+    3. Races video canplaythrough vs 5-second timeout
+    4. Calls afterSplash() when ready
+
+  Internal: afterSplash() -> void
+    Fades out splash screen. Shows difficulty select if not chosen, else startGame().
+
+  Internal: showDifficultySelect() -> void
+    Creates full-screen overlay with 3 difficulty cards.
+    Locked cards are dimmed/disabled. Completed cards show badge.
+    On selection: sets state.difficulty, saves, calls startGame().
+
+  Internal: revealGameUI() -> void
+    Removes .hidden from game-header, scene-area, tab-content, bottom-nav.
+
+  Internal: startGame() -> void
+    (Formerly init.) Reveals UI, calculates offline earnings, initializes
+    all subsystems (Effects, Events, UI), creates bg-video, starts game loop.
 
   App.playSceneVideo(name: string) -> void
     Play video/{name}.mp4 (or .webm) looping in the scene-area bg-video.
@@ -360,9 +415,24 @@ STATE SHAPE (localStorage key: "idleWestern_save")
 
   storyShown: boolean,         // Whether intro story has been shown
 
+  difficulty: string | null,   // 'easy' | 'medium' | 'hard' | null (not yet chosen)
+
   buyMode: number,             // 1, 10, or -1 (max)
   version: number              // Save format version (currently 1)
 }
+
+================================================================================
+COMPLETION TRACKING (localStorage key: "idleWestern_completions")
+================================================================================
+
+Separate from main save so hard reset doesn't erase unlock progress.
+{ easy: boolean, medium: boolean, hard: boolean }
+
+A difficulty is "completed" when the player earns the 'all_biz' achievement
+(owns all 10 business types) while playing on that difficulty.
+
+Completing a difficulty unlocks the next one:
+  easy (always available) -> medium (requires easy completed) -> hard (requires medium completed)
 
 ================================================================================
 DISPLAY NAME vs INTERNAL ID MISMATCHES
@@ -388,6 +458,7 @@ snakeoil       | Snake Oil Salesman| Event, mult randomized at spawn not in def
 tap1..tap6     | Sturdy Gloves..   | Tap upgrades, sequential IDs
 first_tap etc  | Howdy Partner etc | Achievements
 buyMode -1     | "Max"             | UI shows "Max", stored as -1
+easy/medium/hard | Easy/Medium/Hard | Difficulty keys in DIFFICULTY_CONFIG
 
 ================================================================================
 VIDEO FILE CONVENTIONS
@@ -422,3 +493,26 @@ Video specs (same for ALL videos, story and theme):
   - Keep file size small (< 2MB each) since they're not cached by service worker
   - Page attempts to preload all video files on init (404s cleaned up silently)
   - If a video file doesn't exist, the previous video (or CSS bg) stays
+
+================================================================================
+BOOT FLOW
+================================================================================
+
+1. Browser loads index.html → splash screen visible immediately (static HTML)
+2. JS files load → DOMContentLoaded fires → App.boot()
+3. boot() calls GameState.init() to load/migrate save data
+4. boot() determines first video to preload:
+   - New player (!storyShown): video/story0
+   - Returning player: video/theme{N} where N = business types owned
+5. Races video canplaythrough event vs 5-second timeout
+6. afterSplash(): fade out splash, then:
+   - If difficulty not chosen (state.difficulty === null): show difficulty select overlay
+   - If difficulty already set: proceed directly to startGame()
+7. showDifficultySelect(): full-screen overlay with 3 cards
+   - Easy: always available
+   - Medium: locked until Easy completed
+   - Hard: locked until Medium completed, shows warning text
+   - On pick: set state.difficulty, save, call startGame()
+8. startGame(): reveal game UI, init subsystems, start game loop
+   - If new player: Story.start() shows intro with video
+   - If returning: updateThemeVideo() starts background video

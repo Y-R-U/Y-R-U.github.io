@@ -15,8 +15,17 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Splash / Loading Screen (visible before JS loads) -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-icon">&#129312;</div>
+      <div class="splash-title">IDLE WESTERN</div>
+      <div class="splash-sub">Loading the frontier...</div>
+    </div>
+  </div>
+
   <!-- Header -->
-  <header id="game-header">
+  <header id="game-header" class="hidden">
     <div class="header-left">
       <button id="settings-btn" class="icon-btn" aria-label="Settings">&equiv;</button>
       <div class="header-title">IDLE WESTERN</div>
@@ -31,7 +40,7 @@
   <div id="buff-bar" class="buff-bar hidden"></div>
 
   <!-- Scene Area (tap zone + events) -->
-  <div id="scene-area" class="scene-area">
+  <div id="scene-area" class="scene-area hidden">
     <div class="scene-sky"></div>
     <div class="scene-mountains"></div>
     <div class="scene-ground">
@@ -46,10 +55,10 @@
   </div>
 
   <!-- Tab Content -->
-  <div id="tab-content" class="tab-content"></div>
+  <div id="tab-content" class="tab-content hidden"></div>
 
   <!-- Bottom Nav -->
-  <nav id="bottom-nav" class="bottom-nav">
+  <nav id="bottom-nav" class="bottom-nav hidden">
     <button class="tab-btn active" data-tab="jobs">
       <span class="tab-icon">&#128188;</span>
       <span class="tab-label">Jobs</span>

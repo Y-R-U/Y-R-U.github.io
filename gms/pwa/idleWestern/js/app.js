@@ -1,6 +1,10 @@
 /**
  * app.js - Entry point, game loop, initialization
  *
+ * Boot flow:
+ *   boot() → preload first video → afterSplash() →
+ *   showDifficultySelect() (if new) → startGame() → story (if new) → game loop
+ *
  * Owns the single bg-video element in scene-area.
  * Story.js and the theme system both funnel through
  * playSceneVideo() / clearStoryVideo() to avoid conflicts.
@@ -17,15 +21,152 @@ const App = (() => {
   let bgVideoCheckTimer = 0;
   let lastThemeVideoIndex = -1;
 
+  const SPLASH_TIMEOUT = 5000; // Max 5s wait for first video
+
   // Track what's currently driving the video: 'story' | 'theme' | null
   let videoOwner = null;
   // Currently loaded video src so we don't reload the same file
   let currentVideoSrc = null;
 
-  // ── Lifecycle ────────────────────────────────────────────
+  // ── Boot (entry point) ─────────────────────────────────────
 
-  function init() {
+  function boot() {
+    // Init state first so we know if player is new or returning
     GameState.init();
+
+    const state = GameState.getState();
+
+    // Determine which video to preload first
+    let firstVideoBase;
+    if (!state.storyShown) {
+      // New player: preload story0
+      firstVideoBase = 'video/story0';
+    } else {
+      // Existing player: preload correct theme video
+      let typesOwned = 0;
+      for (const biz of GameData.BUSINESSES) {
+        if ((state.businesses[biz.id]?.owned || 0) > 0) typesOwned++;
+      }
+      firstVideoBase = 'video/theme' + typesOwned;
+    }
+
+    // Race: video ready vs timeout
+    let resolved = false;
+    const done = () => {
+      if (resolved) return;
+      resolved = true;
+      afterSplash();
+    };
+
+    // Try to load the first video
+    resolveVideoSrc(firstVideoBase).then(src => {
+      if (src && !resolved) {
+        // Video file exists — wait for it to be playable
+        const v = document.createElement('video');
+        v.preload = 'auto';
+        v.muted = true;
+        v.oncanplaythrough = () => done();
+        v.onerror = () => done();
+        v.src = src;
+      } else {
+        done();
+      }
+    });
+
+    // Timeout fallback
+    setTimeout(done, SPLASH_TIMEOUT);
+  }
+
+  // ── After splash ───────────────────────────────────────────
+
+  function afterSplash() {
+    // Fade out splash screen
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 600);
+    }
+
+    const state = GameState.getState();
+
+    // If difficulty not chosen yet, show difficulty select
+    if (!state.difficulty) {
+      showDifficultySelect();
+    } else {
+      startGame();
+    }
+  }
+
+  // ── Difficulty selection overlay ───────────────────────────
+
+  function showDifficultySelect() {
+    const completions = GameState.getCompletions();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'difficulty-overlay';
+    overlay.id = 'difficulty-overlay';
+
+    let cardsHtml = '';
+    for (const [key, cfg] of Object.entries(GameData.DIFFICULTY_CONFIG)) {
+      const unlocked = GameState.isDifficultyUnlocked(key);
+      const completed = completions[key] === true;
+      const lockedClass = unlocked ? '' : 'locked';
+      const completedBadge = completed ? '<span class="diff-completed">\u2705 Completed</span>' : '';
+      const warningHtml = cfg.warning ? '<div class="diff-warning">' + cfg.warning + '</div>' : '';
+      const lockIcon = unlocked ? '' : '<span class="diff-lock">\uD83D\uDD12</span>';
+
+      cardsHtml += `
+        <button class="diff-card ${lockedClass}" data-diff="${key}" ${unlocked ? '' : 'disabled'}>
+          <div class="diff-card-icon">${cfg.icon} ${lockIcon}</div>
+          <div class="diff-card-label">${cfg.label}</div>
+          <div class="diff-card-desc">${cfg.desc}</div>
+          ${warningHtml}
+          ${completedBadge}
+        </button>
+      `;
+    }
+
+    overlay.innerHTML = `
+      <div class="difficulty-box">
+        <div class="difficulty-title">Choose Your Path</div>
+        <div class="difficulty-cards">${cardsHtml}</div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Bind click handlers
+    overlay.querySelectorAll('.diff-card:not(.locked)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const diff = btn.dataset.diff;
+        const state = GameState.getState();
+        state.difficulty = diff;
+        GameState.save();
+
+        // Remove overlay with fade
+        overlay.classList.add('difficulty-fade-out');
+        setTimeout(() => {
+          overlay.remove();
+          startGame();
+        }, 400);
+      });
+    });
+  }
+
+  // ── Reveal game UI ─────────────────────────────────────────
+
+  function revealGameUI() {
+    const ids = ['game-header', 'scene-area', 'tab-content', 'bottom-nav'];
+    for (const id of ids) {
+      document.getElementById(id)?.classList.remove('hidden');
+    }
+  }
+
+  // ── Start game (formerly init) ─────────────────────────────
+
+  function startGame() {
+    // GameState.init() was already called in boot()
+    revealGameUI();
 
     const offlineEarnings = GameState.calcOfflineEarnings();
 
@@ -269,8 +410,8 @@ const App = (() => {
     requestAnimationFrame(gameLoop);
   }
 
-  return { init, playSceneVideo, clearStoryVideo, updateThemeVideo };
+  return { boot, playSceneVideo, clearStoryVideo, updateThemeVideo };
 })();
 
 // Boot when DOM is ready
-document.addEventListener('DOMContentLoaded', App.init);
+document.addEventListener('DOMContentLoaded', App.boot);

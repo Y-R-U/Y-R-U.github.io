@@ -4,6 +4,7 @@
 
 const GameState = (() => {
   const SAVE_KEY = 'idleWestern_save';
+  const COMPLETIONS_KEY = 'idleWestern_completions';
   const SAVE_INTERVAL = 30000; // 30s auto-save
   const OFFLINE_CAP_HOURS = 8;
   const OFFLINE_RATE = 0.5; // 50% of active rate
@@ -43,6 +44,9 @@ const GameState = (() => {
       // Story
       storyShown: false,
 
+      // Difficulty: 'easy' | 'medium' | 'hard' | null (not yet chosen)
+      difficulty: null,
+
       // Buy mode
       buyMode: 1, // 1, 10, or -1 for max
 
@@ -60,6 +64,12 @@ const GameState = (() => {
         const fresh = createFreshState();
         for (const key in fresh) {
           if (!(key in state)) state[key] = fresh[key];
+        }
+        // Migration: existing players with progress but no difficulty → hard
+        if (state.difficulty === undefined || state.difficulty === null) {
+          if (state.totalEarned > 0 || state.storyShown) {
+            state.difficulty = 'hard';
+          }
         }
       } catch (e) {
         console.warn('Save corrupted, starting fresh');
@@ -125,6 +135,8 @@ const GameState = (() => {
     for (const biz of GameData.BUSINESSES) {
       state.businesses[biz.id] = { owned: 0 };
     }
+    // difficulty reset to null so player picks again
+    // completions NOT cleared (separate localStorage key)
     save();
   }
 
@@ -149,6 +161,44 @@ const GameState = (() => {
     return mult;
   }
 
+  // --- Difficulty ---
+
+  function getDifficultyConfig() {
+    const key = state.difficulty || 'hard';
+    return GameData.DIFFICULTY_CONFIG[key] || GameData.DIFFICULTY_CONFIG.hard;
+  }
+
+  function getDifficultyIncomeMult() {
+    return getDifficultyConfig().incomeMult;
+  }
+
+  function getDifficultyTapMult() {
+    return getDifficultyConfig().tapMult;
+  }
+
+  // --- Completion tracking (separate localStorage, survives hard reset) ---
+
+  function getCompletions() {
+    try {
+      const raw = localStorage.getItem(COMPLETIONS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+    return { easy: false, medium: false, hard: false };
+  }
+
+  function saveCompletion(difficulty) {
+    const completions = getCompletions();
+    completions[difficulty] = true;
+    localStorage.setItem(COMPLETIONS_KEY, JSON.stringify(completions));
+  }
+
+  function isDifficultyUnlocked(diffKey) {
+    const config = GameData.DIFFICULTY_CONFIG[diffKey];
+    if (!config) return false;
+    if (!config.unlockRequires) return true;
+    return getCompletions()[config.unlockRequires] === true;
+  }
+
   function cleanExpiredBuffs() {
     const now = Date.now();
     state.buffs = state.buffs.filter(b => b.endsAt > now);
@@ -167,7 +217,8 @@ const GameState = (() => {
     const base = state.tapValue;
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('tap_mult');
-    return base * prestigeMult * buffMult;
+    const diffMult = getDifficultyTapMult();
+    return base * prestigeMult * buffMult * diffMult;
   }
 
   function getBusinessIncome(bizDef) {
@@ -184,7 +235,8 @@ const GameState = (() => {
     }
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('income_mult');
-    return total * prestigeMult * buffMult;
+    const diffMult = getDifficultyIncomeMult();
+    return total * prestigeMult * buffMult * diffMult;
   }
 
   function getBaseIncomePerSec() {
@@ -193,7 +245,7 @@ const GameState = (() => {
     for (const biz of GameData.BUSINESSES) {
       total += getBusinessIncome(biz);
     }
-    return total * getPrestigeMultiplier();
+    return total * getPrestigeMultiplier() * getDifficultyIncomeMult();
   }
 
   /**
@@ -368,8 +420,13 @@ const GameState = (() => {
     if (state.eventsClicked >= 10 && unlockAchievement('event_10'))
       unlocked.push('event_10');
 
-    if (typesOwned >= 10 && unlockAchievement('all_biz'))
+    if (typesOwned >= 10 && unlockAchievement('all_biz')) {
       unlocked.push('all_biz');
+      // Mark current difficulty as completed
+      if (state.difficulty) {
+        saveCompletion(state.difficulty);
+      }
+    }
 
     return unlocked;
   }
@@ -378,6 +435,8 @@ const GameState = (() => {
     init, save, getState, hardReset,
     resetForPrestige, calcPrestigeStars, getPrestigeMultiplier,
     getBuffMultiplier, addBuff, cleanExpiredBuffs,
+    getDifficultyConfig, getDifficultyIncomeMult, getDifficultyTapMult,
+    getCompletions, saveCompletion, isDifficultyUnlocked,
     getTapValue, getBusinessIncome, getTotalIncomePerSec, getBaseIncomePerSec,
     getOfflineBusinessMultiplier,
     calcOfflineEarnings, doTick, tap,

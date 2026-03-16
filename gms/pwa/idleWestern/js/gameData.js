@@ -4,6 +4,13 @@
 
 const GameData = (() => {
 
+  // ── Difficulty tuning (adjust these values to balance game modes) ──
+  const DIFFICULTY_CONFIG = {
+    easy:   { label: 'Easy',   incomeMult: 100, tapMult: 100, icon: '\uD83C\uDF35', desc: 'Relaxed frontier life',       warning: null,                              unlockRequires: null },
+    medium: { label: 'Medium', incomeMult: 10,  tapMult: 10,  icon: '\u26CF\uFE0F', desc: 'A fair challenge',             warning: null,                              unlockRequires: 'easy' },
+    hard:   { label: 'Hard',   incomeMult: 1,   tapMult: 1,   icon: '\uD83D\uDC80', desc: 'The true frontier experience', warning: '\u26A0\uFE0F You might not finish!', unlockRequires: 'medium' }
+  };
+
   const BUSINESSES = [
     {
       id: 'stable',
@@ -237,6 +244,7 @@ const GameData = (() => {
 
   return {
     BUSINESSES, MILESTONES, TAP_UPGRADES, EVENTS, ACHIEVEMENTS,
+    DIFFICULTY_CONFIG,
     getBusinessCost, getBusinessCostN, getMilestoneMultiplier
   };
 })();
