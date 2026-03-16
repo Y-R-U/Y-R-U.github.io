@@ -126,15 +126,19 @@ body {
   background: rgba(255,215,0,0.15);
 }
 
-/* --- Buff Bar --- */
+/* --- Buff Bar (floats over scene, no layout shift) --- */
 .buff-bar {
+  position: absolute;
+  top: calc(var(--header-h) + var(--safe-top));
+  left: 0;
+  right: 0;
   background: rgba(0,0,0,0.7);
   padding: 4px 8px;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  z-index: 9;
-  flex-shrink: 0;
+  z-index: 11;
+  pointer-events: none;
 }
 
 .buff-pill {
@@ -144,6 +148,7 @@ body {
   padding: 2px 8px;
   border-radius: 10px;
   white-space: nowrap;
+  pointer-events: auto;
 }
 
 /* --- Scene Area --- */
@@ -1323,4 +1328,78 @@ body {
   color: var(--green-light);
   margin-top: 4px;
   font-weight: bold;
+}
+
+/* --- Modal (replaces native confirm/alert) --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFadeIn 0.2s ease-out;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.modal-box {
+  background: var(--paper);
+  border: 3px solid var(--gold-dark);
+  border-radius: 12px;
+  padding: 24px 20px;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: modalSlideIn 0.2s ease-out;
+}
+@keyframes modalSlideIn {
+  from { transform: translateY(30px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--wood-dark);
+}
+.modal-msg {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.modal-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 100px;
+  transition: filter 0.15s;
+}
+.modal-btn:active {
+  filter: brightness(0.85);
+}
+.modal-btn-cancel {
+  background: var(--paper-dark);
+  color: var(--text);
+}
+.modal-btn-primary {
+  background: var(--green);
+  color: white;
+}
+.modal-btn-danger {
+  background: var(--red);
+  color: white;
 }

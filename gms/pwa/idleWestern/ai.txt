@@ -25,17 +25,18 @@ manifest.json
   id:"idle-western-pwa". Icons: img/icon-192.png, img/icon-512.png.
 
 sw.js
-  Service worker. Cache name "idle-western-v3". Caches all app assets.
+  Service worker. Cache name "idle-western-v4". Caches all app assets.
   Video files (.mp4/.webm) bypass cache (network-only).
 
 css/style.css
   All styling. CSS variables in :root. Major sections:
-  - Header, buff bar, scene area (sky/mountains/ground via CSS clip-path)
+  - Header, buff bar (position:absolute overlay, no layout shift), scene area (sky/mountains/ground via CSS clip-path)
   - Random event animations (tumbleweed, dustdevil, nugget, wanted, snakeoil)
   - Tab content (business rows, upgrade rows, prestige panel, achievements)
   - Toast, offline overlay, achievement popup
   - Background video (.bg-video), story overlay, offline multiplier display
   - Splash screen (.splash-screen), difficulty overlay (.difficulty-overlay)
+  - Modal overlay (.modal-overlay) replaces native confirm/alert dialogs
   - Media queries for scene height and desktop centering
 
 ================================================================================
@@ -70,11 +71,16 @@ JS MODULES (all IIFE singletons on window)
 
   GameData.DIFFICULTY_CONFIG: { [key]: DifficultyDef }
     Three difficulty modes. Keys: easy, medium, hard
-    Fields: label, incomeMult, tapMult, icon, desc, warning, unlockRequires
-    easy:   incomeMult=100, tapMult=100, unlockRequires=null
-    medium: incomeMult=10,  tapMult=10,  unlockRequires='easy'
-    hard:   incomeMult=1,   tapMult=1,   unlockRequires='medium'
-    NOTE: Adjust incomeMult/tapMult to rebalance difficulty.
+    Fields: label, icon, desc, warning, unlockRequires, tiers[]
+    Each tier: { totalBiz: number, oilLevel: number, mult: number }
+      totalBiz = total businesses owned across all types
+      oilLevel = Oil Derrick quantity owned
+      mult     = income & tap multiplier when BOTH thresholds met
+    Tiers evaluated in order; last matching tier wins (highest mult).
+    Easy  tiers: 3x start → 10x at 100 biz → 100x at oil 100 → 1000x at oil 300 → 10000x at oil 400
+    Medium tiers: 2x start → 4x at 100 biz → 10x at oil 100 → 100x at oil 300 → 1000x at oil 400
+    Hard  tiers: 1x start → 1x at 100 biz → 1x at oil 100 → 10x at oil 300 → 100x at oil 400
+    NOTE: Adjust tiers array to rebalance difficulty.
     NOTE: Costs/unlockCosts are NOT scaled — only income and tap values change.
 
   GameData.BUSINESSES: Array<BusinessDef>
@@ -158,11 +164,10 @@ JS MODULES (all IIFE singletons on window)
   GameState.getDifficultyConfig() -> DifficultyDef
     Returns config for current difficulty. Falls back to 'hard' if null.
 
-  GameState.getDifficultyIncomeMult() -> number
-    Income multiplier from difficulty (100/10/1).
-
-  GameState.getDifficultyTapMult() -> number
-    Tap multiplier from difficulty (100/10/1).
+  GameState.getDifficultyMult() -> number
+    Progressive income/tap multiplier from difficulty.
+    Evaluates tiers based on total businesses owned + oil level.
+    Returns the mult of the highest matching tier.
 
   GameState.getCompletions() -> { easy: bool, medium: bool, hard: bool }
     Reads from separate localStorage key 'idleWestern_completions'.
@@ -174,16 +179,16 @@ JS MODULES (all IIFE singletons on window)
     True if unlockRequires is null or the required difficulty is completed.
 
   GameState.getTapValue() -> number
-    base tapValue * prestige mult * tap_mult buffs * difficulty tap mult
+    base tapValue * prestige mult * tap_mult buffs * difficulty mult (progressive)
 
   GameState.getBusinessIncome(bizDef: BusinessDef) -> number
     baseIncome * owned * milestoneMultiplier (before prestige/buffs/difficulty)
 
   GameState.getTotalIncomePerSec() -> number
-    Sum of all business income * prestige * income_mult buffs * difficulty income mult
+    Sum of all business income * prestige * income_mult buffs * difficulty mult (progressive)
 
   GameState.getBaseIncomePerSec() -> number
-    Sum of all business income * prestige * difficulty income mult (no buffs).
+    Sum of all business income * prestige * difficulty mult (progressive, no buffs).
 
   GameState.getOfflineBusinessMultiplier() -> number
     Formula: typesOwned + sum(1..floor(highestBizLevel/100))
@@ -312,8 +317,12 @@ JS MODULES (all IIFE singletons on window)
   Internal: renderUpgradesTab(container) -> void
     Tap upgrades + business milestone dots.
 
+  Internal: showModal({ title, message, confirmLabel, cancelLabel, confirmClass }) -> Promise<boolean>
+    Styled modal replacing native confirm(). Returns true on confirm, false on cancel.
+    confirmClass: 'modal-btn-primary' or 'modal-btn-danger'.
+
   Internal: renderPrestigeTab(container) -> void
-    Pioneer star stats + "Move West" button with confirm dialog.
+    Pioneer star stats + "Move West" button with styled modal.
 
   Internal: renderAchievementsTab(container) -> void
     Achievement list with locked/unlocked states.

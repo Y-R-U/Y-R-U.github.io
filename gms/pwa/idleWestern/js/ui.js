@@ -313,12 +313,20 @@ const UI = (() => {
 
     if (newStars > 0) {
       panel.querySelector('#prestige-btn').addEventListener('click', () => {
-        if (confirm(`Move West? You'll earn ${newStars} Pioneer Star(s) but lose all businesses and coins.`)) {
-          GameState.resetForPrestige();
-          updateHeader();
-          renderTab();
-          showToast('\uD83C\uDF05 You head West to a new frontier!');
-        }
+        showModal({
+          title: '\uD83C\uDF05 Move West',
+          message: `You'll earn ${newStars} Pioneer Star(s) but lose all businesses and coins.`,
+          confirmLabel: 'Move West',
+          cancelLabel: 'Stay',
+          confirmClass: 'modal-btn-primary'
+        }).then(ok => {
+          if (ok) {
+            GameState.resetForPrestige();
+            updateHeader();
+            renderTab();
+            showToast('\uD83C\uDF05 You head West to a new frontier!');
+          }
+        });
       });
     }
 
@@ -347,6 +355,35 @@ const UI = (() => {
     }
 
     container.appendChild(section);
+  }
+
+  // ---- MODAL (replaces native confirm/alert) ----
+  function showModal({ title, message, confirmLabel, cancelLabel, confirmClass }) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `
+        <div class="modal-box">
+          <div class="modal-title">${title}</div>
+          <div class="modal-msg">${message}</div>
+          <div class="modal-buttons">
+            <button class="modal-btn modal-btn-cancel" data-action="cancel">${cancelLabel || 'Cancel'}</button>
+            <button class="modal-btn ${confirmClass || 'modal-btn-primary'}" data-action="confirm">${confirmLabel || 'OK'}</button>
+          </div>
+        </div>
+      `;
+
+      function close(result) {
+        overlay.remove();
+        resolve(result);
+      }
+
+      overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+      overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => close(true));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(false); });
+
+      document.body.appendChild(overlay);
+    });
   }
 
   // ---- TOAST ----
@@ -388,12 +425,18 @@ const UI = (() => {
     });
 
     document.getElementById('reset-btn').addEventListener('click', () => {
-      if (confirm('Are you sure? This will DELETE ALL progress permanently!')) {
-        if (confirm('Really? There is no undo!')) {
+      showModal({
+        title: '\u26A0\uFE0F Delete All Progress',
+        message: 'This will permanently DELETE ALL progress. There is no undo!',
+        confirmLabel: 'Delete Everything',
+        cancelLabel: 'Cancel',
+        confirmClass: 'modal-btn-danger'
+      }).then(ok => {
+        if (ok) {
           GameState.hardReset();
           location.reload();
         }
-      }
+      });
     });
   }
 

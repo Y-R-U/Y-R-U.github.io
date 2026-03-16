@@ -168,12 +168,26 @@ const GameState = (() => {
     return GameData.DIFFICULTY_CONFIG[key] || GameData.DIFFICULTY_CONFIG.hard;
   }
 
-  function getDifficultyIncomeMult() {
-    return getDifficultyConfig().incomeMult;
-  }
+  function getDifficultyMult() {
+    const config = getDifficultyConfig();
+    const tiers = config.tiers;
+    if (!tiers || tiers.length === 0) return 1;
 
-  function getDifficultyTapMult() {
-    return getDifficultyConfig().tapMult;
+    // Current game totals
+    let totalBiz = 0;
+    const oilLevel = state.businesses.oil?.owned || 0;
+    for (const biz of GameData.BUSINESSES) {
+      totalBiz += state.businesses[biz.id]?.owned || 0;
+    }
+
+    // Last matching tier wins (tiers ordered ascending)
+    let mult = 1;
+    for (const tier of tiers) {
+      if (totalBiz >= tier.totalBiz && oilLevel >= tier.oilLevel) {
+        mult = tier.mult;
+      }
+    }
+    return mult;
   }
 
   // --- Completion tracking (separate localStorage, survives hard reset) ---
@@ -217,7 +231,7 @@ const GameState = (() => {
     const base = state.tapValue;
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('tap_mult');
-    const diffMult = getDifficultyTapMult();
+    const diffMult = getDifficultyMult();
     return base * prestigeMult * buffMult * diffMult;
   }
 
@@ -235,7 +249,7 @@ const GameState = (() => {
     }
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('income_mult');
-    const diffMult = getDifficultyIncomeMult();
+    const diffMult = getDifficultyMult();
     return total * prestigeMult * buffMult * diffMult;
   }
 
@@ -245,7 +259,7 @@ const GameState = (() => {
     for (const biz of GameData.BUSINESSES) {
       total += getBusinessIncome(biz);
     }
-    return total * getPrestigeMultiplier() * getDifficultyIncomeMult();
+    return total * getPrestigeMultiplier() * getDifficultyMult();
   }
 
   /**
@@ -435,7 +449,7 @@ const GameState = (() => {
     init, save, getState, hardReset,
     resetForPrestige, calcPrestigeStars, getPrestigeMultiplier,
     getBuffMultiplier, addBuff, cleanExpiredBuffs,
-    getDifficultyConfig, getDifficultyIncomeMult, getDifficultyTapMult,
+    getDifficultyConfig, getDifficultyMult,
     getCompletions, saveCompletion, isDifficultyUnlocked,
     getTapValue, getBusinessIncome, getTotalIncomePerSec, getBaseIncomePerSec,
     getOfflineBusinessMultiplier,

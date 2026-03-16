@@ -4,11 +4,47 @@
 
 const GameData = (() => {
 
-  // ── Difficulty tuning (adjust these values to balance game modes) ──
+  // ── Difficulty tuning ──────────────────────────────────────────────
+  // Each tier: { totalBiz, oilLevel, mult }
+  //   totalBiz = total businesses owned across all types
+  //   oilLevel = Oil Derrick quantity owned
+  //   mult     = income & tap multiplier once BOTH thresholds are met
+  // Tiers are evaluated top-to-bottom; last matching tier wins.
+  // Adjust these numbers freely to re-balance difficulty modes.
   const DIFFICULTY_CONFIG = {
-    easy:   { label: 'Easy',   incomeMult: 100, tapMult: 100, icon: '\uD83C\uDF35', desc: 'Relaxed frontier life',       warning: null,                              unlockRequires: null },
-    medium: { label: 'Medium', incomeMult: 10,  tapMult: 10,  icon: '\u26CF\uFE0F', desc: 'A fair challenge',             warning: null,                              unlockRequires: 'easy' },
-    hard:   { label: 'Hard',   incomeMult: 1,   tapMult: 1,   icon: '\uD83D\uDC80', desc: 'The true frontier experience', warning: '\u26A0\uFE0F You might not finish!', unlockRequires: 'medium' }
+    easy: {
+      label: 'Easy', icon: '\uD83C\uDF35', desc: 'Relaxed frontier life',
+      warning: null, unlockRequires: null,
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 3 },
+        { totalBiz: 100, oilLevel: 0,   mult: 10 },
+        { totalBiz: 0,   oilLevel: 100, mult: 100 },
+        { totalBiz: 0,   oilLevel: 300, mult: 1000 },
+        { totalBiz: 0,   oilLevel: 400, mult: 10000 },
+      ]
+    },
+    medium: {
+      label: 'Medium', icon: '\u26CF\uFE0F', desc: 'A fair challenge',
+      warning: null, unlockRequires: 'easy',
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 2 },
+        { totalBiz: 100, oilLevel: 0,   mult: 4 },
+        { totalBiz: 0,   oilLevel: 100, mult: 10 },
+        { totalBiz: 0,   oilLevel: 300, mult: 100 },
+        { totalBiz: 0,   oilLevel: 400, mult: 1000 },
+      ]
+    },
+    hard: {
+      label: 'Hard', icon: '\uD83D\uDC80', desc: 'The true frontier experience',
+      warning: '\u26A0\uFE0F You might not finish!', unlockRequires: 'medium',
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 1 },
+        { totalBiz: 100, oilLevel: 0,   mult: 1 },
+        { totalBiz: 0,   oilLevel: 100, mult: 1 },
+        { totalBiz: 0,   oilLevel: 300, mult: 10 },
+        { totalBiz: 0,   oilLevel: 400, mult: 100 },
+      ]
+    }
   };
 
   const BUSINESSES = [
