@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idle-western-v4';
+const CACHE_NAME = 'idle-western-v5';
 const ASSETS = [
   './',
   './index.html',

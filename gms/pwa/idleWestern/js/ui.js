@@ -71,6 +71,11 @@ const UI = (() => {
       ? Utils.formatCoins(ips) + '/s'
       : 'Tap to earn!';
 
+    // Difficulty speed multiplier
+    const multEl = document.getElementById('header-mult');
+    const diffMult = GameState.getDifficultyMult();
+    multEl.textContent = diffMult > 1 ? `Speed: ${Utils.formatNumber(diffMult)}x` : '';
+
     // Update buff indicators
     updateBuffBar();
   }
@@ -163,12 +168,14 @@ const UI = (() => {
         ? Math.min(100, (owned / nextMilestone.count) * 100)
         : 100;
 
+      const milestoneMult = GameData.getMilestoneMultiplier(owned);
+
       const row = document.createElement('div');
       row.className = `biz-row ${!unlocked ? 'locked' : ''} ${canAfford ? 'affordable' : ''}`;
       row.innerHTML = `
         <div class="biz-icon">${biz.icon}</div>
         <div class="biz-info">
-          <div class="biz-name">${biz.name} ${owned > 0 ? `<span class="biz-count">x${owned}</span>` : ''}</div>
+          <div class="biz-name">${biz.name} ${owned > 0 ? `<span class="biz-count">x${owned}</span>` : ''}${milestoneMult > 1 ? `<span class="biz-mult">${Utils.formatNumber(milestoneMult)}x</span>` : ''}</div>
           <div class="biz-income">${unlocked ? (income > 0 ? Utils.formatCoins(income) + '/s' : 'Idle') : 'Earn ' + Utils.formatCoins(biz.unlockCost) + ' to unlock'}</div>
           ${nextMilestone && owned > 0 ? `<div class="biz-milestone-bar"><div class="biz-milestone-fill" style="width:${milestoneProgress}%"></div><span class="biz-milestone-text">${owned}/${nextMilestone.count}</span></div>` : ''}
         </div>
@@ -283,19 +290,19 @@ const UI = (() => {
       <div class="prestige-stats">
         <div class="prestige-stat">
           <div class="stat-label">Pioneer Stars</div>
-          <div class="stat-value">\u2B50 ${currentStars}</div>
+          <div class="stat-value">\u2B50 ${Utils.formatNumber(currentStars)}</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">Current Bonus</div>
-          <div class="stat-value">${Math.round((prestigeMult - 1) * 100)}%</div>
+          <div class="stat-value">${Utils.formatNumber(Math.round((prestigeMult - 1) * 100))}%</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">Stars on Reset</div>
-          <div class="stat-value">+${newStars}</div>
+          <div class="stat-value">+${Utils.formatNumber(newStars)}</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">New Bonus</div>
-          <div class="stat-value">${Math.round((nextMult - 1) * 100)}%</div>
+          <div class="stat-value">${Utils.formatNumber(Math.round((nextMult - 1) * 100))}%</div>
         </div>
       </div>
 
@@ -307,7 +314,7 @@ const UI = (() => {
       </div>
 
       <button class="prestige-btn ${newStars > 0 ? '' : 'disabled'}" id="prestige-btn" ${newStars > 0 ? '' : 'disabled'}>
-        ${newStars > 0 ? `Move West (+${newStars} \u2B50)` : 'Need $1M+ earned to Move West'}
+        ${newStars > 0 ? `Move West (+${Utils.formatNumber(newStars)} \u2B50)` : 'Need $1M+ earned to Move West'}
       </button>
     `;
 
@@ -342,6 +349,18 @@ const UI = (() => {
 
     for (const ach of GameData.ACHIEVEMENTS) {
       const unlocked = state.achievements.includes(ach.id);
+
+      // Build tier multiplier badges if this achievement has a tierIndex
+      let tierHtml = '';
+      if (ach.tierIndex != null) {
+        const badges = Object.keys(GameData.DIFFICULTY_CONFIG).map(key => {
+          const cfg = GameData.DIFFICULTY_CONFIG[key];
+          const tier = cfg.tiers[ach.tierIndex];
+          return `${cfg.icon}${tier ? tier.mult + 'x' : ''}`;
+        }).join('  ');
+        tierHtml = `<div class="ach-tier-mults">${badges}</div>`;
+      }
+
       const row = document.createElement('div');
       row.className = `ach-row ${unlocked ? 'unlocked' : 'locked'}`;
       row.innerHTML = `
@@ -349,6 +368,7 @@ const UI = (() => {
         <div class="ach-info">
           <div class="ach-name">${unlocked ? ach.name : '???'}</div>
           <div class="ach-desc">${unlocked ? ach.desc : 'Keep playing to unlock'}</div>
+          ${tierHtml}
         </div>
       `;
       section.appendChild(row);

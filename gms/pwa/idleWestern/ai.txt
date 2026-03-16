@@ -25,7 +25,7 @@ manifest.json
   id:"idle-western-pwa". Icons: img/icon-192.png, img/icon-512.png.
 
 sw.js
-  Service worker. Cache name "idle-western-v4". Caches all app assets.
+  Service worker. Cache name "idle-western-v5". Caches all app assets.
   Video files (.mp4/.webm) bypass cache (network-only).
 
 css/style.css
@@ -106,10 +106,13 @@ JS MODULES (all IIFE singletons on window)
     Effects: income_mult, instant_income, tap_mult
     NOTE: snakeoil mult is 0 in definition (randomized 2-10 at spawn time in events.js)
 
-  GameData.ACHIEVEMENTS: Array<{id, name, desc, icon}>
-    14 achievements. IDs: first_tap, first_hire, earn_1k, earn_1m, earn_1b,
+  GameData.ACHIEVEMENTS: Array<{id, name, desc, icon, tierIndex?}>
+    18 achievements. IDs: first_tap, first_hire, earn_1k, earn_1m, earn_1b,
     own_saloon, own_railroad, own_oil, prestige_1, prestige_5,
-    tap_1000, tap_10000, event_10, all_biz
+    tap_1000, tap_10000, event_10, all_biz,
+    biz_100, oil_100, oil_300, oil_400
+    Last 4 have tierIndex field mapping to DIFFICULTY_CONFIG tiers[] position.
+    UI shows per-difficulty multiplier badges on these achievements.
 
   GameData.getBusinessCost(biz: BusinessDef, owned: number) -> number
     Formula: floor(baseCost * costMult^owned)
@@ -297,7 +300,7 @@ JS MODULES (all IIFE singletons on window)
     Binds tabs, binds scene tap handler, renders initial tab.
 
   UI.updateHeader() -> void
-    Updates coin count, income/sec, and buff bar.
+    Updates coin count, income/sec, difficulty speed multiplier, and buff bar.
 
   UI.renderTab() -> void
     Clears and re-renders the current tab panel.
@@ -313,6 +316,7 @@ JS MODULES (all IIFE singletons on window)
 
   Internal: renderJobsTab(container) -> void
     Buy mode selector + business list with buy buttons.
+    Shows milestone multiplier badge (e.g. "12x") next to business count when > 1x.
 
   Internal: renderUpgradesTab(container) -> void
     Tap upgrades + business milestone dots.
@@ -323,9 +327,11 @@ JS MODULES (all IIFE singletons on window)
 
   Internal: renderPrestigeTab(container) -> void
     Pioneer star stats + "Move West" button with styled modal.
+    All large numbers formatted with Utils.formatNumber() (K/M/B abbreviations).
 
   Internal: renderAchievementsTab(container) -> void
     Achievement list with locked/unlocked states.
+    Achievements with tierIndex show per-difficulty multiplier badges.
 
   Internal: updateBuffBar() -> void
     Shows active buff pills with countdown timers.

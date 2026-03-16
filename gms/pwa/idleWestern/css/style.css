@@ -90,6 +90,11 @@ body {
   letter-spacing: 3px;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
+.header-mult {
+  font-size: 10px;
+  color: var(--paper-dark);
+  opacity: 0.9;
+}
 
 .header-right {
   text-align: right;
@@ -515,6 +520,12 @@ body {
   color: var(--wood-light);
   font-weight: normal;
 }
+.biz-mult {
+  font-size: 10px;
+  color: var(--gold-dark);
+  margin-left: 4px;
+  font-weight: normal;
+}
 
 .biz-income {
   font-size: 11px;
@@ -816,6 +827,12 @@ body {
 .ach-info .ach-desc {
   font-size: 11px;
   color: var(--text-muted);
+}
+.ach-tier-mults {
+  font-size: 10px;
+  color: var(--gold-dark);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
 }
 
 /* --- Achievement Popup --- */

@@ -255,7 +255,12 @@ const GameData = (() => {
     { id: 'tap_1000', name: 'Trigger Finger', desc: 'Tap 1,000 times', icon: '\uD83D\uDC46' },
     { id: 'tap_10000', name: 'Fastest Hand', desc: 'Tap 10,000 times', icon: '\u26A1' },
     { id: 'event_10', name: 'Lucky Break', desc: 'Catch 10 random events', icon: '\uD83C\uDF1F' },
-    { id: 'all_biz', name: 'Empire Builder', desc: 'Own all 10 business types', icon: '\uD83C\uDFDB\uFE0F' }
+    { id: 'all_biz', name: 'Empire Builder', desc: 'Own all 10 business types', icon: '\uD83C\uDFDB\uFE0F' },
+    // Difficulty tier milestones (tierIndex maps to DIFFICULTY_CONFIG tiers[])
+    { id: 'biz_100', name: 'Boomtown', desc: 'Own 100 total businesses', icon: '\uD83C\uDFD8\uFE0F', tierIndex: 1 },
+    { id: 'oil_100', name: 'Oil Baron', desc: 'Oil Derrick reaches level 100', icon: '\u26FD', tierIndex: 2 },
+    { id: 'oil_300', name: 'Black Gold Rush', desc: 'Oil Derrick reaches level 300', icon: '\uD83C\uDFD7\uFE0F', tierIndex: 3 },
+    { id: 'oil_400', name: 'Oil Empire', desc: 'Oil Derrick reaches level 400', icon: '\uD83D\uDC51', tierIndex: 4 }
   ];
 
   function getBusinessCost(biz, owned) {

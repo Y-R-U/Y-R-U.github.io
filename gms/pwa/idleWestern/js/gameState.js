@@ -434,6 +434,17 @@ const GameState = (() => {
     if (state.eventsClicked >= 10 && unlockAchievement('event_10'))
       unlocked.push('event_10');
 
+    // Difficulty tier milestones
+    if (totalOwned >= 100 && unlockAchievement('biz_100'))
+      unlocked.push('biz_100');
+    const oilOwned = state.businesses.oil?.owned || 0;
+    if (oilOwned >= 100 && unlockAchievement('oil_100'))
+      unlocked.push('oil_100');
+    if (oilOwned >= 300 && unlockAchievement('oil_300'))
+      unlocked.push('oil_300');
+    if (oilOwned >= 400 && unlockAchievement('oil_400'))
+      unlocked.push('oil_400');
+
     if (typesOwned >= 10 && unlockAchievement('all_biz')) {
       unlocked.push('all_biz');
       // Mark current difficulty as completed
