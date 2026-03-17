@@ -4,6 +4,36 @@ const UI = (() => {
     const panel = document.getElementById('panel');
     const toastContainer = document.getElementById('toast-container');
 
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    const turnLog = [];
+
+    function addLog(msg) {
+        turnLog.push(msg);
+        if (turnLog.length > 80) turnLog.shift();
+    }
+
+    function clearLog() { turnLog.length = 0; }
+
+    function showTurnLog() {
+        const html = `
+            <div class="panel-header">
+                <h2 class="panel-title">Turn Log</h2>
+                <button class="panel-close" id="panel-close">&times;</button>
+            </div>
+            <div class="turn-log-list">
+                ${turnLog.length === 0 ? '<p style="color:var(--text-dim);font-size:13px;">No events yet.</p>' :
+                    turnLog.slice().reverse().map(m => `<div class="log-entry">${esc(m)}</div>`).join('')}
+            </div>
+        `;
+        showOverlay(html);
+        document.getElementById('panel-close').addEventListener('click', hideOverlay);
+    }
+
     function showOverlay(content) {
         panel.innerHTML = content;
         overlay.style.display = 'flex';
@@ -229,8 +259,8 @@ const UI = (() => {
         const bar = document.getElementById('player-stats-bar');
         bar.innerHTML = players.map((p, i) => `
             <div class="player-stat-chip ${i === currentIndex ? 'current' : ''}">
-                <div class="player-avatar" style="background:${p.color}">${p.name.charAt(0)}</div>
-                <span>${p.name}</span>
+                <div class="player-avatar" style="background:${p.color}">${esc(p.name.charAt(0))}</div>
+                <span>${esc(p.name)}</span>
                 <span class="stat-pos">${p.finished ? '&#127937;' : `${p.position}/${totalSquares - 1}`}</span>
                 <span class="stat-treasure">&#128176;${p.treasure}</span>
             </div>
@@ -272,9 +302,11 @@ const UI = (() => {
             const cssClass = eff.category || 'neutral';
             const icon = eff.icon || (idx);
             const label = eff.id === 'empty' ? `Sq ${idx}` : eff.name;
-            return `<button class="choice-btn ${cssClass}" data-idx="${idx}">
+            const desc = eff.desc || '';
+            return `<button class="choice-btn ${cssClass}" data-idx="${idx}" title="${esc(desc)}">
                 <span class="sq-icon">${icon}</span>
                 <span class="sq-label">${label}</span>
+                <span class="sq-desc">${esc(desc)}</span>
             </button>`;
         }).join('');
 
@@ -294,19 +326,95 @@ const UI = (() => {
         diceArea.style.display = 'flex';
     }
 
-    function setupAIPreview(count) {
-        const preview = document.getElementById('ai-players-preview');
-        const names = AI_NAMES.slice(0, count - 1);
-        preview.innerHTML = names.map((name, i) => `
-            <div class="ai-preview-card">
-                <div class="player-avatar" style="background:${PLAYER_COLORS[i + 1]}">${name.charAt(0)}</div>
-                <div>
-                    <div class="ai-name">${name}</div>
-                    <div class="ai-diff">AI Opponent</div>
+    function showStats() {
+        const stats = Storage.get('stats', { gamesPlayed: 0, wins: 0, highScore: 0 });
+        const winRate = stats.gamesPlayed > 0 ? Math.round(stats.wins / stats.gamesPlayed * 100) : 0;
+        const html = `
+            <div class="panel-header">
+                <h2 class="panel-title">Stats</h2>
+                <button class="panel-close" id="panel-close">&times;</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">${stats.gamesPlayed}</div>
+                    <div class="stat-label">Games Played</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.wins}</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${winRate}%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.highScore}</div>
+                    <div class="stat-label">High Score</div>
                 </div>
             </div>
-        `).join('');
+        `;
+        showOverlay(html);
+        document.getElementById('panel-close').addEventListener('click', hideOverlay);
     }
+
+    let playerSlots = [];
+
+    function setupAIPreview(count) {
+        const preview = document.getElementById('ai-players-preview');
+        const slots = document.getElementById('local-player-slots');
+        playerSlots = [];
+        for (let i = 1; i < count; i++) {
+            playerSlots.push({ index: i, name: AI_NAMES[i - 1], isHuman: false });
+        }
+
+        preview.innerHTML = playerSlots.map((s, i) => `
+            <div class="ai-preview-card">
+                <div class="player-avatar" style="background:${PLAYER_COLORS[s.index]}">${esc(s.name.charAt(0))}</div>
+                <div style="flex:1">
+                    <div class="ai-name">${esc(s.name)}</div>
+                    <div class="ai-diff">${s.isHuman ? 'Local Player' : 'AI Opponent'}</div>
+                </div>
+                <button class="btn-toggle-type count-btn" data-slot="${i}" style="padding:6px 12px;min-width:auto;font-size:12px;">
+                    ${s.isHuman ? '&#128100; Human' : '&#129302; AI'}
+                </button>
+            </div>
+        `).join('');
+
+        preview.querySelectorAll('.btn-toggle-type').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.slot);
+                playerSlots[idx].isHuman = !playerSlots[idx].isHuman;
+                setupAIPreview(count);
+            });
+        });
+
+        // Show local player name fields
+        const mpSection = document.getElementById('local-mp-section');
+        const humanSlots = playerSlots.filter(s => s.isHuman);
+        if (humanSlots.length > 0) {
+            mpSection.style.display = '';
+            slots.innerHTML = humanSlots.map(s => `
+                <div class="ai-preview-card" style="margin-bottom:8px;">
+                    <div class="player-avatar" style="background:${PLAYER_COLORS[s.index]}">${esc(s.name.charAt(0))}</div>
+                    <input type="text" class="input-field local-player-name" data-slot-index="${s.index}"
+                           value="${esc(s.name)}" placeholder="Player ${s.index + 1}" maxlength="12"
+                           autocomplete="off" style="flex:1;padding:10px 14px;">
+                </div>
+            `).join('');
+            slots.querySelectorAll('.local-player-name').forEach(inp => {
+                inp.addEventListener('input', () => {
+                    const si = parseInt(inp.dataset.slotIndex);
+                    const slot = playerSlots.find(s => s.index === si);
+                    if (slot) slot.name = inp.value.trim() || `Player ${si + 1}`;
+                });
+            });
+        } else {
+            mpSection.style.display = 'none';
+            slots.innerHTML = '';
+        }
+    }
+
+    function getPlayerSlots() { return playerSlots; }
 
     return {
         showOverlay,
@@ -322,6 +430,11 @@ const UI = (() => {
         setRollEnabled,
         showChoices,
         hideChoices,
-        setupAIPreview
+        setupAIPreview,
+        getPlayerSlots,
+        addLog,
+        clearLog,
+        showTurnLog,
+        showStats
     };
 })();

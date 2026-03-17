@@ -80,9 +80,8 @@ const Audio = (() => {
                 this.playMusic();
             });
             audio.addEventListener('error', () => {
-                // File doesn't exist yet, that's fine
                 musicIndex++;
-                if (musicIndex < musicFiles.length) {
+                if (musicIndex % musicFiles.length !== 0) {
                     this.playMusic();
                 }
             });

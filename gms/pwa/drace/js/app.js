@@ -83,11 +83,25 @@
     const btnRoll = document.getElementById('btn-roll');
     const btnPlayAgain = document.getElementById('btn-play-again');
     const btnMainMenu = document.getElementById('btn-main-menu');
+    const btnContinue = document.getElementById('btn-continue');
     const btnSettingsTitle = document.getElementById('btn-settings-title');
     const btnSettingsGame = document.getElementById('btn-settings-game');
 
     let selectedPlayerCount = 2;
     let selectedBoardSize = 45;
+
+    // Show continue button if save exists
+    function updateContinueButton() {
+        btnContinue.style.display = Game.hasSave() ? '' : 'none';
+    }
+    updateContinueButton();
+
+    // Continue saved game
+    btnContinue.addEventListener('click', () => {
+        Audio.sfxClick();
+        const state = Storage.loadGame();
+        if (state) Game.resume(state);
+    });
 
     // New Game
     btnNewGame.addEventListener('click', () => {
@@ -127,7 +141,8 @@
     btnStartGame.addEventListener('click', () => {
         Audio.sfxClick();
         const name = document.getElementById('player-name').value.trim() || 'Player';
-        Game.create(name, selectedPlayerCount, selectedBoardSize);
+        const slots = UI.getPlayerSlots();
+        Game.create(name, selectedPlayerCount, selectedBoardSize, slots);
 
         // Show welcome guide if first time
         if (!Storage.hasSeenGuide()) {
@@ -157,6 +172,19 @@
         Audio.sfxClick();
         UI.showScreen('screen-title');
         initParticles();
+        updateContinueButton();
+    });
+
+    // Stats
+    document.getElementById('btn-stats-title').addEventListener('click', () => {
+        Audio.sfxClick();
+        UI.showStats();
+    });
+
+    // Turn Log
+    document.getElementById('btn-log-game').addEventListener('click', () => {
+        Audio.sfxClick();
+        UI.showTurnLog();
     });
 
     // Settings
@@ -167,5 +195,36 @@
     btnSettingsGame.addEventListener('click', () => {
         Audio.sfxClick();
         UI.showSettings();
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        // Escape closes overlay
+        if (e.key === 'Escape') {
+            UI.hideOverlay();
+            return;
+        }
+
+        // Only handle game keys on game screen
+        const gameScreen = document.getElementById('screen-game');
+        if (!gameScreen.classList.contains('active')) return;
+
+        // Enter/Space to roll
+        if ((e.key === 'Enter' || e.key === ' ') && !btnRoll.disabled && document.getElementById('dice-area').style.display !== 'none') {
+            e.preventDefault();
+            UI.setRollEnabled(false);
+            Game.doRoll();
+            return;
+        }
+
+        // Number keys 1-9 to pick a choice
+        const choiceArea = document.getElementById('choice-area');
+        if (choiceArea.style.display !== 'none') {
+            const num = parseInt(e.key);
+            if (num >= 1 && num <= 9) {
+                const btns = document.querySelectorAll('#choice-buttons .choice-btn');
+                if (btns[num - 1]) btns[num - 1].click();
+            }
+        }
     });
 })();
