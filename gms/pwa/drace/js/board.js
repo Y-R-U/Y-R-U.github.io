@@ -21,6 +21,7 @@ const Board = (() => {
     let containerEl = null;
     let animTime = 0;
     let playerAnimPositions = [];
+    let playerPathQueues = [];
 
     const SQUARE_COLORS = {
         neutral:  { bg: '#1e2555', border: '#2a3377' },
@@ -203,6 +204,7 @@ const Board = (() => {
         squares = boardSquares;
         players = gamePlayers;
         playerAnimPositions = players.map(p => ({ ...getSquareCenter(p.position) }));
+        playerPathQueues = players.map(() => []);
 
         const rows = Math.ceil(squares.length / cols);
         boardWidth = padding * 2 + cols * (squareSize + 6);
@@ -219,6 +221,17 @@ const Board = (() => {
         panY = targetPanY;
 
         if (!animFrame) startLoop();
+    }
+
+    function animatePlayerMove(playerIdx, fromSq, toSq) {
+        if (!playerPathQueues[playerIdx]) playerPathQueues[playerIdx] = [];
+        const queue = playerPathQueues[playerIdx];
+        queue.length = 0;
+        if (fromSq < toSq) {
+            for (let s = fromSq + 1; s <= toSq; s++) queue.push(s);
+        } else if (fromSq > toSq) {
+            for (let s = fromSq - 1; s >= toSq; s--) queue.push(s);
+        }
     }
 
     function setHighlightSquares(indices, callback) {
@@ -247,14 +260,37 @@ const Board = (() => {
         panX += (targetPanX - panX) * 0.12;
         panY += (targetPanY - panY) * 0.12;
 
-        // Smooth player positions
+        // Smooth player positions with path stepping
         for (let i = 0; i < players.length; i++) {
-            const target = getSquareCenter(players[i].position);
             if (!playerAnimPositions[i]) {
-                playerAnimPositions[i] = { ...target };
+                playerAnimPositions[i] = { ...getSquareCenter(players[i].position) };
             }
-            playerAnimPositions[i].x += (target.x - playerAnimPositions[i].x) * 0.15;
-            playerAnimPositions[i].y += (target.y - playerAnimPositions[i].y) * 0.15;
+            if (!playerPathQueues[i]) playerPathQueues[i] = [];
+
+            const queue = playerPathQueues[i];
+            const anim = playerAnimPositions[i];
+
+            // Get current waypoint target
+            let target;
+            if (queue.length > 0) {
+                target = getSquareCenter(queue[0]);
+            } else {
+                target = getSquareCenter(players[i].position);
+            }
+
+            const dx = target.x - anim.x;
+            const dy = target.y - anim.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 2) {
+                anim.x = target.x;
+                anim.y = target.y;
+                if (queue.length > 0) queue.shift();
+            } else {
+                const speed = queue.length > 0 ? 0.2 : 0.15;
+                anim.x += dx * speed;
+                anim.y += dy * speed;
+            }
         }
 
         // Resize canvas if needed
@@ -389,7 +425,7 @@ const Board = (() => {
 
             // Offset multiple players on same square
             const sameSquare = players.filter((pp, ii) => ii !== i && pp.position === p.position && !pp.finished);
-            const myIdx = players.filter((pp, ii) => ii < i && pp.position === p.position).length;
+            const myIdx = players.filter((pp, ii) => ii < i && pp.position === p.position && !pp.finished).length;
             const offX = sameSquare.length > 0 ? (myIdx - sameSquare.length / 2) * 14 : 0;
             const offY = sameSquare.length > 0 ? -8 : -6;
 
@@ -463,6 +499,7 @@ const Board = (() => {
         focusOnSquare,
         fitBoard,
         destroy,
-        getSquareCenter
+        getSquareCenter,
+        animatePlayerMove
     };
 })();

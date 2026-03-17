@@ -1,4 +1,6 @@
 /* DRace - Game Logic */
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
 const Game = (() => {
     let players = [];
     let squares = [];
@@ -9,7 +11,7 @@ const Game = (() => {
     let boardSize = 45;
     let processing = false;
 
-    function create(playerName, playerCount, size) {
+    function create(playerName, playerCount, size, slotConfig) {
         boardSize = size;
         squares = Effects.generateBoard(boardSize);
         players = [];
@@ -19,13 +21,19 @@ const Game = (() => {
         currentPlayerIndex = 0;
         processing = false;
 
-        // Create human player
+        // Create human player 1
         players.push(new Player(0, playerName, true));
 
-        // Create AI players
-        const aiNames = AI_NAMES.slice(0, playerCount - 1);
-        for (let i = 0; i < aiNames.length; i++) {
-            players.push(new Player(i + 1, aiNames[i], false));
+        // Create remaining players from slot config
+        if (slotConfig && slotConfig.length > 0) {
+            for (const slot of slotConfig) {
+                players.push(new Player(slot.index, slot.name, slot.isHuman));
+            }
+        } else {
+            const aiNames = AI_NAMES.slice(0, playerCount - 1);
+            for (let i = 0; i < aiNames.length; i++) {
+                players.push(new Player(i + 1, aiNames[i], false));
+            }
         }
 
         // Init board
@@ -41,6 +49,9 @@ const Game = (() => {
 
         // Music
         Audio.playMusic();
+
+        // Clear log
+        UI.clearLog();
 
         // Start game - check if first player needs to skip
         checkCurrentTurn();
@@ -83,6 +94,9 @@ const Game = (() => {
         // Show effective roll if different
         if (effectiveRoll !== rawRoll) {
             UI.showToast(`Rolled ${rawRoll} + bonuses = ${effectiveRoll}`, 'info');
+            UI.addLog(`${p.name} rolled ${rawRoll} + bonuses = ${effectiveRoll}`);
+        } else {
+            UI.addLog(`${p.name} rolled ${rawRoll}`);
         }
 
         // Calculate available choices (squares from current+1 to current+effectiveRoll)
@@ -136,7 +150,9 @@ const Game = (() => {
 
     function landOnSquare(targetIdx) {
         const p = players[currentPlayerIndex];
+        const fromSq = p.position;
         p.position = targetIdx;
+        Board.animatePlayerMove(currentPlayerIndex, fromSq, targetIdx);
         Board.focusOnSquare(targetIdx);
         Audio.sfxLand();
 
@@ -146,6 +162,7 @@ const Game = (() => {
             p.finishOrder = finishCount;
             finishCount++;
             const ordinals = ['1st', '2nd', '3rd', '4th'];
+            UI.addLog(`${p.name} finishes ${ordinals[p.finishOrder]}!`);
             UI.showToast(`${p.name} finishes ${ordinals[p.finishOrder]}! 🏁`, 'positive');
             Audio.sfxWin();
 
@@ -168,7 +185,9 @@ const Game = (() => {
 
         UI.updatePlayerStats(players, currentPlayerIndex, boardSize);
 
+        UI.addLog(`${p.name} landed on square ${targetIdx}` + (sq.effect.id !== 'empty' ? ` (${sq.effect.name})` : ''));
         if (result.message) {
+            UI.addLog(`  -> ${result.message}`);
             // Play appropriate sound
             if (result.toastType === 'positive') Audio.sfxPositive();
             else if (result.toastType === 'negative') Audio.sfxNegative();
@@ -201,6 +220,7 @@ const Game = (() => {
         switch (action.type) {
             case 'move': {
                 const newPos = Math.max(0, Math.min(boardSize - 1, p.position + action.amount));
+                Board.animatePlayerMove(currentPlayerIndex, p.position, newPos);
                 p.position = newPos;
                 Board.focusOnSquare(newPos);
                 UI.updatePlayerStats(players, currentPlayerIndex, boardSize);
@@ -305,6 +325,7 @@ const Game = (() => {
 
     function nextPlayer() {
         if (gameOver) return;
+        saveState();
 
         // Advance to next non-finished player
         let attempts = 0;
@@ -324,6 +345,7 @@ const Game = (() => {
 
     function endGame() {
         gameOver = true;
+        Storage.clearGame();
         Audio.stopMusic();
         Board.destroy();
 
@@ -353,9 +375,9 @@ const Game = (() => {
             return `
                 <div class="result-row ${i === 0 ? 'winner' : ''}">
                     <div class="result-rank ${rankClass}">#${i + 1}</div>
-                    <div class="player-avatar" style="background:${r.color}">${r.name.charAt(0)}</div>
+                    <div class="player-avatar" style="background:${r.color}">${escHtml(r.name.charAt(0))}</div>
                     <div class="result-info">
-                        <div class="result-name">${r.name} ${r.isHuman ? '' : '&#129302;'}</div>
+                        <div class="result-name">${escHtml(r.name)} ${r.isHuman ? '' : '&#129302;'}</div>
                         <div class="result-details">
                             ${r.finished ? `Finished ${['1st', '2nd', '3rd', '4th'][r.finishOrder]}` : 'Did not finish'}
                             &middot; &#128176;${r.treasure} treasure
@@ -368,7 +390,8 @@ const Game = (() => {
 
         // Check if human won
         const title = document.getElementById('results-title');
-        if (results[0].isHuman) {
+        const humanWon = results[0].isHuman;
+        if (humanWon) {
             title.textContent = 'You Win!';
             Audio.sfxWin();
         } else {
@@ -376,12 +399,109 @@ const Game = (() => {
         }
 
         UI.showScreen('screen-results');
+        if (humanWon) startConfetti();
+
+        // Save stats
+        saveStats(results);
     }
 
-    // Expose doRoll to be called from UI
+    function startConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const parent = canvas.parentElement;
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+        const colors = ['#ffd700', '#ff6b35', '#00d4ff', '#a855f7', '#00e676', '#ff4757'];
+        const pieces = [];
+        for (let i = 0; i < 100; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 8 + 4,
+                h: Math.random() * 6 + 2,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vy: Math.random() * 3 + 2,
+                vx: (Math.random() - 0.5) * 2,
+                rot: Math.random() * 360,
+                rv: (Math.random() - 0.5) * 8
+            });
+        }
+        let frames = 0;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const p of pieces) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.rv;
+                if (p.y > canvas.height + 20) { p.y = -10; p.x = Math.random() * canvas.width; }
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            }
+            frames++;
+            if (frames < 300) requestAnimationFrame(draw);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        draw();
+    }
+
+    function saveStats(results) {
+        const stats = Storage.get('stats', { gamesPlayed: 0, wins: 0, highScore: 0 });
+        stats.gamesPlayed++;
+        if (results[0].isHuman) stats.wins++;
+        const humanResult = results.find(r => r.isHuman);
+        if (humanResult && humanResult.score > stats.highScore) stats.highScore = humanResult.score;
+        Storage.set('stats', stats);
+    }
+
+    function saveState() {
+        if (gameOver) return;
+        Storage.saveGame({
+            players: players.map(p => p.serialize()),
+            squares: squares,
+            currentPlayerIndex,
+            turn,
+            finishCount,
+            boardSize
+        });
+    }
+
+    function resume(state) {
+        boardSize = state.boardSize;
+        squares = state.squares;
+        currentPlayerIndex = state.currentPlayerIndex;
+        turn = state.turn;
+        finishCount = state.finishCount;
+        gameOver = false;
+        processing = false;
+        players = state.players.map(d => Player.deserialize(d));
+
+        Board.init(document.getElementById('game-board'), document.getElementById('board-container'));
+        Board.setBoard(squares, players);
+
+        UI.showScreen('screen-game');
+        UI.updateHUD(players[currentPlayerIndex], turn);
+        UI.updatePlayerStats(players, currentPlayerIndex, boardSize);
+        UI.setRollEnabled(true);
+        Dice.renderDiceFace(0);
+        Audio.playMusic();
+        checkCurrentTurn();
+    }
+
+    function hasSave() {
+        return Storage.loadGame() !== null;
+    }
+
     return {
         create,
         doRoll,
+        saveState,
+        resume,
+        hasSave,
         get players() { return players; },
         get squares() { return squares; },
         get currentPlayerIndex() { return currentPlayerIndex; },
