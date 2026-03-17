@@ -40,6 +40,20 @@
       "tileSize": 18,
       "image": "/gms/assets/kenney/2d/pixel-platformer/tilemap.png",
       "metadata": "/gms/assets/kenney/2d/pixel-platformer/tilemap.json"
+    },
+    {
+      "id": "cartography",
+      "name": "Kenney Cartography",
+      "tileSize": 64,
+      "image": "/gms/assets/kenney/2d/cartography/edit2d/tilemap.png",
+      "metadata": "/gms/assets/kenney/2d/cartography/edit2d/tilemap.json"
+    },
+    {
+      "id": "scifi-rts",
+      "name": "Kenney Sci-Fi RTS",
+      "tileSize": 64,
+      "image": "/gms/assets/kenney/2d/scifi-rts/edit2d/tilemap.png",
+      "metadata": "/gms/assets/kenney/2d/scifi-rts/edit2d/tilemap.json"
     }
   ]
 }

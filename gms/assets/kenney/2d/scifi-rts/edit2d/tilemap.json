@@ -1,0 +1,798 @@
+{
+  "tileSize": 64,
+  "columns": 18,
+  "spacing": 0,
+  "tiles": [
+    {
+      "id": "dirt_plain",
+      "name": "Dirt Plain",
+      "category": "terrain",
+      "col": 0,
+      "row": 0
+    },
+    {
+      "id": "dirt_vegetation",
+      "name": "Dirt Vegetation",
+      "category": "terrain",
+      "col": 1,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_cross",
+      "name": "Dirt Road Cross",
+      "category": "roads",
+      "col": 2,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_t_south",
+      "name": "Dirt Road T South",
+      "category": "roads",
+      "col": 3,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_turn_se",
+      "name": "Dirt Road Turn SE",
+      "category": "roads",
+      "col": 4,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_straight_h",
+      "name": "Dirt Road Straight H",
+      "category": "roads",
+      "col": 5,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_end_e",
+      "name": "Dirt Road End E",
+      "category": "roads",
+      "col": 6,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_t_west",
+      "name": "Dirt Road T West",
+      "category": "roads",
+      "col": 7,
+      "row": 0
+    },
+    {
+      "id": "dirt_road_turn_ne",
+      "name": "Dirt Road Turn NE",
+      "category": "roads",
+      "col": 8,
+      "row": 0
+    },
+    {
+      "id": "concrete_plain",
+      "name": "Concrete Plain",
+      "category": "terrain",
+      "col": 9,
+      "row": 0
+    },
+    {
+      "id": "concrete_road_cross",
+      "name": "Concrete Road Cross",
+      "category": "roads",
+      "col": 10,
+      "row": 0
+    },
+    {
+      "id": "concrete_road_t",
+      "name": "Concrete Road T South",
+      "category": "roads",
+      "col": 11,
+      "row": 0
+    },
+    {
+      "id": "concrete_road_turn",
+      "name": "Concrete Road Turn SE",
+      "category": "roads",
+      "col": 12,
+      "row": 0
+    },
+    {
+      "id": "turret_small",
+      "name": "Turret Small",
+      "category": "structures",
+      "col": 13,
+      "row": 0
+    },
+    {
+      "id": "antenna",
+      "name": "Antenna",
+      "category": "structures",
+      "col": 14,
+      "row": 0
+    },
+    {
+      "id": "structure_tall_a",
+      "name": "Structure Tall A",
+      "category": "structures",
+      "col": 15,
+      "row": 0
+    },
+    {
+      "id": "structure_tall_b",
+      "name": "Structure Tall B",
+      "category": "structures",
+      "col": 16,
+      "row": 0
+    },
+    {
+      "id": "structure_dome_a",
+      "name": "Structure Dome A",
+      "category": "structures",
+      "col": 17,
+      "row": 0
+    },
+    {
+      "id": "water_shore_w",
+      "name": "Water Shore West",
+      "category": "water",
+      "col": 0,
+      "row": 1
+    },
+    {
+      "id": "dirt_trees",
+      "name": "Dirt Trees",
+      "category": "terrain",
+      "col": 1,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_straight_v",
+      "name": "Dirt Road Straight V",
+      "category": "roads",
+      "col": 2,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_t_east",
+      "name": "Dirt Road T East",
+      "category": "roads",
+      "col": 3,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_turn_sw",
+      "name": "Dirt Road Turn SW",
+      "category": "roads",
+      "col": 4,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_end_s",
+      "name": "Dirt Road End S",
+      "category": "roads",
+      "col": 5,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_t_north",
+      "name": "Dirt Road T North",
+      "category": "roads",
+      "col": 6,
+      "row": 1
+    },
+    {
+      "id": "dirt_road_turn_nw",
+      "name": "Dirt Road Turn NW",
+      "category": "roads",
+      "col": 7,
+      "row": 1
+    },
+    {
+      "id": "dirt_transition",
+      "name": "Dirt Transition",
+      "category": "terrain",
+      "col": 8,
+      "row": 1
+    },
+    {
+      "id": "concrete_road_v",
+      "name": "Concrete Road Straight V",
+      "category": "roads",
+      "col": 9,
+      "row": 1
+    },
+    {
+      "id": "concrete_road_t_e",
+      "name": "Concrete Road T East",
+      "category": "roads",
+      "col": 10,
+      "row": 1
+    },
+    {
+      "id": "concrete_road_sw",
+      "name": "Concrete Road Turn SW",
+      "category": "roads",
+      "col": 11,
+      "row": 1
+    },
+    {
+      "id": "concrete_sparse",
+      "name": "Concrete Sparse",
+      "category": "terrain",
+      "col": 12,
+      "row": 1
+    },
+    {
+      "id": "structure_flag",
+      "name": "Structure Flag",
+      "category": "structures",
+      "col": 13,
+      "row": 1
+    },
+    {
+      "id": "structure_wide",
+      "name": "Structure Wide",
+      "category": "structures",
+      "col": 14,
+      "row": 1
+    },
+    {
+      "id": "structure_hangar",
+      "name": "Structure Hangar",
+      "category": "structures",
+      "col": 15,
+      "row": 1
+    },
+    {
+      "id": "structure_dome_b",
+      "name": "Structure Dome B",
+      "category": "structures",
+      "col": 16,
+      "row": 1
+    },
+    {
+      "id": "structure_glass",
+      "name": "Structure Glass",
+      "category": "structures",
+      "col": 17,
+      "row": 1
+    },
+    {
+      "id": "water_deep",
+      "name": "Water Deep",
+      "category": "water",
+      "col": 0,
+      "row": 2
+    },
+    {
+      "id": "water_shore_s",
+      "name": "Water Shore South",
+      "category": "water",
+      "col": 1,
+      "row": 2
+    },
+    {
+      "id": "dirt_water_road",
+      "name": "Dirt Water Road",
+      "category": "water",
+      "col": 2,
+      "row": 2
+    },
+    {
+      "id": "water_road_cross",
+      "name": "Water Road Cross",
+      "category": "water",
+      "col": 3,
+      "row": 2
+    },
+    {
+      "id": "water_dirt_corner",
+      "name": "Water Dirt Corner",
+      "category": "water",
+      "col": 4,
+      "row": 2
+    },
+    {
+      "id": "concrete_road_h",
+      "name": "Concrete Road Straight H",
+      "category": "roads",
+      "col": 5,
+      "row": 2
+    },
+    {
+      "id": "concrete_road_end",
+      "name": "Concrete Road End",
+      "category": "roads",
+      "col": 6,
+      "row": 2
+    },
+    {
+      "id": "concrete_road_nw",
+      "name": "Concrete Road Turn NW",
+      "category": "roads",
+      "col": 7,
+      "row": 2
+    },
+    {
+      "id": "concrete_road_ne",
+      "name": "Concrete Road Turn NE",
+      "category": "roads",
+      "col": 8,
+      "row": 2
+    },
+    {
+      "id": "vehicle_truck_orange_e",
+      "name": "Truck Orange E",
+      "category": "vehicles",
+      "col": 9,
+      "row": 2
+    },
+    {
+      "id": "vehicle_truck_orange_s",
+      "name": "Truck Orange S",
+      "category": "vehicles",
+      "col": 10,
+      "row": 2
+    },
+    {
+      "id": "vehicle_apc_blue_e",
+      "name": "APC Blue E",
+      "category": "vehicles",
+      "col": 11,
+      "row": 2
+    },
+    {
+      "id": "vehicle_apc_blue_s",
+      "name": "APC Blue S",
+      "category": "vehicles",
+      "col": 12,
+      "row": 2
+    },
+    {
+      "id": "vehicle_tank_orange_e",
+      "name": "Tank Orange E",
+      "category": "vehicles",
+      "col": 13,
+      "row": 2
+    },
+    {
+      "id": "vehicle_tank_orange_s",
+      "name": "Tank Orange S",
+      "category": "vehicles",
+      "col": 14,
+      "row": 2
+    },
+    {
+      "id": "vehicle_tank_blue_e",
+      "name": "Tank Blue E",
+      "category": "vehicles",
+      "col": 15,
+      "row": 2
+    },
+    {
+      "id": "vehicle_tank_blue_s",
+      "name": "Tank Blue S",
+      "category": "vehicles",
+      "col": 16,
+      "row": 2
+    },
+    {
+      "id": "vehicle_scout_orange",
+      "name": "Scout Orange",
+      "category": "vehicles",
+      "col": 17,
+      "row": 2
+    },
+    {
+      "id": "tree_small",
+      "name": "Tree Small",
+      "category": "vegetation",
+      "col": 0,
+      "row": 3
+    },
+    {
+      "id": "tree_medium",
+      "name": "Tree Medium",
+      "category": "vegetation",
+      "col": 1,
+      "row": 3
+    },
+    {
+      "id": "tree_round",
+      "name": "Tree Round",
+      "category": "vegetation",
+      "col": 2,
+      "row": 3
+    },
+    {
+      "id": "tree_tall",
+      "name": "Tree Tall",
+      "category": "vegetation",
+      "col": 3,
+      "row": 3
+    },
+    {
+      "id": "mushroom",
+      "name": "Mushroom",
+      "category": "vegetation",
+      "col": 4,
+      "row": 3
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "category": "vegetation",
+      "col": 5,
+      "row": 3
+    },
+    {
+      "id": "unit_soldier_orange_a",
+      "name": "Soldier Orange A",
+      "category": "units",
+      "col": 6,
+      "row": 3
+    },
+    {
+      "id": "unit_soldier_orange_b",
+      "name": "Soldier Orange B",
+      "category": "units",
+      "col": 7,
+      "row": 3
+    },
+    {
+      "id": "unit_soldier_orange_c",
+      "name": "Soldier Orange C",
+      "category": "units",
+      "col": 8,
+      "row": 3
+    },
+    {
+      "id": "unit_soldier_orange_d",
+      "name": "Soldier Orange D",
+      "category": "units",
+      "col": 9,
+      "row": 3
+    },
+    {
+      "id": "unit_vehicle_blue_a",
+      "name": "Vehicle Blue A",
+      "category": "vehicles",
+      "col": 10,
+      "row": 3
+    },
+    {
+      "id": "unit_vehicle_blue_b",
+      "name": "Vehicle Blue B",
+      "category": "vehicles",
+      "col": 11,
+      "row": 3
+    },
+    {
+      "id": "vehicle_truck_blue_a",
+      "name": "Truck Blue A",
+      "category": "vehicles",
+      "col": 12,
+      "row": 3
+    },
+    {
+      "id": "vehicle_truck_blue_b",
+      "name": "Truck Blue B",
+      "category": "vehicles",
+      "col": 13,
+      "row": 3
+    },
+    {
+      "id": "vehicle_apc_orange_a",
+      "name": "APC Orange A",
+      "category": "vehicles",
+      "col": 14,
+      "row": 3
+    },
+    {
+      "id": "vehicle_apc_orange_b",
+      "name": "APC Orange B",
+      "category": "vehicles",
+      "col": 15,
+      "row": 3
+    },
+    {
+      "id": "vehicle_scout_blue_a",
+      "name": "Scout Blue A",
+      "category": "vehicles",
+      "col": 16,
+      "row": 3
+    },
+    {
+      "id": "vehicle_scout_blue_b",
+      "name": "Scout Blue B",
+      "category": "vehicles",
+      "col": 17,
+      "row": 3
+    },
+    {
+      "id": "rock_small",
+      "name": "Rock Small",
+      "category": "environment",
+      "col": 0,
+      "row": 4
+    },
+    {
+      "id": "rock_medium",
+      "name": "Rock Medium",
+      "category": "environment",
+      "col": 1,
+      "row": 4
+    },
+    {
+      "id": "rock_large_a",
+      "name": "Rock Large A",
+      "category": "environment",
+      "col": 2,
+      "row": 4
+    },
+    {
+      "id": "rock_large_b",
+      "name": "Rock Large B",
+      "category": "environment",
+      "col": 3,
+      "row": 4
+    },
+    {
+      "id": "rock_cluster_a",
+      "name": "Rock Cluster A",
+      "category": "environment",
+      "col": 4,
+      "row": 4
+    },
+    {
+      "id": "rock_cluster_b",
+      "name": "Rock Cluster B",
+      "category": "environment",
+      "col": 5,
+      "row": 4
+    },
+    {
+      "id": "unit_soldier_blue_a",
+      "name": "Soldier Blue A",
+      "category": "units",
+      "col": 6,
+      "row": 4
+    },
+    {
+      "id": "unit_soldier_blue_b",
+      "name": "Soldier Blue B",
+      "category": "units",
+      "col": 7,
+      "row": 4
+    },
+    {
+      "id": "unit_soldier_blue_c",
+      "name": "Soldier Blue C",
+      "category": "units",
+      "col": 8,
+      "row": 4
+    },
+    {
+      "id": "unit_soldier_blue_d",
+      "name": "Soldier Blue D",
+      "category": "units",
+      "col": 9,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_truck_a",
+      "name": "Truck Orange A",
+      "category": "vehicles",
+      "col": 10,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_truck_b",
+      "name": "Truck Orange B",
+      "category": "vehicles",
+      "col": 11,
+      "row": 4
+    },
+    {
+      "id": "vehicle_blue_truck_a",
+      "name": "Truck Blue Alt A",
+      "category": "vehicles",
+      "col": 12,
+      "row": 4
+    },
+    {
+      "id": "vehicle_blue_truck_b",
+      "name": "Truck Blue Alt B",
+      "category": "vehicles",
+      "col": 13,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_apc_a",
+      "name": "APC Orange Alt A",
+      "category": "vehicles",
+      "col": 14,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_apc_b",
+      "name": "APC Orange Alt B",
+      "category": "vehicles",
+      "col": 15,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_scout_a",
+      "name": "Scout Orange A",
+      "category": "vehicles",
+      "col": 16,
+      "row": 4
+    },
+    {
+      "id": "vehicle_orange_scout_b",
+      "name": "Scout Orange B",
+      "category": "vehicles",
+      "col": 17,
+      "row": 4
+    },
+    {
+      "id": "boulder_small",
+      "name": "Boulder Small",
+      "category": "environment",
+      "col": 0,
+      "row": 5
+    },
+    {
+      "id": "boulder_medium",
+      "name": "Boulder Medium",
+      "category": "environment",
+      "col": 1,
+      "row": 5
+    },
+    {
+      "id": "boulder_large",
+      "name": "Boulder Large",
+      "category": "environment",
+      "col": 2,
+      "row": 5
+    },
+    {
+      "id": "cloud_a",
+      "name": "Cloud A",
+      "category": "environment",
+      "col": 3,
+      "row": 5
+    },
+    {
+      "id": "cloud_b",
+      "name": "Cloud B",
+      "category": "environment",
+      "col": 4,
+      "row": 5
+    },
+    {
+      "id": "bush_small",
+      "name": "Bush Small",
+      "category": "vegetation",
+      "col": 5,
+      "row": 5
+    },
+    {
+      "id": "unit_soldier_green_a",
+      "name": "Soldier Green A",
+      "category": "units",
+      "col": 6,
+      "row": 5
+    },
+    {
+      "id": "unit_soldier_green_b",
+      "name": "Soldier Green B",
+      "category": "units",
+      "col": 7,
+      "row": 5
+    },
+    {
+      "id": "unit_soldier_green_c",
+      "name": "Soldier Green C",
+      "category": "units",
+      "col": 8,
+      "row": 5
+    },
+    {
+      "id": "unit_soldier_green_d",
+      "name": "Soldier Green D",
+      "category": "units",
+      "col": 9,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_truck_a",
+      "name": "Truck Green A",
+      "category": "vehicles",
+      "col": 10,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_truck_b",
+      "name": "Truck Green B",
+      "category": "vehicles",
+      "col": 11,
+      "row": 5
+    },
+    {
+      "id": "vehicle_grey_truck_a",
+      "name": "Truck Grey A",
+      "category": "vehicles",
+      "col": 12,
+      "row": 5
+    },
+    {
+      "id": "vehicle_grey_truck_b",
+      "name": "Truck Grey B",
+      "category": "vehicles",
+      "col": 13,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_apc_a",
+      "name": "APC Green A",
+      "category": "vehicles",
+      "col": 14,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_apc_b",
+      "name": "APC Green B",
+      "category": "vehicles",
+      "col": 15,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_scout_a",
+      "name": "Scout Green A",
+      "category": "vehicles",
+      "col": 16,
+      "row": 5
+    },
+    {
+      "id": "vehicle_green_scout_b",
+      "name": "Scout Green B",
+      "category": "vehicles",
+      "col": 17,
+      "row": 5
+    },
+    {
+      "id": "pipe",
+      "name": "Pipe",
+      "category": "environment",
+      "col": 0,
+      "row": 6
+    },
+    {
+      "id": "crate",
+      "name": "Crate",
+      "category": "environment",
+      "col": 1,
+      "row": 6
+    },
+    {
+      "id": "container",
+      "name": "Container",
+      "category": "environment",
+      "col": 2,
+      "row": 6
+    },
+    {
+      "id": "plant_a",
+      "name": "Plant A",
+      "category": "vegetation",
+      "col": 3,
+      "row": 6
+    },
+    {
+      "id": "plant_b",
+      "name": "Plant B",
+      "category": "vegetation",
+      "col": 4,
+      "row": 6
+    }
+  ]
+}

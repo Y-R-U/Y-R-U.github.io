@@ -38,7 +38,7 @@ const Graphics = (() => {
 
   // ===== BACKGROUND RENDERING =====
   function drawBackground(theme, ageIndex) {
-    const key = theme + '_' + W + '_' + H;
+    const key = theme + '_' + W + '_' + H + (Sprites.isLoaded() ? '_k' : '');
     if (bgCache[key]) {
       ctx.drawImage(bgCache[key], 0, 0);
       return;
@@ -53,6 +53,10 @@ const Graphics = (() => {
     }
     const octx = oc.getContext('2d');
     renderBg(octx, theme, ageIndex);
+    // Layer Kenney decorations on top of procedural background
+    if (Sprites.isLoaded()) {
+      Sprites.drawDecorations(octx, theme, W, H, H * CONFIG.GROUND_Y);
+    }
     bgCache[key] = oc;
     ctx.drawImage(oc, 0, 0);
   }
@@ -89,7 +93,7 @@ const Graphics = (() => {
     c.fillRect(0, 0, W, gy);
 
     // Distant ruins silhouette
-    c.fillStyle = 'rgba(30,15,5,0.6)';
+    c.fillStyle = 'rgba(30,15,5,0.35)';
     const rng = seededRandom(42);
     for (let x = 0; x < W; x += 30 + rng() * 40) {
       const h = 15 + rng() * 35;
@@ -202,7 +206,7 @@ const Graphics = (() => {
     }
 
     // Factory silhouettes
-    c.fillStyle = '#1a1a25';
+    c.fillStyle = 'rgba(26,26,37,0.5)';
     for (let i = 0; i < 6; i++) {
       const fx = rng() * W;
       const fw = 20 + rng() * 40;
@@ -256,19 +260,19 @@ const Graphics = (() => {
     }
 
     // Cityscape silhouette
-    c.fillStyle = '#0a0a20';
+    c.fillStyle = 'rgba(10,10,32,0.5)';
     for (let x = 0; x < W; x += 15 + rng() * 25) {
       const bh = 30 + rng() * 80;
       const bw = 10 + rng() * 20;
       c.fillRect(x, gy - bh, bw, bh);
       // Lit windows
-      c.fillStyle = 'rgba(50,150,255,0.2)';
+      c.fillStyle = 'rgba(50,150,255,0.15)';
       for (let wy = gy - bh + 5; wy < gy - 5; wy += 8) {
         for (let wx = x + 3; wx < x + bw - 3; wx += 6) {
           if (rng() > 0.4) c.fillRect(wx, wy, 3, 3);
         }
       }
-      c.fillStyle = '#0a0a20';
+      c.fillStyle = 'rgba(10,10,32,0.5)';
     }
 
     // Glowing ground
@@ -317,16 +321,16 @@ const Graphics = (() => {
     c.lineTo(W, gy * 0.6); c.lineTo(0, gy * 0.6); c.closePath(); c.fill();
 
     // Futuristic towers
-    c.fillStyle = '#0a0020';
+    c.fillStyle = 'rgba(10,0,32,0.5)';
     for (let x = 0; x < W; x += 20 + rng() * 30) {
       const bh = 40 + rng() * 100;
       const bw = 6 + rng() * 15;
       c.fillRect(x, gy - bh, bw, bh);
       // Neon strips
-      c.fillStyle = `rgba(${100 + rng() * 155},${50 + rng() * 100},${180 + rng() * 75},0.3)`;
+      c.fillStyle = `rgba(${100 + rng() * 155},${50 + rng() * 100},${180 + rng() * 75},0.25)`;
       c.fillRect(x, gy - bh + bh * 0.3, bw, 2);
       c.fillRect(x, gy - bh + bh * 0.6, bw, 2);
-      c.fillStyle = '#0a0020';
+      c.fillStyle = 'rgba(10,0,32,0.5)';
     }
 
     // Ground
@@ -391,11 +395,16 @@ const Graphics = (() => {
     const bw = CONFIG.BASE_WIDTH * scale;
     const bh = CONFIG.BASE_HEIGHT * scale;
     const groundY = getGroundY();
+    const healthPct = hp / maxHp;
+
+    // Try Kenney sprite base first
+    if (Sprites.isLoaded() && Sprites.drawBase(ctx, age, x, groundY, bw, bh, isPlayer, healthPct)) {
+      return; // Sprite base drawn successfully
+    }
+
+    // ===== PROCEDURAL FALLBACK =====
     const bx = x - bw / 2;
     const by = groundY - bh;
-
-    // Base building
-    const healthPct = hp / maxHp;
     const ageColors = [
       ['#8B6914', '#6B4A12'], // wasteland
       ['#5a8f5a', '#3a6a3a'], // settlement
@@ -417,38 +426,30 @@ const Graphics = (() => {
     ctx.lineWidth = 2;
 
     if (age <= 1) {
-      // Simple fortress
       ctx.fillRect(bx, by, bw, bh);
       ctx.strokeRect(bx, by, bw, bh);
-      // Battlements
       const bSize = bw / 5;
       for (let i = 0; i < 5; i += 2) {
         ctx.fillRect(bx + i * bSize, by - bSize * 0.7, bSize, bSize * 0.7);
         ctx.strokeRect(bx + i * bSize, by - bSize * 0.7, bSize, bSize * 0.7);
       }
-      // Door
       ctx.fillStyle = 'rgba(0,0,0,0.4)';
       ctx.fillRect(x - bw * 0.12, groundY - bh * 0.35, bw * 0.24, bh * 0.35);
-      // Flag
       drawFlag(ctx, isPlayer ? bx + bw * 0.8 : bx + bw * 0.2, by - bSize * 0.7, isPlayer, age);
     } else if (age <= 2) {
-      // Industrial base
       ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
       ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
-      // Roof
       ctx.beginPath();
       ctx.moveTo(bx - 3, by + bh * 0.2);
       ctx.lineTo(x, by - 5);
       ctx.lineTo(bx + bw + 3, by + bh * 0.2);
       ctx.closePath();
       ctx.fill(); ctx.stroke();
-      // Windows
       ctx.fillStyle = 'rgba(255,200,50,0.4)';
       ctx.fillRect(bx + bw * 0.15, by + bh * 0.35, bw * 0.2, bh * 0.15);
       ctx.fillRect(bx + bw * 0.65, by + bh * 0.35, bw * 0.2, bh * 0.15);
       drawFlag(ctx, x, by - 5, isPlayer, age);
     } else {
-      // Futuristic base
       ctx.beginPath();
       ctx.moveTo(bx, groundY);
       ctx.lineTo(bx + bw * 0.1, by);
@@ -456,27 +457,23 @@ const Graphics = (() => {
       ctx.lineTo(bx + bw, groundY);
       ctx.closePath();
       ctx.fill(); ctx.stroke();
-      // Glowing core
       const coreColor = isPlayer ? 'rgba(50,200,150,0.5)' : 'rgba(230,50,50,0.5)';
       ctx.fillStyle = coreColor;
       ctx.beginPath();
       ctx.arc(x, by + bh * 0.4, bw * 0.15, 0, Math.PI * 2);
       ctx.fill();
-      // Antenna
       ctx.strokeStyle = colors[1];
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(x, by);
       ctx.lineTo(x, by - 15);
       ctx.stroke();
-      // Antenna glow
       ctx.fillStyle = isPlayer ? '#4ecdc4' : '#e74c3c';
       ctx.beginPath();
       ctx.arc(x, by - 15, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Damage cracks when low HP
     if (healthPct < 0.5) {
       ctx.strokeStyle = 'rgba(200,50,50,0.4)';
       ctx.lineWidth = 1.5;
@@ -873,6 +870,21 @@ const Graphics = (() => {
 
   // ===== PROJECTILES =====
   function drawProjectile(proj) {
+    // Try Kenney bullet sprites
+    if (Sprites.isLoaded()) {
+      const flipX = !proj.isPlayer;
+      const size = proj.type === 'cannonball' ? 14 : proj.type === 'plasma' ? 12 : 10;
+      if (Sprites.drawBullet(ctx, proj.type, proj.x, proj.y, size * scale, proj.isPlayer, flipX)) {
+        // Add team-colored glow behind the sprite
+        ctx.fillStyle = proj.isPlayer ? 'rgba(78,205,196,0.3)' : 'rgba(231,76,60,0.3)';
+        ctx.beginPath();
+        ctx.arc(proj.x, proj.y, size * scale * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        return;
+      }
+    }
+
+    // Procedural fallback
     ctx.save();
     ctx.translate(proj.x, proj.y);
 
@@ -881,7 +893,6 @@ const Graphics = (() => {
       ctx.beginPath();
       ctx.arc(0, 0, 2, 0, Math.PI * 2);
       ctx.fill();
-      // Trail
       ctx.fillStyle = proj.isPlayer ? 'rgba(78,205,196,0.3)' : 'rgba(231,76,60,0.3)';
       const dx = proj.isPlayer ? -1 : 1;
       ctx.beginPath();
@@ -929,7 +940,12 @@ const Graphics = (() => {
     const radius = 40 + progress * 20;
     const alpha = 1 - progress;
 
-    // Shockwave ring
+    // Try Kenney explosion sprite
+    if (Sprites.isLoaded()) {
+      Sprites.drawExplosion(ctx, x, groundY - 20, radius * 2, progress, alpha);
+    }
+
+    // Shockwave ring (always draw - looks great layered on explosion sprite)
     ctx.strokeStyle = `rgba(255,180,50,${alpha * 0.8})`;
     ctx.lineWidth = 3;
     ctx.beginPath();

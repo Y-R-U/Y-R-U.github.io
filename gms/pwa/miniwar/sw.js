@@ -1,9 +1,10 @@
-const CACHE_NAME = 'miniwar-v1';
+const CACHE_NAME = 'miniwar-v2';
 const ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/config.js',
+  './js/sprites.js',
   './js/graphics.js',
   './js/units.js',
   './js/game.js',
@@ -11,6 +12,17 @@ const ASSETS = [
   './js/audio.js',
   './js/app.js',
   './manifest.json'
+];
+
+// Kenney spritesheets (cached on first use)
+const KENNEY_ROOT = '/gms/assets/kenney/2d';
+const KENNEY_ASSETS = [
+  `${KENNEY_ROOT}/cartography/spritesheet.png`,
+  `${KENNEY_ROOT}/cartography/spritesheet.xml`,
+  `${KENNEY_ROOT}/tanks/spritesheet.png`,
+  `${KENNEY_ROOT}/tanks/spritesheet.xml`,
+  `${KENNEY_ROOT}/scifi-rts/scifiRTS_spritesheet.png`,
+  `${KENNEY_ROOT}/scifi-rts/scifiRTS_spritesheet.xml`,
 ];
 
 self.addEventListener('install', e => {
@@ -31,6 +43,17 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => {}))
+    caches.match(e.request).then(r => {
+      if (r) return r;
+      return fetch(e.request).then(response => {
+        // Cache Kenney assets on first fetch
+        const url = e.request.url;
+        if (url.includes('/gms/assets/kenney/') && response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        }
+        return response;
+      }).catch(() => {});
+    })
   );
 });
