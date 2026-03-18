@@ -1,4 +1,4 @@
-const CACHE_NAME = 'edit2d-v3';
+const CACHE_NAME = 'edit2d-v4';
 const ASSETS = [
   './',
   './index.html',

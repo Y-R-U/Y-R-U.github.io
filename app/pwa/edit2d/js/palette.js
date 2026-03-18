@@ -2,6 +2,7 @@
 
 import { getState, setState } from './state.js';
 import { getActivePack, getAllTiles, searchTiles, getTilesByCategory, getCategories, getTile, getCatalog, loadPack } from './assets.js';
+import { markDirtyCanvas } from './canvas.js';
 import { modalPackPicker, modalAlert } from './modal.js';
 
 let container, searchInput, categoryBar, tileGrid;
@@ -49,7 +50,12 @@ async function openPackPicker() {
   const picked = await modalPackPicker(catalog.packs, pack?.id);
   if (!picked || picked === pack?.id) return;
 
-  const result = await loadPack(picked);
+  let result;
+  try {
+    result = await loadPack(picked);
+  } catch {
+    result = null;
+  }
   if (!result) {
     await modalAlert('Could not load that pack. The spritesheet may not be available yet.', 'Pack Unavailable');
     return;
@@ -67,6 +73,7 @@ async function openPackPicker() {
   }
 
   render();
+  markDirtyCanvas();
 }
 
 export function render() {
