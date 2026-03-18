@@ -1,7 +1,8 @@
 /* palette.js – tile palette panel: search, category tabs, tile grid */
 
 import { getState, setState } from './state.js';
-import { getActivePack, getAllTiles, searchTiles, getTilesByCategory, getCategories, getTile } from './assets.js';
+import { getActivePack, getAllTiles, searchTiles, getTilesByCategory, getCategories, getTile, getCatalog, loadPack } from './assets.js';
+import { modalPackPicker, modalAlert } from './modal.js';
 
 let container, searchInput, categoryBar, tileGrid;
 let currentCategory = 'all';
@@ -17,7 +18,10 @@ function buildDOM() {
   container.innerHTML = `
     <div class="palette-header">
       <span class="palette-title">Tiles</span>
-      <span class="palette-pack-name"></span>
+      <button class="palette-pack-btn" title="Switch sprite pack">
+        <span class="palette-pack-name"></span>
+        <span class="palette-pack-arrow">&#9662;</span>
+      </button>
     </div>
     <input type="text" class="palette-search" placeholder="Search tiles...">
     <div class="palette-categories"></div>
@@ -32,13 +36,45 @@ function buildDOM() {
     currentSearch = searchInput.value.trim();
     renderTiles();
   });
+
+  // Pack switcher button
+  container.querySelector('.palette-pack-btn').addEventListener('click', openPackPicker);
+}
+
+async function openPackPicker() {
+  const catalog = getCatalog();
+  if (!catalog?.packs?.length) return;
+
+  const pack = getActivePack();
+  const picked = await modalPackPicker(catalog.packs, pack?.id);
+  if (!picked || picked === pack?.id) return;
+
+  const result = await loadPack(picked);
+  if (!result) {
+    await modalAlert('Could not load that pack. The spritesheet may not be available yet.', 'Pack Unavailable');
+    return;
+  }
+
+  // Reset category & search
+  currentCategory = 'all';
+  currentSearch = '';
+  if (searchInput) searchInput.value = '';
+
+  // Select first tile in new pack
+  const tiles = getAllTiles();
+  if (tiles.length > 0) {
+    setState({ selectedTileId: tiles[0].id });
+  }
+
+  render();
 }
 
 export function render() {
   const pack = getActivePack();
   if (!pack) return;
 
-  container.querySelector('.palette-pack-name').textContent = pack.name;
+  const nameEl = container.querySelector('.palette-pack-name');
+  if (nameEl) nameEl.textContent = pack.name;
   renderCategories();
   renderTiles();
 }

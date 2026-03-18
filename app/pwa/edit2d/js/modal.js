@@ -89,3 +89,59 @@ export function modalSelect(title, message, options) {
     resolveModal = resolve;
   });
 }
+
+/**
+ * Pack picker – shows a visual card grid for spritesheet selection.
+ * @param {Array} packs  – catalog entries [{id, name, tileSize, builtin?, image?}]
+ * @param {string} currentId – currently active pack id
+ * @returns {Promise<string|null>} selected pack id, or null if cancelled
+ */
+export function modalPackPicker(packs, currentId) {
+  return new Promise(resolve => {
+    titleEl.textContent = 'Choose Sprite Pack';
+    inputEl.style.display = 'none';
+    btnRow.innerHTML = '';
+
+    // Build card grid inside bodyEl
+    bodyEl.textContent = '';
+    const grid = document.createElement('div');
+    grid.className = 'pack-picker-grid';
+
+    packs.forEach(p => {
+      const card = document.createElement('button');
+      card.className = 'pack-card' + (p.id === currentId ? ' pack-card-active' : '');
+
+      const name = document.createElement('span');
+      name.className = 'pack-card-name';
+      name.textContent = p.name;
+
+      const meta = document.createElement('span');
+      meta.className = 'pack-card-meta';
+      meta.textContent = p.builtin ? 'Built-in' : `${p.tileSize}×${p.tileSize}px`;
+
+      if (p.id === currentId) {
+        const badge = document.createElement('span');
+        badge.className = 'pack-card-badge';
+        badge.textContent = 'Active';
+        card.appendChild(badge);
+      }
+
+      card.appendChild(name);
+      card.appendChild(meta);
+      card.onclick = () => { overlay.classList.remove('active'); resolve(p.id); };
+      grid.appendChild(card);
+    });
+
+    bodyEl.appendChild(grid);
+
+    // Cancel button
+    const cancel = document.createElement('button');
+    cancel.className = 'modal-btn';
+    cancel.textContent = 'Cancel';
+    cancel.onclick = () => { overlay.classList.remove('active'); resolve(null); };
+    btnRow.appendChild(cancel);
+
+    overlay.classList.add('active');
+    resolveModal = resolve;
+  });
+}
