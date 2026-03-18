@@ -21,6 +21,10 @@
             const game = new Game();
             window.GAME = game;
         });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
