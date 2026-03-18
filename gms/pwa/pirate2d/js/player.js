@@ -99,7 +99,9 @@ export class Player {
     }
 
     get distFromHome() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+        const dx = this.x - 200;
+        const dy = this.y - 200;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     update(dt, input, world) {

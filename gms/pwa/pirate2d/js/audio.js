@@ -17,14 +17,18 @@ export class AudioManager {
 
     init() {
         if (this.initialized) return;
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.musicGain = this.ctx.createGain();
-        this.musicGain.gain.value = this.musicVolume;
-        this.musicGain.connect(this.ctx.destination);
-        this.sfxGain = this.ctx.createGain();
-        this.sfxGain.gain.value = this.sfxVolume;
-        this.sfxGain.connect(this.ctx.destination);
-        this.initialized = true;
+        try {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.musicGain = this.ctx.createGain();
+            this.musicGain.gain.value = this.musicVolume;
+            this.musicGain.connect(this.ctx.destination);
+            this.sfxGain = this.ctx.createGain();
+            this.sfxGain.gain.value = this.sfxVolume;
+            this.sfxGain.connect(this.ctx.destination);
+            this.initialized = true;
+        } catch (e) {
+            this.initialized = false;
+        }
     }
 
     resume() {

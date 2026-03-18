@@ -7,7 +7,7 @@ export class CombatSystem {
         this.projectiles = [];
     }
 
-    update(dt, player, enemies, particles, audio) {
+    update(dt, player, enemies, particles, audio, game) {
         // Auto-fire at nearest enemy
         if (player.canFire()) {
             const target = this._findNearestEnemy(player, enemies);
@@ -16,15 +16,12 @@ export class CombatSystem {
             }
         }
 
-        // Enemy auto-fire
+        // Enemy auto-fire (cooldown is decremented in enemy.update, not here)
         for (const enemy of enemies) {
             if (!enemy.alive || enemy.cannonCooldown > 0) continue;
-            enemy.cannonCooldown -= dt;
-            if (enemy.cannonCooldown <= 0) {
-                const d = dist(enemy.x, enemy.y, player.x, player.y);
-                if (d < enemy.cannonRange) {
-                    this._fireEnemyCannon(enemy, player, audio);
-                }
+            const d = dist(enemy.x, enemy.y, player.x, player.y);
+            if (d < enemy.cannonRange) {
+                this._fireEnemyCannon(enemy, player, audio);
             }
         }
 
@@ -53,7 +50,7 @@ export class CombatSystem {
                         audio.playHit();
 
                         if (!enemy.alive) {
-                            this._onEnemyKill(enemy, player, particles, audio);
+                            this._onEnemyKill(enemy, player, particles, audio, game);
                         }
                         this.projectiles.splice(i, 1);
                         break;
@@ -68,6 +65,7 @@ export class CombatSystem {
                         particles.addExplosion(p.x, p.y, 6, '#ff3300');
                         particles.addText(player.x, player.y - 30, `-${dmg}`, '#ff2222', 18);
                         audio.playHit();
+                        if (game) game.addShake(3 + dmg * 0.1);
                     }
                     this.projectiles.splice(i, 1);
                 }
@@ -92,19 +90,29 @@ export class CombatSystem {
 
     _firePlayerCannon(player, target, audio) {
         player.fire();
-        const a = angle(player.x, player.y, target.x, target.y);
+        const targetAngle = angle(player.x, player.y, target.x, target.y);
         const speed = 350;
 
-        // Fire from both sides of the ship
-        const offsets = [Math.PI / 2, -Math.PI / 2];
-        for (const off of offsets) {
+        // Determine which side the target is on relative to ship heading
+        const shipRight = player.angle + Math.PI / 2;
+        const shipLeft = player.angle - Math.PI / 2;
+        const angleDiffRight = Math.abs(this._angleDiff(shipRight, targetAngle));
+        const angleDiffLeft = Math.abs(this._angleDiff(shipLeft, targetAngle));
+
+        // Fire from the side facing the enemy (or both if roughly ahead/behind)
+        const sides = [];
+        if (angleDiffRight < Math.PI * 0.6) sides.push(Math.PI / 2);
+        if (angleDiffLeft < Math.PI * 0.6) sides.push(-Math.PI / 2);
+        if (sides.length === 0) sides.push(angleDiffRight < angleDiffLeft ? Math.PI / 2 : -Math.PI / 2);
+
+        for (const off of sides) {
             const spawnX = player.x + Math.cos(player.angle + off) * 20;
             const spawnY = player.y + Math.sin(player.angle + off) * 20;
 
             this.projectiles.push({
                 x: spawnX, y: spawnY,
-                vx: Math.cos(a) * speed,
-                vy: Math.sin(a) * speed,
+                vx: Math.cos(targetAngle) * speed,
+                vy: Math.sin(targetAngle) * speed,
                 damage: player.cannonDamage,
                 life: 1.5,
                 isPlayer: true,
@@ -112,6 +120,13 @@ export class CombatSystem {
             });
         }
         audio.playCannon();
+    }
+
+    _angleDiff(a, b) {
+        let d = b - a;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        return d;
     }
 
     _fireEnemyCannon(enemy, player, audio) {
@@ -136,7 +151,7 @@ export class CombatSystem {
         if (d < 400) audio.playCannon();
     }
 
-    _onEnemyKill(enemy, player, particles, audio) {
+    _onEnemyKill(enemy, player, particles, audio, game) {
         // Gold drop
         const goldAmount = player.addGold(enemy.goldReward);
         particles.addText(enemy.x, enemy.y - 50, `+${goldAmount} gold`, '#ffd700', 18);
@@ -146,15 +161,32 @@ export class CombatSystem {
         audio.playCoin();
 
         player.enemiesKilled++;
+        if (game) game.addShake(enemy.isBoss ? 8 : 2);
 
-        // Random cargo drop
-        if (Math.random() < 0.3) {
+        // Cargo drop - higher chance for bosses
+        const dropChance = enemy.isBoss ? 0.8 : 0.3;
+        if (Math.random() < dropChance) {
             const items = ['Rum', 'Spices', 'Silk', 'Gunpowder', 'Sugar', 'Gold Ore'];
-            const item = items[Math.floor(Math.random() * items.length)];
-            const qty = player.addCargo(item, 1 + Math.floor(Math.random() * 3));
+            // Bosses drop rarer items
+            const item = enemy.isBoss
+                ? items[3 + Math.floor(Math.random() * 3)] // Gunpowder, Sugar, Gold Ore
+                : items[Math.floor(Math.random() * items.length)];
+            const dropQty = enemy.isBoss ? 3 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 3);
+            const qty = player.addCargo(item, dropQty);
             if (qty > 0) {
                 particles.addText(enemy.x, enemy.y - 70, `+${qty} ${item}`, '#88ccff', 14);
             }
+        }
+
+        // Boss bonus gold burst
+        if (enemy.isBoss) {
+            const bonus = player.addGold(enemy.goldReward); // Double gold for bosses
+            particles.addText(enemy.x, enemy.y - 90, `BOSS BONUS +${bonus}g`, '#ffaa00', 20);
+
+            // Heal player partially on boss kill
+            const healAmt = Math.round(player.maxHp * 0.25);
+            player.heal(healAmt);
+            particles.addText(player.x, player.y - 50, `+${healAmt} HP`, '#44ff44', 16);
         }
     }
 

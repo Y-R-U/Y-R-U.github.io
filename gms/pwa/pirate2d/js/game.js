@@ -37,13 +37,10 @@ export class Game {
         this.ui = new UIManager(this);
 
         this.state = 'loading'; // loading, title, playing, paused, dead, dialogue, port
-        this.lastTime = 0;
+        this.lastTime = -1; // -1 signals first frame
         this.gameTime = 0;
         this.camX = 200;
         this.camY = 0;
-
-        // Water animation
-        this.waterOffset = 0;
 
         // Port interaction
         this.nearPort = null;
@@ -51,6 +48,10 @@ export class Game {
 
         // Wake particle timer
         this.wakeTimer = 0;
+
+        // Screen shake
+        this.shakeIntensity = 0;
+        this.shakeDecay = 5;
 
         this._resize();
         window.addEventListener('resize', () => this._resize());
@@ -187,13 +188,14 @@ export class Game {
         }, 800);
     }
 
-    _enterPort(port) {
-        if (this.portCooldown > 0) return;
+    _enterPort(port, fromSubmenu) {
+        if (!fromSubmenu && this.portCooldown > 0) return;
+        this.ui.closeDockPrompt();
         port.discovered = true;
         this.player.portsVisited.add(port.name);
         this.trading.openPort(port);
         this.state = 'port';
-        this.audio.playPortEnter();
+        if (!fromSubmenu) this.audio.playPortEnter();
 
         this.ui.showPortPrompt(
             port,
@@ -212,7 +214,17 @@ export class Game {
         );
     }
 
+    addShake(intensity) {
+        this.shakeIntensity = Math.min(15, this.shakeIntensity + intensity);
+    }
+
     _loop(timestamp) {
+        // Skip first frame to avoid huge dt
+        if (this.lastTime < 0) {
+            this.lastTime = timestamp;
+            requestAnimationFrame((t) => this._loop(t));
+            return;
+        }
         const dt = Math.min(0.05, (timestamp - this.lastTime) / 1000);
         this.lastTime = timestamp;
         this.gameTime += dt;
@@ -221,6 +233,19 @@ export class Game {
         this._draw();
 
         requestAnimationFrame((t) => this._loop(t));
+    }
+
+    pause() {
+        if (this.state === 'playing') {
+            this._stateBeforePause = 'playing';
+            this.state = 'paused';
+        }
+    }
+
+    resume() {
+        if (this.state === 'paused') {
+            this.state = this._stateBeforePause || 'playing';
+        }
     }
 
     _update(dt) {
@@ -251,7 +276,12 @@ export class Game {
         }
 
         // Combat
-        this.combat.update(dt, this.player, this.enemySpawner.enemies, this.particles, this.audio);
+        this.combat.update(dt, this.player, this.enemySpawner.enemies, this.particles, this.audio, this);
+
+        // Screen shake decay
+        if (this.shakeIntensity > 0) {
+            this.shakeIntensity = Math.max(0, this.shakeIntensity - this.shakeDecay * dt);
+        }
 
         // Particles
         this.particles.update(dt);
@@ -265,13 +295,20 @@ export class Game {
             }
         }
 
-        // Water animation
-        this.waterOffset = (this.waterOffset + dt * 20) % 64;
+        // HP regen near home (within safe zone)
+        if (this.player.distFromHome < 400) {
+            this.player.heal(5 * dt); // 5 HP/sec in safe zone
+        }
 
-        // Port proximity check
-        this.nearPort = this.world.getNearestPort(this.player.x, this.player.y, 100);
+        // Port proximity check - show dock prompt, don't auto-enter
+        const prevPort = this.nearPort;
+        this.nearPort = this.world.getNearestPort(this.player.x, this.player.y, 120);
         if (this.nearPort && !this.ui.hasPanel && this.portCooldown <= 0) {
-            this._enterPort(this.nearPort);
+            if (prevPort !== this.nearPort) {
+                this.ui.showDockPrompt(this.nearPort, () => this._enterPort(this.nearPort));
+            }
+        } else if (!this.nearPort && prevPort && this.ui._dockPrompt) {
+            this.ui.closeDockPrompt();
         }
 
         // Discover ports
@@ -313,25 +350,60 @@ export class Game {
 
         if (this.state === 'title' || this.state === 'dead') return;
 
+        // Apply screen shake offset
+        let shakeDx = 0, shakeDy = 0;
+        if (this.shakeIntensity > 0.1) {
+            shakeDx = (Math.random() - 0.5) * this.shakeIntensity * 2;
+            shakeDy = (Math.random() - 0.5) * this.shakeIntensity * 2;
+        }
+        const drawCamX = this.camX + shakeDx;
+        const drawCamY = this.camY + shakeDy;
+
         // Draw world
-        this.world.draw(ctx, this.camX, this.camY, vw, vh, this.assets);
+        this.world.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets);
+
+        // Draw safe zone indicator near home
+        this._drawSafeZone(ctx, drawCamX, drawCamY, vw, vh);
 
         // Draw enemies
-        this.enemySpawner.draw(ctx, this.camX, this.camY, vw, vh, this.assets, this.gameTime);
+        this.enemySpawner.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets, this.gameTime);
 
         // Draw player
         if (this.player.alive) {
-            this.player.draw(ctx, this.camX, this.camY, vw, vh, this.assets, this.gameTime);
+            this.player.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets, this.gameTime);
         }
 
         // Draw projectiles
-        this.combat.draw(ctx, this.camX, this.camY, vw, vh, this.assets);
+        this.combat.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets);
 
         // Draw particles
-        this.particles.draw(ctx, this.camX - vw / 2, this.camY - vh / 2);
+        this.particles.draw(ctx, drawCamX - vw / 2, drawCamY - vh / 2);
 
         // Draw joystick (screen-space)
         this.input.drawJoystick(ctx);
+    }
+
+    _drawSafeZone(ctx, camX, camY, vw, vh) {
+        // Draw a subtle circle around the home area (400px radius safe zone)
+        const sx = 200 - camX + vw / 2;
+        const sy = 200 - camY + vh / 2;
+        const radius = 400;
+
+        // Only draw if on screen
+        if (sx + radius < 0 || sx - radius > vw || sy + radius < 0 || sy - radius > vh) return;
+
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.strokeStyle = '#44cc44';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 12]);
+        ctx.beginPath();
+        ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 0.03;
+        ctx.fillStyle = '#44cc44';
+        ctx.fill();
+        ctx.restore();
     }
 
     _drawLoading(ctx, vw, vh) {

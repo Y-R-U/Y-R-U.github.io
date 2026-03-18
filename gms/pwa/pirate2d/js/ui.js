@@ -34,9 +34,43 @@ export class UIManager {
             <div class="hud-item"><span class="icon">\uD83D\uDCE6</span><span id="hud-cargo">0/20</span></div>
             <div class="hud-item"><span class="icon">\uD83D\uDDE1\uFE0F</span><span id="hud-kills">0</span></div>
             <div class="hud-item"><span class="icon">\uD83C\uDF0A</span><span id="hud-dist">0m</span></div>
+            <div class="hud-item" id="hud-medicine-btn" style="cursor:pointer;display:none;pointer-events:auto;"><span class="icon">\uD83D\uDC8A</span><span id="hud-medicine-text">Q</span></div>
         `;
         this.hud.style.display = 'none';
         this.uiLayer.appendChild(this.hud);
+
+        // Cache HUD element references to avoid per-frame DOM lookups
+        this._hudHpBar = this.hud.querySelector('#hud-hp');
+        this._hudHpText = this.hud.querySelector('#hud-hp-text');
+        this._hudGold = this.hud.querySelector('#hud-gold');
+        this._hudCargo = this.hud.querySelector('#hud-cargo');
+        this._hudKills = this.hud.querySelector('#hud-kills');
+        this._hudDist = this.hud.querySelector('#hud-dist');
+        this._hudMedicineBtn = this.hud.querySelector('#hud-medicine-btn');
+        this._hudMedicineText = this.hud.querySelector('#hud-medicine-text');
+
+        // Medicine button click
+        this._hudMedicineBtn.addEventListener('click', () => this._useMedicine());
+
+        // Q key to use medicine
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyQ' && this.game.state === 'playing') {
+                this._useMedicine();
+            }
+        });
+    }
+
+    _useMedicine() {
+        const player = this.game.player;
+        if (player.hp >= player.maxHp) return;
+        const have = player.cargo['Medicine'] || 0;
+        if (have <= 0) return;
+        player.removeCargo('Medicine', 1);
+        const healAmt = Math.round(player.maxHp * 0.4);
+        player.heal(healAmt);
+        this.game.audio.playUpgrade();
+        this.game.particles.addText(player.x, player.y - 40, `+${healAmt} HP`, '#44ff44', 16);
+        this.showToast(`Used Medicine: +${healAmt} HP`);
     }
 
     _createMinimap() {
@@ -64,25 +98,25 @@ export class UIManager {
 
     updateHUD(player) {
         const hpRatio = player.hp / player.maxHp;
-        const hpBar = document.getElementById('hud-hp');
-        const hpText = document.getElementById('hud-hp-text');
-        if (hpBar) {
-            hpBar.style.width = (hpRatio * 100) + '%';
-            hpBar.style.background = `linear-gradient(90deg, ${hpRatio > 0.5 ? '#44aa22' : hpRatio > 0.25 ? '#ccaa22' : '#cc2222'}, ${hpRatio > 0.5 ? '#66cc44' : hpRatio > 0.25 ? '#ddbb44' : '#dd4444'})`;
+        if (this._hudHpBar) {
+            this._hudHpBar.style.width = (hpRatio * 100) + '%';
+            this._hudHpBar.style.background = `linear-gradient(90deg, ${hpRatio > 0.5 ? '#44aa22' : hpRatio > 0.25 ? '#ccaa22' : '#cc2222'}, ${hpRatio > 0.5 ? '#66cc44' : hpRatio > 0.25 ? '#ddbb44' : '#dd4444'})`;
         }
-        if (hpText) hpText.textContent = Math.ceil(player.hp);
+        if (this._hudHpText) this._hudHpText.textContent = Math.ceil(player.hp);
+        if (this._hudGold) this._hudGold.textContent = formatGold(player.gold);
+        if (this._hudCargo) this._hudCargo.textContent = `${player.cargoCount}/${player.cargoCapacity}`;
+        if (this._hudKills) this._hudKills.textContent = player.enemiesKilled;
+        if (this._hudDist) this._hudDist.textContent = Math.round(player.distFromHome) + 'm';
 
-        const gold = document.getElementById('hud-gold');
-        if (gold) gold.textContent = formatGold(player.gold);
-
-        const cargo = document.getElementById('hud-cargo');
-        if (cargo) cargo.textContent = `${player.cargoCount}/${player.cargoCapacity}`;
-
-        const kills = document.getElementById('hud-kills');
-        if (kills) kills.textContent = player.enemiesKilled;
-
-        const distEl = document.getElementById('hud-dist');
-        if (distEl) distEl.textContent = Math.round(player.distFromHome) + 'm';
+        // Show medicine button if player has medicine and needs healing
+        const hasMed = (player.cargo['Medicine'] || 0) > 0;
+        const needsHeal = player.hp < player.maxHp;
+        if (this._hudMedicineBtn) {
+            this._hudMedicineBtn.style.display = (hasMed && needsHeal) ? 'flex' : 'none';
+            if (hasMed && this._hudMedicineText) {
+                this._hudMedicineText.textContent = `x${player.cargo['Medicine']} (Q)`;
+            }
+        }
     }
 
     updateMinimap(world, enemySpawner, player) {
@@ -101,7 +135,7 @@ export class UIManager {
     }
 
     // Title screen
-    showTitleScreen(onNewGame, onContinue, player) {
+    showTitleScreen(onNewGame, _unused, player) {
         this.closePanel();
         const panel = document.createElement('div');
         panel.className = 'title-screen';
@@ -165,7 +199,7 @@ export class UIManager {
                     this.showToast(`${PERMANENT_UPGRADES[key].name} upgraded to Lv${result.newLevel}!`);
                     // Refresh
                     this.closePanel();
-                    this.showTitleScreen(onNewGame, onContinue, player);
+                    this.showTitleScreen(onNewGame, null, player);
                 }
             });
         });
@@ -243,10 +277,10 @@ export class UIManager {
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
 
-        // Close
+        // Close - return to port menu, not exit port
         panel.querySelector('#trade-close').addEventListener('click', () => {
             this.closePanel();
-            this.game.trading.closePort();
+            this.game._enterPort(port, true);
         });
 
         // Repair
@@ -330,7 +364,11 @@ export class UIManager {
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
 
-        panel.querySelector('#upgrade-close').addEventListener('click', () => this.closePanel());
+        panel.querySelector('#upgrade-close').addEventListener('click', () => {
+            this.closePanel();
+            const port = this.game.trading.currentPort;
+            if (port) this.game._enterPort(port, true);
+        });
 
         panel.querySelectorAll('[data-run-upgrade]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -346,15 +384,55 @@ export class UIManager {
         });
     }
 
+    // Dock prompt - shown when near a port (player must tap to enter)
+    showDockPrompt(port, onDock) {
+        this.closeDockPrompt();
+        const prompt = document.createElement('div');
+        prompt.className = 'port-prompt';
+        prompt.innerHTML = `
+            <button class="btn btn-green" id="btn-dock">\u2693 Dock at ${port.name}</button>
+        `;
+        this.uiLayer.appendChild(prompt);
+        this._dockPrompt = prompt;
+        prompt.querySelector('#btn-dock').addEventListener('click', () => {
+            this.closeDockPrompt();
+            onDock();
+        });
+
+        // Also allow 'E' key to dock
+        this._dockKeyHandler = (e) => {
+            if (e.code === 'KeyE') {
+                this.closeDockPrompt();
+                onDock();
+            }
+        };
+        window.addEventListener('keydown', this._dockKeyHandler);
+    }
+
+    closeDockPrompt() {
+        if (this._dockPrompt) {
+            if (this._dockPrompt.parentNode) this._dockPrompt.parentNode.removeChild(this._dockPrompt);
+            this._dockPrompt = null;
+        }
+        if (this._dockKeyHandler) {
+            window.removeEventListener('keydown', this._dockKeyHandler);
+            this._dockKeyHandler = null;
+        }
+    }
+
     // Port interaction buttons
     showPortPrompt(port, onTrade, onUpgrade, onLeave) {
         this.closePanel();
+        const player = this.game.player;
+        const hasMedicine = (player.cargo['Medicine'] || 0) > 0;
+        const needsHeal = player.hp < player.maxHp;
         const panel = document.createElement('div');
         panel.className = 'port-prompt';
         panel.innerHTML = `
             <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
                 <button class="btn" id="port-trade">\uD83D\uDCB0 Trade</button>
                 <button class="btn" id="port-upgrade">\u2699\uFE0F Upgrades</button>
+                ${hasMedicine && needsHeal ? '<button class="btn btn-green" id="port-medicine">\uD83D\uDC8A Use Medicine</button>' : ''}
                 <button class="btn btn-red" id="port-leave">\u26F5 Set Sail</button>
             </div>
         `;
@@ -364,6 +442,22 @@ export class UIManager {
         panel.querySelector('#port-trade').addEventListener('click', onTrade);
         panel.querySelector('#port-upgrade').addEventListener('click', onUpgrade);
         panel.querySelector('#port-leave').addEventListener('click', onLeave);
+
+        const medBtn = panel.querySelector('#port-medicine');
+        if (medBtn) {
+            medBtn.addEventListener('click', () => {
+                const used = player.removeCargo('Medicine', 1);
+                if (used > 0) {
+                    const healAmt = Math.round(player.maxHp * 0.4);
+                    player.heal(healAmt);
+                    this.game.audio.playUpgrade();
+                    this.game.particles.addText(player.x, player.y - 40, `+${healAmt} HP`, '#44ff44', 16);
+                    this.showToast(`Used Medicine: +${healAmt} HP`);
+                    // Refresh port prompt
+                    this.showPortPrompt(port, onTrade, onUpgrade, onLeave);
+                }
+            });
+        }
     }
 
     // Story dialogue
@@ -397,6 +491,7 @@ export class UIManager {
     // Settings panel
     showSettings() {
         this.closePanel();
+        this.game.pause();
         const audio = this.game.audio;
 
         const overlay = document.createElement('div');
@@ -437,6 +532,7 @@ export class UIManager {
         // Close
         const closeSettings = () => {
             this.closePanel();
+            this.game.resume();
         };
         panel.querySelector('#settings-close').addEventListener('click', closeSettings);
         overlay.addEventListener('click', closeSettings);
