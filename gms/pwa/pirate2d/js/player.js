@@ -33,6 +33,17 @@ export class Player {
             armor: 0      // +3 armor per level
         };
 
+        // Persistent (survives death) - must be before maxHp access
+        this.persistentGold = 0;
+        this.totalRuns = 0;
+        this.bestDistance = 0;
+        this.permanentUpgrades = {
+            startGold: 0,
+            startHp: 0,
+            luck: 0
+        };
+        this._loadPersistent();
+
         this.hp = this.maxHp;
         this.gold = 50;
         this.totalGoldEarned = 0;
@@ -48,18 +59,6 @@ export class Player {
         this.distanceTraveled = 0;
         this.portsVisited = new Set();
         this.maxDistFromHome = 0;
-
-        // Persistent (survives death)
-        this.persistentGold = 0;
-        this.totalRuns = 0;
-        this.bestDistance = 0;
-        this.permanentUpgrades = {
-            startGold: 0,
-            startHp: 0,
-            luck: 0
-        };
-
-        this._loadPersistent();
     }
 
     get maxHp() {
