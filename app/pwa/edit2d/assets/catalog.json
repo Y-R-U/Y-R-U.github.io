@@ -7,41 +7,6 @@
       "builtin": true
     },
     {
-      "id": "1bit",
-      "name": "Kenney 1-Bit Pack",
-      "tileSize": 16,
-      "image": "/gms/assets/kenney/2d/1bit/tilemap.png",
-      "metadata": "/gms/assets/kenney/2d/1bit/tilemap.json"
-    },
-    {
-      "id": "tiny-dungeon",
-      "name": "Kenney Tiny Dungeon",
-      "tileSize": 16,
-      "image": "/gms/assets/kenney/2d/tiny-dungeon/tilemap.png",
-      "metadata": "/gms/assets/kenney/2d/tiny-dungeon/tilemap.json"
-    },
-    {
-      "id": "tiny-town",
-      "name": "Kenney Tiny Town",
-      "tileSize": 16,
-      "image": "/gms/assets/kenney/2d/tiny-town/tilemap.png",
-      "metadata": "/gms/assets/kenney/2d/tiny-town/tilemap.json"
-    },
-    {
-      "id": "roguelike-rpg",
-      "name": "Kenney Roguelike/RPG Pack",
-      "tileSize": 16,
-      "image": "/gms/assets/kenney/2d/roguelike-rpg/tilemap.png",
-      "metadata": "/gms/assets/kenney/2d/roguelike-rpg/tilemap.json"
-    },
-    {
-      "id": "pixel-platformer",
-      "name": "Kenney Pixel Platformer",
-      "tileSize": 18,
-      "image": "/gms/assets/kenney/2d/pixel-platformer/tilemap.png",
-      "metadata": "/gms/assets/kenney/2d/pixel-platformer/tilemap.json"
-    },
-    {
       "id": "cartography",
       "name": "Kenney Cartography",
       "tileSize": 64,
