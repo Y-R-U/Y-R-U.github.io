@@ -1,0 +1,17 @@
+{
+    "name": "Corsair's Fate",
+    "short_name": "Corsair",
+    "description": "A pirate roguelite adventure on the high seas",
+    "start_url": "./index.html",
+    "display": "fullscreen",
+    "orientation": "any",
+    "background_color": "#0a1628",
+    "theme_color": "#1a3a5c",
+    "icons": [
+        {
+            "src": "assets/ui/hexagon_brown.png",
+            "sizes": "48x48",
+            "type": "image/png"
+        }
+    ]
+}
