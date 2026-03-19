@@ -57,6 +57,10 @@ export class AudioManager {
     async playRandomMusic() {
         if (!this.musicEnabled || this.musicTracks.length === 0 || !this.initialized) return;
 
+        // Prevent concurrent calls
+        if (this._musicLoading) return;
+        this._musicLoading = true;
+
         // Pick a random track different from current
         let track;
         if (this.musicTracks.length === 1) {
@@ -75,10 +79,17 @@ export class AudioManager {
             const buf = await resp.arrayBuffer();
             const audioBuf = await this.ctx.decodeAudioData(buf);
 
+            // Check we weren't stopped/disabled while loading
+            if (!this.musicEnabled) {
+                this._musicLoading = false;
+                return;
+            }
+
             this.currentMusicSource = this.ctx.createBufferSource();
             this.currentMusicSource.buffer = audioBuf;
             this.currentMusicSource.connect(this.musicGain);
             this.currentMusicSource.onended = () => {
+                this.currentMusicSource = null;
                 if (this.musicEnabled) this.playRandomMusic();
             };
             this.currentMusicSource.start();
@@ -87,13 +98,17 @@ export class AudioManager {
             if (this.musicTracks.length > 1) {
                 const idx = this.musicTracks.indexOf(track);
                 if (idx !== -1) this.musicTracks.splice(idx, 1);
+                this._musicLoading = false;
                 this.playRandomMusic();
+                return;
             }
         }
+        this._musicLoading = false;
     }
 
     stopMusic() {
         if (this.currentMusicSource) {
+            try { this.currentMusicSource.onended = null; } catch(e) {}
             try { this.currentMusicSource.stop(); } catch(e) {}
             this.currentMusicSource = null;
         }

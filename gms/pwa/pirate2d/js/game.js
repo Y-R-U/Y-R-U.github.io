@@ -127,6 +127,7 @@ export class Game {
     _startNewGame() {
         this.audio.init();
         this.audio.resume();
+        this.audio.stopMusic();
         if (this.audio.musicTracks.length > 0 && this.audio.musicEnabled) {
             this.audio.playRandomMusic();
         }
@@ -157,6 +158,7 @@ export class Game {
     _continueGame() {
         this.audio.init();
         this.audio.resume();
+        this.audio.stopMusic();
         if (this.audio.musicTracks.length > 0 && this.audio.musicEnabled) {
             this.audio.playRandomMusic();
         }
@@ -262,15 +264,34 @@ export class Game {
     }
 
     pause() {
-        if (this.state === 'playing') {
-            this._stateBeforePause = 'playing';
+        if (this.state !== 'paused' && this.state !== 'loading' && this.state !== 'title' && this.state !== 'dead') {
+            this._stateBeforePause = this.state;
+            this._dialogueBeforePause = null;
+            // If we're in dialogue, save dialogue state so we can re-show it
+            if (this.state === 'dialogue' && this.story.isShowingDialogue) {
+                this._dialogueBeforePause = {
+                    line: this.story.getCurrentLine(),
+                    chapterTitle: this.story.dialogueIndex === 0 ? this.story.getChapterTitle() : null
+                };
+            }
             this.state = 'paused';
         }
     }
 
     resume() {
         if (this.state === 'paused') {
-            this.state = this._stateBeforePause || 'playing';
+            const prevState = this._stateBeforePause || 'playing';
+            this.state = prevState;
+            // Re-show dialogue if we were in dialogue state
+            if (prevState === 'dialogue' && this._dialogueBeforePause) {
+                this._showCurrentDialogue();
+            }
+            // Re-show port prompt if we were in port state
+            if (prevState === 'port') {
+                const port = this.trading.currentPort;
+                if (port) this._enterPort(port, true);
+            }
+            this._dialogueBeforePause = null;
         }
     }
 
