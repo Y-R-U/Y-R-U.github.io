@@ -274,7 +274,7 @@ export class Player {
 
         ctx.save();
         ctx.translate(sx, sy);
-        ctx.rotate(this.angle + Math.PI / 2); // Sprites face up
+        ctx.rotate(this.angle - Math.PI / 2); // Rotated 180 to face correct direction
 
         // Flash when hit
         if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 10) % 2) {
