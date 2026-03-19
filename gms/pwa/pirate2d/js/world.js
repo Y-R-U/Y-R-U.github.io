@@ -19,15 +19,22 @@ const PORT_NAMES = [
 const PORT_TYPES = ['trading', 'military', 'pirate', 'fishing'];
 
 export class World {
-    constructor() {
+    constructor(savedState) {
         this.chunks = new Map();
         this.islands = [];
         this.ports = [];
-        this.worldSeed = Math.floor(Math.random() * 999999);
-        this.portNameIdx = 0;
 
-        // Start area island with home port
-        this._generateStartArea();
+        if (savedState) {
+            // Restore from saved state
+            this.worldSeed = savedState.worldSeed;
+            this.portNameIdx = savedState.portNameIdx;
+            this.ports = savedState.ports || [];
+            this.islands = savedState.islands || [];
+        } else {
+            this.worldSeed = Math.floor(Math.random() * 999999);
+            this.portNameIdx = 0;
+            this._generateStartArea();
+        }
     }
 
     _generateStartArea() {
@@ -133,12 +140,16 @@ export class World {
         const worldCenterX = cx * CHUNK_PX + islandCenterTX * TILE_SIZE + TILE_SIZE / 2;
         const worldCenterY = cy * CHUNK_PX + islandCenterTY * TILE_SIZE + TILE_SIZE / 2;
 
-        // Check not too close to existing islands
+        // Check if island already exists here (from saved state)
+        let alreadyExists = false;
         for (const isl of this.islands) {
-            if (dist(worldCenterX, worldCenterY, isl.x, isl.y) < 500) return;
+            if (dist(worldCenterX, worldCenterY, isl.x, isl.y) < 500) {
+                alreadyExists = true;
+                break;
+            }
         }
 
-        // Place tiles
+        // Always place tiles for rendering
         for (let ty = 0; ty < CHUNK_SIZE; ty++) {
             for (let tx = 0; tx < CHUNK_SIZE; tx++) {
                 const d = dist(tx, ty, islandCenterTX, islandCenterTY);
@@ -153,6 +164,16 @@ export class World {
         }
 
         chunk.hasIsland = true;
+
+        if (alreadyExists) {
+            // Consume rng to keep in sync with normal generation path
+            const _hasPort = rng.next() < 0.6;
+            if (_hasPort) {
+                rng.int(0, PORT_TYPES.length - 1);
+                rng.float(0, Math.PI * 2);
+            }
+            return;
+        }
 
         const island = {
             x: worldCenterX,
@@ -209,6 +230,22 @@ export class World {
             }
         }
         return nearest;
+    }
+
+    // Serialize for localStorage
+    serializeState() {
+        return {
+            worldSeed: this.worldSeed,
+            portNameIdx: this.portNameIdx,
+            ports: this.ports.map(p => ({
+                x: p.x, y: p.y, name: p.name, type: p.type,
+                radius: p.radius, discovered: p.discovered,
+                isHome: p.isHome, prices: p.prices
+            })),
+            islands: this.islands.map(i => ({
+                x: i.x, y: i.y, radius: i.radius, hasPort: i.hasPort
+            }))
+        };
     }
 
     draw(ctx, camX, camY, viewW, viewH, assets) {

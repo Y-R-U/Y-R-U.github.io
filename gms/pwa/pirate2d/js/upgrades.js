@@ -7,13 +7,22 @@ export const RUN_UPGRADES = {
     fireRate: { name: 'Faster Loading',   desc: '+0.2 Fire Rate',    baseCost: 100, costMult: 1.8, maxLevel: 8,  icon: '\u26A1' },
     range:    { name: 'Long Cannons',     desc: '+40 Range',         baseCost: 70,  costMult: 1.5, maxLevel: 6,  icon: '\uD83C\uDFAF' },
     cargo:    { name: 'Expand Hold',      desc: '+10 Cargo Space',   baseCost: 40,  costMult: 1.4, maxLevel: 6,  icon: '\uD83D\uDCE6' },
-    armor:    { name: 'Iron Plating',     desc: '+3 Damage Resist',  baseCost: 90,  costMult: 1.7, maxLevel: 8,  icon: '\u2699\uFE0F' }
+    armor:    { name: 'Iron Plating',     desc: '+3 Damage Resist',  baseCost: 90,  costMult: 1.7, maxLevel: 8,  icon: '\u2699\uFE0F' },
+    repairSpeed: { name: 'Quick Patching', desc: '+0.5 HP/sec repair', baseCost: 30, costMult: 1.5, maxLevel: 8, icon: '\uD83D\uDD27', requiresRepair: true }
 };
 
 export const PERMANENT_UPGRADES = {
-    startGold: { name: 'Treasure Map',    desc: '+25 Starting Gold',  baseCost: 100, costMult: 2.0, maxLevel: 5, icon: '\uD83D\uDDFA\uFE0F' },
-    startHp:   { name: 'Sturdy Build',    desc: '+10 Starting HP',    baseCost: 150, costMult: 2.2, maxLevel: 5, icon: '\u2764\uFE0F' },
-    luck:      { name: 'Fortune\'s Favor', desc: '+5% Gold Bonus',    baseCost: 200, costMult: 2.5, maxLevel: 5, icon: '\uD83C\uDF40' }
+    repairUnlock:    { name: 'Repair Kit',       desc: 'Unlock ship auto-repair',  baseCost: 200, costMult: 1,   maxLevel: 1,  icon: '\uD83D\uDD27' },
+    permDamage:      { name: 'Cannon Training',  desc: '+1 Cannon Damage',         baseCost: 10,  costMult: 1.5, maxLevel: 10, icon: '\uD83D\uDCA5' },
+    permHealth:      { name: 'Thick Hull',       desc: '+2 Max HP',                baseCost: 10,  costMult: 1.5, maxLevel: 10, icon: '\u2764\uFE0F' },
+    permSpeed:       { name: 'Silk Sails',       desc: '+5 Max Speed',             baseCost: 15,  costMult: 1.5, maxLevel: 8,  icon: '\uD83D\uDCA8' },
+    permFireRate:    { name: 'Powder Monkey',    desc: '+0.05 Fire Rate',          baseCost: 20,  costMult: 1.6, maxLevel: 8,  icon: '\u26A1' },
+    permCargo:       { name: 'Extra Hold',       desc: '+2 Cargo Space',           baseCost: 15,  costMult: 1.5, maxLevel: 8,  icon: '\uD83D\uDCE6' },
+    permArmor:       { name: 'Steel Plates',     desc: '+1 Damage Resist',         baseCost: 20,  costMult: 1.6, maxLevel: 8,  icon: '\u2699\uFE0F' },
+    startGold:       { name: 'Treasure Map',     desc: '+25 Starting Gold',        baseCost: 100, costMult: 2.0, maxLevel: 5,  icon: '\uD83D\uDDFA\uFE0F' },
+    startHp:         { name: 'Sturdy Build',     desc: '+10 Starting HP',          baseCost: 150, costMult: 2.2, maxLevel: 5,  icon: '\u2764\uFE0F' },
+    luck:            { name: 'Fortune\'s Favor', desc: '+5% Gold Bonus',           baseCost: 200, costMult: 2.5, maxLevel: 5,  icon: '\uD83C\uDF40' },
+    permRepairSpeed: { name: 'Repair Crew',      desc: '+0.3 HP/sec repair',       baseCost: 25,  costMult: 1.6, maxLevel: 8,  icon: '\uD83D\uDD28', requiresRepair: true }
 };
 
 export class UpgradeSystem {
@@ -51,6 +60,12 @@ export class UpgradeSystem {
         if (player.persistentGold < cost) return { success: false, reason: 'Not enough saved gold' };
         player.persistentGold -= cost;
         player.permanentUpgrades[key] = (player.permanentUpgrades[key] || 0) + 1;
+
+        // Handle repair unlock
+        if (key === 'repairUnlock') {
+            player.hasRepairSkill = true;
+        }
+
         player._savePersistent();
 
         if (audio) audio.playUpgrade();

@@ -34,6 +34,7 @@ export class UIManager {
             <div class="hud-item"><span class="icon">\uD83D\uDCE6</span><span id="hud-cargo">0/20</span></div>
             <div class="hud-item"><span class="icon">\uD83D\uDDE1\uFE0F</span><span id="hud-kills">0</span></div>
             <div class="hud-item"><span class="icon">\uD83C\uDF0A</span><span id="hud-dist">0m</span></div>
+            <div class="hud-item" id="hud-repair-indicator" style="display:none;"><span class="icon">\uD83D\uDD27</span><span id="hud-repair-text">1.0/s</span></div>
             <div class="hud-item" id="hud-medicine-btn" style="cursor:pointer;display:none;pointer-events:auto;"><span class="icon">\uD83D\uDC8A</span><span id="hud-medicine-text">Q</span></div>
         `;
         this.hud.style.display = 'none';
@@ -48,6 +49,8 @@ export class UIManager {
         this._hudDist = this.hud.querySelector('#hud-dist');
         this._hudMedicineBtn = this.hud.querySelector('#hud-medicine-btn');
         this._hudMedicineText = this.hud.querySelector('#hud-medicine-text');
+        this._hudRepairIndicator = this.hud.querySelector('#hud-repair-indicator');
+        this._hudRepairText = this.hud.querySelector('#hud-repair-text');
 
         // Medicine button click
         this._hudMedicineBtn.addEventListener('click', () => this._useMedicine());
@@ -117,6 +120,16 @@ export class UIManager {
                 this._hudMedicineText.textContent = `x${player.cargo['Medicine']} (Q)`;
             }
         }
+
+        // Show repair indicator
+        if (this._hudRepairIndicator) {
+            if (player.hasRepairSkill && player.repairRate > 0) {
+                this._hudRepairIndicator.style.display = 'flex';
+                this._hudRepairText.textContent = `${player.repairRate.toFixed(1)}/s`;
+            } else {
+                this._hudRepairIndicator.style.display = 'none';
+            }
+        }
     }
 
     updateMinimap(world, enemySpawner, player) {
@@ -149,35 +162,19 @@ export class UIManager {
                     &nbsp;|&nbsp; Best: ${Math.round(player.bestDistance)}m
                 </div>
             `;
-
-            // Permanent upgrades
-            permHTML += '<div style="margin-bottom:20px;max-width:360px;width:90vw;">';
-            permHTML += '<h3 style="color:#ffd700;text-align:center;margin-bottom:10px;font-size:16px;">Permanent Upgrades</h3>';
-            for (const [key, upg] of Object.entries(PERMANENT_UPGRADES)) {
-                const level = player.permanentUpgrades[key] || 0;
-                const cost = this.game.upgradeSystem.getPermanentUpgradeCost(key, player);
-                const canBuy = player.persistentGold >= cost && level < upg.maxLevel;
-                const maxed = level >= upg.maxLevel;
-                permHTML += `
-                    <div class="item-row" style="margin:4px 0;">
-                        <span style="font-size:18px;margin-right:8px;">${upg.icon}</span>
-                        <span class="item-name">${upg.name}<br><small style="color:#aaa;">${upg.desc}</small></span>
-                        <span class="item-qty">Lv${level}/${upg.maxLevel}</span>
-                        ${maxed
-                            ? '<span style="color:#44aa22;font-size:12px;">MAX</span>'
-                            : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-perm-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
-                        }
-                    </div>
-                `;
-            }
-            permHTML += '</div>';
         }
+
+        // Check for saved game state
+        let hasSavedGame = false;
+        try { hasSavedGame = !!localStorage.getItem('pirate2d_state'); } catch(e) {}
 
         panel.innerHTML = `
             <h1>CORSAIR'S FATE</h1>
             <div class="subtitle">A Pirate Roguelite</div>
             ${permHTML}
+            ${hasSavedGame ? '<button class="btn btn-green" id="btn-continue" style="margin:8px;min-width:200px;font-size:18px;padding:14px 30px;">\u26F5 Continue Voyage</button>' : ''}
             <button class="btn" id="btn-new-game">Set Sail</button>
+            <button class="btn" id="btn-perm-upgrades" style="margin:8px;min-width:200px;font-size:16px;padding:10px 24px;">\u2693 Upgrades</button>
             <div class="version">v1.0 - Kenney Assets</div>
         `;
 
@@ -186,21 +183,25 @@ export class UIManager {
         this.settingsBtn.style.display = 'flex';
 
         panel.querySelector('#btn-new-game').addEventListener('click', () => {
+            // Clear any saved game state when starting fresh
+            try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
             this.closePanel();
             onNewGame();
         });
 
-        // Permanent upgrade buttons
-        panel.querySelectorAll('[data-perm-upgrade]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const key = btn.dataset.permUpgrade;
-                const result = this.game.upgradeSystem.buyPermanentUpgrade(key, player, this.game.audio);
-                if (result.success) {
-                    this.showToast(`${PERMANENT_UPGRADES[key].name} upgraded to Lv${result.newLevel}!`);
-                    // Refresh
-                    this.closePanel();
-                    this.showTitleScreen(onNewGame, null, player);
-                }
+        // Continue button
+        const continueBtn = panel.querySelector('#btn-continue');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                this.closePanel();
+                this.game._continueGame();
+            });
+        }
+
+        // Permanent upgrades button
+        panel.querySelector('#btn-perm-upgrades').addEventListener('click', () => {
+            this.showPermanentUpgradesPopup(player, () => {
+                this.showTitleScreen(onNewGame, null, player);
             });
         });
     }
@@ -219,14 +220,94 @@ export class UIManager {
                 Ports visited: <span class="gold">${stats.portsVisited}</span><br>
                 Gold saved: <span class="gold">${formatGold(stats.goldKept)}</span>
             </div>
-            <button class="btn" id="btn-restart">Return to Port</button>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                <button class="btn" id="btn-death-upgrades">\u2693 Upgrades (${formatGold(this.game.player.persistentGold)}g)</button>
+                <button class="btn btn-green" id="btn-restart">Return to Port</button>
+            </div>
         `;
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
 
+        panel.querySelector('#btn-death-upgrades').addEventListener('click', () => {
+            this.showPermanentUpgradesPopup(this.game.player, () => {
+                this.showDeathScreen(stats, onRestart);
+            });
+        });
+
         panel.querySelector('#btn-restart').addEventListener('click', () => {
             this.closePanel();
             onRestart();
+        });
+    }
+
+    // Permanent upgrades popup (used on title + death screens)
+    showPermanentUpgradesPopup(player, returnCallback) {
+        this.closePanel();
+
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'settings-overlay';
+        this.uiLayer.appendChild(overlay);
+        this._settingsOverlay = overlay;
+
+        const panel = document.createElement('div');
+        panel.className = 'game-panel upgrade-panel';
+
+        let upgradesHTML = '';
+        for (const [key, upg] of Object.entries(PERMANENT_UPGRADES)) {
+            // Hide repair-dependent upgrades if repair not unlocked
+            if (upg.requiresRepair && !player.hasRepairSkill) continue;
+            // Hide repairUnlock if already purchased
+            if (key === 'repairUnlock' && player.hasRepairSkill) continue;
+
+            const level = player.permanentUpgrades[key] || 0;
+            const cost = this.game.upgradeSystem.getPermanentUpgradeCost(key, player);
+            const canBuy = player.persistentGold >= cost && level < upg.maxLevel;
+            const maxed = level >= upg.maxLevel;
+
+            upgradesHTML += `
+                <div class="item-row">
+                    <span style="font-size:18px;margin-right:6px;">${upg.icon}</span>
+                    <span class="item-name">${upg.name}<br><small style="color:#aaa;">${upg.desc}</small></span>
+                    <span class="item-qty">${maxed ? '' : `Lv${level}/${upg.maxLevel}`}</span>
+                    ${maxed
+                        ? '<span style="color:#44aa22;font-size:12px;min-width:60px;text-align:center;">MAX</span>'
+                        : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-perm-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
+                    }
+                </div>
+            `;
+        }
+
+        panel.innerHTML = `
+            <button class="close-btn" id="perm-upgrade-close">\u2715</button>
+            <h2>\u2693 Permanent Upgrades</h2>
+            <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
+                Saved Gold: <span style="color:#ffd700;">${formatGold(player.persistentGold)}</span>
+            </div>
+            ${upgradesHTML}
+        `;
+
+        this.uiLayer.appendChild(panel);
+        this.activePanel = panel;
+
+        const close = () => {
+            this.closePanel();
+            if (returnCallback) returnCallback();
+        };
+
+        panel.querySelector('#perm-upgrade-close').addEventListener('click', close);
+        overlay.addEventListener('click', close);
+
+        panel.querySelectorAll('[data-perm-upgrade]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.permUpgrade;
+                const result = this.game.upgradeSystem.buyPermanentUpgrade(key, player, this.game.audio);
+                if (result.success) {
+                    this.showToast(`${PERMANENT_UPGRADES[key].name} upgraded!`);
+                    // Refresh popup
+                    this.showPermanentUpgradesPopup(player, returnCallback);
+                }
+            });
         });
     }
 
@@ -255,11 +336,13 @@ export class UIManager {
             `;
         }
 
+        const portType = (port.type || 'trading').toUpperCase();
+
         panel.innerHTML = `
             <button class="close-btn" id="trade-close">\u2715</button>
             <h2>\u2693 ${port.name}</h2>
             <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
-                ${port.type.toUpperCase()} PORT &nbsp;|&nbsp; Gold: <span style="color:#ffd700;">${formatGold(player.gold)}</span>
+                ${portType} PORT &nbsp;|&nbsp; Gold: <span style="color:#ffd700;">${formatGold(player.gold)}</span>
                 &nbsp;|&nbsp; Cargo: ${player.cargoCount}/${player.cargoCapacity}
             </div>
             ${needsRepair ? `
@@ -290,6 +373,7 @@ export class UIManager {
                 if (tradingSystem.repair(player)) {
                     audio.playUpgrade();
                     this.showToast('Ship repaired!');
+                    this.updateHUD(player);
                     this.showTradePanel(port, player, tradingSystem, audio); // Refresh
                 } else {
                     this.showToast('Not enough gold!');
@@ -304,6 +388,7 @@ export class UIManager {
                 const result = tradingSystem.buyItem(item, 1, player);
                 if (result.success) {
                     audio.playCoin();
+                    this.updateHUD(player);
                     this.showTradePanel(port, player, tradingSystem, audio); // Refresh
                 } else {
                     this.showToast(result.reason);
@@ -318,6 +403,7 @@ export class UIManager {
                 const result = tradingSystem.sellItem(item, 1, player);
                 if (result.success) {
                     audio.playCoin();
+                    this.updateHUD(player);
                     this.showTradePanel(port, player, tradingSystem, audio); // Refresh
                 } else {
                     this.showToast(result.reason);
@@ -334,6 +420,9 @@ export class UIManager {
 
         let upgradesHTML = '';
         for (const [key, upg] of Object.entries(RUN_UPGRADES)) {
+            // Hide repair-dependent upgrades if repair not unlocked
+            if (upg.requiresRepair && !player.hasRepairSkill) continue;
+
             const level = player.upgrades[key] || 0;
             const cost = upgradeSystem.getRunUpgradeCost(key, player);
             const canBuy = player.gold >= cost && level < upg.maxLevel;
@@ -376,6 +465,7 @@ export class UIManager {
                 const result = upgradeSystem.buyRunUpgrade(key, player, audio);
                 if (result.success) {
                     this.showToast(`${RUN_UPGRADES[key].name} upgraded to Lv${result.newLevel}!`);
+                    this.updateHUD(player);
                     this.showUpgradePanel(player, upgradeSystem, audio); // Refresh
                 } else {
                     this.showToast(result.reason);
@@ -453,6 +543,7 @@ export class UIManager {
                     this.game.audio.playUpgrade();
                     this.game.particles.addText(player.x, player.y - 40, `+${healAmt} HP`, '#44ff44', 16);
                     this.showToast(`Used Medicine: +${healAmt} HP`);
+                    this.updateHUD(player);
                     // Refresh port prompt
                     this.showPortPrompt(port, onTrade, onUpgrade, onLeave);
                 }
@@ -560,6 +651,7 @@ export class UIManager {
         // Reset progress
         panel.querySelector('#btn-reset-save').addEventListener('click', () => {
             try { localStorage.removeItem('pirate2d_save'); } catch(e) {}
+            try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
             this.showToast('Progress reset! Refresh to apply.');
         });
     }

@@ -7,7 +7,7 @@ const CHAPTERS = [
         title: 'Chapter I: The Beginning',
         dialogues: [
             { speaker: 'Old Sailor', text: 'So ye want to be a pirate, do ye? The seas are dangerous, but the rewards are plentiful for those with the courage to seek them.' },
-            { speaker: 'Old Sailor', text: 'Start by trading between ports — buy low, sell high. Use yer profits to upgrade yer ship. Ye\'ll need it.' },
+            { speaker: 'Old Sailor', text: 'Start by trading between ports \u2014 buy low, sell high. Use yer profits to upgrade yer ship. Ye\'ll need it.' },
             { speaker: 'Old Sailor', text: 'Watch out for enemy ships! Yer cannons fire on their own when enemies get close. The further ye sail from Haven\'s Rest, the tougher they get.' },
             { speaker: 'Old Sailor', text: 'If ye fall in battle, ye\'ll keep some of yer gold. Use it for permanent upgrades at the title screen. Now go, and may the winds favor ye!' }
         ]
@@ -19,7 +19,7 @@ const CHAPTERS = [
         dialogues: [
             { speaker: 'Mysterious Merchant', text: 'Ye\'ve sailed far from home, captain. The waters ahead hold greater treasures... and greater dangers.' },
             { speaker: 'Mysterious Merchant', text: 'I\'ve heard tales of brigantines roaming these parts. Their cannons hit harder than the sloops near Haven.' },
-            { speaker: 'Mysterious Merchant', text: 'Seek out the trading posts — each port has different prices. A canny captain can make a fortune trading between them.' }
+            { speaker: 'Mysterious Merchant', text: 'Seek out the trading posts \u2014 each port has different prices. A canny captain can make a fortune trading between them.' }
         ]
     },
     {
@@ -39,7 +39,7 @@ const CHAPTERS = [
         dialogues: [
             { speaker: 'Cursed Pirate', text: '*cough* Turn back... while ye still can...' },
             { speaker: 'Cursed Pirate', text: 'The Man-o-Wars that patrol these waters answer to no flag. And the ghost ships... they\'re real, captain.' },
-            { speaker: 'Cursed Pirate', text: 'But if ye\'re brave — or foolish — enough to press on, the legendary treasure of Captain Blacktide awaits...' }
+            { speaker: 'Cursed Pirate', text: 'But if ye\'re brave \u2014 or foolish \u2014 enough to press on, the legendary treasure of Captain Blacktide awaits...' }
         ]
     },
     {
@@ -50,7 +50,7 @@ const CHAPTERS = [
             { speaker: '???', text: 'So... another fool seeks my treasure.' },
             { speaker: 'Captain Blacktide', text: 'I am Blacktide, terror of the seven seas! Even in death, my fleet guards these waters.' },
             { speaker: 'Captain Blacktide', text: 'The Kraken answers my call. Turn back now, or face the abyss!' },
-            { speaker: 'Captain Blacktide', text: 'But know this — defeat my Kraken, and riches beyond imagination shall be yours... if ye survive.' }
+            { speaker: 'Captain Blacktide', text: 'But know this \u2014 defeat my Kraken, and riches beyond imagination shall be yours... if ye survive.' }
         ]
     },
     {
@@ -59,7 +59,7 @@ const CHAPTERS = [
         title: 'Chapter VI: Beyond the Edge',
         dialogues: [
             { speaker: 'Ancient Spirit', text: 'No mortal has ever sailed this far. You have proven yourself worthy, captain.' },
-            { speaker: 'Ancient Spirit', text: 'These waters are endless — the enemies will never stop coming, and they only grow stronger.' },
+            { speaker: 'Ancient Spirit', text: 'These waters are endless \u2014 the enemies will never stop coming, and they only grow stronger.' },
             { speaker: 'Ancient Spirit', text: 'But so too will your legend grow. Sail on, Corsair. Sail on forever.' }
         ]
     }
@@ -114,6 +114,22 @@ export class StorySystem {
 
     reset() {
         this.completedChapters = new Set();
+        this.currentDialogue = null;
+        this.dialogueIndex = 0;
+        this.isShowingDialogue = false;
+    }
+
+    // Serialize for localStorage
+    serialize() {
+        return {
+            completedChapters: [...this.completedChapters]
+        };
+    }
+
+    deserialize(data) {
+        if (data && data.completedChapters) {
+            this.completedChapters = new Set(data.completedChapters);
+        }
         this.currentDialogue = null;
         this.dialogueIndex = 0;
         this.isShowingDialogue = false;

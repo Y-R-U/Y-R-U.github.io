@@ -30,17 +30,27 @@ export class Player {
             fireRate: 0,  // +0.2 rate per level
             range: 0,     // +40 range per level
             cargo: 0,     // +10 capacity per level
-            armor: 0      // +3 armor per level
+            armor: 0,     // +3 armor per level
+            repairSpeed: 0 // +0.5 HP/sec per level
         };
 
         // Persistent (survives death) - must be before maxHp access
         this.persistentGold = 0;
         this.totalRuns = 0;
         this.bestDistance = 0;
+        this.hasRepairSkill = false;
         this.permanentUpgrades = {
             startGold: 0,
             startHp: 0,
-            luck: 0
+            luck: 0,
+            repairUnlock: 0,
+            permDamage: 0,
+            permHealth: 0,
+            permSpeed: 0,
+            permFireRate: 0,
+            permCargo: 0,
+            permArmor: 0,
+            permRepairSpeed: 0
         };
         this._loadPersistent();
 
@@ -54,6 +64,9 @@ export class Player {
         this.cannonCooldown = 0;
         this.invulnTimer = 0;
 
+        // Repair
+        this.repairTimer = 0;
+
         // Stats tracking
         this.enemiesKilled = 0;
         this.distanceTraveled = 0;
@@ -62,11 +75,16 @@ export class Player {
     }
 
     get maxHp() {
-        return this.baseStats.maxHp + this.upgrades.hull * 20 + this.permanentUpgrades.startHp * 10;
+        return this.baseStats.maxHp
+            + this.upgrades.hull * 20
+            + (this.permanentUpgrades.startHp || 0) * 10
+            + (this.permanentUpgrades.permHealth || 0) * 2;
     }
 
     get maxSpeed() {
-        return this.baseStats.maxSpeed + this.upgrades.speed * 20;
+        return this.baseStats.maxSpeed
+            + this.upgrades.speed * 20
+            + (this.permanentUpgrades.permSpeed || 0) * 5;
     }
 
     get acceleration() {
@@ -78,7 +96,9 @@ export class Player {
     }
 
     get cannonDamage() {
-        return this.baseStats.cannonDamage + this.upgrades.cannons * 5;
+        return this.baseStats.cannonDamage
+            + this.upgrades.cannons * 5
+            + (this.permanentUpgrades.permDamage || 0) * 1;
     }
 
     get cannonRange() {
@@ -86,15 +106,29 @@ export class Player {
     }
 
     get cannonFireRate() {
-        return this.baseStats.cannonFireRate + this.upgrades.fireRate * 0.2;
+        return this.baseStats.cannonFireRate
+            + this.upgrades.fireRate * 0.2
+            + (this.permanentUpgrades.permFireRate || 0) * 0.05;
     }
 
     get cargoCapacity() {
-        return this.baseStats.cargoCapacity + this.upgrades.cargo * 10;
+        return this.baseStats.cargoCapacity
+            + this.upgrades.cargo * 10
+            + (this.permanentUpgrades.permCargo || 0) * 2;
     }
 
     get armor() {
-        return this.baseStats.armor + this.upgrades.armor * 3;
+        return this.baseStats.armor
+            + this.upgrades.armor * 3
+            + (this.permanentUpgrades.permArmor || 0) * 1;
+    }
+
+    get repairRate() {
+        if (!this.hasRepairSkill) return 0;
+        const base = 1; // 1 HP/sec base
+        const runBonus = (this.upgrades.repairSpeed || 0) * 0.5;
+        const permBonus = (this.permanentUpgrades.permRepairSpeed || 0) * 0.3;
+        return base + runBonus + permBonus;
     }
 
     get distFromHome() {
@@ -107,6 +141,16 @@ export class Player {
         // Timers
         if (this.cannonCooldown > 0) this.cannonCooldown -= dt;
         if (this.invulnTimer > 0) this.invulnTimer -= dt;
+
+        // Auto-repair
+        if (this.hasRepairSkill && this.hp < this.maxHp && this.repairRate > 0) {
+            this.repairTimer += dt;
+            if (this.repairTimer >= 1.0) {
+                this.repairTimer -= 1.0;
+                const healAmt = this.repairRate;
+                this.hp = Math.min(this.maxHp, this.hp + healAmt);
+            }
+        }
 
         if (!input.moving) {
             // Decelerate
@@ -166,7 +210,7 @@ export class Player {
     }
 
     addGold(amount) {
-        const bonus = 1 + this.permanentUpgrades.luck * 0.05;
+        const bonus = 1 + (this.permanentUpgrades.luck || 0) * 0.05;
         const gained = Math.round(amount * bonus);
         this.gold += gained;
         this.totalGoldEarned += gained;
@@ -211,6 +255,8 @@ export class Player {
         this.totalRuns++;
         this.bestDistance = Math.max(this.bestDistance, this.maxDistFromHome);
         this._savePersistent();
+        // Clear game state on death
+        try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
         return {
             goldKept: savedGold,
             enemiesKilled: this.enemiesKilled,
@@ -226,7 +272,7 @@ export class Player {
         this.angle = -Math.PI / 2;
         this.speed = 0;
         this.hp = this.maxHp;
-        this.gold = 50 + this.permanentUpgrades.startGold * 25;
+        this.gold = 50 + (this.permanentUpgrades.startGold || 0) * 25;
         this.cargo = {};
         this.cargoCount = 0;
         this.cannonCooldown = 0;
@@ -236,11 +282,15 @@ export class Player {
         this.portsVisited = new Set();
         this.maxDistFromHome = 0;
         this.totalGoldEarned = 0;
+        this.repairTimer = 0;
 
         // Reset run upgrades
         for (const key of Object.keys(this.upgrades)) {
             this.upgrades[key] = 0;
         }
+
+        // Clear saved game state
+        try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
     }
 
     _savePersistent() {
@@ -249,7 +299,8 @@ export class Player {
                 persistentGold: this.persistentGold,
                 totalRuns: this.totalRuns,
                 bestDistance: this.bestDistance,
-                permanentUpgrades: this.permanentUpgrades
+                permanentUpgrades: this.permanentUpgrades,
+                hasRepairSkill: this.hasRepairSkill
             }));
         } catch(e) {}
     }
@@ -261,11 +312,50 @@ export class Player {
                 this.persistentGold = data.persistentGold || 0;
                 this.totalRuns = data.totalRuns || 0;
                 this.bestDistance = data.bestDistance || 0;
+                this.hasRepairSkill = data.hasRepairSkill || false;
                 if (data.permanentUpgrades) {
                     Object.assign(this.permanentUpgrades, data.permanentUpgrades);
                 }
+                // Sync repairUnlock with hasRepairSkill
+                if (this.permanentUpgrades.repairUnlock > 0) {
+                    this.hasRepairSkill = true;
+                }
             }
         } catch(e) {}
+    }
+
+    // Serialize full run state for localStorage
+    serializeState() {
+        return {
+            x: this.x, y: this.y, angle: this.angle, speed: this.speed,
+            hp: this.hp, gold: this.gold,
+            cargo: { ...this.cargo }, cargoCount: this.cargoCount,
+            upgrades: { ...this.upgrades },
+            enemiesKilled: this.enemiesKilled,
+            distanceTraveled: this.distanceTraveled,
+            portsVisited: [...this.portsVisited],
+            maxDistFromHome: this.maxDistFromHome,
+            totalGoldEarned: this.totalGoldEarned,
+            cannonCooldown: this.cannonCooldown,
+            invulnTimer: this.invulnTimer,
+            repairTimer: this.repairTimer
+        };
+    }
+
+    deserializeState(data) {
+        this.x = data.x; this.y = data.y;
+        this.angle = data.angle; this.speed = data.speed;
+        this.hp = data.hp; this.gold = data.gold;
+        this.cargo = data.cargo || {}; this.cargoCount = data.cargoCount || 0;
+        this.upgrades = { hull: 0, cannons: 0, speed: 0, fireRate: 0, range: 0, cargo: 0, armor: 0, repairSpeed: 0, ...data.upgrades };
+        this.enemiesKilled = data.enemiesKilled || 0;
+        this.distanceTraveled = data.distanceTraveled || 0;
+        this.portsVisited = new Set(data.portsVisited || []);
+        this.maxDistFromHome = data.maxDistFromHome || 0;
+        this.totalGoldEarned = data.totalGoldEarned || 0;
+        this.cannonCooldown = data.cannonCooldown || 0;
+        this.invulnTimer = data.invulnTimer || 0;
+        this.repairTimer = data.repairTimer || 0;
     }
 
     draw(ctx, camX, camY, viewW, viewH, assets, time) {
