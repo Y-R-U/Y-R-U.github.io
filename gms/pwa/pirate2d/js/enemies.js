@@ -2,7 +2,7 @@
 
 import { dist, angle, angleDiff, normalizeAngle, randFloat, randInt } from './utils.js';
 
-const ENEMY_TYPES = [
+export const ENEMY_TYPES = [
     {
         name: 'Sloop',
         baseHp: 30,
@@ -234,6 +234,31 @@ export class Enemy {
             this.aiState = 'patrol';
             this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.1); // Heal a bit
         }
+    }
+
+    // Serialize for localStorage
+    serialize() {
+        return {
+            typeIdx: ENEMY_TYPES.indexOf(this.type),
+            x: this.x, y: this.y, angle: this.angle,
+            speed: this.speed, hp: this.hp, level: this.level,
+            aiState: this.aiState, spawnX: this.spawnX, spawnY: this.spawnY,
+            cannonCooldown: this.cannonCooldown, strafeDir: this.strafeDir
+        };
+    }
+
+    static deserialize(data) {
+        const type = ENEMY_TYPES[data.typeIdx] || ENEMY_TYPES[0];
+        const enemy = new Enemy(type, data.x, data.y, data.level);
+        enemy.angle = data.angle;
+        enemy.speed = data.speed;
+        enemy.hp = data.hp;
+        enemy.aiState = data.aiState;
+        enemy.spawnX = data.spawnX;
+        enemy.spawnY = data.spawnY;
+        enemy.cannonCooldown = data.cannonCooldown;
+        enemy.strafeDir = data.strafeDir;
+        return enemy;
     }
 
     draw(ctx, camX, camY, viewW, viewH, assets, time) {

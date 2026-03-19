@@ -4,7 +4,7 @@ import { AssetLoader } from './utils.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { World } from './world.js';
-import { EnemySpawner } from './enemies.js';
+import { EnemySpawner, Enemy } from './enemies.js';
 import { CombatSystem } from './combat.js';
 import { TradingSystem } from './trading.js';
 import { UpgradeSystem } from './upgrades.js';
@@ -15,6 +15,7 @@ import { UIManager } from './ui.js';
 import { dist } from './utils.js';
 
 const ASSET_PATH = 'assets/';
+const SAVE_INTERVAL = 5; // seconds between auto-saves
 
 export class Game {
     constructor() {
@@ -52,6 +53,9 @@ export class Game {
         // Screen shake
         this.shakeIntensity = 0;
         this.shakeDecay = 5;
+
+        // Auto-save timer
+        this.saveTimer = 0;
 
         this._resize();
         window.addEventListener('resize', () => this._resize());
@@ -137,6 +141,7 @@ export class Game {
         this.camX = this.player.x;
         this.camY = this.player.y;
         this.portCooldown = 0;
+        this.saveTimer = 0;
 
         this.state = 'playing';
         this.ui.showHUD();
@@ -146,6 +151,27 @@ export class Game {
         if (this.story.isShowingDialogue) {
             this._showCurrentDialogue();
         }
+    }
+
+    // Continue from saved game state
+    _continueGame() {
+        this.audio.init();
+        this.audio.resume();
+        if (this.audio.musicTracks.length > 0 && this.audio.musicEnabled) {
+            this.audio.playRandomMusic();
+        }
+
+        const loaded = this._loadGameState();
+        if (!loaded) {
+            // Fallback to new game if load fails
+            this._startNewGame();
+            return;
+        }
+
+        this.portCooldown = 0;
+        this.saveTimer = 0;
+        this.state = 'playing';
+        this.ui.showHUD();
     }
 
     _showCurrentDialogue() {
@@ -209,6 +235,7 @@ export class Game {
                 this.trading.closePort();
                 this.state = 'playing';
                 this.portCooldown = 2; // Prevent instant re-entry
+                this._saveGameState(); // Save on leaving port
             }
         );
     }
@@ -248,6 +275,11 @@ export class Game {
     }
 
     _update(dt) {
+        // Always update HUD when in game (so trades/upgrades show immediately)
+        if (this.state === 'playing' || this.state === 'port' || this.state === 'dialogue') {
+            this.ui.updateHUD(this.player);
+        }
+
         if (this.state !== 'playing') return;
 
         this.input.update();
@@ -328,9 +360,86 @@ export class Game {
             this._handleDeath();
         }
 
-        // Update HUD
-        this.ui.updateHUD(this.player);
+        // Minimap
         this.ui.updateMinimap(this.world, this.enemySpawner, this.player);
+
+        // Auto-save
+        this.saveTimer += dt;
+        if (this.saveTimer >= SAVE_INTERVAL) {
+            this.saveTimer = 0;
+            this._saveGameState();
+        }
+    }
+
+    // Save full game state to localStorage
+    _saveGameState() {
+        if (this.state !== 'playing' && this.state !== 'port') return;
+        try {
+            const state = {
+                player: this.player.serializeState(),
+                world: this.world.serializeState(),
+                enemies: this.enemySpawner.enemies.filter(e => e.alive).map(e => e.serialize()),
+                projectiles: this.combat.projectiles.map(p => ({
+                    x: p.x, y: p.y, vx: p.vx, vy: p.vy,
+                    damage: p.damage, life: p.life,
+                    isPlayer: p.isPlayer, size: p.size
+                })),
+                gameTime: this.gameTime,
+                camX: this.camX,
+                camY: this.camY,
+                story: this.story.serialize()
+            };
+            localStorage.setItem('pirate2d_state', JSON.stringify(state));
+        } catch(e) {}
+    }
+
+    // Load game state from localStorage
+    _loadGameState() {
+        try {
+            const raw = localStorage.getItem('pirate2d_state');
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            if (!data || !data.player || !data.world) return false;
+
+            // Restore world (with saved seed, ports, islands)
+            this.world = new World(data.world);
+
+            // Restore player state
+            this.player.deserializeState(data.player);
+
+            // Restore enemies
+            this.enemySpawner.clear();
+            if (data.enemies) {
+                for (const eData of data.enemies) {
+                    const enemy = Enemy.deserialize(eData);
+                    this.enemySpawner.enemies.push(enemy);
+                }
+            }
+
+            // Restore projectiles
+            this.combat.clear();
+            if (data.projectiles) {
+                this.combat.projectiles = data.projectiles;
+            }
+
+            // Restore game time and camera
+            this.gameTime = data.gameTime || 0;
+            this.camX = data.camX || this.player.x;
+            this.camY = data.camY || this.player.y;
+
+            // Restore story
+            if (data.story) {
+                this.story.deserialize(data.story);
+            }
+
+            // Ensure chunks are loaded around player position
+            this.world.ensureChunksAround(this.camX, this.camY, this.viewW, this.viewH);
+
+            this.particles.clear();
+            return true;
+        } catch(e) {
+            return false;
+        }
     }
 
     _draw() {
