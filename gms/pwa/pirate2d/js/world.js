@@ -228,16 +228,10 @@ export class World {
                 const tile = this.getTile(wx + TILE_SIZE / 2, wy + TILE_SIZE / 2);
 
                 if (tile === 0) {
-                    // Water - use tile sprites or procedural
-                    const waterImg = assets.get('tile_water');
-                    if (waterImg) {
-                        ctx.drawImage(waterImg, sx, sy, TILE_SIZE, TILE_SIZE);
-                    } else {
-                        // Animated water color
-                        const wave = Math.sin((tx + ty) * 0.3 + performance.now() * 0.001) * 10;
-                        ctx.fillStyle = `rgb(${20 + wave}, ${60 + wave}, ${120 + wave})`;
-                        ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
-                    }
+                    // Water - procedural animated water
+                    const wave = Math.sin((tx + ty) * 0.3 + performance.now() * 0.001) * 10;
+                    ctx.fillStyle = `rgb(${20 + wave}, ${60 + wave}, ${120 + wave})`;
+                    ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
                 } else if (tile === 1) {
                     // Beach
                     const beachImg = assets.get('tile_beach');

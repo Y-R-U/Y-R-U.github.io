@@ -83,7 +83,6 @@ export class Game {
 
         // Tile sprites
         const tileFiles = [
-            ['tile_water', 'tiles/tile_49.png'],
             ['tile_beach', 'tiles/tile_42.png'],
             ['tile_land', 'tiles/tile_01.png'],
         ];
