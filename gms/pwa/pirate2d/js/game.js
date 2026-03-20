@@ -67,6 +67,12 @@ export class Game {
                 null,
                 this.player
             );
+            // Fade out loading screen
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => loadingScreen.remove(), 600);
+            }
             this._loop(0);
         });
     }
@@ -113,6 +119,16 @@ export class Game {
 
         // Discover music
         await this.audio.discoverMusic(ASSET_PATH + 'music/');
+
+        // Pre-load first music track so it's ready to play immediately
+        if (this.audio.musicTracks.length > 0) {
+            try {
+                const firstTrack = this.audio.musicTracks[0];
+                const resp = await fetch(firstTrack);
+                const buf = await resp.arrayBuffer();
+                this.audio._preloadedBuffer = { url: firstTrack, buffer: buf };
+            } catch(e) {}
+        }
     }
 
     _resize() {
