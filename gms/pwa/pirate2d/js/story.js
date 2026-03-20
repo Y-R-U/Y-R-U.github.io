@@ -6,10 +6,8 @@ const CHAPTERS = [
         triggerDistance: 0,
         title: 'Chapter I: The Beginning',
         dialogues: [
-            { speaker: 'Old Sailor', text: 'So ye want to be a pirate, do ye? The seas are dangerous, but the rewards are plentiful for those with the courage to seek them.' },
-            { speaker: 'Old Sailor', text: 'Start by trading between ports \u2014 buy low, sell high. Use yer profits to upgrade yer ship. Ye\'ll need it.' },
-            { speaker: 'Old Sailor', text: 'Watch out for enemy ships! Yer cannons fire on their own when enemies get close. The further ye sail from Haven\'s Rest, the tougher they get.' },
-            { speaker: 'Old Sailor', text: 'If ye fall in battle, ye\'ll keep some of yer gold. Use it for permanent upgrades at the title screen. Now go, and may the winds favor ye!' }
+            { speaker: 'Old Sailor', text: 'So ye want to be a pirate, do ye? The seas are dangerous, but the rewards are plentiful for those with the courage to seek them. To make money, trade between ports or attack enemy pirates. Use yer profits to upgrade yer ship \u2014 ye\'ll need it.' },
+            { speaker: 'Old Sailor', text: 'Yer cannons fire on their own when enemies get close. The further ye sail from Haven\'s Rest, the tougher they get. If ye fall in battle, ye\'ll keep some of yer gold for permanent upgrades. Now go, and may the winds favor ye!' }
         ]
     },
     {

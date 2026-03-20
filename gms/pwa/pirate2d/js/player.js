@@ -59,6 +59,7 @@ export class Player {
         this.totalGoldEarned = 0;
         this.cargo = {}; // item: quantity
         this.cargoCount = 0;
+        this.buriedGold = 0; // Gold safely buried (recoverable on death)
 
         // Combat
         this.cannonCooldown = 0;
@@ -248,17 +249,32 @@ export class Player {
         return this.hp > 0;
     }
 
+    // Bury treasure - send pirates off to bury 50% of gold, lose ~20% to pirates
+    buryTreasure() {
+        if (this.gold < 10) return { success: false, reason: 'Not enough gold to bury!' };
+        const halfGold = Math.floor(this.gold * 0.5);
+        // Pirates steal ~20% of what they carry (random 15-25%)
+        const piratesCut = Math.floor(halfGold * (0.15 + Math.random() * 0.1));
+        const buried = halfGold - piratesCut;
+        this.gold -= halfGold;
+        this.buriedGold += buried;
+        return { success: true, sent: halfGold, piratesCut, buried };
+    }
+
     // Death - save persistent data
     onDeath() {
-        const savedGold = Math.floor(this.gold * 0.3); // Keep 30% gold
-        this.persistentGold += savedGold;
+        const savedFromShip = Math.floor(this.gold * 0.3); // Keep 30% gold from ship
+        const totalSaved = savedFromShip + this.buriedGold;
+        this.persistentGold += totalSaved;
         this.totalRuns++;
         this.bestDistance = Math.max(this.bestDistance, this.maxDistFromHome);
         this._savePersistent();
         // Clear game state on death
         try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
         return {
-            goldKept: savedGold,
+            goldKept: savedFromShip,
+            buriedGold: this.buriedGold,
+            totalSaved,
             enemiesKilled: this.enemiesKilled,
             distance: Math.round(this.maxDistFromHome),
             portsVisited: this.portsVisited.size
@@ -275,6 +291,7 @@ export class Player {
         this.gold = 50 + (this.permanentUpgrades.startGold || 0) * 25;
         this.cargo = {};
         this.cargoCount = 0;
+        this.buriedGold = 0;
         this.cannonCooldown = 0;
         this.invulnTimer = 2; // Brief invuln on spawn
         this.enemiesKilled = 0;
@@ -328,7 +345,7 @@ export class Player {
     serializeState() {
         return {
             x: this.x, y: this.y, angle: this.angle, speed: this.speed,
-            hp: this.hp, gold: this.gold,
+            hp: this.hp, gold: this.gold, buriedGold: this.buriedGold,
             cargo: { ...this.cargo }, cargoCount: this.cargoCount,
             upgrades: { ...this.upgrades },
             enemiesKilled: this.enemiesKilled,
@@ -345,7 +362,7 @@ export class Player {
     deserializeState(data) {
         this.x = data.x; this.y = data.y;
         this.angle = data.angle; this.speed = data.speed;
-        this.hp = data.hp; this.gold = data.gold;
+        this.hp = data.hp; this.gold = data.gold; this.buriedGold = data.buriedGold || 0;
         this.cargo = data.cargo || {}; this.cargoCount = data.cargoCount || 0;
         this.upgrades = { hull: 0, cannons: 0, speed: 0, fireRate: 0, range: 0, cargo: 0, armor: 0, repairSpeed: 0, ...data.upgrades };
         this.enemiesKilled = data.enemiesKilled || 0;

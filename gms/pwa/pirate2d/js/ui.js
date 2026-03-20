@@ -31,6 +31,8 @@ export class UIManager {
         this.hud.innerHTML = `
             <div class="hud-item"><span class="icon">\u2764\uFE0F</span><div class="health-bar-bg"><div class="health-bar-fill" id="hud-hp"></div></div><span id="hud-hp-text">100</span></div>
             <div class="hud-item"><span class="icon">\uD83D\uDCB0</span><span id="hud-gold">0</span></div>
+            <div class="hud-item" id="hud-buried-item" style="display:none;"><span class="icon">\uD83D\uDDC3\uFE0F</span><span id="hud-buried">0</span></div>
+            <div class="hud-item" id="hud-bury-btn" style="cursor:pointer;display:none;pointer-events:auto;"><span class="icon">\u2693</span><span id="hud-bury-text">Bury</span></div>
             <div class="hud-item"><span class="icon">\uD83D\uDCE6</span><span id="hud-cargo">0/20</span></div>
             <div class="hud-item"><span class="icon">\uD83D\uDDE1\uFE0F</span><span id="hud-kills">0</span></div>
             <div class="hud-item"><span class="icon">\uD83C\uDF0A</span><span id="hud-dist">0m</span></div>
@@ -51,9 +53,17 @@ export class UIManager {
         this._hudMedicineText = this.hud.querySelector('#hud-medicine-text');
         this._hudRepairIndicator = this.hud.querySelector('#hud-repair-indicator');
         this._hudRepairText = this.hud.querySelector('#hud-repair-text');
+        this._hudBuriedItem = this.hud.querySelector('#hud-buried-item');
+        this._hudBuried = this.hud.querySelector('#hud-buried');
+        this._hudBuryBtn = this.hud.querySelector('#hud-bury-btn');
+        this._hudBuryText = this.hud.querySelector('#hud-bury-text');
+        this._buryFirstTime = true; // Track if first time burying
 
         // Medicine button click
         this._hudMedicineBtn.addEventListener('click', () => this._useMedicine());
+
+        // Bury treasure button click
+        this._hudBuryBtn.addEventListener('click', () => this._buryTreasure());
 
         // Q key to use medicine
         window.addEventListener('keydown', (e) => {
@@ -74,6 +84,83 @@ export class UIManager {
         this.game.audio.playUpgrade();
         this.game.particles.addText(player.x, player.y - 40, `+${healAmt} HP`, '#44ff44', 16);
         this.showToast(`Used Medicine: +${healAmt} HP`);
+    }
+
+    _buryTreasure() {
+        const player = this.game.player;
+        if (player.gold < 10) {
+            this.showToast('Not enough gold to bury!');
+            return;
+        }
+
+        // First time: show explanatory message
+        if (this._buryFirstTime && player.buriedGold === 0) {
+            this._buryFirstTime = false;
+            this._showBuryConfirm(player);
+            return;
+        }
+
+        this._doBury(player);
+    }
+
+    _showBuryConfirm(player) {
+        this.closePanel();
+        this.game.pause();
+        const overlay = document.createElement('div');
+        overlay.className = 'settings-overlay';
+        this.uiLayer.appendChild(overlay);
+        this._settingsOverlay = overlay;
+
+        const panel = document.createElement('div');
+        panel.className = 'game-panel';
+        panel.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(380px,90vw);z-index:300;text-align:center;';
+        panel.innerHTML = `
+            <div style="font-size:40px;margin-bottom:12px;">\uD83D\uDDC3\uFE0F</div>
+            <h2 style="margin-bottom:12px;">Bury Treasure</h2>
+            <p style="font-size:14px;line-height:1.6;color:#f0d9a0;margin-bottom:16px;">
+                Send some pirates off to bury 50% of yer loot. Ye'll lose around 20% of it
+                \u2014 pirates aren't the most honest lot, and they do like their rum \u2014
+                but it can be recovered later if ye lose yer ship.
+            </p>
+            <p style="font-size:13px;color:#c4a035;margin-bottom:16px;">
+                Burying: <span style="color:#ffd700;font-weight:bold;">${formatGold(Math.floor(player.gold * 0.5))}</span> gold
+            </p>
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button class="btn btn-green" id="btn-bury-confirm">Bury It!</button>
+                <button class="btn btn-red" id="btn-bury-cancel">Cancel</button>
+            </div>
+        `;
+
+        this.uiLayer.appendChild(panel);
+        this.activePanel = panel;
+
+        panel.querySelector('#btn-bury-confirm').addEventListener('click', () => {
+            this.closePanel();
+            this.game.resume();
+            this._doBury(player);
+        });
+
+        panel.querySelector('#btn-bury-cancel').addEventListener('click', () => {
+            this.closePanel();
+            this.game.resume();
+        });
+
+        overlay.addEventListener('click', () => {
+            this.closePanel();
+            this.game.resume();
+        });
+    }
+
+    _doBury(player) {
+        const result = player.buryTreasure();
+        if (result.success) {
+            this.game.audio.playCoin();
+            this.game.particles.addText(player.x, player.y - 40, `Buried ${formatGold(result.buried)}g`, '#ffd700', 16);
+            this.showToast(`Sent ${formatGold(result.sent)}g \u2022 Pirates took ${formatGold(result.piratesCut)}g \u2022 Buried ${formatGold(result.buried)}g`);
+            this.updateHUD(player);
+        } else {
+            this.showToast(result.reason);
+        }
     }
 
     _createMinimap() {
@@ -110,6 +197,21 @@ export class UIManager {
         if (this._hudCargo) this._hudCargo.textContent = `${player.cargoCount}/${player.cargoCapacity}`;
         if (this._hudKills) this._hudKills.textContent = player.enemiesKilled;
         if (this._hudDist) this._hudDist.textContent = Math.round(player.distFromHome) + 'm';
+
+        // Show buried gold chest icon
+        if (this._hudBuriedItem) {
+            if (player.buriedGold > 0) {
+                this._hudBuriedItem.style.display = 'flex';
+                this._hudBuried.textContent = formatGold(player.buriedGold);
+            } else {
+                this._hudBuriedItem.style.display = 'none';
+            }
+        }
+
+        // Show bury treasure button when player has enough gold
+        if (this._hudBuryBtn) {
+            this._hudBuryBtn.style.display = player.gold >= 10 ? 'flex' : 'none';
+        }
 
         // Show medicine button if player has medicine and needs healing
         const hasMed = (player.cargo['Medicine'] || 0) > 0;
@@ -153,8 +255,10 @@ export class UIManager {
         const panel = document.createElement('div');
         panel.className = 'title-screen';
 
+        const hasPlayed = player.totalRuns > 0 || player.persistentGold > 0;
+
         let permHTML = '';
-        if (player.persistentGold > 0 || player.totalRuns > 0) {
+        if (hasPlayed) {
             permHTML = `
                 <div style="color:#c4a035;font-size:14px;margin-bottom:20px;text-align:center;">
                     Saved Gold: <span style="color:#ffd700;font-weight:bold;">${formatGold(player.persistentGold)}</span>
@@ -174,7 +278,7 @@ export class UIManager {
             ${permHTML}
             ${hasSavedGame ? '<button class="btn btn-green" id="btn-continue" style="margin:8px;min-width:200px;font-size:18px;padding:14px 30px;">\u26F5 Continue Voyage</button>' : ''}
             <button class="btn" id="btn-new-game">Set Sail</button>
-            <button class="btn" id="btn-perm-upgrades" style="margin:8px;min-width:200px;font-size:16px;padding:10px 24px;">\u2693 Upgrades</button>
+            ${hasPlayed ? '<button class="btn" id="btn-perm-upgrades" style="margin:8px;min-width:200px;font-size:16px;padding:10px 24px;">\u2693 Upgrades</button>' : ''}
             <div class="version">v1.0 - Kenney Assets</div>
         `;
 
@@ -198,12 +302,15 @@ export class UIManager {
             });
         }
 
-        // Permanent upgrades button
-        panel.querySelector('#btn-perm-upgrades').addEventListener('click', () => {
-            this.showPermanentUpgradesPopup(player, () => {
-                this.showTitleScreen(onNewGame, null, player);
+        // Permanent upgrades button (only shown if player has played before)
+        const permUpgradesBtn = panel.querySelector('#btn-perm-upgrades');
+        if (permUpgradesBtn) {
+            permUpgradesBtn.addEventListener('click', () => {
+                this.showPermanentUpgradesPopup(player, () => {
+                    this.showTitleScreen(onNewGame, null, player);
+                });
             });
-        });
+        }
     }
 
     // Death screen
@@ -218,7 +325,9 @@ export class UIManager {
                 Enemies defeated: <span class="gold">${stats.enemiesKilled}</span><br>
                 Distance sailed: <span class="gold">${stats.distance}m</span><br>
                 Ports visited: <span class="gold">${stats.portsVisited}</span><br>
-                Gold saved: <span class="gold">${formatGold(stats.goldKept)}</span>
+                Gold rescued from ship: <span class="gold">${formatGold(stats.goldKept)}</span><br>
+                ${stats.buriedGold > 0 ? `Buried treasure recovered: <span class="gold">${formatGold(stats.buriedGold)}</span><br>` : ''}
+                Total gold saved: <span class="gold">${formatGold(stats.totalSaved)}</span>
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
                 <button class="btn" id="btn-death-upgrades">\u2693 Upgrades (${formatGold(this.game.player.persistentGold)}g)</button>
@@ -557,26 +666,53 @@ export class UIManager {
         const panel = document.createElement('div');
         panel.className = 'game-panel story-dialog';
 
+        // Check if there are more dialogues after this one
+        const story = this.game.story;
+        const hasMore = story.isShowingDialogue && story.currentDialogue &&
+            story.dialogueIndex < story.currentDialogue.dialogues.length - 1;
+
         panel.innerHTML = `
             ${chapterTitle ? `<div style="text-align:center;color:#ffd700;font-size:18px;margin-bottom:12px;letter-spacing:2px;">${chapterTitle}</div>` : ''}
             <div class="speaker">${speaker}</div>
             <div class="text">${text}</div>
-            <div class="continue-hint">Tap or press Space to continue...</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                ${hasMore ? '<button class="btn btn-small skip-story-btn" id="btn-skip-story" style="font-size:11px;padding:4px 12px;min-height:30px;opacity:0.7;">Skip</button>' : '<span></span>'}
+                <div class="continue-hint" style="margin-top:0;">Tap or press Space to continue...</div>
+            </div>
         `;
 
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
 
+        const cleanup = () => {
+            panel.removeEventListener('click', advance);
+            window.removeEventListener('keydown', advance);
+        };
+
         const advance = (e) => {
             if (e.type === 'keydown' && e.code !== 'Space' && e.code !== 'Enter') return;
             e.preventDefault();
-            panel.removeEventListener('click', advance);
-            window.removeEventListener('keydown', advance);
+            cleanup();
             onAdvance();
         };
 
         panel.addEventListener('click', advance);
         window.addEventListener('keydown', advance);
+
+        // Skip button - skip all remaining dialogues in this chapter
+        const skipBtn = panel.querySelector('#btn-skip-story');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cleanup();
+                // Skip to end of chapter
+                while (story.isShowingDialogue) {
+                    story.advance();
+                }
+                this.closePanel();
+                this.game.state = 'playing';
+            });
+        }
     }
 
     // Settings panel
