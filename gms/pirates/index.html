@@ -179,6 +179,9 @@
             if (!instance) return null;
             instance.setEnabled(true);
             instance.position = pos || BABYLON.Vector3.Zero();
+            // GLB imports set rotationQuaternion which overrides .rotation —
+            // clear it so Euler .rotation.y works for steering
+            instance.rotationQuaternion = null;
             instance.rotation.y = rotY || 0;
             if (scale != null) instance.scaling = new BABYLON.Vector3(scale, scale, scale);
             // Add all child meshes to water render list
