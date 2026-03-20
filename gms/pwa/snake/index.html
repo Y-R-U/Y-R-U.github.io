@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="description" content="Snake.io - Grow your snake, eat food, defeat opponents in this multiplayer-style arena game">
+    <title>Snake.io</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Game Canvas (always present) -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Game UI overlay (boost button, notifications) -->
+    <div id="game-ui">
+        <button id="boost-btn">BOOST</button>
+        <div id="powerup-notification"></div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div id="menu-screen" class="screen active">
+        <div class="game-title">SNAKE.IO</div>
+        <div class="game-subtitle">Grow. Hunt. Dominate.</div>
+
+        <div class="coins-badge">
+            <span class="coins-icon"></span>
+            <span class="coins-display">0</span> coins
+        </div>
+
+        <div class="menu-input-group">
+            <input type="text" id="username-input" placeholder="Enter your name" maxlength="16" autocomplete="off">
+        </div>
+
+        <div class="menu-buttons">
+            <button class="btn btn-primary" id="play-btn">PLAY</button>
+            <div class="menu-row">
+                <button class="btn btn-secondary" id="upgrades-btn">Upgrades</button>
+                <button class="btn btn-secondary" id="skins-btn">Skins</button>
+            </div>
+            <button class="btn btn-secondary" id="stats-btn">Stats</button>
+        </div>
+    </div>
+
+    <!-- Game Screen (just shows canvas + HUD) -->
+    <div id="game-screen" class="screen"></div>
+
+    <!-- Death Screen -->
+    <div id="death-screen" class="screen">
+        <div class="death-title">GAME OVER</div>
+        <div id="death-highscore" style="display:none">NEW HIGH SCORE!</div>
+
+        <div class="death-stats">
+            <div class="death-stat">
+                <div class="death-stat-value" id="death-score">0</div>
+                <div class="death-stat-label">Mass</div>
+            </div>
+            <div class="death-stat">
+                <div class="death-stat-value" id="death-kills">0</div>
+                <div class="death-stat-label">Kills</div>
+            </div>
+            <div class="death-stat death-coins">
+                <div class="death-stat-value" id="death-coins">+0</div>
+                <div class="death-stat-label">Coins</div>
+            </div>
+            <div class="death-stat">
+                <div class="death-stat-value" id="death-time">0:00</div>
+                <div class="death-stat-label">Time</div>
+            </div>
+        </div>
+
+        <div class="death-buttons">
+            <button class="btn btn-primary" id="play-again-btn">PLAY AGAIN</button>
+            <div class="menu-row">
+                <button class="btn btn-accent" id="death-upgrades-btn">Upgrades</button>
+                <button class="btn btn-secondary" id="death-menu-btn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrades Screen -->
+    <div id="upgrades-screen" class="screen">
+        <div class="screen-header">
+            <div class="screen-title">Upgrades</div>
+            <div class="coins-badge">
+                <span class="coins-icon"></span>
+                <span class="coins-display">0</span>
+            </div>
+            <button class="back-btn">Back</button>
+        </div>
+        <div id="upgrades-list"></div>
+    </div>
+
+    <!-- Skins Screen -->
+    <div id="skins-screen" class="screen">
+        <div class="screen-header">
+            <div class="screen-title">Skins</div>
+            <div class="coins-badge">
+                <span class="coins-icon"></span>
+                <span class="coins-display">0</span>
+            </div>
+            <button class="back-btn">Back</button>
+        </div>
+        <div id="skins-list"></div>
+    </div>
+
+    <!-- Stats Screen -->
+    <div id="stats-screen" class="screen">
+        <div class="screen-header">
+            <div class="screen-title">Statistics</div>
+            <button class="back-btn">Back</button>
+        </div>
+        <div id="stats-list"></div>
+    </div>
+
+    <!-- Scripts (order matters) -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/snake.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/collision.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/upgrades.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
