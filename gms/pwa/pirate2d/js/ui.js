@@ -350,7 +350,7 @@ export class UIManager {
     }
 
     // Permanent upgrades popup (used on title + death screens)
-    showPermanentUpgradesPopup(player, returnCallback) {
+    showPermanentUpgradesPopup(player, returnCallback, scrollTop) {
         this.closePanel();
 
         // Create overlay
@@ -379,25 +379,35 @@ export class UIManager {
                     <span style="font-size:18px;margin-right:6px;">${upg.icon}</span>
                     <span class="item-name">${upg.name}<br><small style="color:#aaa;">${upg.desc}</small></span>
                     <span class="item-qty">${maxed ? '' : `Lv${level}/${upg.maxLevel}`}</span>
-                    ${maxed
-                        ? '<span style="color:#44aa22;font-size:12px;min-width:60px;text-align:center;">MAX</span>'
-                        : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-perm-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
-                    }
+                    <div class="item-actions">
+                        ${maxed
+                            ? '<span style="color:#44aa22;font-size:12px;min-width:60px;text-align:center;">MAX</span>'
+                            : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-perm-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
+                        }
+                    </div>
                 </div>
             `;
         }
 
         panel.innerHTML = `
-            <button class="close-btn" id="perm-upgrade-close">\u2715</button>
-            <h2>\u2693 Permanent Upgrades</h2>
-            <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
-                Saved Gold: <span style="color:#ffd700;">${formatGold(player.persistentGold)}</span>
+            <div class="panel-header">
+                <button class="close-btn" id="perm-upgrade-close">\u2715</button>
+                <h2>\u2693 Permanent Upgrades</h2>
+                <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
+                    Saved Gold: <span style="color:#ffd700;">${formatGold(player.persistentGold)}</span>
+                </div>
             </div>
-            ${upgradesHTML}
+            <div class="panel-items" id="perm-upgrade-items">
+                ${upgradesHTML}
+            </div>
         `;
 
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
+
+        // Restore scroll position
+        const itemsContainer = panel.querySelector('#perm-upgrade-items');
+        if (scrollTop > 0) itemsContainer.scrollTop = scrollTop;
 
         const close = () => {
             this.closePanel();
@@ -413,15 +423,15 @@ export class UIManager {
                 const result = this.game.upgradeSystem.buyPermanentUpgrade(key, player, this.game.audio);
                 if (result.success) {
                     this.showToast(`${PERMANENT_UPGRADES[key].name} upgraded!`);
-                    // Refresh popup
-                    this.showPermanentUpgradesPopup(player, returnCallback);
+                    const st = itemsContainer.scrollTop;
+                    this.showPermanentUpgradesPopup(player, returnCallback, st);
                 }
             });
         });
     }
 
     // Trade panel
-    showTradePanel(port, player, tradingSystem, audio) {
+    showTradePanel(port, player, tradingSystem, audio, scrollTop) {
         this.closePanel();
         const panel = document.createElement('div');
         panel.className = 'game-panel trade-panel';
@@ -439,8 +449,10 @@ export class UIManager {
                     <span style="font-size:18px;margin-right:6px;">${info.icon}</span>
                     <span class="item-name">${item}</span>
                     <span class="item-qty">x${have}</span>
-                    <button class="btn btn-small btn-green" data-buy="${item}">Buy ${buyPrice}g</button>
-                    <button class="btn btn-small btn-red" data-sell="${item}" ${have > 0 ? '' : 'style="opacity:0.4;"'}>Sell ${sellPrice}g</button>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-green" data-buy="${item}">Buy ${buyPrice}g</button>
+                        <button class="btn btn-small btn-red" data-sell="${item}" ${have > 0 ? '' : 'style="opacity:0.4;"'}>Sell ${sellPrice}g</button>
+                    </div>
                 </div>
             `;
         }
@@ -448,26 +460,34 @@ export class UIManager {
         const portType = (port.type || 'trading').toUpperCase();
 
         panel.innerHTML = `
-            <button class="close-btn" id="trade-close">\u2715</button>
-            <h2>\u2693 ${port.name}</h2>
-            <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
-                ${portType} PORT &nbsp;|&nbsp; Gold: <span style="color:#ffd700;">${formatGold(player.gold)}</span>
-                &nbsp;|&nbsp; Cargo: ${player.cargoCount}/${player.cargoCapacity}
-            </div>
-            ${needsRepair ? `
-                <div class="item-row" style="border:1px solid #44aa22;">
-                    <span style="font-size:18px;margin-right:6px;">\uD83D\uDD27</span>
-                    <span class="item-name">Repair Ship</span>
-                    <span class="item-qty">${Math.ceil(player.hp)}/${player.maxHp} HP</span>
-                    <button class="btn btn-small btn-green" id="btn-repair">${repairCost}g</button>
+            <div class="panel-header">
+                <button class="close-btn" id="trade-close">\u2715</button>
+                <h2>\u2693 ${port.name}</h2>
+                <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
+                    ${portType} PORT &nbsp;|&nbsp; Gold: <span style="color:#ffd700;" id="trade-gold">${formatGold(player.gold)}</span>
+                    &nbsp;|&nbsp; Cargo: <span id="trade-cargo">${player.cargoCount}/${player.cargoCapacity}</span>
                 </div>
-            ` : '<div class="item-row" style="border:1px solid #44aa22;"><span>\u2705 Ship fully repaired</span></div>'}
-            <h3>Trade Goods</h3>
-            ${goodsHTML}
+                ${needsRepair ? `
+                    <div class="item-row" style="border:1px solid #44aa22;">
+                        <span style="font-size:18px;margin-right:6px;">\uD83D\uDD27</span>
+                        <span class="item-name">Repair Ship</span>
+                        <span class="item-qty">${Math.ceil(player.hp)}/${player.maxHp} HP</span>
+                        <div class="item-actions"><button class="btn btn-small btn-green" id="btn-repair">${repairCost}g</button></div>
+                    </div>
+                ` : '<div class="item-row" style="border:1px solid #44aa22;"><span>\u2705 Ship fully repaired</span></div>'}
+                <h3>Trade Goods</h3>
+            </div>
+            <div class="panel-items" id="trade-items">
+                ${goodsHTML}
+            </div>
         `;
 
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
+
+        // Restore scroll position
+        const itemsContainer = panel.querySelector('#trade-items');
+        if (scrollTop > 0) itemsContainer.scrollTop = scrollTop;
 
         // Close - return to port menu, not exit port
         panel.querySelector('#trade-close').addEventListener('click', () => {
@@ -483,7 +503,8 @@ export class UIManager {
                     audio.playUpgrade();
                     this.showToast('Ship repaired!');
                     this.updateHUD(player);
-                    this.showTradePanel(port, player, tradingSystem, audio); // Refresh
+                    const st = itemsContainer.scrollTop;
+                    this.showTradePanel(port, player, tradingSystem, audio, st);
                 } else {
                     this.showToast('Not enough gold!');
                 }
@@ -498,7 +519,8 @@ export class UIManager {
                 if (result.success) {
                     audio.playCoin();
                     this.updateHUD(player);
-                    this.showTradePanel(port, player, tradingSystem, audio); // Refresh
+                    const st = itemsContainer.scrollTop;
+                    this.showTradePanel(port, player, tradingSystem, audio, st);
                 } else {
                     this.showToast(result.reason);
                 }
@@ -513,7 +535,8 @@ export class UIManager {
                 if (result.success) {
                     audio.playCoin();
                     this.updateHUD(player);
-                    this.showTradePanel(port, player, tradingSystem, audio); // Refresh
+                    const st = itemsContainer.scrollTop;
+                    this.showTradePanel(port, player, tradingSystem, audio, st);
                 } else {
                     this.showToast(result.reason);
                 }
@@ -522,7 +545,7 @@ export class UIManager {
     }
 
     // Upgrade panel (at ports)
-    showUpgradePanel(player, upgradeSystem, audio) {
+    showUpgradePanel(player, upgradeSystem, audio, scrollTop) {
         this.closePanel();
         const panel = document.createElement('div');
         panel.className = 'game-panel upgrade-panel';
@@ -542,25 +565,35 @@ export class UIManager {
                     <span style="font-size:18px;margin-right:6px;">${upg.icon}</span>
                     <span class="item-name">${upg.name}<br><small style="color:#aaa;">${upg.desc}</small></span>
                     <span class="item-qty">Lv${level}/${upg.maxLevel}</span>
-                    ${maxed
-                        ? '<span style="color:#44aa22;font-size:12px;min-width:60px;text-align:center;">MAX</span>'
-                        : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-run-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
-                    }
+                    <div class="item-actions">
+                        ${maxed
+                            ? '<span style="color:#44aa22;font-size:12px;min-width:60px;text-align:center;">MAX</span>'
+                            : `<button class="btn btn-small ${canBuy ? 'btn-green' : ''}" data-run-upgrade="${key}" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>`
+                        }
+                    </div>
                 </div>
             `;
         }
 
         panel.innerHTML = `
-            <button class="close-btn" id="upgrade-close">\u2715</button>
-            <h2>\u2699\uFE0F Ship Upgrades</h2>
-            <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
-                Gold: <span style="color:#ffd700;">${formatGold(player.gold)}</span>
+            <div class="panel-header">
+                <button class="close-btn" id="upgrade-close">\u2715</button>
+                <h2>\u2699\uFE0F Ship Upgrades</h2>
+                <div style="text-align:center;color:#c4a035;font-size:13px;margin-bottom:10px;">
+                    Gold: <span style="color:#ffd700;" id="upgrade-gold">${formatGold(player.gold)}</span>
+                </div>
             </div>
-            ${upgradesHTML}
+            <div class="panel-items" id="upgrade-items">
+                ${upgradesHTML}
+            </div>
         `;
 
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
+
+        // Restore scroll position
+        const itemsContainer = panel.querySelector('#upgrade-items');
+        if (scrollTop > 0) itemsContainer.scrollTop = scrollTop;
 
         panel.querySelector('#upgrade-close').addEventListener('click', () => {
             this.closePanel();
@@ -575,7 +608,8 @@ export class UIManager {
                 if (result.success) {
                     this.showToast(`${RUN_UPGRADES[key].name} upgraded to Lv${result.newLevel}!`);
                     this.updateHUD(player);
-                    this.showUpgradePanel(player, upgradeSystem, audio); // Refresh
+                    const st = itemsContainer.scrollTop;
+                    this.showUpgradePanel(player, upgradeSystem, audio, st);
                 } else {
                     this.showToast(result.reason);
                 }
@@ -726,6 +760,9 @@ export class UIManager {
 
         const panel = document.createElement('div');
         panel.className = 'game-panel settings-panel';
+        const game = this.game;
+        const zoomLabels = ['Close (100%)', 'Medium (75%)', 'Far (50%)'];
+
         panel.innerHTML = `
             <button class="close-btn" id="settings-close">\u2715</button>
             <h2>\u2699\uFE0F Settings</h2>
@@ -746,6 +783,17 @@ export class UIManager {
                 <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="${Math.round(audio.musicVolume * 100)}">
             </div>
             ${audio.musicTracks.length === 0 ? '<div style="font-size:12px;color:#886644;text-align:center;margin-top:4px;">No music files found in assets/music/</div>' : ''}
+            <h3 style="margin-top:14px;">Zoom</h3>
+            <div class="toggle-row">
+                <label>Zoom Level</label>
+                <div style="display:flex;gap:4px;" id="zoom-buttons">
+                    ${game.zoomLevels.map((_, i) => `<button class="btn btn-small ${i === game.zoomIndex ? 'btn-green' : ''}" data-zoom="${i}" style="padding:4px 8px;font-size:11px;min-width:auto;min-height:36px;">${zoomLabels[i]}</button>`).join('')}
+                </div>
+            </div>
+            <div class="toggle-row">
+                <label>Pinch Zoom</label>
+                <div class="toggle-switch ${game.pinchZoomEnabled ? 'active' : ''}" id="toggle-pinch"></div>
+            </div>
             <div style="margin-top:20px;text-align:center;">
                 <button class="btn btn-red btn-small" id="btn-reset-save" style="font-size:12px;">Reset All Progress</button>
             </div>
@@ -782,6 +830,23 @@ export class UIManager {
         });
         panel.querySelector('#music-volume').addEventListener('input', (e) => {
             audio.setMusicVolume(e.target.value / 100);
+        });
+
+        // Zoom level buttons
+        panel.querySelectorAll('[data-zoom]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.zoom);
+                game.setZoomLevel(idx);
+                // Refresh settings to update button highlights
+                this.showSettings();
+            });
+        });
+
+        // Pinch zoom toggle
+        panel.querySelector('#toggle-pinch').addEventListener('click', function() {
+            game.pinchZoomEnabled = !game.pinchZoomEnabled;
+            this.classList.toggle('active', game.pinchZoomEnabled);
+            game._saveZoomSettings();
         });
 
         // Reset progress

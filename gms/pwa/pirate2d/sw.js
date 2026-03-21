@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corsairs-fate-v3';
+const CACHE_NAME = 'corsairs-fate-v4';
 const ASSETS = [
     './',
     './index.html',
@@ -16,7 +16,9 @@ const ASSETS = [
     './js/particles.js',
     './js/audio.js',
     './js/ui.js',
-    './manifest.json'
+    './manifest.json',
+    './assets/icon-192.svg',
+    './assets/icon-512.svg'
 ];
 
 self.addEventListener('install', (e) => {
@@ -36,6 +38,25 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+    const url = new URL(e.request.url);
+
+    // Navigation requests: network-first so updates propagate
+    if (e.request.mode === 'navigate') {
+        e.respondWith(
+            fetch(e.request).then((resp) => {
+                if (resp.ok) {
+                    const clone = resp.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+                }
+                return resp;
+            }).catch(() => caches.match(e.request).then((cached) =>
+                cached || new Response('Offline', { status: 503, statusText: 'Service Unavailable' })
+            ))
+        );
+        return;
+    }
+
+    // Other requests: cache-first with network fallback
     e.respondWith(
         caches.match(e.request).then((cached) => {
             return cached || fetch(e.request).then((resp) => {
@@ -44,7 +65,7 @@ self.addEventListener('fetch', (e) => {
                     caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
                 }
                 return resp;
-            }).catch(() => cached || new Response('Offline', { status: 503, statusText: 'Service Unavailable' }));
+            }).catch(() => new Response('Offline', { status: 503, statusText: 'Service Unavailable' }));
         })
     );
 });
