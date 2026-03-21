@@ -46,7 +46,7 @@ export class CombatSystem {
                     if (d < enemy.hitRadius) {
                         const dmg = enemy.takeDamage(p.damage);
                         particles.addExplosion(p.x, p.y, 8, '#ff6600');
-                        particles.addText(enemy.x, enemy.y - 30, `-${dmg}`, '#ff4444');
+                        particles.addText(enemy.x, enemy.y - 30, `-${dmg}`, '#ff4444', enemy.isBoss ? 20 : 16, enemy.isBoss ? 2.0 : 1.2);
                         audio.playHit();
 
                         if (!enemy.alive) {
@@ -154,7 +154,9 @@ export class CombatSystem {
     _onEnemyKill(enemy, player, particles, audio, game) {
         // Gold drop
         const goldAmount = player.addGold(enemy.goldReward);
-        particles.addText(enemy.x, enemy.y - 50, `+${goldAmount} gold`, '#ffd700', 18);
+        const bossDur = 3.0; // Boss messages show much longer
+        const dur = enemy.isBoss ? bossDur : 1.2;
+        particles.addText(enemy.x, enemy.y - 50, `+${goldAmount} gold`, '#ffd700', enemy.isBoss ? 22 : 18, dur);
         particles.addExplosion(enemy.x, enemy.y, 15, '#ff8800');
         particles.addSmoke(enemy.x, enemy.y, 8);
         audio.playExplosion();
@@ -174,19 +176,19 @@ export class CombatSystem {
             const dropQty = enemy.isBoss ? 3 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 3);
             const qty = player.addCargo(item, dropQty);
             if (qty > 0) {
-                particles.addText(enemy.x, enemy.y - 70, `+${qty} ${item}`, '#88ccff', 14);
+                particles.addText(enemy.x, enemy.y - 70, `+${qty} ${item}`, '#88ccff', enemy.isBoss ? 18 : 14, dur);
             }
         }
 
         // Boss bonus gold burst
         if (enemy.isBoss) {
             const bonus = player.addGold(enemy.goldReward); // Double gold for bosses
-            particles.addText(enemy.x, enemy.y - 90, `BOSS BONUS +${bonus}g`, '#ffaa00', 20);
+            particles.addText(enemy.x, enemy.y - 90, `BOSS BONUS +${bonus}g`, '#ffaa00', 24, bossDur);
 
             // Heal player partially on boss kill
             const healAmt = Math.round(player.maxHp * 0.25);
             player.heal(healAmt);
-            particles.addText(player.x, player.y - 50, `+${healAmt} HP`, '#44ff44', 16);
+            particles.addText(player.x, player.y - 50, `+${healAmt} HP`, '#44ff44', 20, bossDur);
         }
     }
 

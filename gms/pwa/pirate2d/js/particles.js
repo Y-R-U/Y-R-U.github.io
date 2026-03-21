@@ -78,14 +78,14 @@ export class ParticleSystem {
     }
 
     // Floating text (damage numbers, gold gained, etc)
-    addText(x, y, text, color = '#ffd700', size = 16) {
+    addText(x, y, text, color = '#ffd700', size = 16, duration = 1.2) {
         this.textParticles.push({
             x, y,
             text,
             color,
             size,
-            life: 1.2,
-            maxLife: 1.2,
+            life: duration,
+            maxLife: duration,
             vy: -40
         });
     }

@@ -57,6 +57,14 @@ export class Game {
         // Auto-save timer
         this.saveTimer = 0;
 
+        // Zoom levels: 1.0 = default (close), 0.75 = medium, 0.5 = far
+        this.zoomLevels = [1.0, 0.75, 0.5];
+        this.zoomIndex = 0;
+        this.zoomScale = 1.0;
+        this.pinchZoomEnabled = true;
+        this._loadZoomSettings();
+        this._setupPinchZoom();
+
         this._resize();
         window.addEventListener('resize', () => this._resize());
 
@@ -136,8 +144,76 @@ export class Game {
         this.canvas.width = window.innerWidth * dpr;
         this.canvas.height = window.innerHeight * dpr;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        this.viewW = window.innerWidth;
-        this.viewH = window.innerHeight;
+        this.viewW = window.innerWidth / this.zoomScale;
+        this.viewH = window.innerHeight / this.zoomScale;
+    }
+
+    _loadZoomSettings() {
+        try {
+            const saved = localStorage.getItem('pirate2d_zoom');
+            if (saved) {
+                const data = JSON.parse(saved);
+                this.zoomIndex = data.zoomIndex || 0;
+                this.zoomScale = this.zoomLevels[this.zoomIndex] || 1.0;
+                this.pinchZoomEnabled = data.pinchZoomEnabled !== false;
+            }
+        } catch(e) {}
+    }
+
+    _saveZoomSettings() {
+        try {
+            localStorage.setItem('pirate2d_zoom', JSON.stringify({
+                zoomIndex: this.zoomIndex,
+                pinchZoomEnabled: this.pinchZoomEnabled
+            }));
+        } catch(e) {}
+    }
+
+    setZoomLevel(index) {
+        this.zoomIndex = Math.max(0, Math.min(this.zoomLevels.length - 1, index));
+        this.zoomScale = this.zoomLevels[this.zoomIndex];
+        this._resize();
+        this._saveZoomSettings();
+    }
+
+    _setupPinchZoom() {
+        let lastPinchDist = 0;
+        let pinching = false;
+
+        this.canvas.addEventListener('touchstart', (e) => {
+            if (!this.pinchZoomEnabled) return;
+            if (e.touches.length === 2) {
+                pinching = true;
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastPinchDist = Math.sqrt(dx * dx + dy * dy);
+            }
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchmove', (e) => {
+            if (!this.pinchZoomEnabled || !pinching || e.touches.length !== 2) return;
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currentDist = Math.sqrt(dx * dx + dy * dy);
+            const delta = currentDist - lastPinchDist;
+
+            if (Math.abs(delta) > 50) {
+                if (delta > 0 && this.zoomIndex > 0) {
+                    // Pinch out = zoom in (closer)
+                    this.setZoomLevel(this.zoomIndex - 1);
+                    this.ui.showToast(`Zoom: ${Math.round(this.zoomScale * 100)}%`);
+                } else if (delta < 0 && this.zoomIndex < this.zoomLevels.length - 1) {
+                    // Pinch in = zoom out (farther)
+                    this.setZoomLevel(this.zoomIndex + 1);
+                    this.ui.showToast(`Zoom: ${Math.round(this.zoomScale * 100)}%`);
+                }
+                lastPinchDist = currentDist;
+            }
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchend', () => {
+            pinching = false;
+        }, { passive: true });
     }
 
     _startNewGame() {
@@ -481,19 +557,25 @@ export class Game {
 
     _draw() {
         const ctx = this.ctx;
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
         const vw = this.viewW;
         const vh = this.viewH;
 
-        // Clear
+        // Clear at screen resolution
         ctx.fillStyle = '#0d2137';
-        ctx.fillRect(0, 0, vw, vh);
+        ctx.fillRect(0, 0, screenW, screenH);
 
         if (this.state === 'loading') {
-            this._drawLoading(ctx, vw, vh);
+            this._drawLoading(ctx, screenW, screenH);
             return;
         }
 
         if (this.state === 'title' || this.state === 'dead') return;
+
+        // Apply zoom
+        ctx.save();
+        ctx.scale(this.zoomScale, this.zoomScale);
 
         // Apply screen shake offset
         let shakeDx = 0, shakeDy = 0;
@@ -524,7 +606,9 @@ export class Game {
         // Draw particles
         this.particles.draw(ctx, drawCamX - vw / 2, drawCamY - vh / 2);
 
-        // Draw joystick (screen-space)
+        ctx.restore();
+
+        // Draw joystick (screen-space, no zoom)
         this.input.drawJoystick(ctx);
     }
 
