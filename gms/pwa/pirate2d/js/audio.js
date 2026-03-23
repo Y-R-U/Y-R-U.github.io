@@ -47,27 +47,36 @@ export class AudioManager {
         this.musicTracks = [];
         this.creepyTracks = {};
 
-        // Discover regular themes
+        // Parallel HEAD requests for faster discovery
+        const regularChecks = [];
         for (let i = 1; i <= 9; i++) {
             const url = `${basePath}theme${i}.mp3`;
-            try {
-                const resp = await fetch(url, { method: 'HEAD' });
-                if (resp.ok) {
-                    this.musicTracks.push(url);
-                }
-            } catch (e) {}
+            regularChecks.push(
+                fetch(url, { method: 'HEAD' })
+                    .then(resp => resp.ok ? url : null)
+                    .catch(() => null)
+            );
         }
 
-        // Discover creepy themes (locked by default)
+        const creepyChecks = [];
         for (let i = 1; i <= 4; i++) {
             const filename = `theme_creepy${i}.mp3`;
             const url = `${basePath}${filename}`;
-            try {
-                const resp = await fetch(url, { method: 'HEAD' });
-                if (resp.ok) {
-                    this.creepyTracks[filename] = url;
-                }
-            } catch (e) {}
+            creepyChecks.push(
+                fetch(url, { method: 'HEAD' })
+                    .then(resp => resp.ok ? { filename, url } : null)
+                    .catch(() => null)
+            );
+        }
+
+        const [regularResults, creepyResults] = await Promise.all([
+            Promise.all(regularChecks),
+            Promise.all(creepyChecks)
+        ]);
+
+        this.musicTracks = regularResults.filter(u => u !== null);
+        for (const result of creepyResults) {
+            if (result) this.creepyTracks[result.filename] = result.url;
         }
 
         return this.musicTracks.length;

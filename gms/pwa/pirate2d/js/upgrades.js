@@ -25,6 +25,8 @@ export const PERMANENT_UPGRADES = {
     permRepairSpeed: { name: 'Repair Crew',      desc: '+0.3 HP/sec repair',       baseCost: 25,  costMult: 1.6, maxLevel: 8,  icon: '\uD83D\uDD28', requiresRepair: true }
 };
 
+export const EXTRA_CANNON_COSTS = [25000, 100000];
+
 export class UpgradeSystem {
     getRunUpgradeCost(key, player) {
         const upgrade = RUN_UPGRADES[key];
@@ -70,5 +72,25 @@ export class UpgradeSystem {
 
         if (audio) audio.playUpgrade();
         return { success: true, newLevel: player.permanentUpgrades[key] };
+    }
+
+    canBuyExtraCannon(player) {
+        return player.bossesDefeatedThisRun > player.extraCannons && player.extraCannons < EXTRA_CANNON_COSTS.length;
+    }
+
+    getExtraCannonCost(player) {
+        const idx = player.extraCannons;
+        return idx < EXTRA_CANNON_COSTS.length ? EXTRA_CANNON_COSTS[idx] : Infinity;
+    }
+
+    buyExtraCannon(player, audio) {
+        if (!this.canBuyExtraCannon(player)) return { success: false, reason: 'Not available' };
+        const cost = this.getExtraCannonCost(player);
+        if (player.gold < cost) return { success: false, reason: 'Not enough gold' };
+        player.gold -= cost;
+        player.extraCannons++;
+        player._savePersistent();
+        if (audio) audio.playUpgrade();
+        return { success: true, totalCannons: 1 + player.extraCannons };
     }
 }

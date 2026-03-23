@@ -39,6 +39,7 @@ export class DebugPanel {
             { label: 'B1', color: '#4a2080', action: () => this._spawnBoss(1) },
             { label: 'B2', color: '#204a80', action: () => this._spawnBoss(2) },
             { label: 'KRK', color: '#206040', action: () => this._spawnBoss(3) },
+            { label: 'B?', color: '#806020', action: () => this._spawnCustomBoss() },
         ];
 
         for (const btn of buttons) {
@@ -85,6 +86,27 @@ export class DebugPanel {
         player.baseStats.maxHp = 999999;
         this.game.ui.showToast('GOD MODE: 999k HP + 999k Gold');
         this.game.ui.updateHUD(player);
+    }
+
+    _spawnCustomBoss() {
+        const input = prompt('Enter boss level (e.g. 15):');
+        if (!input) return;
+        const level = parseInt(input, 10);
+        if (isNaN(level) || level < 1) {
+            this.game.ui.showToast('Invalid level');
+            return;
+        }
+
+        const player = this.game.player;
+        const spawnDist = 300;
+        const spawnX = player.x + Math.cos(player.angle) * spawnDist;
+        const spawnY = player.y + Math.sin(player.angle) * spawnDist;
+
+        // Spawn a Ghost Ship (boss type, index 4) at the given level
+        const { Enemy, ENEMY_TYPES } = this.game._getEnemyImports();
+        const boss = new Enemy(ENEMY_TYPES[4], spawnX, spawnY, level);
+        this.game.enemySpawner.enemies.push(boss);
+        this.game.ui.showToast(`DEBUG: Lv${level} ${ENEMY_TYPES[4].name} spawned!`);
     }
 
     _spawnBoss(runBoss) {

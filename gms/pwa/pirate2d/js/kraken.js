@@ -9,12 +9,12 @@ export class Kraken {
         this.angle = 0;
 
         const scaling = 1 + (level - 1) * 0.3;
-        this.maxHp = Math.round(800 * scaling);
+        this.maxHp = Math.round(750 * scaling);
         this.hp = this.maxHp;
-        this.cannonDamage = Math.round(50 * scaling);
+        this.cannonDamage = Math.round(35 * scaling);
         this.maxSpeed = 35;
         this.speed = 0;
-        this.goldReward = Math.round(500 * scaling);
+        this.goldReward = Math.round(1200 * scaling);
         this.cannonFireRate = 0.8;
         this.cannonRange = 350;
         this.hitRadius = 70;
@@ -23,6 +23,17 @@ export class Kraken {
         this.isBoss = true;
         this.isKraken = true;
         this.glowColor = '#22ffaa';
+
+        // Healing - 3 heals
+        this.healsUsed = 0;
+        this.maxHeals = 3;
+        this.healThresholds = [0.75, 0.5, 0.25];
+        this._justHealed = 0;
+
+        // Red eye mode - explosive shots
+        this.redEyeMode = false;
+        this.redEyeTimer = 8 + Math.random() * 5;
+        this.redEyeDuration = 0; // How long red eye lasts
 
         // Tentacle animation
         this.tentacles = [];
@@ -61,6 +72,18 @@ export class Kraken {
     takeDamage(amount) {
         const dmg = Math.max(1, amount);
         this.hp -= dmg;
+
+        // Healing: check if HP dropped below a threshold
+        if (this.healsUsed < this.maxHeals) {
+            const nextThreshold = this.healThresholds[this.healsUsed];
+            if (nextThreshold !== undefined && (this.hp / this.maxHp) <= nextThreshold) {
+                this.healsUsed++;
+                const healAmount = Math.round(this.maxHp * 0.25);
+                this.hp = Math.min(this.maxHp, this.hp + healAmount);
+                this._justHealed = 2.0;
+            }
+        }
+
         if (this.hp <= 0) this.alive = false;
         return dmg;
     }
@@ -70,6 +93,24 @@ export class Kraken {
 
         this.pulsePhase += dt * 2;
         this.eyeGlow = 0.6 + 0.4 * Math.sin(this.pulsePhase * 1.5);
+
+        // Heal text decay
+        if (this._justHealed > 0) this._justHealed -= dt;
+
+        // Red eye mode timer
+        if (this.redEyeMode) {
+            this.redEyeDuration -= dt;
+            if (this.redEyeDuration <= 0) {
+                this.redEyeMode = false;
+                this.redEyeTimer = 8 + Math.random() * 5;
+            }
+        } else {
+            this.redEyeTimer -= dt;
+            if (this.redEyeTimer <= 0) {
+                this.redEyeMode = true;
+                this.redEyeDuration = 4 + Math.random() * 2; // Red eye lasts 4-6 seconds
+            }
+        }
 
         // Tentacle slam
         if (this.slamming) {
@@ -295,13 +336,16 @@ export class Kraken {
 
     _drawEyes(ctx, sx, sy, time) {
         const eyeOffsets = [[-18, -10], [18, -10]];
+        const isRed = this.redEyeMode;
+        const eyeColor = isRed ? '#ff0000' : '#aaffaa';
+        const glowColor = isRed ? '#ff2200' : '#00ff44';
 
         for (const [ox, oy] of eyeOffsets) {
             ctx.save();
             ctx.translate(sx + ox, sy + oy);
 
-            // Eye white
-            ctx.fillStyle = '#aaffaa';
+            // Eye white/red
+            ctx.fillStyle = eyeColor;
             ctx.beginPath();
             ctx.ellipse(0, 0, 10, 8, 0, 0, Math.PI * 2);
             ctx.fill();
@@ -309,16 +353,16 @@ export class Kraken {
             // Pupil - follows a pattern
             const pupilX = Math.sin(time * 0.7) * 3;
             const pupilY = Math.cos(time * 0.5) * 2;
-            ctx.fillStyle = '#000';
+            ctx.fillStyle = isRed ? '#330000' : '#000';
             ctx.beginPath();
             ctx.ellipse(pupilX, pupilY, 5, 6, 0, 0, Math.PI * 2);
             ctx.fill();
 
             // Eye glow
-            ctx.globalAlpha = this.eyeGlow * 0.3;
-            ctx.shadowColor = '#00ff44';
-            ctx.shadowBlur = 15;
-            ctx.fillStyle = '#00ff44';
+            ctx.globalAlpha = isRed ? 0.6 + 0.4 * Math.sin(time * 6) : this.eyeGlow * 0.3;
+            ctx.shadowColor = glowColor;
+            ctx.shadowBlur = isRed ? 25 : 15;
+            ctx.fillStyle = glowColor;
             ctx.beginPath();
             ctx.ellipse(0, 0, 10, 8, 0, 0, Math.PI * 2);
             ctx.fill();
@@ -335,6 +379,8 @@ export class Kraken {
             aiState: this.aiState, spawnX: this.spawnX, spawnY: this.spawnY,
             cannonCooldown: this.cannonCooldown, strafeDir: this.strafeDir,
             slamTimer: this.slamTimer, inkTimer: this.inkTimer,
+            healsUsed: this.healsUsed, redEyeMode: this.redEyeMode,
+            redEyeTimer: this.redEyeTimer, redEyeDuration: this.redEyeDuration,
             isKraken: true
         };
     }
@@ -351,6 +397,10 @@ export class Kraken {
         k.strafeDir = data.strafeDir;
         k.slamTimer = data.slamTimer || 8;
         k.inkTimer = data.inkTimer || 5;
+        k.healsUsed = data.healsUsed || 0;
+        k.redEyeMode = data.redEyeMode || false;
+        k.redEyeTimer = data.redEyeTimer || 8;
+        k.redEyeDuration = data.redEyeDuration || 0;
         return k;
     }
 

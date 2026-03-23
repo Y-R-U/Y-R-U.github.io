@@ -5,6 +5,7 @@ import { dist, angle } from './utils.js';
 export class CombatSystem {
     constructor() {
         this.projectiles = [];
+        this.mines = []; // Mines laid by bosses
     }
 
     update(dt, player, enemies, particles, audio, game) {
@@ -16,9 +17,30 @@ export class CombatSystem {
             }
         }
 
-        // Enemy auto-fire
+        // Enemy auto-fire + mine laying
         for (const enemy of enemies) {
-            if (!enemy.alive || enemy.cannonCooldown > 0) continue;
+            if (!enemy.alive) continue;
+
+            // Boss mine laying
+            if (enemy.shouldLayMine && enemy.shouldLayMine()) {
+                this.mines.push({
+                    x: enemy.x, y: enemy.y,
+                    damage: enemy.cannonDamage * 1.5,
+                    life: 30, // Mines last 30 seconds
+                    radius: 60, // Detonation radius
+                    pulsePhase: Math.random() * Math.PI * 2
+                });
+            }
+
+            // Boss heal text
+            if (enemy._justHealed > 0) {
+                const healAmt = Math.round(enemy.maxHp * 0.3);
+                if (enemy._justHealed > 1.9) { // Only show text once
+                    particles.addText(enemy.x, enemy.y - 50, `HEALED +${healAmt}`, '#44ff44', 20, 2.0);
+                }
+            }
+
+            if (enemy.cannonCooldown > 0) continue;
             const d = dist(enemy.x, enemy.y, player.x, player.y);
             if (d < enemy.cannonRange) {
                 this._fireEnemyCannon(enemy, player, audio);
@@ -34,11 +56,18 @@ export class CombatSystem {
                     this._firePlayerCannonAt(player, k, audio);
                 }
             }
-            // Kraken fires at player
+
+            // Kraken heal text
+            if (k._justHealed > 0 && k._justHealed > 1.9) {
+                const healAmt = Math.round(k.maxHp * 0.25);
+                particles.addText(k.x, k.y - 50, `HEALED +${healAmt}`, '#44ff44', 22, 2.0);
+            }
+
+            // Kraken fires at player (explosive if red eye mode)
             if (k.cannonCooldown <= 0) {
                 const d = dist(k.x, k.y, player.x, player.y);
                 if (d < k.cannonRange) {
-                    this._fireEnemyCannon(k, player, audio);
+                    this._fireKrakenCannon(k, player, audio);
                 }
             }
         }
@@ -51,7 +80,21 @@ export class CombatSystem {
             p.life -= dt;
 
             if (p.life <= 0) {
-                particles.addSplash(p.x, p.y, 4);
+                if (p.explosive) {
+                    // Explosive projectile detonates on expiry - check blast radius
+                    particles.addExplosion(p.x, p.y, 12, '#ff4400');
+                    audio.playExplosion();
+                    const blastDist = dist(p.x, p.y, player.x, player.y);
+                    if (blastDist < p.blastRadius && !p.isPlayer) {
+                        const dmg = player.takeDamage(Math.round(p.damage * 0.6));
+                        if (dmg > 0) {
+                            particles.addText(player.x, player.y - 30, `-${dmg}`, '#ff2222', 16);
+                            if (game) game.addShake(4);
+                        }
+                    }
+                } else {
+                    particles.addSplash(p.x, p.y, 4);
+                }
                 this.projectiles.splice(i, 1);
                 continue;
             }
@@ -99,13 +142,41 @@ export class CombatSystem {
                 if (d < 25) {
                     const dmg = player.takeDamage(p.damage);
                     if (dmg > 0) {
-                        particles.addExplosion(p.x, p.y, 6, '#ff3300');
+                        if (p.explosive) {
+                            particles.addExplosion(p.x, p.y, 14, '#ff4400');
+                            audio.playExplosion();
+                        } else {
+                            particles.addExplosion(p.x, p.y, 6, '#ff3300');
+                        }
                         particles.addText(player.x, player.y - 30, `-${dmg}`, '#ff2222', 18);
                         audio.playHit();
-                        if (game) game.addShake(3 + dmg * 0.1);
+                        if (game) game.addShake(p.explosive ? 8 : 3 + dmg * 0.1);
                     }
                     this.projectiles.splice(i, 1);
                 }
+            }
+        }
+
+        // Update mines
+        for (let i = this.mines.length - 1; i >= 0; i--) {
+            const mine = this.mines[i];
+            mine.life -= dt;
+            mine.pulsePhase += dt * 4;
+            if (mine.life <= 0) {
+                this.mines.splice(i, 1);
+                continue;
+            }
+            // Check player proximity
+            const d = dist(mine.x, mine.y, player.x, player.y);
+            if (d < mine.radius) {
+                const dmg = player.takeDamage(mine.damage);
+                if (dmg > 0) {
+                    particles.addExplosion(mine.x, mine.y, 15, '#ff4400');
+                    particles.addText(player.x, player.y - 30, `-${dmg} MINE`, '#ff2222', 18);
+                    audio.playExplosion();
+                    if (game) game.addShake(6);
+                }
+                this.mines.splice(i, 1);
             }
         }
 
@@ -176,6 +247,7 @@ export class CombatSystem {
 
     _spawnPlayerProjectiles(player, targetAngle, audio) {
         const speed = 350;
+        const cannonCount = player.cannonCount || 1;
         const shipRight = player.angle + Math.PI / 2;
         const shipLeft = player.angle - Math.PI / 2;
         const angleDiffRight = Math.abs(this._angleDiff(shipRight, targetAngle));
@@ -187,18 +259,25 @@ export class CombatSystem {
         if (sides.length === 0) sides.push(angleDiffRight < angleDiffLeft ? Math.PI / 2 : -Math.PI / 2);
 
         for (const off of sides) {
-            const spawnX = player.x + Math.cos(player.angle + off) * 20;
-            const spawnY = player.y + Math.sin(player.angle + off) * 20;
+            // Fire multiple cannons with slight angle spread
+            for (let c = 0; c < cannonCount; c++) {
+                const spread = cannonCount > 1 ? (c - (cannonCount - 1) / 2) * 0.08 : 0;
+                const fireAngle = targetAngle + spread;
+                const spawnOffset = cannonCount > 1 ? (c - (cannonCount - 1) / 2) * 8 : 0;
+                const perpAngle = player.angle;
+                const spawnX = player.x + Math.cos(player.angle + off) * 20 + Math.cos(perpAngle) * spawnOffset;
+                const spawnY = player.y + Math.sin(player.angle + off) * 20 + Math.sin(perpAngle) * spawnOffset;
 
-            this.projectiles.push({
-                x: spawnX, y: spawnY,
-                vx: Math.cos(targetAngle) * speed,
-                vy: Math.sin(targetAngle) * speed,
-                damage: player.cannonDamage,
-                life: 1.5,
-                isPlayer: true,
-                size: 5
-            });
+                this.projectiles.push({
+                    x: spawnX, y: spawnY,
+                    vx: Math.cos(fireAngle) * speed,
+                    vy: Math.sin(fireAngle) * speed,
+                    damage: player.cannonDamage,
+                    life: 1.5,
+                    isPlayer: true,
+                    size: 5
+                });
+            }
         }
         audio.playCannon();
     }
@@ -226,6 +305,28 @@ export class CombatSystem {
             life: 1.5,
             isPlayer: false,
             size: 4
+        });
+
+        if (d < 400) audio.playCannon();
+    }
+
+    _fireKrakenCannon(kraken, player, audio) {
+        kraken.cannonCooldown = 1 / kraken.cannonFireRate;
+        const a = angle(kraken.x, kraken.y, player.x, player.y);
+        const speed = 220;
+        const d = dist(kraken.x, kraken.y, player.x, player.y);
+        const inaccuracy = (Math.random() - 0.5) * 0.12 * (d / 200);
+
+        this.projectiles.push({
+            x: kraken.x, y: kraken.y,
+            vx: Math.cos(a + inaccuracy) * speed,
+            vy: Math.sin(a + inaccuracy) * speed,
+            damage: kraken.cannonDamage,
+            life: 2.0,
+            isPlayer: false,
+            size: kraken.redEyeMode ? 7 : 5,
+            explosive: kraken.redEyeMode, // Explosive when red eye
+            blastRadius: 80
         });
 
         if (d < 400) audio.playCannon();
@@ -314,26 +415,67 @@ export class CombatSystem {
     }
 
     draw(ctx, camX, camY, viewW, viewH, assets) {
+        // Draw mines
+        for (const mine of this.mines) {
+            const mx = mine.x - camX + viewW / 2;
+            const my = mine.y - camY + viewH / 2;
+            if (mx < -20 || mx > viewW + 20 || my < -20 || my > viewH + 20) continue;
+
+            const pulse = 0.5 + 0.5 * Math.sin(mine.pulsePhase);
+            // Outer spikes
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const a = (Math.PI * 2 / 8) * i;
+                const r = 8 + Math.sin(mine.pulsePhase + i) * 2;
+                if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+                else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+            }
+            ctx.closePath();
+            ctx.fill();
+            // Red center
+            ctx.fillStyle = `rgba(255, ${Math.round(50 * (1 - pulse))}, 0, ${0.6 + pulse * 0.4})`;
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Draw projectiles
         for (const p of this.projectiles) {
             const sx = p.x - camX + viewW / 2;
             const sy = p.y - camY + viewH / 2;
 
             if (sx < -20 || sx > viewW + 20 || sy < -20 || sy > viewH + 20) continue;
 
-            const ballImg = assets.get('cannonBall');
-            if (ballImg) {
-                ctx.drawImage(ballImg, sx - p.size, sy - p.size, p.size * 2, p.size * 2);
-            } else {
-                ctx.fillStyle = p.isPlayer ? '#333' : '#cc3333';
+            if (p.explosive) {
+                // Glowing red explosive projectile
+                ctx.save();
+                ctx.shadowColor = '#ff2200';
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = '#ff4400';
                 ctx.beginPath();
                 ctx.arc(sx, sy, p.size, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.restore();
+            } else {
+                const ballImg = assets.get('cannonBall');
+                if (ballImg) {
+                    ctx.drawImage(ballImg, sx - p.size, sy - p.size, p.size * 2, p.size * 2);
+                } else {
+                    ctx.fillStyle = p.isPlayer ? '#333' : '#cc3333';
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
 
             // Trail
             ctx.save();
             ctx.globalAlpha = 0.3;
-            ctx.fillStyle = p.isPlayer ? '#888' : '#aa4444';
+            ctx.fillStyle = p.explosive ? '#ff6600' : p.isPlayer ? '#888' : '#aa4444';
             ctx.beginPath();
             ctx.arc(sx - p.vx * 0.02, sy - p.vy * 0.02, p.size * 0.7, 0, Math.PI * 2);
             ctx.fill();
@@ -343,5 +485,6 @@ export class CombatSystem {
 
     clear() {
         this.projectiles.length = 0;
+        this.mines.length = 0;
     }
 }

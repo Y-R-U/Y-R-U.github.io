@@ -90,7 +90,7 @@ const RUN_CHAPTERS = {
         },
         {
             id: 'r2_boss',
-            triggerDistance: 8000,
+            triggerDistance: 9000,
             title: "Chapter IV: Captain Blacktide",
             spawnBoss: 2,
             unlockCreepy: 2,

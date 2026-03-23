@@ -1,7 +1,7 @@
 // UI System - HUD, menus, settings, trade/upgrade panels
 
 import { TRADE_GOODS } from './trading.js';
-import { RUN_UPGRADES, PERMANENT_UPGRADES } from './upgrades.js';
+import { RUN_UPGRADES, PERMANENT_UPGRADES, EXTRA_CANNON_COSTS } from './upgrades.js';
 import { formatGold } from './utils.js';
 import { NAME_PREFIXES } from './player.js';
 import { RUN_NAMES } from './story.js';
@@ -611,6 +611,25 @@ export class UIManager {
             `;
         }
 
+        // Extra cannon upgrade (available after boss defeats)
+        let extraCannonHTML = '';
+        if (upgradeSystem.canBuyExtraCannon(player)) {
+            const cost = upgradeSystem.getExtraCannonCost(player);
+            const canBuy = player.gold >= cost;
+            extraCannonHTML = `
+                <div style="border-top:1px solid rgba(255,215,0,0.3);margin-top:8px;padding-top:8px;">
+                    <div class="item-row">
+                        <span style="font-size:18px;margin-right:6px;">\uD83D\uDCA3</span>
+                        <span class="item-name">Extra Cannon<br><small style="color:#ffd700;">+1 cannon (${player.cannonCount} \u2192 ${player.cannonCount + 1})</small></span>
+                        <span class="item-qty">${player.extraCannons}/${EXTRA_CANNON_COSTS.length}</span>
+                        <div class="item-actions">
+                            <button class="btn btn-small ${canBuy ? 'btn-green' : ''}" id="btn-extra-cannon" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         panel.innerHTML = `
             <div class="panel-header">
                 <button class="close-btn" id="upgrade-close">\u2715</button>
@@ -621,6 +640,7 @@ export class UIManager {
             </div>
             <div class="panel-items" id="upgrade-items">
                 ${upgradesHTML}
+                ${extraCannonHTML}
             </div>
         `;
 
@@ -651,6 +671,22 @@ export class UIManager {
                 }
             });
         });
+
+        // Extra cannon button
+        const extraBtn = panel.querySelector('#btn-extra-cannon');
+        if (extraBtn) {
+            extraBtn.addEventListener('click', () => {
+                const result = upgradeSystem.buyExtraCannon(player, audio);
+                if (result.success) {
+                    this.showToast(`Extra cannon installed! Total: ${result.totalCannons} cannons`);
+                    this.updateHUD(player);
+                    const st = itemsContainer.scrollTop;
+                    this.showUpgradePanel(player, upgradeSystem, audio, st);
+                } else {
+                    this.showToast(result.reason);
+                }
+            });
+        }
     }
 
     // Dock prompt - shown when near a port (player must tap to enter)
@@ -731,7 +767,7 @@ export class UIManager {
     }
 
     // Story dialogue
-    showDialogue(speaker, text, chapterTitle, onAdvance) {
+    showDialogue(speaker, text, chapterTitle, onAdvance, minDisplayTime = 0) {
         this.closePanel();
         const panel = document.createElement('div');
         panel.className = 'game-panel story-dialog';
@@ -747,12 +783,14 @@ export class UIManager {
             <div class="text">${text}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
                 ${hasMore ? '<button class="btn btn-small skip-story-btn" id="btn-skip-story" style="font-size:11px;padding:4px 12px;min-height:30px;opacity:0.7;">Skip</button>' : '<span></span>'}
-                <div class="continue-hint" style="margin-top:0;">Tap or press Space to continue...</div>
+                <div class="continue-hint" id="dialogue-hint" style="margin-top:0;${minDisplayTime > 0 ? 'display:none;' : ''}">Tap or press Space to continue...</div>
             </div>
         `;
 
         this.uiLayer.appendChild(panel);
         this.activePanel = panel;
+
+        let canAdvance = minDisplayTime <= 0;
 
         const cleanup = () => {
             panel.removeEventListener('click', advance);
@@ -760,6 +798,7 @@ export class UIManager {
         };
 
         const advance = (e) => {
+            if (!canAdvance) return;
             if (e.type === 'keydown' && e.code !== 'Space' && e.code !== 'Enter') return;
             e.preventDefault();
             cleanup();
@@ -768,6 +807,15 @@ export class UIManager {
 
         panel.addEventListener('click', advance);
         window.addEventListener('keydown', advance);
+
+        // Delay before allowing advance (for boss dialogues)
+        if (minDisplayTime > 0) {
+            setTimeout(() => {
+                canAdvance = true;
+                const hint = panel.querySelector('#dialogue-hint');
+                if (hint) hint.style.display = '';
+            }, minDisplayTime);
+        }
 
         // Skip button - skip all remaining dialogues in this chapter
         const skipBtn = panel.querySelector('#btn-skip-story');

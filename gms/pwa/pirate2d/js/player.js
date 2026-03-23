@@ -56,6 +56,7 @@ export class Player {
         this.currentRun = 1; // Which story run (1, 2, or 3)
         this.completedRuns = []; // Array of completed run numbers
         this.bossDefeated = false; // Whether current run's boss is defeated
+        this.extraCannons = 0; // Extra cannons purchased (persistent)
         this.permanentUpgrades = {
             startGold: 0,
             startHp: 0,
@@ -77,6 +78,7 @@ export class Player {
         this.cargo = {};
         this.cargoCount = 0;
         this.buriedGold = 0;
+        this.bossesDefeatedThisRun = 0;
 
         // Combat
         this.cannonCooldown = 0;
@@ -144,6 +146,10 @@ export class Player {
             + (this.permanentUpgrades.permArmor || 0) * 1;
     }
 
+    get cannonCount() {
+        return 1 + (this.extraCannons || 0);
+    }
+
     get repairRate() {
         if (!this.hasRepairSkill) return 0;
         const base = 1;
@@ -172,6 +178,7 @@ export class Player {
     // Complete current run's boss
     onBossDefeated() {
         this.bossDefeated = true;
+        this.bossesDefeatedThisRun++;
     }
 
     // Finish the current run - advance to next
@@ -350,6 +357,7 @@ export class Player {
         this.totalGoldEarned = 0;
         this.repairTimer = 0;
         this.bossDefeated = false;
+        this.bossesDefeatedThisRun = 0;
 
         for (const key of Object.keys(this.upgrades)) {
             this.upgrades[key] = 0;
@@ -369,7 +377,8 @@ export class Player {
                 currentRun: this.currentRun,
                 completedRuns: this.completedRuns,
                 playerName: this.playerName,
-                namePrefix: this.namePrefix
+                namePrefix: this.namePrefix,
+                extraCannons: this.extraCannons
             }));
         } catch(e) {}
     }
@@ -384,6 +393,7 @@ export class Player {
                 this.hasRepairSkill = data.hasRepairSkill || false;
                 this.currentRun = data.currentRun || 1;
                 this.completedRuns = data.completedRuns || [];
+                this.extraCannons = data.extraCannons || 0;
                 this.playerName = data.playerName || '';
                 this.namePrefix = data.namePrefix || '';
                 if (this.playerName) {
@@ -414,6 +424,7 @@ export class Player {
             invulnTimer: this.invulnTimer,
             repairTimer: this.repairTimer,
             bossDefeated: this.bossDefeated,
+            bossesDefeatedThisRun: this.bossesDefeatedThisRun,
             baseMaxHp: this.baseStats.maxHp
         };
     }
@@ -433,6 +444,7 @@ export class Player {
         this.invulnTimer = data.invulnTimer || 0;
         this.repairTimer = data.repairTimer || 0;
         this.bossDefeated = data.bossDefeated || false;
+        this.bossesDefeatedThisRun = data.bossesDefeatedThisRun || 0;
         if (data.baseMaxHp) this.baseStats.maxHp = data.baseMaxHp;
     }
 

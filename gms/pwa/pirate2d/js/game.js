@@ -108,25 +108,40 @@ export class Game {
 
         // Ship sprites - use the Kenney pirate pack ships
         const shipFiles = [
+            // Player ship (white): undamaged, dmg1, dmg2
             ['player_ship', 'ships/ship (1).png'],
-            ['player_ship_dmg', 'ships/ship (15).png'],
-            ['player_ship_heavy_dmg', 'ships/ship (18).png'],
+            ['player_ship_dmg', 'ships/ship (7).png'],
+            ['player_ship_heavy_dmg', 'ships/ship (13).png'],
+            // Enemy ships: undamaged, dmg1, dmg2 (grid: 6 colors x 3 rows)
+            // Sloop (red sail)
             ['enemy_ship_1', 'ships/ship (3).png'],
+            ['damaged_ship_1', 'ships/ship (9).png'],
+            ['heavy_dmg_ship_1', 'ships/ship (15).png'],
+            // Brigantine (blue sail)
             ['enemy_ship_2', 'ships/ship (5).png'],
-            ['enemy_ship_3', 'ships/ship (7).png'],
-            ['enemy_ship_4', 'ships/ship (9).png'],
-            ['enemy_ship_5', 'ships/ship (11).png'],
+            ['damaged_ship_2', 'ships/ship (11).png'],
+            ['heavy_dmg_ship_2', 'ships/ship (17).png'],
+            // Galleon (green sail)
+            ['enemy_ship_3', 'ships/ship (4).png'],
+            ['damaged_ship_3', 'ships/ship (10).png'],
+            ['heavy_dmg_ship_3', 'ships/ship (16).png'],
+            // Man-o-War (yellow sail)
+            ['enemy_ship_4', 'ships/ship (6).png'],
+            ['damaged_ship_4', 'ships/ship (12).png'],
+            ['heavy_dmg_ship_4', 'ships/ship (18).png'],
+            // Ghost Ship (black sail)
+            ['enemy_ship_5', 'ships/ship (2).png'],
+            ['damaged_ship_5', 'ships/ship (8).png'],
+            ['heavy_dmg_ship_5', 'ships/ship (14).png'],
+            // Kraken (procedural, no sprite needed)
             ['enemy_ship_6', 'ships/ship (13).png'],
-            // Damaged variants for enemies
-            ['damaged_ship_1', 'ships/ship (16).png'],
-            ['damaged_ship_2', 'ships/ship (16).png'],
-            ['damaged_ship_3', 'ships/ship (17).png'],
-            ['damaged_ship_4', 'ships/ship (17).png'],
-            // Boss ships (dark/black)
-            ['boss_ship_1', 'ships/ship (20).png'],
-            ['boss_ship_2', 'ships/ship (21).png'],
-            ['boss_ship_3', 'ships/ship (22).png'],
-            ['boss_ship_4', 'ships/ship (24).png'],
+            // Boss ships (dark row 4): standard=24, dmg1=20, dmg2=19
+            ['boss_ship_std', 'ships/ship (24).png'],
+            ['boss_ship_dmg', 'ships/ship (20).png'],
+            ['boss_ship_heavy', 'ships/ship (19).png'],
+            // Additional dark boss variants
+            ['boss_ship_alt1', 'ships/ship (22).png'],
+            ['boss_ship_alt2', 'ships/ship (21).png'],
         ];
 
         // Tile sprites
@@ -405,6 +420,16 @@ export class Game {
         if (!line) return;
 
         this.state = 'dialogue';
+
+        // Boss chapters get longer display time with screen shake
+        const chapter = this.story.currentDialogue;
+        const isBossChapter = chapter && chapter.spawnBoss;
+        const minDisplayTime = isBossChapter ? 3000 : 0;
+
+        if (isBossChapter) {
+            this.addShake(4);
+        }
+
         this.ui.showDialogue(
             line.speaker,
             line.text,
@@ -417,7 +442,8 @@ export class Game {
                     this.ui.closePanel();
                     this.state = 'playing';
                 }
-            }
+            },
+            minDisplayTime
         );
     }
 
@@ -471,6 +497,10 @@ export class Game {
                 this._saveGameState(); // Save on leaving port
             }
         );
+    }
+
+    _getEnemyImports() {
+        return { Enemy, ENEMY_TYPES };
     }
 
     addShake(intensity) {

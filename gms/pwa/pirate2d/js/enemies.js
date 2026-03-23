@@ -15,6 +15,7 @@ export const ENEMY_TYPES = [
         scale: 0.6,
         shipSprite: 'enemy_ship_1',
         damagedSprite: 'damaged_ship_1',
+        damagedSprite2: 'heavy_dmg_ship_1',
         color: '#886644'
     },
     {
@@ -29,6 +30,7 @@ export const ENEMY_TYPES = [
         scale: 0.8,
         shipSprite: 'enemy_ship_2',
         damagedSprite: 'damaged_ship_2',
+        damagedSprite2: 'heavy_dmg_ship_2',
         color: '#664422'
     },
     {
@@ -43,6 +45,7 @@ export const ENEMY_TYPES = [
         scale: 1.1,
         shipSprite: 'enemy_ship_3',
         damagedSprite: 'damaged_ship_3',
+        damagedSprite2: 'heavy_dmg_ship_3',
         color: '#442211'
     },
     {
@@ -57,6 +60,7 @@ export const ENEMY_TYPES = [
         scale: 1.3,
         shipSprite: 'enemy_ship_4',
         damagedSprite: 'damaged_ship_4',
+        damagedSprite2: 'heavy_dmg_ship_4',
         color: '#331100'
     },
     {
@@ -70,7 +74,8 @@ export const ENEMY_TYPES = [
         hitRadius: 30,
         scale: 1.0,
         shipSprite: 'enemy_ship_5',
-        damagedSprite: 'damaged_ship_3',
+        damagedSprite: 'damaged_ship_5',
+        damagedSprite2: 'heavy_dmg_ship_5',
         color: '#445566',
         isBoss: true,
         glowColor: '#66aaff'
@@ -86,7 +91,8 @@ export const ENEMY_TYPES = [
         hitRadius: 50,
         scale: 1.6,
         shipSprite: 'enemy_ship_6',
-        damagedSprite: 'damaged_ship_4',
+        damagedSprite: 'enemy_ship_6',
+        damagedSprite2: 'enemy_ship_6',
         color: '#225533',
         isBoss: true,
         glowColor: '#44ff88'
@@ -94,37 +100,44 @@ export const ENEMY_TYPES = [
     // === Run bosses (dark/black ships) ===
     {
         name: "Blacktide's Lieutenant",
-        baseHp: 500,
-        baseDamage: 35,
+        baseHp: 675,
+        baseDamage: 25,
         baseSpeed: 70,
-        baseGold: 400,
+        baseGold: 500,
         fireRate: 1.5,
         range: 300,
         hitRadius: 40,
         scale: 1.4,
-        shipSprite: 'boss_ship_1',
-        damagedSprite: 'boss_ship_2',
+        shipSprite: 'boss_ship_std',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
         color: '#1a1a2a',
         isBoss: true,
         isRunBoss: true,
-        glowColor: '#cc2222'
+        glowColor: '#cc2222',
+        maxHeals: 1,
+        healThresholds: [0.5]
     },
     {
         name: 'Captain Blacktide',
-        baseHp: 900,
-        baseDamage: 45,
+        baseHp: 750,
+        baseDamage: 30,
         baseSpeed: 55,
-        baseGold: 700,
+        baseGold: 800,
         fireRate: 1.8,
         range: 350,
         hitRadius: 48,
         scale: 1.7,
-        shipSprite: 'boss_ship_3',
-        damagedSprite: 'boss_ship_4',
+        shipSprite: 'boss_ship_std',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
         color: '#0a0a1a',
         isBoss: true,
         isRunBoss: true,
-        glowColor: '#aa0000'
+        glowColor: '#aa0000',
+        maxHeals: 2,
+        healThresholds: [0.66, 0.33],
+        laysMines: true
     },
     // Dark escort ships
     {
@@ -137,8 +150,9 @@ export const ENEMY_TYPES = [
         range: 280,
         hitRadius: 32,
         scale: 1.1,
-        shipSprite: 'boss_ship_1',
-        damagedSprite: 'boss_ship_2',
+        shipSprite: 'boss_ship_alt1',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
         color: '#1a1a2a',
         glowColor: '#882222'
     }
@@ -185,6 +199,14 @@ export class Enemy {
 
         // Fire timer for damage visual effects
         this.fireTimer = 0;
+
+        // Boss healing
+        this.healsUsed = 0;
+        this.maxHeals = type.maxHeals || 0;
+        this.healThresholds = type.healThresholds || [];
+        this._justHealed = 0; // Timer for heal text display
+        this.laysMines = type.laysMines || false;
+        this.mineTimer = this.laysMines ? 5 + Math.random() * 3 : 0;
     }
 
     get alive() {
@@ -199,6 +221,18 @@ export class Enemy {
         const dmg = Math.max(1, amount);
         this.hp -= dmg;
         if (this.aiState === 'patrol') this.aiState = 'chase';
+
+        // Boss healing: check if HP dropped below a threshold
+        if (this.maxHeals > 0 && this.healsUsed < this.maxHeals) {
+            const nextThreshold = this.healThresholds[this.healsUsed];
+            if (nextThreshold !== undefined && this.hpRatio <= nextThreshold) {
+                this.healsUsed++;
+                const healAmount = Math.round(this.maxHp * 0.3);
+                this.hp = Math.min(this.maxHp, this.hp + healAmount);
+                this._justHealed = 2.0; // Show heal text for 2 seconds
+            }
+        }
+
         return dmg;
     }
 
@@ -209,6 +243,14 @@ export class Enemy {
         // Fire visual timer
         if (this.hpRatio < 0.75) {
             this.fireTimer -= dt;
+        }
+
+        // Boss heal text decay
+        if (this._justHealed > 0) this._justHealed -= dt;
+
+        // Mine laying timer
+        if (this.laysMines && this.mineTimer > 0) {
+            this.mineTimer -= dt;
         }
 
         switch (this.aiState) {
@@ -311,6 +353,13 @@ export class Enemy {
         }
     }
 
+    // Check if boss should lay a mine
+    shouldLayMine() {
+        if (!this.laysMines || this.mineTimer > 0) return false;
+        this.mineTimer = 3 + Math.random() * 4;
+        return true;
+    }
+
     // Serialize for localStorage
     serialize() {
         return {
@@ -318,7 +367,8 @@ export class Enemy {
             x: this.x, y: this.y, angle: this.angle,
             speed: this.speed, hp: this.hp, level: this.level,
             aiState: this.aiState, spawnX: this.spawnX, spawnY: this.spawnY,
-            cannonCooldown: this.cannonCooldown, strafeDir: this.strafeDir
+            cannonCooldown: this.cannonCooldown, strafeDir: this.strafeDir,
+            healsUsed: this.healsUsed, mineTimer: this.mineTimer
         };
     }
 
@@ -333,6 +383,8 @@ export class Enemy {
         enemy.spawnY = data.spawnY;
         enemy.cannonCooldown = data.cannonCooldown;
         enemy.strafeDir = data.strafeDir;
+        enemy.healsUsed = data.healsUsed || 0;
+        enemy.mineTimer = data.mineTimer || 0;
         return enemy;
     }
 
@@ -365,9 +417,11 @@ export class Enemy {
 
         const s = this.scale;
 
-        // Choose sprite based on HP
+        // Choose sprite based on HP (3-tier: >66% normal, 33-66% dmg1, <33% dmg2)
         let spriteKey = this.type.shipSprite;
-        if (this.hpRatio < 0.5 && this.type.damagedSprite) {
+        if (this.hpRatio < 0.33 && this.type.damagedSprite2) {
+            spriteKey = this.type.damagedSprite2;
+        } else if (this.hpRatio < 0.66 && this.type.damagedSprite) {
             spriteKey = this.type.damagedSprite;
         }
 
