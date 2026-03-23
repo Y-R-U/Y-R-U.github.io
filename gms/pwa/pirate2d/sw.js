@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corsairs-fate-v4';
+const CACHE_NAME = 'corsairs-fate-v5';
 const ASSETS = [
     './',
     './index.html',
@@ -16,6 +16,8 @@ const ASSETS = [
     './js/particles.js',
     './js/audio.js',
     './js/ui.js',
+    './js/kraken.js',
+    './js/debug.js',
     './manifest.json',
     './assets/icon-192.svg',
     './assets/icon-512.svg'

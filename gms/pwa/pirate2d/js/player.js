@@ -2,12 +2,26 @@
 
 import { clamp, normalizeAngle, angleDiff, lerp } from './utils.js';
 
+export const NAME_PREFIXES = [
+    'The Dread Pirate',
+    'Captain',
+    'Admiral',
+    'Scallywag',
+    'Buccaneer',
+    'Commodore'
+];
+
 export class Player {
     constructor(x, y) {
         this.x = x;
         this.y = y;
         this.angle = -Math.PI / 2; // Facing up
         this.speed = 0;
+
+        // Player identity
+        this.playerName = '';
+        this.namePrefix = '';
+        this.fullName = '';
 
         // Base stats
         this.baseStats = {
@@ -17,21 +31,21 @@ export class Player {
             maxHp: 100,
             cannonDamage: 15,
             cannonRange: 250,
-            cannonFireRate: 1.0, // shots per second
+            cannonFireRate: 1.0,
             cargoCapacity: 20,
             armor: 0
         };
 
         // Upgrade levels
         this.upgrades = {
-            hull: 0,      // +20 hp per level
-            cannons: 0,   // +5 damage per level
-            speed: 0,     // +20 speed per level
-            fireRate: 0,  // +0.2 rate per level
-            range: 0,     // +40 range per level
-            cargo: 0,     // +10 capacity per level
-            armor: 0,     // +3 armor per level
-            repairSpeed: 0 // +0.5 HP/sec per level
+            hull: 0,
+            cannons: 0,
+            speed: 0,
+            fireRate: 0,
+            range: 0,
+            cargo: 0,
+            armor: 0,
+            repairSpeed: 0
         };
 
         // Persistent (survives death) - must be before maxHp access
@@ -39,6 +53,9 @@ export class Player {
         this.totalRuns = 0;
         this.bestDistance = 0;
         this.hasRepairSkill = false;
+        this.currentRun = 1; // Which story run (1, 2, or 3)
+        this.completedRuns = []; // Array of completed run numbers
+        this.bossDefeated = false; // Whether current run's boss is defeated
         this.permanentUpgrades = {
             startGold: 0,
             startHp: 0,
@@ -57,9 +74,9 @@ export class Player {
         this.hp = this.maxHp;
         this.gold = 50;
         this.totalGoldEarned = 0;
-        this.cargo = {}; // item: quantity
+        this.cargo = {};
         this.cargoCount = 0;
-        this.buriedGold = 0; // Gold safely buried (recoverable on death)
+        this.buriedGold = 0;
 
         // Combat
         this.cannonCooldown = 0;
@@ -73,6 +90,9 @@ export class Player {
         this.distanceTraveled = 0;
         this.portsVisited = new Set();
         this.maxDistFromHome = 0;
+
+        // Fire effect timer for damage visuals
+        this.fireTimer = 0;
     }
 
     get maxHp() {
@@ -126,7 +146,7 @@ export class Player {
 
     get repairRate() {
         if (!this.hasRepairSkill) return 0;
-        const base = 1; // 1 HP/sec base
+        const base = 1;
         const runBonus = (this.upgrades.repairSpeed || 0) * 0.5;
         const permBonus = (this.permanentUpgrades.permRepairSpeed || 0) * 0.3;
         return base + runBonus + permBonus;
@@ -138,10 +158,43 @@ export class Player {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    get hpRatio() {
+        return this.hp / this.maxHp;
+    }
+
+    setName(prefix, name) {
+        this.namePrefix = prefix;
+        this.playerName = name;
+        this.fullName = `${prefix} ${name}`;
+        this._savePersistent();
+    }
+
+    // Complete current run's boss
+    onBossDefeated() {
+        this.bossDefeated = true;
+    }
+
+    // Finish the current run - advance to next
+    finishRun() {
+        if (!this.completedRuns.includes(this.currentRun)) {
+            this.completedRuns.push(this.currentRun);
+        }
+        if (this.currentRun < 3) {
+            this.currentRun++;
+        }
+        this.bossDefeated = false;
+        this._savePersistent();
+    }
+
     update(dt, input, world) {
         // Timers
         if (this.cannonCooldown > 0) this.cannonCooldown -= dt;
         if (this.invulnTimer > 0) this.invulnTimer -= dt;
+
+        // Fire effect timer
+        if (this.hpRatio < 0.75) {
+            this.fireTimer -= dt;
+        }
 
         // Auto-repair
         if (this.hasRepairSkill && this.hp < this.maxHp && this.repairRate > 0) {
@@ -186,7 +239,6 @@ export class Player {
             this.y = ny;
         } else {
             this.speed *= 0.5;
-            // Try sliding along the obstacle
             if (!world.isLand(nx, this.y)) {
                 this.x = nx;
             } else if (!world.isLand(this.x, ny)) {
@@ -249,11 +301,9 @@ export class Player {
         return this.hp > 0;
     }
 
-    // Bury treasure - send pirates off to bury 50% of gold, lose ~20% to pirates
     buryTreasure() {
         if (this.gold < 10) return { success: false, reason: 'Not enough gold to bury!' };
         const halfGold = Math.floor(this.gold * 0.5);
-        // Pirates steal ~20% of what they carry (random 15-25%)
         const piratesCut = Math.floor(halfGold * (0.15 + Math.random() * 0.1));
         const buried = halfGold - piratesCut;
         this.gold -= halfGold;
@@ -261,15 +311,14 @@ export class Player {
         return { success: true, sent: halfGold, piratesCut, buried };
     }
 
-    // Death - save persistent data
     onDeath() {
-        const savedFromShip = Math.floor(this.gold * 0.3); // Keep 30% gold from ship
+        const savedFromShip = Math.floor(this.gold * 0.3);
         const totalSaved = savedFromShip + this.buriedGold;
         this.persistentGold += totalSaved;
         this.totalRuns++;
         this.bestDistance = Math.max(this.bestDistance, this.maxDistFromHome);
+        this.bossDefeated = false;
         this._savePersistent();
-        // Clear game state on death
         try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
         return {
             goldKept: savedFromShip,
@@ -281,32 +330,31 @@ export class Player {
         };
     }
 
-    // Start a new run
     reset() {
         this.x = 200;
         this.y = 0;
         this.angle = -Math.PI / 2;
         this.speed = 0;
+        this.baseStats.maxHp = 100; // Reset in case debug modified it
         this.hp = this.maxHp;
         this.gold = 50 + (this.permanentUpgrades.startGold || 0) * 25;
         this.cargo = {};
         this.cargoCount = 0;
         this.buriedGold = 0;
         this.cannonCooldown = 0;
-        this.invulnTimer = 2; // Brief invuln on spawn
+        this.invulnTimer = 2;
         this.enemiesKilled = 0;
         this.distanceTraveled = 0;
         this.portsVisited = new Set();
         this.maxDistFromHome = 0;
         this.totalGoldEarned = 0;
         this.repairTimer = 0;
+        this.bossDefeated = false;
 
-        // Reset run upgrades
         for (const key of Object.keys(this.upgrades)) {
             this.upgrades[key] = 0;
         }
 
-        // Clear saved game state
         try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
     }
 
@@ -317,7 +365,11 @@ export class Player {
                 totalRuns: this.totalRuns,
                 bestDistance: this.bestDistance,
                 permanentUpgrades: this.permanentUpgrades,
-                hasRepairSkill: this.hasRepairSkill
+                hasRepairSkill: this.hasRepairSkill,
+                currentRun: this.currentRun,
+                completedRuns: this.completedRuns,
+                playerName: this.playerName,
+                namePrefix: this.namePrefix
             }));
         } catch(e) {}
     }
@@ -330,10 +382,16 @@ export class Player {
                 this.totalRuns = data.totalRuns || 0;
                 this.bestDistance = data.bestDistance || 0;
                 this.hasRepairSkill = data.hasRepairSkill || false;
+                this.currentRun = data.currentRun || 1;
+                this.completedRuns = data.completedRuns || [];
+                this.playerName = data.playerName || '';
+                this.namePrefix = data.namePrefix || '';
+                if (this.playerName) {
+                    this.fullName = `${this.namePrefix} ${this.playerName}`;
+                }
                 if (data.permanentUpgrades) {
                     Object.assign(this.permanentUpgrades, data.permanentUpgrades);
                 }
-                // Sync repairUnlock with hasRepairSkill
                 if (this.permanentUpgrades.repairUnlock > 0) {
                     this.hasRepairSkill = true;
                 }
@@ -341,7 +399,6 @@ export class Player {
         } catch(e) {}
     }
 
-    // Serialize full run state for localStorage
     serializeState() {
         return {
             x: this.x, y: this.y, angle: this.angle, speed: this.speed,
@@ -355,7 +412,9 @@ export class Player {
             totalGoldEarned: this.totalGoldEarned,
             cannonCooldown: this.cannonCooldown,
             invulnTimer: this.invulnTimer,
-            repairTimer: this.repairTimer
+            repairTimer: this.repairTimer,
+            bossDefeated: this.bossDefeated,
+            baseMaxHp: this.baseStats.maxHp
         };
     }
 
@@ -373,6 +432,8 @@ export class Player {
         this.cannonCooldown = data.cannonCooldown || 0;
         this.invulnTimer = data.invulnTimer || 0;
         this.repairTimer = data.repairTimer || 0;
+        this.bossDefeated = data.bossDefeated || false;
+        if (data.baseMaxHp) this.baseStats.maxHp = data.baseMaxHp;
     }
 
     draw(ctx, camX, camY, viewW, viewH, assets, time) {
@@ -381,24 +442,37 @@ export class Player {
 
         ctx.save();
         ctx.translate(sx, sy);
-        ctx.rotate(this.angle - Math.PI / 2); // Rotated 180 to face correct direction
+        ctx.rotate(this.angle - Math.PI / 2);
 
         // Flash when hit
         if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 10) % 2) {
             ctx.globalAlpha = 0.5;
         }
 
-        const shipImg = assets.get('player_ship');
+        // Choose sprite based on HP
+        let spriteKey = 'player_ship';
+        if (this.hpRatio < 0.4) {
+            spriteKey = 'player_ship_heavy_dmg';
+        } else if (this.hpRatio < 0.75) {
+            spriteKey = 'player_ship_dmg';
+        }
+
+        const shipImg = assets.get(spriteKey);
         if (shipImg) {
             ctx.drawImage(shipImg, -32, -40, 64, 80);
         } else {
-            // Procedural ship
-            this._drawProceduralShip(ctx);
+            // Fall back to normal ship or procedural
+            const fallback = assets.get('player_ship');
+            if (fallback) {
+                ctx.drawImage(fallback, -32, -40, 64, 80);
+            } else {
+                this._drawProceduralShip(ctx);
+            }
         }
 
         ctx.restore();
 
-        // Draw cannon range indicator (subtle)
+        // Cannon range indicator (subtle)
         if (this.cannonCooldown <= 0) {
             ctx.save();
             ctx.globalAlpha = 0.08;
