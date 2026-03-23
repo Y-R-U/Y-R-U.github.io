@@ -284,58 +284,95 @@ export class Kraken {
 
     _drawBody(ctx, sx, sy, time) {
         const pulse = 1 + 0.05 * Math.sin(time * 2);
-        const bodyW = 45 * pulse;
-        const bodyH = 35 * pulse;
+        const bodyW = 50 * pulse;
+        const bodyH = 38 * pulse;
 
-        // Main body
         ctx.save();
         ctx.translate(sx, sy);
 
-        // Body gradient
-        const grad = ctx.createRadialGradient(0, 0, 5, 0, 0, bodyW);
-        grad.addColorStop(0, '#3a7a4a');
-        grad.addColorStop(0.5, '#2a5a3a');
-        grad.addColorStop(1, '#1a3a2a');
+        // Clip to only show top half of head (half-submerged effect)
+        // The waterline sits at the eye level, so we show from top down to just below eyes
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-bodyW - 10, -bodyH - 10, (bodyW + 10) * 2, bodyH + 14); // Show top portion only
+        ctx.clip();
+
+        // Main body dome - top half of head
+        const grad = ctx.createRadialGradient(0, -8, 5, 0, -5, bodyW);
+        grad.addColorStop(0, '#3a8a4a');
+        grad.addColorStop(0.4, '#2a6a3a');
+        grad.addColorStop(0.8, '#1a4a2a');
+        grad.addColorStop(1, '#0a3a1a');
 
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.ellipse(0, 0, bodyW, bodyH, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Body texture - bumps
-        for (let i = 0; i < 6; i++) {
-            const bx = Math.cos(i * 1.1 + time * 0.3) * bodyW * 0.5;
-            const by = Math.sin(i * 1.3 + time * 0.2) * bodyH * 0.5;
-            ctx.fillStyle = '#4a8a5a';
-            ctx.globalAlpha = 0.4;
+        // Head ridges / texture bumps (only on top portion)
+        for (let i = 0; i < 8; i++) {
+            const bx = Math.cos(i * 0.85 + time * 0.2) * bodyW * 0.55;
+            const by = Math.sin(i * 1.1 + time * 0.15) * bodyH * 0.35 - 8;
+            ctx.fillStyle = '#4a9a5a';
+            ctx.globalAlpha = 0.35;
             ctx.beginPath();
-            ctx.arc(bx, by, 5 + Math.sin(time + i) * 2, 0, Math.PI * 2);
+            ctx.arc(bx, by, 4 + Math.sin(time + i) * 1.5, 0, Math.PI * 2);
             ctx.fill();
         }
-        ctx.globalAlpha = 1;
 
-        // Mouth
-        ctx.fillStyle = '#0a1a0a';
+        // Brow ridge above eyes
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = '#1a3a1a';
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.ellipse(0, 8, 12, 6 + Math.sin(time * 3) * 2, 0, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(-30, -14);
+        ctx.quadraticCurveTo(-18, -20, -8, -16);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(30, -14);
+        ctx.quadraticCurveTo(18, -20, 8, -16);
+        ctx.stroke();
 
-        // Teeth
-        ctx.fillStyle = '#ccddcc';
-        for (let i = -2; i <= 2; i++) {
+        ctx.globalAlpha = 1;
+        ctx.restore(); // Remove clipping
+
+        // Water line effect - waves at the submerged edge
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = '#4488aa';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = -bodyW; i <= bodyW; i += 3) {
+            const waveY = 4 + Math.sin(time * 2.5 + i * 0.15) * 2;
+            // Only draw waterline where it intersects the body ellipse
+            const xRatio = i / bodyW;
+            if (Math.abs(xRatio) < 0.95) {
+                if (i === -bodyW + 3 || Math.abs(xRatio) >= 0.92) {
+                    ctx.moveTo(i, waveY);
+                } else {
+                    ctx.lineTo(i, waveY);
+                }
+            }
+        }
+        ctx.stroke();
+
+        // Foam/splash at waterline
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = '#88ccdd';
+        for (let i = 0; i < 6; i++) {
+            const fx = Math.cos(i * 1.2 + time * 1.5) * bodyW * 0.7;
+            const fy = 3 + Math.sin(time * 3 + i * 2) * 2;
             ctx.beginPath();
-            ctx.moveTo(i * 4, 4);
-            ctx.lineTo(i * 4 - 1.5, 10);
-            ctx.lineTo(i * 4 + 1.5, 10);
-            ctx.closePath();
+            ctx.arc(fx, fy, 3 + Math.sin(time * 2 + i) * 1, 0, Math.PI * 2);
             ctx.fill();
         }
 
+        ctx.globalAlpha = 1;
         ctx.restore();
     }
 
     _drawEyes(ctx, sx, sy, time) {
-        const eyeOffsets = [[-18, -10], [18, -10]];
+        // Eyes sit just above the waterline - prominent and menacing
+        const eyeOffsets = [[-18, -8], [18, -8]];
         const isRed = this.redEyeMode;
         const eyeColor = isRed ? '#ff0000' : '#aaffaa';
         const glowColor = isRed ? '#ff2200' : '#00ff44';

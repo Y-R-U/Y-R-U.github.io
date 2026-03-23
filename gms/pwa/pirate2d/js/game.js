@@ -815,19 +815,29 @@ export class Game {
 
         // Intensity increases as HP drops: 0 at 25%, max at ~5%
         const intensity = 1 - (ratio / 0.25);
-        const pulse = 0.5 + 0.5 * Math.sin(this.gameTime * 3);
-        const alpha = intensity * 0.35 * (0.6 + 0.4 * pulse);
+        const pulse = 0.5 + 0.5 * Math.sin(this.gameTime * 4);
+        const baseAlpha = intensity * 0.6 * (0.5 + 0.5 * pulse);
 
         ctx.save();
-        // Create radial gradient for vignette effect
+        // Strong vignette effect - red glow from edges
         const cx = screenW / 2;
         const cy = screenH / 2;
-        const r = Math.max(screenW, screenH) * 0.7;
-        const grad = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r);
+        const r = Math.max(screenW, screenH) * 0.65;
+        const grad = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r);
         grad.addColorStop(0, 'rgba(200, 0, 0, 0)');
-        grad.addColorStop(1, `rgba(200, 0, 0, ${alpha})`);
+        grad.addColorStop(0.6, `rgba(180, 0, 0, ${baseAlpha * 0.3})`);
+        grad.addColorStop(1, `rgba(200, 0, 0, ${baseAlpha})`);
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, screenW, screenH);
+
+        // Additional heartbeat pulse overlay at very low HP (<15%)
+        if (ratio < 0.15) {
+            const heartbeat = Math.pow(Math.sin(this.gameTime * 5), 2);
+            ctx.globalAlpha = heartbeat * intensity * 0.15;
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 0, screenW, screenH);
+        }
+
         ctx.restore();
     }
 

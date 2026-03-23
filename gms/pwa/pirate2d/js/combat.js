@@ -79,17 +79,29 @@ export class CombatSystem {
             p.y += p.vy * dt;
             p.life -= dt;
 
+            // Explosive projectile with target: detonate when reaching target area
+            if (p.explosive && p.targetX !== undefined) {
+                const distToTarget = dist(p.x, p.y, p.targetX, p.targetY);
+                if (distToTarget < 30) { // Close enough to target - detonate
+                    p.life = 0; // Force expiry to trigger detonation below
+                }
+            }
+
             if (p.life <= 0) {
                 if (p.explosive) {
-                    // Explosive projectile detonates on expiry - check blast radius
-                    particles.addExplosion(p.x, p.y, 12, '#ff4400');
+                    // Explosive projectile detonates - check blast radius for damage
+                    particles.addExplosion(p.x, p.y, 15, '#ff4400');
+                    particles.addExplosion(p.x, p.y, 8, '#ff8800');
                     audio.playExplosion();
+                    if (game) game.addShake(5);
                     const blastDist = dist(p.x, p.y, player.x, player.y);
                     if (blastDist < p.blastRadius && !p.isPlayer) {
-                        const dmg = player.takeDamage(Math.round(p.damage * 0.6));
+                        // Damage falls off with distance
+                        const falloff = 1 - (blastDist / p.blastRadius) * 0.4;
+                        const dmg = player.takeDamage(Math.round(p.damage * 0.6 * falloff));
                         if (dmg > 0) {
-                            particles.addText(player.x, player.y - 30, `-${dmg}`, '#ff2222', 16);
-                            if (game) game.addShake(4);
+                            particles.addText(player.x, player.y - 30, `-${dmg}`, '#ff2222', 18);
+                            if (game) game.addShake(6);
                         }
                     }
                 } else {
@@ -317,17 +329,38 @@ export class CombatSystem {
         const d = dist(kraken.x, kraken.y, player.x, player.y);
         const inaccuracy = (Math.random() - 0.5) * 0.12 * (d / 200);
 
-        this.projectiles.push({
-            x: kraken.x, y: kraken.y,
-            vx: Math.cos(a + inaccuracy) * speed,
-            vy: Math.sin(a + inaccuracy) * speed,
-            damage: kraken.cannonDamage,
-            life: 2.0,
-            isPlayer: false,
-            size: kraken.redEyeMode ? 7 : 5,
-            explosive: kraken.redEyeMode, // Explosive when red eye
-            blastRadius: 80
-        });
+        if (kraken.redEyeMode) {
+            // Explosive shot: targets player's current position
+            // Projectile will detonate when it reaches the target area
+            const fireAngle = a + inaccuracy;
+            const travelTime = d / speed; // Time to reach player's current position
+            this.projectiles.push({
+                x: kraken.x, y: kraken.y,
+                vx: Math.cos(fireAngle) * speed,
+                vy: Math.sin(fireAngle) * speed,
+                damage: kraken.cannonDamage,
+                life: travelTime + 0.3, // Slight buffer past target
+                isPlayer: false,
+                size: 7,
+                explosive: true,
+                blastRadius: 80,
+                targetX: player.x,
+                targetY: player.y
+            });
+        } else {
+            // Normal shot
+            this.projectiles.push({
+                x: kraken.x, y: kraken.y,
+                vx: Math.cos(a + inaccuracy) * speed,
+                vy: Math.sin(a + inaccuracy) * speed,
+                damage: kraken.cannonDamage,
+                life: 1.5,
+                isPlayer: false,
+                size: 5,
+                explosive: false,
+                blastRadius: 0
+            });
+        }
 
         if (d < 400) audio.playCannon();
     }

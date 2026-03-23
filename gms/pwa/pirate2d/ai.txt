@@ -1,14 +1,14 @@
 CORSAIR'S FATE - PIRATE 2D ROGUELITE
 =====================================
 Tech: Vanilla JS (ES modules), HTML5 Canvas, PWA, no build tools
-Service Worker: corsairs-fate-v6
+Service Worker: corsairs-fate-v7
 
 FILE STRUCTURE:
-  js/game.js      - Main game loop, asset loading, boss spawning, run management
+  js/game.js      - Main game loop, asset loading, boss spawning, run management, low-HP glow
   js/enemies.js   - ENEMY_TYPES[9], Enemy class (healing, mines), EnemySpawner
   js/player.js    - Player class, stats, extraCannons, bossesDefeatedThisRun
-  js/combat.js    - Projectiles, mines[], explosive shots, multi-cannon firing
-  js/kraken.js    - Kraken boss (procedural drawing, red eye mode, healing)
+  js/combat.js    - Projectiles, mines[], targeted explosive shots, multi-cannon firing
+  js/kraken.js    - Kraken boss (half-submerged drawing, red eye mode, healing)
   js/upgrades.js  - RUN_UPGRADES, PERMANENT_UPGRADES, EXTRA_CANNON_COSTS
   js/ui.js        - HUD, panels, title screen, upgrade panel with extra cannon
   js/story.js     - 3-run story system, RUN_CHAPTERS, boss triggers
@@ -20,7 +20,7 @@ FILE STRUCTURE:
   js/trading.js   - Port trading system, buy/sell goods
   js/utils.js     - Math helpers, AssetLoader, formatGold
   css/style.css   - All styling
-  sw.js           - Service worker v6, network-first nav, cache-first assets
+  sw.js           - Service worker v7, network-first nav, cache-first assets
 
 === SHIP SPRITE MAP (assets/ships/) ===
 24 PNG files in a conceptual 4-row grid:
@@ -68,11 +68,15 @@ Player proximity check -> explosion + damage + screen shake
 Drawing: 8-spike shape with pulsing red center
 
 === KRAKEN (kraken.js) ===
-Procedural boss - tentacles, body, eyes drawn with canvas
+Procedural boss - half-submerged: only top dome + eyes visible, tentacles below
+  Body clipped to show only top portion (brow ridges, head bumps)
+  Waterline effect with animated waves and foam at submersion edge
+  No mouth/teeth visible - appears partially underwater
 HP: 750 * (1 + (level-1)*0.3), heals 3x
 Red eye mode: cycles 8-13s normal -> 4-6s red
-  When red: eyes glow red, shots are explosive (blastRadius:80)
-  Explosive shots detonate on expiry even if miss, dealing 60% damage in radius
+  When red: eyes glow red, fires targeted explosive shots
+  Explosive shots target player's position at fire time, detonate on arrival
+  Blast radius 80px with distance-based damage falloff (60% base damage)
 Attacks: tentacle slam (6-10s), ink attack (4-7s)
 AI: chase/circle-strafe, never leashes
 
@@ -86,10 +90,21 @@ Persistent: saved in player._savePersistent()
 === COMBAT SYSTEM (combat.js) ===
 CombatSystem: projectiles[], mines[]
 Player auto-fires from port/starboard sides, multi-cannon support
-Explosive projectiles: { explosive:true, blastRadius:80 } - detonate on expiry
-Kraken fires via _fireKrakenCannon() - explosive when redEyeMode
+Explosive projectiles: { explosive:true, blastRadius:80, targetX, targetY }
+  Targeted shots travel to player's position at fire time, detonate within 30px
+  Non-targeted explosive shots detonate on life expiry
+  Detonation: double explosion particles + screen shake + blast radius damage
+Kraken fires via _fireKrakenCannon() - targeted explosive when redEyeMode
+Normal Kraken shots: standard projectiles with life:1.5
 Enemy kills: gold + cargo drops, boss bonus (25% heal + 2x gold)
 Run boss defeat -> game.onRunBossDefeated() -> victory fanfare + finish button
+
+=== LOW HEALTH EFFECTS (game.js) ===
+_drawLowHealthGlow(): red vignette when player HP < 25%
+  Intensity scales from 0 at 25% to max near 0%
+  Radial gradient from center (clear) to edges (red)
+  Below 15% HP: additional heartbeat pulse overlay
+  Drawn in screen-space (not affected by zoom)
 
 === STORY SYSTEM (story.js) ===
 3 runs with RUN_CHAPTERS{1,2,3}:
@@ -128,3 +143,8 @@ SFX: playCannon, playHit, playExplosion, playBossExplosion, playCoin, playUpgrad
 Activated by including "abdebugt3st" in player name
 Buttons: GOD, B1, B2, KRK, B? (prompts for level, spawns Ghost Ship at that level)
 Uses game._getEnemyImports() to access Enemy/ENEMY_TYPES
+
+=== ZOOM SYSTEM (game.js) ===
+3 zoom levels: 1.0 (close), 0.75 (medium), 0.5 (far)
+Pinch-to-zoom on mobile, saved to localStorage
+viewW/viewH adjusted by zoomScale, all game rendering uses ctx.scale()
