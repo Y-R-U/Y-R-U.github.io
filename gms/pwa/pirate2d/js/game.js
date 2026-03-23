@@ -4,14 +4,16 @@ import { AssetLoader } from './utils.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { World } from './world.js';
-import { EnemySpawner, Enemy } from './enemies.js';
+import { EnemySpawner, Enemy, ENEMY_TYPES, BOSS_TYPE_LIEUTENANT, BOSS_TYPE_BLACKTIDE, BOSS_TYPE_ESCORT } from './enemies.js';
 import { CombatSystem } from './combat.js';
 import { TradingSystem } from './trading.js';
 import { UpgradeSystem } from './upgrades.js';
-import { StorySystem } from './story.js';
+import { StorySystem, RUN_NAMES } from './story.js';
 import { ParticleSystem } from './particles.js';
 import { AudioManager } from './audio.js';
 import { UIManager } from './ui.js';
+import { Kraken } from './kraken.js';
+import { DebugPanel } from './debug.js';
 import { dist } from './utils.js';
 
 const ASSET_PATH = 'assets/';
@@ -32,10 +34,12 @@ export class Game {
         this.upgradeSystem = new UpgradeSystem();
         this.story = new StorySystem();
         this.enemySpawner = new EnemySpawner();
+        this.debug = new DebugPanel(this);
 
         this.player = new Player(200, 0);
         this.world = new World();
         this.ui = new UIManager(this);
+        this.kraken = null;
 
         this.state = 'loading'; // loading, title, playing, paused, dead, dialogue, port
         this.lastTime = -1; // -1 signals first frame
@@ -70,11 +74,17 @@ export class Game {
 
         this._loadAssets().then(() => {
             this.state = 'title';
-            this.ui.showTitleScreen(
-                () => this._startNewGame(),
-                null,
-                this.player
-            );
+            // Show name input if player hasn't set a name yet
+            if (!this.player.playerName) {
+                this.ui.showNameInput((prefix, name) => {
+                    this.player.setName(prefix, name);
+                    this.debug.checkActivation(name);
+                    this._showTitleScreen();
+                });
+            } else {
+                this.debug.checkActivation(this.player.playerName);
+                this._showTitleScreen();
+            }
             // Fade out loading screen
             const loadingScreen = document.getElementById('loading-screen');
             if (loadingScreen) {
@@ -85,18 +95,38 @@ export class Game {
         });
     }
 
+    _showTitleScreen() {
+        this.ui.showTitleScreen(
+            (runNumber) => this._startNewGame(runNumber),
+            null,
+            this.player
+        );
+    }
+
     async _loadAssets() {
         const loads = [];
 
         // Ship sprites - use the Kenney pirate pack ships
         const shipFiles = [
             ['player_ship', 'ships/ship (1).png'],
+            ['player_ship_dmg', 'ships/ship (15).png'],
+            ['player_ship_heavy_dmg', 'ships/ship (18).png'],
             ['enemy_ship_1', 'ships/ship (3).png'],
             ['enemy_ship_2', 'ships/ship (5).png'],
             ['enemy_ship_3', 'ships/ship (7).png'],
             ['enemy_ship_4', 'ships/ship (9).png'],
             ['enemy_ship_5', 'ships/ship (11).png'],
             ['enemy_ship_6', 'ships/ship (13).png'],
+            // Damaged variants for enemies
+            ['damaged_ship_1', 'ships/ship (16).png'],
+            ['damaged_ship_2', 'ships/ship (16).png'],
+            ['damaged_ship_3', 'ships/ship (17).png'],
+            ['damaged_ship_4', 'ships/ship (17).png'],
+            // Boss ships (dark/black)
+            ['boss_ship_1', 'ships/ship (20).png'],
+            ['boss_ship_2', 'ships/ship (21).png'],
+            ['boss_ship_3', 'ships/ship (22).png'],
+            ['boss_ship_4', 'ships/ship (24).png'],
         ];
 
         // Tile sprites
@@ -127,6 +157,7 @@ export class Game {
 
         // Discover music
         await this.audio.discoverMusic(ASSET_PATH + 'music/');
+        this.audio.restoreUnlockedCreepy();
 
         // Pre-load first music track so it's ready to play immediately
         if (this.audio.musicTracks.length > 0) {
@@ -216,7 +247,7 @@ export class Game {
         }, { passive: true });
     }
 
-    _startNewGame() {
+    _startNewGame(runNumber) {
         this.audio.init();
         this.audio.resume();
         this.audio.stopMusic();
@@ -230,6 +261,15 @@ export class Game {
         this.combat.clear();
         this.particles.clear();
         this.story.reset();
+        this.kraken = null;
+
+        // Set run and scaling
+        const run = runNumber || this.player.currentRun || 1;
+        this.story.setRun(run);
+        this.enemySpawner.runScaling = 1 + (run - 1) * 0.3;
+
+        // Story completion callback
+        this.story.onDialogueComplete = (chapter) => this._onChapterComplete(chapter);
 
         this.camX = this.player.x;
         this.camY = this.player.y;
@@ -262,10 +302,102 @@ export class Game {
             return;
         }
 
+        // Wire up story callback
+        this.story.onDialogueComplete = (chapter) => this._onChapterComplete(chapter);
+
         this.portCooldown = 0;
         this.saveTimer = 0;
         this.state = 'playing';
         this.ui.showHUD();
+
+        // Show finish run button if boss was already defeated
+        if (this.player.bossDefeated) {
+            this.ui.showFinishRunButton(() => this._finishRun());
+        }
+    }
+
+    _onChapterComplete(chapter) {
+        if (!chapter) return;
+
+        // Spawn boss if chapter triggers it
+        if (chapter.spawnBoss) {
+            const spawnDist = 500;
+            const spawnX = this.player.x + Math.cos(this.player.angle) * spawnDist;
+            const spawnY = this.player.y + Math.sin(this.player.angle) * spawnDist;
+
+            if (chapter.spawnBoss === 3) {
+                this.spawnKraken(spawnX, spawnY);
+            } else {
+                this.spawnRunBoss(chapter.spawnBoss, spawnX, spawnY);
+            }
+        }
+
+        // Unlock creepy music track
+        if (chapter.unlockCreepy) {
+            this.audio.unlockCreepyTrack(chapter.unlockCreepy);
+        }
+    }
+
+    spawnRunBoss(bossNumber, x, y) {
+        const run = this.story.currentRun || 1;
+        const level = Math.max(1, Math.round(3 * (1 + (run - 1) * 0.3)));
+
+        if (bossNumber === 1) {
+            // Lieutenant - single boss
+            const boss = new Enemy(ENEMY_TYPES[BOSS_TYPE_LIEUTENANT], x, y, level);
+            this.enemySpawner.enemies.push(boss);
+        } else if (bossNumber === 2) {
+            // Captain Blacktide with 3 escorts
+            const boss = new Enemy(ENEMY_TYPES[BOSS_TYPE_BLACKTIDE], x, y, level);
+            this.enemySpawner.enemies.push(boss);
+
+            for (let i = 0; i < 3; i++) {
+                const angle = (Math.PI * 2 / 3) * i;
+                const ex = x + Math.cos(angle) * 150;
+                const ey = y + Math.sin(angle) * 150;
+                const escort = new Enemy(ENEMY_TYPES[BOSS_TYPE_ESCORT], ex, ey, Math.max(1, level - 1));
+                this.enemySpawner.enemies.push(escort);
+            }
+        }
+    }
+
+    spawnKraken(x, y) {
+        const run = this.story.currentRun || 3;
+        const level = Math.max(1, Math.round(3 * (1 + (run - 1) * 0.3)));
+        this.kraken = new Kraken(x, y, level);
+    }
+
+    onRunBossDefeated(boss) {
+        this.player.onBossDefeated();
+        this.audio.playVictoryFanfare();
+
+        const runName = RUN_NAMES[(this.story.currentRun || 1) - 1] || 'Unknown';
+        this.ui.showBossVictory(runName, boss.isKraken ? 'THE KRAKEN' : boss.type ? boss.type.name : 'Boss');
+
+        // Show finish run button
+        setTimeout(() => {
+            this.ui.showFinishRunButton(() => this._finishRun());
+        }, 3000);
+    }
+
+    _finishRun() {
+        this.player.finishRun();
+        this.ui.hideFinishRunButton();
+        try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
+        // Return to title
+        this.player = new Player(200, 0);
+        this.kraken = null;
+        this.state = 'title';
+        if (!this.player.playerName) {
+            this.ui.showNameInput((prefix, name) => {
+                this.player.setName(prefix, name);
+                this.debug.checkActivation(name);
+                this._showTitleScreen();
+            });
+        } else {
+            this.debug.checkActivation(this.player.playerName);
+            this._showTitleScreen();
+        }
     }
 
     _showCurrentDialogue() {
@@ -292,17 +424,24 @@ export class Game {
     _handleDeath() {
         this.state = 'dead';
         this.audio.playDeath();
+        this.kraken = null;
         const stats = this.player.onDeath();
         setTimeout(() => {
+            this.ui.hideFinishRunButton();
             this.ui.showDeathScreen(stats, () => {
                 // Reload player persistent data
                 this.player = new Player(200, 0);
                 this.state = 'title';
-                this.ui.showTitleScreen(
-                    () => this._startNewGame(),
-                    null,
-                    this.player
-                );
+                if (!this.player.playerName) {
+                    this.ui.showNameInput((prefix, name) => {
+                        this.player.setName(prefix, name);
+                        this.debug.checkActivation(name);
+                        this._showTitleScreen();
+                    });
+                } else {
+                    this.debug.checkActivation(this.player.playerName);
+                    this._showTitleScreen();
+                }
             });
         }, 800);
     }
@@ -419,6 +558,13 @@ export class Game {
             }
         }
 
+        // Kraken update
+        if (this.kraken && this.kraken.alive) {
+            this.kraken.update(dt, this.player.x, this.player.y);
+        } else if (this.kraken && !this.kraken.alive) {
+            this.kraken = null;
+        }
+
         // Combat
         this.combat.update(dt, this.player, this.enemySpawner.enemies, this.particles, this.audio, this);
 
@@ -474,7 +620,7 @@ export class Game {
         }
 
         // Minimap
-        this.ui.updateMinimap(this.world, this.enemySpawner, this.player);
+        this.ui.updateMinimap(this.world, this.enemySpawner, this.player, this.kraken);
 
         // Auto-save
         this.saveTimer += dt;
@@ -500,7 +646,8 @@ export class Game {
                 gameTime: this.gameTime,
                 camX: this.camX,
                 camY: this.camY,
-                story: this.story.serialize()
+                story: this.story.serialize(),
+                kraken: this.kraken ? this.kraken.serialize() : null
             };
             localStorage.setItem('pirate2d_state', JSON.stringify(state));
         } catch(e) {}
@@ -544,6 +691,17 @@ export class Game {
             if (data.story) {
                 this.story.deserialize(data.story);
             }
+
+            // Restore Kraken
+            if (data.kraken) {
+                this.kraken = Kraken.deserialize(data.kraken);
+            } else {
+                this.kraken = null;
+            }
+
+            // Restore run scaling
+            const run = this.story.currentRun || 1;
+            this.enemySpawner.runScaling = 1 + (run - 1) * 0.3;
 
             // Ensure chunks are loaded around player position
             this.world.ensureChunksAround(this.camX, this.camY, this.viewW, this.viewH);
@@ -595,6 +753,11 @@ export class Game {
         // Draw enemies
         this.enemySpawner.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets, this.gameTime);
 
+        // Draw Kraken
+        if (this.kraken && this.kraken.alive) {
+            this.kraken.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets, this.gameTime);
+        }
+
         // Draw player
         if (this.player.alive) {
             this.player.draw(ctx, drawCamX, drawCamY, vw, vh, this.assets, this.gameTime);
@@ -608,8 +771,34 @@ export class Game {
 
         ctx.restore();
 
+        // Draw low health glow (screen-space, no zoom)
+        this._drawLowHealthGlow(ctx, screenW, screenH);
+
         // Draw joystick (screen-space, no zoom)
         this.input.drawJoystick(ctx);
+    }
+
+    _drawLowHealthGlow(ctx, screenW, screenH) {
+        if (!this.player.alive) return;
+        const ratio = this.player.hpRatio;
+        if (ratio >= 0.25) return;
+
+        // Intensity increases as HP drops: 0 at 25%, max at ~5%
+        const intensity = 1 - (ratio / 0.25);
+        const pulse = 0.5 + 0.5 * Math.sin(this.gameTime * 3);
+        const alpha = intensity * 0.35 * (0.6 + 0.4 * pulse);
+
+        ctx.save();
+        // Create radial gradient for vignette effect
+        const cx = screenW / 2;
+        const cy = screenH / 2;
+        const r = Math.max(screenW, screenH) * 0.7;
+        const grad = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r);
+        grad.addColorStop(0, 'rgba(200, 0, 0, 0)');
+        grad.addColorStop(1, `rgba(200, 0, 0, ${alpha})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, screenW, screenH);
+        ctx.restore();
     }
 
     _drawSafeZone(ctx, camX, camY, vw, vh) {

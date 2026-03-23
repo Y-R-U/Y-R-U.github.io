@@ -14,6 +14,7 @@ export const ENEMY_TYPES = [
         hitRadius: 20,
         scale: 0.6,
         shipSprite: 'enemy_ship_1',
+        damagedSprite: 'damaged_ship_1',
         color: '#886644'
     },
     {
@@ -27,6 +28,7 @@ export const ENEMY_TYPES = [
         hitRadius: 25,
         scale: 0.8,
         shipSprite: 'enemy_ship_2',
+        damagedSprite: 'damaged_ship_2',
         color: '#664422'
     },
     {
@@ -40,6 +42,7 @@ export const ENEMY_TYPES = [
         hitRadius: 32,
         scale: 1.1,
         shipSprite: 'enemy_ship_3',
+        damagedSprite: 'damaged_ship_3',
         color: '#442211'
     },
     {
@@ -53,6 +56,7 @@ export const ENEMY_TYPES = [
         hitRadius: 38,
         scale: 1.3,
         shipSprite: 'enemy_ship_4',
+        damagedSprite: 'damaged_ship_4',
         color: '#331100'
     },
     {
@@ -66,6 +70,7 @@ export const ENEMY_TYPES = [
         hitRadius: 30,
         scale: 1.0,
         shipSprite: 'enemy_ship_5',
+        damagedSprite: 'damaged_ship_3',
         color: '#445566',
         isBoss: true,
         glowColor: '#66aaff'
@@ -81,11 +86,68 @@ export const ENEMY_TYPES = [
         hitRadius: 50,
         scale: 1.6,
         shipSprite: 'enemy_ship_6',
+        damagedSprite: 'damaged_ship_4',
         color: '#225533',
         isBoss: true,
         glowColor: '#44ff88'
+    },
+    // === Run bosses (dark/black ships) ===
+    {
+        name: "Blacktide's Lieutenant",
+        baseHp: 500,
+        baseDamage: 35,
+        baseSpeed: 70,
+        baseGold: 400,
+        fireRate: 1.5,
+        range: 300,
+        hitRadius: 40,
+        scale: 1.4,
+        shipSprite: 'boss_ship_1',
+        damagedSprite: 'boss_ship_2',
+        color: '#1a1a2a',
+        isBoss: true,
+        isRunBoss: true,
+        glowColor: '#cc2222'
+    },
+    {
+        name: 'Captain Blacktide',
+        baseHp: 900,
+        baseDamage: 45,
+        baseSpeed: 55,
+        baseGold: 700,
+        fireRate: 1.8,
+        range: 350,
+        hitRadius: 48,
+        scale: 1.7,
+        shipSprite: 'boss_ship_3',
+        damagedSprite: 'boss_ship_4',
+        color: '#0a0a1a',
+        isBoss: true,
+        isRunBoss: true,
+        glowColor: '#aa0000'
+    },
+    // Dark escort ships
+    {
+        name: 'Dark Warship',
+        baseHp: 250,
+        baseDamage: 28,
+        baseSpeed: 65,
+        baseGold: 150,
+        fireRate: 1.2,
+        range: 280,
+        hitRadius: 32,
+        scale: 1.1,
+        shipSprite: 'boss_ship_1',
+        damagedSprite: 'boss_ship_2',
+        color: '#1a1a2a',
+        glowColor: '#882222'
     }
 ];
+
+// Type indices for boss spawning
+export const BOSS_TYPE_LIEUTENANT = 6;
+export const BOSS_TYPE_BLACKTIDE = 7;
+export const BOSS_TYPE_ESCORT = 8;
 
 export class Enemy {
     constructor(type, x, y, level) {
@@ -108,6 +170,7 @@ export class Enemy {
         this.cannonCooldown = 1 + Math.random() * 2;
         this.scale = type.scale;
         this.isBoss = type.isBoss || false;
+        this.isRunBoss = type.isRunBoss || false;
         this.glowColor = type.glowColor || null;
 
         // AI state
@@ -115,14 +178,21 @@ export class Enemy {
         this.patrolAngle = this.angle;
         this.patrolTimer = randFloat(2, 5);
         this.aggroRange = 400 + level * 20;
-        this.leashRange = 800;
+        this.leashRange = this.isRunBoss ? 99999 : 800;
         this.spawnX = x;
         this.spawnY = y;
         this.strafeDir = Math.random() < 0.5 ? 1 : -1;
+
+        // Fire timer for damage visual effects
+        this.fireTimer = 0;
     }
 
     get alive() {
         return this.hp > 0;
+    }
+
+    get hpRatio() {
+        return this.hp / this.maxHp;
     }
 
     takeDamage(amount) {
@@ -135,6 +205,11 @@ export class Enemy {
     update(dt, playerX, playerY) {
         const distToPlayer = dist(this.x, this.y, playerX, playerY);
         const distToSpawn = dist(this.x, this.y, this.spawnX, this.spawnY);
+
+        // Fire visual timer
+        if (this.hpRatio < 0.75) {
+            this.fireTimer -= dt;
+        }
 
         switch (this.aiState) {
             case 'patrol':
@@ -204,9 +279,9 @@ export class Enemy {
 
         // Maintain distance
         if (distToPlayer < this.cannonRange * 0.5) {
-            this.speed = this.maxSpeed * 0.4; // Slow down if too close
+            this.speed = this.maxSpeed * 0.4;
         } else if (distToPlayer > this.cannonRange * 0.8) {
-            this.speed = this.maxSpeed * 0.9; // Speed up to close distance
+            this.speed = this.maxSpeed * 0.9;
         } else {
             this.speed = this.maxSpeed * 0.6;
         }
@@ -232,7 +307,7 @@ export class Enemy {
 
         if (distToSpawn < 100) {
             this.aiState = 'patrol';
-            this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.1); // Heal a bit
+            this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.1);
         }
     }
 
@@ -269,15 +344,17 @@ export class Enemy {
 
         ctx.save();
 
-        // Boss glow
+        // Boss glow (pulsing red/black for run bosses)
         if (this.isBoss && this.glowColor) {
             ctx.save();
-            const glowPulse = 0.5 + 0.3 * Math.sin(time * 3);
+            const glowPulse = this.isRunBoss
+                ? 0.4 + 0.3 * Math.sin(time * 4)
+                : 0.5 + 0.3 * Math.sin(time * 3);
             ctx.globalAlpha = glowPulse;
             ctx.shadowColor = this.glowColor;
-            ctx.shadowBlur = 25;
+            ctx.shadowBlur = this.isRunBoss ? 35 : 25;
             ctx.beginPath();
-            ctx.arc(sx, sy, this.hitRadius + 10, 0, Math.PI * 2);
+            ctx.arc(sx, sy, this.hitRadius + (this.isRunBoss ? 15 : 10), 0, Math.PI * 2);
             ctx.fillStyle = this.glowColor;
             ctx.fill();
             ctx.restore();
@@ -287,7 +364,14 @@ export class Enemy {
         ctx.rotate(this.angle + Math.PI / 2);
 
         const s = this.scale;
-        const shipImg = assets.get(this.type.shipSprite);
+
+        // Choose sprite based on HP
+        let spriteKey = this.type.shipSprite;
+        if (this.hpRatio < 0.5 && this.type.damagedSprite) {
+            spriteKey = this.type.damagedSprite;
+        }
+
+        const shipImg = assets.get(spriteKey);
         if (shipImg) {
             ctx.drawImage(shipImg, -32 * s, -40 * s, 64 * s, 80 * s);
         } else {
@@ -313,8 +397,13 @@ export class Enemy {
             ctx.strokeRect(bx, by, barW, barH);
         }
 
-        // Level indicator for higher level enemies
-        if (this.level > 1) {
+        // Level / boss name
+        if (this.isRunBoss) {
+            ctx.font = 'bold 12px "Pirata One", Georgia, serif';
+            ctx.fillStyle = '#ff4444';
+            ctx.textAlign = 'center';
+            ctx.fillText(this.type.name, sx, sy - this.hitRadius - 16);
+        } else if (this.level > 1) {
             ctx.font = 'bold 10px Georgia';
             ctx.fillStyle = '#ffd700';
             ctx.textAlign = 'center';
@@ -339,7 +428,7 @@ export class Enemy {
         ctx.stroke();
 
         // Sail
-        ctx.fillStyle = this.isBoss ? '#444466' : '#cc3333';
+        ctx.fillStyle = this.isBoss ? (this.isRunBoss ? '#1a1a1a' : '#444466') : '#cc3333';
         ctx.beginPath();
         ctx.moveTo(-12 * s, -10 * s);
         ctx.quadraticCurveTo(-16 * s, 5 * s, -10 * s, 12 * s);
@@ -350,7 +439,7 @@ export class Enemy {
 
         // Skull on boss
         if (this.isBoss) {
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = this.isRunBoss ? '#cc0000' : '#fff';
             ctx.font = `${14 * s}px serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -365,6 +454,7 @@ export class EnemySpawner {
         this.spawnTimer = 0;
         this.maxEnemies = 25;
         this.bossSpawnDistance = 2000;
+        this.runScaling = 1.0; // Multiplied by run number
     }
 
     update(dt, playerX, playerY) {
@@ -377,9 +467,9 @@ export class EnemySpawner {
                 this.enemies.splice(i, 1);
                 continue;
             }
-            // Despawn enemies very far from player
+            // Despawn enemies very far from player (but never despawn run bosses)
             const d = dist(e.x, e.y, playerX, playerY);
-            if (d > 2500) {
+            if (d > 2500 && !e.isRunBoss) {
                 this.enemies.splice(i, 1);
             }
         }
@@ -392,7 +482,10 @@ export class EnemySpawner {
 
     _spawn(playerX, playerY) {
         const distFromOrigin = dist(playerX, playerY, 200, 200);
-        const level = Math.max(1, Math.floor(distFromOrigin / 600) + 1);
+        let level = Math.max(1, Math.floor(distFromOrigin / 600) + 1);
+
+        // Apply run scaling to level
+        level = Math.max(1, Math.round(level * this.runScaling));
 
         // Choose enemy type based on distance/level
         let typeIdx;
@@ -408,7 +501,7 @@ export class EnemySpawner {
             typeIdx = randInt(1, 3);
         }
 
-        // Boss spawn
+        // Mini-boss spawn (ghost ships / old kraken)
         if (distFromOrigin > this.bossSpawnDistance && Math.random() < 0.08) {
             typeIdx = distFromOrigin > 4000 ? 5 : 4;
         }
@@ -449,8 +542,8 @@ export class EnemySpawner {
             const ey = (enemy.y - playerY) * scale + halfSize;
             if (ex < 0 || ex > size || ey < 0 || ey > size) continue;
 
-            ctx.fillStyle = enemy.isBoss ? '#ff4444' : '#cc3333';
-            const dotSize = enemy.isBoss ? 3 : 2;
+            ctx.fillStyle = enemy.isRunBoss ? '#ff0000' : enemy.isBoss ? '#ff4444' : '#cc3333';
+            const dotSize = enemy.isRunBoss ? 4 : enemy.isBoss ? 3 : 2;
             ctx.beginPath();
             ctx.arc(ex, ey, dotSize, 0, Math.PI * 2);
             ctx.fill();

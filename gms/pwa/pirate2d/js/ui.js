@@ -3,6 +3,8 @@
 import { TRADE_GOODS } from './trading.js';
 import { RUN_UPGRADES, PERMANENT_UPGRADES } from './upgrades.js';
 import { formatGold } from './utils.js';
+import { NAME_PREFIXES } from './player.js';
+import { RUN_NAMES } from './story.js';
 
 export class UIManager {
     constructor(game) {
@@ -234,7 +236,7 @@ export class UIManager {
         }
     }
 
-    updateMinimap(world, enemySpawner, player) {
+    updateMinimap(world, enemySpawner, player, kraken) {
         const ctx = this.minimapCanvas.getContext('2d');
         ctx.clearRect(0, 0, 130, 130);
         ctx.save();
@@ -246,6 +248,9 @@ export class UIManager {
         ctx.arc(65, 65, 65, 0, Math.PI * 2);
         ctx.clip();
         enemySpawner.drawOnMinimap(ctx, player.x, player.y, 130);
+        if (kraken && kraken.alive) {
+            kraken.drawOnMinimap(ctx, player.x, player.y, 130);
+        }
         ctx.restore();
     }
 
@@ -261,6 +266,7 @@ export class UIManager {
         if (hasPlayed) {
             permHTML = `
                 <div style="color:#c4a035;font-size:14px;margin-bottom:20px;text-align:center;">
+                    ${player.fullName ? `<div style="color:#ffd700;font-size:16px;margin-bottom:6px;">${player.fullName}</div>` : ''}
                     Saved Gold: <span style="color:#ffd700;font-weight:bold;">${formatGold(player.persistentGold)}</span>
                     &nbsp;|&nbsp; Runs: ${player.totalRuns}
                     &nbsp;|&nbsp; Best: ${Math.round(player.bestDistance)}m
@@ -272,12 +278,32 @@ export class UIManager {
         let hasSavedGame = false;
         try { hasSavedGame = !!localStorage.getItem('pirate2d_state'); } catch(e) {}
 
+        // Build run selection buttons
+        let runSelectHTML = '';
+        if (hasPlayed) {
+            runSelectHTML = '<div style="margin-bottom:16px;text-align:center;">';
+            runSelectHTML += '<div style="color:#c4a035;font-size:13px;margin-bottom:8px;">Choose Your Voyage:</div>';
+            runSelectHTML += '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">';
+            for (let i = 0; i < 3; i++) {
+                const runNum = i + 1;
+                const completed = player.completedRuns.includes(runNum);
+                const unlocked = runNum === 1 || player.completedRuns.includes(runNum - 1);
+                const isCurrent = runNum === player.currentRun;
+                const checkmark = completed ? ' \u2713' : '';
+                const btnClass = isCurrent ? 'btn btn-green' : (unlocked ? 'btn' : 'btn');
+                const disabled = !unlocked ? 'style="opacity:0.4;pointer-events:none;"' : '';
+                runSelectHTML += `<button class="${btnClass} btn-small" data-run="${runNum}" ${disabled} style="font-size:11px;padding:6px 10px;min-width:auto;${!unlocked ? 'opacity:0.4;pointer-events:none;' : ''}">${runNum}. ${RUN_NAMES[i]}${checkmark}</button>`;
+            }
+            runSelectHTML += '</div></div>';
+        }
+
         panel.innerHTML = `
             <h1>CORSAIR'S FATE</h1>
             <div class="subtitle">A Pirate Roguelite</div>
             ${permHTML}
             ${hasSavedGame ? '<button class="btn btn-green" id="btn-continue" style="margin:8px;min-width:200px;font-size:18px;padding:14px 30px;">\u26F5 Continue Voyage</button>' : ''}
-            <button class="btn" id="btn-new-game">Set Sail</button>
+            ${runSelectHTML}
+            <button class="btn" id="btn-new-game">${hasPlayed ? '\u2693 New Voyage' : 'Set Sail'}</button>
             ${hasPlayed ? '<button class="btn" id="btn-perm-upgrades" style="margin:8px;min-width:200px;font-size:16px;padding:10px 24px;">\u2693 Upgrades</button>' : ''}
             <div class="version">v1.0 - Kenney Assets</div>
         `;
@@ -290,7 +316,17 @@ export class UIManager {
             // Clear any saved game state when starting fresh
             try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
             this.closePanel();
-            onNewGame();
+            onNewGame(player.currentRun || 1);
+        });
+
+        // Run selection buttons
+        panel.querySelectorAll('[data-run]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const runNum = parseInt(btn.dataset.run);
+                try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
+                this.closePanel();
+                onNewGame(runNum);
+            });
         });
 
         // Continue button
@@ -855,6 +891,114 @@ export class UIManager {
             try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
             this.showToast('Progress reset! Refresh to apply.');
         });
+    }
+
+    // Name input popup
+    showNameInput(onComplete) {
+        this.closePanel();
+        const overlay = document.createElement('div');
+        overlay.className = 'settings-overlay';
+        this.uiLayer.appendChild(overlay);
+        this._settingsOverlay = overlay;
+
+        const panel = document.createElement('div');
+        panel.className = 'game-panel';
+        panel.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,92vw);z-index:300;text-align:center;';
+
+        let prefixOptions = NAME_PREFIXES.map((p, i) =>
+            `<option value="${p}" ${i === 0 ? 'selected' : ''}>${p}</option>`
+        ).join('');
+
+        panel.innerHTML = `
+            <h2 style="margin-bottom:16px;">Name Yer Captain</h2>
+            <div style="margin-bottom:12px;">
+                <select id="name-prefix" style="padding:8px;font-size:15px;background:#3d2510;color:#f0d9a0;border:2px solid #8b6914;border-radius:6px;font-family:'Pirata One',Georgia,serif;width:100%;margin-bottom:8px;">
+                    ${prefixOptions}
+                </select>
+                <input type="text" id="name-input" placeholder="Enter yer name..." maxlength="20"
+                    style="padding:10px;font-size:16px;background:#3d2510;color:#f0d9a0;border:2px solid #8b6914;border-radius:6px;width:100%;font-family:'Pirata One',Georgia,serif;text-align:center;">
+            </div>
+            <div id="name-preview" style="color:#ffd700;font-size:18px;margin-bottom:16px;min-height:24px;"></div>
+            <button class="btn btn-green" id="btn-name-confirm" style="opacity:0.5;pointer-events:none;">Confirm</button>
+        `;
+
+        this.uiLayer.appendChild(panel);
+        this.activePanel = panel;
+
+        const input = panel.querySelector('#name-input');
+        const prefix = panel.querySelector('#name-prefix');
+        const preview = panel.querySelector('#name-preview');
+        const confirm = panel.querySelector('#btn-name-confirm');
+
+        const updatePreview = () => {
+            const name = input.value.trim();
+            if (name.length > 0) {
+                preview.textContent = `${prefix.value} ${name}`;
+                confirm.style.opacity = '1';
+                confirm.style.pointerEvents = 'auto';
+            } else {
+                preview.textContent = '';
+                confirm.style.opacity = '0.5';
+                confirm.style.pointerEvents = 'none';
+            }
+        };
+
+        input.addEventListener('input', updatePreview);
+        prefix.addEventListener('change', updatePreview);
+
+        confirm.addEventListener('click', () => {
+            const name = input.value.trim();
+            if (name.length > 0) {
+                this.closePanel();
+                onComplete(prefix.value, name);
+            }
+        });
+
+        // Focus the input
+        setTimeout(() => input.focus(), 100);
+    }
+
+    // Boss victory announcement
+    showBossVictory(runName, bossName) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+            z-index:350;text-align:center;pointer-events:none;
+            animation: toastIn 0.5s ease-out;
+        `;
+        toast.innerHTML = `
+            <div style="font-size:clamp(24px,6vw,42px);color:#ffd700;font-family:'Pirata One',Georgia,serif;text-shadow:3px 3px 8px rgba(0,0,0,0.9);margin-bottom:12px;">VICTORY!</div>
+            <div style="font-size:clamp(14px,3vw,20px);color:#44ff44;font-family:'Pirata One',Georgia,serif;text-shadow:2px 2px 4px rgba(0,0,0,0.8);">${bossName} defeated!</div>
+            <div style="font-size:clamp(12px,2.5vw,16px);color:#c4a035;font-family:'Pirata One',Georgia,serif;margin-top:8px;">${runName} complete</div>
+        `;
+        this.uiLayer.appendChild(toast);
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 5000);
+    }
+
+    // Finish run button (bottom left)
+    showFinishRunButton(onFinish) {
+        this.hideFinishRunButton();
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-green';
+        btn.id = 'finish-run-btn';
+        btn.textContent = '\u2693 Finish Voyage';
+        btn.style.cssText = `
+            position:fixed;bottom:max(20px,env(safe-area-inset-bottom,0px));
+            left:max(10px,env(safe-area-inset-left,0px));
+            z-index:60;pointer-events:auto;font-size:14px;padding:10px 16px;
+        `;
+        btn.addEventListener('click', () => onFinish());
+        this.uiLayer.appendChild(btn);
+        this._finishRunBtn = btn;
+    }
+
+    hideFinishRunButton() {
+        if (this._finishRunBtn) {
+            if (this._finishRunBtn.parentNode) this._finishRunBtn.parentNode.removeChild(this._finishRunBtn);
+            this._finishRunBtn = null;
+        }
     }
 
     // Toast notification
