@@ -297,10 +297,26 @@ export class UIManager {
             runSelectHTML += '</div></div>';
         }
 
+        // Extra cannon upgrade (available after completing stories)
+        let extraCannonHTML = '';
+        const canBuyCannon = this.game.upgradeSystem.canBuyExtraCannon(player);
+        if (canBuyCannon) {
+            const cost = this.game.upgradeSystem.getExtraCannonCost(player);
+            const canAfford = player.persistentGold >= cost;
+            extraCannonHTML = `
+                <div style="margin:12px auto;padding:12px 16px;max-width:320px;background:linear-gradient(180deg,rgba(80,50,20,0.9) 0%,rgba(50,30,10,0.9) 100%);border:2px solid rgba(255,215,0,0.4);border-radius:8px;text-align:center;">
+                    <div style="font-size:16px;color:#ffd700;margin-bottom:6px;">💣 Extra Cannon Available!</div>
+                    <div style="font-size:13px;color:#c4a035;margin-bottom:8px;">+1 cannon (${player.cannonCount} → ${player.cannonCount + 1})</div>
+                    <button class="btn ${canAfford ? 'btn-green' : ''}" id="btn-extra-cannon" ${canAfford ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)} saved gold</button>
+                </div>
+            `;
+        }
+
         panel.innerHTML = `
             <h1>CORSAIR'S FATE</h1>
             <div class="subtitle">A Pirate Roguelite</div>
             ${permHTML}
+            ${extraCannonHTML}
             ${hasSavedGame ? '<button class="btn btn-green" id="btn-continue" style="margin:8px;min-width:200px;font-size:18px;padding:14px 30px;">\u26F5 Continue Voyage</button>' : ''}
             ${runSelectHTML}
             <button class="btn" id="btn-new-game">${hasPlayed ? '\u2693 New Voyage' : 'Set Sail'}</button>
@@ -345,6 +361,20 @@ export class UIManager {
                 this.showPermanentUpgradesPopup(player, () => {
                     this.showTitleScreen(onNewGame, null, player);
                 });
+            });
+        }
+
+        // Extra cannon button (title screen)
+        const extraCannonBtn = panel.querySelector('#btn-extra-cannon');
+        if (extraCannonBtn) {
+            extraCannonBtn.addEventListener('click', () => {
+                const result = this.game.upgradeSystem.buyExtraCannon(player, this.game.audio);
+                if (result.success) {
+                    this.showToast(`Extra cannon installed! Total: ${result.totalCannons} cannons`);
+                    this.showTitleScreen(onNewGame, null, player);
+                } else {
+                    this.showToast(result.reason);
+                }
             });
         }
     }
@@ -611,24 +641,7 @@ export class UIManager {
             `;
         }
 
-        // Extra cannon upgrade (available after boss defeats)
-        let extraCannonHTML = '';
-        if (upgradeSystem.canBuyExtraCannon(player)) {
-            const cost = upgradeSystem.getExtraCannonCost(player);
-            const canBuy = player.gold >= cost;
-            extraCannonHTML = `
-                <div style="border-top:1px solid rgba(255,215,0,0.3);margin-top:8px;padding-top:8px;">
-                    <div class="item-row">
-                        <span style="font-size:18px;margin-right:6px;">\uD83D\uDCA3</span>
-                        <span class="item-name">Extra Cannon<br><small style="color:#ffd700;">+1 cannon (${player.cannonCount} \u2192 ${player.cannonCount + 1})</small></span>
-                        <span class="item-qty">${player.extraCannons}/${EXTRA_CANNON_COSTS.length}</span>
-                        <div class="item-actions">
-                            <button class="btn btn-small ${canBuy ? 'btn-green' : ''}" id="btn-extra-cannon" ${canBuy ? '' : 'style="opacity:0.5;"'}>${formatGold(cost)}g</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        const extraCannonHTML = '';
 
         panel.innerHTML = `
             <div class="panel-header">
@@ -672,21 +685,6 @@ export class UIManager {
             });
         });
 
-        // Extra cannon button
-        const extraBtn = panel.querySelector('#btn-extra-cannon');
-        if (extraBtn) {
-            extraBtn.addEventListener('click', () => {
-                const result = upgradeSystem.buyExtraCannon(player, audio);
-                if (result.success) {
-                    this.showToast(`Extra cannon installed! Total: ${result.totalCannons} cannons`);
-                    this.updateHUD(player);
-                    const st = itemsContainer.scrollTop;
-                    this.showUpgradePanel(player, upgradeSystem, audio, st);
-                } else {
-                    this.showToast(result.reason);
-                }
-            });
-        }
     }
 
     // Dock prompt - shown when near a port (player must tap to enter)
