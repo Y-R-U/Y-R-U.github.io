@@ -10,9 +10,12 @@ const viewLogin  = document.getElementById('view-login');
 const viewHome   = document.getElementById('view-home');
 const viewEditor = document.getElementById('view-editor');
 const syncDot    = document.getElementById('sync-dot');
+const cardGrid   = document.getElementById('card-grid');
 
 let currentView     = null;
 let currentParentId = null;
+let _lastSyncTime   = 0;
+const SYNC_COOLDOWN  = 5000; // ms — minimum gap between auto-syncs
 
 // ─── View switching ───────────────────────────────────────────────────────────
 
@@ -60,17 +63,34 @@ function initApp(username) {
 
   initRouter();
 
-  // Background sync — update the dot and re-render home if it was visible
-  setSyncDot('syncing');
-  syncFromCloud().then(() => {
-    setSyncDot('synced');
-    if (currentView === 'home') renderHome(currentParentId);
-    // Fade dot back to neutral after 2 s
-    setTimeout(() => setSyncDot(''), 2000);
-  }).catch(() => {
-    setSyncDot('error');
-    setTimeout(() => setSyncDot(''), 3000);
+  // ── Shared sync helper (used by initial load, visibility, and pull-to-refresh)
+  async function doSync() {
+    const now = Date.now();
+    if (now - _lastSyncTime < SYNC_COOLDOWN) return;
+    _lastSyncTime = now;
+
+    setSyncDot('syncing');
+    try {
+      await syncFromCloud();
+      setSyncDot('synced');
+      if (currentView === 'home') renderHome(currentParentId);
+      setTimeout(() => setSyncDot(''), 2000);
+    } catch {
+      setSyncDot('error');
+      setTimeout(() => setSyncDot(''), 3000);
+    }
+  }
+
+  // Initial sync on load
+  doSync();
+
+  // ── Sync when app regains focus (tab switch, phone wake, etc.) ──
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') doSync();
   });
+
+  // ── Pull-to-refresh on the card grid ──
+  initPullToRefresh(cardGrid, doSync);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js');
@@ -114,6 +134,54 @@ function initLogin() {
 
   // Auto-focus after animation
   setTimeout(() => usernameInput.focus(), 300);
+}
+
+// ─── Pull-to-refresh ──────────────────────────────────────────────────────────
+
+function initPullToRefresh(scrollEl, onRefresh) {
+  const THRESHOLD = 80;   // px pull distance to trigger
+  let startY   = 0;
+  let pulling  = false;
+  let indicator = null;
+
+  // Lazily create the indicator element
+  function getIndicator() {
+    if (!indicator) {
+      indicator = document.getElementById('pull-indicator');
+    }
+    return indicator;
+  }
+
+  scrollEl.addEventListener('touchstart', (e) => {
+    if (scrollEl.scrollTop > 0) return; // only when scrolled to top
+    startY  = e.touches[0].clientY;
+    pulling = true;
+  }, { passive: true });
+
+  scrollEl.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy < 0) { pulling = false; return; }
+
+    const el = getIndicator();
+    const progress = Math.min(dy / THRESHOLD, 1);
+    el.style.opacity = progress;
+    el.style.transform = `translateX(-50%) translateY(${Math.min(dy * 0.4, 50)}px) rotate(${progress * 360}deg)`;
+    el.classList.toggle('ready', progress >= 1);
+  }, { passive: true });
+
+  scrollEl.addEventListener('touchend', () => {
+    if (!pulling) return;
+    pulling = false;
+
+    const el = getIndicator();
+    const isReady = el.classList.contains('ready');
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(0)';
+    el.classList.remove('ready');
+
+    if (isReady) onRefresh();
+  }, { passive: true });
 }
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
