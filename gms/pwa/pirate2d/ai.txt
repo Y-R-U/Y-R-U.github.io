@@ -50,7 +50,9 @@ World._loadCustomTemplates(): reads pirate2d_custom_islands from localStorage on
 _placeIslandInChunk(): if customTemplates exist, stamps template tiles into chunk
   Template centered on the procedural island center position
   Hotspots with type "port" generate real game ports
-_stampExistingIslands(): places tiles for pre-existing islands (e.g. home island) on chunk gen
+Islands are separate from ports: ports float on water for unobstructed gameplay
+  Islands are distant explorable landmarks (side-quest content)
+  Home port (Haven's Rest) has NO island tiles - just a port marker on water
 
 === SHIP SPRITE MAP (assets/ships/) ===
 24 PNG files in a conceptual 4-row grid:
