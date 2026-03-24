@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corsairs-fate-v10';
+const CACHE_NAME = 'corsairs-fate-v11';
 const ASSETS = [
     './',
     './index.html',
