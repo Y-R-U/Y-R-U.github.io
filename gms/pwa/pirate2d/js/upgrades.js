@@ -75,7 +75,7 @@ export class UpgradeSystem {
     }
 
     canBuyExtraCannon(player) {
-        return player.bossesDefeatedThisRun > player.extraCannons && player.extraCannons < EXTRA_CANNON_COSTS.length;
+        return (player.completedRuns || []).length > player.extraCannons && player.extraCannons < EXTRA_CANNON_COSTS.length;
     }
 
     getExtraCannonCost(player) {
@@ -86,8 +86,8 @@ export class UpgradeSystem {
     buyExtraCannon(player, audio) {
         if (!this.canBuyExtraCannon(player)) return { success: false, reason: 'Not available' };
         const cost = this.getExtraCannonCost(player);
-        if (player.gold < cost) return { success: false, reason: 'Not enough gold' };
-        player.gold -= cost;
+        if (player.persistentGold < cost) return { success: false, reason: 'Not enough saved gold' };
+        player.persistentGold -= cost;
         player.extraCannons++;
         player._savePersistent();
         if (audio) audio.playUpgrade();
