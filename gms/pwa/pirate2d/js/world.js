@@ -169,9 +169,6 @@ export class World {
             this._placeIslandInChunk(chunk, cx, cy, rng, distFromOrigin);
         }
 
-        // Stamp existing islands that overlap this chunk (e.g. home island)
-        this._stampExistingIslands(chunk, cx, cy);
-
         this.chunks.set(key, chunk);
     }
 
@@ -304,33 +301,6 @@ export class World {
         }
 
         this.islands.push(island);
-    }
-
-    _stampExistingIslands(chunk, cx, cy) {
-        // Place tiles for pre-existing islands (like home island) that overlap this chunk
-        const chunkX = cx * CHUNK_PX;
-        const chunkY = cy * CHUNK_PX;
-
-        for (const isl of this.islands) {
-            if (!isl.radius) continue;
-            const radiusTiles = isl.radius / TILE_SIZE;
-            // Quick bounding box check
-            if (isl.x + isl.radius < chunkX || isl.x - isl.radius > chunkX + CHUNK_PX) continue;
-            if (isl.y + isl.radius < chunkY || isl.y - isl.radius > chunkY + CHUNK_PX) continue;
-
-            for (let ty = 0; ty < CHUNK_SIZE; ty++) {
-                for (let tx = 0; tx < CHUNK_SIZE; tx++) {
-                    if (chunk.tiles[ty * CHUNK_SIZE + tx] > 0) continue; // already has tile
-                    const wx = chunkX + tx * TILE_SIZE + TILE_SIZE / 2;
-                    const wy = chunkY + ty * TILE_SIZE + TILE_SIZE / 2;
-                    const d = dist(wx, wy, isl.x, isl.y);
-                    if (d < isl.radius) {
-                        chunk.tiles[ty * CHUNK_SIZE + tx] = d < isl.radius * 0.7 ? 1 : 42;
-                        chunk.hasIsland = true;
-                    }
-                }
-            }
-        }
     }
 
     getTile(worldX, worldY) {
