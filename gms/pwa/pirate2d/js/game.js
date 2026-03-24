@@ -33,11 +33,11 @@ export class Game {
         this.trading = new TradingSystem();
         this.upgradeSystem = new UpgradeSystem();
         this.story = new StorySystem();
-        this.enemySpawner = new EnemySpawner();
         this.debug = new DebugPanel(this);
 
         this.player = new Player(200, 0);
         this.world = new World();
+        this.enemySpawner = new EnemySpawner(this.world);
         this.ui = new UIManager(this);
         this.kraken = null;
 
@@ -144,11 +144,8 @@ export class Game {
             ['boss_ship_alt2', 'ships/ship (21).png'],
         ];
 
-        // Tile sprites
-        const tileFiles = [
-            ['tile_beach', 'tiles/tile_42.png'],
-            ['tile_land', 'tiles/tile_01.png'],
-        ];
+        // Tile sprites (lazy-loaded by world.js tile cache)
+        const tileFiles = [];
 
         // Effect sprites
         const effectFiles = [
@@ -272,6 +269,7 @@ export class Game {
 
         this.player.reset();
         this.world = new World();
+        this.enemySpawner.world = this.world;
         this.enemySpawner.clear();
         this.combat.clear();
         this.particles.clear();
@@ -360,10 +358,12 @@ export class Game {
         if (bossNumber === 1) {
             // Lieutenant - single boss
             const boss = new Enemy(ENEMY_TYPES[BOSS_TYPE_LIEUTENANT], x, y, level);
+            boss._world = this.world;
             this.enemySpawner.enemies.push(boss);
         } else if (bossNumber === 2) {
             // Captain Blacktide with 3 escorts
             const boss = new Enemy(ENEMY_TYPES[BOSS_TYPE_BLACKTIDE], x, y, level);
+            boss._world = this.world;
             this.enemySpawner.enemies.push(boss);
 
             for (let i = 0; i < 3; i++) {
@@ -371,6 +371,7 @@ export class Game {
                 const ex = x + Math.cos(angle) * 150;
                 const ey = y + Math.sin(angle) * 150;
                 const escort = new Enemy(ENEMY_TYPES[BOSS_TYPE_ESCORT], ex, ey, Math.max(1, level - 1));
+                escort._world = this.world;
                 this.enemySpawner.enemies.push(escort);
             }
         }
@@ -693,6 +694,7 @@ export class Game {
 
             // Restore world (with saved seed, ports, islands)
             this.world = new World(data.world);
+            this.enemySpawner.world = this.world;
 
             // Restore player state
             this.player.deserializeState(data.player);
@@ -702,6 +704,7 @@ export class Game {
             if (data.enemies) {
                 for (const eData of data.enemies) {
                     const enemy = Enemy.deserialize(eData);
+                    enemy._world = this.world;
                     this.enemySpawner.enemies.push(enemy);
                 }
             }
