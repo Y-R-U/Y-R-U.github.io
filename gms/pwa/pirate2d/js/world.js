@@ -6,6 +6,29 @@ const TILE_SIZE = 64;
 const CHUNK_SIZE = 16; // tiles per chunk
 const CHUNK_PX = CHUNK_SIZE * TILE_SIZE;
 
+// Custom island template storage key
+const CUSTOM_ISLANDS_KEY = 'pirate2d_custom_islands';
+
+// Tile sprite cache: tileNum -> Image (lazy-loaded)
+const _tileCache = new Map();
+const _tilePending = new Set();
+
+function getTileSpriteAsync(num) {
+    if (_tileCache.has(num)) return _tileCache.get(num);
+    if (_tilePending.has(num)) return null;
+    _tilePending.add(num);
+    const img = new Image();
+    const padded = String(num).padStart(2, '0');
+    img.onload = () => { _tileCache.set(num, img); _tilePending.delete(num); };
+    img.onerror = () => { _tilePending.delete(num); };
+    img.src = `assets/tiles/tile_${padded}.png`;
+    return null;
+}
+
+// Pre-cache the two tiles used by procedural generation
+getTileSpriteAsync(1);
+getTileSpriteAsync(42);
+
 // Port names
 const PORT_NAMES = [
     'Tortuga', 'Nassau', 'Port Royal', 'Havana', 'Santiago',
@@ -23,6 +46,7 @@ export class World {
         this.chunks = new Map();
         this.islands = [];
         this.ports = [];
+        this._loadCustomTemplates();
 
         if (savedState) {
             // Restore from saved state
@@ -34,6 +58,22 @@ export class World {
             this.worldSeed = Math.floor(Math.random() * 999999);
             this.portNameIdx = 0;
             this._generateStartArea();
+        }
+    }
+
+    _loadCustomTemplates() {
+        try {
+            this.customTemplates = JSON.parse(localStorage.getItem(CUSTOM_ISLANDS_KEY) || '[]');
+        } catch {
+            this.customTemplates = [];
+        }
+        // Pre-cache tile sprites used by custom templates
+        for (const tpl of this.customTemplates) {
+            if (tpl.tiles) {
+                for (const t of tpl.tiles) {
+                    if (t > 0) getTileSpriteAsync(t);
+                }
+            }
         }
     }
 
@@ -129,6 +169,9 @@ export class World {
             this._placeIslandInChunk(chunk, cx, cy, rng, distFromOrigin);
         }
 
+        // Stamp existing islands that overlap this chunk (e.g. home island)
+        this._stampExistingIslands(chunk, cx, cy);
+
         this.chunks.set(key, chunk);
     }
 
@@ -149,15 +192,40 @@ export class World {
             }
         }
 
-        // Always place tiles for rendering
-        for (let ty = 0; ty < CHUNK_SIZE; ty++) {
-            for (let tx = 0; tx < CHUNK_SIZE; tx++) {
-                const d = dist(tx, ty, islandCenterTX, islandCenterTY);
-                if (d < radius + (rng.next() - 0.5) * 1.5) {
-                    if (d < radius - 1) {
-                        chunk.tiles[ty * CHUNK_SIZE + tx] = 2; // Inner land
-                    } else {
-                        chunk.tiles[ty * CHUNK_SIZE + tx] = 1; // Beach/shore
+        // Pick a custom template if available, otherwise procedural
+        const templateIdx = this.customTemplates.length > 0
+            ? rng.int(0, this.customTemplates.length - 1) : -1;
+        const template = templateIdx >= 0 ? this.customTemplates[templateIdx] : null;
+
+        if (template) {
+            // Stamp custom template tiles centered on island position
+            const tw = template.width;
+            const th = template.height;
+            const startTX = islandCenterTX - Math.floor(tw / 2);
+            const startTY = islandCenterTY - Math.floor(th / 2);
+            for (let y = 0; y < th; y++) {
+                for (let x = 0; x < tw; x++) {
+                    const cx2 = startTX + x;
+                    const cy2 = startTY + y;
+                    if (cx2 >= 0 && cx2 < CHUNK_SIZE && cy2 >= 0 && cy2 < CHUNK_SIZE) {
+                        const tileVal = template.tiles[y * tw + x];
+                        if (tileVal > 0) {
+                            chunk.tiles[cy2 * CHUNK_SIZE + cx2] = tileVal;
+                        }
+                    }
+                }
+            }
+        } else {
+            // Procedural island - tile 42 = beach, tile 1 = land
+            for (let ty = 0; ty < CHUNK_SIZE; ty++) {
+                for (let tx = 0; tx < CHUNK_SIZE; tx++) {
+                    const d = dist(tx, ty, islandCenterTX, islandCenterTY);
+                    if (d < radius + (rng.next() - 0.5) * 1.5) {
+                        if (d < radius - 1) {
+                            chunk.tiles[ty * CHUNK_SIZE + tx] = 1; // Land (tile_01)
+                        } else {
+                            chunk.tiles[ty * CHUNK_SIZE + tx] = 42; // Beach (tile_42)
+                        }
                     }
                 }
             }
@@ -175,30 +243,93 @@ export class World {
             return;
         }
 
+        // Calculate effective radius based on template or procedural
+        const effectiveRadius = template
+            ? Math.max(template.width, template.height) / 2 * TILE_SIZE
+            : radius * TILE_SIZE;
+
         const island = {
             x: worldCenterX,
             y: worldCenterY,
-            radius: radius * TILE_SIZE,
-            hasPort: rng.next() < 0.6
+            radius: effectiveRadius,
+            hasPort: false,
+            templateId: template ? template.id : null,
+            name: template ? template.name : null
         };
-        this.islands.push(island);
 
-        // Maybe add a port
-        if (island.hasPort) {
-            const portType = PORT_TYPES[rng.int(0, PORT_TYPES.length - 1)];
-            const name = PORT_NAMES[this.portNameIdx % PORT_NAMES.length];
-            this.portNameIdx++;
-            const portAngle = rng.float(0, Math.PI * 2);
-            this.ports.push({
-                x: worldCenterX + Math.cos(portAngle) * radius * TILE_SIZE * 0.5,
-                y: worldCenterY + Math.sin(portAngle) * radius * TILE_SIZE * 0.5,
-                name,
-                type: portType,
-                radius: 80,
-                discovered: false,
-                isHome: false,
-                prices: this._generatePrices(portType)
-            });
+        // Check for hotspot-based ports from template
+        if (template && template.hotspots) {
+            const startTX = islandCenterTX - Math.floor(template.width / 2);
+            const startTY = islandCenterTY - Math.floor(template.height / 2);
+            for (const hs of template.hotspots) {
+                const hx = cx * CHUNK_PX + (startTX + hs.tx) * TILE_SIZE + TILE_SIZE / 2;
+                const hy = cy * CHUNK_PX + (startTY + hs.ty) * TILE_SIZE + TILE_SIZE / 2;
+                if (hs.type === 'port') {
+                    island.hasPort = true;
+                    const portType = PORT_TYPES[rng.int(0, PORT_TYPES.length - 1)];
+                    const name = PORT_NAMES[this.portNameIdx % PORT_NAMES.length];
+                    this.portNameIdx++;
+                    this.ports.push({
+                        x: hx, y: hy, name, type: portType,
+                        radius: 80, discovered: false, isHome: false,
+                        prices: this._generatePrices(portType)
+                    });
+                }
+                // treasure_map hotspots stored on island for future use
+            }
+            // Consume rng to stay in sync with procedural path
+            if (!island.hasPort) {
+                const _hasPort = rng.next() < 0.6;
+                if (_hasPort) {
+                    rng.int(0, PORT_TYPES.length - 1);
+                    rng.float(0, Math.PI * 2);
+                }
+            }
+        } else {
+            // Procedural port placement
+            island.hasPort = rng.next() < 0.6;
+            if (island.hasPort) {
+                const portType = PORT_TYPES[rng.int(0, PORT_TYPES.length - 1)];
+                const name = PORT_NAMES[this.portNameIdx % PORT_NAMES.length];
+                this.portNameIdx++;
+                const portAngle = rng.float(0, Math.PI * 2);
+                this.ports.push({
+                    x: worldCenterX + Math.cos(portAngle) * radius * TILE_SIZE * 0.5,
+                    y: worldCenterY + Math.sin(portAngle) * radius * TILE_SIZE * 0.5,
+                    name, type: portType,
+                    radius: 80, discovered: false, isHome: false,
+                    prices: this._generatePrices(portType)
+                });
+            }
+        }
+
+        this.islands.push(island);
+    }
+
+    _stampExistingIslands(chunk, cx, cy) {
+        // Place tiles for pre-existing islands (like home island) that overlap this chunk
+        const chunkX = cx * CHUNK_PX;
+        const chunkY = cy * CHUNK_PX;
+
+        for (const isl of this.islands) {
+            if (!isl.radius) continue;
+            const radiusTiles = isl.radius / TILE_SIZE;
+            // Quick bounding box check
+            if (isl.x + isl.radius < chunkX || isl.x - isl.radius > chunkX + CHUNK_PX) continue;
+            if (isl.y + isl.radius < chunkY || isl.y - isl.radius > chunkY + CHUNK_PX) continue;
+
+            for (let ty = 0; ty < CHUNK_SIZE; ty++) {
+                for (let tx = 0; tx < CHUNK_SIZE; tx++) {
+                    if (chunk.tiles[ty * CHUNK_SIZE + tx] > 0) continue; // already has tile
+                    const wx = chunkX + tx * TILE_SIZE + TILE_SIZE / 2;
+                    const wy = chunkY + ty * TILE_SIZE + TILE_SIZE / 2;
+                    const d = dist(wx, wy, isl.x, isl.y);
+                    if (d < isl.radius) {
+                        chunk.tiles[ty * CHUNK_SIZE + tx] = d < isl.radius * 0.7 ? 1 : 42;
+                        chunk.hasIsland = true;
+                    }
+                }
+            }
         }
     }
 
@@ -269,22 +400,14 @@ export class World {
                     const wave = Math.sin((tx + ty) * 0.3 + performance.now() * 0.001) * 10;
                     ctx.fillStyle = `rgb(${20 + wave}, ${60 + wave}, ${120 + wave})`;
                     ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
-                } else if (tile === 1) {
-                    // Beach
-                    const beachImg = assets.get('tile_beach');
-                    if (beachImg) {
-                        ctx.drawImage(beachImg, sx, sy, TILE_SIZE, TILE_SIZE);
+                } else {
+                    // Land tile - look up sprite by tile number
+                    const tileImg = getTileSpriteAsync(tile);
+                    if (tileImg) {
+                        ctx.drawImage(tileImg, sx, sy, TILE_SIZE, TILE_SIZE);
                     } else {
-                        ctx.fillStyle = '#d4b86a';
-                        ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
-                    }
-                } else if (tile === 2) {
-                    // Land
-                    const landImg = assets.get('tile_land');
-                    if (landImg) {
-                        ctx.drawImage(landImg, sx, sy, TILE_SIZE, TILE_SIZE);
-                    } else {
-                        ctx.fillStyle = '#3a7a3a';
+                        // Fallback color while loading
+                        ctx.fillStyle = tile === 42 ? '#d4b86a' : '#3a7a3a';
                         ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
                     }
                 }

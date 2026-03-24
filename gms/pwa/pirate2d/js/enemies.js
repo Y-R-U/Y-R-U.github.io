@@ -269,8 +269,18 @@ export class Enemy {
         }
 
         // Move
-        this.x += Math.cos(this.angle) * this.speed * dt;
-        this.y += Math.sin(this.angle) * this.speed * dt;
+        const newX = this.x + Math.cos(this.angle) * this.speed * dt;
+        const newY = this.y + Math.sin(this.angle) * this.speed * dt;
+
+        // Land avoidance: check if new position is on land
+        if (this._world && this._world.isLand(newX, newY)) {
+            // Steer away from land by reversing and turning
+            this.angle += Math.PI * 0.6;
+            this.speed = this.maxSpeed * 0.5;
+        } else {
+            this.x = newX;
+            this.y = newY;
+        }
 
         // Cooldown
         if (this.cannonCooldown > 0) this.cannonCooldown -= dt;
@@ -503,8 +513,9 @@ export class Enemy {
 }
 
 export class EnemySpawner {
-    constructor() {
+    constructor(world) {
         this.enemies = [];
+        this.world = world;
         this.spawnTimer = 0;
         this.maxEnemies = 25;
         this.bossSpawnDistance = 2000;
@@ -572,7 +583,12 @@ export class EnemySpawner {
         const spawnDistFromOrigin = dist(spawnX, spawnY, 200, 200);
         if (spawnDistFromOrigin < 400) return;
 
-        this.enemies.push(new Enemy(type, spawnX, spawnY, level));
+        // Don't spawn on land
+        if (this.world && this.world.isLand(spawnX, spawnY)) return;
+
+        const enemy = new Enemy(type, spawnX, spawnY, level);
+        enemy._world = this.world;
+        this.enemies.push(enemy);
     }
 
     clear() {

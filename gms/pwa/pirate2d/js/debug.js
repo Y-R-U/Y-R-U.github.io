@@ -40,6 +40,7 @@ export class DebugPanel {
 
         const buttons = [
             { label: 'GOD', color: '#8b2020', action: () => this._showGodPanel() },
+            { label: 'ISL', color: '#2a6e4a', action: () => this._openIslandEditor() },
             { label: 'B1', color: '#4a2080', action: () => this._spawnBoss(1) },
             { label: 'B2', color: '#204a80', action: () => this._spawnBoss(2) },
             { label: 'KRK', color: '#206040', action: () => this._spawnBoss(3) },
@@ -226,6 +227,21 @@ export class DebugPanel {
         this.game.resume();
     }
 
+    async _openIslandEditor() {
+        this.game.pause();
+        try {
+            const { IslandEditor } = await import('./island-editor.js');
+            if (!this._islandEditor) {
+                this._islandEditor = new IslandEditor(this.game);
+            }
+            await this._islandEditor.open();
+        } catch (e) {
+            console.error('Failed to load island editor:', e);
+            this.game.ui.showToast('Island editor failed to load');
+            this.game.resume();
+        }
+    }
+
     _spawnCustomBoss() {
         const input = prompt('Enter boss level (e.g. 15):');
         if (!input) return;
@@ -243,6 +259,7 @@ export class DebugPanel {
         // Spawn a Ghost Ship (boss type, index 4) at the given level
         const { Enemy, ENEMY_TYPES } = this.game._getEnemyImports();
         const boss = new Enemy(ENEMY_TYPES[4], spawnX, spawnY, level);
+        boss._world = this.game.world;
         this.game.enemySpawner.enemies.push(boss);
         this.game.ui.showToast(`DEBUG: Lv${level} ${ENEMY_TYPES[4].name} spawned!`);
     }
