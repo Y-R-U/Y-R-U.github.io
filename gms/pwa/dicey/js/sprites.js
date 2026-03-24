@@ -141,42 +141,6 @@ const Sprites = {
         ctx.fillText(token, x, y + 1);
     },
 
-    // Draw a house marker
-    drawHouse(ctx, x, y, size) {
-        ctx.fillStyle = '#2ecc71';
-        ctx.beginPath();
-        ctx.moveTo(x, y - size * 0.6);
-        ctx.lineTo(x + size / 2, y);
-        ctx.lineTo(x + size / 3, y);
-        ctx.lineTo(x + size / 3, y + size * 0.3);
-        ctx.lineTo(x - size / 3, y + size * 0.3);
-        ctx.lineTo(x - size / 3, y);
-        ctx.lineTo(x - size / 2, y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = '#27ae60';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-    },
-
-    // Draw a hotel marker
-    drawHotel(ctx, x, y, size) {
-        ctx.fillStyle = '#e74c3c';
-        const w = size * 0.7;
-        const h = size * 0.8;
-        this.roundRect(ctx, x - w / 2, y - h / 2, w, h, 2);
-        ctx.fill();
-        ctx.strokeStyle = '#c0392b';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-        // H letter
-        ctx.fillStyle = '#fff';
-        ctx.font = `bold ${size * 0.4}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('H', x, y);
-    },
-
     // Draw board space icons
     drawSpaceIcon(ctx, x, y, size, type) {
         ctx.save();
@@ -185,67 +149,49 @@ const Sprites = {
 
         switch (type) {
             case 'go':
-                ctx.font = `bold ${size * 0.5}px sans-serif`;
+                ctx.font = `bold ${size * 0.32}px sans-serif`;
                 ctx.fillStyle = '#2ecc71';
-                ctx.fillText('GO', x, y - size * 0.1);
-                // Arrow
+                ctx.fillText('START', x, y - size * 0.1);
+                // Arrow pointing left (←)
                 ctx.fillStyle = '#2ecc71';
                 ctx.beginPath();
-                ctx.moveTo(x - size * 0.25, y + size * 0.2);
-                ctx.lineTo(x + size * 0.15, y + size * 0.2);
-                ctx.lineTo(x + size * 0.15, y + size * 0.12);
-                ctx.lineTo(x + size * 0.3, y + size * 0.25);
-                ctx.lineTo(x + size * 0.15, y + size * 0.38);
-                ctx.lineTo(x + size * 0.15, y + size * 0.3);
-                ctx.lineTo(x - size * 0.25, y + size * 0.3);
+                ctx.moveTo(x + size * 0.25, y + size * 0.2);
+                ctx.lineTo(x - size * 0.15, y + size * 0.2);
+                ctx.lineTo(x - size * 0.15, y + size * 0.12);
+                ctx.lineTo(x - size * 0.3, y + size * 0.25);
+                ctx.lineTo(x - size * 0.15, y + size * 0.38);
+                ctx.lineTo(x - size * 0.15, y + size * 0.3);
+                ctx.lineTo(x + size * 0.25, y + size * 0.3);
                 ctx.closePath();
                 ctx.fill();
                 break;
 
             case 'jail':
-                // Bars
-                ctx.strokeStyle = '#95a5a6';
-                ctx.lineWidth = 2;
-                for (let i = -1; i <= 1; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(x + i * size * 0.15, y - size * 0.25);
-                    ctx.lineTo(x + i * size * 0.15, y + size * 0.25);
-                    ctx.stroke();
-                }
-                ctx.strokeStyle = '#95a5a6';
-                ctx.beginPath();
-                ctx.moveTo(x - size * 0.22, y);
-                ctx.lineTo(x + size * 0.22, y);
-                ctx.stroke();
-                break;
-
-            case 'parking':
-                ctx.font = `bold ${size * 0.35}px sans-serif`;
-                ctx.fillStyle = '#f39c12';
-                ctx.fillText('FREE', x, y - size * 0.08);
-                ctx.font = `${size * 0.2}px sans-serif`;
-                ctx.fillStyle = '#f39c12';
-                ctx.fillText('PARKING', x, y + size * 0.18);
-                break;
-
-            case 'chance':
-                ctx.font = `bold ${size * 0.55}px sans-serif`;
+                // Hospital - cross icon
+                ctx.font = `${size * 0.4}px sans-serif`;
+                ctx.fillText('🏥', x, y - size * 0.08);
+                ctx.font = `bold ${size * 0.13}px sans-serif`;
                 ctx.fillStyle = '#e74c3c';
-                ctx.fillText('?', x, y);
+                ctx.fillText('HOSPITAL', x, y + size * 0.2);
                 break;
 
-            case 'chest':
-                // Treasure chest
-                ctx.fillStyle = '#8B4513';
-                this.roundRect(ctx, x - size * 0.2, y - size * 0.1, size * 0.4, size * 0.25, 2);
-                ctx.fill();
-                ctx.fillStyle = '#D2691E';
-                this.roundRect(ctx, x - size * 0.22, y - size * 0.18, size * 0.44, size * 0.12, 2);
-                ctx.fill();
-                ctx.fillStyle = '#f5c518';
-                ctx.beginPath();
-                ctx.arc(x, y - size * 0.02, size * 0.04, 0, Math.PI * 2);
-                ctx.fill();
+            case 'rest':
+                // Rest Stop - healing/shield icon
+                ctx.font = `${size * 0.4}px sans-serif`;
+                ctx.fillText('💚', x, y - size * 0.08);
+                ctx.font = `bold ${size * 0.15}px sans-serif`;
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText('REST', x, y + size * 0.2);
+                break;
+
+            case 'fate':
+                // Fate card - crystal ball / question mark
+                ctx.font = `bold ${size * 0.5}px sans-serif`;
+                ctx.fillStyle = '#9b59b6';
+                ctx.fillText('?', x, y - size * 0.05);
+                ctx.font = `bold ${size * 0.13}px sans-serif`;
+                ctx.fillStyle = '#8e44ad';
+                ctx.fillText('FATE', x, y + size * 0.25);
                 break;
 
             case 'tax':
@@ -256,24 +202,12 @@ const Sprites = {
                 ctx.fillText('TAX', x, y + size * 0.25);
                 break;
 
-            case 'railroad':
-                ctx.font = `${size * 0.45}px sans-serif`;
-                ctx.fillText('🚂', x, y);
-                break;
-
-            case 'utility':
-                ctx.font = `${size * 0.45}px sans-serif`;
-                ctx.fillText('⚡', x, y);
-                break;
-
             case 'goToJail':
-                ctx.font = `bold ${size * 0.22}px sans-serif`;
+                ctx.font = `${size * 0.35}px sans-serif`;
+                ctx.fillText('🤕', x, y - size * 0.08);
+                ctx.font = `bold ${size * 0.17}px sans-serif`;
                 ctx.fillStyle = '#e74c3c';
-                ctx.fillText('GO TO', x, y - size * 0.12);
-                ctx.fillText('JAIL', x, y + size * 0.12);
-                // Handcuff icon
-                ctx.font = `${size * 0.3}px sans-serif`;
-                ctx.fillText('👮', x, y + size * 0.35);
+                ctx.fillText('INJURY', x, y + size * 0.22);
                 break;
         }
 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="assets/ui/hexagon_brown.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/icon-192.svg">
+    <meta name="theme-color" content="#1a3a5c">
+    <title>Corsair's Fate - Pirate Roguelite</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading screen (shown immediately, removed by JS) -->
+    <div id="loading-screen">
+        <div class="loading-wheel-container">
+            <svg class="loading-wheel" viewBox="0 0 100 100">
+                <!-- Outer ring -->
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#8b6914" stroke-width="4"/>
+                <circle cx="50" cy="50" r="36" fill="none" stroke="#6b4f10" stroke-width="2"/>
+                <!-- Spokes (8) -->
+                <line x1="50" y1="8" x2="50" y2="28" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="79.7" y1="20.3" x2="64.1" y2="35.9" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="92" y1="50" x2="72" y2="50" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="79.7" y1="79.7" x2="64.1" y2="64.1" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="50" y1="92" x2="50" y2="72" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="20.3" y1="79.7" x2="35.9" y2="64.1" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="8" y1="50" x2="28" y2="50" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <line x1="20.3" y1="20.3" x2="35.9" y2="35.9" stroke="#c4a035" stroke-width="3" stroke-linecap="round"/>
+                <!-- Handles (pegs) at the ends of spokes -->
+                <circle cx="50" cy="6" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="81.1" cy="18.9" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="94" cy="50" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="81.1" cy="81.1" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="50" cy="94" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="18.9" cy="81.1" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="6" cy="50" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <circle cx="18.9" cy="18.9" r="4" fill="#ffd700" stroke="#8b6914" stroke-width="1.5"/>
+                <!-- Center hub -->
+                <circle cx="50" cy="50" r="10" fill="#5c3a1e" stroke="#8b6914" stroke-width="3"/>
+                <circle cx="50" cy="50" r="4" fill="#ffd700"/>
+            </svg>
+        </div>
+        <div class="loading-text">Loading...</div>
+        <div class="loading-subtext">Preparing the seas...</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui-layer"></div>
+
+    <script type="module">
+        import { Game } from './js/game.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const game = new Game();
+            window.GAME = game;
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>

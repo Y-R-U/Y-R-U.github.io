@@ -71,6 +71,11 @@ const UI = (() => {
       ? Utils.formatCoins(ips) + '/s'
       : 'Tap to earn!';
 
+    // Difficulty speed multiplier
+    const multEl = document.getElementById('header-mult');
+    const diffMult = GameState.getDifficultyMult();
+    multEl.textContent = diffMult > 1 ? `Speed: ${Utils.formatNumber(diffMult)}x` : '';
+
     // Update buff indicators
     updateBuffBar();
   }
@@ -163,12 +168,14 @@ const UI = (() => {
         ? Math.min(100, (owned / nextMilestone.count) * 100)
         : 100;
 
+      const milestoneMult = GameData.getMilestoneMultiplier(owned);
+
       const row = document.createElement('div');
       row.className = `biz-row ${!unlocked ? 'locked' : ''} ${canAfford ? 'affordable' : ''}`;
       row.innerHTML = `
         <div class="biz-icon">${biz.icon}</div>
         <div class="biz-info">
-          <div class="biz-name">${biz.name} ${owned > 0 ? `<span class="biz-count">x${owned}</span>` : ''}</div>
+          <div class="biz-name">${biz.name} ${owned > 0 ? `<span class="biz-count">x${owned}</span>` : ''}${milestoneMult > 1 ? `<span class="biz-mult">${Utils.formatNumber(milestoneMult)}x</span>` : ''}</div>
           <div class="biz-income">${unlocked ? (income > 0 ? Utils.formatCoins(income) + '/s' : 'Idle') : 'Earn ' + Utils.formatCoins(biz.unlockCost) + ' to unlock'}</div>
           ${nextMilestone && owned > 0 ? `<div class="biz-milestone-bar"><div class="biz-milestone-fill" style="width:${milestoneProgress}%"></div><span class="biz-milestone-text">${owned}/${nextMilestone.count}</span></div>` : ''}
         </div>
@@ -283,19 +290,19 @@ const UI = (() => {
       <div class="prestige-stats">
         <div class="prestige-stat">
           <div class="stat-label">Pioneer Stars</div>
-          <div class="stat-value">\u2B50 ${currentStars}</div>
+          <div class="stat-value">\u2B50 ${Utils.formatNumber(currentStars)}</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">Current Bonus</div>
-          <div class="stat-value">${Math.round((prestigeMult - 1) * 100)}%</div>
+          <div class="stat-value">${Utils.formatNumber(Math.round((prestigeMult - 1) * 100))}%</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">Stars on Reset</div>
-          <div class="stat-value">+${newStars}</div>
+          <div class="stat-value">+${Utils.formatNumber(newStars)}</div>
         </div>
         <div class="prestige-stat">
           <div class="stat-label">New Bonus</div>
-          <div class="stat-value">${Math.round((nextMult - 1) * 100)}%</div>
+          <div class="stat-value">${Utils.formatNumber(Math.round((nextMult - 1) * 100))}%</div>
         </div>
       </div>
 
@@ -307,18 +314,26 @@ const UI = (() => {
       </div>
 
       <button class="prestige-btn ${newStars > 0 ? '' : 'disabled'}" id="prestige-btn" ${newStars > 0 ? '' : 'disabled'}>
-        ${newStars > 0 ? `Move West (+${newStars} \u2B50)` : 'Need $1M+ earned to Move West'}
+        ${newStars > 0 ? `Move West (+${Utils.formatNumber(newStars)} \u2B50)` : 'Need $1M+ earned to Move West'}
       </button>
     `;
 
     if (newStars > 0) {
       panel.querySelector('#prestige-btn').addEventListener('click', () => {
-        if (confirm(`Move West? You'll earn ${newStars} Pioneer Star(s) but lose all businesses and coins.`)) {
-          GameState.resetForPrestige();
-          updateHeader();
-          renderTab();
-          showToast('\uD83C\uDF05 You head West to a new frontier!');
-        }
+        showModal({
+          title: '\uD83C\uDF05 Move West',
+          message: `You'll earn ${newStars} Pioneer Star(s) but lose all businesses and coins.`,
+          confirmLabel: 'Move West',
+          cancelLabel: 'Stay',
+          confirmClass: 'modal-btn-primary'
+        }).then(ok => {
+          if (ok) {
+            GameState.resetForPrestige();
+            updateHeader();
+            renderTab();
+            showToast('\uD83C\uDF05 You head West to a new frontier!');
+          }
+        });
       });
     }
 
@@ -334,6 +349,18 @@ const UI = (() => {
 
     for (const ach of GameData.ACHIEVEMENTS) {
       const unlocked = state.achievements.includes(ach.id);
+
+      // Build tier multiplier badges if this achievement has a tierIndex
+      let tierHtml = '';
+      if (ach.tierIndex != null) {
+        const badges = Object.keys(GameData.DIFFICULTY_CONFIG).map(key => {
+          const cfg = GameData.DIFFICULTY_CONFIG[key];
+          const tier = cfg.tiers[ach.tierIndex];
+          return `${cfg.icon}${tier ? tier.mult + 'x' : ''}`;
+        }).join('  ');
+        tierHtml = `<div class="ach-tier-mults">${badges}</div>`;
+      }
+
       const row = document.createElement('div');
       row.className = `ach-row ${unlocked ? 'unlocked' : 'locked'}`;
       row.innerHTML = `
@@ -341,12 +368,42 @@ const UI = (() => {
         <div class="ach-info">
           <div class="ach-name">${unlocked ? ach.name : '???'}</div>
           <div class="ach-desc">${unlocked ? ach.desc : 'Keep playing to unlock'}</div>
+          ${tierHtml}
         </div>
       `;
       section.appendChild(row);
     }
 
     container.appendChild(section);
+  }
+
+  // ---- MODAL (replaces native confirm/alert) ----
+  function showModal({ title, message, confirmLabel, cancelLabel, confirmClass }) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `
+        <div class="modal-box">
+          <div class="modal-title">${title}</div>
+          <div class="modal-msg">${message}</div>
+          <div class="modal-buttons">
+            <button class="modal-btn modal-btn-cancel" data-action="cancel">${cancelLabel || 'Cancel'}</button>
+            <button class="modal-btn ${confirmClass || 'modal-btn-primary'}" data-action="confirm">${confirmLabel || 'OK'}</button>
+          </div>
+        </div>
+      `;
+
+      function close(result) {
+        overlay.remove();
+        resolve(result);
+      }
+
+      overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+      overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => close(true));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(false); });
+
+      document.body.appendChild(overlay);
+    });
   }
 
   // ---- TOAST ----
@@ -388,12 +445,18 @@ const UI = (() => {
     });
 
     document.getElementById('reset-btn').addEventListener('click', () => {
-      if (confirm('Are you sure? This will DELETE ALL progress permanently!')) {
-        if (confirm('Really? There is no undo!')) {
+      showModal({
+        title: '\u26A0\uFE0F Delete All Progress',
+        message: 'This will permanently DELETE ALL progress. There is no undo!',
+        confirmLabel: 'Delete Everything',
+        cancelLabel: 'Cancel',
+        confirmClass: 'modal-btn-danger'
+      }).then(ok => {
+        if (ok) {
           GameState.hardReset();
           location.reload();
         }
-      }
+      });
     });
   }
 

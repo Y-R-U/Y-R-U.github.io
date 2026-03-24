@@ -1,0 +1,227 @@
+Edit2D - 2D Level Editor - AI Reference File
+=============================================
+
+## Overview
+App: "Edit2D" - A 2D tile-based level and object editor PWA.
+Tech: Pure HTML/JS/CSS, ES modules, Canvas 2D API, no frameworks.
+Assets: Kenney CC0 2D asset packs (loaded from /gms/assets/kenney/2d/).
+Location: /app/pwa/edit2d/
+
+## Directory Structure
+app/pwa/edit2d/
+  index.html          - Single HTML file: toolbar, canvas, panels, modals
+  manifest.json       - PWA manifest (orientation: "any", theme: #1e1e2e)
+  sw.js               - Service worker (edit2d-v1, cache-first, dynamic cache for Kenney assets)
+  ai.txt              - This file
+  css/
+    style.css         - Dark theme styles, responsive 3-col layout, modals, panels
+  js/
+    app.js            - Entry: boot(), SW register, toolbar/menu wiring, mobile drawer
+    canvas.js         - Canvas renderer: grid, tiles, objects, camera transforms, culling
+    input.js          - Unified pointer events, pinch-zoom, 2-finger pan, scroll wheel, keyboard
+    editor.js         - Tool dispatch: brush paint, erase, flood fill, object place/move/delete, collision
+    state.js          - Central state object, layer CRUD, undo/redo (delta patches), serialize/deserialize
+    assets.js         - Asset catalog loading, sprite sheet loading, placeholder pack generation, tile lookup
+    palette.js        - Tile palette panel: search input, category tabs, tile grid thumbnails
+    layers.js         - Layer panel: visibility toggle, reorder, add/remove, active selection
+    tools.js          - Tool definitions (name, icon, cursor, shortcut), collision type definitions
+    io.js             - Export/import JSON, autosave to localStorage, new map, resize, PNG export
+    modal.js          - Custom modal system (alert, confirm, prompt, select) - NO js alerts
+    utils.js          - Shared: generateId, debounce, throttle, clamp, lerp
+  assets/
+    catalog.json      - Registry of available asset packs (placeholder + Kenney pack entries)
+  icons/
+    icon-192.png      - PWA icon 192x192
+    icon-512.png      - PWA icon 512x512
+
+Kenney assets location (shared, separate from editor):
+/gms/assets/kenney/2d/{packId}/tilemap.png + tilemap.json
+
+## State Shape (state.js)
+EditorState = {
+  map: { name: string, width: int, height: int, tileSize: int, backgroundColor: string },
+  layers: Layer[],              // ordered back-to-front
+  activeLayerId: string,
+  camera: { x: float, y: float, zoom: float },  // zoom range 0.25-8
+  tool: string,                 // "brush"|"eraser"|"fill"|"select"|"object"|"collision"|"pan"
+  selectedTileId: string|null,  // e.g. "grass_1", "wall_2"
+  brushSize: int,
+  showGrid: bool,
+  activePackId: string,         // "placeholder", "1bit", etc.
+  selection: { x, y, width, height }|null,
+  collisionType: int,           // 1=Solid, 2=Platform, 3=Trigger
+}
+
+Layer (tile/collision): { id, name, type, visible, locked, opacity, data: 2D array [row][col] }
+Layer (object): { id, name, type:"object", visible, locked, opacity, objects: Object[] }
+Object: { id, tileId, x, y, width, height, rotation, props, _selected }
+
+History: undoStack/redoStack of delta patches (max 100)
+Patch types: tilePaint, collisionPaint, objectAdd, objectRemove, objectMove
+
+## Functions by File
+
+### js/app.js
+- boot() -> Promise<void>           : Init all modules, load assets, restore autosave, center camera
+- wireToolbar() -> void              : Bind tool button click handlers
+- wireMenus() -> void               : Bind file/view/zoom menu handlers
+- setupMobileDrawer() -> void        : Touch drag on drawer handle to resize palette
+
+### js/canvas.js
+- init(canvasEl: HTMLCanvasElement) -> void  : Setup canvas, DPR, resize handler, start render loop
+- markDirtyCanvas() -> void          : Flag canvas for re-render next frame
+- setGhostTile(col, row, tileId) -> void    : Set preview tile under cursor
+- setGhostObject(x, y, tileId) -> void      : Set preview object under cursor
+- screenToWorld(sx, sy) -> {x, y}    : Screen pixel to world coordinate
+- worldToScreen(wx, wy) -> {x, y}    : World coordinate to screen pixel
+- worldToTile(wx, wy) -> {col, row}  : World coordinate to tile grid position
+- getCanvasSize() -> {width, height} : Canvas size in CSS pixels
+- render() [internal]                : Full redraw: background, layers, ghost, grid, selection
+
+### js/input.js
+- init(canvasEl: HTMLCanvasElement) -> void  : Attach pointer, wheel, keyboard listeners
+- onPointerDownCB(fn: (x,y,button) => void) : Register pointer down callback
+- onPointerMoveCB(fn: (x,y,buttons) => void): Register pointer move callback
+- onPointerUpCB(fn: (x,y) => void)          : Register pointer up callback
+- onZoomCB(fn: (factor,cx,cy) => void)      : Register zoom callback (pinch or wheel)
+- onPanCB(fn: (dx,dy) => void)              : Register pan callback (2-finger drag)
+- onKeyDownCB(fn: (event) => void)          : Register keyboard callback
+
+### js/editor.js
+- init() -> void                     : Wire input callbacks to editor logic
+- setTool(name: string) -> void      : Switch active tool, update UI
+- setCollisionType(type: int) -> void: Set collision paint type (1-3)
+- deleteSelectedObject() -> void     : Remove currently selected object
+- setStatusEl(el: HTMLElement) -> void: Set status bar element reference
+- updateStatus() -> void             : Refresh status bar text and toolbar highlights
+
+### js/state.js
+- getState() -> EditorState          : Get current state reference
+- setState(partial: object) -> void  : Merge partial update, mark dirty
+- getActiveLayer() -> Layer          : Get layer matching activeLayerId
+- getLayerById(id: string) -> Layer|undefined
+- markDirty() -> void                : Flag state as changed
+- consumeDirty() -> bool             : Check and clear dirty flag
+- onChange(fn: () => void) -> void    : Register change callback
+- initMap(w, h, tileSize) -> void    : Reset to empty map with default layers
+- resizeMap(newW, newH) -> void      : Resize preserving existing data
+- addLayer(type, name) -> Layer      : Add new layer, return it
+- removeLayer(id) -> void            : Remove layer by id
+- moveLayer(id, dir) -> void         : Reorder layer (+1/-1)
+- pushAction(patch) -> void          : Record undo action
+- undo() -> void                     : Undo last action
+- redo() -> void                     : Redo last undone action
+- canUndo() -> bool
+- canRedo() -> bool
+- serialize() -> object              : State to JSON-serializable object
+- deserialize(json: object) -> void  : Load from JSON object
+
+### js/assets.js
+- loadCatalog() -> Promise<void>     : Fetch assets/catalog.json
+- loadPack(packId: string) -> Promise<Pack|null>  : Load sprite sheet + metadata
+- getActivePack() -> Pack|null       : Get currently loaded pack
+- getTile(tileId: string) -> {image, sx, sy, sw, sh, name, category}|null
+- getAllTiles() -> TileDef[]         : All tiles in active pack
+- searchTiles(query: string) -> TileDef[]  : Filter by name/id substring
+- getTilesByCategory(cat: string) -> TileDef[]
+- getCategories() -> string[]        : ["all", "terrain", "walls", ...]
+
+### js/palette.js
+- init(containerEl: HTMLElement) -> void  : Build palette DOM, wire search
+- render() -> void                       : Rebuild categories + tile grid
+- refreshSelection() -> void             : Update visual selection state
+
+### js/layers.js
+- init(containerEl: HTMLElement) -> void  : Build layer panel DOM
+- render() -> void                       : Rebuild layer list from state
+
+### js/tools.js (constants only)
+- TOOLS: { brush, eraser, fill, select, object, collision, pan }
+  Each: { name, icon, cursor, shortcut }
+- COLLISION_TYPES: { 0: None, 1: Solid, 2: Platform, 3: Trigger }
+  Each: { name, color }
+
+### js/io.js
+- exportJSON() -> Promise<void>      : Prompt name, serialize, download .json
+- importJSON() -> Promise<void>      : Confirm, file picker, parse, deserialize
+- autosave() -> void                 : Debounced (1s) save to localStorage
+- loadAutosave() -> bool             : Restore from localStorage, return success
+- clearAutosave() -> void            : Remove localStorage entry
+- newMap() -> Promise<void>          : Confirm, prompt dimensions, initMap
+- resizeMapDialog() -> Promise<void> : Prompt new dimensions, resizeMap
+- exportPNG() -> Promise<void>       : Flatten visible layers to PNG download
+
+### js/modal.js
+- initModals() -> void               : Cache DOM references
+- modalAlert(message, title?) -> Promise<true>
+- modalConfirm(message, title?) -> Promise<bool>
+- modalPrompt(message, placeholder?, title?) -> Promise<string|null>
+- modalSelect(title, message, options: {label,value}[]) -> Promise<string|null>
+
+### js/utils.js
+- generateId(prefix?: string) -> string     : Random 8-char base36 id
+- debounce(fn, ms: int) -> function         : Debounced wrapper
+- throttle(fn, ms: int) -> function         : Throttled wrapper
+- clamp(val, min, max) -> number
+- lerp(a, b, t) -> number
+
+## Display Name vs Internal Name Mismatches
+Layers:
+  "Background" -> id "bg"
+  "Main"       -> id "main"
+  "Objects"    -> id "objects"
+  "Foreground" -> id "fg"
+  "Collision"  -> id "collision"
+
+Tools:
+  "Brush"     -> "brush",     shortcut B
+  "Eraser"    -> "eraser",    shortcut E
+  "Fill"      -> "fill",      shortcut F
+  "Select"    -> "select",    shortcut S
+  "Object"    -> "object",    shortcut O
+  "Collision" -> "collision", shortcut C
+  "Pan"       -> "pan",       shortcut H (for "hand")
+
+Collision types:
+  "None"     -> 0
+  "Solid"    -> 1
+  "Platform" -> 2
+  "Trigger"  -> 3
+
+Asset packs (catalog id -> display name):
+  "placeholder"       -> "Placeholder Pack"
+  "1bit"              -> "Kenney 1-Bit Pack"
+  "tiny-dungeon"      -> "Kenney Tiny Dungeon"
+  "tiny-town"         -> "Kenney Tiny Town"
+  "roguelike-rpg"     -> "Kenney Roguelike/RPG Pack"
+  "pixel-platformer"  -> "Kenney Pixel Platformer"
+
+## Key Design Notes
+- Canvas for viewport, DOM for all UI panels (hybrid approach)
+- ES modules (import/export), entry via <script type="module" src="js/app.js">
+- No alert()/prompt()/confirm() - all custom modals via modal.js
+- Undo/redo via delta-patch history (not full state snapshots)
+- Tile IDs are strings ("grass_1") not indices - levels are pack-portable
+- Object x,y are floating-point pixel coords (free-position, not grid-locked)
+- Autosave: debounced 1s to localStorage key "edit2d_autosave"
+- Camera centered on map at boot; zoom toward cursor position
+- Grid visible by default (toggle with G key)
+- Right-click on canvas = eyedropper (pick tile under cursor)
+- Middle-click drag = pan
+- Kenney asset packs loaded on-demand, cached dynamically by service worker
+- Mobile: bottom drawer palette, slide-in layers panel, 2-finger gestures
+
+## JSON Export Format
+{
+  "edit2d": "1.0",
+  "name": "Level Name",
+  "width": 32, "height": 24, "tileSize": 16,
+  "backgroundColor": "#1a1a2e",
+  "assetPack": "placeholder",
+  "layers": [ { id, name, type, visible, opacity, data|objects } ],
+  "metadata": { "createdAt": ISO, "editor": "Edit2D v1.0" }
+}
+
+Tile data: 2D array [row][col] of string tileId or null
+Collision data: 2D array [row][col] of int (0-3)
+Object: { id, tileId, x, y, width, height, rotation, props }

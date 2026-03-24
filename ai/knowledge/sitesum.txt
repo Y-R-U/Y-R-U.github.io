@@ -1,4 +1,4 @@
-Site folder summary for Y-R-U.github.io (generated 2026-02-19)
+Site folder summary for Y-R-U.github.io (updated 2026-03-10)
 ================================================================
 
 ROOT FILES
@@ -9,17 +9,23 @@ i2.html     - Alternate version of the main landing page
 TOP-LEVEL FOLDERS
 -----------------
 assets/     - Shared media assets (video files, e.g. Mv1.mp4)
-c/          - Claude Code projects folder; contains DriverC (isometric racing game) and Simple Shooter, with an index linking all sub-projects
+c/          - Claude Code projects folder; contains DriverC (isometric racing game) and Simple Shooter
 d/          - Image Editor web app for editing images in-browser
+d2/         - Drawing & image editor with layers, pen/shape/text/arrow tools, stroke/fill controls, and PNG export
 e/          - Monaco-based live HTML/JS/CSS code editor with project save/load and preview
 e2/         - Enhanced Monaco Editor (loads projects via projectData.js, compressed storage)
-gms/        - Games collection: Asteroids, Snake Battle, Pocket Legends CCG, Kingdom Management x2, Desert Throw, Interactive Storybook, Sudoku PWA, and a Tululoo-engine game (gms/z)
-k/          - K-Hydro Track: hydration/water-intake tracking app
+gms/        - Games collection: Asteroids, Snake Battle, Pocket Legends CCG, Kingdom Management x2, Desert Throw, Interactive Storybook, Sudoku PWA, Pirates, and a Tululoo-engine game (gms/z)
+k/          - K-Hydro Track: hydroponic plant management app with growth tracking, nutrient logs, harvest data, and photos
 m/          - Minimal textarea-based live HTML/JS/CSS code editor with project save/load
 m2/         - AB Edit: code editor with HTML/JS/CSS tabs (index.html) and a companion T.html view
 n/          - WebRTC STUN peer connection test tool using manual copy/paste signaling
 q/          - GoalTracker: goal-setting and progress tracking app (also has qTracker v1 at v1.html)
 t5/         - Dante's Top 5 Review: ranked list-making and review app
+
+APP SUB-FOLDERS
+---------------
+app/pwa/fnote/      - Fast Notes PWA: syncs notes across devices with folders, dark/light theme, drag-and-drop
+app/pwa/timezones/  - World Clock PWA: tracks times across cities, day/night indicators, meeting planner
 
 GMS SUB-FOLDERS
 ---------------
@@ -30,9 +36,24 @@ gms/k/kc/   - Kingdom Management (city/kingdom management sim)
 gms/k/kg/   - Kingdom Manager Sim (alternative kingdom sim)
 gms/o/      - Interactive Storybook Adventure
 gms/pwa/sudoku/ - Sudoku PWA (Progressive Web App with manifest and service worker)
+gms/pirates/    - 3D isometric pirate ship game (Babylon.js) with islands, water effects, and AI enemy ships
+gms/pwa/sudoku/ - Sudoku PWA with three difficulty levels, notes, undo, win detection, offline play
+gms/pwa/crpg/   - Lands of Ascii: retro console RPG with dungeon exploration and turn-based combat
+gms/pwa/dicey/  - Dicey: Monopoly-inspired board game with 2-4 players and AI opponents
+gms/pwa/drace/  - DRace: strategic dice-race battle game
+gms/pwa/idleLife/ - Life Idle: idle clicker career progression game
+gms/pwa/idleWestern/ - Idle Western: Western-themed idle frontier empire builder
+gms/pwa/miniwar/ - Mini War: real-time strategy battle with unit evolution and age progression
+gms/pwa/orpg/   - Dungeon ORPG: multiplayer online dungeon crawler
+gms/pwa/rcell/  - RCELL: roguelite bullet-hell immune defence game
 gms/s/      - Snake Battle game
 gms/t/      - Desert Throw game
-gms/z/      - Tululoo game engine exported game (action/arcade)
+gms/z/      - Tululoo game engine zombie action game (sprite sheet mode)
+
+C/ SUB-FOLDERS
+--------------
+c/driverc/       - Isometric racing game with 3-lap races, HUD, mobile joystick controls
+c/simple-shooter/- Browser shooter with SVG turret, aimed at incoming enemies, level progression
 
 AI FOLDERS (this area)
 -----------------------

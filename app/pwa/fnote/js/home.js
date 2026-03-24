@@ -177,12 +177,18 @@ async function handleNewNote(parentId) {
 //
 // Uses Pointer Events API — works on both desktop (mouse) and mobile (touch).
 //
-// Flow:
+// Flow (mouse):
 //   pointerdown on a card  → store drag candidate
 //   pointermove (document) → if moved > THRESHOLD px, activate drag
 //                            move ghost, highlight drop target under cursor
 //   pointerup   (document) → commit move or cancel
 //   pointercancel          → cancel
+//
+// Flow (touch):
+//   pointerdown on a card  → start long-press timer (500ms)
+//   pointermove before timer → if moved > THRESHOLD, cancel timer (it's a scroll)
+//   pointerup before timer  → cancel timer (it was just a tap)
+//   timer fires             → activate drag; subsequent pointermove moves ghost
 //
 // Drop zones:
 //   • #drag-cancel button (top-left)   → cancel, no move
@@ -190,9 +196,10 @@ async function handleNewNote(parentId) {
 //   • .card[data-item-id] folder cards → move into that folder
 //     (cycle detection prevents dropping a folder into its own descendant)
 
-const DRAG_THRESHOLD = 10;   // px movement before drag activates
+const DRAG_THRESHOLD = 10;    // px movement before drag activates (mouse) / cancels long-press (touch)
+const LONG_PRESS_MS  = 500;   // ms hold before touch drag activates
 
-let _drag            = null; // active drag state object
+let _drag              = null; // active drag state object
 let _suppressNextClick = false;
 
 // ── Entry point ──────────────────────────────────────────────────────────────
@@ -204,17 +211,71 @@ function dragStart(e, item) {
 
   _drag = {
     item,
-    pointerId:  e.pointerId,
-    originCard: e.currentTarget,
-    startX:     e.clientX,
-    startY:     e.clientY,
-    active:     false,
-    ghost:      null,
-    dropTarget: null,
-    dropData:   null,
+    pointerId:      e.pointerId,
+    originCard:     e.currentTarget,
+    startX:         e.clientX,
+    startY:         e.clientY,
+    active:         false,
+    ghost:          null,
+    dropTarget:     null,
+    dropData:       null,
+    longPressTimer: null,
   };
 
-  // Listen globally so we catch moves/releases outside the card
+  if (e.pointerType === 'touch') {
+    // Touch: require a long press to start drag so normal scrolling still works
+    e.currentTarget.classList.add('long-press-pending');
+    _drag.longPressTimer = setTimeout(() => _touchActivateDrag(), LONG_PRESS_MS);
+    document.addEventListener('pointermove',   _touchEarlyMove,   { passive: true });
+    document.addEventListener('pointerup',     _touchEarlyUp);
+    document.addEventListener('pointercancel', _touchEarlyCancel);
+  } else {
+    // Mouse: activate drag once pointer moves past threshold
+    document.addEventListener('pointermove',   onMove,   { passive: false });
+    document.addEventListener('pointerup',     onUp);
+    document.addEventListener('pointercancel', onCancel);
+  }
+}
+
+// ── Touch long-press helpers ──────────────────────────────────────────────────
+
+function _touchEarlyMove(e) {
+  if (!_drag || e.pointerId !== _drag.pointerId) return;
+  // If finger moves significantly it's a scroll — cancel the long press
+  if (Math.hypot(e.clientX - _drag.startX, e.clientY - _drag.startY) > DRAG_THRESHOLD) {
+    _clearLongPress();
+    cleanupDrag();
+  }
+}
+
+function _touchEarlyUp(e) {
+  if (!_drag || e.pointerId !== _drag.pointerId) return;
+  // Finger lifted before long press fired — treat as tap; let click fire normally
+  _clearLongPress();
+  cleanupDrag();
+}
+
+function _touchEarlyCancel() {
+  _clearLongPress();
+  cleanupDrag();
+}
+
+function _clearLongPress() {
+  if (_drag?.longPressTimer) {
+    clearTimeout(_drag.longPressTimer);
+    _drag.longPressTimer = null;
+  }
+  if (_drag?.originCard) _drag.originCard.classList.remove('long-press-pending');
+  document.removeEventListener('pointermove',   _touchEarlyMove);
+  document.removeEventListener('pointerup',     _touchEarlyUp);
+  document.removeEventListener('pointercancel', _touchEarlyCancel);
+}
+
+function _touchActivateDrag() {
+  if (!_drag) return;
+  _clearLongPress();
+  // Position ghost at finger start location; onMove will track from here
+  activateDrag({ clientX: _drag.startX, clientY: _drag.startY });
   document.addEventListener('pointermove',   onMove,   { passive: false });
   document.addEventListener('pointerup',     onUp);
   document.addEventListener('pointercancel', onCancel);

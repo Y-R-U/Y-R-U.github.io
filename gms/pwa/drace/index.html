@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="DRace - A strategic dice race battle game">
+    <title>DRace</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" sizes="192x192" href="icons/icon-192.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Splash / Title Screen -->
+        <div id="screen-title" class="screen active">
+            <div class="title-bg">
+                <canvas id="title-particles"></canvas>
+            </div>
+            <div class="title-content">
+                <div class="logo-container">
+                    <h1 class="game-logo">
+                        <span class="logo-d">D</span><span class="logo-race">RACE</span>
+                    </h1>
+                    <p class="logo-subtitle">DICE RACE BATTLE</p>
+                </div>
+                <div class="title-buttons">
+                    <button class="btn btn-primary btn-glow" id="btn-new-game" aria-label="Start a new game">
+                        <span class="btn-icon">&#9654;</span> NEW GAME
+                    </button>
+                    <button class="btn btn-secondary" id="btn-continue" style="display:none;" aria-label="Continue saved game">
+                        <span class="btn-icon">&#8635;</span> CONTINUE
+                    </button>
+                </div>
+                <div class="title-footer">
+                    <span class="version">v1.0</span>
+                </div>
+            </div>
+            <button class="btn-icon-circle btn-stats-title" id="btn-stats-title" aria-label="Stats" style="position:absolute;top:calc(16px + var(--safe-top));right:68px;z-index:5;">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+            </button>
+            <button class="btn-icon-circle btn-settings-title" id="btn-settings-title" aria-label="Settings">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.61 3.61 0 0112 15.6z"/></svg>
+            </button>
+        </div>
+
+        <!-- Setup Screen -->
+        <div id="screen-setup" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" id="btn-back-setup">&larr;</button>
+                <h2>Game Setup</h2>
+                <div></div>
+            </div>
+            <div class="setup-content">
+                <div class="setup-section">
+                    <label class="setup-label">Your Name</label>
+                    <input type="text" id="player-name" class="input-field" value="Player" maxlength="12" autocomplete="off">
+                </div>
+                <div class="setup-section">
+                    <label class="setup-label">Number of Players</label>
+                    <div class="player-count-select" id="player-count-select">
+                        <button class="count-btn active" data-count="2">2</button>
+                        <button class="count-btn" data-count="3">3</button>
+                        <button class="count-btn" data-count="4">4</button>
+                    </div>
+                </div>
+                <div class="setup-section">
+                    <label class="setup-label">Board Size</label>
+                    <div class="player-count-select" id="board-size-select">
+                        <button class="count-btn" data-size="30">Short</button>
+                        <button class="count-btn active" data-size="45">Medium</button>
+                        <button class="count-btn" data-size="60">Long</button>
+                    </div>
+                </div>
+                <div class="ai-players-preview" id="ai-players-preview"></div>
+                <div class="setup-section" id="local-mp-section" style="display:none;">
+                    <label class="setup-label">Local Players</label>
+                    <div id="local-player-slots"></div>
+                </div>
+                <button class="btn btn-primary btn-glow btn-start" id="btn-start-game">
+                    <span class="btn-icon">&#9654;</span> START RACE
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="screen-game" class="screen">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="current-player-badge" id="current-player-badge">
+                        <div class="player-avatar" id="hud-avatar"></div>
+                        <span id="hud-player-name">Player</span>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <div class="turn-counter" id="turn-counter">Turn 1</div>
+                </div>
+                <div class="hud-right">
+                    <button class="btn-icon-circle btn-log-game" id="btn-log-game" aria-label="Turn Log">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3 18h12v-2H3v2zM3 6v2h18V6H3zm0 7h18v-2H3v2z"/></svg>
+                    </button>
+                    <button class="btn-icon-circle btn-settings-game" id="btn-settings-game" aria-label="Settings">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.61 3.61 0 0112 15.6z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="board-container" id="board-container">
+                <canvas id="game-board"></canvas>
+            </div>
+            <div class="game-bottom-panel" id="game-bottom-panel">
+                <div class="player-stats-bar" id="player-stats-bar"></div>
+                <div class="dice-area" id="dice-area">
+                    <div class="dice-wrapper">
+                        <div class="dice" id="dice">
+                            <div class="dice-face" id="dice-face">?</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-roll" id="btn-roll" aria-label="Roll dice (Enter or Space)">ROLL DICE</button>
+                </div>
+                <div class="choice-area" id="choice-area" style="display:none;">
+                    <p class="choice-label" id="choice-label">Choose a square to land on (1-6 keys):</p>
+                    <div class="choice-buttons" id="choice-buttons"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="screen-results" class="screen">
+            <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+            <div class="results-content">
+                <h2 class="results-title" id="results-title">Race Complete!</h2>
+                <div class="results-trophy">&#127942;</div>
+                <div class="results-list" id="results-list"></div>
+                <div class="results-buttons">
+                    <button class="btn btn-primary btn-glow" id="btn-play-again">PLAY AGAIN</button>
+                    <button class="btn btn-secondary" id="btn-main-menu">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Panels -->
+    <div class="overlay" id="overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="panel" id="panel" role="document">
+            <!-- Dynamic panel content -->
+        </div>
+    </div>
+
+    <!-- Effect Toast -->
+    <div class="toast-container" id="toast-container" aria-live="polite" role="status"></div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/dice.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

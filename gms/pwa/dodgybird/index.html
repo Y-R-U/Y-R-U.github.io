@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a1a">
+  <title>Flappy Strike</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Settings Cog (always visible) -->
+  <button id="btn-settings" aria-label="Settings">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+
+  <!-- Start Screen -->
+  <div id="start-screen">
+    <div class="start-title">FLAPPY STRIKE</div>
+    <div class="start-subtitle">EVASIVE RUN &amp; GUN</div>
+    <div class="start-stats">
+      <div>Best: <span class="start-stat-val" id="start-highscore">0</span></div>
+      <div>&#9733; <span class="start-stat-val" id="start-coins">0</span></div>
+    </div>
+    <button id="btn-start">TAP TO START</button>
+    <button id="btn-shop-start">SHOP</button>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-score">0</div>
+    <div class="hud-group">
+      <span class="hud-coin-icon">&#9733;</span>
+      <span id="hud-coins">0</span>
+    </div>
+    <div class="hud-group" id="hud-hearts"></div>
+    <div class="hud-group">
+      <div id="hud-cooldown"><div id="hud-cooldown-fill"></div></div>
+    </div>
+    <div id="hud-effects"></div>
+    <button id="btn-pause" aria-label="Pause">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div id="pause-overlay" class="hidden">
+    <div class="pause-title">PAUSED</div>
+    <button id="btn-resume" class="pause-btn primary">Resume</button>
+    <button id="btn-pause-menu" class="pause-btn">Main Menu</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" class="hidden">
+    <div class="go-title">GAME OVER</div>
+    <div class="go-score-section">
+      <div class="go-score-label">SCORE</div>
+      <div class="go-score-val" id="go-score">0</div>
+      <div id="go-new-best" style="display:none">NEW BEST!</div>
+    </div>
+    <div class="go-stats">
+      <div>Best: <span class="go-stat-val" id="go-best">0</span></div>
+      <div>Coins: +<span class="go-stat-val" id="go-coins-earned">0</span></div>
+    </div>
+    <div class="go-buttons">
+      <button id="btn-revive" class="go-btn revive-btn" style="display:none">
+        CONTINUE <span class="revive-cost">10</span> &#9733;
+      </button>
+      <button id="btn-restart" class="go-btn primary">PLAY AGAIN</button>
+      <button id="btn-shop-go" class="go-btn shop-btn">SHOP</button>
+      <button id="btn-menu" class="go-btn secondary">MENU</button>
+    </div>
+  </div>
+
+  <!-- Boss Warning Flash -->
+  <div id="boss-warning" class="hidden">WARNING</div>
+
+  <!-- Popup Overlay (settings, shop, tutorial) -->
+  <div id="popup-overlay" class="hidden">
+    <div id="popup-content"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/obstacles.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/powerups.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

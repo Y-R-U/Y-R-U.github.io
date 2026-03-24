@@ -1,0 +1,220 @@
+DRace - Dice Race Battle Game
+==============================
+Mobile-first portrait PWA board game. Players roll a die and choose which square
+to land on (1 to roll value ahead). Squares have positive/negative/treasure effects.
+First to finish wins. Supports single player vs AI and local multiplayer.
+
+FILE STRUCTURE
+==============
+index.html          - Entry point. Screens: title, setup, game, results. Overlay container for panels.
+manifest.json       - PWA manifest (portrait, standalone)
+sw.js               - Service worker: stale-while-revalidate caching strategy
+css/style.css       - Full styles. Dark theme using CSS vars (--accent, --bg-dark, etc.)
+icons/              - icon-192.svg, icon-512.svg (app icons)
+music/              - Optional: theme1.mp3, theme2.mp3, theme3.mp3 (gracefully skipped if missing)
+
+JS MODULES (loaded in order, each is an IIFE or class):
+--------------------------------------------------------
+
+js/storage.js - LocalStorage wrapper
+  Storage.PREFIX                    - Key prefix: 'drace_'
+  Storage.get(key, fallback)
+  Storage.set(key, value)
+  Storage.remove(key)
+  Storage.getSettings()             - Returns {soundOn, musicOn}
+  Storage.saveSettings(settings)
+  Storage.hasSeenGuide()            - Whether user dismissed the welcome guide
+  Storage.setSeenGuide()
+  Storage.saveGame(state)           - Persists serialized game state for resume
+  Storage.loadGame()                - Returns saved game state or null
+  Storage.clearGame()               - Removes saved game
+
+js/audio.js - Sound effects via Web Audio API + music via HTML5 Audio
+  Audio.soundOn                     - getter
+  Audio.musicOn                     - getter
+  Audio.toggleSound()               - Toggles & persists
+  Audio.toggleMusic()               - Toggles, starts/stops playback, persists
+  Audio.playMusic()                 - Plays music files sequentially (modulo wraps index)
+  Audio.stopMusic()
+  Audio.sfxRoll()                   - Dice roll sound (3 rapid ascending tones)
+  Audio.sfxLand()                   - Landing on square (single tone)
+  Audio.sfxPositive()               - Positive effect (ascending arpeggio)
+  Audio.sfxNegative()               - Negative effect (descending tone)
+  Audio.sfxTreasure()               - Treasure collect (4-note fanfare)
+  Audio.sfxClick()                  - UI button tap
+  Audio.sfxWin()                    - Victory fanfare (4 ascending notes)
+  Audio.init()                      - Sets up audio context resume on first interaction
+
+js/effects.js - Square effect definitions and application
+  Effects.EFFECT_TYPES              - Object of all 24 effect type definitions
+                                      Each: {id, icon, name, desc, category, weight}
+                                      Categories: neutral, positive, negative, treasure
+                                      Weight: relative frequency in board generation pool
+  Effects.generateBoard(size)       - Creates array of {index, effect} squares.
+                                      Square 0 = Start, last = Finish.
+                                      Early squares have fewer negative/powerful effects.
+  Effects.applyEffect(player, effect) - Applies effect to player, returns:
+                                      {message, toastType, extraAction}
+                                      extraAction types: move, roll_again, skip_opponent,
+                                      swap, teleport, steal
+                                      Shield blocks negative effects (consumed on use).
+
+js/dice.js - Dice rolling and rendering
+  Dice.roll()                       - Returns random 1-6
+  Dice.renderDiceFace(value)        - Renders SVG dots into #dice-face element
+  Dice.animateRoll(finalValue)      - Async: animates rapid face changes then lands on final
+
+js/player.js - Player class + constants
+  AI_NAMES                          - Array of 8 AI name strings (global)
+  PLAYER_COLORS                     - Array of 4 hex color strings (global)
+  Player(index, name, isHuman)      - Constructor. Properties:
+    position, treasure, permBonus, tempBonus, doubleNext, shield,
+    skipNextTurn, finished, finishOrder, color, emoji
+  Player.getEffectiveRoll(rawRoll)  - Applies permBonus + tempBonus (doubled if doubleNext).
+                                      Resets tempBonus/doubleNext after use. Min result = 1.
+  Player.getScore(totalSquares)     - Finish bonus (100/60/30/10) + treasure
+  Player.serialize()                - Returns plain object for JSON storage
+  Player.deserialize(data)          - Static factory: creates Player from plain object
+
+js/board.js - Canvas board renderer with zoom/pan and path animation
+  Board.init(canvasEl, container)   - Sets up canvas, input handlers, zoom controls.
+                                      Cleans up previous listeners on re-init.
+  Board.setBoard(squares, players)  - Configures board data, calculates layout,
+                                      fits view, starts render loop.
+                                      Serpentine layout: 7 columns, alternating row direction.
+  Board.setHighlightSquares(indices, callback) - Highlights squares with pulsing glow,
+                                                  clicking a highlighted square calls callback(idx)
+  Board.clearHighlight()
+  Board.focusOnSquare(sqIndex, immediate) - Zooms camera to center on square
+  Board.fitBoard()                  - Zooms out to fit entire board in view
+  Board.destroy()                   - Stops render loop, removes event listeners
+  Board.getSquareCenter(index)      - Returns {x, y} pixel position for square
+  Board.animatePlayerMove(playerIdx, fromSq, toSq)
+                                    - Queues step-by-step path animation for a player token
+                                      moving from one square to another (walks each intermediate
+                                      square instead of direct lerp)
+
+  Internal rendering:
+    drawPath()      - Connecting lines + direction arrows between squares
+    drawSquares()   - Square backgrounds, borders, highlight glow, icons, numbers
+    drawPlayers()   - Player token circles with offset for same-square stacking
+    update()        - Per-frame: smooth zoom/pan interpolation, path queue stepping,
+                      canvas resize detection
+
+js/ai.js - AI decision making
+  AI.chooseSquare(player, choices, squares, allPlayers)
+    - 15% random choice for unpredictability
+    - Otherwise scores each choice: base score from position distance + effect value
+    - Considers shield when evaluating negative squares
+    - Swap scored contextually (good if behind, bad if ahead)
+
+js/ui.js - UI panels, toasts, screen management
+  esc(str)                          - HTML-escapes a string to prevent XSS (internal helper)
+  UI.showOverlay(htmlContent)       - Shows modal overlay with HTML content
+  UI.hideOverlay()                  - Hides and clears overlay
+  UI.showSettings()                 - Settings panel: sound/music toggles + how-to-play button
+  UI.showHowToPlay()                - How to play guide panel (closable)
+  UI.showWelcomeGuide(onContinue)   - First-time welcome: asks if user wants guide.
+                                      Calls onContinue after dismissal.
+  UI.showEffectPanel(effect, playerName, onDismiss)
+                                    - Shows effect result to human player (icon, name, desc)
+  UI.showToast(message, type)       - type: positive|negative|info|treasure. Auto-removes 2.8s.
+  UI.updatePlayerStats(players, currentIndex, totalSquares)
+                                    - Bottom bar player chips (sanitized names)
+  UI.updateHUD(player, turn)        - Top bar: current player + turn counter
+  UI.showScreen(screenId)           - Switches between title/setup/game/results screens
+  UI.setRollEnabled(enabled)        - Enables/disables roll button
+  UI.showChoices(choices, squares, callback)
+                                    - Shows choice buttons with effect description tooltip,
+                                      hides dice area
+  UI.hideChoices()                  - Hides choice buttons, shows dice area
+  UI.setupAIPreview(count)          - Shows opponent cards in setup screen with
+                                      Human/AI toggle button per player slot
+  UI.getPlayerSlots()               - Returns current slot config array for local multiplayer
+                                      Each: {index, name, isHuman}
+  UI.addLog(msg)                    - Appends message to turn history (max 80 entries)
+  UI.clearLog()                     - Clears turn history
+  UI.showTurnLog()                  - Opens turn log panel showing recent events (newest first)
+  UI.showStats()                    - Opens stats panel: games played, wins, win rate, high score
+
+js/game.js - Core game loop
+  escHtml(s)                        - Global HTML escape helper (same as UI.esc)
+  Game.create(playerName, playerCount, size, slotConfig)
+                                    - Initializes new game: generates board, creates players
+                                      from slotConfig (local multiplayer), inits board renderer,
+                                      starts music, clears log
+  Game.doRoll()                     - Rolls dice for current player, shows choices.
+                                      For AI: auto-selects after delay. For human: enables UI.
+                                      Logs roll to turn history.
+  Game.saveState()                  - Serializes full game state to localStorage
+  Game.resume(state)                - Restores game from saved state (re-inits board, UI, music)
+  Game.hasSave()                    - Returns true if a saved game exists
+  Game.players                      - getter
+  Game.squares                      - getter
+  Game.currentPlayerIndex           - getter
+  Game.boardSize                    - getter
+  Game.gameOver                     - getter
+
+  Internal flow:
+    checkCurrentTurn()  -> handles skip/finished, triggers AI auto-roll
+    doRoll()            -> animates dice -> calculates choices -> shows selection UI
+    landOnSquare(idx)   -> animates path movement -> applies effect -> shows panel/toast
+    handleExtraAction(action) -> processes move/roll_again/skip/swap/teleport/steal
+    nextPlayer()        -> advances currentPlayerIndex, increments turn on wrap, auto-saves
+    endGame()           -> clears save, calculates scores, saves stats, shows results,
+                           triggers confetti if human won
+    startConfetti()     -> canvas particle animation on results screen (100 pieces, 5s duration)
+    saveStats(results)  -> persists games played, wins, high score to localStorage
+
+js/app.js - Entry point, event binding
+  Registers service worker
+  Initializes audio context
+  Runs title screen particle animation (cleans up on re-entry)
+  Binds all navigation buttons (new game, continue, back, start, roll, play again,
+    main menu, settings, stats, turn log)
+  Manages setup screen state (player count, board size selection)
+  Shows welcome guide on first game start
+  Shows/hides Continue button based on saved game existence
+  Keyboard controls:
+    Enter/Space  -> roll dice (when roll button is enabled)
+    1-9 keys     -> select choice by position (during square selection)
+    Escape       -> close overlay panel
+
+GAME MECHANICS
+==============
+- Board: serpentine path of 30/45/60 squares (configurable)
+- Players: 2-4 (any mix of human and AI via setup toggle)
+- Turn: roll 1d6 + bonuses -> choose which square to land on (1 to N ahead)
+- Effects applied on landing (shield blocks negative effects)
+- Extra actions can chain (move effects, roll again)
+- Scoring: finish position bonus (100/60/30/10) + collected treasure points
+- Game ends when all but 1 player finishes (or all finish)
+- AI uses weighted scoring per square effect with 15% random choice
+- Auto-saves after each turn; resume from title screen
+
+SCREENS
+=======
+screen-title   - Logo, new game button, continue button (if save exists),
+                 settings cog, stats button
+screen-setup   - Player name, player count (2-4), board size (short/med/long),
+                 opponent cards with Human/AI toggle, local player name inputs
+screen-game    - HUD (player badge, turn, log button, settings cog),
+                 canvas board, dice + choice UI with effect descriptions
+screen-results - Rankings with scores, confetti canvas (if human won),
+                 play again / main menu buttons
+
+OVERLAY PANELS (no alerts/prompts ever)
+=======================================
+- Settings: sound/music toggles + how-to-play
+- How to Play: multi-section guide
+- Welcome Guide: first-time prompt to read guide
+- Effect Panel: shown to human player on landing (icon, name, description)
+- Turn Log: scrollable recent event history (newest first)
+- Stats: games played, wins, win rate, high score
+
+ACCESSIBILITY
+=============
+- ARIA roles on overlay (dialog), toasts (status/live region)
+- ARIA labels on buttons (roll, new game, continue, settings, stats, log)
+- Keyboard controls: Enter/Space to roll, number keys for choices, Escape for overlays
+- Player names are HTML-escaped to prevent XSS injection

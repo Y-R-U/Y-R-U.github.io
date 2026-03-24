@@ -10,8 +10,10 @@ const deleteBtn = document.getElementById('editor-delete');
 const backBtn = document.getElementById('editor-back');
 const fontSizeSelect = document.getElementById('tool-fontsize');
 const fontColorInput = document.getElementById('tool-fontcolor');
-const checklistBtn = document.getElementById('tool-checklist');
-const radiolistBtn = document.getElementById('tool-radiolist');
+const checklistBtn  = document.getElementById('tool-checklist');
+const radiolistBtn  = document.getElementById('tool-radiolist');
+const copyTextBtn   = document.getElementById('tool-copy-text');
+const copyHtmlBtn   = document.getElementById('tool-copy-html');
 
 let currentItem = null;
 let isNew = false;
@@ -190,6 +192,49 @@ radiolistBtn.addEventListener('click', () => {
   contentEl.focus();
   if (debouncedSave) debouncedSave();
 });
+
+// Toolbar: Copy as plain text
+copyTextBtn.addEventListener('click', () => {
+  const clone = contentEl.cloneNode(true);
+  clone.querySelectorAll('.fn-cb').forEach(cb => {
+    cb.replaceWith(cb.dataset.checked === 'true' ? '[x]' : '[ ]');
+  });
+  clone.querySelectorAll('.fn-rd').forEach(rd => {
+    rd.replaceWith(rd.dataset.checked === 'true' ? '(*)' : '( )');
+  });
+  navigator.clipboard.writeText(domToText(clone).trim());
+  flashBtn(copyTextBtn);
+});
+
+// Toolbar: Copy as HTML
+copyHtmlBtn.addEventListener('click', () => {
+  const pretty = contentEl.innerHTML
+    .replace(/(<\/(?:div|p|h[1-6]|li|ul|ol|blockquote)>)/gi, '$1\n')
+    .replace(/<br\s*\/?>/gi, '<br>\n')
+    .trim();
+  navigator.clipboard.writeText(pretty);
+  flashBtn(copyHtmlBtn);
+});
+
+function domToText(node) {
+  let out = '';
+  for (const child of node.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      out += child.textContent;
+    } else if (child.nodeName === 'BR') {
+      out += '\n';
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      out += domToText(child);
+      if (/^(DIV|P|H[1-6]|LI|BLOCKQUOTE)$/.test(child.nodeName)) out += '\n';
+    }
+  }
+  return out;
+}
+
+function flashBtn(btn) {
+  btn.style.borderColor = 'var(--accent)';
+  setTimeout(() => { btn.style.borderColor = ''; }, 800);
+}
 
 // Checkbox/Radio click toggling
 contentEl.addEventListener('click', (e) => {

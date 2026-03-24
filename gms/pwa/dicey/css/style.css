@@ -285,6 +285,11 @@ html, body {
     color: var(--green);
     font-weight: 600;
 }
+#cp-shields {
+    font-size: 12px;
+    color: var(--blue);
+    font-weight: 600;
+}
 
 #round-info {
     font-size: 13px;
@@ -377,13 +382,16 @@ html, body {
     padding: 1px 2px;
     line-height: 1.1;
 }
-.mini-card-houses {
+.mini-card-type {
     font-size: 6px;
     text-align: center;
     padding-bottom: 2px;
     line-height: 1;
-    color: var(--green);
+    text-transform: uppercase;
+    font-weight: 700;
 }
+.mini-card-type.attack { color: var(--accent); }
+.mini-card-type.defense { color: var(--blue); }
 
 /* Large property detail card */
 .detail-card {
@@ -502,10 +510,6 @@ html, body {
     padding: 12px 20px;
 }
 
-#btn-build {
-    font-size: 13px;
-    padding: 8px 16px;
-}
 
 #player-bar {
     display: flex;
@@ -918,6 +922,90 @@ html, body {
 #panel-container::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.15);
     border-radius: 2px;
+}
+
+/* Skill guide rows (How to Play) */
+.guide-skill-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+}
+.guide-skill-row.attack { border-left-color: var(--accent); }
+.guide-skill-row.defense { border-left-color: var(--blue); }
+
+.guide-skill-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+}
+.guide-skill-info {
+    flex: 1;
+    min-width: 0;
+}
+.guide-skill-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+.guide-skill-price {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+}
+.guide-skill-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.4;
+    margin-top: 2px;
+}
+
+/* Skill effect panel */
+.skill-effect-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.skill-effect-msg {
+    font-size: 15px;
+    text-align: center;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+/* Shield prompt */
+.shield-prompt-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+/* Surrender skill list */
+.surrender-skill-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.surrender-skill-btn:active {
+    background: rgba(233,69,96,0.2);
+    border-color: var(--accent);
 }
 
 /* Safe area for notch phones */

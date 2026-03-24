@@ -1,0 +1,189 @@
+{
+  "tileSize": 64,
+  "columns": 6,
+  "spacing": 0,
+  "tiles": [
+    {
+      "id": "castle",
+      "name": "Castle",
+      "category": "buildings",
+      "col": 0,
+      "row": 0
+    },
+    {
+      "id": "castleTall",
+      "name": "Castle Tall",
+      "category": "buildings",
+      "col": 1,
+      "row": 0
+    },
+    {
+      "id": "castleWide",
+      "name": "Castle Wide",
+      "category": "buildings",
+      "col": 2,
+      "row": 0
+    },
+    {
+      "id": "castleWideLow",
+      "name": "Castle Wide Low",
+      "category": "buildings",
+      "col": 3,
+      "row": 0
+    },
+    {
+      "id": "houseTall",
+      "name": "House Tall",
+      "category": "buildings",
+      "col": 4,
+      "row": 0
+    },
+    {
+      "id": "houseViking",
+      "name": "House Viking",
+      "category": "buildings",
+      "col": 5,
+      "row": 0
+    },
+    {
+      "id": "houseSmall",
+      "name": "House Small",
+      "category": "buildings",
+      "col": 0,
+      "row": 1
+    },
+    {
+      "id": "houseChimney",
+      "name": "House Chimney",
+      "category": "buildings",
+      "col": 1,
+      "row": 1
+    },
+    {
+      "id": "mill",
+      "name": "Mill",
+      "category": "buildings",
+      "col": 2,
+      "row": 1
+    },
+    {
+      "id": "mine",
+      "name": "Mine",
+      "category": "buildings",
+      "col": 3,
+      "row": 1
+    },
+    {
+      "id": "lighthouse",
+      "name": "Lighthouse",
+      "category": "buildings",
+      "col": 4,
+      "row": 1
+    },
+    {
+      "id": "treeTall",
+      "name": "Tree Tall",
+      "category": "nature",
+      "col": 5,
+      "row": 1
+    },
+    {
+      "id": "bush",
+      "name": "Bush",
+      "category": "nature",
+      "col": 0,
+      "row": 2
+    },
+    {
+      "id": "palm",
+      "name": "Palm",
+      "category": "nature",
+      "col": 1,
+      "row": 2
+    },
+    {
+      "id": "palmLarge",
+      "name": "Palm Large",
+      "category": "nature",
+      "col": 2,
+      "row": 2
+    },
+    {
+      "id": "rocks",
+      "name": "Rocks",
+      "category": "terrain",
+      "col": 3,
+      "row": 2
+    },
+    {
+      "id": "rocksA",
+      "name": "Rocks A",
+      "category": "terrain",
+      "col": 4,
+      "row": 2
+    },
+    {
+      "id": "rocksB",
+      "name": "Rocks B",
+      "category": "terrain",
+      "col": 5,
+      "row": 2
+    },
+    {
+      "id": "rocksMountain",
+      "name": "Rocks Mountain",
+      "category": "terrain",
+      "col": 0,
+      "row": 3
+    },
+    {
+      "id": "rocksTall",
+      "name": "Rocks Tall",
+      "category": "terrain",
+      "col": 1,
+      "row": 3
+    },
+    {
+      "id": "flag",
+      "name": "Flag",
+      "category": "decoration",
+      "col": 2,
+      "row": 3
+    },
+    {
+      "id": "campfire",
+      "name": "Campfire",
+      "category": "decoration",
+      "col": 3,
+      "row": 3
+    },
+    {
+      "id": "fence",
+      "name": "Fence",
+      "category": "decoration",
+      "col": 4,
+      "row": 3
+    },
+    {
+      "id": "gate",
+      "name": "Gate",
+      "category": "decoration",
+      "col": 5,
+      "row": 3
+    },
+    {
+      "id": "skull",
+      "name": "Skull",
+      "category": "decoration",
+      "col": 0,
+      "row": 4
+    },
+    {
+      "id": "graveyard",
+      "name": "Graveyard",
+      "category": "decoration",
+      "col": 1,
+      "row": 4
+    }
+  ]
+}

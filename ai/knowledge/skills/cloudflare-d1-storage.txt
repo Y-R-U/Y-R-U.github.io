@@ -1,5 +1,9 @@
 Cloudflare D1 (SQLite) Storage Skill
 ======================================
+IMPORTANT: This file is fully self-contained. All backend and frontend code templates
+are included below. Do NOT read or copy from other project files (e.g. fnote/js/store.js
+or fnote/functions/api/notes.js) — everything needed to implement D1 storage is right here.
+
 Reusable pattern for any PWA/web project on this site.
 Shared single table across all projects — each project is isolated by its PROJECT name.
 
@@ -113,7 +117,8 @@ export async function onRequestPost({ request, env }) {
 ---
 
 ## Frontend: Sync Pattern (JS module)
-This is the pattern used in fnote/js/store.js — adapt for your project's data shape.
+Everything needed is in this skill file — do NOT go read other project files (e.g. fnote).
+Use the backend template above and the frontend sync pattern below directly.
 localStorage key naming convention: `<project>_items`, `<project>_settings`, etc.
 
 ```js
@@ -214,19 +219,20 @@ Store in localStorage as `<project>_username`.
 ---
 
 ## When Adapting for a New Project
-1. Copy `functions/api/notes.js` from fnote → rename to your endpoint
-2. Change `const PROJECT = 'fnote'` to your project's slug
-3. Adjust the POST body validation to match your data shape
-4. In your frontend store module, update ITEMS_KEY prefix and API_BASE path
-5. Call initSync(username) after login, syncFromCloud() on app start
-6. Call writeItems() (or your equivalent) on every local data mutation
+Use the templates above directly — everything you need is in this file.
+Do NOT copy from other projects (e.g. fnote) — the templates here are complete.
+
+1. Create `functions/api/<name>.js` using the Backend template above, set PROJECT slug
+2. Adjust the POST body validation to match your data shape
+3. In your frontend store module, use the Sync Pattern above — update ITEMS_KEY prefix and API_BASE path
+4. Call initSync(username) after login, syncFromCloud() on app start
+5. Call writeItems() (or your equivalent) on every local data mutation
 
 ---
 
 ## Data Shape Convention
-The json_text column holds a JSON string. The fnote convention is { "items": [...] }
-where each item has: { id, type, title, content, parentId, createdAt, updatedAt }.
-For other projects, the shape can be anything — just ensure:
+The json_text column holds a JSON string. The standard convention is { "items": [...] }.
+The shape of each item can be anything your project needs — just ensure:
 - Each item has a unique `id` field
 - Each item has an `updatedAt` (timestamp ms) for merge resolution
 - The top-level object has an `items` array (keeps the API consistent)
@@ -234,7 +240,7 @@ For other projects, the shape can be anything — just ensure:
 ---
 
 ## Example: Adding This to a New Project (checklist)
-[ ] Create functions/api/<name>.js — copy template above, set PROJECT slug
+[ ] Create functions/api/<name>.js — use the Backend template above, set PROJECT slug
 [ ] Add D1 binding DB in Cloudflare Pages settings (reuse existing DB if same Pages project)
 [ ] Add username login step in your app (localStorage: <project>_username)
 [ ] Import initSync, syncFromCloud into your app entry point

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1b2838">
+    <title>Idle Transport Empire</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="preconnect" href="https://cdn.babylonjs.com">
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-mid: #161b22;
+            --bg-card: #1c2333;
+            --bg-card-hi: #242d3d;
+            --accent: #58a6ff;
+            --accent-dim: rgba(88,166,255,0.15);
+            --gold: #ffc107;
+            --gold-dim: rgba(255,193,7,0.15);
+            --green: #3fb950;
+            --green-dim: rgba(63,185,80,0.15);
+            --red: #f85149;
+            --orange: #d29922;
+            --text: #e6edf3;
+            --text2: #8b949e;
+            --text3: #484f58;
+            --border: rgba(240,246,252,0.06);
+            --radius: 10px;
+            --room-h: 120px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg-dark);color:var(--text);touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+
+        /* ---- LAYOUT ---- */
+        #app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto;position:relative;overflow:hidden;}
+
+        /* Top HUD */
+        #hud{display:flex;align-items:center;padding:6px 10px;background:var(--bg-mid);border-bottom:1px solid var(--border);z-index:20;flex-shrink:0;gap:6px;}
+        #hud .money-wrap{flex:1;min-width:0;}
+        #hud .money{font-size:1.2em;font-weight:700;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        #hud .per-sec{font-size:0.7em;color:var(--text2);}
+        #hud .pp{font-size:0.75em;color:var(--accent);display:flex;align-items:center;gap:2px;}
+        .hud-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-size:1em;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+        .hud-btn:active{background:var(--bg-card-hi);transform:scale(.95);}
+
+        /* Room viewport (Fallout Shelter style) */
+        #viewport{flex:1;position:relative;overflow:hidden;background:#0a0f16;min-height:0;}
+        #render-canvas{width:100%;height:100%;display:block;outline:none;touch-action:none;}
+
+        /* Click earnings float */
+        .earn-float{position:absolute;pointer-events:none;z-index:25;font-weight:700;font-size:1.1em;color:var(--gold);text-shadow:0 1px 4px rgba(0,0,0,.8);animation:floatUp .9s ease-out forwards;}
+        @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(1.2);}}
+
+        /* Event banner */
+        #event-banner{position:absolute;top:4px;left:8px;right:8px;z-index:30;background:linear-gradient(135deg,#ffc107,#ff9800);color:#1a1a2e;border-radius:10px;padding:10px 12px;display:none;cursor:pointer;font-weight:600;font-size:.82em;box-shadow:0 4px 20px rgba(255,193,7,.3);animation:bannerIn .3s ease-out;}
+        #event-banner.show{display:flex;align-items:center;gap:8px;}
+        @keyframes bannerIn{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+        #event-banner .timer{margin-left:auto;background:rgba(0,0,0,.2);padding:2px 8px;border-radius:8px;font-size:.85em;}
+
+        /* Active bonus bar */
+        #bonus-bar{position:absolute;bottom:4px;left:8px;right:8px;z-index:25;background:rgba(63,185,80,.12);border:1px solid var(--green);border-radius:8px;padding:5px 10px;font-size:.72em;color:var(--green);display:none;backdrop-filter:blur(4px);}
+        #bonus-bar.show{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+        /* Tap prompt overlay */
+        #tap-prompt{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(88,166,255,.85);color:#fff;padding:7px 18px;border-radius:20px;font-weight:600;font-size:.82em;pointer-events:none;animation:pulse 1.8s ease-in-out infinite;white-space:nowrap;}
+        @keyframes pulse{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(1.06);}}
+
+        /* Bottom panel */
+        #bottom-panel{flex-shrink:0;display:flex;flex-direction:column;max-height:45vh;background:var(--bg-mid);border-top:1px solid var(--border);z-index:15;}
+
+        /* Tab bar */
+        #tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(--border);}
+        .tab{flex:1;padding:7px 2px;border:none;background:none;color:var(--text2);font-size:.65em;font-weight:600;cursor:pointer;text-align:center;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:1px;transition:color .15s;}
+        .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+        .tab .ico{font-size:1.3em;}
+
+        /* Content area */
+        #content{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px;-webkit-overflow-scrolling:touch;min-height:0;}
+        .pane{display:none;}
+        .pane.active{display:block;}
+
+        /* Section header */
+        .sec-hdr{font-size:.68em;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:10px 0 5px;padding-left:2px;}
+
+        /* Route cards (styled like Fallout Shelter rooms) */
+        .route-card{background:var(--bg-card);border-radius:var(--radius);padding:10px 12px;margin-bottom:7px;border:1px solid var(--border);transition:border-color .2s;}
+        .route-card.selected{border-color:var(--accent);}
+        .route-card.locked{opacity:.45;}
+        .route-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+        .route-name{font-weight:700;font-size:.88em;display:flex;align-items:center;gap:5px;}
+        .route-name .ico{font-size:1.15em;}
+        .route-lv{font-size:.68em;color:var(--text2);background:var(--bg-dark);padding:1px 7px;border-radius:8px;}
+        .route-info{font-size:.75em;color:var(--green);margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+        .route-bar{height:5px;background:var(--bg-dark);border-radius:3px;margin-bottom:7px;overflow:hidden;}
+        .route-bar-fill{height:100%;border-radius:3px;transition:width .1s linear;}
+        .route-acts{display:flex;gap:5px;flex-wrap:wrap;}
+
+        /* Buttons */
+        .btn{padding:7px 12px;border-radius:8px;border:none;font-weight:600;font-size:.75em;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+        .btn:active{transform:scale(.96);}
+        .btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+        .btn-buy{background:linear-gradient(135deg,var(--accent),#3984d4);color:#fff;}
+        .btn-collect{background:linear-gradient(135deg,var(--green),#2ea043);color:#fff;}
+        .btn-gold{background:linear-gradient(135deg,var(--gold),#e6a800);color:#1a1a2e;}
+        .btn-sec{background:var(--bg-dark);color:var(--text);border:1px solid var(--border);}
+        .btn-danger{background:linear-gradient(135deg,var(--red),#c93030);color:#fff;}
+        .btn-full{width:100%;justify-content:center;}
+
+        /* Upgrade cards */
+        .upg-card{background:var(--bg-card);border-radius:var(--radius);padding:10px;margin-bottom:6px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s;}
+        .upg-card:active{border-color:var(--accent);}
+        .upg-card.bought{opacity:.45;cursor:default;border-color:var(--green);}
+        .upg-ico{width:38px;height:38px;border-radius:10px;background:var(--bg-dark);display:flex;align-items:center;justify-content:center;font-size:1.2em;flex-shrink:0;}
+        .upg-info{flex:1;min-width:0;}
+        .upg-name{font-weight:600;font-size:.82em;}
+        .upg-desc{font-size:.68em;color:var(--text2);margin-top:1px;}
+        .upg-cost{font-size:.72em;color:var(--gold);margin-top:2px;}
+
+        /* Achievement cards */
+        .ach-card{background:var(--bg-card);border-radius:var(--radius);padding:9px 10px;margin-bottom:5px;border:1px solid var(--border);display:flex;align-items:center;gap:9px;}
+        .ach-card.done{border-color:var(--gold);}
+        .ach-card.done .ach-ico{background:var(--gold);color:#1a1a2e;}
+        .ach-ico{width:34px;height:34px;border-radius:50%;background:var(--bg-dark);display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0;}
+        .ach-info{flex:1;}
+        .ach-name{font-weight:600;font-size:.78em;}
+        .ach-desc{font-size:.65em;color:var(--text2);margin-top:1px;}
+
+        /* Prestige */
+        .prestige-hero{text-align:center;padding:16px 8px;}
+        .prestige-hero h2{color:var(--accent);font-size:1.1em;margin-bottom:6px;}
+        .prestige-pts{font-size:2em;color:var(--gold);font-weight:700;}
+        .prestige-earn{color:var(--green);margin:8px 0;font-size:.88em;}
+        .prestige-bonus{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:.82em;}
+
+        /* Stats */
+        .stat-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.82em;}
+        .stat-lbl{color:var(--text2);}
+        .stat-val{font-weight:600;}
+
+        /* Modal */
+        .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
+        .modal-bg.open{display:flex;}
+        .modal{background:var(--bg-mid);border-radius:14px;padding:20px;max-width:340px;width:100%;border:1px solid var(--border);animation:modalIn .25s ease-out;position:relative;max-height:85vh;overflow-y:auto;}
+        @keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+        .modal h3{margin-bottom:14px;font-size:1em;display:flex;align-items:center;gap:6px;}
+        .modal-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:none;background:var(--bg-card);color:var(--text);cursor:pointer;font-size:.9em;display:flex;align-items:center;justify-content:center;}
+
+        /* Settings rows */
+        .set-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+        .set-lbl{font-size:.85em;}
+        .toggle{width:46px;height:24px;border-radius:12px;border:none;background:var(--text3);cursor:pointer;position:relative;transition:background .25s;}
+        .toggle.on{background:var(--green);}
+        .toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .25s;}
+        .toggle.on::after{transform:translateX(22px);}
+        .vol-slider{-webkit-appearance:none;width:90px;height:4px;background:var(--text3);border-radius:2px;outline:none;}
+        .vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;}
+
+        /* Toast */
+        #toasts{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:5px;pointer-events:none;max-width:320px;width:90%;}
+        .toast{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.8em;animation:toastIn .25s ease-out;box-shadow:0 4px 20px rgba(0,0,0,.5);display:flex;align-items:center;gap:7px;}
+        .toast.gold{border-color:var(--gold);}
+        .toast.green{border-color:var(--green);}
+        @keyframes toastIn{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+
+        /* Loading screen */
+        #loading{position:fixed;inset:0;background:var(--bg-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;}
+        #loading h1{color:var(--gold);font-size:1.6em;margin-bottom:6px;}
+        #loading p{color:var(--text2);font-size:.85em;margin-bottom:16px;}
+        .load-bar{width:180px;height:3px;background:var(--bg-card);border-radius:2px;overflow:hidden;}
+        .load-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .3s;}
+
+        /* Install prompt */
+        #pwa-prompt{position:fixed;bottom:0;left:0;right:0;background:var(--bg-mid);border-top:1px solid var(--border);padding:10px 14px;z-index:100;display:none;max-width:480px;margin:0 auto;align-items:center;gap:10px;}
+        #pwa-prompt.show{display:flex;}
+        #pwa-prompt p{flex:1;font-size:.8em;}
+        #pwa-dismiss{background:none;border:none;color:var(--text3);font-size:1.2em;cursor:pointer;}
+
+        /* Scrollbar */
+        ::-webkit-scrollbar{width:3px;}
+        ::-webkit-scrollbar-track{background:transparent;}
+        ::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px;}
+
+        /* Tutorial overlay */
+        #tutorial{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);}
+        #tutorial.show{display:flex;}
+        .tut-box{background:var(--bg-mid);border:1px solid var(--accent);border-radius:14px;padding:20px;max-width:300px;text-align:center;animation:modalIn .3s ease-out;}
+        .tut-box h3{color:var(--accent);margin-bottom:8px;}
+        .tut-box p{font-size:.82em;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading">
+        <h1>Idle Transport Empire</h1>
+        <p>Building your empire...</p>
+        <div class="load-bar"><div class="load-fill" id="load-fill"></div></div>
+    </div>
+
+    <div id="app">
+        <!-- HUD -->
+        <div id="hud">
+            <div class="money-wrap">
+                <div class="money" id="money-txt">$0</div>
+                <div class="per-sec" id="ps-txt">$0/s</div>
+            </div>
+            <span class="pp" id="pp-txt" style="display:none;"></span>
+            <button class="hud-btn" id="btn-stats" title="Stats">&#x1f4ca;</button>
+            <button class="hud-btn" id="btn-settings" title="Settings">&#x2699;&#xfe0f;</button>
+        </div>
+
+        <!-- 3D Viewport (Fallout Shelter rooms) -->
+        <div id="viewport">
+            <canvas id="render-canvas"></canvas>
+
+            <!-- Event banner -->
+            <div id="event-banner">
+                <span id="evt-ico"></span>
+                <span id="evt-txt"></span>
+                <span class="timer" id="evt-timer"></span>
+            </div>
+
+            <!-- Active bonuses -->
+            <div id="bonus-bar"><span>&#x26a1;</span><span id="bonus-txt"></span></div>
+
+            <!-- Tap prompt -->
+            <div id="tap-prompt">Tap to Earn!</div>
+
+            <!-- Tutorial -->
+            <div id="tutorial">
+                <div class="tut-box">
+                    <h3>Welcome, Tycoon!</h3>
+                    <p>Tap the viewport to earn money.<br>Buy your first route to start delivering!<br>Hire managers to automate routes.<br>Prestige to earn permanent bonuses.</p>
+                    <button class="btn btn-buy btn-full" id="tut-ok">Let's Go!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom panel -->
+        <div id="bottom-panel">
+            <div id="tabs">
+                <button class="tab active" data-tab="routes"><span class="ico">&#x1f3ed;</span>Routes</button>
+                <button class="tab" data-tab="upgrades"><span class="ico">&#x2b06;&#xfe0f;</span>Upgrades</button>
+                <button class="tab" data-tab="prestige"><span class="ico">&#x2b50;</span>Prestige</button>
+                <button class="tab" data-tab="achieve"><span class="ico">&#x1f3c6;</span>Achieve</button>
+            </div>
+            <div id="content">
+                <div class="pane active" id="pane-routes"></div>
+                <div class="pane" id="pane-upgrades"></div>
+                <div class="pane" id="pane-prestige"></div>
+                <div class="pane" id="pane-achieve"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-bg" id="modal-settings">
+        <div class="modal">
+            <button class="modal-x" data-close="modal-settings">&times;</button>
+            <h3>&#x2699;&#xfe0f; Settings</h3>
+            <div class="set-row"><span class="set-lbl">Sound Effects</span><button class="toggle on" id="tog-sfx"></button></div>
+            <div class="set-row"><span class="set-lbl">Music</span><button class="toggle on" id="tog-music"></button></div>
+            <div class="set-row"><span class="set-lbl">Music Volume</span><input type="range" class="vol-slider" id="vol-music" min="0" max="100" value="30"></div>
+            <div class="set-row"><span class="set-lbl">SFX Volume</span><input type="range" class="vol-slider" id="vol-sfx" min="0" max="100" value="50"></div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px;">
+                <button class="btn btn-sec btn-full" id="btn-export">Export Save</button>
+                <button class="btn btn-sec btn-full" id="btn-import">Import Save</button>
+                <button class="btn btn-danger btn-full" id="btn-reset">Hard Reset</button>
+            </div>
+            <p style="font-size:.6em;color:var(--text3);text-align:center;margin-top:10px;">Idle Transport Empire v1.0</p>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal-bg" id="modal-stats">
+        <div class="modal">
+            <button class="modal-x" data-close="modal-stats">&times;</button>
+            <h3>&#x1f4ca; Statistics</h3>
+            <div id="stats-body"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-bg" id="modal-confirm">
+        <div class="modal" style="text-align:center;">
+            <h3 id="cfm-title"></h3>
+            <p id="cfm-text" style="font-size:.82em;color:var(--text2);margin-bottom:14px;"></p>
+            <div style="display:flex;gap:8px;justify-content:center;">
+                <button class="btn btn-sec" id="cfm-no">Cancel</button>
+                <button class="btn btn-buy" id="cfm-yes">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-bg" id="modal-import">
+        <div class="modal">
+            <button class="modal-x" data-close="modal-import">&times;</button>
+            <h3>Import Save</h3>
+            <p style="font-size:.8em;color:var(--text2);margin-bottom:10px;">Paste your save data:</p>
+            <textarea id="import-data" style="width:100%;height:80px;background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-size:.78em;resize:none;font-family:monospace;"></textarea>
+            <button class="btn btn-buy btn-full" id="btn-do-import" style="margin-top:8px;">Import</button>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toasts"></div>
+
+    <!-- PWA Install Prompt -->
+    <div id="pwa-prompt">
+        <p>Install Idle Transport Empire for the best experience!</p>
+        <button class="btn btn-buy" id="pwa-install">Install</button>
+        <button id="pwa-dismiss">&times;</button>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/economy.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>My Cyber Website</title>
+  <title>Y-R-U Website</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* Custom CSS with cyber theme */
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap');
+
     :root {
       --cyber-primary: #00fffc;
       --cyber-secondary: #ff00ff;
       --cyber-bg: #0a0a0a;
       --cyber-accent: #39ff14;
       --cyber-dark: #111;
+      --card-gap: 16px;
     }
-    
+
+    * { box-sizing: border-box; }
+
     body {
       font-family: 'Orbitron', Arial, sans-serif;
       margin: 0;
@@ -24,18 +26,21 @@
       overflow-x: hidden;
     }
 
-    /* Cyber-themed navbar */
+    /* ─── NAVBAR ─── */
     .navbar {
       display: flex;
       align-items: center;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.85);
       height: 60px;
-      position: relative;
+      position: fixed;
+      top: 0; left: 0; right: 0;
       overflow: hidden;
       border-bottom: 1px solid var(--cyber-primary);
-      z-index: 100;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    
+
     .navbar::before {
       content: '';
       position: absolute;
@@ -46,7 +51,7 @@
       background: linear-gradient(90deg, transparent, var(--cyber-primary), var(--cyber-secondary), transparent);
       animation: cyber-scan 4s linear infinite;
     }
-    
+
     @keyframes cyber-scan {
       0% { left: -100%; }
       100% { left: 200%; }
@@ -60,6 +65,8 @@
       position: relative;
       overflow: hidden;
       text-shadow: 0 0 5px var(--cyber-primary);
+      font-size: 14px;
+      white-space: nowrap;
     }
 
     .navbar a:hover {
@@ -72,12 +79,11 @@
       color: white;
       box-shadow: 0 0 10px var(--cyber-primary);
     }
-    
+
     .navbar a::after {
       content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
+      bottom: 0; left: 0;
       width: 100%;
       height: 2px;
       background: var(--cyber-primary);
@@ -85,7 +91,7 @@
       transform-origin: right;
       transition: transform 0.3s ease;
     }
-    
+
     .navbar a:hover::after {
       transform: scaleX(1);
       transform-origin: left;
@@ -98,276 +104,632 @@
       text-shadow: 0 0 10px var(--cyber-primary);
     }
 
-    /* Content styling */
-    .content {
-      padding: 20px;
-      min-height: calc(100vh - 100px);
-      position: relative;
-    }
+    /* ─── CONTENT AREAS ─── */
+    .page { display: none; padding-top: 60px; min-height: 100vh; }
+    .page.active { display: block; }
 
-    .hide {
-      display: none;
-    }
-
-    /* Video background */
-    .content video {
+    /* ─── HOME PAGE ─── */
+    #home-page video {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       object-fit: cover;
       z-index: -1;
     }
 
-    /* Sound icon styling */
     .sound-icon {
-      position: absolute;
-      top: 100px;
-      left: 10px;
+      position: fixed;
+      top: 80px; left: 10px;
       color: var(--cyber-primary);
       cursor: pointer;
       transition: all 0.3s;
       z-index: 10;
     }
+    .son { opacity: 0.8; text-shadow: 0 0 10px var(--cyber-primary); }
+    .soff { opacity: 0.5; }
+    .sound-icon:hover { opacity: 1; transform: scale(1.1); }
 
-    .son { 
-      opacity: 0.8;
-      text-shadow: 0 0 10px var(--cyber-primary);
-    }
-    
-    .soff {
-      opacity: 0.5;
+    .home-hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 60px);
     }
 
-    .sound-icon:hover {
-      opacity: 1;
-      transform: scale(1.1);
+    .home-hero h1 {
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      text-align: center;
+      text-shadow: 0 0 20px var(--cyber-primary);
     }
-    
-    /* Cyber overlay for projects */
-    .cyber-overlay {
-      position: relative;
-      padding: 20px;
-      color: var(--cyber-primary);
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 1px solid var(--cyber-primary);
-      box-shadow: 0 0 20px var(--cyber-primary);
-      margin-bottom: 30px;
-      overflow: hidden;
-      animation: fadeIn 0.5s ease-out forwards;
-      max-width: 800px;
-      margin: 20px auto;
-    }
-    
-    .cyber-overlay::before {
-      content: "";
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, var(--cyber-primary), transparent, var(--cyber-secondary), transparent);
-      z-index: -1;
-      animation: borderGlow 3s linear infinite;
-    }
-    
-    @keyframes borderGlow {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
-    
-    .cyber-overlay h1 {
-      color: var(--cyber-accent);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px var(--cyber-accent);
-      position: relative;
-      display: inline-block;
-    }
-    
-    .cyber-overlay h1::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--cyber-accent);
-      box-shadow: 0 0 10px var(--cyber-accent);
-    }
-    
-    .cyber-item {
-      border-left: 3px solid var(--cyber-primary);
-      padding-left: 15px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .cyber-item a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      position: relative;
-      text-shadow: 0 0 5px white;
-      transition: all 0.3s;
-    }
-    
-    .cyber-item a:hover {
-      color: var(--cyber-secondary);
-      text-shadow: 0 0 8px var(--cyber-secondary);
-    }
-    
-    .cyber-item p {
-      color: #ccc;
-      margin-top: 5px;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    /* Matrix-like code background effect */
+
+    /* ─── MATRIX BACKGROUND ─── */
     .matrix-bg {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -2;
       opacity: 0.15;
       pointer-events: none;
     }
-    
+
+    /* ─── FILTER TABS ─── */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 20px 16px 10px;
+      position: sticky;
+      top: 60px;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 60%, transparent);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .filter-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      padding: 8px 20px;
+      background: transparent;
+      color: var(--cyber-primary);
+      border: 1px solid rgba(0,255,252,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,255,252,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .filter-btn:hover::before,
+    .filter-btn.active::before { opacity: 1; }
+
+    .filter-btn.active {
+      border-color: var(--cyber-primary);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0,255,252,0.4), inset 0 0 12px rgba(0,255,252,0.1);
+      text-shadow: 0 0 8px var(--cyber-primary);
+    }
+
+    .filter-btn:first-child { border-radius: 4px 0 0 4px; }
+    .filter-btn:last-child  { border-radius: 0 4px 4px 0; }
+
+    /* ─── CARD GRID ─── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--card-gap);
+      padding: var(--card-gap);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ─── CARD ─── */
+    .card-wrapper {
+      perspective: 1000px;
+      aspect-ratio: 4 / 3;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: cardIn 0.4s ease-out forwards;
+    }
+
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* ─── CARD FRONT ─── */
+    .card-front {
+      background: var(--cyber-dark);
+      border: 1px solid rgba(0,255,252,0.25);
+      box-shadow: 0 0 8px rgba(0,255,252,0.15);
+      transition: box-shadow 0.3s, border-color 0.3s;
+    }
+
+    .card-wrapper:hover .card-front {
+      border-color: rgba(0,255,252,0.6);
+      box-shadow: 0 0 20px rgba(0,255,252,0.3), 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-title {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 8px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      color: #fff;
+      text-shadow: 0 0 6px var(--cyber-primary);
+      pointer-events: none;
+    }
+
+    .card-title .card-name {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-category-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    .badge-app {
+      background: rgba(0,255,252,0.15);
+      color: var(--cyber-primary);
+      border: 1px solid rgba(0,255,252,0.4);
+    }
+
+    .badge-game {
+      background: rgba(255,0,255,0.15);
+      color: var(--cyber-secondary);
+      border: 1px solid rgba(255,0,255,0.4);
+    }
+
+    /* ─── CARD BACK ─── */
+    .card-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, #0d0d1a 0%, #0a0a14 100%);
+      border: 1px solid rgba(0,255,252,0.35);
+      box-shadow: 0 0 15px rgba(0,255,252,0.2), inset 0 0 30px rgba(0,255,252,0.03);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+
+    .card-back-header {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 8px var(--cyber-primary);
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,255,252,0.2);
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .card-back-desc {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #b0b0b0;
+      line-height: 1.5;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+
+    .card-back-meta {
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px solid rgba(0,255,252,0.15);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: rgba(0,255,252,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .card-back-meta .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-icon {
+      width: 12px;
+      text-align: center;
+      opacity: 0.6;
+    }
+
+    .card-back-link {
+      display: block;
+      margin-top: 6px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--cyber-accent);
+      text-decoration: none;
+      padding: 5px;
+      border: 1px solid rgba(57,255,20,0.3);
+      border-radius: 4px;
+      transition: all 0.3s;
+      text-shadow: 0 0 6px var(--cyber-accent);
+      flex-shrink: 0;
+    }
+
+    .card-back-link:hover {
+      background: rgba(57,255,20,0.1);
+      border-color: var(--cyber-accent);
+      box-shadow: 0 0 12px rgba(57,255,20,0.3);
+    }
+
+    /* ─── SCANLINE OVERLAY on cards ─── */
+    .card-front::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
+    /* ─── ABOUT PAGE ─── */
+    .about-container {
+      display: flex;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    .about-panel {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(0,255,252,0.3);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 0 30px rgba(0,255,252,0.1), inset 0 0 40px rgba(0,255,252,0.02);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .about-panel h1 {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--cyber-accent);
+      margin: 0 0 24px;
+      text-shadow: 0 0 15px var(--cyber-accent);
+    }
+
+    .about-section {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0,255,252,0.1);
+    }
+
+    .about-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .about-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      color: var(--cyber-primary);
+      margin: 0 0 10px;
+      text-shadow: 0 0 8px var(--cyber-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .about-icon { opacity: 0.7; font-size: 16px; }
+
+    .about-section p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: #b8b8b8;
+      line-height: 1.7;
+      margin: 0 0 10px;
+    }
+
+    .about-section p:last-child { margin-bottom: 0; }
+
+    .highlight {
+      color: var(--cyber-primary);
+      text-shadow: 0 0 4px var(--cyber-primary);
+    }
+
+    .highlight-alt {
+      color: var(--cyber-secondary);
+      text-shadow: 0 0 4px var(--cyber-secondary);
+    }
+
+    /* ─── GLITCH TEXT ─── */
     .glitch-text {
       position: relative;
       animation: glitch 3s infinite;
     }
-    
+
     @keyframes glitch {
-      0% { text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75), -0.05em -0.025em 0 rgba(0, 255, 255, 0.75); }
-      14% { text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75), -0.05em -0.025em 0 rgba(0, 255, 255, 0.75); }
-      15% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75), 0.025em 0.025em 0 rgba(0, 255, 255, 0.75); }
-      49% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75), 0.025em 0.025em 0 rgba(0, 255, 255, 0.75); }
-      50% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75), 0.05em 0 0 rgba(0, 255, 255, 0.75); }
-      99% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75), 0.05em 0 0 rgba(0, 255, 255, 0.75); }
-      100% { text-shadow: -0.025em 0 0 rgba(255, 0, 255, 0.75), -0.025em -0.025em 0 rgba(0, 255, 255, 0.75); }
+      0%   { text-shadow: 0.05em 0 0 rgba(255,0,255,0.75), -0.05em -0.025em 0 rgba(0,255,255,0.75); }
+      14%  { text-shadow: 0.05em 0 0 rgba(255,0,255,0.75), -0.05em -0.025em 0 rgba(0,255,255,0.75); }
+      15%  { text-shadow: -0.05em -0.025em 0 rgba(255,0,255,0.75), 0.025em 0.025em 0 rgba(0,255,255,0.75); }
+      49%  { text-shadow: -0.05em -0.025em 0 rgba(255,0,255,0.75), 0.025em 0.025em 0 rgba(0,255,255,0.75); }
+      50%  { text-shadow: 0.025em 0.05em 0 rgba(255,0,255,0.75), 0.05em 0 0 rgba(0,255,255,0.75); }
+      99%  { text-shadow: 0.025em 0.05em 0 rgba(255,0,255,0.75), 0.05em 0 0 rgba(0,255,255,0.75); }
+      100% { text-shadow: -0.025em 0 0 rgba(255,0,255,0.75), -0.025em -0.025em 0 rgba(0,255,255,0.75); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1200px) {
+      .card-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .card-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+      .filter-btn { padding: 6px 14px; font-size: 11px; }
+      .card-back { padding: 10px; }
+      .card-back-header { font-size: 11px; }
+      .card-back-desc { font-size: 10px; }
+      .card-back-meta { font-size: 9px; }
+    }
+
+    /* ─── LANDSCAPE PHONE (3 cols) ─── */
+    @media (max-width: 900px) and (orientation: landscape) {
+      .card-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ─── HIDE ANIMATION ─── */
+    .card-wrapper.hiding {
+      animation: cardOut 0.3s ease-in forwards;
+    }
+
+    @keyframes cardOut {
+      to { opacity: 0; transform: translateY(-20px) scale(0.95); }
     }
   </style>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
-  <script>
-    // Content data arrays
-    const contentData = {
-      projects: [
-        {
-          name: "Mobile HTML / JS editor",
-          link: "/m/",
-          description: "Similar to jsfiddle/jsbin etc."
-        },
-        {
-          name: "Desktop HTML / JS editor",
-          link: "/e/",
-          description: "Similar to jsfiddle/jsbin etc."
-        },
-        {
-          name: "Mobile HTML / JS editor V2",
-          link: "/m2/",
-          description: "v2 mobile HTML/JS editor"
-        },
-        {
-          name: "Desktop HTML / JS editor V2",
-          link: "/e2/",
-          description: "v2 desktop HTML/JS editor"
-        },
-        {
-          name: "Snake Game",
-          link: "/gms/s/",
-          description: "AI created Snake Game"
-        },
-        {
-          name: "Throwit",
-          link: "/gms/t/",
-          description: "Throw game"
-        },
-        {
-          name: "CCG Template",
-          link: "/gms/c/",
-          description: "a CCG template. "
-        },
-        {
-          name: "Asteroids",
-          link: "/gms/a/",
-          description: "Asteroids!!!"
-        },
-        {
-          name: "phr4",
-          link: "/gms/s/",
-          description: "phr4"
-        }
-      ],
-      experiments: [
-        {
-          name: "Paste and Draw",
-          link: "/d/",
-          description: "Fast edit an image on a mac: mostly AI created"
-        },
-        {
-          name: "Goal App",
-          link: "/q/",
-          description: "AI created Goal App"
-        }
-      ],
-      about: {
-        content: "Home Page Video best viewed on Portrait Mobile, or re-size browser to approx 16:9 scale. This website showcases various projects and experiments with a cyber-themed design."
-      }
-    };
+</head>
+<body>
 
-    // Matrix code background effect
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <a href="#home" class="home-icon active" data-page="home"><i class="fas fa-home"></i></a>
+    <a href="#projects" data-page="projects">Projects</a>
+    <a href="#about" data-page="about">About</a>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page active">
+    <div class="sound-icon">
+      <i class="fa fa-volume-off fa-3x soff"></i>
+    </div>
+    <video src="assets/Mv1.mp4" muted loop></video>
+    <div class="home-hero">
+      <h1 class="glitch-text">Welcome to Cyber Space</h1>
+    </div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div id="about-page" class="page">
+    <div class="about-container">
+      <div class="about-panel">
+        <h1 class="glitch-text">About</h1>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-code"></i></span> The Project</h2>
+          <p>This site is a growing collection of apps, games, and experiments — all built to explore what's possible when a developer teams up with AI coding agents.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-robot"></i></span> Built With AI</h2>
+          <p>Every project here was created through collaboration with Claude AI. Earlier projects (2024–2025) were built with <span class="highlight">Claude Sonnet 4</span>, while newer work in 2026 uses <span class="highlight-alt">Claude Sonnet / Opus 4.6</span>.</p>
+          <p>The developer describes the idea, the AI writes the code, and together they iterate until it works. It's a new way to build software — conversational, fast, and surprisingly powerful.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-flask"></i></span> Why?</h2>
+          <p>To push the boundaries of AI-assisted development. Each project is an experiment: How complex can you go? How fast can you ship? What happens when you let the AI drive?</p>
+          <p>From simple editors to 3D pirate games, from PWAs to kingdom sims — the answer is: further than you'd think.</p>
+        </div>
+        <div class="about-section">
+          <h2><span class="about-icon"><i class="fas fa-tv"></i></span> Best Viewed</h2>
+          <p>Home page video is best viewed in portrait on mobile, or resize your browser to approximately 16:9. Projects work on both desktop and mobile.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS PAGE -->
+  <div id="projects-page" class="page">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="app">Apps</button>
+      <button class="filter-btn" data-filter="game">Games</button>
+    </div>
+    <div class="card-grid" id="card-grid"></div>
+  </div>
+
+  <script src="projects.js"></script>
+  <script>
+    // ─── DERIVE VISIBLE PROJECTS ───
+    // PROJECTS comes from projects.js — filter to only app/game entries
+    const projects = PROJECTS.filter(p => p.type === 'app' || p.type === 'game');
+
+    // ─── HELPERS ───
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    }
+
+    function getClaudeVersion(iso) {
+      return parseInt(iso.slice(0, 4)) >= 2026
+        ? 'Claude Sonnet / Opus 4.6'
+        : 'Claude Sonnet 4';
+    }
+
+    // ─── BUILD CARDS ───
+    function buildCard(project, index) {
+      const builtWith = getClaudeVersion(project.date);
+      const badgeClass = project.type === 'app' ? 'badge-app' : 'badge-game';
+      const badgeLabel = project.type === 'app' ? 'App' : 'Game';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+      wrapper.dataset.category = project.type;
+      wrapper.style.animationDelay = `${index * 50}ms`;
+
+      wrapper.innerHTML = `
+        <div class="card">
+          <div class="card-face card-front">
+            <img src="assets/screenshots/${project.screenshot}.jpg"
+                 alt="${project.name}" loading="lazy">
+            <div class="card-title"><span class="card-name">${project.name}</span></div>
+            <div class="card-category-badge ${badgeClass}">${badgeLabel}</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-back-header">${project.name}</div>
+            <div class="card-back-desc">${project.desc}</div>
+            <div class="card-back-meta">
+              <div class="meta-row"><span class="meta-icon"><i class="far fa-calendar-alt"></i></span>${formatDate(project.date)}</div>
+              <div class="meta-row"><span class="meta-icon"><i class="fas fa-robot"></i></span>${builtWith}</div>
+            </div>
+            <a href="${project.path}" class="card-back-link">Launch Project →</a>
+          </div>
+        </div>`;
+
+      return wrapper;
+    }
+
+    // ─── RENDER GRID ───
+    function renderGrid(filter) {
+      const grid = document.getElementById('card-grid');
+      const existing = Array.from(grid.children);
+
+      // Animate out
+      existing.forEach(el => el.classList.add('hiding'));
+
+      setTimeout(() => {
+        grid.innerHTML = '';
+        const filtered = filter === 'all'
+          ? projects
+          : projects.filter(p => p.type === filter);
+
+        filtered.forEach((p, i) => grid.appendChild(buildCard(p, i)));
+        attachFlipListeners();
+      }, existing.length > 0 ? 250 : 0);
+    }
+
+    // ─── FLIP LOGIC ───
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // Attach hover listeners directly to each card wrapper after rendering
+    function attachFlipListeners() {
+      if (!hasHover) return;
+      document.querySelectorAll('.card-wrapper').forEach(wrapper => {
+        if (wrapper._flipBound) return; // don't double-bind
+        wrapper._flipBound = true;
+        const card = wrapper.querySelector('.card');
+
+        wrapper.addEventListener('mouseenter', () => {
+          if (card._leaving) { clearTimeout(card._leaving); card._leaving = null; }
+          if (!card.classList.contains('flipped')) {
+            card.classList.add('flipped');
+            card._flipTime = Date.now();
+          }
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+          if (!card.classList.contains('flipped')) return;
+          // Ensure the flip-in animation finishes before flipping back
+          const elapsed = Date.now() - (card._flipTime || 0);
+          const delay = Math.max(0, 600 - elapsed);
+          card._leaving = setTimeout(() => {
+            card.classList.remove('flipped');
+            card._leaving = null;
+          }, delay);
+        });
+      });
+    }
+
+    // Touch: tap to toggle flip
+    document.addEventListener('click', function(e) {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      if (e.target.closest('.card-back-link')) return;
+      if (isTouch && !hasHover) {
+        e.preventDefault();
+        card.classList.toggle('flipped');
+      }
+    });
+
+    // ─── MATRIX BACKGROUND ───
     function createMatrixBackground() {
       const canvas = document.createElement('canvas');
       canvas.className = 'matrix-bg';
       document.body.appendChild(canvas);
-      
+
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
       const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
-      const columns = Math.floor(canvas.width / 15);
+      const fontSize = 15;
+      const columns = Math.floor(canvas.width / fontSize);
       const drops = [];
 
       for (let i = 0; i < columns; i++) {
-        drops[i] = Math.floor(Math.random() * canvas.height);
+        drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
       }
 
       function draw() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         ctx.fillStyle = '#0f0';
-        ctx.font = '15px Orbitron';
-        
+        ctx.font = fontSize + 'px Orbitron';
+
         for (let i = 0; i < drops.length; i++) {
           const text = chars[Math.floor(Math.random() * chars.length)];
-          ctx.fillText(text, i * 15, drops[i] * 15);
-          
-          if (drops[i] * 15 > canvas.height && Math.random() > 0.975) {
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }
           drops[i]++;
@@ -375,186 +737,94 @@
       }
 
       setInterval(draw, 33);
-      
+
       window.addEventListener('resize', function() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       });
     }
 
-    // Main app initialization
-    window.addEventListener("DOMContentLoaded", function() {
-      // Initialize matrix background
-      createMatrixBackground();
-      
-      // Get all the links in the navbar
-      var links = document.querySelectorAll(".navbar a");
-      
-      // Loop through the links and add click event listeners
-      for (var i = 0; i < links.length; i++) {
-        links[i].addEventListener("click", function(event) {
-          // Prevent the default behavior of the link
-          event.preventDefault();
-          
-          // Remove the active class from all the links
-          for (var j = 0; j < links.length; j++) {
-            links[j].classList.remove("active");
-          }
-          
-          // Add the active class to the clicked link
-          this.classList.add("active");
-          
-          // Update the content based on the link href
-          var href = this.getAttribute("href");
-          var content = document.querySelector(".content");
-          var other = document.querySelector(".cyber-overlay");
-          var video = document.querySelector(".content video");
+    // ─── PAGE NAVIGATION ───
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.navbar a').forEach(a => a.classList.remove('active'));
 
-          if (href === 'Projects') {
-            content.className = "content hide";
-            other.className = "cyber-overlay";
-            
-            // Generate project items
-            let projectsHTML = `<h1 class="glitch-text">${href}</h1>`;
-            contentData.projects.forEach(project => {
-              projectsHTML += `<div class="cyber-item">
-                <a href="${project.link}">${project.name}</a>
-                <p>${project.description}</p>
-              </div>`;
-            });
-            
-            other.innerHTML = projectsHTML;
-            
-            // Add animation for each item with delay
-            setTimeout(() => {
-              const items = document.querySelectorAll('.cyber-item');
-              items.forEach((item, index) => {
-                setTimeout(() => {
-                  item.style.animation = `slideIn 0.5s ease-out forwards`;
-                }, index * 100);
-              });
-            }, 100);
-            
-          } else if (href === 'Experiments') {
-            content.className = "content hide";
-            other.className = "cyber-overlay";
-            
-            // Generate experiments items
-            let experimentsHTML = `<h1 class="glitch-text">${href}</h1>`;
-            contentData.experiments.forEach(exp => {
-              experimentsHTML += `<div class="cyber-item">
-                <a href="${exp.link}">${exp.name}</a>
-                <p>${exp.description}</p>
-              </div>`;
-            });
-            
-            other.innerHTML = experimentsHTML;
-            
-            // Add animation for each item with delay
-            setTimeout(() => {
-              const items = document.querySelectorAll('.cyber-item');
-              items.forEach((item, index) => {
-                setTimeout(() => {
-                  item.style.animation = `slideIn 0.5s ease-out forwards`;
-                }, index * 100);
-              });
-            }, 100);
-            
-          } else if (href === 'About') {
-            content.className = "content hide";
-            other.className = "cyber-overlay";
-            
-            // Display about content
-            let aboutHTML = `<h1 class="glitch-text">${href}</h1>
-                            <div class="cyber-item">
-                              <p>${contentData.about.content}</p>
-                            </div>`;
-            
-            other.innerHTML = aboutHTML;
-            
-            // Add animation
-            setTimeout(() => {
-              const items = document.querySelectorAll('.cyber-item');
-              items.forEach((item) => {
-                item.style.animation = `slideIn 0.5s ease-out forwards`;
-              });
-            }, 100);
-            
-          } else if (href === 'Home') {
-            content.className = "content";
-            other.className = "cyber-overlay hide";
-            video.style.display = "block";
-          }
-        });
+      const page = document.getElementById(pageName + '-page');
+      const link = document.querySelector(`.navbar a[data-page="${pageName}"]`);
+
+      if (page) page.classList.add('active');
+      if (link) link.classList.add('active');
+
+      if (pageName === 'home') {
+        const video = document.querySelector('#home-page video');
+        if (video) { video.style.display = 'block'; video.play(); }
+      } else {
+        const video = document.querySelector('#home-page video');
+        if (video) video.style.display = 'none';
       }
 
-      // Get the video element
-      var video = document.querySelector(".content video");
-      // Get the home page content element
-      var home = document.querySelector(".content h1");
-      // Play the video when the page loads
+      if (pageName === 'projects') {
+        renderGrid('all');
+        // Reset filter buttons
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+      }
+    }
+
+    // ─── INIT ───
+    window.addEventListener('DOMContentLoaded', function() {
+      createMatrixBackground();
+
+      // Nav links
+      document.querySelectorAll('.navbar a').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          showPage(this.dataset.page);
+        });
+      });
+
+      // Filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          renderGrid(this.dataset.filter);
+        });
+      });
+
+      // Video
+      const video = document.querySelector('#home-page video');
+      const heroText = document.querySelector('.home-hero');
       video.play();
-      // Show the video element
-      video.style.display = "block";
-      // Hide the home page content element
-      home.style.display = "none";
-      // Add a variable to keep track of the loop count
-      var loopCount = 0;
-      // Add an event listener for when the video ends
-      video.addEventListener("ended", function() {
-        // Increment the loop count
+      video.style.display = 'block';
+      heroText.style.display = 'none';
+
+      let loopCount = 0;
+      video.addEventListener('ended', function() {
         loopCount++;
-        // If the loop count is 1, switch to the home page content
-        if (loopCount == 1) {
-          // Hide the video element
-          video.style.display = "none";
-          // Show the home page content element
-          home.style.display = "block";
+        if (loopCount === 1) {
+          video.style.display = 'none';
+          heroText.style.display = 'flex';
         } else {
-          // Otherwise, replay the video
           video.play();
         }
       });
 
-      // Get the sound icon element
-      var icon = document.querySelector(".sound-icon i");
-      // Add a click event listener to the icon element
-      icon.addEventListener("click", function() {
-        // Check the muted property of the video element
+      // Sound toggle
+      const icon = document.querySelector('.sound-icon i');
+      icon.addEventListener('click', function() {
         if (video.muted) {
-          // If the video is muted, unmute it and change the icon class
           video.muted = false;
-          icon.className = "fa fa-volume-up fa-3x son";
+          icon.className = 'fa fa-volume-up fa-3x son';
         } else {
-          // If the video is not muted, mute it and change the icon class
           video.muted = true;
-          icon.className = "fa fa-volume-off fa-3x soff";
+          icon.className = 'fa fa-volume-off fa-3x soff';
         }
       });
+
+      // Handle hash navigation
+      if (window.location.hash === '#projects') showPage('projects');
     });
   </script>
-</head>
-<body>
-  <div class="navbar">
-    <!-- Home icon with cyber styling -->
-    <a href="Home" class="home-icon active"><i class="fas fa-home"></i></a>
-    <a href="Projects">Projects</a>
-    <a href="Experiments">Experiments</a>
-    <a href="About">About</a>
-  </div>
-  
-  <div class="content">
-    <!-- Sound icon with cyber styling -->
-    <div class="sound-icon">
-      <i class="fa fa-volume-off fa-3x soff"></i>
-    </div>
-    <!-- Video background -->
-    <video src="assets/Mv1.mp4" muted loop></video>
-    <h1 class="glitch-text">Welcome to Cyber Space</h1>
-    <p></p>
-  </div>
-  
-  <!-- Cyber overlay for other content -->
-  <div class="cyber-overlay hide"></div>
 </body>
 </html>

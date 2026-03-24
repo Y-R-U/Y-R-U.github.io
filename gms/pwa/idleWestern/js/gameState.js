@@ -4,6 +4,7 @@
 
 const GameState = (() => {
   const SAVE_KEY = 'idleWestern_save';
+  const COMPLETIONS_KEY = 'idleWestern_completions';
   const SAVE_INTERVAL = 30000; // 30s auto-save
   const OFFLINE_CAP_HOURS = 8;
   const OFFLINE_RATE = 0.5; // 50% of active rate
@@ -40,6 +41,12 @@ const GameState = (() => {
       lastTick: Date.now(),
       gameStarted: Date.now(),
 
+      // Story
+      storyShown: false,
+
+      // Difficulty: 'easy' | 'medium' | 'hard' | null (not yet chosen)
+      difficulty: null,
+
       // Buy mode
       buyMode: 1, // 1, 10, or -1 for max
 
@@ -57,6 +64,12 @@ const GameState = (() => {
         const fresh = createFreshState();
         for (const key in fresh) {
           if (!(key in state)) state[key] = fresh[key];
+        }
+        // Migration: existing players with progress but no difficulty → hard
+        if (state.difficulty === undefined || state.difficulty === null) {
+          if (state.totalEarned > 0 || state.storyShown) {
+            state.difficulty = 'hard';
+          }
         }
       } catch (e) {
         console.warn('Save corrupted, starting fresh');
@@ -122,6 +135,8 @@ const GameState = (() => {
     for (const biz of GameData.BUSINESSES) {
       state.businesses[biz.id] = { owned: 0 };
     }
+    // difficulty reset to null so player picks again
+    // completions NOT cleared (separate localStorage key)
     save();
   }
 
@@ -146,6 +161,58 @@ const GameState = (() => {
     return mult;
   }
 
+  // --- Difficulty ---
+
+  function getDifficultyConfig() {
+    const key = state.difficulty || 'hard';
+    return GameData.DIFFICULTY_CONFIG[key] || GameData.DIFFICULTY_CONFIG.hard;
+  }
+
+  function getDifficultyMult() {
+    const config = getDifficultyConfig();
+    const tiers = config.tiers;
+    if (!tiers || tiers.length === 0) return 1;
+
+    // Current game totals
+    let totalBiz = 0;
+    const oilLevel = state.businesses.oil?.owned || 0;
+    for (const biz of GameData.BUSINESSES) {
+      totalBiz += state.businesses[biz.id]?.owned || 0;
+    }
+
+    // Last matching tier wins (tiers ordered ascending)
+    let mult = 1;
+    for (const tier of tiers) {
+      if (totalBiz >= tier.totalBiz && oilLevel >= tier.oilLevel) {
+        mult = tier.mult;
+      }
+    }
+    return mult;
+  }
+
+  // --- Completion tracking (separate localStorage, survives hard reset) ---
+
+  function getCompletions() {
+    try {
+      const raw = localStorage.getItem(COMPLETIONS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+    return { easy: false, medium: false, hard: false };
+  }
+
+  function saveCompletion(difficulty) {
+    const completions = getCompletions();
+    completions[difficulty] = true;
+    localStorage.setItem(COMPLETIONS_KEY, JSON.stringify(completions));
+  }
+
+  function isDifficultyUnlocked(diffKey) {
+    const config = GameData.DIFFICULTY_CONFIG[diffKey];
+    if (!config) return false;
+    if (!config.unlockRequires) return true;
+    return getCompletions()[config.unlockRequires] === true;
+  }
+
   function cleanExpiredBuffs() {
     const now = Date.now();
     state.buffs = state.buffs.filter(b => b.endsAt > now);
@@ -164,7 +231,8 @@ const GameState = (() => {
     const base = state.tapValue;
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('tap_mult');
-    return base * prestigeMult * buffMult;
+    const diffMult = getDifficultyMult();
+    return base * prestigeMult * buffMult * diffMult;
   }
 
   function getBusinessIncome(bizDef) {
@@ -181,7 +249,8 @@ const GameState = (() => {
     }
     const prestigeMult = getPrestigeMultiplier();
     const buffMult = getBuffMultiplier('income_mult');
-    return total * prestigeMult * buffMult;
+    const diffMult = getDifficultyMult();
+    return total * prestigeMult * buffMult * diffMult;
   }
 
   function getBaseIncomePerSec() {
@@ -190,7 +259,34 @@ const GameState = (() => {
     for (const biz of GameData.BUSINESSES) {
       total += getBusinessIncome(biz);
     }
-    return total * getPrestigeMultiplier();
+    return total * getPrestigeMultiplier() * getDifficultyMult();
+  }
+
+  /**
+   * Get the offline earnings business multiplier.
+   * Formula: numBusinessTypesOwned + sum of floor(highestBizLevel / 100) bonuses
+   * e.g. highest biz at level 300: mult = numBiz + (1 + 2 + 3) = numBiz + 6
+   * At level 100: numBiz + 1, at 200: numBiz + 3, at 300: numBiz + 6
+   */
+  function getOfflineBusinessMultiplier() {
+    let typesOwned = 0;
+    let highestLevel = 0;
+    for (const biz of GameData.BUSINESSES) {
+      const owned = state.businesses[biz.id]?.owned || 0;
+      if (owned > 0) typesOwned++;
+      if (owned > highestLevel) highestLevel = owned;
+    }
+    if (typesOwned === 0) return 1;
+
+    // Cumulative bonus from highest business: for each 100 mark, add that mark/100
+    // lvl 300 -> 1 + 2 + 3 = 6
+    let levelBonus = 0;
+    const hundreds = Math.floor(highestLevel / 100);
+    for (let i = 1; i <= hundreds; i++) {
+      levelBonus += i;
+    }
+
+    return typesOwned + levelBonus;
   }
 
   function calcOfflineEarnings() {
@@ -203,7 +299,8 @@ const GameState = (() => {
     if (elapsed < 5) return 0; // Less than 5 seconds, not worth showing
 
     const income = getBaseIncomePerSec() * OFFLINE_RATE;
-    return income * elapsed;
+    const bizMult = getOfflineBusinessMultiplier();
+    return income * elapsed * bizMult;
   }
 
   function doTick(deltaMs) {
@@ -337,8 +434,24 @@ const GameState = (() => {
     if (state.eventsClicked >= 10 && unlockAchievement('event_10'))
       unlocked.push('event_10');
 
-    if (typesOwned >= 10 && unlockAchievement('all_biz'))
+    // Difficulty tier milestones
+    if (totalOwned >= 100 && unlockAchievement('biz_100'))
+      unlocked.push('biz_100');
+    const oilOwned = state.businesses.oil?.owned || 0;
+    if (oilOwned >= 100 && unlockAchievement('oil_100'))
+      unlocked.push('oil_100');
+    if (oilOwned >= 300 && unlockAchievement('oil_300'))
+      unlocked.push('oil_300');
+    if (oilOwned >= 400 && unlockAchievement('oil_400'))
+      unlocked.push('oil_400');
+
+    if (typesOwned >= 10 && unlockAchievement('all_biz')) {
       unlocked.push('all_biz');
+      // Mark current difficulty as completed
+      if (state.difficulty) {
+        saveCompletion(state.difficulty);
+      }
+    }
 
     return unlocked;
   }
@@ -347,7 +460,10 @@ const GameState = (() => {
     init, save, getState, hardReset,
     resetForPrestige, calcPrestigeStars, getPrestigeMultiplier,
     getBuffMultiplier, addBuff, cleanExpiredBuffs,
+    getDifficultyConfig, getDifficultyMult,
+    getCompletions, saveCompletion, isDifficultyUnlocked,
     getTapValue, getBusinessIncome, getTotalIncomePerSec, getBaseIncomePerSec,
+    getOfflineBusinessMultiplier,
     calcOfflineEarnings, doTick, tap,
     buyBusiness, getMaxBuyable, buyTapUpgrade,
     isBusinessUnlocked, isBusinessVisible,

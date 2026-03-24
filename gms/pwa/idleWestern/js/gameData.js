@@ -4,6 +4,49 @@
 
 const GameData = (() => {
 
+  // ── Difficulty tuning ──────────────────────────────────────────────
+  // Each tier: { totalBiz, oilLevel, mult }
+  //   totalBiz = total businesses owned across all types
+  //   oilLevel = Oil Derrick quantity owned
+  //   mult     = income & tap multiplier once BOTH thresholds are met
+  // Tiers are evaluated top-to-bottom; last matching tier wins.
+  // Adjust these numbers freely to re-balance difficulty modes.
+  const DIFFICULTY_CONFIG = {
+    easy: {
+      label: 'Easy', icon: '\uD83C\uDF35', desc: 'Relaxed frontier life',
+      warning: null, unlockRequires: null,
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 3 },
+        { totalBiz: 100, oilLevel: 0,   mult: 10 },
+        { totalBiz: 0,   oilLevel: 100, mult: 100 },
+        { totalBiz: 0,   oilLevel: 300, mult: 1000 },
+        { totalBiz: 0,   oilLevel: 400, mult: 10000 },
+      ]
+    },
+    medium: {
+      label: 'Medium', icon: '\u26CF\uFE0F', desc: 'A fair challenge',
+      warning: null, unlockRequires: 'easy',
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 2 },
+        { totalBiz: 100, oilLevel: 0,   mult: 4 },
+        { totalBiz: 0,   oilLevel: 100, mult: 10 },
+        { totalBiz: 0,   oilLevel: 300, mult: 100 },
+        { totalBiz: 0,   oilLevel: 400, mult: 1000 },
+      ]
+    },
+    hard: {
+      label: 'Hard', icon: '\uD83D\uDC80', desc: 'The true frontier experience',
+      warning: '\u26A0\uFE0F You might not finish!', unlockRequires: 'medium',
+      tiers: [
+        { totalBiz: 0,   oilLevel: 0,   mult: 1 },
+        { totalBiz: 100, oilLevel: 0,   mult: 1 },
+        { totalBiz: 0,   oilLevel: 100, mult: 1 },
+        { totalBiz: 0,   oilLevel: 300, mult: 10 },
+        { totalBiz: 0,   oilLevel: 400, mult: 100 },
+      ]
+    }
+  };
+
   const BUSINESSES = [
     {
       id: 'stable',
@@ -212,7 +255,12 @@ const GameData = (() => {
     { id: 'tap_1000', name: 'Trigger Finger', desc: 'Tap 1,000 times', icon: '\uD83D\uDC46' },
     { id: 'tap_10000', name: 'Fastest Hand', desc: 'Tap 10,000 times', icon: '\u26A1' },
     { id: 'event_10', name: 'Lucky Break', desc: 'Catch 10 random events', icon: '\uD83C\uDF1F' },
-    { id: 'all_biz', name: 'Empire Builder', desc: 'Own all 10 business types', icon: '\uD83C\uDFDB\uFE0F' }
+    { id: 'all_biz', name: 'Empire Builder', desc: 'Own all 10 business types', icon: '\uD83C\uDFDB\uFE0F' },
+    // Difficulty tier milestones (tierIndex maps to DIFFICULTY_CONFIG tiers[])
+    { id: 'biz_100', name: 'Boomtown', desc: 'Own 100 total businesses', icon: '\uD83C\uDFD8\uFE0F', tierIndex: 1 },
+    { id: 'oil_100', name: 'Oil Baron', desc: 'Oil Derrick reaches level 100', icon: '\u26FD', tierIndex: 2 },
+    { id: 'oil_300', name: 'Black Gold Rush', desc: 'Oil Derrick reaches level 300', icon: '\uD83C\uDFD7\uFE0F', tierIndex: 3 },
+    { id: 'oil_400', name: 'Oil Empire', desc: 'Oil Derrick reaches level 400', icon: '\uD83D\uDC51', tierIndex: 4 }
   ];
 
   function getBusinessCost(biz, owned) {
@@ -237,6 +285,7 @@ const GameData = (() => {
 
   return {
     BUSINESSES, MILESTONES, TAP_UPGRADES, EVENTS, ACHIEVEMENTS,
+    DIFFICULTY_CONFIG,
     getBusinessCost, getBusinessCostN, getMilestoneMultiplier
   };
 })();

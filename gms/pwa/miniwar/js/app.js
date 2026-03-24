@@ -21,10 +21,10 @@
     const canvas = document.getElementById('gameCanvas');
     Graphics.init(canvas);
 
-    setProgress(30, 'Loading graphics...');
-    await delay(100);
+    setProgress(25, 'Loading sprites...');
+    await Sprites.init();
+    await delay(50);
 
-    // Init UI
     setProgress(50, 'Building interface...');
     UI.init();
     await delay(100);

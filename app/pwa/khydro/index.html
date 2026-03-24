@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1b5e20">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Track your hydroponic plants — water, nutrients, harvests, and more.">
+    <title>K-Hydro Track</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+    <link rel="apple-touch-icon" href="./icons/icon.svg">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>K-Hydro Track</h1>
+            <div class="header-right">
+                <button id="darkModeToggle" class="icon-btn">🌙</button>
+                <button id="exportDataBtn" class="primary">Export</button>
+                <label for="fileImport" class="primary" style="display:inline-block;padding:8px 12px;border-radius:5px;cursor:pointer;font-weight:bold;">Import</label>
+                <input type="file" id="fileImport" accept=".json">
+                <div class="user-menu">
+                    <button id="userMenuBtn" class="user-btn">
+                        <span class="user-avatar">?</span>
+                        <span id="usernameDisplay">user</span>
+                    </button>
+                    <div id="userDropdown" class="user-dropdown">
+                        <div class="dropdown-header">Signed in as</div>
+                        <div class="dropdown-username" id="dropdownUsername">@user</div>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="syncNowBtn">🔄 Sync Now</button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" id="logoutBtn">🚪 Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <button id="showAddPlantModalBtn" class="primary" style="width:100%;margin-bottom:20px;padding:12px;">+ Add New Plant</button>
+
+        <div class="table-container">
+            <table id="plantTable">
+                <thead>
+                    <tr>
+                        <th data-sort="name">Name <span class="sort-arrow"></span></th>
+                        <th data-sort="startDate">Start Date <span class="sort-arrow"></span></th>
+                        <th data-sort="initialVolume">Initial Vol (L) <span class="sort-arrow"></span></th>
+                        <th data-sort="totalNutrientVolume">Total Nutrient (L @100%) <span class="sort-arrow"></span></th>
+                        <th data-sort="harvest">Harvest (g) <span class="sort-arrow"></span></th>
+                        <th data-sort="status">Status <span class="sort-arrow"></span></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="plantTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="stats-section">
+            <h3>Overall Statistics</h3>
+            <p>Total Plants: <span id="totalPlantsStat">0</span></p>
+            <p>Total Nutrient Used (All, @100%): <span id="overallNutrientUsedStat">0</span> L</p>
+            <p>Total Harvested (All Plants): <span id="overallHarvestStat">0</span> g</p>
+        </div>
+    </div>
+
+    <!-- Add Plant Modal -->
+    <div id="addPlantModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="addPlantModal">&times;</span>
+            <h3>Add New Plant</h3>
+            <form id="addPlantForm">
+                <label for="newPlantName">Plant Name:</label>
+                <input type="text" id="newPlantName" required>
+                <label for="newInitialVolume">Initial Volume (Liters):</label>
+                <input type="number" id="newInitialVolume" step="0.1" min="0" required>
+                <label for="newStartDate">Start Date:</label>
+                <input type="date" id="newStartDate" required>
+                <button type="submit" class="primary">Add Plant</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Log Entry Modal -->
+    <div id="logEntryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="logEntryModal">&times;</span>
+            <h3 id="logEntryModalTitle">Log Entry for Plant</h3>
+            <form id="logEntryForm">
+                <input type="hidden" id="logEntryPlantId">
+                <label for="logWaterVolume">Volume Added (Liters):</label>
+                <input type="number" id="logWaterVolume" step="0.1" min="0" placeholder="Optional, e.g., 0.5">
+                <label for="logNutrientConcentration">Nutrient Concentration (%):</label>
+                <input type="range" id="logNutrientConcentration" min="0" max="100" value="100" step="1">
+                <span id="logNutrientConcValue">100%</span>
+                <label for="logHarvestWeight" style="margin-top:15px;display:block;">Harvest Weight (grams):</label>
+                <input type="number" id="logHarvestWeight" step="1" min="0" placeholder="Optional, e.g., 50">
+                <button type="submit" class="primary">Log Entry</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Plant Details Modal -->
+    <div id="plantDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="plantDetailsModal">&times;</span>
+            <h3 id="detailsModalPlantName">Plant Details</h3>
+            <input type="hidden" id="detailsPlantId">
+            <p><strong>Start Date:</strong> <span id="detailsStartDate"></span></p>
+            <p><strong>Initial Volume:</strong> <span id="detailsInitialVolume"></span> L (at 100% nutrients)</p>
+            <p><strong>Total Added Water:</strong> <span id="detailsTotalAddedWater"></span> L</p>
+            <p><strong>Total Nutrient (equiv. @100%):</strong> <span id="detailsTotalNutrientVolume"></span> L</p>
+            <p><strong>Total Harvest:</strong> <span id="detailsTotalHarvest"></span> g</p>
+            <h4>Entry Log:</h4>
+            <div id="detailsEntryLogContainer"></div>
+            <h4>Notes:</h4>
+            <div id="detailsNotesDisplay"></div>
+            <button id="detailsEditNotesBtn" class="primary" style="margin-bottom:10px;">📝 Edit Notes</button>
+            <h4>Photos:</h4>
+            <div id="detailsPhotosContainer" class="plant-photos-container" style="margin-bottom:10px;"></div>
+            <button id="detailsAddPhotoBtn" class="primary">📸 Add Photo</button>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="notesModal">&times;</span>
+            <h3>Plant Notes</h3>
+            <form id="notesForm">
+                <input type="hidden" id="notesPlantId">
+                <textarea id="plantNotesText" rows="5" placeholder="Enter observations..."></textarea>
+                <button type="submit" class="primary">Save Notes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="photoModal">&times;</span>
+            <h3>Add Photo</h3>
+            <form id="photoForm">
+                <input type="hidden" id="photoPlantId">
+                <label for="plantPhotoFile">Select or Take Photo:</label>
+                <input type="file" id="plantPhotoFile" accept="image/*" required>
+                <button type="submit" class="primary">Add Photo</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/ui.js"></script>
+    <script src="./js/store.js"></script>
+    <script src="./js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+</body>
+</html>

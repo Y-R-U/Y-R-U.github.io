@@ -1,0 +1,189 @@
+CORSAIR'S FATE - PIRATE 2D ROGUELITE
+=====================================
+Tech: Vanilla JS (ES modules), HTML5 Canvas, PWA, no build tools
+Service Worker: corsairs-fate-v10
+
+FILE STRUCTURE:
+  js/game.js           - Main game loop, asset loading, boss spawning, run management, low-HP glow
+  js/enemies.js        - ENEMY_TYPES[9], Enemy class (healing, mines, land avoidance), EnemySpawner
+  js/player.js         - Player class, stats, extraCannons, bossesDefeatedThisRun
+  js/combat.js         - Projectiles, mines[], targeted explosive shots, multi-cannon firing
+  js/kraken.js         - Kraken boss (half-submerged drawing, red eye mode, healing)
+  js/upgrades.js       - RUN_UPGRADES, PERMANENT_UPGRADES, EXTRA_CANNON_COSTS
+  js/ui.js             - HUD, panels, title screen (with extra cannon), port panels
+  js/story.js          - 3-run story system, RUN_CHAPTERS, boss triggers
+  js/particles.js      - Particle effects (fire, explosions, text, wreckage)
+  js/audio.js          - Procedural SFX + music discovery (parallelized), creepy tracks
+  js/debug.js          - Debug panel (GOD, ISL, B1, B2, KRK, B? buttons)
+  js/island-editor.js  - DEBUG ONLY: Island template editor (loaded dynamically by debug.js)
+  js/input.js          - Touch/mouse/keyboard input manager
+  js/world.js          - Procedural world, chunked tiles, custom island templates, ports
+  js/trading.js        - Port trading system, buy/sell goods
+  js/utils.js          - Math helpers, AssetLoader, formatGold
+  css/style.css        - All styling
+  sw.js                - Service worker v10, network-first nav, cache-first assets
+
+=== TILE SYSTEM (world.js) ===
+96 tile sprites: assets/tiles/tile_01.png through tile_96.png (64x64 each)
+Chunk tile values: 0 = water, 1-96 = tile_XX.png sprite number
+  Procedural islands use: 42 (beach/shore), 1 (land/grass)
+  Custom islands can use any tile 1-96
+Tile sprites lazy-loaded via getTileSpriteAsync() cache in world.js
+isLand(x,y): returns true if getTile() > 0 (any non-water tile)
+
+=== ISLAND EDITOR (js/island-editor.js) ===
+Debug-only tool loaded dynamically via import() from debug.js ISL button
+Full-screen overlay with:
+  - Grid canvas: paint/erase/hotspot tools, click/drag to place tiles
+  - Tile palette: all 96 tile sprites shown as clickable thumbnails
+  - Hotspot types: port, treasure_map
+  - Save/load/delete numbered islands to localStorage (pirate2d_custom_islands)
+Island template format (in localStorage):
+  { id, name, width, height, tiles: [tileNum...], hotspots: [{tx, ty, type}] }
+When custom templates exist, world._placeIslandInChunk picks one randomly
+  instead of generating procedural circular blobs
+Port-type hotspots create actual game ports at those positions
+To disconnect debug: just don't import debug.js; island-editor.js is never loaded directly
+
+=== CUSTOM ISLAND INTEGRATION (world.js) ===
+World._loadCustomTemplates(): reads pirate2d_custom_islands from localStorage on construction
+_placeIslandInChunk(): if customTemplates exist, stamps template tiles into chunk
+  Template centered on the procedural island center position
+  Hotspots with type "port" generate real game ports
+_stampExistingIslands(): places tiles for pre-existing islands (e.g. home island) on chunk gen
+
+=== SHIP SPRITE MAP (assets/ships/) ===
+24 PNG files in a conceptual 4-row grid:
+  Row 1 (1-6):   Undamaged - white, black, red, green, blue, yellow sails
+  Row 2 (7-12):  Damage 1  - same 6 colors
+  Row 3 (13-18): Damage 2  - same 6 colors (most damaged)
+  Row 4 (19-24): Dark/boss ships
+
+Asset key mapping (game.js):
+  Player: player_ship=1, player_ship_dmg=7, player_ship_heavy_dmg=13
+  Sloop (red): enemy_ship_1=3, damaged_ship_1=9, heavy_dmg_ship_1=15
+  Brigantine (blue): enemy_ship_2=5, damaged_ship_2=11, heavy_dmg_ship_2=17
+  Galleon (green): enemy_ship_3=4, damaged_ship_3=10, heavy_dmg_ship_3=16
+  Man-o-War (yellow): enemy_ship_4=6, damaged_ship_4=12, heavy_dmg_ship_4=18
+  Ghost Ship (black): enemy_ship_5=2, damaged_ship_5=8, heavy_dmg_ship_5=14
+  Boss ships: boss_ship_std=24, boss_ship_dmg=20, boss_ship_heavy=19
+
+=== ENEMY TYPES (enemies.js) ===
+Idx | Name               | baseHp | baseDmg | isBoss | isRunBoss | Sprites (3-tier)
+0   | Sloop              | 30     | 5       | false  | false     | enemy_ship_1 / damaged_ship_1 / heavy_dmg_ship_1
+1   | Brigantine         | 60     | 10      | false  | false     | enemy_ship_2 / damaged_ship_2 / heavy_dmg_ship_2
+2   | Galleon            | 120    | 18      | false  | false     | enemy_ship_3 / damaged_ship_3 / heavy_dmg_ship_3
+3   | Man-o-War          | 200    | 25      | false  | false     | enemy_ship_4 / damaged_ship_4 / heavy_dmg_ship_4
+4   | Ghost Ship         | 150    | 30      | true   | false     | enemy_ship_5 / damaged_ship_5 / heavy_dmg_ship_5
+5   | Kraken (ship)      | 400    | 40      | true   | false     | (procedural for real Kraken)
+6   | Lieutenant         | 675    | 25      | true   | true      | boss_ship_std / boss_ship_dmg / boss_ship_heavy
+7   | Captain Blacktide  | 750    | 30      | true   | true      | boss_ship_std / boss_ship_dmg / boss_ship_heavy
+8   | Dark Warship       | 250    | 28      | false  | false     | boss_ship_alt1 / boss_ship_dmg / boss_ship_heavy
+
+HP scaling: maxHp = baseHp * (1 + (level-1) * 0.25)
+Damage sprite thresholds: >66% normal, 33-66% dmg1, <33% dmg2
+Boss spawn level: max(1, round(3 * (1 + (run-1) * 0.3)))
+
+=== ENEMY LAND AVOIDANCE (enemies.js) ===
+Enemy._world: reference to World, set by spawner or game when creating enemies
+Spawn check: EnemySpawner._spawn() skips if world.isLand(spawnX, spawnY)
+Movement check: Enemy.update() checks next position; if on land, reverses angle instead of moving
+All enemy creation paths set _world: spawner, spawnRunBoss, _loadGameState, debug
+
+=== BOSS HEALING (enemies.js + kraken.js) ===
+Enemy fields: healsUsed, maxHeals, healThresholds[], _justHealed timer
+In takeDamage(): if hpRatio <= next threshold, heal 30% maxHp (enemies) or 25% (Kraken)
+  Lieutenant: 1 heal at 50%
+  Blacktide:  2 heals at 66% and 33%, also laysMines=true
+  Kraken:     3 heals at 75%, 50%, 25%
+
+=== MINES (combat.js) ===
+Array: this.mines[] = { x, y, damage, life:30, radius:60, pulsePhase }
+Laid by Blacktide via enemy.shouldLayMine() (3-7s cooldown)
+Player proximity check -> explosion + damage + screen shake
+Drawing: 8-spike shape with pulsing red center
+
+=== KRAKEN (kraken.js) ===
+Procedural boss - half-submerged: only top dome + eyes visible, tentacles below
+  Body clipped to show only top portion (brow ridges, head bumps)
+  Waterline effect with animated waves and foam at submersion edge
+  No mouth/teeth visible - appears partially underwater
+HP: 750 * (1 + (level-1)*0.3), heals 3x
+Red eye mode: cycles 8-13s normal -> 4-6s red
+  When red: eyes glow red, fires targeted explosive shots
+  Explosive shots target player's position at fire time, detonate on arrival
+  Blast radius 80px with distance-based damage falloff (60% base damage)
+Attacks: tentacle slam (6-10s), ink attack (4-7s)
+AI: chase/circle-strafe, never leashes
+
+=== EXTRA CANNON UPGRADE (upgrades.js + ui.js) ===
+EXTRA_CANNON_COSTS = [25000, 100000]
+Title screen upgrade: available when completedRuns.length > extraCannons
+  Uses persistentGold (saved gold), shown on title screen between runs
+  25k after story 1, 100k after story 2
+player.cannonCount getter: 1 + extraCannons
+Multi-cannon: fires cannonCount projectiles per side with 0.08 rad spread
+Persistent: saved in player._savePersistent()
+
+=== COMBAT SYSTEM (combat.js) ===
+CombatSystem: projectiles[], mines[]
+Player auto-fires from port/starboard sides, multi-cannon support
+Explosive projectiles: { explosive:true, blastRadius:80, targetX, targetY }
+  Targeted shots travel to player's position at fire time, detonate within 30px
+  Non-targeted explosive shots detonate on life expiry
+  Detonation: double explosion particles + screen shake + blast radius damage
+Kraken fires via _fireKrakenCannon() - targeted explosive when redEyeMode
+Normal Kraken shots: standard projectiles with life:1.5
+Enemy kills: gold + cargo drops, boss bonus (25% heal + 2x gold)
+Run boss defeat -> game.onRunBossDefeated() -> victory fanfare + finish button
+
+=== LOW HEALTH EFFECTS (game.js) ===
+_drawLowHealthGlow(): red vignette when player HP < 25%
+  Intensity scales from 0 at 25% to max near 0%
+  Radial gradient from center (clear) to edges (red)
+  Below 15% HP: additional heartbeat pulse overlay
+  Drawn in screen-space (not affected by zoom)
+
+=== STORY SYSTEM (story.js) ===
+3 runs with RUN_CHAPTERS{1,2,3}:
+  Run 1 "The Corsair's Awakening": chapters at 0/1500/3000/5000m, boss at 8000m (spawnBoss=1)
+  Run 2 "The Dark Fleet": chapters at 0/2000/5000m, boss at 9000m (spawnBoss=2)
+  Run 3 "The Kraken's Abyss": chapters at 0/3000/6000m, boss at 10000m (spawnBoss=3)
+Boss chapter dialogues have 3000ms minDisplayTime + screen shake
+unlockCreepy: triggers creepy music track unlock on boss chapters
+
+=== PLAYER (player.js) ===
+Base stats: maxHp=100, maxSpeed=150, cannonDamage=15, cannonRange=250, fireRate=1.0
+Damage sprites: >75% player_ship, 40-75% player_ship_dmg, <40% player_ship_heavy_dmg
+Persistent: persistentGold, totalRuns, bestDistance, completedRuns, currentRun, extraCannons
+Per-run: bossesDefeatedThisRun, bossDefeated, buriedGold
+Player naming: namePrefix + playerName (set on first play)
+
+=== UPGRADE SYSTEM (upgrades.js) ===
+RUN_UPGRADES (lost on death): hull, cannons, speed, fireRate, range, cargo, armor, repairSpeed
+PERMANENT_UPGRADES: repairUnlock, permDamage, permHealth, permSpeed, permFireRate,
+  permCargo, permArmor, startGold, startHp, luck, permRepairSpeed
+Extra cannon: canBuyExtraCannon(), getExtraCannonCost(), buyExtraCannon()
+
+=== UI (ui.js) ===
+Panels: title (with extra cannon offer), nameInput, port, trade, upgrade,
+  dialogue (with minDisplayTime + skip), settings, death, bossVictory, finishRun
+HUD: HP bar, gold, buried gold, cargo, kills, distance, repair, medicine, bury button
+Debug: GOD (999k hp/gold), ISL (island editor), B1/B2/KRK (spawn bosses), B? (custom level boss)
+
+=== AUDIO (audio.js) ===
+Music: discoverMusic() uses parallel HEAD requests (Promise.all) for themes 1-9 + creepy 1-4
+Creepy tracks locked by default, unlocked by story (unlockCreepyTrack())
+SFX: playCannon, playHit, playExplosion, playBossExplosion, playCoin, playUpgrade,
+  playVictoryFanfare, playPortEnter, playDeath (all procedural via Web Audio API)
+
+=== DEBUG (debug.js) ===
+Activated by including "abdebugt3st" in player name
+Buttons: GOD, ISL, B1, B2, KRK, B? (prompts for level, spawns Ghost Ship at that level)
+ISL button: dynamically imports island-editor.js and opens the island editor
+Uses game._getEnemyImports() to access Enemy/ENEMY_TYPES
+
+=== ZOOM SYSTEM (game.js) ===
+3 zoom levels: 1.0 (close), 0.75 (medium), 0.5 (far)
+Pinch-to-zoom on mobile, saved to localStorage
+viewW/viewH adjusted by zoomScale, all game rendering uses ctx.scale()

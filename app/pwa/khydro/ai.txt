@@ -1,0 +1,97 @@
+K-Hydro Track — Function Reference
+====================================
+
+--- js/ui.js (KUI module) ---
+
+KUI.showToast(message, type)
+  type: 'success' | 'error' | 'info'. Auto-dismisses after 3 seconds.
+
+KUI.showConfirm(message) -> Promise<boolean>
+  Custom confirm dialog replacing window.confirm. Resolves true on Confirm, false on Cancel.
+
+KUI.showLogin() -> Promise<string>
+  Full-screen login overlay. Validates username (a-z, 0-9, -, _, 2-30 chars). Resolves with username.
+
+KUI.initUserMenu(username)
+  Sets avatar, display name, and dropdown username. Wires open/close toggle.
+
+--- js/store.js (KStore module) ---
+
+KStore.getUsername() -> string|null
+KStore.setUsername(name)
+KStore.clearUsername()
+
+KStore.getDarkMode() -> boolean
+KStore.setDarkMode(val)
+
+KStore.readPlants() -> Array
+KStore.writePlants(plants)
+  Saves to localStorage and fire-and-forget pushes to Cloudflare D1 (photos stripped).
+
+KStore.clearPlants()
+
+KStore.initSync(username)
+  Sets the username used for all cloud sync API calls.
+
+KStore.syncFromCloud() -> Promise<Array|null>
+  Fetches remote data, merges with local (highest updatedAt wins per item id),
+  persists merged result locally, pushes back if remote was stale.
+  Photos are local-only (excluded from cloud sync to stay within D1 size limits).
+
+KStore.migrateOldData()
+  One-time migration from old localStorage keys (kHydroPlants -> khydro_plants).
+
+--- js/app.js (main application, inside jQuery ready) ---
+
+formatDateForDisplay(dateString) -> string
+formatDateTimeForLog(dateString) -> string
+formatDateForInput(dateString) -> string
+getISODate(date?) -> string          e.g. '2024-01-15'
+getISODateTime(date?) -> string      e.g. '2024-01-15T10:30:00.000Z'
+generateId() -> string               e.g. '_a1b2c3d4e'
+
+saveData()
+  Persists plants array via KStore.writePlants and saves dark mode preference.
+
+touchPlant(plant)
+  Sets plant.updatedAt = Date.now() for merge resolution.
+
+normalizePlants(arr)
+  Ensures all plant objects have required fields with defaults.
+
+loadData()
+  Reads plants from KStore, normalizes, applies dark mode, renders table.
+
+openModal(modalId) / closeModal(modalId)
+
+calculatePlantStats(plant) -> { totalAddedWaterVolume, totalNutrientVolumeEquivalent, totalHarvestWeight }
+  Aggregates water log and harvest entries for a single plant.
+
+renderPlantTable()
+  Sorts plants by currentSort, renders table rows, updates sort arrows.
+
+updateOverallStats()
+  Sums stats across all plants for the footer statistics section.
+
+init()
+  Entry point. Handles login flow, cloud sync, and initial render.
+
+--- functions/api/khydro.js (Cloudflare D1 API) ---
+
+onRequestOptions()
+  CORS preflight. Returns 204 with allow headers.
+
+onRequestGet({ request, env })
+  GET /api/khydro?user=<username>
+  Returns { items: [...] } from D1 for project 'k-hydro' and given user.
+
+onRequestPost({ request, env })
+  POST /api/khydro?user=<username>  body: { items: [...] }
+  Upserts the JSON blob into D1. Returns { ok: true }.
+
+--- D1 Storage ---
+
+Table: notes
+Columns: web_project='k-hydro', username, json_text (JSON blob), updated_at (ms timestamp)
+Primary key: (web_project, username)
+Auto-created on first request.

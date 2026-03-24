@@ -1,5 +1,5 @@
 /* ============================================
-   DICEY - UI Manager
+   DICEY - UI Manager (Skills-based)
    All panels, overlays, toasts (no alerts!)
    ============================================ */
 
@@ -14,12 +14,9 @@ const UI = {
         this.overlayBgEl = document.getElementById('overlay-bg');
     },
 
-    // Show overlay with panel content
     showPanel(html, opts = {}) {
         this.panelEl.innerHTML = html;
         this.overlayEl.classList.remove('hidden');
-
-        // Close button handler
         const closeBtn = this.panelEl.querySelector('.panel-close');
         if (closeBtn && !opts.noClose) {
             closeBtn.addEventListener('click', () => {
@@ -28,8 +25,6 @@ const UI = {
                 if (opts.onClose) opts.onClose();
             });
         }
-
-        // Background click to close (unless modal)
         if (!opts.modal) {
             this.overlayBgEl.onclick = () => {
                 AudioManager.playSfx('click');
@@ -39,7 +34,6 @@ const UI = {
         } else {
             this.overlayBgEl.onclick = null;
         }
-
         return this.panelEl;
     },
 
@@ -49,11 +43,9 @@ const UI = {
         this.overlayBgEl.onclick = null;
     },
 
-    // Toast notification
     showToast(message, duration = 2500) {
         const existing = document.querySelector('.toast');
         if (existing) existing.remove();
-
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.textContent = message;
@@ -61,7 +53,7 @@ const UI = {
         setTimeout(() => toast.remove(), duration);
     },
 
-    // Settings panel
+    // ---- SETTINGS ----
     showSettings() {
         const html = `
             <div class="panel">
@@ -71,387 +63,318 @@ const UI = {
                 </div>
                 <div class="panel-body">
                     <div class="setting-row">
-                        <div>
-                            <div class="setting-label">Sound Effects</div>
-                            <div class="setting-desc">Toggle game sound effects</div>
-                        </div>
+                        <div><div class="setting-label">Sound Effects</div><div class="setting-desc">Toggle game sounds</div></div>
                         <button class="toggle ${AudioManager.sfxEnabled ? 'on' : ''}" id="toggle-sfx"></button>
                     </div>
                     <div class="setting-row">
-                        <div>
-                            <div class="setting-label">Music</div>
-                            <div class="setting-desc">Toggle background music</div>
-                        </div>
+                        <div><div class="setting-label">Music</div><div class="setting-desc">Toggle background music</div></div>
                         <button class="toggle ${AudioManager.musicEnabled ? 'on' : ''}" id="toggle-music"></button>
                     </div>
                     <div class="setting-row" style="border-bottom:none;">
-                        <div>
-                            <div class="setting-label">How to Play</div>
-                            <div class="setting-desc">Learn the rules</div>
-                        </div>
+                        <div><div class="setting-label">How to Play</div><div class="setting-desc">Skills & rules guide</div></div>
                         <button class="btn btn-small btn-secondary" id="btn-settings-help">Guide</button>
                     </div>
                 </div>
             </div>`;
-
         const panel = this.showPanel(html);
-
-        panel.querySelector('#toggle-sfx').addEventListener('click', function () {
-            const on = AudioManager.toggleSfx();
-            this.classList.toggle('on', on);
-            AudioManager.playSfx('click');
+        panel.querySelector('#toggle-sfx').addEventListener('click', function() {
+            const on = AudioManager.toggleSfx(); this.classList.toggle('on', on); AudioManager.playSfx('click');
         });
-
-        panel.querySelector('#toggle-music').addEventListener('click', function () {
-            const on = AudioManager.toggleMusic();
-            this.classList.toggle('on', on);
+        panel.querySelector('#toggle-music').addEventListener('click', function() {
+            const on = AudioManager.toggleMusic(); this.classList.toggle('on', on);
         });
-
         panel.querySelector('#btn-settings-help').addEventListener('click', () => {
-            AudioManager.playSfx('click');
-            UI.showHowToPlay();
+            AudioManager.playSfx('click'); UI.showHowToPlay();
         });
     },
 
-    // How to Play guide
+    // ---- HOW TO PLAY ----
     showHowToPlay(opts = {}) {
+        const skillEntries = Object.values(Utils.SKILLS);
+        const attackSkills = skillEntries.filter(s => s.type === 'attack');
+        const defenseSkills = skillEntries.filter(s => s.type === 'defense');
+
+        const skillRow = (s) => `
+            <div class="guide-skill-row">
+                <span class="guide-skill-icon" style="background:${s.color}">${s.icon}</span>
+                <div>
+                    <strong>${s.name}</strong> — ${Utils.formatMoney(s.price)}<br>
+                    <span style="color:var(--text-dim);font-size:12px;">${s.desc}</span>
+                </div>
+            </div>`;
+
         const html = `
             <div class="panel">
                 <div class="panel-header">
                     <h2>How to Play</h2>
-                    <p class="panel-subtitle">Learn the basics of Dicey</p>
+                    <p class="panel-subtitle">Skills, Shields & Strategy</p>
                     ${opts.noClose ? '' : '<button class="panel-close">&times;</button>'}
                 </div>
                 <div class="panel-body">
                     <div class="panel-section">
                         <h3>🎯 Goal</h3>
-                        <p>Be the <strong>richest player</strong> after 30 rounds, or be the <strong>last player standing</strong> as others go bankrupt!</p>
+                        <p>Be the <strong>richest player</strong> after ${Utils.MAX_ROUNDS} rounds, or the <strong>last one standing</strong>!</p>
                     </div>
-
                     <div class="panel-section">
                         <h3>🎲 Your Turn</h3>
-                        <div class="guide-step">
-                            <div class="guide-num">1</div>
-                            <div class="guide-text">Tap <strong>"Roll Dice"</strong> to roll two dice and move your token around the board.</div>
-                        </div>
-                        <div class="guide-step">
-                            <div class="guide-num">2</div>
-                            <div class="guide-text">Land on a space and follow its rules - buy properties, pay rent, or draw cards.</div>
-                        </div>
-                        <div class="guide-step">
-                            <div class="guide-num">3</div>
-                            <div class="guide-text">Roll <strong>doubles</strong> and you get another turn! But three doubles in a row sends you to jail.</div>
-                        </div>
+                        <div class="guide-step"><div class="guide-num">1</div><div class="guide-text">Tap <strong>Roll Dice</strong> to move around the board.</div></div>
+                        <div class="guide-step"><div class="guide-num">2</div><div class="guide-text">Land on a skill space to <strong>buy it</strong> or trigger its effect.</div></div>
+                        <div class="guide-step"><div class="guide-num">3</div><div class="guide-text"><strong>Doubles</strong> = extra turn. Three doubles in a row = Injury!</div></div>
                     </div>
-
                     <div class="panel-section">
-                        <h3>🏠 Properties</h3>
-                        <p>Land on an unowned property to <strong>buy it</strong>. Own all properties of a color group to <strong>double the rent</strong>! Then you can build <strong>houses</strong> (up to 4) and a <strong>hotel</strong> for even more rent.</p>
+                        <h3>🛡️ Shield Cards</h3>
+                        <p>Each player starts with <strong>4 Shield Cards</strong>. When you land on an opponent's attack skill, you can spend a shield to <strong>block the attack completely</strong>.</p>
+                        <p style="margin-top:6px;">If you have <strong>no shields AND no money</strong>, you must <strong>surrender one of your skills</strong> to the attacker!</p>
+                        <p style="margin-top:6px;">Earn shields at the <strong>Rest Stop</strong>, via <strong>Shield Forge</strong>, or from Fate cards. Max 6 shields.</p>
                     </div>
-
                     <div class="panel-section">
-                        <h3>🏗️ Building</h3>
-                        <p>When it's your turn, you can upgrade properties you own by tapping the <strong>"Build"</strong> button. Each house costs <strong>half the property price</strong>. A hotel replaces 4 houses.</p>
+                        <h3>⚔️ Attack Skills</h3>
+                        <p style="margin-bottom:8px;">When an opponent lands on your attack skill, the effect triggers against them:</p>
+                        ${attackSkills.map(skillRow).join('')}
                     </div>
-
                     <div class="panel-section">
-                        <h3>📋 Space Types</h3>
+                        <h3>🛡️ Defense Skills</h3>
+                        <p style="margin-bottom:8px;">Passive bonuses or protective effects that help you survive:</p>
+                        ${defenseSkills.map(skillRow).join('')}
+                    </div>
+                    <div class="panel-section">
+                        <h3>📋 Other Spaces</h3>
                         <div class="guide-icon-row">
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#2ecc71"></div> GO - Collect $200</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Chance - Random event</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#8B4513"></div> Community - Random event</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#f39c12"></div> Free Parking - Rest</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#95a5a6"></div> Jail - Visit or stuck</div>
-                            <div class="guide-icon-item"><div class="gi-color" style="background:#3498db"></div> Tax - Pay up!</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#2ecc71"></div> START — Collect $200+</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#9b59b6"></div> Fate — Random event</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#f39c12"></div> Rest Stop — +1 Shield</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Hospital — Recover here</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e74c3c"></div> Injury — Sent to Hospital</div>
+                            <div class="guide-icon-item"><div class="gi-color" style="background:#e67e22"></div> Toll/Market — Pay tax</div>
                         </div>
                     </div>
-
                     <div class="panel-section">
-                        <h3>🔒 Jail</h3>
-                        <p>In jail? Pay <strong>$50</strong> to get out, or try rolling doubles (3 attempts). If you fail, you auto-pay $50.</p>
+                        <h3>🔮 Fate Cards</h3>
+                        <p style="margin-bottom:8px;">Landing on a Fate space draws a random card from the shuffled deck:</p>
+                        ${Utils.FATE_CARDS.map(c => '<div style="font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);">• ' + c.text + '</div>').join('')}
                     </div>
-
                     <div class="panel-section">
                         <h3>💡 Tips</h3>
-                        <p>• Railroads get more valuable the more you own<br>
-                        • Cheaper properties have the best return on investment<br>
-                        • Don't overbuild - keep cash for rent payments!</p>
+                        <p>• Bodyguard halves all attack damage — great first buy<br>
+                        • Gold Mine stacks — 2 mines = +$200 extra at GO<br>
+                        • Save shields for devastating attacks like Ambush & Jinx (Injury)<br>
+                        • Vault protects your last $100 from any attack</p>
                     </div>
                 </div>
                 <div class="panel-footer">
                     <button class="btn btn-primary btn-block" id="btn-close-guide">${opts.startGame ? "Let's Play!" : 'Got It!'}</button>
                 </div>
             </div>`;
-
         const panel = this.showPanel(html, { modal: opts.modal, noClose: opts.noClose });
-
         panel.querySelector('#btn-close-guide').addEventListener('click', () => {
-            AudioManager.playSfx('click');
-            this.hidePanel();
+            AudioManager.playSfx('click'); this.hidePanel();
             if (opts.onDone) opts.onDone();
         });
     },
 
-    // Welcome / How to Play prompt on start
+    // ---- WELCOME ----
     showWelcomePrompt(onDone) {
         const html = `
             <div class="panel">
                 <div class="panel-header">
                     <h2>Welcome to Dicey!</h2>
-                    <p class="panel-subtitle">Ready to roll your fortune?</p>
+                    <p class="panel-subtitle">Skills, Shields & Strategy</p>
                 </div>
                 <div class="panel-body" style="text-align:center;">
                     <p style="font-size:48px;margin-bottom:12px;">🎲</p>
                     <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">
-                        Roll the dice, buy properties, and outsmart your opponents to become the wealthiest player!
+                        Roll the dice, learn skills, attack opponents and defend yourself to become the wealthiest player!
                     </p>
                 </div>
                 <div class="panel-footer" style="flex-direction:column;gap:10px;">
-                    <button class="btn btn-primary btn-block" id="btn-welcome-guide">
-                        📖 Read How to Play
-                    </button>
-                    <button class="btn btn-secondary btn-block" id="btn-welcome-skip">
-                        Skip - I Know the Rules
-                    </button>
+                    <button class="btn btn-primary btn-block" id="btn-welcome-guide">📖 Read How to Play</button>
+                    <button class="btn btn-secondary btn-block" id="btn-welcome-skip">Skip — I Know the Rules</button>
                 </div>
             </div>`;
-
         const panel = this.showPanel(html, { modal: true, noClose: true });
-
         panel.querySelector('#btn-welcome-guide').addEventListener('click', () => {
             AudioManager.playSfx('click');
             this.showHowToPlay({ modal: true, noClose: true, startGame: true, onDone });
         });
-
         panel.querySelector('#btn-welcome-skip').addEventListener('click', () => {
-            AudioManager.playSfx('click');
-            this.hidePanel();
-            onDone();
+            AudioManager.playSfx('click'); this.hidePanel(); onDone();
         });
     },
 
-    // Property landing panel - Buy or Auction
-    showPropertyPanel(space, index, player, canAfford) {
+    // ---- SKILL BUY PANEL ----
+    showSkillBuyPanel(skill, spaceIdx, player, canAfford, price) {
         return new Promise(resolve => {
             const html = `
                 <div class="panel">
-                    <div class="panel-header">
-                        <h2>Property Available!</h2>
-                    </div>
+                    <div class="panel-header"><h2>Skill Available!</h2></div>
                     <div class="panel-body">
-                        <div class="prop-card">
-                            <div class="prop-card-header" style="background:${space.color || 'var(--blue)'}"></div>
-                            <div class="prop-card-name">${space.name}</div>
-                            <div class="prop-card-price">${Utils.formatMoney(space.price)}</div>
-                            <div class="prop-card-rent">
-                                Base rent: ${Utils.formatMoney(space.rent ? space.rent[0] : 25)}
+                        <div class="detail-card">
+                            <div class="detail-card-banner" style="background:${skill.color}"></div>
+                            <div class="detail-card-body">
+                                <div style="font-size:32px;text-align:center;margin-bottom:4px;">${skill.icon}</div>
+                                <div class="detail-card-name" style="text-align:center;">${skill.name}</div>
+                                <div class="detail-card-type">${skill.type === 'attack' ? '⚔️ Attack Skill' : '🛡️ Defense Skill'}</div>
+                                <div class="detail-card-price" style="text-align:center;">${Utils.formatMoney(price)}${player.discount ? ' (Discounted!)' : ''}</div>
+                                <div class="detail-card-divider"></div>
+                                <p style="font-size:13px;color:var(--text-dim);line-height:1.5;">${skill.desc}</p>
                             </div>
                         </div>
                         <p style="margin-top:12px;color:var(--text-dim);font-size:13px;text-align:center;">
-                            Your balance: <strong style="color:${canAfford ? 'var(--green)' : 'var(--accent)'}">${Utils.formatMoney(player.money)}</strong>
+                            Balance: <strong style="color:${canAfford ? 'var(--green)' : 'var(--accent)'}">${Utils.formatMoney(player.money)}</strong>
                         </p>
                     </div>
                     <div class="panel-footer">
-                        ${canAfford ? `<button class="btn btn-success" id="btn-buy">Buy</button>` : ''}
+                        ${canAfford ? '<button class="btn btn-success" id="btn-buy">Learn Skill</button>' : ''}
                         <button class="btn btn-secondary" id="btn-pass">Pass</button>
                     </div>
                 </div>`;
-
             const panel = this.showPanel(html, { modal: true, noClose: true });
-
-            if (canAfford) {
-                panel.querySelector('#btn-buy').addEventListener('click', () => {
-                    AudioManager.playSfx('buy');
-                    this.hidePanel();
-                    resolve('buy');
-                });
-            }
-            panel.querySelector('#btn-pass').addEventListener('click', () => {
-                AudioManager.playSfx('click');
-                this.hidePanel();
-                resolve('pass');
-            });
+            if (canAfford) panel.querySelector('#btn-buy').addEventListener('click', () => { this.hidePanel(); resolve('buy'); });
+            panel.querySelector('#btn-pass').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); resolve('pass'); });
         });
     },
 
-    // Pay rent panel
-    showRentPanel(space, owner, amount) {
+    // ---- SKILL EFFECT PANEL (attack triggered on human) ----
+    showSkillEffectPanel(skill, attackerIdx, message, accentColor) {
         return new Promise(resolve => {
             const html = `
                 <div class="panel">
-                    <div class="panel-header">
-                        <h2>Pay Rent!</h2>
-                    </div>
+                    <div class="panel-header"><h2>${skill.icon} ${skill.name}!</h2></div>
                     <div class="panel-body" style="text-align:center;">
-                        <div class="prop-card">
-                            <div class="prop-card-header" style="background:${space.color || 'var(--blue)'}"></div>
-                            <div class="prop-card-name">${space.name}</div>
+                        <div style="font-size:48px;margin-bottom:12px;">${skill.icon}</div>
+                        <p style="font-size:16px;line-height:1.6;color:var(--text);white-space:pre-line;">${message}</p>
+                    </div>
+                    <div class="panel-footer">
+                        <button class="btn btn-primary" id="btn-effect-ok">OK</button>
+                    </div>
+                </div>`;
+            const panel = this.showPanel(html, { modal: true, noClose: true });
+            panel.querySelector('#btn-effect-ok').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); resolve(); });
+        });
+    },
+
+    // ---- SHIELD PROMPT ----
+    showShieldPrompt(skill, attackerIdx, player) {
+        return new Promise(resolve => {
+            const html = `
+                <div class="panel">
+                    <div class="panel-header"><h2>⚔️ Incoming Attack!</h2></div>
+                    <div class="panel-body" style="text-align:center;">
+                        <div style="font-size:40px;margin-bottom:8px;">${skill.icon}</div>
+                        <p style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">${skill.name}</p>
+                        <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">
+                            Owned by <strong style="color:${Utils.PLAYER_COLORS[attackerIdx]}">${Utils.PLAYER_NAMES[attackerIdx]}</strong>
+                        </p>
+                        <p style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:12px;">${skill.desc}</p>
+                        <div class="detail-card-divider"></div>
+                        <p style="font-size:14px;color:var(--text);margin-top:8px;">
+                            Use a Shield Card to block? <br>
+                            <span style="font-size:20px;">${'🛡️'.repeat(player.shields)}</span>
+                        </p>
+                    </div>
+                    <div class="panel-footer">
+                        <button class="btn btn-success" id="btn-use-shield">🛡️ Use Shield</button>
+                        <button class="btn btn-secondary" id="btn-take-hit">Take the Hit</button>
+                    </div>
+                </div>`;
+            const panel = this.showPanel(html, { modal: true, noClose: true });
+            panel.querySelector('#btn-use-shield').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); resolve(true); });
+            panel.querySelector('#btn-take-hit').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); resolve(false); });
+        });
+    },
+
+    // ---- SURRENDER SKILL PANEL ----
+    showSurrenderSkillPanel(player, skills, attackerIdx) {
+        return new Promise(resolve => {
+            let listHtml = skills.map(s => `
+                <div class="setting-row" style="cursor:pointer;" data-idx="${s.spaceIdx}">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:20px;">${s.skill.icon}</span>
+                        <div>
+                            <div class="setting-label">${s.skill.name}</div>
+                            <div class="setting-desc">${s.skill.type === 'attack' ? '⚔️ Attack' : '🛡️ Defense'}</div>
                         </div>
-                        <p style="margin-top:16px;font-size:15px;color:var(--text-dim);">
-                            Owned by <strong style="color:${Utils.PLAYER_COLORS[owner]}">${Utils.PLAYER_NAMES[owner]}</strong>
-                        </p>
-                        <p style="font-size:28px;font-weight:800;color:var(--accent);margin-top:8px;">
-                            -${Utils.formatMoney(amount)}
-                        </p>
                     </div>
-                    <div class="panel-footer">
-                        <button class="btn btn-primary" id="btn-pay-rent">Pay</button>
-                    </div>
-                </div>`;
+                    <button class="btn btn-small btn-secondary" data-idx="${s.spaceIdx}">Give</button>
+                </div>`).join('');
 
-            const panel = this.showPanel(html, { modal: true, noClose: true });
-            panel.querySelector('#btn-pay-rent').addEventListener('click', () => {
-                AudioManager.playSfx('pay');
-                this.hidePanel();
-                resolve();
-            });
-        });
-    },
-
-    // Card panel (Chance / Community Chest)
-    showCardPanel(cardType, card) {
-        return new Promise(resolve => {
-            const isChance = cardType === 'chance';
             const html = `
                 <div class="panel">
                     <div class="panel-header">
-                        <h2>${isChance ? '🃏 Chance!' : '📦 Community Chest'}</h2>
+                        <h2>⚠️ Surrender a Skill!</h2>
+                        <p class="panel-subtitle">No shields left! Choose a skill to give to ${Utils.PLAYER_NAMES[attackerIdx]}</p>
                     </div>
-                    <div class="panel-body" style="text-align:center;">
-                        <p style="font-size:17px;line-height:1.6;padding:12px 0;color:var(--text);">
-                            ${card.text}
-                        </p>
-                    </div>
-                    <div class="panel-footer">
-                        <button class="btn btn-primary" id="btn-card-ok">OK</button>
-                    </div>
+                    <div class="panel-body">${listHtml}</div>
                 </div>`;
-
             const panel = this.showPanel(html, { modal: true, noClose: true });
-            panel.querySelector('#btn-card-ok').addEventListener('click', () => {
-                AudioManager.playSfx('click');
-                this.hidePanel();
-                resolve();
+            panel.querySelectorAll('[data-idx]').forEach(el => {
+                el.addEventListener('click', () => {
+                    AudioManager.playSfx('pay'); this.hidePanel();
+                    resolve(parseInt(el.dataset.idx));
+                });
             });
         });
     },
 
-    // Jail panel
+    // ---- FATE CARD PANEL ----
+    showFatePanel(card) {
+        return new Promise(resolve => {
+            const html = `
+                <div class="panel">
+                    <div class="panel-header"><h2>🔮 Fate!</h2></div>
+                    <div class="panel-body" style="text-align:center;">
+                        <p style="font-size:17px;line-height:1.6;padding:12px 0;color:var(--text);">${card.text}</p>
+                    </div>
+                    <div class="panel-footer">
+                        <button class="btn btn-primary" id="btn-fate-ok">OK</button>
+                    </div>
+                </div>`;
+            const panel = this.showPanel(html, { modal: true, noClose: true });
+            panel.querySelector('#btn-fate-ok').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); resolve(); });
+        });
+    },
+
+    // ---- JAIL PANEL ----
     showJailPanel(player, canPay) {
         return new Promise(resolve => {
             const html = `
                 <div class="panel">
-                    <div class="panel-header">
-                        <h2>🔒 In Jail!</h2>
-                        <p class="panel-subtitle">Attempt ${player.jailTurns + 1} of 3</p>
-                    </div>
+                    <div class="panel-header"><h2>🏥 In Hospital!</h2><p class="panel-subtitle">Recovery attempt ${player.jailTurns + 1} of 3</p></div>
                     <div class="panel-body" style="text-align:center;">
-                        <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">
-                            Roll doubles to escape for free, or pay $50 bail.
-                        </p>
+                        <p style="color:var(--text-dim);font-size:14px;">Roll doubles to recover, or pay $50 for treatment.</p>
                     </div>
                     <div class="panel-footer">
                         <button class="btn btn-primary" id="btn-jail-roll">Roll Dice</button>
                         ${canPay ? '<button class="btn btn-gold" id="btn-jail-pay">Pay $50</button>' : ''}
                     </div>
                 </div>`;
-
             const panel = this.showPanel(html, { modal: true, noClose: true });
-            panel.querySelector('#btn-jail-roll').addEventListener('click', () => {
-                AudioManager.playSfx('roll');
-                this.hidePanel();
-                resolve('roll');
-            });
-            if (canPay) {
-                panel.querySelector('#btn-jail-pay').addEventListener('click', () => {
-                    AudioManager.playSfx('pay');
-                    this.hidePanel();
-                    resolve('pay');
-                });
-            }
+            panel.querySelector('#btn-jail-roll').addEventListener('click', () => { AudioManager.playSfx('roll'); this.hidePanel(); resolve('roll'); });
+            if (canPay) panel.querySelector('#btn-jail-pay').addEventListener('click', () => { AudioManager.playSfx('pay'); this.hidePanel(); resolve('pay'); });
         });
     },
 
-    // Build panel
-    showBuildPanel(player, properties, gameState) {
+    // ---- TAX PANEL ----
+    showTaxPanel(space) {
         return new Promise(resolve => {
-            const buildable = properties.filter(idx => {
-                const space = Utils.BOARD_SPACES[idx];
-                const prop = gameState.properties[idx];
-                if (!space || !prop || prop.owner !== player.index) return false;
-                if (space.type !== 'property') return false;
-                if (prop.houses >= 5) return false;
-                // Check if player owns all in group
-                const group = space.group;
-                const groupSpaces = Utils.BOARD_SPACES.map((s, i) => ({ s, i }))
-                    .filter(o => o.s.group === group && o.s.type === 'property');
-                const ownsAll = groupSpaces.every(o => gameState.properties[o.i]?.owner === player.index);
-                if (!ownsAll) return false;
-                const cost = Math.floor(space.price / 2);
-                if (player.money < cost) return false;
-                return true;
-            });
-
-            if (buildable.length === 0) {
-                this.showToast('No properties available to build on');
-                resolve(null);
-                return;
-            }
-
-            let listHtml = buildable.map(idx => {
-                const space = Utils.BOARD_SPACES[idx];
-                const prop = gameState.properties[idx];
-                const cost = Math.floor(space.price / 2);
-                const level = prop.houses < 5 ? `${prop.houses} houses` : 'Hotel';
-                const nextLevel = prop.houses < 4 ? `House ${prop.houses + 1}` : 'Hotel';
-                return `
-                    <div class="setting-row" style="cursor:pointer;" data-build-idx="${idx}">
-                        <div>
-                            <div class="setting-label" style="display:flex;align-items:center;gap:6px;">
-                                <span style="width:10px;height:10px;border-radius:3px;background:${space.color};display:inline-block;"></span>
-                                ${space.name}
-                            </div>
-                            <div class="setting-desc">${level} → ${nextLevel}</div>
-                        </div>
-                        <button class="btn btn-small btn-success" data-build-idx="${idx}">${Utils.formatMoney(cost)}</button>
-                    </div>`;
-            }).join('');
-
             const html = `
                 <div class="panel">
-                    <div class="panel-header">
-                        <h2>🏗️ Build</h2>
-                        <p class="panel-subtitle">Upgrade your properties</p>
-                        <button class="panel-close">&times;</button>
-                    </div>
-                    <div class="panel-body">
-                        ${listHtml}
+                    <div class="panel-header"><h2>💰 ${space.name}</h2></div>
+                    <div class="panel-body" style="text-align:center;">
+                        <p style="font-size:28px;font-weight:800;color:var(--accent);">-${Utils.formatMoney(space.amount)}</p>
+                        <p style="color:var(--text-dim);margin-top:8px;">${space.desc}</p>
                     </div>
                     <div class="panel-footer">
-                        <button class="btn btn-secondary" id="btn-build-done">Done</button>
+                        <button class="btn btn-primary" id="btn-tax-ok">Pay</button>
                     </div>
                 </div>`;
-
-            const panel = this.showPanel(html, { modal: false, onClose: () => resolve(null) });
-
-            panel.querySelectorAll('[data-build-idx]').forEach(el => {
-                el.addEventListener('click', () => {
-                    AudioManager.playSfx('buy');
-                    this.hidePanel();
-                    resolve(parseInt(el.dataset.buildIdx));
-                });
-            });
-
-            panel.querySelector('#btn-build-done').addEventListener('click', () => {
-                AudioManager.playSfx('click');
-                this.hidePanel();
-                resolve(null);
-            });
+            const panel = this.showPanel(html, { modal: true, noClose: true });
+            panel.querySelector('#btn-tax-ok').addEventListener('click', () => { AudioManager.playSfx('pay'); this.hidePanel(); resolve(); });
         });
     },
 
-    // Game Over panel
-    showGameOver(players) {
+    // ---- GAME OVER ----
+    showGameOver(players, gameState) {
         const sorted = [...players].sort((a, b) => {
             if (a.bankrupt && !b.bankrupt) return 1;
             if (!a.bankrupt && b.bankrupt) return -1;
@@ -459,71 +382,118 @@ const UI = {
         });
         const winner = sorted[0];
 
-        let lbHtml = sorted.map((p, i) => `
-            <div class="lb-row ${p.bankrupt ? 'bankrupt' : ''}">
+        const lbHtml = sorted.map((p, i) => {
+            const skillCount = gameState ? Game.getPlayerSkillCount(p.index) : 0;
+            return `<div class="lb-row ${p.bankrupt ? 'bankrupt' : ''}">
                 <div class="lb-rank">${i + 1}</div>
                 <div class="lb-avatar" style="background:${Utils.PLAYER_COLORS[p.index]}">${Utils.PLAYER_TOKENS[p.index]}</div>
                 <div class="lb-name">${Utils.PLAYER_NAMES[p.index]}</div>
                 <div class="lb-money">${p.bankrupt ? 'Bankrupt' : Utils.formatMoney(p.money)}</div>
-            </div>`).join('');
+                <div style="font-size:11px;color:var(--text-dim);width:50px;text-align:right;">${skillCount} skills</div>
+            </div>`;
+        }).join('');
 
         const html = `
             <div class="panel">
-                <div class="panel-header">
-                    <h2>🏆 Game Over!</h2>
-                </div>
+                <div class="panel-header"><h2>🏆 Game Over!</h2></div>
                 <div class="panel-body">
                     <div class="winner-display">
                         <div class="winner-avatar" style="background:${Utils.PLAYER_COLORS[winner.index]}">${Utils.PLAYER_TOKENS[winner.index]}</div>
                         <div class="winner-name">${Utils.PLAYER_NAMES[winner.index]} Wins!</div>
                         <div class="winner-money">${Utils.formatMoney(winner.money)}</div>
                     </div>
-                    <div class="leaderboard">
-                        ${lbHtml}
-                    </div>
+                    <div class="leaderboard">${lbHtml}</div>
                 </div>
                 <div class="panel-footer">
                     <button class="btn btn-primary btn-large" id="btn-play-again">Play Again</button>
                 </div>
             </div>`;
-
         const panel = this.showPanel(html, { modal: true, noClose: true });
-        panel.querySelector('#btn-play-again').addEventListener('click', () => {
-            AudioManager.playSfx('click');
-            this.hidePanel();
-            location.reload();
-        });
+        panel.querySelector('#btn-play-again').addEventListener('click', () => { AudioManager.playSfx('click'); this.hidePanel(); location.reload(); });
     },
 
-    // Tax panel
-    showTaxPanel(space) {
-        return new Promise(resolve => {
-            const html = `
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>💰 ${space.name}</h2>
-                    </div>
-                    <div class="panel-body" style="text-align:center;">
-                        <p style="font-size:28px;font-weight:800;color:var(--accent);">
-                            -${Utils.formatMoney(space.amount)}
-                        </p>
-                        <p style="color:var(--text-dim);margin-top:8px;font-size:14px;">${space.desc}</p>
-                    </div>
-                    <div class="panel-footer">
-                        <button class="btn btn-primary" id="btn-tax-ok">Pay</button>
-                    </div>
-                </div>`;
+    // ---- SKILL DETAIL PANEL (click from board or cards strip) ----
+    showSkillDetailPanel(spaceIdx, gameState) {
+        const space = Utils.BOARD_SPACES[spaceIdx];
+        if (!space || space.type !== 'skill') return;
+        const skill = Utils.getSkillForSpace(spaceIdx);
+        if (!skill) return;
 
-            const panel = this.showPanel(html, { modal: true, noClose: true });
-            panel.querySelector('#btn-tax-ok').addEventListener('click', () => {
-                AudioManager.playSfx('pay');
-                this.hidePanel();
-                resolve();
+        const slot = gameState.skills[spaceIdx];
+        let ownerHtml = '';
+        if (slot && slot.owner !== null) {
+            ownerHtml = `<div class="detail-card-owner">
+                <div class="detail-owner-dot" style="background:${Utils.PLAYER_COLORS[slot.owner]}"></div>
+                <span>Owned by <strong style="color:${Utils.PLAYER_COLORS[slot.owner]}">${Utils.PLAYER_NAMES[slot.owner]}</strong></span>
+            </div>`;
+        } else {
+            ownerHtml = `<div class="detail-card-owner" style="opacity:0.5;"><span>Unowned — ${Utils.formatMoney(skill.price)}</span></div>`;
+        }
+
+        const html = `
+            <div class="panel">
+                <div class="panel-header" style="padding:0;">
+                    <button class="panel-close" style="top:8px;right:8px;z-index:2;">&times;</button>
+                </div>
+                <div class="panel-body" style="padding-top:0;">
+                    <div class="detail-card">
+                        <div class="detail-card-banner" style="background:${skill.color}"></div>
+                        <div class="detail-card-body">
+                            <div style="font-size:36px;text-align:center;margin-bottom:4px;">${skill.icon}</div>
+                            <div class="detail-card-name" style="text-align:center;">${skill.name}</div>
+                            <div class="detail-card-type">${skill.type === 'attack' ? '⚔️ Attack Skill' : '🛡️ Defense Skill'}</div>
+                            <div class="detail-card-price" style="text-align:center;">Cost: ${Utils.formatMoney(skill.price)}</div>
+                            <div class="detail-card-divider"></div>
+                            <p style="font-size:14px;color:var(--text-dim);line-height:1.6;">${skill.desc}</p>
+                            ${ownerHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        this.showPanel(html);
+    },
+
+    // ---- OWNED SKILLS STRIP ----
+    updateCardsStrip(gameState, playerIndex) {
+        const strip = document.getElementById('cards-strip');
+        const scroll = document.getElementById('cards-scroll');
+        if (!strip || !scroll) return;
+
+        const owned = [];
+        for (const [idx, s] of Object.entries(gameState.skills)) {
+            if (s.owner === playerIndex) {
+                const skill = Utils.getSkillForSpace(parseInt(idx));
+                if (skill) owned.push({ idx: parseInt(idx), skill });
+            }
+        }
+
+        if (owned.length === 0) {
+            strip.classList.remove('has-cards');
+            scroll.innerHTML = '';
+            return;
+        }
+
+        strip.classList.add('has-cards');
+        owned.sort((a, b) => {
+            if (a.skill.type !== b.skill.type) return a.skill.type === 'attack' ? -1 : 1;
+            return a.skill.price - b.skill.price;
+        });
+
+        scroll.innerHTML = owned.map(o => `
+            <div class="mini-card" data-space-idx="${o.idx}">
+                <div class="mini-card-color" style="background:${o.skill.color}"></div>
+                <div class="mini-card-name">${o.skill.icon}<br>${o.skill.name}</div>
+            </div>`).join('');
+
+        scroll.querySelectorAll('.mini-card').forEach(card => {
+            card.addEventListener('click', () => {
+                AudioManager.playSfx('click');
+                this.showSkillDetailPanel(parseInt(card.dataset.spaceIdx), gameState);
             });
         });
     },
 
-    // Update HUD
+    // ---- HUD ----
     updateHUD(gameState) {
         const cp = gameState.players[gameState.currentPlayer];
         if (!cp) return;
@@ -531,6 +501,10 @@ const UI = {
         document.getElementById('cp-name').textContent = Utils.PLAYER_NAMES[cp.index];
         document.getElementById('cp-money').textContent = Utils.formatMoney(cp.money);
         document.getElementById('round-num').textContent = gameState.round;
+
+        // Shields display
+        const shieldsEl = document.getElementById('cp-shields');
+        if (shieldsEl) shieldsEl.textContent = '🛡️'.repeat(cp.shields);
 
         const avatar = document.getElementById('cp-avatar');
         avatar.style.background = Utils.PLAYER_COLORS[cp.index];
@@ -541,7 +515,6 @@ const UI = {
         avatar.style.justifyContent = 'center';
         avatar.style.borderColor = Utils.PLAYER_COLORS[cp.index];
 
-        // Player pips
         gameState.players.forEach((p, i) => {
             const pip = document.querySelector(`.player-pip[data-player="${i}"]`);
             if (!pip) return;
@@ -559,150 +532,5 @@ const UI = {
             }
             moneyEl.textContent = p.bankrupt ? '💀' : Utils.formatMoney(p.money);
         });
-    },
-
-    // Owned property cards strip below board
-    updateCardsStrip(gameState, playerIndex) {
-        const strip = document.getElementById('cards-strip');
-        const scroll = document.getElementById('cards-scroll');
-        if (!strip || !scroll) return;
-
-        // Gather all properties owned by this player
-        const owned = [];
-        Utils.BOARD_SPACES.forEach((space, idx) => {
-            const prop = gameState.properties[idx];
-            if (prop && prop.owner === playerIndex) {
-                owned.push({ space, idx, prop });
-            }
-        });
-
-        if (owned.length === 0) {
-            strip.classList.remove('has-cards');
-            scroll.innerHTML = '';
-            return;
-        }
-
-        strip.classList.add('has-cards');
-
-        // Sort by group then price
-        owned.sort((a, b) => {
-            const ga = a.space.group !== undefined ? a.space.group : 99;
-            const gb = b.space.group !== undefined ? b.space.group : 99;
-            if (ga !== gb) return ga - gb;
-            return (a.space.price || 0) - (b.space.price || 0);
-        });
-
-        scroll.innerHTML = owned.map(o => {
-            const color = o.space.color || (o.space.type === 'railroad' ? '#95a5a6' : '#3498db');
-            const housesText = o.prop.houses > 0
-                ? (o.prop.houses >= 5 ? '🏨' : '🏠'.repeat(o.prop.houses))
-                : '';
-            return `<div class="mini-card" data-space-idx="${o.idx}">
-                <div class="mini-card-color" style="background:${color}"></div>
-                <div class="mini-card-name">${o.space.name}</div>
-                ${housesText ? `<div class="mini-card-houses">${housesText}</div>` : ''}
-            </div>`;
-        }).join('');
-
-        // Click handlers on mini cards
-        scroll.querySelectorAll('.mini-card').forEach(card => {
-            card.addEventListener('click', () => {
-                AudioManager.playSfx('click');
-                const idx = parseInt(card.dataset.spaceIdx);
-                this.showPropertyDetailPanel(idx, gameState);
-            });
-        });
-    },
-
-    // Large property detail card panel (click from board or cards strip)
-    showPropertyDetailPanel(spaceIdx, gameState) {
-        const space = Utils.BOARD_SPACES[spaceIdx];
-        if (!space) return;
-
-        const prop = gameState.properties[spaceIdx];
-        const color = space.color || (space.type === 'railroad' ? '#95a5a6' : '#3498db');
-
-        let ownerHtml = '';
-        if (prop && prop.owner !== null) {
-            const ownerColor = Utils.PLAYER_COLORS[prop.owner];
-            const ownerName = Utils.PLAYER_NAMES[prop.owner];
-            ownerHtml = `
-                <div class="detail-card-owner">
-                    <div class="detail-owner-dot" style="background:${ownerColor}"></div>
-                    <span>Owned by <strong style="color:${ownerColor}">${ownerName}</strong></span>
-                </div>`;
-        } else {
-            ownerHtml = `
-                <div class="detail-card-owner" style="opacity:0.5;">
-                    <span>Unowned</span>
-                </div>`;
-        }
-
-        // Build rent table
-        let rentHtml = '';
-        if (space.type === 'property' && space.rent) {
-            const labels = ['Base rent', '1 House', '2 Houses', '3 Houses', '4 Houses', 'Hotel'];
-            const currentLevel = prop ? prop.houses : -1;
-            rentHtml = `<table class="detail-rent-table">
-                ${space.rent.map((r, i) => `
-                    <tr class="${i === currentLevel ? 'current-level' : ''}">
-                        <td>${labels[i]}</td>
-                        <td>${Utils.formatMoney(r)}${i === 0 ? ' *' : ''}</td>
-                    </tr>`).join('')}
-            </table>
-            <p style="font-size:11px;color:var(--text-dark);margin-top:6px;">* Doubled with monopoly (no houses)</p>
-            <div class="detail-card-divider"></div>
-            <p style="font-size:13px;color:var(--text-dim);">Build cost: <strong style="color:var(--gold)">${Utils.formatMoney(Math.floor(space.price / 2))}</strong> per house</p>`;
-        } else if (space.type === 'railroad') {
-            const labels = ['1 Railroad', '2 Railroads', '3 Railroads', '4 Railroads'];
-            const rrCount = prop && prop.owner !== null
-                ? Utils.BOARD_SPACES.filter((s, i) => s.type === 'railroad' && gameState.properties[i]?.owner === prop.owner).length
-                : 0;
-            rentHtml = `<table class="detail-rent-table">
-                ${space.rent.map((r, i) => `
-                    <tr class="${i === rrCount - 1 ? 'current-level' : ''}">
-                        <td>${labels[i]}</td>
-                        <td>${Utils.formatMoney(r)}</td>
-                    </tr>`).join('')}
-            </table>`;
-        } else if (space.type === 'utility') {
-            rentHtml = `<table class="detail-rent-table">
-                <tr><td>1 Utility owned</td><td>4x dice roll</td></tr>
-                <tr><td>2 Utilities owned</td><td>10x dice roll</td></tr>
-            </table>`;
-        }
-
-        // Houses display
-        let housesDisplay = '';
-        if (prop && prop.houses > 0 && space.type === 'property') {
-            if (prop.houses >= 5) {
-                housesDisplay = '<span style="font-size:18px;">🏨</span> <span style="color:var(--accent);font-weight:700;">Hotel</span>';
-            } else {
-                housesDisplay = '<span style="font-size:16px;">' + '🏠'.repeat(prop.houses) + '</span> <span style="color:var(--green);font-weight:600;">' + prop.houses + ' House' + (prop.houses > 1 ? 's' : '') + '</span>';
-            }
-        }
-
-        const html = `
-            <div class="panel">
-                <div class="panel-header" style="padding:0;">
-                    <button class="panel-close" style="top:8px;right:8px;z-index:2;">&times;</button>
-                </div>
-                <div class="panel-body" style="padding-top:0;">
-                    <div class="detail-card">
-                        <div class="detail-card-banner" style="background:${color}"></div>
-                        <div class="detail-card-body">
-                            <div class="detail-card-name">${space.name}</div>
-                            <div class="detail-card-type">${space.type === 'property' ? 'Property' : space.type === 'railroad' ? 'Railroad' : 'Utility'}</div>
-                            <div class="detail-card-price">Purchase: ${Utils.formatMoney(space.price)}</div>
-                            ${housesDisplay ? `<div style="margin-bottom:10px;">${housesDisplay}</div>` : ''}
-                            <div class="detail-card-divider"></div>
-                            ${rentHtml}
-                            ${ownerHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-
-        this.showPanel(html);
     }
 };

@@ -66,6 +66,8 @@ const Effects = (() => {
   }
 
   function showOfflineEarnings(amount) {
+    const bizMult = GameState.getOfflineBusinessMultiplier();
+    const multInfo = bizMult > 1 ? `<div class="offline-mult">${bizMult}x empire bonus applied!</div>` : '';
     const overlay = document.createElement('div');
     overlay.className = 'offline-overlay';
     overlay.innerHTML = `
@@ -73,6 +75,7 @@ const Effects = (() => {
         <div class="offline-title">Welcome Back, Partner!</div>
         <div class="offline-icon">\uD83E\uDD20</div>
         <div class="offline-amount">You earned ${Utils.formatCoins(amount)} while away</div>
+        ${multInfo}
         <button class="offline-btn" onclick="this.closest('.offline-overlay').remove()">Collect</button>
       </div>
     `;

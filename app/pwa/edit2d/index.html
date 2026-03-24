@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1e1e2e">
+  <title>Edit2D - 2D Level Editor</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Splash -->
+  <div id="splash">
+    <h1>Edit2D</h1>
+    <p>2D Level Editor</p>
+    <div class="splash-spinner"></div>
+  </div>
+
+  <!-- App -->
+  <div id="app">
+
+    <!-- Toolbar -->
+    <div id="toolbar">
+      <!-- Mobile menu button -->
+      <button class="tb-btn" id="btn-menu" title="Menu">&#9776;</button>
+
+      <!-- File actions -->
+      <div id="file-menu">
+        <button class="tb-btn tb-btn-text" id="btn-new" title="New map">New</button>
+        <button class="tb-btn tb-btn-text" id="btn-open" title="Import JSON">Open</button>
+        <button class="tb-btn tb-btn-text" id="btn-save" title="Export JSON">Save</button>
+        <button class="tb-btn tb-btn-text" id="btn-export-png" title="Export PNG">PNG</button>
+        <button class="tb-btn tb-btn-text" id="btn-resize" title="Resize map">Resize</button>
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- Tools -->
+      <button class="tool-btn active" data-tool="brush" title="Brush (B)">&#9999;</button>
+      <button class="tool-btn" data-tool="eraser" title="Eraser (E)">&#9249;</button>
+      <button class="tool-btn" data-tool="fill" title="Fill (F)">&#9639;</button>
+      <button class="tool-btn" data-tool="select" title="Select (S)">&#9633;</button>
+      <button class="tool-btn" data-tool="object" title="Object (O)">&#8982;</button>
+      <button class="tool-btn" data-tool="collision" title="Collision (C)">&#9640;</button>
+      <button class="tool-btn" data-tool="pan" title="Pan (H)">&#10022;</button>
+
+      <div class="separator"></div>
+
+      <!-- Collision types -->
+      <div class="coll-group">
+        <button class="coll-btn active" data-coll-type="1" title="Solid">S</button>
+        <button class="coll-btn" data-coll-type="2" title="Platform">P</button>
+        <button class="coll-btn" data-coll-type="3" title="Trigger">T</button>
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- View -->
+      <button class="tb-btn active" id="btn-grid" title="Toggle grid (G)">&#9638;</button>
+      <button class="tb-btn" id="btn-delete" title="Delete selected (Del)">&#10005;</button>
+
+      <div class="separator"></div>
+
+      <!-- Zoom -->
+      <button class="tb-btn" id="btn-zoom-out" title="Zoom out">&#8722;</button>
+      <button class="tb-btn" id="btn-zoom-fit" title="Zoom to fit">&#9635;</button>
+      <button class="tb-btn" id="btn-zoom-in" title="Zoom in">&#43;</button>
+
+      <div style="flex:1"></div>
+
+      <!-- Mobile layers toggle -->
+      <button class="tb-btn" id="btn-layers-toggle" title="Layers">&#9776;</button>
+    </div>
+
+    <!-- Palette Panel -->
+    <div id="palette-panel">
+      <div id="drawer-handle"></div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-container">
+      <canvas id="editor-canvas"></canvas>
+    </div>
+
+    <!-- Layers Panel -->
+    <div id="layers-panel"></div>
+
+    <!-- Status Bar -->
+    <div id="status-bar">Edit2D</div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-overlay">
+    <div id="modal-box">
+      <div id="modal-title"></div>
+      <div id="modal-body"></div>
+      <input type="text" id="modal-input" style="display:none">
+      <div id="modal-buttons"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

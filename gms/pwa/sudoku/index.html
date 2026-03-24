@@ -11,40 +11,34 @@
 <style>
 /* ── Reset & base ─────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box;}
-
-/* Fix #1: PWA fullscreen — use 100% height on html/body
-   and dvh (dynamic viewport height) which accounts for
-   browser chrome, notches, and standalone mode on all devices. */
 html{height:100%;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
   background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-  /* Fallback then preferred unit */
   min-height:100vh;
   min-height:100dvh;
-  /* Safe-area padding for notched phones in standalone mode */
   padding:env(safe-area-inset-top,10px) env(safe-area-inset-right,10px) env(safe-area-inset-bottom,10px) env(safe-area-inset-left,10px);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   color:#333;
 }
-/* iOS Safari standalone workaround */
 @supports (-webkit-touch-callout:none){
   body{min-height:-webkit-fill-available;}
 }
 
 /* ── Layout ───────────────────────────────────────────── */
 .container{max-width:600px;width:100%;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);padding:16px;display:flex;flex-direction:column;gap:12px;}
-h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shadow:2px 2px 4px rgba(0,0,0,0.1);}
 
-/* ── Stats ────────────────────────────────────────────── */
-.stats{display:flex;justify-content:space-around;gap:8px;flex-wrap:wrap;}
-.stat{flex:1;min-width:70px;background:#f0f4f8;padding:8px;border-radius:8px;text-align:center;}
-.stat-label{font-size:0.72rem;color:#666;text-transform:uppercase;letter-spacing:0.5px;}
-.stat-value{font-size:1.4rem;font-weight:bold;color:#4a90e2;margin-top:4px;}
+/* ── Header with icons ────────────────────────────────── */
+.header{display:flex;align-items:center;justify-content:center;position:relative;min-height:40px;}
+.header h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shadow:2px 2px 4px rgba(0,0,0,0.1);}
+.header-icons{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:none;background:#f0f4f8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#667eea;}
+.icon-btn:hover{background:#e3f2fd;transform:scale(1.1);}
+.icon-btn svg{width:20px;height:20px;}
 
 /* ── Difficulty ───────────────────────────────────────── */
-.difficulty{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.diff-btn{flex:1;min-width:70px;padding:10px 16px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:600;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.5px;}
+.difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.diff-btn{padding:14px 6px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-size:clamp(0.7rem,2.2vw,0.85rem);font-weight:600;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.3px;min-height:48px;}
 .diff-btn:hover{background:#4a90e2;color:white;transform:translateY(-2px);box-shadow:0 4px 12px rgba(74,144,226,0.3);}
 .diff-btn.active{background:#4a90e2;color:white;box-shadow:0 4px 12px rgba(74,144,226,0.3);}
 
@@ -83,21 +77,15 @@ h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shado
 .popup.active{display:flex;}
 .popup-content{background:white;border-radius:12px;padding:16px;max-width:380px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.3);}
 .popup-header{text-align:center;font-size:0.85rem;font-weight:600;color:#666;margin-bottom:10px;min-height:18px;}
-
-/* Number/position grid */
 .number-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
 .number-btn{padding:18px 8px;background:#f0f4f8;border:2px solid #4a90e2;border-radius:8px;font-size:1.4rem;font-weight:bold;cursor:pointer;transition:all 0.15s;color:#4a90e2;min-height:56px;display:flex;align-items:center;justify-content:center;}
 .number-btn:hover{background:#4a90e2;color:white;transform:scale(1.05);}
-
-/* Position selector buttons (notes mode) */
 .pos-btn{background:#f5f5f5;border:2px dashed #aaa;color:#999;font-size:0.85rem;}
 .pos-btn.has-note{background:#e8f4fd;border-color:#4a90e2;color:#1565c0;font-size:1.2rem;font-weight:700;}
 .pos-btn.clear-mode{background:#fff3e0;border-color:#ff9800;color:#e65100;}
 .pos-btn:hover{background:#e3f2fd;border-color:#4a90e2;color:#4a90e2;}
 .pos-btn.has-note:hover{background:#bbdefb;}
 .pos-spacer{visibility:hidden;pointer-events:none;}
-
-/* Popup action buttons */
 .popup-actions{display:flex;gap:8px;}
 .popup-btn{flex:1;padding:11px 6px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;transition:all 0.2s;}
 .popup-btn:hover{background:#4a90e2;color:white;}
@@ -110,25 +98,87 @@ h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shado
 .control-btn:hover{background:#666;color:white;transform:translateY(-2px);}
 .install-btn{background:#4caf50;color:white;border:2px solid #4caf50;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;display:none;font-size:0.9rem;}
 .install-btn:hover{background:#45a049;transform:translateY(-2px);box-shadow:0 4px 12px rgba(76,175,80,0.3);}
+
+/* ── Panel overlays (settings, stats, help) ───────────── */
+.panel-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:2000;padding:16px;
+  padding-top:max(16px,env(safe-area-inset-top));
+  padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.panel-overlay.active{display:flex;}
+.panel{background:white;border-radius:16px;padding:0;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;animation:panelSlideIn 0.3s ease;}
+@keyframes panelSlideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #eee;}
+.panel-header h2{font-size:1.2rem;color:#333;margin:0;}
+.panel-close{width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f0;cursor:pointer;font-size:1.2rem;color:#666;display:flex;align-items:center;justify-content:center;transition:all 0.2s;line-height:1;}
+.panel-close:hover{background:#e0e0e0;color:#333;}
+.panel-body{padding:16px 20px 20px;}
+
+/* ── Settings panel ───────────────────────────────────── */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;}
+.setting-row:last-of-type{border-bottom:none;}
+.setting-label{display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:500;color:#333;}
+.setting-label svg{width:20px;height:20px;color:#667eea;}
+
+/* Toggle switch */
+.toggle{position:relative;width:48px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:26px;transition:0.3s;}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle input:checked + .toggle-slider{background:#667eea;}
+.toggle input:checked + .toggle-slider::before{transform:translateX(22px);}
+
+.help-btn{width:100%;margin-top:12px;padding:14px;border:2px solid #667eea;background:white;color:#667eea;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.95rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.help-btn:hover{background:#667eea;color:white;}
+.help-btn svg{width:18px;height:18px;}
+
+/* ── Stats panel ──────────────────────────────────────── */
+.stats-total{text-align:center;padding:10px 0 16px;font-size:0.9rem;color:#888;}
+.stats-total strong{font-size:1.6rem;color:#667eea;display:block;margin-top:2px;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stats-card{background:#f8f9fb;border-radius:10px;padding:14px 8px;text-align:center;transition:transform 0.2s;}
+.stats-card:hover{transform:translateY(-2px);}
+.stats-card-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.stats-card-value{font-size:1.5rem;font-weight:800;margin-bottom:2px;}
+.stats-card-sub{font-size:0.65rem;color:#999;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* ── Help panel ───────────────────────────────────────── */
+.help-content{padding:0;}
+.help-content h3{font-size:0.95rem;color:#667eea;margin:14px 0 6px;display:flex;align-items:center;gap:6px;}
+.help-content h3:first-child{margin-top:0;}
+.help-content p,.help-content ul{font-size:0.85rem;color:#555;line-height:1.5;margin:0 0 6px;}
+.help-content ul{padding-left:18px;}
+.help-content li{margin-bottom:4px;}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>🧩 Sudoku</h1>
-  <div class="stats">
-    <div class="stat"><div class="stat-label">Easy</div><div class="stat-value" id="easyWins">0</div></div>
-    <div class="stat"><div class="stat-label">Medium</div><div class="stat-value" id="mediumWins">0</div></div>
-    <div class="stat"><div class="stat-label">Hard</div><div class="stat-value" id="hardWins">0</div></div>
+  <div class="header">
+    <h1>Sudoku</h1>
+    <div class="header-icons">
+      <button class="icon-btn" id="statsBtn" title="Statistics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="3" width="4" height="18" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="2" y="13" width="4" height="8" rx="1"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
   </div>
+
   <div class="difficulty">
+    <button class="diff-btn" data-level="basic">Basic</button>
+    <button class="diff-btn" data-level="simple">Simple</button>
     <button class="diff-btn active" data-level="easy">Easy</button>
     <button class="diff-btn" data-level="medium">Medium</button>
     <button class="diff-btn" data-level="hard">Hard</button>
+    <button class="diff-btn" data-level="crazy">Crazy</button>
   </div>
+
   <div class="message hidden" id="message"></div>
+
   <div class="game-container">
     <div class="grid" id="grid"></div>
   </div>
+
   <div class="controls">
     <button class="control-btn" id="newGame">New Game</button>
     <button class="control-btn" id="undoBtn">Undo</button>
@@ -149,558 +199,99 @@ h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shado
   </div>
 </div>
 
-<script>
-class SudokuGame {
-  constructor() {
-    // Core grid state
-    this.grid    = Array(9).fill(null).map(() => Array(9).fill(0));
-    this.solution= Array(9).fill(null).map(() => Array(9).fill(0));
-    this.given   = Array(9).fill(null).map(() => Array(9).fill(false));
-    this.level   = 'easy';
-    this.selected= null;
-    this.lastNumber = 0;
-    this.history = [];
+<!-- Settings Panel -->
+<div class="panel-overlay" id="settingsOverlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Settings</h2>
+      <button class="panel-close" id="settingsClose">&times;</button>
+    </div>
+    <div class="panel-body">
+      <div class="setting-row">
+        <div class="setting-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          Music
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="musicToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          Sounds
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="soundToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <button class="help-btn" id="helpBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        How to Play
+      </button>
+    </div>
+  </div>
+</div>
 
-    // Notes state — notes[row][col] = { [pos1..4,6..9]: number }
-    // positions mirror the 3×3 number-grid layout; pos 5 (centre) is unused
-    this.notes   = Array(9).fill(null).map(() => Array(9).fill(null).map(() => ({})));
+<!-- Stats Panel -->
+<div class="panel-overlay" id="statsOverlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Statistics</h2>
+      <button class="panel-close" id="statsClose">&times;</button>
+    </div>
+    <div class="panel-body">
+      <div class="stats-total">Total Wins<strong id="statsTotalWins">0</strong></div>
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+  </div>
+</div>
 
-    // Notes-mode UI state
-    this.notesMode         = false;  // toggle button on/off
-    this.notesPhase        = 'position'; // 'position' | 'number'
-    this.notesClearMode    = false;  // true when clearing a note position
-    this.noteSelectedPos   = null;   // which position was chosen in phase 'position'
+<!-- Help Panel -->
+<div class="panel-overlay" id="helpOverlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>How to Play</h2>
+      <button class="panel-close" id="helpClose">&times;</button>
+    </div>
+    <div class="panel-body help-content">
+      <h3>Goal</h3>
+      <p>Fill every row, column, and 3x3 box with the numbers 1 through 9. Each number can only appear once in each row, column, and box.</p>
 
-    this.stats = JSON.parse(localStorage.getItem('sudokuStats')) || {easy:0,medium:0,hard:0};
-    this.deferredPrompt = null;
-    this.checkPWAInstalled();
-    this.init();
-  }
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Tap a cell</strong> to select it. If you recently placed a number, tapping an empty cell will auto-fill that number (if valid in the box).</li>
+        <li><strong>Long press or right-click</strong> a cell to open the number picker.</li>
+        <li><strong>Notes mode</strong> lets you pencil in candidate numbers at specific positions within a cell.</li>
+        <li><strong>Undo</strong> reverts your last move.</li>
+      </ul>
 
-  // ── Initialise ─────────────────────────────────────────────────────────────
-  init() {
-    this.updateStats();
-    this.createGrid();
-    this.loadGame();
-    document.querySelectorAll('.diff-btn').forEach(btn =>
-      btn.addEventListener('click', () => this.changeDifficulty(btn.dataset.level))
-    );
-    document.getElementById('newGame').addEventListener('click', () => this.confirmNewGame());
-    document.getElementById('undoBtn').addEventListener('click', () => this.undo());
-    document.getElementById('closePopup').addEventListener('click', () => this.closePopup());
-    document.getElementById('clearCell').addEventListener('click', () => this.handleClear());
-    document.getElementById('notesToggle').addEventListener('click', () => this.toggleNotesMode());
-    document.getElementById('popup').addEventListener('click', e => {
-      if (e.target.id === 'popup') this.closePopup();
-    });
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      this.deferredPrompt = e;
-      document.getElementById('installBtn').style.display = 'block';
-    });
-    document.getElementById('installBtn').addEventListener('click', () => this.installApp());
+      <h3>Difficulty Levels</h3>
+      <ul>
+        <li><strong>Basic</strong> &mdash; 56 given cells (great for beginners)</li>
+        <li><strong>Simple</strong> &mdash; 51 given cells</li>
+        <li><strong>Easy</strong> &mdash; 46 given cells</li>
+        <li><strong>Medium</strong> &mdash; 36 given cells</li>
+        <li><strong>Hard</strong> &mdash; 26 given cells</li>
+        <li><strong>Crazy</strong> &mdash; 21 given cells (expert only!)</li>
+      </ul>
 
-    // Fix #2 (offline): register SW relative to this file so scope is correct
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registered', reg.scope))
-        .catch(err => console.warn('SW registration failed (offline-first still works from cache)', err));
-    }
-  }
+      <h3>Tips</h3>
+      <ul>
+        <li>Look for rows, columns, or boxes that are nearly complete.</li>
+        <li>Use notes to track possible candidates for tricky cells.</li>
+        <li>Conflicts are highlighted in red to help you spot mistakes.</li>
+        <li>Every puzzle has exactly one valid solution.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
-  // ── Grid DOM creation ──────────────────────────────────────────────────────
-  createGrid() {
-    const gridEl = document.getElementById('grid');
-    gridEl.innerHTML = '';
-    for (let i = 0; i < 81; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.index = i;
-      cell.addEventListener('click', () => this.selectCell(i));
-      cell.addEventListener('contextmenu', e => {
-        e.preventDefault();
-        this.selectCell(i);
-        this.showPopup();
-      });
-      let touchTimer;
-      cell.addEventListener('touchstart', e => {
-        touchTimer = setTimeout(() => {
-          e.preventDefault();
-          this.selectCell(i);
-          this.showPopup();
-        }, 500);
-      });
-      cell.addEventListener('touchend', () => clearTimeout(touchTimer));
-      cell.addEventListener('touchmove', () => clearTimeout(touchTimer));
-      gridEl.appendChild(cell);
-    }
-  }
-
-  // ── Puzzle generation ──────────────────────────────────────────────────────
-  generateSolution() {
-    this.solution = Array(9).fill(null).map(() => Array(9).fill(0));
-    this.fillGrid(this.solution);
-  }
-
-  fillGrid(grid, row=0, col=0) {
-    if (row === 9) return true;
-    if (col === 9) return this.fillGrid(grid, row+1, 0);
-    const nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random()-0.5);
-    for (const num of nums) {
-      if (this.isValid(grid, row, col, num)) {
-        grid[row][col] = num;
-        if (this.fillGrid(grid, row, col+1)) return true;
-        grid[row][col] = 0;
-      }
-    }
-    return false;
-  }
-
-  isValid(grid, row, col, num) {
-    for (let i=0; i<9; i++) {
-      if (grid[row][i]===num || grid[i][col]===num) return false;
-    }
-    const br=Math.floor(row/3)*3, bc=Math.floor(col/3)*3;
-    for (let i=0; i<3; i++) for (let j=0; j<3; j++) {
-      if (grid[br+i][bc+j]===num) return false;
-    }
-    return true;
-  }
-
-  canPlaceNumber(row, col, num) {
-    const br=Math.floor(row/3)*3, bc=Math.floor(col/3)*3;
-    for (let i=0; i<3; i++) for (let j=0; j<3; j++) {
-      if (this.grid[br+i][bc+j]===num) return false;
-    }
-    return true;
-  }
-
-  // ── New game ────────────────────────────────────────────────────────────────
-  newGame() {
-    this.generateSolution();
-    this.grid  = this.solution.map(r => [...r]);
-    this.given = Array(9).fill(null).map(() => Array(9).fill(false));
-    this.notes = Array(9).fill(null).map(() => Array(9).fill(null).map(() => ({})));
-    this.history = [];
-    this.selected = null;
-    this.lastNumber = 0;
-    this.resetNotesUI();
-
-    const toRemove = {easy:35, medium:45, hard:55}[this.level];
-    let removed = 0;
-    while (removed < toRemove) {
-      const r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9);
-      if (this.grid[r][c] !== 0) { this.grid[r][c]=0; removed++; }
-    }
-    for (let i=0; i<9; i++) for (let j=0; j<9; j++) {
-      if (this.grid[i][j] !== 0) this.given[i][j]=true;
-    }
-    this.saveGame();
-    this.render();
-    this.hideMessage();
-  }
-
-  changeDifficulty(level) {
-    this.level = level;
-    document.querySelectorAll('.diff-btn').forEach(btn =>
-      btn.classList.toggle('active', btn.dataset.level===level)
-    );
-    this.newGame();
-  }
-
-  // ── Cell selection / popup ─────────────────────────────────────────────────
-  selectCell(index) {
-    const row=Math.floor(index/9), col=index%9;
-    if (this.given[row][col]) return;
-    this.selected = index;
-    const val = this.grid[row][col];
-    if (val > 0) { this.showPopup(); this.render(); return; }
-    if (!this.notesMode && this.lastNumber>0 && this.canPlaceNumber(row,col,this.lastNumber)) {
-      this.placeNumber(this.lastNumber);
-    } else {
-      this.showPopup();
-    }
-    this.render();
-  }
-
-  // ── Popup rendering ────────────────────────────────────────────────────────
-  showPopup() {
-    if (this.selected===null) return;
-    const popup   = document.getElementById('popup');
-    const numGrid = document.getElementById('numberGrid');
-    const header  = document.getElementById('popupHeader');
-    numGrid.innerHTML = '';
-
-    const row=Math.floor(this.selected/9), col=this.selected%9;
-    const cellNotes = this.notes[row][col];
-
-    if (this.notesMode && this.notesPhase==='position') {
-      // ── Phase 1: choose a position within the cell ─────────────────────────
-      if (this.notesClearMode) {
-        header.textContent = 'Tap position to clear note';
-      } else {
-        header.textContent = 'Tap position to place note';
-      }
-
-      for (let pos=1; pos<=9; pos++) {
-        if (pos===5) {
-          // Centre position is unused — render an invisible spacer
-          const spacer = document.createElement('div');
-          spacer.className = 'number-btn pos-spacer';
-          numGrid.appendChild(spacer);
-          continue;
-        }
-
-        const existingNote = cellNotes[pos];
-
-        if (this.notesClearMode) {
-          // In clear mode: only show buttons for positions that actually have notes
-          const btn = document.createElement('button');
-          btn.className = 'number-btn pos-btn';
-          if (existingNote) {
-            btn.textContent = existingNote;
-            btn.classList.add('has-note', 'clear-mode');
-            btn.addEventListener('click', () => this.clearNote(pos));
-          } else {
-            // No note here — dim / disabled
-            btn.textContent = '';
-            btn.style.opacity = '0.15';
-            btn.disabled = true;
-          }
-          numGrid.appendChild(btn);
-        } else {
-          // Place mode: show all 8 positions; show existing note value if present
-          const btn = document.createElement('button');
-          btn.className = 'number-btn pos-btn';
-          if (existingNote) {
-            btn.textContent = existingNote;
-            btn.classList.add('has-note');
-          }
-          btn.addEventListener('click', () => this.selectNotePosition(pos));
-          numGrid.appendChild(btn);
-        }
-      }
-
-    } else if (this.notesMode && this.notesPhase==='number') {
-      // ── Phase 2: choose the number to write at the selected position ───────
-      header.textContent = 'Select number for note';
-      for (let i=1; i<=9; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'number-btn';
-        btn.textContent = i;
-        btn.addEventListener('click', () => this.placeNote(i));
-        numGrid.appendChild(btn);
-      }
-
-    } else {
-      // ── Normal mode: pick a number to place in the cell ────────────────────
-      header.textContent = '';
-      for (let i=1; i<=9; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'number-btn';
-        btn.textContent = i;
-        btn.addEventListener('click', () => this.placeNumber(i));
-        numGrid.appendChild(btn);
-      }
-    }
-
-    // Reflect notes-toggle state on the button
-    document.getElementById('notesToggle').classList.toggle('notes-active', this.notesMode);
-    popup.classList.add('active');
-  }
-
-  closePopup() {
-    document.getElementById('popup').classList.remove('active');
-    // Reset to position-select phase when popup closes
-    this.notesPhase = 'position';
-    this.notesClearMode = false;
-    this.noteSelectedPos = null;
-  }
-
-  // ── Notes-mode helpers ─────────────────────────────────────────────────────
-  toggleNotesMode() {
-    this.notesMode = !this.notesMode;
-    this.notesPhase = 'position';
-    this.notesClearMode = false;
-    this.noteSelectedPos = null;
-    this.showPopup();
-  }
-
-  resetNotesUI() {
-    this.notesMode = false;
-    this.notesPhase = 'position';
-    this.notesClearMode = false;
-    this.noteSelectedPos = null;
-  }
-
-  selectNotePosition(pos) {
-    this.noteSelectedPos = pos;
-    this.notesPhase = 'number';
-    this.showPopup();
-  }
-
-  placeNote(num) {
-    if (this.selected===null || this.noteSelectedPos===null) return;
-    const row=Math.floor(this.selected/9), col=this.selected%9;
-    if (this.given[row][col] || this.grid[row][col]!==0) return;
-    this.notes[row][col][this.noteSelectedPos] = num;
-    this.noteSelectedPos = null;
-    this.notesPhase = 'position';
-    this.notesClearMode = false;
-    this.saveGame();
-    this.closePopup();
-    this.render();
-  }
-
-  clearNote(pos) {
-    if (this.selected===null) return;
-    const row=Math.floor(this.selected/9), col=this.selected%9;
-    delete this.notes[row][col][pos];
-    this.noteSelectedPos = null;
-    this.notesPhase = 'position';
-    this.notesClearMode = false;
-    this.saveGame();
-    this.closePopup();
-    this.render();
-  }
-
-  // ── Number placement ───────────────────────────────────────────────────────
-  placeNumber(num) {
-    if (this.selected===null) return;
-    const row=Math.floor(this.selected/9), col=this.selected%9;
-    if (this.given[row][col]) return;
-    this.history.push({index:this.selected, value:this.grid[row][col], notes:JSON.parse(JSON.stringify(this.notes[row][col]))});
-    this.grid[row][col] = num;
-    this.notes[row][col] = {}; // clear notes on this cell when number placed
-    this.lastNumber = num;
-    this.saveGame();
-    this.closePopup();
-    this.render();
-    if (this.isComplete()) this.checkSolution();
-  }
-
-  // ── Clear handler (normal clear or notes-clear trigger) ────────────────────
-  handleClear() {
-    if (this.selected===null) return;
-    const row=Math.floor(this.selected/9), col=this.selected%9;
-    if (this.given[row][col]) return;
-
-    if (this.notesMode) {
-      // Enter clear-note position-selection mode
-      this.notesClearMode = true;
-      this.notesPhase = 'position';
-      this.noteSelectedPos = null;
-      this.showPopup();
-      return;
-    }
-
-    // Normal clear
-    this.history.push({index:this.selected, value:this.grid[row][col], notes:JSON.parse(JSON.stringify(this.notes[row][col]))});
-    this.grid[row][col] = 0;
-    this.saveGame();
-    this.closePopup();
-    this.render();
-  }
-
-  // ── Undo ───────────────────────────────────────────────────────────────────
-  undo() {
-    if (!this.history.length) return;
-    const last=this.history.pop();
-    const row=Math.floor(last.index/9), col=last.index%9;
-    this.grid[row][col] = last.value;
-    if (last.notes) this.notes[row][col] = last.notes;
-    this.selected = last.index;
-    this.saveGame();
-    this.render();
-  }
-
-  // ── Win detection ──────────────────────────────────────────────────────────
-  isComplete() {
-    for (let i=0; i<9; i++) for (let j=0; j<9; j++) if (!this.grid[i][j]) return false;
-    return true;
-  }
-
-  checkSolution() {
-    if (this.isValidCompleteSolution()) {
-      this.stats[this.level]++;
-      localStorage.setItem('sudokuStats', JSON.stringify(this.stats));
-      this.updateStats();
-      this.clearSavedGame();
-      this.showMessage('🎉 Congratulations! You solved it!', 'success');
-      setTimeout(() => this.newGame(), 3000);
-    } else {
-      this.showMessage('❌ Incorrect solution. <span class="restart-link" onclick="game.confirmRestart()">Restart?</span>', 'error');
-      document.getElementById('grid').classList.add('error-border');
-      setTimeout(() => {
-        this.hideMessage();
-        document.getElementById('grid').classList.remove('error-border');
-      }, 5000);
-    }
-  }
-
-  isValidCompleteSolution() {
-    for (let i=0; i<9; i++) {
-      const row=new Set(), col=new Set();
-      for (let j=0; j<9; j++) {
-        if (this.grid[i][j]<1||this.grid[i][j]>9||row.has(this.grid[i][j])) return false;
-        row.add(this.grid[i][j]);
-        if (this.grid[j][i]<1||this.grid[j][i]>9||col.has(this.grid[j][i])) return false;
-        col.add(this.grid[j][i]);
-      }
-    }
-    for (let br=0; br<3; br++) for (let bc=0; bc<3; bc++) {
-      const box=new Set();
-      for (let i=0; i<3; i++) for (let j=0; j<3; j++) {
-        const v=this.grid[br*3+i][bc*3+j];
-        if (box.has(v)) return false;
-        box.add(v);
-      }
-    }
-    return true;
-  }
-
-  confirmRestart() {
-    if (confirm('Restart this game?')) this.newGame();
-  }
-
-  confirmNewGame() {
-    if (confirm('Start a new game? Current progress will be lost.')) this.newGame();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  render() {
-    const cells=document.querySelectorAll('.cell');
-    const selRow=this.selected!==null ? Math.floor(this.selected/9) : -1;
-    const selCol=this.selected!==null ? this.selected%9 : -1;
-    const selNum=this.selected!==null ? this.grid[selRow][selCol] : 0;
-
-    cells.forEach((cell, index) => {
-      const row=Math.floor(index/9), col=index%9;
-      const value=this.grid[row][col];
-      const cellNotes=this.notes[row][col];
-      const hasNotes=Object.keys(cellNotes).length>0;
-
-      // Clear cell content
-      cell.innerHTML='';
-      cell.className='cell';
-
-      // Set classes
-      if (this.given[row][col]) cell.classList.add('given');
-      else if (value) cell.classList.add('filled');
-      if (index===this.selected) cell.classList.add('selected');
-      if (selNum>0 && value===selNum) cell.classList.add('same-number-highlight');
-
-      // Conflict detection (only for user-placed numbers)
-      if (value>0 && !this.given[row][col]) {
-        let conflict=false;
-        for (let i=0; i<9; i++) {
-          if (i!==col && this.grid[row][i]===value) conflict=true;
-          if (i!==row && this.grid[i][col]===value) conflict=true;
-        }
-        const br=Math.floor(row/3)*3, bc=Math.floor(col/3)*3;
-        for (let i=0; i<3; i++) for (let j=0; j<3; j++) {
-          const r=br+i, c=bc+j;
-          if ((r!==row||c!==col) && this.grid[r][c]===value) conflict=true;
-        }
-        if (conflict) cell.classList.add('conflict');
-      }
-
-      // Render value or notes
-      if (value) {
-        cell.textContent = value;
-      } else if (hasNotes) {
-        // Show small notes in the 3×3 positions inside the cell
-        const notesGrid = document.createElement('div');
-        notesGrid.className = 'cell-notes';
-        for (let pos=1; pos<=9; pos++) {
-          const slot = document.createElement('div');
-          slot.className = 'cell-note';
-          // Centre slot (pos 5) intentionally left blank
-          if (pos!==5 && cellNotes[pos]) slot.textContent = cellNotes[pos];
-          notesGrid.appendChild(slot);
-        }
-        cell.appendChild(notesGrid);
-      }
-    });
-  }
-
-  // ── UI helpers ─────────────────────────────────────────────────────────────
-  showMessage(text, type) {
-    const msg=document.getElementById('message');
-    msg.innerHTML=text;
-    msg.className=`message ${type}`;
-    msg.classList.remove('hidden');
-  }
-
-  hideMessage() { document.getElementById('message').classList.add('hidden'); }
-
-  updateStats() {
-    document.getElementById('easyWins').textContent   = this.stats.easy;
-    document.getElementById('mediumWins').textContent = this.stats.medium;
-    document.getElementById('hardWins').textContent   = this.stats.hard;
-  }
-
-  // ── PWA install ────────────────────────────────────────────────────────────
-  installApp() {
-    if (this.deferredPrompt) {
-      this.deferredPrompt.prompt();
-      this.deferredPrompt.userChoice.then(choice => {
-        if (choice.outcome==='accepted') {
-          this.showMessage('✅ App installed!', 'success');
-          setTimeout(() => this.hideMessage(), 3000);
-        }
-        this.deferredPrompt=null;
-      });
-    } else {
-      this.showMessage('ℹ️ iOS: Share > Add to Home Screen. Android: browser menu > Install App.', 'success');
-      setTimeout(() => this.hideMessage(), 6000);
-    }
-  }
-
-  checkPWAInstalled() {
-    if (window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone===true) {
-      document.getElementById('installBtn').style.display='none';
-    }
-  }
-
-  // ── Persistence ────────────────────────────────────────────────────────────
-  saveGame() {
-    localStorage.setItem('sudokuGame2', JSON.stringify({
-      grid:this.grid, solution:this.solution, given:this.given,
-      level:this.level, history:this.history, selected:this.selected,
-      lastNumber:this.lastNumber, notes:this.notes
-    }));
-  }
-
-  loadGame() {
-    const saved = localStorage.getItem('sudokuGame2');
-    if (saved) {
-      try {
-        const s=JSON.parse(saved);
-        this.grid       = s.grid;
-        this.solution   = s.solution;
-        this.given      = s.given;
-        this.level      = s.level;
-        this.history    = s.history || [];
-        this.selected   = s.selected;
-        this.lastNumber = s.lastNumber || 0;
-        this.notes      = s.notes || Array(9).fill(null).map(()=>Array(9).fill(null).map(()=>({})));
-        document.querySelectorAll('.diff-btn').forEach(btn =>
-          btn.classList.toggle('active', btn.dataset.level===this.level)
-        );
-        this.render();
-        return;
-      } catch(e) {
-        console.error('Failed to load saved game', e);
-      }
-    }
-    this.newGame();
-  }
-
-  clearSavedGame() { localStorage.removeItem('sudokuGame2'); }
-}
-
-const game = new SudokuGame();
-</script>
+<script src="./js/engine.js"></script>
+<script src="./js/audio.js"></script>
+<script src="./js/panels.js"></script>
+<script src="./js/game.js"></script>
 </body>
 </html>

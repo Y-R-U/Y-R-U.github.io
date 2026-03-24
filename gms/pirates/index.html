@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pirate Seas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #1a3a5c;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #renderCanvas {
+            width: 100%; height: 100%;
+            display: block;
+            outline: none;
+            touch-action: none;
+        }
+        #loading {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: #1a3a5c; color: #e8d5a3; font-family: serif;
+            z-index: 100;
+        }
+        #loading h1 { font-size: 2em; margin-bottom: 0.5em; }
+        #loading p { font-size: 1.1em; opacity: 0.7; }
+        .bar-wrap {
+            width: 60%; max-width: 300px; height: 8px;
+            background: rgba(255,255,255,0.15); border-radius: 4px;
+            margin-top: 1em; overflow: hidden;
+        }
+        .bar-fill {
+            width: 0%; height: 100%;
+            background: #e8d5a3; border-radius: 4px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <h1>Pirate Seas</h1>
+        <p>Loading assets...</p>
+        <div class="bar-wrap"><div class="bar-fill" id="loadBar"></div></div>
+    </div>
+    <canvas id="renderCanvas"></canvas>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script>
+    (function() {
+        const ASSET_PATH = "../assets/pirate-kit/";
+        const WATER_SIZE = 200;
+        const ISLAND_RADIUS = 18;
+        const AI_SHIP_COUNT = 5;
+        const PLAYER_SPEED = 8;
+        const AI_SPEED_MIN = 2;
+        const AI_SPEED_MAX = 4;
+        const CAM_HEIGHT = 25;
+        const CAM_DISTANCE = 50;
+
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true, { stencil: true });
+        const scene = new BABYLON.Scene(engine);
+
+        // ---- Sky color ----
+        scene.clearColor = new BABYLON.Color4(0.53, 0.77, 0.92, 1);
+        scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.35);
+        scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+        scene.fogDensity = 0.008;
+        scene.fogColor = new BABYLON.Color3(0.53, 0.77, 0.92);
+
+        // ---- Camera ----
+        const camera = new BABYLON.ArcRotateCamera("cam", -Math.PI / 2, Math.PI / 3.2, CAM_DISTANCE, BABYLON.Vector3.Zero(), scene);
+        camera.lowerBetaLimit = 0.3;
+        camera.upperBetaLimit = Math.PI / 2.5;
+        camera.lowerRadiusLimit = 15;
+        camera.upperRadiusLimit = 60;
+        camera.attachControl(canvas, false);
+        // Disable default camera inputs on touch so our joystick works
+        camera.inputs.removeByType("ArcRotateCameraPointersInput");
+
+        // ---- Lights ----
+        const sun = new BABYLON.DirectionalLight("sun", new BABYLON.Vector3(-0.5, -1, 0.5), scene);
+        sun.intensity = 1.5;
+        sun.diffuse = new BABYLON.Color3(1, 0.95, 0.85);
+        const ambient = new BABYLON.HemisphericLight("ambient", new BABYLON.Vector3(0, 1, 0), scene);
+        ambient.intensity = 0.5;
+        ambient.groundColor = new BABYLON.Color3(0.2, 0.3, 0.4);
+
+        // ---- Water ----
+        const waterMesh = BABYLON.MeshBuilder.CreateGround("water", { width: WATER_SIZE, height: WATER_SIZE, subdivisions: 64 }, scene);
+        const waterMat = new BABYLON.WaterMaterial("waterMat", scene, new BABYLON.Vector2(512, 512));
+        waterMat.backFaceCulling = true;
+        waterMat.bumpTexture = new BABYLON.Texture("../assets/pirate-kit/waterbump.png", scene);
+        waterMat.windForce = -5;
+        waterMat.waveHeight = 0.3;
+        waterMat.waveLength = 0.3;
+        waterMat.waterColor = new BABYLON.Color3(0.1, 0.3, 0.5);
+        waterMat.colorBlendFactor = 0.3;
+        waterMat.bumpHeight = 0.1;
+        waterMat.windDirection = new BABYLON.Vector2(1, 1);
+        waterMesh.material = waterMat;
+        waterMesh.position.y = -0.1;
+
+        // Add skybox for water reflections
+        const skybox = BABYLON.MeshBuilder.CreateBox("skybox", { size: 500 }, scene);
+        const skyMat = new BABYLON.StandardMaterial("skyMat", scene);
+        skyMat.backFaceCulling = false;
+        skyMat.disableLighting = true;
+        skyMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        skyMat.specularColor = new BABYLON.Color3(0, 0, 0);
+        skyMat.emissiveColor = new BABYLON.Color3(0.53, 0.77, 0.92);
+        skybox.material = skyMat;
+        skybox.infiniteDistance = true;
+        waterMat.addToRenderList(skybox);
+
+        // ---- Island (simple sand + grass) ----
+        const islandMesh = BABYLON.MeshBuilder.CreateCylinder("island", {
+            height: 3, diameterTop: ISLAND_RADIUS * 2, diameterBottom: ISLAND_RADIUS * 2.3,
+            tessellation: 32
+        }, scene);
+        islandMesh.position.y = 0.2;
+        const islandMat = new BABYLON.StandardMaterial("islandMat", scene);
+        islandMat.diffuseColor = new BABYLON.Color3(0.85, 0.75, 0.55);
+        islandMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+        islandMesh.material = islandMat;
+        waterMat.addToRenderList(islandMesh);
+
+        // Green patch on top
+        const grassPatch = BABYLON.MeshBuilder.CreateCylinder("grass", {
+            height: 0.15, diameter: ISLAND_RADIUS * 1.2, tessellation: 32
+        }, scene);
+        grassPatch.position.y = 1.8;
+        const grassMat = new BABYLON.StandardMaterial("grassMat", scene);
+        grassMat.diffuseColor = new BABYLON.Color3(0.35, 0.6, 0.25);
+        grassMat.specularColor = BABYLON.Color3.Black();
+        grassPatch.material = grassMat;
+        waterMat.addToRenderList(grassPatch);
+
+        // ---- Asset loading ----
+        const modelCache = {};
+        let totalToLoad = 0;
+        let loaded = 0;
+        const loadBar = document.getElementById("loadBar");
+
+        function updateProgress() {
+            loaded++;
+            const pct = Math.min(100, Math.round((loaded / totalToLoad) * 100));
+            loadBar.style.width = pct + "%";
+        }
+
+        function loadModel(name) {
+            return new Promise((resolve, reject) => {
+                BABYLON.SceneLoader.ImportMesh("", ASSET_PATH, name + ".glb", scene, (meshes) => {
+                    const root = meshes[0];
+                    root.setEnabled(false);
+                    modelCache[name] = root;
+                    updateProgress();
+                    resolve(root);
+                }, null, (_scene, msg) => {
+                    console.warn("Failed to load " + name, msg);
+                    updateProgress();
+                    resolve(null);
+                });
+            });
+        }
+
+        function instantiateModel(name, pos, rotY, scale) {
+            const src = modelCache[name];
+            if (!src) return null;
+            const instance = src.instantiateHierarchy(null, {doNotInstantiate: false});
+            if (!instance) return null;
+            instance.setEnabled(true);
+            instance.position = pos || BABYLON.Vector3.Zero();
+            // GLB imports set rotationQuaternion which overrides .rotation —
+            // clear it so Euler .rotation.y works for steering
+            instance.rotationQuaternion = null;
+            instance.rotation.y = rotY || 0;
+            if (scale != null) instance.scaling = new BABYLON.Vector3(scale, scale, scale);
+            // Add all child meshes to water render list
+            instance.getChildMeshes().forEach(m => {
+                waterMat.addToRenderList(m);
+            });
+            return instance;
+        }
+
+        // Models we need
+        const modelsToLoad = [
+            "ship-pirate-small", "ship-pirate-medium",
+            "ship-small", "ship-medium", "ship-large", "ship-ghost",
+            "palm-bend", "palm-straight",
+            "rocks-sand-a", "rocks-sand-b",
+            "barrel", "crate", "ship-wreck"
+        ];
+        totalToLoad = modelsToLoad.length;
+
+        // ---- Player state ----
+        let playerShip = null;
+        let playerAngle = 0;
+        let playerSpeed = 0;
+        let playerPos = new BABYLON.Vector3(ISLAND_RADIUS + 10, 0, 0);
+
+        // ---- Joystick state ----
+        let joystickActive = false;
+        let joystickCenter = { x: 0, y: 0 };
+        let joystickDir = { x: 0, y: 0 };
+        let joystickPointerId = -1;
+
+        // ---- Touch / pointer controls ----
+        const joystickOuter = document.createElement("div");
+        joystickOuter.style.cssText = "position:absolute;width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);pointer-events:none;display:none;transform:translate(-50%,-50%);z-index:10;";
+        document.body.appendChild(joystickOuter);
+
+        const joystickInner = document.createElement("div");
+        joystickInner.style.cssText = "position:absolute;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.6);pointer-events:none;display:none;transform:translate(-50%,-50%);z-index:11;";
+        document.body.appendChild(joystickInner);
+
+        canvas.addEventListener("pointerdown", (e) => {
+            if (joystickActive) return;
+            joystickActive = true;
+            joystickPointerId = e.pointerId;
+            joystickCenter = { x: e.clientX, y: e.clientY };
+            joystickDir = { x: 0, y: 0 };
+            joystickOuter.style.display = "block";
+            joystickOuter.style.left = e.clientX + "px";
+            joystickOuter.style.top = e.clientY + "px";
+            joystickInner.style.display = "block";
+            joystickInner.style.left = e.clientX + "px";
+            joystickInner.style.top = e.clientY + "px";
+            canvas.setPointerCapture(e.pointerId);
+        });
+
+        canvas.addEventListener("pointermove", (e) => {
+            if (!joystickActive || e.pointerId !== joystickPointerId) return;
+            const dx = e.clientX - joystickCenter.x;
+            const dy = e.clientY - joystickCenter.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const maxR = 50;
+            const clampDist = Math.min(dist, maxR);
+            const angle = Math.atan2(dy, dx);
+            const cx = joystickCenter.x + Math.cos(angle) * clampDist;
+            const cy = joystickCenter.y + Math.sin(angle) * clampDist;
+            joystickInner.style.left = cx + "px";
+            joystickInner.style.top = cy + "px";
+            if (dist > 8) {
+                joystickDir = { x: Math.cos(angle), y: Math.sin(angle) };
+            } else {
+                joystickDir = { x: 0, y: 0 };
+            }
+        });
+
+        const endJoystick = (e) => {
+            if (e.pointerId !== joystickPointerId) return;
+            joystickActive = false;
+            joystickPointerId = -1;
+            joystickDir = { x: 0, y: 0 };
+            joystickOuter.style.display = "none";
+            joystickInner.style.display = "none";
+        };
+        canvas.addEventListener("pointerup", endJoystick);
+        canvas.addEventListener("pointercancel", endJoystick);
+
+        // ---- AI Ships ----
+        const aiShips = [];
+        const aiShipModels = ["ship-small", "ship-medium", "ship-large", "ship-ghost"];
+
+        function spawnAIShip() {
+            const modelName = aiShipModels[Math.floor(Math.random() * aiShipModels.length)];
+            const angle = Math.random() * Math.PI * 2;
+            const dist = ISLAND_RADIUS + 15 + Math.random() * 50;
+            const pos = new BABYLON.Vector3(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
+            const heading = Math.random() * Math.PI * 2;
+            const speed = AI_SPEED_MIN + Math.random() * (AI_SPEED_MAX - AI_SPEED_MIN);
+            const ship = instantiateModel(modelName, pos, heading, 1);
+            if (!ship) return;
+            aiShips.push({
+                mesh: ship,
+                heading: heading,
+                speed: speed,
+                turnTimer: Math.random() * 5,
+                turnInterval: 3 + Math.random() * 5,
+                targetHeading: heading
+            });
+        }
+
+        // ---- Island decorations ----
+        function placeIslandDecorations() {
+            // Palms
+            const palmTypes = ["palm-bend", "palm-straight"];
+            for (let i = 0; i < 6; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const r = 3 + Math.random() * (ISLAND_RADIUS * 0.6 - 3);
+                const p = new BABYLON.Vector3(Math.cos(a) * r, 1.7, Math.sin(a) * r);
+                const pName = palmTypes[Math.floor(Math.random() * palmTypes.length)];
+                instantiateModel(pName, p, Math.random() * Math.PI * 2, 1);
+            }
+            // Rocks on shoreline
+            const rockTypes = ["rocks-sand-a", "rocks-sand-b"];
+            for (let i = 0; i < 4; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const r = ISLAND_RADIUS * 0.85 + Math.random() * 2;
+                const p = new BABYLON.Vector3(Math.cos(a) * r, 1.2, Math.sin(a) * r);
+                instantiateModel(rockTypes[i % 2], p, Math.random() * Math.PI * 2, 1);
+            }
+            // Barrels & crates
+            for (let i = 0; i < 3; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const r = 2 + Math.random() * (ISLAND_RADIUS * 0.5);
+                const p = new BABYLON.Vector3(Math.cos(a) * r, 1.8, Math.sin(a) * r);
+                instantiateModel(i < 2 ? "barrel" : "crate", p, Math.random() * Math.PI * 2, 1);
+            }
+            // Ship wreck on the shore
+            const wa = Math.random() * Math.PI * 2;
+            const wr = ISLAND_RADIUS * 0.9;
+            instantiateModel("ship-wreck", new BABYLON.Vector3(Math.cos(wa) * wr, 1.0, Math.sin(wa) * wr), wa + Math.PI / 2, 1);
+        }
+
+        // ---- Bob animation helper ----
+        function bobY(time, offset) {
+            return Math.sin(time * 1.5 + offset) * 0.15;
+        }
+
+        // ---- Game loop ----
+        let gameReady = false;
+        let time = 0;
+
+        scene.registerBeforeRender(() => {
+            if (!gameReady) return;
+            const dt = engine.getDeltaTime() / 1000;
+            time += dt;
+
+            // Player movement
+            if (joystickDir.x !== 0 || joystickDir.y !== 0) {
+                // Convert screen joystick to world direction
+                // Screen X -> world X, Screen Y -> world -Z (top of screen = forward in -Z ... depends on cam)
+                // Since camera looks down from above, screen X = world X, screen Y = world Z
+                const targetAngle = Math.atan2(-joystickDir.x, -joystickDir.y); // reversed because of camera orientation
+                // Smooth rotation
+                let angleDiff = targetAngle - playerAngle;
+                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+                playerAngle += angleDiff * Math.min(1, dt * 4);
+
+                playerSpeed = PLAYER_SPEED;
+            } else {
+                playerSpeed *= 0.95;
+                if (playerSpeed < 0.1) playerSpeed = 0;
+            }
+
+            if (playerSpeed > 0) {
+                playerPos.x += Math.sin(playerAngle) * playerSpeed * dt;
+                playerPos.z += Math.cos(playerAngle) * playerSpeed * dt;
+                // Clamp to world bounds
+                const halfW = WATER_SIZE / 2 - 5;
+                playerPos.x = Math.max(-halfW, Math.min(halfW, playerPos.x));
+                playerPos.z = Math.max(-halfW, Math.min(halfW, playerPos.z));
+                // Push away from island center
+                const distToIsland = Math.sqrt(playerPos.x * playerPos.x + playerPos.z * playerPos.z);
+                if (distToIsland < ISLAND_RADIUS + 2) {
+                    const pushAngle = Math.atan2(playerPos.x, playerPos.z);
+                    playerPos.x = Math.sin(pushAngle) * (ISLAND_RADIUS + 2);
+                    playerPos.z = Math.cos(pushAngle) * (ISLAND_RADIUS + 2);
+                }
+            }
+
+            if (playerShip) {
+                playerShip.position.x = playerPos.x;
+                playerShip.position.z = playerPos.z;
+                playerShip.position.y = bobY(time, 0);
+                playerShip.rotation.y = playerAngle;
+                // Slight roll
+                playerShip.rotation.z = Math.sin(time * 2) * 0.03;
+            }
+
+            // Camera follow
+            camera.target.x += (playerPos.x - camera.target.x) * Math.min(1, dt * 3);
+            camera.target.z += (playerPos.z - camera.target.z) * Math.min(1, dt * 3);
+            camera.target.y = 1;
+
+            // AI ships
+            aiShips.forEach((ai, idx) => {
+                ai.turnTimer += dt;
+                if (ai.turnTimer > ai.turnInterval) {
+                    ai.turnTimer = 0;
+                    ai.turnInterval = 3 + Math.random() * 5;
+                    ai.targetHeading += (Math.random() - 0.5) * Math.PI;
+                }
+                // Smooth heading
+                let hDiff = ai.targetHeading - ai.heading;
+                while (hDiff > Math.PI) hDiff -= Math.PI * 2;
+                while (hDiff < -Math.PI) hDiff += Math.PI * 2;
+                ai.heading += hDiff * Math.min(1, dt * 1.5);
+
+                const ax = ai.mesh.position.x + Math.sin(ai.heading) * ai.speed * dt;
+                const az = ai.mesh.position.z + Math.cos(ai.heading) * ai.speed * dt;
+
+                // Keep in bounds
+                const halfW = WATER_SIZE / 2 - 10;
+                if (Math.abs(ax) > halfW || Math.abs(az) > halfW) {
+                    ai.targetHeading = Math.atan2(-ax, -az);
+                }
+                // Avoid island
+                const distI = Math.sqrt(ax * ax + az * az);
+                if (distI < ISLAND_RADIUS + 5) {
+                    ai.targetHeading = Math.atan2(ax, az);
+                }
+
+                ai.mesh.position.x = Math.max(-halfW, Math.min(halfW, ax));
+                ai.mesh.position.z = Math.max(-halfW, Math.min(halfW, az));
+                ai.mesh.position.y = bobY(time, idx * 1.3);
+                ai.mesh.rotation.y = ai.heading;
+                ai.mesh.rotation.z = Math.sin(time * 2 + idx) * 0.03;
+            });
+        });
+
+        // ---- Init ----
+        async function init() {
+            await Promise.all(modelsToLoad.map(m => loadModel(m)));
+
+            // Player ship
+            playerShip = instantiateModel("ship-pirate-small", playerPos.clone(), 0, 1);
+
+            // AI ships
+            for (let i = 0; i < AI_SHIP_COUNT; i++) spawnAIShip();
+
+            // Island decorations
+            placeIslandDecorations();
+
+            // Hide loading
+            document.getElementById("loading").style.display = "none";
+            gameReady = true;
+        }
+
+        init();
+
+        engine.runRenderLoop(() => scene.render());
+        window.addEventListener("resize", () => engine.resize());
+    })();
+    </script>
+</body>
+</html>

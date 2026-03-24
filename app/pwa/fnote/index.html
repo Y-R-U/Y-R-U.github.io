@@ -92,10 +92,16 @@
       color: var(--text);
     }
 
-    .btn-settings {
+    .header-actions {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-settings {
       background: none;
       border: none;
       color: var(--text-dim);
@@ -107,6 +113,118 @@
       line-height: 1;
     }
     .btn-settings:hover { color: var(--text); background: var(--bg-card); }
+
+    .btn-user {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.76rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 20px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+      line-height: 1;
+    }
+    .btn-user:hover { color: var(--text); border-color: var(--accent); }
+
+    .user-popup {
+      position: fixed;
+      top: 54px;
+      right: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 6px 28px var(--shadow);
+      z-index: 600;
+      min-width: 160px;
+      animation: userPopupIn 0.14s ease-out;
+    }
+    @keyframes userPopupIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    .user-popup-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .user-popup-btn {
+      width: 100%;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 7px 12px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .user-popup-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(255, 77, 106, 0.08);
+    }
+
+    /* Recent-users list inside popup */
+    .user-popup-recents-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 8px 0 4px;
+    }
+    .user-popup-recent-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .user-popup-recent-name {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.84rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: left;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .user-popup-recent-name:hover { background: var(--bg-card-hover); color: var(--text); }
+    .user-popup-recent-rm {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 5px;
+      transition: color 0.12s, background 0.12s;
+      flex-shrink: 0;
+    }
+    .user-popup-recent-rm:hover { color: var(--danger); background: rgba(255,77,106,0.1); }
+    /* Add a divider gap before the Switch User button when recents exist */
+    #user-popup-recents:not(:empty) { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 
     /* Breadcrumbs */
     .breadcrumbs {
@@ -187,6 +305,8 @@
     }
     .card:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
     .card:active { transform: scale(0.97); }
+    /* Suppress press animation once drag is active */
+    .card.dragging:active { transform: scale(0.96); }
 
     .card-new {
       background: var(--card-new-bg);
@@ -323,6 +443,12 @@
       line-height: 1;
     }
     .tool-btn:hover { border-color: var(--accent); background: var(--bg-card); }
+
+    .tool-copy-group {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
 
     .editor-content {
       flex: 1;
@@ -689,6 +815,21 @@
     .card {
       user-select: none;
       -webkit-user-select: none;
+      /* Allow normal vertical scrolling on touch; overridden once drag activates */
+      touch-action: pan-y;
+    }
+    /* Prevent scroll interference while drag is live */
+    body.drag-active .card {
+      touch-action: none;
+    }
+    /* Long-press pending: subtle pulsing border to hint "keep holding to drag" */
+    .card.long-press-pending {
+      border-color: var(--accent);
+      animation: longPressPulse 0.5s ease-out forwards;
+    }
+    @keyframes longPressPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(74,158,255,0.5); }
+      100% { box-shadow: 0 0 0 6px rgba(74,158,255,0); }
     }
     .card.dragging {
       opacity: 0.3;
@@ -788,7 +929,10 @@
       <div class="home-header">
         <span id="sync-dot" class="sync-dot" title="Sync status"></span>
         <h1 class="home-title">Fast Notes</h1>
-        <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
+        <div class="header-actions">
+          <button id="btn-user" class="btn-user" hidden></button>
+          <button id="btn-settings" class="btn-settings" title="Settings">&#9881;</button>
+        </div>
       </div>
       <div id="breadcrumbs" class="breadcrumbs"></div>
       <div style="position:relative">
@@ -814,6 +958,10 @@
         <input type="color" id="tool-fontcolor" class="tool-color" value="#e0e0e0" title="Text Color" />
         <button id="tool-checklist" class="tool-btn" title="Add Checkbox">&#9745;</button>
         <button id="tool-radiolist" class="tool-btn" title="Add Radio">&#9673;</button>
+        <div class="tool-copy-group">
+          <button id="tool-copy-text" class="tool-btn" title="Copy as plain text">&#10697;</button>
+          <button id="tool-copy-html" class="tool-btn" title="Copy as HTML">&lt;/&gt;</button>
+        </div>
       </div>
       <div id="editor-content" class="editor-content" contenteditable="true"></div>
     </div>
@@ -824,6 +972,13 @@
 
     <!-- Drag cancel — shown only while dragging -->
     <button id="drag-cancel">✕ Cancel</button>
+
+    <!-- User popup — shown when clicking the @username chip -->
+    <div id="user-popup" class="user-popup" hidden>
+      <div id="user-popup-name" class="user-popup-name"></div>
+      <div id="user-popup-recents"></div>
+      <button id="user-logout-btn" class="user-popup-btn">Logout</button>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>

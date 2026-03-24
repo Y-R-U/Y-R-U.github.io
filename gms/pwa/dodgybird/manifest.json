@@ -1,0 +1,14 @@
+{
+  "name": "Flappy Strike: Evasive Run & Gun",
+  "short_name": "Flappy Strike",
+  "description": "Fast-paced side-scrolling run & gun action game",
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

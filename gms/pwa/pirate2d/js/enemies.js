@@ -1,0 +1,622 @@
+// Enemy system - spawning, AI, scaling with distance
+
+import { dist, angle, angleDiff, normalizeAngle, randFloat, randInt } from './utils.js';
+
+export const ENEMY_TYPES = [
+    {
+        name: 'Sloop',
+        baseHp: 30,
+        baseDamage: 5,
+        baseSpeed: 80,
+        baseGold: 15,
+        fireRate: 0.5,
+        range: 180,
+        hitRadius: 20,
+        scale: 0.6,
+        shipSprite: 'enemy_ship_1',
+        damagedSprite: 'damaged_ship_1',
+        damagedSprite2: 'heavy_dmg_ship_1',
+        color: '#886644'
+    },
+    {
+        name: 'Brigantine',
+        baseHp: 60,
+        baseDamage: 10,
+        baseSpeed: 100,
+        baseGold: 35,
+        fireRate: 0.7,
+        range: 220,
+        hitRadius: 25,
+        scale: 0.8,
+        shipSprite: 'enemy_ship_2',
+        damagedSprite: 'damaged_ship_2',
+        damagedSprite2: 'heavy_dmg_ship_2',
+        color: '#664422'
+    },
+    {
+        name: 'Galleon',
+        baseHp: 120,
+        baseDamage: 18,
+        baseSpeed: 60,
+        baseGold: 70,
+        fireRate: 1.0,
+        range: 280,
+        hitRadius: 32,
+        scale: 1.1,
+        shipSprite: 'enemy_ship_3',
+        damagedSprite: 'damaged_ship_3',
+        damagedSprite2: 'heavy_dmg_ship_3',
+        color: '#442211'
+    },
+    {
+        name: 'Man-o-War',
+        baseHp: 200,
+        baseDamage: 25,
+        baseSpeed: 50,
+        baseGold: 120,
+        fireRate: 1.2,
+        range: 320,
+        hitRadius: 38,
+        scale: 1.3,
+        shipSprite: 'enemy_ship_4',
+        damagedSprite: 'damaged_ship_4',
+        damagedSprite2: 'heavy_dmg_ship_4',
+        color: '#331100'
+    },
+    {
+        name: 'Ghost Ship',
+        baseHp: 150,
+        baseDamage: 30,
+        baseSpeed: 120,
+        baseGold: 180,
+        fireRate: 1.5,
+        range: 300,
+        hitRadius: 30,
+        scale: 1.0,
+        shipSprite: 'enemy_ship_5',
+        damagedSprite: 'damaged_ship_5',
+        damagedSprite2: 'heavy_dmg_ship_5',
+        color: '#445566',
+        isBoss: true,
+        glowColor: '#66aaff'
+    },
+    {
+        name: 'Kraken',
+        baseHp: 400,
+        baseDamage: 40,
+        baseSpeed: 40,
+        baseGold: 300,
+        fireRate: 2.0,
+        range: 250,
+        hitRadius: 50,
+        scale: 1.6,
+        shipSprite: 'enemy_ship_6',
+        damagedSprite: 'enemy_ship_6',
+        damagedSprite2: 'enemy_ship_6',
+        color: '#225533',
+        isBoss: true,
+        glowColor: '#44ff88'
+    },
+    // === Run bosses (dark/black ships) ===
+    {
+        name: "Blacktide's Lieutenant",
+        baseHp: 675,
+        baseDamage: 25,
+        baseSpeed: 70,
+        baseGold: 500,
+        fireRate: 1.5,
+        range: 300,
+        hitRadius: 40,
+        scale: 1.4,
+        shipSprite: 'boss_ship_std',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
+        color: '#1a1a2a',
+        isBoss: true,
+        isRunBoss: true,
+        glowColor: '#cc2222',
+        maxHeals: 1,
+        healThresholds: [0.5]
+    },
+    {
+        name: 'Captain Blacktide',
+        baseHp: 750,
+        baseDamage: 30,
+        baseSpeed: 55,
+        baseGold: 800,
+        fireRate: 1.8,
+        range: 350,
+        hitRadius: 48,
+        scale: 1.7,
+        shipSprite: 'boss_ship_std',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
+        color: '#0a0a1a',
+        isBoss: true,
+        isRunBoss: true,
+        glowColor: '#aa0000',
+        maxHeals: 2,
+        healThresholds: [0.66, 0.33],
+        laysMines: true
+    },
+    // Dark escort ships
+    {
+        name: 'Dark Warship',
+        baseHp: 250,
+        baseDamage: 28,
+        baseSpeed: 65,
+        baseGold: 150,
+        fireRate: 1.2,
+        range: 280,
+        hitRadius: 32,
+        scale: 1.1,
+        shipSprite: 'boss_ship_alt1',
+        damagedSprite: 'boss_ship_dmg',
+        damagedSprite2: 'boss_ship_heavy',
+        color: '#1a1a2a',
+        glowColor: '#882222'
+    }
+];
+
+// Type indices for boss spawning
+export const BOSS_TYPE_LIEUTENANT = 6;
+export const BOSS_TYPE_BLACKTIDE = 7;
+export const BOSS_TYPE_ESCORT = 8;
+
+export class Enemy {
+    constructor(type, x, y, level) {
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.level = level;
+        this.angle = Math.random() * Math.PI * 2;
+        this.speed = 0;
+
+        const scaling = 1 + (level - 1) * 0.25;
+        this.maxHp = Math.round(type.baseHp * scaling);
+        this.hp = this.maxHp;
+        this.cannonDamage = Math.round(type.baseDamage * scaling);
+        this.maxSpeed = type.baseSpeed * (1 + (level - 1) * 0.1);
+        this.goldReward = Math.round(type.baseGold * scaling);
+        this.cannonFireRate = type.fireRate;
+        this.cannonRange = type.range;
+        this.hitRadius = type.hitRadius;
+        this.cannonCooldown = 1 + Math.random() * 2;
+        this.scale = type.scale;
+        this.isBoss = type.isBoss || false;
+        this.isRunBoss = type.isRunBoss || false;
+        this.glowColor = type.glowColor || null;
+
+        // AI state
+        this.aiState = 'patrol';
+        this.patrolAngle = this.angle;
+        this.patrolTimer = randFloat(2, 5);
+        this.aggroRange = 400 + level * 20;
+        this.leashRange = this.isRunBoss ? 99999 : 800;
+        this.spawnX = x;
+        this.spawnY = y;
+        this.strafeDir = Math.random() < 0.5 ? 1 : -1;
+
+        // Fire timer for damage visual effects
+        this.fireTimer = 0;
+
+        // Boss healing
+        this.healsUsed = 0;
+        this.maxHeals = type.maxHeals || 0;
+        this.healThresholds = type.healThresholds || [];
+        this._justHealed = 0; // Timer for heal text display
+        this.laysMines = type.laysMines || false;
+        this.mineTimer = this.laysMines ? 5 + Math.random() * 3 : 0;
+    }
+
+    get alive() {
+        return this.hp > 0;
+    }
+
+    get hpRatio() {
+        return this.hp / this.maxHp;
+    }
+
+    takeDamage(amount) {
+        const dmg = Math.max(1, amount);
+        this.hp -= dmg;
+        if (this.aiState === 'patrol') this.aiState = 'chase';
+
+        // Boss healing: check if HP dropped below a threshold
+        if (this.maxHeals > 0 && this.healsUsed < this.maxHeals) {
+            const nextThreshold = this.healThresholds[this.healsUsed];
+            if (nextThreshold !== undefined && this.hpRatio <= nextThreshold) {
+                this.healsUsed++;
+                const healAmount = Math.round(this.maxHp * 0.3);
+                this.hp = Math.min(this.maxHp, this.hp + healAmount);
+                this._justHealed = 2.0; // Show heal text for 2 seconds
+            }
+        }
+
+        return dmg;
+    }
+
+    update(dt, playerX, playerY) {
+        const distToPlayer = dist(this.x, this.y, playerX, playerY);
+        const distToSpawn = dist(this.x, this.y, this.spawnX, this.spawnY);
+
+        // Fire visual timer
+        if (this.hpRatio < 0.75) {
+            this.fireTimer -= dt;
+        }
+
+        // Boss heal text decay
+        if (this._justHealed > 0) this._justHealed -= dt;
+
+        // Mine laying timer
+        if (this.laysMines && this.mineTimer > 0) {
+            this.mineTimer -= dt;
+        }
+
+        switch (this.aiState) {
+            case 'patrol':
+                this._patrol(dt, distToPlayer);
+                break;
+            case 'chase':
+                this._chase(dt, playerX, playerY, distToPlayer, distToSpawn);
+                break;
+            case 'attack':
+                this._attack(dt, playerX, playerY, distToPlayer, distToSpawn);
+                break;
+            case 'return':
+                this._returnToSpawn(dt, distToSpawn);
+                break;
+        }
+
+        // Move
+        const newX = this.x + Math.cos(this.angle) * this.speed * dt;
+        const newY = this.y + Math.sin(this.angle) * this.speed * dt;
+
+        // Land avoidance: check if new position is on land
+        if (this._world && this._world.isLand(newX, newY)) {
+            // Steer away from land by reversing and turning
+            this.angle += Math.PI * 0.6;
+            this.speed = this.maxSpeed * 0.5;
+        } else {
+            this.x = newX;
+            this.y = newY;
+        }
+
+        // Cooldown
+        if (this.cannonCooldown > 0) this.cannonCooldown -= dt;
+    }
+
+    _patrol(dt, distToPlayer) {
+        this.patrolTimer -= dt;
+        if (this.patrolTimer <= 0) {
+            this.patrolAngle = this.angle + randFloat(-1, 1);
+            this.patrolTimer = randFloat(2, 5);
+        }
+
+        const diff = angleDiff(this.angle, this.patrolAngle);
+        this.angle += Math.sign(diff) * Math.min(Math.abs(diff), 1.5 * dt);
+        this.speed = this.maxSpeed * 0.3;
+
+        if (distToPlayer < this.aggroRange) {
+            this.aiState = 'chase';
+        }
+    }
+
+    _chase(dt, playerX, playerY, distToPlayer, distToSpawn) {
+        const targetAngle = angle(this.x, this.y, playerX, playerY);
+        const diff = angleDiff(this.angle, targetAngle);
+        this.angle += Math.sign(diff) * Math.min(Math.abs(diff), 2.5 * dt);
+        this.angle = normalizeAngle(this.angle);
+        this.speed = this.maxSpeed * 0.8;
+
+        if (distToPlayer < this.cannonRange * 0.9) {
+            this.aiState = 'attack';
+        }
+        if (distToSpawn > this.leashRange && !this.isBoss) {
+            this.aiState = 'return';
+        }
+        if (distToPlayer > this.aggroRange * 1.5 && !this.isBoss) {
+            this.aiState = 'patrol';
+        }
+    }
+
+    _attack(dt, playerX, playerY, distToPlayer, distToSpawn) {
+        // Circle-strafe the player
+        const targetAngle = angle(this.x, this.y, playerX, playerY);
+        const strafeAngle = targetAngle + (Math.PI / 2) * this.strafeDir;
+
+        const diff = angleDiff(this.angle, strafeAngle);
+        this.angle += Math.sign(diff) * Math.min(Math.abs(diff), 2.0 * dt);
+        this.angle = normalizeAngle(this.angle);
+
+        // Maintain distance
+        if (distToPlayer < this.cannonRange * 0.5) {
+            this.speed = this.maxSpeed * 0.4;
+        } else if (distToPlayer > this.cannonRange * 0.8) {
+            this.speed = this.maxSpeed * 0.9;
+        } else {
+            this.speed = this.maxSpeed * 0.6;
+        }
+
+        // Switch strafe direction occasionally
+        if (Math.random() < dt * 0.3) {
+            this.strafeDir *= -1;
+        }
+
+        if (distToPlayer > this.cannonRange * 1.3) {
+            this.aiState = 'chase';
+        }
+        if (distToSpawn > this.leashRange && !this.isBoss) {
+            this.aiState = 'return';
+        }
+    }
+
+    _returnToSpawn(dt, distToSpawn) {
+        const targetAngle = angle(this.x, this.y, this.spawnX, this.spawnY);
+        const diff = angleDiff(this.angle, targetAngle);
+        this.angle += Math.sign(diff) * Math.min(Math.abs(diff), 2.0 * dt);
+        this.speed = this.maxSpeed * 0.7;
+
+        if (distToSpawn < 100) {
+            this.aiState = 'patrol';
+            this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.1);
+        }
+    }
+
+    // Check if boss should lay a mine
+    shouldLayMine() {
+        if (!this.laysMines || this.mineTimer > 0) return false;
+        this.mineTimer = 3 + Math.random() * 4;
+        return true;
+    }
+
+    // Serialize for localStorage
+    serialize() {
+        return {
+            typeIdx: ENEMY_TYPES.indexOf(this.type),
+            x: this.x, y: this.y, angle: this.angle,
+            speed: this.speed, hp: this.hp, level: this.level,
+            aiState: this.aiState, spawnX: this.spawnX, spawnY: this.spawnY,
+            cannonCooldown: this.cannonCooldown, strafeDir: this.strafeDir,
+            healsUsed: this.healsUsed, mineTimer: this.mineTimer
+        };
+    }
+
+    static deserialize(data) {
+        const type = ENEMY_TYPES[data.typeIdx] || ENEMY_TYPES[0];
+        const enemy = new Enemy(type, data.x, data.y, data.level);
+        enemy.angle = data.angle;
+        enemy.speed = data.speed;
+        enemy.hp = data.hp;
+        enemy.aiState = data.aiState;
+        enemy.spawnX = data.spawnX;
+        enemy.spawnY = data.spawnY;
+        enemy.cannonCooldown = data.cannonCooldown;
+        enemy.strafeDir = data.strafeDir;
+        enemy.healsUsed = data.healsUsed || 0;
+        enemy.mineTimer = data.mineTimer || 0;
+        return enemy;
+    }
+
+    draw(ctx, camX, camY, viewW, viewH, assets, time) {
+        const sx = this.x - camX + viewW / 2;
+        const sy = this.y - camY + viewH / 2;
+
+        if (sx < -80 || sx > viewW + 80 || sy < -80 || sy > viewH + 80) return;
+
+        ctx.save();
+
+        // Boss glow (pulsing red/black for run bosses)
+        if (this.isBoss && this.glowColor) {
+            ctx.save();
+            const glowPulse = this.isRunBoss
+                ? 0.4 + 0.3 * Math.sin(time * 4)
+                : 0.5 + 0.3 * Math.sin(time * 3);
+            ctx.globalAlpha = glowPulse;
+            ctx.shadowColor = this.glowColor;
+            ctx.shadowBlur = this.isRunBoss ? 35 : 25;
+            ctx.beginPath();
+            ctx.arc(sx, sy, this.hitRadius + (this.isRunBoss ? 15 : 10), 0, Math.PI * 2);
+            ctx.fillStyle = this.glowColor;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        ctx.translate(sx, sy);
+        ctx.rotate(this.angle + Math.PI / 2);
+
+        const s = this.scale;
+
+        // Choose sprite based on HP (3-tier: >66% normal, 33-66% dmg1, <33% dmg2)
+        let spriteKey = this.type.shipSprite;
+        if (this.hpRatio < 0.33 && this.type.damagedSprite2) {
+            spriteKey = this.type.damagedSprite2;
+        } else if (this.hpRatio < 0.66 && this.type.damagedSprite) {
+            spriteKey = this.type.damagedSprite;
+        }
+
+        const shipImg = assets.get(spriteKey);
+        if (shipImg) {
+            ctx.drawImage(shipImg, -32 * s, -40 * s, 64 * s, 80 * s);
+        } else {
+            this._drawProceduralShip(ctx, s);
+        }
+
+        ctx.restore();
+
+        // HP bar
+        if (this.hp < this.maxHp) {
+            const barW = 40 * this.scale;
+            const barH = 4;
+            const bx = sx - barW / 2;
+            const by = sy - this.hitRadius - 12;
+            const hpRatio = this.hp / this.maxHp;
+
+            ctx.fillStyle = '#333';
+            ctx.fillRect(bx, by, barW, barH);
+            ctx.fillStyle = hpRatio > 0.5 ? '#44aa22' : hpRatio > 0.25 ? '#ccaa22' : '#cc2222';
+            ctx.fillRect(bx, by, barW * hpRatio, barH);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(bx, by, barW, barH);
+        }
+
+        // Level / boss name
+        if (this.isRunBoss) {
+            ctx.font = 'bold 12px "Pirata One", Georgia, serif';
+            ctx.fillStyle = '#ff4444';
+            ctx.textAlign = 'center';
+            ctx.fillText(this.type.name, sx, sy - this.hitRadius - 16);
+        } else if (this.level > 1) {
+            ctx.font = 'bold 10px Georgia';
+            ctx.fillStyle = '#ffd700';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Lv${this.level}`, sx, sy - this.hitRadius - 16);
+        }
+    }
+
+    _drawProceduralShip(ctx, s) {
+        ctx.fillStyle = this.type.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -30 * s);
+        ctx.lineTo(15 * s, -5 * s);
+        ctx.lineTo(16 * s, 18 * s);
+        ctx.lineTo(10 * s, 28 * s);
+        ctx.lineTo(-10 * s, 28 * s);
+        ctx.lineTo(-16 * s, 18 * s);
+        ctx.lineTo(-15 * s, -5 * s);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Sail
+        ctx.fillStyle = this.isBoss ? (this.isRunBoss ? '#1a1a1a' : '#444466') : '#cc3333';
+        ctx.beginPath();
+        ctx.moveTo(-12 * s, -10 * s);
+        ctx.quadraticCurveTo(-16 * s, 5 * s, -10 * s, 12 * s);
+        ctx.lineTo(10 * s, 12 * s);
+        ctx.quadraticCurveTo(16 * s, 5 * s, 12 * s, -10 * s);
+        ctx.closePath();
+        ctx.fill();
+
+        // Skull on boss
+        if (this.isBoss) {
+            ctx.fillStyle = this.isRunBoss ? '#cc0000' : '#fff';
+            ctx.font = `${14 * s}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('\u2620', 0, 2 * s);
+        }
+    }
+}
+
+export class EnemySpawner {
+    constructor(world) {
+        this.enemies = [];
+        this.world = world;
+        this.spawnTimer = 0;
+        this.maxEnemies = 25;
+        this.bossSpawnDistance = 2000;
+        this.runScaling = 1.0; // Multiplied by run number
+    }
+
+    update(dt, playerX, playerY) {
+        this.spawnTimer -= dt;
+
+        // Remove dead enemies far from player
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+            const e = this.enemies[i];
+            if (!e.alive) {
+                this.enemies.splice(i, 1);
+                continue;
+            }
+            // Despawn enemies very far from player (but never despawn run bosses)
+            const d = dist(e.x, e.y, playerX, playerY);
+            if (d > 2500 && !e.isRunBoss) {
+                this.enemies.splice(i, 1);
+            }
+        }
+
+        if (this.spawnTimer <= 0 && this.enemies.length < this.maxEnemies) {
+            this._spawn(playerX, playerY);
+            this.spawnTimer = 1.5 + Math.random() * 2;
+        }
+    }
+
+    _spawn(playerX, playerY) {
+        const distFromOrigin = dist(playerX, playerY, 200, 200);
+        let level = Math.max(1, Math.floor(distFromOrigin / 600) + 1);
+
+        // Apply run scaling to level
+        level = Math.max(1, Math.round(level * this.runScaling));
+
+        // Choose enemy type based on distance/level
+        let typeIdx;
+        if (level <= 2) {
+            typeIdx = 0; // Sloop
+        } else if (level <= 4) {
+            typeIdx = Math.random() < 0.6 ? 0 : 1;
+        } else if (level <= 6) {
+            typeIdx = Math.random() < 0.3 ? 0 : Math.random() < 0.6 ? 1 : 2;
+        } else if (level <= 8) {
+            typeIdx = randInt(1, 3);
+        } else {
+            typeIdx = randInt(1, 3);
+        }
+
+        // Mini-boss spawn (ghost ships / old kraken)
+        if (distFromOrigin > this.bossSpawnDistance && Math.random() < 0.08) {
+            typeIdx = distFromOrigin > 4000 ? 5 : 4;
+        }
+
+        const type = ENEMY_TYPES[typeIdx];
+
+        // Spawn at edge of view, ahead of player
+        const spawnAngle = Math.random() * Math.PI * 2;
+        const spawnDist = 600 + Math.random() * 300;
+        const spawnX = playerX + Math.cos(spawnAngle) * spawnDist;
+        const spawnY = playerY + Math.sin(spawnAngle) * spawnDist;
+
+        // Don't spawn too close to origin (safe zone)
+        const spawnDistFromOrigin = dist(spawnX, spawnY, 200, 200);
+        if (spawnDistFromOrigin < 400) return;
+
+        // Don't spawn on land
+        if (this.world && this.world.isLand(spawnX, spawnY)) return;
+
+        const enemy = new Enemy(type, spawnX, spawnY, level);
+        enemy._world = this.world;
+        this.enemies.push(enemy);
+    }
+
+    clear() {
+        this.enemies.length = 0;
+    }
+
+    draw(ctx, camX, camY, viewW, viewH, assets, time) {
+        for (const enemy of this.enemies) {
+            if (enemy.alive) {
+                enemy.draw(ctx, camX, camY, viewW, viewH, assets, time);
+            }
+        }
+    }
+
+    drawOnMinimap(ctx, playerX, playerY, size) {
+        const scale = 0.02;
+        const halfSize = size / 2;
+        for (const enemy of this.enemies) {
+            if (!enemy.alive) continue;
+            const ex = (enemy.x - playerX) * scale + halfSize;
+            const ey = (enemy.y - playerY) * scale + halfSize;
+            if (ex < 0 || ex > size || ey < 0 || ey > size) continue;
+
+            ctx.fillStyle = enemy.isRunBoss ? '#ff0000' : enemy.isBoss ? '#ff4444' : '#cc3333';
+            const dotSize = enemy.isRunBoss ? 4 : enemy.isBoss ? 3 : 2;
+            ctx.beginPath();
+            ctx.arc(ex, ey, dotSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
