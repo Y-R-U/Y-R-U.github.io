@@ -793,6 +793,24 @@
       50%       { opacity: 0.35; }
     }
 
+    /* ===== PULL TO REFRESH ===== */
+    .pull-indicator {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      font-size: 1.6rem;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.15s;
+      pointer-events: none;
+      z-index: 10;
+      line-height: 1;
+    }
+    .pull-indicator.ready {
+      color: var(--save-color);
+    }
+
     /* ===== DRAG & DROP ===== */
     .card {
       user-select: none;
@@ -917,6 +935,9 @@
         </div>
       </div>
       <div id="breadcrumbs" class="breadcrumbs"></div>
+      <div style="position:relative">
+        <div id="pull-indicator" class="pull-indicator">&#8635;</div>
+      </div>
       <div id="card-grid" class="card-grid"></div>
     </div>
 

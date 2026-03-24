@@ -5,7 +5,7 @@ Fast Notes PWA - AI Reference File
 app/pwa/fnote/
   index.html          - Single HTML file with all markup + inline CSS (dark/light themes via CSS vars)
   manifest.json       - PWA manifest with inline SVG icon
-  sw.js               - Service worker (fnote-v2), cache-first; skips /api/ routes
+  sw.js               - Service worker (fnote-v7), cache-first; skips /api/ routes
   ai.txt              - This file
   functions/
     api/
@@ -43,7 +43,9 @@ app/pwa/fnote/
 1. On login / app start: syncFromCloud() fetches remote items and merges with local.
    Merge rule: for each item id, keep the version with the higher updatedAt timestamp.
 2. On every local write (save / remove / importAll): _pushToCloud() fire-and-forgets the full items array.
-3. Offline: writes succeed locally; next load re-syncs and pushes accumulated changes.
+3. On visibility change (tab/app regains focus): auto-syncs with 5 s cooldown to avoid hammering.
+4. Pull-to-refresh gesture on card grid: user pulls down to force a sync + re-render.
+5. Offline: writes succeed locally; next load re-syncs and pushes accumulated changes.
 
 ## Routing (hash-based)
 - #/              → Home (root items)
