@@ -1,5 +1,5 @@
 /**
- * Snake.io Game Configuration
+ * Snake-eee Game Configuration
  */
 const CONFIG = {
     // World

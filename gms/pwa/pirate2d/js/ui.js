@@ -321,7 +321,7 @@ export class UIManager {
             ${runSelectHTML}
             <button class="btn" id="btn-new-game">${hasPlayed ? '\u2693 New Voyage' : 'Set Sail'}</button>
             ${hasPlayed ? '<button class="btn" id="btn-perm-upgrades" style="margin:8px;min-width:200px;font-size:16px;padding:10px 24px;">\u2693 Upgrades</button>' : ''}
-            <div class="version">v1.0 - Kenney Assets</div>
+            <div class="version">v1.0 Corsair</div>
         `;
 
         this.uiLayer.appendChild(panel);
@@ -877,6 +877,9 @@ export class UIManager {
                 <div class="toggle-switch ${game.pinchZoomEnabled ? 'active' : ''}" id="toggle-pinch"></div>
             </div>
             <div style="margin-top:20px;text-align:center;">
+                <button class="btn btn-small" id="btn-credits" style="font-size:12px;">Credits</button>
+            </div>
+            <div style="margin-top:10px;text-align:center;">
                 <button class="btn btn-red btn-small" id="btn-reset-save" style="font-size:12px;">Reset All Progress</button>
             </div>
         `;
@@ -931,12 +934,52 @@ export class UIManager {
             game._saveZoomSettings();
         });
 
+        // Credits
+        panel.querySelector('#btn-credits').addEventListener('click', () => {
+            this._showCreditsPopup();
+        });
+
         // Reset progress
         panel.querySelector('#btn-reset-save').addEventListener('click', () => {
             try { localStorage.removeItem('pirate2d_save'); } catch(e) {}
             try { localStorage.removeItem('pirate2d_state'); } catch(e) {}
             this.showToast('Progress reset! Refresh to apply.');
         });
+    }
+
+    _showCreditsPopup() {
+        // Remove any existing credits popup
+        const existing = this.uiLayer.querySelector('.credits-overlay');
+        if (existing) existing.remove();
+        const existingPanel = this.uiLayer.querySelector('.credits-panel');
+        if (existingPanel) existingPanel.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'settings-overlay credits-overlay';
+
+        const panel = document.createElement('div');
+        panel.className = 'game-panel credits-panel';
+        panel.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;padding:20px;min-width:260px;max-width:320px;text-align:center;';
+        panel.innerHTML = `
+            <h2 style="margin:0 0 16px 0;font-size:20px;color:#f0c040;">Credits</h2>
+            <div style="font-size:14px;color:#d4b896;line-height:2;">
+                <div><strong>Aaron Burke</strong></div>
+                <div>Kenney Assets</div>
+                <div>Claude 4.6</div>
+                <div>Suno (Music)</div>
+            </div>
+            <button class="btn btn-small" id="btn-credits-close" style="margin-top:16px;font-size:12px;">Close</button>
+        `;
+
+        this.uiLayer.appendChild(overlay);
+        this.uiLayer.appendChild(panel);
+
+        const closeCredits = () => {
+            overlay.remove();
+            panel.remove();
+        };
+        panel.querySelector('#btn-credits-close').addEventListener('click', closeCredits);
+        overlay.addEventListener('click', closeCredits);
     }
 
     // Name input popup

@@ -1,6 +1,6 @@
 {
-    "name": "Snake.io - Arena Battle",
-    "short_name": "Snake.io",
+    "name": "Snake-eee - Arena Battle",
+    "short_name": "Snake-eee",
     "description": "Grow your snake, eat food, defeat opponents in this multiplayer-style arena game",
     "start_url": "./index.html",
     "scope": "./",
