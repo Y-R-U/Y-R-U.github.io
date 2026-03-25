@@ -797,7 +797,7 @@ export class UIManager {
         const panel = document.createElement('div');
         panel.className = 'game-panel settings-panel';
         const game = this.game;
-        const zoomLabels = ['Close (100%)', 'Medium (75%)', 'Far (50%)'];
+        const zoomLabels = ['Close (100%)', 'Default (90%)', 'Medium (75%)', 'Far (60%)'];
 
         panel.innerHTML = `
             <button class="close-btn" id="settings-close">\u2715</button>
