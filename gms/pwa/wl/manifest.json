@@ -1,0 +1,11 @@
+{
+    "name": "Warlords",
+    "short_name": "Warlords",
+    "description": "A fantasy turn-based strategy game",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "landscape",
+    "background_color": "#0d1117",
+    "theme_color": "#ffd700",
+    "icons": []
+}
