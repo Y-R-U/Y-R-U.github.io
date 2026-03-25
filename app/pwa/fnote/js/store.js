@@ -244,6 +244,14 @@ export function create(type, parentId = null) {
   return item;
 }
 
+/** Returns the gzip-compressed size of all items in bytes. */
+export async function getCompressedSize() {
+  const items = readItems();
+  const json = JSON.stringify({ items });
+  const compressed = await gzCompress(json);
+  return compressed.length;
+}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 export function getSettings() {
