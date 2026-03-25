@@ -1,0 +1,17 @@
+{
+    "name": "Triad Clash",
+    "short_name": "TriadClash",
+    "description": "A strategic card battle game with Warriors, Archers, and Mages",
+    "start_url": ".",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0f0e17",
+    "theme_color": "#1a1a2e",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%231a1a2e'/><polygon points='256,80 440,380 72,380' fill='none' stroke='%23ffd700' stroke-width='12'/><polygon points='256,140 380,340 132,340' fill='none' stroke='%23ff6b6b' stroke-width='8'/><polygon points='256,200 320,300 192,300' fill='none' stroke='%237c5ce0' stroke-width='8'/><circle cx='256' cy='240' r='24' fill='%23ffd700'/></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml"
+        }
+    ]
+}
