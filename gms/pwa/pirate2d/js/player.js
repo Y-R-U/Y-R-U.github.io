@@ -442,7 +442,7 @@ export class Player {
 
         ctx.save();
         ctx.translate(sx, sy);
-        ctx.rotate(this.angle - Math.PI / 2);
+        ctx.rotate(this.angle + Math.PI / 2);
 
         // Flash when hit
         if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 10) % 2) {
