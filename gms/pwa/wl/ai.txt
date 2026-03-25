@@ -1,0 +1,220 @@
+WARLORDS - Project Structure & API Reference
+=============================================
+A turn-based fantasy strategy game (HTML5/Canvas/JS) inspired by Warlords (SSG, 1990).
+No build tools required - plain JS with script tags.
+
+DIRECTORY STRUCTURE:
+gms/pwa/wl/
+├── index.html              - Single page app, loads all scripts in order
+├── manifest.json           - PWA manifest
+├── ai.txt                  - This file
+├── css/
+│   └── style.css           - All styles: dark theme, panels, responsive layout
+└── js/
+    ├── main.js             - Entry point, game loop (requestAnimationFrame)
+    ├── engine/
+    │   ├── constants.js    - All game constants, terrain/unit/player definitions
+    │   ├── utils.js        - Utility functions (rand, shuffle, pathfinding helpers)
+    │   ├── units.js        - Unit creation, stats, army management
+    │   ├── mapgen.js       - Procedural map generation (terrain, cities, ruins, roads)
+    │   ├── gamestate.js    - Central game state (tiles, armies, cities, fog, players)
+    │   ├── combat.js       - Combat resolution (multi-round, stat-based)
+    │   ├── movement.js     - Pathfinding (A*), army movement, reachable tiles
+    │   ├── production.js   - City production, economy (income/upkeep), hero recruitment
+    │   ├── heroes.js       - Ruin searching, item/gold/ally rewards
+    │   ├── ai.js           - AI opponent (target selection, army movement, production)
+    │   ├── turns.js        - Turn management, player cycling, AI chaining
+    │   └── renderer.js     - Canvas rendering (terrain tiles, armies, fog, selection)
+    └── ui/
+        ├── hud.js          - HUD panels (player info, army details, city/production, minimap)
+        ├── screens.js      - Title screen, game setup, game over screen
+        ├── input.js        - Mouse/touch/keyboard input handling
+        └── ui.js           - UI controller (coordinates HUD + screens)
+
+SCRIPT LOAD ORDER (dependencies flow downward):
+constants.js → utils.js → units.js → mapgen.js → gamestate.js → combat.js →
+movement.js → production.js → heroes.js → ai.js → turns.js → renderer.js →
+hud.js → screens.js → input.js → ui.js → main.js
+
+GLOBAL OBJECTS (all singletons, no module system):
+- TILE_SIZE, MAP_COLS, MAP_ROWS, MAX_STACK_SIZE, etc. (constants)
+- TERRAIN {GRASS,FOREST,HILLS,MOUNTAIN,WATER,SWAMP,ROAD,BRIDGE,CITY,RUIN}
+- UNIT_TYPES {LIGHT_INF,HEAVY_INF,CAVALRY,ELVES,DWARVES,WOLVES,GIANTS,GRIFFINS,UNDEAD,DRAGONS,HERO}
+- PLAYER_COLORS[0-7] - {name, primary, secondary, banner}
+- ITEMS[] - hero equipment with strBonus/movesBonus
+- Utils, Units, MapGen, GameState, Combat, Movement, Production, Heroes, AI, Turns
+- Renderer, HUD, Screens, Input, UI, Game
+
+KEY DATA STRUCTURES:
+
+  Tile: number (terrain id, stored in GameState.tiles[row][col])
+
+  Player: {id, name, color, gold, alive, isHuman, heroCount}
+
+  City: {id, name, col, row, owner(-1=neutral), production(unitTypeId|null),
+         turnsLeft, income, isCapital}
+
+  Unit: {id, typeId, name, owner, str, moves, maxMoves, flying, symbol,
+         items[], xp, level}
+
+  Army: {id, col, row, owner, units[Unit], movesLeft}
+
+  Ruin: {id, col, row, searched, reward('item'|'gold'|'ally'|'nothing')}
+
+FUNCTION STUBS BY MODULE:
+
+constants.js:
+  - TERRAIN_BY_ID[id] → terrain object
+  - UNIT_TYPE_BY_ID[id] → unit type object
+  Terrain: {id, name, color, moveCost, defense}
+  UnitType: {id, name, str, moves, cost, turns, symbol, flying}
+
+utils.js - Utils:
+  .rand(min, max) → int
+  .randFloat(min, max) → float
+  .pick(arr) → random element
+  .shuffle(arr) → new shuffled array
+  .dist(x1,y1,x2,y2) → manhattan distance
+  .clamp(val,min,max) → clamped value
+  .inBounds(col,row) → bool
+  .neighbors(col,row) → [[col,row]...] (8-directional, filtered to bounds)
+  .cardinalNeighbors(col,row) → [[col,row]...] (4-directional)
+  .uid() → unique int id
+  .deepCopy(obj) → JSON clone
+
+units.js - Units:
+  .create(typeId, owner) → Unit
+  .getEffectiveStr(unit) → int (base + items + level bonus)
+  .getEffectiveMoves(unit) → int (base + item bonuses)
+  .armyMoves(army) → int (min of all units' moves)
+  .armyStrength(army) → int (sum of all units' effective str)
+  .armyHasFlying(army) → bool (all units flying)
+  .armyHasHero(army) → bool
+  .addToArmy(army, unit) → bool (false if stack full)
+  .removeFromArmy(army, unitId) → bool
+  .gainXP(unit, amount) → bool (true if leveled up)
+
+mapgen.js - MapGen:
+  .generate(numPlayers) → {tiles[][], cities[], ruins[]}
+  ._generateTerrain(tiles) - fills tiles with noise-based terrain
+  ._noiseMap(w,h,numBlobs) → float[][] (0-1 normalized)
+  ._placeCities(tiles, numPlayers) → City[]
+  ._getPlayerZones(numPlayers) → [{x,y,w,h}...]
+  ._findCitySpot(tiles, existing, zone, minDist) → [col,row]|null
+  ._placeRuins(tiles, cities) → Ruin[]
+  ._placeRoads(tiles, cities) - connects nearby cities with road tiles
+
+gamestate.js - GameState:
+  .tiles[][] - terrain ids
+  .cities[] - all cities
+  .ruins[] - all ruins
+  .armies[] - all armies
+  .players[] - all players
+  .currentPlayer - int
+  .turn - int
+  .phase - 'setup'|'play'|'combat'|'gameover'
+  .selectedArmy - Army|null
+  .movePath - path[]|null
+  .fog[playerId][row][col] - bool visibility
+  .winner - int|null
+  .messages[] - string log
+  .init(numPlayers, humanPlayers) - full game reset
+  .getArmyAt(col,row) → Army|undefined
+  .getArmiesAt(col,row) → Army[]
+  .getCityAt(col,row) → City|undefined
+  .getRuinAt(col,row) → Ruin|undefined
+  .getPlayerArmies(playerId) → Army[]
+  .getPlayerCities(playerId) → City[]
+  .removeArmy(army) - removes from armies[]
+  .revealAround(playerId, col, row) - reveals fog in radius
+  .isVisible(playerId, col, row) → bool
+  .addMessage(text) - adds to message log
+  .checkVictory() → bool
+  .eliminatePlayer(playerId) - marks dead, neutralizes cities
+
+combat.js - Combat:
+  .resolve(attacker, defender, terrainId) → CombatResult
+    CombatResult: {attacker, defender, atkStrength, defStrength,
+                   atkLosses[unitId], defLosses[unitId], winner, rounds[]}
+  .applyCombatResult(result) - removes dead units, captures cities, gives XP
+
+movement.js - Movement:
+  .getMoveCost(col, row, army) → float (99=impassable)
+  .canMoveTo(army, col, row) → bool
+  .findPath(army, startCol, startRow, endCol, endRow) → [{col,row,cost}...]|null (A*)
+  .moveArmy(army, path) → {type:'moved'|'combat'|'ruin'|'merged', ...}
+  .getReachableTiles(army) → Map('col,row' → movesLeft)
+
+production.js - Production:
+  .getAvailableUnits(city) → UnitType[] (based on city income)
+  .setProduction(city, unitTypeId) → bool
+  .processProduction(playerId) - collects income, pays upkeep, produces units
+  .buyHero(playerId) → bool (costs 15 gold, max 3 heroes)
+
+heroes.js - Heroes:
+  .searchRuin(army, ruin) → {type, message, item?, amount?, unitType?}
+
+ai.js - AI:
+  .takeTurn(playerId) - full AI turn (production + movement + combat)
+  ._manageProduction(playerId) - sets production for unset cities
+  ._pickProductionUnit(available, playerId) → UnitType
+  ._moveArmies(playerId) - moves all armies toward targets
+  ._findTarget(army, playerId) → {col,row}|null (priority: weak enemies > neutral cities > enemy cities > ruins)
+
+turns.js - Turns:
+  .endTurn() - processes production, advances to next player
+  .startGame(numPlayers, humanPlayers) - initializes everything
+
+renderer.js - Renderer:
+  .canvas, .ctx - canvas elements
+  .camX, .camY - camera position
+  .init(canvas) - setup canvas, build tile cache
+  .resize() - resize canvas to parent
+  .render() - main render frame (terrain, armies, selection, fog)
+  .screenToTile(sx,sy) → {col,row}
+  .centerOn(col,row) - center camera on tile
+  .clampCamera() - keep camera in bounds
+
+hud.js - HUD:
+  .init() - cache DOM elements
+  .update() - refresh all HUD data
+  .showTileInfo(col,row) - show terrain/city info
+  .showArmyPanel(army) - show/hide army unit list
+  .showCityPanel(city) - show/hide city production panel
+  .showCombatResult(result) - show combat overlay
+  .showRuinResult(result) - show ruin search overlay
+  .closePanels() - hide all panels
+
+screens.js - Screens:
+  .showTitle() - show title/setup screen
+  .startGame(numPlayers, humanPlayers) - transition to game
+  .showGameOver() - show victory screen
+  .checkGameOver() → bool
+
+input.js - Input:
+  .init() - bind all event listeners
+  Mouse: click to select/move, right-drag to pan, wheel to scroll
+  Touch: tap to select/move, drag to pan
+  Keys: WASD=scroll, N=next army, E=end turn, H=hire hero, Space=skip, Esc=deselect
+
+ui.js - UI:
+  .init() - initialize HUD + Input
+  .update() - refresh UI state
+  .centerOnPlayer(playerId) - pan camera to player's first army/city
+
+main.js - Game:
+  .init() - setup renderer, UI, show title, start game loop
+  ._loop() - requestAnimationFrame render loop
+
+GAMEPLAY NOTES:
+- 40x30 tile map, procedurally generated each game
+- 4-8 factions, each starts with 1 capital city + 1 hero army
+- Neutral cities have light infantry garrisons
+- Cities produce units over multiple turns, cost gold
+- Armies are stacks of up to 8 units, move at slowest unit speed
+- Heroes can search ruins for items, gold, or allies
+- Combat is multi-round, each unit attacks random enemy per round
+- Terrain gives defense bonuses in combat
+- Fog of war reveals 3-tile radius around armies/cities
+- AI targets: weak enemies > neutral cities > enemy cities > ruins
+- Victory: eliminate all other factions (no cities + no armies)

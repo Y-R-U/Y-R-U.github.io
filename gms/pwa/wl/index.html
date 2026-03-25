@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Warlords</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
+</head>
+<body>
+    <!-- Title Screen -->
+    <div id="title-screen">
+        <h1>Warlords</h1>
+        <p class="subtitle">A Fantasy Strategy Game</p>
+        <div class="setup-panel">
+            <div class="setup-row">
+                <label for="num-players">Players</label>
+                <select id="num-players">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4" selected>4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div class="setup-row">
+                <label for="human-players">Human Players</label>
+                <select id="human-players">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <button id="btn-start" class="btn btn-primary">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden">
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        <div id="side-panel">
+            <!-- Player Info -->
+            <div class="panel-section">
+                <h3>Player</h3>
+                <div id="player-name">-</div>
+                <div class="stat-row">
+                    <span class="label">Turn</span>
+                    <span class="value" id="turn-num">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">Gold</span>
+                    <span class="value" id="gold-amount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">Cities</span>
+                    <span class="value" id="city-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">Armies</span>
+                    <span class="value" id="army-count">0</span>
+                </div>
+            </div>
+
+            <!-- Tile Info -->
+            <div class="panel-section">
+                <h3>Terrain</h3>
+                <div id="tile-info">-</div>
+            </div>
+
+            <!-- Army Panel -->
+            <div id="army-panel" class="panel-section hidden">
+                <h3>Army</h3>
+                <div id="army-units"></div>
+            </div>
+
+            <!-- City Panel -->
+            <div id="city-panel" class="panel-section hidden">
+                <h3>City</h3>
+                <div class="city-info">
+                    <div id="city-name-display">-</div>
+                    <div class="stat-row">
+                        <span class="label">Income</span>
+                        <span class="value" id="city-income">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="label">Producing</span>
+                        <span class="value" id="city-production">None</span>
+                    </div>
+                </div>
+                <h3 style="margin-top:0.5rem">Build</h3>
+                <div id="production-list"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel-section">
+                <h3>Actions</h3>
+                <div class="action-buttons">
+                    <button id="btn-next-army" class="btn">Next Army (N)</button>
+                    <button id="btn-buy-hero" class="btn">Hire Hero (H) - 15g</button>
+                    <button id="btn-end-turn" class="btn btn-primary">End Turn (E)</button>
+                </div>
+            </div>
+
+            <!-- Minimap -->
+            <div class="panel-section">
+                <h3>Map</h3>
+                <canvas id="minimap" width="240" height="100"></canvas>
+            </div>
+
+            <!-- Messages -->
+            <div class="panel-section" style="flex:1">
+                <h3>Log</h3>
+                <div id="message-log"></div>
+            </div>
+
+            <!-- Shortcuts -->
+            <div class="panel-section">
+                <div class="shortcuts">
+                    <kbd>WASD</kbd> Scroll
+                    <kbd>N</kbd> Next Army
+                    <kbd>E</kbd> End Turn
+                    <kbd>H</kbd> Hire Hero
+                    <kbd>Space</kbd> Skip Army
+                    <kbd>Esc</kbd> Deselect
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Combat Overlay -->
+    <div id="combat-panel" class="hidden">
+        <div id="combat-details"></div>
+        <button id="combat-ok" class="btn btn-primary">OK</button>
+    </div>
+
+    <!-- Ruin Search Overlay -->
+    <div id="ruin-panel" class="hidden">
+        <h3 style="color:var(--gold);margin-bottom:0.5rem">Ancient Ruins</h3>
+        <div id="ruin-message"></div>
+        <button id="ruin-ok" class="btn btn-primary">OK</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="hidden">
+        <h2>Victory!</h2>
+        <div id="winner-name">-</div>
+        <div>conquered the realm in <span id="final-turn">0</span> turns</div>
+        <button id="btn-play-again" class="btn btn-primary" style="margin-top:1.5rem">Play Again</button>
+    </div>
+
+    <!-- Scripts (order matters) -->
+    <script src="js/engine/constants.js"></script>
+    <script src="js/engine/utils.js"></script>
+    <script src="js/engine/units.js"></script>
+    <script src="js/engine/mapgen.js"></script>
+    <script src="js/engine/gamestate.js"></script>
+    <script src="js/engine/combat.js"></script>
+    <script src="js/engine/movement.js"></script>
+    <script src="js/engine/production.js"></script>
+    <script src="js/engine/heroes.js"></script>
+    <script src="js/engine/ai.js"></script>
+    <script src="js/engine/turns.js"></script>
+    <script src="js/engine/renderer.js"></script>
+    <script src="js/ui/hud.js"></script>
+    <script src="js/ui/screens.js"></script>
+    <script src="js/ui/input.js"></script>
+    <script src="js/ui/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

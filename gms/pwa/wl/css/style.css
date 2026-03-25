@@ -1,0 +1,455 @@
+/* Warlords - Game Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-dark: #0d1117;
+    --bg-panel: #161b22;
+    --bg-panel-alt: #1c2128;
+    --border-color: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --gold: #ffd700;
+    --danger: #f85149;
+    --success: #3fb950;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Title Screen */
+#title-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #0d1117 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+#title-screen h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 4px 8px rgba(0,0,0,0.5);
+    margin-bottom: 0.5rem;
+    font-variant: small-caps;
+}
+
+#title-screen .subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    letter-spacing: 0.2em;
+}
+
+.setup-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    min-width: 320px;
+}
+
+.setup-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.setup-row label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.setup-row select, .setup-row input {
+    background: var(--bg-panel-alt);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    width: 80px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-panel-alt);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.btn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.btn-primary:hover {
+    background: #79bbff;
+}
+
+/* Game Screen */
+#game-screen {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+#canvas-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#game-canvas {
+    display: block;
+    cursor: crosshair;
+}
+
+/* Side Panel */
+#side-panel {
+    width: 260px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.panel-section {
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.panel-section h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+#player-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding: 0.15rem 0;
+}
+
+.stat-row .label {
+    color: var(--text-secondary);
+}
+
+.stat-row .value {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+#gold-amount {
+    color: var(--gold);
+}
+
+/* Tile Info */
+#tile-info {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    min-height: 1.2em;
+}
+
+/* Army Panel */
+#army-panel {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.unit-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+}
+
+.unit-symbol {
+    display: inline-block;
+    width: 24px;
+    height: 18px;
+    text-align: center;
+    background: var(--bg-panel-alt);
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    line-height: 18px;
+    color: var(--accent);
+}
+
+.unit-name {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.unit-stats {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-family: monospace;
+}
+
+.army-summary {
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding-top: 0.4rem;
+    font-weight: 600;
+}
+
+/* City Panel */
+#city-panel .city-info {
+    font-size: 0.85rem;
+}
+
+#city-name-display {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Production List */
+.prod-option {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+.prod-option:hover {
+    background: var(--bg-panel-alt);
+}
+
+.prod-name {
+    color: var(--text-primary);
+}
+
+.prod-stats {
+    color: var(--text-secondary);
+    font-family: monospace;
+    font-size: 0.65rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.action-buttons .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    text-align: center;
+}
+
+/* Message Log */
+#message-log {
+    font-size: 0.75rem;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.msg {
+    padding: 0.15rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(48, 54, 61, 0.3);
+}
+
+.msg:first-child {
+    color: var(--text-primary);
+}
+
+/* Minimap */
+#minimap {
+    width: 100%;
+    height: 100px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+/* Combat Panel (overlay) */
+#combat-panel, #ruin-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 300px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+.combat-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.combat-winner {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+#combat-details, #ruin-message {
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+#combat-panel .btn, #ruin-panel .btn {
+    margin-top: 1rem;
+    width: 100%;
+    text-align: center;
+}
+
+/* Gameover Screen */
+#gameover-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 17, 23, 0.95);
+    z-index: 200;
+}
+
+#gameover-screen h2 {
+    font-size: 2.5rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    margin-bottom: 1rem;
+}
+
+#winner-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+#gameover-screen .btn {
+    margin-top: 1.5rem;
+}
+
+/* Hidden */
+.hidden {
+    display: none !important;
+}
+
+/* Keyboard shortcuts hint */
+.shortcuts {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    padding: 0.4rem 0;
+    line-height: 1.4;
+}
+
+.shortcuts kbd {
+    display: inline-block;
+    padding: 0 0.3rem;
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.65rem;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #side-panel {
+        width: 200px;
+        font-size: 0.85rem;
+    }
+
+    #title-screen h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #game-screen {
+        flex-direction: column;
+    }
+
+    #side-panel {
+        width: 100%;
+        height: 180px;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-x: auto;
+    }
+
+    .panel-section {
+        min-width: 150px;
+    }
+}
