@@ -61,10 +61,10 @@ export class Game {
         // Auto-save timer
         this.saveTimer = 0;
 
-        // Zoom levels: 1.0 = default (close), 0.75 = medium, 0.5 = far
-        this.zoomLevels = [1.0, 0.75, 0.5];
-        this.zoomIndex = 0;
-        this.zoomScale = 1.0;
+        // Zoom levels: 1.0 = closest, 0.9 = default, 0.75 = medium, 0.6 = far
+        this.zoomLevels = [1.0, 0.9, 0.75, 0.6];
+        this.zoomIndex = 1;
+        this.zoomScale = 0.9;
         this.pinchZoomEnabled = true;
         this._loadZoomSettings();
         this._setupPinchZoom();
