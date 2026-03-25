@@ -1,13 +1,11 @@
 // Cloudflare Pages Function — /api/notes
-// Backed by D1 (SQLite) + R2 overflow for large payloads.
+// Backed by D1 (SQLite) with gzip compression.
 //
 // Bindings:
-//   DB      — D1 database  (required)
-//   STORAGE — R2 bucket    (optional — only needed once a user exceeds 1.5 MB compressed)
+//   DB — D1 database (required)
 //
 // D1 json_text column holds one of:
-//   "gz:<base64>"        — gzip-compressed payload, base64-encoded (< 1.5 MB compressed)
-//   '{"r2":"<key>"}'     — pointer to compressed bytes stored in R2 (≥ 1.5 MB)
+//   "gz:<base64>"        — gzip-compressed payload, base64-encoded
 //   '{"items":[...]}'    — legacy uncompressed JSON (auto-migrates on next write)
 //
 // The client always sends gzip-compressed binary (Content-Type: application/octet-stream)
@@ -25,7 +23,7 @@ const CORS = {
 
 const USER_RE    = /^[a-z0-9_-]{2,30}$/;
 const PROJECT    = 'fnote';
-const R2_LIMIT   = 1.5 * 1024 * 1024;  // 1.5 MB — leave headroom below D1's 2 MB row limit
+const MAX_SIZE   = 1.9 * 1024 * 1024;  // 1.9 MB compressed limit
 
 const CREATE_TABLE = `CREATE TABLE IF NOT EXISTS notes (
   web_project TEXT    NOT NULL,
@@ -117,21 +115,8 @@ export async function onRequestGet({ request, env }) {
     return binaryResp(base64ToUint8(data.slice(3)));
   }
 
-  // ── JSON object — could be R2 pointer or legacy plain data ──
-  if (data.startsWith('{')) {
-    try {
-      const parsed = JSON.parse(data);
-
-      // R2 pointer
-      if (parsed.r2 && env.STORAGE) {
-        const obj = await env.STORAGE.get(parsed.r2);
-        if (obj) return binaryResp(obj.body);
-        // R2 object gone — return empty
-        return binaryResp(await gzCompress('{"items":[]}'));
-      }
-    } catch { /* fall through to legacy path */ }
-
-    // Legacy uncompressed JSON — compress on the fly
+  // ── Legacy uncompressed JSON — compress on the fly ──
+  if (data.startsWith('{') || data.startsWith('[')) {
     return binaryResp(await gzCompress(data));
   }
 
@@ -172,40 +157,23 @@ export async function onRequestPost({ request, env }) {
     compressed = await gzCompress(body);
   }
 
+  // ── Enforce size limit ──
+  if (compressed.length > MAX_SIZE) {
+    const sizeMB = (compressed.length / (1024 * 1024)).toFixed(2);
+    return jsonResp({
+      error: `Payload too large: ${sizeMB} MB exceeds the 1.9 MB limit`,
+    }, 413);
+  }
+
   await env.DB.prepare(CREATE_TABLE).run();
 
-  // ── Decide storage: D1 inline vs R2 overflow ──
-  if (compressed.length > R2_LIMIT && env.STORAGE) {
-    // Store in R2
-    const r2Key = `${PROJECT}:${user}:${Date.now()}`;
-    await env.STORAGE.put(r2Key, compressed);
+  // Store compressed bytes as base64 in D1
+  const encoded = 'gz:' + uint8ToBase64(compressed);
 
-    // Clean up previous R2 object if one exists
-    try {
-      const oldRow = await env.DB
-        .prepare('SELECT json_text FROM notes WHERE web_project = ? AND username = ?')
-        .bind(PROJECT, user)
-        .first();
-      if (oldRow?.json_text?.startsWith('{')) {
-        const old = JSON.parse(oldRow.json_text);
-        if (old.r2) await env.STORAGE.delete(old.r2);
-      }
-    } catch { /* best effort cleanup */ }
-
-    // Write R2 pointer to D1
-    await env.DB
-      .prepare('INSERT OR REPLACE INTO notes (web_project, username, json_text, updated_at) VALUES (?, ?, ?, ?)')
-      .bind(PROJECT, user, JSON.stringify({ r2: r2Key }), Date.now())
-      .run();
-  } else {
-    // Store compressed bytes as base64 in D1
-    const encoded = 'gz:' + uint8ToBase64(compressed);
-
-    await env.DB
-      .prepare('INSERT OR REPLACE INTO notes (web_project, username, json_text, updated_at) VALUES (?, ?, ?, ?)')
-      .bind(PROJECT, user, encoded, Date.now())
-      .run();
-  }
+  await env.DB
+    .prepare('INSERT OR REPLACE INTO notes (web_project, username, json_text, updated_at) VALUES (?, ?, ?, ?)')
+    .bind(PROJECT, user, encoded, Date.now())
+    .run();
 
   return jsonResp({ ok: true });
 }

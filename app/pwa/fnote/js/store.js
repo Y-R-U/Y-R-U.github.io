@@ -3,6 +3,8 @@ import { generateId } from './utils.js';
 const ITEMS_KEY    = 'fnote_items';
 const SETTINGS_KEY = 'fnote_settings';
 const API_BASE     = '/api/notes';
+const SIZE_HARD    = 1.9 * 1024 * 1024;   // 1.9 MB — hard limit (D1 2 MB row cap)
+const SIZE_WARN    = 1.5 * 1024 * 1024;   // 1.5 MB — warning threshold
 
 // Set by initSync() once the user logs in.
 let _username = null;
@@ -75,12 +77,35 @@ export async function syncFromCloud() {
   }
 }
 
-/** Fire-and-forget push to cloud. Always gzip-compresses before sending. */
+/** Fire-and-forget push to cloud. Always gzip-compresses before sending.
+ *  Shows a toast if compressed size is near or over the D1 limit. */
 async function _pushToCloud(items) {
   if (!_username) return;
   try {
     const json = JSON.stringify({ items });
     const compressed = await gzCompress(json);
+    const sizeMB = (compressed.length / (1024 * 1024)).toFixed(2);
+
+    // ── Hard limit — refuse to save ──
+    if (compressed.length > SIZE_HARD) {
+      _showSizeToast(
+        'error',
+        `Unable to save — your data is ${sizeMB} MB which exceeds the 1.9 MB limit. ` +
+        `Please remove some notes or content to reduce the size.`
+      );
+      return;               // don't send to server
+    }
+
+    // ── Warning — getting close ──
+    if (compressed.length > SIZE_WARN) {
+      _showSizeToast(
+        'warn',
+        `Storage warning — your data is ${sizeMB} MB, approaching the 1.9 MB limit.`
+      );
+    } else {
+      _hideSizeToast();     // clear any previous warning
+    }
+
     await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/octet-stream' },
@@ -89,6 +114,29 @@ async function _pushToCloud(items) {
   } catch {
     // Offline — local data is safe; sync will reconcile on next load
   }
+}
+
+// ─── Size toast helpers ──────────────────────────────────────────────────────
+
+function _ensureToastEl() {
+  let el = document.getElementById('size-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'size-toast';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function _showSizeToast(level, message) {
+  const el = _ensureToastEl();
+  el.textContent = message;
+  el.className = `size-toast size-toast--${level} size-toast--visible`;
+}
+
+function _hideSizeToast() {
+  const el = document.getElementById('size-toast');
+  if (el) el.className = 'size-toast';
 }
 
 /** Merge two item arrays. For each id, keep the item with the higher updatedAt. */
