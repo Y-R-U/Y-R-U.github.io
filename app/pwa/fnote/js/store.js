@@ -7,6 +7,24 @@ const API_BASE     = '/api/notes';
 // Set by initSync() once the user logs in.
 let _username = null;
 
+// ─── Compression helpers (gzip via CompressionStream) ────────────────────────
+
+async function gzCompress(text) {
+  const cs = new CompressionStream('gzip');
+  const writer = cs.writable.getWriter();
+  writer.write(new TextEncoder().encode(text));
+  writer.close();
+  return new Uint8Array(await new Response(cs.readable).arrayBuffer());
+}
+
+async function gzDecompress(bytes) {
+  const ds = new DecompressionStream('gzip');
+  const writer = ds.writable.getWriter();
+  writer.write(bytes);
+  writer.close();
+  return new Response(ds.readable).text();
+}
+
 // ─── Sync API ────────────────────────────────────────────────────────────────
 
 /** Call this right after the user supplies a username. */
@@ -24,7 +42,19 @@ export async function syncFromCloud() {
   try {
     const res = await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`);
     if (!res.ok) return;
-    const remote = await res.json();
+
+    // Server always returns gzip-compressed binary (or legacy JSON during migration)
+    let remote;
+    const ct = res.headers.get('Content-Type') || '';
+    if (ct.includes('octet-stream')) {
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      const json = await gzDecompress(bytes);
+      remote = JSON.parse(json);
+    } else {
+      // Legacy plain JSON fallback
+      remote = await res.json();
+    }
+
     const remoteItems = Array.isArray(remote.items) ? remote.items : [];
 
     const local = readItems();
@@ -45,14 +75,16 @@ export async function syncFromCloud() {
   }
 }
 
-/** Fire-and-forget push to cloud. */
+/** Fire-and-forget push to cloud. Always gzip-compresses before sending. */
 async function _pushToCloud(items) {
   if (!_username) return;
   try {
+    const json = JSON.stringify({ items });
+    const compressed = await gzCompress(json);
     await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items }),
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: compressed,
     });
   } catch {
     // Offline — local data is safe; sync will reconcile on next load
