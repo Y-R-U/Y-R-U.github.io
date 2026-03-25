@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a14">
+  <title>Warlords</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== LOADING ===== -->
+  <div id="loading-screen">
+    <div class="loader-content">
+      <div class="loader-title">WARLORDS</div>
+      <div class="loader-subtitle">inspired by Steve Fawkner's classic</div>
+      <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+      <div class="loader-text" id="loader-text">Summoning the realm…</div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN MENU ===== -->
+  <div id="main-menu" class="hidden">
+    <div class="menu-content">
+      <div class="menu-title">WARLORDS</div>
+      <div class="menu-subtitle">Conquer the Realm</div>
+      <button class="menu-btn" id="btn-new-game">New Campaign</button>
+      <button class="menu-btn secondary" id="btn-how-to">How to Play</button>
+    </div>
+  </div>
+
+  <!-- ===== SETUP ===== -->
+  <div id="setup-screen" class="hidden screen">
+    <div class="setup-content">
+      <h2>Choose Your Faction</h2>
+      <div id="faction-select"></div>
+      <div class="setup-options">
+        <label>AI Opponents
+          <select id="ai-count">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="7">7</option>
+          </select>
+        </label>
+        <label>Map Size
+          <select id="map-size">
+            <option value="40" selected>Standard (40×40)</option>
+            <option value="56">Large (56×56)</option>
+          </select>
+        </label>
+      </div>
+      <button class="menu-btn" id="btn-start-game">Begin Campaign</button>
+      <button class="menu-btn secondary" id="btn-setup-back">Back</button>
+    </div>
+  </div>
+
+  <!-- ===== HOW TO PLAY ===== -->
+  <div id="how-to-play" class="hidden screen">
+    <div class="help-content">
+      <h2>How to Play</h2>
+      <div class="help-text">
+        <p><strong>Goal:</strong> Capture all cities to become the supreme Warlord.</p>
+        <p><strong>Select:</strong> Click an army to select it — reachable tiles are highlighted.</p>
+        <p><strong>Move:</strong> Click a highlighted tile to move the selected army there.</p>
+        <p><strong>Attack:</strong> Moving onto an enemy army or defended city triggers combat.</p>
+        <p><strong>Cities:</strong> Click your own city to open the management panel. Buy heroes and train units.</p>
+        <p><strong>Income:</strong> Each city earns gold at the start of your turn. Capitals earn the most.</p>
+        <p><strong>Heroes:</strong> Heroes command armies, gain levels, and boost combat strength.</p>
+        <p><strong>Ruins:</strong> Send armies to unexplored ruins — you may find treasure or powerful units.</p>
+        <p><strong>Winning:</strong> Last faction with cities standing wins.</p>
+      </div>
+      <button class="menu-btn" id="btn-help-back">Back</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME ===== -->
+  <div id="game-container" class="hidden">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD overlay (top bar) -->
+    <div id="hud">
+      <div id="hud-top">
+        <div id="turn-info">
+          <span id="turn-faction-icon" class="faction-dot"></span>
+          <span id="turn-label">Turn 1 — Storm Legion</span>
+        </div>
+        <div id="hud-gold">
+          <span>&#9733;</span>
+          <span id="gold-display">60</span>
+        </div>
+        <div id="hud-btns">
+          <button class="hud-btn" id="btn-end-turn">End Turn</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI turn indicator -->
+    <div id="ai-indicator" class="hidden">AI is thinking…</div>
+
+    <!-- Info panel (right side) -->
+    <div id="info-panel">
+      <div id="info-content">
+        <div class="info-placeholder">Click a unit or city</div>
+      </div>
+    </div>
+
+    <!-- City management panel (bottom) -->
+    <div id="city-panel" class="hidden">
+      <button id="btn-city-close">✕</button>
+      <div id="city-panel-content"></div>
+    </div>
+
+    <!-- Message log (bottom-left) -->
+    <div id="message-log"></div>
+
+    <!-- Flash message (centre) -->
+    <div id="flash-message" class="hidden"></div>
+
+    <!-- Combat result overlay -->
+    <div id="combat-overlay" class="hidden">
+      <div id="combat-content">
+        <h3>⚔ Battle!</h3>
+        <div id="combat-attacker">Attacker</div>
+        <div id="combat-vs">VS</div>
+        <div id="combat-defender">Defender</div>
+        <div id="combat-result"></div>
+        <button id="btn-combat-ok">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME OVER ===== -->
+  <div id="game-over" class="hidden">
+    <div class="gameover-content">
+      <div id="gameover-title">Victory!</div>
+      <div id="gameover-text"></div>
+      <button class="menu-btn" id="btn-play-again">Play Again</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

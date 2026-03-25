@@ -1,0 +1,14 @@
+{
+  "name": "Warlords",
+  "short_name": "Warlords",
+  "description": "Turn-based fantasy strategy game inspired by Steve Fawkner's classic",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0a14",
+  "theme_color": "#0a0a14",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
