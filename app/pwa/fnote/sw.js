@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fnote-v16';
+const CACHE_NAME = 'fnote-v17';
 const ASSETS = [
   '/',
   '/index.html',

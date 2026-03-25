@@ -106,11 +106,21 @@ async function _pushToCloud(items) {
       _hideSizeToast();     // clear any previous warning
     }
 
-    await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
+    const res = await fetch(`${API_BASE}?user=${encodeURIComponent(_username)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/octet-stream' },
       body: compressed,
     });
+
+    // Cache the server-confirmed compressed size
+    if (res.ok) {
+      try {
+        const body = await res.json();
+        if (body.compressedBytes != null) {
+          localStorage.setItem('fnote_compressed_bytes', String(body.compressedBytes));
+        }
+      } catch { /* ignore parse errors */ }
+    }
   } catch {
     // Offline — local data is safe; sync will reconcile on next load
   }
@@ -244,12 +254,10 @@ export function create(type, parentId = null) {
   return item;
 }
 
-/** Returns the gzip-compressed size of all items in bytes. */
-export async function getCompressedSize() {
-  const items = readItems();
-  const json = JSON.stringify({ items });
-  const compressed = await gzCompress(json);
-  return compressed.length;
+/** Returns the last server-confirmed compressed size in bytes, or null if unknown. */
+export function getCompressedSize() {
+  const v = localStorage.getItem('fnote_compressed_bytes');
+  return v ? Number(v) : null;
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────

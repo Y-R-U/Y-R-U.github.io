@@ -140,34 +140,29 @@ export function openSettings(username, onRefresh) {
   const storageText = document.createElement('div');
   storageText.style.cssText =
     'font-size:0.75rem;color:var(--text-muted);line-height:1.5;';
-  storageText.textContent = 'Calculating storage…';
-  storageSection.appendChild(storageText);
-
-  const storageBar = document.createElement('div');
-  storageBar.style.cssText =
-    'margin-top:6px;height:6px;border-radius:3px;background:var(--border);overflow:hidden;';
-  const storageBarFill = document.createElement('div');
-  storageBarFill.style.cssText =
-    'height:100%;border-radius:3px;width:0%;transition:width 0.4s ease,background 0.3s;';
-  storageBar.appendChild(storageBarFill);
-  storageSection.appendChild(storageBar);
-
-  card.appendChild(storageSection);
-
-  // Async: compute and display compressed size
-  getCompressedSize().then(bytes => {
+  const bytes = getCompressedSize();
+  if (bytes != null) {
     const mb = bytes / (1024 * 1024);
     const limitMB = 1.9;
     const pct = Math.min((mb / limitMB) * 100, 100);
     storageText.textContent = `Storage: ${mb.toFixed(2)} MB / ${limitMB} MB`;
-    storageBarFill.style.width = `${pct}%`;
 
-    if (mb > 1.9)      storageBarFill.style.background = 'var(--danger)';
-    else if (mb > 1.5)  storageBarFill.style.background = '#f0a030';
-    else                 storageBarFill.style.background = 'var(--accent)';
-  }).catch(() => {
-    storageText.textContent = 'Storage: unable to calculate';
-  });
+    const storageBar = document.createElement('div');
+    storageBar.style.cssText =
+      'margin-top:6px;height:6px;border-radius:3px;background:var(--border);overflow:hidden;';
+    const storageBarFill = document.createElement('div');
+    storageBarFill.style.cssText =
+      `height:100%;border-radius:3px;width:${pct}%;` +
+      `background:${mb > 1.9 ? 'var(--danger)' : mb > 1.5 ? '#f0a030' : 'var(--accent)'};`;
+    storageBar.appendChild(storageBarFill);
+    storageSection.appendChild(storageText);
+    storageSection.appendChild(storageBar);
+  } else {
+    storageText.textContent = 'Storage: save once to see size';
+    storageSection.appendChild(storageText);
+  }
+
+  card.appendChild(storageSection);
 
   // Close button
   const actions = document.createElement('div');

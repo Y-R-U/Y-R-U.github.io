@@ -175,5 +175,5 @@ export async function onRequestPost({ request, env }) {
     .bind(PROJECT, user, encoded, Date.now())
     .run();
 
-  return jsonResp({ ok: true });
+  return jsonResp({ ok: true, compressedBytes: compressed.length });
 }
