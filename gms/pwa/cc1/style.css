@@ -460,6 +460,27 @@ html, body {
 }
 .card-loser { opacity: 0.5; filter: grayscale(0.5); }
 
+/* Card result overlay (WIN/TIE on card image) */
+.card-result-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.5);
+    pointer-events: none;
+    z-index: 5;
+    animation: resultStamp 0.4s ease-out forwards;
+}
+.card-result-win { color: var(--accent-gold); text-shadow: 0 2px 12px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.3); }
+.card-result-tie { color: var(--text-secondary); text-shadow: 0 2px 12px rgba(160,160,184,0.4); }
+@keyframes resultStamp {
+    from { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 /* Battle card wrapper labels */
 .battle-card-wrapper {
     display: flex; flex-direction: column; align-items: center; gap: 4px;

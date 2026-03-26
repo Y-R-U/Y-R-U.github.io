@@ -15,17 +15,12 @@
     const BASE_SHIELD_CHANCE = 0.10;
     const AI_DELAY = 600;
 
-    // ===== GENERATED CARD IMAGES (will be set if available) =====
+    // ===== CARD IMAGES (external files in images/) =====
     const CARD_IMAGES = {
-        warrior: null,
-        archer: null,
-        mage: null
+        warrior: 'images/warrior.jpg',
+        archer: 'images/archer.jpg',
+        mage: 'images/mage.jpg'
     };
-
-    // Generated card images (resized to 150x200)
-    CARD_IMAGES.warrior = "data:image/jpeg;base64,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";
-    CARD_IMAGES.archer = "data:image/jpeg;base64,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";
-    CARD_IMAGES.mage = "data:image/jpeg;base64,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";
 
     // ===== CHARACTER POOL =====
     const CHARACTERS = {
@@ -227,7 +222,8 @@
         playedCards: [],
         selectedCard: null,
         isResolving: false,
-        isAllAI: false
+        isAllAI: false,
+        lastRoundResult: null
     };
 
     // ===== DOM REFS =====
@@ -451,12 +447,12 @@
     // ===== CARD RENDERING =====
     function getCardImageContent(cls) {
         if (CARD_IMAGES[cls]) {
-            return `<img src="${CARD_IMAGES[cls]}" alt="${CLASS_NAMES[cls]}" style="width:100%;height:100%;object-fit:cover;"/>`;
+            return `<img src="${CARD_IMAGES[cls]}" alt="${CLASS_NAMES[cls]}" style="width:100%;height:100%;"/>`;
         }
         return CARD_SVG[cls];
     }
 
-    function renderCard(card, extraClass = '') {
+    function renderCard(card, extraClass = '', overlay = '') {
         const char = card.character;
         const ability = char.ability;
         const fullName = `${char.name}, ${char.title}`;
@@ -473,7 +469,7 @@
                     <div class="card-power-circle">${card.power}</div>
                     <div class="card-name">${fullName}</div>
                 </div>
-                <div class="card-image-frame">${getCardImageContent(card.class)}</div>
+                <div class="card-image-frame">${getCardImageContent(card.class)}${overlay}</div>
                 <div class="card-desc">${char.desc}</div>
                 ${abilityBadge}
             </div>
@@ -541,7 +537,7 @@
     }
 
     // ===== BATTLE AREA =====
-    function renderBattleArea(played, revealed) {
+    function renderBattleArea(played, revealed, isTie) {
         const oppZone = $('opponent-zone');
         const playerZone = $('player-zone');
         const vsInd = $('vs-indicator');
@@ -570,7 +566,7 @@
             bottomCards = played.slice(Math.ceil(played.length / 2));
         }
 
-        function renderBattleSlot(p, isRevealed) {
+        function renderBattleSlot(p, isRevealed, isTie) {
             const effects = p.effects || {};
             const effectTags = [];
             if (effects.critical) effectTags.push('<span class="battle-effect-tag effect-critical">CRIT x2</span>');
@@ -579,10 +575,19 @@
 
             const winClass = p.isWinner === true ? 'card-winner' : (isRevealed && p.isWinner === false ? 'card-loser' : '');
 
+            // WIN/TIE overlay on the card image
+            let resultOverlay = '';
+            if (isRevealed && p.isWinner === true) {
+                const label = isTie ? 'TIE' : 'WIN';
+                const overlayClass = isTie ? 'card-result-tie' : 'card-result-win';
+                resultOverlay = `<div class="card-result-overlay ${overlayClass}">${label}</div>`;
+            }
+
             if (isRevealed) {
+                const resultAttr = resultOverlay ? ` data-result="${isTie ? 'TIE' : 'WIN'}"` : '';
                 return `<div class="battle-card-wrapper">
                     <span class="battle-player-label">${p.playerName}</span>
-                    ${renderCard(p.card, `battle-card card-flip ${winClass}`)}
+                    ${renderCard(p.card, `battle-card card-flip ${winClass}`, resultOverlay)}
                     <div class="battle-effective">${p.pairwiseWins !== undefined ? `Wins: ${p.pairwiseWins}` : ''}</div>
                     <div>${effectTags.join('')}</div>
                 </div>`;
@@ -595,8 +600,8 @@
             }
         }
 
-        oppZone.innerHTML = topCards.map(p => renderBattleSlot(p, revealed)).join('');
-        playerZone.innerHTML = bottomCards.map(p => renderBattleSlot(p, revealed)).join('');
+        oppZone.innerHTML = topCards.map(p => renderBattleSlot(p, revealed, isTie)).join('');
+        playerZone.innerHTML = bottomCards.map(p => renderBattleSlot(p, revealed, isTie)).join('');
         vsInd.classList.toggle('visible', played.length > 0);
 
         // Attach ability badge listeners in battle area
@@ -630,70 +635,109 @@
     }
 
     // ===== ROUND RESOLUTION =====
+    function buildRoundDetailHTML(played, result) {
+        const humanPlayer = state.players.find(p => !p.isAI);
+        let title, titleClass, detail;
+
+        if (result.isTie) {
+            title = 'Draw!';
+            titleClass = 'draw';
+            detail = `Tie between ${result.winners.map(w => w.playerName).join(' & ')} (${result.maxWins} wins each)`;
+        } else {
+            const winner = result.winners[0];
+            const wChar = winner.card.character;
+            if (!state.isAllAI && humanPlayer && winner.playerIndex === state.players.indexOf(humanPlayer)) {
+                title = 'Victory!';
+                titleClass = 'win';
+            } else {
+                title = `${winner.playerName} Wins!`;
+                titleClass = state.isAllAI ? 'win' : 'lose';
+            }
+            detail = `${winner.playerName}'s ${wChar.name} the ${CLASS_NAMES[winner.card.class]} (Power ${winner.card.power}) with ${winner.pairwiseWins} pairwise wins`;
+        }
+
+        const effectsSummary = played.map(p => {
+            const tags = [];
+            if (p.effects.critical) tags.push('CRIT');
+            if (p.effects.shield) tags.push('SHIELD');
+            if (p.effects.advantage) tags.push('x3 ADV');
+            if (p.effects.abilityActive && p.card.character.ability) tags.push(p.card.character.ability.name);
+            return tags.length > 0 ? `${p.playerName}: ${tags.join(', ')}` : '';
+        }).filter(Boolean).join('<br>');
+
+        return `
+            <div class="round-result-title ${titleClass}">${title}</div>
+            <div class="round-result-detail">${detail}</div>
+            ${effectsSummary ? `<div class="round-result-detail" style="font-size:0.75rem;opacity:0.8">${effectsSummary}</div>` : ''}
+            <button class="round-result-btn" id="btn-close-details">Close</button>
+        `;
+    }
+
+    function advanceRound() {
+        hideRoundResult();
+        state.isResolving = false;
+        state.playedCards = [];
+        state.selectedCard = null;
+        state.lastRoundResult = null;
+
+        // Remove details button if present
+        const detailsBtn = document.querySelector('.round-details-btn');
+        if (detailsBtn) detailsBtn.remove();
+
+        if (state.round >= state.totalRounds) {
+            showResults();
+        } else {
+            renderBattleArea([], false);
+            renderHand();
+            if (state.isAllAI) {
+                setTimeout(() => playAIOnlyRound(), AI_DELAY);
+            }
+        }
+    }
+
     function resolveRound() {
         state.isResolving = true;
         const played = state.playedCards;
 
         const result = resolveCombat(played);
 
-        // Show cards face up
-        renderBattleArea(played, true);
+        // Show cards face up with WIN/TIE overlays on the cards themselves
+        renderBattleArea(played, true, result.isTie);
         updateScoresBar();
 
-        // Show round result popup
+        // Store result for details popup
+        state.lastRoundResult = { played, result };
+
+        // After reveal animation, unlock so player can pick next card (or show details)
         setTimeout(() => {
-            const humanPlayer = state.players.find(p => !p.isAI);
-            let title, titleClass, detail;
+            // Add a "Details" button in the battle area
+            const detailsBtn = document.createElement('button');
+            detailsBtn.className = 'btn btn-secondary round-details-btn';
+            detailsBtn.textContent = 'Details';
+            detailsBtn.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:15;padding:6px 20px;font-size:0.75rem;';
+            const battleArea = document.querySelector('.battle-area');
+            battleArea.style.position = 'relative';
+            battleArea.appendChild(detailsBtn);
 
-            if (result.isTie) {
-                title = 'Draw!';
-                titleClass = 'draw';
-                detail = `Tie between ${result.winners.map(w => w.playerName).join(' & ')} (${result.maxWins} wins each)`;
-            } else {
-                const winner = result.winners[0];
-                const wChar = winner.card.character;
-                if (!state.isAllAI && humanPlayer && winner.playerIndex === state.players.indexOf(humanPlayer)) {
-                    title = 'Victory!';
-                    titleClass = 'win';
-                } else {
-                    title = `${winner.playerName} Wins!`;
-                    titleClass = state.isAllAI ? 'win' : 'lose';
-                }
-                detail = `${winner.playerName}'s ${wChar.name} the ${CLASS_NAMES[winner.card.class]} (Power ${winner.card.power}) with ${winner.pairwiseWins} pairwise wins`;
-            }
-
-            const effectsSummary = played.map(p => {
-                const tags = [];
-                if (p.effects.critical) tags.push('CRIT');
-                if (p.effects.shield) tags.push('SHIELD');
-                if (p.effects.advantage) tags.push('x3 ADV');
-                if (p.effects.abilityActive && p.card.character.ability) tags.push(p.card.character.ability.name);
-                return tags.length > 0 ? `${p.playerName}: ${tags.join(', ')}` : '';
-            }).filter(Boolean).join('<br>');
-
-            showRoundResult(`
-                <div class="round-result-title ${titleClass}">${title}</div>
-                <div class="round-result-detail">${detail}</div>
-                ${effectsSummary ? `<div class="round-result-detail" style="font-size:0.75rem;opacity:0.8">${effectsSummary}</div>` : ''}
-                <button class="round-result-btn" id="btn-next-round">${state.round >= state.totalRounds ? 'Final Results' : 'Next Round'}</button>
-            `);
-
-            $('btn-next-round').addEventListener('click', () => {
-                hideRoundResult();
-                state.isResolving = false;
-                state.playedCards = [];
-                state.selectedCard = null;
-
-                if (state.round >= state.totalRounds) {
-                    showResults();
-                } else {
-                    renderBattleArea([], false);
-                    renderHand();
-                    if (state.isAllAI) {
-                        setTimeout(() => playAIOnlyRound(), AI_DELAY);
-                    }
+            detailsBtn.addEventListener('click', () => {
+                if (state.lastRoundResult) {
+                    const { played: p, result: r } = state.lastRoundResult;
+                    showRoundResult(buildRoundDetailHTML(p, r));
+                    $('btn-close-details').addEventListener('click', hideRoundResult);
                 }
             });
+
+            if (state.round >= state.totalRounds) {
+                // Final round: auto-show results after a short pause
+                setTimeout(() => advanceRound(), 1500);
+            } else if (state.isAllAI) {
+                // AI-only: auto-advance after delay
+                setTimeout(() => advanceRound(), 1800);
+            } else {
+                // Human play: unlock so they can select next card
+                state.isResolving = false;
+                renderHand();
+            }
         }, 800);
     }
 
@@ -745,6 +789,11 @@
         const humanPlayer = state.players.find(p => !p.isAI);
         const card = humanPlayer.hand.find(c => c.id === state.selectedCard);
         if (!card) return;
+
+        // Clear previous round's details button and battle area
+        const detailsBtn = document.querySelector('.round-details-btn');
+        if (detailsBtn) detailsBtn.remove();
+        state.lastRoundResult = null;
 
         state.isResolving = true;
         updatePlayButton();
@@ -961,19 +1010,6 @@
         playBtn.addEventListener('click', confirmPlay);
     }
 
-    // ===== IMAGE LOADING =====
-    async function tryLoadImages() {
-        // Images are embedded as data URIs if they were generated during build
-        // Check if image elements exist in a hidden container
-        const container = document.getElementById('generated-images');
-        if (container) {
-            ['warrior', 'archer', 'mage'].forEach(cls => {
-                const img = container.querySelector(`[data-class="${cls}"]`);
-                if (img && img.src) CARD_IMAGES[cls] = img.src;
-            });
-        }
-    }
-
     // ===== EVENT LISTENERS =====
     function init() {
         // Player config buttons
@@ -985,7 +1021,8 @@
                 if (target === 'humans') {
                     state.humanCount = Math.max(0, Math.min(1, state.humanCount + dir));
                 } else {
-                    state.aiCount = Math.max(1, Math.min(3, state.aiCount + dir));
+                    const maxAI = state.humanCount === 0 ? 4 : 3;
+                    state.aiCount = Math.max(1, Math.min(maxAI, state.aiCount + dir));
                     if (state.humanCount === 0 && state.aiCount < 2) state.aiCount = 2;
                 }
 
@@ -993,6 +1030,11 @@
                 if (total < 2) {
                     if (target === 'humans') state.aiCount = Math.max(state.aiCount, 2 - state.humanCount);
                     else state.humanCount = Math.max(state.humanCount, 2 - state.aiCount);
+                }
+                // Cap total at 4
+                if (total > 4) {
+                    if (target === 'humans') state.aiCount = 4 - state.humanCount;
+                    else state.humanCount = Math.max(0, 4 - state.aiCount);
                 }
 
                 updatePlayerConfig();
@@ -1021,9 +1063,6 @@
 
         // Initial config
         updatePlayerConfig();
-
-        // Try loading generated images
-        tryLoadImages();
 
         // Register service worker
         if ('serviceWorker' in navigator) {
