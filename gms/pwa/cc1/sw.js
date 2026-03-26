@@ -1,4 +1,4 @@
-const CACHE_NAME = 'triad-clash-v1';
+const CACHE_NAME = 'triad-clash-v2';
 const ASSETS = [
     './',
     './index.html',
