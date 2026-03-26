@@ -1,10 +1,13 @@
-const CACHE_NAME = 'triad-clash-v2';
+const CACHE_NAME = 'triad-clash-v5';
 const ASSETS = [
     './',
     './index.html',
     './style.css',
     './game.js',
-    './manifest.json'
+    './manifest.json',
+    './images/warrior.jpg',
+    './images/archer.jpg',
+    './images/mage.jpg'
 ];
 
 self.addEventListener('install', e => {
