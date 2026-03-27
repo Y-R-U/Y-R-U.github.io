@@ -34,7 +34,7 @@ export const ARENA = {
   width: 10,
   depth: 6,
   height: 14,
-  floorAngle: 0.06,          // radians — gentle slope right
+  floorAngle: 0.12,          // radians — steeper slope right for faster ball return
   pipeY: 6.0,                // pipe vertical position
   dangerY: 5.5,              // game-over line
   suctionX: 5.2,             // right edge suction tube

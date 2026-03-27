@@ -1,4 +1,4 @@
-// ─── Entities: Ball, Block, Pipe, SuctionTube classes ───
+// ─── Entities: Ball, Block, Pipe, SuctionTube, BlackHole, WhiteHole, EventOrb ───
 
 import * as THREE from 'three';
 import { ARENA, getBallColor } from './config.js';
@@ -11,7 +11,7 @@ const blockGeos = {
   box: new THREE.BoxGeometry(1, 1, 1),
   cylinder: new THREE.CylinderGeometry(0.5, 0.5, 1, 8),
   hexagonal: new THREE.CylinderGeometry(0.5, 0.5, 1, 6),
-  rounded: new THREE.BoxGeometry(1, 1, 1, 4, 4, 4), // will look rounded-ish with smooth normals
+  rounded: new THREE.BoxGeometry(1, 1, 1, 4, 4, 4),
 };
 const blockShapeTypes = ['box', 'cylinder', 'hexagonal', 'rounded'];
 
@@ -42,9 +42,13 @@ function makeTextSprite(text, color = '#ffffff', fontSize = 48) {
 export class Ball {
   constructor(value, inPipe = true) {
     this.value = value;
+    this.baseValue = value;   // original value (for temp buffs)
     this.inPipe = inPipe;
     this.inSuction = false;
+    this.inLimbo = false;     // trapped by black hole
     this.merged = false;
+    this.isTemporary = false; // clone balls that vanish after round
+    this.tempBuff = 1;        // temp value multiplier (resets after round)
     this.body = null;
     this.suctionProgress = 0;
 
@@ -69,19 +73,32 @@ export class Ball {
     scene.add(this.mesh);
   }
 
+  get effectiveValue() {
+    return this.value * this.tempBuff;
+  }
+
   updateVisual(value) {
     if (value !== undefined) {
       this.value = value;
-      const color = getBallColor(value);
-      this.mat.color.setHex(color);
-      this.mat.emissive.setHex(color);
-      // Update label
-      this.mesh.remove(this.label);
-      this.label.material.map.dispose();
-      this.label.material.dispose();
-      this.label = makeTextSprite(String(this.value));
-      this.mesh.add(this.label);
+      this.baseValue = value;
     }
+    const displayVal = Math.round(this.value * this.tempBuff);
+    const color = getBallColor(displayVal);
+    this.mat.color.setHex(color);
+    this.mat.emissive.setHex(color);
+    // Update label
+    this.mesh.remove(this.label);
+    this.label.material.map.dispose();
+    this.label.material.dispose();
+    let labelText = String(displayVal);
+    if (this.tempBuff !== 1) labelText += (this.tempBuff > 1 ? '↑' : '↓');
+    if (this.isTemporary) labelText += '⏳';
+    this.label = makeTextSprite(labelText);
+    this.mesh.add(this.label);
+  }
+
+  refreshLabel() {
+    this.updateVisual();
   }
 
   spawn(x, y, z) {
@@ -91,7 +108,7 @@ export class Ball {
   }
 
   syncMesh() {
-    if (this.body && !this.inPipe && !this.inSuction) {
+    if (this.body && !this.inPipe && !this.inSuction && !this.inLimbo) {
       this.mesh.position.copy(this.body.position);
       this.mesh.quaternion.copy(this.body.quaternion);
     }
@@ -118,13 +135,11 @@ export class Block {
     this.wave = wave;
     this.dead = false;
 
-    // Random shape
     const shapeType = blockShapeTypes[Math.floor(Math.random() * blockShapeTypes.length)];
     const size = ARENA.blockMinSize + Math.random() * (ARENA.blockMaxSize - ARENA.blockMinSize);
     this.size = size;
     this.shapeType = shapeType;
 
-    // Distinct color per block — spread hues widely using golden ratio
     const blockIndex = Math.floor(x * 3 + hp);
     this.baseHue = ((wave * 0.27 + blockIndex * 0.618033) % 1);
     this.mat = new THREE.MeshStandardMaterial({
@@ -140,12 +155,10 @@ export class Block {
     this.mesh.receiveShadow = true;
     this.mesh.userData.block = this;
 
-    // HP label
     this.label = makeTextSprite(String(hp), '#ffffff', 36);
     this.label.position.y = size * 0.7;
     this.mesh.add(this.label);
 
-    // Physics
     this.body = createBlockBody(shapeType, size, { x, y, z: 0 });
     this.body.userData = { type: 'block', entity: this };
 
@@ -159,7 +172,6 @@ export class Block {
 
   updateColor() {
     const ratio = this.hp / this.maxHp;
-    // Distinct hue per block, brightness fades as HP drops
     const c = new THREE.Color();
     c.setHSL(this.baseHue, 0.8, 0.3 + ratio * 0.3);
     this.mat.color.copy(c);
@@ -172,7 +184,6 @@ export class Block {
       this.dead = true;
     }
     this.updateColor();
-    // Update label
     this.mesh.remove(this.label);
     this.label.material.map.dispose();
     this.label.material.dispose();
@@ -207,10 +218,9 @@ export class Block {
   }
 }
 
-// ─── Pipe (visual only — balls managed by game logic) ───
+// ─── Pipe ───
 export class Pipe {
   constructor() {
-    // Glass tube
     const tubeGeo = new THREE.CylinderGeometry(0.5, 0.5, ARENA.width * 0.8, 16, 1, true);
     const tubeMat = new THREE.MeshPhysicalMaterial({
       color: 0xaaccff,
@@ -225,7 +235,6 @@ export class Pipe {
     this.mesh.position.set(0, ARENA.pipeY, 0);
     scene.add(this.mesh);
 
-    // Drop indicator (small glowing circle under pipe at drop position)
     const indGeo = new THREE.RingGeometry(0.15, 0.3, 16);
     const indMat = new THREE.MeshBasicMaterial({
       color: 0x4a90ff,
@@ -243,17 +252,28 @@ export class Pipe {
     this.shakeTime = 0;
   }
 
-  setTargetX(x) {
+  clampX(x) {
     const hw = ARENA.width / 2 - 0.5;
-    this.targetX = Math.max(-hw, Math.min(hw, x));
+    return Math.max(-hw, Math.min(hw, x));
+  }
+
+  setTargetX(x) {
+    this.targetX = this.clampX(x);
+  }
+
+  // Snap instantly — used on tap/click so ball drops at the right position
+  snapToX(x) {
+    const cx = this.clampX(x);
+    this.targetX = cx;
+    this.currentX = cx;
+    this.indicator.position.x = cx;
   }
 
   update(dt) {
-    // Lerp to target
+    // Lerp to target (for desktop mouse-follow; after snap this is a no-op)
     this.currentX += (this.targetX - this.currentX) * Math.min(1, dt * 15);
     this.indicator.position.x = this.currentX;
 
-    // Shake
     let shakeOff = 0;
     if (this.shakeTime > 0) {
       this.shakeTime -= dt;
@@ -272,7 +292,7 @@ export class Pipe {
   }
 }
 
-// ─── SuctionTube (visual) ───
+// ─── SuctionTube ───
 export class SuctionTube {
   constructor() {
     const hw = ARENA.width / 2;
@@ -283,22 +303,17 @@ export class SuctionTube {
       opacity: 0.12,
       roughness: 0.1,
       side: THREE.DoubleSide,
-      transmission: 0.7,
     });
     this.mesh = new THREE.Mesh(tubeGeo, tubeMat);
     this.mesh.position.set(hw + 0.1, 0, 0);
     scene.add(this.mesh);
 
-    // Suction particles (animated upward glow)
     this.particleTime = 0;
     this.suctionParticles = [];
     for (let i = 0; i < 5; i++) {
       const ringGeo = new THREE.RingGeometry(0.2, 0.35, 12);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x4488ff,
-        transparent: true,
-        opacity: 0.2,
-        side: THREE.DoubleSide,
+        color: 0x4488ff, transparent: true, opacity: 0.2, side: THREE.DoubleSide,
       });
       const ring = new THREE.Mesh(ringGeo, ringMat);
       ring.rotation.x = Math.PI / 2;
@@ -322,5 +337,169 @@ export class SuctionTube {
   destroy() {
     scene.remove(this.mesh);
     this.suctionParticles.forEach(r => scene.remove(r));
+  }
+}
+
+// ─── BlackHole ───
+export class BlackHole {
+  constructor(x, y) {
+    this.x = x; this.y = y;
+    this.lifetime = 4;
+    this.time = 0;
+
+    // Dark sphere with animated swirl
+    const geo = new THREE.SphereGeometry(0.5, 24, 16);
+    this.mat = new THREE.MeshBasicMaterial({
+      color: 0x220044,
+    });
+    this.mesh = new THREE.Mesh(geo, this.mat);
+    this.mesh.position.set(x, y, 0);
+    scene.add(this.mesh);
+
+    // Accretion ring
+    const ringGeo = new THREE.TorusGeometry(0.7, 0.08, 8, 32);
+    this.ringMat = new THREE.MeshBasicMaterial({
+      color: 0xaa44ff,
+      transparent: true,
+      opacity: 0.6,
+    });
+    this.ring = new THREE.Mesh(ringGeo, this.ringMat);
+    this.ring.position.set(x, y, 0);
+    scene.add(this.ring);
+  }
+
+  update(dt) {
+    this.time += dt;
+    // Rotate ring
+    this.ring.rotation.z += dt * 3;
+    this.ring.rotation.x = Math.PI / 3 + Math.sin(this.time * 2) * 0.2;
+    // Pulse core
+    const s = 0.5 + Math.sin(this.time * 5) * 0.08;
+    this.mesh.scale.set(s, s, s);
+    // Fade out near end
+    if (this.lifetime < 1) {
+      this.ringMat.opacity = 0.6 * this.lifetime;
+    }
+  }
+
+  destroy() {
+    scene.remove(this.mesh);
+    scene.remove(this.ring);
+    this.mat.dispose();
+    this.ringMat.dispose();
+  }
+}
+
+// ─── WhiteHole ───
+export class WhiteHole {
+  constructor(x, y) {
+    this.x = x; this.y = y;
+    this.lifetime = 3.5;
+    this.time = 0;
+    this._spitTimer = 0;
+
+    const geo = new THREE.SphereGeometry(0.45, 24, 16);
+    this.mat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+    });
+    this.mesh = new THREE.Mesh(geo, this.mat);
+    this.mesh.position.set(x, y, 0);
+    scene.add(this.mesh);
+
+    // Glow ring
+    const ringGeo = new THREE.TorusGeometry(0.65, 0.06, 8, 32);
+    this.ringMat = new THREE.MeshBasicMaterial({
+      color: 0x88ddff,
+      transparent: true,
+      opacity: 0.5,
+    });
+    this.ring = new THREE.Mesh(ringGeo, this.ringMat);
+    this.ring.position.set(x, y, 0);
+    scene.add(this.ring);
+  }
+
+  update(dt) {
+    this.time += dt;
+    this.ring.rotation.z -= dt * 3;
+    this.ring.rotation.x = Math.PI / 3 + Math.cos(this.time * 2) * 0.2;
+    const s = 0.45 + Math.sin(this.time * 4) * 0.06;
+    this.mesh.scale.set(s, s, s);
+    if (this.lifetime < 1) {
+      this.ringMat.opacity = 0.5 * this.lifetime;
+    }
+  }
+
+  destroy() {
+    scene.remove(this.mesh);
+    scene.remove(this.ring);
+    this.mat.dispose();
+    this.ringMat.dispose();
+  }
+}
+
+// ─── EventOrb (collectible floating orb that triggers effects) ───
+// Types: 'clone' (×3 balls), 'power' (↑ value), 'curse' (↓ value)
+export class EventOrb {
+  constructor(x, y, type) {
+    this.x = x; this.y = y;
+    this.type = type;
+    this.time = 0;
+    this.lifetime = 8;
+    this.dead = false;
+    this.radius = 0.45;
+
+    const colorMap = {
+      clone: 0x44ff88,   // green
+      power: 0xffdd00,   // gold
+      curse: 0xff4466,   // red
+    };
+    const labelMap = {
+      clone: '×3',
+      power: '⬆2x',
+      curse: '⬇½',
+    };
+
+    const geo = new THREE.OctahedronGeometry(this.radius, 1);
+    this.mat = new THREE.MeshStandardMaterial({
+      color: colorMap[type] || 0xffffff,
+      emissive: colorMap[type] || 0xffffff,
+      emissiveIntensity: 0.4,
+      metalness: 0.5,
+      roughness: 0.2,
+      transparent: true,
+      opacity: 0.85,
+    });
+    this.mesh = new THREE.Mesh(geo, this.mat);
+    this.mesh.position.set(x, y, 0);
+    scene.add(this.mesh);
+
+    // Label
+    this.label = makeTextSprite(labelMap[type] || '?', '#ffffff', 40);
+    this.label.position.y = 0.6;
+    this.mesh.add(this.label);
+  }
+
+  update(dt) {
+    this.time += dt;
+    this.lifetime -= dt;
+    if (this.lifetime <= 0) this.dead = true;
+    // Bob and spin
+    this.mesh.position.y = this.y + Math.sin(this.time * 2) * 0.2;
+    this.mesh.rotation.y += dt * 2;
+    this.mesh.rotation.x += dt * 0.5;
+    // Fade out near end
+    if (this.lifetime < 1.5) {
+      this.mat.opacity = 0.85 * (this.lifetime / 1.5);
+      // Blink
+      this.mesh.visible = Math.sin(this.time * 12) > -0.3;
+    }
+  }
+
+  destroy() {
+    scene.remove(this.mesh);
+    this.mat.dispose();
+    this.label.material.map.dispose();
+    this.label.material.dispose();
+    this.dead = true;
   }
 }

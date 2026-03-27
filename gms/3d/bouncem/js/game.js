@@ -8,9 +8,9 @@ import { initScene, scene, camera, renderer, clock,
          screenShake, updateShake, initParticles, spawnParticles,
          updateParticles, toScreen, renderScene } from './scene.js';
 import { initPhysics, world, stepPhysics } from './physics.js';
-import { Ball, Block, Pipe, SuctionTube } from './entities.js';
+import { Ball, Block, Pipe, SuctionTube, BlackHole, WhiteHole, EventOrb } from './entities.js';
 import { initUI, showScreen, updateHUD, showWaveBanner, showChainText,
-         showGameOver, spawnDamageNumber } from './ui.js';
+         showGameOver, spawnDamageNumber, showEventBanner } from './ui.js';
 
 // ─── State ───
 let state = 'title'; // title | playing | waveTransition | gameOver
@@ -34,6 +34,24 @@ let save = null;
 const ballHitCooldowns = new Map();
 const HIT_COOLDOWN = 0.3; // seconds between hits for same ball
 
+// ─── Black hole / White hole system ───
+let blackHole = null;      // active black hole entity
+let whiteHole = null;       // active white hole entity
+let limboBalls = [];        // balls trapped by black hole { ballIdx, captureTime }
+let blackHoleTimer = 0;     // countdown to next black hole spawn
+let whiteHoleTimer = 0;     // countdown to next white hole spawn
+const BLACK_HOLE_INTERVAL_MIN = 12;
+const BLACK_HOLE_INTERVAL_MAX = 25;
+const BLACK_HOLE_LIFETIME = 4.0;
+const WHITE_HOLE_LIFETIME = 3.5;
+
+// ─── Event Orbs ───
+let eventOrbs = [];
+let orbSpawnTimer = 0;
+const ORB_INTERVAL_MIN = 8;
+const ORB_INTERVAL_MAX = 18;
+const ORB_TYPES = ['clone', 'power', 'curse'];
+
 // Upgrade-derived values
 let startBallValue = 2;
 let ballCount = 5;
@@ -45,6 +63,9 @@ let scoreMult = 1;
 let blockHpReduction = 0;
 
 let gameTime = 0;
+
+// ─── Detect touch device ───
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
 // ─── Init ───
 function init() {
@@ -92,6 +113,11 @@ function startRun() {
   hasDroppedAny = false;
   gameTime = 0;
   ballHitCooldowns.clear();
+  limboBalls = [];
+  blackHoleTimer = randRange(BLACK_HOLE_INTERVAL_MIN, BLACK_HOLE_INTERVAL_MAX);
+  whiteHoleTimer = 0;
+  orbSpawnTimer = randRange(ORB_INTERVAL_MIN, ORB_INTERVAL_MAX);
+  eventOrbs = [];
   state = 'playing';
 
   // Create pipe + suction
@@ -117,10 +143,19 @@ function cleanup() {
   balls.forEach(b => b.destroy());
   balls = [];
   pipeQueue = [];
+  limboBalls = [];
   blocks.forEach(b => b.destroy());
   blocks = [];
   if (pipe) { pipe.destroy(); pipe = null; }
   if (suctionTube) { suctionTube.destroy(); suctionTube = null; }
+  if (blackHole) { blackHole.destroy(); blackHole = null; }
+  if (whiteHole) { whiteHole.destroy(); whiteHole = null; }
+  eventOrbs.forEach(o => o.destroy());
+  eventOrbs = [];
+}
+
+function randRange(min, max) {
+  return min + Math.random() * (max - min);
 }
 
 // ─── Position ball visually inside pipe ───
@@ -143,6 +178,7 @@ function dropBall() {
   const ball = balls[ballIdx];
   if (!ball || ball.merged) return;
 
+  // Drop at the pipe's CURRENT position (already snapped on click)
   const dropX = pipe.currentX;
   ball.spawn(dropX, ARENA.pipeY - 0.6, 0);
   // Give ball a good initial downward velocity
@@ -230,14 +266,22 @@ function onPointerDown(e) {
   if (state !== 'playing') return;
   isDragging = true;
   const wx = screenToWorldX(e.clientX);
-  pipe.setTargetX(wx);
+  // Snap pipe instantly to click position, THEN drop
+  pipe.snapToX(wx);
   dropBall();
 }
 
 function onPointerMove(e) {
-  if (!isDragging || state !== 'playing') return;
+  if (state !== 'playing') return;
   const wx = screenToWorldX(e.clientX);
-  pipe.setTargetX(wx);
+
+  if (isDragging) {
+    // While dragging (touch or mouse-down-drag): snap pipe to finger/cursor
+    pipe.snapToX(wx);
+  } else if (!isTouchDevice) {
+    // Desktop only: pipe follows mouse even without clicking (lerp target)
+    pipe.setTargetX(wx);
+  }
 }
 
 function onPointerUp() {
@@ -249,7 +293,7 @@ function handleCollisions() {
   // Ball vs Block (with per-ball hit cooldown)
   for (let bi = 0; bi < balls.length; bi++) {
     const ball = balls[bi];
-    if (ball.inPipe || ball.inSuction || ball.merged || !ball.body) continue;
+    if (ball.inPipe || ball.inSuction || ball.merged || ball.inLimbo || !ball.body) continue;
 
     // Check hit cooldown for this ball
     const lastHit = ballHitCooldowns.get(bi) || 0;
@@ -261,7 +305,7 @@ function handleCollisions() {
       const minDist = ARENA.ballRadius + block.size * 0.7;
       if (dist < minDist) {
         // Damage
-        let dmg = ball.value;
+        let dmg = ball.effectiveValue;
         const isCrit = Math.random() < critChance;
         if (isCrit) dmg *= 2;
 
@@ -298,10 +342,10 @@ function handleCollisions() {
   let didMerge = false;
   for (let i = 0; i < balls.length && !didMerge; i++) {
     const a = balls[i];
-    if (a.merged || a.inSuction) continue;
+    if (a.merged || a.inSuction || a.inLimbo) continue;
     for (let j = i + 1; j < balls.length && !didMerge; j++) {
       const b = balls[j];
-      if (b.merged || b.inSuction) continue;
+      if (b.merged || b.inSuction || b.inLimbo) continue;
       if (a.value !== b.value) continue;
 
       const aInPipe = a.inPipe;
@@ -386,7 +430,7 @@ function updateSuction(dt) {
   const floorY = -ARENA.height / 2 + 1.5;
 
   for (const ball of balls) {
-    if (ball.merged || ball.inPipe || ball.inSuction || !ball.body) continue;
+    if (ball.merged || ball.inPipe || ball.inSuction || ball.inLimbo || !ball.body) continue;
 
     const bx = ball.body.position.x;
     const by = ball.body.position.y;
@@ -426,12 +470,265 @@ function updateSuction(dt) {
 
     if (t >= 1) {
       ball.inSuction = false;
-      ball.inPipe = true;
-      const idx = balls.indexOf(ball);
-      if (idx !== -1 && !pipeQueue.includes(idx)) {
-        pipeQueue.push(idx);
-        positionBallInPipe(idx, pipeQueue.indexOf(idx));
+      // Temporary clone balls vanish after traversing suction
+      if (ball.isTemporary) {
+        ball.destroy();
+        ball.merged = true; // mark so it's skipped everywhere
+      } else {
+        ball.inPipe = true;
+        const idx = balls.indexOf(ball);
+        if (idx !== -1 && !pipeQueue.includes(idx)) {
+          pipeQueue.push(idx);
+          positionBallInPipe(idx, pipeQueue.indexOf(idx));
+        }
       }
+    }
+  }
+}
+
+// ─── Black Hole / White Hole Events ───
+function updateBlackWhiteHoles(dt) {
+  // ── Black hole spawning ──
+  if (!blackHole && blackHoleTimer > 0) {
+    blackHoleTimer -= dt;
+    if (blackHoleTimer <= 0 && hasDroppedAny) {
+      // Spawn a black hole at a random position in the play area
+      const x = randRange(-ARENA.width / 2 + 1.5, ARENA.width / 2 - 1.5);
+      const y = randRange(-ARENA.height / 2 + 3, ARENA.height / 2 - 3);
+      blackHole = new BlackHole(x, y);
+      blackHole.lifetime = BLACK_HOLE_LIFETIME;
+      showEventBanner('⚫ BLACK HOLE', '#aa44ff');
+    }
+  }
+
+  // ── Active black hole ──
+  if (blackHole) {
+    blackHole.lifetime -= dt;
+    blackHole.update(dt);
+
+    // Check balls near the black hole — suck them in
+    for (let bi = 0; bi < balls.length; bi++) {
+      const ball = balls[bi];
+      if (ball.merged || ball.inPipe || ball.inSuction || ball.inLimbo || !ball.body) continue;
+
+      const dx = blackHole.x - ball.body.position.x;
+      const dy = blackHole.y - ball.body.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Gravitational pull within range
+      if (dist < 3.0 && dist > 0.01) {
+        const pullForce = 8 / (dist * dist + 0.5);
+        ball.body.velocity.x += (dx / dist) * pullForce * dt;
+        ball.body.velocity.y += (dy / dist) * pullForce * dt;
+      }
+
+      // Capture ball if very close
+      if (dist < 0.6) {
+        ball.inLimbo = true;
+        ball.mesh.visible = false;
+        if (ball.body) {
+          world.removeBody(ball.body);
+          ball.body = null;
+        }
+        limboBalls.push({ ballIdx: bi, captureTime: gameTime });
+        spawnParticles({ x: blackHole.x, y: blackHole.y, z: 0 }, 0x8800ff, 10);
+        screenShake(0.15);
+      }
+    }
+
+    // Remove black hole when expired
+    if (blackHole.lifetime <= 0) {
+      blackHole.destroy();
+      blackHole = null;
+      // Schedule white hole if we have limbo balls
+      if (limboBalls.length > 0) {
+        whiteHoleTimer = randRange(3, 6);
+      }
+      // Schedule next black hole
+      blackHoleTimer = randRange(BLACK_HOLE_INTERVAL_MIN, BLACK_HOLE_INTERVAL_MAX);
+    }
+  }
+
+  // ── White hole spawning ──
+  if (!whiteHole && whiteHoleTimer > 0 && limboBalls.length > 0) {
+    whiteHoleTimer -= dt;
+    if (whiteHoleTimer <= 0) {
+      const x = randRange(-ARENA.width / 2 + 1.5, ARENA.width / 2 - 1.5);
+      const y = randRange(-ARENA.height / 2 + 3, 0);
+      whiteHole = new WhiteHole(x, y);
+      whiteHole.lifetime = WHITE_HOLE_LIFETIME;
+      showEventBanner('⚪ WHITE HOLE', '#88ddff');
+    }
+  }
+
+  // ── Active white hole — release limbo balls ──
+  if (whiteHole) {
+    whiteHole.lifetime -= dt;
+    whiteHole.update(dt);
+
+    // Spit out one limbo ball per ~0.4s
+    if (limboBalls.length > 0) {
+      whiteHole._spitTimer = (whiteHole._spitTimer || 0) + dt;
+      if (whiteHole._spitTimer > 0.4) {
+        whiteHole._spitTimer = 0;
+        const entry = limboBalls.shift();
+        const ball = balls[entry.ballIdx];
+        if (ball && !ball.merged) {
+          ball.inLimbo = false;
+          ball.mesh.visible = true;
+          // Re-spawn with physics at white hole position
+          ball.spawn(whiteHole.x, whiteHole.y, 0);
+          // Eject in a random upward direction
+          ball.body.velocity.set(
+            (Math.random() - 0.5) * 6,
+            3 + Math.random() * 4,
+            0
+          );
+          spawnParticles({ x: whiteHole.x, y: whiteHole.y, z: 0 }, 0x88ddff, 12);
+        }
+      }
+    }
+
+    // Remove white hole when expired or all balls freed
+    if (whiteHole.lifetime <= 0 || (limboBalls.length === 0 && whiteHole._spitTimer > 0.5)) {
+      // Any remaining limbo balls get freed at suction entrance
+      for (const entry of limboBalls) {
+        const ball = balls[entry.ballIdx];
+        if (ball && !ball.merged) {
+          ball.inLimbo = false;
+          ball.mesh.visible = true;
+          ball.inSuction = true;
+          ball.suctionProgress = 0;
+        }
+      }
+      limboBalls = [];
+      whiteHole.destroy();
+      whiteHole = null;
+    }
+  }
+}
+
+// ─── Event Orbs (clone, power, curse) ───
+function updateEventOrbs(dt) {
+  // ── Spawn timer ──
+  if (hasDroppedAny) {
+    orbSpawnTimer -= dt;
+    if (orbSpawnTimer <= 0) {
+      const type = ORB_TYPES[Math.floor(Math.random() * ORB_TYPES.length)];
+      const x = randRange(-ARENA.width / 2 + 1.5, ARENA.width / 2 - 1.5);
+      const y = randRange(-ARENA.height / 2 + 3, ARENA.height / 2 - 3);
+      const orb = new EventOrb(x, y, type);
+      eventOrbs.push(orb);
+
+      const labelMap = { clone: '×3 CLONE ORB', power: '⬆ POWER ORB', curse: '⬇ CURSE ORB' };
+      const colorMap = { clone: '#44ff88', power: '#ffdd00', curse: '#ff4466' };
+      showEventBanner(labelMap[type], colorMap[type]);
+
+      orbSpawnTimer = randRange(ORB_INTERVAL_MIN, ORB_INTERVAL_MAX);
+    }
+  }
+
+  // ── Check ball–orb collisions and apply effects ──
+  for (let oi = eventOrbs.length - 1; oi >= 0; oi--) {
+    const orb = eventOrbs[oi];
+    if (orb.dead) continue;
+
+    orb.update(dt);
+
+    // Check each active ball
+    for (let bi = 0; bi < balls.length; bi++) {
+      const ball = balls[bi];
+      if (ball.merged || ball.inPipe || ball.inSuction || ball.inLimbo || !ball.body) continue;
+
+      const dx = orb.x - ball.body.position.x;
+      const dy = orb.mesh.position.y - ball.body.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < orb.radius + ARENA.ballRadius) {
+        // Ball hit the orb — apply effect
+        applyOrbEffect(orb, ball, bi);
+        spawnParticles({ x: orb.x, y: orb.mesh.position.y, z: 0 },
+          orb.type === 'clone' ? 0x44ff88 : orb.type === 'power' ? 0xffdd00 : 0xff4466, 15);
+        screenShake(0.12);
+        orb.destroy();
+        eventOrbs.splice(oi, 1);
+        break; // orb consumed
+      }
+    }
+  }
+
+  // ── Clean up expired orbs ──
+  for (let i = eventOrbs.length - 1; i >= 0; i--) {
+    if (eventOrbs[i].dead) {
+      eventOrbs[i].destroy();
+      eventOrbs.splice(i, 1);
+    }
+  }
+}
+
+function applyOrbEffect(orb, ball, ballIdx) {
+  switch (orb.type) {
+    case 'clone': {
+      // Spawn 2 temporary duplicates near the ball
+      for (let c = 0; c < 2; c++) {
+        const clone = new Ball(ball.value, false);
+        clone.isTemporary = true;
+        clone.spawn(
+          ball.body.position.x + (Math.random() - 0.5) * 1.5,
+          ball.body.position.y + 0.5 + Math.random() * 1.0,
+          0
+        );
+        clone.body.velocity.set(
+          (Math.random() - 0.5) * 4,
+          2 + Math.random() * 3,
+          0
+        );
+        clone.updateVisual();
+        balls.push(clone);
+      }
+      showEventBanner('×3 CLONED!', '#44ff88');
+      break;
+    }
+    case 'power': {
+      // Double the ball's effective value temporarily
+      ball.tempBuff = 2;
+      ball.updateVisual();
+      showEventBanner('POWER ×2!', '#ffdd00');
+      break;
+    }
+    case 'curse': {
+      // Halve the ball's effective value temporarily
+      ball.tempBuff = 0.5;
+      ball.updateVisual();
+      showEventBanner('CURSED ½!', '#ff4466');
+      break;
+    }
+  }
+}
+
+// ─── Round-end cleanup for temporary effects ───
+function cleanupTemporaryEffects() {
+  // Remove temporary clone balls
+  for (let i = balls.length - 1; i >= 0; i--) {
+    const ball = balls[i];
+    if (ball.isTemporary && !ball.inPipe) {
+      // Remove from pipe queue if somehow there
+      const qi = pipeQueue.indexOf(i);
+      if (qi !== -1) pipeQueue.splice(qi, 1);
+      ball.destroy();
+      balls.splice(i, 1);
+      // Fix up pipeQueue indices that shifted
+      for (let q = 0; q < pipeQueue.length; q++) {
+        if (pipeQueue[q] > i) pipeQueue[q]--;
+      }
+    }
+  }
+
+  // Reset temp buffs on all remaining balls
+  for (const ball of balls) {
+    if (ball.tempBuff !== 1) {
+      ball.tempBuff = 1;
+      ball.updateVisual();
     }
   }
 }
@@ -443,10 +740,10 @@ function applyMagnet(dt) {
 
   for (let i = 0; i < balls.length; i++) {
     const a = balls[i];
-    if (a.merged || a.inPipe || a.inSuction || !a.body) continue;
+    if (a.merged || a.inPipe || a.inSuction || a.inLimbo || !a.body) continue;
     for (let j = i + 1; j < balls.length; j++) {
       const b = balls[j];
-      if (b.merged || b.inPipe || b.inSuction || !b.body) continue;
+      if (b.merged || b.inPipe || b.inSuction || b.inLimbo || !b.body) continue;
       if (a.value !== b.value) continue;
 
       const diff = b.body.position.vsub(a.body.position);
@@ -464,14 +761,19 @@ function applyMagnet(dt) {
 function checkRoundComplete() {
   if (state !== 'playing' || !hasDroppedAny) return;
 
-  // All non-merged balls must be back in pipe
-  const allInPipe = balls.every(b => b.merged || b.inPipe);
+  // Can't complete round while balls are in limbo
+  if (limboBalls.length > 0) return;
+
+  // All non-merged, non-temporary balls must be back in pipe
+  // (temporary clone balls get cleaned up on round end)
+  const allInPipe = balls.every(b => b.merged || b.inPipe || b.isTemporary);
   if (!allInPipe) return;
 
   // At least some balls in the queue
   if (pipeQueue.length < 1) return;
 
   // Round complete — advance wave
+  cleanupTemporaryEffects();
   hasDroppedAny = false;
   sfxWaveComplete();
   state = 'waveTransition';
@@ -510,6 +812,8 @@ function loop() {
     handleCollisions();
     applyMagnet(dt);
     updateSuction(dt);
+    updateBlackWhiteHoles(dt);
+    updateEventOrbs(dt);
     cleanupBlocks();
     checkRoundComplete();
 
@@ -531,6 +835,14 @@ function loop() {
   // Update visuals regardless of state
   if (pipe) pipe.update(dt);
   if (suctionTube) suctionTube.update(dt);
+  // Note: blackHole/whiteHole/eventOrbs are already updated in their
+  // respective update functions during 'playing' state, but we still
+  // need visual updates when paused or transitioning
+  if (state !== 'playing') {
+    if (blackHole) blackHole.update(dt);
+    if (whiteHole) whiteHole.update(dt);
+    eventOrbs.forEach(o => { if (!o.dead) o.update(dt); });
+  }
   blocks.forEach(b => b.update(dt));
   updateShake();
   updateParticles(dt);
