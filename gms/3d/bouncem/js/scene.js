@@ -15,11 +15,15 @@ export function initScene() {
   scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x0a0a2e, 0.015);
 
-  // Camera — isometric-ish perspective
+  // Camera — adjusts FOV and distance for portrait vs landscape
   const aspect = window.innerWidth / window.innerHeight;
-  camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-  camera.position.set(0, 4, 16);
-  camera.lookAt(0, 0, 0);
+  const isPortrait = aspect < 1;
+  const fov = isPortrait ? 55 : 45;
+  const camZ = isPortrait ? 18 : 16;
+  const camY = isPortrait ? 3 : 4;
+  camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+  camera.position.set(0, camY, camZ);
+  camera.lookAt(0, -1, 0);
   cameraBasePos.copy(camera.position);
 
   // Renderer
@@ -138,7 +142,13 @@ function createDangerLine() {
 
 function onResize() {
   const w = window.innerWidth, h = window.innerHeight;
-  camera.aspect = w / h;
+  const aspect = w / h;
+  const isPortrait = aspect < 1;
+  camera.aspect = aspect;
+  camera.fov = isPortrait ? 55 : 45;
+  camera.position.set(0, isPortrait ? 3 : 4, isPortrait ? 18 : 16);
+  camera.lookAt(0, -1, 0);
+  cameraBasePos.copy(camera.position);
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
 }

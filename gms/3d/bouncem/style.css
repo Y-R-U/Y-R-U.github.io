@@ -269,6 +269,20 @@ html, body {
 }
 .shop-buttons button { flex: 1; }
 
+/* ─── Event Banner ─── */
+#event-banner {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 29; pointer-events: none;
+}
+#event-banner.hidden { display: none !important; }
+#event-banner-text {
+  font-size: 2rem; font-weight: 900;
+  letter-spacing: 3px;
+  text-shadow: 0 0 24px currentColor, 0 4px 12px rgba(0,0,0,0.5);
+  animation: bannerIn 0.35s ease-out forwards, bannerOut 0.3s 1s ease-in forwards;
+}
+
 /* ─── Damage Numbers ─── */
 .damage-number {
   position: fixed;

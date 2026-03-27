@@ -157,6 +157,19 @@ export function showGameOver(score, waves, bestMerge, crystalsEarned) {
   showPopup('gameover-popup');
 }
 
+// ─── Event Banner (black hole, white hole, orbs) ───
+export function showEventBanner(text, color = '#ffffff') {
+  const el = document.getElementById('event-banner');
+  const span = document.getElementById('event-banner-text');
+  span.textContent = text;
+  span.style.color = color;
+  el.classList.remove('hidden');
+  span.style.animation = 'none';
+  span.offsetHeight;
+  span.style.animation = '';
+  setTimeout(() => el.classList.add('hidden'), 1400);
+}
+
 // ─── Damage Numbers ───
 export function spawnDamageNumber(screenX, screenY, amount, isCrit) {
   const el = document.createElement('div');
