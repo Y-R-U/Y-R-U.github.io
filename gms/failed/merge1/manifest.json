@@ -1,0 +1,17 @@
+{
+    "name": "Bounce Merge: Roguelite",
+    "short_name": "BounceMerge",
+    "description": "Aim, shoot, merge, and survive! A roguelite ball-bouncing puzzle game.",
+    "start_url": ".",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0a0a2e",
+    "theme_color": "#0a0a2e",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%230a0a2e'/><circle cx='256' cy='200' r='80' fill='%23FF6B6B'/><text x='256' y='220' font-size='80' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>2</text><circle cx='180' cy='360' r='50' fill='%23FF9F43'/><text x='180' y='375' font-size='50' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>4</text><circle cx='332' cy='360' r='50' fill='%23FECA57'/><text x='332' y='375' font-size='50' text-anchor='middle' fill='%23333' font-family='Arial' font-weight='bold'>8</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml"
+        }
+    ]
+}

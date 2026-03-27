@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a2e">
+    <title>Bounce Merge: Roguelite</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FF6B6B'/><text x='50' y='65' font-size='40' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>2</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="uiOverlay">
+        <!-- HUD -->
+        <div id="hud" class="hidden">
+            <div id="hudLeft">
+                <div id="scoreDisplay">0</div>
+                <div id="waveDisplay">Wave 1</div>
+            </div>
+            <div id="hudCenter">
+                <div id="nextBallPreview">
+                    <span class="next-label">NEXT</span>
+                    <div id="nextBallCircle"></div>
+                </div>
+            </div>
+            <div id="hudRight">
+                <button id="settingsBtn" class="icon-btn" aria-label="Settings">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Title Screen -->
+        <div id="titleScreen" class="screen active">
+            <div class="title-content">
+                <div class="title-balls">
+                    <div class="title-ball tb1">2</div>
+                    <div class="title-ball tb2">4</div>
+                    <div class="title-ball tb3">8</div>
+                    <div class="title-ball tb4">16</div>
+                </div>
+                <h1 class="game-title">BOUNCE<br>MERGE</h1>
+                <p class="game-subtitle">ROGUELITE</p>
+                <div class="title-buttons">
+                    <button id="playBtn" class="btn btn-primary btn-lg pulse-glow">PLAY</button>
+                    <button id="shopBtnTitle" class="btn btn-secondary">UPGRADES <span id="crystalCountTitle" class="crystal-badge">0</span></button>
+                    <button id="settingsBtnTitle" class="btn btn-ghost">SETTINGS</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen hidden">
+            <div class="screen-card">
+                <h2 class="screen-title go-title">GAME OVER</h2>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="finalScore">0</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="finalWaves">0</div>
+                        <div class="stat-label">Waves</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="finalMerge">0</div>
+                        <div class="stat-label">Best Merge</div>
+                    </div>
+                    <div class="stat-item highlight">
+                        <div class="stat-value" id="crystalsEarned">0</div>
+                        <div class="stat-label">Crystals</div>
+                    </div>
+                </div>
+                <div class="screen-buttons">
+                    <button id="shopBtnGO" class="btn btn-secondary">UPGRADES</button>
+                    <button id="retryBtn" class="btn btn-primary">PLAY AGAIN</button>
+                    <button id="menuBtn" class="btn btn-ghost">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Screen -->
+        <div id="shopScreen" class="screen hidden">
+            <div class="shop-panel">
+                <div class="shop-header">
+                    <button id="shopBackBtn" class="btn btn-ghost btn-sm">&#8592; BACK</button>
+                    <h2 class="screen-title">UPGRADES</h2>
+                    <div id="crystalCount" class="crystal-badge lg">0</div>
+                </div>
+                <div id="upgradeList" class="upgrade-list"></div>
+                <button id="startRunBtn" class="btn btn-primary btn-lg">START RUN</button>
+            </div>
+        </div>
+
+        <!-- Settings Popup -->
+        <div id="settingsPopup" class="popup hidden">
+            <div class="popup-backdrop"></div>
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3>SETTINGS</h3>
+                    <button class="popup-close" data-close="settingsPopup">&#10005;</button>
+                </div>
+                <div class="popup-body">
+                    <div class="setting-row">
+                        <span>Music</span>
+                        <button id="musicToggle" class="toggle-btn on">ON</button>
+                    </div>
+                    <div class="setting-row">
+                        <span>Sound Effects</span>
+                        <button id="sfxToggle" class="toggle-btn on">ON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generic Confirm Popup -->
+        <div id="confirmPopup" class="popup hidden">
+            <div class="popup-backdrop"></div>
+            <div class="popup-content popup-sm">
+                <div class="popup-header"><h3 id="confirmTitle">Confirm</h3></div>
+                <div class="popup-body"><p id="confirmMessage"></p></div>
+                <div class="popup-footer">
+                    <button id="confirmNo" class="btn btn-ghost btn-sm">CANCEL</button>
+                    <button id="confirmYes" class="btn btn-primary btn-sm">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast" class="toast hidden"></div>
+
+        <!-- Wave Banner -->
+        <div id="waveBanner" class="wave-banner hidden">
+            <span id="waveBannerText"></span>
+        </div>
+
+        <!-- Boss Warning -->
+        <div id="bossWarning" class="boss-warning hidden">
+            <span>BOSS WAVE</span>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

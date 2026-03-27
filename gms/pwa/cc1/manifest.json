@@ -1,15 +1,15 @@
 {
-    "name": "Bounce Merge: Roguelite",
-    "short_name": "BounceMerge",
-    "description": "Aim, shoot, merge, and survive! A roguelite ball-bouncing puzzle game.",
+    "name": "Triad Clash",
+    "short_name": "TriadClash",
+    "description": "A strategic card battle game with Warriors, Archers, and Mages",
     "start_url": ".",
     "display": "standalone",
     "orientation": "portrait",
-    "background_color": "#0a0a2e",
-    "theme_color": "#0a0a2e",
+    "background_color": "#0f0e17",
+    "theme_color": "#1a1a2e",
     "icons": [
         {
-            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%230a0a2e'/><circle cx='256' cy='200' r='80' fill='%23FF6B6B'/><text x='256' y='220' font-size='80' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>2</text><circle cx='180' cy='360' r='50' fill='%23FF9F43'/><text x='180' y='375' font-size='50' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>4</text><circle cx='332' cy='360' r='50' fill='%23FECA57'/><text x='332' y='375' font-size='50' text-anchor='middle' fill='%23333' font-family='Arial' font-weight='bold'>8</text></svg>",
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%231a1a2e'/><polygon points='256,80 440,380 72,380' fill='none' stroke='%23ffd700' stroke-width='12'/><polygon points='256,140 380,340 132,340' fill='none' stroke='%23ff6b6b' stroke-width='8'/><polygon points='256,200 320,300 192,300' fill='none' stroke='%237c5ce0' stroke-width='8'/><circle cx='256' cy='240' r='24' fill='%23ffd700'/></svg>",
             "sizes": "512x512",
             "type": "image/svg+xml"
         }
