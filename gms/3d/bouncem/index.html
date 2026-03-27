@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Bounce Merge 3D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Three.js canvas inserted by scene.js -->
+  <div id="game-container"></div>
+
+  <!-- ─── HUD (visible during gameplay) ─── -->
+  <div id="hud" class="screen hidden">
+    <div id="hud-left">
+      <div id="hud-score">Score: 0</div>
+      <div id="hud-wave">Wave 1</div>
+    </div>
+    <div id="hud-right">
+      <button id="btn-settings-hud" class="icon-btn">⚙</button>
+    </div>
+  </div>
+
+  <!-- ─── Wave Banner ─── -->
+  <div id="wave-banner" class="hidden">
+    <span id="wave-banner-text">WAVE 1</span>
+  </div>
+
+  <!-- ─── Chain Text ─── -->
+  <div id="chain-text" class="hidden"></div>
+
+  <!-- ─── Title Screen ─── -->
+  <div id="title-screen" class="screen">
+    <div id="title-logo-area"></div>
+    <h1 id="title-text">Bounce Merge 3D</h1>
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn-primary">PLAY</button>
+      <button id="btn-upgrades" class="btn-secondary">UPGRADES</button>
+      <button id="btn-settings" class="btn-secondary">SETTINGS</button>
+    </div>
+  </div>
+
+  <!-- ─── Upgrade Shop ─── -->
+  <div id="upgrade-screen" class="screen hidden">
+    <div class="screen-header">
+      <h2>UPGRADES</h2>
+      <div id="crystal-balance">💎 <span id="crystal-count">0</span></div>
+    </div>
+    <div id="upgrade-list"></div>
+    <div class="shop-buttons">
+      <button id="btn-shop-back" class="btn-secondary">BACK</button>
+      <button id="btn-shop-start" class="btn-primary">START RUN</button>
+    </div>
+  </div>
+
+  <!-- ─── Settings Popup ─── -->
+  <div id="settings-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>SETTINGS</h2>
+      <div class="setting-row">
+        <span>Music</span>
+        <button id="toggle-music" class="toggle-btn on">ON</button>
+      </div>
+      <div class="setting-row">
+        <span>Sound Effects</span>
+        <button id="toggle-sfx" class="toggle-btn on">ON</button>
+      </div>
+      <button id="btn-settings-close" class="btn-secondary">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- ─── Game Over Popup ─── -->
+  <div id="gameover-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>GAME OVER</h2>
+      <div id="go-stats">
+        <div class="stat-row"><span>Score</span><span id="go-score">0</span></div>
+        <div class="stat-row"><span>Waves</span><span id="go-waves">0</span></div>
+        <div class="stat-row"><span>Best Merge</span><span id="go-merge">0</span></div>
+        <div class="stat-row"><span>Crystals Earned</span><span id="go-crystals">0</span></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-go-upgrades" class="btn-secondary">UPGRADES</button>
+        <button id="btn-go-retry" class="btn-primary">PLAY AGAIN</button>
+        <button id="btn-go-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+    }
+  }
+  </script>
+  <script type="module" src="js/config.js"></script>
+  <script type="module" src="js/audio.js"></script>
+  <script type="module" src="js/scene.js"></script>
+  <script type="module" src="js/physics.js"></script>
+  <script type="module" src="js/entities.js"></script>
+  <script type="module" src="js/ui.js"></script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
