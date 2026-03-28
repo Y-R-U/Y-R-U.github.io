@@ -738,17 +738,21 @@ function recoverEscapedBalls() {
   const limitLeft = -(ARENA.width / 2 + 2);
   const limitRight = ARENA.width / 2 + 2;
   const limitBottom = -(ARENA.height / 2 + 3);
-  const recoverX = ARENA.width / 2 - 1;            // bottom-right area
-  const recoverY = -ARENA.height / 2 + 1.5;
+  const floorY = -ARENA.height / 2 + 1.5;
 
   for (const ball of balls) {
     if (ball.merged || ball.inPipe || ball.inSuction || ball.inLimbo || !ball.body) continue;
 
     const pos = ball.body.position;
-    if (pos.x < limitLeft || pos.x > limitRight || pos.y < limitBottom) {
-      // Teleport to bottom-right corner with rightward momentum toward suction
-      pos.set(recoverX, recoverY, 0);
-      ball.body.velocity.set(3, 2, 0);
+
+    if (pos.x < limitLeft || pos.y < limitBottom) {
+      // Escaped left or fell below — put on left side with rightward momentum
+      pos.set(-ARENA.width / 2 + 1, floorY, 0);
+      ball.body.velocity.set(5, 2, 0);
+    } else if (pos.x > limitRight) {
+      // Escaped right — put bottom-right with no momentum so suction grabs it
+      pos.set(ARENA.width / 2 - 0.5, floorY, 0);
+      ball.body.velocity.set(0, 0, 0);
     }
   }
 }
