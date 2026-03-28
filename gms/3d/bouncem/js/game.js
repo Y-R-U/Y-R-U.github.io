@@ -734,7 +734,12 @@ function cleanupTemporaryEffects() {
 }
 
 // ─── Recover balls that escape the arena ───
-function recoverEscapedBalls() {
+let escapeCheckTimer = 0;
+function recoverEscapedBalls(dt) {
+  escapeCheckTimer += dt;
+  if (escapeCheckTimer < 1.0) return; // only check once per second
+  escapeCheckTimer = 0;
+
   const limitLeft = -(ARENA.width / 2 + 2);
   const limitRight = ARENA.width / 2 + 2;
   const limitBottom = -(ARENA.height / 2 + 3);
@@ -829,7 +834,7 @@ function loop() {
     }
 
     stepPhysics(dt);
-    recoverEscapedBalls();
+    recoverEscapedBalls(dt);
 
     // Sync meshes
     balls.forEach(b => { if (!b.merged) b.syncMesh(); });
