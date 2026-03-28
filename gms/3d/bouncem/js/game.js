@@ -733,6 +733,35 @@ function cleanupTemporaryEffects() {
   }
 }
 
+// ─── Recover balls that escape the arena ───
+let escapeCheckTimer = 0;
+function recoverEscapedBalls(dt) {
+  escapeCheckTimer += dt;
+  if (escapeCheckTimer < 1.0) return; // only check once per second
+  escapeCheckTimer = 0;
+
+  const limitLeft = -(ARENA.width / 2 + 2);
+  const limitRight = ARENA.width / 2 + 2;
+  const limitBottom = -(ARENA.height / 2 + 3);
+  const floorY = -ARENA.height / 2 + 1.5;
+
+  for (const ball of balls) {
+    if (ball.merged || ball.inPipe || ball.inSuction || ball.inLimbo || !ball.body) continue;
+
+    const pos = ball.body.position;
+
+    if (pos.x < limitLeft || pos.y < limitBottom) {
+      // Escaped left or fell below — put on left side with rightward momentum
+      pos.set(-ARENA.width / 2 + 1, floorY, 0);
+      ball.body.velocity.set(5, 2, 0);
+    } else if (pos.x > limitRight) {
+      // Escaped right — put bottom-right with no momentum so suction grabs it
+      pos.set(ARENA.width / 2 - 0.5, floorY, 0);
+      ball.body.velocity.set(0, 0, 0);
+    }
+  }
+}
+
 // ─── Magnet ───
 function applyMagnet(dt) {
   if (magnetStrength === 0) return;
@@ -805,6 +834,7 @@ function loop() {
     }
 
     stepPhysics(dt);
+    recoverEscapedBalls(dt);
 
     // Sync meshes
     balls.forEach(b => { if (!b.merged) b.syncMesh(); });
