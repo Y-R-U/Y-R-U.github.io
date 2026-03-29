@@ -1,6 +1,6 @@
 // ─── UI: screen management, popups, shop, HUD updates ───
 
-import { UPGRADES, loadSave, writeSave, getUpgradeLevel } from './config.js';
+import { UPGRADES, loadSave, writeSave, getUpgradeLevel, formatNumber } from './config.js';
 import { sfxClick, sfxUpgrade, isMusicOn, isSfxOn, setMusicOn, setSfxOn } from './audio.js';
 
 let onPlay = null;
@@ -119,7 +119,7 @@ function hideSettings() {
 
 // ─── HUD Updates ───
 export function updateHUD(score, wave) {
-  document.getElementById('hud-score').textContent = `Score: ${Math.floor(score)}`;
+  document.getElementById('hud-score').textContent = `Score: ${formatNumber(score)}`;
   document.getElementById('hud-wave').textContent = `Wave ${wave}`;
 }
 
@@ -150,10 +150,10 @@ export function showChainText(count) {
 
 // ─── Game Over ───
 export function showGameOver(score, waves, bestMerge, crystalsEarned) {
-  document.getElementById('go-score').textContent = Math.floor(score);
+  document.getElementById('go-score').textContent = formatNumber(score);
   document.getElementById('go-waves').textContent = waves;
-  document.getElementById('go-merge').textContent = bestMerge;
-  document.getElementById('go-crystals').textContent = crystalsEarned;
+  document.getElementById('go-merge').textContent = formatNumber(bestMerge);
+  document.getElementById('go-crystals').textContent = formatNumber(crystalsEarned);
   showPopup('gameover-popup');
 }
 
@@ -174,7 +174,7 @@ export function showEventBanner(text, color = '#ffffff') {
 export function spawnDamageNumber(screenX, screenY, amount, isCrit) {
   const el = document.createElement('div');
   el.className = 'damage-number';
-  el.textContent = `-${Math.floor(amount)}`;
+  el.textContent = `-${formatNumber(amount)}`;
   if (isCrit) {
     el.textContent += '!';
     el.style.color = '#ffdd00';

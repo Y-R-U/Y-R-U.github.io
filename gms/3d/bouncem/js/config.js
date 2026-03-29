@@ -45,14 +45,30 @@ export const ARENA = {
   blockMaxSize: 1.0,
 };
 
+// ─── Number formatting (compact: ###.#K/M/B/T) ───
+export function formatNumber(n) {
+  n = Math.abs(n);
+  if (n < 1000) return String(Math.floor(n));
+  const suffixes = ['', 'K', 'M', 'B', 'T'];
+  let tier = 0;
+  let val = n;
+  while (val >= 1000 && tier < suffixes.length - 1) {
+    val /= 1000;
+    tier++;
+  }
+  if (val >= 100) return `${Math.floor(val)}${suffixes[tier]}`;
+  return `${(Math.floor(val * 10) / 10).toFixed(1)}${suffixes[tier]}`;
+}
+
 // ─── Upgrade definitions ───
+// Costs start cheap but scale ~3x per level
 export const UPGRADES = [
   {
     id: 'ballPower',
     name: 'Ball Power',
     desc: 'Starting ball value',
     maxLevel: 6,
-    costs: [0, 30, 80, 200, 500, 1200],
+    costs: [0, 10, 40, 150, 500, 2000],
     values: [2, 4, 8, 16, 32, 64],
     effectLabel: v => `${v}`,
   },
@@ -61,7 +77,7 @@ export const UPGRADES = [
     name: 'Ball Count',
     desc: 'Start with more balls',
     maxLevel: 5,
-    costs: [0, 40, 100, 250, 600],
+    costs: [0, 15, 60, 250, 1000],
     values: [5, 7, 9, 12, 15],
     effectLabel: v => `${v} balls`,
   },
@@ -70,7 +86,7 @@ export const UPGRADES = [
     name: 'Velocity',
     desc: 'Balls move faster',
     maxLevel: 5,
-    costs: [0, 25, 60, 150, 400],
+    costs: [0, 10, 40, 150, 600],
     values: [0, 12, 25, 40, 60],
     effectLabel: v => `+${v}%`,
   },
@@ -79,7 +95,7 @@ export const UPGRADES = [
     name: 'Critical Hit',
     desc: 'Chance for 2x block damage',
     maxLevel: 5,
-    costs: [0, 35, 90, 220, 550],
+    costs: [0, 12, 50, 200, 800],
     values: [0, 8, 16, 25, 35],
     effectLabel: v => `${v}%`,
   },
@@ -88,7 +104,7 @@ export const UPGRADES = [
     name: 'Merge Luck',
     desc: 'Chance to merge one tier higher',
     maxLevel: 4,
-    costs: [0, 50, 140, 400],
+    costs: [0, 15, 60, 300],
     values: [0, 10, 20, 32],
     effectLabel: v => `${v}%`,
   },
@@ -97,7 +113,7 @@ export const UPGRADES = [
     name: 'Magnet',
     desc: 'Same-value balls attract each other',
     maxLevel: 4,
-    costs: [0, 45, 120, 320],
+    costs: [0, 15, 60, 280],
     values: [0, 1, 2, 3], // 0=off, 1=weak, 2=med, 3=strong
     effectLabel: v => ['Off', 'Weak', 'Med', 'Strong'][v],
   },
@@ -106,7 +122,7 @@ export const UPGRADES = [
     name: 'Score Bonus',
     desc: 'Earn more score/crystals',
     maxLevel: 5,
-    costs: [0, 30, 70, 180, 450],
+    costs: [0, 10, 40, 160, 650],
     values: [1.0, 1.2, 1.5, 1.8, 2.2],
     effectLabel: v => `x${v}`,
   },
@@ -115,7 +131,7 @@ export const UPGRADES = [
     name: 'Sturdy Blocks',
     desc: 'Blocks start with less HP',
     maxLevel: 4,
-    costs: [0, 40, 110, 300],
+    costs: [0, 12, 50, 220],
     values: [0, 10, 20, 30],
     effectLabel: v => `${v}% less HP`,
   },

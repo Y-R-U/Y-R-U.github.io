@@ -203,13 +203,14 @@ function nextWave() {
   // Move existing blocks up
   blocks.forEach(b => b.moveUp(ARENA.blockRowSpacing));
 
-  // Spawn new row
-  const numBlocks = isBoss ? 1 : 3 + Math.floor(Math.random() * 3);
+  // Spawn new row — waves 1-2 are easy training, then difficulty jumps
+  const numBlocks = isBoss ? 1 : wave <= 2 ? 2 + Math.floor(Math.random() * 2) : 3 + Math.floor(Math.random() * 3);
   const hw = ARENA.width / 2 - 1;
 
   for (let i = 0; i < numBlocks; i++) {
     const x = -hw + (i / Math.max(1, numBlocks - 1)) * (hw * 2);
-    const baseHp = 10 * Math.pow(1.25, wave);
+    // Training waves: very low HP. Post-training: steep exponential ramp
+    const baseHp = wave <= 2 ? 3 * wave : 10 * Math.pow(1.3, wave - 2);
     let hp = isBoss ? baseHp * 8 : baseHp * (0.6 + Math.random() * 0.8);
     hp *= (1 - blockHpReduction);
     hp = Math.max(1, Math.ceil(hp));
@@ -401,14 +402,18 @@ function mergeBalls(idxA, idxB) {
   const bQueueIdx = pipeQueue.indexOf(idxB);
   if (bQueueIdx !== -1) pipeQueue.splice(bQueueIdx, 1);
 
+  const bWasTemporary = b.isTemporary;
   b.destroy();
 
-  // Spawn replacement ball (lowest value) to maintain ball count
-  const newBall = new Ball(startBallValue, true);
-  balls.push(newBall);
-  const newIdx = balls.length - 1;
-  pipeQueue.push(newIdx);
-  positionBallInPipe(newIdx, pipeQueue.indexOf(newIdx));
+  // Only spawn a replacement ball if both merging balls were primary (not clones)
+  // This prevents clone orbs from inflating the ball count
+  if (!a.isTemporary && !bWasTemporary) {
+    const newBall = new Ball(startBallValue, true);
+    balls.push(newBall);
+    const newIdx = balls.length - 1;
+    pipeQueue.push(newIdx);
+    positionBallInPipe(newIdx, pipeQueue.indexOf(newIdx));
+  }
 
   // Reposition remaining pipe balls
   pipeQueue.forEach((bi, qi) => positionBallInPipe(bi, qi));
