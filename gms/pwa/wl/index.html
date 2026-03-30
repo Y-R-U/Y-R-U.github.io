@@ -36,8 +36,33 @@
                     <option value="4">4</option>
                 </select>
             </div>
+            <div class="setup-row">
+                <label for="map-size">Map Size</label>
+                <select id="map-size">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                    <option value="huge">Huge</option>
+                </select>
+            </div>
+            <div class="setup-row">
+                <label for="map-type">Map Type</label>
+                <select id="map-type">
+                    <option value="continents" selected>Continents</option>
+                    <option value="islands">Islands</option>
+                    <option value="pangaea">Pangaea</option>
+                    <option value="archipelago">Archipelago</option>
+                </select>
+            </div>
             <button id="btn-start" class="btn btn-primary">Start Game</button>
+            <div id="load-slots" style="margin-top:0.8rem"></div>
         </div>
+    </div>
+
+    <!-- Turn Banner -->
+    <div id="turn-banner" class="hidden">
+        <div id="turn-banner-text"></div>
+        <div id="turn-banner-sub"></div>
     </div>
 
     <!-- Game Screen -->
@@ -68,6 +93,12 @@
                 </div>
             </div>
 
+            <!-- Factions Legend -->
+            <div class="panel-section" id="factions-panel">
+                <h3>Factions</h3>
+                <div id="factions-list"></div>
+            </div>
+
             <!-- Tile Info -->
             <div class="panel-section">
                 <h3>Terrain</h3>
@@ -78,6 +109,10 @@
             <div id="army-panel" class="panel-section hidden">
                 <h3>Army</h3>
                 <div id="army-units"></div>
+                <div id="army-actions" class="hidden" style="margin-top:0.4rem;display:flex;gap:0.3rem">
+                    <button id="btn-split-army" class="btn btn-sm" style="flex:1">Split</button>
+                    <button id="btn-scout-toggle" class="btn btn-sm" style="flex:1">Scout</button>
+                </div>
             </div>
 
             <!-- City Panel -->
@@ -106,6 +141,12 @@
                     <button id="btn-buy-hero" class="btn">Hire Hero (H) - 15g</button>
                     <button id="btn-end-turn" class="btn btn-primary">End Turn (E)</button>
                 </div>
+                <div class="action-buttons" style="margin-top:0.3rem">
+                    <div style="display:flex;gap:0.3rem">
+                        <button id="btn-save" class="btn btn-sm" style="flex:1">Save</button>
+                        <button id="btn-sound" class="btn btn-sm" style="flex:1">Sound: On</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Minimap -->
@@ -121,13 +162,13 @@
             </div>
 
             <!-- Shortcuts -->
-            <div class="panel-section">
+            <div class="panel-section shortcuts-section">
                 <div class="shortcuts">
                     <kbd>WASD</kbd> Scroll
                     <kbd>N</kbd> Next Army
                     <kbd>E</kbd> End Turn
                     <kbd>H</kbd> Hire Hero
-                    <kbd>Space</kbd> Skip Army
+                    <kbd>Space</kbd> Skip
                     <kbd>Esc</kbd> Deselect
                 </div>
             </div>
@@ -145,6 +186,47 @@
         <h3 style="color:var(--gold);margin-bottom:0.5rem">Ancient Ruins</h3>
         <div id="ruin-message"></div>
         <button id="ruin-ok" class="btn btn-primary">OK</button>
+    </div>
+
+    <!-- Merge Armies Overlay -->
+    <div id="merge-panel" class="hidden">
+        <h3 style="color:var(--accent);margin-bottom:0.5rem">Combine Armies?</h3>
+        <div id="merge-details"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button id="merge-yes" class="btn btn-primary" style="flex:1">Combine</button>
+            <button id="merge-no" class="btn" style="flex:1">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Split Army Overlay -->
+    <div id="split-panel" class="hidden">
+        <h3 style="color:var(--accent);margin-bottom:0.5rem">Split Army</h3>
+        <div id="split-units"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button id="split-confirm" class="btn btn-primary" style="flex:1">Split</button>
+            <button id="split-cancel" class="btn" style="flex:1">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Save Game Overlay -->
+    <div id="save-panel" class="hidden">
+        <h3 style="color:var(--accent);margin-bottom:0.5rem">Save Game</h3>
+        <div id="save-slots"></div>
+        <button id="save-close" class="btn" style="margin-top:0.5rem;width:100%;text-align:center">Close</button>
+    </div>
+
+    <!-- Waypoint Banner -->
+    <div id="waypoint-banner" class="hidden">
+        <span id="waypoint-text"></span>
+        <button id="waypoint-continue" class="btn btn-sm">Continue</button>
+        <button id="waypoint-cancel" class="btn btn-sm btn-danger">Cancel</button>
+    </div>
+
+    <!-- Promotion Overlay -->
+    <div id="promotion-panel" class="hidden">
+        <h3 style="color:var(--gold);margin-bottom:0.5rem">Unit Promoted!</h3>
+        <div id="promotion-message"></div>
+        <button id="promotion-ok" class="btn btn-primary">OK</button>
     </div>
 
     <!-- Game Over Screen -->
@@ -167,6 +249,9 @@
     <script src="js/engine/heroes.js"></script>
     <script src="js/engine/ai.js"></script>
     <script src="js/engine/turns.js"></script>
+    <script src="js/engine/animation.js"></script>
+    <script src="js/engine/audio.js"></script>
+    <script src="js/engine/savegame.js"></script>
     <script src="js/engine/renderer.js"></script>
     <script src="js/ui/hud.js"></script>
     <script src="js/ui/screens.js"></script>

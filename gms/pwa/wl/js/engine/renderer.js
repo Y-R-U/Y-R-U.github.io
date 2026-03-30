@@ -22,16 +22,28 @@ const Renderer = {
     },
 
     _buildTileCache() {
-        // Pre-render tiles to offscreen canvas
+        // Pre-render multiple tile variants per terrain type for visual variety
         this.tileCache = {};
+        const VARIANTS = 4;
         Object.values(TERRAIN).forEach(t => {
-            const c = document.createElement('canvas');
-            c.width = TILE_SIZE;
-            c.height = TILE_SIZE;
-            const ctx = c.getContext('2d');
-            this._drawTerrainTile(ctx, t);
-            this.tileCache[t.id] = c;
+            this.tileCache[t.id] = [];
+            for (let v = 0; v < VARIANTS; v++) {
+                const c = document.createElement('canvas');
+                c.width = TILE_SIZE;
+                c.height = TILE_SIZE;
+                const ctx = c.getContext('2d');
+                this._drawTerrainTile(ctx, t);
+                this.tileCache[t.id].push(c);
+            }
         });
+    },
+
+    _getTileVariant(tileId, col, row) {
+        // Deterministic variant based on position
+        const variants = this.tileCache[tileId];
+        if (!variants || variants.length === 0) return null;
+        const hash = (col * 7919 + row * 6271) & 0x7fffffff;
+        return variants[hash % variants.length];
     },
 
     _drawTerrainTile(ctx, terrain) {
@@ -226,6 +238,7 @@ const Renderer = {
         if (GameState.phase === 'setup') return;
 
         this.animFrame++;
+        Animation.update();
 
         // Calculate visible tiles
         const startCol = Math.max(0, Math.floor(this.camX / TILE_SIZE));
@@ -249,8 +262,8 @@ const Renderer = {
                     continue;
                 }
 
-                // Draw cached tile
-                const cached = this.tileCache[tileId];
+                // Draw cached tile (with variant)
+                const cached = this._getTileVariant(tileId, c, r);
                 if (cached) {
                     ctx.drawImage(cached, sx, sy);
                 }
@@ -276,19 +289,34 @@ const Renderer = {
             this._drawReachableTiles(ctx);
         }
 
-        // Draw movement path
-        if (GameState.movePath && isHuman) {
-            this._drawPath(ctx, GameState.movePath);
+        // Draw waypoint paths for selected army
+        if (GameState.selectedArmy && isHuman) {
+            const wp = GameState.getWaypoint(GameState.selectedArmy.id);
+            if (wp && wp.path) {
+                this._drawPath(ctx, wp.path, 'rgba(100,255,100,0.4)', [6, 4]);
+            }
         }
 
-        // Draw armies
-        for (const army of GameState.armies) {
-            if (isHuman && !GameState.isVisible(pid, army.col, army.row)) continue;
-            if (army.col < startCol - 1 || army.col > endCol + 1) continue;
-            if (army.row < startRow - 1 || army.row > endRow + 1) continue;
+        // Draw movement path (hover preview)
+        if (GameState.movePath && isHuman) {
+            this._drawPath(ctx, GameState.movePath, 'rgba(255,255,100,0.7)', [4, 4]);
+        }
 
-            const sx = army.col * TILE_SIZE - this.camX;
-            const sy = army.row * TILE_SIZE - this.camY;
+        // Draw armies (with animation support)
+        for (const army of GameState.armies) {
+            // Check for tweened position
+            const tweenPos = Animation.getTweenPos(army);
+            const drawCol = tweenPos ? tweenPos.col : army.col;
+            const drawRow = tweenPos ? tweenPos.row : army.row;
+
+            if (isHuman && !GameState.isVisible(pid, army.col, army.row)) continue;
+            if (drawCol < startCol - 2 || drawCol > endCol + 2) continue;
+            if (drawRow < startRow - 2 || drawRow > endRow + 2) continue;
+
+            // Apply shake offset
+            const shake = Animation.getShakeOffset(army.col, army.row);
+            const sx = drawCol * TILE_SIZE - this.camX + shake.x;
+            const sy = drawRow * TILE_SIZE - this.camY + shake.y;
             this._drawArmy(ctx, sx, sy, army);
         }
 
@@ -349,56 +377,86 @@ const Renderer = {
         ctx.strokeStyle = 'rgba(0,0,0,0.15)';
         ctx.lineWidth = 1;
         ctx.strokeRect(sx + 0.5, sy + 0.5, s - 1, s - 1);
+
+        // City name label above
+        if (city) {
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(sx + 2, sy - 10, s - 4, 10);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(city.name.length > 8 ? city.name.substring(0, 7) + '.' : city.name, sx + s / 2, sy - 2);
+        }
     },
 
     _drawArmy(ctx, sx, sy, army) {
+        if (!army.units || army.units.length === 0) return;
         const s = TILE_SIZE;
         const color = army.owner >= 0
             ? GameState.players[army.owner].color.primary
             : '#888';
         const bannerColor = army.owner >= 0
             ? GameState.players[army.owner].color.banner
-            : '#666';
+            : '#555';
+        const secondaryColor = army.owner >= 0
+            ? GameState.players[army.owner].color.secondary
+            : '#999';
 
-        // Banner/flag background
-        ctx.fillStyle = bannerColor;
-        ctx.fillRect(sx + 6, sy + 4, s - 12, s - 8);
-
-        // Unit count indicator
-        const count = army.units.length;
+        // Colored border ring to clearly show faction ownership
         ctx.fillStyle = color;
-        ctx.fillRect(sx + 8, sy + 6, s - 16, s - 12);
+        ctx.fillRect(sx + 3, sy + 2, s - 6, s - 4);
+
+        // Inner body
+        ctx.fillStyle = bannerColor;
+        ctx.fillRect(sx + 5, sy + 4, s - 10, s - 8);
+
+        // Colored top banner bar
+        ctx.fillStyle = secondaryColor;
+        ctx.fillRect(sx + 5, sy + 4, s - 10, 5);
 
         // Unit symbol (first unit)
         const mainUnit = army.units[0];
+        const count = army.units.length;
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold 11px monospace';
+        ctx.font = 'bold 12px monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(mainUnit.symbol, sx + s / 2, sy + s / 2 - 2);
+        ctx.fillText(mainUnit.symbol, sx + s / 2, sy + s / 2 + 1);
 
-        // Stack size indicator
+        // Stack size badge (bottom-right)
         if (count > 1) {
-            ctx.fillStyle = '#ffd700';
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(sx + s - 8, sy + s - 8, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
             ctx.font = 'bold 9px monospace';
-            ctx.fillText(count.toString(), sx + s - 10, sy + s - 8);
+            ctx.fillText(count.toString(), sx + s - 8, sy + s - 7);
         }
 
-        // Hero star
+        // Hero star (top-left)
         if (Units.armyHasHero(army)) {
             ctx.fillStyle = '#ffd700';
-            this._drawStar(ctx, sx + 10, sy + 8, 4);
+            this._drawStar(ctx, sx + 9, sy + 8, 5);
         }
 
-        // Movement dots
+        // Movement dots (bottom-left)
         if (army.owner === GameState.currentPlayer && army.movesLeft > 0) {
             ctx.fillStyle = '#0f0';
             const dots = Math.min(3, Math.ceil(army.movesLeft));
             for (let i = 0; i < dots; i++) {
                 ctx.beginPath();
-                ctx.arc(sx + 12 + i * 6, sy + s - 5, 2, 0, Math.PI * 2);
+                ctx.arc(sx + 9 + i * 6, sy + s - 6, 2, 0, Math.PI * 2);
                 ctx.fill();
             }
+        }
+
+        // Owner name label below for non-player armies (if visible)
+        if (army.owner >= 0 && army.owner !== GameState.currentPlayer) {
+            ctx.fillStyle = color;
+            ctx.font = '8px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(GameState.players[army.owner].name.split(' ')[0], sx + s / 2, sy + s + 7);
         }
     },
 
@@ -437,11 +495,11 @@ const Renderer = {
         }
     },
 
-    _drawPath(ctx, path) {
+    _drawPath(ctx, path, color, dash) {
         if (path.length < 2) return;
-        ctx.strokeStyle = 'rgba(255,255,100,0.7)';
+        ctx.strokeStyle = color || 'rgba(255,255,100,0.7)';
         ctx.lineWidth = 3;
-        ctx.setLineDash([4, 4]);
+        ctx.setLineDash(dash || [4, 4]);
         ctx.beginPath();
         for (let i = 0; i < path.length; i++) {
             const px = path[i].col * TILE_SIZE + TILE_SIZE / 2 - this.camX;
@@ -451,6 +509,15 @@ const Renderer = {
         }
         ctx.stroke();
         ctx.setLineDash([]);
+
+        // Draw destination marker
+        const last = path[path.length - 1];
+        const lx = last.col * TILE_SIZE + TILE_SIZE / 2 - this.camX;
+        const ly = last.row * TILE_SIZE + TILE_SIZE / 2 - this.camY;
+        ctx.fillStyle = color || 'rgba(255,255,100,0.7)';
+        ctx.beginPath();
+        ctx.arc(lx, ly, 4, 0, Math.PI * 2);
+        ctx.fill();
     },
 
     _lighten(hex, amount) {

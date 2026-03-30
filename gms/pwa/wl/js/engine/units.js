@@ -38,6 +38,7 @@ const Units = {
     },
 
     armyMoves(army) {
+        if (!army.units || army.units.length === 0) return 0;
         // Army moves at speed of slowest unit
         let minMoves = Infinity;
         let hasFlying = false;
@@ -83,8 +84,29 @@ const Units = {
         const newLevel = 1 + Math.floor(unit.xp / 5);
         if (newLevel > unit.level) {
             unit.level = newLevel;
-            return true; // leveled up
+            return true;
         }
         return false;
+    },
+
+    checkPromotion(unit) {
+        if (unit.promoted) return null;
+        const promo = PROMOTIONS[unit.typeId];
+        if (!promo) return null;
+        if (unit.xp >= promo.xpRequired) {
+            return promo;
+        }
+        return null;
+    },
+
+    applyPromotion(unit) {
+        const promo = this.checkPromotion(unit);
+        if (!promo) return false;
+        unit.promoted = true;
+        unit.str += promo.strBonus;
+        unit.maxMoves += promo.movesBonus;
+        unit.moves += promo.movesBonus;
+        unit.name = promo.name;
+        return true;
     },
 };

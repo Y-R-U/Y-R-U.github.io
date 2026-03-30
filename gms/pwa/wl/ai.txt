@@ -9,32 +9,35 @@ gms/pwa/wl/
 ├── manifest.json           - PWA manifest
 ├── ai.txt                  - This file
 ├── css/
-│   └── style.css           - All styles: dark theme, panels, responsive layout
+│   └── style.css           - All styles: dark theme, panels, overlays, responsive layout, mobile
 └── js/
     ├── main.js             - Entry point, game loop (requestAnimationFrame)
     ├── engine/
-    │   ├── constants.js    - All game constants, terrain/unit/player definitions
+    │   ├── constants.js    - All game constants, terrain/unit/player/promotion definitions
     │   ├── utils.js        - Utility functions (rand, shuffle, pathfinding helpers)
-    │   ├── units.js        - Unit creation, stats, army management
+    │   ├── units.js        - Unit creation, stats, army management, promotions
     │   ├── mapgen.js       - Procedural map generation (terrain, cities, ruins, roads)
-    │   ├── gamestate.js    - Central game state (tiles, armies, cities, fog, players)
-    │   ├── combat.js       - Combat resolution (multi-round, stat-based)
-    │   ├── movement.js     - Pathfinding (A*), army movement, reachable tiles
-    │   ├── production.js   - City production, economy (income/upkeep), hero recruitment
-    │   ├── heroes.js       - Ruin searching, item/gold/ally rewards
+    │   ├── gamestate.js    - Central game state (tiles, armies, cities, fog, waypoints)
+    │   ├── combat.js       - Combat resolution (multi-round, stat-based, XP/promotions)
+    │   ├── movement.js     - Pathfinding (A*), army movement, animated tweens
+    │   ├── production.js   - City production, economy (income/upkeep/bankruptcy)
+    │   ├── heroes.js       - Ruin searching (always finds something), item/gold/ally/xp rewards
     │   ├── ai.js           - AI opponent (target selection, army movement, production)
-    │   ├── turns.js        - Turn management, player cycling, AI chaining
-    │   └── renderer.js     - Canvas rendering (terrain tiles, armies, fog, selection)
+    │   ├── turns.js        - Turn management, player cycling, AI chaining, scout processing
+    │   ├── animation.js    - Tween system for smooth army movement and shake effects
+    │   ├── audio.js        - Procedural Web Audio API sound effects
+    │   ├── savegame.js     - Save/load game with localStorage (3 slots)
+    │   └── renderer.js     - Canvas rendering (terrain tile variants, armies, fog, selection, waypoints)
     └── ui/
-        ├── hud.js          - HUD panels (player info, army details, city/production, minimap)
-        ├── screens.js      - Title screen, game setup, game over screen
-        ├── input.js        - Mouse/touch/keyboard input handling
+        ├── hud.js          - HUD panels (player info, factions legend, army details, city/production, minimap)
+        ├── screens.js      - Title screen, game setup (map size/type), turn banner, game over
+        ├── input.js        - Mouse/touch/keyboard input, merge/split, waypoints, scout, save, promotions
         └── ui.js           - UI controller (coordinates HUD + screens)
 
 SCRIPT LOAD ORDER (dependencies flow downward):
 constants.js → utils.js → units.js → mapgen.js → gamestate.js → combat.js →
-movement.js → production.js → heroes.js → ai.js → turns.js → renderer.js →
-hud.js → screens.js → input.js → ui.js → main.js
+movement.js → production.js → heroes.js → ai.js → turns.js → animation.js →
+audio.js → savegame.js → renderer.js → hud.js → screens.js → input.js → ui.js → main.js
 
 GLOBAL OBJECTS (all singletons, no module system):
 - TILE_SIZE, MAP_COLS, MAP_ROWS, MAX_STACK_SIZE, etc. (constants)
@@ -49,7 +52,7 @@ KEY DATA STRUCTURES:
 
   Tile: number (terrain id, stored in GameState.tiles[row][col])
 
-  Player: {id, name, color, gold, alive, isHuman, heroCount}
+  Player: {id, name, color:{primary,secondary,banner}, gold, alive, isHuman, heroCount}
 
   City: {id, name, col, row, owner(-1=neutral), production(unitTypeId|null),
          turnsLeft, income, isCapital}
@@ -59,7 +62,10 @@ KEY DATA STRUCTURES:
 
   Army: {id, col, row, owner, units[Unit], movesLeft}
 
-  Ruin: {id, col, row, searched, reward('item'|'gold'|'ally'|'nothing')}
+  Ruin: {id, col, row, searched, reward(null - rolled dynamically)}
+
+  Waypoint: {targetCol, targetRow, path[{col,row,cost}]}
+    Stored in GameState.waypoints[armyId]
 
 FUNCTION STUBS BY MODULE:
 
@@ -86,17 +92,19 @@ units.js - Units:
   .create(typeId, owner) → Unit
   .getEffectiveStr(unit) → int (base + items + level bonus)
   .getEffectiveMoves(unit) → int (base + item bonuses)
-  .armyMoves(army) → int (min of all units' moves)
+  .armyMoves(army) → int (min of all units' moves; returns 0 for empty armies)
   .armyStrength(army) → int (sum of all units' effective str)
   .armyHasFlying(army) → bool (all units flying)
   .armyHasHero(army) → bool
   .addToArmy(army, unit) → bool (false if stack full)
   .removeFromArmy(army, unitId) → bool
   .gainXP(unit, amount) → bool (true if leveled up)
+  .checkPromotion(unit) → {name, strBonus, movesBonus}|null
+  .applyPromotion(unit) → bool (applies promotion bonuses)
 
 mapgen.js - MapGen:
-  .generate(numPlayers) → {tiles[][], cities[], ruins[]}
-  ._generateTerrain(tiles) - fills tiles with noise-based terrain
+  .generate(numPlayers, mapType) → {tiles[][], cities[], ruins[]}
+  ._generateTerrain(tiles, mapType) - fills tiles with noise-based terrain (water threshold from MAP_TYPES)
   ._noiseMap(w,h,numBlobs) → float[][] (0-1 normalized)
   ._placeCities(tiles, numPlayers) → City[]
   ._getPlayerZones(numPlayers) → [{x,y,w,h}...]
@@ -116,9 +124,10 @@ gamestate.js - GameState:
   .selectedArmy - Army|null
   .movePath - path[]|null
   .fog[playerId][row][col] - bool visibility
+  .waypoints{} - armyId → {targetCol, targetRow, path}
   .winner - int|null
   .messages[] - string log
-  .init(numPlayers, humanPlayers) - full game reset
+  .init(numPlayers, humanPlayers, mapType) - full game reset
   .getArmyAt(col,row) → Army|undefined
   .getArmiesAt(col,row) → Army[]
   .getCityAt(col,row) → City|undefined
@@ -130,13 +139,19 @@ gamestate.js - GameState:
   .isVisible(playerId, col, row) → bool
   .addMessage(text) - adds to message log
   .checkVictory() → bool
-  .eliminatePlayer(playerId) - marks dead, neutralizes cities
+  .eliminatePlayer(playerId) - marks dead, removes armies, neutralizes cities
+  .setWaypoint(armyId, targetCol, targetRow, path) - saves multi-turn path
+  .getWaypoint(armyId) → {targetCol, targetRow, path}|null
+  .clearWaypoint(armyId) - removes saved waypoint
+  .clearAllWaypoints(playerId) - removes all waypoints for player
 
 combat.js - Combat:
   .resolve(attacker, defender, terrainId) → CombatResult
     CombatResult: {attacker, defender, atkStrength, defStrength,
-                   atkLosses[unitId], defLosses[unitId], winner, rounds[]}
-  .applyCombatResult(result) - removes dead units, captures cities, gives XP
+                   atkLosses[unitId], defLosses[unitId], winner, rounds[],
+                   promotions[{unitName, owner}]}
+    Winner: handles mutual destruction (attacker wins tie)
+  .applyCombatResult(result) - removes dead units, captures cities, gives XP, checks promotions
 
 movement.js - Movement:
   .getMoveCost(col, row, army) → float (99=impassable)
@@ -148,54 +163,125 @@ movement.js - Movement:
 production.js - Production:
   .getAvailableUnits(city) → UnitType[] (based on city income)
   .setProduction(city, unitTypeId) → bool
-  .processProduction(playerId) - collects income, pays upkeep, produces units
+  .processProduction(playerId) - collects income, pays upkeep, auto-disbands if bankrupt, produces units
   .buyHero(playerId) → bool (costs 15 gold, max 3 heroes)
 
 heroes.js - Heroes:
   .searchRuin(army, ruin) → {type, message, item?, amount?, unitType?}
+    Always finds something: 25% item, 20% ally, 25% gold(12-35), 15% gold(3-10), 15% XP(2-5)
 
 ai.js - AI:
   .takeTurn(playerId) - full AI turn (production + movement + combat)
   ._manageProduction(playerId) - sets production for unset cities
   ._pickProductionUnit(available, playerId) → UnitType
-  ._moveArmies(playerId) - moves all armies toward targets
+  ._moveArmies(playerId) - moves all armies toward targets, always fights on contact
   ._findTarget(army, playerId) → {col,row}|null (priority: weak enemies > neutral cities > enemy cities > ruins)
 
 turns.js - Turns:
-  .endTurn() - processes production, advances to next player
-  .startGame(numPlayers, humanPlayers) - initializes everything
+  .endTurn() - processes production, processes scouts, advances to next player
+  ._nextPlayer() - cycles with safety check, victory check, shows turn banner for humans
+  ._processScouts(playerId) - auto-moves scout-mode armies toward unexplored tiles
+  ._findScoutTarget(army, playerId) → {col,row}|null (nearest unexplored passable tile)
+  .startGame(numPlayers, humanPlayers, mapType) - initializes everything
+
+animation.js - Animation:
+  .addMoveTween(army, fromCol, fromRow, toCol, toRow, duration) - queues smooth movement
+  .addShake(col, row, duration) - adds shake effect at tile
+  .isAnimating() → bool
+  .update() - advances all active tweens (called each frame)
+  .getTweenPos(army) → {col, row}|null (interpolated position)
+  .getShakeOffset(col, row) → {dx, dy} (current shake offset)
+
+audio.js - Audio:
+  .init() - creates Web Audio context
+  .playSelect() - army selection click
+  .playMove() - army movement step
+  .playCombat() - battle clash (3 metallic sounds)
+  .playVictory() - victory fanfare
+  .playCapture() - city capture ascending notes
+  .playTurnStart() - turn start notification
+  .playRuinFind() - ruin discovery ascending sine
+  .playError() - error descending square
+  .playPromotion() - promotion ascending sine fanfare
+  .toggle() → bool (returns new enabled state)
+
+savegame.js - SaveGame:
+  .MAX_SLOTS = 3
+  .save(slot) - saves full game state to localStorage
+  .load(slot) → bool - restores game state from localStorage
+  .getSlotInfo(slot) → {playerName, turn, date}|null
+  .deleteSave(slot)
+  .hasSave(slot) → bool
 
 renderer.js - Renderer:
   .canvas, .ctx - canvas elements
   .camX, .camY - camera position
+  .tileCache{} - terrain tile variants (4 per type for visual variety)
   .init(canvas) - setup canvas, build tile cache
   .resize() - resize canvas to parent
-  .render() - main render frame (terrain, armies, selection, fog)
+  ._buildTileCache() - generates 4 random variants per terrain type
+  ._getTileVariant(tileId, col, row) → canvas (deterministic variant by position)
+  .render() - main render frame (terrain variants, city labels, armies with colors,
+              waypoint paths, move paths, fog, selection highlight)
+  ._drawCityOnMap(ctx, sx, sy, col, row) - city with owner color + name label
+  ._drawArmy(ctx, sx, sy, army) - army with faction color border, symbol, count badge,
+              hero star, movement dots, enemy name label
+  ._drawPath(ctx, path, color?, dash?) - path line with destination marker
+  ._drawReachableTiles(ctx) - highlights reachable tiles (blue) and enemies (red)
   .screenToTile(sx,sy) → {col,row}
   .centerOn(col,row) - center camera on tile
   .clampCamera() - keep camera in bounds
 
 hud.js - HUD:
   .init() - cache DOM elements
-  .update() - refresh all HUD data
-  .showTileInfo(col,row) - show terrain/city info
-  .showArmyPanel(army) - show/hide army unit list
-  .showCityPanel(city) - show/hide city production panel
-  .showCombatResult(result) - show combat overlay
+  .update() - refresh all HUD data + factions legend + minimap
+  ._updateFactions() - renders color-coded faction list with city/army counts
+  .showTileInfo(col,row) - show terrain/city/army info with owner colors
+  .showArmyPanel(army) - show army with owner color, unit list, stats
+  .showCityPanel(city) - show/hide city production panel with build options
+  .showCombatResult(result) - show enhanced combat overlay (color-coded, side-by-side stats)
   .showRuinResult(result) - show ruin search overlay
   .closePanels() - hide all panels
 
 screens.js - Screens:
-  .showTitle() - show title/setup screen
-  .startGame(numPlayers, humanPlayers) - transition to game
-  .showGameOver() - show victory screen
+  ._bound - prevents duplicate event listeners
+  .showTitle() - show title/setup screen with load game slots
+  ._updateLoadSlots() - renders saved game buttons on title screen
+  .showSetup() - reads map size/type selects, starts game
+  .startGame(numPlayers, humanPlayers, mapType) - transition to game, resize canvas, init audio
+  .showGameOver() - show victory screen with fanfare
   .checkGameOver() → bool
+  .showTurnBanner(player) - full-screen turn announcement, auto-dismiss 1.5s, click to dismiss
 
 input.js - Input:
-  .init() - bind all event listeners
+  .pendingMerge - {source, target} for merge popup
+  .init() - bind all event listeners (mouse, touch, keyboard, buttons, merge, waypoint,
+            split, scout, save, sound, promotion, minimap drag)
+  ._handleClick(col, row) - main click handler:
+    - Click own army: select it (with Audio.playSelect), show waypoint banner if has one
+    - Click friendly army with selection: show merge popup if fits, else set waypoint
+    - Click enemy/empty: move/attack, set waypoint if destination out of reach
+  ._handleMoveResult(result, army, col, row) - processes movement outcomes with Audio:
+    - combat: Audio.playCombat(), resolve, show promotions if any, Audio.playCapture() on city capture
+    - ruin: Audio.playRuinFind(), search ruin
+    - merged: Audio.playSelect()
+    - moved: Audio.playMove()
+  ._showMergePopup(source, target) - shows combine armies confirmation dialog
+  ._confirmMerge() - moves source to target, combines units
+  ._cancelMerge() - dismisses merge popup
+  ._showWaypointBanner(army) - shows top banner with continue/cancel
+  ._continueWaypoint() - recalculates path, moves army toward waypoint
+  ._cancelWaypoint() - clears waypoint for selected army
+  ._showSplitPanel() - shows unit selection checkboxes for splitting army
+  ._confirmSplit() - creates new army with selected units on adjacent tile
+  ._cancelSplit() - dismisses split panel
+  ._toggleScout() - toggles scout mode on selected army (auto-explore each turn end)
+  ._showSavePanel() - shows save/delete slots with current game info
+  ._showPromotions(promotions) - shows promotion overlay with Audio.playPromotion()
+  ._onMinimapDown(e) / _minimapDragging - click+drag minimap scrolling
   Mouse: click to select/move, right-drag to pan, wheel to scroll
-  Touch: tap to select/move, drag to pan
-  Keys: WASD=scroll, N=next army, E=end turn, H=hire hero, Space=skip, Esc=deselect
+  Touch: tap to select/move, drag to pan (8px threshold)
+  Keys: WASD=scroll, N=next army, E=end turn, H=hire hero, Space=skip, Esc=deselect+close
 
 ui.js - UI:
   .init() - initialize HUD + Input
@@ -207,14 +293,29 @@ main.js - Game:
   ._loop() - requestAnimationFrame render loop
 
 GAMEPLAY NOTES:
-- 40x30 tile map, procedurally generated each game
-- 4-8 factions, each starts with 1 capital city + 1 hero army
-- Neutral cities have light infantry garrisons
+- Configurable map sizes (small 30x20, medium 40x30, large 55x40, huge 70x50)
+- Map types: continents, islands, pangaea, archipelago (different water thresholds)
+- 2-8 factions, each with distinct color (shown on armies, cities, and faction legend)
+- Each faction starts with 1 capital city + 1 hero army
+- Neutral cities/armies shown in grey (#888)
 - Cities produce units over multiple turns, cost gold
 - Armies are stacks of up to 8 units, move at slowest unit speed
-- Heroes can search ruins for items, gold, or allies
+- Army splitting: select units to split into new army on adjacent tile
+- Clicking friendly army with selection shows "Combine Armies?" popup
+- If target out of reach, waypoint is set - path shown on map, banner shows continue/cancel
+- Scout mode: toggle on player armies to auto-explore toward unexplored tiles each turn end
+- Heroes can search ruins - always finds something: items, allies, gold, or XP
 - Combat is multi-round, each unit attacks random enemy per round
+- Units gain XP from combat; winners get 2 XP, losers get 1 XP
+- Unit promotions: when XP threshold met, units gain stat bonuses (shown with * in panel)
 - Terrain gives defense bonuses in combat
 - Fog of war reveals 3-tile radius around armies/cities
-- AI targets: weak enemies > neutral cities > enemy cities > ruins
+- AI targets: weak enemies > neutral cities > enemy cities > ruins; always fights on contact
+- Negative gold triggers bankruptcy warning; deep debt auto-disbands weakest army
 - Victory: eliminate all other factions (no cities + no armies)
+- Save/load: 3 localStorage slots, saves all game state including fog and waypoints
+- Sound effects: procedural Web Audio API tones for select, move, combat, capture, ruin, promotion, etc.
+- Smooth animated army movement with tweened tile transitions
+- Full-screen turn banner announcement with auto-dismiss
+- Responsive: mobile uses bottom panel layout, larger touch targets, no keyboard shortcuts shown
+- Tile rendering uses 4 random variants per terrain type with deterministic selection by position

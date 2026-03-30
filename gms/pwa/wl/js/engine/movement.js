@@ -106,10 +106,15 @@ const Movement = {
                 break; // Can't merge, stack full
             }
 
+            const prevCol = army.col;
+            const prevRow = army.row;
             army.col = step.col;
             army.row = step.row;
             army.movesLeft = Math.max(0, army.movesLeft - cost);
             GameState.revealAround(army.owner, army.col, army.row);
+
+            // Add move animation
+            Animation.addMoveTween(army, prevCol, prevRow, step.col, step.row, 120);
 
             // Check for ruin
             const ruin = GameState.getRuinAt(step.col, step.row);
