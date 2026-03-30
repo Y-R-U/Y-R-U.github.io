@@ -68,6 +68,12 @@
                 </div>
             </div>
 
+            <!-- Factions Legend -->
+            <div class="panel-section" id="factions-panel">
+                <h3>Factions</h3>
+                <div id="factions-list"></div>
+            </div>
+
             <!-- Tile Info -->
             <div class="panel-section">
                 <h3>Terrain</h3>
@@ -145,6 +151,23 @@
         <h3 style="color:var(--gold);margin-bottom:0.5rem">Ancient Ruins</h3>
         <div id="ruin-message"></div>
         <button id="ruin-ok" class="btn btn-primary">OK</button>
+    </div>
+
+    <!-- Merge Armies Overlay -->
+    <div id="merge-panel" class="hidden">
+        <h3 style="color:var(--accent);margin-bottom:0.5rem">Combine Armies?</h3>
+        <div id="merge-details"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button id="merge-yes" class="btn btn-primary" style="flex:1">Combine</button>
+            <button id="merge-no" class="btn" style="flex:1">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Waypoint Banner -->
+    <div id="waypoint-banner" class="hidden">
+        <span id="waypoint-text"></span>
+        <button id="waypoint-continue" class="btn btn-sm">Continue</button>
+        <button id="waypoint-cancel" class="btn btn-sm btn-danger">Cancel</button>
     </div>
 
     <!-- Game Over Screen -->

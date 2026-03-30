@@ -16,6 +16,7 @@ const GameState = {
     combatResult: null,
     winner: null,
     messages: [],
+    waypoints: {}, // armyId -> { targetCol, targetRow, path }
 
     init(numPlayers, humanPlayers) {
         this.turn = 1;
@@ -27,6 +28,7 @@ const GameState = {
         this.winner = null;
         this.armies = [];
         this.messages = [];
+        this.waypoints = {};
 
         // Generate map
         const map = MapGen.generate(numPlayers);
@@ -171,10 +173,33 @@ const GameState = {
 
     eliminatePlayer(playerId) {
         this.players[playerId].alive = false;
+        // Remove armies
+        this.armies = this.armies.filter(a => a.owner !== playerId);
         // Transfer cities to neutral
         for (const city of this.cities) {
             if (city.owner === playerId) city.owner = -1;
         }
         this.addMessage(`${this.players[playerId].name} has been eliminated!`);
+    },
+
+    setWaypoint(armyId, targetCol, targetRow, path) {
+        this.waypoints[armyId] = { targetCol, targetRow, path };
+    },
+
+    getWaypoint(armyId) {
+        return this.waypoints[armyId] || null;
+    },
+
+    clearWaypoint(armyId) {
+        delete this.waypoints[armyId];
+    },
+
+    clearAllWaypoints(playerId) {
+        for (const id of Object.keys(this.waypoints)) {
+            const army = this.armies.find(a => a.id === parseInt(id));
+            if (army && army.owner === playerId) {
+                delete this.waypoints[id];
+            }
+        }
     },
 };

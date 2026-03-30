@@ -45,7 +45,7 @@ const Combat = {
             }
         }
 
-        result.winner = atkUnits.length > 0 ? 'attacker' : 'defender';
+        result.winner = atkUnits.length > 0 ? 'attacker' : (defUnits.length > 0 ? 'defender' : 'attacker');
         return result;
     },
 

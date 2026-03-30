@@ -183,6 +183,41 @@ html, body {
     color: var(--gold);
 }
 
+/* Factions Legend */
+.faction-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.1rem 0;
+    font-size: 0.75rem;
+}
+
+.faction-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.faction-name {
+    flex: 1;
+}
+
+.faction-stats {
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    font-family: monospace;
+}
+
+.faction-dead {
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+
+.faction-you {
+    font-weight: 700;
+}
+
 /* Tile Info */
 #tile-info {
     font-size: 0.8rem;
@@ -385,6 +420,81 @@ html, body {
     margin-top: 1.5rem;
 }
 
+/* Merge Panel */
+#merge-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-panel);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 320px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+#merge-details {
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.merge-army-info {
+    background: var(--bg-panel-alt);
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin: 0.4rem 0;
+}
+
+.merge-army-info .army-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.merge-army-info .army-units-list {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.btn-sm {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
+}
+
+.btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn-danger:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+/* Waypoint Banner */
+#waypoint-banner {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 50;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+#waypoint-text {
+    color: var(--text-primary);
+}
+
 /* Hidden */
 .hidden {
     display: none !important;
@@ -432,24 +542,69 @@ html, body {
     #title-screen h1 {
         font-size: 2.5rem;
     }
+
+    .action-buttons .btn {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     #game-screen {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
 
     #side-panel {
         width: 100%;
-        height: 180px;
+        height: auto;
+        max-height: 40vh;
         border-left: none;
         border-top: 1px solid var(--border-color);
-        flex-direction: row;
-        flex-wrap: wrap;
-        overflow-x: auto;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    #canvas-container {
+        flex: 1;
+        min-height: 50vh;
     }
 
     .panel-section {
-        min-width: 150px;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 100px;
+        padding: 0.7rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .shortcuts {
+        display: none;
+    }
+
+    #minimap {
+        height: 70px;
+    }
+
+    #title-screen h1 {
+        font-size: 2rem;
+    }
+
+    .setup-panel {
+        min-width: auto;
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    #combat-panel, #ruin-panel, #merge-panel {
+        width: 90%;
+        min-width: auto;
     }
 }

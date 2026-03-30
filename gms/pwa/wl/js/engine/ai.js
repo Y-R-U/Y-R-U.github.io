@@ -23,7 +23,6 @@ const AI = {
         for (const city of cities) {
             if (city.production === null) {
                 const available = Production.getAvailableUnits(city);
-                // Prefer a mix: some fast units, some strong
                 const weighted = this._pickProductionUnit(available, playerId);
                 Production.setProduction(city, weighted.id);
             }
@@ -34,20 +33,16 @@ const AI = {
         const armies = GameState.getPlayerArmies(playerId);
         const totalUnits = armies.reduce((s, a) => s + a.units.length, 0);
 
-        // Early game: cheap units
         if (totalUnits < 8) {
             const cheap = available.filter(u => u.cost <= 4);
             return Utils.pick(cheap.length > 0 ? cheap : available);
         }
 
-        // Mid/late game: mix of strong and fast
         if (Math.random() < 0.3) {
-            // Fast units for expansion
             const fast = available.filter(u => u.moves >= 4);
             if (fast.length > 0) return Utils.pick(fast);
         }
         if (Math.random() < 0.4) {
-            // Strong units
             const strong = available.filter(u => u.str >= 5);
             if (strong.length > 0) return Utils.pick(strong);
         }
@@ -58,7 +53,7 @@ const AI = {
         const armies = [...GameState.getPlayerArmies(playerId)];
 
         for (const army of armies) {
-            if (!GameState.armies.includes(army)) continue; // May have been removed
+            if (!GameState.armies.includes(army)) continue;
             if (army.movesLeft <= 0) continue;
 
             const target = this._findTarget(army, playerId);
@@ -69,17 +64,13 @@ const AI = {
 
             const result = Movement.moveArmy(army, path);
             if (result && result.type === 'combat') {
+                // Always fight when movement triggers combat (movement cost already spent)
                 const terrain = GameState.tiles[result.defender.row][result.defender.col];
-                // Only attack if we have reasonable odds
-                const atkStr = Units.armyStrength(result.attacker);
-                const defStr = Units.armyStrength(result.defender);
-                if (atkStr >= defStr * 0.7) {
-                    const combatResult = Combat.resolve(result.attacker, result.defender, terrain);
-                    Combat.applyCombatResult(combatResult);
-                    GameState.addMessage(
-                        `${GameState.players[playerId].name} attacks at (${result.col},${result.row})!`
-                    );
-                }
+                const combatResult = Combat.resolve(result.attacker, result.defender, terrain);
+                Combat.applyCombatResult(combatResult);
+                GameState.addMessage(
+                    `${GameState.players[playerId].name} attacks at (${result.col},${result.row})!`
+                );
             } else if (result && result.type === 'ruin') {
                 const searchResult = Heroes.searchRuin(result.army, result.ruin);
                 if (searchResult.message) {
@@ -91,13 +82,13 @@ const AI = {
 
     _findTarget(army, playerId) {
         const targets = [];
+        const myStr = Units.armyStrength(army);
 
         // Priority 1: Nearby weak enemy armies
         for (const enemy of GameState.armies) {
-            if (enemy.owner === playerId || enemy.owner === -1) continue;
+            if (enemy.owner === playerId) continue;
             const d = Utils.dist(army.col, army.row, enemy.col, enemy.row);
             if (d <= 8) {
-                const myStr = Units.armyStrength(army);
                 const theirStr = Units.armyStrength(enemy);
                 if (myStr >= theirStr * 0.8) {
                     targets.push({ col: enemy.col, row: enemy.row, priority: 10 - d });
@@ -138,7 +129,6 @@ const AI = {
         }
 
         if (targets.length === 0) {
-            // Wander towards center or nearest enemy city
             const enemyCities = GameState.cities.filter(c => c.owner >= 0 && c.owner !== playerId);
             if (enemyCities.length > 0) {
                 const nearest = enemyCities.reduce((best, c) => {
@@ -156,4 +146,3 @@ const AI = {
         return targets[0];
     },
 };
-

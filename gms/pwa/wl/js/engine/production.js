@@ -35,6 +35,21 @@ const Production = {
         const upkeep = armies.length;
         player.gold += income - upkeep;
 
+        // Warn if gold is negative
+        if (player.gold < 0) {
+            GameState.addMessage(`${player.name}: Treasury bankrupt! (${player.gold}g)`);
+            // Auto-disband weakest army if deeply in debt
+            if (player.gold < -10 && armies.length > 1) {
+                const weakest = armies.reduce((w, a) =>
+                    Units.armyStrength(a) < Units.armyStrength(w) ? a : w);
+                if (!Units.armyHasHero(weakest)) {
+                    GameState.removeArmy(weakest);
+                    player.gold += 5;
+                    GameState.addMessage(`${player.name}: Army disbanded due to bankruptcy`);
+                }
+            }
+        }
+
         // Process city production
         for (const city of cities) {
             if (city.production === null) continue;

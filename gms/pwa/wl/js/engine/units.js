@@ -38,6 +38,7 @@ const Units = {
     },
 
     armyMoves(army) {
+        if (!army.units || army.units.length === 0) return 0;
         // Army moves at speed of slowest unit
         let minMoves = Infinity;
         let hasFlying = false;

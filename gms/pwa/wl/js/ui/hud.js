@@ -25,6 +25,7 @@ const HUD = {
             ruinPanel: document.getElementById('ruin-panel'),
             ruinMessage: document.getElementById('ruin-message'),
             minimap: document.getElementById('minimap'),
+            factionsList: document.getElementById('factions-list'),
         };
     },
 
@@ -39,27 +40,56 @@ const HUD = {
         this.elements.cityCount.textContent = GameState.getPlayerCities(p.id).length;
         this.elements.armyCount.textContent = GameState.getPlayerArmies(p.id).length;
 
+        this._updateFactions();
         this._updateMessages();
         this._updateMinimap();
     },
 
+    _updateFactions() {
+        const list = document.getElementById('factions-list');
+        if (!list) return;
+        const pid = GameState.currentPlayer;
+        list.innerHTML = GameState.players.map(p => {
+            const cities = GameState.getPlayerCities(p.id).length;
+            const armies = GameState.getPlayerArmies(p.id).length;
+            const deadClass = !p.alive ? ' faction-dead' : '';
+            const youClass = p.id === pid ? ' faction-you' : '';
+            const youTag = p.id === pid ? ' (You)' : (p.isHuman ? ' (Human)' : '');
+            return `<div class="faction-row${deadClass}">
+                <div class="faction-dot" style="background:${p.color.primary}"></div>
+                <span class="faction-name${youClass}">${p.name}${youTag}</span>
+                <span class="faction-stats">${cities}c ${armies}a</span>
+            </div>`;
+        }).join('');
+    },
+
     showTileInfo(col, row) {
         if (!Utils.inBounds(col, row)) {
-            this.elements.tileInfo.textContent = '';
+            this.elements.tileInfo.innerHTML = '';
             return;
         }
         const terrain = TERRAIN_BY_ID[GameState.tiles[row][col]];
         const city = GameState.getCityAt(col, row);
         const ruin = GameState.getRuinAt(col, row);
-        let text = `${terrain.name} (${col},${row})`;
+        const army = GameState.getArmyAt(col, row);
+
+        let html = `${terrain.name} (${col},${row})`;
+        if (terrain.defense > 0) html += ` Def+${terrain.defense}`;
+
         if (city) {
-            const owner = city.owner >= 0 ? GameState.players[city.owner].name : 'Neutral';
-            text = `${city.name} [${owner}] Income: ${city.income}`;
+            const ownerColor = city.owner >= 0 ? GameState.players[city.owner].color.primary : '#888';
+            const ownerName = city.owner >= 0 ? GameState.players[city.owner].name : 'Neutral';
+            html = `<strong>${city.name}</strong> <span style="color:${ownerColor}">[${ownerName}]</span> Income:${city.income}`;
         }
         if (ruin) {
-            text += ruin.searched ? ' (Explored)' : ' (Unexplored)';
+            html += ruin.searched ? ' <span style="color:var(--text-secondary)">(Explored)</span>' : ' <span style="color:var(--gold)">(Unexplored!)</span>';
         }
-        this.elements.tileInfo.textContent = text;
+        if (army) {
+            const armyColor = army.owner >= 0 ? GameState.players[army.owner].color.primary : '#888';
+            const armyOwner = army.owner >= 0 ? GameState.players[army.owner].name : 'Neutral';
+            html += ` <span style="color:${armyColor}"> | ${armyOwner} army (${army.units.length})</span>`;
+        }
+        this.elements.tileInfo.innerHTML = html;
     },
 
     showArmyPanel(army) {
@@ -69,14 +99,17 @@ const HUD = {
         }
 
         this.elements.armyPanel.classList.remove('hidden');
-        const html = army.units.map(u => {
-            const type = UNIT_TYPE_BY_ID[u.typeId];
+        const ownerColor = army.owner >= 0 ? GameState.players[army.owner].color.primary : '#888';
+        const ownerName = army.owner >= 0 ? GameState.players[army.owner].name : 'Neutral';
+
+        let html = `<div style="color:${ownerColor};font-weight:600;font-size:0.8rem;margin-bottom:0.3rem">${ownerName}'s Army</div>`;
+        html += army.units.map(u => {
             const str = Units.getEffectiveStr(u);
             const moves = Units.getEffectiveMoves(u);
             const items = u.items.length > 0 ? ` [${u.items.map(i => i.name).join(', ')}]` : '';
             const lvl = u.level > 1 ? ` Lv${u.level}` : '';
             return `<div class="unit-row">
-                <span class="unit-symbol">${u.symbol}</span>
+                <span class="unit-symbol" style="border-left:3px solid ${ownerColor}">${u.symbol}</span>
                 <span class="unit-name">${u.name}${lvl}</span>
                 <span class="unit-stats">S:${str} M:${moves}${items}</span>
             </div>`;
@@ -84,7 +117,6 @@ const HUD = {
 
         this.elements.armyUnits.innerHTML = html;
 
-        // Show total strength and moves
         const totalStr = Units.armyStrength(army);
         const movesLeft = army.movesLeft;
         this.elements.armyUnits.innerHTML += `
@@ -135,22 +167,38 @@ const HUD = {
 
     showCombatResult(result) {
         this.elements.combatPanel.classList.remove('hidden');
-        const winner = result.winner === 'attacker' ? 'Attacker' : 'Defender';
-        const atkName = result.attacker.owner >= 0
-            ? GameState.players[result.attacker.owner].name
-            : 'Neutral';
-        const defName = result.defender.owner >= 0
-            ? GameState.players[result.defender.owner].name
-            : 'Neutral';
+        const winnerLabel = result.winner === 'attacker' ? 'Attacker wins!' : 'Defender wins!';
+        const atkOwner = result.attacker.owner;
+        const defOwner = result.defender.owner;
+        const atkName = atkOwner >= 0 ? GameState.players[atkOwner].name : 'Neutral';
+        const defName = defOwner >= 0 ? GameState.players[defOwner].name : 'Neutral';
+        const atkColor = atkOwner >= 0 ? GameState.players[atkOwner].color.primary : '#888';
+        const defColor = defOwner >= 0 ? GameState.players[defOwner].color.primary : '#888';
+
+        const atkSurvivors = result.attacker.units.length;
+        const defSurvivors = result.defender.units.length;
 
         this.elements.combatDetails.innerHTML = `
-            <div class="combat-header">${atkName} vs ${defName}</div>
-            <div>Attacker Strength: ${result.atkStrength}</div>
-            <div>Defender Strength: ${result.defStrength}</div>
-            <div>Rounds: ${result.rounds.length}</div>
-            <div>Attacker Losses: ${result.atkLosses.length}</div>
-            <div>Defender Losses: ${result.defLosses.length}</div>
-            <div class="combat-winner">${winner} wins!</div>
+            <div class="combat-header">Battle!</div>
+            <div style="display:flex;gap:1rem;margin:0.5rem 0">
+                <div style="flex:1;text-align:center">
+                    <div style="color:${atkColor};font-weight:700;font-size:0.9rem">${atkName}</div>
+                    <div style="font-size:2rem;font-weight:700">${result.atkStrength}</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary)">strength</div>
+                    <div style="color:var(--danger);font-size:0.8rem;margin-top:0.3rem">-${result.atkLosses.length} lost</div>
+                    <div style="color:var(--success);font-size:0.8rem">${atkSurvivors} survived</div>
+                </div>
+                <div style="display:flex;align-items:center;color:var(--text-secondary);font-size:1.2rem">vs</div>
+                <div style="flex:1;text-align:center">
+                    <div style="color:${defColor};font-weight:700;font-size:0.9rem">${defName}</div>
+                    <div style="font-size:2rem;font-weight:700">${result.defStrength}</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary)">strength</div>
+                    <div style="color:var(--danger);font-size:0.8rem;margin-top:0.3rem">-${result.defLosses.length} lost</div>
+                    <div style="color:var(--success);font-size:0.8rem">${defSurvivors} survived</div>
+                </div>
+            </div>
+            <div style="text-align:center;font-size:0.8rem;color:var(--text-secondary)">${result.rounds.length} rounds of combat</div>
+            <div class="combat-winner">${winnerLabel}</div>
         `;
     },
 
