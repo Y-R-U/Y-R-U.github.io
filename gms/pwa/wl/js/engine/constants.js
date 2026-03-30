@@ -1,13 +1,26 @@
 // constants.js - Game constants and configuration
 'use strict';
 
-const TILE_SIZE = 48;
-const MAP_COLS = 40;
-const MAP_ROWS = 30;
+let TILE_SIZE = 48;
+let MAP_COLS = 40;
+let MAP_ROWS = 30;
 const MAX_STACK_SIZE = 8;
 const MAX_PLAYERS = 8;
 const FOG_REVEAL_RADIUS = 3;
-const HERO_SEARCH_CHANCE = 0.4;
+
+const MAP_SIZES = {
+    small:  { cols: 30, rows: 22, label: 'Small (30x22)' },
+    medium: { cols: 40, rows: 30, label: 'Medium (40x30)' },
+    large:  { cols: 56, rows: 40, label: 'Large (56x40)' },
+    huge:   { cols: 72, rows: 50, label: 'Huge (72x50)' },
+};
+
+const MAP_TYPES = {
+    continents: { label: 'Continents', waterChance: 0.22 },
+    islands:    { label: 'Islands',    waterChance: 0.35 },
+    pangaea:    { label: 'Pangaea',    waterChance: 0.12 },
+    archipelago:{ label: 'Archipelago',waterChance: 0.45 },
+};
 
 const TERRAIN = {
     GRASS:    { id: 0, name: 'Grass',    color: '#4a8c3f', moveCost: 1, defense: 0 },
@@ -42,6 +55,21 @@ const UNIT_TYPES = {
 const UNIT_TYPE_BY_ID = {};
 Object.values(UNIT_TYPES).forEach(u => UNIT_TYPE_BY_ID[u.id] = u);
 
+// Promotion: when a unit reaches the required XP, it can promote to an elite version
+const PROMOTIONS = {
+    0:  { name: 'Veteran Infantry',  strBonus: 1, movesBonus: 0, xpRequired: 6 },
+    1:  { name: 'Elite Infantry',    strBonus: 2, movesBonus: 0, xpRequired: 6 },
+    2:  { name: 'Knight',            strBonus: 1, movesBonus: 1, xpRequired: 5 },
+    3:  { name: 'Elf Lord',          strBonus: 2, movesBonus: 0, xpRequired: 5 },
+    4:  { name: 'Dwarf Champion',    strBonus: 2, movesBonus: 0, xpRequired: 6 },
+    5:  { name: 'Dire Wolves',       strBonus: 1, movesBonus: 1, xpRequired: 4 },
+    6:  { name: 'Titan',             strBonus: 2, movesBonus: 0, xpRequired: 8 },
+    7:  { name: 'Royal Griffins',    strBonus: 2, movesBonus: 0, xpRequired: 7 },
+    8:  { name: 'Death Knights',     strBonus: 2, movesBonus: 1, xpRequired: 5 },
+    9:  { name: 'Elder Dragon',      strBonus: 3, movesBonus: 0, xpRequired: 10 },
+    10: { name: 'Legendary Hero',    strBonus: 2, movesBonus: 1, xpRequired: 8 },
+};
+
 const PLAYER_COLORS = [
     { name: 'Sirians',      primary: '#3366cc', secondary: '#5588ee', banner: '#2244aa' },
     { name: 'Storm Giants',  primary: '#cc3333', secondary: '#ee5555', banner: '#aa2222' },
@@ -64,8 +92,6 @@ const ITEMS = [
     { name: 'Boots of Speed',    strBonus: 0, movesBonus: 2 },
 ];
 
-const RUIN_REWARDS = ['item', 'gold', 'ally', 'nothing', 'nothing'];
-
 const CITY_NAMES = [
     'Dorvale', 'Stormheim', 'Greyrock', 'Korhold', 'Elvenhall',
     'Selentia', 'Horsegate', 'Darkspire', 'Ironforge', 'Greendale',
@@ -74,4 +100,6 @@ const CITY_NAMES = [
     'Eaglepeak', 'Wolfrun', 'Thornwall', 'Misthollow', 'Sunridge',
     'Frostdale', 'Ember Keep', 'Crystal Bay', 'Raven Rock', 'Silver Falls',
     'Dragon Roost', 'Moonhaven', 'Thunder Peak', 'Iron Gate', 'Ashford',
+    'Windhelm', 'Oakshire', 'Redfort', 'Bluewater', 'Greenholm',
+    'Darkwood', 'Goldshire', 'Silverpine', 'Ashvale', 'Stonebridge',
 ];

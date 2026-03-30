@@ -238,6 +238,7 @@ const Renderer = {
         if (GameState.phase === 'setup') return;
 
         this.animFrame++;
+        Animation.update();
 
         // Calculate visible tiles
         const startCol = Math.max(0, Math.floor(this.camX / TILE_SIZE));
@@ -301,14 +302,21 @@ const Renderer = {
             this._drawPath(ctx, GameState.movePath, 'rgba(255,255,100,0.7)', [4, 4]);
         }
 
-        // Draw armies
+        // Draw armies (with animation support)
         for (const army of GameState.armies) {
-            if (isHuman && !GameState.isVisible(pid, army.col, army.row)) continue;
-            if (army.col < startCol - 1 || army.col > endCol + 1) continue;
-            if (army.row < startRow - 1 || army.row > endRow + 1) continue;
+            // Check for tweened position
+            const tweenPos = Animation.getTweenPos(army);
+            const drawCol = tweenPos ? tweenPos.col : army.col;
+            const drawRow = tweenPos ? tweenPos.row : army.row;
 
-            const sx = army.col * TILE_SIZE - this.camX;
-            const sy = army.row * TILE_SIZE - this.camY;
+            if (isHuman && !GameState.isVisible(pid, army.col, army.row)) continue;
+            if (drawCol < startCol - 2 || drawCol > endCol + 2) continue;
+            if (drawRow < startRow - 2 || drawRow > endRow + 2) continue;
+
+            // Apply shake offset
+            const shake = Animation.getShakeOffset(army.col, army.row);
+            const sx = drawCol * TILE_SIZE - this.camX + shake.x;
+            const sy = drawRow * TILE_SIZE - this.camY + shake.y;
             this._drawArmy(ctx, sx, sy, army);
         }
 

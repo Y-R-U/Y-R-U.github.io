@@ -93,14 +93,17 @@ const HUD = {
     },
 
     showArmyPanel(army) {
+        const actionsDiv = document.getElementById('army-actions');
         if (!army) {
             this.elements.armyPanel.classList.add('hidden');
+            if (actionsDiv) actionsDiv.classList.add('hidden');
             return;
         }
 
         this.elements.armyPanel.classList.remove('hidden');
         const ownerColor = army.owner >= 0 ? GameState.players[army.owner].color.primary : '#888';
         const ownerName = army.owner >= 0 ? GameState.players[army.owner].name : 'Neutral';
+        const isOwn = army.owner === GameState.currentPlayer;
 
         let html = `<div style="color:${ownerColor};font-weight:600;font-size:0.8rem;margin-bottom:0.3rem">${ownerName}'s Army</div>`;
         html += army.units.map(u => {
@@ -108,9 +111,10 @@ const HUD = {
             const moves = Units.getEffectiveMoves(u);
             const items = u.items.length > 0 ? ` [${u.items.map(i => i.name).join(', ')}]` : '';
             const lvl = u.level > 1 ? ` Lv${u.level}` : '';
+            const promo = u.promoted ? ' *' : '';
             return `<div class="unit-row">
                 <span class="unit-symbol" style="border-left:3px solid ${ownerColor}">${u.symbol}</span>
-                <span class="unit-name">${u.name}${lvl}</span>
+                <span class="unit-name">${u.name}${lvl}${promo}</span>
                 <span class="unit-stats">S:${str} M:${moves}${items}</span>
             </div>`;
         }).join('');
@@ -119,10 +123,25 @@ const HUD = {
 
         const totalStr = Units.armyStrength(army);
         const movesLeft = army.movesLeft;
+        const scoutLabel = army.scouting ? ' | Scouting' : '';
         this.elements.armyUnits.innerHTML += `
             <div class="army-summary">
-                Total Str: ${totalStr} | Moves: ${movesLeft.toFixed(1)}
+                Total Str: ${totalStr} | Moves: ${movesLeft.toFixed(1)}${scoutLabel}
             </div>`;
+
+        // Show/hide army action buttons for own armies
+        if (actionsDiv) {
+            if (isOwn) {
+                actionsDiv.classList.remove('hidden');
+                actionsDiv.style.display = 'flex';
+                const scoutBtn = document.getElementById('btn-scout-toggle');
+                if (scoutBtn) {
+                    scoutBtn.textContent = army.scouting ? 'Unscout' : 'Scout';
+                }
+            } else {
+                actionsDiv.classList.add('hidden');
+            }
+        }
     },
 
     showCityPanel(city) {

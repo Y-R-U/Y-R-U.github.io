@@ -103,11 +103,18 @@ const Combat = {
             Units.removeFromArmy(defender, id);
         }
 
-        // Give XP to surviving units
+        // Give XP to surviving units and check promotions
+        result.promotions = [];
         const xpAmount = result.winner === 'attacker' ? 2 : 1;
         const winners = result.winner === 'attacker' ? attacker.units : defender.units;
         for (const unit of winners) {
             Units.gainXP(unit, xpAmount);
+            const promo = Units.checkPromotion(unit);
+            if (promo && Units.applyPromotion(unit)) {
+                result.promotions.push({ unitName: promo.name, owner: unit.owner });
+                const ownerName = unit.owner >= 0 ? GameState.players[unit.owner].name : 'Neutral';
+                GameState.addMessage(`${ownerName}: ${unit.name} promoted!`);
+            }
         }
 
         if (result.winner === 'attacker') {

@@ -2,7 +2,7 @@
 'use strict';
 
 const MapGen = {
-    generate(numPlayers) {
+    generate(numPlayers, mapType) {
         const tiles = [];
         for (let r = 0; r < MAP_ROWS; r++) {
             tiles[r] = [];
@@ -10,23 +10,27 @@ const MapGen = {
                 tiles[r][c] = TERRAIN.GRASS.id;
             }
         }
-        this._generateTerrain(tiles);
+        this._generateTerrain(tiles, mapType);
         const cities = this._placeCities(tiles, numPlayers);
         const ruins = this._placeRuins(tiles, cities);
         this._placeRoads(tiles, cities);
         return { tiles, cities, ruins };
     },
 
-    _generateTerrain(tiles) {
-        // Use simplex-like noise via multiple octaves of random blobs
-        const heightMap = this._noiseMap(MAP_COLS, MAP_ROWS, 6);
-        const moistureMap = this._noiseMap(MAP_COLS, MAP_ROWS, 5);
+    _generateTerrain(tiles, mapType) {
+        const mapTypeConfig = MAP_TYPES[mapType] || MAP_TYPES.continents;
+        const waterThreshold = mapTypeConfig.waterChance;
+
+        // Scale blobs with map size
+        const blobCount = Math.max(6, Math.floor(MAP_COLS * MAP_ROWS / 150));
+        const heightMap = this._noiseMap(MAP_COLS, MAP_ROWS, blobCount);
+        const moistureMap = this._noiseMap(MAP_COLS, MAP_ROWS, Math.floor(blobCount * 0.8));
 
         for (let r = 0; r < MAP_ROWS; r++) {
             for (let c = 0; c < MAP_COLS; c++) {
                 const h = heightMap[r][c];
                 const m = moistureMap[r][c];
-                if (h < 0.2) {
+                if (h < waterThreshold) {
                     tiles[r][c] = TERRAIN.WATER.id;
                 } else if (h < 0.3) {
                     tiles[r][c] = m > 0.6 ? TERRAIN.SWAMP.id : TERRAIN.GRASS.id;
@@ -229,7 +233,7 @@ const MapGen = {
                     col: c,
                     row: r,
                     searched: false,
-                    reward: Utils.pick(RUIN_REWARDS),
+                    reward: null, // Rolled dynamically when searched
                 });
                 break;
             }

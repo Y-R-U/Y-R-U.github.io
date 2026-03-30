@@ -8,6 +8,9 @@ const Turns = {
         // Process production for current player
         Production.processProduction(pid);
 
+        // Process scout mode armies
+        this._processScouts(pid);
+
         // Move to next player
         this._nextPlayer();
     },
@@ -25,7 +28,7 @@ const Turns = {
                 GameState.turn++;
             }
             checks++;
-            if (checks > GameState.players.length) break; // Safety
+            if (checks > GameState.players.length) break;
         } while (!GameState.players[next].alive);
 
         GameState.currentPlayer = next;
@@ -42,7 +45,6 @@ const Turns = {
         // If AI player, take turn automatically
         if (!currentPlayer.isHuman) {
             AI.takeTurn(next);
-            // Chain to next player after short delay for visual feedback
             if (GameState.phase !== 'gameover') {
                 setTimeout(() => this.endTurn(), 200);
             }
@@ -54,11 +56,63 @@ const Turns = {
                 UI.centerOnPlayer(next);
                 UI.update();
             }
+            if (typeof Screens !== 'undefined') {
+                Screens.showTurnBanner(currentPlayer);
+            }
         }
     },
 
-    startGame(numPlayers, humanPlayers) {
-        GameState.init(numPlayers, humanPlayers);
+    _processScouts(playerId) {
+        // Move scout-mode armies toward unexplored territory
+        const scouts = GameState.getPlayerArmies(playerId).filter(a => a.scouting);
+        for (const army of scouts) {
+            if (army.movesLeft <= 0) continue;
+            if (!GameState.armies.includes(army)) continue;
+
+            const target = this._findScoutTarget(army, playerId);
+            if (!target) {
+                army.scouting = false;
+                GameState.addMessage('Scout found nothing new to explore.');
+                continue;
+            }
+
+            const path = Movement.findPath(army, army.col, army.row, target.col, target.row);
+            if (path && path.length >= 2) {
+                const result = Movement.moveArmy(army, path);
+                if (result && result.type === 'combat') {
+                    // Auto-fight for scouts
+                    const terrain = GameState.tiles[result.defender.row][result.defender.col];
+                    const combatResult = Combat.resolve(result.attacker, result.defender, terrain);
+                    Combat.applyCombatResult(combatResult);
+                }
+            }
+        }
+    },
+
+    _findScoutTarget(army, playerId) {
+        // Find nearest unexplored tile
+        let bestDist = Infinity;
+        let bestTarget = null;
+
+        for (let r = 0; r < MAP_ROWS; r += 2) {
+            for (let c = 0; c < MAP_COLS; c += 2) {
+                if (GameState.isVisible(playerId, c, r)) continue;
+                const terrain = TERRAIN_BY_ID[GameState.tiles[r][c]];
+                if (terrain.moveCost >= 50) continue;
+
+                const d = Utils.dist(army.col, army.row, c, r);
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestTarget = { col: c, row: r };
+                }
+            }
+        }
+
+        return bestTarget;
+    },
+
+    startGame(numPlayers, humanPlayers, mapType) {
+        GameState.init(numPlayers, humanPlayers, mapType);
 
         // Set initial production for AI players
         for (let i = humanPlayers; i < numPlayers; i++) {

@@ -18,7 +18,7 @@ const GameState = {
     messages: [],
     waypoints: {}, // armyId -> { targetCol, targetRow, path }
 
-    init(numPlayers, humanPlayers) {
+    init(numPlayers, humanPlayers, mapType) {
         this.turn = 1;
         this.currentPlayer = 0;
         this.phase = 'play';
@@ -31,7 +31,7 @@ const GameState = {
         this.waypoints = {};
 
         // Generate map
-        const map = MapGen.generate(numPlayers);
+        const map = MapGen.generate(numPlayers, mapType);
         this.tiles = map.tiles;
         this.cities = map.cities;
         this.ruins = map.ruins;

@@ -44,8 +44,39 @@ const Input = {
         document.getElementById('waypoint-continue').addEventListener('click', () => this._continueWaypoint());
         document.getElementById('waypoint-cancel').addEventListener('click', () => this._cancelWaypoint());
 
-        // Minimap click
+        // Split army
+        document.getElementById('btn-split-army').addEventListener('click', () => this._showSplitPanel());
+        document.getElementById('split-confirm').addEventListener('click', () => this._confirmSplit());
+        document.getElementById('split-cancel').addEventListener('click', () => this._cancelSplit());
+
+        // Scout toggle
+        document.getElementById('btn-scout-toggle').addEventListener('click', () => this._toggleScout());
+
+        // Save/Load
+        document.getElementById('btn-save').addEventListener('click', () => this._showSavePanel());
+        document.getElementById('save-close').addEventListener('click', () => {
+            document.getElementById('save-panel').classList.add('hidden');
+        });
+
+        // Sound toggle
+        document.getElementById('btn-sound').addEventListener('click', () => {
+            const on = Audio.toggle();
+            document.getElementById('btn-sound').textContent = `Sound: ${on ? 'On' : 'Off'}`;
+        });
+
+        // Promotion OK
+        document.getElementById('promotion-ok').addEventListener('click', () => {
+            document.getElementById('promotion-panel').classList.add('hidden');
+        });
+
+        // Minimap click + drag
         const minimap = document.getElementById('minimap');
+        minimap.addEventListener('mousedown', e => this._onMinimapDown(e));
+        minimap.addEventListener('mousemove', e => {
+            if (this._minimapDragging) this._onMinimapClick(e);
+        });
+        minimap.addEventListener('mouseup', () => { this._minimapDragging = false; });
+        minimap.addEventListener('mouseleave', () => { this._minimapDragging = false; });
         minimap.addEventListener('click', e => this._onMinimapClick(e));
     },
 
@@ -203,6 +234,7 @@ const Input = {
 
         // No selection - select own army
         if (army && army.owner === pid) {
+            Audio.playSelect();
             GameState.selectedArmy = army;
             HUD.showArmyPanel(army);
 
@@ -227,6 +259,7 @@ const Input = {
 
         switch (result.type) {
             case 'combat': {
+                Audio.playCombat();
                 const terrain = GameState.tiles[result.defender.row][result.defender.col];
                 const combatResult = Combat.resolve(result.attacker, result.defender, terrain);
                 Combat.applyCombatResult(combatResult);
@@ -238,25 +271,38 @@ const Input = {
                 if (combatResult.winner === 'attacker') {
                     GameState.selectedArmy = result.attacker;
                     HUD.showArmyPanel(result.attacker);
+                    // Check city capture
+                    const capturedCity = GameState.getCityAt(result.defender.col, result.defender.row);
+                    if (capturedCity && capturedCity.owner === result.attacker.owner) {
+                        Audio.playCapture();
+                    }
                 } else {
                     GameState.selectedArmy = null;
                     HUD.showArmyPanel(null);
+                }
+
+                // Show promotion panel if any units were promoted
+                if (combatResult.promotions && combatResult.promotions.length > 0) {
+                    this._showPromotions(combatResult.promotions);
                 }
 
                 GameState.checkVictory();
                 break;
             }
             case 'ruin': {
+                Audio.playRuinFind();
                 const searchResult = Heroes.searchRuin(result.army, result.ruin);
                 HUD.showRuinResult(searchResult);
                 GameState.addMessage(searchResult.message);
                 break;
             }
             case 'merged':
+                Audio.playSelect();
                 GameState.selectedArmy = result.army;
                 HUD.showArmyPanel(result.army);
                 break;
             case 'moved':
+                Audio.playMove();
                 if (GameState.armies.includes(army)) {
                     HUD.showArmyPanel(army);
                 }
@@ -515,5 +561,170 @@ const Input = {
         const col = Math.floor((mx / e.target.width) * MAP_COLS);
         const row = Math.floor((my / e.target.height) * MAP_ROWS);
         Renderer.centerOn(col, row);
+    },
+
+    _minimapDragging: false,
+    _onMinimapDown(e) {
+        this._minimapDragging = true;
+        this._onMinimapClick(e);
+    },
+
+    // ---- Split army ----
+    _splitSelection: [],
+
+    _showSplitPanel() {
+        const army = GameState.selectedArmy;
+        if (!army || army.owner !== GameState.currentPlayer) return;
+        if (army.units.length < 2) {
+            GameState.addMessage('Need at least 2 units to split.');
+            return;
+        }
+
+        this._splitSelection = army.units.map(() => false);
+        const panel = document.getElementById('split-panel');
+        const container = document.getElementById('split-units');
+        const color = GameState.players[army.owner].color.primary;
+
+        container.innerHTML = '<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.3rem">Select units to split into new army:</div>' +
+            army.units.map((u, i) => {
+                const str = Units.getEffectiveStr(u);
+                const promo = u.promoted ? ' *' : '';
+                return `<label class="split-unit-row" data-idx="${i}">
+                    <input type="checkbox" data-idx="${i}">
+                    <span class="unit-symbol" style="border-left:3px solid ${color}">${u.symbol}</span>
+                    <span class="unit-name">${u.name}${promo}</span>
+                    <span class="unit-stats">S:${str}</span>
+                </label>`;
+            }).join('');
+
+        container.querySelectorAll('input[type=checkbox]').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const idx = parseInt(cb.dataset.idx);
+                this._splitSelection[idx] = cb.checked;
+            });
+        });
+
+        panel.classList.remove('hidden');
+    },
+
+    _confirmSplit() {
+        const army = GameState.selectedArmy;
+        if (!army) { this._cancelSplit(); return; }
+
+        const selectedIndices = [];
+        this._splitSelection.forEach((sel, i) => { if (sel) selectedIndices.push(i); });
+
+        if (selectedIndices.length === 0 || selectedIndices.length === army.units.length) {
+            GameState.addMessage('Select some (but not all) units to split.');
+            return;
+        }
+
+        // Find adjacent empty tile
+        let splitTarget = null;
+        for (const [nc, nr] of Utils.cardinalNeighbors(army.col, army.row)) {
+            const t = GameState.tiles[nr][nc];
+            if (TERRAIN_BY_ID[t].moveCost >= 50) continue;
+            const existing = GameState.getArmyAt(nc, nr);
+            if (!existing) {
+                splitTarget = { col: nc, row: nr };
+                break;
+            }
+        }
+
+        if (!splitTarget) {
+            GameState.addMessage('No adjacent empty tile to split into.');
+            return;
+        }
+
+        // Create new army with selected units
+        const newUnits = [];
+        // Remove in reverse order to keep indices valid
+        for (let i = selectedIndices.length - 1; i >= 0; i--) {
+            const idx = selectedIndices[i];
+            newUnits.unshift(army.units.splice(idx, 1)[0]);
+        }
+
+        const newArmy = {
+            id: Utils.uid(),
+            col: splitTarget.col,
+            row: splitTarget.row,
+            owner: army.owner,
+            units: newUnits,
+            movesLeft: Math.min(army.movesLeft, Units.armyMoves({ units: newUnits })),
+        };
+        GameState.armies.push(newArmy);
+        GameState.addMessage(`Army split! New army at (${splitTarget.col},${splitTarget.row})`);
+        Audio.playSelect();
+
+        this._cancelSplit();
+        HUD.showArmyPanel(army);
+        HUD.update();
+    },
+
+    _cancelSplit() {
+        this._splitSelection = [];
+        document.getElementById('split-panel').classList.add('hidden');
+    },
+
+    // ---- Scout mode ----
+    _toggleScout() {
+        const army = GameState.selectedArmy;
+        if (!army || army.owner !== GameState.currentPlayer) return;
+
+        army.scouting = !army.scouting;
+        if (army.scouting) {
+            GameState.addMessage('Army set to scout mode - will auto-explore each turn.');
+            Audio.playSelect();
+        } else {
+            GameState.addMessage('Scout mode disabled.');
+        }
+        HUD.showArmyPanel(army);
+        HUD.update();
+    },
+
+    // ---- Save panel ----
+    _showSavePanel() {
+        const panel = document.getElementById('save-panel');
+        const container = document.getElementById('save-slots');
+
+        let html = '';
+        for (let i = 0; i < SaveGame.MAX_SLOTS; i++) {
+            const info = SaveGame.getSlotInfo(i);
+            const label = info
+                ? `Slot ${i + 1}: ${info.playerName} - Turn ${info.turn} (${info.date})`
+                : `Slot ${i + 1}: Empty`;
+            html += `<div style="display:flex;gap:0.3rem;margin-bottom:0.3rem">
+                <button class="btn btn-sm save-slot-save" data-slot="${i}" style="flex:1;text-align:left">${label}</button>
+                ${info ? `<button class="btn btn-sm btn-danger save-slot-del" data-slot="${i}">X</button>` : ''}
+            </div>`;
+        }
+        container.innerHTML = html;
+
+        container.querySelectorAll('.save-slot-save').forEach(btn => {
+            btn.addEventListener('click', () => {
+                SaveGame.save(parseInt(btn.dataset.slot));
+                this._showSavePanel(); // Refresh
+                HUD.update();
+            });
+        });
+        container.querySelectorAll('.save-slot-del').forEach(btn => {
+            btn.addEventListener('click', () => {
+                SaveGame.deleteSave(parseInt(btn.dataset.slot));
+                this._showSavePanel();
+            });
+        });
+
+        panel.classList.remove('hidden');
+    },
+
+    // ---- Promotion display ----
+    _showPromotions(promotions) {
+        Audio.playPromotion();
+        const panel = document.getElementById('promotion-panel');
+        const msg = document.getElementById('promotion-message');
+        msg.innerHTML = promotions.map(p =>
+            `<div style="margin-bottom:0.3rem"><strong style="color:var(--gold)">${p.unitName}</strong> has been promoted!</div>`
+        ).join('');
+        panel.classList.remove('hidden');
     },
 };
