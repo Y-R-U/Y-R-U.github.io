@@ -1,7 +1,7 @@
 // ─── Entities: Ball, Block, Pipe, SuctionTube, BlackHole, WhiteHole, EventOrb ───
 
 import * as THREE from 'three';
-import { ARENA, getBallColor } from './config.js';
+import { ARENA, getBallColor, formatNumber } from './config.js';
 import { scene, spawnParticles } from './scene.js';
 import { createBallBody, createBlockBody, removeBody, world } from './physics.js';
 
@@ -66,7 +66,7 @@ export class Ball {
     this.mesh.userData.ball = this;
 
     // Label
-    this.label = makeTextSprite(String(value));
+    this.label = makeTextSprite(formatNumber(value));
     this.label.position.y = 0;
     this.mesh.add(this.label);
 
@@ -90,7 +90,7 @@ export class Ball {
     this.mesh.remove(this.label);
     this.label.material.map.dispose();
     this.label.material.dispose();
-    let labelText = String(displayVal);
+    let labelText = formatNumber(displayVal);
     if (this.tempBuff !== 1) labelText += (this.tempBuff > 1 ? '↑' : '↓');
     if (this.isTemporary) labelText += '⏳';
     this.label = makeTextSprite(labelText);
@@ -155,7 +155,7 @@ export class Block {
     this.mesh.receiveShadow = true;
     this.mesh.userData.block = this;
 
-    this.label = makeTextSprite(String(hp), '#ffffff', 36);
+    this.label = makeTextSprite(formatNumber(hp), '#ffffff', 36);
     this.label.position.y = size * 0.7;
     this.mesh.add(this.label);
 
@@ -187,7 +187,7 @@ export class Block {
     this.mesh.remove(this.label);
     this.label.material.map.dispose();
     this.label.material.dispose();
-    this.label = makeTextSprite(String(Math.ceil(this.hp)), '#ffffff', 36);
+    this.label = makeTextSprite(formatNumber(Math.ceil(this.hp)), '#ffffff', 36);
     this.label.position.y = this.size * 0.7;
     this.mesh.add(this.label);
   }
