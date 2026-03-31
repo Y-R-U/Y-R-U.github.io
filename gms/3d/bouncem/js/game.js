@@ -30,6 +30,7 @@ let isDragging = false;
 let hasDroppedAny = false; // prevents round-complete before any balls dropped
 let waveTransitionTimer = 0;
 let allBlocksClearedTimer = 0; // countdown to next wave after all blocks destroyed
+let roundDropCount = 0;        // drops this wave; triggers block nudge every (ballCount+1) drops
 let save = null;
 
 // Per-ball hit cooldown (ball index → timestamp)
@@ -115,6 +116,7 @@ function startRun() {
   hasDroppedAny = false;
   gameTime = 0;
   allBlocksClearedTimer = 0;
+  roundDropCount = 0;
   ballHitCooldowns.clear();
   limboBalls = [];
   blackHoleTimer = randRange(BLACK_HOLE_INTERVAL_MIN, BLACK_HOLE_INTERVAL_MAX);
@@ -192,6 +194,12 @@ function dropBall() {
   dropCooldown = 0.2;
   hasDroppedAny = true;
 
+  // Every (ballCount+1) drops, nudge all blocks up so balls can always get underneath
+  roundDropCount++;
+  if (roundDropCount % (ballCount + 1) === 0) {
+    blocks.forEach(b => b.moveUp(ARENA.blockRowSpacing));
+  }
+
   // Reposition remaining pipe balls
   pipeQueue.forEach((bi, qi) => positionBallInPipe(bi, qi));
 }
@@ -199,6 +207,7 @@ function dropBall() {
 // ─── Wave generation ───
 function nextWave() {
   wave++;
+  roundDropCount = 0; // reset drop counter for new wave
   const isBoss = wave % 5 === 0;
   showWaveBanner(wave, isBoss);
   updateHUD(score, wave);
@@ -352,7 +361,8 @@ function handleCollisions() {
       const b = balls[j];
       if (b.merged || b.inSuction || b.inLimbo) continue;
       if (gameTime < b.mergeImmunityUntil) continue;
-      if (a.value !== b.value) continue;
+      // Compare effective (displayed) values so buffed/cursed balls can merge with matching balls
+      if (Math.round(a.effectiveValue) !== Math.round(b.effectiveValue)) continue;
 
       const aInPipe = a.inPipe;
       const bInPipe = b.inPipe;
@@ -385,13 +395,15 @@ function mergeBalls(idxA, idxB) {
 
   const aWasTemporary = a.isTemporary; // save before modifying
 
-  let newValue = a.value * 2;
+  // Base the merge on effective (displayed) value so buffed/cursed balls produce the correct result
+  let newValue = Math.round(a.effectiveValue) * 2;
   // Merge luck: chance to go one tier higher
   if (Math.random() < mergeLuckChance) {
     newValue *= 2;
   }
 
-  // Keep ball A, destroy B
+  // Keep ball A, destroy B — bake effective value in and clear any buff/curse
+  a.tempBuff = 1;
   a.updateVisual(newValue);
   // Merge result is always permanent — clones that merge stay in play
   a.isTemporary = false;
