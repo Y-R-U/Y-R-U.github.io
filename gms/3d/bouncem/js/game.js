@@ -28,6 +28,7 @@ let pipeQueue = []; // indices into balls[] for balls currently in pipe
 let isDragging = false;
 let hasDroppedAny = false; // prevents round-complete before any balls dropped
 let waveTransitionTimer = 0;
+let allBlocksClearedTimer = 0; // countdown to next wave after all blocks destroyed
 let save = null;
 
 // Per-ball hit cooldown (ball index → timestamp)
@@ -112,6 +113,7 @@ function startRun() {
   chainCount = 0;
   hasDroppedAny = false;
   gameTime = 0;
+  allBlocksClearedTimer = 0;
   ballHitCooldowns.clear();
   limboBalls = [];
   blackHoleTimer = randRange(BLACK_HOLE_INTERVAL_MIN, BLACK_HOLE_INTERVAL_MAX);
@@ -378,6 +380,8 @@ function mergeBalls(idxA, idxB) {
   const a = balls[idxA];
   const b = balls[idxB];
 
+  const aWasTemporary = a.isTemporary; // save before modifying
+
   let newValue = a.value * 2;
   // Merge luck: chance to go one tier higher
   if (Math.random() < mergeLuckChance) {
@@ -386,6 +390,8 @@ function mergeBalls(idxA, idxB) {
 
   // Keep ball A, destroy B
   a.updateVisual(newValue);
+  // Merge result is always permanent — clones that merge stay in play
+  a.isTemporary = false;
   if (a.body) {
     a.mat.emissiveIntensity = 0.5;
     setTimeout(() => { if (!a.merged) a.mat.emissiveIntensity = 0.15; }, 300);
@@ -407,7 +413,7 @@ function mergeBalls(idxA, idxB) {
 
   // Only spawn a replacement ball if both merging balls were primary (not clones)
   // This prevents clone orbs from inflating the ball count
-  if (!a.isTemporary && !bWasTemporary) {
+  if (!aWasTemporary && !bWasTemporary) {
     const newBall = new Ball(startBallValue, true);
     balls.push(newBall);
     const newIdx = balls.length - 1;
@@ -674,23 +680,26 @@ function updateEventOrbs(dt) {
 function applyOrbEffect(orb, ball, ballIdx) {
   switch (orb.type) {
     case 'clone': {
-      // Spawn 2 temporary duplicates near the ball
-      for (let c = 0; c < 2; c++) {
-        const clone = new Ball(ball.value, false);
-        clone.isTemporary = true;
-        clone.spawn(
-          ball.body.position.x + (Math.random() - 0.5) * 1.5,
-          ball.body.position.y + 0.5 + Math.random() * 1.0,
-          0
-        );
-        clone.body.velocity.set(
-          (Math.random() - 0.5) * 4,
-          2 + Math.random() * 3,
-          0
-        );
-        clone.updateVisual();
-        balls.push(clone);
-      }
+      // Original continues straight down at good speed
+      const downSpeed = Math.max(Math.abs(ball.body.velocity.y), 5) * velocityMult;
+      ball.body.velocity.set(0, -downSpeed, 0);
+
+      // Clone 1: shoot left-downward diagonal
+      const clone1 = new Ball(ball.value, false);
+      clone1.isTemporary = true;
+      clone1.spawn(ball.body.position.x, ball.body.position.y, 0);
+      clone1.body.velocity.set(-4 * velocityMult, -downSpeed * 0.7, 0);
+      clone1.updateVisual();
+      balls.push(clone1);
+
+      // Clone 2: shoot right-downward diagonal
+      const clone2 = new Ball(ball.value, false);
+      clone2.isTemporary = true;
+      clone2.spawn(ball.body.position.x, ball.body.position.y, 0);
+      clone2.body.velocity.set(4 * velocityMult, -downSpeed * 0.7, 0);
+      clone2.updateVisual();
+      balls.push(clone2);
+
       showEventBanner('×3 CLONED!', '#44ff88');
       break;
     }
@@ -763,6 +772,13 @@ function recoverEscapedBalls(dt) {
       // Escaped right — put bottom-right with no momentum so suction grabs it
       pos.set(ARENA.width / 2 - 0.5, floorY, 0);
       ball.body.velocity.set(0, 0, 0);
+    } else {
+      // Check if stuck (nearly stationary in the play area — e.g. wedged against a block)
+      const v = ball.body.velocity;
+      const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+      if (speed < 0.8) {
+        ball.body.velocity.set((Math.random() - 0.5) * 3, -5 * velocityMult, 0);
+      }
     }
   }
 }
@@ -791,12 +807,26 @@ function applyMagnet(dt) {
   }
 }
 
+// ─── Wave transition ───
+function triggerWaveTransition() {
+  if (state !== 'playing') return;
+  allBlocksClearedTimer = 0;
+  cleanupTemporaryEffects();
+  hasDroppedAny = false;
+  sfxWaveComplete();
+  state = 'waveTransition';
+  waveTransitionTimer = 0.8;
+}
+
 // ─── Round check ───
 function checkRoundComplete() {
   if (state !== 'playing' || !hasDroppedAny) return;
 
   // Can't complete round while balls are in limbo
   if (limboBalls.length > 0) return;
+
+  // If all-blocks-cleared countdown is running, let it finish (fixed 3s wait)
+  if (allBlocksClearedTimer > 0) return;
 
   // All non-merged, non-temporary balls must be back in pipe
   // (temporary clone balls get cleaned up on round end)
@@ -806,12 +836,7 @@ function checkRoundComplete() {
   // At least some balls in the queue
   if (pipeQueue.length < 1) return;
 
-  // Round complete — advance wave
-  cleanupTemporaryEffects();
-  hasDroppedAny = false;
-  sfxWaveComplete();
-  state = 'waveTransition';
-  waveTransitionTimer = 0.8;
+  triggerWaveTransition();
 }
 
 // ─── Clean up dead blocks ───
@@ -821,6 +846,13 @@ function cleanupBlocks() {
       blocks[i].destroy();
       blocks.splice(i, 1);
     }
+  }
+
+  // When all blocks are destroyed, start a 3s countdown to next wave
+  // instead of waiting for balls to return to the pipe
+  if (blocks.length === 0 && state === 'playing' && hasDroppedAny && allBlocksClearedTimer === 0) {
+    allBlocksClearedTimer = 3.0;
+    showEventBanner('STAGE CLEAR!  Next wave in 3s', '#44ffaa');
   }
 }
 
@@ -851,6 +883,14 @@ function loop() {
     updateEventOrbs(dt);
     cleanupBlocks();
     checkRoundComplete();
+
+    // All-blocks-cleared countdown
+    if (allBlocksClearedTimer > 0) {
+      allBlocksClearedTimer -= dt;
+      if (allBlocksClearedTimer <= 0) {
+        triggerWaveTransition();
+      }
+    }
 
     // Chain timer
     if (chainTimer > 0) {
