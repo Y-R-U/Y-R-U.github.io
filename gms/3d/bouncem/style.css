@@ -241,7 +241,7 @@ html, body {
   display: flex; gap: 3px; margin-top: 6px;
 }
 .upgrade-level .pip {
-  width: 18px; height: 5px;
+  width: 13px; height: 5px;
   border-radius: 3px;
   background: rgba(255,255,255,0.12);
 }
