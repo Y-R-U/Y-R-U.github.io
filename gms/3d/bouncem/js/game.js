@@ -200,6 +200,7 @@ function dropBall() {
   roundDropCount++;
   if (roundDropCount % (ballCount + 1) === 0) {
     blocks.forEach(b => b.moveUp(ARENA.blockRowSpacing));
+    checkGameOver();
   }
 
   // Reposition remaining pipe balls
@@ -225,7 +226,7 @@ function nextWave() {
   for (let i = 0; i < numBlocks; i++) {
     const x = -hw + (i / Math.max(1, numBlocks - 1)) * (hw * 2);
     // Training waves: very low HP. Post-training: steep exponential ramp
-    const baseHp = wave <= 2 ? 3 * wave : 10 * Math.pow(1.3, wave - 2);
+    const baseHp = wave <= 2 ? 3 * wave : 10 * Math.pow(1.45, wave - 2);
     let hp = isBoss ? baseHp * 8 : baseHp * (0.6 + Math.random() * 0.8);
     hp *= (1 - blockHpReduction);
     hp = Math.max(1, Math.ceil(hp));
@@ -907,6 +908,7 @@ function loop() {
     updateBlackWhiteHoles(dt);
     updateEventOrbs(dt);
     cleanupBlocks();
+    checkGameOver();
     checkRoundComplete();
 
     // Time-based block nudge: when all balls are in play (queue empty) and blocks
@@ -917,6 +919,7 @@ function loop() {
       if (queueEmptyNudgeTimer >= 4.0) {
         queueEmptyNudgeTimer = 0;
         blocks.forEach(b => b.moveUp(ARENA.blockRowSpacing));
+        checkGameOver();
       }
     } else {
       queueEmptyNudgeTimer = 0;
