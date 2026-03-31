@@ -200,7 +200,7 @@ const Input = {
             }
 
             // Try to move/attack
-            if (selected.movesLeft > 0 || true) {
+            if (selected.movesLeft > 0) {
                 const path = Movement.findPath(selected, selected.col, selected.row, col, row);
                 if (path) {
                     // Check if destination is beyond reach - set waypoint
