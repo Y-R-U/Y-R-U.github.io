@@ -31,6 +31,7 @@ let hasDroppedAny = false; // prevents round-complete before any balls dropped
 let waveTransitionTimer = 0;
 let allBlocksClearedTimer = 0; // countdown to next wave after all blocks destroyed
 let roundDropCount = 0;        // drops this wave; triggers block nudge every (ballCount+1) drops
+let queueEmptyNudgeTimer = 0;  // time since all balls were in play with empty pipe queue
 let save = null;
 
 // Per-ball hit cooldown (ball index → timestamp)
@@ -117,6 +118,7 @@ function startRun() {
   gameTime = 0;
   allBlocksClearedTimer = 0;
   roundDropCount = 0;
+  queueEmptyNudgeTimer = 0;
   ballHitCooldowns.clear();
   limboBalls = [];
   blackHoleTimer = randRange(BLACK_HOLE_INTERVAL_MIN, BLACK_HOLE_INTERVAL_MAX);
@@ -207,7 +209,8 @@ function dropBall() {
 // ─── Wave generation ───
 function nextWave() {
   wave++;
-  roundDropCount = 0; // reset drop counter for new wave
+  roundDropCount = 0;
+  queueEmptyNudgeTimer = 0;
   const isBoss = wave % 5 === 0;
   showWaveBanner(wave, isBoss);
   updateHUD(score, wave);
@@ -905,6 +908,19 @@ function loop() {
     updateEventOrbs(dt);
     cleanupBlocks();
     checkRoundComplete();
+
+    // Time-based block nudge: when all balls are in play (queue empty) and blocks
+    // still exist, nudge every 4s so a bouncing ball can never be permanently trapped
+    const hasActiveBalls = balls.some(b => !b.merged && !b.inPipe && !b.inSuction && b.body);
+    if (hasActiveBalls && pipeQueue.length === 0 && blocks.length > 0) {
+      queueEmptyNudgeTimer += dt;
+      if (queueEmptyNudgeTimer >= 4.0) {
+        queueEmptyNudgeTimer = 0;
+        blocks.forEach(b => b.moveUp(ARENA.blockRowSpacing));
+      }
+    } else {
+      queueEmptyNudgeTimer = 0;
+    }
 
     // All-blocks-cleared countdown
     if (allBlocksClearedTimer > 0) {
