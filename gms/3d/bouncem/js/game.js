@@ -347,9 +347,11 @@ function handleCollisions() {
   for (let i = 0; i < balls.length && !didMerge; i++) {
     const a = balls[i];
     if (a.merged || a.inSuction || a.inLimbo) continue;
+    if (gameTime < a.mergeImmunityUntil) continue;
     for (let j = i + 1; j < balls.length && !didMerge; j++) {
       const b = balls[j];
       if (b.merged || b.inSuction || b.inLimbo) continue;
+      if (gameTime < b.mergeImmunityUntil) continue;
       if (a.value !== b.value) continue;
 
       const aInPipe = a.inPipe;
@@ -685,9 +687,14 @@ function applyOrbEffect(orb, ball, ballIdx) {
       const downSpeed = Math.max(Math.abs(ball.body.velocity.y), 5) * velocityMult;
       ball.body.velocity.set(0, -downSpeed, 0);
 
+      // Give all 3 balls immunity so they can't instantly merge on spawn
+      const immuneUntil = gameTime + 0.7;
+      ball.mergeImmunityUntil = immuneUntil;
+
       // Clone 1: shoot left-downward diagonal
       const clone1 = new Ball(ball.value, false);
       clone1.isTemporary = true;
+      clone1.mergeImmunityUntil = immuneUntil;
       clone1.spawn(ball.body.position.x, ball.body.position.y, 0);
       clone1.body.velocity.set(-4 * velocityMult, -downSpeed * 0.7, 0);
       clone1.updateVisual();
@@ -696,6 +703,7 @@ function applyOrbEffect(orb, ball, ballIdx) {
       // Clone 2: shoot right-downward diagonal
       const clone2 = new Ball(ball.value, false);
       clone2.isTemporary = true;
+      clone2.mergeImmunityUntil = immuneUntil;
       clone2.spawn(ball.body.position.x, ball.body.position.y, 0);
       clone2.body.velocity.set(4 * velocityMult, -downSpeed * 0.7, 0);
       clone2.updateVisual();

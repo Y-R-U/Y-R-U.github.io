@@ -51,6 +51,7 @@ export class Ball {
     this.tempBuff = 1;        // temp value multiplier (resets after round)
     this.body = null;
     this.suctionProgress = 0;
+    this.mergeImmunityUntil = 0; // game-time before which this ball cannot merge
 
     // Mesh
     const color = getBallColor(value);
