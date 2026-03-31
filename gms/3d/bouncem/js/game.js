@@ -86,9 +86,10 @@ function init() {
   el.addEventListener('pointerup', onPointerUp);
   el.addEventListener('pointercancel', onPointerUp);
 
-  // Prevent context menu & scroll
+  // Prevent context menu & scroll — but allow scrolling inside the upgrade list
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.body.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  document.getElementById('upgrade-list').addEventListener('touchmove', e => e.stopPropagation(), { passive: true });
 
   initMusic();
   showScreen('title-screen');
@@ -259,7 +260,7 @@ function triggerGameOver() {
   sfxGameOver();
 
   // Calculate crystals
-  const crystalsEarned = Math.floor((wave * 5 + score / 100) * scoreMult);
+  const crystalsEarned = Math.floor((wave * 5 + score / 1000) * scoreMult);
   save.crystals += crystalsEarned;
   if (score > save.bestScore) save.bestScore = score;
   if (wave > save.bestWave) save.bestWave = wave;
@@ -814,7 +815,7 @@ function recoverEscapedBalls(dt) {
 // ─── Magnet ───
 function applyMagnet(dt) {
   if (magnetStrength === 0) return;
-  const force = [0, 0.5, 1.2, 2.5][magnetStrength] || 0;
+  const force = [0, 0.5, 1.2, 2.5, 4.0, 6.0, 9.0, 13.0, 18.0, 25.0][magnetStrength] || 0;
 
   for (let i = 0; i < balls.length; i++) {
     const a = balls[i];
