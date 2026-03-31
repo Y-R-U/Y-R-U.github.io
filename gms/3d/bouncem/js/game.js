@@ -779,6 +779,9 @@ function recoverEscapedBalls(dt) {
   if (escapeCheckTimer < 1.0) return; // only check once per second
   escapeCheckTimer = 0;
 
+  // Also check game over once per second (blocks may have been nudged above dangerY mid-wave)
+  checkGameOver();
+
   const limitLeft = -(ARENA.width / 2 + 2);
   const limitRight = ARENA.width / 2 + 2;
   const limitBottom = -(ARENA.height / 2 + 3);
@@ -908,7 +911,6 @@ function loop() {
     updateBlackWhiteHoles(dt);
     updateEventOrbs(dt);
     cleanupBlocks();
-    checkGameOver();
     checkRoundComplete();
 
     // Time-based block nudge: when all balls are in play (queue empty) and blocks
