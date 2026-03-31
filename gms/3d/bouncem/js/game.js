@@ -260,7 +260,7 @@ function triggerGameOver() {
   sfxGameOver();
 
   // Calculate crystals
-  const crystalsEarned = Math.floor((wave * 5 + score / 100) * scoreMult);
+  const crystalsEarned = Math.floor((wave * 5 + score / 1000) * scoreMult);
   save.crystals += crystalsEarned;
   if (score > save.bestScore) save.bestScore = score;
   if (wave > save.bestWave) save.bestWave = wave;
