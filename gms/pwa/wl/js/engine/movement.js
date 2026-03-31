@@ -76,6 +76,7 @@ const Movement = {
 
     moveArmy(army, path) {
         if (!path || path.length < 2) return false;
+        if (army.movesLeft <= 0) return false;
 
         for (let i = 1; i < path.length; i++) {
             const step = path[i];
