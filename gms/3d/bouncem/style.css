@@ -269,6 +269,27 @@ html, body {
 }
 .shop-buttons button { flex: 1; }
 
+/* ─── Stage Clear Banner ─── */
+#stage-clear-banner {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 29; pointer-events: none;
+  gap: 4px;
+}
+#stage-clear-banner.hidden { display: none !important; }
+#sc-title {
+  font-size: 2.2rem; font-weight: 900;
+  letter-spacing: 3px;
+  color: #44ffaa;
+  text-shadow: 0 0 24px rgba(68,255,170,0.6), 0 4px 12px rgba(0,0,0,0.5);
+}
+#sc-countdown {
+  font-size: 3.5rem; font-weight: 900;
+  color: #44ffaa;
+  text-shadow: 0 0 30px rgba(68,255,170,0.8);
+  line-height: 1;
+}
+
 /* ─── Event Banner ─── */
 #event-banner {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;

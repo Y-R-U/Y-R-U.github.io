@@ -10,7 +10,8 @@ import { initScene, scene, camera, renderer, clock,
 import { initPhysics, world, stepPhysics } from './physics.js';
 import { Ball, Block, Pipe, SuctionTube, BlackHole, WhiteHole, EventOrb } from './entities.js';
 import { initUI, showScreen, updateHUD, showWaveBanner, showChainText,
-         showGameOver, spawnDamageNumber, showEventBanner } from './ui.js';
+         showGameOver, spawnDamageNumber, showEventBanner,
+         showStageClearCountdown, hideStageClearBanner } from './ui.js';
 
 // ─── State ───
 let state = 'title'; // title | playing | waveTransition | gameOver
@@ -165,9 +166,9 @@ function positionBallInPipe(ballIdx, queuePos) {
   const ball = balls[ballIdx];
   if (!ball || ball.merged) return;
   const hw = ARENA.width * 0.4;
-  const startX = hw;
+  const startX = -hw; // queuePos 0 (next to drop) is on the LEFT
   const spacing = ARENA.ballRadius * 3.0;
-  const x = startX - queuePos * spacing;
+  const x = startX + queuePos * spacing; // higher queuePos → further right
   ball.mesh.position.set(x, ARENA.pipeY, 0);
   ball.inPipe = true;
 }
@@ -811,6 +812,7 @@ function applyMagnet(dt) {
 function triggerWaveTransition() {
   if (state !== 'playing') return;
   allBlocksClearedTimer = 0;
+  hideStageClearBanner();
   cleanupTemporaryEffects();
   hasDroppedAny = false;
   sfxWaveComplete();
@@ -852,7 +854,7 @@ function cleanupBlocks() {
   // instead of waiting for balls to return to the pipe
   if (blocks.length === 0 && state === 'playing' && hasDroppedAny && allBlocksClearedTimer === 0) {
     allBlocksClearedTimer = 3.0;
-    showEventBanner('STAGE CLEAR!  Next wave in 3s', '#44ffaa');
+    showStageClearCountdown(3);
   }
 }
 
@@ -889,6 +891,8 @@ function loop() {
       allBlocksClearedTimer -= dt;
       if (allBlocksClearedTimer <= 0) {
         triggerWaveTransition();
+      } else {
+        showStageClearCountdown(Math.ceil(allBlocksClearedTimer));
       }
     }
 

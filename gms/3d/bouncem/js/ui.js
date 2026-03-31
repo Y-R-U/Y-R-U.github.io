@@ -157,6 +157,16 @@ export function showGameOver(score, waves, bestMerge, crystalsEarned) {
   showPopup('gameover-popup');
 }
 
+// ─── Stage Clear Countdown ───
+export function showStageClearCountdown(n) {
+  document.getElementById('sc-countdown').textContent = n;
+  document.getElementById('stage-clear-banner').classList.remove('hidden');
+}
+
+export function hideStageClearBanner() {
+  document.getElementById('stage-clear-banner').classList.add('hidden');
+}
+
 // ─── Event Banner (black hole, white hole, orbs) ───
 export function showEventBanner(text, color = '#ffffff') {
   const el = document.getElementById('event-banner');
