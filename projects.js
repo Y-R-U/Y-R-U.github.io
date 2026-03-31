@@ -176,6 +176,18 @@ const PROJECTS = [
     desc: "3D idle transport tycoon with Babylon.js graphics. Build routes, upgrade vehicles, and grow your business empire.",
     date: "2026-03-11" },
 
+  { name: "Bounce Merge 3D",    path: "/gms/3d/bouncem/",        screenshot: "bouncem",         type: "game",
+    desc: "3D ball-merging roguelite with physics-based gameplay, wave progression, and upgrades using Three.js.",
+    date: "2026-03-27" },
+
+  { name: "Triad Clash",        path: "/gms/pwa/cc1/",           screenshot: "cc1",             type: "game",
+    desc: "Strategy card battle game with three classes (Warrior, Archer, Mage) in 12-round AI battles.",
+    date: "2026-03-25" },
+
+  { name: "Warlords",           path: "/gms/pwa/wl/",            screenshot: "warlords",        type: "game",
+    desc: "Fantasy strategy game with map conquest, hero units, city production, and turn-based combat for 2-8 players.",
+    date: "2026-03-25" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
@@ -185,6 +197,7 @@ const PROJECTS = [
   { name: "Game Assets",        path: "/gms/assets/",        type: "other",  note: "Game-specific shared assets" },
   { name: "Y-R-U Mirror",       path: "/Y-R-U/",            type: "other",  note: "Repository mirror / branch checkout" },
   { name: "K-Hydro PWA",        path: "/app/pwa/khydro/",   type: "other",  note: "PWA version of K-Hydro Track (main entry at /k/)" },
+  { name: "Bounce Merge 2D",    path: "/gms/failed/merge1/", type: "other",  note: "Earlier 2D version of Bounce Merge (superseded by 3D version)" },
   { name: "i2 backup",          path: "/i2.html",           type: "other",  note: "Older version of the main index.html" },
   { name: ".github",            path: "/.github/",          type: "other",  note: "GitHub workflows and CI configuration" },
   { name: ".claude",            path: "/.claude/",          type: "other",  note: "Claude Code configuration" },
