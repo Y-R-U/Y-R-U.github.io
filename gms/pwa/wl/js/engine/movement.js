@@ -78,6 +78,9 @@ const Movement = {
         if (!path || path.length < 2) return false;
         if (army.movesLeft <= 0) return false;
 
+        // Track each tile walked for undo support
+        const stepsWalked = [{ col: army.col, row: army.row, movesLeft: army.movesLeft }];
+
         for (let i = 1; i < path.length; i++) {
             const step = path[i];
             const prevStep = path[i - 1];
@@ -90,7 +93,7 @@ const Movement = {
             if (enemyArmy && enemyArmy.owner !== army.owner) {
                 // Initiate combat
                 army.movesLeft = Math.max(0, army.movesLeft - cost);
-                return { type: 'combat', attacker: army, defender: enemyArmy, col: step.col, row: step.row };
+                return { type: 'combat', attacker: army, defender: enemyArmy, col: step.col, row: step.row, stepsWalked };
             }
 
             // Check for friendly army - merge if possible
@@ -102,7 +105,7 @@ const Movement = {
                     }
                     GameState.removeArmy(army);
                     GameState.revealAround(enemyArmy.owner, enemyArmy.col, enemyArmy.row);
-                    return { type: 'merged', army: enemyArmy };
+                    return { type: 'merged', army: enemyArmy, stepsWalked };
                 }
                 break; // Can't merge, stack full
             }
@@ -114,17 +117,20 @@ const Movement = {
             army.movesLeft = Math.max(0, army.movesLeft - cost);
             GameState.revealAround(army.owner, army.col, army.row);
 
+            // Record this step
+            stepsWalked.push({ col: army.col, row: army.row, movesLeft: army.movesLeft });
+
             // Add move animation
             Animation.addMoveTween(army, prevCol, prevRow, step.col, step.row, 120);
 
             // Check for ruin
             const ruin = GameState.getRuinAt(step.col, step.row);
             if (ruin && !ruin.searched && Units.armyHasHero(army)) {
-                return { type: 'ruin', army, ruin };
+                return { type: 'ruin', army, ruin, stepsWalked };
             }
         }
 
-        return { type: 'moved' };
+        return { type: 'moved', stepsWalked };
     },
 
     getReachableTiles(army) {
