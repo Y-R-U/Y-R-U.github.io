@@ -109,9 +109,10 @@
             <div id="army-panel" class="panel-section hidden">
                 <h3>Army</h3>
                 <div id="army-units"></div>
-                <div id="army-actions" class="hidden" style="margin-top:0.4rem;display:flex;gap:0.3rem">
+                <div id="army-actions" class="hidden" style="margin-top:0.4rem;display:flex;gap:0.3rem;flex-wrap:wrap">
                     <button id="btn-split-army" class="btn btn-sm" style="flex:1">Split</button>
                     <button id="btn-scout-toggle" class="btn btn-sm" style="flex:1">Scout</button>
+                    <button id="btn-undo-move" class="btn btn-sm btn-danger" style="flex:1">Undo</button>
                 </div>
             </div>
 
@@ -168,6 +169,7 @@
                     <kbd>N</kbd> Next Army
                     <kbd>E</kbd> End Turn
                     <kbd>H</kbd> Hire Hero
+                    <kbd>U</kbd> Undo Move
                     <kbd>Space</kbd> Skip
                     <kbd>Esc</kbd> Deselect
                 </div>
@@ -219,7 +221,14 @@
     <div id="waypoint-banner" class="hidden">
         <span id="waypoint-text"></span>
         <button id="waypoint-continue" class="btn btn-sm">Continue</button>
-        <button id="waypoint-cancel" class="btn btn-sm btn-danger">Cancel</button>
+        <button id="waypoint-cancel" class="btn btn-sm btn-danger">Cancel Path</button>
+        <button id="waypoint-close" class="btn btn-sm" style="padding:0.2rem 0.5rem">X</button>
+    </div>
+
+    <!-- Unit Detail Overlay -->
+    <div id="unit-detail-panel" class="hidden">
+        <div id="unit-detail-content"></div>
+        <button id="unit-detail-ok" class="btn btn-primary" style="margin-top:0.8rem">OK</button>
     </div>
 
     <!-- Promotion Overlay -->
