@@ -10,6 +10,10 @@ const Input = {
     hoverCol: -1,
     hoverRow: -1,
     pendingMerge: null, // { source, target }
+    _undoState: null, // { armyId, col, row, movesLeft }
+    _longPressTimer: null,
+    _isLongPress: false,
+    _mouseDownTime: 0,
 
     init() {
         const canvas = Renderer.canvas;
@@ -43,6 +47,15 @@ const Input = {
         // Waypoint buttons
         document.getElementById('waypoint-continue').addEventListener('click', () => this._continueWaypoint());
         document.getElementById('waypoint-cancel').addEventListener('click', () => this._cancelWaypoint());
+        document.getElementById('waypoint-close').addEventListener('click', () => this._hideWaypointBanner());
+
+        // Undo move
+        document.getElementById('btn-undo-move').addEventListener('click', () => this._undoMove());
+
+        // Unit detail
+        document.getElementById('unit-detail-ok').addEventListener('click', () => {
+            document.getElementById('unit-detail-panel').classList.add('hidden');
+        });
 
         // Split army
         document.getElementById('btn-split-army').addEventListener('click', () => this._showSplitPanel());
@@ -91,10 +104,20 @@ const Input = {
         }
 
         this.isDragging = false;
+        this._isLongPress = false;
+        this._mouseDownTime = Date.now();
         this.dragStartX = e.clientX;
         this.dragStartY = e.clientY;
         this.dragStartCamX = Renderer.camX;
         this.dragStartCamY = Renderer.camY;
+
+        // Start long-press timer (300ms)
+        clearTimeout(this._longPressTimer);
+        this._longPressTimer = setTimeout(() => {
+            if (!this.isDragging) {
+                this._isLongPress = true;
+            }
+        }, 300);
     },
 
     _onMouseMove(e) {
@@ -129,6 +152,8 @@ const Input = {
     },
 
     _onMouseUp(e) {
+        clearTimeout(this._longPressTimer);
+
         if (this.isDragging) {
             this.isDragging = false;
             return;
@@ -142,7 +167,15 @@ const Input = {
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
         const { col, row } = Renderer.screenToTile(mx, my);
-        this._handleClick(col, row);
+
+        if (this._isLongPress) {
+            // Long press: just show path preview, don't move
+            this._handleLongClick(col, row);
+        } else {
+            // Quick click: select or move
+            this._handleClick(col, row);
+        }
+        this._isLongPress = false;
     },
 
     _handleClick(col, row) {
@@ -160,9 +193,7 @@ const Input = {
 
             // Clicked on same army - deselect
             if (army && army.id === selected.id) {
-                GameState.selectedArmy = null;
-                GameState.movePath = null;
-                HUD.showArmyPanel(null);
+                this._deselectArmy();
                 return;
             }
 
@@ -181,8 +212,8 @@ const Input = {
                         // Out of reach this turn - set waypoint
                         const path = Movement.findPath(selected, selected.col, selected.row, col, row);
                         if (path) {
+                            this._saveUndoState(selected);
                             GameState.setWaypoint(selected.id, col, row, path);
-                            // Move as far as we can this turn
                             const result = Movement.moveArmy(selected, path);
                             this._handleMoveResult(result, selected, col, row);
                             GameState.addMessage(`Waypoint set: army heading to (${col},${row})`);
@@ -193,9 +224,7 @@ const Input = {
                     }
                 }
                 // Stack would be full or no path - switch selection
-                GameState.selectedArmy = army;
-                GameState.movePath = null;
-                HUD.showArmyPanel(army);
+                this._selectArmy(army);
                 return;
             }
 
@@ -203,6 +232,9 @@ const Input = {
             if (selected.movesLeft > 0) {
                 const path = Movement.findPath(selected, selected.col, selected.row, col, row);
                 if (path) {
+                    // Save undo state before moving
+                    this._saveUndoState(selected);
+
                     // Check if destination is beyond reach - set waypoint
                     const reachable = Movement.getReachableTiles(selected);
                     const destKey = `${col},${row}`;
@@ -221,28 +253,26 @@ const Input = {
                         GameState.clearWaypoint(selected.id);
                     }
 
+                    // Deselect if army ran out of moves (unless combat overlay showing)
+                    if (result && result.type === 'moved' && selected.movesLeft <= 0) {
+                        GameState.selectedArmy = null;
+                        GameState.movePath = null;
+                        HUD.showArmyPanel(null);
+                        this._hideWaypointBanner();
+                    }
+
                     HUD.update();
                     return;
                 }
             }
 
             // Deselect
-            GameState.selectedArmy = null;
-            GameState.movePath = null;
-            HUD.showArmyPanel(null);
+            this._deselectArmy();
         }
 
         // No selection - select own army
         if (army && army.owner === pid) {
-            Audio.playSelect();
-            GameState.selectedArmy = army;
-            HUD.showArmyPanel(army);
-
-            // Check for waypoint
-            const wp = GameState.getWaypoint(army.id);
-            if (wp) {
-                this._showWaypointBanner(army);
-            }
+            this._selectArmy(army);
         }
 
         // Show city info
@@ -252,6 +282,40 @@ const Input = {
         } else {
             HUD.showCityPanel(null);
         }
+    },
+
+    _handleLongClick(col, row) {
+        // Long press: show path preview without moving
+        if (!Utils.inBounds(col, row)) return;
+        if (GameState.phase !== 'play') return;
+        if (!GameState.selectedArmy) return;
+
+        const army = GameState.selectedArmy;
+        const path = Movement.findPath(army, army.col, army.row, col, row);
+        GameState.movePath = path;
+        // Path stays visible until next click or deselect
+    },
+
+    _selectArmy(army) {
+        this._hideWaypointBanner();
+        this._undoState = null; // Clear undo when switching armies
+        Audio.playSelect();
+        GameState.selectedArmy = army;
+        GameState.movePath = null;
+        HUD.showArmyPanel(army);
+
+        // Show waypoint banner only for this army
+        const wp = GameState.getWaypoint(army.id);
+        if (wp) {
+            this._showWaypointBanner(army);
+        }
+    },
+
+    _deselectArmy() {
+        this._hideWaypointBanner();
+        GameState.selectedArmy = null;
+        GameState.movePath = null;
+        HUD.showArmyPanel(null);
     },
 
     _handleMoveResult(result, army, col, row) {
@@ -438,8 +502,24 @@ const Input = {
             this.dragStartCamX = Renderer.camX;
             this.dragStartCamY = Renderer.camY;
             this.isDragging = false;
+            this._isLongPress = false;
+            this._mouseDownTime = Date.now();
+
+            clearTimeout(this._longPressTimer);
+            this._longPressTimer = setTimeout(() => {
+                if (!this.isDragging) {
+                    this._isLongPress = true;
+                    // Show path preview on long press
+                    const rect = Renderer.canvas.getBoundingClientRect();
+                    const mx = t.clientX - rect.left;
+                    const my = t.clientY - rect.top;
+                    const { col, row } = Renderer.screenToTile(mx, my);
+                    this._handleLongClick(col, row);
+                }
+            }, 400);
         } else if (e.touches.length === 2) {
             this.isDragging = true;
+            clearTimeout(this._longPressTimer);
         }
     },
 
@@ -459,13 +539,19 @@ const Input = {
     },
 
     _onTouchEnd(e) {
+        clearTimeout(this._longPressTimer);
         if (!this.isDragging && e.changedTouches.length === 1) {
-            const t = e.changedTouches[0];
-            const rect = Renderer.canvas.getBoundingClientRect();
-            const mx = t.clientX - rect.left;
-            const my = t.clientY - rect.top;
-            const { col, row } = Renderer.screenToTile(mx, my);
-            this._handleClick(col, row);
+            if (this._isLongPress) {
+                // Long press already handled path preview in touchstart timer
+                this._isLongPress = false;
+            } else {
+                const t = e.changedTouches[0];
+                const rect = Renderer.canvas.getBoundingClientRect();
+                const mx = t.clientX - rect.left;
+                const my = t.clientY - rect.top;
+                const { col, row } = Renderer.screenToTile(mx, my);
+                this._handleClick(col, row);
+            }
         }
         this.isDragging = false;
     },
@@ -488,11 +574,13 @@ const Input = {
             case 'h':
                 this._buyHero(); break;
             case 'Escape':
-                GameState.selectedArmy = null;
-                GameState.movePath = null;
+                this._deselectArmy();
                 HUD.closePanels();
-                this._hideWaypointBanner();
                 this._cancelMerge();
+                document.getElementById('unit-detail-panel').classList.add('hidden');
+                break;
+            case 'u':
+                this._undoMove();
                 break;
             case ' ':
                 if (GameState.selectedArmy) {
@@ -507,10 +595,9 @@ const Input = {
     _endTurn() {
         const p = GameState.players[GameState.currentPlayer];
         if (!p.isHuman) return;
-        GameState.selectedArmy = null;
-        GameState.movePath = null;
+        this._deselectArmy();
+        this._undoState = null;
         HUD.closePanels();
-        this._hideWaypointBanner();
         Turns.endTurn();
         HUD.update();
     },
@@ -527,12 +614,10 @@ const Input = {
     },
 
     _nextArmy() {
-        this._hideWaypointBanner();
         const pid = GameState.currentPlayer;
         const armies = GameState.getPlayerArmies(pid).filter(a => a.movesLeft > 0);
         if (armies.length === 0) {
-            GameState.selectedArmy = null;
-            HUD.showArmyPanel(null);
+            this._deselectArmy();
             return;
         }
 
@@ -542,16 +627,8 @@ const Input = {
             idx = (curIdx + 1) % armies.length;
         }
 
-        GameState.selectedArmy = armies[idx];
-        GameState.movePath = null;
+        this._selectArmy(armies[idx]);
         Renderer.centerOn(armies[idx].col, armies[idx].row);
-        HUD.showArmyPanel(armies[idx]);
-
-        // Show waypoint banner if army has one
-        const wp = GameState.getWaypoint(armies[idx].id);
-        if (wp) {
-            this._showWaypointBanner(armies[idx]);
-        }
     },
 
     _onMinimapClick(e) {
@@ -567,6 +644,44 @@ const Input = {
     _onMinimapDown(e) {
         this._minimapDragging = true;
         this._onMinimapClick(e);
+    },
+
+    // ---- Undo last move ----
+    _saveUndoState(army) {
+        this._undoState = {
+            armyId: army.id,
+            col: army.col,
+            row: army.row,
+            movesLeft: army.movesLeft,
+        };
+    },
+
+    _undoMove() {
+        if (!this._undoState) {
+            GameState.addMessage('Nothing to undo.');
+            HUD.update();
+            return;
+        }
+        const army = GameState.armies.find(a => a.id === this._undoState.armyId);
+        if (!army) {
+            this._undoState = null;
+            GameState.addMessage('Army no longer exists.');
+            HUD.update();
+            return;
+        }
+        // Restore position and moves
+        army.col = this._undoState.col;
+        army.row = this._undoState.row;
+        army.movesLeft = this._undoState.movesLeft;
+        GameState.clearWaypoint(army.id);
+        this._undoState = null;
+
+        GameState.selectedArmy = army;
+        GameState.movePath = null;
+        HUD.showArmyPanel(army);
+        GameState.addMessage('Move undone.');
+        HUD.update();
+        Renderer.centerOn(army.col, army.row);
     },
 
     // ---- Split army ----

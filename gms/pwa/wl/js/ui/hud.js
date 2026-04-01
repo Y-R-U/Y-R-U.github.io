@@ -106,16 +106,22 @@ const HUD = {
         const isOwn = army.owner === GameState.currentPlayer;
 
         let html = `<div style="color:${ownerColor};font-weight:600;font-size:0.8rem;margin-bottom:0.3rem">${ownerName}'s Army</div>`;
-        html += army.units.map(u => {
-            const str = Units.getEffectiveStr(u);
-            const moves = Units.getEffectiveMoves(u);
-            const items = u.items.length > 0 ? ` [${u.items.map(i => i.name).join(', ')}]` : '';
+        html += army.units.map((u, idx) => {
+            const baseStr = u.str;
+            const effStr = Units.getEffectiveStr(u);
+            const effMoves = Units.getEffectiveMoves(u);
+            const boosted = effStr > baseStr;
+            const strDisplay = boosted
+                ? `<span style="color:var(--success)">${effStr}</span>`
+                : `${effStr}`;
             const lvl = u.level > 1 ? ` Lv${u.level}` : '';
-            const promo = u.promoted ? ' *' : '';
-            return `<div class="unit-row">
+            const promo = u.promoted ? ' <span style="color:var(--gold)">*</span>' : '';
+            const itemDot = u.items.length > 0 ? ' <span style="color:var(--gold)">+</span>' : '';
+            const xpBar = u.xp > 0 ? ` <span style="color:var(--text-secondary);font-size:0.6rem">xp:${u.xp}</span>` : '';
+            return `<div class="unit-row unit-row-clickable" data-unit-idx="${idx}">
                 <span class="unit-symbol" style="border-left:3px solid ${ownerColor}">${u.symbol}</span>
-                <span class="unit-name">${u.name}${lvl}${promo}</span>
-                <span class="unit-stats">S:${str} M:${moves}${items}</span>
+                <span class="unit-name">${u.name}${lvl}${promo}${itemDot}</span>
+                <span class="unit-stats">S:${strDisplay} M:${effMoves}${xpBar}</span>
             </div>`;
         }).join('');
 
@@ -129,6 +135,16 @@ const HUD = {
                 Total Str: ${totalStr} | Moves: ${movesLeft.toFixed(1)}${scoutLabel}
             </div>`;
 
+        // Click on unit rows to show detail
+        this.elements.armyUnits.querySelectorAll('.unit-row-clickable').forEach(row => {
+            row.addEventListener('click', () => {
+                const idx = parseInt(row.dataset.unitIdx);
+                if (army.units[idx]) {
+                    this.showUnitDetail(army.units[idx], army);
+                }
+            });
+        });
+
         // Show/hide army action buttons for own armies
         if (actionsDiv) {
             if (isOwn) {
@@ -138,10 +154,102 @@ const HUD = {
                 if (scoutBtn) {
                     scoutBtn.textContent = army.scouting ? 'Unscout' : 'Scout';
                 }
+                // Show/hide undo button
+                const undoBtn = document.getElementById('btn-undo-move');
+                if (undoBtn) {
+                    const hasUndo = Input._undoState && Input._undoState.armyId === army.id;
+                    undoBtn.style.display = hasUndo ? '' : 'none';
+                }
             } else {
                 actionsDiv.classList.add('hidden');
             }
         }
+    },
+
+    showUnitDetail(unit, army) {
+        const panel = document.getElementById('unit-detail-panel');
+        const content = document.getElementById('unit-detail-content');
+        const baseType = UNIT_TYPE_BY_ID[unit.typeId];
+        const effStr = Units.getEffectiveStr(unit);
+        const effMoves = Units.getEffectiveMoves(unit);
+        const baseStr = baseType.str;
+        const baseMoves = baseType.moves;
+
+        // Calculate bonus breakdown
+        let itemStrBonus = 0, itemMovesBonus = 0;
+        for (const item of unit.items) {
+            itemStrBonus += item.strBonus || 0;
+            itemMovesBonus += item.movesBonus || 0;
+        }
+        const levelStrBonus = Math.floor(unit.level / 3);
+        const promoStrBonus = unit.promoted ? (PROMOTIONS[unit.typeId]?.strBonus || 0) : 0;
+        const promoMovesBonus = unit.promoted ? (PROMOTIONS[unit.typeId]?.movesBonus || 0) : 0;
+
+        const ownerColor = unit.owner >= 0 ? GameState.players[unit.owner].color.primary : '#888';
+
+        let html = `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem">
+            <span class="unit-symbol" style="border-left:3px solid ${ownerColor};font-size:1rem;width:32px;height:24px;line-height:24px">${unit.symbol}</span>
+            <div>
+                <div style="font-weight:700;font-size:1rem;color:var(--text-primary)">${unit.name}</div>
+                <div style="font-size:0.7rem;color:var(--text-secondary)">${baseType.name}${unit.promoted ? ' (Promoted)' : ''} | Level ${unit.level}</div>
+            </div>
+        </div>`;
+
+        // Stats grid
+        html += `<div class="detail-stat-grid">
+            <span class="label">Strength</span>
+            <span class="value">${effStr}`;
+        if (effStr > baseStr) {
+            html += ` <span class="bonus">(${baseStr}`;
+            if (promoStrBonus > 0) html += ` +${promoStrBonus} promo`;
+            if (itemStrBonus > 0) html += ` +${itemStrBonus} items`;
+            if (levelStrBonus > 0) html += ` +${levelStrBonus} level`;
+            html += `)</span>`;
+        }
+        html += `</span>
+            <span class="label">Movement</span>
+            <span class="value">${effMoves}`;
+        if (effMoves > baseMoves) {
+            html += ` <span class="bonus">(${baseMoves}`;
+            if (promoMovesBonus > 0) html += ` +${promoMovesBonus} promo`;
+            if (itemMovesBonus > 0) html += ` +${itemMovesBonus} items`;
+            html += `)</span>`;
+        }
+        html += `</span>
+            <span class="label">XP</span>
+            <span class="value">${unit.xp}`;
+        const promo = PROMOTIONS[unit.typeId];
+        if (promo && !unit.promoted) html += ` <span style="color:var(--text-secondary)">/ ${promo.xpRequired} to promote</span>`;
+        html += `</span>
+            <span class="label">Type</span>
+            <span class="value">${unit.flying ? 'Flying' : 'Ground'}</span>
+        </div>`;
+
+        // Items section
+        if (unit.items.length > 0) {
+            html += `<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.1em">Items</div>`;
+            for (const item of unit.items) {
+                let bonusText = [];
+                if (item.strBonus) bonusText.push(`+${item.strBonus} Str`);
+                if (item.movesBonus) bonusText.push(`+${item.movesBonus} Moves`);
+                html += `<div class="detail-item-row">
+                    <span class="detail-item-name">${item.name}</span>
+                    <span class="detail-item-bonus">${bonusText.join(', ')}</span>
+                </div>`;
+            }
+        }
+
+        // Stack context - show how this unit contributes to army
+        if (army) {
+            const totalStr = Units.armyStrength(army);
+            const pct = Math.round((effStr / totalStr) * 100);
+            html += `<div style="margin-top:0.5rem;font-size:0.7rem;color:var(--text-secondary)">
+                Contributes ${pct}% of army strength (${effStr}/${totalStr})
+            </div>`;
+        }
+
+        content.innerHTML = html;
+        panel.classList.remove('hidden');
     },
 
     showCityPanel(city) {
@@ -299,5 +407,9 @@ const HUD = {
         this.elements.cityPanel.classList.add('hidden');
         this.hideCombatResult();
         this.hideRuinResult();
+        const detailPanel = document.getElementById('unit-detail-panel');
+        if (detailPanel) detailPanel.classList.add('hidden');
+        const actionsDiv = document.getElementById('army-actions');
+        if (actionsDiv) actionsDiv.classList.add('hidden');
     },
 };
