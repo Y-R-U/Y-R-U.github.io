@@ -10,7 +10,7 @@ const Input = {
     hoverCol: -1,
     hoverRow: -1,
     pendingMerge: null, // { source, target }
-    _undoState: null, // { armyId, col, row, movesLeft }
+    _undoState: null, // { armyId, steps: [{col, row, movesLeft}], turnStartCol, turnStartRow, turnStartMoves }
     _longPressTimer: null,
     _isLongPress: false,
     _mouseDownTime: 0,
@@ -212,9 +212,9 @@ const Input = {
                         // Out of reach this turn - set waypoint
                         const path = Movement.findPath(selected, selected.col, selected.row, col, row);
                         if (path) {
-                            this._saveUndoState(selected);
                             GameState.setWaypoint(selected.id, col, row, path);
                             const result = Movement.moveArmy(selected, path);
+                            if (result) this._saveUndoState(selected, result);
                             this._handleMoveResult(result, selected, col, row);
                             GameState.addMessage(`Waypoint set: army heading to (${col},${row})`);
                             HUD.update();
@@ -232,15 +232,13 @@ const Input = {
             if (selected.movesLeft > 0) {
                 const path = Movement.findPath(selected, selected.col, selected.row, col, row);
                 if (path) {
-                    // Save undo state before moving
-                    this._saveUndoState(selected);
-
                     // Check if destination is beyond reach - set waypoint
                     const reachable = Movement.getReachableTiles(selected);
                     const destKey = `${col},${row}`;
                     const isReachable = reachable.has(destKey);
 
                     const result = Movement.moveArmy(selected, path);
+                    if (result) this._saveUndoState(selected, result);
                     this._handleMoveResult(result, selected, col, row);
                     GameState.movePath = null;
 
@@ -298,7 +296,6 @@ const Input = {
 
     _selectArmy(army) {
         this._hideWaypointBanner();
-        this._undoState = null; // Clear undo when switching armies
         Audio.playSelect();
         GameState.selectedArmy = army;
         GameState.movePath = null;
@@ -646,18 +643,41 @@ const Input = {
         this._onMinimapClick(e);
     },
 
-    // ---- Undo last move ----
-    _saveUndoState(army) {
-        this._undoState = {
-            armyId: army.id,
-            col: army.col,
-            row: army.row,
-            movesLeft: army.movesLeft,
-        };
+    // ---- Undo last move (step-by-step) ----
+    // _undoState.steps is a stack of positions: first entry is original start-of-turn pos,
+    // last entry is the most recent tile before the army moved to its current tile.
+    // Each undo pops one step and teleports the army back there.
+
+    _saveUndoState(army, moveResult) {
+        // moveResult.stepsWalked = [{col,row,movesLeft}, ...] from movement.js
+        // First entry is where army was before it moved, rest are tiles walked through.
+        if (!moveResult || !moveResult.stepsWalked || moveResult.stepsWalked.length < 2) return;
+
+        // If switching to a different army, replace undo history entirely
+        if (this._undoState && this._undoState.armyId !== army.id) {
+            this._undoState = null;
+        }
+
+        const walked = moveResult.stepsWalked;
+
+        if (!this._undoState) {
+            // Brand new undo chain: store all steps except the final (current) position
+            // stepsWalked[0] is the original position, stepsWalked[last] is where army ended up
+            this._undoState = {
+                armyId: army.id,
+                steps: walked.slice(0, -1), // everything except final position
+            };
+        } else {
+            // Continuing an existing chain: append intermediate steps
+            // walked[0] is where army was (already our last known pos), so skip it
+            for (let i = 1; i < walked.length - 1; i++) {
+                this._undoState.steps.push(walked[i]);
+            }
+        }
     },
 
     _undoMove() {
-        if (!this._undoState) {
+        if (!this._undoState || this._undoState.steps.length === 0) {
             GameState.addMessage('Nothing to undo.');
             HUD.update();
             return;
@@ -669,17 +689,23 @@ const Input = {
             HUD.update();
             return;
         }
-        // Restore position and moves
-        army.col = this._undoState.col;
-        army.row = this._undoState.row;
-        army.movesLeft = this._undoState.movesLeft;
+
+        // Pop the last saved step (go back one square)
+        const prevStep = this._undoState.steps.pop();
+        army.col = prevStep.col;
+        army.row = prevStep.row;
+        army.movesLeft = prevStep.movesLeft;
         GameState.clearWaypoint(army.id);
-        this._undoState = null;
+
+        // If no more steps, undo is fully exhausted (back to start of turn)
+        if (this._undoState.steps.length === 0) {
+            this._undoState = null;
+        }
 
         GameState.selectedArmy = army;
         GameState.movePath = null;
         HUD.showArmyPanel(army);
-        GameState.addMessage('Move undone.');
+        GameState.addMessage('Move undone (1 step back).');
         HUD.update();
         Renderer.centerOn(army.col, army.row);
     },

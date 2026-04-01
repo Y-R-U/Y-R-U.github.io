@@ -157,7 +157,7 @@ const HUD = {
                 // Show/hide undo button
                 const undoBtn = document.getElementById('btn-undo-move');
                 if (undoBtn) {
-                    const hasUndo = Input._undoState && Input._undoState.armyId === army.id;
+                    const hasUndo = Input._undoState && Input._undoState.armyId === army.id && Input._undoState.steps.length > 0;
                     undoBtn.style.display = hasUndo ? '' : 'none';
                 }
             } else {

@@ -227,13 +227,11 @@ html, body {
 
 /* Army Panel */
 #army-panel {
-    overflow-y: visible;
-    min-height: 80px;
+    overflow-y: auto;
 }
 
 #army-units {
     min-height: 60px;
-    max-height: 300px;
     overflow-y: auto;
 }
 
