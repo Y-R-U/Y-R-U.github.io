@@ -2,101 +2,300 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>Emerald Place</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-<div id="game-wrapper">
 
-  <!-- ── Game Stage ───────────────────────────────────────────── -->
-  <div id="game-stage">
+<!-- ════════════════════════════════════════════════════════════
+     SHELL: [left panel] [centre col] [right panel]
+     ════════════════════════════════════════════════════════════ -->
+<div id="shell">
 
-    <!-- HUD -->
-    <div id="hud">
-      <div class="hud-line" id="hud-unit">Unit 65</div>
-      <div class="hud-line" id="hud-date"></div>
-      <div class="hud-line" id="hud-view" style="opacity:0.4">room</div>
-    </div>
+  <!-- ══ LEFT PANEL (desktop only) ══════════════════════════ -->
+  <aside id="panel-left" class="side-panel">
 
-    <!-- ── VIEW: Room ────────────────────────────────────────── -->
-    <div id="room-view" class="view">
-      <!-- SVG room drawn inline so we can animate individual elements -->
-      <object
-        id="room-svg"
-        data="room.svg"
-        type="image/svg+xml"
-        style="width:100%;height:100%;display:block;pointer-events:none"
-        aria-label="Room interior"
-      ></object>
-      <!-- Invisible click overlay matching SVG zones - handled by game.js -->
-    </div>
+    <!-- Character card -->
+    <div class="panel-section">
+      <div class="panel-title">Resident</div>
 
-    <!-- ── VIEW: Window (outside panorama) ───────────────────── -->
-    <div id="window-view" class="view hidden">
-      <div id="window-viewport">
-        <div id="outside-container">
-          <object
-            data="outside.svg"
-            type="image/svg+xml"
-            style="width:2400px;height:400px;display:block"
-            aria-label="View outside the window"
-          ></object>
+      <div id="char-portrait">👤</div>
+      <div id="char-name">???</div>
+      <div id="char-unit-tag">Unit 65 · Floor 2</div>
+
+      <div class="stat-row">
+        <span class="stat-label">mood</span>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" id="stat-mood" style="width:70%;background:#e94560"></div>
         </div>
-        <!-- Window frame overlay (CSS-only border + cross divider) -->
-        <div id="window-frame-overlay"></div>
+        <span class="stat-val" id="stat-mood-val">70</span>
       </div>
-      <div id="window-sill"></div>
-      <button id="btn-back-from-window" class="back-btn">&#9650; Step back</button>
-    </div>
-
-    <!-- ── VIEW: Laptop Screen ───────────────────────────────── -->
-    <div id="laptop-view" class="view hidden">
-      <div id="laptop-bezel">
-        <div id="micro-game-container">
-          <!-- Micro-game loaded here by game.js -->
+      <div class="stat-row">
+        <span class="stat-label">energy</span>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" id="stat-energy" style="width:55%;background:#53d8fb"></div>
         </div>
+        <span class="stat-val" id="stat-energy-val">55</span>
       </div>
-      <div id="laptop-base"></div>
-      <button id="btn-back-from-laptop" class="back-btn">&#9660; Close laptop</button>
-    </div>
-
-    <!-- ── VIEW: Sleep ───────────────────────────────────────── -->
-    <div id="sleep-view" class="view hidden">
-      sleeping&hellip;
-    </div>
-
-    <!-- ── Calendar Overlay ───────────────────────────────────── -->
-    <div id="calendar-overlay" class="hidden">
-      <div id="calendar-panel">
-        <h3 id="cal-month-year">April 2026</h3>
-        <div id="cal-today-highlight">
-          Today: <span id="cal-today"></span>
+      <div class="stat-row">
+        <span class="stat-label">cash</span>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" id="stat-cash" style="width:20%;background:#c9a227"></div>
         </div>
-        <button id="cal-close">Close</button>
+        <span class="stat-val" id="stat-cash-val">$0</span>
       </div>
     </div>
 
-    <!-- ── Transition Overlay ─────────────────────────────────── -->
-    <div id="transition-overlay"></div>
+    <!-- Unit selector -->
+    <div id="unit-selector-panel">
+      <div class="panel-title">Units</div>
+      <!-- Injected by game.js -->
+    </div>
 
-  </div><!-- /game-stage -->
+  </aside>
 
-  <!-- ── Unit Selector (below stage) ─────────────────────────── -->
-  <div id="unit-selector" role="navigation" aria-label="Select unit">
-    <!-- Buttons injected by game.js -->
+  <!-- ══ CENTRE COLUMN ═══════════════════════════════════════ -->
+  <div id="centre-col">
+
+    <!-- Top bar (mobile only) -->
+    <header id="top-bar">
+      <span id="top-bar-title">EMERALD PLACE</span>
+      <div id="top-bar-right">
+        <button class="icon-btn" id="btn-open-log"   aria-label="Story log"  title="Story log">📖</button>
+        <button class="icon-btn" id="btn-open-settings" aria-label="Settings" title="Settings">⚙</button>
+      </div>
+    </header>
+
+    <!-- ── Game Stage ─────────────────────────────────────── -->
+    <div id="game-stage">
+
+      <!-- In-stage HUD -->
+      <div id="hud">
+        <div class="hud-line" id="hud-unit">Unit 65</div>
+        <div class="hud-line dim" id="hud-date"></div>
+      </div>
+
+      <!-- ── VIEW: Room ──────────────────────────────────── -->
+      <div id="room-view" class="view">
+        <object
+          data="room.svg"
+          type="image/svg+xml"
+          style="width:100%;height:100%;display:block;pointer-events:none"
+          aria-label="Room interior"
+        ></object>
+      </div>
+
+      <!-- ── VIEW: Window panorama ───────────────────────── -->
+      <div id="window-view" class="view hidden">
+        <div id="window-viewport">
+          <div id="outside-container">
+            <object
+              data="outside.svg"
+              type="image/svg+xml"
+              style="width:2400px;height:100%;display:block"
+              aria-label="View outside the window"
+            ></object>
+          </div>
+          <div id="window-frame-overlay"></div>
+        </div>
+        <div id="window-sill"></div>
+        <button id="btn-back-from-window" class="back-btn">&#9650; Step back</button>
+      </div>
+
+      <!-- ── VIEW: Laptop ────────────────────────────────── -->
+      <div id="laptop-view" class="view hidden">
+        <div id="laptop-bezel">
+          <div id="micro-game-container"></div>
+        </div>
+        <div id="laptop-base-bar"></div>
+        <button id="btn-back-from-laptop" class="back-btn">&#9660; Close laptop</button>
+      </div>
+
+      <!-- ── VIEW: Sleep ─────────────────────────────────── -->
+      <div id="sleep-view" class="view hidden">sleeping&hellip;</div>
+
+      <!-- ── Calendar overlay (in-stage) ─────────────────── -->
+      <div id="calendar-overlay" class="hidden">
+        <div id="calendar-panel">
+          <h3 id="cal-month-year">April 2026</h3>
+          <div id="cal-today-highlight"><span id="cal-today"></span></div>
+          <div style="font-size:0.65rem;color:#888;margin-top:4px">today</div>
+          <button id="cal-close">Close</button>
+        </div>
+      </div>
+
+      <!-- ── Transition overlay ───────────────────────────── -->
+      <div id="transition-overlay"></div>
+
+    </div><!-- /game-stage -->
+
+    <!-- Bottom nav (mobile only) -->
+    <nav id="bottom-nav" aria-label="Navigation">
+      <button class="nav-btn" id="btn-nav-char">
+        <span class="nav-icon">👤</span>
+        <span>Character</span>
+      </button>
+      <button class="nav-btn" id="btn-nav-units">
+        <span class="nav-icon">🏠</span>
+        <span>Units</span>
+      </button>
+      <button class="nav-btn" id="btn-nav-log">
+        <span class="nav-icon">📖</span>
+        <span>Log</span>
+      </button>
+      <button class="nav-btn" id="btn-nav-settings">
+        <span class="nav-icon">⚙</span>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+  </div><!-- /centre-col -->
+
+  <!-- ══ RIGHT PANEL (desktop only) ═════════════════════════ -->
+  <aside id="panel-right" class="side-panel">
+
+    <!-- Story log -->
+    <div class="panel-section" id="story-log-section">
+      <div class="panel-title">Story Log</div>
+      <div id="story-log">
+        <div class="log-entry">
+          <div class="log-time">Day 1 · Morning</div>
+          You arrive at Emerald Place. The corridor smells of fresh paint.
+        </div>
+        <div class="log-entry">
+          <div class="log-time">—</div>
+          <em style="color:rgba(224,216,200,0.25)">Nothing else yet.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="panel-section" id="settings-section">
+      <div class="panel-title">Settings</div>
+
+      <div class="setting-row">
+        <span>Sound FX</span>
+        <button class="toggle on" id="toggle-sfx" aria-label="Toggle sound effects"></button>
+      </div>
+      <div class="setting-row">
+        <span>Music</span>
+        <button class="toggle on" id="toggle-music" aria-label="Toggle music"></button>
+      </div>
+      <div class="setting-row">
+        <span>Notifications</span>
+        <button class="toggle" id="toggle-notif" aria-label="Toggle notifications"></button>
+      </div>
+      <div class="setting-row">
+        <span>Dev overlay</span>
+        <button class="toggle" id="toggle-dev" aria-label="Toggle dev mode"></button>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- /shell -->
+
+<!-- ════════════════════════════════════════════════════════════
+     DRAWERS (mobile — outside #shell so they overlay everything)
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- Backdrop -->
+<div id="drawer-backdrop"></div>
+
+<!-- Settings drawer (slides from top) -->
+<div id="drawer-settings" class="drawer" role="dialog" aria-label="Settings">
+  <div class="drawer-handle"></div>
+  <button class="drawer-close" id="drawer-settings-close">✕</button>
+  <div class="drawer-title">Settings</div>
+
+  <div class="setting-row">
+    <span>Sound FX</span>
+    <button class="toggle on" id="m-toggle-sfx"></button>
+  </div>
+  <div class="setting-row">
+    <span>Music</span>
+    <button class="toggle on" id="m-toggle-music"></button>
+  </div>
+  <div class="setting-row">
+    <span>Notifications</span>
+    <button class="toggle" id="m-toggle-notif"></button>
+  </div>
+  <div class="setting-row">
+    <span>Dev overlay</span>
+    <button class="toggle" id="m-toggle-dev"></button>
+  </div>
+</div>
+
+<!-- Character drawer (slides from bottom) -->
+<div id="drawer-char" class="drawer" role="dialog" aria-label="Character">
+  <div class="drawer-handle"></div>
+  <button class="drawer-close" id="drawer-char-close">✕</button>
+  <div class="drawer-title">Resident</div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+    <div style="
+      width:64px;height:64px;flex-shrink:0;
+      background:var(--surface2);border-radius:var(--radius);
+      border:1px solid var(--border);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;
+    ">👤</div>
+    <div>
+      <div id="m-char-name" style="font-size:0.85rem;color:var(--gold);margin-bottom:3px">???</div>
+      <div id="m-char-unit" style="font-size:0.65rem;color:var(--text-dim)">Unit 65 · Floor 2</div>
+    </div>
   </div>
 
-  <!-- Room label (synced to current unit) -->
-  <div id="room-label" style="
-    margin-top: 6px;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    color: rgba(201,162,39,0.6);
-    font-family: 'Courier New', monospace;
-  "></div>
+  <!-- Stats mirrored -->
+  <div class="stat-row">
+    <span class="stat-label">mood</span>
+    <div class="stat-bar-bg">
+      <div class="stat-bar-fill" id="m-stat-mood" style="width:70%;background:#e94560"></div>
+    </div>
+    <span class="stat-val" id="m-stat-mood-val">70</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">energy</span>
+    <div class="stat-bar-bg">
+      <div class="stat-bar-fill" id="m-stat-energy" style="width:55%;background:#53d8fb"></div>
+    </div>
+    <span class="stat-val" id="m-stat-energy-val">55</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">cash</span>
+    <div class="stat-bar-bg">
+      <div class="stat-bar-fill" id="m-stat-cash" style="width:20%;background:#c9a227"></div>
+    </div>
+    <span class="stat-val" id="m-stat-cash-val">$0</span>
+  </div>
 
-</div><!-- /game-wrapper -->
+  <div style="margin-top:16px">
+    <div class="drawer-title">Units</div>
+    <div id="unit-selector-drawer" style="display:flex;flex-direction:column;gap:6px">
+      <!-- injected by game.js -->
+    </div>
+  </div>
+</div>
+
+<!-- Story log drawer (slides from right) -->
+<div id="drawer-log" class="drawer" role="dialog" aria-label="Story log">
+  <div class="drawer-title">Story Log</div>
+  <button class="drawer-close" id="drawer-log-close">✕</button>
+  <div id="story-log-mobile">
+    <div class="log-entry">
+      <div class="log-time">Day 1 · Morning</div>
+      You arrive at Emerald Place. The corridor smells of fresh paint.
+    </div>
+    <div class="log-entry">
+      <div class="log-time">—</div>
+      <em style="color:rgba(224,216,200,0.25)">Nothing else yet.</em>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="game.js"></script>
 </body>

@@ -1,121 +1,182 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
-  <!-- Room background / walls -->
-  <rect width="800" height="600" fill="#d4c5a9"/>
-
-  <!-- Floor perspective -->
-  <polygon points="0,600 800,600 680,420 120,420" fill="#b8a98a"/>
-
-  <!-- Back wall -->
-  <rect x="120" y="80" width="560" height="340" fill="#e8dcc8"/>
-
-  <!-- Left wall -->
-  <polygon points="0,0 120,80 120,420 0,600" fill="#c9b899"/>
-
-  <!-- Right wall -->
-  <polygon points="800,0 680,80 680,420 800,600" fill="#c9b899"/>
-
-  <!-- Ceiling -->
-  <polygon points="0,0 800,0 680,80 120,80" fill="#ede3d2"/>
-
-  <!-- === WINDOW === -->
-  <!-- Window frame outer -->
-  <rect id="window-frame-outer" x="290" y="110" width="220" height="180" rx="4" fill="#8b7355"/>
-  <!-- Window sill -->
-  <rect x="280" y="285" width="240" height="14" fill="#a08060" rx="2"/>
-  <!-- Window pane - sky visible through it -->
-  <rect id="window-pane" x="300" y="120" width="200" height="160" fill="#87ceeb" rx="2"/>
-  <!-- Sky gradient in window -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" width="360" height="640">
   <defs>
-    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4a90d9"/>
-      <stop offset="60%" stop-color="#87ceeb"/>
-      <stop offset="100%" stop-color="#c8e6c9"/>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ede3d2"/>
+      <stop offset="100%" stop-color="#d8c9b2"/>
     </linearGradient>
     <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#b8a98a"/>
       <stop offset="100%" stop-color="#9a8b72"/>
     </linearGradient>
+    <linearGradient id="skyWin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a90d9"/>
+      <stop offset="55%" stop-color="#87ceeb"/>
+      <stop offset="100%" stop-color="#c8e6c9"/>
+    </linearGradient>
+    <linearGradient id="ceilGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5efe4"/>
+      <stop offset="100%" stop-color="#ede3d2"/>
+    </linearGradient>
   </defs>
-  <rect x="300" y="120" width="200" height="160" fill="url(#skyGrad)" rx="2"/>
+
+  <!-- ── CEILING ─────────────────────────────────────────── -->
+  <!-- Perspective trapezoid: narrow at back, wide at viewer -->
+  <polygon points="0,0 360,0 360,70 0,70" fill="url(#ceilGrad)"/>
+  <!-- Ceiling–wall join -->
+  <line x1="0" y1="70" x2="360" y2="70" stroke="#c9b899" stroke-width="2"/>
+
+  <!-- ── LEFT WALL (sliver) ─────────────────────────────── -->
+  <polygon points="0,70 52,70 52,490 0,490" fill="#c9b899"/>
+  <!-- Shadow on left wall -->
+  <polygon points="0,70 52,70 52,490 0,490" fill="rgba(0,0,0,0.08)"/>
+
+  <!-- ── RIGHT WALL (sliver) ────────────────────────────── -->
+  <polygon points="308,70 360,70 360,490 308,490" fill="#c4b390"/>
+  <polygon points="308,70 360,70 360,490 308,490" fill="rgba(0,0,0,0.05)"/>
+
+  <!-- ── BACK WALL ───────────────────────────────────────── -->
+  <rect x="52" y="70" width="256" height="420" fill="url(#wallGrad)"/>
+
+  <!-- ── FLOOR ───────────────────────────────────────────── -->
+  <rect x="0" y="490" width="360" height="150" fill="url(#floorGrad)"/>
+  <!-- Floorboard lines -->
+  <line x1="0" y1="510" x2="360" y2="510" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="0" y1="535" x2="360" y2="535" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="0" y1="560" x2="360" y2="560" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="0" y1="590" x2="360" y2="590" stroke="#a89870" stroke-width="1" opacity="0.35"/>
+  <!-- Vertical boards -->
+  <line x1="60"  y1="490" x2="40"  y2="640" stroke="#a89870" stroke-width="0.7" opacity="0.3"/>
+  <line x1="120" y1="490" x2="90"  y2="640" stroke="#a89870" stroke-width="0.7" opacity="0.3"/>
+  <line x1="180" y1="490" x2="180" y2="640" stroke="#a89870" stroke-width="0.7" opacity="0.3"/>
+  <line x1="240" y1="490" x2="270" y2="640" stroke="#a89870" stroke-width="0.7" opacity="0.3"/>
+  <line x1="300" y1="490" x2="320" y2="640" stroke="#a89870" stroke-width="0.7" opacity="0.3"/>
+
+  <!-- ── SKIRTING BOARDS ────────────────────────────────── -->
+  <rect x="52" y="476" width="256" height="16" fill="#c4a87a" rx="1"/>
+  <rect x="52" y="488" width="256" height="4" fill="#b09060"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- WINDOW                                                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Outer frame -->
+  <rect x="108" y="88" width="144" height="190" rx="3" fill="#8b7355"/>
+  <!-- Inner sill-ledge -->
+  <rect x="100" y="272" width="160" height="14" rx="2" fill="#a08060"/>
+  <!-- Window pane sky -->
+  <rect x="116" y="96" width="128" height="174" fill="url(#skyWin)" rx="1"/>
   <!-- Building silhouettes in window -->
-  <rect x="305" y="210" width="40" height="70" fill="#2d5a27" opacity="0.6"/>
-  <rect x="350" y="225" width="30" height="55" fill="#2d5a27" opacity="0.5"/>
-  <rect x="420" y="200" width="45" height="80" fill="#2d5a27" opacity="0.6"/>
-  <rect x="468" y="218" width="25" height="62" fill="#2d5a27" opacity="0.5"/>
-  <!-- Ground visible through window -->
-  <rect x="300" y="252" width="200" height="28" fill="#4a7c59" opacity="0.7"/>
-  <!-- Window divider cross -->
-  <rect x="398" y="120" width="4" height="160" fill="#8b7355"/>
-  <rect x="300" y="198" width="200" height="4" fill="#8b7355"/>
-  <!-- Window click area label (dev helper, hidden in prod) -->
-  <text x="380" y="205" text-anchor="middle" font-size="10" fill="rgba(0,0,0,0.3)" font-family="monospace">[window]</text>
+  <rect x="118" y="198" width="22" height="72" fill="#2d5a27" opacity="0.55"/>
+  <rect x="143" y="210" width="16" height="60" fill="#2d5a27" opacity="0.45"/>
+  <rect x="175" y="190" width="28" height="80" fill="#2d5a27" opacity="0.55"/>
+  <rect x="206" y="205" width="18" height="65" fill="#2d5a27" opacity="0.45"/>
+  <rect x="227" y="215" width="16" height="55" fill="#2d5a27" opacity="0.4"/>
+  <!-- Ground strip in window -->
+  <rect x="116" y="240" width="128" height="30" fill="#4a7c59" opacity="0.65"/>
+  <!-- Window cross dividers -->
+  <rect x="178" y="96" width="4" height="174" fill="#8b7355"/>
+  <rect x="116" y="181" width="128" height="4" fill="#8b7355"/>
+  <!-- Window glare highlight -->
+  <rect x="118" y="98" width="30" height="80" fill="white" opacity="0.06" rx="1"/>
+  <!-- Dev label -->
+  <text x="180" y="192" text-anchor="middle" font-size="9" fill="rgba(0,0,0,0.2)" font-family="monospace">[window]</text>
 
-  <!-- === DESK === -->
-  <rect x="500" y="330" width="180" height="12" fill="#6b4e3d" rx="2"/>
-  <rect x="500" y="342" width="180" height="80" fill="#7a5c47"/>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CALENDAR (left of window)                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="60" y="100" width="40" height="52" rx="2" fill="#fff"/>
+  <rect x="60" y="100" width="40" height="14" rx="2" fill="#e94560"/>
+  <!-- Rings -->
+  <circle cx="70" cy="100" r="2.5" fill="#ccc"/>
+  <circle cx="90" cy="100" r="2.5" fill="#ccc"/>
+  <!-- Month -->
+  <text x="80" y="110" text-anchor="middle" font-size="6" fill="white" font-family="monospace" font-weight="bold">APR</text>
+  <!-- Days grid -->
+  <text x="64" y="122" font-size="5.5" fill="#555" font-family="monospace">M T W T</text>
+  <text x="64" y="131" font-size="5.5" fill="#555" font-family="monospace">1 2 3 4</text>
+  <text x="64" y="140" font-size="5.5" fill="#555" font-family="monospace">7 8 9 0</text>
+  <text x="64" y="149" font-size="5.5" fill="#e94560" font-family="monospace" font-weight="bold">14</text>
+  <!-- Dev label -->
+  <text x="80" y="163" text-anchor="middle" font-size="7" fill="rgba(0,0,0,0.2)" font-family="monospace">[cal]</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ROOM NUMBER SIGN                                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="142" y="310" width="76" height="22" rx="3" fill="#c9a227"/>
+  <text x="180" y="325" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="monospace" font-weight="bold" id="room-number-sign">UNIT 65</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- DESK (right side)                                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Desk surface -->
+  <rect x="210" y="400" width="148" height="10" rx="2" fill="#7a5c47"/>
+  <rect x="212" y="408" width="144" height="82" fill="#6b4e3d"/>
+  <!-- Desk highlight -->
+  <rect x="210" y="400" width="148" height="4" rx="1" fill="#8a6a55"/>
   <!-- Desk legs -->
-  <rect x="508" y="422" width="12" height="60" fill="#6b4e3d"/>
-  <rect x="656" y="422" width="12" height="60" fill="#6b4e3d"/>
-  <!-- Desk surface highlight -->
-  <rect x="500" y="330" width="180" height="4" fill="#8a6a55" rx="2"/>
+  <rect x="218" y="488" width="8" height="50" fill="#5c3d2e"/>
+  <rect x="348" y="488" width="8" height="50" fill="#5c3d2e"/>
 
-  <!-- === LAPTOP === -->
-  <!-- Laptop base -->
-  <rect id="laptop-base" x="530" y="305" width="100" height="28" rx="3" fill="#2a2a2a"/>
-  <!-- Laptop screen -->
-  <rect id="laptop-screen" x="535" y="255" width="90" height="55" rx="3" fill="#1a1a2e"/>
-  <!-- Screen glow -->
-  <rect x="538" y="258" width="84" height="49" rx="2" fill="#16213e"/>
-  <rect x="540" y="260" width="80" height="45" rx="1" fill="#0f3460" opacity="0.8"/>
-  <!-- Screen content suggestion -->
-  <rect x="544" y="264" width="50" height="4" fill="#e94560" opacity="0.7" rx="1"/>
-  <rect x="544" y="271" width="35" height="3" fill="#53d8fb" opacity="0.5" rx="1"/>
-  <rect x="544" y="277" width="42" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
-  <rect x="544" y="283" width="28" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
-  <text x="580" y="295" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">[laptop]</text>
-  <!-- Laptop hinge -->
-  <rect x="535" y="308" width="90" height="4" rx="1" fill="#1a1a1a"/>
+  <!-- ─── LAPTOP (on desk) ─────────────────────────────── -->
+  <!-- Laptop screen (open) -->
+  <rect x="228" y="340" width="106" height="64" rx="2" fill="#1a1a2e"/>
+  <rect x="231" y="343" width="100" height="58" rx="1" fill="#0f3460"/>
+  <!-- Screen glow content -->
+  <rect x="234" y="347" width="58" height="4" fill="#e94560" opacity="0.7" rx="1"/>
+  <rect x="234" y="354" width="42" height="3" fill="#53d8fb" opacity="0.5" rx="1"/>
+  <rect x="234" y="360" width="50" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
+  <rect x="234" y="366" width="32" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
+  <rect x="234" y="372" width="46" height="3" fill="#53d8fb" opacity="0.35" rx="1"/>
+  <text x="281" y="390" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.25)" font-family="monospace">[laptop]</text>
+  <!-- Laptop base / keyboard -->
+  <rect x="225" y="402" width="112" height="8" rx="2" fill="#2a2a2a"/>
+  <rect x="227" y="404" width="108" height="4" fill="#1a1a1a" rx="1"/>
+  <!-- Hinge line -->
+  <line x1="228" y1="404" x2="334" y2="404" stroke="#333" stroke-width="1"/>
 
-  <!-- === BED === -->
-  <!-- Bed frame -->
-  <rect x="30" y="330" width="220" height="140" rx="6" fill="#5c3d2e"/>
-  <!-- Mattress -->
-  <rect x="38" y="318" width="204" height="120" rx="4" fill="#e8e0d0"/>
-  <!-- Pillow -->
-  <rect x="48" y="322" width="80" height="45" rx="6" fill="#f5f0e8"/>
-  <rect x="50" y="324" width="76" height="41" rx="5" fill="#fffef8" opacity="0.8"/>
-  <!-- Blanket -->
-  <rect x="38" y="370" width="204" height="68" rx="4" fill="#4a6fa5"/>
-  <!-- Blanket folds -->
-  <line x1="38" y1="385" x2="242" y2="385" stroke="#3a5f95" stroke-width="1.5" opacity="0.5"/>
-  <line x1="38" y1="400" x2="242" y2="400" stroke="#3a5f95" stroke-width="1.5" opacity="0.5"/>
+  <!-- Small items on desk -->
+  <!-- Coffee mug -->
+  <rect x="344" y="388" width="12" height="14" rx="2" fill="#8b4513"/>
+  <rect x="346" y="386" width="8" height="4" rx="1" fill="#a0522d"/>
+  <!-- Steam -->
+  <path d="M 348 384 q 2,-4 0,-7" stroke="#ccc" stroke-width="1" fill="none" opacity="0.5"/>
+  <path d="M 352 384 q 2,-4 0,-7" stroke="#ccc" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- BED (left side / foreground)                             -->
+  <!-- ═══════════════════════════════════════════════════════ -->
   <!-- Headboard -->
-  <rect x="25" y="300" width="234" height="40" rx="6" fill="#6b4e3d"/>
-  <text x="142" y="460" text-anchor="middle" font-size="10" fill="rgba(0,0,0,0.3)" font-family="monospace">[bed]</text>
+  <rect x="0" y="425" width="155" height="32" rx="4" fill="#6b4e3d"/>
+  <rect x="4" y="429" width="147" height="24" rx="3" fill="#7a5c47"/>
+  <!-- Mattress -->
+  <rect x="0" y="455" width="158" height="100" fill="#e8e0d0"/>
+  <!-- Pillow -->
+  <rect x="8" y="458" width="68" height="38" rx="5" fill="#f5f0e8"/>
+  <rect x="11" y="461" width="62" height="32" rx="4" fill="#fffef8" opacity="0.9"/>
+  <!-- Blanket -->
+  <rect x="0" y="492" width="158" height="63" fill="#4a6fa5"/>
+  <!-- Blanket fold highlight -->
+  <rect x="0" y="492" width="158" height="6" fill="#5a7fb5" opacity="0.5"/>
+  <!-- Blanket stitch lines -->
+  <line x1="0" y1="505" x2="158" y2="505" stroke="#3a5f95" stroke-width="1" opacity="0.4"/>
+  <line x1="0" y1="520" x2="158" y2="520" stroke="#3a5f95" stroke-width="1" opacity="0.4"/>
+  <!-- Bed frame base visible at front -->
+  <rect x="0" y="553" width="158" height="12" rx="2" fill="#5c3d2e"/>
+  <!-- Dev label -->
+  <text x="79" y="548" text-anchor="middle" font-size="8" fill="rgba(0,0,0,0.2)" font-family="monospace">[bed]</text>
 
-  <!-- === CALENDAR === -->
-  <rect id="calendar" x="170" y="130" width="80" height="90" rx="3" fill="#fff"/>
-  <rect x="170" y="130" width="80" height="22" rx="3" fill="#e94560"/>
-  <!-- Calendar rings -->
-  <circle cx="190" cy="130" r="4" fill="#ccc"/>
-  <circle cx="230" cy="130" r="4" fill="#ccc"/>
-  <!-- Calendar month text -->
-  <text x="210" y="146" text-anchor="middle" font-size="10" fill="white" font-family="monospace" font-weight="bold">APRIL</text>
-  <!-- Calendar grid -->
-  <text x="178" y="165" font-size="8" fill="#555" font-family="monospace">M  T  W  T</text>
-  <text x="178" y="177" font-size="8" fill="#555" font-family="monospace">1  2  3  4</text>
-  <text x="178" y="189" font-size="8" fill="#555" font-family="monospace">7  8  9 10</text>
-  <text x="178" y="201" font-size="8" fill="#e94560" font-family="monospace" font-weight="bold">14</text>
-  <text x="192" y="201" font-size="8" fill="#555" font-family="monospace"> 15 16 17</text>
-  <text x="170" y="215" font-size="7" fill="rgba(0,0,0,0.3)" font-family="monospace">[calendar]</text>
+  <!-- ─── Wall lamp above desk ─────────────────────────── -->
+  <rect x="316" y="270" width="6" height="22" fill="#888"/>
+  <polygon points="306,292 332,292 328,308 310,308" fill="#c9a227" opacity="0.9"/>
+  <!-- Lamp glow -->
+  <ellipse cx="319" cy="308" rx="16" ry="5" fill="#ffd700" opacity="0.15"/>
 
-  <!-- === ROOM NUMBER SIGN === -->
-  <rect x="350" y="88" width="100" height="28" rx="4" fill="#c9a227"/>
-  <text x="400" y="107" text-anchor="middle" font-size="16" fill="#1a1a1a" font-family="monospace" font-weight="bold" id="room-number-sign">UNIT 65</text>
+  <!-- ─── Power outlet ───────────────────────────────────── -->
+  <rect x="265" y="468" width="16" height="12" rx="2" fill="#d4c5a9" stroke="#b0a080" stroke-width="1"/>
+  <rect x="268" y="471" width="3" height="5" rx="1" fill="#888"/>
+  <rect x="274" y="471" width="3" height="5" rx="1" fill="#888"/>
 
-  <!-- Floor texture lines -->
-  <line x1="120" y1="500" x2="300" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
-  <line x1="250" y1="540" x2="400" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
-  <line x1="400" y1="560" x2="500" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
-  <line x1="550" y1="580" x2="600" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <!-- ─── Subtle ceiling light ───────────────────────────── -->
+  <rect x="155" y="68" width="50" height="6" rx="2" fill="#e0d0b0"/>
+  <rect x="158" y="72" width="44" height="4" rx="1" fill="#ffd700" opacity="0.6"/>
+  <ellipse cx="180" cy="76" rx="60" ry="12" fill="#ffd700" opacity="0.04"/>
 </svg>

@@ -1,230 +1,241 @@
 /**
- * Emerald Place - Core Game Engine
+ * Emerald Place — Core Game Engine
  *
  * Architecture:
- *   - RoomEngine: manages state, view transitions, clickable zones
- *   - UnitConfig: per-unit data (scroll offset, floor, active micro-game)
- *   - Views: "room" | "window" | "laptop" | "sleep"
- *
- * Micro-games are lazily loaded per unit via dynamic import.
+ *   RoomEngine  — state, view transitions, click zones
+ *   PanelSystem — drawer / side-panel open/close (responsive)
+ *   UnitConfig  — per-unit scroll offsets, themes, micro-game paths
+ *   MicroLoader — lazy import of unit JS modules
  */
 
-// ─── Unit Configuration ────────────────────────────────────────────────────
+// ─── Unit Config ────────────────────────────────────────────
 
 const UNITS = {
   65: {
     name: "Unit 65",
+    emoji: "💌",
     floor: 2,
-    outsideScrollX: 400,   // px offset into outside.svg panorama
+    outsideScrollX: 400,
     outsideScrollY: 0,
     microGame: "units/unit65.js",
     theme: "#4a6fa5",
+    char: { name: "???", portrait: "👤" },
+    stats: { mood: 70, energy: 55, cash: 0 },
   },
   66: {
     name: "Unit 66",
+    emoji: "📦",
     floor: 2,
     outsideScrollX: 500,
     outsideScrollY: 0,
     microGame: "units/unit66.js",
     theme: "#c9a227",
-    startsOutside: true,   // starts in window-zoomed mode looking at street
+    startsOutside: true,
+    char: { name: "???", portrait: "🧍" },
+    stats: { mood: 30, energy: 40, cash: 0 },
   },
   67: {
     name: "Unit 67",
+    emoji: "🔮",
     floor: 2,
     outsideScrollX: 600,
     outsideScrollY: 0,
     microGame: "units/unit67.js",
-    theme: "#6b2fa0",
+    theme: "#9b59b6",
+    char: { name: "???", portrait: "🧙" },
+    stats: { mood: 60, energy: 80, cash: 50 },
   },
   68: {
     name: "Unit 68",
+    emoji: "👁",
     floor: 2,
     outsideScrollX: 700,
     outsideScrollY: 0,
     microGame: "units/unit68.js",
-    theme: "#1a1a2e",
+    theme: "#c0392b",
+    char: { name: "???", portrait: "😰" },
+    stats: { mood: 20, energy: 35, cash: 30 },
   },
   69: {
     name: "Unit 69",
+    emoji: "💋",
     floor: 2,
     outsideScrollX: 800,
     outsideScrollY: 0,
     microGame: "units/unit69.js",
-    theme: "#c0392b",
+    theme: "#e91e8c",
+    char: { name: "???", portrait: "😏" },
+    stats: { mood: 90, energy: 70, cash: 200 },
   },
 };
 
-// Floor offset: each floor shifts Y by this amount in the outside panorama
-const FLOOR_Y_OFFSET = 80; // px per floor
+const FLOOR_Y_OFFSET = 60; // px per floor in outside panorama
 
-// ─── State ─────────────────────────────────────────────────────────────────
+// ─── State ──────────────────────────────────────────────────
 
 const State = {
   currentUnit: 65,
-  view: "room",         // "room" | "window" | "laptop" | "sleep"
-  date: new Date(),
+  view: "room",   // "room" | "window" | "laptop" | "sleep"
+  date: new Date(2026, 3, 2),  // April 2nd 2026
   microGameActive: false,
   microGameInstance: null,
-  easterEggsUnlocked: [],  // unit IDs whose easter eggs are visible
+  easterEggsUnlocked: [],
+  settings: {
+    sfx: true,
+    music: true,
+    notifications: false,
+    dev: false,
+  },
 };
 
-// ─── DOM References ─────────────────────────────────────────────────────────
+// ─── View Transitions ────────────────────────────────────────
 
-let canvas, ctx;
-let roomImg, outsideImg;
-let outsideLoaded = false;
-let roomLoaded = false;
-
-// ─── View Transition ────────────────────────────────────────────────────────
-
-const TRANSITION_MS = 400;
+const TRANS_MS = 350;
 
 function setView(newView) {
   const overlay = document.getElementById("transition-overlay");
   overlay.classList.add("fade-in");
-
   setTimeout(() => {
     State.view = newView;
-    renderCurrentView();
+    applyView();
     overlay.classList.remove("fade-in");
     overlay.classList.add("fade-out");
-    setTimeout(() => overlay.classList.remove("fade-out"), TRANSITION_MS);
-  }, TRANSITION_MS / 2);
+    setTimeout(() => overlay.classList.remove("fade-out"), TRANS_MS);
+  }, TRANS_MS / 2);
 }
 
-// ─── Rendering ──────────────────────────────────────────────────────────────
+function applyView() {
+  const views = ["room-view", "window-view", "laptop-view", "sleep-view"];
+  views.forEach(id => document.getElementById(id).classList.add("hidden"));
 
-function renderCurrentView() {
   switch (State.view) {
-    case "room":
-      renderRoom();
-      break;
-    case "window":
-      renderWindow();
-      break;
-    case "laptop":
-      renderLaptop();
-      break;
-    case "sleep":
-      renderSleep();
-      break;
+    case "room":   showRoom();   break;
+    case "window": showWindow(); break;
+    case "laptop": showLaptop(); break;
+    case "sleep":  showSleep();  break;
   }
   updateHUD();
 }
 
-function renderRoom() {
-  const roomView = document.getElementById("room-view");
-  const windowView = document.getElementById("window-view");
-  const laptopView = document.getElementById("laptop-view");
-  const sleepView = document.getElementById("sleep-view");
-
-  roomView.classList.remove("hidden");
-  windowView.classList.add("hidden");
-  laptopView.classList.add("hidden");
-  sleepView.classList.add("hidden");
-
-  // Update room number sign
-  const unit = UNITS[State.currentUnit];
-  document.getElementById("room-label").textContent = unit.name;
+function showRoom() {
+  document.getElementById("room-view").classList.remove("hidden");
 }
 
-function renderWindow() {
-  const roomView = document.getElementById("room-view");
-  const windowView = document.getElementById("window-view");
-
-  roomView.classList.add("hidden");
-  windowView.classList.remove("hidden");
-
+function showWindow() {
+  document.getElementById("window-view").classList.remove("hidden");
   const unit = UNITS[State.currentUnit];
-  const scrollX = unit.outsideScrollX + (unit.floor - 1) * 0;
-  const scrollY = unit.outsideScrollY + (unit.floor - 1) * FLOOR_Y_OFFSET;
-
-  const outsideContainer = document.getElementById("outside-container");
-  outsideContainer.style.transform = `translate(-${scrollX}px, -${scrollY}px)`;
+  const x = unit.outsideScrollX;
+  const y = unit.outsideScrollY + (unit.floor - 1) * FLOOR_Y_OFFSET;
+  document.getElementById("outside-container").style.transform =
+    `translate(-${x}px, -${y}px)`;
 }
 
-function renderLaptop() {
-  document.getElementById("room-view").classList.add("hidden");
-  document.getElementById("window-view").classList.add("hidden");
+function showLaptop() {
   document.getElementById("laptop-view").classList.remove("hidden");
-
-  // Lazy-load the micro-game for this unit
-  if (!State.microGameActive) {
-    loadMicroGame(State.currentUnit);
-  }
+  if (!State.microGameActive) loadMicroGame(State.currentUnit);
 }
 
-function renderSleep() {
-  document.getElementById("room-view").classList.add("hidden");
+function showSleep() {
   document.getElementById("sleep-view").classList.remove("hidden");
-
-  // Advance time by 8 hours (game mechanic hook)
-  const sleepEvent = new CustomEvent("ep:sleep", { detail: { unit: State.currentUnit } });
-  document.dispatchEvent(sleepEvent);
-
-  setTimeout(() => setView("room"), 2000);
+  document.dispatchEvent(new CustomEvent("ep:sleep", { detail: { unit: State.currentUnit } }));
+  setTimeout(() => setView("room"), 2200);
 }
 
-// ─── HUD ────────────────────────────────────────────────────────────────────
+// ─── HUD ─────────────────────────────────────────────────────
 
 function updateHUD() {
   const unit = UNITS[State.currentUnit];
   document.getElementById("hud-unit").textContent = unit.name;
-  document.getElementById("hud-date").textContent = formatDate(State.date);
-  document.getElementById("hud-view").textContent = State.view;
+  document.getElementById("hud-date").textContent = fmtDate(State.date);
+  // Sync desktop character panel
+  syncCharPanel(unit);
 }
 
-function formatDate(d) {
+function syncCharPanel(unit) {
+  const char = unit.char;
+  const stats = unit.stats;
+  // Desktop left panel
+  setIfExists("char-name", char.name);
+  setIfExists("char-unit-tag", `${unit.name} · Floor ${unit.floor}`);
+  setIfExists("char-portrait", char.portrait);
+  setStatBar("stat-mood",   stats.mood);
+  setStatBar("stat-energy", stats.energy);
+  setCashBar("stat-cash",   stats.cash);
+  // Mobile drawer mirrors
+  setIfExists("m-char-name", char.name);
+  setIfExists("m-char-unit", `${unit.name} · Floor ${unit.floor}`);
+  setStatBar("m-stat-mood",   stats.mood);
+  setStatBar("m-stat-energy", stats.energy);
+  setCashBar("m-stat-cash",   stats.cash);
+}
+
+function setStatBar(id, val) {
+  const fill = document.getElementById(id);
+  if (fill) {
+    fill.style.width = Math.min(100, Math.max(0, val)) + "%";
+    const valEl = document.getElementById(id + "-val");
+    if (valEl) valEl.textContent = val;
+  }
+}
+
+function setCashBar(id, val) {
+  const fill = document.getElementById(id);
+  if (fill) {
+    // Cash bar uses log scale so it doesn't pin at 0 forever
+    const pct = Math.min(100, (Math.log10(Math.max(1, val)) / 4) * 100);
+    fill.style.width = pct + "%";
+    const valEl = document.getElementById(id + "-val");
+    if (valEl) valEl.textContent = "$" + (val >= 1000 ? (val / 1000).toFixed(1) + "k" : val);
+  }
+}
+
+function setIfExists(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function fmtDate(d) {
   return d.toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" });
 }
 
-// ─── Click Zones (Room View) ─────────────────────────────────────────────────
+// ─── Room Click Zones ─────────────────────────────────────────
+// Coords in room.svg portrait viewBox (360 × 640)
 
-// These are normalised [0–1] coords of the room.svg viewBox (800x600)
 const CLICK_ZONES = [
   {
     id: "window",
     label: "Look outside",
-    // rect in SVG coords
-    x: 290, y: 110, w: 220, h: 190,
+    x: 108, y: 88, w: 152, h: 200,
     action: () => setView("window"),
   },
   {
     id: "laptop",
     label: "Use laptop",
-    x: 520, y: 250, w: 120, h: 90,
+    x: 218, y: 335, w: 130, h: 80,
     action: () => setView("laptop"),
   },
   {
     id: "bed",
     label: "Sleep",
-    x: 25, y: 295, w: 245, h: 185,
+    x: 0, y: 425, w: 165, h: 215,
     action: () => setView("sleep"),
   },
   {
     id: "calendar",
     label: "Check calendar",
-    x: 170, y: 125, w: 85, h: 100,
+    x: 56, y: 95, w: 50, h: 80,
     action: () => showCalendarOverlay(),
   },
 ];
 
 function initRoomClicks() {
   const roomEl = document.getElementById("room-view");
+
   roomEl.addEventListener("click", (e) => {
     if (State.view !== "room") return;
-    const rect = roomEl.getBoundingClientRect();
-    // Map click to SVG coordinate space
-    const svgW = 800, svgH = 600;
-    const scaleX = svgW / rect.width;
-    const scaleY = svgH / rect.height;
-    const svgX = (e.clientX - rect.left) * scaleX;
-    const svgY = (e.clientY - rect.top) * scaleY;
-
+    const [svgX, svgY] = toSVGCoords(e, roomEl, 360, 640);
     for (const zone of CLICK_ZONES) {
-      if (svgX >= zone.x && svgX <= zone.x + zone.w &&
-          svgY >= zone.y && svgY <= zone.y + zone.h) {
+      if (inZone(svgX, svgY, zone)) {
         showClickFeedback(e.clientX, e.clientY, zone.label);
         zone.action();
         return;
@@ -232,53 +243,30 @@ function initRoomClicks() {
     }
   });
 
-  // Hover cursor feedback
   roomEl.addEventListener("mousemove", (e) => {
     if (State.view !== "room") return;
-    const rect = roomEl.getBoundingClientRect();
-    const scaleX = 800 / rect.width;
-    const scaleY = 600 / rect.height;
-    const svgX = (e.clientX - rect.left) * scaleX;
-    const svgY = (e.clientY - rect.top) * scaleY;
-
-    const hit = CLICK_ZONES.some(z =>
-      svgX >= z.x && svgX <= z.x + z.w &&
-      svgY >= z.y && svgY <= z.y + z.h
-    );
+    const [svgX, svgY] = toSVGCoords(e, roomEl, 360, 640);
+    const hit = CLICK_ZONES.some(z => inZone(svgX, svgY, z));
     roomEl.style.cursor = hit ? "pointer" : "default";
   });
 }
 
-// ─── Window View Controls ────────────────────────────────────────────────────
-
-function initWindowControls() {
-  document.getElementById("btn-back-from-window").addEventListener("click", () => {
-    setView("room");
-  });
-
-  // Scroll hint animation runs automatically via CSS
+function toSVGCoords(e, el, svgW, svgH) {
+  const r = el.getBoundingClientRect();
+  return [(e.clientX - r.left) * (svgW / r.width), (e.clientY - r.top) * (svgH / r.height)];
 }
 
-// ─── Laptop View Controls ────────────────────────────────────────────────────
-
-function initLaptopControls() {
-  document.getElementById("btn-back-from-laptop").addEventListener("click", () => {
-    if (State.microGameInstance?.onExit) State.microGameInstance.onExit();
-    State.microGameActive = false;
-    State.microGameInstance = null;
-    document.getElementById("micro-game-container").innerHTML = "";
-    setView("room");
-  });
+function inZone(x, y, z) {
+  return x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h;
 }
 
-// ─── Micro-Game Loader ───────────────────────────────────────────────────────
+// ─── Micro-Game Loader ───────────────────────────────────────
 
 async function loadMicroGame(unitId) {
   const unit = UNITS[unitId];
   if (!unit?.microGame) return;
-
   const container = document.getElementById("micro-game-container");
-  container.innerHTML = `<div class="loading-screen">Loading ${unit.name}...</div>`;
+  container.innerHTML = `<div class="loading-screen">Loading ${unit.name}…</div>`;
 
   try {
     const mod = await import(`./${unit.microGame}`);
@@ -291,45 +279,138 @@ async function loadMicroGame(unitId) {
     console.warn(`Micro-game for unit ${unitId} not yet implemented.`, err);
     container.innerHTML = `
       <div class="stub-game">
+        <div style="font-size:2rem">${unit.emoji}</div>
         <h2>${unit.name}</h2>
         <p class="stub-note">[ micro-game stub — coming soon ]</p>
-        <p>Unit theme: <span style="color:${unit.theme}">${unit.name}</span></p>
       </div>
     `;
   }
 }
 
-// ─── Calendar Overlay ────────────────────────────────────────────────────────
+// ─── Calendar Overlay ────────────────────────────────────────
 
 function showCalendarOverlay() {
   const overlay = document.getElementById("calendar-overlay");
   overlay.classList.remove("hidden");
-  const d = State.date;
   document.getElementById("cal-month-year").textContent =
-    d.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
-  // Simple day highlight
-  document.getElementById("cal-today").textContent = d.getDate();
+    State.date.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
+  document.getElementById("cal-today").textContent = State.date.getDate();
 }
 
-function initCalendarOverlay() {
-  document.getElementById("cal-close").addEventListener("click", () => {
-    document.getElementById("calendar-overlay").classList.add("hidden");
-  });
-}
-
-// ─── Click Feedback ──────────────────────────────────────────────────────────
+// ─── Click Feedback ──────────────────────────────────────────
 
 function showClickFeedback(x, y, label) {
   const el = document.createElement("div");
   el.className = "click-feedback";
   el.textContent = label;
   el.style.left = x + "px";
-  el.style.top = y + "px";
+  el.style.top  = y + "px";
   document.body.appendChild(el);
   el.addEventListener("animationend", () => el.remove());
 }
 
-// ─── Unit Switcher (dev/menu) ────────────────────────────────────────────────
+// ─── Story Log ───────────────────────────────────────────────
+
+function addLogEntry(time, text) {
+  const entry = `
+    <div class="log-entry">
+      <div class="log-time">${time}</div>
+      ${text}
+    </div>
+  `;
+  ["story-log", "story-log-mobile"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.insertAdjacentHTML("afterbegin", entry);
+  });
+}
+
+// ─── Panel / Drawer System ───────────────────────────────────
+
+const Drawers = {
+  active: null,
+
+  open(id) {
+    if (this.active) this.close(this.active);
+    const el = document.getElementById(id);
+    const backdrop = document.getElementById("drawer-backdrop");
+    el?.classList.add("open");
+    backdrop.classList.add("visible");
+    this.active = id;
+    // Mark active nav btn
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    const btn = document.querySelector(`[data-drawer="${id}"]`);
+    btn?.classList.add("active");
+  },
+
+  close(id) {
+    document.getElementById(id)?.classList.remove("open");
+    document.getElementById("drawer-backdrop").classList.remove("visible");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    if (this.active === id) this.active = null;
+  },
+
+  toggle(id) {
+    this.active === id ? this.close(id) : this.open(id);
+  },
+};
+
+function initPanelSystem() {
+  // Mobile bottom nav
+  const navMap = {
+    "btn-nav-char":     "drawer-char",
+    "btn-nav-units":    "drawer-char",   // units section is inside char drawer
+    "btn-nav-log":      "drawer-log",
+    "btn-nav-settings": "drawer-settings",
+  };
+
+  Object.entries(navMap).forEach(([btnId, drawerId]) => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.dataset.drawer = drawerId;
+      btn.addEventListener("click", () => Drawers.toggle(drawerId));
+    }
+  });
+
+  // Mobile top bar icon buttons
+  document.getElementById("btn-open-log")?.addEventListener("click",
+    () => Drawers.toggle("drawer-log"));
+  document.getElementById("btn-open-settings")?.addEventListener("click",
+    () => Drawers.toggle("drawer-settings"));
+
+  // Drawer close buttons
+  ["drawer-settings", "drawer-char", "drawer-log"].forEach(id => {
+    document.getElementById(`${id}-close`)?.addEventListener("click",
+      () => Drawers.close(id));
+  });
+
+  // Backdrop closes active drawer
+  document.getElementById("drawer-backdrop").addEventListener("click",
+    () => { if (Drawers.active) Drawers.close(Drawers.active); });
+
+  // Settings toggles (sync desktop ↔ mobile)
+  initToggle("toggle-sfx",    "m-toggle-sfx",    "sfx");
+  initToggle("toggle-music",  "m-toggle-music",  "music");
+  initToggle("toggle-notif",  "m-toggle-notif",  "notifications");
+  initToggle("toggle-dev",    "m-toggle-dev",    "dev");
+}
+
+function initToggle(desktopId, mobileId, key) {
+  const sync = (val) => {
+    [desktopId, mobileId].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("on", val);
+    });
+    State.settings[key] = val;
+  };
+
+  [desktopId, mobileId].forEach(id => {
+    document.getElementById(id)?.addEventListener("click", () => {
+      sync(!State.settings[key]);
+    });
+  });
+}
+
+// ─── Unit Switcher ───────────────────────────────────────────
 
 function switchUnit(unitId) {
   if (!UNITS[unitId]) return;
@@ -338,57 +419,92 @@ function switchUnit(unitId) {
   State.microGameActive = false;
   State.microGameInstance = null;
   document.getElementById("micro-game-container").innerHTML = "";
-  renderCurrentView();
+  // Highlight active unit btn everywhere
+  document.querySelectorAll(".unit-btn").forEach(b => {
+    b.classList.toggle("active", Number(b.dataset.unit) === unitId);
+  });
+  applyView();
+  addLogEntry(fmtDate(State.date), `Entered ${UNITS[unitId].name}.`);
 }
 
-// ─── Easter Egg Check ────────────────────────────────────────────────────────
+function buildUnitButtons(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = "";
+  Object.entries(UNITS).forEach(([id, unit]) => {
+    const btn = document.createElement("button");
+    btn.className = "unit-btn" + (Number(id) === State.currentUnit ? " active" : "");
+    btn.dataset.unit = id;
+    btn.style.borderColor = unit.theme + "66";
+    btn.innerHTML = `
+      <span class="unit-dot" style="background:${unit.theme}"></span>
+      <span>${unit.emoji} ${unit.name}</span>
+    `;
+    btn.addEventListener("click", () => {
+      switchUnit(Number(id));
+      // Close drawer on mobile after selecting
+      if (Drawers.active) Drawers.close(Drawers.active);
+    });
+    container.appendChild(btn);
+  });
+}
 
-/**
- * Called when loading unit to determine which easter egg sprites
- * should appear in the outside view based on completed stories.
- */
+// ─── Easter Eggs ─────────────────────────────────────────────
+
 function checkEasterEggs() {
-  // Stub: read from localStorage which units have been completed
-  const completed = JSON.parse(localStorage.getItem("ep_completed") || "[]");
-  State.easterEggsUnlocked = completed;
-  // TODO: inject sprite overlays into outside view based on current date
+  State.easterEggsUnlocked = JSON.parse(
+    localStorage.getItem("ep_completed") || "[]"
+  );
 }
 
-// ─── Init ────────────────────────────────────────────────────────────────────
+// ─── Back Buttons ────────────────────────────────────────────
+
+function initBackButtons() {
+  document.getElementById("btn-back-from-window")?.addEventListener("click",
+    () => setView("room"));
+
+  document.getElementById("btn-back-from-laptop")?.addEventListener("click", () => {
+    State.microGameInstance?.onExit?.();
+    State.microGameActive = false;
+    State.microGameInstance = null;
+    document.getElementById("micro-game-container").innerHTML = "";
+    setView("room");
+  });
+
+  document.getElementById("cal-close")?.addEventListener("click", () => {
+    document.getElementById("calendar-overlay").classList.add("hidden");
+  });
+}
+
+// ─── Init ─────────────────────────────────────────────────────
 
 function init() {
   checkEasterEggs();
   initRoomClicks();
-  initWindowControls();
-  initLaptopControls();
-  initCalendarOverlay();
-
-  // Build unit selector buttons
-  const selector = document.getElementById("unit-selector");
-  Object.keys(UNITS).forEach(id => {
-    const btn = document.createElement("button");
-    btn.textContent = UNITS[id].name;
-    btn.className = "unit-btn";
-    btn.style.borderColor = UNITS[id].theme;
-    btn.addEventListener("click", () => switchUnit(Number(id)));
-    selector.appendChild(btn);
-  });
-
-  // Start in current unit
-  renderCurrentView();
+  initBackButtons();
+  initPanelSystem();
+  buildUnitButtons("unit-selector-panel");
+  buildUnitButtons("unit-selector-drawer");
+  applyView();
+  updateHUD();
 }
 
 document.addEventListener("DOMContentLoaded", init);
 
-// ─── Public API (for micro-games to call back into engine) ───────────────────
+// ─── Public API ───────────────────────────────────────────────
 
 window.EmeraldPlace = {
   setView,
-  getState: () => State,
-  getUnit: () => UNITS[State.currentUnit],
+  getState:   ()    => State,
+  getUnit:    ()    => UNITS[State.currentUnit],
+  addLog:     (time, text) => addLogEntry(time, text),
   advanceDate: (days = 1) => {
     State.date.setDate(State.date.getDate() + days);
     updateHUD();
+  },
+  setStat: (key, val) => {
+    UNITS[State.currentUnit].stats[key] = val;
+    syncCharPanel(UNITS[State.currentUnit]);
   },
   unlockEasterEgg: (unitId) => {
     if (!State.easterEggsUnlocked.includes(unitId)) {
