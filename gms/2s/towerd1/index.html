@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Defense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-overlay">
+            <div id="top-bar">
+                <div id="gold-display">Gold: <span id="gold">200</span></div>
+                <div id="wave-display">Wave: <span id="wave">0</span></div>
+                <div id="lives-display">Lives: <span id="lives">20</span></div>
+            </div>
+            <button id="start-wave-btn">Start Wave</button>
+        </div>
+        <div id="tower-tooltip" class="hidden">
+            <div id="tooltip-title"></div>
+            <div id="tooltip-info"></div>
+            <button id="tooltip-btn"></button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
