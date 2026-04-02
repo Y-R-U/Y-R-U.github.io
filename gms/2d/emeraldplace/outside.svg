@@ -1,0 +1,281 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 400" width="2400" height="400">
+  <defs>
+    <linearGradient id="skyBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a3a5c"/>
+      <stop offset="40%" stop-color="#2e6da4"/>
+      <stop offset="70%" stop-color="#87ceeb"/>
+      <stop offset="100%" stop-color="#b8d4e8"/>
+    </linearGradient>
+    <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a7c59"/>
+      <stop offset="100%" stop-color="#2d5a3d"/>
+    </linearGradient>
+    <linearGradient id="sunsetLeft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff7043" stop-opacity="0.3"/>
+      <stop offset="30%" stop-color="transparent"/>
+    </linearGradient>
+
+    <!-- Cloud filter -->
+    <filter id="cloudBlur">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="2400" height="300" fill="url(#skyBg)"/>
+
+  <!-- Ground / street level -->
+  <rect y="290" width="2400" height="110" fill="url(#groundGrad)"/>
+  <!-- Pavement -->
+  <rect y="320" width="2400" height="30" fill="#888"/>
+  <!-- Road -->
+  <rect y="350" width="2400" height="50" fill="#555"/>
+  <!-- Road markings -->
+  <rect x="0" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="120" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="240" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="360" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="480" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="600" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="720" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="840" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="960" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1080" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1200" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1320" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1440" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1560" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1680" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1800" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="1920" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="2040" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="2160" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+  <rect x="2280" y="372" width="80" height="6" fill="#fff" opacity="0.7"/>
+
+  <!-- === BACKGROUND CITY SKYLINE (far, faded) === -->
+  <!-- Tall skyscraper far left -->
+  <rect x="50" y="100" width="35" height="220" fill="#2a4a6b" opacity="0.4"/>
+  <rect x="58" y="108" width="5" height="8" fill="#ffd700" opacity="0.3"/>
+  <rect x="68" y="108" width="5" height="8" fill="#ffd700" opacity="0.3"/>
+  <rect x="58" y="122" width="5" height="8" fill="#ffd700" opacity="0.2"/>
+
+  <rect x="100" y="140" width="60" height="180" fill="#243d5a" opacity="0.45"/>
+  <rect x="160" y="160" width="25" height="160" fill="#2a4a6b" opacity="0.4"/>
+  <rect x="200" y="120" width="80" height="200" fill="#1e3a55" opacity="0.5"/>
+  <!-- Antenna -->
+  <line x1="240" y1="80" x2="240" y2="120" stroke="#2a4a6b" stroke-width="2" opacity="0.5"/>
+  <circle cx="240" cy="78" r="3" fill="#e94560" opacity="0.6"/>
+
+  <rect x="310" y="155" width="50" height="165" fill="#2a4a6b" opacity="0.4"/>
+  <rect x="370" y="130" width="70" height="190" fill="#243d5a" opacity="0.45"/>
+  <rect x="380" y="90" width="50" height="40" fill="#243d5a" opacity="0.35"/>
+
+  <!-- Mid-left buildings -->
+  <rect x="450" y="170" width="55" height="150" fill="#2d5a3d" opacity="0.5"/>
+  <rect x="510" y="150" width="40" height="170" fill="#2a4a6b" opacity="0.45"/>
+  <rect x="555" y="185" width="65" height="135" fill="#3a6b4a" opacity="0.4"/>
+  <rect x="630" y="145" width="85" height="175" fill="#243d5a" opacity="0.5"/>
+  <!-- Windows on mid building -->
+  <rect x="638" y="160" width="8" height="8" fill="#ffd700" opacity="0.4"/>
+  <rect x="652" y="160" width="8" height="8" fill="#ffd700" opacity="0.4"/>
+  <rect x="666" y="160" width="8" height="8" fill="#ffd700" opacity="0.2"/>
+  <rect x="638" y="177" width="8" height="8" fill="#ffd700" opacity="0.3"/>
+  <rect x="652" y="177" width="8" height="8" fill="#fff" opacity="0.5"/>
+  <rect x="638" y="194" width="8" height="8" fill="#ffd700" opacity="0.4"/>
+
+  <!-- === MIDDLE GROUND BUILDINGS === -->
+  <!-- Apartment block with detail -->
+  <rect x="720" y="200" width="120" height="120" fill="#5a7a8a"/>
+  <rect x="720" y="195" width="120" height="12" fill="#4a6a7a" rx="2"/>
+  <!-- Windows -->
+  <rect x="728" y="212" width="14" height="12" fill="#c8e6f0" opacity="0.8"/>
+  <rect x="748" y="212" width="14" height="12" fill="#1a1a2e" opacity="0.9"/>
+  <rect x="768" y="212" width="14" height="12" fill="#c8e6f0" opacity="0.8"/>
+  <rect x="788" y="212" width="14" height="12" fill="#c8e6f0" opacity="0.7"/>
+  <rect x="808" y="212" width="14" height="12" fill="#1a1a2e" opacity="0.9"/>
+  <rect x="728" y="232" width="14" height="12" fill="#1a1a2e" opacity="0.9"/>
+  <rect x="748" y="232" width="14" height="12" fill="#c8e6f0" opacity="0.8"/>
+  <rect x="768" y="232" width="14" height="12" fill="#ffd700" opacity="0.6"/>
+  <rect x="788" y="232" width="14" height="12" fill="#c8e6f0" opacity="0.8"/>
+  <rect x="808" y="232" width="14" height="12" fill="#c8e6f0" opacity="0.7"/>
+  <!-- Door -->
+  <rect x="770" y="290" width="20" height="30" fill="#3a2a1a"/>
+
+  <!-- Green park area -->
+  <rect x="850" y="270" width="200" height="50" fill="#4a7c59"/>
+  <!-- Trees -->
+  <circle cx="880" cy="258" r="22" fill="#2d7a3a"/>
+  <rect x="877" y="270" width="6" height="20" fill="#5c3d2e"/>
+  <circle cx="930" cy="252" r="28" fill="#3a8a42"/>
+  <rect x="927" y="268" width="6" height="22" fill="#5c3d2e"/>
+  <circle cx="990" cy="260" r="20" fill="#2d7a3a"/>
+  <rect x="987" y="272" width="6" height="18" fill="#5c3d2e"/>
+  <circle cx="1030" cy="255" r="25" fill="#4a9a52"/>
+  <rect x="1027" y="268" width="6" height="22" fill="#5c3d2e"/>
+
+  <!-- === UNIT 66 REFERENCE: cardboard box on street === -->
+  <rect x="1090" y="298" width="50" height="34" fill="#c8a96e"/>
+  <rect x="1090" y="298" width="50" height="8" fill="#b8994e"/>
+  <!-- Box flap -->
+  <polygon points="1090,298 1115,288 1140,298" fill="#d4b87a"/>
+  <text x="1115" y="340" text-anchor="middle" font-size="7" fill="#5c3d2e" font-family="monospace">[box]</text>
+
+  <!-- Large office tower center -->
+  <rect x="1150" y="80" width="100" height="240" fill="#3a5a7a"/>
+  <rect x="1150" y="75" width="100" height="12" fill="#2a4a6a" rx="2"/>
+  <!-- Glass facade pattern -->
+  <rect x="1158" y="95" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1175" y="95" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1192" y="95" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1209" y="95" width="12" height="10" fill="#ffd700" opacity="0.6"/>
+  <rect x="1226" y="95" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1158" y="112" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1175" y="112" width="12" height="10" fill="#ffd700" opacity="0.6"/>
+  <rect x="1192" y="112" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1209" y="112" width="12" height="10" fill="#87ceeb" opacity="0.4"/>
+  <rect x="1226" y="112" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1158" y="129" width="12" height="10" fill="#1a1a2e" opacity="0.8"/>
+  <rect x="1175" y="129" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1192" y="129" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1209" y="129" width="12" height="10" fill="#87ceeb" opacity="0.5"/>
+  <rect x="1226" y="129" width="12" height="10" fill="#1a1a2e" opacity="0.8"/>
+  <!-- Antenna -->
+  <line x1="1200" y1="40" x2="1200" y2="75" stroke="#2a4a6a" stroke-width="3"/>
+  <circle cx="1200" cy="38" r="4" fill="#e94560"/>
+
+  <!-- Street scene elements -->
+  <!-- Lamp post -->
+  <rect x="1300" y="250" width="6" height="70" fill="#888"/>
+  <rect x="1290" y="250" width="26" height="6" fill="#888" rx="2"/>
+  <ellipse cx="1303" cy="250" rx="14" ry="6" fill="#ffd700" opacity="0.7"/>
+
+  <!-- Car (parked) - Unit 66 progression reference -->
+  <rect x="1320" y="308" width="70" height="24" rx="4" fill="#c0392b"/>
+  <rect x="1328" y="300" width="54" height="14" rx="3" fill="#e74c3c"/>
+  <circle cx="1336" cy="334" r="7" fill="#333"/>
+  <circle cx="1376" cy="334" r="7" fill="#333"/>
+  <circle cx="1336" cy="334" r="3" fill="#888"/>
+  <circle cx="1376" cy="334" r="3" fill="#888"/>
+  <rect x="1338" y="304" width="34" height="8" rx="1" fill="#87ceeb" opacity="0.8"/>
+
+  <!-- Trees right side -->
+  <circle cx="1430" cy="248" r="26" fill="#2d7a3a"/>
+  <rect x="1427" y="265" width="6" height="25" fill="#5c3d2e"/>
+
+  <!-- === RIGHT SECTION: more residential === -->
+  <rect x="1480" y="190" width="90" height="130" fill="#7a6a5a"/>
+  <!-- Windows with curtains suggestion -->
+  <rect x="1490" y="205" width="16" height="14" fill="#ffd700" opacity="0.5"/>
+  <rect x="1512" y="205" width="16" height="14" fill="#c8e6f0" opacity="0.7"/>
+  <rect x="1534" y="205" width="16" height="14" fill="#c8e6f0" opacity="0.7"/>
+  <rect x="1490" y="227" width="16" height="14" fill="#c8e6f0" opacity="0.7"/>
+  <rect x="1512" y="227" width="16" height="14" fill="#1a1a2e" opacity="0.9"/>
+  <rect x="1534" y="227" width="16" height="14" fill="#ffd700" opacity="0.5"/>
+
+  <!-- Shop fronts -->
+  <rect x="1580" y="260" width="80" height="60" fill="#8a7a6a"/>
+  <rect x="1580" y="260" width="80" height="18" fill="#c9a227"/>
+  <rect x="1588" y="278" width="64" height="30" fill="#87ceeb" opacity="0.6"/>
+  <text x="1620" y="273" text-anchor="middle" font-size="8" fill="#1a1a1a" font-family="monospace">SHOP</text>
+
+  <!-- Bicycle - Unit 66 progression -->
+  <text x="1680" y="338" font-size="28" font-family="serif">🚲</text>
+  <text x="1680" y="350" text-anchor="middle" font-size="7" fill="#555" font-family="monospace">[bike]</text>
+
+  <!-- === FAR RIGHT: luxury area === -->
+  <rect x="1750" y="160" width="130" height="160" fill="#4a3a8a"/>
+  <rect x="1750" y="155" width="130" height="14" fill="#3a2a7a" rx="2"/>
+  <!-- Fancy windows -->
+  <rect x="1760" y="176" width="18" height="15" fill="#c8e6f0" opacity="0.9" rx="1"/>
+  <rect x="1785" y="176" width="18" height="15" fill="#ffd700" opacity="0.7" rx="1"/>
+  <rect x="1810" y="176" width="18" height="15" fill="#c8e6f0" opacity="0.9" rx="1"/>
+  <rect x="1840" y="176" width="18" height="15" fill="#c8e6f0" opacity="0.8" rx="1"/>
+  <rect x="1760" y="200" width="18" height="15" fill="#ffd700" opacity="0.7" rx="1"/>
+  <rect x="1785" y="200" width="18" height="15" fill="#c8e6f0" opacity="0.9" rx="1"/>
+  <rect x="1810" y="200" width="18" height="15" fill="#c8e6f0" opacity="0.9" rx="1"/>
+  <rect x="1840" y="200" width="18" height="15" fill="#ffd700" opacity="0.6" rx="1"/>
+
+  <!-- Luxury car -->
+  <rect x="1760" y="308" width="90" height="24" rx="5" fill="#1a1a1a"/>
+  <rect x="1772" y="298" width="66" height="16" rx="3" fill="#2a2a2a"/>
+  <circle cx="1780" cy="334" r="8" fill="#333"/>
+  <circle cx="1840" cy="334" r="8" fill="#333"/>
+  <circle cx="1780" cy="334" r="3.5" fill="#c0c0c0"/>
+  <circle cx="1840" cy="334" r="3.5" fill="#c0c0c0"/>
+  <rect x="1782" y="301" width="46" height="10" rx="1" fill="#87ceeb" opacity="0.8"/>
+  <text x="1805" y="350" text-anchor="middle" font-size="7" fill="#555" font-family="monospace">[luxury car]</text>
+
+  <!-- Boat (far right, near harbor) -->
+  <polygon points="2050,320 2200,320 2180,345 2070,345" fill="#1a5276"/>
+  <polygon points="2100,320 2120,320 2120,260 2100,260" fill="#f0f0f0"/><!-- Sail -->
+  <polygon points="2100,260 2145,320 2100,320" fill="#ecf0f1" opacity="0.9"/>
+  <text x="2125" y="360" text-anchor="middle" font-size="7" fill="#555" font-family="monospace">[boat]</text>
+
+  <!-- Water for harbor -->
+  <rect x="2000" y="340" width="400" height="60" fill="#1a5276" opacity="0.5"/>
+  <rect x="2000" y="340" width="400" height="8" fill="#2980b9" opacity="0.4"/>
+
+  <!-- Bird silhouettes (easter egg area) -->
+  <!-- Unit 66 bird watching area - far right -->
+  <g opacity="0.7">
+    <!-- Bird 1 -->
+    <path d="M 2250 80 q 8,-6 16,0" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    <path d="M 2248 80 q 8,-6 16,0" stroke="#1a1a1a" stroke-width="1.5" fill="none" transform="translate(22,8)"/>
+    <!-- Bird 2 -->
+    <path d="M 2300 60 q 10,-7 20,0" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    <!-- Bird 3 -->
+    <path d="M 2340 90 q 7,-5 14,0" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    <!-- Bird 4 (rarer, brighter) -->
+    <path d="M 2370 55 q 12,-8 24,0" stroke="#e94560" stroke-width="2.5" fill="none"/>
+    <path d="M 2375 58 q 7,-5 14,0" stroke="#e94560" stroke-width="1.5" fill="none"/>
+  </g>
+
+  <!-- === CLOUDS === -->
+  <g opacity="0.85" filter="url(#cloudBlur)">
+    <!-- Cloud 1 -->
+    <ellipse cx="200" cy="60" rx="60" ry="22" fill="white"/>
+    <ellipse cx="240" cy="50" rx="45" ry="20" fill="white"/>
+    <ellipse cx="165" cy="62" rx="35" ry="16" fill="white"/>
+    <!-- Cloud 2 -->
+    <ellipse cx="600" cy="40" rx="70" ry="24" fill="white"/>
+    <ellipse cx="645" cy="30" rx="50" ry="22" fill="white"/>
+    <ellipse cx="560" cy="44" rx="40" ry="18" fill="#f0f0f0"/>
+    <!-- Cloud 3 -->
+    <ellipse cx="1050" cy="55" rx="55" ry="20" fill="white"/>
+    <ellipse cx="1090" cy="44" rx="42" ry="19" fill="white"/>
+    <!-- Cloud 4 -->
+    <ellipse cx="1550" cy="35" rx="65" ry="22" fill="white"/>
+    <ellipse cx="1600" cy="26" rx="48" ry="20" fill="white"/>
+    <ellipse cx="1510" cy="38" rx="38" ry="16" fill="#f0f0f0"/>
+    <!-- Cloud 5 -->
+    <ellipse cx="2000" cy="50" rx="58" ry="21" fill="white"/>
+    <ellipse cx="2040" cy="40" rx="44" ry="19" fill="white"/>
+    <!-- Cloud 6 wispy -->
+    <ellipse cx="2300" cy="30" rx="80" ry="16" fill="white" opacity="0.6"/>
+    <ellipse cx="2360" cy="22" rx="60" ry="13" fill="white" opacity="0.5"/>
+  </g>
+
+  <!-- Sun (top-left, daytime) -->
+  <circle cx="120" cy="45" r="28" fill="#ffd700" opacity="0.9"/>
+  <circle cx="120" cy="45" r="22" fill="#ffec6e"/>
+  <!-- Sun rays -->
+  <line x1="120" y1="10" x2="120" y2="0" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="155" y1="18" x2="162" y2="11" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="165" y1="48" x2="176" y2="48" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="155" y1="72" x2="162" y2="79" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="85" y1="18" x2="78" y2="11" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="75" y1="48" x2="64" y2="48" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+  <line x1="85" y1="72" x2="78" y2="79" stroke="#ffd700" stroke-width="3" opacity="0.6"/>
+
+  <!-- Unit scroll markers (dev reference) -->
+  <line x1="400" y1="0" x2="400" y2="400" stroke="rgba(233,69,96,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="402" y="15" font-size="9" fill="rgba(233,69,96,0.4)" font-family="monospace">U65</text>
+  <line x1="500" y1="0" x2="500" y2="400" stroke="rgba(233,69,96,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="502" y="15" font-size="9" fill="rgba(233,69,96,0.4)" font-family="monospace">U66</text>
+  <line x1="600" y1="0" x2="600" y2="400" stroke="rgba(233,69,96,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="602" y="15" font-size="9" fill="rgba(233,69,96,0.4)" font-family="monospace">U67</text>
+  <line x1="700" y1="0" x2="700" y2="400" stroke="rgba(233,69,96,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="702" y="15" font-size="9" fill="rgba(233,69,96,0.4)" font-family="monospace">U68</text>
+  <line x1="800" y1="0" x2="800" y2="400" stroke="rgba(233,69,96,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="802" y="15" font-size="9" fill="rgba(233,69,96,0.4)" font-family="monospace">U69</text>
+</svg>

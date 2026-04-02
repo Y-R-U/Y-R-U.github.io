@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- Room background / walls -->
+  <rect width="800" height="600" fill="#d4c5a9"/>
+
+  <!-- Floor perspective -->
+  <polygon points="0,600 800,600 680,420 120,420" fill="#b8a98a"/>
+
+  <!-- Back wall -->
+  <rect x="120" y="80" width="560" height="340" fill="#e8dcc8"/>
+
+  <!-- Left wall -->
+  <polygon points="0,0 120,80 120,420 0,600" fill="#c9b899"/>
+
+  <!-- Right wall -->
+  <polygon points="800,0 680,80 680,420 800,600" fill="#c9b899"/>
+
+  <!-- Ceiling -->
+  <polygon points="0,0 800,0 680,80 120,80" fill="#ede3d2"/>
+
+  <!-- === WINDOW === -->
+  <!-- Window frame outer -->
+  <rect id="window-frame-outer" x="290" y="110" width="220" height="180" rx="4" fill="#8b7355"/>
+  <!-- Window sill -->
+  <rect x="280" y="285" width="240" height="14" fill="#a08060" rx="2"/>
+  <!-- Window pane - sky visible through it -->
+  <rect id="window-pane" x="300" y="120" width="200" height="160" fill="#87ceeb" rx="2"/>
+  <!-- Sky gradient in window -->
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a90d9"/>
+      <stop offset="60%" stop-color="#87ceeb"/>
+      <stop offset="100%" stop-color="#c8e6c9"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b8a98a"/>
+      <stop offset="100%" stop-color="#9a8b72"/>
+    </linearGradient>
+  </defs>
+  <rect x="300" y="120" width="200" height="160" fill="url(#skyGrad)" rx="2"/>
+  <!-- Building silhouettes in window -->
+  <rect x="305" y="210" width="40" height="70" fill="#2d5a27" opacity="0.6"/>
+  <rect x="350" y="225" width="30" height="55" fill="#2d5a27" opacity="0.5"/>
+  <rect x="420" y="200" width="45" height="80" fill="#2d5a27" opacity="0.6"/>
+  <rect x="468" y="218" width="25" height="62" fill="#2d5a27" opacity="0.5"/>
+  <!-- Ground visible through window -->
+  <rect x="300" y="252" width="200" height="28" fill="#4a7c59" opacity="0.7"/>
+  <!-- Window divider cross -->
+  <rect x="398" y="120" width="4" height="160" fill="#8b7355"/>
+  <rect x="300" y="198" width="200" height="4" fill="#8b7355"/>
+  <!-- Window click area label (dev helper, hidden in prod) -->
+  <text x="380" y="205" text-anchor="middle" font-size="10" fill="rgba(0,0,0,0.3)" font-family="monospace">[window]</text>
+
+  <!-- === DESK === -->
+  <rect x="500" y="330" width="180" height="12" fill="#6b4e3d" rx="2"/>
+  <rect x="500" y="342" width="180" height="80" fill="#7a5c47"/>
+  <!-- Desk legs -->
+  <rect x="508" y="422" width="12" height="60" fill="#6b4e3d"/>
+  <rect x="656" y="422" width="12" height="60" fill="#6b4e3d"/>
+  <!-- Desk surface highlight -->
+  <rect x="500" y="330" width="180" height="4" fill="#8a6a55" rx="2"/>
+
+  <!-- === LAPTOP === -->
+  <!-- Laptop base -->
+  <rect id="laptop-base" x="530" y="305" width="100" height="28" rx="3" fill="#2a2a2a"/>
+  <!-- Laptop screen -->
+  <rect id="laptop-screen" x="535" y="255" width="90" height="55" rx="3" fill="#1a1a2e"/>
+  <!-- Screen glow -->
+  <rect x="538" y="258" width="84" height="49" rx="2" fill="#16213e"/>
+  <rect x="540" y="260" width="80" height="45" rx="1" fill="#0f3460" opacity="0.8"/>
+  <!-- Screen content suggestion -->
+  <rect x="544" y="264" width="50" height="4" fill="#e94560" opacity="0.7" rx="1"/>
+  <rect x="544" y="271" width="35" height="3" fill="#53d8fb" opacity="0.5" rx="1"/>
+  <rect x="544" y="277" width="42" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
+  <rect x="544" y="283" width="28" height="3" fill="#53d8fb" opacity="0.4" rx="1"/>
+  <text x="580" y="295" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">[laptop]</text>
+  <!-- Laptop hinge -->
+  <rect x="535" y="308" width="90" height="4" rx="1" fill="#1a1a1a"/>
+
+  <!-- === BED === -->
+  <!-- Bed frame -->
+  <rect x="30" y="330" width="220" height="140" rx="6" fill="#5c3d2e"/>
+  <!-- Mattress -->
+  <rect x="38" y="318" width="204" height="120" rx="4" fill="#e8e0d0"/>
+  <!-- Pillow -->
+  <rect x="48" y="322" width="80" height="45" rx="6" fill="#f5f0e8"/>
+  <rect x="50" y="324" width="76" height="41" rx="5" fill="#fffef8" opacity="0.8"/>
+  <!-- Blanket -->
+  <rect x="38" y="370" width="204" height="68" rx="4" fill="#4a6fa5"/>
+  <!-- Blanket folds -->
+  <line x1="38" y1="385" x2="242" y2="385" stroke="#3a5f95" stroke-width="1.5" opacity="0.5"/>
+  <line x1="38" y1="400" x2="242" y2="400" stroke="#3a5f95" stroke-width="1.5" opacity="0.5"/>
+  <!-- Headboard -->
+  <rect x="25" y="300" width="234" height="40" rx="6" fill="#6b4e3d"/>
+  <text x="142" y="460" text-anchor="middle" font-size="10" fill="rgba(0,0,0,0.3)" font-family="monospace">[bed]</text>
+
+  <!-- === CALENDAR === -->
+  <rect id="calendar" x="170" y="130" width="80" height="90" rx="3" fill="#fff"/>
+  <rect x="170" y="130" width="80" height="22" rx="3" fill="#e94560"/>
+  <!-- Calendar rings -->
+  <circle cx="190" cy="130" r="4" fill="#ccc"/>
+  <circle cx="230" cy="130" r="4" fill="#ccc"/>
+  <!-- Calendar month text -->
+  <text x="210" y="146" text-anchor="middle" font-size="10" fill="white" font-family="monospace" font-weight="bold">APRIL</text>
+  <!-- Calendar grid -->
+  <text x="178" y="165" font-size="8" fill="#555" font-family="monospace">M  T  W  T</text>
+  <text x="178" y="177" font-size="8" fill="#555" font-family="monospace">1  2  3  4</text>
+  <text x="178" y="189" font-size="8" fill="#555" font-family="monospace">7  8  9 10</text>
+  <text x="178" y="201" font-size="8" fill="#e94560" font-family="monospace" font-weight="bold">14</text>
+  <text x="192" y="201" font-size="8" fill="#555" font-family="monospace"> 15 16 17</text>
+  <text x="170" y="215" font-size="7" fill="rgba(0,0,0,0.3)" font-family="monospace">[calendar]</text>
+
+  <!-- === ROOM NUMBER SIGN === -->
+  <rect x="350" y="88" width="100" height="28" rx="4" fill="#c9a227"/>
+  <text x="400" y="107" text-anchor="middle" font-size="16" fill="#1a1a1a" font-family="monospace" font-weight="bold" id="room-number-sign">UNIT 65</text>
+
+  <!-- Floor texture lines -->
+  <line x1="120" y1="500" x2="300" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="250" y1="540" x2="400" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="400" y1="560" x2="500" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+  <line x1="550" y1="580" x2="600" y2="420" stroke="#a89870" stroke-width="1" opacity="0.4"/>
+</svg>
