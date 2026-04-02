@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emerald Place</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="game-wrapper">
+
+  <!-- ── Game Stage ───────────────────────────────────────────── -->
+  <div id="game-stage">
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-line" id="hud-unit">Unit 65</div>
+      <div class="hud-line" id="hud-date"></div>
+      <div class="hud-line" id="hud-view" style="opacity:0.4">room</div>
+    </div>
+
+    <!-- ── VIEW: Room ────────────────────────────────────────── -->
+    <div id="room-view" class="view">
+      <!-- SVG room drawn inline so we can animate individual elements -->
+      <object
+        id="room-svg"
+        data="room.svg"
+        type="image/svg+xml"
+        style="width:100%;height:100%;display:block;pointer-events:none"
+        aria-label="Room interior"
+      ></object>
+      <!-- Invisible click overlay matching SVG zones - handled by game.js -->
+    </div>
+
+    <!-- ── VIEW: Window (outside panorama) ───────────────────── -->
+    <div id="window-view" class="view hidden">
+      <div id="window-viewport">
+        <div id="outside-container">
+          <object
+            data="outside.svg"
+            type="image/svg+xml"
+            style="width:2400px;height:400px;display:block"
+            aria-label="View outside the window"
+          ></object>
+        </div>
+        <!-- Window frame overlay (CSS-only border + cross divider) -->
+        <div id="window-frame-overlay"></div>
+      </div>
+      <div id="window-sill"></div>
+      <button id="btn-back-from-window" class="back-btn">&#9650; Step back</button>
+    </div>
+
+    <!-- ── VIEW: Laptop Screen ───────────────────────────────── -->
+    <div id="laptop-view" class="view hidden">
+      <div id="laptop-bezel">
+        <div id="micro-game-container">
+          <!-- Micro-game loaded here by game.js -->
+        </div>
+      </div>
+      <div id="laptop-base"></div>
+      <button id="btn-back-from-laptop" class="back-btn">&#9660; Close laptop</button>
+    </div>
+
+    <!-- ── VIEW: Sleep ───────────────────────────────────────── -->
+    <div id="sleep-view" class="view hidden">
+      sleeping&hellip;
+    </div>
+
+    <!-- ── Calendar Overlay ───────────────────────────────────── -->
+    <div id="calendar-overlay" class="hidden">
+      <div id="calendar-panel">
+        <h3 id="cal-month-year">April 2026</h3>
+        <div id="cal-today-highlight">
+          Today: <span id="cal-today"></span>
+        </div>
+        <button id="cal-close">Close</button>
+      </div>
+    </div>
+
+    <!-- ── Transition Overlay ─────────────────────────────────── -->
+    <div id="transition-overlay"></div>
+
+  </div><!-- /game-stage -->
+
+  <!-- ── Unit Selector (below stage) ─────────────────────────── -->
+  <div id="unit-selector" role="navigation" aria-label="Select unit">
+    <!-- Buttons injected by game.js -->
+  </div>
+
+  <!-- Room label (synced to current unit) -->
+  <div id="room-label" style="
+    margin-top: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: rgba(201,162,39,0.6);
+    font-family: 'Courier New', monospace;
+  "></div>
+
+</div><!-- /game-wrapper -->
+
+<script type="module" src="game.js"></script>
+</body>
+</html>
