@@ -137,7 +137,11 @@ function showLaptop() {
 
 function showSleep() {
   document.getElementById("sleep-view").classList.remove("hidden");
-  document.dispatchEvent(new CustomEvent("ep:sleep", { detail: { unit: State.currentUnit } }));
+  // Advance the in-game date by one day
+  State.date.setDate(State.date.getDate() + 1);
+  document.dispatchEvent(new CustomEvent("ep:sleep", {
+    detail: { unit: State.currentUnit, day: getDay() }
+  }));
   setTimeout(() => setView("room"), 2200);
 }
 
@@ -295,6 +299,24 @@ function showCalendarOverlay() {
   document.getElementById("cal-month-year").textContent =
     State.date.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
   document.getElementById("cal-today").textContent = State.date.getDate();
+}
+
+// ─── Notify Toast ────────────────────────────────────────────
+
+function notify(text, type = "info") {
+  const el = document.createElement("div");
+  el.className = `ep-notify ep-notify--${type}`;
+  el.textContent = text;
+  const stage = document.getElementById("game-stage");
+  stage.appendChild(el);
+  el.addEventListener("animationend", () => el.remove());
+}
+
+// ─── Day Counter ─────────────────────────────────────────────
+
+function getDay() {
+  const start = new Date(2026, 3, 2); // April 2nd, day 1
+  return Math.max(1, Math.floor((State.date - start) / 86400000) + 1);
 }
 
 // ─── Click Feedback ──────────────────────────────────────────
@@ -479,6 +501,10 @@ function initBackButtons() {
 // ─── Init ─────────────────────────────────────────────────────
 
 function init() {
+  // Restore persistent flags (e.g. unit 66 earned a room)
+  if (localStorage.getItem("ep_u66_hasroom") === "1") {
+    UNITS[66].startsOutside = false;
+  }
   checkEasterEggs();
   initRoomClicks();
   initBackButtons();
@@ -495,9 +521,11 @@ document.addEventListener("DOMContentLoaded", init);
 
 window.EmeraldPlace = {
   setView,
-  getState:   ()    => State,
-  getUnit:    ()    => UNITS[State.currentUnit],
-  addLog:     (time, text) => addLogEntry(time, text),
+  notify,
+  getState:   () => State,
+  getUnit:    () => UNITS[State.currentUnit],
+  getDay,
+  addLog: (time, text) => addLogEntry(time, text),
   advanceDate: (days = 1) => {
     State.date.setDate(State.date.getDate() + days);
     updateHUD();
@@ -505,6 +533,18 @@ window.EmeraldPlace = {
   setStat: (key, val) => {
     UNITS[State.currentUnit].stats[key] = val;
     syncCharPanel(UNITS[State.currentUnit]);
+  },
+  setOutsideScroll: (x, y) => {
+    const unit = UNITS[State.currentUnit];
+    if (x !== undefined) unit.outsideScrollX = x;
+    if (y !== undefined) unit.outsideScrollY = y;
+    if (State.view === "window") showWindow();
+  },
+  unlockRoomStart: (unitId) => {
+    if (UNITS[unitId]) {
+      UNITS[unitId].startsOutside = false;
+      localStorage.setItem(`ep_u${unitId}_hasroom`, "1");
+    }
   },
   unlockEasterEgg: (unitId) => {
     if (!State.easterEggsUnlocked.includes(unitId)) {

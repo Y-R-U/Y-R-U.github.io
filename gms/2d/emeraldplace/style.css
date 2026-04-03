@@ -717,6 +717,45 @@ html, body {
 }
 
 /* ════════════════════════════════════════════════════════════
+   NOTIFY TOAST  (in-stage)
+   ════════════════════════════════════════════════════════════ */
+
+.ep-notify {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(22, 33, 62, 0.96);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  padding: 5px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  z-index: 80;
+  pointer-events: none;
+  animation: notifyAnim 3s ease forwards;
+}
+
+.ep-notify--milestone {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ep-notify--unlock {
+  border-color: #53d8fb;
+  color: #53d8fb;
+}
+
+@keyframes notifyAnim {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  12%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+/* ════════════════════════════════════════════════════════════
    CLICK FEEDBACK
    ════════════════════════════════════════════════════════════ */
 
