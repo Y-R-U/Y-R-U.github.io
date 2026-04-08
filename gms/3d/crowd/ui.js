@@ -22,19 +22,27 @@ class UIManager {
     this.setText('hud-crowd-num',    crowdSize);
     this.setText('hud-enemy-num',    enemyCount);
     this.setText('hud-coins-ig-num', coins);
-    this.setText('progress-target',  targetCrowd);
-
-    const secs = Math.max(0, Math.ceil(timeLeft));
-    const m    = Math.floor(secs / 60);
-    const s    = secs % 60;
-    this.setText('hud-timer-val', `${m}:${String(s).padStart(2, '0')}`);
 
     const timerPill = document.getElementById('hud-timer');
-    if (secs <= 15) timerPill.classList.add('urgent');
-    else            timerPill.classList.remove('urgent');
+    const pbWrap    = document.getElementById('progress-bar-wrap');
 
-    const pct = Math.min(100, Math.round((crowdSize / targetCrowd) * 100));
-    document.getElementById('progress-bar-fill').style.width = pct + '%';
+    if (!isFinite(timeLeft)) {
+      // LMS mode — no timer, no progress bar
+      this.setText('hud-timer-val', 'LMS');
+      timerPill.classList.remove('urgent');
+      if (pbWrap) pbWrap.style.visibility = 'hidden';
+    } else {
+      if (pbWrap) pbWrap.style.visibility = '';
+      this.setText('progress-target', targetCrowd);
+      const secs = Math.max(0, Math.ceil(timeLeft));
+      const m    = Math.floor(secs / 60);
+      const s    = secs % 60;
+      this.setText('hud-timer-val', `${m}:${String(s).padStart(2, '0')}`);
+      if (secs <= 15) timerPill.classList.add('urgent');
+      else            timerPill.classList.remove('urgent');
+      const pct = Math.min(100, Math.round((crowdSize / targetCrowd) * 100));
+      document.getElementById('progress-bar-fill').style.width = pct + '%';
+    }
   }
 
   // ── Result screens ───────────────────────────────────────────────────
@@ -156,5 +164,58 @@ class UIManager {
   refreshMenuCoins(coins) {
     this.setText('menu-coin-count', coins);
     this.setText('upgrade-coin-count', coins);
+  }
+
+  // ── Ranking panel ────────────────────────────────────────────────────
+  // entities = [{name, size, color (hex int), isPlayer}]
+  updateRanking(entities) {
+    const sorted = [...entities].sort((a, b) => b.size - a.size);
+    const list   = document.getElementById('ranking-list');
+    if (!list) return;
+    list.innerHTML = '';
+    sorted.slice(0, 9).forEach((ent, rank) => {
+      const div       = document.createElement('div');
+      div.className   = 'rank-entry' + (ent.isPlayer ? ' rank-player' : '');
+      const colorStr  = '#' + ent.color.toString(16).padStart(6, '0');
+      div.innerHTML   = `
+        <span class="rank-pos">#${rank + 1}</span>
+        <span class="rank-dot" style="background:${colorStr}"></span>
+        <span class="rank-name">${ent.name}</span>
+        <span class="rank-size">${ent.size}</span>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ── Size labels (CSS overlay) ─────────────────────────────────────────
+  // Call once per entity per frame with projected screen position
+  updateLabel(id, screenX, screenY, size, colorHex, visible) {
+    const container = document.getElementById('label-container');
+    if (!container) return;
+
+    let el = document.getElementById('lbl-' + id);
+    if (!el) {
+      el              = document.createElement('div');
+      el.className    = 'entity-label';
+      el.id           = 'lbl-' + id;
+      container.appendChild(el);
+    }
+
+    if (!visible) { el.style.display = 'none'; return; }
+
+    const colorStr  = '#' + colorHex.toString(16).padStart(6, '0');
+    el.style.display = 'flex';
+    el.style.left    = screenX + 'px';
+    el.style.top     = screenY + 'px';
+    el.innerHTML     = `<span class="label-dot" style="background:${colorStr}"></span>${size}`;
+  }
+
+  removeLabel(id) {
+    document.getElementById('lbl-' + id)?.remove();
+  }
+
+  clearLabels() {
+    const c = document.getElementById('label-container');
+    if (c) c.innerHTML = '';
   }
 }

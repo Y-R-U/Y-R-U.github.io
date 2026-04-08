@@ -38,6 +38,20 @@ const UPGRADE_DEFS = [
   { id: 'coinBonus', icon: '🪙', name: 'Coin Boost',      desc: '+15% coins earned per level',        maxLevel: 5, costs: [10, 25, 50, 100, 200] },
 ];
 
+// ── Game modes ──────────────────────────────────────────────────────────────
+const GAME_MODES = { LEVELS: 'levels', LMS: 'lms' };
+
+// Enemies for Last Man Standing mode
+const LMS_ENEMIES = [
+  { type: 'rookie',   count: 2 },
+  { type: 'fighter',  count: 2 },
+  { type: 'champion', count: 2 },
+  { type: 'boss',     count: 2 },
+];
+
+// LMS: player starts with a few followers so they have a chance
+const LMS_PLAYER_START_CROWD = 5;
+
 const IG_UPGRADES = [
   { id: 'speedSurge', icon: '⚡', name: 'Speed Surge',  desc: '+30% speed for this run'             },
   { id: 'massMagnet', icon: '🧲', name: 'Mass Magnet',  desc: '+60% magnet range this run'          },

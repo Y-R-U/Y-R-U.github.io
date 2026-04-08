@@ -5,9 +5,8 @@ class Enemy {
   constructor(scene, type, spawnX, spawnZ) {
     this.scene      = scene;
     this.type       = type;
-    this.followers  = []; // [{mesh, phase, offX, offZ}]
+    this.followers  = []; // [{mesh, phase}]
     this.mesh       = null;
-    this.trail      = new TrailSystem();
 
     const props       = ENEMY_PROPS[type];
     this.color        = props.color;
@@ -22,6 +21,13 @@ class Enemy {
     this._wanderDz  = Math.random() * 2 - 1;
     this._targetX   = 0;
     this._targetZ   = 0;
+
+    // Movement direction for cluster orientation
+    this._moveDirX = this._wanderDx;
+    this._moveDirZ = this._wanderDz;
+
+    // Eating cooldown (LMS mode)
+    this._lastEat = -1;
 
     // Build
     const [minC, maxC] = props.startCrowd;
@@ -40,7 +46,6 @@ class Enemy {
     this.mesh.position.set(x, B_RAD.player, z);
     this.mesh.castShadow = true;
     this.scene.add(this.mesh);
-    this.trail.push(x, z);
     for (let i = 0; i < startCount; i++) this.addFollower();
   }
 
@@ -62,7 +67,7 @@ class Enemy {
     if ((this.type === 'champion' || this.type === 'boss') &&
         player.crowdSize > this.crowdSize + 6 &&
         distToPlayer < this.senseRange) {
-      this.state   = 'flee';
+      this.state    = 'flee';
       this._targetX = ex + (ex - px);
       this._targetZ = ez + (ez - pz);
       return;
@@ -72,7 +77,7 @@ class Enemy {
     if (this.huntRange > 0 &&
         distToPlayer < this.huntRange &&
         this.crowdSize >= player.crowdSize - 3) {
-      this.state   = 'chase';
+      this.state    = 'chase';
       this._targetX = px;
       this._targetZ = pz;
       return;
@@ -87,7 +92,7 @@ class Enemy {
         if (d < nearDist) { nearDist = d; nearest = c; }
       }
       if (nearest) {
-        this.state   = 'seek_collect';
+        this.state    = 'seek_collect';
         this._targetX = nearest.mesh.position.x;
         this._targetZ = nearest.mesh.position.z;
         return;
@@ -132,16 +137,30 @@ class Enemy {
     this.mesh.position.x = nx;
     this.mesh.position.z = nz;
     this.mesh.rotation.y = Math.atan2(dx, dz);
-    this.trail.push(nx, nz);
+
+    // Track movement direction for cluster orientation
+    if (Math.hypot(dx, dz) > 0.01) {
+      this._moveDirX = dx;
+      this._moveDirZ = dz;
+    }
   }
 
-  // ── Follower update ───────────────────────────────────────────────────
+  // ── Follower cluster update (fibonacci spiral) ────────────────────────
   _updateFollowers(dt, time) {
-    const GAP = 5;
+    const TRAIL_BACK = 1.5;
+    const PACK_R     = B_RAD.follower * 2.2;
+
+    const cx = this.mesh.position.x - this._moveDirX * TRAIL_BACK;
+    const cz = this.mesh.position.z - this._moveDirZ * TRAIL_BACK;
+
     this.followers.forEach((f, i) => {
-      const tgt = this.trail.getAt((i + 1) * GAP);
-      const fdx = (tgt.x + f.offX) - f.mesh.position.x;
-      const fdz = (tgt.z + f.offZ) - f.mesh.position.z;
+      const r  = PACK_R * Math.sqrt(i + 1);
+      const a  = i * GOLDEN_ANGLE;
+      const tx = cx + Math.cos(a) * r;
+      const tz = cz + Math.sin(a) * r;
+
+      const fdx  = tx - f.mesh.position.x;
+      const fdz  = tz - f.mesh.position.z;
       const dist = Math.hypot(fdx, fdz);
       if (dist > 0.05) {
         const step = Math.min(10 * dt, dist);
@@ -150,6 +169,7 @@ class Enemy {
       }
       f.mesh.position.y = B_RAD.follower + Math.sin(time * 3 + f.phase) * 0.08;
     });
+
     this.mesh.position.y = B_RAD.player + Math.sin(time * 2.5 + this.followers.length * 0.3) * 0.1;
   }
 
@@ -162,8 +182,7 @@ class Enemy {
     m.position.copy(this.mesh.position);
     m.position.y = B_RAD.follower;
     m.castShadow  = true;
-    const f = { mesh: m, phase: Math.random() * Math.PI * 2, offX: (Math.random() - 0.5) * 0.5, offZ: (Math.random() - 0.5) * 0.5 };
-    this.followers.push(f);
+    this.followers.push({ mesh: m, phase: Math.random() * Math.PI * 2 });
     this.scene.add(m);
   }
 
@@ -175,6 +194,15 @@ class Enemy {
       f.mesh.geometry.dispose();
       f.mesh.material.dispose();
     }
+  }
+
+  // Remove a specific follower by index (for LMS eating)
+  removeFollowerAt(idx) {
+    if (idx < 0 || idx >= this.followers.length) return;
+    const f = this.followers.splice(idx, 1)[0];
+    this.scene.remove(f.mesh);
+    f.mesh.geometry.dispose();
+    f.mesh.material.dispose();
   }
 
   dispose() {
