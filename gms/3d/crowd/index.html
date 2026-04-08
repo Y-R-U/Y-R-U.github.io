@@ -51,6 +51,31 @@
   </div>
 
   <!-- ============================================
+       MODE SELECT SCREEN
+       ============================================ -->
+  <div id="mode-screen" class="screen screen-bg hidden">
+    <div class="menu-logo">
+      <h1 style="font-size:clamp(1.8rem,6vw,2.8rem)">Select Mode</h1>
+      <p>How do you want to play?</p>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card" id="mode-card-levels">
+        <div class="mode-icon">🗺️</div>
+        <div class="mode-name">Story Mode</div>
+        <div class="mode-desc">5 levels. Reach the target crowd size. Soft collisions — grow safely and out-number enemies.</div>
+        <button class="btn btn-primary mode-play-btn">▶ Play</button>
+      </div>
+      <div class="mode-card" id="mode-card-lms">
+        <div class="mode-icon">⚔️</div>
+        <div class="mode-name">Last Man Standing</div>
+        <div class="mode-desc">8 enemies. Real contact eating — touch smaller crowds to absorb their followers. Last crowd wins!</div>
+        <button class="btn btn-danger mode-play-btn">⚔ Fight</button>
+      </div>
+    </div>
+    <button class="btn btn-secondary" id="btn-mode-back">← Back</button>
+  </div>
+
+  <!-- ============================================
        LEVEL SELECT SCREEN
        ============================================ -->
   <div id="level-screen" class="screen screen-bg hidden">
@@ -257,6 +282,25 @@
   <!-- Toast container -->
   <div id="toast-container"></div>
 
+  <!-- ============================================
+       RANKING PANEL (in-game)
+       ============================================ -->
+  <div id="ranking-panel" class="hidden">
+    <div class="ranking-header">🏆 Rankings</div>
+    <div id="ranking-list"></div>
+  </div>
+
+  <!-- ============================================
+       MINI-MAP (in-game)
+       ============================================ -->
+  <div id="minimap-wrap" class="hidden">
+    <div class="minimap-label">MAP</div>
+    <canvas id="minimap-canvas"></canvas>
+  </div>
+
+  <!-- Size labels container (CSS-positioned over 3D) -->
+  <div id="label-container"></div>
+
 </div><!-- #game-container -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -269,6 +313,7 @@
 <script src="enemy.js"></script>
 <script src="collectible.js"></script>
 <script src="input.js"></script>
+<script src="minimap.js"></script>
 <script src="ui.js"></script>
 <script src="game.js"></script>
 </body>

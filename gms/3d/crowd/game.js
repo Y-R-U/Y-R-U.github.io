@@ -27,6 +27,11 @@ class Game {
     this._camTarget = new THREE.Vector3();
     this._camLook   = new THREE.Vector3();
     this.MAX_COLL   = 120;
+
+    // Mode & HUD extras
+    this.gameMode     = GAME_MODES.LEVELS;
+    this._minimap     = null;
+    this._rankTimer   = 0; // throttle ranking DOM updates
   }
 
   // ── Initialise ───────────────────────────────────────────────────────
@@ -34,6 +39,7 @@ class Game {
     SaveSystem.load();
     this.audio.init(SaveSystem.get('settings'));
     this._initRenderer();
+    this._minimap = new MiniMap('minimap-canvas');
     this._initUI();
     this._showMenu();
     document.getElementById('loading-screen').classList.add('hidden');
@@ -102,8 +108,15 @@ class Game {
     for (const e of this.enemies) e.update(dt, this.player, this.collectibles, this._gt);
 
     this._updateCollectibles(dt);
-    this._collidePlayerEnemy();
-    this._collideEnemyEnemy();
+
+    // Collision — real eating in LMS, soft in Levels
+    if (this.gameMode === GAME_MODES.LMS) {
+      this._collideLMS();
+    } else {
+      this._collidePlayerEnemy();
+      this._collideEnemyEnemy();
+    }
+
     updateParticles(this.scene, dt);
 
     // Camera smooth follow
@@ -120,15 +133,60 @@ class Game {
     );
     this.camera.lookAt(this._camLook);
 
+    // HUD
+    const isLMS = this.gameMode === GAME_MODES.LMS;
     this.ui.updateHUD(
       this.player.crowdSize,
       this.enemies.length,
-      this._timeLeft,
-      LEVELS[this._levelIdx].targetCrowd,
+      isLMS ? Infinity : this._timeLeft,
+      isLMS ? 0 : LEVELS[this._levelIdx].targetCrowd,
       this.player.coinsThisGame
     );
 
+    // Labels, minimap, ranking (throttled)
+    this._updateLabels();
+    this._minimap.draw(this.player, this.enemies, this.collectibles);
+    this._rankTimer -= dt;
+    if (this._rankTimer <= 0) { this._updateRanking(); this._rankTimer = 0.25; }
+
     this._checkEnd();
+  }
+
+  // ── Size labels (project 3D → 2D screen) ─────────────────────────────
+  _updateLabels() {
+    const w = innerWidth, h = innerHeight;
+    const project = (mesh, labelY) => {
+      const v = new THREE.Vector3();
+      v.copy(mesh.position);
+      v.y += labelY;
+      v.project(this.camera);
+      return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, vis: v.z < 1 };
+    };
+
+    const p = project(this.player.mesh, 2.5);
+    this.ui.updateLabel('player', p.x, p.y, this.player.crowdSize, COLORS.player, p.vis);
+
+    this.enemies.forEach((e, i) => {
+      const ep = project(e.mesh, 2.5);
+      this.ui.updateLabel('enemy' + i, ep.x, ep.y, e.crowdSize, e.color, ep.vis);
+    });
+
+    // Remove stale enemy labels (enemies that were eliminated)
+    // We only create labels for current enemies so excess labels just stay hidden until reused
+  }
+
+  // ── Ranking panel ─────────────────────────────────────────────────────
+  _updateRanking() {
+    const entities = [
+      { name: 'You', size: this.player.crowdSize, color: COLORS.player, isPlayer: true },
+      ...this.enemies.map((e, i) => ({
+        name:     e.type.charAt(0).toUpperCase() + e.type.slice(1) + ' ' + (i + 1),
+        size:     e.crowdSize,
+        color:    e.color,
+        isPlayer: false,
+      })),
+    ];
+    this.ui.updateRanking(entities);
   }
 
   // ── Collectible logic ────────────────────────────────────────────────
@@ -284,14 +342,166 @@ class Game {
     }
   }
 
+  // ── LMS: real contact-eating collision ───────────────────────────────
+  // Both player↔enemy and enemy↔enemy checked here.
+  // Bigger crowd eats one ball per entity per EAT_CD seconds on contact.
+  _collideLMS() {
+    const now    = this._gt;
+    const EAT_CD = 0.10; // seconds between each eat per entity
+    const EAT_R  = 1.9;  // contact range (leader or follower)
+
+    // Helper: find closest ball of entity B to point (qx, qz)
+    // Returns { idx: followerIndex or -1 for leader, dist }
+    const closestBall = (entity, qx, qz) => {
+      let best = Math.hypot(entity.mesh.position.x - qx, entity.mesh.position.z - qz);
+      let idx  = -1; // -1 = leader
+      entity.followers.forEach((f, fi) => {
+        const d = Math.hypot(f.mesh.position.x - qx, f.mesh.position.z - qz);
+        if (d < best) { best = d; idx = fi; }
+      });
+      return { idx, dist: best };
+    };
+
+    // Helper: remove one ball from entity (leader handled as game-over/eliminate)
+    const eatFrom = (entity, idx, isEnemy, enemyArrIdx) => {
+      if (idx === -1) {
+        // Leader hit — eliminate (already has no followers if we get here)
+        spawnParticles(this.scene, entity.mesh.position.x, 1, entity.mesh.position.z, entity.color || COLORS.follower, 12);
+        if (isEnemy) {
+          this.audio.playAbsorb();
+          entity.dispose();
+          this.enemies.splice(enemyArrIdx, 1);
+          this.player.enemiesAbsorbed++;
+          this.player.coinsThisGame += 15;
+          this.ui.showToast('Enemy eliminated!', 'good');
+        } else {
+          this._endGame(false);
+        }
+      } else {
+        const f = isEnemy ? entity.followers[idx] : this.player.followers[idx];
+        spawnParticles(this.scene, f.mesh.position.x, 1, f.mesh.position.z, entity.color || COLORS.follower, 4);
+        if (isEnemy) entity.removeFollowerAt(idx);
+        else         this.player.removeFollowerAt(idx);
+        this.audio.playHit();
+        if (!isEnemy) this.audio.vibrate(20);
+      }
+    };
+
+    // ── Player vs each enemy ─────────────────────────────────────────
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      if (!this._running) return;
+      const e = this.enemies[i];
+
+      // Quick reject
+      const roughDist = Math.hypot(
+        this.player.mesh.position.x - e.mesh.position.x,
+        this.player.mesh.position.z - e.mesh.position.z
+      );
+      if (roughDist > 25) continue;
+
+      // Player eats enemy ball
+      if (this.player.crowdSize > e.crowdSize && now - this.player._lastEat > EAT_CD) {
+        const { idx, dist } = closestBall(e, this.player.mesh.position.x, this.player.mesh.position.z);
+        if (dist < EAT_R) {
+          if (idx === -1 && e.followers.length > 0) {
+            // Leader touched but still has followers — eat last follower instead
+            const last = e.followers.length - 1;
+            spawnParticles(this.scene, e.followers[last].mesh.position.x, 1, e.followers[last].mesh.position.z, e.color, 4);
+            e.removeFollowerAt(last);
+            this.audio.playHit();
+          } else {
+            eatFrom(e, idx, true, i);
+          }
+          this.player._lastEat = now;
+          if (i >= this.enemies.length) break; // array shrank
+        }
+      }
+
+      if (i >= this.enemies.length) break;
+      if (!this._running) return;
+      const e2 = this.enemies[i]; // re-fetch in case it changed
+
+      // Enemy eats player ball
+      if (e2.crowdSize > this.player.crowdSize && now - e2._lastEat > EAT_CD && !this.player.invincible) {
+        if (this.player.shieldCharges > 0) {
+          this.player.shieldCharges--;
+          this.player.activateShield(2.5);
+          this.ui.showToast('🛡 Shield!', 'info');
+          this.audio.playHit();
+          e2._lastEat = now;
+        } else {
+          const { idx, dist } = closestBall(this.player, e2.mesh.position.x, e2.mesh.position.z);
+          if (dist < EAT_R) {
+            if (idx === -1 && this.player.followers.length > 0) {
+              const last = this.player.followers.length - 1;
+              spawnParticles(this.scene, this.player.followers[last].mesh.position.x, 1, this.player.followers[last].mesh.position.z, COLORS.follower, 4);
+              this.player.removeFollowerAt(last);
+              this.audio.playHit();
+              this.audio.vibrate(25);
+              this.player.activateShield(0.5); // tiny grace after hit
+            } else {
+              eatFrom(this.player, idx, false, -1);
+            }
+            e2._lastEat = now;
+            if (!this._running) return;
+          }
+        }
+      }
+    }
+
+    // ── Enemy vs enemy ────────────────────────────────────────────────
+    for (let i = 0; i < this.enemies.length; i++) {
+      for (let j = i + 1; j < this.enemies.length; j++) {
+        const a = this.enemies[i], b = this.enemies[j];
+        const d = Math.hypot(a.mesh.position.x - b.mesh.position.x, a.mesh.position.z - b.mesh.position.z);
+        if (d > 20) continue;
+
+        if (a.crowdSize > b.crowdSize && now - a._lastEat > EAT_CD) {
+          const { idx, dist } = closestBall(b, a.mesh.position.x, a.mesh.position.z);
+          if (dist < EAT_R) {
+            if (idx === -1 && b.followers.length > 0) {
+              b.removeFollowerAt(b.followers.length - 1);
+            } else if (idx === -1) {
+              spawnParticles(this.scene, b.mesh.position.x, 1, b.mesh.position.z, b.color, 10);
+              b.dispose(); this.enemies.splice(j, 1); j--;
+            } else {
+              b.removeFollowerAt(idx);
+            }
+            a._lastEat = now;
+          }
+        } else if (j < this.enemies.length && b.crowdSize > a.crowdSize && now - b._lastEat > EAT_CD) {
+          const { idx, dist } = closestBall(a, b.mesh.position.x, b.mesh.position.z);
+          if (dist < EAT_R) {
+            if (idx === -1 && a.followers.length > 0) {
+              a.removeFollowerAt(a.followers.length - 1);
+            } else if (idx === -1) {
+              spawnParticles(this.scene, a.mesh.position.x, 1, a.mesh.position.z, a.color, 10);
+              a.dispose(); this.enemies.splice(i, 1); i--; j = this.enemies.length; // break inner
+            } else {
+              a.removeFollowerAt(idx);
+            }
+            b._lastEat = now;
+          }
+        }
+      }
+    }
+  }
+
   // ── Win / lose ────────────────────────────────────────────────────────
   _checkEnd() {
     if (!this._running) return;
-    const lv = LEVELS[this._levelIdx];
-    if (this.enemies.length === 0 || this.player.crowdSize >= lv.targetCrowd) {
-      this._endGame(true);
-    } else if (this._timeLeft <= 0) {
-      this._endGame(false);
+
+    if (this.gameMode === GAME_MODES.LMS) {
+      // LMS: win if all enemies gone
+      if (this.enemies.length === 0) this._endGame(true);
+      // Lose condition handled inside _collideLMS when player is eliminated
+    } else {
+      const lv = LEVELS[this._levelIdx];
+      if (this.enemies.length === 0 || this.player.crowdSize >= lv.targetCrowd) {
+        this._endGame(true);
+      } else if (this._timeLeft <= 0) {
+        this._endGame(false);
+      }
     }
   }
 
@@ -306,8 +516,43 @@ class Game {
     });
   }
 
-  // ── Start a level ─────────────────────────────────────────────────────
+  // ── Shared spawn helper ───────────────────────────────────────────────
+  _spawnEnemyList(enemyDefs) {
+    this.enemies = [];
+    enemyDefs.forEach(def => {
+      for (let i = 0; i < def.count; i++) {
+        let ex, ez, tries = 0;
+        do {
+          const ang = Math.random() * Math.PI * 2;
+          const r   = 55 + Math.random() * 30;
+          ex = Math.cos(ang) * r;
+          ez = Math.sin(ang) * r;
+          tries++;
+        } while (tries < 30 && (Math.abs(ex) > MAP_HALF - 4 || Math.abs(ez) > MAP_HALF - 4));
+        ex = Math.max(-(MAP_HALF - 4), Math.min(MAP_HALF - 4, ex));
+        ez = Math.max(-(MAP_HALF - 4), Math.min(MAP_HALF - 4, ez));
+        this.enemies.push(new Enemy(this.scene, def.type, ex, ez));
+      }
+    });
+  }
+
+  _startCommon() {
+    this.collectibles = [];
+    for (let i = 0; i < this.MAX_COLL; i++) this._spawnCollectible();
+    this.camera.position.set(0, 22, 18);
+    this.ui.show('hud');
+    this.ui.show('joystick-zone');
+    this.ui.show('ranking-panel');
+    this._minimap.show();
+    this.input.attach();
+    this._running = true;
+    this._rankTimer = 0;
+    this.audio.playRandomTheme();
+  }
+
+  // ── Start a Story-mode level ──────────────────────────────────────────
   startLevel(idx) {
+    this.gameMode  = GAME_MODES.LEVELS;
     this._levelIdx = idx;
     this._cleanup();
 
@@ -319,46 +564,32 @@ class Game {
     this._paused   = false;
 
     this.ui.hide('ig-upgrade-overlay');
-
-    // Build world
     this.map = new MapBuilder(this.scene);
     this.map.build();
-
-    // Spawn player
     this.player = new Player(this.scene, SaveSystem.getData());
+    this._spawnEnemyList(lv.enemies);
+    this._startCommon();
+  }
 
-    // Spawn enemies at map edges
-    this.enemies = [];
-    lv.enemies.forEach(def => {
-      for (let i = 0; i < def.count; i++) {
-        let ex, ez, tries = 0;
-        do {
-          const ang = Math.random() * Math.PI * 2;
-          const r   = 60 + Math.random() * 25;
-          ex = Math.cos(ang) * r;
-          ez = Math.sin(ang) * r;
-          tries++;
-        } while (tries < 30 && (Math.abs(ex) > MAP_HALF - 4 || Math.abs(ez) > MAP_HALF - 4));
-        ex = Math.max(-(MAP_HALF - 4), Math.min(MAP_HALF - 4, ex));
-        ez = Math.max(-(MAP_HALF - 4), Math.min(MAP_HALF - 4, ez));
-        this.enemies.push(new Enemy(this.scene, def.type, ex, ez));
-      }
-    });
+  // ── Start Last Man Standing ───────────────────────────────────────────
+  startLMS() {
+    this.gameMode  = GAME_MODES.LMS;
+    this._levelIdx = -1;
+    this._cleanup();
 
-    // Seed collectibles
-    this.collectibles = [];
-    for (let i = 0; i < this.MAX_COLL; i++) this._spawnCollectible();
+    this._timeLeft = Infinity; // no timer
+    this._survived = 0;
+    this._gt       = 0;
+    this._running  = false;
+    this._paused   = false;
 
-    // Snap camera
-    this.camera.position.set(0, 22, 18);
-
-    // Show HUD + joystick, attach input
-    this.ui.show('hud');
-    this.ui.show('joystick-zone');
-    this.input.attach();
-
-    this._running = true;
-    this.audio.playRandomTheme();
+    this.ui.hide('ig-upgrade-overlay');
+    this.map = new MapBuilder(this.scene);
+    this.map.build();
+    // Give player a head-start squad
+    this.player = new Player(this.scene, SaveSystem.getData(), LMS_PLAYER_START_CROWD);
+    this._spawnEnemyList(LMS_ENEMIES);
+    this._startCommon();
   }
 
   // ── End game ──────────────────────────────────────────────────────────
@@ -370,21 +601,51 @@ class Game {
     clearParticles(this.scene);
     this.ui.hide('hud');
     this.ui.hide('joystick-zone');
+    this.ui.hide('ranking-panel');
+    this._minimap.hide();
+    this.ui.clearLabels();
 
-    const lv          = LEVELS[this._levelIdx];
     const coinsEarned = this.player.coinsThisGame;
     SaveSystem.addCoins(coinsEarned);
+
+    if (this.gameMode === GAME_MODES.LMS) {
+      // LMS result
+      if (won) {
+        this.audio.playVictory();
+        this.audio.vibrate([50, 30, 50, 30, 100]);
+        this.ui.showVictory({
+          finalCrowd:      this.player.crowdSize,
+          timeLeft:        0,       // no timer in LMS
+          totalTime:       1,       // avoid div-by-zero in star calc
+          targetCrowd:     9999,    // star threshold not relevant
+          enemiesAbsorbed: this.player.enemiesAbsorbed,
+          coinsEarned,
+        }, -1); // -1 = no next level
+      } else {
+        this.audio.playGameOver();
+        this.audio.vibrate([100, 50, 100]);
+        this.ui.showGameOver({
+          peakCrowd:       this.player.peakCrowd,
+          survived:        this._survived,
+          enemiesAbsorbed: this.player.enemiesAbsorbed,
+          coinsEarned,
+        });
+      }
+      // Retry LMS button re-wired at bottom via _lastMode
+      this._lastWasLMS = true;
+      return;
+    }
+
+    this._lastWasLMS = false;
+    const lv = LEVELS[this._levelIdx];
 
     if (won) {
       this.audio.playVictory();
       this.audio.vibrate([50, 30, 50, 30, 100]);
-
-      // Unlock next level
       const current = SaveSystem.get('unlockedLevel') || 1;
       if (this._levelIdx + 1 >= current) {
         SaveSystem.set('unlockedLevel', Math.min(LEVELS.length, this._levelIdx + 2));
       }
-
       this.ui.showVictory({
         finalCrowd:      this.player.crowdSize,
         timeLeft:        this._timeLeft,
@@ -393,7 +654,6 @@ class Game {
         enemiesAbsorbed: this.player.enemiesAbsorbed,
         coinsEarned,
       }, this._levelIdx);
-
     } else {
       this.audio.playGameOver();
       this.audio.vibrate([100, 50, 100]);
@@ -415,14 +675,25 @@ class Game {
     this.collectibles = [];
     clearParticles(this.scene);
     if (this.map) { this.map.dispose(); this.map = null; }
+    this.ui.clearLabels();
+    this.ui.hide('ranking-panel');
+    if (this._minimap) this._minimap.hide();
   }
 
   // ── Menu ─────────────────────────────────────────────────────────────
   _showMenu() {
     this.ui.refreshMenuCoins(SaveSystem.get('coins') || 0);
-    ['level-screen','upgrade-screen','gameover-screen','victory-screen','hud','joystick-zone']
+    ['mode-screen','level-screen','upgrade-screen','gameover-screen',
+     'victory-screen','hud','joystick-zone','ranking-panel','ig-upgrade-overlay']
       .forEach(id => this.ui.hide(id));
+    if (this._minimap) this._minimap.hide();
     this.ui.show('menu-screen');
+  }
+
+  // ── Mode select screen ────────────────────────────────────────────────
+  _showModeSelect() {
+    ['menu-screen','level-screen'].forEach(id => this.ui.hide(id));
+    this.ui.show('mode-screen');
   }
 
   // ── UI wiring ────────────────────────────────────────────────────────
@@ -462,9 +733,21 @@ class Game {
       }
     });
 
-    // Main menu
+    // Main menu → mode select
     document.getElementById('btn-play').addEventListener('click', () => {
       this.ui.hide('menu-screen');
+      this._showModeSelect();
+    });
+
+    // Mode select back
+    document.getElementById('btn-mode-back').addEventListener('click', () => {
+      this.ui.hide('mode-screen');
+      this._showMenu();
+    });
+
+    // Mode: Story → level select
+    document.getElementById('mode-card-levels').addEventListener('click', () => {
+      this.ui.hide('mode-screen');
       this.ui.buildLevelScreen(
         SaveSystem.get('levelStars') || [0,0,0,0,0],
         SaveSystem.get('unlockedLevel') || 1,
@@ -473,9 +756,15 @@ class Game {
       this.ui.show('level-screen');
     });
 
+    // Mode: LMS → start immediately
+    document.getElementById('mode-card-lms').addEventListener('click', () => {
+      this.ui.hide('mode-screen');
+      this.startLMS();
+    });
+
     document.getElementById('btn-level-back').addEventListener('click', () => {
       this.ui.hide('level-screen');
-      this._showMenu();
+      this._showModeSelect();
     });
 
     document.getElementById('btn-upgrades').addEventListener('click', () => {
@@ -492,7 +781,7 @@ class Game {
     // Game over
     document.getElementById('btn-retry').addEventListener('click', () => {
       this.ui.hide('gameover-screen');
-      this.startLevel(this._levelIdx);
+      if (this._lastWasLMS) this.startLMS(); else this.startLevel(this._levelIdx);
     });
     document.getElementById('btn-go-menu').addEventListener('click', () => {
       this.ui.hide('gameover-screen');
@@ -502,6 +791,7 @@ class Game {
     // Victory
     document.getElementById('btn-next-level').addEventListener('click', () => {
       this.ui.hide('victory-screen');
+      if (this._lastWasLMS || this._levelIdx < 0) { this._showMenu(); return; }
       const next = this._levelIdx + 1;
       if (next < LEVELS.length) this.startLevel(next); else this._showMenu();
     });

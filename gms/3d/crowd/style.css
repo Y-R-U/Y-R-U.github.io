@@ -936,3 +936,222 @@ html, body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* =============================================
+   MODE SELECT SCREEN
+   ============================================= */
+.mode-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.mode-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  flex: 1;
+  min-width: 220px;
+  max-width: 270px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.mode-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(41,182,246,0.3);
+}
+
+.mode-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.mode-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.mode-desc {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.mode-play-btn { margin-top: 4px; }
+
+/* =============================================
+   RANKING PANEL
+   ============================================= */
+#ranking-panel {
+  position: absolute;
+  top: 70px;
+  right: 16px;
+  width: 170px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 10px 8px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.ranking-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.rank-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+  transition: background 0.15s;
+}
+
+.rank-entry.rank-player {
+  background: rgba(41,182,246,0.12);
+  border: 1px solid rgba(41,182,246,0.25);
+}
+
+.rank-pos {
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.7rem;
+  width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rank-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px currentColor;
+}
+
+.rank-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-size {
+  font-weight: 800;
+  color: var(--accent);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* =============================================
+   MINI-MAP
+   ============================================= */
+#minimap-wrap {
+  position: absolute;
+  bottom: 90px;
+  right: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.18);
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+
+.minimap-label {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1.5px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#minimap-canvas {
+  display: block;
+  width: 130px;
+  height: 130px;
+}
+
+/* =============================================
+   SIZE LABELS (CSS overlay)
+   ============================================= */
+#label-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  overflow: hidden;
+}
+
+.entity-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 50px;
+  padding: 2px 7px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.entity-label .label-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* LMS badge on mode card */
+.lms-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+}
+
+/* LMS results colour override */
+.result-title.lms { color: #ff7043; }
