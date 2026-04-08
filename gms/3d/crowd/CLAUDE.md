@@ -8,12 +8,23 @@ Prompt Claude with:
 
 ## Architecture Overview
 
-| File | Purpose |
-|------|---------|
-| `index.html` | HTML skeleton, UI screens, imports |
-| `style.css` | Mobile-first CSS, screens, HUD, overlays |
-| `game.js` | Full game logic (~1600 lines) |
-| `music/` | Place theme1.mp3–theme9.mp3 here for music |
+Files load in this order (all via `<script>` tags in index.html):
+
+| File | Purpose | ~Lines |
+|------|---------|--------|
+| `index.html` | HTML skeleton, all UI screens | 275 |
+| `style.css` | Mobile-first CSS, screens, HUD, overlays | 620 |
+| `config.js` | Constants, LEVELS[], UPGRADE_DEFS[], IG_UPGRADES[], COLORS | 50 |
+| `save.js` | SaveSystem (localStorage, dot-path get/set) | 70 |
+| `audio.js` | AudioManager — Web Audio SFX + mp3 music loader | 130 |
+| `map.js` | MapBuilder — floor, buildings, trees, plaza | 175 |
+| `player.js` | TrailSystem + Player (movement, followers, upgrades) | 170 |
+| `enemy.js` | Enemy (AI state machine: wander/seek/chase/flee) | 180 |
+| `collectible.js` | Collectible + spawnParticles/updateParticles/clearParticles | 90 |
+| `input.js` | InputController — keyboard + virtual touch joystick | 110 |
+| `ui.js` | UIManager — screens, HUD, toasts, upgrade UI | 165 |
+| `game.js` | Game class (main loop, collision, wiring) + entry point | 310 |
+| `music/` | Drop theme1.mp3–theme9.mp3 here for background music | — |
 
 ## Tech Stack
 - **Three.js r128** (via CDN, global `THREE`)
@@ -116,28 +127,28 @@ Lose: your crowd is fully absorbed OR timer runs out with fewer than 3 followers
 
 ## TODO / Status
 
-- [x] Project scaffold (index.html, style.css, game.js, CLAUDE.md)
-- [x] Three.js scene, camera, lighting, shadows
-- [x] Map generator (floor, buildings, trees, plaza)
-- [x] Trail/crowd following system
-- [x] Player controller (keyboard + touch joystick)
-- [x] Collectible spawning + magnet + collect logic
-- [x] Enemy AI (state machine, all 4 types)
-- [x] Collision: absorption (larger crowd absorbs smaller)
-- [x] HUD (crowd count, enemy count, timer, coins)
-- [x] Main menu screen
-- [x] Level select screen (5 levels)
-- [x] Upgrade shop screen
-- [x] In-game upgrade prompts
-- [x] Settings overlay (⚙ cog, sound/music toggles)
-- [x] Game over / victory screens
-- [x] Save system (localStorage)
-- [x] Audio manager (SFX + music loader)
-- [x] Particle effects (collect/absorb)
-- [x] Mobile-first touch joystick
-- [x] Desktop keyboard support
-- [ ] Playtesting / balance tweaks (future)
-- [ ] Add actual music files to `music/` folder
+- [x] Project scaffold (index.html, style.css, CLAUDE.md)
+- [x] Multi-file architecture (10 JS modules, no build step)
+- [x] Three.js r128 scene, camera, lighting, shadow map
+- [x] MapBuilder: floor, 28 pastel buildings w/ rooftop details, 18 trees, central plaza + glowing orb
+- [x] TrailSystem: position-history crowd-following mechanic
+- [x] Player: move, followers, speed/magnet/shield/temp-upgrade logic
+- [x] Enemy AI: 4 types, state machine (wander/seek_collect/chase/flee)
+- [x] Collectible: bobbing spheres, magnet pull, particle burst on collect
+- [x] Collision: player absorbs enemy (if bigger +1), loses followers (if smaller), enemy-enemy
+- [x] HUD: crowd count, timer (urgent red <15s), enemy count, coins, progress bar
+- [x] Main menu + level select (5 levels, star ratings, lock/unlock)
+- [x] Upgrade shop (4 upgrades × 5 levels, coin cost, live feedback)
+- [x] In-game upgrade prompts (every 10 collects, pick 1 of 3)
+- [x] Settings panel: SFX/Music/Vibration toggles, data reset
+- [x] Game over / victory screens with stats + coins earned
+- [x] Save system (localStorage, dot-path API)
+- [x] AudioManager: synth SFX via Web Audio API, mp3 music auto-loader
+- [x] Particle system: burst on collect/absorb, gravity, fade
+- [x] Mobile: touch joystick (dynamic origin where user touches)
+- [x] Desktop: WASD + arrow keys
+- [ ] Playtesting / balance tweaks
+- [ ] Add music files to `music/theme1.mp3` … `music/theme9.mp3`
 
 ---
 
