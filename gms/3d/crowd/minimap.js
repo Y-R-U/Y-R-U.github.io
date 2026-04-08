@@ -5,12 +5,18 @@ class MiniMap {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx    = this.canvas.getContext('2d');
-    this.SIZE   = 130; // canvas px (styled to same in CSS)
-    this.canvas.width  = this.SIZE;
-    this.canvas.height = this.SIZE;
+    this.SIZE   = 130; // logical size in CSS px
+
+    // Scale canvas for device pixel ratio (sharp on retina screens)
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width  = this.SIZE * dpr;
+    this.canvas.height = this.SIZE * dpr;
+    this.canvas.style.width  = this.SIZE + 'px';
+    this.canvas.style.height = this.SIZE + 'px';
+    this.ctx.scale(dpr, dpr);
   }
 
-  // Convert world coords → canvas px
+  // Convert world coords → canvas logical px
   _w2c(wx, wz) {
     return {
       x: ((wx + MAP_HALF) / (MAP_HALF * 2)) * this.SIZE,
@@ -24,7 +30,7 @@ class MiniMap {
     ctx.clearRect(0, 0, SIZE, SIZE);
 
     // Background
-    ctx.fillStyle = 'rgba(10,15,25,0.88)';
+    ctx.fillStyle = 'rgba(10,15,25,0.82)';
     ctx.fillRect(0, 0, SIZE, SIZE);
 
     // Subtle grid lines
@@ -57,9 +63,9 @@ class MiniMap {
       ctx.fill();
     }
 
-    // Player — blue dot with white ring
-    const pp = this._w2c(player.mesh.position.x, player.mesh.position.z);
-    const pr = 4 + Math.min(8, player.crowdSize * 0.12);
+    // Player — blue dot with white ring + direction indicator
+    const pp  = this._w2c(player.mesh.position.x, player.mesh.position.z);
+    const pr  = 4 + Math.min(8, player.crowdSize * 0.12);
     ctx.fillStyle = '#29b6f6';
     ctx.beginPath();
     ctx.arc(pp.x, pp.y, pr, 0, Math.PI * 2);
@@ -68,8 +74,18 @@ class MiniMap {
     ctx.lineWidth   = 1.5;
     ctx.stroke();
 
+    // Direction chevron
+    const angle = Math.atan2(player._moveDirZ, player._moveDirX);
+    const tipLen = pr + 4;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pp.x + Math.cos(angle) * pr, pp.y + Math.sin(angle) * pr);
+    ctx.lineTo(pp.x + Math.cos(angle) * tipLen, pp.y + Math.sin(angle) * tipLen);
+    ctx.stroke();
+
     // Border
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.lineWidth   = 1;
     ctx.strokeRect(0.5, 0.5, SIZE - 1, SIZE - 1);
   }

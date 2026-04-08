@@ -6,10 +6,11 @@ const SaveSystem = (() => {
 
   const DEFAULTS = {
     coins: 0,
-    upgrades:      { speed: 0, magnet: 0, squad: 0, coinBonus: 0 },
+    upgrades:      { speed: 0, magnet: 0, squad: 0, coinBonus: 0, steal: 0 },
     levelStars:    [0, 0, 0, 0, 0],
     unlockedLevel: 1,
     settings:      { sfx: true, music: true, vibrate: true },
+    lmsBest:       { crowd: 0, enemies: 0, time: 0 },
   };
 
   let data = null;
@@ -26,6 +27,7 @@ const SaveSystem = (() => {
         data = Object.assign(_clone(DEFAULTS), parsed);
         data.upgrades  = Object.assign(_clone(DEFAULTS.upgrades),  data.upgrades  || {});
         data.settings  = Object.assign(_clone(DEFAULTS.settings),  data.settings  || {});
+        data.lmsBest   = Object.assign(_clone(DEFAULTS.lmsBest),   data.lmsBest   || {});
         if (!Array.isArray(data.levelStars) || data.levelStars.length !== 5) {
           data.levelStars = [0, 0, 0, 0, 0];
         }

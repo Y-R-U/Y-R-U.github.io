@@ -1,31 +1,10 @@
 'use strict';
-/* ── player.js ── TrailSystem + Player entity ── */
-
-// Lightweight trail — kept for reference but cluster formation is primary
-class TrailSystem {
-  constructor() {
-    this.history = [];
-    this._lastX  = null;
-    this._lastZ  = null;
-  }
-
-  push(x, z) {
-    if (this._lastX === null || Math.hypot(x - this._lastX, z - this._lastZ) >= 0.7) {
-      this.history.unshift({ x, z });
-      if (this.history.length > 500) this.history.pop();
-      this._lastX = x;
-      this._lastZ = z;
-    }
-  }
-
-  getAt(trailIndex) {
-    const idx = Math.min(trailIndex, this.history.length - 1);
-    return this.history[idx] || { x: 0, z: 0 };
-  }
-}
+/* ── player.js ── Player entity ── */
 
 // Golden angle for Fibonacci spiral crowd packing
 const GOLDEN_ANGLE = 2.399963; // ~137.5° in radians
+// Max crowd radius — followers beyond this cap overlap (crowd density)
+const MAX_CROWD_R = B_RAD.follower * 2.2 * 6.5;
 
 // ────────────────────────────────────────────────────────────────────────────
 class Player {
@@ -35,10 +14,11 @@ class Player {
     this.mesh      = null;
 
     // Stat multipliers from persistent upgrades
-    const upg          = saveData.upgrades;
-    this.baseSpeed     = 11 * (1 + (upg.speed    || 0) * 0.10);
-    this.magnetBase    = 8  * (1 + (upg.magnet   || 0) * 0.20);
+    const upg          = saveData.upgrades || {};
+    this.baseSpeed     = 11 * (1 + (upg.speed    || 0) * 0.08);
+    this.magnetBase    = 8  * (1 + (upg.magnet   || 0) * 0.15);
     this.coinMult      = 1  + (upg.coinBonus || 0) * 0.15;
+    this.stealCount    = upg.steal || 0; // followers stolen per contact
     const startSquad   = (upg.squad || 0) * 2 + startExtra;
 
     // In-game temporary multipliers / timers
@@ -46,10 +26,12 @@ class Player {
     this.magnetMult       = 1;
     this.shieldCharges    = 0;
     this.doubleCrew       = 0;
-    this.crowdBurstTimer  = 0;
     this.luckyStarTimer   = 0;
     this.invincible       = false;
     this.invincibleTimer  = 0;
+
+    // Curse timer (when player is cursed by enemy/LMS opponent)
+    this.curseTimer = 0;
 
     // Eating cooldown (for LMS mode)
     this._lastEat = -1;
@@ -63,7 +45,6 @@ class Player {
     this.peakCrowd       = 1;
     this.enemiesAbsorbed = 0;
     this.collectiblesGot = 0;
-    this.lastIgAt        = 0;
 
     this._build(startSquad);
   }
@@ -85,10 +66,10 @@ class Player {
     return m;
   }
 
-  // ── Getters ──────────────────────────────────────────────────────────
+  // ── Getters (with caps) ───────────────────────────────────────────────
   get crowdSize()    { return this.followers.length + 1; }
-  get speed()        { return this.baseSpeed * this.speedMult; }
-  get magnetRadius() { return this.magnetBase * this.magnetMult; }
+  get speed()        { return Math.min(this.baseSpeed * this.speedMult, SPEED_CAP); }
+  get magnetRadius() { return Math.min(this.magnetBase * this.magnetMult, MAGNET_CAP); }
 
   // ── Movement ─────────────────────────────────────────────────────────
   move(dx, dz, dt) {
@@ -107,18 +88,17 @@ class Player {
 
   // ── Update followers + timers ─────────────────────────────────────────
   updateFollowers(dt, time) {
-    const followSpeed = this.crowdBurstTimer > 0 ? 20 : 12;
-
-    // Cluster center: slightly behind the player in movement direction
-    const TRAIL_BACK = 1.5;
-    const PACK_R     = B_RAD.follower * 2.2; // spacing unit
+    // Followers lag behind slowly — looks like a real crowd trailing
+    const followSpeed = 6;
+    const TRAIL_BACK  = 1.5;
+    const PACK_R      = B_RAD.follower * 2.2;
 
     const cx = this.mesh.position.x - this._moveDirX * TRAIL_BACK;
     const cz = this.mesh.position.z - this._moveDirZ * TRAIL_BACK;
 
     this.followers.forEach((f, i) => {
-      // Fibonacci spiral slot — each ball i gets a unique angle + radius
-      const r  = PACK_R * Math.sqrt(i + 1);
+      // Cap radius so large crowds overlap and look dense
+      const r  = Math.min(PACK_R * Math.sqrt(i + 1), MAX_CROWD_R);
       const a  = i * GOLDEN_ANGLE;
       const tx = cx + Math.cos(a) * r;
       const tz = cz + Math.sin(a) * r;
@@ -151,9 +131,9 @@ class Player {
     }
 
     // Timers
-    if (this.doubleCrew      > 0) this.doubleCrew      -= dt;
-    if (this.crowdBurstTimer > 0) this.crowdBurstTimer -= dt;
-    if (this.luckyStarTimer  > 0) this.luckyStarTimer  -= dt;
+    if (this.doubleCrew     > 0) this.doubleCrew     -= dt;
+    if (this.luckyStarTimer > 0) this.luckyStarTimer -= dt;
+    if (this.curseTimer     > 0) this.curseTimer     -= dt;
 
     if (this.crowdSize > this.peakCrowd) this.peakCrowd = this.crowdSize;
   }
@@ -167,7 +147,6 @@ class Player {
     this.scene.add(m);
   }
 
-  // Remove from the tail (outermost spiral positions first)
   removeFollowers(count) {
     const n = Math.min(count, this.followers.length);
     for (let i = 0; i < n; i++) {
@@ -178,7 +157,6 @@ class Player {
     }
   }
 
-  // Remove a specific follower by index (for LMS eating)
   removeFollowerAt(idx) {
     if (idx < 0 || idx >= this.followers.length) return;
     const f = this.followers.splice(idx, 1)[0];
@@ -196,12 +174,12 @@ class Player {
   // ── In-game upgrade application ──────────────────────────────────────
   applyIgUpgrade(id) {
     switch (id) {
-      case 'speedSurge': this.speedMult      *= 1.3;  break;
-      case 'massMagnet': this.magnetMult     *= 1.6;  break;
-      case 'shield':     this.shieldCharges++;         break;
-      case 'doubleCrew': this.doubleCrew      = 20;   break;
-      case 'crowdBurst': this.crowdBurstTimer = 10;   break;
-      case 'luckyStar':  this.luckyStarTimer  = 30;   break;
+      case 'speedSurge': this.speedMult  *= 1.25; break;
+      case 'massMagnet': this.magnetMult *= 1.40; break;
+      case 'shield':     this.shieldCharges++;     break;
+      case 'doubleCrew': this.doubleCrew  = 20;   break;
+      case 'luckyStar':  this.luckyStarTimer = 30; break;
+      // 'curse' is handled by game.js (targets an enemy, not the player)
     }
   }
 

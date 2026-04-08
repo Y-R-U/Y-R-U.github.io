@@ -13,14 +13,18 @@ class Enemy {
     this.speed        = props.speed;
     this.senseRange   = props.senseRange;
     this.huntRange    = props.huntRange;
+    this.huntRangeBoost = 0; // E8: increases as enemies are eliminated in LMS
 
     // AI state
     this.state      = 'wander';
     this.stateTimer = 0;
-    this._wanderDx  = Math.random() * 2 - 1;
-    this._wanderDz  = Math.random() * 2 - 1;
-    this._targetX   = 0;
-    this._targetZ   = 0;
+
+    // Normalised wander direction (fix B4)
+    const ang         = Math.random() * Math.PI * 2;
+    this._wanderDx    = Math.cos(ang);
+    this._wanderDz    = Math.sin(ang);
+    this._targetX     = 0;
+    this._targetZ     = 0;
 
     // Movement direction for cluster orientation
     this._moveDirX = this._wanderDx;
@@ -29,6 +33,9 @@ class Enemy {
     // Eating cooldown (LMS mode)
     this._lastEat = -1;
 
+    // Curse timer (E8: when cursed by player's IG upgrade)
+    this.curseTimer = 0;
+
     // Build
     const [minC, maxC] = props.startCrowd;
     const startCount   = minC + Math.floor(Math.random() * (maxC - minC + 1));
@@ -36,6 +43,7 @@ class Enemy {
   }
 
   get crowdSize() { return this.followers.length + 1; }
+  get effectiveHuntRange() { return this.huntRange + this.huntRangeBoost; }
 
   // ── Build ────────────────────────────────────────────────────────────
   _build(x, z, startCount) {
@@ -52,6 +60,7 @@ class Enemy {
   // ── Update (called each frame) ────────────────────────────────────────
   update(dt, player, collectibles, time) {
     this.stateTimer -= dt;
+    if (this.curseTimer > 0) this.curseTimer -= dt;
     this._decideState(player, collectibles);
     this._move(dt);
     this._updateFollowers(dt, time);
@@ -68,14 +77,18 @@ class Enemy {
         player.crowdSize > this.crowdSize + 6 &&
         distToPlayer < this.senseRange) {
       this.state    = 'flee';
-      this._targetX = ex + (ex - px);
-      this._targetZ = ez + (ez - pz);
+      // Clamp flee target to map boundary (fix B2)
+      const fleeX   = ex + (ex - px);
+      const fleeZ   = ez + (ez - pz);
+      this._targetX = Math.max(-MAP_HALF + 5, Math.min(MAP_HALF - 5, fleeX));
+      this._targetZ = Math.max(-MAP_HALF + 5, Math.min(MAP_HALF - 5, fleeZ));
       return;
     }
 
-    // Hunt player if big enough and within range
-    if (this.huntRange > 0 &&
-        distToPlayer < this.huntRange &&
+    // Hunt player if big enough and within effective range
+    const hunt = this.effectiveHuntRange;
+    if (hunt > 0 &&
+        distToPlayer < hunt &&
         this.crowdSize >= player.crowdSize - 3) {
       this.state    = 'chase';
       this._targetX = px;
@@ -131,14 +144,13 @@ class Enemy {
     let nz = ez + dz * step;
 
     // Boundary bounce
-    if (Math.abs(nx) > MAP_HALF) { this._wanderDx *= -1; nx = Math.sign(nx) * MAP_HALF; }
-    if (Math.abs(nz) > MAP_HALF) { this._wanderDz *= -1; nz = Math.sign(nz) * MAP_HALF; }
+    if (Math.abs(nx) > MAP_HALF) { this._wanderDx = -this._wanderDx; dx = -dx; nx = Math.sign(nx) * MAP_HALF; }
+    if (Math.abs(nz) > MAP_HALF) { this._wanderDz = -this._wanderDz; dz = -dz; nz = Math.sign(nz) * MAP_HALF; }
 
     this.mesh.position.x = nx;
     this.mesh.position.z = nz;
     this.mesh.rotation.y = Math.atan2(dx, dz);
 
-    // Track movement direction for cluster orientation
     if (Math.hypot(dx, dz) > 0.01) {
       this._moveDirX = dx;
       this._moveDirZ = dz;
@@ -154,7 +166,8 @@ class Enemy {
     const cz = this.mesh.position.z - this._moveDirZ * TRAIL_BACK;
 
     this.followers.forEach((f, i) => {
-      const r  = PACK_R * Math.sqrt(i + 1);
+      // Cap radius so large crowds overlap naturally
+      const r  = Math.min(PACK_R * Math.sqrt(i + 1), MAX_CROWD_R);
       const a  = i * GOLDEN_ANGLE;
       const tx = cx + Math.cos(a) * r;
       const tz = cz + Math.sin(a) * r;
@@ -163,7 +176,7 @@ class Enemy {
       const fdz  = tz - f.mesh.position.z;
       const dist = Math.hypot(fdx, fdz);
       if (dist > 0.05) {
-        const step = Math.min(10 * dt, dist);
+        const step = Math.min(7 * dt, dist); // slightly faster than player for snappier AI
         f.mesh.position.x += (fdx / dist) * step;
         f.mesh.position.z += (fdz / dist) * step;
       }
@@ -175,6 +188,9 @@ class Enemy {
 
   // ── Crowd management ─────────────────────────────────────────────────
   addFollower() {
+    // Skip follower add if cursed (50% chance) — E8 curse mechanic
+    if (this.curseTimer > 0 && Math.random() < 0.5) return;
+
     const m = new THREE.Mesh(
       new THREE.SphereGeometry(B_RAD.follower, 10, 7),
       new THREE.MeshPhongMaterial({ color: this.color, shininess: 45 })
@@ -196,7 +212,6 @@ class Enemy {
     }
   }
 
-  // Remove a specific follower by index (for LMS eating)
   removeFollowerAt(idx) {
     if (idx < 0 || idx >= this.followers.length) return;
     const f = this.followers.splice(idx, 1)[0];
