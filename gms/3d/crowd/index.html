@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Crowd Rush 3D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game-container">
+
+  <!-- Three.js canvas -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Loading screen -->
+  <div id="loading-screen">
+    <div class="loader-ring"></div>
+    <div id="loading-text">Loading…</div>
+  </div>
+
+  <!-- ============================================
+       MAIN MENU
+       ============================================ -->
+  <div id="menu-screen" class="screen screen-bg hidden">
+    <div class="menu-logo">
+      <div class="logo-balls">
+        <span class="logo-ball" style="background:#29b6f6;"></span>
+        <span class="logo-ball" style="background:#4dd0e1;width:22px;height:22px;margin-top:3px;"></span>
+        <span class="logo-ball" style="background:#ffd54f;width:18px;height:18px;margin-top:5px;"></span>
+        <span class="logo-ball" style="background:#29b6f6;width:24px;height:24px;margin-top:2px;"></span>
+        <span class="logo-ball" style="background:#81d4fa;width:16px;height:16px;margin-top:6px;"></span>
+      </div>
+      <h1>Crowd Rush</h1>
+      <p>3D Edition</p>
+    </div>
+
+    <div class="menu-coins">
+      <span class="coin-icon">🪙</span>
+      <span id="menu-coin-count">0</span>
+    </div>
+
+    <div class="menu-buttons">
+      <button class="btn btn-primary btn-lg" id="btn-play">▶ Play</button>
+      <button class="btn btn-secondary btn-lg" id="btn-upgrades">⚡ Upgrades</button>
+    </div>
+  </div>
+
+  <!-- ============================================
+       LEVEL SELECT SCREEN
+       ============================================ -->
+  <div id="level-screen" class="screen screen-bg hidden">
+    <h2 class="level-screen-title">Select Level</h2>
+    <div class="levels-grid" id="levels-grid">
+      <!-- Populated by JS -->
+    </div>
+    <button class="btn btn-secondary" id="btn-level-back">← Back</button>
+  </div>
+
+  <!-- ============================================
+       UPGRADE SHOP SCREEN
+       ============================================ -->
+  <div id="upgrade-screen" class="screen screen-bg hidden">
+    <div class="upgrade-header">
+      <span class="upgrade-title">⚡ Upgrades</span>
+      <div class="upgrade-coins">
+        <span>🪙</span>
+        <span id="upgrade-coin-count">0</span>
+      </div>
+    </div>
+
+    <div class="upgrades-list" id="upgrades-list">
+      <!-- Populated by JS -->
+    </div>
+
+    <button class="btn btn-secondary" id="btn-upgrade-back">← Back</button>
+  </div>
+
+  <!-- ============================================
+       IN-GAME HUD
+       ============================================ -->
+  <div id="hud" class="hidden">
+    <div id="hud-top">
+      <div class="hud-pill" id="hud-crowd">👥 <span id="hud-crowd-num">0</span></div>
+      <div class="hud-pill" id="hud-timer">⏱ <span id="hud-timer-val">2:00</span></div>
+      <div class="hud-pill" id="hud-enemies">⚔ <span id="hud-enemy-num">0</span></div>
+    </div>
+
+    <div id="progress-bar-wrap">
+      <div id="progress-bar-label">Target: <span id="progress-target">15</span></div>
+      <div id="progress-bar-track">
+        <div id="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <div id="hud-bottom">
+      <div></div>
+      <div class="hud-pill" id="hud-coins-ig">🪙 <span id="hud-coins-ig-num">0</span></div>
+    </div>
+  </div>
+
+  <!-- Virtual joystick zone -->
+  <div id="joystick-zone" class="hidden">
+    <div id="joystick-base">
+      <div id="joystick-knob"></div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       SETTINGS PANEL (slide-in from right)
+       ============================================ -->
+  <div id="settings-panel">
+    <div class="settings-header">
+      <span class="settings-title">⚙ Settings</span>
+      <button class="settings-close" id="settings-close-btn">✕</button>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <span class="settings-row-icon">🔊</span>
+        <div>
+          <div class="settings-row-label">Sound Effects</div>
+          <div class="settings-row-sub">Collect, absorb, hit sounds</div>
+        </div>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggle-sfx" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <span class="settings-row-icon">🎵</span>
+        <div>
+          <div class="settings-row-label">Music</div>
+          <div class="settings-row-sub">Place theme1–9.mp3 in music/</div>
+        </div>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggle-music" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <span class="settings-row-icon">📳</span>
+        <div>
+          <div class="settings-row-label">Vibration</div>
+          <div class="settings-row-sub">Haptic feedback on mobile</div>
+        </div>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggle-vibrate" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <span class="settings-row-icon">📊</span>
+        <div>
+          <div class="settings-row-label">High Score Reset</div>
+          <div class="settings-row-sub">Clear all saved data</div>
+        </div>
+      </div>
+      <button class="btn btn-danger btn-sm" id="btn-reset-data">Reset</button>
+    </div>
+
+    <div style="padding: 12px 0; color: var(--text-dim); font-size: 0.75rem; text-align: center; margin-top: auto;">
+      Crowd Rush 3D v1.0<br>
+      Put theme1.mp3–theme9.mp3 in the<br><code style="color:#29b6f6">music/</code> folder for background music.
+    </div>
+  </div>
+
+  <!-- Settings backdrop -->
+  <div id="settings-backdrop" style="
+    display:none;position:absolute;inset:0;
+    background:rgba(0,0,0,0.4);z-index:490;
+    backdrop-filter:blur(2px);
+  "></div>
+
+  <!-- COG button -->
+  <button id="cog-btn">⚙</button>
+
+  <!-- ============================================
+       IN-GAME UPGRADE PROMPT
+       ============================================ -->
+  <div id="ig-upgrade-overlay" class="hidden">
+    <div id="ig-upgrade-title">Level Up!</div>
+    <div id="ig-upgrade-sub">Choose a power-up</div>
+    <div id="ig-upgrade-cards">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ============================================
+       GAME OVER SCREEN
+       ============================================ -->
+  <div id="gameover-screen" class="screen screen-bg hidden">
+    <div class="result-icon">💀</div>
+    <h2 class="result-title bad">Absorbed!</h2>
+    <div class="result-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="go-crowd">0</div>
+        <div class="stat-label">Peak Crowd</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="go-time">0s</div>
+        <div class="stat-label">Survived</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="go-enemies">0</div>
+        <div class="stat-label">Enemies Absorbed</div>
+      </div>
+    </div>
+    <div class="coins-earned">🪙 +<span id="go-coins">0</span> coins</div>
+    <div class="result-buttons">
+      <button class="btn btn-primary" id="btn-retry">↺ Retry</button>
+      <button class="btn btn-secondary" id="btn-go-menu">🏠 Menu</button>
+    </div>
+  </div>
+
+  <!-- ============================================
+       VICTORY SCREEN
+       ============================================ -->
+  <div id="victory-screen" class="screen screen-bg hidden">
+    <div class="result-icon">🏆</div>
+    <h2 class="result-title good">Victory!</h2>
+    <div class="stars-row" id="victory-stars">⭐⭐⭐</div>
+    <div class="result-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="vic-crowd">0</div>
+        <div class="stat-label">Final Crowd</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="vic-time">0s</div>
+        <div class="stat-label">Time Left</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="vic-enemies">0</div>
+        <div class="stat-label">Enemies Crushed</div>
+      </div>
+    </div>
+    <div class="coins-earned">🪙 +<span id="vic-coins">0</span> coins</div>
+    <div class="result-buttons">
+      <button class="btn btn-primary btn-lg" id="btn-next-level">Next Level →</button>
+      <button class="btn btn-secondary" id="btn-vic-menu">🏠 Menu</button>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+</div><!-- #game-container -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Game modules — load order matters (dependencies first) -->
+<script src="config.js"></script>
+<script src="save.js"></script>
+<script src="audio.js"></script>
+<script src="map.js"></script>
+<script src="player.js"></script>
+<script src="enemy.js"></script>
+<script src="collectible.js"></script>
+<script src="input.js"></script>
+<script src="ui.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
