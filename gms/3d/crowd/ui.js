@@ -2,6 +2,13 @@
 /* ── ui.js ── UIManager: screens, HUD updates, toasts, overlays ── */
 
 class UIManager {
+  constructor() {
+    // Cache for label last-rendered values (P3: skip innerHTML if unchanged)
+    this._labelVals = {};
+    // Pre-built ranking row elements for in-place updates (P4)
+    this._rankRows  = [];
+  }
+
   // ── Helpers ──────────────────────────────────────────────────────────
   show(id) { document.getElementById(id)?.classList.remove('hidden'); }
   hide(id) { document.getElementById(id)?.classList.add('hidden'); }
@@ -23,25 +30,28 @@ class UIManager {
     this.setText('hud-enemy-num',    enemyCount);
     this.setText('hud-coins-ig-num', coins);
 
-    const timerPill = document.getElementById('hud-timer');
-    const pbWrap    = document.getElementById('progress-bar-wrap');
+    const timerEl = document.getElementById('hud-timer');
+    const pbWrap  = document.getElementById('progress-bar-wrap');
 
     if (!isFinite(timeLeft)) {
       // LMS mode — no timer, no progress bar
       this.setText('hud-timer-val', 'LMS');
-      timerPill.classList.remove('urgent');
-      if (pbWrap) pbWrap.style.visibility = 'hidden';
+      if (timerEl) timerEl.classList.remove('urgent');
+      if (pbWrap)  pbWrap.style.display = 'none';
     } else {
-      if (pbWrap) pbWrap.style.visibility = '';
+      if (pbWrap) pbWrap.style.display = '';
       this.setText('progress-target', targetCrowd);
       const secs = Math.max(0, Math.ceil(timeLeft));
       const m    = Math.floor(secs / 60);
       const s    = secs % 60;
       this.setText('hud-timer-val', `${m}:${String(s).padStart(2, '0')}`);
-      if (secs <= 15) timerPill.classList.add('urgent');
-      else            timerPill.classList.remove('urgent');
+      if (timerEl) {
+        if (secs <= 15) timerEl.classList.add('urgent');
+        else            timerEl.classList.remove('urgent');
+      }
       const pct = Math.min(100, Math.round((crowdSize / targetCrowd) * 100));
-      document.getElementById('progress-bar-fill').style.width = pct + '%';
+      const fill = document.getElementById('progress-bar-fill');
+      if (fill) fill.style.width = pct + '%';
     }
   }
 
@@ -56,19 +66,25 @@ class UIManager {
 
   showVictory(stats, levelIdx) {
     this.setText('vic-crowd',   stats.finalCrowd);
-    this.setText('vic-time',    Math.ceil(Math.max(0, stats.timeLeft)) + 's');
     this.setText('vic-enemies', stats.enemiesAbsorbed);
     this.setText('vic-coins',   stats.coinsEarned);
 
-    // Star rating
-    let stars = 1;
-    if (stats.timeLeft / stats.totalTime > 0.5)   stars = 2;
-    if (stats.finalCrowd >= stats.targetCrowd)     stars = 3;
+    let stars, timeDisplay;
+    if (!isFinite(stats.totalTime) || stats.totalTime <= 1) {
+      // LMS win — star based on enemies absorbed
+      timeDisplay = Math.ceil(stats.survived || 0) + 's';
+      stars = stats.enemiesAbsorbed >= 6 ? 3 : stats.enemiesAbsorbed >= 3 ? 2 : 1;
+    } else {
+      timeDisplay = Math.ceil(Math.max(0, stats.timeLeft)) + 's';
+      stars = 1;
+      if (stats.timeLeft / stats.totalTime > 0.5) stars = 2;
+      if (stats.finalCrowd >= stats.targetCrowd)  stars = 3;
+    }
+    this.setText('vic-time', timeDisplay);
     this.setText('victory-stars', '⭐'.repeat(stars) + '☆'.repeat(3 - stars));
 
-    // Hide "Next Level" on last level
     const nextBtn = document.getElementById('btn-next-level');
-    nextBtn.style.display = levelIdx >= LEVELS.length - 1 ? 'none' : '';
+    if (nextBtn) nextBtn.style.display = (levelIdx >= LEVELS.length - 1 || levelIdx < 0) ? 'none' : '';
 
     this.show('victory-screen');
   }
@@ -166,56 +182,119 @@ class UIManager {
     this.setText('upgrade-coin-count', coins);
   }
 
-  // ── Ranking panel ────────────────────────────────────────────────────
+  // ── LMS personal best display ─────────────────────────────────────────
+  updateLmsBest(best) {
+    const el = document.getElementById('lms-best-line');
+    if (!el) return;
+    if (best && (best.crowd > 0 || best.enemies > 0)) {
+      el.textContent = `Best: ${best.enemies} eliminated · crowd ${best.crowd}`;
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  // ── Ranking panel (in-place update, P4) ──────────────────────────────
   // entities = [{name, size, color (hex int), isPlayer}]
   updateRanking(entities) {
     const sorted = [...entities].sort((a, b) => b.size - a.size);
     const list   = document.getElementById('ranking-list');
     if (!list) return;
-    list.innerHTML = '';
-    sorted.slice(0, 9).forEach((ent, rank) => {
-      const div       = document.createElement('div');
-      div.className   = 'rank-entry' + (ent.isPlayer ? ' rank-player' : '');
-      const colorStr  = '#' + ent.color.toString(16).padStart(6, '0');
-      div.innerHTML   = `
-        <span class="rank-pos">#${rank + 1}</span>
-        <span class="rank-dot" style="background:${colorStr}"></span>
-        <span class="rank-name">${ent.name}</span>
-        <span class="rank-size">${ent.size}</span>
-      `;
+
+    const count = Math.min(sorted.length, 9);
+
+    // Create or reuse row elements
+    while (this._rankRows.length < count) {
+      const div = document.createElement('div');
+      div.className = 'rank-entry';
+      div.innerHTML = `<span class="rank-pos"></span><span class="rank-dot"></span><span class="rank-name"></span><span class="rank-size"></span>`;
       list.appendChild(div);
-    });
+      this._rankRows.push(div);
+    }
+    // Hide excess rows
+    for (let i = count; i < this._rankRows.length; i++) {
+      this._rankRows[i].style.display = 'none';
+    }
+
+    for (let rank = 0; rank < count; rank++) {
+      const ent = sorted[rank];
+      const row = this._rankRows[rank];
+      row.style.display = '';
+      row.className = 'rank-entry' + (ent.isPlayer ? ' rank-player' : '');
+      const colorStr = '#' + ent.color.toString(16).padStart(6, '0');
+      row.querySelector('.rank-pos').textContent  = '#' + (rank + 1);
+      row.querySelector('.rank-dot').style.background = colorStr;
+      row.querySelector('.rank-name').textContent = ent.name;
+      row.querySelector('.rank-size').textContent = ent.size;
+    }
   }
 
-  // ── Size labels (CSS overlay) ─────────────────────────────────────────
-  // Call once per entity per frame with projected screen position
+  // Reset ranking rows when starting a new game
+  clearRanking() {
+    this._rankRows.forEach(r => r.remove());
+    this._rankRows = [];
+  }
+
+  // ── Kill feed (LMS) ───────────────────────────────────────────────────
+  showKillFeed(msg) {
+    const feed = document.getElementById('kill-feed');
+    if (!feed) return;
+    const div = document.createElement('div');
+    div.className = 'kill-msg';
+    div.textContent = msg;
+    feed.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+  }
+
+  clearKillFeed() {
+    const feed = document.getElementById('kill-feed');
+    if (feed) feed.innerHTML = '';
+  }
+
+  // ── Hit flash ─────────────────────────────────────────────────────────
+  showHitFlash() {
+    const el = document.getElementById('hit-flash');
+    if (!el) return;
+    el.classList.remove('flash');
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add('flash');
+  }
+
+  // ── Size labels (CSS overlay, P3: cache to skip redundant writes) ─────
   updateLabel(id, screenX, screenY, size, colorHex, visible) {
     const container = document.getElementById('label-container');
     if (!container) return;
 
     let el = document.getElementById('lbl-' + id);
     if (!el) {
-      el              = document.createElement('div');
-      el.className    = 'entity-label';
-      el.id           = 'lbl-' + id;
+      el           = document.createElement('div');
+      el.className = 'entity-label';
+      el.id        = 'lbl-' + id;
       container.appendChild(el);
+      this._labelVals[id] = -1; // force first write
     }
 
     if (!visible) { el.style.display = 'none'; return; }
 
-    const colorStr  = '#' + colorHex.toString(16).padStart(6, '0');
     el.style.display = 'flex';
-    el.style.left    = screenX + 'px';
-    el.style.top     = screenY + 'px';
-    el.innerHTML     = `<span class="label-dot" style="background:${colorStr}"></span>${size}`;
+    el.style.left    = Math.round(screenX) + 'px';
+    el.style.top     = Math.round(screenY) + 'px';
+
+    if (this._labelVals[id] !== size || !el.innerHTML) {
+      this._labelVals[id] = size;
+      const colorStr = '#' + colorHex.toString(16).padStart(6, '0');
+      el.innerHTML = `<span class="label-dot" style="background:${colorStr}"></span>${size}`;
+    }
   }
 
   removeLabel(id) {
     document.getElementById('lbl-' + id)?.remove();
+    delete this._labelVals[id];
   }
 
   clearLabels() {
     const c = document.getElementById('label-container');
     if (c) c.innerHTML = '';
+    this._labelVals = {};
   }
 }

@@ -3,9 +3,10 @@
 
 class MapBuilder {
   constructor(scene) {
-    this.scene   = scene;
-    this.meshes  = []; // all disposable meshes
-    this._orbRef = null;
+    this.scene     = scene;
+    this.meshes    = []; // all disposable meshes
+    this.buildings = []; // [{x, z, hw, hd}] for collision detection
+    this._orbRef   = null;
   }
 
   build() {
@@ -103,6 +104,7 @@ class MapBuilder {
       }
 
       placed.push({ x, z, hw, hd });
+      this.buildings.push({ x, z, hw, hd }); // expose for collision
       count++;
     }
   }
@@ -173,7 +175,8 @@ class MapBuilder {
       m.geometry.dispose();
       if (m.material && m.material.dispose) m.material.dispose();
     }
-    this.meshes  = [];
-    this._orbRef = null;
+    this.meshes    = [];
+    this.buildings = [];
+    this._orbRef   = null;
   }
 }

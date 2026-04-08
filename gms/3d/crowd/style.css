@@ -490,31 +490,31 @@ html, body {
 }
 
 /* =============================================
-   COG BUTTON (always visible in-game + menu)
+   COG BUTTON (inside ranking panel header)
    ============================================= */
 #cog-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 48px;
-  height: 48px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: none;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  font-size: 1.4rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.8rem;
   cursor: pointer;
-  z-index: 300;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.3s, background 0.2s;
   touch-action: manipulation;
+  pointer-events: all; /* override parent pointer-events:none */
+  flex-shrink: 0;
 }
 
-#cog-btn:hover { background: rgba(0,0,0,0.7); }
+#cog-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
 #cog-btn.spinning { animation: spin 2s linear infinite; }
+
+/* Menu settings button (smaller, text variant) */
+.menu-settings-btn { margin-top: 4px; font-size: 0.85rem; }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -531,53 +531,44 @@ html, body {
   z-index: 100;
 }
 
-#hud-top {
+/* Left combined panel: all stats in one place */
+#hud-left {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  padding: 14px 16px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+  background: rgba(0,0,0,0.42);
+  backdrop-filter: blur(8px);
+  border-radius: 0 0 14px 0;
+  padding: 10px 14px 10px 10px;
+  pointer-events: none;
+  max-width: min(280px, 55vw);
 }
 
-.hud-pill {
+#hud-stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.hud-stat {
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(6px);
-  border-radius: 50px;
-  padding: 7px 14px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 3px;
 }
 
-#hud-crowd {
-  color: var(--accent);
-  font-size: 1.1rem;
-}
-
-#hud-timer {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: #fff;
-}
+#hud-crowd   { color: var(--accent); font-size: 1rem; }
+#hud-timer   { color: #fff; font-weight: 900; }
+#hud-enemies { color: #ef5350; }
+#hud-coins-ig { color: #ffd54f; }
 
 #hud-timer.urgent {
   color: var(--danger);
   animation: pulse 0.5s ease infinite alternate;
-}
-
-#hud-enemies {
-  color: #ef5350;
-}
-
-#hud-coins-ig {
-  color: #ffd54f;
 }
 
 @keyframes pulse {
@@ -585,38 +576,15 @@ html, body {
   to { opacity: 0.5; }
 }
 
-#hud-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 16px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
-  pointer-events: none;
-}
-
-/* Progress bar toward target crowd */
+/* Progress bar toward target crowd (inside left panel) */
 #progress-bar-wrap {
-  position: absolute;
-  top: 72px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(260px, 70vw);
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-  border-radius: 50px;
-  padding: 6px 12px;
-  border: 1px solid rgba(255,255,255,0.1);
+  width: 100%;
 }
 
 #progress-bar-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
-  text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -992,30 +960,38 @@ html, body {
 .mode-play-btn { margin-top: 4px; }
 
 /* =============================================
-   RANKING PANEL
+   RANKING PANEL (top-right, contains cog)
    ============================================= */
 #ranking-panel {
   position: absolute;
-  top: 70px;
-  right: 16px;
-  width: 170px;
-  background: rgba(0,0,0,0.6);
+  top: 0;
+  right: 0;
+  width: 148px;
+  background: rgba(0,0,0,0.38);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  padding: 10px 10px 8px;
+  border-radius: 0 0 0 14px;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0 5px 8px;
   z-index: 100;
   pointer-events: none;
 }
 
 .ranking-header {
-  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px 6px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 4px;
+}
+
+.ranking-title {
+  font-size: 0.66rem;
   font-weight: 700;
-  color: var(--text-dim);
+  color: rgba(255,255,255,0.5);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 8px;
-  text-align: center;
 }
 
 .rank-entry {
@@ -1072,13 +1048,13 @@ html, body {
    ============================================= */
 #minimap-wrap {
   position: absolute;
-  bottom: 90px;
+  bottom: 16px;
   right: 16px;
   border-radius: 10px;
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  opacity: 0.75;
   pointer-events: none;
 }
 
@@ -1155,3 +1131,68 @@ html, body {
 
 /* LMS results colour override */
 .result-title.lms { color: #ff7043; }
+
+/* =============================================
+   KILL FEED (LMS mode, centre screen)
+   ============================================= */
+#kill-feed {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(-80px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  pointer-events: none;
+  z-index: 150;
+  min-width: 0;
+}
+
+.kill-msg {
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  animation: killFadeOut 3s ease-out forwards;
+}
+
+@keyframes killFadeOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  65%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* =============================================
+   HIT FLASH (red vignette on damage)
+   ============================================= */
+#hit-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  border-radius: 0;
+}
+
+#hit-flash.flash {
+  animation: hitFlash 0.4s ease-out forwards;
+}
+
+@keyframes hitFlash {
+  0%   { box-shadow: inset 0 0 90px 40px rgba(220,20,20,0.65); }
+  100% { box-shadow: inset 0 0 0 0 rgba(220,20,20,0); }
+}
+
+/* =============================================
+   LMS PERSONAL BEST (on mode card)
+   ============================================= */
+.mode-best-line {
+  font-size: 0.72rem;
+  color: #ffd54f;
+  font-weight: 600;
+  margin-top: -4px;
+}

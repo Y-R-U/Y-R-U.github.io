@@ -32,6 +32,17 @@ class Game {
     this.gameMode     = GAME_MODES.LEVELS;
     this._minimap     = null;
     this._rankTimer   = 0; // throttle ranking DOM updates
+    this._lastWasLMS  = false; // B5 fix: initialise
+
+    // In-game upgrade interval (doubles after each offer: 10, 20, 40, 80…)
+    this._igNextAt        = 10;
+    this._collectsThisGame = 0;
+
+    // Curse mechanic
+    this._curseTarget = null; // enemy reference currently cursed
+
+    // Pre-allocated vector for label projection (P1 perf)
+    this._labelVec = new THREE.Vector3();
   }
 
   // ── Initialise ───────────────────────────────────────────────────────
@@ -98,14 +109,29 @@ class Game {
   // ── Per-frame game update ─────────────────────────────────────────────
   _update(dt) {
     this._gt       += dt;
-    this._timeLeft -= dt;
     this._survived += dt;
+    // _timeLeft decremented below after input (skip for Infinity)
+
+    // Decrement time only in timed modes
+    if (isFinite(this._timeLeft)) this._timeLeft -= dt;
 
     this.input.update();
     this.player.move(this.input.dx, this.input.dz, dt);
+
+    // Building collision for player leader
+    const pp = this._resolveBuildings(this.player.mesh.position.x, this.player.mesh.position.z);
+    this.player.mesh.position.x = pp.x;
+    this.player.mesh.position.z = pp.z;
+
     this.player.updateFollowers(dt, this._gt);
 
-    for (const e of this.enemies) e.update(dt, this.player, this.collectibles, this._gt);
+    for (const e of this.enemies) {
+      e.update(dt, this.player, this.collectibles, this._gt);
+      // Building collision for enemy leaders
+      const ep = this._resolveBuildings(e.mesh.position.x, e.mesh.position.z);
+      e.mesh.position.x = ep.x;
+      e.mesh.position.z = ep.z;
+    }
 
     this._updateCollectibles(dt);
 
@@ -152,11 +178,11 @@ class Game {
     this._checkEnd();
   }
 
-  // ── Size labels (project 3D → 2D screen) ─────────────────────────────
+  // ── Size labels (project 3D → 2D screen) — P1: reuse vector ────────
   _updateLabels() {
     const w = innerWidth, h = innerHeight;
+    const v = this._labelVec;
     const project = (mesh, labelY) => {
-      const v = new THREE.Vector3();
       v.copy(mesh.position);
       v.y += labelY;
       v.project(this.camera);
@@ -170,9 +196,25 @@ class Game {
       const ep = project(e.mesh, 2.5);
       this.ui.updateLabel('enemy' + i, ep.x, ep.y, e.crowdSize, e.color, ep.vis);
     });
+  }
 
-    // Remove stale enemy labels (enemies that were eliminated)
-    // We only create labels for current enemies so excess labels just stay hidden until reused
+  // ── Building collision push ───────────────────────────────────────────
+  // Returns pushed-out (x, z) for a sphere of radius r at (ex, ez)
+  _resolveBuildings(ex, ez, r = 1.4) {
+    if (!this.map || !this.map.buildings) return { x: ex, z: ez };
+    let nx = ex, nz = ez;
+    for (const b of this.map.buildings) {
+      const clampX = Math.max(b.x - b.hw, Math.min(b.x + b.hw, nx));
+      const clampZ = Math.max(b.z - b.hd, Math.min(b.z + b.hd, nz));
+      const dx = nx - clampX, dz = nz - clampZ;
+      const dist = Math.hypot(dx, dz);
+      if (dist < r && dist > 0.001) {
+        const push = (r - dist) / dist;
+        nx += dx * push;
+        nz += dz * push;
+      }
+    }
+    return { x: nx, z: nz };
   }
 
   // ── Ranking panel ─────────────────────────────────────────────────────
@@ -250,14 +292,15 @@ class Game {
     for (let j = 0; j < count; j++) this.player.addFollower();
 
     this.player.collectiblesGot++;
+    this._collectsThisGame++;
     const coinGain = Math.ceil(
       (c.special ? 3 : 1) * this.player.coinMult * (this.player.luckyStarTimer > 0 ? 2 : 1)
     );
     this.player.coinsThisGame += coinGain;
 
-    // Offer in-game upgrade every 10 collects
-    if (this.player.collectiblesGot - this.player.lastIgAt >= 10) {
-      this.player.lastIgAt = this.player.collectiblesGot;
+    // Offer in-game upgrade on doubling interval (10, 20, 40, 80…)
+    if (this._collectsThisGame >= this._igNextAt) {
+      this._igNextAt = this._igNextAt * 2; // double threshold each time
       this._offerIgUpgrade();
     }
     this._respawn();
@@ -280,7 +323,8 @@ class Game {
 
   // ── Collision: player ↔ enemy ─────────────────────────────────────────
   _collidePlayerEnemy() {
-    const px = this.player.mesh.position.x, pz = this.player.mesh.position.z;
+    const px  = this.player.mesh.position.x, pz = this.player.mesh.position.z;
+    const now = this._gt;
 
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e  = this.enemies[i];
@@ -297,8 +341,19 @@ class Game {
         for (let j = 0; j < gained; j++) this.player.addFollower();
         this.player.coinsThisGame += e.crowdSize * 2;
         this.player.enemiesAbsorbed++;
+        this.ui.removeLabel('enemy' + i); // B1: remove stale label
         e.dispose();
         this.enemies.splice(i, 1);
+
+      } else if (this.player.stealCount > 0 && now - this.player._lastEat > 0.4) {
+        // Steal followers from enemy on contact (persistent upgrade)
+        const stealN = Math.min(this.player.stealCount, e.followers.length);
+        if (stealN > 0) {
+          e.removeFollowers(stealN);
+          for (let j = 0; j < stealN; j++) this.player.addFollower();
+          this.audio.playCollect();
+          this.player._lastEat = now;
+        }
 
       } else if (e.crowdSize > this.player.crowdSize + 1 && !this.player.invincible) {
         if (this.player.shieldCharges > 0) {
@@ -313,6 +368,7 @@ class Game {
           this.audio.playHit();
           this.audio.vibrate([40, 20, 40]);
           this.ui.showToast(`Lost ${lose}!`, 'bad');
+          this.ui.showHitFlash(); // E6
           this.player.activateShield(1.2); // brief immunity after hit
 
           if (this.player.followers.length === 0) { this._endGame(false); return; }
@@ -368,13 +424,20 @@ class Game {
         // Leader hit — eliminate (already has no followers if we get here)
         spawnParticles(this.scene, entity.mesh.position.x, 1, entity.mesh.position.z, entity.color || COLORS.follower, 12);
         if (isEnemy) {
+          const eName = entity.type.charAt(0).toUpperCase() + entity.type.slice(1);
           this.audio.playAbsorb();
+          this.ui.removeLabel('enemy' + enemyArrIdx); // B1: stale label cleanup
           entity.dispose();
           this.enemies.splice(enemyArrIdx, 1);
           this.player.enemiesAbsorbed++;
           this.player.coinsThisGame += 15;
-          this.ui.showToast('Enemy eliminated!', 'good');
+          this.ui.showToast(`${eName} eliminated!`, 'good');
+          this.ui.showKillFeed(`You eliminated ${eName}!`);
+          // E8: boost remaining enemies' aggression
+          const boost = 10;
+          for (const e of this.enemies) e.huntRangeBoost += boost;
         } else {
+          this.ui.showHitFlash(); // E6
           this._endGame(false);
         }
       } else {
@@ -383,7 +446,10 @@ class Game {
         if (isEnemy) entity.removeFollowerAt(idx);
         else         this.player.removeFollowerAt(idx);
         this.audio.playHit();
-        if (!isEnemy) this.audio.vibrate(20);
+        if (!isEnemy) {
+          this.audio.vibrate(20);
+          this.ui.showHitFlash(); // E6
+        }
       }
     };
 
@@ -462,8 +528,13 @@ class Game {
             if (idx === -1 && b.followers.length > 0) {
               b.removeFollowerAt(b.followers.length - 1);
             } else if (idx === -1) {
+              const aName = a.type.charAt(0).toUpperCase() + a.type.slice(1);
+              const bName = b.type.charAt(0).toUpperCase() + b.type.slice(1);
               spawnParticles(this.scene, b.mesh.position.x, 1, b.mesh.position.z, b.color, 10);
+              this.ui.removeLabel('enemy' + j); // B1
               b.dispose(); this.enemies.splice(j, 1); j--;
+              this.ui.showKillFeed(`${aName} ate ${bName}!`);
+              for (const e of this.enemies) e.huntRangeBoost += 8; // E8
             } else {
               b.removeFollowerAt(idx);
             }
@@ -475,8 +546,13 @@ class Game {
             if (idx === -1 && a.followers.length > 0) {
               a.removeFollowerAt(a.followers.length - 1);
             } else if (idx === -1) {
+              const aName = a.type.charAt(0).toUpperCase() + a.type.slice(1);
+              const bName = b.type.charAt(0).toUpperCase() + b.type.slice(1);
               spawnParticles(this.scene, a.mesh.position.x, 1, a.mesh.position.z, a.color, 10);
+              this.ui.removeLabel('enemy' + i); // B1
               a.dispose(); this.enemies.splice(i, 1); i--; j = this.enemies.length; // break inner
+              this.ui.showKillFeed(`${bName} ate ${aName}!`);
+              for (const e of this.enemies) e.huntRangeBoost += 8; // E8
             } else {
               a.removeFollowerAt(idx);
             }
@@ -510,7 +586,17 @@ class Game {
     this._paused = true;
     this.audio.playLevelUp();
     this.ui.showIgUpgrade(id => {
-      this.player.applyIgUpgrade(id);
+      if (id === 'curse') {
+        // Curse the top-ranked enemy (most followers), not the player
+        const top = [...this.enemies].sort((a, b) => b.crowdSize - a.crowdSize)[0];
+        if (top) {
+          top.curseTimer = 30;
+          this._curseTarget = top;
+          this.ui.showToast('🧿 Cursed the leader!', 'good');
+        }
+      } else {
+        this.player.applyIgUpgrade(id);
+      }
       this.ui.hide('ig-upgrade-overlay');
       this._paused = false;
     });
@@ -540,13 +626,25 @@ class Game {
     this.collectibles = [];
     for (let i = 0; i < this.MAX_COLL; i++) this._spawnCollectible();
     this.camera.position.set(0, 22, 18);
+    this.ui.clearRanking(); // reset in-place ranking rows
     this.ui.show('hud');
     this.ui.show('joystick-zone');
     this.ui.show('ranking-panel');
     this._minimap.show();
+    // Show kill feed only in LMS
+    if (this.gameMode === GAME_MODES.LMS) {
+      this.ui.clearKillFeed();
+      this.ui.show('kill-feed');
+    } else {
+      this.ui.hide('kill-feed');
+    }
     this.input.attach();
-    this._running = true;
+    this._running  = true;
     this._rankTimer = 0;
+    // Reset IG upgrade interval
+    this._igNextAt        = 10;
+    this._collectsThisGame = 0;
+    this._curseTarget     = null;
     this.audio.playRandomTheme();
   }
 
@@ -613,11 +711,17 @@ class Game {
       if (won) {
         this.audio.playVictory();
         this.audio.vibrate([50, 30, 50, 30, 100]);
+        // E5: save LMS personal best
+        const prev = SaveSystem.get('lmsBest') || { crowd: 0, enemies: 0, time: 0 };
+        if (this.player.crowdSize > prev.crowd || this.player.enemiesAbsorbed > prev.enemies) {
+          const best = { crowd: this.player.crowdSize, enemies: this.player.enemiesAbsorbed, time: Math.floor(this._survived) };
+          SaveSystem.set('lmsBest', best);
+        }
         this.ui.showVictory({
           finalCrowd:      this.player.crowdSize,
-          timeLeft:        0,       // no timer in LMS
-          totalTime:       1,       // avoid div-by-zero in star calc
-          targetCrowd:     9999,    // star threshold not relevant
+          survived:        this._survived,
+          totalTime:       Infinity, // signals LMS mode to ui.js
+          targetCrowd:     0,
           enemiesAbsorbed: this.player.enemiesAbsorbed,
           coinsEarned,
         }, -1); // -1 = no next level
@@ -631,7 +735,6 @@ class Game {
           coinsEarned,
         });
       }
-      // Retry LMS button re-wired at bottom via _lastMode
       this._lastWasLMS = true;
       return;
     }
@@ -676,15 +779,19 @@ class Game {
     clearParticles(this.scene);
     if (this.map) { this.map.dispose(); this.map = null; }
     this.ui.clearLabels();
+    this.ui.clearRanking();
+    this.ui.clearKillFeed();
     this.ui.hide('ranking-panel');
+    this.ui.hide('kill-feed');
     if (this._minimap) this._minimap.hide();
+    this._curseTarget = null;
   }
 
   // ── Menu ─────────────────────────────────────────────────────────────
   _showMenu() {
     this.ui.refreshMenuCoins(SaveSystem.get('coins') || 0);
     ['mode-screen','level-screen','upgrade-screen','gameover-screen',
-     'victory-screen','hud','joystick-zone','ranking-panel','ig-upgrade-overlay']
+     'victory-screen','hud','joystick-zone','ranking-panel','ig-upgrade-overlay','kill-feed']
       .forEach(id => this.ui.hide(id));
     if (this._minimap) this._minimap.hide();
     this.ui.show('menu-screen');
@@ -693,6 +800,8 @@ class Game {
   // ── Mode select screen ────────────────────────────────────────────────
   _showModeSelect() {
     ['menu-screen','level-screen'].forEach(id => this.ui.hide(id));
+    // E5: show LMS personal best on mode card
+    this.ui.updateLmsBest(SaveSystem.get('lmsBest'));
     this.ui.show('mode-screen');
   }
 
@@ -732,6 +841,9 @@ class Game {
         this._showMenu();
       }
     });
+
+    // Menu settings button (accessible from main menu)
+    document.getElementById('btn-menu-settings')?.addEventListener('click', openSettings);
 
     // Main menu → mode select
     document.getElementById('btn-play').addEventListener('click', () => {
