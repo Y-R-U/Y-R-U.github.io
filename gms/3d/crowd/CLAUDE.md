@@ -18,8 +18,8 @@ Files load in this order (all via `<script>` tags in index.html):
 | `save.js` | SaveSystem (localStorage, dot-path get/set) | 74 |
 | `audio.js` | AudioManager — Web Audio SFX + mp3 music loader | 136 |
 | `map.js` | MapBuilder — floor, buildings, trees, plaza; exposes buildings[] for collision | ~185 |
-| `player.js` | Player (movement, Fibonacci spiral followers, upgrades, LMS helpers) | ~200 |
-| `enemy.js` | Enemy (AI state machine + Fibonacci spiral formation + LMS helpers) | ~215 |
+| `player.js` | Player (movement, chain-following followers, upgrades, LMS helpers) | ~210 |
+| `enemy.js` | Enemy (AI state machine + chain-following formation + LMS helpers) | ~240 |
 | `collectible.js` | Collectible + spawnParticles/updateParticles/clearParticles | 93 |
 | `input.js` | InputController — keyboard + virtual touch joystick | 111 |
 | `minimap.js` | MiniMap — DPR-aware canvas mini-map drawn every frame | ~85 |
@@ -91,15 +91,17 @@ In-Game (Last Man Standing)
 
 ---
 
-## Crowd Formation (Fibonacci Spiral)
-Both player and enemies use a sunflower/Fibonacci spiral cluster formation:
+## Crowd Formation (Chain-Following)
+Both player and enemies use a chain-following system where each follower chases the one ahead:
 ```
-GOLDEN_ANGLE = 2.399963  (radians ≈ 137.5°)
-cluster center = entity pos − moveDirXZ * TRAIL_BACK (1.5u behind)
-follower[i]: r = min(PACK_R * sqrt(i+1), MAX_CROWD_R),  angle = i * GOLDEN_ANGLE
+follower[0] → chases player leader
+follower[i] → chases follower[i-1]
+GAP = 1.0 (desired trailing distance behind target)
 ```
-- MAX_CROWD_R caps radius at ~6.5 × PACK_R so large crowds overlap naturally (crowd-like density)
-- followSpeed is LOW (6 for player, 7 for enemy) so followers lag behind — looks like a crowd trailing, not glued to leader
+- Per-follower random `followSpeed` (player: 5–10, enemy: 6–11) creates natural bunching:
+  fast followers catch up to slow ones ahead → crowd clumps organically
+- Per-follower random `latOff` (lateral offset ±0.9) prevents single-file lines
+- Result: trailing crowd that spreads out when moving and bunches when stopping
 
 ---
 
@@ -143,6 +145,7 @@ Pick 1 of 3 randomly presented from:
 | Boss | Purple `#AB47BC` | 22–35 | Smart: collects + hunts |
 
 Enemy AI: WANDER → SEEK_COLLECT → CHASE_PLAYER → FLEE
+- **Flee**: ALL enemy types flee when player is clearly bigger (crowdSize > enemy + 4)
 - **LMS aggression scaling**: as enemies are eliminated, survivors get +10 huntRange each
 
 ---
@@ -168,15 +171,21 @@ Enemy AI: WANDER → SEEK_COLLECT → CHASE_PLAYER → FLEE
 ```js
 SPEED_CAP  = 22   // max player speed in units/s
 MAGNET_CAP = 20   // max magnet radius in units
-MAX_CROWD_R = PACK_R * 6.5  // crowd packing radius cap (in player/enemy)
 ```
 
 ---
 
-## Building Collision
+## Building Collision (DISABLED)
 `MapBuilder` exposes `this.buildings = [{x, z, hw, hd}, ...]` for all placed buildings.
-`Game._resolveBuildings(ex, ez, r)` pushes entity out of any intersecting building AABB.
-Applied to: player leader, each enemy leader (not followers — they can overlap buildings).
+`Game._resolveBuildings(ex, ez, r)` method exists but is NOT called — disabled because enemies
+were getting stuck behind buildings. All entities pass through buildings for now.
+
+## Camera & Zoom
+- Default zoom level: `_zoomLevel = 0.33` (0 = closest, 1 = furthest)
+- Camera height: `22 + zl * 22`, Z offset: `18 + zl * 18`
+- Mobile: pinch-to-zoom on canvas (two-touch gesture)
+- Desktop: scroll wheel zoom
+- Camera lerps smoothly to target position each frame
 
 ---
 
@@ -191,18 +200,21 @@ Displayed on the LMS mode card in the mode-select screen.
 
 ## TODO / Status
 
-### Session 3 (current) — In Progress
-- [ ] config.js: add steal upgrade, replace crowdBurst→curse, add caps
-- [ ] player.js: remove TrailSystem, stealCount, curseTimer, speed/magnet cap, slow followers
-- [ ] enemy.js: B2 flee clamp, B4 wander normalize, curseTimer, huntRangeBoost, slow followers
-- [ ] map.js: expose buildings[] for collision
-- [ ] minimap.js: DPR scaling
-- [ ] ui.js: LMS star fix, ranking in-place, label cache, showKillFeed, showHitFlash
-- [ ] index.html: left HUD panel, cog in ranking header, kill feed, hit flash
-- [ ] style.css: left panel, transparent ranking panel, transparent minimap, kill feed, hit flash
-- [ ] game.js: IG doubling intervals, steal mechanic, curse mechanic, building collision,
+### Session 3 — Completed
+- [x] config.js: add steal upgrade, replace crowdBurst→curse, add caps (SPEED_CAP, MAGNET_CAP)
+- [x] player.js: chain-following crowd, stealCount, curseTimer, speed/magnet cap
+- [x] enemy.js: chain-following crowd, B2 flee clamp, B4 wander normalize, curseTimer,
+              huntRangeBoost, all-types flee when player clearly bigger
+- [x] map.js: expose buildings[] for collision
+- [x] minimap.js: DPR scaling
+- [x] ui.js: LMS star fix, ranking in-place, label cache, showKillFeed, showHitFlash, updateLmsBest
+- [x] index.html: left HUD panel, cog in ranking header, kill feed, hit flash, LMS best line
+- [x] style.css: left panel, transparent ranking/minimap, kill feed, hit flash
+- [x] game.js: IG doubling intervals, steal mechanic, curse mechanic, pinch-to-zoom,
+              scroll-wheel zoom, zoomed-out default camera, building collision disabled,
               kill feed (E4), LMS best (E5), hit flash (E6), enemy aggression (E8),
-              crowd LOD (E9), B1/B3/B5 bugs, P1/P3/P4 perf, balance fixes
+              B1/B3/B5 bugs, P1/P3/P4 perf, balance fixes
+- [x] save.js: steal upgrade + lmsBest defaults
 
 ### Previously Completed (Sessions 1-2)
 - [x] Project scaffold (index.html, style.css, CLAUDE.md)
@@ -241,6 +253,7 @@ Displayed on the LMS mode card in the mode-select screen.
 ---
 
 ## Known Limitations
-- No actual mesh collision for buildings (just AABB leader push)
+- Building collision disabled (enemies got stuck); entities pass through buildings
 - Music files must be provided by user
 - LMS enemy-vs-enemy eating round-robins all pairs per frame
+- E9 crowd LOD not yet implemented (deferred to future session)

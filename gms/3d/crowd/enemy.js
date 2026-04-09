@@ -72,9 +72,8 @@ class Enemy {
     const px = player.mesh.position.x, pz = player.mesh.position.z;
     const distToPlayer = Math.hypot(ex - px, ez - pz);
 
-    // Flee if player is much bigger and close
-    if ((this.type === 'champion' || this.type === 'boss') &&
-        player.crowdSize > this.crowdSize + 6 &&
+    // Flee if player is clearly bigger and close (all types)
+    if (player.crowdSize > this.crowdSize + 4 &&
         distToPlayer < this.senseRange) {
       this.state    = 'flee';
       // Clamp flee target to map boundary (fix B2)
@@ -157,26 +156,36 @@ class Enemy {
     }
   }
 
-  // ── Follower cluster update (fibonacci spiral) ────────────────────────
+  // ── Follower chain-following (same system as player) ────────────────
   _updateFollowers(dt, time) {
-    const TRAIL_BACK = 1.5;
-    const PACK_R     = B_RAD.follower * 2.2;
-
-    const cx = this.mesh.position.x - this._moveDirX * TRAIL_BACK;
-    const cz = this.mesh.position.z - this._moveDirZ * TRAIL_BACK;
+    const GAP = 1.0;
 
     this.followers.forEach((f, i) => {
-      // Cap radius so large crowds overlap naturally
-      const r  = Math.min(PACK_R * Math.sqrt(i + 1), MAX_CROWD_R);
-      const a  = i * GOLDEN_ANGLE;
-      const tx = cx + Math.cos(a) * r;
-      const tz = cz + Math.sin(a) * r;
+      let aheadX, aheadZ, fwdX, fwdZ;
+      if (i === 0) {
+        aheadX = this.mesh.position.x;
+        aheadZ = this.mesh.position.z;
+        fwdX   = this._moveDirX;
+        fwdZ   = this._moveDirZ;
+      } else {
+        const prev = this.followers[i - 1];
+        aheadX = prev.mesh.position.x;
+        aheadZ = prev.mesh.position.z;
+        const ddx = aheadX - f.mesh.position.x;
+        const ddz = aheadZ - f.mesh.position.z;
+        const dl  = Math.hypot(ddx, ddz) || 1;
+        fwdX = ddx / dl;
+        fwdZ = ddz / dl;
+      }
+
+      const tx = aheadX - fwdX * GAP + (-fwdZ) * f.latOff;
+      const tz = aheadZ - fwdZ * GAP + fwdX * f.latOff;
 
       const fdx  = tx - f.mesh.position.x;
       const fdz  = tz - f.mesh.position.z;
       const dist = Math.hypot(fdx, fdz);
       if (dist > 0.05) {
-        const step = Math.min(7 * dt, dist); // slightly faster than player for snappier AI
+        const step = Math.min(f.followSpeed * dt, dist);
         f.mesh.position.x += (fdx / dist) * step;
         f.mesh.position.z += (fdz / dist) * step;
       }
@@ -198,7 +207,12 @@ class Enemy {
     m.position.copy(this.mesh.position);
     m.position.y = B_RAD.follower;
     m.castShadow  = true;
-    this.followers.push({ mesh: m, phase: Math.random() * Math.PI * 2 });
+    this.followers.push({
+      mesh: m,
+      phase:       Math.random() * Math.PI * 2,
+      followSpeed: 6 + Math.random() * 5,        // staggered reaction → bunching
+      latOff:      (Math.random() - 0.5) * 1.6,  // lateral spread
+    });
     this.scene.add(m);
   }
 

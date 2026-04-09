@@ -88,26 +88,39 @@ class Player {
 
   // ── Update followers + timers ─────────────────────────────────────────
   updateFollowers(dt, time) {
-    // Followers lag behind slowly — looks like a real crowd trailing
-    const followSpeed = 6;
-    const TRAIL_BACK  = 1.5;
-    const PACK_R      = B_RAD.follower * 2.2;
-
-    const cx = this.mesh.position.x - this._moveDirX * TRAIL_BACK;
-    const cz = this.mesh.position.z - this._moveDirZ * TRAIL_BACK;
+    // Chain-following: each follower chases the one ahead of it.
+    // Staggered followSpeed per follower creates natural bunching:
+    // fast followers catch up to slow ones ahead → crowd clumps.
+    const GAP = 1.0; // desired trailing distance behind target
 
     this.followers.forEach((f, i) => {
-      // Cap radius so large crowds overlap and look dense
-      const r  = Math.min(PACK_R * Math.sqrt(i + 1), MAX_CROWD_R);
-      const a  = i * GOLDEN_ANGLE;
-      const tx = cx + Math.cos(a) * r;
-      const tz = cz + Math.sin(a) * r;
+      // Target = entity ahead (follower 0 → player, follower i → follower i-1)
+      let aheadX, aheadZ, fwdX, fwdZ;
+      if (i === 0) {
+        aheadX = this.mesh.position.x;
+        aheadZ = this.mesh.position.z;
+        fwdX   = this._moveDirX;
+        fwdZ   = this._moveDirZ;
+      } else {
+        const prev = this.followers[i - 1];
+        aheadX = prev.mesh.position.x;
+        aheadZ = prev.mesh.position.z;
+        const ddx = aheadX - f.mesh.position.x;
+        const ddz = aheadZ - f.mesh.position.z;
+        const dl  = Math.hypot(ddx, ddz) || 1;
+        fwdX = ddx / dl;
+        fwdZ = ddz / dl;
+      }
+
+      // Target slightly behind ahead entity, with lateral spread
+      const tx = aheadX - fwdX * GAP + (-fwdZ) * f.latOff;
+      const tz = aheadZ - fwdZ * GAP + fwdX * f.latOff;
 
       const fdx  = tx - f.mesh.position.x;
       const fdz  = tz - f.mesh.position.z;
       const dist = Math.hypot(fdx, fdz);
       if (dist > 0.05) {
-        const step = Math.min(followSpeed * dt, dist);
+        const step = Math.min(f.followSpeed * dt, dist);
         f.mesh.position.x += (fdx / dist) * step;
         f.mesh.position.z += (fdz / dist) * step;
       }
@@ -143,7 +156,12 @@ class Player {
     const m = this._makeBall(B_RAD.follower, COLORS.follower);
     m.position.copy(this.mesh.position);
     m.position.y = B_RAD.follower;
-    this.followers.push({ mesh: m, phase: Math.random() * Math.PI * 2 });
+    this.followers.push({
+      mesh: m,
+      phase:       Math.random() * Math.PI * 2,
+      followSpeed: 5 + Math.random() * 5,            // staggered reaction → bunching
+      latOff:      (Math.random() - 0.5) * 1.8,      // lateral spread so they don't single-file
+    });
     this.scene.add(m);
   }
 
