@@ -126,6 +126,19 @@
       <div class="floor-label">Floor</div>
       <div id="floor-buttons"></div>
     </div>
+    <!-- Virtual joysticks for mobile -->
+    <div id="joystick-container" class="hidden">
+      <div class="joy-zone joy-left" id="joy-left">
+        <div class="joy-ring"></div>
+        <div class="joy-thumb" id="joy-left-thumb"></div>
+        <div class="joy-label">Move</div>
+      </div>
+      <div class="joy-zone joy-right" id="joy-right">
+        <div class="joy-ring"></div>
+        <div class="joy-thumb" id="joy-right-thumb"></div>
+        <div class="joy-label">Look</div>
+      </div>
+    </div>
     <div id="viewer-hud">
       <div id="hud-info"></div>
       <div id="hud-controls">
@@ -159,6 +172,7 @@
 <script src="projects-ui.js"></script>
 <script src="config-ui.js"></script>
 <script src="interior.js"></script>
+<script src="joystick.js"></script>
 <script src="viewer.js"></script>
 <script src="app.js"></script>
 </body>
