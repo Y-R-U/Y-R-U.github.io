@@ -43,6 +43,11 @@ class Game {
 
     // Pre-allocated vector for label projection (P1 perf)
     this._labelVec = new THREE.Vector3();
+
+    // Camera zoom: 0 = closest, 1 = furthest out
+    // Default 0.33 — zoomed out a bit from the old close view
+    this._zoomLevel  = 0.33;
+    this._pinchDist0 = 0;
   }
 
   // ── Initialise ───────────────────────────────────────────────────────
@@ -93,6 +98,34 @@ class Game {
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(innerWidth, innerHeight);
     });
+
+    // ── Pinch-to-zoom (mobile) ────────────────────────────────────────
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        this._pinchDist0 = Math.hypot(dx, dy);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && this._pinchDist0 > 10) {
+        const dx   = e.touches[0].clientX - e.touches[1].clientX;
+        const dy   = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        const scale = dist / this._pinchDist0;
+        // spread fingers = zoom in (decrease zoomLevel); pinch = zoom out
+        this._zoomLevel = Math.max(0, Math.min(1, this._zoomLevel - (scale - 1) * 0.6));
+        this._pinchDist0 = dist;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => { this._pinchDist0 = 0; }, { passive: true });
+
+    // ── Scroll-wheel zoom (desktop) ────────────────────────────────────
+    canvas.addEventListener('wheel', e => {
+      this._zoomLevel = Math.max(0, Math.min(1, this._zoomLevel + e.deltaY * 0.001));
+    }, { passive: true });
   }
 
   // ── Main loop ────────────────────────────────────────────────────────
@@ -117,20 +150,10 @@ class Game {
 
     this.input.update();
     this.player.move(this.input.dx, this.input.dz, dt);
-
-    // Building collision for player leader
-    const pp = this._resolveBuildings(this.player.mesh.position.x, this.player.mesh.position.z);
-    this.player.mesh.position.x = pp.x;
-    this.player.mesh.position.z = pp.z;
-
     this.player.updateFollowers(dt, this._gt);
 
     for (const e of this.enemies) {
       e.update(dt, this.player, this.collectibles, this._gt);
-      // Building collision for enemy leaders
-      const ep = this._resolveBuildings(e.mesh.position.x, e.mesh.position.z);
-      e.mesh.position.x = ep.x;
-      e.mesh.position.z = ep.z;
     }
 
     this._updateCollectibles(dt);
@@ -145,11 +168,14 @@ class Game {
 
     updateParticles(this.scene, dt);
 
-    // Camera smooth follow
+    // Camera smooth follow — zoom level: 0 = closest (h22/z18), 1 = furthest (h44/z36)
+    const zl   = this._zoomLevel;
+    const camH = 22 + zl * 22;
+    const camZ = 18 + zl * 18;
     this._camTarget.set(
       this.player.mesh.position.x,
-      this.player.mesh.position.y + 22,
-      this.player.mesh.position.z + 18
+      this.player.mesh.position.y + camH,
+      this.player.mesh.position.z + camZ
     );
     this.camera.position.lerp(this._camTarget, 0.07);
     this._camLook.set(
