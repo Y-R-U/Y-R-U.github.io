@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Paper Ant</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Settings Cog (always visible during gameplay) -->
+        <button id="settings-btn" class="cog-btn" aria-label="Settings">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+                <path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84a.48.48 0 00-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87a.48.48 0 00.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/>
+            </svg>
+        </button>
+
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <div class="title-content">
+                <div class="title-ant-decoration"></div>
+                <h1 class="game-title">Paper Ant</h1>
+                <p class="game-subtitle">Draw lines to guide the ant!</p>
+                <button id="play-btn" class="paper-btn primary">Play</button>
+                <button id="how-to-play-btn" class="paper-btn">How to Play</button>
+            </div>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="how-to-play-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup">
+                    <h2>How to Play</h2>
+                    <div class="tutorial-steps">
+                        <div class="tutorial-step">
+                            <div class="tutorial-icon">&#9997;&#65039;</div>
+                            <p><strong>Draw lines</strong> on the paper with your finger or mouse to create temporary walls.</p>
+                        </div>
+                        <div class="tutorial-step">
+                            <div class="tutorial-icon">&#128028;</div>
+                            <p>The <strong>ant</strong> will bump into your lines and change direction.</p>
+                        </div>
+                        <div class="tutorial-step">
+                            <div class="tutorial-icon">&#9200;</div>
+                            <p>Lines <strong>fade away</strong> after a few seconds, so time your draws carefully!</p>
+                        </div>
+                        <div class="tutorial-step">
+                            <div class="tutorial-icon">&#11088;</div>
+                            <p>Guide the ant to all <strong>goals</strong> to complete each level.</p>
+                        </div>
+                    </div>
+                    <button id="how-to-play-back" class="paper-btn primary">Got it!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div id="level-select-screen" class="screen">
+            <div class="level-select-content">
+                <h2 class="screen-title">Select Level</h2>
+                <div id="level-grid" class="level-grid"></div>
+                <button id="level-select-back" class="paper-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- Game HUD -->
+        <div id="game-hud" class="hud hidden">
+            <div class="hud-left">
+                <button id="hud-back-btn" class="hud-btn" aria-label="Back to levels">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <span id="hud-level" class="hud-text">Level 1</span>
+            </div>
+            <div class="hud-center">
+                <span id="hud-goal" class="hud-text"></span>
+            </div>
+            <div class="hud-right">
+                <span id="hud-timer" class="hud-text">0:00</span>
+                <span id="hud-ink" class="hud-text ink-meter">
+                    <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    <span id="ink-bar-container"><span id="ink-bar"></span></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Level Complete Popup -->
+        <div id="level-complete-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup level-complete">
+                    <h2>Level Complete!</h2>
+                    <div id="level-stars" class="stars"></div>
+                    <p id="level-time" class="level-stat"></p>
+                    <div class="popup-buttons">
+                        <button id="complete-levels-btn" class="paper-btn">Levels</button>
+                        <button id="complete-next-btn" class="paper-btn primary">Next Level</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Failed Popup -->
+        <div id="level-failed-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup level-failed">
+                    <h2>Time's Up!</h2>
+                    <p class="fail-message">The ant didn't reach all goals in time.</p>
+                    <div class="popup-buttons">
+                        <button id="failed-levels-btn" class="paper-btn">Levels</button>
+                        <button id="failed-retry-btn" class="paper-btn primary">Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Popup -->
+        <div id="settings-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup settings-popup">
+                    <h2>Settings</h2>
+                    <div class="setting-row">
+                        <span>Sound Effects</span>
+                        <button id="sfx-toggle" class="toggle-btn on" data-setting="sfx">ON</button>
+                    </div>
+                    <div class="setting-row">
+                        <span>Music</span>
+                        <button id="music-toggle" class="toggle-btn on" data-setting="music">ON</button>
+                    </div>
+                    <div class="setting-row">
+                        <span>Vibration</span>
+                        <button id="vibrate-toggle" class="toggle-btn on" data-setting="vibrate">ON</button>
+                    </div>
+                    <button id="settings-close" class="paper-btn primary">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Levels Complete -->
+        <div id="game-complete-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup game-complete">
+                    <h2>Congratulations!</h2>
+                    <div class="trophy">&#127942;</div>
+                    <p>You've guided all the ants home!</p>
+                    <p id="total-stars" class="level-stat"></p>
+                    <button id="game-complete-btn" class="paper-btn primary">Back to Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/ant.js"></script>
+    <script src="js/drawing.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
