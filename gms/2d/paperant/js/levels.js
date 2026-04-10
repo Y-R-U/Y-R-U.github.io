@@ -36,10 +36,13 @@ const LevelManager = (() => {
     }
 
     function getStates() {
-        return levelStates.map((s, i) => ({
-            ...s,
-            current: s.unlocked && !s.completed,
-        }));
+        // Only mark the FIRST unlocked-but-not-completed level as 'current'
+        let foundCurrent = false;
+        return levelStates.map((s, i) => {
+            const isCurrent = !foundCurrent && s.unlocked && !s.completed;
+            if (isCurrent) foundCurrent = true;
+            return { ...s, current: isCurrent };
+        });
     }
 
     function getLevelData(index) {

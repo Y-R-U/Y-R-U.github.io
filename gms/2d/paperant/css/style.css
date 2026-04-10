@@ -15,6 +15,8 @@ html, body {
 #game-container {
     position: relative;
     width: 100%; height: 100dvh;
+    max-width: 600px;
+    margin: 0 auto;
     overflow: hidden;
     background: #b8a88a;
 }
@@ -340,6 +342,16 @@ html, body {
     gap: 0.6rem;
     justify-content: center;
     margin-top: 1rem;
+}
+
+/* === Low Time Warning === */
+.hud-text.low-time {
+    color: #c33;
+    animation: timerFlash 0.6s ease-in-out infinite alternate;
+}
+@keyframes timerFlash {
+    from { opacity: 1; }
+    to { opacity: 0.4; }
 }
 
 /* === Responsive === */

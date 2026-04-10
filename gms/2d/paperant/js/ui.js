@@ -5,7 +5,7 @@ const UI = (() => {
     const screens = {};
     let currentScreen = null;
 
-    // Callbacks
+    // Callbacks set by main.js
     let onPlayClick = null;
     let onLevelSelect = null;
     let onNextLevel = null;
@@ -14,7 +14,6 @@ const UI = (() => {
     let onBackToTitle = null;
 
     function init(callbacks) {
-        Object.assign({ onPlayClick, onLevelSelect, onNextLevel, onRetryLevel, onBackToLevels, onBackToTitle }, callbacks);
         onPlayClick = callbacks.onPlayClick;
         onLevelSelect = callbacks.onLevelSelect;
         onNextLevel = callbacks.onNextLevel;
@@ -25,32 +24,36 @@ const UI = (() => {
         // Cache screen elements
         const ids = ['title-screen', 'how-to-play-screen', 'level-select-screen',
                      'level-complete-screen', 'level-failed-screen', 'settings-screen',
-                     'game-complete-screen'];
+                     'game-complete-screen', 'quit-confirm-screen'];
         ids.forEach(id => { screens[id] = document.getElementById(id); });
 
         // Button bindings
-        bindBtn('play-btn', () => { Audio.SFX.buttonClick(); onPlayClick?.(); });
-        bindBtn('how-to-play-btn', () => { Audio.SFX.buttonClick(); showScreen('how-to-play-screen'); });
-        bindBtn('how-to-play-back', () => { Audio.SFX.buttonClick(); showScreen('title-screen'); });
-        bindBtn('level-select-back', () => { Audio.SFX.buttonClick(); onBackToTitle?.(); });
-        bindBtn('complete-next-btn', () => { Audio.SFX.buttonClick(); onNextLevel?.(); });
-        bindBtn('complete-levels-btn', () => { Audio.SFX.buttonClick(); onBackToLevels?.(); });
-        bindBtn('failed-retry-btn', () => { Audio.SFX.buttonClick(); onRetryLevel?.(); });
-        bindBtn('failed-levels-btn', () => { Audio.SFX.buttonClick(); onBackToLevels?.(); });
-        bindBtn('game-complete-btn', () => { Audio.SFX.buttonClick(); onBackToTitle?.(); });
-        bindBtn('hud-back-btn', () => { Audio.SFX.buttonClick(); onBackToLevels?.(); });
+        bindBtn('play-btn', () => { GameAudio.SFX.buttonClick(); onPlayClick?.(); });
+        bindBtn('how-to-play-btn', () => { GameAudio.SFX.buttonClick(); showScreen('how-to-play-screen'); });
+        bindBtn('how-to-play-back', () => { GameAudio.SFX.buttonClick(); showScreen('title-screen'); });
+        bindBtn('level-select-back', () => { GameAudio.SFX.buttonClick(); onBackToTitle?.(); });
+        bindBtn('complete-next-btn', () => { GameAudio.SFX.buttonClick(); onNextLevel?.(); });
+        bindBtn('complete-levels-btn', () => { GameAudio.SFX.buttonClick(); onBackToLevels?.(); });
+        bindBtn('failed-retry-btn', () => { GameAudio.SFX.buttonClick(); onRetryLevel?.(); });
+        bindBtn('failed-levels-btn', () => { GameAudio.SFX.buttonClick(); onBackToLevels?.(); });
+        bindBtn('game-complete-btn', () => { GameAudio.SFX.buttonClick(); onBackToTitle?.(); });
+        bindBtn('hud-back-btn', () => { GameAudio.SFX.buttonClick(); showQuitConfirm(); });
+
+        // Quit confirm buttons
+        bindBtn('quit-yes-btn', () => { GameAudio.SFX.buttonClick(); hideQuitConfirm(); onBackToLevels?.(); });
+        bindBtn('quit-no-btn', () => { GameAudio.SFX.buttonClick(); hideQuitConfirm(); });
 
         // Settings
-        bindBtn('settings-btn', () => { Audio.SFX.buttonClick(); toggleSettings(); });
-        bindBtn('settings-close', () => { Audio.SFX.buttonClick(); hideSettings(); });
-        bindBtn('sfx-toggle', () => { toggleSettingBtn('sfx-toggle', Audio.toggleSfx()); });
-        bindBtn('music-toggle', () => { toggleSettingBtn('music-toggle', Audio.toggleMusic()); });
-        bindBtn('vibrate-toggle', () => { toggleSettingBtn('vibrate-toggle', Audio.toggleVibrate()); });
+        bindBtn('settings-btn', () => { GameAudio.SFX.buttonClick(); toggleSettings(); });
+        bindBtn('settings-close', () => { GameAudio.SFX.buttonClick(); hideSettings(); });
+        bindBtn('sfx-toggle', () => { toggleSettingBtn('sfx-toggle', GameAudio.toggleSfx()); });
+        bindBtn('music-toggle', () => { toggleSettingBtn('music-toggle', GameAudio.toggleMusic()); });
+        bindBtn('vibrate-toggle', () => { toggleSettingBtn('vibrate-toggle', GameAudio.toggleVibrate()); });
 
-        // Init toggle states
-        updateToggleBtn('sfx-toggle', Audio.sfxEnabled);
-        updateToggleBtn('music-toggle', Audio.musicEnabled);
-        updateToggleBtn('vibrate-toggle', Audio.vibrateEnabled);
+        // Init toggle states from saved prefs
+        updateToggleBtn('sfx-toggle', GameAudio.sfxEnabled);
+        updateToggleBtn('music-toggle', GameAudio.musicEnabled);
+        updateToggleBtn('vibrate-toggle', GameAudio.vibrateEnabled);
     }
 
     function bindBtn(id, handler) {
@@ -59,7 +62,7 @@ const UI = (() => {
     }
 
     function toggleSettingBtn(id, state) {
-        Audio.SFX.buttonClick();
+        GameAudio.SFX.buttonClick();
         updateToggleBtn(id, state);
     }
 
@@ -71,33 +74,69 @@ const UI = (() => {
         el.textContent = isOn ? 'ON' : 'OFF';
     }
 
+    // === Settings panel ===
     let settingsOpen = false;
     function toggleSettings() {
         if (settingsOpen) hideSettings();
         else showSettings();
     }
     function showSettings() {
-        screens['settings-screen'].classList.add('active');
+        if (screens['settings-screen']) screens['settings-screen'].classList.add('active');
         settingsOpen = true;
     }
     function hideSettings() {
-        screens['settings-screen'].classList.remove('active');
+        if (screens['settings-screen']) screens['settings-screen'].classList.remove('active');
         settingsOpen = false;
     }
     function isSettingsOpen() { return settingsOpen; }
 
+    // === Quit confirm ===
+    let quitOpen = false;
+    function showQuitConfirm() {
+        if (screens['quit-confirm-screen']) screens['quit-confirm-screen'].classList.add('active');
+        quitOpen = true;
+    }
+    function hideQuitConfirm() {
+        if (screens['quit-confirm-screen']) screens['quit-confirm-screen'].classList.remove('active');
+        quitOpen = false;
+    }
+    function isQuitOpen() { return quitOpen; }
+
+    // === Screen management ===
     function showScreen(id) {
-        // Hide all screens
-        Object.values(screens).forEach(s => s.classList.remove('active'));
+        // Hide all screens except settings overlay
+        Object.entries(screens).forEach(([key, s]) => {
+            if (s && key !== 'settings-screen' && key !== 'quit-confirm-screen') {
+                s.classList.remove('active');
+            }
+        });
         if (screens[id]) {
             screens[id].classList.add('active');
             currentScreen = id;
         }
+        // Update cog visibility
+        updateCogVisibility(id);
     }
 
     function hideAllScreens() {
-        Object.values(screens).forEach(s => s.classList.remove('active'));
+        Object.values(screens).forEach(s => { if (s) s.classList.remove('active'); });
         currentScreen = null;
+        settingsOpen = false;
+        quitOpen = false;
+        updateCogVisibility(null);
+    }
+
+    function updateCogVisibility(screenId) {
+        const cog = document.getElementById('settings-btn');
+        if (!cog) return;
+        // Hide cog on title and level-select (they have their own full backgrounds)
+        const hiddenOn = ['title-screen', 'how-to-play-screen', 'level-select-screen',
+                          'game-complete-screen'];
+        if (hiddenOn.includes(screenId)) {
+            cog.style.display = 'none';
+        } else {
+            cog.style.display = '';
+        }
     }
 
     function showHUD(show) {
@@ -105,12 +144,22 @@ const UI = (() => {
         hud.classList.toggle('hidden', !show);
     }
 
-    function updateHUD(levelNum, goalText, time, inkFrac) {
+    function updateHUD(levelNum, goalText, timeRemaining, inkFrac) {
         document.getElementById('hud-level').textContent = 'Level ' + levelNum;
         document.getElementById('hud-goal').textContent = goalText;
-        const mins = Math.floor(time / 60);
-        const secs = Math.floor(time % 60);
-        document.getElementById('hud-timer').textContent = mins + ':' + String(secs).padStart(2, '0');
+
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = Math.floor(timeRemaining % 60);
+        const timerEl = document.getElementById('hud-timer');
+        timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
+
+        // Flash timer red when low on time
+        if (timeRemaining <= CONFIG.LOW_TIME_WARN) {
+            timerEl.classList.add('low-time');
+        } else {
+            timerEl.classList.remove('low-time');
+        }
+
         document.getElementById('ink-bar').style.width = (inkFrac * 100) + '%';
 
         // Color ink bar based on level
@@ -132,7 +181,7 @@ const UI = (() => {
                 btn.innerHTML = `<span>${i + 1}</span><span class="level-stars">${starsHTML(state.stars || 0)}</span>`;
                 if (state.current) btn.classList.add('current');
                 btn.addEventListener('click', () => {
-                    Audio.SFX.buttonClick();
+                    GameAudio.SFX.buttonClick();
                     onSelect(i);
                 });
             } else {
@@ -182,6 +231,6 @@ const UI = (() => {
     return {
         init, showScreen, hideAllScreens, showHUD, updateHUD,
         buildLevelGrid, showLevelComplete, showLevelFailed, showGameComplete,
-        isSettingsOpen, hideSettings,
+        isSettingsOpen, hideSettings, isQuitOpen, hideQuitConfirm,
     };
 })();

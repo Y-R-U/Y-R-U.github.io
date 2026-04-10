@@ -1,7 +1,8 @@
 /* audio.js - Sound effects (Web Audio API) and music management */
+/* Renamed from Audio to GameAudio to avoid shadowing window.Audio */
 'use strict';
 
-const Audio = (() => {
+const GameAudio = (() => {
     let audioCtx = null;
     let sfxEnabled = true;
     let musicEnabled = true;
@@ -40,7 +41,7 @@ const Audio = (() => {
         if (!sfxEnabled) return;
         try {
             const ctx = getCtx();
-            const bufferSize = ctx.sampleRate * duration;
+            const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * vol;
@@ -101,7 +102,7 @@ const Audio = (() => {
             musicElement.play().catch(() => {});
             return;
         }
-        // Pick random track
+        // Pick random track (avoid repeating same track)
         let idx;
         do { idx = Math.floor(Math.random() * musicTracks.length); }
         while (idx === currentTrack && musicTracks.length > 1);

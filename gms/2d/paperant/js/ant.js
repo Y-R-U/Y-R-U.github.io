@@ -1,8 +1,10 @@
-/* ant.js - Ant entity: AI movement, wall/line collision, rendering */
+/* ant.js - Ant entity: reflection-based physics, wall/line collision, rendering */
 'use strict';
 
 const AntSystem = (() => {
-    // Ant drawing - detailed top-down ant
+
+    // === RENDERING ===
+
     function drawAnt(ctx, ant, dpr) {
         const s = CONFIG.ANT_SIZE * dpr;
         ctx.save();
@@ -62,7 +64,7 @@ const AntSystem = (() => {
         ctx.ellipse(0, 0, s * 0.2, s * 0.16, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Petiole (thin waist between thorax and abdomen)
+        // Petiole (thin waist)
         ctx.fillStyle = bodyColor;
         ctx.beginPath();
         ctx.ellipse(-s * 0.15, 0, s * 0.06, s * 0.07, 0, 0, Math.PI * 2);
@@ -79,17 +81,20 @@ const AntSystem = (() => {
         ctx.ellipse(s * 0.35, -s * 0.04, s * 0.08, s * 0.06, -0.3, 0, Math.PI * 2);
         ctx.fill();
 
-        // Eyes
+        // Eyes (separate beginPath for each so they don't share a path)
         ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(s * 0.42, -s * 0.08, s * 0.05, 0, Math.PI * 2);
         ctx.fill();
+        ctx.beginPath();
         ctx.arc(s * 0.42, s * 0.08, s * 0.05, 0, Math.PI * 2);
         ctx.fill();
+        // Pupils
         ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.arc(s * 0.44, -s * 0.08, s * 0.025, 0, Math.PI * 2);
         ctx.fill();
+        ctx.beginPath();
         ctx.arc(s * 0.44, s * 0.08, s * 0.025, 0, Math.PI * 2);
         ctx.fill();
 
@@ -97,12 +102,10 @@ const AntSystem = (() => {
         ctx.strokeStyle = legColor;
         ctx.lineWidth = Math.max(1, s * 0.06);
         const antennaSwing = Math.sin(legPhase * 0.7) * s * 0.08;
-        // Left antenna
         ctx.beginPath();
         ctx.moveTo(s * 0.42, -s * 0.12);
         ctx.quadraticCurveTo(s * 0.6, -s * 0.3 + antennaSwing, s * 0.7, -s * 0.35 + antennaSwing);
         ctx.stroke();
-        // Right antenna
         ctx.beginPath();
         ctx.moveTo(s * 0.42, s * 0.12);
         ctx.quadraticCurveTo(s * 0.6, s * 0.3 - antennaSwing, s * 0.7, s * 0.35 - antennaSwing);
@@ -124,7 +127,9 @@ const AntSystem = (() => {
         ctx.restore();
     }
 
-    function createAnt(def, playArea, dpr) {
+    // === CREATION ===
+
+    function createAnt(def, dpr) {
         const pos = Renderer.toCanvas(def.x, def.y);
         return {
             cx: pos.x,
@@ -135,15 +140,57 @@ const AntSystem = (() => {
             baseSpeed: (def.speed || CONFIG.ANT_SPEED) * dpr,
             wanderAngle: 0,
             walkCycle: Math.random() * Math.PI * 2,
-            stuckTimer: 0,
             hitCooldown: 0,
             reachedGoals: [],
+            // Anti-stuck tracking
+            prevX: pos.x,
+            prevY: pos.y,
+            stuckFrames: 0,
         };
     }
+
+    // === PHYSICS ===
+
+    /**
+     * Reflect angle off a surface normal.
+     * Returns the reflected angle with small controlled randomness.
+     */
+    function reflectAngle(inAngle, normalAngle) {
+        // Reflection: out = 2*normal - in + PI
+        // Standard reflection formula for angle of incidence = angle of reflection
+        const reflected = 2 * normalAngle - inAngle;
+        const jitter = (Math.random() - 0.5) * CONFIG.ANT_BOUNCE_RANDOMNESS * 2;
+        return reflected + jitter;
+    }
+
+    /**
+     * Get the normal angle of a line segment (always pointing away from the ant's approach).
+     */
+    function getSegmentNormal(ax, ay, bx, by, antAngle) {
+        const segAngle = Math.atan2(by - ay, bx - ax);
+        const normal1 = segAngle + Math.PI / 2;
+        const normal2 = segAngle - Math.PI / 2;
+        // Pick the normal that faces against the ant's direction
+        const dot1 = Math.cos(antAngle - normal1);
+        return dot1 < 0 ? normal1 : normal2;
+    }
+
+    function pointToSegmentDist(px, py, ax, ay, bx, by) {
+        const dx = bx - ax;
+        const dy = by - ay;
+        const len2 = dx * dx + dy * dy;
+        if (len2 === 0) return Math.hypot(px - ax, py - ay);
+        let t = ((px - ax) * dx + (py - ay) * dy) / len2;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+    }
+
+    // === UPDATE ===
 
     function updateAnt(ant, dt, playArea, lines, obstacles, goals, dpr) {
         const area = playArea;
         const size = CONFIG.ANT_SIZE * dpr;
+        const margin = size * 0.8;
 
         // Walk cycle animation
         ant.walkCycle += ant.speed * 0.5;
@@ -151,11 +198,12 @@ const AntSystem = (() => {
         // Ramp up speed
         ant.speed += (ant.targetSpeed - ant.speed) * 0.05;
 
-        // Wandering behavior
-        if (Math.random() < CONFIG.ANT_WANDER_CHANGE) {
-            ant.wanderAngle += (Math.random() - 0.5) * 0.8;
+        // Gentle wandering - framerate-independent
+        // Only change wander occasionally, scale by dt
+        if (Math.random() < CONFIG.ANT_WANDER_CHANGE * dt * 60) {
+            ant.wanderAngle += (Math.random() - 0.5) * CONFIG.ANT_WANDER_STRENGTH;
         }
-        ant.wanderAngle *= 0.98; // dampen
+        ant.wanderAngle *= Math.pow(0.97, dt * 60); // framerate-independent damping
         ant.angle += ant.wanderAngle * dt;
 
         // Move forward
@@ -167,69 +215,117 @@ const AntSystem = (() => {
         // Collision cooldown
         if (ant.hitCooldown > 0) ant.hitCooldown -= dt;
 
-        // Wall collision (play area bounds)
         let bounced = false;
-        const margin = size * 0.8;
-        if (nx - margin < area.x) { ant.angle = Math.PI - ant.angle + (Math.random() - 0.5) * 0.5; bounced = true; nx = area.x + margin; }
-        if (nx + margin > area.x + area.w) { ant.angle = Math.PI - ant.angle + (Math.random() - 0.5) * 0.5; bounced = true; nx = area.x + area.w - margin; }
-        if (ny - margin < area.y) { ant.angle = -ant.angle + (Math.random() - 0.5) * 0.5; bounced = true; ny = area.y + margin; }
-        if (ny + margin > area.y + area.h) { ant.angle = -ant.angle + (Math.random() - 0.5) * 0.5; bounced = true; ny = area.y + area.h - margin; }
+        let bouncedOnLine = false;
 
-        // Obstacle collision
+        // Wall collision (play area bounds) - proper reflection
+        if (nx - margin < area.x) {
+            ant.angle = reflectAngle(ant.angle, 0); // right-facing normal
+            nx = area.x + margin;
+            bounced = true;
+        } else if (nx + margin > area.x + area.w) {
+            ant.angle = reflectAngle(ant.angle, Math.PI); // left-facing normal
+            nx = area.x + area.w - margin;
+            bounced = true;
+        }
+        if (ny - margin < area.y) {
+            ant.angle = reflectAngle(ant.angle, Math.PI / 2); // down-facing normal
+            ny = area.y + margin;
+            bounced = true;
+        } else if (ny + margin > area.y + area.h) {
+            ant.angle = reflectAngle(ant.angle, -Math.PI / 2); // up-facing normal
+            ny = area.y + area.h - margin;
+            bounced = true;
+        }
+
+        // Obstacle collision - reflect off nearest edge
         for (const obs of obstacles) {
             const op = Renderer.toCanvas(obs.x, obs.y);
             const ow = obs.w * area.w;
             const oh = obs.h * area.h;
             if (nx + margin > op.x && nx - margin < op.x + ow &&
                 ny + margin > op.y && ny - margin < op.y + oh) {
-                // Push out and bounce
-                const cx = op.x + ow / 2;
-                const cy = op.y + oh / 2;
-                const dx = nx - cx;
-                const dy = ny - cy;
-                ant.angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.5;
-                nx = ant.cx;
-                ny = ant.cy;
+                // Determine which edge we're closest to for proper reflection
+                const dLeft = Math.abs(nx - op.x);
+                const dRight = Math.abs(nx - (op.x + ow));
+                const dTop = Math.abs(ny - op.y);
+                const dBottom = Math.abs(ny - (op.y + oh));
+                const minD = Math.min(dLeft, dRight, dTop, dBottom);
+
+                if (minD === dLeft) {
+                    ant.angle = reflectAngle(ant.angle, Math.PI); // reflect left
+                    nx = op.x - margin;
+                } else if (minD === dRight) {
+                    ant.angle = reflectAngle(ant.angle, 0); // reflect right
+                    nx = op.x + ow + margin;
+                } else if (minD === dTop) {
+                    ant.angle = reflectAngle(ant.angle, -Math.PI / 2); // reflect up
+                    ny = op.y - margin;
+                } else {
+                    ant.angle = reflectAngle(ant.angle, Math.PI / 2); // reflect down
+                    ny = op.y + oh + margin;
+                }
                 bounced = true;
             }
         }
 
-        // Pencil line collision
+        // Pencil line collision - true reflection off line segment normal
         if (ant.hitCooldown <= 0) {
+            let closestDist = Infinity;
+            let closestNormal = 0;
+            let hitLine = false;
+
             for (const line of lines) {
                 if (line.fading && line.opacity < 0.3) continue;
                 for (let i = 1; i < line.points.length; i++) {
                     const p1 = line.points[i - 1];
                     const p2 = line.points[i];
                     const dist = pointToSegmentDist(nx, ny, p1.x, p1.y, p2.x, p2.y);
-                    if (dist < margin + CONFIG.PENCIL_WIDTH * dpr) {
-                        // Bounce off the line
-                        const segAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-                        const normal = segAngle + Math.PI / 2;
-                        const dot = Math.cos(ant.angle - normal);
-                        if (dot < 0) {
-                            ant.angle = 2 * normal - ant.angle + (Math.random() - 0.5) * 0.4;
-                        } else {
-                            ant.angle = 2 * (normal + Math.PI) - ant.angle + (Math.random() - 0.5) * 0.4;
-                        }
-                        nx = ant.cx;
-                        ny = ant.cy;
-                        bounced = true;
-                        ant.hitCooldown = 0.15;
-                        Audio.SFX.antBounce();
-                        break;
+                    const threshold = margin + CONFIG.PENCIL_WIDTH * dpr;
+
+                    if (dist < threshold && dist < closestDist) {
+                        closestDist = dist;
+                        closestNormal = getSegmentNormal(p1.x, p1.y, p2.x, p2.y, ant.angle);
+                        hitLine = true;
                     }
                 }
-                if (bounced) break;
+            }
+
+            if (hitLine) {
+                // Reflect off the closest line segment
+                ant.angle = reflectAngle(ant.angle, closestNormal);
+                nx = ant.cx; // stay at previous position
+                ny = ant.cy;
+                bounced = true;
+                bouncedOnLine = true;
+                ant.hitCooldown = CONFIG.ANT_BOUNCE_COOLDOWN;
+                // Single SFX per frame, not per segment
+                GameAudio.SFX.antBounce();
             }
         }
 
         ant.cx = nx;
         ant.cy = ny;
 
+        // Anti-stuck detection
+        const movedDist = Math.hypot(ant.cx - ant.prevX, ant.cy - ant.prevY);
+        if (movedDist < 0.5 * dpr) {
+            ant.stuckFrames++;
+            if (ant.stuckFrames > CONFIG.ANT_STUCK_THRESHOLD) {
+                // Force a random direction change to escape
+                ant.angle += Math.PI * (0.5 + Math.random() * 0.5);
+                ant.stuckFrames = 0;
+                ant.hitCooldown = 0.3;
+            }
+        } else {
+            ant.stuckFrames = 0;
+        }
+        ant.prevX = ant.cx;
+        ant.prevY = ant.cy;
+
         if (bounced) {
             ant.wanderAngle = 0;
-            Audio.vibrate(10);
+            GameAudio.vibrate(10);
         }
 
         // Check goal collection
@@ -254,17 +350,7 @@ const AntSystem = (() => {
             }
         }
 
-        return { bounced, collected };
-    }
-
-    function pointToSegmentDist(px, py, ax, ay, bx, by) {
-        const dx = bx - ax;
-        const dy = by - ay;
-        const len2 = dx * dx + dy * dy;
-        if (len2 === 0) return Math.hypot(px - ax, py - ay);
-        let t = ((px - ax) * dx + (py - ay) * dy) / len2;
-        t = Math.max(0, Math.min(1, t));
-        return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+        return { bounced, bouncedOnLine, collected };
     }
 
     return { createAnt, updateAnt, drawAnt };

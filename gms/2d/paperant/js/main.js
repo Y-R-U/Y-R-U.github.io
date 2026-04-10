@@ -7,7 +7,7 @@
     // Init all systems
     Renderer.init(canvas);
     Input.init(canvas);
-    Audio.init();
+    GameAudio.init();
     LevelManager.init();
 
     // Draw initial paper background
@@ -38,7 +38,7 @@
         },
         onBackToTitle() {
             Game.stopLevel();
-            Audio.stopMusic();
+            GameAudio.stopMusic();
             UI.showScreen('title-screen');
             UI.showHUD(false);
             Renderer.drawPaper();
@@ -62,7 +62,7 @@
         }
     });
 
-    // Start game loop
+    // Start game loop (RAF-based, safe to call once)
     Game.startLoop();
 
     // Show title screen
