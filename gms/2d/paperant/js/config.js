@@ -13,8 +13,12 @@ const CONFIG = {
     ANT_SPEED: 1.8,
     ANT_SIZE: 14,
     ANT_TURN_SPEED: 0.06,
-    ANT_WANDER_CHANGE: 0.02, // chance to change direction per frame
+    ANT_WANDER_CHANGE: 0.008, // reduced - ants mostly go straight
+    ANT_WANDER_STRENGTH: 0.3, // max wander angle delta
     ANT_WALL_DETECT: 20,
+    ANT_BOUNCE_RANDOMNESS: 0.15, // radians of randomness on reflection (small)
+    ANT_STUCK_THRESHOLD: 5, // frames stuck in same spot before forced nudge
+    ANT_BOUNCE_COOLDOWN: 0.12, // seconds between line bounces
 
     // Drawing / Pencil
     PENCIL_COLOR: '#4a4a4a',
@@ -30,13 +34,11 @@ const CONFIG = {
     GOAL_SIZE: 18,
     GOAL_PULSE_SPEED: 2,
 
-    // Obstacles
-    OBSTACLE_COLOR: 'rgba(100, 160, 220, 0.35)',
-
     // Timing
     TARGET_FPS: 60,
     LEVEL_TIME_BONUS_3STAR: 0.5, // fraction of time remaining for 3 stars
     LEVEL_TIME_BONUS_2STAR: 0.25,
+    LOW_TIME_WARN: 10, // seconds - timer flashes when below this
 
     // Particles
     MAX_PARTICLES: 80,
@@ -45,11 +47,16 @@ const CONFIG = {
 
 // Goal types with their appearance
 const GOAL_TYPES = {
-    food: { emoji: '&#127838;', label: 'Food', color: '#c87533' },
-    nest: { emoji: '&#127974;', label: 'Nest', color: '#8b6914' },
-    friend: { emoji: '&#128028;', label: 'Friend', color: '#4a7340' },
-    leaf: { emoji: '&#127811;', label: 'Leaf', color: '#5c8a4d' },
-    sugar: { emoji: '&#127856;', label: 'Sugar', color: '#e0c080' },
+    food:   { label: 'Food',   color: '#c87533' },
+    nest:   { label: 'Nest',   color: '#8b6914' },
+    friend: { label: 'Friend', color: '#4a7340' },
+    leaf:   { label: 'Leaf',   color: '#5c8a4d' },
+    sugar:  { label: 'Sugar',  color: '#e0c080' },
+};
+
+// Emoji lookup used by renderer (real emoji chars, not HTML entities)
+const GOAL_ICONS = {
+    food: '🍞', nest: '🏠', friend: '🐜', leaf: '🍃', sugar: '🍬',
 };
 
 // Level definitions
@@ -83,8 +90,8 @@ const LEVELS = [
         ants: [{ x: 0.15, y: 0.5, angle: 0 }],
         goals: [{ x: 0.85, y: 0.2, type: 'leaf' }],
         obstacles: [
-            { x: 0.45, y: 0.0, w: 0.04, h: 0.42 },
-            { x: 0.45, y: 0.58, w: 0.04, h: 0.42 },
+            { x: 0.45, y: 0.0, w: 0.04, h: 0.40 },
+            { x: 0.45, y: 0.60, w: 0.04, h: 0.40 },
         ],
         antSpeed: 1.7,
     },

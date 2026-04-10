@@ -1,8 +1,8 @@
-/* game.js - Game loop, state machine, level lifecycle */
+/* game.js - Game loop (RAF-based), state machine, level lifecycle */
 'use strict';
 
 const Game = (() => {
-    // States: 'idle', 'playing', 'paused', 'levelComplete', 'levelFailed'
+    // States: 'idle', 'playing', 'celebrating', 'levelComplete', 'levelFailed'
     let state = 'idle';
     let currentLevel = 0;
     let ants = [];
@@ -11,8 +11,10 @@ const Game = (() => {
     let timeRemaining = 0;
     let timeUsed = 0;
     let lastTime = 0;
-    let animFrameId = null;
-    let levelStartDelay = 0; // brief countdown before ant moves
+    let rafId = null;
+    let levelStartDelay = 0;
+    let celebrationTimer = 0;
+    let celebrationStars = 0;
 
     function startLevel(index) {
         const data = LevelManager.getLevelData(index);
@@ -22,14 +24,13 @@ const Game = (() => {
         state = 'playing';
         timeRemaining = data.timeLimit;
         timeUsed = 0;
-        levelStartDelay = 1.0; // 1 second delay before ants move
+        levelStartDelay = 1.0;
 
         const dpr = Renderer.getDpr();
-        const area = Renderer.getPlayArea();
 
         // Create ants
         ants = data.ants.map(def => {
-            const ant = AntSystem.createAnt(def, area, dpr);
+            const ant = AntSystem.createAnt(def, dpr);
             ant.targetSpeed = data.antSpeed * dpr;
             ant.baseSpeed = data.antSpeed * dpr;
             return ant;
@@ -59,7 +60,7 @@ const Game = (() => {
         UI.showHUD(true);
 
         // Start music
-        Audio.playMusic();
+        GameAudio.playMusic();
 
         lastTime = performance.now() / 1000;
     }
@@ -70,23 +71,37 @@ const Game = (() => {
         UI.showHUD(false);
     }
 
-    function tick() {
+    // === RAF-based game loop ===
+    function tick(timestamp) {
+        rafId = requestAnimationFrame(tick);
 
-        const now = performance.now() / 1000;
+        const now = timestamp / 1000;
         let dt = now - lastTime;
         lastTime = now;
-        if (dt > 0.1) dt = 0.016; // cap delta
+        if (dt > 0.1) dt = 0.016; // cap delta for tab-away
 
-        if (state !== 'playing') return;
-        if (UI.isSettingsOpen()) return; // pause while settings open
+        // Pause while settings or quit confirm is open
+        if (UI.isSettingsOpen() || UI.isQuitOpen()) {
+            // Still render the current frame so canvas isn't blank behind popup
+            render(now);
+            return;
+        }
 
-        // Update HUD always (even during delay)
-        const data = LevelManager.getLevelData(currentLevel);
+        if (state === 'playing') {
+            tickPlaying(dt, now);
+        } else if (state === 'celebrating') {
+            tickCelebration(dt, now);
+        }
+        // idle / levelComplete / levelFailed: no update needed, canvas stays as-is
+    }
+
+    function tickPlaying(dt, now) {
+        // Update HUD
         const collectedCount = goals.filter(g => g.collected).length;
         const goalText = `${collectedCount} / ${goals.length}`;
         UI.updateHUD(currentLevel + 1, goalText, timeRemaining, Drawing.getInkFraction());
 
-        // Start delay
+        // Start delay countdown
         if (levelStartDelay > 0) {
             levelStartDelay -= dt;
             render(now);
@@ -100,13 +115,12 @@ const Game = (() => {
         if (timeRemaining <= 0) {
             timeRemaining = 0;
             onLevelFailed();
+            render(now);
             return;
         }
 
-        // Update drawing
+        // Update systems
         Drawing.update(dt, now);
-
-        // Update particles
         Particles.update(dt);
 
         // Update ants
@@ -119,29 +133,41 @@ const Game = (() => {
             if (result.collected) {
                 const gp = Renderer.toCanvas(result.collected.x, result.collected.y);
                 Particles.spawnGoalCollect(gp.x, gp.y, result.collected.type);
-                Audio.SFX.goalCollect();
-                Audio.vibrate(30);
+                GameAudio.SFX.goalCollect();
+                GameAudio.vibrate(30);
             }
         }
 
         // Check if all goals collected
         if (goals.every(g => g.collected)) {
             onLevelComplete();
-            return;
         }
 
         render(now);
+    }
+
+    function tickCelebration(dt, now) {
+        // Animate particles for ~1 second then show UI
+        celebrationTimer -= dt;
+        Particles.update(dt);
+        render(now);
+
+        if (celebrationTimer <= 0) {
+            state = 'levelComplete';
+            if (LevelManager.isAllComplete() && currentLevel === LEVELS.length - 1) {
+                UI.showGameComplete(LevelManager.getTotalStars(), LevelManager.getMaxStars());
+            } else {
+                UI.showLevelComplete(celebrationStars, timeUsed, currentLevel + 1);
+            }
+        }
     }
 
     function render(now) {
         const ctx = Renderer.getCtx();
         const dpr = Renderer.getDpr();
 
-        // Draw paper background
         Renderer.clear();
         Renderer.drawPaper();
-
-        // Draw obstacles
         Renderer.drawObstacles(obstacles);
 
         // Draw goals
@@ -165,7 +191,7 @@ const Game = (() => {
         Particles.draw(ctx);
 
         // Start delay overlay
-        if (levelStartDelay > 0) {
+        if (state === 'playing' && levelStartDelay > 0) {
             const area = Renderer.getPlayArea();
             ctx.save();
             ctx.fillStyle = 'rgba(245, 240, 225, 0.5)';
@@ -174,55 +200,36 @@ const Game = (() => {
             ctx.fillStyle = '#2c1810';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const num = Math.ceil(levelStartDelay);
-            ctx.fillText(num > 0 ? 'Ready...' : 'Go!', area.x + area.w / 2, area.y + area.h / 2);
+            ctx.fillText('Ready...', area.x + area.w / 2, area.y + area.h / 2);
             ctx.restore();
         }
     }
 
     function onLevelComplete() {
-        state = 'levelComplete';
+        state = 'celebrating';
         Input.disable();
+        celebrationStars = LevelManager.completeLevel(currentLevel, timeUsed);
+        celebrationTimer = 1.0; // 1 second of particle celebration
 
-        const stars = LevelManager.completeLevel(currentLevel, timeUsed);
-
-        // Effects
         const size = Renderer.getSize();
         Particles.spawnLevelComplete(size.w / 2, size.h / 2);
-        Audio.SFX.levelComplete();
-        Audio.vibrate([30, 50, 30]);
-
-        // Keep rendering particles briefly, then show UI
-        let frames = 0;
-        const celebrationId = setInterval(() => {
-            if (frames > 60) {
-                clearInterval(celebrationId);
-                if (LevelManager.isAllComplete() && currentLevel === LEVELS.length - 1) {
-                    UI.showGameComplete(LevelManager.getTotalStars(), LevelManager.getMaxStars());
-                } else {
-                    UI.showLevelComplete(stars, timeUsed, currentLevel + 1);
-                }
-                return;
-            }
-            frames++;
-            const now = performance.now() / 1000;
-            Particles.update(0.016);
-            render(now);
-        }, 1000 / CONFIG.TARGET_FPS);
+        GameAudio.SFX.levelComplete();
+        GameAudio.vibrate([30, 50, 30]);
     }
 
     function onLevelFailed() {
         state = 'levelFailed';
         Input.disable();
-        Audio.SFX.levelFail();
-        Audio.vibrate([50, 30, 50]);
+        GameAudio.SFX.levelFail();
+        GameAudio.vibrate([50, 30, 50]);
         UI.showLevelFailed();
     }
 
     function startLoop() {
+        // Cancel any existing loop to prevent duplicates
+        if (rafId) cancelAnimationFrame(rafId);
         lastTime = performance.now() / 1000;
-        // Use setInterval for reliable ticking (RAF throttles in background tabs)
-        setInterval(tick, 1000 / CONFIG.TARGET_FPS);
+        rafId = requestAnimationFrame(tick);
     }
 
     function getCurrentLevel() { return currentLevel; }

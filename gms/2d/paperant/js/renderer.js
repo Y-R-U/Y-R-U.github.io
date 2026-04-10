@@ -1,11 +1,30 @@
 /* renderer.js - Canvas rendering: paper background, grid, margins, obstacles */
 'use strict';
 
+// roundRect polyfill for older browsers (Safari <16, etc.)
+if (typeof CanvasRenderingContext2D !== 'undefined' &&
+    !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+        const r = typeof radii === 'number' ? radii : (Array.isArray(radii) ? radii[0] : 0);
+        this.moveTo(x + r, y);
+        this.lineTo(x + w - r, y);
+        this.arcTo(x + w, y, x + w, y + r, r);
+        this.lineTo(x + w, y + h - r);
+        this.arcTo(x + w, y + h, x + w - r, y + h, r);
+        this.lineTo(x + r, y + h);
+        this.arcTo(x, y + h, x, y + h - r, r);
+        this.lineTo(x, y + r);
+        this.arcTo(x, y, x + r, y, r);
+        this.closePath();
+    };
+}
+
 const Renderer = (() => {
     let canvas, ctx;
     let w, h;
-    let playArea = { x: 0, y: 0, w: 0, h: 0 }; // area inside margins
+    let playArea = { x: 0, y: 0, w: 0, h: 0 };
     let dpr = 1;
+    let paperCache = null; // offscreen canvas for static paper background
 
     function init(canvasEl) {
         canvas = canvasEl;
@@ -25,8 +44,10 @@ const Renderer = (() => {
         canvas.style.height = rect.height + 'px';
         // Play area inside margins
         const mx = Math.round(w * CONFIG.PAPER_MARGIN_X);
-        const topPad = Math.round(52 * dpr); // HUD space
+        const topPad = Math.round(52 * dpr);
         playArea = { x: mx, y: topPad, w: w - mx * 2, h: h - topPad - Math.round(16 * dpr) };
+        // Invalidate paper cache on resize
+        paperCache = null;
     }
 
     function getPlayArea() { return { ...playArea }; }
@@ -50,61 +71,77 @@ const Renderer = (() => {
         };
     }
 
-    function drawPaper() {
-        // Paper background
-        ctx.fillStyle = CONFIG.PAPER_COLOR;
-        ctx.fillRect(0, 0, w, h);
+    // Build paper texture once to offscreen canvas (no per-frame Math.random flickering)
+    function buildPaperCache() {
+        const offscreen = document.createElement('canvas');
+        offscreen.width = w;
+        offscreen.height = h;
+        const oc = offscreen.getContext('2d');
 
-        // Subtle paper texture (noise dots)
-        ctx.fillStyle = 'rgba(180, 170, 150, 0.06)';
+        // Paper background
+        oc.fillStyle = CONFIG.PAPER_COLOR;
+        oc.fillRect(0, 0, w, h);
+
+        // Deterministic paper texture (seeded noise dots)
+        oc.fillStyle = 'rgba(180, 170, 150, 0.06)';
         const step = 6;
+        let seed = 12345;
         for (let px = 0; px < w; px += step) {
             for (let py = 0; py < h; py += step) {
-                if (Math.random() < 0.3) {
-                    ctx.fillRect(px, py, 2, 2);
+                // Simple LCG pseudo-random, deterministic per position
+                seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+                if ((seed % 100) < 30) {
+                    oc.fillRect(px, py, 2, 2);
                 }
             }
         }
 
         // Horizontal ruled lines
         const spacing = CONFIG.PAPER_LINE_SPACING * dpr;
-        ctx.strokeStyle = CONFIG.PAPER_LINE_COLOR;
-        ctx.lineWidth = 1;
+        oc.strokeStyle = CONFIG.PAPER_LINE_COLOR;
+        oc.lineWidth = 1;
         const startY = playArea.y;
         for (let y = startY; y < h; y += spacing) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(w, y);
-            ctx.stroke();
+            oc.beginPath();
+            oc.moveTo(0, y);
+            oc.lineTo(w, y);
+            oc.stroke();
         }
 
         // Left margin line (red)
         const marginX = playArea.x;
-        ctx.strokeStyle = CONFIG.PAPER_MARGIN_COLOR;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(marginX, 0);
-        ctx.lineTo(marginX, h);
-        ctx.stroke();
+        oc.strokeStyle = CONFIG.PAPER_MARGIN_COLOR;
+        oc.lineWidth = 2;
+        oc.beginPath();
+        oc.moveTo(marginX, 0);
+        oc.lineTo(marginX, h);
+        oc.stroke();
 
         // Paper edge shadow (left)
-        const edgeGrad = ctx.createLinearGradient(0, 0, 20 * dpr, 0);
+        const edgeGrad = oc.createLinearGradient(0, 0, 20 * dpr, 0);
         edgeGrad.addColorStop(0, 'rgba(0,0,0,0.08)');
         edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = edgeGrad;
-        ctx.fillRect(0, 0, 20 * dpr, h);
+        oc.fillStyle = edgeGrad;
+        oc.fillRect(0, 0, 20 * dpr, h);
 
         // Hole punches on left margin
         const holeY = [h * 0.25, h * 0.5, h * 0.75];
-        ctx.fillStyle = '#d4c9a8';
-        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-        ctx.lineWidth = 1;
+        oc.fillStyle = '#d4c9a8';
+        oc.strokeStyle = 'rgba(0,0,0,0.1)';
+        oc.lineWidth = 1;
         for (const hy of holeY) {
-            ctx.beginPath();
-            ctx.arc(marginX * 0.4, hy, 8 * dpr, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            oc.beginPath();
+            oc.arc(marginX * 0.4, hy, 8 * dpr, 0, Math.PI * 2);
+            oc.fill();
+            oc.stroke();
         }
+
+        paperCache = offscreen;
+    }
+
+    function drawPaper() {
+        if (!paperCache) buildPaperCache();
+        ctx.drawImage(paperCache, 0, 0);
     }
 
     function drawObstacles(obstacles) {
@@ -113,7 +150,6 @@ const Renderer = (() => {
             const ow = obs.w * playArea.w;
             const oh = obs.h * playArea.h;
 
-            // Water puddle look
             ctx.save();
             ctx.beginPath();
             ctx.roundRect(pos.x, pos.y, ow, oh, 8 * dpr);
@@ -136,7 +172,7 @@ const Renderer = (() => {
 
             // Highlight
             ctx.beginPath();
-            ctx.ellipse(pos.x + ow * 0.35, pos.y + oh * 0.3, ow * 0.15, oh * 0.1, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(pos.x + ow * 0.35, pos.y + oh * 0.3, Math.max(1, ow * 0.15), Math.max(1, oh * 0.1), -0.3, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
             ctx.fill();
 
@@ -172,8 +208,7 @@ const Renderer = (() => {
         ctx.font = `${size * 1.2}px serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const icons = { food: '🍞', nest: '🏠', friend: '🐜', leaf: '🍃', sugar: '🍬' };
-        ctx.fillText(icons[goal.type] || '⭐', 0, 1);
+        ctx.fillText(GOAL_ICONS[goal.type] || '⭐', 0, 1);
 
         // Order number if sequential
         if (goal.order && !goal.collected) {

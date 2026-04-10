@@ -18,7 +18,7 @@ const Drawing = (() => {
     function startStroke(pos) {
         if (ink <= 1) return;
         currentStroke = { points: [pos], createdAt: performance.now() / 1000 };
-        Audio.SFX.draw();
+        GameAudio.SFX.draw();
     }
 
     function addPoint(pos) {
@@ -35,7 +35,7 @@ const Drawing = (() => {
         currentStroke.points.push(pos);
         ink -= dist * CONFIG.INK_COST_PER_PIXEL;
         if (ink < 0) ink = 0;
-        Audio.SFX.draw();
+        GameAudio.SFX.draw();
     }
 
     function endStroke() {
@@ -85,6 +85,14 @@ const Drawing = (() => {
         }
     }
 
+    /**
+     * Simple hash for deterministic per-point noise (no frame-to-frame shimmer)
+     */
+    function pointNoise(index, seed) {
+        const h = ((index * 2654435761) ^ (seed * 1103515245)) & 0x7fffffff;
+        return (h % 1000) / 1000 - 0.5; // -0.5 to 0.5
+    }
+
     function drawStroke(ctx, points, opacity) {
         if (points.length < 2) return;
 
@@ -103,7 +111,7 @@ const Drawing = (() => {
         }
         ctx.stroke();
 
-        // Pencil texture - slight rough edge
+        // Pencil texture - slight rough edge, deterministic per point
         ctx.globalAlpha = opacity * 0.2;
         ctx.lineWidth = CONFIG.PENCIL_WIDTH * dpr * 1.5;
         ctx.strokeStyle = '#6a6a6a';
@@ -111,8 +119,8 @@ const Drawing = (() => {
         ctx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) {
             ctx.lineTo(
-                points[i].x + (Math.random() - 0.5) * 1.5 * dpr,
-                points[i].y + (Math.random() - 0.5) * 1.5 * dpr
+                points[i].x + pointNoise(i, 1) * 1.5 * dpr,
+                points[i].y + pointNoise(i, 2) * 1.5 * dpr
             );
         }
         ctx.stroke();
