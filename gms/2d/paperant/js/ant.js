@@ -152,25 +152,34 @@ const AntSystem = (() => {
     // === PHYSICS ===
 
     /**
-     * Reflect angle off a surface normal.
-     * Returns the reflected angle with small controlled randomness.
+     * Bounce angle for walls/obstacles: standard reflection with small jitter.
      */
     function reflectAngle(inAngle, normalAngle) {
-        // Reflection: out = 2*normal - in + PI
-        // Standard reflection formula for angle of incidence = angle of reflection
         const reflected = 2 * normalAngle - inAngle;
-        const jitter = (Math.random() - 0.5) * CONFIG.ANT_BOUNCE_RANDOMNESS * 2;
+        const jitter = (Math.random() - 0.5) * 0.3;
         return reflected + jitter;
     }
 
     /**
-     * Get the normal angle of a line segment (always pointing away from the ant's approach).
+     * Bounce angle for pencil lines: random direction in the away-hemisphere.
+     * The ant picks a random angle within ±70° of the surface normal,
+     * guaranteeing it always moves meaningfully AWAY from the line.
+     * This prevents the wiggle-stuck problem of shallow reflections.
+     */
+    function bounceAwayAngle(normalAngle) {
+        // Random angle within ±70° of the normal (140° cone away from line)
+        const spread = (Math.random() - 0.5) * (Math.PI * 0.78); // ±70°
+        return normalAngle + spread;
+    }
+
+    /**
+     * Get the normal angle of a line segment pointing away from the ant's approach side.
      */
     function getSegmentNormal(ax, ay, bx, by, antAngle) {
         const segAngle = Math.atan2(by - ay, bx - ax);
         const normal1 = segAngle + Math.PI / 2;
         const normal2 = segAngle - Math.PI / 2;
-        // Pick the normal that faces against the ant's direction
+        // Pick the normal that faces against the ant's travel direction
         const dot1 = Math.cos(antAngle - normal1);
         return dot1 < 0 ? normal1 : normal2;
     }
@@ -320,15 +329,16 @@ const AntSystem = (() => {
         }
 
         if (hitLine) {
-            // Reflect the ant's angle off the line
-            ant.angle = reflectAngle(ant.angle, closestNormalAngle);
-            // Push ant OUT along the normal so it's fully clear of the line
-            const pushDist = lineThreshold - closestDist + 2 * dpr; // extra 2px clearance
+            // Random bounce AWAY from the line (not reflection — avoids wiggle-stuck)
+            ant.angle = bounceAwayAngle(closestNormalAngle);
+            // Push ant well clear of the line along the normal direction
+            const pushDist = lineThreshold - closestDist + 4 * dpr;
             nx += closestNx * pushDist;
             ny += closestNy * pushDist;
+            // Kill any wander momentum so the bounce direction sticks
+            ant.wanderAngle = 0;
             bounced = true;
             bouncedOnLine = true;
-            // SFX only if cooldown expired (prevents audio spam, not collision)
             if (ant.sfxCooldown <= 0) {
                 GameAudio.SFX.antBounce();
                 ant.sfxCooldown = CONFIG.ANT_BOUNCE_COOLDOWN;

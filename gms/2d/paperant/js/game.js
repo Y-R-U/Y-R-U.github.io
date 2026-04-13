@@ -42,6 +42,22 @@ const Game = (() => {
         // Copy obstacles
         obstacles = data.obstacles.map(o => ({ ...o }));
 
+        // Ensure no ant starts pointing directly at a goal.
+        // If the angle to any goal is within 30°, rotate the ant away.
+        for (const ant of ants) {
+            for (const goal of goals) {
+                const gp = Renderer.toCanvas(goal.x, goal.y);
+                const angleToGoal = Math.atan2(gp.y - ant.cy, gp.x - ant.cx);
+                let diff = angleToGoal - ant.angle;
+                // Normalize to -PI..PI
+                diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+                if (Math.abs(diff) < Math.PI / 6) { // within ±30°
+                    // Rotate ant 90° away from the goal
+                    ant.angle += (Math.PI / 2) + (Math.random() - 0.5) * 0.5;
+                }
+            }
+        }
+
         // Init systems
         Drawing.init();
         Drawing.setDpr(dpr);
