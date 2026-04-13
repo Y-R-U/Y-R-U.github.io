@@ -140,7 +140,7 @@ const AntSystem = (() => {
             baseSpeed: (def.speed || CONFIG.ANT_SPEED) * dpr,
             wanderAngle: 0,
             walkCycle: Math.random() * Math.PI * 2,
-            hitCooldown: 0,
+            sfxCooldown: 0,
             reachedGoals: [],
             // Anti-stuck tracking
             prevX: pos.x,
@@ -185,6 +185,20 @@ const AntSystem = (() => {
         return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
     }
 
+    /**
+     * Find closest point on segment (ax,ay)-(bx,by) to point (px,py).
+     * Returns {x, y, t} where t is parametric position along segment.
+     */
+    function closestPointOnSegment(px, py, ax, ay, bx, by) {
+        const dx = bx - ax;
+        const dy = by - ay;
+        const len2 = dx * dx + dy * dy;
+        if (len2 === 0) return { x: ax, y: ay, t: 0 };
+        let t = ((px - ax) * dx + (py - ay) * dy) / len2;
+        t = Math.max(0, Math.min(1, t));
+        return { x: ax + t * dx, y: ay + t * dy, t };
+    }
+
     // === UPDATE ===
 
     function updateAnt(ant, dt, playArea, lines, obstacles, goals, dpr) {
@@ -199,11 +213,10 @@ const AntSystem = (() => {
         ant.speed += (ant.targetSpeed - ant.speed) * 0.05;
 
         // Gentle wandering - framerate-independent
-        // Only change wander occasionally, scale by dt
         if (Math.random() < CONFIG.ANT_WANDER_CHANGE * dt * 60) {
             ant.wanderAngle += (Math.random() - 0.5) * CONFIG.ANT_WANDER_STRENGTH;
         }
-        ant.wanderAngle *= Math.pow(0.97, dt * 60); // framerate-independent damping
+        ant.wanderAngle *= Math.pow(0.97, dt * 60);
         ant.angle += ant.wanderAngle * dt;
 
         // Move forward
@@ -212,28 +225,28 @@ const AntSystem = (() => {
         let nx = ant.cx + vx;
         let ny = ant.cy + vy;
 
-        // Collision cooldown
-        if (ant.hitCooldown > 0) ant.hitCooldown -= dt;
+        // SFX cooldown (only prevents audio spam, NOT collision detection)
+        if (ant.sfxCooldown > 0) ant.sfxCooldown -= dt;
 
         let bounced = false;
         let bouncedOnLine = false;
 
         // Wall collision (play area bounds) - proper reflection
         if (nx - margin < area.x) {
-            ant.angle = reflectAngle(ant.angle, 0); // right-facing normal
+            ant.angle = reflectAngle(ant.angle, 0);
             nx = area.x + margin;
             bounced = true;
         } else if (nx + margin > area.x + area.w) {
-            ant.angle = reflectAngle(ant.angle, Math.PI); // left-facing normal
+            ant.angle = reflectAngle(ant.angle, Math.PI);
             nx = area.x + area.w - margin;
             bounced = true;
         }
         if (ny - margin < area.y) {
-            ant.angle = reflectAngle(ant.angle, Math.PI / 2); // down-facing normal
+            ant.angle = reflectAngle(ant.angle, Math.PI / 2);
             ny = area.y + margin;
             bounced = true;
         } else if (ny + margin > area.y + area.h) {
-            ant.angle = reflectAngle(ant.angle, -Math.PI / 2); // up-facing normal
+            ant.angle = reflectAngle(ant.angle, -Math.PI / 2);
             ny = area.y + area.h - margin;
             bounced = true;
         }
@@ -245,7 +258,6 @@ const AntSystem = (() => {
             const oh = obs.h * area.h;
             if (nx + margin > op.x && nx - margin < op.x + ow &&
                 ny + margin > op.y && ny - margin < op.y + oh) {
-                // Determine which edge we're closest to for proper reflection
                 const dLeft = Math.abs(nx - op.x);
                 const dRight = Math.abs(nx - (op.x + ow));
                 const dTop = Math.abs(ny - op.y);
@@ -253,56 +265,79 @@ const AntSystem = (() => {
                 const minD = Math.min(dLeft, dRight, dTop, dBottom);
 
                 if (minD === dLeft) {
-                    ant.angle = reflectAngle(ant.angle, Math.PI); // reflect left
+                    ant.angle = reflectAngle(ant.angle, Math.PI);
                     nx = op.x - margin;
                 } else if (minD === dRight) {
-                    ant.angle = reflectAngle(ant.angle, 0); // reflect right
+                    ant.angle = reflectAngle(ant.angle, 0);
                     nx = op.x + ow + margin;
                 } else if (minD === dTop) {
-                    ant.angle = reflectAngle(ant.angle, -Math.PI / 2); // reflect up
+                    ant.angle = reflectAngle(ant.angle, -Math.PI / 2);
                     ny = op.y - margin;
                 } else {
-                    ant.angle = reflectAngle(ant.angle, Math.PI / 2); // reflect down
+                    ant.angle = reflectAngle(ant.angle, Math.PI / 2);
                     ny = op.y + oh + margin;
                 }
                 bounced = true;
             }
         }
 
-        // Pencil line collision - true reflection off line segment normal
-        if (ant.hitCooldown <= 0) {
-            let closestDist = Infinity;
-            let closestNormal = 0;
-            let hitLine = false;
+        // === Pencil line collision ===
+        // ALWAYS checked (no cooldown skip) - lines are solid barriers.
+        // On hit: reflect angle AND push ant out along the normal so it can't tunnel.
+        const lineThreshold = margin + CONFIG.PENCIL_WIDTH * dpr;
 
-            for (const line of lines) {
-                if (line.fading && line.opacity < 0.3) continue;
-                for (let i = 1; i < line.points.length; i++) {
-                    const p1 = line.points[i - 1];
-                    const p2 = line.points[i];
-                    const dist = pointToSegmentDist(nx, ny, p1.x, p1.y, p2.x, p2.y);
-                    const threshold = margin + CONFIG.PENCIL_WIDTH * dpr;
+        let closestDist = Infinity;
+        let closestNormalAngle = 0;
+        let closestNx = 0;  // normal direction x
+        let closestNy = 0;  // normal direction y
+        let hitLine = false;
 
-                    if (dist < threshold && dist < closestDist) {
-                        closestDist = dist;
-                        closestNormal = getSegmentNormal(p1.x, p1.y, p2.x, p2.y, ant.angle);
-                        hitLine = true;
+        for (const line of lines) {
+            if (line.fading && line.opacity < 0.3) continue;
+            for (let i = 1; i < line.points.length; i++) {
+                const p1 = line.points[i - 1];
+                const p2 = line.points[i];
+                const cp = closestPointOnSegment(nx, ny, p1.x, p1.y, p2.x, p2.y);
+                const dx = nx - cp.x;
+                const dy = ny - cp.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < lineThreshold && dist < closestDist) {
+                    closestDist = dist;
+                    closestNormalAngle = getSegmentNormal(p1.x, p1.y, p2.x, p2.y, ant.angle);
+                    // Compute push-out direction: from closest point on segment toward ant
+                    if (dist > 0.01) {
+                        closestNx = dx / dist;
+                        closestNy = dy / dist;
+                    } else {
+                        // Ant exactly on the line - use segment normal
+                        closestNx = Math.cos(closestNormalAngle);
+                        closestNy = Math.sin(closestNormalAngle);
                     }
+                    hitLine = true;
                 }
             }
+        }
 
-            if (hitLine) {
-                // Reflect off the closest line segment
-                ant.angle = reflectAngle(ant.angle, closestNormal);
-                nx = ant.cx; // stay at previous position
-                ny = ant.cy;
-                bounced = true;
-                bouncedOnLine = true;
-                ant.hitCooldown = CONFIG.ANT_BOUNCE_COOLDOWN;
-                // Single SFX per frame, not per segment
+        if (hitLine) {
+            // Reflect the ant's angle off the line
+            ant.angle = reflectAngle(ant.angle, closestNormalAngle);
+            // Push ant OUT along the normal so it's fully clear of the line
+            const pushDist = lineThreshold - closestDist + 2 * dpr; // extra 2px clearance
+            nx += closestNx * pushDist;
+            ny += closestNy * pushDist;
+            bounced = true;
+            bouncedOnLine = true;
+            // SFX only if cooldown expired (prevents audio spam, not collision)
+            if (ant.sfxCooldown <= 0) {
                 GameAudio.SFX.antBounce();
+                ant.sfxCooldown = CONFIG.ANT_BOUNCE_COOLDOWN;
             }
         }
+
+        // Clamp to play area after all pushes (safety net)
+        nx = Math.max(area.x + margin, Math.min(area.x + area.w - margin, nx));
+        ny = Math.max(area.y + margin, Math.min(area.y + area.h - margin, ny));
 
         ant.cx = nx;
         ant.cy = ny;
@@ -315,7 +350,6 @@ const AntSystem = (() => {
                 // Force a random direction change to escape
                 ant.angle += Math.PI * (0.5 + Math.random() * 0.5);
                 ant.stuckFrames = 0;
-                ant.hitCooldown = 0.3;
             }
         } else {
             ant.stuckFrames = 0;
