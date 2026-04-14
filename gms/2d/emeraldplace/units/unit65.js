@@ -7,9 +7,9 @@
 // ─── Character Definitions ──────────────────────────────────
 
 const CHARS = {
-  alex:  { name: "Alex",  emoji: "🎨", color: "#9b59b6", tagline: "Photographer · floor above" },
-  sam:   { name: "Sam",   emoji: "☕", color: "#e67e22", tagline: "Barista · ground floor café" },
-  quinn: { name: "Quinn", emoji: "📚", color: "#27ae60", tagline: "Bibliophile · next door" },
+  alex:  { name: "Alex",  emoji: "🎨", portrait: "images/alex.png",  color: "#9b59b6", tagline: "Photographer · floor above" },
+  sam:   { name: "Sam",   emoji: "☕", portrait: "images/sam.png",   color: "#e67e22", tagline: "Barista · ground floor café" },
+  quinn: { name: "Quinn", emoji: "📚", portrait: "images/quinn.png", color: "#27ae60", tagline: "Bibliophile · next door" },
 };
 
 // ─── Scene Tree ─────────────────────────────────────────────
@@ -347,8 +347,11 @@ function renderCharView(root, charId) {
       const div = document.createElement("div");
       div.className = "u65-msg " + (isPlayer ? "u65-msg--player" : "u65-msg--npc");
       if (!isPlayer) div.style.setProperty("--char-color", char.color);
+      const avatar = char.portrait
+        ? `<img class="u65-avatar" src="${char.portrait}" alt="${char.name}">`
+        : `<span class="u65-avatar-emoji">${char.emoji}</span>`;
       div.innerHTML = `
-        ${!isPlayer ? `<span class="u65-msg-who">${char.emoji} ${char.name}</span>` : ""}
+        ${!isPlayer ? `<span class="u65-msg-who">${avatar} ${char.name}</span>` : ""}
         <span class="u65-bubble">${entry.text}</span>
         ${entry.note ? `<em class="u65-note">${entry.note}</em>` : ""}
       `;
@@ -359,8 +362,11 @@ function renderCharView(root, charId) {
       const pending = document.createElement("div");
       pending.className = "u65-msg u65-msg--npc u65-msg--pending";
       pending.style.setProperty("--char-color", char.color);
+      const pendAvatar = char.portrait
+        ? `<img class="u65-avatar" src="${char.portrait}" alt="${char.name}">`
+        : `<span class="u65-avatar-emoji">${char.emoji}</span>`;
       pending.innerHTML = `
-        <span class="u65-msg-who">${char.emoji} ${char.name}</span>
+        <span class="u65-msg-who">${pendAvatar} ${char.name}</span>
         <span class="u65-bubble">${scene.text}</span>
         ${scene.note ? `<em class="u65-note">${scene.note}</em>` : ""}
       `;
@@ -512,6 +518,21 @@ const CSS = `
 .u65-msg { display: flex; flex-direction: column; max-width: 85%; gap: 2px; }
 .u65-msg--npc { align-self: flex-start; align-items: flex-start; }
 .u65-msg--player { align-self: flex-end; align-items: flex-end; }
+
+.u65-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.u65-avatar-emoji {
+  font-size: 0.9rem;
+  vertical-align: middle;
+  margin-right: 3px;
+}
 
 .u65-msg-who {
   font-size: 0.58rem;

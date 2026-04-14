@@ -326,10 +326,23 @@ const CSS = `
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #0a0800 0%, #1a1200 100%);
+  background: url('../images/unit66_bg.png') center/cover no-repeat;
   font-family: 'Courier New', Courier, monospace;
   color: #e0d8c8;
   overflow: hidden;
+  position: relative;
+}
+.u66-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 0, 0.72);
+  pointer-events: none;
+  z-index: 0;
+}
+.u66-header, .u66-body, .u66-footer, .u66-rent-banner {
+  position: relative;
+  z-index: 1;
 }
 
 /* Header */

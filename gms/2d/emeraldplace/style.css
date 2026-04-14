@@ -413,7 +413,7 @@ html, body {
 
 /* ── Window View ─────────────────────────────────────────── */
 #window-view {
-  background: #0a1628;
+  background: #0a1628 url('images/outside_night.png') center/cover no-repeat;
   display: flex;
   flex-direction: column;
 }
@@ -531,11 +531,12 @@ html, body {
 
 /* ── Sleep View ──────────────────────────────────────────── */
 #sleep-view {
-  background: #000;
+  background: #000 url('images/sleep_bg.png') center/cover no-repeat;
   display: flex; align-items: center; justify-content: center;
-  color: var(--text-dim);
+  color: rgba(180,200,255,0.6);
   font-size: 1rem;
   letter-spacing: 0.2em;
+  text-shadow: 0 0 20px rgba(100,150,255,0.8);
 }
 
 /* ── Back Buttons (in-stage) ─────────────────────────────── */

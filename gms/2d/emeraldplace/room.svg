@@ -19,26 +19,26 @@
     </linearGradient>
   </defs>
 
-  <!-- ── CEILING ─────────────────────────────────────────── -->
-  <!-- Perspective trapezoid: narrow at back, wide at viewer -->
-  <polygon points="0,0 360,0 360,70 0,70" fill="url(#ceilGrad)"/>
+  <!-- ── PHOTO BACKGROUND ────────────────────────────────── -->
+  <image href="images/room_bg.png" x="0" y="0" width="360" height="640" preserveAspectRatio="xMidYMid slice"/>
+
+  <!-- ── ROOM STRUCTURE OVERLAYS (semi-transparent for depth) ── -->
+  <g opacity="0.38">
+    <!-- CEILING -->
+    <polygon points="0,0 360,0 360,70 0,70" fill="url(#ceilGrad)"/>
+    <!-- LEFT WALL -->
+    <polygon points="0,70 52,70 52,490 0,490" fill="#c9b899"/>
+    <polygon points="0,70 52,70 52,490 0,490" fill="rgba(0,0,0,0.08)"/>
+    <!-- RIGHT WALL -->
+    <polygon points="308,70 360,70 360,490 308,490" fill="#c4b390"/>
+    <polygon points="308,70 360,70 360,490 308,490" fill="rgba(0,0,0,0.05)"/>
+    <!-- BACK WALL -->
+    <rect x="52" y="70" width="256" height="420" fill="url(#wallGrad)"/>
+    <!-- FLOOR -->
+    <rect x="0" y="490" width="360" height="150" fill="url(#floorGrad)"/>
+  </g>
   <!-- Ceiling–wall join -->
-  <line x1="0" y1="70" x2="360" y2="70" stroke="#c9b899" stroke-width="2"/>
-
-  <!-- ── LEFT WALL (sliver) ─────────────────────────────── -->
-  <polygon points="0,70 52,70 52,490 0,490" fill="#c9b899"/>
-  <!-- Shadow on left wall -->
-  <polygon points="0,70 52,70 52,490 0,490" fill="rgba(0,0,0,0.08)"/>
-
-  <!-- ── RIGHT WALL (sliver) ────────────────────────────── -->
-  <polygon points="308,70 360,70 360,490 308,490" fill="#c4b390"/>
-  <polygon points="308,70 360,70 360,490 308,490" fill="rgba(0,0,0,0.05)"/>
-
-  <!-- ── BACK WALL ───────────────────────────────────────── -->
-  <rect x="52" y="70" width="256" height="420" fill="url(#wallGrad)"/>
-
-  <!-- ── FLOOR ───────────────────────────────────────────── -->
-  <rect x="0" y="490" width="360" height="150" fill="url(#floorGrad)"/>
+  <line x1="0" y1="70" x2="360" y2="70" stroke="#c9b899" stroke-width="2" opacity="0.5"/>
   <!-- Floorboard lines -->
   <line x1="0" y1="510" x2="360" y2="510" stroke="#a89870" stroke-width="1" opacity="0.4"/>
   <line x1="0" y1="535" x2="360" y2="535" stroke="#a89870" stroke-width="1" opacity="0.4"/>

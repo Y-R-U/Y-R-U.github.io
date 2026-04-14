@@ -19,7 +19,7 @@ const UNITS = {
     outsideScrollY: 0,
     microGame: "units/unit65.js",
     theme: "#4a6fa5",
-    char: { name: "???", portrait: "👤" },
+    char: { name: "???", portrait: "images/alex.png" },
     stats: { mood: 70, energy: 55, cash: 0 },
   },
   66: {
@@ -31,7 +31,7 @@ const UNITS = {
     microGame: "units/unit66.js",
     theme: "#c9a227",
     startsOutside: true,
-    char: { name: "???", portrait: "🧍" },
+    char: { name: "???", portrait: "images/char_66.png" },
     stats: { mood: 30, energy: 40, cash: 0 },
   },
   67: {
@@ -42,7 +42,7 @@ const UNITS = {
     outsideScrollY: 0,
     microGame: "units/unit67.js",
     theme: "#9b59b6",
-    char: { name: "???", portrait: "🧙" },
+    char: { name: "???", portrait: "images/char_67.png" },
     stats: { mood: 60, energy: 80, cash: 50 },
   },
   68: {
@@ -53,7 +53,7 @@ const UNITS = {
     outsideScrollY: 0,
     microGame: "units/unit68.js",
     theme: "#c0392b",
-    char: { name: "???", portrait: "😰" },
+    char: { name: "???", portrait: "images/char_68.png" },
     stats: { mood: 20, energy: 35, cash: 30 },
   },
   69: {
@@ -64,7 +64,7 @@ const UNITS = {
     outsideScrollY: 0,
     microGame: "units/unit69.js",
     theme: "#e91e8c",
-    char: { name: "???", portrait: "😏" },
+    char: { name: "???", portrait: "images/char_69.png" },
     stats: { mood: 90, energy: 70, cash: 200 },
   },
 };
@@ -161,7 +161,7 @@ function syncCharPanel(unit) {
   // Desktop left panel
   setIfExists("char-name", char.name);
   setIfExists("char-unit-tag", `${unit.name} · Floor ${unit.floor}`);
-  setIfExists("char-portrait", char.portrait);
+  setPortrait("char-portrait", char.portrait);
   setStatBar("stat-mood",   stats.mood);
   setStatBar("stat-energy", stats.energy);
   setCashBar("stat-cash",   stats.cash);
@@ -196,6 +196,16 @@ function setCashBar(id, val) {
 function setIfExists(id, val) {
   const el = document.getElementById(id);
   if (el) el.textContent = val;
+}
+
+function setPortrait(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val && (val.startsWith("images/") || val.startsWith("http") || val.endsWith(".png") || val.endsWith(".jpg") || val.endsWith(".webp"))) {
+    el.innerHTML = `<img src="${val}" alt="portrait" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+  } else {
+    el.textContent = val;
+  }
 }
 
 function fmtDate(d) {
