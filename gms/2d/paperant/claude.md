@@ -18,17 +18,12 @@ A top-down puzzle game where you draw pencil lines on paper to guide ants to goa
 - Star rating (1-3) based on speed of completion
 
 ## Levels
-10 levels with progressive difficulty:
-1. First Steps - single ant, single food
-2. Wrong Way - redirect ant
-3. Fork in the Road - obstacles create paths
-4. Double Treat - ordered goals (food then nest)
-5. Two Friends - multiple ants
-6. Speed Ant - fast ant with obstacles
-7. Water Hazard - many puddle obstacles
-8. Triple Threat - three ants, three goals
-9. The Maze - corridor navigation
-10. Grand Finale - multiple ants, ordered goals, obstacles
+50 levels with progressive difficulty:
+- **1-10 (Tutorial → Intro)**: First Steps, Wrong Way, Fork in the Road, Double Treat, Two Friends, Speed Ant, Water Hazard, Triple Threat, The Maze, Grand Finale
+- **11-20 (Intermediate)**: Crossroads, Zigzag, Pincer, The Detour, Narrow Gap, Three Course Meal, Scatter, Guard Duty, Race Against Time, The Chase
+- **21-30 (Advanced)**: Diamond Formation, Opposite Day, Ring of Fire, Forked Maze, The Workforce, Delivery Route, Wall Break, The Grid, Pinball, Speed Maze
+- **31-40 (Hard)**: Quadrant Quest, Choke Point, Double Helix, Seven Ants, Order of Operations, The Gauntlet, Congestion, Precision Drop, Ant Army, The Puzzle Box
+- **41-50 (Expert → Ultimate)**: Full House, The Grand Maze, Bullet Time, Ten Tasks, Last Stand, Labyrinth Lord, Chain Reaction, The Final Test, Puzzle Master, Ant Overlord
 
 ## File Structure
 ```
