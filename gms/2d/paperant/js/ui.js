@@ -181,13 +181,27 @@ const UI = (() => {
             timerEl.classList.remove('low-time');
         }
 
-        document.getElementById('ink-bar').style.width = (inkFrac * 100) + '%';
+        const bar = document.getElementById('ink-bar');
+        const container = document.getElementById('ink-bar-container');
+        bar.style.width = (inkFrac * 100) + '%';
 
         // Color ink bar based on level
-        const bar = document.getElementById('ink-bar');
         if (inkFrac < 0.2) bar.style.background = 'linear-gradient(90deg, #c44, #e66)';
         else if (inkFrac < 0.5) bar.style.background = 'linear-gradient(90deg, #c98a2e, #daa840)';
         else bar.style.background = 'linear-gradient(90deg, #3a5a9f, #5a7abf)';
+
+        // Empty class when ink is below the minimum needed to start a stroke
+        const inkAbsolute = inkFrac * CONFIG.INK_MAX;
+        if (container) container.classList.toggle('empty', inkAbsolute < CONFIG.INK_START_MIN);
+    }
+
+    function flashInkEmpty() {
+        const container = document.getElementById('ink-bar-container');
+        if (!container) return;
+        container.classList.remove('shake');
+        // Force reflow so the animation restarts even on rapid retries
+        void container.offsetWidth;
+        container.classList.add('shake');
     }
 
     function buildLevelGrid(levelStates, onSelect) {
@@ -278,7 +292,7 @@ const UI = (() => {
     }
 
     return {
-        init, showScreen, hideAllScreens, showHUD, updateHUD,
+        init, showScreen, hideAllScreens, showHUD, updateHUD, flashInkEmpty,
         buildLevelGrid, showLevelComplete, showLevelFailed, showGameComplete,
         isSettingsOpen, hideSettings, isQuitOpen, hideQuitConfirm,
     };

@@ -26,8 +26,10 @@ const CONFIG = {
     LINE_FADE_DURATION: 1.0, // seconds to fully fade
     INK_MAX: 100,
     INK_COST_PER_PIXEL: 0.15,
-    INK_REGEN_RATE: 8, // per second
+    INK_REGEN_RATE: 14, // per second
+    INK_START_MIN: 25, // minimum ink required to begin a new stroke
     MIN_DRAW_DIST: 4, // min distance between draw points
+    MAX_LINE_LENGTH: 900, // max canvas px per stroke (prevents drawing forever)
 
     // Goals
     GOAL_SIZE: 18,

@@ -16,26 +16,53 @@ const Drawing = (() => {
     function setDpr(d) { dpr = d; }
 
     function startStroke(pos) {
-        if (ink <= 1) return;
-        currentStroke = { points: [pos], createdAt: performance.now() / 1000 };
+        // Need a meaningful minimum ink to begin a stroke. Once started,
+        // the stroke runs until the user lifts or hits MAX_LINE_LENGTH —
+        // ink is no longer allowed to abort it mid-drag.
+        if (ink < CONFIG.INK_START_MIN) {
+            // Visible feedback so the player understands why nothing drew
+            if (typeof UI !== 'undefined' && UI.flashInkEmpty) UI.flashInkEmpty();
+            return;
+        }
+        const clamped = clampToPlayArea(pos);
+        currentStroke = {
+            points: [clamped],
+            createdAt: performance.now() / 1000,
+            lengthPx: 0,
+        };
         GameAudio.SFX.draw();
     }
 
     function addPoint(pos) {
-        if (!currentStroke || ink <= 0) return;
+        if (!currentStroke) return;
+        // Hard cap on stroke length so users can't draw forever
+        if (currentStroke.lengthPx >= CONFIG.MAX_LINE_LENGTH * dpr) return;
+
+        // Clamp the point to the play area instead of dropping it. Users
+        // commonly draw barriers right next to walls; rejecting any drift
+        // outside the area felt like the pen randomly stopped working.
+        const clamped = clampToPlayArea(pos);
+
         const last = currentStroke.points[currentStroke.points.length - 1];
-        const dist = Math.hypot(pos.x - last.x, pos.y - last.y);
+        const dist = Math.hypot(clamped.x - last.x, clamped.y - last.y);
         if (dist < CONFIG.MIN_DRAW_DIST * dpr) return;
 
-        // Check if point is in play area
-        const area = Renderer.getPlayArea();
-        if (pos.x < area.x || pos.x > area.x + area.w ||
-            pos.y < area.y || pos.y > area.y + area.h) return;
+        currentStroke.points.push(clamped);
+        currentStroke.lengthPx += dist;
 
-        currentStroke.points.push(pos);
-        ink -= dist * CONFIG.INK_COST_PER_PIXEL;
-        if (ink < 0) ink = 0;
+        // Deduct ink for visual feedback in the HUD; cap at 0 but DON'T
+        // abort the stroke when it hits zero. The MAX_LINE_LENGTH cap
+        // above is what prevents abuse.
+        ink = Math.max(0, ink - dist * CONFIG.INK_COST_PER_PIXEL);
         GameAudio.SFX.draw();
+    }
+
+    function clampToPlayArea(pos) {
+        const area = Renderer.getPlayArea();
+        return {
+            x: Math.max(area.x, Math.min(area.x + area.w, pos.x)),
+            y: Math.max(area.y, Math.min(area.y + area.h, pos.y)),
+        };
     }
 
     function endStroke() {

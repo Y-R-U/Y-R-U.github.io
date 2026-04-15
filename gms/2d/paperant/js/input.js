@@ -1,10 +1,16 @@
-/* input.js - Unified touch/mouse input handling */
+/* input.js - Unified pointer input handling (mouse + touch + pen)
+ *
+ * Uses Pointer Events with setPointerCapture so a stroke is locked to the
+ * originating pointer until release. This fixes:
+ *  - touchcancel (browser gesture interception) ending strokes mid-drag
+ *  - second finger taps orphaning the in-progress stroke
+ *  - mouseleave ending the stroke when the cursor crosses the canvas edge
+ */
 'use strict';
 
 const Input = (() => {
     let canvas = null;
-    let isDown = false;
-    let points = []; // current stroke points
+    let activePointerId = null;
     let onStrokeStart = null;
     let onStrokeMove = null;
     let onStrokeEnd = null;
@@ -14,62 +20,50 @@ const Input = (() => {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        let clientX, clientY;
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else if (e.changedTouches && e.changedTouches.length > 0) {
-            clientX = e.changedTouches[0].clientX;
-            clientY = e.changedTouches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
         return {
-            x: (clientX - rect.left) * scaleX,
-            y: (clientY - rect.top) * scaleY,
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY,
         };
     }
 
     function handleStart(e) {
         if (!enabled) return;
-        // Don't capture if it started on a UI element
+        // Ignore if a pointer is already drawing (don't let a second finger hijack)
+        if (activePointerId !== null) return;
+        // Don't start strokes that originate on UI elements
         if (e.target !== canvas) return;
         e.preventDefault();
-        isDown = true;
+        activePointerId = e.pointerId;
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
         const pos = getPos(e);
-        points = [pos];
         if (onStrokeStart) onStrokeStart(pos);
     }
 
     function handleMove(e) {
-        if (!enabled || !isDown) return;
+        if (!enabled) return;
+        if (e.pointerId !== activePointerId) return;
         e.preventDefault();
         const pos = getPos(e);
-        points.push(pos);
-        if (onStrokeMove) onStrokeMove(pos, points);
+        if (onStrokeMove) onStrokeMove(pos);
     }
 
     function handleEnd(e) {
-        if (!enabled || !isDown) return;
+        if (!enabled) return;
+        if (e.pointerId !== activePointerId) return;
         e.preventDefault();
-        isDown = false;
-        if (onStrokeEnd) onStrokeEnd([...points]);
-        points = [];
+        try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+        activePointerId = null;
+        if (onStrokeEnd) onStrokeEnd();
     }
 
     function init(canvasEl) {
         canvas = canvasEl;
-        // Touch
-        canvas.addEventListener('touchstart', handleStart, { passive: false });
-        canvas.addEventListener('touchmove', handleMove, { passive: false });
-        canvas.addEventListener('touchend', handleEnd, { passive: false });
-        canvas.addEventListener('touchcancel', handleEnd, { passive: false });
-        // Mouse
-        canvas.addEventListener('mousedown', handleStart);
-        canvas.addEventListener('mousemove', handleMove);
-        canvas.addEventListener('mouseup', handleEnd);
-        canvas.addEventListener('mouseleave', handleEnd);
+        canvas.addEventListener('pointerdown', handleStart);
+        canvas.addEventListener('pointermove', handleMove);
+        canvas.addEventListener('pointerup', handleEnd);
+        canvas.addEventListener('pointercancel', handleEnd);
+        // Prevent context menu on long-press
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 
     function setCallbacks(start, move, end) {
@@ -79,7 +73,16 @@ const Input = (() => {
     }
 
     function enable() { enabled = true; }
-    function disable() { enabled = false; isDown = false; points = []; }
+    function disable() {
+        enabled = false;
+        if (activePointerId !== null) {
+            try { canvas.releasePointerCapture(activePointerId); } catch (e) {}
+            activePointerId = null;
+        }
+    }
 
-    return { init, setCallbacks, enable, disable, get isDrawing() { return isDown; } };
+    return {
+        init, setCallbacks, enable, disable,
+        get isDrawing() { return activePointerId !== null; },
+    };
 })();
