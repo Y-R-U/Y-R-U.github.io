@@ -17,7 +17,6 @@ const CONFIG = {
     ANT_WANDER_STRENGTH: 0.3, // max wander angle delta
     ANT_WALL_DETECT: 20,
     ANT_BOUNCE_RANDOMNESS: 0.15, // radians of randomness on reflection (small)
-    ANT_STUCK_THRESHOLD: 5, // frames stuck in same spot before forced nudge
     ANT_BOUNCE_COOLDOWN: 0.12, // seconds between line bounces
 
     // Drawing / Pencil

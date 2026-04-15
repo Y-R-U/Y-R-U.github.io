@@ -142,22 +142,34 @@ const AntSystem = (() => {
             walkCycle: Math.random() * Math.PI * 2,
             sfxCooldown: 0,
             reachedGoals: [],
-            // Anti-stuck tracking
-            prevX: pos.x,
-            prevY: pos.y,
-            stuckFrames: 0,
+            // Anti-stuck tracking (rolling net-displacement window)
+            stuckTimer: 0,
+            stuckCheckX: pos.x,
+            stuckCheckY: pos.y,
         };
     }
 
     // === PHYSICS ===
 
     /**
-     * Bounce angle for walls/obstacles: standard reflection with small jitter.
+     * Reflect a velocity-direction angle across a surface with the given
+     * outward normal. Uses the vector formula v' = v - 2(v·n)n, which is
+     * the correct reflection; the previous `2*normal - angle` version
+     * reflected across the TANGENT, which leaves the ant heading back
+     * into the wall and causes wiggle-stuck behavior.
      */
     function reflectAngle(inAngle, normalAngle) {
-        const reflected = 2 * normalAngle - inAngle;
+        const vx = Math.cos(inAngle);
+        const vy = Math.sin(inAngle);
+        const nx = Math.cos(normalAngle);
+        const ny = Math.sin(normalAngle);
+        const dot = vx * nx + vy * ny;
+        // Only reflect if actually heading into the surface
+        if (dot >= 0) return inAngle;
+        const rx = vx - 2 * dot * nx;
+        const ry = vy - 2 * dot * ny;
         const jitter = (Math.random() - 0.5) * 0.3;
-        return reflected + jitter;
+        return Math.atan2(ry, rx) + jitter;
     }
 
     /**
@@ -352,20 +364,33 @@ const AntSystem = (() => {
         ant.cx = nx;
         ant.cy = ny;
 
-        // Anti-stuck detection
-        const movedDist = Math.hypot(ant.cx - ant.prevX, ant.cy - ant.prevY);
-        if (movedDist < 0.5 * dpr) {
-            ant.stuckFrames++;
-            if (ant.stuckFrames > CONFIG.ANT_STUCK_THRESHOLD) {
-                // Force a random direction change to escape
-                ant.angle += Math.PI * (0.5 + Math.random() * 0.5);
-                ant.stuckFrames = 0;
+        // Anti-stuck detection: check net displacement over a rolling window.
+        // Per-frame checks miss "wiggle stuck" (jitter moves ant a few px each
+        // frame while it's pinned against a wall/line). Instead compare the
+        // ant's position every ~0.4s against where it was at the last check.
+        ant.stuckTimer += dt;
+        if (ant.stuckTimer >= 0.4) {
+            const netMoved = Math.hypot(ant.cx - ant.stuckCheckX, ant.cy - ant.stuckCheckY);
+            // Expected travel at this speed over 0.4s @ ~60fps is speed*24 px.
+            // Anything below ~25% of that is "stuck".
+            if (netMoved < ant.speed * 6) {
+                // Escape: aim toward center of play area and teleport a bit.
+                const centerX = area.x + area.w / 2;
+                const centerY = area.y + area.h / 2;
+                const toCenter = Math.atan2(centerY - ant.cy, centerX - ant.cx);
+                ant.angle = toCenter + (Math.random() - 0.5) * 0.6;
+                const jumpDist = size * 1.5;
+                ant.cx += Math.cos(toCenter) * jumpDist;
+                ant.cy += Math.sin(toCenter) * jumpDist;
+                // Re-clamp after teleport
+                ant.cx = Math.max(area.x + margin, Math.min(area.x + area.w - margin, ant.cx));
+                ant.cy = Math.max(area.y + margin, Math.min(area.y + area.h - margin, ant.cy));
+                ant.wanderAngle = 0;
             }
-        } else {
-            ant.stuckFrames = 0;
+            ant.stuckTimer = 0;
+            ant.stuckCheckX = ant.cx;
+            ant.stuckCheckY = ant.cy;
         }
-        ant.prevX = ant.cx;
-        ant.prevY = ant.cy;
 
         if (bounced) {
             ant.wanderAngle = 0;
