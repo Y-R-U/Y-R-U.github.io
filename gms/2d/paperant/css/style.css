@@ -305,21 +305,28 @@ html, body {
 .ink-meter svg {
     width: 22px; height: 22px;
     color: #4a3c2e;
+    flex-shrink: 0;
 }
 #ink-bar-container {
+    /* MUST be inline-block (or block) — span default is `inline`, which
+       silently ignores width/height. The bar appeared as 0×0 for ages. */
+    display: inline-block;
     width: 110px; height: 16px;
-    background: #d4c9a8;
+    background: #e8dcc0;
     border-radius: 8px;
-    border: 2px solid #8b7355;
+    border: 2px solid #6b5a48;
     overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
     position: relative;
+    vertical-align: middle;
 }
 #ink-bar {
+    /* Same reason: the inner span needs an explicit display so its
+       width/height take effect. Without this the black bar was invisible. */
+    display: block;
     width: 100%; height: 100%;
-    background: linear-gradient(90deg, #3a5a9f, #5a7abf);
-    border-radius: 6px;
-    transition: width 0.12s ease, background 0.2s ease;
+    background: linear-gradient(180deg, #3a2c20 0%, #1a0e08 50%, #3a2c20 100%);
+    transition: width 0.1s linear, background 0.2s ease;
 }
 /* Empty state — pulses red so the player knows why drawing won't start */
 #ink-bar-container.empty {
@@ -327,8 +334,8 @@ html, body {
     animation: inkEmptyPulse 0.7s ease-in-out infinite alternate;
 }
 @keyframes inkEmptyPulse {
-    from { box-shadow: inset 0 1px 2px rgba(0,0,0,0.15), 0 0 0 0 rgba(204,51,51,0.0); }
-    to   { box-shadow: inset 0 1px 2px rgba(0,0,0,0.15), 0 0 6px 2px rgba(204,51,51,0.6); }
+    from { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 0 0 rgba(204,51,51,0.0); }
+    to   { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 6px 2px rgba(204,51,51,0.6); }
 }
 /* Quick shake when the player tries to start a stroke without enough ink */
 #ink-bar-container.shake { animation: inkShake 0.35s ease; }
@@ -339,7 +346,6 @@ html, body {
     60% { transform: translateX(-3px); }
     80% { transform: translateX(3px); }
 }
-
 /* === Stars === */
 .stars {
     font-size: 2.5rem;

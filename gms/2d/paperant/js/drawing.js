@@ -16,9 +16,9 @@ const Drawing = (() => {
     function setDpr(d) { dpr = d; }
 
     function startStroke(pos) {
-        // Need a meaningful minimum ink to begin a stroke. Once started,
-        // the stroke runs until the user lifts or hits MAX_LINE_LENGTH —
-        // ink is no longer allowed to abort it mid-drag.
+        // Need a meaningful minimum ink (in seconds) to begin. Once started,
+        // the stroke runs until the user lifts OR ink hits zero (handled in
+        // update()) — the line is never silently halted mid-drag.
         if (ink < CONFIG.INK_START_MIN) {
             // Visible feedback so the player understands why nothing drew
             if (typeof UI !== 'undefined' && UI.flashInkEmpty) UI.flashInkEmpty();
@@ -28,15 +28,12 @@ const Drawing = (() => {
         currentStroke = {
             points: [clamped],
             createdAt: performance.now() / 1000,
-            lengthPx: 0,
         };
         GameAudio.SFX.draw();
     }
 
     function addPoint(pos) {
         if (!currentStroke) return;
-        // Hard cap on stroke length so users can't draw forever
-        if (currentStroke.lengthPx >= CONFIG.MAX_LINE_LENGTH * dpr) return;
 
         // Clamp the point to the play area instead of dropping it. Users
         // commonly draw barriers right next to walls; rejecting any drift
@@ -48,12 +45,6 @@ const Drawing = (() => {
         if (dist < CONFIG.MIN_DRAW_DIST * dpr) return;
 
         currentStroke.points.push(clamped);
-        currentStroke.lengthPx += dist;
-
-        // Deduct ink for visual feedback in the HUD; cap at 0 but DON'T
-        // abort the stroke when it hits zero. The MAX_LINE_LENGTH cap
-        // above is what prevents abuse.
-        ink = Math.max(0, ink - dist * CONFIG.INK_COST_PER_PIXEL);
         GameAudio.SFX.draw();
     }
 
@@ -76,8 +67,18 @@ const Drawing = (() => {
     }
 
     function update(dt, now) {
-        // Regen ink
-        if (!Input.isDrawing) {
+        // Time-based ink: drain while a stroke is active, regen while idle.
+        // When ink hits zero mid-stroke, force-end the stroke so the user
+        // sees a clear "pen ran dry" — they must lift and wait for regen.
+        if (currentStroke) {
+            ink -= dt;
+            if (ink <= 0) {
+                ink = 0;
+                endStroke();
+            }
+        } else if (!Input.isDrawing) {
+            // Only regen once the user has actually lifted. If their finger
+            // is still down after the stroke auto-ended, no regen until lift.
             ink = Math.min(CONFIG.INK_MAX, ink + CONFIG.INK_REGEN_RATE * dt);
         }
 

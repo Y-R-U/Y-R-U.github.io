@@ -24,12 +24,15 @@ const CONFIG = {
     PENCIL_WIDTH: 4,
     LINE_FADE_TIME: 3.5, // seconds before line starts fading
     LINE_FADE_DURATION: 1.0, // seconds to fully fade
-    INK_MAX: 100,
-    INK_COST_PER_PIXEL: 0.15,
-    INK_REGEN_RATE: 14, // per second
-    INK_START_MIN: 25, // minimum ink required to begin a new stroke
-    MIN_DRAW_DIST: 4, // min distance between draw points
-    MAX_LINE_LENGTH: 900, // max canvas px per stroke (prevents drawing forever)
+    // Ink is now TIME-based (in seconds of drawing) instead of pixel-based.
+    // This makes it consistent across DPI / screen sizes — drawing for 1 real
+    // second always uses 1 second of ink, regardless of how far the finger
+    // moved. Drawing fast covers more distance per second of ink (messier),
+    // drawing slow covers less (more accurate). Natural skill trade-off.
+    INK_MAX: 2.5,        // max seconds of continuous drawing time
+    INK_REGEN_RATE: 1.0, // seconds of ink regenerated per real second when not drawing
+    INK_START_MIN: 0.5,  // minimum ink (seconds) required to begin a new stroke
+    MIN_DRAW_DIST: 4,    // min distance between draw points (canvas px)
 
     // Goals
     GOAL_SIZE: 18,
