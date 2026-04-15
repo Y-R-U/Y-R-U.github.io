@@ -2,8 +2,14 @@
 'use strict';
 
 const UI = (() => {
+    const LEVELS_PER_PAGE = 10;
     const screens = {};
     let currentScreen = null;
+
+    // Pagination state for level-select grid
+    let levelPage = 0;
+    let levelGridStates = [];
+    let levelGridOnSelect = null;
 
     // Callbacks set by main.js
     let onPlayClick = null;
@@ -32,6 +38,21 @@ const UI = (() => {
         bindBtn('how-to-play-btn', () => { GameAudio.SFX.buttonClick(); showScreen('how-to-play-screen'); });
         bindBtn('how-to-play-back', () => { GameAudio.SFX.buttonClick(); showScreen('title-screen'); });
         bindBtn('level-select-back', () => { GameAudio.SFX.buttonClick(); onBackToTitle?.(); });
+        bindBtn('level-prev-btn', () => {
+            if (levelPage > 0) {
+                GameAudio.SFX.buttonClick();
+                levelPage--;
+                renderLevelPage();
+            }
+        });
+        bindBtn('level-next-btn', () => {
+            const totalPages = Math.max(1, Math.ceil(LEVELS.length / LEVELS_PER_PAGE));
+            if (levelPage < totalPages - 1) {
+                GameAudio.SFX.buttonClick();
+                levelPage++;
+                renderLevelPage();
+            }
+        });
         bindBtn('complete-next-btn', () => { GameAudio.SFX.buttonClick(); onNextLevel?.(); });
         bindBtn('complete-levels-btn', () => { GameAudio.SFX.buttonClick(); onBackToLevels?.(); });
         bindBtn('failed-retry-btn', () => { GameAudio.SFX.buttonClick(); onRetryLevel?.(); });
@@ -170,19 +191,39 @@ const UI = (() => {
     }
 
     function buildLevelGrid(levelStates, onSelect) {
+        levelGridStates = levelStates;
+        levelGridOnSelect = onSelect;
+
+        // Jump to the page containing the 'current' level (or first unlocked-not-completed)
+        const totalPages = Math.max(1, Math.ceil(LEVELS.length / LEVELS_PER_PAGE));
+        let focusIdx = levelStates.findIndex(s => s && s.current);
+        if (focusIdx < 0) focusIdx = levelStates.findIndex(s => s && s.unlocked && !s.completed);
+        if (focusIdx < 0) focusIdx = 0;
+        levelPage = Math.min(totalPages - 1, Math.floor(focusIdx / LEVELS_PER_PAGE));
+
+        renderLevelPage();
+    }
+
+    function renderLevelPage() {
         const grid = document.getElementById('level-grid');
+        if (!grid) return;
         grid.innerHTML = '';
-        for (let i = 0; i < LEVELS.length; i++) {
+
+        const totalPages = Math.max(1, Math.ceil(LEVELS.length / LEVELS_PER_PAGE));
+        const start = levelPage * LEVELS_PER_PAGE;
+        const end = Math.min(LEVELS.length, start + LEVELS_PER_PAGE);
+
+        for (let i = start; i < end; i++) {
             const btn = document.createElement('button');
             btn.className = 'level-btn';
-            const state = levelStates[i] || {};
+            const state = levelGridStates[i] || {};
 
             if (state.unlocked) {
                 btn.innerHTML = `<span>${i + 1}</span><span class="level-stars">${starsHTML(state.stars || 0)}</span>`;
                 if (state.current) btn.classList.add('current');
                 btn.addEventListener('click', () => {
                     GameAudio.SFX.buttonClick();
-                    onSelect(i);
+                    levelGridOnSelect?.(i);
                 });
             } else {
                 btn.classList.add('locked');
@@ -190,6 +231,14 @@ const UI = (() => {
             }
             grid.appendChild(btn);
         }
+
+        // Update pager controls
+        const label = document.getElementById('level-page-label');
+        if (label) label.textContent = `${levelPage + 1} / ${totalPages}`;
+        const prevBtn = document.getElementById('level-prev-btn');
+        const nextBtn = document.getElementById('level-next-btn');
+        if (prevBtn) prevBtn.disabled = levelPage === 0;
+        if (nextBtn) nextBtn.disabled = levelPage >= totalPages - 1;
     }
 
     function starsHTML(count) {
