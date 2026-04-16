@@ -473,11 +473,22 @@ html, body {
   border-radius: 3px;
 }
 
+/* Sill ledge below window */
+#zone-window::after {
+  content: "";
+  position: absolute;
+  bottom: -6px; left: -4%; right: -4%;
+  height: 6px;
+  background: linear-gradient(to bottom, #a08060, #8a6a48);
+  border-radius: 0 0 2px 2px;
+  z-index: 4;
+  pointer-events: none;
+}
+
 #room-win-thumb {
   position: absolute; inset: 0;
   background-image: url('images/outside_day.png');
-  background-size: 2400px auto;
-  background-position-y: 30%;
+  background-size: cover;
   background-repeat: no-repeat;
 }
 
@@ -508,20 +519,20 @@ html, body {
 
 /* ── CALENDAR zone ───────────────────────────────────────── */
 #zone-calendar {
-  left: 15.5%; top: 15.3%;
-  width: 11.5%; height: 8.6%;
+  left: 14%; top: 14%;
+  width: 13%; height: 10%;
 }
 
 /* ── BED zone (wall icon) ────────────────────────────────── */
 #zone-bed {
-  left: 15.5%; top: 25.5%;
-  width: 11.5%; height: 6%;
+  left: 14%; top: 26%;
+  width: 13%; height: 7.5%;
 }
 
 /* ── COMPUTER zone ───────────────────────────────────────── */
 #zone-computer {
-  left: 60%; top: 50%;
-  width: 30%; height: 13%;
+  left: 62%; top: 50%;
+  width: 26%; height: 12%;
 }
 
 /* ── Room number tag ─────────────────────────────────────── */
@@ -558,7 +569,6 @@ html, body {
 #outside-container {
   position: absolute;
   transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
-  /* outside.svg is 2400×400 — we scale height to fill the viewport */
   width: 2400px;
   height: 100%;
 }

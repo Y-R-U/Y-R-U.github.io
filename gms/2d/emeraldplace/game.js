@@ -123,10 +123,13 @@ function showRoom() {
   // Per-unit background image
   document.getElementById("room-scene").style.backgroundImage =
     `url('images/unit${State.currentUnit}_bg.png')`;
-  // Window thumbnail: show outside panorama at this unit's horizontal offset
+  // Window thumbnail: show outside panorama at this unit's horizontal offset.
+  // outsideScrollX is in a 2400px conceptual space; convert to a percentage
+  // for use with background-size:cover so it scales with the element.
   const thumb = document.getElementById("room-win-thumb");
   if (thumb) {
-    thumb.style.backgroundPositionX = `-${unit.outsideScrollX}px`;
+    const pct = (unit.outsideScrollX / 2400) * 100;
+    thumb.style.backgroundPosition = `${pct}% 30%`;
   }
   // Room number tag
   const tag = document.getElementById("room-number-display");
