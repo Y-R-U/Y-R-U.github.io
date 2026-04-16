@@ -119,6 +119,18 @@ function applyView() {
 
 function showRoom() {
   document.getElementById("room-view").classList.remove("hidden");
+  const unit = UNITS[State.currentUnit];
+  // Per-unit background image
+  document.getElementById("room-scene").style.backgroundImage =
+    `url('images/unit${State.currentUnit}_bg.png')`;
+  // Window thumbnail: show outside panorama at this unit's horizontal offset
+  const thumb = document.getElementById("room-win-thumb");
+  if (thumb) {
+    thumb.style.backgroundPositionX = `-${unit.outsideScrollX}px`;
+  }
+  // Room number tag
+  const tag = document.getElementById("room-number-display");
+  if (tag) tag.textContent = `UNIT ${State.currentUnit}`;
 }
 
 function showWindow() {
@@ -212,66 +224,29 @@ function fmtDate(d) {
   return d.toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" });
 }
 
-// ─── Room Click Zones ─────────────────────────────────────────
-// Coords in room.svg portrait viewBox (360 × 640)
+// ─── Room Click Zones ────────────────────────────────────────
+// DOM-based — each zone is a .room-zone div with data-action
 
-const CLICK_ZONES = [
-  {
-    id: "window",
-    label: "Look outside",
-    x: 108, y: 88, w: 152, h: 200,
-    action: () => setView("window"),
-  },
-  {
-    id: "laptop",
-    label: "Use laptop",
-    x: 218, y: 335, w: 130, h: 80,
-    action: () => setView("laptop"),
-  },
-  {
-    id: "bed",
-    label: "Sleep",
-    x: 0, y: 425, w: 165, h: 215,
-    action: () => setView("sleep"),
-  },
-  {
-    id: "calendar",
-    label: "Check calendar",
-    x: 56, y: 95, w: 50, h: 80,
-    action: () => showCalendarOverlay(),
-  },
-];
+const ZONE_LABELS = {
+  window:   "Look outside",
+  calendar: "Check calendar",
+  sleep:    "Sleep",
+  laptop:   "Use computer",
+};
 
 function initRoomClicks() {
-  const roomEl = document.getElementById("room-view");
-
-  roomEl.addEventListener("click", (e) => {
-    if (State.view !== "room") return;
-    const [svgX, svgY] = toSVGCoords(e, roomEl, 360, 640);
-    for (const zone of CLICK_ZONES) {
-      if (inZone(svgX, svgY, zone)) {
-        showClickFeedback(e.clientX, e.clientY, zone.label);
-        zone.action();
-        return;
-      }
-    }
+  document.querySelectorAll(".room-zone").forEach(zone => {
+    zone.addEventListener("click", (e) => {
+      if (State.view !== "room") return;
+      const action = zone.dataset.action;
+      const label = ZONE_LABELS[action] ?? action;
+      showClickFeedback(e.clientX, e.clientY, label);
+      if (action === "window")   setView("window");
+      else if (action === "calendar") showCalendarOverlay();
+      else if (action === "laptop")   setView("laptop");
+      else if (action === "sleep")    setView("sleep");
+    });
   });
-
-  roomEl.addEventListener("mousemove", (e) => {
-    if (State.view !== "room") return;
-    const [svgX, svgY] = toSVGCoords(e, roomEl, 360, 640);
-    const hit = CLICK_ZONES.some(z => inZone(svgX, svgY, z));
-    roomEl.style.cursor = hit ? "pointer" : "default";
-  });
-}
-
-function toSVGCoords(e, el, svgW, svgH) {
-  const r = el.getBoundingClientRect();
-  return [(e.clientX - r.left) * (svgW / r.width), (e.clientY - r.top) * (svgH / r.height)];
-}
-
-function inZone(x, y, z) {
-  return x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h;
 }
 
 // ─── Micro-Game Loader ───────────────────────────────────────
