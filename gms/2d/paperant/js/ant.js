@@ -230,8 +230,8 @@ const AntSystem = (() => {
         // Walk cycle animation
         ant.walkCycle += ant.speed * 0.5;
 
-        // Ramp up speed
-        ant.speed += (ant.targetSpeed - ant.speed) * 0.05;
+        // Ramp up speed (frame-rate independent)
+        ant.speed += (ant.targetSpeed - ant.speed) * (1 - Math.pow(0.95, dt * 60));
 
         // Gentle wandering - framerate-independent
         if (Math.random() < CONFIG.ANT_WANDER_CHANGE * dt * 60) {
@@ -240,9 +240,11 @@ const AntSystem = (() => {
         ant.wanderAngle *= Math.pow(0.97, dt * 60);
         ant.angle += ant.wanderAngle * dt;
 
-        // Move forward
-        const vx = Math.cos(ant.angle) * ant.speed;
-        const vy = Math.sin(ant.angle) * ant.speed;
+        // Move forward (dt * 60 keeps speed values tuned for 60 fps while
+        // making movement frame-rate independent — fixes ants speeding up on
+        // high-refresh-rate displays, e.g. 120 Hz ProMotion when touching)
+        const vx = Math.cos(ant.angle) * ant.speed * dt * 60;
+        const vy = Math.sin(ant.angle) * ant.speed * dt * 60;
         let nx = ant.cx + vx;
         let ny = ant.cy + vy;
 

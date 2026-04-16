@@ -29,8 +29,8 @@ const CONFIG = {
     // second always uses 1 second of ink, regardless of how far the finger
     // moved. Drawing fast covers more distance per second of ink (messier),
     // drawing slow covers less (more accurate). Natural skill trade-off.
-    INK_MAX: 2.5,        // max seconds of continuous drawing time
-    INK_REGEN_RATE: 1.0, // seconds of ink regenerated per real second when not drawing
+    INK_MAX: 1.25,       // max seconds of continuous drawing time
+    INK_REGEN_RATE: 0.5, // seconds of ink regenerated per real second when not drawing
     INK_START_MIN: 0.5,  // minimum ink (seconds) required to begin a new stroke
     MIN_DRAW_DIST: 4,    // min distance between draw points (canvas px)
 
