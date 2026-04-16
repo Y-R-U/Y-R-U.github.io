@@ -43,9 +43,13 @@ const Renderer = (() => {
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
         // Play area inside margins
-        const mx = Math.round(w * CONFIG.PAPER_MARGIN_X);
+        // Left margin is the red ruled-paper margin; right side extends
+        // almost to the screen edge so the ant doesn't appear to hit an
+        // invisible wall.
+        const mxLeft = Math.round(w * CONFIG.PAPER_MARGIN_X);
+        const mxRight = Math.round(8 * dpr); // small gutter only
         const topPad = Math.round(52 * dpr);
-        playArea = { x: mx, y: topPad, w: w - mx * 2, h: h - topPad - Math.round(16 * dpr) };
+        playArea = { x: mxLeft, y: topPad, w: w - mxLeft - mxRight, h: h - topPad - Math.round(16 * dpr) };
         // Invalidate paper cache on resize
         paperCache = null;
     }
