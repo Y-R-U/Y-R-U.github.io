@@ -9,6 +9,15 @@ import { resetFrog } from './frog.js';
 const GROUND_Y = H - 60;
 export { GROUND_Y };
 
+function makePlatform(x, y, w) {
+  const dirt = [];
+  const count = Math.floor(w / 15);
+  for (let i = 0; i < count; i++) {
+    dirt.push({ dx: Math.random() * w, dy: 12 + Math.random() * 20, dw: 2 + Math.random() * 3 });
+  }
+  return { x, y, w, dirt };
+}
+
 export function generateLevel(lvl) {
   world.anchors = [];
   world.collectibles = [];
@@ -22,10 +31,10 @@ export function generateLevel(lvl) {
   let gx = 0;
   while (gx < world.levelWidth + 200) {
     const pw = 100 + Math.random() * 200;
-    world.platforms.push({ x: gx, y: GROUND_Y, w: pw });
+    world.platforms.push(makePlatform(gx, GROUND_Y, pw));
     gx += pw + (Math.random() < 0.3 + difficulty * 0.02 ? 80 + Math.random() * 60 : 0);
   }
-  world.platforms.unshift({ x: 0, y: GROUND_Y, w: 200 });
+  world.platforms.unshift(makePlatform(0, GROUND_Y, 200));
 
   // Swing anchors
   let ax = 250;

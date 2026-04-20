@@ -32,14 +32,26 @@ window.addEventListener('resize', resizeCanvas);
 initInput(canvas);
 
 let lastTime = 0;
+let paused = false;
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    paused = true;
+  } else {
+    paused = false;
+    lastTime = 0;
+  }
+});
 
 function gameLoop(timestamp) {
   if (!lastTime) lastTime = timestamp;
   const dt = Math.min((timestamp - lastTime) / 1000, 0.05);
   lastTime = timestamp;
 
-  update(dt);
-  tickShake(dt);
+  if (!paused) {
+    update(dt);
+    tickShake(dt);
+  }
   draw();
 
   requestAnimationFrame(gameLoop);

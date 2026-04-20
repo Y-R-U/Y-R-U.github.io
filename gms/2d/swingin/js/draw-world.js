@@ -71,10 +71,8 @@ export function drawGround(ctx) {
     }
 
     ctx.fillStyle = '#7a5c12';
-    for (let i = 0; i < p.w / 15; i++) {
-      const dx = sx + Math.random() * p.w;
-      const dy = sy + 12 + Math.random() * 20;
-      ctx.fillRect(dx, dy, 2 + Math.random() * 3, 1);
+    if (p.dirt) {
+      for (const d of p.dirt) ctx.fillRect(sx + d.dx, sy + d.dy, d.dw, 1);
     }
   }
 }

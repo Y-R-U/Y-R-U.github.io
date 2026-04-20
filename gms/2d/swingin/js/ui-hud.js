@@ -40,9 +40,15 @@ export function drawHUD(ctx) {
 
   // Controls hint
   if (game.timer > timerMax - 3 && game.level <= 2) {
+    const isTouch = (typeof window !== 'undefined') &&
+      ('ontouchstart' in window || (navigator.maxTouchPoints | 0) > 0);
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Click to shoot tongue \u2022 Release to let go', W / 2, H - 20);
+    ctx.fillText(
+      isTouch
+        ? 'Tap to shoot tongue \u2022 Tap again to let go'
+        : 'Click to shoot tongue \u2022 Release to let go',
+      W / 2, H - 20);
   }
 }

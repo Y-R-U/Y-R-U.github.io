@@ -37,11 +37,12 @@ export function spawnCelebration(x, y) {
 }
 
 export function updateParticles(dt) {
+  const step = dt * 60;
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.1;
+    p.x += p.vx * step;
+    p.y += p.vy * step;
+    p.vy += 0.1 * step;
     p.life -= dt / p.maxLife;
     if (p.life <= 0) particles.splice(i, 1);
   }

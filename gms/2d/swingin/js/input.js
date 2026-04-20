@@ -20,6 +20,7 @@ export function initInput(canvas) {
     };
   }
 
+  // --- Mouse (desktop) ---
   canvas.addEventListener('mousemove', e => {
     const p = getScreenPos(e);
     mouse.x = p.x;
@@ -37,13 +38,16 @@ export function initInput(canvas) {
     handleRelease();
   });
 
+  // --- Touch (mobile) ---
+  // UI screens fire on touchstart for responsiveness. In-game shoot fires on
+  // touchend so the player can drag to preview aim before committing.
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     const p = getScreenPos(e.touches[0]);
     mouse.x = p.x;
     mouse.y = p.y;
     mouse.down = true;
-    handleClick();
+    if (game.state !== 'playing') handleClick();
   }, { passive: false });
 
   canvas.addEventListener('touchmove', e => {
@@ -56,7 +60,10 @@ export function initInput(canvas) {
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
     mouse.down = false;
-    handleRelease();
+    if (game.state === 'playing' && !frog.dead) {
+      if (frog.swinging) releaseTongue();
+      else shootTongue();
+    }
   }, { passive: false });
 }
 

@@ -11,6 +11,8 @@ export function update(dt) {
   if (game.state !== 'playing') return;
   if (frog.dead) return;
 
+  const step = dt * 60;
+
   // Timer
   game.timer -= dt;
   if (game.timer <= 0) {
@@ -23,8 +25,7 @@ export function update(dt) {
 
   // Tongue shooting animation
   if (frog.tongue && frog.tongue.shooting) {
-    const spd = getEffective('tongueSpeed') * dt * 60;
-    frog.tongue.progress += spd * 0.05;
+    frog.tongue.progress += getEffective('tongueSpeed') * dt * 3;
 
     if (frog.tongue.progress >= 1) {
       frog.tongue.shooting = false;
@@ -37,8 +38,9 @@ export function update(dt) {
       } else {
         const a = frog.tongue.anchor;
         a.used = true;
+        const bobY = a.y + Math.sin(Date.now() * 0.001 * a.bobSpeed + a.bobOffset) * a.bobAmount;
         const dx = frog.x - a.x;
-        const dy = frog.y - a.y;
+        const dy = frog.y - bobY;
         frog.tongue.length = Math.sqrt(dx * dx + dy * dy);
         frog.tongue.angle = Math.atan2(dx, -dy);
         const tangent = { x: -Math.cos(frog.tongue.angle), y: -Math.sin(frog.tongue.angle) };
@@ -65,12 +67,12 @@ export function update(dt) {
   }
 
   if (frog.swinging && frog.tongue) {
-    // Pendulum physics
+    // Pendulum physics — angVel/angle in per-frame units, scaled by step for dt-independence
     const t = frog.tongue;
     const gravityAng = (GRAVITY / t.length) * Math.sin(t.angle);
-    t.angVel += gravityAng;
-    t.angVel *= 0.998;
-    t.angle += t.angVel;
+    t.angVel += gravityAng * step;
+    t.angVel *= Math.pow(0.998, step);
+    t.angle += t.angVel * step;
 
     const anchorBobY = t.anchor.y + Math.sin(Date.now() * 0.001 * t.anchor.bobSpeed + t.anchor.bobOffset) * t.anchor.bobAmount;
     frog.x = t.anchor.x + Math.sin(t.angle) * t.length;
@@ -83,10 +85,10 @@ export function update(dt) {
     t.ty = anchorBobY;
   } else {
     // Free flight
-    frog.vy += GRAVITY;
-    frog.x += frog.vx;
-    frog.y += frog.vy;
-    frog.vx *= 0.999;
+    frog.vy += GRAVITY * step;
+    frog.x += frog.vx * step;
+    frog.y += frog.vy * step;
+    frog.vx *= Math.pow(0.999, step);
 
     // Ground collision
     for (const p of world.platforms) {
@@ -136,11 +138,11 @@ export function update(dt) {
   frog.eyeBlink -= dt;
   if (frog.eyeBlink <= 0) frog.eyeBlink = 2 + Math.random() * 4;
 
-  // Camera follow
+  // Camera follow (dt-independent exponential smoothing)
   const targetCamX = Math.max(0, frog.x - W * 0.35);
   const targetCamY = Math.max(0, Math.min(frog.y - H * 0.5, 100));
-  camera.x += (targetCamX - camera.x) * 0.08;
-  camera.y += (targetCamY - camera.y) * 0.05;
+  camera.x += (targetCamX - camera.x) * (1 - Math.pow(1 - 0.08, step));
+  camera.y += (targetCamY - camera.y) * (1 - Math.pow(1 - 0.05, step));
 
   updateParticles(dt);
 

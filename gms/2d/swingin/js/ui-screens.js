@@ -3,7 +3,7 @@
 // ============================================================
 
 import { W, H, UPGRADE_MAX, UPGRADE_COSTS, UPGRADE_NAMES, UPGRADE_DESCS } from './config.js';
-import { game, mouse, upgrades, getEffective, resetGame, world } from './state.js';
+import { game, mouse, upgrades, getEffective, resetGame } from './state.js';
 import { generateLevel } from './level.js';
 import { drawParticles } from './draw-particles.js';
 import { roundRect } from './draw-utils.js';
@@ -57,8 +57,8 @@ export function drawMenu(ctx) {
   // Buttons
   menuButtons = [];
 
-  const playBtn = makeButton(W / 2 - 100, 380, 200, 50);
-  drawButton(ctx, playBtn, 'PLAY', 'bold 24px sans-serif', true);
+  const playBtn = makeButton(W / 2 - 120, 370, 240, 66);
+  drawButton(ctx, playBtn, 'PLAY', 'bold 26px sans-serif', true);
   playBtn.action = () => {
     resetGame();
     if (!game.tutorialShown) {
@@ -71,7 +71,7 @@ export function drawMenu(ctx) {
   };
   menuButtons.push(playBtn);
 
-  const helpBtn = makeButton(W / 2 - 80, 445, 160, 40);
+  const helpBtn = makeButton(W / 2 - 100, 460, 200, 52);
   drawGhostButton(ctx, helpBtn, 'How to Play', '16px sans-serif');
   helpBtn.action = () => { game.state = 'tutorial'; };
   menuButtons.push(helpBtn);
@@ -159,11 +159,12 @@ export function drawTutorial(ctx) {
   // Mini diagram
   drawTutorialDiagram(ctx);
 
-  const btn = makeButton(W / 2 - 80, 520, 160, 45);
-  drawButton(ctx, btn, 'Got it!', 'bold 20px sans-serif', true);
+  const btn = makeButton(W / 2 - 110, 520, 220, 60);
+  drawButton(ctx, btn, 'Got it!', 'bold 22px sans-serif', true);
   btn.action = () => {
     game.tutorialShown = true;
-    if (game.level === 1 && !world.anchors.length) generateLevel(game.level);
+    resetGame();
+    generateLevel(1);
     game.state = 'playing';
   };
   tutorialButton = btn;
@@ -278,15 +279,15 @@ export function drawShop(ctx) {
     ctx.fillText(valText, W / 2 + 75, y + 55);
 
     if (!maxed) {
-      const btn = makeButton(W / 2 + 180, y + 10, 100, 45);
+      const btn = makeButton(W / 2 + 175, y + 5, 120, 56);
       const hover = isHover(btn);
       ctx.fillStyle = canAfford ? (hover ? '#6bcb77' : '#4a8c3f') : 'rgba(255,255,255,0.1)';
       roundRect(ctx, btn.x, btn.y, btn.w, btn.h, 8);
       ctx.fill();
       ctx.fillStyle = canAfford ? '#fff' : '#666';
-      ctx.font = 'bold 14px sans-serif';
+      ctx.font = 'bold 15px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('\u2b25 ' + cost, btn.x + btn.w / 2, btn.y + 28);
+      ctx.fillText('\u2b25 ' + cost, btn.x + btn.w / 2, btn.y + 34);
 
       if (canAfford) {
         btn.action = () => { game.coins -= cost; upgrades[key]++; };
@@ -296,12 +297,12 @@ export function drawShop(ctx) {
       ctx.fillStyle = '#6bcb77';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('MAX', W / 2 + 230, y + 38);
+      ctx.fillText('MAX', W / 2 + 235, y + 38);
     }
   }
 
-  const contBtn = makeButton(W / 2 - 100, H - 65, 200, 50);
-  drawButton(ctx, contBtn, 'Next Level \u25b6', 'bold 20px sans-serif', true);
+  const contBtn = makeButton(W / 2 - 130, H - 80, 260, 64);
+  drawButton(ctx, contBtn, 'Next Level \u25b6', 'bold 22px sans-serif', true);
   contBtn.action = () => { generateLevel(game.level); game.state = 'playing'; };
   shopButtons.push(contBtn);
 }
@@ -330,15 +331,15 @@ export function drawLevelComplete(ctx) {
 
   levelCompleteButtons = [];
 
-  const shopBtn = makeButton(W / 2 - 100, 360, 200, 50);
+  const shopBtn = makeButton(W / 2 - 130, 360, 260, 64);
   const shopHover = isHover(shopBtn);
   ctx.fillStyle = shopHover ? '#ffd93d' : '#e6b800';
   roundRect(ctx, shopBtn.x, shopBtn.y, shopBtn.w, shopBtn.h, 12);
   ctx.fill();
   ctx.fillStyle = '#222';
-  ctx.font = 'bold 20px sans-serif';
+  ctx.font = 'bold 22px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Upgrades', W / 2, shopBtn.y + 33);
+  ctx.fillText('Upgrades', W / 2, shopBtn.y + 41);
   shopBtn.action = () => {
     game.coins += timeBonus;
     game.totalCoins += timeBonus;
@@ -347,7 +348,7 @@ export function drawLevelComplete(ctx) {
   };
   levelCompleteButtons.push(shopBtn);
 
-  const skipBtn = makeButton(W / 2 - 80, 425, 160, 40);
+  const skipBtn = makeButton(W / 2 - 110, 440, 220, 52);
   drawGhostButton(ctx, skipBtn, 'Skip to next level', '16px sans-serif');
   skipBtn.action = () => {
     game.coins += timeBonus;
@@ -380,12 +381,12 @@ export function drawGameOver(ctx) {
 
   gameOverButtons = [];
 
-  const retryBtn = makeButton(W / 2 - 100, 420, 200, 50);
-  drawButton(ctx, retryBtn, 'Try Again', 'bold 22px sans-serif', true);
+  const retryBtn = makeButton(W / 2 - 130, 410, 260, 64);
+  drawButton(ctx, retryBtn, 'Try Again', 'bold 24px sans-serif', true);
   retryBtn.action = () => { generateLevel(game.level); game.state = 'playing'; };
   gameOverButtons.push(retryBtn);
 
-  const menuBtn = makeButton(W / 2 - 80, 485, 160, 40);
+  const menuBtn = makeButton(W / 2 - 110, 485, 220, 52);
   drawGhostButton(ctx, menuBtn, 'Main Menu', '16px sans-serif');
   menuBtn.action = () => { game.state = 'menu'; };
   gameOverButtons.push(menuBtn);

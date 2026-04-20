@@ -2,9 +2,13 @@
 //  FROG & TONGUE DRAWING
 // ============================================================
 
-import { W, FROG_W, FROG_H } from './config.js';
-import { camera, mouse, game, getEffective, world } from './state.js';
+import { FROG_W, FROG_H } from './config.js';
+import { camera, mouse, game, getEffective } from './state.js';
 import { frog } from './frog.js';
+import { findAimTarget } from './tongue.js';
+
+const IS_TOUCH = (typeof window !== 'undefined') &&
+  ('ontouchstart' in window || (navigator.maxTouchPoints | 0) > 0);
 
 export function drawFrogSprite(ctx) {
   const sx = frog.x - camera.x;
@@ -151,9 +155,9 @@ export function drawTongue(ctx) {
 
 export function drawAimLine(ctx) {
   if (game.state !== 'playing' || frog.dead || frog.swinging || (frog.tongue && frog.tongue.shooting)) return;
+  // On touch devices, only show aim while finger is down — otherwise it sits at a stale position.
+  if (IS_TOUCH && !mouse.down) return;
 
-  const worldMX = mouse.x + camera.x;
-  const worldMY = mouse.y + camera.y;
   const maxRange = getEffective('tongueLength');
   const sx = frog.x - camera.x;
   const sy = frog.y - camera.y;
@@ -166,67 +170,26 @@ export function drawAimLine(ctx) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  let bestAnchor = null;
-  let bestDist = Infinity;
+  const target = findAimTarget();
+  if (!target) return;
 
-  for (const a of world.anchors) {
-    const bobY = a.y + Math.sin(Date.now() * 0.001 * a.bobSpeed + a.bobOffset) * a.bobAmount;
-    const dx = a.x - frog.x;
-    const dy = bobY - frog.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+  const tx = target.kind === 'fly' ? target.fly.x : target.anchor.x;
+  const tax = tx - camera.x;
+  const tay = target.bobY - camera.y;
+  const isFly = target.kind === 'fly';
 
-    const toMouseDx = worldMX - frog.x;
-    const toMouseDy = worldMY - frog.y;
-    const toMouseDist = Math.sqrt(toMouseDx * toMouseDx + toMouseDy * toMouseDy);
+  ctx.strokeStyle = isFly ? 'rgba(255, 100, 50, 0.35)' : 'rgba(232, 64, 87, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(sx, sy);
+  ctx.lineTo(tax, tay);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
-    if (toMouseDist > 0) {
-      const dot = (dx * toMouseDx + dy * toMouseDy) / (dist * toMouseDist);
-      if (dot < 0.3) continue;
-    }
-    if (dist < maxRange && dist < bestDist) {
-      bestDist = dist;
-      bestAnchor = a;
-    }
-  }
-
-  // Check fly
-  const fly = world.flyTarget;
-  if (fly && !fly.caught) {
-    const flyBobY = fly.y + Math.sin(Date.now() * 0.003 + fly.bobOffset) * 8;
-    const dx = fly.x - frog.x;
-    const dy = flyBobY - frog.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const toMouseDx = worldMX - frog.x;
-    const toMouseDy = worldMY - frog.y;
-    const toMouseDist = Math.sqrt(toMouseDx * toMouseDx + toMouseDy * toMouseDy);
-    if (toMouseDist > 0) {
-      const dot = (dx * toMouseDx + dy * toMouseDy) / (dist * toMouseDist);
-      if (dot > 0.3 && dist < maxRange && dist < bestDist) {
-        bestAnchor = { x: fly.x, y: flyBobY, isFly: true };
-        bestDist = dist;
-      }
-    }
-  }
-
-  if (bestAnchor) {
-    const ay = bestAnchor.isFly ? bestAnchor.y
-      : bestAnchor.y + (bestAnchor.bobAmount ? Math.sin(Date.now() * 0.001 * bestAnchor.bobSpeed + bestAnchor.bobOffset) * bestAnchor.bobAmount : 0);
-    const tax = bestAnchor.x - camera.x;
-    const tay = ay - camera.y;
-
-    ctx.strokeStyle = bestAnchor.isFly ? 'rgba(255, 100, 50, 0.35)' : 'rgba(232, 64, 87, 0.25)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(tax, tay);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.strokeStyle = bestAnchor.isFly ? 'rgba(255, 100, 50, 0.5)' : 'rgba(232, 64, 87, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(tax, tay, 12, 0, Math.PI * 2);
-    ctx.stroke();
-  }
+  ctx.strokeStyle = isFly ? 'rgba(255, 100, 50, 0.5)' : 'rgba(232, 64, 87, 0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(tax, tay, 12, 0, Math.PI * 2);
+  ctx.stroke();
 }

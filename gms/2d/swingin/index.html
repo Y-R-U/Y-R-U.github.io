@@ -2,28 +2,65 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Swingin' - Frog Tongue Swinging Game</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; }
 body {
   background: #1a1a2e;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 canvas {
   border-radius: 8px;
   cursor: crosshair;
   image-rendering: auto;
+  touch-action: none;
+  display: block;
+}
+#rotate-prompt {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #88ff88;
+  text-align: center;
+  padding: 24px;
+}
+#rotate-prompt svg { margin-bottom: 20px; animation: rotate-hint 2s ease-in-out infinite; }
+#rotate-prompt h1 { font-size: 22px; margin-bottom: 10px; letter-spacing: 1px; }
+#rotate-prompt p { color: #c8e6a0; font-size: 15px; max-width: 280px; line-height: 1.4; }
+@keyframes rotate-hint {
+  0%, 40% { transform: rotate(0); }
+  60%, 100% { transform: rotate(-90deg); }
+}
+@media (orientation: portrait) and (max-width: 900px) {
+  #game { display: none; }
+  #rotate-prompt { display: flex; }
 }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
+<div id="rotate-prompt">
+  <svg viewBox="0 0 64 64" width="88" height="88" fill="none" stroke="#88ff88" stroke-width="2.5" stroke-linejoin="round">
+    <rect x="20" y="4" width="24" height="56" rx="4"/>
+    <rect x="23" y="9" width="18" height="46" fill="#88ff88" fill-opacity="0.15" stroke="none"/>
+    <circle cx="32" cy="58" r="1.5" fill="#88ff88" stroke="none"/>
+  </svg>
+  <h1>Rotate to Landscape</h1>
+  <p>Swingin' plays best with your device held sideways.</p>
+</div>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
