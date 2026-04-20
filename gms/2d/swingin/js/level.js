@@ -37,17 +37,26 @@ export function generateLevel(lvl) {
   world.platforms.unshift(makePlatform(0, GROUND_Y, 200));
 
   // Swing anchors
-  let ax = 250;
   const types = ['twig', 'leaf', 'grass', 'flower', 'branch'];
+  let ax = 100; // frog spawn x — ensures first anchor is placed relative to the frog
 
   for (let i = 0; i < numAnchors; i++) {
-    const spacing = 120 + Math.random() * 100 - difficulty * 2;
-    ax += Math.max(80, spacing);
-    const ay = 80 + Math.random() * (GROUND_Y - 200);
+    let aposX, aposY;
+    if (i === 0) {
+      // First anchor — guaranteed reachable from the frog's spawn so level 1 is playable.
+      aposX = 220;
+      aposY = GROUND_Y - 140;
+      ax = aposX;
+    } else {
+      const spacing = 120 + Math.random() * 100 - difficulty * 2;
+      ax += Math.max(80, spacing);
+      aposX = ax;
+      aposY = 80 + Math.random() * (GROUND_Y - 200);
+    }
     const type = types[Math.floor(Math.random() * types.length)];
 
     world.anchors.push({
-      x: ax, y: ay, type,
+      x: aposX, y: aposY, type,
       bobOffset: Math.random() * Math.PI * 2,
       bobSpeed: 0.5 + Math.random() * 1.5,
       bobAmount: type === 'leaf' ? 3 : (type === 'grass' ? 5 : 1),
@@ -57,8 +66,8 @@ export function generateLevel(lvl) {
     // Bugs near some anchors
     if (Math.random() < 0.5) {
       world.collectibles.push({
-        x: ax + (Math.random() - 0.5) * 80,
-        y: ay + 30 + Math.random() * 60,
+        x: aposX + (Math.random() - 0.5) * 80,
+        y: aposY + 30 + Math.random() * 60,
         collected: false,
         type: 'gnat',
         bobOffset: Math.random() * Math.PI * 2,
