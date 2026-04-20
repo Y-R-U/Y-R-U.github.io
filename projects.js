@@ -76,6 +76,10 @@ const PROJECTS = [
     desc: "Toroidal space habitat configurator with 3D viewer. Design rotating torus habitats with artificial gravity simulation.",
     date: "2026-04-09" },
 
+  { name: "Reader",         path: "/app/pwa/reader/",   screenshot: "reader",         type: "app",
+    desc: "Offline audiobook reader — imports EPUB/PDF/text and narrates with on-device Kokoro TTS via WebGPU. Per-book voice & position, chapter drawer, adjustable speed.",
+    date: "2026-04-21" },
+
   // ══════════════════════════════════════════
   //  GAMES (sorted by date, oldest first)
   // ══════════════════════════════════════════

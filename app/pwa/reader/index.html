@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e1e1e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Reader</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Library view (default) -->
+  <section id="library-view" class="view">
+    <header class="app-bar">
+      <h1>Reader</h1>
+      <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
+    </header>
+    <div id="library-list" class="library-list"></div>
+    <div class="library-empty" id="library-empty">
+      <p>No books yet.</p>
+      <p class="hint">Tap + to add an EPUB, PDF, or text file.</p>
+    </div>
+    <button id="btn-import" class="fab" aria-label="Add book">+</button>
+    <input type="file" id="file-input" accept=".epub,.pdf,.txt" hidden>
+  </section>
+
+  <!-- Player view -->
+  <section id="player-view" class="view hidden">
+    <header class="app-bar">
+      <button id="btn-back" class="icon-btn" aria-label="Back">←</button>
+      <h1 id="player-title">—</h1>
+      <button id="btn-chapters" class="icon-btn" aria-label="Chapters">☰</button>
+    </header>
+    <div class="now-playing">
+      <div id="now-chapter" class="chapter-title">—</div>
+      <div id="now-sentence" class="sentence-text"></div>
+    </div>
+    <div class="controls">
+      <button id="btn-prev" class="control-btn" aria-label="Previous chapter">⏮</button>
+      <button id="btn-play" class="control-btn play" aria-label="Play">▶</button>
+      <button id="btn-next" class="control-btn" aria-label="Next chapter">⏭</button>
+    </div>
+    <div class="player-row">
+      <label for="speed">Speed <span id="speed-val">1.0×</span></label>
+      <input type="range" id="speed" min="0.5" max="2.0" step="0.1" value="1.0">
+    </div>
+    <div class="player-row">
+      <button id="btn-voice" class="text-btn">Voice: <span id="voice-name">Heart</span></button>
+    </div>
+  </section>
+
+  <!-- Chapter drawer -->
+  <aside id="chapter-drawer" class="drawer hidden">
+    <div class="drawer-scrim"></div>
+    <div class="drawer-panel">
+      <header class="drawer-header">
+        <h2>Chapters</h2>
+        <button class="icon-btn" id="btn-close-chapters" aria-label="Close">×</button>
+      </header>
+      <ol id="chapter-list" class="chapter-list"></ol>
+    </div>
+  </aside>
+
+  <!-- Voice picker modal -->
+  <div id="voice-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>Narrator</h2>
+        <button class="icon-btn" id="btn-close-voice" aria-label="Close">×</button>
+      </header>
+      <div id="voice-list" class="voice-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings / about modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="btn-close-settings" aria-label="Close">×</button>
+      </header>
+      <div class="settings-body">
+        <p>Model: Kokoro-82M (q8, WebGPU)</p>
+        <p id="model-status">Not loaded</p>
+        <button id="btn-preload" class="text-btn">Download model now</button>
+        <hr>
+        <p class="hint">All generation happens on-device. No audio is saved — it plays as it's generated.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loading" class="loading hidden">
+    <div class="loading-panel">
+      <div class="spinner"></div>
+      <div id="loading-msg">Loading…</div>
+      <progress id="loading-progress" max="100" value="0" hidden></progress>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
