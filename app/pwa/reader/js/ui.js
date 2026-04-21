@@ -73,6 +73,14 @@ export function updatePlayer() {
   const all = [...voices.female, ...voices.male];
   const current = all.find((v) => v.id === s.voice);
   $('voice-name').textContent = current?.name || s.voice;
+  const errEl = $('player-error');
+  if (s.lastError) {
+    errEl.textContent = s.lastError;
+    errEl.classList.remove('hidden');
+  } else {
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+  }
 }
 
 export function renderChapters(onSelect) {

@@ -1,10 +1,12 @@
-const VERSION = 'reader-v1';
+const VERSION = 'reader-v2';
 const SHELL = [
   './',
   './index.html',
   './manifest.json',
   './styles.css',
   './icons/icon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './js/app.js',
   './js/storage.js',
   './js/books.js',

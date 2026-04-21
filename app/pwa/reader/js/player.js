@@ -14,7 +14,12 @@ export const state = {
   currentSource: null,
   gen: 0,
   onUpdate: null,
+  lastError: null,
 };
+
+export function clearError() {
+  if (state.lastError) { state.lastError = null; notify(); }
+}
 
 function ctx() {
   if (!state.ctx || state.ctx.state === 'closed') {
@@ -96,6 +101,7 @@ async function playLoop() {
       buffer = pre ?? await generateSentenceBuffer(sentenceText);
     } catch (err) {
       console.error('TTS generation failed:', err);
+      state.lastError = 'Narration failed: ' + (err?.message || String(err));
       state.playing = false;
       notify();
       return;
@@ -120,6 +126,7 @@ async function playLoop() {
 
 export function play() {
   if (!state.book || state.playing) return;
+  state.lastError = null;
   state.playing = true;
   ctx();
   updateMediaSession();

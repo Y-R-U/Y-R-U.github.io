@@ -1,4 +1,6 @@
-import { KokoroTTS } from 'https://esm.sh/kokoro-js@1.2.1';
+import { KokoroTTS, TextSplitterStream } from 'https://esm.sh/kokoro-js@1.2.1';
+
+export { TextSplitterStream };
 
 const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 const ENGLISH_PREFIXES = ['af_', 'am_', 'bf_', 'bm_'];

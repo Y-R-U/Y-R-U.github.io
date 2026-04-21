@@ -1,4 +1,5 @@
 import * as store from './storage.js';
+import { TextSplitterStream } from './tts.js';
 
 const EPUBJS_URL = 'https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js';
 const PDFJS_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs';
@@ -55,7 +56,7 @@ function newId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-async function parseEpub(arrayBuffer) {
+async function parseEpub(arrayBuffer, onProgress) {
   const ePub = await loadEpub();
   const book = ePub(arrayBuffer);
   await book.ready;
@@ -73,8 +74,11 @@ async function parseEpub(arrayBuffer) {
   };
   walk(navToc);
 
+  const spine = book.spine.spineItems;
+  const total = spine.length;
   const chapters = [];
-  for (const item of book.spine.spineItems) {
+  for (let i = 0; i < total; i++) {
+    const item = spine[i];
     const href = (item.href || '').split('#')[0];
     const meta = tocByHref.get(href);
     const label = meta?.label?.trim() || `Section ${chapters.length + 1}`;
@@ -84,6 +88,7 @@ async function parseEpub(arrayBuffer) {
       item.unload();
       if (text.length > 40) chapters.push({ title: label, text });
     } catch (_) {}
+    onProgress?.(i + 1, total, 'Reading EPUB');
   }
   return { title, author, chapters };
 }
@@ -121,7 +126,7 @@ async function extractPageText(pdf, pageNum) {
   return cleanText(c.items.map((i) => i.str).join(' '));
 }
 
-async function parsePdf(arrayBuffer) {
+async function parsePdf(arrayBuffer, onProgress) {
   const pdfjs = await loadPdf();
   const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
   const meta = await pdf.getMetadata().catch(() => ({ info: {} }));
@@ -131,12 +136,14 @@ async function parsePdf(arrayBuffer) {
 
   const outline = await parsePdfOutline(pdf);
   const chapters = [];
+  let pagesDone = 0;
+  const tick = () => { pagesDone += 1; onProgress?.(pagesDone, numPages, 'Reading PDF'); };
   if (outline) {
     for (let i = 0; i < outline.length; i++) {
       const start = outline[i].page;
       const end = (i + 1 < outline.length ? outline[i + 1].page : numPages) - 1;
       const parts = [];
-      for (let p = start; p <= end; p++) parts.push(await extractPageText(pdf, p + 1));
+      for (let p = start; p <= end; p++) { parts.push(await extractPageText(pdf, p + 1)); tick(); }
       const text = cleanText(parts.join(' '));
       if (text.length > 40) chapters.push({ title: outline[i].title, text });
     }
@@ -145,7 +152,7 @@ async function parsePdf(arrayBuffer) {
     for (let start = 0; start < numPages; start += chunk) {
       const end = Math.min(start + chunk, numPages);
       const parts = [];
-      for (let p = start; p < end; p++) parts.push(await extractPageText(pdf, p + 1));
+      for (let p = start; p < end; p++) { parts.push(await extractPageText(pdf, p + 1)); tick(); }
       const text = cleanText(parts.join(' '));
       if (text.length > 40) chapters.push({ title: `Pages ${start + 1}–${end}`, text });
     }
@@ -162,16 +169,26 @@ function parseTxt(text) {
   return { title: 'Text document', author: '', chapters };
 }
 
-export async function importFile(file) {
-  const id = newId();
+export async function importFile(file, onProgress) {
   const ext = file.name.toLowerCase().split('.').pop();
+  const key = `${file.name}:${file.size}`;
+
+  const existing = (await store.listBooks()).find((b) => b.key === key);
+  if (existing) {
+    existing.lastOpened = Date.now();
+    await store.putBook(existing);
+    return { meta: existing, duplicate: true };
+  }
+
+  const id = newId();
   let parsed;
   if (ext === 'epub') {
-    parsed = await parseEpub(await file.arrayBuffer());
+    parsed = await parseEpub(await file.arrayBuffer(), onProgress);
   } else if (ext === 'pdf') {
-    parsed = await parsePdf(await file.arrayBuffer());
+    parsed = await parsePdf(await file.arrayBuffer(), onProgress);
   } else if (ext === 'txt') {
     parsed = parseTxt(await file.text());
+    onProgress?.(1, 1, 'Reading text');
   } else {
     throw new Error(`Unsupported file type: .${ext}`);
   }
@@ -186,6 +203,7 @@ export async function importFile(file) {
   const lastVoice = await store.getPref('lastVoice', 'af_heart');
   const meta = {
     id,
+    key,
     title: parsed.title,
     author: parsed.author,
     format: ext,
@@ -197,23 +215,19 @@ export async function importFile(file) {
     lastOpened: Date.now(),
   };
   await store.putBook(meta);
-  return meta;
+  return { meta, duplicate: false };
 }
 
-// Sentence split for playback. Not perfect on abbreviations, but good enough.
+// Sentence split for playback — uses kokoro-js TextSplitterStream,
+// which handles abbreviations ("Dr.", "U.S.") better than a naive regex.
 export function splitSentences(text) {
+  const splitter = new TextSplitterStream();
+  splitter.push(text);
+  splitter.close();
   const out = [];
-  const re = /[^.!?…]+[.!?…]+["'”’)\]]*\s*|[^.!?…]+$/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    const s = m[0].trim();
-    if (s.length >= 2) out.push(s);
+  for (const s of splitter) {
+    const t = s.trim();
+    if (t.length >= 2) out.push(t);
   }
-  // Merge very short fragments into previous.
-  const merged = [];
-  for (const s of out) {
-    if (merged.length && s.length < 15) merged[merged.length - 1] += ' ' + s;
-    else merged.push(s);
-  }
-  return merged;
+  return out;
 }

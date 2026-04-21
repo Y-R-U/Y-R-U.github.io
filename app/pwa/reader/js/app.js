@@ -55,8 +55,17 @@ async function ensureTTS() {
 async function handleImport(file) {
   ui.showLoading(`Importing ${file.name}…`, null);
   try {
-    await books.importFile(file);
+    const onProgress = (done, total, label) => {
+      const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : null;
+      ui.showLoading(`${label || 'Importing'} ${file.name}… ${done}/${total}`, pct);
+    };
+    const result = await books.importFile(file, onProgress);
     await refreshLibrary();
+    if (result.duplicate) {
+      ui.hideLoading();
+      alert(`"${result.meta.title}" is already in your library.`);
+      return;
+    }
   } catch (e) {
     alert('Import failed: ' + (e.message || e));
   } finally {
@@ -82,6 +91,7 @@ function wire() {
     refreshLibrary();
   });
   $('btn-play').addEventListener('click', async () => {
+    player.clearError();
     await ensureTTS();
     player.togglePlay();
   });

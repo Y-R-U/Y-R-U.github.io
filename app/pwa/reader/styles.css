@@ -104,6 +104,7 @@ button {
   overflow-y: auto;
   padding: 8px;
 }
+.library-list:empty { display: none; }
 .book-card {
   display: flex;
   gap: 12px;
@@ -202,6 +203,18 @@ button {
   max-width: 600px;
   margin: 0 auto;
 }
+.player-error {
+  margin: 12px auto 0;
+  max-width: 600px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--danger) 20%, var(--bg-2));
+  border: 1px solid var(--danger);
+  color: var(--fg);
+  font-size: 14px;
+  text-align: left;
+}
+.player-error.hidden { display: none; }
 
 .controls {
   display: flex;
