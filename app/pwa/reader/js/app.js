@@ -53,23 +53,33 @@ async function ensureTTS() {
 }
 
 async function handleImport(file) {
-  ui.showLoading(`Importing ${file.name}…`, null);
+  const niceName = ui.shortName(file.name);
+  ui.showLoading(`Importing ${niceName}…`, null);
   try {
     const onProgress = (done, total, label) => {
       const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : null;
-      ui.showLoading(`${label || 'Importing'} ${file.name}… ${done}/${total}`, pct);
+      ui.showLoading(`${label || 'Importing'} ${niceName}… ${done}/${total}`, pct);
     };
     const result = await books.importFile(file, onProgress);
     await refreshLibrary();
     if (result.duplicate) {
-      ui.hideLoading();
-      alert(`"${result.meta.title}" is already in your library.`);
-      return;
+      ui.showToast(`“${result.meta.title}” is already in your library.`);
     }
   } catch (e) {
-    alert('Import failed: ' + (e.message || e));
+    ui.showToast('Import failed: ' + (e.message || e), { error: true, duration: 5000 });
   } finally {
     ui.hideLoading();
+  }
+}
+
+async function backfillBookKeys() {
+  const list = await store.listBooks();
+  for (const b of list) {
+    if (b.key || !b.filename) continue;
+    const size = await store.bookFileSize(b.id, b.filename);
+    if (size == null) continue;
+    b.key = `${b.filename}:${size}`;
+    await store.putBook(b);
   }
 }
 
@@ -129,6 +139,7 @@ async function main() {
   wire();
   const lastVoice = await store.getPref('lastVoice', 'af_heart');
   player.state.voice = lastVoice;
+  await backfillBookKeys();
   await refreshLibrary();
 }
 

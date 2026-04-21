@@ -63,6 +63,17 @@ export async function readBookFile(bookId, filename) {
   return f.arrayBuffer();
 }
 
+export async function bookFileSize(bookId, filename) {
+  try {
+    const dir = await (await booksDir()).getDirectoryHandle(bookId);
+    const fh = await dir.getFileHandle(filename);
+    const f = await fh.getFile();
+    return f.size;
+  } catch (_) {
+    return null;
+  }
+}
+
 export async function deleteBookFiles(bookId) {
   const dir = await booksDir();
   try { await dir.removeEntry(bookId, { recursive: true }); } catch (_) {}

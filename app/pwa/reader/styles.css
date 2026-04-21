@@ -462,3 +462,59 @@ button {
 #loading-progress::-webkit-progress-bar { background: var(--bg-3); border-radius: 3px; }
 #loading-progress::-webkit-progress-value { background: var(--accent); border-radius: 3px; }
 #loading-progress::-moz-progress-bar { background: var(--accent); }
+
+/* Confirm dialog */
+.confirm-panel {
+  max-height: none;
+  max-width: 420px;
+}
+.confirm-body { padding: 20px 20px 8px; }
+.confirm-body h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.confirm-body p {
+  color: var(--fg-dim);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+}
+.confirm-actions .text-btn { flex: 1; }
+.confirm-actions .text-btn.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.confirm-actions .text-btn.danger:hover,
+.confirm-actions .text-btn.danger:active {
+  background: #b91c1c;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  background: var(--bg-3);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  max-width: calc(100% - 32px);
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  z-index: 50;
+}
+.toast.error {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.toast.hidden { display: none; }

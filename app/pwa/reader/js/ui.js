@@ -41,9 +41,15 @@ export function renderLibrary(books, onOpen, onDelete) {
     card.querySelector('.book-meta').textContent = [b.author, chapter, lastRead].filter(Boolean).join(' · ');
     card.querySelector('.book-info').addEventListener('click', () => onOpen(b.id));
     card.querySelector('.book-thumb').addEventListener('click', () => onOpen(b.id));
-    card.querySelector('.book-del').addEventListener('click', (e) => {
+    card.querySelector('.book-del').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (confirm(`Delete "${b.title}"?`)) onDelete(b.id);
+      const ok = await showConfirm({
+        title: 'Delete book?',
+        message: `“${b.title}” will be removed from your library.`,
+        okLabel: 'Delete',
+        danger: true,
+      });
+      if (ok) onDelete(b.id);
     });
     list.appendChild(card);
   }
@@ -176,3 +182,59 @@ export function showLoading(msg, pct) {
 export function hideLoading() { $('loading').classList.add('hidden'); }
 
 export function setModelStatus(msg) { $('model-status').textContent = msg; }
+
+/* Middle-truncate a filename so it fits in narrow progress labels. */
+export function shortName(name, max = 24) {
+  if (!name || name.length <= max) return name;
+  const dot = name.lastIndexOf('.');
+  const ext = dot > 0 ? name.slice(dot) : '';
+  const base = dot > 0 ? name.slice(0, dot) : name;
+  const keep = Math.max(4, max - ext.length - 1);
+  if (base.length <= keep) return base + ext;
+  const head = Math.ceil(keep * 0.6);
+  const tail = keep - head;
+  return base.slice(0, head) + '…' + base.slice(base.length - tail) + ext;
+}
+
+let toastTimer = null;
+export function showToast(msg, { error = false, duration = 3500 } = {}) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!error);
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), duration);
+}
+
+export function showConfirm({ title = 'Confirm', message = '', okLabel = 'OK', danger = false } = {}) {
+  return new Promise((resolve) => {
+    const m = $('confirm-modal');
+    $('confirm-title').textContent = title;
+    $('confirm-msg').textContent = message;
+    const ok = $('btn-confirm-ok');
+    const cancel = $('btn-confirm-cancel');
+    const scrim = m.querySelector('.modal-scrim');
+    ok.textContent = okLabel;
+    ok.classList.toggle('danger', !!danger);
+    m.classList.remove('hidden');
+    const done = (v) => {
+      m.classList.add('hidden');
+      ok.removeEventListener('click', onOk);
+      cancel.removeEventListener('click', onCancel);
+      scrim.removeEventListener('click', onCancel);
+      document.removeEventListener('keydown', onKey);
+      resolve(v);
+    };
+    const onOk = () => done(true);
+    const onCancel = () => done(false);
+    const onKey = (e) => {
+      if (e.key === 'Escape') onCancel();
+      else if (e.key === 'Enter') onOk();
+    };
+    ok.addEventListener('click', onOk);
+    cancel.addEventListener('click', onCancel);
+    scrim.addEventListener('click', onCancel);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => ok.focus(), 0);
+  });
+}

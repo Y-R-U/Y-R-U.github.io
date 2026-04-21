@@ -41,6 +41,7 @@ function loadChapter(idx) {
 export async function loadBook(bookId, { onUpdate } = {}) {
   const book = await store.getBook(bookId);
   state.book = book;
+  state.lastError = null;
   state.voice = book.voice || await store.getPref('lastVoice', 'af_heart');
   state.chapterIdx = book.position?.chapter || 0;
   state.sentenceIdx = 0;
@@ -191,7 +192,10 @@ function updateMediaSession() {
     title: chapterTitle,
     artist: state.book.author || state.book.title,
     album: state.book.title,
-    artwork: [{ src: 'icons/icon.svg', sizes: '512x512', type: 'image/svg+xml' }],
+    artwork: [
+      { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
   });
   navigator.mediaSession.playbackState = state.playing ? 'playing' : 'paused';
   const h = navigator.mediaSession.setActionHandler.bind(navigator.mediaSession);
