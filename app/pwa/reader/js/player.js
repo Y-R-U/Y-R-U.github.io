@@ -1,196 +1,131 @@
-import * as tts from './tts.js';
+/* HTMLAudioElement-based player. No more sentence streaming — we're playing
+   the pre-rendered MP3 that the server produced. */
 import * as store from './storage.js';
-import { splitSentences } from './books.js';
 
 export const state = {
   book: null,
-  chapterIdx: 0,
-  sentenceIdx: 0,
-  sentences: [],
-  voice: 'af_heart',
-  speed: 1.0,
+  audio: null,
+  url: null,
   playing: false,
-  ctx: null,
-  currentSource: null,
-  gen: 0,
+  duration: 0,
+  position: 0,
+  speed: 1.0,
   onUpdate: null,
-  lastError: null,
 };
 
-export function clearError() {
-  if (state.lastError) { state.lastError = null; notify(); }
-}
+function notify() { state.onUpdate?.(); }
 
-function ctx() {
-  if (!state.ctx || state.ctx.state === 'closed') {
-    state.ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+function teardown() {
+  if (state.audio) {
+    state.audio.pause();
+    state.audio.src = '';
   }
-  if (state.ctx.state === 'suspended') state.ctx.resume();
-  return state.ctx;
-}
-
-function notify() { if (state.onUpdate) state.onUpdate(); }
-
-function loadChapter(idx) {
-  const ch = state.book.chapters[idx];
-  state.chapterIdx = idx;
-  state.sentences = ch ? splitSentences(ch.text) : [];
-  state.sentenceIdx = 0;
+  if (state.url) URL.revokeObjectURL(state.url);
+  state.audio = null;
+  state.url = null;
+  state.playing = false;
+  state.duration = 0;
+  state.position = 0;
 }
 
 export async function loadBook(bookId, { onUpdate } = {}) {
+  teardown();
   const book = await store.getBook(bookId);
+  if (!book) throw new Error('book not found');
+  const file = await store.readAudioFile(bookId);
   state.book = book;
-  state.lastError = null;
-  state.voice = book.voice || await store.getPref('lastVoice', 'af_heart');
-  state.chapterIdx = book.position?.chapter || 0;
-  state.sentenceIdx = 0;
-  const ch = book.chapters[state.chapterIdx];
-  state.sentences = ch ? splitSentences(ch.text) : [];
-  state.sentenceIdx = Math.min(book.position?.sentence || 0, Math.max(0, state.sentences.length - 1));
+  state.url = URL.createObjectURL(file);
   state.onUpdate = onUpdate;
-  book.lastOpened = Date.now();
+  state.speed = book.speed || 1.0;
+
+  const audio = new Audio();
+  audio.preload = 'auto';
+  audio.src = state.url;
+  audio.playbackRate = state.speed;
+  audio.addEventListener('loadedmetadata', () => {
+    state.duration = isFinite(audio.duration) ? audio.duration : 0;
+    if (book.position && book.position < state.duration - 1) {
+      audio.currentTime = book.position;
+    }
+    notify();
+  });
+  audio.addEventListener('timeupdate', () => {
+    state.position = audio.currentTime;
+    notify();
+    savePositionThrottled();
+  });
+  audio.addEventListener('play', () => { state.playing = true; updateMediaSession(); notify(); });
+  audio.addEventListener('pause', () => { state.playing = false; updateMediaSession(); notify(); savePosition(); });
+  audio.addEventListener('ended', () => {
+    state.playing = false;
+    state.position = state.duration;
+    savePosition();
+    notify();
+  });
+  state.audio = audio;
+
+  book.lastPlayed = Date.now();
   await store.putBook(book);
   updateMediaSession();
   notify();
 }
 
-async function savePos() {
-  if (!state.book) return;
-  state.book.position = { chapter: state.chapterIdx, sentence: state.sentenceIdx };
-  state.book.voice = state.voice;
-  await store.putBook(state.book);
-  await store.setPref('lastVoice', state.voice);
-}
-
-function audioBufferFrom(raw) {
-  const buf = ctx().createBuffer(1, raw.audio.length, raw.sampling_rate);
-  buf.getChannelData(0).set(raw.audio);
-  return buf;
-}
-
-async function generateSentenceBuffer(text) {
-  const raw = await tts.generate(text, state.voice, state.speed);
-  return audioBufferFrom(raw);
-}
-
-function scheduleBuffer(buffer) {
-  const src = ctx().createBufferSource();
-  src.buffer = buffer;
-  src.connect(ctx().destination);
-  src.start();
-  state.currentSource = src;
-  return src;
-}
-
-async function playLoop() {
-  const myGen = ++state.gen;
-  let pre = null;
-  while (state.gen === myGen && state.playing && state.chapterIdx < state.book.chapters.length) {
-    if (state.sentenceIdx >= state.sentences.length) {
-      if (state.chapterIdx + 1 >= state.book.chapters.length) break;
-      state.chapterIdx += 1;
-      loadChapter(state.chapterIdx);
-      pre = null;
-      notify();
-      updateMediaSession();
-      continue;
-    }
-    const sentenceText = state.sentences[state.sentenceIdx];
-    let buffer;
-    try {
-      buffer = pre ?? await generateSentenceBuffer(sentenceText);
-    } catch (err) {
-      console.error('TTS generation failed:', err);
-      state.lastError = 'Narration failed: ' + (err?.message || String(err));
-      state.playing = false;
-      notify();
-      return;
-    }
-    if (state.gen !== myGen || !state.playing) return;
-    pre = null;
-    notify();
-    const src = scheduleBuffer(buffer);
-    const nextIdx = state.sentenceIdx + 1;
-    const nextGen = nextIdx < state.sentences.length
-      ? generateSentenceBuffer(state.sentences[nextIdx]).catch(() => null)
-      : Promise.resolve(null);
-    await new Promise((resolve) => { src.onended = resolve; });
-    if (state.gen !== myGen || !state.playing) return;
-    state.sentenceIdx = nextIdx;
-    savePos();
-    pre = await nextGen;
-  }
-  state.playing = false;
-  notify();
-}
-
-export function play() {
-  if (!state.book || state.playing) return;
-  state.lastError = null;
-  state.playing = true;
-  ctx();
-  updateMediaSession();
-  notify();
-  playLoop();
+export async function play() {
+  if (!state.audio) return;
+  try { await state.audio.play(); } catch (e) { console.warn('play failed', e); }
 }
 
 export function pause() {
-  state.playing = false;
-  try { state.currentSource?.stop(); } catch (_) {}
-  state.gen += 1;
-  updateMediaSession();
-  notify();
+  state.audio?.pause();
 }
 
 export function togglePlay() {
   state.playing ? pause() : play();
 }
 
-function reset() {
-  const wasPlaying = state.playing;
-  state.playing = false;
-  try { state.currentSource?.stop(); } catch (_) {}
-  state.gen += 1;
-  if (wasPlaying) setTimeout(() => play(), 50);
+export function seekTo(seconds) {
+  if (!state.audio) return;
+  const t = Math.max(0, Math.min(state.duration || 0, seconds));
+  state.audio.currentTime = t;
+  state.position = t;
+  notify();
+}
+
+export function skip(seconds) {
+  if (!state.audio) return;
+  seekTo((state.audio.currentTime || 0) + seconds);
 }
 
 export function setSpeed(v) {
-  state.speed = Math.max(0.5, Math.min(2.0, v));
-  reset();
+  state.speed = Math.max(0.5, Math.min(3.0, v));
+  if (state.audio) state.audio.playbackRate = state.speed;
+  if (state.book) { state.book.speed = state.speed; store.putBook(state.book); }
   notify();
 }
 
-export function setVoice(id) {
-  state.voice = id;
-  if (state.book) { state.book.voice = id; store.putBook(state.book); }
-  store.setPref('lastVoice', id);
-  reset();
-  notify();
+export function unload() {
+  savePosition();
+  teardown();
+  state.book = null;
+  state.onUpdate = null;
 }
 
-export function seekChapter(idx) {
-  if (idx < 0 || idx >= state.book.chapters.length) return;
-  const wasPlaying = state.playing;
-  state.playing = false;
-  try { state.currentSource?.stop(); } catch (_) {}
-  state.gen += 1;
-  loadChapter(idx);
-  savePos();
-  updateMediaSession();
-  notify();
-  if (wasPlaying) setTimeout(() => play(), 50);
+let saveTimer = null;
+function savePositionThrottled() {
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => { saveTimer = null; savePosition(); }, 2000);
 }
-
-export function nextChapter() { seekChapter(state.chapterIdx + 1); }
-export function prevChapter() { seekChapter(state.chapterIdx - 1); }
+async function savePosition() {
+  if (!state.book) return;
+  state.book.position = state.position;
+  await store.putBook(state.book);
+}
 
 function updateMediaSession() {
   if (!('mediaSession' in navigator) || !state.book) return;
-  const chapterTitle = state.book.chapters[state.chapterIdx]?.title || '';
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: chapterTitle,
-    artist: state.book.author || state.book.title,
+    title: state.book.title,
+    artist: state.book.author || 'Reader',
     album: state.book.title,
     artwork: [
       { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -202,20 +137,8 @@ function updateMediaSession() {
   try {
     h('play', () => play());
     h('pause', () => pause());
-    h('previoustrack', () => prevChapter());
-    h('nexttrack', () => nextChapter());
-    h('seekbackward', () => { state.sentenceIdx = Math.max(0, state.sentenceIdx - 1); reset(); notify(); });
-    h('seekforward', () => { state.sentenceIdx = Math.min(state.sentences.length, state.sentenceIdx + 1); reset(); notify(); });
+    h('seekbackward', (e) => skip(-(e?.seekOffset || 15)));
+    h('seekforward', (e) => skip(e?.seekOffset || 15));
+    h('seekto', (e) => { if (typeof e?.seekTime === 'number') seekTo(e.seekTime); });
   } catch (_) {}
-}
-
-// Preview-only — not tied to book state.
-export async function previewVoice(voiceId, text) {
-  const raw = await tts.generate(text, voiceId, 1.0);
-  const buf = audioBufferFrom(raw);
-  const src = ctx().createBufferSource();
-  src.buffer = buf;
-  src.connect(ctx().destination);
-  src.start();
-  return new Promise((resolve) => { src.onended = resolve; });
 }

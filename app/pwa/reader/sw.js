@@ -1,4 +1,4 @@
-const VERSION = 'reader-v4';
+const VERSION = 'reader-v5';
 const SHELL = [
   './',
   './index.html',
@@ -10,7 +10,7 @@ const SHELL = [
   './js/app.js',
   './js/storage.js',
   './js/books.js',
-  './js/tts.js',
+  './js/api.js',
   './js/player.js',
   './js/ui.js',
 ];
@@ -27,35 +27,20 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first for same-origin + approved CDNs. HF weight hosts are included so
-// the Kokoro model survives Cache Storage eviction of transformers.js's own cache.
-const CACHEABLE_CDN = /^https:\/\/([a-z0-9-]+\.)*(jsdelivr\.net|esm\.sh|huggingface\.co|hf\.co)\//;
-
-self.addEventListener('message', (e) => {
-  if (e.data === 'clear-model-cache') {
-    e.waitUntil((async () => {
-      const names = await caches.keys();
-      await Promise.all(names.filter((n) => n.startsWith('transformers-')).map((n) => caches.delete(n)));
-      const own = await caches.open(VERSION);
-      const reqs = await own.keys();
-      await Promise.all(reqs.filter((r) => /huggingface\.co|hf\.co/.test(r.url)).map((r) => own.delete(r)));
-    })());
-  }
-});
-
+// Cache-first for same-origin static shell only. API endpoints are always
+// network — we never want to return a stale job state or cached MP3 response.
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  const sameOrigin = url.origin === self.location.origin;
-  const cdnOk = CACHEABLE_CDN.test(req.url);
-  if (!sameOrigin && !cdnOk) return;
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;  // let browser handle directly
 
   e.respondWith(
     caches.match(req).then((hit) => {
       if (hit) return hit;
       return fetch(req).then((res) => {
-        if (res.ok && (sameOrigin || cdnOk)) {
+        if (res.ok) {
           const copy = res.clone();
           caches.open(VERSION).then((c) => c.put(req, copy));
         }

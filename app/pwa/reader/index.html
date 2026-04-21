@@ -16,17 +16,24 @@
 
 <div id="app">
 
-  <!-- Library view (default) -->
+  <!-- Library view -->
   <section id="library-view" class="view">
     <header class="app-bar">
       <h1>Reader</h1>
       <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
     </header>
+
+    <div id="jobs-section" class="jobs-section hidden">
+      <div class="section-label">In progress</div>
+      <div id="jobs-list" class="jobs-list"></div>
+    </div>
+
     <div id="library-list" class="library-list"></div>
     <div class="library-empty" id="library-empty">
-      <p>No books yet.</p>
+      <p>No audiobooks yet.</p>
       <p class="hint">Tap + to add an EPUB, PDF, or text file.</p>
     </div>
+
     <button id="btn-import" class="fab" aria-label="Add book">+</button>
     <input type="file" id="file-input" accept=".epub,.pdf,.txt" hidden>
   </section>
@@ -36,52 +43,48 @@
     <header class="app-bar">
       <button id="btn-back" class="icon-btn" aria-label="Back">←</button>
       <h1 id="player-title">—</h1>
-      <button id="btn-chapters" class="icon-btn" aria-label="Chapters">☰</button>
+      <button id="btn-player-dl" class="icon-btn" aria-label="Download MP3">⬇</button>
     </header>
     <div class="now-playing">
-      <div id="now-chapter" class="chapter-title">—</div>
-      <div id="now-sentence" class="sentence-text"></div>
-      <div id="player-error" class="player-error hidden" role="alert"></div>
+      <div class="big-thumb">🎧</div>
+      <div id="player-author" class="player-author"></div>
+    </div>
+    <div class="scrub-row">
+      <span id="time-cur">0:00</span>
+      <input type="range" id="scrubber" min="0" max="0" value="0" step="0.1">
+      <span id="time-total">0:00</span>
     </div>
     <div class="controls">
-      <button id="btn-prev" class="control-btn" aria-label="Previous chapter">⏮</button>
+      <button id="btn-back-15" class="control-btn" aria-label="Back 15s">⟲15</button>
       <button id="btn-play" class="control-btn play" aria-label="Play">▶</button>
-      <button id="btn-next" class="control-btn" aria-label="Next chapter">⏭</button>
+      <button id="btn-fwd-30" class="control-btn" aria-label="Forward 30s">30⟳</button>
     </div>
     <div class="player-row">
-      <label for="speed">Speed <span id="speed-val">1.0×</span></label>
-      <input type="range" id="speed" min="0.5" max="2.0" step="0.1" value="1.0">
-    </div>
-    <div class="player-row">
-      <button id="btn-voice" class="text-btn">Voice: <span id="voice-name">Heart</span></button>
+      <label for="speed">Speed <span id="speed-val">1×</span></label>
+      <input type="range" id="speed" min="0.5" max="3.0" step="0.05" value="1.0">
     </div>
   </section>
 
-  <!-- Chapter drawer -->
-  <aside id="chapter-drawer" class="drawer hidden">
-    <div class="drawer-scrim"></div>
-    <div class="drawer-panel">
-      <header class="drawer-header">
-        <h2>Chapters</h2>
-        <button class="icon-btn" id="btn-close-chapters" aria-label="Close">×</button>
-      </header>
-      <ol id="chapter-list" class="chapter-list"></ol>
-    </div>
-  </aside>
-
-  <!-- Voice picker modal -->
-  <div id="voice-modal" class="modal hidden">
+  <!-- Import / voice picker modal -->
+  <div id="import-modal" class="modal hidden">
     <div class="modal-scrim"></div>
     <div class="modal-panel">
       <header class="modal-header">
-        <h2>Narrator</h2>
-        <button class="icon-btn" id="btn-close-voice" aria-label="Close">×</button>
+        <h2>Choose a voice</h2>
+        <button id="btn-import-cancel" class="icon-btn" aria-label="Cancel">×</button>
       </header>
+      <div class="import-file-row">
+        <span class="hint">Importing</span>
+        <span id="import-filename"></span>
+      </div>
       <div id="voice-list" class="voice-list"></div>
+      <div class="import-actions">
+        <button id="btn-import-confirm" class="text-btn primary">Start conversion</button>
+      </div>
     </div>
   </div>
 
-  <!-- Settings / about modal -->
+  <!-- Settings modal -->
   <div id="settings-modal" class="modal hidden">
     <div class="modal-scrim"></div>
     <div class="modal-panel">
@@ -90,38 +93,10 @@
         <button class="icon-btn" id="btn-close-settings" aria-label="Close">×</button>
       </header>
       <div class="settings-body">
-        <p>Model: Kokoro-82M</p>
-        <p id="model-status">Not loaded</p>
-
-        <div class="setting-row">
-          <label for="set-device">Inference device</label>
-          <select id="set-device"></select>
-        </div>
-        <div class="setting-row">
-          <label for="set-dtype">Quantization</label>
-          <select id="set-dtype"></select>
-        </div>
-        <p class="hint" id="webgpu-hint"></p>
-
-        <div class="setting-actions">
-          <button id="btn-preload" class="text-btn">Load / reload model</button>
-          <button id="btn-clear-cache" class="text-btn">Clear cached model</button>
-        </div>
-
+        <div id="storage-status"></div>
         <hr>
-        <p id="storage-status" class="hint"></p>
-        <p class="hint">All generation happens on-device. No audio is saved — it plays as it's generated.</p>
-        <p class="hint">If you hear high-pitched noise instead of speech, switch device to WASM (some mobile GPUs produce garbage output with WebGPU).</p>
+        <p class="hint">Conversions run on the airon server. Once complete, the MP3 is saved on this device so it plays offline. Use the download button to save a copy to your device's file system.</p>
       </div>
-    </div>
-  </div>
-
-  <!-- Loading overlay -->
-  <div id="loading" class="loading hidden">
-    <div class="loading-panel">
-      <div class="spinner"></div>
-      <div id="loading-msg">Loading…</div>
-      <progress id="loading-progress" max="100" value="0" hidden></progress>
     </div>
   </div>
 
