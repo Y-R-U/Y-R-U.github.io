@@ -31,12 +31,28 @@ async function openBook(id) {
   }
 }
 
+async function getTTSOptions() {
+  return {
+    device: await store.getPref('device', 'auto'),
+    dtype: await store.getPref('dtype', 'q8'),
+  };
+}
+
+function modelStatusText() {
+  if (!tts.isLoaded()) return 'Not loaded';
+  return `Loaded (${tts.getDevice()}, ${tts.getDtype()})`;
+}
+
 async function ensureTTS() {
-  if (tts.isLoaded()) return;
-  ui.showLoading('Preparing narrator model (first load only)…', 0);
+  const opts = await getTTSOptions();
+  const already = tts.isLoaded()
+    && tts.currentOptions()?.dtype === opts.dtype
+    && tts.currentOptions()?.device === (opts.device === 'auto' ? (tts.hasWebGPU() ? 'webgpu' : 'wasm') : opts.device);
+  if (already) return;
+  ui.showLoading('Preparing narrator model…', 0);
   ui.setModelStatus('Loading…');
   let lastPct = 0;
-  await tts.initTTS((p) => {
+  await tts.initTTS(opts, (p) => {
     if (p && typeof p.progress === 'number') {
       const pct = Math.min(100, Math.round(p.progress));
       if (pct !== lastPct) {
@@ -48,7 +64,7 @@ async function ensureTTS() {
       ui.showLoading(`Narrator model: ${p.status}`, null);
     }
   });
-  ui.setModelStatus(`Loaded (${tts.getDevice()})`);
+  ui.setModelStatus(modelStatusText());
   ui.hideLoading();
 }
 
@@ -83,6 +99,58 @@ async function backfillBookKeys() {
   }
 }
 
+async function refreshSettingsView() {
+  const opts = await getTTSOptions();
+  ui.setSettingsValues(opts);
+  ui.setModelStatus(modelStatusText());
+  let persisted = false;
+  try { persisted = await (navigator.storage?.persisted?.() ?? Promise.resolve(false)); } catch (_) {}
+  ui.setStorageStatus(persisted);
+}
+
+async function openSettings() {
+  ui.populateSettingsOptions({
+    deviceOptions: tts.DEVICE_OPTIONS,
+    dtypeOptions: tts.DTYPE_OPTIONS,
+    hasWebGPU: tts.hasWebGPU(),
+  });
+  await refreshSettingsView();
+  ui.openSettings();
+}
+
+async function onDeviceChange(e) {
+  await store.setPref('device', e.target.value);
+  tts.unload();
+  ui.setModelStatus(modelStatusText());
+}
+
+async function onDtypeChange(e) {
+  await store.setPref('dtype', e.target.value);
+  tts.unload();
+  ui.setModelStatus(modelStatusText());
+}
+
+async function clearModelCache() {
+  const ok = await ui.showConfirm({
+    title: 'Clear cached model?',
+    message: 'The Kokoro weights will be removed from local storage. The next play will re-download (~80 MB).',
+    okLabel: 'Clear',
+    danger: true,
+  });
+  if (!ok) return;
+  tts.unload();
+  try {
+    const reg = await navigator.serviceWorker?.ready;
+    reg?.active?.postMessage('clear-model-cache');
+  } catch (_) {}
+  try {
+    const names = await caches.keys();
+    await Promise.all(names.filter((n) => n.startsWith('transformers-')).map((n) => caches.delete(n)));
+  } catch (_) {}
+  ui.setModelStatus(modelStatusText());
+  ui.showToast('Cached model cleared.');
+}
+
 function wire() {
   $('btn-import').addEventListener('click', () => $('file-input').click());
   $('file-input').addEventListener('change', async (e) => {
@@ -90,10 +158,13 @@ function wire() {
     e.target.value = '';
     if (file) await handleImport(file);
   });
-  $('btn-settings').addEventListener('click', () => ui.openSettings());
+  $('btn-settings').addEventListener('click', openSettings);
   $('btn-close-settings').addEventListener('click', () => ui.closeSettings());
   $('settings-modal').querySelector('.modal-scrim').addEventListener('click', () => ui.closeSettings());
   $('btn-preload').addEventListener('click', ensureTTS);
+  $('btn-clear-cache').addEventListener('click', clearModelCache);
+  $('set-device').addEventListener('change', onDeviceChange);
+  $('set-dtype').addEventListener('change', onDtypeChange);
 
   $('btn-back').addEventListener('click', () => {
     player.pause();

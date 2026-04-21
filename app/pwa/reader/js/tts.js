@@ -6,32 +6,67 @@ const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 const ENGLISH_PREFIXES = ['af_', 'am_', 'bf_', 'bm_'];
 const GRADE_ORDER = { 'A+': 0, 'A': 1, 'A-': 2, 'B+': 3, 'B': 4, 'B-': 5, 'C+': 6, 'C': 7, 'C-': 8, 'D+': 9, 'D': 10, 'D-': 11, 'F+': 12, 'F': 13 };
 
+export const DEVICE_OPTIONS = [
+  { id: 'auto', label: 'Auto (WebGPU if available)' },
+  { id: 'webgpu', label: 'WebGPU (fast, may be buggy on mobile)' },
+  { id: 'wasm', label: 'WASM (slow, most compatible)' },
+];
+export const DTYPE_OPTIONS = [
+  { id: 'q4', label: 'q4 (smallest, lower quality)' },
+  { id: 'q8', label: 'q8 (default)' },
+  { id: 'fp16', label: 'fp16' },
+  { id: 'fp32', label: 'fp32 (largest, best quality)' },
+];
+
 let tts = null;
 let loading = null;
+let currentConfig = null;
 
 export function isLoaded() { return tts !== null; }
-
-export async function initTTS(onProgress) {
-  if (tts) return tts;
-  if (loading) return loading;
-  loading = (async () => {
-    tts = await KokoroTTS.from_pretrained(MODEL_ID, {
-      dtype: 'q8',
-      device: webgpuAvailable() ? 'webgpu' : 'wasm',
-      progress_callback: (p) => { if (onProgress) onProgress(p); },
-    });
-    return tts;
-  })();
-  try { return await loading; } finally { loading = null; }
-}
+export function currentOptions() { return currentConfig; }
 
 function webgpuAvailable() {
   return typeof navigator !== 'undefined' && 'gpu' in navigator;
 }
 
-export function getDevice() {
+function resolveDevice(device) {
+  if (device === 'webgpu' || device === 'wasm') return device;
   return webgpuAvailable() ? 'webgpu' : 'wasm';
 }
+
+export async function initTTS({ device = 'auto', dtype = 'q8' } = {}, onProgress) {
+  const resolvedDevice = resolveDevice(device);
+  if (tts && currentConfig && currentConfig.device === resolvedDevice && currentConfig.dtype === dtype) {
+    return tts;
+  }
+  if (tts) unload();
+  if (loading) return loading;
+  loading = (async () => {
+    tts = await KokoroTTS.from_pretrained(MODEL_ID, {
+      dtype,
+      device: resolvedDevice,
+      progress_callback: (p) => { if (onProgress) onProgress(p); },
+    });
+    currentConfig = { device: resolvedDevice, dtype };
+    return tts;
+  })();
+  try { return await loading; } finally { loading = null; }
+}
+
+export function unload() {
+  tts = null;
+  currentConfig = null;
+}
+
+export function getDevice() {
+  return currentConfig?.device ?? (webgpuAvailable() ? 'webgpu' : 'wasm');
+}
+
+export function getDtype() {
+  return currentConfig?.dtype ?? 'q8';
+}
+
+export function hasWebGPU() { return webgpuAvailable(); }
 
 export async function generate(text, voice, speed) {
   if (!tts) throw new Error('TTS not initialised');

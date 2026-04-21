@@ -167,6 +167,42 @@ export function closeVoicePicker() { $('voice-modal').classList.add('hidden'); }
 export function openSettings() { $('settings-modal').classList.remove('hidden'); }
 export function closeSettings() { $('settings-modal').classList.add('hidden'); }
 
+export function populateSettingsOptions({ deviceOptions, dtypeOptions, hasWebGPU }) {
+  const devSel = $('set-device');
+  devSel.innerHTML = '';
+  for (const o of deviceOptions) {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = o.label;
+    if (o.id === 'webgpu' && !hasWebGPU) { opt.disabled = true; opt.textContent += ' — unavailable'; }
+    devSel.appendChild(opt);
+  }
+  const dtSel = $('set-dtype');
+  dtSel.innerHTML = '';
+  for (const o of dtypeOptions) {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = o.label;
+    dtSel.appendChild(opt);
+  }
+  $('webgpu-hint').textContent = hasWebGPU
+    ? 'This browser reports WebGPU support.'
+    : 'This browser has no WebGPU — Auto falls back to WASM.';
+}
+
+export function setSettingsValues({ device, dtype }) {
+  $('set-device').value = device;
+  $('set-dtype').value = dtype;
+}
+
+export function setStorageStatus(persisted) {
+  const el = $('storage-status');
+  if (!el) return;
+  el.textContent = persisted
+    ? 'Storage: persistent (model cache is protected from eviction).'
+    : 'Storage: best-effort (browser may evict the cached model under pressure).';
+}
+
 export function showLoading(msg, pct) {
   $('loading-msg').textContent = msg;
   const p = $('loading-progress');

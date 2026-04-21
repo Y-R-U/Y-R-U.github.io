@@ -90,11 +90,28 @@
         <button class="icon-btn" id="btn-close-settings" aria-label="Close">×</button>
       </header>
       <div class="settings-body">
-        <p>Model: Kokoro-82M (q8, WebGPU)</p>
+        <p>Model: Kokoro-82M</p>
         <p id="model-status">Not loaded</p>
-        <button id="btn-preload" class="text-btn">Download model now</button>
+
+        <div class="setting-row">
+          <label for="set-device">Inference device</label>
+          <select id="set-device"></select>
+        </div>
+        <div class="setting-row">
+          <label for="set-dtype">Quantization</label>
+          <select id="set-dtype"></select>
+        </div>
+        <p class="hint" id="webgpu-hint"></p>
+
+        <div class="setting-actions">
+          <button id="btn-preload" class="text-btn">Load / reload model</button>
+          <button id="btn-clear-cache" class="text-btn">Clear cached model</button>
+        </div>
+
         <hr>
+        <p id="storage-status" class="hint"></p>
         <p class="hint">All generation happens on-device. No audio is saved — it plays as it's generated.</p>
+        <p class="hint">If you hear high-pitched noise instead of speech, switch device to WASM (some mobile GPUs produce garbage output with WebGPU).</p>
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-const VERSION = 'reader-v3';
+const VERSION = 'reader-v4';
 const SHELL = [
   './',
   './index.html',
@@ -27,9 +27,21 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first for same-origin + approved CDNs. Leave HF model/weight hosts alone —
-// Transformers.js manages its own Cache Storage for those.
-const CACHEABLE_CDN = /^https:\/\/(cdn\.jsdelivr\.net|esm\.sh)\//;
+// Cache-first for same-origin + approved CDNs. HF weight hosts are included so
+// the Kokoro model survives Cache Storage eviction of transformers.js's own cache.
+const CACHEABLE_CDN = /^https:\/\/([a-z0-9-]+\.)*(jsdelivr\.net|esm\.sh|huggingface\.co|hf\.co)\//;
+
+self.addEventListener('message', (e) => {
+  if (e.data === 'clear-model-cache') {
+    e.waitUntil((async () => {
+      const names = await caches.keys();
+      await Promise.all(names.filter((n) => n.startsWith('transformers-')).map((n) => caches.delete(n)));
+      const own = await caches.open(VERSION);
+      const reqs = await own.keys();
+      await Promise.all(reqs.filter((r) => /huggingface\.co|hf\.co/.test(r.url)).map((r) => own.delete(r)));
+    })());
+  }
+});
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
