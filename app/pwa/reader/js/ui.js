@@ -163,6 +163,7 @@ export function renderVoicePicker(voices, currentVoice, onSelect) {
   const list = $('voice-list');
   list.innerHTML = '';
   const groups = [
+    { label: 'Custom blends',   filter: (v) => v.accent === 'Blend' },
     { label: 'American female', filter: (v) => v.accent === 'American' && v.gender === 'female' },
     { label: 'American male',   filter: (v) => v.accent === 'American' && v.gender === 'male' },
     { label: 'British female',  filter: (v) => v.accent === 'British'  && v.gender === 'female' },
