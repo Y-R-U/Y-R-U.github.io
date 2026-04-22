@@ -146,7 +146,11 @@ export function updatePlayer() {
     scrub.max = String(s.duration);
     scrub.value = String(s.position);
   }
-  $('speed-val').textContent = s.speed.toFixed(2).replace(/0$/, '') + '×';
+  const speedEl = $('speed');
+  if (document.activeElement !== speedEl) {
+    speedEl.value = String(s.speed);
+    $('speed-val').textContent = s.speed.toFixed(2).replace(/0$/, '') + '×';
+  }
 }
 
 function fmtTime(sec) {
