@@ -9,6 +9,7 @@ const $ = (id) => document.getElementById(id);
 let voicesCache = null;
 let pollTimer = null;
 let serverReachable = true;
+let lastRenderKey = '';
 
 /* In-flight uploads that the server doesn't yet know about. Keyed by a
    synthetic id; cleared once the server assigns a real job id. */
@@ -115,13 +116,20 @@ async function refresh() {
   }
 
   ui.setConnectionStatus(serverReachable);
-  ui.renderJobs(jobRows, cancelJobRow);
-  ui.renderLibrary(libraryRows, {
-    onOpen: openBook,
-    onSaveToDevice: saveBookToDevice,
-    onRemoveCache: removeFromCache,
-    onDelete: deleteBook,
-  });
+
+  // Skip re-rendering the DOM if nothing visible changed — prevents the
+  // library flicker when we poll on a steady state.
+  const key = renderKey(jobRows, libraryRows, serverReachable);
+  if (key !== lastRenderKey) {
+    lastRenderKey = key;
+    ui.renderJobs(jobRows, cancelJobRow);
+    ui.renderLibrary(libraryRows, {
+      onOpen: openBook,
+      onSaveToDevice: saveBookToDevice,
+      onRemoveCache: removeFromCache,
+      onDelete: deleteBook,
+    });
+  }
 
   // Kick off background downloads for any done-but-not-cached books.
   if (serverJobs !== null) {
@@ -132,12 +140,19 @@ async function refresh() {
     }
   }
 
-  // Keep polling while anything is still in flight.
-  if (jobRows.length || caching.size || uploads.size) {
-    ensurePolling();
-  } else {
-    stopPolling();
-  }
+  // Only keep polling while something is *actually* progressing. Error
+  // jobs are terminal — they shouldn't force a live loop.
+  const hasProgressing = uploads.size > 0
+    || caching.size > 0
+    || (serverJobs || []).some((j) => j.state === 'queued' || j.state === 'processing');
+  if (hasProgressing) ensurePolling();
+  else stopPolling();
+}
+
+function renderKey(jobRows, libraryRows, online) {
+  const j = jobRows.map((r) => `${r.id}:${r.state}:${Math.round((r.progress || 0) * 100)}:${r.error || ''}`).join('|');
+  const b = libraryRows.map((r) => `${r.jobId}:${r.cached ? 1 : 0}:${r.onServer ? 1 : 0}:${r.lastPlayed || 0}`).join('|');
+  return `${online ? 1 : 0}|${j}|${b}`;
 }
 
 function ensurePolling() {
