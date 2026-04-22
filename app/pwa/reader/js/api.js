@@ -48,7 +48,12 @@ export async function createJob(file, voice, speed = 1.0, { onUploadProgress } =
 }
 
 export async function deleteJob(id) {
-  await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+  const r = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+  if (!r.ok) {
+    let msg = `delete failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (_) {}
+    throw new Error(msg);
+  }
 }
 
 export async function fetchMp3Blob(id, onProgress) {
@@ -67,24 +72,4 @@ export async function fetchMp3Blob(id, onProgress) {
     onProgress(loaded / total);
   }
   return new Blob(chunks, { type: 'audio/mpeg' });
-}
-
-/* Server-Sent Events — resolve/reject-style with per-update callback. */
-export function streamJob(id, onUpdate) {
-  const es = new EventSource(`/api/jobs/${id}/stream`);
-  let closed = false;
-  const done = new Promise((resolve, reject) => {
-    es.addEventListener('update', (e) => {
-      try {
-        const meta = JSON.parse(e.data);
-        onUpdate(meta);
-        if (meta.state === 'done') { closed = true; es.close(); resolve(meta); }
-        else if (meta.state === 'error') { closed = true; es.close(); reject(new Error(meta.error || 'conversion failed')); }
-      } catch (err) { reject(err); }
-    });
-    es.onerror = () => {
-      if (!closed) { closed = true; es.close(); reject(new Error('stream dropped')); }
-    };
-  });
-  return { done, close: () => { closed = true; es.close(); } };
 }

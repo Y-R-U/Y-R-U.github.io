@@ -1,4 +1,4 @@
-const VERSION = 'reader-v5';
+const VERSION = 'reader-v6';
 const SHELL = [
   './',
   './index.html',

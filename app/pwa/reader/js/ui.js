@@ -12,22 +12,29 @@ export function showPlayer() {
   $('library-view').classList.add('hidden');
 }
 
-/* ---- Library ---- */
-export function renderJobs(jobs, onCancel) {
+/* ---- Connection indicator ---- */
+export function setConnectionStatus(online) {
+  const el = $('connection-banner');
+  if (!el) return;
+  el.classList.toggle('hidden', !!online);
+}
+
+/* ---- Jobs (uploading / converting / caching / error) ---- */
+export function renderJobs(rows, onCancel) {
   const section = $('jobs-section');
   const list = $('jobs-list');
   list.innerHTML = '';
-  if (!jobs.length) { section.classList.add('hidden'); return; }
+  if (!rows.length) { section.classList.add('hidden'); return; }
   section.classList.remove('hidden');
-  for (const j of jobs) {
+  for (const r of rows) {
     const card = document.createElement('div');
-    card.className = 'job-card' + (j.state === 'error' ? ' error' : '');
-    const stateLabel = j.state === 'error' ? 'Failed'
-      : j.state === 'done' ? 'Saving…'
-      : j.state === 'processing' ? 'Converting'
-      : j.state === 'uploading' ? 'Uploading'
+    card.className = 'job-card' + (r.state === 'error' ? ' error' : '');
+    const stateLabel = r.state === 'error' ? 'Failed'
+      : r.state === 'processing' ? 'Converting'
+      : r.state === 'uploading' ? 'Uploading'
+      : r.state === 'downloading' ? 'Caching to device'
       : 'Queued';
-    const pct = Math.round((j.progress || 0) * 100);
+    const pct = Math.round((r.progress || 0) * 100);
     card.innerHTML = `
       <div class="job-info">
         <div class="job-title"></div>
@@ -37,53 +44,72 @@ export function renderJobs(jobs, onCancel) {
       </div>
       <button class="icon-btn job-cancel" aria-label="Cancel">×</button>
     `;
-    card.querySelector('.job-title').textContent = j.title || j.filename;
-    card.querySelector('.job-state').textContent = `${stateLabel} · ${pct}%`;
+    card.querySelector('.job-title').textContent = r.title;
+    card.querySelector('.job-state').textContent = r.state === 'error' ? 'Failed' : `${stateLabel} · ${pct}%`;
     card.querySelector('.job-bar-fill').style.width = pct + '%';
-    if (j.error) {
+    if (r.error) {
       const err = card.querySelector('.job-error');
-      err.textContent = j.error;
+      err.textContent = r.error;
       err.classList.remove('hidden');
     }
-    card.querySelector('.job-cancel').addEventListener('click', () => onCancel(j));
+    card.querySelector('.job-cancel').addEventListener('click', () => onCancel(r));
     list.appendChild(card);
   }
 }
 
-export function renderLibrary(books, onOpen, onDelete, onDownload) {
+/* ---- Library ---- */
+export function renderLibrary(books, handlers) {
+  const { onOpen, onSaveToDevice, onRemoveCache, onDelete } = handlers;
   const list = $('library-list');
   list.innerHTML = '';
   const empty = $('library-empty');
   if (!books.length) { empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
-  books.sort((a, b) => (b.lastPlayed || b.createdAt || 0) - (a.lastPlayed || a.createdAt || 0));
+  books.sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
   for (const b of books) {
     const card = document.createElement('div');
     card.className = 'book-card';
     const dur = b.duration ? fmtDuration(b.duration) : '';
     const sub = [b.author, dur, fmtSize(b.size)].filter(Boolean).join(' · ');
+    const badges = [];
+    if (b.cached) badges.push('<span class="badge cached">On device</span>');
+    else if (b.onServer) badges.push('<span class="badge server-only">Server only</span>');
+    if (!b.onServer) badges.push('<span class="badge offline">Offline copy</span>');
+
     card.innerHTML = `
       <div class="book-thumb">🎧</div>
       <div class="book-info">
         <div class="book-title"></div>
         <div class="book-meta"></div>
+        <div class="book-badges">${badges.join('')}</div>
       </div>
-      <button class="icon-btn book-dl" aria-label="Download MP3">⬇</button>
-      <button class="icon-btn book-del" aria-label="Delete">🗑</button>
+      <div class="book-actions">
+        <button class="icon-btn book-dl" aria-label="Save .mp3 to device">⬇</button>
+        <button class="icon-btn book-menu" aria-label="More">⋮</button>
+      </div>
     `;
     card.querySelector('.book-title').textContent = b.title;
     card.querySelector('.book-meta').textContent = sub;
-    card.querySelector('.book-info').addEventListener('click', () => onOpen(b.id));
-    card.querySelector('.book-thumb').addEventListener('click', () => onOpen(b.id));
-    card.querySelector('.book-dl').addEventListener('click', (e) => { e.stopPropagation(); onDownload(b); });
-    card.querySelector('.book-del').addEventListener('click', async (e) => {
+    card.querySelector('.book-info').addEventListener('click', () => onOpen(b));
+    card.querySelector('.book-thumb').addEventListener('click', () => onOpen(b));
+    card.querySelector('.book-dl').addEventListener('click', (e) => {
       e.stopPropagation();
-      const ok = await showConfirm({
-        title: 'Delete audiobook?',
-        message: `"${b.title}" will be removed from this device.`,
-        okLabel: 'Delete', danger: true,
+      onSaveToDevice(b);
+    });
+    card.querySelector('.book-menu').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const choice = await showActionSheet({
+        title: b.title,
+        actions: [
+          b.cached && b.onServer ? { id: 'uncache', label: 'Remove from device (keep on server)' } : null,
+          b.onServer ? { id: 'delete', label: 'Delete everywhere', danger: true } : { id: 'uncache', label: 'Delete from device', danger: true },
+        ].filter(Boolean),
       });
-      if (ok) onDelete(b.id);
+      if (choice === 'uncache') {
+        if (b.onServer) onRemoveCache(b); else onDelete(b);
+      } else if (choice === 'delete') {
+        onDelete(b);
+      }
     });
     list.appendChild(card);
   }
@@ -153,6 +179,7 @@ export function renderVoicePicker(voices, currentVoice, onSelect) {
     for (const v of items) {
       const item = document.createElement('div');
       item.className = 'voice-item' + (v.id === currentVoice ? ' selected' : '');
+      item.dataset.voiceId = v.id;
       item.innerHTML = `
         <div class="info">
           <div class="name"></div>
@@ -174,12 +201,8 @@ export function renderVoicePicker(voices, currentVoice, onSelect) {
 export function openImport({ filename, voices, currentVoice, onConfirm, onCancel }) {
   $('import-filename').textContent = filename;
   renderVoicePicker(voices, currentVoice, (id) => {
-    document.querySelectorAll('#voice-list .voice-item').forEach((el) => el.classList.remove('selected'));
-    const items = document.querySelectorAll('#voice-list .voice-item');
-    items.forEach((el) => {
-      if (el.querySelector('.name')?.textContent && voices.find((v) => v.id === id)?.name === el.querySelector('.name').textContent) {
-        el.classList.add('selected');
-      }
+    document.querySelectorAll('#voice-list .voice-item').forEach((el) => {
+      el.classList.toggle('selected', el.dataset.voiceId === id);
     });
     $('import-modal').dataset.selected = id;
   });
@@ -218,7 +241,7 @@ export function setStorageStatus({ persisted, usage, quota }) {
   el.innerHTML = `<p class="hint">${line1}</p>${line2 ? `<p class="hint">${line2}</p>` : ''}`;
 }
 
-/* ---- Toast / confirm ---- */
+/* ---- Toast / confirm / action sheet ---- */
 let toastTimer = null;
 export function showToast(msg, { error = false, duration = 3500 } = {}) {
   const t = $('toast');
@@ -256,5 +279,33 @@ export function showConfirm({ title = 'Confirm', message = '', okLabel = 'OK', d
     scrim.addEventListener('click', onCancel);
     document.addEventListener('keydown', onKey);
     setTimeout(() => ok.focus(), 0);
+  });
+}
+
+export function showActionSheet({ title = '', actions = [] } = {}) {
+  return new Promise((resolve) => {
+    const m = $('sheet-modal');
+    $('sheet-title').textContent = title;
+    const list = $('sheet-actions');
+    list.innerHTML = '';
+    for (const a of actions) {
+      const btn = document.createElement('button');
+      btn.className = 'sheet-action' + (a.danger ? ' danger' : '');
+      btn.textContent = a.label;
+      btn.addEventListener('click', () => done(a.id));
+      list.appendChild(btn);
+    }
+    const cancel = $('btn-sheet-cancel');
+    const scrim = m.querySelector('.modal-scrim');
+    m.classList.remove('hidden');
+    const done = (v) => {
+      m.classList.add('hidden');
+      cancel.removeEventListener('click', onCancel);
+      scrim.removeEventListener('click', onCancel);
+      resolve(v);
+    };
+    const onCancel = () => done(null);
+    cancel.addEventListener('click', onCancel);
+    scrim.addEventListener('click', onCancel);
   });
 }

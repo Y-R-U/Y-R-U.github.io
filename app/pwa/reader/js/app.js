@@ -7,7 +7,15 @@ import * as ui from './ui.js';
 const $ = (id) => document.getElementById(id);
 
 let voicesCache = null;
-const activeTrackers = new Map();  // jobId -> { close }
+let pollTimer = null;
+let serverReachable = true;
+
+/* In-flight uploads that the server doesn't yet know about. Keyed by a
+   synthetic id; cleared once the server assigns a real job id. */
+const uploads = new Map();
+
+/* Books currently being cached into OPFS. */
+const caching = new Map();
 
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
@@ -21,30 +29,194 @@ async function getVoices() {
   return voicesCache;
 }
 
-/* ---- Library refresh ---- */
+/* ---- Refresh ---- */
 async function refresh() {
-  const [localBooks, localJobs] = await Promise.all([store.listBooks(), store.listJobs()]);
-  ui.renderJobs(localJobs, cancelJob);
-  ui.renderLibrary(localBooks, openBook, deleteBook, downloadBook);
-}
-
-async function cancelJob(jobRow) {
-  const tracker = activeTrackers.get(jobRow.jobId);
-  tracker?.close();
-  activeTrackers.delete(jobRow.jobId);
-  await store.deleteJobRow(jobRow.jobId);
-  api.deleteJob(jobRow.jobId).catch(() => {});
-  await refresh();
-}
-
-async function deleteBook(id) {
-  await store.deleteBook(id);
-  await refresh();
-}
-
-async function downloadBook(book) {
+  let serverJobs = null;
   try {
-    const file = await store.readAudioFile(book.id);
+    serverJobs = await api.listJobs();
+    serverReachable = true;
+  } catch (_) {
+    serverReachable = false;
+  }
+
+  // Jobs section = live uploads + in-flight server jobs + error jobs
+  const uploadRows = Array.from(uploads.values());
+  const active = (serverJobs || []).filter(
+    (j) => j.state === 'queued' || j.state === 'processing' || j.state === 'error'
+  );
+
+  // Overlay caching progress onto done-but-not-cached jobs so the user sees
+  // the download bar in the same place as the conversion bar.
+  const jobRows = [
+    ...uploadRows.map((u) => ({
+      kind: 'upload',
+      id: u.id,
+      title: u.title,
+      state: 'uploading',
+      progress: u.progress,
+    })),
+    ...active.map((j) => ({
+      kind: 'server',
+      id: j.id,
+      title: j.title || j.input_filename,
+      state: j.state,
+      progress: j.progress,
+      error: j.error,
+    })),
+  ];
+
+  for (const [jobId, info] of caching.entries()) {
+    jobRows.push({ kind: 'cache', id: jobId, title: info.title, state: 'downloading', progress: info.progress });
+  }
+
+  // Library = server's done jobs (authoritative), augmented with local
+  // metadata + cached flag.
+  const libraryRows = [];
+  if (serverJobs !== null) {
+    const done = serverJobs.filter((j) => j.state === 'done');
+    for (const j of done) {
+      if (caching.has(j.id)) continue; // still showing as a progress card
+      const meta = (await store.getBookMeta(j.id)) || {};
+      const cached = await store.audioExists(j.id);
+      libraryRows.push({
+        jobId: j.id,
+        title: j.title || meta.title || j.input_filename,
+        author: j.author || meta.author || '',
+        voice: j.voice,
+        speed: j.speed,
+        size: j.mp3_size || meta.size || 0,
+        duration: meta.duration || null,
+        position: meta.position || 0,
+        lastPlayed: meta.lastPlayed || 0,
+        cached,
+        onServer: true,
+      });
+    }
+  } else {
+    // Server unreachable — fall back to locally cached books so playback
+    // still works offline.
+    const local = await store.listBookMeta();
+    for (const m of local) {
+      if (!(await store.audioExists(m.jobId))) continue;
+      libraryRows.push({
+        jobId: m.jobId,
+        title: m.title || '(untitled)',
+        author: m.author || '',
+        voice: m.voice,
+        speed: m.speed,
+        size: m.size || 0,
+        duration: m.duration || null,
+        position: m.position || 0,
+        lastPlayed: m.lastPlayed || 0,
+        cached: true,
+        onServer: false,
+      });
+    }
+  }
+
+  ui.setConnectionStatus(serverReachable);
+  ui.renderJobs(jobRows, cancelJobRow);
+  ui.renderLibrary(libraryRows, {
+    onOpen: openBook,
+    onSaveToDevice: saveBookToDevice,
+    onRemoveCache: removeFromCache,
+    onDelete: deleteBook,
+  });
+
+  // Kick off background downloads for any done-but-not-cached books.
+  if (serverJobs !== null) {
+    for (const b of libraryRows) {
+      if (!b.cached && !caching.has(b.jobId)) {
+        startCaching(b.jobId).catch(() => {});
+      }
+    }
+  }
+
+  // Keep polling while anything is still in flight.
+  if (jobRows.length || caching.size || uploads.size) {
+    ensurePolling();
+  } else {
+    stopPolling();
+  }
+}
+
+function ensurePolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(() => refresh().catch(() => {}), 2000);
+}
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+/* ---- Actions on jobs/books ---- */
+async function cancelJobRow(row) {
+  if (row.kind === 'upload') {
+    const entry = uploads.get(row.id);
+    entry?.xhr?.abort();
+    uploads.delete(row.id);
+    await refresh();
+    return;
+  }
+  if (row.kind === 'cache') {
+    const entry = caching.get(row.id);
+    entry?.abort?.();
+    caching.delete(row.id);
+    await refresh();
+    return;
+  }
+  // kind === 'server' — ask first, since this deletes server-side work.
+  if (row.state === 'processing') {
+    ui.showToast('Can\'t cancel while converting. Wait for it to finish, then delete.');
+    return;
+  }
+  const ok = await ui.showConfirm({
+    title: row.state === 'error' ? 'Remove failed job?' : 'Cancel conversion?',
+    message: `"${row.title}" will be removed from the server.`,
+    okLabel: row.state === 'error' ? 'Remove' : 'Cancel job',
+    danger: true,
+  });
+  if (!ok) return;
+  try {
+    await api.deleteJob(row.id);
+  } catch (e) {
+    ui.showToast('Delete failed: ' + (e.message || e), { error: true });
+  }
+  await refresh();
+}
+
+async function deleteBook(book) {
+  const ok = await ui.showConfirm({
+    title: 'Delete audiobook?',
+    message: `"${book.title}" will be removed from the server and this device. This cannot be undone.`,
+    okLabel: 'Delete', danger: true,
+  });
+  if (!ok) return;
+  await api.deleteJob(book.jobId).catch(() => {});
+  await store.deleteAudio(book.jobId);
+  await store.deleteBookMeta(book.jobId);
+  await refresh();
+}
+
+async function removeFromCache(book) {
+  const ok = await ui.showConfirm({
+    title: 'Remove from device?',
+    message: `"${book.title}" will be removed from this device, but stays on the server and can be re-downloaded.`,
+    okLabel: 'Remove',
+  });
+  if (!ok) return;
+  await store.deleteAudio(book.jobId);
+  await refresh();
+}
+
+async function saveBookToDevice(book) {
+  try {
+    let file;
+    if (await store.audioExists(book.jobId)) {
+      file = await store.readAudioFile(book.jobId);
+    } else {
+      ui.showToast('Downloading first…');
+      file = await api.fetchMp3Blob(book.jobId);
+    }
     const url = URL.createObjectURL(file);
     const a = document.createElement('a');
     a.href = url;
@@ -55,20 +227,54 @@ async function downloadBook(book) {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (e) {
-    ui.showToast('Download failed: ' + (e.message || e), { error: true });
+    ui.showToast('Save failed: ' + (e.message || e), { error: true });
   }
 }
 
-async function openBook(id) {
+async function openBook(book) {
   ui.showPlayer();
   try {
-    await player.loadBook(id, { onUpdate: ui.updatePlayer });
+    if (!(await store.audioExists(book.jobId))) {
+      if (!serverReachable) throw new Error('not cached and server is offline');
+      ui.showToast('Downloading…');
+      await startCaching(book.jobId);
+    }
+    await player.loadBook(book.jobId, { onUpdate: ui.updatePlayer });
     ui.updatePlayer();
   } catch (e) {
     ui.showToast('Could not load: ' + (e.message || e), { error: true });
     ui.showLibrary();
     await refresh();
   }
+}
+
+/* ---- Caching (server -> OPFS) ---- */
+async function startCaching(jobId) {
+  if (caching.has(jobId)) return caching.get(jobId).promise;
+  const meta = await api.getJob(jobId);
+  if (!meta || meta.state !== 'done') return;
+
+  let aborted = false;
+  const entry = { title: meta.title || meta.input_filename, progress: 0, abort: () => { aborted = true; } };
+  const promise = (async () => {
+    try {
+      await books.cacheMp3(meta, (p) => {
+        if (aborted) throw new Error('cache aborted');
+        entry.progress = p;
+        refresh();
+      });
+      ui.showToast(`"${entry.title}" ready to play`);
+    } catch (e) {
+      if (!aborted) ui.showToast('Cache failed: ' + (e.message || e), { error: true });
+    } finally {
+      caching.delete(jobId);
+      refresh();
+    }
+  })();
+  entry.promise = promise;
+  caching.set(jobId, entry);
+  refresh();
+  return promise;
 }
 
 /* ---- Import flow ---- */
@@ -86,120 +292,43 @@ async function onFilePicked(file) {
     onCancel: () => {},
     onConfirm: async (voice) => {
       await store.setPref('lastVoice', voice);
-      startConversion(file, voice);
+      startUpload(file, voice);
     },
   });
 }
 
-async function startConversion(file, voice) {
-  // Optimistic placeholder job row so the card shows up before the POST
-  // completes (important for large uploads).
-  const placeholderId = `pending-${Date.now()}`;
-  const placeholder = {
-    jobId: placeholderId,
-    filename: file.name,
-    voice,
-    state: 'uploading',
-    progress: 0,
+async function startUpload(file, voice) {
+  const localId = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const entry = {
+    id: localId,
     title: file.name.replace(/\.[^.]+$/, ''),
-    author: '',
-    error: null,
-    createdAt: Date.now(),
+    progress: 0,
+    xhr: null,
   };
-  await store.putJob(placeholder);
+  uploads.set(localId, entry);
   refresh();
 
-  let jobRow = null;
   try {
     const job = await api.createJob(file, voice, 1.0, {
-      onUploadProgress: async (frac) => {
-        placeholder.progress = frac;
-        await store.putJob(placeholder);
+      onUploadProgress: (frac) => {
+        entry.progress = frac;
         refresh();
       },
     });
-    await store.deleteJobRow(placeholderId);
-    jobRow = {
-      jobId: job.id,
-      filename: file.name,
+    uploads.delete(localId);
+    // Seed local metadata so the title shows up before first polling tick.
+    await store.updateBookMeta(job.id, {
+      title: job.title || entry.title,
+      author: '',
       voice,
       speed: 1.0,
-      state: job.state,
-      progress: 0,
-      title: job.title || placeholder.title,
-      author: '',
-      error: null,
-      createdAt: Date.now(),
-    };
-    await store.putJob(jobRow);
-    await refresh();
-    await trackToCompletion(jobRow);
-  } catch (e) {
-    if (jobRow) {
-      jobRow.state = 'error';
-      jobRow.error = e.message || String(e);
-      await store.putJob(jobRow);
-    } else {
-      await store.deleteJobRow(placeholderId);
-    }
-    await refresh();
-    ui.showToast('Conversion failed: ' + (e.message || e), { error: true, duration: 6000 });
-  }
-}
-
-async function trackToCompletion(jobRow) {
-  if (activeTrackers.has(jobRow.jobId)) return;
-  const tracker = api.streamJob(jobRow.jobId, async (meta) => {
-    jobRow.state = meta.state;
-    jobRow.progress = meta.progress || 0;
-    jobRow.title = meta.title || jobRow.title;
-    jobRow.author = meta.author || jobRow.author;
-    jobRow.error = meta.error || null;
-    await store.putJob(jobRow);
-    refresh();
-  });
-  activeTrackers.set(jobRow.jobId, tracker);
-  try {
-    await tracker.done;
-    jobRow.state = 'downloading';
-    jobRow.progress = 0;
-    await store.putJob(jobRow);
-    refresh();
-    await books.completeJob(jobRow, async (frac) => {
-      jobRow.progress = frac;
-      await store.putJob(jobRow);
-      refresh();
     });
-    ui.showToast(`"${jobRow.title}" ready.`);
+    await refresh();
+    ensurePolling();
   } catch (e) {
-    jobRow.state = 'error';
-    jobRow.error = e.message || String(e);
-    await store.putJob(jobRow);
-    ui.showToast('Conversion failed: ' + (e.message || e), { error: true, duration: 6000 });
-  } finally {
-    activeTrackers.delete(jobRow.jobId);
-    refresh();
-  }
-}
-
-/* ---- Resume active jobs on page load ---- */
-async function resumeJobs() {
-  const rows = await store.listJobs();
-  for (const row of rows) {
-    if (!row.jobId || row.jobId.startsWith('pending-')) {
-      // Upload never completed server-side.
-      await store.deleteJobRow(row.jobId);
-      continue;
-    }
-    const serverMeta = await api.getJob(row.jobId).catch(() => null);
-    if (!serverMeta) { await store.deleteJobRow(row.jobId); continue; }
-    row.state = serverMeta.state;
-    row.progress = serverMeta.progress || 0;
-    row.title = serverMeta.title || row.title;
-    await store.putJob(row);
-    if (serverMeta.state === 'done' || serverMeta.state === 'processing' || serverMeta.state === 'queued') {
-      trackToCompletion(row).catch(() => {});
-    }
+    uploads.delete(localId);
+    await refresh();
+    ui.showToast('Upload failed: ' + (e.message || e), { error: true, duration: 6000 });
   }
 }
 
@@ -236,8 +365,13 @@ function wire() {
   });
   $('speed').addEventListener('change', (e) => player.setSpeed(parseFloat(e.target.value)));
   $('btn-player-dl').addEventListener('click', () => {
-    if (player.state.book) downloadBook(player.state.book);
+    if (player.state.book) saveBookToDevice(player.state.book);
   });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refresh();
+  });
+  window.addEventListener('online', () => refresh());
 }
 
 async function main() {
@@ -245,7 +379,6 @@ async function main() {
   store.requestPersist();
   wire();
   await refresh();
-  resumeJobs();
 }
 
 main();

@@ -23,6 +23,8 @@
       <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
     </header>
 
+    <div id="connection-banner" class="connection-banner hidden">Server unreachable — showing cached books only.</div>
+
     <div id="jobs-section" class="jobs-section hidden">
       <div class="section-label">In progress</div>
       <div id="jobs-list" class="jobs-list"></div>
@@ -97,6 +99,16 @@
         <hr>
         <p class="hint">Conversions run on the airon server. Once complete, the MP3 is saved on this device so it plays offline. Use the download button to save a copy to your device's file system.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Action sheet modal -->
+  <div id="sheet-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel sheet-panel">
+      <div id="sheet-title" class="sheet-title"></div>
+      <div id="sheet-actions" class="sheet-actions"></div>
+      <button id="btn-sheet-cancel" class="text-btn sheet-cancel">Cancel</button>
     </div>
   </div>
 

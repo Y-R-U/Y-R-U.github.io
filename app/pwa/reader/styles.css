@@ -636,3 +636,79 @@ button {
   color: #fff;
 }
 .toast.hidden { display: none; }
+
+/* Connection banner */
+.connection-banner {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: center;
+}
+.connection-banner.hidden { display: none; }
+
+/* Book badges + actions */
+.book-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg-3);
+  color: var(--fg-dim);
+  border: 1px solid var(--border);
+}
+.badge.cached { background: rgba(34, 197, 94, 0.15); color: #86efac; border-color: rgba(34, 197, 94, 0.3); }
+.badge.server-only { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+.badge.offline { background: rgba(251, 191, 36, 0.15); color: #fcd34d; border-color: rgba(251, 191, 36, 0.3); }
+
+.book-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+/* Action sheet */
+.sheet-panel {
+  padding: 12px;
+}
+.sheet-title {
+  padding: 8px 12px 12px;
+  font-size: 14px;
+  color: var(--fg-dim);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sheet-action {
+  background: transparent;
+  border: 0;
+  color: var(--fg);
+  padding: 14px 12px;
+  font-size: 15px;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.sheet-action:hover, .sheet-action:active { background: var(--bg-3); }
+.sheet-action.danger { color: #fca5a5; }
+.sheet-cancel {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  background: var(--bg-3);
+  border-radius: 8px;
+}

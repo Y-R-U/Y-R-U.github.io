@@ -1,5 +1,4 @@
-/* HTMLAudioElement-based player. No more sentence streaming — we're playing
-   the pre-rendered MP3 that the server produced. */
+/* HTMLAudioElement-based player. Plays the cached MP3 out of OPFS. */
 import * as store from './storage.js';
 
 export const state = {
@@ -28,15 +27,14 @@ function teardown() {
   state.position = 0;
 }
 
-export async function loadBook(bookId, { onUpdate } = {}) {
+export async function loadBook(jobId, { onUpdate } = {}) {
   teardown();
-  const book = await store.getBook(bookId);
-  if (!book) throw new Error('book not found');
-  const file = await store.readAudioFile(bookId);
-  state.book = book;
+  const meta = (await store.getBookMeta(jobId)) || { jobId, title: '', author: '', speed: 1.0 };
+  const file = await store.readAudioFile(jobId);
+  state.book = { ...meta, jobId };
   state.url = URL.createObjectURL(file);
   state.onUpdate = onUpdate;
-  state.speed = book.speed || 1.0;
+  state.speed = meta.speed || 1.0;
 
   const audio = new Audio();
   audio.preload = 'auto';
@@ -44,8 +42,11 @@ export async function loadBook(bookId, { onUpdate } = {}) {
   audio.playbackRate = state.speed;
   audio.addEventListener('loadedmetadata', () => {
     state.duration = isFinite(audio.duration) ? audio.duration : 0;
-    if (book.position && book.position < state.duration - 1) {
-      audio.currentTime = book.position;
+    if (state.duration && !meta.duration) {
+      store.updateBookMeta(jobId, { duration: state.duration });
+    }
+    if (meta.position && meta.position < state.duration - 1) {
+      audio.currentTime = meta.position;
     }
     notify();
   });
@@ -64,8 +65,7 @@ export async function loadBook(bookId, { onUpdate } = {}) {
   });
   state.audio = audio;
 
-  book.lastPlayed = Date.now();
-  await store.putBook(book);
+  await store.updateBookMeta(jobId, { lastPlayed: Date.now() });
   updateMediaSession();
   notify();
 }
@@ -99,7 +99,10 @@ export function skip(seconds) {
 export function setSpeed(v) {
   state.speed = Math.max(0.5, Math.min(3.0, v));
   if (state.audio) state.audio.playbackRate = state.speed;
-  if (state.book) { state.book.speed = state.speed; store.putBook(state.book); }
+  if (state.book) {
+    state.book.speed = state.speed;
+    store.updateBookMeta(state.book.jobId, { speed: state.speed });
+  }
   notify();
 }
 
@@ -117,16 +120,15 @@ function savePositionThrottled() {
 }
 async function savePosition() {
   if (!state.book) return;
-  state.book.position = state.position;
-  await store.putBook(state.book);
+  await store.updateBookMeta(state.book.jobId, { position: state.position });
 }
 
 function updateMediaSession() {
   if (!('mediaSession' in navigator) || !state.book) return;
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: state.book.title,
+    title: state.book.title || 'Audiobook',
     artist: state.book.author || 'Reader',
-    album: state.book.title,
+    album: state.book.title || '',
     artwork: [
       { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
       { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
