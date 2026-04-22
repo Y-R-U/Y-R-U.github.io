@@ -47,8 +47,8 @@ export function drawHUD(ctx) {
     ctx.textAlign = 'center';
     ctx.fillText(
       isTouch
-        ? 'Tap to shoot tongue \u2022 Tap again to let go'
-        : 'Click to shoot tongue \u2022 Release to let go',
+        ? 'Tap to grab \u2022 Hold to pull up \u2022 Release to launch'
+        : 'Click to grab \u2022 Hold to pull up \u2022 Release to launch',
       W / 2, H - 20);
   }
 }

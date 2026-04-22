@@ -7,6 +7,8 @@ import { mouse, camera, getEffective, world } from './state.js';
 import { createParticle, particles } from './particles.js';
 
 // Returns the best aim target in range + within the aim cone.
+// Among in-range cone-passing targets, picks the one closest to the cursor
+// so players can intentionally grab flies or specific anchors.
 // Shape: { kind: 'anchor'|'fly', anchor?, fly?, bobY, dist } or null.
 export function findAimTarget() {
   const worldMX = mouse.x + camera.x;
@@ -17,7 +19,7 @@ export function findAimTarget() {
   const toMd = Math.sqrt(toMx * toMx + toMy * toMy);
 
   let best = null;
-  let bestDist = Infinity;
+  let bestMouseDist = Infinity;
 
   const inCone = (dx, dy, dist) => {
     if (toMd <= 0) return true;
@@ -30,10 +32,14 @@ export function findAimTarget() {
     const dx = a.x - frog.x;
     const dy = bobY - frog.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist >= maxRange || dist >= bestDist) continue;
-    if (!inCone(dx, dy, dist)) continue;
-    best = { kind: 'anchor', anchor: a, bobY, dist };
-    bestDist = dist;
+    if (dist >= maxRange || !inCone(dx, dy, dist)) continue;
+    const mdx = a.x - worldMX;
+    const mdy = bobY - worldMY;
+    const md = Math.sqrt(mdx * mdx + mdy * mdy);
+    if (md < bestMouseDist) {
+      best = { kind: 'anchor', anchor: a, bobY, dist };
+      bestMouseDist = md;
+    }
   }
 
   const fly = world.flyTarget;
@@ -42,8 +48,14 @@ export function findAimTarget() {
     const dx = fly.x - frog.x;
     const dy = flyBobY - frog.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < maxRange && dist < bestDist && inCone(dx, dy, dist)) {
-      best = { kind: 'fly', fly, bobY: flyBobY, dist };
+    if (dist < maxRange && inCone(dx, dy, dist)) {
+      const mdx = fly.x - worldMX;
+      const mdy = flyBobY - worldMY;
+      const md = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (md < bestMouseDist) {
+        best = { kind: 'fly', fly, bobY: flyBobY, dist };
+        bestMouseDist = md;
+      }
     }
   }
 

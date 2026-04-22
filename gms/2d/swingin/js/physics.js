@@ -3,7 +3,7 @@
 // ============================================================
 
 import { W, H, GRAVITY, FROG_H } from './config.js';
-import { game, camera, getEffective, world, shake } from './state.js';
+import { game, camera, getEffective, world, shake, mouse } from './state.js';
 import { frog } from './frog.js';
 import { particles, spawnCoinParticles, spawnCelebration, updateParticles } from './particles.js';
 
@@ -69,6 +69,21 @@ export function update(dt) {
   if (frog.swinging && frog.tongue) {
     // Pendulum physics — angVel/angle in per-frame units, scaled by step for dt-independence
     const t = frog.tongue;
+
+    // Reel in while input is held — lets the player pull upward toward the anchor.
+    // Preserve tangential velocity (v = ω·r): as r shrinks, ω grows proportionally.
+    if (mouse.down) {
+      const minLen = 24;
+      const reelRate = 150; // pixels per second
+      if (t.length > minLen) {
+        const newLen = Math.max(minLen, t.length - reelRate * dt);
+        if (newLen < t.length) {
+          t.angVel *= t.length / newLen;
+          t.length = newLen;
+        }
+      }
+    }
+
     const gravityAng = (GRAVITY / t.length) * Math.sin(t.angle);
     t.angVel += gravityAng * step;
     t.angVel *= Math.pow(0.998, step);
