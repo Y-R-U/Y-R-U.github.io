@@ -18,6 +18,10 @@ const uploads = new Map();
 /* Books currently being cached into OPFS. */
 const caching = new Map();
 
+/* Job ids that recently failed to cache — we won't auto-retry them in
+   this session. User tapping play/download clears the flag. */
+const cacheFailed = new Set();
+
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try { await navigator.serviceWorker.register('sw.js'); } catch (e) { console.warn('SW register failed:', e); }
@@ -132,9 +136,10 @@ async function refresh() {
   }
 
   // Kick off background downloads for any done-but-not-cached books.
+  // Skip any that already failed this session — user must tap to retry.
   if (serverJobs !== null) {
     for (const b of libraryRows) {
-      if (!b.cached && !caching.has(b.jobId)) {
+      if (!b.cached && !caching.has(b.jobId) && !cacheFailed.has(b.jobId)) {
         startCaching(b.jobId).catch(() => {});
       }
     }
@@ -224,6 +229,7 @@ async function removeFromCache(book) {
 }
 
 async function saveBookToDevice(book) {
+  cacheFailed.delete(book.jobId);
   try {
     let file;
     if (await store.audioExists(book.jobId)) {
@@ -247,6 +253,7 @@ async function saveBookToDevice(book) {
 }
 
 async function openBook(book) {
+  cacheFailed.delete(book.jobId);
   ui.showPlayer();
   try {
     if (!(await store.audioExists(book.jobId))) {
@@ -264,15 +271,21 @@ async function openBook(book) {
 }
 
 /* ---- Caching (server -> OPFS) ---- */
-async function startCaching(jobId) {
+function startCaching(jobId) {
   if (caching.has(jobId)) return caching.get(jobId).promise;
-  const meta = await api.getJob(jobId);
-  if (!meta || meta.state !== 'done') return;
+  cacheFailed.delete(jobId);
 
+  // Reserve the slot synchronously — otherwise two poll ticks can each
+  // kick off a parallel download of the same job.
   let aborted = false;
-  const entry = { title: meta.title || meta.input_filename, progress: 0, abort: () => { aborted = true; } };
+  const entry = { title: '(loading…)', progress: 0, abort: () => { aborted = true; }, promise: null };
+  caching.set(jobId, entry);
+
   const promise = (async () => {
     try {
+      const meta = await api.getJob(jobId);
+      if (!meta || meta.state !== 'done') return;
+      entry.title = meta.title || meta.input_filename || jobId;
       await books.cacheMp3(meta, (p) => {
         if (aborted) throw new Error('cache aborted');
         entry.progress = p;
@@ -280,14 +293,17 @@ async function startCaching(jobId) {
       });
       ui.showToast(`"${entry.title}" ready to play`);
     } catch (e) {
-      if (!aborted) ui.showToast('Cache failed: ' + (e.message || e), { error: true });
+      console.error('cache failed for', jobId, e);
+      if (!aborted) {
+        cacheFailed.add(jobId);
+        ui.showToast('Cache failed: ' + (e && e.message ? e.message : String(e)), { error: true, duration: 6000 });
+      }
     } finally {
       caching.delete(jobId);
       refresh();
     }
   })();
   entry.promise = promise;
-  caching.set(jobId, entry);
   refresh();
   return promise;
 }
