@@ -1,5 +1,9 @@
+/* IndexedDB only. OPFS needs a secure context (HTTPS / localhost), and
+   this PWA is served over plain HTTP on the LAN, so navigator.storage
+   is undefined on most clients. IDB blob storage works everywhere. */
+
 const DB_NAME = 'reader';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbPromise = null;
 
@@ -11,6 +15,7 @@ export function openDB() {
       const db = req.result;
       for (const name of Array.from(db.objectStoreNames)) db.deleteObjectStore(name);
       db.createObjectStore('bookMeta', { keyPath: 'jobId' });
+      db.createObjectStore('audio', { keyPath: 'jobId' });
       db.createObjectStore('prefs', { keyPath: 'key' });
     };
     req.onsuccess = () => resolve(req.result);
@@ -30,9 +35,7 @@ function wrap(req) {
   });
 }
 
-/* bookMeta: local per-book state keyed by server jobId.
-   Holds title/author/voice/speed/size (mirrors of server meta, cached so the
-   library still renders offline) + duration/position/lastPlayed (local only). */
+/* bookMeta: local per-book state keyed by server jobId. */
 export async function getBookMeta(jobId) { return wrap((await tx('bookMeta')).get(jobId)); }
 export async function listBookMeta() { return wrap((await tx('bookMeta')).getAll()); }
 export async function putBookMeta(meta) { return wrap((await tx('bookMeta', 'readwrite')).put(meta)); }
@@ -53,60 +56,48 @@ export async function setPref(key, value) {
   return wrap((await tx('prefs', 'readwrite')).put({ key, value }));
 }
 
-/* --- OPFS (audio blobs live here) --- */
-async function audioDir() {
-  const root = await navigator.storage.getDirectory();
-  return root.getDirectoryHandle('audio', { create: true });
-}
-
+/* --- Audio blobs (IDB 'audio' store) --- */
 export async function saveAudio(jobId, blob) {
-  const dir = await audioDir();
-  const fh = await dir.getFileHandle(`${jobId}.mp3`, { create: true });
-  const w = await fh.createWritable();
-  await w.write(blob);
-  await w.close();
+  return wrap((await tx('audio', 'readwrite')).put({ jobId, blob, size: blob.size }));
 }
 
 export async function readAudioFile(jobId) {
-  const dir = await audioDir();
-  const fh = await dir.getFileHandle(`${jobId}.mp3`);
-  return fh.getFile();
+  const row = await wrap((await tx('audio')).get(jobId));
+  if (!row || !row.blob) throw new Error('audio not cached');
+  return row.blob;
 }
 
 export async function audioExists(jobId) {
   try {
-    const dir = await audioDir();
-    await dir.getFileHandle(`${jobId}.mp3`);
-    return true;
+    const count = await wrap((await tx('audio')).count(jobId));
+    return count > 0;
   } catch (_) { return false; }
 }
 
 export async function audioSize(jobId) {
   try {
-    const f = await readAudioFile(jobId);
-    return f.size;
+    const row = await wrap((await tx('audio')).get(jobId));
+    return row?.size ?? row?.blob?.size ?? null;
   } catch (_) { return null; }
 }
 
 export async function deleteAudio(jobId) {
-  try {
-    const dir = await audioDir();
-    await dir.removeEntry(`${jobId}.mp3`);
-  } catch (_) {}
+  try { await wrap((await tx('audio', 'readwrite')).delete(jobId)); } catch (_) {}
 }
 
+/* --- Storage diagnostics (all guarded — navigator.storage is missing
+       in non-secure contexts on some browsers) --- */
 export async function requestPersist() {
-  if (navigator.storage && navigator.storage.persist) {
-    try { return await navigator.storage.persist(); } catch (_) { return false; }
-  }
-  return false;
+  if (!navigator.storage?.persist) return false;
+  try { return await navigator.storage.persist(); } catch (_) { return false; }
 }
 
 export async function isPersisted() {
-  try { return await (navigator.storage?.persisted?.() ?? Promise.resolve(false)); }
-  catch (_) { return false; }
+  if (!navigator.storage?.persisted) return false;
+  try { return await navigator.storage.persisted(); } catch (_) { return false; }
 }
 
 export async function storageEstimate() {
+  if (!navigator.storage?.estimate) return { usage: 0, quota: 0 };
   try { return await navigator.storage.estimate(); } catch (_) { return { usage: 0, quota: 0 }; }
 }
