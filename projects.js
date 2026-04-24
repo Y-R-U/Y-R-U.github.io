@@ -216,6 +216,10 @@ const PROJECTS = [
     desc: "Low-poly Three.js tank shooter. Drive across a ridge and shoot down red-eyed black crows before they dive.",
     date: "2026-04-24" },
 
+  { name: "Claude 3D Tank",     path: "/gms/3d/claude_3d_tank/",  screenshot: "claude-3d-tank",  type: "game",
+    desc: "Low-poly 3D tank shooter at dusk. Hold off waves of diving black crows with glowing red eyes. WASD + mouse aim, barrel pitches up to track crows overhead.",
+    date: "2026-04-24" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
