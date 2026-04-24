@@ -20,7 +20,7 @@ export async function getJob(id) {
   return r.json();
 }
 
-export async function createJob(file, voice, speed = 1.0, { onUploadProgress } = {}) {
+export async function createJob(file, voice, speed = 1.0, { onUploadProgress, onXhr } = {}) {
   const form = new FormData();
   form.append('file', file);
   form.append('voice', voice);
@@ -28,6 +28,7 @@ export async function createJob(file, voice, speed = 1.0, { onUploadProgress } =
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/api/convert');
+    if (onXhr) onXhr(xhr);
     if (onUploadProgress) {
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) onUploadProgress(e.loaded / e.total);
@@ -43,6 +44,7 @@ export async function createJob(file, voice, speed = 1.0, { onUploadProgress } =
       }
     };
     xhr.onerror = () => reject(new Error('upload failed'));
+    xhr.onabort = () => reject(new Error('upload canceled'));
     xhr.send(form);
   });
 }

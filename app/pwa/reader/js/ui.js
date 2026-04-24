@@ -59,7 +59,7 @@ export function renderJobs(rows, onCancel) {
 
 /* ---- Library ---- */
 export function renderLibrary(books, handlers) {
-  const { onOpen, onSaveToDevice, onRemoveCache, onDelete } = handlers;
+  const { onOpen, onSaveToDevice, onSyncToDevice, onRemoveCache, onDelete } = handlers;
   const list = $('library-list');
   list.innerHTML = '';
   const empty = $('library-empty');
@@ -76,6 +76,11 @@ export function renderLibrary(books, handlers) {
     else if (b.onServer) badges.push('<span class="badge server-only">Server only</span>');
     if (!b.onServer) badges.push('<span class="badge offline">Offline copy</span>');
 
+    const primaryBtn = b.cached
+      ? '<button class="icon-btn book-dl" aria-label="Save .mp3 to device">⬇</button>'
+      : b.onServer
+        ? '<button class="icon-btn book-sync" aria-label="Sync to this device">☁</button>'
+        : '';
     card.innerHTML = `
       <div class="book-thumb">🎧</div>
       <div class="book-info">
@@ -84,7 +89,7 @@ export function renderLibrary(books, handlers) {
         <div class="book-badges">${badges.join('')}</div>
       </div>
       <div class="book-actions">
-        <button class="icon-btn book-dl" aria-label="Save .mp3 to device">⬇</button>
+        ${primaryBtn}
         <button class="icon-btn book-menu" aria-label="More">⋮</button>
       </div>
     `;
@@ -92,20 +97,24 @@ export function renderLibrary(books, handlers) {
     card.querySelector('.book-meta').textContent = sub;
     card.querySelector('.book-info').addEventListener('click', () => onOpen(b));
     card.querySelector('.book-thumb').addEventListener('click', () => onOpen(b));
-    card.querySelector('.book-dl').addEventListener('click', (e) => {
-      e.stopPropagation();
-      onSaveToDevice(b);
-    });
+    const dlBtn = card.querySelector('.book-dl');
+    if (dlBtn) dlBtn.addEventListener('click', (e) => { e.stopPropagation(); onSaveToDevice(b); });
+    const syncBtn = card.querySelector('.book-sync');
+    if (syncBtn) syncBtn.addEventListener('click', (e) => { e.stopPropagation(); onSyncToDevice(b); });
     card.querySelector('.book-menu').addEventListener('click', async (e) => {
       e.stopPropagation();
       const choice = await showActionSheet({
         title: b.title,
         actions: [
+          !b.cached && b.onServer ? { id: 'sync', label: 'Sync to this device' } : null,
+          b.onServer ? { id: 'save', label: 'Save .mp3 file' } : null,
           b.cached && b.onServer ? { id: 'uncache', label: 'Remove from device (keep on server)' } : null,
           b.onServer ? { id: 'delete', label: 'Delete everywhere', danger: true } : { id: 'uncache', label: 'Delete from device', danger: true },
         ].filter(Boolean),
       });
-      if (choice === 'uncache') {
+      if (choice === 'sync') onSyncToDevice(b);
+      else if (choice === 'save') onSaveToDevice(b);
+      else if (choice === 'uncache') {
         if (b.onServer) onRemoveCache(b); else onDelete(b);
       } else if (choice === 'delete') {
         onDelete(b);

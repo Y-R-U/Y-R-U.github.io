@@ -11,6 +11,16 @@ let pollTimer = null;
 let serverReachable = true;
 let lastRenderKey = '';
 
+/* Last successful /api/jobs payload. We reuse this on a single transient
+   failure so the UI doesn't flap between "server only" and "offline" while
+   a large MP3 download is saturating the connection. */
+let lastJobs = null;
+let consecutiveFails = 0;
+
+/* Throttle for progress-driven refreshes during a cache download. */
+let lastProgressRefresh = 0;
+const PROGRESS_REFRESH_MS = 400;
+
 /* In-flight uploads that the server doesn't yet know about. Keyed by a
    synthetic id; cleared once the server assigns a real job id. */
 const uploads = new Map();
@@ -39,9 +49,18 @@ async function refresh() {
   let serverJobs = null;
   try {
     serverJobs = await api.listJobs();
+    lastJobs = serverJobs;
+    consecutiveFails = 0;
     serverReachable = true;
   } catch (_) {
-    serverReachable = false;
+    consecutiveFails++;
+    if (consecutiveFails >= 2) {
+      serverReachable = false;
+    } else if (lastJobs) {
+      // Single blip — reuse the last good payload. Prevents the offline
+      // banner from flashing when a cache download contends with polling.
+      serverJobs = lastJobs;
+    }
   }
 
   // Jobs section = live uploads + in-flight server jobs + error jobs
@@ -130,19 +149,10 @@ async function refresh() {
     ui.renderLibrary(libraryRows, {
       onOpen: openBook,
       onSaveToDevice: saveBookToDevice,
+      onSyncToDevice: syncToDevice,
       onRemoveCache: removeFromCache,
       onDelete: deleteBook,
     });
-  }
-
-  // Kick off background downloads for any done-but-not-cached books.
-  // Skip any that already failed this session — user must tap to retry.
-  if (serverJobs !== null) {
-    for (const b of libraryRows) {
-      if (!b.cached && !caching.has(b.jobId) && !cacheFailed.has(b.jobId)) {
-        startCaching(b.jobId).catch(() => {});
-      }
-    }
   }
 
   // Only keep polling while something is *actually* progressing. Error
@@ -172,6 +182,7 @@ function stopPolling() {
 async function cancelJobRow(row) {
   if (row.kind === 'upload') {
     const entry = uploads.get(row.id);
+    if (entry) entry.cancelled = true;
     entry?.xhr?.abort();
     uploads.delete(row.id);
     await refresh();
@@ -226,6 +237,11 @@ async function removeFromCache(book) {
   if (!ok) return;
   await store.deleteAudio(book.jobId);
   await refresh();
+}
+
+function syncToDevice(book) {
+  cacheFailed.delete(book.jobId);
+  startCaching(book.jobId).catch(() => {});
 }
 
 async function saveBookToDevice(book) {
@@ -289,7 +305,14 @@ function startCaching(jobId) {
       await books.cacheMp3(meta, (p) => {
         if (aborted) throw new Error('cache aborted');
         entry.progress = p;
-        refresh();
+        // Throttle — fetchMp3Blob fires onProgress for every chunk, and
+        // calling refresh() every time spams /api/jobs enough to cause
+        // transient timeouts that flash the offline banner.
+        const now = Date.now();
+        if (now - lastProgressRefresh > PROGRESS_REFRESH_MS) {
+          lastProgressRefresh = now;
+          refresh();
+        }
       });
       ui.showToast(`"${entry.title}" ready to play`);
     } catch (e) {
@@ -341,6 +364,9 @@ async function startUpload(file, voice) {
 
   try {
     const job = await api.createJob(file, voice, 1.0, {
+      onXhr: (xhr) => {
+        entry.xhr = xhr;
+      },
       onUploadProgress: (frac) => {
         entry.progress = frac;
         refresh();
@@ -359,7 +385,9 @@ async function startUpload(file, voice) {
   } catch (e) {
     uploads.delete(localId);
     await refresh();
-    ui.showToast('Upload failed: ' + (e.message || e), { error: true, duration: 6000 });
+    if (!entry.cancelled) {
+      ui.showToast('Upload failed: ' + (e.message || e), { error: true, duration: 6000 });
+    }
   }
 }
 
