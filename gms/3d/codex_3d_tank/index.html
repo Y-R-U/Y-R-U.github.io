@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#151714">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Crow Tank 3D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="game">
+    <canvas id="game-canvas" aria-label="Crow Tank 3D game canvas"></canvas>
+
+    <section id="hud" class="hud hidden" aria-live="polite">
+      <div class="hud-group">
+        <div class="hud-stat">
+          <span class="hud-label">Score</span>
+          <strong id="score">0</strong>
+        </div>
+        <div class="hud-stat">
+          <span class="hud-label">Wave</span>
+          <strong id="wave">1</strong>
+        </div>
+      </div>
+      <div class="hud-center">
+        <div id="crosshair"></div>
+      </div>
+      <div class="hud-group right">
+        <div class="hud-stat">
+          <span class="hud-label">Crows</span>
+          <strong id="crows">0</strong>
+        </div>
+        <div class="hud-stat hearts" id="lives">|||</div>
+      </div>
+    </section>
+
+    <div id="heat-wrap" class="hidden" aria-hidden="true">
+      <div id="heat-fill"></div>
+    </div>
+
+    <button id="fire-button" class="fire-button hidden" type="button" aria-label="Fire cannon">FIRE</button>
+    <div id="stick-zone" class="stick-zone hidden" aria-hidden="true">
+      <div id="stick-base">
+        <div id="stick-knob"></div>
+      </div>
+    </div>
+
+    <section id="menu" class="overlay">
+      <div class="panel">
+        <p class="kicker">low-poly sky defense</p>
+        <h1>Crow Tank 3D</h1>
+        <p class="tagline">Hold the ridge against the red-eyed flock.</p>
+        <button id="start-button" class="primary-action" type="button">Start Sortie</button>
+      </div>
+    </section>
+
+    <section id="result" class="overlay hidden">
+      <div class="panel">
+        <p class="kicker" id="result-kicker">sortie complete</p>
+        <h2 id="result-title">Ridge Secured</h2>
+        <div class="result-grid">
+          <div>
+            <span>Score</span>
+            <strong id="result-score">0</strong>
+          </div>
+          <div>
+            <span>Wave</span>
+            <strong id="result-wave">1</strong>
+          </div>
+        </div>
+        <button id="restart-button" class="primary-action" type="button">Redeploy</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>

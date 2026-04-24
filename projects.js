@@ -212,6 +212,10 @@ const PROJECTS = [
     desc: "Puzzle game with a hand-drawn paper theme. Draw pencil lines to guide ants to goals with reflection physics and ink management.",
     date: "2026-04-10" },
 
+  { name: "Crow Tank 3D",       path: "/gms/3d/codex_3d_tank/",   screenshot: "codex-3d-tank",  type: "game",
+    desc: "Low-poly Three.js tank shooter. Drive across a ridge and shoot down red-eyed black crows before they dive.",
+    date: "2026-04-24" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
