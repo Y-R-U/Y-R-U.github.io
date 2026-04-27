@@ -8,8 +8,22 @@ class AudioManager {
     this.audio = null;
     this.availableTracks = [];
     this.tracksChecked = false;
+    this.sfxCtx = null;
 
     this.loadSettings();
+  }
+
+  // Lazy-init a single shared AudioContext. Browsers cap concurrent contexts
+  // (~6 in Chrome) and don't reclaim them, so creating one per sound leaks
+  // and eventually silently breaks SFX. One context, reused forever.
+  getSfxCtx() {
+    if (!this.sfxCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      this.sfxCtx = new Ctx();
+    }
+    if (this.sfxCtx.state === 'suspended') this.sfxCtx.resume().catch(() => {});
+    return this.sfxCtx;
   }
 
   loadSettings() {
@@ -102,48 +116,54 @@ class AudioManager {
     }
   }
 
-  // Play a short sound effect
+  // Play a short sound effect. Uses one shared AudioContext (see getSfxCtx)
+  // and schedules a small attack/release envelope on the gain node so the
+  // oscillator doesn't click on start/stop.
   playSound(name) {
     if (!this.soundEnabled) return;
-    // Simple synthesised sounds using Web Audio API
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
+      const ctx = this.getSfxCtx();
+      if (!ctx) return;
+      const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
 
+      const t0 = ctx.currentTime;
+      const env = (peak, dur, attack = 0.005, release = 0.04) => {
+        // Ramp up then hold, then ramp down to zero just before stop.
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(peak, t0 + attack);
+        gain.gain.setValueAtTime(peak, t0 + Math.max(attack, dur - release));
+        gain.gain.linearRampToValueAtTime(0, t0 + dur);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.01);
+      };
+
       switch (name) {
         case 'place':
-          osc.frequency.value = 600;
-          gain.gain.value = 0.12;
-          osc.start();
-          osc.stop(ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(600, t0);
+          env(0.12, 0.08);
           break;
         case 'error':
-          osc.frequency.value = 200;
           osc.type = 'sawtooth';
-          gain.gain.value = 0.1;
-          osc.start();
-          osc.stop(ctx.currentTime + 0.25);
+          osc.frequency.setValueAtTime(200, t0);
+          env(0.10, 0.25);
           break;
         case 'win':
-          osc.frequency.value = 523;
-          gain.gain.value = 0.15;
-          osc.start();
-          setTimeout(() => osc.frequency.value = 659, 150);
-          setTimeout(() => osc.frequency.value = 784, 300);
-          osc.stop(ctx.currentTime + 0.5);
+          // Major triad (C5 → E5 → G5) scheduled on the audio clock so the
+          // notes fire even if the main thread is busy.
+          osc.frequency.setValueAtTime(523, t0);
+          osc.frequency.setValueAtTime(659, t0 + 0.15);
+          osc.frequency.setValueAtTime(784, t0 + 0.30);
+          env(0.15, 0.5, 0.005, 0.08);
           break;
         case 'click':
-          osc.frequency.value = 800;
-          gain.gain.value = 0.06;
-          osc.start();
-          osc.stop(ctx.currentTime + 0.04);
+          osc.frequency.setValueAtTime(800, t0);
+          env(0.06, 0.04, 0.003, 0.02);
           break;
         default:
-          osc.start();
-          osc.stop(ctx.currentTime + 0.05);
+          env(0.05, 0.05);
       }
     } catch (e) { /* Web Audio not available */ }
   }

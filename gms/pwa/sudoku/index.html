@@ -32,6 +32,8 @@ body{
 .header{display:flex;align-items:center;justify-content:center;position:relative;min-height:40px;}
 .header h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shadow:2px 2px 4px rgba(0,0,0,0.1);}
 .header-icons{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
+.timer{position:absolute;left:0;top:50%;transform:translateY(-50%);font-variant-numeric:tabular-nums;font-weight:700;color:#667eea;font-size:0.95rem;background:#f0f4f8;padding:6px 10px;border-radius:8px;min-width:60px;text-align:center;}
+.timer.paused{opacity:0.5;}
 .icon-btn{width:38px;height:38px;border-radius:10px;border:none;background:#f0f4f8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#667eea;}
 .icon-btn:hover{background:#e3f2fd;transform:scale(1.1);}
 .icon-btn svg{width:20px;height:20px;}
@@ -59,9 +61,11 @@ body{
 .cell:nth-child(n+19):nth-child(-n+27),.cell:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid #333;}
 .cell.given{background:#f0f4f8;color:#333;font-weight:700;}
 .cell.filled{color:#4a90e2;}
+.cell.related{background:#eef3fb;}
+.cell.related.given{background:#e3eaf3;}
+.cell.same-number-highlight{background:#fff59d;font-weight:700;}
 .cell.selected{background:#bbdefb;box-shadow:inset 0 0 0 2px #4a90e2;}
 .cell.conflict{background:#ffcccc;color:#d32f2f;}
-.cell.same-number-highlight{background:#fff59d;font-weight:700;}
 .cell:hover:not(.given){background:#e3f2fd;}
 
 /* ── Notes in cells ───────────────────────────────────── */
@@ -140,6 +144,7 @@ body{
 .stats-card-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
 .stats-card-value{font-size:1.5rem;font-weight:800;margin-bottom:2px;}
 .stats-card-sub{font-size:0.65rem;color:#999;text-transform:uppercase;letter-spacing:0.5px;}
+.stats-card-best{font-size:0.85rem;color:#555;font-weight:600;font-variant-numeric:tabular-nums;margin-top:6px;padding-top:6px;border-top:1px solid #e6e9ee;}
 
 /* ── Help panel ───────────────────────────────────────── */
 .help-content{padding:0;}
@@ -153,6 +158,7 @@ body{
 <body>
 <div class="container">
   <div class="header">
+    <div class="timer" id="timer" title="Elapsed time">0:00</div>
     <h1>Sudoku</h1>
     <div class="header-icons">
       <button class="icon-btn" id="statsBtn" title="Statistics">
@@ -262,8 +268,9 @@ body{
 
       <h3>Controls</h3>
       <ul>
-        <li><strong>Tap a cell</strong> to select it. If you recently placed a number, tapping an empty cell will auto-fill that number (if valid in the box).</li>
+        <li><strong>Tap a cell</strong> to select it. If you recently placed a number, tapping an empty cell will auto-fill that number (only if it's fully valid — otherwise the picker opens).</li>
         <li><strong>Long press or right-click</strong> a cell to open the number picker.</li>
+        <li><strong>Keyboard:</strong> arrow keys move the selection, <strong>1-9</strong> places a number, <strong>Backspace/Delete</strong> clears, <strong>Esc</strong> closes the picker, <strong>N</strong> toggles notes mode.</li>
         <li><strong>Notes mode</strong> lets you pencil in candidate numbers at specific positions within a cell.</li>
         <li><strong>Undo</strong> reverts your last move.</li>
       </ul>
