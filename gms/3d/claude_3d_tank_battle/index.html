@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0a18" />
+  <title>Tank Battle Royale</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Layer for floating tank name tags (3D-projected) -->
+  <div id="tag-layer" class="hidden"></div>
+
+  <!-- Crosshair -->
+  <div id="crosshair" class="hidden"></div>
+
+  <!-- Top-left: player info -->
+  <div id="player-info" class="hidden">
+    <div class="pi-row">
+      <span class="pi-label">YOU</span>
+      <span id="player-name" class="pi-name">—</span>
+      <button id="btn-rename" title="Change name" aria-label="Change name">✎</button>
+    </div>
+    <div class="pi-bar"><div id="hp-fill"></div></div>
+    <div class="pi-stats">
+      <span>Kills <b id="player-kills">0</b></span>
+      <span>Place <b id="player-place">—</b></span>
+    </div>
+  </div>
+
+  <!-- Top-right: leaderboard -->
+  <div id="leaderboard" class="hidden">
+    <div class="lb-header">
+      <span>ALIVE</span>
+      <span id="lb-alive">10</span>
+    </div>
+    <ul id="lb-list"></ul>
+  </div>
+
+  <!-- Center banner -->
+  <div id="banner" class="hidden"><span id="banner-text"></span></div>
+
+  <!-- Hit flash -->
+  <div id="hit-flash" class="hidden"></div>
+
+  <!-- Touch controls -->
+  <div id="touch-left" class="touch-ctrl hidden">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <button id="touch-fire" class="touch-ctrl hidden">FIRE</button>
+
+  <!-- Title screen -->
+  <div id="title-screen" class="screen">
+    <h1 class="game-title">TANK<br /><span class="subtitle">BATTLE ROYALE</span></h1>
+    <p class="tagline">10 tanks. One survivor.</p>
+    <div class="title-name-row">
+      <span class="title-name-label">Playing as</span>
+      <span id="title-player-name">—</span>
+      <button id="btn-title-rename" class="btn-link">change</button>
+    </div>
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn-primary">ENTER BATTLE</button>
+      <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+    </div>
+    <div id="help-box" class="help-box hidden">
+      <p><b>Move:</b> WASD / arrows (or joystick)</p>
+      <p><b>Aim:</b> mouse (or auto-aim on touch)</p>
+      <p><b>Fire:</b> click / space (or FIRE button)</p>
+      <p>Be the last tank rolling.</p>
+    </div>
+  </div>
+
+  <!-- Generic popup root -->
+  <div id="popup-root" class="hidden"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
