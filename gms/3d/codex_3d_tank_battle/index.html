@@ -40,6 +40,7 @@
       <ol id="leader-list"></ol>
     </aside>
 
+    <div id="battle-status" class="battle-status hidden" aria-live="polite"></div>
     <div id="crosshair" class="crosshair hidden" aria-hidden="true"></div>
     <button id="fire-button" class="fire-button hidden" type="button" aria-label="Fire cannon">FIRE</button>
     <div id="stick-zone" class="stick-zone hidden" aria-hidden="true">
@@ -94,6 +95,14 @@
       </form>
     </section>
 
+    <section id="boot-error" class="overlay hidden" aria-live="assertive">
+      <div class="panel">
+        <p class="kicker">render error</p>
+        <h2>WebGL Unavailable</h2>
+        <p class="tagline" id="boot-error-message">The browser could not start the 3D renderer.</p>
+      </div>
+    </section>
+
     <div id="labels" class="labels" aria-hidden="true"></div>
   </main>
 
@@ -106,11 +115,16 @@
   </script>
   <script type="module">
     const markGameError = (error) => {
-      document.documentElement.dataset.gameError = String(error?.message || error);
+      const message = String(error?.message || error);
+      document.documentElement.dataset.gameError = message;
+      const overlay = document.getElementById('boot-error');
+      const messageEl = document.getElementById('boot-error-message');
+      if (messageEl) messageEl.textContent = message;
+      if (overlay) overlay.classList.remove('hidden');
     };
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./src/game.js?v=20260428').catch(markGameError);
+    import('./src/game.js').catch(markGameError);
   </script>
 </body>
 </html>

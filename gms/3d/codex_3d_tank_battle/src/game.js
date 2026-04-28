@@ -6,7 +6,7 @@ import { createInput } from './input.js';
 import { createBattleNames, getStoredPlayerName } from './names.js';
 import { createTankEntity, markTankDestroyed } from './tankFactory.js';
 import { createUi, rankTanks } from './ui.js';
-import { angleTo, clamp, distanceXZ, keepInsideArena, lerpAngle, randomPointInArena, resolveCircleCollision } from './utils.js';
+import { angleTo, clamp, distanceXZ, keepInsideArena, lerpAngle, resolveCircleCollision } from './utils.js';
 import { createWorld } from './world.js';
 
 const canvas = document.getElementById('game-canvas');
@@ -33,6 +33,7 @@ const state = {
   tanks: [],
   shells: [],
   explosions: [],
+  eliminationOrder: 0,
   endTimer: 0
 };
 
@@ -55,6 +56,7 @@ function startBattle() {
   cleanupBattle();
   state.phase = 'running';
   state.endTimer = 0;
+  state.eliminationOrder = 0;
   state.tanks = createRoster();
   state.player = state.tanks[0];
   state.tanks.forEach((tank) => world.scene.add(tank.root));
@@ -218,7 +220,6 @@ function updateShells(dt) {
       for (const tank of state.tanks) {
         if (!tank.alive || tank.id === shell.ownerId && shell.age < 0.16) continue;
         if (distanceXZ(shell.mesh.position, tank.root.position) < tank.radius + shell.radius) {
-          damageTank(tank, shell.ownerId, TUNING.shellDamage);
           detonated = true;
           break;
         }
@@ -226,10 +227,22 @@ function updateShells(dt) {
     }
 
     if (detonated) {
-      spawnExplosion(shell.mesh.position, shell.mesh.material.color.getHex());
+      detonateShell(shell);
       world.scene.remove(shell.mesh);
       state.shells.splice(i, 1);
     }
+  }
+}
+
+function detonateShell(shell) {
+  spawnExplosion(shell.mesh.position, shell.mesh.material.color.getHex());
+  for (const tank of state.tanks) {
+    if (!tank.alive) continue;
+    if (tank.id === shell.ownerId && shell.age < 0.18) continue;
+    const distance = distanceXZ(shell.mesh.position, tank.root.position);
+    if (distance > TUNING.blastRadius + tank.radius) continue;
+    const falloff = clamp(1 - Math.max(0, distance - tank.radius) / TUNING.blastRadius, 0.25, 1);
+    damageTank(tank, shell.ownerId, TUNING.shellDamage * falloff);
   }
 }
 
@@ -240,6 +253,7 @@ function damageTank(tank, ownerId, amount) {
 
   if (tank.hp <= 0 && tank.alive) {
     markTankDestroyed(tank);
+    tank.eliminatedAt = ++state.eliminationOrder;
     spawnExplosion(tank.root.position, tank.accent);
     if (attacker && attacker.id !== tank.id) attacker.kills += 1;
   }
@@ -284,7 +298,15 @@ function placeCamera() {
 
 function checkEnd(dt) {
   const alive = state.tanks.filter((tank) => tank.alive);
-  if (alive.length > 1 && state.player.alive) return;
+  if (!state.player.alive && alive.length > 1) {
+    ui.setBattleStatus(`Eliminated - spectating ${alive[0].name}`);
+  } else {
+    ui.setBattleStatus('');
+  }
+  if (alive.length > 1) {
+    state.endTimer = 0;
+    return;
+  }
   state.endTimer += dt;
   if (state.endTimer < 1.2) return;
 

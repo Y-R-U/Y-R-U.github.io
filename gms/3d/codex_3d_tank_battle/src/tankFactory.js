@@ -92,6 +92,7 @@ export function createTankEntity({ id, name, isPlayer, personality, color, accen
     maxHp: TUNING.maxHp,
     hp: TUNING.maxHp,
     alive: true,
+    eliminatedAt: null,
     kills: 0,
     damage: 0,
     cooldown: 0,
