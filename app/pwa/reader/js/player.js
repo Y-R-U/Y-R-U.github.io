@@ -1,5 +1,6 @@
-/* HTMLAudioElement-based player. Plays the cached MP3 out of OPFS. */
+/* HTMLAudioElement-based player. Plays the cached MP3 out of IndexedDB. */
 import * as store from './storage.js';
+import * as sync from './sync.js';
 
 export const state = {
   book: null,
@@ -27,11 +28,11 @@ function teardown() {
   state.position = 0;
 }
 
-export async function loadBook(jobId, { onUpdate } = {}) {
+export async function loadBook(jobId, { onUpdate, hasSegments } = {}) {
   teardown();
   const meta = (await store.getBookMeta(jobId)) || { jobId, title: '', author: '', speed: 1.0 };
   const file = await store.readAudioFile(jobId);
-  state.book = { ...meta, jobId };
+  state.book = { ...meta, jobId, has_segments: !!hasSegments };
   state.url = URL.createObjectURL(file);
   state.onUpdate = onUpdate;
   state.speed = meta.speed || 1.0;
@@ -53,8 +54,12 @@ export async function loadBook(jobId, { onUpdate } = {}) {
   audio.addEventListener('timeupdate', () => {
     state.position = audio.currentTime;
     notify();
+    sync.tick(audio.currentTime);
+    updatePositionStateThrottled();
     savePositionThrottled();
   });
+  audio.addEventListener('seeked', () => { state.position = audio.currentTime; updatePositionState(); notify(); });
+  audio.addEventListener('ratechange', () => { state.speed = audio.playbackRate; updatePositionState(); });
   audio.addEventListener('play', () => { state.playing = true; updateMediaSession(); notify(); });
   audio.addEventListener('pause', () => { state.playing = false; updateMediaSession(); notify(); savePosition(); });
   audio.addEventListener('ended', () => {
@@ -66,6 +71,8 @@ export async function loadBook(jobId, { onUpdate } = {}) {
   state.audio = audio;
 
   await store.updateBookMeta(jobId, { lastPlayed: Date.now() });
+  // Kick off segment fetch in parallel — sync.loadFor handles cache + miss.
+  sync.loadFor(jobId, hasSegments).catch(() => {});
   updateMediaSession();
   notify();
 }
@@ -111,6 +118,7 @@ export function unload() {
   teardown();
   state.book = null;
   state.onUpdate = null;
+  sync.loadFor(null);
 }
 
 let saveTimer = null;
@@ -135,12 +143,40 @@ function updateMediaSession() {
     ],
   });
   navigator.mediaSession.playbackState = state.playing ? 'playing' : 'paused';
-  const h = navigator.mediaSession.setActionHandler.bind(navigator.mediaSession);
+  // Bind each handler in its own try so an unsupported action (some cars
+  // reject 'seekto' or 'previoustrack') doesn't drop the others.
+  const setH = (name, fn) => {
+    try { navigator.mediaSession.setActionHandler(name, fn); } catch (_) {}
+  };
+  setH('play', () => play());
+  setH('pause', () => pause());
+  setH('stop', () => pause());
+  setH('seekbackward', (e) => skip(-(e?.seekOffset || 30)));
+  setH('seekforward', (e) => skip(e?.seekOffset || 30));
+  // Most car/BT remotes send previoustrack / nexttrack for the |◁ ▷| keys.
+  setH('previoustrack', () => skip(-30));
+  setH('nexttrack', () => skip(30));
+  setH('seekto', (e) => { if (typeof e?.seekTime === 'number') seekTo(e.seekTime); });
+  updatePositionState();
+}
+
+function updatePositionState() {
+  if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return;
+  if (!state.audio) return;
+  const dur = state.duration || state.audio.duration;
+  if (!isFinite(dur) || dur <= 0) return;
+  const pos = Math.max(0, Math.min(dur, state.position || state.audio.currentTime || 0));
   try {
-    h('play', () => play());
-    h('pause', () => pause());
-    h('seekbackward', (e) => skip(-(e?.seekOffset || 15)));
-    h('seekforward', (e) => skip(e?.seekOffset || 15));
-    h('seekto', (e) => { if (typeof e?.seekTime === 'number') seekTo(e.seekTime); });
+    navigator.mediaSession.setPositionState({
+      duration: dur,
+      playbackRate: state.audio.playbackRate || state.speed || 1,
+      position: pos,
+    });
   } catch (_) {}
+}
+
+let posStateTimer = null;
+function updatePositionStateThrottled() {
+  if (posStateTimer) return;
+  posStateTimer = setTimeout(() => { posStateTimer = null; updatePositionState(); }, 1000);
 }

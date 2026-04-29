@@ -1,4 +1,4 @@
-const VERSION = 'reader-v13';
+const VERSION = 'reader-v17';
 const SHELL = [
   './',
   './index.html',
@@ -8,10 +8,14 @@ const SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './js/app.js',
-  './js/storage.js',
-  './js/books.js',
   './js/api.js',
+  './js/books.js',
+  './js/dragdrop.js',
+  './js/library.js',
   './js/player.js',
+  './js/storage.js',
+  './js/sync.js',
+  './js/textedit.js',
   './js/ui.js',
 ];
 
@@ -35,6 +39,11 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/')) return;  // let browser handle directly
+
+  if (req.mode === 'navigate') {
+    e.respondWith(fetch(req).catch(() => caches.match('./index.html')));
+    return;
+  }
 
   e.respondWith(
     caches.match(req).then((hit) => {

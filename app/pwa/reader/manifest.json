@@ -1,13 +1,17 @@
 {
+  "id": "/",
   "name": "Reader",
   "short_name": "Reader",
-  "description": "Offline on-device audiobook reader (Kokoro TTS, WebGPU).",
+  "description": "LAN audiobook reader with server-side conversion and offline playback for synced books.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "orientation": "any",
   "background_color": "#1e1e1e",
   "theme_color": "#1e1e1e",
+  "categories": ["books", "music", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icons/icon-192.png",

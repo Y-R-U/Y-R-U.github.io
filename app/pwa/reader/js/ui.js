@@ -5,11 +5,13 @@ const $ = (id) => document.getElementById(id);
 export function showLibrary() {
   $('library-view').classList.remove('hidden');
   $('player-view').classList.add('hidden');
+  $('text-view').classList.add('hidden');
 }
 
 export function showPlayer() {
   $('player-view').classList.remove('hidden');
   $('library-view').classList.add('hidden');
+  $('text-view').classList.add('hidden');
 }
 
 /* ---- Connection indicator ---- */
@@ -53,73 +55,6 @@ export function renderJobs(rows, onCancel) {
       err.classList.remove('hidden');
     }
     card.querySelector('.job-cancel').addEventListener('click', () => onCancel(r));
-    list.appendChild(card);
-  }
-}
-
-/* ---- Library ---- */
-export function renderLibrary(books, handlers) {
-  const { onOpen, onSaveToDevice, onSyncToDevice, onRemoveCache, onDelete } = handlers;
-  const list = $('library-list');
-  list.innerHTML = '';
-  const empty = $('library-empty');
-  if (!books.length) { empty.classList.remove('hidden'); return; }
-  empty.classList.add('hidden');
-  books.sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
-  for (const b of books) {
-    const card = document.createElement('div');
-    card.className = 'book-card';
-    const dur = b.duration ? fmtDuration(b.duration) : '';
-    const sub = [b.author, dur, fmtSize(b.size)].filter(Boolean).join(' · ');
-    const badges = [];
-    if (b.cached) badges.push('<span class="badge cached">On device</span>');
-    else if (b.onServer) badges.push('<span class="badge server-only">Server only</span>');
-    if (!b.onServer) badges.push('<span class="badge offline">Offline copy</span>');
-
-    const primaryBtn = b.cached
-      ? '<button class="icon-btn book-dl" aria-label="Save .mp3 to device">⬇</button>'
-      : b.onServer
-        ? '<button class="icon-btn book-sync" aria-label="Sync to this device">☁</button>'
-        : '';
-    card.innerHTML = `
-      <div class="book-thumb">🎧</div>
-      <div class="book-info">
-        <div class="book-title"></div>
-        <div class="book-meta"></div>
-        <div class="book-badges">${badges.join('')}</div>
-      </div>
-      <div class="book-actions">
-        ${primaryBtn}
-        <button class="icon-btn book-menu" aria-label="More">⋮</button>
-      </div>
-    `;
-    card.querySelector('.book-title').textContent = b.title;
-    card.querySelector('.book-meta').textContent = sub;
-    card.querySelector('.book-info').addEventListener('click', () => onOpen(b));
-    card.querySelector('.book-thumb').addEventListener('click', () => onOpen(b));
-    const dlBtn = card.querySelector('.book-dl');
-    if (dlBtn) dlBtn.addEventListener('click', (e) => { e.stopPropagation(); onSaveToDevice(b); });
-    const syncBtn = card.querySelector('.book-sync');
-    if (syncBtn) syncBtn.addEventListener('click', (e) => { e.stopPropagation(); onSyncToDevice(b); });
-    card.querySelector('.book-menu').addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const choice = await showActionSheet({
-        title: b.title,
-        actions: [
-          !b.cached && b.onServer ? { id: 'sync', label: 'Sync to this device' } : null,
-          b.onServer ? { id: 'save', label: 'Save .mp3 file' } : null,
-          b.cached && b.onServer ? { id: 'uncache', label: 'Remove from device (keep on server)' } : null,
-          b.onServer ? { id: 'delete', label: 'Delete everywhere', danger: true } : { id: 'uncache', label: 'Delete from device', danger: true },
-        ].filter(Boolean),
-      });
-      if (choice === 'sync') onSyncToDevice(b);
-      else if (choice === 'save') onSaveToDevice(b);
-      else if (choice === 'uncache') {
-        if (b.onServer) onRemoveCache(b); else onDelete(b);
-      } else if (choice === 'delete') {
-        onDelete(b);
-      }
-    });
     list.appendChild(card);
   }
 }
@@ -171,7 +106,7 @@ function fmtTime(sec) {
     : `${m}:${String(s).padStart(2, '0')}`;
 }
 
-/* ---- Upload / voice modal ---- */
+/* ---- Voice picker (used both for upload and convert) ---- */
 export function renderVoicePicker(voices, currentVoice, onSelect) {
   const list = $('voice-list');
   list.innerHTML = '';
@@ -212,8 +147,10 @@ export function renderVoicePicker(voices, currentVoice, onSelect) {
   }
 }
 
-export function openImport({ filename, voices, currentVoice, onConfirm, onCancel }) {
-  $('import-filename').textContent = filename;
+export function openImport({ filename, voices, currentVoice, onConfirm, onCancel, title, hideFilename }) {
+  $('import-title').textContent = title || 'Choose a voice';
+  $('import-filename').textContent = filename || '';
+  document.querySelector('.import-file-row').classList.toggle('hidden', !!hideFilename);
   renderVoicePicker(voices, currentVoice, (id) => {
     document.querySelectorAll('#voice-list .voice-item').forEach((el) => {
       el.classList.toggle('selected', el.dataset.voiceId === id);
@@ -236,8 +173,8 @@ export function openImport({ filename, voices, currentVoice, onConfirm, onCancel
     cleanup();
     onConfirm(voice);
   };
-  cancelBtn.onclick = () => { cleanup(); onCancel(); };
-  scrim.onclick = () => { cleanup(); onCancel(); };
+  cancelBtn.onclick = () => { cleanup(); onCancel?.(); };
+  scrim.onclick = () => { cleanup(); onCancel?.(); };
 }
 
 /* ---- Settings ---- */
@@ -255,7 +192,7 @@ export function setStorageStatus({ persisted, usage, quota }) {
   el.innerHTML = `<p class="hint">${line1}</p>${line2 ? `<p class="hint">${line2}</p>` : ''}`;
 }
 
-/* ---- Toast / confirm / action sheet ---- */
+/* ---- Toast / confirm / prompt / action sheet ---- */
 let toastTimer = null;
 export function showToast(msg, { error = false, duration = 3500 } = {}) {
   const t = $('toast');
@@ -293,6 +230,36 @@ export function showConfirm({ title = 'Confirm', message = '', okLabel = 'OK', d
     scrim.addEventListener('click', onCancel);
     document.addEventListener('keydown', onKey);
     setTimeout(() => ok.focus(), 0);
+  });
+}
+
+export function showPrompt({ title = 'Name', initialValue = '', placeholder = '' } = {}) {
+  return new Promise((resolve) => {
+    const m = $('prompt-modal');
+    $('prompt-title').textContent = title;
+    const input = $('prompt-input');
+    input.value = initialValue;
+    input.placeholder = placeholder;
+    const ok = $('btn-prompt-ok');
+    const cancel = $('btn-prompt-cancel');
+    const scrim = m.querySelector('.modal-scrim');
+    m.classList.remove('hidden');
+    const done = (v) => {
+      m.classList.add('hidden');
+      ok.removeEventListener('click', onOk);
+      cancel.removeEventListener('click', onCancel);
+      scrim.removeEventListener('click', onCancel);
+      input.removeEventListener('keydown', onKey);
+      resolve(v);
+    };
+    const onOk = () => done(input.value.trim() || null);
+    const onCancel = () => done(null);
+    const onKey = (e) => { if (e.key === 'Escape') onCancel(); else if (e.key === 'Enter') { e.preventDefault(); onOk(); } };
+    ok.addEventListener('click', onOk);
+    cancel.addEventListener('click', onCancel);
+    scrim.addEventListener('click', onCancel);
+    input.addEventListener('keydown', onKey);
+    setTimeout(() => { input.focus(); input.select(); }, 0);
   });
 }
 

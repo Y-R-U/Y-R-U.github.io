@@ -1,4 +1,4 @@
-/* Download a completed server job into OPFS, record local metadata. */
+/* Download a completed server job into IndexedDB, record local metadata. */
 import * as store from './storage.js';
 import * as api from './api.js';
 

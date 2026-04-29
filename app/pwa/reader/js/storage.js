@@ -3,7 +3,7 @@
    is undefined on most clients. IDB blob storage works everywhere. */
 
 const DB_NAME = 'reader';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 let dbPromise = null;
 
@@ -13,10 +13,18 @@ export function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      for (const name of Array.from(db.objectStoreNames)) db.deleteObjectStore(name);
-      db.createObjectStore('bookMeta', { keyPath: 'jobId' });
-      db.createObjectStore('audio', { keyPath: 'jobId' });
-      db.createObjectStore('prefs', { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('bookMeta')) {
+        db.createObjectStore('bookMeta', { keyPath: 'jobId' });
+      }
+      if (!db.objectStoreNames.contains('audio')) {
+        db.createObjectStore('audio', { keyPath: 'jobId' });
+      }
+      if (!db.objectStoreNames.contains('prefs')) {
+        db.createObjectStore('prefs', { keyPath: 'key' });
+      }
+      if (!db.objectStoreNames.contains('segments')) {
+        db.createObjectStore('segments', { keyPath: 'jobId' });
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -83,6 +91,20 @@ export async function audioSize(jobId) {
 
 export async function deleteAudio(jobId) {
   try { await wrap((await tx('audio', 'readwrite')).delete(jobId)); } catch (_) {}
+}
+
+/* --- Segments (sync-text data) --- */
+export async function saveSegments(jobId, segments) {
+  return wrap((await tx('segments', 'readwrite')).put({ jobId, segments }));
+}
+export async function getSegments(jobId) {
+  try {
+    const row = await wrap((await tx('segments')).get(jobId));
+    return row?.segments || null;
+  } catch (_) { return null; }
+}
+export async function deleteSegments(jobId) {
+  try { await wrap((await tx('segments', 'readwrite')).delete(jobId)); } catch (_) {}
 }
 
 /* --- Storage diagnostics (all guarded — navigator.storage is missing
