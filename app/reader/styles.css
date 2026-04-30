@@ -75,6 +75,10 @@ button {
   cursor: pointer;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .icon-btn {
   width: var(--tap);
   height: var(--tap);
