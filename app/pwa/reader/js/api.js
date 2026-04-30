@@ -169,8 +169,9 @@ export async function deleteJob(id) {
   }
 }
 
-export async function fetchMp3Blob(id, onProgress) {
-  const r = await fetchWithTimeout(u(`/api/jobs/${id}/mp3`), {}, 15000);
+export async function fetchMp3Blob(id, onProgress, cacheBust = Date.now()) {
+  const suffix = cacheBust ? `?v=${encodeURIComponent(cacheBust)}` : '';
+  const r = await fetchWithTimeout(u(`/api/jobs/${id}/mp3${suffix}`), { cache: 'no-store' }, 15000);
   if (!r.ok) throw new Error('mp3 not ready');
   const total = Number(r.headers.get('content-length')) || 0;
   if (!onProgress || !total || !r.body) return r.blob();

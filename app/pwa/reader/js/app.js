@@ -363,6 +363,7 @@ async function saveBookToDevice(row) {
 async function openBook(row) {
   cacheFailed.delete(row.jobId);
   const isCached = await store.audioExists(row.jobId);
+  hidePlayerLoading();
 
   if (!isCached) {
     if (!serverReachable) {
@@ -409,8 +410,10 @@ async function openBook(row) {
       hasSegments: row.hasSegments,
     });
     ui.updatePlayer();
+    hidePlayerLoading();
     refresh();
   } catch (e) {
+    hidePlayerLoading();
     ui.showToast('Could not load: ' + (e.message || e), { error: true });
     history.back();
   }
@@ -433,6 +436,7 @@ function hidePlayerLoading() {
 function applyHistoryState(s) {
   if (!s || s.view === 'library') {
     if (player.state.book) player.unload();
+    hidePlayerLoading();
     library.setPathByIds(s?.path || []);
     ui.showLibrary();
     lastRenderKey = '';
@@ -450,12 +454,13 @@ window.addEventListener('popstate', (e) => applyHistoryState(e.state));
 
 async function reconvertText(row) {
   try {
+    if (player.state.book?.jobId === row.jobId) player.unload();
     await api.convertItem(row.jobId);
     ui.showToast('Re-converting…');
     // Drop the stale local audio so the next play prompts a fresh cache.
     await store.deleteAudio(row.jobId);
     await store.deleteSegments(row.jobId);
-    await store.updateBookMeta(row.jobId, { duration: null, position: 0 });
+    await store.updateBookMeta(row.jobId, { duration: null, position: 0, size: null, cachedAt: null });
     lastRenderKey = '';
     await refresh();
     ensurePolling();
@@ -568,6 +573,7 @@ textedit.init({
       onConfirm: async (voice) => {
         await store.setPref('lastVoice', voice);
         try {
+          if (player.state.book?.jobId === jobId) player.unload();
           await api.convertItem(jobId, { voice });
           ui.showToast('Converting…');
           // Stale local audio/segments must go — otherwise re-play would
@@ -575,13 +581,12 @@ textedit.init({
           // their edits didn't take.
           await store.deleteAudio(jobId);
           await store.deleteSegments(jobId);
-          await store.updateBookMeta(jobId, { duration: null, position: 0, voice });
-          // Pop history twice — once for the open import-modal pseudo state
-          // and once for the text-editor — so we land back in the library
-          // without leaving phantom entries on the stack. (Modals don't push
-          // history; the only extra entry is the text-view.)
+          await store.updateBookMeta(jobId, { duration: null, position: 0, voice, size: null, cachedAt: null });
+          lastRenderKey = '';
+          await refresh();
+          ensurePolling();
           if (history.state?.view === 'text') history.back();
-          else { ui.showLibrary(); lastRenderKey = ''; await refresh(); ensurePolling(); }
+          else ui.showLibrary();
         } catch (e) {
           ui.showToast('Convert failed: ' + (e.message || e), { error: true });
         }
@@ -639,6 +644,19 @@ function wire() {
   });
   window.addEventListener('online', () => refresh());
 }
+
+window.ABReaderHandleBack = function () {
+  if (!$('settings-modal').classList.contains('hidden')) { ui.closeSettings(); return true; }
+  if (!$('import-modal').classList.contains('hidden')) {
+    $('btn-import-cancel')?.click();
+    return true;
+  }
+  if (!$('player-view').classList.contains('hidden') || textedit.isOpen() || !library.isAtRoot()) {
+    history.back();
+    return true;
+  }
+  return false;
+};
 
 async function main() {
   registerSW();

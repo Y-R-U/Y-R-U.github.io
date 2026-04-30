@@ -3,7 +3,7 @@ import * as store from './storage.js';
 import * as api from './api.js';
 
 export async function cacheMp3(jobMeta, onProgress) {
-  const blob = await api.fetchMp3Blob(jobMeta.id, onProgress);
+  const blob = await api.fetchMp3Blob(jobMeta.id, onProgress, jobMeta.updated_at || jobMeta.completed_at || Date.now());
   await store.saveAudio(jobMeta.id, blob);
 
   let duration = null;
