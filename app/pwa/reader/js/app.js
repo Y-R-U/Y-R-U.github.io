@@ -44,6 +44,9 @@ async function refresh() {
     lastJobs = serverJobs;
     consecutiveFails = 0;
     serverReachable = true;
+    // Persist for offline / off-LAN startups (APK use case).
+    store.saveLibraryTree(lib).catch(() => {});
+    store.saveJobsCache(serverJobs || []).catch(() => {});
   } catch (_) {
     consecutiveFails++;
     if (consecutiveFails >= 2) serverReachable = false;
@@ -73,14 +76,20 @@ async function refresh() {
   if (lib) {
     library.setData({ tree: lib, jobs: serverJobs || [], metas: localMetas });
   } else if (library.getTree() == null) {
-    // Offline first paint with no cached tree — just render an empty shell.
-    library.setData({ tree: { rev: 0, topLevel: [
-      { id: 'f1', name: 'Books', children: [] }, { id: 'f2', name: 'Folder 2', children: [] },
-      { id: 'f3', name: 'Folder 3', children: [] }, { id: 'f4', name: 'Folder 4', children: [] },
-    ]}, jobs: [], metas: localMetas });
+    // First paint with no in-memory tree — try IDB cache before falling back.
+    const cached = await store.getLibraryTree();
+    const cachedJobs = cached ? (await store.getJobsCache()) || [] : [];
+    if (cached) {
+      library.setData({ tree: cached, jobs: cachedJobs, metas: localMetas });
+    } else {
+      library.setData({ tree: { rev: 0, topLevel: [
+        { id: 'f1', name: 'Books', children: [] }, { id: 'f2', name: 'Folder 2', children: [] },
+        { id: 'f3', name: 'Folder 3', children: [] }, { id: 'f4', name: 'Folder 4', children: [] },
+      ]}, jobs: [], metas: localMetas });
+    }
   } else {
-    // Offline but we have a cached tree — refresh local metas (lastPlayed,
-    // cached flag) so recents and item cards stay current.
+    // Offline but we have an in-memory tree — refresh local metas so recents
+    // and item cards stay current.
     library.setData({ tree: library.getTree(), jobs: serverJobs || [], metas: localMetas });
   }
 
@@ -353,34 +362,100 @@ async function saveBookToDevice(row) {
 
 async function openBook(row) {
   cacheFailed.delete(row.jobId);
+  const isCached = await store.audioExists(row.jobId);
+
+  if (!isCached) {
+    if (!serverReachable) {
+      ui.showToast(`"${row.title}" isn't on this device, and the server is offline.`, { error: true });
+      return;
+    }
+    const sizeStr = row.size ? ` (${ui.fmtSize(row.size)})` : '';
+    const ok = await ui.showConfirm({
+      title: 'Cache to this device?',
+      message: `"${row.title}" isn't on this device yet${sizeStr}. Cache it now to play offline?`,
+      okLabel: 'Cache & Play',
+    });
+    if (!ok) return;
+  }
+
+  // Push a player history entry so Android/browser back returns to the
+  // library (popstate handler closes the player).
+  history.pushState({ view: 'player', jobId: row.jobId }, '', null);
   ui.showPlayer();
-  // Show edit pencil if this item has editable text.
+  // Pencil edit only for .txt items (text-editor or uploaded .txt).
   $('btn-player-edit').classList.toggle('hidden', !row.hasText);
   $('btn-player-edit').onclick = () => textedit.openExisting(row.jobId);
-  try {
-    if (!(await store.audioExists(row.jobId))) {
-      if (!serverReachable) throw new Error('not cached and server is offline');
-      ui.showToast('Downloading…');
-      await startCaching(row.jobId);
+  $('player-title').textContent = row.title;
+  $('player-author').textContent = row.author || '';
+
+  if (!isCached) {
+    showPlayerLoading('Caching audio…', 0);
+    try {
+      const meta = await api.getJob(row.jobId);
+      if (!meta || meta.state !== 'done') throw new Error('not ready on server');
+      await books.cacheMp3(meta, (frac) => showPlayerLoading('Caching audio…', frac));
+    } catch (e) {
+      hidePlayerLoading();
+      ui.showToast('Cache failed: ' + (e.message || e), { error: true });
+      history.back();
+      return;
     }
+    hidePlayerLoading();
+  }
+
+  try {
     await player.loadBook(row.jobId, {
       onUpdate: ui.updatePlayer,
       hasSegments: row.hasSegments,
     });
     ui.updatePlayer();
+    refresh();
   } catch (e) {
     ui.showToast('Could not load: ' + (e.message || e), { error: true });
-    ui.showLibrary();
-    await refresh();
+    history.back();
   }
 }
+
+function showPlayerLoading(msg, frac) {
+  const el = $('player-loading');
+  if (!el) return;
+  el.classList.remove('hidden');
+  $('player-loading-msg').textContent = msg;
+  const pct = Math.round((frac || 0) * 100);
+  $('player-loading-bar').value = pct;
+  $('player-loading-pct').textContent = pct + '%';
+}
+function hidePlayerLoading() {
+  $('player-loading')?.classList.add('hidden');
+}
+
+/* ---------------- History (back button) ---------------- */
+function applyHistoryState(s) {
+  if (!s || s.view === 'library') {
+    if (player.state.book) player.unload();
+    library.setPathByIds(s?.path || []);
+    ui.showLibrary();
+    lastRenderKey = '';
+    refresh();
+    return;
+  }
+  // Coming forward into a player/text state via Forward — we don't try to
+  // reopen the book. Just show the library.
+  if (player.state.book) player.unload();
+  ui.showLibrary();
+  refresh();
+}
+
+window.addEventListener('popstate', (e) => applyHistoryState(e.state));
 
 async function reconvertText(row) {
   try {
     await api.convertItem(row.jobId);
     ui.showToast('Re-converting…');
+    // Drop the stale local audio so the next play prompts a fresh cache.
     await store.deleteAudio(row.jobId);
     await store.deleteSegments(row.jobId);
+    await store.updateBookMeta(row.jobId, { duration: null, position: 0 });
     lastRenderKey = '';
     await refresh();
     ensurePolling();
@@ -475,9 +550,8 @@ async function startUpload(file, voice, parentFolderId) {
 textedit.init({
   onSaved: async (jobId) => {
     ui.showToast('Saved');
-    ui.showLibrary();
-    lastRenderKey = '';
-    await refresh();
+    if (history.state?.view === 'text') history.back();
+    else { ui.showLibrary(); lastRenderKey = ''; await refresh(); }
   },
   onConvertRequested: async (jobId) => {
     // Show voice picker, then call /api/items/{id}/convert.
@@ -496,17 +570,28 @@ textedit.init({
         try {
           await api.convertItem(jobId, { voice });
           ui.showToast('Converting…');
-          ui.showLibrary();
-          lastRenderKey = '';
-          await refresh();
-          ensurePolling();
+          // Stale local audio/segments must go — otherwise re-play would
+          // serve the old conversion from IDB and the user would think
+          // their edits didn't take.
+          await store.deleteAudio(jobId);
+          await store.deleteSegments(jobId);
+          await store.updateBookMeta(jobId, { duration: null, position: 0, voice });
+          // Pop history twice — once for the open import-modal pseudo state
+          // and once for the text-editor — so we land back in the library
+          // without leaving phantom entries on the stack. (Modals don't push
+          // history; the only extra entry is the text-view.)
+          if (history.state?.view === 'text') history.back();
+          else { ui.showLibrary(); lastRenderKey = ''; await refresh(); ensurePolling(); }
         } catch (e) {
           ui.showToast('Convert failed: ' + (e.message || e), { error: true });
         }
       },
     });
   },
-  onCancelled: () => { ui.showLibrary(); },
+  onCancelled: () => {
+    if (history.state?.view === 'text') history.back();
+    else ui.showLibrary();
+  },
   onError: (msg) => ui.showToast(msg, { error: true }),
 });
 
@@ -528,16 +613,14 @@ function wire() {
     e.target.value = '';
     if (file) await onFilePicked(file);
   });
-  $('btn-up').addEventListener('click', () => { library.navigateUp(); lastRenderKey = ''; refresh(); });
+  // Up arrow + player back both use the history stack so Android/browser
+  // back behaves the same way as tapping the in-app arrow.
+  $('btn-up').addEventListener('click', () => history.back());
   $('btn-settings').addEventListener('click', async () => { await refreshSettings(); ui.openSettings(); });
   $('btn-close-settings').addEventListener('click', () => ui.closeSettings());
   $('settings-modal').querySelector('.modal-scrim').addEventListener('click', () => ui.closeSettings());
 
-  $('btn-back').addEventListener('click', () => {
-    player.unload();
-    ui.showLibrary();
-    refresh();
-  });
+  $('btn-back').addEventListener('click', () => history.back());
   $('btn-play').addEventListener('click', () => player.togglePlay());
   $('btn-back-30').addEventListener('click', () => player.skip(-30));
   $('btn-fwd-30').addEventListener('click', () => player.skip(30));
@@ -561,6 +644,23 @@ async function main() {
   registerSW();
   store.requestPersist();
   wire();
+
+  // Bootstrap from IDB so the APK paints books immediately when the LAN
+  // server is unreachable. The subsequent refresh() will overwrite this
+  // with fresh data once the network call lands.
+  const cachedTree = await store.getLibraryTree();
+  if (cachedTree) {
+    const cachedJobs = (await store.getJobsCache()) || [];
+    const localMetas = await store.listBookMeta();
+    for (const m of localMetas) m.cached = await store.audioExists(m.jobId);
+    library.setData({ tree: cachedTree, jobs: cachedJobs, metas: localMetas });
+    library.render();
+  }
+
+  // Anchor the history stack so the first back press from root closes the
+  // app instead of leaving the WebView on a phantom entry.
+  history.replaceState({ view: 'library', path: [] }, '', null);
+
   await refresh();
 }
 

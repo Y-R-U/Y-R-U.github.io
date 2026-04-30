@@ -64,6 +64,25 @@ export async function setPref(key, value) {
   return wrap((await tx('prefs', 'readwrite')).put({ key, value }));
 }
 
+/* Cached library tree — last-known good copy from /api/library. We restore
+   from this when the server is unreachable (offline / off-LAN), so the APK
+   keeps showing folders and books instead of an empty shell. */
+export async function saveLibraryTree(tree) {
+  return setPref('libraryTree', tree);
+}
+export async function getLibraryTree() {
+  return getPref('libraryTree', null);
+}
+
+/* Cached jobs list — used as offline fallback so item cards still render
+   titles, durations, etc. when the server can't be reached. */
+export async function saveJobsCache(jobs) {
+  return setPref('jobsCache', jobs);
+}
+export async function getJobsCache() {
+  return getPref('jobsCache', null);
+}
+
 /* --- Audio blobs (IDB 'audio' store) --- */
 export async function saveAudio(jobId, blob) {
   return wrap((await tx('audio', 'readwrite')).put({ jobId, blob, size: blob.size }));

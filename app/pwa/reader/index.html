@@ -74,6 +74,12 @@
     <div class="now-playing">
       <div class="big-thumb">🎧</div>
       <div id="player-author" class="player-author"></div>
+      <div id="player-loading" class="player-loading hidden">
+        <div class="spinner"></div>
+        <div id="player-loading-msg" class="player-loading-msg">Caching audio…</div>
+        <progress id="player-loading-bar" max="100" value="0" class="player-loading-bar"></progress>
+        <div id="player-loading-pct" class="hint">0%</div>
+      </div>
       <div id="sync-row" class="sync-row hidden">
         <button id="btn-sync-toggle" class="sync-toggle" aria-label="Toggle text">👁</button>
         <div id="sync-line" class="sync-line"></div>

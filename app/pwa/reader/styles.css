@@ -895,6 +895,40 @@ body.dragging-active .library-scroll { overflow: hidden; }
   min-height: 40px;
 }
 
+/* Player cache progress overlay */
+.player-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 420px;
+}
+.player-loading.hidden { display: none; }
+.player-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--bg-3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  margin: 0;
+  animation: spin 0.9s linear infinite;
+}
+.player-loading-msg { font-size: 14px; color: var(--fg); }
+.player-loading-bar {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.player-loading-bar::-webkit-progress-bar { background: var(--bg-3); border-radius: 3px; }
+.player-loading-bar::-webkit-progress-value { background: var(--accent); border-radius: 3px; }
+.player-loading-bar::-moz-progress-bar { background: var(--accent); }
+
 /* Player text-sync line */
 .sync-row {
   display: flex;
@@ -914,7 +948,22 @@ body.dragging-active .library-scroll { overflow: hidden; }
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.sync-toggle.off { color: var(--fg-dim); opacity: 0.6; }
+.sync-toggle { position: relative; overflow: hidden; }
+.sync-toggle.off { color: var(--fg-dim); }
+.sync-toggle.off::after {
+  /* Diagonal slash to convey "closed eye" — Unicode has no clean closed-eye
+     glyph, so we draw it ourselves. */
+  content: '';
+  position: absolute;
+  width: 26px;
+  height: 2px;
+  background: currentColor;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  pointer-events: none;
+}
+.sync-line.hidden { display: none; }
 .sync-line {
   flex: 1;
   font-size: 15px;

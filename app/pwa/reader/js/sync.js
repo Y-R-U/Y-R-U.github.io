@@ -41,8 +41,11 @@ function setEnabled(on) {
 function applyVisibility() {
   const r = state.els?.row;
   if (!r) return;
-  const visible = state.enabled && state.segments && state.segments.length;
-  r.classList.toggle('hidden', !visible);
+  // Hide entire row only when there's nothing to show. The eye stays visible
+  // whenever there are segments — toggling it just shows/hides the line.
+  const hasSegs = !!(state.segments && state.segments.length);
+  r.classList.toggle('hidden', !hasSegs);
+  state.els.line.classList.toggle('hidden', !state.enabled);
   state.els.toggle.classList.toggle('off', !state.enabled);
 }
 

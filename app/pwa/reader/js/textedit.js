@@ -14,7 +14,8 @@ const state = {
 
 export function init(callbacks) {
   state.callbacks = callbacks;
-  $('btn-text-back').addEventListener('click', () => state.callbacks?.onCancelled?.());
+  // Use the history stack — Android/browser back lands here too.
+  $('btn-text-back').addEventListener('click', () => history.back());
   $('btn-text-save').addEventListener('click', onSave);
   $('btn-text-convert').addEventListener('click', onConvert);
   const markDirty = () => { state.dirty = true; };
@@ -48,10 +49,17 @@ export async function openExisting(jobId) {
 }
 
 function show() {
+  // If we came from the player, replace its history entry so back from the
+  // text view lands in the library (not back through the player overlay).
+  const fromPlayer = !$('player-view').classList.contains('hidden');
   $('library-view').classList.add('hidden');
   $('player-view').classList.add('hidden');
   $('text-view').classList.remove('hidden');
-  // Defer focus so iOS doesn't steal scroll position.
+  if (history.state?.view !== 'text') {
+    const newState = { view: 'text', jobId: state.itemId };
+    if (fromPlayer) history.replaceState(newState, '', null);
+    else history.pushState(newState, '', null);
+  }
   setTimeout(() => $('text-name').focus(), 50);
 }
 

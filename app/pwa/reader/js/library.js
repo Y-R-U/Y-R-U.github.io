@@ -48,22 +48,49 @@ export function currentParentId() {
   return p ? p.id : null;
 }
 
+function syncHistory() {
+  // Reflect the current path into history so browser/Android back navigates up.
+  const ids = state.path.map((f) => f.id);
+  history.pushState({ view: 'library', path: ids }, '', null);
+}
+
 export function navigateTo(folder) {
   // folder: a folder object reachable from current parent (or top-level when at root)
   state.path.push(folder);
+  syncHistory();
 }
 
 export function navigateUp() {
   state.path.pop();
+  syncHistory();
 }
 
 export function navigateRoot() {
   state.path = [];
+  syncHistory();
 }
 
 export function navigateToBreadcrumb(index) {
   // index === -1 means root
   state.path = state.path.slice(0, index + 1);
+  syncHistory();
+}
+
+/** Set the path by folder ids without pushing history. Used by the popstate
+    handler to react to browser/Android back. Returns true on success. */
+export function setPathByIds(ids) {
+  if (!state.tree) return false;
+  const p = [];
+  let children = state.tree.topLevel;
+  for (const id of ids || []) {
+    const next = (children || []).find((c) => c.id === id);
+    if (!next) return false;
+    if (next.type && next.type !== 'folder') return false;
+    p.push(next);
+    children = next.children;
+  }
+  state.path = p;
+  return true;
 }
 
 /* ----- Tree helpers ----- */
@@ -210,22 +237,27 @@ export async function moveNode(nodeId, dstParentId, dstIndex) {
 /* ----- Recent items ----- */
 
 export function recentItems(limit = 3) {
-  if (!state.tree) return [];
-  const items = [];
-  const visit = (folder) => {
-    for (const c of folder.children || []) {
-      if (c.type === 'item') items.push(c.id);
-      else if (c.type === 'folder') visit(c);
-    }
-  };
-  for (const slot of state.tree.topLevel) visit(slot);
+  const ids = new Set();
+  if (state.tree) {
+    const visit = (folder) => {
+      for (const c of folder.children || []) {
+        if (c.type === 'item') ids.add(c.id);
+        else if (c.type === 'folder') visit(c);
+      }
+    };
+    for (const slot of state.tree.topLevel) visit(slot);
+  }
+  // Fallback: any IDB-cached item with a lastPlayed timestamp, even if the
+  // server's tree doesn't reference it (offline, fresh APK install, etc).
+  for (const m of state.metaById.values()) {
+    if (m.lastPlayed && m.cached) ids.add(m.jobId);
+  }
 
-  const rows = items
+  return [...ids]
     .map((jid) => buildItemRow(jid))
     .filter((r) => r && r.lastPlayed)
     .sort((a, b) => b.lastPlayed - a.lastPlayed)
     .slice(0, limit);
-  return rows;
 }
 
 export function buildItemRow(jobId) {

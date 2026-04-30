@@ -1,5 +1,15 @@
 /* Thin wrapper around the server-side /api/* endpoints. */
 
+/* The Android APK serves the static shell from https://abreader.local (via
+   shouldInterceptRequest). Relative /api/* URLs would resolve there too,
+   which is a dead host on the network. When we detect that origin we route
+   API calls to the LAN server instead. */
+const LAN_API_BASE = 'http://192.168.0.236:7865';
+export const API_BASE = (typeof location !== 'undefined' && location.host === 'abreader.local')
+  ? LAN_API_BASE
+  : '';
+const u = (path) => API_BASE + path;
+
 const DEFAULT_TIMEOUT_MS = 3500;
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
@@ -13,21 +23,21 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_M
 }
 
 export async function listVoices() {
-  const r = await fetchWithTimeout('/api/voices');
+  const r = await fetchWithTimeout(u('/api/voices'));
   if (!r.ok) throw new Error('voices fetch failed');
   const { voices } = await r.json();
   return voices;
 }
 
 export async function listJobs() {
-  const r = await fetchWithTimeout('/api/jobs');
+  const r = await fetchWithTimeout(u('/api/jobs'));
   if (!r.ok) throw new Error('jobs list failed');
   const { jobs } = await r.json();
   return jobs;
 }
 
 export async function getJob(id) {
-  const r = await fetchWithTimeout(`/api/jobs/${id}`);
+  const r = await fetchWithTimeout(u(`/api/jobs/${id}`));
   if (!r.ok) return null;
   return r.json();
 }
@@ -40,7 +50,7 @@ export async function createJob(file, voice, speed = 1.0, { onUploadProgress, on
   if (parentFolderId) form.append('parent_folder_id', parentFolderId);
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/convert');
+    xhr.open('POST', u('/api/convert'));
     if (onXhr) onXhr(xhr);
     if (onUploadProgress) {
       xhr.upload.onprogress = (e) => {
@@ -64,13 +74,13 @@ export async function createJob(file, voice, speed = 1.0, { onUploadProgress, on
 
 /* ---- Library tree ---- */
 export async function getLibrary() {
-  const r = await fetchWithTimeout('/api/library', {}, 5000);
+  const r = await fetchWithTimeout(u('/api/library'), {}, 5000);
   if (!r.ok) throw new Error('library fetch failed');
   return r.json();
 }
 
 export async function putLibrary(rev, topLevel) {
-  const r = await fetch('/api/library', {
+  const r = await fetch(u('/api/library'), {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ rev, topLevel }),
@@ -92,7 +102,7 @@ export async function putLibrary(rev, topLevel) {
 
 /* ---- Text items ---- */
 export async function createTextItem({ title, text, parent_folder_id, voice }) {
-  const r = await fetch('/api/items/text', {
+  const r = await fetch(u('/api/items/text'), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ title, text, parent_folder_id, voice }),
@@ -106,7 +116,7 @@ export async function createTextItem({ title, text, parent_folder_id, voice }) {
 }
 
 export async function getTextItem(id) {
-  const r = await fetchWithTimeout(`/api/items/${id}/text`, {}, 5000);
+  const r = await fetchWithTimeout(u(`/api/items/${id}/text`), {}, 5000);
   if (!r.ok) throw new Error('text fetch failed');
   return r.json();
 }
@@ -115,7 +125,7 @@ export async function updateTextItem(id, { title, text }) {
   const body = {};
   if (title !== undefined) body.title = title;
   if (text !== undefined) body.text = text;
-  const r = await fetch(`/api/items/${id}/text`, {
+  const r = await fetch(u(`/api/items/${id}/text`), {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
@@ -129,7 +139,7 @@ export async function updateTextItem(id, { title, text }) {
 }
 
 export async function convertItem(id, { voice, speed } = {}) {
-  const r = await fetch(`/api/items/${id}/convert`, {
+  const r = await fetch(u(`/api/items/${id}/convert`), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ voice, speed }),
@@ -144,14 +154,14 @@ export async function convertItem(id, { voice, speed } = {}) {
 
 /* ---- Segments ---- */
 export async function getSegments(jobId) {
-  const r = await fetchWithTimeout(`/api/jobs/${jobId}/segments`, {}, 5000);
+  const r = await fetchWithTimeout(u(`/api/jobs/${jobId}/segments`), {}, 5000);
   if (r.status === 404) return null;
   if (!r.ok) throw new Error('segments fetch failed');
   return r.json();
 }
 
 export async function deleteJob(id) {
-  const r = await fetchWithTimeout(`/api/jobs/${id}`, { method: 'DELETE' });
+  const r = await fetchWithTimeout(u(`/api/jobs/${id}`), { method: 'DELETE' });
   if (!r.ok) {
     let msg = `delete failed (${r.status})`;
     try { msg = (await r.json()).detail || msg; } catch (_) {}
@@ -160,7 +170,7 @@ export async function deleteJob(id) {
 }
 
 export async function fetchMp3Blob(id, onProgress) {
-  const r = await fetchWithTimeout(`/api/jobs/${id}/mp3`, {}, 15000);
+  const r = await fetchWithTimeout(u(`/api/jobs/${id}/mp3`), {}, 15000);
   if (!r.ok) throw new Error('mp3 not ready');
   const total = Number(r.headers.get('content-length')) || 0;
   if (!onProgress || !total || !r.body) return r.blob();
