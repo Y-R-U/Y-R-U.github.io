@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e1e1e">
+<meta name="application-name" content="Reader">
+<title>Reader</title>
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Library view -->
+  <section id="library-view" class="view">
+    <header class="app-bar">
+      <button id="btn-up" class="icon-btn hidden" aria-label="Up">←</button>
+      <h1 id="library-title">Reader</h1>
+      <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
+    </header>
+
+    <div id="connection-banner" class="connection-banner hidden">Server unreachable — showing cached books only.</div>
+
+    <nav id="breadcrumbs" class="breadcrumbs hidden" aria-label="Breadcrumbs"></nav>
+
+    <div class="library-scroll">
+      <div id="jobs-section" class="jobs-section hidden">
+        <div class="section-label">In progress</div>
+        <div id="jobs-list" class="jobs-list"></div>
+      </div>
+
+      <div id="recent-section" class="recent-section hidden">
+        <div class="section-label">Recently played</div>
+        <div id="recent-list" class="recent-list"></div>
+      </div>
+
+      <div id="grid-section" class="grid-section">
+        <div id="grid-label" class="section-label hidden"></div>
+        <div id="grid" class="grid"></div>
+      </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".epub,.pdf,.txt" hidden>
+  </section>
+
+  <!-- Text editor view -->
+  <section id="text-view" class="view hidden">
+    <header class="app-bar">
+      <button id="btn-text-back" class="icon-btn" aria-label="Back">←</button>
+      <input id="text-name" class="text-name" placeholder="Untitled" autocomplete="off" spellcheck="false">
+      <span class="text-ext">.txt</span>
+      <button id="btn-text-save" class="text-btn" aria-label="Save">Save</button>
+      <button id="btn-text-convert" class="text-btn primary" aria-label="Convert">Convert</button>
+    </header>
+    <textarea id="text-body" class="text-body" placeholder="Paste or write text here…" spellcheck="false"></textarea>
+  </section>
+
+  <!-- Player view -->
+  <section id="player-view" class="view hidden">
+    <header class="app-bar">
+      <button id="btn-back" class="icon-btn" aria-label="Back">←</button>
+      <h1 id="player-title">—</h1>
+      <button id="btn-player-edit" class="icon-btn hidden" aria-label="Edit text">✎</button>
+      <button id="btn-player-dl" class="icon-btn" aria-label="Download MP3">⬇</button>
+    </header>
+    <div class="now-playing">
+      <div class="big-thumb">🎧</div>
+      <div id="player-author" class="player-author"></div>
+      <div id="player-loading" class="player-loading hidden">
+        <div class="spinner"></div>
+        <div id="player-loading-msg" class="player-loading-msg">Caching audio…</div>
+        <progress id="player-loading-bar" max="100" value="0" class="player-loading-bar"></progress>
+        <div id="player-loading-pct" class="hint">0%</div>
+      </div>
+      <div id="sync-row" class="sync-row hidden">
+        <button id="btn-sync-toggle" class="sync-toggle" aria-label="Toggle text">👁</button>
+        <div id="sync-line" class="sync-line"></div>
+      </div>
+    </div>
+    <div class="scrub-row">
+      <span id="time-cur">0:00</span>
+      <input type="range" id="scrubber" min="0" max="0" value="0" step="0.1">
+      <span id="time-total">0:00</span>
+    </div>
+    <div class="controls">
+      <button id="btn-back-30" class="control-btn" aria-label="Back 30s">⟲30</button>
+      <button id="btn-play" class="control-btn play" aria-label="Play">▶</button>
+      <button id="btn-fwd-30" class="control-btn" aria-label="Forward 30s">30⟳</button>
+    </div>
+    <div class="player-row">
+      <label for="speed">Speed <span id="speed-val">1×</span></label>
+      <input type="range" id="speed" min="0.5" max="3.0" step="0.05" value="1.0">
+    </div>
+  </section>
+
+  <!-- Import / voice picker modal -->
+  <div id="import-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2 id="import-title">Choose a voice</h2>
+        <button id="btn-import-cancel" class="icon-btn" aria-label="Cancel">×</button>
+      </header>
+      <div class="import-file-row">
+        <span class="hint" id="import-prefix">Importing</span>
+        <span id="import-filename"></span>
+      </div>
+      <div id="voice-list" class="voice-list"></div>
+      <div class="import-actions">
+        <button id="btn-import-confirm" class="text-btn primary">Start conversion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="btn-close-settings" aria-label="Close">×</button>
+      </header>
+      <div class="settings-body">
+        <div id="storage-status"></div>
+        <hr>
+        <p class="hint">Conversions run on the airon server. Audiobooks stay server-side until you tap the ☁ sync button to save a copy on this device for offline playback. The ⬇ button saves the .mp3 file to your device's file system.</p>
+        <p class="hint"><a href="downloads/abreader.apk?v=5">Install ABReader Android APK v5</a> for the bundled LAN reader app. Version 5 includes cache refresh and Android back-button fixes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action sheet modal -->
+  <div id="sheet-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel sheet-panel">
+      <div id="sheet-title" class="sheet-title"></div>
+      <div id="sheet-actions" class="sheet-actions"></div>
+      <button id="btn-sheet-cancel" class="text-btn sheet-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div id="confirm-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel confirm-panel">
+      <div class="confirm-body">
+        <h2 id="confirm-title">Confirm</h2>
+        <p id="confirm-msg"></p>
+      </div>
+      <div class="confirm-actions">
+        <button class="text-btn" id="btn-confirm-cancel">Cancel</button>
+        <button class="text-btn" id="btn-confirm-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt modal (for naming folders) -->
+  <div id="prompt-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel confirm-panel">
+      <div class="confirm-body">
+        <h2 id="prompt-title">Name</h2>
+        <input id="prompt-input" class="prompt-input" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="confirm-actions">
+        <button class="text-btn" id="btn-prompt-cancel">Cancel</button>
+        <button class="text-btn primary" id="btn-prompt-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

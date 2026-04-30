@@ -23,11 +23,6 @@ const uploads = new Map();
 const caching = new Map();
 const cacheFailed = new Set();
 
-async function registerSW() {
-  if (!('serviceWorker' in navigator)) return;
-  try { await navigator.serviceWorker.register('sw.js'); } catch (e) { console.warn('SW register failed:', e); }
-}
-
 async function getVoices() {
   if (voicesCache) return voicesCache;
   try { voicesCache = await api.listVoices(); }
@@ -659,7 +654,6 @@ window.ABReaderHandleBack = function () {
 };
 
 async function main() {
-  registerSW();
   store.requestPersist();
   wire();
 
