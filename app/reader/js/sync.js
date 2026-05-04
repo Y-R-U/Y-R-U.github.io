@@ -207,10 +207,18 @@ function renderParagraph(line, segIdx, wordIdx) {
   }
   line.innerHTML = parts.filter(Boolean).join(' ');
   const strong = line.querySelector('strong');
-  if (strong) {
-    const targetTop = strong.offsetTop - (line.clientHeight / 2) + (strong.offsetHeight / 2);
-    line.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-  }
+  if (strong) centerParagraphWord(line, strong);
+}
+
+function centerParagraphWord(line, strong) {
+  const lineRect = line.getBoundingClientRect();
+  const wordRect = strong.getBoundingClientRect();
+  const targetTop = line.scrollTop
+    + (wordRect.top - lineRect.top)
+    - (line.clientHeight / 2)
+    + (wordRect.height / 2);
+  const maxTop = Math.max(0, line.scrollHeight - line.clientHeight);
+  line.scrollTo({ top: Math.max(0, Math.min(maxTop, targetTop)), behavior: 'auto' });
 }
 
 function renderCurrent() {
