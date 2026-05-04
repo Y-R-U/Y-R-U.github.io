@@ -137,12 +137,12 @@ export function drawTutorial(ctx) {
   ctx.fillText('How to Play', W / 2, 60);
 
   const instructions = [
-    ['Click / Tap', 'Shoot your tongue at the nearest anchor point'],
-    ['Release', 'Let go of the anchor to launch yourself'],
-    ['Aim', 'Move your mouse toward where you want to swing'],
+    ['Tap & Hold', 'Tongue grabs the nearest anchor in your aim cone'],
+    ['Pump!', 'Holding pulls the rope shorter — do it at the bottom of a swing to gain speed and altitude'],
+    ['Release', 'Let go to fly free — release late in the upswing for an upward arc to the next branch'],
+    ['Tap on ground', 'No anchor in range? You hop toward your cursor'],
     ['Collect', 'Grab bugs mid-air for coins to buy upgrades'],
     ['Goal', 'Reach and eat the fly at the end of each level!'],
-    ['Timer', 'Beat each level before time runs out'],
   ];
 
   ctx.textAlign = 'left';

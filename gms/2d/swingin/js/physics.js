@@ -2,7 +2,7 @@
 //  PHYSICS UPDATE — gravity, swinging, collisions, collectibles
 // ============================================================
 
-import { W, H, GRAVITY, FROG_H } from './config.js';
+import { W, H, GRAVITY, FROG_H, MAX_TANGENTIAL_SPEED } from './config.js';
 import { game, camera, getEffective, world, shake, mouse } from './state.js';
 import { frog } from './frog.js';
 import { particles, spawnCoinParticles, spawnCelebration, updateParticles } from './particles.js';
@@ -70,15 +70,25 @@ export function update(dt) {
     // Pendulum physics — angVel/angle in per-frame units, scaled by step for dt-independence
     const t = frog.tongue;
 
-    // Reel in while input is held — lets the player pull upward toward the anchor.
-    // Preserve tangential velocity (v = ω·r): as r shrinks, ω grows proportionally.
+    // Reel in while input is held — this is the "pump" mechanic.
+    // Conservation of angular momentum (m·r²·ω = const) means ω scales as
+    // 1/r²: pulling the rope shorter at the bottom of a swing converts the
+    // player's "work against centripetal force" into kinetic energy. Doing
+    // this at high ω (near the bottom of swings) gains altitude over time.
     if (mouse.down) {
       const minLen = 24;
       const reelRate = 150; // pixels per second
       if (t.length > minLen) {
         const newLen = Math.max(minLen, t.length - reelRate * dt);
         if (newLen < t.length) {
-          t.angVel *= t.length / newLen;
+          const ratio = t.length / newLen;
+          let newAngVel = t.angVel * ratio * ratio;
+          // Cap tangential speed so pumping can't run away to infinity.
+          const tangential = Math.abs(newAngVel) * newLen;
+          if (tangential > MAX_TANGENTIAL_SPEED) {
+            newAngVel = Math.sign(newAngVel) * MAX_TANGENTIAL_SPEED / newLen;
+          }
+          t.angVel = newAngVel;
           t.length = newLen;
         }
       }

@@ -5,6 +5,7 @@
 import { frog } from './frog.js';
 import { mouse, camera, getEffective, world } from './state.js';
 import { createParticle, particles } from './particles.js';
+import { RELEASE_KICK, GROUND_HOP_VY } from './config.js';
 
 // Returns the best aim target in range + within the aim cone.
 // Among in-range cone-passing targets, picks the one closest to the cursor
@@ -67,7 +68,18 @@ export function shootTongue() {
   if (frog.swinging) return;
 
   const target = findAimTarget();
-  if (!target) return;
+  if (!target) {
+    // No anchor in cone/range — give grounded players a small recovery hop
+    // toward the cursor so they're never stuck on the ground.
+    if (frog.grounded) {
+      const dx = (mouse.x + camera.x) - frog.x;
+      const dir = dx === 0 ? 0 : (dx > 0 ? 1 : -1);
+      frog.vy = -GROUND_HOP_VY;
+      frog.vx = dir * 3;
+      frog.grounded = false;
+    }
+    return;
+  }
 
   if (target.kind === 'fly') {
     frog.tongue = {
@@ -95,6 +107,9 @@ export function releaseTongue() {
   const power = getEffective('swingPower');
   frog.vx *= power;
   frog.vy *= power;
+  // Additive upward kick so even slow releases give a satisfying hop.
+  // Without this, swingPower=1.0 at level 1 means release does nothing.
+  frog.vy -= RELEASE_KICK;
 
   frog.swinging = false;
   frog.tongue = null;

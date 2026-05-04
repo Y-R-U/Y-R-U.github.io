@@ -2,12 +2,18 @@
 //  LEVEL GENERATION
 // ============================================================
 
-import { H, FROG_H, BASE_TONGUE_LENGTH } from './config.js';
+import { H, FROG_H, BASE_TONGUE_LENGTH, START_HEIGHT } from './config.js';
 import { game, camera, getEffective, world } from './state.js';
 import { resetFrog } from './frog.js';
 
 const GROUND_Y = H - 60;
 export { GROUND_Y };
+
+// Frog spawn point — top of the start branch.
+const START_PLATFORM_X = 60;
+const START_PLATFORM_W = 110;
+const FROG_SPAWN_X = 105;
+const FROG_SPAWN_Y = GROUND_Y - START_HEIGHT - FROG_H;
 
 // Cap consecutive-anchor gap a bit under base tongue length so every
 // transition is a direct-grab candidate, even without upgrades.
@@ -35,9 +41,12 @@ export function generateLevel(lvl) {
   for (let i = 0; i < numAnchors; i++) {
     let aposX, aposY;
     if (i === 0) {
-      // First anchor — pinned so it's reachable from the frog's spawn.
-      aposX = 220;
-      aposY = GROUND_Y - 140;
+      // First anchor — placed for a clean opening swing from the elevated
+      // start branch. Frog at (105, GROUND_Y-248), anchor below+right so the
+      // pendulum starts near horizontal and converts the height drop into
+      // real tangential speed.
+      aposX = 265;
+      aposY = GROUND_Y - 200;
     } else {
       const prev = world.anchors[i - 1];
       const spacing = 100 + Math.random() * 60; // 100..160
@@ -81,6 +90,12 @@ export function generateLevel(lvl) {
   }
   world.platforms.unshift(makePlatform(0, GROUND_Y, 200));
 
+  // --- Start branch (elevated tree-branch the frog spawns on) ---
+  const startBranch = makePlatform(START_PLATFORM_X, GROUND_Y - START_HEIGHT, START_PLATFORM_W);
+  startBranch.tree = true;
+  startBranch.dirt = [];
+  world.platforms.push(startBranch);
+
   // --- Extra airborne collectibles ---
   for (let i = 0; i < Math.floor(numAnchors * 0.3); i++) {
     world.collectibles.push({
@@ -103,7 +118,7 @@ export function generateLevel(lvl) {
     bobOffset: 0, caught: false,
   };
 
-  resetFrog(100, GROUND_Y - FROG_H);
+  resetFrog(FROG_SPAWN_X, FROG_SPAWN_Y);
   game.timer = getEffective('timerBoost');
   camera.x = 0;
   camera.y = 0;

@@ -15,6 +15,18 @@ export const BASE_MAGNET_RADIUS = 30;
 export const FROG_W = 32;
 export const FROG_H = 28;
 
+// Pendulum: cap on tangential speed (per-frame) to prevent runaway pumping.
+// Reel-in conserves angular momentum, so ω·r grows toward this cap.
+export const MAX_TANGENTIAL_SPEED = 24;
+// Additive upward boost (per-frame) added to vy on tongue release. Gives a
+// satisfying hop on slow swings without dominating fast ones.
+export const RELEASE_KICK = 4;
+// Small hop when player taps with no anchor target while grounded.
+export const GROUND_HOP_VY = 8;
+// Frog spawns this many pixels above ground, on a tree branch, so the very
+// first swing has potential energy to convert.
+export const START_HEIGHT = 220;
+
 export const UPGRADE_MAX = 10;
 
 export const UPGRADE_COSTS = {

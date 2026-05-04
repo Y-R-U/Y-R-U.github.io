@@ -59,6 +59,37 @@ export function drawGround(ctx) {
     const sx = p.x - camera.x;
     const sy = p.y - camera.y;
 
+    if (p.tree) {
+      // Elevated start branch — draw a narrow trunk down to the ground
+      // instead of a full-width dirt slab.
+      const trunkW = 34;
+      const trunkX = sx + (p.w - trunkW) / 2;
+      const trunkH = (H - p.y + camera.y + 10) - 6;
+      ctx.fillStyle = '#6b4423';
+      ctx.fillRect(trunkX, sy + 6, trunkW, trunkH);
+      ctx.fillStyle = '#4f311a';
+      ctx.fillRect(trunkX, sy + 6, 4, trunkH);
+      ctx.fillRect(trunkX + trunkW - 4, sy + 6, 4, trunkH);
+      // Branch top
+      ctx.fillStyle = '#8B6914';
+      ctx.fillRect(sx, sy, p.w, 10);
+      ctx.fillStyle = '#4a8c3f';
+      ctx.fillRect(sx, sy, p.w, 5);
+      ctx.fillStyle = '#5da64e';
+      for (let gx = sx; gx < sx + p.w; gx += 6) {
+        ctx.fillRect(gx, sy - 3, 3, 6);
+      }
+      // A couple of leaves dangling off the branch
+      ctx.fillStyle = '#5da64e';
+      ctx.beginPath();
+      ctx.ellipse(sx - 3, sy + 6, 9, 4, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(sx + p.w + 3, sy + 6, 9, 4, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      continue;
+    }
+
     ctx.fillStyle = '#8B6914';
     ctx.fillRect(sx, sy, p.w, H - p.y + camera.y + 10);
 
