@@ -13,6 +13,7 @@ const state = {
   segments: null,    // [{start, end, text, words: [{w,s,e}]}]
   jobId: null,
   enabled: true,
+  paragraph: false,
   segIdx: 0,
   wordIdx: -1,
   els: null,         // {row, line, toggle}
@@ -31,6 +32,20 @@ export function setEnabledFromPref(on) {
 }
 
 export function isEnabled() { return state.enabled; }
+export function isParagraph() { return state.paragraph; }
+
+export function setParagraphFromPref(on) {
+  state.paragraph = !!on;
+  applyVisibility();
+  renderCurrent();
+}
+
+export function setParagraphMode(on) {
+  state.paragraph = !!on;
+  store.setPref('syncParagraph', state.paragraph).catch(() => {});
+  applyVisibility();
+  renderCurrent();
+}
 
 function setEnabled(on) {
   state.enabled = !!on;
@@ -45,6 +60,8 @@ function applyVisibility() {
   // whenever there are segments — toggling it just shows/hides the line.
   const hasSegs = !!(state.segments && state.segments.length);
   r.classList.toggle('hidden', !hasSegs);
+  r.classList.toggle('paragraph', state.paragraph);
+  state.els.line.classList.toggle('paragraph', state.paragraph);
   state.els.line.classList.toggle('hidden', !state.enabled);
   state.els.toggle.classList.toggle('off', !state.enabled);
 }
@@ -147,9 +164,12 @@ function renderLine(segIdx, wordIdx) {
   if (!line) return;
   const seg = state.segments[segIdx];
   if (!seg) { line.innerHTML = ''; return; }
+  if (state.paragraph) {
+    renderParagraph(line, segIdx, wordIdx);
+    return;
+  }
   // Build the current line: render the full segment text, with the current
-  // word wrapped in <strong>. Limit to ~140 chars window centered on the
-  // current word so very long sentences don't make the line unreadable.
+  // word wrapped in <strong>.
   if (!seg.words || seg.words.length === 0) {
     line.textContent = seg.text;
     return;
@@ -167,6 +187,32 @@ function renderLine(segIdx, wordIdx) {
     const centerOffset = (wordRect.left - lineRect.left) - (lineRect.width / 2 - wordRect.width / 2);
     line.scrollTo({ left: line.scrollLeft + centerOffset, behavior: 'smooth' });
   }
+}
+
+function renderParagraph(line, segIdx, wordIdx) {
+  const segs = state.segments || [];
+  const start = Math.max(0, segIdx - 1);
+  const end = Math.min(segs.length, segIdx + 3);
+  const parts = [];
+  for (let i = start; i < end; i++) {
+    const seg = segs[i];
+    if (!seg) continue;
+    if (i === segIdx && seg.words && seg.words.length) {
+      parts.push(seg.words.map((w, idx) => (
+        idx === wordIdx ? `<strong>${escapeHtml(w.w)}</strong>` : escapeHtml(w.w)
+      )).join(' '));
+    } else {
+      parts.push(escapeHtml(seg.text || ''));
+    }
+  }
+  line.innerHTML = parts.filter(Boolean).join(' ');
+  const strong = line.querySelector('strong');
+  if (strong) strong.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+function renderCurrent() {
+  if (!state.enabled || !state.segments || !state.segments.length) return;
+  renderLine(state.segIdx, state.wordIdx);
 }
 
 function escapeHtml(s) {

@@ -23,6 +23,8 @@ export function attachAll(rootEl) {
 }
 
 function attachOne(el) {
+  if (el.dataset.dragAttached === '1') return;
+  el.dataset.dragAttached = '1';
   el.addEventListener('pointerdown', (e) => {
     if (e.button && e.button !== 0) return; // only primary
     if (e.target.closest('button')) return;  // tapping a card button shouldn't start drag
@@ -40,6 +42,8 @@ function startGesture(srcEl, ev) {
     lastX: ev.clientX,
     lastY: ev.clientY,
     started: false,
+    scrollMode: false,
+    scrollEl: ev.target.closest('.library-scroll'),
     timer: null,
     ghost: null,
     lastDropTarget: null,
@@ -83,15 +87,25 @@ function beginDrag() {
 
 function onPointerMove(ev) {
   if (!active || ev.pointerId !== active.pointerId) return;
+  const prevY = active.lastY;
   active.lastX = ev.clientX;
   active.lastY = ev.clientY;
+  if (active.scrollMode) {
+    ev.preventDefault();
+    if (active.scrollEl) active.scrollEl.scrollTop += prevY - ev.clientY;
+    return;
+  }
   if (!active.started) {
     const dx = ev.clientX - active.startX;
     const dy = ev.clientY - active.startY;
     if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) {
-      // For touch we abort: a swipe means "scroll", not drag.
+      // If touch moves before the long press, treat it as scrolling. Cards use
+      // touch-action:none to keep WebView from cancelling an active drag.
       if (active.pointerType === 'touch' || active.pointerType === 'pen') {
-        cancelGesture();
+        clearTimeout(active.timer);
+        active.scrollMode = true;
+        ev.preventDefault();
+        if (active.scrollEl) active.scrollEl.scrollTop += prevY - ev.clientY;
         return;
       }
       // For mouse: this counts as starting drag.

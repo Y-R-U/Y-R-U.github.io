@@ -341,18 +341,57 @@ async function saveBookToDevice(row) {
     let file;
     if (await store.audioExists(row.jobId)) file = await store.readAudioFile(row.jobId);
     else { ui.showToast('Downloading first…'); file = await api.fetchMp3Blob(row.jobId); }
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url;
     const safe = (row.title || 'audiobook').replace(/[^\w\s.-]+/g, '_');
-    a.download = `${safe}.mp3`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    await saveBlobToDevice(file, `${safe}.mp3`);
   } catch (e) {
     ui.showToast('Save failed: ' + (e.message || e), { error: true });
   }
+}
+
+async function saveBlobToDevice(blob, filename) {
+  const bridge = window.ABReaderAndroid;
+  if (bridge?.beginFileDownload && bridge?.writeFileDownloadChunk && bridge?.finishFileDownload) {
+    ui.showToast('Saving .mp3…');
+    await saveBlobWithAndroid(bridge, blob, filename);
+    ui.showToast(`Saved ${filename} to Downloads`);
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function saveBlobWithAndroid(bridge, blob, filename) {
+  const id = bridge.beginFileDownload(filename, blob.type || 'audio/mpeg');
+  if (!id) throw new Error('Android download unavailable');
+  const chunkSize = 192 * 1024;
+  try {
+    for (let offset = 0; offset < blob.size; offset += chunkSize) {
+      const bytes = new Uint8Array(await blob.slice(offset, offset + chunkSize).arrayBuffer());
+      if (!bridge.writeFileDownloadChunk(id, bytesToBase64(bytes))) {
+        throw new Error('Android download write failed');
+      }
+    }
+    const savedName = bridge.finishFileDownload(id);
+    if (!savedName) throw new Error('Android download save failed');
+  } catch (e) {
+    try { bridge.cancelFileDownload(id); } catch (_) {}
+    throw e;
+  }
+}
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
 async function openBook(row) {
@@ -598,12 +637,41 @@ textedit.init({
 /* ---------------- Sync ticker init ---------------- */
 sync.init({ row: $('sync-row'), line: $('sync-line'), toggle: $('btn-sync-toggle') });
 store.getPref('syncEnabled', true).then((on) => sync.setEnabledFromPref(on));
+store.getPref('syncParagraph', false).then((on) => {
+  sync.setParagraphFromPref(on);
+  updateParagraphToggle();
+});
 
 /* ---------------- Settings ---------------- */
 async function refreshSettings() {
   const persisted = await store.isPersisted();
   const est = await store.storageEstimate();
   ui.setStorageStatus({ persisted, ...est });
+  updateParagraphToggle();
+}
+
+function updateParagraphToggle() {
+  const btn = $('sync-paragraph-toggle');
+  if (!btn) return;
+  const on = sync.isParagraph();
+  btn.textContent = on ? 'On' : 'Off';
+  btn.setAttribute('aria-checked', on ? 'true' : 'false');
+  btn.classList.toggle('on', on);
+}
+
+function snapSpeed(v) {
+  return Math.round(Math.max(0.5, Math.min(3.0, v)) * 20) / 20;
+}
+
+function updateSpeedLabel(v) {
+  $('speed-val').textContent = v.toFixed(2).replace(/0$/, '') + '×';
+}
+
+function setPlayerSpeed(v) {
+  const next = snapSpeed(v);
+  $('speed').value = String(next);
+  updateSpeedLabel(next);
+  player.setSpeed(next);
 }
 
 /* ---------------- Wire global UI ---------------- */
@@ -619,6 +687,10 @@ function wire() {
   $('btn-settings').addEventListener('click', async () => { await refreshSettings(); ui.openSettings(); });
   $('btn-close-settings').addEventListener('click', () => ui.closeSettings());
   $('settings-modal').querySelector('.modal-scrim').addEventListener('click', () => ui.closeSettings());
+  $('sync-paragraph-toggle').addEventListener('click', () => {
+    sync.setParagraphMode(!sync.isParagraph());
+    updateParagraphToggle();
+  });
 
   $('btn-back').addEventListener('click', () => history.back());
   $('btn-play').addEventListener('click', () => player.togglePlay());
@@ -626,10 +698,11 @@ function wire() {
   $('btn-fwd-30').addEventListener('click', () => player.skip(30));
   $('scrubber').addEventListener('input', (e) => player.seekTo(parseFloat(e.target.value)));
   $('speed').addEventListener('input', (e) => {
-    const v = parseFloat(e.target.value);
-    $('speed-val').textContent = v.toFixed(2).replace(/0$/, '') + '×';
+    updateSpeedLabel(parseFloat(e.target.value));
   });
-  $('speed').addEventListener('change', (e) => player.setSpeed(parseFloat(e.target.value)));
+  $('speed').addEventListener('change', (e) => setPlayerSpeed(parseFloat(e.target.value)));
+  $('btn-speed-down').addEventListener('click', () => setPlayerSpeed(player.state.speed - 0.05));
+  $('btn-speed-up').addEventListener('click', () => setPlayerSpeed(player.state.speed + 0.05));
   $('btn-player-dl').addEventListener('click', () => {
     if (player.state.book) saveBookToDevice({ jobId: player.state.book.jobId, title: player.state.book.title });
   });

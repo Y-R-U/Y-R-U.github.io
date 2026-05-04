@@ -49,6 +49,7 @@ export async function loadBook(jobId, { onUpdate, hasSegments } = {}) {
     if (meta.position && meta.position < state.duration - 1) {
       audio.currentTime = meta.position;
     }
+    updatePositionState();
     notify();
   });
   audio.addEventListener('timeupdate', () => {
@@ -65,6 +66,7 @@ export async function loadBook(jobId, { onUpdate, hasSegments } = {}) {
   audio.addEventListener('ended', () => {
     state.playing = false;
     state.position = state.duration;
+    updateMediaSession();
     savePosition();
     notify();
   });
@@ -132,6 +134,7 @@ async function savePosition() {
 }
 
 function updateMediaSession() {
+  updateAndroidMediaSession();
   if (!('mediaSession' in navigator) || !state.book) return;
   navigator.mediaSession.metadata = new MediaMetadata({
     title: state.book.title || 'Audiobook',
@@ -161,6 +164,7 @@ function updateMediaSession() {
 }
 
 function updatePositionState() {
+  updateAndroidPositionState();
   if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return;
   if (!state.audio) return;
   const dur = state.duration || state.audio.duration;
@@ -180,3 +184,44 @@ function updatePositionStateThrottled() {
   if (posStateTimer) return;
   posStateTimer = setTimeout(() => { posStateTimer = null; updatePositionState(); }, 1000);
 }
+
+function androidBridge() {
+  return window.ABReaderAndroid || null;
+}
+
+function updateAndroidMediaSession() {
+  const bridge = androidBridge();
+  if (!bridge || !state.book) return;
+  const duration = finiteDuration();
+  try {
+    bridge.mediaMetadata(
+      state.book.title || 'Audiobook',
+      state.book.author || 'Reader',
+      duration
+    );
+    bridge.playbackState(state.playing ? 'playing' : 'paused');
+  } catch (_) {}
+}
+
+function updateAndroidPositionState() {
+  const bridge = androidBridge();
+  if (!bridge || !state.audio) return;
+  const duration = finiteDuration();
+  const position = Math.max(0, Math.min(duration || Number.MAX_SAFE_INTEGER, state.position || state.audio.currentTime || 0));
+  try {
+    bridge.mediaPosition(position, duration, state.audio.playbackRate || state.speed || 1);
+  } catch (_) {}
+}
+
+function finiteDuration() {
+  const duration = state.duration || state.audio?.duration || 0;
+  return isFinite(duration) && duration > 0 ? duration : 0;
+}
+
+window.ABReaderNativeControls = {
+  play: () => play(),
+  pause: () => pause(),
+  toggle: () => togglePlay(),
+  skip: (seconds) => skip(Number(seconds) || 0),
+  seekTo: (seconds) => seekTo(Number(seconds) || 0),
+};

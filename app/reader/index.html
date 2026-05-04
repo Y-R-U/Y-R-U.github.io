@@ -92,7 +92,9 @@
     </div>
     <div class="player-row">
       <label for="speed">Speed <span id="speed-val">1×</span></label>
+      <button id="btn-speed-down" class="speed-step-btn" aria-label="Decrease speed">−</button>
       <input type="range" id="speed" min="0.5" max="3.0" step="0.05" value="1.0">
+      <button id="btn-speed-up" class="speed-step-btn" aria-label="Increase speed">+</button>
     </div>
   </section>
 
@@ -124,10 +126,15 @@
         <button class="icon-btn" id="btn-close-settings" aria-label="Close">×</button>
       </header>
       <div class="settings-body">
+        <div class="setting-row">
+          <label for="sync-paragraph-toggle">Paragraph text</label>
+          <button id="sync-paragraph-toggle" class="toggle-btn" type="button" role="switch" aria-checked="false">Off</button>
+        </div>
+        <hr>
         <div id="storage-status"></div>
         <hr>
         <p class="hint">Conversions run on the airon server. Audiobooks stay server-side until you tap the ☁ sync button to save a copy on this device for offline playback. The ⬇ button saves the .mp3 file to your device's file system.</p>
-        <p class="hint"><a href="downloads/abreader.apk?v=6">Install ABReader Android APK v6</a> for the bundled LAN reader app. Version 6 includes cache refresh, Android back-button fixes, and the root back-button cleanup.</p>
+        <p class="hint"><a href="downloads/abreader.apk?v=11">Install ABReader Android APK v11</a> for the bundled LAN reader app. Version 11 adds APK MP3 saving, paragraph text, and speed step buttons.</p>
       </div>
     </div>
   </div>
