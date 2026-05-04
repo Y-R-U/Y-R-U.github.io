@@ -191,7 +191,7 @@ function renderLine(segIdx, wordIdx) {
 
 function renderParagraph(line, segIdx, wordIdx) {
   const segs = state.segments || [];
-  const start = Math.max(0, segIdx - 1);
+  const start = Math.max(0, segIdx - 2);
   const end = Math.min(segs.length, segIdx + 3);
   const parts = [];
   for (let i = start; i < end; i++) {
@@ -207,7 +207,10 @@ function renderParagraph(line, segIdx, wordIdx) {
   }
   line.innerHTML = parts.filter(Boolean).join(' ');
   const strong = line.querySelector('strong');
-  if (strong) strong.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  if (strong) {
+    const targetTop = strong.offsetTop - (line.clientHeight / 2) + (strong.offsetHeight / 2);
+    line.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+  }
 }
 
 function renderCurrent() {
