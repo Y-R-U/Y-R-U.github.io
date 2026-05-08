@@ -31,7 +31,7 @@ export const PERSONALITIES = [
     courage: 1,
     fireDiscipline: 0.92,
     strafe: 0.42,
-    retreatHealth: 12,
+    retreatHealth: 2,
     aimNoise: 0.35
   },
   {
@@ -42,7 +42,7 @@ export const PERSONALITIES = [
     courage: 0.38,
     fireDiscipline: 0.68,
     strafe: 0.74,
-    retreatHealth: 54,
+    retreatHealth: 8,
     aimNoise: 0.7
   },
   {
@@ -53,7 +53,7 @@ export const PERSONALITIES = [
     courage: 0.78,
     fireDiscipline: 0.84,
     strafe: 0.58,
-    retreatHealth: 30,
+    retreatHealth: 5,
     aimNoise: 0.44
   },
   {
@@ -64,7 +64,7 @@ export const PERSONALITIES = [
     courage: 0.56,
     fireDiscipline: 0.97,
     strafe: 0.3,
-    retreatHealth: 38,
+    retreatHealth: 6,
     aimNoise: 0.24
   },
   {
@@ -75,13 +75,13 @@ export const PERSONALITIES = [
     courage: 0.64,
     fireDiscipline: 0.8,
     strafe: 0.64,
-    retreatHealth: 34,
+    retreatHealth: 5,
     aimNoise: 0.55
   }
 ];
 
 export const TUNING = {
-  maxHp: 100,
+  maxHp: 15,
   playerSpeed: 15,
   aiSpeed: 10.8,
   acceleration: 16,
@@ -89,7 +89,7 @@ export const TUNING = {
   turretTurnRate: 9,
   shellSpeed: 31,
   shellLife: 2.15,
-  shellDamage: 36,
+  shellDamage: 1,
   blastRadius: 2.8,
   fireCooldown: 0.74,
   aiFireCooldownBonus: 0.16,
