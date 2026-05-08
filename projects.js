@@ -77,7 +77,7 @@ const PROJECTS = [
     date: "2026-04-09" },
 
   { name: "Reader",         path: "/app/reader/",       screenshot: "reader",         type: "app",
-    desc: "Offline audiobook reader — imports EPUB/PDF/text and narrates with on-device Kokoro TTS via WebGPU. Per-book voice & position, chapter drawer, adjustable speed.",
+    desc: "Local server-backed audiobook reader. The laptop runs the Kokoro TTS backend while the Android APK caches books for offline playback.",
     date: "2026-04-21" },
 
   // ══════════════════════════════════════════
@@ -219,6 +219,18 @@ const PROJECTS = [
   { name: "Claude 3D Tank",     path: "/gms/3d/claude_3d_tank/",  screenshot: "claude-3d-tank",  type: "game",
     desc: "Low-poly 3D tank shooter at dusk. Hold off waves of diving black crows with glowing red eyes. WASD + mouse aim, barrel pitches up to track crows overhead.",
     date: "2026-04-24" },
+
+  { name: "Swingin'",           path: "/gms/2d/swingin/",          screenshot: "swingin",         type: "game",
+    desc: "Frog tongue swinging platformer. Swing from anchors, collect bugs, buy upgrades, and reach the fly at the end of each level.",
+    date: "2026-05-08" },
+
+  { name: "Codex Tank Battle",  path: "/gms/3d/codex_3d_tank_battle/", screenshot: "codex-tank-battle", type: "game",
+    desc: "Last-tank-standing 3D battle royale with ten named tanks, AI commanders, a live leaderboard, mobile controls, and cannon combat.",
+    date: "2026-05-08" },
+
+  { name: "Tank Battle Royale", path: "/gms/3d/claude_3d_tank_battle/", screenshot: "claude-tank-battle", type: "game",
+    desc: "3D tank battle royale where ten tanks enter an arena and fight until one survivor remains. Includes leaderboard, name tags, and touch controls.",
+    date: "2026-05-08" },
 
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
