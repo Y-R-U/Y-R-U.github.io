@@ -3,7 +3,7 @@
    is undefined on most clients. IDB blob storage works everywhere. */
 
 const DB_NAME = 'reader';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 let dbPromise = null;
 
@@ -24,6 +24,11 @@ export function openDB() {
       }
       if (!db.objectStoreNames.contains('segments')) {
         db.createObjectStore('segments', { keyPath: 'jobId' });
+      }
+      if (!db.objectStoreNames.contains('notesQueue')) {
+        // Queued voice notes when the server was unreachable; keyed by a
+        // local id, replayed by notes.js on reconnect.
+        db.createObjectStore('notesQueue', { keyPath: 'localId' });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -124,6 +129,17 @@ export async function getSegments(jobId) {
 }
 export async function deleteSegments(jobId) {
   try { await wrap((await tx('segments', 'readwrite')).delete(jobId)); } catch (_) {}
+}
+
+/* --- Notes queue (offline voice notes waiting to upload) --- */
+export async function enqueueNote(entry) {
+  return wrap((await tx('notesQueue', 'readwrite')).put(entry));
+}
+export async function listQueuedNotes() {
+  return wrap((await tx('notesQueue')).getAll());
+}
+export async function dequeueNote(localId) {
+  return wrap((await tx('notesQueue', 'readwrite')).delete(localId));
 }
 
 /* --- Storage diagnostics (all guarded — navigator.storage is missing

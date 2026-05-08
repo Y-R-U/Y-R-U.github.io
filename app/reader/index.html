@@ -63,11 +63,15 @@
     <header class="app-bar">
       <button id="btn-back" class="icon-btn" aria-label="Back">←</button>
       <h1 id="player-title">—</h1>
+      <button id="btn-player-notes" class="icon-btn" aria-label="Voice notes">🗒</button>
       <button id="btn-player-edit" class="icon-btn hidden" aria-label="Edit text">✎</button>
       <button id="btn-player-dl" class="icon-btn" aria-label="Download MP3">⬇</button>
     </header>
     <div class="now-playing">
-      <div class="big-thumb">🎧</div>
+      <button id="btn-record-note" class="big-thumb-btn" aria-label="Record voice note">
+        <span class="big-thumb">🎧</span>
+        <span class="mic-badge" aria-hidden="true">🎙</span>
+      </button>
       <div id="player-author" class="player-author"></div>
       <div id="player-loading" class="player-loading hidden">
         <div class="spinner"></div>
@@ -98,6 +102,45 @@
     </div>
   </section>
 
+  <!-- Recording view (voice notes) -->
+  <section id="record-view" class="view hidden">
+    <header class="app-bar">
+      <button id="btn-record-back" class="icon-btn" aria-label="Back">←</button>
+      <h1 id="record-title">Voice note</h1>
+      <button id="btn-record-save" class="text-btn primary hidden" aria-label="Save">Save</button>
+    </header>
+    <div class="record-body">
+      <div class="record-context">
+        <div class="hint" id="record-position">0:00</div>
+        <div class="record-paragraph" id="record-paragraph"></div>
+      </div>
+      <button id="btn-record-toggle" class="record-button" aria-label="Record">
+        <span class="record-icon">●</span>
+        <span class="record-label">Record</span>
+      </button>
+      <div class="record-secondary hidden" id="record-secondary">
+        <button id="btn-record-play" class="control-btn" aria-label="Play recording">▶</button>
+        <button id="btn-record-rerecord" class="control-btn" aria-label="Re-record">↺</button>
+      </div>
+      <audio id="record-preview" preload="auto" hidden></audio>
+      <div class="hint record-hint" id="record-hint">Tap record to start.</div>
+    </div>
+  </section>
+
+  <!-- Notes list modal -->
+  <div id="notes-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>Voice notes</h2>
+        <button id="btn-notes-close" class="icon-btn" aria-label="Close">×</button>
+      </header>
+      <div id="notes-list" class="notes-list">
+        <div class="hint">Loading…</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Import / voice picker modal -->
   <div id="import-modal" class="modal hidden">
     <div class="modal-scrim"></div>
@@ -113,6 +156,20 @@
       <div id="voice-list" class="voice-list"></div>
       <div class="import-actions">
         <button id="btn-import-confirm" class="text-btn primary">Start conversion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abogen import modal -->
+  <div id="abogen-modal" class="modal hidden">
+    <div class="modal-scrim"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>Import from Abogen</h2>
+        <button id="btn-abogen-close" class="icon-btn" aria-label="Close">×</button>
+      </header>
+      <div id="abogen-list" class="abogen-list">
+        <div class="hint" id="abogen-empty">Loading…</div>
       </div>
     </div>
   </div>
@@ -134,7 +191,7 @@
         <div id="storage-status"></div>
         <hr>
         <p class="hint">Conversions run on the airon server. Audiobooks stay server-side until you tap the ☁ sync button to save a copy on this device for offline playback. The ⬇ button saves the .mp3 file to your device's file system.</p>
-        <p class="hint"><a href="downloads/abreader.apk?v=13">Install ABReader Android APK v13</a> for the bundled LAN reader app. Version 13 keeps the focused paragraph word visible and centered.</p>
+        <p class="hint"><a href="downloads/abreader.apk?v=14">Install ABReader Android APK v14</a> for the bundled LAN reader app. Version 14 adds voice notes (microphone) and Abogen import.</p>
       </div>
     </div>
   </div>

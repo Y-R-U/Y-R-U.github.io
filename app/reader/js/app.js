@@ -7,6 +7,7 @@ import * as library from './library.js';
 import * as dragdrop from './dragdrop.js';
 import * as textedit from './textedit.js';
 import * as sync from './sync.js';
+import * as notes from './notes.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -186,6 +187,7 @@ async function addHere(parentFolderId) {
       { id: 'folder', label: '📁  New folder' },
       { id: 'file', label: '📄  Upload file (EPUB / PDF / TXT)' },
       { id: 'text', label: '✎  Write text' },
+      { id: 'abogen', label: '📥  Import from Abogen' },
     ],
   });
   if (choice === 'folder') {
@@ -203,7 +205,77 @@ async function addHere(parentFolderId) {
     $('file-input').click();
   } else if (choice === 'text') {
     textedit.openNew(parentFolderId);
+  } else if (choice === 'abogen') {
+    openAbogenImport(parentFolderId);
   }
+}
+
+async function openAbogenImport(parentFolderId) {
+  const modal = $('abogen-modal');
+  const list = $('abogen-list');
+  list.innerHTML = '<div class="hint">Loading…</div>';
+  modal.classList.remove('hidden');
+  let data;
+  try {
+    data = await api.listAbogenCompleted();
+  } catch (e) {
+    list.innerHTML = `<div class="hint">Couldn't reach the server: ${e.message || e}</div>`;
+    return;
+  }
+  if (!data.available) {
+    list.innerHTML = '<div class="hint">Abogen output folder not found on this server.</div>';
+    return;
+  }
+  if (!data.items.length) {
+    list.innerHTML = '<div class="hint">No new Abogen conversions to import.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  for (const item of data.items) {
+    const row = document.createElement('div');
+    row.className = 'abogen-item';
+    const dur = item.duration ? library.fmtDuration(item.duration) : '';
+    const sizeStr = ui.fmtSize(item.size_bytes);
+    const meta = [item.author, dur, sizeStr].filter(Boolean).join(' · ');
+    row.innerHTML = `
+      <div class="thumb">🎧</div>
+      <div class="info">
+        <div class="title"></div>
+        <div class="meta"></div>
+      </div>
+      <button class="import-btn">Import</button>
+    `;
+    row.querySelector('.title').textContent = item.title;
+    row.querySelector('.meta').textContent = meta;
+    const btn = row.querySelector('.import-btn');
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (row.classList.contains('busy')) return;
+      row.classList.add('busy');
+      btn.disabled = true;
+      btn.textContent = 'Importing…';
+      try {
+        await api.importAbogen(item.folder, parentFolderId);
+        row.remove();
+        ui.showToast(`Imported "${item.title}"`);
+        lastRenderKey = '';
+        await refresh();
+        if (!list.children.length) {
+          list.innerHTML = '<div class="hint">No more Abogen conversions to import.</div>';
+        }
+      } catch (err) {
+        row.classList.remove('busy');
+        btn.disabled = false;
+        btn.textContent = 'Import';
+        ui.showToast('Import failed: ' + (err.message || err), { error: true });
+      }
+    });
+    list.appendChild(row);
+  }
+}
+
+function closeAbogenImport() {
+  $('abogen-modal').classList.add('hidden');
 }
 
 let pendingParentForUpload = null;
@@ -477,6 +549,20 @@ function applyHistoryState(s) {
     refresh();
     return;
   }
+  if (s.view === 'player') {
+    // Returning from record/notes-list overlay back to the player.
+    $('record-view').classList.add('hidden');
+    $('text-view').classList.add('hidden');
+    $('notes-modal').classList.add('hidden');
+    if (player.state.book) {
+      ui.showPlayer();
+      ui.updatePlayer();
+    } else {
+      ui.showLibrary();
+      refresh();
+    }
+    return;
+  }
   // Coming forward into a player/text state via Forward — we don't try to
   // reopen the book. Just show the library.
   if (player.state.book) player.unload();
@@ -687,6 +773,8 @@ function wire() {
   $('btn-settings').addEventListener('click', async () => { await refreshSettings(); ui.openSettings(); });
   $('btn-close-settings').addEventListener('click', () => ui.closeSettings());
   $('settings-modal').querySelector('.modal-scrim').addEventListener('click', () => ui.closeSettings());
+  $('btn-abogen-close').addEventListener('click', () => closeAbogenImport());
+  $('abogen-modal').querySelector('.modal-scrim').addEventListener('click', () => closeAbogenImport());
   $('sync-paragraph-toggle').addEventListener('click', () => {
     sync.setParagraphMode(!sync.isParagraph());
     updateParagraphToggle();
@@ -706,6 +794,8 @@ function wire() {
   $('btn-player-dl').addEventListener('click', () => {
     if (player.state.book) saveBookToDevice({ jobId: player.state.book.jobId, title: player.state.book.title });
   });
+  $('btn-player-notes').addEventListener('click', () => notes.openNotesList());
+  $('btn-record-note').addEventListener('click', () => notes.openRecorderForCurrent());
 
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) refresh();
@@ -715,10 +805,13 @@ function wire() {
 
 window.ABReaderHandleBack = function () {
   if (!$('settings-modal').classList.contains('hidden')) { ui.closeSettings(); return true; }
+  if (!$('abogen-modal').classList.contains('hidden')) { closeAbogenImport(); return true; }
+  if (notes.isNotesListOpen()) { notes.closeNotesListExternal(); return true; }
   if (!$('import-modal').classList.contains('hidden')) {
     $('btn-import-cancel')?.click();
     return true;
   }
+  if (notes.isOnRecordView()) { notes.backFromRecord(); return true; }
   if (!$('player-view').classList.contains('hidden') || textedit.isOpen() || !library.isAtRoot()) {
     history.back();
     return true;
@@ -729,6 +822,8 @@ window.ABReaderHandleBack = function () {
 async function main() {
   store.requestPersist();
   wire();
+  notes.init();
+  notes.flushQueue().catch(() => {});
 
   // Bootstrap from IDB so the APK paints books immediately when the LAN
   // server is unreachable. The subsequent refresh() will overwrite this

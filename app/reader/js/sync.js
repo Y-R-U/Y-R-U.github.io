@@ -34,6 +34,27 @@ export function setEnabledFromPref(on) {
 export function isEnabled() { return state.enabled; }
 export function isParagraph() { return state.paragraph; }
 
+/** Snapshot of the current paragraph + index, for tagging voice notes. */
+export function currentParagraph() {
+  if (!state.segments || !state.segments.length) return null;
+  const seg = state.segments[state.segIdx];
+  if (!seg) return null;
+  return { index: state.segIdx, text: seg.text || '', start: seg.start, end: seg.end };
+}
+
+/** Paragraph at a specific playback position. Independent of the eye-toggle
+ *  state — voice-note tagging always wants the current paragraph even when
+ *  the user has hidden the sync line on the player. */
+export function paragraphAt(seconds) {
+  if (!state.segments || !state.segments.length) return null;
+  const segs = state.segments;
+  const idx = findSegmentIndex(segs, seconds);
+  const clamped = Math.max(0, Math.min(segs.length - 1, idx));
+  const seg = segs[clamped];
+  if (!seg) return null;
+  return { index: clamped, text: seg.text || '', start: seg.start, end: seg.end };
+}
+
 export function setParagraphFromPref(on) {
   state.paragraph = !!on;
   applyVisibility();

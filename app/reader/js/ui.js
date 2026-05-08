@@ -6,12 +6,15 @@ export function showLibrary() {
   $('library-view').classList.remove('hidden');
   $('player-view').classList.add('hidden');
   $('text-view').classList.add('hidden');
+  $('record-view')?.classList.add('hidden');
+  $('notes-modal')?.classList.add('hidden');
 }
 
 export function showPlayer() {
   $('player-view').classList.remove('hidden');
   $('library-view').classList.add('hidden');
   $('text-view').classList.add('hidden');
+  $('record-view')?.classList.add('hidden');
 }
 
 /* ---- Connection indicator ---- */

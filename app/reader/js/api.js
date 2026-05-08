@@ -169,6 +169,87 @@ export async function deleteJob(id) {
   }
 }
 
+/* ---- Voice notes ---- */
+export async function listNotes(bookId) {
+  const r = await fetchWithTimeout(u(`/api/notes/${bookId}`), {}, 5000);
+  if (!r.ok) throw new Error('notes list failed');
+  const { notes } = await r.json();
+  return notes;
+}
+
+export async function uploadNote(bookId, blob, { positionSeconds, paragraphIndex, paragraphText }) {
+  const form = new FormData();
+  const ext = blob.type.includes('ogg') ? 'ogg' : blob.type.includes('mp4') ? 'm4a' : 'webm';
+  form.append('audio', blob, `note.${ext}`);
+  form.append('position_seconds', String(positionSeconds));
+  form.append('paragraph_index', String(paragraphIndex ?? -1));
+  form.append('paragraph_text', paragraphText || '');
+  const r = await fetch(u(`/api/notes/${bookId}`), { method: 'POST', body: form });
+  if (!r.ok) {
+    let msg = `note upload failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+export async function replaceNoteAudio(bookId, noteId, blob) {
+  const form = new FormData();
+  const ext = blob.type.includes('ogg') ? 'ogg' : blob.type.includes('mp4') ? 'm4a' : 'webm';
+  form.append('audio', blob, `note.${ext}`);
+  const r = await fetch(u(`/api/notes/${bookId}/${noteId}/audio`), { method: 'PUT', body: form });
+  if (!r.ok) {
+    let msg = `note re-record failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+export async function updateNote(bookId, noteId, { paragraphText }) {
+  const r = await fetch(u(`/api/notes/${bookId}/${noteId}`), {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ paragraph_text: paragraphText }),
+  });
+  if (!r.ok) {
+    let msg = `note update failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+export async function deleteNote(bookId, noteId) {
+  const r = await fetchWithTimeout(u(`/api/notes/${bookId}/${noteId}`), { method: 'DELETE' });
+  if (!r.ok) throw new Error('note delete failed');
+}
+
+export function noteAudioUrl(bookId, noteId) {
+  return u(`/api/notes/${bookId}/${noteId}/audio.mp3`);
+}
+
+/* ---- Abogen import ---- */
+export async function listAbogenCompleted() {
+  const r = await fetchWithTimeout(u('/api/abogen/completed'), {}, 15000);
+  if (!r.ok) throw new Error('abogen list failed');
+  return r.json();
+}
+
+export async function importAbogen(folder, parentFolderId) {
+  const r = await fetch(u('/api/abogen/import'), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ folder, parent_folder_id: parentFolderId || null }),
+  });
+  if (!r.ok) {
+    let msg = `abogen import failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
 export async function fetchMp3Blob(id, onProgress, cacheBust = Date.now()) {
   const suffix = cacheBust ? `?v=${encodeURIComponent(cacheBust)}` : '';
   const r = await fetchWithTimeout(u(`/api/jobs/${id}/mp3${suffix}`), { cache: 'no-store' }, 15000);

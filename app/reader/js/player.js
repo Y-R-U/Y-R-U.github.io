@@ -123,6 +123,32 @@ export function unload() {
   sync.loadFor(null);
 }
 
+/** Pause and detach the audio source so Android Audio HAL releases the
+ *  device. Needed before getUserMedia: pause() alone leaves the device
+ *  "owned" by the WebView's media pipeline, and the mic capture fails with
+ *  NotReadableError. We keep state.book intact so reloadCurrentBook() can
+ *  restore playback position later. */
+export function pauseAndReleaseDevice() {
+  if (!state.audio) return false;
+  savePosition();
+  state.audio.pause();
+  state.audio.removeAttribute('src');
+  try { state.audio.load(); } catch (_) {}
+  state.playing = false;
+  notify();
+  return true;
+}
+
+/** Re-load the current book from IDB and restore the saved playback
+ *  position. Used after a voice-note recording session releases the device. */
+export async function reloadCurrentBook() {
+  if (!state.book) return;
+  const jobId = state.book.jobId;
+  const onUpdate = state.onUpdate;
+  const hasSegments = state.book.has_segments;
+  await loadBook(jobId, { onUpdate, hasSegments });
+}
+
 let saveTimer = null;
 function savePositionThrottled() {
   if (saveTimer) return;
