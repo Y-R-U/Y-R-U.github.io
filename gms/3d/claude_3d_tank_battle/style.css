@@ -680,6 +680,45 @@ html, body {
   box-shadow: none;
 }
 
+/* ─── Spectator bar ─── */
+#spectator-bar {
+  position: fixed;
+  top: max(env(safe-area-inset-top, 14px), 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 22;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px;
+  background: rgba(8, 12, 26, 0.78);
+  border: 1px solid rgba(255, 100, 120, 0.45);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  letter-spacing: 1.5px;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+#spectator-bar .sb-label {
+  color: #ff7088;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+#spectator-bar #sb-name {
+  font-weight: 800;
+  color: #fff7a0;
+  letter-spacing: 1px;
+}
+#spectator-bar .sb-hint {
+  color: #88a4c4;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+}
+@media (max-width: 480px) {
+  #spectator-bar { font-size: 0.72rem; padding: 6px 12px; }
+  #spectator-bar .sb-hint { display: none; }
+}
+
 /* ─── Popup muted text ─── */
 .popup-card .muted {
   color: #88a4c4;

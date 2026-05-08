@@ -28,6 +28,8 @@ export class UI {
     this.$helpBox = document.getElementById('help-box');
     this.$touchLeft = document.getElementById('touch-left');
     this.$touchFire = document.getElementById('touch-fire');
+    this.$specBar = document.getElementById('spectator-bar');
+    this.$specName = document.getElementById('sb-name');
 
     this._killFeed = this._ensureContainer('kill-feed');
     this._toastRoot = this._ensureContainer('toast-root');
@@ -67,6 +69,7 @@ export class UI {
     this.$tagLayer.classList.add('hidden');
     this.$touchLeft.classList.add('hidden');
     this.$touchFire.classList.add('hidden');
+    this.hideSpectator();
     if (this.minimap) this.minimap.hide();
   }
   hideTitle() {
@@ -95,9 +98,36 @@ export class UI {
     }
     this._killFeed.innerHTML = '';
     this._toastRoot.innerHTML = '';
-    this.showBanner('FIGHT');
+    this.hideSpectator();
+    // Battle drives the countdown banner (3, 2, 1, FIGHT) — don't pre-empt it.
     this._refreshHUD();
     this._refreshLeaderboard();
+  }
+
+  // Called by Battle when the player dies (match continues — they spectate).
+  onPlayerDeath(battle) {
+    this.showSpectator(battle.spectatorTarget);
+    // Hide touch fire button — repurpose touch joystick area? Simpler: make
+    // tapping the FIRE button cycle the spectator target.
+    if (this.$touchFire && !this.$touchFire.classList.contains('hidden')) {
+      this.$touchFire.textContent = 'NEXT';
+      this.$touchFire.classList.add('is-spectator');
+    }
+    this.$crosshair.classList.add('hidden');
+  }
+
+  showSpectator(tank) {
+    if (!tank) { this.hideSpectator(); return; }
+    this.$specName.textContent = tank.name;
+    this.$specName.style.color = tank.color?.tag || '#fff7a0';
+    this.$specBar.classList.remove('hidden');
+  }
+  hideSpectator() {
+    if (this.$specBar) this.$specBar.classList.add('hidden');
+    if (this.$touchFire) {
+      this.$touchFire.textContent = 'FIRE';
+      this.$touchFire.classList.remove('is-spectator');
+    }
   }
 
   // Called by Battle each frame (or after damage events) to keep HUD in sync.
@@ -110,6 +140,10 @@ export class UI {
     if (p && p.alive && !this.$crosshair.classList.contains('hidden')) {
       const onCd = p.fireCooldown > 0.05;
       this.$crosshair.classList.toggle('cooldown', onCd);
+    }
+    // Keep spectator badge in sync if the auto-pick switches targets.
+    if (p && !p.alive && this.battle.matchActive) {
+      this.showSpectator(this.battle.spectatorTarget);
     }
   }
 
@@ -191,6 +225,7 @@ export class UI {
   onMatchEnd(won, battle) {
     this._refreshHUD();
     this._refreshLeaderboard();
+    this.hideSpectator();
     setTimeout(() => this._showEndPopup(won, battle), 700);
   }
 

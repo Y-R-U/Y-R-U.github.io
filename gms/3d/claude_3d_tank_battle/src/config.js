@@ -5,6 +5,12 @@ export const CFG = {
     totalTanks: 10,        // 1 player + 9 AI by default
     spawnRing: 60,         // radius around centre that AI spawn on
     spawnJitter: 12,       // random offset on spawn ring
+    prepTime: 3,           // seconds before any tank can fire (countdown banner)
+    // Shrinking safe zone (battle-royale circle).
+    shrinkStartSec: 25,    // grace period before the zone starts closing
+    shrinkDurationSec: 90, // time from start to fully closed
+    endRadius: 18,         // final safe-zone radius
+    outOfBoundsDPS: 1.6,   // damage/sec when a tank is outside the safe zone
   },
   tank: {
     moveSpeed: 12,
@@ -13,7 +19,7 @@ export const CFG = {
     turretSpeed: 5,        // rad/s turret yaw lerp
     barrelSpeed: 6,        // rad/s barrel pitch lerp
     fireCooldown: 0.55,    // seconds between shots (player baseline)
-    maxHealth: 5,
+    maxHealth: 15,
     bodyRadius: 1.8,       // collision radius
     aimMaxPitch: 0.6,      // up
     aimMinPitch: -0.05,    // can't aim below horizontal much
@@ -36,9 +42,9 @@ export const CFG = {
     arenaRadius: 105,      // tanks bounce back inside this
   },
   camera: {
-    height: 14,
-    distance: 18,
-    lookAhead: 4,
+    height: 22,
+    distance: 26,
+    lookAhead: 5,
     lerp: 4,
   },
   ai: {

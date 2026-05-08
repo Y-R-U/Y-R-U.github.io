@@ -4,6 +4,7 @@ import { CFG } from './config.js';
 import { Tank } from './tank.js';
 import { aiBrain } from './ai.js';
 import { pickRandomNames, pickRandomColors, pickPersonalities, TANK_COLORS } from './names.js';
+import { arenaState } from './world.js';
 
 export class Battle {
   constructor({ scene, bulletSystem, particles, nameTags, camera, ui, audio, totalTanks }) {
@@ -20,6 +21,8 @@ export class Battle {
     this.matchActive = false;
     this.deathOrder = [];   // tanks in order of death (first death = last place)
     this.playerSettled = false;
+    this.matchTime = 0;
+    this.spectatorTarget = null;  // tank the camera/UI follows after player death
   }
 
   start(playerName) {
@@ -69,6 +72,10 @@ export class Battle {
 
     this.deathOrder = [];
     this.playerSettled = false;
+    this.matchTime = 0;
+    this.prepLastDigit = null;
+    this.spectatorTarget = null;
+    arenaState.radius = CFG.world.arenaRadius;
     this.matchActive = true;
     this.ui.onMatchStart(this);
   }
@@ -87,6 +94,12 @@ export class Battle {
 
   update(dt) {
     if (!this.matchActive) return;
+    this.matchTime += dt;
+    this._updateSafeZone(dt);
+    this._updatePrepCountdown();
+
+    const inPrep = this.matchTime < CFG.match.prepTime;
+
     const ctx = {
       tanks: this.tanks,
       bulletSystem: this.bulletSystem,
@@ -100,6 +113,10 @@ export class Battle {
       if (!t.alive || t.isPlayer || !t.brain) continue;
       t.brain(t, ctx, dt);
     }
+    // During the prep window, no tank may fire — but they can still drive/aim.
+    if (inPrep) {
+      for (const t of this.tanks) t.wantsFire = false;
+    }
     // Tanks update (player has had its inputs filled in by the player controller already).
     for (const t of this.tanks) {
       const wasAlive = t.alive;
@@ -109,6 +126,72 @@ export class Battle {
 
     this._enforceTankSeparation(dt);
     this._wreckSmoke(dt);
+    this._applyOutOfBoundsDamage(dt);
+
+    // If our spectator target died, pick another so the camera doesn't stall.
+    if (this.spectatorTarget && !this.spectatorTarget.alive) {
+      this.spectatorTarget = this._pickSpectatorTarget();
+    }
+  }
+
+  _updateSafeZone(dt) {
+    const m = CFG.match;
+    // Shrink timer doesn't start until after the prep countdown.
+    const fightTime = Math.max(0, this.matchTime - m.prepTime);
+    const t = Math.max(0, fightTime - m.shrinkStartSec);
+    const k = Math.min(1, t / m.shrinkDurationSec);
+    // Smoothstep for a gentler feel at the start/end.
+    const eased = k * k * (3 - 2 * k);
+    arenaState.radius = CFG.world.arenaRadius +
+      (m.endRadius - CFG.world.arenaRadius) * eased;
+  }
+
+  _updatePrepCountdown() {
+    const prep = CFG.match.prepTime;
+    if (this.matchTime >= prep) {
+      if (this.prepLastDigit !== 'go') {
+        this.prepLastDigit = 'go';
+        this.ui.showBanner?.('FIGHT');
+      }
+      return;
+    }
+    const remaining = Math.ceil(prep - this.matchTime);
+    if (remaining !== this.prepLastDigit) {
+      this.prepLastDigit = remaining;
+      this.ui.showBanner?.(String(remaining));
+    }
+  }
+
+  _applyOutOfBoundsDamage(dt) {
+    const r = arenaState.radius;
+    const dps = CFG.match.outOfBoundsDPS;
+    if (dps <= 0) return;
+    for (const t of this.tanks) {
+      if (!t.alive) continue;
+      const x = t.root.position.x, z = t.root.position.z;
+      const d = Math.sqrt(x * x + z * z);
+      if (d > r) {
+        const wasAlive = t.alive;
+        t.takeDamage(dps * dt, null, null);
+        if (wasAlive && !t.alive) this._onDeath(t);
+      }
+    }
+  }
+
+  cycleSpectator(dir = 1) {
+    const alive = this.aliveTanks();
+    if (!alive.length) { this.spectatorTarget = null; return; }
+    const cur = this.spectatorTarget;
+    const idx = cur ? alive.indexOf(cur) : -1;
+    const next = (idx + dir + alive.length) % alive.length;
+    this.spectatorTarget = alive[next] || alive[0];
+  }
+
+  _pickSpectatorTarget() {
+    const alive = this.aliveTanks();
+    if (!alive.length) return null;
+    // Prefer the tank with the most kills so it's an interesting watch.
+    return alive.slice().sort((a, b) => b.kills - a.kills)[0];
   }
 
   // Periodic smoke from wrecks for atmosphere.
@@ -158,11 +241,18 @@ export class Battle {
     // Place = total - kills-after-this. Easier: assign placement when match ends.
     this.audio?.sfxExplode(tank.isPlayer ? 1 : 0.6);
     this.ui.onTankDeath(tank, tank.lastKilledBy, this);
+    // Two tanks may die on the same frame (e.g. simultaneous out-of-bounds);
+    // skip placement/onMatchEnd updates once the match has already ended.
+    if (!this.matchActive) {
+      return;
+    }
 
     // Player just died?
     if (tank.isPlayer && !this.playerSettled) {
       this.playerSettled = true;
       this.player.placement = this._currentPlacement(tank);
+      this.spectatorTarget = this._pickSpectatorTarget();
+      this.ui.onPlayerDeath?.(this);
     }
 
     // Last tank standing?

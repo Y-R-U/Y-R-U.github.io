@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { CFG } from './src/config.js';
 import { createSceneStack } from './src/scene.js';
-import { buildWorld, updateClouds } from './src/world.js';
+import { buildWorld, updateClouds, updateSafeZone, arenaState } from './src/world.js';
 import { createInput, isTouch } from './src/input.js';
 import { ParticleSystem } from './src/particles.js';
 import { BulletSystem } from './src/bullets.js';
@@ -15,7 +15,7 @@ import * as audio from './src/audio.js';
 
 const container = document.getElementById('game-container');
 const { renderer, scene, camera } = createSceneStack(container);
-const { clouds } = buildWorld(scene);
+const { clouds, safeZone } = buildWorld(scene);
 
 const input = createInput(renderer.domElement);
 const particles = new ParticleSystem(scene);
@@ -145,35 +145,77 @@ function trackPlayerDamage() {
     playerHealthRef.last = p.health;
     return;
   }
-  if (p.health < playerHealthRef.last) {
+  // Only react to meaningful damage deltas — small chip from the safe-zone
+  // boundary accumulates per frame and would otherwise spam flashes/sfx.
+  if (p.health < playerHealthRef.last - 0.5) {
     audio.sfxDamage(1);
     ui.flashHit();
     if (p.lastHitFrom) {
       ui.showDamageDirection(p.lastHitFrom);
     }
+    playerHealthRef.last = p.health;
+  } else if (p.health > playerHealthRef.last) {
+    playerHealthRef.last = p.health;
   }
-  playerHealthRef.last = p.health;
 }
 
 // ── Camera ──
 const _camLookT = new THREE.Vector3();
 const _camDesired = new THREE.Vector3();
+function getCameraSubject() {
+  // While alive, follow the player. Once dead, follow the spectator target.
+  // If neither is set yet, fall back to the player wreck so we don't snap.
+  const p = battle.player;
+  if (p && p.alive) return p;
+  if (battle.spectatorTarget && battle.spectatorTarget.alive) return battle.spectatorTarget;
+  return p;
+}
 function updateCamera(dt) {
-  // Always follow the player's wreck, even after death — avoids teleport-snap.
-  const target = battle.player ? battle.player.root.position : _vTmp.set(0, 0, 0);
+  const subject = getCameraSubject();
+  const target = subject ? subject.root.position : _vTmp.set(0, 0, 0);
 
   _camDesired.set(target.x, target.y + CFG.camera.height, target.z - CFG.camera.distance);
   camera.position.lerp(_camDesired, Math.min(1, CFG.camera.lerp * dt));
 
   _camLookT.set(target.x, target.y + 2, target.z);
-  if (battle.player && battle.player.alive) {
-    const turret = battle.player.turret;
+  if (subject && subject.alive) {
+    const turret = subject.turret;
     turret.getWorldQuaternion(_qTmp);
     _vTmp.set(0, 0, 1).applyQuaternion(_qTmp);
     _camLookT.addScaledVector(_vTmp, CFG.camera.lookAhead);
   }
   camera.lookAt(_camLookT);
 }
+
+// ── Spectator input: cycle target with Tab / N / left-click / tap when dead ──
+function isSpectating() {
+  return battle.matchActive && battle.player && !battle.player.alive;
+}
+addEventListener('keydown', (e) => {
+  if (!isSpectating()) return;
+  if (e.code === 'Tab' || e.code === 'KeyN' || e.code === 'KeyE') {
+    e.preventDefault();
+    battle.cycleSpectator(1);
+    ui.showSpectator(battle.spectatorTarget);
+  } else if (e.code === 'KeyQ') {
+    e.preventDefault();
+    battle.cycleSpectator(-1);
+    ui.showSpectator(battle.spectatorTarget);
+  }
+});
+renderer.domElement.addEventListener('click', () => {
+  if (!isSpectating()) return;
+  battle.cycleSpectator(1);
+  ui.showSpectator(battle.spectatorTarget);
+});
+// Touch: when the player is dead, repurpose the FIRE button as "NEXT".
+document.getElementById('touch-fire').addEventListener('touchstart', (e) => {
+  if (!isSpectating()) return;
+  e.preventDefault();
+  e.stopPropagation();
+  battle.cycleSpectator(1);
+  ui.showSpectator(battle.spectatorTarget);
+}, { capture: true });
 
 // ── Loop ──
 let lastT = performance.now();
@@ -189,6 +231,7 @@ function loop(now) {
   trackPlayerDamage();
 
   updateClouds(clouds, dt);
+  updateSafeZone(safeZone, dt);
   updateCamera(dt);
   nameTags.update();
 

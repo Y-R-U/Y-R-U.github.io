@@ -1,6 +1,7 @@
 // Tiny canvas mini-map: shows arena, player, alive tanks, wrecks.
 
 import { CFG } from './config.js';
+import { arenaState } from './world.js';
 
 const SIZE = 140;        // CSS pixels (square)
 const PAD = 4;
@@ -51,15 +52,30 @@ export class Minimap {
     ctx.moveTo(PAD, half); ctx.lineTo(SIZE - PAD, half);
     ctx.stroke();
 
-    const player = this.battle.player;
-    // We rotate so player faces "up" on the minimap — north-up otherwise if no player.
+    // Camera target: spectated tank if player dead, else player.
+    const focus = (this.battle.player && this.battle.player.alive)
+      ? this.battle.player
+      : (this.battle.spectatorTarget || this.battle.player);
     let cx = 0, cz = 0, yaw = 0;
-    if (player) {
-      cx = player.root.position.x;
-      cz = player.root.position.z;
-      yaw = player.root.rotation.y;
+    if (focus) {
+      cx = focus.root.position.x;
+      cz = focus.root.position.z;
+      yaw = focus.root.rotation.y;
     }
     const cos = Math.cos(yaw), sin = Math.sin(yaw);
+
+    // Safe-zone (shrinking) ring — pulsing red, centered on world origin.
+    const sz = arenaState.radius;
+    if (sz < r - 0.5) {
+      const ox = -cx, oz = -cz;
+      const lx = ox * cos - oz * sin;
+      const lz = ox * sin + oz * cos;
+      ctx.strokeStyle = 'rgba(255, 70, 80, 0.85)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(half + lx * scale, half - lz * scale, sz * scale, 0, Math.PI * 2);
+      ctx.stroke();
+    }
 
     for (const t of this.battle.tanks) {
       // World pos relative to player.

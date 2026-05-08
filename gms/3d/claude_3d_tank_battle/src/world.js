@@ -3,6 +3,9 @@
 import * as THREE from 'three';
 import { CFG } from './config.js';
 
+// Mutable runtime state for the safe-zone radius. Battle writes; tank/minimap read.
+export const arenaState = { radius: CFG.world.arenaRadius };
+
 export function terrainHeight(x, z) {
   const d = Math.sqrt(x * x + z * z);
   // flat near origin, gentle hills further out
@@ -18,7 +21,8 @@ export function buildWorld(scene) {
   scatterDecor(scene);
   const clouds = buildClouds(scene);
   buildArenaRing(scene);
-  return { terrain, clouds };
+  const safeZone = buildSafeZoneRing(scene);
+  return { terrain, clouds, safeZone };
 }
 
 function buildTerrain() {
@@ -196,6 +200,51 @@ function buildArenaRing(scene) {
   });
   const ring = new THREE.LineLoop(geom, mat);
   scene.add(ring);
+}
+
+// Glowing red safe-zone ring. Geometry is rebuilt when the radius changes
+// noticeably, so it follows the terrain height around the new circle.
+function buildSafeZoneRing(scene) {
+  const segments = 96;
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array((segments + 1) * 3), 3));
+  const mat = new THREE.LineBasicMaterial({
+    color: 0xff3a4a,
+    transparent: true,
+    opacity: 0.85,
+    fog: true,
+  });
+  const ring = new THREE.LineLoop(geom, mat);
+  ring.frustumCulled = false;
+  scene.add(ring);
+  const state = { ring, segments, lastRadius: -1 };
+  rebuildSafeZoneRing(state, arenaState.radius);
+  return state;
+}
+
+function rebuildSafeZoneRing(state, radius) {
+  const arr = state.ring.geometry.attributes.position.array;
+  for (let i = 0; i <= state.segments; i++) {
+    const a = (i / state.segments) * Math.PI * 2;
+    const x = Math.cos(a) * radius;
+    const z = Math.sin(a) * radius;
+    arr[i * 3] = x;
+    arr[i * 3 + 1] = terrainHeight(x, z) + 0.5;
+    arr[i * 3 + 2] = z;
+  }
+  state.ring.geometry.attributes.position.needsUpdate = true;
+  state.lastRadius = radius;
+}
+
+export function updateSafeZone(safeZone, dt) {
+  if (!safeZone) return;
+  // Pulse opacity for a "danger" feel.
+  const t = (performance.now() / 1000) * 1.4;
+  safeZone.ring.material.opacity = 0.55 + 0.35 * (0.5 + 0.5 * Math.sin(t));
+  // Rebuild geometry when the radius drifts more than a small amount.
+  if (Math.abs(safeZone.lastRadius - arenaState.radius) > 0.4) {
+    rebuildSafeZoneRing(safeZone, arenaState.radius);
+  }
 }
 
 export function updateClouds(clouds, dt) {

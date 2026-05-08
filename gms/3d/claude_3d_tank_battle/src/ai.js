@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { CFG } from './config.js';
+import { arenaState } from './world.js';
 
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
@@ -178,6 +179,14 @@ export function aiBrain(tank, ctx, dt) {
 
   // Berserker-style sometimes "dashes" — random forward sprint regardless.
   if (Math.random() < p.dashChance * dt) {
+    driveForward = 1;
+  }
+
+  // If outside the safe zone, override drive to head back toward centre.
+  // Keep aiming at the target, but body steers home.
+  const distFromCentre = Math.sqrt(me.x * me.x + me.z * me.z);
+  if (distFromCentre > arenaState.radius - 2) {
+    bodyDir.set(-me.x, 0, -me.z).normalize();
     driveForward = 1;
   }
 
