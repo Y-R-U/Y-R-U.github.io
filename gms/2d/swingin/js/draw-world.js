@@ -4,6 +4,7 @@
 
 import { W, H } from './config.js';
 import { camera, world } from './state.js';
+import { GROUND_Y } from './level.js';
 
 export function drawBackground(ctx) {
   const grad = ctx.createLinearGradient(0, 0, 0, H);
@@ -52,6 +53,131 @@ function drawCloud(ctx, x, y, size) {
   ctx.arc(x + size * 1.4, y, size * 0.6, 0, Math.PI * 2);
   ctx.arc(x - size * 0.5, y + size * 0.1, size * 0.5, 0, Math.PI * 2);
   ctx.fill();
+}
+
+export function drawWater(ctx) {
+  if (!world.gaps || world.gaps.length === 0) return;
+  const t = Date.now() * 0.002;
+  for (const g of world.gaps) {
+    const sx = g.x - camera.x;
+    if (sx + g.w < -10 || sx > W + 10) continue;
+    const surface = GROUND_Y - camera.y + 4;
+    const bottom = H - camera.y + 10;
+
+    // Body of water
+    const grad = ctx.createLinearGradient(0, surface, 0, bottom);
+    grad.addColorStop(0, '#3a7fb8');
+    grad.addColorStop(1, '#1d4a78');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(sx, surface);
+    for (let x = 0; x <= g.w; x += 4) {
+      const wy = surface + Math.sin((x + g.x) * 0.06 + t) * 2.5;
+      ctx.lineTo(sx + x, wy);
+    }
+    ctx.lineTo(sx + g.w, bottom);
+    ctx.lineTo(sx, bottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // Surface highlight
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = 0; x <= g.w; x += 4) {
+      const wy = surface + Math.sin((x + g.x) * 0.06 + t) * 2.5;
+      if (x === 0) ctx.moveTo(sx + x, wy);
+      else ctx.lineTo(sx + x, wy);
+    }
+    ctx.stroke();
+
+    // Sparkles
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    for (let i = 0; i < 3; i++) {
+      const sxsp = sx + ((g.x * 13 + i * 41 + Math.floor(t * 20)) % Math.max(20, g.w - 10)) + 5;
+      const sysp = surface + 8 + (i * 6) % 18;
+      ctx.fillRect(sxsp, sysp, 2, 1);
+    }
+  }
+}
+
+export function drawRescueAnims(ctx) {
+  for (const a of world.rescueAnims) {
+    const lifeRatio = Math.max(0, a.life / a.maxLife);
+    if (a.type === 'fish') {
+      const sx = a.x - camera.x;
+      const sy = a.y - camera.y;
+      ctx.save();
+      ctx.translate(sx, sy);
+      // Slight tilt based on vertical velocity
+      const tilt = Math.atan2(a.vy, 1) * 0.05;
+      ctx.rotate(tilt);
+      // Body
+      ctx.fillStyle = '#e6883a';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 18, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Belly
+      ctx.fillStyle = '#ffd28a';
+      ctx.beginPath();
+      ctx.ellipse(0, 3, 12, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Tail
+      ctx.fillStyle = '#c9651e';
+      ctx.beginPath();
+      ctx.moveTo(-15, 0);
+      ctx.lineTo(-24, -7);
+      ctx.lineTo(-24, 7);
+      ctx.closePath();
+      ctx.fill();
+      // Eye
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(10, -2, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(10.6, -2, 1.4, 0, Math.PI * 2); ctx.fill();
+      // Mouth (open, hungry)
+      ctx.strokeStyle = '#7a3a10';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(16, 1, 2, -0.4, 0.7); ctx.stroke();
+      ctx.restore();
+    } else if (a.type === 'branch') {
+      const x = a.side === 'left' ? 0 : W;
+      const dir = a.side === 'left' ? 1 : -1;
+      const swing = Math.sin(a.swing * Math.PI); // 0 → 1 → 0
+      ctx.save();
+      ctx.translate(x, (a.y - camera.y));
+      ctx.rotate(dir * (0.3 + swing * 0.6));
+      // Main branch
+      ctx.strokeStyle = '#6b4423';
+      ctx.lineWidth = 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(dir * 140, -20);
+      ctx.stroke();
+      // Twigs
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(dir * 60, -8);
+      ctx.lineTo(dir * 75, -28);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(dir * 100, -14);
+      ctx.lineTo(dir * 115, 4);
+      ctx.stroke();
+      // Leaves
+      ctx.fillStyle = '#5da64e';
+      ctx.beginPath(); ctx.ellipse(dir * 80, -32, 10, 5, dir * -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dir * 120, 8, 10, 5, dir * 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dir * 140, -18, 12, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      // Impact flash
+      ctx.globalAlpha = lifeRatio * 0.4;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(a.side === 'left' ? 0 : W - 80, 0, 80, H);
+      ctx.globalAlpha = 1;
+    }
+  }
 }
 
 export function drawGround(ctx) {

@@ -6,7 +6,7 @@ import { W, H } from './config.js';
 import { game, camera, shake, tickShake, world } from './state.js';
 import { update } from './physics.js';
 import { initInput } from './input.js';
-import { drawBackground, drawGround, drawAnchor, drawCollectible, drawFly } from './draw-world.js';
+import { drawBackground, drawGround, drawAnchor, drawCollectible, drawFly, drawWater, drawRescueAnims } from './draw-world.js';
 import { drawFrogSprite, drawTongue, drawAimLine } from './draw-frog.js';
 import { drawParticles } from './draw-particles.js';
 import { drawHUD } from './ui-hud.js';
@@ -75,6 +75,7 @@ function draw() {
 
   drawBackground(ctx);
   drawGround(ctx);
+  drawWater(ctx);
 
   for (const a of world.anchors) {
     const sx = a.x - camera.x;
@@ -87,6 +88,7 @@ function draw() {
   drawAimLine(ctx);
   drawTongue(ctx);
   drawFrogSprite(ctx);
+  drawRescueAnims(ctx);
   drawParticles(ctx);
 
   ctx.restore();

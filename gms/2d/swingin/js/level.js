@@ -2,7 +2,7 @@
 //  LEVEL GENERATION
 // ============================================================
 
-import { H, FROG_H, BASE_TONGUE_LENGTH, START_HEIGHT } from './config.js';
+import { H, FROG_H, BASE_TONGUE_LENGTH, START_HEIGHT, MAX_SAVES } from './config.js';
 import { game, camera, getEffective, world } from './state.js';
 import { resetFrog } from './frog.js';
 
@@ -32,6 +32,8 @@ export function generateLevel(lvl) {
   world.anchors = [];
   world.collectibles = [];
   world.platforms = [];
+  world.gaps = [];
+  world.rescueAnims = [];
 
   const difficulty = Math.min(lvl, 20);
   const numAnchors = 8 + Math.floor(difficulty * 1.5);
@@ -81,12 +83,19 @@ export function generateLevel(lvl) {
   const lastAnchor = world.anchors[world.anchors.length - 1];
   world.levelWidth = lastAnchor.x + 240;
 
-  // --- Ground platforms (with occasional gaps) ---
+  // --- Ground platforms (with occasional water-filled gaps) ---
   let gx = 0;
   while (gx < world.levelWidth + 200) {
     const pw = 100 + Math.random() * 200;
     world.platforms.push(makePlatform(gx, GROUND_Y, pw));
-    gx += pw + (Math.random() < 0.3 + difficulty * 0.02 ? 80 + Math.random() * 60 : 0);
+    gx += pw;
+    // Keep the very start clear of water — the frog needs a safe landing
+    // on the initial swing — so don't open a gap until we're past 280px.
+    if (gx > 280 && Math.random() < 0.3 + difficulty * 0.02) {
+      const gw = 80 + Math.random() * 60;
+      world.gaps.push({ x: gx, w: gw });
+      gx += gw;
+    }
   }
   world.platforms.unshift(makePlatform(0, GROUND_Y, 200));
 
@@ -120,6 +129,8 @@ export function generateLevel(lvl) {
 
   resetFrog(FROG_SPAWN_X, FROG_SPAWN_Y);
   game.timer = getEffective('timerBoost');
+  game.saves = MAX_SAVES;
+  game.maxSaves = MAX_SAVES;
   camera.x = 0;
   camera.y = 0;
 }

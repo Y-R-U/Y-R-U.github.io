@@ -4,7 +4,7 @@
 
 import {
   BASE_TONGUE_LENGTH, BASE_TONGUE_SPEED, BASE_TIMER,
-  BASE_SWING_POWER, BASE_MAGNET_RADIUS,
+  BASE_SWING_POWER, BASE_MAGNET_RADIUS, MAX_SAVES,
 } from './config.js';
 
 export const game = {
@@ -15,6 +15,8 @@ export const game = {
   timer: BASE_TIMER,
   lastTime: 0,
   tutorialShown: false,
+  saves: MAX_SAVES,
+  maxSaves: MAX_SAVES,
 };
 
 export const camera = { x: 0, y: 0 };
@@ -34,6 +36,8 @@ export const world = {
   collectibles: [],
   flyTarget: null,
   platforms: [],
+  gaps: [],
+  rescueAnims: [],
   levelWidth: 0,
 };
 

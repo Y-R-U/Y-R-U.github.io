@@ -2,16 +2,99 @@
 //  PHYSICS UPDATE — gravity, swinging, collisions, collectibles
 // ============================================================
 
-import { W, H, GRAVITY, FROG_H, MAX_TANGENTIAL_SPEED } from './config.js';
+import {
+  W, H, GRAVITY, FROG_H, MAX_TANGENTIAL_SPEED,
+  FISH_BOUNCE_VY, BRANCH_BOUNCE_VX, BRANCH_BOUNCE_VY, SIDE_MARGIN,
+} from './config.js';
 import { game, camera, getEffective, world, shake, mouse } from './state.js';
 import { frog } from './frog.js';
-import { particles, spawnCoinParticles, spawnCelebration, updateParticles } from './particles.js';
+import { particles, spawnCoinParticles, spawnCelebration, updateParticles, createParticle } from './particles.js';
+import { shootTongue } from './tongue.js';
+import { GROUND_Y } from './level.js';
+
+function inGap(x) {
+  for (const g of world.gaps) {
+    if (x >= g.x && x <= g.x + g.w) return g;
+  }
+  return null;
+}
+
+function spawnSplash(x, y) {
+  for (let i = 0; i < 12; i++) {
+    const p = createParticle(x, y, 'coin');
+    p.color = '#bfe6ff';
+    p.vx = (Math.random() - 0.5) * 8;
+    p.vy = -4 - Math.random() * 6;
+    p.maxLife = 0.6 + Math.random() * 0.4;
+    particles.push(p);
+  }
+}
+
+function consumeFishSave(gap) {
+  game.saves--;
+  shake.timer = 0.2; shake.intensity = 4;
+  const surfaceY = GROUND_Y + 5;
+  spawnSplash(frog.x, surfaceY);
+  // Bounce frog up and nudge toward the gap centre so the next swing arc
+  // clears the water.
+  const centre = gap.x + gap.w / 2;
+  frog.vy = -FISH_BOUNCE_VY;
+  frog.vx = (frog.x < centre ? 1 : -1) * Math.max(2, Math.abs(frog.vx) * 0.6);
+  frog.y = surfaceY - FROG_H;
+  world.rescueAnims.push({
+    type: 'fish', x: frog.x, y: surfaceY,
+    vy: -10, life: 0.8, maxLife: 0.8,
+  });
+}
+
+function consumeBranchSave(side) {
+  game.saves--;
+  shake.timer = 0.2; shake.intensity = 4;
+  if (side === 'left') {
+    frog.x = 12;
+    frog.vx = BRANCH_BOUNCE_VX;
+  } else {
+    frog.x = world.levelWidth - 12;
+    frog.vx = -BRANCH_BOUNCE_VX;
+  }
+  frog.vy = Math.min(frog.vy, 0) - BRANCH_BOUNCE_VY;
+  // Drop any in-progress tongue (e.g. mid-shoot when bumped).
+  frog.swinging = false;
+  frog.tongue = null;
+  world.rescueAnims.push({
+    type: 'branch', side, x: side === 'left' ? 0 : world.levelWidth,
+    y: frog.y, life: 0.5, maxLife: 0.5, swing: 0,
+  });
+}
+
+function updateRescueAnims(dt) {
+  const step = dt * 60;
+  for (let i = world.rescueAnims.length - 1; i >= 0; i--) {
+    const a = world.rescueAnims[i];
+    a.life -= dt;
+    if (a.type === 'fish') {
+      a.y += a.vy * step;
+      a.vy += 0.5 * step;
+    } else if (a.type === 'branch') {
+      a.swing = (a.maxLife - a.life) / a.maxLife;
+    }
+    if (a.life <= 0) world.rescueAnims.splice(i, 1);
+  }
+}
 
 export function update(dt) {
   if (game.state !== 'playing') return;
+  updateRescueAnims(dt);
   if (frog.dead) return;
 
   const step = dt * 60;
+
+  // Auto-grab: while the player holds the button, attach to the first
+  // anchor that enters reach. allowHop=false so the grounded recovery hop
+  // only fires on the original press, not every frame.
+  if (mouse.down && !frog.swinging && !frog.tongue) {
+    shootTongue({ allowHop: false });
+  }
 
   // Timer
   game.timer -= dt;
@@ -127,7 +210,26 @@ export function update(dt) {
       }
     }
 
-    // Fell off screen
+    // Side protection: swung off the edge of the level.
+    if (frog.x < -SIDE_MARGIN) {
+      if (game.saves > 0) consumeBranchSave('left');
+      else { frog.dead = true; shake.timer = 0.3; shake.intensity = 8; game.state = 'gameover'; return; }
+    } else if (frog.x > world.levelWidth + SIDE_MARGIN) {
+      if (game.saves > 0) consumeBranchSave('right');
+      else { frog.dead = true; shake.timer = 0.3; shake.intensity = 8; game.state = 'gameover'; return; }
+    }
+
+    // Water / fall protection: dropping into a gap between platforms.
+    if (frog.y + FROG_H >= GROUND_Y + 5 && frog.vy > 0) {
+      const gap = inGap(frog.x);
+      if (gap) {
+        if (game.saves > 0) consumeFishSave(gap);
+        else { frog.dead = true; shake.timer = 0.3; shake.intensity = 8; game.state = 'gameover'; return; }
+      }
+    }
+
+    // Fell off screen (rare now — anything past the bottom didn't hit a
+    // gap, so this is the final safety net).
     if (frog.y > H + 100 + camera.y) {
       frog.dead = true;
       shake.timer = 0.3; shake.intensity = 8;

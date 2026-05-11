@@ -27,6 +27,19 @@ export const GROUND_HOP_VY = 8;
 // first swing has potential energy to convert.
 export const START_HEIGHT = 220;
 
+// Per-level safety saves: branch-bumps the frog back from screen sides,
+// fish-bounces them up out of water gaps. Three is enough to be forgiving
+// without removing the threat of game over.
+export const MAX_SAVES = 3;
+// Fish save: vertical kick when bounced off the fish's face.
+export const FISH_BOUNCE_VY = 14;
+// Branch save: horizontal kick when swatted back from a side.
+export const BRANCH_BOUNCE_VX = 8;
+export const BRANCH_BOUNCE_VY = 5;
+// How far past the level edge counts as "off the side" — small buffer so
+// the frog has to clearly leave play before the branch swats.
+export const SIDE_MARGIN = 20;
+
 export const UPGRADE_MAX = 10;
 
 export const UPGRADE_COSTS = {

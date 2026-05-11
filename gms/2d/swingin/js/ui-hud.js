@@ -38,6 +38,17 @@ export function drawHUD(ctx) {
   ctx.textAlign = 'right';
   ctx.fillText('Level ' + game.level, W - 15, 26);
 
+  // Saves remaining — little fish icons
+  const iconY = 46;
+  let iconX = W - 15;
+  ctx.textAlign = 'right';
+  for (let i = game.maxSaves - 1; i >= 0; i--) {
+    drawSaveIcon(ctx, iconX, iconY, i < game.saves);
+    iconX -= 22;
+  }
+
+  drawSavesLabel(ctx);
+
   // Controls hint
   if (game.timer > timerMax - 3 && game.level <= 2) {
     const isTouch = (typeof window !== 'undefined') &&
@@ -51,4 +62,33 @@ export function drawHUD(ctx) {
         : 'Click to grab \u2022 Hold to pull up \u2022 Release to launch',
       W / 2, H - 20);
   }
+}
+
+function drawSaveIcon(ctx, x, y, active) {
+  ctx.save();
+  ctx.translate(x - 8, y);
+  ctx.fillStyle = active ? '#e6883a' : 'rgba(255,255,255,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 8, 4.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-6, 0);
+  ctx.lineTo(-11, -3);
+  ctx.lineTo(-11, 3);
+  ctx.closePath();
+  ctx.fill();
+  if (active) {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(4, -1, 1, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawSavesLabel(ctx) {
+  if (game.saves >= game.maxSaves) return;
+  // Subtle "saves" label when at least one has been used.
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('saves', W - 15 - game.maxSaves * 22, 46 + 2);
 }

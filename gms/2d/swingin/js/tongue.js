@@ -63,15 +63,17 @@ export function findAimTarget() {
   return best;
 }
 
-export function shootTongue() {
+// allowHop: only the user's direct press should fire the recovery hop.
+// The per-frame auto-grab poll passes false so holding the button on the
+// ground doesn't bunny-hop repeatedly.
+export function shootTongue(opts) {
   if (frog.tongue && frog.tongue.shooting) return;
   if (frog.swinging) return;
+  const allowHop = !opts || opts.allowHop !== false;
 
   const target = findAimTarget();
   if (!target) {
-    // No anchor in cone/range — give grounded players a small recovery hop
-    // toward the cursor so they're never stuck on the ground.
-    if (frog.grounded) {
+    if (allowHop && frog.grounded) {
       const dx = (mouse.x + camera.x) - frog.x;
       const dir = dx === 0 ? 0 : (dx > 0 ? 1 : -1);
       frog.vy = -GROUND_HOP_VY;
