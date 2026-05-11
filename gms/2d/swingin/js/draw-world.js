@@ -55,6 +55,41 @@ function drawCloud(ctx, x, y, size) {
   ctx.fill();
 }
 
+export function drawEndZone(ctx) {
+  if (!world.levelWidth) return;
+  const fadeWidth = 260;
+  const startScreenX = world.levelWidth - fadeWidth - camera.x;
+  const endScreenX = world.levelWidth - camera.x;
+  if (startScreenX > W) return;
+
+  // Fade ramp from transparent to red as we approach the end line.
+  if (endScreenX > 0) {
+    const grad = ctx.createLinearGradient(startScreenX, 0, endScreenX, 0);
+    grad.addColorStop(0, 'rgba(200, 30, 30, 0)');
+    grad.addColorStop(1, 'rgba(200, 30, 30, 0.55)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(Math.max(0, startScreenX), 0, Math.min(W, endScreenX) - Math.max(0, startScreenX), H);
+  }
+
+  // Solid red wash for anything past the end line.
+  if (endScreenX < W) {
+    ctx.fillStyle = 'rgba(200, 30, 30, 0.55)';
+    ctx.fillRect(Math.max(0, endScreenX), 0, W - Math.max(0, endScreenX), H);
+
+    // A dashed warning line right on the end.
+    if (endScreenX >= 0 && endScreenX <= W) {
+      ctx.strokeStyle = 'rgba(255, 80, 80, 0.9)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([12, 8]);
+      ctx.beginPath();
+      ctx.moveTo(endScreenX, 0);
+      ctx.lineTo(endScreenX, H);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+}
+
 export function drawWater(ctx) {
   if (!world.gaps || world.gaps.length === 0) return;
   const t = Date.now() * 0.002;

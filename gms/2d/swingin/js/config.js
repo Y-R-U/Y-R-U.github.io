@@ -42,12 +42,16 @@ export const SIDE_MARGIN = 20;
 
 export const UPGRADE_MAX = 10;
 
+// Exponential cost curve — first couple of ranks are cheap so the shop
+// feels rewarding early, but the last few cost real grinding. Maxing
+// every stat takes roughly an order of magnitude longer than the old
+// linear curve, which was tappable-out in ~10 minutes.
 export const UPGRADE_COSTS = {
-  tongueLength: i => 3 + i * 2,
-  timerBoost: i => 4 + i * 3,
-  swingPower: i => 3 + i * 2,
-  tongueSpeed: i => 2 + i * 2,
-  magnetRadius: i => 2 + i * 1,
+  tongueLength: i => Math.round(5 * Math.pow(1.7, i)),
+  timerBoost:   i => Math.round(7 * Math.pow(1.7, i)),
+  swingPower:   i => Math.round(5 * Math.pow(1.7, i)),
+  tongueSpeed:  i => Math.round(4 * Math.pow(1.7, i)),
+  magnetRadius: i => Math.round(3 * Math.pow(1.6, i)),
 };
 
 export const UPGRADE_NAMES = {
