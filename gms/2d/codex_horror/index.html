@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07080a">
+<meta name="description" content="Black Glass House, a mobile-first branching horror story game.">
+<title>Black Glass House</title>
+<link rel="preload" href="images/title.jpg" as="image">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main id="app" aria-live="polite">
+  <section id="wake-screen" class="screen wake-screen active" aria-label="Wake up">
+    <div class="wake-bg"></div>
+    <div class="wake-pulse" aria-hidden="true"></div>
+    <button id="wake-button" class="wake-button" type="button">
+      <span id="wake-line">tap to wake</span>
+      <span id="wake-count">0 / 9</span>
+    </button>
+  </section>
+
+  <section id="title-screen" class="screen title-screen" aria-label="Title">
+    <img class="title-art" src="images/title.jpg" alt="">
+    <div class="title-shade"></div>
+    <div class="title-copy">
+      <p class="eyebrow">a codex horror story</p>
+      <h1>Black Glass House</h1>
+      <p class="subtitle">Wake up. Walk the rooms. Decide which memories deserve a door.</p>
+      <div class="title-actions">
+        <button id="new-game" class="btn primary" type="button">New Game</button>
+        <button id="continue-game" class="btn" type="button" hidden>Continue</button>
+        <button id="title-journal" class="btn quiet" type="button" hidden>Journal</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="game-screen" class="screen game-screen" aria-label="Game">
+    <article class="room-card">
+      <div class="art-frame">
+        <img id="room-image" alt="">
+        <div class="art-gradient"></div>
+        <div class="room-heading">
+          <p id="room-kicker"></p>
+          <h2 id="room-title"></h2>
+        </div>
+      </div>
+      <div class="story-panel">
+        <div class="stats-row">
+          <button id="open-map" class="mini-stat" type="button">
+            <span id="room-count">0</span>
+            <small>rooms</small>
+          </button>
+          <button id="open-evidence" class="mini-stat" type="button">
+            <span id="clue-count">0</span>
+            <small>clues</small>
+          </button>
+          <div class="mini-stat dread-stat" aria-label="Dread">
+            <span id="dread-value">0</span>
+            <small>dread</small>
+          </div>
+        </div>
+        <p id="room-text" class="room-text"></p>
+        <div id="effect-line" class="effect-line" hidden></div>
+        <div id="choices" class="choices"></div>
+      </div>
+    </article>
+  </section>
+
+  <section id="ending-screen" class="screen ending-screen" aria-label="Ending">
+    <img id="ending-image" class="ending-art" alt="">
+    <div class="ending-shade"></div>
+    <div class="ending-copy">
+      <p id="ending-kind" class="eyebrow"></p>
+      <h2 id="ending-title"></h2>
+      <p id="ending-text"></p>
+      <div class="title-actions">
+        <button id="ending-restart" class="btn primary" type="button">Wake Again</button>
+        <button id="ending-journal" class="btn quiet" type="button">Journal</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="top-tools" aria-label="Game tools">
+  <button id="tool-journal" class="icon-btn" type="button" aria-label="Journal" title="Journal" hidden>
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path d="M5 4.8A2.8 2.8 0 0 1 7.8 2H19v17.5H7.5A2.5 2.5 0 0 0 5 22V4.8Z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M8 6h7M8 9h7M8 12h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button id="tool-settings" class="icon-btn" type="button" aria-label="Settings" title="Settings">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M19.3 14.8c.1.4.3.8.6 1.1l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a2 2 0 0 0-2.1-.4c-.7.3-1.1 1-1.1 1.7V20a2 2 0 0 1-4 0v-.1c0-.8-.4-1.4-1.1-1.7a2 2 0 0 0-2.1.4l-.1.1A2 2 0 1 1 3.8 16l.1-.1c.5-.5.7-1.3.4-2.1A2 2 0 0 0 2.5 12h-.1a2 2 0 0 1 0-4h.1c.8 0 1.5-.5 1.8-1.2.3-.7.1-1.5-.4-2l-.1-.1A2 2 0 0 1 6.6 2l.1.1c.5.5 1.3.7 2.1.4.7-.3 1.1-1 1.1-1.7V.7a2 2 0 0 1 4 0v.1c0 .8.4 1.4 1.1 1.7.7.3 1.5.1 2.1-.4l.1-.1A2 2 0 0 1 20 4.8l-.1.1c-.5.5-.7 1.3-.4 2.1.3.7 1 1.2 1.8 1.2h.1a2 2 0 0 1 0 4h-.1c-.9 0-1.6.5-2 1.6Z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</nav>
+
+<aside id="settings-panel" class="panel" aria-hidden="true">
+  <div class="panel-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <header class="panel-head">
+      <h3 id="settings-title">Settings</h3>
+      <button class="panel-close" type="button" data-close="settings-panel" aria-label="Close">×</button>
+    </header>
+    <div class="panel-body">
+      <label class="setting-row">
+        <span>Music</span>
+        <button id="music-toggle" class="switch" type="button" aria-pressed="true"><span></span></button>
+      </label>
+      <label class="setting-row">
+        <span>Volume</span>
+        <input id="volume" type="range" min="0" max="100" value="55">
+      </label>
+      <label class="setting-row">
+        <span>Text</span>
+        <select id="text-speed">
+          <option value="instant">Instant</option>
+          <option value="fast">Fast</option>
+          <option value="normal" selected>Normal</option>
+          <option value="slow">Slow</option>
+        </select>
+      </label>
+      <button id="reset-run" class="btn danger full" type="button">Reset Current Run</button>
+      <p class="panel-note">Progress saves on this device. Endings remain after a run reset.</p>
+    </div>
+  </div>
+</aside>
+
+<aside id="journal-panel" class="panel" aria-hidden="true">
+  <div class="panel-card tall" role="dialog" aria-modal="true" aria-labelledby="journal-title">
+    <header class="panel-head">
+      <h3 id="journal-title">Journal</h3>
+      <button class="panel-close" type="button" data-close="journal-panel" aria-label="Close">×</button>
+    </header>
+    <div class="panel-body">
+      <div id="ending-badges" class="badges"></div>
+      <ol id="history-list" class="history-list"></ol>
+    </div>
+  </div>
+</aside>
+
+<aside id="evidence-panel" class="panel" aria-hidden="true">
+  <div class="panel-card tall" role="dialog" aria-modal="true" aria-labelledby="evidence-title">
+    <header class="panel-head">
+      <h3 id="evidence-title">Evidence</h3>
+      <button class="panel-close" type="button" data-close="evidence-panel" aria-label="Close">×</button>
+    </header>
+    <div id="evidence-list" class="panel-body evidence-list"></div>
+  </div>
+</aside>
+
+<aside id="map-panel" class="panel" aria-hidden="true">
+  <div class="panel-card tall" role="dialog" aria-modal="true" aria-labelledby="map-title">
+    <header class="panel-head">
+      <h3 id="map-title">Rooms</h3>
+      <button class="panel-close" type="button" data-close="map-panel" aria-label="Close">×</button>
+    </header>
+    <div id="map-list" class="panel-body map-list"></div>
+  </div>
+</aside>
+
+<div id="modal-root" class="modal-root" aria-live="polite"></div>
+<div id="toast-root" class="toast-root" aria-live="polite"></div>
+<audio id="music" preload="none" loop></audio>
+
+<script src="js/story.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
