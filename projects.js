@@ -232,6 +232,14 @@ const PROJECTS = [
     desc: "3D tank battle royale where ten tanks enter an arena and fight until one survivor remains. Includes leaderboard, name tags, and touch controls.",
     date: "2026-05-08" },
 
+  { name: "Black Glass House",  path: "/gms/2d/codex_horror/", screenshot: "codex-horror", type: "game",
+    desc: "Mobile-first branching horror story. Wake yourself, explore haunted rooms, gather clues, and choose what waits beyond the black glass door.",
+    date: "2026-05-12" },
+
+  { name: "The Hollow",         path: "/gms/2d/claude_horror/", screenshot: "claude-horror", type: "game",
+    desc: "Mobile-first text horror. Click yourself awake, wander a Victorian house between life and death, collect memories and items, and reach one of seven endings. Rooms generated locally with MFLUX.",
+    date: "2026-05-12" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
