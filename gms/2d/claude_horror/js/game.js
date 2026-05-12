@@ -229,6 +229,9 @@
     }
 
     if (room.type === 'ending') {
+      if (window.Music && typeof Music.playEndingFor === 'function') {
+        Music.playEndingFor(roomId);
+      }
       showEnding(room);
       Save.recordEnding(room.ending);
       return;

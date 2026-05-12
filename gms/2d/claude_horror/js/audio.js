@@ -1,10 +1,19 @@
 // THE HOLLOW — music player.
 // Looks for music/theme1.mp3 .. theme9.mp3 (user-supplied). Plays available tracks
 // in random order, crossfading on `ended`. No track found = silent (no error UI).
+//
+// Endings can have a short bespoke sting. Map: ending nodeId → ending_themeN.mp3.
+// When entered, background fades out, the ending theme plays once, then random
+// background shuffle resumes (the ending screen typically stays up anyway).
 
 (function () {
   const MAX_TRACKS = 9;
   const FADE_MS = 1200;
+
+  const ENDING_THEMES = {
+    ending_window: 1,
+    ending_lost_sleep: 2,
+  };
 
   const audio = document.getElementById('bg-audio');
   const tracks = [];        // discovered URLs
@@ -14,6 +23,7 @@
   let targetVolume = 0.6;
   let muted = true;
   let fadeRaf = null;
+  let playingEnding = false;
 
   function url(i) { return `music/theme${i}.mp3`; }
 
@@ -73,7 +83,13 @@
   }
 
   audio.addEventListener('ended', () => {
-    if (!muted) playRandom();
+    if (muted) return;
+    if (playingEnding) {
+      playingEnding = false;
+      playRandom();
+    } else {
+      playRandom();
+    }
   });
   // If a track 404s mid-stream or fails to decode, drop it from rotation and try the next.
   audio.addEventListener('error', () => {
@@ -105,6 +121,31 @@
     primeOnGesture() {
       if (started || muted) return;
       playRandom();
+    },
+    // Play a one-shot ending sting if one is mapped for this node, then resume
+    // random background on `ended`. Silently no-op if muted or unmapped.
+    async playEndingFor(nodeId) {
+      const idx = ENDING_THEMES[nodeId];
+      if (!idx || muted) return;
+      const src = `music/ending_theme${idx}.mp3`;
+      try {
+        const head = await fetch(src, { method: 'HEAD' });
+        if (!head.ok) return;
+      } catch (e) { return; }
+      playingEnding = true;
+      // Quick fade-down of current track, then swap and fade in.
+      fadeTo(0, 300);
+      setTimeout(async () => {
+        audio.src = src;
+        audio.volume = 0;
+        try {
+          await audio.play();
+          fadeTo(targetVolume, 400);
+          started = true;
+        } catch (e) {
+          playingEnding = false;
+        }
+      }, 320);
     },
     isMuted: () => muted,
   };
