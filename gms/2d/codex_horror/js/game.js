@@ -7,8 +7,10 @@
   let state = Save.loadState();
   let settings = Save.loadSettings();
   let typeTimer = null;
+  let endingVideoTimer = null;
   let lastRoomId = "";
   let wokeThisSession = false;
+  const endingVideoStillMs = 1500;
   const mapRoomIds = [
     "cot_room",
     "artery_hall",
@@ -49,6 +51,7 @@
     openMap: $("open-map"),
     openEvidence: $("open-evidence"),
     endingImage: $("ending-image"),
+    endingVideo: $("ending-video"),
     endingKind: $("ending-kind"),
     endingTitle: $("ending-title"),
     endingText: $("ending-text"),
@@ -157,6 +160,7 @@
   }
 
   function showTitle() {
+    stopEndingVideo();
     UI.showScreen("title-screen");
     els.continueGame.hidden = !Save.hasActiveRun();
     els.titleJournal.hidden = !hasAnyJournal();
@@ -205,6 +209,7 @@
   }
 
   function beginRun() {
+    stopEndingVideo();
     state = Save.freshState();
     state.active = true;
     Save.saveState(state);
@@ -355,6 +360,54 @@
     els.endingKind.textContent = `${ending.kind} ending`;
     els.endingTitle.textContent = ending.title;
     els.endingText.textContent = room.text;
+    prepareEndingVideo(room.video || "");
+  }
+
+  function prepareEndingVideo(src) {
+    stopEndingVideo();
+    if (!src) return;
+
+    const video = els.endingVideo;
+    video.src = src;
+    video.load();
+
+    const playOnce = () => {
+      video.classList.add("active");
+      video.play().catch(() => video.classList.remove("active"));
+    };
+
+    const pauseOnStill = () => {
+      video.classList.remove("active");
+      try {
+        video.currentTime = 0;
+      } catch (err) {
+        console.warn("Ending video rewind failed", err);
+      }
+      endingVideoTimer = window.setTimeout(playOnce, endingVideoStillMs);
+    };
+
+    video.onloadeddata = () => {
+      pauseOnStill();
+    };
+    video.onended = pauseOnStill;
+    video.onerror = () => {
+      stopEndingVideo();
+    };
+  }
+
+  function stopEndingVideo() {
+    if (endingVideoTimer) {
+      window.clearTimeout(endingVideoTimer);
+      endingVideoTimer = null;
+    }
+    if (!els.endingVideo) return;
+    els.endingVideo.pause();
+    els.endingVideo.removeAttribute("src");
+    els.endingVideo.classList.remove("active");
+    els.endingVideo.onloadeddata = null;
+    els.endingVideo.onended = null;
+    els.endingVideo.onerror = null;
+    els.endingVideo.load();
   }
 
   function updateStats() {

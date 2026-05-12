@@ -403,6 +403,7 @@
         title: "Black Glass",
         kicker: "Ending",
         image: image("horror"),
+        video: "videos/black_glass_bad.mp4",
         text: "You open the door before the truth can name you. Black glass pours out like water. It fills your mouth with every room you skipped.",
       },
       ending_cot: {
