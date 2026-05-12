@@ -13,3 +13,13 @@ Drop optional theme files here as:
 - `theme9.mp3`
 
 The game shuffles these names and plays the first file that loads.
+
+Generated Codex tracks currently included:
+
+- `theme1.mp3` - dark hospital ambience
+- `theme2.mp3` - nursery music-box dread
+- `theme3.mp3` - melancholic mystery theme
+- `ending_clear.mp3` - good ending transition
+- `ending_witness.mp3` - strange ending transition
+- `ending_bad.mp3` - bad ending stinger
+- `ending_observation.mp3` - panic/observation stinger

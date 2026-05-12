@@ -361,6 +361,7 @@
     els.endingTitle.textContent = ending.title;
     els.endingText.textContent = room.text;
     prepareEndingVideo(room.video || "");
+    Audio.playEnding(room.ending, ending.kind);
   }
 
   function prepareEndingVideo(src) {
