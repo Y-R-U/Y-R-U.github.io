@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#04070b">
+<meta name="description" content="A mobile-first sci-fi horror escape game with generated room transition video.">
+<title>Awake</title>
+<link rel="preload" href="images/suspension_room.jpg" as="image">
+<link rel="preload" href="images/hallway.jpg" as="image">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main id="app">
+  <section id="intro-screen" class="screen active" aria-label="Awake intro">
+    <video id="intro-video" class="ambient-video" muted playsinline preload="auto" poster="images/suspension_room.jpg"></video>
+    <div class="scene-shade"></div>
+    <div class="intro-copy">
+      <p class="overline">caching_data</p>
+      <h1 id="intro-name">Awake</h1>
+      <p id="intro-status" class="subtitle">Linking suspension feed.</p>
+      <div class="cache-meter" aria-label="Asset cache progress">
+        <span id="cache-fill"></span>
+      </div>
+      <div class="title-actions">
+        <button id="intro-new-game" class="glass-button primary" type="button" disabled>New Run</button>
+        <button id="intro-continue" class="glass-button" type="button" hidden disabled>Continue</button>
+        <button id="intro-history" class="glass-button quiet" type="button" hidden disabled>History</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="title-screen" class="screen" aria-label="Game title">
+    <video id="title-loop" class="ambient-video" muted playsinline loop preload="metadata" poster="images/hallway.jpg">
+      <source src="videos/hallway_to_room.mp4" type="video/mp4">
+    </video>
+    <div class="scene-shade"></div>
+    <div class="title-copy">
+      <p class="overline">v0.1 vertical slice</p>
+      <h1 id="title-name">Wake Protocol</h1>
+      <p class="subtitle">No memory. One sealed facility. Something counting your footsteps.</p>
+      <div class="title-actions">
+        <button id="new-game" class="glass-button primary" type="button">New Run</button>
+        <button id="continue-game" class="glass-button" type="button" hidden>Continue</button>
+        <button id="title-history" class="glass-button quiet" type="button" hidden>History</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="game-screen" class="screen game-screen" aria-label="Game">
+    <div class="stage">
+      <div class="media-pane">
+        <video id="room-video" class="room-video" muted playsinline preload="auto" poster="images/suspension_room.jpg"></video>
+        <img id="room-fallback" class="room-fallback" src="images/suspension_room.jpg" alt="">
+        <div class="scene-shade"></div>
+
+        <div class="tag tag-room">
+          <span id="room-name">Suspension Room</span>
+          <small id="turn-count">1 / ??</small>
+        </div>
+        <button id="details-mobile" class="tag tag-details mobile-only" type="button">Details</button>
+        <button id="map-mobile" class="tag tag-map-toggle mobile-only" type="button">Map</button>
+        <div id="subroom-actions" class="tag-stack tag-left"></div>
+        <div id="exit-actions" class="tag-stack tag-right"></div>
+        <div id="threat-flash" class="threat-flash" aria-hidden="true"></div>
+      </div>
+
+      <aside id="side-panel" class="side-panel">
+        <section class="panel-section">
+          <div class="section-head">
+            <h2 id="facility-name">Unknown Facility</h2>
+            <span id="threat-label">signal lost</span>
+          </div>
+          <p id="story-text" class="story-text"></p>
+        </section>
+        <section class="panel-section compact-grid">
+          <button id="open-details" class="glass-button slim" type="button">Details</button>
+          <button id="open-history" class="glass-button slim" type="button">History</button>
+        </section>
+        <section class="panel-section">
+          <div class="section-head">
+            <h3>Mini-map</h3>
+            <span id="map-status">offline</span>
+          </div>
+          <div id="desktop-map" class="mini-map offline"></div>
+        </section>
+        <section class="panel-section">
+          <h3>Inventory</h3>
+          <ul id="inventory-list" class="clean-list"></ul>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <section id="ending-screen" class="screen" aria-label="Ending">
+    <video id="ending-video" class="ambient-video" muted playsinline preload="metadata" poster="images/hallway.jpg">
+      <source src="videos/hallway_to_room.mp4" type="video/mp4">
+    </video>
+    <div class="scene-shade"></div>
+    <div class="title-copy ending-copy">
+      <p id="ending-kind" class="overline">ending</p>
+      <h2 id="ending-title">Signal Lost</h2>
+      <p id="ending-text" class="subtitle"></p>
+      <div class="title-actions">
+        <button id="restart-game" class="glass-button primary" type="button">Wake Again</button>
+        <button id="ending-history" class="glass-button quiet" type="button">History</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="top-tools" aria-label="Tools">
+  <button id="debug-button" class="icon-button" type="button" aria-label="Debug transitions" title="Debug transitions">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M8 4v4"/><path d="M16 10v4"/><path d="M11 16v4"/></svg>
+  </button>
+  <button id="settings-button" class="icon-button" type="button" aria-label="Settings" title="Settings">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 14.5c.1.4.3.8.6 1.1l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a2 2 0 0 0-2.2-.4 2 2 0 0 0-1.1 1.8V20a2 2 0 0 1-4 0v-.2A2 2 0 0 0 8.8 18a2 2 0 0 0-2.2.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1c.5-.5.7-1.3.4-2.1A2 2 0 0 0 2.4 12h-.2a2 2 0 0 1 0-4h.2a2 2 0 0 0 1.8-1.2c.3-.7.1-1.5-.4-2l-.1-.1a2 2 0 0 1 2.8-2.8l.1.1c.6.5 1.4.7 2.2.4A2 2 0 0 0 9.9.6V.5a2 2 0 0 1 4 0v.1A2 2 0 0 0 15 2.4c.8.3 1.6.1 2.2-.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1c-.5.5-.7 1.3-.4 2 .3.7 1 1.2 1.8 1.2h.2a2 2 0 0 1 0 4h-.2a2 2 0 0 0-2 2.5Z"/></svg>
+  </button>
+</nav>
+
+<aside id="settings-panel" class="overlay" aria-hidden="true">
+  <div class="popup" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <header class="popup-head">
+      <h2 id="settings-title">Settings</h2>
+      <button class="close-button" type="button" data-close="settings-panel" aria-label="Close">×</button>
+    </header>
+    <div class="setting-row">
+      <span>Music</span>
+      <button id="music-toggle" class="switch" type="button" aria-pressed="true"><span></span></button>
+    </div>
+    <div class="setting-row">
+      <span>Sound</span>
+      <button id="sound-toggle" class="switch" type="button" aria-pressed="true"><span></span></button>
+    </div>
+    <label class="setting-row">
+      <span>Volume</span>
+      <input id="volume" type="range" min="0" max="100" value="55">
+    </label>
+    <div class="popup-actions">
+      <button id="help-button" class="glass-button" type="button">Help</button>
+      <button id="reset-run" class="glass-button danger" type="button">Reset Run</button>
+    </div>
+  </div>
+</aside>
+
+<aside id="debug-panel" class="overlay" aria-hidden="true">
+  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="debug-title">
+    <header class="popup-head">
+      <h2 id="debug-title">Transition Debug</h2>
+      <button class="close-button" type="button" data-close="debug-panel" aria-label="Close">×</button>
+    </header>
+    <div class="debug-grid">
+      <section>
+        <video id="debug-video" class="debug-video" muted playsinline controls preload="metadata" poster="images/hallway.jpg"></video>
+        <p id="debug-note" class="debug-note">Choose a transition to preview it and copy the file name.</p>
+      </section>
+      <section>
+        <div id="debug-list" class="debug-list"></div>
+      </section>
+    </div>
+  </div>
+</aside>
+
+<aside id="difficulty-panel" class="overlay" aria-hidden="true">
+  <div class="popup" role="dialog" aria-modal="true" aria-labelledby="difficulty-title">
+    <header class="popup-head">
+      <h2 id="difficulty-title">Run Difficulty</h2>
+      <button class="close-button" type="button" data-close="difficulty-panel" aria-label="Close">×</button>
+    </header>
+    <div class="difficulty-list">
+      <button class="glass-button primary difficulty-choice" type="button" data-difficulty="easy">Easy <span>longer timer, full goals</span></button>
+      <button class="glass-button difficulty-choice" type="button" data-difficulty="medium">Medium <span>balanced timer, partial goals</span></button>
+      <button class="glass-button danger difficulty-choice" type="button" data-difficulty="hard">Hard <span>short timer, hidden goals</span></button>
+    </div>
+  </div>
+</aside>
+
+<aside id="details-panel" class="overlay" aria-hidden="true">
+  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="details-title">
+    <header class="popup-head">
+      <h2 id="details-title">Run Details</h2>
+      <button class="close-button" type="button" data-close="details-panel" aria-label="Close">×</button>
+    </header>
+    <div class="detail-grid">
+      <section>
+        <h3>Goals</h3>
+        <ul id="goals-list" class="clean-list goals-list"></ul>
+      </section>
+      <section>
+        <h3>Inventory</h3>
+        <ul id="details-inventory-list" class="clean-list"></ul>
+      </section>
+      <section>
+        <h3>Station</h3>
+        <dl id="run-stats" class="stat-list"></dl>
+      </section>
+      <section>
+        <h3>Known Rooms</h3>
+        <div id="popup-map" class="mini-map"></div>
+      </section>
+    </div>
+  </div>
+</aside>
+
+<aside id="history-panel" class="overlay" aria-hidden="true">
+  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="history-title">
+    <header class="popup-head">
+      <h2 id="history-title">Story History</h2>
+      <button class="close-button" type="button" data-close="history-panel" aria-label="Close">×</button>
+    </header>
+    <ol id="history-list" class="history-list"></ol>
+  </div>
+</aside>
+
+<aside id="help-panel" class="overlay stacked" aria-hidden="true">
+  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <header class="popup-head">
+      <h2 id="help-title">Help</h2>
+      <button class="close-button" type="button" data-close="help-panel" aria-label="Close">×</button>
+    </header>
+    <div class="help-copy">
+      <p>Each action spends a turn. The hunter arrives when the hidden turn limit is reached; the range changes by difficulty.</p>
+      <p>Easy shows every goal. Medium and hard hide part of the list until you restore a console or find a map cache.</p>
+      <p>Room buttons move through generated transition videos. The first frame is held as the current room still.</p>
+      <p>Version 0.1 tests one room type, one hallway, two transition clips, save progress, history, music, and the procedural run shell.</p>
+    </div>
+  </div>
+</aside>
+
+<div id="modal-root" class="modal-root" aria-live="polite"></div>
+<div id="toast-root" class="toast-root" aria-live="polite"></div>
+<audio id="music" preload="none"></audio>
+
+<script src="js/story.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

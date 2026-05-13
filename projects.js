@@ -240,6 +240,10 @@ const PROJECTS = [
     desc: "Mobile-first text horror. Click yourself awake, wander a Victorian house between life and death, collect memories and items, and reach one of seven endings. Rooms generated locally with MFLUX.",
     date: "2026-05-12" },
 
+  { name: "Awake",              path: "/gms/2d/awake/", screenshot: "awake", type: "game",
+    desc: "Mobile-first sci-fi horror escape prototype. Wake with no memory, search a generated facility, and outrun what is hunting the hallway.",
+    date: "2026-05-13" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
