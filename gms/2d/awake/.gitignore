@@ -1,2 +1,5 @@
 original_files/
 gen_images.log
+gen_transitions.log
+.DS_Store
+__pycache__/

@@ -5,7 +5,7 @@
   const UI = window.CodexHorrorUI;
 
   const $ = id => document.getElementById(id);
-  let state = Save.loadState();
+  let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
   let cacheStarted = false;
@@ -13,7 +13,12 @@
   let introTimer = 0;
   let introIndex = 0;
   let introCycle = 0;
+  let helperOnline = false;
+  let debugTransitions = [];
+  let selectedTransition = null;
+  let helperPoll = 0;
   const cachedMedia = new Set();
+  const helperUrl = "http://127.0.0.1:8788/api";
 
   const els = {
     introVideo: $("intro-video"),
@@ -49,6 +54,12 @@
     debugVideo: $("debug-video"),
     debugList: $("debug-list"),
     debugNote: $("debug-note"),
+    debugHelperStatus: $("debug-helper-status"),
+    debugRefresh: $("debug-refresh"),
+    regenFile: $("regen-file"),
+    regenPrompt: $("regen-prompt"),
+    regenDelete: $("regen-delete"),
+    regenMove: $("regen-move"),
     settingsButton: $("settings-button"),
     musicToggle: $("music-toggle"),
     soundToggle: $("sound-toggle"),
@@ -75,7 +86,18 @@
     wireEvents();
     syncSettings();
     renderDebugList();
+    refreshHelperStatus();
+    helperPoll = window.setInterval(refreshHelperStatus, 5000);
     showIntro();
+    if (new URLSearchParams(window.location.search).has("debug")) {
+      setTimeout(() => UI.openPanel("debug-panel"), 250);
+    }
+  }
+
+  function normalizeState(nextState) {
+    if (!nextState) return null;
+    if (nextState.currentRoom === "suspension") nextState.currentRoom = "cryo_room";
+    return nextState;
   }
 
   function wireEvents() {
@@ -100,7 +122,13 @@
     els.mapMobile.addEventListener("click", openDetails);
     els.endingHistory.addEventListener("click", openHistory);
     els.restartGame.addEventListener("click", () => showIntro(true));
-    els.debugButton.addEventListener("click", () => UI.openPanel("debug-panel"));
+    els.debugButton.addEventListener("click", () => {
+      refreshHelperStatus();
+      UI.openPanel("debug-panel");
+    });
+    els.debugRefresh.addEventListener("click", refreshHelperStatus);
+    els.regenDelete.addEventListener("click", () => submitRegen("delete"));
+    els.regenMove.addEventListener("click", () => submitRegen("move"));
     els.settingsButton.addEventListener("click", () => {
       Audio.prime();
       UI.openPanel("settings-panel");
@@ -126,6 +154,11 @@
       state = null;
       UI.closePanel("settings-panel");
       showIntro(true);
+    });
+    document.addEventListener("pointerup", event => {
+      if (!event.target.closest("button")) return;
+      Audio.prime();
+      Audio.click();
     });
   }
 
@@ -303,14 +336,14 @@
       if (!ok) return;
     }
     state = Story.createRun(difficulty);
-    addHistory("You woke inside the suspension room with no clear memory.");
+    addHistory("You woke inside the cryo_room with no clear memory.");
     Save.saveState(state);
     renderGame();
   }
 
   function continueRun() {
     Audio.prime();
-    state = Save.loadState();
+    state = normalizeState(Save.loadState());
     if (!state) return showIntro(true);
     renderGame();
   }
@@ -348,7 +381,7 @@
   }
 
   function currentStoryText(room) {
-    if (state.currentRoom === "suspension" && state.playerRevealed) {
+    if (state.currentRoom === "cryo_room" && state.playerRevealed) {
       return `${room.text} The wrist band insists you are ${state.playerName}.`;
     }
     if (state.currentRoom === "hallway" && state.flags.map) {
@@ -424,7 +457,8 @@
   function transitionTo(targetRoom) {
     return new Promise(resolve => {
       const from = Story.rooms[state.currentRoom];
-      const videoSrc = state.currentRoom === "suspension" ? from.toHallway : from.toRoom;
+      const to = Story.rooms[targetRoom];
+      const videoSrc = targetRoom === "hallway" ? from.toHallway : to.fromHallway;
       transitionLocked = true;
       els.roomVideo.src = videoSrc;
       els.roomVideo.currentTime = 0;
@@ -527,9 +561,16 @@
       target.textContent = "offline";
       return;
     }
-    ["Suspension Room", "Central Hallway", "Transport Tube"].forEach(label => {
+    [
+      ["cryo_room", "Cryo Room"],
+      ["med_bay", "Med Bay"],
+      ["hallway", "Central Hallway"],
+      ["hydroponic_biome", "Hydroponic Biome"],
+      ["reactor_gallery", "Reactor Gallery"],
+      ["transport", "Transport Tube"],
+    ].forEach(([id, label]) => {
       const node = document.createElement("div");
-      node.className = `map-node ${label.toLowerCase().includes(state.currentRoom === "suspension" ? "suspension" : "hallway") ? "current" : ""}`;
+      node.className = `map-node ${id === state.currentRoom ? "current" : ""}`;
       node.textContent = label;
       target.append(node);
     });
@@ -556,27 +597,139 @@
   }
 
   function renderDebugList() {
+    const transitions = debugTransitions.length ? debugTransitions : (Story.transitions || []);
     els.debugList.innerHTML = "";
-    (Story.transitions || []).forEach(transition => {
-      const row = document.createElement("div");
-      row.className = "debug-row";
-      const pick = document.createElement("button");
-      pick.className = "glass-button debug-pick";
-      pick.type = "button";
-      pick.innerHTML = `${UI.escapeHtml(transition.file)}<small>${UI.escapeHtml(transition.label)}</small>`;
-      pick.addEventListener("click", () => previewTransition(transition, true));
-      const copy = document.createElement("button");
-      copy.className = "glass-button slim debug-copy";
-      copy.type = "button";
-      copy.textContent = "Copy";
-      copy.addEventListener("click", () => copyTransitionName(transition.file));
-      row.append(pick, copy);
-      els.debugList.append(row);
+    const groups = [
+      ["room_transitions", "Room transitions"],
+      ["possible_other_transition", "Possible other transition videos"],
+    ];
+    groups.forEach(([groupId, label]) => {
+      const items = transitions.filter(transition => transition.group === groupId);
+      if (!items.length) return;
+      const section = document.createElement("section");
+      section.className = "debug-section";
+      const heading = document.createElement("h3");
+      heading.textContent = label;
+      section.append(heading);
+      items.forEach(transition => {
+        const row = document.createElement("div");
+        row.className = "debug-row";
+        const pick = document.createElement("button");
+        pick.className = "glass-button debug-pick";
+        pick.type = "button";
+        pick.innerHTML = `${UI.escapeHtml(transition.file)}<small>${UI.escapeHtml(transition.label)}</small>`;
+        pick.addEventListener("click", () => previewTransition(transition, true));
+        const copy = document.createElement("button");
+        copy.className = "glass-button slim debug-copy";
+        copy.type = "button";
+        copy.textContent = "Copy";
+        copy.addEventListener("click", () => copyTransitionName(transition.file));
+        const redo = document.createElement("button");
+        redo.className = "glass-button slim debug-redo";
+        redo.type = "button";
+        redo.textContent = "Redo";
+        redo.disabled = !helperOnline || !transition.promptText || transition.group !== "room_transitions";
+        redo.addEventListener("click", () => openRegenPanel(transition));
+        row.append(pick, copy, redo);
+        section.append(row);
+      });
+      els.debugList.append(section);
     });
-    if (Story.transitions && Story.transitions[0]) {
-      const first = Story.transitions[0];
+    if (transitions[0]) {
+      const first = transitions[0];
       els.debugVideo.poster = first.poster;
       els.debugNote.textContent = first.status || first.label;
+    }
+  }
+
+  async function refreshHelperStatus() {
+    try {
+      const result = await helperFetch("/status", { method: "GET" });
+      helperOnline = true;
+      debugTransitions = Array.isArray(result.transitions) ? result.transitions : [];
+      renderHelperStatus(result);
+    } catch (err) {
+      helperOnline = false;
+      debugTransitions = [];
+      els.debugHelperStatus.textContent = "Local regen helper: offline";
+    }
+    renderDebugList();
+  }
+
+  function renderHelperStatus(result) {
+    const running = result.running;
+    if (running) {
+      const event = running.ltx_event && running.ltx_event.event ? ` (${running.ltx_event.event})` : "";
+      els.debugHelperStatus.textContent = `Local regen helper: ${running.status} ${running.file}${event}`;
+      return;
+    }
+    if (result.queue_depth > 0) {
+      els.debugHelperStatus.textContent = `Local regen helper: ${result.queue_depth} queued`;
+      return;
+    }
+    const recent = Array.isArray(result.jobs) ? result.jobs[result.jobs.length - 1] : null;
+    els.debugHelperStatus.textContent = recent
+      ? `Local regen helper: ready, last ${recent.file} ${recent.status}`
+      : "Local regen helper: ready";
+  }
+
+  async function helperFetch(path, options) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 1800);
+    try {
+      const response = await fetch(`${helperUrl}${path}`, Object.assign({}, options, {
+        signal: controller.signal,
+        headers: Object.assign({ "Content-Type": "application/json" }, options && options.headers),
+      }));
+      const data = await response.json();
+      if (!response.ok || data.ok === false) throw new Error(data.error || "helper request failed");
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function openRegenPanel(transition) {
+    if (!helperOnline) {
+      UI.toast("Start regen_helper.py first");
+      return;
+    }
+    selectedTransition = transition;
+    els.regenFile.textContent = transition.file;
+    els.regenPrompt.value = transition.promptText || "";
+    UI.openPanel("regen-panel");
+  }
+
+  async function submitRegen(mode) {
+    if (!selectedTransition) return;
+    const promptText = els.regenPrompt.value.trim();
+    if (!promptText) {
+      UI.toast("Prompt text is required");
+      return;
+    }
+    const label = mode === "move" ? "Regen + Move" : "Regen + Delete";
+    const ok = await UI.confirm({
+      title: `${label}?`,
+      body: `Queue a local regeneration for ${selectedTransition.file}.`,
+      confirmLabel: "Queue",
+      cancelLabel: "Cancel",
+      danger: mode === "delete",
+    });
+    if (!ok) return;
+    try {
+      const result = await helperFetch("/regen", {
+        method: "POST",
+        body: JSON.stringify({
+          file: selectedTransition.file,
+          promptText,
+          mode,
+        }),
+      });
+      UI.closePanel("regen-panel");
+      UI.toast(`Queued ${result.job.file}`);
+      refreshHelperStatus();
+    } catch (err) {
+      UI.toast(err.message || "Helper request failed");
     }
   }
 

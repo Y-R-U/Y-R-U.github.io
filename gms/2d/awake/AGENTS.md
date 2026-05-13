@@ -19,9 +19,10 @@ Awake is a separate game from `gms/2d/codex_horror/`. Do not modify `codex_horro
   - hidden player name revealed by scanning wrist band
   - hunter type: genetically created monster, alien infiltrator, or reanimated crew
   - difficulty-driven random turn limit
-- One playable room type: `Suspension Room`.
+- Playable room feeds: `cryo_room`, `med_bay`, `hydroponic_biome`, and `reactor_gallery`.
 - One shared `Central Hallway`.
 - Transition debug panel for previewing generated videos and copying short file names.
+- Optional localhost-only regen helper: run `python3 regen_helper.py` from the Awake folder, then the debug panel can queue replacement transition renders.
 - Goal list, inventory, story history, local save, settings panel, help panel, and minimap behavior.
 - Desktop layout uses video left and details panel right; mobile layout overlays glass tags over the video.
 
@@ -29,15 +30,23 @@ Awake is a separate game from `gms/2d/codex_horror/`. Do not modify `codex_horro
 
 Runtime assets:
 
-- `images/suspension_room.jpg`
 - `images/hallway.jpg`
-- `videos/room_to_hallway.mp4`
-- `videos/hallway_to_room.mp4`
+- `images/cryo_room.jpg`
+- `images/med_bay.jpg`
+- `images/hydroponic_biome.jpg`
+- `images/reactor_gallery.jpg`
+- `videos/*_to_hallway.mp4`
+- `videos/hallway_to_*.mp4`
+- `videos/cryo_room_event_collapse.mp4`
 - `music/theme1.mp3`
 
 Ignored source assets:
 
 - `original_files/suspension_room.png`
+- `original_files/cryo_room.png`
+- `original_files/med_bay.png`
+- `original_files/hydroponic_biome.png`
+- `original_files/reactor_gallery.png`
 - `original_files/hallway.png`
 
 The PNGs are Flux source outputs and should stay ignored. The JPGs are browser runtime assets.
@@ -48,10 +57,13 @@ Flux stills were generated locally through MFLUX using `gen_images.py`.
 
 LTX transition videos were generated locally through `http://localhost:7866/api/generate`:
 
-- `room_to_hallway.mp4`: 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 215.5 s.
-- `hallway_to_room.mp4`: 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 229.7 s.
+- New review transitions are 384x640, 73 frames, 24 FPS, about 3.04 s, video-only.
+- `cryo_room_event_collapse.mp4`: former `room_to_hallway.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 215.5 s.
+- `hallway_to_cryo_room.mp4`: former `hallway_to_room.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 229.7 s.
+- `gen_transitions.py` queues batch transition generation.
+- `regen_helper.py` starts a local-only helper on `http://127.0.0.1:8788` so the debug panel can edit prompt text, queue one-at-a-time regenerations, and either delete or move the old clip into possible transition candidates.
 
-`room_to_hallway.mp4` is visually strong but not accurate as a hallway transition. Treat it as a candidate ending or room-event clip until replaced.
+`cryo_room_event_collapse.mp4` is visually strong but not accurate as a hallway transition. Treat it as a candidate ending or room-event clip.
 
 ACE-Step generated `music/theme1.mp3` as a 120 s instrumental sci-fi elevator background track with acoustic guitar, soft keys, sparse drums, and no vocals.
 

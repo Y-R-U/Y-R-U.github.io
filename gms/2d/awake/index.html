@@ -9,19 +9,19 @@
 <meta name="theme-color" content="#04070b">
 <meta name="description" content="A mobile-first sci-fi horror escape game with generated room transition video.">
 <title>Awake</title>
-<link rel="preload" href="images/suspension_room.jpg" as="image">
+<link rel="preload" href="images/cryo_room.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <main id="app">
   <section id="intro-screen" class="screen active" aria-label="Awake intro">
-    <video id="intro-video" class="ambient-video" muted playsinline preload="auto" poster="images/suspension_room.jpg"></video>
+    <video id="intro-video" class="ambient-video" muted playsinline preload="auto" poster="images/cryo_room.jpg"></video>
     <div class="scene-shade"></div>
     <div class="intro-copy">
       <p class="overline">caching_data</p>
       <h1 id="intro-name">Awake</h1>
-      <p id="intro-status" class="subtitle">Linking suspension feed.</p>
+      <p id="intro-status" class="subtitle">Linking cryo_room feed.</p>
       <div class="cache-meter" aria-label="Asset cache progress">
         <span id="cache-fill"></span>
       </div>
@@ -35,7 +35,7 @@
 
   <section id="title-screen" class="screen" aria-label="Game title">
     <video id="title-loop" class="ambient-video" muted playsinline loop preload="metadata" poster="images/hallway.jpg">
-      <source src="videos/hallway_to_room.mp4" type="video/mp4">
+      <source src="videos/hallway_to_cryo_room.mp4" type="video/mp4">
     </video>
     <div class="scene-shade"></div>
     <div class="title-copy">
@@ -53,12 +53,12 @@
   <section id="game-screen" class="screen game-screen" aria-label="Game">
     <div class="stage">
       <div class="media-pane">
-        <video id="room-video" class="room-video" muted playsinline preload="auto" poster="images/suspension_room.jpg"></video>
-        <img id="room-fallback" class="room-fallback" src="images/suspension_room.jpg" alt="">
+        <video id="room-video" class="room-video" muted playsinline preload="auto" poster="images/cryo_room.jpg"></video>
+        <img id="room-fallback" class="room-fallback" src="images/cryo_room.jpg" alt="">
         <div class="scene-shade"></div>
 
         <div class="tag tag-room">
-          <span id="room-name">Suspension Room</span>
+          <span id="room-name">Cryo Room</span>
           <small id="turn-count">1 / ??</small>
         </div>
         <button id="details-mobile" class="tag tag-details mobile-only" type="button">Details</button>
@@ -97,7 +97,7 @@
 
   <section id="ending-screen" class="screen" aria-label="Ending">
     <video id="ending-video" class="ambient-video" muted playsinline preload="metadata" poster="images/hallway.jpg">
-      <source src="videos/hallway_to_room.mp4" type="video/mp4">
+      <source src="videos/hallway_to_cryo_room.mp4" type="video/mp4">
     </video>
     <div class="scene-shade"></div>
     <div class="title-copy ending-copy">
@@ -147,11 +147,15 @@
 </aside>
 
 <aside id="debug-panel" class="overlay" aria-hidden="true">
-  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="debug-title">
+  <div class="popup wide debug-popup" role="dialog" aria-modal="true" aria-labelledby="debug-title">
     <header class="popup-head">
       <h2 id="debug-title">Transition Debug</h2>
       <button class="close-button" type="button" data-close="debug-panel" aria-label="Close">×</button>
     </header>
+    <div class="debug-toolbar">
+      <span id="debug-helper-status">Local regen helper: checking</span>
+      <button id="debug-refresh" class="glass-button slim" type="button">Refresh</button>
+    </div>
     <div class="debug-grid">
       <section>
         <video id="debug-video" class="debug-video" muted playsinline controls preload="metadata" poster="images/hallway.jpg"></video>
@@ -161,6 +165,25 @@
         <div id="debug-list" class="debug-list"></div>
       </section>
     </div>
+  </div>
+</aside>
+
+<aside id="regen-panel" class="overlay stacked" aria-hidden="true">
+  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="regen-title">
+    <header class="popup-head">
+      <h2 id="regen-title">Redo Transition</h2>
+      <button class="close-button" type="button" data-close="regen-panel" aria-label="Close">×</button>
+    </header>
+    <p id="regen-file" class="debug-note"></p>
+    <label class="prompt-editor">
+      <span>Prompt text</span>
+      <textarea id="regen-prompt" rows="8"></textarea>
+    </label>
+    <div class="popup-actions regen-actions">
+      <button id="regen-delete" class="glass-button danger" type="button">Regen + Delete</button>
+      <button id="regen-move" class="glass-button primary" type="button">Regen + Move</button>
+    </div>
+    <p class="debug-note">Requires the local Awake regen helper. Move keeps the old clip under possible_other_transition, then writes the new clip to the original filename.</p>
   </div>
 </aside>
 
@@ -225,7 +248,7 @@
       <p>Each action spends a turn. The hunter arrives when the hidden turn limit is reached; the range changes by difficulty.</p>
       <p>Easy shows every goal. Medium and hard hide part of the list until you restore a console or find a map cache.</p>
       <p>Room buttons move through generated transition videos. The first frame is held as the current room still.</p>
-      <p>Version 0.1 tests one room type, one hallway, two transition clips, save progress, history, music, and the procedural run shell.</p>
+      <p>Version 0.1 tests named room feeds, a shared hallway, grouped transition review, save progress, history, music, and the procedural run shell.</p>
     </div>
   </div>
 </aside>

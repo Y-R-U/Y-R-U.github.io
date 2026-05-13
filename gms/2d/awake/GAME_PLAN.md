@@ -11,19 +11,31 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
    - Player name: hidden until discovered.
    - Hunter: genetically created monster, alien infiltrator, or reanimated crew.
    - Turn limit: randomized inside the difficulty range.
-3. Explore one generated room type and one hallway.
+3. Explore named room feeds connected through one shared hallway.
 4. Spend turns searching, restoring the map, and escaping before the hunter reaches the hallway.
 5. Save progress, inventory, goals, and story history locally.
 
 ## Version 0.1 Media Scope
 
-- `images/suspension_room.jpg`
+- `images/cryo_room.jpg`
 - `images/hallway.jpg`
-- `videos/room_to_hallway.mp4`
-- `videos/hallway_to_room.mp4`
+- `images/med_bay.jpg`
+- `images/hydroponic_biome.jpg`
+- `images/reactor_gallery.jpg`
+- `videos/cryo_room_to_hallway.mp4`
+- `videos/hallway_to_cryo_room.mp4`
+- `videos/med_bay_to_hallway.mp4`
+- `videos/hallway_to_med_bay.mp4`
+- `videos/hydroponic_biome_to_hallway.mp4`
+- `videos/hallway_to_hydroponic_biome.mp4`
+- `videos/reactor_gallery_to_hallway.mp4`
+- `videos/hallway_to_reactor_gallery.mp4`
+- `videos/cryo_room_event_collapse.mp4`
 - `music/theme1.mp3`
 
-The game treats each transition video as both motion and a still frame. A room view pauses on the first frame of the transition that starts from that room. The debug panel lets generated clips be reviewed, copied by file name, approved, replaced, or repurposed.
+The game treats each transition video as both motion and a still frame. A room view pauses on the first frame of the transition that starts from that room. The debug panel groups intended `room_transitions` separately from `possible_other_transition` clips so generated videos can be approved, replaced, deleted, or repurposed.
+
+For local testing, run `python3 regen_helper.py` from this folder. The debug panel then enables `Redo`, lets the prompt text be edited, and queues replacement renders through the local LTX service. `Regen + Delete` replaces the current file after the new render succeeds. `Regen + Move` moves the old file to a `possible_*.mp4` candidate before writing the replacement.
 
 ## Future Room Packs
 

@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Generate Wake Protocol v0.1 stills through the local MFLUX API."""
+"""Generate Awake room stills through the local MFLUX API."""
 
 import base64
 import json
 import os
+import sys
 import time
 import urllib.request
 
 API_URL = "http://localhost:7861/sdapi/v1/txt2img"
 MODEL = "flux2-klein-4b"
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_DIR = os.path.join(HERE, "images")
+OUT_DIR = os.path.join(HERE, "original_files")
 LOG_PATH = os.path.join(HERE, "gen_images.log")
 
 STYLE = (
@@ -21,7 +22,7 @@ STYLE = (
 
 IMAGES = [
     (
-        "suspension_room.png",
+        "cryo_room.png",
         768,
         1344,
         "inside a cracked cryogenic suspension room in a remote space habitat, open sleep pod in foreground, "
@@ -35,6 +36,29 @@ IMAGES = [
         "long central hallway inside an abandoned mars habitat and orbital station hybrid, curved metal walls, "
         "floor vents, emergency red rim lights, distant sealed transport door, reflective black floor, "
         "claustrophobic sci-fi horror corridor",
+    ),
+    (
+        "med_bay.png",
+        768,
+        1344,
+        "abandoned futuristic med bay inside a damaged orbital habitat, two empty diagnostic beds, suspended surgical arms, "
+        "soft white medical lamps mixed with warning amber light, sterile glass cabinets, one sealed exit door visible, "
+        "realistic unsettling hospital science fiction mood",
+    ),
+    (
+        "hydroponic_biome.png",
+        768,
+        1344,
+        "overgrown hydroponic biome chamber in a failing space station, vertical plant towers, wet reflective walkway, "
+        "mist drifting under ultraviolet grow lights, broken transparent dome panels showing dark space beyond, "
+        "one heavy airlock exit visible, beautiful eerie survival horror atmosphere",
+    ),
+    (
+        "reactor_gallery.png",
+        768,
+        1344,
+        "narrow reactor gallery in a mars habitat, massive humming power core behind ribbed glass, blue white plasma glow, "
+        "maintenance catwalks, warning stripes, drifting sparks, one reinforced exit door visible, cinematic realistic sci-fi dread",
     ),
 ]
 
@@ -68,8 +92,17 @@ def main():
     with open(LOG_PATH, "w", encoding="utf-8") as handle:
         handle.write("")
 
+    args = set(sys.argv[1:])
+    force = "--force" in args
+    wanted = args - {"--force"}
     for filename, width, height, prompt in IMAGES:
+        stem = os.path.splitext(filename)[0]
+        if wanted and filename not in wanted and stem not in wanted:
+            continue
         path = os.path.join(OUT_DIR, filename)
+        if os.path.exists(path) and not force:
+            log(f"skip {filename} already exists")
+            continue
         started = time.time()
         log(f"gen {filename} {width}x{height}")
         result = generate(prompt, width, height)

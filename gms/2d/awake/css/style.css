@@ -342,6 +342,7 @@ button.tag {
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .tag-action small {
@@ -415,6 +416,10 @@ button.tag {
   z-index: 11;
 }
 
+.modal-root {
+  z-index: 12;
+}
+
 .popup,
 .modal {
   width: min(100%, 460px);
@@ -429,6 +434,10 @@ button.tag {
 
 .popup.wide {
   width: min(100%, 820px);
+}
+
+.popup.debug-popup {
+  width: min(98vw, 1400px);
 }
 
 .popup-head {
@@ -618,6 +627,25 @@ button.tag {
   gap: 14px;
 }
 
+.debug-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(137, 238, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.debug-toolbar .glass-button {
+  width: auto;
+  min-width: 112px;
+}
+
 .debug-video {
   display: block;
   width: 100%;
@@ -636,12 +664,21 @@ button.tag {
 
 .debug-list {
   display: grid;
+  gap: 16px;
+}
+
+.debug-section {
+  display: grid;
   gap: 8px;
+}
+
+.debug-section h3 {
+  margin: 0;
 }
 
 .debug-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 8px;
   align-items: stretch;
 }
@@ -653,6 +690,7 @@ button.tag {
   justify-items: start;
   align-content: center;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .debug-pick small {
@@ -665,6 +703,32 @@ button.tag {
 
 .debug-copy {
   min-width: 66px;
+}
+
+.debug-redo {
+  min-width: 66px;
+}
+
+.prompt-editor {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.prompt-editor textarea {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  border: 1px solid rgba(137, 238, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(1, 6, 10, 0.64);
+  color: var(--ink);
+  padding: 12px;
+  line-height: 1.45;
+}
+
+.regen-actions {
+  margin-top: 12px;
 }
 
 .toast-root {
