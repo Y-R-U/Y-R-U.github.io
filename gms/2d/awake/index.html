@@ -154,12 +154,25 @@
     </header>
     <div class="debug-toolbar">
       <span id="debug-helper-status">Local regen helper: checking</span>
+      <div class="debug-filters" role="group" aria-label="Transition filters">
+        <button class="filter-chip active" type="button" data-debug-filter="room">ROOM</button>
+        <button class="filter-chip" type="button" data-debug-filter="possible">POSSIBLE</button>
+        <button class="filter-chip" type="button" data-debug-filter="other">OTHER</button>
+        <button class="filter-chip" type="button" data-debug-filter="all">ALL</button>
+      </div>
       <button id="debug-refresh" class="glass-button slim" type="button">Refresh</button>
     </div>
     <div class="debug-grid">
       <section>
         <video id="debug-video" class="debug-video" muted playsinline controls preload="metadata" poster="images/hallway.jpg"></video>
-        <p id="debug-note" class="debug-note">Choose a transition to preview it and copy the file name.</p>
+        <label class="debug-editor">
+          <span>Message</span>
+          <textarea id="debug-note" rows="3">Choose a transition to preview it and copy the file name.</textarea>
+        </label>
+        <div class="debug-prompt-view">
+          <span>Prompt</span>
+          <p id="debug-prompt">Select a transition to view its prompt.</p>
+        </div>
       </section>
       <section>
         <div id="debug-list" class="debug-list"></div>
@@ -169,21 +182,26 @@
 </aside>
 
 <aside id="regen-panel" class="overlay stacked" aria-hidden="true">
-  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="regen-title">
+  <div class="popup wide regen-popup" role="dialog" aria-modal="true" aria-labelledby="regen-title">
     <header class="popup-head">
       <h2 id="regen-title">Redo Transition</h2>
       <button class="close-button" type="button" data-close="regen-panel" aria-label="Close">×</button>
     </header>
     <p id="regen-file" class="debug-note"></p>
     <label class="prompt-editor">
-      <span>Prompt text</span>
+      <span>New video prompt text</span>
       <textarea id="regen-prompt" rows="8"></textarea>
+    </label>
+    <label class="prompt-editor">
+      <span>Moved video message</span>
+      <textarea id="regen-move-message" rows="5"></textarea>
     </label>
     <div class="popup-actions regen-actions">
       <button id="regen-delete" class="glass-button danger" type="button">Regen + Delete</button>
-      <button id="regen-move" class="glass-button primary" type="button">Regen + Move</button>
+      <button id="regen-move" class="glass-button" type="button">Regen + Possible</button>
+      <button id="regen-other" class="glass-button primary" type="button">Regen + Other</button>
     </div>
-    <p class="debug-note">Requires the local Awake regen helper. Move keeps the old clip under possible_other_transition, then writes the new clip to the original filename.</p>
+    <p class="debug-note">Requires the local Awake regen helper. The moved-video message is used only when the old clip is moved to Possible or Other.</p>
   </div>
 </aside>
 

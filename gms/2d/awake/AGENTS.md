@@ -21,7 +21,7 @@ Awake is a separate game from `gms/2d/codex_horror/`. Do not modify `codex_horro
   - difficulty-driven random turn limit
 - Playable room feeds: `cryo_room`, `med_bay`, `hydroponic_biome`, and `reactor_gallery`.
 - One shared `Central Hallway`.
-- Transition debug panel for previewing generated videos and copying short file names.
+- Transition debug panel for previewing generated videos, filtering ROOM/POSSIBLE/OTHER/ALL, editing local review messages, viewing prompts, and copying short file names.
 - Optional localhost-only regen helper: run `python3 regen_helper.py` from the Awake folder, then the debug panel can queue replacement transition renders.
 - Goal list, inventory, story history, local save, settings panel, help panel, and minimap behavior.
 - Desktop layout uses video left and details panel right; mobile layout overlays glass tags over the video.
@@ -61,7 +61,7 @@ LTX transition videos were generated locally through `http://localhost:7866/api/
 - `cryo_room_event_collapse.mp4`: former `room_to_hallway.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 215.5 s.
 - `hallway_to_cryo_room.mp4`: former `hallway_to_room.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 229.7 s.
 - `gen_transitions.py` queues batch transition generation.
-- `regen_helper.py` starts a local-only helper on `http://127.0.0.1:8788` so the debug panel can edit prompt text, queue one-at-a-time regenerations, and either delete or move the old clip into possible transition candidates.
+- `regen_helper.py` starts a local-only helper on `http://127.0.0.1:8788` so the debug panel can edit prompt text, queue one-at-a-time regenerations, and either delete the old clip or move it into Possible or Other review buckets.
 
 `cryo_room_event_collapse.mp4` is visually strong but not accurate as a hallway transition. Treat it as a candidate ending or room-event clip.
 

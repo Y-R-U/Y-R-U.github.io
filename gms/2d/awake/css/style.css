@@ -440,6 +440,11 @@ button.tag {
   width: min(98vw, 1400px);
 }
 
+.popup.regen-popup {
+  width: min(98vw, 1180px);
+  max-height: 94dvh;
+}
+
 .popup-head {
   display: flex;
   align-items: center;
@@ -641,6 +646,35 @@ button.tag {
   font-size: 0.84rem;
 }
 
+.debug-toolbar > span {
+  min-width: min(100%, 230px);
+}
+
+.debug-filters {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  min-height: 34px;
+  border: 1px solid rgba(137, 238, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.filter-chip.active {
+  border-color: rgba(169, 255, 203, 0.54);
+  background: rgba(169, 255, 203, 0.14);
+  color: #e7fff0;
+}
+
 .debug-toolbar .glass-button {
   width: auto;
   min-width: 112px;
@@ -656,10 +690,52 @@ button.tag {
   object-fit: contain;
 }
 
-.debug-note {
+.debug-note,
+.debug-prompt-view {
   margin: 10px 0 0;
   color: var(--muted);
   line-height: 1.42;
+}
+
+.debug-editor,
+.debug-prompt-view {
+  display: grid;
+  gap: 6px;
+}
+
+.debug-editor span,
+.debug-prompt-view span,
+.prompt-editor span {
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.debug-editor textarea,
+.prompt-editor textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid rgba(137, 238, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(1, 6, 10, 0.64);
+  color: var(--ink);
+  padding: 12px;
+  line-height: 1.45;
+}
+
+.debug-editor textarea {
+  min-height: 88px;
+}
+
+.debug-prompt-view p {
+  margin: 0;
+  border: 1px solid rgba(137, 238, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 10px;
+  color: var(--dim);
 }
 
 .debug-list {
@@ -716,18 +792,11 @@ button.tag {
 }
 
 .prompt-editor textarea {
-  width: 100%;
   min-height: 170px;
-  resize: vertical;
-  border: 1px solid rgba(137, 238, 255, 0.24);
-  border-radius: 8px;
-  background: rgba(1, 6, 10, 0.64);
-  color: var(--ink);
-  padding: 12px;
-  line-height: 1.45;
 }
 
 .regen-actions {
+  grid-template-columns: repeat(3, 1fr);
   margin-top: 12px;
 }
 
@@ -836,6 +905,11 @@ button.tag {
 }
 
 @media (max-width: 420px) {
+  .debug-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .tag-stack {
     width: 40vw;
   }

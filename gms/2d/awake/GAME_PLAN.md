@@ -33,9 +33,9 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
 - `videos/cryo_room_event_collapse.mp4`
 - `music/theme1.mp3`
 
-The game treats each transition video as both motion and a still frame. A room view pauses on the first frame of the transition that starts from that room. The debug panel groups intended `room_transitions` separately from `possible_other_transition` clips so generated videos can be approved, replaced, deleted, or repurposed.
+The game treats each transition video as both motion and a still frame. A room view pauses on the first frame of the transition that starts from that room. The debug panel groups intended `room_transitions` separately from Possible and Other clips so generated videos can be approved, replaced, deleted, or repurposed.
 
-For local testing, run `python3 regen_helper.py` from this folder. The debug panel then enables `Redo`, lets the prompt text be edited, and queues replacement renders through the local LTX service. `Regen + Delete` replaces the current file after the new render succeeds. `Regen + Move` moves the old file to a `possible_*.mp4` candidate before writing the replacement.
+For local testing, run `python3 regen_helper.py` from this folder. The debug panel then enables `Redo`, lets the prompt text be edited, and queues replacement renders through the local LTX service. `Regen + Delete` replaces the current file after the new render succeeds. `Regen + Possible` moves the old file to a `possible_*.mp4` candidate before writing the replacement. `Regen + Other` moves the old file to an `other_*.mp4` candidate for clips that look good but do not currently fit the game.
 
 ## Future Room Packs
 

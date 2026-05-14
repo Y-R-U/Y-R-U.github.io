@@ -3,3 +3,4 @@ gen_images.log
 gen_transitions.log
 .DS_Store
 __pycache__/
+.debug_transition_metadata.json

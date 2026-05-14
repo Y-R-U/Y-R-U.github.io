@@ -22,6 +22,7 @@ HOST = "127.0.0.1"
 PORT = 8788
 HERE = os.path.dirname(os.path.abspath(__file__))
 VIDEO_DIR = os.path.join(HERE, "videos")
+METADATA_PATH = os.path.join(HERE, ".debug_transition_metadata.json")
 
 COMMON = (
     "realistic cinematic sci-fi horror game transition, vertical mobile portrait shot, "
@@ -43,6 +44,7 @@ TRANSITIONS = {
         "end": "images/hallway.jpg",
         "seed": 84,
         "promptText": "camera leaves a cracked cryogenic room, passes through the only exit door, and ends in the central hallway",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "hallway_to_cryo_room.mp4": {
         "id": "hallway_to_cryo_room",
@@ -51,6 +53,7 @@ TRANSITIONS = {
         "end": "images/cryo_room.jpg",
         "seed": 86,
         "promptText": "camera moves from the central hallway through a sealed cryogenic door and ends inside the cracked cryo_room",
+        "status": "Approved candidate for hallway-to-room transition.",
     },
     "med_bay_to_hallway.mp4": {
         "id": "med_bay_to_hallway",
@@ -59,6 +62,7 @@ TRANSITIONS = {
         "end": "images/hallway.jpg",
         "seed": 91,
         "promptText": "camera leaves an abandoned futuristic med bay, passes through the only exit door, and ends in the central hallway",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "hallway_to_med_bay.mp4": {
         "id": "hallway_to_med_bay",
@@ -67,6 +71,7 @@ TRANSITIONS = {
         "end": "images/med_bay.jpg",
         "seed": 92,
         "promptText": "camera moves from the central hallway through a sealed medical door and ends inside the abandoned med bay",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "hydroponic_biome_to_hallway.mp4": {
         "id": "hydroponic_biome_to_hallway",
@@ -75,6 +80,7 @@ TRANSITIONS = {
         "end": "images/hallway.jpg",
         "seed": 101,
         "promptText": "camera leaves an overgrown hydroponic biome chamber, passes through the airlock door, and ends in the central hallway",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "hallway_to_hydroponic_biome.mp4": {
         "id": "hallway_to_hydroponic_biome",
@@ -83,6 +89,7 @@ TRANSITIONS = {
         "end": "images/hydroponic_biome.jpg",
         "seed": 102,
         "promptText": "camera moves from the central hallway through a fogged airlock and ends inside the overgrown hydroponic biome",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "reactor_gallery_to_hallway.mp4": {
         "id": "reactor_gallery_to_hallway",
@@ -91,6 +98,7 @@ TRANSITIONS = {
         "end": "images/hallway.jpg",
         "seed": 111,
         "promptText": "camera leaves a narrow reactor gallery, passes through the reinforced exit door, and ends in the central hallway",
+        "status": "New 3.04s intended transition. Needs review.",
     },
     "hallway_to_reactor_gallery.mp4": {
         "id": "hallway_to_reactor_gallery",
@@ -99,6 +107,7 @@ TRANSITIONS = {
         "end": "images/reactor_gallery.jpg",
         "seed": 112,
         "promptText": "camera moves from the central hallway through a reinforced service door and ends inside the glowing reactor gallery",
+        "status": "New 3.04s intended transition. Needs review.",
     },
 }
 
@@ -106,6 +115,20 @@ TASKS = queue.Queue()
 JOBS = []
 RUNNING = None
 LOCK = threading.Lock()
+
+
+def load_metadata():
+    try:
+        with open(METADATA_PATH, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) else {}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def save_metadata(data):
+    with open(METADATA_PATH, "w", encoding="utf-8") as handle:
+        json.dump(data, handle, indent=2, sort_keys=True)
 
 
 def post_json(path, payload):
@@ -132,16 +155,17 @@ def download(path, target):
 
 def queue_snapshot():
     with LOCK:
-      return {
-          "running": RUNNING,
-          "jobs": JOBS[-20:],
-          "queue_depth": TASKS.qsize(),
-          "transitions": list_transitions(),
-      }
+        return {
+            "running": RUNNING,
+            "jobs": JOBS[-20:],
+            "queue_depth": TASKS.qsize(),
+            "transitions": list_transitions(),
+        }
 
 
 def list_transitions():
     rows = []
+    metadata = load_metadata()
     for file_name, transition in TRANSITIONS.items():
         rows.append({
             "id": transition["id"],
@@ -153,7 +177,7 @@ def list_transitions():
             "startImage": transition["start"],
             "endImage": transition["end"],
             "promptText": transition["promptText"],
-            "status": "Local helper managed transition.",
+            "status": transition.get("status", "Local helper managed transition."),
             "canRedo": True,
             "exists": os.path.exists(os.path.join(VIDEO_DIR, file_name)),
         })
@@ -169,16 +193,25 @@ def list_transitions():
         "exists": os.path.exists(os.path.join(VIDEO_DIR, "cryo_room_event_collapse.mp4")),
     })
     for file_name in sorted(os.listdir(VIDEO_DIR)):
-        if not file_name.startswith("possible_") or not file_name.endswith(".mp4"):
+        if not file_name.endswith(".mp4"):
             continue
+        if file_name.startswith("possible_"):
+            default_group = "possible_other_transition"
+            default_status = "Moved to possible by local regen helper."
+        elif file_name.startswith("other_"):
+            default_group = "other_transition"
+            default_status = "Moved to other by local regen helper."
+        else:
+            continue
+        meta = metadata.get(file_name, {})
         rows.append({
             "id": file_name.replace(".mp4", ""),
-            "group": "possible_other_transition",
+            "group": meta.get("group", default_group),
             "label": file_name.replace(".mp4", ""),
             "file": file_name,
             "src": f"videos/{file_name}",
-            "poster": "images/hallway.jpg",
-            "status": "Moved by local regen helper.",
+            "poster": meta.get("poster", "images/hallway.jpg"),
+            "status": meta.get("status", default_status),
             "canRedo": False,
             "exists": True,
         })
@@ -222,6 +255,7 @@ def process_one(local_job):
     file_name = local_job["file"]
     mode = local_job["mode"]
     prompt_text = local_job["promptText"].strip()
+    moved_status = local_job.get("movedStatus", "").strip()
     transition = TRANSITIONS[file_name]
     target = os.path.join(VIDEO_DIR, file_name)
     temp = os.path.join(VIDEO_DIR, f".regen_{file_name}")
@@ -234,12 +268,20 @@ def process_one(local_job):
     local_job["status"] = "downloading"
     download(f"/api/jobs/{ltx_id}/file", temp)
 
-    if mode == "move" and os.path.exists(target):
+    if mode in {"move", "other"} and os.path.exists(target):
         stamp = time.strftime("%Y%m%d_%H%M%S")
-        moved_name = f"possible_{os.path.splitext(file_name)[0]}_{stamp}.mp4"
+        prefix = "other" if mode == "other" else "possible"
+        moved_name = f"{prefix}_{os.path.splitext(file_name)[0]}_{stamp}.mp4"
         moved = os.path.join(VIDEO_DIR, moved_name)
         shutil.move(target, moved)
         local_job["moved_to"] = moved_name
+        metadata = load_metadata()
+        metadata[moved_name] = {
+            "group": "other_transition" if mode == "other" else "possible_other_transition",
+            "poster": transition["start"],
+            "status": moved_status or ("Moved to other for later review." if mode == "other" else "Moved to possible for later review."),
+        }
+        save_metadata(metadata)
     elif mode == "delete" and os.path.exists(target):
         os.remove(target)
     shutil.move(temp, target)
@@ -309,8 +351,8 @@ class Handler(BaseHTTPRequestHandler):
         if file_name not in TRANSITIONS:
             self.send_json({"ok": False, "error": "unknown transition"}, 400)
             return
-        if mode not in {"delete", "move"}:
-            self.send_json({"ok": False, "error": "mode must be delete or move"}, 400)
+        if mode not in {"delete", "move", "other"}:
+            self.send_json({"ok": False, "error": "mode must be delete, move, or other"}, 400)
             return
         if not prompt_text.strip():
             self.send_json({"ok": False, "error": "promptText is required"}, 400)
@@ -320,6 +362,7 @@ class Handler(BaseHTTPRequestHandler):
             "file": file_name,
             "mode": mode,
             "promptText": prompt_text,
+            "movedStatus": data.get("movedStatus", ""),
             "status": "queued",
             "created_at": time.time(),
         }

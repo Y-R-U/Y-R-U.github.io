@@ -5,6 +5,7 @@
   const UI = window.CodexHorrorUI;
 
   const $ = id => document.getElementById(id);
+  const DEBUG_META_KEY = "awake.debugMeta.v1";
   let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
@@ -16,7 +17,10 @@
   let helperOnline = false;
   let debugTransitions = [];
   let selectedTransition = null;
+  let previewedTransition = null;
   let helperPoll = 0;
+  let debugFilter = "room";
+  let debugMeta = loadDebugMeta();
   const cachedMedia = new Set();
   const helperUrl = "http://127.0.0.1:8788/api";
 
@@ -54,12 +58,15 @@
     debugVideo: $("debug-video"),
     debugList: $("debug-list"),
     debugNote: $("debug-note"),
+    debugPrompt: $("debug-prompt"),
     debugHelperStatus: $("debug-helper-status"),
     debugRefresh: $("debug-refresh"),
     regenFile: $("regen-file"),
     regenPrompt: $("regen-prompt"),
+    regenMoveMessage: $("regen-move-message"),
     regenDelete: $("regen-delete"),
     regenMove: $("regen-move"),
+    regenOther: $("regen-other"),
     settingsButton: $("settings-button"),
     musicToggle: $("music-toggle"),
     soundToggle: $("sound-toggle"),
@@ -100,6 +107,23 @@
     return nextState;
   }
 
+  function loadDebugMeta() {
+    try {
+      const raw = localStorage.getItem(DEBUG_META_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function saveDebugMeta() {
+    try {
+      localStorage.setItem(DEBUG_META_KEY, JSON.stringify(debugMeta));
+    } catch (err) {
+      console.warn("Debug metadata save failed", err);
+    }
+  }
+
   function wireEvents() {
     els.introNewGame.addEventListener("click", () => {
       Audio.prime();
@@ -127,8 +151,16 @@
       UI.openPanel("debug-panel");
     });
     els.debugRefresh.addEventListener("click", refreshHelperStatus);
+    document.querySelectorAll("[data-debug-filter]").forEach(button => {
+      button.addEventListener("click", () => {
+        debugFilter = button.dataset.debugFilter || "room";
+        renderDebugList();
+      });
+    });
+    els.debugNote.addEventListener("input", () => savePreviewMessage());
     els.regenDelete.addEventListener("click", () => submitRegen("delete"));
     els.regenMove.addEventListener("click", () => submitRegen("move"));
+    els.regenOther.addEventListener("click", () => submitRegen("other"));
     els.settingsButton.addEventListener("click", () => {
       Audio.prime();
       UI.openPanel("settings-panel");
@@ -597,12 +629,10 @@
   }
 
   function renderDebugList() {
-    const transitions = debugTransitions.length ? debugTransitions : (Story.transitions || []);
+    const transitions = getDebugTransitions();
     els.debugList.innerHTML = "";
-    const groups = [
-      ["room_transitions", "Room transitions"],
-      ["possible_other_transition", "Possible other transition videos"],
-    ];
+    updateFilterButtons();
+    const groups = getVisibleDebugGroups();
     groups.forEach(([groupId, label]) => {
       const items = transitions.filter(transition => transition.group === groupId);
       if (!items.length) return;
@@ -635,11 +665,63 @@
       });
       els.debugList.append(section);
     });
-    if (transitions[0]) {
-      const first = transitions[0];
-      els.debugVideo.poster = first.poster;
-      els.debugNote.textContent = first.status || first.label;
+    if (!els.debugList.children.length) {
+      const empty = document.createElement("p");
+      empty.className = "debug-note";
+      empty.textContent = "No transitions in this filter.";
+      els.debugList.append(empty);
     }
+    const visible = groups.flatMap(([groupId]) => transitions.filter(transition => transition.group === groupId));
+    if (visible[0] && (!previewedTransition || !visible.some(transition => transition.file === previewedTransition.file))) {
+      const first = visible[0];
+      els.debugVideo.poster = first.poster;
+      renderPreviewText(first);
+    }
+  }
+
+  function getDebugTransitions() {
+    const base = debugTransitions.length ? debugTransitions : (Story.transitions || []);
+    return base.map(transition => {
+      const meta = debugMeta[transition.file] || {};
+      return Object.assign({}, transition, {
+        status: meta.status || transition.status,
+      });
+    });
+  }
+
+  function getVisibleDebugGroups() {
+    const groups = [
+      ["room_transitions", "Room transitions"],
+      ["possible_other_transition", "Possible transition videos"],
+      ["other_transition", "Other videos"],
+    ];
+    if (debugFilter === "all") return groups;
+    const map = {
+      room: "room_transitions",
+      possible: "possible_other_transition",
+      other: "other_transition",
+    };
+    return groups.filter(([groupId]) => groupId === map[debugFilter]);
+  }
+
+  function updateFilterButtons() {
+    document.querySelectorAll("[data-debug-filter]").forEach(button => {
+      button.classList.toggle("active", button.dataset.debugFilter === debugFilter);
+    });
+  }
+
+  function renderPreviewText(transition) {
+    previewedTransition = transition;
+    els.debugNote.value = transition.status || "";
+    els.debugPrompt.textContent = transition.promptText || "No prompt metadata for this clip.";
+  }
+
+  function savePreviewMessage() {
+    if (!previewedTransition) return;
+    debugMeta[previewedTransition.file] = Object.assign({}, debugMeta[previewedTransition.file], {
+      status: els.debugNote.value,
+    });
+    saveDebugMeta();
   }
 
   async function refreshHelperStatus() {
@@ -697,6 +779,7 @@
     selectedTransition = transition;
     els.regenFile.textContent = transition.file;
     els.regenPrompt.value = transition.promptText || "";
+    els.regenMoveMessage.value = transition.status || "";
     UI.openPanel("regen-panel");
   }
 
@@ -707,7 +790,7 @@
       UI.toast("Prompt text is required");
       return;
     }
-    const label = mode === "move" ? "Regen + Move" : "Regen + Delete";
+    const label = mode === "delete" ? "Regen + Delete" : mode === "other" ? "Regen + Other" : "Regen + Possible";
     const ok = await UI.confirm({
       title: `${label}?`,
       body: `Queue a local regeneration for ${selectedTransition.file}.`,
@@ -722,6 +805,7 @@
         body: JSON.stringify({
           file: selectedTransition.file,
           promptText,
+          movedStatus: els.regenMoveMessage.value.trim(),
           mode,
         }),
       });
@@ -734,6 +818,7 @@
   }
 
   function previewTransition(transition, shouldCopy) {
+    transition = getDebugTransitions().find(item => item.file === transition.file) || transition;
     els.debugVideo.poster = transition.poster;
     if (els.debugVideo.dataset.src !== transition.src) {
       els.debugVideo.dataset.src = transition.src;
@@ -741,7 +826,7 @@
     }
     els.debugVideo.currentTime = 0;
     els.debugVideo.play().catch(() => {});
-    els.debugNote.textContent = transition.status || transition.label;
+    renderPreviewText(transition);
     if (shouldCopy) copyTransitionName(transition.file);
   }
 
