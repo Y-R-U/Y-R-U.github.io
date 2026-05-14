@@ -6,6 +6,7 @@
 
   const $ = id => document.getElementById(id);
   const DEBUG_META_KEY = "awake.debugMeta.v1";
+  const STATIC_MEDIA_VERSION = "20260515-runtime-media-1";
   let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
@@ -287,7 +288,7 @@
     if (Story.introPlaylist && Story.introPlaylist.length) {
       const first = Story.introPlaylist[0];
       els.introVideo.poster = first.poster;
-      els.introVideo.src = first.src;
+      els.introVideo.src = mediaSrc(first.src);
       els.introVideo.load();
       els.introVideo.addEventListener("loadeddata", () => {
         els.introVideo.currentTime = 0;
@@ -311,7 +312,7 @@
         const image = new Image();
         image.onload = done;
         image.onerror = fail;
-        image.src = entry.src;
+        image.src = mediaSrc(entry.src);
         return;
       }
       const video = document.createElement("video");
@@ -320,7 +321,7 @@
       video.preload = "auto";
       video.addEventListener("loadeddata", done, { once: true });
       video.addEventListener("error", fail, { once: true });
-      video.src = entry.src;
+      video.src = mediaSrc(entry.src);
       video.load();
     });
   }
@@ -375,9 +376,10 @@
     const clip = playlist[introIndex % playlist.length];
     introIndex += 1;
     els.introVideo.poster = clip.poster;
-    if (els.introVideo.dataset.src !== clip.src) {
-      els.introVideo.dataset.src = clip.src;
-      els.introVideo.src = clip.src;
+    const clipSrc = mediaSrc(clip.src);
+    if (els.introVideo.dataset.src !== clipSrc) {
+      els.introVideo.dataset.src = clipSrc;
+      els.introVideo.src = clipSrc;
     }
     els.introVideo.currentTime = 0;
     els.introVideo.pause();
@@ -465,9 +467,10 @@
     transitionLocked = false;
     els.roomFallback.src = room.poster;
     els.roomFallback.classList.add("visible");
-    if (els.roomVideo.dataset.src !== room.idleVideo) {
-      els.roomVideo.dataset.src = room.idleVideo;
-      els.roomVideo.src = room.idleVideo;
+    const idleSrc = mediaSrc(room.idleVideo);
+    if (els.roomVideo.dataset.src !== idleSrc) {
+      els.roomVideo.dataset.src = idleSrc;
+      els.roomVideo.src = idleSrc;
     }
     els.roomVideo.poster = room.poster;
     els.roomVideo.pause();
@@ -590,6 +593,7 @@
       const from = Story.rooms[state.currentRoom];
       const to = Story.rooms[targetRoom];
       const videoSrc = targetRoom === "hallway" ? from.toHallway : to.fromHallway;
+      const playbackSrc = mediaSrc(videoSrc);
       const transitionMeta = findTransitionMeta(videoSrc);
       const rawTrim = runtimeTrimFromMeta(transitionMeta);
       transitionLocked = true;
@@ -598,8 +602,8 @@
       els.roomFallback.src = from.poster;
       els.roomFallback.classList.remove("visible");
       els.roomVideo.poster = from.poster;
-      els.roomVideo.dataset.src = videoSrc;
-      els.roomVideo.src = videoSrc;
+      els.roomVideo.dataset.src = playbackSrc;
+      els.roomVideo.src = playbackSrc;
       els.roomVideo.load();
       const done = () => {
         if (token !== transitionSequence) return;
@@ -645,6 +649,26 @@
   function findTransitionMeta(src) {
     const list = Story.transitions || [];
     return list.find(transition => src === transition.src || src.endsWith(transition.src) || src.endsWith(transition.file));
+  }
+
+  function mediaSrc(src) {
+    if (!src || /^(?:https?:)?\/\//.test(src) || src.startsWith("data:")) return src;
+    if (src.startsWith("videos/")) {
+      const helperSrc = helperVideoSrc(src);
+      if (helperSrc) return helperSrc;
+    }
+    return appendMediaVersion(src);
+  }
+
+  function helperVideoSrc(src) {
+    const file = src.split("/").pop().split("?")[0];
+    const transition = debugTransitions.find(item => item.file === file && item.src);
+    return transition ? transition.src : "";
+  }
+
+  function appendMediaVersion(src) {
+    const separator = src.includes("?") ? "&" : "?";
+    return `${src}${separator}v=${STATIC_MEDIA_VERSION}`;
   }
 
   function runtimeTrimFromMeta(transition) {
