@@ -14,9 +14,13 @@
   let introTimer = 0;
   let introIndex = 0;
   let introCycle = 0;
+  let roomMediaToken = 0;
+  let transitionSequence = 0;
+  let transitionTimer = 0;
   let helperOnline = false;
   let debugTransitions = [];
   let selectedTransition = null;
+  let selectedReverseTransition = null;
   let previewedTransition = null;
   let helperPoll = 0;
   let debugFilter = "room";
@@ -59,6 +63,8 @@
     debugList: $("debug-list"),
     debugNote: $("debug-note"),
     debugPrompt: $("debug-prompt"),
+    debugTrimStart: $("debug-trim-start"),
+    debugTrimEnd: $("debug-trim-end"),
     debugHelperStatus: $("debug-helper-status"),
     debugRefresh: $("debug-refresh"),
     regenFile: $("regen-file"),
@@ -67,10 +73,19 @@
     regenDelete: $("regen-delete"),
     regenMove: $("regen-move"),
     regenOther: $("regen-other"),
+    reverseSummary: $("reverse-summary"),
+    reverseMoveMessage: $("reverse-move-message"),
+    reverseDelete: $("reverse-delete"),
+    reverseMove: $("reverse-move"),
+    reverseOther: $("reverse-other"),
     settingsButton: $("settings-button"),
     musicToggle: $("music-toggle"),
     soundToggle: $("sound-toggle"),
     volume: $("volume"),
+    runKey: $("run-key"),
+    copyRunKey: $("copy-run-key"),
+    seedRunKey: $("seed-run-key"),
+    startKeyRun: $("start-key-run"),
     resetRun: $("reset-run"),
     helpButton: $("help-button"),
     goalsList: $("goals-list"),
@@ -104,6 +119,13 @@
   function normalizeState(nextState) {
     if (!nextState) return null;
     if (nextState.currentRoom === "suspension") nextState.currentRoom = "cryo_room";
+    nextState.visitedRooms = Array.isArray(nextState.visitedRooms) ? nextState.visitedRooms : [nextState.currentRoom || "cryo_room"];
+    nextState.hiddenRooms = Array.isArray(nextState.hiddenRooms) ? nextState.hiddenRooms : [];
+    nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
+    nextState.flags = nextState.flags || {};
+    nextState.inventory = Array.isArray(nextState.inventory) ? nextState.inventory : [];
+    nextState.history = Array.isArray(nextState.history) ? nextState.history : [];
+    nextState.runKey = nextState.runKey || "legacy-run";
     return nextState;
   }
 
@@ -158,11 +180,20 @@
       });
     });
     els.debugNote.addEventListener("input", () => savePreviewMessage());
+    els.debugTrimStart.addEventListener("change", () => savePreviewTrim(true));
+    els.debugTrimEnd.addEventListener("change", () => savePreviewTrim(true));
+    els.debugVideo.addEventListener("loadedmetadata", () => seekDebugPreview(false));
+    els.debugVideo.addEventListener("play", () => clampDebugPreviewToWindow());
+    els.debugVideo.addEventListener("timeupdate", () => clampDebugPreviewToWindow());
     els.regenDelete.addEventListener("click", () => submitRegen("delete"));
     els.regenMove.addEventListener("click", () => submitRegen("move"));
     els.regenOther.addEventListener("click", () => submitRegen("other"));
+    els.reverseDelete.addEventListener("click", () => submitReverse("delete"));
+    els.reverseMove.addEventListener("click", () => submitReverse("move"));
+    els.reverseOther.addEventListener("click", () => submitReverse("other"));
     els.settingsButton.addEventListener("click", () => {
       Audio.prime();
+      syncRunKeyUi();
       UI.openPanel("settings-panel");
     });
     els.helpButton.addEventListener("click", () => UI.openPanel("help-panel"));
@@ -173,6 +204,11 @@
       Save.saveSettings(settings);
       Audio.apply(settings);
     });
+    els.copyRunKey.addEventListener("click", () => {
+      if (!state || !state.runKey) return UI.toast("No active run key");
+      copyText(state.runKey, "Copied run key");
+    });
+    els.startKeyRun.addEventListener("click", startRunFromKey);
     els.resetRun.addEventListener("click", async () => {
       const ok = await UI.confirm({
         title: "Reset this run?",
@@ -184,6 +220,7 @@
       if (!ok) return;
       Save.clearState();
       state = null;
+      cancelActiveTransition();
       UI.closePanel("settings-panel");
       showIntro(true);
     });
@@ -209,6 +246,7 @@
   }
 
   function showIntro(force = false) {
+    cancelActiveTransition();
     UI.showScreen("intro-screen");
     els.introName.textContent = randomTitle();
     els.introContinue.hidden = !Save.hasActiveRun();
@@ -368,8 +406,32 @@
       if (!ok) return;
     }
     state = Story.createRun(difficulty);
-    addHistory("You woke inside the cryo_room with no clear memory.");
+    const startRoom = Story.rooms[state.currentRoom];
+    addHistory(`You woke inside the ${startRoom.name} with no clear memory.`);
     Save.saveState(state);
+    renderGame();
+  }
+
+  async function startRunFromKey() {
+    const key = els.seedRunKey.value.trim();
+    if (!key) {
+      UI.toast("Enter a run key first");
+      return;
+    }
+    if (Save.hasActiveRun()) {
+      const ok = await UI.confirm({
+        title: "Start this run key?",
+        body: "This replaces the active save, but archived endings remain.",
+        confirmLabel: "Start Key",
+        cancelLabel: "Cancel",
+      });
+      if (!ok) return;
+    }
+    state = Story.createRun("medium", key);
+    const startRoom = Story.rooms[state.currentRoom];
+    addHistory(`Run key ${state.runKey} woke you inside the ${startRoom.name}.`);
+    Save.saveState(state);
+    UI.closePanel("settings-panel");
     renderGame();
   }
 
@@ -383,19 +445,24 @@
   function renderGame(message) {
     stopIntroSlideshow();
     UI.showScreen("game-screen");
+    rememberRoomVisit(state.currentRoom);
     const room = Story.rooms[state.currentRoom];
     setRoomMedia(room);
-    els.roomName.textContent = room.name;
+    els.roomName.textContent = roomDisplayName(room.id);
     els.turnCount.textContent = `${state.turn} / ${state.turnRange[0]}-${state.turnRange[1]}`;
     els.facilityName.textContent = state.facility;
     els.threatLabel.textContent = `${state.threat.label}: ${distanceLabel()}`;
     els.storyText.textContent = message || currentStoryText(room);
     renderActions();
     renderDetails();
+    syncRunKeyUi();
     Save.saveState(state);
   }
 
   function setRoomMedia(room) {
+    const token = ++roomMediaToken;
+    clearTimeout(transitionTimer);
+    transitionLocked = false;
     els.roomFallback.src = room.poster;
     els.roomFallback.classList.add("visible");
     if (els.roomVideo.dataset.src !== room.idleVideo) {
@@ -403,13 +470,39 @@
       els.roomVideo.src = room.idleVideo;
     }
     els.roomVideo.poster = room.poster;
-    els.roomVideo.currentTime = 0;
     els.roomVideo.pause();
-    els.roomVideo.addEventListener("loadeddata", () => {
-      els.roomFallback.classList.remove("visible");
+    try {
       els.roomVideo.currentTime = 0;
+    } catch (err) {
+      // Some browsers reject seeking before metadata; the load handler below will settle it.
+    }
+    els.roomVideo.addEventListener("loadeddata", () => {
+      if (token !== roomMediaToken) return;
+      els.roomFallback.classList.remove("visible");
+      try {
+        els.roomVideo.currentTime = 0;
+      } catch (err) {}
       els.roomVideo.pause();
     }, { once: true });
+  }
+
+  function rememberRoomVisit(roomId) {
+    if (!state || !roomId) return;
+    state.visitedRooms = Array.isArray(state.visitedRooms) ? state.visitedRooms : [];
+    if (!state.visitedRooms.includes(roomId)) state.visitedRooms.push(roomId);
+  }
+
+  function isRoomNameKnown(roomId) {
+    if (!state || roomId === "hallway") return true;
+    const hiddenRooms = Array.isArray(state.hiddenRooms) ? state.hiddenRooms : [];
+    const visitedRooms = Array.isArray(state.visitedRooms) ? state.visitedRooms : [];
+    return !hiddenRooms.includes(roomId) || visitedRooms.includes(roomId) || state.currentRoom === roomId;
+  }
+
+  function roomDisplayName(roomId) {
+    const room = Story.rooms[roomId];
+    if (!room) return "Unknown";
+    return isRoomNameKnown(roomId) ? room.name : "Unknown Sector";
   }
 
   function currentStoryText(room) {
@@ -431,10 +524,21 @@
       const button = document.createElement("button");
       button.className = "tag tag-action";
       button.type = "button";
-      button.innerHTML = `${UI.escapeHtml(action.label)}<small>${UI.escapeHtml(action.hint || "")}</small>`;
+      const label = actionDisplayLabel(action);
+      button.innerHTML = `${UI.escapeHtml(label.text)}<small>${UI.escapeHtml(label.hint)}</small>`;
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+  }
+
+  function actionDisplayLabel(action) {
+    if (!action.target || action.target === "hallway") {
+      return { text: action.label, hint: action.hint || "" };
+    }
+    if (!isRoomNameKnown(action.target)) {
+      return { text: "Enter Unknown Sector", hint: "unscanned" };
+    }
+    return { text: action.label, hint: action.hint || "" };
   }
 
   async function doAction(action) {
@@ -476,36 +580,96 @@
     Audio.tick();
   }
 
-  function updateGoalsFromFlags() {
-    state.mapUnlocked = !!state.flags.map;
-    if (state.flags.identity) state.flags.goal_identity = true;
-    if (state.flags.map) state.flags.goal_map = true;
-  }
-
   function isCaught() {
     return state.turn + state.threatPressure >= state.turnLimit;
   }
 
   function transitionTo(targetRoom) {
     return new Promise(resolve => {
+      const token = ++transitionSequence;
       const from = Story.rooms[state.currentRoom];
       const to = Story.rooms[targetRoom];
       const videoSrc = targetRoom === "hallway" ? from.toHallway : to.fromHallway;
+      const transitionMeta = findTransitionMeta(videoSrc);
+      const rawTrim = runtimeTrimFromMeta(transitionMeta);
       transitionLocked = true;
+      roomMediaToken += 1;
+      clearTimeout(transitionTimer);
+      els.roomFallback.src = from.poster;
+      els.roomFallback.classList.remove("visible");
+      els.roomVideo.poster = from.poster;
+      els.roomVideo.dataset.src = videoSrc;
       els.roomVideo.src = videoSrc;
-      els.roomVideo.currentTime = 0;
-      els.roomVideo.play().catch(() => {});
+      els.roomVideo.load();
       const done = () => {
+        if (token !== transitionSequence) return;
+        clearTimeout(transitionTimer);
+        els.roomVideo.removeEventListener("loadedmetadata", start);
+        els.roomVideo.removeEventListener("timeupdate", clamp);
         els.roomVideo.removeEventListener("ended", done);
+        els.roomVideo.removeEventListener("error", done);
         state.currentRoom = targetRoom;
         transitionLocked = false;
         resolve();
       };
+      const start = () => {
+        if (token !== transitionSequence) return;
+        const trim = resolveRuntimeTrim(rawTrim, els.roomVideo.duration);
+        try {
+          els.roomVideo.currentTime = trim.start;
+        } catch (err) {}
+        els.roomVideo.play().catch(() => {});
+        const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
+        transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
+      };
+      const clamp = () => {
+        if (token !== transitionSequence) return;
+        const trim = resolveRuntimeTrim(rawTrim, els.roomVideo.duration);
+        if (Number.isFinite(trim.end) && els.roomVideo.currentTime >= trim.end) done();
+      };
+      els.roomVideo.addEventListener("loadedmetadata", start, { once: true });
+      els.roomVideo.addEventListener("timeupdate", clamp);
       els.roomVideo.addEventListener("ended", done, { once: true });
-      setTimeout(() => {
-        if (transitionLocked) done();
-      }, 8000);
+      els.roomVideo.addEventListener("error", done, { once: true });
+      transitionTimer = setTimeout(done, 4200);
     });
+  }
+
+  function cancelActiveTransition() {
+    transitionLocked = false;
+    transitionSequence += 1;
+    clearTimeout(transitionTimer);
+    if (els.roomVideo) els.roomVideo.pause();
+  }
+
+  function findTransitionMeta(src) {
+    const list = Story.transitions || [];
+    return list.find(transition => src === transition.src || src.endsWith(transition.src) || src.endsWith(transition.file));
+  }
+
+  function runtimeTrimFromMeta(transition) {
+    if (!transition) return { start: 0, end: 3.04 };
+    const meta = debugMeta[transition.file] || {};
+    return {
+      start: typeof meta.trimStart === "number" ? meta.trimStart : (transition.trimStart || 0),
+      end: typeof meta.trimEnd === "number" ? meta.trimEnd : (transition.trimEnd || 0),
+    };
+  }
+
+  function resolveRuntimeTrim(raw, duration) {
+    const hasDuration = Number.isFinite(duration) && duration > 0;
+    const rawStart = Math.max(0, raw.start || 0);
+    const start = hasDuration ? Math.min(rawStart, Math.max(0, duration - 0.05)) : rawStart;
+    let end = raw.end || 0;
+    if (end < 0 && hasDuration) {
+      end = Math.max(0, duration + end);
+    } else if (end <= 0) {
+      end = hasDuration ? duration : 3.04;
+    }
+    if (Number.isFinite(end) && end <= start + 0.05) {
+      end = hasDuration ? duration : start + 3.04;
+    }
+    return { start, end };
   }
 
   function finishRun(kind) {
@@ -555,9 +719,10 @@
 
   function renderGoals() {
     els.goalsList.innerHTML = "";
-    Story.goals.forEach((goal, index) => {
+    const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
+    goals.forEach((goal, index) => {
       const visible = index < state.visibleGoals || state.flags.console || state.flags.map;
-      const done = !!state.flags[`goal_${goal.id}`];
+      const done = !!state.flags[`goal_${goal.id}`] || !!state.flags[goal.requires];
       const li = document.createElement("li");
       li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"}`.trim();
       li.textContent = visible ? `${done ? "Complete: " : ""}${goal.text}` : "Hidden goal: restore a console or route cache.";
@@ -580,6 +745,7 @@
     els.runStats.innerHTML = `
       <dt>Identity</dt><dd>${UI.escapeHtml(name)}</dd>
       <dt>Facility</dt><dd>${UI.escapeHtml(state.facility)}</dd>
+      <dt>Run Key</dt><dd>${UI.escapeHtml(state.runKey || "legacy-run")}</dd>
       <dt>Difficulty</dt><dd>${UI.escapeHtml(state.difficultyLabel)}</dd>
       <dt>Threat</dt><dd>${UI.escapeHtml(state.threat.name)}</dd>
       <dt>Turns</dt><dd>${state.turn} / ${state.turnRange[0]}-${state.turnRange[1]}</dd>
@@ -594,18 +760,25 @@
       return;
     }
     [
-      ["cryo_room", "Cryo Room"],
-      ["med_bay", "Med Bay"],
-      ["hallway", "Central Hallway"],
-      ["hydroponic_biome", "Hydroponic Biome"],
-      ["reactor_gallery", "Reactor Gallery"],
-      ["transport", "Transport Tube"],
-    ].forEach(([id, label]) => {
+      ["cryo_room", "node-top-left"],
+      ["med_bay", "node-top-right"],
+      ["hallway", "node-center"],
+      ["hydroponic_biome", "node-bottom-left"],
+      ["reactor_gallery", "node-bottom-right"],
+      ["transport", "node-exit"],
+    ].forEach(([id, positionClass]) => {
       const node = document.createElement("div");
-      node.className = `map-node ${id === state.currentRoom ? "current" : ""}`;
+      const known = id === "transport" ? state.flags.map : isRoomNameKnown(id);
+      node.className = `map-node ${positionClass} ${id === state.currentRoom ? "current" : ""} ${known ? "" : "unknown"}`.trim();
+      const label = id === "transport" ? "Transport Tube" : roomDisplayName(id);
       node.textContent = label;
       target.append(node);
     });
+  }
+
+  function syncRunKeyUi() {
+    if (!els.runKey) return;
+    els.runKey.value = state && state.runKey ? state.runKey : "";
   }
 
   function openDetails() {
@@ -644,10 +817,13 @@
       items.forEach(transition => {
         const row = document.createElement("div");
         row.className = "debug-row";
+        row.classList.toggle("processing", !!transition.processing);
         const pick = document.createElement("button");
         pick.className = "glass-button debug-pick";
         pick.type = "button";
-        pick.innerHTML = `${UI.escapeHtml(transition.file)}<small>${UI.escapeHtml(transition.label)}</small>`;
+        const tag = transition.processing ? "<b>Processing</b>" : "";
+        const fileInfo = transition.fileInfo && transition.fileInfo.label ? transition.fileInfo.label : "";
+        pick.innerHTML = `${tag}<strong>${UI.escapeHtml(transition.label)}</strong><small>${UI.escapeHtml(transition.file)}</small><small>${UI.escapeHtml(fileInfo)}</small>`;
         pick.addEventListener("click", () => previewTransition(transition, true));
         const copy = document.createElement("button");
         copy.className = "glass-button slim debug-copy";
@@ -658,9 +834,15 @@
         redo.className = "glass-button slim debug-redo";
         redo.type = "button";
         redo.textContent = "Redo";
-        redo.disabled = !helperOnline || !transition.promptText || transition.group !== "room_transitions";
+        redo.disabled = !!transition.processing || !helperOnline || !transition.promptText || transition.group !== "room_transitions";
         redo.addEventListener("click", () => openRegenPanel(transition));
-        row.append(pick, copy, redo);
+        const reverse = document.createElement("button");
+        reverse.className = "glass-button slim debug-reverse";
+        reverse.type = "button";
+        reverse.textContent = "Reverse";
+        reverse.disabled = !!transition.processing || !helperOnline || !transition.canReverse || transition.group !== "room_transitions";
+        reverse.addEventListener("click", () => openReversePanel(transition));
+        row.append(pick, copy, redo, reverse);
         section.append(row);
       });
       els.debugList.append(section);
@@ -685,6 +867,8 @@
       const meta = debugMeta[transition.file] || {};
       return Object.assign({}, transition, {
         status: meta.status || transition.status,
+        trimStart: typeof meta.trimStart === "number" ? meta.trimStart : (transition.trimStart || 0),
+        trimEnd: typeof meta.trimEnd === "number" ? meta.trimEnd : (transition.trimEnd || 0),
       });
     });
   }
@@ -694,12 +878,18 @@
       ["room_transitions", "Room transitions"],
       ["possible_other_transition", "Possible transition videos"],
       ["other_transition", "Other videos"],
+      ["ending_video", "Ending videos"],
+      ["monster_release", "Monster release videos"],
+      ["monster_attack", "Monster attack videos"],
     ];
     if (debugFilter === "all") return groups;
     const map = {
       room: "room_transitions",
       possible: "possible_other_transition",
       other: "other_transition",
+      ending: "ending_video",
+      release: "monster_release",
+      attack: "monster_attack",
     };
     return groups.filter(([groupId]) => groupId === map[debugFilter]);
   }
@@ -714,6 +904,8 @@
     previewedTransition = transition;
     els.debugNote.value = transition.status || "";
     els.debugPrompt.textContent = transition.promptText || "No prompt metadata for this clip.";
+    els.debugTrimStart.value = formatSeconds(transition.trimStart || 0);
+    els.debugTrimEnd.value = formatSeconds(transition.trimEnd || 0);
   }
 
   function savePreviewMessage() {
@@ -722,6 +914,30 @@
       status: els.debugNote.value,
     });
     saveDebugMeta();
+  }
+
+  function savePreviewTrim(shouldRestart) {
+    if (!previewedTransition) return;
+    const trimStart = Math.max(0, parseTrimValue(els.debugTrimStart.value));
+    const trimEnd = parseTrimValue(els.debugTrimEnd.value);
+    els.debugTrimStart.value = formatSeconds(trimStart);
+    els.debugTrimEnd.value = formatSeconds(trimEnd);
+    debugMeta[previewedTransition.file] = Object.assign({}, debugMeta[previewedTransition.file], {
+      trimStart,
+      trimEnd,
+    });
+    saveDebugMeta();
+    previewedTransition = Object.assign({}, previewedTransition, { trimStart, trimEnd });
+    if (shouldRestart) seekDebugPreview(true);
+  }
+
+  function parseTrimValue(value) {
+    const parsed = parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function formatSeconds(value) {
+    return (Number.isFinite(value) ? value : 0).toFixed(2);
   }
 
   async function refreshHelperStatus() {
@@ -783,6 +999,21 @@
     UI.openPanel("regen-panel");
   }
 
+  function openReversePanel(transition) {
+    if (!helperOnline) {
+      UI.toast("Start regen_helper.py first");
+      return;
+    }
+    if (!transition.reverseTarget) {
+      UI.toast("No paired reverse target for this transition");
+      return;
+    }
+    selectedReverseTransition = transition;
+    els.reverseSummary.textContent = `${transition.file} will be reversed and will replace ${transition.reverseTarget}.`;
+    els.reverseMoveMessage.value = `Moved before reverse replacement from ${transition.file}.`;
+    UI.openPanel("reverse-panel");
+  }
+
   async function submitRegen(mode) {
     if (!selectedTransition) return;
     const promptText = els.regenPrompt.value.trim();
@@ -817,6 +1048,34 @@
     }
   }
 
+  async function submitReverse(mode) {
+    if (!selectedReverseTransition) return;
+    const label = mode === "delete" ? "Reverse + Delete" : mode === "other" ? "Reverse + Other" : "Reverse + Possible";
+    const ok = await UI.confirm({
+      title: `${label}?`,
+      body: `Reverse ${selectedReverseTransition.file} and replace ${selectedReverseTransition.reverseTarget}.`,
+      confirmLabel: "Queue",
+      cancelLabel: "Cancel",
+      danger: mode === "delete",
+    });
+    if (!ok) return;
+    try {
+      const result = await helperFetch("/reverse", {
+        method: "POST",
+        body: JSON.stringify({
+          file: selectedReverseTransition.file,
+          movedStatus: els.reverseMoveMessage.value.trim(),
+          mode,
+        }),
+      });
+      UI.closePanel("reverse-panel");
+      UI.toast(`Queued reverse for ${result.job.targetFile}`);
+      refreshHelperStatus();
+    } catch (err) {
+      UI.toast(err.message || "Helper request failed");
+    }
+  }
+
   function previewTransition(transition, shouldCopy) {
     transition = getDebugTransitions().find(item => item.file === transition.file) || transition;
     els.debugVideo.poster = transition.poster;
@@ -824,19 +1083,74 @@
       els.debugVideo.dataset.src = transition.src;
       els.debugVideo.src = transition.src;
     }
-    els.debugVideo.currentTime = 0;
-    els.debugVideo.play().catch(() => {});
     renderPreviewText(transition);
+    seekDebugPreview(true);
     if (shouldCopy) copyTransitionName(transition.file);
   }
 
-  function copyTransitionName(name) {
-    const done = () => UI.toast(`Copied ${name}`);
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(name).then(done).catch(() => fallbackCopy(name, done));
+  function seekDebugPreview(shouldPlay) {
+    if (!previewedTransition || !els.debugVideo.src) return;
+    const video = els.debugVideo;
+    const trim = resolveDebugTrim(previewedTransition);
+    const seek = () => {
+      try {
+        video.currentTime = trim.start;
+      } catch (err) {
+        return;
+      }
+      if (shouldPlay) video.play().catch(() => {});
+    };
+    if (video.readyState > 0) {
+      seek();
+    } else {
+      video.addEventListener("loadedmetadata", seek, { once: true });
+    }
+  }
+
+  function clampDebugPreviewToWindow() {
+    if (!previewedTransition || !els.debugVideo.src || els.debugVideo.readyState === 0) return;
+    const video = els.debugVideo;
+    const trim = resolveDebugTrim(previewedTransition);
+    if (video.currentTime < trim.start - 0.05) {
+      video.currentTime = trim.start;
       return;
     }
-    fallbackCopy(name, done);
+    if (Number.isFinite(trim.end) && video.currentTime >= trim.end) {
+      video.pause();
+      video.currentTime = trim.start;
+    }
+  }
+
+  function resolveDebugTrim(transition) {
+    const duration = Number.isFinite(els.debugVideo.duration) ? els.debugVideo.duration : 0;
+    const rawStart = Math.max(0, transition.trimStart || 0);
+    const start = duration > 0 ? Math.min(rawStart, Math.max(0, duration - 0.05)) : rawStart;
+    const rawEnd = transition.trimEnd || 0;
+    let end = Infinity;
+    if (rawEnd < 0 && duration > 0) {
+      end = Math.max(0, duration + rawEnd);
+    } else if (rawEnd > 0) {
+      end = rawEnd;
+    } else if (duration > 0) {
+      end = duration;
+    }
+    if (Number.isFinite(end) && end <= start + 0.05) {
+      end = duration > start + 0.05 ? duration : Infinity;
+    }
+    return { start, end };
+  }
+
+  function copyTransitionName(name) {
+    copyText(name, `Copied ${name}`);
+  }
+
+  function copyText(text, message) {
+    const done = () => UI.toast(message);
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      return;
+    }
+    fallbackCopy(text, done);
   }
 
   function fallbackCopy(name, done) {
@@ -866,6 +1180,14 @@
     if (!state || !line) return;
     state.history.push(line);
     if (state.history.length > 40) state.history = state.history.slice(-40);
+  }
+
+  function updateGoalsFromFlags() {
+    state.mapUnlocked = !!state.flags.map;
+    const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
+    goals.forEach(goal => {
+      if (goal.requires && state.flags[goal.requires]) state.flags[`goal_${goal.id}`] = true;
+    });
   }
 
   function distanceLabel() {

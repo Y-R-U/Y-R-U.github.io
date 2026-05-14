@@ -57,7 +57,8 @@ Flux stills were generated locally through MFLUX using `gen_images.py`.
 
 LTX transition videos were generated locally through `http://localhost:7866/api/generate`:
 
-- New review transitions are 384x640, 73 frames, 24 FPS, about 3.04 s, video-only.
+- Existing review transitions are 384x640, 73 frames, 24 FPS, about 3.04 s, video-only.
+- Future game transition generation defaults to the proven 384x640 portrait size. The requested 360x640 9:16 shape is not valid in the current LTX AV path because it asserts 64-pixel-aligned dimensions; use 640x384 for landscape game clips.
 - `cryo_room_event_collapse.mp4`: former `room_to_hallway.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 215.5 s.
 - `hallway_to_cryo_room.mp4`: former `hallway_to_room.mp4`; 384x640, 121 frames, 24 FPS, 5.04 s, video-only, peak 15.77 GB, generation time 229.7 s.
 - `gen_transitions.py` queues batch transition generation.

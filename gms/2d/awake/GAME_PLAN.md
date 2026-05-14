@@ -37,6 +37,8 @@ The game treats each transition video as both motion and a still frame. A room v
 
 For local testing, run `python3 regen_helper.py` from this folder. The debug panel then enables `Redo`, lets the prompt text be edited, and queues replacement renders through the local LTX service. `Regen + Delete` replaces the current file after the new render succeeds. `Regen + Possible` moves the old file to a `possible_*.mp4` candidate before writing the replacement. `Regen + Other` moves the old file to an `other_*.mp4` candidate for clips that look good but do not currently fit the game.
 
+The debug preview can trim playback non-destructively. `First frame` is an absolute start time in seconds. `Last frame` can be an absolute end time, `0.00` for the real end, or a negative value such as `-1.00` to stop one second before the real end.
+
 ## Future Room Packs
 
 Every main room should connect through the hallway to control the video count:

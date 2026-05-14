@@ -11,6 +11,8 @@ API = "http://localhost:7866"
 HERE = os.path.dirname(os.path.abspath(__file__))
 VIDEO_DIR = os.path.join(HERE, "videos")
 LOG_PATH = os.path.join(HERE, "gen_transitions.log")
+GAME_PORTRAIT_WIDTH = 384
+GAME_PORTRAIT_HEIGHT = 640
 
 COMMON = (
     "realistic cinematic sci-fi horror game transition, vertical mobile portrait shot, "
@@ -109,8 +111,8 @@ def download(path, target):
 def submit(transition):
     payload = {
         "prompt": f"{transition['prompt']}, {COMMON}",
-        "width": 384,
-        "height": 640,
+        "width": GAME_PORTRAIT_WIDTH,
+        "height": GAME_PORTRAIT_HEIGHT,
         "num_frames": 73,
         "fps": 24,
         "seed": transition["seed"],

@@ -11,7 +11,7 @@
 <title>Awake</title>
 <link rel="preload" href="images/cryo_room.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=20260515-fleshout">
 </head>
 <body>
 <main id="app">
@@ -139,6 +139,22 @@
       <span>Volume</span>
       <input id="volume" type="range" min="0" max="100" value="55">
     </label>
+    <div class="run-key-box">
+      <label class="prompt-editor">
+        <span>Current run key</span>
+        <input id="run-key" type="text" readonly value="">
+      </label>
+      <div class="popup-actions compact-actions">
+        <button id="copy-run-key" class="glass-button" type="button">Copy Key</button>
+      </div>
+      <label class="prompt-editor">
+        <span>Start from key</span>
+        <input id="seed-run-key" type="text" autocomplete="off" placeholder="medium-l2aw4h-0k3mz">
+      </label>
+      <div class="popup-actions compact-actions">
+        <button id="start-key-run" class="glass-button primary" type="button">Start Key</button>
+      </div>
+    </div>
     <div class="popup-actions">
       <button id="help-button" class="glass-button" type="button">Help</button>
       <button id="reset-run" class="glass-button danger" type="button">Reset Run</button>
@@ -158,6 +174,9 @@
         <button class="filter-chip active" type="button" data-debug-filter="room">ROOM</button>
         <button class="filter-chip" type="button" data-debug-filter="possible">POSSIBLE</button>
         <button class="filter-chip" type="button" data-debug-filter="other">OTHER</button>
+        <button class="filter-chip" type="button" data-debug-filter="ending">ENDING</button>
+        <button class="filter-chip" type="button" data-debug-filter="release">RELEASE</button>
+        <button class="filter-chip" type="button" data-debug-filter="attack">ATTACK</button>
         <button class="filter-chip" type="button" data-debug-filter="all">ALL</button>
       </div>
       <button id="debug-refresh" class="glass-button slim" type="button">Refresh</button>
@@ -165,6 +184,16 @@
     <div class="debug-grid">
       <section>
         <video id="debug-video" class="debug-video" muted playsinline controls preload="metadata" poster="images/hallway.jpg"></video>
+        <div class="debug-trim-row" aria-label="Preview trim controls">
+          <label>
+            <span>First frame</span>
+            <input id="debug-trim-start" type="number" min="0" step="0.01" value="0.00" inputmode="decimal">
+          </label>
+          <label>
+            <span>Last frame</span>
+            <input id="debug-trim-end" type="number" step="0.01" value="0.00" inputmode="decimal">
+          </label>
+        </div>
         <label class="debug-editor">
           <span>Message</span>
           <textarea id="debug-note" rows="3">Choose a transition to preview it and copy the file name.</textarea>
@@ -202,6 +231,26 @@
       <button id="regen-other" class="glass-button primary" type="button">Regen + Other</button>
     </div>
     <p class="debug-note">Requires the local Awake regen helper. The moved-video message is used only when the old clip is moved to Possible or Other.</p>
+  </div>
+</aside>
+
+<aside id="reverse-panel" class="overlay stacked" aria-hidden="true">
+  <div class="popup wide regen-popup" role="dialog" aria-modal="true" aria-labelledby="reverse-title">
+    <header class="popup-head">
+      <h2 id="reverse-title">Reverse Transition</h2>
+      <button class="close-button" type="button" data-close="reverse-panel" aria-label="Close">×</button>
+    </header>
+    <p id="reverse-summary" class="debug-note"></p>
+    <label class="prompt-editor">
+      <span>Moved target message</span>
+      <textarea id="reverse-move-message" rows="5"></textarea>
+    </label>
+    <div class="popup-actions regen-actions">
+      <button id="reverse-delete" class="glass-button danger" type="button">Reverse + Delete</button>
+      <button id="reverse-move" class="glass-button" type="button">Reverse + Possible</button>
+      <button id="reverse-other" class="glass-button primary" type="button">Reverse + Other</button>
+    </div>
+    <p class="debug-note">The selected video is used as the source. The paired opposite transition is replaced by a reversed mp4. Possible or Other moves the old target clip before replacement.</p>
   </div>
 </aside>
 
@@ -279,6 +328,6 @@
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
-<script src="js/game.js"></script>
+<script src="js/game.js?v=20260515-fleshout"></script>
 </body>
 </html>

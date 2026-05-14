@@ -54,6 +54,11 @@
     "Space Biome",
     "Space Station",
     "Mars Habitat",
+    "Orbital Greenhouse",
+    "Deep Range Relay",
+    "Lunar Research Annex",
+    "Asteroid Mining Habitat",
+    "Europa Ice Station",
   ];
 
   const facilityNames = [
@@ -67,6 +72,16 @@
     "Helix Dawn",
     "Orison",
     "Caldera Array",
+    "Blackwell",
+    "Cinder Vault",
+    "Kairo Spire",
+    "Nadir Bloom",
+    "Glass Meridian",
+    "Warden Loop",
+    "Oberon Gate",
+    "Riven Halo",
+    "Solace Yard",
+    "Kestrel Verge",
   ];
 
   const playerNames = [
@@ -99,12 +114,30 @@
       label: "crew echo",
       clue: "The dead walk slowly until they hear a door decide to open.",
     },
+    {
+      id: "machine",
+      name: "maintenance intelligence",
+      label: "machine pursuit",
+      clue: "The station repair system has mistaken living bodies for broken parts.",
+    },
+    {
+      id: "parasite",
+      name: "black root parasite",
+      label: "botanical breach",
+      clue: "The growth remembers every room it has touched and keeps reaching for new lungs.",
+    },
+    {
+      id: "shadow",
+      name: "pressure-suit shadow",
+      label: "suit signal",
+      clue: "The suit is empty until a door opens. Then it walks like it has been waiting.",
+    },
   ];
 
   const difficulties = {
-    easy: { label: "Easy", range: [100, 120], visibleGoals: 3 },
-    medium: { label: "Medium", range: [90, 110], visibleGoals: 2 },
-    hard: { label: "Hard", range: [70, 92], visibleGoals: 1 },
+    easy: { label: "Easy", range: [100, 120], visibleGoals: 4, hiddenRoomCount: 0 },
+    medium: { label: "Medium", range: [90, 110], visibleGoals: 2, hiddenRoomCount: 2 },
+    hard: { label: "Hard", range: [70, 92], visibleGoals: 1, hiddenRoomCount: 99 },
   };
 
   const gameNames = [
@@ -117,10 +150,14 @@
     "Noon On Mars",
   ];
 
-  const goals = [
-    { id: "identity", text: "Recover your identity from the wrist band." },
-    { id: "map", text: "Restore a facility map or route cache." },
-    { id: "escape", text: "Arm the emergency transport and leave." },
+  const goalPool = [
+    { id: "identity", text: "Recover your identity from the wrist band.", requires: "identity", core: true },
+    { id: "map", text: "Restore a facility map or route cache.", requires: "map", core: true },
+    { id: "escape", text: "Arm the emergency transport and leave.", requires: "escape", core: true },
+    { id: "console", text: "Recover the release note from a damaged console.", requires: "console" },
+    { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache" },
+    { id: "biome_sample", text: "Seal a sample from the corrupted plant towers.", requires: "biome_sample" },
+    { id: "reactor_reading", text: "Collect the reactor timing code.", requires: "reactor_reading" },
   ];
 
   const transitions = [
@@ -139,7 +176,7 @@
     {
       id: "hallway_to_cryo_room",
       group: "room_transitions",
-      label: "hallway to cryo_room",
+      label: "cryo_room from hallway",
       file: "hallway_to_cryo_room.mp4",
       src: "videos/hallway_to_cryo_room.mp4",
       poster: "images/hallway.jpg",
@@ -163,7 +200,7 @@
     {
       id: "hallway_to_med_bay",
       group: "room_transitions",
-      label: "hallway to med_bay",
+      label: "med_bay from hallway",
       file: "hallway_to_med_bay.mp4",
       src: "videos/hallway_to_med_bay.mp4",
       poster: "images/hallway.jpg",
@@ -187,7 +224,7 @@
     {
       id: "hallway_to_hydroponic_biome",
       group: "room_transitions",
-      label: "hallway to hydroponic_biome",
+      label: "hydroponic_biome from hallway",
       file: "hallway_to_hydroponic_biome.mp4",
       src: "videos/hallway_to_hydroponic_biome.mp4",
       poster: "images/hallway.jpg",
@@ -211,7 +248,7 @@
     {
       id: "hallway_to_reactor_gallery",
       group: "room_transitions",
-      label: "hallway to reactor_gallery",
+      label: "reactor_gallery from hallway",
       file: "hallway_to_reactor_gallery.mp4",
       src: "videos/hallway_to_reactor_gallery.mp4",
       poster: "images/hallway.jpg",
@@ -237,6 +274,13 @@
     transitions[7],
   ];
 
+  transitions.forEach(transition => {
+    if (transition.group === "room_transitions" && typeof transition.trimEnd !== "number") {
+      transition.trimStart = 0;
+      transition.trimEnd = 3.04;
+    }
+  });
+
   const mediaManifest = [
     { type: "image", src: "images/cryo_room.jpg", required: true, label: "Cryo room still" },
     { type: "image", src: "images/hallway.jpg", required: false, label: "Hallway still" },
@@ -244,13 +288,13 @@
     { type: "image", src: "images/hydroponic_biome.jpg", required: false, label: "Hydroponic biome still" },
     { type: "image", src: "images/reactor_gallery.jpg", required: false, label: "Reactor gallery still" },
     { type: "video", src: "videos/cryo_room_to_hallway.mp4", required: true, label: "cryo_room to hallway transition" },
-    { type: "video", src: "videos/hallway_to_cryo_room.mp4", required: true, label: "hallway to cryo_room transition" },
+    { type: "video", src: "videos/hallway_to_cryo_room.mp4", required: true, label: "cryo_room from hallway transition" },
     { type: "video", src: "videos/med_bay_to_hallway.mp4", required: false, label: "med_bay to hallway transition" },
-    { type: "video", src: "videos/hallway_to_med_bay.mp4", required: false, label: "hallway to med_bay transition" },
+    { type: "video", src: "videos/hallway_to_med_bay.mp4", required: false, label: "med_bay from hallway transition" },
     { type: "video", src: "videos/hydroponic_biome_to_hallway.mp4", required: false, label: "hydroponic_biome to hallway transition" },
-    { type: "video", src: "videos/hallway_to_hydroponic_biome.mp4", required: false, label: "hallway to hydroponic_biome transition" },
+    { type: "video", src: "videos/hallway_to_hydroponic_biome.mp4", required: false, label: "hydroponic_biome from hallway transition" },
     { type: "video", src: "videos/reactor_gallery_to_hallway.mp4", required: false, label: "reactor_gallery to hallway transition" },
-    { type: "video", src: "videos/hallway_to_reactor_gallery.mp4", required: false, label: "hallway to reactor_gallery transition" },
+    { type: "video", src: "videos/hallway_to_reactor_gallery.mp4", required: false, label: "reactor_gallery from hallway transition" },
     { type: "video", src: "videos/cryo_room_event_collapse.mp4", required: false, label: "cryo_room event candidate" },
   ];
 
@@ -448,38 +492,100 @@
     ],
   };
 
-  function randomItem(list) {
-    return list[Math.floor(Math.random() * list.length)];
+  function hashKey(value) {
+    let hash = 2166136261;
+    for (let index = 0; index < value.length; index += 1) {
+      hash ^= value.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
   }
 
-  function randomInt(min, max) {
-    return Math.floor(min + Math.random() * (max - min + 1));
+  function createRng(key) {
+    let seed = hashKey(key) || 1;
+    return function rng() {
+      seed += 0x6D2B79F5;
+      let t = seed;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function cleanRunKey(value) {
+    return String(value || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
+  }
+
+  function makeRunKey(difficultyId) {
+    const randomPart = Math.floor(Math.random() * 0xffffff).toString(36).padStart(5, "0");
+    return `${difficultyId}-${Date.now().toString(36)}-${randomPart}`;
+  }
+
+  function difficultyFromKey(key, fallback) {
+    const prefix = String(key).split("-")[0];
+    return difficulties[prefix] ? prefix : fallback;
+  }
+
+  function randomItem(list, rng = Math.random) {
+    return list[Math.floor(rng() * list.length)];
+  }
+
+  function randomInt(min, max, rng = Math.random) {
+    return Math.floor(min + rng() * (max - min + 1));
+  }
+
+  function shuffled(list, rng) {
+    const copy = list.slice();
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swap = Math.floor(rng() * (index + 1));
+      [copy[index], copy[swap]] = [copy[swap], copy[index]];
+    }
+    return copy;
   }
 
   function addUnique(list, item) {
     if (!list.includes(item)) list.push(item);
   }
 
+  function selectRunGoals(rng) {
+    const core = goalPool.filter(goal => goal.core);
+    const optional = shuffled(goalPool.filter(goal => !goal.core), rng).slice(0, 2);
+    return core.concat(optional);
+  }
+
+  function selectHiddenRooms(difficulty, startRoom, rng) {
+    const candidates = Object.keys(rooms).filter(id => id !== "hallway" && id !== startRoom);
+    const limit = Math.min(candidates.length, difficulty.hiddenRoomCount || 0);
+    return shuffled(candidates, rng).slice(0, limit);
+  }
+
   window.CodexHorrorStory = {
     version: "0.1",
     rooms,
     actions,
-    goals,
+    goals: goalPool,
     transitions,
     introPlaylist,
     mediaManifest,
     gameNames,
     difficulties,
-    createRun(difficultyId = "medium") {
+    createRun(difficultyId = "medium", seedKey = "") {
+      const requestedKey = cleanRunKey(seedKey);
+      const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";
+      const runKey = requestedKey || makeRunKey(initialDifficulty);
+      difficultyId = difficultyFromKey(runKey, initialDifficulty);
       const difficulty = difficulties[difficultyId] || difficulties.medium;
-      const location = randomItem(locations);
-      const prefix = randomItem(facilityNames);
-      const threat = randomItem(threats);
-      const limit = randomInt(difficulty.range[0], difficulty.range[1]);
+      const rng = createRng(runKey);
+      const location = randomItem(locations, rng);
+      const prefix = randomItem(facilityNames, rng);
+      const threat = randomItem(threats, rng);
+      const limit = randomInt(difficulty.range[0], difficulty.range[1], rng);
+      const startRoom = randomItem(["cryo_room", "med_bay"], rng);
       return {
         active: true,
         ended: false,
         version: "0.1",
+        runKey,
         difficultyId,
         difficultyLabel: difficulty.label,
         turn: 1,
@@ -489,11 +595,15 @@
         facilityPrefix: prefix,
         location,
         facility: `${prefix} ${location}`,
-        playerName: randomItem(playerNames),
+        playerName: randomItem(playerNames, rng),
         playerRevealed: false,
         threat,
         threatPressure: 0,
-        currentRoom: "cryo_room",
+        currentRoom: startRoom,
+        startRoom,
+        visitedRooms: [startRoom],
+        hiddenRooms: selectHiddenRooms(difficulty, startRoom, rng),
+        goals: selectRunGoals(rng),
         flags: {},
         inventory: [],
         history: [],

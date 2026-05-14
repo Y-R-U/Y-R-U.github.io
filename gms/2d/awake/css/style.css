@@ -588,12 +588,33 @@ button.tag {
 
 .mini-map {
   display: grid;
-  grid-template-columns: repeat(3, minmax(56px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(5, minmax(30px, 1fr));
+  grid-template-rows: repeat(4, minmax(36px, auto));
+  gap: 7px;
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(137, 238, 255, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(rgba(137, 238, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(137, 238, 255, 0.08) 1px, transparent 1px),
+    rgba(1, 8, 12, 0.38);
+  background-size: 18px 18px;
+  padding: 10px;
+}
+
+.mini-map::before {
+  content: "";
+  position: absolute;
+  inset: 27% 18% 26%;
+  z-index: -1;
+  border: 1px solid rgba(137, 238, 255, 0.16);
+  border-left: 0;
+  border-right: 0;
 }
 
 .map-node {
-  min-height: 50px;
+  min-height: 46px;
   border: 1px solid rgba(137, 238, 255, 0.18);
   border-radius: 8px;
   display: grid;
@@ -605,9 +626,45 @@ button.tag {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.map-node.unknown {
+  border-style: dashed;
+  color: rgba(216, 226, 238, 0.52);
+}
+
 .map-node.current {
   border-color: var(--green);
   color: #e7fff0;
+  box-shadow: 0 0 16px rgba(169, 255, 203, 0.16);
+}
+
+.node-top-left {
+  grid-column: 1 / span 2;
+  grid-row: 1;
+}
+
+.node-top-right {
+  grid-column: 4 / span 2;
+  grid-row: 1;
+}
+
+.node-center {
+  grid-column: 2 / span 3;
+  grid-row: 2;
+}
+
+.node-bottom-left {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+}
+
+.node-bottom-right {
+  grid-column: 4 / span 2;
+  grid-row: 3;
+}
+
+.node-exit {
+  grid-column: 2 / span 3;
+  grid-row: 4;
 }
 
 .mini-map.offline {
@@ -690,6 +747,36 @@ button.tag {
   object-fit: contain;
 }
 
+.debug-trim-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.debug-trim-row label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+}
+
+.debug-trim-row span {
+  color: var(--cyan);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.debug-trim-row input {
+  width: 100%;
+  border: 1px solid rgba(137, 238, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(1, 6, 10, 0.62);
+  color: var(--ink);
+  padding: 10px;
+}
+
 .debug-note,
 .debug-prompt-view {
   margin: 10px 0 0;
@@ -714,7 +801,8 @@ button.tag {
 }
 
 .debug-editor textarea,
-.prompt-editor textarea {
+.prompt-editor textarea,
+.prompt-editor input {
   width: 100%;
   resize: vertical;
   border: 1px solid rgba(137, 238, 255, 0.24);
@@ -723,6 +811,24 @@ button.tag {
   color: var(--ink);
   padding: 12px;
   line-height: 1.45;
+}
+
+.prompt-editor input {
+  resize: none;
+}
+
+.run-key-box {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+  border: 1px solid rgba(137, 238, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 12px;
+}
+
+.compact-actions {
+  margin: 0;
 }
 
 .debug-editor textarea {
@@ -754,7 +860,7 @@ button.tag {
 
 .debug-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   gap: 8px;
   align-items: stretch;
 }
@@ -767,6 +873,33 @@ button.tag {
   align-content: center;
   text-align: left;
   overflow-wrap: anywhere;
+}
+
+.debug-row.processing .debug-pick {
+  border-color: rgba(255, 216, 138, 0.5);
+  background: rgba(255, 216, 138, 0.12);
+}
+
+.debug-pick b {
+  width: fit-content;
+  margin-bottom: 5px;
+  border: 1px solid rgba(255, 216, 138, 0.46);
+  border-radius: 999px;
+  background: rgba(255, 216, 138, 0.14);
+  color: var(--gold);
+  padding: 3px 8px;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.debug-pick strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1.18;
 }
 
 .debug-pick small {
@@ -783,6 +916,10 @@ button.tag {
 
 .debug-redo {
   min-width: 66px;
+}
+
+.debug-reverse {
+  min-width: 82px;
 }
 
 .prompt-editor {
@@ -900,7 +1037,12 @@ button.tag {
   }
 
   .debug-grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    grid-template-columns: minmax(240px, 0.68fr) minmax(300px, 1.32fr);
+  }
+
+  .debug-grid > section:first-child {
+    width: min(100%, 430px);
+    justify-self: center;
   }
 }
 
