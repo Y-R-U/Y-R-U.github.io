@@ -31,6 +31,10 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
 - `videos/reactor_gallery_to_hallway.mp4`
 - `videos/hallway_to_reactor_gallery.mp4`
 - `videos/cryo_room_event_collapse.mp4`
+- `videos/monster_release_*.mp4`
+- `videos/monster_attack_*.mp4`
+- `videos/ending_victory_*.mp4`
+- `videos/possible_*_alt01.mp4`
 - `music/theme1.mp3`
 
 The game treats each transition video as both motion and a still frame. A room view pauses on the first frame of the transition that starts from that room. The debug panel groups intended `room_transitions` separately from Possible and Other clips so generated videos can be approved, replaced, deleted, or repurposed.
@@ -38,6 +42,8 @@ The game treats each transition video as both motion and a still frame. A room v
 For local testing, run `python3 regen_helper.py` from this folder. The debug panel then enables `Redo`, lets the prompt text be edited, and queues replacement renders through the local LTX service. `Regen + Delete` replaces the current file after the new render succeeds. `Regen + Possible` moves the old file to a `possible_*.mp4` candidate before writing the replacement. `Regen + Other` moves the old file to an `other_*.mp4` candidate for clips that look good but do not currently fit the game.
 
 The debug preview can trim playback non-destructively. `First frame` is an absolute start time in seconds. `Last frame` can be an absolute end time, `0.00` for the real end, or a negative value such as `-1.00` to stop one second before the real end.
+
+`gen_event_videos.py` queues review batches for hallway-start monster release clips, monster attack clips, victory endings, and alternate room-to-hallway candidates. These files appear under the debug panel's Release, Attack, Ending, and Possible filters.
 
 ## Future Room Packs
 

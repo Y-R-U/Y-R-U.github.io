@@ -274,6 +274,25 @@
     transitions[7],
   ];
 
+  const eventVideos = {
+    release: {
+      gene: "videos/monster_release_gene.mp4",
+      alien: "videos/monster_release_alien.mp4",
+      zombie: "videos/monster_release_zombie.mp4",
+      default: "videos/monster_release_gene.mp4",
+    },
+    attack: {
+      gene: "videos/monster_attack_gene.mp4",
+      alien: "videos/monster_attack_alien.mp4",
+      zombie: "videos/monster_attack_zombie.mp4",
+      default: "videos/monster_attack_gene.mp4",
+    },
+    victory: [
+      "videos/ending_victory_transport_tube.mp4",
+      "videos/ending_victory_shuttle_launch.mp4",
+    ],
+  };
+
   transitions.forEach(transition => {
     if (transition.group === "room_transitions" && typeof transition.trimEnd !== "number") {
       transition.trimStart = 0;
@@ -296,6 +315,14 @@
     { type: "video", src: "videos/reactor_gallery_to_hallway.mp4", required: false, label: "reactor_gallery to hallway transition" },
     { type: "video", src: "videos/hallway_to_reactor_gallery.mp4", required: false, label: "reactor_gallery from hallway transition" },
     { type: "video", src: "videos/cryo_room_event_collapse.mp4", required: false, label: "cryo_room event candidate" },
+    { type: "video", src: "videos/monster_release_gene.mp4", required: false, label: "gene monster release" },
+    { type: "video", src: "videos/monster_release_alien.mp4", required: false, label: "alien monster release" },
+    { type: "video", src: "videos/monster_release_zombie.mp4", required: false, label: "zombie monster release" },
+    { type: "video", src: "videos/monster_attack_gene.mp4", required: false, label: "gene monster attack" },
+    { type: "video", src: "videos/monster_attack_alien.mp4", required: false, label: "alien monster attack" },
+    { type: "video", src: "videos/monster_attack_zombie.mp4", required: false, label: "zombie monster attack" },
+    { type: "video", src: "videos/ending_victory_transport_tube.mp4", required: false, label: "transport tube victory" },
+    { type: "video", src: "videos/ending_victory_shuttle_launch.mp4", required: false, label: "shuttle launch victory" },
   ];
 
   const actions = {
@@ -334,6 +361,7 @@
         hint: "goals",
         turns: 1,
         once: true,
+        event: "monster_release",
         run(state) {
           state.flags.console = true;
           return `The console prints one clean line: ${state.threat.name.toUpperCase()} released during evacuation.`;
@@ -565,6 +593,7 @@
     actions,
     goals: goalPool,
     transitions,
+    eventVideos,
     introPlaylist,
     mediaManifest,
     gameNames,

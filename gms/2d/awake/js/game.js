@@ -46,6 +46,8 @@
     roomFallback: $("room-fallback"),
     roomName: $("room-name"),
     turnCount: $("turn-count"),
+    eventOverlay: $("event-overlay"),
+    eventMessage: $("event-message"),
     detailsMobile: $("details-mobile"),
     mapMobile: $("map-mobile"),
     subroomActions: $("subroom-actions"),
@@ -570,6 +572,13 @@
       return;
     }
 
+    if (action.event === "monster_release" && message) {
+      addHistory(message);
+      await playMonsterRelease(message);
+      renderGame(message);
+      return;
+    }
+
     if (message) {
       addHistory(message);
       UI.toast(message);
@@ -696,6 +705,84 @@
     return { start, end };
   }
 
+  async function playMonsterRelease(message) {
+    const clip = eventVideoFor("release");
+    if (!clip) {
+      UI.toast(message);
+      return;
+    }
+    transitionLocked = true;
+    roomMediaToken += 1;
+    clearTimeout(transitionTimer);
+    els.eventMessage.textContent = message;
+    els.eventOverlay.classList.add("active");
+    els.eventOverlay.classList.remove("video-reveal");
+    await delay(900);
+    els.roomFallback.src = Story.rooms.hallway.poster;
+    els.roomFallback.classList.remove("visible");
+    els.roomVideo.poster = Story.rooms.hallway.poster;
+    els.roomVideo.dataset.src = mediaSrc(clip);
+    els.roomVideo.src = mediaSrc(clip);
+    els.roomVideo.load();
+    await videoReady(els.roomVideo, 1800);
+    try {
+      els.roomVideo.currentTime = 0;
+    } catch (err) {}
+    els.roomVideo.pause();
+    els.eventOverlay.classList.add("video-reveal");
+    await delay(1000);
+    els.roomVideo.play().catch(() => {});
+    await waitForVideoWindow(els.roomVideo, 3600);
+    els.eventOverlay.classList.remove("video-reveal");
+    await delay(520);
+    els.eventOverlay.classList.remove("active");
+    transitionLocked = false;
+  }
+
+  function eventVideoFor(kind) {
+    const videos = Story.eventVideos || {};
+    if (kind === "victory") {
+      const list = Array.isArray(videos.victory) ? videos.victory : [];
+      if (!list.length) return "";
+      return list[state.turn % list.length];
+    }
+    const group = videos[kind] || {};
+    return group[state.threat && state.threat.id] || group.default || "";
+  }
+
+  function videoReady(video, timeoutMs) {
+    if (video.readyState > 0) return Promise.resolve();
+    return new Promise(resolve => {
+      const done = () => {
+        clearTimeout(timer);
+        video.removeEventListener("loadedmetadata", done);
+        video.removeEventListener("error", done);
+        resolve();
+      };
+      const timer = setTimeout(done, timeoutMs);
+      video.addEventListener("loadedmetadata", done, { once: true });
+      video.addEventListener("error", done, { once: true });
+    });
+  }
+
+  function waitForVideoWindow(video, timeoutMs) {
+    return new Promise(resolve => {
+      const done = () => {
+        clearTimeout(timer);
+        video.removeEventListener("ended", done);
+        video.removeEventListener("error", done);
+        resolve();
+      };
+      const timer = setTimeout(done, timeoutMs);
+      video.addEventListener("ended", done, { once: true });
+      video.addEventListener("error", done, { once: true });
+    });
+  }
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   function finishRun(kind) {
     state.active = false;
     state.ended = true;
@@ -727,6 +814,8 @@
     els.endingText.textContent = success
       ? `The transport tube fires. ${state.facility} becomes a thin scar of light behind you. Your memory has not returned, but your name has.`
       : `The hallway lights go out in order. The ${state.threat.name} reaches you before the next door opens.`;
+    const eventClip = success ? eventVideoFor("victory") : eventVideoFor("attack");
+    if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
     els.endingVideo.currentTime = 0;
     els.endingVideo.play().catch(() => {});
   }

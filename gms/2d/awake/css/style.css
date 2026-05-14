@@ -86,6 +86,45 @@ button {
     radial-gradient(circle at 28% 82%, rgba(255, 85, 116, 0.14), transparent 34%);
 }
 
+.event-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.9);
+  transition: opacity 520ms ease;
+}
+
+.event-overlay.active {
+  opacity: 1;
+}
+
+.event-overlay.video-reveal {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.event-overlay span {
+  width: min(82vw, 560px);
+  border: 1px solid rgba(255, 85, 116, 0.35);
+  border-radius: 8px;
+  background: rgba(7, 9, 13, 0.72);
+  box-shadow: 0 0 30px rgba(255, 85, 116, 0.16);
+  color: #ffdce4;
+  padding: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: clamp(0.9rem, 4vw, 1.25rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.event-overlay.video-reveal span {
+  opacity: 0;
+}
+
 .intro-copy,
 .wake-shell,
 .title-copy {
