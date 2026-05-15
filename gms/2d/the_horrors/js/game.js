@@ -121,8 +121,7 @@
 
   function normalizeState(nextState) {
     if (!nextState) return null;
-    if (nextState.currentRoom === "suspension") nextState.currentRoom = "cryo_room";
-    nextState.visitedRooms = Array.isArray(nextState.visitedRooms) ? nextState.visitedRooms : [nextState.currentRoom || "cryo_room"];
+    nextState.visitedRooms = Array.isArray(nextState.visitedRooms) ? nextState.visitedRooms : [nextState.currentRoom || "bedroom"];
     nextState.hiddenRooms = Array.isArray(nextState.hiddenRooms) ? nextState.hiddenRooms : [];
     nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
     nextState.flags = nextState.flags || {};
@@ -507,15 +506,15 @@
   function roomDisplayName(roomId) {
     const room = Story.rooms[roomId];
     if (!room) return "Unknown";
-    return isRoomNameKnown(roomId) ? room.name : "Unknown Sector";
+    return isRoomNameKnown(roomId) ? room.name : "Unknown Room";
   }
 
   function currentStoryText(room) {
-    if (state.currentRoom === "cryo_room" && state.playerRevealed) {
-      return `${room.text} The wrist band insists you are ${state.playerName}.`;
+    if (state.currentRoom === "bedroom" && state.playerRevealed) {
+      return `${room.text} The diary insists you are ${state.playerName}.`;
     }
     if (state.currentRoom === "hallway" && state.flags.map) {
-      return `${room.text} The route cache marks a transport tube at the far end.`;
+      return `${room.text} The folded plan marks the front door at the far end.`;
     }
     return room.text;
   }
@@ -526,6 +525,7 @@
     els.exitActions.innerHTML = "";
     actions.forEach(action => {
       if (action.once && state.flags[action.id]) return;
+      if (typeof action.guard === "function" && !action.guard(state)) return;
       const button = document.createElement("button");
       button.className = "tag tag-action";
       button.type = "button";
@@ -561,7 +561,7 @@
     }
 
     if (isCaught()) {
-      addHistory("The hunter reached the central hallway before you could leave.");
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
       return finishRun("caught");
     }
 
@@ -807,14 +807,26 @@
 
   function renderEnding(kind) {
     stopIntroSlideshow();
-    const success = kind === "escape";
     UI.showScreen("ending-screen");
-    els.endingKind.textContent = success ? "successful escape" : "bad ending";
-    els.endingTitle.textContent = success ? "Transport Burn" : "Caught In The Hallway";
-    els.endingText.textContent = success
-      ? `The transport tube fires. ${state.facility} becomes a thin scar of light behind you. Your memory has not returned, but your name has.`
-      : `The hallway lights go out in order. The ${state.threat.name} reaches you before the next door opens.`;
-    const eventClip = success ? eventVideoFor("victory") : eventVideoFor("attack");
+    const endings = (Story.eventVideos && Story.eventVideos.endings) || {};
+    let kindLabel = "bad ending";
+    let title = "Caught In The Hallway";
+    let text = `The hallway lights go out one by one. ${state.threat.name} reaches you before the next door opens.`;
+    let eventClip = endings.caught || eventVideoFor("attack");
+    if (kind === "escape") {
+      kindLabel = "successful escape";
+      title = "The Door Opens";
+      text = `The front door of ${state.facility} swings open. Outside, the air is colder than you remember air being. You do not look back.`;
+      eventClip = ""; // no specific clip — keep the last loaded frame
+    } else if (kind === "window") {
+      kindLabel = "bad ending";
+      title = "She Waved Back";
+      text = `Outside the bedroom window, ${state.threat.name} pressed her hand against the glass. The garden is empty when you finally turn to call for help, but the handprint stays.`;
+      eventClip = endings.window || "";
+    }
+    els.endingKind.textContent = kindLabel;
+    els.endingTitle.textContent = title;
+    els.endingText.textContent = text;
     if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
     els.endingVideo.currentTime = 0;
     els.endingVideo.play().catch(() => {});
@@ -873,17 +885,16 @@
       return;
     }
     [
-      ["cryo_room", "node-top-left"],
-      ["med_bay", "node-top-right"],
+      ["bedroom", "node-top-left"],
+      ["bathroom", "node-top-right"],
       ["hallway", "node-center"],
-      ["hydroponic_biome", "node-bottom-left"],
-      ["reactor_gallery", "node-bottom-right"],
-      ["transport", "node-exit"],
+      ["cellar", "node-bottom-left"],
+      ["exit", "node-exit"],
     ].forEach(([id, positionClass]) => {
       const node = document.createElement("div");
-      const known = id === "transport" ? state.flags.map : isRoomNameKnown(id);
+      const known = id === "exit" ? state.flags.map : isRoomNameKnown(id);
       node.className = `map-node ${positionClass} ${id === state.currentRoom ? "current" : ""} ${known ? "" : "unknown"}`.trim();
-      const label = id === "transport" ? "Transport Tube" : roomDisplayName(id);
+      const label = id === "exit" ? "Front Door" : roomDisplayName(id);
       node.textContent = label;
       target.append(node);
     });

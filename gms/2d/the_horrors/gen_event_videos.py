@@ -35,41 +35,53 @@ COMMON = (
 NEGATIVE = (
     "readable text, logo, watermark, subtitles, gore, blood, dismemberment, corpse, "
     "cartoon, anime, painting, melting architecture, duplicated doors, distorted camera, "
-    "sci-fi, futuristic, neon, hologram"
+    "sci-fi, futuristic, neon, hologram, "
+    # Tessellation guard — LTX-2.3 distilled-Q4 falls into a repeating-tile
+    # attractor when foreground/background contrast is too low. v1 clips with
+    # white nightgown against off-white walls all dissolved into mosaic by
+    # frame ~20. Keep these in the negative prompt:
+    "tessellated pattern, repeating texture, mosaic tile, grid pattern, "
+    "interlocking pattern, repeating squares, kaleidoscope, fractal artifact"
 )
 
 EVENTS = [
+    # All figures are deliberately HIGH-CONTRAST against the off-white walls:
+    # dark hooded shawl / long dark dress / dark hair. Avoid white-on-white
+    # (caused v1 tessellation collapse — see possible_*_v1.mp4 archives).
     {
         "output": "monster_release_pale_woman.mp4",
         "group": "monster_release",
         "poster": "images/hallway.jpg",
         "start": "images/hallway.jpg",
-        "seed": 311,
-        "prompt": "the empty central hallway lights flicker, a tall pale woman in a white "
-                  "nightgown with long dark hair covering her face appears at the far end of "
-                  "the corridor and slowly turns her head toward the camera, tense PG horror "
-                  "reveal, no gore",
+        "seed": 511,
+        "prompt": "the empty central hallway lights dim, a tall pale-faced woman wrapped in a "
+                  "dark grey shawl with long dark hair down past her shoulders steps slowly out "
+                  "of the shadow at the far end of the corridor, her dark silhouette clearly "
+                  "framed against the off-white walls, she stops and looks toward the camera, "
+                  "tense atmospheric PG horror reveal, no gore",
     },
     {
         "output": "monster_attack_pale_woman.mp4",
         "group": "monster_attack",
         "poster": "images/hallway.jpg",
         "start": "images/hallway.jpg",
-        "seed": 312,
-        "prompt": "central hallway point of view, a pale woman in a white nightgown with long "
-                  "dark hair rushes directly toward the camera with arms slightly raised, hair "
-                  "whipping behind her, fast PG jump scare impact, no blood, no gore",
+        "seed": 512,
+        "prompt": "central hallway point of view, a pale-faced woman in a long dark dress with "
+                  "loose long dark hair rushes directly toward the camera at running pace, her "
+                  "dark figure clearly silhouetted against the lit hallway, hair flowing behind "
+                  "her, fast PG jump scare impact, no blood, no gore",
     },
     {
         "output": "ending_window.mp4",
         "group": "ending_video",
         "poster": "images/bedroom.jpg",
         "start": "images/bedroom.jpg",
-        "seed": 401,
-        "prompt": "inside a plain bedroom, the lace curtain shifts and a tall pale woman in a "
-                  "white nightgown with long dark hair appears outside the window pressing her "
-                  "pale face and one hand against the glass, slow oppressive PG horror reveal, "
-                  "no blood, no gore",
+        "seed": 601,
+        "prompt": "inside a plain bedroom, the lace curtain shifts and the silhouette of a "
+                  "pale-faced woman wearing a long dark dress with long dark hair gradually "
+                  "becomes visible standing motionless outside the bedroom window, she presses "
+                  "her dark hand and pale face against the glass, slow oppressive PG horror "
+                  "reveal, no blood, no gore",
     },
 ]
 
