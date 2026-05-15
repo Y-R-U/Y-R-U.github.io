@@ -1,0 +1,7 @@
+original_files/
+gen_images.log
+gen_transitions.log
+gen_event_videos.log
+.DS_Store
+__pycache__/
+.debug_transition_metadata.json
