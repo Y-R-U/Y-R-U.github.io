@@ -86,6 +86,153 @@ TRANSITIONS = [
         "prompt": "camera moves from the central hallway through a wooden cellar door, "
                   "descends the wooden staircase, and ends in a dim cellar lit by a single bare bulb",
     },
+    # ── kitchen ─────────────────────────────────────────────────────────
+    {
+        "output": "kitchen_to_hallway.mp4",
+        "start": "images/kitchen.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 241,
+        "prompt": "camera leaves a plain kitchen past the enamel sink and the wooden table, "
+                  "passes through the only wooden kitchen door, and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_kitchen.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/kitchen.jpg",
+        "seed": 242,
+        "prompt": "camera moves from the central hallway through a wooden kitchen door, "
+                  "and ends inside a plain kitchen with an old kettle on the hob",
+    },
+    # ── study ───────────────────────────────────────────────────────────
+    {
+        "output": "study_to_hallway.mp4",
+        "start": "images/study.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 251,
+        "prompt": "camera leaves a small study past the wooden desk and the lit oil lamp, "
+                  "passes through the only wooden study door, and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_study.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/study.jpg",
+        "seed": 252,
+        "prompt": "camera moves from the central hallway through a wooden study door, "
+                  "and ends inside a small study with a heavy wooden desk and a single lit oil lamp",
+    },
+    # ── attic ───────────────────────────────────────────────────────────
+    {
+        "output": "attic_to_hallway.mp4",
+        "start": "images/attic.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 261,
+        "prompt": "camera descends the wooden attic staircase past the round dusty window and the "
+                  "covered chairs, passes through the only wooden attic door at the bottom, "
+                  "and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_attic.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/attic.jpg",
+        "seed": 262,
+        "prompt": "camera moves from the central hallway through a wooden attic door, "
+                  "ascends the wooden staircase, and ends in a dim attic with sloped beams "
+                  "and a single round window letting in pale grey light",
+    },
+    # ── dining_room ─────────────────────────────────────────────────────
+    {
+        "output": "dining_room_to_hallway.mp4",
+        "start": "images/dining_room.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 271,
+        "prompt": "camera leaves a plain dining room past the long wooden table set with white "
+                  "plates and the unlit candelabra, passes through the only wooden dining room "
+                  "door, and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_dining_room.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/dining_room.jpg",
+        "seed": 272,
+        "prompt": "camera moves from the central hallway through a wooden dining room door, "
+                  "and ends inside a plain dining room with a long wooden table set for no one "
+                  "and an unlit candelabra in the centre",
+    },
+    # ── library ─────────────────────────────────────────────────────────
+    {
+        "output": "library_to_hallway.mp4",
+        "start": "images/library.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 281,
+        "prompt": "camera leaves a small library past the tall dark wood bookshelves and the "
+                  "armchair beside the unlit fireplace, passes through the only wooden library "
+                  "door, and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_library.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/library.jpg",
+        "seed": 282,
+        "prompt": "camera moves from the central hallway through a wooden library door, "
+                  "and ends inside a small library with tall bookshelves and a single armchair "
+                  "angled toward an unlit fireplace",
+    },
+    # ── parlour ─────────────────────────────────────────────────────────
+    {
+        "output": "parlour_to_hallway.mp4",
+        "start": "images/parlour.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 291,
+        "prompt": "camera leaves a plain parlour past the low couch and the wooden tea table "
+                  "with an empty teacup, passes through the only wooden parlour door, and ends "
+                  "in the long central hallway",
+    },
+    {
+        "output": "hallway_to_parlour.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/parlour.jpg",
+        "seed": 292,
+        "prompt": "camera moves from the central hallway through a wooden parlour door, "
+                  "and ends inside a plain parlour with a low couch and a still wall clock",
+    },
+    # ── storeroom ───────────────────────────────────────────────────────
+    {
+        "output": "storeroom_to_hallway.mp4",
+        "start": "images/storeroom.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 301,
+        "prompt": "camera leaves a plain storeroom past the wooden shelves crowded with old "
+                  "boxes and folded linens, passes through the only wooden storeroom door, "
+                  "and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_storeroom.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/storeroom.jpg",
+        "seed": 302,
+        "prompt": "camera moves from the central hallway through a wooden storeroom door, "
+                  "and ends inside a plain storeroom with floor-to-ceiling wooden shelves "
+                  "lit by a single overhead bulb",
+    },
+    # ── conservatory ────────────────────────────────────────────────────
+    {
+        "output": "conservatory_to_hallway.mp4",
+        "start": "images/conservatory.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 311,
+        "prompt": "camera leaves a plain glass-walled conservatory past the potted ferns and "
+                  "the wicker chair, passes through the only interior wooden conservatory door, "
+                  "and ends in the long central hallway",
+    },
+    {
+        "output": "hallway_to_conservatory.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/conservatory.jpg",
+        "seed": 312,
+        "prompt": "camera moves from the central hallway through a wooden conservatory door, "
+                  "and ends inside a glass-walled conservatory with arched panes letting in "
+                  "cold pale grey light, potted ferns and a wicker chair",
+    },
 ]
 
 

@@ -20,9 +20,11 @@ Visuals deliberately plain (off-white walls, simple paintings, no era markers, n
 
 Any prompt edits in `gen_*.py` MUST stay diegesis-neutral. Don't add Victorian wallpaper, fluorescent lights, asylum bars, etc.
 
-## Slice scope (v0.1)
+## Slice scope
 
-3 rooms: bedroom (start) + bathroom + cellar. Hub: hallway. Monster: pale woman. Endings: window (in bedroom) + caught (reuses monster_attack clip) + escape (no clip — text only).
+**v0.1** (initial): 3 rooms (bedroom + bathroom + cellar) + hallway. One monster (pale woman). 3 endings.
+
+**v0.2** (current): 11 spoke rooms — bedroom, bathroom, cellar, kitchen, study, attic, dining_room, library, parlour, storeroom, conservatory. All 6 threats have their own per-threat release + attack clips (with pale_woman as the missing-clip default). Hallway is rendered as a vertical corridor in the mini-map (col 2, rows 2-6) with 5 spokes flanking each side; parlour spans the wide top row, exit spans the wide bottom row.
 
 ## Asset pipeline
 

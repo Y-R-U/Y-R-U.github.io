@@ -885,10 +885,15 @@
       return;
     }
     [
-      ["bedroom", "node-top-left"],
-      ["bathroom", "node-top-right"],
+      // 11 spokes flanking the central hallway corridor — see CSS
+      // .node-row* / .node-wide-top / .node-exit grid positions.
+      ["parlour", "node-wide-top"],
+      ["bedroom", "node-row1-left"],   ["bathroom", "node-row1-right"],
+      ["study", "node-row2-left"],     ["library", "node-row2-right"],
+      ["kitchen", "node-row3-left"],   ["dining_room", "node-row3-right"],
+      ["cellar", "node-row4-left"],    ["attic", "node-row4-right"],
+      ["storeroom", "node-row5-left"], ["conservatory", "node-row5-right"],
       ["hallway", "node-center"],
-      ["cellar", "node-bottom-left"],
       ["exit", "node-exit"],
     ].forEach(([id, positionClass]) => {
       const node = document.createElement("div");
