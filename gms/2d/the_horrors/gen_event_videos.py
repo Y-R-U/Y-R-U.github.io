@@ -83,6 +83,133 @@ EVENTS = [
                   "her dark hand and pale face against the glass, slow oppressive PG horror "
                   "reveal, no blood, no gore",
     },
+    # ── lost_child ─────────────────────────────────────────────────────────
+    {
+        "output": "monster_release_lost_child.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 521,
+        "prompt": "the empty central hallway lights flicker, a small child of about eight in a "
+                  "dirty dark navy coat and dark hood with dark hair partly covering the face "
+                  "steps slowly out of the shadow at the far end of the corridor, the small "
+                  "dark silhouette clearly framed against the lit off-white walls, the child "
+                  "stops and tilts its head toward the camera, tense atmospheric PG horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_lost_child.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 522,
+        "prompt": "central hallway point of view, a small dark-coated child runs directly toward "
+                  "the camera with arms outstretched, dark hood pulled back, dark hair flying, "
+                  "the small figure clearly silhouetted against the lit hallway, fast PG jump "
+                  "scare impact, no blood, no gore",
+    },
+    # ── previous_tenant ───────────────────────────────────────────────────
+    {
+        "output": "monster_release_previous_tenant.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 531,
+        "prompt": "the empty central hallway dims, a gaunt elderly man in a dark brown wool "
+                  "suit and dark waistcoat with neatly combed dark grey hair and hollow shadowed "
+                  "eyes steps slowly out from a doorway at the far end of the corridor, his "
+                  "dark figure clearly silhouetted against the lit off-white walls, he stops "
+                  "and stares directly toward the camera, slow oppressive PG horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_previous_tenant.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 532,
+        "prompt": "central hallway point of view, a gaunt elderly man in a dark brown suit "
+                  "strides quickly toward the camera with one bony hand raised, his hollow "
+                  "shadowed eyes wide, the dark figure clearly silhouetted against the lit "
+                  "off-white walls, fast PG jump scare impact, no blood, no gore",
+    },
+    # ── white_shadow ──────────────────────────────────────────────────────
+    # NOTE: white_shadow needs a high-contrast READING despite the name. We
+    # use a tall jet-black silhouette so it stays clearly framed against the
+    # off-white walls and never collapses into the tessellation attractor.
+    # The "white" of the name refers to the LIT-WALL backdrop, not the figure.
+    {
+        "output": "monster_release_white_shadow.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 541,
+        "prompt": "the empty central hallway lights flare bright, a tall featureless jet-black "
+                  "humanoid silhouette like a perfect ink-cut shape steps slowly out of the "
+                  "shadow at the far end of the corridor, the very dark figure is razor-sharp "
+                  "against the brightly lit off-white walls, it pauses motionless facing the "
+                  "camera, slow oppressive PG horror reveal, no detail on the figure, no face, no gore",
+    },
+    {
+        "output": "monster_attack_white_shadow.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 542,
+        "prompt": "central hallway point of view, a tall featureless jet-black humanoid "
+                  "silhouette glides quickly toward the camera, the very dark figure is "
+                  "razor-sharp against the brightly lit off-white walls, no facial detail, "
+                  "fast PG jump scare impact, no blood, no gore",
+    },
+    # ── silent_companion ──────────────────────────────────────────────────
+    {
+        "output": "monster_release_silent_companion.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 551,
+        "prompt": "the empty central hallway is still, a slim figure in a charcoal-grey dressing "
+                  "gown with long dark hair gradually rises into frame as if from sitting on the "
+                  "hallway floor at the far end, dark silhouette clearly framed against the "
+                  "lit off-white walls, the figure quietly turns its head toward the camera "
+                  "without moving its feet, slow oppressive PG horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_silent_companion.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 552,
+        "prompt": "central hallway point of view, a slim figure in a charcoal-grey dressing "
+                  "gown with long dark hair walks deliberately toward the camera without "
+                  "making a sound, dark silhouette clearly against the lit off-white walls, "
+                  "their hand rises slowly toward the lens, tense PG jump scare impact, "
+                  "no blood, no gore",
+    },
+    # ── hollow_one ────────────────────────────────────────────────────────
+    {
+        "output": "monster_release_hollow_one.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 561,
+        "prompt": "the empty central hallway lights dim, a tall figure in a long dark heavy "
+                  "coat steps slowly out of the shadow at the far end of the corridor with a "
+                  "deep dark hood pulled up so the face is completely hidden in shadow, dark "
+                  "silhouette clearly framed against the lit off-white walls, the figure "
+                  "stops and faces the camera, slow oppressive PG horror reveal, hood obscures "
+                  "all facial features, no gore",
+    },
+    {
+        "output": "monster_attack_hollow_one.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 562,
+        "prompt": "central hallway point of view, a tall hooded figure in a long dark coat "
+                  "with a deep dark hood hiding the face rushes directly toward the camera, "
+                  "dark silhouette clearly against the lit off-white walls, hood and coat "
+                  "billowing, fast PG jump scare impact, hood obscures all facial features, "
+                  "no blood, no gore",
+    },
 ]
 
 

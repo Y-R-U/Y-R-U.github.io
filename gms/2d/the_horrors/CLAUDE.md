@@ -48,3 +48,19 @@ python3 gen_event_videos.py          # LTX → monster + ending clips
 - No `alert`, `prompt`, `confirm` — overlay modals only.
 - Music + sound toggles in settings panel; volume slider 0–100; reset run.
 - Local regen helper at `127.0.0.1:8788` if running `regen_helper.py`.
+
+## Debug panel + regen helper
+
+The debug panel ships in `index.html` (the bug button in the top-right). It calls the local helper at `http://127.0.0.1:8788`. `regen_helper.py` is **byte-identical** to `awake/regen_helper.py` and reads its project-specific data from `regen_config.json` in the same directory.
+
+To debug this game locally:
+```
+cd ~/cc/yru/site/gms/2d/the_horrors && python3 regen_helper.py
+```
+Open `index.html?debug` in the browser and the panel auto-opens. Each row shows file size and mtime (e.g. `386 KB | 2026-05-16 00:46:59`) so stale clips are obvious.
+
+`regen_config.json` schema: `{ common, negative, transitions: {<file>: {id,label,start,end,seed,promptText,status}}, extras: [...], extra_prefixes: {<pre>: {group,status,default_poster}} }`. Add a new room → update `regen_config.json`, `gen_transitions.py`, and `js/story.js` `transitions` array (three sources of truth, kept aligned by hand).
+
+## Per-threat clip strategy
+
+`js/story.js` declares `eventVideos.release[<threat_id>]` and `eventVideos.attack[<threat_id>]` for all 6 threats; `eventVideoFor()` in `js/game.js` falls back to `group.default` (the pale_woman clip) when a per-threat file is missing. So generation of the remaining 10 monster clips can run in the background — the game stays playable the whole time, just shows pale_woman for unmapped threats.

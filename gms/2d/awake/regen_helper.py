@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Local-only Awake transition regeneration helper.
+"""Local-only video regeneration helper for hub-spoke video games.
 
-Run from this folder with:
+Run from the project folder with:
     python3 regen_helper.py
 
-The static game can then call http://127.0.0.1:8788/api/regen to queue
+Reads `regen_config.json` from the same directory for project-specific data
+(transitions, COMMON/NEGATIVE prompt boilerplate, extra-video prefixes). The
+script itself is identical between projects — copy it verbatim alongside a
+fresh regen_config.json and it works.
+
+The static game then calls http://127.0.0.1:8788/api/regen to queue
 replacement LTX renders that write back into ./videos.
 """
 
@@ -26,108 +31,32 @@ PORT = 8788
 HERE = os.path.dirname(os.path.abspath(__file__))
 VIDEO_DIR = os.path.join(HERE, "videos")
 METADATA_PATH = os.path.join(HERE, ".debug_transition_metadata.json")
+CONFIG_PATH = os.path.join(HERE, "regen_config.json")
 GAME_PORTRAIT_WIDTH = 384
 GAME_PORTRAIT_HEIGHT = 640
 
-COMMON = (
-    "realistic cinematic sci-fi horror game transition, vertical mobile portrait shot, "
-    "smooth forward camera movement through a sealed doorway, preserve exact architecture, "
-    "empty environment, no people, no readable text, no logos, no watermark, no collapse, "
-    "no melting, no creature, no body, professional atmospheric game footage"
-)
 
-NEGATIVE = (
-    "person, face, body, creature, readable text, logo, watermark, cartoon, painting, "
-    "melting architecture, collapsing room, explosion, gore, extra doors, duplicated hallway"
-)
+def _load_config():
+    if not os.path.exists(CONFIG_PATH):
+        raise SystemExit(
+            f"regen_helper.py: missing {CONFIG_PATH}.\n"
+            "Create one alongside this script. See ~/cc/yru/site/gms/2d/awake/regen_config.json for the schema."
+        )
+    with open(CONFIG_PATH, "r", encoding="utf-8") as handle:
+        return json.load(handle)
 
-TRANSITIONS = {
-    "cryo_room_to_hallway.mp4": {
-        "id": "cryo_room_to_hallway",
-        "label": "cryo_room to hallway",
-        "start": "images/cryo_room.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 84,
-        "promptText": "camera leaves a cracked cryogenic room, passes through the only exit door, and ends in the central hallway",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "hallway_to_cryo_room.mp4": {
-        "id": "hallway_to_cryo_room",
-        "label": "cryo_room from hallway",
-        "start": "images/hallway.jpg",
-        "end": "images/cryo_room.jpg",
-        "seed": 86,
-        "promptText": "camera moves from the central hallway through a sealed cryogenic door and ends inside the cracked cryo_room",
-        "status": "Approved candidate for hallway-to-room transition.",
-    },
-    "med_bay_to_hallway.mp4": {
-        "id": "med_bay_to_hallway",
-        "label": "med_bay to hallway",
-        "start": "images/med_bay.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 91,
-        "promptText": "camera leaves an abandoned futuristic med bay, passes through the only exit door, and ends in the central hallway",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "hallway_to_med_bay.mp4": {
-        "id": "hallway_to_med_bay",
-        "label": "med_bay from hallway",
-        "start": "images/hallway.jpg",
-        "end": "images/med_bay.jpg",
-        "seed": 92,
-        "promptText": "camera moves from the central hallway through a sealed medical door and ends inside the abandoned med bay",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "hydroponic_biome_to_hallway.mp4": {
-        "id": "hydroponic_biome_to_hallway",
-        "label": "hydroponic_biome to hallway",
-        "start": "images/hydroponic_biome.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 101,
-        "promptText": "camera leaves an overgrown hydroponic biome chamber, passes through the airlock door, and ends in the central hallway",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "hallway_to_hydroponic_biome.mp4": {
-        "id": "hallway_to_hydroponic_biome",
-        "label": "hydroponic_biome from hallway",
-        "start": "images/hallway.jpg",
-        "end": "images/hydroponic_biome.jpg",
-        "seed": 102,
-        "promptText": "camera moves from the central hallway through a fogged airlock and ends inside the overgrown hydroponic biome",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "reactor_gallery_to_hallway.mp4": {
-        "id": "reactor_gallery_to_hallway",
-        "label": "reactor_gallery to hallway",
-        "start": "images/reactor_gallery.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 111,
-        "promptText": "camera leaves a narrow reactor gallery, passes through the reinforced exit door, and ends in the central hallway",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-    "hallway_to_reactor_gallery.mp4": {
-        "id": "hallway_to_reactor_gallery",
-        "label": "reactor_gallery from hallway",
-        "start": "images/hallway.jpg",
-        "end": "images/reactor_gallery.jpg",
-        "seed": 112,
-        "promptText": "camera moves from the central hallway through a reinforced service door and ends inside the glowing reactor gallery",
-        "status": "New 3.04s intended transition. Needs review.",
-    },
-}
+
+CONFIG = _load_config()
+COMMON = CONFIG["common"]
+NEGATIVE = CONFIG["negative"]
+TRANSITIONS = CONFIG["transitions"]
+EXTRA_ROWS = CONFIG.get("extras", [])
+EXTRA_VIDEO_PREFIXES = CONFIG.get("extra_prefixes", {})
 
 TASKS = queue.Queue()
 JOBS = []
 RUNNING = None
 LOCK = threading.Lock()
-
-EXTRA_VIDEO_PREFIXES = {
-    "possible_": ("possible_other_transition", "Moved to possible by local regen helper."),
-    "other_": ("other_transition", "Moved to other by local regen helper."),
-    "ending_": ("ending_video", "Ending clip. Needs review."),
-    "monster_release_": ("monster_release", "Monster release clip. Needs review."),
-    "monster_attack_": ("monster_attack", "Monster attack clip. Needs review."),
-}
 
 
 def load_metadata():
@@ -232,6 +161,7 @@ def list_transitions():
     rows = []
     metadata = load_metadata()
     processing_file = running_file_name()
+    explicit_files = set(TRANSITIONS.keys())
     for file_name, transition in TRANSITIONS.items():
         meta = metadata.get(file_name, {})
         is_processing = file_name == processing_file
@@ -256,39 +186,41 @@ def list_transitions():
             "fileInfo": video_file_info(file_name),
             "exists": os.path.exists(os.path.join(VIDEO_DIR, file_name)),
         })
-    rows.append({
-        "id": "cryo_room_event_collapse",
-        "group": "possible_other_transition",
-        "label": "cryo_room collapse event",
-        "file": "cryo_room_event_collapse.mp4",
-        "src": video_row_src("cryo_room_event_collapse.mp4"),
-        "poster": "images/cryo_room.jpg",
-        "status": "Candidate bad ending or room-event clip.",
-        "canRedo": False,
-        "canReverse": False,
-        "reverseTarget": None,
-        "processing": False,
-        "fileInfo": video_file_info("cryo_room_event_collapse.mp4"),
-        "exists": os.path.exists(os.path.join(VIDEO_DIR, "cryo_room_event_collapse.mp4")),
-    })
+    for extra in EXTRA_ROWS:
+        file_name = extra["file"]
+        explicit_files.add(file_name)
+        rows.append({
+            "id": extra.get("id", file_name.replace(".mp4", "")),
+            "group": extra.get("group", "possible_other_transition"),
+            "label": extra.get("label", file_name.replace(".mp4", "")),
+            "file": file_name,
+            "src": video_row_src(file_name),
+            "poster": extra.get("poster", "images/hallway.jpg"),
+            "status": extra.get("status", "Local helper managed extra clip."),
+            "canRedo": False,
+            "canReverse": False,
+            "reverseTarget": None,
+            "processing": file_name == processing_file,
+            "fileInfo": video_file_info(file_name),
+            "exists": os.path.exists(os.path.join(VIDEO_DIR, file_name)),
+        })
     for file_name in sorted(os.listdir(VIDEO_DIR)):
         if not file_name.endswith(".mp4"):
             continue
-        if file_name in TRANSITIONS or file_name == "cryo_room_event_collapse.mp4":
+        if file_name in explicit_files:
             continue
         defaults = extra_video_defaults(file_name)
         if not defaults:
             continue
-        default_group, default_status = defaults
         meta = metadata.get(file_name, {})
         rows.append({
             "id": file_name.replace(".mp4", ""),
-            "group": meta.get("group", default_group),
+            "group": meta.get("group", defaults["group"]),
             "label": file_name.replace(".mp4", ""),
             "file": file_name,
             "src": video_row_src(file_name),
-            "poster": meta.get("poster", "images/hallway.jpg"),
-            "status": meta.get("status", default_status),
+            "poster": meta.get("poster", defaults.get("default_poster", "images/hallway.jpg")),
+            "status": meta.get("status", defaults["status"]),
             "canRedo": False,
             "canReverse": False,
             "reverseTarget": None,
@@ -587,7 +519,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({"ok": False, "error": "promptText is required"}, 400)
                 return
         job = {
-            "id": f"awake-{int(time.time() * 1000)}",
+            "id": f"regen-{int(time.time() * 1000)}",
             "task": "reverse" if is_reverse else "regen",
             "file": file_name,
             "targetFile": target_file,
@@ -610,7 +542,7 @@ def main():
     os.makedirs(VIDEO_DIR, exist_ok=True)
     threading.Thread(target=worker, daemon=True).start()
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"Awake regen helper listening on http://{HOST}:{PORT}", flush=True)
+    print(f"Regen helper listening on http://{HOST}:{PORT} (project dir: {HERE})", flush=True)
     server.serve_forever()
 
 

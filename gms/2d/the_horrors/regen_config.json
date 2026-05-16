@@ -1,0 +1,88 @@
+{
+  "common": "realistic cinematic horror game transition, vertical mobile portrait shot, smooth forward camera movement through a wooden doorway, preserve exact architecture, empty environment, period-neutral, no people, no readable text, no logos, no watermark, no collapse, no melting, no creature, no body, professional atmospheric game footage",
+  "negative": "person, face, body, creature, readable text, logo, watermark, cartoon, painting, melting architecture, collapsing room, explosion, gore, extra doors, duplicated hallway, sci-fi, futuristic, neon, hologram, tessellated pattern, repeating texture, mosaic tile, grid pattern, interlocking pattern, repeating squares, kaleidoscope, fractal artifact",
+  "transitions": {
+    "bedroom_to_hallway.mp4": {
+      "id": "bedroom_to_hallway",
+      "label": "bedroom to hallway",
+      "start": "images/bedroom.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 211,
+      "promptText": "camera leaves a plain bedroom past the lace curtains and the unlit lamp, passes through the only wooden bedroom door, and ends in the long central hallway",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    },
+    "hallway_to_bedroom.mp4": {
+      "id": "hallway_to_bedroom",
+      "label": "bedroom from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/bedroom.jpg",
+      "seed": 212,
+      "promptText": "camera moves from the central hallway through a wooden bedroom door, and ends inside a plain bedroom with the lace curtain shifting at the window",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    },
+    "bathroom_to_hallway.mp4": {
+      "id": "bathroom_to_hallway",
+      "label": "bathroom to hallway",
+      "start": "images/bathroom.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 221,
+      "promptText": "camera leaves a small white-tiled bathroom past the basin and shower curtain, passes through the only wooden bathroom door, and ends in the long central hallway",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    },
+    "hallway_to_bathroom.mp4": {
+      "id": "hallway_to_bathroom",
+      "label": "bathroom from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/bathroom.jpg",
+      "seed": 222,
+      "promptText": "camera moves from the central hallway through a wooden bathroom door, and ends inside a small white-tiled bathroom with a single overhead bulb",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    },
+    "cellar_to_hallway.mp4": {
+      "id": "cellar_to_hallway",
+      "label": "cellar to hallway",
+      "start": "images/cellar.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 231,
+      "promptText": "camera climbs the wooden steps out of a dim cellar, passes through the only wooden cellar door, and ends in the long central hallway",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    },
+    "hallway_to_cellar.mp4": {
+      "id": "hallway_to_cellar",
+      "label": "cellar from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/cellar.jpg",
+      "seed": 232,
+      "promptText": "camera moves from the central hallway through a wooden cellar door, descends the wooden staircase, and ends in a dim cellar lit by a single bare bulb",
+      "status": "v0.1 3.04s intended transition. Needs review."
+    }
+  },
+  "extras": [],
+  "extra_prefixes": {
+    "possible_": {
+      "group": "possible_other_transition",
+      "status": "Moved to possible by local regen helper.",
+      "default_poster": "images/hallway.jpg"
+    },
+    "other_": {
+      "group": "other_transition",
+      "status": "Moved to other by local regen helper.",
+      "default_poster": "images/hallway.jpg"
+    },
+    "ending_": {
+      "group": "ending_video",
+      "status": "Ending clip. Needs review.",
+      "default_poster": "images/bedroom.jpg"
+    },
+    "monster_release_": {
+      "group": "monster_release",
+      "status": "Monster release clip. Needs review.",
+      "default_poster": "images/hallway.jpg"
+    },
+    "monster_attack_": {
+      "group": "monster_attack",
+      "status": "Monster attack clip. Needs review.",
+      "default_poster": "images/hallway.jpg"
+    }
+  }
+}

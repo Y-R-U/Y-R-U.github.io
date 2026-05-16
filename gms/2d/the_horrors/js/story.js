@@ -241,14 +241,27 @@
     transitions[5], // hallway_to_cellar
   ];
 
-  // Single visual representation per event type — diegesis-neutral so one
-  // pale-woman clip serves every threat. (Could split per-threat later.)
+  // Per-threat clips. eventVideoFor() in game.js picks group[state.threat.id]
+  // first, then falls back to group.default — so missing per-threat clips
+  // gracefully reuse the pale_woman default until generation completes.
   const eventVideos = {
     release: {
       default: "videos/monster_release_pale_woman.mp4",
+      pale_woman: "videos/monster_release_pale_woman.mp4",
+      lost_child: "videos/monster_release_lost_child.mp4",
+      previous_tenant: "videos/monster_release_previous_tenant.mp4",
+      white_shadow: "videos/monster_release_white_shadow.mp4",
+      silent_companion: "videos/monster_release_silent_companion.mp4",
+      hollow_one: "videos/monster_release_hollow_one.mp4",
     },
     attack: {
       default: "videos/monster_attack_pale_woman.mp4",
+      pale_woman: "videos/monster_attack_pale_woman.mp4",
+      lost_child: "videos/monster_attack_lost_child.mp4",
+      previous_tenant: "videos/monster_attack_previous_tenant.mp4",
+      white_shadow: "videos/monster_attack_white_shadow.mp4",
+      silent_companion: "videos/monster_attack_silent_companion.mp4",
+      hollow_one: "videos/monster_attack_hollow_one.mp4",
     },
     endings: {
       window: "videos/ending_window.mp4",
@@ -276,6 +289,16 @@
     { type: "video", src: "videos/hallway_to_cellar.mp4", required: false, label: "cellar from hallway transition" },
     { type: "video", src: "videos/monster_release_pale_woman.mp4", required: false, label: "pale woman release" },
     { type: "video", src: "videos/monster_attack_pale_woman.mp4", required: false, label: "pale woman attack" },
+    { type: "video", src: "videos/monster_release_lost_child.mp4", required: false, label: "lost child release" },
+    { type: "video", src: "videos/monster_attack_lost_child.mp4", required: false, label: "lost child attack" },
+    { type: "video", src: "videos/monster_release_previous_tenant.mp4", required: false, label: "previous tenant release" },
+    { type: "video", src: "videos/monster_attack_previous_tenant.mp4", required: false, label: "previous tenant attack" },
+    { type: "video", src: "videos/monster_release_white_shadow.mp4", required: false, label: "white shadow release" },
+    { type: "video", src: "videos/monster_attack_white_shadow.mp4", required: false, label: "white shadow attack" },
+    { type: "video", src: "videos/monster_release_silent_companion.mp4", required: false, label: "silent companion release" },
+    { type: "video", src: "videos/monster_attack_silent_companion.mp4", required: false, label: "silent companion attack" },
+    { type: "video", src: "videos/monster_release_hollow_one.mp4", required: false, label: "hollow one release" },
+    { type: "video", src: "videos/monster_attack_hollow_one.mp4", required: false, label: "hollow one attack" },
     { type: "video", src: "videos/ending_window.mp4", required: false, label: "bedroom window ending" },
   ];
 
