@@ -27,7 +27,20 @@
   let debugFilter = "room";
   let debugMeta = loadDebugMeta();
   const cachedMedia = new Set();
-  const helperUrl = "http://127.0.0.1:8788/api";
+  // Helper URL — derived from the page location so the same code works
+  // whether you're on http://127.0.0.1:8788/the_horrors/?debug
+  // (helper-served, same origin) or your own static server at
+  // http://localhost:8778/gms/2d/the_horrors/ (helper is cross-origin,
+  // CORS handles it). The helper now hosts every project under its own
+  // slug, so we extract the slug from the URL path.
+  const helperUrl = (function () {
+    const m = location.pathname.match(/\/gms\/2d\/([^\/]+)\//)
+           || location.pathname.replace(/^\//, "").match(/^([^\/]+)/);
+    const slug = (m && m[1]) || "the_horrors";
+    const sameOrigin = location.port === "8788";
+    const origin = sameOrigin ? location.origin : "http://127.0.0.1:8788";
+    return `${origin}/${slug}/api`;
+  })();
 
   const els = {
     introVideo: $("intro-video"),
