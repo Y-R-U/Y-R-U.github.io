@@ -6,7 +6,8 @@
     bedroom: {
       id: "bedroom",
       name: "Bedroom",
-      kind: "room",
+      kind: "sleeping",
+      canStart: true,
       poster: "images/bedroom.jpg",
       idleVideo: "videos/bedroom_to_hallway.mp4",
       toHallway: "videos/bedroom_to_hallway.mp4",
@@ -16,7 +17,7 @@
     bathroom: {
       id: "bathroom",
       name: "Bathroom",
-      kind: "room",
+      kind: "bath_like",
       poster: "images/bathroom.jpg",
       idleVideo: "videos/bathroom_to_hallway.mp4",
       toHallway: "videos/bathroom_to_hallway.mp4",
@@ -26,7 +27,8 @@
     cellar: {
       id: "cellar",
       name: "Cellar",
-      kind: "room",
+      kind: "storage_like",
+      canStart: true,
       poster: "images/cellar.jpg",
       idleVideo: "videos/cellar_to_hallway.mp4",
       toHallway: "videos/cellar_to_hallway.mp4",
@@ -36,7 +38,7 @@
     kitchen: {
       id: "kitchen",
       name: "Kitchen",
-      kind: "room",
+      kind: "kitchen_like",
       poster: "images/kitchen.jpg",
       idleVideo: "videos/kitchen_to_hallway.mp4",
       toHallway: "videos/kitchen_to_hallway.mp4",
@@ -46,7 +48,8 @@
     study: {
       id: "study",
       name: "Study",
-      kind: "room",
+      kind: "study_like",
+      canStart: true,
       poster: "images/study.jpg",
       idleVideo: "videos/study_to_hallway.mp4",
       toHallway: "videos/study_to_hallway.mp4",
@@ -56,7 +59,7 @@
     attic: {
       id: "attic",
       name: "Attic",
-      kind: "room",
+      kind: "storage_like",
       poster: "images/attic.jpg",
       idleVideo: "videos/attic_to_hallway.mp4",
       toHallway: "videos/attic_to_hallway.mp4",
@@ -66,7 +69,7 @@
     dining_room: {
       id: "dining_room",
       name: "Dining Room",
-      kind: "room",
+      kind: "kitchen_like",
       poster: "images/dining_room.jpg",
       idleVideo: "videos/dining_room_to_hallway.mp4",
       toHallway: "videos/dining_room_to_hallway.mp4",
@@ -76,7 +79,8 @@
     library: {
       id: "library",
       name: "Library",
-      kind: "room",
+      kind: "study_like",
+      canStart: true,
       poster: "images/library.jpg",
       idleVideo: "videos/library_to_hallway.mp4",
       toHallway: "videos/library_to_hallway.mp4",
@@ -86,7 +90,8 @@
     parlour: {
       id: "parlour",
       name: "Parlour",
-      kind: "room",
+      kind: "sleeping",
+      canStart: true,
       poster: "images/parlour.jpg",
       idleVideo: "videos/parlour_to_hallway.mp4",
       toHallway: "videos/parlour_to_hallway.mp4",
@@ -96,7 +101,7 @@
     storeroom: {
       id: "storeroom",
       name: "Storeroom",
-      kind: "room",
+      kind: "storage_like",
       poster: "images/storeroom.jpg",
       idleVideo: "videos/storeroom_to_hallway.mp4",
       toHallway: "videos/storeroom_to_hallway.mp4",
@@ -106,12 +111,218 @@
     conservatory: {
       id: "conservatory",
       name: "Conservatory",
-      kind: "room",
+      kind: "wild",
       poster: "images/conservatory.jpg",
       idleVideo: "videos/conservatory_to_hallway.mp4",
       toHallway: "videos/conservatory_to_hallway.mp4",
       fromHallway: "videos/hallway_to_conservatory.mp4",
       text: "Cold pale light through arched glass. Ferns in plain pots. A wicker chair beside an empty glass. Frost is still tracing the lower panes even though the door from the hallway is warm.",
+    },
+    // ── Expansion rooms (v0.3) — sleeping variants. All canStart so the
+    // wake-up location varies wildly run to run.
+    master_bedroom: {
+      id: "master_bedroom",
+      name: "Master Bedroom",
+      kind: "sleeping",
+      canStart: true,
+      poster: "images/master_bedroom.jpg",
+      idleVideo: "videos/master_bedroom_to_hallway.mp4",
+      toHallway: "videos/master_bedroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_master_bedroom.mp4",
+      text: "A wide four-poster bed under a heavy canopy. Twin armchairs face an unlit fire. The dressing table mirror is turned to the wall.",
+    },
+    childs_bedroom: {
+      id: "childs_bedroom",
+      name: "Child's Bedroom",
+      kind: "sleeping",
+      canStart: true,
+      poster: "images/childs_bedroom.jpg",
+      idleVideo: "videos/childs_bedroom_to_hallway.mp4",
+      toHallway: "videos/childs_bedroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_childs_bedroom.mp4",
+      text: "A small bed under a quilted patchwork. A rocking horse rests at the end of its rail. The wallpaper carries a faded animal alphabet — one letter has been scratched out.",
+    },
+    elegant_bedroom: {
+      id: "elegant_bedroom",
+      name: "Elegant Bedroom",
+      kind: "sleeping",
+      canStart: true,
+      poster: "images/elegant_bedroom.jpg",
+      idleVideo: "videos/elegant_bedroom_to_hallway.mp4",
+      toHallway: "videos/elegant_bedroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_elegant_bedroom.mp4",
+      text: "Damask wallpaper, brass fittings polished long ago. A silk dressing gown still draped on the chair as if to be put on any moment. Two glasses on the bedside table — only one was emptied.",
+    },
+    servants_quarters: {
+      id: "servants_quarters",
+      name: "Servants' Quarters",
+      kind: "sleeping",
+      canStart: true,
+      poster: "images/servants_quarters.jpg",
+      idleVideo: "videos/servants_quarters_to_hallway.mp4",
+      toHallway: "videos/servants_quarters_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_servants_quarters.mp4",
+      text: "Three plain cots, three foot-lockers, three sets of folded uniforms. Only one cot is unmade — and the boots beside it are turned the wrong way for someone leaving.",
+    },
+    nursery: {
+      id: "nursery",
+      name: "Nursery",
+      kind: "sleeping",
+      canStart: true,
+      poster: "images/nursery.jpg",
+      idleVideo: "videos/nursery_to_hallway.mp4",
+      toHallway: "videos/nursery_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_nursery.mp4",
+      text: "A wicker bassinet, recently rocked. A wooden mobile turns by itself, very slowly. The lullaby music box on the shelf is wound but not playing.",
+    },
+    // ── Bathing rooms — three variants. bath_like.
+    elegant_bathroom: {
+      id: "elegant_bathroom",
+      name: "Elegant Bathroom",
+      kind: "bath_like",
+      poster: "images/elegant_bathroom.jpg",
+      idleVideo: "videos/elegant_bathroom_to_hallway.mp4",
+      toHallway: "videos/elegant_bathroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_elegant_bathroom.mp4",
+      text: "Marble basin, brass swan taps, a deep clawfoot tub draped with a fresh white towel. The folded towel is still warm. The mirror is fogged from the inside.",
+    },
+    red_bathroom: {
+      id: "red_bathroom",
+      name: "Red Bathroom",
+      kind: "bath_like",
+      poster: "images/red_bathroom.jpg",
+      idleVideo: "videos/red_bathroom_to_hallway.mp4",
+      toHallway: "videos/red_bathroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_red_bathroom.mp4",
+      text: "Deep oxblood-painted walls and a dim red-glass lamp. The mirror gives back too little of the room. The tap whistles, then stops, then whistles again on a different count.",
+    },
+    bloody_bathroom: {
+      id: "bloody_bathroom",
+      name: "Bloody Bathroom",
+      kind: "bath_like",
+      poster: "images/bloody_bathroom.jpg",
+      idleVideo: "videos/bloody_bathroom_to_hallway.mp4",
+      toHallway: "videos/bloody_bathroom_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_bloody_bathroom.mp4",
+      text: "Dried dark stains run down the white tiles and pool around the drain. The tub holds a few inches of murky water. The room was washed, but not for long enough.",
+    },
+    // ── Kitchen-likes.
+    butlers_kitchen: {
+      id: "butlers_kitchen",
+      name: "Butler's Kitchen",
+      kind: "kitchen_like",
+      poster: "images/butlers_kitchen.jpg",
+      idleVideo: "videos/butlers_kitchen_to_hallway.mp4",
+      toHallway: "videos/butlers_kitchen_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_butlers_kitchen.mp4",
+      text: "A narrow prep kitchen lined with polished silverware racks and a hanging row of copper pans. A leather notebook of menus lies open on the bench, marked for tonight.",
+    },
+    grand_dining_hall: {
+      id: "grand_dining_hall",
+      name: "Grand Dining Hall",
+      kind: "kitchen_like",
+      poster: "images/grand_dining_hall.jpg",
+      idleVideo: "videos/grand_dining_hall_to_hallway.mp4",
+      toHallway: "videos/grand_dining_hall_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_grand_dining_hall.mp4",
+      text: "A long polished table set for twelve. A chandelier draped in unlit candles hangs low. At one end, a single half-empty wine glass, the lip print fresh.",
+    },
+    pantry: {
+      id: "pantry",
+      name: "Pantry",
+      kind: "storage_like",
+      poster: "images/pantry.jpg",
+      idleVideo: "videos/pantry_to_hallway.mp4",
+      toHallway: "videos/pantry_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_pantry.mp4",
+      text: "Floor-to-ceiling shelves of preserves and dried goods, labelled in a careful hand. One jar is missing from a row of identical jars; its outline still in the dust.",
+    },
+    // ── Lounges, music & games. Several canStart (couches available).
+    music_room: {
+      id: "music_room",
+      name: "Music Room",
+      kind: "lounge_like",
+      canStart: true,
+      poster: "images/music_room.jpg",
+      idleVideo: "videos/music_room_to_hallway.mp4",
+      toHallway: "videos/music_room_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_music_room.mp4",
+      text: "A baby grand piano lid raised, sheet music open to a page no one is playing. A velvet daybed against the wall. The metronome on the piano ticks at a pace nobody set.",
+    },
+    billiard_room: {
+      id: "billiard_room",
+      name: "Billiard Room",
+      kind: "lounge_like",
+      canStart: true,
+      poster: "images/billiard_room.jpg",
+      idleVideo: "videos/billiard_room_to_hallway.mp4",
+      toHallway: "videos/billiard_room_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_billiard_room.mp4",
+      text: "A green-felted billiard table with the cues still in the rack. Three balls are arranged for an interrupted shot. A leather chesterfield sofa against the back wall.",
+    },
+    smoking_room: {
+      id: "smoking_room",
+      name: "Smoking Room",
+      kind: "lounge_like",
+      canStart: true,
+      poster: "images/smoking_room.jpg",
+      idleVideo: "videos/smoking_room_to_hallway.mp4",
+      toHallway: "videos/smoking_room_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_smoking_room.mp4",
+      text: "Dark wood panels, two leather wingbacks, and a low table with a glass ashtray. A cigar in the ashtray is still warm. The air sits heavy and sweet.",
+    },
+    // ── Study-likes.
+    portrait_gallery: {
+      id: "portrait_gallery",
+      name: "Portrait Gallery",
+      kind: "study_like",
+      poster: "images/portrait_gallery.jpg",
+      idleVideo: "videos/portrait_gallery_to_hallway.mp4",
+      toHallway: "videos/portrait_gallery_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_portrait_gallery.mp4",
+      text: "A long room of family portraits, faces lit by gilt-framed sconces. The portrait at the far end has been turned to face the wall. The frame is the right size for you.",
+    },
+    chapel: {
+      id: "chapel",
+      name: "Chapel",
+      kind: "study_like",
+      poster: "images/chapel.jpg",
+      idleVideo: "videos/chapel_to_hallway.mp4",
+      toHallway: "videos/chapel_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_chapel.mp4",
+      text: "A small private chapel, six wooden pews and a plain altar. A single candle burns on the altar — wick fresh. The kneeler in the front pew shows the marks of recent use.",
+    },
+    // ── Storage-likes.
+    wine_cellar: {
+      id: "wine_cellar",
+      name: "Wine Cellar",
+      kind: "storage_like",
+      poster: "images/wine_cellar.jpg",
+      idleVideo: "videos/wine_cellar_to_hallway.mp4",
+      toHallway: "videos/wine_cellar_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_wine_cellar.mp4",
+      text: "Rows of dark bottles in stone alcoves, the air thirty years older than the house. A small stool, a single empty glass, a ledger of vintages with one entry crossed out.",
+    },
+    linen_closet: {
+      id: "linen_closet",
+      name: "Linen Closet",
+      kind: "storage_like",
+      poster: "images/linen_closet.jpg",
+      idleVideo: "videos/linen_closet_to_hallway.mp4",
+      toHallway: "videos/linen_closet_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_linen_closet.mp4",
+      text: "Floor-to-ceiling shelves of folded sheets and pillowcases, each pile tied with ribbon. One ribbon is fresh; one pile has been unfolded and refolded with less care.",
+    },
+    // ── Outdoor / wild.
+    greenhouse: {
+      id: "greenhouse",
+      name: "Greenhouse",
+      kind: "wild",
+      poster: "images/greenhouse.jpg",
+      idleVideo: "videos/greenhouse_to_hallway.mp4",
+      toHallway: "videos/greenhouse_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_greenhouse.mp4",
+      text: "Long benches of seedling trays under cracked panes. A trowel still wet beside an unfinished pot. One plant has grown crookedly toward the door, not the light.",
     },
     hallway: {
       id: "hallway",
@@ -211,12 +422,52 @@
       label: "faceless caller",
       clue: "Their face is the room they were last seen in.",
     },
+    // ── Expansion v0.3 — six more.
+    {
+      id: "faceless_doctor",
+      name: "the faceless doctor",
+      label: "white coat",
+      clue: "The doctor's notes are clean and current. The doctor has no face above the collar.",
+    },
+    {
+      id: "bone_collector",
+      name: "the bone collector",
+      label: "small bag",
+      clue: "A polite figure with a leather bag. They will ask if anything in here is yours.",
+    },
+    {
+      id: "crawling_thing",
+      name: "the crawling thing",
+      label: "low movement",
+      clue: "It moves only along the floor and only when no one is watching the floor.",
+    },
+    {
+      id: "mourning_groom",
+      name: "the mourning groom",
+      label: "groom in black",
+      clue: "He waits at the foot of the stairs in a black suit. He has been waiting for someone other than you.",
+    },
+    {
+      id: "paper_mask",
+      name: "the paper mask",
+      label: "paper face",
+      clue: "A figure who covers their face with a folded sheet of paper. The face under the paper is whichever face you last saw on the paper.",
+    },
+    {
+      id: "red_lady",
+      name: "the red lady",
+      label: "red dress",
+      clue: "A tall woman in a red dress that is never quite where she stands. She steps out of her dress when she steps out of the room.",
+    },
   ];
 
+  // roomCount caps how many rooms appear in any single run (always
+  // clamped to the number actually defined in rooms{}). groupCount is
+  // how many task chains get placed at run start.
   const difficulties = {
-    easy: { label: "Easy", range: [100, 120], visibleGoals: 4, hiddenRoomCount: 0 },
-    medium: { label: "Medium", range: [90, 110], visibleGoals: 2, hiddenRoomCount: 1 },
-    hard: { label: "Hard", range: [70, 92], visibleGoals: 1, hiddenRoomCount: 99 },
+    easy:   { label: "Easy",   range: [100, 120], visibleGoals: 4, roomCount: 8,  groupCount: 1 },
+    medium: { label: "Medium", range: [90, 110],  visibleGoals: 2, roomCount: 10, groupCount: 2 },
+    hard:   { label: "Hard",   range: [70, 92],   visibleGoals: 1, roomCount: 12, groupCount: 3 },
   };
 
   const gameNames = [
@@ -329,7 +580,31 @@
     ["storeroom", "Storeroom"],
     ["conservatory", "Conservatory"],
   ];
-  v02Spokes.forEach(([roomId, displayName]) => {
+  // v0.3 expansion — 19 new rooms (named variants + new types). Same
+  // auto-registration pattern: transitions + manifest both fall out.
+  const v03Spokes = [
+    ["master_bedroom",    "Master Bedroom"],
+    ["childs_bedroom",    "Child's Bedroom"],
+    ["elegant_bedroom",   "Elegant Bedroom"],
+    ["servants_quarters", "Servants' Quarters"],
+    ["nursery",           "Nursery"],
+    ["elegant_bathroom",  "Elegant Bathroom"],
+    ["red_bathroom",      "Red Bathroom"],
+    ["bloody_bathroom",   "Bloody Bathroom"],
+    ["butlers_kitchen",   "Butler's Kitchen"],
+    ["grand_dining_hall", "Grand Dining Hall"],
+    ["pantry",            "Pantry"],
+    ["music_room",        "Music Room"],
+    ["billiard_room",     "Billiard Room"],
+    ["smoking_room",      "Smoking Room"],
+    ["portrait_gallery",  "Portrait Gallery"],
+    ["chapel",            "Chapel"],
+    ["wine_cellar",       "Wine Cellar"],
+    ["linen_closet",      "Linen Closet"],
+    ["greenhouse",        "Greenhouse"],
+  ];
+  const allSpokes = v02Spokes.concat(v03Spokes);
+  allSpokes.forEach(([roomId, displayName]) => {
     transitions.push({
       id: `${roomId}_to_hallway`,
       group: "room_transitions",
@@ -340,7 +615,7 @@
       startImage: `images/${roomId}.jpg`,
       endImage: "images/hallway.jpg",
       promptText: `camera leaves the ${displayName.toLowerCase()}, passes through the only wooden door, and ends in the long central hallway`,
-      status: "v0.2 3.04s intended transition. Needs review.",
+      status: "Generated 3.04s intended transition. Needs review.",
     });
     transitions.push({
       id: `hallway_to_${roomId}`,
@@ -352,7 +627,7 @@
       startImage: "images/hallway.jpg",
       endImage: `images/${roomId}.jpg`,
       promptText: `camera moves from the central hallway through a wooden door and ends inside the ${displayName.toLowerCase()}`,
-      status: "v0.2 3.04s intended transition. Needs review.",
+      status: "Generated 3.04s intended transition. Needs review.",
     });
   });
 
@@ -374,6 +649,12 @@
       white_shadow: "videos/monster_release_white_shadow.mp4",
       silent_companion: "videos/monster_release_silent_companion.mp4",
       hollow_one: "videos/monster_release_hollow_one.mp4",
+      faceless_doctor: "videos/monster_release_faceless_doctor.mp4",
+      bone_collector: "videos/monster_release_bone_collector.mp4",
+      crawling_thing: "videos/monster_release_crawling_thing.mp4",
+      mourning_groom: "videos/monster_release_mourning_groom.mp4",
+      paper_mask: "videos/monster_release_paper_mask.mp4",
+      red_lady: "videos/monster_release_red_lady.mp4",
     },
     attack: {
       default: "videos/monster_attack_pale_woman.mp4",
@@ -383,6 +664,12 @@
       white_shadow: "videos/monster_attack_white_shadow.mp4",
       silent_companion: "videos/monster_attack_silent_companion.mp4",
       hollow_one: "videos/monster_attack_hollow_one.mp4",
+      faceless_doctor: "videos/monster_attack_faceless_doctor.mp4",
+      bone_collector: "videos/monster_attack_bone_collector.mp4",
+      crawling_thing: "videos/monster_attack_crawling_thing.mp4",
+      mourning_groom: "videos/monster_attack_mourning_groom.mp4",
+      paper_mask: "videos/monster_attack_paper_mask.mp4",
+      red_lady: "videos/monster_attack_red_lady.mp4",
     },
     endings: {
       window: "videos/ending_window.mp4",
@@ -423,12 +710,19 @@
     { type: "video", src: "videos/ending_window.mp4", required: false, label: "bedroom window ending" },
   ];
 
-  // ── v0.2 spoke media (added in code so the room list above stays the
-  // single source of truth) ─────────────────────────────────────────────
-  v02Spokes.forEach(([roomId, displayName]) => {
+  // ── v0.2 + v0.3 spoke media (added in code so the room list above stays
+  // the single source of truth) ────────────────────────────────────────
+  allSpokes.forEach(([roomId, displayName]) => {
     mediaManifest.push({ type: "image", src: `images/${roomId}.jpg`, required: false, label: `${displayName} still` });
     mediaManifest.push({ type: "video", src: `videos/${roomId}_to_hallway.mp4`, required: false, label: `${roomId} to hallway transition` });
     mediaManifest.push({ type: "video", src: `videos/hallway_to_${roomId}.mp4`, required: false, label: `${roomId} from hallway transition` });
+  });
+  // v0.3 expansion monsters — release + attack clips for each new threat.
+  const v03Monsters = ["faceless_doctor", "bone_collector", "crawling_thing", "mourning_groom", "paper_mask", "red_lady"];
+  v03Monsters.forEach(monsterId => {
+    const display = monsterId.replace(/_/g, " ");
+    mediaManifest.push({ type: "video", src: `videos/monster_release_${monsterId}.mp4`, required: false, label: `${display} release` });
+    mediaManifest.push({ type: "video", src: `videos/monster_attack_${monsterId}.mp4`, required: false, label: `${display} attack` });
   });
 
   // ── Per-room actions ─────────────────────────────────────────────────────
@@ -540,7 +834,12 @@
         side: "sub",
         hint: "chart",
         turns: 1,
-        once: true,
+        // Stays clickable after the reveal but does nothing — once
+        // monster_revealed is set (either by reading the chart or by
+        // the turn-5 auto-reveal), this just shows a "nothing new"
+        // toast and doesn't burn a turn.
+        noopIf: state => !!state.flags.monster_revealed,
+        noopMessage: "The chart is unchanged. The room already knows what's outside.",
         event: "monster_release",
         run(state) {
           state.flags.chart = true;
@@ -1054,19 +1353,361 @@
     return core.concat(optional);
   }
 
-  function selectHiddenRooms(difficulty, startRoom, rng) {
-    const candidates = Object.keys(rooms).filter(id => id !== "hallway" && id !== startRoom);
-    const limit = Math.min(candidates.length, difficulty.hiddenRoomCount || 0);
-    return shuffled(candidates, rng).slice(0, limit);
+  // ── Task groups (puzzle chains) ──────────────────────────────────────
+  // Each group is a chain of steps placed at run start across rooms whose
+  // kind matches step.roomKind. Steps may declare `requires` (an inventory
+  // item id / flag name) and `provides` (the same shape — what doing this
+  // step grants). The engine in game.js handles disabled-locked UI and
+  // gating; story.js just declares the data.
+  //
+  // Authoring rules:
+  // - A step's room MUST exist in the run (placement filters by runRooms).
+  // - If no runRoom matches a step's roomKind, the whole group is skipped
+  //   for that run (better to drop the chain than place a broken step).
+  // - Keep steps small — 2–3 steps per chain plays best with current
+  //   turn budgets. The auto-reveal at turn 5 still applies.
+  // Step factory — keeps the data dense and consistent. Each step picks
+  // up an inventory item (optional), sets a provides flag (optional),
+  // and returns a one-line flavor message. `roomKind` "any" / omitted
+  // means the step can land in any run room.
+  function makeStep(opts) {
+    return {
+      id: opts.id,
+      label: opts.label,
+      roomKind: opts.roomKind || "any",
+      requires: opts.requires,
+      provides: opts.provides,
+      run(state) {
+        if (opts.item) addUnique(state.inventory, opts.item);
+        if (opts.provides) state.flags[opts.provides] = true;
+        return opts.text;
+      },
+    };
   }
 
-  // ── Mini-map layout + nearby topology ────────────────────────────────
-  // Single source of truth for both the mini-map grid positions AND the
-  // 1-turn "nearby" adjacency. Side: "left" | "right" | "wide".
-  // "across" = same row, opposite side.
-  // "up"     = previous row, same side (or any wide row at row-1).
-  // "down"   = next row, same side (wide rows below are NOT auto-nearby
-  //            so the bottom corner rooms don't all jump to "exit").
+  // ~35 chain puzzles. Most are 2-step "find X → use X" pairs that read
+  // well in a haunted-house / asylum / manor context. Some have a third
+  // assembly step. roomKind tags steer placement — "any" = anywhere,
+  // others target rooms by kind. Edit/add/remove freely; createRun
+  // picks K of these per run (1/2/3 by difficulty).
+  const taskGroups = [
+    { id: "lockbox_chain", label: "Lockbox & ledger", steps: [
+      makeStep({ id: "find_brass_key", label: "Search the drawers", provides: "key_brass", item: "Brass key",
+        text: "A small brass key tucked under folded linen, warm as if just handled." }),
+      makeStep({ id: "open_lockbox", label: "Open the lockbox", roomKind: "study_like", requires: "key_brass", provides: "ledger", item: "Ledger page",
+        text: "The lockbox clicks open. A single ledger page slides out — your name, dated yesterday." }),
+    ]},
+    { id: "diary_cipher", label: "Coded diary", steps: [
+      makeStep({ id: "find_coded_diary", label: "Pick up the locked diary", provides: "diary_coded", item: "Coded diary",
+        text: "A slim diary, every entry written in a child's substitution cipher." }),
+      makeStep({ id: "find_decipher_sheet", label: "Find the slip of paper", requires: "diary_coded", provides: "diary_decoded", item: "Cipher sheet",
+        text: "A torn slip lists letter pairs. The diary's last entry reads as a name." }),
+    ]},
+    { id: "sealed_letter", label: "Sealed letter", steps: [
+      makeStep({ id: "find_sealed_letter", label: "Lift the sealed envelope", provides: "sealed_letter", item: "Sealed letter",
+        text: "Wax seal, no addressee. Heavier than a single page should be." }),
+      makeStep({ id: "find_letter_opener", label: "Take the letter opener", requires: "sealed_letter", provides: "letter_opened", item: "Letter contents",
+        text: "The seal lifts whole. Inside: directions, in your own handwriting." }),
+    ]},
+    { id: "gramophone_message", label: "Gramophone record", steps: [
+      makeStep({ id: "find_vinyl_record", label: "Lift the vinyl record", provides: "vinyl_record", item: "Vinyl record",
+        text: "A record with no label, sleeve still warm from a hand that just held it." }),
+      makeStep({ id: "play_gramophone", label: "Wind the gramophone", roomKind: "lounge_like", requires: "vinyl_record", provides: "record_heard", item: "Recorded voice",
+        text: "The needle drops. The voice is yours. It is asking the room a question." }),
+    ]},
+    { id: "music_box", label: "Music box & key", steps: [
+      makeStep({ id: "find_silver_key", label: "Take the tiny silver key", provides: "silver_key", item: "Silver key",
+        text: "A key too small for any door, etched with a single initial." }),
+      makeStep({ id: "open_music_box", label: "Open the music box", requires: "silver_key", provides: "music_box_open", item: "Music box note",
+        text: "The lid lifts on a frozen ballerina. A folded note lies beneath the felt." }),
+    ]},
+    { id: "bible_bookmark", label: "Family bible & bookmark", steps: [
+      makeStep({ id: "find_family_bible", label: "Take down the family bible", roomKind: "study_like", provides: "family_bible", item: "Family bible",
+        text: "A bible with a family tree pencilled on the flyleaf. Your name is missing." }),
+      makeStep({ id: "find_pressed_bookmark", label: "Pick up the pressed bookmark", requires: "family_bible", provides: "bible_decoded", item: "Pressed bookmark",
+        text: "A pressed flower bookmark slips into a verse. The first letters spell a date." }),
+    ]},
+    { id: "photo_negative", label: "Photo negative", steps: [
+      makeStep({ id: "find_negative", label: "Pick up the film negative", provides: "photo_negative", item: "Film negative",
+        text: "A film negative held to the light shows a room missing one figure." }),
+      makeStep({ id: "develop_photo", label: "Develop the photo", roomKind: "bath_like", requires: "photo_negative", provides: "photo_developed", item: "Developed photo",
+        text: "The print resolves. Behind you in the picture, someone is standing very close." }),
+    ]},
+    { id: "pocket_watch", label: "Pocket watch", steps: [
+      makeStep({ id: "find_pocket_watch", label: "Take the pocket watch", provides: "watch_held", item: "Pocket watch",
+        text: "A pocket watch, stopped at a time you remember choosing." }),
+      makeStep({ id: "wind_pocket_watch", label: "Wind it carefully", requires: "watch_held", provides: "watch_wound", item: "Engraved hour",
+        text: "Wound, the watch ticks once and shows a future hour you have not lived yet." }),
+    ]},
+    { id: "wax_seal_kit", label: "Wax seal kit", steps: [
+      makeStep({ id: "find_wax_stick", label: "Pick up the wax stick", provides: "wax_stick", item: "Wax stick",
+        text: "A red wax stick, the tip already softened from use." }),
+      makeStep({ id: "use_seal_matrix", label: "Press the seal matrix", roomKind: "study_like", requires: "wax_stick", provides: "seal_made", item: "Wax seal impression",
+        text: "The brass matrix bites the wax. A family crest you do not recognise as yours." }),
+    ]},
+    { id: "liquor_cabinet", label: "Liquor cabinet", steps: [
+      makeStep({ id: "find_liquor_key", label: "Pocket the liquor key", provides: "liquor_key", item: "Cabinet key",
+        text: "A small key on a faded ribbon: the cabinet is for someone with steadier nerves." }),
+      makeStep({ id: "open_liquor_cabinet", label: "Open the cabinet", roomKind: "kitchen_like", requires: "liquor_key", provides: "courage", item: "Courage shot",
+        text: "One bottle, one glass. The taste is sharper than it should be. Your hands stop shaking." }),
+    ]},
+    { id: "wallpaper_message", label: "Wallpaper message", steps: [
+      makeStep({ id: "peel_wallpaper", label: "Peel the loose wallpaper", provides: "wallpaper_strip", item: "Wallpaper strip",
+        text: "The paper lifts cleanly. There is writing on the wall behind it." }),
+      makeStep({ id: "match_wall_symbol", label: "Match the pencilled symbol", requires: "wallpaper_strip", provides: "wall_symbol_matched", item: "Matched glyph",
+        text: "The pencilled glyph matches one you saw on a doorframe two rooms ago." }),
+    ]},
+    { id: "pet_collar", label: "Worn collar", steps: [
+      makeStep({ id: "find_worn_collar", label: "Pick up the worn collar", provides: "worn_collar", item: "Worn pet collar",
+        text: "A small leather collar, the buckle still warm. No tag." }),
+      makeStep({ id: "call_the_dog", label: "Whistle softly", requires: "worn_collar", provides: "dog_called", item: "Soft footsteps",
+        text: "Something patters in the hall — too small for the thing you are afraid of. It leaves a trail of pawprints toward a door." }),
+    ]},
+    { id: "broken_mirror", label: "Broken mirror", steps: [
+      makeStep({ id: "find_shard_a", label: "Pick up the silvered shard", provides: "shard_a", item: "Mirror shard A",
+        text: "A shard sharp enough to cut light. It reflects half a face that is not yours." }),
+      makeStep({ id: "find_shard_b", label: "Pick up the matching shard", provides: "shard_b", item: "Mirror shard B",
+        text: "A second shard, the edge matches the first. Together they show a whole stranger." }),
+      makeStep({ id: "assemble_mirror", label: "Fit the shards together", requires: "shard_b", provides: "mirror_whole", item: "Mended mirror",
+        text: "The shards seal. In the joined mirror, the stranger mouths a single word: run." }),
+    ]},
+    { id: "funeral_wreath", label: "Funeral wreath", steps: [
+      makeStep({ id: "find_wreath_ribbon", label: "Pull the wreath ribbon", provides: "wreath_ribbon", item: "Wreath ribbon",
+        text: "A black ribbon, embroidered with a date a week from now." }),
+      makeStep({ id: "find_hairpin", label: "Pocket the hairpin", requires: "wreath_ribbon", provides: "hairpin", item: "Hairpin",
+        text: "A hairpin too small for the ribbon's bow — but it fits a different lock." }),
+    ]},
+    { id: "apothecary_label", label: "Apothecary jar", steps: [
+      makeStep({ id: "find_empty_jar", label: "Lift the empty jar", provides: "empty_jar", item: "Apothecary jar",
+        text: "An empty jar with the residue of something faintly sweet inside." }),
+      makeStep({ id: "match_label", label: "Match the faded label", requires: "empty_jar", provides: "label_matched", item: "Faded label",
+        text: "The label, peeled and pocketed, names the contents and a dosage in a familiar hand." }),
+    ]},
+    { id: "calendar_date", label: "Calendar & safe", steps: [
+      makeStep({ id: "find_calendar", label: "Take the wall calendar", roomKind: "study_like", provides: "calendar_date", item: "Marked calendar",
+        text: "One date is circled twice. Two single digits scrawled beside it." }),
+      makeStep({ id: "try_safe", label: "Try the safe combination", requires: "calendar_date", provides: "safe_open", item: "Safe contents",
+        text: "The digits work. The safe holds one keepsake and one warning written for you." }),
+    ]},
+    { id: "doll_ritual", label: "Cursed doll", steps: [
+      makeStep({ id: "find_cursed_doll", label: "Pick up the doll", provides: "cursed_doll", item: "Cursed doll",
+        text: "A porcelain doll whose painted eyes follow you when you stop watching them." }),
+      makeStep({ id: "find_hearth_pin", label: "Take the hearth pin", requires: "cursed_doll", provides: "hearth_pin", item: "Hearth pin",
+        text: "An iron pin, blackened, found behind the hearth." }),
+      makeStep({ id: "burn_the_doll", label: "Pin and burn the doll", requires: "hearth_pin", provides: "doll_burned", item: "Doll ashes",
+        text: "Pinned through the chest, the doll burns quietly. The house feels half a tone lighter." }),
+    ]},
+    { id: "gardener_pruners", label: "Pruners & trellis", steps: [
+      makeStep({ id: "find_pruners", label: "Take the pruners", roomKind: "storage_like", provides: "pruners", item: "Garden pruners",
+        text: "Heavy pruners, oiled. Whoever last used them sharpened them recently." }),
+      makeStep({ id: "climb_trellis", label: "Cut down the trellis vines", roomKind: "wild", requires: "pruners", provides: "trellis_clear", item: "Cleared path",
+        text: "The vines part. There is a window behind the trellis no one has used in years." }),
+    ]},
+    { id: "wedding_ring", label: "Wedding ring", steps: [
+      makeStep({ id: "find_wedding_ring", label: "Pick up the wedding ring", provides: "wedding_ring", item: "Wedding ring",
+        text: "A wedding ring, engraved inside with a name. Not yours." }),
+      makeStep({ id: "match_portrait", label: "Match it to the portrait", requires: "wedding_ring", provides: "portrait_matched", item: "Identification",
+        text: "The ring matches the one painted on the portrait's left hand. The painted eyes seem to relax." }),
+    ]},
+    { id: "tea_arrangement", label: "Tea & seance", steps: [
+      makeStep({ id: "set_tea", label: "Arrange the tea cups", roomKind: "kitchen_like", provides: "tea_arrangement", item: "Tea arrangement",
+        text: "Three cups, three saucers — set the way someone here once set them." }),
+      makeStep({ id: "speak_seance", label: "Speak the seance words", requires: "tea_arrangement", provides: "seance_done", item: "Whispered answer",
+        text: "The spoon turns by itself. A whisper answers a question you only thought." }),
+    ]},
+    { id: "bell_jar", label: "Bell jar inscription", steps: [
+      makeStep({ id: "lift_bell_jar", label: "Lift the bell jar", roomKind: "storage_like", provides: "bell_jar_lifted", item: "Bell jar contents",
+        text: "Under the glass: a wax model of this house, with one door painted shut." }),
+      makeStep({ id: "read_bell_jar", label: "Read the etched base", requires: "bell_jar_lifted", provides: "bell_jar_read", item: "Etched names",
+        text: "The base lists every tenant in order. The last name is fresh — pencil, not ink." }),
+    ]},
+    { id: "snuff_box", label: "Snuff box", steps: [
+      makeStep({ id: "find_snuff_box", label: "Pick up the snuff box", provides: "snuff_box", item: "Snuff box",
+        text: "A silver snuff box, hinge worn from constant opening." }),
+      makeStep({ id: "analyse_snuff", label: "Tip the powder onto paper", requires: "snuff_box", provides: "snuff_analysed", item: "Pinned powder note",
+        text: "Not snuff. A dried herb that quiets dogs and dulls memory." }),
+    ]},
+    { id: "confession_password", label: "Confession password", steps: [
+      makeStep({ id: "find_booth_screen", label: "Lift the booth screen", provides: "booth_screen", item: "Slipped confession",
+        text: "A folded confession was wedged behind the screen. It names a room and a hour." }),
+      makeStep({ id: "speak_password", label: "Speak the password aloud", requires: "booth_screen", provides: "booth_password", item: "Password",
+        text: "Said aloud, the password makes a small click somewhere distant in the house." }),
+    ]},
+    { id: "portrait_recess", label: "Portrait recess", steps: [
+      makeStep({ id: "loosen_portrait", label: "Loosen the loose portrait", provides: "portrait_moved", item: "Loose portrait",
+        text: "The portrait slides sideways on a hidden track. There is a recess behind it." }),
+      makeStep({ id: "open_recess", label: "Reach into the recess", requires: "portrait_moved", provides: "recess_opened", item: "Recess contents",
+        text: "Inside the recess, a brooch and a single key still wearing a paper tag." }),
+    ]},
+    { id: "candle_count", label: "Three candles", steps: [
+      makeStep({ id: "gather_candles", label: "Gather the three candles", provides: "three_candles", item: "Three black candles",
+        text: "Three black candles, only one half-burnt — the other two have never been lit." }),
+      makeStep({ id: "light_fourth", label: "Light the absent fourth", requires: "three_candles", provides: "fourth_lit", item: "Fourth flame",
+        text: "Lit with the others, a fourth flame steadies where there is no candle. Something moves at the edge of the light." }),
+    ]},
+    { id: "gardeners_almanac", label: "Gardener's almanac", steps: [
+      makeStep({ id: "find_almanac", label: "Pick up the almanac", roomKind: "study_like", provides: "almanac", item: "Gardener's almanac",
+        text: "An old almanac, the planting beds annotated by a careful hand." }),
+      makeStep({ id: "match_bed", label: "Match the bed to the page", roomKind: "wild", requires: "almanac", provides: "bed_marked", item: "Marked planting bed",
+        text: "The bed in the almanac matches the one outside. Something has been buried under it recently." }),
+    ]},
+    { id: "family_recipe", label: "Family recipe & tonic", steps: [
+      makeStep({ id: "find_recipe_card", label: "Pick up the recipe card", roomKind: "kitchen_like", provides: "recipe_card", item: "Recipe card",
+        text: "A handwritten recipe, ingredients lined up too neatly. The last line is a warning." }),
+      makeStep({ id: "brew_tonic", label: "Brew the tonic carefully", roomKind: "kitchen_like", requires: "recipe_card", provides: "tonic_brewed", item: "Bottled tonic",
+        text: "The tonic comes out clear and bitter. According to the warning, it will keep a thing at bay for one passage." }),
+    ]},
+    { id: "child_drawing", label: "Child's drawing", steps: [
+      makeStep({ id: "find_child_drawing", label: "Pick up the crayon drawing", provides: "child_drawing", item: "Crayon drawing",
+        text: "A child's crayon drawing of this house. There is a smiling figure where no one stands." }),
+      makeStep({ id: "find_marked_spot", label: "Find the spot the child drew", requires: "child_drawing", provides: "spot_found", item: "Mark on the floor",
+        text: "The floorboard at the marked spot is loose. Under it, a tin of folded letters." }),
+    ]},
+    { id: "locked_chest", label: "Chest & locker key", steps: [
+      makeStep({ id: "find_chest_tag", label: "Lift the chest tag", provides: "chest_tag", item: "Chest tag",
+        text: "A paper tag tied to a brass chest. It names a person and asks for forgiveness." }),
+      makeStep({ id: "find_locker_key", label: "Take the locker key", requires: "chest_tag", provides: "locker_key", item: "Locker key",
+        text: "The key fits a locker upstairs. Whoever was forgiven left their coat behind." }),
+    ]},
+    { id: "stamped_envelope", label: "Stamped envelope", steps: [
+      makeStep({ id: "find_stamped_envelope", label: "Pick up the stamped envelope", provides: "stamped_envelope", item: "Stamped envelope",
+        text: "Stamps from a place the household has never been. The postmark is tomorrow." }),
+      makeStep({ id: "reverse_stamp", label: "Steam the stamp loose", roomKind: "study_like", requires: "stamped_envelope", provides: "stamp_lifted", item: "Hidden microtext",
+        text: "Behind the stamp, a square of writing too small to read without glass — but you have glass." }),
+    ]},
+    { id: "dressmaker_chain", label: "Dressmaker's hem", steps: [
+      makeStep({ id: "find_pin_cushion", label: "Take the pin cushion", provides: "pin_cushion", item: "Pin cushion",
+        text: "A pin cushion shaped like a tomato, bristling with pins of three different colours." }),
+      makeStep({ id: "unstitch_hem", label: "Unstitch the embroidered hem", requires: "pin_cushion", provides: "hem_unstitched", item: "Embroidered hem",
+        text: "The embroidery is a code. Picked apart, it spells a child's nickname." }),
+      makeStep({ id: "read_hidden_note", label: "Read the hidden note", requires: "hem_unstitched", provides: "hem_note_read", item: "Hidden note",
+        text: "Folded into the hem, a note: 'Do not let her wear this.' The handwriting is yours." }),
+    ]},
+    { id: "spirit_board", label: "Spirit board", steps: [
+      makeStep({ id: "find_planchette", label: "Pick up the planchette", provides: "planchette", item: "Planchette",
+        text: "A wooden planchette, the felt worn smooth from years of motion." }),
+      makeStep({ id: "ask_spirit", label: "Sit and ask softly", roomKind: "lounge_like", requires: "planchette", provides: "spirit_spoke", item: "Spirit answer",
+        text: "The planchette spells two words, then breaks. Two words are enough." }),
+    ]},
+    { id: "bird_cage", label: "Bird cage", steps: [
+      makeStep({ id: "find_cage_key", label: "Pick up the cage key", provides: "cage_key", item: "Cage key",
+        text: "A tiny key, the kind that fits a bird cage. The bird has been gone a long time." }),
+      makeStep({ id: "open_cage", label: "Open the cage door", requires: "cage_key", provides: "cage_open", item: "Found feather",
+        text: "Inside the cage: one feather and a folded slip of paper. The slip names a way out." }),
+    ]},
+    { id: "footprint_trail", label: "Muddy footprint", steps: [
+      makeStep({ id: "find_muddy_print", label: "Look closely at the print", provides: "muddy_print", item: "Tracing of a footprint",
+        text: "A muddy footprint, small, recent. You trace it onto paper." }),
+      makeStep({ id: "compare_bootprint", label: "Compare against the boots", roomKind: "storage_like", requires: "muddy_print", provides: "print_matched", item: "Matched boot",
+        text: "The print matches a child's boot tucked behind a coat. Today's mud is on the sole." }),
+    ]},
+    { id: "silverware_count", label: "Silverware count", steps: [
+      makeStep({ id: "polish_spoons", label: "Polish the spoon set", roomKind: "kitchen_like", provides: "spoon_set", item: "Polished spoon set",
+        text: "Polished, the spoons show a maker's mark that matches a date — a date you've seen circled." }),
+      makeStep({ id: "read_engraving", label: "Read the inherited engraving", requires: "spoon_set", provides: "engraving_read", item: "Inherited initials",
+        text: "The initials engraved on the handles are not the family's. They are yours." }),
+    ]},
+  ];
+
+  // For each group picked for a run, walk its steps and assign each one
+  // to a room whose kind matches. Returns placedActions:
+  //   { roomId: [stepObject, ...] }
+  // Group is dropped entirely if any step can't find a matching room
+  // in the run — better than leaving a step orphaned in the hallway.
+  function placeTaskGroups(difficulty, runRooms, rng) {
+    const placed = {};
+    const want = difficulty.groupCount || 0;
+    if (!want || !taskGroups.length) return placed;
+    const weighted = [];
+    taskGroups.forEach(group => {
+      const weight = group.weight || 1;
+      for (let i = 0; i < weight; i += 1) weighted.push(group);
+    });
+    const picks = [];
+    const seen = new Set();
+    const pool = shuffled(weighted, rng);
+    for (let i = 0; i < pool.length && picks.length < want; i += 1) {
+      const group = pool[i];
+      if (seen.has(group.id)) continue;
+      seen.add(group.id);
+      picks.push(group);
+    }
+    const usedRooms = new Set();
+    picks.forEach(group => {
+      const stepRooms = [];
+      let ok = true;
+      group.steps.forEach(step => {
+        if (!ok) return;
+        const candidates = runRooms.filter(id => {
+          const room = rooms[id];
+          if (!room) return false;
+          // "any" (or missing roomKind) means the step can be placed in
+          // any room of the run — useful for items that could plausibly
+          // be dropped anywhere: a diary, a brass key, a torn note.
+          if (!step.roomKind || step.roomKind === "any") return true;
+          return room.kind === step.roomKind;
+        });
+        // Prefer rooms not already used by another step (any group),
+        // but fall back to reusing one if there's no unused match.
+        const fresh = candidates.filter(id => !usedRooms.has(id));
+        const pool2 = fresh.length ? fresh : candidates;
+        if (!pool2.length) { ok = false; return; }
+        const chosen = randomItem(pool2, rng);
+        usedRooms.add(chosen);
+        stepRooms.push([chosen, step]);
+      });
+      if (!ok) return;
+      stepRooms.forEach(([roomId, step]) => {
+        if (!placed[roomId]) placed[roomId] = [];
+        // Persist only IDs — the live step (with `run` fn) is looked up
+        // from Story.taskGroups at render time. Functions don't survive
+        // JSON, so this is what lets the run resume from a saved state.
+        placed[roomId].push({ groupId: group.id, stepId: step.id });
+      });
+    });
+    return placed;
+  }
+
+  // Look up a placed step ({groupId, stepId}) back to the live step
+  // object that has the run() function. Returns null if either id is
+  // stale (e.g. content removed between releases).
+  function resolveStep(ref) {
+    if (!ref || !ref.groupId || !ref.stepId) return null;
+    const group = taskGroups.find(g => g.id === ref.groupId);
+    if (!group) return null;
+    return group.steps.find(s => s.id === ref.stepId) || null;
+  }
+
+  // Pick which rooms exist for this run. Always includes startRoom +
+  // (hallway is implicit-always-in everywhere else). Capped by however
+  // many rooms are actually defined, so a new game type with fewer
+  // rooms than the difficulty target just uses everything it has.
+  function selectRunRooms(difficulty, startRoom, rng) {
+    const target = difficulty.roomCount || 99;
+    const others = Object.keys(rooms).filter(id => id !== "hallway" && id !== startRoom);
+    const want = Math.max(0, Math.min(others.length, target - 1));
+    const picked = shuffled(others, rng).slice(0, want);
+    return [startRoom, ...picked];
+  }
+
+  // ── Per-run dynamic layout ───────────────────────────────────────────
+  // With ~30 rooms in the catalogue but only 8/10/12 chosen per run,
+  // we build a compact 2-column grid AT RUN START — picked rooms get
+  // tight positions (rows 1..N × left/right). This keeps the mini-map
+  // and the nearbyRooms topology aligned per run without forcing all
+  // 30 into a single static grid the player would never see whole.
+  function buildRunLayout(runRooms, rng) {
+    const candidates = runRooms.filter(id => id !== "hallway");
+    const arranged = shuffled(candidates, rng);
+    return arranged.map((id, index) => {
+      const row = Math.floor(index / 2) + 1;
+      const side = index % 2 === 0 ? "left" : "right";
+      return { id, row, side, pos: `node-row${row}-${side}` };
+    });
+  }
+
+  // Backwards-compatible static layout (used as a fallback for legacy
+  // saves without state.runLayout). Covers the v0.1/v0.2 11 rooms.
   const roomLayout = [
     { id: "parlour",      row: 1, side: "wide",  pos: "node-wide-top" },
     { id: "bedroom",      row: 2, side: "left",  pos: "node-row1-left" },
@@ -1081,26 +1722,29 @@
     { id: "conservatory", row: 6, side: "right", pos: "node-row5-right" },
   ];
 
-  function nearbyRooms(roomId) {
-    const me = roomLayout.find(entry => entry.id === roomId);
+  // nearbyRooms now takes the layout explicitly so it can work off the
+  // per-run layout. Falls back to the static roomLayout when called
+  // without a second argument (legacy callers, or pre-run lookups).
+  function nearbyRooms(roomId, layout) {
+    const useLayout = Array.isArray(layout) && layout.length ? layout : roomLayout;
+    const me = useLayout.find(entry => entry.id === roomId);
     if (!me) return [];
     const out = [];
     const add = id => { if (id && !out.includes(id) && id !== roomId) out.push(id); };
     if (me.side === "left" || me.side === "right") {
       const opp = me.side === "left" ? "right" : "left";
-      const across = roomLayout.find(e => e.row === me.row && e.side === opp);
+      const across = useLayout.find(e => e.row === me.row && e.side === opp);
       if (across) add(across.id);
-      const upSame = roomLayout.find(e => e.row === me.row - 1 && e.side === me.side);
+      const upSame = useLayout.find(e => e.row === me.row - 1 && e.side === me.side);
       if (upSame) add(upSame.id);
       else {
-        const upWide = roomLayout.find(e => e.row === me.row - 1 && e.side === "wide");
+        const upWide = useLayout.find(e => e.row === me.row - 1 && e.side === "wide");
         if (upWide) add(upWide.id);
       }
-      const downSame = roomLayout.find(e => e.row === me.row + 1 && e.side === me.side);
+      const downSame = useLayout.find(e => e.row === me.row + 1 && e.side === me.side);
       if (downSame) add(downSame.id);
     } else if (me.side === "wide") {
-      // wide rows: both sides of the row below count as nearby
-      const next = roomLayout.filter(e => e.row === me.row + 1);
+      const next = useLayout.filter(e => e.row === me.row + 1);
       next.forEach(e => add(e.id));
     }
     return out;
@@ -1119,6 +1763,9 @@
     difficulties,
     roomLayout,
     nearbyRooms,
+    buildRunLayout,
+    taskGroups,
+    resolveStep,
     createRun(difficultyId = "medium", seedKey = "") {
       const requestedKey = cleanRunKey(seedKey);
       const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";
@@ -1130,7 +1777,15 @@
       const prefix = randomItem(facilityNames, rng);
       const threat = randomItem(threats, rng);
       const limit = randomInt(difficulty.range[0], difficulty.range[1], rng);
-      const startRoom = "bedroom";
+      // Any room flagged canStart is eligible — lets new sleeping/lounge
+      // rooms join the pool just by setting the flag, no list to update.
+      const startCandidates = Object.keys(rooms).filter(id => rooms[id].canStart);
+      const startRoom = startCandidates.length
+        ? randomItem(startCandidates, rng)
+        : "bedroom";
+      const runRooms = selectRunRooms(difficulty, startRoom, rng);
+      const runLayout = buildRunLayout(runRooms, rng);
+      const placedActions = placeTaskGroups(difficulty, runRooms, rng);
       return {
         active: true,
         ended: false,
@@ -1152,7 +1807,9 @@
         currentRoom: startRoom,
         startRoom,
         visitedRooms: [startRoom],
-        hiddenRooms: selectHiddenRooms(difficulty, startRoom, rng),
+        runRooms,
+        runLayout,
+        placedActions,
         goals: selectRunGoals(rng),
         flags: {},
         inventory: [],

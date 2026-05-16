@@ -76,8 +76,13 @@ button {
   transition: opacity 200ms ease;
 }
 
+/* Show INSTANTLY (no fade-in). The fallback only needs to be smooth
+   on the way out — fading IN over 200ms exposes the video element
+   in its post-src-swap state, which can render the poster letterboxed
+   for a frame (the "video gets thinner then expands" flash). */
 .room-fallback.visible {
   opacity: 1;
+  transition: none;
 }
 
 .scene-shade {

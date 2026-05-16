@@ -236,6 +236,71 @@ TRANSITIONS = [
 ]
 
 
+# ── v0.3 expansion: 19 new rooms × 2 transitions each ──────────────────────
+# Compact spec: each entry is (room_id, seed_base, room_phrase). The pair of
+# transitions for each room is built below the spec. Seeds are spaced 10
+# apart so seed_base = N → outgoing N+1, return N+2 (and N+3..N+9 are free
+# for re-rolls).
+V03_ROOMS = [
+    ("master_bedroom",    400,
+     "large master bedroom past the canopied four-poster bed and the dressing table with its mirror turned to the wall"),
+    ("childs_bedroom",    410,
+     "small child's bedroom past the rocking horse and the patchwork quilt with the faded alphabet wallpaper border"),
+    ("elegant_bedroom",   420,
+     "elegant damask-walled bedroom past the silk-draped chair and the brass-fitted four-poster bed"),
+    ("servants_quarters", 430,
+     "narrow servants quarters past the three iron-framed cots and the row of folded uniforms"),
+    ("nursery",           440,
+     "small nursery past the wicker bassinet and the slowly turning wooden mobile of carved animals"),
+    ("elegant_bathroom",  450,
+     "elegant period bathroom past the marble basin and the deep porcelain clawfoot bathtub"),
+    ("red_bathroom",      460,
+     "small dim oxblood-red painted bathroom past the dark mirror and the curtained clawfoot bathtub"),
+    ("bloody_bathroom",   470,
+     "small white tiled bathroom with dried dark stained tiles past the clawfoot tub holding murky water"),
+    ("butlers_kitchen",   480,
+     "narrow butler's prep kitchen past the polished silver cutlery laid out and the hanging copper pans"),
+    ("grand_dining_hall", 490,
+     "grand formal dining hall past the long table set for twelve and the unlit chandelier draped in candles"),
+    ("pantry",            500,
+     "small pantry past the floor-to-ceiling shelves of labelled preserve jars with one jar conspicuously missing"),
+    ("music_room",        510,
+     "elegant music room past the baby grand piano with raised lid and the velvet daybed against the wall"),
+    ("billiard_room",     520,
+     "small billiard room past the green-felted billiard table with three balls arranged and the leather chesterfield"),
+    ("smoking_room",      530,
+     "small dark wood-panelled smoking room past the two leather wingback chairs and the still-smouldering cigar in the ashtray"),
+    ("portrait_gallery",  540,
+     "long portrait gallery past the rows of gilt-framed family portraits with the last one turned to face the wall"),
+    ("chapel",            550,
+     "small private chapel past the six wooden pews and the single lit candle on the plain altar"),
+    ("wine_cellar",       560,
+     "small underground wine cellar past the stone alcoves of dark bottles and the wooden ledger of vintages"),
+    ("linen_closet",      570,
+     "small linen closet past the floor-to-ceiling shelves of folded white sheets and pillowcases tied with ribbon"),
+    ("greenhouse",        580,
+     "small greenhouse past the long benches of seedling trays and the crookedly grown young plant"),
+]
+
+for _room_id, _seed_base, _phrase in V03_ROOMS:
+    TRANSITIONS.append({
+        "output": f"{_room_id}_to_hallway.mp4",
+        "start":  f"images/{_room_id}.jpg",
+        "end":    "images/hallway.jpg",
+        "seed":   _seed_base + 1,
+        "prompt": f"camera leaves a {_phrase}, passes through the only wooden door, "
+                  f"and ends in the long central hallway",
+    })
+    TRANSITIONS.append({
+        "output": f"hallway_to_{_room_id}.mp4",
+        "start":  "images/hallway.jpg",
+        "end":    f"images/{_room_id}.jpg",
+        "seed":   _seed_base + 2,
+        "prompt": f"camera moves from the central hallway through a wooden door, "
+                  f"and ends inside a {_phrase}",
+    })
+
+
 def log(message):
     line = f"[{time.strftime('%H:%M:%S')}] {message}"
     print(line, flush=True)

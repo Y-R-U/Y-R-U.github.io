@@ -210,6 +210,154 @@ EVENTS = [
                   "billowing, fast PG jump scare impact, hood obscures all facial features, "
                   "no blood, no gore",
     },
+    # ── faceless_doctor ──────────────────────────────────────────────────
+    {
+        "output": "monster_release_faceless_doctor.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 571,
+        "prompt": "the empty central hallway lights flicker, a tall slim figure in a long dark "
+                  "physician's coat with a brass stethoscope steps slowly out of a doorway at "
+                  "the far end, the collar high enough that above the collar is only a smooth "
+                  "blank shape with no features, dark silhouette clearly framed against the lit "
+                  "off-white walls, slow oppressive PG horror reveal, no face, no gore",
+    },
+    {
+        "output": "monster_attack_faceless_doctor.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 572,
+        "prompt": "central hallway point of view, the tall faceless physician in a long dark "
+                  "coat strides quickly toward the camera with one gloved hand outstretched, "
+                  "above the high collar there is only a smooth blank shape, dark figure "
+                  "razor-sharp against the lit off-white walls, fast PG jump scare impact, "
+                  "no blood, no gore",
+    },
+    # ── bone_collector ───────────────────────────────────────────────────
+    {
+        "output": "monster_release_bone_collector.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 581,
+        "prompt": "the empty central hallway dims, a stooped figure in a long dark travelling "
+                  "coat carrying a heavy worn leather bag steps slowly out of the shadow at the "
+                  "far end of the corridor, dark silhouette clearly framed against the lit "
+                  "off-white walls, the figure stops and tilts the bag toward the camera as if "
+                  "offering it, slow oppressive PG horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_bone_collector.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 582,
+        "prompt": "central hallway point of view, the stooped bone collector in a long dark "
+                  "coat lurches directly toward the camera, the heavy leather bag swinging in "
+                  "one hand, dark figure clearly silhouetted against the lit off-white walls, "
+                  "fast PG jump scare impact, no blood, no gore",
+    },
+    # ── crawling_thing ───────────────────────────────────────────────────
+    {
+        "output": "monster_release_crawling_thing.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 591,
+        "prompt": "the empty central hallway is still, a long dark humanoid shape slowly "
+                  "extends along the floor from the shadow at the far end of the corridor, "
+                  "crawling low and silently on all fours, the very dark silhouette razor-sharp "
+                  "against the lit off-white walls, head lifts toward the camera at the end of "
+                  "the motion, slow oppressive PG horror reveal, no blood, no gore",
+    },
+    {
+        "output": "monster_attack_crawling_thing.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 592,
+        "prompt": "central hallway point of view, a dark humanoid shape crawls fast directly "
+                  "toward the camera along the floor on all fours, the very dark silhouette "
+                  "razor-sharp against the lit off-white walls, head lifts at the lens, fast "
+                  "PG jump scare impact, no blood, no gore",
+    },
+    # ── mourning_groom ───────────────────────────────────────────────────
+    {
+        "output": "monster_release_mourning_groom.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 601,
+        "prompt": "the empty central hallway dims, a tall man in a formal black wedding suit "
+                  "with neatly combed dark hair and a small white boutonniere on his lapel "
+                  "steps slowly out of a doorway at the far end of the corridor, dark "
+                  "silhouette clearly framed against the lit off-white walls, his hollow eyes "
+                  "are fixed on the camera as if expecting someone else, slow oppressive PG "
+                  "horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_mourning_groom.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 602,
+        "prompt": "central hallway point of view, the tall mourning groom in a formal black "
+                  "wedding suit walks quickly toward the camera with one hand outstretched as "
+                  "if asking for a dance, dark figure clearly silhouetted against the lit "
+                  "off-white walls, fast PG jump scare impact, no blood, no gore",
+    },
+    # ── paper_mask ───────────────────────────────────────────────────────
+    {
+        "output": "monster_release_paper_mask.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 611,
+        "prompt": "the empty central hallway flickers, a slim figure in a long dark coat steps "
+                  "slowly out of the shadow at the far end of the corridor, the face is "
+                  "completely covered by a flat folded white sheet of paper held in place, dark "
+                  "silhouette clearly framed against the lit off-white walls, the figure stops "
+                  "and tilts the paper face toward the camera, slow oppressive PG horror "
+                  "reveal, paper covers entire face, no gore",
+    },
+    {
+        "output": "monster_attack_paper_mask.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 612,
+        "prompt": "central hallway point of view, the slim figure in a long dark coat with a "
+                  "flat folded white paper covering its whole face strides quickly toward the "
+                  "camera, paper face held perfectly forward, dark silhouette clearly against "
+                  "the lit off-white walls, fast PG jump scare impact, paper covers entire "
+                  "face, no blood, no gore",
+    },
+    # ── red_lady ─────────────────────────────────────────────────────────
+    {
+        "output": "monster_release_red_lady.mp4",
+        "group": "monster_release",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 621,
+        "prompt": "the empty central hallway dims, a tall woman in a long deep crimson red "
+                  "evening dress with dark hair worn up steps slowly out of the shadow at the "
+                  "far end of the corridor, the dark red dress is strikingly saturated against "
+                  "the lit off-white walls, she stops and turns her head smoothly toward the "
+                  "camera, slow oppressive PG horror reveal, no gore",
+    },
+    {
+        "output": "monster_attack_red_lady.mp4",
+        "group": "monster_attack",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 622,
+        "prompt": "central hallway point of view, the tall woman in a long deep crimson red "
+                  "evening dress with dark hair worn up walks quickly directly toward the "
+                  "camera, the saturated red dress razor-sharp against the lit off-white walls, "
+                  "fast PG jump scare impact, no blood, no gore",
+    },
 ]
 
 

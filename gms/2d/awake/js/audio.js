@@ -71,6 +71,77 @@
     setTimeout(() => ctx.close(), 140);
   }
 
+  // Heartbeat: a low lub-dub pulse that loops while the run is tense.
+  // No visual flash — pure audio cue. BPM is set by game.js based on
+  // turn progress + whether the monster has been revealed.
+  let heartbeatTimer = 0;
+  let heartbeatBpm = 0;
+
+  function heartbeatPulse() {
+    if (!settings.sound || !primed) return;
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return;
+    const ctx = new Context();
+    const now = ctx.currentTime;
+    const lub = ctx.createOscillator();
+    const lubAmp = ctx.createGain();
+    lub.type = "sine";
+    lub.frequency.value = 72;
+    lubAmp.gain.setValueAtTime(0.0001, now);
+    lubAmp.gain.exponentialRampToValueAtTime(0.18 * settings.volume, now + 0.01);
+    lubAmp.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+    lub.connect(lubAmp).connect(ctx.destination);
+    lub.start(now);
+    lub.stop(now + 0.14);
+    const dub = ctx.createOscillator();
+    const dubAmp = ctx.createGain();
+    dub.type = "sine";
+    dub.frequency.value = 58;
+    dubAmp.gain.setValueAtTime(0.0001, now + 0.16);
+    dubAmp.gain.exponentialRampToValueAtTime(0.13 * settings.volume, now + 0.17);
+    dubAmp.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+    dub.connect(dubAmp).connect(ctx.destination);
+    dub.start(now + 0.16);
+    dub.stop(now + 0.29);
+    setTimeout(() => ctx.close(), 360);
+  }
+
+  function startHeartbeat(bpm) {
+    if (heartbeatBpm === bpm) return;
+    stopHeartbeat();
+    heartbeatBpm = bpm;
+    if (!bpm) return;
+    heartbeatPulse();
+    heartbeatTimer = setInterval(heartbeatPulse, Math.round(60000 / bpm));
+  }
+
+  function stopHeartbeat() {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = 0;
+    heartbeatBpm = 0;
+  }
+
+  // One-off soft pulse used as the "you've been idle" nudge. Quieter
+  // and longer than the heartbeat so it reads as a different signal.
+  function idlePulse() {
+    if (!settings.sound || !primed) return;
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return;
+    const ctx = new Context();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const amp = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 95;
+    amp.gain.setValueAtTime(0.0001, now);
+    amp.gain.exponentialRampToValueAtTime(0.06 * settings.volume, now + 0.05);
+    amp.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+    osc.connect(amp).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.6);
+    setTimeout(() => ctx.close(), 700);
+  }
+
   window.CodexHorrorAudio = {
     init(el, initialSettings) {
       audio = el;
@@ -86,6 +157,7 @@
       settings = Object.assign(settings, nextSettings);
       if (!audio) return;
       audio.volume = settings.volume;
+      if (!settings.sound) stopHeartbeat();
       if (!settings.music) {
         audio.pause();
         return;
@@ -108,6 +180,15 @@
     success() {
       beep(420, 0.08, 0.04);
       setTimeout(() => beep(760, 0.11, 0.035), 80);
+    },
+    startHeartbeat(bpm) {
+      startHeartbeat(bpm);
+    },
+    stopHeartbeat() {
+      stopHeartbeat();
+    },
+    idlePulse() {
+      idlePulse();
     },
   };
 })();

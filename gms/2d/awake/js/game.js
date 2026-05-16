@@ -137,12 +137,20 @@
     if (!nextState) return null;
     if (nextState.currentRoom === "suspension") nextState.currentRoom = "cryo_room";
     nextState.visitedRooms = Array.isArray(nextState.visitedRooms) ? nextState.visitedRooms : [nextState.currentRoom || "cryo_room"];
-    nextState.hiddenRooms = Array.isArray(nextState.hiddenRooms) ? nextState.hiddenRooms : [];
+    // runRooms didn't exist on older saves — treat them as "all rooms in
+    // this run" so the player isn't suddenly locked out of half the map.
+    if (!Array.isArray(nextState.runRooms) || !nextState.runRooms.length) {
+      nextState.runRooms = Object.keys(Story.rooms).filter(id => id !== "hallway");
+    }
     nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
     nextState.flags = nextState.flags || {};
     nextState.inventory = Array.isArray(nextState.inventory) ? nextState.inventory : [];
     nextState.history = Array.isArray(nextState.history) ? nextState.history : [];
     nextState.runKey = nextState.runKey || "legacy-run";
+    // placedActions is a map of roomId → [{groupId, stepId}]. Older
+    // saves (or runs created before task groups existed) just see an
+    // empty map — no chains for that run, but everything else works.
+    nextState.placedActions = nextState.placedActions && typeof nextState.placedActions === "object" ? nextState.placedActions : {};
     return nextState;
   }
 
@@ -264,6 +272,8 @@
 
   function showIntro(force = false) {
     cancelActiveTransition();
+    Audio.stopHeartbeat();
+    clearIdleTimer();
     UI.showScreen("intro-screen");
     els.introName.textContent = randomTitle();
     els.introContinue.hidden = !Save.hasActiveRun();
@@ -478,6 +488,42 @@
     renderDetails();
     syncRunKeyUi();
     Save.saveState(state);
+    updateTensionAudio();
+    resetIdleTimer();
+  }
+
+  // Heartbeat intensity scales with how close we are to the turn limit
+  // and whether the monster has already been revealed. Pure audio cue,
+  // no visual flash. Set bpm=0 to stop.
+  function updateTensionAudio() {
+    if (!state || state.ended) {
+      Audio.stopHeartbeat();
+      return;
+    }
+    const progress = state.turnLimit > 0 ? state.turn / state.turnLimit : 0;
+    const revealed = !!state.flags.monster_revealed;
+    let bpm = 0;
+    if (progress >= 0.75 || (revealed && progress >= 0.55)) bpm = 84;
+    else if (progress >= 0.5 || revealed) bpm = 56;
+    Audio.startHeartbeat(bpm);
+  }
+
+  // Soft "are you still there?" pulse if the player hasn't clicked
+  // anything for IDLE_PROMPT_MS. Re-arms itself so it can fire again.
+  let idleTimer = 0;
+  const IDLE_PROMPT_MS = 30000;
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    if (!state || state.ended) return;
+    idleTimer = setTimeout(function pulse() {
+      if (!state || state.ended) return;
+      Audio.idlePulse();
+      idleTimer = setTimeout(pulse, IDLE_PROMPT_MS);
+    }, IDLE_PROMPT_MS);
+  }
+  function clearIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = 0;
   }
 
   function setRoomMedia(room) {
@@ -490,7 +536,11 @@
     // transitionTo's preReveal usually has the new poster loaded by
     // the time we get here, so this is normally instant.
     const idleSrc = mediaSrc(room.idleVideo);
-    els.roomVideo.poster = room.poster;
+    // Intentionally NOT setting roomVideo.poster — when video.src
+    // changes the element may render the poster image at intrinsic
+    // ratio (object-fit on video posters isn't reliable), which
+    // briefly letterboxes ("video gets thinner then expands"). The
+    // fallback img above provides a reliable bridge instead.
     const showFallback = () => {
       if (token !== roomMediaToken) return;
       els.roomFallback.classList.add("visible");
@@ -532,17 +582,30 @@
     if (!state.visitedRooms.includes(roomId)) state.visitedRooms.push(roomId);
   }
 
+  // A room participates in the current run if it's in state.runRooms.
+  // Hallway is always in. Defaults to all rooms if runRooms isn't set
+  // (legacy save fallback handled in normalizeState too).
+  function isRoomInRun(roomId) {
+    if (!roomId) return false;
+    if (roomId === "hallway") return true;
+    if (!state || !Array.isArray(state.runRooms) || !state.runRooms.length) return true;
+    return state.runRooms.includes(roomId);
+  }
+
   function isRoomNameKnown(roomId) {
+    // Hallway is always known. Every other room stays "???" until
+    // the player visits it, or until the map is unlocked (which
+    // reveals every room's name at once).
     if (!state || roomId === "hallway") return true;
-    const hiddenRooms = Array.isArray(state.hiddenRooms) ? state.hiddenRooms : [];
+    if (state.flags && state.flags.map) return true;
     const visitedRooms = Array.isArray(state.visitedRooms) ? state.visitedRooms : [];
-    return !hiddenRooms.includes(roomId) || visitedRooms.includes(roomId) || state.currentRoom === roomId;
+    return visitedRooms.includes(roomId) || state.currentRoom === roomId;
   }
 
   function roomDisplayName(roomId) {
     const room = Story.rooms[roomId];
-    if (!room) return "Unknown";
-    return isRoomNameKnown(roomId) ? room.name : "Unknown Sector";
+    if (!room) return "???";
+    return isRoomNameKnown(roomId) ? room.name : "???";
   }
 
   function currentStoryText(room) {
@@ -572,9 +635,28 @@
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+    // Placed task-group steps (chain puzzles). Locked steps render
+    // disabled with "(locked)" so the player knows there's a puzzle.
+    const placedRefs = (state.placedActions && state.placedActions[state.currentRoom]) || [];
+    placedRefs.forEach(ref => {
+      const step = typeof Story.resolveStep === "function" ? Story.resolveStep(ref) : null;
+      if (!step) return;
+      if (state.flags[`done_${ref.groupId}_${ref.stepId}`]) return;
+      const button = document.createElement("button");
+      button.className = "tag tag-action";
+      button.type = "button";
+      const locked = step.requires && !state.flags[step.requires];
+      button.textContent = locked ? `${step.label} (locked)` : step.label;
+      button.disabled = locked;
+      if (!locked) button.addEventListener("click", () => doPlacedStep(ref, step));
+      els.subroomActions.append(button);
+    });
     if (inHallway && Array.isArray(Story.roomLayout)) {
+      // Hallway exits: only the rooms that are part of THIS run.
+      // Unknown ones still show labelled "???" so the player can
+      // explore blindly with consistent positions.
       Story.roomLayout.forEach(entry => {
-        if (!isRoomNameKnown(entry.id)) return;
+        if (!isRoomInRun(entry.id)) return;
         const button = document.createElement("button");
         button.className = "tag tag-action";
         button.type = "button";
@@ -584,8 +666,10 @@
         else els.subroomActions.append(button);
       });
     } else if (!inHallway && typeof Story.nearbyRooms === "function") {
+      // Filter nearby rooms by isRoomInRun so we don't suggest a room
+      // that isn't part of this run's map.
       Story.nearbyRooms(state.currentRoom).forEach(targetId => {
-        if (!Story.rooms[targetId] || !isRoomNameKnown(targetId)) return;
+        if (!Story.rooms[targetId] || !isRoomInRun(targetId)) return;
         const button = document.createElement("button");
         button.className = "tag tag-action";
         button.type = "button";
@@ -608,7 +692,7 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
-    renderGame("");
+    await afterTurn("");
   }
 
   async function doNearbyMove(targetRoom) {
@@ -627,7 +711,7 @@
     await transitionTo("hallway", { skipRevealAtEnd: true });
     await delay(150);
     await transitionTo(targetRoom);
-    renderGame("");
+    await afterTurn("");
   }
 
   async function doFarMove(targetRoom) {
@@ -649,7 +733,37 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
-    renderGame("");
+    await afterTurn("");
+  }
+
+  // Auto-reveal: if the player hasn't discovered the threat by turn 5,
+  // play a release cutscene at the cost of one extra turn. Player only
+  // ever sees this if they haven't triggered a reveal themselves first.
+  async function maybeForcedReveal() {
+    if (!state || state.ended) return false;
+    if (state.flags.monster_revealed) return false;
+    if (state.turn < 5) return false;
+    spendTurns(1);
+    state.flags.monster_revealed = true;
+    if (isCaught()) {
+      addHistory("The hunter reached you before the station's alarm finished.");
+      finishRun("caught");
+      return true;
+    }
+    const peek = state.currentRoom === "hallway"
+      ? `A sound rolls down the hall. ${state.threat.name.toUpperCase()} released during evacuation.`
+      : `You hear a noise and peek toward the hallway. ${state.threat.name.toUpperCase()} released during evacuation.`;
+    addHistory(peek);
+    await playMonsterRelease(peek);
+    return false;
+  }
+
+  // Wraps the post-action render so the auto-reveal can slip in BEFORE
+  // the next renderGame paints — keeps the UI consistent with state.
+  async function afterTurn(message) {
+    const ended = await maybeForcedReveal();
+    if (ended) return;
+    renderGame(message);
   }
 
   function actionDisplayLabel(action) {
@@ -657,7 +771,7 @@
       return { text: action.label };
     }
     if (!isRoomNameKnown(action.target)) {
-      return { text: "Enter Unknown Sector" };
+      return { text: "Enter ???" };
     }
     return { text: action.label };
   }
@@ -665,6 +779,13 @@
   async function doAction(action) {
     if (transitionLocked || !state || state.ended) return;
     Audio.prime();
+    // Actions can opt out of consuming a turn after some condition is
+    // met (e.g. a discovery clue that's already been seen). When noopIf
+    // matches, just show its message and bail before spendTurns.
+    if (typeof action.noopIf === "function" && action.noopIf(state)) {
+      if (action.noopMessage) UI.toast(action.noopMessage);
+      return;
+    }
     spendTurns(action.turns || 1);
     let message = "";
     if (action.run) message = action.run(state);
@@ -684,14 +805,15 @@
     if (action.target) {
       addHistory(`${Story.rooms[state.currentRoom].name}: ${action.label}.`);
       await transitionTo(action.target);
-      renderGame(message);
+      await afterTurn(message);
       return;
     }
 
     if (action.event === "monster_release" && message) {
+      state.flags.monster_revealed = true;
       addHistory(message);
       await playMonsterRelease(message);
-      renderGame(message);
+      await afterTurn(message);
       return;
     }
 
@@ -701,7 +823,7 @@
     if (action.look && message) {
       addHistory(message);
       await playLookCutscene(action, message);
-      renderGame(message);
+      await afterTurn(message);
       return;
     }
 
@@ -709,7 +831,34 @@
       addHistory(message);
       UI.toast(message);
     }
-    renderGame(message);
+    await afterTurn(message);
+  }
+
+  // Run one step of a placed task group. Looks like doAction but
+  // simpler — no transitions, no events, just spend a turn, run the
+  // step's effect, mark complete, advance.
+  async function doPlacedStep(ref, step) {
+    if (transitionLocked || !state || state.ended) return;
+    Audio.prime();
+    if (step.requires && !state.flags[step.requires]) return; // safety
+    spendTurns(step.turns || 1);
+    const message = typeof step.run === "function" ? step.run(state) : "";
+    if (step.provides) state.flags[step.provides] = true;
+    state.flags[`done_${ref.groupId}_${ref.stepId}`] = true;
+    updateGoalsFromFlags();
+    if (state.ending) {
+      addHistory(message);
+      return finishRun(state.ending);
+    }
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    if (message) {
+      addHistory(message);
+      UI.toast(message);
+    }
+    await afterTurn(message);
   }
 
   async function playLookCutscene(action, text) {
@@ -774,7 +923,6 @@
       clearTimeout(transitionTimer);
       els.roomFallback.src = from.poster;
       els.roomFallback.classList.remove("visible");
-      els.roomVideo.poster = from.poster;
       els.roomVideo.dataset.src = playbackSrc;
       els.roomVideo.src = playbackSrc;
       els.roomVideo.load();
@@ -809,7 +957,6 @@
         setTimeout(() => {
           if (token !== transitionSequence) return;
           els.roomFallback.src = to.poster;
-          els.roomVideo.poster = to.poster;
           if (!opts.skipRevealAtEnd) showActionTrays();
         }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
@@ -918,7 +1065,6 @@
     els.eventOverlay.classList.remove("video-reveal");
     els.roomFallback.src = Story.rooms.hallway.poster;
     els.roomFallback.classList.remove("visible");
-    els.roomVideo.poster = Story.rooms.hallway.poster;
     els.roomVideo.dataset.src = mediaSrc(clip);
     els.roomVideo.src = mediaSrc(clip);
     els.roomVideo.load();
@@ -1004,6 +1150,8 @@
     state.active = false;
     state.ended = true;
     state.ending = kind;
+    Audio.stopHeartbeat();
+    clearIdleTimer();
     const success = kind === "escape";
     if (success) {
       state.flags.goal_escape = true;
@@ -1089,11 +1237,14 @@
       target.textContent = "offline";
       return;
     }
-    const layout = (Story.roomLayout || []).map(entry => [entry.id, entry.pos])
+    // Filter to rooms in THIS run so the map matches the hallway tray.
+    const layout = (Story.roomLayout || [])
+      .filter(entry => isRoomInRun(entry.id))
+      .map(entry => [entry.id, entry.pos])
       .concat([["hallway", "node-center"], ["transport", "node-exit"]]);
     const nearby = state.currentRoom === "hallway"
-      ? new Set((Story.roomLayout || []).map(e => e.id))
-      : new Set((typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []));
+      ? new Set((Story.roomLayout || []).map(e => e.id).filter(isRoomInRun))
+      : new Set((typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []).filter(isRoomInRun));
     layout.forEach(([id, positionClass]) => {
       const node = document.createElement("button");
       node.type = "button";
@@ -1134,7 +1285,7 @@
       }
       addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
       await transitionTo("hallway");
-      renderGame("");
+      await afterTurn("");
       return;
     }
     if (state.currentRoom === "hallway") return doHallwayToRoom(targetId);
