@@ -40,6 +40,36 @@
       fromHallway: "videos/hallway_to_reactor_gallery.mp4",
       text: "The reactor gallery hums behind ribbed glass. Each pulse of light turns the shadows into machinery.",
     },
+    security_hub: {
+      id: "security_hub",
+      name: "Security Hub",
+      kind: "room",
+      poster: "images/security_hub.jpg",
+      idleVideo: "videos/security_hub_to_hallway.mp4",
+      toHallway: "videos/security_hub_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_security_hub.mp4",
+      text: "Dark monitors tile the security hub. One camera still follows you even when you stop moving.",
+    },
+    observation_deck: {
+      id: "observation_deck",
+      name: "Observation Deck",
+      kind: "room",
+      poster: "images/observation_deck.jpg",
+      idleVideo: "videos/observation_deck_to_hallway.mp4",
+      toHallway: "videos/observation_deck_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_observation_deck.mp4",
+      text: "The observation deck looks out over impossible distance. The glass shows stars, a red planet, and one reflection that is not yours.",
+    },
+    engineering_bay: {
+      id: "engineering_bay",
+      name: "Engineering Bay",
+      kind: "room",
+      poster: "images/engineering_bay.jpg",
+      idleVideo: "videos/engineering_bay_to_hallway.mp4",
+      toHallway: "videos/engineering_bay_to_hallway.mp4",
+      fromHallway: "videos/hallway_to_engineering_bay.mp4",
+      text: "Repair arms hang over the engineering bay like paused lightning. Every tool is clean except the one missing from its cradle.",
+    },
     hallway: {
       id: "hallway",
       name: "Central Hallway",
@@ -158,6 +188,9 @@
     { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache" },
     { id: "biome_sample", text: "Seal a sample from the corrupted plant towers.", requires: "biome_sample" },
     { id: "reactor_reading", text: "Collect the reactor timing code.", requires: "reactor_reading" },
+    { id: "security_log", text: "Recover the last security log.", requires: "security_log" },
+    { id: "starfix", text: "Align the observation deck star fix.", requires: "starfix" },
+    { id: "toolmark", text: "Find the missing engineering tool.", requires: "toolmark" },
   ];
 
   const transitions = [
@@ -258,6 +291,78 @@
       status: "New 3.04s intended transition. Needs review.",
     },
     {
+      id: "security_hub_to_hallway",
+      group: "room_transitions",
+      label: "security_hub to hallway",
+      file: "security_hub_to_hallway.mp4",
+      src: "videos/security_hub_to_hallway.mp4",
+      poster: "images/security_hub.jpg",
+      startImage: "images/security_hub.jpg",
+      endImage: "images/hallway.jpg",
+      promptText: "camera leaves a compact security hub with dark surveillance monitors, passes through the armored exit door, and ends in the central hallway",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
+      id: "hallway_to_security_hub",
+      group: "room_transitions",
+      label: "security_hub from hallway",
+      file: "hallway_to_security_hub.mp4",
+      src: "videos/hallway_to_security_hub.mp4",
+      poster: "images/hallway.jpg",
+      startImage: "images/hallway.jpg",
+      endImage: "images/security_hub.jpg",
+      promptText: "camera moves from the central hallway through an armored security door and ends inside the compact surveillance hub",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
+      id: "observation_deck_to_hallway",
+      group: "room_transitions",
+      label: "observation_deck to hallway",
+      file: "observation_deck_to_hallway.mp4",
+      src: "videos/observation_deck_to_hallway.mp4",
+      poster: "images/observation_deck.jpg",
+      startImage: "images/observation_deck.jpg",
+      endImage: "images/hallway.jpg",
+      promptText: "camera leaves a tall observation deck with a panoramic space window, passes through the sealed exit door, and ends in the central hallway",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
+      id: "hallway_to_observation_deck",
+      group: "room_transitions",
+      label: "observation_deck from hallway",
+      file: "hallway_to_observation_deck.mp4",
+      src: "videos/hallway_to_observation_deck.mp4",
+      poster: "images/hallway.jpg",
+      startImage: "images/hallway.jpg",
+      endImage: "images/observation_deck.jpg",
+      promptText: "camera moves from the central hallway through a sealed viewing door and ends inside the lonely observation deck",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
+      id: "engineering_bay_to_hallway",
+      group: "room_transitions",
+      label: "engineering_bay to hallway",
+      file: "engineering_bay_to_hallway.mp4",
+      src: "videos/engineering_bay_to_hallway.mp4",
+      poster: "images/engineering_bay.jpg",
+      startImage: "images/engineering_bay.jpg",
+      endImage: "images/hallway.jpg",
+      promptText: "camera leaves an industrial engineering bay with suspended repair arms, passes through the heavy exit door, and ends in the central hallway",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
+      id: "hallway_to_engineering_bay",
+      group: "room_transitions",
+      label: "engineering_bay from hallway",
+      file: "hallway_to_engineering_bay.mp4",
+      src: "videos/hallway_to_engineering_bay.mp4",
+      poster: "images/hallway.jpg",
+      startImage: "images/hallway.jpg",
+      endImage: "images/engineering_bay.jpg",
+      promptText: "camera moves from the central hallway through a heavy maintenance door and ends inside the industrial engineering bay",
+      status: "New 3.04s intended transition. Needs review.",
+    },
+    {
       id: "cryo_room_event_collapse",
       group: "possible_other_transition",
       label: "cryo_room collapse event",
@@ -279,12 +384,18 @@
       gene: "videos/monster_release_gene.mp4",
       alien: "videos/monster_release_alien.mp4",
       zombie: "videos/monster_release_zombie.mp4",
+      machine: "videos/monster_release_machine.mp4",
+      parasite: "videos/monster_release_parasite.mp4",
+      shadow: "videos/monster_release_shadow.mp4",
       default: "videos/monster_release_gene.mp4",
     },
     attack: {
       gene: "videos/monster_attack_gene.mp4",
       alien: "videos/monster_attack_alien.mp4",
       zombie: "videos/monster_attack_zombie.mp4",
+      machine: "videos/monster_attack_machine.mp4",
+      parasite: "videos/monster_attack_parasite.mp4",
+      shadow: "videos/monster_attack_shadow.mp4",
       default: "videos/monster_attack_gene.mp4",
     },
     victory: [
@@ -306,6 +417,9 @@
     { type: "image", src: "images/med_bay.jpg", required: false, label: "Med bay still" },
     { type: "image", src: "images/hydroponic_biome.jpg", required: false, label: "Hydroponic biome still" },
     { type: "image", src: "images/reactor_gallery.jpg", required: false, label: "Reactor gallery still" },
+    { type: "image", src: "images/security_hub.jpg", required: false, label: "Security hub still" },
+    { type: "image", src: "images/observation_deck.jpg", required: false, label: "Observation deck still" },
+    { type: "image", src: "images/engineering_bay.jpg", required: false, label: "Engineering bay still" },
     { type: "video", src: "videos/cryo_room_to_hallway.mp4", required: true, label: "cryo_room to hallway transition" },
     { type: "video", src: "videos/hallway_to_cryo_room.mp4", required: true, label: "cryo_room from hallway transition" },
     { type: "video", src: "videos/med_bay_to_hallway.mp4", required: false, label: "med_bay to hallway transition" },
@@ -314,13 +428,25 @@
     { type: "video", src: "videos/hallway_to_hydroponic_biome.mp4", required: false, label: "hydroponic_biome from hallway transition" },
     { type: "video", src: "videos/reactor_gallery_to_hallway.mp4", required: false, label: "reactor_gallery to hallway transition" },
     { type: "video", src: "videos/hallway_to_reactor_gallery.mp4", required: false, label: "reactor_gallery from hallway transition" },
+    { type: "video", src: "videos/security_hub_to_hallway.mp4", required: false, label: "security_hub to hallway transition" },
+    { type: "video", src: "videos/hallway_to_security_hub.mp4", required: false, label: "security_hub from hallway transition" },
+    { type: "video", src: "videos/observation_deck_to_hallway.mp4", required: false, label: "observation_deck to hallway transition" },
+    { type: "video", src: "videos/hallway_to_observation_deck.mp4", required: false, label: "observation_deck from hallway transition" },
+    { type: "video", src: "videos/engineering_bay_to_hallway.mp4", required: false, label: "engineering_bay to hallway transition" },
+    { type: "video", src: "videos/hallway_to_engineering_bay.mp4", required: false, label: "engineering_bay from hallway transition" },
     { type: "video", src: "videos/cryo_room_event_collapse.mp4", required: false, label: "cryo_room event candidate" },
     { type: "video", src: "videos/monster_release_gene.mp4", required: false, label: "gene monster release" },
     { type: "video", src: "videos/monster_release_alien.mp4", required: false, label: "alien monster release" },
     { type: "video", src: "videos/monster_release_zombie.mp4", required: false, label: "zombie monster release" },
+    { type: "video", src: "videos/monster_release_machine.mp4", required: false, label: "machine monster release" },
+    { type: "video", src: "videos/monster_release_parasite.mp4", required: false, label: "parasite monster release" },
+    { type: "video", src: "videos/monster_release_shadow.mp4", required: false, label: "shadow monster release" },
     { type: "video", src: "videos/monster_attack_gene.mp4", required: false, label: "gene monster attack" },
     { type: "video", src: "videos/monster_attack_alien.mp4", required: false, label: "alien monster attack" },
     { type: "video", src: "videos/monster_attack_zombie.mp4", required: false, label: "zombie monster attack" },
+    { type: "video", src: "videos/monster_attack_machine.mp4", required: false, label: "machine monster attack" },
+    { type: "video", src: "videos/monster_attack_parasite.mp4", required: false, label: "parasite monster attack" },
+    { type: "video", src: "videos/monster_attack_shadow.mp4", required: false, label: "shadow monster attack" },
     { type: "video", src: "videos/ending_victory_transport_tube.mp4", required: false, label: "transport tube victory" },
     { type: "video", src: "videos/ending_victory_shuttle_launch.mp4", required: false, label: "shuttle launch victory" },
   ];
@@ -445,6 +571,113 @@
         turns: 1,
       },
     ],
+    security_hub: [
+      {
+        id: "security_log",
+        label: "Review security log",
+        side: "sub",
+        hint: "clue",
+        turns: 1,
+        once: true,
+        run(state) {
+          state.flags.security_log = true;
+          addUnique(state.inventory, "Last security log");
+          return "The security log shows every evacuation route closing from the inside.";
+        },
+      },
+      {
+        id: "unlock_sensors",
+        label: "Wake motion sensors",
+        side: "sub",
+        hint: "map",
+        turns: 1,
+        once: true,
+        run(state) {
+          state.mapUnlocked = true;
+          state.flags.map = true;
+          addUnique(state.inventory, "Sensor route overlay");
+          return "The security grid paints the map in blue, then marks one corridor in red.";
+        },
+      },
+      {
+        id: "security_to_hallway",
+        label: "Exit to hallway",
+        side: "exit",
+        hint: "transition",
+        target: "hallway",
+        turns: 1,
+      },
+    ],
+    observation_deck: [
+      {
+        id: "starfix",
+        label: "Align star fix",
+        side: "sub",
+        hint: "route",
+        turns: 1,
+        once: true,
+        run(state) {
+          state.flags.starfix = true;
+          addUnique(state.inventory, "Emergency star fix");
+          return "The deck aligns three stars and tells you the facility is not where the map says it is.";
+        },
+      },
+      {
+        id: "check_reflection",
+        label: "Check reflection",
+        side: "sub",
+        hint: "risk",
+        turns: 1,
+        run(state) {
+          state.threatPressure += 1;
+          return `Your reflection turns its head late. The ${state.threat.name} has learned another angle.`;
+        },
+      },
+      {
+        id: "observation_to_hallway",
+        label: "Exit to hallway",
+        side: "exit",
+        hint: "transition",
+        target: "hallway",
+        turns: 1,
+      },
+    ],
+    engineering_bay: [
+      {
+        id: "toolmark",
+        label: "Search tool cradle",
+        side: "sub",
+        hint: "supplies",
+        turns: 1,
+        once: true,
+        run(state) {
+          state.flags.toolmark = true;
+          addUnique(state.inventory, "Mag-sealed cutter");
+          return "One tool cradle is empty. The cutter you find nearby is still warm.";
+        },
+      },
+      {
+        id: "patch_transport",
+        label: "Patch transport relay",
+        side: "sub",
+        hint: "escape",
+        turns: 1,
+        once: true,
+        run(state) {
+          state.flags.transport_patch = true;
+          addUnique(state.inventory, "Transport relay patch");
+          return "The relay patch gives the transport tube a second route, but something hears the reboot tone.";
+        },
+      },
+      {
+        id: "engineering_to_hallway",
+        label: "Exit to hallway",
+        side: "exit",
+        hint: "transition",
+        target: "hallway",
+        turns: 1,
+      },
+    ],
     hallway: [
       {
         id: "route_cache",
@@ -465,6 +698,8 @@
         side: "sub",
         hint: "risk",
         turns: 1,
+        look: true,
+        lookVideo: "videos/look_hallway_vents.mp4",
         run(state) {
           state.threatPressure += 1;
           return `A sound answers from three vents at once. The ${state.threat.name} is closer than the map admits.`;
@@ -515,6 +750,30 @@
         side: "exit",
         hint: "transition",
         target: "reactor_gallery",
+        turns: 1,
+      },
+      {
+        id: "enter_security",
+        label: "Enter security",
+        side: "exit",
+        hint: "transition",
+        target: "security_hub",
+        turns: 1,
+      },
+      {
+        id: "enter_observation",
+        label: "Enter observation",
+        side: "exit",
+        hint: "transition",
+        target: "observation_deck",
+        turns: 1,
+      },
+      {
+        id: "enter_engineering",
+        label: "Enter engineering",
+        side: "exit",
+        hint: "transition",
+        target: "engineering_bay",
         turns: 1,
       },
     ],
@@ -587,6 +846,50 @@
     return shuffled(candidates, rng).slice(0, limit);
   }
 
+  // ── Mini-map layout + nearby topology ────────────────────────────────
+  // Single source of truth for both the mini-map grid positions AND the
+  // 1-turn "nearby" adjacency. Mirrors The Horrors's structure so the
+  // same renderMap / nearbyRooms code works.
+  const roomLayout = [
+    { id: "cryo_room",        row: 1, side: "left",  pos: "node-row1-left" },
+    { id: "med_bay",          row: 1, side: "right", pos: "node-row1-right" },
+    { id: "hydroponic_biome", row: 2, side: "left",  pos: "node-row2-left" },
+    { id: "reactor_gallery",  row: 2, side: "right", pos: "node-row2-right" },
+    { id: "security_hub",     row: 3, side: "left",  pos: "node-row3-left" },
+    { id: "observation_deck", row: 3, side: "right", pos: "node-row3-right" },
+    { id: "engineering_bay",  row: 4, side: "wide",  pos: "node-wide-bottom" },
+  ];
+
+  function nearbyRooms(roomId) {
+    const me = roomLayout.find(entry => entry.id === roomId);
+    if (!me) return [];
+    const out = [];
+    const add = id => { if (id && !out.includes(id) && id !== roomId) out.push(id); };
+    if (me.side === "left" || me.side === "right") {
+      const opp = me.side === "left" ? "right" : "left";
+      const across = roomLayout.find(e => e.row === me.row && e.side === opp);
+      if (across) add(across.id);
+      const upSame = roomLayout.find(e => e.row === me.row - 1 && e.side === me.side);
+      if (upSame) add(upSame.id);
+      else {
+        const upWide = roomLayout.find(e => e.row === me.row - 1 && e.side === "wide");
+        if (upWide) add(upWide.id);
+      }
+      const downSame = roomLayout.find(e => e.row === me.row + 1 && e.side === me.side);
+      if (downSame) add(downSame.id);
+      else {
+        const downWide = roomLayout.find(e => e.row === me.row + 1 && e.side === "wide");
+        if (downWide) add(downWide.id);
+      }
+    } else if (me.side === "wide") {
+      const above = roomLayout.filter(e => e.row === me.row - 1);
+      above.forEach(e => add(e.id));
+      const below = roomLayout.filter(e => e.row === me.row + 1);
+      below.forEach(e => add(e.id));
+    }
+    return out;
+  }
+
   window.CodexHorrorStory = {
     version: "0.1",
     rooms,
@@ -598,6 +901,8 @@
     mediaManifest,
     gameNames,
     difficulties,
+    roomLayout,
+    nearbyRooms,
     createRun(difficultyId = "medium", seedKey = "") {
       const requestedKey = cleanRunKey(seedKey);
       const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";

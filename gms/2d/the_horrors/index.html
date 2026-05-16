@@ -19,10 +19,9 @@
     <video id="intro-video" class="ambient-video" muted playsinline preload="auto" poster="images/bedroom.jpg"></video>
     <div class="scene-shade"></div>
     <div class="intro-copy">
-      <p class="overline">caching_data</p>
       <h1 id="intro-name">The Horrors</h1>
-      <p id="intro-status" class="subtitle">Loading the bedroom.</p>
-      <div class="cache-meter" aria-label="Asset cache progress">
+      <p id="intro-status" class="subtitle cache-fade">Caching game data</p>
+      <div id="cache-meter" class="cache-meter cache-fade" aria-label="Asset cache progress">
         <span id="cache-fill"></span>
       </div>
       <div class="title-actions">
@@ -325,6 +324,10 @@
 
 <div id="modal-root" class="modal-root" aria-live="polite"></div>
 <div id="toast-root" class="toast-root" aria-live="polite"></div>
+<div id="cutscene-overlay" class="cutscene-overlay" aria-hidden="true">
+  <video id="cutscene-video" class="cutscene-video" muted playsinline preload="auto"></video>
+  <p id="cutscene-text" class="cutscene-text"></p>
+</div>
 <audio id="music" preload="none"></audio>
 
 <script src="js/story.js"></script>

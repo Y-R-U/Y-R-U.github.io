@@ -467,6 +467,8 @@
         side: "sub",
         hint: "watch",
         turns: 1,
+        look: true,
+        lookVideo: "videos/look_bedroom_window.mp4",
         run(state) {
           state.threatPressure += 1;
           return "Outside, the garden is too still. The curtain shifts though the window is closed.";
@@ -586,6 +588,8 @@
         side: "sub",
         hint: "risk",
         turns: 1,
+        look: true,
+        lookVideo: "videos/look_hallway_listen.mp4",
         run(state) {
           state.threatPressure += 1;
           return `Behind one of the doors, breathing. ${state.threat.name} is closer than the building admits.`;
@@ -791,6 +795,8 @@
         side: "sub",
         hint: "watch",
         turns: 1,
+        look: true,
+        lookVideo: "videos/look_attic_window.mp4",
         run(state) {
           state.threatPressure += 1;
           return "Below: the garden, empty. The garden, empty. The garden, with someone in it that wasn't there a moment ago.";
@@ -955,6 +961,8 @@
         side: "sub",
         hint: "watch",
         turns: 1,
+        look: true,
+        lookVideo: "videos/look_conservatory_glass.mp4",
         once: true,
         run(state) {
           state.threatPressure += 1;
@@ -1052,8 +1060,54 @@
     return shuffled(candidates, rng).slice(0, limit);
   }
 
+  // ── Mini-map layout + nearby topology ────────────────────────────────
+  // Single source of truth for both the mini-map grid positions AND the
+  // 1-turn "nearby" adjacency. Side: "left" | "right" | "wide".
+  // "across" = same row, opposite side.
+  // "up"     = previous row, same side (or any wide row at row-1).
+  // "down"   = next row, same side (wide rows below are NOT auto-nearby
+  //            so the bottom corner rooms don't all jump to "exit").
+  const roomLayout = [
+    { id: "parlour",      row: 1, side: "wide",  pos: "node-wide-top" },
+    { id: "bedroom",      row: 2, side: "left",  pos: "node-row1-left" },
+    { id: "bathroom",     row: 2, side: "right", pos: "node-row1-right" },
+    { id: "study",        row: 3, side: "left",  pos: "node-row2-left" },
+    { id: "library",      row: 3, side: "right", pos: "node-row2-right" },
+    { id: "kitchen",      row: 4, side: "left",  pos: "node-row3-left" },
+    { id: "dining_room",  row: 4, side: "right", pos: "node-row3-right" },
+    { id: "cellar",       row: 5, side: "left",  pos: "node-row4-left" },
+    { id: "attic",        row: 5, side: "right", pos: "node-row4-right" },
+    { id: "storeroom",    row: 6, side: "left",  pos: "node-row5-left" },
+    { id: "conservatory", row: 6, side: "right", pos: "node-row5-right" },
+  ];
+
+  function nearbyRooms(roomId) {
+    const me = roomLayout.find(entry => entry.id === roomId);
+    if (!me) return [];
+    const out = [];
+    const add = id => { if (id && !out.includes(id) && id !== roomId) out.push(id); };
+    if (me.side === "left" || me.side === "right") {
+      const opp = me.side === "left" ? "right" : "left";
+      const across = roomLayout.find(e => e.row === me.row && e.side === opp);
+      if (across) add(across.id);
+      const upSame = roomLayout.find(e => e.row === me.row - 1 && e.side === me.side);
+      if (upSame) add(upSame.id);
+      else {
+        const upWide = roomLayout.find(e => e.row === me.row - 1 && e.side === "wide");
+        if (upWide) add(upWide.id);
+      }
+      const downSame = roomLayout.find(e => e.row === me.row + 1 && e.side === me.side);
+      if (downSame) add(downSame.id);
+    } else if (me.side === "wide") {
+      // wide rows: both sides of the row below count as nearby
+      const next = roomLayout.filter(e => e.row === me.row + 1);
+      next.forEach(e => add(e.id));
+    }
+    return out;
+  }
+
   window.TheHorrorsStory = {
-    version: "0.1",
+    version: "0.2",
     rooms,
     actions,
     goals: goalPool,
@@ -1063,6 +1117,8 @@
     mediaManifest,
     gameNames,
     difficulties,
+    roomLayout,
+    nearbyRooms,
     createRun(difficultyId = "medium", seedKey = "") {
       const requestedKey = cleanRunKey(seedKey);
       const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";

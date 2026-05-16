@@ -6,7 +6,7 @@
 
   const $ = id => document.getElementById(id);
   const DEBUG_META_KEY = "awake.debugMeta.v1";
-  const STATIC_MEDIA_VERSION = "20260515-runtime-media-1";
+  const STATIC_MEDIA_VERSION = "20260516-more-media";
   let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
@@ -48,6 +48,7 @@
     turnCount: $("turn-count"),
     eventOverlay: $("event-overlay"),
     eventMessage: $("event-message"),
+    eventSkip: $("event-skip"),
     detailsMobile: $("details-mobile"),
     mapMobile: $("map-mobile"),
     subroomActions: $("subroom-actions"),
@@ -340,16 +341,19 @@
     const loaded = manifest.filter(entry => cachedMedia.has(entry.src) || entry.failed).length;
     const percent = manifest.length ? Math.round((loaded / manifest.length) * 100) : 100;
     els.cacheFill.style.width = `${percent}%`;
-    const next = manifest.find(entry => !cachedMedia.has(entry.src) && !entry.failed);
-    if (introReady) {
-      els.introStatus.textContent = loaded >= manifest.length
-        ? "All current room feeds cached."
-        : `Ready. Background caching ${loaded}/${manifest.length}.`;
-      return;
+    const meter = document.getElementById("cache-meter");
+    if (loaded >= manifest.length) {
+      if (els.introStatus && els.introStatus.dataset.cacheDone !== "1") {
+        els.introStatus.dataset.cacheDone = "1";
+        els.introStatus.textContent = "Caching finished";
+        setTimeout(() => {
+          if (els.introStatus) els.introStatus.classList.add("cache-gone");
+          if (meter) meter.classList.add("cache-gone");
+        }, 900);
+      }
+    } else {
+      els.introStatus.textContent = "Caching game data";
     }
-    els.introStatus.textContent = next
-      ? `Caching ${next.label.toLowerCase()}... ${loaded}/${manifest.length}`
-      : "Preparing room feed.";
   }
 
   function maybeEnableIntro() {
@@ -524,26 +528,105 @@
     const actions = Story.actions[state.currentRoom] || [];
     els.subroomActions.innerHTML = "";
     els.exitActions.innerHTML = "";
+    const inHallway = state.currentRoom === "hallway";
     actions.forEach(action => {
+      if (action.side === "exit" && action.target && action.target !== "hallway") return;
       if (action.once && state.flags[action.id]) return;
+      if (typeof action.guard === "function" && !action.guard(state)) return;
       const button = document.createElement("button");
       button.className = "tag tag-action";
       button.type = "button";
       const label = actionDisplayLabel(action);
-      button.innerHTML = `${UI.escapeHtml(label.text)}<small>${UI.escapeHtml(label.hint)}</small>`;
+      button.textContent = label.text;
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+    if (inHallway && Array.isArray(Story.roomLayout)) {
+      Story.roomLayout.forEach(entry => {
+        if (!isRoomNameKnown(entry.id)) return;
+        const button = document.createElement("button");
+        button.className = "tag tag-action";
+        button.type = "button";
+        button.textContent = roomDisplayName(entry.id);
+        button.addEventListener("click", () => doHallwayToRoom(entry.id));
+        if (entry.side === "right") els.exitActions.append(button);
+        else els.subroomActions.append(button);
+      });
+    } else if (!inHallway && typeof Story.nearbyRooms === "function") {
+      Story.nearbyRooms(state.currentRoom).forEach(targetId => {
+        if (!Story.rooms[targetId] || !isRoomNameKnown(targetId)) return;
+        const button = document.createElement("button");
+        button.className = "tag tag-action";
+        button.type = "button";
+        button.textContent = roomDisplayName(targetId);
+        button.addEventListener("click", () => doNearbyMove(targetId));
+        els.exitActions.append(button);
+      });
+    }
+  }
+
+  async function doHallwayToRoom(targetRoom) {
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
+    await transitionTo(targetRoom);
+    renderGame("");
+  }
+
+  async function doNearbyMove(targetRoom) {
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    addHistory(`${Story.rooms[state.currentRoom].name} → ${Story.rooms[targetRoom].name}.`);
+    await transitionTo("hallway");
+    await delay(150);
+    await transitionTo(targetRoom);
+    renderGame("");
+  }
+
+  async function doFarMove(targetRoom) {
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
+    await transitionTo("hallway");
+    spendTurns(1);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
+    await transitionTo(targetRoom);
+    renderGame("");
   }
 
   function actionDisplayLabel(action) {
     if (!action.target || action.target === "hallway") {
-      return { text: action.label, hint: action.hint || "" };
+      return { text: action.label };
     }
     if (!isRoomNameKnown(action.target)) {
-      return { text: "Enter Unknown Sector", hint: "unscanned" };
+      return { text: "Enter Unknown Sector" };
     }
-    return { text: action.label, hint: action.hint || "" };
+    return { text: action.label };
   }
 
   async function doAction(action) {
@@ -579,11 +662,59 @@
       return;
     }
 
+    // Look actions: fade to black, show the message text large for
+    // 1.5s (or play the lookVideo if it actually exists on disk),
+    // then fade back. Marked in story.js with action.look = true.
+    if (action.look && message) {
+      addHistory(message);
+      await playLookCutscene(action, message);
+      renderGame(message);
+      return;
+    }
+
     if (message) {
       addHistory(message);
       UI.toast(message);
     }
     renderGame(message);
+  }
+
+  async function playLookCutscene(action, text) {
+    const overlay = document.getElementById("cutscene-overlay");
+    const videoEl = document.getElementById("cutscene-video");
+    const textEl = document.getElementById("cutscene-text");
+    if (!overlay) return;
+    transitionLocked = true;
+    overlay.setAttribute("aria-hidden", "false");
+    textEl.textContent = text;
+    overlay.classList.remove("has-video");
+    const lookSrc = action.lookVideo ? mediaSrc(action.lookVideo) : "";
+    const lookExists = !!lookSrc && cachedMedia.has(action.lookVideo);
+    if (lookExists) {
+      overlay.classList.add("has-video");
+      videoEl.src = lookSrc;
+      videoEl.load();
+      try { videoEl.currentTime = 0; } catch (err) {}
+    }
+    requestAnimationFrame(() => overlay.classList.add("visible"));
+    if (lookExists) {
+      try { await videoEl.play(); } catch (err) {}
+      await new Promise(resolve => {
+        const done = () => {
+          videoEl.removeEventListener("ended", done);
+          resolve();
+        };
+        videoEl.addEventListener("ended", done, { once: true });
+        setTimeout(done, 5500);
+      });
+    } else {
+      await delay(1500);
+    }
+    overlay.classList.remove("visible");
+    await delay(420);
+    overlay.setAttribute("aria-hidden", "true");
+    if (videoEl.src) { try { videoEl.pause(); } catch (err) {} videoEl.removeAttribute("src"); videoEl.load(); }
+    transitionLocked = false;
   }
 
   function spendTurns(count) {
@@ -614,6 +745,8 @@
       els.roomVideo.dataset.src = playbackSrc;
       els.roomVideo.src = playbackSrc;
       els.roomVideo.load();
+      // Drop the action trays while the transition video plays.
+      hideActionTrays();
       const done = () => {
         if (token !== transitionSequence) return;
         clearTimeout(transitionTimer);
@@ -633,6 +766,13 @@
         } catch (err) {}
         els.roomVideo.play().catch(() => {});
         const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
+        // Bring the destination room's actions back in 0.5s before the
+        // transition video ends — feels continuous instead of popping.
+        const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
+        setTimeout(() => {
+          if (token !== transitionSequence) return;
+          showActionTrays();
+        }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
       };
       const clamp = () => {
@@ -653,6 +793,26 @@
     transitionSequence += 1;
     clearTimeout(transitionTimer);
     if (els.roomVideo) els.roomVideo.pause();
+    showActionTrays();
+  }
+
+  function hideActionTrays() {
+    if (els.subroomActions) {
+      els.subroomActions.classList.remove("tags-fading-in");
+      els.subroomActions.classList.add("tags-hidden");
+    }
+    if (els.exitActions) {
+      els.exitActions.classList.remove("tags-fading-in");
+      els.exitActions.classList.add("tags-hidden");
+    }
+  }
+
+  function showActionTrays() {
+    [els.subroomActions, els.exitActions].forEach(tray => {
+      if (!tray) return;
+      tray.classList.add("tags-fading-in");
+      tray.classList.remove("tags-hidden");
+    });
   }
 
   function findTransitionMeta(src) {
@@ -717,14 +877,17 @@
     els.eventMessage.textContent = message;
     els.eventOverlay.classList.add("active");
     els.eventOverlay.classList.remove("video-reveal");
-    await delay(900);
     els.roomFallback.src = Story.rooms.hallway.poster;
     els.roomFallback.classList.remove("visible");
     els.roomVideo.poster = Story.rooms.hallway.poster;
     els.roomVideo.dataset.src = mediaSrc(clip);
     els.roomVideo.src = mediaSrc(clip);
     els.roomVideo.load();
-    await videoReady(els.roomVideo, 1800);
+    const ready = videoReady(els.roomVideo, 4200);
+    els.eventSkip.hidden = false;
+    await waitForEventSkip(5200);
+    els.eventSkip.hidden = true;
+    await ready;
     try {
       els.roomVideo.currentTime = 0;
     } catch (err) {}
@@ -737,6 +900,21 @@
     await delay(520);
     els.eventOverlay.classList.remove("active");
     transitionLocked = false;
+  }
+
+  function waitForEventSkip(timeoutMs) {
+    return new Promise(resolve => {
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        els.eventSkip.removeEventListener("click", done);
+        resolve();
+      };
+      const timer = setTimeout(done, timeoutMs);
+      els.eventSkip.addEventListener("click", done);
+    });
   }
 
   function eventVideoFor(kind) {
@@ -872,21 +1050,58 @@
       target.textContent = "offline";
       return;
     }
-    [
-      ["cryo_room", "node-top-left"],
-      ["med_bay", "node-top-right"],
-      ["hallway", "node-center"],
-      ["hydroponic_biome", "node-bottom-left"],
-      ["reactor_gallery", "node-bottom-right"],
-      ["transport", "node-exit"],
-    ].forEach(([id, positionClass]) => {
-      const node = document.createElement("div");
+    const layout = (Story.roomLayout || []).map(entry => [entry.id, entry.pos])
+      .concat([["hallway", "node-center"], ["transport", "node-exit"]]);
+    const nearby = state.currentRoom === "hallway"
+      ? new Set((Story.roomLayout || []).map(e => e.id))
+      : new Set((typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []));
+    layout.forEach(([id, positionClass]) => {
+      const node = document.createElement("button");
+      node.type = "button";
       const known = id === "transport" ? state.flags.map : isRoomNameKnown(id);
-      node.className = `map-node ${positionClass} ${id === state.currentRoom ? "current" : ""} ${known ? "" : "unknown"}`.trim();
+      const isCurrent = id === state.currentRoom;
+      const cost = mapMoveCost(id, nearby);
+      node.className = `map-node ${positionClass} ${isCurrent ? "current" : ""} ${known ? "" : "unknown"} ${cost ? `cost-${cost}` : ""}`.trim();
       const label = id === "transport" ? "Transport Tube" : roomDisplayName(id);
-      node.textContent = label;
+      node.innerHTML = cost
+        ? `<span class="map-label">${UI.escapeHtml(label)}</span><span class="map-cost">${cost}</span>`
+        : `<span class="map-label">${UI.escapeHtml(label)}</span>`;
+      node.disabled = !cost || isCurrent || state.ended || transitionLocked;
+      node.addEventListener("click", () => handleMapClick(id));
       target.append(node);
     });
+  }
+
+  function mapMoveCost(id, nearbySet) {
+    if (id === state.currentRoom) return 0;
+    if (id === "transport") return null;
+    if (state.currentRoom === "hallway") return 1;
+    if (id === "hallway") return 1;
+    return nearbySet.has(id) ? 1 : 2;
+  }
+
+  async function handleMapClick(targetId) {
+    if (!state || state.ended || transitionLocked) return;
+    if (targetId === state.currentRoom) return;
+    if (targetId === "transport") return;
+    UI.closePanel("details-panel");
+    if (targetId === "hallway") {
+      Audio.prime();
+      spendTurns(1);
+      if (state.ending) return finishRun(state.ending);
+      if (isCaught()) {
+        addHistory("The hunter reached the central hallway before you could leave.");
+        return finishRun("caught");
+      }
+      addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
+      await transitionTo("hallway");
+      renderGame("");
+      return;
+    }
+    if (state.currentRoom === "hallway") return doHallwayToRoom(targetId);
+    const nearby = new Set(typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []);
+    if (nearby.has(targetId)) return doNearbyMove(targetId);
+    return doFarMove(targetId);
   }
 
   function syncRunKeyUi() {

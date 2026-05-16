@@ -59,7 +59,9 @@ To debug this game locally:
 ```
 cd ~/cc/yru/site/gms/2d/the_horrors && python3 regen_helper.py
 ```
-Open `index.html?debug` in the browser and the panel auto-opens. Each row shows file size and mtime (e.g. `386 KB | 2026-05-16 00:46:59`) so stale clips are obvious.
+**Then open `http://127.0.0.1:8788/?debug` in the browser** (NOT the GitHub Pages URL). The helper now serves the static game files too — that puts the debug panel at the same origin as the `/api/` endpoints, so the deployed HTTPS site doesn't blow up with mixed-content errors when trying to reach the local `http://127.0.0.1:8788` helper.
+
+The panel auto-opens via `?debug`. Each row shows file size + mtime in amber (e.g. `386 KB | 2026-05-16 00:46:59`) under the filename, so stale clips are obvious at a glance.
 
 `regen_config.json` schema: `{ common, negative, transitions: {<file>: {id,label,start,end,seed,promptText,status}}, extras: [...], extra_prefixes: {<pre>: {group,status,default_poster}} }`. Add a new room → update `regen_config.json`, `gen_transitions.py`, and `js/story.js` `transitions` array (three sources of truth, kept aligned by hand).
 

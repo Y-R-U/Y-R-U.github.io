@@ -339,16 +339,21 @@
     const loaded = manifest.filter(entry => cachedMedia.has(entry.src) || entry.failed).length;
     const percent = manifest.length ? Math.round((loaded / manifest.length) * 100) : 100;
     els.cacheFill.style.width = `${percent}%`;
-    const next = manifest.find(entry => !cachedMedia.has(entry.src) && !entry.failed);
-    if (introReady) {
-      els.introStatus.textContent = loaded >= manifest.length
-        ? "All current room feeds cached."
-        : `Ready. Background caching ${loaded}/${manifest.length}.`;
-      return;
+    const meter = document.getElementById("cache-meter");
+    if (loaded >= manifest.length) {
+      if (els.introStatus && els.introStatus.dataset.cacheDone !== "1") {
+        els.introStatus.dataset.cacheDone = "1";
+        els.introStatus.textContent = "Caching finished";
+        // Brief beat to let the user see the success message, then fade
+        // status + meter together. CSS handles the opacity transition.
+        setTimeout(() => {
+          if (els.introStatus) els.introStatus.classList.add("cache-gone");
+          if (meter) meter.classList.add("cache-gone");
+        }, 900);
+      }
+    } else {
+      els.introStatus.textContent = "Caching game data";
     }
-    els.introStatus.textContent = next
-      ? `Caching ${next.label.toLowerCase()}... ${loaded}/${manifest.length}`
-      : "Preparing room feed.";
   }
 
   function maybeEnableIntro() {
@@ -523,27 +528,119 @@
     const actions = Story.actions[state.currentRoom] || [];
     els.subroomActions.innerHTML = "";
     els.exitActions.innerHTML = "";
+    const inHallway = state.currentRoom === "hallway";
     actions.forEach(action => {
+      // Hallway: skip inline "enter_X" exits — we generate them below
+      //   from Story.roomLayout so they live on the matching side.
+      // Other rooms: also skip inline "enter_X" — nearby exits below.
+      if (action.side === "exit" && action.target && action.target !== "hallway") return;
       if (action.once && state.flags[action.id]) return;
       if (typeof action.guard === "function" && !action.guard(state)) return;
       const button = document.createElement("button");
       button.className = "tag tag-action";
       button.type = "button";
       const label = actionDisplayLabel(action);
-      button.innerHTML = `${UI.escapeHtml(label.text)}<small>${UI.escapeHtml(label.hint)}</small>`;
+      button.textContent = label.text;
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+    if (inHallway && Array.isArray(Story.roomLayout)) {
+      // Distribute the 11 room exits left/right (and parlour at top of
+      // left) so the trays stay short enough to fit on mobile. Each
+      // button only shows the room name — no "Enter the X" prefix.
+      Story.roomLayout.forEach(entry => {
+        if (!isRoomNameKnown(entry.id)) return;
+        const button = document.createElement("button");
+        button.className = "tag tag-action";
+        button.type = "button";
+        button.textContent = roomDisplayName(entry.id);
+        button.addEventListener("click", () => doHallwayToRoom(entry.id));
+        if (entry.side === "right") els.exitActions.append(button);
+        else els.subroomActions.append(button);
+      });
+    } else if (!inHallway && typeof Story.nearbyRooms === "function") {
+      // Non-hallway rooms get up to 3 nearby-room exits (1-turn moves)
+      // plus their existing "Step into the hallway" exit (above).
+      Story.nearbyRooms(state.currentRoom).forEach(targetId => {
+        if (!Story.rooms[targetId] || !isRoomNameKnown(targetId)) return;
+        const button = document.createElement("button");
+        button.className = "tag tag-action";
+        button.type = "button";
+        button.textContent = roomDisplayName(targetId);
+        button.addEventListener("click", () => doNearbyMove(targetId));
+        els.exitActions.append(button);
+      });
+    }
+  }
+
+  async function doHallwayToRoom(targetRoom) {
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
+    }
+    addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
+    await transitionTo(targetRoom);
+    renderGame("");
+  }
+
+  async function doNearbyMove(targetRoom) {
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
+    }
+    const fromName = Story.rooms[state.currentRoom].name;
+    const toName = Story.rooms[targetRoom].name;
+    addHistory(`${fromName} → ${toName}.`);
+    // Play current → hallway, brief beat, hallway → target. Spends a
+    // single turn even though two clips play (this is the "nearby" cost).
+    await transitionTo("hallway");
+    await delay(150);
+    await transitionTo(targetRoom);
+    renderGame("");
+  }
+
+  async function doFarMove(targetRoom) {
+    // Two-turn move: stop in the hallway between rooms. Used by the map
+    // when the player picks a non-nearby room directly.
+    if (transitionLocked || !state || state.ended) return;
+    if (targetRoom === state.currentRoom) return;
+    Audio.prime();
+    spendTurns(1);
+    if (state.ending) return finishRun(state.ending);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
+    }
+    addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
+    await transitionTo("hallway");
+    spendTurns(1);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
+    }
+    addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
+    await transitionTo(targetRoom);
+    renderGame("");
   }
 
   function actionDisplayLabel(action) {
     if (!action.target || action.target === "hallway") {
-      return { text: action.label, hint: action.hint || "" };
+      return { text: action.label };
     }
     if (!isRoomNameKnown(action.target)) {
-      return { text: "Enter Unknown Sector", hint: "unscanned" };
+      return { text: "Enter the unknown room" };
     }
-    return { text: action.label, hint: action.hint || "" };
+    return { text: action.label };
   }
 
   async function doAction(action) {
@@ -579,11 +676,63 @@
       return;
     }
 
+    // Look actions: fade to black, show the message text large for
+    // 1.5s (or play the lookVideo if it actually exists on disk),
+    // then fade back. Marked in story.js with action.look = true.
+    if (action.look && message) {
+      addHistory(message);
+      await playLookCutscene(action, message);
+      renderGame(message);
+      return;
+    }
+
     if (message) {
       addHistory(message);
       UI.toast(message);
     }
     renderGame(message);
+  }
+
+  async function playLookCutscene(action, text) {
+    const overlay = document.getElementById("cutscene-overlay");
+    const videoEl = document.getElementById("cutscene-video");
+    const textEl = document.getElementById("cutscene-text");
+    if (!overlay) return;
+    transitionLocked = true;
+    overlay.setAttribute("aria-hidden", "false");
+    textEl.textContent = text;
+    overlay.classList.remove("has-video");
+    // If action.lookVideo names a real cached clip, play it; otherwise
+    // just hold the text for 1.5s on a black field. (Placeholder shell —
+    // drop a real mp4 in videos/ and the same code path picks it up.)
+    const lookSrc = action.lookVideo ? mediaSrc(action.lookVideo) : "";
+    const lookExists = !!lookSrc && cachedMedia.has(action.lookVideo);
+    if (lookExists) {
+      overlay.classList.add("has-video");
+      videoEl.src = lookSrc;
+      videoEl.load();
+      try { videoEl.currentTime = 0; } catch (err) {}
+    }
+    requestAnimationFrame(() => overlay.classList.add("visible"));
+    if (lookExists) {
+      try { await videoEl.play(); } catch (err) {}
+      await new Promise(resolve => {
+        const done = () => {
+          videoEl.removeEventListener("ended", done);
+          resolve();
+        };
+        videoEl.addEventListener("ended", done, { once: true });
+        // safety: longest realistic look-clip is 5s
+        setTimeout(done, 5500);
+      });
+    } else {
+      await delay(1500);
+    }
+    overlay.classList.remove("visible");
+    await delay(420);
+    overlay.setAttribute("aria-hidden", "true");
+    if (videoEl.src) { try { videoEl.pause(); } catch (err) {} videoEl.removeAttribute("src"); videoEl.load(); }
+    transitionLocked = false;
   }
 
   function spendTurns(count) {
@@ -614,6 +763,9 @@
       els.roomVideo.dataset.src = playbackSrc;
       els.roomVideo.src = playbackSrc;
       els.roomVideo.load();
+      // Drop the action trays while the transition video plays. Both
+      // sides go opaque-to-invisible in 220ms (.tag-stack transition).
+      hideActionTrays();
       const done = () => {
         if (token !== transitionSequence) return;
         clearTimeout(transitionTimer);
@@ -633,6 +785,14 @@
         } catch (err) {}
         els.roomVideo.play().catch(() => {});
         const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
+        // Bring the destination room's actions back in 0.5s before the
+        // transition video ends. renderGame() runs after done(), but we
+        // pre-fade so it looks continuous instead of popping in.
+        const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
+        setTimeout(() => {
+          if (token !== transitionSequence) return;
+          showActionTrays();
+        }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
       };
       const clamp = () => {
@@ -653,6 +813,27 @@
     transitionSequence += 1;
     clearTimeout(transitionTimer);
     if (els.roomVideo) els.roomVideo.pause();
+    showActionTrays();
+  }
+
+  function hideActionTrays() {
+    if (els.subroomActions) {
+      els.subroomActions.classList.remove("tags-fading-in");
+      els.subroomActions.classList.add("tags-hidden");
+    }
+    if (els.exitActions) {
+      els.exitActions.classList.remove("tags-fading-in");
+      els.exitActions.classList.add("tags-hidden");
+    }
+  }
+
+  function showActionTrays() {
+    [els.subroomActions, els.exitActions].forEach(tray => {
+      if (!tray) return;
+      // slower fade-in than fade-out so it feels gentle
+      tray.classList.add("tags-fading-in");
+      tray.classList.remove("tags-hidden");
+    });
   }
 
   function findTransitionMeta(src) {
@@ -884,25 +1065,75 @@
       target.textContent = "offline";
       return;
     }
-    [
-      // 11 spokes flanking the central hallway corridor — see CSS
-      // .node-row* / .node-wide-top / .node-exit grid positions.
-      ["parlour", "node-wide-top"],
-      ["bedroom", "node-row1-left"],   ["bathroom", "node-row1-right"],
-      ["study", "node-row2-left"],     ["library", "node-row2-right"],
-      ["kitchen", "node-row3-left"],   ["dining_room", "node-row3-right"],
-      ["cellar", "node-row4-left"],    ["attic", "node-row4-right"],
-      ["storeroom", "node-row5-left"], ["conservatory", "node-row5-right"],
-      ["hallway", "node-center"],
-      ["exit", "node-exit"],
-    ].forEach(([id, positionClass]) => {
-      const node = document.createElement("div");
+    // Pull spoke layout from story.js (single source of truth — also
+    // drives the nearbyRooms() topology used by the room exits).
+    const layout = (Story.roomLayout || []).map(entry => [entry.id, entry.pos])
+      .concat([["hallway", "node-center"], ["exit", "node-exit"]]);
+    const nearby = state.currentRoom === "hallway"
+      ? new Set((Story.roomLayout || []).map(e => e.id))
+      : new Set((typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []));
+    layout.forEach(([id, positionClass]) => {
+      const node = document.createElement("button");
+      node.type = "button";
       const known = id === "exit" ? state.flags.map : isRoomNameKnown(id);
-      node.className = `map-node ${positionClass} ${id === state.currentRoom ? "current" : ""} ${known ? "" : "unknown"}`.trim();
+      const isCurrent = id === state.currentRoom;
+      const cost = mapMoveCost(id, nearby);
+      node.className = `map-node ${positionClass} ${isCurrent ? "current" : ""} ${known ? "" : "unknown"} ${cost ? `cost-${cost}` : ""}`.trim();
       const label = id === "exit" ? "Front Door" : roomDisplayName(id);
-      node.textContent = label;
+      // Append move cost ("1" or "2") as a tiny suffix so the player
+      // sees how many turns each click costs from where they are now.
+      node.innerHTML = cost
+        ? `<span class="map-label">${UI.escapeHtml(label)}</span><span class="map-cost">${cost}</span>`
+        : `<span class="map-label">${UI.escapeHtml(label)}</span>`;
+      node.disabled = !cost || isCurrent || state.ended || transitionLocked;
+      node.addEventListener("click", () => handleMapClick(id));
       target.append(node);
     });
+  }
+
+  function mapMoveCost(id, nearbySet) {
+    if (id === state.currentRoom) return 0;
+    if (id === "exit") return null; // exit is reached via the hallway action, not the map click
+    if (state.currentRoom === "hallway") return 1;
+    if (id === "hallway") return 1;
+    return nearbySet.has(id) ? 1 : 2;
+  }
+
+  async function handleMapClick(targetId) {
+    if (!state || state.ended || transitionLocked) return;
+    if (targetId === state.currentRoom) return;
+    if (targetId === "exit") return; // not navigable via map
+    UI.closePanel("details-panel");
+    if (targetId === "hallway") {
+      // Same as the existing "step into hallway" exit action.
+      Audio.prime();
+      spendTurns(1);
+      if (state.ending) return finishRun(state.ending);
+      if (isCaught()) {
+        addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+        return finishRun("caught");
+      }
+      addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
+      await transitionTo("hallway");
+      renderGame("");
+      return;
+    }
+    const nearby = new Set(typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []);
+    if (state.currentRoom === "hallway") {
+      // Hallway → room: same as one-turn exit action.
+      Audio.prime();
+      spendTurns(1);
+      if (isCaught()) {
+        addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+        return finishRun("caught");
+      }
+      addHistory(`Hallway → ${Story.rooms[targetId].name}.`);
+      await transitionTo(targetId);
+      renderGame("");
+      return;
+    }
+    if (nearby.has(targetId)) return doNearbyMove(targetId);
+    return doFarMove(targetId);
   }
 
   function syncRunKeyUi() {

@@ -438,7 +438,42 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/videos/"):
             self.send_video()
             return
+        # Serve game static files (index.html, js/, css/, images/, music/)
+        # from the project dir. This lets you open
+        # http://127.0.0.1:8788/?debug in a browser and hit the same
+        # origin as the /api/ endpoints — sidesteps the mixed-content
+        # block that stops the deployed https:// site from reaching
+        # the local helper.
+        if self.serve_static():
+            return
         self.send_json({"ok": False, "error": "not found"}, 404)
+
+    def serve_static(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path = urllib.parse.unquote(parsed.path)
+        if path in ("", "/"):
+            path = "/index.html"
+        if path.startswith("/api/") or path.startswith("/videos/"):
+            return False
+        # Resolve safely under HERE — reject anything that escapes.
+        resolved = os.path.realpath(os.path.join(HERE, path.lstrip("/")))
+        if not resolved.startswith(os.path.realpath(HERE) + os.sep):
+            return False
+        if not os.path.isfile(resolved):
+            return False
+        content_type = mimetypes.guess_type(resolved)[0] or "application/octet-stream"
+        try:
+            with open(resolved, "rb") as handle:
+                body = handle.read()
+        except OSError:
+            return False
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+        return True
 
     def send_video(self, head_only=False):
         parsed = urllib.parse.urlparse(self.path)

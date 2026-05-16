@@ -91,11 +91,14 @@
       toast.textContent = message;
       toastRoot.innerHTML = "";
       toastRoot.append(toast);
+      // Longer dwell — used to be 2.2s which was too short to read the
+      // story beats. Keep ~5s visible + a slow fade so the player has
+      // time to absorb action results without having to open Details.
       setTimeout(() => {
         toast.style.opacity = "0";
         toast.style.transform = "translateY(8px)";
-      }, 2200);
-      setTimeout(() => toast.remove(), 2600);
+      }, 5000);
+      setTimeout(() => toast.remove(), 5600);
     },
   };
 })();
