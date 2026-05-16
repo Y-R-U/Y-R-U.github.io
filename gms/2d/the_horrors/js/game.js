@@ -484,14 +484,35 @@
     const token = ++roomMediaToken;
     clearTimeout(transitionTimer);
     transitionLocked = false;
-    els.roomFallback.src = room.poster;
-    els.roomFallback.classList.add("visible");
+    // The fallback img is what bridges the gap while the new idle
+    // video loads. It must already be displaying the NEW room's
+    // poster before we flip .visible — otherwise we briefly show the
+    // previous room (e.g. hallway flicker after hallway→room). When
+    // we get here straight from a transitionTo, preRevealMs already
+    // started loading to.poster, so this is usually instant.
     const idleSrc = mediaSrc(room.idleVideo);
+    els.roomVideo.poster = room.poster;
+    const showFallback = () => {
+      if (token !== roomMediaToken) return;
+      els.roomFallback.classList.add("visible");
+    };
+    if (els.roomFallback.getAttribute("src") !== room.poster) {
+      els.roomFallback.classList.remove("visible");
+      els.roomFallback.addEventListener("load", showFallback, { once: true });
+      els.roomFallback.src = room.poster;
+      // Safety: if the img is already cached the load event may not
+      // fire; check complete after assignment.
+      if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) showFallback();
+    } else if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) {
+      showFallback();
+    } else {
+      els.roomFallback.classList.remove("visible");
+      els.roomFallback.addEventListener("load", showFallback, { once: true });
+    }
     if (els.roomVideo.dataset.src !== idleSrc) {
       els.roomVideo.dataset.src = idleSrc;
       els.roomVideo.src = idleSrc;
     }
-    els.roomVideo.poster = room.poster;
     els.roomVideo.pause();
     try {
       els.roomVideo.currentTime = 0;
@@ -616,7 +637,9 @@
     addHistory(`${fromName} → ${toName}.`);
     // Play current → hallway, brief beat, hallway → target. Spends a
     // single turn even though two clips play (this is the "nearby" cost).
-    await transitionTo("hallway");
+    // Skip the action-tray reveal on the first leg so buttons don't
+    // flash in midway between the two clips.
+    await transitionTo("hallway", { skipRevealAtEnd: true });
     await delay(150);
     await transitionTo(targetRoom);
     renderGame("");
@@ -635,7 +658,7 @@
       return finishRun("caught");
     }
     addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
-    await transitionTo("hallway");
+    await transitionTo("hallway", { skipRevealAtEnd: true });
     spendTurns(1);
     if (isCaught()) {
       addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
@@ -758,7 +781,7 @@
     return state.turn + state.threatPressure >= state.turnLimit;
   }
 
-  function transitionTo(targetRoom) {
+  function transitionTo(targetRoom, opts = {}) {
     return new Promise(resolve => {
       const token = ++transitionSequence;
       const from = Story.rooms[state.currentRoom];
@@ -786,6 +809,10 @@
         els.roomVideo.removeEventListener("timeupdate", clamp);
         els.roomVideo.removeEventListener("ended", done);
         els.roomVideo.removeEventListener("error", done);
+        // Pause on the transition's last good frame so the player
+        // doesn't see the clip play past the trim point (or stutter
+        // back to its first frame) between rooms.
+        try { els.roomVideo.pause(); } catch (err) {}
         state.currentRoom = targetRoom;
         transitionLocked = false;
         resolve();
@@ -798,13 +825,18 @@
         } catch (err) {}
         els.roomVideo.play().catch(() => {});
         const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
-        // Bring the destination room's actions back in 0.5s before the
-        // transition video ends. renderGame() runs after done(), but we
-        // pre-fade so it looks continuous instead of popping in.
+        // 0.5s before the clip ends, swap the fallback img + the video
+        // poster to the destination room. The img is async-loaded so
+        // having it ready before setRoomMedia flips .visible kills the
+        // "stale poster of the previous room" flicker. Also bring the
+        // action trays back in unless the caller is chaining a second
+        // transition (in which case skipRevealAtEnd avoids a flash).
         const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
         setTimeout(() => {
           if (token !== transitionSequence) return;
-          showActionTrays();
+          els.roomFallback.src = to.poster;
+          els.roomVideo.poster = to.poster;
+          if (!opts.skipRevealAtEnd) showActionTrays();
         }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
       };

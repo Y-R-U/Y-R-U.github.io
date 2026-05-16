@@ -484,14 +484,32 @@
     const token = ++roomMediaToken;
     clearTimeout(transitionTimer);
     transitionLocked = false;
-    els.roomFallback.src = room.poster;
-    els.roomFallback.classList.add("visible");
+    // Only flip the fallback img to .visible once its src is the NEW
+    // room's poster and actually painted — otherwise it'd briefly
+    // show the previous room (e.g. hallway flicker on room arrival).
+    // transitionTo's preReveal usually has the new poster loaded by
+    // the time we get here, so this is normally instant.
     const idleSrc = mediaSrc(room.idleVideo);
+    els.roomVideo.poster = room.poster;
+    const showFallback = () => {
+      if (token !== roomMediaToken) return;
+      els.roomFallback.classList.add("visible");
+    };
+    if (els.roomFallback.getAttribute("src") !== room.poster) {
+      els.roomFallback.classList.remove("visible");
+      els.roomFallback.addEventListener("load", showFallback, { once: true });
+      els.roomFallback.src = room.poster;
+      if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) showFallback();
+    } else if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) {
+      showFallback();
+    } else {
+      els.roomFallback.classList.remove("visible");
+      els.roomFallback.addEventListener("load", showFallback, { once: true });
+    }
     if (els.roomVideo.dataset.src !== idleSrc) {
       els.roomVideo.dataset.src = idleSrc;
       els.roomVideo.src = idleSrc;
     }
-    els.roomVideo.poster = room.poster;
     els.roomVideo.pause();
     try {
       els.roomVideo.currentTime = 0;
@@ -604,7 +622,9 @@
       return finishRun("caught");
     }
     addHistory(`${Story.rooms[state.currentRoom].name} → ${Story.rooms[targetRoom].name}.`);
-    await transitionTo("hallway");
+    // Skip the action-tray reveal on the first leg so buttons don't
+    // flash in midway between the two back-to-back transition clips.
+    await transitionTo("hallway", { skipRevealAtEnd: true });
     await delay(150);
     await transitionTo(targetRoom);
     renderGame("");
@@ -621,7 +641,7 @@
       return finishRun("caught");
     }
     addHistory(`${Story.rooms[state.currentRoom].name} → Hallway.`);
-    await transitionTo("hallway");
+    await transitionTo("hallway", { skipRevealAtEnd: true });
     spendTurns(1);
     if (isCaught()) {
       addHistory("The hunter reached the central hallway before you could leave.");
@@ -740,7 +760,7 @@
     return state.turn + state.threatPressure >= state.turnLimit;
   }
 
-  function transitionTo(targetRoom) {
+  function transitionTo(targetRoom, opts = {}) {
     return new Promise(resolve => {
       const token = ++transitionSequence;
       const from = Story.rooms[state.currentRoom];
@@ -767,6 +787,8 @@
         els.roomVideo.removeEventListener("timeupdate", clamp);
         els.roomVideo.removeEventListener("ended", done);
         els.roomVideo.removeEventListener("error", done);
+        // Hold the transition's last good frame visible.
+        try { els.roomVideo.pause(); } catch (err) {}
         state.currentRoom = targetRoom;
         transitionLocked = false;
         resolve();
@@ -779,12 +801,16 @@
         } catch (err) {}
         els.roomVideo.play().catch(() => {});
         const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
-        // Bring the destination room's actions back in 0.5s before the
-        // transition video ends — feels continuous instead of popping.
+        // 0.5s before the clip ends, preload the destination poster
+        // onto the fallback + video element so setRoomMedia doesn't
+        // flash the previous room. Skip showActionTrays when chaining
+        // a second transition (otherwise buttons flash mid-move).
         const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
         setTimeout(() => {
           if (token !== transitionSequence) return;
-          showActionTrays();
+          els.roomFallback.src = to.poster;
+          els.roomVideo.poster = to.poster;
+          if (!opts.skipRevealAtEnd) showActionTrays();
         }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
       };
