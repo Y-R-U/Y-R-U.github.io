@@ -119,8 +119,12 @@
     endingKind: $("ending-kind"),
     endingTitle: $("ending-title"),
     endingText: $("ending-text"),
+    endingReplay: $("ending-replay"),
+    endingRunKey: $("ending-run-key"),
+    endingCopyKey: $("ending-copy-key"),
     restartGame: $("restart-game"),
     endingHistory: $("ending-history"),
+    sceneFade: $("scene-fade"),
     music: $("music"),
   };
 
@@ -270,6 +274,11 @@
     els.copyRunKey.addEventListener("click", () => {
       if (!state || !state.runKey) return UI.toast("No active run key");
       copyText(state.runKey, "Copied run key");
+    });
+    els.endingCopyKey.addEventListener("click", () => {
+      const key = (els.endingRunKey && els.endingRunKey.value) || (state && state.runKey) || "";
+      if (!key) return UI.toast("No replay code");
+      copyText(key, "Copied replay code");
     });
     els.startKeyRun.addEventListener("click", startRunFromKey);
     els.resetRun.addEventListener("click", async () => {
@@ -1262,31 +1271,98 @@
     renderEnding(kind);
   }
 
+  // Per-room success ending copy. Keys match Story.eventVideos.endings.escape.
+  const ESCAPE_VARIANTS = {
+    default: {
+      title: "The Door Opens",
+      text: state => `The front door of ${state.facility} swings open. Outside, the air is colder than you remember air being. You do not look back.`,
+    },
+    wine_cellar: {
+      title: "The Cellar Passage",
+      text: state => `Behind the wine racks of ${state.facility}, a low stone passage opens onto wet earth. You follow it until the dark thins into pale daylight.`,
+    },
+    attic: {
+      title: "Headlights At The Window",
+      text: state => `From the attic of ${state.facility}, you see distant headlights turn off the road. They grow steadily brighter until they fill the round window with warm rescue light.`,
+    },
+    greenhouse: {
+      title: "The Glass Breaks Outward",
+      text: state => `In the greenhouse of ${state.facility}, a cracked pane finally gives. You step out through the opening into the open garden, the house silent behind you.`,
+    },
+    chapel: {
+      title: "Sunrise Through The Chapel",
+      text: state => `You wait in the chapel of ${state.facility} until the stained glass fills with warm gold light. Whatever was in the house with you does not come into the chapel.`,
+    },
+  };
+
+  function pickEscapeVariant() {
+    const endings = (Story.eventVideos && Story.eventVideos.endings) || {};
+    const escapeMap = endings.escape || {};
+    const variants = Object.keys(escapeMap).filter(k => k !== "default");
+    // Prefer an explicit room marker if the game sets one in the future.
+    if (state.escapeRoom && escapeMap[state.escapeRoom]) return state.escapeRoom;
+    // Otherwise rotate by run key so the same seed always lands on the same
+    // success clip — keeps replay codes deterministic.
+    if (!variants.length) return "default";
+    const seed = (state.runKey || "").split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    return variants[seed % variants.length];
+  }
+
   function renderEnding(kind) {
     stopIntroSlideshow();
-    UI.showScreen("ending-screen");
     const endings = (Story.eventVideos && Story.eventVideos.endings) || {};
+    const isSuccess = kind === "escape";
     let kindLabel = "bad ending";
     let title = "Caught In The Hallway";
     let text = `The hallway lights go out one by one. ${state.threat.name} reaches you before the next door opens.`;
     let eventClip = endings.caught || eventVideoFor("attack");
-    if (kind === "escape") {
+    if (isSuccess) {
+      const variantKey = pickEscapeVariant();
+      const variant = ESCAPE_VARIANTS[variantKey] || ESCAPE_VARIANTS.default;
+      const escapeMap = endings.escape || {};
       kindLabel = "successful escape";
-      title = "The Door Opens";
-      text = `The front door of ${state.facility} swings open. Outside, the air is colder than you remember air being. You do not look back.`;
-      eventClip = ""; // no specific clip — keep the last loaded frame
+      title = variant.title;
+      text = typeof variant.text === "function" ? variant.text(state) : variant.text;
+      eventClip = escapeMap[variantKey] || escapeMap.default || "";
     } else if (kind === "window") {
       kindLabel = "bad ending";
       title = "She Waved Back";
       text = `Outside the bedroom window, ${state.threat.name} pressed her hand against the glass. The garden is empty when you finally turn to call for help, but the handprint stays.`;
       eventClip = endings.window || "";
     }
-    els.endingKind.textContent = kindLabel;
-    els.endingTitle.textContent = title;
-    els.endingText.textContent = text;
-    if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
-    els.endingVideo.currentTime = 0;
-    els.endingVideo.play().catch(() => {});
+
+    const paint = () => {
+      els.endingKind.textContent = kindLabel;
+      els.endingTitle.textContent = title;
+      els.endingText.textContent = text;
+      // Replay code is only meaningful when you successfully escape — death
+      // endings stay clean.
+      if (els.endingReplay) {
+        if (isSuccess && state.runKey) {
+          els.endingRunKey.value = state.runKey;
+          els.endingReplay.hidden = false;
+        } else {
+          els.endingReplay.hidden = true;
+        }
+      }
+      if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
+      els.endingVideo.currentTime = 0;
+      els.endingVideo.play().catch(() => {});
+      UI.showScreen("ending-screen");
+    };
+
+    // Success deserves a deliberate fade-to-black; death keeps the snappier
+    // existing swap so the jump scare lands.
+    if (isSuccess && els.sceneFade) {
+      els.sceneFade.classList.add("active");
+      setTimeout(() => {
+        paint();
+        // Let the ending screen + clip mount before fading back in.
+        setTimeout(() => els.sceneFade.classList.remove("active"), 80);
+      }, 850);
+    } else {
+      paint();
+    }
   }
 
   function renderDetails() {

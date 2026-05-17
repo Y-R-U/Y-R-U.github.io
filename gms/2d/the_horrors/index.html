@@ -106,6 +106,13 @@
       <p id="ending-kind" class="overline">ending</p>
       <h2 id="ending-title">Signal Lost</h2>
       <p id="ending-text" class="subtitle"></p>
+      <div id="ending-replay" class="ending-replay" hidden>
+        <label class="ending-replay-label" for="ending-run-key">Replay code</label>
+        <div class="ending-replay-row">
+          <input id="ending-run-key" type="text" readonly>
+          <button id="ending-copy-key" class="glass-button" type="button">Copy</button>
+        </div>
+      </div>
       <div class="title-actions">
         <button id="restart-game" class="glass-button primary" type="button">Wake Again</button>
         <button id="ending-history" class="glass-button quiet" type="button">History</button>
@@ -113,6 +120,8 @@
     </div>
   </section>
 </main>
+
+<div id="scene-fade" class="scene-fade-overlay" aria-hidden="true"></div>
 
 <nav class="top-tools" aria-label="Tools">
   <button id="debug-button" class="icon-button" type="button" aria-label="Debug transitions" title="Debug transitions">

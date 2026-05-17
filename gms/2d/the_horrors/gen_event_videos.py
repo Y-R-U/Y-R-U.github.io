@@ -77,11 +77,13 @@ EVENTS = [
         "poster": "images/bedroom.jpg",
         "start": "images/bedroom.jpg",
         "seed": 601,
+        "num_frames": 145,
         "prompt": "inside a plain bedroom, the lace curtain shifts and the silhouette of a "
                   "pale-faced woman wearing a long dark dress with long dark hair gradually "
                   "becomes visible standing motionless outside the bedroom window, she presses "
-                  "her dark hand and pale face against the glass, slow oppressive PG horror "
-                  "reveal, no blood, no gore",
+                  "her dark hand and pale face against the glass, holds the pose for a long "
+                  "oppressive moment, then suddenly her face lunges forward and fills the frame "
+                  "in a fast PG jump scare impact at the very end, no blood, no gore",
     },
     # ── lost_child ─────────────────────────────────────────────────────────
     {
@@ -355,8 +357,74 @@ EVENTS = [
         "seed": 622,
         "prompt": "central hallway point of view, the tall woman in a long deep crimson red "
                   "evening dress with dark hair worn up walks quickly directly toward the "
-                  "camera, the saturated red dress razor-sharp against the lit off-white walls, "
-                  "fast PG jump scare impact, no blood, no gore",
+                  "camera, the saturated red dress razor-sharp against the lit off-white walls,"
+                  " fast PG jump scare impact, no blood, no gore",
+    },
+    # ── Success endings (~6s each, 145 frames). One per plausible escape
+    # route. The runtime picks by state.escapeRoom when set, otherwise
+    # rotates for variety. Keep these calm/triumphant — the death-side
+    # endings carry the horror beats.
+    {
+        "output": "ending_escape_front_door.mp4",
+        "group": "ending_video",
+        "poster": "images/hallway.jpg",
+        "start": "images/hallway.jpg",
+        "seed": 701,
+        "num_frames": 145,
+        "prompt": "camera moves through the central hallway toward the heavy front door, the "
+                  "door swings open, cold pale dawn light floods the entrance, the camera walks "
+                  "out across the front step onto the gravel drive and the empty garden beyond, "
+                  "the door is left open behind, calm relieved PG ending, no people, no gore",
+    },
+    {
+        "output": "ending_escape_wine_cellar_tunnel.mp4",
+        "group": "ending_video",
+        "poster": "images/wine_cellar.jpg",
+        "start": "images/wine_cellar.jpg",
+        "seed": 702,
+        "num_frames": 145,
+        "prompt": "inside the dim brick wine cellar, the camera moves past the wooden racks of "
+                  "dusty bottles, a low arched stone passage at the back is revealed, the "
+                  "camera ducks through the passage and follows it into pale grey daylight at "
+                  "the far end, emerging onto wet earth outside the mansion, calm relieved PG "
+                  "ending, no people, no gore",
+    },
+    {
+        "output": "ending_escape_attic_rescue.mp4",
+        "group": "ending_video",
+        "poster": "images/attic.jpg",
+        "start": "images/attic.jpg",
+        "seed": 703,
+        "num_frames": 145,
+        "prompt": "inside the dim sloped attic, the camera approaches the small round attic "
+                  "window, distant white-yellow headlights sweep across the dark grounds "
+                  "outside, then grow steadily brighter until they fill the round window with "
+                  "warm rescue light, calm relieved PG ending, no people visible, no gore",
+    },
+    {
+        "output": "ending_escape_greenhouse_smash.mp4",
+        "group": "ending_video",
+        "poster": "images/greenhouse.jpg",
+        "start": "images/greenhouse.jpg",
+        "seed": 704,
+        "num_frames": 145,
+        "prompt": "inside the glass-walled greenhouse among the long benches of seedling trays, "
+                  "the camera moves toward a cracked glass panel, the panel bursts outward in a "
+                  "single bright shatter, the camera steps through the opening into the open "
+                  "garden under pale dawn sky, calm relieved PG ending, no people, no gore",
+    },
+    {
+        "output": "ending_escape_chapel_sanctuary.mp4",
+        "group": "ending_video",
+        "poster": "images/chapel.jpg",
+        "start": "images/chapel.jpg",
+        "seed": 705,
+        "num_frames": 145,
+        "prompt": "inside the small dark wooden chapel with rows of empty pews, the camera sits "
+                  "low and still as the tall narrow stained glass window at the far end "
+                  "gradually fills with warm gold sunrise light, the chapel interior brightens "
+                  "from cold blue to warm gold over a long calm hold, calm relieved PG ending, "
+                  "no people, no gore",
     },
 ]
 
@@ -409,7 +477,9 @@ def submit(item):
         "prompt": f"{item['prompt']}, {COMMON}",
         "width": GAME_PORTRAIT_WIDTH,
         "height": GAME_PORTRAIT_HEIGHT,
-        "num_frames": 73,
+        # Per-item override lets endings run longer (145 frames ≈ 6s @ 24fps)
+        # while monster/release clips stay at the snappier 73-frame default.
+        "num_frames": item.get("num_frames", 73),
         "fps": 24,
         "seed": item["seed"],
         "num_inference_steps": 20,

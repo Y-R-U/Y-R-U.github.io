@@ -674,6 +674,15 @@
     endings: {
       window: "videos/ending_window.mp4",
       caught: "videos/monster_attack_pale_woman.mp4",
+      // Success endings (one per plausible escape route). game.renderEnding
+      // picks by state.escapeRoom when set; otherwise rotates for variety.
+      escape: {
+        default: "videos/ending_escape_front_door.mp4",
+        wine_cellar: "videos/ending_escape_wine_cellar_tunnel.mp4",
+        attic: "videos/ending_escape_attic_rescue.mp4",
+        greenhouse: "videos/ending_escape_greenhouse_smash.mp4",
+        chapel: "videos/ending_escape_chapel_sanctuary.mp4",
+      },
     },
   };
 
@@ -708,6 +717,11 @@
     { type: "video", src: "videos/monster_release_hollow_one.mp4", required: false, label: "hollow one release" },
     { type: "video", src: "videos/monster_attack_hollow_one.mp4", required: false, label: "hollow one attack" },
     { type: "video", src: "videos/ending_window.mp4", required: false, label: "bedroom window ending" },
+    { type: "video", src: "videos/ending_escape_front_door.mp4", required: false, label: "front door escape ending" },
+    { type: "video", src: "videos/ending_escape_wine_cellar_tunnel.mp4", required: false, label: "wine cellar tunnel escape ending" },
+    { type: "video", src: "videos/ending_escape_attic_rescue.mp4", required: false, label: "attic rescue escape ending" },
+    { type: "video", src: "videos/ending_escape_greenhouse_smash.mp4", required: false, label: "greenhouse smash escape ending" },
+    { type: "video", src: "videos/ending_escape_chapel_sanctuary.mp4", required: false, label: "chapel sanctuary escape ending" },
   ];
 
   // ── v0.2 + v0.3 spoke media (added in code so the room list above stays
