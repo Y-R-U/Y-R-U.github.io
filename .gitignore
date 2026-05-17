@@ -2,3 +2,6 @@
 .claude/
 node_modules/
 gms/assets/kenney/2d/zips/
+# Per-run gen logs (transient, regenerated on each bulk_generate run)
+gms/2d/the_horrors/*.log
+gms/2d/awake/*.log
