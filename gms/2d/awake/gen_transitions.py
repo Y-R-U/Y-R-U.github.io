@@ -76,6 +76,48 @@ TRANSITIONS = [
         "seed": 112,
         "prompt": "camera moves from the central hallway through a reinforced service door and ends inside the glowing reactor gallery",
     },
+    {
+        "output": "security_hub_to_hallway.mp4",
+        "start": "images/security_hub.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 121,
+        "prompt": "camera leaves a compact security hub with dark surveillance monitors, passes through the armored exit door, and ends in the central hallway",
+    },
+    {
+        "output": "hallway_to_security_hub.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/security_hub.jpg",
+        "seed": 122,
+        "prompt": "camera moves from the central hallway through an armored security door and ends inside the compact surveillance hub",
+    },
+    {
+        "output": "observation_deck_to_hallway.mp4",
+        "start": "images/observation_deck.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 131,
+        "prompt": "camera leaves a tall observation deck with a panoramic space window, passes through the sealed exit door, and ends in the central hallway",
+    },
+    {
+        "output": "hallway_to_observation_deck.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/observation_deck.jpg",
+        "seed": 132,
+        "prompt": "camera moves from the central hallway through a sealed viewing door and ends inside the lonely observation deck",
+    },
+    {
+        "output": "engineering_bay_to_hallway.mp4",
+        "start": "images/engineering_bay.jpg",
+        "end": "images/hallway.jpg",
+        "seed": 141,
+        "prompt": "camera leaves an industrial engineering bay with suspended repair arms, passes through the heavy exit door, and ends in the central hallway",
+    },
+    {
+        "output": "hallway_to_engineering_bay.mp4",
+        "start": "images/hallway.jpg",
+        "end": "images/engineering_bay.jpg",
+        "seed": 142,
+        "prompt": "camera moves from the central hallway through a heavy maintenance door and ends inside the industrial engineering bay",
+    },
 ]
 
 

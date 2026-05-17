@@ -60,6 +60,27 @@ IMAGES = [
         "narrow reactor gallery in a mars habitat, massive humming power core behind ribbed glass, blue white plasma glow, "
         "maintenance catwalks, warning stripes, drifting sparks, one reinforced exit door visible, cinematic realistic sci-fi dread",
     ),
+    (
+        "security_hub.png",
+        768,
+        1344,
+        "compact orbital habitat security hub, curved wall of dark surveillance monitors, inactive drone racks, "
+        "hard cyan interface glow, red emergency strips, one armored exit door visible, realistic sci-fi horror command room",
+    ),
+    (
+        "observation_deck.png",
+        768,
+        1344,
+        "tall observation deck in a damaged deep space station, panoramic reinforced window showing stars and a red planet, "
+        "broken seating rails, faint aurora light, one sealed exit door visible, beautiful lonely sci-fi horror atmosphere",
+    ),
+    (
+        "engineering_bay.png",
+        768,
+        1344,
+        "industrial engineering bay inside an abandoned mars habitat, suspended repair arms, coolant pipes, tool lockers, "
+        "orange warning lamps mixed with cold blue machinery light, one heavy exit door visible, realistic tense sci-fi survival mood",
+    ),
 ]
 
 

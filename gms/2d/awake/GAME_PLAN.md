@@ -9,7 +9,7 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
    - Location type: Space Biome, Space Station, or Mars Habitat.
    - Facility name: generated from a short prefix list plus the location.
    - Player name: hidden until discovered.
-   - Hunter: genetically created monster, alien infiltrator, or reanimated crew.
+   - Hunter: genetically created monster, alien infiltrator, reanimated crew, maintenance intelligence, black root parasite, or pressure-suit shadow.
    - Turn limit: randomized inside the difficulty range.
 3. Explore named room feeds connected through one shared hallway.
 4. Spend turns searching, restoring the map, and escaping before the hunter reaches the hallway.
@@ -22,6 +22,9 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
 - `images/med_bay.jpg`
 - `images/hydroponic_biome.jpg`
 - `images/reactor_gallery.jpg`
+- `images/security_hub.jpg`
+- `images/observation_deck.jpg`
+- `images/engineering_bay.jpg`
 - `videos/cryo_room_to_hallway.mp4`
 - `videos/hallway_to_cryo_room.mp4`
 - `videos/med_bay_to_hallway.mp4`
@@ -30,6 +33,12 @@ Version 0.1 is a production-ready vertical slice for testing the generated trans
 - `videos/hallway_to_hydroponic_biome.mp4`
 - `videos/reactor_gallery_to_hallway.mp4`
 - `videos/hallway_to_reactor_gallery.mp4`
+- `videos/security_hub_to_hallway.mp4`
+- `videos/hallway_to_security_hub.mp4`
+- `videos/observation_deck_to_hallway.mp4`
+- `videos/hallway_to_observation_deck.mp4`
+- `videos/engineering_bay_to_hallway.mp4`
+- `videos/hallway_to_engineering_bay.mp4`
 - `videos/cryo_room_event_collapse.mp4`
 - `videos/monster_release_*.mp4`
 - `videos/monster_attack_*.mp4`
@@ -44,6 +53,8 @@ For local testing, run `python3 regen_helper.py` from this folder. The debug pan
 The debug preview can trim playback non-destructively. `First frame` is an absolute start time in seconds. `Last frame` can be an absolute end time, `0.00` for the real end, or a negative value such as `-1.00` to stop one second before the real end.
 
 `gen_event_videos.py` queues review batches for hallway-start monster release clips, monster attack clips, victory endings, and alternate room-to-hallway candidates. These files appear under the debug panel's Release, Attack, Ending, and Possible filters.
+
+The monster release warning intentionally holds on black long enough to read, with a Skip button for repeat testing.
 
 ## Future Room Packs
 

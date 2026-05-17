@@ -73,6 +73,60 @@
       "seed": 112,
       "promptText": "camera moves from the central hallway through a reinforced service door and ends inside the glowing reactor gallery",
       "status": "New 3.04s intended transition. Needs review."
+    },
+    "security_hub_to_hallway.mp4": {
+      "id": "security_hub_to_hallway",
+      "label": "security_hub to hallway",
+      "start": "images/security_hub.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 121,
+      "promptText": "camera leaves a compact security hub with dark surveillance monitors, passes through the armored exit door, and ends in the central hallway",
+      "status": "New 3.04s intended transition. Needs review."
+    },
+    "hallway_to_security_hub.mp4": {
+      "id": "hallway_to_security_hub",
+      "label": "security_hub from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/security_hub.jpg",
+      "seed": 122,
+      "promptText": "camera moves from the central hallway through an armored security door and ends inside the compact surveillance hub",
+      "status": "New 3.04s intended transition. Needs review."
+    },
+    "observation_deck_to_hallway.mp4": {
+      "id": "observation_deck_to_hallway",
+      "label": "observation_deck to hallway",
+      "start": "images/observation_deck.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 131,
+      "promptText": "camera leaves a tall observation deck with a panoramic space window, passes through the sealed exit door, and ends in the central hallway",
+      "status": "New 3.04s intended transition. Needs review."
+    },
+    "hallway_to_observation_deck.mp4": {
+      "id": "hallway_to_observation_deck",
+      "label": "observation_deck from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/observation_deck.jpg",
+      "seed": 132,
+      "promptText": "camera moves from the central hallway through a sealed viewing door and ends inside the lonely observation deck",
+      "status": "New 3.04s intended transition. Needs review."
+    },
+    "engineering_bay_to_hallway.mp4": {
+      "id": "engineering_bay_to_hallway",
+      "label": "engineering_bay to hallway",
+      "start": "images/engineering_bay.jpg",
+      "end": "images/hallway.jpg",
+      "seed": 141,
+      "promptText": "camera leaves an industrial engineering bay with suspended repair arms, passes through the heavy exit door, and ends in the central hallway",
+      "status": "New 3.04s intended transition. Needs review."
+    },
+    "hallway_to_engineering_bay.mp4": {
+      "id": "hallway_to_engineering_bay",
+      "label": "engineering_bay from hallway",
+      "start": "images/hallway.jpg",
+      "end": "images/engineering_bay.jpg",
+      "seed": 142,
+      "promptText": "camera moves from the central hallway through a heavy maintenance door and ends inside the industrial engineering bay",
+      "status": "New 3.04s intended transition. Needs review."
     }
   },
   "extras": [
