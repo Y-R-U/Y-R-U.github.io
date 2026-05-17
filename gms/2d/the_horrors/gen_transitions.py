@@ -371,6 +371,7 @@ def main():
     args = set(sys.argv[1:])
     force = "--force" in args
     wanted = args - {"--force"}
+    failed = []
     for transition in TRANSITIONS:
         stem = os.path.splitext(transition["output"])[0]
         if wanted and stem not in wanted and transition["output"] not in wanted:
@@ -379,12 +380,22 @@ def main():
         if os.path.exists(target) and not force:
             log(f"skip {transition['output']} already exists")
             continue
-        log(f"queue {transition['output']}")
-        job_id = submit(transition)
-        log(f"job {job_id} {transition['output']}")
-        job = wait_for_job(job_id)
-        download(f"/api/jobs/{job_id}/file", target)
-        log(f"ok {transition['output']} {os.path.getsize(target)} bytes {job.get('duration_secs')}s")
+        try:
+            log(f"queue {transition['output']}")
+            job_id = submit(transition)
+            log(f"job {job_id} {transition['output']}")
+            job = wait_for_job(job_id)
+            download(f"/api/jobs/{job_id}/file", target)
+            log(f"ok {transition['output']} {os.path.getsize(target)} bytes {job.get('duration_secs')}s")
+        except Exception as err:
+            # Don't let one bad clip kill the whole queue — log it and
+            # keep going. The next bulk run will skip the ones that
+            # finished and retry whatever's still missing on disk.
+            log(f"FAIL {transition['output']} {err}")
+            failed.append(transition["output"])
+    if failed:
+        log(f"done — {len(failed)} failure(s): {failed}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

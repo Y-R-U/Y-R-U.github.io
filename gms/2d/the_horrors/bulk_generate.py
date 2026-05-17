@@ -80,6 +80,40 @@ def run_suite(suite_path: str, passthrough_args: list[str]) -> int:
     return rc
 
 
+def convert_pngs_to_jpgs() -> int:
+    """gen_images.py writes PNGs to original_files/. The video gen scripts
+    (and the runtime) expect JPGs in images/. This step bridges the gap so
+    bulk runs don't fail on FileNotFoundError partway through transitions
+    like the 2026-05-17 run did. Idempotent: skips when the .jpg already
+    exists. Uses macOS `sips` since the rest of the pipeline assumes it."""
+    original_dir = os.path.join(HERE, "original_files")
+    images_dir = os.path.join(HERE, "images")
+    if not os.path.isdir(original_dir):
+        log("convert_pngs: no original_files/ — skipping")
+        return 0
+    os.makedirs(images_dir, exist_ok=True)
+    converted = 0
+    skipped = 0
+    for fname in sorted(os.listdir(original_dir)):
+        if not fname.lower().endswith(".png"):
+            continue
+        src = os.path.join(original_dir, fname)
+        dst = os.path.join(images_dir, fname[:-4] + ".jpg")
+        if os.path.exists(dst):
+            skipped += 1
+            continue
+        rc = subprocess.call([
+            "sips", "-s", "format", "jpeg", "-s", "formatOptions", "80",
+            "-Z", "1344", src, "--out", dst,
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if rc != 0:
+            log(f"convert_pngs: sips failed on {fname} rc={rc}")
+            return rc
+        converted += 1
+    log(f"convert_pngs: {converted} converted, {skipped} already JPG")
+    return 0
+
+
 def main() -> int:
     args = list(sys.argv[1:])
     force = "--force" in args
@@ -115,6 +149,13 @@ def main() -> int:
         rc = run_suite(script, passthrough)
         if rc != 0:
             failed.append(os.path.basename(script))
+        # After images: convert any fresh PNGs to JPGs before the video
+        # gen scripts run (they read images/<room>.jpg as I2V start/end
+        # frames and will FileNotFoundError on missing JPGs otherwise).
+        if os.path.basename(script) == "gen_images.py":
+            crc = convert_pngs_to_jpgs()
+            if crc != 0:
+                failed.append("convert_pngs_to_jpgs")
     overall_dt = time.time() - overall_t0
 
     log(f"ALL DONE in {overall_dt / 60:.1f} min, {len(failed)} script(s) failed")
