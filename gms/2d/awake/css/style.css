@@ -112,6 +112,14 @@ button {
   background: rgba(0, 0, 0, 0.22);
 }
 
+.event-overlay.continue-ready {
+  cursor: pointer;
+}
+
+.event-overlay.settling {
+  transition-duration: 900ms;
+}
+
 .event-card {
   width: min(82vw, 560px);
   border: 1px solid rgba(255, 85, 116, 0.35);

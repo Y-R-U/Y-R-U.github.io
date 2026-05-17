@@ -481,16 +481,21 @@
     "Whose Room",
   ];
 
-  // Only engine-mechanic goals live here now (map → unlocks the door
-  // ending; escape → the door action itself). Identity, letter, chart
-  // and mirror used to be optional/core entries with hardcoded rooms —
-  // they moved into `taskGroups` below as placeable steps with room-kind
-  // constraints, which lets the placement system put them in any matching
-  // run room rather than failing when a specific room ID isn't drawn.
+  // Identity lives in taskGroups as the only mandatory task. The map is
+  // a randomly placed helper item, not a goal. Escape stays here as the
+  // overall objective; other clue chains are randomly selected below.
   const goalPool = [
-    { id: "map", text: "Find a sketch of the building's layout.", requires: "map", core: true },
     { id: "escape", text: "Reach the front door at the end of the hallway.", requires: "escape", core: true },
   ];
+
+  function incompleteTaskGoals(state) {
+    const goals = Array.isArray(state.goals) ? state.goals : [];
+    return goals.filter(goal => {
+      if (!goal || goal.id === "escape") return false;
+      if (state.flags[`goal_${goal.id}`]) return false;
+      return goal.requires && !state.flags[goal.requires];
+    });
+  }
 
   // ── Transition + event metadata (drives the debug panel) ─────────────────
   const transitions = [
@@ -744,10 +749,9 @@
   // ── Per-room actions ─────────────────────────────────────────────────────
   const actions = {
     bedroom: [
-      // Identity + letter actions used to live here as hardcoded
-      // bedroom-only finds. They moved into mandatory taskGroups
-      // (identity_find / personal_letter) so they can land in any run
-      // room — see the top of the taskGroups array.
+      // Identity and letter actions used to live here as hardcoded
+      // bedroom-only finds. They now live in taskGroups so identity can
+      // be mandatory and the letter can be randomly placed.
       {
         id: "look_window",
         label: "Look out the window",
@@ -812,9 +816,9 @@
       },
     ],
     cellar: [
-      // Chart action (with its monster_release event) moved to the
-      // medical_chart taskGroup so it can land in any room — the
-      // monster reveal cutscene still fires via doPlacedStep.
+      // Chart action moved to the medical_chart taskGroup so it can
+      // land in any room. Monster reveal is now handled only by the
+      // deferred auto-reveal timer.
       {
         id: "check_shelf",
         label: "Search the shelves",
@@ -844,6 +848,9 @@
         hint: "map",
         turns: 1,
         once: true,
+        guard(state) {
+          return !state.flags.map && (!state.mapRoom || state.mapRoom === "hallway");
+        },
         run(state) {
           state.flags.map = true;
           addUnique(state.inventory, "Folded floor plan");
@@ -870,9 +877,14 @@
         hint: "escape",
         turns: 1,
         run(state) {
-          if (!state.flags.identity || !state.flags.map) {
+          const remainingTasks = incompleteTaskGoals(state);
+          if (!state.flags.identity) {
             state.threatPressure += 2;
-            return "The door will not open for someone without a name and without a route. Behind you, the corridor lengthens.";
+            return "The door will not open for someone without a name. Behind you, the corridor lengthens.";
+          }
+          if (remainingTasks.length) {
+            state.threatPressure += 1;
+            return "Your hand finds the latch, but the memory is incomplete. Something important is still missing.";
           }
           state.ending = "escape";
           return "The door opens. Outside, the air is colder than you remember air being.";
@@ -1094,7 +1106,7 @@
         turns: 1,
         once: true,
         guard(state) {
-          return !state.flags.map;
+          return !state.flags.map && state.mapRoom === "library";
         },
         run(state) {
           state.flags.map = true;
@@ -1407,7 +1419,7 @@
       provides: opts.provides,
       // event/noopIf/noopMessage are honoured by doPlacedStep the same
       // way doAction honours them — lets a placed step fire a cutscene
-      // (e.g. monster_release) or stay clickable as a no-op after first use.
+      // or stay clickable as a no-op after first use.
       event: opts.event,
       noopIf: opts.noopIf,
       noopMessage: opts.noopMessage,
@@ -1427,15 +1439,11 @@
   // others target rooms by kind. Edit/add/remove freely; createRun
   // picks K of these per run (1/2/3 by difficulty).
   const taskGroups = [
-    // ── Must-place "core finds" ────────────────────────────────────────
-    // These four replace the old hardcoded room actions for identity,
-    // letter, chart and mirror. mandatory: true means placeTaskGroups
-    // always slots them in (regardless of difficulty.groupCount) so the
-    // matching goals are always completable. mirror is the exception —
-    // bath_like-only, so if no bathroom-kind room is in the run it
-    // simply isn't placed (and the goal doesn't appear).
+    // ── Task finds ─────────────────────────────────────────────────────
+    // Identity is the only mandatory task. Everything else below is
+    // part of the random task pool.
     { id: "identity_find", mandatory: true, label: "Identity",
-      goalText: "Find something with your name on it.",
+      goalText: "Discover your identity.",
       steps: [
         makeStep({
           // Generic button label — reads like the flavor "search the
@@ -1451,7 +1459,7 @@
         }),
       ],
     },
-    { id: "personal_letter", mandatory: true, label: "Personal letter",
+    { id: "personal_letter", label: "Personal letter",
       goalText: "Find an unsent personal letter.",
       steps: [
         makeStep({
@@ -1460,11 +1468,11 @@
           roomKind: "any",
           provides: "letter",
           item: "Unsent letter",
-          text: "Between the papers: an unfinished letter on folded stock. The handwriting is yours. The recipient is also yours.",
+          text: "Between the papers: an unfinished letter on folded stock. It never names the writer, only the room they were afraid to enter.",
         }),
       ],
     },
-    { id: "medical_chart", mandatory: true, label: "Medical chart",
+    { id: "medical_chart", label: "Medical chart",
       goalText: "Find a chart that explains what's loose in the building.",
       steps: [
         makeStep({
@@ -1472,13 +1480,6 @@
           label: "Read what's pinned to the wall",
           roomKind: "any",
           provides: "chart",
-          // Preserve the original cellar action's behaviour: trigger the
-          // monster_release cutscene the first time the chart is read,
-          // unless the monster has already been revealed by the auto-
-          // reveal (its turn is per-run randomized).
-          event: "monster_release",
-          noopIf: state => !!state.flags.monster_revealed,
-          noopMessage: "Already read. The room already knows what's outside.",
           text: state => `Pinned among other notes: a medical chart, recent. The last entry is one line: ${state.threat.name.toUpperCase()} returned.`,
         }),
       ],
@@ -1776,11 +1777,8 @@
   function placeTaskGroups(difficulty, runRooms, rng) {
     const placed = {};
     if (!taskGroups.length) return placed;
-    // Mandatory groups (identity / letter / chart in any room) are placed
-    // every run, regardless of difficulty.groupCount. Optional puzzle
-    // chains then fill up to groupCount additional slots. Mandatory ones
-    // are placed first so they reserve a room before the random chains
-    // start grabbing rooms.
+    // Mandatory groups are placed every run. Optional puzzle chains then
+    // fill up to groupCount additional slots.
     const mandatory = taskGroups.filter(g => g.mandatory);
     const optional = taskGroups.filter(g => !g.mandatory);
     const want = difficulty.groupCount || 0;
@@ -1859,11 +1857,8 @@
       if (!group || !group.steps || !group.steps.length) return;
       const lastStep = group.steps[group.steps.length - 1];
       if (!lastStep || !lastStep.provides) return;
-      // Prefer a hand-authored goalText (used by must-place groups so the
-      // goal reads naturally — "Find your identity." rather than
-      // "Follow a clue trail somewhere: Identity.").
       const text = group.goalText
-        || `Follow a clue trail somewhere in the building: ${group.label || id}.`;
+        || (group.label || id);
       out.push({
         id: `chain_${id}`,
         text,
@@ -1986,6 +1981,7 @@
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
       const runLayout = buildRunLayout(runRooms, rng);
       const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Synthetic per-chain goal so the player sees a chain exists
       // without being told which room holds which step.
       const chainGoals = chainGoalsFromPlaced(placedActions);
@@ -2017,6 +2013,7 @@
         visitedRooms: [startRoom],
         runRooms,
         runLayout,
+        mapRoom,
         placedActions,
         goals: baseGoals.concat(chainGoals),
         flags: {},

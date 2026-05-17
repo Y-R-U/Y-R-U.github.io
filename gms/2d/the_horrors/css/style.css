@@ -109,10 +109,19 @@ button {
 
 .event-overlay.active {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .event-overlay.video-reveal {
   background: rgba(0, 0, 0, 0.22);
+}
+
+.event-overlay.continue-ready {
+  cursor: pointer;
+}
+
+.event-overlay.settling {
+  transition-duration: 900ms;
 }
 
 .event-overlay span {

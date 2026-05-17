@@ -175,6 +175,17 @@
       }
     }
     nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
+    nextState.goals = nextState.goals
+      .filter(goal => goal && goal.id !== "map")
+      .map(goal => {
+        if (goal.id === "chain_identity_find") return { ...goal, text: "Discover your identity." };
+        const prefix = "Follow a clue trail somewhere in the building: ";
+        if (typeof goal.text === "string" && goal.text.startsWith(prefix)) {
+          return { ...goal, text: goal.text.slice(prefix.length) };
+        }
+        return goal;
+      });
+    nextState.mapRoom = nextState.mapRoom || "hallway";
     nextState.flags = nextState.flags || {};
     nextState.inventory = Array.isArray(nextState.inventory) ? nextState.inventory : [];
     nextState.history = Array.isArray(nextState.history) ? nextState.history : [];
@@ -713,6 +724,7 @@
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+    renderMapHelperAction();
     // Placed task-group steps for this room (chain puzzles). Locked
     // steps (requires not yet held) still render but are disabled with
     // a "(locked)" suffix so the player knows there's a puzzle here.
@@ -775,10 +787,22 @@
     }
   }
 
+  function renderMapHelperAction() {
+    if (!state || state.flags.map || state.currentRoom !== state.mapRoom) return;
+    if (state.currentRoom === "hallway" || state.currentRoom === "library") return;
+    const button = document.createElement("button");
+    button.className = "tag tag-action";
+    button.type = "button";
+    button.textContent = "Find a folded floor plan";
+    button.addEventListener("click", findMapHelper);
+    els.subroomActions.append(button);
+  }
+
   async function doHallwayToRoom(targetRoom) {
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -794,6 +818,7 @@
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -819,6 +844,7 @@
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -837,15 +863,13 @@
     await afterTurn("");
   }
 
-  // Auto-reveal: if the player hasn't discovered the threat by a
-  // per-run randomized turn (3-8, picked at createRun), play a release
-  // cutscene at the cost of one extra turn. Player only ever sees this
-  // if they haven't triggered a reveal themselves first.
-  async function maybeForcedReveal() {
+  // Auto-reveal: once the timer is due, intercept the next attempted
+  // room change instead of firing during an item click.
+  async function maybeForcedReveal(projectedTurnCost = 0) {
     if (!state || state.ended) return false;
     if (state.flags.monster_revealed) return false;
     const revealAt = Number.isFinite(state.revealTurn) ? state.revealTurn : 5;
-    if (state.turn < revealAt) return false;
+    if (state.turn + projectedTurnCost < revealAt) return false;
     spendTurns(1);
     if (isCaught()) {
       // Caught before the cutscene fires — don't mark monster_revealed
@@ -861,14 +885,11 @@
       : `You hear a noise and peek toward the hallway. ${state.threat.name.toUpperCase()} released during evacuation.`;
     addHistory(peek);
     await playMonsterRelease(peek);
-    return false;
+    renderGame("You close the door and wait for the hallway to clear.");
+    return true;
   }
 
-  // Wraps the post-action render so the auto-reveal can slip in BEFORE
-  // the next renderGame paints — keeps the UI consistent with state.
   async function afterTurn(message) {
-    const ended = await maybeForcedReveal();
-    if (ended) return;
     renderGame(message);
   }
 
@@ -892,6 +913,7 @@
       if (action.noopMessage) UI.toast(action.noopMessage);
       return;
     }
+    if (action.target && await maybeForcedReveal(action.turns || 1)) return;
     spendTurns(action.turns || 1);
     let message = "";
     if (action.run) message = action.run(state);
@@ -899,8 +921,10 @@
     updateGoalsFromFlags();
 
     if (state.ending) {
+      const ending = state.ending;
       addHistory(message);
-      return finishRun(state.ending);
+      if (ending === "escape") await playEscapePrelude();
+      return finishRun(ending);
     }
 
     if (isCaught()) {
@@ -942,9 +966,7 @@
 
   // Run one step of a placed task group. Mirrors doAction but skips
   // transitions (placed steps never move the player). Honours noopIf
-  // (don't burn a turn if a precondition has flipped) and event
-  // (currently just "monster_release") so a placed step can replace
-  // a hardcoded room action that fired a cutscene.
+  // (don't burn a turn if a precondition has flipped) and event hooks.
   async function doPlacedStep(ref, step) {
     if (transitionLocked || !state || state.ended) return;
     Audio.prime();
@@ -959,8 +981,10 @@
     state.flags[`done_${ref.groupId}_${ref.stepId}`] = true;
     updateGoalsFromFlags();
     if (state.ending) {
+      const ending = state.ending;
       addHistory(message);
-      return finishRun(state.ending);
+      if (ending === "escape") await playEscapePrelude();
+      return finishRun(ending);
     }
     if (isCaught()) {
       addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
@@ -976,6 +1000,29 @@
     if (message) {
       addHistory(message);
       UI.toast(message);
+    }
+    await afterTurn(message);
+  }
+
+  function addInventoryItem(item) {
+    state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
+    if (!state.inventory.includes(item)) state.inventory.push(item);
+  }
+
+  async function findMapHelper() {
+    if (transitionLocked || !state || state.ended || state.flags.map) return;
+    Audio.prime();
+    spendTurns(1);
+    state.flags.map = true;
+    state.mapUnlocked = true;
+    addInventoryItem("Folded floor plan");
+    updateGoalsFromFlags();
+    const message = "A folded floor plan is tucked out of sight here. It reveals the nearby rooms.";
+    addHistory(message);
+    UI.toast(message);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
     }
     await afterTurn(message);
   }
@@ -1212,7 +1259,7 @@
     clearTimeout(transitionTimer);
     els.eventMessage.textContent = message;
     els.eventOverlay.classList.add("active");
-    els.eventOverlay.classList.remove("video-reveal");
+    els.eventOverlay.classList.remove("settling", "video-reveal");
     // Pre-load the reveal video underneath while the player reads the
     // message — so when they hit "click to continue" the video can start
     // immediately. The element stays paused until we explicitly play().
@@ -1234,11 +1281,66 @@
     els.roomVideo.play().catch(() => {});
     await waitForVideoWindow(els.roomVideo, 3600);
     els.eventOverlay.classList.remove("video-reveal");
-    await delay(520);
+    els.eventMessage.textContent = "You close the door and wait for the hallway to clear.";
+    setRoomMedia(Story.rooms[state.currentRoom]);
+    transitionLocked = true;
+    await delay(1800);
+    els.eventOverlay.classList.add("settling");
     els.eventOverlay.classList.remove("active");
+    await delay(900);
+    els.eventOverlay.classList.remove("settling");
     // Pause on the last frame so renderGame's setRoomMedia doesn't
     // briefly catch the monster clip still playing on swap.
     try { els.roomVideo.pause(); } catch (err) {}
+    transitionLocked = false;
+  }
+
+  async function playEscapePrelude() {
+    const variantKey = pickEscapeVariant();
+    const messages = {
+      default: "The last memory returns. The front door key was never hidden; you left it in the one place you would have to pass.",
+      wine_cellar: "The last memory returns. There is a passage behind the wine racks, and the latch opens only after the house believes you are leaving by the front.",
+      attic: "The last memory returns. The round attic window faces the road, and someone was told to watch for your signal.",
+      greenhouse: "The last memory returns. The greenhouse glass was already cracked from the outside; it only needed pressure from within.",
+      chapel: "The last memory returns. The chapel was built after the first disappearance, and the thing in the halls has never crossed its threshold.",
+    };
+    const endings = (Story.eventVideos && Story.eventVideos.endings) || {};
+    const escapeMap = endings.escape || {};
+    const clip = escapeMap[variantKey] || escapeMap.default || "";
+    await playMessageVideoEvent(messages[variantKey] || messages.default, clip, 4300);
+  }
+
+  async function playMessageVideoEvent(message, clip, videoMs = 3600) {
+    transitionLocked = true;
+    roomMediaToken += 1;
+    clearTimeout(transitionTimer);
+    els.eventMessage.textContent = message;
+    els.eventOverlay.classList.add("active");
+    els.eventOverlay.classList.remove("settling", "video-reveal");
+    let ready = Promise.resolve();
+    if (clip) {
+      els.roomFallback.src = Story.rooms.hallway.poster;
+      els.roomFallback.classList.remove("visible");
+      els.roomVideo.dataset.src = mediaSrc(clip);
+      els.roomVideo.src = mediaSrc(clip);
+      els.roomVideo.load();
+      ready = videoReady(els.roomVideo, 4200);
+    }
+    await delay(1800);
+    await awaitContinue(9000);
+    await ready;
+    if (clip) {
+      try { els.roomVideo.currentTime = 0; } catch (err) {}
+      els.roomVideo.pause();
+      els.eventOverlay.classList.add("video-reveal");
+      await delay(700);
+      els.roomVideo.play().catch(() => {});
+      await waitForVideoWindow(els.roomVideo, videoMs);
+      els.eventOverlay.classList.remove("video-reveal");
+    }
+    await delay(520);
+    els.eventOverlay.classList.remove("active");
+    await delay(520);
     transitionLocked = false;
   }
 
@@ -1250,6 +1352,7 @@
     const btn = els.eventContinue;
     if (!btn) return delay(Math.max(0, timeoutMs - 1000));
     btn.hidden = false;
+    els.eventOverlay.classList.add("continue-ready");
     // Two frames so the transition has something to transition FROM.
     requestAnimationFrame(() => requestAnimationFrame(() => btn.classList.add("visible")));
     return new Promise(resolve => {
@@ -1260,6 +1363,7 @@
         clearTimeout(timer);
         btn.removeEventListener("click", finish);
         els.eventOverlay.removeEventListener("click", overlayClick);
+        els.eventOverlay.classList.remove("continue-ready");
         btn.classList.remove("visible");
         // Hide after the fade-out completes so it doesn't snap back.
         setTimeout(() => { btn.hidden = true; }, 480);
@@ -1386,7 +1490,7 @@
     let kindLabel = "bad ending";
     let title = "Caught In The Hallway";
     let text = `The hallway lights go out one by one. ${state.threat.name} reaches you before the next door opens.`;
-    let eventClip = endings.caught || eventVideoFor("attack");
+    let eventClip = eventVideoFor("attack") || endings.caught || "";
     if (isSuccess) {
       const variantKey = pickEscapeVariant();
       const variant = ESCAPE_VARIANTS[variantKey] || ESCAPE_VARIANTS.default;
@@ -1406,13 +1510,14 @@
       els.endingKind.textContent = kindLabel;
       els.endingTitle.textContent = title;
       els.endingText.textContent = text;
-      // Replay code is only meaningful when you successfully escape — death
-      // endings stay clean.
       if (els.endingReplay) {
-        if (isSuccess && state.runKey) {
+        if (state.runKey) {
           els.endingRunKey.value = state.runKey;
+          els.endingRunKey.setAttribute("value", state.runKey);
           els.endingReplay.hidden = false;
         } else {
+          els.endingRunKey.value = "";
+          els.endingRunKey.removeAttribute("value");
           els.endingReplay.hidden = true;
         }
       }
@@ -1457,7 +1562,7 @@
       const done = !!state.flags[`goal_${goal.id}`] || !!state.flags[goal.requires];
       const li = document.createElement("li");
       li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"} ${isChain ? "chain-goal" : ""}`.trim();
-      li.textContent = visible ? `${done ? "Complete: " : ""}${goal.text}` : "Hidden goal: find a personal record or a sketch of the building.";
+      li.textContent = visible ? goal.text : "Hidden goal: find a personal record or a clue in the building.";
       els.goalsList.append(li);
     });
   }
@@ -1564,6 +1669,7 @@
     if (targetId === "hallway") {
       // Same as the existing "step into hallway" exit action.
       Audio.prime();
+      if (await maybeForcedReveal(1)) return;
       spendTurns(1);
       if (state.ending) return finishRun(state.ending);
       if (isCaught()) {
@@ -1579,6 +1685,7 @@
     if (state.currentRoom === "hallway") {
       // Hallway → room: same as one-turn exit action.
       Audio.prime();
+      if (await maybeForcedReveal(1)) return;
       spendTurns(1);
       if (isCaught()) {
         addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);

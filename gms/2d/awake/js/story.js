@@ -187,17 +187,10 @@
     "Noon On Mars",
   ];
 
-  // Identity moved into `taskGroups` as a placeable step so it can land
-  // in any run room instead of being hardcoded to cryo_room. The map and
-  // escape entries stay here — they're tied to engine mechanics (map
-  // unlocks the transport, escape is the door action itself). The seven
-  // room-specific optional goals stay too: each is satisfied by an
-  // action in its matching room, and all current rooms are always drawn
-  // (Awake's room count equals difficulty.roomCount), so they cannot be
-  // impossible. If more rooms are added later, the rooms[] filter in
-  // selectRunGoals keeps them safe.
+  // Identity lives in taskGroups as the only mandatory task. The map is
+  // a randomly placed helper item, not a goal. Escape stays here as the
+  // overall objective; room-specific entries are random optional tasks.
   const goalPool = [
-    { id: "map", text: "Restore a facility map or route cache.", requires: "map", core: true },
     { id: "escape", text: "Arm the emergency transport and leave.", requires: "escape", core: true },
     { id: "console", text: "Recover the release note from a damaged console.", requires: "console", rooms: ["cryo_room"] },
     { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache", rooms: ["med_bay"] },
@@ -207,6 +200,15 @@
     { id: "starfix", text: "Find and align the navigation star fix.", requires: "starfix", rooms: ["observation_deck"] },
     { id: "toolmark", text: "Find the missing engineering tool.", requires: "toolmark", rooms: ["engineering_bay"] },
   ];
+
+  function incompleteTaskGoals(state) {
+    const goals = Array.isArray(state.goals) ? state.goals : [];
+    return goals.filter(goal => {
+      if (!goal || goal.id === "escape") return false;
+      if (state.flags[`goal_${goal.id}`]) return false;
+      return goal.requires && !state.flags[goal.requires];
+    });
+  }
 
   const transitions = [
     {
@@ -490,16 +492,10 @@
         side: "sub",
         hint: "goals",
         turns: 1,
-        // Stays clickable after the reveal but does nothing — once
-        // monster_revealed is set (either by reading the console or
-        // by the turn-5 auto-reveal), this just shows a "dead now"
-        // toast and doesn't burn a turn.
-        noopIf: state => !!state.flags.monster_revealed,
-        noopMessage: "The console is dead now. Nothing more to read.",
-        event: "monster_release",
+        once: true,
         run(state) {
           state.flags.console = true;
-          return `The console prints one clean line: ${state.threat.name.toUpperCase()} released during evacuation.`;
+          return `The console recovers one corrupted release note: ${state.threat.name.toUpperCase()} was listed as contained, then manually overwritten.`;
         },
       },
       {
@@ -601,6 +597,9 @@
         hint: "map",
         turns: 1,
         once: true,
+        guard(state) {
+          return !state.flags.map && state.mapRoom === "security_hub";
+        },
         run(state) {
           state.mapUnlocked = true;
           state.flags.map = true;
@@ -695,6 +694,9 @@
         hint: "map",
         turns: 1,
         once: true,
+        guard(state) {
+          return !state.flags.map && (!state.mapRoom || state.mapRoom === "hallway");
+        },
         run(state) {
           state.flags.map = true;
           addUnique(state.inventory, "Partial facility map");
@@ -721,9 +723,14 @@
         hint: "escape",
         turns: 1,
         run(state) {
-          if (!state.flags.identity || !state.flags.map) {
+          const remainingTasks = incompleteTaskGoals(state);
+          if (!state.flags.identity) {
             state.threatPressure += 2;
-            return "The tube refuses a nameless passenger on an unknown route. Somewhere behind you, claws find metal.";
+            return "The tube refuses a nameless passenger. Somewhere behind you, claws find metal.";
+          }
+          if (remainingTasks.length) {
+            state.threatPressure += 1;
+            return "The tube opens halfway, then locks. You still do not remember enough to choose the right burn path.";
           }
           state.ending = "escape";
           return "The tube accepts your band and burns a path through the dark.";
@@ -940,7 +947,7 @@
       provides: opts.provides,
       // event/noopIf/noopMessage are honoured by doPlacedStep the same
       // way doAction honours them — lets a placed step fire a cutscene
-      // (e.g. monster_release) or stay clickable as a no-op after first use.
+      // or stay clickable as a no-op after first use.
       event: opts.event,
       noopIf: opts.noopIf,
       noopMessage: opts.noopMessage,
@@ -965,7 +972,7 @@
     // lives here now as a mandatory any-room placement so the identity
     // goal is satisfied wherever the player happens to be exploring.
     { id: "identity_find", mandatory: true, label: "Identity",
-      goalText: "Find something with your name on it.",
+      goalText: "Discover your identity.",
       steps: [
         makeStep({
           // Generic button label — reads like the flavor "check the
@@ -1314,7 +1321,7 @@
       const lastStep = group.steps[group.steps.length - 1];
       if (!lastStep || !lastStep.provides) return;
       const text = group.goalText
-        || `Follow a clue trail somewhere on the station: ${group.label || id}.`;
+        || (group.label || id);
       out.push({
         id: `chain_${id}`,
         text,
@@ -1420,6 +1427,7 @@
         : "cryo_room";
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
       const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Each placed group gets a synthetic goal (uses group.goalText if
       // present, otherwise a generic "follow a clue trail" line). This
       // is what makes the placed identity step visible as a real goal.
@@ -1451,6 +1459,7 @@
         startRoom,
         visitedRooms: [startRoom],
         runRooms,
+        mapRoom,
         placedActions,
         goals: baseGoals.concat(chainGoals),
         flags: {},

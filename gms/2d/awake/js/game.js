@@ -144,6 +144,17 @@
       nextState.runRooms = Object.keys(Story.rooms).filter(id => id !== "hallway");
     }
     nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
+    nextState.goals = nextState.goals
+      .filter(goal => goal && goal.id !== "map")
+      .map(goal => {
+        if (goal.id === "chain_identity_find") return { ...goal, text: "Discover your identity." };
+        const prefix = "Follow a clue trail somewhere on the station: ";
+        if (typeof goal.text === "string" && goal.text.startsWith(prefix)) {
+          return { ...goal, text: goal.text.slice(prefix.length) };
+        }
+        return goal;
+      });
+    nextState.mapRoom = nextState.mapRoom || "hallway";
     nextState.flags = nextState.flags || {};
     nextState.inventory = Array.isArray(nextState.inventory) ? nextState.inventory : [];
     nextState.history = Array.isArray(nextState.history) ? nextState.history : [];
@@ -635,6 +646,7 @@
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
+    renderMapHelperAction();
     // Placed task-group steps (chain puzzles). Locked steps render
     // disabled with "(locked)" so the player knows there's a puzzle.
     const placedRefs = (state.placedActions && state.placedActions[state.currentRoom]) || [];
@@ -680,10 +692,22 @@
     }
   }
 
+  function renderMapHelperAction() {
+    if (!state || state.flags.map || state.currentRoom !== state.mapRoom) return;
+    if (state.currentRoom === "hallway" || state.currentRoom === "security_hub") return;
+    const button = document.createElement("button");
+    button.className = "tag tag-action";
+    button.type = "button";
+    button.textContent = "Recover route cache";
+    button.addEventListener("click", findMapHelper);
+    els.subroomActions.append(button);
+  }
+
   async function doHallwayToRoom(targetRoom) {
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -699,6 +723,7 @@
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -718,6 +743,7 @@
     if (transitionLocked || !state || state.ended) return;
     if (targetRoom === state.currentRoom) return;
     Audio.prime();
+    if (await maybeForcedReveal(1)) return;
     spendTurns(1);
     if (state.ending) return finishRun(state.ending);
     if (isCaught()) {
@@ -736,34 +762,30 @@
     await afterTurn("");
   }
 
-  // Auto-reveal: if the player hasn't discovered the threat by turn 5,
-  // play a release cutscene at the cost of one extra turn. Player only
-  // ever sees this if they haven't triggered a reveal themselves first.
-  async function maybeForcedReveal() {
+  // Auto-reveal: once the timer is due, intercept the next attempted
+  // room change instead of firing during an item click.
+  async function maybeForcedReveal(projectedTurnCost = 0) {
     if (!state || state.ended) return false;
     if (state.flags.monster_revealed) return false;
     const revealAt = Number.isFinite(state.revealTurn) ? state.revealTurn : 5;
-    if (state.turn < revealAt) return false;
+    if (state.turn + projectedTurnCost < revealAt) return false;
     spendTurns(1);
-    state.flags.monster_revealed = true;
     if (isCaught()) {
       addHistory("The hunter reached you before the station's alarm finished.");
       finishRun("caught");
       return true;
     }
+    state.flags.monster_revealed = true;
     const peek = state.currentRoom === "hallway"
       ? `A sound rolls down the hall. ${state.threat.name.toUpperCase()} released during evacuation.`
       : `You hear a noise and peek toward the hallway. ${state.threat.name.toUpperCase()} released during evacuation.`;
     addHistory(peek);
     await playMonsterRelease(peek);
-    return false;
+    renderGame("You close the door and wait for the hallway to clear.");
+    return true;
   }
 
-  // Wraps the post-action render so the auto-reveal can slip in BEFORE
-  // the next renderGame paints — keeps the UI consistent with state.
   async function afterTurn(message) {
-    const ended = await maybeForcedReveal();
-    if (ended) return;
     renderGame(message);
   }
 
@@ -787,6 +809,7 @@
       if (action.noopMessage) UI.toast(action.noopMessage);
       return;
     }
+    if (action.target && await maybeForcedReveal(action.turns || 1)) return;
     spendTurns(action.turns || 1);
     let message = "";
     if (action.run) message = action.run(state);
@@ -794,8 +817,10 @@
     updateGoalsFromFlags();
 
     if (state.ending) {
+      const ending = state.ending;
       addHistory(message);
-      return finishRun(state.ending);
+      if (ending === "escape") await playEscapePrelude();
+      return finishRun(ending);
     }
 
     if (isCaught()) {
@@ -837,9 +862,7 @@
 
   // Run one step of a placed task group. Mirrors doAction but skips
   // transitions (placed steps never move the player). Honours noopIf
-  // (don't burn a turn if a precondition has flipped) and event
-  // (currently just "monster_release") so a placed step can replace
-  // a hardcoded room action that fired a cutscene.
+  // (don't burn a turn if a precondition has flipped) and event hooks.
   async function doPlacedStep(ref, step) {
     if (transitionLocked || !state || state.ended) return;
     Audio.prime();
@@ -854,8 +877,10 @@
     state.flags[`done_${ref.groupId}_${ref.stepId}`] = true;
     updateGoalsFromFlags();
     if (state.ending) {
+      const ending = state.ending;
       addHistory(message);
-      return finishRun(state.ending);
+      if (ending === "escape") await playEscapePrelude();
+      return finishRun(ending);
     }
     if (isCaught()) {
       addHistory("The hunter reached the central hallway before you could leave.");
@@ -871,6 +896,29 @@
     if (message) {
       addHistory(message);
       UI.toast(message);
+    }
+    await afterTurn(message);
+  }
+
+  function addInventoryItem(item) {
+    state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
+    if (!state.inventory.includes(item)) state.inventory.push(item);
+  }
+
+  async function findMapHelper() {
+    if (transitionLocked || !state || state.ended || state.flags.map) return;
+    Audio.prime();
+    spendTurns(1);
+    state.flags.map = true;
+    state.mapUnlocked = true;
+    addInventoryItem("Partial facility map");
+    updateGoalsFromFlags();
+    const message = "A route cache flickers open here. It is incomplete, but it reveals the nearby rooms.";
+    addHistory(message);
+    UI.toast(message);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
     }
     await afterTurn(message);
   }
@@ -1094,7 +1142,7 @@
     clearTimeout(transitionTimer);
     els.eventMessage.textContent = message;
     els.eventOverlay.classList.add("active");
-    els.eventOverlay.classList.remove("video-reveal");
+    els.eventOverlay.classList.remove("settling", "video-reveal");
     // Pre-load the reveal video while the player reads the message so
     // the cutscene starts cleanly after they click to continue.
     els.roomFallback.src = Story.rooms.hallway.poster;
@@ -1116,8 +1164,53 @@
     els.roomVideo.play().catch(() => {});
     await waitForVideoWindow(els.roomVideo, 3600);
     els.eventOverlay.classList.remove("video-reveal");
+    els.eventMessage.textContent = "You close the door and wait for the hallway to clear.";
+    setRoomMedia(Story.rooms[state.currentRoom]);
+    transitionLocked = true;
+    await delay(1800);
+    els.eventOverlay.classList.add("settling");
+    els.eventOverlay.classList.remove("active");
+    await delay(900);
+    els.eventOverlay.classList.remove("settling");
+    transitionLocked = false;
+  }
+
+  async function playEscapePrelude() {
+    const message = "The last pieces connect. You remember the transport command, the burn path, and why you hid them from yourself.";
+    await playMessageVideoEvent(message, eventVideoFor("victory"), 4300);
+  }
+
+  async function playMessageVideoEvent(message, clip, videoMs = 3600) {
+    transitionLocked = true;
+    roomMediaToken += 1;
+    clearTimeout(transitionTimer);
+    els.eventMessage.textContent = message;
+    els.eventOverlay.classList.add("active");
+    els.eventOverlay.classList.remove("settling", "video-reveal");
+    let ready = Promise.resolve();
+    if (clip) {
+      els.roomFallback.src = Story.rooms.hallway.poster;
+      els.roomFallback.classList.remove("visible");
+      els.roomVideo.dataset.src = mediaSrc(clip);
+      els.roomVideo.src = mediaSrc(clip);
+      els.roomVideo.load();
+      ready = videoReady(els.roomVideo, 4200);
+    }
+    await delay(1800);
+    await awaitContinue(9000);
+    await ready;
+    if (clip) {
+      try { els.roomVideo.currentTime = 0; } catch (err) {}
+      els.roomVideo.pause();
+      els.eventOverlay.classList.add("video-reveal");
+      await delay(700);
+      els.roomVideo.play().catch(() => {});
+      await waitForVideoWindow(els.roomVideo, videoMs);
+      els.eventOverlay.classList.remove("video-reveal");
+    }
     await delay(520);
     els.eventOverlay.classList.remove("active");
+    await delay(520);
     transitionLocked = false;
   }
 
@@ -1129,6 +1222,7 @@
     const btn = els.eventContinue;
     if (!btn) return delay(Math.max(0, timeoutMs - 1000));
     btn.hidden = false;
+    els.eventOverlay.classList.add("continue-ready");
     requestAnimationFrame(() => requestAnimationFrame(() => btn.classList.add("visible")));
     return new Promise(resolve => {
       let done = false;
@@ -1138,6 +1232,7 @@
         clearTimeout(timer);
         btn.removeEventListener("click", finish);
         els.eventOverlay.removeEventListener("click", overlayClick);
+        els.eventOverlay.classList.remove("continue-ready");
         btn.classList.remove("visible");
         setTimeout(() => { btn.hidden = true; }, 480);
         resolve();
@@ -1246,11 +1341,12 @@
     els.goalsList.innerHTML = "";
     const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
     goals.forEach((goal, index) => {
-      const visible = index < state.visibleGoals || state.flags.console || state.flags.map;
+      const isChain = !!goal.synthetic;
+      const visible = isChain || index < state.visibleGoals || state.flags.console || state.flags.map;
       const done = !!state.flags[`goal_${goal.id}`] || !!state.flags[goal.requires];
       const li = document.createElement("li");
-      li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"}`.trim();
-      li.textContent = visible ? `${done ? "Complete: " : ""}${goal.text}` : "Hidden goal: restore a console or route cache.";
+      li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"} ${isChain ? "chain-goal" : ""}`.trim();
+      li.textContent = visible ? goal.text : "Hidden goal: restore a console or clue cache.";
       els.goalsList.append(li);
     });
   }
@@ -1352,6 +1448,7 @@
     UI.closePanel("details-panel");
     if (targetId === "hallway") {
       Audio.prime();
+      if (await maybeForcedReveal(1)) return;
       spendTurns(1);
       if (state.ending) return finishRun(state.ending);
       if (isCaught()) {
