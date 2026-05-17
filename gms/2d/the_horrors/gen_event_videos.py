@@ -475,18 +475,31 @@ def main():
         todo.append(item)
     queued = []
     for item in todo:
-        log(f"queue {item['output']}")
-        queued.append((item, submit(item)))
-        log(f"job {queued[-1][1]} {item['output']}")
+        try:
+            log(f"queue {item['output']}")
+            queued.append((item, submit(item)))
+            log(f"job {queued[-1][1]} {item['output']}")
+        except Exception as err:
+            log(f"FAIL queue {item['output']} {err}")
+    failed = []
     for item, job_id in queued:
         target = os.path.join(VIDEO_DIR, item["output"])
-        job = wait_for_job(job_id, item["output"])
-        job["id"] = job_id
-        download(f"/api/jobs/{job_id}/file", target)
-        bytes_written = os.path.getsize(target)
-        update_metadata(item, job, bytes_written)
-        log(f"ok {item['output']} {bytes_written} bytes {job.get('duration_secs')}s")
-    log(f"done {len(queued)} generated")
+        try:
+            job = wait_for_job(job_id, item["output"])
+            job["id"] = job_id
+            download(f"/api/jobs/{job_id}/file", target)
+            bytes_written = os.path.getsize(target)
+            update_metadata(item, job, bytes_written)
+            log(f"ok {item['output']} {bytes_written} bytes {job.get('duration_secs')}s")
+        except Exception as err:
+            # Don't let one bad clip kill the rest. Subsequent bulk
+            # runs will pick up whatever's still missing on disk.
+            log(f"FAIL {item['output']} {err}")
+            failed.append(item['output'])
+    log(f"done {len(queued)} generated, {len(failed)} failed")
+    if failed:
+        log(f"failed list: {failed}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

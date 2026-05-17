@@ -80,12 +80,14 @@ def run_suite(suite_path: str, passthrough_args: list[str]) -> int:
     return rc
 
 
-def convert_pngs_to_jpgs() -> int:
+def convert_pngs_to_jpgs(force: bool = False) -> int:
     """gen_images.py writes PNGs to original_files/. The video gen scripts
     (and the runtime) expect JPGs in images/. This step bridges the gap so
     bulk runs don't fail on FileNotFoundError partway through transitions
     like the 2026-05-17 run did. Idempotent: skips when the .jpg already
-    exists. Uses macOS `sips` since the rest of the pipeline assumes it."""
+    exists. With force=True (bulk --force), re-convert even when the .jpg
+    is present, so a freshly regenerated PNG actually replaces its JPG.
+    Uses macOS `sips` since the rest of the pipeline assumes it."""
     original_dir = os.path.join(HERE, "original_files")
     images_dir = os.path.join(HERE, "images")
     if not os.path.isdir(original_dir):
@@ -99,7 +101,7 @@ def convert_pngs_to_jpgs() -> int:
             continue
         src = os.path.join(original_dir, fname)
         dst = os.path.join(images_dir, fname[:-4] + ".jpg")
-        if os.path.exists(dst):
+        if os.path.exists(dst) and not force:
             skipped += 1
             continue
         rc = subprocess.call([
@@ -110,7 +112,8 @@ def convert_pngs_to_jpgs() -> int:
             log(f"convert_pngs: sips failed on {fname} rc={rc}")
             return rc
         converted += 1
-    log(f"convert_pngs: {converted} converted, {skipped} already JPG")
+    log(f"convert_pngs: {converted} converted, {skipped} already JPG"
+        + (" (force)" if force else ""))
     return 0
 
 
@@ -153,7 +156,7 @@ def main() -> int:
         # gen scripts run (they read images/<room>.jpg as I2V start/end
         # frames and will FileNotFoundError on missing JPGs otherwise).
         if os.path.basename(script) == "gen_images.py":
-            crc = convert_pngs_to_jpgs()
+            crc = convert_pngs_to_jpgs(force=force)
             if crc != 0:
                 failed.append("convert_pngs_to_jpgs")
     overall_dt = time.time() - overall_t0

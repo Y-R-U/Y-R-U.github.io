@@ -1678,6 +1678,31 @@
     return group.steps.find(s => s.id === ref.stepId) || null;
   }
 
+  // Walk placedActions to figure out which groups landed in this run,
+  // then make one "chain goal" per group that completes when the last
+  // step fires. Label-only — doesn't tell the player which room holds
+  // which step, so it raises awareness without spoiling placement.
+  function chainGoalsFromPlaced(placedActions) {
+    const groupIds = new Set();
+    Object.values(placedActions || {}).forEach(refs => {
+      (refs || []).forEach(ref => { if (ref && ref.groupId) groupIds.add(ref.groupId); });
+    });
+    const out = [];
+    groupIds.forEach(id => {
+      const group = taskGroups.find(g => g.id === id);
+      if (!group || !group.steps || !group.steps.length) return;
+      const lastStep = group.steps[group.steps.length - 1];
+      if (!lastStep || !lastStep.provides) return;
+      out.push({
+        id: `chain_${id}`,
+        text: `Follow a clue trail somewhere in the building: ${group.label || id}.`,
+        requires: lastStep.provides,
+        synthetic: true,
+      });
+    });
+    return out;
+  }
+
   // Pick which rooms exist for this run. Always includes startRoom +
   // (hallway is implicit-always-in everywhere else). Capped by however
   // many rooms are actually defined, so a new game type with fewer
@@ -1786,6 +1811,10 @@
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
       const runLayout = buildRunLayout(runRooms, rng);
       const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      // Synthetic per-chain goal so the player sees a chain exists
+      // without being told which room holds which step.
+      const chainGoals = chainGoalsFromPlaced(placedActions);
+      const baseGoals = selectRunGoals(rng);
       return {
         active: true,
         ended: false,
@@ -1810,7 +1839,7 @@
         runRooms,
         runLayout,
         placedActions,
-        goals: selectRunGoals(rng),
+        goals: baseGoals.concat(chainGoals),
         flags: {},
         inventory: [],
         history: [],

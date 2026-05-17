@@ -6,7 +6,12 @@
 
   const $ = id => document.getElementById(id);
   const DEBUG_META_KEY = "the_horrors.debugMeta.v1";
-  const STATIC_MEDIA_VERSION = "20260515-runtime-media-1";
+  // Appended as ?v= to every media URL via mediaSrc(). New filenames bust
+  // cache themselves (so adding a new room doesn't require a bump). BUMP
+  // THIS when an existing file is overwritten in place — i.e. anytime the
+  // regen helper's Redo/Reverse swaps the contents of an mp4 the player
+  // may have already cached. Format: YYYYMMDD-shortnote.
+  const STATIC_MEDIA_VERSION = "20260517-v03";
   let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
@@ -18,6 +23,7 @@
   let roomMediaToken = 0;
   let transitionSequence = 0;
   let transitionTimer = 0;
+  let preRevealTimer = 0;
   let helperOnline = false;
   let debugTransitions = [];
   let selectedTransition = null;
@@ -124,12 +130,23 @@
     wireEvents();
     syncSettings();
     renderDebugList();
-    refreshHelperStatus();
-    helperPoll = window.setInterval(refreshHelperStatus, 5000);
+    // Helper poll is intentionally NOT started here — it only fires
+    // while the debug panel is open. See startHelperPoll below.
     showIntro();
     if (new URLSearchParams(window.location.search).has("debug")) {
       setTimeout(() => UI.openPanel("debug-panel"), 250);
     }
+  }
+
+  function startHelperPoll() {
+    if (helperPoll) return;
+    refreshHelperStatus();
+    helperPoll = window.setInterval(refreshHelperStatus, 5000);
+  }
+  function stopHelperPoll() {
+    if (!helperPoll) return;
+    clearInterval(helperPoll);
+    helperPoll = 0;
   }
 
   function normalizeState(nextState) {
@@ -203,10 +220,22 @@
     els.endingHistory.addEventListener("click", openHistory);
     els.restartGame.addEventListener("click", () => showIntro(true));
     els.debugButton.addEventListener("click", () => {
-      refreshHelperStatus();
+      startHelperPoll();
       UI.openPanel("debug-panel");
     });
     els.debugRefresh.addEventListener("click", refreshHelperStatus);
+    // The debug panel close button uses [data-close="debug-panel"]; UI
+    // calls our closePanel via that. We can't easily wedge a hook in
+    // there, so poll explicitly when the panel transitions to hidden.
+    const debugPanel = document.getElementById("debug-panel");
+    if (debugPanel) {
+      const observer = new MutationObserver(() => {
+        const open = debugPanel.classList.contains("open");
+        if (open) startHelperPoll();
+        else stopHelperPoll();
+      });
+      observer.observe(debugPanel, { attributes: true, attributeFilter: ["class"] });
+    }
     document.querySelectorAll("[data-debug-filter]").forEach(button => {
       button.addEventListener("click", () => {
         debugFilter = button.dataset.debugFilter || "room";
@@ -537,10 +566,20 @@
     idleTimer = 0;
   }
 
+  // Tracks the AbortController of the most recent setRoomMedia call so
+  // we can hard-cancel any pending load/loadeddata handlers it attached
+  // (previously these piled up — harmless because of the token guard,
+  // but a real leak over a long session).
+  let roomMediaAbort = null;
+
   function setRoomMedia(room) {
     const token = ++roomMediaToken;
     clearTimeout(transitionTimer);
     transitionLocked = false;
+    if (roomMediaAbort) roomMediaAbort.abort();
+    const ac = new AbortController();
+    roomMediaAbort = ac;
+    const signal = ac.signal;
     // The fallback img is what bridges the gap while the new idle
     // video loads. It must already be displaying the NEW room's
     // poster before we flip .visible — otherwise we briefly show the
@@ -559,7 +598,7 @@
     };
     if (els.roomFallback.getAttribute("src") !== room.poster) {
       els.roomFallback.classList.remove("visible");
-      els.roomFallback.addEventListener("load", showFallback, { once: true });
+      els.roomFallback.addEventListener("load", showFallback, { once: true, signal });
       els.roomFallback.src = room.poster;
       // Safety: if the img is already cached the load event may not
       // fire; check complete after assignment.
@@ -568,7 +607,7 @@
       showFallback();
     } else {
       els.roomFallback.classList.remove("visible");
-      els.roomFallback.addEventListener("load", showFallback, { once: true });
+      els.roomFallback.addEventListener("load", showFallback, { once: true, signal });
     }
     if (els.roomVideo.dataset.src !== idleSrc) {
       els.roomVideo.dataset.src = idleSrc;
@@ -587,7 +626,7 @@
         els.roomVideo.currentTime = 0;
       } catch (err) {}
       els.roomVideo.pause();
-    }, { once: true });
+    }, { once: true, signal });
   }
 
   function rememberRoomVisit(roomId) {
@@ -695,8 +734,7 @@
         else els.subroomActions.append(button);
       });
     } else {
-      // Non-hallway rooms get up to 3 nearby-room exits (1-turn moves)
-      // plus their existing "Step into the hallway" exit (above).
+      // Non-hallway rooms get up to 3 nearby-room exits (1-turn moves).
       nearbyForCurrent().forEach(targetId => {
         if (!Story.rooms[targetId] || !isRoomInRun(targetId)) return;
         const button = document.createElement("button");
@@ -706,6 +744,24 @@
         button.addEventListener("click", () => doNearbyMove(targetId));
         els.exitActions.append(button);
       });
+      // Hallway-back exit: auto-generated unless the room's own actions
+      // already declare one. Without this, v0.3 rooms (master_bedroom,
+      // greenhouse, etc.) had no declared exit and stranded the player.
+      const hasHallwayExit = actions.some(a => a.side === "exit" && a.target === "hallway");
+      if (!hasHallwayExit) {
+        const button = document.createElement("button");
+        button.className = "tag tag-action";
+        button.type = "button";
+        button.textContent = "Step into the hallway";
+        button.addEventListener("click", () => doAction({
+          id: `auto_${state.currentRoom}_to_hallway`,
+          side: "exit",
+          target: "hallway",
+          label: "Step into the hallway",
+          turns: 1,
+        }));
+        els.exitActions.append(button);
+      }
     }
   }
 
@@ -779,12 +835,15 @@
     if (state.flags.monster_revealed) return false;
     if (state.turn < 5) return false;
     spendTurns(1);
-    state.flags.monster_revealed = true;
     if (isCaught()) {
+      // Caught before the cutscene fires — don't mark monster_revealed
+      // (the reveal didn't actually happen, archived run shouldn't
+      // claim it did).
       addHistory(`${state.threat ? state.threat.name : "Something"} reached you before the alarm finished.`);
       finishRun("caught");
       return true;
     }
+    state.flags.monster_revealed = true;
     const peek = state.currentRoom === "hallway"
       ? `A sound rolls down the hall. ${state.threat.name.toUpperCase()} released during evacuation.`
       : `You hear a noise and peek toward the hallway. ${state.threat.name.toUpperCase()} released during evacuation.`;
@@ -960,6 +1019,7 @@
       transitionLocked = true;
       roomMediaToken += 1;
       clearTimeout(transitionTimer);
+      clearTimeout(preRevealTimer);
       els.roomFallback.src = from.poster;
       els.roomFallback.classList.remove("visible");
       els.roomVideo.dataset.src = playbackSrc;
@@ -971,6 +1031,7 @@
       const done = () => {
         if (token !== transitionSequence) return;
         clearTimeout(transitionTimer);
+        clearTimeout(preRevealTimer);
         els.roomVideo.removeEventListener("loadedmetadata", start);
         els.roomVideo.removeEventListener("timeupdate", clamp);
         els.roomVideo.removeEventListener("ended", done);
@@ -998,7 +1059,7 @@
         // action trays back in unless the caller is chaining a second
         // transition (in which case skipRevealAtEnd avoids a flash).
         const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
-        setTimeout(() => {
+        preRevealTimer = setTimeout(() => {
           if (token !== transitionSequence) return;
           els.roomFallback.src = to.poster;
           if (!opts.skipRevealAtEnd) showActionTrays();
@@ -1022,6 +1083,7 @@
     transitionLocked = false;
     transitionSequence += 1;
     clearTimeout(transitionTimer);
+    clearTimeout(preRevealTimer);
     if (els.roomVideo) els.roomVideo.pause();
     showActionTrays();
   }
@@ -1126,6 +1188,9 @@
     els.eventOverlay.classList.remove("video-reveal");
     await delay(520);
     els.eventOverlay.classList.remove("active");
+    // Pause on the last frame so renderGame's setRoomMedia doesn't
+    // briefly catch the monster clip still playing on swap.
+    try { els.roomVideo.pause(); } catch (err) {}
     transitionLocked = false;
   }
 
@@ -1238,11 +1303,14 @@
     els.goalsList.innerHTML = "";
     const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
     goals.forEach((goal, index) => {
-      const visible = index < state.visibleGoals || state.flags.console || state.flags.map;
+      // Synthetic chain goals are always visible — that's the whole
+      // point (player needs to know the chain exists, just not where).
+      const isChain = !!goal.synthetic;
+      const visible = isChain || index < state.visibleGoals || state.flags.console || state.flags.map || state.flags.chart;
       const done = !!state.flags[`goal_${goal.id}`] || !!state.flags[goal.requires];
       const li = document.createElement("li");
-      li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"}`.trim();
-      li.textContent = visible ? `${done ? "Complete: " : ""}${goal.text}` : "Hidden goal: restore a console or route cache.";
+      li.className = `${done ? "done" : ""} ${visible ? "" : "hidden-goal"} ${isChain ? "chain-goal" : ""}`.trim();
+      li.textContent = visible ? `${done ? "Complete: " : ""}${goal.text}` : "Hidden goal: find a personal record or a sketch of the building.";
       els.goalsList.append(li);
     });
   }
@@ -1764,12 +1832,10 @@
   }
 
   function distanceLabel() {
+    // Pure label only — no DOM side-effects. End-game tension is the
+    // heartbeat's job (no continual visual flashes per user request).
     const remaining = state.turnLimit - state.turn - state.threatPressure;
-    if (remaining < 8) {
-      els.threatFlash.classList.add("active");
-      setTimeout(() => els.threatFlash.classList.remove("active"), 560);
-      return "at the door";
-    }
+    if (remaining < 8) return "at the door";
     if (remaining < 20) return "near";
     if (remaining < 40) return "closing";
     return "distant";
