@@ -59,9 +59,10 @@
     roomFallback: $("room-fallback"),
     roomName: $("room-name"),
     turnCount: $("turn-count"),
+    turnBar: $("turn-bar"),
     eventOverlay: $("event-overlay"),
     eventMessage: $("event-message"),
-    eventSkip: $("event-skip"),
+    eventContinue: $("event-continue"),
     mapMobile: $("map-mobile"),
     subroomActions: $("subroom-actions"),
     exitActions: $("exit-actions"),
@@ -107,6 +108,7 @@
     goalsList: $("goals-list"),
     detailsInventoryList: $("details-inventory-list"),
     runStats: $("run-stats"),
+    runStatsSide: $("run-stats-side"),
     popupMap: $("popup-map"),
     historyList: $("history-list"),
     endingVideo: $("ending-video"),
@@ -478,7 +480,7 @@
     const room = Story.rooms[state.currentRoom];
     setRoomMedia(room);
     els.roomName.textContent = roomDisplayName(room.id);
-    els.turnCount.textContent = `${state.turn} / ${state.turnRange[0]}-${state.turnRange[1]}`;
+    renderTurnBar();
     els.facilityName.textContent = state.facility;
     els.threatLabel.textContent = `${state.threat.label}: ${distanceLabel()}`;
     els.storyText.textContent = message || currentStoryText(room);
@@ -740,7 +742,8 @@
   async function maybeForcedReveal() {
     if (!state || state.ended) return false;
     if (state.flags.monster_revealed) return false;
-    if (state.turn < 5) return false;
+    const revealAt = Number.isFinite(state.revealTurn) ? state.revealTurn : 5;
+    if (state.turn < revealAt) return false;
     spendTurns(1);
     state.flags.monster_revealed = true;
     if (isCaught()) {
@@ -932,13 +935,25 @@
       transitionLocked = true;
       roomMediaToken += 1;
       clearTimeout(transitionTimer);
-      els.roomFallback.src = from.poster;
-      els.roomFallback.classList.remove("visible");
+      // Keep the FROM room covered by the fallback img while the new
+      // clip loads. Removing .visible later (after the video actually
+      // starts playing) bridges the brief blank that follows a
+      // video.src swap — the source of the inter-room flicker.
+      if (els.roomFallback.getAttribute("src") !== from.poster) {
+        els.roomFallback.src = from.poster;
+      }
+      els.roomFallback.classList.add("visible");
       els.roomVideo.dataset.src = playbackSrc;
       els.roomVideo.src = playbackSrc;
       els.roomVideo.load();
       // Drop the action trays while the transition video plays.
       hideActionTrays();
+      let fallbackDropped = false;
+      const dropFallback = () => {
+        if (fallbackDropped) return;
+        fallbackDropped = true;
+        els.roomFallback.classList.remove("visible");
+      };
       const done = () => {
         if (token !== transitionSequence) return;
         clearTimeout(transitionTimer);
@@ -948,6 +963,7 @@
         els.roomVideo.removeEventListener("error", done);
         // Hold the transition's last good frame visible.
         try { els.roomVideo.pause(); } catch (err) {}
+        dropFallback();
         state.currentRoom = targetRoom;
         transitionLocked = false;
         resolve();
@@ -958,7 +974,12 @@
         try {
           els.roomVideo.currentTime = trim.start;
         } catch (err) {}
-        els.roomVideo.play().catch(() => {});
+        // play() resolves once playback has actually started — by then
+        // a frame has been committed, so we can fade the fallback out
+        // without exposing the post-src-swap blank.
+        els.roomVideo.play()
+          .then(() => requestAnimationFrame(dropFallback))
+          .catch(() => dropFallback());
         const duration = Number.isFinite(trim.end) ? Math.max(0.25, trim.end - trim.start) : 3.04;
         // 0.5s before the clip ends, preload the destination poster
         // onto the fallback + video element so setRoomMedia doesn't
@@ -1074,15 +1095,17 @@
     els.eventMessage.textContent = message;
     els.eventOverlay.classList.add("active");
     els.eventOverlay.classList.remove("video-reveal");
+    // Pre-load the reveal video while the player reads the message so
+    // the cutscene starts cleanly after they click to continue.
     els.roomFallback.src = Story.rooms.hallway.poster;
     els.roomFallback.classList.remove("visible");
     els.roomVideo.dataset.src = mediaSrc(clip);
     els.roomVideo.src = mediaSrc(clip);
     els.roomVideo.load();
     const ready = videoReady(els.roomVideo, 4200);
-    els.eventSkip.hidden = false;
-    await waitForEventSkip(5200);
-    els.eventSkip.hidden = true;
+    // Hold the message ~3× the old timing before offering "continue".
+    await delay(2000);
+    await awaitContinue(7000);
     await ready;
     try {
       els.roomVideo.currentTime = 0;
@@ -1098,18 +1121,31 @@
     transitionLocked = false;
   }
 
-  function waitForEventSkip(timeoutMs) {
+  // Show the "click to continue" prompt after the reading pause, then
+  // wait for either a click on it OR the fallback timeout. Used by any
+  // message+video event so the player controls the pace from message
+  // → cutscene rather than the engine guessing how fast they read.
+  function awaitContinue(timeoutMs) {
+    const btn = els.eventContinue;
+    if (!btn) return delay(Math.max(0, timeoutMs - 1000));
+    btn.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => btn.classList.add("visible")));
     return new Promise(resolve => {
-      let settled = false;
-      const done = () => {
-        if (settled) return;
-        settled = true;
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
         clearTimeout(timer);
-        els.eventSkip.removeEventListener("click", done);
+        btn.removeEventListener("click", finish);
+        els.eventOverlay.removeEventListener("click", overlayClick);
+        btn.classList.remove("visible");
+        setTimeout(() => { btn.hidden = true; }, 480);
         resolve();
       };
-      const timer = setTimeout(done, timeoutMs);
-      els.eventSkip.addEventListener("click", done);
+      const overlayClick = ev => { if (ev.target !== btn) finish(); };
+      const timer = setTimeout(finish, timeoutMs);
+      btn.addEventListener("click", finish);
+      els.eventOverlay.addEventListener("click", overlayClick);
     });
   }
 
@@ -1229,16 +1265,44 @@
     });
   }
 
+  // Drives the headline progress bar (replaces the old "1 / 100-120"
+  // text). Bar width = state.turn / state.turnLimit. The exact limit is
+  // hidden — the player only sees the bar fill and shift colour, so
+  // running out of time is a tightening feeling rather than a deadline
+  // number. Threshold bands match the CSS pulse animations.
+  function renderTurnBar() {
+    const bar = els.turnBar;
+    const label = els.turnCount;
+    if (!bar || !label) return;
+    const limit = Math.max(1, Number(state.turnLimit) || 1);
+    const ratio = Math.min(1, Math.max(0, (state.turn - 1) / limit));
+    const pct = Math.round(ratio * 100);
+    bar.style.setProperty("--turn-pct", `${pct}%`);
+    bar.setAttribute("aria-valuenow", String(pct));
+    let band = "calm";
+    if (ratio >= 0.9) band = "critical";
+    else if (ratio >= 0.75) band = "urgent";
+    else if (ratio >= 0.5) band = "warm";
+    bar.classList.remove("calm", "warm", "urgent", "critical");
+    bar.classList.add(band);
+    label.textContent = String(state.turn);
+  }
+
   function renderStats() {
     const name = state.playerRevealed ? state.playerName : "unresolved";
-    els.runStats.innerHTML = `
+    // Turns moved to the headline progress bar (turn-count), so it's
+    // omitted here to avoid duplicating that info in the stats list.
+    const html = `
       <dt>Identity</dt><dd>${UI.escapeHtml(name)}</dd>
       <dt>Facility</dt><dd>${UI.escapeHtml(state.facility)}</dd>
       <dt>Run Key</dt><dd>${UI.escapeHtml(state.runKey || "legacy-run")}</dd>
       <dt>Difficulty</dt><dd>${UI.escapeHtml(state.difficultyLabel)}</dd>
       <dt>Threat</dt><dd>${UI.escapeHtml(state.threat.name)}</dd>
-      <dt>Turns</dt><dd>${state.turn} / ${state.turnRange[0]}-${state.turnRange[1]}</dd>
     `;
+    // Render to BOTH locations — popup copy (mobile-only on desktop)
+    // and side-panel copy (desktop only).
+    if (els.runStats) els.runStats.innerHTML = html;
+    if (els.runStatsSide) els.runStatsSide.innerHTML = html;
   }
 
   function renderMap(target) {

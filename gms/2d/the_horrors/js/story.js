@@ -974,7 +974,8 @@
         side: "sub",
         hint: "warmth",
         turns: 1,
-        once: true,
+        // Repeatable flavor — kettle stays on the bench, the player can
+        // keep lifting it to burn turns. No flag/inventory side effect.
         run(state) {
           state.threatPressure += 1;
           return "The kettle is still warm. Whoever was here left it on long after the gas was off.";
@@ -1008,7 +1009,7 @@
         side: "sub",
         hint: "watch",
         turns: 1,
-        once: true,
+        // Repeatable — the lamp is still here on subsequent visits.
         run(state) {
           state.threatPressure += 1;
           return "You twist the wick down. The lamp does not dim. The shadow under the desk does.";
@@ -1053,7 +1054,8 @@
         side: "sub",
         hint: "watch",
         turns: 1,
-        once: true,
+        // Repeatable — chairs stay. Player can keep pulling them out
+        // and burning turns if they want the creepy atmosphere line.
         run(state) {
           state.threatPressure += 1;
           return "It moves more easily than a chair this old should. Something exhales as you sit, then stops when you do.";
@@ -1128,7 +1130,7 @@
         side: "sub",
         hint: "watch",
         turns: 1,
-        once: true,
+        // Repeatable — the clock keeps running down; player can rewind.
         run(state) {
           state.threatPressure += 1;
           return "The pendulum lurches into motion. It ticks once, twice, then keeps perfect time with your breathing.";
@@ -1162,7 +1164,7 @@
         side: "sub",
         hint: "watch",
         turns: 1,
-        once: true,
+        // Repeatable — there are many sheets; lift any one each turn.
         run(state) {
           state.threatPressure += 1;
           return "Underneath: another covering sheet, fitted to a shape that does not match any furniture you have seen.";
@@ -1198,7 +1200,8 @@
         turns: 1,
         look: true,
         lookVideo: "videos/look_conservatory_glass.mp4",
-        once: true,
+        // Repeatable — glass is still here. Replays the look cutscene
+        // each time, which is by design (the player chose to look).
         run(state) {
           state.threatPressure += 1;
           return "The frost on the inside of the pane retreats from your fingertip — and then writes a single word back: STAY.";
@@ -1231,6 +1234,85 @@
     // the auto-generated "Step into the hallway" exit from renderActions
     // and any placed steps that land in them.
   };
+
+  // ── Generic flavor "search slots" injected per room kind ─────────────
+  // Pure atmosphere: no flag, no inventory, no `once` (so they stay
+  // clickable each visit and the player can burn turns on them). Their
+  // labels intentionally look like "open the drawer / search the
+  // bookshelf" — the same verbs the placed task steps use — so the
+  // player can't tell from a button which slot hides a real task and
+  // which is just creepy filler. Burns one turn per click.
+  const flavorByKind = {
+    sleeping: [
+      { id: "open_wardrobe", label: "Open the wardrobe",
+        text: "Empty, except for a wire hanger swaying as if you'd just opened a door." },
+      { id: "look_under_bed", label: "Look under the bed",
+        text: "Dust. A single button. The faint outline of a footprint pressed into the rug." },
+      { id: "lift_pillow", label: "Lift the pillow",
+        text: "The pillow is cold on one side. The dent of a head is on the other." },
+    ],
+    bath_like: [
+      { id: "lift_rug", label: "Lift the floor rug",
+        text: "Tile underneath. The grout is too wet for a room this dry." },
+      { id: "check_basin", label: "Check the basin",
+        text: "The drain holds a single dark hair, longer than yours." },
+    ],
+    kitchen_like: [
+      { id: "check_cupboard", label: "Open a cupboard",
+        text: "Stacked plates, all clean, all faintly warm." },
+      { id: "check_pantry", label: "Look in the pantry",
+        text: "Jars rearranged into a pattern only someone watching could read." },
+    ],
+    study_like: [
+      { id: "search_desk", label: "Search the desk",
+        text: "Pencil shavings. A torn corner of paper. Nothing else for now." },
+      { id: "scan_shelves", label: "Scan the bookshelf",
+        text: "A row of books all by the same author, none you remember reading." },
+    ],
+    storage_like: [
+      { id: "move_crate", label: "Move a crate",
+        text: "Heavier than it should be. You move it back to where it was." },
+      { id: "open_drawer", label: "Open the drawer",
+        text: "A coil of rope, a length of chain, a hand-written tag with one initial." },
+    ],
+    lounge_like: [
+      { id: "check_cushion", label: "Check the cushion",
+        text: "Coins, a hairpin, something soft that you do not pick up." },
+      { id: "open_bureau", label: "Open the bureau",
+        text: "Letterhead from somewhere that does not exist on any map." },
+    ],
+    wild: [
+      { id: "move_planter", label: "Move a planter",
+        text: "Soil dark and wet around the rim — as though something was watered tonight." },
+      { id: "lift_matting", label: "Lift the matting",
+        text: "Underneath: an outline scratched into the floor in the shape of a small door." },
+    ],
+  };
+
+  // Inject flavor slots into every non-hallway room of a known kind.
+  // Goes BEFORE any existing exit action so the room's exit stays at
+  // the bottom of the sub-action stack. Skipped for the hallway since
+  // the hallway has its own per-room exit grid.
+  Object.keys(rooms).forEach(roomId => {
+    const room = rooms[roomId];
+    if (!room || !room.kind || roomId === "hallway") return;
+    const pool = flavorByKind[room.kind] || [];
+    if (!pool.length) return;
+    if (!actions[roomId]) actions[roomId] = [];
+    const exitIdx = actions[roomId].findIndex(a => a.side === "exit");
+    const injected = pool.map(f => ({
+      id: `${roomId}_${f.id}`,
+      label: f.label,
+      side: "sub",
+      hint: "watch",
+      turns: 1,
+      // Repeatable: no `once`, no provides, no inventory. Run returns
+      // the flavor line and the engine burns a turn via spendTurns.
+      run() { return f.text; },
+    }));
+    if (exitIdx >= 0) actions[roomId].splice(exitIdx, 0, ...injected);
+    else actions[roomId].push(...injected);
+  });
 
   // ── Procedural helpers ───────────────────────────────────────────────────
   function hashKey(value) {
@@ -1356,8 +1438,11 @@
       goalText: "Find something with your name on it.",
       steps: [
         makeStep({
+          // Generic button label — reads like the flavor "search the
+          // desk / open the wardrobe" slots, so players have to click
+          // around to discover where the task actually lives this run.
           id: "claim_identity",
-          label: "Look for something personal",
+          label: "Search for something familiar",
           roomKind: "any",
           provides: "identity",
           item: state => `${state.playerName}'s personal effect`,
@@ -1371,11 +1456,11 @@
       steps: [
         makeStep({
           id: "find_personal_letter",
-          label: "Pick up the folded letter",
+          label: "Look through the papers",
           roomKind: "any",
           provides: "letter",
           item: "Unsent letter",
-          text: "An unfinished letter on folded paper. The handwriting is yours. The recipient is also yours.",
+          text: "Between the papers: an unfinished letter on folded stock. The handwriting is yours. The recipient is also yours.",
         }),
       ],
     },
@@ -1384,18 +1469,17 @@
       steps: [
         makeStep({
           id: "read_medical_chart",
-          label: "Read the chart",
+          label: "Read what's pinned to the wall",
           roomKind: "any",
           provides: "chart",
           // Preserve the original cellar action's behaviour: trigger the
           // monster_release cutscene the first time the chart is read,
-          // unless the monster has already been revealed by the turn-5
-          // auto-reveal — in which case the step is a no-op so it doesn't
-          // burn a turn or replay the cutscene.
+          // unless the monster has already been revealed by the auto-
+          // reveal (its turn is per-run randomized).
           event: "monster_release",
           noopIf: state => !!state.flags.monster_revealed,
-          noopMessage: "The chart is unchanged. The room already knows what's outside.",
-          text: state => `A medical chart, recent. The last entry is one line: ${state.threat.name.toUpperCase()} returned.`,
+          noopMessage: "Already read. The room already knows what's outside.",
+          text: state => `Pinned among other notes: a medical chart, recent. The last entry is one line: ${state.threat.name.toUpperCase()} returned.`,
         }),
       ],
     },
@@ -1404,7 +1488,7 @@
       steps: [
         makeStep({
           id: "cover_a_mirror",
-          label: "Cover the mirror",
+          label: "Reach for the towel rail",
           roomKind: "bath_like",
           provides: "mirror",
           text: "You drape a towel across the mirror. The drip in the basin pauses, then resumes a half-second slower.",
@@ -1556,10 +1640,11 @@
         text: "Said aloud, the password makes a small click somewhere distant in the house." }),
     ]},
     { id: "portrait_recess", label: "Portrait recess", steps: [
-      makeStep({ id: "loosen_portrait", label: "Loosen the loose portrait", provides: "portrait_moved", item: "Loose portrait",
-        text: "The portrait slides sideways on a hidden track. There is a recess behind it." }),
-      makeStep({ id: "open_recess", label: "Reach into the recess", requires: "portrait_moved", provides: "recess_opened", item: "Recess contents",
-        text: "Inside the recess, a brooch and a single key still wearing a paper tag." }),
+      // Collapsed from two steps — the original chain placed step 2
+      // ("Reach into the recess") in a different room from the portrait,
+      // which read as a dangling lead. Now find + open in one go.
+      makeStep({ id: "loosen_portrait_recess", label: "Loosen the loose portrait", provides: "recess_opened", item: "Recess contents",
+        text: "The portrait slides sideways on a hidden track. Inside the recess behind it: a brooch and a single key still wearing a paper tag." }),
     ]},
     { id: "candle_count", label: "Three candles", steps: [
       makeStep({ id: "gather_candles", label: "Gather the three candles", provides: "three_candles", item: "Three black candles",
@@ -1915,6 +2000,10 @@
         turn: 1,
         turnLimit: limit,
         turnRange: difficulty.range.slice(),
+        // Per-run randomized auto-reveal turn (3-8). game.js falls back
+        // to 5 if absent. Picking it here keeps the run reproducible
+        // from the run key — same seed, same surprise.
+        revealTurn: randomInt(3, 8, rng),
         visibleGoals: difficulty.visibleGoals,
         facilityPrefix: prefix,
         location,

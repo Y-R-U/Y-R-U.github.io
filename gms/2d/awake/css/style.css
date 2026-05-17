@@ -131,6 +131,43 @@ button {
   letter-spacing: 0.08em;
 }
 
+/* "click to continue" prompt — fades in after the reading pause, takes
+   the click that advances from the message slide to the reveal video.
+   Pulses gently so it reads as actionable without stealing focus. */
+.event-continue {
+  position: relative;
+  margin-top: 14px;
+  padding: 10px 22px;
+  border: 1px solid rgba(140, 220, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(7, 9, 13, 0.55);
+  color: #cfeaff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 480ms ease;
+  animation: continue-pulse 1600ms ease-in-out infinite;
+  pointer-events: none;
+}
+
+.event-overlay .event-continue.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.event-overlay.video-reveal .event-continue {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes continue-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(140, 220, 255, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(140, 220, 255, 0.18); }
+}
+
 .event-skip {
   margin-top: 18px;
   min-width: 108px;
@@ -373,6 +410,67 @@ button.tag {
 
 .tag-room small {
   color: var(--muted);
+}
+
+/* Progress bar replacing the literal "1 / 100-120" turn counter. Fill
+   width is driven by --turn-pct from JS. Hue + pulse intensity escalate
+   via .calm / .warm / .urgent / .critical classes. The actual turn
+   limit is hidden — the bar filling up is the signal that time is short. */
+.turn-bar {
+  position: relative;
+  height: 10px;
+  width: min(48vw, 220px);
+  margin-top: 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  --turn-pct: 0%;
+  --bar-color: rgba(155, 220, 255, 0.55);
+}
+
+.turn-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--turn-pct);
+  background: var(--bar-color);
+  border-radius: 6px;
+  transition: width 360ms ease, background-color 480ms ease;
+}
+
+.turn-bar-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.turn-bar.calm    { --bar-color: rgba(155, 220, 255, 0.55); }
+.turn-bar.warm    { --bar-color: rgba(255, 220, 120, 0.72); }
+.turn-bar.urgent  { --bar-color: rgba(255, 156, 70, 0.85); }
+.turn-bar.critical { --bar-color: rgba(255, 80, 90, 0.92); }
+
+.turn-bar.urgent .turn-bar-fill {
+  animation: turn-pulse-soft 1400ms ease-in-out infinite;
+}
+
+.turn-bar.critical .turn-bar-fill {
+  animation: turn-pulse-hard 760ms ease-in-out infinite;
+}
+
+@keyframes turn-pulse-soft {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.25); }
+}
+
+@keyframes turn-pulse-hard {
+  0%, 100% { filter: brightness(1)   saturate(1); }
+  50%      { filter: brightness(1.5) saturate(1.4); }
 }
 
 .tag-map-toggle {
@@ -1187,10 +1285,26 @@ button.tag {
     align-items: baseline;
   }
 
+  /* The top-tools cog is position:fixed at the screen's top-right and
+     overlays the side-panel. Reserve clearance on the first panel
+     section so the threat-label (right-aligned in section-head) doesn't
+     end up underneath the cog. ~110px = 44px cog + 44px debug icon +
+     gap + buffer. */
+  .side-panel > .panel-section:first-child {
+    padding-right: 110px;
+  }
+
   .section-head span {
     color: var(--dim);
     font-size: 0.74rem;
     text-transform: uppercase;
+  }
+
+  /* Sections inside the details popup that only make sense on mobile —
+     on desktop, the side panel already shows inventory, map and run
+     details, so the popup focuses on just the tasks/goals list. */
+  .popup-mobile-only {
+    display: none;
   }
 
   .mobile-only {

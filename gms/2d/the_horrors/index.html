@@ -57,8 +57,11 @@
         <div class="scene-shade"></div>
 
         <div class="tag tag-room">
-          <span id="room-name">Cryo Room</span>
-          <small id="turn-count">1 / ??</small>
+          <span id="room-name">Bedroom</span>
+          <div id="turn-bar" class="turn-bar" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="turn-bar-fill"></div>
+            <small id="turn-count" class="turn-bar-label">1</small>
+          </div>
         </div>
         <button id="map-mobile" class="tag tag-map-toggle tag-info mobile-only" type="button">Detail</button>
         <div id="subroom-actions" class="tag-stack tag-left"></div>
@@ -66,6 +69,7 @@
         <div id="threat-flash" class="threat-flash" aria-hidden="true"></div>
         <div id="event-overlay" class="event-overlay" aria-hidden="true">
           <span id="event-message"></span>
+          <button id="event-continue" class="event-continue" type="button" hidden>click to continue</button>
         </div>
       </div>
 
@@ -91,6 +95,10 @@
         <section class="panel-section">
           <h3>Inventory</h3>
           <ul id="inventory-list" class="clean-list"></ul>
+        </section>
+        <section class="panel-section">
+          <h3>Run details</h3>
+          <dl id="run-stats-side" class="stat-list"></dl>
         </section>
       </aside>
     </div>
@@ -281,7 +289,7 @@
 <aside id="details-panel" class="overlay" aria-hidden="true">
   <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="details-title">
     <header class="popup-head">
-      <h2 id="details-title">Run Details</h2>
+      <h2 id="details-title">Tasks</h2>
       <button class="close-button" type="button" data-close="details-panel" aria-label="Close">×</button>
     </header>
     <div class="detail-grid">
@@ -289,16 +297,18 @@
         <h3>Goals</h3>
         <ul id="goals-list" class="clean-list goals-list"></ul>
       </section>
-      <section>
+      <!-- Mobile-only sections — desktop shows these in the right side
+           panel instead, so the popup stays focused on tasks/goals. -->
+      <section class="popup-mobile-only">
         <h3>Inventory</h3>
         <ul id="details-inventory-list" class="clean-list"></ul>
       </section>
-      <section>
-        <h3>Station</h3>
+      <section class="popup-mobile-only">
+        <h3>Run details</h3>
         <dl id="run-stats" class="stat-list"></dl>
       </section>
-      <section>
-        <h3>Known Rooms</h3>
+      <section class="popup-mobile-only">
+        <h3>Known rooms</h3>
         <div id="popup-map" class="mini-map"></div>
       </section>
     </div>

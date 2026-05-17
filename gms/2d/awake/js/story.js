@@ -788,6 +788,77 @@
     ],
   };
 
+  // ── Generic flavor "search slots" injected per room kind ─────────────
+  // Pure atmosphere: no flag, no inventory, no `once`. The labels are
+  // intentionally indistinguishable from placed-task labels so the
+  // player can't tell which slots hide real tasks until they click.
+  // Burns one turn per click.
+  const flavorByKind = {
+    sleeping: [
+      { id: "open_cradle", label: "Check the cradle",
+        text: "The cryo cradle is empty but warm — somebody else slept here recently." },
+      { id: "scan_panel", label: "Scan the wall panel",
+        text: "The panel cycles through diagnostic codes. None of them mean anything to you anymore." },
+    ],
+    bath_like: [
+      { id: "check_basin", label: "Check the basin",
+        text: "The drain holds a single dark hair, longer than yours." },
+    ],
+    kitchen_like: [
+      { id: "check_locker", label: "Open a ration locker",
+        text: "Sealed ration packs, all the dates reading next week." },
+    ],
+    study_like: [
+      { id: "tap_terminal", label: "Tap the inactive terminal",
+        text: "The screen wakes for a moment, shows a half-deleted log, then sleeps again." },
+      { id: "open_filing", label: "Open a filing drawer",
+        text: "Personnel folders. The tabs are coded in a colour scheme you don't recognise." },
+    ],
+    storage_like: [
+      { id: "move_pallet", label: "Move a pallet",
+        text: "Heavier than the manifest claims. You set it back exactly where it was." },
+    ],
+    lounge_like: [
+      { id: "check_recliner", label: "Check the recliner",
+        text: "A novel face-down on the armrest. The bookmark is a hand-drawn map." },
+    ],
+    wild: [
+      { id: "test_humidity", label: "Test the humidity",
+        text: "Hot, wet, breathing-back air. The plants tilt very slightly toward you." },
+      { id: "probe_soil", label: "Probe the soil",
+        text: "The probe meets something that isn't dirt or root — and pulses faintly under your hand." },
+    ],
+    power_like: [
+      { id: "read_load", label: "Read the load gauge",
+        text: "Power draw spikes when you look directly at the gauge, then settles when you look away." },
+      { id: "check_conduit", label: "Check a conduit",
+        text: "Warm. Humming a frequency just above what the human ear is supposed to manage." },
+    ],
+  };
+
+  // Inject flavor slots into every non-hallway room of a known kind.
+  // Goes BEFORE any existing exit action so the room's exit stays last
+  // in the sub-action stack.
+  Object.keys(rooms).forEach(roomId => {
+    const room = rooms[roomId];
+    if (!room || !room.kind || roomId === "hallway") return;
+    const pool = flavorByKind[room.kind] || [];
+    if (!pool.length) return;
+    if (!actions[roomId]) actions[roomId] = [];
+    const exitIdx = actions[roomId].findIndex(a => a.side === "exit");
+    const injected = pool.map(f => ({
+      id: `${roomId}_${f.id}`,
+      label: f.label,
+      side: "sub",
+      hint: "watch",
+      turns: 1,
+      // Repeatable: no `once`, no provides, no inventory.
+      run() { return f.text; },
+    }));
+    if (exitIdx >= 0) actions[roomId].splice(exitIdx, 0, ...injected);
+    else actions[roomId].push(...injected);
+  });
+
   function hashKey(value) {
     let hash = 2166136261;
     for (let index = 0; index < value.length; index += 1) {
@@ -897,8 +968,11 @@
       goalText: "Find something with your name on it.",
       steps: [
         makeStep({
+          // Generic button label — reads like the flavor "check the
+          // cradle / tap the terminal" slots, so players have to click
+          // around to discover where the task actually lives this run.
           id: "claim_identity",
-          label: "Look for something personal",
+          label: "Search for something familiar",
           roomKind: "any",
           provides: "identity",
           item: state => `${state.playerName}'s wrist band`,
@@ -1361,6 +1435,10 @@
         turn: 1,
         turnLimit: limit,
         turnRange: difficulty.range.slice(),
+        // Per-run randomized auto-reveal turn (3-8). game.js falls back
+        // to 5 if absent. Picking it here keeps the run reproducible
+        // from the run key.
+        revealTurn: randomInt(3, 8, rng),
         visibleGoals: difficulty.visibleGoals,
         facilityPrefix: prefix,
         location,
