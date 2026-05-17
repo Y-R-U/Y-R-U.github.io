@@ -377,15 +377,18 @@ button.tag {
   color: var(--muted);
 }
 
-.tag-details {
-  top: max(14px, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 .tag-map-toggle {
   left: max(14px, env(safe-area-inset-left));
   bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.tag-info {
+  border-style: dashed;
+  font-weight: 600;
+}
+
+.tag-info::after {
+  display: none;
 }
 
 .tag-stack {

@@ -62,7 +62,6 @@
     eventOverlay: $("event-overlay"),
     eventMessage: $("event-message"),
     eventSkip: $("event-skip"),
-    detailsMobile: $("details-mobile"),
     mapMobile: $("map-mobile"),
     subroomActions: $("subroom-actions"),
     exitActions: $("exit-actions"),
@@ -188,7 +187,6 @@
     els.continueGame.addEventListener("click", continueRun);
     els.titleHistory.addEventListener("click", openHistory);
     els.openDetails.addEventListener("click", openDetails);
-    els.detailsMobile.addEventListener("click", openDetails);
     els.openHistory.addEventListener("click", openHistory);
     els.mapMobile.addEventListener("click", openDetails);
     els.endingHistory.addEventListener("click", openHistory);
@@ -834,13 +832,19 @@
     await afterTurn(message);
   }
 
-  // Run one step of a placed task group. Looks like doAction but
-  // simpler — no transitions, no events, just spend a turn, run the
-  // step's effect, mark complete, advance.
+  // Run one step of a placed task group. Mirrors doAction but skips
+  // transitions (placed steps never move the player). Honours noopIf
+  // (don't burn a turn if a precondition has flipped) and event
+  // (currently just "monster_release") so a placed step can replace
+  // a hardcoded room action that fired a cutscene.
   async function doPlacedStep(ref, step) {
     if (transitionLocked || !state || state.ended) return;
     Audio.prime();
     if (step.requires && !state.flags[step.requires]) return; // safety
+    if (typeof step.noopIf === "function" && step.noopIf(state)) {
+      if (step.noopMessage) UI.toast(step.noopMessage);
+      return;
+    }
     spendTurns(step.turns || 1);
     const message = typeof step.run === "function" ? step.run(state) : "";
     if (step.provides) state.flags[step.provides] = true;
@@ -853,6 +857,13 @@
     if (isCaught()) {
       addHistory("The hunter reached the central hallway before you could leave.");
       return finishRun("caught");
+    }
+    if (step.event === "monster_release" && message) {
+      state.flags.monster_revealed = true;
+      addHistory(message);
+      await playMonsterRelease(message);
+      await afterTurn(message);
+      return;
     }
     if (message) {
       addHistory(message);

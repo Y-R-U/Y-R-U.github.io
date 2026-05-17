@@ -481,13 +481,15 @@
     "Whose Room",
   ];
 
+  // Only engine-mechanic goals live here now (map → unlocks the door
+  // ending; escape → the door action itself). Identity, letter, chart
+  // and mirror used to be optional/core entries with hardcoded rooms —
+  // they moved into `taskGroups` below as placeable steps with room-kind
+  // constraints, which lets the placement system put them in any matching
+  // run room rather than failing when a specific room ID isn't drawn.
   const goalPool = [
-    { id: "identity", text: "Recover your name from a personal item.", requires: "identity", core: true },
     { id: "map", text: "Find a sketch of the building's layout.", requires: "map", core: true },
     { id: "escape", text: "Reach the front door at the end of the hallway.", requires: "escape", core: true },
-    { id: "letter", text: "Find the unsent letter left on the writing desk.", requires: "letter" },
-    { id: "chart", text: "Read the chart left in the cellar.", requires: "chart" },
-    { id: "mirror", text: "Cover the bathroom mirror.", requires: "mirror" },
   ];
 
   // ── Transition + event metadata (drives the debug panel) ─────────────────
@@ -742,33 +744,10 @@
   // ── Per-room actions ─────────────────────────────────────────────────────
   const actions = {
     bedroom: [
-      {
-        id: "read_diary",
-        label: "Open the bedside drawer",
-        side: "sub",
-        hint: "identity",
-        turns: 1,
-        once: true,
-        run(state) {
-          state.flags.identity = true;
-          state.playerRevealed = true;
-          addUnique(state.inventory, `${state.playerName}'s diary`);
-          return `A small leather diary, your name in faded ink: ${state.playerName}.`;
-        },
-      },
-      {
-        id: "read_letter",
-        label: "Read the desk letter",
-        side: "sub",
-        hint: "letter",
-        turns: 1,
-        once: true,
-        run(state) {
-          state.flags.letter = true;
-          addUnique(state.inventory, "Unsent letter");
-          return "An unfinished letter. Whoever wrote it stopped halfway through your name.";
-        },
-      },
+      // Identity + letter actions used to live here as hardcoded
+      // bedroom-only finds. They moved into mandatory taskGroups
+      // (identity_find / personal_letter) so they can land in any run
+      // room — see the top of the taskGroups array.
       {
         id: "look_window",
         label: "Look out the window",
@@ -808,18 +787,9 @@
       },
     ],
     bathroom: [
-      {
-        id: "cover_mirror",
-        label: "Cover the mirror",
-        side: "sub",
-        hint: "mirror",
-        turns: 1,
-        once: true,
-        run(state) {
-          state.flags.mirror = true;
-          return "You drape a towel across the mirror. The drip in the basin pauses, then resumes a half-second slower.";
-        },
-      },
+      // Mirror action moved to the bathroom_mirror taskGroup (bath_like)
+      // so all bathroom variants (elegant_bathroom, red_bathroom, etc.)
+      // can host it, not just this one room.
       {
         id: "check_cabinet",
         label: "Open the cabinet",
@@ -842,24 +812,9 @@
       },
     ],
     cellar: [
-      {
-        id: "read_chart",
-        label: "Read the chart",
-        side: "sub",
-        hint: "chart",
-        turns: 1,
-        // Stays clickable after the reveal but does nothing — once
-        // monster_revealed is set (either by reading the chart or by
-        // the turn-5 auto-reveal), this just shows a "nothing new"
-        // toast and doesn't burn a turn.
-        noopIf: state => !!state.flags.monster_revealed,
-        noopMessage: "The chart is unchanged. The room already knows what's outside.",
-        event: "monster_release",
-        run(state) {
-          state.flags.chart = true;
-          return `A medical chart, recent. The last entry is one line: ${state.threat.name.toUpperCase()} returned.`;
-        },
-      },
+      // Chart action (with its monster_release event) moved to the
+      // medical_chart taskGroup so it can land in any room — the
+      // monster reveal cutscene still fires via doPlacedStep.
       {
         id: "check_shelf",
         label: "Search the shelves",
@@ -1060,22 +1015,6 @@
         },
       },
       {
-        id: "study_letter",
-        label: "Read the desk letter",
-        side: "sub",
-        hint: "letter",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.letter;
-        },
-        run(state) {
-          state.flags.letter = true;
-          addUnique(state.inventory, "Unsent letter");
-          return "An unfinished letter on study paper. The handwriting is yours. The recipient is also yours.";
-        },
-      },
-      {
         id: "study_to_hallway",
         label: "Step into the hallway",
         side: "exit",
@@ -1085,23 +1024,6 @@
       },
     ],
     attic: [
-      {
-        id: "attic_trunk",
-        label: "Open the steamer trunk",
-        side: "sub",
-        hint: "identity",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.identity;
-        },
-        run(state) {
-          state.flags.identity = true;
-          state.playerRevealed = true;
-          addUnique(state.inventory, `${state.playerName}'s coat`);
-          return `An old coat folded on top, the lining stitched: ${state.playerName}.`;
-        },
-      },
       {
         id: "attic_window",
         label: "Look through the round window",
@@ -1303,6 +1225,11 @@
         turns: 1,
       },
     ],
+    // master_bedroom / childs_bedroom / elegant_bedroom / servants_quarters
+    // used to have hardcoded identity actions here. The identity_find
+    // taskGroup (any-room placement) replaces them; these rooms now get
+    // the auto-generated "Step into the hallway" exit from renderActions
+    // and any placed steps that land in them.
   };
 
   // ── Procedural helpers ───────────────────────────────────────────────────
@@ -1361,10 +1288,13 @@
     if (!list.includes(item)) list.push(item);
   }
 
-  function selectRunGoals(rng) {
-    const core = goalPool.filter(goal => goal.core);
-    const optional = shuffled(goalPool.filter(goal => !goal.core), rng).slice(0, 2);
-    return core.concat(optional);
+  function selectRunGoals(runRooms, rng) {
+    // Optional/room-specific goals have moved to taskGroups (placed via
+    // placeTaskGroups, surfaced via chainGoalsFromPlaced), so this just
+    // returns the two engine-mechanic core goals. runRooms/rng kept for
+    // signature stability; future kind-agnostic optional goals could go
+    // here too if there's ever a reason to bypass the placement system.
+    return goalPool.filter(goal => goal.core);
   }
 
   // ── Task groups (puzzle chains) ──────────────────────────────────────
@@ -1385,16 +1315,26 @@
   // and returns a one-line flavor message. `roomKind` "any" / omitted
   // means the step can land in any run room.
   function makeStep(opts) {
+    // Resolve a value that may be a literal or a function-of-state.
+    const value = (v, state) => (typeof v === "function" ? v(state) : v);
     return {
       id: opts.id,
       label: opts.label,
       roomKind: opts.roomKind || "any",
       requires: opts.requires,
       provides: opts.provides,
+      // event/noopIf/noopMessage are honoured by doPlacedStep the same
+      // way doAction honours them — lets a placed step fire a cutscene
+      // (e.g. monster_release) or stay clickable as a no-op after first use.
+      event: opts.event,
+      noopIf: opts.noopIf,
+      noopMessage: opts.noopMessage,
       run(state) {
-        if (opts.item) addUnique(state.inventory, opts.item);
+        const item = value(opts.item, state);
+        if (item) addUnique(state.inventory, item);
         if (opts.provides) state.flags[opts.provides] = true;
-        return opts.text;
+        if (typeof opts.onRun === "function") opts.onRun(state);
+        return value(opts.text, state) || "";
       },
     };
   }
@@ -1405,6 +1345,74 @@
   // others target rooms by kind. Edit/add/remove freely; createRun
   // picks K of these per run (1/2/3 by difficulty).
   const taskGroups = [
+    // ── Must-place "core finds" ────────────────────────────────────────
+    // These four replace the old hardcoded room actions for identity,
+    // letter, chart and mirror. mandatory: true means placeTaskGroups
+    // always slots them in (regardless of difficulty.groupCount) so the
+    // matching goals are always completable. mirror is the exception —
+    // bath_like-only, so if no bathroom-kind room is in the run it
+    // simply isn't placed (and the goal doesn't appear).
+    { id: "identity_find", mandatory: true, label: "Identity",
+      goalText: "Find something with your name on it.",
+      steps: [
+        makeStep({
+          id: "claim_identity",
+          label: "Look for something personal",
+          roomKind: "any",
+          provides: "identity",
+          item: state => `${state.playerName}'s personal effect`,
+          text: state => `Tucked away, a small personal item with your name worked into it: ${state.playerName}.`,
+          onRun(state) { state.playerRevealed = true; },
+        }),
+      ],
+    },
+    { id: "personal_letter", mandatory: true, label: "Personal letter",
+      goalText: "Find an unsent personal letter.",
+      steps: [
+        makeStep({
+          id: "find_personal_letter",
+          label: "Pick up the folded letter",
+          roomKind: "any",
+          provides: "letter",
+          item: "Unsent letter",
+          text: "An unfinished letter on folded paper. The handwriting is yours. The recipient is also yours.",
+        }),
+      ],
+    },
+    { id: "medical_chart", mandatory: true, label: "Medical chart",
+      goalText: "Find a chart that explains what's loose in the building.",
+      steps: [
+        makeStep({
+          id: "read_medical_chart",
+          label: "Read the chart",
+          roomKind: "any",
+          provides: "chart",
+          // Preserve the original cellar action's behaviour: trigger the
+          // monster_release cutscene the first time the chart is read,
+          // unless the monster has already been revealed by the turn-5
+          // auto-reveal — in which case the step is a no-op so it doesn't
+          // burn a turn or replay the cutscene.
+          event: "monster_release",
+          noopIf: state => !!state.flags.monster_revealed,
+          noopMessage: "The chart is unchanged. The room already knows what's outside.",
+          text: state => `A medical chart, recent. The last entry is one line: ${state.threat.name.toUpperCase()} returned.`,
+        }),
+      ],
+    },
+    { id: "bathroom_mirror", label: "Bathroom mirror",
+      goalText: "Cover a bathroom mirror.",
+      steps: [
+        makeStep({
+          id: "cover_a_mirror",
+          label: "Cover the mirror",
+          roomKind: "bath_like",
+          provides: "mirror",
+          text: "You drape a towel across the mirror. The drip in the basin pauses, then resumes a half-second slower.",
+        }),
+      ],
+    },
+
+    // ── Puzzle chains ──────────────────────────────────────────────────
     { id: "lockbox_chain", label: "Lockbox & ledger", steps: [
       makeStep({ id: "find_brass_key", label: "Search the drawers", provides: "key_brass", item: "Brass key",
         text: "A small brass key tucked under folded linen, warm as if just handled." }),
@@ -1621,6 +1629,58 @@
       makeStep({ id: "read_engraving", label: "Read the inherited engraving", requires: "spoon_set", provides: "engraving_read", item: "Inherited initials",
         text: "The initials engraved on the handles are not the family's. They are yours." }),
     ]},
+
+    // ── Additional agnostic puzzle chains (mostly roomKind "any" so
+    // they can place anywhere — gives the placement system more options
+    // and keeps each run feeling different).
+    { id: "torn_photo", label: "Torn photograph", steps: [
+      makeStep({ id: "find_photo_half", label: "Pick up the torn photo half", provides: "photo_half", item: "Torn photo half",
+        text: "Half a photograph, ripped along a face. The remaining half holds a familiar shoulder." }),
+      makeStep({ id: "find_other_half", label: "Find the other half", requires: "photo_half", provides: "photo_joined", item: "Joined photograph",
+        text: "The two halves align. The torn-out face had been smiling — at someone holding the camera who was you." }),
+    ]},
+    { id: "hairpin_box", label: "Hairpin & jewelry box", steps: [
+      makeStep({ id: "find_hairpin_loose", label: "Pocket the loose hairpin", provides: "hairpin_loose", item: "Loose hairpin",
+        text: "A hairpin on the carpet, hooked, the kind made for picking small locks as well as holding hair." }),
+      makeStep({ id: "open_jewelry_box", label: "Pick the jewelry box lock", requires: "hairpin_loose", provides: "jewelry_box_open", item: "Boxed pendant",
+        text: "The box opens on a pendant engraved with the wrong name — but the same date as your locket." }),
+    ]},
+    { id: "tally_marks", label: "Wall tally", steps: [
+      makeStep({ id: "count_tally", label: "Count the pencil tally", provides: "tally_counted", item: "Tally count",
+        text: "Pencil tallies behind the door, in batches of five. The count matches the days since someone went missing." }),
+    ]},
+    { id: "stopped_watch", label: "Stopped watch chain", steps: [
+      makeStep({ id: "lift_watch_chain", label: "Lift the broken watch chain", provides: "watch_chain", item: "Broken watch chain",
+        text: "A watch chain with no watch on it, snapped at one link. The break is fresh." }),
+      makeStep({ id: "find_chain_watch", label: "Find the missing watch", requires: "watch_chain", provides: "chain_paired", item: "Paired pocket watch",
+        text: "Tucked in a coat pocket nearby, the matching watch. Still stopped at the same minute." }),
+    ]},
+    { id: "spool_thread", label: "Black thread spool", steps: [
+      makeStep({ id: "take_thread_spool", label: "Take the black thread spool", provides: "thread_spool", item: "Black thread spool",
+        text: "A wooden spool of black thread. The end has been knotted to mark a length." }),
+      makeStep({ id: "trace_thread", label: "Follow the thread to its end", requires: "thread_spool", provides: "thread_traced", item: "Knotted measurement",
+        text: "Unwound, the length matches your own height to the inch. Someone has measured you while you slept." }),
+    ]},
+    { id: "candle_stub", label: "Candle stub & strike", steps: [
+      makeStep({ id: "find_candle_stub", label: "Pick up the candle stub", provides: "candle_stub", item: "Candle stub",
+        text: "A candle stub, wax pooled twice — lit, blown out, lit again. The wick is still warm." }),
+      makeStep({ id: "strike_match", label: "Strike the salvaged match", requires: "candle_stub", provides: "candle_lit", item: "Salvaged matchstick",
+        text: "A single match strikes. The stub catches. By its light, words on the wall you couldn't see before." }),
+    ]},
+    { id: "ribbon_locket", label: "Ribbon & locket", steps: [
+      makeStep({ id: "find_silk_ribbon", label: "Pocket the silk ribbon", provides: "silk_ribbon", item: "Silk ribbon",
+        text: "A black silk ribbon, threaded through a hole big enough for a chain that isn't here." }),
+      makeStep({ id: "find_paired_locket", label: "Find the paired locket", requires: "silk_ribbon", provides: "locket_found", item: "Engraved locket",
+        text: "The locket the ribbon was meant for. Inside: two faces, one scratched out." }),
+      makeStep({ id: "match_locket_face", label: "Match the unscratched face", requires: "locket_found", provides: "locket_matched", item: "Matched portrait",
+        text: "You've seen the unscratched face on a portrait somewhere in the building. It was you." }),
+    ]},
+    { id: "fingerprint_glass", label: "Fingerprint glass", steps: [
+      makeStep({ id: "dust_glass", label: "Dust the glass for prints", provides: "dusted_glass", item: "Dusted glass tumbler",
+        text: "A tumbler dusted with hearth-ash shows three sets of fingerprints. One set is yours." }),
+      makeStep({ id: "compare_prints", label: "Compare against your hand", requires: "dusted_glass", provides: "prints_matched", item: "Matched prints",
+        text: "Two sets are larger than yours, one smaller. The smaller one is from inside the room — pressed against the glass from the wrong side." }),
+    ]},
   ];
 
   // For each group picked for a run, walk its steps and assign each one
@@ -1630,17 +1690,24 @@
   // in the run — better than leaving a step orphaned in the hallway.
   function placeTaskGroups(difficulty, runRooms, rng) {
     const placed = {};
+    if (!taskGroups.length) return placed;
+    // Mandatory groups (identity / letter / chart in any room) are placed
+    // every run, regardless of difficulty.groupCount. Optional puzzle
+    // chains then fill up to groupCount additional slots. Mandatory ones
+    // are placed first so they reserve a room before the random chains
+    // start grabbing rooms.
+    const mandatory = taskGroups.filter(g => g.mandatory);
+    const optional = taskGroups.filter(g => !g.mandatory);
     const want = difficulty.groupCount || 0;
-    if (!want || !taskGroups.length) return placed;
     const weighted = [];
-    taskGroups.forEach(group => {
+    optional.forEach(group => {
       const weight = group.weight || 1;
       for (let i = 0; i < weight; i += 1) weighted.push(group);
     });
-    const picks = [];
-    const seen = new Set();
+    const picks = mandatory.slice();
+    const seen = new Set(mandatory.map(g => g.id));
     const pool = shuffled(weighted, rng);
-    for (let i = 0; i < pool.length && picks.length < want; i += 1) {
+    for (let i = 0; i < pool.length && picks.length - mandatory.length < want; i += 1) {
       const group = pool[i];
       if (seen.has(group.id)) continue;
       seen.add(group.id);
@@ -1707,9 +1774,14 @@
       if (!group || !group.steps || !group.steps.length) return;
       const lastStep = group.steps[group.steps.length - 1];
       if (!lastStep || !lastStep.provides) return;
+      // Prefer a hand-authored goalText (used by must-place groups so the
+      // goal reads naturally — "Find your identity." rather than
+      // "Follow a clue trail somewhere: Identity.").
+      const text = group.goalText
+        || `Follow a clue trail somewhere in the building: ${group.label || id}.`;
       out.push({
         id: `chain_${id}`,
-        text: `Follow a clue trail somewhere in the building: ${group.label || id}.`,
+        text,
         requires: lastStep.provides,
         synthetic: true,
       });
@@ -1793,7 +1865,11 @@
     version: "0.2",
     rooms,
     actions,
-    goals: goalPool,
+    // Exported as the fallback used by game.js when state.goals is empty
+    // (legacy saves, dev mode). Pool is now the core gameplay goals only,
+    // so falling back to it can never produce impossible-to-complete
+    // entries. Placed groups are surfaced separately via chainGoalsFromPlaced.
+    goals: goalPool.filter(g => g.core),
     transitions,
     eventVideos,
     introPlaylist,
@@ -1828,7 +1904,7 @@
       // Synthetic per-chain goal so the player sees a chain exists
       // without being told which room holds which step.
       const chainGoals = chainGoalsFromPlaced(placedActions);
-      const baseGoals = selectRunGoals(rng);
+      const baseGoals = selectRunGoals(runRooms, rng);
       return {
         active: true,
         ended: false,

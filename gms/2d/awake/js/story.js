@@ -187,17 +187,25 @@
     "Noon On Mars",
   ];
 
+  // Identity moved into `taskGroups` as a placeable step so it can land
+  // in any run room instead of being hardcoded to cryo_room. The map and
+  // escape entries stay here — they're tied to engine mechanics (map
+  // unlocks the transport, escape is the door action itself). The seven
+  // room-specific optional goals stay too: each is satisfied by an
+  // action in its matching room, and all current rooms are always drawn
+  // (Awake's room count equals difficulty.roomCount), so they cannot be
+  // impossible. If more rooms are added later, the rooms[] filter in
+  // selectRunGoals keeps them safe.
   const goalPool = [
-    { id: "identity", text: "Recover your identity from the wrist band.", requires: "identity", core: true },
     { id: "map", text: "Restore a facility map or route cache.", requires: "map", core: true },
     { id: "escape", text: "Arm the emergency transport and leave.", requires: "escape", core: true },
-    { id: "console", text: "Recover the release note from a damaged console.", requires: "console" },
-    { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache" },
-    { id: "biome_sample", text: "Seal a sample from the corrupted plant towers.", requires: "biome_sample" },
-    { id: "reactor_reading", text: "Collect the reactor timing code.", requires: "reactor_reading" },
-    { id: "security_log", text: "Recover the last security log.", requires: "security_log" },
-    { id: "starfix", text: "Align the observation deck star fix.", requires: "starfix" },
-    { id: "toolmark", text: "Find the missing engineering tool.", requires: "toolmark" },
+    { id: "console", text: "Recover the release note from a damaged console.", requires: "console", rooms: ["cryo_room"] },
+    { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache", rooms: ["med_bay"] },
+    { id: "biome_sample", text: "Seal a sample from the corrupted plant towers.", requires: "biome_sample", rooms: ["hydroponic_biome"] },
+    { id: "reactor_reading", text: "Collect the reactor timing code.", requires: "reactor_reading", rooms: ["reactor_gallery"] },
+    { id: "security_log", text: "Recover the last security log.", requires: "security_log", rooms: ["security_hub"] },
+    { id: "starfix", text: "Find and align the navigation star fix.", requires: "starfix", rooms: ["observation_deck"] },
+    { id: "toolmark", text: "Find the missing engineering tool.", requires: "toolmark", rooms: ["engineering_bay"] },
   ];
 
   const transitions = [
@@ -460,20 +468,9 @@
 
   const actions = {
     cryo_room: [
-      {
-        id: "scan_band",
-        label: "Scan wrist band",
-        side: "sub",
-        hint: "identity",
-        turns: 1,
-        once: true,
-        run(state) {
-          state.flags.identity = true;
-          addUnique(state.inventory, `${state.playerName} wrist band`);
-          state.playerRevealed = true;
-          return `The band resolves: ${state.playerName}. The facility redacts why you were asleep.`;
-        },
-      },
+      // scan_band used to live here as the hardcoded identity action.
+      // It moved into the identity_find taskGroup (any-room placement)
+      // so the identity goal isn't tied to one specific start room.
       {
         id: "check_locker",
         label: "Open equipment locker",
@@ -846,9 +843,12 @@
     if (!list.includes(item)) list.push(item);
   }
 
-  function selectRunGoals(rng) {
+  function selectRunGoals(runRooms, rng) {
     const core = goalPool.filter(goal => goal.core);
-    const optional = shuffled(goalPool.filter(goal => !goal.core), rng).slice(0, 2);
+    const eligible = goalPool.filter(goal =>
+      !goal.core && (!goal.rooms || goal.rooms.some(r => runRooms.includes(r)))
+    );
+    const optional = shuffled(eligible, rng).slice(0, 2);
     return core.concat(optional);
   }
 
@@ -859,16 +859,26 @@
   // and returns a one-line flavor message. `roomKind` "any" / omitted
   // means the step can land in any run room.
   function makeStep(opts) {
+    // Resolve a value that may be a literal or a function-of-state.
+    const value = (v, state) => (typeof v === "function" ? v(state) : v);
     return {
       id: opts.id,
       label: opts.label,
       roomKind: opts.roomKind || "any",
       requires: opts.requires,
       provides: opts.provides,
+      // event/noopIf/noopMessage are honoured by doPlacedStep the same
+      // way doAction honours them — lets a placed step fire a cutscene
+      // (e.g. monster_release) or stay clickable as a no-op after first use.
+      event: opts.event,
+      noopIf: opts.noopIf,
+      noopMessage: opts.noopMessage,
       run(state) {
-        if (opts.item) addUnique(state.inventory, opts.item);
+        const item = value(opts.item, state);
+        if (item) addUnique(state.inventory, item);
         if (opts.provides) state.flags[opts.provides] = true;
-        return opts.text;
+        if (typeof opts.onRun === "function") opts.onRun(state);
+        return value(opts.text, state) || "";
       },
     };
   }
@@ -879,6 +889,26 @@
   // = anywhere, others target rooms by kind. Edit/add/remove freely;
   // createRun picks K per run (1/2/3 by difficulty).
   const taskGroups = [
+    // ── Must-place "core finds" ────────────────────────────────────────
+    // identity used to be a hardcoded scan_band action in cryo_room. It
+    // lives here now as a mandatory any-room placement so the identity
+    // goal is satisfied wherever the player happens to be exploring.
+    { id: "identity_find", mandatory: true, label: "Identity",
+      goalText: "Find something with your name on it.",
+      steps: [
+        makeStep({
+          id: "claim_identity",
+          label: "Look for something personal",
+          roomKind: "any",
+          provides: "identity",
+          item: state => `${state.playerName}'s wrist band`,
+          text: state => `Tucked into a panel: a wrist band. The band resolves: ${state.playerName}. The facility redacts why you were asleep.`,
+          onRun(state) { state.playerRevealed = true; },
+        }),
+      ],
+    },
+
+    // ── Puzzle chains ──────────────────────────────────────────────────
     { id: "transport_unlock", label: "Access card & transport", steps: [
       makeStep({ id: "find_access_card", label: "Search the personal locker", provides: "access_card", item: "Access card",
         text: "An access card slides out of a tucked pocket — your name is half-rubbed off." }),
@@ -1093,21 +1123,64 @@
       makeStep({ id: "open_tagged_crate", label: "Pop the tagged crate", roomKind: "storage_like", requires: "loose_magnet", provides: "crate_open", item: "Crate contents",
         text: "The magnet flips the hidden catch. The crate opens onto a pair of insulated gloves and a sealed flare." }),
     ]},
+
+    // ── Additional agnostic puzzle chains (mostly roomKind "any" so
+    // they can place anywhere — gives the placement system more options).
+    { id: "anomaly_readout", label: "Anomaly readout", steps: [
+      makeStep({ id: "read_anomaly_strip", label: "Read the anomaly strip", provides: "anomaly_strip", item: "Anomaly strip",
+        text: "A printed strip of telemetry, half scrolled off the panel. A spike at the same hour you woke up." }),
+    ]},
+    { id: "crew_portrait_pair", label: "Crew portrait & roster", steps: [
+      makeStep({ id: "find_crew_portrait", label: "Lift the crew portrait", provides: "crew_portrait", item: "Crew portrait",
+        text: "A printed crew portrait peeled half off the bulkhead. Five faces — one of them is yours, slightly younger." }),
+      makeStep({ id: "match_to_roster", label: "Match the portrait to a roster", requires: "crew_portrait", provides: "portrait_matched", item: "Matched name",
+        text: "Four of the names match the roster you've seen elsewhere. Yours is missing." }),
+    ]},
+    { id: "sealed_cargo", label: "Sealed cargo crate", steps: [
+      makeStep({ id: "find_cargo_chip", label: "Pocket the cargo chip", provides: "cargo_chip", item: "Cargo chip",
+        text: "A small data chip taped under a workbench — labelled with a route code you don't recognise." }),
+      makeStep({ id: "open_sealed_cargo", label: "Plug the chip into the cargo seal", requires: "cargo_chip", provides: "cargo_open", item: "Cargo contents",
+        text: "The seal hisses open. Inside: a stack of pre-printed evacuation tags. The top one has your name." }),
+    ]},
+    { id: "calibration_crystal", label: "Calibration crystal", steps: [
+      makeStep({ id: "lift_calibration_crystal", label: "Lift the calibration crystal", provides: "cal_crystal", item: "Calibration crystal",
+        text: "A small calibration crystal still humming. Pull it from its cradle and the cradle goes dark." }),
+      makeStep({ id: "slot_calibration", label: "Slot it into the bench", roomKind: "power_like", requires: "cal_crystal", provides: "bench_calibrated", item: "Calibrated bench reading",
+        text: "The bench wakes up. One reading agrees with no other — and it is exactly your body temperature." }),
+    ]},
+    { id: "handprint_scan", label: "Handprint & scanner", steps: [
+      makeStep({ id: "find_dust_handprint", label: "Note the dust handprint", provides: "dust_print", item: "Dust handprint",
+        text: "A handprint in fine dust on a panel — smaller than yours, fresh. Someone else is awake." }),
+      makeStep({ id: "match_scanner", label: "Match it on the scanner", requires: "dust_print", provides: "scanner_matched", item: "Scanned print",
+        text: "The scanner returns a partial ID — half the crew number is yours. The other half is not." }),
+    ]},
+    { id: "echo_recording", label: "Echo recording", steps: [
+      makeStep({ id: "find_echo_chip", label: "Pull the echo chip", provides: "echo_chip", item: "Echo chip",
+        text: "A small recording chip slotted into a maintenance panel. Labelled with a hand-scrawled exclamation mark." }),
+      makeStep({ id: "play_echo", label: "Play it back", requires: "echo_chip", provides: "echo_played", item: "Played echo",
+        text: "The chip plays back a voice — yours — saying a sentence you do not remember saying. Then a single long breath." }),
+    ]},
   ];
 
   function placeTaskGroups(difficulty, runRooms, rng) {
     const placed = {};
+    if (!taskGroups.length) return placed;
+    // Mandatory groups (identity in any room) are placed every run,
+    // regardless of difficulty.groupCount. Optional puzzle chains then
+    // fill up to groupCount additional slots. Mandatory ones are placed
+    // first so they reserve a room before random chains start grabbing.
+    const mandatory = taskGroups.filter(g => g.mandatory);
+    const optional = taskGroups.filter(g => !g.mandatory);
     const want = difficulty.groupCount || 0;
-    if (!want || !taskGroups.length) return placed;
     const weighted = [];
-    taskGroups.forEach(group => {
+    optional.forEach(group => {
       const weight = group.weight || 1;
       for (let i = 0; i < weight; i += 1) weighted.push(group);
     });
-    const picks = [];
-    const seen = new Set();
+    const picks = mandatory.slice();
+    const seen = new Set(mandatory.map(g => g.id));
     const pool = shuffled(weighted, rng);
-    for (let i = 0; i < pool.length && picks.length < want; i += 1) {
+    for (let i = 0; i < pool.length && picks.length - mandatory.length < want; i += 1) {
       const group = pool[i];
       if (seen.has(group.id)) continue;
       seen.add(group.id);
@@ -1149,6 +1222,33 @@
     const group = taskGroups.find(g => g.id === ref.groupId);
     if (!group) return null;
     return group.steps.find(s => s.id === ref.stepId) || null;
+  }
+
+  // Walk placedActions to figure out which groups landed in this run,
+  // then make one "chain goal" per group that completes when the last
+  // step fires. Mirrors the helper in horror/story.js — label-only, so
+  // the player sees a chain exists but not which room holds which step.
+  function chainGoalsFromPlaced(placedActions) {
+    const groupIds = new Set();
+    Object.values(placedActions || {}).forEach(refs => {
+      (refs || []).forEach(ref => { if (ref && ref.groupId) groupIds.add(ref.groupId); });
+    });
+    const out = [];
+    groupIds.forEach(id => {
+      const group = taskGroups.find(g => g.id === id);
+      if (!group || !group.steps || !group.steps.length) return;
+      const lastStep = group.steps[group.steps.length - 1];
+      if (!lastStep || !lastStep.provides) return;
+      const text = group.goalText
+        || `Follow a clue trail somewhere on the station: ${group.label || id}.`;
+      out.push({
+        id: `chain_${id}`,
+        text,
+        requires: lastStep.provides,
+        synthetic: true,
+      });
+    });
+    return out;
   }
 
   // Pick which rooms exist for this run. Always includes startRoom +
@@ -1211,7 +1311,11 @@
     version: "0.1",
     rooms,
     actions,
-    goals: goalPool,
+    // Fallback used by game.js when state.goals is missing (legacy
+    // saves, dev mode). Only core entries — never the room-constrained
+    // optional goals, which could otherwise surface in a run whose
+    // rooms can't satisfy them.
+    goals: goalPool.filter(g => g.core),
     transitions,
     eventVideos,
     introPlaylist,
@@ -1242,6 +1346,11 @@
         : "cryo_room";
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
       const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      // Each placed group gets a synthetic goal (uses group.goalText if
+      // present, otherwise a generic "follow a clue trail" line). This
+      // is what makes the placed identity step visible as a real goal.
+      const chainGoals = chainGoalsFromPlaced(placedActions);
+      const baseGoals = selectRunGoals(runRooms, rng);
       return {
         active: true,
         ended: false,
@@ -1265,7 +1374,7 @@
         visitedRooms: [startRoom],
         runRooms,
         placedActions,
-        goals: selectRunGoals(rng),
+        goals: baseGoals.concat(chainGoals),
         flags: {},
         inventory: [],
         history: [],
