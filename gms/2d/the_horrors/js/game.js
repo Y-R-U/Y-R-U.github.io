@@ -190,7 +190,7 @@
         }
         return goal;
       });
-    nextState.mapRoom = nextState.mapRoom || "hallway";
+    nextState.mapUnlocked = true;
     nextState.flags = nextState.flags || {};
     nextState.inventory = Array.isArray(nextState.inventory) ? nextState.inventory : [];
     nextState.history = Array.isArray(nextState.history) ? nextState.history : [];
@@ -705,11 +705,9 @@
   }
 
   function isRoomNameKnown(roomId) {
-    // Hallway is always known. Every other room stays "???" until
-    // the player visits it, or until the map is unlocked (which
-    // reveals every room's name at once).
+    // Hallway is always known. Every other room stays "???" until the
+    // player visits it.
     if (!state || roomId === "hallway") return true;
-    if (state.flags && state.flags.map) return true;
     const visitedRooms = Array.isArray(state.visitedRooms) ? state.visitedRooms : [];
     return visitedRooms.includes(roomId) || state.currentRoom === roomId;
   }
@@ -750,7 +748,6 @@
       button.addEventListener("click", () => doAction(action));
       (action.side === "sub" ? els.subroomActions : els.exitActions).append(button);
     });
-    renderMapHelperAction();
     // Placed task-group steps for this room (chain puzzles). Locked
     // steps (requires not yet held) still render but are disabled with
     // a "(locked)" suffix so the player knows there's a puzzle here.
@@ -811,17 +808,6 @@
         els.exitActions.append(button);
       }
     }
-  }
-
-  function renderMapHelperAction() {
-    if (!state || state.flags.map || state.currentRoom !== state.mapRoom) return;
-    if (state.currentRoom === "hallway" || state.currentRoom === "library") return;
-    const button = document.createElement("button");
-    button.className = "tag tag-action";
-    button.type = "button";
-    button.textContent = "Find a folded floor plan";
-    button.addEventListener("click", findMapHelper);
-    els.subroomActions.append(button);
   }
 
   async function doHallwayToRoom(targetRoom) {
@@ -1068,24 +1054,6 @@
   function addInventoryItem(item) {
     state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
     if (!state.inventory.includes(item)) state.inventory.push(item);
-  }
-
-  async function findMapHelper() {
-    if (transitionLocked || !state || state.ended || state.flags.map) return;
-    Audio.prime();
-    spendTurns(1);
-    state.flags.map = true;
-    state.mapUnlocked = true;
-    addInventoryItem("Folded floor plan");
-    updateGoalsFromFlags();
-    const message = "A folded floor plan is tucked out of sight here. It reveals the nearby rooms.";
-    addHistory(message);
-    UI.toast(message);
-    if (isCaught()) {
-      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
-      return finishRun("caught");
-    }
-    await afterTurn(message);
   }
 
   async function playLookCutscene(action, text) {
@@ -1731,7 +1699,7 @@
     layout.forEach(([id, positionClass]) => {
       const node = document.createElement("button");
       node.type = "button";
-      const known = id === "exit" ? state.flags.map : isRoomNameKnown(id);
+      const known = id === "exit" ? true : isRoomNameKnown(id);
       const isCurrent = id === state.currentRoom;
       const cost = mapMoveCost(id, nearby);
       node.className = `map-node ${positionClass} ${isCurrent ? "current" : ""} ${known ? "" : "unknown"} ${cost ? `cost-${cost}` : ""}`.trim();
@@ -2215,7 +2183,6 @@
   }
 
   function updateGoalsFromFlags() {
-    state.mapUnlocked = !!state.flags.map;
     const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
     goals.forEach(goal => {
       if (!goal.requires || !state.flags[goal.requires]) return;

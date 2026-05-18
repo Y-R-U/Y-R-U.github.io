@@ -481,9 +481,9 @@
     "Whose Room",
   ];
 
-  // Identity lives in taskGroups as the only mandatory task. The map is
-  // a randomly placed helper item, not a goal. Escape stays here as the
-  // overall objective; other clue chains are randomly selected below.
+  // Identity lives in taskGroups as the only mandatory task. Escape
+  // stays here as the overall objective; other clue chains are randomly
+  // selected below.
   const goalPool = [
     { id: "escape", text: "Final objective: reach the front door after the tasks are complete.", requires: "escape", core: true },
   ];
@@ -842,22 +842,6 @@
     ],
     hallway: [
       {
-        id: "find_layout",
-        label: "Search behind a frame",
-        side: "sub",
-        hint: "map",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.map && (!state.mapRoom || state.mapRoom === "hallway");
-        },
-        run(state) {
-          state.flags.map = true;
-          addUnique(state.inventory, "Folded floor plan");
-          return "A small folded plan of the building, hidden behind a portrait. The front door is at the far end of this corridor.";
-        },
-      },
-      {
         id: "listen",
         label: "Listen at the doors",
         side: "sub",
@@ -1099,22 +1083,6 @@
       },
     ],
     library: [
-      {
-        id: "library_book",
-        label: "Pick up the open book",
-        side: "sub",
-        hint: "map",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.map && state.mapRoom === "library";
-        },
-        run(state) {
-          state.flags.map = true;
-          addUnique(state.inventory, "Folded floor plan");
-          return "A folded floor plan tucked between the pages — the front door is at the end of the hallway, marked in red.";
-        },
-      },
       {
         id: "library_fireplace",
         label: "Reach into the fireplace",
@@ -2082,7 +2050,6 @@
         threat,
       });
       const placedActions = placeTaskGroups(difficulty, runRooms, rng, challengeGroups);
-      const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Synthetic per-chain goal so the player sees a chain exists
       // without being told which room holds which step.
       const chainGoals = chainGoalsFromPlaced(placedActions, challengeGroups);
@@ -2114,7 +2081,6 @@
         visitedRooms: [startRoom],
         runRooms,
         runLayout,
-        mapRoom,
         placedActions,
         challengeGroups,
         goals: baseGoals.concat(chainGoals),
@@ -2122,7 +2088,7 @@
         inventory: [],
         history: [],
         ending: "",
-        mapUnlocked: false,
+        mapUnlocked: true,
         createdAt: Date.now(),
       };
     },

@@ -480,9 +480,9 @@
     "Noon On Mars",
   ];
 
-  // Identity lives in taskGroups as the only mandatory task. The map is
-  // a randomly placed helper item, not a goal. Escape stays here as the
-  // overall objective; room-specific entries are random optional tasks.
+  // Identity lives in taskGroups as the only mandatory task. Escape stays
+  // here as the overall objective; room-specific entries are random
+  // optional tasks.
   const goalPool = [
     { id: "escape", text: "Final objective: arm the emergency transport after the tasks are complete.", requires: "escape", core: true },
     { id: "console", text: "Recover the release note from a damaged console.", requires: "console", rooms: ["cryo_room"] },
@@ -932,23 +932,6 @@
         },
       },
       {
-        id: "unlock_sensors",
-        label: "Wake motion sensors",
-        side: "sub",
-        hint: "map",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.map && state.mapRoom === "security_hub";
-        },
-        run(state) {
-          state.mapUnlocked = true;
-          state.flags.map = true;
-          addUnique(state.inventory, "Sensor route overlay");
-          return "The security grid paints the map in blue, then marks one corridor in red.";
-        },
-      },
-      {
         id: "security_to_hallway",
         label: "Exit to hallway",
         side: "exit",
@@ -1028,22 +1011,6 @@
       },
     ],
     hallway: [
-      {
-        id: "route_cache",
-        label: "Pull route cache",
-        side: "sub",
-        hint: "map",
-        turns: 1,
-        once: true,
-        guard(state) {
-          return !state.flags.map && (!state.mapRoom || state.mapRoom === "hallway");
-        },
-        run(state) {
-          state.flags.map = true;
-          addUnique(state.inventory, "Partial facility map");
-          return "A wall panel unlocks. The map is incomplete, but it proves the emergency transport is one junction away.";
-        },
-      },
       {
         id: "listen",
         label: "Listen at the vents",
@@ -1919,7 +1886,6 @@
         threat,
       });
       const placedActions = placeTaskGroups(placementDifficulty, runRooms, rng, challengeGroups);
-      const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Each placed group gets a synthetic goal (uses group.goalText if
       // present, otherwise a generic "follow a clue trail" line). This
       // is what makes the placed identity step visible as a real goal.
@@ -1951,7 +1917,6 @@
         visitedRooms: [startRoom],
         runRooms,
         runLayout,
-        mapRoom,
         placedActions,
         challengeGroups,
         goals: baseGoals.concat(chainGoals),
@@ -1959,7 +1924,7 @@
         inventory: [],
         history: [],
         ending: "",
-        mapUnlocked: false,
+        mapUnlocked: true,
         createdAt: Date.now(),
       };
     },
