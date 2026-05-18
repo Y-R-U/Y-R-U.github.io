@@ -46,6 +46,31 @@ GAME_PORTRAIT_WIDTH = 384
 GAME_PORTRAIT_HEIGHT = 640
 
 
+def load_story_transitions(root):
+    story_path = os.path.join(root, "js", "story.js")
+    if not os.path.exists(story_path):
+        return {}
+    script = (
+        "global.window={};"
+        "require('./js/story.js');"
+        "const s=window.CodexHorrorStory||window.TheHorrorsStory;"
+        "if(!s){console.log('{}');process.exit(0);}"
+        "const out={};"
+        "(s.transitions||[]).filter(t=>t.group==='room_transitions').forEach(t=>{"
+        "out[t.file]={id:t.id,label:t.label,start:t.startImage,end:t.endImage,"
+        "seed:t.seed||0,promptText:t.promptText,status:t.status||'Story-managed transition. Needs review.'};"
+        "});"
+        "console.log(JSON.stringify(out));"
+    )
+    try:
+        raw = subprocess.check_output(["node", "-e", script], cwd=root, text=True)
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else {}
+    except Exception as exc:
+        print(f"[{time.strftime('%H:%M:%S')}] story transition load failed for {root}: {exc}", flush=True)
+        return {}
+
+
 class Project:
     """One game's state — config, queues, metadata, and worker thread."""
 
@@ -59,6 +84,10 @@ class Project:
         self.common = cfg["common"]
         self.negative = cfg["negative"]
         self.transitions = cfg["transitions"]
+        if cfg.get("auto_story_transitions"):
+            merged = dict(self.transitions)
+            merged.update(load_story_transitions(self.root))
+            self.transitions = merged
         self.extras = cfg.get("extras", [])
         self.extra_prefixes = cfg.get("extra_prefixes", {})
         self.tasks = queue.Queue()

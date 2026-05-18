@@ -143,6 +143,11 @@
     if (!Array.isArray(nextState.runRooms) || !nextState.runRooms.length) {
       nextState.runRooms = Object.keys(Story.rooms).filter(id => id !== "hallway");
     }
+    if (!Array.isArray(nextState.runLayout) || !nextState.runLayout.length) {
+      nextState.runLayout = typeof Story.buildRunLayout === "function"
+        ? Story.buildRunLayout(nextState.runRooms)
+        : (Story.roomLayout || []);
+    }
     nextState.goals = Array.isArray(nextState.goals) && nextState.goals.length ? nextState.goals : (Story.goals || []);
     nextState.goals = nextState.goals
       .filter(goal => goal && goal.id !== "map")
@@ -163,6 +168,10 @@
     // saves (or runs created before task groups existed) just see an
     // empty map — no chains for that run, but everything else works.
     nextState.placedActions = nextState.placedActions && typeof nextState.placedActions === "object" ? nextState.placedActions : {};
+    nextState.challengeGroups = Array.isArray(nextState.challengeGroups) ? nextState.challengeGroups : [];
+    if (typeof Story.ensureChallengeTasks === "function") {
+      nextState = Story.ensureChallengeTasks(nextState) || nextState;
+    }
     return nextState;
   }
 
@@ -316,7 +325,7 @@
       return;
     }
     cacheStarted = true;
-    const manifest = Story.mediaManifest || [];
+    const manifest = cacheManifest();
     manifest.forEach(entry => {
       preloadMedia(entry)
         .then(() => markCached(entry, true))
@@ -371,7 +380,7 @@
   }
 
   function updateCacheUi() {
-    const manifest = Story.mediaManifest || [];
+    const manifest = cacheManifest();
     const loaded = manifest.filter(entry => cachedMedia.has(entry.src) || entry.failed).length;
     const percent = manifest.length ? Math.round((loaded / manifest.length) * 100) : 100;
     els.cacheFill.style.width = `${percent}%`;
@@ -391,7 +400,7 @@
   }
 
   function maybeEnableIntro() {
-    const required = (Story.mediaManifest || []).filter(entry => entry.required);
+    const required = cacheManifest();
     const ready = required.every(entry => cachedMedia.has(entry.src) || entry.failed);
     if (!ready || introReady) return;
     introReady = true;
@@ -400,6 +409,10 @@
     els.introHistory.disabled = false;
     updateCacheUi();
     startIntroSlideshow();
+  }
+
+  function cacheManifest() {
+    return (Story.mediaManifest || []).filter(entry => entry.required);
   }
 
   function startIntroSlideshow() {
@@ -447,6 +460,10 @@
       });
       if (!ok) return;
     }
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page before starting a new run.");
+      return;
+    }
     state = Story.createRun(difficulty);
     const startRoom = Story.rooms[state.currentRoom];
     addHistory(`You woke inside the ${startRoom.name} with no clear memory.`);
@@ -469,6 +486,10 @@
       });
       if (!ok) return;
     }
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page before starting a new run.");
+      return;
+    }
     state = Story.createRun("medium", key);
     const startRoom = Story.rooms[state.currentRoom];
     addHistory(`Run key ${state.runKey} woke you inside the ${startRoom.name}.`);
@@ -481,7 +502,16 @@
     Audio.prime();
     state = normalizeState(Save.loadState());
     if (!state) return showIntro(true);
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page if challenge tasks are missing.");
+    }
     renderGame();
+  }
+
+  function challengeSystemReady() {
+    return !!(window.HubPuzzles
+      && typeof window.HubPuzzles.createChallengeGroups === "function"
+      && typeof window.HubPuzzles.start === "function");
   }
 
   function renderGame(message) {
@@ -613,6 +643,20 @@
     return visitedRooms.includes(roomId) || state.currentRoom === roomId;
   }
 
+  function currentLayout() {
+    if (state && Array.isArray(state.runLayout) && state.runLayout.length) return state.runLayout;
+    if (state && Array.isArray(state.runRooms) && typeof Story.buildRunLayout === "function") {
+      return Story.buildRunLayout(state.runRooms);
+    }
+    return Story.roomLayout || [];
+  }
+
+  function nearbyForCurrentRoom() {
+    return typeof Story.nearbyRooms === "function"
+      ? Story.nearbyRooms(state.currentRoom, currentLayout())
+      : [];
+  }
+
   function roomDisplayName(roomId) {
     const room = Story.rooms[roomId];
     if (!room) return "???";
@@ -651,7 +695,7 @@
     // disabled with "(locked)" so the player knows there's a puzzle.
     const placedRefs = (state.placedActions && state.placedActions[state.currentRoom]) || [];
     placedRefs.forEach(ref => {
-      const step = typeof Story.resolveStep === "function" ? Story.resolveStep(ref) : null;
+      const step = typeof Story.resolveStep === "function" ? Story.resolveStep(ref, state) : null;
       if (!step) return;
       if (state.flags[`done_${ref.groupId}_${ref.stepId}`]) return;
       const button = document.createElement("button");
@@ -663,11 +707,11 @@
       if (!locked) button.addEventListener("click", () => doPlacedStep(ref, step));
       els.subroomActions.append(button);
     });
-    if (inHallway && Array.isArray(Story.roomLayout)) {
+    if (inHallway && currentLayout().length) {
       // Hallway exits: only the rooms that are part of THIS run.
       // Unknown ones still show labelled "???" so the player can
       // explore blindly with consistent positions.
-      Story.roomLayout.forEach(entry => {
+      currentLayout().forEach(entry => {
         if (!isRoomInRun(entry.id)) return;
         const button = document.createElement("button");
         button.className = "tag tag-action";
@@ -680,7 +724,7 @@
     } else if (!inHallway && typeof Story.nearbyRooms === "function") {
       // Filter nearby rooms by isRoomInRun so we don't suggest a room
       // that isn't part of this run's map.
-      Story.nearbyRooms(state.currentRoom).forEach(targetId => {
+      nearbyForCurrentRoom().forEach(targetId => {
         if (!Story.rooms[targetId] || !isRoomInRun(targetId)) return;
         const button = document.createElement("button");
         button.className = "tag tag-action";
@@ -871,6 +915,7 @@
       if (step.noopMessage) UI.toast(step.noopMessage);
       return;
     }
+    if (step.challenge) return runChallengeStep(ref, step);
     spendTurns(step.turns || 1);
     const message = typeof step.run === "function" ? step.run(state) : "";
     if (step.provides) state.flags[step.provides] = true;
@@ -898,6 +943,40 @@
       UI.toast(message);
     }
     await afterTurn(message);
+  }
+
+  async function runChallengeStep(ref, step) {
+    if (!window.HubPuzzles || typeof window.HubPuzzles.start !== "function") {
+      UI.toast("Challenge system is unavailable.");
+      return;
+    }
+    transitionLocked = true;
+    const result = await window.HubPuzzles.start(step.challenge);
+    transitionLocked = false;
+    if (result && result.success) {
+      const message = step.successText || "Challenge solved.";
+      if (step.provides) state.flags[step.provides] = true;
+      state.flags[`done_${ref.groupId}_${ref.stepId}`] = true;
+      updateGoalsFromFlags();
+      addHistory(message);
+      UI.toast(message);
+      await afterTurn(message);
+      return;
+    }
+    if (result && result.noPenalty) {
+      UI.toast("Challenge paused.");
+      return;
+    }
+    const failMessage = step.failText || "The challenge fails. The delay costs you a turn.";
+    spendTurns(step.turns || 1);
+    updateGoalsFromFlags();
+    addHistory(failMessage);
+    if (isCaught()) {
+      addHistory("The hunter reached the central hallway before you could leave.");
+      return finishRun("caught");
+    }
+    UI.toast(failMessage);
+    await afterTurn(failMessage);
   }
 
   function addInventoryItem(item) {
@@ -1177,10 +1256,10 @@
 
   async function playEscapePrelude() {
     const message = "The last pieces connect. You remember the transport command, the burn path, and why you hid them from yourself.";
-    await playMessageVideoEvent(message, eventVideoFor("victory"), 4300);
+    await playMessageVideoEvent(message, eventVideoFor("victory"));
   }
 
-  async function playMessageVideoEvent(message, clip, videoMs = 3600) {
+  async function playMessageVideoEvent(message, clip, videoMs = 0) {
     transitionLocked = true;
     roomMediaToken += 1;
     clearTimeout(transitionTimer);
@@ -1205,7 +1284,7 @@
       els.eventOverlay.classList.add("video-reveal");
       await delay(700);
       els.roomVideo.play().catch(() => {});
-      await waitForVideoWindow(els.roomVideo, videoMs);
+      await waitForVideoWindow(els.roomVideo, eventVideoWindowMs(els.roomVideo, videoMs || 3600));
       els.eventOverlay.classList.remove("video-reveal");
     }
     await delay(520);
@@ -1282,6 +1361,13 @@
       video.addEventListener("ended", done, { once: true });
       video.addEventListener("error", done, { once: true });
     });
+  }
+
+  function eventVideoWindowMs(video, fallbackMs) {
+    const duration = Number.isFinite(video.duration) && video.duration > 0
+      ? video.duration
+      : 0;
+    return duration ? Math.round((duration + 0.35) * 1000) : fallbackMs;
   }
 
   function delay(ms) {
@@ -1409,13 +1495,13 @@
       return;
     }
     // Filter to rooms in THIS run so the map matches the hallway tray.
-    const layout = (Story.roomLayout || [])
+    const layout = currentLayout()
       .filter(entry => isRoomInRun(entry.id))
       .map(entry => [entry.id, entry.pos])
       .concat([["hallway", "node-center"], ["transport", "node-exit"]]);
     const nearby = state.currentRoom === "hallway"
-      ? new Set((Story.roomLayout || []).map(e => e.id).filter(isRoomInRun))
-      : new Set((typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []).filter(isRoomInRun));
+      ? new Set(currentLayout().map(e => e.id).filter(isRoomInRun))
+      : new Set(nearbyForCurrentRoom().filter(isRoomInRun));
     layout.forEach(([id, positionClass]) => {
       const node = document.createElement("button");
       node.type = "button";
@@ -1461,7 +1547,7 @@
       return;
     }
     if (state.currentRoom === "hallway") return doHallwayToRoom(targetId);
-    const nearby = new Set(typeof Story.nearbyRooms === "function" ? Story.nearbyRooms(state.currentRoom) : []);
+    const nearby = new Set(nearbyForCurrentRoom());
     if (nearby.has(targetId)) return doNearbyMove(targetId);
     return doFarMove(targetId);
   }

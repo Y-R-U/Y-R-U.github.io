@@ -1,4 +1,5 @@
 {
+  "auto_story_transitions": true,
   "common": "realistic cinematic sci-fi horror game transition, vertical mobile portrait shot, smooth forward camera movement through a sealed doorway, preserve exact architecture, empty environment, no people, no readable text, no logos, no watermark, no collapse, no melting, no creature, no body, professional atmospheric game footage",
   "negative": "person, face, body, creature, readable text, logo, watermark, cartoon, painting, melting architecture, collapsing room, explosion, gore, extra doors, duplicated hallway",
   "transitions": {

@@ -485,7 +485,7 @@
   // a randomly placed helper item, not a goal. Escape stays here as the
   // overall objective; other clue chains are randomly selected below.
   const goalPool = [
-    { id: "escape", text: "Reach the front door at the end of the hallway.", requires: "escape", core: true },
+    { id: "escape", text: "Final objective: reach the front door after the tasks are complete.", requires: "escape", core: true },
   ];
 
   function incompleteTaskGoals(state) {
@@ -884,7 +884,8 @@
           }
           if (remainingTasks.length) {
             state.threatPressure += 1;
-            return "Your hand finds the latch, but the memory is incomplete. Something important is still missing.";
+            const noun = remainingTasks.length === 1 ? "task" : "tasks";
+            return `Your hand finds the latch, but ${remainingTasks.length} ${noun} still need finishing, including any challenge locks in your task list.`;
           }
           state.ending = "escape";
           return "The door opens. Outside, the air is colder than you remember air being.";
@@ -1774,31 +1775,46 @@
   //   { roomId: [stepObject, ...] }
   // Group is dropped entirely if any step can't find a matching room
   // in the run — better than leaving a step orphaned in the hallway.
-  function placeTaskGroups(difficulty, runRooms, rng) {
-    const placed = {};
-    if (!taskGroups.length) return placed;
-    // Mandatory groups are placed every run. Optional puzzle chains then
-    // fill up to groupCount additional slots.
-    const mandatory = taskGroups.filter(g => g.mandatory);
-    const optional = taskGroups.filter(g => !g.mandatory);
-    const want = difficulty.groupCount || 0;
-    const weighted = [];
-    optional.forEach(group => {
-      const weight = group.weight || 1;
-      for (let i = 0; i < weight; i += 1) weighted.push(group);
-    });
-    const picks = mandatory.slice();
-    const seen = new Set(mandatory.map(g => g.id));
-    const pool = shuffled(weighted, rng);
-    for (let i = 0; i < pool.length && picks.length - mandatory.length < want; i += 1) {
-      const group = pool[i];
-      if (seen.has(group.id)) continue;
-      seen.add(group.id);
-      picks.push(group);
+  function challengeGroupsForRun(ctx) {
+    if (window.HubPuzzles && typeof window.HubPuzzles.createChallengeGroups === "function") {
+      return window.HubPuzzles.createChallengeGroups(ctx);
     }
-    const usedRooms = new Set();
+    return [];
+  }
+
+  function allTaskGroups(extraGroups = []) {
+    return taskGroups.concat(Array.isArray(extraGroups) ? extraGroups : []);
+  }
+
+  function placedGroupIds(placedActions) {
+    const ids = new Set();
+    Object.values(placedActions || {}).forEach(refs => {
+      (refs || []).forEach(ref => { if (ref && ref.groupId) ids.add(ref.groupId); });
+    });
+    return ids;
+  }
+
+  function usedRoomsFromPlaced(placedActions) {
+    return new Set(Object.keys(placedActions || {}).filter(roomId => {
+      const refs = placedActions[roomId];
+      return Array.isArray(refs) && refs.length;
+    }));
+  }
+
+  function mergePlacedActions(base, added) {
+    const merged = { ...(base || {}) };
+    Object.entries(added || {}).forEach(([roomId, refs]) => {
+      if (!Array.isArray(refs) || !refs.length) return;
+      merged[roomId] = (merged[roomId] || []).concat(refs);
+    });
+    return merged;
+  }
+
+  function placePickedGroups(picks, runRooms, rng, usedRooms = new Set()) {
+    const placed = {};
     picks.forEach(group => {
       const stepRooms = [];
+      const reservedRooms = [];
       let ok = true;
       group.steps.forEach(step => {
         if (!ok) return;
@@ -1817,10 +1833,11 @@
         const pool2 = fresh.length ? fresh : candidates;
         if (!pool2.length) { ok = false; return; }
         const chosen = randomItem(pool2, rng);
-        usedRooms.add(chosen);
+        reservedRooms.push(chosen);
         stepRooms.push([chosen, step]);
       });
       if (!ok) return;
+      reservedRooms.forEach(roomId => usedRooms.add(roomId));
       stepRooms.forEach(([roomId, step]) => {
         if (!placed[roomId]) placed[roomId] = [];
         // Persist only IDs — the live step (with `run` fn) is looked up
@@ -1832,12 +1849,43 @@
     return placed;
   }
 
+  function placeTaskGroups(difficulty, runRooms, rng, extraGroups = []) {
+    const availableGroups = allTaskGroups(extraGroups);
+    if (!availableGroups.length) return {};
+    // Mandatory groups are placed every run. Optional puzzle chains then
+    // fill up to groupCount additional slots.
+    const mandatory = availableGroups.filter(g => g.mandatory);
+    const optional = availableGroups.filter(g => !g.mandatory);
+    const want = difficulty.groupCount || 0;
+    const weighted = [];
+    optional.forEach(group => {
+      const weight = group.weight || 1;
+      for (let i = 0; i < weight; i += 1) weighted.push(group);
+    });
+    const picks = mandatory.slice();
+    const seen = new Set(mandatory.map(g => g.id));
+    const pool = shuffled(weighted, rng);
+    const usedRooms = new Set();
+    let placed = placePickedGroups(picks, runRooms, rng, usedRooms);
+    let placedOptional = 0;
+    for (let i = 0; i < pool.length && placedOptional < want; i += 1) {
+      const group = pool[i];
+      if (seen.has(group.id)) continue;
+      seen.add(group.id);
+      const addition = placePickedGroups([group], runRooms, rng, usedRooms);
+      if (!placedGroupIds(addition).has(group.id)) continue;
+      placed = mergePlacedActions(placed, addition);
+      placedOptional += 1;
+    }
+    return placed;
+  }
+
   // Look up a placed step ({groupId, stepId}) back to the live step
   // object that has the run() function. Returns null if either id is
   // stale (e.g. content removed between releases).
-  function resolveStep(ref) {
+  function resolveStep(ref, runState) {
     if (!ref || !ref.groupId || !ref.stepId) return null;
-    const group = taskGroups.find(g => g.id === ref.groupId);
+    const group = allTaskGroups(runState && runState.challengeGroups).find(g => g.id === ref.groupId);
     if (!group) return null;
     return group.steps.find(s => s.id === ref.stepId) || null;
   }
@@ -1846,14 +1894,15 @@
   // then make one "chain goal" per group that completes when the last
   // step fires. Label-only — doesn't tell the player which room holds
   // which step, so it raises awareness without spoiling placement.
-  function chainGoalsFromPlaced(placedActions) {
+  function chainGoalsFromPlaced(placedActions, extraGroups = []) {
     const groupIds = new Set();
     Object.values(placedActions || {}).forEach(refs => {
       (refs || []).forEach(ref => { if (ref && ref.groupId) groupIds.add(ref.groupId); });
     });
     const out = [];
+    const availableGroups = allTaskGroups(extraGroups);
     groupIds.forEach(id => {
-      const group = taskGroups.find(g => g.id === id);
+      const group = availableGroups.find(g => g.id === id);
       if (!group || !group.steps || !group.steps.length) return;
       const lastStep = group.steps[group.steps.length - 1];
       if (!lastStep || !lastStep.provides) return;
@@ -1867,6 +1916,49 @@
       });
     });
     return out;
+  }
+
+  function ensureChallengeTasks(runState) {
+    if (!runState || runState.ended || runState.active === false || runState.ending) return runState;
+    runState.flags = runState.flags || {};
+    runState.placedActions = runState.placedActions && typeof runState.placedActions === "object" ? runState.placedActions : {};
+    runState.challengeGroups = Array.isArray(runState.challengeGroups) ? runState.challengeGroups : [];
+    runState.goals = Array.isArray(runState.goals) && runState.goals.length ? runState.goals : goalPool.filter(g => g.core);
+    const generated = challengeGroupsForRun({
+      gameId: "the_horrors",
+      runKey: runState.runKey || "legacy-run",
+      difficultyId: runState.difficultyId || "medium",
+      location: runState.location,
+      facility: runState.facility,
+      threat: runState.threat || {},
+    });
+    if (!generated.length) return runState;
+
+    const existingGroups = new Map(runState.challengeGroups.map(group => [group && group.id, group]).filter(([id]) => id));
+    generated.forEach(group => {
+      if (!existingGroups.has(group.id)) existingGroups.set(group.id, group);
+    });
+    runState.challengeGroups = Array.from(existingGroups.values());
+
+    const existingPlacedIds = placedGroupIds(runState.placedActions);
+    const missingPlacements = generated.filter(group => !existingPlacedIds.has(group.id));
+    if (missingPlacements.length) {
+      const runRooms = Array.isArray(runState.runRooms) && runState.runRooms.length
+        ? runState.runRooms
+        : Object.keys(rooms).filter(id => id !== "hallway");
+      const rng = createRng(`${runState.runKey || "legacy-run"}-challenge-migration`);
+      const added = placePickedGroups(missingPlacements, runRooms, rng, usedRoomsFromPlaced(runState.placedActions));
+      runState.placedActions = mergePlacedActions(runState.placedActions, added);
+    }
+
+    const goalIds = new Set(runState.goals.map(goal => goal && goal.id));
+    chainGoalsFromPlaced(runState.placedActions, runState.challengeGroups).forEach(goal => {
+      if (!goalIds.has(goal.id)) {
+        goalIds.add(goal.id);
+        runState.goals.push(goal);
+      }
+    });
+    return runState;
   }
 
   // Pick which rooms exist for this run. Always includes startRoom +
@@ -1961,6 +2053,7 @@
     buildRunLayout,
     taskGroups,
     resolveStep,
+    ensureChallengeTasks,
     createRun(difficultyId = "medium", seedKey = "") {
       const requestedKey = cleanRunKey(seedKey);
       const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";
@@ -1980,11 +2073,19 @@
         : "bedroom";
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
       const runLayout = buildRunLayout(runRooms, rng);
-      const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      const challengeGroups = challengeGroupsForRun({
+        gameId: "the_horrors",
+        runKey,
+        difficultyId,
+        location,
+        facility: `${prefix} ${location}`,
+        threat,
+      });
+      const placedActions = placeTaskGroups(difficulty, runRooms, rng, challengeGroups);
       const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Synthetic per-chain goal so the player sees a chain exists
       // without being told which room holds which step.
-      const chainGoals = chainGoalsFromPlaced(placedActions);
+      const chainGoals = chainGoalsFromPlaced(placedActions, challengeGroups);
       const baseGoals = selectRunGoals(runRooms, rng);
       return {
         active: true,
@@ -2015,6 +2116,7 @@
         runLayout,
         mapRoom,
         placedActions,
+        challengeGroups,
         goals: baseGoals.concat(chainGoals),
         flags: {},
         inventory: [],

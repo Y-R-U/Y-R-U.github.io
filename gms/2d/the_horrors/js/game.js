@@ -194,6 +194,10 @@
     // saves (or runs created before task groups existed) just see an
     // empty map — no chains for that run, but everything else works.
     nextState.placedActions = nextState.placedActions && typeof nextState.placedActions === "object" ? nextState.placedActions : {};
+    nextState.challengeGroups = Array.isArray(nextState.challengeGroups) ? nextState.challengeGroups : [];
+    if (typeof Story.ensureChallengeTasks === "function") {
+      nextState = Story.ensureChallengeTasks(nextState) || nextState;
+    }
     return nextState;
   }
 
@@ -497,6 +501,10 @@
       });
       if (!ok) return;
     }
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page before starting a new run.");
+      return;
+    }
     state = Story.createRun(difficulty);
     const startRoom = Story.rooms[state.currentRoom];
     addHistory(`You woke inside the ${startRoom.name} with no clear memory.`);
@@ -519,6 +527,10 @@
       });
       if (!ok) return;
     }
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page before starting a new run.");
+      return;
+    }
     state = Story.createRun("medium", key);
     const startRoom = Story.rooms[state.currentRoom];
     addHistory(`Run key ${state.runKey} woke you inside the ${startRoom.name}.`);
@@ -531,7 +543,16 @@
     Audio.prime();
     state = normalizeState(Save.loadState());
     if (!state) return showIntro(true);
+    if (!challengeSystemReady()) {
+      UI.toast("Challenge puzzles did not load. Refresh the page if challenge tasks are missing.");
+    }
     renderGame();
+  }
+
+  function challengeSystemReady() {
+    return !!(window.HubPuzzles
+      && typeof window.HubPuzzles.createChallengeGroups === "function"
+      && typeof window.HubPuzzles.start === "function");
   }
 
   function renderGame(message) {
@@ -730,7 +751,7 @@
     // a "(locked)" suffix so the player knows there's a puzzle here.
     const placedRefs = (state.placedActions && state.placedActions[state.currentRoom]) || [];
     placedRefs.forEach(ref => {
-      const step = typeof Story.resolveStep === "function" ? Story.resolveStep(ref) : null;
+      const step = typeof Story.resolveStep === "function" ? Story.resolveStep(ref, state) : null;
       if (!step) return;
       if (state.flags[`done_${ref.groupId}_${ref.stepId}`]) return;
       const button = document.createElement("button");
@@ -975,6 +996,7 @@
       if (step.noopMessage) UI.toast(step.noopMessage);
       return;
     }
+    if (step.challenge) return runChallengeStep(ref, step);
     spendTurns(step.turns || 1);
     const message = typeof step.run === "function" ? step.run(state) : "";
     if (step.provides) state.flags[step.provides] = true;
@@ -1002,6 +1024,40 @@
       UI.toast(message);
     }
     await afterTurn(message);
+  }
+
+  async function runChallengeStep(ref, step) {
+    if (!window.HubPuzzles || typeof window.HubPuzzles.start !== "function") {
+      UI.toast("Challenge system is unavailable.");
+      return;
+    }
+    transitionLocked = true;
+    const result = await window.HubPuzzles.start(step.challenge);
+    transitionLocked = false;
+    if (result && result.success) {
+      const message = step.successText || "Challenge solved.";
+      if (step.provides) state.flags[step.provides] = true;
+      state.flags[`done_${ref.groupId}_${ref.stepId}`] = true;
+      updateGoalsFromFlags();
+      addHistory(message);
+      UI.toast(message);
+      await afterTurn(message);
+      return;
+    }
+    if (result && result.noPenalty) {
+      UI.toast("Challenge paused.");
+      return;
+    }
+    const failMessage = step.failText || "The challenge fails. The delay costs you a turn.";
+    spendTurns(step.turns || 1);
+    updateGoalsFromFlags();
+    addHistory(failMessage);
+    if (isCaught()) {
+      addHistory(`${state.threat ? state.threat.name : "Something"} reached the hallway before you could leave.`);
+      return finishRun("caught");
+    }
+    UI.toast(failMessage);
+    await afterTurn(failMessage);
   }
 
   function addInventoryItem(item) {

@@ -84,6 +84,209 @@
     },
   };
 
+  const roomTemplates = {
+    cryo_room: rooms.cryo_room,
+    med_bay: rooms.med_bay,
+    hydroponic_biome: rooms.hydroponic_biome,
+    reactor_gallery: rooms.reactor_gallery,
+    security_hub: rooms.security_hub,
+    observation_deck: rooms.observation_deck,
+    engineering_bay: rooms.engineering_bay,
+  };
+
+  function addRoom(id, opts) {
+    if (rooms[id]) return;
+    rooms[id] = {
+      id,
+      name: opts.name,
+      kind: opts.kind,
+      canStart: !!opts.canStart,
+      poster: `images/${id}.jpg`,
+      idleVideo: `videos/${id}_to_hallway.mp4`,
+      toHallway: `videos/${id}_to_hallway.mp4`,
+      fromHallway: `videos/hallway_to_${id}.mp4`,
+      mediaTemplate: opts.template,
+      text: opts.text,
+    };
+  }
+
+  [
+    ["science_lab", {
+      name: "Science Lab",
+      kind: "study_like",
+      template: "med_bay",
+      canStart: true,
+      text: "A science lab waits under white panels and blue hazard glass. Every bench is clean except for one fresh smear beside the analyser.",
+    }],
+    ["bloody_lab", {
+      name: "Bloody Lab",
+      kind: "study_like",
+      template: "med_bay",
+      text: "The lab equipment is intact, but the floor tells a different story. Red streaks lead from the sample fridge to a sealed drain.",
+    }],
+    ["quarantine_lab", {
+      name: "Quarantine Lab",
+      kind: "sleeping",
+      template: "med_bay",
+      canStart: true,
+      text: "Transparent quarantine curtains hang in layers. One isolation bed is strapped down as if the patient tried to leave with the whole room attached.",
+    }],
+    ["genetics_lab", {
+      name: "Genetics Lab",
+      kind: "study_like",
+      template: "security_hub",
+      text: "Gene sequencers blink in standby. The newest sample tray carries your old crew number beside a warning symbol nobody explained.",
+    }],
+    ["specimen_vault", {
+      name: "Specimen Vault",
+      kind: "storage_like",
+      template: "engineering_bay",
+      text: "Cold drawers line the specimen vault. Most labels are printed. Three are written by hand and crossed out twice.",
+    }],
+    ["cold_storage", {
+      name: "Cold Storage",
+      kind: "storage_like",
+      template: "cryo_room",
+      text: "Frost seals the cold storage lockers. Something inside one of them taps once, waits, then taps in the rhythm of your breathing.",
+    }],
+    ["supply_depot", {
+      name: "Supply Depot",
+      kind: "storage_like",
+      template: "engineering_bay",
+      text: "Stacked supply crates form narrow paths. The manifest says nothing is missing, which is worse than a theft.",
+    }],
+    ["cargo_lock", {
+      name: "Cargo Lock",
+      kind: "storage_like",
+      template: "engineering_bay",
+      text: "Magnetic cargo clamps hold empty pallets in place. The pressure door is dented from the inside.",
+    }],
+    ["mess_hall", {
+      name: "Mess Hall",
+      kind: "kitchen_like",
+      template: "observation_deck",
+      canStart: true,
+      text: "The mess hall tables are set for a meal that never happened. Cups tremble each time the ventilation changes pitch.",
+    }],
+    ["galley", {
+      name: "Galley",
+      kind: "kitchen_like",
+      template: "med_bay",
+      text: "Compact ovens line the galley wall. One ration printer keeps trying to print a meal for someone not on the roster.",
+    }],
+    ["nutrient_kitchen", {
+      name: "Nutrient Kitchen",
+      kind: "kitchen_like",
+      template: "hydroponic_biome",
+      text: "Green nutrient tanks bubble behind sealed panels. The mixing paddle moves even though the power switch is off.",
+    }],
+    ["drone_workshop", {
+      name: "Drone Workshop",
+      kind: "power_like",
+      template: "engineering_bay",
+      text: "Small service drones hang from charging hooks. Their lenses turn toward you a second after you look away.",
+    }],
+    ["robotics_bay", {
+      name: "Robotics Bay",
+      kind: "power_like",
+      template: "engineering_bay",
+      text: "Half-built frames sleep in the robotics bay. One arm has scratched the same word into the bench until the metal thinned.",
+    }],
+    ["coolant_works", {
+      name: "Coolant Works",
+      kind: "power_like",
+      template: "reactor_gallery",
+      text: "Blue coolant tubes cross the ceiling like veins. The gauges dip whenever the hallway lights flicker.",
+    }],
+    ["airlock_control", {
+      name: "Airlock Control",
+      kind: "study_like",
+      template: "security_hub",
+      text: "Airlock controls glow behind a cracked shield. The last cycle log says someone opened the outer door from this side.",
+    }],
+    ["comms_array", {
+      name: "Comms Array",
+      kind: "study_like",
+      template: "observation_deck",
+      text: "The comms array listens to static from too many directions. A carrier signal repeats your wake-up time.",
+    }],
+    ["server_crypt", {
+      name: "Server Crypt",
+      kind: "study_like",
+      template: "security_hub",
+      text: "Server racks hum behind black mesh. The cold aisle smells like dust, ozone, and old secrets kept alive by backup power.",
+    }],
+    ["navigation_nest", {
+      name: "Navigation Nest",
+      kind: "lounge_like",
+      template: "observation_deck",
+      text: "A recessed navigation nest curves around the viewport. Someone left escape vectors pinned under a coffee mug.",
+    }],
+    ["crew_lounge", {
+      name: "Crew Lounge",
+      kind: "lounge_like",
+      template: "observation_deck",
+      canStart: true,
+      text: "The crew lounge still tries to be comfortable. The cushions remember bodies the cameras insist were never here.",
+    }],
+    ["sleep_pods", {
+      name: "Sleep Pods",
+      kind: "sleeping",
+      template: "cryo_room",
+      canStart: true,
+      text: "Sleep pods curve along the wall in neat rows. One pod door is open, and its blankets are folded with military care.",
+    }],
+    ["isolation_ward", {
+      name: "Isolation Ward",
+      kind: "sleeping",
+      template: "med_bay",
+      canStart: true,
+      text: "The isolation ward smells of antiseptic and burnt plastic. The privacy screens show silhouettes even when nothing stands behind them.",
+    }],
+    ["algae_tanks", {
+      name: "Algae Tanks",
+      kind: "wild",
+      template: "hydroponic_biome",
+      text: "Tall algae tanks glow emerald in the dark. Air bubbles climb in patterns that look almost like code.",
+    }],
+    ["fungal_nursery", {
+      name: "Fungal Nursery",
+      kind: "wild",
+      template: "hydroponic_biome",
+      text: "Soft fungal trays pulse under amber lamps. Spores drift in the air and avoid the places your shadow falls.",
+    }],
+    ["terraforming_core", {
+      name: "Terraforming Core",
+      kind: "power_like",
+      template: "reactor_gallery",
+      text: "The terraforming core turns planetary weather into numbers. One storm cell on the display follows your movement room by room.",
+    }],
+    ["waste_reclamation", {
+      name: "Waste Reclamation",
+      kind: "power_like",
+      template: "hydroponic_biome",
+      text: "Waste reclamation tanks churn slowly. The filters are clogged with fibres that look too much like hair.",
+    }],
+    ["chapel_module", {
+      name: "Chapel Module",
+      kind: "lounge_like",
+      template: "observation_deck",
+      text: "A tiny chapel module faces the stars. The prayer wall has been overwritten with coordinates and apologies.",
+    }],
+    ["black_box_archive", {
+      name: "Black Box Archive",
+      kind: "storage_like",
+      template: "security_hub",
+      text: "Black boxes sit in padded slots from floor to ceiling. The newest slot is empty, and its status light is still warm.",
+    }],
+    ["eva_ready_room", {
+      name: "EVA Ready Room",
+      kind: "storage_like",
+      template: "engineering_bay",
+      text: "Suit lockers stand open in the EVA ready room. Each helmet faces the door as if waiting for inspection.",
+    }],
+  ].forEach(([id, opts]) => addRoom(id, opts));
+
   const locations = [
     "Space Biome",
     "Space Station",
@@ -93,6 +296,22 @@
     "Lunar Research Annex",
     "Asteroid Mining Habitat",
     "Europa Ice Station",
+    "Titan Methane Lab",
+    "Venus Cloud Platform",
+    "Kuiper Ark",
+    "Oort Signal Station",
+    "Deep Void Conservatory",
+    "Phobos Quarantine Annex",
+    "Deimos Relay Habitat",
+    "Ceres Ice Refinery",
+    "Io Radiation Shelter",
+    "Ganymede Research Ring",
+    "Enceladus Ocean Drill",
+    "Rogue Planet Outpost",
+    "Solar Mirror Array",
+    "Generation Ship",
+    "Terraforming Cradle",
+    "Black Site Observatory",
   ];
 
   const facilityNames = [
@@ -116,6 +335,32 @@
     "Riven Halo",
     "Solace Yard",
     "Kestrel Verge",
+    "Axiom Hollow",
+    "Blue Casket",
+    "Crownfall",
+    "Dawn Needle",
+    "Erebus Spoke",
+    "Faraday Bloom",
+    "Grief Lantern",
+    "Harrow Nine",
+    "Icarus Fold",
+    "Juno Drift",
+    "Kelvin Orchard",
+    "Lazarus Reef",
+    "Manta Spire",
+    "Null Harbor",
+    "Ossuary Loop",
+    "Pale Meridian",
+    "Quartz Warden",
+    "Red Agnes",
+    "Sable Gate",
+    "Tarn Relay",
+    "Umbral Yard",
+    "Vesper Coil",
+    "Winterglass",
+    "Xeno Vale",
+    "Yarrow Crown",
+    "Zenith Hold",
   ];
 
   const playerNames = [
@@ -166,6 +411,54 @@
       label: "suit signal",
       clue: "The suit is empty until a door opens. Then it walks like it has been waiting.",
     },
+    {
+      id: "mimic",
+      name: "voice mimic",
+      label: "false rescue call",
+      clue: "It speaks in every missing crew voice, but always uses your name first.",
+    },
+    {
+      id: "swarm",
+      name: "nanite swarm",
+      label: "grey cloud",
+      clue: "The swarm repairs the facility by taking apart anything warm enough to move.",
+    },
+    {
+      id: "frost",
+      name: "cryogenic wraith",
+      label: "cold signature",
+      clue: "Every room it enters drops below freezing, but the cameras show only condensation.",
+    },
+    {
+      id: "radiant",
+      name: "radiation revenant",
+      label: "hot silhouette",
+      clue: "Its outline blooms on radiation sensors long before anything visible arrives.",
+    },
+    {
+      id: "mirror",
+      name: "mirror duplicate",
+      label: "identity echo",
+      clue: "The duplicate wears your face badly, like it learned you from corrupted footage.",
+    },
+    {
+      id: "siren",
+      name: "emergency siren host",
+      label: "alarm parasite",
+      clue: "The alarm is not warning you about the creature. The alarm is how it hunts.",
+    },
+    {
+      id: "warden",
+      name: "containment warden",
+      label: "lockdown body",
+      clue: "The warden was built to keep experiments inside. It no longer distinguishes staff from breach.",
+    },
+    {
+      id: "spore",
+      name: "breathing spore mass",
+      label: "spore bloom",
+      clue: "The bloom follows airflow maps and gathers wherever frightened people would hide.",
+    },
   ];
 
   // roomCount caps how many rooms appear in any single run (always
@@ -191,7 +484,7 @@
   // a randomly placed helper item, not a goal. Escape stays here as the
   // overall objective; room-specific entries are random optional tasks.
   const goalPool = [
-    { id: "escape", text: "Arm the emergency transport and leave.", requires: "escape", core: true },
+    { id: "escape", text: "Final objective: arm the emergency transport after the tasks are complete.", requires: "escape", core: true },
     { id: "console", text: "Recover the release note from a damaged console.", requires: "console", rooms: ["cryo_room"] },
     { id: "med_cache", text: "Find a medical record that explains why one patient remains.", requires: "med_cache", rooms: ["med_bay"] },
     { id: "biome_sample", text: "Seal a sample from the corrupted plant towers.", requires: "biome_sample", rooms: ["hydroponic_biome"] },
@@ -390,6 +683,48 @@
     },
   ];
 
+  function transitionPromptRoomName(room) {
+    return room.name.toLowerCase().replace(/\s+/g, " ");
+  }
+
+  function ensureRoomTransitionPair(roomId) {
+    const room = rooms[roomId];
+    if (!room || roomId === "hallway") return;
+    const roomName = transitionPromptRoomName(room);
+    const toId = `${roomId}_to_hallway`;
+    const fromId = `hallway_to_${roomId}`;
+    if (!transitions.some(transition => transition.id === toId)) {
+      transitions.push({
+        id: toId,
+        group: "room_transitions",
+        label: `${roomId} to hallway`,
+        file: `${toId}.mp4`,
+        src: `videos/${toId}.mp4`,
+        poster: `images/${roomId}.jpg`,
+        startImage: `images/${roomId}.jpg`,
+        endImage: "images/hallway.jpg",
+        promptText: `camera leaves the ${roomName}, passes through the only exit door, and ends in the central hallway`,
+        status: "Generated from expanded room catalogue. Needs review.",
+      });
+    }
+    if (!transitions.some(transition => transition.id === fromId)) {
+      transitions.push({
+        id: fromId,
+        group: "room_transitions",
+        label: `${roomId} from hallway`,
+        file: `${fromId}.mp4`,
+        src: `videos/${fromId}.mp4`,
+        poster: "images/hallway.jpg",
+        startImage: "images/hallway.jpg",
+        endImage: `images/${roomId}.jpg`,
+        promptText: `camera moves from the central hallway through a sealed door and ends inside the ${roomName}`,
+        status: "Generated from expanded room catalogue. Needs review.",
+      });
+    }
+  }
+
+  Object.keys(rooms).forEach(ensureRoomTransitionPair);
+
   const introPlaylist = [
     transitions[1],
     transitions[5],
@@ -404,6 +739,14 @@
       machine: "videos/monster_release_machine.mp4",
       parasite: "videos/monster_release_parasite.mp4",
       shadow: "videos/monster_release_shadow.mp4",
+      mimic: "videos/monster_release_mimic.mp4",
+      swarm: "videos/monster_release_swarm.mp4",
+      frost: "videos/monster_release_frost.mp4",
+      radiant: "videos/monster_release_radiant.mp4",
+      mirror: "videos/monster_release_mirror.mp4",
+      siren: "videos/monster_release_siren.mp4",
+      warden: "videos/monster_release_warden.mp4",
+      spore: "videos/monster_release_spore.mp4",
       default: "videos/monster_release_gene.mp4",
     },
     attack: {
@@ -413,11 +756,21 @@
       machine: "videos/monster_attack_machine.mp4",
       parasite: "videos/monster_attack_parasite.mp4",
       shadow: "videos/monster_attack_shadow.mp4",
+      mimic: "videos/monster_attack_mimic.mp4",
+      swarm: "videos/monster_attack_swarm.mp4",
+      frost: "videos/monster_attack_frost.mp4",
+      radiant: "videos/monster_attack_radiant.mp4",
+      mirror: "videos/monster_attack_mirror.mp4",
+      siren: "videos/monster_attack_siren.mp4",
+      warden: "videos/monster_attack_warden.mp4",
+      spore: "videos/monster_attack_spore.mp4",
       default: "videos/monster_attack_gene.mp4",
     },
     victory: [
       "videos/ending_victory_transport_tube.mp4",
       "videos/ending_victory_shuttle_launch.mp4",
+      "videos/ending_victory_escape_pod_drift.mp4",
+      "videos/ending_victory_surface_dawn.mp4",
     ],
   };
 
@@ -428,45 +781,33 @@
     }
   });
 
-  const mediaManifest = [
-    { type: "image", src: "images/cryo_room.jpg", required: true, label: "Cryo room still" },
-    { type: "image", src: "images/hallway.jpg", required: false, label: "Hallway still" },
-    { type: "image", src: "images/med_bay.jpg", required: false, label: "Med bay still" },
-    { type: "image", src: "images/hydroponic_biome.jpg", required: false, label: "Hydroponic biome still" },
-    { type: "image", src: "images/reactor_gallery.jpg", required: false, label: "Reactor gallery still" },
-    { type: "image", src: "images/security_hub.jpg", required: false, label: "Security hub still" },
-    { type: "image", src: "images/observation_deck.jpg", required: false, label: "Observation deck still" },
-    { type: "image", src: "images/engineering_bay.jpg", required: false, label: "Engineering bay still" },
-    { type: "video", src: "videos/cryo_room_to_hallway.mp4", required: true, label: "cryo_room to hallway transition" },
-    { type: "video", src: "videos/hallway_to_cryo_room.mp4", required: true, label: "cryo_room from hallway transition" },
-    { type: "video", src: "videos/med_bay_to_hallway.mp4", required: false, label: "med_bay to hallway transition" },
-    { type: "video", src: "videos/hallway_to_med_bay.mp4", required: false, label: "med_bay from hallway transition" },
-    { type: "video", src: "videos/hydroponic_biome_to_hallway.mp4", required: false, label: "hydroponic_biome to hallway transition" },
-    { type: "video", src: "videos/hallway_to_hydroponic_biome.mp4", required: false, label: "hydroponic_biome from hallway transition" },
-    { type: "video", src: "videos/reactor_gallery_to_hallway.mp4", required: false, label: "reactor_gallery to hallway transition" },
-    { type: "video", src: "videos/hallway_to_reactor_gallery.mp4", required: false, label: "reactor_gallery from hallway transition" },
-    { type: "video", src: "videos/security_hub_to_hallway.mp4", required: false, label: "security_hub to hallway transition" },
-    { type: "video", src: "videos/hallway_to_security_hub.mp4", required: false, label: "security_hub from hallway transition" },
-    { type: "video", src: "videos/observation_deck_to_hallway.mp4", required: false, label: "observation_deck to hallway transition" },
-    { type: "video", src: "videos/hallway_to_observation_deck.mp4", required: false, label: "observation_deck from hallway transition" },
-    { type: "video", src: "videos/engineering_bay_to_hallway.mp4", required: false, label: "engineering_bay to hallway transition" },
-    { type: "video", src: "videos/hallway_to_engineering_bay.mp4", required: false, label: "engineering_bay from hallway transition" },
-    { type: "video", src: "videos/cryo_room_event_collapse.mp4", required: false, label: "cryo_room event candidate" },
-    { type: "video", src: "videos/monster_release_gene.mp4", required: false, label: "gene monster release" },
-    { type: "video", src: "videos/monster_release_alien.mp4", required: false, label: "alien monster release" },
-    { type: "video", src: "videos/monster_release_zombie.mp4", required: false, label: "zombie monster release" },
-    { type: "video", src: "videos/monster_release_machine.mp4", required: false, label: "machine monster release" },
-    { type: "video", src: "videos/monster_release_parasite.mp4", required: false, label: "parasite monster release" },
-    { type: "video", src: "videos/monster_release_shadow.mp4", required: false, label: "shadow monster release" },
-    { type: "video", src: "videos/monster_attack_gene.mp4", required: false, label: "gene monster attack" },
-    { type: "video", src: "videos/monster_attack_alien.mp4", required: false, label: "alien monster attack" },
-    { type: "video", src: "videos/monster_attack_zombie.mp4", required: false, label: "zombie monster attack" },
-    { type: "video", src: "videos/monster_attack_machine.mp4", required: false, label: "machine monster attack" },
-    { type: "video", src: "videos/monster_attack_parasite.mp4", required: false, label: "parasite monster attack" },
-    { type: "video", src: "videos/monster_attack_shadow.mp4", required: false, label: "shadow monster attack" },
-    { type: "video", src: "videos/ending_victory_transport_tube.mp4", required: false, label: "transport tube victory" },
-    { type: "video", src: "videos/ending_victory_shuttle_launch.mp4", required: false, label: "shuttle launch victory" },
-  ];
+  function buildMediaManifest() {
+    const seen = new Set();
+    const manifest = [];
+    const add = item => {
+      if (!item || !item.src || seen.has(item.src)) return;
+      seen.add(item.src);
+      manifest.push(item);
+    };
+    Object.values(rooms).forEach(room => {
+      add({ type: "image", src: room.poster, required: room.id === "cryo_room", label: `${room.name} still` });
+    });
+    transitions.forEach(transition => {
+      add({ type: "video", src: transition.src, required: transition.id === "cryo_room_to_hallway" || transition.id === "hallway_to_cryo_room", label: transition.label || transition.id });
+    });
+    ["release", "attack"].forEach(group => {
+      Object.entries(eventVideos[group] || {}).forEach(([id, src]) => {
+        if (id === "default") return;
+        add({ type: "video", src, required: false, label: `${id} monster ${group}` });
+      });
+    });
+    (eventVideos.victory || []).forEach(src => {
+      add({ type: "video", src, required: false, label: src.replace(/^videos\//, "").replace(/\.mp4$/, "") });
+    });
+    return manifest;
+  }
+
+  const mediaManifest = buildMediaManifest();
 
   const actions = {
     cryo_room: [
@@ -730,7 +1071,8 @@
           }
           if (remainingTasks.length) {
             state.threatPressure += 1;
-            return "The tube opens halfway, then locks. You still do not remember enough to choose the right burn path.";
+            const noun = remainingTasks.length === 1 ? "task" : "tasks";
+            return `The tube opens halfway, then locks. ${remainingTasks.length} ${noun} still need finishing, including any challenge locks in your task list.`;
           }
           state.ending = "escape";
           return "The tube accepts your band and burns a path through the dark.";
@@ -850,8 +1192,18 @@
     const room = rooms[roomId];
     if (!room || !room.kind || roomId === "hallway") return;
     const pool = flavorByKind[room.kind] || [];
-    if (!pool.length) return;
     if (!actions[roomId]) actions[roomId] = [];
+    if (!actions[roomId].some(action => action.target === "hallway")) {
+      actions[roomId].push({
+        id: `exit_${roomId}`,
+        label: "Exit to hallway",
+        side: "exit",
+        hint: "transition",
+        target: "hallway",
+        turns: 1,
+      });
+    }
+    if (!pool.length) return;
     const exitIdx = actions[roomId].findIndex(a => a.side === "exit");
     const injected = pool.map(f => ({
       id: `${roomId}_${f.id}`,
@@ -928,6 +1280,14 @@
     );
     const optional = shuffled(eligible, rng).slice(0, 2);
     return core.concat(optional);
+  }
+
+  function normalTaskTarget(difficulty) {
+    // Pre-challenge Awake expected: final objective + identity + up to
+    // two room goals + difficulty.groupCount normal chains. The two
+    // challenge puzzles are additive, so fill normal chains when the
+    // randomized room subset cannot support both room-specific goals.
+    return 1 + 2 + (difficulty.groupCount || 0);
   }
 
   // ── Task groups (puzzle chains) — see horror story.js for the
@@ -1243,33 +1603,46 @@
     ]},
   ];
 
-  function placeTaskGroups(difficulty, runRooms, rng) {
-    const placed = {};
-    if (!taskGroups.length) return placed;
-    // Mandatory groups (identity in any room) are placed every run,
-    // regardless of difficulty.groupCount. Optional puzzle chains then
-    // fill up to groupCount additional slots. Mandatory ones are placed
-    // first so they reserve a room before random chains start grabbing.
-    const mandatory = taskGroups.filter(g => g.mandatory);
-    const optional = taskGroups.filter(g => !g.mandatory);
-    const want = difficulty.groupCount || 0;
-    const weighted = [];
-    optional.forEach(group => {
-      const weight = group.weight || 1;
-      for (let i = 0; i < weight; i += 1) weighted.push(group);
-    });
-    const picks = mandatory.slice();
-    const seen = new Set(mandatory.map(g => g.id));
-    const pool = shuffled(weighted, rng);
-    for (let i = 0; i < pool.length && picks.length - mandatory.length < want; i += 1) {
-      const group = pool[i];
-      if (seen.has(group.id)) continue;
-      seen.add(group.id);
-      picks.push(group);
+  function challengeGroupsForRun(ctx) {
+    if (window.HubPuzzles && typeof window.HubPuzzles.createChallengeGroups === "function") {
+      return window.HubPuzzles.createChallengeGroups(ctx);
     }
-    const usedRooms = new Set();
+    return [];
+  }
+
+  function allTaskGroups(extraGroups = []) {
+    return taskGroups.concat(Array.isArray(extraGroups) ? extraGroups : []);
+  }
+
+  function placedGroupIds(placedActions) {
+    const ids = new Set();
+    Object.values(placedActions || {}).forEach(refs => {
+      (refs || []).forEach(ref => { if (ref && ref.groupId) ids.add(ref.groupId); });
+    });
+    return ids;
+  }
+
+  function usedRoomsFromPlaced(placedActions) {
+    return new Set(Object.keys(placedActions || {}).filter(roomId => {
+      const refs = placedActions[roomId];
+      return Array.isArray(refs) && refs.length;
+    }));
+  }
+
+  function mergePlacedActions(base, added) {
+    const merged = { ...(base || {}) };
+    Object.entries(added || {}).forEach(([roomId, refs]) => {
+      if (!Array.isArray(refs) || !refs.length) return;
+      merged[roomId] = (merged[roomId] || []).concat(refs);
+    });
+    return merged;
+  }
+
+  function placePickedGroups(picks, runRooms, rng, usedRooms = new Set()) {
+    const placed = {};
     picks.forEach(group => {
       const stepRooms = [];
+      const reservedRooms = [];
       let ok = true;
       group.steps.forEach(step => {
         if (!ok) return;
@@ -1286,10 +1659,11 @@
         const pool2 = fresh.length ? fresh : candidates;
         if (!pool2.length) { ok = false; return; }
         const chosen = randomItem(pool2, rng);
-        usedRooms.add(chosen);
+        reservedRooms.push(chosen);
         stepRooms.push([chosen, step]);
       });
       if (!ok) return;
+      reservedRooms.forEach(roomId => usedRooms.add(roomId));
       stepRooms.forEach(([roomId, step]) => {
         if (!placed[roomId]) placed[roomId] = [];
         placed[roomId].push({ groupId: group.id, stepId: step.id });
@@ -1298,9 +1672,42 @@
     return placed;
   }
 
-  function resolveStep(ref) {
+  function placeTaskGroups(difficulty, runRooms, rng, extraGroups = []) {
+    const availableGroups = allTaskGroups(extraGroups);
+    if (!availableGroups.length) return {};
+    // Mandatory groups (identity in any room) are placed every run,
+    // regardless of difficulty.groupCount. Optional puzzle chains then
+    // fill up to groupCount additional slots. Mandatory ones are placed
+    // first so they reserve a room before random chains start grabbing.
+    const mandatory = availableGroups.filter(g => g.mandatory);
+    const optional = availableGroups.filter(g => !g.mandatory);
+    const want = difficulty.groupCount || 0;
+    const weighted = [];
+    optional.forEach(group => {
+      const weight = group.weight || 1;
+      for (let i = 0; i < weight; i += 1) weighted.push(group);
+    });
+    const picks = mandatory.slice();
+    const seen = new Set(mandatory.map(g => g.id));
+    const pool = shuffled(weighted, rng);
+    const usedRooms = new Set();
+    let placed = placePickedGroups(picks, runRooms, rng, usedRooms);
+    let placedOptional = 0;
+    for (let i = 0; i < pool.length && placedOptional < want; i += 1) {
+      const group = pool[i];
+      if (seen.has(group.id)) continue;
+      seen.add(group.id);
+      const addition = placePickedGroups([group], runRooms, rng, usedRooms);
+      if (!placedGroupIds(addition).has(group.id)) continue;
+      placed = mergePlacedActions(placed, addition);
+      placedOptional += 1;
+    }
+    return placed;
+  }
+
+  function resolveStep(ref, runState) {
     if (!ref || !ref.groupId || !ref.stepId) return null;
-    const group = taskGroups.find(g => g.id === ref.groupId);
+    const group = allTaskGroups(runState && runState.challengeGroups).find(g => g.id === ref.groupId);
     if (!group) return null;
     return group.steps.find(s => s.id === ref.stepId) || null;
   }
@@ -1309,14 +1716,15 @@
   // then make one "chain goal" per group that completes when the last
   // step fires. Mirrors the helper in horror/story.js — label-only, so
   // the player sees a chain exists but not which room holds which step.
-  function chainGoalsFromPlaced(placedActions) {
+  function chainGoalsFromPlaced(placedActions, extraGroups = []) {
     const groupIds = new Set();
     Object.values(placedActions || {}).forEach(refs => {
       (refs || []).forEach(ref => { if (ref && ref.groupId) groupIds.add(ref.groupId); });
     });
     const out = [];
+    const availableGroups = allTaskGroups(extraGroups);
     groupIds.forEach(id => {
-      const group = taskGroups.find(g => g.id === id);
+      const group = availableGroups.find(g => g.id === id);
       if (!group || !group.steps || !group.steps.length) return;
       const lastStep = group.steps[group.steps.length - 1];
       if (!lastStep || !lastStep.provides) return;
@@ -1332,6 +1740,49 @@
     return out;
   }
 
+  function ensureChallengeTasks(runState) {
+    if (!runState || runState.ended || runState.active === false || runState.ending) return runState;
+    runState.flags = runState.flags || {};
+    runState.placedActions = runState.placedActions && typeof runState.placedActions === "object" ? runState.placedActions : {};
+    runState.challengeGroups = Array.isArray(runState.challengeGroups) ? runState.challengeGroups : [];
+    runState.goals = Array.isArray(runState.goals) && runState.goals.length ? runState.goals : goalPool.filter(g => g.core);
+    const generated = challengeGroupsForRun({
+      gameId: "awake",
+      runKey: runState.runKey || "legacy-run",
+      difficultyId: runState.difficultyId || "medium",
+      location: runState.location,
+      facility: runState.facility,
+      threat: runState.threat || {},
+    });
+    if (!generated.length) return runState;
+
+    const existingGroups = new Map(runState.challengeGroups.map(group => [group && group.id, group]).filter(([id]) => id));
+    generated.forEach(group => {
+      if (!existingGroups.has(group.id)) existingGroups.set(group.id, group);
+    });
+    runState.challengeGroups = Array.from(existingGroups.values());
+
+    const existingPlacedIds = placedGroupIds(runState.placedActions);
+    const missingPlacements = generated.filter(group => !existingPlacedIds.has(group.id));
+    if (missingPlacements.length) {
+      const runRooms = Array.isArray(runState.runRooms) && runState.runRooms.length
+        ? runState.runRooms
+        : Object.keys(rooms).filter(id => id !== "hallway");
+      const rng = createRng(`${runState.runKey || "legacy-run"}-challenge-migration`);
+      const added = placePickedGroups(missingPlacements, runRooms, rng, usedRoomsFromPlaced(runState.placedActions));
+      runState.placedActions = mergePlacedActions(runState.placedActions, added);
+    }
+
+    const goalIds = new Set(runState.goals.map(goal => goal && goal.id));
+    chainGoalsFromPlaced(runState.placedActions, runState.challengeGroups).forEach(goal => {
+      if (!goalIds.has(goal.id)) {
+        goalIds.add(goal.id);
+        runState.goals.push(goal);
+      }
+    });
+    return runState;
+  }
+
   // Pick which rooms exist for this run. Always includes startRoom +
   // (hallway is implicit-always-in everywhere else). Capped by however
   // many rooms are actually defined, so a new game type with fewer
@@ -1345,9 +1796,9 @@
   }
 
   // ── Mini-map layout + nearby topology ────────────────────────────────
-  // Single source of truth for both the mini-map grid positions AND the
-  // 1-turn "nearby" adjacency. Mirrors The Horrors's structure so the
-  // same renderMap / nearbyRooms code works.
+  // The full catalogue is large, but each run gets its own compact
+  // two-column hallway layout. This keeps replay keys meaningful: the
+  // same key recreates the same room set and the same map positions.
   const roomLayout = [
     { id: "cryo_room",        row: 1, side: "left",  pos: "node-row1-left" },
     { id: "med_bay",          row: 1, side: "right", pos: "node-row1-right" },
@@ -1358,31 +1809,54 @@
     { id: "engineering_bay",  row: 4, side: "wide",  pos: "node-wide-bottom" },
   ];
 
-  function nearbyRooms(roomId) {
-    const me = roomLayout.find(entry => entry.id === roomId);
+  function buildRunLayout(runRooms) {
+    const ids = (Array.isArray(runRooms) ? runRooms : [])
+      .filter(id => id && id !== "hallway" && rooms[id]);
+    const layout = [];
+    ids.forEach((id, index) => {
+      const row = Math.floor(index / 2) + 1;
+      const side = index % 2 === 0 ? "left" : "right";
+      layout.push({
+        id,
+        row,
+        side,
+        pos: `node-row${row}-${side}`,
+      });
+    });
+    if (layout.length % 2 === 1 && layout.length > 1) {
+      const last = layout[layout.length - 1];
+      last.side = "wide";
+      last.pos = `node-row${last.row}-wide`;
+    }
+    return layout;
+  }
+
+  function nearbyRooms(roomId, layout = roomLayout) {
+    const activeLayout = Array.isArray(layout) && layout.length ? layout : roomLayout;
+    const me = activeLayout.find(entry => entry.id === roomId);
     if (!me) return [];
     const out = [];
     const add = id => { if (id && !out.includes(id) && id !== roomId) out.push(id); };
     if (me.side === "left" || me.side === "right") {
       const opp = me.side === "left" ? "right" : "left";
-      const across = roomLayout.find(e => e.row === me.row && e.side === opp);
+      const across = activeLayout.find(e => e.row === me.row && e.side === opp);
       if (across) add(across.id);
-      const upSame = roomLayout.find(e => e.row === me.row - 1 && e.side === me.side);
+      const upSame = activeLayout.find(e => e.row === me.row - 1 && e.side === me.side);
       if (upSame) add(upSame.id);
       else {
-        const upWide = roomLayout.find(e => e.row === me.row - 1 && e.side === "wide");
+        const upWide = activeLayout.find(e => e.row === me.row - 1 && e.side === "wide");
         if (upWide) add(upWide.id);
       }
-      const downSame = roomLayout.find(e => e.row === me.row + 1 && e.side === me.side);
+      const downSame = activeLayout.find(e => e.row === me.row + 1 && e.side === me.side);
       if (downSame) add(downSame.id);
       else {
-        const downWide = roomLayout.find(e => e.row === me.row + 1 && e.side === "wide");
+        const downWide = activeLayout.find(e => e.row === me.row + 1 && e.side === "wide");
         if (downWide) add(downWide.id);
       }
     } else if (me.side === "wide") {
-      const above = roomLayout.filter(e => e.row === me.row - 1);
+      const above = activeLayout.filter(e => e.row === me.row - 1);
       above.forEach(e => add(e.id));
-      const below = roomLayout.filter(e => e.row === me.row + 1);
+      const below = activeLayout.filter(e => e.row === me.row + 1);
       below.forEach(e => add(e.id));
     }
     return out;
@@ -1402,11 +1876,14 @@
     introPlaylist,
     mediaManifest,
     gameNames,
+    threats,
     difficulties,
     roomLayout,
     nearbyRooms,
+    buildRunLayout,
     taskGroups,
     resolveStep,
+    ensureChallengeTasks,
     createRun(difficultyId = "medium", seedKey = "") {
       const requestedKey = cleanRunKey(seedKey);
       const initialDifficulty = difficulties[difficultyId] ? difficultyId : "medium";
@@ -1426,13 +1903,27 @@
         ? randomItem(startCandidates, rng)
         : "cryo_room";
       const runRooms = selectRunRooms(difficulty, startRoom, rng);
-      const placedActions = placeTaskGroups(difficulty, runRooms, rng);
+      const runLayout = buildRunLayout(runRooms);
+      const baseGoals = selectRunGoals(runRooms, rng);
+      const baseTaskCount = baseGoals.filter(goal => goal.id !== "escape").length;
+      const placementDifficulty = {
+        ...difficulty,
+        groupCount: Math.max(difficulty.groupCount || 0, normalTaskTarget(difficulty) - baseTaskCount - 1),
+      };
+      const challengeGroups = challengeGroupsForRun({
+        gameId: "awake",
+        runKey,
+        difficultyId,
+        location,
+        facility: `${prefix} ${location}`,
+        threat,
+      });
+      const placedActions = placeTaskGroups(placementDifficulty, runRooms, rng, challengeGroups);
       const mapRoom = randomItem(["hallway", ...runRooms], rng);
       // Each placed group gets a synthetic goal (uses group.goalText if
       // present, otherwise a generic "follow a clue trail" line). This
       // is what makes the placed identity step visible as a real goal.
-      const chainGoals = chainGoalsFromPlaced(placedActions);
-      const baseGoals = selectRunGoals(runRooms, rng);
+      const chainGoals = chainGoalsFromPlaced(placedActions, challengeGroups);
       return {
         active: true,
         ended: false,
@@ -1459,8 +1950,10 @@
         startRoom,
         visitedRooms: [startRoom],
         runRooms,
+        runLayout,
         mapRoom,
         placedActions,
+        challengeGroups,
         goals: baseGoals.concat(chainGoals),
         flags: {},
         inventory: [],

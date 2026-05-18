@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
-"""Queue Awake event and review videos through the local LTX API."""
+"""Queue Awake event and review videos through the local LTX API.
+
+Threat events and victory clips are loaded from js/story.js. Existing
+MP4s are skipped unless --force is passed. Victory/escape clips render
+at about 6 seconds; threat events stay at the 3 second review length.
+
+The local LTX server has a warm queue: submit all selected jobs first,
+then poll/download them one at a time. The server still runs one render
+at a time, but this avoids idle unload gaps between clips.
+"""
 
 import json
 import os
+import subprocess
 import sys
 import time
 import urllib.request
@@ -26,147 +36,94 @@ NEGATIVE = (
     "cartoon, anime, painting, melting architecture, duplicated doors, distorted camera"
 )
 
-EVENTS = [
-    {
-        "output": "monster_release_gene.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1201,
-        "prompt": "the empty central hallway lights flicker, a tall bio-engineered hunter steps out of steam at the far end and turns toward the camera, tense PG sci-fi horror reveal",
-    },
-    {
-        "output": "monster_release_alien.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1202,
-        "prompt": "the empty central hallway darkens, a sleek alien infiltrator silhouette appears from a side shadow and slowly raises its head toward the camera, tense PG sci-fi horror reveal",
-    },
-    {
-        "output": "monster_release_zombie.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1203,
-        "prompt": "the empty central hallway warning lights pulse, a reanimated crew member in a damaged space uniform staggers into view at the far end and notices the camera, tense PG sci-fi horror reveal",
-    },
-    {
-        "output": "monster_release_machine.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1204,
-        "prompt": "the empty central hallway goes cold blue, an autonomous maintenance rig with jointed repair arms rolls out of a service alcove and locks onto the camera, tense PG sci-fi horror reveal",
-    },
-    {
-        "output": "monster_release_parasite.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1205,
-        "prompt": "the empty central hallway vents open, black root-like alien vines creep across the floor and walls toward the camera, tense PG botanical sci-fi horror reveal, no gore",
-    },
-    {
-        "output": "monster_release_shadow.mp4",
-        "group": "monster_release",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1206,
-        "prompt": "the empty central hallway lights dim, a silent empty pressure suit steps from the darkness at the far end and faces the camera, tense PG sci-fi horror reveal",
-    },
-    {
-        "output": "monster_attack_gene.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1301,
-        "prompt": "central hallway point of view, a tall bio-engineered hunter suddenly rushes directly toward the camera, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "monster_attack_alien.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1302,
-        "prompt": "central hallway point of view, a sleek alien infiltrator darts from the shadows and lunges at the camera, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "monster_attack_zombie.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1303,
-        "prompt": "central hallway point of view, a reanimated crew member in a damaged space uniform surges close and grabs toward the camera, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "monster_attack_machine.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1304,
-        "prompt": "central hallway point of view, an autonomous maintenance rig accelerates directly toward the camera with repair arms raised, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "monster_attack_parasite.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1305,
-        "prompt": "central hallway point of view, black root-like alien vines whip forward across the floor and walls toward the camera, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "monster_attack_shadow.mp4",
-        "group": "monster_attack",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1306,
-        "prompt": "central hallway point of view, a silent empty pressure suit suddenly lunges from the darkness directly into the camera, fast PG jump scare impact, no blood, no gore",
-    },
-    {
-        "output": "ending_victory_transport_tube.mp4",
-        "group": "ending_video",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1401,
-        "prompt": "central hallway transforms into a bright emergency transport tube, doors open, white-blue light pulls the camera forward into escape, hopeful sci-fi victory ending",
-    },
-    {
-        "output": "ending_victory_shuttle_launch.mp4",
-        "group": "ending_video",
-        "poster": "images/hallway.jpg",
-        "start": "images/hallway.jpg",
-        "seed": 1402,
-        "prompt": "central hallway opens to a small escape shuttle bay, the camera rushes into the launch light as the shuttle departs the station, hopeful sci-fi victory ending",
-    },
-    {
-        "output": "possible_cryo_room_to_hallway_alt01.mp4",
-        "group": "possible_other_transition",
-        "poster": "images/cryo_room.jpg",
-        "start": "images/cryo_room.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 1501,
-        "prompt": "camera leaves the cracked cryogenic room through the only exit, moves cleanly through the door frame, and ends in the central hallway, empty environment",
-    },
-    {
-        "output": "possible_med_bay_to_hallway_alt01.mp4",
-        "group": "possible_other_transition",
-        "poster": "images/med_bay.jpg",
-        "start": "images/med_bay.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 1502,
-        "prompt": "camera leaves the abandoned futuristic med bay through the only medical door, moves cleanly into the central hallway, empty environment",
-    },
-    {
-        "output": "possible_hydroponic_biome_to_hallway_alt01.mp4",
-        "group": "possible_other_transition",
-        "poster": "images/hydroponic_biome.jpg",
-        "start": "images/hydroponic_biome.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 1503,
-        "prompt": "camera leaves the misty hydroponic biome chamber through the airlock, plant towers recede behind, and the camera ends in the central hallway, empty environment",
-    },
-]
+VICTORY_PROMPTS = {
+    "ending_victory_transport_tube.mp4": "central hallway transforms into a bright emergency transport tube, doors open, white-blue light pulls the camera forward into escape, hopeful sci-fi victory ending",
+    "ending_victory_shuttle_launch.mp4": "central hallway opens to a small escape shuttle bay, the camera rushes into the launch light as the shuttle departs the station, hopeful sci-fi victory ending",
+    "ending_victory_escape_pod_drift.mp4": "central hallway opens into a compact escape pod, the pod seals, launches into deep space, then drifts away from the damaged facility, hopeful sci-fi victory ending",
+    "ending_victory_surface_dawn.mp4": "central hallway becomes a transport airlock, the camera exits into a quiet planetary dawn under a thin atmosphere, hopeful sci-fi victory ending",
+}
+
+THREAT_VISUALS = {
+    "gene": "a tall bio-engineered humanoid hunter with pale synthetic armor plates and long predatory limbs",
+    "alien": "a sleek black-grey alien infiltrator with reflective eyes and a narrow insectile silhouette",
+    "zombie": "a reanimated crew member in a torn space uniform, helmet cracked, movements stiff and unnatural",
+    "machine": "an autonomous maintenance rig with jointed repair arms, sensor lenses, and sparking tool claws",
+    "parasite": "black root-like alien vines spreading across the floor and walls like a living cable mass",
+    "shadow": "an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong",
+    "mimic": "a false rescue worker in a clean emergency suit with a visor-glare face and unnaturally smooth posture",
+    "swarm": "a dense grey nanite cloud forming a rough human outline above the hallway floor",
+    "frost": "a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals",
+    "radiant": "a glowing radiation silhouette in a damaged hazard suit, edges flaring with hot white light",
+    "mirror": "a duplicate astronaut with a reflective visor and mismatched body language, copying the viewer badly",
+    "siren": "a humanoid emergency alarm host with flashing red beacon lights embedded in its suit and shoulders",
+    "warden": "a bulky containment security android with lockdown plating, clamp arms, and a cold visor slit",
+    "spore": "a breathing spore mass of pale fungal bulbs and drifting dust motes gathering into a hunched shape",
+}
+
+
+def load_story():
+    script = (
+        "global.window={};"
+        "require('./js/story.js');"
+        "const s=window.CodexHorrorStory;"
+        "console.log(JSON.stringify({threats:s.threats,eventVideos:s.eventVideos}));"
+    )
+    raw = subprocess.check_output(["node", "-e", script], cwd=HERE, text=True)
+    return json.loads(raw)
+
+
+def threat_release_prompt(threat):
+    visual = THREAT_VISUALS.get(threat["id"], f"the {threat['name']}")
+    return (
+        f"the empty central hallway flickers and reveals {visual} at the far end, "
+        f"it turns toward the camera, tense PG sci-fi horror reveal, {threat.get('clue', '')}"
+    )
+
+
+def threat_attack_prompt(threat):
+    visual = THREAT_VISUALS.get(threat["id"], f"the {threat['name']}")
+    return (
+        f"central hallway point of view, {visual} suddenly rushes directly toward the camera, "
+        "fast PG jump scare impact, no blood, no gore"
+    )
+
+
+def load_events():
+    story = load_story()
+    by_id = {threat["id"]: threat for threat in story["threats"]}
+    events = []
+    seed = 1200
+    for group_key, group_name, prompt_fn in [
+        ("release", "monster_release", threat_release_prompt),
+        ("attack", "monster_attack", threat_attack_prompt),
+    ]:
+        for threat_id, src in story["eventVideos"].get(group_key, {}).items():
+            if threat_id == "default" or threat_id not in by_id:
+                continue
+            seed += 1
+            output = src.split("/")[-1]
+            events.append({
+                "output": output,
+                "group": group_name,
+                "poster": "images/hallway.jpg",
+                "start": "images/hallway.jpg",
+                "seed": seed,
+                "num_frames": 73,
+                "prompt": prompt_fn(by_id[threat_id]),
+            })
+    for src in story["eventVideos"].get("victory", []):
+        seed += 1
+        output = src.split("/")[-1]
+        events.append({
+            "output": output,
+            "group": "ending_video",
+            "poster": "images/hallway.jpg",
+            "start": "images/hallway.jpg",
+            "seed": seed,
+            "num_frames": 145,
+            "prompt": VICTORY_PROMPTS.get(output, "central hallway opens into a clean emergency escape route, the camera moves forward into safe light, hopeful sci-fi victory ending"),
+        })
+    return events
 
 
 def log(message):
@@ -217,7 +174,7 @@ def submit(item):
         "prompt": f"{item['prompt']}, {COMMON}",
         "width": GAME_PORTRAIT_WIDTH,
         "height": GAME_PORTRAIT_HEIGHT,
-        "num_frames": 73,
+        "num_frames": item.get("num_frames", 73),
         "fps": 24,
         "seed": item["seed"],
         "num_inference_steps": 20,
@@ -246,7 +203,7 @@ def wait_for_job(job_id, output):
         if status == "done":
             return job
         if status in {"failed", "cancelled"}:
-            raise RuntimeError(f"{output} {job_id} ended with {status}")
+            return job
         time.sleep(6)
 
 
@@ -272,7 +229,7 @@ def main():
     force = "--force" in args
     wanted = args - {"--force"}
     todo = []
-    for item in EVENTS:
+    for item in load_events():
         stem = os.path.splitext(item["output"])[0]
         target = os.path.join(VIDEO_DIR, item["output"])
         if wanted and stem not in wanted and item["output"] not in wanted and item["group"] not in wanted:
@@ -284,11 +241,19 @@ def main():
     queued = []
     for item in todo:
         log(f"queue {item['output']}")
-        queued.append((item, submit(item)))
-        log(f"job {queued[-1][1]} {item['output']}")
+        try:
+            job_id = submit(item)
+        except Exception as exc:
+            log(f"submit failed {item['output']} {exc}")
+            continue
+        queued.append((item, job_id))
+        log(f"job {job_id} {item['output']}")
     for item, job_id in queued:
         target = os.path.join(VIDEO_DIR, item["output"])
         job = wait_for_job(job_id, item["output"])
+        if job.get("status") != "done":
+            log(f"failed {item['output']} {job_id} status={job.get('status')} events={job.get('events', [])[-1:]}")
+            continue
         job["id"] = job_id
         download(f"/api/jobs/{job_id}/file", target)
         bytes_written = os.path.getsize(target)

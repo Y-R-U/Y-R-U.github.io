@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
-"""Generate Awake room transition videos through the local LTX API."""
+"""Generate Awake room transition videos through the local LTX API.
+
+Transitions are loaded from js/story.js so the runtime, debug panel, and
+generation queue share one catalogue. Existing MP4s are skipped unless
+--force is passed.
+
+The local LTX server has a warm queue: submit all selected jobs first,
+then poll/download them one at a time. The server still runs one render
+at a time, but this avoids idle unload gaps between clips.
+"""
 
 import json
 import os
+import subprocess
 import sys
 import time
 import urllib.request
@@ -26,99 +36,24 @@ NEGATIVE = (
     "melting architecture, collapsing room, explosion, gore, extra doors, duplicated hallway"
 )
 
-TRANSITIONS = [
-    {
-        "output": "cryo_room_to_hallway.mp4",
-        "start": "images/cryo_room.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 84,
-        "prompt": "camera leaves a cracked cryogenic room, passes through the only exit door, and ends in the central hallway",
-    },
-    {
-        "output": "med_bay_to_hallway.mp4",
-        "start": "images/med_bay.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 91,
-        "prompt": "camera leaves an abandoned futuristic med bay, passes through the only exit door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_med_bay.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/med_bay.jpg",
-        "seed": 92,
-        "prompt": "camera moves from the central hallway through a sealed medical door and ends inside the abandoned med bay",
-    },
-    {
-        "output": "hydroponic_biome_to_hallway.mp4",
-        "start": "images/hydroponic_biome.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 101,
-        "prompt": "camera leaves an overgrown hydroponic biome chamber, passes through the airlock door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_hydroponic_biome.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/hydroponic_biome.jpg",
-        "seed": 102,
-        "prompt": "camera moves from the central hallway through a fogged airlock and ends inside the overgrown hydroponic biome",
-    },
-    {
-        "output": "reactor_gallery_to_hallway.mp4",
-        "start": "images/reactor_gallery.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 111,
-        "prompt": "camera leaves a narrow reactor gallery, passes through the reinforced exit door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_reactor_gallery.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/reactor_gallery.jpg",
-        "seed": 112,
-        "prompt": "camera moves from the central hallway through a reinforced service door and ends inside the glowing reactor gallery",
-    },
-    {
-        "output": "security_hub_to_hallway.mp4",
-        "start": "images/security_hub.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 121,
-        "prompt": "camera leaves a compact security hub with dark surveillance monitors, passes through the armored exit door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_security_hub.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/security_hub.jpg",
-        "seed": 122,
-        "prompt": "camera moves from the central hallway through an armored security door and ends inside the compact surveillance hub",
-    },
-    {
-        "output": "observation_deck_to_hallway.mp4",
-        "start": "images/observation_deck.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 131,
-        "prompt": "camera leaves a tall observation deck with a panoramic space window, passes through the sealed exit door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_observation_deck.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/observation_deck.jpg",
-        "seed": 132,
-        "prompt": "camera moves from the central hallway through a sealed viewing door and ends inside the lonely observation deck",
-    },
-    {
-        "output": "engineering_bay_to_hallway.mp4",
-        "start": "images/engineering_bay.jpg",
-        "end": "images/hallway.jpg",
-        "seed": 141,
-        "prompt": "camera leaves an industrial engineering bay with suspended repair arms, passes through the heavy exit door, and ends in the central hallway",
-    },
-    {
-        "output": "hallway_to_engineering_bay.mp4",
-        "start": "images/hallway.jpg",
-        "end": "images/engineering_bay.jpg",
-        "seed": 142,
-        "prompt": "camera moves from the central hallway through a heavy maintenance door and ends inside the industrial engineering bay",
-    },
-]
+def load_story_transitions():
+    script = (
+        "global.window={};"
+        "require('./js/story.js');"
+        "const s=window.CodexHorrorStory;"
+        "console.log(JSON.stringify(s.transitions.filter(t=>t.group==='room_transitions')));"
+    )
+    raw = subprocess.check_output(["node", "-e", script], cwd=HERE, text=True)
+    transitions = []
+    for index, transition in enumerate(json.loads(raw), start=1):
+        transitions.append({
+            "output": transition["file"],
+            "start": transition["startImage"],
+            "end": transition["endImage"],
+            "seed": transition.get("seed") or 1000 + index,
+            "prompt": transition["promptText"],
+        })
+    return transitions
 
 
 def log(message):
@@ -171,16 +106,19 @@ def submit(transition):
 
 
 def wait_for_job(job_id):
+    last_event = ""
     while True:
         job = get_json(f"/api/jobs/{job_id}")
         status = job.get("status")
         event = job.get("running_last_event") or job.get("last_event") or {}
-        if event.get("event"):
-            log(f"{job_id} {status} {event.get('event')}")
+        event_name = event.get("event") or ""
+        if event_name and event_name != last_event:
+            last_event = event_name
+            log(f"{job_id} {status} {event_name}")
         if status == "done":
             return job
         if status in {"failed", "cancelled"}:
-            raise RuntimeError(f"{job_id} ended with {status}")
+            return job
         time.sleep(5)
 
 
@@ -191,7 +129,8 @@ def main():
     args = set(sys.argv[1:])
     force = "--force" in args
     wanted = args - {"--force"}
-    for transition in TRANSITIONS:
+    todo = []
+    for transition in load_story_transitions():
         stem = os.path.splitext(transition["output"])[0]
         if wanted and stem not in wanted and transition["output"] not in wanted:
             continue
@@ -199,12 +138,26 @@ def main():
         if os.path.exists(target) and not force:
             log(f"skip {transition['output']} already exists")
             continue
+        todo.append(transition)
+    queued = []
+    for transition in todo:
         log(f"queue {transition['output']}")
-        job_id = submit(transition)
+        try:
+            job_id = submit(transition)
+        except Exception as exc:
+            log(f"submit failed {transition['output']} {exc}")
+            continue
+        queued.append((transition, job_id))
         log(f"job {job_id} {transition['output']}")
+    for transition, job_id in queued:
+        target = os.path.join(VIDEO_DIR, transition["output"])
         job = wait_for_job(job_id)
+        if job.get("status") != "done":
+            log(f"failed {transition['output']} {job_id} status={job.get('status')} events={job.get('events', [])[-1:]}")
+            continue
         download(f"/api/jobs/{job_id}/file", target)
         log(f"ok {transition['output']} {os.path.getsize(target)} bytes {job.get('duration_secs')}s")
+    log(f"done {len(queued)} generated")
 
 
 if __name__ == "__main__":

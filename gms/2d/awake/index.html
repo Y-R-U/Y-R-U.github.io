@@ -12,6 +12,7 @@
 <link rel="preload" href="images/cryo_room.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
 <link rel="stylesheet" href="css/style.css?v=20260516-more-media">
+<link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260519-puzzles">
 </head>
 <body>
 <main id="app">
@@ -326,6 +327,7 @@
     </header>
     <div class="help-copy">
       <p>Each action spends a turn. The hunter arrives when the hidden turn limit is reached; the range changes by difficulty.</p>
+      <p>Some task buttons open timed challenge puzzles. Solving one completes the task; timing out costs a turn and leaves it unsolved.</p>
       <p>Easy shows every goal. Medium and hard hide part of the list until you restore a console or find a map cache.</p>
       <p>Room buttons move through generated transition videos. The first frame is held as the current room still.</p>
       <p>Version 0.1 tests named room feeds, a shared hallway, grouped transition review, save progress, history, music, and the procedural run shell.</p>
@@ -341,10 +343,11 @@
 </div>
 <audio id="music" preload="none"></audio>
 
-<script src="js/story.js?v=20260516-more-media"></script>
+<script src="js/puzzles/puzzles.js?v=20260519-puzzles"></script>
+<script src="js/story.js?v=20260519-puzzles"></script>
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
-<script src="js/game.js?v=20260516-more-media"></script>
+<script src="js/game.js?v=20260519-puzzles"></script>
 </body>
 </html>

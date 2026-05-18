@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Generate Awake room stills through the local MFLUX API."""
+"""Generate Awake room stills through the local MFLUX API.
+
+The room catalogue is loaded from js/story.js so new rooms only need to
+be authored once. Existing outputs are skipped unless --force is passed.
+"""
 
 import base64
 import json
 import os
+import subprocess
 import sys
 import time
 import urllib.request
@@ -12,6 +17,7 @@ API_URL = "http://localhost:7861/sdapi/v1/txt2img"
 MODEL = "flux2-klein-4b"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(HERE, "original_files")
+RUNTIME_DIR = os.path.join(HERE, "images")
 LOG_PATH = os.path.join(HERE, "gen_images.log")
 
 STYLE = (
@@ -20,68 +26,35 @@ STYLE = (
     "beautiful but unsettling, no people, no readable text, no watermark, no logo"
 )
 
-IMAGES = [
-    (
-        "cryo_room.png",
-        768,
-        1344,
-        "inside a cracked cryogenic suspension room in a remote space habitat, open sleep pod in foreground, "
-        "thin frost floating upward, medical glass, restrained cyan and green lights, one exit door visible, "
-        "lonely mystery atmosphere",
-    ),
-    (
-        "hallway.png",
-        768,
-        1344,
-        "long central hallway inside an abandoned mars habitat and orbital station hybrid, curved metal walls, "
-        "floor vents, emergency red rim lights, distant sealed transport door, reflective black floor, "
-        "claustrophobic sci-fi horror corridor",
-    ),
-    (
-        "med_bay.png",
-        768,
-        1344,
-        "abandoned futuristic med bay inside a damaged orbital habitat, two empty diagnostic beds, suspended surgical arms, "
-        "soft white medical lamps mixed with warning amber light, sterile glass cabinets, one sealed exit door visible, "
-        "realistic unsettling hospital science fiction mood",
-    ),
-    (
-        "hydroponic_biome.png",
-        768,
-        1344,
-        "overgrown hydroponic biome chamber in a failing space station, vertical plant towers, wet reflective walkway, "
-        "mist drifting under ultraviolet grow lights, broken transparent dome panels showing dark space beyond, "
-        "one heavy airlock exit visible, beautiful eerie survival horror atmosphere",
-    ),
-    (
-        "reactor_gallery.png",
-        768,
-        1344,
-        "narrow reactor gallery in a mars habitat, massive humming power core behind ribbed glass, blue white plasma glow, "
-        "maintenance catwalks, warning stripes, drifting sparks, one reinforced exit door visible, cinematic realistic sci-fi dread",
-    ),
-    (
-        "security_hub.png",
-        768,
-        1344,
-        "compact orbital habitat security hub, curved wall of dark surveillance monitors, inactive drone racks, "
-        "hard cyan interface glow, red emergency strips, one armored exit door visible, realistic sci-fi horror command room",
-    ),
-    (
-        "observation_deck.png",
-        768,
-        1344,
-        "tall observation deck in a damaged deep space station, panoramic reinforced window showing stars and a red planet, "
-        "broken seating rails, faint aurora light, one sealed exit door visible, beautiful lonely sci-fi horror atmosphere",
-    ),
-    (
-        "engineering_bay.png",
-        768,
-        1344,
-        "industrial engineering bay inside an abandoned mars habitat, suspended repair arms, coolant pipes, tool lockers, "
-        "orange warning lamps mixed with cold blue machinery light, one heavy exit door visible, realistic tense sci-fi survival mood",
-    ),
-]
+ROOM_KIND_HINTS = {
+    "sleeping": "sleep pods, medical sleep hardware, waking mystery, one sealed exit door visible",
+    "study_like": "terminals, lab benches, archive equipment, hard interface glow, one sealed exit door visible",
+    "storage_like": "stacked lockers, crates, cold utility lighting, narrow paths, one heavy exit door visible",
+    "kitchen_like": "compact galley surfaces, ration hardware, communal crew traces, one sealed exit door visible",
+    "lounge_like": "crew seating, viewport light, lived-in details, one sealed exit door visible",
+    "wild": "overgrown controlled biome, humid air, strange plants, wet reflective walkway, one airlock exit visible",
+    "power_like": "industrial machinery, conduits, warning lamps, pulsing power systems, one reinforced exit door visible",
+    "hallway": "long central corridor, curved metal walls, floor vents, distant sealed transport door",
+}
+
+
+def load_story():
+    script = (
+        "global.window={};"
+        "require('./js/story.js');"
+        "const s=window.CodexHorrorStory;"
+        "console.log(JSON.stringify({rooms:s.rooms}));"
+    )
+    raw = subprocess.check_output(["node", "-e", script], cwd=HERE, text=True)
+    return json.loads(raw)
+
+
+def image_prompt(room):
+    hint = ROOM_KIND_HINTS.get(room.get("kind"), ROOM_KIND_HINTS["study_like"])
+    return (
+        f"{room['name']} in a remote abandoned sci-fi habitat, {hint}, "
+        f"{room.get('text', '')}"
+    )
 
 
 def log(message):
@@ -110,27 +83,44 @@ def generate(prompt, width, height):
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
+    os.makedirs(RUNTIME_DIR, exist_ok=True)
     with open(LOG_PATH, "w", encoding="utf-8") as handle:
         handle.write("")
 
     args = set(sys.argv[1:])
     force = "--force" in args
     wanted = args - {"--force"}
-    for filename, width, height, prompt in IMAGES:
-        stem = os.path.splitext(filename)[0]
+    story = load_story()
+    rooms = story["rooms"]
+    for room_id, room in rooms.items():
+        filename = f"{room_id}.png"
+        jpg_name = f"{room_id}.jpg"
+        stem = room_id
+        width = 768
+        height = 1344
+        prompt = image_prompt(room)
         if wanted and filename not in wanted and stem not in wanted:
             continue
         path = os.path.join(OUT_DIR, filename)
-        if os.path.exists(path) and not force:
-            log(f"skip {filename} already exists")
+        jpg_path = os.path.join(RUNTIME_DIR, jpg_name)
+        if os.path.exists(path) and os.path.exists(jpg_path) and not force:
+            log(f"skip {filename} and {jpg_name} already exist")
             continue
-        started = time.time()
-        log(f"gen {filename} {width}x{height}")
-        result = generate(prompt, width, height)
-        with open(path, "wb") as image_file:
-            image_file.write(base64.b64decode(result["images"][0]))
-        elapsed = time.time() - started
-        log(f"ok  {filename} {os.path.getsize(path) // 1024} kB {elapsed:.1f}s")
+        if not os.path.exists(path) or force:
+            started = time.time()
+            log(f"gen {filename} {width}x{height}")
+            result = generate(prompt, width, height)
+            with open(path, "wb") as image_file:
+                image_file.write(base64.b64decode(result["images"][0]))
+            elapsed = time.time() - started
+            log(f"ok  {filename} {os.path.getsize(path) // 1024} kB {elapsed:.1f}s")
+        log(f"jpg {jpg_name}")
+        subprocess.run(
+            ["sips", "-s", "format", "jpeg", "-s", "formatOptions", "85", path, "--out", jpg_path],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
 
 if __name__ == "__main__":

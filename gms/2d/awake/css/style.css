@@ -922,14 +922,42 @@ button.tag {
 .node-row3-right { grid-column: 3; grid-row: 3; }
 .node-wide-bottom { grid-column: 1 / span 3; grid-row: 4; }
 
+.node-row1-wide,
+.node-row2-wide,
+.node-row3-wide,
+.node-row4-wide,
+.node-row5-wide,
+.node-row6-wide { grid-column: 1 / span 3; }
+
+.node-row4-left,
+.node-row5-left,
+.node-row6-left { grid-column: 1; }
+
+.node-row4-right,
+.node-row5-right,
+.node-row6-right { grid-column: 3; }
+
+.node-row1-wide { grid-row: 1; }
+.node-row2-wide { grid-row: 2; }
+.node-row3-wide { grid-row: 3; }
+.node-row4-left,
+.node-row4-right,
+.node-row4-wide { grid-row: 4; }
+.node-row5-left,
+.node-row5-right,
+.node-row5-wide { grid-row: 5; }
+.node-row6-left,
+.node-row6-right,
+.node-row6-wide { grid-row: 6; }
+
 .node-center {
   grid-column: 2;
-  grid-row: 1 / span 4;
+  grid-row: 1 / span 6;
 }
 
 .node-exit {
   grid-column: 1 / span 3;
-  grid-row: 5;
+  grid-row: 7;
 }
 
 .mini-map.offline {
