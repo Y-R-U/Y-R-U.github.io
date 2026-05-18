@@ -62,6 +62,7 @@
     newGame: $("new-game"),
     continueGame: $("continue-game"),
     titleHistory: $("title-history"),
+    mediaPane: document.querySelector(".media-pane"),
     roomVideo: $("room-video"),
     roomFallback: $("room-fallback"),
     roomName: $("room-name"),
@@ -120,6 +121,7 @@
     runStatsSide: $("run-stats-side"),
     popupMap: $("popup-map"),
     historyList: $("history-list"),
+    endingScreen: $("ending-screen"),
     endingVideo: $("ending-video"),
     endingKind: $("ending-kind"),
     endingTitle: $("ending-title"),
@@ -1307,6 +1309,34 @@
     return { start, end };
   }
 
+  function setEventVideoChromeHidden(hidden) {
+    if (els.mediaPane) els.mediaPane.classList.toggle("event-video-playing", !!hidden);
+  }
+
+  function hideEndingButtonsDuringPlayback() {
+    if (!els.endingScreen || !els.endingVideo) return;
+    let timer = 0;
+    const clear = () => {
+      clearTimeout(timer);
+      els.endingScreen.classList.remove("event-video-playing");
+      els.endingVideo.removeEventListener("ended", clear);
+      els.endingVideo.removeEventListener("error", clear);
+      els.endingVideo.removeEventListener("loadedmetadata", schedule);
+    };
+    const schedule = () => {
+      clearTimeout(timer);
+      const duration = Number.isFinite(els.endingVideo.duration) && els.endingVideo.duration > 0
+        ? Math.round((els.endingVideo.duration + 0.35) * 1000)
+        : 7000;
+      timer = setTimeout(clear, duration);
+    };
+    els.endingScreen.classList.add("event-video-playing");
+    els.endingVideo.addEventListener("loadedmetadata", schedule);
+    els.endingVideo.addEventListener("ended", clear);
+    els.endingVideo.addEventListener("error", clear);
+    schedule();
+  }
+
   async function playMonsterRelease(message) {
     const clip = eventVideoFor("release");
     if (!clip) {
@@ -1336,9 +1366,11 @@
     try { els.roomVideo.currentTime = 0; } catch (err) {}
     els.roomVideo.pause();
     els.eventOverlay.classList.add("video-reveal");
+    setEventVideoChromeHidden(true);
     await delay(1000);
     els.roomVideo.play().catch(() => {});
     await waitForVideoWindow(els.roomVideo, 3600);
+    setEventVideoChromeHidden(false);
     els.eventOverlay.classList.remove("video-reveal");
     els.eventMessage.textContent = "You close the door and wait for the hallway to clear.";
     setRoomMedia(Story.rooms[state.currentRoom]);
@@ -1392,9 +1424,11 @@
       try { els.roomVideo.currentTime = 0; } catch (err) {}
       els.roomVideo.pause();
       els.eventOverlay.classList.add("video-reveal");
+      setEventVideoChromeHidden(true);
       await delay(700);
       els.roomVideo.play().catch(() => {});
       await waitForVideoWindow(els.roomVideo, videoMs);
+      setEventVideoChromeHidden(false);
       els.eventOverlay.classList.remove("video-reveal");
     }
     await delay(520);
@@ -1582,6 +1616,7 @@
       }
       if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
       els.endingVideo.currentTime = 0;
+      if (eventClip) hideEndingButtonsDuringPlayback();
       els.endingVideo.play().catch(() => {});
       UI.showScreen("ending-screen");
     };

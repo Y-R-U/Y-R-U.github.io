@@ -112,6 +112,18 @@ button {
   background: rgba(0, 0, 0, 0.22);
 }
 
+.media-pane.event-video-playing button.tag,
+.media-pane.event-video-playing .tag-stack,
+.media-pane.event-video-playing .task-complete-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.screen.event-video-playing .title-actions {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .event-overlay.continue-ready {
   cursor: pointer;
 }
