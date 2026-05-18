@@ -11,7 +11,7 @@
 <title>Awake</title>
 <link rel="preload" href="images/cryo_room.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
-<link rel="stylesheet" href="css/style.css?v=20260516-more-media">
+<link rel="stylesheet" href="css/style.css?v=20260519-task-complete">
 <link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260519-puzzles">
 </head>
 <body>
@@ -56,6 +56,10 @@
         <video id="room-video" class="room-video" muted playsinline preload="auto" poster="images/cryo_room.jpg"></video>
         <img id="room-fallback" class="room-fallback" src="images/cryo_room.jpg" alt="">
         <div class="scene-shade"></div>
+        <div id="task-complete-overlay" class="task-complete-overlay" aria-live="polite" aria-hidden="true">
+          <span class="task-complete-kicker">task complete</span>
+          <strong id="task-complete-text"></strong>
+        </div>
 
         <div class="tag tag-room">
           <span id="room-name">Cryo Room</span>
@@ -348,6 +352,6 @@
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
-<script src="js/game.js?v=20260519-puzzles"></script>
+<script src="js/game.js?v=20260519-task-complete"></script>
 </body>
 </html>

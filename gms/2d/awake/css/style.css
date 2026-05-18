@@ -139,6 +139,49 @@ button {
   letter-spacing: 0.08em;
 }
 
+.task-complete-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  width: min(82vw, 520px);
+  padding: 18px 20px;
+  border: 1px solid rgba(169, 255, 203, 0.48);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(7, 20, 16, 0.88), rgba(8, 12, 19, 0.78)),
+    radial-gradient(circle at 50% 0%, rgba(169, 255, 203, 0.24), transparent 58%);
+  box-shadow: 0 0 42px rgba(169, 255, 203, 0.18), var(--shadow);
+  color: var(--ink);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -42%) scale(0.96);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.task-complete-overlay.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: taskCompletePulse 1500ms ease both;
+}
+
+.task-complete-kicker {
+  color: var(--green);
+  text-transform: uppercase;
+  font-size: clamp(0.72rem, 2.4vw, 0.88rem);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.task-complete-overlay strong {
+  color: var(--ink);
+  font-size: clamp(1rem, 4.2vw, 1.45rem);
+  line-height: 1.2;
+}
+
 /* "click to continue" prompt — fades in after the reading pause, takes
    the click that advances from the message slide to the reveal video.
    Pulses gently so it reads as actionable without stealing focus. */
@@ -1273,6 +1316,21 @@ button.tag {
   92% {
     opacity: 0;
     transform: translateX(55%);
+  }
+}
+
+@keyframes taskCompletePulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -38%) scale(0.94);
+  }
+  14%, 78% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -56%) scale(0.98);
   }
 }
 

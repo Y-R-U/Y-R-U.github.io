@@ -18,6 +18,7 @@
   let roomMediaToken = 0;
   let transitionSequence = 0;
   let transitionTimer = 0;
+  let taskCompleteTimer = 0;
   let helperOnline = false;
   let debugTransitions = [];
   let selectedTransition = null;
@@ -58,6 +59,8 @@
     roomVideo: $("room-video"),
     roomFallback: $("room-fallback"),
     roomName: $("room-name"),
+    taskCompleteOverlay: $("task-complete-overlay"),
+    taskCompleteText: $("task-complete-text"),
     turnCount: $("turn-count"),
     turnBar: $("turn-bar"),
     eventOverlay: $("event-overlay"),
@@ -1958,11 +1961,29 @@
     if (state.history.length > 40) state.history = state.history.slice(-40);
   }
 
+  function showTaskComplete(goal) {
+    if (!goal || goal.id === "escape" || !els.taskCompleteOverlay || !els.taskCompleteText) return;
+    clearTimeout(taskCompleteTimer);
+    els.taskCompleteText.textContent = goal.text || "Task completed.";
+    els.taskCompleteOverlay.classList.remove("active");
+    els.taskCompleteOverlay.setAttribute("aria-hidden", "false");
+    void els.taskCompleteOverlay.offsetWidth;
+    els.taskCompleteOverlay.classList.add("active");
+    taskCompleteTimer = setTimeout(() => {
+      els.taskCompleteOverlay.classList.remove("active");
+      els.taskCompleteOverlay.setAttribute("aria-hidden", "true");
+    }, 1600);
+  }
+
   function updateGoalsFromFlags() {
     state.mapUnlocked = !!state.flags.map;
     const goals = Array.isArray(state.goals) && state.goals.length ? state.goals : Story.goals;
     goals.forEach(goal => {
-      if (goal.requires && state.flags[goal.requires]) state.flags[`goal_${goal.id}`] = true;
+      if (!goal.requires || !state.flags[goal.requires]) return;
+      const goalFlag = `goal_${goal.id}`;
+      const wasDone = !!state.flags[goalFlag];
+      state.flags[goalFlag] = true;
+      if (!wasDone) showTaskComplete(goal);
     });
   }
 
