@@ -11,8 +11,8 @@
 <title>The Horrors</title>
 <link rel="preload" href="images/bedroom.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
-<link rel="stylesheet" href="css/style.css?v=20260519-event-buttons">
-<link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260519-puzzles">
+<link rel="stylesheet" href="css/style.css?v=20260521-mini-pack">
+<link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260521-mini-pack">
 </head>
 <body>
 <main id="app">
@@ -201,6 +201,7 @@
         <button class="filter-chip" type="button" data-debug-filter="release">RELEASE</button>
         <button class="filter-chip" type="button" data-debug-filter="attack">ATTACK</button>
         <button class="filter-chip" type="button" data-debug-filter="all">ALL</button>
+        <button class="filter-chip" type="button" data-debug-filter="mini">MINI</button>
       </div>
       <button id="debug-refresh" class="glass-button slim" type="button">Refresh</button>
     </div>
@@ -292,7 +293,7 @@
 </aside>
 
 <aside id="details-panel" class="overlay" aria-hidden="true">
-  <div class="popup wide" role="dialog" aria-modal="true" aria-labelledby="details-title">
+  <div class="popup wide details-popup" role="dialog" aria-modal="true" aria-labelledby="details-title">
     <header class="popup-head">
       <h2 id="details-title">Tasks</h2>
       <button class="close-button" type="button" data-close="details-panel" aria-label="Close">×</button>
@@ -354,11 +355,11 @@
 </div>
 <audio id="music" preload="none"></audio>
 
-<script src="js/puzzles/puzzles.js?v=20260519-puzzles"></script>
-<script src="js/story.js?v=20260519-puzzles"></script>
+<script src="js/puzzles/puzzles.js?v=20260521-mini-pack"></script>
+<script src="js/story.js?v=20260521-mini-pack"></script>
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
-<script src="js/game.js?v=20260519-event-buttons"></script>
+<script src="js/game.js?v=20260521-mini-pack"></script>
 </body>
 </html>

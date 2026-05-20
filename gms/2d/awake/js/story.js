@@ -1570,9 +1570,25 @@
     ]},
   ];
 
+  function imageChoicesForRooms(runRooms) {
+    const ids = Array.isArray(runRooms) && runRooms.length
+      ? runRooms
+      : Object.keys(rooms).filter(id => id !== "hallway");
+    return ids
+      .map(id => {
+        const room = rooms[id];
+        if (!room || !room.poster) return null;
+        return { src: room.poster, label: room.name || id };
+      })
+      .filter(Boolean);
+  }
+
   function challengeGroupsForRun(ctx) {
     if (window.HubPuzzles && typeof window.HubPuzzles.createChallengeGroups === "function") {
-      return window.HubPuzzles.createChallengeGroups(ctx);
+      return window.HubPuzzles.createChallengeGroups({
+        ...ctx,
+        imageChoices: ctx && ctx.imageChoices ? ctx.imageChoices : imageChoicesForRooms(ctx && ctx.runRooms),
+      });
     }
     return [];
   }
@@ -1720,6 +1736,7 @@
       location: runState.location,
       facility: runState.facility,
       threat: runState.threat || {},
+      runRooms: runState.runRooms,
     });
     if (!generated.length) return runState;
 
@@ -1884,6 +1901,7 @@
         location,
         facility: `${prefix} ${location}`,
         threat,
+        runRooms,
       });
       const placedActions = placeTaskGroups(placementDifficulty, runRooms, rng, challengeGroups);
       // Each placed group gets a synthetic goal (uses group.goalText if

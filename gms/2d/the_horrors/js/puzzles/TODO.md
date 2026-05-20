@@ -12,8 +12,14 @@ Shared puzzle code lives in `js/puzzles/` and should be copied between:
 - Implemented puzzle types:
   - `code`: short memory/code-entry puzzle, available for the per-run location challenge.
   - `sequence_repeat`: watch a short symbol sequence, then replay it; available for the per-run location challenge.
-  - `word_order`: tap words in order; available for the per-run monster challenge.
+  - `image_tiles`: swap a 3x3 image puzzle using the current run's room stills; available for the per-run location challenge.
+  - `code_order`: memorise and place three random code tokens; available for the per-run monster challenge.
   - `symbol_equation`: solve a tiny symbol arithmetic clue; available for the per-run monster challenge.
+  - `wire_match`: match left and right symbol terminals.
+  - `pressure_order`: memorise and repeat a valve/control order.
+  - `spot_difference`: tap the altered tile in a 3x3 image grid.
+  - `memory_grid`: repeat a flashed cell pattern.
+  - `dial_align`: rotate three dials to match target symbols.
 - Intended runtime behavior:
   - Each run adds exactly two mandatory challenge tasks in addition to the existing task count.
   - One challenge is derived from the selected run location.
@@ -24,9 +30,7 @@ Shared puzzle code lives in `js/puzzles/` and should be copied between:
 
 ## Next Puzzle Ideas
 
-- Add `wire_match`: connect 3-4 symbols in matching pairs.
-- Add `image_tiles`: simple 2x2 or 3x3 tile reorder using room stills or generated puzzle art.
-- Add `pressure_order`: tap valves/levers in a clue-derived order.
+- Add game-specific 256x256 puzzle art packs if the room stills are not distinct enough.
 
 ## Integration Notes
 

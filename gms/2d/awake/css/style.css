@@ -731,6 +731,10 @@ button.tag {
   width: min(100%, 820px);
 }
 
+.popup.details-popup {
+  width: min(100%, 680px);
+}
+
 .popup.debug-popup {
   width: min(98vw, 1400px);
 }
@@ -1213,6 +1217,10 @@ button.tag {
   align-items: stretch;
 }
 
+.debug-row.mini-game-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .debug-pick {
   position: relative;
   display: grid;
@@ -1278,6 +1286,10 @@ button.tag {
 
 .debug-reverse {
   min-width: 82px;
+}
+
+.mini-game-launch {
+  min-width: 104px;
 }
 
 .prompt-editor {
@@ -1422,7 +1434,7 @@ button.tag {
   }
 
   .detail-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .debug-grid {

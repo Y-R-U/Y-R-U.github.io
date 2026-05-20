@@ -1584,9 +1584,13 @@
   }
 
   function renderDebugList() {
-    const transitions = getDebugTransitions();
     els.debugList.innerHTML = "";
     updateFilterButtons();
+    if (debugFilter === "mini") {
+      renderMiniGameList();
+      return;
+    }
+    const transitions = getDebugTransitions();
     const groups = getVisibleDebugGroups();
     groups.forEach(([groupId, label]) => {
       const items = transitions.filter(transition => transition.group === groupId);
@@ -1641,6 +1645,60 @@
       els.debugVideo.poster = first.poster;
       renderPreviewText(first);
     }
+  }
+
+  function renderMiniGameList() {
+    if (!window.HubPuzzles || typeof window.HubPuzzles.samplePuzzles !== "function" || typeof window.HubPuzzles.start !== "function") {
+      const empty = document.createElement("p");
+      empty.className = "debug-note";
+      empty.textContent = "Mini-game samples did not load.";
+      els.debugList.append(empty);
+      return;
+    }
+    els.debugHelperStatus.textContent = "Mini-game test mode";
+    els.debugNote.value = "Choose a mini-game sample to play it in the same challenge popup used by real runs.";
+    els.debugPrompt.textContent = "These examples do not affect the current run.";
+    const section = document.createElement("section");
+    section.className = "debug-section";
+    const heading = document.createElement("h3");
+    heading.textContent = "Mini-game samples";
+    section.append(heading);
+    getMiniGameSamples().forEach(sample => {
+      const row = document.createElement("div");
+      row.className = "debug-row mini-game-row";
+      const pick = document.createElement("button");
+      pick.className = "glass-button debug-pick";
+      pick.type = "button";
+      pick.innerHTML = `<strong>${UI.escapeHtml(sample.label)}</strong><small>${UI.escapeHtml(sample.puzzle.type)}</small>`;
+      pick.addEventListener("click", () => startMiniGameSample(sample));
+      const play = document.createElement("button");
+      play.className = "glass-button slim mini-game-launch";
+      play.type = "button";
+      play.textContent = "Play";
+      play.addEventListener("click", () => startMiniGameSample(sample));
+      row.append(pick, play);
+      section.append(row);
+    });
+    els.debugList.append(section);
+  }
+
+  function getMiniGameSamples() {
+    const imageChoices = Object.entries(Story.rooms || {})
+      .filter(([id, room]) => id !== "hallway" && room && room.poster)
+      .slice(0, 4)
+      .map(([id, room]) => ({ src: room.poster, label: room.name || id }));
+    return window.HubPuzzles.samplePuzzles({
+      gameId: "awake",
+      imageChoices,
+    });
+  }
+
+  function startMiniGameSample(sample) {
+    UI.closePanel("debug-panel");
+    window.HubPuzzles.start(sample.puzzle).then(result => {
+      const status = result && result.success ? "solved" : (result && result.reason ? result.reason : "closed");
+      UI.toast(`${sample.label}: ${status}`);
+    });
   }
 
   function getDebugTransitions() {
