@@ -139,11 +139,37 @@
     };
   }
 
+  function mergeTargetForDifficulty(difficultyId) {
+    if (difficultyId === "hard") return 128;
+    if (difficultyId === "easy") return 32;
+    return 64;
+  }
+
+  function readMergeBest(gameId) {
+    try {
+      const data = JSON.parse(localStorage.getItem("hubPuzzles.merge2048.best.v1") || "{}");
+      return Math.max(0, Number(data[gameId || "shared"]) || 0);
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  function writeMergeBest(gameId, value) {
+    try {
+      const key = gameId || "shared";
+      const data = JSON.parse(localStorage.getItem("hubPuzzles.merge2048.best.v1") || "{}");
+      data[key] = Math.max(Number(data[key]) || 0, Number(value) || 0);
+      localStorage.setItem("hubPuzzles.merge2048.best.v1", JSON.stringify(data));
+    } catch (err) {
+      // Local storage can be unavailable in private or embedded contexts.
+    }
+  }
+
   function locationChallenge(location, baseSeed, seconds, ctx) {
     const rng = rngFromSeed(`${baseSeed}:location:kind`);
     const image = imagePuzzleChoice(ctx, baseSeed, "location");
     const roll = rng();
-    if (image && roll < 0.2) {
+    if (image && roll < 0.16) {
       return {
         label: "Restore the local image lock",
         challenge: {
@@ -159,7 +185,7 @@
         failText: `The ${location} image lock stays scrambled. The delay costs you a turn.`,
       };
     }
-    if (image && roll < 0.36) {
+    if (image && roll < 0.3) {
       return {
         label: "Find the image fault",
         challenge: {
@@ -174,7 +200,24 @@
         failText: `The ${location} image fault stays hidden. The delay costs you a turn.`,
       };
     }
-    if (roll < 0.54) {
+    if (roll < 0.48) {
+      const target = mergeTargetForDifficulty(ctx && ctx.difficultyId);
+      return {
+        label: "Merge the local power cells",
+        challenge: {
+          type: "merge_2048",
+          title: `${location} Power Merge`,
+          prompt: `Merge matching cells until you create ${target}.`,
+          seconds: 60,
+          target,
+          gameId: ctx && ctx.gameId,
+          seed: `${baseSeed}:location:merge-2048`,
+        },
+        successText: `The ${location} power cells reach ${target} and the panel grants access.`,
+        failText: `The ${location} power cells stall out. The delay costs you a turn.`,
+      };
+    }
+    if (roll < 0.62) {
       const code = codeFromText(location, baseSeed);
       return {
         label: "Solve the local access code",
@@ -190,7 +233,7 @@
         failText: `The ${location} relay rejects the attempt. The delay costs you a turn.`,
       };
     }
-    if (roll < 0.74) {
+    if (roll < 0.8) {
       const sequence = sequenceFromText(location, baseSeed);
       return {
         label: "Repeat the local signal",
@@ -442,6 +485,19 @@
           tiles: ["door", "open", "sealed", "the"],
           seconds: 20,
           seed: "sample:word-order",
+        },
+      },
+      {
+        id: "merge_2048",
+        label: "2048 Merge",
+        puzzle: {
+          type: "merge_2048",
+          title: "Sample Power Merge",
+          prompt: "Merge matching cells until you create 64.",
+          target: 64,
+          seconds: 60,
+          gameId: ctx.gameId || "sample",
+          seed: "sample:merge-2048",
         },
       },
       {
@@ -968,6 +1024,122 @@
       };
       render();
       check = () => values.join(" ") === answer.join(" ");
+    } else if (puzzle.type === "merge_2048") {
+      const targetValue = Math.max(32, Number(puzzle.target) || 64);
+      const gameId = puzzle.gameId || "shared";
+      const rng = rngFromSeed(`${puzzle.seed || "sample"}:merge-2048`);
+      let board = Array.from({ length: 16 }, () => 0);
+      let touchStart = null;
+      let bestEver = readMergeBest(gameId);
+      let bestRun = 0;
+      body.innerHTML = `
+        <div class="puzzle-2048-status">Target ${targetValue}</div>
+        <div class="puzzle-2048-wrap">
+          <button class="puzzle-2048-arrow top" type="button" aria-label="Move up">&#9650;</button>
+          <button class="puzzle-2048-arrow right" type="button" aria-label="Move right">&#9654;</button>
+          <button class="puzzle-2048-arrow bottom" type="button" aria-label="Move down">&#9660;</button>
+          <button class="puzzle-2048-arrow left" type="button" aria-label="Move left">&#9664;</button>
+          <div class="puzzle-2048-board" role="group" aria-label="2048 merge board"></div>
+        </div>
+      `;
+      const status = body.querySelector(".puzzle-2048-status");
+      const boardEl = body.querySelector(".puzzle-2048-board");
+      const cells = [];
+      const emptyCells = () => board.map((value, index) => value ? -1 : index).filter(index => index >= 0);
+      const maxTile = () => Math.max(...board);
+      const addTile = () => {
+        const empty = emptyCells();
+        if (!empty.length) return;
+        board[empty[Math.floor(rng() * empty.length)]] = rng() < 0.9 ? 2 : 4;
+      };
+      const mergeLine = line => {
+        const compact = line.filter(Boolean);
+        const merged = [];
+        for (let i = 0; i < compact.length; i += 1) {
+          if (compact[i] === compact[i + 1]) {
+            merged.push(compact[i] * 2);
+            i += 1;
+          } else {
+            merged.push(compact[i]);
+          }
+        }
+        while (merged.length < 4) merged.push(0);
+        return merged;
+      };
+      const linesFor = dir => {
+        if (dir === "left" || dir === "right") {
+          return Array.from({ length: 4 }, (_, row) => Array.from({ length: 4 }, (_, col) => row * 4 + col));
+        }
+        return Array.from({ length: 4 }, (_, col) => Array.from({ length: 4 }, (_, row) => row * 4 + col));
+      };
+      const canMove = () => {
+        if (emptyCells().length) return true;
+        return linesFor("left").concat(linesFor("up")).some(line => line.some((index, i) => i < 3 && board[index] === board[line[i + 1]]));
+      };
+      const move = dir => {
+        const before = board.join(",");
+        linesFor(dir).forEach(indices => {
+          const source = (dir === "right" || dir === "down") ? indices.slice().reverse() : indices;
+          const merged = mergeLine(source.map(index => board[index]));
+          source.forEach((index, i) => { board[index] = merged[i]; });
+        });
+        if (board.join(",") === before) return false;
+        addTile();
+        return true;
+      };
+      const render = () => {
+        boardEl.innerHTML = "";
+        cells.length = 0;
+        bestRun = Math.max(bestRun, maxTile());
+        if (bestRun > bestEver) {
+          bestEver = bestRun;
+          writeMergeBest(gameId, bestEver);
+        }
+        board.forEach(value => {
+          const cell = document.createElement("div");
+          cell.className = value ? `puzzle-2048-cell v${Math.min(value, 128)}` : "puzzle-2048-cell";
+          cell.textContent = value ? String(value) : "";
+          boardEl.append(cell);
+          cells.push(cell);
+        });
+        const max = maxTile();
+        status.textContent = max >= targetValue
+          ? `Target ${targetValue} reached · Run ${bestRun || 0} · Best ever ${bestEver || 0}`
+          : `Target ${targetValue} · Run ${bestRun || 0} · Best ever ${bestEver || 0}`;
+        if (max < targetValue && !canMove()) status.textContent = `No moves left · Run ${bestRun || 0} · Best ever ${bestEver || 0}`;
+      };
+      const doMove = dir => {
+        if (maxTile() >= targetValue) return;
+        if (move(dir)) render();
+      };
+      const onKey = event => {
+        const map = { ArrowUp: "up", ArrowRight: "right", ArrowDown: "down", ArrowLeft: "left" };
+        const dir = map[event.key];
+        if (!dir) return;
+        event.preventDefault();
+        doMove(dir);
+      };
+      body.querySelector(".puzzle-2048-arrow.top").addEventListener("click", () => doMove("up"));
+      body.querySelector(".puzzle-2048-arrow.right").addEventListener("click", () => doMove("right"));
+      body.querySelector(".puzzle-2048-arrow.bottom").addEventListener("click", () => doMove("down"));
+      body.querySelector(".puzzle-2048-arrow.left").addEventListener("click", () => doMove("left"));
+      boardEl.addEventListener("pointerdown", event => {
+        touchStart = { x: event.clientX, y: event.clientY };
+      });
+      boardEl.addEventListener("pointerup", event => {
+        if (!touchStart) return;
+        const dx = event.clientX - touchStart.x;
+        const dy = event.clientY - touchStart.y;
+        touchStart = null;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+        doMove(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+      });
+      window.addEventListener("keydown", onKey);
+      teardown = () => window.removeEventListener("keydown", onKey);
+      addTile();
+      addTile();
+      render();
+      check = () => maxTile() >= targetValue;
     }
 
     return new Promise(resolve => {

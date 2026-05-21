@@ -328,6 +328,92 @@
   font-weight: 900;
 }
 
+.puzzle-2048-status {
+  border: 1px solid rgba(189, 229, 255, 0.24);
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #aef2ff;
+  background: rgba(111, 205, 255, 0.1);
+  text-align: center;
+  font-weight: 900;
+}
+
+.puzzle-2048-wrap {
+  position: relative;
+  width: min(100%, 360px);
+  margin: 0 auto;
+  padding: 42px;
+}
+
+.puzzle-2048-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  touch-action: none;
+}
+
+.puzzle-2048-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  border-radius: 10px;
+  color: rgba(238, 251, 255, 0.42);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: clamp(1rem, 7vw, 1.8rem);
+  font-weight: 900;
+}
+
+.puzzle-2048-cell.v2 { background: rgba(111, 205, 255, 0.16); color: #e8fbff; }
+.puzzle-2048-cell.v4 { background: rgba(111, 205, 255, 0.24); color: #e8fbff; }
+.puzzle-2048-cell.v8 { background: rgba(169, 255, 203, 0.24); color: #eafff1; }
+.puzzle-2048-cell.v16 { background: rgba(255, 216, 138, 0.28); color: #fff6dc; }
+.puzzle-2048-cell.v32 { background: rgba(255, 154, 104, 0.34); color: #fff0e8; }
+.puzzle-2048-cell.v64 { background: rgba(255, 112, 132, 0.36); color: #fff0f3; }
+.puzzle-2048-cell.v128 { background: rgba(214, 139, 255, 0.38); color: #fbf1ff; }
+
+.puzzle-2048-arrow {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(174, 242, 255, 0.36);
+  border-radius: 999px;
+  color: #aef2ff;
+  background: rgba(111, 205, 255, 0.12);
+  font: inherit;
+  font-weight: 900;
+}
+
+.puzzle-2048-arrow.top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.puzzle-2048-arrow.right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.puzzle-2048-arrow.bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.puzzle-2048-arrow.left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
 @media (max-width: 440px) {
   .puzzle-image-wrap {
     grid-template-columns: 1fr;
@@ -335,6 +421,10 @@
 
   .puzzle-image-reference {
     width: 76px;
+  }
+
+  .puzzle-2048-wrap {
+    padding: 36px;
   }
 }
 

@@ -20,6 +20,7 @@ Shared puzzle code lives in `js/puzzles/` and should be copied between:
   - `spot_difference`: tap the altered tile in a 3x3 image grid.
   - `memory_grid`: repeat a flashed cell pattern.
   - `dial_align`: rotate three dials to match target symbols.
+  - `merge_2048`: 2048-style tile merge puzzle; target is 32 on easy, 64 on medium, and 128 on hard.
 - Intended runtime behavior:
   - Each run adds exactly two mandatory challenge tasks in addition to the existing task count.
   - One challenge is derived from the selected run location.
