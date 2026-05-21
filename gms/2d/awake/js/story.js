@@ -227,7 +227,7 @@
       kind: "lounge_like",
       template: "observation_deck",
       canStart: true,
-      text: "The crew lounge still tries to be comfortable. The cushions remember bodies the cameras insist were never here.",
+      text: "The crew lounge still tries to be comfortable. Collapsed cushions face the viewport, waiting for a shift change that never comes.",
     }],
     ["sleep_pods", {
       name: "Sleep Pods",

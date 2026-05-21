@@ -6,7 +6,7 @@
 
   const $ = id => document.getElementById(id);
   const DEBUG_META_KEY = "awake.debugMeta.v1";
-  const STATIC_MEDIA_VERSION = "20260516-more-media";
+  const STATIC_MEDIA_VERSION = "20260521-crew-lounge";
   let state = normalizeState(Save.loadState());
   let settings = Save.loadSettings();
   let transitionLocked = false;
@@ -576,25 +576,18 @@
     const token = ++roomMediaToken;
     clearTimeout(transitionTimer);
     transitionLocked = false;
-    // Only flip the fallback img to .visible once its src is the NEW
-    // room's poster and actually painted — otherwise it'd briefly
-    // show the previous room (e.g. hallway flicker on room arrival).
-    // transitionTo's preReveal usually has the new poster loaded by
-    // the time we get here, so this is normally instant.
-    const idleSrc = mediaSrc(room.idleVideo);
-    // Intentionally NOT setting roomVideo.poster — when video.src
-    // changes the element may render the poster image at intrinsic
-    // ratio (object-fit on video posters isn't reliable), which
-    // briefly letterboxes ("video gets thinner then expands"). The
-    // fallback img above provides a reliable bridge instead.
+    // Keep the high-quality room still visible as the settled room view.
+    // The video layer is reserved for transitions/events; showing its first
+    // frame here can briefly resize or letterbox during source swaps.
     const showFallback = () => {
       if (token !== roomMediaToken) return;
       els.roomFallback.classList.add("visible");
     };
-    if (els.roomFallback.getAttribute("src") !== room.poster) {
+    const posterSrc = mediaSrc(room.poster);
+    if (els.roomFallback.getAttribute("src") !== posterSrc) {
       els.roomFallback.classList.remove("visible");
       els.roomFallback.addEventListener("load", showFallback, { once: true });
-      els.roomFallback.src = room.poster;
+      els.roomFallback.src = posterSrc;
       if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) showFallback();
     } else if (els.roomFallback.complete && els.roomFallback.naturalWidth > 0) {
       showFallback();
@@ -602,24 +595,7 @@
       els.roomFallback.classList.remove("visible");
       els.roomFallback.addEventListener("load", showFallback, { once: true });
     }
-    if (els.roomVideo.dataset.src !== idleSrc) {
-      els.roomVideo.dataset.src = idleSrc;
-      els.roomVideo.src = idleSrc;
-    }
     els.roomVideo.pause();
-    try {
-      els.roomVideo.currentTime = 0;
-    } catch (err) {
-      // Some browsers reject seeking before metadata; the load handler below will settle it.
-    }
-    els.roomVideo.addEventListener("loadeddata", () => {
-      if (token !== roomMediaToken) return;
-      els.roomFallback.classList.remove("visible");
-      try {
-        els.roomVideo.currentTime = 0;
-      } catch (err) {}
-      els.roomVideo.pause();
-    }, { once: true });
   }
 
   function rememberRoomVisit(roomId) {
@@ -1039,8 +1015,9 @@
       // clip loads. Removing .visible later (after the video actually
       // starts playing) bridges the brief blank that follows a
       // video.src swap — the source of the inter-room flicker.
-      if (els.roomFallback.getAttribute("src") !== from.poster) {
-        els.roomFallback.src = from.poster;
+      const fromPosterSrc = mediaSrc(from.poster);
+      if (els.roomFallback.getAttribute("src") !== fromPosterSrc) {
+        els.roomFallback.src = fromPosterSrc;
       }
       els.roomFallback.classList.add("visible");
       els.roomVideo.dataset.src = playbackSrc;
@@ -1088,7 +1065,7 @@
         const preRevealMs = Math.max(0, Math.round((duration - 0.5) * 1000));
         setTimeout(() => {
           if (token !== transitionSequence) return;
-          els.roomFallback.src = to.poster;
+          els.roomFallback.src = mediaSrc(to.poster);
           if (!opts.skipRevealAtEnd) showActionTrays();
         }, preRevealMs);
         transitionTimer = setTimeout(done, Math.round((duration + 0.65) * 1000));
@@ -1225,7 +1202,7 @@
     els.eventOverlay.classList.remove("settling", "video-reveal");
     // Pre-load the reveal video while the player reads the message so
     // the cutscene starts cleanly after they click to continue.
-    els.roomFallback.src = Story.rooms.hallway.poster;
+    els.roomFallback.src = mediaSrc(Story.rooms.hallway.poster);
     els.roomFallback.classList.remove("visible");
     els.roomVideo.dataset.src = mediaSrc(clip);
     els.roomVideo.src = mediaSrc(clip);
@@ -1271,7 +1248,7 @@
     els.eventOverlay.classList.remove("settling", "video-reveal");
     let ready = Promise.resolve();
     if (clip) {
-      els.roomFallback.src = Story.rooms.hallway.poster;
+      els.roomFallback.src = mediaSrc(Story.rooms.hallway.poster);
       els.roomFallback.classList.remove("visible");
       els.roomVideo.dataset.src = mediaSrc(clip);
       els.roomVideo.src = mediaSrc(clip);

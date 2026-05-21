@@ -23,7 +23,8 @@ LOG_PATH = os.path.join(HERE, "gen_images.log")
 STYLE = (
     "cinematic realistic sci-fi horror concept art, premium mobile game background, "
     "portrait composition, deep spatial depth, volumetric emergency lighting, high detail, "
-    "beautiful but unsettling, no people, no readable text, no watermark, no logo"
+    "beautiful but unsettling, empty room, no people, no human remains, no body parts, "
+    "no arms, no legs, no readable text, no watermark, no logo"
 )
 
 ROOM_KIND_HINTS = {
