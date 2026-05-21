@@ -44,7 +44,7 @@
       });
     },
     openPanel(id) {
-      if (id !== "help-panel" && id !== "regen-panel") closeOverlays();
+      if (!["help-panel", "regen-panel", "reverse-panel", "marker-panel"].includes(id)) closeOverlays();
       const panel = document.getElementById(id);
       if (!panel) return;
       panel.classList.add("open");

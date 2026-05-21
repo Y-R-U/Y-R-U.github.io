@@ -11,7 +11,7 @@
 <title>Awake</title>
 <link rel="preload" href="images/cryo_room.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
-<link rel="stylesheet" href="css/style.css?v=20260521-merge2048">
+<link rel="stylesheet" href="css/style.css?v=20260521-debug-upgrade">
 <link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260521-merge2048">
 </head>
 <body>
@@ -236,12 +236,38 @@
     <p id="regen-file" class="debug-note"></p>
     <label class="prompt-editor">
       <span>New video prompt text</span>
-      <textarea id="regen-prompt" rows="8"></textarea>
+      <textarea id="regen-prompt" rows="7"></textarea>
     </label>
     <label class="prompt-editor">
       <span>Moved video message</span>
-      <textarea id="regen-move-message" rows="5"></textarea>
+      <textarea id="regen-move-message" class="short-message" rows="2"></textarea>
     </label>
+    <div class="regen-option-grid">
+      <section class="regen-option-group">
+        <span>Resolution</span>
+        <div class="segmented-buttons" role="group" aria-label="Render resolution">
+          <button class="filter-chip active" type="button" data-regen-resolution="384x640">384x640</button>
+          <button class="filter-chip" type="button" data-regen-resolution="576x960">576x960</button>
+        </div>
+      </section>
+      <section class="regen-option-group">
+        <span>Length</span>
+        <div class="segmented-buttons" role="group" aria-label="Render duration">
+          <button class="filter-chip active" type="button" data-regen-duration="73">3s</button>
+          <button class="filter-chip" type="button" data-regen-duration="121">5s</button>
+        </div>
+      </section>
+      <label class="regen-option-group">
+        <span>Frames <small id="regen-frame-seconds">3.04s</small></span>
+        <input id="regen-frames" type="number" min="1" step="8" value="73" inputmode="numeric">
+      </label>
+      <section id="regen-marker-wrap" class="regen-option-group marker-picker" hidden>
+        <span>Marker Frame</span>
+        <button id="regen-marker-toggle" class="glass-button slim" type="button">No marker selected</button>
+        <button id="regen-marker-clear" class="glass-button slim quiet" type="button">Clear</button>
+        <div id="regen-marker-list" class="marker-list" hidden></div>
+      </section>
+    </div>
     <div class="popup-actions regen-actions">
       <button id="regen-delete" class="glass-button danger" type="button">Regen + Delete</button>
       <button id="regen-move" class="glass-button" type="button">Regen + Possible</button>
@@ -268,6 +294,25 @@
       <button id="reverse-other" class="glass-button primary" type="button">Reverse + Other</button>
     </div>
     <p class="debug-note">The selected video is used as the source. The paired opposite transition is replaced by a reversed mp4. Possible or Other moves the old target clip before replacement.</p>
+  </div>
+</aside>
+
+<aside id="marker-panel" class="overlay stacked" aria-hidden="true">
+  <div class="popup marker-popup" role="dialog" aria-modal="true" aria-labelledby="marker-title">
+    <header class="popup-head">
+      <h2 id="marker-title">Save Marker Frame</h2>
+      <button class="close-button" type="button" data-close="marker-panel" aria-label="Close">×</button>
+    </header>
+    <p id="marker-summary" class="debug-note"></p>
+    <label class="prompt-editor">
+      <span>Marker name</span>
+      <input id="marker-name" type="text" autocomplete="off">
+    </label>
+    <div class="popup-actions compact-actions">
+      <button class="glass-button quiet" type="button" data-close="marker-panel">Cancel</button>
+      <button id="marker-save" class="glass-button primary" type="button">Save Marker</button>
+    </div>
+    <p class="debug-note">The marker is extracted from the current preview frame and saved in this game's ref folder.</p>
   </div>
 </aside>
 
@@ -352,7 +397,7 @@
 <script src="js/story.js?v=20260521-crew-lounge"></script>
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/game.js?v=20260521-crew-lounge"></script>
+<script src="js/ui.js?v=20260521-debug-upgrade"></script>
+<script src="js/game.js?v=20260521-debug-upgrade"></script>
 </body>
 </html>

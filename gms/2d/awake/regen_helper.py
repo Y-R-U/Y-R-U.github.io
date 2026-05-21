@@ -26,6 +26,7 @@ script), not here.
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import glob
+import importlib.util
 import json
 import mimetypes
 import os
@@ -44,6 +45,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SEARCH_GLOB = os.path.expanduser("~/cc/yru/site/gms/2d/*/regen_config.json")
 GAME_PORTRAIT_WIDTH = 384
 GAME_PORTRAIT_HEIGHT = 640
+ALLOWED_RESOLUTIONS = {(384, 640), (576, 960)}
 
 
 def load_story_transitions(root):
@@ -71,6 +73,54 @@ def load_story_transitions(root):
         return {}
 
 
+def load_event_transitions(root):
+    script_path = os.path.join(root, "gen_event_videos.py")
+    if not os.path.exists(script_path):
+        return {}
+    module_name = f"regen_events_{os.path.basename(root)}"
+    try:
+        spec = importlib.util.spec_from_file_location(module_name, script_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        if hasattr(module, "load_events"):
+            events = module.load_events()
+        else:
+            events = getattr(module, "EVENTS", [])
+    except Exception as exc:
+        print(f"[{time.strftime('%H:%M:%S')}] event transition load failed for {root}: {exc}", flush=True)
+        return {}
+    rows = {}
+    for item in events:
+        file_name = item.get("output")
+        if not file_name:
+            continue
+        group = item.get("group", "")
+        if group not in {"ending_video", "monster_release", "monster_attack"}:
+            continue
+        stem = os.path.splitext(file_name)[0]
+        rows[file_name] = {
+            "id": stem,
+            "group": group,
+            "label": stem,
+            "start": item.get("start", "images/hallway.jpg"),
+            "end": item.get("end", ""),
+            "seed": item.get("seed", 0),
+            "num_frames": item.get("num_frames", 73),
+            "promptText": item.get("prompt", ""),
+            "status": "Event clip. Needs review.",
+            "poster": item.get("poster", item.get("start", "images/hallway.jpg")),
+            "common": getattr(module, "COMMON", ""),
+            "negative": getattr(module, "NEGATIVE", ""),
+        }
+    return rows
+
+
+def sanitize_marker_name(name):
+    value = "".join(ch if ch.isalnum() or ch in {"_", "-"} else "_" for ch in str(name).strip().lower())
+    value = "_".join(part for part in value.split("_") if part)
+    return value[:80] or f"marker_{int(time.time())}"
+
+
 class Project:
     """One game's state — config, queues, metadata, and worker thread."""
 
@@ -88,13 +138,18 @@ class Project:
             merged = dict(self.transitions)
             merged.update(load_story_transitions(self.root))
             self.transitions = merged
+        self.event_transitions = load_event_transitions(self.root)
+        self.regen_targets = dict(self.transitions)
+        self.regen_targets.update(self.event_transitions)
         self.extras = cfg.get("extras", [])
         self.extra_prefixes = cfg.get("extra_prefixes", {})
         self.tasks = queue.Queue()
         self.jobs = []
         self.running = None
         self.lock = threading.Lock()
+        self.ref_dir = os.path.join(self.root, "ref")
         os.makedirs(self.video_dir, exist_ok=True)
+        os.makedirs(self.ref_dir, exist_ok=True)
         threading.Thread(target=_worker_loop, args=(self,), daemon=True).start()
 
     # ── per-project helpers ────────────────────────────────────────────
@@ -131,6 +186,31 @@ class Project:
             size_label = f"{size / 1024:.0f} KB"
         return {"bytes": size, "modified": modified, "label": f"{size_label} | {modified}"}
 
+    def marker_src(self, file_name):
+        path = os.path.join(self.ref_dir, file_name)
+        url_file = urllib.parse.quote(file_name)
+        if not os.path.exists(path):
+            return f"http://{HOST}:{PORT}/{self.slug}/ref/{url_file}"
+        stat = os.stat(path)
+        return f"http://{HOST}:{PORT}/{self.slug}/ref/{url_file}?v={int(stat.st_mtime)}-{stat.st_size}"
+
+    def list_markers(self):
+        markers = []
+        if not os.path.isdir(self.ref_dir):
+            return markers
+        for file_name in sorted(os.listdir(self.ref_dir)):
+            if not file_name.lower().endswith((".jpg", ".jpeg", ".png")):
+                continue
+            path = os.path.join(self.ref_dir, file_name)
+            stat = os.stat(path)
+            markers.append({
+                "file": file_name,
+                "name": os.path.splitext(file_name)[0],
+                "src": self.marker_src(file_name),
+                "modified": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)),
+            })
+        return markers
+
     def running_file_name(self):
         if not self.running:
             return None
@@ -160,6 +240,7 @@ class Project:
                 "jobs": self.jobs[-20:],
                 "queue_depth": self.tasks.qsize(),
                 "transitions": self.list_transitions(),
+                "markers": self.list_markers(),
             }
 
     def list_transitions(self):
@@ -190,6 +271,33 @@ class Project:
                 "processing": is_processing,
                 "fileInfo": self.video_file_info(file_name),
                 "exists": os.path.exists(os.path.join(self.video_dir, file_name)),
+            })
+        for file_name, transition in self.event_transitions.items():
+            explicit_files.add(file_name)
+            meta = metadata.get(file_name, {})
+            is_processing = file_name == processing_file
+            status = meta.get("status") or transition.get("status", "Event clip. Needs review.")
+            if is_processing:
+                status = "Processing replacement video. Current preview is the previous file until generation finishes."
+            rows.append({
+                "id": transition["id"],
+                "group": transition["group"],
+                "label": transition["label"],
+                "file": file_name,
+                "src": self.video_row_src(file_name),
+                "poster": meta.get("poster") or transition.get("poster", transition["start"]),
+                "startImage": transition["start"],
+                "endImage": transition.get("end", ""),
+                "promptText": meta.get("promptText") or transition["promptText"],
+                "status": status,
+                "canRedo": True,
+                "canReverse": False,
+                "canMarker": True,
+                "reverseTarget": None,
+                "processing": is_processing,
+                "fileInfo": self.video_file_info(file_name),
+                "exists": os.path.exists(os.path.join(self.video_dir, file_name)),
+                "numFrames": meta.get("num_frames") or transition.get("num_frames", 73),
             })
         for extra in self.extras:
             file_name = extra["file"]
@@ -259,23 +367,37 @@ def download(path, target):
         handle.write(data)
 
 
-def submit_ltx(project, transition, prompt_text):
+def submit_ltx(project, transition, prompt_text, render_options):
+    width = int(render_options.get("width") or GAME_PORTRAIT_WIDTH)
+    height = int(render_options.get("height") or GAME_PORTRAIT_HEIGHT)
+    if (width, height) not in ALLOWED_RESOLUTIONS:
+        width, height = GAME_PORTRAIT_WIDTH, GAME_PORTRAIT_HEIGHT
+    num_frames = max(1, int(render_options.get("num_frames") or transition.get("num_frames") or 73))
+    marker_file = os.path.basename(render_options.get("marker") or "")
+    marker_path = os.path.join(project.ref_dir, marker_file) if marker_file else ""
+    start_image = transition.get("start") or "images/hallway.jpg"
+    end_image = transition.get("end") or ""
+    common = transition.get("common") or project.common
+    negative = transition.get("negative") or project.negative
     payload = {
-        "prompt": f"{prompt_text}, {project.common}",
-        "width": GAME_PORTRAIT_WIDTH,
-        "height": GAME_PORTRAIT_HEIGHT,
-        "num_frames": 73,
+        "prompt": f"{prompt_text}, {common}",
+        "width": width,
+        "height": height,
+        "num_frames": num_frames,
         "fps": 24,
         "seed": int(time.time()) % 100000,
         "num_inference_steps": 20,
         "cfg_scale": 3.0,
-        "negative_prompt": project.negative,
-        "image": os.path.join(project.root, transition["start"]),
-        "image_end": os.path.join(project.root, transition["end"]),
+        "negative_prompt": negative,
+        "image": os.path.join(project.root, start_image),
         "image_strength": 1.0,
         "tiling": "aggressive",
         "no_audio": True,
     }
+    if marker_path and os.path.exists(marker_path):
+        payload["image_end"] = marker_path
+    elif end_image:
+        payload["image_end"] = os.path.join(project.root, end_image)
     return post_json("/api/generate", payload)["job_id"]
 
 
@@ -313,12 +435,13 @@ def process_regen(project, local_job):
     mode = local_job["mode"]
     prompt_text = local_job["promptText"].strip()
     moved_status = local_job.get("movedStatus", "").strip()
-    transition = project.transitions[file_name]
+    transition = project.regen_targets[file_name]
     target = os.path.join(project.video_dir, file_name)
     temp = os.path.join(project.video_dir, f".regen_{file_name}")
 
     local_job["status"] = "queued_ltx"
-    ltx_id = submit_ltx(project, transition, prompt_text)
+    render_options = local_job.get("renderOptions") or {}
+    ltx_id = submit_ltx(project, transition, prompt_text, render_options)
     local_job["ltx_job_id"] = ltx_id
     local_job["status"] = "generating"
     ltx_job = wait_for_ltx(project, ltx_id, local_job)
@@ -342,15 +465,44 @@ def process_regen(project, local_job):
     if moved_name:
         action = f"Replaced target; previous clip moved to {moved_name}"
     metadata[file_name] = {
-        "group": "room_transitions",
-        "poster": transition["start"],
+        "group": transition.get("group", "room_transitions"),
+        "poster": transition.get("poster") or transition["start"],
         "promptText": prompt_text,
         "status": f"{action}. Local regen completed {completed_stamp}.",
         "ltxJobId": ltx_id,
         "bytes": local_job["bytes"],
         "duration_secs": ltx_job.get("duration_secs"),
+        "width": render_options.get("width"),
+        "height": render_options.get("height"),
+        "num_frames": render_options.get("num_frames"),
+        "marker": render_options.get("marker", ""),
     }
     project.save_metadata(metadata)
+    local_job["status"] = "done"
+
+
+def process_marker(project, local_job):
+    file_name = local_job["file"]
+    source = os.path.join(project.video_dir, file_name)
+    if not os.path.exists(source):
+        raise RuntimeError(f"source video missing: {file_name}")
+    marker_name = sanitize_marker_name(local_job.get("name", ""))
+    target_file = f"{marker_name}.jpg"
+    target = os.path.join(project.ref_dir, target_file)
+    seconds = max(0, float(local_job.get("time", 0) or 0))
+    local_job["status"] = "extracting"
+    result = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", f"{seconds:.3f}", "-i", source, "-frames:v", "1", "-q:v", "2", target],
+        cwd=project.root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or f"ffmpeg exited with {result.returncode}")
+    local_job["marker"] = target_file
+    local_job["bytes"] = os.path.getsize(target)
     local_job["status"] = "done"
 
 
@@ -412,7 +564,9 @@ def _worker_loop(project):
         with project.lock:
             project.running = job
         try:
-            if job.get("task") == "reverse":
+            if job.get("task") == "marker":
+                process_marker(project, job)
+            elif job.get("task") == "reverse":
                 process_reverse(project, job)
             else:
                 process_regen(project, job)
@@ -471,6 +625,9 @@ class Handler(BaseHTTPRequestHandler):
         if slug and rest.startswith("/videos/") and slug in PROJECTS:
             self._send_video(PROJECTS[slug], rest, head_only=True)
             return
+        if slug and rest.startswith("/ref/") and slug in PROJECTS:
+            self._send_ref(PROJECTS[slug], rest, head_only=True)
+            return
         self.send_response(404)
         self.end_headers()
 
@@ -503,6 +660,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({"ok": True, **project.queue_snapshot()})
         if rest.startswith("/videos/"):
             return self._send_video(project, rest)
+        if rest.startswith("/ref/"):
+            return self._send_ref(project, rest)
         return self._send_static(project, rest)
 
     def _send_index(self):
@@ -595,12 +754,34 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(chunk)
                 remaining -= len(chunk)
 
+    def _send_ref(self, project, rest, head_only=False):
+        file_name = os.path.basename(rest)
+        if not file_name.lower().endswith((".jpg", ".jpeg", ".png")):
+            return self.send_json({"ok": False, "error": "not found"}, 404)
+        path = os.path.realpath(os.path.join(project.ref_dir, file_name))
+        if not path.startswith(project.ref_dir + os.sep):
+            return self.send_json({"ok": False, "error": "not found"}, 404)
+        if not os.path.exists(path):
+            return self.send_json({"ok": False, "error": "not found"}, 404)
+        stat = os.stat(path)
+        content_type = mimetypes.guess_type(path)[0] or "image/jpeg"
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(stat.st_size))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Last-Modified", self.date_time_string(stat.st_mtime))
+        self.end_headers()
+        if head_only:
+            return
+        with open(path, "rb") as handle:
+            shutil.copyfileobj(handle, self.wfile)
+
     # ── POST dispatch ─────────────────────────────────────────────────
     def do_POST(self):
         slug, rest = self._split_path()
         if slug not in PROJECTS:
             return self.send_json({"ok": False, "error": f"unknown project: {slug}"}, 404)
-        if rest not in {"/api/regen", "/api/reverse"}:
+        if rest not in {"/api/regen", "/api/reverse", "/api/marker"}:
             return self.send_json({"ok": False, "error": "not found"}, 404)
         project = PROJECTS[slug]
         length = int(self.headers.get("Content-Length", "0"))
@@ -611,18 +792,48 @@ class Handler(BaseHTTPRequestHandler):
         file_name = os.path.basename(data.get("file", ""))
         mode = data.get("mode")
         prompt_text = data.get("promptText", "")
-        if file_name not in project.transitions:
+        if rest == "/api/marker":
+            if file_name not in project.event_transitions:
+                return self.send_json({"ok": False, "error": "markers are only enabled for event clips"}, 400)
+            job = {
+                "id": f"{project.slug}-{int(time.time() * 1000)}",
+                "task": "marker",
+                "file": file_name,
+                "name": data.get("name", ""),
+                "time": data.get("time", 0),
+                "status": "queued",
+                "created_at": time.time(),
+                "project": project.slug,
+            }
+            with project.lock:
+                project.jobs.append(job)
+            project.tasks.put(job)
+            return self.send_json({"ok": True, "job": job})
+        if file_name not in project.regen_targets:
             return self.send_json({"ok": False, "error": "unknown transition"}, 400)
         if mode not in {"delete", "move", "other"}:
             return self.send_json({"ok": False, "error": "mode must be delete, move, or other"}, 400)
         is_reverse = rest == "/api/reverse"
         target_file = project.reverse_target_for(file_name) if is_reverse else None
         if is_reverse:
+            if file_name not in project.transitions:
+                return self.send_json({"ok": False, "error": "reverse is only supported for room transitions"}, 400)
             if not target_file:
                 return self.send_json({"ok": False, "error": "transition has no reverse target"}, 400)
         else:
             if not prompt_text.strip():
                 return self.send_json({"ok": False, "error": "promptText is required"}, 400)
+        width = int(data.get("width") or GAME_PORTRAIT_WIDTH)
+        height = int(data.get("height") or GAME_PORTRAIT_HEIGHT)
+        if (width, height) not in ALLOWED_RESOLUTIONS:
+            return self.send_json({"ok": False, "error": "resolution must be 384x640 or 576x960"}, 400)
+        try:
+            num_frames = max(1, int(data.get("numFrames") or 73))
+        except (TypeError, ValueError):
+            return self.send_json({"ok": False, "error": "numFrames must be a number"}, 400)
+        marker = os.path.basename(data.get("marker", ""))
+        if marker and not os.path.exists(os.path.join(project.ref_dir, marker)):
+            return self.send_json({"ok": False, "error": "marker frame not found"}, 400)
         job = {
             "id": f"{project.slug}-{int(time.time() * 1000)}",
             "task": "reverse" if is_reverse else "regen",
@@ -631,6 +842,12 @@ class Handler(BaseHTTPRequestHandler):
             "mode": mode,
             "promptText": prompt_text,
             "movedStatus": data.get("movedStatus", ""),
+            "renderOptions": {
+                "width": width,
+                "height": height,
+                "num_frames": num_frames,
+                "marker": marker,
+            },
             "status": "queued",
             "created_at": time.time(),
             "project": project.slug,

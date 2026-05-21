@@ -748,6 +748,11 @@ button.tag {
 .popup.regen-popup {
   width: min(98vw, 1180px);
   max-height: 94dvh;
+  overflow: auto;
+}
+
+.popup.marker-popup {
+  width: min(100%, 520px);
 }
 
 .popup-head {
@@ -1289,6 +1294,109 @@ button.tag {
   min-height: 170px;
 }
 
+.prompt-editor textarea.short-message {
+  min-height: 74px;
+}
+
+.regen-option-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+  align-items: start;
+}
+
+.regen-option-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--muted);
+}
+
+.regen-option-group > span,
+.regen-option-group label > span {
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.regen-option-group small {
+  color: var(--dim);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.segmented-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.regen-option-group input {
+  width: 100%;
+  border: 1px solid rgba(173, 132, 90, 0.24);
+  border-radius: 8px;
+  background: rgba(1, 6, 10, 0.64);
+  color: var(--ink);
+  padding: 10px;
+}
+
+.marker-picker {
+  position: relative;
+}
+
+.marker-picker .glass-button {
+  min-height: 38px;
+  padding: 8px 10px;
+}
+
+.marker-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 4;
+  display: grid;
+  gap: 8px;
+  width: min(360px, 86vw);
+  max-height: min(380px, 48dvh);
+  overflow: auto;
+  border: 1px solid rgba(173, 132, 90, 0.24);
+  border-radius: 8px;
+  background: rgba(18, 10, 6, 0.98);
+  box-shadow: var(--shadow);
+  padding: 8px;
+}
+
+.marker-choice {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 72px;
+  text-align: left;
+}
+
+.marker-choice img {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.marker-choice strong,
+.marker-choice small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.marker-choice small {
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
 .regen-actions {
   grid-template-columns: repeat(3, 1fr);
   margin-top: 12px;
@@ -1426,11 +1534,28 @@ button.tag {
 
   .debug-grid {
     grid-template-columns: minmax(240px, 0.68fr) minmax(300px, 1.32fr);
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
   }
 
   .debug-grid > section:first-child {
     width: min(100%, 430px);
     justify-self: center;
+    max-height: 100%;
+    overflow: auto;
+  }
+
+  .debug-grid > section:last-child {
+    min-height: 0;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .popup.debug-popup {
+    display: flex;
+    flex-direction: column;
+    height: min(94dvh, 900px);
   }
 }
 

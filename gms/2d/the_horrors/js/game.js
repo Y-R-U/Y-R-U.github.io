@@ -29,6 +29,10 @@
   let debugTransitions = [];
   let selectedTransition = null;
   let selectedReverseTransition = null;
+  let selectedMarkerTransition = null;
+  let helperMarkers = [];
+  let selectedRegenMarker = "";
+  let regenRenderOptions = { width: 384, height: 640, numFrames: 73 };
   let previewedTransition = null;
   let helperPoll = 0;
   let debugFilter = "room";
@@ -97,6 +101,12 @@
     regenFile: $("regen-file"),
     regenPrompt: $("regen-prompt"),
     regenMoveMessage: $("regen-move-message"),
+    regenFrames: $("regen-frames"),
+    regenFrameSeconds: $("regen-frame-seconds"),
+    regenMarkerWrap: $("regen-marker-wrap"),
+    regenMarkerToggle: $("regen-marker-toggle"),
+    regenMarkerClear: $("regen-marker-clear"),
+    regenMarkerList: $("regen-marker-list"),
     regenDelete: $("regen-delete"),
     regenMove: $("regen-move"),
     regenOther: $("regen-other"),
@@ -105,6 +115,9 @@
     reverseDelete: $("reverse-delete"),
     reverseMove: $("reverse-move"),
     reverseOther: $("reverse-other"),
+    markerSummary: $("marker-summary"),
+    markerName: $("marker-name"),
+    markerSave: $("marker-save"),
     settingsButton: $("settings-button"),
     musicToggle: $("music-toggle"),
     soundToggle: $("sound-toggle"),
@@ -276,6 +289,16 @@
     els.regenDelete.addEventListener("click", () => submitRegen("delete"));
     els.regenMove.addEventListener("click", () => submitRegen("move"));
     els.regenOther.addEventListener("click", () => submitRegen("other"));
+    document.querySelectorAll("[data-regen-resolution]").forEach(button => {
+      button.addEventListener("click", () => setRegenResolution(button.dataset.regenResolution));
+    });
+    document.querySelectorAll("[data-regen-duration]").forEach(button => {
+      button.addEventListener("click", () => setRegenFrames(parseInt(button.dataset.regenDuration, 10)));
+    });
+    els.regenFrames.addEventListener("input", () => setRegenFrames(parseInt(els.regenFrames.value, 10), false));
+    els.regenMarkerToggle.addEventListener("click", toggleMarkerList);
+    els.regenMarkerClear.addEventListener("click", () => selectRegenMarker(""));
+    els.markerSave.addEventListener("click", saveMarkerFrame);
     els.reverseDelete.addEventListener("click", () => submitReverse("delete"));
     els.reverseMove.addEventListener("click", () => submitReverse("move"));
     els.reverseOther.addEventListener("click", () => submitReverse("other"));
@@ -1824,14 +1847,20 @@
         redo.className = "glass-button slim debug-redo";
         redo.type = "button";
         redo.textContent = "Redo";
-        redo.disabled = !!transition.processing || !helperOnline || !transition.promptText || transition.group !== "room_transitions";
+        redo.disabled = !canRedoTransition(transition);
         redo.addEventListener("click", () => openRegenPanel(transition));
         const reverse = document.createElement("button");
         reverse.className = "glass-button slim debug-reverse";
         reverse.type = "button";
-        reverse.textContent = "Reverse";
-        reverse.disabled = !!transition.processing || !helperOnline || !transition.canReverse || transition.group !== "room_transitions";
-        reverse.addEventListener("click", () => openReversePanel(transition));
+        if (isEventTransition(transition)) {
+          reverse.textContent = "Marker";
+          reverse.disabled = !canSaveMarker(transition);
+          reverse.addEventListener("click", () => openMarkerPanel(transition));
+        } else {
+          reverse.textContent = "Reverse";
+          reverse.disabled = !canReverseTransition(transition);
+          reverse.addEventListener("click", () => openReversePanel(transition));
+        }
         row.append(pick, copy, redo, reverse);
         section.append(row);
       });
@@ -1917,6 +1946,25 @@
     });
   }
 
+  function isEventTransition(transition) {
+    return ["ending_video", "monster_release", "monster_attack"].includes(transition.group);
+  }
+
+  function canRedoTransition(transition) {
+    if (!helperOnline || !!transition.processing || !transition.promptText) return false;
+    if (transition.group === "room_transitions") return transition.canRedo !== false;
+    if (isEventTransition(transition)) return transition.canRedo === true;
+    return false;
+  }
+
+  function canReverseTransition(transition) {
+    return helperOnline && !transition.processing && transition.group === "room_transitions" && !!transition.canReverse;
+  }
+
+  function canSaveMarker(transition) {
+    return helperOnline && !transition.processing && isEventTransition(transition) && !!transition.exists;
+  }
+
   function getVisibleDebugGroups() {
     const groups = [
       ["room_transitions", "Room transitions"],
@@ -1989,10 +2037,12 @@
       const result = await helperFetch("/status", { method: "GET" });
       helperOnline = true;
       debugTransitions = Array.isArray(result.transitions) ? result.transitions : [];
+      helperMarkers = Array.isArray(result.markers) ? result.markers : [];
       renderHelperStatus(result);
     } catch (err) {
       helperOnline = false;
       debugTransitions = [];
+      helperMarkers = [];
       els.debugHelperStatus.textContent = "Local regen helper: offline";
     }
     renderDebugList();
@@ -2031,6 +2081,75 @@
     }
   }
 
+  function setRegenResolution(value) {
+    const [width, height] = String(value || "384x640").split("x").map(Number);
+    regenRenderOptions.width = width === 576 && height === 960 ? 576 : 384;
+    regenRenderOptions.height = width === 576 && height === 960 ? 960 : 640;
+    document.querySelectorAll("[data-regen-resolution]").forEach(button => {
+      button.classList.toggle("active", button.dataset.regenResolution === `${regenRenderOptions.width}x${regenRenderOptions.height}`);
+    });
+  }
+
+  function setRegenFrames(frames, syncInput = true) {
+    const next = Number.isFinite(frames) && frames > 0 ? Math.round(frames) : 73;
+    regenRenderOptions.numFrames = next;
+    if (syncInput) els.regenFrames.value = String(next);
+    els.regenFrameSeconds.textContent = `${(next / 24).toFixed(2)}s`;
+    document.querySelectorAll("[data-regen-duration]").forEach(button => {
+      button.classList.toggle("active", parseInt(button.dataset.regenDuration, 10) === next);
+    });
+  }
+
+  function setupRegenOptions(transition) {
+    setRegenResolution("384x640");
+    setRegenFrames(transition.numFrames || (isEventTransition(transition) && transition.group === "ending_video" ? 121 : 73));
+    selectedRegenMarker = "";
+    const canUseMarkers = isEventTransition(transition);
+    els.regenMarkerWrap.hidden = !canUseMarkers;
+    els.regenMarkerList.hidden = true;
+    renderMarkerList();
+    selectRegenMarker("");
+  }
+
+  function renderMarkerList() {
+    els.regenMarkerList.innerHTML = "";
+    if (!helperMarkers.length) {
+      const empty = document.createElement("p");
+      empty.className = "debug-note";
+      empty.textContent = "No saved marker frames yet.";
+      els.regenMarkerList.append(empty);
+      return;
+    }
+    helperMarkers.forEach(marker => {
+      const button = document.createElement("button");
+      button.className = "glass-button marker-choice";
+      button.type = "button";
+      button.innerHTML = `<img src="${UI.escapeHtml(marker.src)}" alt=""><span><strong>${UI.escapeHtml(marker.name)}</strong><small>${UI.escapeHtml(marker.modified || "")}</small></span>`;
+      button.addEventListener("click", () => {
+        selectRegenMarker(marker.file);
+        els.regenMarkerList.hidden = true;
+      });
+      els.regenMarkerList.append(button);
+    });
+  }
+
+  function selectRegenMarker(file) {
+    selectedRegenMarker = file || "";
+    const marker = helperMarkers.find(item => item.file === selectedRegenMarker);
+    els.regenMarkerToggle.textContent = marker ? marker.name : "No marker selected";
+  }
+
+  function toggleMarkerList() {
+    els.regenMarkerList.hidden = !els.regenMarkerList.hidden;
+  }
+
+  function defaultMarkerName(transition) {
+    const stem = (transition.file || "").replace(/\.mp4$/i, "");
+    if (stem.startsWith("monster_release_")) return `${stem.replace("monster_release_", "")}_release`;
+    if (stem.startsWith("monster_attack_")) return `${stem.replace("monster_attack_", "")}_attack`;
+    return stem || "marker";
+  }
+
   function openRegenPanel(transition) {
     if (!helperOnline) {
       UI.toast("Start regen_helper.py first");
@@ -2040,7 +2159,22 @@
     els.regenFile.textContent = transition.file;
     els.regenPrompt.value = transition.promptText || "";
     els.regenMoveMessage.value = transition.status || "";
+    setupRegenOptions(transition);
     UI.openPanel("regen-panel");
+  }
+
+  function openMarkerPanel(transition) {
+    if (!helperOnline) {
+      UI.toast("Start regen_helper.py first");
+      return;
+    }
+    selectedMarkerTransition = transition;
+    const time = Number.isFinite(els.debugVideo.currentTime) ? els.debugVideo.currentTime : 0;
+    els.markerSummary.textContent = `Save a marker from ${transition.file} at ${time.toFixed(2)}s.`;
+    els.markerName.value = defaultMarkerName(transition);
+    UI.openPanel("marker-panel");
+    els.markerName.focus();
+    els.markerName.select();
   }
 
   function openReversePanel(transition) {
@@ -2081,11 +2215,39 @@
           file: selectedTransition.file,
           promptText,
           movedStatus: els.regenMoveMessage.value.trim(),
+          width: regenRenderOptions.width,
+          height: regenRenderOptions.height,
+          numFrames: regenRenderOptions.numFrames,
+          marker: selectedRegenMarker,
           mode,
         }),
       });
       UI.closePanel("regen-panel");
       UI.toast(`Queued ${result.job.file}`);
+      refreshHelperStatus();
+    } catch (err) {
+      UI.toast(err.message || "Helper request failed");
+    }
+  }
+
+  async function saveMarkerFrame() {
+    if (!selectedMarkerTransition) return;
+    const name = els.markerName.value.trim();
+    if (!name) {
+      UI.toast("Marker name is required");
+      return;
+    }
+    try {
+      const result = await helperFetch("/marker", {
+        method: "POST",
+        body: JSON.stringify({
+          file: selectedMarkerTransition.file,
+          name,
+          time: Number.isFinite(els.debugVideo.currentTime) ? els.debugVideo.currentTime : 0,
+        }),
+      });
+      UI.closePanel("marker-panel");
+      UI.toast(`Queued marker ${result.job.name}`);
       refreshHelperStatus();
     } catch (err) {
       UI.toast(err.message || "Helper request failed");
