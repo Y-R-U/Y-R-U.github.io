@@ -39,6 +39,7 @@ import urllib.parse
 import urllib.request
 
 LTX_API = "http://localhost:7866"
+MFLUX_API = "http://localhost:7867"
 HOST = "127.0.0.1"
 PORT = 8788
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +47,22 @@ SEARCH_GLOB = os.path.expanduser("~/cc/yru/site/gms/2d/*/regen_config.json")
 GAME_PORTRAIT_WIDTH = 384
 GAME_PORTRAIT_HEIGHT = 640
 ALLOWED_RESOLUTIONS = {(384, 640), (576, 960)}
+
+# Image redo (still generation) runs on the mflux-queue warm server, which does
+# both txt2img (rooms / success end-frames) and multi-ref edit (monster-in-hallway
+# composites). Matched 3:5 portrait, 9B-4bit @ 10 steps — see the airon
+# project-awake-video-pipeline memory for why these are the go-forward defaults.
+IMAGE_MODEL = "flux2-klein-9b-mlx-4bit"
+IMAGE_STEPS = 10
+IMAGE_WIDTH = 768
+IMAGE_HEIGHT = 1280
+# Monster character reference: a clean identity portrait reused across every
+# redo of that monster's release/attack clips so the creature stays consistent.
+MONSTER_REF_STYLE = (
+    "full-body character reference, one single creature centered in frame, "
+    "plain dark neutral background, dramatic rim lighting, sharp high detail, "
+    "no people, no human bystanders, no readable text, no watermark, no logo"
+)
 
 
 def load_story_transitions(root):
@@ -73,15 +90,29 @@ def load_story_transitions(root):
         return {}
 
 
-def load_event_transitions(root):
-    script_path = os.path.join(root, "gen_event_videos.py")
+def import_project_module(root, filename):
+    """Import a project's gen_*.py module so we can reuse its prompt builders
+    and style strings. Returns the module or None (missing/failed import)."""
+    script_path = os.path.join(root, filename)
     if not os.path.exists(script_path):
-        return {}
-    module_name = f"regen_events_{os.path.basename(root)}"
+        return None
+    module_name = f"regen_{os.path.splitext(filename)[0]}_{os.path.basename(root)}"
     try:
         spec = importlib.util.spec_from_file_location(module_name, script_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        return module
+    except Exception as exc:
+        print(f"[{time.strftime('%H:%M:%S')}] import {filename} failed for {root}: {exc}", flush=True)
+        return None
+
+
+def load_event_transitions(root, module=None):
+    if module is None:
+        module = import_project_module(root, "gen_event_videos.py")
+    if module is None:
+        return {}
+    try:
         if hasattr(module, "load_events"):
             events = module.load_events()
         else:
@@ -121,6 +152,134 @@ def sanitize_marker_name(name):
     return value[:80] or f"marker_{int(time.time())}"
 
 
+def room_id_from_transition(file_name):
+    if file_name.endswith("_to_hallway.mp4"):
+        return file_name.removesuffix("_to_hallway.mp4")
+    if file_name.startswith("hallway_to_") and file_name.endswith(".mp4"):
+        return file_name.removeprefix("hallway_to_").removesuffix(".mp4")
+    return None
+
+
+def monster_id_from_transition(file_name):
+    stem = os.path.splitext(file_name)[0]
+    if stem.startswith("monster_release_"):
+        return stem.removeprefix("monster_release_"), "release"
+    if stem.startswith("monster_attack_"):
+        return stem.removeprefix("monster_attack_"), "attack"
+    return None, None
+
+
+def build_image_meta(project):
+    """Per-transition still-generation metadata: which non-hallway image an
+    Image-Redo regenerates, its editable prompt, and which video(s) it feeds.
+
+    Rooms feed two clips (room->hallway and hallway->room); monster and success
+    clips feed one each. Best-effort — a missing module/attr just yields a blank
+    prompt the user can fill in by hand."""
+    meta = {}
+    img = project.image_module
+    evt = project.event_module
+
+    # ── rooms ──────────────────────────────────────────────────────────
+    # Two game layouts: awake builds prompts from story.js rooms via
+    # image_prompt(); the_horrors hardcodes an IMAGES list of (file, w, h, prompt).
+    style = getattr(img, "STYLE", "") if img is not None else ""
+    rooms = {}
+    if img is not None and hasattr(img, "load_story"):
+        try:
+            rooms = (img.load_story() or {}).get("rooms", {}) or {}
+        except Exception as exc:
+            print(f"[{time.strftime('%H:%M:%S')}] room story load failed: {exc}", flush=True)
+    images_list = {}
+    for entry in (getattr(img, "IMAGES", []) or []):
+        try:
+            images_list[os.path.splitext(entry[0])[0]] = entry[-1]
+        except (IndexError, TypeError):
+            continue
+
+    def room_prompt(room):
+        if room in rooms and img is not None and hasattr(img, "image_prompt"):
+            try:
+                base = img.image_prompt(rooms[room])
+                return f"{base}, {style}" if style else base
+            except Exception:
+                pass
+        if room in images_list:
+            base = images_list[room]
+            return f"{base}, {style}" if style else base
+        return ""
+
+    seen_rooms = set()
+    for file_name in project.transitions:
+        room = room_id_from_transition(file_name)
+        if not room or room == "hallway":
+            continue
+        siblings = [f"{room}_to_hallway.mp4", f"hallway_to_{room}.mp4"]
+        video_files = [f for f in siblings if f in project.transitions]
+        prompt = room_prompt(room)
+        info = {
+            "kind": "room",
+            "imagePrompt": prompt,
+            "otherImage": f"images/{room}.jpg",
+            "otherImagePng": f"original_files/{room}.png",
+            "videoFiles": video_files,
+            "endFrame": False,
+            "monsterId": "",
+        }
+        for f in video_files:
+            meta[f] = info
+        seen_rooms.add(room)
+
+    # ── monsters (release / attack) ────────────────────────────────────
+    threats = {}
+    if evt is not None and hasattr(evt, "load_story"):
+        try:
+            threats = {t["id"]: t for t in (evt.load_story() or {}).get("threats", [])}
+        except Exception as exc:
+            print(f"[{time.strftime('%H:%M:%S')}] threat story load failed: {exc}", flush=True)
+    visuals = getattr(evt, "THREAT_VISUALS", {}) if evt is not None else {}
+    for file_name, transition in project.event_transitions.items():
+        monster_id, variant = monster_id_from_transition(file_name)
+        if not monster_id:
+            continue
+        # Start-frame prompt: the event's own per-monster prompt already places
+        # the creature in the hallway and is hand-tuned in both games.
+        start_prompt = transition.get("promptText", "")
+        # Character-reference prompt: prefer a clean visual descriptor; the user
+        # can edit it before re-rolling the saved monster reference.
+        visual = (visuals.get(monster_id) if visuals else "") or (threats.get(monster_id, {}).get("name") if threats else "")
+        ref_basis = visual or start_prompt or f"the {monster_id}"
+        meta[file_name] = {
+            "kind": f"monster_{variant}",
+            "imagePrompt": start_prompt,
+            "otherImage": f"images/monster_{variant}_{monster_id}_start.jpg",
+            "otherImagePng": f"original_files/monster_{variant}_{monster_id}_start.png",
+            "videoFiles": [file_name],
+            "endFrame": False,
+            "monsterId": monster_id,
+            "monsterRefFile": f"monster_{monster_id}.png",
+            "monsterRefPrompt": f"{ref_basis}, {MONSTER_REF_STYLE}",
+        }
+
+    # ── success / ending videos (still becomes the end-frame) ──────────
+    victory = getattr(evt, "VICTORY_PROMPTS", {}) if evt is not None else {}
+    for file_name, transition in project.event_transitions.items():
+        if transition.get("group") != "ending_video":
+            continue
+        stem = os.path.splitext(file_name)[0]
+        prompt = victory.get(file_name) or transition.get("promptText", "")
+        meta[file_name] = {
+            "kind": "success",
+            "imagePrompt": prompt,
+            "otherImage": f"images/{stem}_end.jpg",
+            "otherImagePng": f"original_files/{stem}_end.png",
+            "videoFiles": [file_name],
+            "endFrame": True,
+            "monsterId": "",
+        }
+    return meta
+
+
 class Project:
     """One game's state — config, queues, metadata, and worker thread."""
 
@@ -138,7 +297,9 @@ class Project:
             merged = dict(self.transitions)
             merged.update(load_story_transitions(self.root))
             self.transitions = merged
-        self.event_transitions = load_event_transitions(self.root)
+        self.image_module = import_project_module(self.root, "gen_images.py")
+        self.event_module = import_project_module(self.root, "gen_event_videos.py")
+        self.event_transitions = load_event_transitions(self.root, self.event_module)
         self.regen_targets = dict(self.transitions)
         self.regen_targets.update(self.event_transitions)
         self.extras = cfg.get("extras", [])
@@ -148,8 +309,15 @@ class Project:
         self.running = None
         self.lock = threading.Lock()
         self.ref_dir = os.path.join(self.root, "ref")
+        self.preview_dir = os.path.join(self.root, ".image_previews")
         os.makedirs(self.video_dir, exist_ok=True)
         os.makedirs(self.ref_dir, exist_ok=True)
+        os.makedirs(self.preview_dir, exist_ok=True)
+        self.image_meta = {}
+        try:
+            self.image_meta = build_image_meta(self)
+        except Exception as exc:
+            print(f"[{time.strftime('%H:%M:%S')}] image meta build failed for {self.root}: {exc}", flush=True)
         threading.Thread(target=_worker_loop, args=(self,), daemon=True).start()
 
     # ── per-project helpers ────────────────────────────────────────────
@@ -341,7 +509,27 @@ class Project:
                 "fileInfo": self.video_file_info(file_name),
                 "exists": True,
             })
+        for row in rows:
+            info = self.image_meta.get(row["file"])
+            if not info:
+                continue
+            decorated = dict(info)
+            ref_file = info.get("monsterRefFile")
+            if ref_file:
+                ref_path = os.path.join(self.ref_dir, ref_file)
+                decorated["monsterRefExists"] = os.path.exists(ref_path)
+                decorated["monsterRefSrc"] = self.marker_src(ref_file) if os.path.exists(ref_path) else ""
+            decorated["otherImageExists"] = os.path.exists(os.path.join(self.root, info["otherImage"]))
+            row["imageRedo"] = decorated
         return rows
+
+    def preview_src(self, file_name):
+        path = os.path.join(self.preview_dir, file_name)
+        url_file = urllib.parse.quote(file_name)
+        if not os.path.exists(path):
+            return f"http://{HOST}:{PORT}/{self.slug}/preview/{url_file}"
+        stat = os.stat(path)
+        return f"http://{HOST}:{PORT}/{self.slug}/preview/{url_file}?v={int(stat.st_mtime)}-{stat.st_size}"
 
 
 # ── LTX HTTP helpers (shared across all projects) ──────────────────────
@@ -367,6 +555,86 @@ def download(path, target):
         handle.write(data)
 
 
+# ── mflux-queue HTTP helpers (image generation) ────────────────────────
+def mflux_post(path, payload):
+    request = urllib.request.Request(
+        f"{MFLUX_API}{path}",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:
+        return json.load(response)
+
+
+def mflux_get(path):
+    with urllib.request.urlopen(f"{MFLUX_API}{path}", timeout=60) as response:
+        return json.load(response)
+
+
+def mflux_download(path, target):
+    with urllib.request.urlopen(f"{MFLUX_API}{path}", timeout=240) as response:
+        data = response.read()
+    with open(target, "wb") as handle:
+        handle.write(data)
+
+
+def best_effort_unload(api):
+    """Free a backend's resident model so the other can fit in 24 GB.
+    Swallows 409 (job in flight) and connection errors."""
+    try:
+        request = urllib.request.Request(f"{api}/admin/unload", data=b"{}",
+                                         headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(request, timeout=30):
+            return True
+    except Exception:
+        return False
+
+
+def wait_for_ltx_idle(local_job, timeout=150):
+    """LTX has no explicit unload — it drops its ~16 GB worker after 120 s of
+    queue idle. Before loading Flux, wait for that so they don't co-reside."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            status = get_json("/api/status")
+        except Exception:
+            return
+        if not status.get("worker_warm"):
+            return
+        local_job["status"] = "waiting_ltx_idle"
+        time.sleep(5)
+
+
+def mflux_generate(prompt, target, *, mode="txt2img", image_paths=None, local_job=None):
+    """Generate one still on mflux-queue and download it to target."""
+    payload = {
+        "mode": mode,
+        "prompt": prompt,
+        "model": IMAGE_MODEL,
+        "width": IMAGE_WIDTH,
+        "height": IMAGE_HEIGHT,
+        "num_inference_steps": IMAGE_STEPS,
+        "seed": int(time.time()) % 100000,
+        "num_images": 1,
+    }
+    if mode == "edit":
+        payload["image_paths"] = image_paths or []
+    job_id = mflux_post("/api/generate", payload)["job_id"]
+    if local_job is not None:
+        local_job["mflux_job_id"] = job_id
+    while True:
+        job = mflux_get(f"/api/jobs/{job_id}")
+        if local_job is not None:
+            local_job["mflux_status"] = job.get("status")
+        if job.get("status") == "done":
+            break
+        if job.get("status") in {"failed", "cancelled"}:
+            raise RuntimeError(f"mflux job {job_id} ended with {job.get('status')}: {job.get('error', '')}")
+        time.sleep(3)
+    mflux_download(f"/api/jobs/{job_id}/file/0", target)
+    return target
+
+
 def submit_ltx(project, transition, prompt_text, render_options):
     width = int(render_options.get("width") or GAME_PORTRAIT_WIDTH)
     height = int(render_options.get("height") or GAME_PORTRAIT_HEIGHT)
@@ -375,8 +643,10 @@ def submit_ltx(project, transition, prompt_text, render_options):
     num_frames = max(1, int(render_options.get("num_frames") or transition.get("num_frames") or 73))
     marker_file = os.path.basename(render_options.get("marker") or "")
     marker_path = os.path.join(project.ref_dir, marker_file) if marker_file else ""
-    start_image = transition.get("start") or "images/hallway.jpg"
-    end_image = transition.get("end") or ""
+    # Image-Redo wires its generated still in here: a monster start-frame
+    # overrides the start image; a success destination overrides the end frame.
+    start_image = render_options.get("start_image") or transition.get("start") or "images/hallway.jpg"
+    end_image = render_options.get("end_image") or transition.get("end") or ""
     common = transition.get("common") or project.common
     negative = transition.get("negative") or project.negative
     payload = {
@@ -441,6 +711,8 @@ def process_regen(project, local_job):
 
     local_job["status"] = "queued_ltx"
     render_options = local_job.get("renderOptions") or {}
+    # Free the Flux worker so LTX (~16 GB) fits in 24 GB before we render video.
+    best_effort_unload(MFLUX_API)
     ltx_id = submit_ltx(project, transition, prompt_text, render_options)
     local_job["ltx_job_id"] = ltx_id
     local_job["status"] = "generating"
@@ -479,6 +751,111 @@ def process_regen(project, local_job):
     }
     project.save_metadata(metadata)
     local_job["status"] = "done"
+
+
+def hallway_reference(project):
+    """Highest-quality hallway still available, for monster composites."""
+    for candidate in ("original_files/hallway.png", "images/hallway.jpg", "images/hallway.png"):
+        path = os.path.join(project.root, candidate)
+        if os.path.exists(path):
+            return path
+    return os.path.join(project.root, "images/hallway.jpg")
+
+
+def png_to_jpg(src_png, dst_jpg, quality=85):
+    os.makedirs(os.path.dirname(dst_jpg), exist_ok=True)
+    subprocess.run(
+        ["sips", "-s", "format", "jpeg", "-s", "formatOptions", str(quality), src_png, "--out", dst_jpg],
+        check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+
+
+def process_image_preview(project, local_job):
+    file_name = local_job["file"]
+    info = project.image_meta.get(file_name)
+    if not info:
+        raise RuntimeError(f"no image-redo metadata for {file_name}")
+    prompt = (local_job.get("promptText") or info.get("imagePrompt") or "").strip()
+    if not prompt:
+        raise RuntimeError("image prompt is required")
+    kind = info["kind"]
+    # Let LTX drop its worker so Flux has room (24 GB box).
+    wait_for_ltx_idle(local_job)
+    local_job["status"] = "generating_image"
+    token = f"{os.path.splitext(file_name)[0]}_{int(time.time())}.png"
+    preview_path = os.path.join(project.preview_dir, token)
+
+    if kind in {"monster_release", "monster_attack"} and local_job.get("useMonsterRef", True):
+        ref_file = info["monsterRefFile"]
+        ref_path = os.path.join(project.ref_dir, ref_file)
+        if not os.path.exists(ref_path) or local_job.get("rerollRef"):
+            ref_prompt = (local_job.get("monsterRefPrompt") or info.get("monsterRefPrompt") or "").strip()
+            local_job["status"] = "generating_monster_ref"
+            mflux_generate(ref_prompt, ref_path, mode="txt2img", local_job=local_job)
+            local_job["monsterRefSrc"] = project.marker_src(ref_file)
+        else:
+            local_job["monsterRefSrc"] = project.marker_src(ref_file)
+        local_job["status"] = "compositing"
+        mflux_generate(prompt, preview_path, mode="edit",
+                       image_paths=[hallway_reference(project), ref_path], local_job=local_job)
+    else:
+        mflux_generate(prompt, preview_path, mode="txt2img", local_job=local_job)
+
+    local_job["preview"] = token
+    local_job["previewSrc"] = project.preview_src(token)
+    local_job["imagePrompt"] = prompt
+    local_job["status"] = "image_ready"
+
+
+def commit_image(project, file_name, preview_token, render_options, mode, moved_status):
+    """Move an accepted preview into the game's image paths and enqueue the
+    video redo(s) it feeds. Rooms feed two clips; monster/success feed one."""
+    info = project.image_meta.get(file_name)
+    if not info:
+        raise RuntimeError(f"no image-redo metadata for {file_name}")
+    preview_path = os.path.join(project.preview_dir, os.path.basename(preview_token))
+    if not os.path.exists(preview_path):
+        raise RuntimeError("preview image not found; regenerate it first")
+    png_dst = os.path.join(project.root, info["otherImagePng"])
+    jpg_dst = os.path.join(project.root, info["otherImage"])
+    os.makedirs(os.path.dirname(png_dst), exist_ok=True)
+    shutil.copyfile(preview_path, png_dst)
+    png_to_jpg(png_dst, jpg_dst)
+
+    enqueued = []
+    for video_file in info["videoFiles"]:
+        if video_file not in project.regen_targets:
+            continue
+        transition = project.regen_targets[video_file]
+        opts = {
+            "width": render_options.get("width"),
+            "height": render_options.get("height"),
+            "num_frames": render_options.get("num_frames"),
+            "marker": "",
+        }
+        if info.get("endFrame"):
+            opts["end_image"] = info["otherImage"]
+        elif info["kind"].startswith("monster_"):
+            opts["start_image"] = info["otherImage"]
+        job = {
+            "id": f"{project.slug}-{int(time.time() * 1000)}-{len(enqueued)}",
+            "task": "regen",
+            "file": video_file,
+            "targetFile": None,
+            "mode": mode,
+            "promptText": transition.get("promptText", ""),
+            "movedStatus": moved_status,
+            "renderOptions": opts,
+            "status": "queued",
+            "created_at": time.time(),
+            "project": project.slug,
+            "fromImageRedo": True,
+        }
+        with project.lock:
+            project.jobs.append(job)
+        project.tasks.put(job)
+        enqueued.append(job)
+    return enqueued
 
 
 def process_marker(project, local_job):
@@ -568,6 +945,8 @@ def _worker_loop(project):
                 process_marker(project, job)
             elif job.get("task") == "reverse":
                 process_reverse(project, job)
+            elif job.get("task") == "image_preview":
+                process_image_preview(project, job)
             else:
                 process_regen(project, job)
         except Exception as err:
@@ -628,6 +1007,9 @@ class Handler(BaseHTTPRequestHandler):
         if slug and rest.startswith("/ref/") and slug in PROJECTS:
             self._send_ref(PROJECTS[slug], rest, head_only=True)
             return
+        if slug and rest.startswith("/preview/") and slug in PROJECTS:
+            self._send_ref(PROJECTS[slug], rest, head_only=True, base_dir=PROJECTS[slug].preview_dir)
+            return
         self.send_response(404)
         self.end_headers()
 
@@ -662,6 +1044,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send_video(project, rest)
         if rest.startswith("/ref/"):
             return self._send_ref(project, rest)
+        if rest.startswith("/preview/"):
+            return self._send_ref(project, rest, base_dir=project.preview_dir)
         return self._send_static(project, rest)
 
     def _send_index(self):
@@ -754,12 +1138,13 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(chunk)
                 remaining -= len(chunk)
 
-    def _send_ref(self, project, rest, head_only=False):
+    def _send_ref(self, project, rest, head_only=False, base_dir=None):
+        base = base_dir or project.ref_dir
         file_name = os.path.basename(rest)
         if not file_name.lower().endswith((".jpg", ".jpeg", ".png")):
             return self.send_json({"ok": False, "error": "not found"}, 404)
-        path = os.path.realpath(os.path.join(project.ref_dir, file_name))
-        if not path.startswith(project.ref_dir + os.sep):
+        path = os.path.realpath(os.path.join(base, file_name))
+        if not path.startswith(base + os.sep):
             return self.send_json({"ok": False, "error": "not found"}, 404)
         if not os.path.exists(path):
             return self.send_json({"ok": False, "error": "not found"}, 404)
@@ -781,7 +1166,7 @@ class Handler(BaseHTTPRequestHandler):
         slug, rest = self._split_path()
         if slug not in PROJECTS:
             return self.send_json({"ok": False, "error": f"unknown project: {slug}"}, 404)
-        if rest not in {"/api/regen", "/api/reverse", "/api/marker"}:
+        if rest not in {"/api/regen", "/api/reverse", "/api/marker", "/api/image_preview", "/api/image_commit"}:
             return self.send_json({"ok": False, "error": "not found"}, 404)
         project = PROJECTS[slug]
         length = int(self.headers.get("Content-Length", "0"))
@@ -809,6 +1194,50 @@ class Handler(BaseHTTPRequestHandler):
                 project.jobs.append(job)
             project.tasks.put(job)
             return self.send_json({"ok": True, "job": job})
+        if rest == "/api/image_preview":
+            if file_name not in project.image_meta:
+                return self.send_json({"ok": False, "error": "image redo is not available for this transition"}, 400)
+            job = {
+                "id": f"{project.slug}-{int(time.time() * 1000)}",
+                "task": "image_preview",
+                "file": file_name,
+                "promptText": prompt_text,
+                "useMonsterRef": bool(data.get("useMonsterRef", True)),
+                "monsterRefPrompt": data.get("monsterRefPrompt", ""),
+                "rerollRef": bool(data.get("rerollRef", False)),
+                "status": "queued",
+                "created_at": time.time(),
+                "project": project.slug,
+            }
+            with project.lock:
+                project.jobs.append(job)
+            project.tasks.put(job)
+            return self.send_json({"ok": True, "job": job})
+        if rest == "/api/image_commit":
+            if file_name not in project.image_meta:
+                return self.send_json({"ok": False, "error": "image redo is not available for this transition"}, 400)
+            if mode not in {"delete", "move", "other"}:
+                return self.send_json({"ok": False, "error": "mode must be delete, move, or other"}, 400)
+            preview_token = os.path.basename(data.get("preview", ""))
+            if not preview_token:
+                return self.send_json({"ok": False, "error": "preview token is required"}, 400)
+            c_width = int(data.get("width") or GAME_PORTRAIT_WIDTH)
+            c_height = int(data.get("height") or GAME_PORTRAIT_HEIGHT)
+            if (c_width, c_height) not in ALLOWED_RESOLUTIONS:
+                return self.send_json({"ok": False, "error": "resolution must be 384x640 or 576x960"}, 400)
+            try:
+                c_frames = max(1, int(data.get("numFrames") or 73))
+            except (TypeError, ValueError):
+                return self.send_json({"ok": False, "error": "numFrames must be a number"}, 400)
+            try:
+                enqueued = commit_image(
+                    project, file_name, preview_token,
+                    {"width": c_width, "height": c_height, "num_frames": c_frames},
+                    mode, data.get("movedStatus", "").strip(),
+                )
+            except Exception as exc:
+                return self.send_json({"ok": False, "error": str(exc)}, 400)
+            return self.send_json({"ok": True, "jobs": enqueued})
         if file_name not in project.regen_targets:
             return self.send_json({"ok": False, "error": "unknown transition"}, 400)
         if mode not in {"delete", "move", "other"}:

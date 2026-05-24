@@ -1402,6 +1402,56 @@ button.tag {
   margin-top: 12px;
 }
 
+#regen-mode-toggle {
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.monster-ref-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.regen-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.regen-checkbox input {
+  width: auto;
+  margin: 0;
+}
+
+.regen-ref-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.regen-ref-thumb {
+  width: 54px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+#regen-preview-wrap {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.regen-preview {
+  max-width: 100%;
+  max-height: 50vh;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
 .toast-root {
   position: fixed;
   left: 14px;

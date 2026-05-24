@@ -238,13 +238,42 @@
   <div class="popup wide regen-popup" role="dialog" aria-modal="true" aria-labelledby="regen-title">
     <header class="popup-head">
       <h2 id="regen-title">Redo Transition</h2>
+      <button id="regen-mode-toggle" class="glass-button slim" type="button" hidden>Redo Image</button>
       <button class="close-button" type="button" data-close="regen-panel" aria-label="Close">×</button>
     </header>
     <p id="regen-file" class="debug-note"></p>
-    <label class="prompt-editor">
-      <span>New video prompt text</span>
-      <textarea id="regen-prompt" rows="7"></textarea>
-    </label>
+    <div id="regen-video-mode">
+      <label class="prompt-editor">
+        <span>New video prompt text</span>
+        <textarea id="regen-prompt" rows="7"></textarea>
+      </label>
+    </div>
+    <div id="regen-image-mode" hidden>
+      <label class="prompt-editor">
+        <span>Image prompt</span>
+        <textarea id="regen-image-prompt" rows="6"></textarea>
+      </label>
+      <section id="regen-monster-wrap" class="regen-option-group monster-ref-controls" hidden>
+        <label class="regen-checkbox"><input type="checkbox" id="regen-use-ref" checked> <span>Use monster reference (consistent identity)</span></label>
+        <div class="regen-ref-row">
+          <img id="regen-ref-thumb" class="regen-ref-thumb" alt="monster reference" hidden>
+          <button id="regen-reroll-ref" class="glass-button slim" type="button">Re-roll reference</button>
+        </div>
+        <label class="prompt-editor" id="regen-ref-prompt-wrap">
+          <span>Monster reference prompt</span>
+          <textarea id="regen-ref-prompt" rows="3"></textarea>
+        </label>
+      </section>
+      <div class="popup-actions compact-actions">
+        <button id="regen-generate-image" class="glass-button primary" type="button">Generate Image</button>
+      </div>
+      <div id="regen-preview-wrap" hidden>
+        <img id="regen-preview-img" class="regen-preview" alt="generated still preview">
+        <div class="popup-actions compact-actions">
+          <button id="regen-regen-image" class="glass-button" type="button">Regenerate Image</button>
+        </div>
+      </div>
+    </div>
     <label class="prompt-editor">
       <span>Moved video message</span>
       <textarea id="regen-move-message" class="short-message" rows="2"></textarea>
@@ -280,6 +309,7 @@
       <button id="regen-move" class="glass-button" type="button">Regen + Possible</button>
       <button id="regen-other" class="glass-button primary" type="button">Regen + Other</button>
     </div>
+    <p id="regen-image-note" class="debug-note" hidden>Image mode regenerates the still (room / monster / success end-frame), then on accept redoes the video(s) it feeds at the chosen resolution and length. Rooms redo both room→hallway and hallway→room.</p>
     <p class="debug-note">Requires the local regen helper. The moved-video message is used only when the old clip is moved to Possible or Other.</p>
   </div>
 </aside>

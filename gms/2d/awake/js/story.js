@@ -777,7 +777,9 @@
   transitions.forEach(transition => {
     if (transition.group === "room_transitions" && typeof transition.trimEnd !== "number") {
       transition.trimStart = 0;
-      transition.trimEnd = 3.04;
+      // Negative = stop this many seconds before the natural end; the last
+      // ~0.4s of these clips is unreliable tail, so cut it and hold the still.
+      transition.trimEnd = -0.4;
     }
   });
 

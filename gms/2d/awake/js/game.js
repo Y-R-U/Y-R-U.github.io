@@ -27,6 +27,10 @@
   let helperMarkers = [];
   let selectedRegenMarker = "";
   let regenRenderOptions = { width: 384, height: 640, numFrames: 73 };
+  let regenMode = "video";
+  let imageRedoInfo = null;
+  let imagePreviewToken = "";
+  let imagePollTimer = 0;
   let previewedTransition = null;
   let helperPoll = 0;
   let debugFilter = "room";
@@ -92,6 +96,7 @@
     debugTrimEnd: $("debug-trim-end"),
     debugHelperStatus: $("debug-helper-status"),
     debugRefresh: $("debug-refresh"),
+    regenTitle: $("regen-title"),
     regenFile: $("regen-file"),
     regenPrompt: $("regen-prompt"),
     regenMoveMessage: $("regen-move-message"),
@@ -104,6 +109,21 @@
     regenDelete: $("regen-delete"),
     regenMove: $("regen-move"),
     regenOther: $("regen-other"),
+    regenModeToggle: $("regen-mode-toggle"),
+    regenVideoMode: $("regen-video-mode"),
+    regenImageMode: $("regen-image-mode"),
+    regenImagePrompt: $("regen-image-prompt"),
+    regenMonsterWrap: $("regen-monster-wrap"),
+    regenUseRef: $("regen-use-ref"),
+    regenRefThumb: $("regen-ref-thumb"),
+    regenRerollRef: $("regen-reroll-ref"),
+    regenRefPromptWrap: $("regen-ref-prompt-wrap"),
+    regenRefPrompt: $("regen-ref-prompt"),
+    regenGenerateImage: $("regen-generate-image"),
+    regenPreviewWrap: $("regen-preview-wrap"),
+    regenPreviewImg: $("regen-preview-img"),
+    regenRegenImage: $("regen-regen-image"),
+    regenImageNote: $("regen-image-note"),
     reverseSummary: $("reverse-summary"),
     reverseMoveMessage: $("reverse-move-message"),
     reverseDelete: $("reverse-delete"),
@@ -248,9 +268,14 @@
     els.debugVideo.addEventListener("loadedmetadata", () => seekDebugPreview(false));
     els.debugVideo.addEventListener("play", () => clampDebugPreviewToWindow());
     els.debugVideo.addEventListener("timeupdate", () => clampDebugPreviewToWindow());
-    els.regenDelete.addEventListener("click", () => submitRegen("delete"));
-    els.regenMove.addEventListener("click", () => submitRegen("move"));
-    els.regenOther.addEventListener("click", () => submitRegen("other"));
+    els.regenDelete.addEventListener("click", () => submitRedo("delete"));
+    els.regenMove.addEventListener("click", () => submitRedo("move"));
+    els.regenOther.addEventListener("click", () => submitRedo("other"));
+    els.regenModeToggle.addEventListener("click", () => setRegenMode(regenMode === "image" ? "video" : "image"));
+    els.regenGenerateImage.addEventListener("click", () => generateImage(false));
+    els.regenRegenImage.addEventListener("click", () => generateImage(false));
+    els.regenRerollRef.addEventListener("click", () => generateImage(true));
+    els.regenUseRef.addEventListener("change", updateMonsterRefControls);
     document.querySelectorAll("[data-regen-resolution]").forEach(button => {
       button.addEventListener("click", () => setRegenResolution(button.dataset.regenResolution));
     });
@@ -1158,12 +1183,26 @@
     return `${src}${separator}v=${STATIC_MEDIA_VERSION}`;
   }
 
+  // Room<->hallway (and hallway->success) clips end with ~0.4s of unreliable
+  // tail, so cut them short and hold the destination still. A negative trimEnd
+  // means "this many seconds before the natural end". An explicit per-clip trim
+  // in the debug panel still overrides this default.
+  function defaultTrimEndFor(file) {
+    if (!file) return 0;
+    if (file.endsWith("_to_hallway.mp4")) return -0.4;
+    if (file.startsWith("hallway_to_")) return -0.4;
+    if (/success/i.test(file)) return -0.4;
+    return 0;
+  }
+
   function runtimeTrimFromMeta(transition) {
     if (!transition) return { start: 0, end: 3.04 };
     const meta = debugMeta[transition.file] || {};
+    const explicitEnd = typeof meta.trimEnd === "number" ? meta.trimEnd
+      : (typeof transition.trimEnd === "number" ? transition.trimEnd : null);
     return {
       start: typeof meta.trimStart === "number" ? meta.trimStart : (transition.trimStart || 0),
-      end: typeof meta.trimEnd === "number" ? meta.trimEnd : (transition.trimEnd || 0),
+      end: explicitEnd !== null ? explicitEnd : defaultTrimEndFor(transition.file),
     };
   }
 
@@ -1929,11 +1968,173 @@
       return;
     }
     selectedTransition = transition;
+    imageRedoInfo = transition.imageRedo || null;
     els.regenFile.textContent = transition.file;
     els.regenPrompt.value = transition.promptText || "";
     els.regenMoveMessage.value = transition.status || "";
     setupRegenOptions(transition);
+    setupImageRedo();
+    setRegenMode("video");
     UI.openPanel("regen-panel");
+  }
+
+  function setupImageRedo() {
+    clearTimeout(imagePollTimer);
+    imagePreviewToken = "";
+    els.regenModeToggle.hidden = !imageRedoInfo;
+    els.regenPreviewWrap.hidden = true;
+    els.regenPreviewImg.removeAttribute("src");
+    if (!imageRedoInfo) return;
+    els.regenImagePrompt.value = imageRedoInfo.imagePrompt || "";
+    const isMonster = String(imageRedoInfo.kind || "").startsWith("monster_");
+    els.regenMonsterWrap.hidden = !isMonster;
+    if (isMonster) {
+      els.regenUseRef.checked = true;
+      els.regenRefPrompt.value = imageRedoInfo.monsterRefPrompt || "";
+      if (imageRedoInfo.monsterRefExists && imageRedoInfo.monsterRefSrc) {
+        els.regenRefThumb.src = imageRedoInfo.monsterRefSrc;
+        els.regenRefThumb.hidden = false;
+      } else {
+        els.regenRefThumb.hidden = true;
+      }
+      updateMonsterRefControls();
+    }
+  }
+
+  function updateMonsterRefControls() {
+    const useRef = els.regenUseRef.checked;
+    els.regenRefPromptWrap.hidden = !useRef;
+    els.regenRerollRef.hidden = !useRef;
+  }
+
+  function setRegenMode(mode) {
+    regenMode = mode === "image" && imageRedoInfo ? "image" : "video";
+    const isImage = regenMode === "image";
+    els.regenVideoMode.hidden = isImage;
+    els.regenImageMode.hidden = !isImage;
+    els.regenImageNote.hidden = !isImage;
+    els.regenTitle && (els.regenTitle.textContent = isImage ? "Redo Image" : "Redo Transition");
+    els.regenModeToggle.textContent = isImage ? "Redo Video" : "Redo Image";
+    // The marker picker only applies to the video (no-ref) path.
+    if (els.regenMarkerWrap && isImage) els.regenMarkerWrap.hidden = true;
+    else if (els.regenMarkerWrap && selectedTransition) els.regenMarkerWrap.hidden = !isEventTransition(selectedTransition);
+    updateImageActionState();
+  }
+
+  function updateImageActionState() {
+    if (regenMode !== "image") {
+      [els.regenDelete, els.regenMove, els.regenOther].forEach(b => { b.disabled = false; });
+      return;
+    }
+    const ready = !!imagePreviewToken;
+    [els.regenDelete, els.regenMove, els.regenOther].forEach(b => { b.disabled = !ready; });
+  }
+
+  async function generateImage(rerollRef) {
+    if (!selectedTransition || !imageRedoInfo) return;
+    const promptText = els.regenImagePrompt.value.trim();
+    if (!promptText) { UI.toast("Image prompt is required"); return; }
+    setImageBusy(true, rerollRef ? "Re-rolling reference…" : "Generating image…");
+    try {
+      const result = await helperFetch("/image_preview", {
+        method: "POST",
+        body: JSON.stringify({
+          file: selectedTransition.file,
+          promptText,
+          useMonsterRef: els.regenUseRef.checked,
+          monsterRefPrompt: els.regenRefPrompt.value.trim(),
+          rerollRef: !!rerollRef,
+        }),
+      });
+      pollImageJob(result.job.id);
+    } catch (err) {
+      setImageBusy(false);
+      UI.toast(err.message || "Helper request failed");
+    }
+  }
+
+  function pollImageJob(jobId) {
+    clearTimeout(imagePollTimer);
+    const tick = async () => {
+      let job = null;
+      try {
+        const status = await helperFetch("/status", { method: "GET" });
+        const jobs = Array.isArray(status.jobs) ? status.jobs : [];
+        job = jobs.find(item => item.id === jobId);
+      } catch (err) {
+        imagePollTimer = setTimeout(tick, 2500);
+        return;
+      }
+      if (!job) { imagePollTimer = setTimeout(tick, 2500); return; }
+      if (job.status === "image_ready") {
+        imagePreviewToken = job.preview || "";
+        els.regenPreviewImg.src = job.previewSrc || "";
+        els.regenPreviewWrap.hidden = false;
+        if (job.monsterRefSrc) { els.regenRefThumb.src = job.monsterRefSrc; els.regenRefThumb.hidden = false; }
+        setImageBusy(false);
+        updateImageActionState();
+        UI.toast("Image ready — accept to redo the video(s)");
+        return;
+      }
+      if (job.status === "failed") {
+        setImageBusy(false);
+        UI.toast(job.error || "Image generation failed");
+        return;
+      }
+      els.regenGenerateImage.textContent = job.status ? job.status.replace(/_/g, " ") + "…" : "Working…";
+      imagePollTimer = setTimeout(tick, 2500);
+    };
+    tick();
+  }
+
+  function setImageBusy(busy, label) {
+    els.regenGenerateImage.disabled = busy;
+    els.regenRegenImage.disabled = busy;
+    els.regenRerollRef.disabled = busy;
+    els.regenGenerateImage.textContent = busy ? (label || "Working…") : "Generate Image";
+    if (busy) updateImageActionState();
+  }
+
+  function submitRedo(mode) {
+    if (regenMode === "image") return submitImageCommit(mode);
+    return submitRegen(mode);
+  }
+
+  async function submitImageCommit(mode) {
+    if (!selectedTransition || !imagePreviewToken) {
+      UI.toast("Generate an image first");
+      return;
+    }
+    const label = mode === "delete" ? "Accept + Delete" : mode === "other" ? "Accept + Other" : "Accept + Possible";
+    const videoCount = (imageRedoInfo.videoFiles || []).length || 1;
+    const ok = await UI.confirm({
+      title: `${label}?`,
+      body: `Save the new still and redo ${videoCount} video(s) for ${selectedTransition.file}.`,
+      confirmLabel: "Queue",
+      cancelLabel: "Cancel",
+      danger: mode === "delete",
+    });
+    if (!ok) return;
+    try {
+      const result = await helperFetch("/image_commit", {
+        method: "POST",
+        body: JSON.stringify({
+          file: selectedTransition.file,
+          preview: imagePreviewToken,
+          movedStatus: els.regenMoveMessage.value.trim(),
+          width: regenRenderOptions.width,
+          height: regenRenderOptions.height,
+          numFrames: regenRenderOptions.numFrames,
+          mode,
+        }),
+      });
+      UI.closePanel("regen-panel");
+      const n = Array.isArray(result.jobs) ? result.jobs.length : 1;
+      UI.toast(`Queued ${n} video redo(s)`);
+      refreshHelperStatus();
+    } catch (err) {
+      UI.toast(err.message || "Helper request failed");
+    }
   }
 
   function openMarkerPanel(transition) {
