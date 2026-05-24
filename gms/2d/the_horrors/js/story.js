@@ -694,10 +694,12 @@
   };
 
   transitions.forEach(transition => {
-    if (transition.group === "room_transitions" && typeof transition.trimEnd !== "number") {
+    // Any transition with a defined end-frame (room transitions, and success
+    // clips once an end-image is set) carries ~0.4s of unreliable tail riding
+    // on the end-frame — cut it and hold the destination still. Clips with no
+    // end-frame (e.g. monster release/attack) animate freely and are left whole.
+    if (transition.endImage && typeof transition.trimEnd !== "number") {
       transition.trimStart = 0;
-      // Negative = stop this many seconds before the natural end; the last
-      // ~0.4s of these clips is unreliable tail, so cut it and hold the still.
       transition.trimEnd = -0.4;
     }
   });

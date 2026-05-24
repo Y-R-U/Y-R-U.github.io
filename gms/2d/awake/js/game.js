@@ -1183,16 +1183,13 @@
     return `${src}${separator}v=${STATIC_MEDIA_VERSION}`;
   }
 
-  // Room<->hallway (and hallway->success) clips end with ~0.4s of unreliable
-  // tail, so cut them short and hold the destination still. A negative trimEnd
-  // means "this many seconds before the natural end". An explicit per-clip trim
-  // in the debug panel still overrides this default.
-  function defaultTrimEndFor(file) {
-    if (!file) return 0;
-    if (file.endsWith("_to_hallway.mp4")) return -0.4;
-    if (file.startsWith("hallway_to_")) return -0.4;
-    if (/success/i.test(file)) return -0.4;
-    return 0;
+  // Clips with a defined end-frame (room transitions, success clips with an
+  // end-image) carry ~0.4s of unreliable tail riding on that end-frame, so cut
+  // it and hold the destination still. A negative trimEnd means "this many
+  // seconds before the natural end". Clips with no end-frame animate freely and
+  // are left whole. An explicit per-clip trim in the debug panel still wins.
+  function defaultTrimEndFor(transition) {
+    return transition && transition.endImage ? -0.4 : 0;
   }
 
   function runtimeTrimFromMeta(transition) {
@@ -1202,7 +1199,7 @@
       : (typeof transition.trimEnd === "number" ? transition.trimEnd : null);
     return {
       start: typeof meta.trimStart === "number" ? meta.trimStart : (transition.trimStart || 0),
-      end: explicitEnd !== null ? explicitEnd : defaultTrimEndFor(transition.file),
+      end: explicitEnd !== null ? explicitEnd : defaultTrimEndFor(transition),
     };
   }
 
@@ -2015,6 +2012,10 @@
     els.regenImageNote.hidden = !isImage;
     els.regenTitle && (els.regenTitle.textContent = isImage ? "Redo Image" : "Redo Transition");
     els.regenModeToggle.textContent = isImage ? "Redo Video" : "Redo Image";
+    const verb = isImage ? "Accept" : "Regen";
+    els.regenDelete.textContent = `${verb} + Delete`;
+    els.regenMove.textContent = `${verb} + Possible`;
+    els.regenOther.textContent = `${verb} + Other`;
     // The marker picker only applies to the video (no-ref) path.
     if (els.regenMarkerWrap && isImage) els.regenMarkerWrap.hidden = true;
     else if (els.regenMarkerWrap && selectedTransition) els.regenMarkerWrap.hidden = !isEventTransition(selectedTransition);

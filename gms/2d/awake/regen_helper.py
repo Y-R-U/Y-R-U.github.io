@@ -510,6 +510,10 @@ class Project:
                 "exists": True,
             })
         for row in rows:
+            # Clips with a defined end-frame are cut 0.4s short (tail rides on
+            # the end-frame); surface it so the debug preview matches gameplay.
+            if row.get("endImage"):
+                row["trimEnd"] = -0.4
             info = self.image_meta.get(row["file"])
             if not info:
                 continue
