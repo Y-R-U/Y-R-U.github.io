@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>THE HOLLOW</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- TITLE -->
+<section id="screen-title" class="screen">
+  <img class="bg" src="images/title_bg.jpg" alt="">
+  <div class="title-inner">
+    <h1>THE HOLLOW</h1>
+    <p class="tag">a procedural descent · every seed is a different place to be lost</p>
+    <div class="seed-row">
+      <input id="seed-input" type="text" autocomplete="off" spellcheck="false" placeholder="seed">
+      <button id="btn-random" class="ghost" title="new seed">⟳</button>
+    </div>
+    <button id="btn-start" class="primary">DESCEND</button>
+    <p class="howto">
+      Move through doors with the on-screen arrows or <b>WASD / arrow keys</b>.<br>
+      Light burns down each step — find batteries. Find the <b>key</b>, reach the <b>stairs</b>, go deeper.<br>
+      Something walks these halls. When the screen reddens, it is one room away.<br>
+      <span class="dim"><b>Space</b> act · <b>M</b> map · <b>Esc</b> quit</span>
+    </p>
+    <p class="best">deepest descent: <b id="best-depth">0</b></p>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section id="screen-play" class="screen">
+  <div class="room-stage">
+    <img id="room-a" class="room-img front" alt="">
+    <img id="room-b" class="room-img" alt="">
+    <canvas id="grain" class="overlay grain"></canvas>
+    <div id="darkness" class="overlay darkness"></div>
+    <div class="overlay vignette"></div>
+    <div id="danger" class="overlay danger"></div>
+    <img id="jumpscare" class="overlay jumpscare" alt="">
+    <div id="room-name" class="room-name"></div>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-left">
+      <span id="hud-depth" class="chip">D1</span>
+      <div class="meters">
+        <div class="meter"><span class="lbl">light</span><div class="track"><i id="light-bar" class="fill light"></i></div></div>
+        <div class="meter"><span class="lbl">mind</span><div class="track"><i id="sanity-bar" class="fill sanity"></i></div></div>
+      </div>
+    </div>
+    <div class="hud-right">
+      <span id="hud-keys" class="chip">🗝 0</span>
+      <button id="btn-map" class="chip btn">⊞</button>
+      <button id="btn-mute" class="chip btn">🔊</button>
+    </div>
+  </div>
+
+  <div id="map-wrap" class="map-wrap"><canvas id="map"></canvas></div>
+
+  <div class="controls">
+    <button id="action-btn" class="action-btn" style="display:none"></button>
+    <div id="doors" class="doors"></div>
+  </div>
+</section>
+
+<!-- GAME OVER -->
+<section id="screen-over" class="screen">
+  <img id="over-img" class="bg" src="" alt="">
+  <div class="over-inner">
+    <h1 id="over-title">TAKEN</h1>
+    <p id="over-stats"></p>
+    <button id="btn-retry" class="primary">RETURN TO THE SURFACE</button>
+  </div>
+</section>
+
+<script src="js/rng.js"></script>
+<script src="js/dungeon.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
