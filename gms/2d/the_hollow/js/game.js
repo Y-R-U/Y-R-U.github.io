@@ -7,9 +7,17 @@
   const DIR_ARROW = { N: "↑", E: "→", S: "↓", W: "←" };
   const RITUAL_KINDS = { ritual: 1 };
 
+  const MODES = {
+    easy: { label: "Easy", target: 2 },
+    medium: { label: "Medium", target: 5 },
+    hard: { label: "Hard", target: 10 },
+    endless: { label: "Endless", target: Infinity },
+  };
+
   const S = {
     screen: "title",
     seed: "", depth: 1,
+    mode: "easy", target: 2, moves: 0,
     dungeon: null, pos: null,
     light: 100, sanity: 100, keys: 0,
     explored: 0, entityId: null,
@@ -22,7 +30,7 @@
   function cacheEls() {
     el = {
       title: $("screen-title"), play: $("screen-play"), over: $("screen-over"),
-      seedInput: $("seed-input"), best: $("best-depth"),
+      seedInput: $("seed-input"), best: $("best-depth"), modeRow: $("mode-row"),
       btnDescendStart: $("btn-start"), btnRandom: $("btn-random"),
       roomA: $("room-a"), roomB: $("room-b"),
       grain: $("grain"), darkness: $("darkness"), danger: $("danger"),
@@ -44,16 +52,42 @@
     el.title.classList.add("active");
     el.play.classList.remove("active");
     el.over.classList.remove("active");
-    el.seedInput.value = HollowRNG.randomSeed();
-    el.best.textContent = localStorage.getItem("hollow_best") || "0";
+    el.over.classList.remove("win");
+    if (!el.seedInput.value) el.seedInput.value = HollowRNG.randomSeed();
+    renderModes();
+    updateBest();
+  }
+
+  function renderModes() {
+    el.modeRow.innerHTML = "";
+    for (const k of ["easy", "medium", "hard", "endless"]) {
+      const m = MODES[k];
+      const b = document.createElement("button");
+      b.className = "mode-btn" + (k === S.mode ? " active" : "");
+      b.innerHTML = m.label + "<span class='goal'>" +
+        (m.target === Infinity ? "∞ levels" : m.target + " levels") + "</span>";
+      b.onclick = () => { S.mode = k; renderModes(); updateBest(); };
+      el.modeRow.appendChild(b);
+    }
+  }
+
+  function bestScore() { return parseInt(localStorage.getItem("hollow_score_" + S.mode) || "0", 10); }
+
+  function updateBest() {
+    const won = localStorage.getItem("hollow_win_" + S.mode);
+    const sc = bestScore();
+    el.best.innerHTML = (won && S.mode !== "endless" ? "<b class='ok'>escaped ✓</b> · " : "") +
+      "best score: <b>" + sc + "</b>";
   }
 
   function startGame(seed) {
     Audio.start();
     S.seed = (seed || "").trim() || HollowRNG.randomSeed();
-    S.depth = 1; S.light = 100; S.sanity = 100; S.keys = 0; S.explored = 0;
+    S.target = MODES[S.mode].target;
+    S.depth = 1; S.moves = 0; S.light = 100; S.sanity = 100; S.keys = 0; S.explored = 0;
     el.title.classList.remove("active");
     el.over.classList.remove("active");
+    el.over.classList.remove("win");
     el.play.classList.add("active");
     S.screen = "play";
     newLevel();
@@ -83,6 +117,7 @@
     else S.sanity = Math.max(0, S.sanity - 9);
 
     S.pos = targetId;
+    S.moves++;
     const nr = curRoom();
     if (!nr.seen) { nr.seen = true; S.explored++; }
     if (RITUAL_KINDS[nr.kind]) S.sanity = Math.max(0, S.sanity - 5);
@@ -145,8 +180,11 @@
     if (S.busy || S.screen !== "play") return;
     const room = curRoom();
     if (room.id === S.dungeon.exitId) {
-      if (S.keys >= 1) { S.keys -= 1; S.depth++; Audio.descend(); descendFlash(); }
-      else toast("LOCKED — find the key", 1500);
+      if (S.keys >= 1) {
+        S.keys -= 1;
+        if (S.target !== Infinity && S.depth >= S.target) { return win(); }
+        S.depth++; Audio.descend(); descendFlash();
+      } else toast("LOCKED — find the key", 1500);
       return;
     }
     if (room.item) {
@@ -166,18 +204,41 @@
     setTimeout(() => { newLevel(); el.darkness.style.transition = ""; S.busy = false; }, 520);
   }
 
-  function gameOver(cause) {
+  // levels cleared reward depth heavily; efficiency (fewer moves) breaks ties
+  function score() { return Math.max(0, S.depth * 1000 + S.explored * 20 - S.moves * 5); }
+
+  function saveBest(sc) {
+    if (sc > bestScore()) localStorage.setItem("hollow_score_" + S.mode, String(sc));
+  }
+
+  function endScreen(won, title) {
     S.screen = "over";
-    Audio.scream();
-    const best = Math.max(parseInt(localStorage.getItem("hollow_best") || "0", 10), S.depth);
-    localStorage.setItem("hollow_best", String(best));
-    el.overTitle.textContent = cause === "caught" ? "TAKEN" : "CONSUMED BY THE DARK";
-    el.overStats.innerHTML =
-      "Reached <b>Depth " + S.depth + "</b><br>" + S.explored + " rooms explored<br>" +
-      "<span class='dim'>seed: " + S.seed + "</span><br>best depth: " + best;
-    el.overImg.src = IMG("caught");
+    el.over.classList.toggle("win", won);
+    el.overTitle.textContent = title;
+    el.overImg.src = IMG(won ? "stairs_down" : "caught");
     el.play.classList.remove("active");
     el.over.classList.add("active");
+  }
+
+  function win() {
+    Audio.descend();
+    localStorage.setItem("hollow_win_" + S.mode, "1");
+    const sc = score(); saveBest(sc);
+    endScreen(true, "ESCAPED");
+    el.overStats.innerHTML =
+      "Survived all <b>" + S.target + " level" + (S.target > 1 ? "s" : "") + "</b> · " + MODES[S.mode].label + "<br>" +
+      S.explored + " rooms · " + S.moves + " moves<br><b>score " + sc + "</b><br>" +
+      "<span class='dim'>seed: " + S.seed + "</span>";
+  }
+
+  function gameOver(cause) {
+    Audio.scream();
+    const sc = score(); const prev = bestScore(); saveBest(sc);
+    endScreen(false, cause === "caught" ? "TAKEN" : "CONSUMED BY THE DARK");
+    el.overStats.innerHTML =
+      "Reached <b>Depth " + S.depth + (S.target !== Infinity ? "/" + S.target : "") + "</b> · " + MODES[S.mode].label + "<br>" +
+      S.explored + " rooms · " + S.moves + " moves<br><b>score " + sc + "</b><br>" +
+      "<span class='dim'>seed: " + S.seed + "</span><br>best score: " + Math.max(sc, prev);
   }
 
   // ── rendering ────────────────────────────────────────────────────────────
@@ -202,7 +263,7 @@
     }
 
     // HUD
-    el.hudDepth.textContent = "D" + S.depth;
+    el.hudDepth.textContent = "D" + S.depth + (S.target !== Infinity ? "/" + S.target : "");
     el.lightBar.style.width = S.light + "%";
     el.sanityBar.style.width = S.sanity + "%";
     el.lightBar.classList.toggle("low", S.light < 25);
