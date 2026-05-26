@@ -258,6 +258,10 @@ const PROJECTS = [
     desc: "Mobile-first hub-and-spoke video horror. Every room connects through a central hallway via short generated transition videos; monster reveals, attacks, and most endings play in the hallway.",
     date: "2026-05-15", creator: "Opus 4.7" },
 
+  { name: "Gate Tank Runner",   path: "/gms/3d/codex_gate_tank_runner/", screenshot: "codex-gate-tank-runner", type: "game",
+    desc: "Low-poly Three.js tank runner. Smash glass gates for strength, armor, and tiny escort tanks, then spend salvaged coins on permanent garage upgrades.",
+    date: "2026-05-27", creator: "OpenAI 5.5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
