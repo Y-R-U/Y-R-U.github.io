@@ -693,8 +693,7 @@ function updateGates(dt) {
     const selectedPanel = pickGatePanel(gate);
     updateGateHighlight(gate, selectedPanel, dt);
     if (!gate.used && gate.root.position.z > PLAYER_Z - 1.4 && gate.root.position.z < PLAYER_Z + 2.2) {
-      const panel = selectedPanel && Math.abs(state.laneX - selectedPanel.x) < 2.25 ? selectedPanel : null;
-      if (panel) applyGate(gate, panel);
+      if (selectedPanel) applyGate(gate, selectedPanel);
     }
     if (gate.root.position.z > 22) {
       removeFromArray(gates, i, obstacleLayer, 'root');
