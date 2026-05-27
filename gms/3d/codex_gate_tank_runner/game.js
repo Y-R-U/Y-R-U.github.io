@@ -34,7 +34,7 @@ const LANES = [-4.8, 0, 4.8];
 const ROAD_WIDTH = 16;
 const RUN_LENGTH = 245;
 const DPR_CAP = 1.25;
-const PLAYER_Z = 5.8;
+const PLAYER_Z = 2.6;
 const PLAYER_MIN_X = -6.2;
 const PLAYER_MAX_X = 6.2;
 const TARGET_LOCK_RANGE = 88;
@@ -70,6 +70,7 @@ const tmpVec2 = new THREE.Vector3();
 const screenVec = new THREE.Vector3();
 const bulletMaterials = new Map();
 const gateTextureCache = new Map();
+const effectMaterials = new Map();
 let lastIdleRender = 0;
 
 const save = loadSave();
@@ -135,6 +136,7 @@ const materials = {
   }),
   coin: new THREE.MeshStandardMaterial({ color: 0xffd15a, roughness: 0.34, metalness: 0.34, emissive: 0x4a2b00, emissiveIntensity: 0.25 }),
   shard: new THREE.MeshStandardMaterial({ color: 0xc9f8ff, roughness: 0.1, metalness: 0.02, transparent: true, opacity: 0.64 }),
+  gateTarget: new THREE.MeshBasicMaterial({ color: 0xfff2a6, transparent: true, opacity: 0.84, depthWrite: false }),
   bullet: new THREE.MeshStandardMaterial({ color: 0xffc35a, roughness: 0.34, emissive: 0xff8a32, emissiveIntensity: 1.2 }),
   tree: new THREE.MeshStandardMaterial({ color: 0x2f5837, roughness: 0.82 }),
   trunk: new THREE.MeshStandardMaterial({ color: 0x65452e, roughness: 0.84 }),
@@ -156,7 +158,11 @@ const geometries = {
   wheel: new THREE.CylinderGeometry(0.22, 0.22, 0.09, 10),
   gatePane: new THREE.BoxGeometry(3.95, 3.45, 0.16),
   gatePost: new THREE.BoxGeometry(0.18, 3.9, 0.18),
+  gateTargetH: new THREE.BoxGeometry(4.65, 0.16, 0.12),
+  gateTargetV: new THREE.BoxGeometry(0.16, 3.85, 0.12),
   glassChip: new THREE.BoxGeometry(0.34, 0.08, 0.02),
+  glassBlock: new THREE.BoxGeometry(0.52, 0.38, 0.12),
+  flashRing: new THREE.RingGeometry(0.4, 2.9, 24),
   enemy: new THREE.BoxGeometry(2.2, 1.25, 2.4),
   drone: new THREE.TetrahedronGeometry(0.9, 0),
   bullet: new THREE.SphereGeometry(0.16, 10, 8),
@@ -684,12 +690,41 @@ function updateGates(dt) {
     gate.root.children.forEach((child, childIndex) => {
       child.rotation.y = Math.sin(state.distance * 0.06 + childIndex) * 0.045;
     });
+    const selectedPanel = pickGatePanel(gate);
+    updateGateHighlight(gate, selectedPanel, dt);
     if (!gate.used && gate.root.position.z > PLAYER_Z - 1.4 && gate.root.position.z < PLAYER_Z + 2.2) {
-      const panel = gate.panels.find((entry) => Math.abs(state.laneX - entry.x) < 2.15);
+      const panel = selectedPanel && Math.abs(state.laneX - selectedPanel.x) < 2.25 ? selectedPanel : null;
       if (panel) applyGate(gate, panel);
     }
     if (gate.root.position.z > 22) {
       removeFromArray(gates, i, obstacleLayer, 'root');
+    }
+  }
+}
+
+function pickGatePanel(gate) {
+  if (gate.used || gate.root.position.z < PLAYER_Z - 18 || gate.root.position.z > PLAYER_Z + 6) return null;
+  let best = null;
+  let bestDistance = Infinity;
+  for (const panel of gate.panels) {
+    const distance = Math.abs(state.laneX - panel.x);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = panel;
+    }
+  }
+  return bestDistance <= 2.55 ? best : null;
+}
+
+function updateGateHighlight(gate, selectedPanel, dt) {
+  for (const panel of gate.panels) {
+    const selected = panel === selectedPanel;
+    const targetScale = selected ? 1.13 : 1;
+    const currentScale = damp(panel.mesh.scale.x, targetScale, 12, dt);
+    panel.mesh.scale.set(currentScale, currentScale, currentScale);
+    if (panel.mesh.userData.targetFrame) {
+      panel.mesh.userData.targetFrame.visible = selected;
+      panel.mesh.userData.targetFrame.scale.setScalar(selected ? 1 + Math.sin(performance.now() * 0.012) * 0.035 : 1);
     }
   }
 }
@@ -765,7 +800,8 @@ function updateShards(dt) {
     shard.rotation.x += dt * shard.userData.spin.x;
     shard.rotation.y += dt * shard.userData.spin.y;
     if (shard.userData.expand) shard.scale.addScalar(shard.userData.expand * dt);
-    shard.material.opacity = Math.max(0, shard.userData.life / 0.75);
+    if (shard.userData.shrink) shard.scale.multiplyScalar(Math.max(0.965, 1 - dt * shard.userData.shrink));
+    if (!shard.userData.noFade) shard.material.opacity = Math.max(0, shard.userData.life / 0.75);
     if (shard.userData.life <= 0) removeFromArray(shards, i, effectLayer);
   }
 }
@@ -835,12 +871,33 @@ function createGatePanel(x, spec) {
   text.scale.set(3.05, 2.2, 1);
   group.add(text);
 
+  const targetFrame = createGateTargetFrame();
+  targetFrame.visible = false;
+  group.userData.targetFrame = targetFrame;
+  group.add(targetFrame);
+
   const glow = new THREE.PointLight(typeConfig.color, good ? 1.1 : 0.7, 9);
   if (!matchMedia('(max-width: 700px)').matches) {
     glow.position.set(0, 2.1, 0.4);
     group.add(glow);
   }
   return group;
+}
+
+function createGateTargetFrame() {
+  const frame = new THREE.Group();
+  const bars = [
+    { pos: [0, 4.02, 0.32], geometry: geometries.gateTargetH },
+    { pos: [0, 0.18, 0.32], geometry: geometries.gateTargetH },
+    { pos: [-2.32, 2.1, 0.32], geometry: geometries.gateTargetV },
+    { pos: [2.32, 2.1, 0.32], geometry: geometries.gateTargetV }
+  ];
+  for (const bar of bars) {
+    const mesh = new THREE.Mesh(bar.geometry, materials.gateTarget);
+    mesh.position.set(...bar.pos);
+    frame.add(mesh);
+  }
+  return frame;
 }
 
 function randomAmount(positive, type) {
@@ -890,6 +947,7 @@ function applyGate(gate, panel) {
   if (newTotal > oldTotal) state.runCoins += Math.max(1, Math.floor((newTotal - oldTotal) * 0.8));
   state.peakPower = Math.max(state.peakPower, state.strength + state.defense + supportTanks.length);
   const impact = panel.mesh.getWorldPosition(tmpVec);
+  impact.y = 2.15;
   spawnGlassSmash(impact, panel.amount > 0 ? 0x96f3ff : 0xff8a82);
   state.screenShake = Math.max(state.screenShake, 0.25);
   obstacleLayer.remove(gate.root);
@@ -1050,26 +1108,51 @@ function spawnCoinArc(z, x = 0, count = 7) {
 }
 
 function spawnGlassSmash(position, color) {
-  spawnShardBurst(position, 16, color);
-  for (let i = 0; i < 18; i++) {
-    const material = materials.shard.clone();
-    material.color.setHex(color);
-    material.opacity = 0.58 + Math.random() * 0.22;
-    const shard = new THREE.Mesh(geometries.glassChip, material);
+  spawnShardBurst(position, 8, color);
+  const blockMaterial = getEffectMaterial(color, 0.72);
+  const columns = 5;
+  const rows = 4;
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
+      const shard = new THREE.Mesh(geometries.glassBlock, blockMaterial);
+      const offsetX = (column - (columns - 1) / 2) * 0.74;
+      const offsetY = (row - (rows - 1) / 2) * 0.58;
+      shard.position.set(position.x + offsetX, position.y + offsetY, position.z);
+      const burstX = offsetX * 2.2 + (Math.random() - 0.5) * 3.6;
+      const burstY = offsetY * 2.4 + 2.5 + Math.random() * 4.5;
+      const burstZ = 5 + Math.random() * 8;
+      shard.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+      shard.scale.setScalar(0.88 + Math.random() * 0.42);
+      shard.userData = {
+        life: 0.68 + Math.random() * 0.32,
+        velocity: new THREE.Vector3(burstX, burstY, burstZ),
+        spin: { x: (Math.random() - 0.5) * 14, y: (Math.random() - 0.5) * 14 },
+        noFade: true,
+        shrink: 0.55
+      };
+      effectLayer.add(shard);
+      shards.push(shard);
+    }
+  }
+
+  for (let i = 0; i < 12; i++) {
+    const shard = new THREE.Mesh(geometries.glassChip, blockMaterial);
     shard.position.copy(position);
-    shard.scale.set(0.7 + Math.random() * 2.2, 0.5 + Math.random() * 1.8, 1);
+    shard.scale.set(0.8 + Math.random() * 2.8, 0.55 + Math.random() * 1.9, 1);
     shard.userData = {
       life: 0.55 + Math.random() * 0.42,
       velocity: new THREE.Vector3((Math.random() - 0.5) * 15, 3 + Math.random() * 8, (Math.random() - 0.5) * 12 + 2),
-      spin: { x: (Math.random() - 0.5) * 18, y: (Math.random() - 0.5) * 18 }
+      spin: { x: (Math.random() - 0.5) * 18, y: (Math.random() - 0.5) * 18 },
+      noFade: true,
+      shrink: 0.72
     };
     effectLayer.add(shard);
     shards.push(shard);
   }
 
   const flash = new THREE.Mesh(
-    new THREE.RingGeometry(0.4, 2.6, 24),
-    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.42, side: THREE.DoubleSide })
+    geometries.flashRing,
+    getEffectMaterial(color, 0.42, true)
   );
   flash.position.copy(position);
   flash.rotation.x = Math.PI / 2;
@@ -1077,26 +1160,43 @@ function spawnGlassSmash(position, color) {
     life: 0.28,
     velocity: new THREE.Vector3(0, 0, 0),
     spin: { x: 0, y: 0 },
-    expand: 8
+    expand: 8,
+    noFade: true,
+    shrink: 0.3
   };
   effectLayer.add(flash);
   shards.push(flash);
 }
 
 function spawnShardBurst(position, count, color) {
+  const material = getEffectMaterial(color, 0.62);
   for (let i = 0; i < count; i++) {
-    const material = materials.shard.clone();
-    material.color.setHex(color);
     const shard = new THREE.Mesh(geometries.shard, material);
     shard.position.copy(position);
     shard.userData = {
       life: 0.34 + Math.random() * 0.28,
       velocity: new THREE.Vector3((Math.random() - 0.5) * 8, 2 + Math.random() * 6, (Math.random() - 0.5) * 8),
-      spin: { x: (Math.random() - 0.5) * 12, y: (Math.random() - 0.5) * 12 }
+      spin: { x: (Math.random() - 0.5) * 12, y: (Math.random() - 0.5) * 12 },
+      noFade: true,
+      shrink: 1.1
     };
     effectLayer.add(shard);
     shards.push(shard);
   }
+}
+
+function getEffectMaterial(color, opacity, doubleSide = false) {
+  const key = `${color}:${opacity}:${doubleSide ? 1 : 0}`;
+  if (!effectMaterials.has(key)) {
+    effectMaterials.set(key, new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      side: doubleSide ? THREE.DoubleSide : THREE.FrontSide
+    }));
+  }
+  return effectMaterials.get(key);
 }
 
 function findTarget(origin, range) {
@@ -1157,9 +1257,9 @@ function updateCamera(dt) {
   const baseX = tank ? state.laneX * 0.25 : 0;
   const shakeX = (Math.random() - 0.5) * state.screenShake;
   const shakeY = (Math.random() - 0.5) * state.screenShake;
-  tmpVec.set(baseX + shakeX, 11.9 + shakeY, 20.6);
+  tmpVec.set(baseX + shakeX, 11.6 + shakeY, 21.4);
   camera.position.lerp(tmpVec, 1 - Math.exp(-dt * 6));
-  tmpVec2.set(baseX * 0.22, 1.45, -15.5);
+  tmpVec2.set(baseX * 0.22, 1.25, -17.8);
   camera.lookAt(tmpVec2);
 }
 
