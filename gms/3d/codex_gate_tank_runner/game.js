@@ -33,17 +33,23 @@ const SAVE_KEY = 'codexGateTankRunnerSaveV1';
 const LANES = [-4.8, 0, 4.8];
 const ROAD_WIDTH = 16;
 const RUN_LENGTH = 245;
+const DPR_CAP = 1.25;
+const PLAYER_Z = 5.8;
+const PLAYER_MIN_X = -6.2;
+const PLAYER_MAX_X = 6.2;
+const TARGET_LOCK_RANGE = 88;
+const BULLET_MAX_RANGE = 54;
 const GATE_TYPES = [
-  { key: 'strength', label: 'STR', icon: 'MUSCLE', color: 0xffb84f },
-  { key: 'defense', label: 'ARM', icon: 'SHIELD', color: 0x54d8ff },
-  { key: 'support', label: 'TANK', icon: 'MINI', color: 0x80df75 }
+  { key: 'strength', label: 'STR', color: 0xffb84f },
+  { key: 'defense', label: 'ARM', color: 0x54d8ff },
+  { key: 'support', label: 'TANK', color: 0x80df75 }
 ];
 const UPGRADES = [
-  { key: 'core', name: 'Hotter Cannon', desc: '+1 starting strength and higher shot damage.', max: 6, base: 55 },
-  { key: 'armor', name: 'Reactive Armor', desc: '+1 starting defense and stronger collision survival.', max: 6, base: 50 },
-  { key: 'bay', name: 'Escort Bay', desc: 'Start with tiny support tanks and keep a wider formation.', max: 4, base: 80 },
-  { key: 'magnet', name: 'Coin Magnet', desc: 'Pull coins and glass shards from farther away.', max: 5, base: 45 },
-  { key: 'bank', name: 'Salvage Contract', desc: 'Earn more coins from every enemy and finish bonus.', max: 5, base: 70 }
+  { key: 'core', name: 'Hotter Cannon', desc: '+1 starting strength and higher shot damage.', max: 10, base: 55 },
+  { key: 'armor', name: 'Reactive Armor', desc: '+1 starting defense, but enemies scale harder with armor installs.', max: 10, base: 50 },
+  { key: 'bay', name: 'Escort Bay', desc: 'Start with tiny support tanks and keep a wider formation.', max: 10, base: 80 },
+  { key: 'magnet', name: 'Coin Magnet', desc: 'Each level attracts coins 5% farther across your steering width.', max: 10, base: 45 },
+  { key: 'bank', name: 'Salvage Contract', desc: 'Earn more coins from every enemy and finish bonus.', max: 10, base: 70 }
 ];
 
 const scene = new THREE.Scene();
@@ -52,16 +58,19 @@ scene.fog = new THREE.Fog(0x8fc6d1, 58, 190);
 
 const camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.1, 360);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false;
 
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointerPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 const tmpVec = new THREE.Vector3();
 const tmpVec2 = new THREE.Vector3();
+const screenVec = new THREE.Vector3();
+const bulletMaterials = new Map();
+const gateTextureCache = new Map();
+let lastIdleRender = 0;
 
 const save = loadSave();
 const state = {
@@ -77,6 +86,7 @@ const state = {
   keys: new Set(),
   strength: 1,
   defense: 1,
+  maxDefense: 1,
   support: 0,
   peakPower: 1,
   runCoins: 0,
@@ -102,19 +112,25 @@ const materials = {
   enemy: new THREE.MeshStandardMaterial({ color: 0x9b3532, roughness: 0.7, metalness: 0.16 }),
   enemyDark: new THREE.MeshStandardMaterial({ color: 0x331b1d, roughness: 0.84, metalness: 0.16 }),
   glassGood: new THREE.MeshPhysicalMaterial({
-    color: 0x70e4ff,
-    roughness: 0.05,
-    transmission: 0.45,
+    color: 0xb8f7ff,
+    roughness: 0.02,
+    transmission: 0.72,
     transparent: true,
-    opacity: 0.5,
+    opacity: 0.28,
+    depthWrite: false,
+    emissive: 0x0a6688,
+    emissiveIntensity: 0.08,
     side: THREE.DoubleSide
   }),
   glassBad: new THREE.MeshPhysicalMaterial({
-    color: 0xff756e,
-    roughness: 0.08,
-    transmission: 0.35,
+    color: 0xffbab4,
+    roughness: 0.03,
+    transmission: 0.62,
     transparent: true,
-    opacity: 0.5,
+    opacity: 0.28,
+    depthWrite: false,
+    emissive: 0x8a1111,
+    emissiveIntensity: 0.08,
     side: THREE.DoubleSide
   }),
   coin: new THREE.MeshStandardMaterial({ color: 0xffd15a, roughness: 0.34, metalness: 0.34, emissive: 0x4a2b00, emissiveIntensity: 0.25 }),
@@ -140,6 +156,7 @@ const geometries = {
   wheel: new THREE.CylinderGeometry(0.22, 0.22, 0.09, 10),
   gatePane: new THREE.BoxGeometry(3.95, 3.45, 0.16),
   gatePost: new THREE.BoxGeometry(0.18, 3.9, 0.18),
+  glassChip: new THREE.BoxGeometry(0.34, 0.08, 0.02),
   enemy: new THREE.BoxGeometry(2.2, 1.25, 2.4),
   drone: new THREE.TetrahedronGeometry(0.9, 0),
   bullet: new THREE.SphereGeometry(0.16, 10, 8),
@@ -198,10 +215,6 @@ function initLighting() {
   scene.add(new THREE.HemisphereLight(0xe9f8ff, 0x243322, 1.55));
   const sun = new THREE.DirectionalLight(0xffe3ac, 2.8);
   sun.position.set(-18, 34, 18);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { near: 1, far: 115, left: -32, right: 32, top: 48, bottom: -32 });
-  sun.shadow.bias = -0.0015;
   scene.add(sun);
 }
 
@@ -223,10 +236,10 @@ function createWorld() {
     world.add(edge);
   }
 
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 46; i++) {
     const item = Math.random() > 0.38 ? createTree() : createRock();
     const side = Math.random() > 0.5 ? 1 : -1;
-    item.position.set(side * (10 + Math.random() * 24), 0.1, 42 - i * 6.2 - Math.random() * 3);
+    item.position.set(side * (10 + Math.random() * 24), 0.1, 42 - i * 11.5 - Math.random() * 5);
     item.rotation.y = Math.random() * Math.PI;
     item.scale.setScalar(0.7 + Math.random() * 0.85);
     scenery.push(item);
@@ -304,8 +317,45 @@ function createTank(material = materials.tank, scale = 1) {
   muzzle.position.set(0, 0.18, -2.52);
   turretPivot.add(muzzle);
 
+  const health = createHealthBar(scale < 1 ? 1.9 : 2.9, scale < 1 ? 0x7bd66f : 0x54d8ff);
+  health.root.position.set(0, 2.1, 0.12);
+  root.add(health.root);
+
   root.scale.setScalar(scale);
-  return { root, turretPivot, muzzle, barrel, wheels: root.children.filter((child) => child.geometry === geometries.wheel) };
+  return {
+    root,
+    turretPivot,
+    muzzle,
+    barrel,
+    healthFill: health.fill,
+    healthWidth: health.width,
+    wheels: root.children.filter((child) => child.geometry === geometries.wheel)
+  };
+}
+
+function createHealthBar(width, color) {
+  const root = new THREE.Group();
+  const back = new THREE.Mesh(
+    new THREE.BoxGeometry(width + 0.16, 0.1, 0.1),
+    new THREE.MeshBasicMaterial({ color: 0x111517 })
+  );
+  back.position.y = 0.01;
+  root.add(back);
+
+  const fill = new THREE.Mesh(
+    new THREE.BoxGeometry(width, 0.12, 0.12),
+    new THREE.MeshBasicMaterial({ color })
+  );
+  root.add(fill);
+  return { root, fill, width };
+}
+
+function setHealthBar(unit, ratio) {
+  if (!unit?.healthFill) return;
+  const clamped = clamp(ratio, 0, 1);
+  unit.healthFill.scale.x = Math.max(0.04, clamped);
+  unit.healthFill.position.x = -(1 - clamped) * unit.healthWidth * 0.5;
+  unit.healthFill.material.color.setHex(clamped > 0.52 ? 0x7bd66f : clamped > 0.24 ? 0xffd15a : 0xff635d);
 }
 
 function bindInput() {
@@ -356,7 +406,7 @@ function endDrag(event) {
 function steerFromPointer(event) {
   const rect = canvas.getBoundingClientRect();
   const normalized = clamp((event.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
-  state.targetX = clamp((normalized - 0.5) * 15.4, -6.2, 6.2);
+  state.targetX = clamp((normalized - 0.5) * 15.4, PLAYER_MIN_X, PLAYER_MAX_X);
 }
 
 function startGame() {
@@ -369,6 +419,7 @@ function startGame() {
   state.laneX = 0;
   state.strength = 2 + save.upgrades.core + (state.demo ? 4 : 0);
   state.defense = 3 + save.upgrades.armor + (state.demo ? 5 : 0);
+  state.maxDefense = state.defense;
   state.support = 0;
   state.peakPower = state.strength + state.defense;
   state.runCoins = 0;
@@ -382,8 +433,9 @@ function startGame() {
   state.screenShake = 0;
 
   tank = createTank(materials.tank, 1);
-  tank.root.position.set(0, 0, 8);
+  tank.root.position.set(0, 0, PLAYER_Z);
   tank.root.rotation.y = Math.PI;
+  setHealthBar(tank, 1);
   scene.add(tank.root);
   const startingSupport = Math.min(3, save.upgrades.bay + (state.demo ? 2 : 0));
   for (let i = 0; i < startingSupport; i++) addSupportTank(false);
@@ -476,7 +528,7 @@ function buyUpgrade(upgrade, cost) {
 }
 
 function getUpgradeCost(upgrade, level) {
-  return Math.round(upgrade.base * Math.pow(1.55, level));
+  return Math.round(upgrade.base * Math.pow(2.15, level) + level * level * 40);
 }
 
 function updateMenuCoins() {
@@ -487,8 +539,11 @@ function updateMenuCoins() {
 function loop() {
   const dt = Math.min(clock.getDelta(), 0.033);
   if (state.running) updateGame(dt);
-  updateCamera(dt);
-  renderer.render(scene, camera);
+  if (state.running || performance.now() - lastIdleRender > 250) {
+    updateCamera(dt);
+    renderer.render(scene, camera);
+    if (!state.running) lastIdleRender = performance.now();
+  }
   requestAnimationFrame(loop);
 }
 
@@ -518,17 +573,18 @@ function handleMovement(dt) {
   let steer = 0;
   if (state.keys.has('arrowleft') || state.keys.has('a')) steer -= 1;
   if (state.keys.has('arrowright') || state.keys.has('d')) steer += 1;
-  if (steer !== 0) state.targetX = clamp(state.targetX + steer * dt * 8.5, -6.2, 6.2);
+  if (steer !== 0) state.targetX = clamp(state.targetX + steer * dt * 8.5, PLAYER_MIN_X, PLAYER_MAX_X);
   state.laneX = damp(state.laneX, state.targetX, 12, dt);
 }
 
 function updateTank(dt) {
   if (!tank) return;
   tank.root.position.x = state.laneX;
-  tank.root.position.z = 8;
+  tank.root.position.z = PLAYER_Z;
   tank.root.rotation.z = -clamp((state.laneX - tank.root.position.x) * 0.06, -0.18, 0.18);
+  setHealthBar(tank, state.defense / Math.max(1, state.maxDefense));
 
-  const target = findTarget(tank.root.position, 34);
+  const target = findTarget(tank.root.position, TARGET_LOCK_RANGE);
   if (target) {
     aimTurret(tank, target.root.position, dt);
     state.shotCooldown -= dt;
@@ -544,16 +600,17 @@ function updateTank(dt) {
 }
 
 function updateSupport(dt) {
-  const spacing = 1.42 + save.upgrades.bay * 0.12;
+  const spacing = 1.34 + save.upgrades.bay * 0.08;
   supportTanks.forEach((support, index) => {
     const row = Math.floor(index / 2);
     const side = index % 2 === 0 ? -1 : 1;
     const targetX = clamp(state.laneX + side * spacing * (row + 1), -6.7, 6.7);
-    const targetZ = 9.7 + row * 1.25;
+    const targetZ = PLAYER_Z + 1.45 + row * 1.1;
     support.root.position.x = damp(support.root.position.x, targetX, 8, dt);
     support.root.position.z = damp(support.root.position.z, targetZ, 8, dt);
     support.root.rotation.y = Math.PI + Math.sin(state.distance * 0.09 + index) * 0.04;
-    const target = findTarget(support.root.position, 25);
+    setHealthBar(support, support.hp / Math.max(1, support.maxHp));
+    const target = findTarget(support.root.position, TARGET_LOCK_RANGE);
     if (target) {
       aimTurret(support, target.root.position, dt);
       support.cooldown -= dt;
@@ -574,23 +631,30 @@ function aimTurret(source, targetPos, dt) {
 
 function shoot(source, target, power, scale) {
   const color = bulletColor(power);
-  const material = new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.28,
-    emissive: color,
-    emissiveIntensity: 1.25
-  });
+  const material = getBulletMaterial(color);
   const bullet = new THREE.Mesh(geometries.bullet, material);
   bullet.scale.setScalar(scale);
   source.muzzle.getWorldPosition(bullet.position);
   bullet.userData = {
     target,
     damage: Math.max(1, power * scale),
-    life: 1.4,
+    life: BULLET_MAX_RANGE / 44,
     velocity: new THREE.Vector3()
   };
   bullets.push(bullet);
   projectileLayer.add(bullet);
+}
+
+function getBulletMaterial(color) {
+  if (!bulletMaterials.has(color)) {
+    bulletMaterials.set(color, new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.28,
+      emissive: color,
+      emissiveIntensity: 1.25
+    }));
+  }
+  return bulletMaterials.get(color);
 }
 
 function updateBullets(dt) {
@@ -603,7 +667,7 @@ function updateBullets(dt) {
       continue;
     }
     tmpVec.copy(target.root.position).add(new THREE.Vector3(0, 0.8, 0)).sub(bullet.position).normalize();
-    bullet.userData.velocity.lerp(tmpVec.multiplyScalar(43), 0.22);
+    bullet.userData.velocity.lerp(tmpVec.multiplyScalar(44), 0.22);
     bullet.position.addScaledVector(bullet.userData.velocity, dt);
     if (bullet.position.distanceTo(target.root.position) < target.radius + 0.42) {
       damageEnemy(target, bullet.userData.damage);
@@ -620,7 +684,7 @@ function updateGates(dt) {
     gate.root.children.forEach((child, childIndex) => {
       child.rotation.y = Math.sin(state.distance * 0.06 + childIndex) * 0.045;
     });
-    if (!gate.used && gate.root.position.z > 6.4 && gate.root.position.z < 10.8) {
+    if (!gate.used && gate.root.position.z > PLAYER_Z - 1.4 && gate.root.position.z < PLAYER_Z + 2.2) {
       const panel = gate.panels.find((entry) => Math.abs(state.laneX - entry.x) < 2.15);
       if (panel) applyGate(gate, panel);
     }
@@ -639,7 +703,7 @@ function updateEnemies(dt) {
       enemy.root.position.y = 1.7 + Math.sin(state.distance * 0.16 + enemy.phase) * 0.5;
       enemy.root.rotation.x += dt * 1.6;
     }
-    if (enemy.root.position.z > 7.2 && enemy.root.position.z < 10.6 && Math.abs(enemy.root.position.x - state.laneX) < enemy.radius + 1.35) {
+    if (enemy.root.position.z > PLAYER_Z - 1.2 && enemy.root.position.z < PLAYER_Z + 2.2 && Math.abs(enemy.root.position.x - state.laneX) < enemy.radius + 1.35) {
       collideEnemy(enemy);
       removeEnemy(i);
       continue;
@@ -651,15 +715,18 @@ function updateEnemies(dt) {
 }
 
 function updateCoins(dt) {
-  const magnet = 1.7 + save.upgrades.magnet * 0.85;
+  const magnetReachPx = getCoinMagnetReachPx();
+  const magnetLevel = save.upgrades.magnet || 0;
   for (let i = coins.length - 1; i >= 0; i--) {
     const coin = coins[i];
     coin.position.z += state.speed * dt;
     coin.rotation.y += dt * 5.6;
     coin.rotation.x += dt * 1.8;
     const dist = coin.position.distanceTo(tank.root.position);
-    if (dist < magnet + (save.upgrades.magnet > 0 ? 2.1 : 0)) {
-      coin.position.lerp(tmpVec.set(state.laneX, 1.25, 8), 0.16 + save.upgrades.magnet * 0.02);
+    const zClose = Math.abs(coin.position.z - PLAYER_Z) < 15 + magnetLevel * 1.6;
+    const xClose = Math.abs(worldToScreenX(coin.position) - worldToScreenX(tank.root.position)) <= magnetReachPx;
+    if (magnetLevel > 0 && zClose && xClose) {
+      coin.position.lerp(tmpVec.set(state.laneX, 1.25, PLAYER_Z), 0.07 + magnetLevel * 0.012);
     }
     if (dist < 1.3) {
       state.runCoins += Math.round(1 + save.upgrades.bank * 0.2);
@@ -671,6 +738,24 @@ function updateCoins(dt) {
   }
 }
 
+function getCoinMagnetReachPx() {
+  const level = save.upgrades.magnet || 0;
+  const tankWidthPx = Math.abs(
+    worldToScreenX(tmpVec.set(state.laneX + 1.35, 1, PLAYER_Z)) -
+    worldToScreenX(tmpVec2.set(state.laneX - 1.35, 1, PLAYER_Z))
+  );
+  const movementPx = Math.max(1, Math.abs(
+    worldToScreenX(tmpVec.set(PLAYER_MAX_X, 1, PLAYER_Z)) -
+    worldToScreenX(tmpVec2.set(PLAYER_MIN_X, 1, PLAYER_Z))
+  ) - tankWidthPx);
+  return tankWidthPx * 0.5 + movementPx * 0.05 * level;
+}
+
+function worldToScreenX(position) {
+  screenVec.copy(position).project(camera);
+  return (screenVec.x * 0.5 + 0.5) * window.innerWidth;
+}
+
 function updateShards(dt) {
   for (let i = shards.length - 1; i >= 0; i--) {
     const shard = shards[i];
@@ -679,6 +764,7 @@ function updateShards(dt) {
     shard.userData.velocity.y -= dt * 8;
     shard.rotation.x += dt * shard.userData.spin.x;
     shard.rotation.y += dt * shard.userData.spin.y;
+    if (shard.userData.expand) shard.scale.addScalar(shard.userData.expand * dt);
     shard.material.opacity = Math.max(0, shard.userData.life / 0.75);
     if (shard.userData.life <= 0) removeFromArray(shards, i, effectLayer);
   }
@@ -706,9 +792,9 @@ function spawnGateSet(z) {
   lanes.forEach((laneIndex, panelIndex) => {
     const positive = panelIndex === 0 || Math.random() > 0.42;
     const type = panelIndex === 0 ? primary : (rareSupport && panelIndex === 1 ? 'support' : secondary);
-    const amount = type === 'support' ? (positive ? 1 : -1) : randomAmount(positive, type);
-    const panel = createGatePanel(LANES[laneIndex], type, amount);
-    gate.panels.push({ x: LANES[laneIndex], type, amount, mesh: panel });
+    const spec = createGateSpec(type, positive);
+    const panel = createGatePanel(LANES[laneIndex], spec);
+    gate.panels.push({ x: LANES[laneIndex], ...spec, mesh: panel });
     root.add(panel);
   });
 
@@ -716,7 +802,18 @@ function spawnGateSet(z) {
   gates.push(gate);
 }
 
-function createGatePanel(x, type, amount) {
+function createGateSpec(type, positive) {
+  if (type === 'support') {
+    return { type, op: 'add', amount: positive ? 1 : -1 };
+  }
+  if (positive && Math.random() < 0.12) {
+    return { type, op: 'mul', amount: 2 };
+  }
+  return { type, op: 'add', amount: randomAmount(positive, type) };
+}
+
+function createGatePanel(x, spec) {
+  const { type, amount, op } = spec;
   const good = amount > 0;
   const group = new THREE.Group();
   group.position.x = x;
@@ -733,29 +830,42 @@ function createGatePanel(x, type, amount) {
   }
 
   const typeConfig = GATE_TYPES.find((entry) => entry.key === type);
-  const label = `${amount > 0 ? '+' : ''}${amount} ${typeConfig.icon}`;
-  const text = makeTextSprite(label, good ? '#c7fff0' : '#ffd0cf', good ? 'rgba(12, 80, 72, 0.52)' : 'rgba(110, 18, 22, 0.52)');
-  text.position.set(0, 2.2, -0.1);
-  text.scale.set(2.7, 1.05, 1);
+  const text = makeGateTextSprite(spec, typeConfig);
+  text.position.set(0, 2.16, 0.22);
+  text.scale.set(3.05, 2.2, 1);
   group.add(text);
 
   const glow = new THREE.PointLight(typeConfig.color, good ? 1.1 : 0.7, 9);
-  glow.position.set(0, 2.1, 0.4);
-  group.add(glow);
+  if (!matchMedia('(max-width: 700px)').matches) {
+    glow.position.set(0, 2.1, 0.4);
+    group.add(glow);
+  }
   return group;
 }
 
 function randomAmount(positive, type) {
   const base = type === 'strength' ? state.strength : state.defense;
-  const magnitude = Math.max(1, Math.round(Math.min(8, base * (0.18 + Math.random() * 0.18))));
+  const factor = type === 'defense' ? 0.12 + Math.random() * 0.12 : 0.16 + Math.random() * 0.16;
+  const magnitude = Math.max(1, Math.round(Math.min(type === 'defense' ? 5 : 8, base * factor)));
   return positive ? magnitude : -Math.max(1, Math.ceil(magnitude * 0.75));
 }
 
 function applyGate(gate, panel) {
   gate.used = true;
   const oldTotal = state.strength + state.defense + supportTanks.length;
-  if (panel.type === 'strength') state.strength = Math.max(1, state.strength + panel.amount);
-  if (panel.type === 'defense') state.defense = Math.max(0, state.defense + panel.amount);
+  if (panel.type === 'strength') {
+    state.strength = panel.op === 'mul' ? Math.ceil(state.strength * panel.amount) : Math.max(1, state.strength + panel.amount);
+  }
+  if (panel.type === 'defense') {
+    if (panel.op === 'mul') {
+      const nextDefense = Math.ceil(state.defense * panel.amount);
+      state.maxDefense += Math.max(0, nextDefense - state.defense);
+      state.defense = nextDefense;
+    } else {
+      state.defense = Math.max(0, state.defense + panel.amount);
+      if (panel.amount > 0) state.maxDefense += panel.amount;
+    }
+  }
   if (panel.type === 'support') {
     if (panel.amount > 0) addSupportTank(true);
     else loseSupportTank();
@@ -769,7 +879,7 @@ function applyGate(gate, panel) {
       state.overdrive = Math.min(4, state.overdrive + 1.6);
       setMessage(`${panel.type.toUpperCase()} streak: overdrive fire online`);
     } else {
-      setMessage(`${panel.type.toUpperCase()} gate gained ${panel.amount}`);
+      setMessage(`${panel.type.toUpperCase()} gate gained ${formatGateValue(panel)}`);
     }
   } else {
     state.gateStreak = 0;
@@ -779,7 +889,9 @@ function applyGate(gate, panel) {
   const newTotal = state.strength + state.defense + supportTanks.length;
   if (newTotal > oldTotal) state.runCoins += Math.max(1, Math.floor((newTotal - oldTotal) * 0.8));
   state.peakPower = Math.max(state.peakPower, state.strength + state.defense + supportTanks.length);
-  spawnShardBurst(panel.mesh.getWorldPosition(tmpVec), 18, panel.amount > 0 ? 0x80f0ff : 0xff6d68);
+  const impact = panel.mesh.getWorldPosition(tmpVec);
+  spawnGlassSmash(impact, panel.amount > 0 ? 0x96f3ff : 0xff8a82);
+  state.screenShake = Math.max(state.screenShake, 0.25);
   obstacleLayer.remove(gate.root);
 }
 
@@ -790,9 +902,12 @@ function addSupportTank(showMessage) {
     return;
   }
   const support = createTank(materials.friendly, 0.5);
-  support.root.position.set(state.laneX, 0, 10.2 + supportTanks.length * 0.7);
+  support.root.position.set(state.laneX, 0, PLAYER_Z + 1.45 + supportTanks.length * 0.55);
   support.root.rotation.y = Math.PI;
   support.cooldown = 0.3 + Math.random() * 0.4;
+  support.maxHp = 1 + Math.floor(save.upgrades.armor / 5);
+  support.hp = support.maxHp;
+  setHealthBar(support, 1);
   supportTanks.push(support);
   scene.add(support.root);
   state.support = supportTanks.length;
@@ -825,11 +940,12 @@ function spawnEnemyWave(z) {
 
 function createEnemy(kind) {
   const root = new THREE.Group();
-  const difficulty = 1 + state.distance / 54 + state.peakPower * 0.08;
-  let hp = Math.round((kind === 'drone' ? 2.4 : 4.8) * difficulty);
+  const upgradePressure = save.upgrades.core * 0.18 + save.upgrades.armor * 0.3 + save.upgrades.bay * 0.14;
+  const difficulty = 1 + state.distance / 42 + state.peakPower * 0.15 + upgradePressure;
+  let hp = Math.round((kind === 'drone' ? 3.2 : 6.2) * difficulty);
   let radius = kind === 'drone' ? 0.9 : 1.35;
   if (kind === 'boss') {
-    hp = Math.round(44 + state.peakPower * 5.4 + supportTanks.length * 7);
+    hp = Math.round(60 + state.peakPower * 7.2 + supportTanks.length * 10 + save.upgrades.armor * 12);
     radius = 3.2;
     const body = new THREE.Mesh(geometries.boss, materials.enemy);
     body.position.y = 1.4;
@@ -844,9 +960,6 @@ function createEnemy(kind) {
     body.position.y = 1.6;
     body.castShadow = true;
     root.add(body);
-    const light = new THREE.PointLight(0xff423b, 1, 8);
-    light.position.y = 1.6;
-    root.add(light);
   } else {
     const body = new THREE.Mesh(geometries.enemy, materials.enemy);
     body.position.y = 0.82;
@@ -897,12 +1010,20 @@ function damageEnemy(enemy, damage) {
 
 function collideEnemy(enemy) {
   state.screenShake = 0.45;
-  if (supportTanks.length && Math.random() < 0.55) {
-    loseSupportTank();
-    setMessage('Escort intercepted the crash');
+  const hit = getEnemyCollisionDamage(enemy);
+  if (supportTanks.length && Math.random() < 0.35) {
+    const support = supportTanks[supportTanks.length - 1];
+    support.hp -= 1;
+    spawnShardBurst(support.root.position, 10, 0x7bd66f);
+    if (support.hp <= 0) {
+      loseSupportTank();
+      setMessage('Escort took the hit and broke away');
+    } else {
+      setHealthBar(support, support.hp / support.maxHp);
+      setMessage('Escort armor absorbed the crash');
+    }
     return;
   }
-  const hit = enemy.kind === 'boss' ? 5 : enemy.kind === 'drone' ? 1 : 2;
   state.defense -= hit;
   spawnShardBurst(tank.root.position, 14, 0xff635d);
   if (state.defense < 0) {
@@ -910,6 +1031,11 @@ function collideEnemy(enemy) {
   } else {
     setMessage(`Armor absorbed ${hit} damage`);
   }
+}
+
+function getEnemyCollisionDamage(enemy) {
+  const base = enemy.kind === 'boss' ? 8 : enemy.kind === 'drone' ? 2 : 3;
+  return base + Math.floor(state.distance / 82) + Math.floor(state.peakPower / 16);
 }
 
 function spawnCoinArc(z, x = 0, count = 7) {
@@ -923,6 +1049,40 @@ function spawnCoinArc(z, x = 0, count = 7) {
   }
 }
 
+function spawnGlassSmash(position, color) {
+  spawnShardBurst(position, 16, color);
+  for (let i = 0; i < 18; i++) {
+    const material = materials.shard.clone();
+    material.color.setHex(color);
+    material.opacity = 0.58 + Math.random() * 0.22;
+    const shard = new THREE.Mesh(geometries.glassChip, material);
+    shard.position.copy(position);
+    shard.scale.set(0.7 + Math.random() * 2.2, 0.5 + Math.random() * 1.8, 1);
+    shard.userData = {
+      life: 0.55 + Math.random() * 0.42,
+      velocity: new THREE.Vector3((Math.random() - 0.5) * 15, 3 + Math.random() * 8, (Math.random() - 0.5) * 12 + 2),
+      spin: { x: (Math.random() - 0.5) * 18, y: (Math.random() - 0.5) * 18 }
+    };
+    effectLayer.add(shard);
+    shards.push(shard);
+  }
+
+  const flash = new THREE.Mesh(
+    new THREE.RingGeometry(0.4, 2.6, 24),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.42, side: THREE.DoubleSide })
+  );
+  flash.position.copy(position);
+  flash.rotation.x = Math.PI / 2;
+  flash.userData = {
+    life: 0.28,
+    velocity: new THREE.Vector3(0, 0, 0),
+    spin: { x: 0, y: 0 },
+    expand: 8
+  };
+  effectLayer.add(flash);
+  shards.push(flash);
+}
+
 function spawnShardBurst(position, count, color) {
   for (let i = 0; i < count; i++) {
     const material = materials.shard.clone();
@@ -930,7 +1090,7 @@ function spawnShardBurst(position, count, color) {
     const shard = new THREE.Mesh(geometries.shard, material);
     shard.position.copy(position);
     shard.userData = {
-      life: 0.45 + Math.random() * 0.35,
+      life: 0.34 + Math.random() * 0.28,
       velocity: new THREE.Vector3((Math.random() - 0.5) * 8, 2 + Math.random() * 6, (Math.random() - 0.5) * 8),
       spin: { x: (Math.random() - 0.5) * 12, y: (Math.random() - 0.5) * 12 }
     };
@@ -997,17 +1157,139 @@ function updateCamera(dt) {
   const baseX = tank ? state.laneX * 0.25 : 0;
   const shakeX = (Math.random() - 0.5) * state.screenShake;
   const shakeY = (Math.random() - 0.5) * state.screenShake;
-  tmpVec.set(baseX + shakeX, 11.7 + shakeY, 22.5);
+  tmpVec.set(baseX + shakeX, 11.9 + shakeY, 20.6);
   camera.position.lerp(tmpVec, 1 - Math.exp(-dt * 6));
-  tmpVec2.set(baseX * 0.22, 1.45, -13.5);
+  tmpVec2.set(baseX * 0.22, 1.45, -15.5);
   camera.lookAt(tmpVec2);
 }
 
 function resize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function formatGateValue(spec) {
+  if (spec.op === 'mul') return `*${spec.amount}`;
+  return `${spec.amount > 0 ? '+' : ''}${spec.amount}`;
+}
+
+function makeGateTextSprite(spec, typeConfig) {
+  const key = `${spec.type}:${spec.op}:${spec.amount}`;
+  if (gateTextureCache.has(key)) {
+    return new THREE.Sprite(new THREE.SpriteMaterial({ map: gateTextureCache.get(key), transparent: true, depthWrite: false }));
+  }
+
+  const textCanvas = document.createElement('canvas');
+  textCanvas.width = 512;
+  textCanvas.height = 384;
+  const ctx = textCanvas.getContext('2d');
+  ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+
+  const good = spec.amount > 0;
+  ctx.fillStyle = good ? 'rgba(4, 42, 52, 0.42)' : 'rgba(78, 12, 18, 0.45)';
+  roundRect(ctx, 74, 48, 364, 288, 34);
+  ctx.fill();
+  ctx.strokeStyle = good ? 'rgba(220, 255, 255, 0.92)' : 'rgba(255, 224, 224, 0.92)';
+  ctx.lineWidth = 8;
+  roundRect(ctx, 74, 48, 364, 288, 34);
+  ctx.stroke();
+
+  drawGateIcon(ctx, spec.type, typeConfig.color, 256, 136, good);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.68)';
+  ctx.lineWidth = 12;
+  ctx.font = '950 92px system-ui, sans-serif';
+  const value = formatGateValue(spec);
+  ctx.strokeText(value, 256, 260);
+  ctx.fillStyle = good ? '#dffcff' : '#ffe5df';
+  ctx.fillText(value, 256, 260);
+
+  const texture = new THREE.CanvasTexture(textCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  gateTextureCache.set(key, texture);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
+  return sprite;
+}
+
+function drawGateIcon(ctx, type, color, x, y, good) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.lineWidth = 14;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.62)';
+  ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+
+  if (type === 'strength') {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.68)';
+    ctx.beginPath();
+    ctx.moveTo(-78, 36);
+    ctx.quadraticCurveTo(-48, -26, 10, -18);
+    ctx.quadraticCurveTo(72, -8, 76, 48);
+    ctx.stroke();
+    ctx.strokeStyle = `#${color.toString(16).padStart(6, '0')}`;
+    ctx.lineWidth = 22;
+    ctx.beginPath();
+    ctx.moveTo(-72, 32);
+    ctx.quadraticCurveTo(-46, -26, 6, -20);
+    ctx.quadraticCurveTo(58, -14, 66, 32);
+    ctx.stroke();
+    ctx.fillStyle = good ? '#fff8dc' : '#ffe0dc';
+    ctx.beginPath();
+    ctx.arc(46, -34, 31, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = `#${color.toString(16).padStart(6, '0')}`;
+    ctx.lineWidth = 12;
+    ctx.stroke();
+  } else if (type === 'defense') {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.68)';
+    ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+    ctx.beginPath();
+    ctx.moveTo(0, -78);
+    ctx.lineTo(70, -44);
+    ctx.lineTo(56, 32);
+    ctx.quadraticCurveTo(34, 72, 0, 88);
+    ctx.quadraticCurveTo(-34, 72, -56, 32);
+    ctx.lineTo(-70, -44);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.86)';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(0, -50);
+    ctx.lineTo(0, 50);
+    ctx.moveTo(-36, -16);
+    ctx.lineTo(36, -16);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.68)';
+    ctx.lineWidth = 12;
+    roundRect(ctx, -76, -10, 152, 64, 14);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(-42, 58, 18, 0, Math.PI * 2);
+    ctx.arc(42, 58, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, -22, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.86)';
+    ctx.lineWidth = 11;
+    ctx.beginPath();
+    ctx.moveTo(14, -28);
+    ctx.lineTo(76, -54);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function makeTextSprite(text, fill, background) {
