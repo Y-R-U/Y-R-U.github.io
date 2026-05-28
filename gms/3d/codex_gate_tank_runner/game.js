@@ -21,6 +21,15 @@ const resultDistance = document.getElementById('result-distance');
 const resultCoins = document.getElementById('result-coins');
 const resultPower = document.getElementById('result-power');
 const resultSupport = document.getElementById('result-support');
+const modelDebugButton = document.getElementById('model-debug-button');
+const modelGallery = document.getElementById('model-gallery');
+const modelGalleryClose = document.getElementById('model-gallery-close');
+const modelList = document.getElementById('model-list');
+const modelPreviewCanvas = document.getElementById('model-preview-canvas');
+const modelPreviewName = document.getElementById('model-preview-name');
+const modelPreviewMeta = document.getElementById('model-preview-meta');
+const modelMemoryStatus = document.getElementById('model-memory-status');
+const modelMemoryOutput = document.getElementById('model-memory-output');
 
 const startButton = document.getElementById('start-button');
 const shopButton = document.getElementById('shop-button');
@@ -30,6 +39,7 @@ const restartButton = document.getElementById('restart-button');
 const resultShopButton = document.getElementById('result-shop-button');
 
 const SAVE_KEY = 'codexGateTankRunnerSaveV1';
+const MODEL_MEMORY_KEY = 'codexGateTankRunnerModelLikesV1';
 const LANES = [-4.8, 0, 4.8];
 const ROAD_WIDTH = 16;
 const RUN_LENGTH_BASE = 820;
@@ -75,6 +85,7 @@ const screenVec = new THREE.Vector3();
 const bulletMaterials = new Map();
 const gateTextureCache = new Map();
 const effectMaterials = new Map();
+const previewMaterials = new Map();
 let lastIdleRender = 0;
 
 const save = loadSave();
@@ -214,6 +225,37 @@ const scenery = [];
 const supportTanks = [];
 let tank = null;
 let finishLine = null;
+
+const modelDebug = {
+  open: false,
+  renderer: null,
+  scene: null,
+  camera: null,
+  root: null,
+  selectedIndex: 0,
+  liked: new Set(loadModelLikes()),
+  rotationX: -0.22,
+  rotationY: 0,
+  zoom: 8,
+  drag: false,
+  lastX: 0,
+  lastY: 0
+};
+
+const MODEL_DEFS = [
+  { name: 'Atlas Siege Tank', note: 'Heavy hero tank with layered armor and gold trim.', build: createPreviewAtlasTank },
+  { name: 'Needle Scout Tank', note: 'Small support tank with a long fast cannon.', build: createPreviewScoutTank },
+  { name: 'Fortress Crusher', note: 'Boss-grade tracked machine with command crown.', build: createPreviewFortressCrusher },
+  { name: 'Glassbreaker Drone', note: 'Angular hovering enemy with wing fins and hot core.', build: createPreviewGlassbreakerDrone },
+  { name: 'Aegis Shield Rig', note: 'Mobile defense generator for armor upgrades.', build: createPreviewShieldRig },
+  { name: 'Magnet Harvester', note: 'Coin-pulling tower with rotating collector rings.', build: createPreviewMagnetHarvester },
+  { name: 'Railgun Sentry', note: 'Lane turret concept with stabilizer legs.', build: createPreviewRailgunSentry },
+  { name: 'Crystal Gate Pylon', note: 'Glass gate support with fractured energy panes.', build: createPreviewGatePylon },
+  { name: 'Finish Line Arch', note: 'Chunky victory arch with beacon caps.', build: createPreviewFinishArch },
+  { name: 'Pine Barricade', note: 'Richer low-poly tree cluster and rock base.', build: createPreviewPineBarricade },
+  { name: 'Coin Vault Truck', note: 'Reward convoy vehicle with visible cargo.', build: createPreviewCoinTruck },
+  { name: 'Overdrive Core', note: 'Power-up reactor with spinning armor fins.', build: createPreviewOverdriveCore }
+];
 
 initLighting();
 createWorld();
@@ -398,8 +440,24 @@ function bindInput() {
   resultShopButton.addEventListener('click', showShop);
   shopBackButton.addEventListener('click', showMenu);
   resetSaveButton.addEventListener('click', resetSave);
+  modelDebugButton.addEventListener('click', openModelGallery);
+  modelGalleryClose.addEventListener('click', closeModelGallery);
+  modelGallery.addEventListener('pointerdown', (event) => {
+    if (event.target === modelGallery) closeModelGallery();
+  });
+  modelPreviewCanvas.addEventListener('pointerdown', startModelDrag);
+  modelPreviewCanvas.addEventListener('pointermove', dragModelPreview);
+  modelPreviewCanvas.addEventListener('pointerup', endModelDrag);
+  modelPreviewCanvas.addEventListener('pointercancel', endModelDrag);
+  modelPreviewCanvas.addEventListener('wheel', zoomModelPreview, { passive: false });
+  renderModelList();
+  updateModelMemoryField(false);
 
   window.addEventListener('keydown', (event) => {
+    if (modelDebug.open) {
+      handleModelGalleryKey(event);
+      return;
+    }
     state.keys.add(event.key.toLowerCase());
     if (event.key === ' ' && !state.running && !state.ended) startGame();
   });
@@ -575,6 +633,7 @@ function updateMenuCoins() {
 function loop() {
   const dt = Math.min(clock.getDelta(), 0.033);
   if (state.running) updateGame(dt);
+  updateModelGallery(dt);
   if (state.running || performance.now() - lastIdleRender > 250) {
     updateCamera(dt);
     renderer.render(scene, camera);
@@ -1396,6 +1455,422 @@ function resize() {
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  resizeModelGallery();
+}
+
+function openModelGallery() {
+  modelDebug.open = true;
+  state.keys.clear();
+  modelGallery.classList.remove('hidden');
+  ensureModelGalleryScene();
+  selectDebugModel(modelDebug.selectedIndex);
+  resizeModelGallery();
+  modelPreviewCanvas.focus();
+}
+
+function closeModelGallery() {
+  modelDebug.open = false;
+  modelGallery.classList.add('hidden');
+  modelDebug.drag = false;
+}
+
+function ensureModelGalleryScene() {
+  if (modelDebug.renderer) return;
+  modelDebug.renderer = new THREE.WebGLRenderer({ canvas: modelPreviewCanvas, antialias: true, alpha: true });
+  modelDebug.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
+  modelDebug.scene = new THREE.Scene();
+  modelDebug.scene.background = new THREE.Color(0x11191d);
+  modelDebug.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
+  modelDebug.camera.position.set(0, 3.4, modelDebug.zoom);
+  modelDebug.scene.add(new THREE.HemisphereLight(0xeaf8ff, 0x17231c, 1.8));
+  const key = new THREE.DirectionalLight(0xffe0a8, 2.2);
+  key.position.set(-5, 8, 6);
+  modelDebug.scene.add(key);
+  const rim = new THREE.DirectionalLight(0x76d9ff, 1.2);
+  rim.position.set(5, 4, -5);
+  modelDebug.scene.add(rim);
+  const floor = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.8, 4.5, 0.12, 48),
+    getPreviewMaterial('display-floor', 0x1b272b, 0.82, 0.02)
+  );
+  floor.position.y = -0.08;
+  modelDebug.scene.add(floor);
+}
+
+function renderModelList() {
+  modelList.innerHTML = '';
+  MODEL_DEFS.forEach((model, index) => {
+    const row = document.createElement('label');
+    row.className = `model-row${index === modelDebug.selectedIndex ? ' is-active' : ''}`;
+    row.innerHTML = `
+      <input type="checkbox" ${modelDebug.liked.has(model.name) ? 'checked' : ''} aria-label="Like ${model.name}">
+      <span><strong>${model.name}</strong><span>${model.note}</span></span>
+    `;
+    row.addEventListener('click', () => selectDebugModel(index));
+    const checkbox = row.querySelector('input');
+    checkbox.addEventListener('click', (event) => event.stopPropagation());
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) modelDebug.liked.add(model.name);
+      else modelDebug.liked.delete(model.name);
+      updateModelMemoryField(true);
+    });
+    modelList.append(row);
+  });
+}
+
+function selectDebugModel(index) {
+  modelDebug.selectedIndex = clamp(index, 0, MODEL_DEFS.length - 1);
+  const model = MODEL_DEFS[modelDebug.selectedIndex];
+  modelPreviewName.textContent = model.name;
+  modelPreviewMeta.textContent = `${model.note} Drag, wheel zoom, or use arrow keys.`;
+  if (modelDebug.root) {
+    modelDebug.scene.remove(modelDebug.root);
+    disposePreviewModel(modelDebug.root);
+  }
+  modelDebug.root = model.build();
+  centerPreviewModel(modelDebug.root);
+  modelDebug.scene.add(modelDebug.root);
+  modelDebug.rotationX = -0.22;
+  modelDebug.rotationY = 0;
+  renderModelList();
+}
+
+function disposePreviewModel(root) {
+  root.traverse((child) => {
+    if (child.geometry && !Object.values(geometries).includes(child.geometry)) child.geometry.dispose();
+  });
+}
+
+function centerPreviewModel(root) {
+  const box = new THREE.Box3().setFromObject(root);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  root.position.sub(center);
+  const maxSize = Math.max(size.x, size.y, size.z, 1);
+  root.scale.setScalar(Math.min(1.35, 4.2 / maxSize));
+  root.position.y += 0.12;
+}
+
+function updateModelGallery(dt) {
+  if (!modelDebug.open || !modelDebug.renderer || !modelDebug.root) return;
+  if (!modelDebug.drag) modelDebug.rotationY += dt * 0.55;
+  modelDebug.root.rotation.set(modelDebug.rotationX, modelDebug.rotationY, 0);
+  modelDebug.camera.position.set(0, 2.8, modelDebug.zoom);
+  modelDebug.camera.lookAt(0, 1.2, 0);
+  modelDebug.renderer.render(modelDebug.scene, modelDebug.camera);
+}
+
+function resizeModelGallery() {
+  if (!modelDebug.renderer) return;
+  const width = Math.max(1, modelPreviewCanvas.clientWidth);
+  const height = Math.max(1, modelPreviewCanvas.clientHeight);
+  modelDebug.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
+  modelDebug.renderer.setSize(width, height, false);
+  modelDebug.camera.aspect = width / height;
+  modelDebug.camera.updateProjectionMatrix();
+}
+
+function startModelDrag(event) {
+  if (!modelDebug.open) return;
+  event.preventDefault();
+  modelDebug.drag = true;
+  modelDebug.lastX = event.clientX;
+  modelDebug.lastY = event.clientY;
+  modelPreviewCanvas.setPointerCapture(event.pointerId);
+  modelPreviewCanvas.focus();
+}
+
+function dragModelPreview(event) {
+  if (!modelDebug.drag) return;
+  event.preventDefault();
+  const dx = event.clientX - modelDebug.lastX;
+  const dy = event.clientY - modelDebug.lastY;
+  modelDebug.lastX = event.clientX;
+  modelDebug.lastY = event.clientY;
+  modelDebug.rotationY += dx * 0.012;
+  modelDebug.rotationX = clamp(modelDebug.rotationX + dy * 0.01, -1.1, 0.75);
+}
+
+function endModelDrag(event) {
+  if (!modelDebug.drag) return;
+  modelDebug.drag = false;
+  try {
+    modelPreviewCanvas.releasePointerCapture(event.pointerId);
+  } catch {
+    // Capture can already be released after pointer cancel.
+  }
+}
+
+function zoomModelPreview(event) {
+  if (!modelDebug.open) return;
+  event.preventDefault();
+  modelDebug.zoom = clamp(modelDebug.zoom + Math.sign(event.deltaY) * 0.5, 4.5, 12);
+}
+
+function handleModelGalleryKey(event) {
+  const key = event.key.toLowerCase();
+  if (key === 'escape') {
+    closeModelGallery();
+    event.preventDefault();
+    return;
+  }
+  if (key === 'arrowleft') modelDebug.rotationY -= 0.18;
+  else if (key === 'arrowright') modelDebug.rotationY += 0.18;
+  else if (key === 'arrowup') modelDebug.rotationX = clamp(modelDebug.rotationX - 0.12, -1.1, 0.75);
+  else if (key === 'arrowdown') modelDebug.rotationX = clamp(modelDebug.rotationX + 0.12, -1.1, 0.75);
+  else return;
+  event.preventDefault();
+}
+
+function loadModelLikes() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(MODEL_MEMORY_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.filter((name) => typeof name === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function updateModelMemoryField(copyToClipboard) {
+  const names = MODEL_DEFS.map((model) => model.name).filter((name) => modelDebug.liked.has(name));
+  const text = names.length ? names.join('\n') : '';
+  localStorage.setItem(MODEL_MEMORY_KEY, JSON.stringify(names));
+  modelMemoryOutput.value = text || 'No model selections yet.';
+  modelMemoryStatus.textContent = names.length ? `${names.length} selection${names.length === 1 ? '' : 's'} saved to browser memory.` : 'Selections saved here.';
+  if (copyToClipboard && navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      modelMemoryStatus.textContent = names.length ? 'Copied selection list to clipboard.' : 'Cleared selection memory.';
+    }).catch(() => {
+      copyModelMemoryFallback(names.length);
+    });
+  } else if (copyToClipboard) {
+    copyModelMemoryFallback(names.length);
+  }
+}
+
+function copyModelMemoryFallback(hasSelections) {
+  modelMemoryOutput.focus();
+  modelMemoryOutput.select();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch {
+    copied = false;
+  }
+  modelMemoryStatus.textContent = copied
+    ? (hasSelections ? 'Copied selection list to clipboard.' : 'Cleared selection memory.')
+    : 'Saved below. Copy manually if clipboard is blocked.';
+}
+
+function getPreviewMaterial(key, color, roughness = 0.62, metalness = 0.08, emissive = 0x000000) {
+  const mapKey = `${key}:${color}:${roughness}:${metalness}:${emissive}`;
+  if (!previewMaterials.has(mapKey)) {
+    previewMaterials.set(mapKey, new THREE.MeshStandardMaterial({ color, roughness, metalness, emissive, emissiveIntensity: emissive ? 0.2 : 0 }));
+  }
+  return previewMaterials.get(mapKey);
+}
+
+function addBox(root, size, position, material, rotation = [0, 0, 0]) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), material);
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+  root.add(mesh);
+  return mesh;
+}
+
+function addCylinder(root, radiusTop, radiusBottom, height, segments, position, material, rotation = [0, 0, 0]) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments), material);
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+  root.add(mesh);
+  return mesh;
+}
+
+function addCone(root, radius, height, segments, position, material, rotation = [0, 0, 0]) {
+  const mesh = new THREE.Mesh(new THREE.ConeGeometry(radius, height, segments), material);
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+  root.add(mesh);
+  return mesh;
+}
+
+function addSphere(root, radius, position, material, scale = [1, 1, 1]) {
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 10), material);
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.scale.set(scale[0], scale[1], scale[2]);
+  root.add(mesh);
+  return mesh;
+}
+
+function createPreviewAtlasTank() {
+  const root = new THREE.Group();
+  const green = getPreviewMaterial('atlas-green', 0x526f5c, 0.58, 0.16);
+  const dark = getPreviewMaterial('atlas-dark', 0x172125, 0.74, 0.18);
+  const gold = getPreviewMaterial('atlas-gold', 0xd7aa52, 0.42, 0.18);
+  addBox(root, [3.8, 0.58, 4.2], [0, 0.58, 0], dark);
+  addBox(root, [3.18, 0.9, 3.5], [0, 1.08, 0], green);
+  addBox(root, [2.35, 0.34, 2.65], [0, 1.72, -0.08], green);
+  addCylinder(root, 0.92, 1.08, 0.6, 10, [0, 2.12, -0.18], green);
+  addCylinder(root, 0.16, 0.22, 2.95, 10, [0, 2.18, -1.9], dark, [Math.PI / 2, 0, 0]);
+  addBox(root, [0.62, 0.22, 0.46], [0, 2.18, -3.3], gold);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.48, 0.68, 4.42], [side * 2.08, 0.66, 0], dark);
+    for (let i = 0; i < 5; i++) addCylinder(root, 0.22, 0.22, 0.12, 10, [side * 2.36, 0.66, -1.65 + i * 0.82], gold, [0, 0, Math.PI / 2]);
+  }
+  return root;
+}
+
+function createPreviewScoutTank() {
+  const root = new THREE.Group();
+  const body = getPreviewMaterial('scout-body', 0x5fa977, 0.6, 0.12);
+  const dark = getPreviewMaterial('scout-dark', 0x1b2b2e, 0.74, 0.16);
+  const cyan = getPreviewMaterial('scout-cyan', 0x54d8ff, 0.34, 0.12, 0x164a55);
+  addBox(root, [2.4, 0.52, 3.05], [0, 0.62, 0], body);
+  addBox(root, [2.9, 0.34, 3.25], [0, 0.38, 0], dark);
+  addCylinder(root, 0.58, 0.7, 0.44, 8, [0, 1.14, -0.2], body);
+  addCylinder(root, 0.08, 0.13, 3.2, 8, [0, 1.18, -1.95], cyan, [Math.PI / 2, 0, 0]);
+  addBox(root, [1.35, 0.1, 0.34], [0, 1.42, 0.45], cyan);
+  for (const side of [-1, 1]) addBox(root, [0.34, 0.44, 3.18], [side * 1.45, 0.46, 0], dark);
+  return root;
+}
+
+function createPreviewFortressCrusher() {
+  const root = new THREE.Group();
+  const red = getPreviewMaterial('fortress-red', 0x963632, 0.64, 0.18);
+  const dark = getPreviewMaterial('fortress-dark', 0x2a1619, 0.8, 0.16);
+  const brass = getPreviewMaterial('fortress-brass', 0xefb75b, 0.45, 0.12);
+  addBox(root, [5.8, 1.8, 4.5], [0, 1.05, 0], red);
+  addBox(root, [6.7, 0.62, 4.9], [0, 0.48, 0], dark);
+  addCylinder(root, 1.45, 1.75, 0.72, 8, [0, 2.42, -0.25], dark);
+  addCylinder(root, 0.22, 0.34, 3.5, 9, [0, 2.44, -2.35], brass, [Math.PI / 2, 0, 0]);
+  addBox(root, [4.6, 0.18, 0.52], [0, 1.88, -2.34], brass);
+  for (const side of [-1, 1]) addBox(root, [0.72, 0.82, 5.05], [side * 3.42, 0.65, 0], dark);
+  for (let i = 0; i < 5; i++) addBox(root, [0.45, 0.5, 0.2], [(i - 2) * 0.58, 3.0, -0.25], brass);
+  return root;
+}
+
+function createPreviewGlassbreakerDrone() {
+  const root = new THREE.Group();
+  const red = getPreviewMaterial('drone-red', 0xb63e3a, 0.52, 0.18);
+  const dark = getPreviewMaterial('drone-dark', 0x251b22, 0.7, 0.12);
+  const glow = getPreviewMaterial('drone-core', 0xffc25d, 0.28, 0.08, 0x8a3b00);
+  addSphere(root, 0.92, [0, 1.45, 0], red, [1.2, 0.72, 1.05]);
+  addBox(root, [4.2, 0.12, 0.62], [0, 1.44, 0], dark, [0, 0, 0.1]);
+  addBox(root, [0.62, 0.12, 3.1], [0, 1.36, 0], dark, [0.14, 0, 0]);
+  addSphere(root, 0.34, [0, 1.48, -0.74], glow, [1, 1, 1]);
+  for (const x of [-1.9, 1.9]) addCylinder(root, 0.22, 0.28, 0.28, 8, [x, 1.46, 0], glow);
+  return root;
+}
+
+function createPreviewShieldRig() {
+  const root = new THREE.Group();
+  const blue = getPreviewMaterial('shield-blue', 0x54d8ff, 0.36, 0.08, 0x0c4b64);
+  const steel = getPreviewMaterial('shield-steel', 0x56646a, 0.62, 0.18);
+  const dark = getPreviewMaterial('shield-dark', 0x172125, 0.72, 0.12);
+  addBox(root, [2.8, 0.62, 2.4], [0, 0.55, 0], steel);
+  addCylinder(root, 0.55, 0.75, 1.8, 8, [0, 1.52, 0], dark);
+  addCylinder(root, 1.55, 1.55, 0.08, 32, [0, 2.1, 0], blue, [Math.PI / 2, 0, 0]);
+  addCylinder(root, 2.15, 2.15, 0.08, 32, [0, 2.1, 0], blue, [Math.PI / 2, 0, 0]);
+  for (const side of [-1, 1]) addBox(root, [0.34, 0.52, 2.6], [side * 1.58, 0.42, 0], dark);
+  return root;
+}
+
+function createPreviewMagnetHarvester() {
+  const root = new THREE.Group();
+  const gold = getPreviewMaterial('magnet-gold', 0xf0bc52, 0.42, 0.12);
+  const cyan = getPreviewMaterial('magnet-cyan', 0x54d8ff, 0.3, 0.08, 0x154858);
+  const base = getPreviewMaterial('magnet-base', 0x3a474a, 0.72, 0.14);
+  addBox(root, [2.5, 0.52, 2.5], [0, 0.28, 0], base);
+  addCylinder(root, 0.42, 0.6, 2.3, 10, [0, 1.58, 0], gold);
+  addCylinder(root, 1.42, 1.42, 0.12, 24, [0, 2.25, 0], cyan, [Math.PI / 2, 0, 0]);
+  addCylinder(root, 1.1, 1.1, 0.12, 24, [0, 2.85, 0], cyan, [Math.PI / 2, 0, 0]);
+  addSphere(root, 0.44, [0, 3.18, 0], gold, [1, 1, 1]);
+  return root;
+}
+
+function createPreviewRailgunSentry() {
+  const root = new THREE.Group();
+  const steel = getPreviewMaterial('rail-steel', 0x5d6669, 0.58, 0.22);
+  const dark = getPreviewMaterial('rail-dark', 0x182022, 0.72, 0.16);
+  const orange = getPreviewMaterial('rail-orange', 0xff9954, 0.34, 0.08, 0x5a1f00);
+  addCylinder(root, 0.9, 1.15, 0.7, 8, [0, 0.7, 0], dark);
+  addBox(root, [1.7, 0.62, 1.4], [0, 1.28, 0], steel);
+  addBox(root, [0.32, 0.32, 3.8], [-0.32, 1.36, -1.8], dark);
+  addBox(root, [0.32, 0.32, 3.8], [0.32, 1.36, -1.8], dark);
+  addBox(root, [0.92, 0.2, 0.22], [0, 1.36, -3.72], orange);
+  for (const x of [-1.28, 1.28]) addBox(root, [0.24, 0.2, 2.5], [x, 0.18, 0.35], dark, [0, 0, x * 0.18]);
+  return root;
+}
+
+function createPreviewGatePylon() {
+  const root = new THREE.Group();
+  const glass = getPreviewMaterial('pylon-glass', 0x91f0ff, 0.22, 0.02, 0x12495a);
+  const red = getPreviewMaterial('pylon-red', 0xff8a82, 0.26, 0.02, 0x571111);
+  const post = getPreviewMaterial('pylon-post', 0x2a4d58, 0.54, 0.1);
+  for (const x of [-1.7, 1.7]) addBox(root, [0.26, 3.7, 0.26], [x, 1.85, 0], post);
+  addBox(root, [3.2, 2.8, 0.14], [0, 1.9, 0], glass, [0, 0.15, 0]);
+  addBox(root, [1.25, 1.05, 0.16], [-0.58, 2.0, 0.12], red, [0, -0.18, 0.1]);
+  addBox(root, [1.25, 1.05, 0.16], [0.74, 1.58, 0.14], glass, [0, 0.2, -0.12]);
+  return root;
+}
+
+function createPreviewFinishArch() {
+  const root = new THREE.Group();
+  const gold = getPreviewMaterial('arch-gold', 0xf4c75d, 0.44, 0.12);
+  const white = getPreviewMaterial('arch-white', 0xf8faf4, 0.62, 0.04);
+  const dark = getPreviewMaterial('arch-dark', 0x15191d, 0.7, 0.04);
+  for (const x of [-2.8, 2.8]) {
+    addBox(root, [0.36, 4.1, 0.36], [x, 2.05, 0], gold);
+    addCylinder(root, 0.38, 0.5, 0.46, 8, [x, 4.38, 0], white);
+  }
+  addBox(root, [6.2, 0.45, 0.42], [0, 4.05, 0], gold);
+  for (let i = 0; i < 8; i++) addBox(root, [0.56, 0.08, 0.56], [-2 + i * 0.58, 0.06, 0], i % 2 ? dark : white);
+  return root;
+}
+
+function createPreviewPineBarricade() {
+  const root = new THREE.Group();
+  const greens = [
+    getPreviewMaterial('pine-dark', 0x24462d, 0.86, 0.02),
+    getPreviewMaterial('pine-mid', 0x2f5837, 0.82, 0.02),
+    getPreviewMaterial('pine-light', 0x3f7342, 0.8, 0.02)
+  ];
+  const trunk = getPreviewMaterial('pine-trunk', 0x65452e, 0.84, 0.02);
+  for (let t = 0; t < 3; t++) {
+    const x = (t - 1) * 1.2;
+    addCylinder(root, 0.16, 0.25, 1.15, 6, [x, 0.58, 0], trunk);
+    for (let i = 0; i < 3; i++) addCone(root, 0.78 - i * 0.12, 1.35 - i * 0.12, 7, [x, 1.22 + i * 0.45, 0], greens[i]);
+  }
+  addBox(root, [4.3, 0.26, 0.52], [0, 0.17, 0.66], getPreviewMaterial('pine-log', 0x705039, 0.8, 0.02), [0, 0.12, 0]);
+  return root;
+}
+
+function createPreviewCoinTruck() {
+  const root = new THREE.Group();
+  const green = getPreviewMaterial('truck-green', 0x486c58, 0.64, 0.14);
+  const dark = getPreviewMaterial('truck-dark', 0x1d282b, 0.76, 0.18);
+  const gold = getPreviewMaterial('truck-gold', 0xffd15a, 0.38, 0.22, 0x4a2b00);
+  addBox(root, [3.6, 0.7, 3.4], [0, 0.62, 0], dark);
+  addBox(root, [2.8, 1.05, 2.1], [0, 1.24, 0.4], green);
+  addBox(root, [2.2, 0.82, 1.2], [0, 1.24, -1.45], gold);
+  for (const x of [-1.9, 1.9]) for (const z of [-1.1, 1.1]) addCylinder(root, 0.28, 0.28, 0.16, 12, [x, 0.42, z], gold, [0, 0, Math.PI / 2]);
+  return root;
+}
+
+function createPreviewOverdriveCore() {
+  const root = new THREE.Group();
+  const core = getPreviewMaterial('core-cyan', 0x54d8ff, 0.28, 0.06, 0x164a55);
+  const orange = getPreviewMaterial('core-orange', 0xff8b50, 0.34, 0.08, 0x6a2400);
+  const dark = getPreviewMaterial('core-dark', 0x182024, 0.72, 0.12);
+  addCylinder(root, 0.92, 1.1, 0.36, 12, [0, 0.25, 0], dark);
+  addSphere(root, 0.82, [0, 1.38, 0], core, [1, 1.18, 1]);
+  for (let i = 0; i < 6; i++) {
+    const angle = i * Math.PI / 3;
+    const fin = addBox(root, [0.22, 1.35, 0.58], [Math.cos(angle) * 1.05, 1.38, Math.sin(angle) * 1.05], orange, [0, angle, 0]);
+    fin.rotation.z = 0.2;
+  }
+  addCylinder(root, 1.55, 1.55, 0.08, 24, [0, 1.38, 0], core, [Math.PI / 2, 0, 0]);
+  return root;
 }
 
 function formatGateValue(spec) {

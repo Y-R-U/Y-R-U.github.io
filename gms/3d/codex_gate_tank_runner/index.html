@@ -13,6 +13,7 @@
 <body>
   <main id="game">
     <canvas id="game-canvas" aria-label="Gate Tank Runner 3D game canvas"></canvas>
+    <button id="model-debug-button" class="model-debug-button" type="button">Models</button>
 
     <section id="hud" class="hud hidden" aria-live="polite">
       <div class="hud-row">
@@ -42,6 +43,34 @@
     <div id="lane-helper" class="lane-helper hidden">
       <span></span><span></span><span></span>
     </div>
+
+    <section id="model-gallery" class="model-gallery hidden" role="dialog" aria-modal="true" aria-labelledby="model-gallery-title">
+      <div class="model-gallery-panel">
+        <aside class="model-list-panel">
+          <div class="model-gallery-top">
+            <div>
+              <p class="kicker">debug gallery</p>
+              <h2 id="model-gallery-title">Model Lab</h2>
+            </div>
+            <button id="model-gallery-close" class="model-close-button" type="button" aria-label="Close model gallery">X</button>
+          </div>
+          <div id="model-list" class="model-list"></div>
+          <div class="model-memory">
+            <span id="model-memory-status">Selections saved here.</span>
+            <textarea id="model-memory-output" readonly rows="3" aria-label="Selected model names"></textarea>
+          </div>
+        </aside>
+        <div class="model-preview-panel">
+          <div class="model-preview-heading">
+            <div>
+              <strong id="model-preview-name">Model</strong>
+              <span id="model-preview-meta">Drag or use arrow keys.</span>
+            </div>
+          </div>
+          <canvas id="model-preview-canvas" tabindex="0" aria-label="Selected model preview"></canvas>
+        </div>
+      </div>
+    </section>
 
     <section id="menu" class="overlay">
       <div class="panel menu-panel">
@@ -116,6 +145,6 @@
     }
   }
   </script>
-  <script type="module" src="game.js?v=20260528c"></script>
+  <script type="module" src="game.js?v=20260528d"></script>
 </body>
 </html>
