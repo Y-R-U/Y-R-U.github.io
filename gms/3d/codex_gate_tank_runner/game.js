@@ -32,9 +32,11 @@ const resultShopButton = document.getElementById('result-shop-button');
 const SAVE_KEY = 'codexGateTankRunnerSaveV1';
 const LANES = [-4.8, 0, 4.8];
 const ROAD_WIDTH = 16;
-const RUN_LENGTH_BASE = 500;
-const RUN_LENGTH_VARIANCE = 80;
-const WORLD_DEPTH = 980;
+const RUN_LENGTH_BASE = 820;
+const RUN_LENGTH_VARIANCE = 140;
+const FINISH_CLEAR_DISTANCE = 26;
+const BOSS_APPROACH_DISTANCE = 150;
+const WORLD_DEPTH = 1240;
 const DPR_CAP = 1.25;
 const PLAYER_Z = 2.6;
 const PLAYER_MIN_X = -6.2;
@@ -151,6 +153,7 @@ const materials = {
   finishWhite: new THREE.MeshBasicMaterial({ color: 0xf8faf4 }),
   finishBlack: new THREE.MeshBasicMaterial({ color: 0x15191d }),
   finishGold: new THREE.MeshStandardMaterial({ color: 0xf4c75d, roughness: 0.45, metalness: 0.08 }),
+  finishGlow: new THREE.MeshBasicMaterial({ color: 0xfff2a6, transparent: true, opacity: 0.5, depthWrite: false }),
   black: new THREE.MeshBasicMaterial({ color: 0x151a1c }),
   whiteText: new THREE.MeshBasicMaterial({ color: 0xffffff }),
   redText: new THREE.MeshBasicMaterial({ color: 0xff4f49 }),
@@ -192,7 +195,8 @@ const geometries = {
   finishTile: new THREE.BoxGeometry(1.02, 0.06, 1.02),
   finishPost: new THREE.BoxGeometry(0.42, 5.1, 0.42),
   finishBeam: new THREE.BoxGeometry(ROAD_WIDTH + 2.2, 0.48, 0.44),
-  finishBeacon: new THREE.CylinderGeometry(0.36, 0.5, 0.5, 8)
+  finishBeacon: new THREE.CylinderGeometry(0.36, 0.5, 0.5, 8),
+  finishGlow: new THREE.BoxGeometry(ROAD_WIDTH + 2.6, 0.08, 3.6)
 };
 
 const world = new THREE.Group();
@@ -248,23 +252,23 @@ function initLighting() {
 
 function createWorld() {
   const grass = new THREE.Mesh(geometries.grass, materials.grass);
-  grass.position.set(0, -0.26, -330);
+  grass.position.set(0, -0.26, -460);
   grass.receiveShadow = true;
   world.add(grass);
 
   const road = new THREE.Mesh(geometries.road, materials.road);
-  road.position.set(0, 0, -330);
+  road.position.set(0, 0, -460);
   road.receiveShadow = true;
   world.add(road);
 
   for (const x of [-ROAD_WIDTH / 2, ROAD_WIDTH / 2]) {
     const edge = new THREE.Mesh(geometries.edge, materials.roadEdge);
-    edge.position.set(x, 0.05, -330);
+    edge.position.set(x, 0.05, -460);
     edge.receiveShadow = true;
     world.add(edge);
   }
 
-  for (let i = 0; i < 74; i++) {
+  for (let i = 0; i < 104; i++) {
     const item = Math.random() > 0.38 ? createTree() : createRock();
     const side = Math.random() > 0.5 ? 1 : -1;
     item.position.set(side * (10 + Math.random() * 24), 0.1, 42 - i * 10.4 - Math.random() * 5);
@@ -274,7 +278,7 @@ function createWorld() {
     world.add(item);
   }
 
-  for (let i = 0; i < 54; i++) {
+  for (let i = 0; i < 74; i++) {
     const stripe = new THREE.Mesh(geometries.roadStripe, materials.roadStripe);
     stripe.position.set(0, 0.22, 35 - i * 14);
     world.add(stripe);
@@ -598,8 +602,8 @@ function updateGame(dt) {
   updateFinishLine(dt);
   updateHud();
 
-  if (!state.bossSpawned && state.distance > state.runLength - 54) spawnBoss();
-  if (state.distance >= state.runLength && enemies.length === 0) endRun(true);
+  if (!state.bossSpawned && state.distance > state.runLength - BOSS_APPROACH_DISTANCE) spawnBoss();
+  if (state.distance >= state.runLength + FINISH_CLEAR_DISTANCE && enemies.length === 0) endRun(true);
 }
 
 function handleMovement(dt) {
@@ -1092,11 +1096,11 @@ function createEnemy(kind) {
 function spawnBoss() {
   state.bossSpawned = true;
   const boss = createEnemy('boss');
-  boss.root.position.set(0, 0, -62);
+  boss.root.position.set(0, 0, -112);
   boss.speed = 0.3;
   obstacleLayer.add(boss.root);
   enemies.push(boss);
-  setMessage('Fortress tank ahead. Focus fire.');
+  setMessage('Fortress tank guarding the finish. Focus fire.');
 }
 
 function damageEnemy(enemy, damage) {
@@ -1163,6 +1167,10 @@ function createFinishLine() {
   const root = new THREE.Group();
   root.position.z = PLAYER_Z - state.runLength;
 
+  const glow = new THREE.Mesh(geometries.finishGlow, materials.finishGlow);
+  glow.position.set(0, 0.31, 0);
+  root.add(glow);
+
   for (let ix = 0; ix < 10; ix++) {
     for (let iz = 0; iz < 3; iz++) {
       const tile = new THREE.Mesh(
@@ -1187,10 +1195,20 @@ function createFinishLine() {
   beam.position.set(0, 5.05, 0);
   root.add(beam);
 
+  const lowerBeam = new THREE.Mesh(geometries.finishBeam, materials.finishWhite);
+  lowerBeam.position.set(0, 4.28, 0);
+  lowerBeam.scale.set(0.82, 0.38, 0.72);
+  root.add(lowerBeam);
+
   const banner = makeTextSprite('FINISH', '#15191d', 'rgba(248, 250, 244, 0.9)');
   banner.position.set(0, 5.16, 0.32);
   banner.scale.set(5.5, 1.28, 1);
   root.add(banner);
+
+  const distanceBanner = makeTextSprite(`${state.runLength}M`, '#fff8d6', 'rgba(21, 25, 29, 0.78)');
+  distanceBanner.position.set(0, 4.28, 0.34);
+  distanceBanner.scale.set(3.8, 0.9, 1);
+  root.add(distanceBanner);
 
   finishLine = root;
   obstacleLayer.add(root);
@@ -1206,8 +1224,10 @@ function updateFinishLine(dt) {
     }
   });
   const remaining = state.runLength - state.distance;
-  if (remaining < 70 && remaining > 0 && state.messageTimer <= 0) {
-    setMessage('Finish line ahead. Break the fortress tank to bank the run.');
+  if (remaining < 150 && remaining > 0 && state.messageTimer <= 0) {
+    setMessage(`Finish ${Math.max(1, Math.ceil(remaining))}m ahead. Break through the arch.`);
+  } else if (remaining <= 0 && state.messageTimer <= 0) {
+    setMessage('Cross the finish line to bank the run.');
   }
 }
 
