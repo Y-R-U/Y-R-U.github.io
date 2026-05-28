@@ -1371,7 +1371,7 @@ function endRun(won) {
   save.best = Math.max(save.best, Math.floor(state.distance));
   writeSave();
 
-  resultKicker.textContent = won ? 'fortress broken' : 'convoy wrecked';
+  resultKicker.textContent = won ? 'run complete' : 'convoy wrecked';
   resultTitle.textContent = won ? 'Run Complete' : 'Armor Failed';
   resultDistance.textContent = `${Math.floor(state.distance)}m`;
   resultCoins.textContent = formatNumber(banked);
