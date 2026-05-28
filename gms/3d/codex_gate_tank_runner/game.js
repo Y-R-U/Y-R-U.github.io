@@ -603,7 +603,7 @@ function updateGame(dt) {
   updateHud();
 
   if (!state.bossSpawned && state.distance > state.runLength - BOSS_APPROACH_DISTANCE) spawnBoss();
-  if (state.distance >= state.runLength + FINISH_CLEAR_DISTANCE && enemies.length === 0) endRun(true);
+  if (state.distance >= state.runLength + FINISH_CLEAR_DISTANCE && isFinishCleared()) endRun(true);
 }
 
 function handleMovement(dt) {
@@ -1216,7 +1216,7 @@ function createFinishLine() {
 
 function updateFinishLine(dt) {
   if (!finishLine) return;
-  finishLine.position.z = PLAYER_Z - Math.max(0, state.runLength - state.distance);
+  finishLine.position.z = PLAYER_Z - (state.runLength - state.distance);
   finishLine.children.forEach((child, index) => {
     if (child.geometry === geometries.finishBeacon) {
       child.rotation.y += dt * 4.4;
@@ -1226,9 +1226,13 @@ function updateFinishLine(dt) {
   const remaining = state.runLength - state.distance;
   if (remaining < 150 && remaining > 0 && state.messageTimer <= 0) {
     setMessage(`Finish ${Math.max(1, Math.ceil(remaining))}m ahead. Break through the arch.`);
-  } else if (remaining <= 0 && state.messageTimer <= 0) {
-    setMessage('Cross the finish line to bank the run.');
+  } else if (remaining <= 0 && !isFinishCleared() && state.messageTimer <= 0) {
+    setMessage('Finish crossed. Destroy the fortress tank to bank the run.');
   }
+}
+
+function isFinishCleared() {
+  return state.bossDefeated || !enemies.some((enemy) => enemy.kind === 'boss');
 }
 
 function spawnGlassSmash(position, color) {
