@@ -32,7 +32,9 @@ const resultShopButton = document.getElementById('result-shop-button');
 const SAVE_KEY = 'codexGateTankRunnerSaveV1';
 const LANES = [-4.8, 0, 4.8];
 const ROAD_WIDTH = 16;
-const RUN_LENGTH = 245;
+const RUN_LENGTH_BASE = 500;
+const RUN_LENGTH_VARIANCE = 80;
+const WORLD_DEPTH = 980;
 const DPR_CAP = 1.25;
 const PLAYER_Z = 2.6;
 const PLAYER_MIN_X = -6.2;
@@ -79,6 +81,7 @@ const state = {
   ended: false,
   demo: new URLSearchParams(window.location.search).get('demo') === '1',
   distance: 0,
+  runLength: RUN_LENGTH_BASE,
   speed: 18,
   laneX: 0,
   targetX: 0,
@@ -105,6 +108,7 @@ const state = {
 const materials = {
   road: new THREE.MeshStandardMaterial({ color: 0x384044, roughness: 0.92 }),
   roadEdge: new THREE.MeshStandardMaterial({ color: 0xd49f50, roughness: 0.78 }),
+  roadStripe: new THREE.MeshBasicMaterial({ color: 0xf0d389, transparent: true, opacity: 0.38 }),
   grass: new THREE.MeshStandardMaterial({ color: 0x486c4e, roughness: 0.98 }),
   tank: new THREE.MeshStandardMaterial({ color: 0x486c58, roughness: 0.68, metalness: 0.18 }),
   tankDark: new THREE.MeshStandardMaterial({ color: 0x1f2a2d, roughness: 0.76, metalness: 0.2 }),
@@ -112,6 +116,7 @@ const materials = {
   friendly: new THREE.MeshStandardMaterial({ color: 0x5fb571, roughness: 0.68, metalness: 0.16 }),
   enemy: new THREE.MeshStandardMaterial({ color: 0x9b3532, roughness: 0.7, metalness: 0.16 }),
   enemyDark: new THREE.MeshStandardMaterial({ color: 0x331b1d, roughness: 0.84, metalness: 0.16 }),
+  enemyAccent: new THREE.MeshStandardMaterial({ color: 0xf0b35f, roughness: 0.54, metalness: 0.12 }),
   glassGood: new THREE.MeshPhysicalMaterial({
     color: 0xb8f7ff,
     roughness: 0.02,
@@ -139,8 +144,13 @@ const materials = {
   gateTarget: new THREE.MeshBasicMaterial({ color: 0xfff2a6, transparent: true, opacity: 0.84, depthWrite: false }),
   bullet: new THREE.MeshStandardMaterial({ color: 0xffc35a, roughness: 0.34, emissive: 0xff8a32, emissiveIntensity: 1.2 }),
   tree: new THREE.MeshStandardMaterial({ color: 0x2f5837, roughness: 0.82 }),
+  treeLight: new THREE.MeshStandardMaterial({ color: 0x3f7342, roughness: 0.8 }),
+  treeDark: new THREE.MeshStandardMaterial({ color: 0x24462d, roughness: 0.86 }),
   trunk: new THREE.MeshStandardMaterial({ color: 0x65452e, roughness: 0.84 }),
   rock: new THREE.MeshStandardMaterial({ color: 0x6b706e, roughness: 0.9 }),
+  finishWhite: new THREE.MeshBasicMaterial({ color: 0xf8faf4 }),
+  finishBlack: new THREE.MeshBasicMaterial({ color: 0x15191d }),
+  finishGold: new THREE.MeshStandardMaterial({ color: 0xf4c75d, roughness: 0.45, metalness: 0.08 }),
   black: new THREE.MeshBasicMaterial({ color: 0x151a1c }),
   whiteText: new THREE.MeshBasicMaterial({ color: 0xffffff }),
   redText: new THREE.MeshBasicMaterial({ color: 0xff4f49 }),
@@ -148,9 +158,10 @@ const materials = {
 };
 
 const geometries = {
-  road: new THREE.BoxGeometry(ROAD_WIDTH, 0.35, 540),
-  edge: new THREE.BoxGeometry(0.22, 0.36, 540),
-  grass: new THREE.BoxGeometry(90, 0.3, 540),
+  road: new THREE.BoxGeometry(ROAD_WIDTH, 0.35, WORLD_DEPTH),
+  edge: new THREE.BoxGeometry(0.22, 0.36, WORLD_DEPTH),
+  grass: new THREE.BoxGeometry(90, 0.3, WORLD_DEPTH),
+  roadStripe: new THREE.BoxGeometry(0.22, 0.035, 2.6),
   chassis: new THREE.BoxGeometry(2.35, 0.72, 3.1),
   tread: new THREE.BoxGeometry(0.48, 0.54, 3.35),
   turret: new THREE.CylinderGeometry(0.72, 0.86, 0.54, 8),
@@ -164,6 +175,12 @@ const geometries = {
   glassBlock: new THREE.BoxGeometry(0.52, 0.38, 0.12),
   flashRing: new THREE.RingGeometry(0.4, 2.9, 24),
   enemy: new THREE.BoxGeometry(2.2, 1.25, 2.4),
+  enemyTread: new THREE.BoxGeometry(0.38, 0.34, 2.65),
+  enemyBarBack: new THREE.BoxGeometry(2.6, 0.12, 0.08),
+  enemyBarFill: new THREE.BoxGeometry(2.5, 0.1, 0.09),
+  enemyBarrel: new THREE.CylinderGeometry(0.08, 0.11, 1.7, 7),
+  bossCrown: new THREE.CylinderGeometry(1.4, 1.8, 0.62, 7),
+  droneWing: new THREE.BoxGeometry(1.9, 0.12, 0.44),
   drone: new THREE.TetrahedronGeometry(0.9, 0),
   bullet: new THREE.SphereGeometry(0.16, 10, 8),
   coin: new THREE.CylinderGeometry(0.32, 0.32, 0.12, 18),
@@ -171,7 +188,11 @@ const geometries = {
   treeTop: new THREE.ConeGeometry(1.05, 2.1, 7),
   trunk: new THREE.CylinderGeometry(0.18, 0.26, 1.6, 6),
   rock: new THREE.DodecahedronGeometry(0.72, 0),
-  boss: new THREE.BoxGeometry(5.8, 2.7, 4.2)
+  boss: new THREE.BoxGeometry(5.8, 2.7, 4.2),
+  finishTile: new THREE.BoxGeometry(1.02, 0.06, 1.02),
+  finishPost: new THREE.BoxGeometry(0.42, 5.1, 0.42),
+  finishBeam: new THREE.BoxGeometry(ROAD_WIDTH + 2.2, 0.48, 0.44),
+  finishBeacon: new THREE.CylinderGeometry(0.36, 0.5, 0.5, 8)
 };
 
 const world = new THREE.Group();
@@ -188,6 +209,7 @@ const shards = [];
 const scenery = [];
 const supportTanks = [];
 let tank = null;
+let finishLine = null;
 
 initLighting();
 createWorld();
@@ -226,37 +248,34 @@ function initLighting() {
 
 function createWorld() {
   const grass = new THREE.Mesh(geometries.grass, materials.grass);
-  grass.position.set(0, -0.26, -165);
+  grass.position.set(0, -0.26, -330);
   grass.receiveShadow = true;
   world.add(grass);
 
   const road = new THREE.Mesh(geometries.road, materials.road);
-  road.position.set(0, 0, -165);
+  road.position.set(0, 0, -330);
   road.receiveShadow = true;
   world.add(road);
 
   for (const x of [-ROAD_WIDTH / 2, ROAD_WIDTH / 2]) {
     const edge = new THREE.Mesh(geometries.edge, materials.roadEdge);
-    edge.position.set(x, 0.05, -165);
+    edge.position.set(x, 0.05, -330);
     edge.receiveShadow = true;
     world.add(edge);
   }
 
-  for (let i = 0; i < 46; i++) {
+  for (let i = 0; i < 74; i++) {
     const item = Math.random() > 0.38 ? createTree() : createRock();
     const side = Math.random() > 0.5 ? 1 : -1;
-    item.position.set(side * (10 + Math.random() * 24), 0.1, 42 - i * 11.5 - Math.random() * 5);
+    item.position.set(side * (10 + Math.random() * 24), 0.1, 42 - i * 10.4 - Math.random() * 5);
     item.rotation.y = Math.random() * Math.PI;
     item.scale.setScalar(0.7 + Math.random() * 0.85);
     scenery.push(item);
     world.add(item);
   }
 
-  for (let i = 0; i < 22; i++) {
-    const stripe = new THREE.Mesh(
-      new THREE.BoxGeometry(0.22, 0.035, 2.6),
-      new THREE.MeshBasicMaterial({ color: 0xf0d389, transparent: true, opacity: 0.4 })
-    );
+  for (let i = 0; i < 54; i++) {
+    const stripe = new THREE.Mesh(geometries.roadStripe, materials.roadStripe);
     stripe.position.set(0, 0.22, 35 - i * 14);
     world.add(stripe);
   }
@@ -265,16 +284,20 @@ function createWorld() {
 function createTree() {
   const tree = new THREE.Group();
   const trunk = new THREE.Mesh(geometries.trunk, materials.trunk);
-  trunk.position.y = 0.8;
+  trunk.position.y = 0.78;
   trunk.castShadow = true;
   tree.add(trunk);
-  for (let i = 0; i < 2; i++) {
-    const top = new THREE.Mesh(geometries.treeTop, materials.tree);
-    top.position.y = 1.55 + i * 0.62;
-    top.scale.setScalar(1 - i * 0.18);
+  const canopyMaterials = [materials.treeDark, materials.tree, materials.treeLight];
+  for (let i = 0; i < 3; i++) {
+    const top = new THREE.Mesh(geometries.treeTop, canopyMaterials[i]);
+    top.position.y = 1.3 + i * 0.52;
+    top.rotation.y = i * 0.72;
+    top.scale.set(1.12 - i * 0.17, 1 - i * 0.1, 1.12 - i * 0.17);
     top.castShadow = true;
     tree.add(top);
   }
+  const lean = (Math.random() - 0.5) * 0.12;
+  trunk.rotation.z = lean;
   return tree;
 }
 
@@ -420,6 +443,7 @@ function startGame() {
   state.running = true;
   state.ended = false;
   state.distance = 0;
+  state.runLength = Math.round(RUN_LENGTH_BASE + (Math.random() - 0.5) * RUN_LENGTH_VARIANCE);
   state.speed = 18 + save.upgrades.core * 0.5;
   state.targetX = 0;
   state.laneX = 0;
@@ -443,6 +467,7 @@ function startGame() {
   tank.root.rotation.y = Math.PI;
   setHealthBar(tank, 1);
   scene.add(tank.root);
+  createFinishLine();
   const startingSupport = Math.min(3, save.upgrades.bay + (state.demo ? 2 : 0));
   for (let i = 0; i < startingSupport; i++) addSupportTank(false);
 
@@ -470,6 +495,7 @@ function clearRun() {
   coins.length = 0;
   shards.length = 0;
   supportTanks.length = 0;
+  finishLine = null;
 }
 
 function showMenu() {
@@ -569,10 +595,11 @@ function updateGame(dt) {
   updateEnemies(dt);
   updateCoins(dt);
   updateShards(dt);
+  updateFinishLine(dt);
   updateHud();
 
-  if (!state.bossSpawned && state.distance > RUN_LENGTH - 44) spawnBoss();
-  if (state.distance >= RUN_LENGTH && enemies.length === 0) endRun(true);
+  if (!state.bossSpawned && state.distance > state.runLength - 54) spawnBoss();
+  if (state.distance >= state.runLength && enemies.length === 0) endRun(true);
 }
 
 function handleMovement(dt) {
@@ -806,7 +833,7 @@ function updateShards(dt) {
 }
 
 function spawnAhead() {
-  while (state.spawnCursor < Math.min(RUN_LENGTH - 18, state.distance + 120)) {
+  while (state.spawnCursor < Math.min(state.runLength - 28, state.distance + 120)) {
     const roll = Math.random();
     if (roll < 0.44) spawnGateSet(-state.spawnCursor);
     else if (roll < 0.76) spawnEnemyWave(-state.spawnCursor);
@@ -1008,29 +1035,55 @@ function createEnemy(kind) {
     body.position.y = 1.4;
     body.castShadow = true;
     root.add(body);
-    const crown = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.8, 0.62, 7), materials.enemyDark);
+    for (const side of [-1, 1]) {
+      const tread = new THREE.Mesh(geometries.enemyTread, materials.enemyDark);
+      tread.position.set(side * 3.15, 0.62, 0);
+      root.add(tread);
+    }
+    const crown = new THREE.Mesh(geometries.bossCrown, materials.enemyDark);
     crown.position.y = 3.1;
     crown.castShadow = true;
     root.add(crown);
+    const stripe = new THREE.Mesh(geometries.finishBeam, materials.enemyAccent);
+    stripe.position.set(0, 2.02, -2.2);
+    stripe.scale.set(0.22, 0.48, 0.35);
+    root.add(stripe);
   } else if (kind === 'drone') {
     const body = new THREE.Mesh(geometries.drone, materials.enemy);
     body.position.y = 1.6;
     body.castShadow = true;
     root.add(body);
+    const wing = new THREE.Mesh(geometries.droneWing, materials.enemyDark);
+    wing.position.y = 1.45;
+    wing.rotation.z = 0.18;
+    root.add(wing);
+    const core = new THREE.Mesh(geometries.bullet, materials.enemyAccent);
+    core.position.y = 1.6;
+    core.scale.setScalar(1.5);
+    root.add(core);
   } else {
     const body = new THREE.Mesh(geometries.enemy, materials.enemy);
     body.position.y = 0.82;
     body.castShadow = true;
     root.add(body);
+    for (const side of [-1, 1]) {
+      const tread = new THREE.Mesh(geometries.enemyTread, materials.enemyDark);
+      tread.position.set(side * 1.28, 0.45, 0);
+      root.add(tread);
+    }
     const turret = new THREE.Mesh(geometries.turret, materials.enemyDark);
     turret.position.y = 1.65;
     turret.castShadow = true;
     root.add(turret);
+    const barrel = new THREE.Mesh(geometries.enemyBarrel, materials.enemyAccent);
+    barrel.rotation.x = Math.PI / 2;
+    barrel.position.set(0, 1.68, -1.28);
+    root.add(barrel);
   }
-  const barBack = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.12, 0.08), materials.black);
+  const barBack = new THREE.Mesh(geometries.enemyBarBack, materials.black);
   barBack.position.set(0, kind === 'boss' ? 3.85 : 2.25, 0);
   root.add(barBack);
-  const bar = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 0.09), new THREE.MeshBasicMaterial({ color: 0x7bd66f }));
+  const bar = new THREE.Mesh(geometries.enemyBarFill, new THREE.MeshBasicMaterial({ color: 0x7bd66f }));
   bar.position.set(0, kind === 'boss' ? 3.86 : 2.26, -0.02);
   root.add(bar);
   return { root, hp, maxHp: hp, radius, kind, speed: kind === 'drone' ? 2.8 : 1.2, phase: Math.random() * 10, bar };
@@ -1103,6 +1156,58 @@ function spawnCoinArc(z, x = 0, count = 7) {
     coin.castShadow = true;
     obstacleLayer.add(coin);
     coins.push(coin);
+  }
+}
+
+function createFinishLine() {
+  const root = new THREE.Group();
+  root.position.z = PLAYER_Z - state.runLength;
+
+  for (let ix = 0; ix < 10; ix++) {
+    for (let iz = 0; iz < 3; iz++) {
+      const tile = new THREE.Mesh(
+        geometries.finishTile,
+        (ix + iz) % 2 === 0 ? materials.finishWhite : materials.finishBlack
+      );
+      tile.position.set(-4.6 + ix * 1.02, 0.27, -1.03 + iz * 1.02);
+      root.add(tile);
+    }
+  }
+
+  for (const x of [-ROAD_WIDTH * 0.5 - 0.75, ROAD_WIDTH * 0.5 + 0.75]) {
+    const post = new THREE.Mesh(geometries.finishPost, materials.finishGold);
+    post.position.set(x, 2.55, 0);
+    root.add(post);
+    const beacon = new THREE.Mesh(geometries.finishBeacon, materials.coin);
+    beacon.position.set(x, 5.35, 0);
+    root.add(beacon);
+  }
+
+  const beam = new THREE.Mesh(geometries.finishBeam, materials.finishGold);
+  beam.position.set(0, 5.05, 0);
+  root.add(beam);
+
+  const banner = makeTextSprite('FINISH', '#15191d', 'rgba(248, 250, 244, 0.9)');
+  banner.position.set(0, 5.16, 0.32);
+  banner.scale.set(5.5, 1.28, 1);
+  root.add(banner);
+
+  finishLine = root;
+  obstacleLayer.add(root);
+}
+
+function updateFinishLine(dt) {
+  if (!finishLine) return;
+  finishLine.position.z = PLAYER_Z - Math.max(0, state.runLength - state.distance);
+  finishLine.children.forEach((child, index) => {
+    if (child.geometry === geometries.finishBeacon) {
+      child.rotation.y += dt * 4.4;
+      child.position.y = 5.35 + Math.sin(performance.now() * 0.006 + index) * 0.12;
+    }
+  });
+  const remaining = state.runLength - state.distance;
+  if (remaining < 70 && remaining > 0 && state.messageTimer <= 0) {
+    setMessage('Finish line ahead. Break the fortress tank to bank the run.');
   }
 }
 
@@ -1217,7 +1322,7 @@ function updateHud() {
   defenseStat.textContent = formatNumber(Math.max(0, state.defense));
   supportStat.textContent = String(supportTanks.length);
   runCoinStat.textContent = formatNumber(state.runCoins);
-  progressFill.style.width = `${clamp((state.distance / RUN_LENGTH) * 100, 0, 100)}%`;
+  progressFill.style.width = `${clamp((state.distance / state.runLength) * 100, 0, 100)}%`;
   if (state.messageTimer <= 0 && state.running) {
     messageLine.textContent = 'Convoy systems armed. Cannon tracking live targets.';
   }
