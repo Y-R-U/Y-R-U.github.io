@@ -86,6 +86,7 @@ const bulletMaterials = new Map();
 const gateTextureCache = new Map();
 const effectMaterials = new Map();
 const previewMaterials = new Map();
+const armorTextureCache = new Map();
 let lastIdleRender = 0;
 
 const save = loadSave();
@@ -127,9 +128,34 @@ const materials = {
   tankDark: new THREE.MeshStandardMaterial({ color: 0x1f2a2d, roughness: 0.76, metalness: 0.2 }),
   tankTrim: new THREE.MeshStandardMaterial({ color: 0xd9b75c, roughness: 0.52, metalness: 0.12 }),
   friendly: new THREE.MeshStandardMaterial({ color: 0x5fb571, roughness: 0.68, metalness: 0.16 }),
-  enemy: new THREE.MeshStandardMaterial({ color: 0x9b3532, roughness: 0.7, metalness: 0.16 }),
-  enemyDark: new THREE.MeshStandardMaterial({ color: 0x331b1d, roughness: 0.84, metalness: 0.16 }),
-  enemyAccent: new THREE.MeshStandardMaterial({ color: 0xf0b35f, roughness: 0.54, metalness: 0.12 }),
+  enemy: new THREE.MeshStandardMaterial({
+    color: 0xb3493c,
+    roughness: 0.62,
+    metalness: 0.22,
+    map: createArmorPanelTexture('enemy-red', '#9f382f', 'rgba(255, 209, 120, 0.42)', 'rgba(36, 18, 20, 0.52)')
+  }),
+  enemyDark: new THREE.MeshStandardMaterial({
+    color: 0x24181b,
+    roughness: 0.78,
+    metalness: 0.2,
+    map: createArmorPanelTexture('enemy-dark', '#24181b', 'rgba(255, 116, 84, 0.18)', 'rgba(0, 0, 0, 0.45)')
+  }),
+  enemyAccent: new THREE.MeshStandardMaterial({ color: 0xffb257, roughness: 0.42, metalness: 0.18, emissive: 0x4c1900, emissiveIntensity: 0.22 }),
+  enemyGlow: new THREE.MeshStandardMaterial({ color: 0xff6a45, roughness: 0.26, metalness: 0.08, emissive: 0xff4b24, emissiveIntensity: 0.95 }),
+  enemyBlade: new THREE.MeshStandardMaterial({ color: 0x5d6467, roughness: 0.58, metalness: 0.28 }),
+  droneHull: new THREE.MeshStandardMaterial({
+    color: 0x9d3f58,
+    roughness: 0.48,
+    metalness: 0.2,
+    map: createArmorPanelTexture('drone-plum', '#8d334f', 'rgba(255, 184, 104, 0.3)', 'rgba(25, 15, 28, 0.54)')
+  }),
+  bossHull: new THREE.MeshStandardMaterial({
+    color: 0x7f2e33,
+    roughness: 0.66,
+    metalness: 0.22,
+    map: createArmorPanelTexture('boss-crimson', '#7f2e33', 'rgba(255, 211, 90, 0.32)', 'rgba(26, 13, 14, 0.56)')
+  }),
+  bossPlate: new THREE.MeshStandardMaterial({ color: 0xd78a45, roughness: 0.5, metalness: 0.16, emissive: 0x351000, emissiveIntensity: 0.16 }),
   glassGood: new THREE.MeshPhysicalMaterial({
     color: 0xb8f7ff,
     roughness: 0.02,
@@ -189,13 +215,31 @@ const geometries = {
   glassBlock: new THREE.BoxGeometry(0.52, 0.38, 0.12),
   flashRing: new THREE.RingGeometry(0.4, 2.9, 24),
   enemy: new THREE.BoxGeometry(2.2, 1.25, 2.4),
+  enemyHull: new THREE.BoxGeometry(2.5, 0.86, 2.9),
+  enemyCabin: new THREE.BoxGeometry(1.5, 0.52, 1.5),
+  enemyArmorPlate: new THREE.BoxGeometry(0.74, 0.16, 0.58),
+  enemyNose: new THREE.ConeGeometry(0.82, 1.24, 4),
+  enemyPod: new THREE.BoxGeometry(0.38, 0.38, 1.28),
+  enemyVent: new THREE.BoxGeometry(0.72, 0.1, 0.16),
+  enemyAntenna: new THREE.CylinderGeometry(0.025, 0.045, 0.82, 5),
   enemyTread: new THREE.BoxGeometry(0.38, 0.34, 2.65),
   enemyBarBack: new THREE.BoxGeometry(2.6, 0.12, 0.08),
   enemyBarFill: new THREE.BoxGeometry(2.5, 0.1, 0.09),
   enemyBarrel: new THREE.CylinderGeometry(0.08, 0.11, 1.7, 7),
   bossCrown: new THREE.CylinderGeometry(1.4, 1.8, 0.62, 7),
+  bossLower: new THREE.BoxGeometry(6.25, 1.25, 4.95),
+  bossUpper: new THREE.BoxGeometry(4.8, 0.94, 3.25),
+  bossSideTread: new THREE.BoxGeometry(0.78, 0.86, 5.32),
+  bossNose: new THREE.ConeGeometry(1.25, 1.65, 4),
+  bossPanel: new THREE.BoxGeometry(1.1, 0.18, 0.72),
+  bossCannon: new THREE.CylinderGeometry(0.16, 0.26, 3.45, 9),
   droneWing: new THREE.BoxGeometry(1.9, 0.12, 0.44),
   drone: new THREE.TetrahedronGeometry(0.9, 0),
+  droneCore: new THREE.OctahedronGeometry(0.9, 0),
+  droneArm: new THREE.BoxGeometry(1.72, 0.12, 0.22),
+  droneBlade: new THREE.BoxGeometry(1.16, 0.06, 0.22),
+  droneRotor: new THREE.CylinderGeometry(0.34, 0.34, 0.12, 10),
+  droneFin: new THREE.ConeGeometry(0.42, 0.82, 3),
   bullet: new THREE.SphereGeometry(0.16, 10, 8),
   coin: new THREE.CylinderGeometry(0.32, 0.32, 0.12, 18),
   shard: new THREE.TetrahedronGeometry(0.22, 0),
@@ -245,16 +289,24 @@ const modelDebug = {
 const MODEL_DEFS = [
   { name: 'Atlas Siege Tank', note: 'Heavy hero tank with layered armor and gold trim.', build: createPreviewAtlasTank },
   { name: 'Needle Scout Tank', note: 'Small support tank with a long fast cannon.', build: createPreviewScoutTank },
+  { name: 'Marauder Gate Tank', note: 'New standard enemy tank with plow armor, pods, and hot optics.', build: createPreviewMarauderGateTank },
+  { name: 'Twin Rail Ravager', note: 'Enemy rail variant with paired barrels and heavier side armor.', build: createPreviewTwinRailRavager },
+  { name: 'Vanta Spear Drone', note: 'New enemy drone silhouette with rotors, fins, and a bright attack core.', build: createPreviewVantaSpearDrone },
   { name: 'Fortress Crusher', note: 'Boss-grade tracked machine with command crown.', build: createPreviewFortressCrusher },
+  { name: 'Obsidian Gatebreaker', note: 'Alternate boss shape with dual cannons and a serrated front ram.', build: createPreviewObsidianGatebreaker },
   { name: 'Glassbreaker Drone', note: 'Angular hovering enemy with wing fins and hot core.', build: createPreviewGlassbreakerDrone },
   { name: 'Aegis Shield Rig', note: 'Mobile defense generator for armor upgrades.', build: createPreviewShieldRig },
   { name: 'Magnet Harvester', note: 'Coin-pulling tower with rotating collector rings.', build: createPreviewMagnetHarvester },
+  { name: 'Volt Magnet Skimmer', note: 'Fast reward-tech vehicle with collector fins and charged rails.', build: createPreviewVoltMagnetSkimmer },
   { name: 'Railgun Sentry', note: 'Lane turret concept with stabilizer legs.', build: createPreviewRailgunSentry },
+  { name: 'Shard Ram Roller', note: 'Compact obstacle/enemy concept with glass-crushing front teeth.', build: createPreviewShardRamRoller },
   { name: 'Crystal Gate Pylon', note: 'Glass gate support with fractured energy panes.', build: createPreviewGatePylon },
+  { name: 'Prism Command Gate', note: 'Premium gate concept with floating fractured panes and icon frame.', build: createPreviewPrismCommandGate },
   { name: 'Finish Line Arch', note: 'Chunky victory arch with beacon caps.', build: createPreviewFinishArch },
   { name: 'Pine Barricade', note: 'Richer low-poly tree cluster and rock base.', build: createPreviewPineBarricade },
   { name: 'Coin Vault Truck', note: 'Reward convoy vehicle with visible cargo.', build: createPreviewCoinTruck },
-  { name: 'Overdrive Core', note: 'Power-up reactor with spinning armor fins.', build: createPreviewOverdriveCore }
+  { name: 'Overdrive Core', note: 'Power-up reactor with spinning armor fins.', build: createPreviewOverdriveCore },
+  { name: 'Cobalt Repair Crawler', note: 'Support-style utility crawler with tools and blue shield plates.', build: createPreviewCobaltRepairCrawler }
 ];
 
 initLighting();
@@ -352,6 +404,17 @@ function createRock() {
   rock.castShadow = true;
   rock.receiveShadow = true;
   return rock;
+}
+
+function addModelPart(root, geometry, material, position, rotation = [0, 0, 0], scale = [1, 1, 1]) {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+  mesh.scale.set(scale[0], scale[1], scale[2]);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  root.add(mesh);
+  return mesh;
 }
 
 function createTank(material = materials.tank, scale = 1) {
@@ -823,9 +886,13 @@ function updateEnemies(dt) {
     const enemy = enemies[i];
     enemy.root.position.z += (state.speed + enemy.speed) * dt;
     enemy.root.rotation.y += Math.sin(state.distance * 0.04 + i) * dt * 0.35;
+    if (enemy.wheels?.length) {
+      for (const wheel of enemy.wheels) wheel.rotation.x += dt * (state.speed + enemy.speed) * 1.25;
+    }
     if (enemy.kind === 'drone') {
       enemy.root.position.y = 1.7 + Math.sin(state.distance * 0.16 + enemy.phase) * 0.5;
       enemy.root.rotation.x += dt * 1.6;
+      for (const rotor of enemy.rotors || []) rotor.rotation.y += dt * 9.5;
     }
     if (enemy.root.position.z > PLAYER_Z - 1.2 && enemy.root.position.z < PLAYER_Z + 2.2 && Math.abs(enemy.root.position.x - state.laneX) < enemy.radius + 1.35) {
       collideEnemy(enemy);
@@ -1085,71 +1152,129 @@ function spawnEnemyWave(z) {
   }
 }
 
+function createEnemyHealthBar(width, color) {
+  const root = new THREE.Group();
+  const back = new THREE.Mesh(geometries.enemyBarBack, materials.black);
+  back.scale.x = width / 2.6;
+  root.add(back);
+  const fill = new THREE.Mesh(geometries.enemyBarFill, new THREE.MeshBasicMaterial({ color }));
+  fill.position.z = -0.02;
+  const fullScaleX = width / 2.5;
+  fill.scale.x = fullScaleX;
+  root.add(fill);
+  return { root, fill, width, fullScaleX };
+}
+
+function buildMarauderEnemy(root, variant) {
+  root.userData.wheels = [];
+  const isRail = variant === 'rail';
+  addModelPart(root, geometries.enemyHull, materials.enemy, [0, 0.82, 0.04]);
+  addModelPart(root, geometries.enemyCabin, materials.enemyDark, [0, 1.36, 0.22], [0, 0.08, 0], [1.08, 1, 1.05]);
+  addModelPart(root, geometries.enemyNose, materials.enemyBlade, [0, 0.86, -1.62], [-Math.PI / 2, Math.PI / 4, 0], [0.92, 0.78, 0.88]);
+  addModelPart(root, geometries.enemyVent, materials.enemyGlow, [0, 1.64, -0.58], [0, 0, 0], [1.15, 1, 1]);
+  for (const side of [-1, 1]) {
+    addModelPart(root, geometries.enemyTread, materials.enemyDark, [side * 1.44, 0.45, 0.02], [0, 0, 0], [1.28, 1.18, 1.12]);
+    addModelPart(root, geometries.enemyPod, isRail ? materials.enemyAccent : materials.enemyBlade, [side * 1.45, 1.04, -0.74], [0, side * 0.06, 0], [1, 0.92, isRail ? 1.35 : 1]);
+    addModelPart(root, geometries.enemyArmorPlate, materials.enemyBlade, [side * 0.72, 1.06, -1.19], [0.04, 0, side * 0.08], [1.05, 1, 0.88]);
+    addModelPart(root, geometries.enemyArmorPlate, materials.enemyBlade, [side * 0.78, 0.98, 0.92], [-0.04, 0, -side * 0.08], [0.95, 1, 0.92]);
+    for (let i = 0; i < 4; i++) {
+      const wheel = addModelPart(root, geometries.wheel, materials.enemyAccent, [side * 1.68, 0.43, -1.18 + i * 0.78], [0, 0, Math.PI / 2], [0.9, 0.9, 0.9]);
+      root.userData.wheels.push(wheel);
+    }
+  }
+  addModelPart(root, geometries.turret, materials.enemyDark, [0, 1.72, -0.18], [0, 0, 0], [0.88, 0.82, 0.88]);
+  if (isRail) {
+    addModelPart(root, geometries.enemyBarrel, materials.enemyAccent, [-0.22, 1.77, -1.56], [Math.PI / 2, 0, 0], [1.05, 1.05, 1.25]);
+    addModelPart(root, geometries.enemyBarrel, materials.enemyAccent, [0.22, 1.77, -1.56], [Math.PI / 2, 0, 0], [1.05, 1.05, 1.25]);
+  } else {
+    addModelPart(root, geometries.enemyBarrel, materials.enemyAccent, [0, 1.77, -1.58], [Math.PI / 2, 0, 0], [1.15, 1.15, 1.18]);
+  }
+  for (const x of [-0.42, 0.42]) {
+    addModelPart(root, geometries.bullet, materials.enemyGlow, [x, 1.22, -1.34], [0, 0, 0], [0.68, 0.68, 0.68]);
+  }
+  addModelPart(root, geometries.enemyAntenna, materials.enemyAccent, [-0.42, 1.94, 0.68], [0, 0.18, -0.16]);
+}
+
+function buildDroneEnemy(root) {
+  root.userData.rotors = [];
+  addModelPart(root, geometries.droneCore, materials.droneHull, [0, 1.58, 0], [0.1, Math.PI / 4, 0.14], [1.2, 0.78, 1.08]);
+  addModelPart(root, geometries.droneWing, materials.enemyDark, [0, 1.48, 0.02], [0.04, 0, 0.08], [1.32, 1, 1.1]);
+  addModelPart(root, geometries.droneArm, materials.enemyBlade, [0, 1.5, -0.5], [0, 0.04, 0], [1.18, 1, 1]);
+  addModelPart(root, geometries.enemyNose, materials.enemyGlow, [0, 1.58, -0.86], [-Math.PI / 2, Math.PI / 4, 0], [0.42, 0.5, 0.42]);
+  for (const side of [-1, 1]) {
+    addModelPart(root, geometries.droneFin, materials.enemyDark, [side * 0.82, 1.42, 0.68], [Math.PI / 2, side * 0.2, side * 0.45], [0.82, 0.82, 0.82]);
+    addModelPart(root, geometries.droneRotor, materials.enemyDark, [side * 1.72, 1.5, 0.06]);
+    const bladeA = addModelPart(root, geometries.droneBlade, materials.enemyAccent, [side * 1.72, 1.58, 0.06], [0, 0, 0]);
+    const bladeB = addModelPart(root, geometries.droneBlade, materials.enemyAccent, [side * 1.72, 1.6, 0.06], [0, Math.PI / 2, 0]);
+    root.userData.rotors.push(bladeA, bladeB);
+  }
+  addModelPart(root, geometries.bullet, materials.enemyGlow, [0, 1.58, -0.48], [0, 0, 0], [1.28, 1.28, 1.28]);
+}
+
+function buildFortressEnemy(root) {
+  root.userData.wheels = [];
+  addModelPart(root, geometries.bossLower, materials.bossHull, [0, 0.98, 0.04]);
+  addModelPart(root, geometries.bossUpper, materials.enemyDark, [0, 1.98, 0.1], [0, 0.04, 0]);
+  addModelPart(root, geometries.bossNose, materials.enemyBlade, [0, 0.96, -2.62], [-Math.PI / 2, Math.PI / 4, 0], [1.1, 0.86, 1]);
+  addModelPart(root, geometries.bossCrown, materials.enemyDark, [0, 3.0, 0.42], [0, Math.PI / 7, 0], [0.9, 0.82, 0.9]);
+  for (const side of [-1, 1]) {
+    addModelPart(root, geometries.bossSideTread, materials.enemyDark, [side * 3.38, 0.62, 0.02]);
+    addModelPart(root, geometries.bossPanel, materials.bossPlate, [side * 1.6, 1.76, -1.74], [0.02, 0, side * 0.08], [1.15, 1, 1]);
+    addModelPart(root, geometries.bossPanel, materials.bossPlate, [side * 1.6, 1.7, 1.22], [-0.02, 0, -side * 0.08], [1.05, 1, 1]);
+    addModelPart(root, geometries.enemyPod, materials.enemyBlade, [side * 2.72, 1.74, -1.1], [0, side * 0.08, 0], [1.26, 1.36, 1.56]);
+    for (let i = 0; i < 5; i++) {
+      const wheel = addModelPart(root, geometries.wheel, materials.enemyAccent, [side * 3.78, 0.55, -1.76 + i * 0.88], [0, 0, Math.PI / 2], [1.05, 1.05, 1.05]);
+      root.userData.wheels.push(wheel);
+    }
+  }
+  addModelPart(root, geometries.turret, materials.enemyDark, [-0.62, 2.68, -0.52], [0, 0, 0], [1.2, 1.05, 1.2]);
+  addModelPart(root, geometries.turret, materials.enemyDark, [0.62, 2.68, -0.52], [0, 0, 0], [1.2, 1.05, 1.2]);
+  addModelPart(root, geometries.bossCannon, materials.enemyAccent, [-0.62, 2.72, -2.38], [Math.PI / 2, 0, 0]);
+  addModelPart(root, geometries.bossCannon, materials.enemyAccent, [0.62, 2.72, -2.38], [Math.PI / 2, 0, 0]);
+  addModelPart(root, geometries.finishBeam, materials.enemyGlow, [0, 1.76, -2.4], [0, 0, 0], [0.18, 0.34, 0.24]);
+  for (let i = 0; i < 5; i++) {
+    addModelPart(root, geometries.enemyVent, materials.enemyGlow, [(i - 2) * 0.56, 2.42, -2.0], [0, 0, 0], [0.72, 1, 1]);
+  }
+}
+
 function createEnemy(kind) {
   const root = new THREE.Group();
   const upgradePressure = save.upgrades.core * 0.18 + save.upgrades.armor * 0.3 + save.upgrades.bay * 0.14;
   const difficulty = 1 + state.distance / 42 + state.peakPower * 0.15 + upgradePressure;
   let hp = Math.round((kind === 'drone' ? 3.2 : 6.2) * difficulty);
   let radius = kind === 'drone' ? 0.9 : 1.35;
+  let barY = kind === 'drone' ? 2.62 : 2.46;
+  let barWidth = kind === 'drone' ? 2.3 : 2.8;
+  const variant = kind === 'tank' && Math.random() < 0.36 ? 'rail' : 'marauder';
   if (kind === 'boss') {
     hp = Math.round(60 + state.peakPower * 7.2 + supportTanks.length * 10 + save.upgrades.armor * 12);
     radius = 3.2;
-    const body = new THREE.Mesh(geometries.boss, materials.enemy);
-    body.position.y = 1.4;
-    body.castShadow = true;
-    root.add(body);
-    for (const side of [-1, 1]) {
-      const tread = new THREE.Mesh(geometries.enemyTread, materials.enemyDark);
-      tread.position.set(side * 3.15, 0.62, 0);
-      root.add(tread);
-    }
-    const crown = new THREE.Mesh(geometries.bossCrown, materials.enemyDark);
-    crown.position.y = 3.1;
-    crown.castShadow = true;
-    root.add(crown);
-    const stripe = new THREE.Mesh(geometries.finishBeam, materials.enemyAccent);
-    stripe.position.set(0, 2.02, -2.2);
-    stripe.scale.set(0.22, 0.48, 0.35);
-    root.add(stripe);
+    barY = 3.92;
+    barWidth = 5.8;
+    buildFortressEnemy(root);
   } else if (kind === 'drone') {
-    const body = new THREE.Mesh(geometries.drone, materials.enemy);
-    body.position.y = 1.6;
-    body.castShadow = true;
-    root.add(body);
-    const wing = new THREE.Mesh(geometries.droneWing, materials.enemyDark);
-    wing.position.y = 1.45;
-    wing.rotation.z = 0.18;
-    root.add(wing);
-    const core = new THREE.Mesh(geometries.bullet, materials.enemyAccent);
-    core.position.y = 1.6;
-    core.scale.setScalar(1.5);
-    root.add(core);
+    buildDroneEnemy(root);
   } else {
-    const body = new THREE.Mesh(geometries.enemy, materials.enemy);
-    body.position.y = 0.82;
-    body.castShadow = true;
-    root.add(body);
-    for (const side of [-1, 1]) {
-      const tread = new THREE.Mesh(geometries.enemyTread, materials.enemyDark);
-      tread.position.set(side * 1.28, 0.45, 0);
-      root.add(tread);
-    }
-    const turret = new THREE.Mesh(geometries.turret, materials.enemyDark);
-    turret.position.y = 1.65;
-    turret.castShadow = true;
-    root.add(turret);
-    const barrel = new THREE.Mesh(geometries.enemyBarrel, materials.enemyAccent);
-    barrel.rotation.x = Math.PI / 2;
-    barrel.position.set(0, 1.68, -1.28);
-    root.add(barrel);
+    buildMarauderEnemy(root, variant);
   }
-  const barBack = new THREE.Mesh(geometries.enemyBarBack, materials.black);
-  barBack.position.set(0, kind === 'boss' ? 3.85 : 2.25, 0);
-  root.add(barBack);
-  const bar = new THREE.Mesh(geometries.enemyBarFill, new THREE.MeshBasicMaterial({ color: 0x7bd66f }));
-  bar.position.set(0, kind === 'boss' ? 3.86 : 2.26, -0.02);
-  root.add(bar);
-  return { root, hp, maxHp: hp, radius, kind, speed: kind === 'drone' ? 2.8 : 1.2, phase: Math.random() * 10, bar };
+  const health = createEnemyHealthBar(barWidth, 0x7bd66f);
+  health.root.position.set(0, barY, 0);
+  root.add(health.root);
+  return {
+    root,
+    hp,
+    maxHp: hp,
+    radius,
+    kind,
+    variant,
+    speed: kind === 'drone' ? 2.8 : 1.2,
+    phase: Math.random() * 10,
+    bar: health.fill,
+    barFullScale: health.fullScaleX,
+    barWidth: health.width,
+    wheels: root.userData.wheels || [],
+    rotors: root.userData.rotors || []
+  };
 }
 
 function spawnBoss() {
@@ -1165,8 +1290,8 @@ function spawnBoss() {
 function damageEnemy(enemy, damage) {
   enemy.hp -= damage;
   const ratio = clamp(enemy.hp / enemy.maxHp, 0, 1);
-  enemy.bar.scale.x = ratio;
-  enemy.bar.position.x = -(1 - ratio) * 1.25;
+  enemy.bar.scale.x = enemy.barFullScale * ratio;
+  enemy.bar.position.x = -(1 - ratio) * enemy.barWidth * 0.5;
   enemy.bar.material.color.setHex(ratio > 0.5 ? 0x7bd66f : ratio > 0.25 ? 0xffd15a : 0xff635d);
   if (enemy.hp <= 0) {
     const index = enemies.indexOf(enemy);
@@ -1670,6 +1795,19 @@ function getPreviewMaterial(key, color, roughness = 0.62, metalness = 0.08, emis
   return previewMaterials.get(mapKey);
 }
 
+function getPreviewPanelMaterial(key, color, base, line, shadow, roughness = 0.58, metalness = 0.16) {
+  const mapKey = `panel:${key}:${color}:${base}:${line}:${shadow}:${roughness}:${metalness}`;
+  if (!previewMaterials.has(mapKey)) {
+    previewMaterials.set(mapKey, new THREE.MeshStandardMaterial({
+      color,
+      roughness,
+      metalness,
+      map: createArmorPanelTexture(`preview-${key}`, base, line, shadow)
+    }));
+  }
+  return previewMaterials.get(mapKey);
+}
+
 function addBox(root, size, position, material, rotation = [0, 0, 0]) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), material);
   mesh.position.set(position[0], position[1], position[2]);
@@ -1734,18 +1872,119 @@ function createPreviewScoutTank() {
   return root;
 }
 
+function createPreviewMarauderGateTank() {
+  const root = new THREE.Group();
+  const red = getPreviewPanelMaterial('marauder-red', 0xb3493c, '#9f382f', 'rgba(255, 209, 120, 0.42)', 'rgba(36, 18, 20, 0.52)');
+  const dark = getPreviewPanelMaterial('marauder-dark', 0x24181b, '#24181b', 'rgba(255, 116, 84, 0.18)', 'rgba(0, 0, 0, 0.45)', 0.74, 0.18);
+  const glow = getPreviewMaterial('marauder-glow', 0xff6a45, 0.28, 0.08, 0x8a2100);
+  const steel = getPreviewMaterial('marauder-steel', 0x697174, 0.58, 0.24);
+  addBox(root, [3.05, 0.78, 3.25], [0, 0.78, 0.04], red);
+  addBox(root, [1.78, 0.56, 1.62], [0, 1.36, 0.28], dark, [0, 0.08, 0]);
+  const ram = addCone(root, 0.92, 1.35, 4, [0, 0.86, -1.85], steel, [-Math.PI / 2, Math.PI / 4, 0]);
+  ram.scale.set(1, 0.76, 0.9);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.46, 0.56, 3.56], [side * 1.72, 0.52, 0.02], dark);
+    addBox(root, [0.45, 0.4, 1.35], [side * 1.5, 1.04, -0.72], steel, [0, side * 0.08, 0]);
+    addBox(root, [0.78, 0.16, 0.62], [side * 0.78, 1.08, -1.22], steel, [0.04, 0, side * 0.08]);
+    addBox(root, [0.7, 0.16, 0.58], [side * 0.82, 0.98, 0.98], steel, [-0.04, 0, -side * 0.08]);
+    for (let i = 0; i < 4; i++) addCylinder(root, 0.23, 0.23, 0.12, 10, [side * 1.95, 0.5, -1.24 + i * 0.82], glow, [0, 0, Math.PI / 2]);
+  }
+  addCylinder(root, 0.7, 0.86, 0.48, 8, [0, 1.78, -0.18], dark);
+  addCylinder(root, 0.13, 0.19, 2.18, 9, [0, 1.82, -1.63], glow, [Math.PI / 2, 0, 0]);
+  addBox(root, [1.1, 0.1, 0.18], [0, 1.64, -0.66], glow);
+  for (const x of [-0.48, 0.48]) addSphere(root, 0.14, [x, 1.2, -1.45], glow, [1, 1, 1]);
+  addCylinder(root, 0.03, 0.05, 0.8, 5, [-0.5, 1.98, 0.72], glow, [0, 0.12, -0.14]);
+  return root;
+}
+
+function createPreviewTwinRailRavager() {
+  const root = new THREE.Group();
+  const red = getPreviewPanelMaterial('ravager-red', 0x8f3140, '#7c2a38', 'rgba(255, 179, 86, 0.32)', 'rgba(18, 10, 13, 0.55)');
+  const dark = getPreviewMaterial('ravager-dark', 0x1a1519, 0.76, 0.2);
+  const orange = getPreviewMaterial('ravager-orange', 0xffa24d, 0.34, 0.12, 0x6d2100);
+  const steel = getPreviewMaterial('ravager-steel', 0x60686b, 0.58, 0.24);
+  addBox(root, [3.36, 0.74, 3.6], [0, 0.76, 0.06], red);
+  addBox(root, [2.22, 0.46, 2.05], [0, 1.28, 0.18], dark);
+  addBox(root, [1.72, 0.2, 0.52], [0, 1.66, -1.08], orange);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.54, 0.62, 3.88], [side * 1.9, 0.54, 0], dark);
+    addBox(root, [0.44, 0.45, 1.78], [side * 1.66, 1.18, -0.88], steel);
+    addBox(root, [0.28, 0.32, 1.72], [side * 0.42, 1.82, -1.68], orange, [Math.PI / 2, 0, 0]);
+    for (let i = 0; i < 5; i++) addCylinder(root, 0.2, 0.2, 0.12, 10, [side * 2.18, 0.52, -1.44 + i * 0.72], orange, [0, 0, Math.PI / 2]);
+  }
+  addCylinder(root, 0.85, 1.02, 0.54, 8, [0, 1.76, -0.28], dark);
+  addCylinder(root, 0.1, 0.18, 2.9, 9, [-0.26, 1.82, -2.02], orange, [Math.PI / 2, 0, 0]);
+  addCylinder(root, 0.1, 0.18, 2.9, 9, [0.26, 1.82, -2.02], orange, [Math.PI / 2, 0, 0]);
+  const ram = addCone(root, 1.0, 1.55, 4, [0, 0.78, -2.04], steel, [-Math.PI / 2, Math.PI / 4, 0]);
+  ram.scale.set(1.08, 0.68, 0.9);
+  return root;
+}
+
+function createPreviewVantaSpearDrone() {
+  const root = new THREE.Group();
+  const hull = getPreviewPanelMaterial('vanta-drone', 0x9d3f58, '#8d334f', 'rgba(255, 184, 104, 0.3)', 'rgba(25, 15, 28, 0.54)', 0.5, 0.18);
+  const dark = getPreviewMaterial('vanta-dark', 0x15131a, 0.74, 0.14);
+  const glow = getPreviewMaterial('vanta-glow', 0xff744d, 0.26, 0.08, 0x912400);
+  addSphere(root, 0.92, [0, 1.5, 0], hull, [1.28, 0.72, 1.05]);
+  addBox(root, [4.2, 0.12, 0.38], [0, 1.45, 0.04], dark, [0, 0, 0.08]);
+  addBox(root, [2.58, 0.12, 0.28], [0, 1.47, -0.55], dark, [0, 0.05, 0]);
+  const spear = addCone(root, 0.42, 1.0, 4, [0, 1.5, -1.08], glow, [-Math.PI / 2, Math.PI / 4, 0]);
+  spear.scale.set(0.76, 0.76, 0.76);
+  for (const side of [-1, 1]) {
+    addCylinder(root, 0.34, 0.34, 0.16, 10, [side * 1.82, 1.46, 0.08], dark);
+    addBox(root, [1.16, 0.06, 0.22], [side * 1.82, 1.56, 0.08], glow, [0, side * 0.28, 0]);
+    addBox(root, [1.16, 0.06, 0.22], [side * 1.82, 1.58, 0.08], glow, [0, Math.PI / 2 + side * 0.28, 0]);
+    addCone(root, 0.42, 0.82, 3, [side * 0.86, 1.38, 0.72], dark, [Math.PI / 2, side * 0.2, side * 0.45]);
+  }
+  addSphere(root, 0.34, [0, 1.5, -0.5], glow, [1.1, 1.1, 1.1]);
+  return root;
+}
+
 function createPreviewFortressCrusher() {
   const root = new THREE.Group();
-  const red = getPreviewMaterial('fortress-red', 0x963632, 0.64, 0.18);
+  const red = getPreviewPanelMaterial('fortress-red', 0x963632, '#7f2e33', 'rgba(255, 211, 90, 0.32)', 'rgba(26, 13, 14, 0.56)', 0.64, 0.18);
   const dark = getPreviewMaterial('fortress-dark', 0x2a1619, 0.8, 0.16);
   const brass = getPreviewMaterial('fortress-brass', 0xefb75b, 0.45, 0.12);
+  const steel = getPreviewMaterial('fortress-steel', 0x62686b, 0.62, 0.24);
   addBox(root, [5.8, 1.8, 4.5], [0, 1.05, 0], red);
   addBox(root, [6.7, 0.62, 4.9], [0, 0.48, 0], dark);
+  const ram = addCone(root, 1.12, 1.65, 4, [0, 0.92, -2.64], steel, [-Math.PI / 2, Math.PI / 4, 0]);
+  ram.scale.set(1.12, 0.78, 1);
   addCylinder(root, 1.45, 1.75, 0.72, 8, [0, 2.42, -0.25], dark);
   addCylinder(root, 0.22, 0.34, 3.5, 9, [0, 2.44, -2.35], brass, [Math.PI / 2, 0, 0]);
   addBox(root, [4.6, 0.18, 0.52], [0, 1.88, -2.34], brass);
-  for (const side of [-1, 1]) addBox(root, [0.72, 0.82, 5.05], [side * 3.42, 0.65, 0], dark);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.72, 0.82, 5.05], [side * 3.42, 0.65, 0], dark);
+    addBox(root, [1.0, 0.16, 0.64], [side * 1.55, 1.94, -1.68], brass, [0, 0, side * 0.07]);
+    addBox(root, [0.42, 0.48, 1.52], [side * 2.72, 1.62, -0.98], steel);
+    for (let i = 0; i < 5; i++) addCylinder(root, 0.24, 0.24, 0.14, 10, [side * 3.82, 0.58, -1.7 + i * 0.85], brass, [0, 0, Math.PI / 2]);
+  }
   for (let i = 0; i < 5; i++) addBox(root, [0.45, 0.5, 0.2], [(i - 2) * 0.58, 3.0, -0.25], brass);
+  return root;
+}
+
+function createPreviewObsidianGatebreaker() {
+  const root = new THREE.Group();
+  const black = getPreviewPanelMaterial('obsidian-black', 0x202228, '#202228', 'rgba(116, 217, 255, 0.26)', 'rgba(0, 0, 0, 0.56)', 0.62, 0.26);
+  const red = getPreviewMaterial('obsidian-red', 0x9d3135, 0.56, 0.22);
+  const glow = getPreviewMaterial('obsidian-glow', 0xffd15a, 0.34, 0.12, 0x7a3200);
+  const steel = getPreviewMaterial('obsidian-steel', 0x6a7072, 0.58, 0.28);
+  addBox(root, [6.2, 1.22, 5.0], [0, 0.88, 0], black);
+  addBox(root, [4.86, 1.0, 3.12], [0, 1.84, 0.24], red);
+  addBox(root, [3.7, 0.22, 0.64], [0, 2.32, -1.58], glow);
+  for (let x = -1.2; x <= 1.2; x += 0.6) {
+    const tooth = addCone(root, 0.28, 0.82, 4, [x, 0.7, -2.82], steel, [-Math.PI / 2, Math.PI / 4, 0]);
+    tooth.scale.set(0.8, 0.8, 0.8);
+  }
+  for (const side of [-1, 1]) {
+    addBox(root, [0.84, 0.82, 5.36], [side * 3.48, 0.58, 0], black);
+    addCylinder(root, 0.18, 0.28, 3.5, 9, [side * 0.54, 2.58, -2.36], glow, [Math.PI / 2, 0, 0]);
+    addCylinder(root, 0.94, 1.12, 0.5, 8, [side * 0.54, 2.48, -0.62], black);
+    addBox(root, [0.5, 0.46, 1.5], [side * 2.72, 1.45, -1.2], steel);
+    for (let i = 0; i < 5; i++) addCylinder(root, 0.24, 0.24, 0.14, 10, [side * 3.92, 0.54, -1.8 + i * 0.9], glow, [0, 0, Math.PI / 2]);
+  }
+  addCylinder(root, 1.0, 1.28, 0.88, 7, [0, 3.02, 0.52], red);
+  addSphere(root, 0.38, [0, 3.58, 0.52], glow, [1, 1, 1]);
   return root;
 }
 
@@ -1788,6 +2027,26 @@ function createPreviewMagnetHarvester() {
   return root;
 }
 
+function createPreviewVoltMagnetSkimmer() {
+  const root = new THREE.Group();
+  const teal = getPreviewPanelMaterial('volt-teal', 0x2f8f8c, '#2a7a78', 'rgba(255, 230, 130, 0.34)', 'rgba(13, 34, 36, 0.48)', 0.48, 0.14);
+  const dark = getPreviewMaterial('volt-dark', 0x19272a, 0.72, 0.16);
+  const gold = getPreviewMaterial('volt-gold', 0xffd15a, 0.34, 0.18, 0x5d3100);
+  const cyan = getPreviewMaterial('volt-cyan', 0x54d8ff, 0.28, 0.08, 0x164a55);
+  addBox(root, [3.15, 0.5, 2.65], [0, 0.58, 0], teal);
+  addBox(root, [2.16, 0.62, 1.64], [0, 1.12, -0.08], dark, [0, 0.08, 0]);
+  addCylinder(root, 0.32, 0.45, 1.68, 9, [0, 1.78, 0.28], gold);
+  addCylinder(root, 1.22, 1.22, 0.08, 24, [0, 2.2, 0.28], cyan, [Math.PI / 2, 0, 0]);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.28, 0.18, 2.85], [side * 1.78, 0.8, 0], gold, [0, side * 0.08, side * 0.2]);
+    addBox(root, [0.36, 0.24, 1.28], [side * 1.22, 1.22, -0.92], cyan, [0, side * 0.22, 0]);
+    addCylinder(root, 0.24, 0.24, 0.14, 10, [side * 1.82, 0.44, -0.88], gold, [0, 0, Math.PI / 2]);
+    addCylinder(root, 0.24, 0.24, 0.14, 10, [side * 1.82, 0.44, 0.92], gold, [0, 0, Math.PI / 2]);
+  }
+  addSphere(root, 0.42, [0, 1.28, -1.18], cyan, [1, 0.72, 1]);
+  return root;
+}
+
 function createPreviewRailgunSentry() {
   const root = new THREE.Group();
   const steel = getPreviewMaterial('rail-steel', 0x5d6669, 0.58, 0.22);
@@ -1802,6 +2061,29 @@ function createPreviewRailgunSentry() {
   return root;
 }
 
+function createPreviewShardRamRoller() {
+  const root = new THREE.Group();
+  const red = getPreviewMaterial('ram-red', 0x9e3832, 0.66, 0.16);
+  const dark = getPreviewMaterial('ram-dark', 0x20191a, 0.82, 0.16);
+  const glass = getPreviewMaterial('ram-glass', 0xa9f5ff, 0.18, 0.02, 0x155c66);
+  const steel = getPreviewMaterial('ram-steel', 0x6b7172, 0.62, 0.24);
+  addCylinder(root, 0.82, 0.82, 2.72, 10, [0, 0.72, 0], red, [Math.PI / 2, 0, 0]);
+  addBox(root, [2.62, 0.52, 1.35], [0, 1.18, 0.14], dark);
+  addBox(root, [2.9, 0.24, 0.36], [0, 1.28, -1.18], steel);
+  for (let i = 0; i < 7; i++) {
+    const x = (i - 3) * 0.38;
+    const tooth = addCone(root, 0.16, 0.58, 4, [x, 1.1, -1.48], glass, [-Math.PI / 2, Math.PI / 4, 0]);
+    tooth.scale.set(0.85, 0.85, 0.85);
+  }
+  for (const side of [-1, 1]) {
+    addCylinder(root, 0.34, 0.34, 0.18, 12, [side * 1.55, 0.55, -0.76], glass, [0, 0, Math.PI / 2]);
+    addCylinder(root, 0.34, 0.34, 0.18, 12, [side * 1.55, 0.55, 0.76], glass, [0, 0, Math.PI / 2]);
+    addBox(root, [0.34, 0.18, 1.9], [side * 1.32, 1.14, 0.08], steel);
+  }
+  addSphere(root, 0.24, [0, 1.52, -0.72], glass, [1, 0.72, 1]);
+  return root;
+}
+
 function createPreviewGatePylon() {
   const root = new THREE.Group();
   const glass = getPreviewMaterial('pylon-glass', 0x91f0ff, 0.22, 0.02, 0x12495a);
@@ -1811,6 +2093,25 @@ function createPreviewGatePylon() {
   addBox(root, [3.2, 2.8, 0.14], [0, 1.9, 0], glass, [0, 0.15, 0]);
   addBox(root, [1.25, 1.05, 0.16], [-0.58, 2.0, 0.12], red, [0, -0.18, 0.1]);
   addBox(root, [1.25, 1.05, 0.16], [0.74, 1.58, 0.14], glass, [0, 0.2, -0.12]);
+  return root;
+}
+
+function createPreviewPrismCommandGate() {
+  const root = new THREE.Group();
+  const cyan = getPreviewMaterial('prism-cyan', 0x91f0ff, 0.14, 0.02, 0x12495a);
+  const amber = getPreviewMaterial('prism-amber', 0xffc25d, 0.18, 0.04, 0x5c2600);
+  const red = getPreviewMaterial('prism-red', 0xff8a82, 0.2, 0.02, 0x571111);
+  const post = getPreviewMaterial('prism-post', 0x244c58, 0.5, 0.12);
+  for (const x of [-2.0, 2.0]) {
+    addBox(root, [0.34, 3.92, 0.34], [x, 1.96, 0], post);
+    addCylinder(root, 0.28, 0.38, 0.42, 7, [x, 4.08, 0], amber);
+  }
+  addBox(root, [4.15, 0.28, 0.28], [0, 3.72, 0], post);
+  addBox(root, [3.28, 2.58, 0.12], [0, 1.94, 0], cyan, [0, 0.12, 0.04]);
+  addBox(root, [1.2, 1.04, 0.16], [-0.76, 2.08, 0.18], amber, [0, -0.22, 0.12]);
+  addBox(root, [1.08, 0.94, 0.18], [0.82, 1.62, 0.22], red, [0, 0.24, -0.12]);
+  addBox(root, [1.36, 0.18, 0.18], [0, 2.8, 0.26], amber);
+  addSphere(root, 0.28, [0, 1.98, 0.34], cyan, [1, 1, 1]);
   return root;
 }
 
@@ -1870,6 +2171,26 @@ function createPreviewOverdriveCore() {
     fin.rotation.z = 0.2;
   }
   addCylinder(root, 1.55, 1.55, 0.08, 24, [0, 1.38, 0], core, [Math.PI / 2, 0, 0]);
+  return root;
+}
+
+function createPreviewCobaltRepairCrawler() {
+  const root = new THREE.Group();
+  const blue = getPreviewPanelMaterial('cobalt-blue', 0x3f7fa0, '#346f8d', 'rgba(184, 247, 255, 0.34)', 'rgba(14, 28, 36, 0.46)', 0.56, 0.14);
+  const dark = getPreviewMaterial('cobalt-dark', 0x17232a, 0.76, 0.16);
+  const cyan = getPreviewMaterial('cobalt-cyan', 0x54d8ff, 0.26, 0.08, 0x164a55);
+  const steel = getPreviewMaterial('cobalt-steel', 0x677176, 0.62, 0.22);
+  addBox(root, [3.2, 0.58, 2.85], [0, 0.58, 0], blue);
+  addBox(root, [2.26, 0.76, 1.6], [0, 1.18, -0.1], dark);
+  addCylinder(root, 0.55, 0.74, 0.48, 8, [0, 1.74, -0.18], blue);
+  addCylinder(root, 0.1, 0.16, 1.55, 8, [0, 1.78, -1.25], cyan, [Math.PI / 2, 0, 0]);
+  for (const side of [-1, 1]) {
+    addBox(root, [0.42, 0.48, 3.05], [side * 1.6, 0.44, 0], dark);
+    addBox(root, [0.26, 0.92, 0.18], [side * 1.18, 1.34, 0.82], steel, [0, 0, side * 0.22]);
+    addSphere(root, 0.24, [side * 0.96, 1.8, 0.88], cyan, [1, 1, 1]);
+    for (let i = 0; i < 4; i++) addCylinder(root, 0.2, 0.2, 0.12, 10, [side * 1.84, 0.44, -1.12 + i * 0.74], cyan, [0, 0, Math.PI / 2]);
+  }
+  addCylinder(root, 1.18, 1.18, 0.06, 24, [0, 1.66, 0.22], cyan, [Math.PI / 2, 0, 0]);
   return root;
 }
 
@@ -2027,6 +2348,41 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.arcTo(x, y + height, x, y, radius);
   ctx.arcTo(x, y, x + width, y, radius);
   ctx.closePath();
+}
+
+function createArmorPanelTexture(key, base, line, shadow) {
+  if (armorTextureCache.has(key)) return armorTextureCache.get(key);
+  const textureCanvas = document.createElement('canvas');
+  textureCanvas.width = 128;
+  textureCanvas.height = 128;
+  const ctx = textureCanvas.getContext('2d');
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = shadow;
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect(8 + i * 25, 0, 7, 128);
+  }
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 3;
+  for (let y = 18; y < 128; y += 36) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(128, y + 14);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.lineWidth = 1;
+  for (let x = 16; x < 128; x += 32) {
+    ctx.strokeRect(x, 12, 23, 22);
+    ctx.strokeRect(x - 7, 62, 24, 24);
+  }
+  const texture = new THREE.CanvasTexture(textureCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1.4, 1.4);
+  armorTextureCache.set(key, texture);
+  return texture;
 }
 
 function bulletColor(power) {
