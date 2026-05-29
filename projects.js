@@ -19,10 +19,12 @@
  *     "Opus 4.7"                  - Claude Opus 4.7 (the current Claude model)
  *     "OpenAI 5.5"                - OpenAI Codex / GPT-5.5
  *     "Opus 4.7 + OpenAI 5.5"     - Combination project, both contributed
- *     "Claude"                    - Older Claude model, exact version unknown
+ *     "Claude"                    - Older Claude/Sonnet model, exact version unknown
  *     "Hand"                      - Hand-coded by Aaron
  *   New projects MUST set `creator` to whichever model(s) actually built it.
  *   Update if a different model later contributes substantially.
+ *   Projects with codex_* paths/names are OpenAI 5.5 unless explicitly mixed.
+ *   Claude-built projects from The Hollow era onward should use "Opus 4.7".
  */
 const PROJECTS = [
 
@@ -252,11 +254,11 @@ const PROJECTS = [
 
   { name: "Awake",              path: "/gms/2d/awake/", screenshot: "awake", type: "game",
     desc: "Mobile-first sci-fi horror escape prototype. Wake with no memory, search a generated facility, and outrun what is hunting the hallway.",
-    date: "2026-05-13", creator: "OpenAI 5.5" },
+    date: "2026-05-13", creator: "Opus 4.7 + OpenAI 5.5" },
 
   { name: "The Horrors",        path: "/gms/2d/the_horrors/", screenshot: "the-horrors", type: "game",
     desc: "Mobile-first hub-and-spoke video horror. Every room connects through a central hallway via short generated transition videos; monster reveals, attacks, and most endings play in the hallway.",
-    date: "2026-05-15", creator: "Opus 4.7" },
+    date: "2026-05-15", creator: "Opus 4.7 + OpenAI 5.5" },
 
   { name: "Gate Tank Runner",   path: "/gms/3d/codex_gate_tank_runner/", screenshot: "codex-gate-tank-runner", type: "game",
     desc: "Low-poly Three.js tank runner. Smash glass gates for strength, armor, and tiny escort tanks, then spend salvaged coins on permanent garage upgrades.",

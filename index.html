@@ -560,7 +560,7 @@
         </div>
         <div class="about-section">
           <h2><span class="about-icon"><i class="fas fa-robot"></i></span> Built With AI</h2>
-          <p>Every project here was created through collaboration with Claude AI. Earlier projects (2024–2025) were built with <span class="highlight">Claude Sonnet 4</span>, while newer work in 2026 uses <span class="highlight-alt">Claude Sonnet / Opus 4.6</span>.</p>
+          <p>Projects here were created through collaboration with AI coding agents. Older Claude/Sonnet projects are labeled as <span class="highlight">Claude</span>, Claude projects from around The Hollow onward are labeled <span class="highlight-alt">Opus 4.7</span>, and codex_* projects are labeled <span class="highlight-alt">OpenAI Codex / GPT-5.5</span>.</p>
           <p>The developer describes the idea, the AI writes the code, and together they iterate until it works. It's a new way to build software — conversational, fast, and surprisingly powerful.</p>
         </div>
         <div class="about-section">
@@ -599,15 +599,13 @@
       return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     }
 
-    function getClaudeVersion(iso) {
-      return parseInt(iso.slice(0, 4)) >= 2026
-        ? 'Claude Sonnet / Opus 4.6'
-        : 'Claude Sonnet 4';
+    function getProjectCreator(project) {
+      return project.creator || 'Creator unknown';
     }
 
     // ─── BUILD CARDS ───
     function buildCard(project, index) {
-      const builtWith = getClaudeVersion(project.date);
+      const builtWith = getProjectCreator(project);
       const badgeClass = project.type === 'app' ? 'badge-app' : 'badge-game';
       const badgeLabel = project.type === 'app' ? 'App' : 'Game';
 
