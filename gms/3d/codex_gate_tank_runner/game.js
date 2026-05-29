@@ -1667,10 +1667,10 @@ function ensureModelGalleryScene() {
   rim.position.set(5, 4, -5);
   modelDebug.scene.add(rim);
   const floor = new THREE.Mesh(
-    new THREE.CylinderGeometry(3.8, 4.5, 0.12, 48),
+    new THREE.CylinderGeometry(3.95, 3.95, 0.08, 12),
     getPreviewMaterial('display-floor', 0x1b272b, 0.82, 0.02)
   );
-  floor.position.y = -0.08;
+  floor.position.y = -0.06;
   modelDebug.scene.add(floor);
 }
 
@@ -1722,10 +1722,10 @@ function centerPreviewModel(root) {
   const box = new THREE.Box3().setFromObject(root);
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
-  root.position.sub(center);
   const maxSize = Math.max(size.x, size.y, size.z, 1);
-  root.scale.setScalar(Math.min(1.35, 4.2 / maxSize));
-  root.position.y += 0.12;
+  const scale = Math.min(1.35, 4.2 / maxSize);
+  root.scale.setScalar(scale);
+  root.position.set(-center.x * scale, 0.18 - box.min.y * scale, -center.z * scale);
 }
 
 function updateModelGallery(dt) {
