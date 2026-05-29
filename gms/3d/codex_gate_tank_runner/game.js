@@ -156,6 +156,15 @@ const materials = {
     map: createArmorPanelTexture('boss-crimson', '#7f2e33', 'rgba(255, 211, 90, 0.32)', 'rgba(26, 13, 14, 0.56)')
   }),
   bossPlate: new THREE.MeshStandardMaterial({ color: 0xd78a45, roughness: 0.5, metalness: 0.16, emissive: 0x351000, emissiveIntensity: 0.16 }),
+  enemyGlass: new THREE.MeshStandardMaterial({
+    color: 0xa9f5ff,
+    roughness: 0.16,
+    metalness: 0.02,
+    transparent: true,
+    opacity: 0.78,
+    emissive: 0x155c66,
+    emissiveIntensity: 0.34
+  }),
   glassGood: new THREE.MeshPhysicalMaterial({
     color: 0xb8f7ff,
     roughness: 0.02,
@@ -233,6 +242,10 @@ const geometries = {
   bossNose: new THREE.ConeGeometry(1.25, 1.65, 4),
   bossPanel: new THREE.BoxGeometry(1.1, 0.18, 0.72),
   bossCannon: new THREE.CylinderGeometry(0.16, 0.26, 3.45, 9),
+  ramRoller: new THREE.CylinderGeometry(0.86, 0.86, 2.9, 10),
+  ramBody: new THREE.BoxGeometry(2.82, 0.56, 1.38),
+  ramJaw: new THREE.BoxGeometry(3.12, 0.25, 0.42),
+  ramTooth: new THREE.ConeGeometry(0.17, 0.64, 4),
   droneWing: new THREE.BoxGeometry(1.9, 0.12, 0.44),
   drone: new THREE.TetrahedronGeometry(0.9, 0),
   droneCore: new THREE.OctahedronGeometry(0.9, 0),
@@ -889,6 +902,9 @@ function updateEnemies(dt) {
     if (enemy.wheels?.length) {
       for (const wheel of enemy.wheels) wheel.rotation.x += dt * (state.speed + enemy.speed) * 1.25;
     }
+    if (enemy.rollers?.length) {
+      for (const roller of enemy.rollers) roller.rotation.x += dt * (state.speed + enemy.speed) * 1.45;
+    }
     if (enemy.kind === 'drone') {
       enemy.root.position.y = 1.7 + Math.sin(state.distance * 0.16 + enemy.phase) * 0.5;
       enemy.root.rotation.x += dt * 1.6;
@@ -1144,8 +1160,9 @@ function spawnEnemyWave(z) {
   const lanes = shuffle([0, 1, 2]);
   for (let i = 0; i < count; i++) {
     const lane = lanes[i];
-    const drone = Math.random() < 0.24;
-    const enemy = createEnemy(drone ? 'drone' : 'tank');
+    const roll = Math.random();
+    const kind = roll < 0.22 ? 'drone' : roll < 0.4 ? 'ram' : 'tank';
+    const enemy = createEnemy(kind);
     enemy.root.position.set(LANES[lane] + (Math.random() - 0.5) * 0.8, 0, z - i * 4.5);
     obstacleLayer.add(enemy.root);
     enemies.push(enemy);
@@ -1211,6 +1228,33 @@ function buildDroneEnemy(root) {
   addModelPart(root, geometries.bullet, materials.enemyGlow, [0, 1.58, -0.48], [0, 0, 0], [1.28, 1.28, 1.28]);
 }
 
+function buildRamEnemy(root) {
+  root.userData.rollers = [];
+  const roller = addModelPart(root, geometries.ramRoller, materials.enemy, [0, 0.66, 0], [0, 0, Math.PI / 2]);
+  root.userData.rollers.push(roller);
+  addModelPart(root, geometries.ramBody, materials.enemyDark, [0, 1.2, 0.16], [0, 0.06, 0], [1.06, 1, 1]);
+  addModelPart(root, geometries.ramJaw, materials.enemyBlade, [0, 1.25, -1.18], [0, 0, 0], [1.06, 1, 1]);
+  addModelPart(root, geometries.enemyVent, materials.enemyGlow, [0, 1.55, -0.58], [0, 0, 0], [1.2, 1, 1]);
+  for (let i = 0; i < 7; i++) {
+    const tooth = addModelPart(
+      root,
+      geometries.ramTooth,
+      materials.enemyGlass,
+      [(i - 3) * 0.38, 1.02 + Math.abs(i - 3) * 0.025, -1.52],
+      [-Math.PI / 2, Math.PI / 4, 0],
+      [0.9, 0.9, 0.9]
+    );
+    tooth.rotation.z = (i - 3) * 0.04;
+  }
+  for (const side of [-1, 1]) {
+    addModelPart(root, geometries.enemyPod, materials.enemyBlade, [side * 1.3, 1.08, -0.12], [0, side * 0.08, 0], [0.92, 0.82, 1.35]);
+    addModelPart(root, geometries.enemyArmorPlate, materials.enemyGlass, [side * 0.88, 1.38, 0.74], [0, 0, side * 0.16], [0.86, 1, 0.82]);
+    addModelPart(root, geometries.wheel, materials.enemyAccent, [side * 1.58, 0.55, -0.8], [0, 0, Math.PI / 2], [1.2, 1.2, 1.2]);
+    addModelPart(root, geometries.wheel, materials.enemyAccent, [side * 1.58, 0.55, 0.8], [0, 0, Math.PI / 2], [1.2, 1.2, 1.2]);
+  }
+  addModelPart(root, geometries.bullet, materials.enemyGlow, [0, 1.56, -0.98], [0, 0, 0], [0.9, 0.9, 0.9]);
+}
+
 function buildFortressEnemy(root) {
   root.userData.wheels = [];
   addModelPart(root, geometries.bossLower, materials.bossHull, [0, 0.98, 0.04]);
@@ -1241,8 +1285,8 @@ function createEnemy(kind) {
   const root = new THREE.Group();
   const upgradePressure = save.upgrades.core * 0.18 + save.upgrades.armor * 0.3 + save.upgrades.bay * 0.14;
   const difficulty = 1 + state.distance / 42 + state.peakPower * 0.15 + upgradePressure;
-  let hp = Math.round((kind === 'drone' ? 3.2 : 6.2) * difficulty);
-  let radius = kind === 'drone' ? 0.9 : 1.35;
+  let hp = Math.round((kind === 'drone' ? 3.2 : kind === 'ram' ? 5.2 : 6.2) * difficulty);
+  let radius = kind === 'drone' ? 1.08 : kind === 'ram' ? 1.55 : 1.55;
   let barY = kind === 'drone' ? 2.62 : 2.46;
   let barWidth = kind === 'drone' ? 2.3 : 2.8;
   const variant = kind === 'tank' && Math.random() < 0.36 ? 'rail' : 'marauder';
@@ -1254,8 +1298,15 @@ function createEnemy(kind) {
     buildFortressEnemy(root);
   } else if (kind === 'drone') {
     buildDroneEnemy(root);
+    root.scale.setScalar(1.16);
+  } else if (kind === 'ram') {
+    barY = 2.34;
+    barWidth = 2.85;
+    buildRamEnemy(root);
+    root.scale.setScalar(1.12);
   } else {
     buildMarauderEnemy(root, variant);
+    root.scale.setScalar(1.16);
   }
   const health = createEnemyHealthBar(barWidth, 0x7bd66f);
   health.root.position.set(0, barY, 0);
@@ -1267,13 +1318,14 @@ function createEnemy(kind) {
     radius,
     kind,
     variant,
-    speed: kind === 'drone' ? 2.8 : 1.2,
+    speed: kind === 'drone' ? 2.8 : kind === 'ram' ? 2.05 : 1.2,
     phase: Math.random() * 10,
     bar: health.fill,
     barFullScale: health.fullScaleX,
     barWidth: health.width,
     wheels: root.userData.wheels || [],
-    rotors: root.userData.rotors || []
+    rotors: root.userData.rotors || [],
+    rollers: root.userData.rollers || []
   };
 }
 
@@ -1296,10 +1348,10 @@ function damageEnemy(enemy, damage) {
   if (enemy.hp <= 0) {
     const index = enemies.indexOf(enemy);
     if (index !== -1) {
-      const payout = enemy.kind === 'boss' ? 45 : enemy.kind === 'drone' ? 5 : 8;
+      const payout = enemy.kind === 'boss' ? 45 : enemy.kind === 'drone' ? 5 : enemy.kind === 'ram' ? 7 : 8;
       state.runCoins += Math.round(payout * (1 + save.upgrades.bank * 0.16));
-      spawnCoinArc(enemy.root.position.z, enemy.root.position.x, enemy.kind === 'boss' ? 16 : 4);
-      spawnShardBurst(enemy.root.position, enemy.kind === 'boss' ? 32 : 14, 0xff635d);
+      spawnCoinArc(enemy.root.position.z, enemy.root.position.x, enemy.kind === 'boss' ? 16 : enemy.kind === 'ram' ? 5 : 4);
+      spawnShardBurst(enemy.root.position, enemy.kind === 'boss' ? 32 : enemy.kind === 'ram' ? 18 : 14, enemy.kind === 'ram' ? 0xa9f5ff : 0xff635d);
       if (enemy.kind === 'boss') state.bossDefeated = true;
       removeEnemy(index);
     }
@@ -1332,7 +1384,7 @@ function collideEnemy(enemy) {
 }
 
 function getEnemyCollisionDamage(enemy) {
-  const base = enemy.kind === 'boss' ? 8 : enemy.kind === 'drone' ? 2 : 3;
+  const base = enemy.kind === 'boss' ? 8 : enemy.kind === 'drone' ? 2 : enemy.kind === 'ram' ? 4 : 3;
   return base + Math.floor(state.distance / 82) + Math.floor(state.peakPower / 16);
 }
 
