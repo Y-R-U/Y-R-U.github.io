@@ -19,11 +19,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"log"
+	"mime"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -52,6 +55,16 @@ func main() {
 		log.Fatalf("migrate: %v", err)
 	}
 	seedGlobals()
+	mime.AddExtensionType(".webmanifest", "application/manifest+json")
+
+	// drop stale sessions on boot, then daily
+	cleanupSessions()
+	go func() {
+		t := time.NewTicker(24 * time.Hour)
+		for range t.C {
+			cleanupSessions()
+		}
+	}()
 
 	mux := http.NewServeMux()
 
@@ -59,8 +72,8 @@ func main() {
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": true, "mode": "server"})
 	})
-	mux.HandleFunc("POST /api/register", hRegister)
-	mux.HandleFunc("POST /api/login", hLogin)
+	mux.HandleFunc("POST /api/register", rateLimit(hRegister))
+	mux.HandleFunc("POST /api/login", rateLimit(hLogin))
 	mux.HandleFunc("POST /api/logout", hLogout)
 	mux.HandleFunc("GET /api/me", auth(hMe))
 	mux.HandleFunc("PUT /api/settings", auth(hSettings))
@@ -197,6 +210,10 @@ func hRegister(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 400, "username (2+) and password (4+) required")
 		return
 	}
+	if len(c.Password) > 72 { // bcrypt only hashes the first 72 bytes
+		writeErr(w, 400, "password is too long (max 72 characters)")
+		return
+	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(c.Password), 12)
 	if err != nil {
 		writeErr(w, 500, "hash error")
@@ -297,6 +314,7 @@ func hAddEntry(w http.ResponseWriter, r *http.Request) {
 		Label    string `json:"label"`
 		Calories int    `json:"calories"`
 		When     int64  `json:"when"` // optional unix seconds
+		Hour     *int   `json:"hour"` // optional client-local hour 0-23, for time-of-day matching
 	}
 	if !readJSON(w, r, &in) {
 		return
@@ -321,7 +339,12 @@ func hAddEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Remember it as a suggestion (upsert): bump count, track time-of-day, keep latest calories.
+	// Prefer the client's local hour (the browser's timezone) so time-of-day matching is
+	// consistent with how the front-end ranks; fall back to the server's hour.
 	hour := time.Unix(when, 0).Hour()
+	if in.Hour != nil && *in.Hour >= 0 && *in.Hour <= 23 {
+		hour = *in.Hour
+	}
 	db.Exec(`INSERT INTO suggestions(user_id,kind,label,calories,use_count,hour_sum,last_used)
 	         VALUES(?,?,?,?,1,?,?)
 	         ON CONFLICT(user_id,kind,label) DO UPDATE SET
@@ -485,6 +508,58 @@ func logReq(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		next.ServeHTTP(w, r)
 	})
+}
+
+func cleanupSessions() {
+	db.Exec(`DELETE FROM sessions WHERE created_at < ?`, time.Now().Add(-400*24*time.Hour).Unix())
+}
+
+// rateLimit is a tiny in-memory sliding-window limiter for the auth endpoints,
+// keyed by client IP. Generous enough that real use never trips it; just blunts
+// brute-force attempts.
+var (
+	rlMu   sync.Mutex
+	rlHits = map[string][]int64{}
+)
+
+func rateLimit(h http.HandlerFunc) http.HandlerFunc {
+	const window = int64(15 * 60) // seconds
+	const max = 30                // attempts per window per IP
+	return func(w http.ResponseWriter, r *http.Request) {
+		ip := clientIP(r)
+		now := time.Now().Unix()
+		rlMu.Lock()
+		kept := rlHits[ip][:0]
+		for _, t := range rlHits[ip] {
+			if now-t < window {
+				kept = append(kept, t)
+			}
+		}
+		if len(kept) >= max {
+			rlHits[ip] = kept
+			rlMu.Unlock()
+			writeErr(w, 429, "too many attempts — please wait a few minutes")
+			return
+		}
+		rlHits[ip] = append(kept, now)
+		rlMu.Unlock()
+		h(w, r)
+	}
+}
+
+// clientIP trusts X-Forwarded-For (set by the Caddy reverse proxy in front),
+// falling back to the raw connection address.
+func clientIP(r *http.Request) string {
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		if i := strings.IndexByte(xff, ','); i >= 0 {
+			return strings.TrimSpace(xff[:i])
+		}
+		return strings.TrimSpace(xff)
+	}
+	if host, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+		return host
+	}
+	return r.RemoteAddr
 }
 
 func env(k, def string) string {

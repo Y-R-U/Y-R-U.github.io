@@ -19,11 +19,18 @@ caltrack.br8t.com to make an account and sync.
 index.html          SPA shell (auth screen, app, settings sheet, confirm modal, toasts)
 app.css             All styles. Mobile-first, light + dark (prefers-color-scheme).
 app.js              Storage adapter (Store), shared pure helpers, UI, tiny canvas charts.
+manifest.webmanifest + sw.js + icon.svg/icon-192.png/icon-512.png  — installable PWA / offline shell.
 server/main.go      Go HTTP API + static file server. modernc.org/sqlite (CGO-free) + bcrypt.
 server/go.mod
 caltrack.service    systemd unit (port 8003, db at /srv/data/caltrack).
 deploy.sh           Build-on-box deploy to the br8t VPS (mirrors ../../../ionos/vpstats).
 ```
+
+PWA: `sw.js` precaches the shell; API requests are never cached, navigations are
+network-first, other assets stale-while-revalidate. Scope = wherever it's served
+(`/` on the VPS, `/app/caltrack/` on Pages). Time-of-day matching: the client sends
+its local `hour` with each entry so server-stored `hour_sum` is in the user's
+timezone. "Base daily burn" is BMR (rest only); exercise is added on top.
 
 The Go source lives in the repo as the single source of truth; GitHub Pages just
 ignores it and serves the static files.

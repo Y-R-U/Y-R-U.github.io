@@ -179,7 +179,7 @@ const emojiFor = k => k==='food' ? '🍎' : '💪';
    APP STATE + UI
    ========================================================================= */
 const State = {
-  me:null, kind:'food', sugCache:{food:[],exercise:[]},
+  me:null, kind:'food', sugCache:{food:[],exercise:[]}, entries:[],
   projDef:250, projWk:10, periodDays:7,
 };
 
@@ -242,7 +242,7 @@ async function saveEntry(){
   const cal = parseInt($('#cal-input').value,10)||0;
   if(!label){ toast('Give it a name first'); $('#label-input').focus(); return; }
   if(cal<=0){ toast('Set a calorie amount'); $('#cal-input').focus(); return; }
-  await Store.addEntry({kind:State.kind, label, calories:cal});
+  await Store.addEntry({kind:State.kind, label, calories:cal, hour:new Date().getHours()});
   $('#label-input').value=''; $('#cal-input').value=0;
   toast(`${emojiFor(State.kind)} ${label} · ${cal} kcal saved`, {accent:true});
   await loadSuggestions();
@@ -254,9 +254,9 @@ async function saveEntry(){
 async function refreshData(){
   const now = Math.floor(Date.now()/1000);
   const monthAgo = now - 31*86400;
-  const all = await Store.listEntries(monthAgo, now+86400);
-  renderToday(all);
-  renderActuals(all);
+  State.entries = await Store.listEntries(monthAgo, now+86400);
+  renderToday(State.entries);
+  renderActuals(State.entries);
 }
 
 function renderToday(all){
@@ -274,10 +274,10 @@ function renderToday(all){
   const pct = Math.max(0, Math.min(100, net/1000*100));
   $('#net-bar').style.width = pct+'%';
   let msg;
-  if(!burn) msg = 'Set your daily burn in ⚙️ to see your real deficit.';
-  else if(net>0) msg = `On track — a ${net} kcal deficit ≈ ${round1(kgLost(net,7))} kg/week if you keep it up.`;
-  else if(net===0) msg = 'Right at maintenance today.';
-  else msg = `${-net} kcal over maintenance today — tomorrow's a fresh start.`;
+  if(!burn) msg = 'Set your base daily burn in ⚙️ to see your real deficit.';
+  else if(net>0) msg = `Nice — ${net} kcal under your burn so far today.`;
+  else if(net===0) msg = 'Right at maintenance so far today.';
+  else msg = `${-net} kcal over your burn so far today — still time to move!`;
   $('#net-msg').textContent = msg;
 
   const ul = $('#today-entries'); ul.innerHTML='';
@@ -300,24 +300,28 @@ function renderToday(all){
 function renderActuals(all){
   const burn = State.me.daily_burn||0;
   const card = $('#actual-card');
-  if(!all.length || !burn){ card.classList.add('hidden'); return; }
+  // Need a base burn AND at least one logged meal — otherwise there's nothing real to show.
+  if(!burn || !all.some(e=>e.kind==='food')){ card.classList.add('hidden'); return; }
   card.classList.remove('hidden');
 
   const days = State.periodDays;
   const todayStart = startOfDay(Math.floor(Date.now()/1000));
-  const series = [];        // [{deficit}] oldest→newest
-  let total = 0;
+  const series = [];                 // per-day net deficit; 0 = untracked day (no bar)
+  let total = 0, trackedDays = 0;
   for(let i=days-1;i>=0;i--){
     const ds = todayStart - i*86400, de = ds + 86400;
     const dayEntries = all.filter(e=>e.created_at>=ds && e.created_at<de);
+    // A day only counts if food was logged — otherwise we can't assume zero intake,
+    // and an empty day would otherwise read as a full +burn "deficit".
+    if(!dayEntries.some(e=>e.kind==='food')){ series.push(0); continue; }
     const eaten  = dayEntries.filter(e=>e.kind==='food').reduce((a,e)=>a+e.calories,0);
     const burned = dayEntries.filter(e=>e.kind==='exercise').reduce((a,e)=>a+e.calories,0);
     const def = burn + burned - eaten;
-    series.push(def); total += def;
+    series.push(def); total += def; trackedDays++;
   }
-  const avg = Math.round(total/days);
-  $('#a-avg').textContent = (avg>=0?'+':'')+avg;
-  $('#a-kg').textContent  = round1(total/KCAL_PER_KG);        // net kg over the period
+  const avg = Math.round(total/Math.max(1,trackedDays));
+  $('#a-avg').textContent  = (avg>=0?'+':'')+avg;
+  $('#a-kg').textContent   = round1(total/KCAL_PER_KG);       // net kg across tracked days
   $('#a-proj').textContent = round1(avg*70/KCAL_PER_KG);      // kg if this avg held for 10wk
   drawBars($('#actual-chart'), series);
 }
@@ -518,11 +522,15 @@ function wireEvents(){
     refreshData();
   });
 
+  // On resize just redraw the charts from cached data — no need to refetch.
   let rt; window.addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(()=>{
-    renderProjection(); refreshData(); }, 200); });
+    renderProjection(); renderToday(State.entries); renderActuals(State.entries); }, 200); });
 }
 
 (async function main(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  }
   wireEvents();
   await Store.init();
   if(Store.mode==='server'){

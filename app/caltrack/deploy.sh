@@ -21,7 +21,10 @@ ssh "$HOST" "sudo install -d -o deploy -g deploy /srv/apps/$APP $BUILD_DIR $STAT
 
 echo ">> syncing static SPA"
 rsync -az --delete \
-  --include='index.html' --include='app.css' --include='app.js' --exclude='*' \
+  --include='index.html' --include='app.css' --include='app.js' \
+  --include='manifest.webmanifest' --include='sw.js' \
+  --include='icon.svg' --include='icon-192.png' --include='icon-512.png' \
+  --exclude='*' \
   "$SRC_DIR/" "$HOST:$STATIC_DIR/"
 
 echo ">> syncing Go source"
