@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#0f8a5f">
+<meta name="description" content="caltrack — a super-simple, mobile-first calorie & exercise tracker.">
+<title>caltrack</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ===================== AUTH (server mode only) ===================== -->
+<section id="auth" class="auth hidden">
+  <div class="auth-card">
+    <div class="brand"><span class="brand-mark">🔥</span><h1>caltrack</h1></div>
+    <p class="tagline">Calories in, calories out. Dead simple.</p>
+    <form id="auth-form" autocomplete="on">
+      <label>Username <small>(an email works, but anything goes)</small>
+        <input id="au-user" type="text" autocomplete="username" placeholder="you@example.com" required>
+      </label>
+      <label>Password
+        <input id="au-pass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </label>
+      <button id="au-submit" class="btn-primary" type="submit">Create account</button>
+    </form>
+    <p class="auth-toggle">Already have an account? <a id="au-switch" href="#">Log in</a></p>
+    <p class="auth-err" id="au-err"></p>
+  </div>
+</section>
+
+<!-- ===================== MAIN APP ===================== -->
+<section id="app" class="app hidden">
+  <header class="topbar">
+    <div class="brand sm"><span class="brand-mark">🔥</span><b>caltrack</b></div>
+    <button id="cog" class="icon-btn" aria-label="Settings" title="Settings">⚙️</button>
+  </header>
+
+  <main class="stack">
+
+    <!-- ENTRY CARD -->
+    <div class="card entry-card">
+      <div class="seg" id="kind-seg" role="tablist">
+        <button class="seg-btn active" data-kind="food" role="tab">🍎 Food</button>
+        <button class="seg-btn" data-kind="exercise" role="tab">💪 Exercise</button>
+      </div>
+
+      <div class="combo">
+        <input id="label-input" type="text" inputmode="text" autocomplete="off"
+               placeholder="What did you eat?" aria-label="Entry name">
+        <ul id="suggest-list" class="suggest hidden"></ul>
+      </div>
+
+      <div class="cal-row">
+        <button class="step neg" data-delta="-50">−50</button>
+        <button class="step neg" data-delta="-10">−10</button>
+        <div class="cal-field">
+          <input id="cal-input" type="number" inputmode="numeric" min="0" step="10" value="0">
+          <span class="cal-unit">kcal</span>
+        </div>
+        <button class="step pos" data-delta="10">+10</button>
+        <button class="step pos" data-delta="50">+50</button>
+      </div>
+
+      <button id="save-btn" class="btn-primary big">Add Food</button>
+    </div>
+
+    <!-- TODAY SUMMARY -->
+    <div class="card today-card">
+      <div class="today-head">
+        <h2>Today</h2>
+        <span id="today-date" class="muted"></span>
+      </div>
+      <div class="rings">
+        <div class="stat eaten"><b id="t-eaten">0</b><span>eaten</span></div>
+        <div class="stat burned"><b id="t-burned">0</b><span>burned</span></div>
+        <div class="stat net"><b id="t-net">0</b><span>net deficit</span></div>
+      </div>
+      <div class="bar"><div id="net-bar" class="bar-fill"></div></div>
+      <p id="net-msg" class="net-msg muted"></p>
+      <ul id="today-entries" class="entries"></ul>
+    </div>
+
+    <!-- PROJECTION CARD (always works) -->
+    <div class="card proj-card">
+      <h2>What a little deficit does <span class="spark">✨</span></h2>
+      <p class="proj-sentence">
+        Keep a daily deficit of
+        <span class="stepper">
+          <button class="mini" data-proj="def" data-delta="-50">−</button>
+          <b id="proj-def">250</b><i>kcal</i>
+          <button class="mini" data-proj="def" data-delta="50">+</button>
+        </span>
+        for
+        <span class="stepper">
+          <button class="mini" data-proj="wk" data-delta="-1">−</button>
+          <b id="proj-wk">10</b><i>wk</i>
+          <button class="mini" data-proj="wk" data-delta="1">+</button>
+        </span>
+        and you'll lose
+        <b id="proj-kg" class="big-kg">2.3 kg</b>.
+      </p>
+      <canvas id="proj-chart" class="chart" height="150"></canvas>
+      <p id="proj-target" class="muted small"></p>
+    </div>
+
+    <!-- ACTUALS CARD (once there is data) -->
+    <div class="card actual-card hidden" id="actual-card">
+      <div class="today-head">
+        <h2>Your real pace</h2>
+        <span class="stepper">
+          <button class="mini" data-period="-1">−</button>
+          <b id="period-days">7</b><i>days</i>
+          <button class="mini" data-period="1">+</button>
+        </span>
+      </div>
+      <div class="rings">
+        <div class="stat"><b id="a-avg">0</b><span>avg daily deficit</span></div>
+        <div class="stat"><b id="a-kg">0</b><span>kg in period</span></div>
+        <div class="stat"><b id="a-proj">0</b><span>kg / 10wk pace</span></div>
+      </div>
+      <canvas id="actual-chart" class="chart" height="150"></canvas>
+      <p class="muted small">Green bars = days in deficit (losing). Red = surplus.</p>
+    </div>
+
+  </main>
+  <div class="foot-space"></div>
+</section>
+
+<!-- ===================== SETTINGS SHEET ===================== -->
+<div id="sheet-backdrop" class="backdrop hidden"></div>
+<section id="settings" class="sheet hidden">
+  <div class="sheet-grip"></div>
+  <h2>Settings</h2>
+  <label>Daily calorie burn <small>(resting / maintenance — what you burn doing nothing)</small>
+    <input id="set-burn" type="number" inputmode="numeric" min="0" step="50" placeholder="e.g. 1800">
+  </label>
+  <label>Target weight loss <small>(kg — optional goal)</small>
+    <input id="set-target" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 5">
+  </label>
+  <label>Current weight <small>(kg — optional, used for projections)</small>
+    <input id="set-weight" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 80">
+  </label>
+  <button id="set-save" class="btn-primary">Save</button>
+  <button id="set-close" class="btn-ghost">Close</button>
+  <p class="storage-note" id="storage-note"></p>
+  <button id="logout-btn" class="btn-ghost danger hidden">Log out</button>
+</section>
+
+<!-- ===================== CONFIRM MODAL ===================== -->
+<div id="confirm-backdrop" class="backdrop hidden">
+  <div class="confirm">
+    <p id="confirm-text">Are you sure?</p>
+    <div class="confirm-row">
+      <button id="confirm-no" class="btn-ghost">Cancel</button>
+      <button id="confirm-yes" class="btn-primary danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOASTS ===================== -->
+<div id="toasts" class="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

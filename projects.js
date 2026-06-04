@@ -92,6 +92,10 @@ const PROJECTS = [
     desc: "Local server-backed audiobook reader. The laptop runs the Kokoro TTS backend while the Android APK caches books for offline playback.",
     date: "2026-04-21", creator: "Opus 4.7 + OpenAI 5.5" },
 
+  { name: "CalTrack",       path: "/app/caltrack/",     screenshot: "caltrack",       type: "app",
+    desc: "Super-simple mobile-first calorie & exercise tracker. Time-of-day smart suggestions, deficit projections, and live progress charts. Full accounts + SQLite sync at caltrack.br8t.com; browser-only backup here.",
+    date: "2026-06-04", creator: "Opus 4.8" },
+
   // ══════════════════════════════════════════
   //  GAMES (sorted by date, oldest first)
   // ══════════════════════════════════════════

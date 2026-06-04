@@ -1,0 +1,25 @@
+[Unit]
+Description=caltrack — calorie & exercise tracker
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/apps/caltrack
+ExecStart=/srv/apps/caltrack/caltrack
+Restart=on-failure
+RestartSec=3
+Environment=CALTRACK_ADDR=127.0.0.1:8003
+Environment=CALTRACK_DB=/srv/data/caltrack/caltrack.db
+Environment=CALTRACK_STATIC=/srv/apps/caltrack/static
+
+# hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/data/caltrack
+
+[Install]
+WantedBy=multi-user.target
