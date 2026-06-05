@@ -2,7 +2,7 @@
    Network-first so an online device always gets the latest code; the cache is
    only an offline fallback. API requests are never cached. Bump VERSION on any
    change so browsers pick up the new worker and drop old caches.               */
-const VERSION = 'caltrack-v2';
+const VERSION = 'caltrack-v3';
 const SHELL = [
   './', './index.html', './app.css', './app.js',
   './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',

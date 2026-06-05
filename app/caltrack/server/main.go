@@ -91,6 +91,14 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
+		// Shell files (html/js/css/sw/manifest) must always revalidate so a deploy
+		// is picked up immediately; hashed-by-content icons can cache for a while.
+		switch {
+		case strings.HasSuffix(r.URL.Path, ".png"), strings.HasSuffix(r.URL.Path, ".svg"), strings.HasSuffix(r.URL.Path, ".jpg"):
+			w.Header().Set("Cache-Control", "public, max-age=604800")
+		default:
+			w.Header().Set("Cache-Control", "no-cache")
+		}
 		// serve real files; otherwise hand back the SPA shell
 		if r.URL.Path != "/" {
 			if _, err := os.Stat(filepath.Join(staticDir, filepath.Clean(r.URL.Path))); err == nil {

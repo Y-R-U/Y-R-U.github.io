@@ -584,6 +584,17 @@ function wireEvents(){
   $('#cog').onclick = openSettings;
   $('#set-save').onclick = saveSettings;
   $('#set-close').onclick = closeSettings;
+  $('#force-update').onclick = async ()=>{
+    toast('Clearing cache…');
+    try{
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+      if(self.caches){ const ks = await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); }
+    }catch(_){}
+    location.reload();
+  };
   $('#sheet-backdrop').onclick = closeSettings;
   $('#logout-btn').onclick = async ()=>{ await Store.logout(); location.reload(); };
 
