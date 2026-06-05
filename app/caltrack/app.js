@@ -608,6 +608,14 @@ function wireEvents(){
 
 (async function main(){
   if('serviceWorker' in navigator){
+    // Auto-reload once when a *new* worker takes control (an update) — but not on
+    // the very first install, where there was no prior controller.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(reloaded || !hadController) return;
+      reloaded = true; location.reload();
+    });
     window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
   }
   wireEvents();
