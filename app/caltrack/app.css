@@ -85,6 +85,11 @@ form input:focus,#settings input:focus{outline:none;border-color:var(--accent)}
 .seg-btn{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:15px;color:var(--muted);transition:.15s}
 .seg-btn.active[data-kind="food"]{background:var(--card);color:var(--food);box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .seg-btn.active[data-kind="exercise"]{background:var(--card);color:var(--exercise);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.edit-banner{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:color-mix(in srgb,var(--accent) 14%,var(--card));border:1px solid var(--accent);
+  color:var(--accent);border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:13px;font-weight:600}
+.edit-banner button{color:var(--accent);font-weight:700;font-size:13px;padding:4px 8px;border-radius:8px}
+.edit-banner button:active{background:var(--bg)}
 .combo{position:relative;margin-bottom:12px}
 #label-input{
   width:100%;padding:14px;border-radius:12px;font-size:17px;
@@ -103,6 +108,13 @@ form input:focus,#settings input:focus{outline:none;border-color:var(--accent)}
 .suggest .s-glob{font-size:11px;opacity:.5}
 .suggest .s-del{font-size:18px;color:var(--muted);width:30px;height:30px;border-radius:8px;flex:none}
 .suggest .s-del:active{background:var(--bg);color:var(--bad)}
+/* expand/collapse notch under the first couple of suggestions */
+.suggest .s-notch{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+  padding:6px 0 3px;margin-top:2px;border-top:1px solid var(--line);color:var(--muted);
+  font-size:12px;font-weight:600}
+.suggest .s-notch .chev{font-size:13px;line-height:1;display:inline-block;transition:transform .2s}
+.suggest .s-notch.open .chev{transform:rotate(180deg)}
+.suggest .s-notch:active{color:var(--accent)}
 
 .cal-row{display:flex;align-items:stretch;gap:7px;margin-bottom:14px}
 .step{
@@ -136,7 +148,8 @@ form input:focus,#settings input:focus{outline:none;border-color:var(--accent)}
 .entries .e-label{flex:1;font-weight:600}
 .entries .e-cal{font-variant-numeric:tabular-nums;color:var(--muted)}
 .entries .e-cal.food{color:var(--food)} .entries .e-cal.exercise{color:var(--exercise)}
-.entries .e-del{color:var(--muted);font-size:17px;width:28px;height:28px;border-radius:8px}
+.entries .e-edit,.entries .e-del{color:var(--muted);font-size:16px;width:30px;height:30px;border-radius:8px;flex:none}
+.entries .e-edit:active{background:var(--bg)}
 .entries .e-del:active{color:var(--bad);background:var(--bg)}
 .entries .empty{color:var(--muted);font-size:14px;padding:8px 0;border:0}
 
@@ -152,7 +165,7 @@ form input:focus,#settings input:focus{outline:none;border-color:var(--accent)}
 .stepper b{font-variant-numeric:tabular-nums;min-width:30px;text-align:center;font-size:16px}
 .stepper i{font-style:normal;color:var(--muted);font-size:12px;margin-left:-2px}
 .big-kg{color:var(--good);font-size:19px;font-weight:800;white-space:nowrap}
-.chart{width:100%;display:block;margin:6px 0}
+.chart{width:100%;height:150px;display:block;margin:6px 0}
 .proj-card h2,.actual-card h2{display:flex;align-items:center;gap:6px}
 
 /* ---------- settings sheet ---------- */

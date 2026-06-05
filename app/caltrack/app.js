@@ -118,6 +118,17 @@ const Store = {
     this._rememberClient(e.kind, e.label, e.calories, when);
     return row;
   },
+  async updateEntry(id, e){
+    if(this.mode==='server') return this._api('entries/'+id,{method:'PUT',body:JSON.stringify(e)});
+    const entries = this._lsGet('entries', []);
+    const row = entries.find(x=>x.id===id);
+    if(row){
+      row.kind=e.kind; row.label=e.label; row.calories=e.calories;
+      this._lsSet('entries', entries);
+      this._rememberClient(e.kind, e.label, e.calories, row.created_at);
+    }
+    return row;
+  },
   async deleteEntry(id){
     if(this.mode==='server') return this._api('entries/'+id,{method:'DELETE'});
     this._lsSet('entries', this._lsGet('entries', []).filter(e=>e.id!==id));
@@ -180,29 +191,40 @@ const emojiFor = k => k==='food' ? '🍎' : '💪';
    ========================================================================= */
 const State = {
   me:null, kind:'food', sugCache:{food:[],exercise:[]}, entries:[],
+  sugOpen:false, sugExpanded:false, hideT:null, editingId:null,
   projDef:250, projWk:10, periodDays:7,
 };
 
 /* ---------- entry kind toggle ---------- */
 function setKind(kind){
   State.kind = kind;
+  State.sugExpanded = false;
   $$('#kind-seg .seg-btn').forEach(b=>b.classList.toggle('active', b.dataset.kind===kind));
   $('#label-input').placeholder = kind==='food' ? 'What did you eat?' : 'What did you do?';
-  $('#save-btn').textContent = kind==='food' ? 'Add Food' : 'Add Exercise';
+  updateSaveLabel();
   loadSuggestions().then(renderSuggest);
+}
+
+function updateSaveLabel(){
+  const verb = State.editingId ? 'Update' : 'Add';
+  $('#save-btn').textContent = `${verb} ${State.kind==='food' ? 'Food' : 'Exercise'}`;
 }
 
 async function loadSuggestions(){
   State.sugCache[State.kind] = await Store.suggestions(State.kind);
 }
 
+const COLLAPSED_SUGGESTIONS = 2;
+
 function renderSuggest(){
   const box = $('#suggest-list');
-  const txt = $('#label-input').value;
-  const ranked = rankSuggestions(State.sugCache[State.kind]||[], txt, new Date().getHours());
-  if(!ranked.length || document.activeElement !== $('#label-input')){ box.classList.add('hidden'); box.innerHTML=''; return; }
+  const ranked = rankSuggestions(State.sugCache[State.kind]||[], $('#label-input').value, new Date().getHours());
+  if(!State.sugOpen || !ranked.length){ box.classList.add('hidden'); box.innerHTML=''; return; }
+
+  const collapsible = ranked.length > COLLAPSED_SUGGESTIONS;
+  const shown = (State.sugExpanded || !collapsible) ? ranked : ranked.slice(0, COLLAPSED_SUGGESTIONS);
   box.innerHTML = '';
-  for(const s of ranked){
+  for(const s of shown){
     const li = document.createElement('li');
     li.innerHTML = `<span class="s-label">${esc(s.label)}</span>
       ${s.global?'<span class="s-glob">global</span>':''}
@@ -212,21 +234,34 @@ function renderSuggest(){
     li.querySelector('.s-cal').onclick = ()=>pick(s);
     li.querySelector('.s-del').onclick = async (ev)=>{
       ev.stopPropagation();
+      clearTimeout(State.hideT);                 // keep the list alive through the dialog
       const ok = await confirmDialog(`Remove “${s.label}” from your suggestions?`, {yes:'Remove'});
-      if(!ok) return;
+      if(!ok){ renderSuggest(); return; }
       await Store.deleteSuggestion(s.id);
       await loadSuggestions(); renderSuggest();
       toast('Suggestion removed');
     };
     box.appendChild(li);
   }
+  if(collapsible){
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 's-notch' + (State.sugExpanded ? ' open' : '');
+    more.innerHTML = (State.sugExpanded ? 'Show less' : `${ranked.length - COLLAPSED_SUGGESTIONS} more`) +
+                     ' <span class="chev">▾</span>';
+    more.addEventListener('mousedown', e=>e.preventDefault());   // don't blur the input
+    more.onclick = ()=>{ clearTimeout(State.hideT); State.sugExpanded = !State.sugExpanded; renderSuggest(); };
+    box.appendChild(more);
+  }
   box.classList.remove('hidden');
 }
 
 function pick(s){
+  State.sugOpen = false;
+  clearTimeout(State.hideT);
+  $('#suggest-list').classList.add('hidden'); $('#suggest-list').innerHTML='';
   $('#label-input').value = s.label;
   $('#cal-input').value = s.calories;
-  $('#suggest-list').classList.add('hidden');
   $('#cal-input').focus();
 }
 
@@ -236,18 +271,43 @@ function bumpCal(delta){
   inp.value = Math.max(0, (parseInt(inp.value,10)||0) + delta);
 }
 
-/* ---------- save an entry ---------- */
+/* ---------- save an entry (new, or an edit in progress) ---------- */
 async function saveEntry(){
   const label = $('#label-input').value.trim();
   const cal = parseInt($('#cal-input').value,10)||0;
   if(!label){ toast('Give it a name first'); $('#label-input').focus(); return; }
   if(cal<=0){ toast('Set a calorie amount'); $('#cal-input').focus(); return; }
-  await Store.addEntry({kind:State.kind, label, calories:cal, hour:new Date().getHours()});
-  $('#label-input').value=''; $('#cal-input').value=0;
-  toast(`${emojiFor(State.kind)} ${label} · ${cal} kcal saved`, {accent:true});
+  const payload = {kind:State.kind, label, calories:cal, hour:new Date().getHours()};
+  if(State.editingId != null){
+    await Store.updateEntry(State.editingId, payload);
+    exitEditMode();
+    toast(`${emojiFor(State.kind)} ${label} updated`, {accent:true});
+  }else{
+    await Store.addEntry(payload);
+    $('#label-input').value=''; $('#cal-input').value=0;
+    toast(`${emojiFor(State.kind)} ${label} · ${cal} kcal saved`, {accent:true});
+  }
+  State.sugOpen = false;
   await loadSuggestions();
   await refreshData();
   $('#label-input').focus();
+}
+
+/* ---------- edit an existing entry ---------- */
+function editEntry(e){
+  State.editingId = e.id;
+  $('#edit-banner').classList.remove('hidden');
+  setKind(e.kind);                       // sets kind + Save label = "Update …"
+  $('#label-input').value = e.label;
+  $('#cal-input').value = e.calories;
+  $('.entry-card').scrollIntoView({behavior:'smooth', block:'start'});
+  $('#cal-input').focus();
+}
+function exitEditMode(){
+  State.editingId = null;
+  $('#edit-banner').classList.add('hidden');
+  $('#label-input').value=''; $('#cal-input').value=0;
+  updateSaveLabel();
 }
 
 /* ---------- today + actuals data ---------- */
@@ -287,10 +347,13 @@ function renderToday(all){
     li.innerHTML = `<span class="e-emoji">${emojiFor(e.kind)}</span>
       <span class="e-label">${esc(e.label)}</span>
       <span class="e-cal ${e.kind}">${e.kind==='food'?'+':'−'}${e.calories}</span>
+      <button class="e-edit" aria-label="Edit entry">✏️</button>
       <button class="e-del" aria-label="Delete entry">🗑</button>`;
+    li.querySelector('.e-edit').onclick = ()=>editEntry(e);
     li.querySelector('.e-del').onclick = async ()=>{
       const ok = await confirmDialog(`Delete “${e.label}”?`);
       if(!ok) return;
+      if(State.editingId===e.id) exitEditMode();
       await Store.deleteEntry(e.id); await refreshData(); toast('Entry deleted');
     };
     ul.appendChild(li);
@@ -323,7 +386,7 @@ function renderActuals(all){
   $('#a-avg').textContent  = (avg>=0?'+':'')+avg;
   $('#a-kg').textContent   = round1(total/KCAL_PER_KG);       // net kg across tracked days
   $('#a-proj').textContent = round1(avg*70/KCAL_PER_KG);      // kg if this avg held for 10wk
-  drawBars($('#actual-chart'), series);
+  whenSized($('#actual-chart'), ()=> drawBars($('#actual-chart'), series));
 }
 
 /* ---------- projection ---------- */
@@ -336,7 +399,7 @@ function renderProjection(){
   // chart: cumulative kg over the weeks
   const pts = [];
   for(let w=0; w<=wk; w++) pts.push(kgLost(def, w*7));
-  drawLine($('#proj-chart'), pts, {fmt:v=>round1(v)+'kg'});
+  whenSized($('#proj-chart'), ()=> drawLine($('#proj-chart'), pts, {fmt:v=>round1(v)+'kg'}));
   // target hint
   const tgt = State.me && State.me.target_loss_kg;
   if(tgt>0){
@@ -353,16 +416,26 @@ function renderProjection(){
    ========================================================================= */
 function chartCtx(cv){
   const dpr = window.devicePixelRatio||1;
-  const w = cv.clientWidth || cv.parentElement.clientWidth-32;
-  const h = parseInt(cv.getAttribute('height'),10);
-  cv.width = w*dpr; cv.height = h*dpr;
-  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr);
+  // Read the rendered size from CSS layout (stable), NOT the canvas width/height
+  // attributes — those are the backing store we overwrite here, so reading them
+  // back and re-multiplying by dpr would inflate the canvas on every redraw.
+  const w = cv.clientWidth, h = cv.clientHeight || 150;
+  if(w < 2) return null;                       // not laid out yet — caller retries
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   return {ctx, w, h};
 }
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 
+// Draw once the canvas actually has a width (handles first paint / just-unhidden cards).
+function whenSized(cv, draw, tries=12){
+  if(cv.clientWidth >= 2){ draw(); return; }
+  if(tries > 0) requestAnimationFrame(()=>whenSized(cv, draw, tries-1));
+}
+
 function drawLine(cv, pts, {fmt=v=>v}={}){
-  const {ctx,w,h} = chartCtx(cv);
+  const m = chartCtx(cv); if(!m) return;
+  const {ctx,w,h} = m;
   ctx.clearRect(0,0,w,h);
   const pad = {l:6,r:6,t:14,b:16};
   const max = Math.max(...pts, 0.001);
@@ -387,7 +460,8 @@ function drawLine(cv, pts, {fmt=v=>v}={}){
 }
 
 function drawBars(cv, vals){
-  const {ctx,w,h} = chartCtx(cv);
+  const m = chartCtx(cv); if(!m) return;
+  const {ctx,w,h} = m;
   ctx.clearRect(0,0,w,h);
   const pad={t:10,b:14}, n=vals.length;
   const maxAbs = Math.max(1, ...vals.map(Math.abs));
@@ -497,10 +571,15 @@ function wireEvents(){
   $('#save-btn').onclick = saveEntry;
   const li = $('#label-input');
   li.addEventListener('input', renderSuggest);
-  li.addEventListener('focus', renderSuggest);
-  li.addEventListener('blur', ()=>setTimeout(()=>$('#suggest-list').classList.add('hidden'), 180));
+  li.addEventListener('focus', ()=>{ State.sugOpen=true; State.sugExpanded=false; renderSuggest(); });
+  li.addEventListener('blur', ()=>{ State.hideT=setTimeout(()=>{ State.sugOpen=false; renderSuggest(); }, 180); });
   li.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#cal-input').focus(); } });
   $('#cal-input').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); saveEntry(); } });
+  // tap anywhere outside the entry box closes the suggestion list
+  document.addEventListener('pointerdown', e=>{
+    if(State.sugOpen && !e.target.closest('.combo')){ State.sugOpen=false; clearTimeout(State.hideT); renderSuggest(); }
+  });
+  $('#edit-cancel').onclick = exitEditMode;
 
   $('#cog').onclick = openSettings;
   $('#set-save').onclick = saveSettings;

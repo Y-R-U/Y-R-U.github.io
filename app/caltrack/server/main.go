@@ -79,6 +79,7 @@ func main() {
 	mux.HandleFunc("PUT /api/settings", auth(hSettings))
 	mux.HandleFunc("GET /api/entries", auth(hListEntries))
 	mux.HandleFunc("POST /api/entries", auth(hAddEntry))
+	mux.HandleFunc("PUT /api/entries/{id}", auth(hUpdateEntry))
 	mux.HandleFunc("DELETE /api/entries/{id}", auth(hDeleteEntry))
 	mux.HandleFunc("GET /api/suggestions", auth(hSuggestions))
 	mux.HandleFunc("DELETE /api/suggestions/{id}", auth(hDeleteSuggestion))
@@ -352,6 +353,51 @@ func hAddEntry(w http.ResponseWriter, r *http.Request) {
 		uid(r), in.Kind, in.Label, in.Calories, hour, when, hour, in.Calories, when)
 	id, _ := res.LastInsertId()
 	writeJSON(w, 200, entry{ID: id, Kind: in.Kind, Label: in.Label, Calories: in.Calories, CreatedAt: when})
+}
+
+func hUpdateEntry(w http.ResponseWriter, r *http.Request) {
+	id := atoi(r.PathValue("id"), 0)
+	var in struct {
+		Kind     string `json:"kind"`
+		Label    string `json:"label"`
+		Calories int    `json:"calories"`
+		Hour     *int   `json:"hour"`
+	}
+	if !readJSON(w, r, &in) {
+		return
+	}
+	in.Label = strings.TrimSpace(in.Label)
+	if in.Kind != "food" && in.Kind != "exercise" {
+		writeErr(w, 400, "kind must be food or exercise")
+		return
+	}
+	if in.Label == "" || in.Calories <= 0 {
+		writeErr(w, 400, "label and a positive calorie amount are required")
+		return
+	}
+	res, err := db.Exec(`UPDATE entries SET kind=?,label=?,calories=? WHERE id=? AND user_id=?`,
+		in.Kind, in.Label, in.Calories, id, uid(r))
+	if err != nil {
+		writeErr(w, 500, "update")
+		return
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		writeErr(w, 404, "entry not found")
+		return
+	}
+	// keep the original timestamp; refresh the suggestion the same way an add does
+	var createdAt int64
+	db.QueryRow(`SELECT created_at FROM entries WHERE id=?`, id).Scan(&createdAt)
+	hour := time.Unix(createdAt, 0).Hour()
+	if in.Hour != nil && *in.Hour >= 0 && *in.Hour <= 23 {
+		hour = *in.Hour
+	}
+	db.Exec(`INSERT INTO suggestions(user_id,kind,label,calories,use_count,hour_sum,last_used)
+	         VALUES(?,?,?,?,1,?,?)
+	         ON CONFLICT(user_id,kind,label) DO UPDATE SET
+	           use_count=use_count+1, hour_sum=hour_sum+?, calories=?, last_used=?`,
+		uid(r), in.Kind, in.Label, in.Calories, hour, createdAt, hour, in.Calories, createdAt)
+	writeJSON(w, 200, entry{ID: id, Kind: in.Kind, Label: in.Label, Calories: in.Calories, CreatedAt: createdAt})
 }
 
 func hDeleteEntry(w http.ResponseWriter, r *http.Request) {
