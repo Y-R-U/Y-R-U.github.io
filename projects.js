@@ -268,6 +268,10 @@ const PROJECTS = [
     desc: "Low-poly Three.js tank runner. Smash glass gates for strength, armor, and tiny escort tanks, then spend salvaged coins on permanent garage upgrades.",
     date: "2026-05-27", creator: "OpenAI 5.5" },
 
+  { name: "Void Cockpit",       path: "/gms/3d/codex_void_cockpit/", screenshot: "codex-void-cockpit", type: "game",
+    desc: "Mobile-first space cockpit shooter with a generated alpha-key cockpit plate, live Three.js asteroid fields, drones, station flybys, and touch firing.",
+    date: "2026-06-09", creator: "OpenAI 5.5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
