@@ -25,8 +25,19 @@ const resultBest = document.getElementById('result-best');
 const resultWave = document.getElementById('result-wave');
 const resultTitle = document.getElementById('result-title');
 const resultKicker = document.getElementById('result-kicker');
+const resultMessage = document.getElementById('result-message');
+const resultLock = document.getElementById('result-lock');
+const resultLockText = resultLock?.querySelector('span');
+const resultLockBar = resultLock?.querySelector('i');
+
+const BEST_KEY = 'outpace-best';
+const LEGACY_BEST_KEY = 'void-cockpit-best';
+const RESULT_LOCK_MS = 3200;
+let resultUnlockTimeout = 0;
+let resultCountdownTimer = 0;
 
 const clock = new THREE.Clock();
+const params = new URLSearchParams(window.location.search);
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
@@ -39,10 +50,11 @@ const pick = (items) => items[Math.floor(Math.random() * items.length)];
 
 const state = {
   running: false,
-  demo: new URLSearchParams(window.location.search).has('demo'),
+  demo: params.has('demo'),
+  demoResult: params.has('demoResult'),
   time: 0,
   score: 0,
-  best: Number(localStorage.getItem('void-cockpit-best') || 0),
+  best: Number(localStorage.getItem(BEST_KEY) || localStorage.getItem(LEGACY_BEST_KEY) || 0),
   shield: 100,
   heat: 0,
   wave: 1,
@@ -58,6 +70,7 @@ const state = {
   target: { x: 0, y: 0 },
   pointerDown: false,
   firing: false,
+  resultLocked: false,
   cockpitReady: false,
   objects: [],
   beams: [],
@@ -389,7 +402,42 @@ function setGameState(nextState) {
   document.documentElement.dataset.gameState = nextState;
 }
 
+function clearResultLock() {
+  window.clearTimeout(resultUnlockTimeout);
+  window.clearInterval(resultCountdownTimer);
+  resultUnlockTimeout = 0;
+  resultCountdownTimer = 0;
+  state.resultLocked = false;
+  restartButton.disabled = false;
+  restartButton.textContent = 'Relaunch';
+  if (resultLockText) resultLockText.textContent = 'Telemetry saved';
+  if (resultLockBar) resultLockBar.style.transform = 'scaleX(1)';
+}
+
+function lockResultScreen(duration = RESULT_LOCK_MS) {
+  window.clearTimeout(resultUnlockTimeout);
+  window.clearInterval(resultCountdownTimer);
+  const unlockAt = performance.now() + duration;
+  state.resultLocked = true;
+  restartButton.disabled = true;
+
+  const update = () => {
+    const remainingMs = Math.max(0, unlockAt - performance.now());
+    const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
+    const progress = clamp(1 - remainingMs / duration, 0, 1);
+    restartButton.textContent = `Telemetry ${seconds}`;
+    if (resultLockText) resultLockText.textContent = 'Saving telemetry';
+    if (resultLockBar) resultLockBar.style.transform = `scaleX(${progress})`;
+  };
+
+  update();
+  resultCountdownTimer = window.setInterval(update, 100);
+  resultUnlockTimeout = window.setTimeout(clearResultLock, duration);
+}
+
 function resetGame() {
+  if (state.resultLocked) return;
+  clearResultLock();
   for (const object of state.objects) removeObject(object);
   for (const beam of state.beams) {
     scene.remove(beam);
@@ -432,21 +480,39 @@ function resetGame() {
     if (i % 3 === 0) createDrone();
     else createAsteroid();
   }
+  if (state.demoResult) {
+    window.setTimeout(() => {
+      state.score = Math.max(state.score, 860);
+      state.wave = Math.max(state.wave, 4);
+      finishGame();
+    }, 900);
+  }
   updateHud();
 }
 
 function finishGame() {
+  if (!state.running && gameEl.dataset.state === 'result') return;
   state.running = false;
-  state.best = Math.max(state.best, Math.round(state.score));
-  localStorage.setItem('void-cockpit-best', String(state.best));
-  resultScore.textContent = String(Math.round(state.score));
+  state.firing = false;
+  state.pointerDown = false;
+  const finalScore = Math.round(state.score);
+  const previousBest = state.best;
+  state.best = Math.max(state.best, finalScore);
+  localStorage.setItem(BEST_KEY, String(state.best));
+  resultScore.textContent = String(finalScore);
   resultBest.textContent = String(state.best);
   resultWave.textContent = String(state.wave);
-  resultTitle.textContent = state.demo ? 'Demo Complete' : 'Hull Breach';
-  resultKicker.textContent = state.demo ? 'flight sample' : 'signal lost';
+  resultTitle.textContent = state.demo ? 'Flight Logged' : finalScore > previousBest ? 'New Record' : 'Outpaced';
+  resultKicker.textContent = state.demo ? 'flight recorder' : 'run complete';
+  if (resultMessage) {
+    resultMessage.textContent = state.demo
+      ? `Demo run sealed at ${finalScore} points through wave ${state.wave}.`
+      : `You pushed through wave ${state.wave} and banked ${finalScore} points before the field caught you.`;
+  }
   resultEl.classList.remove('hidden');
   fireButton.classList.add('hidden');
   setGameState('result');
+  lockResultScreen();
 }
 
 function firePulse() {
@@ -872,7 +938,7 @@ function setupEvents() {
       state.firing = true;
       firePulse();
     }
-    if (event.code === 'Enter' && !state.running) resetGame();
+    if (event.code === 'Enter' && !state.running && !state.resultLocked) resetGame();
     if (event.code === 'ArrowLeft' || event.code === 'KeyA') state.target.x = clamp(state.target.x - 0.14, -1, 1);
     if (event.code === 'ArrowRight' || event.code === 'KeyD') state.target.x = clamp(state.target.x + 0.14, -1, 1);
     if (event.code === 'ArrowUp' || event.code === 'KeyW') state.target.y = clamp(state.target.y + 0.14, -1, 1);

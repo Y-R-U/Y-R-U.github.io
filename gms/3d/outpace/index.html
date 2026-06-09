@@ -7,13 +7,13 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Void Cockpit</title>
+  <title>Outpace</title>
   <link rel="preload" href="assets/cockpit-chroma.png" as="image">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main id="game" data-state="menu">
-    <canvas id="space-canvas" aria-label="Void Cockpit 3D space game canvas"></canvas>
+    <canvas id="space-canvas" aria-label="Outpace 3D space game canvas"></canvas>
     <canvas id="cockpit-canvas" aria-hidden="true"></canvas>
     <div id="glass-haze" aria-hidden="true"></div>
     <div id="damage-flash" aria-hidden="true"></div>
@@ -53,8 +53,8 @@
 
     <section id="menu" class="overlay">
       <div class="launch-panel">
-        <p class="kicker">deep-space cockpit</p>
-        <h1>Void Cockpit</h1>
+        <p class="kicker">deep-space sprint</p>
+        <h1>Outpace</h1>
         <div class="launch-readout">
           <span>Station Field</span>
           <b>AR-7</b>
@@ -67,6 +67,7 @@
       <div class="launch-panel result-panel">
         <p class="kicker" id="result-kicker">signal lost</p>
         <h2 id="result-title">Hull Breach</h2>
+        <p class="result-message" id="result-message">Flight recorder sealed.</p>
         <div class="result-grid">
           <div>
             <span>Score</span>
@@ -81,7 +82,11 @@
             <strong id="result-wave">1</strong>
           </div>
         </div>
-        <button id="restart-button" class="primary-action" type="button">Relaunch</button>
+        <div class="result-lock" id="result-lock" aria-live="polite">
+          <span>Saving telemetry</span>
+          <i></i>
+        </div>
+        <button id="restart-button" class="primary-action" type="button" disabled>Telemetry</button>
       </div>
     </section>
 
@@ -113,7 +118,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260609a').catch(markGameError);
+    import('./game.mjs?v=20260610a').catch(markGameError);
   </script>
 </body>
 </html>
