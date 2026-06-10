@@ -284,6 +284,10 @@ const PROJECTS = [
     desc: "Low-poly evil crow shooter on a harvest-dusk farm. Drive a flak tank and blast red-eyed crows out of the sunset as they wheel, flare, and dive. Three.js with bloom, wave bosses, full touch controls.",
     date: "2026-06-10", creator: "Fable 5" },
 
+  { name: "Murder Royale",      path: "/gms/3d/fable5_crow_tank_battle/", screenshot: "fable5-crow-tank-battle", type: "game",
+    desc: "Last-tank-standing battle royale on the dusk farm against 9 AI personalities. A circling murder of crows closes the field, with live standings, neon name tags, callsign popups, and duel/skirmish/royale/frenzy modes.",
+    date: "2026-06-11", creator: "Fable 5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
