@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#160d20" />
+  <title>Fable 5 — Murder at Dusk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Crosshair -->
+  <div id="crosshair" class="hidden"></div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div class="hud-score">SCORE <span id="score">0</span></div>
+      <div class="hud-wave">WAVE <span id="wave">1</span></div>
+      <div class="hud-crows">CROWS <span id="crows-left">0</span></div>
+      <div class="hud-hi">BEST <span id="hi-score">0</span></div>
+    </div>
+    <div class="hud-right">
+      <div class="armor-label">ARMOR</div>
+      <div id="armor-bar"><div id="armor-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Boss health -->
+  <div id="boss-bar" class="hidden">
+    <div class="boss-name">CORVUS REX</div>
+    <div id="boss-track"><div id="boss-fill"></div></div>
+  </div>
+
+  <!-- Off-screen threat arrows -->
+  <div id="arrows"></div>
+
+  <!-- Floating score popups -->
+  <div id="popups"></div>
+
+  <!-- Wave banner -->
+  <div id="banner" class="hidden"><span id="banner-text">WAVE 1</span></div>
+
+  <!-- Hit flash -->
+  <div id="hit-flash" class="hidden"></div>
+
+  <!-- Touch controls -->
+  <div id="touch-left" class="touch-ctrl hidden">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <button id="touch-fire" class="touch-ctrl hidden">FIRE</button>
+
+  <!-- Mute -->
+  <button id="btn-mute" class="hidden" aria-label="Toggle sound">&#x1F50A;</button>
+
+  <!-- Title screen -->
+  <div id="title-screen" class="screen">
+    <div class="title-kicker">FABLE 5</div>
+    <h1 class="game-title">MURDER<br /><span class="subtitle">AT DUSK</span></h1>
+    <p class="tagline">The crows have turned. Hold the field until dark.</p>
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn-primary">PLAY</button>
+      <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+    </div>
+    <div id="help-box" class="help-box hidden">
+      <p><b>Move:</b> WASD / arrows (or joystick)</p>
+      <p><b>Aim:</b> mouse — the flak turret tracks your crosshair</p>
+      <p><b>Fire:</b> hold click / space (or FIRE button, auto-aim)</p>
+      <p>Crows wheel overhead, then flare their red eyes and dive.
+         Blast them before the claws land. Red arrows point at divers
+         off screen. Armor regenerates if you avoid damage.</p>
+    </div>
+  </div>
+
+  <!-- Game over popup -->
+  <div id="gameover-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>THE MURDER FEASTS</h2>
+      <div class="go-stats">
+        <div class="stat-row"><span>Score</span><span id="go-score">0</span></div>
+        <div class="stat-row"><span>Best</span><span id="go-hi">0</span></div>
+        <div class="stat-row"><span>Waves survived</span><span id="go-wave">0</span></div>
+        <div class="stat-row"><span>Crows downed</span><span id="go-kills">0</span></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-retry" class="btn-primary">PLAY AGAIN</button>
+        <button id="btn-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

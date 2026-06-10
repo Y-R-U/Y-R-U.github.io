@@ -280,6 +280,10 @@ const PROJECTS = [
     desc: "Last-tank-standing battle royale against 9 AI tanks with distinct personalities, a shrinking storm wall, live leaderboard, neon name tags, kill feed, and duel/squad/royale/chaos modes.",
     date: "2026-06-10", creator: "Fable 5" },
 
+  { name: "Murder at Dusk",     path: "/gms/3d/fable5_crow_tank/", screenshot: "fable5-crow-tank", type: "game",
+    desc: "Low-poly evil crow shooter on a harvest-dusk farm. Drive a flak tank and blast red-eyed crows out of the sunset as they wheel, flare, and dive. Three.js with bloom, wave bosses, full touch controls.",
+    date: "2026-06-10", creator: "Fable 5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
