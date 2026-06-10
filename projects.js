@@ -276,6 +276,10 @@ const PROJECTS = [
     desc: "Neon synthwave hover-tank shooter. Blast waves of evil drones with glowing laser eyes out of the night sky. Three.js with bloom, WASD + mouse aim, full touch controls.",
     date: "2026-06-10", creator: "Fable 5" },
 
+  { name: "Storm Royale",       path: "/gms/3d/fable5_3d_tank_battle/", screenshot: "fable5-3d-tank-battle", type: "game",
+    desc: "Last-tank-standing battle royale against 9 AI tanks with distinct personalities, a shrinking storm wall, live leaderboard, neon name tags, kill feed, and duel/squad/royale/chaos modes.",
+    date: "2026-06-10", creator: "Fable 5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════

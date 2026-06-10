@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0618" />
+  <title>Fable 5 — Storm Royale</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Crosshair -->
+  <div id="crosshair" class="hidden"></div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div id="player-chip">
+        <span class="chip-label">CALLSIGN</span>
+        <span id="player-name">—</span>
+        <button id="btn-edit-name" aria-label="Change callsign">&#x270E;</button>
+      </div>
+      <div id="hp-bar"><div id="hp-fill"></div></div>
+      <div id="kills-chip">&#x2694; <span id="player-kills">0</span> &nbsp;&middot;&nbsp; ALIVE <span id="alive-count">10</span></div>
+    </div>
+    <div class="hud-center"><div id="zone-status" class="hidden"></div></div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div id="leaderboard" class="hidden"></div>
+
+  <!-- Name tags / threat arrows / kill feed -->
+  <div id="tags"></div>
+  <div id="arrows"></div>
+  <div id="feed"></div>
+
+  <!-- Banner -->
+  <div id="banner" class="hidden"><span id="banner-text"></span></div>
+
+  <!-- Hit flash -->
+  <div id="hit-flash" class="hidden"></div>
+
+  <!-- Touch controls -->
+  <div id="touch-left" class="touch-ctrl hidden">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <button id="touch-fire" class="touch-ctrl hidden">FIRE</button>
+
+  <!-- Mute -->
+  <button id="btn-mute" class="hidden" aria-label="Toggle sound">&#x1F50A;</button>
+
+  <!-- Spectate bar -->
+  <div id="spectate-bar" class="hidden">
+    <span>SPECTATING <b id="spec-name">—</b> &nbsp;&middot;&nbsp; YOU PLACED <b id="spec-place">—</b></span>
+    <button id="btn-spec-retry" class="btn-mini">PLAY AGAIN</button>
+    <button id="btn-spec-menu" class="btn-mini">MENU</button>
+  </div>
+
+  <!-- Title screen -->
+  <div id="title-screen" class="screen">
+    <div class="title-kicker">FABLE 5</div>
+    <h1 class="game-title">STORM<br /><span class="subtitle">ROYALE</span></h1>
+    <p class="tagline">Ten tanks. One storm. Last one standing wins.</p>
+
+    <div id="title-name-row">
+      CALLSIGN&nbsp; <b id="title-name">—</b>
+      <button id="btn-title-edit" aria-label="Change callsign">&#x270E;</button>
+    </div>
+
+    <div id="mode-row">
+      <button class="mode-pill" data-count="2">DUEL<small>1v1</small></button>
+      <button class="mode-pill" data-count="5">SQUAD<small>5 tanks</small></button>
+      <button class="mode-pill selected" data-count="10">ROYALE<small>10 tanks</small></button>
+      <button class="mode-pill" data-count="16">CHAOS<small>16 tanks</small></button>
+    </div>
+
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn-primary">DEPLOY</button>
+      <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+    </div>
+    <div id="help-box" class="help-box hidden">
+      <p><b>Move:</b> WASD / arrows (or joystick)</p>
+      <p><b>Aim:</b> mouse — turret tracks your crosshair (auto-aim on touch)</p>
+      <p><b>Fire:</b> hold click / space (or FIRE button)</p>
+      <p>Free-for-all: every tank fights for itself, and each AI has its own
+         personality — some hunt, some snipe, some run. The magenta storm wall
+         shrinks the arena: stay inside it. Grab green energy cores to repair.
+         Outlive everyone.</p>
+    </div>
+  </div>
+
+  <!-- Defeat popup -->
+  <div id="gameover-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>DESTROYED</h2>
+      <div class="place-big" id="go-place">#10</div>
+      <div class="go-stats">
+        <div class="stat-row"><span>Kills</span><span id="go-kills">0</span></div>
+        <div class="stat-row"><span>Survived</span><span id="go-time">0:00</span></div>
+        <div class="stat-row"><span>Destroyed by</span><span id="go-killer">—</span></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-spectate" class="btn-secondary">SPECTATE</button>
+        <button id="btn-retry" class="btn-primary">PLAY AGAIN</button>
+        <button id="btn-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Victory popup -->
+  <div id="victory-popup" class="popup hidden">
+    <div class="popup-content victory">
+      <h2>VICTORY</h2>
+      <div class="place-big gold">#1</div>
+      <p class="victory-sub">LAST TANK STANDING</p>
+      <div class="go-stats">
+        <div class="stat-row"><span>Kills</span><span id="win-kills">0</span></div>
+        <div class="stat-row"><span>Match time</span><span id="win-time">0:00</span></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-win-retry" class="btn-primary">PLAY AGAIN</button>
+        <button id="btn-win-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Callsign modal -->
+  <div id="name-modal" class="popup hidden">
+    <div class="popup-content">
+      <h2>CALLSIGN</h2>
+      <input id="name-input" type="text" maxlength="10" autocomplete="off"
+             spellcheck="false" placeholder="YOUR NAME" />
+      <div class="menu-buttons modal-buttons">
+        <button id="btn-name-random" class="btn-secondary">RANDOM</button>
+        <button id="btn-name-cancel" class="btn-secondary">CANCEL</button>
+        <button id="btn-name-save" class="btn-primary">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
