@@ -272,6 +272,10 @@ const PROJECTS = [
     desc: "Mobile-first cockpit space shooter with a generated alpha-key cockpit plate, live Three.js asteroid fields, drones, station flybys, and touch firing.",
     date: "2026-06-09", creator: "OpenAI 5.5" },
 
+  { name: "Drone Storm",        path: "/gms/3d/fable5_3d_tank/", screenshot: "fable5-3d-tank", type: "game",
+    desc: "Neon synthwave hover-tank shooter. Blast waves of evil drones with glowing laser eyes out of the night sky. Three.js with bloom, WASD + mouse aim, full touch controls.",
+    date: "2026-06-10", creator: "Fable 5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════

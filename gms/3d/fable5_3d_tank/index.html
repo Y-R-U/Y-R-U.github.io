@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0618" />
+  <title>Fable 5 — Drone Storm</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Crosshair -->
+  <div id="crosshair" class="hidden"></div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div class="hud-score">SCORE <span id="score">0</span></div>
+      <div class="hud-wave">WAVE <span id="wave">1</span></div>
+      <div class="hud-drones">DRONES <span id="drones-left">0</span></div>
+      <div class="hud-hi">BEST <span id="hi-score">0</span></div>
+    </div>
+    <div class="hud-right">
+      <div class="shield-label">SHIELD</div>
+      <div id="shield-bar"><div id="shield-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Off-screen threat arrows -->
+  <div id="arrows"></div>
+
+  <!-- Floating score popups -->
+  <div id="popups"></div>
+
+  <!-- Wave banner -->
+  <div id="banner" class="hidden"><span id="banner-text">WAVE 1</span></div>
+
+  <!-- Hit flash -->
+  <div id="hit-flash" class="hidden"></div>
+
+  <!-- Touch controls -->
+  <div id="touch-left" class="touch-ctrl hidden">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <button id="touch-fire" class="touch-ctrl hidden">FIRE</button>
+
+  <!-- Mute -->
+  <button id="btn-mute" class="hidden" aria-label="Toggle sound">&#x1F50A;</button>
+
+  <!-- Title screen -->
+  <div id="title-screen" class="screen">
+    <div class="title-kicker">FABLE 5</div>
+    <h1 class="game-title">DRONE<br /><span class="subtitle">STORM</span></h1>
+    <p class="tagline">The drones are watching. Burn them out of the sky.</p>
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn-primary">PLAY</button>
+      <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+    </div>
+    <div id="help-box" class="help-box hidden">
+      <p><b>Move:</b> WASD / arrows (or joystick)</p>
+      <p><b>Aim:</b> mouse — the turret tracks your crosshair</p>
+      <p><b>Fire:</b> hold click / space (or FIRE button, auto-aim)</p>
+      <p>Drones charge their eye before firing — when an eye burns
+         white, dodge or kill. Red arrows point at threats off screen.
+         Shield regenerates if you avoid damage.</p>
+    </div>
+  </div>
+
+  <!-- Game over popup -->
+  <div id="gameover-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>TANK DESTROYED</h2>
+      <div class="go-stats">
+        <div class="stat-row"><span>Score</span><span id="go-score">0</span></div>
+        <div class="stat-row"><span>Best</span><span id="go-hi">0</span></div>
+        <div class="stat-row"><span>Waves survived</span><span id="go-wave">0</span></div>
+        <div class="stat-row"><span>Drones downed</span><span id="go-kills">0</span></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-retry" class="btn-primary">PLAY AGAIN</button>
+        <button id="btn-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
