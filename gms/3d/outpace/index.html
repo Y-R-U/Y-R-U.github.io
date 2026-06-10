@@ -15,6 +15,7 @@
   <main id="game" data-state="menu">
     <canvas id="space-canvas" aria-label="Outpace 3D space game canvas"></canvas>
     <canvas id="cockpit-canvas" aria-hidden="true"></canvas>
+    <canvas id="laser-canvas" aria-hidden="true"></canvas>
     <div id="glass-haze" aria-hidden="true"></div>
     <div id="damage-flash" aria-hidden="true"></div>
 
@@ -38,6 +39,9 @@
       <div class="signal-line">
         <span id="sector-value">CINDERS / 01</span>
         <span id="threat-value">CLEAR</span>
+      </div>
+      <div class="route-line" aria-hidden="true">
+        <i id="route-meter"></i>
       </div>
     </section>
 
@@ -90,6 +94,38 @@
       </div>
     </section>
 
+    <section id="station" class="overlay hidden">
+      <div class="launch-panel station-panel">
+        <div class="station-heading">
+          <div>
+            <p class="kicker" id="station-kicker">trading dock</p>
+            <h2 id="station-title">Docked</h2>
+          </div>
+          <div class="credit-pill">
+            <span>Credits</span>
+            <strong id="station-credits">0</strong>
+          </div>
+        </div>
+        <p class="station-message" id="station-message">Cargo transferred. Supplies loaded for the next run.</p>
+        <div class="station-summary">
+          <div>
+            <span>Delivery</span>
+            <strong id="station-payout">0</strong>
+          </div>
+          <div>
+            <span>Cargo</span>
+            <strong id="station-cargo">8t</strong>
+          </div>
+          <div>
+            <span>Next</span>
+            <strong id="station-route">02</strong>
+          </div>
+        </div>
+        <div id="upgrade-list" class="upgrade-list"></div>
+        <button id="launch-next-button" class="primary-action" type="button">Launch Next Delivery</button>
+      </div>
+    </section>
+
     <section id="boot-error" class="overlay hidden" aria-live="assertive">
       <div class="launch-panel">
         <p class="kicker">render error</p>
@@ -118,7 +154,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260610a').catch(markGameError);
+    import('./game.mjs?v=20260610b').catch(markGameError);
   </script>
 </body>
 </html>

@@ -43,7 +43,8 @@ button {
 }
 
 #space-canvas,
-#cockpit-canvas {
+#cockpit-canvas,
+#laser-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -60,6 +61,12 @@ button {
   z-index: 20;
   pointer-events: none;
   filter: contrast(1.05) saturate(1.08);
+}
+
+#laser-canvas {
+  z-index: 28;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 #glass-haze {
@@ -193,6 +200,23 @@ button {
 .signal-line span:last-child {
   color: rgba(255, 206, 137, 0.92);
   text-align: right;
+}
+
+.route-line {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(152, 215, 255, 0.11);
+  box-shadow: 0 0 0 1px rgba(124, 232, 255, 0.12) inset;
+}
+
+.route-line i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
+  box-shadow: 0 0 18px rgba(85, 230, 255, 0.62);
 }
 
 .reticle {
@@ -341,6 +365,13 @@ button {
   border-radius: 8px;
 }
 
+.station-panel {
+  width: min(100%, 470px);
+  max-height: calc(100svh - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
 .kicker {
   margin: 0 0 8px;
   color: rgba(124, 232, 255, 0.72);
@@ -380,6 +411,139 @@ h2 {
   color: rgba(255, 218, 170, 0.98);
   font-size: 0.88rem;
   font-variant-numeric: tabular-nums;
+}
+
+.station-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.credit-pill {
+  min-width: 94px;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 179, 82, 0.28);
+  border-radius: 7px;
+  background: rgba(255, 179, 82, 0.09);
+  text-align: right;
+}
+
+.credit-pill span,
+.station-summary span,
+.upgrade-meta span,
+.upgrade-level {
+  display: block;
+  color: rgba(220, 246, 255, 0.62);
+  font-size: 0.62rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.credit-pill strong {
+  display: block;
+  margin-top: 6px;
+  color: #ffe0ae;
+  font-size: 1.22rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.station-message {
+  margin: 13px 0 0;
+  color: rgba(236, 249, 255, 0.82);
+  font-size: 0.92rem;
+  line-height: 1.36;
+}
+
+.station-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.station-summary div {
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid rgba(124, 232, 255, 0.22);
+  border-radius: 7px;
+  background: rgba(8, 19, 25, 0.48);
+}
+
+.station-summary strong {
+  display: block;
+  margin-top: 7px;
+  color: #fff;
+  font-size: clamp(1.02rem, 4.6vw, 1.42rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.upgrade-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.upgrade-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 74px;
+  padding: 10px;
+  border: 1px solid rgba(124, 232, 255, 0.18);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgba(21, 42, 52, 0.72), rgba(5, 10, 15, 0.62)),
+    rgba(8, 16, 22, 0.52);
+}
+
+.upgrade-card h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.upgrade-card p {
+  margin: 5px 0 0;
+  color: rgba(229, 247, 255, 0.68);
+  font-size: 0.76rem;
+  line-height: 1.28;
+}
+
+.upgrade-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.upgrade-meta span {
+  color: rgba(255, 210, 150, 0.74);
+}
+
+.upgrade-buy {
+  min-width: 86px;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 199, 126, 0.52);
+  border-radius: 6px;
+  color: #140907;
+  background: linear-gradient(180deg, #ffe3b4, #ffb05a 62%, #e57440);
+  box-shadow: 0 8px 22px rgba(255, 122, 61, 0.18);
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.upgrade-buy:disabled {
+  color: rgba(223, 238, 245, 0.52);
+  border-color: rgba(124, 232, 255, 0.14);
+  background: rgba(35, 50, 60, 0.62);
+  box-shadow: none;
 }
 
 .primary-action {
@@ -525,5 +689,20 @@ h2 {
 
   .signal-line {
     padding-inline: 9px;
+  }
+}
+
+@media (max-width: 620px) {
+  .station-panel {
+    width: min(100%, 360px);
+    justify-self: start;
+  }
+
+  .station-heading {
+    gap: 9px;
+  }
+
+  .credit-pill {
+    min-width: 82px;
   }
 }

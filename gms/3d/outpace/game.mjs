@@ -3,14 +3,18 @@ import * as THREE from 'three';
 const canvas = document.getElementById('space-canvas');
 const cockpitCanvas = document.getElementById('cockpit-canvas');
 const cockpitCtx = cockpitCanvas.getContext('2d');
+const laserCanvas = document.getElementById('laser-canvas');
+const laserCtx = laserCanvas.getContext('2d');
 const gameEl = document.getElementById('game');
 const hudEl = document.getElementById('hud');
 const menuEl = document.getElementById('menu');
 const resultEl = document.getElementById('result');
+const stationEl = document.getElementById('station');
 const reticleEl = document.getElementById('reticle');
 const fireButton = document.getElementById('fire-button');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
+const launchNextButton = document.getElementById('launch-next-button');
 const damageFlash = document.getElementById('damage-flash');
 
 const scoreValue = document.getElementById('score-value');
@@ -20,6 +24,7 @@ const shieldMeter = document.getElementById('shield-meter');
 const heatMeter = document.getElementById('heat-meter');
 const sectorValue = document.getElementById('sector-value');
 const threatValue = document.getElementById('threat-value');
+const routeMeter = document.getElementById('route-meter');
 const resultScore = document.getElementById('result-score');
 const resultBest = document.getElementById('result-best');
 const resultWave = document.getElementById('result-wave');
@@ -29,15 +34,25 @@ const resultMessage = document.getElementById('result-message');
 const resultLock = document.getElementById('result-lock');
 const resultLockText = resultLock?.querySelector('span');
 const resultLockBar = resultLock?.querySelector('i');
+const stationKicker = document.getElementById('station-kicker');
+const stationTitle = document.getElementById('station-title');
+const stationMessage = document.getElementById('station-message');
+const stationCredits = document.getElementById('station-credits');
+const stationPayout = document.getElementById('station-payout');
+const stationCargo = document.getElementById('station-cargo');
+const stationRoute = document.getElementById('station-route');
+const upgradeList = document.getElementById('upgrade-list');
 
 const BEST_KEY = 'outpace-best';
 const LEGACY_BEST_KEY = 'void-cockpit-best';
+const SAVE_KEY = 'outpace-save-v2';
 const RESULT_LOCK_MS = 3200;
 let resultUnlockTimeout = 0;
 let resultCountdownTimer = 0;
 
 const clock = new THREE.Clock();
 const params = new URLSearchParams(window.location.search);
+const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult');
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
@@ -48,13 +63,166 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (min, max) => min + Math.random() * (max - min);
 const pick = (items) => items[Math.floor(Math.random() * items.length)];
 
+const UPGRADE_DEFS = [
+  {
+    id: 'shield',
+    name: 'Hull Plating',
+    blurb: 'More shield capacity for longer asteroid lanes.',
+    max: 8,
+    base: 140,
+    scale: 1.42,
+    stat: (level) => `+${level * 22} shield`,
+  },
+  {
+    id: 'cooling',
+    name: 'Cryo Heat Sinks',
+    blurb: 'Faster heat bleed and a lower pulse heat spike.',
+    max: 8,
+    base: 120,
+    scale: 1.4,
+    stat: (level) => `+${level * 5}/s cooling`,
+  },
+  {
+    id: 'laser',
+    name: 'Twin Lance Array',
+    blurb: 'Harder-hitting double shots from the cockpit turrets.',
+    max: 7,
+    base: 170,
+    scale: 1.48,
+    stat: (level) => `${1 + level} beam power`,
+  },
+  {
+    id: 'targeting',
+    name: 'Threat Predictor',
+    blurb: 'Better auto-lock priority for objects actually on your path.',
+    max: 6,
+    base: 150,
+    scale: 1.46,
+    stat: (level) => `+${level} lock AI`,
+  },
+  {
+    id: 'cargo',
+    name: 'Cargo Spine',
+    blurb: 'Stations load more freight, so each delivery pays more.',
+    max: 9,
+    base: 130,
+    scale: 1.43,
+    stat: (level) => `${getCargoCapacity(level)}t bay`,
+  },
+  {
+    id: 'engine',
+    name: 'Vector Drive',
+    blurb: 'Shorter runs and a higher cruise speed between stations.',
+    max: 6,
+    base: 160,
+    scale: 1.45,
+    stat: (level) => `+${level * 5}% drive`,
+  },
+];
+
+function makeDefaultSave() {
+  return {
+    credits: 0,
+    route: 1,
+    upgrades: Object.fromEntries(UPGRADE_DEFS.map((def) => [def.id, 0])),
+  };
+}
+
+function loadSave() {
+  const save = makeDefaultSave();
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return save;
+    const parsed = JSON.parse(raw);
+    save.credits = Math.max(0, Number(parsed.credits) || 0);
+    save.route = Math.max(1, Number(parsed.route) || 1);
+    for (const def of UPGRADE_DEFS) {
+      save.upgrades[def.id] = clamp(Number(parsed.upgrades?.[def.id]) || 0, 0, def.max);
+    }
+  } catch {
+    return save;
+  }
+  return save;
+}
+
+function saveProgress() {
+  if (DEMO_MODE) return;
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
+}
+
+function getUpgradeLevel(id) {
+  return state.save.upgrades[id] || 0;
+}
+
+function getUpgradeCost(def) {
+  const level = getUpgradeLevel(def.id);
+  if (level >= def.max) return 0;
+  return Math.round(def.base * Math.pow(def.scale, level) / 5) * 5;
+}
+
+function getCargoCapacity(level = getUpgradeLevel('cargo')) {
+  return 8 + level * 5;
+}
+
+function getShipStats() {
+  const shield = getUpgradeLevel('shield');
+  const cooling = getUpgradeLevel('cooling');
+  const laser = getUpgradeLevel('laser');
+  const targeting = getUpgradeLevel('targeting');
+  const cargo = getUpgradeLevel('cargo');
+  const engine = getUpgradeLevel('engine');
+  return {
+    maxShield: 100 + shield * 22,
+    coolRate: 17 + cooling * 5.2,
+    shotHeat: clamp(18 - cooling * 1.15 - laser * 0.35, 7.5, 18),
+    shotCooldown: clamp(0.15 - laser * 0.012, 0.07, 0.15),
+    beamPower: 1 + laser,
+    lockAssist: targeting,
+    cargo: getCargoCapacity(cargo),
+    speedBonus: 1 + engine * 0.05,
+    routeReduction: engine * 34,
+  };
+}
+
+function getStationType(route = state.save.route) {
+  if (route % 10 === 0) return 'mega';
+  if (route % 5 === 0) return 'large';
+  return 'small';
+}
+
+function getStationLabel(type = getStationType()) {
+  if (type === 'mega') return 'orbital exchange';
+  if (type === 'large') return 'regional hub';
+  return 'mining dock';
+}
+
+function getRouteLength(route = state.save.route) {
+  const stats = getShipStats();
+  return Math.max(1180, 1680 + route * 135 - stats.routeReduction);
+}
+
+function getDeliveryPayout(route = state.save.route, type = getStationType(route)) {
+  const stats = getShipStats();
+  const multiplier = type === 'mega' ? 2.25 : type === 'large' ? 1.58 : 1;
+  return Math.round((105 + route * 24 + stats.cargo * 18) * multiplier);
+}
+
 const state = {
   running: false,
   demo: params.has('demo'),
   demoResult: params.has('demoResult'),
+  demoDock: params.has('demoDock'),
+  save: loadSave(),
   time: 0,
   score: 0,
   best: Number(localStorage.getItem(BEST_KEY) || localStorage.getItem(LEGACY_BEST_KEY) || 0),
+  routeDistance: 0,
+  routeLength: 1600,
+  currentPayout: 0,
+  lastStationType: 'small',
+  docking: false,
+  docked: false,
+  dockObject: null,
   shield: 100,
   heat: 0,
   wave: 1,
@@ -69,7 +237,14 @@ const state = {
   player: { x: 0, y: 0 },
   target: { x: 0, y: 0 },
   pointerDown: false,
+  movementPointerId: null,
+  moveOrigin: { x: 0, y: 0 },
+  moveCurrent: { x: 0, y: 0 },
+  firePointerId: null,
   firing: false,
+  lockedTarget: null,
+  lockedScreen: null,
+  laserBursts: [],
   resultLocked: false,
   cockpitReady: false,
   objects: [],
@@ -122,6 +297,10 @@ const materials = {
   stationDark: new THREE.MeshStandardMaterial({ color: 0x080c11, roughness: 0.5, metalness: 0.7, flatShading: true }),
   stationGlow: new THREE.MeshStandardMaterial({ color: 0x56e4ff, emissive: 0x19cfff, emissiveIntensity: 2.1, roughness: 0.25, metalness: 0.25 }),
   amberGlow: new THREE.MeshStandardMaterial({ color: 0xffb455, emissive: 0xff7e2f, emissiveIntensity: 2.1, roughness: 0.28, metalness: 0.25 }),
+  dockHull: new THREE.MeshStandardMaterial({ color: 0x202d33, roughness: 0.44, metalness: 0.8, flatShading: true }),
+  dockDark: new THREE.MeshStandardMaterial({ color: 0x080c10, roughness: 0.52, metalness: 0.75, flatShading: true }),
+  dockRunway: new THREE.MeshStandardMaterial({ color: 0x74f2ff, emissive: 0x20d7ff, emissiveIntensity: 2.4, roughness: 0.18, metalness: 0.35 }),
+  dockWarning: new THREE.MeshStandardMaterial({ color: 0xffb04b, emissive: 0xff6e2f, emissiveIntensity: 2.3, roughness: 0.22, metalness: 0.3 }),
   collect: new THREE.MeshStandardMaterial({ color: 0x89ffb0, emissive: 0x39ff74, emissiveIntensity: 1.8, roughness: 0.2, metalness: 0.45 }),
 };
 
@@ -239,6 +418,13 @@ function addGlowPanel(parent, x, y, z, sx, sy, sz, material = materials.stationG
   panel.position.set(x, y, z);
   parent.add(panel);
   return panel;
+}
+
+function addDockBlock(parent, x, y, z, sx, sy, sz, material = materials.dockHull) {
+  const block = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+  block.position.set(x, y, z);
+  parent.add(block);
+  return block;
 }
 
 function createAsteroid() {
@@ -360,6 +546,68 @@ function createStation() {
   state.objects.push(group);
 }
 
+function createDockStation(type = getStationType()) {
+  const group = new THREE.Group();
+  const scale = type === 'mega' ? 1.75 : type === 'large' ? 1.32 : 1;
+  const width = type === 'mega' ? 28 : type === 'large' ? 22 : 17;
+  const height = type === 'mega' ? 15 : type === 'large' ? 12 : 9;
+  const depth = type === 'mega' ? 12 : type === 'large' ? 10 : 8;
+
+  addDockBlock(group, 0, height * 0.42, 0, width, 2.2, depth, materials.dockHull);
+  addDockBlock(group, 0, -height * 0.42, 0, width, 2.2, depth, materials.dockHull);
+  addDockBlock(group, -width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
+  addDockBlock(group, width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
+
+  addDockBlock(group, 0, 0, -1.2, width * 0.62, 0.62, depth * 1.2, materials.dockRunway);
+  addDockBlock(group, 0, 1.32, -1.1, width * 0.42, 0.22, depth * 1.24, materials.dockWarning);
+  addDockBlock(group, 0, -1.32, -1.1, width * 0.42, 0.22, depth * 1.24, materials.dockWarning);
+
+  for (let i = 0; i < 10 + (type === 'mega' ? 10 : type === 'large' ? 5 : 0); i += 1) {
+    const side = i % 2 ? -1 : 1;
+    const x = side * rand(width * 0.58, width * 0.86);
+    const y = rand(-height * 0.46, height * 0.46);
+    const z = rand(-depth * 0.85, depth * 0.45);
+    addDockBlock(group, x, y, z, rand(1.1, 3.8), rand(0.8, 2.4), rand(1.5, 4.5), i % 4 === 0 ? materials.dockDark : materials.dockHull);
+  }
+
+  for (let i = 0; i < 18; i += 1) {
+    const side = i % 2 ? -1 : 1;
+    const y = -height * 0.42 + (i % 9) * (height * 0.84 / 8);
+    const material = i % 3 === 0 ? materials.dockWarning : materials.dockRunway;
+    addGlowPanel(group, side * width * 0.36, y, depth * 0.52, 0.32, 0.22, 0.18, material);
+  }
+
+  if (type !== 'small') {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(width * 0.42, 0.36, 12, 52), materials.dockDark);
+    ring.position.z = -depth * 0.48;
+    ring.rotation.z = Math.PI / 2;
+    group.add(ring);
+  }
+
+  if (type === 'mega') {
+    for (let i = 0; i < 4; i += 1) {
+      const arm = addDockBlock(group, 0, 0, -depth * 0.72, width * 1.15, 0.58, 1.2, materials.dockDark);
+      arm.rotation.z = i * Math.PI / 4;
+    }
+  }
+
+  group.position.set(0, 0, -205);
+  group.scale.setScalar(scale);
+  group.userData = {
+    kind: 'dock',
+    stationType: type,
+    radius: width * scale * 0.55,
+    hp: 999,
+    speedScale: 0.82,
+    passed: false,
+  };
+  scene.add(group);
+  state.objects.push(group);
+  state.dockObject = group;
+  state.docking = true;
+  return group;
+}
+
 function createBeam(start, end, material = beamMaterial, ttl = 0.12) {
   const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
   const line = new THREE.Line(geometry, material.clone());
@@ -368,6 +616,187 @@ function createBeam(start, end, material = beamMaterial, ttl = 0.12) {
   scene.add(line);
   state.beams.push(line);
   return line;
+}
+
+function worldToScreen(position) {
+  tmpVector.copy(position).project(camera);
+  if (tmpVector.z < -1 || tmpVector.z > 1) return null;
+  return {
+    x: (tmpVector.x * 0.5 + 0.5) * window.innerWidth,
+    y: (-tmpVector.y * 0.5 + 0.5) * window.innerHeight,
+    ndcX: tmpVector.x,
+    ndcY: tmpVector.y,
+  };
+}
+
+function getTurretAnchors() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  return [
+    { x: w * 0.355, y: h * 0.59 },
+    { x: w * 0.645, y: h * 0.59 },
+  ];
+}
+
+function getThreatScore(object, playerX, playerY) {
+  const data = object.userData;
+  if (!['asteroid', 'drone'].includes(data.kind)) return -Infinity;
+  if (object.position.z > 4 || object.position.z < -155) return -Infinity;
+  const stats = getShipStats();
+  const speed = Math.max(10, state.speed * data.speedScale);
+  const timeToImpact = Math.max(0.1, (-1.5 - object.position.z) / speed);
+  const lateral = Math.hypot(object.position.x - playerX, object.position.y - playerY);
+  const threatRadius = data.radius + 3.4 + stats.lockAssist * 0.55;
+  const pathThreat = clamp(1 - lateral / threatRadius, 0, 1);
+  if (pathThreat <= 0.02 && object.position.z > -65) return -Infinity;
+  const urgency = clamp(1 - timeToImpact / 3.6, 0, 1);
+  const centerBias = clamp(1 - Math.hypot(object.position.x, object.position.y) / 25, 0, 1);
+  const droneBonus = data.kind === 'drone' ? 0.22 : 0;
+  return pathThreat * 110 + urgency * 70 + centerBias * 22 + droneBonus * 40 - timeToImpact * 4;
+}
+
+function acquireTarget() {
+  const playerX = state.player.x * 11;
+  const playerY = state.player.y * 7.5;
+  let best = null;
+  let bestScore = -Infinity;
+  for (const object of state.objects) {
+    const score = getThreatScore(object, playerX, playerY);
+    if (score > bestScore) {
+      bestScore = score;
+      best = object;
+    }
+  }
+
+  if (!best) {
+    const aimNdc = getAimNdc();
+    let bestDistance = Infinity;
+    for (const object of state.objects) {
+      if (!['asteroid', 'drone'].includes(object.userData.kind) || object.position.z > -4) continue;
+      object.getWorldPosition(tmpVectorB);
+      const screen = worldToScreen(tmpVectorB);
+      if (!screen) continue;
+      const dx = screen.ndcX - aimNdc.x;
+      const dy = screen.ndcY - aimNdc.y;
+      const distance = Math.hypot(dx, dy);
+      const threshold = 0.24 + getShipStats().lockAssist * 0.018;
+      if (distance < threshold && distance < bestDistance) {
+        bestDistance = distance;
+        best = object;
+      }
+    }
+  }
+
+  state.lockedTarget = best;
+  if (best) {
+    best.getWorldPosition(tmpVectorB);
+    state.lockedScreen = worldToScreen(tmpVectorB);
+  } else {
+    state.lockedScreen = null;
+  }
+  return best;
+}
+
+function addLaserBurst(targetScreen) {
+  const anchors = getTurretAnchors();
+  state.laserBursts.push({
+    anchors,
+    target: targetScreen,
+    ttl: 0.18,
+    life: 0.18,
+  });
+}
+
+function drawLaserOverlay(delta) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = laserCanvas.width / dpr;
+  const height = laserCanvas.height / dpr;
+  laserCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  laserCtx.clearRect(0, 0, width, height);
+
+  const anchors = getTurretAnchors();
+  const target = state.lockedScreen || {
+    x: window.innerWidth * 0.5 + state.target.x * window.innerWidth * 0.23,
+    y: window.innerHeight * 0.46 - state.target.y * window.innerHeight * 0.18,
+  };
+  const lockStrength = state.lockedTarget ? 1 : 0.32;
+
+  for (const anchor of anchors) {
+    const angle = Math.atan2(target.y - anchor.y, target.x - anchor.x);
+    laserCtx.save();
+    laserCtx.translate(anchor.x, anchor.y);
+    laserCtx.rotate(angle);
+    laserCtx.fillStyle = `rgba(14, 28, 34, ${0.64 + lockStrength * 0.18})`;
+    laserCtx.strokeStyle = `rgba(124, 232, 255, ${0.18 + lockStrength * 0.34})`;
+    laserCtx.lineWidth = 1.2;
+    laserCtx.shadowColor = state.lockedTarget ? 'rgba(85, 230, 255, 0.86)' : 'rgba(85, 230, 255, 0.32)';
+    laserCtx.shadowBlur = state.lockedTarget ? 18 : 8;
+    laserCtx.beginPath();
+    if (laserCtx.roundRect) laserCtx.roundRect(-9, -6, 27, 12, 5);
+    else laserCtx.rect(-9, -6, 27, 12);
+    laserCtx.fill();
+    laserCtx.stroke();
+    laserCtx.fillStyle = state.lockedTarget ? 'rgba(255, 210, 130, 0.96)' : 'rgba(130, 246, 255, 0.56)';
+    laserCtx.beginPath();
+    laserCtx.arc(18, 0, 4 + lockStrength * 2, 0, Math.PI * 2);
+    laserCtx.fill();
+    laserCtx.restore();
+  }
+
+  if (state.lockedScreen && state.running) {
+    laserCtx.save();
+    laserCtx.strokeStyle = `rgba(85, 230, 255, ${0.13 + lockStrength * 0.12})`;
+    laserCtx.lineWidth = 1;
+    laserCtx.setLineDash([4, 7]);
+    for (const anchor of anchors) {
+      laserCtx.beginPath();
+      laserCtx.moveTo(anchor.x, anchor.y);
+      laserCtx.lineTo(state.lockedScreen.x, state.lockedScreen.y);
+      laserCtx.stroke();
+    }
+    laserCtx.setLineDash([]);
+    laserCtx.strokeStyle = 'rgba(255, 190, 96, 0.66)';
+    laserCtx.lineWidth = 1.3;
+    laserCtx.beginPath();
+    laserCtx.arc(state.lockedScreen.x, state.lockedScreen.y, 18, 0, Math.PI * 2);
+    laserCtx.stroke();
+    laserCtx.restore();
+  }
+
+  for (let i = state.laserBursts.length - 1; i >= 0; i -= 1) {
+    const burst = state.laserBursts[i];
+    burst.life -= delta;
+    const alpha = clamp(burst.life / burst.ttl, 0, 1);
+    for (const anchor of burst.anchors) {
+      const gradient = laserCtx.createLinearGradient(anchor.x, anchor.y, burst.target.x, burst.target.y);
+      gradient.addColorStop(0, `rgba(255, 244, 208, ${alpha})`);
+      gradient.addColorStop(0.35, `rgba(82, 235, 255, ${alpha * 0.95})`);
+      gradient.addColorStop(1, `rgba(255, 121, 68, ${alpha * 0.9})`);
+      laserCtx.save();
+      laserCtx.globalCompositeOperation = 'lighter';
+      laserCtx.strokeStyle = `rgba(122, 236, 255, ${alpha * 0.24})`;
+      laserCtx.lineWidth = 13;
+      laserCtx.lineCap = 'round';
+      laserCtx.beginPath();
+      laserCtx.moveTo(anchor.x, anchor.y);
+      laserCtx.lineTo(burst.target.x, burst.target.y);
+      laserCtx.stroke();
+      laserCtx.strokeStyle = gradient;
+      laserCtx.lineWidth = 4.2;
+      laserCtx.beginPath();
+      laserCtx.moveTo(anchor.x, anchor.y);
+      laserCtx.lineTo(burst.target.x, burst.target.y);
+      laserCtx.stroke();
+      laserCtx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
+      laserCtx.lineWidth = 1.2;
+      laserCtx.beginPath();
+      laserCtx.moveTo(anchor.x, anchor.y);
+      laserCtx.lineTo(burst.target.x, burst.target.y);
+      laserCtx.stroke();
+      laserCtx.restore();
+    }
+    if (burst.life <= 0) state.laserBursts.splice(i, 1);
+  }
 }
 
 function createExplosion(position, color = 0xffa356, count = 26) {
@@ -435,6 +864,87 @@ function lockResultScreen(duration = RESULT_LOCK_MS) {
   resultUnlockTimeout = window.setTimeout(clearResultLock, duration);
 }
 
+function renderUpgrades() {
+  const credits = state.save.credits;
+  upgradeList.innerHTML = '';
+  for (const def of UPGRADE_DEFS) {
+    const level = getUpgradeLevel(def.id);
+    const cost = getUpgradeCost(def);
+    const maxed = level >= def.max;
+    const card = document.createElement('article');
+    card.className = 'upgrade-card';
+    card.innerHTML = `
+      <div>
+        <h3>${def.name}</h3>
+        <p>${def.blurb}</p>
+        <div class="upgrade-meta">
+          <span>${def.stat(level)}</span>
+          <span class="upgrade-level">LV ${level}/${def.max}</span>
+        </div>
+      </div>
+      <button class="upgrade-buy" type="button" data-upgrade="${def.id}" ${maxed || credits < cost ? 'disabled' : ''}>
+        ${maxed ? 'Max' : `${cost} cr`}
+      </button>
+    `;
+    upgradeList.append(card);
+  }
+}
+
+function updateStationUi(payout = 0, type = getStationType()) {
+  stationKicker.textContent = getStationLabel(type);
+  stationTitle.textContent = type === 'mega' ? 'Mega Exchange Docked' : type === 'large' ? 'Hub Docked' : 'Mining Docked';
+  stationMessage.textContent = payout > 0
+    ? `Cargo transferred. ${payout} credits paid for this delivery. Supplies are loaded for the next run.`
+    : 'Supplies loaded. Spend credits before launching the next delivery.';
+  stationCredits.textContent = String(state.save.credits);
+  stationPayout.textContent = String(payout || getDeliveryPayout(state.save.route, type));
+  stationCargo.textContent = `${getShipStats().cargo}t`;
+  stationRoute.textContent = String(state.save.route).padStart(2, '0');
+  renderUpgrades();
+}
+
+function buyUpgrade(id) {
+  const def = UPGRADE_DEFS.find((item) => item.id === id);
+  if (!def) return;
+  const level = getUpgradeLevel(id);
+  const cost = getUpgradeCost(def);
+  if (level >= def.max || state.save.credits < cost) return;
+  state.save.credits -= cost;
+  state.save.upgrades[id] = level + 1;
+  saveProgress();
+  updateStationUi(0, state.lastStationType);
+}
+
+function openStation(type = getStationType()) {
+  state.running = false;
+  state.docked = true;
+  state.docking = false;
+  state.firing = false;
+  state.firePointerId = null;
+  state.movementPointerId = null;
+  state.pointerDown = false;
+  state.lastStationType = type;
+  const completedRoute = state.save.route;
+  const payout = getDeliveryPayout(completedRoute, type);
+  state.currentPayout = payout;
+  state.save.credits += payout;
+  state.save.route = completedRoute + 1;
+  state.score += payout;
+  saveProgress();
+  updateHud();
+  updateStationUi(payout, type);
+  stationEl.classList.remove('hidden');
+  hudEl.classList.add('hidden');
+  fireButton.classList.add('hidden');
+  reticleEl.classList.add('hidden');
+  setGameState('station');
+}
+
+function launchNextRun() {
+  saveProgress();
+  resetGame();
+}
+
 function resetGame() {
   if (state.resultLocked) return;
   clearResultLock();
@@ -452,13 +962,22 @@ function resetGame() {
   state.objects.length = 0;
   state.beams.length = 0;
   state.particles.length = 0;
+  state.laserBursts.length = 0;
+  const stats = getShipStats();
   state.running = true;
+  state.docked = false;
+  state.docking = false;
+  state.dockObject = null;
   state.time = 0;
   state.score = 0;
-  state.shield = 100;
+  state.routeDistance = 0;
+  state.routeLength = getRouteLength();
+  if (state.demoDock) state.routeLength = 260;
+  state.currentPayout = getDeliveryPayout();
+  state.shield = stats.maxShield;
   state.heat = 0;
-  state.wave = 1;
-  state.speed = 48;
+  state.wave = state.save.route;
+  state.speed = 48 * stats.speedBonus;
   state.spawnTimer = 0.2;
   state.stationTimer = 1.2;
   state.collectTimer = 3.2;
@@ -471,6 +990,7 @@ function resetGame() {
 
   menuEl.classList.add('hidden');
   resultEl.classList.add('hidden');
+  stationEl.classList.add('hidden');
   hudEl.classList.remove('hidden');
   reticleEl.classList.remove('hidden');
   fireButton.classList.remove('hidden');
@@ -487,6 +1007,11 @@ function resetGame() {
       finishGame();
     }, 900);
   }
+  if (state.demoDock) {
+    window.setTimeout(() => {
+      if (state.running) openStation(getStationType(state.save.route));
+    }, 1400);
+  }
   updateHud();
 }
 
@@ -498,7 +1023,7 @@ function finishGame() {
   const finalScore = Math.round(state.score);
   const previousBest = state.best;
   state.best = Math.max(state.best, finalScore);
-  localStorage.setItem(BEST_KEY, String(state.best));
+  if (!DEMO_MODE) localStorage.setItem(BEST_KEY, String(state.best));
   resultScore.textContent = String(finalScore);
   resultBest.textContent = String(state.best);
   resultWave.textContent = String(state.wave);
@@ -516,35 +1041,30 @@ function finishGame() {
 }
 
 function firePulse() {
-  if (!state.running || state.shotTimer > 0 || state.heat > 92) return;
-  state.shotTimer = 0.14;
-  state.heat = clamp(state.heat + 17, 0, 100);
+  const stats = getShipStats();
+  if (!state.running || state.docking || state.shotTimer > 0 || state.heat > 96) return;
+  state.shotTimer = stats.shotCooldown;
+  state.heat = clamp(state.heat + stats.shotHeat, 0, 100);
 
+  const bestTarget = acquireTarget();
   const aimNdc = getAimNdc();
-  let bestTarget = null;
-  let bestDistance = Infinity;
-  for (const object of state.objects) {
-    if (object.userData.kind === 'station' || object.position.z > -4) continue;
-    object.getWorldPosition(tmpVector);
-    tmpVector.project(camera);
-    const dx = tmpVector.x - aimNdc.x;
-    const dy = tmpVector.y - aimNdc.y;
-    const screenDistance = Math.hypot(dx, dy);
-    const threshold = object.userData.kind === 'asteroid' ? 0.13 : 0.16;
-    if (screenDistance < threshold && screenDistance < bestDistance) {
-      bestDistance = screenDistance;
-      bestTarget = object;
-    }
-  }
-
   const ray = new THREE.Vector3(aimNdc.x, aimNdc.y, 0.5).unproject(camera).sub(camera.position).normalize();
   const endpoint = camera.position.clone().add(ray.multiplyScalar(140));
-  if (bestTarget) bestTarget.getWorldPosition(endpoint);
-  createBeam(camera.position.clone(), endpoint, beamMaterial, 0.13);
+  let targetScreen = {
+    x: window.innerWidth * 0.5 + aimNdc.x * window.innerWidth * 0.42,
+    y: window.innerHeight * 0.5 - aimNdc.y * window.innerHeight * 0.42,
+  };
+  if (bestTarget) {
+    bestTarget.getWorldPosition(endpoint);
+    targetScreen = worldToScreen(endpoint) || targetScreen;
+  }
+  addLaserBurst(targetScreen);
+  createBeam(camera.position.clone().add(new THREE.Vector3(-0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
+  createBeam(camera.position.clone().add(new THREE.Vector3(0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
 
   if (bestTarget) {
-    bestTarget.userData.hp -= 1;
-    state.score += bestTarget.userData.kind === 'drone' ? 45 : 20;
+    bestTarget.userData.hp -= stats.beamPower;
+    state.score += bestTarget.userData.kind === 'drone' ? 45 + stats.beamPower * 3 : 20 + stats.beamPower * 2;
     cockpitLight.intensity = 4.5;
     if (bestTarget.userData.hp <= 0) {
       bestTarget.getWorldPosition(tmpVectorB);
@@ -578,10 +1098,11 @@ function updateHud() {
   scoreValue.textContent = String(Math.round(state.score));
   shieldValue.textContent = String(Math.round(state.shield));
   heatValue.textContent = String(Math.round(state.heat));
-  shieldMeter.style.width = `${state.shield}%`;
+  shieldMeter.style.width = `${clamp(state.shield / getShipStats().maxShield * 100, 0, 100)}%`;
   heatMeter.style.width = `${state.heat}%`;
-  sectorValue.textContent = `CINDERS / ${String(state.wave).padStart(2, '0')}`;
-  threatValue.textContent = state.threat > 4 ? 'CONTACT' : state.threat > 1 ? 'TRACE' : 'CLEAR';
+  if (routeMeter) routeMeter.style.width = `${clamp(state.routeDistance / Math.max(1, state.routeLength) * 100, 0, 100)}%`;
+  sectorValue.textContent = `ROUTE ${String(state.save.route).padStart(2, '0')} / ${getStationLabel(getStationType(state.save.route)).toUpperCase()}`;
+  threatValue.textContent = state.docking ? 'DOCKING' : state.threat > 4 ? 'CONTACT' : state.threat > 1 ? 'TRACE' : `${state.currentPayout} CR`;
 }
 
 function updateReticle() {
@@ -591,27 +1112,47 @@ function updateReticle() {
   reticleEl.style.top = `${y}px`;
 }
 
-function updateInputFromPointer(event) {
-  const x = event.clientX / Math.max(1, window.innerWidth);
-  const y = event.clientY / Math.max(1, window.innerHeight);
-  state.target.x = clamp((x - 0.5) * 2.35, -1, 1);
-  state.target.y = clamp((0.52 - y) * 2.35, -1, 1);
+function updateInputFromMovement(event) {
+  state.moveCurrent.x = event.clientX;
+  state.moveCurrent.y = event.clientY;
+  const width = Math.max(1, window.innerWidth);
+  const height = Math.max(1, window.innerHeight);
+  const dx = event.clientX - state.moveOrigin.x;
+  const dy = event.clientY - state.moveOrigin.y;
+  state.target.x = clamp(dx / (width * 0.24), -1, 1);
+  state.target.y = clamp(-dy / (height * 0.22), -1, 1);
   updateReticle();
 }
 
 function onPointerDown(event) {
   if (event.target.closest('button')) return;
+  if (event.clientX > window.innerWidth * 0.78) return;
+  if (state.movementPointerId !== null) return;
+  event.preventDefault();
+  state.movementPointerId = event.pointerId;
   state.pointerDown = true;
-  updateInputFromPointer(event);
+  state.moveOrigin.x = event.clientX;
+  state.moveOrigin.y = event.clientY;
+  updateInputFromMovement(event);
+  gameEl.setPointerCapture?.(event.pointerId);
 }
 
 function onPointerMove(event) {
-  if (!state.pointerDown) return;
-  updateInputFromPointer(event);
+  if (!state.pointerDown || event.pointerId !== state.movementPointerId) return;
+  event.preventDefault();
+  updateInputFromMovement(event);
 }
 
-function onPointerUp() {
+function onPointerUp(event) {
+  if (event.pointerId === state.firePointerId) {
+    state.firePointerId = null;
+    if (!state.demo) state.firing = false;
+    fireButton.releasePointerCapture?.(event.pointerId);
+  }
+  if (event.pointerId !== state.movementPointerId) return;
   state.pointerDown = false;
+  state.movementPointerId = null;
+  gameEl.releasePointerCapture?.(event.pointerId);
 }
 
 function updateStars(delta) {
@@ -638,7 +1179,18 @@ function updateNebulae(delta) {
 }
 
 function spawnObjects(delta) {
-  if (!state.running) return;
+  if (!state.running || state.docking) return;
+  if (state.routeDistance >= state.routeLength) {
+    for (let i = state.objects.length - 1; i >= 0; i -= 1) {
+      removeObject(state.objects[i]);
+      state.objects.splice(i, 1);
+    }
+    createDockStation(getStationType(state.save.route));
+    state.spawnTimer = 99;
+    state.stationTimer = 99;
+    state.collectTimer = 99;
+    return;
+  }
   state.spawnTimer -= delta;
   state.stationTimer -= delta;
   state.collectTimer -= delta;
@@ -691,16 +1243,24 @@ function updateObjects(delta) {
     } else if (data.kind === 'station') {
       object.rotation.z += delta * 0.04;
       object.position.x -= data.drift * delta;
+    } else if (data.kind === 'dock') {
+      object.rotation.z = Math.sin(state.time * 0.45) * 0.025;
+      object.rotation.y = Math.sin(state.time * 0.26) * 0.035;
+      object.position.x = lerp(object.position.x, 0, delta * 1.4);
+      object.position.y = lerp(object.position.y, 0, delta * 1.4);
+      if (object.position.z > -18 && state.running) {
+        openStation(data.stationType);
+      }
     } else if (data.kind === 'collector') {
       object.rotation.x += delta * 2.2;
       object.rotation.z += delta * 1.7;
     }
 
-    if (object.position.z > -70 && object.position.z < 10 && data.kind !== 'station') threat += 1;
+    if (object.position.z > -70 && object.position.z < 10 && !['station', 'dock'].includes(data.kind)) threat += 1;
 
     const collisionWindow = object.position.z > -2.5 && object.position.z < 7.5;
     const distance = Math.hypot(object.position.x - playerX, object.position.y - playerY);
-    if (collisionWindow && !data.passed && data.kind !== 'station') {
+    if (collisionWindow && !data.passed && !['station', 'dock'].includes(data.kind)) {
       if (data.kind === 'collector' && distance < data.radius + 1.8) {
         state.shield = clamp(state.shield + 18, 0, 100);
         state.heat = clamp(state.heat - 32, 0, 100);
@@ -718,7 +1278,7 @@ function updateObjects(delta) {
       }
     }
 
-    if (object.position.z > 22) {
+    if (object.position.z > 22 && data.kind !== 'dock') {
       state.objects.splice(i, 1);
       removeObject(object);
     }
@@ -763,11 +1323,12 @@ function updateParticles(delta) {
 }
 
 function updateFlight(delta) {
+  const stats = getShipStats();
   const inputLerp = 1 - Math.exp(-delta * 4.8);
   state.player.x = lerp(state.player.x, state.target.x, inputLerp);
   state.player.y = lerp(state.player.y, state.target.y, inputLerp);
 
-  if (!state.pointerDown && !state.demo) {
+  if (!state.pointerDown && !state.demo && state.running) {
     state.target.x = lerp(state.target.x, 0, delta * 0.42);
     state.target.y = lerp(state.target.y, 0, delta * 0.42);
   }
@@ -790,10 +1351,16 @@ function updateFlight(delta) {
   cockpitLight.intensity = lerp(cockpitLight.intensity, 2.2, delta * 4);
   warmLight.intensity = 1.2 + Math.sin(state.time * 2.1) * 0.22;
   state.shake = Math.max(0, state.shake - delta * 0.9);
-  state.heat = Math.max(0, state.heat - delta * 17);
+  state.heat = Math.max(0, state.heat - delta * stats.coolRate);
   state.shotTimer = Math.max(0, state.shotTimer - delta);
-  state.speed = clamp(48 + state.time * 0.42, 48, 82);
-  state.wave = Math.max(1, Math.floor(state.time / 18) + 1);
+  const routePressure = Math.floor(state.routeDistance / 520);
+  const dockingFactor = state.docking ? 0.48 : 1;
+  state.speed = clamp((48 + routePressure * 2.2 + state.save.route * 0.9) * stats.speedBonus * dockingFactor, 42, 106);
+  state.wave = Math.max(1, state.save.route + routePressure);
+  if (state.running && !state.docked) {
+    state.routeDistance = Math.min(state.routeLength + 140, state.routeDistance + state.speed * delta);
+  }
+  acquireTarget();
 
   if (state.flashTimer > 0) {
     state.flashTimer -= delta;
@@ -817,6 +1384,7 @@ function animate() {
   updateObjects(delta);
   updateBeams(delta);
   updateParticles(delta);
+  drawLaserOverlay(delta);
 
   if (state.running && Math.floor(state.time * 8) % 4 === 0) updateHud();
   if (state.demo && state.running && state.time > 18) finishGame();
@@ -903,6 +1471,16 @@ function drawCockpit() {
   cockpitCtx.drawImage(img, x, y, drawWidth, drawHeight);
 }
 
+function resizeLaserCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, Math.round(window.innerWidth * dpr));
+  const height = Math.max(1, Math.round(window.innerHeight * dpr));
+  laserCanvas.width = width;
+  laserCanvas.height = height;
+  laserCanvas.style.width = `${window.innerWidth}px`;
+  laserCanvas.style.height = `${window.innerHeight}px`;
+}
+
 function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -913,26 +1491,50 @@ function resize() {
   camera.fov = height >= width ? 63 : 54;
   camera.updateProjectionMatrix();
   drawCockpit();
+  resizeLaserCanvas();
   updateReticle();
+}
+
+function restoreCanvasesSoon() {
+  window.setTimeout(() => {
+    resize();
+    if (state.cockpitPlate) {
+      drawCockpit();
+    } else {
+      loadCockpit().catch(() => {});
+    }
+  }, 80);
 }
 
 function setupEvents() {
   startButton.addEventListener('click', resetGame);
   restartButton.addEventListener('click', resetGame);
-  gameEl.addEventListener('pointerdown', onPointerDown, { passive: true });
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  launchNextButton.addEventListener('click', launchNextRun);
+  upgradeList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-upgrade]');
+    if (button) buyUpgrade(button.dataset.upgrade);
+  });
+  gameEl.addEventListener('pointerdown', onPointerDown, { passive: false });
+  window.addEventListener('pointermove', onPointerMove, { passive: false });
   window.addEventListener('pointerup', onPointerUp, { passive: true });
   window.addEventListener('pointercancel', onPointerUp, { passive: true });
   window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', restoreCanvasesSoon);
+  window.addEventListener('focus', restoreCanvasesSoon);
+  window.addEventListener('pageshow', restoreCanvasesSoon);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') restoreCanvasesSoon();
+  });
 
   fireButton.addEventListener('pointerdown', (event) => {
     event.preventDefault();
+    state.firePointerId = event.pointerId;
     state.firing = true;
+    fireButton.setPointerCapture?.(event.pointerId);
     firePulse();
-  });
-  window.addEventListener('pointerup', () => {
-    if (!state.demo) state.firing = false;
-  });
+  }, { passive: false });
+  fireButton.addEventListener('pointerup', onPointerUp, { passive: true });
+  fireButton.addEventListener('pointercancel', onPointerUp, { passive: true });
   window.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
       state.firing = true;
