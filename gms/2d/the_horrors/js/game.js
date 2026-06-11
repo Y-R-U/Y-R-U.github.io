@@ -104,6 +104,9 @@
     debugRefresh: $("debug-refresh"),
     regenTitle: $("regen-title"),
     regenFile: $("regen-file"),
+    regenCurrentRef: $("regen-current-ref"),
+    regenCurrentRefImg: $("regen-current-ref-img"),
+    regenCurrentRefCaption: $("regen-current-ref-caption"),
     regenPrompt: $("regen-prompt"),
     regenMoveMessage: $("regen-move-message"),
     regenFrames: $("regen-frames"),
@@ -2208,6 +2211,7 @@
     els.regenModeToggle.hidden = !imageRedoInfo;
     els.regenPreviewWrap.hidden = true;
     els.regenPreviewImg.removeAttribute("src");
+    updateCurrentRefDisplay();
     if (!imageRedoInfo) return;
     els.regenImagePrompt.value = imageRedoInfo.imagePrompt || "";
     const isMonster = String(imageRedoInfo.kind || "").startsWith("monster_");
@@ -2229,6 +2233,31 @@
     const useRef = els.regenUseRef.checked;
     els.regenRefPromptWrap.hidden = !useRef;
     els.regenRerollRef.hidden = !useRef;
+  }
+
+  function updateCurrentRefDisplay() {
+    if (!els.regenCurrentRef) return;
+    const info = imageRedoInfo;
+    const isMonster = info && String(info.kind || "").startsWith("monster_");
+    if (!isMonster) {
+      els.regenCurrentRef.hidden = true;
+      els.regenCurrentRefImg.removeAttribute("src");
+      return;
+    }
+    els.regenCurrentRef.hidden = false;
+    if (info.monsterRefExists && info.monsterRefSrc) {
+      els.regenCurrentRefImg.src = info.monsterRefSrc;
+      els.regenCurrentRefImg.hidden = false;
+      els.regenCurrentRefCaption.textContent = `Monster reference: ${info.monsterRefFile}`;
+    } else if (info.monsterMarkerSrc) {
+      els.regenCurrentRefImg.src = info.monsterMarkerSrc;
+      els.regenCurrentRefImg.hidden = false;
+      els.regenCurrentRefCaption.textContent = `No reference yet — showing marker: ${info.monsterMarkerFile}`;
+    } else {
+      els.regenCurrentRefImg.hidden = true;
+      els.regenCurrentRefImg.removeAttribute("src");
+      els.regenCurrentRefCaption.textContent = "No monster reference or marker saved yet.";
+    }
   }
 
   function setRegenMode(mode) {
@@ -2298,7 +2327,15 @@
         imagePreviewToken = job.preview || "";
         els.regenPreviewImg.src = job.previewSrc || "";
         els.regenPreviewWrap.hidden = false;
-        if (job.monsterRefSrc) { els.regenRefThumb.src = job.monsterRefSrc; els.regenRefThumb.hidden = false; }
+        if (job.monsterRefSrc) {
+          els.regenRefThumb.src = job.monsterRefSrc;
+          els.regenRefThumb.hidden = false;
+          if (imageRedoInfo) {
+            imageRedoInfo.monsterRefExists = true;
+            imageRedoInfo.monsterRefSrc = job.monsterRefSrc;
+          }
+          updateCurrentRefDisplay();
+        }
         setImageBusy(false);
         updateImageActionState();
         UI.toast("Image ready — accept to redo the video(s)");
@@ -2353,6 +2390,7 @@
           width: regenRenderOptions.width,
           height: regenRenderOptions.height,
           numFrames: regenRenderOptions.numFrames,
+          videoPromptText: els.regenPrompt.value.trim(),
           mode,
         }),
       });

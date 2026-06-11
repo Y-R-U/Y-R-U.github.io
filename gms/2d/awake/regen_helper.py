@@ -27,6 +27,7 @@ script), not here.
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import glob
 import importlib.util
+import itertools
 import json
 import mimetypes
 import os
@@ -144,6 +145,15 @@ def load_event_transitions(root, module=None):
             "negative": getattr(module, "NEGATIVE", ""),
         }
     return rows
+
+
+# Millisecond timestamps collide when several jobs are submitted in one burst,
+# so job ids carry a process-wide counter to stay unique.
+_JOB_SEQ = itertools.count()
+
+
+def new_job_id(slug):
+    return f"{slug}-{int(time.time() * 1000)}-{next(_JOB_SEQ)}"
 
 
 def sanitize_marker_name(name):
@@ -509,6 +519,7 @@ class Project:
                 "fileInfo": self.video_file_info(file_name),
                 "exists": True,
             })
+        markers = self.list_markers()
         for row in rows:
             # Clips with a defined end-frame are cut 0.4s short (tail rides on
             # the end-frame); surface it so the debug preview matches gameplay.
@@ -523,6 +534,18 @@ class Project:
                 ref_path = os.path.join(self.ref_dir, ref_file)
                 decorated["monsterRefExists"] = os.path.exists(ref_path)
                 decorated["monsterRefSrc"] = self.marker_src(ref_file) if os.path.exists(ref_path) else ""
+                # Marker fallback: when no clean reference exists yet, the panel
+                # shows a saved marker frame for this monster (e.g. a screen-grab
+                # of its release clip) so redos still have something to look at.
+                monster_id = info.get("monsterId", "")
+                variant = info["kind"].removeprefix("monster_")
+                candidates = [m for m in markers
+                              if m["name"] == monster_id or m["name"].startswith(f"{monster_id}_")]
+                preferred = [m for m in candidates if m["name"] == f"{monster_id}_{variant}"]
+                pick = (preferred or candidates)
+                if pick:
+                    decorated["monsterMarkerFile"] = pick[-1]["file"]
+                    decorated["monsterMarkerSrc"] = pick[-1]["src"]
             decorated["otherImageExists"] = os.path.exists(os.path.join(self.root, info["otherImage"]))
             row["imageRedo"] = decorated
         return rows
@@ -811,7 +834,7 @@ def process_image_preview(project, local_job):
     local_job["status"] = "image_ready"
 
 
-def commit_image(project, file_name, preview_token, render_options, mode, moved_status):
+def commit_image(project, file_name, preview_token, render_options, mode, moved_status, video_prompt=""):
     """Move an accepted preview into the game's image paths and enqueue the
     video redo(s) it feeds. Rooms feed two clips; monster/success feed one."""
     info = project.image_meta.get(file_name)
@@ -842,12 +865,12 @@ def commit_image(project, file_name, preview_token, render_options, mode, moved_
         elif info["kind"].startswith("monster_"):
             opts["start_image"] = info["otherImage"]
         job = {
-            "id": f"{project.slug}-{int(time.time() * 1000)}-{len(enqueued)}",
+            "id": new_job_id(project.slug),
             "task": "regen",
             "file": video_file,
             "targetFile": None,
             "mode": mode,
-            "promptText": transition.get("promptText", ""),
+            "promptText": video_prompt or transition.get("promptText", ""),
             "movedStatus": moved_status,
             "renderOptions": opts,
             "status": "queued",
@@ -1185,7 +1208,7 @@ class Handler(BaseHTTPRequestHandler):
             if file_name not in project.event_transitions:
                 return self.send_json({"ok": False, "error": "markers are only enabled for event clips"}, 400)
             job = {
-                "id": f"{project.slug}-{int(time.time() * 1000)}",
+                "id": new_job_id(project.slug),
                 "task": "marker",
                 "file": file_name,
                 "name": data.get("name", ""),
@@ -1202,7 +1225,7 @@ class Handler(BaseHTTPRequestHandler):
             if file_name not in project.image_meta:
                 return self.send_json({"ok": False, "error": "image redo is not available for this transition"}, 400)
             job = {
-                "id": f"{project.slug}-{int(time.time() * 1000)}",
+                "id": new_job_id(project.slug),
                 "task": "image_preview",
                 "file": file_name,
                 "promptText": prompt_text,
@@ -1238,6 +1261,7 @@ class Handler(BaseHTTPRequestHandler):
                     project, file_name, preview_token,
                     {"width": c_width, "height": c_height, "num_frames": c_frames},
                     mode, data.get("movedStatus", "").strip(),
+                    video_prompt=str(data.get("videoPromptText", "")).strip(),
                 )
             except Exception as exc:
                 return self.send_json({"ok": False, "error": str(exc)}, 400)
@@ -1268,7 +1292,7 @@ class Handler(BaseHTTPRequestHandler):
         if marker and not os.path.exists(os.path.join(project.ref_dir, marker)):
             return self.send_json({"ok": False, "error": "marker frame not found"}, 400)
         job = {
-            "id": f"{project.slug}-{int(time.time() * 1000)}",
+            "id": new_job_id(project.slug),
             "task": "reverse" if is_reverse else "regen",
             "file": file_name,
             "targetFile": target_file,

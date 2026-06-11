@@ -63,6 +63,8 @@ cd ~/cc/yru/site/gms/2d/the_horrors && python3 regen_helper.py
 
 The panel auto-opens via `?debug`. Each row shows file size + mtime in amber (e.g. `386 KB | 2026-05-16 00:46:59`) under the filename, so stale clips are obvious at a glance.
 
+The Redo popup for monster release/attack rows shows the current monster reference (`ref/monster_<id>.png`) at the top; if no reference exists but a marker frame for that monster is saved in `ref/`, the marker is shown instead, captioned as a fallback. Accepting an Image-Redo passes the (possibly edited) video prompt to the queued video regen via `videoPromptText`.
+
 `regen_config.json` schema: `{ common, negative, transitions: {<file>: {id,label,start,end,seed,promptText,status}}, extras: [...], extra_prefixes: {<pre>: {group,status,default_poster}} }`. Add a new room → update `regen_config.json`, `gen_transitions.py`, and `js/story.js` `transitions` array (three sources of truth, kept aligned by hand).
 
 ## Per-threat clip strategy
