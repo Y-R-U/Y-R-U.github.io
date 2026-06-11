@@ -288,6 +288,10 @@ const PROJECTS = [
     desc: "Last-tank-standing battle royale on the dusk farm against 9 AI personalities. A circling murder of crows closes the field, with live standings, neon name tags, callsign popups, and duel/skirmish/royale/frenzy modes.",
     date: "2026-06-11", creator: "Fable 5" },
 
+  { name: "The Glade",          path: "/gms/3d/fable5_glade/", screenshot: "fable5-glade", type: "game",
+    desc: "ARPG graphics test glade - a Diablo/RuneScape-style circular meadow with tap-to-move hero, villager NPC, chickens, thatched cottage, campfire, and floating pickups. Debug inspector lists every object with tri counts, colliders, and camera focus. Three.js, mobile-first.",
+    date: "2026-06-12", creator: "Fable 5" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════

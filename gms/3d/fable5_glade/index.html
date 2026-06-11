@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#7ec4e8" />
+  <title>Fable 5 — The Glade (ARPG Test)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="inventory"></div>
+    <button id="debug-btn" title="Debug: scene objects" aria-label="Debug panel">&#128030;</button>
+    <div id="hint">Tap ground to move &middot; Drag to orbit &middot; Pinch / wheel to zoom</div>
+    <div id="toasts"></div>
+  </div>
+
+  <!-- Debug panel (filled by js/debug.js) -->
+  <div id="debug-panel" class="hidden"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
