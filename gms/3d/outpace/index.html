@@ -94,35 +94,59 @@
       </div>
     </section>
 
-    <section id="station" class="overlay hidden">
-      <div class="launch-panel station-panel">
-        <div class="station-heading">
-          <div>
+    <section id="station" class="overlay station-overlay hidden">
+      <div class="station-room">
+        <div class="station-window">
+          <canvas id="station-window-canvas" aria-hidden="true"></canvas>
+          <div class="station-window-rim" aria-hidden="true"></div>
+          <div class="station-window-label">
             <p class="kicker" id="station-kicker">trading dock</p>
             <h2 id="station-title">Docked</h2>
           </div>
-          <div class="credit-pill">
-            <span>Credits</span>
-            <strong id="station-credits">0</strong>
-          </div>
         </div>
-        <p class="station-message" id="station-message">Cargo transferred. Supplies loaded for the next run.</p>
-        <div class="station-summary">
-          <div>
-            <span>Delivery</span>
-            <strong id="station-payout">0</strong>
-          </div>
-          <div>
-            <span>Cargo</span>
-            <strong id="station-cargo">8t</strong>
-          </div>
-          <div>
-            <span>Next</span>
-            <strong id="station-route">02</strong>
-          </div>
+        <div class="station-bunk" aria-hidden="true">
+          <span></span>
+          <i></i>
         </div>
-        <div id="upgrade-list" class="upgrade-list"></div>
-        <button id="launch-next-button" class="primary-action" type="button">Launch Next Delivery</button>
+        <div class="station-console">
+          <div class="station-heading">
+            <div>
+              <p class="kicker">dock terminal</p>
+              <h3 id="station-panel-title">Upgrade Terminal</h3>
+            </div>
+            <div class="credit-pill">
+              <span>Credits</span>
+              <strong id="station-credits">0</strong>
+            </div>
+          </div>
+          <p class="station-message" id="station-message">Cargo transferred. Supplies loaded for the next run.</p>
+          <div class="station-summary">
+            <div>
+              <span>Delivery</span>
+              <strong id="station-payout">0</strong>
+            </div>
+            <div>
+              <span>Cargo</span>
+              <strong id="station-cargo">8t</strong>
+            </div>
+            <div>
+              <span>Next</span>
+              <strong id="station-route">02</strong>
+            </div>
+          </div>
+          <div id="station-tabs" class="station-tabs" role="tablist" aria-label="Station terminal sections">
+            <button type="button" data-station-tab="upgrades" aria-selected="true">Upgrades</button>
+            <button type="button" data-station-tab="cargo" aria-selected="false">Cargo</button>
+            <button type="button" data-station-tab="briefing" aria-selected="false">Briefing</button>
+            <button type="button" data-station-tab="ship" aria-selected="false">Ship</button>
+          </div>
+          <div class="terminal-screen">
+            <div id="upgrade-category-tabs" class="upgrade-category-tabs" role="tablist" aria-label="Upgrade categories"></div>
+            <p id="station-panel-copy" class="station-panel-copy">Select a system group, spend credits, and launch when the hold is sealed.</p>
+            <div id="upgrade-list" class="upgrade-list"></div>
+          </div>
+          <button id="launch-next-button" class="primary-action" type="button">Launch Next Delivery</button>
+        </div>
       </div>
     </section>
 
@@ -154,7 +178,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260610b').catch(markGameError);
+    import('./game.mjs?v=20260611a').catch(markGameError);
   </script>
 </body>
 </html>

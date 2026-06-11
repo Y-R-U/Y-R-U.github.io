@@ -5,6 +5,8 @@ const cockpitCanvas = document.getElementById('cockpit-canvas');
 const cockpitCtx = cockpitCanvas.getContext('2d');
 const laserCanvas = document.getElementById('laser-canvas');
 const laserCtx = laserCanvas.getContext('2d');
+const stationWindowCanvas = document.getElementById('station-window-canvas');
+const stationWindowCtx = stationWindowCanvas?.getContext('2d');
 const gameEl = document.getElementById('game');
 const hudEl = document.getElementById('hud');
 const menuEl = document.getElementById('menu');
@@ -41,6 +43,10 @@ const stationCredits = document.getElementById('station-credits');
 const stationPayout = document.getElementById('station-payout');
 const stationCargo = document.getElementById('station-cargo');
 const stationRoute = document.getElementById('station-route');
+const stationTabs = document.getElementById('station-tabs');
+const stationPanelTitle = document.getElementById('station-panel-title');
+const stationPanelCopy = document.getElementById('station-panel-copy');
+const upgradeCategoryTabs = document.getElementById('upgrade-category-tabs');
 const upgradeList = document.getElementById('upgrade-list');
 
 const BEST_KEY = 'outpace-best';
@@ -63,9 +69,46 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (min, max) => min + Math.random() * (max - min);
 const pick = (items) => items[Math.floor(Math.random() * items.length)];
 
+const UPGRADE_CATEGORIES = [
+  {
+    id: 'flight',
+    label: 'Flight',
+    title: 'Flight Systems',
+    copy: 'Survive longer runs with stronger shields, colder systems, and faster station hops.',
+  },
+  {
+    id: 'weapons',
+    label: 'Weapons',
+    title: 'Weapon Bay',
+    copy: 'Improve the twin lances, target choice, and heat ceiling before the next route.',
+  },
+  {
+    id: 'trade',
+    label: 'Trade',
+    title: 'Freight Office',
+    copy: 'Make each station run pay harder without manually trading cargo.',
+  },
+];
+
+const STATION_BASE_NAMES = [
+  'Aster',
+  'Kepler',
+  'Morrow',
+  'Vega',
+  'Nysa',
+  'Talon',
+  'Helio',
+  'Cinder',
+  'Maru',
+  'Orion',
+  'Eidolon',
+  'Sable',
+];
+
 const UPGRADE_DEFS = [
   {
     id: 'shield',
+    category: 'flight',
     name: 'Hull Plating',
     blurb: 'More shield capacity for longer asteroid lanes.',
     max: 8,
@@ -75,6 +118,7 @@ const UPGRADE_DEFS = [
   },
   {
     id: 'cooling',
+    category: 'flight',
     name: 'Cryo Heat Sinks',
     blurb: 'Faster heat bleed and a lower pulse heat spike.',
     max: 8,
@@ -83,7 +127,18 @@ const UPGRADE_DEFS = [
     stat: (level) => `+${level * 5}/s cooling`,
   },
   {
+    id: 'engine',
+    category: 'flight',
+    name: 'Vector Drive',
+    blurb: 'Shorter runs and a higher cruise speed between stations.',
+    max: 6,
+    base: 160,
+    scale: 1.45,
+    stat: (level) => `+${level * 5}% drive`,
+  },
+  {
     id: 'laser',
+    category: 'weapons',
     name: 'Twin Lance Array',
     blurb: 'Harder-hitting double shots from the cockpit turrets.',
     max: 7,
@@ -93,6 +148,7 @@ const UPGRADE_DEFS = [
   },
   {
     id: 'targeting',
+    category: 'weapons',
     name: 'Threat Predictor',
     blurb: 'Better auto-lock priority for objects actually on your path.',
     max: 6,
@@ -101,7 +157,18 @@ const UPGRADE_DEFS = [
     stat: (level) => `+${level} lock AI`,
   },
   {
+    id: 'capacitor',
+    category: 'weapons',
+    name: 'Heat Capacitor',
+    blurb: 'Raises the overheat ceiling so burst fire lasts longer.',
+    max: 6,
+    base: 145,
+    scale: 1.42,
+    stat: (level) => `${100 + level * 12}% heat cap`,
+  },
+  {
     id: 'cargo',
+    category: 'trade',
     name: 'Cargo Spine',
     blurb: 'Stations load more freight, so each delivery pays more.',
     max: 9,
@@ -110,13 +177,14 @@ const UPGRADE_DEFS = [
     stat: (level) => `${getCargoCapacity(level)}t bay`,
   },
   {
-    id: 'engine',
-    name: 'Vector Drive',
-    blurb: 'Shorter runs and a higher cruise speed between stations.',
+    id: 'broker',
+    category: 'trade',
+    name: 'Station License',
+    blurb: 'Better berth priority and delivery fees from every depot.',
     max: 6,
-    base: 160,
-    scale: 1.45,
-    stat: (level) => `+${level * 5}% drive`,
+    base: 155,
+    scale: 1.44,
+    stat: (level) => `+${level * 7}% fees`,
   },
 ];
 
@@ -169,10 +237,13 @@ function getShipStats() {
   const cooling = getUpgradeLevel('cooling');
   const laser = getUpgradeLevel('laser');
   const targeting = getUpgradeLevel('targeting');
+  const capacitor = getUpgradeLevel('capacitor');
   const cargo = getUpgradeLevel('cargo');
   const engine = getUpgradeLevel('engine');
+  const broker = getUpgradeLevel('broker');
   return {
     maxShield: 100 + shield * 22,
+    maxHeat: 100 + capacitor * 12,
     coolRate: 17 + cooling * 5.2,
     shotHeat: clamp(18 - cooling * 1.15 - laser * 0.35, 7.5, 18),
     shotCooldown: clamp(0.15 - laser * 0.012, 0.07, 0.15),
@@ -181,6 +252,7 @@ function getShipStats() {
     cargo: getCargoCapacity(cargo),
     speedBonus: 1 + engine * 0.05,
     routeReduction: engine * 34,
+    deliveryBonus: 1 + broker * 0.07,
   };
 }
 
@@ -196,6 +268,12 @@ function getStationLabel(type = getStationType()) {
   return 'mining dock';
 }
 
+function getStationName(route = state.save.route, type = getStationType(route)) {
+  const base = STATION_BASE_NAMES[(route * 7 + route * route * 3) % STATION_BASE_NAMES.length];
+  const suffix = type === 'mega' ? 'Exchange' : type === 'large' ? 'Station' : 'Depot';
+  return `${base} ${suffix}`;
+}
+
 function getRouteLength(route = state.save.route) {
   const stats = getShipStats();
   return Math.max(1180, 1680 + route * 135 - stats.routeReduction);
@@ -204,7 +282,7 @@ function getRouteLength(route = state.save.route) {
 function getDeliveryPayout(route = state.save.route, type = getStationType(route)) {
   const stats = getShipStats();
   const multiplier = type === 'mega' ? 2.25 : type === 'large' ? 1.58 : 1;
-  return Math.round((105 + route * 24 + stats.cargo * 18) * multiplier);
+  return Math.round((105 + route * 24 + stats.cargo * 18) * multiplier * stats.deliveryBonus);
 }
 
 const state = {
@@ -220,6 +298,12 @@ const state = {
   routeLength: 1600,
   currentPayout: 0,
   lastStationType: 'small',
+  lastStationRoute: 1,
+  lastStationName: '',
+  stationTab: 'upgrades',
+  upgradeCategory: 'flight',
+  stationWindowTime: 0,
+  stationTraffic: [],
   docking: false,
   docked: false,
   dockObject: null,
@@ -427,6 +511,73 @@ function addDockBlock(parent, x, y, z, sx, sy, sz, material = materials.dockHull
   return block;
 }
 
+function createStationSignTexture(name, type) {
+  const signCanvas = document.createElement('canvas');
+  signCanvas.width = 768;
+  signCanvas.height = 192;
+  const ctx = signCanvas.getContext('2d');
+  ctx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+
+  const accent = type === 'mega' ? '#ffc56f' : type === 'large' ? '#8ffcff' : '#67f0ff';
+  const label = name.toUpperCase();
+  let fontSize = 58;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  do {
+    ctx.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
+    fontSize -= 2;
+  } while (ctx.measureText(label).width > 650 && fontSize > 34);
+
+  const glow = ctx.createLinearGradient(54, 0, 714, 0);
+  glow.addColorStop(0, 'rgba(104, 238, 255, 0)');
+  glow.addColorStop(0.5, 'rgba(104, 238, 255, 0.28)');
+  glow.addColorStop(1, 'rgba(104, 238, 255, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(30, 24, 708, 144);
+
+  ctx.strokeStyle = 'rgba(104, 238, 255, 0.55)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(48, 34, 672, 124);
+  ctx.strokeStyle = 'rgba(255, 181, 86, 0.34)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(66, 50, 636, 92);
+
+  ctx.shadowColor = accent;
+  ctx.shadowBlur = 24;
+  ctx.fillStyle = accent;
+  ctx.fillText(label, 384, 88);
+  ctx.shadowBlur = 5;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(label, 384, 88);
+
+  ctx.shadowColor = '#55e6ff';
+  ctx.shadowBlur = 16;
+  ctx.font = '700 22px Inter, Arial, sans-serif';
+  ctx.fillStyle = 'rgba(214, 251, 255, 0.88)';
+  ctx.fillText('APPROACH BAY OPEN', 384, 132);
+
+  const texture = new THREE.CanvasTexture(signCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function addStationSign(parent, name, width, height, depth, type) {
+  addDockBlock(parent, 0, height * 0.66, depth * 0.58, width * 0.78, 0.85, 0.28, materials.dockDark);
+  const texture = createStationSignTexture(name, type);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  });
+  material.userData.temporary = true;
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(width * 0.72, 2.05), material);
+  sign.position.set(0, height * 0.66, depth * 0.75);
+  parent.add(sign);
+  return sign;
+}
+
 function createAsteroid() {
   const size = rand(1.25, 4.4) + state.wave * 0.07;
   const mesh = new THREE.Mesh(makeAsteroidGeometry(size), pick(materials.asteroid));
@@ -552,11 +703,37 @@ function createDockStation(type = getStationType()) {
   const width = type === 'mega' ? 28 : type === 'large' ? 22 : 17;
   const height = type === 'mega' ? 15 : type === 'large' ? 12 : 9;
   const depth = type === 'mega' ? 12 : type === 'large' ? 10 : 8;
+  const stationName = getStationName(state.save.route, type);
 
   addDockBlock(group, 0, height * 0.42, 0, width, 2.2, depth, materials.dockHull);
   addDockBlock(group, 0, -height * 0.42, 0, width, 2.2, depth, materials.dockHull);
   addDockBlock(group, -width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
   addDockBlock(group, width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
+  addStationSign(group, stationName, width, height, depth, type);
+
+  const railX = width * 0.33;
+  const railY = height * 0.24;
+  const tunnelLength = depth * 2.35;
+  const tunnelFront = depth * 0.96;
+  for (const x of [-railX, railX]) {
+    for (const y of [-railY, railY]) {
+      addDockBlock(group, x, y, tunnelFront, 0.34, 0.34, tunnelLength, materials.dockDark);
+    }
+  }
+
+  for (let i = 0; i < 6; i += 1) {
+    const z = -depth * 0.28 + i * (tunnelLength / 5);
+    const material = i % 2 ? materials.dockHull : materials.dockDark;
+    addDockBlock(group, 0, railY, z, railX * 2.08, 0.22, 0.42, material);
+    addDockBlock(group, 0, -railY, z, railX * 2.08, 0.22, 0.42, material);
+    addDockBlock(group, -railX, 0, z, 0.22, railY * 2.08, 0.42, material);
+    addDockBlock(group, railX, 0, z, 0.22, railY * 2.08, 0.42, material);
+  }
+
+  addDockBlock(group, 0, height * 0.22, -depth * 0.62, width * 0.55, 0.26, 0.34, materials.dockDark);
+  addDockBlock(group, 0, -height * 0.22, -depth * 0.62, width * 0.55, 0.26, 0.34, materials.dockDark);
+  addDockBlock(group, -width * 0.28, 0, -depth * 0.62, 0.26, height * 0.44, 0.34, materials.dockDark);
+  addDockBlock(group, width * 0.28, 0, -depth * 0.62, 0.26, height * 0.44, 0.34, materials.dockDark);
 
   addDockBlock(group, 0, 0, -1.2, width * 0.62, 0.62, depth * 1.2, materials.dockRunway);
   addDockBlock(group, 0, 1.32, -1.1, width * 0.42, 0.22, depth * 1.24, materials.dockWarning);
@@ -596,6 +773,7 @@ function createDockStation(type = getStationType()) {
   group.userData = {
     kind: 'dock',
     stationType: type,
+    stationName,
     radius: width * scale * 0.55,
     hp: 999,
     speedScale: 0.82,
@@ -799,6 +977,120 @@ function drawLaserOverlay(delta) {
   }
 }
 
+function resetStationTraffic() {
+  state.stationTraffic = Array.from({ length: 8 }, (_, index) => ({
+    x: rand(0.05, 0.95),
+    y: rand(0.16, 0.72),
+    speed: rand(0.018, 0.055) * (index % 2 ? 1 : -1),
+    size: rand(0.65, 1.35),
+    color: pick(['#55e6ff', '#ffb352', '#7dff9d', '#ffffff']),
+  }));
+}
+
+function drawStationWindow(delta = 0) {
+  if (!stationWindowCanvas || !stationWindowCtx) return;
+  const rect = stationWindowCanvas.getBoundingClientRect();
+  const cssWidth = Math.max(1, Math.round(rect.width || stationWindowCanvas.clientWidth || 320));
+  const cssHeight = Math.max(1, Math.round(rect.height || stationWindowCanvas.clientHeight || 180));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const pixelWidth = Math.round(cssWidth * dpr);
+  const pixelHeight = Math.round(cssHeight * dpr);
+  if (stationWindowCanvas.width !== pixelWidth || stationWindowCanvas.height !== pixelHeight) {
+    stationWindowCanvas.width = pixelWidth;
+    stationWindowCanvas.height = pixelHeight;
+  }
+
+  if (!state.stationTraffic.length) resetStationTraffic();
+  state.stationWindowTime += delta;
+  const t = state.stationWindowTime;
+  const ctx = stationWindowCtx;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+  const sky = ctx.createLinearGradient(0, 0, cssWidth, cssHeight);
+  sky.addColorStop(0, '#020713');
+  sky.addColorStop(0.55, '#07121b');
+  sky.addColorStop(1, '#140a10');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+  const nebula = ctx.createRadialGradient(cssWidth * 0.62, cssHeight * 0.18, 4, cssWidth * 0.62, cssHeight * 0.18, cssWidth * 0.52);
+  nebula.addColorStop(0, 'rgba(90, 231, 255, 0.22)');
+  nebula.addColorStop(0.45, 'rgba(173, 70, 59, 0.12)');
+  nebula.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = nebula;
+  ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+  for (let i = 0; i < 76; i += 1) {
+    const x = (i * 83 + t * (10 + (i % 5) * 2)) % (cssWidth + 24) - 12;
+    const y = (i * 47 + Math.sin(t * 0.18 + i) * 9) % cssHeight;
+    const alpha = 0.26 + (i % 4) * 0.12;
+    ctx.fillStyle = `rgba(220, 248, 255, ${alpha})`;
+    ctx.fillRect(x, y, i % 7 === 0 ? 2 : 1, i % 9 === 0 ? 2 : 1);
+  }
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.strokeStyle = 'rgba(85, 230, 255, 0.16)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 4; i += 1) {
+    const y = cssHeight * (0.42 + i * 0.12) + Math.sin(t * 0.25 + i) * 4;
+    ctx.beginPath();
+    ctx.moveTo(cssWidth * 0.12, y);
+    ctx.bezierCurveTo(cssWidth * 0.35, y - 22, cssWidth * 0.62, y + 24, cssWidth * 0.9, y - 8);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  for (const ship of state.stationTraffic) {
+    ship.x += ship.speed * delta;
+    if (ship.x < -0.12) ship.x = 1.14;
+    if (ship.x > 1.14) ship.x = -0.12;
+    const x = ship.x * cssWidth;
+    const y = ship.y * cssHeight + Math.sin(t * 0.9 + ship.size * 3) * 3;
+    const size = ship.size * Math.min(cssWidth, cssHeight) * 0.055;
+    const dir = ship.speed >= 0 ? 1 : -1;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    ctx.globalCompositeOperation = 'lighter';
+    const trail = ctx.createLinearGradient(-size * 2.2, 0, -size * 0.1, 0);
+    trail.addColorStop(0, 'rgba(85, 230, 255, 0)');
+    trail.addColorStop(1, 'rgba(85, 230, 255, 0.5)');
+    ctx.strokeStyle = trail;
+    ctx.lineWidth = Math.max(1, size * 0.18);
+    ctx.beginPath();
+    ctx.moveTo(-size * 2.1, 0);
+    ctx.lineTo(-size * 0.25, 0);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(229, 248, 255, 0.92)';
+    ctx.strokeStyle = ship.color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(size * 0.82, 0);
+    ctx.lineTo(-size * 0.55, -size * 0.36);
+    ctx.lineTo(-size * 0.28, 0);
+    ctx.lineTo(-size * 0.55, size * 0.36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.fillStyle = 'rgba(3, 8, 12, 0.34)';
+  ctx.fillRect(0, cssHeight * 0.78, cssWidth, cssHeight * 0.22);
+  ctx.strokeStyle = 'rgba(124, 232, 255, 0.22)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cssWidth * 0.5, 0);
+  ctx.lineTo(cssWidth * 0.5, cssHeight);
+  ctx.moveTo(0, cssHeight * 0.78);
+  ctx.lineTo(cssWidth, cssHeight * 0.78);
+  ctx.stroke();
+}
+
 function createExplosion(position, color = 0xffa356, count = 26) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
@@ -820,8 +1112,15 @@ function createExplosion(position, color = 0xffa356, count = 26) {
 
 function removeObject(object) {
   scene.remove(object);
+  const disposeTemporaryMaterial = (material) => {
+    if (!material?.userData?.temporary) return;
+    material.map?.dispose?.();
+    material.dispose?.();
+  };
   object.traverse?.((child) => {
     if (child.geometry && child !== object) child.geometry.dispose?.();
+    if (Array.isArray(child.material)) child.material.forEach(disposeTemporaryMaterial);
+    else disposeTemporaryMaterial(child.material);
   });
   if (object.geometry) object.geometry.dispose();
 }
@@ -864,10 +1163,27 @@ function lockResultScreen(duration = RESULT_LOCK_MS) {
   resultUnlockTimeout = window.setTimeout(clearResultLock, duration);
 }
 
+function renderUpgradeCategoryTabs() {
+  if (!upgradeCategoryTabs) return;
+  upgradeCategoryTabs.classList.remove('hidden');
+  upgradeCategoryTabs.innerHTML = '';
+  for (const category of UPGRADE_CATEGORIES) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.upgradeCategory = category.id;
+    button.setAttribute('aria-selected', String(state.upgradeCategory === category.id));
+    button.textContent = category.label;
+    upgradeCategoryTabs.append(button);
+  }
+}
+
 function renderUpgrades() {
   const credits = state.save.credits;
+  const category = UPGRADE_CATEGORIES.find((item) => item.id === state.upgradeCategory) || UPGRADE_CATEGORIES[0];
+  state.upgradeCategory = category.id;
+  upgradeList.className = 'upgrade-list';
   upgradeList.innerHTML = '';
-  for (const def of UPGRADE_DEFS) {
+  for (const def of UPGRADE_DEFS.filter((item) => item.category === category.id)) {
     const level = getUpgradeLevel(def.id);
     const cost = getUpgradeCost(def);
     const maxed = level >= def.max;
@@ -890,17 +1206,100 @@ function renderUpgrades() {
   }
 }
 
-function updateStationUi(payout = 0, type = getStationType()) {
+function renderTerminalCards(cards) {
+  upgradeList.className = 'upgrade-list terminal-grid';
+  upgradeList.innerHTML = '';
+  for (const cardData of cards) {
+    const card = document.createElement('article');
+    card.className = 'terminal-card';
+    card.innerHTML = `
+      <span>${cardData.kicker}</span>
+      <h3>${cardData.title}</h3>
+      <p>${cardData.text}</p>
+    `;
+    upgradeList.append(card);
+  }
+}
+
+function setStationTab(tab) {
+  state.stationTab = tab;
+  renderStationPanel();
+}
+
+function setUpgradeCategory(category) {
+  state.upgradeCategory = category;
+  state.stationTab = 'upgrades';
+  renderStationPanel();
+}
+
+function renderStationPanel() {
+  const tab = state.stationTab || 'upgrades';
+  stationTabs?.querySelectorAll('[data-station-tab]').forEach((button) => {
+    button.setAttribute('aria-selected', String(button.dataset.stationTab === tab));
+  });
+
+  if (tab === 'upgrades') {
+    const category = UPGRADE_CATEGORIES.find((item) => item.id === state.upgradeCategory) || UPGRADE_CATEGORIES[0];
+    state.upgradeCategory = category.id;
+    if (stationPanelTitle) stationPanelTitle.textContent = category.title;
+    if (stationPanelCopy) stationPanelCopy.textContent = category.copy;
+    renderUpgradeCategoryTabs();
+    renderUpgrades();
+    return;
+  }
+
+  upgradeCategoryTabs?.classList.add('hidden');
+  const stats = getShipStats();
+  const nextRoute = state.save.route;
+  const nextType = getStationType(nextRoute);
+  const nextName = getStationName(nextRoute, nextType);
+  const nextPayout = getDeliveryPayout(nextRoute, nextType);
+
+  if (tab === 'cargo') {
+    if (stationPanelTitle) stationPanelTitle.textContent = 'Cargo Office';
+    if (stationPanelCopy) stationPanelCopy.textContent = 'The station handles the freight. Your hold size and license decide the fee.';
+    renderTerminalCards([
+      { kicker: 'Freight bay', title: `${stats.cargo}t capacity`, text: 'More cargo space means larger sealed station loads and better delivery pay.' },
+      { kicker: 'Next manifest', title: `${nextPayout} cr estimate`, text: `${nextName} has a reserved berth and auto-load contract waiting.` },
+      { kicker: 'Station fee', title: `+${Math.round((stats.deliveryBonus - 1) * 100)}% license`, text: 'License upgrades improve every delivery payout without manual trading.' },
+    ]);
+    return;
+  }
+
+  if (tab === 'briefing') {
+    if (stationPanelTitle) stationPanelTitle.textContent = 'Route Briefing';
+    if (stationPanelCopy) stationPanelCopy.textContent = 'Hazards rise with distance, but every fifth station gives a stronger service dock.';
+    renderTerminalCards([
+      { kicker: 'Destination', title: nextName, text: `${getStationLabel(nextType)} route ${String(nextRoute).padStart(2, '0')} is plotted through active debris lanes.` },
+      { kicker: 'Run length', title: `${Math.round(getRouteLength(nextRoute))} km`, text: 'Vector Drive upgrades shorten the sprint and raise your cruise speed.' },
+      { kicker: 'Hazard pay', title: `${nextPayout} cr`, text: 'Larger stations pay more, but their approach lanes are busier and longer.' },
+    ]);
+    return;
+  }
+
+  if (stationPanelTitle) stationPanelTitle.textContent = 'Ship Status';
+  if (stationPanelCopy) stationPanelCopy.textContent = 'Current installed systems calculated from your upgrade levels.';
+  renderTerminalCards([
+    { kicker: 'Shield', title: `${stats.maxShield} hull shield`, text: 'Hull Plating increases total impact tolerance.' },
+    { kicker: 'Heat', title: `${stats.maxHeat}% heat cap`, text: 'Cooling bleeds heat faster while capacitors delay lockout.' },
+    { kicker: 'Weapons', title: `${stats.beamPower} beam power`, text: `Threat Predictor lock assist level ${stats.lockAssist} prioritizes path-crossing targets.` },
+    { kicker: 'Drive', title: `${Math.round((stats.speedBonus - 1) * 100)}% cruise gain`, text: 'Vector Drive improves speed and reduces contract distance.' },
+  ]);
+}
+
+function updateStationUi(payout = state.currentPayout, type = getStationType(), notice = '') {
+  const dockedRoute = state.lastStationRoute || Math.max(1, state.save.route - 1);
+  const stationName = state.lastStationName || getStationName(dockedRoute, type);
   stationKicker.textContent = getStationLabel(type);
-  stationTitle.textContent = type === 'mega' ? 'Mega Exchange Docked' : type === 'large' ? 'Hub Docked' : 'Mining Docked';
-  stationMessage.textContent = payout > 0
-    ? `Cargo transferred. ${payout} credits paid for this delivery. Supplies are loaded for the next run.`
-    : 'Supplies loaded. Spend credits before launching the next delivery.';
+  stationTitle.textContent = stationName;
+  stationMessage.textContent = notice || (payout > 0
+    ? `Cargo transferred at ${stationName}. ${payout} credits paid and the next hold is being sealed.`
+    : `${stationName} has the berth locked. Spend credits before launching the next delivery.`);
   stationCredits.textContent = String(state.save.credits);
-  stationPayout.textContent = String(payout || getDeliveryPayout(state.save.route, type));
+  stationPayout.textContent = String(payout || state.currentPayout || getDeliveryPayout(dockedRoute, type));
   stationCargo.textContent = `${getShipStats().cargo}t`;
   stationRoute.textContent = String(state.save.route).padStart(2, '0');
-  renderUpgrades();
+  renderStationPanel();
 }
 
 function buyUpgrade(id) {
@@ -912,7 +1311,7 @@ function buyUpgrade(id) {
   state.save.credits -= cost;
   state.save.upgrades[id] = level + 1;
   saveProgress();
-  updateStationUi(0, state.lastStationType);
+  updateStationUi(state.currentPayout, state.lastStationType, `${def.name} installed. Credits updated and the next manifest is still reserved.`);
 }
 
 function openStation(type = getStationType()) {
@@ -925,6 +1324,10 @@ function openStation(type = getStationType()) {
   state.pointerDown = false;
   state.lastStationType = type;
   const completedRoute = state.save.route;
+  state.lastStationRoute = completedRoute;
+  state.lastStationName = getStationName(completedRoute, type);
+  state.stationTab = 'upgrades';
+  state.upgradeCategory = 'flight';
   const payout = getDeliveryPayout(completedRoute, type);
   state.currentPayout = payout;
   state.save.credits += payout;
@@ -932,8 +1335,10 @@ function openStation(type = getStationType()) {
   state.score += payout;
   saveProgress();
   updateHud();
+  resetStationTraffic();
   updateStationUi(payout, type);
   stationEl.classList.remove('hidden');
+  drawStationWindow(0);
   hudEl.classList.add('hidden');
   fireButton.classList.add('hidden');
   reticleEl.classList.add('hidden');
@@ -1042,9 +1447,9 @@ function finishGame() {
 
 function firePulse() {
   const stats = getShipStats();
-  if (!state.running || state.docking || state.shotTimer > 0 || state.heat > 96) return;
+  if (!state.running || state.docking || state.shotTimer > 0 || state.heat > stats.maxHeat - 4) return;
   state.shotTimer = stats.shotCooldown;
-  state.heat = clamp(state.heat + stats.shotHeat, 0, 100);
+  state.heat = clamp(state.heat + stats.shotHeat, 0, stats.maxHeat);
 
   const bestTarget = acquireTarget();
   const aimNdc = getAimNdc();
@@ -1086,7 +1491,7 @@ function getAimNdc() {
 }
 
 function damage(amount) {
-  state.shield = clamp(state.shield - amount, 0, 100);
+  state.shield = clamp(state.shield - amount, 0, getShipStats().maxShield);
   state.shake = Math.max(state.shake, amount * 0.013);
   state.flashTimer = 0.15;
   damageFlash.classList.add('active');
@@ -1095,11 +1500,13 @@ function damage(amount) {
 }
 
 function updateHud() {
+  const stats = getShipStats();
+  const heatPercent = clamp(state.heat / Math.max(1, stats.maxHeat) * 100, 0, 100);
   scoreValue.textContent = String(Math.round(state.score));
   shieldValue.textContent = String(Math.round(state.shield));
-  heatValue.textContent = String(Math.round(state.heat));
-  shieldMeter.style.width = `${clamp(state.shield / getShipStats().maxShield * 100, 0, 100)}%`;
-  heatMeter.style.width = `${state.heat}%`;
+  heatValue.textContent = String(Math.round(heatPercent));
+  shieldMeter.style.width = `${clamp(state.shield / stats.maxShield * 100, 0, 100)}%`;
+  heatMeter.style.width = `${heatPercent}%`;
   if (routeMeter) routeMeter.style.width = `${clamp(state.routeDistance / Math.max(1, state.routeLength) * 100, 0, 100)}%`;
   sectorValue.textContent = `ROUTE ${String(state.save.route).padStart(2, '0')} / ${getStationLabel(getStationType(state.save.route)).toUpperCase()}`;
   threatValue.textContent = state.docking ? 'DOCKING' : state.threat > 4 ? 'CONTACT' : state.threat > 1 ? 'TRACE' : `${state.currentPayout} CR`;
@@ -1262,8 +1669,9 @@ function updateObjects(delta) {
     const distance = Math.hypot(object.position.x - playerX, object.position.y - playerY);
     if (collisionWindow && !data.passed && !['station', 'dock'].includes(data.kind)) {
       if (data.kind === 'collector' && distance < data.radius + 1.8) {
-        state.shield = clamp(state.shield + 18, 0, 100);
-        state.heat = clamp(state.heat - 32, 0, 100);
+        const stats = getShipStats();
+        state.shield = clamp(state.shield + 18, 0, stats.maxShield);
+        state.heat = clamp(state.heat - 32, 0, stats.maxHeat);
         state.score += data.value;
         createExplosion(object.position.clone(), 0x82ff9e, 18);
         state.objects.splice(i, 1);
@@ -1385,6 +1793,7 @@ function animate() {
   updateBeams(delta);
   updateParticles(delta);
   drawLaserOverlay(delta);
+  if (state.docked || gameEl.dataset.state === 'station') drawStationWindow(delta);
 
   if (state.running && Math.floor(state.time * 8) % 4 === 0) updateHud();
   if (state.demo && state.running && state.time > 18) finishGame();
@@ -1492,6 +1901,7 @@ function resize() {
   camera.updateProjectionMatrix();
   drawCockpit();
   resizeLaserCanvas();
+  drawStationWindow(0);
   updateReticle();
 }
 
@@ -1510,6 +1920,14 @@ function setupEvents() {
   startButton.addEventListener('click', resetGame);
   restartButton.addEventListener('click', resetGame);
   launchNextButton.addEventListener('click', launchNextRun);
+  stationTabs?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-station-tab]');
+    if (button) setStationTab(button.dataset.stationTab);
+  });
+  upgradeCategoryTabs?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-upgrade-category]');
+    if (button) setUpgradeCategory(button.dataset.upgradeCategory);
+  });
   upgradeList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-upgrade]');
     if (button) buyUpgrade(button.dataset.upgrade);
