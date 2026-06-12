@@ -1,10 +1,26 @@
 # The Glade — Fable 5 ARPG graphics test area
 
 Mobile-first Diablo/RuneScape-style test scene: a circular grass meadow with
-a tap-to-move hero, villager NPC, chickens, thatched cottage, campfire,
-collidable props, and floating pickups. Three.js 0.160 via CDN importmap, no
-build step, **no external assets** — every model is built from three.js
-primitives in code and every texture is a procedural `<canvas>`.
+a tap-to-move hero, villager NPC, attackable chickens, thatched cottage,
+campfire, collidable props, and floating pickups. Three.js 0.160 via CDN
+importmap, no build step, **no external assets** — every model is built from
+three.js primitives in code and every texture is a procedural `<canvas>`.
+
+Two heroes share one player controller: **Roland** (blocky boxes, default)
+and **Maeve** (rounded low-poly: sphere head + sculpted face, lathe torso,
+capsule limbs with elbows, swaying ponytail). Maeve exists only in the debug
+panel until you press **Play** on her row — that swaps the active rig.
+`?hero=maeve` spawns as her directly.
+
+**Combat:** tap a chicken (invisible fat-finger hit proxy) → the hero draws
+the back-scabbard sword while walking in (routing through the pen gate),
+then loops an overhead slash inside `attackRange`. Each swing rolls
+1..`dmgMax` damage at the hit frame; chickens have `chickenHp` (40), show a
+health bar + red hit splats + feather bursts, flee between hits, tip over on
+death and respawn after `chickenRespawn`s. Sword auto-sheathes 4s after
+combat ends. Both rigs share the same draw/sheathe/attack overlay
+(`js/combat.js`), which runs after `animate()` and only overrides the right
+arm/elbow/torso so locomotion blends underneath.
 
 The point of this scene is to evaluate object quality, so the 🐞 debug button
 (top right) lists every registered object with live position, triangle count,
@@ -22,12 +38,19 @@ Wireframe / Colliders / Pause.
 - `js/props.js` — house, trees, rocks, well, fence pen, barrels, crates,
   campfire, stone path, pickups. One `makeX()` builder per object returning a
   `THREE.Group` with origin at ground level; placed + registered in `buildProps()`
-- `js/entities.js` — `makeHumanoid(opts)` factory (hero + villager), chickens
-  (wander/peck/flee state machine), butterflies; procedural walk/idle animation
-- `js/controls.js` — tap-to-move raycast, drag orbit, pinch/wheel zoom, WASD,
-  camera follow + debug focus
+- `js/entities.js` — `makeHumanoid(opts)` factory (Roland + villager), player
+  controller (movement, chase + gate routing, attack loop, hero switching),
+  chickens (wander/peck/flee/dying/dead/respawn state machine), butterflies
+- `js/heroine.js` — `makeHeroine()`: Maeve's model, same rig contract as
+  `makeHumanoid` ({ group, parts, animate(t, walk) })
+- `js/combat.js` — `makeHeroSword()`, `attachCombat(rig, opts)`: scabbard,
+  hand sword, swing trail, draw/sheathe/attack state machine
+- `js/fx.js` — hit splats, feather bursts, health bars
+- `js/controls.js` — tap raycast (chicken proxies first, then ground), drag
+  orbit, pinch/wheel zoom, WASD, camera follow + debug focus
 - `js/ui.js` — inventory chips, toasts (styled popups only, never `alert()`)
-- `js/debug.js` — the debug panel
+- `js/debug.js` — the debug panel; entries may set `focusLabel` + `onFocus()`
+  (used for the hero Play buttons), `object.userData.status` shows live in rows
 - `js/main.js` — boot, loop, circle collision (`collider: {r}` dynamic or
   `{points:[{x,z,r}]}` static), pickup collection, `?shot` staging, `?auto` driver
 
@@ -57,8 +80,11 @@ site root.
 
 - `?shot=1` stages the thumbnail frame, sets `window.__shotReady` after 8 frames
 - `?lite=1` disables shadows/fire-light, halves grass instances
-- `?auto=1` AI-drives the hero (wander + collect); poll `window.__state`
-  ({fps, pos, picked, pickupsLeft, errors}) — note Chrome's
-  `--virtual-time-budget` does NOT advance the sim, use real waits
+- `?auto=1` AI-drives the hero (wander + collect + attack chickens); poll
+  `window.__state` ({fps, pos, picked, pickupsLeft, hero, chickens, errors})
+  — note Chrome's `--virtual-time-budget` does NOT advance the sim, use real
+  waits, and at low headless fps the dt clamp (0.05s) dilates sim time
+- `window.__game` ({player, chickens, controls, setHero}) + `window.__camera`
+  for scripted tests; `controls._raycastTap(x, y)` probes the tap path
 - After visual changes re-stage the thumbnail: `assets/screenshots/fable5-glade.jpg`
   (1280×800 jpg via `sips`)

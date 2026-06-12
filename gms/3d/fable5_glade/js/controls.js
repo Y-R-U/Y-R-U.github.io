@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { CFG } from './config.js';
 import { clamp, damp } from './utils.js';
 
-export function createControls({ camera, dom, player, ground, onTap }) {
+export function createControls({ camera, dom, player, ground, attackables, onTap }) {
   const st = {
     yaw: CFG.camYaw, pitch: CFG.camPitch, dist: CFG.camDist,
     focusObj: null,
@@ -21,18 +21,26 @@ export function createControls({ camera, dom, player, ground, onTap }) {
   window.addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
 
   const raycaster = new THREE.Raycaster();
-  function raycastGround(cx, cy) {
+  // Returns { chicken } when a tap hits an attackable, else { point } on the ground.
+  function raycastTap(cx, cy) {
     const ndc = new THREE.Vector2(
       (cx / window.innerWidth) * 2 - 1,
       -(cy / window.innerHeight) * 2 + 1
     );
     raycaster.setFromCamera(ndc, camera);
+    const targets = attackables ? attackables() : [];
+    const hitT = raycaster.intersectObjects(targets, true)[0];
+    if (hitT) {
+      let o = hitT.object;
+      while (o && !o.userData.chicken) o = o.parent;
+      if (o) return { chicken: o.userData.chicken };
+    }
     const hit = raycaster.intersectObject(ground, false)[0];
     if (!hit) return null;
     const p = hit.point;
     const r = Math.hypot(p.x, p.z), maxR = CFG.playRadius - 0.8;
     if (r > maxR) { p.x *= maxR / r; p.z *= maxR / r; }
-    return p;
+    return { point: p };
   }
 
   // ── pointers ──
@@ -40,7 +48,7 @@ export function createControls({ camera, dom, player, ground, onTap }) {
   let dragging = false, downAt = 0, pinchStart = 0, distStart = 0;
 
   dom.addEventListener('pointerdown', e => {
-    dom.setPointerCapture(e.pointerId);
+    try { dom.setPointerCapture(e.pointerId); } catch { /* synthetic pointers */ }
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
     if (pointers.size === 1) { dragging = false; downAt = performance.now(); }
     if (pointers.size === 2) {
@@ -72,8 +80,8 @@ export function createControls({ camera, dom, player, ground, onTap }) {
     const wasSingle = pointers.size === 1;
     pointers.delete(e.pointerId);
     if (wasSingle && !dragging && performance.now() - downAt < 450) {
-      const p = raycastGround(e.clientX, e.clientY);
-      if (p) { st.focusObj = null; onTap(p); }
+      const res = raycastTap(e.clientX, e.clientY);
+      if (res) { st.focusObj = null; onTap(res.point || null, res.chicken || null); }
     }
     if (pointers.size < 2) pinchStart = 0;
   };
@@ -89,6 +97,7 @@ export function createControls({ camera, dom, player, ground, onTap }) {
 
   return {
     state: st,
+    _raycastTap: raycastTap, // test hook
     focus(obj) { st.focusObj = obj; },
     clearFocus() { st.focusObj = null; },
 

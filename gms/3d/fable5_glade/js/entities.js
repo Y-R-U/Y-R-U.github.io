@@ -1,15 +1,19 @@
-// Characters: chunky RuneScape-style hero (tap-to-move), villager NPC with
-// waypoint patrol + wave greeting, wandering/pecking chickens, butterflies.
+// Characters: two switchable heroes (Roland — blocky boxes, Maeve — rounded
+// low-poly, debug-panel "Play" to swap), villager NPC with waypoint patrol +
+// wave greeting, attackable chickens (HP, flee, death, respawn), butterflies.
 
 import * as THREE from 'three';
 import { CFG, SITES } from './config.js';
-import { rand, pick, clamp, lerpAngle, damp, M, mesh, makeNameSprite } from './utils.js';
+import { rand, pick, clamp, lerpAngle, damp, M, mesh, makeNameSprite, chime } from './utils.js';
 import { register } from './registry.js';
 import { groundHeight } from './world.js';
+import { makeHeroine } from './heroine.js';
+import { attachCombat } from './combat.js';
+import * as fx from './fx.js';
 
 const SKIN = 0xe0b48a;
 
-// ───────── humanoid factory ─────────
+// ───────── humanoid factory (Roland + Bram) ─────────
 
 function makeHumanoid(o) {
   const g = new THREE.Group();
@@ -67,17 +71,6 @@ function makeHumanoid(o) {
   g.add(head);
   parts.head = head;
 
-  if (o.backSword) {
-    const sw = new THREE.Group();
-    sw.position.set(-0.12, 1.0, -0.18);
-    sw.rotation.z = 0.45;
-    sw.add(mesh(new THREE.BoxGeometry(0.1, 0.72, 0.05), M(0x4a3320)));
-    sw.add(mesh(new THREE.BoxGeometry(0.22, 0.05, 0.06), M(0xcaa34a, { metalness: 0.6, roughness: 0.4 }), 0, 0.4, 0));
-    sw.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.16, 6), M(0x2e2118), 0, 0.5, 0));
-    sw.add(mesh(new THREE.SphereGeometry(0.04, 6, 5), M(0xcaa34a), 0, 0.6, 0));
-    g.add(sw);
-  }
-
   g.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
 
   return {
@@ -90,40 +83,126 @@ function makeHumanoid(o) {
       parts.rArm.rotation.x = swing * 0.8 + Math.sin(t * 1.9 + 1) * 0.04 * (1 - walk);
       parts.torso.scale.x = 1 + Math.sin(t * 2.2) * 0.012 * (1 - walk);
       parts.head.rotation.y = Math.sin(t * 0.4) * 0.18 * (1 - walk);
-      return Math.abs(Math.sin(t * 9)) * 0.05 * walk; // bob offset
+      return Math.abs(Math.sin(t * 9)) * 0.05 * walk; // bob
     },
   };
 }
 
-// ───────── player ─────────
+// ───────── player (two switchable hero rigs) ─────────
 
 function createPlayer(scene) {
-  const h = makeHumanoid({
+  const roland = makeHumanoid({
     tunic: 0x3a6ea8, sleeves: 0x3a6ea8, pants: 0x5a4a3a, boots: 0x3a2d20,
-    hair: 0x6a4a2a, pads: true, backSword: true,
+    hair: 0x6a4a2a, pads: true,
   });
-  const pos = new THREE.Vector3(0, groundHeight(0, 0), 0);
-  h.group.position.copy(pos);
-  scene.add(h.group);
+  attachCombat(roland, {
+    handAttach: roland.parts.rArm, handOffset: { x: 0, y: -0.5, z: 0.04 },
+    backPos: { x: -0.12, y: 1.0, z: -0.19 }, backRot: 0.45,
+  });
 
-  const entry = register({
-    name: 'Hero (you)', category: 'Characters', icon: '🧝', object: h.group,
-    collider: null, pickup: null, note: 'Tap-to-move, procedural walk cycle, shoulder pads + back sword',
+  const maeve = makeHeroine();
+  attachCombat(maeve, {
+    handAttach: maeve.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    backPos: { x: -0.08, y: 0.92, z: -0.15 }, backRot: 0.5, scale: 0.9,
   });
+
+  const pos = new THREE.Vector3(0, groundHeight(0, 0), 0);
+  let rig = roland;
+  roland.group.position.copy(pos);
+  scene.add(roland.group);
 
   const player = {
-    group: h.group, pos, entry,
-    target: null, yaw: 0, speed: 0,
-    setTarget(p) { this.target = new THREE.Vector2(p.x, p.z); },
+    rigs: { roland, maeve },
+    rigName: 'roland',
+    get rig() { return rig; },
+    get group() { return rig.group; },
+    pos,
+    target: null, attackTarget: null,
+    yaw: 0, speed: 0, attackCd: 0, sheatheT: 0,
+
+    setTarget(p) {
+      this.attackTarget = null;
+      this.target = new THREE.Vector2(p.x, p.z);
+    },
+
+    attackChicken(ch) {
+      if (ch.state === 'dying' || ch.state === 'dead') return;
+      this.attackTarget = ch;
+      this.target = null;
+      rig.draw(); // start unsheathing on the way in
+    },
+
+    setHero(name) {
+      if (!this.rigs[name] || name === this.rigName) return rig.group;
+      this.attackTarget = null;
+      this.target = null;
+      rig.forceSheathe();
+      scene.remove(rig.group);
+      rig = this.rigs[name];
+      this.rigName = name;
+      rig.group.position.copy(pos);
+      rig.group.rotation.y = this.yaw;
+      scene.add(rig.group);
+      roland.group.userData.status = name === 'roland' ? '🟢 ACTIVE' : 'debug only — Play to switch';
+      maeve.group.userData.status = name === 'maeve' ? '🟢 ACTIVE' : 'debug only — Play to switch';
+      return rig.group;
+    },
+
     tick(dt, t, keyDir) {
+      this.attackCd = Math.max(0, this.attackCd - dt);
       const v = new THREE.Vector2();
-      if (keyDir) { v.copy(keyDir).multiplyScalar(CFG.playerSpeed); this.target = null; }
-      else if (this.target) {
-        const to = new THREE.Vector2(this.target.x - pos.x, this.target.y - pos.z);
-        const d = to.length();
-        if (d < 0.12) this.target = null;
-        else v.copy(to).normalize().multiplyScalar(Math.min(CFG.playerSpeed, d * 6));
+
+      if (keyDir) {
+        this.attackTarget = null;
+        this.target = null;
+        v.copy(keyDir).multiplyScalar(CFG.playerSpeed);
+      } else {
+        const ch = this.attackTarget;
+        if (ch) {
+          if (ch.hp <= 0 || ch.state === 'dying' || ch.state === 'dead') {
+            this.attackTarget = null;
+          } else {
+            const d = Math.hypot(ch.pos.x - pos.x, ch.pos.z - pos.z);
+            if (d > CFG.attackRange) {
+              // route through the pen gate — straight-line chase wedges into the fence
+              const P = SITES.pen;
+              const inPen = Math.abs(pos.x - P.x) < 2.45 && Math.abs(pos.z - P.z) < 2.45;
+              const gate = new THREE.Vector2(P.x, P.z + 3.0); // gap is on the +z side
+              if (!inPen && gate.distanceTo(new THREE.Vector2(pos.x, pos.z)) > 0.6) {
+                this.target = gate;
+              } else {
+                this.target = new THREE.Vector2(ch.pos.x, ch.pos.z); // chase
+              }
+            } else {
+              this.target = null;
+              this.yaw = lerpAngle(this.yaw, Math.atan2(ch.pos.x - pos.x, ch.pos.z - pos.z), damp(10, dt));
+              const c = rig.combat;
+              if (!c.armed && c.state === 'none') rig.draw();
+              else if (c.armed && c.state === 'none' && this.attackCd <= 0) {
+                rig.attack(() => {
+                  const dmg = 1 + Math.floor(Math.random() * CFG.dmgMax);
+                  ch.hit(dmg, pos);
+                });
+                this.attackCd = CFG.attackPeriod;
+              }
+            }
+          }
+        }
+        if (this.target) {
+          const to = new THREE.Vector2(this.target.x - pos.x, this.target.y - pos.z);
+          const d = to.length();
+          if (d < 0.12) this.target = null;
+          else v.copy(to).normalize().multiplyScalar(Math.min(CFG.playerSpeed, d * 6));
+        }
       }
+
+      // auto-sheathe a few seconds after combat ends
+      if (this.attackTarget) this.sheatheT = 4;
+      else if (rig.combat.armed) {
+        this.sheatheT -= dt;
+        if (this.sheatheT <= 0 && rig.combat.state === 'none') rig.sheathe();
+      }
+
       const sp = v.length();
       this.speed = THREE.MathUtils.lerp(this.speed, sp, damp(10, dt));
       if (sp > 0.1) {
@@ -135,12 +214,30 @@ function createPlayer(scene) {
       if (r > maxR) { pos.x *= maxR / r; pos.z *= maxR / r; }
 
       const walk = clamp(this.speed / CFG.playerSpeed, 0, 1);
-      const bob = h.animate(t, walk);
+      const bob = rig.animate(t, walk);
+      rig.tickCombat(dt, t, walk);
       pos.y = groundHeight(pos.x, pos.z);
-      h.group.position.set(pos.x, pos.y + bob, pos.z);
-      h.group.rotation.y = this.yaw;
+      rig.group.position.set(pos.x, pos.y + bob, pos.z);
+      rig.group.rotation.y = this.yaw;
     },
   };
+
+  roland.group.userData.status = '🟢 ACTIVE';
+  maeve.group.userData.status = 'debug only — Play to switch';
+
+  register({
+    name: 'Hero 1 — Roland', category: 'Characters', icon: '🧝', object: roland.group,
+    collider: null, pickup: null, isHero: true, focusLabel: 'Play',
+    onFocus: () => player.setHero('roland'),
+    note: 'Blocky box-primitive hero. Tap a chicken to draw the sword and attack',
+  });
+  register({
+    name: 'Hero 2 — Maeve', category: 'Characters', icon: '🧝‍♀️', object: maeve.group,
+    collider: null, pickup: null, isHero: true, focusLabel: 'Play',
+    onFocus: () => player.setHero('maeve'),
+    note: 'Rounded low-poly heroine: sphere head + sculpted face, lathe torso, capsule limbs, swaying ponytail',
+  });
+
   return player;
 }
 
@@ -247,8 +344,13 @@ function makeChickenMesh(tint) {
     leg.add(mesh(new THREE.BoxGeometry(0.07, 0.02, 0.09), M(0xe8923a), 0, -0.18, 0.02, false));
     g.add(leg); legs.push(leg);
   }
-  g.traverse(m => { if (m.isMesh && m.castShadow === undefined) m.castShadow = true; });
-  body.castShadow = true;
+
+  // invisible fat-finger tap target (raycaster still tests hidden meshes)
+  const proxy = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), new THREE.MeshBasicMaterial());
+  proxy.position.y = 0.32;
+  proxy.visible = false;
+  g.add(proxy);
+
   return { group: g, headG, legs, body };
 }
 
@@ -258,11 +360,80 @@ function createChicken(scene, name, tint, getPlayerPos) {
   const pos = new THREE.Vector3(P.x + rand(-1.5, 1.5), 0, P.z + rand(-1.5, 1.5));
   scene.add(c.group);
 
+  // cache materials for the death fade
+  const mats = [];
+  c.group.traverse(o => { if (o.isMesh) mats.push(o.material); });
+
+  const bar = fx.makeHealthBar(c.group, 0.85);
   const pickTarget = () => new THREE.Vector2(P.x + rand(-1.9, 1.9), P.z + rand(-1.9, 1.9));
+
   const chicken = {
-    group: c.group,
-    state: 'idle', stateT: rand(0.5, 2), target: pickTarget(), yaw: rand(0, 6), phase: rand(0, 9),
+    group: c.group, pos, tint,
+    hp: CFG.chickenHp,
+    state: 'idle', stateT: rand(0.5, 2), respawnT: 0,
+    target: pickTarget(), yaw: rand(0, 6), phase: rand(0, 9),
+
+    hit(dmg, fromPos) {
+      if (this.state === 'dying' || this.state === 'dead') return;
+      this.hp = Math.max(0, this.hp - dmg);
+      fx.splat(pos.clone().add(new THREE.Vector3(0, 0.95, 0)), dmg);
+      fx.feathers(pos.clone().add(new THREE.Vector3(0, 0.35, 0)), tint);
+      bar.set(this.hp / CFG.chickenHp);
+      c.group.userData.status = `HP ${this.hp}/${CFG.chickenHp}`;
+      if (this.hp <= 0) {
+        this.state = 'dying'; this.stateT = 0;
+        bar.hide();
+        c.group.userData.status = '☠ defeated';
+        chime(170);
+      } else {
+        chime(290);
+        // squawk away from the attacker
+        const away = new THREE.Vector2(pos.x - fromPos.x, pos.z - fromPos.z).normalize().multiplyScalar(2.2);
+        this.target = new THREE.Vector2(
+          clamp(pos.x + away.x, P.x - 2, P.x + 2), clamp(pos.z + away.y, P.z - 2, P.z + 2));
+        this.state = 'flee'; this.stateT = 1.0;
+      }
+    },
+
+    respawn() {
+      this.hp = CFG.chickenHp;
+      this.state = 'spawn'; this.stateT = 0;
+      pos.set(P.x + rand(-1.5, 1.5), 0, P.z + rand(-1.5, 1.5));
+      c.group.rotation.z = 0;
+      c.group.visible = true;
+      for (const m of mats) { m.opacity = 1; m.transparent = false; }
+      c.group.userData.status = `HP ${this.hp}/${CFG.chickenHp}`;
+    },
+
     tick(dt, t) {
+      if (this.state === 'dying') {
+        this.stateT += dt;
+        c.group.rotation.z = Math.min(this.stateT / 0.35, 1) * 1.5;
+        if (this.stateT > 0.9) {
+          const k = clamp((this.stateT - 0.9) / 0.6, 0, 1);
+          for (const m of mats) { m.transparent = true; m.opacity = 1 - k; }
+        }
+        if (this.stateT > 1.5) {
+          c.group.visible = false;
+          this.state = 'dead';
+          this.respawnT = CFG.chickenRespawn;
+        }
+        return;
+      }
+      if (this.state === 'dead') {
+        this.respawnT -= dt;
+        c.group.userData.status = `respawn in ${Math.ceil(this.respawnT)}s`;
+        if (this.respawnT <= 0) this.respawn();
+        return;
+      }
+      if (this.state === 'spawn') {
+        this.stateT += dt;
+        const k = Math.min(this.stateT / 0.3, 1);
+        c.group.scale.setScalar(k);
+        if (k >= 1) { this.state = 'idle'; this.stateT = rand(0.5, 2); }
+      }
+
+      bar.tick(dt);
       this.stateT -= dt;
       const tt = t + this.phase;
       const pp = getPlayerPos();
@@ -304,9 +475,11 @@ function createChicken(scene, name, tint, getPlayerPos) {
       c.group.rotation.y = this.yaw;
     },
   };
+  c.group.userData.chicken = chicken;
+  c.group.userData.status = `HP ${chicken.hp}/${CFG.chickenHp}`;
   register({
     name, category: 'Animals', icon: '🐔', object: c.group,
-    collider: null, pickup: null, note: 'Wander/peck/flee state machine inside the pen',
+    collider: null, pickup: null, note: `${CFG.chickenHp} HP — tap to attack. Wander/peck/flee, death + respawn`,
   });
   return chicken;
 }

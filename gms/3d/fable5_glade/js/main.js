@@ -2,8 +2,8 @@
 // collision, pickup collection, ?shot / ?auto modes, error capture.
 
 import * as THREE from 'three';
-import { CFG, SHOT, LITE, AUTO } from './config.js';
-import { clamp, rand, unlockAudio } from './utils.js';
+import { CFG, SHOT, LITE, AUTO, HERO } from './config.js';
+import { clamp, rand, pick, unlockAudio } from './utils.js';
 import { registry, liveColliders, livePickups } from './registry.js';
 import { buildWorld } from './world.js';
 import { buildProps } from './props.js';
@@ -11,6 +11,7 @@ import { buildEntities } from './entities.js';
 import { createControls } from './controls.js';
 import { initUi, addPickup, inventoryCounts } from './ui.js';
 import { initDebug, debugFlags } from './debug.js';
+import { initFx, tickFx } from './fx.js';
 
 window.__errors = [];
 window.addEventListener('error', e => window.__errors.push(String(e.message)));
@@ -41,9 +42,11 @@ window.addEventListener('resize', () => {
 // ── build the glade ──
 
 const world = buildWorld(scene);
+initFx(scene);
 const props = buildProps(scene);
 const ents = buildEntities(scene);
 const player = ents.player;
+if (HERO === 'maeve' || HERO === '2') player.setHero('maeve');
 
 initUi();
 
@@ -66,11 +69,20 @@ function spawnMarker(p) {
 
 const controls = createControls({
   camera, dom: renderer.domElement, player, ground: world.ground,
-  onTap(p) { unlockAudio(); player.setTarget(p); spawnMarker(p); },
+  attackables: () => ents.chickens
+    .filter(c => c.state !== 'dead' && c.state !== 'dying')
+    .map(c => c.group),
+  onTap(p, chicken) {
+    unlockAudio();
+    if (chicken) player.attackChicken(chicken);
+    else if (p) { player.setTarget(p); spawnMarker(p); }
+  },
 });
 
-const playerEntry = registry.find(e => e.name === 'Hero (you)');
-initDebug({ scene, renderer, controls, getFps: () => fps, playerEntry });
+initDebug({
+  scene, renderer, controls, getFps: () => fps,
+  playerGroups: [player.rigs.roland.group, player.rigs.maeve.group],
+});
 
 // ── shot mode: stage the thumbnail ──
 
@@ -123,13 +135,17 @@ function collectPickups() {
 let autoTimer = 0;
 function autoTick(dt) {
   autoTimer -= dt;
-  if (autoTimer > 0) return;
+  if (autoTimer > 0 || player.attackTarget) return;
   autoTimer = rand(2.5, 4.5);
+  const roll = Math.random();
   const remaining = livePickups();
-  if (remaining.length && Math.random() < 0.65) {
+  const alive = ents.chickens.filter(c => c.hp > 0 && c.state !== 'dying' && c.state !== 'dead');
+  if (roll < 0.4 && remaining.length) {
     const target = remaining[Math.floor(Math.random() * remaining.length)].object.position;
     player.setTarget(target);
     spawnMarker(target);
+  } else if (roll < 0.75 && alive.length) {
+    player.attackChicken(pick(alive));
   } else {
     const a = rand(0, Math.PI * 2), r = Math.sqrt(Math.random()) * (CFG.playRadius - 3);
     const p = new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r);
@@ -158,6 +174,7 @@ function loop() {
   collectPickups();
   props.tick(t, dt);
   world.tick(dt);
+  tickFx(dt);
 
   for (let i = markers.length - 1; i >= 0; i--) {
     const m = markers[i];
@@ -190,5 +207,9 @@ window.__state = {
   get pos() { return { x: +player.pos.x.toFixed(2), z: +player.pos.z.toFixed(2) }; },
   get picked() { return { ...inventoryCounts }; },
   get pickupsLeft() { return livePickups().length; },
+  get hero() { return player.rigName; },
+  get chickens() { return ents.chickens.map(c => `${c.hp}hp/${c.state}`); },
   get errors() { return window.__errors; },
 };
+window.__game = { player, chickens: ents.chickens, controls, setHero: (n) => player.setHero(n) };
+window.__camera = camera;

@@ -5,6 +5,7 @@ const q = new URLSearchParams(location.search);
 export const SHOT = q.has('shot');
 export const LITE = q.has('lite');
 export const AUTO = q.has('auto');
+export const HERO = q.get('hero'); // 'maeve' / '2' spawns as the second hero
 
 export const CFG = {
   playRadius: 26,      // walkable circle radius
@@ -12,6 +13,13 @@ export const CFG = {
   playerSpeed: 4.0,
   playerRadius: 0.35,  // collision circle
   pickupRange: 0.85,
+
+  // combat
+  chickenHp: 40,
+  dmgMax: 10,          // each swing rolls 1..dmgMax
+  attackRange: 1.25,
+  attackPeriod: 0.9,   // seconds between swings
+  chickenRespawn: 10,
 
   camDist: 13, camDistMin: 7, camDistMax: 20,
   camPitch: 0.68, camPitchMin: 0.35, camPitchMax: 1.25,

@@ -10,7 +10,7 @@ const CATEGORY_ORDER = ['Characters', 'Animals', 'Buildings', 'Props', 'Pickups'
 
 export const debugFlags = { paused: false };
 
-export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
+export function initDebug({ scene, renderer, controls, getFps, playerGroups = [] }) {
   const panel = document.getElementById('debug-panel');
   const btn = document.getElementById('debug-btn');
   let open = false, statsTimer = null;
@@ -55,7 +55,7 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
             <div class="meta"></div>
             ${e.note ? `<div class="meta">${e.note}</div>` : ''}
           </div>
-          <button class="focus">Focus</button>`;
+          <button class="focus">${e.focusLabel || 'Focus'}</button>`;
         row.querySelector('.focus').addEventListener('click', () => focusEntry(e));
         listEl.appendChild(row);
       }
@@ -71,8 +71,9 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
       e.object.getWorldPosition(v);
       const extra = e.pickup ? (e.dead ? ' · collected ✓' : ` · ${e.pickup.kind}`) : '';
       const coll = e.collider ? (e.collider.r ? ` · r=${e.collider.r.toFixed(2)}` : ` · ${e.collider.points.length} pts`) : '';
+      const status = e.object.userData.status ? ` · ${e.object.userData.status}` : '';
       row.querySelector('.meta').textContent =
-        `${e.tris.toLocaleString()} tris · (${v.x.toFixed(1)}, ${v.y.toFixed(1)}, ${v.z.toFixed(1)})${coll}${extra}`;
+        `${e.tris.toLocaleString()} tris · (${v.x.toFixed(1)}, ${v.y.toFixed(1)}, ${v.z.toFixed(1)})${coll}${extra}${status}`;
     }
   }
 
@@ -87,9 +88,14 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
   }
 
   function focusEntry(e) {
-    controls.focus(e.object);
+    let obj = e.object;
+    if (e.onFocus) {
+      const r = e.onFocus(); // e.g. hero switch returns the now-active group
+      if (r && r.isObject3D) obj = r;
+    }
+    controls.focus(obj);
     if (highlight) { scene.remove(highlight); clearTimeout(highlightT); }
-    highlight = new THREE.BoxHelper(e.object, 0xffe06a);
+    highlight = new THREE.BoxHelper(obj, 0xffe06a);
     highlight.material.userData.noWire = true;
     scene.add(highlight);
     highlightT = setTimeout(() => { scene.remove(highlight); highlight = null; }, 2600);
@@ -107,6 +113,7 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
     });
   }
 
+  const allRings = [];
   function buildColliders() {
     colliderGroup = new THREE.Group();
     const ringGeo = (r) => {
@@ -125,7 +132,7 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
         const ring = new THREE.Line(ringGeo(e.collider.r), mat);
         ring.position.y = 0.06;
         e.object.add(ring);           // follows dynamic objects
-        ring.userData.isColliderRing = true;
+        allRings.push(ring);
       } else {
         for (const p of e.collider.points) {
           const ring = new THREE.Line(ringGeo(p.r), mat);
@@ -134,13 +141,14 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
         }
       }
     }
-    // player radius
-    if (playerEntry) {
-      const pr = new THREE.Line(ringGeo(0.35), new THREE.LineBasicMaterial({ color: 0x6ab8ff }));
-      pr.material.userData.noWire = true;
+    // player radius (both hero rigs, so the ring survives switching)
+    const prMat = new THREE.LineBasicMaterial({ color: 0x6ab8ff });
+    prMat.userData.noWire = true;
+    for (const grp of playerGroups) {
+      const pr = new THREE.Line(ringGeo(0.35), prMat);
       pr.position.y = 0.06;
-      pr.userData.isColliderRing = true;
-      playerEntry.object.add(pr);
+      grp.add(pr);
+      allRings.push(pr);
     }
     scene.add(colliderGroup);
   }
@@ -149,7 +157,7 @@ export function initDebug({ scene, renderer, controls, getFps, playerEntry }) {
     collidersOn = on;
     if (on && !colliderGroup) buildColliders();
     if (colliderGroup) colliderGroup.visible = on;
-    scene.traverse(o => { if (o.userData.isColliderRing) o.visible = on; });
+    for (const ring of allRings) ring.visible = on;
   }
 
   panel.querySelectorAll('.dbg-toggle').forEach(b => {
