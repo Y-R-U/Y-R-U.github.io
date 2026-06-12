@@ -1176,6 +1176,13 @@ function setStationTerminalOpen(open) {
   if (open) renderStationPanel();
 }
 
+function onStationPointerDown(event) {
+  if (stationEl.classList.contains('hidden')) return;
+  const inTerminal = stationTerminalPanel?.contains(event.target);
+  if (state.stationTerminalOpen && !inTerminal) setStationTerminalOpen(false);
+  event.stopPropagation();
+}
+
 function renderUpgradeCategoryTabs() {
   if (!upgradeCategoryTabs) return;
   upgradeCategoryTabs.classList.remove('hidden');
@@ -1935,6 +1942,7 @@ function setupEvents() {
   startButton.addEventListener('click', resetGame);
   restartButton.addEventListener('click', resetGame);
   launchNextButton.addEventListener('click', launchNextRun);
+  stationEl.addEventListener('pointerdown', onStationPointerDown);
   stationTerminalHotspot?.addEventListener('click', () => setStationTerminalOpen(true));
   stationCloseTerminal?.addEventListener('click', () => setStationTerminalOpen(false));
   stationTabs?.addEventListener('click', (event) => {
