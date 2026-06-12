@@ -41,7 +41,8 @@ hero debug rows count the BODY only; the weapon rack by the house holds
 display copies registered under the Gear category with their own tri counts.
 
 This project is the demo/testing ground — if it ever becomes a real game,
-this directory is the copy-paste starting template.
+this directory is the copy-paste starting template. **`TEMPLATE.md` has the
+step-by-step instructions for copying it into a new game.**
 
 The point of this scene is to evaluate object quality, so the 🐞 debug button
 (top right) lists every registered object with live position, triangle count,
