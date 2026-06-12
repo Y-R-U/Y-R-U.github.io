@@ -8,6 +8,7 @@ import { rand, pick, clamp, lerpAngle, damp, M, mesh, makeNameSprite, chime } fr
 import { register } from './registry.js';
 import { groundHeight } from './world.js';
 import { makeHeroine } from './heroine.js';
+import { makeKnight, makeScout } from './heroes.js';
 import { attachCombat } from './combat.js';
 import * as fx from './fx.js';
 
@@ -106,13 +107,25 @@ function createPlayer(scene) {
     backPos: { x: -0.08, y: 0.92, z: -0.15 }, backRot: 0.5, scale: 0.9,
   });
 
+  const garrick = makeKnight();
+  attachCombat(garrick, {
+    handAttach: garrick.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    backPos: { x: -0.1, y: 0.96, z: -0.19 }, backRot: 0.45,
+  });
+
+  const wren = makeScout();
+  attachCombat(wren, {
+    handAttach: wren.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    backPos: { x: -0.08, y: 0.93, z: -0.16 }, backRot: 0.5, scale: 0.88,
+  });
+
   const pos = new THREE.Vector3(0, groundHeight(0, 0), 0);
   let rig = roland;
   roland.group.position.copy(pos);
   scene.add(roland.group);
 
   const player = {
-    rigs: { roland, maeve },
+    rigs: { roland, maeve, garrick, wren },
     rigName: 'roland',
     get rig() { return rig; },
     get group() { return rig.group; },
@@ -143,8 +156,8 @@ function createPlayer(scene) {
       rig.group.position.copy(pos);
       rig.group.rotation.y = this.yaw;
       scene.add(rig.group);
-      roland.group.userData.status = name === 'roland' ? '🟢 ACTIVE' : 'debug only — Play to switch';
-      maeve.group.userData.status = name === 'maeve' ? '🟢 ACTIVE' : 'debug only — Play to switch';
+      for (const [n, r] of Object.entries(this.rigs))
+        r.group.userData.status = n === name ? '🟢 ACTIVE' : 'debug only — Play to switch';
       return rig.group;
     },
 
@@ -222,8 +235,8 @@ function createPlayer(scene) {
     },
   };
 
-  roland.group.userData.status = '🟢 ACTIVE';
-  maeve.group.userData.status = 'debug only — Play to switch';
+  for (const [n, r] of Object.entries(player.rigs))
+    r.group.userData.status = n === 'roland' ? '🟢 ACTIVE' : 'debug only — Play to switch';
 
   register({
     name: 'Hero 1 — Roland', category: 'Characters', icon: '🧝', object: roland.group,
@@ -236,6 +249,18 @@ function createPlayer(scene) {
     collider: null, pickup: null, isHero: true, focusLabel: 'Play',
     onFocus: () => player.setHero('maeve'),
     note: 'Rounded low-poly heroine: sphere head + sculpted face, lathe torso, capsule limbs, swaying ponytail',
+  });
+  register({
+    name: 'Hero 3 — Garrick', category: 'Characters', icon: '🛡️', object: garrick.group,
+    collider: null, pickup: null, isHero: true, focusLabel: 'Play',
+    onFocus: () => player.setHero('garrick'),
+    note: 'Mid-budget knight: lathe cuirass, open-faced helm with crimson crest, capsule limbs',
+  });
+  register({
+    name: 'Hero 4 — Wren', category: 'Characters', icon: '🏹', object: wren.group,
+    collider: null, pickup: null, isHero: true, focusLabel: 'Play',
+    onFocus: () => player.setHero('wren'),
+    note: 'Mid-budget scout: moss hood with open face, shoulder braid, mantle cape, capsule limbs',
   });
 
   return player;

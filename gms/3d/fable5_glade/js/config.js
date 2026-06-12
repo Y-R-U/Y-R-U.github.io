@@ -5,7 +5,7 @@ const q = new URLSearchParams(location.search);
 export const SHOT = q.has('shot');
 export const LITE = q.has('lite');
 export const AUTO = q.has('auto');
-export const HERO = q.get('hero'); // 'maeve' / '2' spawns as the second hero
+export const HERO = q.get('hero'); // 'maeve'/'2', 'garrick'/'3', 'wren'/'4' spawn as that hero
 
 export const CFG = {
   playRadius: 26,      // walkable circle radius

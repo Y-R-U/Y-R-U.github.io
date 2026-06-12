@@ -46,7 +46,8 @@ initFx(scene);
 const props = buildProps(scene);
 const ents = buildEntities(scene);
 const player = ents.player;
-if (HERO === 'maeve' || HERO === '2') player.setHero('maeve');
+const HERO_ALIAS = { maeve: 'maeve', 2: 'maeve', garrick: 'garrick', 3: 'garrick', wren: 'wren', 4: 'wren' };
+if (HERO && HERO_ALIAS[HERO]) player.setHero(HERO_ALIAS[HERO]);
 
 initUi();
 
@@ -81,7 +82,7 @@ const controls = createControls({
 
 initDebug({
   scene, renderer, controls, getFps: () => fps,
-  playerGroups: [player.rigs.roland.group, player.rigs.maeve.group],
+  playerGroups: Object.values(player.rigs).map(r => r.group),
 });
 
 // ── shot mode: stage the thumbnail ──

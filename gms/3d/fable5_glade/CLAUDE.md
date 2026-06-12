@@ -6,11 +6,15 @@ campfire, collidable props, and floating pickups. Three.js 0.160 via CDN
 importmap, no build step, **no external assets** — every model is built from
 three.js primitives in code and every texture is a procedural `<canvas>`.
 
-Two heroes share one player controller: **Roland** (blocky boxes, default)
-and **Maeve** (rounded low-poly: sphere head + sculpted face, lathe torso,
-capsule limbs with elbows, swaying ponytail). Maeve exists only in the debug
-panel until you press **Play** on her row — that swaps the active rig.
-`?hero=maeve` spawns as her directly.
+Four heroes share one player controller: **Roland** (blocky boxes, ~0.6k
+tris, default), **Maeve** (rounded showcase: sphere head + sculpted face,
+lathe torso, capsule limbs with elbows, swaying ponytail, ~6k), and two
+mid-budget rigs (~2.4k each incl. sword): **Garrick** the knight (lathe
+cuirass, open-faced helm with crimson crest) and **Wren** the hooded scout
+(moss hood with face window + feather pin, shoulder braid, mantle cape).
+Benched heroes exist only in the debug panel until you press **Play** on
+their row — that swaps the active rig. `?hero=maeve|2|garrick|3|wren|4`
+spawns as that hero directly.
 
 **Combat:** tap a chicken (invisible fat-finger hit proxy) → the hero draws
 the back-scabbard sword while walking in (routing through the pen gate),
@@ -43,6 +47,9 @@ Wireframe / Colliders / Pause.
   chickens (wander/peck/flee/dying/dead/respawn state machine), butterflies
 - `js/heroine.js` — `makeHeroine()`: Maeve's model, same rig contract as
   `makeHumanoid` ({ group, parts, animate(t, walk) })
+- `js/heroes.js` — `makeKnight()` (Garrick) + `makeScout()` (Wren): mid-budget
+  rigs sharing addArms/addLegs/addFace helpers with Maeve's joint spacing, so
+  attachCombat's hand offset works unchanged on all capsule-limb heroes
 - `js/combat.js` — `makeHeroSword()`, `attachCombat(rig, opts)`: scabbard,
   hand sword, swing trail, draw/sheathe/attack state machine
 - `js/fx.js` — hit splats, feather bursts, health bars
