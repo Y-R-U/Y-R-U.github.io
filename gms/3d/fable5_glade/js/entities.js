@@ -400,6 +400,7 @@ function createChicken(scene, name, tint, getPlayerPos) {
       this.state = 'spawn'; this.stateT = 0;
       pos.set(P.x + rand(-1.5, 1.5), 0, P.z + rand(-1.5, 1.5));
       c.group.rotation.z = 0;
+      c.group.scale.setScalar(0.001); // grow back in via the spawn pop
       c.group.visible = true;
       for (const m of mats) { m.opacity = 1; m.transparent = false; }
       c.group.userData.status = `HP ${this.hp}/${CFG.chickenHp}`;
@@ -427,10 +428,15 @@ function createChicken(scene, name, tint, getPlayerPos) {
         return;
       }
       if (this.state === 'spawn') {
+        // must return: the shared `stateT -= dt` below would cancel the += and
+        // freeze the scale-pop at ~0, leaving the chicken invisible forever
         this.stateT += dt;
         const k = Math.min(this.stateT / 0.3, 1);
-        c.group.scale.setScalar(k);
+        c.group.scale.setScalar(Math.max(k, 0.001));
+        pos.y = groundHeight(pos.x, pos.z);
+        c.group.position.set(pos.x, pos.y, pos.z);
         if (k >= 1) { this.state = 'idle'; this.stateT = rand(0.5, 2); }
+        return;
       }
 
       bar.tick(dt);
