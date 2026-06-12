@@ -416,7 +416,7 @@ function createChicken(scene, name, tint, getPlayerPos) {
         if (this.stateT > 1.5) {
           c.group.visible = false;
           this.state = 'dead';
-          this.respawnT = CFG.chickenRespawn;
+          this.respawnT = rand(CFG.chickenRespawnMin, CFG.chickenRespawnMax);
         }
         return;
       }

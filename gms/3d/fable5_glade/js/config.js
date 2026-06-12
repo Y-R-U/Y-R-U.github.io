@@ -19,7 +19,8 @@ export const CFG = {
   dmgMax: 10,          // each swing rolls 1..dmgMax
   attackRange: 1.25,
   attackPeriod: 0.9,   // seconds between swings
-  chickenRespawn: 10,
+  chickenRespawnMin: 30,  // dead chickens come back after rand(min, max) seconds
+  chickenRespawnMax: 60,
 
   camDist: 13, camDistMin: 7, camDistMax: 20,
   camPitch: 0.68, camPitchMin: 0.35, camPitchMax: 1.25,

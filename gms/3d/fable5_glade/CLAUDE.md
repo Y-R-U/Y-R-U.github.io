@@ -17,7 +17,7 @@ the back-scabbard sword while walking in (routing through the pen gate),
 then loops an overhead slash inside `attackRange`. Each swing rolls
 1..`dmgMax` damage at the hit frame; chickens have `chickenHp` (40), show a
 health bar + red hit splats + feather bursts, flee between hits, tip over on
-death and respawn after `chickenRespawn`s. Sword auto-sheathes 4s after
+death and respawn after `rand(chickenRespawnMin, chickenRespawnMax)`s (30–60s). Sword auto-sheathes 4s after
 combat ends. Both rigs share the same draw/sheathe/attack overlay
 (`js/combat.js`), which runs after `animate()` and only overrides the right
 arm/elbow/torso so locomotion blends underneath.
