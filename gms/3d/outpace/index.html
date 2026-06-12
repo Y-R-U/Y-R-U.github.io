@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Outpace</title>
   <link rel="preload" href="assets/cockpit-chroma.png" as="image">
+  <link rel="preload" href="assets/station-lounge-alpha.png" as="image">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -96,29 +97,13 @@
 
     <section id="station" class="overlay station-overlay hidden">
       <div class="station-room">
-        <div class="station-window">
-          <canvas id="station-window-canvas" aria-hidden="true"></canvas>
-          <div class="station-window-rim" aria-hidden="true"></div>
-          <div class="station-window-label">
-            <p class="kicker" id="station-kicker">trading dock</p>
-            <h2 id="station-title">Docked</h2>
-          </div>
+        <canvas id="station-window-canvas" aria-hidden="true"></canvas>
+        <img class="station-plate" src="assets/station-lounge-alpha.png" alt="" aria-hidden="true">
+        <div class="station-window-label">
+          <p class="kicker" id="station-kicker">trading dock</p>
+          <h2 id="station-title">Docked</h2>
         </div>
-        <div class="station-bunk" aria-hidden="true">
-          <span></span>
-          <i></i>
-        </div>
-        <div class="station-console">
-          <div class="station-heading">
-            <div>
-              <p class="kicker">dock terminal</p>
-              <h3 id="station-panel-title">Upgrade Terminal</h3>
-            </div>
-            <div class="credit-pill">
-              <span>Credits</span>
-              <strong id="station-credits">0</strong>
-            </div>
-          </div>
+        <div class="station-status-panel">
           <p class="station-message" id="station-message">Cargo transferred. Supplies loaded for the next run.</p>
           <div class="station-summary">
             <div>
@@ -132,6 +117,24 @@
             <div>
               <span>Next</span>
               <strong id="station-route">02</strong>
+            </div>
+          </div>
+        </div>
+        <button id="station-terminal-hotspot" class="station-terminal-hotspot" type="button" aria-label="Open dock terminal" aria-expanded="false">
+          <span aria-hidden="true"></span>
+        </button>
+        <div id="station-terminal-panel" class="station-console station-terminal-panel hidden" role="dialog" aria-label="Dock terminal">
+          <div class="station-heading">
+            <div>
+              <p class="kicker">dock terminal</p>
+              <h3 id="station-panel-title">Upgrade Terminal</h3>
+            </div>
+            <div class="station-heading-actions">
+              <div class="credit-pill">
+                <span>Credits</span>
+                <strong id="station-credits">0</strong>
+              </div>
+              <button id="station-close-terminal" class="station-close-terminal" type="button" aria-label="Close dock terminal">X</button>
             </div>
           </div>
           <div id="station-tabs" class="station-tabs" role="tablist" aria-label="Station terminal sections">
@@ -178,7 +181,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260611a').catch(markGameError);
+    import('./game.mjs?v=20260612a').catch(markGameError);
   </script>
 </body>
 </html>

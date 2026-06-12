@@ -12,6 +12,9 @@ const hudEl = document.getElementById('hud');
 const menuEl = document.getElementById('menu');
 const resultEl = document.getElementById('result');
 const stationEl = document.getElementById('station');
+const stationTerminalHotspot = document.getElementById('station-terminal-hotspot');
+const stationTerminalPanel = document.getElementById('station-terminal-panel');
+const stationCloseTerminal = document.getElementById('station-close-terminal');
 const reticleEl = document.getElementById('reticle');
 const fireButton = document.getElementById('fire-button');
 const startButton = document.getElementById('start-button');
@@ -58,7 +61,7 @@ let resultCountdownTimer = 0;
 
 const clock = new THREE.Clock();
 const params = new URLSearchParams(window.location.search);
-const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult');
+const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal');
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
@@ -290,6 +293,7 @@ const state = {
   demo: params.has('demo'),
   demoResult: params.has('demoResult'),
   demoDock: params.has('demoDock'),
+  demoTerminal: params.has('demoTerminal'),
   save: loadSave(),
   time: 0,
   score: 0,
@@ -301,6 +305,7 @@ const state = {
   lastStationRoute: 1,
   lastStationName: '',
   stationTab: 'upgrades',
+  stationTerminalOpen: false,
   upgradeCategory: 'flight',
   stationWindowTime: 0,
   stationTraffic: [],
@@ -1163,6 +1168,14 @@ function lockResultScreen(duration = RESULT_LOCK_MS) {
   resultUnlockTimeout = window.setTimeout(clearResultLock, duration);
 }
 
+function setStationTerminalOpen(open) {
+  state.stationTerminalOpen = open;
+  stationEl.classList.toggle('terminal-open', open);
+  stationTerminalPanel?.classList.toggle('hidden', !open);
+  stationTerminalHotspot?.setAttribute('aria-expanded', String(open));
+  if (open) renderStationPanel();
+}
+
 function renderUpgradeCategoryTabs() {
   if (!upgradeCategoryTabs) return;
   upgradeCategoryTabs.classList.remove('hidden');
@@ -1327,6 +1340,7 @@ function openStation(type = getStationType()) {
   state.lastStationRoute = completedRoute;
   state.lastStationName = getStationName(completedRoute, type);
   state.stationTab = 'upgrades';
+  state.stationTerminalOpen = state.demoTerminal;
   state.upgradeCategory = 'flight';
   const payout = getDeliveryPayout(completedRoute, type);
   state.currentPayout = payout;
@@ -1338,6 +1352,7 @@ function openStation(type = getStationType()) {
   resetStationTraffic();
   updateStationUi(payout, type);
   stationEl.classList.remove('hidden');
+  setStationTerminalOpen(state.demoTerminal);
   drawStationWindow(0);
   hudEl.classList.add('hidden');
   fireButton.classList.add('hidden');
@@ -1920,6 +1935,8 @@ function setupEvents() {
   startButton.addEventListener('click', resetGame);
   restartButton.addEventListener('click', resetGame);
   launchNextButton.addEventListener('click', launchNextRun);
+  stationTerminalHotspot?.addEventListener('click', () => setStationTerminalOpen(true));
+  stationCloseTerminal?.addEventListener('click', () => setStationTerminalOpen(false));
   stationTabs?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-station-tab]');
     if (button) setStationTab(button.dataset.stationTab);
