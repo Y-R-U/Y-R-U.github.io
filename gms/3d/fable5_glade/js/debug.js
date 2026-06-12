@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { registry, countTris } from './registry.js';
 import { groundHeight } from './world.js';
 
-const CATEGORY_ORDER = ['Characters', 'Animals', 'Buildings', 'Props', 'Pickups', 'Environment'];
+const CATEGORY_ORDER = ['Characters', 'Gear', 'Animals', 'Buildings', 'Props', 'Pickups', 'Environment'];
 
 export const debugFlags = { paused: false };
 

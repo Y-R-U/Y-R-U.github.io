@@ -16,15 +16,29 @@ Benched heroes exist only in the debug panel until you press **Play** on
 their row — that swaps the active rig. `?hero=maeve|2|garrick|3|wren|4`
 spawns as that hero directly.
 
-**Combat:** tap a chicken (invisible fat-finger hit proxy) → the hero draws
-the back-scabbard sword while walking in (routing through the pen gate),
-then loops an overhead slash inside `attackRange`. Each swing rolls
-1..`dmgMax` damage at the hit frame; chickens have `chickenHp` (40), show a
-health bar + red hit splats + feather bursts, flee between hits, tip over on
-death and respawn after `rand(chickenRespawnMin, chickenRespawnMax)`s (30–60s). Sword auto-sheathes 4s after
-combat ends. Both rigs share the same draw/sheathe/attack overlay
-(`js/combat.js`), which runs after `animate()` and only overrides the right
-arm/elbow/torso so locomotion blends underneath.
+**Combat:** three attack styles picked in the bottom HUD bar — ⚔️ sword
+(melee, `attackRange`), 🏹 bow (arrow projectile, `bowRange`), 🔮 staff
+(fireball projectile, `staffRange`). Tap a chicken (invisible fat-finger hit
+proxy) → the hero draws the current weapon off their back while closing to
+range (melee routes through the pen gate; ranged styles stop at distance and
+shoot over the fence). Each attack rolls 1..`dmgMax` damage — melee applies
+at the slash hit frame, ranged rides the projectile and applies on arrival
+(`fx.arrow` / `fx.fireball`). Chickens have `chickenHp` (40), show a health
+bar + red hit splats + feather bursts, flee between hits, tip over on death
+and respawn after `rand(chickenRespawnMin, chickenRespawnMax)`s (30–60s).
+Weapon auto-sheathes 4s after combat ends. All four rigs share the same
+draw/sheathe/attack overlay (`js/combat.js`), which runs after `animate()`
+and overrides arms/torso only, so locomotion blends underneath; the bow is
+held in the LEFT hand (`handAttachL`).
+
+**HUD:** top-left health/mana potion counters (red/blue tinted 🧪 chips),
+top-right 🎒 inventory popup (all pickup kinds + counts) and 🐞 debug,
+bottom-centre style picker. Carried weapons are flagged `userData.gear` so
+hero debug rows count the BODY only; the weapon rack by the house holds
+display copies registered under the Gear category with their own tri counts.
+
+This project is the demo/testing ground — if it ever becomes a real game,
+this directory is the copy-paste starting template.
 
 The point of this scene is to evaluate object quality, so the 🐞 debug button
 (top right) lists every registered object with live position, triangle count,
@@ -50,12 +64,16 @@ Wireframe / Colliders / Pause.
 - `js/heroes.js` — `makeKnight()` (Garrick) + `makeScout()` (Wren): mid-budget
   rigs sharing addArms/addLegs/addFace helpers with Maeve's joint spacing, so
   attachCombat's hand offset works unchanged on all capsule-limb heroes
-- `js/combat.js` — `makeHeroSword()`, `attachCombat(rig, opts)`: scabbard,
-  hand sword, swing trail, draw/sheathe/attack state machine
-- `js/fx.js` — hit splats, feather bursts, health bars
+- `js/combat.js` — `makeHeroSword()` / `makeBow()` / `makeStaff()`,
+  `attachCombat(rig, opts)`: back-carried + in-hand weapons per style, swing
+  trail, draw/sheathe + per-style attack state machine, `rig.setStyle()`,
+  `rig.muzzle()` (projectile spawn point from the weapon's `userData.tip`)
+- `js/fx.js` — hit splats, feather bursts, health bars, `arrow()` /
+  `fireball()` projectiles (glow sprites, trail puffs, impact burst)
 - `js/controls.js` — tap raycast (chicken proxies first, then ground), drag
   orbit, pinch/wheel zoom, WASD, camera follow + debug focus
-- `js/ui.js` — inventory chips, toasts (styled popups only, never `alert()`)
+- `js/ui.js` — potion chips, style picker, 🎒 inventory popup, toasts
+  (styled popups only, never `alert()`)
 - `js/debug.js` — the debug panel; entries may set `focusLabel` + `onFocus()`
   (used for the hero Play buttons), `object.userData.status` shows live in rows
 - `js/main.js` — boot, loop, circle collision (`collider: {r}` dynamic or

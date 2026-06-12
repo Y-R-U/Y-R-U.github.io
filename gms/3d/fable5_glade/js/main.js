@@ -9,7 +9,7 @@ import { buildWorld } from './world.js';
 import { buildProps } from './props.js';
 import { buildEntities } from './entities.js';
 import { createControls } from './controls.js';
-import { initUi, addPickup, inventoryCounts } from './ui.js';
+import { initUi, addPickup, inventoryCounts, setStyleActive } from './ui.js';
 import { initDebug, debugFlags } from './debug.js';
 import { initFx, tickFx } from './fx.js';
 
@@ -49,7 +49,7 @@ const player = ents.player;
 const HERO_ALIAS = { maeve: 'maeve', 2: 'maeve', garrick: 'garrick', 3: 'garrick', wren: 'wren', 4: 'wren' };
 if (HERO && HERO_ALIAS[HERO]) player.setHero(HERO_ALIAS[HERO]);
 
-initUi();
+initUi({ onStyle: (s) => player.setStyle(s) });
 
 // ── tap markers ──
 
@@ -146,6 +146,9 @@ function autoTick(dt) {
     player.setTarget(target);
     spawnMarker(target);
   } else if (roll < 0.75 && alive.length) {
+    const style = pick(['sword', 'bow', 'staff']);
+    player.setStyle(style);
+    setStyleActive(style);
     player.attackChicken(pick(alive));
   } else {
     const a = rand(0, Math.PI * 2), r = Math.sqrt(Math.random()) * (CFG.playRadius - 3);
@@ -209,8 +212,13 @@ window.__state = {
   get picked() { return { ...inventoryCounts }; },
   get pickupsLeft() { return livePickups().length; },
   get hero() { return player.rigName; },
+  get style() { return player.style; },
   get chickens() { return ents.chickens.map(c => `${c.hp}hp/${c.state}`); },
   get errors() { return window.__errors; },
 };
-window.__game = { player, chickens: ents.chickens, controls, setHero: (n) => player.setHero(n) };
+window.__game = {
+  player, chickens: ents.chickens, controls,
+  setHero: (n) => player.setHero(n),
+  setStyle: (s) => { player.setStyle(s); setStyleActive(s); },
+};
 window.__camera = camera;

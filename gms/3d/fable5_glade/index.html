@@ -15,13 +15,16 @@
   <!-- HUD -->
   <div id="hud">
     <div id="inventory"></div>
+    <button id="bag-btn" title="Inventory" aria-label="Inventory">&#127890;</button>
     <button id="debug-btn" title="Debug: scene objects" aria-label="Debug panel">&#128030;</button>
-    <div id="hint">Tap ground to move &middot; Drag to orbit &middot; Pinch / wheel to zoom</div>
+    <div id="style-bar"></div>
+    <div id="hint">Tap ground to move &middot; Tap a chicken to attack &middot; Drag to orbit</div>
     <div id="toasts"></div>
   </div>
 
-  <!-- Debug panel (filled by js/debug.js) -->
+  <!-- Popup panels (filled by js/debug.js / js/ui.js) -->
   <div id="debug-panel" class="hidden"></div>
+  <div id="inv-panel" class="hidden"></div>
 
   <script type="importmap">
   {

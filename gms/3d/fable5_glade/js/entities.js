@@ -97,25 +97,25 @@ function createPlayer(scene) {
     hair: 0x6a4a2a, pads: true,
   });
   attachCombat(roland, {
-    handAttach: roland.parts.rArm, handOffset: { x: 0, y: -0.5, z: 0.04 },
+    handAttach: roland.parts.rArm, handAttachL: roland.parts.lArm, handOffset: { x: 0, y: -0.5, z: 0.04 },
     backPos: { x: -0.12, y: 1.0, z: -0.19 }, backRot: 0.45,
   });
 
   const maeve = makeHeroine();
   attachCombat(maeve, {
-    handAttach: maeve.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    handAttach: maeve.parts.elbowR, handAttachL: maeve.parts.elbowL, handOffset: { x: 0, y: -0.22, z: 0.03 },
     backPos: { x: -0.08, y: 0.92, z: -0.15 }, backRot: 0.5, scale: 0.9,
   });
 
   const garrick = makeKnight();
   attachCombat(garrick, {
-    handAttach: garrick.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    handAttach: garrick.parts.elbowR, handAttachL: garrick.parts.elbowL, handOffset: { x: 0, y: -0.22, z: 0.03 },
     backPos: { x: -0.1, y: 0.96, z: -0.19 }, backRot: 0.45,
   });
 
   const wren = makeScout();
   attachCombat(wren, {
-    handAttach: wren.parts.elbowR, handOffset: { x: 0, y: -0.22, z: 0.03 },
+    handAttach: wren.parts.elbowR, handAttachL: wren.parts.elbowL, handOffset: { x: 0, y: -0.22, z: 0.03 },
     backPos: { x: -0.08, y: 0.93, z: -0.16 }, backRot: 0.5, scale: 0.88,
   });
 
@@ -127,6 +127,7 @@ function createPlayer(scene) {
   const player = {
     rigs: { roland, maeve, garrick, wren },
     rigName: 'roland',
+    style: 'sword',
     get rig() { return rig; },
     get group() { return rig.group; },
     pos,
@@ -145,6 +146,18 @@ function createPlayer(scene) {
       rig.draw(); // start unsheathing on the way in
     },
 
+    setStyle(s) {
+      if (!['sword', 'bow', 'staff'].includes(s) || s === this.style) return;
+      this.style = s;
+      rig.setStyle(s);          // forceSheathes as a side effect
+      if (this.attackTarget) rig.draw();
+    },
+
+    range() {
+      return this.style === 'sword' ? CFG.attackRange
+        : this.style === 'bow' ? CFG.bowRange : CFG.staffRange;
+    },
+
     setHero(name) {
       if (!this.rigs[name] || name === this.rigName) return rig.group;
       this.attackTarget = null;
@@ -153,6 +166,7 @@ function createPlayer(scene) {
       scene.remove(rig.group);
       rig = this.rigs[name];
       this.rigName = name;
+      rig.setStyle(this.style); // benched rigs may carry a stale style
       rig.group.position.copy(pos);
       rig.group.rotation.y = this.yaw;
       scene.add(rig.group);
@@ -176,7 +190,7 @@ function createPlayer(scene) {
             this.attackTarget = null;
           } else {
             const d = Math.hypot(ch.pos.x - pos.x, ch.pos.z - pos.z);
-            if (d > CFG.attackRange) {
+            if (d > this.range()) {
               // route through the pen gate — straight-line chase wedges into the fence
               const P = SITES.pen;
               const inPen = Math.abs(pos.x - P.x) < 2.45 && Math.abs(pos.z - P.z) < 2.45;
@@ -192,9 +206,19 @@ function createPlayer(scene) {
               const c = rig.combat;
               if (!c.armed && c.state === 'none') rig.draw();
               else if (c.armed && c.state === 'none' && this.attackCd <= 0) {
+                const style = this.style;
                 rig.attack(() => {
                   const dmg = 1 + Math.floor(Math.random() * CFG.dmgMax);
-                  ch.hit(dmg, pos);
+                  if (style === 'sword') {
+                    ch.hit(dmg, pos);
+                  } else {
+                    // projectile carries the damage — applies on arrival
+                    const target = ch.pos.clone().add(new THREE.Vector3(0, 0.4, 0));
+                    const launch = style === 'bow' ? fx.arrow : fx.fireball;
+                    launch(rig.muzzle(), target, () => {
+                      if (ch.hp > 0 && ch.state !== 'dying' && ch.state !== 'dead') ch.hit(dmg, pos);
+                    });
+                  }
                 });
                 this.attackCd = CFG.attackPeriod;
               }

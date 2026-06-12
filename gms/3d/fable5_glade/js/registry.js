@@ -21,15 +21,20 @@ export function register(entry) {
 export const liveColliders = () => registry.filter(e => e.collider && !e.dead);
 export const livePickups = () => registry.filter(e => e.pickup && !e.dead);
 
+// Skips userData.gear subtrees (carried weapons/scabbards), so hero rows
+// show the body budget — weapons are registered as their own Gear entries.
 export function countTris(object) {
   let n = 0;
-  object.traverse(o => {
+  const walk = (o) => {
+    if (o.userData.gear) return;
     if ((o.isMesh || o.isInstancedMesh) && o.geometry) {
       const g = o.geometry;
       let t = g.index ? g.index.count / 3 : g.attributes.position.count / 3;
       if (o.isInstancedMesh) t *= o.count;
       n += t;
     }
-  });
+    for (const ch of o.children) walk(ch);
+  };
+  walk(object);
   return Math.round(n);
 }

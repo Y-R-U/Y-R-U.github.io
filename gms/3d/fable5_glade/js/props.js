@@ -7,6 +7,7 @@ import { CFG, SITES, LITE } from './config.js';
 import { rand, pick, canvasTexture, M, mesh } from './utils.js';
 import { register } from './registry.js';
 import { groundHeight } from './world.js';
+import { makeHeroSword, makeBow, makeStaff } from './combat.js';
 
 const ticks = [];   // (t, dt) animation callbacks
 const TIMBER = 0x5b4530, WOOD = 0x7a5634, DARKWOOD = 0x6e4a26, STONE = 0x8e8a80, GOLD = 0xcaa34a;
@@ -337,11 +338,11 @@ function makeCoin() {
   return g;
 }
 
-function makePotion() {
+function makePotion(body = 0xc43b4a, glow = 0x701820) {
   const g = new THREE.Group();
   g.add(mesh(new THREE.SphereGeometry(0.16, 12, 10), new THREE.MeshStandardMaterial({
-    color: 0xc43b4a, roughness: 0.2, metalness: 0.1, transparent: true, opacity: 0.92,
-    emissive: 0x701820, emissiveIntensity: 0.4,
+    color: body, roughness: 0.2, metalness: 0.1, transparent: true, opacity: 0.92,
+    emissive: glow, emissiveIntensity: 0.4,
   }), 0, 0.18, 0));
   g.add(mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.12, 8), M(0xd8e8ea, { roughness: 0.2 }), 0, 0.36, 0));
   g.add(mesh(new THREE.CylinderGeometry(0.05, 0.055, 0.07, 8), M(0xb89a6a), 0, 0.45, 0));
@@ -497,6 +498,33 @@ export function buildProps(scene) {
   crate1.add(crate2);
   register({ name: 'Crates', category: 'Props', icon: '📦', object: crate1, collider: { r: 0.55 }, pickup: null, note: 'Stacked plank-texture boxes, corner trim' });
 
+  // weapon rack — display copies of the gear the heroes carry, so each
+  // weapon gets its own debug entry + tri count
+  const rack = new THREE.Group();
+  for (const x of [-0.55, 0.55]) {
+    rack.add(mesh(new THREE.BoxGeometry(0.09, 1.5, 0.09), M(WOOD), x, 0.75, 0));
+    rack.add(mesh(new THREE.BoxGeometry(0.09, 0.09, 0.5), M(WOOD), x, 0.045, 0));
+  }
+  rack.add(mesh(new THREE.BoxGeometry(1.3, 0.08, 0.08), M(WOOD), 0, 1.45, 0));
+  rack.add(mesh(new THREE.BoxGeometry(1.3, 0.06, 0.06), M(DARKWOOD), 0, 0.55, 0));
+  const dispSword = makeHeroSword();
+  dispSword.position.set(-0.38, 1.32, 0.07);
+  dispSword.rotation.z = Math.PI; // hangs point-down
+  rack.add(dispSword);
+  const dispBow = makeBow();
+  dispBow.position.set(0.08, 0.85, 0.07);
+  rack.add(dispBow);
+  const dispStaff = makeStaff();
+  dispStaff.position.set(0.46, 0.5, 0.12);
+  dispStaff.rotation.z = -0.16; dispStaff.rotation.x = -0.1;
+  rack.add(dispStaff);
+  const [rx, rz] = placeNearHouse(-2.2, 2.7);
+  place(scene, rack, rx, rz, houseRot + 0.4);
+  register({ name: 'Weapon Rack', category: 'Props', icon: '🪵', object: rack, collider: { r: 0.55 }, pickup: null, note: 'Display rack for the heroes’ gear' });
+  register({ name: 'Hero Sword', category: 'Gear', icon: '🗡️', object: dispSword, collider: null, pickup: null, note: 'Carried by all heroes (⚔️ style). Box blade + fuller, 4-side cone tip, gold guard' });
+  register({ name: 'Recurve Bow', category: 'Gear', icon: '🏹', object: dispBow, collider: null, pickup: null, note: 'Carried by all heroes (🏹 style). Torus-arc limbs, string, gold nocks' });
+  register({ name: 'Mage Staff', category: 'Gear', icon: '🪄', object: dispStaff, collider: null, pickup: null, note: 'Carried by all heroes (🔮 style). Emissive crystal orb in claw prongs' });
+
   // pickups
   scene.add(placePickup('Gold Coin 1', '🪙', 'coin', makeCoin, door.x + dir.x * 2.5, door.y + dir.y * 2.5, 0xffd34a, { note: 'Spinning edge-on cylinder' }));
   scene.add(placePickup('Gold Coin 2', '🪙', 'coin', makeCoin, door.x + dir.x * 4.2 + 0.6, door.y + dir.y * 4.2, 0xffd34a));
@@ -504,8 +532,11 @@ export function buildProps(scene) {
   scene.add(placePickup('Gold Coin 4', '🪙', 'coin', makeCoin, W.x + 2.2, W.z - 0.6, 0xffd34a));
   scene.add(placePickup('Gold Coin 5', '🪙', 'coin', makeCoin, F.x + 1.4, F.z + 1.2, 0xffd34a));
   scene.add(placePickup('Gold Coin 6', '🪙', 'coin', makeCoin, -2, -8, 0xffd34a));
-  scene.add(placePickup('Health Potion 1', '🧪', 'potion', makePotion, F.x - 1.3, F.z + 0.6, 0xff6a7a, { floatY: 0.12, note: 'Translucent flask, faint emissive' }));
-  scene.add(placePickup('Health Potion 2', '🧪', 'potion', makePotion, door.x - dir.y * 1.6, door.y + dir.x * 1.6, 0xff6a7a, { floatY: 0.12 }));
+  scene.add(placePickup('Health Potion 1', '🧪', 'hpot', makePotion, F.x - 1.3, F.z + 0.6, 0xff6a7a, { floatY: 0.12, note: 'Translucent flask, faint emissive' }));
+  scene.add(placePickup('Health Potion 2', '🧪', 'hpot', makePotion, door.x - dir.y * 1.6, door.y + dir.x * 1.6, 0xff6a7a, { floatY: 0.12 }));
+  const makeManaPotion = () => makePotion(0x3a7ac8, 0x182a70);
+  scene.add(placePickup('Mana Potion 1', '🧪', 'mpot', makeManaPotion, W.x - 1.7, W.z + 1.4, 0x6aa8ff, { floatY: 0.12, note: 'Same flask, blue brew' }));
+  scene.add(placePickup('Mana Potion 2', '🧪', 'mpot', makeManaPotion, P.x + 4.4, P.z + 4.2, 0x6aa8ff, { floatY: 0.12 }));
   scene.add(placePickup('Iron Sword', '🗡️', 'sword', makeSword, 13.2, 6.8, 0xbcd9ff, { floatY: 0.55, note: 'Diablo-style hovering loot by the boulders' }));
   scene.add(placePickup('Mushroom 1', '🍄', 'mushroom', makeMushroom, -13.6, 2.9, 0xffb46a, { float: false, spin: false, floatY: 0, note: 'Grounded — no float/spin' }));
   scene.add(placePickup('Mushroom 2', '🍄', 'mushroom', makeMushroom, -12.2, 1.6, 0xffb46a, { float: false, spin: false, floatY: 0 }));

@@ -1,7 +1,8 @@
-// Combat feedback: RuneScape-style hit splats, feather bursts, health bars.
+// Combat feedback: RuneScape-style hit splats, feather bursts, health bars,
+// and ranged projectiles (arrows, fireballs).
 
 import * as THREE from 'three';
-import { rand } from './utils.js';
+import { rand, M, mesh } from './utils.js';
 
 let scene = null;
 const actives = []; // { obj, tick(dt) -> alive }
@@ -83,6 +84,137 @@ export function feathers(pos, tint) {
       dispose() { m.material.dispose(); },
     });
   }
+}
+
+// ── projectiles ──
+
+let glowTex = null;
+function getGlowTex() {
+  if (glowTex) return glowTex;
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 2, 32, 32, 30);
+  grad.addColorStop(0, 'rgba(255,220,150,1)');
+  grad.addColorStop(0.4, 'rgba(255,160,60,0.55)');
+  grad.addColorStop(1, 'rgba(255,120,30,0)');
+  g.fillStyle = grad; g.fillRect(0, 0, 64, 64);
+  glowTex = new THREE.CanvasTexture(c);
+  glowTex.colorSpace = THREE.SRGBColorSpace;
+  return glowTex;
+}
+
+function glowSprite(scl, opacity = 1) {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: getGlowTex(), transparent: true, opacity,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  sp.scale.set(scl, scl, 1);
+  return sp;
+}
+
+// Flies from→to along a slight arc, then calls onArrive.
+export function arrow(from, to, onArrive) {
+  const g = new THREE.Group();
+  const shaft = mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.5, 4).rotateX(Math.PI / 2), M(0x8a6340), 0, 0, 0, false);
+  g.add(shaft);
+  g.add(mesh(new THREE.ConeGeometry(0.024, 0.09, 4).rotateX(Math.PI / 2), M(0x9aa6b8, { metalness: 0.5, roughness: 0.4 }), 0, 0, 0.28, false));
+  for (const rot of [0, Math.PI / 2]) {
+    const f = mesh(new THREE.PlaneGeometry(0.05, 0.09), M(0xe8e2d0, { side: THREE.DoubleSide }), 0, 0, -0.22, false);
+    f.rotation.z = rot;
+    g.add(f);
+  }
+  g.position.copy(from);
+  scene.add(g);
+  const dist = from.distanceTo(to);
+  const arcH = Math.min(0.45, dist * 0.05);
+  const speed = 15;
+  let s = 0;
+  const cur = new THREE.Vector3(), next = new THREE.Vector3();
+  const at = (u, out) => {
+    out.lerpVectors(from, to, u);
+    out.y += 4 * arcH * u * (1 - u);
+    return out;
+  };
+  actives.push({
+    obj: g,
+    tick(dt) {
+      s += (speed * dt) / Math.max(dist, 0.001);
+      if (s >= 1) { onArrive?.(); return false; }
+      at(s, cur);
+      at(Math.min(s + 0.04, 1), next);
+      g.position.copy(cur);
+      g.lookAt(next);
+      return true;
+    },
+  });
+}
+
+// Glowing orb with a fading trail; small flash burst on arrival.
+export function fireball(from, to, onArrive) {
+  const g = new THREE.Group();
+  const core = mesh(new THREE.SphereGeometry(0.085, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe08a }), 0, 0, 0, false);
+  core.material.userData.noWire = true;
+  g.add(core);
+  g.add(glowSprite(0.55, 0.9));
+  g.position.copy(from);
+  scene.add(g);
+  const dist = from.distanceTo(to);
+  const speed = 9;
+  let s = 0, trailT = 0;
+  actives.push({
+    obj: g,
+    tick(dt) {
+      s += (speed * dt) / Math.max(dist, 0.001);
+      if (s >= 1) {
+        burst(to);
+        onArrive?.();
+        return false;
+      }
+      g.position.lerpVectors(from, to, s);
+      g.position.y += Math.sin(s * 18) * 0.03; // flicker wobble
+      core.scale.setScalar(1 + Math.sin(s * 40) * 0.15);
+      trailT += dt;
+      if (trailT > 0.05) { trailT = 0; puff(g.position); }
+      return true;
+    },
+  });
+}
+
+function puff(pos) {
+  const sp = glowSprite(0.3, 0.5);
+  sp.position.copy(pos);
+  scene.add(sp);
+  let age = 0;
+  actives.push({
+    obj: sp,
+    tick(dt) {
+      age += dt;
+      const k = age / 0.3;
+      sp.scale.setScalar(0.3 * (1 - k * 0.6));
+      sp.material.opacity = 0.5 * (1 - k);
+      return k < 1;
+    },
+    dispose() { sp.material.dispose(); },
+  });
+}
+
+function burst(pos) {
+  const sp = glowSprite(0.3, 1);
+  sp.position.copy(pos);
+  scene.add(sp);
+  let age = 0;
+  actives.push({
+    obj: sp,
+    tick(dt) {
+      age += dt;
+      const k = age / 0.28;
+      sp.scale.setScalar(0.3 + k * 1.3);
+      sp.material.opacity = 1 - k;
+      return k < 1;
+    },
+    dispose() { sp.material.dispose(); },
+  });
 }
 
 // ── floating health bar (attached to a parent, redrawn on hit) ──
