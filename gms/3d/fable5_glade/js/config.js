@@ -18,7 +18,7 @@ export const CFG = {
   chickenHp: 40,
   dmgMax: 10,          // each attack rolls 1..dmgMax
   attackRange: 1.25,   // melee (sword)
-  bowRange: 7,
+  crossbowRange: 7,
   staffRange: 6,
   attackPeriod: 0.9,   // seconds between attacks
   chickenRespawnMin: 30,  // dead chickens come back after rand(min, max) seconds

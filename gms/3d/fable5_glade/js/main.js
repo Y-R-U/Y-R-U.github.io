@@ -146,7 +146,7 @@ function autoTick(dt) {
     player.setTarget(target);
     spawnMarker(target);
   } else if (roll < 0.75 && alive.length) {
-    const style = pick(['sword', 'bow', 'staff']);
+    const style = pick(['sword', 'crossbow', 'staff']);
     player.setStyle(style);
     setStyleActive(style);
     player.attackChicken(pick(alive));

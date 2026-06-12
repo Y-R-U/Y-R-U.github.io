@@ -113,22 +113,22 @@ function glowSprite(scl, opacity = 1) {
   return sp;
 }
 
-// Flies from→to along a slight arc, then calls onArrive.
-export function arrow(from, to, onArrive) {
+// Dart projectile (arrow / crossbow bolt): flies from→to along a slight
+// arc, then calls onArrive.
+function launchDart(from, to, onArrive, { len, speed, arcK }) {
   const g = new THREE.Group();
-  const shaft = mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.5, 4).rotateX(Math.PI / 2), M(0x8a6340), 0, 0, 0, false);
+  const shaft = mesh(new THREE.CylinderGeometry(0.011, 0.011, len, 4).rotateX(Math.PI / 2), M(0x8a6340), 0, 0, 0, false);
   g.add(shaft);
-  g.add(mesh(new THREE.ConeGeometry(0.024, 0.09, 4).rotateX(Math.PI / 2), M(0x9aa6b8, { metalness: 0.5, roughness: 0.4 }), 0, 0, 0.28, false));
+  g.add(mesh(new THREE.ConeGeometry(0.024, 0.08, 4).rotateX(Math.PI / 2), M(0x9aa6b8, { metalness: 0.5, roughness: 0.4 }), 0, 0, len * 0.56, false));
   for (const rot of [0, Math.PI / 2]) {
-    const f = mesh(new THREE.PlaneGeometry(0.05, 0.09), M(0xe8e2d0, { side: THREE.DoubleSide }), 0, 0, -0.22, false);
+    const f = mesh(new THREE.PlaneGeometry(0.05, 0.08), M(0xe8e2d0, { side: THREE.DoubleSide }), 0, 0, -len * 0.44, false);
     f.rotation.z = rot;
     g.add(f);
   }
   g.position.copy(from);
   scene.add(g);
   const dist = from.distanceTo(to);
-  const arcH = Math.min(0.45, dist * 0.05);
-  const speed = 15;
+  const arcH = Math.min(0.45, dist * arcK);
   let s = 0;
   const cur = new THREE.Vector3(), next = new THREE.Vector3();
   const at = (u, out) => {
@@ -149,6 +149,10 @@ export function arrow(from, to, onArrive) {
     },
   });
 }
+
+export const arrow = (from, to, onArrive) => launchDart(from, to, onArrive, { len: 0.5, speed: 15, arcK: 0.05 });
+// crossbow bolt: stubbier, faster, near-flat trajectory
+export const bolt = (from, to, onArrive) => launchDart(from, to, onArrive, { len: 0.32, speed: 19, arcK: 0.012 });
 
 // Glowing orb with a fading trail; small flash burst on arrival.
 export function fireball(from, to, onArrive) {

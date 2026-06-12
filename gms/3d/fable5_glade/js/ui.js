@@ -8,13 +8,14 @@ const KINDS = {
   mpot:     { icon: '🧪', label: 'Mana Potion',   freq: 720, cls: 'mp' },
   coin:     { icon: '🪙', label: 'Gold',          freq: 990 },
   sword:    { icon: '🗡️', label: 'Sword',         freq: 520 },
+  bow:      { icon: '🏹', label: 'Bow',           freq: 560 },
   mushroom: { icon: '🍄', label: 'Mushroom',      freq: 780 },
 };
 
 const STYLES = [
-  { id: 'sword', icon: '⚔️', label: 'Melee' },
-  { id: 'bow',   icon: '🏹', label: 'Archer' },
-  { id: 'staff', icon: '🔮', label: 'Mage' },
+  { id: 'sword',    icon: '⚔️', label: 'Melee' },
+  { id: 'crossbow', icon: '🏹', label: 'Crossbow' },
+  { id: 'staff',    icon: '🔮', label: 'Mage' },
 ];
 
 const counts = {};
@@ -62,7 +63,7 @@ export function initUi({ onStyle } = {}) {
       <button class="dbg-close" aria-label="Close">✕</button>
     </div>
     <div class="inv-grid"></div>
-    <div class="inv-note">⚔️ melee · 🏹 arrows · 🔮 fireballs — pick a style below, then tap a chicken.</div>`;
+    <div class="inv-note">⚔️ melee · 🏹 bolts · 🔮 fireballs — pick a style below, then tap a chicken.</div>`;
   invGrid = panel.querySelector('.inv-grid');
   renderInv();
   panel.querySelector('.dbg-close').addEventListener('click', () => panel.classList.add('hidden'));

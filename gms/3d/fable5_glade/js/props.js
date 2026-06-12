@@ -7,7 +7,7 @@ import { CFG, SITES, LITE } from './config.js';
 import { rand, pick, canvasTexture, M, mesh } from './utils.js';
 import { register } from './registry.js';
 import { groundHeight } from './world.js';
-import { makeHeroSword, makeBow, makeStaff } from './combat.js';
+import { makeHeroSword, makeBow, makeCrossbow, makeStaff } from './combat.js';
 
 const ticks = [];   // (t, dt) animation callbacks
 const TIMBER = 0x5b4530, WOOD = 0x7a5634, DARKWOOD = 0x6e4a26, STONE = 0x8e8a80, GOLD = 0xcaa34a;
@@ -511,9 +511,9 @@ export function buildProps(scene) {
   dispSword.position.set(-0.38, 1.32, 0.07);
   dispSword.rotation.z = Math.PI; // hangs point-down
   rack.add(dispSword);
-  const dispBow = makeBow();
-  dispBow.position.set(0.08, 0.85, 0.07);
-  rack.add(dispBow);
+  const dispXbow = makeCrossbow();
+  dispXbow.position.set(0.08, 0.78, 0.09);
+  rack.add(dispXbow);
   const dispStaff = makeStaff();
   dispStaff.position.set(0.46, 0.5, 0.12);
   dispStaff.rotation.z = -0.16; dispStaff.rotation.x = -0.1;
@@ -522,7 +522,7 @@ export function buildProps(scene) {
   place(scene, rack, rx, rz, houseRot + 0.4);
   register({ name: 'Weapon Rack', category: 'Props', icon: '🪵', object: rack, collider: { r: 0.55 }, pickup: null, note: 'Display rack for the heroes’ gear' });
   register({ name: 'Hero Sword', category: 'Gear', icon: '🗡️', object: dispSword, collider: null, pickup: null, note: 'Carried by all heroes (⚔️ style). Box blade + fuller, 4-side cone tip, gold guard' });
-  register({ name: 'Recurve Bow', category: 'Gear', icon: '🏹', object: dispBow, collider: null, pickup: null, note: 'Carried by all heroes (🏹 style). Torus-arc limbs, string, gold nocks' });
+  register({ name: 'Crossbow', category: 'Gear', icon: '🏹', object: dispXbow, collider: null, pickup: null, note: 'Carried by all heroes (🏹 style). Swept limbs, cocked string, loaded bolt' });
   register({ name: 'Mage Staff', category: 'Gear', icon: '🪄', object: dispStaff, collider: null, pickup: null, note: 'Carried by all heroes (🔮 style). Emissive crystal orb in claw prongs' });
 
   // pickups
@@ -538,6 +538,7 @@ export function buildProps(scene) {
   scene.add(placePickup('Mana Potion 1', '🧪', 'mpot', makeManaPotion, W.x - 1.7, W.z + 1.4, 0x6aa8ff, { floatY: 0.12, note: 'Same flask, blue brew' }));
   scene.add(placePickup('Mana Potion 2', '🧪', 'mpot', makeManaPotion, P.x + 4.4, P.z + 4.2, 0x6aa8ff, { floatY: 0.12 }));
   scene.add(placePickup('Iron Sword', '🗡️', 'sword', makeSword, 13.2, 6.8, 0xbcd9ff, { floatY: 0.55, note: 'Diablo-style hovering loot by the boulders' }));
+  scene.add(placePickup('Recurve Bow', '🏹', 'bow', makeBow, -7.2, 11.5, 0xc8e89a, { floatY: 0.55, note: 'Decorative loot — the demo heroes shoot crossbows instead' }));
   scene.add(placePickup('Mushroom 1', '🍄', 'mushroom', makeMushroom, -13.6, 2.9, 0xffb46a, { float: false, spin: false, floatY: 0, note: 'Grounded — no float/spin' }));
   scene.add(placePickup('Mushroom 2', '🍄', 'mushroom', makeMushroom, -12.2, 1.6, 0xffb46a, { float: false, spin: false, floatY: 0 }));
   scene.add(placePickup('Mushroom 3', '🍄', 'mushroom', makeMushroom, 0.8, -13.4, 0xffb46a, { float: false, spin: false, floatY: 0 }));

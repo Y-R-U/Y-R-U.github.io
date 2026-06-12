@@ -147,7 +147,7 @@ function createPlayer(scene) {
     },
 
     setStyle(s) {
-      if (!['sword', 'bow', 'staff'].includes(s) || s === this.style) return;
+      if (!['sword', 'crossbow', 'staff'].includes(s) || s === this.style) return;
       this.style = s;
       rig.setStyle(s);          // forceSheathes as a side effect
       if (this.attackTarget) rig.draw();
@@ -155,7 +155,7 @@ function createPlayer(scene) {
 
     range() {
       return this.style === 'sword' ? CFG.attackRange
-        : this.style === 'bow' ? CFG.bowRange : CFG.staffRange;
+        : this.style === 'crossbow' ? CFG.crossbowRange : CFG.staffRange;
     },
 
     setHero(name) {
@@ -214,7 +214,7 @@ function createPlayer(scene) {
                   } else {
                     // projectile carries the damage — applies on arrival
                     const target = ch.pos.clone().add(new THREE.Vector3(0, 0.4, 0));
-                    const launch = style === 'bow' ? fx.arrow : fx.fireball;
+                    const launch = style === 'crossbow' ? fx.bolt : fx.fireball;
                     launch(rig.muzzle(), target, () => {
                       if (ch.hp > 0 && ch.state !== 'dying' && ch.state !== 'dead') ch.hit(dmg, pos);
                     });

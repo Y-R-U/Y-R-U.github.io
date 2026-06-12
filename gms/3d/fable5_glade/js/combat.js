@@ -2,8 +2,10 @@
 // a rig back-carried weapons (scabbard / bow / staff), in-hand versions, a
 // swing trail, and per-style draw / sheathe / attack overlays that run AFTER
 // rig.animate() each frame (they override arms / torso, so locomotion keeps
-// working underneath). Styles: 'sword' (melee), 'bow' (arrow), 'staff'
+// working underneath). Styles: 'sword' (melee), 'crossbow' (bolt), 'staff'
 // (fireball) — ranged styles fire their projectile from rig.muzzle().
+// makeBow() is kept only as a decorative pickup — its draw animation never
+// looked right (string/limb layering), hence the point-and-shoot crossbow.
 
 import * as THREE from 'three';
 import { M, mesh } from './utils.js';
@@ -38,6 +40,41 @@ export function makeBow() {
   for (const sy of [-1, 1]) g.add(mesh(new THREE.SphereGeometry(0.018, 5, 4), M(GOLD, { metalness: 0.6, roughness: 0.4 }), tipX, sy * tipY, 0, false));
   const tip = new THREE.Object3D();
   tip.position.set(-0.1, 0, 0);
+  g.add(tip);
+  g.userData.tip = tip;
+  return g;
+}
+
+// Crossbow: origin at the grip, stock/muzzle up +y, bolt groove on local -z
+// (which faces up once the hand rotation is applied). String sits cocked at
+// the latch. Point-and-shoot — no draw pose needed, unlike the recurve bow.
+export function makeCrossbow() {
+  const g = new THREE.Group();
+  const wood = M(0x5a4026, { roughness: 0.75 });
+  const steel = M(0x9aa6b8, { metalness: 0.5, roughness: 0.4 });
+  g.add(mesh(new THREE.BoxGeometry(0.045, 0.56, 0.06), wood, 0, 0.12, 0));        // stock
+  const grip = mesh(new THREE.BoxGeometry(0.04, 0.13, 0.05), wood, 0, -0.06, 0.04);
+  grip.rotation.x = 0.45;
+  g.add(grip);
+  for (const side of [-1, 1]) {                                                    // swept-back limbs
+    const limb = mesh(new THREE.BoxGeometry(0.22, 0.018, 0.034), wood, side * 0.115, 0.36, -0.01);
+    limb.rotation.z = -side * 0.28;
+    g.add(limb);
+    g.add(mesh(new THREE.SphereGeometry(0.016, 5, 4), steel, side * 0.215, 0.33, -0.01, false));
+    // cocked string: limb tip → latch
+    const str = mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.26, 4, 1, true),
+      M(0xe8e2d0, { roughness: 0.5 }), side * 0.107, 0.26, -0.018);
+    str.rotation.z = -side * 0.99;
+    g.add(str);
+  }
+  g.add(mesh(new THREE.BoxGeometry(0.05, 0.045, 0.04), steel, 0, 0.185, -0.015)); // latch
+  g.add(mesh(new THREE.BoxGeometry(0.016, 0.05, 0.03), steel, 0, 0.03, 0.04));    // trigger
+  // loaded bolt in the groove
+  g.add(mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.3, 4), M(0x8a6340), 0, 0.31, -0.038, false));
+  const head = mesh(new THREE.ConeGeometry(0.018, 0.06, 4), steel, 0, 0.49, -0.038, false);
+  g.add(head);
+  const tip = new THREE.Object3D();
+  tip.position.set(0, 0.5, -0.035);
   g.add(tip);
   g.userData.tip = tip;
   return g;
@@ -80,9 +117,8 @@ function makeBackScabbard() {
   return { group, hilt };
 }
 
-// opts: handAttach (right-hand Object3D weapons parent to), handAttachL
-//       (left, for the bow), handOffset {x,y,z}, backPos {x,y,z},
-//       backRot (z-lean), scale
+// opts: handAttach (right-hand Object3D weapons parent to),
+//       handOffset {x,y,z}, backPos {x,y,z}, backRot (z-lean), scale
 export function attachCombat(rig, opts) {
   const scale = opts.scale ?? 1;
 
@@ -106,9 +142,8 @@ export function attachCombat(rig, opts) {
   const back = makeBackScabbard();
   placeBack(back.group, opts.backRot);
   rig.backHilt = back.hilt;
-  const bowBack = makeBow();
-  bowBack.rotation.y = Math.PI / 2; // flat against the back
-  placeBack(bowBack, opts.backRot + 0.35);
+  const xbowBack = makeCrossbow();
+  placeBack(xbowBack, opts.backRot + 0.35);
   const staffBack = makeStaff();
   placeBack(staffBack, -opts.backRot);
 
@@ -117,9 +152,9 @@ export function attachCombat(rig, opts) {
   rig.handSword = handSword;
   const handStaff = makeStaff();
   placeHand(handStaff, opts.handAttach);
-  const handBow = makeBow();
-  placeHand(handBow, opts.handAttachL || opts.handAttach);
-  const handItems = { sword: handSword, bow: handBow, staff: handStaff };
+  const handXbow = makeCrossbow();
+  placeHand(handXbow, opts.handAttach);
+  const handItems = { sword: handSword, crossbow: handXbow, staff: handStaff };
 
   const trailMat = new THREE.MeshBasicMaterial({
     color: 0xffe6a0, transparent: true, opacity: 0, side: THREE.DoubleSide,
@@ -145,13 +180,13 @@ export function attachCombat(rig, opts) {
   function applyVis(armed) {
     back.group.visible = c.style === 'sword';
     back.hilt.visible = c.style === 'sword' && !armed;
-    bowBack.visible = c.style === 'bow' && !armed;
+    xbowBack.visible = c.style === 'crossbow' && !armed;
     staffBack.visible = c.style === 'staff' && !armed;
     for (const [s, item] of Object.entries(handItems)) item.visible = c.style === s && armed;
   }
   applyVis(false);
 
-  const ATTACK_DUR = { sword: 0.55, bow: 0.85, staff: 0.7 };
+  const ATTACK_DUR = { sword: 0.55, crossbow: 0.6, staff: 0.7 };
 
   rig.draw = () => { if (c.state === 'none' && !c.armed) { c.state = 'draw'; c.t = 0; c.dur = 0.4; c.swapped = false; } };
   rig.sheathe = () => { if (c.state === 'none' && c.armed) { c.state = 'sheathe'; c.t = 0; c.dur = 0.4; c.swapped = false; } };
@@ -198,10 +233,10 @@ export function attachCombat(rig, opts) {
           A.rotation.x = -0.4 + bob * 0.5;
           A.rotation.z = -0.15;
           if (E) E.rotation.x = -0.85;
-        } else {                          // bow carried in the left hand
-          L.rotation.x = -0.45 + bob * 0.5;
-          L.rotation.z = 0.15;
-          if (EL) EL.rotation.x = -0.5;
+        } else {                          // crossbow carried low, muzzle forward
+          A.rotation.x = -0.55 + bob * 0.5;
+          A.rotation.z = -0.18;
+          if (E) E.rotation.x = -0.35;
         }
       }
     } else {
@@ -274,29 +309,26 @@ export function attachCombat(rig, opts) {
           if (E) E.rotation.x = -0.35 - 0.5 * p;
         }
         if (k >= 1) c.state = 'none';
-      } else if (c.state === 'attack' && c.style === 'bow') {
-        twist = 0.45 * S(Math.min(k / 0.25, (1 - k) / 0.2)); // side-on stance
-        if (k < 0.4) {             // raise bow, right hand finds the string
+      } else if (c.state === 'attack' && c.style === 'crossbow') {
+        const AIM = -1.5; // arm level, gun-style
+        if (k < 0.4) {             // raise to aim
           const p = S(k / 0.4);
-          L.rotation.x = -0.45 + (-1.5 + 0.45) * p;
-          L.rotation.z = 0.15 * (1 - p);
-          if (EL) EL.rotation.x = -0.5 + 0.35 * p;
-          A.rotation.x = -1.1 * p;
-          A.rotation.z = 0.2 * p;
-          if (E) E.rotation.x = -0.5 * p;
-        } else if (k < 0.6) {      // pull to the cheek
-          const p = S((k - 0.4) / 0.2);
-          L.rotation.x = -1.5;
-          A.rotation.x = -1.1 + 0.15 * p;
-          if (E) E.rotation.x = -0.5 - 1.0 * p;
-        } else {                   // release — arrow flies, arms ease down
-          if (!c.hitDone) { c.hitDone = true; c.onHit?.(); }
-          const p = S((k - 0.6) / 0.4);
-          L.rotation.x = -1.5 + (-0.45 + 1.5) * p;
-          if (EL) EL.rotation.x = -0.15 - 0.35 * p;
-          A.rotation.x = -1.25 * (1 - p);
-          A.rotation.z = 0.2 * (1 - p);
-          if (E) E.rotation.x = -0.4 * (1 - p);
+          A.rotation.x = -0.55 + (AIM + 0.55) * p;
+          A.rotation.z = -0.18 * (1 - p);
+          twist = 0.2 * p;
+          if (E) E.rotation.x = -0.35 * (1 - p) - 0.05 * p;
+        } else if (k < 0.62) {     // fire + recoil kick
+          const p = (k - 0.4) / 0.22;
+          if (!c.hitDone && p > 0.25) { c.hitDone = true; c.onHit?.(); }
+          A.rotation.x = AIM + Math.sin(Math.min(Math.max(p - 0.25, 0) / 0.75, 1) * Math.PI) * 0.22;
+          twist = 0.2;
+          if (E) E.rotation.x = -0.05;
+        } else {                   // lower back to the carry pose
+          const p = S((k - 0.62) / 0.38);
+          A.rotation.x = AIM + (-0.55 - AIM) * p;
+          A.rotation.z = -0.18 * p;
+          twist = 0.2 * (1 - p);
+          if (E) E.rotation.x = -0.05 - 0.3 * p;
         }
         if (k >= 1) c.state = 'none';
       }

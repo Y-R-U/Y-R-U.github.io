@@ -17,19 +17,22 @@ their row — that swaps the active rig. `?hero=maeve|2|garrick|3|wren|4`
 spawns as that hero directly.
 
 **Combat:** three attack styles picked in the bottom HUD bar — ⚔️ sword
-(melee, `attackRange`), 🏹 bow (arrow projectile, `bowRange`), 🔮 staff
-(fireball projectile, `staffRange`). Tap a chicken (invisible fat-finger hit
-proxy) → the hero draws the current weapon off their back while closing to
-range (melee routes through the pen gate; ranged styles stop at distance and
-shoot over the fence). Each attack rolls 1..`dmgMax` damage — melee applies
-at the slash hit frame, ranged rides the projectile and applies on arrival
-(`fx.arrow` / `fx.fireball`). Chickens have `chickenHp` (40), show a health
-bar + red hit splats + feather bursts, flee between hits, tip over on death
-and respawn after `rand(chickenRespawnMin, chickenRespawnMax)`s (30–60s).
-Weapon auto-sheathes 4s after combat ends. All four rigs share the same
-draw/sheathe/attack overlay (`js/combat.js`), which runs after `animate()`
-and overrides arms/torso only, so locomotion blends underneath; the bow is
-held in the LEFT hand (`handAttachL`).
+(melee, `attackRange`), 🏹 crossbow (bolt projectile, `crossbowRange`),
+🔮 staff (fireball projectile, `staffRange`). Tap a chicken (invisible
+fat-finger hit proxy) → the hero draws the current weapon off their back
+while closing to range (melee routes through the pen gate; ranged styles
+stop at distance and shoot over the fence). Each attack rolls 1..`dmgMax`
+damage — melee applies at the slash hit frame, ranged rides the projectile
+and applies on arrival (`fx.bolt` / `fx.fireball`). Chickens have
+`chickenHp` (40), show a health bar + red hit splats + feather bursts, flee
+between hits, tip over on death and respawn after
+`rand(chickenRespawnMin, chickenRespawnMax)`s (30–60s). Weapon auto-sheathes
+4s after combat ends. All four rigs share the same draw/sheathe/attack
+overlay (`js/combat.js`), which runs after `animate()` and overrides
+arms/torso only, so locomotion blends underneath. The crossbow is
+point-and-shoot (aim → fire → recoil) — the recurve bow was dropped as a
+usable weapon because its string/limb layering never animated right; it
+survives as decorative ground loot.
 
 **HUD:** top-left health/mana potion counters (red/blue tinted 🧪 chips),
 top-right 🎒 inventory popup (all pickup kinds + counts) and 🐞 debug,
@@ -64,11 +67,12 @@ Wireframe / Colliders / Pause.
 - `js/heroes.js` — `makeKnight()` (Garrick) + `makeScout()` (Wren): mid-budget
   rigs sharing addArms/addLegs/addFace helpers with Maeve's joint spacing, so
   attachCombat's hand offset works unchanged on all capsule-limb heroes
-- `js/combat.js` — `makeHeroSword()` / `makeBow()` / `makeStaff()`,
-  `attachCombat(rig, opts)`: back-carried + in-hand weapons per style, swing
-  trail, draw/sheathe + per-style attack state machine, `rig.setStyle()`,
-  `rig.muzzle()` (projectile spawn point from the weapon's `userData.tip`)
-- `js/fx.js` — hit splats, feather bursts, health bars, `arrow()` /
+- `js/combat.js` — `makeHeroSword()` / `makeCrossbow()` / `makeStaff()`
+  (+ `makeBow()`, decorative only), `attachCombat(rig, opts)`: back-carried +
+  in-hand weapons per style, swing trail, draw/sheathe + per-style attack
+  state machine, `rig.setStyle()`, `rig.muzzle()` (projectile spawn point
+  from the weapon's `userData.tip`)
+- `js/fx.js` — hit splats, feather bursts, health bars, `bolt()` / `arrow()` /
   `fireball()` projectiles (glow sprites, trail puffs, impact burst)
 - `js/controls.js` — tap raycast (chicken proxies first, then ground), drag
   orbit, pinch/wheel zoom, WASD, camera follow + debug focus
