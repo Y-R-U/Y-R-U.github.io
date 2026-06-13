@@ -3,18 +3,40 @@
 Mobile-first Diablo/RuneScape-style test scene: a circular grass meadow with
 a tap-to-move hero, villager NPC, attackable chickens, thatched cottage,
 campfire, collidable props, and floating pickups. Three.js 0.160 via CDN
-importmap, no build step, **no external assets** — every model is built from
-three.js primitives in code and every texture is a procedural `<canvas>`.
+importmap, no build step. The scene is built **from three.js primitives in
+code** with procedural `<canvas>` textures — that constraint is the point of
+the test. Two deliberate exceptions let us compare against real assets: `?pp=1`
+drops a couple of imported PolyPerfect GLBs into the scene (`js/external.js`),
+and Hero 5 "Cass" is an imported, rigged PolyPerfect character
+(`js/imported.js`, see below).
 
-Four heroes share one player controller: **Roland** (blocky boxes, ~0.6k
+Five heroes share one player controller: **Roland** (blocky boxes, ~0.6k
 tris, default), **Maeve** (rounded showcase: sphere head + sculpted face,
-lathe torso, capsule limbs with elbows, swaying ponytail, ~6k), and two
+lathe torso, capsule limbs with elbows, swaying ponytail, ~6k), two
 mid-budget rigs (~2.4k each incl. sword): **Garrick** the knight (lathe
 cuirass, open-faced helm with crimson crest) and **Wren** the hooded scout
-(moss hood with face window + feather pin, shoulder braid, mantle cape).
-Benched heroes exist only in the debug panel until you press **Play** on
-their row — that swaps the active rig. `?hero=maeve|2|garrick|3|wren|4`
-spawns as that hero directly.
+(moss hood with face window + feather pin, shoulder braid, mantle cape), and
+**Cass** — an *imported* PolyPerfect `man_casual`, a real glTF **SkinnedMesh**
+(exported from Unity with its 80-bone skeleton via glTFast, ~1.1k tris) whose
+actual bones are driven procedurally. Benched heroes exist only in the debug
+panel until you press **Play** on their row — that swaps the active rig.
+`?hero=maeve|2|garrick|3|wren|4|man` spawns as that hero directly (Cass loads
+async, so `?hero=man` switches as soon as the GLB arrives).
+
+**Cass / the imported-rig pipeline** (`js/imported.js`): the man is one rigid
+SkinnedMesh whose 80 bones are in arbitrary FBX local frames (a T-pose).
+Rather than poke `bone.rotation`, each controlled bone (hips, knees, shoulders,
+elbows, head) is driven with a rotation in clean **body space** (x=right,
+y=up, z=forward). We capture each bone's rest orientation *relative to the hero
+group*; the group's world rotation then cancels out, so the same body-space
+rotation works at any yaw: `bone.local = parentRestRelGroup⁻¹ · W ·
+boneRestRelGroup`. T-pose arms come down via a body-z rotation; the walk swings
+hips/arms about body-x; weapons parent to a node under `Wrist_R` and to the
+group's back. It re-implements the rig contract + combat interface the player
+expects, reusing the `combat.js` weapon builders and `fx.js` projectiles, so it
+drops into the roster unchanged. The GLB came from
+`Airon.SkinnedExport.ExportPrefab` in the Unity AssetDL project — see
+`~/cc/assets/POLYPERFECT_ASSET_HOWTO.md` for the export pipeline.
 
 **Combat:** three attack styles picked in the bottom HUD bar — ⚔️ sword
 (melee, `attackRange`), 🏹 crossbow (bolt projectile, `crossbowRange`),
@@ -68,6 +90,15 @@ Wireframe / Colliders / Pause.
 - `js/heroes.js` — `makeKnight()` (Garrick) + `makeScout()` (Wren): mid-budget
   rigs sharing addArms/addLegs/addFace helpers with Maeve's joint spacing, so
   attachCombat's hand offset works unchanged on all capsule-limb heroes
+- `js/imported.js` — `loadImportedHero()`: Hero 5 "Cass", the imported rigged
+  PolyPerfect `man_casual` GLB. Drives the real SkinnedMesh bones in body space
+  (see the pipeline note up top), re-implements the rig + combat interface.
+  Loaded async from `models/man-casual-rigged.glb`
+- `js/external.js` — `loadExternal()`: the `?pp=1` showcase — loads a couple of
+  static PolyPerfect GLBs (tree + person) next to the hand-built equivalents,
+  registered under an "Imported" debug category for side-by-side tri counts
+- `models/` — the only binary assets in the project: the rigged hero GLB plus
+  the two `?pp=1` showcase GLBs (all exported from the PolyPerfect Unity pack)
 - `js/combat.js` — `makeHeroSword()` / `makeCrossbow()` / `makeStaff()`
   (+ `makeBow()`, decorative only), `attachCombat(rig, opts)`: back-carried +
   in-hand weapons per style, swing trail, draw/sheathe + per-style attack

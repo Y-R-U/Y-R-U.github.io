@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { CFG, SHOT, LITE, AUTO, HERO, PP } from './config.js';
 import { clamp, rand, pick, unlockAudio } from './utils.js';
-import { registry, liveColliders, livePickups } from './registry.js';
+import { registry, register, liveColliders, livePickups } from './registry.js';
 import { buildWorld } from './world.js';
 import { buildProps } from './props.js';
 import { buildEntities } from './entities.js';
@@ -49,6 +49,20 @@ const ents = buildEntities(scene);
 const player = ents.player;
 const HERO_ALIAS = { maeve: 'maeve', 2: 'maeve', garrick: 'garrick', 3: 'garrick', wren: 'wren', 4: 'wren' };
 if (HERO && HERO_ALIAS[HERO]) player.setHero(HERO_ALIAS[HERO]);
+
+// Hero 5 "Cass" — imported rigged PolyPerfect man, loaded async (GLB + skeleton)
+import('./imported.js').then(m => m.loadImportedHero(scene)).then(rig => {
+  player.rigs.man = rig;
+  rig.group.userData.status = 'debug only — Play to switch';
+  register({
+    name: 'Hero 5 — Cass', category: 'Characters', icon: '🧑', object: rig.group,
+    collider: null, pickup: null, isHero: true, focusLabel: 'Play',
+    onFocus: () => player.setHero('man'),
+    note: 'Imported PolyPerfect man_casual — real glTF SkinnedMesh, bones driven procedurally (walk + sword/crossbow/staff)',
+  });
+  if (['man', '5', 'cass'].includes(HERO)) player.setHero('man');
+  console.info('[hero] Cass (imported rigged man) ready — Play in 🐞 or ?hero=man');
+}).catch(e => window.__errors.push('imported hero: ' + String(e)));
 
 initUi({ onStyle: (s) => player.setStyle(s) });
 
