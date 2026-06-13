@@ -6,6 +6,7 @@ export const SHOT = q.has('shot');
 export const LITE = q.has('lite');
 export const AUTO = q.has('auto');
 export const HERO = q.get('hero'); // 'maeve'/'2', 'garrick'/'3', 'wren'/'4' spawn as that hero
+export const PP = q.has('pp');     // ?pp=1 drops a couple of imported PolyPerfect GLBs in for comparison
 
 export const CFG = {
   playRadius: 26,      // walkable circle radius

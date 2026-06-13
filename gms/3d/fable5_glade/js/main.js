@@ -2,7 +2,7 @@
 // collision, pickup collection, ?shot / ?auto modes, error capture.
 
 import * as THREE from 'three';
-import { CFG, SHOT, LITE, AUTO, HERO } from './config.js';
+import { CFG, SHOT, LITE, AUTO, HERO, PP } from './config.js';
 import { clamp, rand, pick, unlockAudio } from './utils.js';
 import { registry, liveColliders, livePickups } from './registry.js';
 import { buildWorld } from './world.js';
@@ -44,6 +44,7 @@ window.addEventListener('resize', () => {
 const world = buildWorld(scene);
 initFx(scene);
 const props = buildProps(scene);
+if (PP) import('./external.js').then(m => m.loadExternal(scene)); // ?pp=1 imported-asset showcase
 const ents = buildEntities(scene);
 const player = ents.player;
 const HERO_ALIAS = { maeve: 'maeve', 2: 'maeve', garrick: 'garrick', 3: 'garrick', wren: 'wren', 4: 'wren' };
