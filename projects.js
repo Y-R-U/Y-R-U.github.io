@@ -292,6 +292,10 @@ const PROJECTS = [
     desc: "ARPG graphics test glade - a Diablo/RuneScape-style circular meadow with tap-to-move hero, villager NPC, chickens, thatched cottage, campfire, and floating pickups. Debug inspector lists every object with tri counts, colliders, and camera focus. Three.js, mobile-first.",
     date: "2026-06-12", creator: "Fable 5" },
 
+  { name: "Glade Bros",         path: "/gms/2d/glade_bros/", screenshot: "glade-bros", type: "game",
+    desc: "Two brothers, one prank: fart in the same room and bolt, then it is hide-and-seek for revenge. Pick the older or younger brother and your part - the computer plays the other. Top-down house with bubble-box taunts, a coughing head-start, and a seek-timer showdown.",
+    date: "2026-06-15", creator: "Opus 4.8" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
