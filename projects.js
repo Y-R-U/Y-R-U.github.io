@@ -296,6 +296,10 @@ const PROJECTS = [
     desc: "Two brothers, one prank: fart in the same room and bolt, then it is hide-and-seek for revenge. Pick the older or younger brother and your part - the computer plays the other. Top-down house with bubble-box taunts, a coughing head-start, and a seek-timer showdown.",
     date: "2026-06-15", creator: "Opus 4.8" },
 
+  { name: "Glade Bros 3D",      path: "/gms/3d/glade_bros/", screenshot: "glade-bros-3d", type: "game",
+    desc: "The 3D dollhouse cut of Glade Bros: one brother farts in the same room and bolts, the other coughs then hunts for revenge. Pick the older or younger brother and your part; the computer plays the other. Three.js diorama of low-poly kids, an orbit camera, tap-to-move, and bubble-box taunts. Mobile-first.",
+    date: "2026-06-15", creator: "Opus 4.8" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
