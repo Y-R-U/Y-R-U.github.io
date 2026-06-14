@@ -51,6 +51,9 @@ export class UI {
     this.banner = this.hud.querySelector('#banner');
     this.timerEl = this.hud.querySelector('#timer');
 
+    this.gas = el(`<div class="gasview"><div class="gasinner"><div class="gbig">🤢💨</div><div>*cough!* *hack!*<br>Can't see a thing!</div></div></div>`);
+    overlay.appendChild(this.gas);
+
     this.fartBtn = el(`<button id="fartbtn" class="hide">💨 FART!</button>`);
     overlay.appendChild(this.fartBtn);
     this.fartBtn.addEventListener('click', () => this.onFart && this.onFart());
@@ -87,6 +90,7 @@ export class UI {
     this.timerEl.classList.toggle('warn', s <= 8);
   }
   showFart(on) { this.fartBtn.classList.toggle('hide', !on); }
+  showGas(on) { this.gas.classList.toggle('show', on); }
   hint(t) { this.hintEl.textContent = t; this.hintEl.classList.add('show'); }
   hideHint() { this.hintEl.classList.remove('show'); }
 

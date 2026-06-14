@@ -98,7 +98,22 @@ body {
 #result .win { color: #2f9c6a; }
 #result .lose { color: var(--accent); }
 
-.hint { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+/* ── gas screen (avenger's coughing fit) ── */
+.gasview { position: absolute; inset: 0; z-index: 3; pointer-events: none !important;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 42%, rgba(150,214,108,.78) 0%, rgba(108,182,78,.93) 55%, rgba(62,120,46,.99) 100%);
+  opacity: 0; transition: opacity .2s ease; }
+.gasview.show { opacity: 1; }
+.gasinner { text-align: center; color: #1d3a14; font-weight: 800; font-size: clamp(16px, 4.6vw, 24px);
+  text-shadow: 0 1px 0 rgba(255,255,255,.25); animation: cough .85s ease-in-out infinite; }
+.gasinner .gbig { font-size: clamp(54px, 17vw, 104px); line-height: 1; margin-bottom: 6px; }
+@keyframes cough { 0%,100% { transform: scale(1) rotate(-1.5deg); } 50% { transform: scale(1.07) rotate(1.5deg); } }
+#bubbles { z-index: 2; }
+#hud { z-index: 4; }
+#fartbtn { z-index: 5; }
+#result { z-index: 6; }
+
+.hint { position: absolute; z-index: 5; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
   background: rgba(42,29,58,.82); color: var(--paper); border-radius: 12px; padding: 8px 14px; font-size: 13px;
   font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .3s; }
 .hint.show { opacity: 1; }

@@ -12,7 +12,7 @@ export const TS = 1.1;                      // world units per tile
 export const CFG = {
   walkSpeed: 3.2 * TS,
   runSpeed:  5.3 * TS,
-  coughTime: FAST ? 2.5 : 5.0,             // seeker frozen coughing (head-start)
+  coughTime: FAST ? 2.5 : 10.0,            // seeker frozen coughing (head-start)
   seekTime:  FAST ? 14 : 28,               // seconds to find the hider
   searchDist: 1.5 * TS,
   exposeDist: 1.7 * TS,

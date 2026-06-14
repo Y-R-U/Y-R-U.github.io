@@ -37,7 +37,7 @@ class Game {
     this.ui = new UI();
     this.ui.onStart = (b, r) => this.startRound(b, r);
     this.ui.onFart = () => { if (this.human && this.human.role === 'p1') this.triggerFart(this.human); };
-    this.ui.onAgain = () => { this.ui.hideResult(); this.ui.showMenu(); this.phase = 'menu'; };
+    this.ui.onAgain = () => { this.ui.hideResult(); this.ui.showGas(false); this.ui.showMenu(); this.phase = 'menu'; };
 
     // tuck markers for hidden brothers
     this.tuck = { p1: makeEmojiSprite('🙈', 0.9), p2: makeEmojiSprite('🙈', 0.9) };
@@ -64,7 +64,7 @@ class Game {
   nameOf(br) { return br.bro.label; }
 
   startRound(broKey, roleKey, auto = false) {
-    this.ui.hideMenu(); this.ui.hideResult(); this.ui.showHUD();
+    this.ui.hideMenu(); this.ui.hideResult(); this.ui.showHUD(); this.ui.showGas(false);
     this.ui.clearAllBubbles();
     for (const s of this.spots) s.checked = false;
 
@@ -107,6 +107,8 @@ class Game {
 
     this.phase = 'hide'; this.coughT = 0;
     victim.frozen = true; by.speed = CFG.runSpeed;
+    // if the human is the one coughing, gas the screen so they can't watch the flee
+    if (this.human && this.human.role === 'p2') this.ui.showGas(true);
     this.updateBanner();
   }
 
@@ -184,6 +186,7 @@ class Game {
     if (this.coughT >= CFG.coughTime) {
       this.p2.frozen = false; this.p2.speed = CFG.runSpeed * 0.95;
       this.ui.hideHint();
+      this.ui.showGas(false);   // cough's over — vision clears, now go find him
       this.phase = 'seek'; this.timeLeft = CFG.seekTime;
       this.ui.say('p2', pick(['Right! 😤', 'Found yet… 👀', "You're dead! 😤"]), 1.6);
     }
@@ -213,7 +216,7 @@ class Game {
   endRound(winner) {
     if (this.phase === 'result') return;
     this.phase = 'result'; this.found = winner; this.resultT = 0;
-    this.ui.showFart(false); this.ui.setTimer(null);
+    this.ui.showFart(false); this.ui.showGas(false); this.ui.setTimer(null);
     this.stats.rounds++; this.stats[winner + 'wins']++;
     const p1 = this.p1, p2 = this.p2;
     p1.hidden = false; p1.frozen = false; p1.stop(); p2.stop();
@@ -330,6 +333,8 @@ class Game {
     window.__state = {
       get phase() { return game.phase; },
       get timeLeft() { return +(game.timeLeft || 0).toFixed(1); },
+      get coughLeft() { return +Math.max(0, CFG.coughTime - (game.coughT || 0)).toFixed(1); },
+      get gas() { return game.ui.gas.classList.contains('show'); },
       get p1hidden() { return !!(game.p1 && game.p1.hidden); },
       get p1spot() { return game.p1 && game.p1.spot ? game.p1.spot.name : null; },
       get checked() { return game.spots.filter(s => s.checked).length; },

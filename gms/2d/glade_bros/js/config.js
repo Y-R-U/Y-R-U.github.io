@@ -13,7 +13,7 @@ export const MAP_H = ROWS * TILE;
 export const CFG = {
   walkSpeed: 3.1 * TILE,   // px/s — calm walk
   runSpeed:  5.3 * TILE,   // px/s — fleeing / chasing
-  coughTime: FAST ? 2.5 : 5.0,     // seconds the seeker is frozen coughing (the head-start)
+  coughTime: FAST ? 2.5 : 10.0,    // seconds the seeker is frozen coughing (the head-start)
   seekTime:  FAST ? 14 : 28,       // seconds the seeker has to find the hider
   searchDist: 1.5 * TILE,          // how close a seeker must get to "check" a hiding spot
   exposeDist: 1.7 * TILE,          // a hider not on a spot is caught within this range

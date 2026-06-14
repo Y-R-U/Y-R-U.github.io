@@ -28,7 +28,7 @@ class Game {
 
     this.ui.onStart = (bro, role) => this.startRound(bro, role);
     this.ui.onFart = () => { if (this.human && this.human.role === 'p1') this.triggerFart(this.human); };
-    this.ui.onAgain = () => { this.ui.hideResult(); this.ui.showMenu(); this.phase = 'menu'; };
+    this.ui.onAgain = () => { this.ui.hideResult(); this.ui.showGas(false); this.ui.showMenu(); this.phase = 'menu'; };
 
     addEventListener('resize', () => this.resize());
     this.resize();
@@ -43,7 +43,7 @@ class Game {
 
   // ── round setup ──
   startRound(broKey, roleKey, auto = false) {
-    this.ui.hideMenu(); this.ui.hideResult(); this.ui.showHUD();
+    this.ui.hideMenu(); this.ui.hideResult(); this.ui.showHUD(); this.ui.showGas(false);
     clearAllBubbles();
     for (const s of this.spots) s.checked = false;
 
@@ -96,6 +96,8 @@ class Game {
     this.coughT = 0;
     victim.frozen = true;
     by.speed = CFG.runSpeed;
+    // if the human is the one coughing, gas the screen so they can't watch the flee
+    if (this.human && this.human.role === 'p2') this.ui.showGas(true);
     this.updateBanner();
   }
 
@@ -190,6 +192,7 @@ class Game {
       this.p2.frozen = false;
       this.p2.speed = CFG.runSpeed * 0.95;
       this.ui.hideHint();
+      this.ui.showGas(false);   // cough's over — vision clears, now go find him
       this.phase = 'seek';
       this.timeLeft = CFG.seekTime;
       say(this.p2, pick(['Right! 😤', 'Found yet… 👀', "You're dead! 😤"]), 1.6);
@@ -229,6 +232,7 @@ class Game {
     this.found = winner;
     this.resultT = 0;
     this.ui.showFart(false);
+    this.ui.showGas(false);
     this.ui.setTimer(null);
     this.stats.rounds++;
     this.stats[winner + 'wins']++;
@@ -378,6 +382,7 @@ class Game {
       get phase() { return game.phase; },
       get timeLeft() { return +(game.timeLeft || 0).toFixed(1); },
       get coughLeft() { return +Math.max(0, CFG.coughTime - (game.coughT || 0)).toFixed(1); },
+      get gas() { return game.ui.gas.classList.contains('show'); },
       get p1hidden() { return !!(game.p1 && game.p1.hidden); },
       get p1spot() { return game.p1 && game.p1.spot ? game.p1.spot.name : null; },
       get checked() { return game.spots.filter(s => s.checked).length; },
