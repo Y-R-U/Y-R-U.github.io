@@ -12,6 +12,8 @@ const hudEl = document.getElementById('hud');
 const menuEl = document.getElementById('menu');
 const resultEl = document.getElementById('result');
 const stationEl = document.getElementById('station');
+const dockTransitionEl = document.getElementById('dock-transition');
+const menuAchievements = document.getElementById('menu-achievements');
 const stationTerminalHotspot = document.getElementById('station-terminal-hotspot');
 const stationTerminalPanel = document.getElementById('station-terminal-panel');
 const stationCloseTerminal = document.getElementById('station-close-terminal');
@@ -56,12 +58,17 @@ const BEST_KEY = 'outpace-best';
 const LEGACY_BEST_KEY = 'void-cockpit-best';
 const SAVE_KEY = 'outpace-save-v2';
 const RESULT_LOCK_MS = 3200;
+const DOCK_FADE_IN_MS = 760;
+const DOCK_HOLD_MS = 360;
+const DOCK_FADE_OUT_MS = 760;
 let resultUnlockTimeout = 0;
 let resultCountdownTimer = 0;
+let dockTransitionTimers = [];
 
 const clock = new THREE.Clock();
 const params = new URLSearchParams(window.location.search);
 const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal');
+const DEMO_STATION_TAB = params.get('demoTab') || '';
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
@@ -108,6 +115,97 @@ const STATION_BASE_NAMES = [
   'Sable',
 ];
 
+const CARGO_CAPACITY_BY_LEVEL = [
+  8, 12, 17, 23, 30, 38, 48, 60, 74, 90, 108, 128,
+  151, 177, 206, 238, 273, 312, 355, 402, 454, 512,
+];
+
+const STORY_ARCS = [
+  {
+    id: 'kin',
+    label: 'Search Thread',
+    targets: ['daughter', 'son', 'father', 'mother', 'friend'],
+    title: (target) => `Search: ${target}`,
+    endingTitle: 'Signal Found',
+    ending: (target) => `The final berth log resolves to a live room code. Your ${target} is waiting beyond the inner dock.`,
+  },
+  {
+    id: 'revenge',
+    label: 'Search Thread',
+    targets: ['enemy', 'rival', 'former captain'],
+    title: (target) => `Trace: ${target}`,
+    endingTitle: 'Account Open',
+    ending: (target) => `The terminal confirms your ${target} docked under a false name. Their bay is one door away.`,
+  },
+  {
+    id: 'blackbox',
+    label: 'Black Box Trail',
+    targets: ['lost black box'],
+    title: () => 'Black Box Trail',
+    endingTitle: 'Beacon Decoded',
+    ending: () => 'The box fragments align into one final coordinate. A live rescue beacon answers from the static.',
+  },
+];
+
+const ACHIEVEMENT_DEFS = [
+  {
+    id: 'first-dock',
+    title: 'First Berth',
+    text: 'Dock at any station.',
+    goal: 1,
+    progress: (save) => save.stats.dockings,
+  },
+  {
+    id: 'linked-ports',
+    title: 'Linked Ports',
+    text: 'Complete five station runs.',
+    goal: 5,
+    progress: (save) => save.stats.dockings,
+  },
+  {
+    id: 'lance-work',
+    title: 'Lance Work',
+    text: 'Destroy twenty hazards.',
+    goal: 20,
+    progress: (save) => save.stats.kills,
+  },
+  {
+    id: 'heavy-hold',
+    title: 'Heavy Hold',
+    text: 'Reach 108t cargo capacity.',
+    goal: 108,
+    progress: (save) => Math.max(save.stats.bestCargo, getCargoCapacity(save.upgrades.cargo || 0)),
+  },
+  {
+    id: 'deep-pockets',
+    title: 'Deep Pockets',
+    text: 'Earn 25000 total credits.',
+    goal: 25000,
+    progress: (save) => save.stats.totalCredits,
+  },
+  {
+    id: 'shipwright',
+    title: 'Shipwright',
+    text: 'Install twelve upgrades.',
+    goal: 12,
+    progress: (save) => save.stats.upgradesBought,
+  },
+  {
+    id: 'warm-trail',
+    title: 'Warm Trail',
+    text: 'Run four port searches.',
+    goal: 4,
+    progress: (save) => save.stats.storySearches,
+  },
+  {
+    id: 'closure',
+    title: 'Closure',
+    text: 'Finish a search thread.',
+    goal: 1,
+    progress: (save) => save.stats.storyCompleted,
+  },
+];
+
 const UPGRADE_DEFS = [
   {
     id: 'shield',
@@ -115,8 +213,8 @@ const UPGRADE_DEFS = [
     name: 'Hull Plating',
     blurb: 'More shield capacity for longer asteroid lanes.',
     max: 8,
-    base: 140,
-    scale: 1.42,
+    base: 225,
+    scale: 1.62,
     stat: (level) => `+${level * 22} shield`,
   },
   {
@@ -125,8 +223,8 @@ const UPGRADE_DEFS = [
     name: 'Cryo Heat Sinks',
     blurb: 'Faster heat bleed and a lower pulse heat spike.',
     max: 8,
-    base: 120,
-    scale: 1.4,
+    base: 205,
+    scale: 1.6,
     stat: (level) => `+${level * 5}/s cooling`,
   },
   {
@@ -135,8 +233,8 @@ const UPGRADE_DEFS = [
     name: 'Vector Drive',
     blurb: 'Shorter runs and a higher cruise speed between stations.',
     max: 6,
-    base: 160,
-    scale: 1.45,
+    base: 260,
+    scale: 1.68,
     stat: (level) => `+${level * 5}% drive`,
   },
   {
@@ -144,10 +242,10 @@ const UPGRADE_DEFS = [
     category: 'weapons',
     name: 'Twin Lance Array',
     blurb: 'Harder-hitting double shots from the cockpit turrets.',
-    max: 7,
-    base: 170,
-    scale: 1.48,
-    stat: (level) => `${1 + level} beam power`,
+    max: 9,
+    base: 285,
+    scale: 1.72,
+    stat: (level) => `${(0.72 + level * 0.62).toFixed(1)} beam power`,
   },
   {
     id: 'targeting',
@@ -155,8 +253,8 @@ const UPGRADE_DEFS = [
     name: 'Threat Predictor',
     blurb: 'Better auto-lock priority for objects actually on your path.',
     max: 6,
-    base: 150,
-    scale: 1.46,
+    base: 240,
+    scale: 1.66,
     stat: (level) => `+${level} lock AI`,
   },
   {
@@ -165,8 +263,8 @@ const UPGRADE_DEFS = [
     name: 'Heat Capacitor',
     blurb: 'Raises the overheat ceiling so burst fire lasts longer.',
     max: 6,
-    base: 145,
-    scale: 1.42,
+    base: 230,
+    scale: 1.64,
     stat: (level) => `${100 + level * 12}% heat cap`,
   },
   {
@@ -174,9 +272,9 @@ const UPGRADE_DEFS = [
     category: 'trade',
     name: 'Cargo Spine',
     blurb: 'Stations load more freight, so each delivery pays more.',
-    max: 9,
-    base: 130,
-    scale: 1.43,
+    max: CARGO_CAPACITY_BY_LEVEL.length - 1,
+    base: 185,
+    scale: 1.5,
     stat: (level) => `${getCargoCapacity(level)}t bay`,
   },
   {
@@ -185,17 +283,71 @@ const UPGRADE_DEFS = [
     name: 'Station License',
     blurb: 'Better berth priority and delivery fees from every depot.',
     max: 6,
-    base: 155,
-    scale: 1.44,
+    base: 260,
+    scale: 1.7,
     stat: (level) => `+${level * 7}% fees`,
   },
 ];
+
+function makeDefaultStats() {
+  return {
+    dockings: 0,
+    kills: 0,
+    droneKills: 0,
+    asteroidKills: 0,
+    collectors: 0,
+    shotsFired: 0,
+    totalCredits: 0,
+    upgradesBought: 0,
+    storySearches: 0,
+    storyCompleted: 0,
+    bestCargo: 8,
+  };
+}
+
+function createStory() {
+  const arc = pick(STORY_ARCS);
+  const target = pick(arc.targets);
+  return {
+    id: `${arc.id}-${Date.now().toString(36)}-${Math.floor(rand(100, 999))}`,
+    kind: arc.id,
+    target,
+    goal: Math.floor(rand(7, 13)),
+    progress: 0,
+    lastRoute: 0,
+    complete: false,
+    endingSeen: false,
+    lastMessage: '',
+  };
+}
+
+function normalizeStory(rawStory) {
+  if (!rawStory || typeof rawStory !== 'object') return createStory();
+  const fallback = createStory();
+  const arc = STORY_ARCS.find((item) => item.id === rawStory.kind) || STORY_ARCS.find((item) => item.id === fallback.kind);
+  const target = arc.targets.includes(rawStory.target) ? rawStory.target : arc.targets[0];
+  const goal = clamp(Math.round(Number(rawStory.goal) || fallback.goal), 5, 16);
+  const progress = clamp(Math.round(Number(rawStory.progress) || 0), 0, goal);
+  return {
+    id: typeof rawStory.id === 'string' ? rawStory.id : fallback.id,
+    kind: arc.id,
+    target,
+    goal,
+    progress,
+    lastRoute: Math.max(0, Math.round(Number(rawStory.lastRoute) || 0)),
+    complete: Boolean(rawStory.complete) || progress >= goal,
+    endingSeen: Boolean(rawStory.endingSeen),
+    lastMessage: typeof rawStory.lastMessage === 'string' ? rawStory.lastMessage.slice(0, 180) : '',
+  };
+}
 
 function makeDefaultSave() {
   return {
     credits: 0,
     route: 1,
     upgrades: Object.fromEntries(UPGRADE_DEFS.map((def) => [def.id, 0])),
+    stats: makeDefaultStats(),
+    story: createStory(),
   };
 }
 
@@ -210,6 +362,12 @@ function loadSave() {
     for (const def of UPGRADE_DEFS) {
       save.upgrades[def.id] = clamp(Number(parsed.upgrades?.[def.id]) || 0, 0, def.max);
     }
+    save.stats = { ...makeDefaultStats(), ...(parsed.stats || {}) };
+    for (const key of Object.keys(save.stats)) {
+      save.stats[key] = Math.max(0, Number(save.stats[key]) || 0);
+    }
+    save.stats.bestCargo = Math.max(save.stats.bestCargo, getCargoCapacity(save.upgrades.cargo || 0));
+    save.story = normalizeStory(parsed.story);
   } catch {
     return save;
   }
@@ -232,7 +390,8 @@ function getUpgradeCost(def) {
 }
 
 function getCargoCapacity(level = getUpgradeLevel('cargo')) {
-  return 8 + level * 5;
+  const safeLevel = clamp(Math.floor(level), 0, CARGO_CAPACITY_BY_LEVEL.length - 1);
+  return CARGO_CAPACITY_BY_LEVEL[safeLevel];
 }
 
 function getShipStats() {
@@ -250,7 +409,7 @@ function getShipStats() {
     coolRate: 17 + cooling * 5.2,
     shotHeat: clamp(18 - cooling * 1.15 - laser * 0.35, 7.5, 18),
     shotCooldown: clamp(0.15 - laser * 0.012, 0.07, 0.15),
-    beamPower: 1 + laser,
+    beamPower: 0.72 + laser * 0.62,
     lockAssist: targeting,
     cargo: getCargoCapacity(cargo),
     speedBonus: 1 + engine * 0.05,
@@ -285,7 +444,8 @@ function getRouteLength(route = state.save.route) {
 function getDeliveryPayout(route = state.save.route, type = getStationType(route)) {
   const stats = getShipStats();
   const multiplier = type === 'mega' ? 2.25 : type === 'large' ? 1.58 : 1;
-  return Math.round((105 + route * 24 + stats.cargo * 18) * multiplier * stats.deliveryBonus);
+  const cargoRate = 18 + Math.min(18, stats.cargo / 28);
+  return Math.round((95 + route * 26 + stats.cargo * cargoRate) * multiplier * stats.deliveryBonus);
 }
 
 const state = {
@@ -310,6 +470,7 @@ const state = {
   stationWindowTime: 0,
   stationTraffic: [],
   docking: false,
+  dockTransitioning: false,
   docked: false,
   dockObject: null,
   shield: 100,
@@ -420,6 +581,7 @@ const starGeometry = new THREE.BufferGeometry();
 const starCount = 980;
 const starPositions = new Float32Array(starCount * 3);
 const starColors = new Float32Array(starCount * 3);
+const starSideSpeeds = new Float32Array(starCount);
 
 function resetStar(index, deep = true) {
   const i = index * 3;
@@ -434,7 +596,10 @@ function resetStar(index, deep = true) {
   starColors[i + 2] = tmpColor.b;
 }
 
-for (let i = 0; i < starCount; i += 1) resetStar(i);
+for (let i = 0; i < starCount; i += 1) {
+  resetStar(i);
+  starSideSpeeds[i] = rand(3.5, 9.5) * (i % 9 === 0 ? -0.45 : 1);
+}
 starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
 starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 const stars = new THREE.Points(
@@ -1130,9 +1295,73 @@ function removeObject(object) {
   if (object.geometry) object.geometry.dispose();
 }
 
+function clearDynamicScene() {
+  for (const object of state.objects) removeObject(object);
+  for (const beam of state.beams) {
+    scene.remove(beam);
+    beam.geometry.dispose();
+    beam.material.dispose();
+  }
+  for (const particle of state.particles) {
+    scene.remove(particle);
+    particle.geometry.dispose();
+    particle.material.dispose();
+  }
+  state.objects.length = 0;
+  state.beams.length = 0;
+  state.particles.length = 0;
+  state.laserBursts.length = 0;
+  state.lockedTarget = null;
+  state.lockedScreen = null;
+}
+
 function setGameState(nextState) {
   gameEl.dataset.state = nextState;
   document.documentElement.dataset.gameState = nextState;
+}
+
+function clearDockTransition() {
+  for (const timer of dockTransitionTimers) window.clearTimeout(timer);
+  dockTransitionTimers = [];
+  state.dockTransitioning = false;
+  dockTransitionEl?.classList.remove('active');
+  dockTransitionEl?.classList.add('hidden');
+  dockTransitionEl?.setAttribute('aria-hidden', 'true');
+}
+
+function queueDockTransition(callback, delay) {
+  const timer = window.setTimeout(() => {
+    dockTransitionTimers = dockTransitionTimers.filter((item) => item !== timer);
+    callback();
+  }, delay);
+  dockTransitionTimers.push(timer);
+}
+
+function beginDockingTransition(type = getStationType()) {
+  if (state.dockTransitioning || state.docked) return;
+  state.dockTransitioning = true;
+  state.running = false;
+  state.docking = true;
+  state.firing = false;
+  state.firePointerId = null;
+  state.movementPointerId = null;
+  state.pointerDown = false;
+  hudEl.classList.add('hidden');
+  fireButton.classList.add('hidden');
+  reticleEl.classList.add('hidden');
+  dockTransitionEl?.classList.remove('hidden');
+  dockTransitionEl?.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => dockTransitionEl?.classList.add('active'));
+
+  queueDockTransition(() => {
+    openStation(type);
+    queueDockTransition(() => dockTransitionEl?.classList.remove('active'), DOCK_HOLD_MS);
+    queueDockTransition(() => {
+      dockTransitionEl?.classList.add('hidden');
+      dockTransitionEl?.setAttribute('aria-hidden', 'true');
+      state.dockTransitioning = false;
+    }, DOCK_HOLD_MS + DOCK_FADE_OUT_MS);
+  }, DOCK_FADE_IN_MS);
 }
 
 function clearResultLock() {
@@ -1181,6 +1410,233 @@ function onStationPointerDown(event) {
   const inTerminal = stationTerminalPanel?.contains(event.target);
   if (state.stationTerminalOpen && !inTerminal) setStationTerminalOpen(false);
   event.stopPropagation();
+}
+
+function getStoryArc(story = state.save.story) {
+  return STORY_ARCS.find((arc) => arc.id === story?.kind) || STORY_ARCS[0];
+}
+
+function getStoryTitle(story = state.save.story) {
+  return getStoryArc(story).title(story.target);
+}
+
+function getStoryMessage(story = state.save.story) {
+  const arc = getStoryArc(story);
+  if (story.complete) return arc.ending(story.target);
+  const progress = clamp(story.progress, 0, story.goal);
+  const remaining = Math.max(1, story.goal - progress);
+  const ratio = progress / Math.max(1, story.goal);
+
+  if (progress <= 0) {
+    return story.kind === 'blackbox'
+      ? 'No fragments decoded. Run a port search from each dock.'
+      : `No live trail for your ${story.target}. Run a port search from each dock.`;
+  }
+
+  if (story.kind === 'blackbox') {
+    if (ratio < 0.34) return `A weak wreck ping repeats every ${remaining + 4} cycles.`;
+    if (ratio < 0.72) return `Black box fragments now point within ${remaining * 9} hours.`;
+    return `The next station should expose the final beacon lock.`;
+  }
+
+  if (ratio < 0.34) return `No direct hit, but an alias repeats within ${remaining + 5} port logs.`;
+  if (ratio < 0.72) return `A stale entry for your ${story.target} appears within ${remaining * 8} hours.`;
+  return `Fresh dock records put your ${story.target} very close.`;
+}
+
+function getAchievementRows(save = state.save) {
+  return ACHIEVEMENT_DEFS.map((def) => {
+    const progress = Math.max(0, Math.round(def.progress(save) || 0));
+    const capped = clamp(progress, 0, def.goal);
+    return {
+      ...def,
+      progress,
+      capped,
+      unlocked: progress >= def.goal,
+      ratio: clamp(progress / Math.max(1, def.goal), 0, 1),
+    };
+  });
+}
+
+function formatProgress(value) {
+  return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function renderMenuAchievements() {
+  if (!menuAchievements) return;
+  menuAchievements.innerHTML = '';
+  const rows = getAchievementRows();
+  const unlocked = rows.filter((row) => row.unlocked).length;
+  const nextRows = rows
+    .filter((row) => !row.unlocked)
+    .sort((a, b) => b.ratio - a.ratio)
+    .slice(0, 3);
+  const story = state.save.story;
+
+  const head = document.createElement('div');
+  head.className = 'menu-achievements-head';
+  const title = document.createElement('span');
+  title.textContent = 'Achievements';
+  const count = document.createElement('strong');
+  count.textContent = `${unlocked}/${rows.length}`;
+  head.append(title, count);
+  menuAchievements.append(head);
+
+  const storyLine = document.createElement('p');
+  storyLine.className = 'menu-story-line';
+  storyLine.textContent = `${getStoryTitle(story)} ${story.progress}/${story.goal}`;
+  menuAchievements.append(storyLine);
+
+  const featured = nextRows.length ? nextRows : rows.filter((row) => row.unlocked).slice(-3);
+  for (const row of featured) {
+    const item = document.createElement('div');
+    item.className = 'menu-achievement-row';
+    const label = document.createElement('span');
+    label.textContent = row.title;
+    const progress = document.createElement('strong');
+    progress.textContent = row.unlocked ? 'Done' : `${formatProgress(row.capped)}/${formatProgress(row.goal)}`;
+    item.append(label, progress);
+    menuAchievements.append(item);
+  }
+}
+
+function renderAchievements() {
+  upgradeList.className = 'upgrade-list achievement-list';
+  upgradeList.innerHTML = '';
+  const rows = getAchievementRows()
+    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.ratio - a.ratio)
+    .slice(0, 6);
+
+  for (const row of rows) {
+    const card = document.createElement('article');
+    card.className = `achievement-card${row.unlocked ? ' unlocked' : ''}`;
+
+    const stateLabel = document.createElement('span');
+    stateLabel.textContent = row.unlocked ? 'Unlocked' : `${formatProgress(row.capped)}/${formatProgress(row.goal)}`;
+    const title = document.createElement('h3');
+    title.textContent = row.title;
+    const text = document.createElement('p');
+    text.textContent = row.text;
+    const meter = document.createElement('div');
+    meter.className = 'achievement-meter';
+    const bar = document.createElement('i');
+    bar.style.width = `${row.ratio * 100}%`;
+    meter.append(bar);
+
+    card.append(stateLabel, title, text, meter);
+    upgradeList.append(card);
+  }
+}
+
+function runStorySearch() {
+  const story = state.save.story;
+  if (story.complete) return;
+  const route = state.lastStationRoute || Math.max(1, state.save.route - 1);
+  if (story.lastRoute === route) {
+    stationMessage.textContent = 'This station cache has already been searched.';
+    renderStationPanel();
+    return;
+  }
+
+  story.progress = clamp(story.progress + 1, 0, story.goal);
+  story.lastRoute = route;
+  story.complete = story.progress >= story.goal;
+  story.lastMessage = getStoryMessage(story);
+  state.save.stats.storySearches += 1;
+  if (story.complete) state.save.stats.storyCompleted += 1;
+  saveProgress();
+  renderMenuAchievements();
+  updateStationUi(state.currentPayout, state.lastStationType, story.lastMessage);
+}
+
+function finishStoryGame() {
+  const story = state.save.story;
+  const arc = getStoryArc(story);
+  story.complete = true;
+  story.endingSeen = true;
+  saveProgress();
+  renderMenuAchievements();
+
+  state.running = false;
+  state.docked = false;
+  state.firing = false;
+  stationEl.classList.add('hidden');
+  hudEl.classList.add('hidden');
+  fireButton.classList.add('hidden');
+  reticleEl.classList.add('hidden');
+
+  const finalScore = Math.round(state.save.credits + state.score);
+  resultScore.textContent = String(finalScore);
+  resultBest.textContent = String(state.best);
+  resultWave.textContent = String(Math.max(1, state.save.route - 1));
+  resultTitle.textContent = arc.endingTitle;
+  resultKicker.textContent = 'story complete';
+  if (resultMessage) resultMessage.textContent = arc.ending(story.target);
+  resultEl.classList.remove('hidden');
+  setGameState('result');
+  lockResultScreen();
+}
+
+function continueStoryRuns() {
+  state.save.story.endingSeen = true;
+  saveProgress();
+  state.stationTab = 'briefing';
+  updateStationUi(state.currentPayout, state.lastStationType, 'Search archived. The next delivery is ready.');
+}
+
+function renderStorySearch() {
+  upgradeList.className = 'upgrade-list story-list';
+  upgradeList.innerHTML = '';
+  const story = state.save.story;
+  const route = state.lastStationRoute || Math.max(1, state.save.route - 1);
+  const searchedHere = story.lastRoute === route && story.progress > 0;
+
+  const card = document.createElement('article');
+  card.className = 'terminal-card story-card';
+
+  const kicker = document.createElement('span');
+  kicker.textContent = getStoryArc(story).label;
+  const title = document.createElement('h3');
+  title.textContent = getStoryTitle(story);
+  const text = document.createElement('p');
+  text.textContent = story.lastMessage || getStoryMessage(story);
+  const progress = document.createElement('div');
+  progress.className = 'story-progress';
+  const bar = document.createElement('i');
+  bar.style.width = `${clamp(story.progress / Math.max(1, story.goal) * 100, 0, 100)}%`;
+  progress.append(bar);
+  const actions = document.createElement('div');
+  actions.className = 'story-actions';
+
+  if (story.complete) {
+    const complete = document.createElement('button');
+    complete.type = 'button';
+    complete.className = 'terminal-action primary';
+    complete.dataset.storyComplete = 'true';
+    complete.textContent = 'Complete Game';
+    const cont = document.createElement('button');
+    cont.type = 'button';
+    cont.className = 'terminal-action';
+    cont.dataset.storyContinue = 'true';
+    cont.textContent = 'Continue Runs';
+    actions.append(complete, cont);
+  } else {
+    const search = document.createElement('button');
+    search.type = 'button';
+    search.className = 'terminal-action primary';
+    search.dataset.storySearch = 'true';
+    search.disabled = searchedHere;
+    search.textContent = searchedHere ? 'Searched' : 'Run Search';
+    const routeLabel = document.createElement('button');
+    routeLabel.type = 'button';
+    routeLabel.className = 'terminal-action';
+    routeLabel.disabled = true;
+    routeLabel.textContent = `${story.progress}/${story.goal}`;
+    actions.append(search, routeLabel);
+  }
+
+  card.append(kicker, title, text, progress, actions);
+  upgradeList.append(card);
 }
 
 function renderUpgradeCategoryTabs() {
@@ -1297,6 +1753,20 @@ function renderStationPanel() {
     return;
   }
 
+  if (tab === 'search') {
+    if (stationPanelTitle) stationPanelTitle.textContent = 'Port Search';
+    if (stationPanelCopy) stationPanelCopy.textContent = 'Optional trace work. One station cache can be searched per dock.';
+    renderStorySearch();
+    return;
+  }
+
+  if (tab === 'achievements') {
+    if (stationPanelTitle) stationPanelTitle.textContent = 'Achievements';
+    if (stationPanelCopy) stationPanelCopy.textContent = 'Persistent milestones from flights, cargo, upgrades, and the search thread.';
+    renderAchievements();
+    return;
+  }
+
   if (stationPanelTitle) stationPanelTitle.textContent = 'Ship Status';
   if (stationPanelCopy) stationPanelCopy.textContent = 'Current installed systems calculated from your upgrade levels.';
   renderTerminalCards([
@@ -1330,7 +1800,10 @@ function buyUpgrade(id) {
   if (level >= def.max || state.save.credits < cost) return;
   state.save.credits -= cost;
   state.save.upgrades[id] = level + 1;
+  state.save.stats.upgradesBought += 1;
+  state.save.stats.bestCargo = Math.max(state.save.stats.bestCargo, getCargoCapacity(state.save.upgrades.cargo || 0));
   saveProgress();
+  renderMenuAchievements();
   updateStationUi(state.currentPayout, state.lastStationType, `${def.name} installed. Credits updated and the next manifest is still reserved.`);
 }
 
@@ -1346,15 +1819,21 @@ function openStation(type = getStationType()) {
   const completedRoute = state.save.route;
   state.lastStationRoute = completedRoute;
   state.lastStationName = getStationName(completedRoute, type);
-  state.stationTab = 'upgrades';
+  clearDynamicScene();
+  state.dockObject = null;
+  state.stationTab = ['upgrades', 'cargo', 'briefing', 'search', 'achievements'].includes(DEMO_STATION_TAB) ? DEMO_STATION_TAB : 'upgrades';
   state.stationTerminalOpen = state.demoTerminal;
   state.upgradeCategory = 'flight';
   const payout = getDeliveryPayout(completedRoute, type);
   state.currentPayout = payout;
   state.save.credits += payout;
   state.save.route = completedRoute + 1;
+  state.save.stats.dockings += 1;
+  state.save.stats.totalCredits += payout;
+  state.save.stats.bestCargo = Math.max(state.save.stats.bestCargo, getShipStats().cargo);
   state.score += payout;
   saveProgress();
+  renderMenuAchievements();
   updateHud();
   resetStationTraffic();
   updateStationUi(payout, type);
@@ -1375,21 +1854,8 @@ function launchNextRun() {
 function resetGame() {
   if (state.resultLocked) return;
   clearResultLock();
-  for (const object of state.objects) removeObject(object);
-  for (const beam of state.beams) {
-    scene.remove(beam);
-    beam.geometry.dispose();
-    beam.material.dispose();
-  }
-  for (const particle of state.particles) {
-    scene.remove(particle);
-    particle.geometry.dispose();
-    particle.material.dispose();
-  }
-  state.objects.length = 0;
-  state.beams.length = 0;
-  state.particles.length = 0;
-  state.laserBursts.length = 0;
+  clearDockTransition();
+  clearDynamicScene();
   const stats = getShipStats();
   state.running = true;
   state.docked = false;
@@ -1436,7 +1902,7 @@ function resetGame() {
   }
   if (state.demoDock) {
     window.setTimeout(() => {
-      if (state.running) openStation(getStationType(state.save.route));
+      if (state.running) beginDockingTransition(getStationType(state.save.route));
     }, 1400);
   }
   updateHud();
@@ -1472,6 +1938,7 @@ function firePulse() {
   if (!state.running || state.docking || state.shotTimer > 0 || state.heat > stats.maxHeat - 4) return;
   state.shotTimer = stats.shotCooldown;
   state.heat = clamp(state.heat + stats.shotHeat, 0, stats.maxHeat);
+  state.save.stats.shotsFired += 1;
 
   const bestTarget = acquireTarget();
   const aimNdc = getAimNdc();
@@ -1494,6 +1961,11 @@ function firePulse() {
     state.score += bestTarget.userData.kind === 'drone' ? 45 + stats.beamPower * 3 : 20 + stats.beamPower * 2;
     cockpitLight.intensity = 4.5;
     if (bestTarget.userData.hp <= 0) {
+      state.save.stats.kills += 1;
+      if (bestTarget.userData.kind === 'drone') state.save.stats.droneKills += 1;
+      if (bestTarget.userData.kind === 'asteroid') state.save.stats.asteroidKills += 1;
+      saveProgress();
+      renderMenuAchievements();
       bestTarget.getWorldPosition(tmpVectorB);
       createExplosion(tmpVectorB, bestTarget.userData.kind === 'drone' ? 0xff7e40 : 0xffc175, bestTarget.userData.kind === 'drone' ? 34 : 24);
       state.score += bestTarget.userData.value;
@@ -1586,9 +2058,22 @@ function onPointerUp(event) {
 
 function updateStars(delta) {
   const position = starGeometry.attributes.position;
+  const stationView = state.docked || gameEl.dataset.state === 'station';
   const boost = state.running ? state.speed : 28;
   for (let i = 0; i < starCount; i += 1) {
     const p = i * 3;
+    if (stationView) {
+      starPositions[p] += starSideSpeeds[i] * delta;
+      starPositions[p + 1] += Math.sin(state.time * 0.18 + i) * delta * 0.28;
+      starPositions[p + 2] += delta * 0.45;
+      if (starPositions[p] > 190 || starPositions[p] < -190) {
+        starPositions[p] = starPositions[p] > 190 ? -188 : 188;
+        starPositions[p + 1] = rand(-92, 92);
+        starPositions[p + 2] = rand(-760, -55);
+        starSideSpeeds[i] = rand(3.5, 9.5) * (i % 9 === 0 ? -0.45 : 1);
+      }
+      continue;
+    }
     starPositions[p] += state.player.x * delta * 0.9;
     starPositions[p + 1] += state.player.y * delta * 0.55;
     starPositions[p + 2] += boost * delta * rand(0.64, 1.58);
@@ -1598,7 +2083,17 @@ function updateStars(delta) {
 }
 
 function updateNebulae(delta) {
+  const stationView = state.docked || gameEl.dataset.state === 'station';
   for (const sprite of nebulae) {
+    if (stationView) {
+      sprite.position.x += delta * 2.1;
+      sprite.position.y += Math.sin(state.time * 0.12 + sprite.position.z) * delta * 0.08;
+      sprite.material.rotation += sprite.userData.spin * delta * 0.28;
+      if (sprite.position.x > 180) {
+        sprite.position.set(rand(-180, -150), rand(-120, 120), rand(-740, -150));
+      }
+      continue;
+    }
     sprite.position.z += delta * (state.running ? state.speed * 0.17 : 5);
     sprite.material.rotation += sprite.userData.spin * delta;
     if (sprite.position.z > 24) {
@@ -1678,7 +2173,7 @@ function updateObjects(delta) {
       object.position.x = lerp(object.position.x, 0, delta * 1.4);
       object.position.y = lerp(object.position.y, 0, delta * 1.4);
       if (object.position.z > -18 && state.running) {
-        openStation(data.stationType);
+        beginDockingTransition(data.stationType);
       }
     } else if (data.kind === 'collector') {
       object.rotation.x += delta * 2.2;
@@ -1695,6 +2190,9 @@ function updateObjects(delta) {
         state.shield = clamp(state.shield + 18, 0, stats.maxShield);
         state.heat = clamp(state.heat - 32, 0, stats.maxHeat);
         state.score += data.value;
+        state.save.stats.collectors += 1;
+        saveProgress();
+        renderMenuAchievements();
         createExplosion(object.position.clone(), 0x82ff9e, 18);
         state.objects.splice(i, 1);
         removeObject(object);
@@ -1956,6 +2454,12 @@ function setupEvents() {
   upgradeList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-upgrade]');
     if (button) buyUpgrade(button.dataset.upgrade);
+    const storySearch = event.target.closest('[data-story-search]');
+    if (storySearch) runStorySearch();
+    const storyComplete = event.target.closest('[data-story-complete]');
+    if (storyComplete) finishStoryGame();
+    const storyContinue = event.target.closest('[data-story-continue]');
+    if (storyContinue) continueStoryRuns();
   });
   gameEl.addEventListener('pointerdown', onPointerDown, { passive: false });
   window.addEventListener('pointermove', onPointerMove, { passive: false });
@@ -2011,6 +2515,7 @@ async function boot() {
   resize();
   await loadCockpit();
   updateHud();
+  renderMenuAchievements();
   document.documentElement.dataset.gameReady = '1';
   animate();
 

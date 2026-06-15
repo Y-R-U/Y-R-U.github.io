@@ -646,6 +646,62 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+.menu-achievements {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 10px;
+  border: 1px solid rgba(124, 232, 255, 0.18);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgba(11, 28, 34, 0.60), rgba(5, 9, 13, 0.54)),
+    rgba(6, 13, 18, 0.48);
+}
+
+.menu-achievements:empty {
+  display: none;
+}
+
+.menu-achievements-head,
+.menu-achievement-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.menu-achievements-head span,
+.menu-achievement-row span {
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(229, 247, 255, 0.76);
+  font-size: 0.68rem;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-achievements-head strong,
+.menu-achievement-row strong {
+  flex: 0 0 auto;
+  color: #ffe0ae;
+  font-size: 0.66rem;
+  line-height: 1;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-story-line {
+  margin: 0;
+  overflow: hidden;
+  color: rgba(124, 232, 255, 0.76);
+  font-size: 0.64rem;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .station-heading {
   display: flex;
   align-items: start;
@@ -757,7 +813,7 @@ h3 {
 }
 
 .station-tabs {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .upgrade-category-tabs {
@@ -833,6 +889,69 @@ h3 {
   grid-column: 1 / -1;
 }
 
+.achievement-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.achievement-card {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(124, 232, 255, 0.18);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgba(21, 42, 52, 0.72), rgba(5, 10, 15, 0.62)),
+    rgba(8, 16, 22, 0.52);
+}
+
+.achievement-card.unlocked {
+  border-color: rgba(255, 199, 126, 0.40);
+  background:
+    linear-gradient(135deg, rgba(67, 48, 24, 0.68), rgba(7, 15, 18, 0.64)),
+    rgba(10, 18, 22, 0.54);
+}
+
+.achievement-card span {
+  display: block;
+  color: rgba(220, 246, 255, 0.62);
+  font-size: 0.56rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.achievement-card h3 {
+  margin: 4px 0 0;
+  color: #fff;
+  font-size: 0.79rem;
+  line-height: 1.05;
+}
+
+.achievement-card p {
+  margin: 4px 0 0;
+  color: rgba(229, 247, 255, 0.66);
+  font-size: 0.61rem;
+  line-height: 1.12;
+}
+
+.achievement-meter {
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(185, 232, 255, 0.12);
+}
+
+.achievement-meter i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--amber));
+  box-shadow: 0 0 12px rgba(85, 230, 255, 0.38);
+}
+
 .upgrade-card,
 .terminal-card {
   min-width: 0;
@@ -880,6 +999,63 @@ h3 {
 .terminal-grid .terminal-card p {
   font-size: 0.63rem;
   line-height: 1.12;
+}
+
+.story-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.story-card {
+  display: grid;
+  gap: 8px;
+}
+
+.story-progress {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(185, 232, 255, 0.12);
+}
+
+.story-progress i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
+  box-shadow: 0 0 16px rgba(85, 230, 255, 0.46);
+}
+
+.story-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.terminal-action {
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 6px;
+  border: 1px solid rgba(124, 232, 255, 0.28);
+  border-radius: 6px;
+  color: rgba(229, 248, 255, 0.90);
+  background: rgba(9, 22, 29, 0.72);
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.terminal-action.primary {
+  color: #140907;
+  border-color: rgba(255, 199, 126, 0.62);
+  background: linear-gradient(180deg, #ffe3b4, #ffb05a 62%, #e57440);
+}
+
+.terminal-action:disabled {
+  color: rgba(223, 238, 245, 0.52);
+  border-color: rgba(124, 232, 255, 0.14);
+  background: rgba(35, 50, 60, 0.62);
 }
 
 .upgrade-meta {
@@ -1028,6 +1204,46 @@ h3 {
   line-height: 1.35;
 }
 
+.dock-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 64;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  padding: 28px;
+  background: #000;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 720ms ease;
+}
+
+.dock-transition.active {
+  opacity: 1;
+}
+
+.dock-transition div {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  transform: translateY(8px);
+  opacity: 0;
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+
+.dock-transition.active div {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.dock-transition h2 {
+  font-size: clamp(2.1rem, 11vw, 4.2rem);
+  text-align: center;
+  text-shadow:
+    0 0 26px rgba(85, 230, 255, 0.52),
+    0 0 52px rgba(255, 179, 82, 0.16);
+}
+
 @media (orientation: landscape) and (min-width: 760px) {
   .hud {
     left: 50%;
@@ -1127,7 +1343,8 @@ h3 {
   }
 
   .upgrade-card p,
-  .terminal-card p {
+  .terminal-card p,
+  .achievement-card p {
     display: none;
   }
 

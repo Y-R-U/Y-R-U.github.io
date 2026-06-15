@@ -64,6 +64,7 @@
           <span>Station Field</span>
           <b>AR-7</b>
         </div>
+        <div id="menu-achievements" class="menu-achievements" aria-label="Achievements"></div>
         <button id="start-button" class="primary-action" type="button">Launch</button>
       </div>
     </section>
@@ -140,8 +141,9 @@
           <div id="station-tabs" class="station-tabs" role="tablist" aria-label="Station terminal sections">
             <button type="button" data-station-tab="upgrades" aria-selected="true">Upgrades</button>
             <button type="button" data-station-tab="cargo" aria-selected="false">Cargo</button>
-            <button type="button" data-station-tab="briefing" aria-selected="false">Briefing</button>
-            <button type="button" data-station-tab="ship" aria-selected="false">Ship</button>
+            <button type="button" data-station-tab="briefing" aria-selected="false">Brief</button>
+            <button type="button" data-station-tab="search" aria-selected="false">Search</button>
+            <button type="button" data-station-tab="achievements" aria-selected="false">Awards</button>
           </div>
           <div class="terminal-screen">
             <div id="upgrade-category-tabs" class="upgrade-category-tabs" role="tablist" aria-label="Upgrade categories"></div>
@@ -150,6 +152,13 @@
           </div>
           <button id="launch-next-button" class="primary-action" type="button">Launch Next Delivery</button>
         </div>
+      </div>
+    </section>
+
+    <section id="dock-transition" class="dock-transition hidden" aria-hidden="true">
+      <div>
+        <p class="kicker">approach lock</p>
+        <h2>Docking...</h2>
       </div>
     </section>
 
@@ -181,7 +190,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260612b').catch(markGameError);
+    import('./game.mjs?v=20260615a').catch(markGameError);
   </script>
 </body>
 </html>
