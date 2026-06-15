@@ -101,7 +101,7 @@ body {
 /* ── gas screen (avenger's coughing fit) ── */
 .gasview { position: absolute; inset: 0; z-index: 3; pointer-events: none !important;
   display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 50% 42%, rgba(150,214,108,.78) 0%, rgba(108,182,78,.93) 55%, rgba(62,120,46,.99) 100%);
+  background: radial-gradient(circle at 50% 42%, rgb(150,214,108) 0%, rgb(108,182,78) 55%, rgb(62,120,46) 100%);
   opacity: 0; transition: opacity .2s ease; }
 .gasview.show { opacity: 1; }
 .gasinner { text-align: center; color: #1d3a14; font-weight: 800; font-size: clamp(16px, 4.6vw, 24px);
