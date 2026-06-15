@@ -5,3 +5,7 @@ gms/assets/kenney/2d/zips/
 # Per-run gen logs (transient, regenerated on each bulk_generate run)
 gms/2d/the_horrors/*.log
 gms/2d/awake/*.log
+# Local-only PolyPerfect asset gallery — commercial Unity Asset Store pack,
+# not redistributable in a public repo. Kept local until assets are protected
+# (compressed+encrypted) or hosted behind auth (e.g. ionos).
+app/3d/gallery/
