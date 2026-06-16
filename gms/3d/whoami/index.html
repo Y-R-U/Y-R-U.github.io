@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#2a3a24" />
+  <title>Who Am I — a mini RPG</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot / loading -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">WHO AM I</div>
+      <div class="boot-sub">a tiny open-world RPG</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">waking the world…</div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <!-- vitals top-left -->
+    <div id="vitals">
+      <div class="bar hp"><span class="ic">❤️</span><i></i><b>12</b></div>
+      <div class="bar food"><span class="ic">🍗</span><i></i></div>
+      <div class="bar water"><span class="ic">💧</span><i></i></div>
+      <div id="gold">🪙 <b>25</b></div>
+    </div>
+
+    <!-- buttons top-right -->
+    <div id="topbtns">
+      <button data-panel="skills" title="Skills">📊</button>
+      <button data-panel="inv" title="Inventory">🎒</button>
+      <button data-panel="quests" title="Quests">📜</button>
+    </div>
+
+    <!-- quest tracker -->
+    <div id="tracker" class="hidden"><button class="qt-x" title="Hide">✕</button><div class="qt-title">Quest</div><div class="qt-obj"></div></div>
+
+    <!-- centre interaction prompt + channel bar -->
+    <div id="prompt" class="hidden"></div>
+    <div id="channel" class="hidden"><div class="ch-label"></div><div class="ch-bar"><i></i></div></div>
+
+    <!-- bottom controls -->
+    <div id="styles"></div>
+    <div id="actionbar">
+      <button id="act-eat" title="Eat best food">🍗</button>
+      <button id="act-use" title="Interact (E / Space)">✋<small>Use</small></button>
+    </div>
+
+    <div id="hint">Tap ground to move · tap a creature to attack · drag to look · WASD + Shift to run</div>
+    <div id="toasts"></div>
+    <div id="dmgflash"></div>
+    <div id="levelpop" class="hidden"></div>
+  </div>
+
+  <!-- panels -->
+  <div id="panel-inv" class="modal hidden"></div>
+  <div id="panel-skills" class="modal hidden"></div>
+  <div id="panel-quests" class="modal hidden"></div>
+  <div id="panel-shop" class="modal hidden"></div>
+  <div id="panel-death" class="modal hidden"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

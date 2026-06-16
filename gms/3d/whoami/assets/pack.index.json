@@ -1,0 +1,347 @@
+{
+"key_hint": "whoami",
+"entries": {
+"hero": {
+"off": 0,
+"len": 85233,
+"kind": "model",
+"raw": 225524
+},
+"rat": {
+"off": 85233,
+"len": 8161,
+"kind": "model",
+"raw": 23556
+},
+"hen": {
+"off": 93394,
+"len": 12634,
+"kind": "model",
+"raw": 38432
+},
+"fish": {
+"off": 106028,
+"len": 4881,
+"kind": "model",
+"raw": 12472
+},
+"skeleton": {
+"off": 110909,
+"len": 16790,
+"kind": "model",
+"raw": 52252
+},
+"skeleton_soldier": {
+"off": 127699,
+"len": 22097,
+"kind": "model",
+"raw": 64848
+},
+"spider": {
+"off": 149796,
+"len": 20887,
+"kind": "model",
+"raw": 59924
+},
+"snake": {
+"off": 170683,
+"len": 12015,
+"kind": "model",
+"raw": 30156
+},
+"zombie": {
+"off": 182698,
+"len": 16119,
+"kind": "model",
+"raw": 45656
+},
+"tree": {
+"off": 198817,
+"len": 46652,
+"kind": "model",
+"raw": 140288
+},
+"tree_apple": {
+"off": 245469,
+"len": 12465,
+"kind": "model",
+"raw": 33300
+},
+"tree_forest": {
+"off": 257934,
+"len": 12821,
+"kind": "model",
+"raw": 26068
+},
+"bush": {
+"off": 270755,
+"len": 6928,
+"kind": "model",
+"raw": 17392
+},
+"bush_small": {
+"off": 277683,
+"len": 5132,
+"kind": "model",
+"raw": 12060
+},
+"rock_large": {
+"off": 282815,
+"len": 7939,
+"kind": "model",
+"raw": 20812
+},
+"rocks_small": {
+"off": 290754,
+"len": 4963,
+"kind": "model",
+"raw": 11596
+},
+"mushroom": {
+"off": 295717,
+"len": 5287,
+"kind": "model",
+"raw": 14176
+},
+"store": {
+"off": 301004,
+"len": 10036,
+"kind": "model",
+"raw": 29916
+},
+"house": {
+"off": 311040,
+"len": 30394,
+"kind": "model",
+"raw": 100724
+},
+"well": {
+"off": 341434,
+"len": 12873,
+"kind": "model",
+"raw": 33368
+},
+"campfire": {
+"off": 354307,
+"len": 9405,
+"kind": "model",
+"raw": 27620
+},
+"fire": {
+"off": 363712,
+"len": 1479,
+"kind": "model",
+"raw": 3380
+},
+"tent": {
+"off": 365191,
+"len": 5729,
+"kind": "model",
+"raw": 16316
+},
+"fence": {
+"off": 370920,
+"len": 3572,
+"kind": "model",
+"raw": 9112
+},
+"barrel": {
+"off": 374492,
+"len": 9041,
+"kind": "model",
+"raw": 28192
+},
+"crate": {
+"off": 383533,
+"len": 2852,
+"kind": "model",
+"raw": 9124
+},
+"anvil": {
+"off": 386385,
+"len": 3278,
+"kind": "model",
+"raw": 10904
+},
+"pot": {
+"off": 389663,
+"len": 4845,
+"kind": "model",
+"raw": 15472
+},
+"lantern": {
+"off": 394508,
+"len": 2901,
+"kind": "model",
+"raw": 9800
+},
+"apple": {
+"off": 397409,
+"len": 3902,
+"kind": "model",
+"raw": 10112
+},
+"carrot": {
+"off": 401311,
+"len": 2776,
+"kind": "model",
+"raw": 7892
+},
+"bread": {
+"off": 404087,
+"len": 4472,
+"kind": "model",
+"raw": 12332
+},
+"meat": {
+"off": 408559,
+"len": 3216,
+"kind": "model",
+"raw": 8944
+},
+"potion_red": {
+"off": 411775,
+"len": 2223,
+"kind": "model",
+"raw": 7192
+},
+"potion_blue": {
+"off": 413998,
+"len": 2227,
+"kind": "model",
+"raw": 7192
+},
+"axe": {
+"off": 416225,
+"len": 2071,
+"kind": "model",
+"raw": 5216
+},
+"log": {
+"off": 418296,
+"len": 1694,
+"kind": "model",
+"raw": 3648
+},
+"logs": {
+"off": 419990,
+"len": 4795,
+"kind": "model",
+"raw": 12104
+},
+"sword": {
+"off": 424785,
+"len": 2548,
+"kind": "model",
+"raw": 7008
+},
+"bow": {
+"off": 427333,
+"len": 5335,
+"kind": "model",
+"raw": 14688
+},
+"fishing_pole": {
+"off": 432668,
+"len": 6653,
+"kind": "model",
+"raw": 19312
+},
+"gem": {
+"off": 439321,
+"len": 1766,
+"kind": "model",
+"raw": 5216
+},
+"gems": {
+"off": 441087,
+"len": 5878,
+"kind": "model",
+"raw": 13852
+},
+"gold": {
+"off": 446965,
+"len": 1958,
+"kind": "model",
+"raw": 5728
+},
+"chest": {
+"off": 448923,
+"len": 6141,
+"kind": "model",
+"raw": 18404
+},
+"bucket": {
+"off": 455064,
+"len": 8290,
+"kind": "model",
+"raw": 25556
+},
+"torch": {
+"off": 463354,
+"len": 2823,
+"kind": "model",
+"raw": 7200
+},
+"dn_floor": {
+"off": 466177,
+"len": 1579,
+"kind": "model",
+"raw": 4392
+},
+"dn_wall": {
+"off": 467756,
+"len": 4666,
+"kind": "model",
+"raw": 13096
+},
+"dn_wall_window": {
+"off": 472422,
+"len": 7582,
+"kind": "model",
+"raw": 21072
+},
+"dn_pillar": {
+"off": 480004,
+"len": 8057,
+"kind": "model",
+"raw": 20792
+},
+"dn_pillar_corner": {
+"off": 488061,
+"len": 4040,
+"kind": "model",
+"raw": 10996
+},
+"dn_door": {
+"off": 492101,
+"len": 6176,
+"kind": "model",
+"raw": 16984
+},
+"dn_torch": {
+"off": 498277,
+"len": 3716,
+"kind": "model",
+"raw": 9776
+},
+"cave_skull": {
+"off": 501993,
+"len": 9561,
+"kind": "model",
+"raw": 23288
+},
+"atlas_gradient": {
+"off": 511554,
+"len": 208471,
+"kind": "tex",
+"raw": 208817
+},
+"atlas_specular": {
+"off": 720025,
+"len": 1164,
+"kind": "tex",
+"raw": 4599
+}
+}
+}

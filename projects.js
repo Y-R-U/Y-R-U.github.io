@@ -300,6 +300,10 @@ const PROJECTS = [
     desc: "The 3D dollhouse cut of Glade Bros: one brother farts in the same room and bolts, the other coughs then hunts for revenge. Pick the older or younger brother and your part; the computer plays the other. Three.js diorama of low-poly kids, an orbit camera, tap-to-move, and bubble-box taunts. Mobile-first.",
     date: "2026-06-15", creator: "Opus 4.8" },
 
+  { name: "Who Am I",           path: "/gms/3d/whoami/", screenshot: "whoami", type: "game",
+    desc: "A tiny open-world Diablo/RuneScape-style RPG. Wake with no memory, then level Attack, Strength, Defence, Archery, Magic, Health and Fishing through XP. Survive with slow-draining food and water (auto-refill at any river or well), pick fruit, fish, chop wood with an axe, light fires with a tinderbox and cook your catch. Trade at the general store, follow a guide through intro quests, and delve a torch-lit dungeon of skeletons, spiders and zombies with randomized loot. Three.js, tap-to-move + WASD, mobile-first.",
+    date: "2026-06-16", creator: "Opus 4.8" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
