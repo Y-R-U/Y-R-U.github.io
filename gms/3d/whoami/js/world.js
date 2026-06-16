@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CFG, RIVER, LITE } from './config.js';
-import { M } from './utils.js';
+import { M, canvasTexture, rand } from './utils.js';
 
 export const WATER_LEVEL = -0.55;
 const RIVER_HALF = 5.2;          // half-width of the carved channel
@@ -49,6 +49,7 @@ export function groundHeight(x, z) {
   // gentle rolling hills, flattened around the central village
   let h = (Math.sin(x * 0.055) * Math.cos(z * 0.048) + Math.sin(x * 0.021 + z * 0.03) * 0.6) * 0.45;
   h *= smooth(12, 40, r);
+  h = Math.max(h, -0.3);   // keep dry land above the waterline — the river is the ONLY water
   // carve the riverbed
   const d = riverDist(x, z);
   if (d < RIVER_HALF + BANK) {
@@ -153,11 +154,27 @@ export function buildWorld(scene, renderer) {
   if (!LITE) grass = buildGrass();
 
   function buildGrass() {
-    // a little 3-plane star so each tuft reads as a grass clump, not a cube
-    const blade = new THREE.PlaneGeometry(0.2, 0.7); blade.translate(0, 0.34, 0);
-    const merged = mergeGeo([blade, blade.clone().rotateY(Math.PI / 3), blade.clone().rotateY(2 * Math.PI / 3)]);
-    const N = 1800;
-    const m = new THREE.MeshStandardMaterial({ color: 0x6aa83e, side: THREE.DoubleSide, roughness: 1 });
+    // soft alpha-cut blades (ported from the Glade) — reads as wispy grass, not
+    // solid green spikes. A canvas of curved blades on crossed quads.
+    const blade = canvasTexture(128, (g, s) => {
+      g.clearRect(0, 0, s, s);
+      for (let i = 0; i < 7; i++) {
+        const xb = rand(18, 110), w = rand(4, 8), lean = rand(-18, 18), top = rand(6, 38);
+        const grad = g.createLinearGradient(0, s, 0, top);
+        grad.addColorStop(0, '#cfe0b0'); grad.addColorStop(1, '#f4ffe2');
+        g.fillStyle = grad;
+        g.beginPath();
+        g.moveTo(xb - w, s);
+        g.quadraticCurveTo(xb - w * 0.4 + lean * 0.5, s * 0.5, xb + lean, top);
+        g.quadraticCurveTo(xb + w * 0.4 + lean * 0.5, s * 0.5, xb + w, s);
+        g.closePath(); g.fill();
+      }
+    });
+    blade.wrapS = blade.wrapT = THREE.ClampToEdgeWrapping;
+    const p1 = new THREE.PlaneGeometry(0.55, 0.5).translate(0, 0.25, 0);
+    const merged = mergeGeo([p1, p1.clone().rotateY(Math.PI / 2)]);
+    const m = new THREE.MeshStandardMaterial({ map: blade, alphaTest: 0.45, side: THREE.DoubleSide, roughness: 1 });
+    const N = LITE ? 1200 : 2600;
     const inst = new THREE.InstancedMesh(merged, m, N);
     const dummy = new THREE.Object3D();
     const cc = new THREE.Color();
@@ -168,12 +185,13 @@ export function buildWorld(scene, renderer) {
       if (riverDist(x, z) < RIVER_HALF + 1) continue;
       const h = groundHeight(x, z);
       if (h < WATER_LEVEL) continue;
-      dummy.position.set(x, h, z);
+      const s = 0.7 + Math.random() * 0.8;
+      dummy.position.set(x, h - 0.02, z);
       dummy.rotation.y = Math.random() * Math.PI;
-      dummy.scale.setScalar(0.7 + Math.random() * 0.9);
+      dummy.scale.set(s, s * (0.85 + Math.random() * 0.4), s);
       dummy.updateMatrix();
       inst.setMatrixAt(n, dummy.matrix);
-      cc.setHSL(0.25 + Math.random() * 0.06, 0.5, 0.36 + Math.random() * 0.12);
+      cc.setHSL(0.26 + rand(-0.02, 0.035), 0.52, rand(0.34, 0.48));
       inst.setColorAt(n, cc);
       n++;
     }

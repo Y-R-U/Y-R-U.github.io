@@ -108,8 +108,9 @@ function start() {
     for (const s of dungeon.spawns) { const c = makeCreature(s.type, s.x, s.z, scene, world, bus); c.group.userData.creature = c; dungCreatures.push(c); }
   }
 
-  // static collision circles for overworld props (props are placed synchronously)
-  const worldCircles = liveColliders().map(e => ({ x: e.object.position.x, z: e.object.position.z, r: e.collider.r }));
+  // static collision shapes for overworld props (props are placed synchronously)
+  const worldCircles = liveColliders().filter(e => e.collider.r).map(e => ({ x: e.object.position.x, z: e.object.position.z, r: e.collider.r }));
+  const worldBoxes = liveColliders().filter(e => e.collider.box).map(e => ({ x: e.object.position.x, z: e.object.position.z, ...e.collider.box }));
 
   // ── area state ──
   let area = 'over';
@@ -345,6 +346,14 @@ function start() {
       const minD = cc.r + CFG.playerRadius;
       const dx = px.x - cc.x, dz = px.z - cc.z, d = Math.hypot(dx, dz);
       if (d < minD && d > 1e-5) { px.x = cc.x + (dx / d) * minD; px.z = cc.z + (dz / d) * minD; }
+    }
+    if (area !== 'dungeon') for (const b of worldBoxes) {        // axis-aligned box pushout
+      const pr = CFG.playerRadius;
+      const minX = b.x - b.hx - pr, maxX = b.x + b.hx + pr, minZ = b.z - b.hz - pr, maxZ = b.z + b.hz + pr;
+      if (px.x <= minX || px.x >= maxX || px.z <= minZ || px.z >= maxZ) continue;
+      const dl = px.x - minX, dr = maxX - px.x, dd = px.z - minZ, du = maxZ - px.z;
+      const m = Math.min(dl, dr, dd, du);
+      if (m === dl) px.x = minX; else if (m === dr) px.x = maxX; else if (m === dd) px.z = minZ; else px.z = maxZ;
     }
   }
 

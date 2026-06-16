@@ -27,13 +27,14 @@ export function buildWorldObjects(scene, world) {
     return it;
   }
 
-  function place(name, x, z, { scale = 1, rotY = null, collide = 0, reg = null, y = 0 } = {}) {
+  function place(name, x, z, { scale = 1, rotY = null, collide = 0, box = null, reg = null, y = 0 } = {}) {
     const holder = new THREE.Group();
     holder.position.set(x, ground(x, z) + y, z);
     holder.rotation.y = rotY == null ? rand(0, 6.28) : rotY;
     scene.add(holder);
     loadModel(name).then(m => { m.scale.setScalar(scale); holder.add(m); });
-    if (collide) register({ name: reg || name, category: 'Props', icon: '🌳', object: holder, collider: { r: collide }, note: name });
+    if (box) register({ name: reg || name, category: 'Props', icon: '🏠', object: holder, collider: { box }, note: name });
+    else if (collide) register({ name: reg || name, category: 'Props', icon: '🌳', object: holder, collider: { r: collide }, note: name });
     return holder;
   }
 
@@ -51,7 +52,12 @@ export function buildWorldObjects(scene, world) {
 
   place('anvil', SITES.anvil.x, SITES.anvil.z, { scale: 1.0, collide: 0.7, reg: 'Anvil' });
   place('tent', SITES.spawn.x - 6, SITES.spawn.z + 3, { scale: 1.0, collide: 1.4, reg: 'Tent' });
-  place('house', 12, 4, { scale: 1.0, rotY: -Math.PI * 0.5, collide: 3.0, reg: 'Forester House' });
+  // big forester barn (21 × 13.87 model). Placed clear of the village POIs, with
+  // a box collider matching its footprint so you can't walk through the walls.
+  // rotated -90° → world footprint swaps to (13.87 × 21) × scale.
+  const HS = 0.8;
+  place('house', 18, -13, { scale: HS, rotY: -Math.PI / 2, reg: 'Forester Barn',
+    box: { hx: 13.87 * HS / 2 + 0.2, hz: 21 * HS / 2 + 0.2 } });
   for (const [lx, lz] of [[-2, -2], [4, -1], [-8, 2]]) place('lantern', lx, lz, { scale: 1.0, collide: 0.3 });
   for (const [bx, bz, n] of [[-9, -6, 'barrel'], [-9.8, -5, 'crate'], [10, 2, 'barrel']]) place(n, bx, bz, { scale: 1, collide: 0.5 });
 
