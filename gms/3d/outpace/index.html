@@ -20,6 +20,13 @@
     <div id="glass-haze" aria-hidden="true"></div>
     <div id="damage-flash" aria-hidden="true"></div>
 
+    <button id="settings-button" class="settings-button" type="button" aria-label="Open ship settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 8.2a3.8 3.8 0 1 1 0 7.6 3.8 3.8 0 0 1 0-7.6Z"></path>
+        <path d="M19.4 13.4a7.6 7.6 0 0 0 0-2.8l2-1.5-2-3.5-2.5 1a7.8 7.8 0 0 0-2.4-1.4L14.1 2h-4.2l-.4 3.2a7.8 7.8 0 0 0-2.4 1.4l-2.5-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 2.8l-2 1.5 2 3.5 2.5-1a7.8 7.8 0 0 0 2.4 1.4l.4 3.2h4.2l.4-3.2a7.8 7.8 0 0 0 2.4-1.4l2.5 1 2-3.5-2-1.5Z"></path>
+      </svg>
+    </button>
+
     <section id="hud" class="hud hidden" aria-live="polite">
       <div class="status-strip">
         <div class="hud-cell">
@@ -162,6 +169,77 @@
       </div>
     </section>
 
+    <section id="settings-modal" class="system-modal hidden" aria-hidden="true">
+      <div class="system-backdrop" data-close-modal></div>
+      <div class="system-panel settings-panel" role="dialog" aria-modal="true" aria-label="Ship settings">
+        <div class="system-heading">
+          <div>
+            <p class="kicker">ship systems</p>
+            <h2>Settings</h2>
+          </div>
+          <button class="system-close" type="button" data-close-modal aria-label="Close settings">X</button>
+        </div>
+        <div class="settings-list">
+          <button id="sound-toggle" class="setting-row" type="button">
+            <span>Sound</span>
+            <strong id="sound-state">On</strong>
+          </button>
+          <button id="music-toggle" class="setting-row" type="button">
+            <span>Music</span>
+            <strong id="music-state">Off</strong>
+          </button>
+          <button id="debug-open-button" class="setting-row" type="button">
+            <span>Debug</span>
+            <strong>Open</strong>
+          </button>
+          <button id="reset-open-button" class="setting-row danger" type="button">
+            <span>Reset Progress</span>
+            <strong>Warning</strong>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="reset-modal" class="system-modal hidden" aria-hidden="true">
+      <div class="system-backdrop" data-close-modal></div>
+      <div class="system-panel reset-panel" role="dialog" aria-modal="true" aria-label="Reset progress warning">
+        <div class="system-heading">
+          <div>
+            <p class="kicker">data purge</p>
+            <h2>Reset progress?</h2>
+          </div>
+          <button class="system-close" type="button" data-close-modal aria-label="Close reset warning">X</button>
+        </div>
+        <p class="system-copy">This clears credits, upgrades, route progress, achievements, story progress, and best score on this device.</p>
+        <div class="system-actions">
+          <button id="reset-cancel-button" class="terminal-action" type="button">Cancel</button>
+          <button id="reset-confirm-button" class="terminal-action primary danger-action" type="button">Reset All</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="debug-modal" class="system-modal hidden" aria-hidden="true">
+      <div class="system-backdrop" data-close-modal></div>
+      <div class="system-panel debug-panel" role="dialog" aria-modal="true" aria-label="Debug tools">
+        <div class="system-heading">
+          <div>
+            <p class="kicker">local tools</p>
+            <h2>Debug</h2>
+          </div>
+          <button class="system-close" type="button" data-close-modal aria-label="Close debug tools">X</button>
+        </div>
+        <div class="debug-actions">
+          <button id="debug-skip-depot-button" class="terminal-action primary" type="button">Skip To Depot</button>
+          <button id="debug-refresh-media-button" class="terminal-action" type="button">Refresh Media</button>
+        </div>
+        <div class="debug-media-head">
+          <span>Media library</span>
+          <strong id="debug-media-count">0</strong>
+        </div>
+        <div id="debug-media-list" class="debug-media-list" aria-label="Image and video media assets"></div>
+      </div>
+    </section>
+
     <section id="boot-error" class="overlay hidden" aria-live="assertive">
       <div class="launch-panel">
         <p class="kicker">render error</p>
@@ -190,7 +268,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260615a').catch(markGameError);
+    import('./game.mjs?v=20260616a').catch(markGameError);
   </script>
 </body>
 </html>

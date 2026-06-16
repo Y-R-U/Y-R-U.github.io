@@ -14,6 +14,22 @@ const resultEl = document.getElementById('result');
 const stationEl = document.getElementById('station');
 const dockTransitionEl = document.getElementById('dock-transition');
 const menuAchievements = document.getElementById('menu-achievements');
+const settingsButton = document.getElementById('settings-button');
+const settingsModal = document.getElementById('settings-modal');
+const resetModal = document.getElementById('reset-modal');
+const debugModal = document.getElementById('debug-modal');
+const soundToggle = document.getElementById('sound-toggle');
+const musicToggle = document.getElementById('music-toggle');
+const soundState = document.getElementById('sound-state');
+const musicState = document.getElementById('music-state');
+const debugOpenButton = document.getElementById('debug-open-button');
+const resetOpenButton = document.getElementById('reset-open-button');
+const resetCancelButton = document.getElementById('reset-cancel-button');
+const resetConfirmButton = document.getElementById('reset-confirm-button');
+const debugSkipDepotButton = document.getElementById('debug-skip-depot-button');
+const debugRefreshMediaButton = document.getElementById('debug-refresh-media-button');
+const debugMediaList = document.getElementById('debug-media-list');
+const debugMediaCount = document.getElementById('debug-media-count');
 const stationTerminalHotspot = document.getElementById('station-terminal-hotspot');
 const stationTerminalPanel = document.getElementById('station-terminal-panel');
 const stationCloseTerminal = document.getElementById('station-close-terminal');
@@ -57,6 +73,7 @@ const upgradeList = document.getElementById('upgrade-list');
 const BEST_KEY = 'outpace-best';
 const LEGACY_BEST_KEY = 'void-cockpit-best';
 const SAVE_KEY = 'outpace-save-v2';
+const SETTINGS_KEY = 'outpace-settings-v1';
 const RESULT_LOCK_MS = 3200;
 const DOCK_FADE_IN_MS = 760;
 const DOCK_HOLD_MS = 360;
@@ -67,7 +84,9 @@ let dockTransitionTimers = [];
 
 const clock = new THREE.Clock();
 const params = new URLSearchParams(window.location.search);
-const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal');
+const DEMO_SETTINGS = params.has('demoSettings');
+const DEMO_DEBUG = params.has('demoDebug');
+const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal') || DEMO_SETTINGS || DEMO_DEBUG;
 const DEMO_STATION_TAB = params.get('demoTab') || '';
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
@@ -204,6 +223,97 @@ const ACHIEVEMENT_DEFS = [
     goal: 1,
     progress: (save) => save.stats.storyCompleted,
   },
+];
+
+const STORY_MEDIA = [
+  {
+    id: 'IMG-01',
+    type: 'image',
+    title: 'Cold Port Record',
+    storyKinds: ['kin', 'revenge'],
+    phase: 'cold',
+    src: '',
+    plannedPath: 'assets/story/img-01-cold-port-record.jpg',
+    generator: 'MFLUX flux2-klein-4b',
+    prompt: 'close-up sci-fi dock terminal evidence still, cold missing-person port record, dim cyan interface reflections, no readable text, no logos',
+  },
+  {
+    id: 'IMG-02',
+    type: 'image',
+    title: 'Warm Alias Hit',
+    storyKinds: ['kin', 'revenge'],
+    phase: 'warm',
+    src: '',
+    plannedPath: 'assets/story/img-02-warm-alias-hit.jpg',
+    generator: 'MFLUX flux2-klein-4b',
+    prompt: 'cinematic sci-fi case file still, partially corrupted face silhouette and dock receipt fragments, amber warning light, no readable text, no logos',
+  },
+  {
+    id: 'IMG-03',
+    type: 'image',
+    title: 'Black Box Fragment',
+    storyKinds: ['blackbox'],
+    phase: 'cold',
+    src: '',
+    plannedPath: 'assets/story/img-03-black-box-fragment.jpg',
+    generator: 'MFLUX flux2-klein-4b',
+    prompt: 'macro sci-fi black box data core fragment floating in a repair tray, cyan scan lines, damaged metal, no readable text, no logos',
+  },
+  {
+    id: 'IMG-04',
+    type: 'image',
+    title: 'Final Berth',
+    storyKinds: ['kin', 'revenge', 'blackbox'],
+    phase: 'final',
+    src: '',
+    plannedPath: 'assets/story/img-04-final-berth.jpg',
+    generator: 'MFLUX flux2-klein-4b',
+    prompt: 'cinematic sci-fi docking lounge evidence still, final berth door with bright rim light and emotional mystery, no readable text, no logos',
+  },
+  {
+    id: 'VID-01',
+    type: 'video',
+    title: 'Signal Sweep Loop',
+    storyKinds: ['kin', 'revenge'],
+    phase: 'warm',
+    src: '',
+    plannedPath: 'assets/story/vid-01-signal-sweep-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'small dock terminal signal sweep, radar pulse crosses a corrupted case file, extremely slow zoom in, no readable text, no logos',
+    notes: 'Generate part A from IMG-02. Generate part B from part A last frame back to IMG-02, then crop any final glitch frames.',
+  },
+  {
+    id: 'VID-02',
+    type: 'video',
+    title: 'Black Box Decode Loop',
+    storyKinds: ['blackbox'],
+    phase: 'warm',
+    src: '',
+    plannedPath: 'assets/story/vid-02-black-box-decode-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'black box fragment decoding in a station terminal tray, tiny light pulses and scan haze, extremely slow push in, no readable text, no logos',
+    notes: 'Generate part A from IMG-03. Generate part B from part A last frame back to IMG-03, crop the last half-second if it rushes the end frame.',
+  },
+];
+
+const DEBUG_MEDIA = [
+  {
+    id: 'BASE-01',
+    type: 'image',
+    title: 'Cockpit Window Mask',
+    src: 'assets/cockpit-chroma.png',
+    generator: 'generated cockpit asset',
+    prompt: 'Runtime cockpit image. Green-screen window is keyed out so the Three.js space scene renders underneath.',
+  },
+  {
+    id: 'BASE-02',
+    type: 'image',
+    title: 'Station Lounge Alpha',
+    src: 'assets/station-lounge-alpha.png',
+    generator: 'generated lounge asset',
+    prompt: 'Station lounge image with transparent window openings over the live sideways starfield.',
+  },
+  ...STORY_MEDIA,
 ];
 
 const UPGRADE_DEFS = [
@@ -374,9 +484,34 @@ function loadSave() {
   return save;
 }
 
+function makeDefaultSettings() {
+  return {
+    sound: true,
+    music: false,
+  };
+}
+
+function loadSettings() {
+  const settings = makeDefaultSettings();
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return settings;
+    const parsed = JSON.parse(raw);
+    settings.sound = parsed.sound !== false;
+    settings.music = Boolean(parsed.music);
+  } catch {
+    return settings;
+  }
+  return settings;
+}
+
 function saveProgress() {
   if (DEMO_MODE) return;
   localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
+}
+
+function saveSettings() {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
 }
 
 function getUpgradeLevel(id) {
@@ -455,6 +590,14 @@ const state = {
   demoDock: params.has('demoDock'),
   demoTerminal: params.has('demoTerminal'),
   save: loadSave(),
+  settings: loadSettings(),
+  modal: null,
+  audio: {
+    context: null,
+    musicGain: null,
+    musicNodes: [],
+    musicRunning: false,
+  },
   time: 0,
   score: 0,
   best: Number(localStorage.getItem(BEST_KEY) || localStorage.getItem(LEGACY_BEST_KEY) || 0),
@@ -1412,12 +1555,279 @@ function onStationPointerDown(event) {
   event.stopPropagation();
 }
 
+function renderSettingsState() {
+  if (soundState) soundState.textContent = state.settings.sound ? 'On' : 'Off';
+  if (musicState) musicState.textContent = state.settings.music ? 'On' : 'Off';
+}
+
+function showModal(modal) {
+  if (!modal) return;
+  closeAllModals();
+  state.modal = modal.id;
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  renderSettingsState();
+  if (modal === debugModal) renderDebugMediaList();
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  if (state.modal === modal.id) state.modal = null;
+}
+
+function closeAllModals() {
+  for (const modal of [settingsModal, resetModal, debugModal]) closeModal(modal);
+}
+
+function ensureAudioContext() {
+  if (!state.audio.context) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    state.audio.context = new AudioContextClass();
+  }
+  if (state.audio.context.state === 'suspended') state.audio.context.resume().catch(() => {});
+  return state.audio.context;
+}
+
+function playSfx(kind = 'click') {
+  if (!state.settings.sound) return;
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const gain = ctx.createGain();
+  const osc = ctx.createOscillator();
+  const config = {
+    click: [420, 0.035, 0.018, 'triangle'],
+    buy: [720, 0.09, 0.035, 'sine'],
+    laser: [980, 0.08, 0.028, 'sawtooth'],
+    dock: [180, 0.26, 0.045, 'sine'],
+    error: [120, 0.14, 0.040, 'square'],
+  }[kind] || [420, 0.035, 0.018, 'triangle'];
+  osc.type = config[3];
+  osc.frequency.setValueAtTime(config[0], now);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(40, config[0] * 0.62), now + config[1]);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(config[2], now + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + config[1]);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + config[1] + 0.02);
+}
+
+function stopMusic() {
+  for (const node of state.audio.musicNodes) {
+    try {
+      node.stop?.();
+      node.disconnect?.();
+    } catch {}
+  }
+  state.audio.musicNodes.length = 0;
+  state.audio.musicGain?.disconnect?.();
+  state.audio.musicGain = null;
+  state.audio.musicRunning = false;
+}
+
+function startMusic() {
+  if (!state.settings.music || state.audio.musicRunning) return;
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.024, now + 1.2);
+  gain.connect(ctx.destination);
+
+  const notes = [82.41, 123.47, 164.81, 246.94];
+  const nodes = [];
+  for (const [index, freq] of notes.entries()) {
+    const osc = ctx.createOscillator();
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    osc.type = index % 2 ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(0.035 + index * 0.012, now);
+    lfoGain.gain.setValueAtTime(freq * 0.012, now);
+    lfo.connect(lfoGain).connect(osc.frequency);
+    osc.connect(gain);
+    osc.start(now);
+    lfo.start(now);
+    nodes.push(osc, lfo, lfoGain);
+  }
+
+  state.audio.musicGain = gain;
+  state.audio.musicNodes = nodes;
+  state.audio.musicRunning = true;
+}
+
+function syncMusic() {
+  if (state.settings.music) startMusic();
+  else stopMusic();
+}
+
+function toggleSound() {
+  state.settings.sound = !state.settings.sound;
+  saveSettings();
+  renderSettingsState();
+  playSfx(state.settings.sound ? 'buy' : 'click');
+}
+
+function toggleMusic() {
+  state.settings.music = !state.settings.music;
+  saveSettings();
+  renderSettingsState();
+  if (state.settings.music) {
+    playSfx('buy');
+    startMusic();
+  } else {
+    playSfx('click');
+    stopMusic();
+  }
+}
+
+function resetProgress() {
+  localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(BEST_KEY);
+  localStorage.removeItem(LEGACY_BEST_KEY);
+  clearResultLock();
+  clearDockTransition();
+  clearDynamicScene();
+  state.save = makeDefaultSave();
+  state.best = 0;
+  state.score = 0;
+  state.currentPayout = 0;
+  state.routeDistance = 0;
+  state.routeLength = getRouteLength();
+  state.running = false;
+  state.docking = false;
+  state.docked = false;
+  state.firing = false;
+  state.pointerDown = false;
+  state.firePointerId = null;
+  state.movementPointerId = null;
+  state.shield = getShipStats().maxShield;
+  state.heat = 0;
+  state.wave = 1;
+  menuEl.classList.remove('hidden');
+  resultEl.classList.add('hidden');
+  stationEl.classList.add('hidden');
+  hudEl.classList.add('hidden');
+  fireButton.classList.add('hidden');
+  reticleEl.classList.add('hidden');
+  closeAllModals();
+  setGameState('menu');
+  updateHud();
+  renderMenuAchievements();
+  playSfx('dock');
+}
+
+function debugSkipToDepot() {
+  closeAllModals();
+  clearResultLock();
+  clearDockTransition();
+  clearDynamicScene();
+  const stats = getShipStats();
+  state.running = true;
+  state.docked = false;
+  state.docking = false;
+  state.firing = false;
+  state.pointerDown = false;
+  state.routeLength = Math.max(60, getRouteLength());
+  state.routeDistance = state.routeLength;
+  state.currentPayout = getDeliveryPayout();
+  state.shield = Math.max(1, state.shield || stats.maxShield);
+  state.heat = 0;
+  menuEl.classList.add('hidden');
+  resultEl.classList.add('hidden');
+  stationEl.classList.add('hidden');
+  hudEl.classList.remove('hidden');
+  reticleEl.classList.remove('hidden');
+  fireButton.classList.remove('hidden');
+  setGameState('playing');
+  updateHud();
+  playSfx('dock');
+  beginDockingTransition(getStationType(state.save.route));
+}
+
 function getStoryArc(story = state.save.story) {
   return STORY_ARCS.find((arc) => arc.id === story?.kind) || STORY_ARCS[0];
 }
 
 function getStoryTitle(story = state.save.story) {
   return getStoryArc(story).title(story.target);
+}
+
+function getStoryPhase(story = state.save.story) {
+  if (story.complete || story.progress >= story.goal - 1) return 'final';
+  const ratio = story.progress / Math.max(1, story.goal);
+  return ratio >= 0.36 ? 'warm' : 'cold';
+}
+
+function getStoryMedia(story = state.save.story) {
+  const phase = getStoryPhase(story);
+  return STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind) && item.phase === phase)
+    || STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind))
+    || STORY_MEDIA[0];
+}
+
+function createMediaFrame(item, className = 'story-media-frame') {
+  const frame = document.createElement('div');
+  frame.className = className;
+  frame.dataset.mediaId = item.id;
+
+  if (item.src) {
+    if (item.type === 'video') {
+      const video = document.createElement('video');
+      video.src = item.src;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.preload = 'metadata';
+      frame.append(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = '';
+      img.loading = 'lazy';
+      frame.append(img);
+    }
+  }
+
+  const label = document.createElement('span');
+  label.className = className === 'story-media-frame' ? 'story-media-id' : '';
+  label.textContent = item.id;
+  frame.append(label);
+  return frame;
+}
+
+function renderDebugMediaList() {
+  if (!debugMediaList) return;
+  debugMediaList.innerHTML = '';
+  if (debugMediaCount) debugMediaCount.textContent = String(DEBUG_MEDIA.length);
+
+  for (const item of DEBUG_MEDIA) {
+    const card = document.createElement('article');
+    card.className = 'media-debug-card';
+    const thumb = createMediaFrame(item, 'media-debug-thumb');
+    const meta = document.createElement('div');
+    meta.className = 'media-debug-meta';
+
+    const title = document.createElement('h3');
+    title.textContent = `${item.id} ${item.title}`;
+    const type = document.createElement('p');
+    type.textContent = `${item.type.toUpperCase()} | ${item.generator}`;
+    const path = document.createElement('code');
+    path.textContent = item.src || item.plannedPath || 'pending asset path';
+    const prompt = document.createElement('p');
+    prompt.textContent = item.notes ? `${item.prompt} ${item.notes}` : item.prompt;
+
+    meta.append(title, type, path, prompt);
+    card.append(thumb, meta);
+    debugMediaList.append(card);
+  }
 }
 
 function getStoryMessage(story = state.save.story) {
@@ -1598,6 +2008,7 @@ function renderStorySearch() {
   kicker.textContent = getStoryArc(story).label;
   const title = document.createElement('h3');
   title.textContent = getStoryTitle(story);
+  const media = createMediaFrame(getStoryMedia(story));
   const text = document.createElement('p');
   text.textContent = story.lastMessage || getStoryMessage(story);
   const progress = document.createElement('div');
@@ -1635,7 +2046,7 @@ function renderStorySearch() {
     actions.append(search, routeLabel);
   }
 
-  card.append(kicker, title, text, progress, actions);
+  card.append(kicker, title, media, text, progress, actions);
   upgradeList.append(card);
 }
 
@@ -1804,6 +2215,7 @@ function buyUpgrade(id) {
   state.save.stats.bestCargo = Math.max(state.save.stats.bestCargo, getCargoCapacity(state.save.upgrades.cargo || 0));
   saveProgress();
   renderMenuAchievements();
+  playSfx('buy');
   updateStationUi(state.currentPayout, state.lastStationType, `${def.name} installed. Credits updated and the next manifest is still reserved.`);
 }
 
@@ -1834,6 +2246,7 @@ function openStation(type = getStationType()) {
   state.score += payout;
   saveProgress();
   renderMenuAchievements();
+  playSfx('dock');
   updateHud();
   resetStationTraffic();
   updateStationUi(payout, type);
@@ -1955,6 +2368,7 @@ function firePulse() {
   addLaserBurst(targetScreen);
   createBeam(camera.position.clone().add(new THREE.Vector3(-0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
   createBeam(camera.position.clone().add(new THREE.Vector3(0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
+  playSfx('laser');
 
   if (bestTarget) {
     bestTarget.userData.hp -= stats.beamPower;
@@ -2437,29 +2851,96 @@ function restoreCanvasesSoon() {
 }
 
 function setupEvents() {
-  startButton.addEventListener('click', resetGame);
-  restartButton.addEventListener('click', resetGame);
-  launchNextButton.addEventListener('click', launchNextRun);
+  settingsButton?.addEventListener('click', () => {
+    playSfx('click');
+    showModal(settingsModal);
+  });
+  for (const modal of [settingsModal, resetModal, debugModal]) {
+    modal?.addEventListener('pointerdown', (event) => event.stopPropagation());
+    modal?.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close-modal]')) {
+        playSfx('click');
+        closeModal(modal);
+      }
+    });
+  }
+  soundToggle?.addEventListener('click', toggleSound);
+  musicToggle?.addEventListener('click', toggleMusic);
+  debugOpenButton?.addEventListener('click', () => {
+    playSfx('click');
+    showModal(debugModal);
+  });
+  resetOpenButton?.addEventListener('click', () => {
+    playSfx('error');
+    showModal(resetModal);
+  });
+  resetCancelButton?.addEventListener('click', () => {
+    playSfx('click');
+    closeModal(resetModal);
+  });
+  resetConfirmButton?.addEventListener('click', resetProgress);
+  debugSkipDepotButton?.addEventListener('click', debugSkipToDepot);
+  debugRefreshMediaButton?.addEventListener('click', () => {
+    playSfx('click');
+    renderDebugMediaList();
+  });
+
+  startButton.addEventListener('click', () => {
+    playSfx('buy');
+    syncMusic();
+    resetGame();
+  });
+  restartButton.addEventListener('click', () => {
+    playSfx('buy');
+    syncMusic();
+    resetGame();
+  });
+  launchNextButton.addEventListener('click', () => {
+    playSfx('buy');
+    syncMusic();
+    launchNextRun();
+  });
   stationEl.addEventListener('pointerdown', onStationPointerDown);
-  stationTerminalHotspot?.addEventListener('click', () => setStationTerminalOpen(true));
-  stationCloseTerminal?.addEventListener('click', () => setStationTerminalOpen(false));
+  stationTerminalHotspot?.addEventListener('click', () => {
+    playSfx('click');
+    setStationTerminalOpen(true);
+  });
+  stationCloseTerminal?.addEventListener('click', () => {
+    playSfx('click');
+    setStationTerminalOpen(false);
+  });
   stationTabs?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-station-tab]');
-    if (button) setStationTab(button.dataset.stationTab);
+    if (button) {
+      playSfx('click');
+      setStationTab(button.dataset.stationTab);
+    }
   });
   upgradeCategoryTabs?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-upgrade-category]');
-    if (button) setUpgradeCategory(button.dataset.upgradeCategory);
+    if (button) {
+      playSfx('click');
+      setUpgradeCategory(button.dataset.upgradeCategory);
+    }
   });
   upgradeList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-upgrade]');
     if (button) buyUpgrade(button.dataset.upgrade);
     const storySearch = event.target.closest('[data-story-search]');
-    if (storySearch) runStorySearch();
+    if (storySearch) {
+      playSfx('buy');
+      runStorySearch();
+    }
     const storyComplete = event.target.closest('[data-story-complete]');
-    if (storyComplete) finishStoryGame();
+    if (storyComplete) {
+      playSfx('dock');
+      finishStoryGame();
+    }
     const storyContinue = event.target.closest('[data-story-continue]');
-    if (storyContinue) continueStoryRuns();
+    if (storyContinue) {
+      playSfx('click');
+      continueStoryRuns();
+    }
   });
   gameEl.addEventListener('pointerdown', onPointerDown, { passive: false });
   window.addEventListener('pointermove', onPointerMove, { passive: false });
@@ -2483,6 +2964,10 @@ function setupEvents() {
   fireButton.addEventListener('pointerup', onPointerUp, { passive: true });
   fireButton.addEventListener('pointercancel', onPointerUp, { passive: true });
   window.addEventListener('keydown', (event) => {
+    if (event.code === 'Escape' && state.modal) {
+      closeAllModals();
+      return;
+    }
     if (event.code === 'Space') {
       state.firing = true;
       firePulse();
@@ -2515,12 +3000,20 @@ async function boot() {
   resize();
   await loadCockpit();
   updateHud();
+  renderSettingsState();
   renderMenuAchievements();
+  renderDebugMediaList();
   document.documentElement.dataset.gameReady = '1';
   animate();
 
   if (state.demo) {
     setTimeout(resetGame, 350);
+  }
+  if (DEMO_SETTINGS) {
+    setTimeout(() => showModal(settingsModal), 450);
+  }
+  if (DEMO_DEBUG) {
+    setTimeout(() => showModal(debugModal), 450);
   }
 }
 
