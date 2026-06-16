@@ -93,7 +93,9 @@ const clock = new THREE.Clock();
 const params = new URLSearchParams(window.location.search);
 const DEMO_SETTINGS = params.has('demoSettings');
 const DEMO_DEBUG = params.has('demoDebug');
-const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal') || DEMO_SETTINGS || DEMO_DEBUG;
+const DEMO_STORY_STATE = params.get('demoStory') || '';
+const DEMO_QUEST = params.get('demoQuest') || '';
+const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal') || params.has('demoStory') || params.has('demoQuest') || DEMO_SETTINGS || DEMO_DEBUG;
 const DEMO_STATION_TAB = params.get('demoTab') || '';
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
@@ -146,30 +148,48 @@ const CARGO_CAPACITY_BY_LEVEL = [
   151, 177, 206, 238, 273, 312, 355, 402, 454, 512,
 ];
 
+const OWNER_LAST_NAMES = ['Vale', 'Morrow', 'Sable', 'Kestrel', 'Rourke', 'Orion'];
+
 const STORY_ARCS = [
   {
+    id: 'identity',
+    label: 'Identity Cache',
+    targets: OWNER_LAST_NAMES,
+    title: (target) => `Who is ${target}?`,
+    endingTitle: 'Registry Matched',
+    summary: 'Recover the owner record and the lost shipping-family trail.',
+    unavailable: 'Required first mission.',
+    ending: (target) => `The ${target} freight line was pushed out by a syndicate. Most of the family is missing, and the quest board is now open.`,
+  },
+  {
     id: 'kin',
-    label: 'Search Thread',
-    targets: ['daughter', 'son', 'father', 'mother', 'friend'],
-    title: (target) => `Search: ${target}`,
+    label: 'Family Search',
+    targets: ['mother', 'father', 'sister', 'brother', 'cousin'],
+    title: (target) => `Find: ${target}`,
     endingTitle: 'Signal Found',
-    ending: (target) => `The final berth log resolves to a live room code. Your ${target} is waiting beyond the inner dock.`,
+    summary: 'Use port caches to find one missing family member.',
+    unavailable: 'Unlocks after the identity cache.',
+    ending: (target) => `The final berth log resolves to a live room code. Your ${target} is alive beyond the inner dock.`,
   },
   {
     id: 'revenge',
-    label: 'Search Thread',
-    targets: ['enemy', 'rival', 'former captain'],
+    label: 'Syndicate Trace',
+    targets: ['syndicate broker', 'dock lieutenant', 'former family agent'],
     title: (target) => `Trace: ${target}`,
     endingTitle: 'Account Open',
-    ending: (target) => `The terminal confirms your ${target} docked under a false name. Their bay is one door away.`,
+    summary: 'Trace the criminal organisation that took the family routes.',
+    unavailable: 'Unlocks after the identity cache.',
+    ending: (target) => `The terminal confirms the ${target} docked under a false name. Their bay is one door away.`,
   },
   {
     id: 'blackbox',
     label: 'Black Box Trail',
-    targets: ['lost black box'],
+    targets: ['escape recorder'],
     title: () => 'Black Box Trail',
     endingTitle: 'Beacon Decoded',
-    ending: () => 'The box fragments align into one final coordinate. A live rescue beacon answers from the static.',
+    summary: 'Recover the small cargo ship launch recorder and the missing minutes.',
+    unavailable: 'Unlocks after the identity cache.',
+    ending: () => 'The recorder fragments align into one final coordinate. A live rescue beacon answers from the static.',
   },
 ];
 
@@ -237,7 +257,7 @@ const STORY_MEDIA = [
     id: 'IMG-01',
     type: 'image',
     title: 'Cold Port Record',
-    storyKinds: ['kin', 'revenge'],
+    storyKinds: ['kin'],
     phase: 'cold',
     src: 'assets/story/img-01-cold-port-record.png',
     plannedPath: 'assets/story/img-01-cold-port-record.png',
@@ -270,12 +290,139 @@ const STORY_MEDIA = [
     id: 'IMG-04',
     type: 'image',
     title: 'Final Berth',
-    storyKinds: ['kin', 'revenge', 'blackbox'],
+    storyKinds: ['revenge', 'blackbox'],
     phase: 'final',
     src: 'assets/story/img-04-final-berth.png',
     plannedPath: 'assets/story/img-04-final-berth.png',
     generator: 'MFLUX flux2-klein-9b-mlx-4bit',
     prompt: 'cinematic sci-fi docking lounge evidence still, final berth door with bright rim light and emotional mystery, no readable text, no logos',
+  },
+  {
+    id: 'IMG-05',
+    type: 'image',
+    title: 'Owner Registry',
+    storyKinds: ['identity'],
+    phase: 'cold',
+    src: 'assets/story/img-05-owner-registry.png',
+    plannedPath: 'assets/story/img-05-owner-registry.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'cinematic sci-fi ship registry evidence still, scrubbed owner record on a dark cockpit console, no readable text, no logos',
+  },
+  {
+    id: 'IMG-06',
+    type: 'image',
+    title: 'Autopilot Escape',
+    storyKinds: ['identity'],
+    phase: 'warm',
+    src: 'assets/story/img-06-autopilot-escape.png',
+    plannedPath: 'assets/story/img-06-autopilot-escape.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'small fast cargo starship escaping an orbital freight hangar under emergency autopilot, no readable text, no logos',
+  },
+  {
+    id: 'IMG-07',
+    type: 'image',
+    title: 'Family Ledger',
+    storyKinds: ['identity'],
+    phase: 'final',
+    src: 'assets/story/img-07-family-ledger.png',
+    plannedPath: 'assets/story/img-07-family-ledger.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'family shipping archive with holographic freight routes and syndicate overlays, no readable text, no logos',
+  },
+  {
+    id: 'IMG-08',
+    type: 'image',
+    title: 'Syndicate Trace',
+    storyKinds: ['revenge'],
+    phase: 'cold',
+    src: 'assets/story/img-08-syndicate-trace.png',
+    plannedPath: 'assets/story/img-08-syndicate-trace.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'black market orbital route board with red threat lines over blue station schematics, no readable text, no logos',
+  },
+  {
+    id: 'IMG-09',
+    type: 'image',
+    title: 'Family Signal',
+    storyKinds: ['kin'],
+    phase: 'final',
+    src: 'assets/story/img-09-family-signal.png',
+    plannedPath: 'assets/story/img-09-family-signal.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'missing family signal from a warm inner berth door in station mist, no readable text, no logos',
+  },
+  {
+    id: 'VID-03',
+    type: 'video',
+    title: 'Owner Registry Loop',
+    storyKinds: ['identity'],
+    phase: 'cold',
+    src: 'assets/story/vid-03-owner-registry-loop.mp4',
+    plannedPath: 'assets/story/vid-03-owner-registry-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'ship registry terminal loop, scrubbed owner record panels flicker softly, no readable text, no logos',
+    notes: 'Generated from IMG-05, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-04',
+    type: 'video',
+    title: 'Autopilot Escape Loop',
+    storyKinds: ['identity'],
+    phase: 'warm',
+    src: 'assets/story/vid-04-autopilot-escape-loop.mp4',
+    plannedPath: 'assets/story/vid-04-autopilot-escape-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'emergency cargo starship launch loop, blue engine flare and orange dock alarms pulse, no readable text, no logos',
+    notes: 'Generated from IMG-06, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-05',
+    type: 'video',
+    title: 'Family Ledger Loop',
+    storyKinds: ['identity'],
+    phase: 'final',
+    src: 'assets/story/vid-05-family-ledger-loop.mp4',
+    plannedPath: 'assets/story/vid-05-family-ledger-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'family freight route archive loop, holographic route lines crawl across a lounge table, no readable text, no logos',
+    notes: 'Generated from IMG-07, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-08',
+    type: 'video',
+    title: 'Family Signal Loop',
+    storyKinds: ['kin'],
+    phase: 'final',
+    src: 'assets/story/vid-08-family-signal-loop.mp4',
+    plannedPath: 'assets/story/vid-08-family-signal-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'missing family signal loop, warm beacon from an inner berth door pulses softly, no readable text, no logos',
+    notes: 'Generated from IMG-09, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-07',
+    type: 'video',
+    title: 'Syndicate Trace Loop',
+    storyKinds: ['revenge'],
+    phase: 'warm',
+    src: 'assets/story/vid-07-syndicate-trace-loop.mp4',
+    plannedPath: 'assets/story/vid-07-syndicate-trace-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'syndicate route trace loop, red threat lines pulse over blue station map panels, no readable text, no logos',
+    notes: 'Generated from IMG-08, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-06',
+    type: 'video',
+    title: 'Final Berth Loop',
+    storyKinds: ['revenge', 'blackbox'],
+    phase: 'final',
+    src: 'assets/story/vid-06-final-berth-loop.mp4',
+    plannedPath: 'assets/story/vid-06-final-berth-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'final berth evidence loop, rim light breathes behind a distant station door, no readable text, no logos',
+    notes: 'Generated from IMG-04, then returned to the source frame for a compact loop.',
   },
   {
     id: 'VID-01',
@@ -424,14 +571,14 @@ function makeDefaultStats() {
   };
 }
 
-function createStory() {
-  const arc = pick(STORY_ARCS);
-  const target = pick(arc.targets);
+function createQuest(kind = 'identity', targetOverride = '') {
+  const arc = STORY_ARCS.find((item) => item.id === kind) || STORY_ARCS[0];
+  const target = targetOverride || (kind === 'identity' ? pick(OWNER_LAST_NAMES) : arc.targets[0]);
   return {
     id: `${arc.id}-${Date.now().toString(36)}-${Math.floor(rand(100, 999))}`,
     kind: arc.id,
     target,
-    goal: Math.floor(rand(7, 13)),
+    goal: arc.id === 'identity' ? 4 : arc.id === 'blackbox' ? 8 : 9,
     progress: 0,
     lastRoute: 0,
     complete: false,
@@ -440,24 +587,62 @@ function createStory() {
   };
 }
 
-function normalizeStory(rawStory) {
-  if (!rawStory || typeof rawStory !== 'object') return createStory();
-  const fallback = createStory();
-  const arc = STORY_ARCS.find((item) => item.id === rawStory.kind) || STORY_ARCS.find((item) => item.id === fallback.kind);
-  const target = arc.targets.includes(rawStory.target) ? rawStory.target : arc.targets[0];
-  const goal = clamp(Math.round(Number(rawStory.goal) || fallback.goal), 5, 16);
-  const progress = clamp(Math.round(Number(rawStory.progress) || 0), 0, goal);
+function normalizeQuest(rawQuest, kind = 'identity', lastName = '') {
+  const fallback = createQuest(kind, kind === 'identity' ? lastName : '');
+  const arc = STORY_ARCS.find((item) => item.id === (rawQuest?.kind || kind)) || STORY_ARCS[0];
+  const target = arc.targets.includes(rawQuest?.target) ? rawQuest.target : fallback.target;
+  const goal = clamp(Math.round(Number(rawQuest?.goal) || fallback.goal), arc.id === 'identity' ? 3 : 5, 16);
+  const progress = clamp(Math.round(Number(rawQuest?.progress) || 0), 0, goal);
   return {
-    id: typeof rawStory.id === 'string' ? rawStory.id : fallback.id,
+    id: typeof rawQuest?.id === 'string' ? rawQuest.id : fallback.id,
     kind: arc.id,
     target,
     goal,
     progress,
-    lastRoute: Math.max(0, Math.round(Number(rawStory.lastRoute) || 0)),
-    complete: Boolean(rawStory.complete) || progress >= goal,
-    endingSeen: Boolean(rawStory.endingSeen),
-    lastMessage: typeof rawStory.lastMessage === 'string' ? rawStory.lastMessage.slice(0, 180) : '',
+    lastRoute: Math.max(0, Math.round(Number(rawQuest?.lastRoute) || 0)),
+    complete: Boolean(rawQuest?.complete) || progress >= goal,
+    endingSeen: Boolean(rawQuest?.endingSeen),
+    lastMessage: typeof rawQuest?.lastMessage === 'string' ? rawQuest.lastMessage.slice(0, 240) : '',
   };
+}
+
+function createStoryBoard(lastName = pick(OWNER_LAST_NAMES)) {
+  return {
+    schema: 2,
+    lastName,
+    activeId: 'identity',
+    completed: [],
+    quests: {
+      identity: createQuest('identity', lastName),
+      kin: createQuest('kin'),
+      revenge: createQuest('revenge'),
+      blackbox: createQuest('blackbox'),
+    },
+  };
+}
+
+function normalizeStory(rawStory) {
+  if (!rawStory || typeof rawStory !== 'object') return createStoryBoard();
+  if (rawStory.schema !== 2) {
+    const board = createStoryBoard();
+    if (rawStory.kind && rawStory.kind !== 'identity' && board.quests[rawStory.kind]) {
+      board.quests[rawStory.kind] = normalizeQuest(rawStory, rawStory.kind, board.lastName);
+    }
+    return board;
+  }
+
+  const lastName = OWNER_LAST_NAMES.includes(rawStory.lastName) ? rawStory.lastName : pick(OWNER_LAST_NAMES);
+  const board = createStoryBoard(lastName);
+  const completed = Array.isArray(rawStory.completed) ? rawStory.completed.filter((id) => board.quests[id]) : [];
+  board.completed = [...new Set(completed)];
+  for (const kind of Object.keys(board.quests)) {
+    board.quests[kind] = normalizeQuest(rawStory.quests?.[kind], kind, lastName);
+    if (board.quests[kind].complete && !board.completed.includes(kind)) board.completed.push(kind);
+  }
+  board.activeId = rawStory.activeId;
+  if (!board.quests[board.activeId]) board.activeId = board.completed.includes('identity') ? null : 'identity';
+  if (!board.completed.includes('identity')) board.activeId = 'identity';
+  return board;
 }
 
 function makeDefaultSave() {
@@ -467,7 +652,7 @@ function makeDefaultSave() {
     route: 1,
     upgrades: Object.fromEntries(UPGRADE_DEFS.map((def) => [def.id, 0])),
     stats: makeDefaultStats(),
-    story: createStory(),
+    story: createStoryBoard(),
   };
 }
 
@@ -655,6 +840,28 @@ function showShipPurchaseNotice() {
   playSfx('error');
   haptic(14);
   updateStationUi(state.currentPayout, state.lastStationType, 'Ship purchase licenses are locked behind a paid upgrade feature.');
+}
+
+function completeDemoQuest(quest) {
+  if (!quest) return;
+  quest.progress = quest.goal;
+  quest.complete = true;
+  quest.lastMessage = getStoryArc(quest).ending(quest.target);
+}
+
+function applyDemoStoryState() {
+  if (!DEMO_STORY_STATE && !DEMO_QUEST) return;
+  const board = getStoryBoard();
+  const identity = board.quests.identity;
+  if (DEMO_STORY_STATE === 'identity-complete' || DEMO_STORY_STATE === 'board' || DEMO_QUEST) {
+    completeDemoQuest(identity);
+    if (!board.completed.includes('identity')) board.completed.push('identity');
+    board.activeId = DEMO_STORY_STATE === 'board' ? null : 'identity';
+  }
+  if (DEMO_QUEST && board.quests[DEMO_QUEST] && isQuestAvailable(DEMO_QUEST)) {
+    board.activeId = DEMO_QUEST;
+    board.quests[DEMO_QUEST].lastMessage ||= getStoryMessage(board.quests[DEMO_QUEST]);
+  }
 }
 
 const state = {
@@ -1883,26 +2090,63 @@ function debugSkipToDepot() {
   beginDockingTransition(getStationType(state.save.route));
 }
 
-function getStoryArc(story = state.save.story) {
+function getStoryBoard() {
+  if (!state.save.story || state.save.story.schema !== 2) state.save.story = normalizeStory(state.save.story);
+  return state.save.story;
+}
+
+function getActiveStory() {
+  const board = getStoryBoard();
+  return board.quests?.[board.activeId] || null;
+}
+
+function getStoryArc(story = getActiveStory()) {
   return STORY_ARCS.find((arc) => arc.id === story?.kind) || STORY_ARCS[0];
 }
 
-function getStoryTitle(story = state.save.story) {
+function getStoryTitle(story = getActiveStory()) {
+  if (!story) return 'Quest Board';
   return getStoryArc(story).title(story.target);
 }
 
-function getStoryPhase(story = state.save.story) {
+function isQuestAvailable(kind) {
+  const board = getStoryBoard();
+  if (kind === 'identity') return true;
+  return board.completed.includes('identity');
+}
+
+function getQuestStatus(kind) {
+  const board = getStoryBoard();
+  const quest = board.quests?.[kind];
+  if (!quest) return 'locked';
+  if (quest.complete || board.completed.includes(kind)) return 'completed';
+  if (board.activeId === kind) return 'active';
+  return isQuestAvailable(kind) ? 'available' : 'locked';
+}
+
+function setActiveQuest(kind) {
+  const board = getStoryBoard();
+  if (!board.quests?.[kind] || !isQuestAvailable(kind) || board.quests[kind].complete) return false;
+  board.activeId = kind;
+  board.quests[kind].lastMessage ||= getStoryMessage(board.quests[kind]);
+  saveProgress();
+  renderMenuAchievements();
+  updateStationUi(state.currentPayout, state.lastStationType, `${getStoryTitle(board.quests[kind])} selected.`);
+  return true;
+}
+
+function getStoryPhase(story = getActiveStory()) {
+  if (!story) return 'cold';
   if (story.complete || story.progress >= story.goal - 1) return 'final';
   const ratio = story.progress / Math.max(1, story.goal);
   return ratio >= 0.36 ? 'warm' : 'cold';
 }
 
-function getStoryMedia(story = state.save.story) {
+function getStoryMedia(story = getActiveStory()) {
+  if (!story) return STORY_MEDIA[0];
   const phase = getStoryPhase(story);
-  if (phase === 'warm') {
-    const video = STORY_MEDIA.find((item) => item.type === 'video' && item.src && item.storyKinds.includes(story.kind) && item.phase === phase);
-    if (video) return video;
-  }
+  const video = STORY_MEDIA.find((item) => item.type === 'video' && item.src && item.storyKinds.includes(story.kind) && item.phase === phase);
+  if (video) return video;
   return STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind) && item.phase === phase)
     || STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind))
     || STORY_MEDIA[0];
@@ -1968,26 +2212,41 @@ function renderDebugMediaList() {
   }
 }
 
-function getStoryMessage(story = state.save.story) {
+function getStoryMessage(story = getActiveStory()) {
+  if (!story) return 'Choose an available quest from the board.';
   const arc = getStoryArc(story);
   if (story.complete) return arc.ending(story.target);
   const progress = clamp(story.progress, 0, story.goal);
   const remaining = Math.max(1, story.goal - progress);
   const ratio = progress / Math.max(1, story.goal);
 
+  if (story.kind === 'identity') {
+    if (progress <= 0) return `The ship registry only knows one thing: owner surname ${story.target}. First name scrubbed.`;
+    if (progress === 1) return `Autopilot launched this fast cargo ship under emergency seal while you were unconscious.`;
+    if (progress === 2) return `Port ledgers say the ${story.target} family ran a shipping line before a syndicate moved in.`;
+    if (progress === 3) return `Most ${story.target} family records are missing or sealed. One more cache should unlock the quest board.`;
+    return arc.ending(story.target);
+  }
+
   if (progress <= 0) {
     return story.kind === 'blackbox'
-      ? 'No fragments decoded. Run a port search from each dock.'
-      : `No live trail for your ${story.target}. Run a port search from each dock.`;
+      ? 'The escape recorder is fragmented. Run a port search from each dock.'
+      : `No live trail for the ${story.target}. Run a port search from each dock.`;
   }
 
   if (story.kind === 'blackbox') {
     if (ratio < 0.34) return `A weak wreck ping repeats every ${remaining + 4} cycles.`;
-    if (ratio < 0.72) return `Black box fragments now point within ${remaining * 9} hours.`;
+    if (ratio < 0.72) return `Escape recorder fragments now point within ${remaining * 9} hours.`;
     return `The next station should expose the final beacon lock.`;
   }
 
-  if (ratio < 0.34) return `No direct hit, but an alias repeats within ${remaining + 5} port logs.`;
+  if (story.kind === 'revenge') {
+    if (ratio < 0.34) return `No direct hit, but syndicate aliases repeat within ${remaining + 5} port logs.`;
+    if (ratio < 0.72) return `A stale entry for the ${story.target} appears within ${remaining * 8} hours.`;
+    return `Fresh dock records put the ${story.target} very close.`;
+  }
+
+  if (ratio < 0.34) return `No direct hit, but a family alias repeats within ${remaining + 5} port logs.`;
   if (ratio < 0.72) return `A stale entry for your ${story.target} appears within ${remaining * 8} hours.`;
   return `Fresh dock records put your ${story.target} very close.`;
 }
@@ -2019,7 +2278,8 @@ function renderMenuAchievements() {
     .filter((row) => !row.unlocked)
     .sort((a, b) => b.ratio - a.ratio)
     .slice(0, 3);
-  const story = state.save.story;
+  const board = getStoryBoard();
+  const story = getActiveStory();
 
   const head = document.createElement('div');
   head.className = 'menu-achievements-head';
@@ -2032,7 +2292,10 @@ function renderMenuAchievements() {
 
   const storyLine = document.createElement('p');
   storyLine.className = 'menu-story-line';
-  storyLine.textContent = `${getStoryTitle(story)} ${story.progress}/${story.goal}`;
+  const completedCount = board.completed.length;
+  storyLine.textContent = story
+    ? `${getStoryTitle(story)} ${story.progress}/${story.goal}`
+    : `Quest Board ${completedCount}/${Object.keys(board.quests).length} complete`;
   menuAchievements.append(storyLine);
 
   const featured = nextRows.length ? nextRows : rows.filter((row) => row.unlocked).slice(-3);
@@ -2077,7 +2340,8 @@ function renderAchievements() {
 }
 
 function runStorySearch() {
-  const story = state.save.story;
+  const story = getActiveStory();
+  if (!story) return;
   if (story.complete) return;
   const route = state.lastStationRoute || Math.max(1, state.save.route - 1);
   if (story.lastRoute === route) {
@@ -2091,51 +2355,83 @@ function runStorySearch() {
   story.complete = story.progress >= story.goal;
   story.lastMessage = getStoryMessage(story);
   state.save.stats.storySearches += 1;
-  if (story.complete) state.save.stats.storyCompleted += 1;
+  if (story.complete) {
+    const board = getStoryBoard();
+    if (!board.completed.includes(story.kind)) {
+      board.completed.push(story.kind);
+      state.save.stats.storyCompleted += 1;
+    }
+  }
   saveProgress();
   renderMenuAchievements();
   updateStationUi(state.currentPayout, state.lastStationType, story.lastMessage);
 }
 
-function finishStoryGame() {
-  const story = state.save.story;
-  const arc = getStoryArc(story);
-  story.complete = true;
-  story.endingSeen = true;
+function continueStoryRuns() {
+  const story = getActiveStory();
+  if (story) story.endingSeen = true;
   saveProgress();
-  renderMenuAchievements();
-
-  state.running = false;
-  state.docked = false;
-  state.firing = false;
-  stationEl.classList.add('hidden');
-  hudEl.classList.add('hidden');
-  fireButton.classList.add('hidden');
-  reticleEl.classList.add('hidden');
-
-  const finalScore = Math.round(state.save.credits + state.score);
-  resultScore.textContent = String(finalScore);
-  resultBest.textContent = String(state.best);
-  resultWave.textContent = String(Math.max(1, state.save.route - 1));
-  resultTitle.textContent = arc.endingTitle;
-  resultKicker.textContent = 'story complete';
-  if (resultMessage) resultMessage.textContent = arc.ending(story.target);
-  resultEl.classList.remove('hidden');
-  setGameState('result');
-  lockResultScreen();
+  renderStationPanel();
 }
 
-function continueStoryRuns() {
-  state.save.story.endingSeen = true;
+function showQuestBoard() {
+  const board = getStoryBoard();
+  const story = getActiveStory();
+  if (story?.complete) {
+    story.endingSeen = true;
+    board.activeId = null;
+  }
   saveProgress();
-  state.stationTab = 'briefing';
-  updateStationUi(state.currentPayout, state.lastStationType, 'Search archived. The next delivery is ready.');
+  renderMenuAchievements();
+  renderStationPanel();
+}
+
+function renderQuestBoard() {
+  const board = getStoryBoard();
+  const quests = Object.values(board.quests)
+    .sort((a, b) => (a.kind === 'identity' ? -1 : b.kind === 'identity' ? 1 : STORY_ARCS.findIndex((arc) => arc.id === a.kind) - STORY_ARCS.findIndex((arc) => arc.id === b.kind)));
+  for (const quest of quests) {
+    const arc = getStoryArc(quest);
+    const status = getQuestStatus(quest.kind);
+    const card = document.createElement('article');
+    card.className = `terminal-card quest-card ${status}`;
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = status === 'available' ? 'terminal-action primary' : 'terminal-action';
+    action.disabled = status !== 'available';
+    action.textContent = status === 'active' ? 'Active' : status === 'completed' ? 'Complete' : status === 'locked' ? 'Locked' : 'Start';
+    if (status === 'available') action.dataset.questStart = quest.kind;
+
+    const progress = document.createElement('div');
+    progress.className = 'story-progress mini';
+    const bar = document.createElement('i');
+    bar.style.width = `${clamp(quest.progress / Math.max(1, quest.goal) * 100, 0, 100)}%`;
+    progress.append(bar);
+
+    const stateLabel = status === 'locked'
+      ? arc.unavailable
+      : status === 'completed'
+        ? quest.lastMessage || arc.ending(quest.target)
+        : arc.summary;
+
+    card.innerHTML = `
+      <span>${status === 'completed' ? 'Completed' : status === 'active' ? 'Active' : status === 'available' ? 'Available' : 'Locked'}</span>
+      <h3>${arc.title(quest.target)}</h3>
+      <p>${stateLabel}</p>
+    `;
+    card.append(progress, action);
+    upgradeList.append(card);
+  }
 }
 
 function renderStorySearch() {
   upgradeList.className = 'upgrade-list story-list';
   upgradeList.innerHTML = '';
-  const story = state.save.story;
+  const story = getActiveStory();
+  if (!story) {
+    renderQuestBoard();
+    return;
+  }
   const route = state.lastStationRoute || Math.max(1, state.save.route - 1);
   const searchedHere = story.lastRoute === route && story.progress > 0;
 
@@ -2161,13 +2457,13 @@ function renderStorySearch() {
     const complete = document.createElement('button');
     complete.type = 'button';
     complete.className = 'terminal-action primary';
-    complete.dataset.storyComplete = 'true';
-    complete.textContent = 'Complete Game';
+    complete.dataset.storyBoard = 'true';
+    complete.textContent = 'Quest Board';
     const cont = document.createElement('button');
     cont.type = 'button';
     cont.className = 'terminal-action';
     cont.dataset.storyContinue = 'true';
-    cont.textContent = 'Continue Runs';
+    cont.textContent = 'Review';
     actions.append(complete, cont);
   } else {
     const search = document.createElement('button');
@@ -2186,6 +2482,7 @@ function renderStorySearch() {
 
   card.append(kicker, title, media, text, progress, actions);
   upgradeList.append(card);
+  if (story.complete || getStoryBoard().completed.includes('identity')) renderQuestBoard();
 }
 
 function renderUpgradeCategoryTabs() {
@@ -2827,7 +3124,8 @@ function updateObjects(delta) {
 
     if (object.position.z > -70 && object.position.z < 10 && !['station', 'dock'].includes(data.kind)) threat += 1;
 
-    const collisionWindow = object.position.z > -2.5 && object.position.z < 7.5;
+    const collisionDepth = data.kind === 'asteroid' ? Math.max(5.5, data.radius * 1.35) : 5;
+    const collisionWindow = object.position.z > -collisionDepth && object.position.z < 8.5;
     const distance = Math.hypot(object.position.x - playerX, object.position.y - playerY);
     if (collisionWindow && !data.passed && !['station', 'dock'].includes(data.kind)) {
       if (data.kind === 'collector' && distance < data.radius + 1.8) {
@@ -2845,9 +3143,14 @@ function updateObjects(delta) {
         updateHud();
         continue;
       }
-      if (data.kind === 'asteroid' && distance < data.radius + 2.15) {
+      if (data.kind === 'asteroid') {
+        const lateralBuffer = data.sizeClass === 'large' ? 4.6 : data.sizeClass === 'medium' ? 3.2 : 2.1;
+        const hitRadius = data.radius + lateralBuffer;
+        if (distance >= hitRadius) continue;
         data.passed = true;
-        const severity = clamp((data.radius + 2.15 - distance) / Math.max(1, data.radius * 0.85), 0.16, 1);
+        const lateralSeverity = clamp((hitRadius - distance) / Math.max(1, data.radius * 0.95), 0.16, 1);
+        const depthSeverity = clamp(1 - Math.abs(object.position.z) / Math.max(1, collisionDepth), 0.24, 1);
+        const severity = clamp(lateralSeverity * 0.78 + depthSeverity * 0.22, 0.16, 1);
         const impact = Math.round(data.impactDamage * (0.34 + severity * 0.66));
         createExplosion(object.position.clone(), severity > 0.55 ? 0xff5d3b : 0xffb563, Math.round(12 + severity * 18));
         damage(impact, severity);
@@ -3180,15 +3483,20 @@ function setupEvents() {
       playSfx('buy');
       runStorySearch();
     }
-    const storyComplete = event.target.closest('[data-story-complete]');
-    if (storyComplete) {
-      playSfx('dock');
-      finishStoryGame();
+    const questStart = event.target.closest('[data-quest-start]');
+    if (questStart) {
+      playSfx('buy');
+      setActiveQuest(questStart.dataset.questStart);
     }
     const storyContinue = event.target.closest('[data-story-continue]');
     if (storyContinue) {
       playSfx('click');
       continueStoryRuns();
+    }
+    const storyBoard = event.target.closest('[data-story-board]');
+    if (storyBoard) {
+      playSfx('dock');
+      showQuestBoard();
     }
   });
   gameEl.addEventListener('pointerdown', onPointerDown, { passive: false });
@@ -3248,10 +3556,10 @@ async function boot() {
   setupEvents();
   resize();
   await loadCockpit();
+  applyDemoStoryState();
   updateHud();
   renderSettingsState();
   renderMenuAchievements();
-  renderDebugMediaList();
   document.documentElement.dataset.gameReady = '1';
   animate();
 

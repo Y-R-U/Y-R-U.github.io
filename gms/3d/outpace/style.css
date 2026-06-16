@@ -1058,6 +1058,19 @@ h3 {
   gap: 8px;
 }
 
+.quest-card {
+  display: grid;
+  gap: 6px;
+}
+
+.quest-card.completed {
+  border-color: rgba(125, 255, 157, 0.28);
+}
+
+.quest-card.locked {
+  opacity: 0.66;
+}
+
 .story-progress {
   height: 5px;
   overflow: hidden;
@@ -1072,6 +1085,10 @@ h3 {
   border-radius: inherit;
   background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
   box-shadow: 0 0 16px rgba(85, 230, 255, 0.46);
+}
+
+.story-progress.mini {
+  height: 4px;
 }
 
 .story-actions {
