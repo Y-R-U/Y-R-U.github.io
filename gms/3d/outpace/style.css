@@ -408,7 +408,7 @@ button {
 
 .launch-panel {
   width: min(100%, 430px);
-  max-width: calc(100vw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  max-width: calc(100dvw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));
   padding: 18px;
   border-radius: 8px;
 }
@@ -826,7 +826,7 @@ h3 {
 
 .station-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   margin: 0;
 }
@@ -1021,6 +1021,12 @@ h3 {
   padding: 7px;
 }
 
+.terminal-card.action-card {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
 .upgrade-card h3,
 .terminal-card h3 {
   margin: 0;
@@ -1196,14 +1202,14 @@ h3 {
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
   margin: 18px 0 10px;
 }
 
 .result-grid div {
-  min-height: 62px;
-  padding: 10px;
+  min-height: 58px;
+  padding: 8px 6px;
   border: 1px solid rgba(124, 232, 255, 0.23);
   border-radius: 6px;
   background: rgba(12, 25, 32, 0.45);
@@ -1213,7 +1219,7 @@ h3 {
   display: block;
   margin-top: 7px;
   color: #fff;
-  font-size: clamp(1.1rem, 5vw, 1.55rem);
+  font-size: clamp(0.98rem, 4.4vw, 1.42rem);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -1663,6 +1669,14 @@ h3 {
 }
 
 @media (max-width: 520px) {
+  .overlay {
+    justify-items: start;
+  }
+
+  .launch-panel {
+    width: min(360px, calc(100dvw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  }
+
   .system-modal {
     justify-items: start;
   }

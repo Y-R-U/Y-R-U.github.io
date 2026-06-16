@@ -20,8 +20,10 @@ const resetModal = document.getElementById('reset-modal');
 const debugModal = document.getElementById('debug-modal');
 const soundToggle = document.getElementById('sound-toggle');
 const musicToggle = document.getElementById('music-toggle');
+const hapticsToggle = document.getElementById('haptics-toggle');
 const soundState = document.getElementById('sound-state');
 const musicState = document.getElementById('music-state');
+const hapticsState = document.getElementById('haptics-state');
 const debugOpenButton = document.getElementById('debug-open-button');
 const resetOpenButton = document.getElementById('reset-open-button');
 const resetCancelButton = document.getElementById('reset-cancel-button');
@@ -51,6 +53,7 @@ const routeMeter = document.getElementById('route-meter');
 const resultScore = document.getElementById('result-score');
 const resultBest = document.getElementById('result-best');
 const resultWave = document.getElementById('result-wave');
+const resultDebt = document.getElementById('result-debt');
 const resultTitle = document.getElementById('result-title');
 const resultKicker = document.getElementById('result-kicker');
 const resultMessage = document.getElementById('result-message');
@@ -63,6 +66,7 @@ const stationMessage = document.getElementById('station-message');
 const stationCredits = document.getElementById('station-credits');
 const stationPayout = document.getElementById('station-payout');
 const stationCargo = document.getElementById('station-cargo');
+const stationDebt = document.getElementById('station-debt');
 const stationRoute = document.getElementById('station-route');
 const stationTabs = document.getElementById('station-tabs');
 const stationPanelTitle = document.getElementById('station-panel-title');
@@ -78,6 +82,9 @@ const RESULT_LOCK_MS = 3200;
 const DOCK_FADE_IN_MS = 760;
 const DOCK_HOLD_MS = 360;
 const DOCK_FADE_OUT_MS = 760;
+const STARTING_DEBT = 2000;
+const DEBT_LIMIT = 10000;
+const DEBT_INTEREST_RATE = 0.02;
 let resultUnlockTimeout = 0;
 let resultCountdownTimer = 0;
 let dockTransitionTimers = [];
@@ -232,9 +239,9 @@ const STORY_MEDIA = [
     title: 'Cold Port Record',
     storyKinds: ['kin', 'revenge'],
     phase: 'cold',
-    src: '',
-    plannedPath: 'assets/story/img-01-cold-port-record.jpg',
-    generator: 'MFLUX flux2-klein-4b',
+    src: 'assets/story/img-01-cold-port-record.png',
+    plannedPath: 'assets/story/img-01-cold-port-record.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
     prompt: 'close-up sci-fi dock terminal evidence still, cold missing-person port record, dim cyan interface reflections, no readable text, no logos',
   },
   {
@@ -243,9 +250,9 @@ const STORY_MEDIA = [
     title: 'Warm Alias Hit',
     storyKinds: ['kin', 'revenge'],
     phase: 'warm',
-    src: '',
-    plannedPath: 'assets/story/img-02-warm-alias-hit.jpg',
-    generator: 'MFLUX flux2-klein-4b',
+    src: 'assets/story/img-02-warm-alias-hit.png',
+    plannedPath: 'assets/story/img-02-warm-alias-hit.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
     prompt: 'cinematic sci-fi case file still, partially corrupted face silhouette and dock receipt fragments, amber warning light, no readable text, no logos',
   },
   {
@@ -254,9 +261,9 @@ const STORY_MEDIA = [
     title: 'Black Box Fragment',
     storyKinds: ['blackbox'],
     phase: 'cold',
-    src: '',
-    plannedPath: 'assets/story/img-03-black-box-fragment.jpg',
-    generator: 'MFLUX flux2-klein-4b',
+    src: 'assets/story/img-03-black-box-fragment.png',
+    plannedPath: 'assets/story/img-03-black-box-fragment.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
     prompt: 'macro sci-fi black box data core fragment floating in a repair tray, cyan scan lines, damaged metal, no readable text, no logos',
   },
   {
@@ -265,9 +272,9 @@ const STORY_MEDIA = [
     title: 'Final Berth',
     storyKinds: ['kin', 'revenge', 'blackbox'],
     phase: 'final',
-    src: '',
-    plannedPath: 'assets/story/img-04-final-berth.jpg',
-    generator: 'MFLUX flux2-klein-4b',
+    src: 'assets/story/img-04-final-berth.png',
+    plannedPath: 'assets/story/img-04-final-berth.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
     prompt: 'cinematic sci-fi docking lounge evidence still, final berth door with bright rim light and emotional mystery, no readable text, no logos',
   },
   {
@@ -276,7 +283,7 @@ const STORY_MEDIA = [
     title: 'Signal Sweep Loop',
     storyKinds: ['kin', 'revenge'],
     phase: 'warm',
-    src: '',
+    src: 'assets/story/vid-01-signal-sweep-loop.mp4',
     plannedPath: 'assets/story/vid-01-signal-sweep-loop.mp4',
     generator: 'LTX 2-part loop',
     prompt: 'small dock terminal signal sweep, radar pulse crosses a corrupted case file, extremely slow zoom in, no readable text, no logos',
@@ -288,7 +295,7 @@ const STORY_MEDIA = [
     title: 'Black Box Decode Loop',
     storyKinds: ['blackbox'],
     phase: 'warm',
-    src: '',
+    src: 'assets/story/vid-02-black-box-decode-loop.mp4',
     plannedPath: 'assets/story/vid-02-black-box-decode-loop.mp4',
     generator: 'LTX 2-part loop',
     prompt: 'black box fragment decoding in a station terminal tray, tiny light pulses and scan haze, extremely slow push in, no readable text, no logos',
@@ -355,7 +362,7 @@ const UPGRADE_DEFS = [
     max: 9,
     base: 285,
     scale: 1.72,
-    stat: (level) => `${(0.72 + level * 0.62).toFixed(1)} beam power`,
+    stat: (level) => `${(0.62 + level * 0.78).toFixed(1)} beam power`,
   },
   {
     id: 'targeting',
@@ -412,6 +419,8 @@ function makeDefaultStats() {
     storySearches: 0,
     storyCompleted: 0,
     bestCargo: 8,
+    escapePods: 0,
+    confiscations: 0,
   };
 }
 
@@ -454,6 +463,7 @@ function normalizeStory(rawStory) {
 function makeDefaultSave() {
   return {
     credits: 0,
+    debt: STARTING_DEBT,
     route: 1,
     upgrades: Object.fromEntries(UPGRADE_DEFS.map((def) => [def.id, 0])),
     stats: makeDefaultStats(),
@@ -468,6 +478,7 @@ function loadSave() {
     if (!raw) return save;
     const parsed = JSON.parse(raw);
     save.credits = Math.max(0, Number(parsed.credits) || 0);
+    save.debt = Number.isFinite(Number(parsed.debt)) ? Math.max(0, Math.round(Number(parsed.debt))) : STARTING_DEBT;
     save.route = Math.max(1, Number(parsed.route) || 1);
     for (const def of UPGRADE_DEFS) {
       save.upgrades[def.id] = clamp(Number(parsed.upgrades?.[def.id]) || 0, 0, def.max);
@@ -488,6 +499,7 @@ function makeDefaultSettings() {
   return {
     sound: true,
     music: false,
+    haptics: true,
   };
 }
 
@@ -499,6 +511,7 @@ function loadSettings() {
     const parsed = JSON.parse(raw);
     settings.sound = parsed.sound !== false;
     settings.music = Boolean(parsed.music);
+    settings.haptics = parsed.haptics !== false;
   } catch {
     return settings;
   }
@@ -544,7 +557,7 @@ function getShipStats() {
     coolRate: 17 + cooling * 5.2,
     shotHeat: clamp(18 - cooling * 1.15 - laser * 0.35, 7.5, 18),
     shotCooldown: clamp(0.15 - laser * 0.012, 0.07, 0.15),
-    beamPower: 0.72 + laser * 0.62,
+    beamPower: 0.62 + laser * 0.78,
     lockAssist: targeting,
     cargo: getCargoCapacity(cargo),
     speedBonus: 1 + engine * 0.05,
@@ -583,6 +596,67 @@ function getDeliveryPayout(route = state.save.route, type = getStationType(route
   return Math.round((95 + route * 26 + stats.cargo * cargoRate) * multiplier * stats.deliveryBonus);
 }
 
+function formatCredits(value) {
+  return String(Math.round(value || 0));
+}
+
+function calculateRepairBill() {
+  const routePressure = Math.max(1, state.save.route);
+  const installedLevels = Object.values(state.save.upgrades || {}).reduce((sum, level) => sum + (Number(level) || 0), 0);
+  return Math.round((340 + routePressure * 74 + installedLevels * 28) / 5) * 5;
+}
+
+function applyDebtInterest() {
+  if (state.save.debt <= 0) {
+    state.lastDebtInterest = 0;
+    return 0;
+  }
+  const interest = Math.max(1, Math.ceil(state.save.debt * DEBT_INTEREST_RATE));
+  state.save.debt += interest;
+  state.lastDebtInterest = interest;
+  saveProgress();
+  return interest;
+}
+
+function applyEscapePodRepair() {
+  const bill = calculateRepairBill();
+  const paid = Math.min(state.save.credits, bill);
+  const addedDebt = bill - paid;
+  state.save.credits -= paid;
+  state.save.debt += addedDebt;
+  state.save.stats.escapePods += 1;
+  state.lastRepairBill = bill;
+  state.lastRepairPaid = paid;
+  state.lastDebtAdded = addedDebt;
+  state.confiscated = state.save.debt > DEBT_LIMIT;
+  if (state.confiscated) state.save.stats.confiscations += 1;
+  saveProgress();
+  return { bill, paid, addedDebt };
+}
+
+function payDebt() {
+  if (!state.save.debt || !state.save.credits) {
+    playSfx('error');
+    updateStationUi(state.currentPayout, state.lastStationType, state.save.debt > 0
+      ? 'No spare credits available for debt service.'
+      : 'Debt ledger is clear. No payment needed.');
+    return;
+  }
+  const payment = Math.min(state.save.credits, state.save.debt);
+  state.save.credits -= payment;
+  state.save.debt -= payment;
+  saveProgress();
+  playSfx('buy');
+  haptic([18, 24, 18]);
+  updateStationUi(state.currentPayout, state.lastStationType, `${payment} credits transferred to the debt ledger.`);
+}
+
+function showShipPurchaseNotice() {
+  playSfx('error');
+  haptic(14);
+  updateStationUi(state.currentPayout, state.lastStationType, 'Ship purchase licenses are locked behind a paid upgrade feature.');
+}
+
 const state = {
   running: false,
   demo: params.has('demo'),
@@ -604,6 +678,11 @@ const state = {
   routeDistance: 0,
   routeLength: 1600,
   currentPayout: 0,
+  lastRepairBill: 0,
+  lastRepairPaid: 0,
+  lastDebtAdded: 0,
+  lastDebtInterest: 0,
+  confiscated: false,
   lastStationType: 'small',
   lastStationRoute: 1,
   lastStationName: '',
@@ -892,17 +971,32 @@ function addStationSign(parent, name, width, height, depth, type) {
 }
 
 function createAsteroid() {
-  const size = rand(1.25, 4.4) + state.wave * 0.07;
+  const roll = Math.random();
+  const sizeClass = roll < 0.32 ? 'small' : roll < 0.76 ? 'medium' : 'large';
+  const baseSize = sizeClass === 'small' ? rand(0.9, 1.55) : sizeClass === 'medium' ? rand(1.75, 2.85) : rand(3.15, 4.65);
+  const size = baseSize + state.wave * (sizeClass === 'large' ? 0.08 : 0.04);
+  const hp = sizeClass === 'small'
+    ? 1.15 + state.wave * 0.08
+    : sizeClass === 'medium'
+      ? 3.25 + state.wave * 0.22
+      : 7.8 + state.wave * 0.48;
+  const impactDamage = sizeClass === 'small'
+    ? 14 + state.wave * 0.4
+    : sizeClass === 'medium'
+      ? 27 + state.wave * 0.8
+      : 48 + state.wave * 1.25;
   const mesh = new THREE.Mesh(makeAsteroidGeometry(size), pick(materials.asteroid));
   mesh.position.set(rand(-18, 18), rand(-10, 11), rand(-185, -120));
   mesh.rotation.set(rand(0, Math.PI), rand(0, Math.PI), rand(0, Math.PI));
   mesh.userData = {
     kind: 'asteroid',
+    sizeClass,
     radius: size * 0.9,
     spin: new THREE.Vector3(rand(-1.2, 1.2), rand(-1.2, 1.2), rand(-1.2, 1.2)),
-    hp: size > 3.2 ? 2 : 1,
-    value: Math.round(size * 36),
-    speedScale: rand(0.86, 1.18),
+    hp,
+    impactDamage,
+    value: Math.round(size * (sizeClass === 'large' ? 72 : sizeClass === 'medium' ? 52 : 38)),
+    speedScale: rand(0.82, 1.16),
     passed: false,
   };
   scene.add(mesh);
@@ -1512,6 +1606,14 @@ function clearResultLock() {
   window.clearInterval(resultCountdownTimer);
   resultUnlockTimeout = 0;
   resultCountdownTimer = 0;
+  if (state.confiscated) {
+    state.resultLocked = true;
+    restartButton.disabled = true;
+    restartButton.textContent = 'Ship Confiscated';
+    if (resultLockText) resultLockText.textContent = 'Debt limit exceeded';
+    if (resultLockBar) resultLockBar.style.transform = 'scaleX(1)';
+    return;
+  }
   state.resultLocked = false;
   restartButton.disabled = false;
   restartButton.textContent = 'Relaunch';
@@ -1558,6 +1660,7 @@ function onStationPointerDown(event) {
 function renderSettingsState() {
   if (soundState) soundState.textContent = state.settings.sound ? 'On' : 'Off';
   if (musicState) musicState.textContent = state.settings.music ? 'On' : 'Off';
+  if (hapticsState) hapticsState.textContent = state.settings.haptics ? 'On' : 'Off';
 }
 
 function showModal(modal) {
@@ -1614,6 +1717,23 @@ function playSfx(kind = 'click') {
   osc.connect(gain).connect(ctx.destination);
   osc.start(now);
   osc.stop(now + config[1] + 0.02);
+}
+
+function haptic(pattern) {
+  if (!state.settings.haptics || !navigator.vibrate) return;
+  try {
+    navigator.vibrate(pattern);
+  } catch {}
+}
+
+function hapticImpact(amount, severity = 0.5) {
+  if (amount >= 42 || severity > 0.78) {
+    haptic([45, 35, 70]);
+  } else if (amount >= 22 || severity > 0.42) {
+    haptic([24, 24, 34]);
+  } else {
+    haptic(18);
+  }
 }
 
 function stopMusic() {
@@ -1687,6 +1807,14 @@ function toggleMusic() {
   }
 }
 
+function toggleHaptics() {
+  state.settings.haptics = !state.settings.haptics;
+  saveSettings();
+  renderSettingsState();
+  if (state.settings.haptics) haptic([12, 30, 12]);
+  playSfx('click');
+}
+
 function resetProgress() {
   localStorage.removeItem(SAVE_KEY);
   localStorage.removeItem(BEST_KEY);
@@ -1697,6 +1825,10 @@ function resetProgress() {
   state.save = makeDefaultSave();
   state.best = 0;
   state.score = 0;
+  state.lastRepairBill = 0;
+  state.lastRepairPaid = 0;
+  state.lastDebtAdded = 0;
+  state.confiscated = false;
   state.currentPayout = 0;
   state.routeDistance = 0;
   state.routeLength = getRouteLength();
@@ -1767,6 +1899,10 @@ function getStoryPhase(story = state.save.story) {
 
 function getStoryMedia(story = state.save.story) {
   const phase = getStoryPhase(story);
+  if (phase === 'warm') {
+    const video = STORY_MEDIA.find((item) => item.type === 'video' && item.src && item.storyKinds.includes(story.kind) && item.phase === phase);
+    if (video) return video;
+  }
   return STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind) && item.phase === phase)
     || STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind))
     || STORY_MEDIA[0];
@@ -1784,6 +1920,8 @@ function createMediaFrame(item, className = 'story-media-frame') {
       video.muted = true;
       video.loop = true;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
       video.autoplay = true;
       video.preload = 'metadata';
       frame.append(video);
@@ -2108,6 +2246,61 @@ function renderTerminalCards(cards) {
   }
 }
 
+function renderCargoOffice() {
+  const stats = getShipStats();
+  const nextRoute = state.save.route;
+  const nextType = getStationType(nextRoute);
+  const nextName = getStationName(nextRoute, nextType);
+  const nextPayout = getDeliveryPayout(nextRoute, nextType);
+  upgradeList.className = 'upgrade-list terminal-grid';
+  upgradeList.innerHTML = '';
+
+  const cards = [
+    {
+      kicker: 'Freight bay',
+      title: `${stats.cargo}t capacity`,
+      text: 'More cargo space means larger sealed station loads and better delivery pay.',
+    },
+    {
+      kicker: 'Next manifest',
+      title: `${nextPayout} cr estimate`,
+      text: `${nextName} has a reserved berth and auto-load contract waiting.`,
+    },
+    {
+      kicker: 'Debt ledger',
+      title: `${formatCredits(state.save.debt)} cr owed`,
+      text: state.save.debt > 0
+        ? `Debt rises ${Math.round(DEBT_INTEREST_RATE * 100)}% each trip. Crossing ${DEBT_LIMIT} means confiscation.`
+        : 'Ledger clear. Future repair claims can still create new debt.',
+      action: 'Pay Debt',
+      actionAttr: 'data-pay-debt',
+      disabled: state.save.debt <= 0 || state.save.credits <= 0,
+    },
+    {
+      kicker: 'Shipyard',
+      title: 'Purchase ship',
+      text: 'Browse larger hulls, specialist cockpits, and premium contracts.',
+      action: 'Purchase',
+      actionAttr: 'data-ship-purchase',
+    },
+  ];
+
+  for (const cardData of cards) {
+    const card = document.createElement('article');
+    card.className = 'terminal-card action-card';
+    const button = cardData.action
+      ? `<button class="terminal-action ${cardData.actionAttr === 'data-pay-debt' ? 'primary' : ''}" type="button" ${cardData.actionAttr} ${cardData.disabled ? 'disabled' : ''}>${cardData.action}</button>`
+      : '';
+    card.innerHTML = `
+      <span>${cardData.kicker}</span>
+      <h3>${cardData.title}</h3>
+      <p>${cardData.text}</p>
+      ${button}
+    `;
+    upgradeList.append(card);
+  }
+}
+
 function setStationTab(tab) {
   state.stationTab = tab;
   renderStationPanel();
@@ -2144,12 +2337,8 @@ function renderStationPanel() {
 
   if (tab === 'cargo') {
     if (stationPanelTitle) stationPanelTitle.textContent = 'Cargo Office';
-    if (stationPanelCopy) stationPanelCopy.textContent = 'The station handles the freight. Your hold size and license decide the fee.';
-    renderTerminalCards([
-      { kicker: 'Freight bay', title: `${stats.cargo}t capacity`, text: 'More cargo space means larger sealed station loads and better delivery pay.' },
-      { kicker: 'Next manifest', title: `${nextPayout} cr estimate`, text: `${nextName} has a reserved berth and auto-load contract waiting.` },
-      { kicker: 'Station fee', title: `+${Math.round((stats.deliveryBonus - 1) * 100)}% license`, text: 'License upgrades improve every delivery payout without manual trading.' },
-    ]);
+    if (stationPanelCopy) stationPanelCopy.textContent = 'Freight contracts, debt service, and shipyard access are handled here.';
+    renderCargoOffice();
     return;
   }
 
@@ -2199,6 +2388,7 @@ function updateStationUi(payout = state.currentPayout, type = getStationType(), 
   stationCredits.textContent = String(state.save.credits);
   stationPayout.textContent = String(payout || state.currentPayout || getDeliveryPayout(dockedRoute, type));
   stationCargo.textContent = `${getShipStats().cargo}t`;
+  if (stationDebt) stationDebt.textContent = formatCredits(state.save.debt);
   stationRoute.textContent = String(state.save.route).padStart(2, '0');
   renderStationPanel();
 }
@@ -2264,8 +2454,37 @@ function launchNextRun() {
   resetGame();
 }
 
+function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit. The lender seized your ship at berth.') {
+  state.running = false;
+  state.firing = false;
+  state.pointerDown = false;
+  state.confiscated = true;
+  resultScore.textContent = String(Math.round(state.score));
+  resultBest.textContent = String(state.best);
+  resultWave.textContent = String(state.wave);
+  if (resultDebt) resultDebt.textContent = formatCredits(state.save.debt);
+  resultTitle.textContent = 'Ship Confiscated';
+  resultKicker.textContent = 'lender seizure';
+  if (resultMessage) resultMessage.textContent = message;
+  menuEl.classList.add('hidden');
+  stationEl.classList.add('hidden');
+  resultEl.classList.remove('hidden');
+  fireButton.classList.add('hidden');
+  reticleEl.classList.add('hidden');
+  setGameState('result');
+  haptic([90, 80, 120]);
+  lockResultScreen();
+}
+
 function resetGame() {
-  if (state.resultLocked) return;
+  if (state.resultLocked || state.confiscated) return;
+  if (!DEMO_MODE) {
+    const interest = applyDebtInterest();
+    if (state.save.debt > DEBT_LIMIT) {
+      showConfiscationResult(`Debt interest added ${interest} credits and pushed the ledger over ${DEBT_LIMIT}. The lender seized your ship.`);
+      return;
+    }
+  }
   clearResultLock();
   clearDockTransition();
   clearDynamicScene();
@@ -2326,6 +2545,7 @@ function finishGame() {
   state.running = false;
   state.firing = false;
   state.pointerDown = false;
+  const repair = DEMO_MODE ? { bill: 0, paid: 0, addedDebt: 0 } : applyEscapePodRepair();
   const finalScore = Math.round(state.score);
   const previousBest = state.best;
   state.best = Math.max(state.best, finalScore);
@@ -2333,16 +2553,25 @@ function finishGame() {
   resultScore.textContent = String(finalScore);
   resultBest.textContent = String(state.best);
   resultWave.textContent = String(state.wave);
-  resultTitle.textContent = state.demo ? 'Flight Logged' : finalScore > previousBest ? 'New Record' : 'Outpaced';
-  resultKicker.textContent = state.demo ? 'flight recorder' : 'run complete';
+  if (resultDebt) resultDebt.textContent = formatCredits(state.save.debt);
+  resultTitle.textContent = state.confiscated ? 'Ship Confiscated' : state.demo ? 'Flight Logged' : finalScore > previousBest ? 'Escape Pod Record' : 'Escape Pod Recovery';
+  resultKicker.textContent = state.confiscated ? 'lender seizure' : state.demo ? 'flight recorder' : 'salvage claim';
   if (resultMessage) {
-    resultMessage.textContent = state.demo
-      ? `Demo run sealed at ${finalScore} points through wave ${state.wave}.`
-      : `You pushed through wave ${state.wave} and banked ${finalScore} points before the field caught you.`;
+    if (state.demo) {
+      resultMessage.textContent = `Demo run sealed at ${finalScore} points through wave ${state.wave}.`;
+    } else if (state.confiscated) {
+      resultMessage.textContent = `Escape pod recovered. Repair claim was ${repair.bill} credits, but debt reached ${formatCredits(state.save.debt)}. Your ship was confiscated to settle the account.`;
+    } else {
+      const paidText = repair.addedDebt > 0
+        ? `${repair.paid} paid, ${repair.addedDebt} added to debt`
+        : `${repair.paid} paid in full`;
+      resultMessage.textContent = `Escape pod recovered. Salvage repair cost ${repair.bill} credits: ${paidText}. Debt now ${formatCredits(state.save.debt)}.`;
+    }
   }
   resultEl.classList.remove('hidden');
   fireButton.classList.add('hidden');
   setGameState('result');
+  haptic(state.confiscated ? [90, 80, 120] : [70, 50, 90, 60, 120]);
   lockResultScreen();
 }
 
@@ -2352,6 +2581,7 @@ function firePulse() {
   state.shotTimer = stats.shotCooldown;
   state.heat = clamp(state.heat + stats.shotHeat, 0, stats.maxHeat);
   state.save.stats.shotsFired += 1;
+  haptic(8);
 
   const bestTarget = acquireTarget();
   const aimNdc = getAimNdc();
@@ -2398,11 +2628,12 @@ function getAimNdc() {
   };
 }
 
-function damage(amount) {
+function damage(amount, severity = 0.5) {
   state.shield = clamp(state.shield - amount, 0, getShipStats().maxShield);
   state.shake = Math.max(state.shake, amount * 0.013);
   state.flashTimer = 0.15;
   damageFlash.classList.add('active');
+  hapticImpact(amount, severity);
   updateHud();
   if (state.shield <= 0) finishGame();
 }
@@ -2607,16 +2838,23 @@ function updateObjects(delta) {
         state.save.stats.collectors += 1;
         saveProgress();
         renderMenuAchievements();
+        haptic([12, 28, 12]);
         createExplosion(object.position.clone(), 0x82ff9e, 18);
         state.objects.splice(i, 1);
         removeObject(object);
         updateHud();
         continue;
       }
-      if (data.kind !== 'collector' && distance < data.radius + 1.25) {
+      if (data.kind === 'asteroid' && distance < data.radius + 2.15) {
+        data.passed = true;
+        const severity = clamp((data.radius + 2.15 - distance) / Math.max(1, data.radius * 0.85), 0.16, 1);
+        const impact = Math.round(data.impactDamage * (0.34 + severity * 0.66));
+        createExplosion(object.position.clone(), severity > 0.55 ? 0xff5d3b : 0xffb563, Math.round(12 + severity * 18));
+        damage(impact, severity);
+      } else if (data.kind === 'drone' && distance < data.radius + 1.25) {
         data.passed = true;
         createExplosion(object.position.clone(), 0xff5d3b, 18);
-        damage(data.kind === 'drone' ? 16 : 24);
+        damage(16, 0.48);
       }
     }
 
@@ -2866,6 +3104,7 @@ function setupEvents() {
   }
   soundToggle?.addEventListener('click', toggleSound);
   musicToggle?.addEventListener('click', toggleMusic);
+  hapticsToggle?.addEventListener('click', toggleHaptics);
   debugOpenButton?.addEventListener('click', () => {
     playSfx('click');
     showModal(debugModal);
@@ -2924,6 +3163,16 @@ function setupEvents() {
     }
   });
   upgradeList.addEventListener('click', (event) => {
+    const payDebtButton = event.target.closest('[data-pay-debt]');
+    if (payDebtButton) {
+      payDebt();
+      return;
+    }
+    const shipPurchaseButton = event.target.closest('[data-ship-purchase]');
+    if (shipPurchaseButton) {
+      showShipPurchaseNotice();
+      return;
+    }
     const button = event.target.closest('[data-upgrade]');
     if (button) buyUpgrade(button.dataset.upgrade);
     const storySearch = event.target.closest('[data-story-search]');

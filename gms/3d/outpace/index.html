@@ -94,6 +94,10 @@
             <span>Wave</span>
             <strong id="result-wave">1</strong>
           </div>
+          <div>
+            <span>Debt</span>
+            <strong id="result-debt">2000</strong>
+          </div>
         </div>
         <div class="result-lock" id="result-lock" aria-live="polite">
           <span>Saving telemetry</span>
@@ -121,6 +125,10 @@
             <div>
               <span>Cargo</span>
               <strong id="station-cargo">8t</strong>
+            </div>
+            <div>
+              <span>Debt</span>
+              <strong id="station-debt">2000</strong>
             </div>
             <div>
               <span>Next</span>
@@ -187,6 +195,10 @@
           <button id="music-toggle" class="setting-row" type="button">
             <span>Music</span>
             <strong id="music-state">Off</strong>
+          </button>
+          <button id="haptics-toggle" class="setting-row" type="button">
+            <span>Haptics</span>
+            <strong id="haptics-state">On</strong>
           </button>
           <button id="debug-open-button" class="setting-row" type="button">
             <span>Debug</span>
@@ -268,7 +280,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260616a').catch(markGameError);
+    import('./game.mjs?v=20260616b').catch(markGameError);
   </script>
 </body>
 </html>
