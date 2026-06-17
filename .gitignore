@@ -5,7 +5,12 @@ gms/assets/kenney/2d/zips/
 # Per-run gen logs (transient, regenerated on each bulk_generate run)
 gms/2d/the_horrors/*.log
 gms/2d/awake/*.log
-# Local-only PolyPerfect asset gallery — commercial Unity Asset Store pack,
-# not redistributable in a public repo. Kept local until assets are protected
-# (compressed+encrypted) or hosted behind auth (e.g. ionos).
-app/3d/gallery/
+# PolyPerfect "Low Poly Ultimate Pack" — a commercial Unity Asset Store pack.
+# The gallery PAGE is committed, but the art ships only as an obfuscated pack
+# (app/3d/gallery/assets/pack.dat, built by tools/build_pack.py). The raw
+# GLB/PNG source folders stay LOCAL — never committed — and double as the
+# reference cache for current/future games.
+app/3d/gallery/models_all/
+app/3d/gallery/models/
+# Western shooter — still loads the raw local-only assets directly.
+gms/3d/western/

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3D Asset Gallery · PolyPerfect</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <header id="top">
+    <div class="titlewrap">
+      <h1>3D Asset Gallery</h1>
+      <p class="sub" id="sub">PolyPerfect · Low Poly Ultimate Pack</p>
+    </div>
+    <input id="search" type="search" placeholder="Search…" autocomplete="off">
+    <a id="flylink" href="scene.html">🛩 Fly-through</a>
+    <div id="counts" class="counts"></div>
+  </header>
+
+  <nav id="filters">
+    <div class="frow"><span class="flabel">Category</span><div id="catfilters" class="chips"></div></div>
+    <div class="frow"><span class="flabel">World</span><div id="worldfilters" class="chips"></div></div>
+    <div class="frow"><span class="flabel">Tags</span><div id="tagfilters" class="chips chips-wrap"></div></div>
+  </nav>
+
+  <main id="grid"></main>
+  <div id="empty" class="empty hidden">No assets match those filters. <button id="clearall">Clear filters</button></div>
+
+  <div id="viewer" class="viewer hidden">
+    <div class="vbackdrop"></div>
+    <div class="vcard">
+      <button id="vclose" class="vclose" aria-label="Close">✕</button>
+      <canvas id="vcanvas"></canvas>
+      <div class="vinfo">
+        <h2 id="vtitle"></h2>
+        <div id="vcat" class="vbadge"></div>
+        <dl id="vmeta"></dl>
+        <div class="vtags" id="vtags"></div>
+        <div class="vpath">
+          <code id="vpath"></code>
+          <button id="vcopy">Copy path</button>
+        </div>
+        <p class="vhint">drag to rotate · scroll to zoom</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fly-through · PolyPerfect Demo Scenes</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: #0a0d12; font: 14px/1.4 system-ui, sans-serif; color: #e7edf3; }
+  #c { display: block; width: 100vw; height: 100vh; }
+
+  #hud { position: fixed; top: 12px; left: 12px; z-index: 5; display: flex; gap: 10px; align-items: center; }
+  select, a.btn { background: rgba(18,24,33,.82); border: 1px solid #2a3848; color: #e7edf3;
+    padding: 7px 11px; border-radius: 9px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  #fps { font-variant-numeric: tabular-nums; color: #8fd6a0; background: rgba(18,24,33,.82);
+    border: 1px solid #2a3848; padding: 7px 11px; border-radius: 9px; }
+
+  #overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+    background: radial-gradient(ellipse at 50% 35%, rgba(30,44,62,.55), rgba(7,10,14,.92)); }
+  #overlay.hidden { display: none; }
+  .panel { text-align: center; max-width: 480px; padding: 30px 36px; background: rgba(14,19,27,.9);
+    border: 1px solid #243140; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .panel h1 { font-size: 20px; margin-bottom: 6px; }
+  .panel p { color: #9fb0c0; margin-bottom: 14px; }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; text-align: left;
+    margin: 16px auto 20px; width: max-content; font-size: 13px; }
+  .keys b { color: #cfe0f0; font-family: ui-monospace, monospace; }
+  .keys span { color: #93a4b4; }
+  #play { background: #2d7d46; border: 0; color: #fff; padding: 11px 26px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer; }
+  #play:hover { background: #339152; }
+  #bar { width: 320px; height: 6px; background: #1c2530; border-radius: 4px; overflow: hidden; margin: 8px auto 0; }
+  #bar > i { display: block; height: 100%; width: 0; background: #3a8de0; transition: width .15s; }
+  #status { font-size: 12px; color: #7e90a0; margin-top: 8px; }
+  #play:disabled { opacity: .5; cursor: default; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="hud">
+    <select id="scenesel" title="Scene"></select>
+    <div id="fps">— fps</div>
+    <a class="btn" href="index.html">← Gallery</a>
+  </div>
+  <div id="overlay">
+    <div class="panel">
+      <h1 id="otitle">All-Models Fly-through</h1>
+      <p id="osub">PolyPerfect · Low Poly Ultimate Pack</p>
+      <div class="keys">
+        <b>W A S D</b><span>move</span>
+        <b>Mouse</b><span>look</span>
+        <b>Shift</b><span>sprint</span>
+        <b>Space / C</b><span>up / down</span>
+        <b>Esc</b><span>release mouse</span>
+      </div>
+      <button id="play" disabled>Loading…</button>
+      <div id="bar"><i></i></div>
+      <div id="status">starting…</div>
+    </div>
+  </div>
+  <script type="module" src="js/scene.js"></script>
+</body>
+</html>

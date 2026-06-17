@@ -1,0 +1,46 @@
+{
+  "_comment": "Curated SEMANTIC cross-tags + world membership, keyed by PolyPerfect asset name. build_index.py also auto-adds the lowercased category and the name's own words, then unions + dedupes. Only add tags here that aren't already derivable from the name/category.",
+
+  "Bank_Western":        { "tags": ["building", "town", "shop", "gold", "money"], "worlds": ["wildwest"] },
+  "Church_Western":      { "tags": ["building", "town", "religion"], "worlds": ["wildwest"] },
+  "Gunsmith_Western":    { "tags": ["building", "town", "shop", "guns"], "worlds": ["wildwest"] },
+  "Hotel_Western":       { "tags": ["building", "town", "saloon", "inn"], "worlds": ["wildwest"] },
+  "Scheriff_Western":    { "tags": ["building", "town", "sheriff", "law", "office"], "worlds": ["wildwest"] },
+  "Scheriff_Jail_Western": { "tags": ["building", "town", "sheriff", "law", "jail", "prison"], "worlds": ["wildwest"] },
+  "Water_Tower_Western": { "tags": ["building", "town", "water", "tower", "train"], "worlds": ["wildwest"] },
+  "Windmill_Western":    { "tags": ["building", "farm", "water", "wind"], "worlds": ["wildwest", "farm"] },
+
+  "Horse_Wagon":         { "tags": ["vehicle", "cart", "transport", "horse", "stagecoach"], "worlds": ["wildwest"] },
+  "Horse_Rest":          { "tags": ["prop", "horse", "hitching", "trough"], "worlds": ["wildwest"] },
+  "Wheel_Wood":          { "tags": ["prop", "wheel", "wagon", "wood"], "worlds": ["wildwest"] },
+  "Canoe":               { "tags": ["vehicle", "boat", "water", "river", "native"], "worlds": ["wildwest"] },
+  "Rail_Straight":       { "tags": ["prop", "fence", "hitching", "rail"], "worlds": ["wildwest"] },
+  "Rail_Straight_Bottom":{ "tags": ["prop", "fence", "hitching", "rail"], "worlds": ["wildwest"] },
+  "Pole_Electric":       { "tags": ["prop", "pole", "telegraph", "town"], "worlds": ["wildwest", "city"] },
+  "Dryer":               { "tags": ["prop", "rack", "drying"], "worlds": ["wildwest"] },
+  "Barrel_Old":          { "tags": ["prop", "container", "storage"], "worlds": ["wildwest", "pirate", "medieval"] },
+
+  "Tent_Teepee":         { "tags": ["native", "shelter", "tent", "tribal", "camp"], "worlds": ["wildwest"] },
+  "Totem":               { "tags": ["native", "tribal", "prop", "landmark"], "worlds": ["wildwest"] },
+  "Pipe_Peace":          { "tags": ["native", "tribal", "prop", "pipe"], "worlds": ["wildwest"] },
+
+  "Tumbleweed":          { "tags": ["nature", "plant", "desert", "western"], "worlds": ["wildwest"] },
+  "Cactus_Basic":        { "tags": ["nature", "plant", "desert", "western"], "worlds": ["wildwest"] },
+  "Cactus_Big":          { "tags": ["nature", "plant", "desert", "western"], "worlds": ["wildwest"] },
+  "Cactus_Medium":       { "tags": ["nature", "plant", "desert", "western"], "worlds": ["wildwest"] },
+  "Tree_Bare":           { "tags": ["nature", "tree", "dead", "desert", "western", "spooky"], "worlds": ["wildwest", "apocalypse"] },
+
+  "Horse":               { "tags": ["animal", "mount", "ride", "farm", "western"], "worlds": ["wildwest", "farm", "medieval"] },
+  "Cow":                 { "tags": ["animal", "cattle", "farm", "western"], "worlds": ["wildwest", "farm"] },
+
+  "Revolver":            { "tags": ["weapon", "gun", "sixshooter", "shooter", "western"], "worlds": ["wildwest"] },
+  "Rifle_Old":           { "tags": ["weapon", "gun", "shooter", "western", "hunting"], "worlds": ["wildwest"] },
+  "Pistol":              { "tags": ["weapon", "gun", "handgun", "shooter"], "worlds": ["wildwest", "modern"] },
+  "Pistol_Eagle":        { "tags": ["weapon", "gun", "handgun", "shooter"], "worlds": ["modern", "city"] },
+  "Shotgun_Old":         { "tags": ["weapon", "gun", "shooter", "western", "hunting"], "worlds": ["wildwest"] },
+  "Shotgun_DoubleBarrel":{ "tags": ["weapon", "gun", "shooter", "western", "hunting"], "worlds": ["wildwest"] },
+  "Shotgun_SawedOff":    { "tags": ["weapon", "gun", "shooter", "western"], "worlds": ["wildwest"] },
+  "Dynamite":            { "tags": ["weapon", "explosive", "tnt", "mining", "western"], "worlds": ["wildwest"] },
+  "Dynamite_Pack":       { "tags": ["weapon", "explosive", "tnt", "bundle", "mining", "western"], "worlds": ["wildwest"] },
+  "Ammo_Shotgun":        { "tags": ["weapon", "ammo", "shells", "shotgun"], "worlds": ["wildwest"] }
+}
