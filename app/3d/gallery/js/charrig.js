@@ -138,15 +138,17 @@ const ANIMS = {
     S.bob = Math.abs(Math.sin(t * 7.6)) * 0.04;
   },
   wave(C, t, S) {
-    // left side rest; right arm up beside the head, forearm waving
+    // left arm rests at the side; right arm raised on ITS OWN side, forearm waving.
+    // The right arm rests pointing -x; qz(-π/2) is straight up, so we stop short of
+    // that (-1.35) to keep the hand up-and-out to the RIGHT — NOT across the head.
     C.lArm && C.lArm.apply(qx(0.04).multiply(DOWN_L));
     C.lElb && C.lElb.apply(qx(0.12));
     C.rLeg && C.rLeg.apply(qx(0)); C.lLeg && C.lLeg.apply(qx(0));
     C.rKnee && C.rKnee.apply(qx(0)); C.lKnee && C.lKnee.apply(qx(0));
-    C.rArm && C.rArm.apply(qz(-2.55).multiply(qx(0.2)));     // raise up & slightly out
-    C.rElb && C.rElb.apply(qx(-0.5 + Math.sin(t * 7.5) * 0.55));
+    C.rArm && C.rArm.apply(qz(-1.35).multiply(qx(0.12)));
+    C.rElb && C.rElb.apply(qx(-0.35 + Math.sin(t * 7.5) * 0.5));
     C.spine && C.spine.apply(qx(-0.02));
-    C.head && C.head.apply(qy(0.12).multiply(qx(0.05)));
+    C.head && C.head.apply(qy(0.1).multiply(qx(0.04)));
     S.bob = 0;
   },
   look(C, t, S) {
@@ -162,9 +164,10 @@ const ANIMS = {
   },
   cheer(C, t, S) {
     const p = Math.sin(t * 4.2);
-    C.rArm && C.rArm.apply(qz(-2.5 - 0.28 * p));
-    C.lArm && C.lArm.apply(qz(2.5 + 0.28 * p));
-    C.rElb && C.rElb.apply(qx(-0.35)); C.lElb && C.lElb.apply(qx(-0.35));
+    // both arms up on their OWN sides (right ~-90°, left ~+90°), pumping toward vertical
+    C.rArm && C.rArm.apply(qz(-1.35 - 0.18 * p));
+    C.lArm && C.lArm.apply(qz(1.35 + 0.18 * p));
+    C.rElb && C.rElb.apply(qx(-0.3)); C.lElb && C.lElb.apply(qx(-0.3));
     C.rLeg && C.rLeg.apply(qx(0)); C.lLeg && C.lLeg.apply(qx(0));
     C.rKnee && C.rKnee.apply(qx(Math.max(0, p) * 0.25));
     C.lKnee && C.lKnee.apply(qx(Math.max(0, p) * 0.25));
