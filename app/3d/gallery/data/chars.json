@@ -1,0 +1,590 @@
+{
+"count": 117,
+"chars": [
+{
+"name": "boy-large",
+"file": "boy-large.glb",
+"label": "Boy Large"
+},
+{
+"name": "boy_casual_cap",
+"file": "boy_casual_cap.glb",
+"label": "Boy Casual Cap"
+},
+{
+"name": "boy_coat_winter",
+"file": "boy_coat_winter.glb",
+"label": "Boy Coat Winter"
+},
+{
+"name": "girl-large",
+"file": "girl-large.glb",
+"label": "Girl Large"
+},
+{
+"name": "girl_casual_shorts",
+"file": "girl_casual_shorts.glb",
+"label": "Girl Casual Shorts"
+},
+{
+"name": "girl_coat_winter",
+"file": "girl_coat_winter.glb",
+"label": "Girl Coat Winter"
+},
+{
+"name": "man_astronaut",
+"file": "man_astronaut.glb",
+"label": "Man Astronaut"
+},
+{
+"name": "man_basketball_player",
+"file": "man_basketball_player.glb",
+"label": "Man Basketball Player"
+},
+{
+"name": "man_boxer",
+"file": "man_boxer.glb",
+"label": "Man Boxer"
+},
+{
+"name": "man_business",
+"file": "man_business.glb",
+"label": "Man Business"
+},
+{
+"name": "man_butler",
+"file": "man_butler.glb",
+"label": "Man Butler"
+},
+{
+"name": "man_carpenter",
+"file": "man_carpenter.glb",
+"label": "Man Carpenter"
+},
+{
+"name": "man_casual",
+"file": "man_casual.glb",
+"label": "Man Casual"
+},
+{
+"name": "man_casual_shorts",
+"file": "man_casual_shorts.glb",
+"label": "Man Casual Shorts"
+},
+{
+"name": "man_chef",
+"file": "man_chef.glb",
+"label": "Man Chef"
+},
+{
+"name": "man_claus",
+"file": "man_claus.glb",
+"label": "Man Claus"
+},
+{
+"name": "man_clown",
+"file": "man_clown.glb",
+"label": "Man Clown"
+},
+{
+"name": "man_coat_winter",
+"file": "man_coat_winter.glb",
+"label": "Man Coat Winter"
+},
+{
+"name": "man_construction_worker",
+"file": "man_construction_worker.glb",
+"label": "Man Construction Worker"
+},
+{
+"name": "man_cowboy",
+"file": "man_cowboy.glb",
+"label": "Man Cowboy"
+},
+{
+"name": "man_cyclist",
+"file": "man_cyclist.glb",
+"label": "Man Cyclist"
+},
+{
+"name": "man_dentist",
+"file": "man_dentist.glb",
+"label": "Man Dentist"
+},
+{
+"name": "man_diving",
+"file": "man_diving.glb",
+"label": "Man Diving"
+},
+{
+"name": "man_doctor",
+"file": "man_doctor.glb",
+"label": "Man Doctor"
+},
+{
+"name": "man_eskimo",
+"file": "man_eskimo.glb",
+"label": "Man Eskimo"
+},
+{
+"name": "man_explorer",
+"file": "man_explorer.glb",
+"label": "Man Explorer"
+},
+{
+"name": "man_farm",
+"file": "man_farm.glb",
+"label": "Man Farm"
+},
+{
+"name": "man_fire",
+"file": "man_fire.glb",
+"label": "Man Fire"
+},
+{
+"name": "man_hazard",
+"file": "man_hazard.glb",
+"label": "Man Hazard"
+},
+{
+"name": "man_homeless",
+"file": "man_homeless.glb",
+"label": "Man Homeless"
+},
+{
+"name": "man_judge",
+"file": "man_judge.glb",
+"label": "Man Judge"
+},
+{
+"name": "man_knight",
+"file": "man_knight.glb",
+"label": "Man Knight"
+},
+{
+"name": "man_large",
+"file": "man_large.glb",
+"label": "Man Large"
+},
+{
+"name": "man_lumberjack",
+"file": "man_lumberjack.glb",
+"label": "Man Lumberjack"
+},
+{
+"name": "man_mechanic",
+"file": "man_mechanic.glb",
+"label": "Man Mechanic"
+},
+{
+"name": "man_metalhead",
+"file": "man_metalhead.glb",
+"label": "Man Metalhead"
+},
+{
+"name": "man_mummy",
+"file": "man_mummy.glb",
+"label": "Man Mummy"
+},
+{
+"name": "man_naval_officer",
+"file": "man_naval_officer.glb",
+"label": "Man Naval Officer"
+},
+{
+"name": "man_ninja",
+"file": "man_ninja.glb",
+"label": "Man Ninja"
+},
+{
+"name": "man_officer_swat",
+"file": "man_officer_swat.glb",
+"label": "Man Officer Swat"
+},
+{
+"name": "man_paramedic",
+"file": "man_paramedic.glb",
+"label": "Man Paramedic"
+},
+{
+"name": "man_pilot",
+"file": "man_pilot.glb",
+"label": "Man Pilot"
+},
+{
+"name": "man_pirate",
+"file": "man_pirate.glb",
+"label": "Man Pirate"
+},
+{
+"name": "man_plumber",
+"file": "man_plumber.glb",
+"label": "Man Plumber"
+},
+{
+"name": "man_police",
+"file": "man_police.glb",
+"label": "Man Police"
+},
+{
+"name": "man_post",
+"file": "man_post.glb",
+"label": "Man Post"
+},
+{
+"name": "man_prehistoric",
+"file": "man_prehistoric.glb",
+"label": "Man Prehistoric"
+},
+{
+"name": "man_punk",
+"file": "man_punk.glb",
+"label": "Man Punk"
+},
+{
+"name": "man_race_driver",
+"file": "man_race_driver.glb",
+"label": "Man Race Driver"
+},
+{
+"name": "man_reporter",
+"file": "man_reporter.glb",
+"label": "Man Reporter"
+},
+{
+"name": "man_scientist",
+"file": "man_scientist.glb",
+"label": "Man Scientist"
+},
+{
+"name": "man_skate",
+"file": "man_skate.glb",
+"label": "Man Skate"
+},
+{
+"name": "man_skeleton",
+"file": "man_skeleton.glb",
+"label": "Man Skeleton"
+},
+{
+"name": "man_ski",
+"file": "man_ski.glb",
+"label": "Man Ski"
+},
+{
+"name": "man_soldier",
+"file": "man_soldier.glb",
+"label": "Man Soldier"
+},
+{
+"name": "man_sumo",
+"file": "man_sumo.glb",
+"label": "Man Sumo"
+},
+{
+"name": "man_superhero",
+"file": "man_superhero.glb",
+"label": "Man Superhero"
+},
+{
+"name": "man_swimsuit",
+"file": "man_swimsuit.glb",
+"label": "Man Swimsuit"
+},
+{
+"name": "man_tennis",
+"file": "man_tennis.glb",
+"label": "Man Tennis"
+},
+{
+"name": "man_viking",
+"file": "man_viking.glb",
+"label": "Man Viking"
+},
+{
+"name": "man_weightlifter",
+"file": "man_weightlifter.glb",
+"label": "Man Weightlifter"
+},
+{
+"name": "man_wizard",
+"file": "man_wizard.glb",
+"label": "Man Wizard"
+},
+{
+"name": "man_yeti",
+"file": "man_yeti.glb",
+"label": "Man Yeti"
+},
+{
+"name": "man_zombie",
+"file": "man_zombie.glb",
+"label": "Man Zombie"
+},
+{
+"name": "woman_actionhero",
+"file": "woman_actionhero.glb",
+"label": "Woman Actionhero"
+},
+{
+"name": "woman_astronaut",
+"file": "woman_astronaut.glb",
+"label": "Woman Astronaut"
+},
+{
+"name": "woman_basketball_player",
+"file": "woman_basketball_player.glb",
+"label": "Woman Basketball Player"
+},
+{
+"name": "woman_boxer",
+"file": "woman_boxer.glb",
+"label": "Woman Boxer"
+},
+{
+"name": "woman_business",
+"file": "woman_business.glb",
+"label": "Woman Business"
+},
+{
+"name": "woman_carpenter",
+"file": "woman_carpenter.glb",
+"label": "Woman Carpenter"
+},
+{
+"name": "woman_casual",
+"file": "woman_casual.glb",
+"label": "Woman Casual"
+},
+{
+"name": "woman_casual_shorts",
+"file": "woman_casual_shorts.glb",
+"label": "Woman Casual Shorts"
+},
+{
+"name": "woman_chef",
+"file": "woman_chef.glb",
+"label": "Woman Chef"
+},
+{
+"name": "woman_claus",
+"file": "woman_claus.glb",
+"label": "Woman Claus"
+},
+{
+"name": "woman_clown",
+"file": "woman_clown.glb",
+"label": "Woman Clown"
+},
+{
+"name": "woman_coat_winter",
+"file": "woman_coat_winter.glb",
+"label": "Woman Coat Winter"
+},
+{
+"name": "woman_construction_worker",
+"file": "woman_construction_worker.glb",
+"label": "Woman Construction Worker"
+},
+{
+"name": "woman_cowgirl",
+"file": "woman_cowgirl.glb",
+"label": "Woman Cowgirl"
+},
+{
+"name": "woman_cyclist",
+"file": "woman_cyclist.glb",
+"label": "Woman Cyclist"
+},
+{
+"name": "woman_dentist",
+"file": "woman_dentist.glb",
+"label": "Woman Dentist"
+},
+{
+"name": "woman_doctor",
+"file": "woman_doctor.glb",
+"label": "Woman Doctor"
+},
+{
+"name": "woman_eskimo",
+"file": "woman_eskimo.glb",
+"label": "Woman Eskimo"
+},
+{
+"name": "woman_explorer",
+"file": "woman_explorer.glb",
+"label": "Woman Explorer"
+},
+{
+"name": "woman_farm",
+"file": "woman_farm.glb",
+"label": "Woman Farm"
+},
+{
+"name": "woman_fire",
+"file": "woman_fire.glb",
+"label": "Woman Fire"
+},
+{
+"name": "woman_hazard",
+"file": "woman_hazard.glb",
+"label": "Woman Hazard"
+},
+{
+"name": "woman_homeless",
+"file": "woman_homeless.glb",
+"label": "Woman Homeless"
+},
+{
+"name": "woman_judge",
+"file": "woman_judge.glb",
+"label": "Woman Judge"
+},
+{
+"name": "woman_large",
+"file": "woman_large.glb",
+"label": "Woman Large"
+},
+{
+"name": "woman_lumberjack",
+"file": "woman_lumberjack.glb",
+"label": "Woman Lumberjack"
+},
+{
+"name": "woman_maid",
+"file": "woman_maid.glb",
+"label": "Woman Maid"
+},
+{
+"name": "woman_mechanic",
+"file": "woman_mechanic.glb",
+"label": "Woman Mechanic"
+},
+{
+"name": "woman_metalhead",
+"file": "woman_metalhead.glb",
+"label": "Woman Metalhead"
+},
+{
+"name": "woman_mummy",
+"file": "woman_mummy.glb",
+"label": "Woman Mummy"
+},
+{
+"name": "woman_naval_officer",
+"file": "woman_naval_officer.glb",
+"label": "Woman Naval Officer"
+},
+{
+"name": "woman_ninja",
+"file": "woman_ninja.glb",
+"label": "Woman Ninja"
+},
+{
+"name": "woman_paramedic",
+"file": "woman_paramedic.glb",
+"label": "Woman Paramedic"
+},
+{
+"name": "woman_pilot",
+"file": "woman_pilot.glb",
+"label": "Woman Pilot"
+},
+{
+"name": "woman_pirate",
+"file": "woman_pirate.glb",
+"label": "Woman Pirate"
+},
+{
+"name": "woman_plumber",
+"file": "woman_plumber.glb",
+"label": "Woman Plumber"
+},
+{
+"name": "woman_police",
+"file": "woman_police.glb",
+"label": "Woman Police"
+},
+{
+"name": "woman_post",
+"file": "woman_post.glb",
+"label": "Woman Post"
+},
+{
+"name": "woman_prehistoric",
+"file": "woman_prehistoric.glb",
+"label": "Woman Prehistoric"
+},
+{
+"name": "woman_punk",
+"file": "woman_punk.glb",
+"label": "Woman Punk"
+},
+{
+"name": "woman_race_car_driver",
+"file": "woman_race_car_driver.glb",
+"label": "Woman Race Car Driver"
+},
+{
+"name": "woman_reporter",
+"file": "woman_reporter.glb",
+"label": "Woman Reporter"
+},
+{
+"name": "woman_scientist",
+"file": "woman_scientist.glb",
+"label": "Woman Scientist"
+},
+{
+"name": "woman_skate",
+"file": "woman_skate.glb",
+"label": "Woman Skate"
+},
+{
+"name": "woman_soldier",
+"file": "woman_soldier.glb",
+"label": "Woman Soldier"
+},
+{
+"name": "woman_sumo",
+"file": "woman_sumo.glb",
+"label": "Woman Sumo"
+},
+{
+"name": "woman_superhero",
+"file": "woman_superhero.glb",
+"label": "Woman Superhero"
+},
+{
+"name": "woman_swimsuit",
+"file": "woman_swimsuit.glb",
+"label": "Woman Swimsuit"
+},
+{
+"name": "woman_tennis",
+"file": "woman_tennis.glb",
+"label": "Woman Tennis"
+},
+{
+"name": "woman_viking",
+"file": "woman_viking.glb",
+"label": "Woman Viking"
+},
+{
+"name": "woman_weightlifter",
+"file": "woman_weightlifter.glb",
+"label": "Woman Weightlifter"
+},
+{
+"name": "woman_yeti",
+"file": "woman_yeti.glb",
+"label": "Woman Yeti"
+},
+{
+"name": "woman_zombie",
+"file": "woman_zombie.glb",
+"label": "Woman Zombie"
+}
+]
+}

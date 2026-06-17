@@ -10,8 +10,10 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { initAssets, loadGLB, atlasTex, specTex } from './assets.js';
+import { initChars, loadCharacter } from './charrig.js';
 
 const SCENES = [
+  ['cast', 'Characters'],
   ['demo01', 'All Models'], ['demo02', 'Worlds'], ['demo07', 'Wild West'],
   ['demo04', 'City'], ['demo05', 'Suburban'], ['demo08', 'Japan'],
   ['demo06', 'Castle'], ['demo09', 'Dungeon'], ['demo10', 'Sci-Fi'],
@@ -115,6 +117,71 @@ function buildWorld(data) {
 // switches, so a removed world's wrappers are just dropped for GC — nothing to free.
 function disposeTree() {}
 
+// ── animated character cast (the rigged PolyPerfect Animated People) ─────────
+// All 118 share one 80-bone rig, so one procedural animation set (charrig.js)
+// drives them all. We lay them out in a grid and let each slowly cycle through
+// the animation set with its own phase, so the crowd reads as alive.
+let castGroup = null;
+let castChars = [];
+const CAST_FACE = 0;                // characters face +Z, toward the opening camera
+async function loadCast() {
+  if (world) { scene.remove(world); world = null; }
+  if (castGroup) { scene.remove(castGroup); castGroup = null; }
+  castChars = [];
+
+  const man = await fetch('data/chars.json').then(r => r.json());
+  $('#osub').textContent = `${man.count} animated characters · one shared 80-bone rig`;
+  await initChars();
+
+  castGroup = new THREE.Group();
+  scene.add(castGroup);
+
+  const list = man.chars;
+  const COLS = 15, GAP = 2.4;
+  const rows = Math.ceil(list.length / COLS);
+  const x0 = -(COLS - 1) * GAP / 2;
+  const z0 = -(rows - 1) * GAP / 2;
+  const box = new THREE.Box3();
+
+  let done = 0;
+  const queue = list.map((c, i) => ({ c, i }));
+  const worker = async () => {
+    while (queue.length) {
+      const { c, i } = queue.shift();
+      try {
+        const ch = await loadCharacter(c.file);
+        const col = i % COLS, row = Math.floor(i / COLS);
+        ch.group.position.set(x0 + col * GAP, 0, z0 + row * GAP);
+        ch.group.rotation.y = CAST_FACE;
+        ch.update(0.001);                       // pose once so the preview isn't a T-pose
+        box.setFromObject(ch.group);
+        ch.group.position.y -= box.min.y;        // drop feet onto the ground
+        ch._baseY = ch.group.position.y;
+        castGroup.add(ch.group);
+        castChars.push(ch);
+      } catch (e) { /* skip a character that fails to decode */ }
+      $('#bar > i').style.width = `${(++done / list.length * 100).toFixed(1)}%`;
+      $('#status').textContent = `loading characters ${done} / ${list.length}`;
+    }
+  };
+  await Promise.all(Array.from({ length: 12 }, worker));
+  castGroup.updateMatrixWorld(true);
+  frameToCast(COLS, rows, GAP);
+  window.__dbg = { scene, camera, castChars, render1,
+    step: (dt) => { updateChars(dt); render1(); },     // deterministic tick for headless tests
+    setView: (px, py, pz, y, p) => { camera.position.set(px, py, pz); yaw = y; pitch = p; } };
+}
+function frameToCast(cols, rows, gap) {
+  const span = Math.max(cols * gap, rows * gap);
+  // open low and near the front row so you walk into the crowd, aimed at chest height
+  camera.position.set(0, 6, rows * gap / 2 + span * 0.34);
+  const dx = -camera.position.x, dy = 1.2 - camera.position.y, dz = -camera.position.z;
+  const L = Math.hypot(dx, dy, dz);
+  yaw = Math.atan2(-dx / L, -dz / L);
+  pitch = Math.asin(dy / L);
+}
+function updateChars(dt) { for (const ch of castChars) ch.update(dt); }
+
 // ── fly controls (pointer lock) ────────────────────────────────────────────
 const keys = new Set();
 let yaw = 0, pitch = -0.12, locked = false;
@@ -155,6 +222,7 @@ function loop() {
   requestAnimationFrame(loop);
   const now = performance.now(), dt = Math.min((now - last) / 1000, 0.05); last = now;
   updateCamera(dt);
+  if (castChars.length) updateChars(dt);
   render1();
   acc += dt; if (++frames >= 20) { fpsEl.textContent = `${Math.round(frames / acc)} fps`; frames = 0; acc = 0; }
 }
@@ -184,18 +252,24 @@ async function loadScene(id, label) {
   $('#overlay').classList.remove('hidden');
   $('#otitle').textContent = label;
   $('#play').disabled = true; $('#play').textContent = 'Loading…';
-  $('#status').textContent = 'fetching placements…';
-  const data = await fetch(`scenes/${id}.json`).then(r => r.json());
-  $('#osub').textContent = `${data.count.toLocaleString()} objects · ${data.uniques.toLocaleString()} unique models`;
-  await loadAll(data.files, (d, n) => {
-    $('#bar > i').style.width = `${(d / n * 100).toFixed(1)}%`;
-    $('#status').textContent = `loading models ${d} / ${n}`;
-  });
-  $('#status').textContent = 'placing objects…';
-  await new Promise(r => setTimeout(r, 0));
-  buildWorld(data);
-  frameToScene(data);
-  $('#status').textContent = `ready · ${data.count.toLocaleString()} objects`;
+  if (id === 'cast') {
+    $('#status').textContent = 'decoding character pack…';
+    await loadCast();
+  } else {
+    if (castGroup) { scene.remove(castGroup); castGroup = null; castChars = []; }
+    $('#status').textContent = 'fetching placements…';
+    const data = await fetch(`scenes/${id}.json`).then(r => r.json());
+    $('#osub').textContent = `${data.count.toLocaleString()} objects · ${data.uniques.toLocaleString()} unique models`;
+    await loadAll(data.files, (d, n) => {
+      $('#bar > i').style.width = `${(d / n * 100).toFixed(1)}%`;
+      $('#status').textContent = `loading models ${d} / ${n}`;
+    });
+    $('#status').textContent = 'placing objects…';
+    await new Promise(r => setTimeout(r, 0));
+    buildWorld(data);
+    frameToScene(data);
+  }
+  $('#status').textContent = 'ready';
   $('#play').disabled = false; $('#play').textContent = 'Enter scene ▸';
   render1();
 }
@@ -225,8 +299,9 @@ $('#play').addEventListener('click', () => {
     map: atlasTex, metalnessMap: specTex, metalness: 1.0, roughness: 0.62,
     envMapIntensity: 1.0, side: THREE.DoubleSide,
   });
-  // only list scenes whose json exists
+  // only list demo scenes whose json exists ('cast' is procedural, not a json)
   for (const [id] of SCENES) {
+    if (id === 'cast') continue;
     const ok = await fetch(`scenes/${id}.json`, { method: 'HEAD' }).then(r => r.ok).catch(() => false);
     if (!ok) { const opt = [...sel.options].find(o => o.value === id); if (opt) opt.remove(); }
   }

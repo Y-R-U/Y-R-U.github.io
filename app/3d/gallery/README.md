@@ -2,7 +2,8 @@
 
 A browsable, searchable, taggable index of **all 3,156 models** from the
 **PolyPerfect — Low Poly Ultimate Pack**, converted to three.js-loadable `.glb`,
-plus a walk/fly-through of the pack's Unity demo scenes.
+plus a walk/fly-through of the pack's Unity demo scenes — and a **"Characters"
+showcase** of all 117 rigged **Animated People**, each procedurally animated.
 
 > **⚠ ASSETS ARE PROTECTED, NOT PUBLIC.** PolyPerfect is a commercial Unity Asset
 > Store pack — its raw GLB/PNG files must never be committed. So the page ships the
@@ -43,11 +44,15 @@ Re-pack after changing the model set or re-stripping: `python3 tools/build_pack.
 ```
 gallery/                                  COMMITTED (page + obfuscated pack):
   index.html  css/style.css  js/app.js   ← gallery (grid + filters + orbit viewer)
-  scene.html               js/scene.js    ← demo-scene fly-through (WASD + mouse)
+  scene.html               js/scene.js    ← fly-through + "Characters" cast (WASD + mouse)
   js/assets.js                           ← protected-pack loader (Range-fetch + decode)
+  js/charrig.js                          ← rigged-character loader + procedural animation
   tools/build_pack.py                    ← builds assets/pack.dat from models_all/
+  tools/build_chars.py                   ← builds assets/chars.dat from the rigged-char cache
   assets/pack.dat  assets/pack.index.json ← obfuscated art blob + byte offsets
+  assets/chars.dat assets/chars.index.json ← obfuscated rigged-character blob + offsets
   data/catalog.json                      ← gallery metadata (titles/tags/tris) — plaintext
+  data/chars.json                        ← character manifest (name/file/label) — plaintext
   scenes/demo01.json … demo14.json       ← world-space placements per Unity demo scene
   tags.json                              ← hand-curated semantic cross-tags
   build_index_all.py  build_index.py     ← (local) rebuild models_all/index.json
@@ -59,6 +64,8 @@ gallery/                                  COMMITTED (page + obfuscated pack):
     index.json                           ← gallery data (generated; copied → data/catalog.json)
   models/                                ← legacy 37-asset western subset (embedded atlas)
 ```
+(The rigged-character source GLBs live outside the repo, in the shared cache
+`~/cc/assets/3d/public/assets/chars_rigged/`; `build_chars.py` reads them from there.)
 
 ## How colour works (one shared atlas, no per-model textures)
 
@@ -88,12 +95,40 @@ placement matrix `M` is rebased to `C·M·C` with `C = diag(1,1,-1)`. The world 
 `_M` and `_T` share identical geometry, `parse_scene.py` maps `_M` guids → our `_T`
 GLB by prefab name (88–99 % coverage).
 
+## Animated characters (the "Characters" cast)
+
+The fly-through's first scene, **Characters**, lines up all 117 rigged
+PolyPerfect **Animated People** and lets each slowly cycle through a small set
+of looping animations (idle / walk / wave / look / cheer), with a per-character
+phase so the crowd reads as alive.
+
+The trick that makes this cheap: **all 117 are skinned to ONE shared skeleton**
+(`_MainRig`, identical bone names — `Hip_R/L`, `Knee_R/L`, `Shoulder_R/L`,
+`Elbow_R/L`, `Head_M`, …), so a single bone-name-keyed animation set drives every
+one of them with no per-character work and no retargeting. `js/charrig.js` is a
+standalone generalisation of the Glade's imported-hero rig driver: it loads a
+rigged GLB, drives its real bones in **body space** (poses set a target,
+`update()` slerps toward it so anim switches crossfade), and exposes
+`initChars()` / `loadCharacter(file)` for reuse in other games.
+
+- `assets/chars.dat` (~14 MB, 117 characters) — same obfuscation + HTTP-Range
+  scheme as `pack.dat` but a **distinct key** and a **separate blob**, so the
+  gallery thumbnail pack is untouched and only `scene.html` loads it.
+- Textures stay **embedded** per character (all 117 share one tiny ~33 KB atlas),
+  so each GLB is correct on its own — no V-flip / shared-material plumbing.
+- Source rigged GLBs come from the Unity glTFast batch exporter
+  `Airon.SkinnedExport.ExportList` (see `~/cc/assets/POLYPERFECT_ASSET_HOWTO.md`).
+  `build_chars.py` auto-skips non-character prefabs (`skins > 12`, e.g. a
+  showcase prefab that bundles a whole crowd).
+
 ## Regenerate
 
 ```sh
 cd app/3d/gallery
 python3 build_index_all.py                          # rebuild models_all/index.json
 python3 tools/build_pack.py                         # re-pack assets/ + copy data/catalog.json
+python3 tools/build_chars.py                        # re-pack assets/chars.dat + data/chars.json
+# (rigged characters: export from Unity first via Airon.SkinnedExport.ExportList — see HOWTO)
 # scene placements (run from anywhere; needs /tmp/guid_to_glb*.json — see parse_scene.py):
 python3 /tmp/parse_scene.py <SCENE.unity> scenes/<id>.json [guid_map.json]
 ```
