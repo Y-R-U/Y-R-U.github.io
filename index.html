@@ -153,18 +153,80 @@
     }
 
     /* ─── FILTER TABS ─── */
+    /* sticky wrapper holds the type filter + the month bar */
+    #projects-controls {
+      position: sticky;
+      top: 60px;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.97) 70%, rgba(10,10,10,0.6));
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding-top: 12px;
+    }
+
     .filter-bar {
       display: flex;
       justify-content: center;
       gap: 4px;
-      padding: 20px 16px 10px;
-      position: sticky;
-      top: 60px;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 60%, transparent);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      padding: 8px 16px;
     }
+
+    /* ─── MONTH BAR ─── */
+    .month-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 0 16px 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .month-bar::-webkit-scrollbar { display: none; }
+
+    .month-chip {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      white-space: nowrap;
+      padding: 6px 12px;
+      border: 1px solid rgba(0,255,252,0.25);
+      border-radius: 14px;
+      background: transparent;
+      color: var(--cyber-primary);
+      cursor: pointer;
+      transition: all 0.25s;
+      flex: 0 0 auto;
+    }
+    .month-chip .mc-count { opacity: 0.55; margin-left: 6px; font-size: 10px; }
+    .month-chip:hover { border-color: rgba(0,255,252,0.6); }
+    .month-chip.active {
+      border-color: var(--cyber-primary);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0,255,252,0.35);
+      text-shadow: 0 0 6px var(--cyber-primary);
+    }
+
+    /* ─── REVEAL TOAST (secret hidden-projects toggle) ─── */
+    .reveal-toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10,10,20,0.95);
+      border: 1px solid var(--cyber-secondary);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      box-shadow: 0 0 20px rgba(255,0,255,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s;
+      z-index: 2000;
+    }
+    .reveal-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #grid-sentinel { height: 1px; width: 100%; }
 
     .filter-btn {
       font-family: 'Orbitron', sans-serif;
@@ -578,19 +640,53 @@
 
   <!-- PROJECTS PAGE -->
   <div id="projects-page" class="page">
-    <div class="filter-bar">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="app">Apps</button>
-      <button class="filter-btn" data-filter="game">Games</button>
+    <div id="projects-controls">
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="app">Apps</button>
+        <button class="filter-btn" data-filter="game">Games</button>
+      </div>
+      <div class="month-bar" id="month-bar"></div>
     </div>
     <div class="card-grid" id="card-grid"></div>
+    <div id="grid-sentinel"></div>
+    <div id="reveal-toast" class="reveal-toast"></div>
   </div>
 
   <script src="projects.js"></script>
   <script>
-    // ─── DERIVE VISIBLE PROJECTS ───
-    // PROJECTS comes from projects.js — filter to only app/game entries
-    const projects = PROJECTS.filter(p => p.type === 'app' || p.type === 'game');
+    // ─── PROJECT POOL + MONTH GROUPING STATE ───
+    // PROJECTS comes from projects.js. Only app/game entries show; some are
+    // flagged `hidden:true` and appear only after the secret reveal (tap the
+    // current-month chip 5×). The grid defaults to the current month.
+    const allProjects = PROJECTS.filter(p => p.type === 'app' || p.type === 'game');
+
+    const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthKey = iso => (iso || '').slice(0, 7);                 // 'YYYY-MM'
+    const monthLabel = key => { const [y, m] = key.split('-'); return `${MONTHS_SHORT[(+m || 1) - 1]} ${y}`; };
+    const now = new Date();
+    const CURRENT_MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    let typeFilter = 'all';
+    let monthFilter = CURRENT_MONTH;     // default view = current month
+    let hiddenRevealed = false;
+    let projectsInited = false;
+
+    const pool = () => hiddenRevealed ? allProjects : allProjects.filter(p => !p.hidden);
+
+    function monthsWithProjects() {
+      const set = new Set(pool().map(p => monthKey(p.date)).filter(Boolean));
+      set.add(CURRENT_MONTH);            // always show the current-month chip (the secret trigger)
+      return [...set].sort().reverse();
+    }
+    const monthCount = key => pool().filter(p => monthKey(p.date) === key).length;
+
+    function filteredProjects() {
+      let list = pool();
+      if (typeFilter !== 'all') list = list.filter(p => p.type === typeFilter);
+      if (monthFilter !== 'all') list = list.filter(p => monthKey(p.date) === monthFilter);
+      return list.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    }
 
     // ─── HELPERS ───
     function formatDate(iso) {
@@ -608,6 +704,7 @@
       const builtWith = getProjectCreator(project);
       const badgeClass = project.type === 'app' ? 'badge-app' : 'badge-game';
       const badgeLabel = project.type === 'app' ? 'App' : 'Game';
+      const lock = project.hidden ? '🔒 ' : '';
 
       const wrapper = document.createElement('div');
       wrapper.className = 'card-wrapper';
@@ -619,11 +716,11 @@
           <div class="card-face card-front">
             <img src="assets/screenshots/${project.screenshot}.jpg"
                  alt="${project.name}" loading="lazy">
-            <div class="card-title"><span class="card-name">${project.name}</span></div>
+            <div class="card-title"><span class="card-name">${lock}${project.name}</span></div>
             <div class="card-category-badge ${badgeClass}">${badgeLabel}</div>
           </div>
           <div class="card-face card-back">
-            <div class="card-back-header">${project.name}</div>
+            <div class="card-back-header">${lock}${project.name}</div>
             <div class="card-back-desc">${project.desc}</div>
             <div class="card-back-meta">
               <div class="meta-row"><span class="meta-icon"><i class="far fa-calendar-alt"></i></span>${formatDate(project.date)}</div>
@@ -636,23 +733,99 @@
       return wrapper;
     }
 
-    // ─── RENDER GRID ───
-    function renderGrid(filter) {
+    // ─── RENDER GRID (batched / lazy) ───
+    // Cards render in batches; a sentinel below the grid pulls the next batch in
+    // as it scrolls into view, so big views (e.g. "All" months) stay light.
+    let renderQueue = [], renderedCount = 0, gridIO = null;
+    const BATCH = 24;
+
+    function appendBatch() {
+      const grid = document.getElementById('card-grid');
+      const slice = renderQueue.slice(renderedCount, renderedCount + BATCH);
+      slice.forEach((p, i) => grid.appendChild(buildCard(p, renderedCount + i)));
+      renderedCount += slice.length;
+      attachFlipListeners();
+    }
+    function fillUntilSentinelOffscreen() {
+      appendBatch();
+      if (renderedCount < renderQueue.length) {
+        const r = document.getElementById('grid-sentinel').getBoundingClientRect();
+        if (r.top < window.innerHeight + 400) requestAnimationFrame(fillUntilSentinelOffscreen);
+      }
+    }
+    function renderGrid() {
       const grid = document.getElementById('card-grid');
       const existing = Array.from(grid.children);
-
-      // Animate out
       existing.forEach(el => el.classList.add('hiding'));
-
       setTimeout(() => {
         grid.innerHTML = '';
-        const filtered = filter === 'all'
-          ? projects
-          : projects.filter(p => p.type === filter);
-
-        filtered.forEach((p, i) => grid.appendChild(buildCard(p, i)));
-        attachFlipListeners();
+        renderQueue = filteredProjects();
+        renderedCount = 0;
+        fillUntilSentinelOffscreen();
+        if (gridIO) gridIO.disconnect();
+        gridIO = new IntersectionObserver(es => {
+          if (es[0].isIntersecting && renderedCount < renderQueue.length) fillUntilSentinelOffscreen();
+        }, { rootMargin: '400px' });
+        gridIO.observe(document.getElementById('grid-sentinel'));
       }, existing.length > 0 ? 250 : 0);
+    }
+
+    // ─── MONTH BAR + SECRET HIDDEN-PROJECTS REVEAL ───
+    let secretTaps = 0, secretTimer = null, toastTimer = null;
+
+    function monthChip(key, label, count, onClick) {
+      const c = document.createElement('button');
+      c.className = 'month-chip';
+      c.dataset.month = key;
+      c.innerHTML = `${label}<span class="mc-count">${count}</span>`;
+      c.addEventListener('click', onClick);
+      return c;
+    }
+    function markActiveChips() {
+      document.querySelectorAll('.month-chip').forEach(c =>
+        c.classList.toggle('active', c.dataset.month === monthFilter));
+    }
+    function buildMonthBar() {
+      const bar = document.getElementById('month-bar');
+      bar.innerHTML = '';
+      bar.appendChild(monthChip('all', 'All', pool().length, () => selectMonth('all')));
+      for (const key of monthsWithProjects()) {
+        const isCurrent = key === CURRENT_MONTH;
+        bar.appendChild(monthChip(key, monthLabel(key), monthCount(key),
+          isCurrent ? onCurrentMonthTap : () => selectMonth(key)));
+      }
+      markActiveChips();
+    }
+    function selectMonth(key) { monthFilter = key; markActiveChips(); renderGrid(); }
+
+    // The current-month chip doubles as a secret toggle: 5 quick taps reveal the
+    // hidden projects (and jump to "All"); once revealed, a single tap hides them.
+    function onCurrentMonthTap() {
+      if (hiddenRevealed) {
+        hiddenRevealed = false;
+        monthFilter = CURRENT_MONTH;
+        buildMonthBar(); renderGrid();
+        showToast('Hidden projects hidden');
+        return;
+      }
+      selectMonth(CURRENT_MONTH);
+      secretTaps++;
+      clearTimeout(secretTimer);
+      secretTimer = setTimeout(() => { secretTaps = 0; }, 1500);
+      if (secretTaps >= 5) {
+        secretTaps = 0;
+        hiddenRevealed = true;
+        monthFilter = 'all';
+        buildMonthBar(); renderGrid();
+        const n = allProjects.filter(p => p.hidden).length;
+        showToast(`🔓 ${n} hidden project${n === 1 ? '' : 's'} revealed`);
+      }
+    }
+    function showToast(msg) {
+      const t = document.getElementById('reveal-toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
     // ─── FLIP LOGIC ───
@@ -762,10 +935,10 @@
       }
 
       if (pageName === 'projects') {
-        renderGrid('all');
-        // Reset filter buttons
+        if (!projectsInited) { projectsInited = true; buildMonthBar(); }
+        renderGrid();
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+        document.querySelector(`.filter-btn[data-filter="${typeFilter}"]`).classList.add('active');
       }
     }
 
@@ -786,7 +959,8 @@
         btn.addEventListener('click', function() {
           document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
-          renderGrid(this.dataset.filter);
+          typeFilter = this.dataset.filter;
+          renderGrid();
         });
       });
 

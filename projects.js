@@ -304,6 +304,16 @@ const PROJECTS = [
     desc: "A tiny open-world Diablo/RuneScape-style RPG. Wake with no memory, then level Attack, Strength, Defence, Archery, Magic, Health and Fishing through XP. Survive with slow-draining food and water (auto-refill at any river or well), pick fruit, fish, chop wood with an axe, light fires with a tinderbox and cook your catch. Trade at the general store, follow a guide through intro quests, and delve a torch-lit dungeon of skeletons, spiders and zombies with randomized loot. Three.js, tap-to-move + WASD, mobile-first.",
     date: "2026-06-16", creator: "Opus 4.8" },
 
+  // ── HIDDEN: PolyPerfect asset tools (commercial pack — art ships obfuscated;
+  //    shown only via the secret reveal on the Projects page) ──
+  { name: "Asset Gallery",      path: "/app/3d/gallery/", screenshot: "gallery", type: "app", hidden: true,
+    desc: "Browsable, searchable, taggable index of all 3,156 PolyPerfect Low Poly Ultimate Pack models, rendered live in Three.js with a shared palette atlas. Filter by category/world/tag and orbit any model. The art ships as one obfuscated pack, never as raw files.",
+    date: "2026-06-17", creator: "Opus 4.8" },
+
+  { name: "Asset Fly-through",  path: "/app/3d/gallery/scene.html", screenshot: "flythrough", type: "app", hidden: true,
+    desc: "Free-fly through the PolyPerfect demo worlds — City, Wild West, Castle, Japan, Sci-Fi and more — rebuilt from the Unity demo scenes in Three.js. WASD + mouse over thousands of placed low-poly models sharing one atlas material.",
+    date: "2026-06-17", creator: "Opus 4.8" },
+
   // ══════════════════════════════════════════
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
