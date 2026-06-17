@@ -2251,6 +2251,12 @@ function getStoryMessage(story = getActiveStory()) {
   return `Fresh dock records put your ${story.target} very close.`;
 }
 
+function getSearchPanelCopy() {
+  const story = getActiveStory();
+  if (!story) return 'Choose an available mission from the board.';
+  return story.lastMessage || getStoryMessage(story);
+}
+
 function getAchievementRows(save = state.save) {
   return ACHIEVEMENT_DEFS.map((def) => {
     const progress = Math.max(0, Math.round(def.progress(save) || 0));
@@ -2438,13 +2444,9 @@ function renderStorySearch() {
   const card = document.createElement('article');
   card.className = 'terminal-card story-card';
 
-  const kicker = document.createElement('span');
-  kicker.textContent = getStoryArc(story).label;
   const title = document.createElement('h3');
-  title.textContent = getStoryTitle(story);
+  title.textContent = `Mission: ${getStoryTitle(story)}`;
   const media = createMediaFrame(getStoryMedia(story));
-  const text = document.createElement('p');
-  text.textContent = story.lastMessage || getStoryMessage(story);
   const progress = document.createElement('div');
   progress.className = 'story-progress';
   const bar = document.createElement('i');
@@ -2480,7 +2482,7 @@ function renderStorySearch() {
     actions.append(search, routeLabel);
   }
 
-  card.append(kicker, title, media, text, progress, actions);
+  card.append(title, media, progress, actions);
   upgradeList.append(card);
   if (story.complete || getStoryBoard().completed.includes('identity')) renderQuestBoard();
 }
@@ -2652,7 +2654,7 @@ function renderStationPanel() {
 
   if (tab === 'search') {
     if (stationPanelTitle) stationPanelTitle.textContent = 'Port Search';
-    if (stationPanelCopy) stationPanelCopy.textContent = 'Optional trace work. One station cache can be searched per dock.';
+    if (stationPanelCopy) stationPanelCopy.textContent = getSearchPanelCopy();
     renderStorySearch();
     return;
   }

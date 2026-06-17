@@ -597,13 +597,14 @@ button {
   bottom: max(10px, env(safe-area-inset-bottom));
   width: 360px;
   max-width: calc(100vw - 20px);
-  height: min(64svh, 560px);
+  height: min(78svh, 650px);
+  max-height: calc(100svh - 104px);
   min-height: 0;
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 7px;
-  padding: 11px;
+  gap: 6px;
+  padding: 10px;
   border: 1px solid rgba(124, 232, 255, 0.30);
   border-radius: 8px;
   background:
@@ -894,8 +895,8 @@ h3 {
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 6px;
-  padding: 8px;
+  gap: 5px;
+  padding: 7px;
   border: 1px solid rgba(124, 232, 255, 0.21);
   border-radius: 7px;
   background:
@@ -1055,7 +1056,7 @@ h3 {
 
 .story-card {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .quest-card {
@@ -1586,6 +1587,7 @@ h3 {
 
 .story-media-frame {
   position: relative;
+  aspect-ratio: 16 / 10;
   min-height: 94px;
   overflow: hidden;
   border: 1px solid rgba(124, 232, 255, 0.18);
@@ -1600,7 +1602,7 @@ h3 {
 .story-media-frame video {
   width: 100%;
   height: 100%;
-  min-height: 94px;
+  min-height: 0;
   display: block;
   object-fit: cover;
 }
@@ -1743,9 +1745,9 @@ h3 {
 
 @media (max-height: 720px) {
   .station-console {
-    height: 68%;
+    height: min(80svh, calc(100svh - 90px));
     gap: 5px;
-    padding: 9px;
+    padding: 8px;
   }
 
   .station-message,
@@ -1776,12 +1778,7 @@ h3 {
   }
 
   .story-media-frame {
-    min-height: 76px;
-  }
-
-  .story-media-frame img,
-  .story-media-frame video {
-    min-height: 76px;
+    min-height: 0;
   }
 
   .primary-action {
