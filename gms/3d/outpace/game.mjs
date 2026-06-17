@@ -353,6 +353,72 @@ const STORY_MEDIA = [
     prompt: 'missing family signal from a warm inner berth door in station mist, no readable text, no logos',
   },
   {
+    id: 'IMG-10',
+    type: 'image',
+    title: 'Family Locker',
+    storyKinds: ['kin'],
+    phase: 'cold',
+    src: 'assets/story/img-10-family-locker.png',
+    plannedPath: 'assets/story/img-10-family-locker.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'old family freight locker opened inside a space station berth, worn metal case and cargo chips, no readable text, no logos',
+  },
+  {
+    id: 'IMG-11',
+    type: 'image',
+    title: 'Private Signal Cache',
+    storyKinds: ['kin'],
+    phase: 'warm',
+    src: 'assets/story/img-11-private-signal-cache.png',
+    plannedPath: 'assets/story/img-11-private-signal-cache.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'station communicator projecting a faint human-shaped waveform and family route fragments, no readable text, no logos',
+  },
+  {
+    id: 'IMG-12',
+    type: 'image',
+    title: 'Wreck Ping',
+    storyKinds: ['blackbox'],
+    phase: 'cold',
+    src: 'assets/story/img-12-wreck-ping.png',
+    plannedPath: 'assets/story/img-12-wreck-ping.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'damaged escape recorder beacon near a broken cargo ship fragment in deep space, cyan scan rings, no readable text, no logos',
+  },
+  {
+    id: 'IMG-13',
+    type: 'image',
+    title: 'Rescue Beacon',
+    storyKinds: ['blackbox'],
+    phase: 'final',
+    src: 'assets/story/img-13-rescue-beacon.png',
+    plannedPath: 'assets/story/img-13-rescue-beacon.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'final coordinate hologram in an orbital station observation room with a live beacon beyond the window, no readable text, no logos',
+  },
+  {
+    id: 'IMG-14',
+    type: 'image',
+    title: 'Dock Camera Trace',
+    storyKinds: ['revenge'],
+    phase: 'cold',
+    src: 'assets/story/img-14-dock-camera-trace.png',
+    plannedPath: 'assets/story/img-14-dock-camera-trace.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'grainy orbital loading bay security feed on a dark station monitor, red route warning marks, no readable text, no logos',
+  },
+  {
+    id: 'IMG-15',
+    type: 'image',
+    title: 'Syndicate Door',
+    storyKinds: ['revenge'],
+    phase: 'final',
+    src: 'assets/story/img-15-syndicate-door.png',
+    plannedPath: 'assets/story/img-15-syndicate-door.png',
+    generator: 'MFLUX flux2-klein-9b-mlx-4bit',
+    prompt: 'sealed armored station door in a dark service corridor with red security glow, no readable text, no logos',
+  },
+  {
     id: 'VID-03',
     type: 'video',
     title: 'Owner Registry Loop',
@@ -423,6 +489,66 @@ const STORY_MEDIA = [
     generator: 'LTX 2-part loop',
     prompt: 'final berth evidence loop, rim light breathes behind a distant station door, no readable text, no logos',
     notes: 'Generated from IMG-04, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-09',
+    type: 'video',
+    title: 'Family Locker Loop',
+    storyKinds: ['kin'],
+    phase: 'cold',
+    src: 'assets/story/vid-09-family-locker-loop.mp4',
+    plannedPath: 'assets/story/vid-09-family-locker-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'family freight locker evidence loop, cyan cargo chips glow and a warm scan passes over worn metal, no readable text, no logos',
+    notes: 'Generated from IMG-10, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-10',
+    type: 'video',
+    title: 'Private Signal Loop',
+    storyKinds: ['kin'],
+    phase: 'warm',
+    src: 'assets/story/vid-10-private-signal-loop.mp4',
+    plannedPath: 'assets/story/vid-10-private-signal-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'private signal cache evidence loop, human-shaped waveform pulses above a station communicator, no readable text, no logos',
+    notes: 'Generated from IMG-11, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-11',
+    type: 'video',
+    title: 'Wreck Ping Loop',
+    storyKinds: ['blackbox'],
+    phase: 'cold',
+    src: 'assets/story/vid-11-wreck-ping-loop.mp4',
+    plannedPath: 'assets/story/vid-11-wreck-ping-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'black box wreck ping evidence loop, cyan scan rings pulse around a damaged recorder beacon, no readable text, no logos',
+    notes: 'Generated from IMG-12, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-12',
+    type: 'video',
+    title: 'Rescue Beacon Loop',
+    storyKinds: ['blackbox'],
+    phase: 'final',
+    src: 'assets/story/vid-12-rescue-beacon-loop.mp4',
+    plannedPath: 'assets/story/vid-12-rescue-beacon-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'rescue beacon evidence loop, final coordinate hologram aligns and a live beacon pulses beyond the window, no readable text, no logos',
+    notes: 'Generated from IMG-13, then returned to the source frame for a compact loop.',
+  },
+  {
+    id: 'VID-13',
+    type: 'video',
+    title: 'Dock Camera Trace Loop',
+    storyKinds: ['revenge'],
+    phase: 'cold',
+    src: 'assets/story/vid-13-dock-camera-trace-loop.mp4',
+    plannedPath: 'assets/story/vid-13-dock-camera-trace-loop.mp4',
+    generator: 'LTX 2-part loop',
+    prompt: 'syndicate dock camera evidence loop, grainy orbital loading bay feed flickers and route warnings pulse, no readable text, no logos',
+    notes: 'Generated from IMG-14, then returned to the source frame for a compact loop.',
   },
   {
     id: 'VID-01',
@@ -2142,12 +2268,26 @@ function getStoryPhase(story = getActiveStory()) {
   return ratio >= 0.36 ? 'warm' : 'cold';
 }
 
+function getStoryMediaSeed(story, phase) {
+  const idHash = String(story?.id || story?.kind || '')
+    .split('')
+    .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return idHash + (story?.progress || 0) * 7 + (story?.lastRoute || 0) * 3 + phase.length;
+}
+
+function pickStoryMedia(candidates, story, phase) {
+  if (!candidates.length) return null;
+  return candidates[getStoryMediaSeed(story, phase) % candidates.length];
+}
+
 function getStoryMedia(story = getActiveStory()) {
   if (!story) return STORY_MEDIA[0];
   const phase = getStoryPhase(story);
-  const video = STORY_MEDIA.find((item) => item.type === 'video' && item.src && item.storyKinds.includes(story.kind) && item.phase === phase);
+  const videos = STORY_MEDIA.filter((item) => item.type === 'video' && item.src && item.storyKinds.includes(story.kind) && item.phase === phase);
+  const video = pickStoryMedia(videos, story, phase);
   if (video) return video;
-  return STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind) && item.phase === phase)
+  const phaseItems = STORY_MEDIA.filter((item) => item.storyKinds.includes(story.kind) && item.phase === phase);
+  return pickStoryMedia(phaseItems, story, phase)
     || STORY_MEDIA.find((item) => item.storyKinds.includes(story.kind))
     || STORY_MEDIA[0];
 }
@@ -2613,6 +2753,7 @@ function setUpgradeCategory(category) {
 
 function renderStationPanel() {
   const tab = state.stationTab || 'upgrades';
+  if (stationTerminalPanel) stationTerminalPanel.dataset.tab = tab;
   stationTabs?.querySelectorAll('[data-station-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.stationTab === tab));
   });

@@ -621,6 +621,25 @@ button {
   animation: station-terminal-in 160ms ease-out;
 }
 
+.station-terminal-panel[data-tab="search"] {
+  height: auto;
+  max-height: calc(100svh - 96px);
+  align-content: start;
+  grid-template-rows: auto auto minmax(0, auto) auto;
+}
+
+.station-terminal-panel[data-tab="search"] .terminal-screen {
+  align-content: start;
+  grid-template-rows: auto minmax(0, auto);
+}
+
+.station-terminal-panel[data-tab="search"] .upgrade-list {
+  max-height: min(52svh, 430px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 @keyframes station-terminal-in {
   from {
     opacity: 0;
