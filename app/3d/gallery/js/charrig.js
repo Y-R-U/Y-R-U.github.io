@@ -175,6 +175,38 @@ const ANIMS = {
     C.head && C.head.apply(qx(-0.08));
     S.bob = Math.max(0, p) * 0.06;
   },
+  jump(C, t, S) {
+    // periodic standing hop: wind-up crouch → spring up (the WHOLE body lifts off
+    // the ground via S.bob, feet and all) → land and absorb. S.bob is continuous
+    // across the three phases so the arc is smooth; the bone targets slerp.
+    const P = 1.25;                      // seconds per hop
+    const u = (t % P) / P;               // cycle phase 0..1
+    let h, knee, hip, arm, lean;
+    if (u < 0.20) {                      // crouch / wind-up
+      const k = Math.sin((u / 0.20) * Math.PI / 2);
+      h = -0.12 * k; knee = 1.0 * k; hip = 0.45 * k; arm = 0.5 * k; lean = 0.18 * k;
+    } else if (u < 0.64) {               // launch + airborne
+      const k = (u - 0.20) / 0.44;
+      const arc = Math.sin(k * Math.PI); // 0 → 1 (apex) → 0
+      h = -0.12 + 0.72 * arc;            // legs straighten at the apex, bend at both ends
+      knee = 0.9 * (1 - arc); hip = 0.4 * (1 - arc);
+      arm = -1.6 * Math.min(1, k * 1.6); lean = -0.05;   // arms throw forward-up
+    } else {                             // land + absorb
+      const k = (u - 0.64) / 0.36;
+      const dip = Math.sin(k * Math.PI);
+      h = -0.12 * (1 - k) - 0.05 * dip;
+      knee = 0.9 * (1 - k) + 0.3 * dip; hip = 0.4 * (1 - k);
+      arm = -1.6 * (1 - k); lean = 0.1 * dip;
+    }
+    C.rLeg && C.rLeg.apply(qx(hip)); C.lLeg && C.lLeg.apply(qx(hip));
+    C.rKnee && C.rKnee.apply(qx(knee)); C.lKnee && C.lKnee.apply(qx(knee));
+    C.rArm && C.rArm.apply(qx(arm).multiply(DOWN_R));
+    C.lArm && C.lArm.apply(qx(arm).multiply(DOWN_L));
+    C.rElb && C.rElb.apply(qx(0.2)); C.lElb && C.lElb.apply(qx(0.2));
+    C.spine && C.spine.apply(qx(lean));
+    C.head && C.head.apply(qx(-lean * 0.4));
+    S.bob = h;
+  },
 };
 export const ANIM_NAMES = Object.keys(ANIMS);
 
