@@ -100,12 +100,29 @@ const DEMO_STATION_TAB = params.get('demoTab') || '';
 const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
+const tmpVectorC = new THREE.Vector3();
+const tmpVectorD = new THREE.Vector3();
 const tmpColor = new THREE.Color();
+const leftBeamOffset = new THREE.Vector3(-0.32, -0.22, 0);
+const rightBeamOffset = new THREE.Vector3(0.32, -0.22, 0);
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (min, max) => min + Math.random() * (max - min);
 const pick = (items) => items[Math.floor(Math.random() * items.length)];
+const isCoarsePointer = () => window.matchMedia?.('(pointer: coarse)').matches || Math.min(window.innerWidth, window.innerHeight) < 720;
+let scenePixelRatio = 1;
+let overlayPixelRatio = 1;
+
+function refreshPixelRatios() {
+  const coarse = isCoarsePointer();
+  const dpr = window.devicePixelRatio || 1;
+  scenePixelRatio = Math.min(dpr, coarse ? 1.35 : 1.75);
+  overlayPixelRatio = Math.min(dpr, coarse ? 1.5 : 2);
+}
+
+const getScenePixelRatio = () => scenePixelRatio;
+const getOverlayPixelRatio = () => overlayPixelRatio;
 
 const UPGRADE_CATEGORIES = [
   {
@@ -910,9 +927,25 @@ function loadSettings() {
   return settings;
 }
 
-function saveProgress() {
-  if (DEMO_MODE) return;
+let deferredSaveTimer = 0;
+let saveIsDirty = false;
+
+function flushProgressSave() {
+  if (DEMO_MODE || !saveIsDirty) return;
+  window.clearTimeout(deferredSaveTimer);
+  deferredSaveTimer = 0;
+  saveIsDirty = false;
   localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
+}
+
+function saveProgress({ defer = false } = {}) {
+  if (DEMO_MODE) return;
+  saveIsDirty = true;
+  if (!defer) {
+    flushProgressSave();
+    return;
+  }
+  if (!deferredSaveTimer) deferredSaveTimer = window.setTimeout(flushProgressSave, 450);
 }
 
 function saveSettings() {
@@ -1117,6 +1150,7 @@ const state = {
   stationTimer: 3,
   collectTimer: 5,
   shotTimer: 0,
+  hudTimer: 0,
   threat: 0,
   shake: 0,
   flashTimer: 0,
@@ -1130,6 +1164,9 @@ const state = {
   firing: false,
   lockedTarget: null,
   lockedScreen: null,
+  reticleX: null,
+  reticleY: null,
+  laserOverlayActive: false,
   laserBursts: [],
   resultLocked: false,
   cockpitReady: false,
@@ -1204,6 +1241,11 @@ const enemyBeamMaterial = new THREE.LineBasicMaterial({
   blending: THREE.AdditiveBlending,
 });
 
+const beamPools = {
+  player: [],
+  enemy: [],
+};
+
 const particleMaterial = new THREE.PointsMaterial({
   size: 1.1,
   color: 0xffb15c,
@@ -1218,6 +1260,7 @@ const starCount = 980;
 const starPositions = new Float32Array(starCount * 3);
 const starColors = new Float32Array(starCount * 3);
 const starSideSpeeds = new Float32Array(starCount);
+const starDepthSpeeds = new Float32Array(starCount);
 
 function resetStar(index, deep = true) {
   const i = index * 3;
@@ -1230,6 +1273,7 @@ function resetStar(index, deep = true) {
   starColors[i] = tmpColor.r;
   starColors[i + 1] = tmpColor.g;
   starColors[i + 2] = tmpColor.b;
+  starDepthSpeeds[index] = rand(0.64, 1.58);
 }
 
 for (let i = 0; i < starCount; i += 1) {
@@ -1302,6 +1346,12 @@ function makeAsteroidGeometry(radius) {
   geometry.computeVertexNormals();
   return geometry;
 }
+
+const asteroidGeometries = Array.from({ length: 14 }, () => {
+  const geometry = makeAsteroidGeometry(1);
+  geometry.userData.shared = true;
+  return geometry;
+});
 
 function addGlowPanel(parent, x, y, z, sx, sy, sz, material = materials.stationGlow) {
   const panel = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
@@ -1399,7 +1449,8 @@ function createAsteroid() {
     : sizeClass === 'medium'
       ? 27 + state.wave * 0.8
       : 48 + state.wave * 1.25;
-  const mesh = new THREE.Mesh(makeAsteroidGeometry(size), pick(materials.asteroid));
+  const mesh = new THREE.Mesh(pick(asteroidGeometries), pick(materials.asteroid));
+  mesh.scale.setScalar(size);
   mesh.position.set(rand(-18, 18), rand(-10, 11), rand(-185, -120));
   mesh.rotation.set(rand(0, Math.PI), rand(0, Math.PI), rand(0, Math.PI));
   mesh.userData = {
@@ -1407,10 +1458,13 @@ function createAsteroid() {
     sizeClass,
     radius: size * 0.9,
     spin: new THREE.Vector3(rand(-1.2, 1.2), rand(-1.2, 1.2), rand(-1.2, 1.2)),
+    baseScale: size,
+    hitFlash: 0,
     hp,
     impactDamage,
     value: Math.round(size * (sizeClass === 'large' ? 72 : sizeClass === 'medium' ? 52 : 38)),
     speedScale: rand(0.82, 1.16),
+    nearMissAwarded: false,
     passed: false,
   };
   scene.add(mesh);
@@ -1446,6 +1500,8 @@ function createDrone() {
   group.userData = {
     kind: 'drone',
     radius: 1.65,
+    baseScale: 1,
+    hitFlash: 0,
     hp: state.wave > 4 ? 2 : 1,
     value: 180 + state.wave * 18,
     speedScale: rand(0.98, 1.28),
@@ -1608,13 +1664,32 @@ function createDockStation(type = getStationType()) {
 }
 
 function createBeam(start, end, material = beamMaterial, ttl = 0.12) {
-  const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
-  const line = new THREE.Line(geometry, material.clone());
+  const poolKey = material === enemyBeamMaterial ? 'enemy' : 'player';
+  const line = beamPools[poolKey].pop() || (() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+    const pooled = new THREE.Line(geometry, material.clone());
+    pooled.userData.poolKey = poolKey;
+    pooled.userData.baseOpacity = material.opacity ?? 0.9;
+    return pooled;
+  })();
+  const position = line.geometry.attributes.position;
+  position.setXYZ(0, start.x, start.y, start.z);
+  position.setXYZ(1, end.x, end.y, end.z);
+  position.needsUpdate = true;
   line.userData.ttl = ttl;
   line.userData.life = ttl;
+  line.material.opacity = line.userData.baseOpacity;
   scene.add(line);
   state.beams.push(line);
   return line;
+}
+
+function releaseBeam(beam) {
+  scene.remove(beam);
+  beam.userData.life = 0;
+  beam.material.opacity = beam.userData.baseOpacity ?? 0.9;
+  beamPools[beam.userData.poolKey || 'player'].push(beam);
 }
 
 function worldToScreen(position) {
@@ -1637,11 +1712,10 @@ function getTurretAnchors() {
   ];
 }
 
-function getThreatScore(object, playerX, playerY) {
+function getThreatScore(object, playerX, playerY, stats) {
   const data = object.userData;
   if (!['asteroid', 'drone'].includes(data.kind)) return -Infinity;
   if (object.position.z > 4 || object.position.z < -155) return -Infinity;
-  const stats = getShipStats();
   const speed = Math.max(10, state.speed * data.speedScale);
   const timeToImpact = Math.max(0.1, (-1.5 - object.position.z) / speed);
   const lateral = Math.hypot(object.position.x - playerX, object.position.y - playerY);
@@ -1657,10 +1731,11 @@ function getThreatScore(object, playerX, playerY) {
 function acquireTarget() {
   const playerX = state.player.x * 11;
   const playerY = state.player.y * 7.5;
+  const stats = getShipStats();
   let best = null;
   let bestScore = -Infinity;
   for (const object of state.objects) {
-    const score = getThreatScore(object, playerX, playerY);
+    const score = getThreatScore(object, playerX, playerY, stats);
     if (score > bestScore) {
       bestScore = score;
       best = object;
@@ -1678,7 +1753,7 @@ function acquireTarget() {
       const dx = screen.ndcX - aimNdc.x;
       const dy = screen.ndcY - aimNdc.y;
       const distance = Math.hypot(dx, dy);
-      const threshold = 0.24 + getShipStats().lockAssist * 0.018;
+      const threshold = 0.24 + stats.lockAssist * 0.018;
       if (distance < threshold && distance < bestDistance) {
         bestDistance = distance;
         best = object;
@@ -1707,7 +1782,19 @@ function addLaserBurst(targetScreen) {
 }
 
 function drawLaserOverlay(delta) {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const shouldDraw = state.running || state.laserBursts.length > 0;
+  if (!shouldDraw) {
+    if (state.laserOverlayActive) {
+      const dpr = getOverlayPixelRatio();
+      laserCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      laserCtx.clearRect(0, 0, laserCanvas.width / dpr, laserCanvas.height / dpr);
+      state.laserOverlayActive = false;
+    }
+    return;
+  }
+
+  state.laserOverlayActive = true;
+  const dpr = getOverlayPixelRatio();
   const width = laserCanvas.width / dpr;
   const height = laserCanvas.height / dpr;
   laserCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1813,7 +1900,7 @@ function drawStationWindow(delta = 0) {
   const rect = stationWindowCanvas.getBoundingClientRect();
   const cssWidth = Math.max(1, Math.round(rect.width || stationWindowCanvas.clientWidth || 320));
   const cssHeight = Math.max(1, Math.round(rect.height || stationWindowCanvas.clientHeight || 180));
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = getOverlayPixelRatio();
   const pixelWidth = Math.round(cssWidth * dpr);
   const pixelHeight = Math.round(cssHeight * dpr);
   if (stationWindowCanvas.width !== pixelWidth || stationWindowCanvas.height !== pixelHeight) {
@@ -1933,25 +2020,31 @@ function createExplosion(position, color = 0xffa356, count = 26) {
 
 function removeObject(object) {
   scene.remove(object);
+  const disposedGeometries = new Set();
+  const disposedMaterials = new Set();
   const disposeTemporaryMaterial = (material) => {
-    if (!material?.userData?.temporary) return;
+    if (!material?.userData?.temporary || disposedMaterials.has(material)) return;
+    disposedMaterials.add(material);
     material.map?.dispose?.();
     material.dispose?.();
   };
+  const disposeGeometry = (geometry) => {
+    if (!geometry || geometry.userData?.shared || disposedGeometries.has(geometry)) return;
+    disposedGeometries.add(geometry);
+    geometry.dispose?.();
+  };
   object.traverse?.((child) => {
-    if (child.geometry && child !== object) child.geometry.dispose?.();
+    if (child !== object) disposeGeometry(child.geometry);
     if (Array.isArray(child.material)) child.material.forEach(disposeTemporaryMaterial);
     else disposeTemporaryMaterial(child.material);
   });
-  if (object.geometry) object.geometry.dispose();
+  disposeGeometry(object.geometry);
 }
 
 function clearDynamicScene() {
   for (const object of state.objects) removeObject(object);
   for (const beam of state.beams) {
-    scene.remove(beam);
-    beam.geometry.dispose();
-    beam.material.dispose();
+    releaseBeam(beam);
   }
   for (const particle of state.particles) {
     scene.remove(particle);
@@ -3027,12 +3120,15 @@ function resetGame() {
   state.spawnTimer = 0.2;
   state.stationTimer = 1.2;
   state.collectTimer = 3.2;
+  state.hudTimer = 0;
   state.threat = 0;
   state.shake = 0;
   state.player.x = 0;
   state.player.y = 0;
   state.target.x = 0;
   state.target.y = 0;
+  state.reticleX = null;
+  state.reticleY = null;
 
   menuEl.classList.add('hidden');
   resultEl.classList.add('hidden');
@@ -3106,8 +3202,13 @@ function firePulse() {
 
   const bestTarget = acquireTarget();
   const aimNdc = getAimNdc();
-  const ray = new THREE.Vector3(aimNdc.x, aimNdc.y, 0.5).unproject(camera).sub(camera.position).normalize();
-  const endpoint = camera.position.clone().add(ray.multiplyScalar(140));
+  const endpoint = tmpVectorC
+    .set(aimNdc.x, aimNdc.y, 0.5)
+    .unproject(camera)
+    .sub(camera.position)
+    .normalize()
+    .multiplyScalar(140)
+    .add(camera.position);
   let targetScreen = {
     x: window.innerWidth * 0.5 + aimNdc.x * window.innerWidth * 0.42,
     y: window.innerHeight * 0.5 - aimNdc.y * window.innerHeight * 0.42,
@@ -3117,19 +3218,20 @@ function firePulse() {
     targetScreen = worldToScreen(endpoint) || targetScreen;
   }
   addLaserBurst(targetScreen);
-  createBeam(camera.position.clone().add(new THREE.Vector3(-0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
-  createBeam(camera.position.clone().add(new THREE.Vector3(0.32, -0.22, 0)), endpoint, beamMaterial, 0.16);
+  createBeam(tmpVectorD.copy(camera.position).add(leftBeamOffset), endpoint, beamMaterial, 0.16);
+  createBeam(tmpVectorD.copy(camera.position).add(rightBeamOffset), endpoint, beamMaterial, 0.16);
   playSfx('laser');
 
   if (bestTarget) {
     bestTarget.userData.hp -= stats.beamPower;
+    bestTarget.userData.hitFlash = 0.18;
     state.score += bestTarget.userData.kind === 'drone' ? 45 + stats.beamPower * 3 : 20 + stats.beamPower * 2;
     cockpitLight.intensity = 4.5;
     if (bestTarget.userData.hp <= 0) {
       state.save.stats.kills += 1;
       if (bestTarget.userData.kind === 'drone') state.save.stats.droneKills += 1;
       if (bestTarget.userData.kind === 'asteroid') state.save.stats.asteroidKills += 1;
-      saveProgress();
+      saveProgress({ defer: true });
       renderMenuAchievements();
       bestTarget.getWorldPosition(tmpVectorB);
       createExplosion(tmpVectorB, bestTarget.userData.kind === 'drone' ? 0xff7e40 : 0xffc175, bestTarget.userData.kind === 'drone' ? 34 : 24);
@@ -3173,10 +3275,16 @@ function updateHud() {
 }
 
 function updateReticle() {
+  if (!state.running && !state.demo) return;
   const x = window.innerWidth * 0.5 + state.target.x * window.innerWidth * 0.23;
   const y = window.innerHeight * 0.46 - state.target.y * window.innerHeight * 0.18;
-  reticleEl.style.left = `${x}px`;
-  reticleEl.style.top = `${y}px`;
+  const px = Math.round(x);
+  const py = Math.round(y);
+  if (state.reticleX === px && state.reticleY === py) return;
+  state.reticleX = px;
+  state.reticleY = py;
+  reticleEl.style.left = `${px}px`;
+  reticleEl.style.top = `${py}px`;
 }
 
 function updateInputFromMovement(event) {
@@ -3242,7 +3350,7 @@ function updateStars(delta) {
     }
     starPositions[p] += state.player.x * delta * 0.9;
     starPositions[p + 1] += state.player.y * delta * 0.55;
-    starPositions[p + 2] += boost * delta * rand(0.64, 1.58);
+    starPositions[p + 2] += boost * delta * starDepthSpeeds[i];
     if (starPositions[p + 2] > 14) resetStar(i, false);
   }
   position.needsUpdate = true;
@@ -3313,6 +3421,12 @@ function updateObjects(delta) {
     const data = object.userData;
     const speed = state.speed * data.speedScale;
     object.position.z += speed * delta;
+    if (data.hitFlash > 0) {
+      data.hitFlash = Math.max(0, data.hitFlash - delta);
+      object.scale.setScalar((data.baseScale || 1) * (1 + data.hitFlash * 0.36));
+    } else if (data.baseScale && object.scale.x !== data.baseScale) {
+      object.scale.setScalar(data.baseScale);
+    }
 
     if (data.kind === 'asteroid') {
       object.rotation.x += data.spin.x * delta;
@@ -3326,7 +3440,8 @@ function updateObjects(delta) {
       data.shot -= delta;
       if (data.shot <= 0 && object.position.z > -80 && object.position.z < -12) {
         object.getWorldPosition(tmpVector);
-        createBeam(tmpVector.clone(), new THREE.Vector3(playerX * 0.22, playerY * 0.1, 4), enemyBeamMaterial, 0.24);
+        tmpVectorB.set(playerX * 0.22, playerY * 0.1, 4);
+        createBeam(tmpVector, tmpVectorB, enemyBeamMaterial, 0.24);
         if (Math.hypot(object.position.x - playerX, object.position.y - playerY) < 9.5) damage(4 + state.wave * 0.2);
         data.shot = rand(1.1, 2.4);
       }
@@ -3358,7 +3473,7 @@ function updateObjects(delta) {
         state.heat = clamp(state.heat - 32, 0, stats.maxHeat);
         state.score += data.value;
         state.save.stats.collectors += 1;
-        saveProgress();
+        saveProgress({ defer: true });
         renderMenuAchievements();
         haptic([12, 28, 12]);
         createExplosion(object.position.clone(), 0x82ff9e, 18);
@@ -3370,7 +3485,20 @@ function updateObjects(delta) {
       if (data.kind === 'asteroid') {
         const lateralBuffer = data.sizeClass === 'large' ? 4.6 : data.sizeClass === 'medium' ? 3.2 : 2.1;
         const hitRadius = data.radius + lateralBuffer;
-        if (distance >= hitRadius) continue;
+        if (distance >= hitRadius) {
+          const nearMargin = data.sizeClass === 'large' ? 4.3 : data.sizeClass === 'medium' ? 3.2 : 2.4;
+          if (!data.nearMissAwarded && object.position.z > 0 && distance < hitRadius + nearMargin) {
+            const reward = data.sizeClass === 'large' ? 34 : data.sizeClass === 'medium' ? 22 : 14;
+            data.nearMissAwarded = true;
+            data.passed = true;
+            state.score += reward + state.wave * 2;
+            state.heat = Math.max(0, state.heat - (data.sizeClass === 'large' ? 12 : 7));
+            state.shake = Math.max(state.shake, 0.08);
+            haptic(10);
+            updateHud();
+          }
+          continue;
+        }
         data.passed = true;
         const lateralSeverity = clamp((hitRadius - distance) / Math.max(1, data.radius * 0.95), 0.16, 1);
         const depthSeverity = clamp(1 - Math.abs(object.position.z) / Math.max(1, collisionDepth), 0.24, 1);
@@ -3400,9 +3528,7 @@ function updateBeams(delta) {
     beam.material.opacity = Math.max(0, beam.userData.life / beam.userData.ttl) * 0.9;
     if (beam.userData.life <= 0) {
       state.beams.splice(i, 1);
-      scene.remove(beam);
-      beam.geometry.dispose();
-      beam.material.dispose();
+      releaseBeam(beam);
     }
   }
 }
@@ -3494,7 +3620,13 @@ function animate() {
   drawLaserOverlay(delta);
   if (state.docked || gameEl.dataset.state === 'station') drawStationWindow(delta);
 
-  if (state.running && Math.floor(state.time * 8) % 4 === 0) updateHud();
+  if (state.running) {
+    state.hudTimer -= delta;
+    if (state.hudTimer <= 0) {
+      updateHud();
+      state.hudTimer = 0.14;
+    }
+  }
   if (state.demo && state.running && state.time > 18) finishGame();
 
   renderer.render(scene, camera);
@@ -3559,7 +3691,7 @@ function processCockpitImage(img) {
 }
 
 function drawCockpit() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = getOverlayPixelRatio();
   const width = Math.max(1, Math.round(window.innerWidth * dpr));
   const height = Math.max(1, Math.round(window.innerHeight * dpr));
   cockpitCanvas.width = width;
@@ -3580,7 +3712,7 @@ function drawCockpit() {
 }
 
 function resizeLaserCanvas() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = getOverlayPixelRatio();
   const width = Math.max(1, Math.round(window.innerWidth * dpr));
   const height = Math.max(1, Math.round(window.innerHeight * dpr));
   laserCanvas.width = width;
@@ -3592,7 +3724,8 @@ function resizeLaserCanvas() {
 function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+  refreshPixelRatios();
+  const dpr = getScenePixelRatio();
   renderer.setPixelRatio(dpr);
   renderer.setSize(width, height, false);
   camera.aspect = width / Math.max(1, height);
@@ -3731,8 +3864,10 @@ function setupEvents() {
   window.addEventListener('orientationchange', restoreCanvasesSoon);
   window.addEventListener('focus', restoreCanvasesSoon);
   window.addEventListener('pageshow', restoreCanvasesSoon);
+  window.addEventListener('pagehide', flushProgressSave);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') restoreCanvasesSoon();
+    else flushProgressSave();
   });
 
   fireButton.addEventListener('pointerdown', (event) => {
