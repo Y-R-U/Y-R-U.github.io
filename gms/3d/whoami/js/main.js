@@ -105,7 +105,9 @@ function start() {
   const dungCreatures = [];
   function spawnDungeon() {
     if (dungCreatures.length) return;
-    for (const s of dungeon.spawns) { const c = makeCreature(s.type, s.x, s.z, scene, world, bus); c.group.userData.creature = c; dungCreatures.push(c); }
+    // dungeon monsters sit on the flat crypt floor, not the overworld hills at x≈400
+    const floorY = () => dungeon.floorY;
+    for (const s of dungeon.spawns) { const c = makeCreature(s.type, s.x, s.z, scene, world, bus, floorY); c.group.userData.creature = c; dungCreatures.push(c); }
   }
 
   // static collision shapes for overworld props (props are placed synchronously)
@@ -209,7 +211,9 @@ function start() {
   }
   let autoTarget = null, autoTargetT = 0;   // tapped interactable: walk to it then auto-trigger
   const controls = createControls({
-    camera, dom: renderer.domElement, player, ground: world.ground,
+    camera, dom: renderer.domElement, player,
+    getGround: () => area === 'dungeon' ? dungeon.floor : world.ground,
+    clampPoint: (p) => player.clampPos(p),   // area's own clamp (disc+river / dungeon box)
     attackables: () => activeCreatures().filter(c => c.alive).map(c => c.group),
     interactTargets: getInteractTargets,
     onTapGround: (p) => { unlockAudio(); autoTarget = null; player.setTarget(p); spawnMarker(p); },

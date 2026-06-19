@@ -118,7 +118,7 @@ export function createPlayer(rig, world, scene, bus) {
   }
   p.respawn = () => {
     p.alive = true; p.hp = p.maxHp; p.food = Math.max(p.food, 40); p.water = Math.max(p.water, 40);
-    pos.set(CFG.worldRadius ? 0 : 0, 0, 6); p.stop();
+    pos.set(0, 0, 6); p.stop();
     bus.hpChanged?.();
   };
 

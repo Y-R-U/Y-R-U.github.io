@@ -68,9 +68,24 @@ export function buildDungeon(scene) {
   portal.material.userData.noWire = true;
   portal.position.set(CX, FLOOR_Y + 1.6, CZ + HALF_Z - 2.5); portal.rotation.x = Math.PI / 2; root.add(portal);
 
-  // treasure chest at the far end
+  // treasure chest at the far end — a gold glow + floating beacon make it easy
+  // to spot across the dark crypt, and an invisible proxy makes it easy to tap.
   const chest = { pos: new THREE.Vector3(CX, FLOOR_Y, CZ - HALF_Z + 3), opened: false, group: null };
-  loadModel('chest').then(m => { m.scale.setScalar(1.4); m.position.copy(chest.pos); root.add(m); chest.group = m; });
+  const chestGlow = new THREE.PointLight(0xffd66a, 2.6, 14, 2);
+  chestGlow.position.set(chest.pos.x, FLOOR_Y + 1.6, chest.pos.z); root.add(chestGlow);
+  const beacon = new THREE.Mesh(
+    new THREE.SphereGeometry(0.2, 12, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffe9a6, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  beacon.material.userData.noWire = true;
+  beacon.position.set(chest.pos.x, FLOOR_Y + 2.2, chest.pos.z); root.add(beacon);
+  chest.glow = chestGlow; chest.beacon = beacon;
+  loadModel('chest').then(m => {
+    m.scale.setScalar(1.4); m.position.copy(chest.pos); root.add(m); chest.group = m;
+    const proxy = new THREE.Mesh(new THREE.SphereGeometry(1.1, 8, 6),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }));
+    proxy.position.y = 0.5; m.add(proxy);   // child of the chest → a tap walks up to userData.interact
+  });
 
   // monster spawn points
   const spawns = [];
@@ -81,10 +96,10 @@ export function buildDungeon(scene) {
   }
 
   return {
-    root, colliders, chest, portal,
+    root, floor, colliders, chest, portal,
     floorY: FLOOR_Y,
     center: new THREE.Vector3(CX, 0, CZ),
-    entryPos: new THREE.Vector3(CX, 0, CZ + HALF_Z - 4),     // where you arrive
+    entryPos: new THREE.Vector3(CX, 0, CZ + HALF_Z - 9),     // arrive clear of the exit portal
     portalPos: new THREE.Vector3(CX, 0, CZ + HALF_Z - 2.5),  // step here to leave
     spawns,
     heightAt: () => FLOOR_Y,
@@ -92,6 +107,16 @@ export function buildDungeon(scene) {
       pos.x = Math.max(CX - HALF_X + 1, Math.min(CX + HALF_X - 1, pos.x));
       pos.z = Math.max(CZ - HALF_Z + 1, Math.min(CZ + HALF_Z - 1, pos.z));
     },
-    tick(t) { for (let i = 0; i < torchLights.length; i++) torchLights[i].intensity = 1.7 + Math.sin(t * 12 + i) * 0.4; portal.rotation.z = t * 0.6; },
+    tick(t) {
+      for (let i = 0; i < torchLights.length; i++) torchLights[i].intensity = 1.7 + Math.sin(t * 12 + i) * 0.4;
+      portal.rotation.z = t * 0.6;
+      const open = chest.opened;
+      beacon.visible = !open; chestGlow.visible = !open;   // hide the glow once looted
+      if (!open) {
+        beacon.position.y = FLOOR_Y + 2.1 + Math.sin(t * 2) * 0.14;
+        beacon.material.opacity = 0.55 + (Math.sin(t * 4) * 0.5 + 0.5) * 0.4;
+        chestGlow.intensity = 2.2 + Math.sin(t * 5) * 0.5;
+      }
+    },
   };
 }

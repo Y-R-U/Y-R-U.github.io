@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { CFG } from './config.js';
 import { clamp, damp } from './utils.js';
 
-export function createControls({ camera, dom, player, ground, attackables, interactTargets, onTapGround, onTapCreature, onTapInteract }) {
+export function createControls({ camera, dom, player, getGround, attackables, interactTargets, onTapGround, onTapCreature, onTapInteract, clampPoint }) {
   const st = {
     yaw: CFG.camYaw, pitch: CFG.camPitch, dist: CFG.camDist,
     lookAt: new THREE.Vector3(player.pos.x, player.pos.y + 1.1, player.pos.z),
@@ -31,11 +31,12 @@ export function createControls({ camera, dom, player, ground, attackables, inter
     const its = interactTargets ? interactTargets() : [];
     const hitI = its.length ? raycaster.intersectObjects(its, true)[0] : null;
     if (hitI) { let o = hitI.object; while (o && !o.userData.interact) o = o.parent; if (o) return { interact: o.userData.interact }; }
-    const hit = raycaster.intersectObject(ground, false)[0];
+    // ground is area-aware: overworld terrain plane OR the dungeon floor
+    const ground = getGround ? getGround() : null;
+    const hit = ground ? raycaster.intersectObject(ground, false)[0] : null;
     if (!hit) return null;
     const p = hit.point;
-    const r = Math.hypot(p.x, p.z), maxR = CFG.worldRadius - 0.8;
-    if (r > maxR) { p.x *= maxR / r; p.z *= maxR / r; }
+    clampPoint?.(p);   // keep the destination inside the current area (disc / river / dungeon box)
     return { point: p };
   }
 

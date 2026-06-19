@@ -25,10 +25,11 @@ export const CREATURES = {
               loot: { gold: [3, 11], rolls: [['meat_raw', 0.4], ['gem', 0.1], ['gold_bar', 0.03]] } },
 };
 
-export function makeCreature(type, x, z, scene, world, bus) {
+export function makeCreature(type, x, z, scene, world, bus, heightFn) {
   const def = CREATURES[type];
+  const groundY = heightFn || ((gx, gz) => world.groundHeight(gx, gz));   // area-aware floor (dungeon = flat)
   const group = new THREE.Group();
-  group.position.set(x, world.groundHeight(x, z), z);
+  group.position.set(x, groundY(x, z), z);
   scene.add(group);
 
   const c = {
@@ -137,7 +138,7 @@ export function makeCreature(type, x, z, scene, world, bus) {
       group.position.x += mvx * spd * dt; group.position.z += mvz * spd * dt;
       c.faceY = Math.atan2(mvx, mvz);
     }
-    group.position.y = world.groundHeight(group.position.x, group.position.z);
+    group.position.y = groundY(group.position.x, group.position.z);
     group.rotation.y += (((c.faceY - group.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * Math.min(1, dt * 10);
 
     // procedural anim: hop while moving, breathe while idle, attack lunge
@@ -153,7 +154,7 @@ export function makeCreature(type, x, z, scene, world, bus) {
   function respawn() {
     c.alive = true; c.hp = c.maxHp; c.state = 'wander'; c.stateT = rand(0, 2);
     group.visible = true; group.rotation.set(0, c.faceY, 0);
-    group.position.set(c.spawn.x, world.groundHeight(c.spawn.x, c.spawn.z), c.spawn.z);
+    group.position.set(c.spawn.x, groundY(c.spawn.x, c.spawn.z), c.spawn.z);
     if (c.model) { c.model.position.set(0, 0, 0); c.model.rotation.set(0, 0, 0); }
   }
 
