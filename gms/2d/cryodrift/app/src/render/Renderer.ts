@@ -2,6 +2,7 @@ import { Application, Container, DisplacementFilter, Graphics, Sprite, TilingSpr
 import { AdvancedBloomFilter } from 'pixi-filters';
 import { PAL } from '../config/palette';
 import { WAVE } from '../config/balance';
+import { settings } from '../core/settings';
 import type { Input } from '../input/Input';
 import type { InputState } from '../input/InputState';
 import type { World } from '../sim/World';
@@ -49,6 +50,15 @@ export class Renderer {
   camX = 0;
   camY = 0;
   tier: Tier = 'high';
+  // view bounds in world space (for off-screen culling), recomputed each frame
+  private vL = 0;
+  private vR = 0;
+  private vT = 0;
+  private vB = 0;
+
+  private inView(x: number, y: number, m: number): boolean {
+    return x > this.vL - m && x < this.vR + m && y > this.vT - m && y < this.vB + m;
+  }
 
   constructor(
     private readonly app: Application,
@@ -98,10 +108,11 @@ export class Renderer {
     if (!this.bloom) {
       this.bloom = new AdvancedBloomFilter({ threshold: 0.35, bloomScale: 0.9, brightness: 1, blur: 6, quality: 4 });
     }
+    const wobble = !settings.reduceMotion;
     if (this.tier === 'high') {
       this.displacement.scale.set(14);
       this.bloom.bloomScale = 0.95;
-      this.fx.filters = [this.displacement, this.bloom];
+      this.fx.filters = wobble ? [this.displacement, this.bloom] : [this.bloom];
     } else if (this.tier === 'medium') {
       this.bloom.bloomScale = 0.7;
       this.fx.filters = [this.bloom];
@@ -119,6 +130,10 @@ export class Renderer {
     const py = iy(world.player, alpha);
     this.camX = px;
     this.camY = py;
+    this.vL = px - w / 2;
+    this.vR = px + w / 2;
+    this.vT = py - h / 2;
+    this.vB = py + h / 2;
     this.worldLayer.position.set(w / 2 - px + juice.shakeX, h / 2 - py + juice.shakeY);
 
     this.drawBackground(w, h, world.time);
@@ -195,6 +210,7 @@ export class Renderer {
       if (!ab.alive) continue;
       const x = ix(ab, a);
       const y = iy(ab, a);
+      if (!this.inView(x, y, ab.radius + 10)) continue;
       g.circle(x, y, ab.radius + 4).fill({ color: PAL.macrophage, alpha: 0.05 });
       for (let i = 0; i < 5; i++) {
         const ang = ab.heading + (i / 5) * Math.PI * 2;
@@ -207,6 +223,7 @@ export class Renderer {
       if (!pk.alive) continue;
       const x = ix(pk, a);
       const y = iy(pk, a);
+      if (!this.inView(x, y, 20)) continue;
       const tw = 0.7 + Math.sin(pk.wobble) * 0.3;
       if (pk.kind === 'nutrient') {
         g.circle(x, y, pk.radius + 3).fill({ color: PAL.nutrient, alpha: 0.12 * tw });
@@ -227,6 +244,7 @@ export class Renderer {
       if (!pr.alive) continue;
       const x = ix(pr, a);
       const y = iy(pr, a);
+      if (!this.inView(x, y, 30)) continue;
       const col = pr.team === 0 ? PAL.toxin : PAL.danger;
       g.moveTo(x - pr.vel.x * 0.02, y - pr.vel.y * 0.02).lineTo(x, y).stroke({ width: pr.radius * 0.9, color: col, alpha: 0.4, cap: 'round' });
       g.circle(x, y, pr.radius + 2).fill({ color: col, alpha: 0.18 });
@@ -241,6 +259,7 @@ export class Renderer {
       if (!e.alive) continue;
       const x = ix(e, a);
       const y = iy(e, a);
+      if (!this.inView(x, y, 60)) continue;
       const tint = e.def.tint;
       const flash = e.hitFlash;
       g.circle(x, y, e.radius + 6).fill({ color: tint, alpha: 0.06 });

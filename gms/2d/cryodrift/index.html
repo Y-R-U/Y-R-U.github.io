@@ -147,8 +147,18 @@
         position: fixed; bottom: calc(var(--safe-b) + 26px); right: calc(var(--safe-r) + 22px);
         z-index: 45; pointer-events: auto; width: auto; padding: 10px 18px; font-size: 11px;
       }
+
+      #rotate {
+        position: fixed; inset: 0; z-index: 60; background: var(--medium-deep);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+        color: var(--ink-dim); text-align: center; letter-spacing: 0.1em;
+      }
+      #rotate .rot-icon { font-size: 56px; color: var(--biolum); animation: spin 3s linear infinite; }
+      #rotate p { font-size: 15px; color: var(--ink); letter-spacing: 0.2em; text-transform: uppercase; }
+      #rotate small { font-size: 11px; }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
-    <script type="module" crossorigin src="./assets/index-BU3Ta1Ae.js"></script>
+    <script type="module" crossorigin src="./assets/index-B4fXWL4l.js"></script>
   </head>
   <body>
     <div id="stage"></div>
@@ -162,6 +172,12 @@
     <div id="hint" class="hidden">left thumb · drift   —   right thumb · aim &amp; fire</div>
 
     <div id="ui"></div>
+
+    <div id="rotate" class="hidden">
+      <div class="rot-icon">⟲</div>
+      <p>rotate to portrait</p>
+      <small>the specimen is observed top-down</small>
+    </div>
 
   </body>
 </html>

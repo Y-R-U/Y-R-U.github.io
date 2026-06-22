@@ -26,6 +26,7 @@ export function detectTier(): QualityTier {
 }
 
 const DENSITY: Record<QualityTier, number> = { high: 1, medium: 0.6, low: 0.32 };
+export const DPR_CAP: Record<QualityTier, number> = { high: 2, medium: 1.5, low: 1 };
 
 export function applyQuality(renderer: Renderer): void {
   currentTier = detectTier();

@@ -1,6 +1,6 @@
 import { createApp } from './core/App';
 import { initSafeArea } from './core/safearea';
-import { applyQuality } from './core/quality';
+import { applyQuality, detectTier, DPR_CAP } from './core/quality';
 import { Game } from './core/Game';
 import { Input } from './input/Input';
 import { Sound } from './audio/Sound';
@@ -18,7 +18,7 @@ async function main(): Promise<void> {
   const boostBtn = document.getElementById('boost')!;
   const specialBtn = document.getElementById('special')!;
 
-  const app = await createApp(stage);
+  const app = await createApp(stage, DPR_CAP[detectTier()]);
   const sound = new Sound();
   const input = new Input(app.canvas, boostBtn, specialBtn);
   input.onFirstInput = () => sound.unlock();
@@ -44,6 +44,21 @@ async function main(): Promise<void> {
       ui.showPause();
     }
   });
+
+  // portrait guard — nudge to rotate on landscape phones
+  const rotate = document.getElementById('rotate')!;
+  const coarse = window.matchMedia('(pointer: coarse)');
+  const checkOrientation = (): void => {
+    const landscape = window.innerWidth > window.innerHeight && coarse.matches;
+    rotate.classList.toggle('hidden', !landscape);
+    if (landscape && game.state === 'playing') {
+      game.pause();
+      ui.showPause();
+    }
+  };
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+  checkOrientation();
 
   // dev: live feel/balance tuning (stripped from production build)
   if (import.meta.env.DEV) {
