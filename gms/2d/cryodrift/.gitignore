@@ -1,0 +1,8 @@
+# deps & local tooling
+node_modules/
+app/.vite/
+*.log
+.DS_Store
+
+# NOTE: the built index.html + assets/ at the project root are committed on purpose
+# (GitHub Pages serves them statically). Do not ignore them.

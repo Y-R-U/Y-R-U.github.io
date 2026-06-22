@@ -1,0 +1,23 @@
+{
+  "name": "cryodrift",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Subspace-style inertial flight, reskinned as warring micro-organisms in a petri dish. PixiJS v8.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && node scripts/clean.mjs && vite build",
+    "preview": "vite preview --host",
+    "test:sim": "esbuild test/simSmoke.ts --bundle --platform=node --format=esm --outfile=node_modules/.simtest.mjs && node node_modules/.simtest.mjs",
+    "deploy": "npm run build"
+  },
+  "dependencies": {
+    "pixi.js": "^8.6.6"
+  },
+  "devDependencies": {
+    "@tweakpane/core": "^2.0.5",
+    "tweakpane": "^4.0.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

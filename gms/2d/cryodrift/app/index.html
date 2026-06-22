@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#050A14" />
+    <meta name="description" content="Cryodrift — pilot a single-celled organism through a petri dish. Inertial drift combat in dark-field microscopy." />
+    <title>Cryodrift</title>
+    <style>
+      :root {
+        --medium-deep: #050a14;
+        --medium-mid: #0a1a2a;
+        --biolum: #5ff3d0;
+        --toxin: #7cf6c0;
+        --mutation: #b98bff;
+        --nutrient: #8be36b;
+        --danger: #ff4d5e;
+        --ink: #cfe9ff;
+        --ink-dim: #5b7a93;
+        --reticle: #2a5f7a;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+        --safe-l: env(safe-area-inset-left, 0px);
+        --safe-r: env(safe-area-inset-right, 0px);
+        --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 100%; height: 100%;
+        background: var(--medium-deep);
+        overflow: hidden; overscroll-behavior: none; touch-action: none;
+        -webkit-user-select: none; user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        font-family: var(--mono); color: var(--ink);
+      }
+      #stage { position: fixed; inset: 0; }
+      #stage canvas { display: block; width: 100%; height: 100%; }
+
+      #hud { /* dev-only debug readout */
+        position: fixed; top: calc(var(--safe-t) + 8px); left: calc(var(--safe-l) + 10px);
+        color: var(--ink-dim); font-size: 10px; line-height: 1.5; white-space: pre;
+        pointer-events: none; opacity: 0.6; z-index: 30;
+      }
+
+      /* ── on-screen controls ── */
+      #controls { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+      #controls button { pointer-events: auto; }
+      .pad {
+        position: fixed; width: 76px; height: 76px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 9px; letter-spacing: 0.14em; font-family: var(--mono);
+        border: 1.5px solid; background: transparent; color: inherit;
+        transition: transform 0.08s ease, background 0.08s ease; text-align: center;
+      }
+      .pad small { display: block; font-size: 7px; opacity: 0.6; margin-top: 2px; }
+      .pad.active { transform: scale(0.9); }
+      #boost {
+        right: calc(var(--safe-r) + 20px); bottom: calc(var(--safe-b) + 30px);
+        border-color: rgba(95, 243, 208, 0.4); color: var(--biolum);
+        background: radial-gradient(circle at 50% 40%, rgba(95,243,208,0.12), transparent 70%);
+      }
+      #boost.active { background: radial-gradient(circle at 50% 40%, rgba(95,243,208,0.4), transparent 70%); }
+      #special {
+        left: calc(var(--safe-l) + 20px); bottom: calc(var(--safe-b) + 30px);
+        border-color: rgba(185, 139, 255, 0.45); color: var(--mutation);
+        background: radial-gradient(circle at 50% 40%, rgba(185,139,255,0.12), transparent 70%);
+      }
+      #special.active { background: radial-gradient(circle at 50% 40%, rgba(185,139,255,0.42), transparent 70%); }
+      #pause {
+        position: fixed; top: calc(var(--safe-t) + 10px); right: calc(var(--safe-r) + 14px);
+        width: 38px; height: 38px; border-radius: 10px; pointer-events: auto;
+        border: 1px solid var(--reticle); background: rgba(10,26,42,0.5); color: var(--ink-dim);
+        font-size: 14px; z-index: 21;
+      }
+      .hidden { display: none !important; }
+
+      #hint {
+        position: fixed; left: 0; right: 0; bottom: calc(var(--safe-b) + 120px);
+        text-align: center; color: var(--ink-dim); font-size: 12px; letter-spacing: 0.08em;
+        pointer-events: none; transition: opacity 0.6s ease; z-index: 19;
+      }
+
+      /* ── overlays / menus ── */
+      .overlay {
+        position: fixed; inset: 0; z-index: 40;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: calc(var(--safe-t) + 24px) 24px calc(var(--safe-b) + 24px);
+        background: radial-gradient(circle at 50% 35%, rgba(10,26,42,0.55), rgba(5,10,20,0.86));
+        backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+        animation: fade 0.4s ease both;
+      }
+      @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+      .panel { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+
+      .brand { text-align: center; margin-bottom: 6px; }
+      .brand h1 {
+        font-size: clamp(34px, 13vw, 60px); font-weight: 700; letter-spacing: 0.06em;
+        color: var(--biolum); text-shadow: 0 0 28px rgba(95,243,208,0.5); line-height: 0.95;
+      }
+      .brand .sub { color: var(--ink-dim); font-size: 11px; letter-spacing: 0.34em; margin-top: 10px; text-transform: uppercase; }
+
+      .btn {
+        font-family: var(--mono); font-size: 14px; letter-spacing: 0.16em;
+        padding: 15px 26px; width: 100%; border-radius: 12px; cursor: pointer;
+        border: 1px solid rgba(95,243,208,0.4); color: var(--biolum);
+        background: linear-gradient(180deg, rgba(95,243,208,0.12), rgba(95,243,208,0.03));
+        text-transform: uppercase; transition: transform 0.1s ease, background 0.1s ease;
+      }
+      .btn:active { transform: scale(0.97); }
+      .btn.ghost { border-color: var(--reticle); color: var(--ink-dim); background: rgba(10,26,42,0.4); }
+      .btn.danger { border-color: rgba(255,77,94,0.5); color: var(--danger); background: rgba(255,77,94,0.06); }
+
+      .cards { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+      .cards.row { flex-direction: row; }
+      .card {
+        flex: 1; text-align: left; cursor: pointer; border-radius: 12px; padding: 14px 16px;
+        border: 1px solid var(--reticle); background: rgba(10,26,42,0.5);
+        transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
+      }
+      .card:active { transform: scale(0.98); }
+      .card.sel { border-color: var(--biolum); background: rgba(95,243,208,0.08); }
+      .card h3 { font-size: 14px; letter-spacing: 0.08em; margin-bottom: 6px; }
+      .card p { font-size: 11px; line-height: 1.5; color: var(--ink-dim); }
+      .card .tag { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); }
+
+      .title-sm { font-size: 12px; letter-spacing: 0.3em; color: var(--ink-dim); text-transform: uppercase; align-self: flex-start; }
+
+      .summary { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin: 4px 0; }
+      .summary .k { color: var(--ink-dim); font-size: 11px; letter-spacing: 0.12em; }
+      .summary .v { color: var(--ink); font-size: 20px; text-align: right; }
+      .big { font-size: 30px !important; color: var(--biolum) !important; }
+
+      .settings-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; font-size: 12px; letter-spacing: 0.08em; color: var(--ink-dim); padding: 6px 0; }
+      .settings-row input[type="range"] { width: 130px; accent-color: var(--biolum); }
+      .toggle { width: 52px; height: 28px; border-radius: 14px; border: 1px solid var(--reticle); background: rgba(10,26,42,0.6); position: relative; cursor: pointer; }
+      .toggle.on { border-color: var(--biolum); background: rgba(95,243,208,0.18); }
+      .toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink-dim); transition: transform 0.12s ease, background 0.12s ease; }
+      .toggle.on::after { transform: translateX(24px); background: var(--biolum); }
+
+      #skipIntro {
+        position: fixed; bottom: calc(var(--safe-b) + 26px); right: calc(var(--safe-r) + 22px);
+        z-index: 45; pointer-events: auto; width: auto; padding: 10px 18px; font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="hud"></div>
+
+    <div id="controls" class="hidden">
+      <button id="special" class="pad">PHAGO<small>engulf · lyse</small></button>
+      <button id="boost" class="pad">BOOST<small>flagellum</small></button>
+      <button id="pause">⏸</button>
+    </div>
+    <div id="hint" class="hidden">left thumb · drift   —   right thumb · aim &amp; fire</div>
+
+    <div id="ui"></div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
