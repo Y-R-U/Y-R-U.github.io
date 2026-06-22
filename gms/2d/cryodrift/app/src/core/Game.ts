@@ -1,5 +1,6 @@
-import type { Application } from 'pixi.js';
+import type { Application, Texture } from 'pixi.js';
 import { SIM_HZ } from '../config/feel';
+import { Intro } from '../scenes/Intro';
 import type { UpgradeDef } from '../config/balance';
 import { Input } from '../input/Input';
 import { emptyInput, type InputState } from '../input/InputState';
@@ -22,6 +23,7 @@ export class Game {
   state: GameState = 'menu';
   world: World;
   strainId = 'cyto';
+  introTexture?: Texture;
 
   readonly renderer: Renderer;
   readonly hud: HUD;
@@ -74,6 +76,19 @@ export class Game {
 
   restart(): void {
     this.start(this.strainId);
+  }
+
+  hasIntro(): boolean {
+    return !!this.introTexture;
+  }
+
+  /** Play the microscope-dive intro over the (already live) game, then onDone. */
+  playIntro(onDone: () => void): void {
+    if (!this.introTexture) {
+      onDone();
+      return;
+    }
+    new Intro(this.app, this.introTexture, onDone);
   }
 
   pause(): void {

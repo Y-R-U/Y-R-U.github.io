@@ -5,7 +5,8 @@ import { Game } from './core/Game';
 import { Input } from './input/Input';
 import { Sound } from './audio/Sound';
 import { UI } from './ui/UI';
-import { loadGameTextures } from './render/textures';
+import { loadGameTextures, loadIntroTexture } from './render/textures';
+import { settings } from './core/settings';
 
 /**
  * Boot + wiring. Sim/render/input/audio are all owned by Game; this file just
@@ -34,6 +35,11 @@ async function main(): Promise<void> {
     game.renderer.setBackground(tex);
     applyQuality(game.renderer);
   });
+
+  // intro hero is lazy-loaded only when the cinematic is actually enabled
+  if (settings.intro && !settings.reduceMotion) {
+    void loadIntroTexture().then((tex) => (game.introTexture = tex));
+  }
 
   app.ticker.add((ticker) => game.tick(ticker.deltaMS));
 
@@ -65,12 +71,22 @@ async function main(): Promise<void> {
     const { DebugHUD } = await import('./ui/DebugHUD');
     const dbg = new DebugHUD();
     app.ticker.add(() => dbg.update(game.world, app.ticker.deltaMS));
-    // ?play=<strain> jumps straight into a run (for quick testing / screenshots)
-    const p = new URLSearchParams(location.search).get('play');
-    if (p !== null) {
-      document.getElementById('ui')!.replaceChildren();
-      document.getElementById('controls')!.classList.remove('hidden');
-      game.start(p || 'cyto');
+    // ?play=<strain> jumps into a run; ?intro plays the cinematic (testing/screenshots)
+    const params = new URLSearchParams(location.search);
+    if (params.has('intro')) {
+      void loadIntroTexture().then((tex) => {
+        game.introTexture = tex;
+        document.getElementById('ui')!.replaceChildren();
+        game.start('cyto');
+        game.playIntro(() => document.getElementById('controls')!.classList.remove('hidden'));
+      });
+    } else {
+      const p = params.get('play');
+      if (p !== null) {
+        document.getElementById('ui')!.replaceChildren();
+        document.getElementById('controls')!.classList.remove('hidden');
+        game.start(p || 'cyto');
+      }
     }
   }
 }

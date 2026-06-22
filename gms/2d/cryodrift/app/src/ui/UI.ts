@@ -103,10 +103,20 @@ export class UI {
     this.sound.unlock();
     this.sound.ui();
     this.clear();
-    this.showControls(true);
-    this.hint.classList.remove('hidden');
-    setTimeout(() => this.hint.classList.add('hidden'), 4000);
     this.game.start(this.chosenStrain);
+
+    const revealControls = (): void => {
+      this.showControls(true);
+      this.hint.classList.remove('hidden');
+      setTimeout(() => this.hint.classList.add('hidden'), 4000);
+    };
+
+    if (settings.intro && !settings.reduceMotion && this.game.hasIntro()) {
+      this.showControls(false);
+      this.game.playIntro(revealControls);
+    } else {
+      revealControls();
+    }
   }
 
   // ── pause ──
