@@ -104,6 +104,19 @@ export class Game {
 
     this.renderer.particles.update(realDt);
 
+    // flagellum boost exhaust
+    if (this.state === 'playing' && this.input.boost && this.world.player.atp > 0) {
+      const p = this.world.player;
+      if (Math.hypot(p.vel.x, p.vel.y) > 60) {
+        this.renderer.particles.emit(
+          p.pos.x - Math.cos(p.heading) * p.radius,
+          p.pos.y - Math.sin(p.heading) * p.radius,
+          2,
+          { color: 0x5ff3d0, speed: 70, life: 0.4, size: 2.2, glow: true, drag: 0.86 },
+        );
+      }
+    }
+
     const w = this.app.screen.width;
     const h = this.app.screen.height;
     if (this.hud.view.visible) this.hud.update(this.world, w, h, realDt);

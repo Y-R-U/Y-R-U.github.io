@@ -12,6 +12,7 @@
     "deploy": "npm run build"
   },
   "dependencies": {
+    "pixi-filters": "^6.1.5",
     "pixi.js": "^8.6.6"
   },
   "devDependencies": {

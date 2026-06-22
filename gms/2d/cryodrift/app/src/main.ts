@@ -5,6 +5,7 @@ import { Game } from './core/Game';
 import { Input } from './input/Input';
 import { Sound } from './audio/Sound';
 import { UI } from './ui/UI';
+import { loadGameTextures } from './render/textures';
 
 /**
  * Boot + wiring. Sim/render/input/audio are all owned by Game; this file just
@@ -27,6 +28,12 @@ async function main(): Promise<void> {
 
   const ui = new UI(game, sound);
   ui.showMenu();
+
+  // backdrop textures load after first paint, then pop in + (re)apply quality filters
+  void loadGameTextures().then((tex) => {
+    game.renderer.setBackground(tex);
+    applyQuality(game.renderer);
+  });
 
   app.ticker.add((ticker) => game.tick(ticker.deltaMS));
 

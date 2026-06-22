@@ -1,4 +1,5 @@
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application, Container, DisplacementFilter, Graphics, Sprite, TilingSprite } from 'pixi.js';
+import { AdvancedBloomFilter } from 'pixi-filters';
 import { PAL } from '../config/palette';
 import { WAVE } from '../config/balance';
 import type { Input } from '../input/Input';
@@ -6,53 +7,108 @@ import type { InputState } from '../input/InputState';
 import type { World } from '../sim/World';
 import type { Body } from '../sim/movement';
 import { Particles, Juice } from './effects';
+import type { GameTextures } from './textures';
 
 const ARENA = WAVE.arenaRadius;
 const GRID = 90;
+type Tier = 'high' | 'medium' | 'low';
 
-function ix(b: Body, a: number): number {
-  return b.prev.x + (b.pos.x - b.prev.x) * a;
-}
-function iy(b: Body, a: number): number {
-  return b.prev.y + (b.pos.y - b.prev.y) * a;
-}
+const ix = (b: Body, a: number): number => b.prev.x + (b.pos.x - b.prev.x) * a;
+const iy = (b: Body, a: number): number => b.prev.y + (b.pos.y - b.prev.y) * a;
 
 /**
- * Draws the world. Reads sim state only (build plan §4). Camera centres the
- * interpolated player; screen shake offsets the whole world layer. Immediate-mode
- * Graphics for now — P3 swaps emissive bits to textured sprites + filters.
+ * Draws the world (reads sim state only — build plan §4). Parallax haze backdrop,
+ * an emissive `fx` layer carrying bloom + a displacement "membrane wobble", and a
+ * microscope vignette. Heavy filters are gated by quality tier (§7).
  */
 export class Renderer {
+  readonly bg = new Container();
   readonly worldLayer = new Container();
+  readonly fx = new Container();
   readonly overlay = new Container();
   readonly particles = new Particles();
 
-  private dish = new Graphics();
   private grid = new Graphics();
+  private dish = new Graphics();
   private haz = new Graphics();
-  private bodies = new Graphics(); // antibodies + pickups
+  private bodies = new Graphics();
   private enemies = new Graphics();
   private proj = new Graphics();
   private player = new Graphics();
   private sticks = new Graphics();
   private flash = new Graphics();
 
+  private hazeFar?: TilingSprite;
+  private hazeNear?: TilingSprite;
+  private vignette?: Sprite;
+  private noiseSprite?: Sprite;
+  private displacement?: DisplacementFilter;
+  private bloom?: AdvancedBloomFilter;
+  private textures?: GameTextures;
+
   camX = 0;
   camY = 0;
-  tier: 'high' | 'medium' | 'low' = 'high';
-
-  setQuality(tier: 'high' | 'medium' | 'low', density: number): void {
-    this.tier = tier;
-    this.particles.density = density;
-  }
+  tier: Tier = 'high';
 
   constructor(
     private readonly app: Application,
     private readonly input: Input,
   ) {
-    this.worldLayer.addChild(this.grid, this.dish, this.haz, this.bodies, this.proj, this.enemies, this.player, this.particles.g);
+    this.worldLayer.addChild(this.grid, this.dish, this.haz, this.bodies);
+    this.fx.addChild(this.proj, this.enemies, this.player, this.particles.g);
+    this.worldLayer.addChild(this.fx);
+    app.stage.addChild(this.bg, this.worldLayer, this.overlay);
     this.overlay.addChild(this.sticks, this.flash);
-    app.stage.addChild(this.worldLayer, this.overlay);
+  }
+
+  setQuality(tier: Tier, density: number): void {
+    this.tier = tier;
+    this.particles.density = density;
+    this.applyFilters();
+  }
+
+  /** Called once game textures finish loading. */
+  setBackground(t: GameTextures): void {
+    this.textures = t;
+    const w = this.app.screen.width;
+    const h = this.app.screen.height;
+    this.hazeFar = new TilingSprite({ texture: t.hazeFar, width: w, height: h });
+    this.hazeFar.tileScale.set(1.5);
+    this.hazeFar.alpha = 0.5;
+    this.hazeNear = new TilingSprite({ texture: t.hazeNear, width: w, height: h });
+    this.hazeNear.tileScale.set(0.9);
+    this.hazeNear.alpha = 0.32;
+    this.bg.addChild(this.hazeFar, this.hazeNear);
+
+    this.vignette = new Sprite(t.vignette);
+    this.overlay.addChildAt(this.vignette, 0);
+
+    this.noiseSprite = new Sprite(t.noise);
+    this.noiseSprite.renderable = false;
+    this.fx.addChild(this.noiseSprite);
+
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    if (!this.textures || !this.noiseSprite) return;
+    if (!this.displacement) {
+      this.displacement = new DisplacementFilter({ sprite: this.noiseSprite, scale: 14 });
+    }
+    if (!this.bloom) {
+      this.bloom = new AdvancedBloomFilter({ threshold: 0.35, bloomScale: 0.9, brightness: 1, blur: 6, quality: 4 });
+    }
+    if (this.tier === 'high') {
+      this.displacement.scale.set(14);
+      this.bloom.bloomScale = 0.95;
+      this.fx.filters = [this.displacement, this.bloom];
+    } else if (this.tier === 'medium') {
+      this.bloom.bloomScale = 0.7;
+      this.fx.filters = [this.bloom];
+    } else {
+      this.fx.filters = [];
+    }
+    if (this.hazeNear) this.hazeNear.visible = this.tier !== 'low';
   }
 
   render(world: World, input: InputState, alpha: number, juice: Juice): void {
@@ -65,6 +121,7 @@ export class Renderer {
     this.camY = py;
     this.worldLayer.position.set(w / 2 - px + juice.shakeX, h / 2 - py + juice.shakeY);
 
+    this.drawBackground(w, h, world.time);
     this.drawGrid(w, h);
     this.drawDish();
     this.drawHazards(world);
@@ -78,6 +135,28 @@ export class Renderer {
     this.drawFlash(w, h, juice);
   }
 
+  private drawBackground(w: number, h: number, time: number): void {
+    if (this.hazeFar) {
+      this.hazeFar.width = w;
+      this.hazeFar.height = h;
+      this.hazeFar.tilePosition.set(-this.camX * 0.12 + time * 2, -this.camY * 0.12);
+    }
+    if (this.hazeNear) {
+      this.hazeNear.width = w;
+      this.hazeNear.height = h;
+      this.hazeNear.tilePosition.set(-this.camX * 0.34 - time * 4, -this.camY * 0.34);
+    }
+    if (this.vignette) {
+      this.vignette.width = w * 1.05;
+      this.vignette.height = h * 1.05;
+      this.vignette.position.set(-w * 0.025, -h * 0.025);
+    }
+    if (this.noiseSprite) {
+      this.noiseSprite.position.set(Math.sin(time * 0.3) * 30, Math.cos(time * 0.23) * 30);
+      this.noiseSprite.scale.set(2 + Math.sin(time * 0.5) * 0.1);
+    }
+  }
+
   private drawGrid(w: number, h: number): void {
     const g = this.grid;
     g.clear();
@@ -85,19 +164,14 @@ export class Renderer {
     const right = this.camX + w / 2;
     const top = this.camY - h / 2;
     const bottom = this.camY + h / 2;
-    for (let x = Math.floor(left / GRID) * GRID; x <= right; x += GRID) {
-      g.moveTo(x, top).lineTo(x, bottom);
-    }
-    for (let y = Math.floor(top / GRID) * GRID; y <= bottom; y += GRID) {
-      g.moveTo(left, y).lineTo(right, y);
-    }
-    g.stroke({ width: 1, color: PAL.membrane, alpha: 0.05 });
+    for (let x = Math.floor(left / GRID) * GRID; x <= right; x += GRID) g.moveTo(x, top).lineTo(x, bottom);
+    for (let y = Math.floor(top / GRID) * GRID; y <= bottom; y += GRID) g.moveTo(left, y).lineTo(right, y);
+    g.stroke({ width: 1, color: PAL.membrane, alpha: 0.045 });
   }
 
   private drawDish(): void {
     const g = this.dish;
     g.clear();
-    // meniscus wall — a glowing ring + faint inner vignette band
     g.circle(0, 0, ARENA).stroke({ width: 6, color: PAL.membrane, alpha: 0.18 });
     g.circle(0, 0, ARENA).stroke({ width: 1.5, color: PAL.player, alpha: 0.25 });
     g.circle(0, 0, ARENA - 40).stroke({ width: 60, color: PAL.membrane, alpha: 0.03 });
@@ -117,7 +191,6 @@ export class Renderer {
   private drawBodies(world: World, a: number): void {
     const g = this.bodies;
     g.clear();
-    // antibodies (immune obstacles)
     for (const ab of world.antibodies.items) {
       if (!ab.alive) continue;
       const x = ix(ab, a);
@@ -130,7 +203,6 @@ export class Renderer {
       }
       g.circle(x, y, ab.radius).stroke({ width: 1.2, color: PAL.danger, alpha: 0.3 });
     }
-    // pickups
     for (const pk of world.pickups.items) {
       if (!pk.alive) continue;
       const x = ix(pk, a);
@@ -156,7 +228,6 @@ export class Renderer {
       const x = ix(pr, a);
       const y = iy(pr, a);
       const col = pr.team === 0 ? PAL.toxin : PAL.danger;
-      // tracer
       g.moveTo(x - pr.vel.x * 0.02, y - pr.vel.y * 0.02).lineTo(x, y).stroke({ width: pr.radius * 0.9, color: col, alpha: 0.4, cap: 'round' });
       g.circle(x, y, pr.radius + 2).fill({ color: col, alpha: 0.18 });
       g.circle(x, y, pr.radius).fill({ color: col, alpha: 0.95 });
@@ -172,19 +243,14 @@ export class Renderer {
       const y = iy(e, a);
       const tint = e.def.tint;
       const flash = e.hitFlash;
-
       g.circle(x, y, e.radius + 6).fill({ color: tint, alpha: 0.06 });
       g.circle(x, y, e.radius).fill({ color: tint, alpha: 0.16 + flash * 0.5 });
       g.circle(x, y, e.radius).stroke({ width: 2, color: flash > 0.1 ? 0xffffff : tint, alpha: 0.85 });
       g.circle(x, y, e.radius * 0.32).fill({ color: tint, alpha: 0.9 });
-
-      // burster fuse pulse
       if (e.fuse > 0) {
         const p = 0.5 + Math.sin(world.time * 40) * 0.5;
         g.circle(x, y, e.radius + 4 + p * 6).stroke({ width: 2, color: PAL.dangerWarm, alpha: 0.3 + p * 0.5 });
       }
-
-      // hp arc for tougher enemies
       if (e.maxHp > 40) {
         const frac = Math.max(0, e.hp / e.maxHp);
         g.arc(x, y, e.radius + 9, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2).stroke({ width: 2.5, color: tint, alpha: 0.7 });
@@ -202,14 +268,11 @@ export class Renderer {
     const tint = world.strain.tint;
     const r = p.radius;
     const flick = p.invuln > 0 ? 0.45 + Math.sin(world.time * 50) * 0.35 : 1;
-
     g.circle(x, y, r + 12).fill({ color: tint, alpha: 0.05 * flick });
     g.circle(x, y, r + 5).fill({ color: tint, alpha: 0.09 * flick });
     g.circle(x, y, r).fill({ color: tint, alpha: 0.18 * flick });
     g.circle(x, y, r).stroke({ width: 2.5, color: tint, alpha: 0.95 * flick });
     g.circle(x, y, r * 0.34).fill({ color: PAL.playerCore, alpha: 0.9 * flick });
-
-    // heading nose
     const hx = Math.cos(p.heading);
     const hy = Math.sin(p.heading);
     const speed = Math.hypot(p.vel.x, p.vel.y);
@@ -233,9 +296,8 @@ export class Renderer {
     if (!input.firing || world.state === 'dead') return;
     const cx = w / 2;
     const cy = h / 2;
-    const d = 70;
-    const x = cx + input.aimX * d;
-    const y = cy + input.aimY * d;
+    const x = cx + input.aimX * 70;
+    const y = cy + input.aimY * 70;
     const g = this.sticks;
     g.circle(x, y, 7).stroke({ width: 1.5, color: PAL.toxin, alpha: 0.6 });
     g.circle(x, y, 2).fill({ color: PAL.toxin, alpha: 0.9 });
@@ -244,8 +306,6 @@ export class Renderer {
   private drawFlash(w: number, h: number, juice: Juice): void {
     const g = this.flash;
     g.clear();
-    if (juice.flashAlpha > 0.01) {
-      g.rect(0, 0, w, h).fill({ color: juice.flashColor, alpha: juice.flashAlpha });
-    }
+    if (juice.flashAlpha > 0.01) g.rect(0, 0, w, h).fill({ color: juice.flashColor, alpha: juice.flashAlpha });
   }
 }
