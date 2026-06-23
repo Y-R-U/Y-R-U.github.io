@@ -694,6 +694,26 @@ const DEBUG_MEDIA = [
   ...STORY_MEDIA,
 ];
 
+const MEDIA_POSTER_BY_ID = {
+  'VID-01': 'assets/story/img-02-warm-alias-hit.png',
+  'VID-02': 'assets/story/img-03-black-box-fragment.png',
+  'VID-03': 'assets/story/img-05-owner-registry.png',
+  'VID-04': 'assets/story/img-06-autopilot-escape.png',
+  'VID-05': 'assets/story/img-07-family-ledger.png',
+  'VID-06': 'assets/story/img-04-final-berth.png',
+  'VID-07': 'assets/story/img-08-syndicate-trace.png',
+  'VID-08': 'assets/story/img-09-family-signal.png',
+  'VID-09': 'assets/story/img-10-family-locker.png',
+  'VID-10': 'assets/story/img-11-private-signal-cache.png',
+  'VID-11': 'assets/story/img-12-wreck-ping.png',
+  'VID-12': 'assets/story/img-13-rescue-beacon.png',
+  'VID-13': 'assets/story/img-14-dock-camera-trace.png',
+  'VID-14': 'assets/story/img-16-recorder-decode.png',
+  'VID-15': 'assets/story/img-15-syndicate-door.png',
+  'VID-16': 'assets/story/img-17-emergency-autopilot.png',
+  'VID-17': 'assets/story/img-18-family-route-ledger.png',
+};
+
 const UPGRADE_DEFS = [
   {
     id: 'shield',
@@ -888,7 +908,7 @@ function loadSave() {
     const parsed = JSON.parse(raw);
     save.credits = Math.max(0, Number(parsed.credits) || 0);
     save.debt = Number.isFinite(Number(parsed.debt)) ? Math.max(0, Math.round(Number(parsed.debt))) : STARTING_DEBT;
-    save.route = Math.max(1, Number(parsed.route) || 1);
+    save.route = Math.max(1, Math.round(Number(parsed.route) || 1));
     for (const def of UPGRADE_DEFS) {
       save.upgrades[def.id] = clamp(Number(parsed.upgrades?.[def.id]) || 0, 0, def.max);
     }
@@ -1254,6 +1274,23 @@ const particleMaterial = new THREE.PointsMaterial({
   depthWrite: false,
   blending: THREE.AdditiveBlending,
 });
+const EXPLOSION_PARTICLE_CAPACITY = 40;
+const particlePool = [];
+
+function createParticleObject() {
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(EXPLOSION_PARTICLE_CAPACITY * 3), 3));
+  geometry.setDrawRange(0, 0);
+  const material = particleMaterial.clone();
+  const points = new THREE.Points(geometry, material);
+  points.userData = {
+    ttl: 0,
+    life: 0,
+    count: 0,
+    velocities: Array.from({ length: EXPLOSION_PARTICLE_CAPACITY }, () => new THREE.Vector3()),
+  };
+  return points;
+}
 
 const starGeometry = new THREE.BufferGeometry();
 const starCount = 980;
@@ -1721,11 +1758,18 @@ function getThreatScore(object, playerX, playerY, stats) {
   const lateral = Math.hypot(object.position.x - playerX, object.position.y - playerY);
   const threatRadius = data.radius + 3.4 + stats.lockAssist * 0.55;
   const pathThreat = clamp(1 - lateral / threatRadius, 0, 1);
-  if (pathThreat <= 0.02 && object.position.z > -65) return -Infinity;
+  if (pathThreat <= 0.02) return -Infinity;
   const urgency = clamp(1 - timeToImpact / 3.6, 0, 1);
   const centerBias = clamp(1 - Math.hypot(object.position.x, object.position.y) / 25, 0, 1);
-  const droneBonus = data.kind === 'drone' ? 0.22 : 0;
-  return pathThreat * 110 + urgency * 70 + centerBias * 22 + droneBonus * 40 - timeToImpact * 4;
+  const droneBonus = data.kind === 'drone' ? 42 : 0;
+  const sizeBias = data.kind === 'asteroid'
+    ? data.sizeClass === 'small' ? 18 : data.sizeClass === 'medium' ? 8 : -8
+    : 0;
+  const shotsNeeded = Math.ceil(data.hp / Math.max(0.1, stats.beamPower));
+  const shotsPossible = timeToImpact / Math.max(0.08, stats.shotCooldown);
+  const killWindow = clamp(shotsPossible / Math.max(1, shotsNeeded), 0, 1);
+  const killability = killWindow * 26 - (killWindow < 0.45 ? 14 : 0);
+  return pathThreat * 132 + urgency * 82 + centerBias * 16 + droneBonus + sizeBias + killability - timeToImpact * 5;
 }
 
 function acquireTarget() {
@@ -2000,22 +2044,34 @@ function drawStationWindow(delta = 0) {
 }
 
 function createExplosion(position, color = 0xffa356, count = 26) {
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(count * 3);
-  const velocities = [];
-  for (let i = 0; i < count; i += 1) {
+  const points = particlePool.pop() || createParticleObject();
+  const activeCount = clamp(Math.round(count), 1, EXPLOSION_PARTICLE_CAPACITY);
+  const positions = points.geometry.attributes.position.array;
+  const velocities = points.userData.velocities;
+  for (let i = 0; i < activeCount; i += 1) {
     positions[i * 3] = position.x;
     positions[i * 3 + 1] = position.y;
     positions[i * 3 + 2] = position.z;
-    velocities.push(new THREE.Vector3(rand(-8, 8), rand(-8, 8), rand(-8, 8)).normalize().multiplyScalar(rand(5, 18)));
+    velocities[i].set(rand(-8, 8), rand(-8, 8), rand(-8, 8)).normalize().multiplyScalar(rand(5, 18));
   }
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const material = particleMaterial.clone();
-  material.color.set(color);
-  const points = new THREE.Points(geometry, material);
-  points.userData = { ttl: 0.68, life: 0.68, velocities };
+  points.geometry.attributes.position.needsUpdate = true;
+  points.geometry.setDrawRange(0, activeCount);
+  points.material.color.set(color);
+  points.material.opacity = 0.9;
+  points.userData.ttl = 0.68;
+  points.userData.life = 0.68;
+  points.userData.count = activeCount;
   scene.add(points);
   state.particles.push(points);
+}
+
+function releaseParticle(particle) {
+  scene.remove(particle);
+  particle.userData.life = 0;
+  particle.userData.count = 0;
+  particle.geometry.setDrawRange(0, 0);
+  particle.material.opacity = 0;
+  particlePool.push(particle);
 }
 
 function removeObject(object) {
@@ -2047,9 +2103,7 @@ function clearDynamicScene() {
     releaseBeam(beam);
   }
   for (const particle of state.particles) {
-    scene.remove(particle);
-    particle.geometry.dispose();
-    particle.material.dispose();
+    releaseParticle(particle);
   }
   state.objects.length = 0;
   state.beams.length = 0;
@@ -2339,6 +2393,9 @@ function resetProgress() {
   state.currentPayout = 0;
   state.routeDistance = 0;
   state.routeLength = getRouteLength();
+  state.stationTab = 'upgrades';
+  state.stationTerminalOpen = false;
+  state.upgradeCategory = 'flight';
   state.running = false;
   state.docking = false;
   state.docked = false;
@@ -2352,6 +2409,9 @@ function resetProgress() {
   menuEl.classList.remove('hidden');
   resultEl.classList.add('hidden');
   stationEl.classList.add('hidden');
+  stationEl.classList.remove('terminal-open');
+  stationTerminalPanel?.classList.add('hidden');
+  stationTerminalHotspot?.setAttribute('aria-expanded', 'false');
   hudEl.classList.add('hidden');
   fireButton.classList.add('hidden');
   reticleEl.classList.add('hidden');
@@ -2466,10 +2526,15 @@ function getStoryMedia(story = getActiveStory()) {
     || STORY_MEDIA[0];
 }
 
+function getMediaPoster(item) {
+  return item?.poster || MEDIA_POSTER_BY_ID[item?.id] || '';
+}
+
 function createMediaFrame(item, className = 'story-media-frame') {
   const frame = document.createElement('div');
   frame.className = className;
   frame.dataset.mediaId = item.id;
+  const isStoryFrame = className === 'story-media-frame';
 
   if (item.src) {
     if (item.type === 'video') {
@@ -2480,9 +2545,15 @@ function createMediaFrame(item, className = 'story-media-frame') {
       video.playsInline = true;
       video.setAttribute('playsinline', '');
       video.setAttribute('webkit-playsinline', '');
-      video.autoplay = true;
-      video.preload = 'metadata';
+      video.preload = isStoryFrame ? 'auto' : 'metadata';
+      const poster = getMediaPoster(item);
+      if (poster) video.poster = poster;
+      if (isStoryFrame) {
+        video.autoplay = true;
+        video.addEventListener('canplay', () => video.play().catch(() => {}), { once: true });
+      }
       frame.append(video);
+      if (isStoryFrame) requestAnimationFrame(() => video.play().catch(() => {}));
     } else {
       const img = document.createElement('img');
       img.src = item.src;
@@ -3412,6 +3483,11 @@ function spawnObjects(delta) {
 }
 
 function updateObjects(delta) {
+  if (!state.running) {
+    state.threat = 0;
+    return;
+  }
+
   const playerX = state.player.x * 11;
   const playerY = state.player.y * 7.5;
   let threat = 0;
@@ -3538,7 +3614,8 @@ function updateParticles(delta) {
     const particle = state.particles[i];
     const position = particle.geometry.attributes.position;
     const velocities = particle.userData.velocities;
-    for (let p = 0; p < position.count; p += 1) {
+    const activeCount = particle.userData.count || position.count;
+    for (let p = 0; p < activeCount; p += 1) {
       position.array[p * 3] += velocities[p].x * delta;
       position.array[p * 3 + 1] += velocities[p].y * delta;
       position.array[p * 3 + 2] += velocities[p].z * delta + state.speed * delta * 0.6;
@@ -3548,25 +3625,34 @@ function updateParticles(delta) {
     particle.material.opacity = Math.max(0, particle.userData.life / particle.userData.ttl);
     if (particle.userData.life <= 0) {
       state.particles.splice(i, 1);
-      scene.remove(particle);
-      particle.geometry.dispose();
-      particle.material.dispose();
+      releaseParticle(particle);
     }
   }
 }
 
 function updateFlight(delta) {
+  if (!state.running) {
+    cockpitLight.intensity = lerp(cockpitLight.intensity, 2.2, delta * 4);
+    warmLight.intensity = 1.2 + Math.sin(state.time * 2.1) * 0.22;
+    state.shake = Math.max(0, state.shake - delta * 0.9);
+    if (state.flashTimer > 0) {
+      state.flashTimer -= delta;
+      if (state.flashTimer <= 0) damageFlash.classList.remove('active');
+    }
+    return;
+  }
+
   const stats = getShipStats();
   const inputLerp = 1 - Math.exp(-delta * 4.8);
   state.player.x = lerp(state.player.x, state.target.x, inputLerp);
   state.player.y = lerp(state.player.y, state.target.y, inputLerp);
 
-  if (!state.pointerDown && !state.demo && state.running) {
+  if (!state.pointerDown && !state.demo) {
     state.target.x = lerp(state.target.x, 0, delta * 0.42);
     state.target.y = lerp(state.target.y, 0, delta * 0.42);
   }
 
-  if (state.demo && state.running) {
+  if (state.demo) {
     state.target.x = Math.sin(state.time * 0.8) * 0.72;
     state.target.y = Math.sin(state.time * 0.56 + 0.8) * 0.44;
     state.firing = true;
@@ -3600,8 +3686,8 @@ function updateFlight(delta) {
     if (state.flashTimer <= 0) damageFlash.classList.remove('active');
   }
 
-  if (state.firing || (state.demo && state.running)) firePulse();
-  if (state.running) state.score += delta * (8 + state.wave * 1.6);
+  if (state.firing || state.demo) firePulse();
+  state.score += delta * (8 + state.wave * 1.6);
   updateReticle();
 }
 

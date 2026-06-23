@@ -10,7 +10,7 @@
   <title>Outpace</title>
   <link rel="preload" href="assets/cockpit-chroma.png" as="image">
   <link rel="preload" href="assets/station-lounge-alpha.png" as="image">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260623a">
 </head>
 <body>
   <main id="game" data-state="menu">
@@ -280,7 +280,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260616b').catch(markGameError);
+    import('./game.mjs?v=20260623a').catch(markGameError);
   </script>
 </body>
 </html>
