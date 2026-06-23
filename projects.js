@@ -172,6 +172,10 @@ const PROJECTS = [
     desc: "Monopoly-inspired board game with 2-4 players, property trading, house building, and AI opponents.",
     date: "2026-03-05", creator: "Claude" },
 
+  { name: "Dicey-vid",          path: "/gms/pwa/Dicey-vid/",     screenshot: "dicey-vid",       type: "game",
+    desc: "Dicey experiment with image-backed board spaces, active tiny looping videos, and a debug media editor for Flux/LTX re-rolls.",
+    date: "2026-05-31", creator: "OpenAI Codex / GPT-5.5" },
+
   { name: "DRace",              path: "/gms/pwa/drace/",         screenshot: "drace",           type: "game",
     desc: "Strategic dice-race battle game. Compete to reach the finish using dice rolls and movement choices.",
     date: "2026-03-08", creator: "Claude" },
@@ -272,6 +276,10 @@ const PROJECTS = [
     desc: "Mobile-first cockpit space shooter with a generated alpha-key cockpit plate, live Three.js asteroid fields, drones, station flybys, and touch firing.",
     date: "2026-06-09", creator: "OpenAI 5.5" },
 
+  { name: "DRK",                path: "/gms/2d/drk/", screenshot: "drk", type: "game",
+    desc: "Mobile-first wealth and dating life sim with jobs, trading, gambling, romance routes, generated character cards, and local Flux/LTX debug media tools.",
+    date: "2026-06-02", creator: "OpenAI 5.5" },
+
   { name: "Drone Storm",        path: "/gms/3d/fable5_3d_tank/", screenshot: "fable5-3d-tank", type: "game",
     desc: "Neon synthwave hover-tank shooter. Blast waves of evil drones with glowing laser eyes out of the night sky. Three.js with bloom, WASD + mouse aim, full touch controls.",
     date: "2026-06-10", creator: "Fable 5" },
@@ -303,6 +311,10 @@ const PROJECTS = [
   { name: "Who Am I",           path: "/gms/3d/whoami/", screenshot: "whoami", type: "game",
     desc: "A tiny open-world Diablo/RuneScape-style RPG. Wake with no memory, then level Attack, Strength, Defence, Archery, Magic, Health and Fishing through XP. Survive with slow-draining food and water (auto-refill at any river or well), pick fruit, fish, chop wood with an axe, light fires with a tinderbox and cook your catch. Trade at the general store, follow a guide through intro quests, and delve a torch-lit dungeon of skeletons, spiders and zombies with randomized loot. Three.js, tap-to-move + WASD, mobile-first.",
     date: "2026-06-16", creator: "Opus 4.8" },
+
+  { name: "Crazy Space",        path: "/gms/2d/crazyspace/", screenshot: "crazyspace", type: "game",
+    desc: "Single-player Subspace-style space arena shooter. Pilot one of five inertial ships through Deathmatch, Team Battle, Capture the Flag and King of the Hill against AI opponents — energy doubles as health and ammo, grab green power-ups, and dodge bouncing bullets and bombs. Vanilla Canvas, no build step, touch joystick + keyboard, mobile-first portrait.",
+    date: "2026-06-23", creator: "Opus 4.8" },
 
   // ── HIDDEN: PolyPerfect asset tools (commercial pack — art ships obfuscated;
   //    shown only via the secret reveal on the Projects page) ──
