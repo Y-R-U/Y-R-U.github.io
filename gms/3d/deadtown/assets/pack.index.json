@@ -1,0 +1,368 @@
+{
+"key_hint": "deadtown",
+"rigs": [
+"hero"
+],
+"entries": {
+"hero": {
+"off": 0,
+"len": 85233,
+"kind": "model",
+"raw": 225524
+},
+"zombie_m": {
+"off": 85233,
+"len": 15856,
+"kind": "model",
+"raw": 43972
+},
+"zombie_w": {
+"off": 101089,
+"len": 13770,
+"kind": "model",
+"raw": 38160
+},
+"survivor": {
+"off": 114859,
+"len": 13638,
+"kind": "model",
+"raw": 38308
+},
+"cop": {
+"off": 128497,
+"len": 18381,
+"kind": "model",
+"raw": 51024
+},
+"axe": {
+"off": 146878,
+"len": 2071,
+"kind": "model",
+"raw": 5216
+},
+"bat": {
+"off": 148949,
+"len": 2484,
+"kind": "model",
+"raw": 7004
+},
+"pistol": {
+"off": 151433,
+"len": 4068,
+"kind": "model",
+"raw": 11548
+},
+"revolver": {
+"off": 155501,
+"len": 4224,
+"kind": "model",
+"raw": 11932
+},
+"rifle": {
+"off": 159725,
+"len": 7337,
+"kind": "model",
+"raw": 18020
+},
+"shotgun": {
+"off": 167062,
+"len": 8471,
+"kind": "model",
+"raw": 23024
+},
+"smg": {
+"off": 175533,
+"len": 6100,
+"kind": "model",
+"raw": 19680
+},
+"machinegun": {
+"off": 181633,
+"len": 15781,
+"kind": "model",
+"raw": 49580
+},
+"ammo_box": {
+"off": 197414,
+"len": 4637,
+"kind": "model",
+"raw": 13876
+},
+"medkit": {
+"off": 202051,
+"len": 3425,
+"kind": "model",
+"raw": 11296
+},
+"bld_house_a": {
+"off": 205476,
+"len": 50037,
+"kind": "model",
+"raw": 165252
+},
+"bld_house_b": {
+"off": 255513,
+"len": 25802,
+"kind": "model",
+"raw": 94828
+},
+"bld_family_a": {
+"off": 281315,
+"len": 38106,
+"kind": "model",
+"raw": 134356
+},
+"bld_family_b": {
+"off": 319421,
+"len": 33521,
+"kind": "model",
+"raw": 122792
+},
+"bld_cafe": {
+"off": 352942,
+"len": 91145,
+"kind": "model",
+"raw": 277352
+},
+"bld_burger": {
+"off": 444087,
+"len": 46919,
+"kind": "model",
+"raw": 151264
+},
+"bld_cabin": {
+"off": 491006,
+"len": 29463,
+"kind": "model",
+"raw": 92492
+},
+"bld_police": {
+"off": 520469,
+"len": 88961,
+"kind": "model",
+"raw": 266236
+},
+"bld_block": {
+"off": 609430,
+"len": 114960,
+"kind": "model",
+"raw": 418864
+},
+"bld_carwash": {
+"off": 724390,
+"len": 69779,
+"kind": "model",
+"raw": 232216
+},
+"car_broken": {
+"off": 794169,
+"len": 32952,
+"kind": "model",
+"raw": 86668
+},
+"car_wreck": {
+"off": 827121,
+"len": 25555,
+"kind": "model",
+"raw": 71396
+},
+"car_wreck_b": {
+"off": 852676,
+"len": 21212,
+"kind": "model",
+"raw": 57572
+},
+"car_police": {
+"off": 873888,
+"len": 33670,
+"kind": "model",
+"raw": 96720
+},
+"bus_wreck": {
+"off": 907558,
+"len": 32013,
+"kind": "model",
+"raw": 89404
+},
+"lamp_city": {
+"off": 939571,
+"len": 6120,
+"kind": "model",
+"raw": 16116
+},
+"lamp_road": {
+"off": 945691,
+"len": 6288,
+"kind": "model",
+"raw": 17384
+},
+"barrier": {
+"off": 951979,
+"len": 2021,
+"kind": "model",
+"raw": 7888
+},
+"barrier_dmg": {
+"off": 954000,
+"len": 2795,
+"kind": "model",
+"raw": 9656
+},
+"barricade": {
+"off": 956795,
+"len": 1589,
+"kind": "model",
+"raw": 3516
+},
+"barrier_traf": {
+"off": 958384,
+"len": 2685,
+"kind": "model",
+"raw": 9752
+},
+"barrel": {
+"off": 961069,
+"len": 4554,
+"kind": "model",
+"raw": 12848
+},
+"crate": {
+"off": 965623,
+"len": 2852,
+"kind": "model",
+"raw": 9124
+},
+"bin": {
+"off": 968475,
+"len": 6090,
+"kind": "model",
+"raw": 19132
+},
+"roadsign": {
+"off": 974565,
+"len": 10083,
+"kind": "model",
+"raw": 32524
+},
+"int_floor_wood": {
+"off": 984648,
+"len": 783,
+"kind": "model",
+"raw": 1916
+},
+"int_floor_parq": {
+"off": 985431,
+"len": 4568,
+"kind": "model",
+"raw": 15812
+},
+"int_floor_conc": {
+"off": 989999,
+"len": 47536,
+"kind": "model",
+"raw": 168296
+},
+"int_wall": {
+"off": 1037535,
+"len": 802,
+"kind": "model",
+"raw": 1900
+},
+"door_house": {
+"off": 1038337,
+"len": 2668,
+"kind": "model",
+"raw": 8448
+},
+"door_wood": {
+"off": 1041005,
+"len": 9597,
+"kind": "model",
+"raw": 29968
+},
+"bed": {
+"off": 1050602,
+"len": 6026,
+"kind": "model",
+"raw": 16972
+},
+"bed_wood": {
+"off": 1056628,
+"len": 4195,
+"kind": "model",
+"raw": 13200
+},
+"television": {
+"off": 1060823,
+"len": 2450,
+"kind": "model",
+"raw": 7088
+},
+"tv_table": {
+"off": 1063273,
+"len": 1989,
+"kind": "model",
+"raw": 7868
+},
+"wardrobe": {
+"off": 1065262,
+"len": 3199,
+"kind": "model",
+"raw": 10988
+},
+"shelf": {
+"off": 1068461,
+"len": 2299,
+"kind": "model",
+"raw": 7796
+},
+"table_coffee": {
+"off": 1070760,
+"len": 2880,
+"kind": "model",
+"raw": 9444
+},
+"chair": {
+"off": 1073640,
+"len": 4249,
+"kind": "model",
+"raw": 11440
+},
+"rug": {
+"off": 1077889,
+"len": 2900,
+"kind": "model",
+"raw": 8604
+},
+"lamp_floor": {
+"off": 1080789,
+"len": 3680,
+"kind": "model",
+"raw": 10268
+},
+"curtains": {
+"off": 1084469,
+"len": 5377,
+"kind": "model",
+"raw": 19196
+},
+"pc": {
+"off": 1089846,
+"len": 2844,
+"kind": "model",
+"raw": 9376
+},
+"atlas_gradient": {
+"off": 1092690,
+"len": 208471,
+"kind": "tex",
+"raw": 208817
+},
+"atlas_specular": {
+"off": 1301161,
+"len": 1164,
+"kind": "tex",
+"raw": 4599
+}
+}
+}

@@ -316,6 +316,10 @@ const PROJECTS = [
     desc: "Single-player Subspace-style space arena shooter. Pilot one of five inertial ships through Deathmatch, Team Battle, Capture the Flag and King of the Hill against AI opponents — energy doubles as health and ammo, grab green power-ups, and dodge bouncing bullets and bombs. Vanilla Canvas, no build step, touch joystick + keyboard, mobile-first portrait.",
     date: "2026-06-23", creator: "Opus 4.8" },
 
+  { name: "Deadtown",           path: "/gms/3d/deadtown/", screenshot: "deadtown", type: "game",
+    desc: "A mobile-first 3D zombie shooter with a Diablo/RuneScape camera. Wake in your bedroom to a TV hissing a broken emergency broadcast, then take to the streets of an apocalyptic town. Hold and drag anywhere to move; a laser sights straight out of your weapon and auto-locks the nearest zombie, then auto-fires — scavenge a fire axe, pistols, shotgun, SMG, rifle and machine gun plus ammo and medkits dropped by the horde. Duck into buildings (the camera pulls in close, roofless, so nothing blocks your view), watch the minimap, and survive the endless spawn. Three.js, no build step, PolyPerfect art.",
+    date: "2026-06-27", creator: "Opus 4.8" },
+
   // ── HIDDEN: PolyPerfect asset tools (commercial pack — art ships obfuscated;
   //    shown only via the secret reveal on the Projects page) ──
   { name: "Asset Gallery",      path: "/app/3d/gallery/", screenshot: "gallery", type: "app", hidden: true,
