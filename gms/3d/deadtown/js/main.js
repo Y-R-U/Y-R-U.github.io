@@ -17,6 +17,7 @@ import { makeZombie, preloadZombies, ZTYPES } from './zombies.js';
 import { createControls } from './controls.js';
 import { createAim } from './aim.js';
 import { createMinimap } from './minimap.js';
+import { createObjectives } from './objectives.js';
 import { createIntro } from './intro.js';
 import { initFx, tickFx } from './fx.js';
 import { model as loadModel } from './assets.js';
@@ -88,6 +89,7 @@ function start() {
 
   // ── area state ──
   let area = 'town';
+  const visited = new Set();   // interiors entered (for objectives)
   const intro = createIntro(interiors.get('home').tv);
   const activeZombies = () => area === 'town' ? zombies : [];
   const activeInteractables = () => area === 'town' ? town.interactables : interiors.get(area).interactables;
@@ -98,7 +100,7 @@ function start() {
 
   function enterInterior(id) {
     const it = interiors.get(id); if (!it) return;
-    area = id;
+    area = id; visited.add(id);
     player.setArea({ heightAt: it.heightAt, clampPos: it.clampPos });
     player.pos.copy(it.entryPos); player.yaw = 0; player.target = null;
     it.root.visible = true; town.group.visible = false; zGroup.visible = false; world.groundVisual.visible = false;
@@ -154,6 +156,7 @@ function start() {
     shot: (def) => chime(def.kind === 'gun' ? 220 : 300),
     swung: () => chime(300),
     dryFire: () => chime(110),
+    celebrate: () => chime(990),
     zombieKilled: (z) => {
       // drop loot at the corpse; tougher types (brute/skeleton) drop better
       const tough = z.type === 'brute' || z.type === 'skeleton';
@@ -166,10 +169,11 @@ function start() {
     died: () => ui.showDeath(`You were overrun after ${player.kills} kills.`),
   });
 
-  // ── controls / aim / minimap ──
+  // ── controls / aim / minimap / objectives ──
   const controls = createControls({ camera, dom: renderer.domElement, player });
   const aim = createAim(scene);
   const minimap = createMinimap(document.getElementById('minimap'));
+  const objectives = createObjectives({ player, visited, get kills() { return player.kills; } }, bus);
 
   // interaction: nearest door/exit within range → prompt + Use button
   let nearIt = null;
@@ -199,6 +203,7 @@ function start() {
     restart: () => { if (area !== 'town') exitToStreet(area); player.respawn(); ui.hideDeath(); },
   });
   ui.bars();
+  ui.setObjective(objectives.text());
 
   // keyboard shortcuts (desktop)
   addEventListener('keydown', e => {
@@ -248,12 +253,12 @@ function start() {
     // only persist street state — interior coords sit at x~200 and we always
     // resume in town, so never autosave while inside a building or dead.
     if (!player.alive || area !== 'town') return;
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ p: player.serialize() })); } catch {}
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ p: player.serialize(), o: objectives.serialize() })); } catch {}
   }
   function load() {
     let d; try { d = JSON.parse(localStorage.getItem(SAVE_KEY)); } catch { return false; }
     if (!d) return false;
-    player.load(d.p); ui.buildWeapons(); ui.bars();
+    player.load(d.p); objectives.load(d.o); ui.buildWeapons(); ui.bars();
     ui.toast('💾 Welcome back to the apocalypse.');
     return true;
   }
@@ -325,7 +330,7 @@ function start() {
 
   // ── loop ──
   const clock = new THREE.Clock();
-  let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, frameCount = 0;
+  let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, objT = 0, objShown = false, frameCount = 0;
   let autoT = 0, autoMv = { x: 0, z: 0, run: false };
   function loop() {
     requestAnimationFrame(loop);
@@ -380,6 +385,7 @@ function start() {
 
     // minimap (a few times a second)
     mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups }); }
+    objT += dt; if (objT > 1) { objT = 0; if (objectives.check() || !objShown) { objShown = true; ui.setObjective(objectives.text()); } }
 
     ui.bars();
     controls.tick(dt);

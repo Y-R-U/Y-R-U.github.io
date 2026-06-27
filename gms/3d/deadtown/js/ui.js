@@ -52,7 +52,13 @@ export function bars() {
   const sc = $('score'); if (sc) sc.textContent = `${P.kills}`;
 }
 
-let promptT = null;
+export function setObjective(text) {
+  const el = $('objective'); if (!el) return;
+  el.textContent = '🎯 ' + text;
+  el.classList.remove('hidden');
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+}
+
 export function prompt(text) {
   const el = $('prompt'); const use = $('act-use');
   if (!el) return;

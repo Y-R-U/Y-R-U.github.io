@@ -14,7 +14,7 @@ import { ROADS } from './world.js';
 const BUILDINGS = [
   { model: 'bld_family_a', x: 0,   z: 40,  rot: Math.PI,        scale: 1.0, hx: 6, hz: 5, door: -6, interior: 'home',   label: 'Home' },
   { model: 'bld_house_a',  x: -22, z: -6,  rot: Math.PI / 2,    scale: 1.0, hx: 6, hz: 6, door: 7,  interior: 'store',  label: 'Corner Store' },
-  { model: 'bld_police',   x: 28,  z: -22, rot: 0,              scale: 1.0, hx: 8, hz: 7, door: 9,  interior: null,     locked: true, label: 'Police Station' },
+  { model: 'bld_police',   x: 28,  z: -22, rot: 0,              scale: 1.0, hx: 8, hz: 7, door: 9,  interior: 'police', label: 'Police Armory' },
   { model: 'bld_cafe',     x: -28, z: 18,  rot: Math.PI / 2,    scale: 1.0, hx: 6, hz: 5, door: 7,  interior: null,     locked: true, label: 'Café' },
   { model: 'bld_burger',   x: 30,  z: 24,  rot: -Math.PI / 2,   scale: 1.0, hx: 6, hz: 5, door: -7, interior: null,     locked: true, label: 'Burger Joint' },
   { model: 'bld_block',    x: 18,  z: 42,  rot: Math.PI,        scale: 1.0, hx: 8, hz: 6, door: -7, interior: null,     locked: true, label: 'Apartments' },

@@ -61,6 +61,29 @@ const INTERIORS = {
       { kind: 'medkit', x: 6, z: -1.5 },
     ],
   },
+  police: {
+    center: [320, 0, 0], floorKind: 'tile', floorColor: 0x474d54,
+    half: { x: 9, z: 8 }, wallH: 0.55, light: 0x6a7a8a, ambient: 0.5,
+    entry: [0, 6.5], exit: [0, 7.4],
+    furniture: [
+      { model: 'shelf', x: -7, z: -4.5, rot: 0, collide: 0.9 },
+      { model: 'shelf', x: 7, z: -4.5, rot: 0, collide: 0.9 },
+      { model: 'crate', x: -7, z: 4.5, rot: 0.3, collide: 0.7 },
+      { model: 'crate', x: 7, z: 4.5, rot: -0.3, collide: 0.7 },
+      { model: 'barrel', x: 0, z: -5.5, rot: 0, collide: 0.6 },
+      { model: 'table_coffee', x: -3, z: 0.5, rot: 0, collide: 1.0 },
+      { model: 'table_coffee', x: 3, z: 0.5, rot: 0, collide: 1.0 },
+    ],
+    loot: [
+      { kind: 'weapon', id: 'rifle', x: -3, z: 0.5 },
+      { kind: 'weapon', id: 'machinegun', x: 3, z: 0.5 },
+      { kind: 'ammo', ammo: 'rifle', n: 60, x: -6.5, z: -3 },
+      { kind: 'ammo', ammo: 'shells', n: 24, x: 6.5, z: -3 },
+      { kind: 'ammo', ammo: '9mm', n: 40, x: 0, z: 3.5 },
+      { kind: 'medkit', x: -6.5, z: 4.5 },
+      { kind: 'medkit', x: 6.5, z: 4.5 },
+    ],
+  },
 };
 
 function floorTexture(kind) {
