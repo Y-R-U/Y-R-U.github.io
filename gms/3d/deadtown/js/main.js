@@ -22,6 +22,7 @@ import { createIntro } from './intro.js';
 import { initFx, tickFx } from './fx.js';
 import { model as loadModel } from './assets.js';
 import { WEAPONS } from './weapons.js';
+import * as audio from './audio.js';
 import * as ui from './ui.js';
 
 window.__errors = [];
@@ -142,22 +143,23 @@ function start() {
     if (pk.kind === 'weapon') { const fresh = player.giveWeapon(pk.id); ui.buildWeapons(); ui.toast(`${WEAPONS[pk.id].icon} ${fresh ? 'Picked up' : 'More'} ${WEAPONS[pk.id].name}`); }
     else if (pk.kind === 'ammo') { player.addAmmo(pk.ammo, pk.n); ui.toast(`🔫 +${pk.n} ${pk.ammo}`); }
     else if (pk.kind === 'medkit') { player.addMedkit(1); ui.toast('🩹 +1 Medkit'); }
-    chime(760);
+    audio.pickup();
   }
 
   // ── event bus ──
   Object.assign(bus, {
     toast: ui.toast,
-    hurt: () => { ui.hurtFlash(); chime(150); },
+    hurt: () => { ui.hurtFlash(); audio.hurt(); },
     hpChanged: () => {},
     ammoChanged: () => {},
     invChanged: () => {},
     weaponChanged: (id) => ui.setWeaponActive(id),
-    shot: (def) => chime(def.kind === 'gun' ? 220 : 300),
-    swung: () => chime(300),
+    shot: (def) => audio.gunshot(def),
+    swung: () => audio.melee(),
     dryFire: () => chime(110),
-    celebrate: () => chime(990),
+    celebrate: () => audio.objective(),
     zombieKilled: (z) => {
+      audio.zombieDie();
       // drop loot at the corpse; tougher types (brute/skeleton) drop better
       const tough = z.type === 'brute' || z.type === 'skeleton';
       const r = Math.random();
@@ -174,6 +176,7 @@ function start() {
   const aim = createAim(scene);
   const minimap = createMinimap(document.getElementById('minimap'));
   const objectives = createObjectives({ player, visited, get kills() { return player.kills; } }, bus);
+  addEventListener('pointerdown', () => audio.unlock(), { passive: true });   // unlock SFX on first touch (joystick)
 
   // interaction: nearest door/exit within range → prompt + Use button
   let nearIt = null;
@@ -331,7 +334,7 @@ function start() {
 
   // ── loop ──
   const clock = new THREE.Clock();
-  let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, objT = 0, objShown = false, frameCount = 0;
+  let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, objT = 0, objShown = false, groanT = 3, frameCount = 0;
   let autoT = 0, autoMv = { x: 0, z: 0, run: false };
   function loop() {
     requestAnimationFrame(loop);
@@ -387,6 +390,7 @@ function start() {
     // minimap (a few times a second)
     mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups }); }
     objT += dt; if (objT > 1) { objT = 0; if (objectives.check() || !objShown) { objShown = true; ui.setObjective(objectives.text()); } }
+    groanT -= dt; if (groanT <= 0) { groanT = rand(4, 9); if (area === 'town' && activeZombies().some(z => z.alive && Math.hypot(z.group.position.x - player.pos.x, z.group.position.z - player.pos.z) < 22)) audio.groan(); }
 
     ui.bars();
     controls.tick(dt);
