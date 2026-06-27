@@ -50,9 +50,11 @@ export function buildWorld(scene, renderer) {
   );
   sky.userData.noWire = true;
   scene.add(sky);
+  const skyMat = sky.material;
 
   // ── lighting: flat overcast + a low hazy sun ──
-  scene.add(new THREE.HemisphereLight(0xb9bca8, 0x3a382f, 1.05));
+  const hemi = new THREE.HemisphereLight(0xb9bca8, 0x3a382f, 1.05);
+  scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xf2e9cf, 1.35);
   sun.position.set(...CFG.sunDir);
   if (!LITE) {
@@ -84,10 +86,41 @@ export function buildWorld(scene, renderer) {
   );
   scene.add(rayPlane);
 
+  // ── day → night cycle (kept readable; never pitch black) ──
+  const townFog = scene.fog;                       // mutated in place; main keeps this as the town fog
+  const C = (h) => new THREE.Color(h);
+  const PAL = {
+    dayFog: C(0x6b6f63), nightFog: C(0x12151d),
+    daySkyTop: C(0x3c4642), nightSkyTop: C(0x090d16),
+    daySkyBot: C(0x8a8b77), nightSkyBot: C(0x232838),
+    daySun: C(0xf2e9cf), nightSun: C(0x5a6a8a),
+    dayHemiSky: C(0xb9bca8), nightHemiSky: C(0x2a3346),
+  };
+  const _c = new THREE.Color();
+  let dayT = 0; const CYCLE = 240;                 // seconds for a full day→night→day
+  let k = 1;                                       // 1 = midday, 0 = midnight
+  function setDaylight(kk) {
+    k = kk;
+    sun.intensity = 0.18 + k * 1.25;
+    sun.color.copy(PAL.nightSun).lerp(PAL.daySun, k);
+    hemi.intensity = 0.42 + k * 0.7;
+    hemi.color.copy(PAL.nightHemiSky).lerp(PAL.dayHemiSky, k);
+    _c.copy(PAL.nightFog).lerp(PAL.dayFog, k);
+    townFog.color.copy(_c); scene.background.copy(_c);
+    townFog.near = 24 + k * 14; townFog.far = 78 + k * 48;   // night closes in
+    skyMat.uniforms.top.value.copy(PAL.nightSkyTop).lerp(PAL.daySkyTop, k);
+    skyMat.uniforms.bot.value.copy(PAL.nightSkyBot).lerp(PAL.daySkyBot, k);
+  }
+  setDaylight(1);
+
   return {
     ground: rayPlane, groundVisual: ground,
     groundHeight, onRoad,
-    sun, sunTarget, sky,
+    sun, sunTarget, sky, townFog,
+    daylight: () => k,
+    setDaylight,
+    // called by main ONLY in town (interiors swap scene.fog, so don't clobber)
+    tickSky(dt) { dayT += dt; setDaylight(0.5 + 0.5 * Math.cos((dayT / CYCLE) * Math.PI * 2)); },
     tick() {},
   };
 }

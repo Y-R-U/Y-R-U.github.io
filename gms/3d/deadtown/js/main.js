@@ -384,6 +384,7 @@ function start() {
     if (area !== 'town') interiors.get(area).tick(t);
     intro.update(dt, t);
     world.tick(dt, t);
+    if (area === 'town') world.tickSky(dt);   // day→night cycle (interiors swap the fog)
     tickFx(dt);
 
     if (!LITE && area === 'town') { world.sun.position.set(player.pos.x + CFG.sunDir[0], CFG.sunDir[1], player.pos.z + CFG.sunDir[2]); world.sunTarget.position.copy(player.pos); }
