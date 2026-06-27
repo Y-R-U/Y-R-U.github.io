@@ -52,6 +52,14 @@ export function bars() {
   const sc = $('score'); if (sc) sc.textContent = `${P.kills}`;
 }
 
+export function setCombo(n, mult) {
+  const el = $('combo'); if (!el) return;
+  if (n < 2) { el.classList.add('hidden'); return; }
+  el.innerHTML = `<b>${n}</b> KILL STREAK <span>×${mult}</span>`;
+  el.classList.remove('hidden');
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+}
+
 export function setObjective(text) {
   const el = $('objective'); if (!el) return;
   el.textContent = '🎯 ' + text;

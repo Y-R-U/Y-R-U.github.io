@@ -157,6 +157,7 @@ function start() {
     shot: (def) => audio.gunshot(def),
     swung: () => audio.melee(),
     dryFire: () => chime(110),
+    combo: (n, mult) => ui.setCombo(n, mult),
     celebrate: () => audio.objective(),
     zombieKilled: (z) => {
       audio.zombieDie();

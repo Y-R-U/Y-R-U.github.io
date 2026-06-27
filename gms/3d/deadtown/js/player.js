@@ -19,7 +19,7 @@ export function createPlayer(rig, world, scene, bus) {
     medkits: 1,
     weapons: ['axe', 'pistol'],
     curWeapon: 'axe',
-    score: 0, kills: 0,
+    score: 0, kills: 0, combo: 0, comboTimer: 0,
     atkCd: 0, combatT: 0, moving: false, walk: 0, alive: true,
     aiming: false, target: null, _dry: false, _moveYaw: Math.PI, _dt: 0.016,
   };
@@ -97,6 +97,7 @@ export function createPlayer(rig, world, scene, bus) {
   p.combat = (dt, t, target) => {
     if (p.atkCd > 0) p.atkCd -= dt;
     if (p.combatT > 0) p.combatT -= dt;
+    if (p.comboTimer > 0) { p.comboTimer -= dt; if (p.comboTimer <= 0 && p.combo > 0) { p.combo = 0; bus.combo?.(0, 1); } }
     const def = p.weaponDef();
     p.target = (target && target.alive) ? target : null;
     if (p.alive && p.target) {
@@ -162,7 +163,16 @@ export function createPlayer(rig, world, scene, bus) {
   }
   // the zombie's own hurt()->kill() emits bus.zombieKilled (loot); here we just
   // tally the player's kill/score and drop the lock.
-  function onKill(z) { p.kills++; p.score += 10; p.target = null; }
+  // kill streak: chain kills within COMBO_WINDOW for a rising score multiplier
+  const COMBO_WINDOW = 3.5;
+  function onKill(z) {
+    p.comboTimer = COMBO_WINDOW;
+    p.combo += 1;
+    const mult = 1 + Math.floor((p.combo - 1) / 2);   // x1, x2 at 3, x3 at 5, …
+    p.kills++; p.score += 10 * mult;
+    p.target = null;
+    bus.combo?.(p.combo, mult);
+  }
 
   // ── save / load (lean) ──
   p.serialize = () => ({
