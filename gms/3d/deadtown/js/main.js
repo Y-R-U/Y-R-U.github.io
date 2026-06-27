@@ -11,7 +11,7 @@ import { initAssets } from './assets.js';
 import { initHero, makeHumanoid } from './hero.js';
 import { buildWorld } from './world.js';
 import { buildTown } from './townobj.js';
-import { buildInteriors } from './interiors.js';
+import { buildInteriors, makePickupVisual, tickPickup } from './interiors.js';
 import { createPlayer } from './player.js';
 import { makeZombie, preloadZombies, ZTYPES } from './zombies.js';
 import { createControls } from './controls.js';
@@ -128,18 +128,15 @@ function start() {
   // ── pickups (town loot from kills + interior loot) ──
   const townPickups = [];
   function makeTownPickup(kind, opts, x, z) {
-    const holder = new THREE.Group(); holder.position.set(x, 0.4, z); zGroup.add(holder);
-    const mdl = kind === 'weapon' ? opts.id : (kind === 'medkit' ? 'medkit' : 'ammo_box');
-    loadModel(mdl).then(m => { m.scale.setScalar(kind === 'weapon' ? 1 : 0.85); holder.add(m); });
-    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffe9a6, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }));
-    beacon.material.userData.noWire = true; beacon.position.y = 0.85; holder.add(beacon);
-    townPickups.push({ kind, ...opts, pos: new THREE.Vector3(x, 0, z), group: holder, beacon, taken: false });
+    const v = makePickupVisual(kind, opts.id);
+    v.holder.position.set(x, 0, z); zGroup.add(v.holder);
+    townPickups.push({ kind, ...opts, pos: new THREE.Vector3(x, 0, z), group: v.holder, itemNode: v.itemNode, ring: v.ring, taken: false });
   }
   function applyPickup(pk) {
     if (pk.taken) return;
     pk.taken = true;
     pk.group.parent?.remove(pk.group);          // free the scene node…
-    pk.beacon?.material.dispose();              // …+ its per-instance beacon (shared model mats/geo stay)
+    pk.ring?.material.dispose();                // …+ its per-instance ring (shared model mats/geo stay)
     if (pk.kind === 'weapon') { const fresh = player.giveWeapon(pk.id); ui.buildWeapons(); ui.toast(`${WEAPONS[pk.id].icon} ${fresh ? 'Picked up' : 'More'} ${WEAPONS[pk.id].name}`); }
     else if (pk.kind === 'ammo') { player.addAmmo(pk.ammo, pk.n); ui.toast(`🔫 +${pk.n} ${pk.ammo}`); }
     else if (pk.kind === 'medkit') { player.addMedkit(1); ui.toast('🩹 +1 Medkit'); }
@@ -158,10 +155,13 @@ function start() {
     swung: () => chime(300),
     dryFire: () => chime(110),
     zombieKilled: (z) => {
-      // drop loot at the corpse
+      // drop loot at the corpse; tougher types (brute/skeleton) drop better
+      const tough = z.type === 'brute' || z.type === 'skeleton';
       const r = Math.random();
-      if (r < 0.30) makeTownPickup('ammo', { ammo: pick(['9mm', '9mm', 'shells', 'rifle']), n: 8 + (Math.random() * 10 | 0) }, z.group.position.x, z.group.position.z);
-      else if (r < 0.42) makeTownPickup('medkit', {}, z.group.position.x, z.group.position.z);
+      const gx = z.group.position.x, gz = z.group.position.z;
+      if (r < (tough ? 0.22 : 0.08)) makeTownPickup('weapon', { id: pick(['revolver', 'smg', 'rifle', 'shotgun', 'bat']) }, gx, gz);
+      else if (r < 0.48) makeTownPickup('ammo', { ammo: pick(['9mm', '9mm', 'shells', 'rifle']), n: 8 + (Math.random() * 12 | 0) }, gx, gz);
+      else if (r < 0.60) makeTownPickup('medkit', {}, gx, gz);
     },
     died: () => ui.showDeath(`You were overrun after ${player.kills} kills.`),
   });
@@ -209,7 +209,25 @@ function start() {
     else if (k >= '1' && k <= '9') { const id = player.weapons[+k - 1]; if (id) player.selectWeapon(id); }
   });
 
+  // fixed world loot so every weapon is reliably findable (the rifle by the
+  // police station, etc.), plus ammo caches. Placed once at boot.
+  function placeStarterLoot() {
+    const spots = [
+      ['weapon', { id: 'rifle' }, 33, -11],     // by the police station
+      ['weapon', { id: 'smg' }, -27, 12],       // near the café
+      ['weapon', { id: 'revolver' }, 12, 26],
+      ['weapon', { id: 'bat' }, -4, 17],
+      ['weapon', { id: 'machinegun' }, 40, -38],// far reward by the car wash
+      ['ammo', { ammo: 'rifle', n: 30 }, 30, -9],
+      ['ammo', { ammo: 'shells', n: 16 }, 8, 27],
+      ['ammo', { ammo: '9mm', n: 30 }, -25, 14],
+      ['medkit', {}, 0, 19], ['medkit', {}, -30, -10],
+    ];
+    for (const [kind, opts, x, z] of spots) makeTownPickup(kind, opts, x, z);
+  }
+
   // ── load / fresh ──
+  placeStarterLoot();
   const saved = !NOSAVE && load();
   if (!saved) {
     // fresh: scatter the starting horde, then either cold-open in the bedroom
@@ -254,7 +272,13 @@ function start() {
       spawnZombie(pickType(), Math.cos(a) * r, Math.sin(a) * r);
     }
   }
-  function pickType() { const r = Math.random(); return r < 0.62 ? (Math.random() < 0.5 ? 'walker' : 'woman') : r < 0.85 ? 'runner' : 'brute'; }
+  function pickType() {
+    const r = Math.random();
+    if (r < 0.50) return Math.random() < 0.5 ? 'walker' : 'woman';
+    if (r < 0.70) return 'runner';
+    if (r < 0.85) return 'skeleton';
+    return 'brute';
+  }
   let spawnT = 4;
   function spawnTick(dt) {
     spawnT -= dt;
@@ -335,10 +359,11 @@ function start() {
     for (let i = townPickups.length - 1; i >= 0; i--) if (townPickups[i].taken) townPickups.splice(i, 1);
     if (area === 'town' && player.alive) spawnTick(dt);
 
-    // 5. pickups (auto collect on walk-over)
+    // 5. pickups (spin/glow, auto collect on walk-over)
     for (const pk of activePickups()) {
       if (pk.taken) continue;
       if (Math.hypot(player.pos.x - pk.pos.x, player.pos.z - pk.pos.z) < CFG.pickupRange) applyPickup(pk);
+      else tickPickup(pk, t);
     }
 
     // 6. interaction prompt
@@ -354,7 +379,7 @@ function start() {
     if (!LITE && area === 'town') { world.sun.position.set(player.pos.x + CFG.sunDir[0], CFG.sunDir[1], player.pos.z + CFG.sunDir[2]); world.sunTarget.position.copy(player.pos); }
 
     // minimap (a few times a second)
-    mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings }); }
+    mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups }); }
 
     ui.bars();
     controls.tick(dt);

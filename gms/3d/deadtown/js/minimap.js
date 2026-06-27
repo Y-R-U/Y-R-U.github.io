@@ -14,8 +14,9 @@ export function createMinimap(canvas) {
   const my = (z) => (z + H) / span * SZ;
   const ms = (d) => d / span * SZ;
 
+  const PK = { weapon: '#ffd24a', ammo: '#6fd0ff', medkit: '#7aff8a' };
   return {
-    update({ player, zombies, buildings }) {
+    update({ player, zombies, buildings, pickups }) {
       g.clearRect(0, 0, SZ, SZ);
       // ground
       g.fillStyle = '#23251f'; g.fillRect(0, 0, SZ, SZ);
@@ -28,6 +29,12 @@ export function createMinimap(canvas) {
         g.fillStyle = b.locked ? 'rgba(150,150,140,0.55)' : 'rgba(90,200,120,0.6)';
         g.fillRect(mx(b.x - b.hx), my(b.z - b.hz), ms(b.hx * 2), ms(b.hz * 2));
         if (!b.locked) { g.strokeStyle = '#7af0a0'; g.lineWidth = 1; g.strokeRect(mx(b.x - b.hx), my(b.z - b.hz), ms(b.hx * 2), ms(b.hz * 2)); }
+      }
+      // loot pickups (weapon = gold, ammo = cyan, medkit = green)
+      for (const p of (pickups || [])) {
+        if (p.taken) continue;
+        g.fillStyle = PK[p.kind] || '#fff';
+        g.fillRect(mx(p.pos.x) - 2, my(p.pos.z) - 2, 4, 4);
       }
       // zombies
       g.fillStyle = '#ff4536';

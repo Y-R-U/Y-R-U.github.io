@@ -19,18 +19,21 @@ export const WEAPONS = {
                 hand: { pos: [0, 0.02, 0.05], rot: [Math.PI / 2, 0, 0.2], scale: 1.0 } },
   bat:        { name: 'Baseball Bat', model: 'bat',       kind: 'melee', dmg: [14, 24], range: 2.1, cd: 0.52, icon: '🏏',
                 hand: { pos: [0, 0.0, 0.05], rot: [Math.PI / 2, 0, 0.15], scale: 1.0 } },
+  // guns share native orientation (re-origined to bottom-centre, barrel +Z),
+  // so rot=[0,0,0] points the barrel down the forearm; pos.z pushes the grip
+  // into the hand (longer guns need a bigger push), pos.y drops it into the palm.
   pistol:     { name: 'Pistol',      model: 'pistol',     kind: 'gun', dmg: [18, 26], range: 15, cd: 0.40, ammo: '9mm', spread: 0.015, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.06], rot: [Math.PI / 2, 0, 0], scale: 1.0 } },
+                hand: { pos: [0.03, -0.03, 0.03], rot: [0, 0, 0], scale: 1.0 } },
   revolver:   { name: 'Revolver',    model: 'revolver',   kind: 'gun', dmg: [34, 50], range: 17, cd: 0.78, ammo: '9mm', spread: 0.01, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.06], rot: [Math.PI / 2, 0, 0], scale: 1.0 } },
+                hand: { pos: [0.03, -0.03, 0.07], rot: [0, 0, 0], scale: 1.0 } },
   smg:        { name: 'Uzi',         model: 'smg',        kind: 'gun', dmg: [11, 17], range: 14, cd: 0.11, ammo: '9mm', spread: 0.05, auto: true, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.07], rot: [Math.PI / 2, 0, 0], scale: 1.0 }, twoHand: true },
+                hand: { pos: [0.03, -0.03, 0.05], rot: [0, 0, 0], scale: 1.0 }, twoHand: true },
   shotgun:    { name: 'Shotgun',     model: 'shotgun',    kind: 'gun', dmg: [8, 14], pellets: 7, range: 10, cd: 0.82, ammo: 'shells', spread: 0.16, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.1], rot: [Math.PI / 2, 0, 0], scale: 1.0 }, twoHand: true },
+                hand: { pos: [0.03, -0.03, 0.2], rot: [0, 0, 0], scale: 1.0 }, twoHand: true },
   rifle:      { name: 'Rifle',       model: 'rifle',      kind: 'gun', dmg: [44, 64], range: 26, cd: 1.05, ammo: 'rifle', spread: 0.006, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.12], rot: [Math.PI / 2, 0, 0], scale: 1.0 }, twoHand: true },
+                hand: { pos: [0.03, -0.03, 0.26], rot: [0, 0, 0], scale: 1.0 }, twoHand: true },
   machinegun: { name: 'Machine Gun', model: 'machinegun', kind: 'gun', dmg: [15, 23], range: 22, cd: 0.085, ammo: 'rifle', spread: 0.04, auto: true, icon: '🔫',
-                hand: { pos: [0.02, 0, 0.12], rot: [Math.PI / 2, 0, 0], scale: 1.0 }, twoHand: true },
+                hand: { pos: [0.03, -0.03, 0.2], rot: [0, 0, 0], scale: 1.0 }, twoHand: true },
 };
 
 export const AMMO_KINDS = ['9mm', 'shells', 'rifle'];

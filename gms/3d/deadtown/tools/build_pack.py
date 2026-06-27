@@ -30,24 +30,27 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 GAME = os.path.dirname(HERE)
 SRC  = "/Users/aaronair/cc/yru/site/app/3d/gallery/models_all"
 RIG  = "/Users/aaronair/cc/yru/site/gms/3d/fable5_glade/models"
+RIGZ = "/Users/aaronair/cc/assets/3d/rigged"   # freshly SKINNED-exported characters
 OUT  = os.path.join(GAME, "assets")
 
 KEY = "deadtown-lpup-9Xv!aron-2026"   # also embedded in js/assets.js (must match)
 
 # Rigged SkinnedMesh characters loaded raw (own skin + skeleton, body-space
-# driven). Only the hero GLB carries the real 80-bone skeleton; the gallery
-# "-rig" exports are actually STATIC meshes (0 bones), so they go through the
-# normal shared-atlas path and are animated as whole-body models (zombies.js).
-RIGS = ["hero"]
+# driven via buildRig). The gallery "-rig" exports are actually STATIC (0
+# bones); the real articulated characters come from the SKINNED exporter
+# (Airon.SkinnedExport.ExportList) into RIGZ — same 67-80 bone skeleton family
+# as the hero, so one driver animates them all. See tools/ + CLAUDE.md.
+RIGS = ["hero", "zombie_m", "zombie_w", "skeleton"]
 
 # logical name -> (source root, GLB filename)
 MODELS = {
-    # --- characters (rigged, one shared skeleton) ---
-    "hero":       (RIG, "man-casual-rigged.glb"),          # the player (proven rig)
-    "zombie_m":   (SRC, "man-zombie-rig-67747e99.glb"),
-    "zombie_w":   (SRC, "woman-zombie-rig-84a9e44d.glb"),
-    "survivor":   (SRC, "man-coat-rig-901c6205.glb"),      # friendly NPC
-    "cop":        (SRC, "man-police-rig-4fd6c948.glb"),    # friendly NPC / future
+    # --- characters (rigged, one shared skeleton, body-space driven) ---
+    "hero":       (RIG,  "man-casual-rigged.glb"),         # the player (proven rig)
+    "zombie_m":   (RIGZ, "man_zombie.glb"),                # rigged (skinned export)
+    "zombie_w":   (RIGZ, "woman_zombie.glb"),              # rigged
+    "skeleton":   (RIGZ, "man_skeleton.glb"),              # rigged bonus enemy
+    "survivor":   (SRC,  "man-coat-rig-901c6205.glb"),     # static NPC (gallery)
+    "cop":        (SRC,  "man-police-rig-4fd6c948.glb"),   # static NPC / future
 
     # --- weapons (static, attach to the hand) ---
     "axe":        (SRC, "axe-c2822dd9.glb"),

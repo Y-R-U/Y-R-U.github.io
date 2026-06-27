@@ -38,20 +38,35 @@ assets out of the repo. **To change the model set, edit `MODELS` in
 the in-game role (`zombie_m`, `pistol`, `bld_cafe`, `int_wall`), not the
 PolyPerfect asset name. **Do not** copy raw `.glb`/`.png` into this folder.
 
-## Characters — the rigging reality
+## Characters — the rigging pipeline
 
-**Only the hero GLB is truly rigged.** `man-casual-rigged.glb` (from
-`fable5_glade/models`, the proven export) carries the real **80-bone skeleton**;
-the player rig is driven procedurally in **body space** (`js/hero.js` →
-`buildRig`, ported from the Glade). The gallery `*-rig` exports
-(`man-zombie-rig` etc.) come out as **STATIC meshes with 0 bones**, so **zombies
-are animated as whole-body static models** — a procedural shamble (side-rock +
-forward hunch + lunge bite), like the old chickens (`js/zombies.js`). The zombie
-meshes already stand arms-outstretched, so this reads correctly. Non-hero models
-are re-skinned onto ONE shared atlas material (gradient `.map` + specular
-`.metalnessMap`). *If you want articulated zombies later, export rigged zombie
-GLBs from Unity (see `~/cc/assets/POLYPERFECT_ASSET_HOWTO.md`) and run them
-through `buildRig` — same skeleton, same driver.*
+The player AND the zombies are now **real rigged SkinnedMeshes** driven through
+`buildRig` (`js/hero.js`) in **body space**, all sharing the same bone family
+(`Root_M / Hip_R / Knee_R / Shoulder_R / Elbow_R / Wrist_R / Head_M …`):
+- **hero** = `man-casual-rigged.glb` (80 bones, from `fable5_glade/models`).
+- **zombie_m / zombie_w / skeleton** = freshly **skinned-exported** from Unity
+  into `~/cc/assets/3d/rigged/` (67–69 bones). `js/zombies.js` drives them with
+  an articulated shamble (legs shuffle + arms-forward reach + lunge bite).
+
+**Gotcha that bit us:** the gallery cache `*-rig` GLBs
+(`app/3d/gallery/models_all/man-zombie-rig-*.glb`) are exported by the *static*
+`PolyPerfectGlbExporter` and come out with **0 bones**. The articulated ones
+come from the **SKINNED** exporter `Airon.SkinnedExport.ExportList`
+(`~/unity/AssetDL/Assets/Editor/AironExport/SkinnedExport.cs`):
+
+```sh
+# list one Unity prefab path per line; outputs <name>.glb to PP_OUT_DIR
+PP_PREFAB_LIST=/tmp/list.txt PP_OUT_DIR=/Users/aaronair/cc/assets/3d/rigged \
+  "/Applications/Unity/Hub/Editor/6000.4.11f1/Unity.app/Contents/MacOS/Unity" \
+  -batchmode -projectPath /Users/aaronair/unity/AssetDL \
+  -executeMethod Airon.SkinnedExport.ExportList -logFile /tmp/exp.log   # NO -quit
+```
+The rigged people prefabs live under `Assets/polyperfect/Low Poly Animated
+People/- Prefabs/` (e.g. `man_zombie.prefab`, `woman_zombie.prefab`,
+`man_skeleton.prefab` — plus dozens more to mine for NPCs). Rigs are listed in
+`RIGS` in `build_pack.py` so `js/assets.js` loads them raw (own skin + skeleton)
+instead of re-skinning onto the shared atlas. Static props still use the shared
+atlas material.
 
 ## The four contracts (keep these; swap everything else)
 
@@ -121,25 +136,27 @@ use real waits. After visual changes re-stage `assets/screenshots/deadtown.jpg`
 
 ## ROADMAP (next sessions)
 
-The slice is complete + runnable. Good focused follow-ups, roughly ordered:
+The slice is complete + runnable. **Done since launch:** articulated rigged
+zombies (skinned export), all weapons obtainable (world spawns + drops + minimap
+loot dots), in-hand weapon holding fixed (guns `rot=[0,0,0]`, barrel forward),
+interior floor + pickup visibility (single tinted plane, floating spinning
+glowing pickups). Good focused follow-ups, roughly ordered:
 
-1. **Tune in-hand weapons**: the gun/axe `hand.pos/rot` in `WEAPONS` are
-   first-pass — screenshot each weapon up close and dial the orientation so
-   barrels point forward and the axe sits in the grip.
-2. **More open interiors**: only `home` + `store` are enterable; the police
-   station, café, burger joint, apartments etc. are `locked:true` in
+1. **More open interiors**: only `home` + `store` are enterable; the police
+   station (armory!), café, burger joint, apartments etc. are `locked:true` in
    `BUILDINGS`. Add `INTERIORS` specs + flip `locked` + set `interior`.
-3. **Zombie variety/feel**: add crawlers (use `body-*` packed models), a
-   screamer that summons, day/night, hordes that path around buildings (grid
-   A* — there is none today; they walk straight + get pushed off walls).
+2. **Objectives/progression**: a reason to explore (find the radio, reach the
+   checkpoint, clear a building, escape), a wave/score meter, danger ramp.
+3. **Zombie variety/feel**: crawlers, a screamer that summons, day/night,
+   pathing around buildings (grid A* — none today; they walk straight + get
+   pushed off walls). Now that they're rigged you can add per-type anim flavour.
 4. **Gunplay polish**: real gunshot SFX (Web Audio noise burst per weapon),
-   shell casings, reload + magazine sizes, headshot bonus, weapon spread
-   reticle, knockback. **Line of sight**: `aim.js` + `player.fireGun` currently
-   lock/hit through walls — pass a building-box segment test so you can't shoot
-   through buildings (known deferral, like the template).
-5. **Objectives/progression**: a reason to explore (find the radio, reach the
-   checkpoint, clear a building), a wave/score meter, danger ramp.
-6. **Survivor NPCs**: the `survivor`/`cop` rigs are packed; they're static like
-   zombies — drive them with the same whole-body anim as rescuable allies.
-7. **Save the full state** (area, zombie/pickup positions) — currently only the
+   shell casings, reload + magazine sizes, headshot bonus, knockback. **Line of
+   sight**: `aim.js` + `player.fireGun` currently lock/hit through walls — pass a
+   building-box segment test (known deferral, like the template).
+5. **Survivor NPCs**: mine the Animated People pack (export more rigged prefabs
+   via `SkinnedExport.ExportList`) for rescuable allies driven by `buildRig`.
+6. **Save the full state** (area, zombie/pickup positions) — currently only the
    player serializes and you always resume in town.
+7. **Two-hand grip polish**: long guns bring the left arm up but it doesn't sit
+   on the foregrip; add an IK-ish offset or a second hand attach.
