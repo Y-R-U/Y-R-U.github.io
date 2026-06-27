@@ -212,6 +212,7 @@ export function createPlayer(rig, world, scene, bus) {
   p.serialize = () => ({
     pos: [pos.x, pos.z], yaw: p.yaw, hp: p.hp, ammo: p.ammo, medkits: p.medkits,
     weapons: p.weapons, cur: p.curWeapon, score: p.score, kills: p.kills, rescued: p.rescued,
+    mags: p.mags,   // save loaded rounds too, else reload re-draws from reserve (ammo loss)
   });
   p.load = (d) => {
     if (!d) return;
@@ -222,6 +223,8 @@ export function createPlayer(rig, world, scene, bus) {
     p.weapons = (d.weapons || []).filter(id => WEAPONS[id]);
     if (!p.weapons.length) p.weapons = ['axe', 'pistol'];
     p.score = d.score || 0; p.kills = d.kills || 0; p.rescued = d.rescued || 0;
+    // restore mags BEFORE selectWeapon so ensureMag() doesn't re-draw from reserve
+    p.mags = {}; for (const id of p.weapons) if (typeof d.mags?.[id] === 'number') p.mags[id] = d.mags[id];
     selectWeapon(d.cur && p.weapons.includes(d.cur) ? d.cur : p.weapons[0]);
   };
 
