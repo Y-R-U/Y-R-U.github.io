@@ -137,26 +137,27 @@ use real waits. After visual changes re-stage `assets/screenshots/deadtown.jpg`
 ## ROADMAP (next sessions)
 
 The slice is complete + runnable. **Done since launch:** articulated rigged
-zombies (skinned export), all weapons obtainable (world spawns + drops + minimap
-loot dots), in-hand weapon holding fixed (guns `rot=[0,0,0]`, barrel forward),
-interior floor + pickup visibility (single tinted plane, floating spinning
-glowing pickups). Good focused follow-ups, roughly ordered:
+zombies (skinned export) + skeleton type; all weapons obtainable (world spawns +
+drops + minimap loot dots); in-hand weapon holding fixed (guns `rot=[0,0,0]`,
+barrel forward); interior floor + pickup visibility (single tinted plane,
+floating spinning glowing pickups); **objective/mission chain** (`objectives.js`,
+HUD banner + rewards); **police armory + café** interiors; **escalating threat
+ramp** (horde grows + tougher with kills); **synthesized audio** (`audio.js` —
+gunshots/melee/hits/groans/pickups, no asset files); **kill-streak combos** +
+score multiplier; **day→night cycle** (`world.tickSky`). Good follow-ups:
 
-1. **More open interiors**: only `home` + `store` are enterable; the police
-   station (armory!), café, burger joint, apartments etc. are `locked:true` in
-   `BUILDINGS`. Add `INTERIORS` specs + flip `locked` + set `interior`.
-2. **Objectives/progression**: a reason to explore (find the radio, reach the
-   checkpoint, clear a building, escape), a wave/score meter, danger ramp.
-3. **Zombie variety/feel**: crawlers, a screamer that summons, day/night,
-   pathing around buildings (grid A* — none today; they walk straight + get
-   pushed off walls). Now that they're rigged you can add per-type anim flavour.
-4. **Gunplay polish**: real gunshot SFX (Web Audio noise burst per weapon),
-   shell casings, reload + magazine sizes, headshot bonus, knockback. **Line of
-   sight**: `aim.js` + `player.fireGun` currently lock/hit through walls — pass a
-   building-box segment test (known deferral, like the template).
-5. **Survivor NPCs**: mine the Animated People pack (export more rigged prefabs
-   via `SkinnedExport.ExportList`) for rescuable allies driven by `buildRig`.
+1. **Survivor NPCs**: export more rigged prefabs (Animated People pack via
+   `SkinnedExport.ExportList`) for rescuable allies driven by `buildRig` — tie to
+   an objective. Many prefabs available (`man_*`, `woman_*`).
+2. **Line of sight**: `aim.js` + `player.fireGun` lock/hit through walls — pass a
+   building-box segment test so you can't shoot through buildings.
+3. **Reload + magazines**: per-weapon mag size, a reload pose + timer + SFX,
+   out-of-mag auto-reload; HUD shows `mag/reserve`.
+4. **More open interiors**: burger joint, apartments, cabin, car wash are still
+   `locked:true` in `BUILDINGS` — add `INTERIORS` specs + flip them.
+5. **Zombie variety/feel**: crawlers, a screamer that summons, pathing around
+   buildings (grid A* — none today; they walk straight + get pushed off walls).
 6. **Save the full state** (area, zombie/pickup positions) — currently only the
-   player serializes and you always resume in town.
+   player + objective index serialize; you always resume in town.
 7. **Two-hand grip polish**: long guns bring the left arm up but it doesn't sit
    on the foregrip; add an IK-ish offset or a second hand attach.
