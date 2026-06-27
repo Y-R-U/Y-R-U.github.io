@@ -19,6 +19,8 @@ export function initHud(player, actions) {
   $('act-med')?.addEventListener('click', () => actions.useMedkit());
   $('act-use')?.addEventListener('click', () => actions.interact());
   $('btn-restart')?.addEventListener('click', () => actions.restart());
+  const ammoChip = document.querySelector('.ammo-chip');
+  if (ammoChip) { ammoChip.style.pointerEvents = 'auto'; ammoChip.title = 'Reload'; ammoChip.addEventListener('click', () => actions.reload?.()); }
   buildWeapons();
 }
 
@@ -46,7 +48,7 @@ export function bars() {
   const hb = $('hp-fill'); if (hb) hb.style.width = (hpFrac * 100) + '%';
   const ht = $('hp-num'); if (ht) ht.textContent = Math.ceil(P.hp);
   const def = P.weaponDef();
-  const at = $('ammo'); if (at) at.textContent = def.ammo ? `${P.ammo[def.ammo] || 0}` : '∞';
+  const at = $('ammo'); if (at) at.textContent = def.ammo ? (P.reloading ? '⟳ …' : `${P.curMag()}/${P.ammo[def.ammo] || 0}`) : '∞';
   const ak = $('ammo-kind'); if (ak) ak.textContent = def.kind === 'melee' ? def.icon : '🔫';
   const md = $('med-num'); if (md) md.textContent = P.medkits;
   const sc = $('score'); if (sc) sc.textContent = `${P.kills}`;

@@ -98,6 +98,17 @@ export function hurt() {
   const g = c.createGain(); env(g, t, 0.3, 0.18); src.connect(lp).connect(g).connect(master); src.start(t); src.stop(t + 0.2);
 }
 
+export function reload() {
+  const c = ensure(); if (!c || muted) return;
+  const t = c.currentTime;
+  [0, 0.16].forEach(off => {           // mag out … mag in: two mechanical clicks
+    const src = c.createBufferSource(); src.buffer = noise();
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 2.5;
+    const g = c.createGain(); env(g, t + off, 0.12, 0.05);
+    src.connect(bp).connect(g).connect(master); src.start(t + off); src.stop(t + off + 0.06);
+  });
+}
+
 export function pickup() {
   const c = ensure(); if (!c || muted) return;
   const t = c.currentTime;

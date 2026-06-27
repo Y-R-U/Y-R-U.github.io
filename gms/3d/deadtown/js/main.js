@@ -157,6 +157,7 @@ function start() {
     shot: (def) => audio.gunshot(def),
     swung: () => audio.melee(),
     dryFire: () => chime(110),
+    reload: () => audio.reload(),
     combo: (n, mult) => ui.setCombo(n, mult),
     celebrate: () => audio.objective(),
     zombieKilled: (z) => {
@@ -203,6 +204,7 @@ function start() {
   ui.initHud(player, {
     selectWeapon: (id) => { unlockAudio(); player.selectWeapon(id); },
     useMedkit: () => { unlockAudio(); player.useMedkit(); },
+    reload: () => { audio.unlock(); player.reload(); },
     interact: doInteract,
     restart: () => { if (area !== 'town') exitToStreet(area); player.respawn(); ui.hideDeath(); },
   });
@@ -214,7 +216,8 @@ function start() {
     const k = e.key.toLowerCase();
     if (k === 'e' || k === ' ') doInteract();
     else if (k === 'q') player.cycleWeapon();
-    else if (k === 'r') player.useMedkit();
+    else if (k === 'r') player.reload();
+    else if (k === 'h') player.useMedkit();
     else if (k >= '1' && k <= '9') { const id = player.weapons[+k - 1]; if (id) player.selectWeapon(id); }
   });
 

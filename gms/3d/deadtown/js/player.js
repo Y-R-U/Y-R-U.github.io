@@ -20,6 +20,7 @@ export function createPlayer(rig, world, scene, bus) {
     weapons: ['axe', 'pistol'],
     curWeapon: 'axe',
     score: 0, kills: 0, combo: 0, comboTimer: 0,
+    mags: {}, reloading: false, reloadT: 0,
     atkCd: 0, combatT: 0, moving: false, walk: 0, alive: true,
     aiming: false, target: null, _dry: false, _moveYaw: Math.PI, _dt: 0.016,
   };
@@ -35,15 +36,34 @@ export function createPlayer(rig, world, scene, bus) {
   p.weaponDef = () => WEAPONS[p.curWeapon];
   p.hasWeapon = (id) => p.weapons.includes(id);
   p.giveWeapon = (id) => { if (!WEAPONS[id]) return false; const fresh = !p.hasWeapon(id); if (fresh) p.weapons.push(id); selectWeapon(id); return fresh; };
+  // load a weapon's magazine from its reserve pool the first time it's used
+  function ensureMag(id) {
+    const def = WEAPONS[id]; if (!def?.ammo) return;
+    if (p.mags[id] === undefined) {
+      const take = Math.min(def.mag, p.ammo[def.ammo] || 0);
+      p.mags[id] = take; p.ammo[def.ammo] = (p.ammo[def.ammo] || 0) - take;
+    }
+  }
   function selectWeapon(id) {
     if (!p.hasWeapon(id)) return;
     p.curWeapon = id; rig.setWeapon(id); p._dry = false;
+    p.reloading = false; p.reloadT = 0; ensureMag(id);
     bus.weaponChanged?.(id);
   }
   p.selectWeapon = selectWeapon;
   p.cycleWeapon = () => { const i = p.weapons.indexOf(p.curWeapon); selectWeapon(p.weapons[(i + 1) % p.weapons.length]); };
   p.addAmmo = (kind, n) => { if (!AMMO_KINDS.includes(kind)) return; p.ammo[kind] = (p.ammo[kind] || 0) + n; p._dry = false; bus.ammoChanged?.(); };
   p.curAmmo = () => { const d = p.weaponDef(); return d.ammo ? (p.ammo[d.ammo] || 0) : Infinity; };
+  p.curMag = () => { const d = p.weaponDef(); return d.ammo ? (p.mags[p.curWeapon] || 0) : Infinity; };
+  function startReload() {
+    const def = p.weaponDef();
+    if (!def.ammo || p.reloading) return;
+    if ((p.mags[p.curWeapon] || 0) >= def.mag) return;     // already full
+    if ((p.ammo[def.ammo] || 0) <= 0) return;              // nothing to load
+    p.reloading = true; p.reloadT = def.reload; rig.setAiming?.(false);
+    bus.reload?.(def);
+  }
+  p.reload = startReload;
 
   // ── medkit ──
   p.useMedkit = () => {
@@ -98,13 +118,21 @@ export function createPlayer(rig, world, scene, bus) {
     if (p.atkCd > 0) p.atkCd -= dt;
     if (p.combatT > 0) p.combatT -= dt;
     if (p.comboTimer > 0) { p.comboTimer -= dt; if (p.comboTimer <= 0 && p.combo > 0) { p.combo = 0; bus.combo?.(0, 1); } }
+    if (p.reloading) {
+      p.reloadT -= dt;
+      if (p.reloadT <= 0) {
+        const d = p.weaponDef(), need = d.mag - (p.mags[p.curWeapon] || 0), take = Math.min(need, p.ammo[d.ammo] || 0);
+        p.mags[p.curWeapon] = (p.mags[p.curWeapon] || 0) + take; p.ammo[d.ammo] -= take;
+        p.reloading = false; bus.ammoChanged?.();
+      }
+    }
     const def = p.weaponDef();
     p.target = (target && target.alive) ? target : null;
     if (p.alive && p.target) {
       const dx = p.target.group.position.x - pos.x, dz = p.target.group.position.z - pos.z;
       p.yaw = lerpAngle(p.yaw, Math.atan2(dx, dz), 1 - Math.exp(-CFG.aimTurn * dt));
       const dist = Math.hypot(dx, dz);
-      p.aiming = def.kind === 'gun';
+      p.aiming = def.kind === 'gun' && !p.reloading;
       if (p.atkCd <= 0 && dist <= def.range * (def.kind === 'melee' ? 1.08 : 1.05)) {
         if (def.kind === 'gun') fireGun(def, p.target); else meleeSwing(def, p.target);
       }
@@ -126,12 +154,18 @@ export function createPlayer(rig, world, scene, bus) {
 
   const _dir = new THREE.Vector3();
   function fireGun(def, target) {
-    if (def.ammo && (p.ammo[def.ammo] || 0) <= 0) {
-      if (!p._dry) { p._dry = true; bus.toast?.(`🔫 Out of ${def.ammo} — switch weapon or find ammo.`); bus.dryFire?.(); }
-      return;
+    if (def.ammo) {
+      if (p.reloading) return;                              // mid-reload, can't fire
+      const mag = p.mags[p.curWeapon] || 0;
+      if (mag <= 0) {
+        if ((p.ammo[def.ammo] || 0) > 0) { startReload(); return; }   // empty mag → reload
+        if (!p._dry) { p._dry = true; bus.toast?.(`🔫 Out of ${def.ammo} — switch weapon or find ammo.`); bus.dryFire?.(); }
+        return;
+      }
+      p.mags[p.curWeapon] = mag - 1; bus.ammoChanged?.();
+      if (p.mags[p.curWeapon] === 0 && (p.ammo[def.ammo] || 0) > 0) startReload();  // auto-reload when emptied
     }
-    if (def.ammo) { p.ammo[def.ammo]--; bus.ammoChanged?.(); }
-    p.atkCd = def.cd; p.combatT = 4;
+    p.atkCd = def.cd; p.combatT = CFG.regenDelay;
     const muzzle = rig.muzzle(); rig.fire();
     fx.muzzleFlash(muzzle);
     const aimAt = target.aimPoint();
