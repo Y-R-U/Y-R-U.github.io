@@ -84,6 +84,26 @@ const INTERIORS = {
       { kind: 'medkit', x: 6.5, z: 4.5 },
     ],
   },
+  cafe: {
+    center: [380, 0, 0], floorKind: 'tile', floorColor: 0x5b5046,
+    half: { x: 8, z: 7 }, wallH: 0.55, light: 0x8a7a5a, ambient: 0.55,
+    entry: [0, 5.5], exit: [0, 6.4],
+    furniture: [
+      { model: 'table_coffee', x: -4, z: -2, rot: 0, collide: 1.0 },
+      { model: 'table_coffee', x: 4, z: -2, rot: 0, collide: 1.0 },
+      { model: 'chair', x: -4, z: 0.2, rot: 0, collide: 0.5 },
+      { model: 'chair', x: 4, z: 0.2, rot: 0, collide: 0.5 },
+      { model: 'shelf', x: 0, z: -5, rot: 0, collide: 0.9 },
+      { model: 'crate', x: -6, z: 4, rot: 0.3, collide: 0.7 },
+      { model: 'crate', x: 6, z: 4, rot: -0.3, collide: 0.7 },
+    ],
+    loot: [
+      { kind: 'weapon', id: 'smg', x: 0, z: -3.3 },
+      { kind: 'ammo', ammo: '9mm', n: 30, x: -4, z: -2 },
+      { kind: 'medkit', x: 4, z: -2 },
+      { kind: 'medkit', x: -6, z: 4 },
+    ],
+  },
 };
 
 function floorTexture(kind) {

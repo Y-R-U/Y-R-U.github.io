@@ -269,8 +269,8 @@ function start() {
   ui.setBoot('ready', 1);
   setTimeout(ui.hideBoot, 250);
 
-  // ── zombie horde helpers ──
-  const MAX_Z = 18;
+  // ── zombie horde helpers (difficulty ramps with your kill count) ──
+  const maxZ = () => Math.min(36, 16 + player.kills * 0.3);          // bigger horde over time
   function seedHorde(n) {
     for (let i = 0; i < n; i++) {
       const a = rand(0, 6.28), r = rand(16, CFG.townHalf - 6);
@@ -278,18 +278,19 @@ function start() {
     }
   }
   function pickType() {
+    const k = player.kills;
+    const tough = Math.min(0.5, 0.12 + k * 0.005);                   // brutes/skeletons grow common
     const r = Math.random();
-    if (r < 0.50) return Math.random() < 0.5 ? 'walker' : 'woman';
-    if (r < 0.70) return 'runner';
-    if (r < 0.85) return 'skeleton';
-    return 'brute';
+    if (r < tough) return Math.random() < 0.5 ? 'brute' : 'skeleton';
+    if (r < tough + 0.25) return 'runner';
+    return Math.random() < 0.5 ? 'walker' : 'woman';
   }
   let spawnT = 4;
   function spawnTick(dt) {
     spawnT -= dt;
     const alive = zombies.filter(z => z.alive).length;
-    if (spawnT <= 0 && alive < MAX_Z) {
-      spawnT = rand(3, 6);
+    if (spawnT <= 0 && alive < maxZ()) {
+      spawnT = rand(2.4, 5) / (1 + player.kills / 70);              // spawns quicken as it ramps
       // spawn out past the fog edge, away from the player
       let x, z, tries = 0;
       do { const a = rand(0, 6.28), r = rand(40, CFG.townHalf - 3); x = player.pos.x + Math.cos(a) * r; z = player.pos.z + Math.sin(a) * r; tries++; }
