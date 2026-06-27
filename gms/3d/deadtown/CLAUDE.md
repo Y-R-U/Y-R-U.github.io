@@ -143,21 +143,22 @@ barrel forward); interior floor + pickup visibility (single tinted plane,
 floating spinning glowing pickups); **objective/mission chain** (`objectives.js`,
 HUD banner + rewards); **police armory + café** interiors; **escalating threat
 ramp** (horde grows + tougher with kills); **synthesized audio** (`audio.js` —
-gunshots/melee/hits/groans/pickups, no asset files); **kill-streak combos** +
-score multiplier; **day→night cycle** (`world.tickSky`). Good follow-ups:
+gunshots/melee/hits/groans/pickups/reload, no asset files); **kill-streak
+combos** + score multiplier; **day→night cycle** (`world.tickSky`); **line of
+sight** (no shooting through buildings — `losBlocked`); **reload + magazines**
+(per-weapon mag/reserve, auto-reload, `R`/tap to reload); **survivor NPCs**
+(`survivors.js` — rigged civilians you find cowering, Use to rescue → reward +
+flee, two rescue objectives). Good follow-ups:
 
-1. **Survivor NPCs**: export more rigged prefabs (Animated People pack via
-   `SkinnedExport.ExportList`) for rescuable allies driven by `buildRig` — tie to
-   an objective. Many prefabs available (`man_*`, `woman_*`).
-2. **Line of sight**: `aim.js` + `player.fireGun` lock/hit through walls — pass a
-   building-box segment test so you can't shoot through buildings.
-3. **Reload + magazines**: per-weapon mag size, a reload pose + timer + SFX,
-   out-of-mag auto-reload; HUD shows `mag/reserve`.
-4. **More open interiors**: burger joint, apartments, cabin, car wash are still
+1. **More open interiors**: burger joint, apartments, cabin, car wash are still
    `locked:true` in `BUILDINGS` — add `INTERIORS` specs + flip them.
-5. **Zombie variety/feel**: crawlers, a screamer that summons, pathing around
+2. **Zombie variety/feel**: crawlers, a screamer that summons, pathing around
    buildings (grid A* — none today; they walk straight + get pushed off walls).
-6. **Save the full state** (area, zombie/pickup positions) — currently only the
-   player + objective index serialize; you always resume in town.
-7. **Two-hand grip polish**: long guns bring the left arm up but it doesn't sit
+3. **Save the full state** (area, zombie/pickup/survivor positions) — currently
+   only the player + objective index serialize; you always resume in town.
+4. **Escort survivors**: instead of fleeing, have a rescued survivor follow you
+   to a safe point (the police armory) for a bigger reward.
+5. **Two-hand grip polish**: long guns bring the left arm up but it doesn't sit
    on the foregrip; add an IK-ish offset or a second hand attach.
+6. **Boss / special zombies**, weather, a real soundtrack (ACE-Step), a proper
+   start menu + difficulty select.
