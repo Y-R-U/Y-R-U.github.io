@@ -5,7 +5,8 @@
 // area-swap into/out of buildings, pickups, collisions, the minimap and save.
 
 import * as THREE from 'three';
-import { CFG, SHOT, LITE, AUTO, NOSAVE, SKIP_INTRO, SITES } from './config.js';
+import { CFG, SHOT, LITE, AUTO, NOSAVE, SKIP_INTRO, WPOSE, SITES } from './config.js';
+import { createWposeTuner } from './wpose.js';
 import { clamp, rand, pick, unlockAudio, chime } from './utils.js';
 import { initAssets } from './assets.js';
 import { initHero, makeHumanoid } from './hero.js';
@@ -263,7 +264,7 @@ function start() {
     // fresh: scatter the starting horde, then either cold-open in the bedroom
     // or (?town) drop straight into the street.
     seedHorde(14);
-    if (!SKIP_INTRO && !SHOT) {
+    if (!SKIP_INTRO && !SHOT && !WPOSE) {
       enterInterior('home');
       player.pos.set(interiors.get('home').entryPos.x + 6, 0, interiors.get('home').entryPos.z - 9); // on the bed
       setTimeout(() => intro.run(), 400);
@@ -466,4 +467,6 @@ function start() {
     get errors() { return window.__errors; },
   };
   window.__camera = camera;
+
+  if (WPOSE) createWposeTuner(player, controls);   // ?wpose → live weapon-pose tuner
 }

@@ -57,6 +57,7 @@ export function attachArsenal(rig) {
   rig.combat = c;
   rig.weaponDef = () => curDef;
   rig.weaponId = () => curId;
+  rig.currentWeaponModel = () => loaded[curId] || null;   // live in-hand model (debug tuner)
 
   rig.setWeapon = (id) => {
     const def = WEAPONS[id]; if (!def || id === curId) return;

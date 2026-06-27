@@ -8,6 +8,7 @@ export const LITE = q.has('lite');
 export const AUTO = q.has('auto');
 export const NOSAVE = q.has('nosave');
 export const SKIP_INTRO = q.has('town');   // boot straight into the street
+export const WPOSE = q.has('wpose');       // weapon-pose debug tuner (js/wpose.js)
 
 export const CFG = {
   // town is a rectangle centred on origin (half-extents)
