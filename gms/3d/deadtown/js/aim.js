@@ -30,12 +30,13 @@ export function createAim(scene) {
     target: () => (current && current.alive ? current : null),
     setVisible(v) { laser.visible = v; dot.visible = v; },
 
-    // muzzlePos: world Vector3; faceDir: normalized xz Vector3; zombies: array.
-    // Returns the locked target (or null). Updates the laser visuals.
-    update({ muzzlePos, faceDir, zombies, range, cone }) {
-      // drop a stale target (dead, or not in the current area's zombie list —
-      // e.g. after an area swap the old town target is no longer active)
-      if (current && (!current.alive || !zombies.includes(current))) current = null;
+    // muzzlePos: world Vector3; faceDir: normalized xz Vector3; zombies: array;
+    // blocked(from,to)->bool drops line-of-sight through buildings. Returns the
+    // locked target (or null) and updates the laser visuals.
+    update({ muzzlePos, faceDir, zombies, range, cone, blocked }) {
+      const los = (z) => !blocked || !blocked(muzzlePos, z.group.position);
+      // drop a stale target (dead, gone from the area, or now behind a wall)
+      if (current && (!current.alive || !zombies.includes(current) || !los(current))) current = null;
       if (current) {
         _to.set(current.group.position.x - muzzlePos.x, 0, current.group.position.z - muzzlePos.z);
         const d = _to.length();
@@ -43,7 +44,7 @@ export function createAim(scene) {
         const dot2 = _to.x * faceDir.x + _to.z * faceDir.z;
         if (d > range + 2 || Math.acos(THREE.MathUtils.clamp(dot2, -1, 1)) > cone * 1.7) current = null;
       }
-      // acquire the best (most-centred, then nearest) zombie in cone+range
+      // acquire the nearest (centred as tie-break) zombie in cone+range with LOS
       if (!current) {
         let best = null, bestScore = -Infinity;
         for (const z of zombies) {
@@ -54,6 +55,7 @@ export function createAim(scene) {
           _to.normalize();
           const ang = Math.acos(THREE.MathUtils.clamp(_to.x * faceDir.x + _to.z * faceDir.z, -1, 1));
           if (ang > cone) continue;
+          if (!los(z)) continue;                                 // can't see through a building
           const score = (1 - d / range) * 2 + (1 - ang / cone);  // nearest first, centred as tie-break
           if (score > bestScore) { bestScore = score; best = z; }
         }

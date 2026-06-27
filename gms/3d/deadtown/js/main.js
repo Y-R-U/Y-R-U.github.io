@@ -317,6 +317,25 @@ function start() {
       if (d < minD && d > 1e-5) { p.x = cc.x + (dx / d) * minD; p.z = cc.z + (dz / d) * minD; }
     }
   }
+  // line-of-sight: does the muzzle→target segment cross any building footprint?
+  // Liang–Barsky clip of the 2D segment against each (slightly padded) box.
+  function segHitsBox(ax, az, bx, bz, b) {
+    const pad = 0.3;
+    const minX = b.x - b.hx - pad, maxX = b.x + b.hx + pad, minZ = b.z - b.hz - pad, maxZ = b.z + b.hz + pad;
+    const dx = bx - ax, dz = bz - az;
+    let t0 = 0, t1 = 1;
+    const edges = [[-dx, ax - minX], [dx, maxX - ax], [-dz, az - minZ], [dz, maxZ - az]];
+    for (const [p, q] of edges) {
+      if (Math.abs(p) < 1e-9) { if (q < 0) return false; }
+      else { const r = q / p; if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; } }
+    }
+    return t0 <= t1;
+  }
+  function losBlocked(from, to) {
+    for (const b of town.colliders.boxes) if (segHitsBox(from.x, from.z, to.x, to.z, b)) return true;
+    return false;
+  }
+
   function resolvePlayer() {
     const px = player.pos;
     for (const cc of activeColliders()) {
@@ -354,7 +373,7 @@ function start() {
     const def = player.weaponDef();
     if (player.alive) {
       const rng = def.kind === 'melee' ? 5 : Math.min(CFG.aimRange, def.range);
-      target = aim.update({ muzzlePos: player.muzzle(), faceDir: player.faceDir(), zombies: activeZombies(), range: rng, cone: CFG.aimCone });
+      target = aim.update({ muzzlePos: player.muzzle(), faceDir: player.faceDir(), zombies: activeZombies(), range: rng, cone: CFG.aimCone, blocked: area === 'town' ? losBlocked : null });
       aim.setVisible(true);
     } else aim.setVisible(false);
 
