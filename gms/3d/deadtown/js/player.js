@@ -19,7 +19,7 @@ export function createPlayer(rig, world, scene, bus) {
     medkits: 1,
     weapons: ['axe', 'pistol'],
     curWeapon: 'axe',
-    score: 0, kills: 0, combo: 0, comboTimer: 0,
+    score: 0, kills: 0, combo: 0, comboTimer: 0, rescued: 0,
     mags: {}, reloading: false, reloadT: 0,
     atkCd: 0, combatT: 0, moving: false, walk: 0, alive: true,
     aiming: false, target: null, _dry: false, _moveYaw: Math.PI, _dt: 0.016,
@@ -211,7 +211,7 @@ export function createPlayer(rig, world, scene, bus) {
   // ── save / load (lean) ──
   p.serialize = () => ({
     pos: [pos.x, pos.z], yaw: p.yaw, hp: p.hp, ammo: p.ammo, medkits: p.medkits,
-    weapons: p.weapons, cur: p.curWeapon, score: p.score, kills: p.kills,
+    weapons: p.weapons, cur: p.curWeapon, score: p.score, kills: p.kills, rescued: p.rescued,
   });
   p.load = (d) => {
     if (!d) return;
@@ -221,7 +221,7 @@ export function createPlayer(rig, world, scene, bus) {
     // drop any weapon ids the current build no longer knows about, never empty
     p.weapons = (d.weapons || []).filter(id => WEAPONS[id]);
     if (!p.weapons.length) p.weapons = ['axe', 'pistol'];
-    p.score = d.score || 0; p.kills = d.kills || 0;
+    p.score = d.score || 0; p.kills = d.kills || 0; p.rescued = d.rescued || 0;
     selectWeapon(d.cur && p.weapons.includes(d.cur) ? d.cur : p.weapons[0]);
   };
 

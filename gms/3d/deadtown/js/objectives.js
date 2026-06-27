@@ -11,7 +11,9 @@ export function createObjectives(ctx, bus) {
     { id: 'gearup', text: 'Find a real firearm',        hint: 'scavenge the streets', done: () => has('shotgun', 'rifle', 'smg', 'revolver', 'machinegun'), reward: () => P.addMedkit(1) },
     { id: 'armory', text: 'Raid the police armory',      hint: 'NE — follow the minimap', done: () => ctx.visited.has('police'), reward: () => P.addAmmo('rifle', 30) },
     { id: 'cull',   text: 'Thin the horde — 25 kills',   hint: '', done: () => P.kills >= 25, reward: () => { P.addMedkit(1); P.addAmmo('9mm', 30); } },
+    { id: 'rescue', text: 'Rescue a survivor',           hint: 'follow the blue 🆘 beacons', done: () => P.rescued >= 1, reward: () => P.addMedkit(1) },
     { id: 'arsenal', text: 'Collect 4 different weapons', hint: '', done: () => P.weapons.length >= 4, reward: () => P.addMedkit(2) },
+    { id: 'rescue3', text: 'Rescue 3 survivors',         hint: '', done: () => P.rescued >= 3, reward: () => P.addAmmo('rifle', 30) },
     { id: 'horde',  text: 'Hold out — 60 kills',         hint: 'the dead keep coming', done: () => P.kills >= 60, reward: () => P.addAmmo('rifle', 40) },
   ];
   let i = 0;

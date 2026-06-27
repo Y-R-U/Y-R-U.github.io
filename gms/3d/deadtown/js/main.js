@@ -14,6 +14,7 @@ import { buildTown } from './townobj.js';
 import { buildInteriors, makePickupVisual, tickPickup } from './interiors.js';
 import { createPlayer } from './player.js';
 import { makeZombie, preloadZombies, ZTYPES } from './zombies.js';
+import { makeSurvivor, preloadSurvivors } from './survivors.js';
 import { createControls } from './controls.js';
 import { createAim } from './aim.js';
 import { createMinimap } from './minimap.js';
@@ -53,6 +54,7 @@ async function boot() {
     await initHero();
     ui.setBoot('raising the dead…', 0.62);
     await preloadZombies();
+    await preloadSurvivors();
     ui.setBoot('building the town…', 0.8);
     start();
   } catch (e) {
@@ -80,9 +82,15 @@ function start() {
   const returnDoor = {};
   for (const it of town.interactables) if (it.interior) returnDoor[it.interior] = it;
 
-  // zombies live under one group so we can hide them inside buildings
+  // zombies + survivors live under one group so we can hide them inside buildings
   const zGroup = new THREE.Group(); scene.add(zGroup);
   const zombies = [];
+  const survivors = [];
+  function placeSurvivors() {
+    const spots = [['casual', -14, 9], ['biz', 25, 7], ['doc', -31, -15]];
+    for (const [ty, sx, sz] of spots) survivors.push(makeSurvivor(ty, sx, sz, zGroup, bus, world.groundHeight));
+  }
+  const liveSurvivorInteracts = () => survivors.filter(s => !s.rescued && !s.remove).map(s => s.interact);
   function spawnZombie(type, x, z) {
     const c = makeZombie(type, x, z, zGroup, bus, world.groundHeight, zCollide);
     zombies.push(c); return c;
@@ -93,7 +101,7 @@ function start() {
   const visited = new Set();   // interiors entered (for objectives)
   const intro = createIntro(interiors.get('home').tv);
   const activeZombies = () => area === 'town' ? zombies : [];
-  const activeInteractables = () => area === 'town' ? town.interactables : interiors.get(area).interactables;
+  const activeInteractables = () => area === 'town' ? town.interactables.concat(liveSurvivorInteracts()) : interiors.get(area).interactables;
   const activePickups = () => area === 'town' ? townPickups : interiors.get(area).pickups;
   const activeColliders = () => area === 'town' ? town.colliders.circles : interiors.get(area).colliders;
   const activeBoxes = () => area === 'town' ? town.colliders.boxes : [];
@@ -198,6 +206,15 @@ function start() {
       enterInterior(nearIt.interior);
     } else if (nearIt.kind === 'exit') {
       exitToStreet(nearIt.interior);
+    } else if (nearIt.kind === 'rescue') {
+      const reward = nearIt.survivor.rescue();
+      if (reward) {
+        player.rescued++;
+        if (reward.medkit) player.addMedkit(reward.medkit);
+        if (reward.ammo) player.addAmmo(reward.ammo, reward.n);
+        ui.toast(`🆘 Survivor rescued! ${reward.medkit ? `+${reward.medkit} medkit` : `+${reward.n} ${reward.ammo}`}`);
+        audio.objective();
+      }
     }
   }
 
@@ -240,6 +257,7 @@ function start() {
 
   // ── load / fresh ──
   placeStarterLoot();
+  placeSurvivors();
   const saved = !NOSAVE && load();
   if (!saved) {
     // fresh: scatter the starting horde, then either cold-open in the bedroom
@@ -389,6 +407,9 @@ function start() {
     for (let i = zombies.length - 1; i >= 0; i--) if (zombies[i].remove) { zombies[i].dispose?.(); zGroup.remove(zombies[i].group); zombies.splice(i, 1); }
     // prune collected town pickups (already detached from the scene)
     for (let i = townPickups.length - 1; i >= 0; i--) if (townPickups[i].taken) townPickups.splice(i, 1);
+    // survivors (town only)
+    if (area === 'town') for (const s of survivors) s.update(dt, t, player);
+    for (let i = survivors.length - 1; i >= 0; i--) if (survivors[i].remove) { zGroup.remove(survivors[i].group); survivors.splice(i, 1); }
     if (area === 'town' && player.alive) spawnTick(dt);
 
     // 5. pickups (spin/glow, auto collect on walk-over)
@@ -412,7 +433,7 @@ function start() {
     if (!LITE && area === 'town') { world.sun.position.set(player.pos.x + CFG.sunDir[0], CFG.sunDir[1], player.pos.z + CFG.sunDir[2]); world.sunTarget.position.copy(player.pos); }
 
     // minimap (a few times a second)
-    mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups }); }
+    mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups, survivors }); }
     objT += dt; if (objT > 1) { objT = 0; if (objectives.check() || !objShown) { objShown = true; ui.setObjective(objectives.text()); } }
     groanT -= dt; if (groanT <= 0) { groanT = rand(4, 9); if (area === 'town' && activeZombies().some(z => z.alive && Math.hypot(z.group.position.x - player.pos.x, z.group.position.z - player.pos.z) < 22)) audio.groan(); }
 
@@ -431,7 +452,7 @@ function start() {
   }
 
   // ── test hooks ──
-  window.__game = { player, world, town, interiors, controls, aim, zombies, get area() { return area; }, enterInterior, exitToStreet, scene, camera };
+  window.__game = { player, world, town, interiors, controls, aim, zombies, survivors, doInteract, get area() { return area; }, enterInterior, exitToStreet, scene, camera };
   window.__state = {
     get fps() { return Math.round(fps); },
     get pos() { return { x: +player.pos.x.toFixed(1), z: +player.pos.z.toFixed(1) }; },

@@ -40,7 +40,7 @@ KEY = "deadtown-lpup-9Xv!aron-2026"   # also embedded in js/assets.js (must matc
 # bones); the real articulated characters come from the SKINNED exporter
 # (Airon.SkinnedExport.ExportList) into RIGZ — same 67-80 bone skeleton family
 # as the hero, so one driver animates them all. See tools/ + CLAUDE.md.
-RIGS = ["hero", "zombie_m", "zombie_w", "skeleton"]
+RIGS = ["hero", "zombie_m", "zombie_w", "skeleton", "survivor_w", "survivor_b", "survivor_d"]
 
 # logical name -> (source root, GLB filename)
 MODELS = {
@@ -49,8 +49,9 @@ MODELS = {
     "zombie_m":   (RIGZ, "man_zombie.glb"),                # rigged (skinned export)
     "zombie_w":   (RIGZ, "woman_zombie.glb"),              # rigged
     "skeleton":   (RIGZ, "man_skeleton.glb"),              # rigged bonus enemy
-    "survivor":   (SRC,  "man-coat-rig-901c6205.glb"),     # static NPC (gallery)
-    "cop":        (SRC,  "man-police-rig-4fd6c948.glb"),   # static NPC / future
+    "survivor_w": (RIGZ, "woman_casual.glb"),              # rigged civilian (rescue)
+    "survivor_b": (RIGZ, "man_business.glb"),              # rigged civilian (rescue)
+    "survivor_d": (RIGZ, "woman_doctor.glb"),              # rigged medic (rescue)
 
     # --- weapons (static, attach to the hand) ---
     "axe":        (SRC, "axe-c2822dd9.glb"),

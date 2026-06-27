@@ -16,7 +16,7 @@ export function createMinimap(canvas) {
 
   const PK = { weapon: '#ffd24a', ammo: '#6fd0ff', medkit: '#7aff8a' };
   return {
-    update({ player, zombies, buildings, pickups }) {
+    update({ player, zombies, buildings, pickups, survivors }) {
       g.clearRect(0, 0, SZ, SZ);
       // ground
       g.fillStyle = '#23251f'; g.fillRect(0, 0, SZ, SZ);
@@ -35,6 +35,12 @@ export function createMinimap(canvas) {
         if (p.taken) continue;
         g.fillStyle = PK[p.kind] || '#fff';
         g.fillRect(mx(p.pos.x) - 2, my(p.pos.z) - 2, 4, 4);
+      }
+      // survivors (blue, pulsing)
+      for (const s of (survivors || [])) {
+        if (s.rescued || s.remove) continue;
+        g.fillStyle = '#7fd0ff';
+        g.beginPath(); g.arc(mx(s.group.position.x), my(s.group.position.z), 3, 0, 7); g.fill();
       }
       // zombies
       g.fillStyle = '#ff4536';
