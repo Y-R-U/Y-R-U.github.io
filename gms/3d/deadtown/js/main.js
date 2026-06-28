@@ -378,12 +378,17 @@ function start() {
   const clock = new THREE.Clock();
   let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, objT = 0, objShown = false, groanT = 3, frameCount = 0;
   let autoT = 0, autoMv = { x: 0, z: 0, run: false };
+  let paused = false;   // ?wpose tuner freezes the sim while its panel is open
   function loop() {
     requestAnimationFrame(loop);
     let dt = clamp(clock.getDelta(), 0, 0.05);
     frames++; fpsT += dt; if (fpsT >= 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
     t += dt;
 
+    // When the wpose panel is open the sim is frozen (no zombies, no movement)
+    // so the tuner is the only thing posing the rig — render + camera still run
+    // at the bottom so you can orbit and inspect the weapon.
+    if (!paused) {
     // 1. move from joystick (or the soak driver)
     if (AUTO) autoTick(dt);
     player.move(dt, t, AUTO ? autoMv : controls.getMove());
@@ -437,6 +442,7 @@ function start() {
     mmT += dt; if (mmT > 0.18) { mmT = 0; minimap.update({ player, zombies: activeZombies(), buildings: town.buildings, pickups: townPickups, survivors }); }
     objT += dt; if (objT > 1) { objT = 0; if (objectives.check() || !objShown) { objShown = true; ui.setObjective(objectives.text()); } }
     groanT -= dt; if (groanT <= 0) { groanT = rand(4, 9); if (area === 'town' && activeZombies().some(z => z.alive && Math.hypot(z.group.position.x - player.pos.x, z.group.position.z - player.pos.z) < 22)) audio.groan(); }
+    }   // end if (!paused)
 
     ui.bars();
     controls.tick(dt);
@@ -468,5 +474,7 @@ function start() {
   };
   window.__camera = camera;
 
-  if (WPOSE) createWposeTuner(player, controls);   // ?wpose → live weapon-pose tuner
+  // ?wpose → live weapon-pose tuner. Pausing also hides the horde so the posing
+  // stage is just the player (the seeded zombies are frozen, but out of view).
+  if (WPOSE) createWposeTuner(player, controls, { setPaused: (v) => { paused = v; zGroup.visible = !v; aim.setVisible(!v); } });
 }

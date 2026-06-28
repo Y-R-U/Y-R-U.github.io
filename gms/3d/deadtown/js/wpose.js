@@ -17,11 +17,11 @@ const KEY = 'deadtown_wpose_v2';
 const r3 = (n) => Math.round(n * 1000) / 1000;
 const v3 = (a) => `[${a.map(r3).join(', ')}]`;
 
-export function createWposeTuner(player, controls) {
+export function createWposeTuner(player, controls, hooks = {}) {
   const rig = player.rig;
   const ids = Object.keys(WEAPONS);
   for (const id of ids) player.giveWeapon(id);     // own them all so we can cycle
-  let idx = 0, forceAim = true;
+  let idx = 0, forceAim = true, expanded = true;
 
   // default config straight from WEAPONS (deep copy so edits don't mutate defs)
   const fresh = (id) => {
@@ -80,10 +80,10 @@ export function createWposeTuner(player, controls) {
       <div id="wp-hand"></div>
       <div class="grp">Aim arm</div>
       <div id="wp-arm"></div>
-      <label class="chk"><input type="checkbox" id="wp-aim" checked> Aim pose</label>
+      <label class="chk"><input type="checkbox" id="wp-aim" checked> Aiming stance (gun up)</label>
       <div class="btns"><button id="wp-reset">Reset</button><button id="wp-copy">Copy all</button></div>
       <textarea id="wp-out" readonly placeholder="Copy output appears here — paste it back to Claude"></textarea>
-      <div class="hint">Tune both groups, hit Copy all (every weapon, 1 click), paste back. Saved automatically.</div>
+      <div class="hint">Sim is paused while this panel is open (no zombies). Tap – to fold &amp; play. Tune both groups, Copy all (1 click), paste back. Auto-saved.</div>
     </div>
   `;
   document.body.appendChild(el);
@@ -142,12 +142,17 @@ export function createWposeTuner(player, controls) {
   }
   function select(n) { idx = (n + ids.length) % ids.length; player.selectWeapon(ids[idx]); syncInputs(); }
 
+  // expanded → freeze the sim and let the tuner own the pose; folded → resume
+  // normal gameplay (peek at / test the character) and the tuner hands off.
+  function setExpanded(v) {
+    expanded = v;
+    el.classList.toggle('folded', !v);
+    el.querySelector('#wp-fold').textContent = v ? '–' : '+';
+    hooks.setPaused?.(v);
+  }
   el.querySelector('#wp-prev').onclick = () => select(idx - 1);
   el.querySelector('#wp-next').onclick = () => select(idx + 1);
-  el.querySelector('#wp-fold').onclick = () => {
-    el.classList.toggle('folded');
-    el.querySelector('#wp-fold').textContent = el.classList.contains('folded') ? '+' : '–';
-  };
+  el.querySelector('#wp-fold').onclick = () => setExpanded(!expanded);
   el.querySelector('#wp-aim').onchange = (e) => { forceAim = e.target.checked; };
   el.querySelector('#wp-reset').onclick = () => { cfg[ids[idx]] = fresh(ids[idx]); persist(); syncInputs(); };
   el.querySelector('#wp-copy').onclick = () => {
@@ -166,22 +171,28 @@ export function createWposeTuner(player, controls) {
     btn.textContent = 'Copied ✓'; setTimeout(() => { btn.textContent = old; }, 1100);
   };
 
-  // apply every frame (own rAF; runs after the game loop so it wins). Keeps the
-  // model transform live and, when enabled, holds the per-weapon firing stance.
+  // own rAF. While expanded the sim is paused (main.js), so the tuner is the
+  // SOLE driver of the rig: lay down a clean still idle, then the in-hand model
+  // transform, then the arm pose (firing stance, or relaxed when unchecked).
   function frame() {
     requestAnimationFrame(frame);
-    const c = cfg[ids[idx]], m = rig.currentWeaponModel?.();
+    if (!expanded) return;                          // folded → game runs normally
+    rig.animate?.(0, 0);                            // neutral, motionless base
+    const c = cfg[ids[idx]], P = rig.parts, two = !!WEAPONS[ids[idx]].twoHand;
+    const m = rig.currentWeaponModel?.();
     if (m) { m.position.set(c.hand.pos[0], c.hand.pos[1], c.hand.pos[2]); m.rotation.set(c.hand.rot[0], c.hand.rot[1], c.hand.rot[2]); m.scale.setScalar(c.hand.scale); m.visible = true; }
-    if (forceAim && rig.parts?.rArm) {
-      const a = c.aim, P = rig.parts;
+    if (!P?.rArm) return;
+    if (forceAim) {                                 // raised firing stance (Aim-arm sliders)
+      const a = c.aim;
       P.rArm.apply(qx(a.rArm[0]).multiply(qy(a.rArm[1])).multiply(qz(a.rArm[2])).multiply(rig.DOWN_R));
       P.rElb.apply(qx(a.rElb));
-      if (WEAPONS[ids[idx]].twoHand) {
-        P.lArm.apply(qx(a.lArm[0]).multiply(qy(a.lArm[1])).multiply(qz(a.lArm[2])).multiply(rig.DOWN_L));
-        P.lElb.apply(qx(a.lElb));
-      }
+      if (two) { P.lArm.apply(qx(a.lArm[0]).multiply(qy(a.lArm[1])).multiply(qz(a.lArm[2])).multiply(rig.DOWN_L)); P.lElb.apply(qx(a.lElb)); }
+    } else {                                        // relaxed: gun lowered at the side
+      P.rArm.apply(qx(-0.4).multiply(rig.DOWN_R)); P.rElb.apply(qx(0));
+      if (two) { P.lArm.apply(qx(-0.4).multiply(rig.DOWN_L)); P.lElb.apply(qx(0)); }
     }
   }
-  select(0); requestAnimationFrame(frame);
-  console.log('[wpose] tuner active — In hand + Aim arm sliders; "Copy all" emits every weapon.');
+  select(0); setExpanded(true);                     // start paused + posing
+  requestAnimationFrame(frame);
+  console.log('[wpose] tuner active — sim paused; In hand + Aim arm sliders; "Copy all" emits every weapon.');
 }
