@@ -379,8 +379,45 @@ function start() {
   let t = 0, fps = 60, frames = 0, fpsT = 0, mmT = 0, objT = 0, objShown = false, groanT = 3, frameCount = 0;
   let autoT = 0, autoMv = { x: 0, z: 0, run: false };
   let paused = false;   // ?wpose tuner freezes the sim while its panel is open
+
+  // ── WebGL context recovery ──
+  // Mobile browsers free the GL context when the tab is backgrounded; without
+  // this you return to a black canvas. preventDefault() lets the browser restore
+  // it (THREE re-uploads on the next render); if it doesn't come back, a
+  // tap-to-resume card reloads (state was saved on hide → resume in town).
+  let glLost = false, resumeEl = null;
+  const glCanvas = renderer.domElement;
+  glCanvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); glLost = true; showResume(); }, false);
+  glCanvas.addEventListener('webglcontextrestored', () => { glLost = false; clock.getDelta(); hideResume(); }, false);
+  addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    clock.getDelta();   // drop the long idle delta so the first frame isn't a jump
+    setTimeout(() => { if (renderer.getContext().isContextLost()) { glLost = true; showResume(); } }, 350);
+  });
+  function showResume() {
+    if (resumeEl) { resumeEl.style.display = 'flex'; return; }
+    const st = document.createElement('style');
+    st.textContent = `#gl-resume{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(6,8,5,.93);font:15px -apple-system,system-ui,sans-serif;color:#e8efdd}
+      #gl-resume .card{max-width:280px;text-align:center;padding:22px 20px;background:#141811;border:1px solid #3a4a2a;border-radius:14px;box-shadow:0 8px 30px #000a}
+      #gl-resume .t{font-size:18px;font-weight:700;color:#ffd24a;margin-bottom:8px}
+      #gl-resume .s{font-size:13px;color:#aab79a;line-height:1.45;margin-bottom:16px}
+      #gl-resume button{background:#2e3a22;border:1px solid #5a6e3a;color:#eaf2dd;border-radius:9px;padding:11px 22px;font-size:15px;font-weight:600}`;
+    document.head.appendChild(st);
+    resumeEl = document.createElement('div');
+    resumeEl.id = 'gl-resume';
+    resumeEl.innerHTML = `<div class="card"><div class="t">▶ Resume</div><div class="s">The 3D view was dropped while the game was in the background. Tap to restore it.</div><button>Tap to resume</button></div>`;
+    resumeEl.querySelector('button').onclick = recover;
+    document.body.appendChild(resumeEl);
+  }
+  function hideResume() { if (resumeEl) resumeEl.style.display = 'none'; }
+  function recover() {
+    if (renderer.getContext().isContextLost()) { save(); location.reload(); return; }
+    glLost = false; clock.getDelta(); hideResume();
+  }
+
   function loop() {
     requestAnimationFrame(loop);
+    if (glLost) { clock.getDelta(); return; }   // context dropped — hold for restore / resume tap
     let dt = clamp(clock.getDelta(), 0, 0.05);
     frames++; fpsT += dt; if (fpsT >= 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
     t += dt;
