@@ -21,32 +21,31 @@ import { model as loadModel } from './assets.js';
 //   preview but real melee swings instead.
 export const WEAPONS = {
   axe:        { name: 'Fire Axe',    model: 'axe',        kind: 'melee', dmg: [22, 36], range: 2.1, cd: 0.62, icon: '🪓',
-                hand: { pos: [0, 0.02, 0.05], rot: [Math.PI / 2, 0, 0.2], scale: 1.0 },
-                aim: { rArm: [-0.35, 0, 0], rElb: 0, lArm: [-0.5, 0, 0], lElb: 0 } },
+                hand: { pos: [0.185, 0.06, -0.27], rot: [-0.31, 1.73, 0.53], scale: 1.0 },
+                aim: { rArm: [-1.43, 0.58, -0.18], rElb: -0.46, lArm: [-0.5, 0, 0], lElb: 0 } },
   bat:        { name: 'Baseball Bat', model: 'bat',       kind: 'melee', dmg: [14, 24], range: 2.1, cd: 0.52, icon: '🏏',
-                hand: { pos: [0, 0.0, 0.05], rot: [Math.PI / 2, 0, 0.15], scale: 1.0 },
+                hand: { pos: [0.15, -0.065, -0.055], rot: [0.05, 0, 0.15], scale: 1.0 },
                 aim: { rArm: [-0.35, 0, 0], rElb: 0, lArm: [-0.5, 0, 0], lElb: 0 } },
-  // guns share native orientation (re-origined to bottom-centre, barrel +Z),
-  // so rot=[0,0,0] points the barrel down the forearm; pos.z pushes the grip
-  // into the hand (longer guns need a bigger push), pos.y drops it into the palm.
+  // grip values dialled in via ?wpose. hand = the GLB in the wrist; aim = the
+  // firing-arm stance (rArm xyz / rElb, + lArm xyz / lElb on two-hand guns).
   pistol:     { name: 'Pistol',      model: 'pistol',     kind: 'gun', dmg: [18, 26], range: 15, cd: 0.40, ammo: '9mm', spread: 0.015, mag: 12, reload: 1.1, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.03], rot: [0, 0, 0], scale: 1.0 },
+                hand: { pos: [0.2, -0.02, -0.015], rot: [-0.49, 1.55, 0], scale: 1.0 },
                 aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
   revolver:   { name: 'Revolver',    model: 'revolver',   kind: 'gun', dmg: [34, 50], range: 17, cd: 0.78, ammo: '9mm', spread: 0.01, mag: 6, reload: 1.5, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.07], rot: [0, 0, 0], scale: 1.0 },
+                hand: { pos: [0.255, -0.04, 0.025], rot: [0.07, 1.21, 0], scale: 1.0 },
                 aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
   smg:        { name: 'Uzi',         model: 'smg',        kind: 'gun', dmg: [11, 17], range: 14, cd: 0.11, ammo: '9mm', spread: 0.05, auto: true, mag: 30, reload: 1.6, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.05], rot: [0, 0, 0], scale: 1.0 }, twoHand: true,
+                hand: { pos: [0.24, -0.17, 0.115], rot: [-0.13, 1.41, 0], scale: 1.0 }, twoHand: true,
                 aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
   shotgun:    { name: 'Shotgun',     model: 'shotgun',    kind: 'gun', dmg: [8, 14], pellets: 7, range: 10, cd: 0.82, ammo: 'shells', spread: 0.16, mag: 6, reload: 2.0, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.2], rot: [0, 0, 0], scale: 1.0 }, twoHand: true,
-                aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
+                hand: { pos: [-0.025, -0.095, -0.195], rot: [-0.53, 1.79, 0.53], scale: 1.0 }, twoHand: true,
+                aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.57, -0.28, 0], lElb: -0.7 } },
   rifle:      { name: 'Rifle',       model: 'rifle',      kind: 'gun', dmg: [44, 64], range: 26, cd: 1.05, ammo: 'rifle', spread: 0.006, mag: 8, reload: 1.8, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.26], rot: [0, 0, 0], scale: 1.0 }, twoHand: true,
-                aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
+                hand: { pos: [0.235, -0.01, -0.115], rot: [-0.51, 1.55, 0.25], scale: 1.0 }, twoHand: true,
+                aim: { rArm: [-1.5, -0.04, 0], rElb: -0.15, lArm: [-1.67, 0, 0], lElb: -0.7 } },
   machinegun: { name: 'Machine Gun', model: 'machinegun', kind: 'gun', dmg: [15, 23], range: 22, cd: 0.085, ammo: 'rifle', spread: 0.04, auto: true, mag: 60, reload: 2.5, icon: '🔫',
-                hand: { pos: [0.03, -0.03, 0.2], rot: [0, 0, 0], scale: 1.0 }, twoHand: true,
-                aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.25, 0, 0], lElb: -0.7 } },
+                hand: { pos: [0.34, -0.02, -0.14], rot: [-0.05, 1.61, 0], scale: 1.0 }, twoHand: true,
+                aim: { rArm: [-1.5, 0, 0], rElb: -0.15, lArm: [-1.57, -0.22, 0], lElb: -0.7 } },
 };
 
 export const AMMO_KINDS = ['9mm', 'shells', 'rifle'];

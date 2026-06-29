@@ -123,7 +123,11 @@ Reused from the template: `js/fx.js` (splats/bars/tracers/blood/muzzle flash),
 
 `?town` skip the bedroom intro (straight into the street) · `?nosave` fresh ·
 `?shot` thumbnail stage (HUD hidden) · `?lite` drop shadows/density · `?auto`
-soak-drive.
+soak-drive · `?wpose` weapon-pose tuner (`js/wpose.js`): freezes the sim +
+hides the horde, sliders for each weapon's in-hand model (pos/rot/scale) AND
+firing stance (`aim`: R/L shoulder xyz + elbows), "Copy all" emits a
+paste-ready `hand:`+`aim:` block per weapon. This is how the grips in
+`WEAPONS` were dialled in.
 
 Headless Chrome + puppeteer-core (`--use-angle=swiftshader
 --enable-unsafe-swiftshader`); serve `python3 -m http.server 8810` from the site
@@ -138,8 +142,9 @@ use real waits. After visual changes re-stage `assets/screenshots/deadtown.jpg`
 
 The slice is complete + runnable. **Done since launch:** articulated rigged
 zombies (skinned export) + skeleton type; all weapons obtainable (world spawns +
-drops + minimap loot dots); in-hand weapon holding fixed (guns `rot=[0,0,0]`,
-barrel forward); interior floor + pickup visibility (single tinted plane,
+drops + minimap loot dots); **in-hand weapon holding + firing stance tuned per
+weapon** (`hand` grip + `aim` arm pose in `WEAPONS`, dialled in via `?wpose`);
+interior floor + pickup visibility (single tinted plane,
 floating spinning glowing pickups); **objective/mission chain** (`objectives.js`,
 HUD banner + rewards); **police armory + café** interiors; **escalating threat
 ramp** (horde grows + tougher with kills); **synthesized audio** (`audio.js` —
@@ -158,7 +163,8 @@ flee, two rescue objectives). Good follow-ups:
    only the player + objective index serialize; you always resume in town.
 4. **Escort survivors**: instead of fleeing, have a rescued survivor follow you
    to a safe point (the police armory) for a bigger reward.
-5. **Two-hand grip polish**: long guns bring the left arm up but it doesn't sit
-   on the foregrip; add an IK-ish offset or a second hand attach.
+5. **Two-hand grip polish**: grips + stance are now tuned per weapon via
+   `?wpose`, but the left hand still floats near (not locked onto) the foregrip
+   — an IK-ish offset or second hand-attach bone would nail it.
 6. **Boss / special zombies**, weather, a real soundtrack (ACE-Step), a proper
    start menu + difficulty select.
