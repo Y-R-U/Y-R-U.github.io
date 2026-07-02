@@ -1,0 +1,4 @@
+data/deadtown.db
+data/deadtown.db-wal
+data/deadtown.db-shm
+server/f5deadtown

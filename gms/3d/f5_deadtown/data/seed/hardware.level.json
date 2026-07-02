@@ -1,0 +1,37 @@
+{
+  "id": "hardware",
+  "name": "Hanson's Hardware",
+  "kind": "interior",
+  "bounds": { "hx": 8, "hz": 7 },
+  "env": { "preset": "interior", "floor": "concrete", "floorColor": "#a8a89c", "dayCycle": false, "wallH": 0.55 },
+  "roads": null,
+  "playerStart": { "x": 0, "z": 5.2, "yaw": 3.1416 },
+  "objects": [
+    { "uid": "o_shelf1", "model": "shelf", "x": -6, "z": -3.5, "rot": 0, "scale": 1, "collide": { "type": "circle", "r": 0.9 } },
+    { "uid": "o_shelf2", "model": "shelf", "x": -2, "z": -3.5, "rot": 0, "scale": 1, "collide": { "type": "circle", "r": 0.9 } },
+    { "uid": "o_shelf3", "model": "shelf", "x": 2,  "z": -3.5, "rot": 0, "scale": 1, "collide": { "type": "circle", "r": 0.9 } },
+    { "uid": "o_shelf4", "model": "shelf", "x": 6,  "z": -3.5, "rot": 0, "scale": 1, "collide": { "type": "circle", "r": 0.9 } },
+    { "uid": "o_counter","model": "table_coffee", "x": -4.2, "z": 3.4, "rot": 1.5708, "scale": 1.2, "collide": { "type": "circle", "r": 1.1 } },
+    { "uid": "o_crate1", "model": "crate",  "x": 6.4,  "z": 4.2, "rot": -0.3, "scale": 1, "collide": { "type": "circle", "r": 0.7 } },
+    { "uid": "o_crate2", "model": "crate",  "x": 5.2,  "z": 5.0, "rot": 0.5,  "scale": 0.85, "collide": { "type": "circle", "r": 0.6 } },
+    { "uid": "o_barrel1","model": "barrel", "x": -6.8, "z": 0.5, "rot": 0,    "scale": 1, "collide": { "type": "circle", "r": 0.6 } },
+    { "uid": "o_bin1",   "model": "bin",    "x": 7.2,  "z": 0.2, "rot": 1.2,  "scale": 1, "collide": { "type": "circle", "r": 0.7 } }
+  ],
+  "pickups": [
+    { "uid": "p_med",  "kind": "medkit", "x": 6.2, "z": -1.4 },
+    { "uid": "p_ammo", "kind": "ammo", "ammo": "9mm", "n": 24, "x": -6.2, "z": -1.4 }
+  ],
+  "spawns": [
+    { "uid": "s_aisle", "x": 0, "z": -2.8, "r": 3.5, "types": ["walker"], "count": 1, "maxAlive": 1, "respawn": false, "rate": 0 }
+  ],
+  "hotspots": [
+    { "uid": "h_axe", "type": "item", "x": -5.4, "z": 4.6, "r": 2.2, "label": "Behind the register", "once": true, "sets": "got_axe",
+      "text": "Bolted to the wall behind the register: HANSON'S — IN CASE OF FIRE. The axe is heavy, oiled, perfect.",
+      "gives": [ { "kind": "weapon", "item": "axe" } ] },
+    { "uid": "h_ledger", "type": "note", "x": -3.4, "z": 4.4, "r": 2.0, "label": "IOU ledger",
+      "text": "Hanson's IOU ledger. Last entry, three days ago: \"D. Henderson — 1 box roofing nails.\"" },
+    { "uid": "h_exit", "type": "exit", "x": 0, "z": 6.2, "r": 2.4, "label": "Door to the street",
+      "target": { "level": "street1", "hotspot": "h_hw_door" } }
+  ],
+  "ambient": null
+}

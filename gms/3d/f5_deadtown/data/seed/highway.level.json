@@ -1,0 +1,48 @@
+{
+  "id": "highway",
+  "name": "Old Highway",
+  "kind": "outdoor",
+  "bounds": { "hx": 20, "hz": 56 },
+  "env": { "preset": "night", "floor": "street", "floorColor": null, "dayCycle": false },
+  "roads": { "vert": [0], "horiz": [], "half": 6.5, "sidewalk": 1.4 },
+  "playerStart": { "x": 0, "z": 50, "yaw": 3.1416 },
+  "objects": [
+    { "uid": "o_bus",   "model": "bus_wreck",   "x": 1,   "z": 2,   "rot": 0.25,  "scale": 1, "collide": { "type": "circle", "r": 3.0 } },
+    { "uid": "o_car1",  "model": "car_wreck",   "x": -3,  "z": 34,  "rot": 2.0,   "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_car2",  "model": "car_wreck_b", "x": 4,   "z": 24,  "rot": -0.5,  "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_car3",  "model": "car_broken",  "x": -4,  "z": 14,  "rot": 1.1,   "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_car4",  "model": "car_wreck",   "x": 5,   "z": -12, "rot": 2.9,   "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_car5",  "model": "car_wreck_b", "x": -5,  "z": -24, "rot": 0.7,   "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_car6",  "model": "car_broken",  "x": 2,   "z": -34, "rot": -1.8,  "scale": 1, "collide": { "type": "circle", "r": 2.4 } },
+    { "uid": "o_lamp1", "model": "lamp_road",   "x": 8.2, "z": 28,  "rot": 0,     "scale": 1, "collide": { "type": "circle", "r": 0.5 } },
+    { "uid": "o_lamp2", "model": "lamp_road",   "x": -8.2,"z": 8,   "rot": 3.1416,"scale": 1, "collide": { "type": "circle", "r": 0.5 } },
+    { "uid": "o_lamp3", "model": "lamp_road",   "x": 8.2, "z": -16, "rot": 0,     "scale": 1, "collide": { "type": "circle", "r": 0.5 } },
+    { "uid": "o_sign",  "model": "roadsign",    "x": -8,  "z": 44,  "rot": 0.2,   "scale": 1, "collide": { "type": "circle", "r": 0.6 } },
+    { "uid": "o_mbar1", "model": "barrier_dmg", "x": -3,  "z": -42, "rot": 0.05,  "scale": 1, "collide": { "type": "circle", "r": 1.2 } },
+    { "uid": "o_mbar2", "model": "barrier",     "x": 0,   "z": -42, "rot": 0,     "scale": 1, "collide": { "type": "circle", "r": 1.2 } },
+    { "uid": "o_mbar3", "model": "barrier_dmg", "x": 3,   "z": -42, "rot": -0.1,  "scale": 1, "collide": { "type": "circle", "r": 1.2 } },
+    { "uid": "o_brl1",  "model": "barrel",      "x": 6,   "z": -44, "rot": 0,     "scale": 1, "collide": { "type": "circle", "r": 0.85 } },
+    { "uid": "o_crt1",  "model": "crate",       "x": -6,  "z": -45, "rot": 0.4,   "scale": 1, "collide": { "type": "circle", "r": 0.85 } }
+  ],
+  "pickups": [
+    { "uid": "p_med1",  "kind": "medkit", "x": -7, "z": 30 },
+    { "uid": "p_med2",  "kind": "medkit", "x": 6, "z": -40 },
+    { "uid": "p_ammo1", "kind": "ammo", "ammo": "9mm", "n": 30, "x": 3, "z": 20 }
+  ],
+  "spawns": [
+    { "uid": "s_mid",   "x": 0,  "z": 10,  "r": 10, "types": ["walker", "woman", "runner"],   "count": 6, "maxAlive": 8,  "respawn": true, "rate": 5 },
+    { "uid": "s_south", "x": 0,  "z": -20, "r": 12, "types": ["walker", "runner", "skeleton"],"count": 6, "maxAlive": 8,  "respawn": true, "rate": 5 },
+    { "uid": "s_brute", "x": -2, "z": -36, "r": 6,  "types": ["brute"],                       "count": 1, "maxAlive": 1,  "respawn": false, "rate": 0 }
+  ],
+  "hotspots": [
+    { "uid": "h_ramp_back", "type": "exit", "x": 0, "z": 52, "r": 3.0, "label": "Back to Maple Street",
+      "target": { "level": "street1", "hotspot": "h_ramp" } },
+    { "uid": "h_supplies", "type": "item", "x": 4.6, "z": -44.6, "r": 2.4, "label": "Abandoned duty bag", "once": true, "sets": "got_supplies",
+      "text": "A soldier's duty bag, dropped mid-run. Stripped magazines — and loose 9mm rolling around the bottom.",
+      "gives": [ { "kind": "ammo", "ammo": "9mm", "n": 60 }, { "kind": "medkit", "n": 1 } ] },
+    { "uid": "h_checkpoint", "type": "exit", "x": 0, "z": -52, "r": 3.0, "label": "Military checkpoint",
+      "target": { "level": "street1", "hotspot": "h_ramp" },
+      "requires": "chapter2", "lockedMsg": "The checkpoint gate is chained shut. Beyond it the road disappears into smoke. (To be continued.)" }
+  ],
+  "ambient": { "maxAlive": 14, "types": ["walker", "woman", "runner"], "rate": 4, "growth": true }
+}

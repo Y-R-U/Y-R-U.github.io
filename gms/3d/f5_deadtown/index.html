@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1a1c18" />
+  <title>Deadtown — day one</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot / loading -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">DEADTOWN</div>
+      <div class="boot-sub">day one</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- start menu -->
+  <div id="menu" class="hidden">
+    <div class="menu-card">
+      <div id="menu-title">DEADTOWN</div>
+      <div id="menu-sub">day one</div>
+      <button id="menu-cont" class="hidden">▶ Continue</button>
+      <button id="menu-new">✚ New Game</button>
+      <div id="menu-confirm" class="hidden">
+        <p>Start over? Your current run will be erased.</p>
+        <button id="menu-confirm-yes">Erase &amp; start</button>
+        <button id="menu-confirm-no">Keep my run</button>
+      </div>
+      <a id="menu-editor" class="hidden" target="_blank">🛠 level editor</a>
+    </div>
+  </div>
+
+  <!-- TV news cinematic -->
+  <div id="cine" class="hidden">
+    <canvas id="cine-canvas"></canvas>
+    <div id="cine-skip">tap to skip</div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="vitals">
+      <div class="bar hp"><span class="ic">❤️</span><div class="track"><i id="hp-fill"></i></div><b id="hp-num">100</b></div>
+      <div id="row2">
+        <div class="chip ammo-chip"><span id="ammo-kind">👊</span><b id="ammo">∞</b></div>
+        <div class="chip"><span>💀</span><b id="score">0</b></div>
+      </div>
+    </div>
+
+    <div id="map-wrap"><canvas id="minimap" width="150" height="150"></canvas></div>
+    <div id="objective" class="hidden"></div>
+    <div id="combo" class="hidden"></div>
+    <div id="prompt" class="hidden"></div>
+
+    <div id="weapons"></div>
+    <div id="actionbar">
+      <button id="act-med" title="Use medkit (H)">🩹<b id="med-num">0</b></button>
+      <button id="act-use" class="hidden" title="Interact (E)">✋<small>Use</small></button>
+    </div>
+
+    <div id="hint">Hold &amp; drag anywhere to move · the laser auto-aims · two fingers to look</div>
+    <div id="toasts"></div>
+    <div id="dmgflash"></div>
+
+    <div id="joy-base"></div>
+    <div id="joy-knob"></div>
+  </div>
+
+  <!-- hotspot dialog (speaker + typed lines) -->
+  <div id="dialog" class="hidden">
+    <div class="dlg-card">
+      <div id="dlg-who"></div>
+      <div id="dlg-text"></div>
+      <div class="dlg-next">tap ▸</div>
+    </div>
+  </div>
+
+  <!-- note / found-item card -->
+  <div id="card" class="hidden">
+    <div class="note-card">
+      <div id="card-title"></div>
+      <div id="card-text"></div>
+      <div class="note-ok">tap to close</div>
+    </div>
+  </div>
+
+  <!-- level-swap fade -->
+  <div id="fade"></div>
+
+  <!-- death -->
+  <div id="panel-death" class="modal hidden">
+    <div class="modal-card">
+      <h2>YOU DIED</h2>
+      <p id="death-stats"></p>
+      <button id="btn-restart">Try again</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

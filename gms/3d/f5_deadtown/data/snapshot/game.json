@@ -1,0 +1,1533 @@
+{
+  "config": {
+    "game": {
+      "startLevel": "home",
+      "title": "DEADTOWN",
+      "subtitle": "day one",
+      "missions": [
+        {
+          "id": "m_tv",
+          "title": "Something woke you — check the TV",
+          "type": "flag",
+          "flag": "saw_tv"
+        },
+        {
+          "id": "m_bat",
+          "title": "Find something to swing",
+          "hint": "your camping gear is stacked by the wardrobe",
+          "type": "weapon",
+          "weapon": "bat"
+        },
+        {
+          "id": "m_out",
+          "title": "Get outside",
+          "type": "level",
+          "level": "street1"
+        },
+        {
+          "id": "m_axe",
+          "title": "An axe at Hanson's Hardware",
+          "hint": "west side of Main — Mrs. Ferro swears by it",
+          "type": "weapon",
+          "weapon": "axe",
+          "reward": {
+            "medkit": 1
+          }
+        },
+        {
+          "id": "m_cull",
+          "title": "Put down 10 of the dead",
+          "type": "kills",
+          "n": 10
+        },
+        {
+          "id": "m_pistol",
+          "title": "Search the wrecked police cruiser",
+          "hint": "blue-and-white, south of the plaza",
+          "type": "weapon",
+          "weapon": "pistol"
+        },
+        {
+          "id": "m_ramp",
+          "title": "Reach the old highway",
+          "hint": "the on-ramp at the south end of Main",
+          "type": "level",
+          "level": "highway",
+          "reward": {
+            "medkit": 1
+          }
+        },
+        {
+          "id": "m_hold",
+          "title": "Survive the highway — 30 total kills",
+          "type": "kills",
+          "n": 30,
+          "reward": {
+            "ammo": "9mm",
+            "n": 30
+          }
+        }
+      ]
+    }
+  },
+  "levels": {
+    "hardware": {
+      "id": "hardware",
+      "name": "Hanson's Hardware",
+      "kind": "interior",
+      "bounds": {
+        "hx": 8,
+        "hz": 7
+      },
+      "env": {
+        "preset": "interior",
+        "floor": "concrete",
+        "floorColor": "#a8a89c",
+        "dayCycle": false,
+        "wallH": 0.55
+      },
+      "roads": null,
+      "playerStart": {
+        "x": 0,
+        "z": 5.2,
+        "yaw": 3.1416
+      },
+      "objects": [
+        {
+          "uid": "o_shelf1",
+          "model": "shelf",
+          "x": -6,
+          "z": -3.5,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        },
+        {
+          "uid": "o_shelf2",
+          "model": "shelf",
+          "x": -2,
+          "z": -3.5,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        },
+        {
+          "uid": "o_shelf3",
+          "model": "shelf",
+          "x": 2,
+          "z": -3.5,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        },
+        {
+          "uid": "o_shelf4",
+          "model": "shelf",
+          "x": 6,
+          "z": -3.5,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        },
+        {
+          "uid": "o_counter",
+          "model": "table_coffee",
+          "x": -4.2,
+          "z": 3.4,
+          "rot": 1.5708,
+          "scale": 1.2,
+          "collide": {
+            "type": "circle",
+            "r": 1.1
+          }
+        },
+        {
+          "uid": "o_crate1",
+          "model": "crate",
+          "x": 6.4,
+          "z": 4.2,
+          "rot": -0.3,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.7
+          }
+        },
+        {
+          "uid": "o_crate2",
+          "model": "crate",
+          "x": 5.2,
+          "z": 5.0,
+          "rot": 0.5,
+          "scale": 0.85,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        },
+        {
+          "uid": "o_barrel1",
+          "model": "barrel",
+          "x": -6.8,
+          "z": 0.5,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        },
+        {
+          "uid": "o_bin1",
+          "model": "bin",
+          "x": 7.2,
+          "z": 0.2,
+          "rot": 1.2,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.7
+          }
+        }
+      ],
+      "pickups": [
+        {
+          "uid": "p_med",
+          "kind": "medkit",
+          "x": 6.2,
+          "z": -1.4
+        },
+        {
+          "uid": "p_ammo",
+          "kind": "ammo",
+          "ammo": "9mm",
+          "n": 24,
+          "x": -6.2,
+          "z": -1.4
+        }
+      ],
+      "spawns": [
+        {
+          "uid": "s_aisle",
+          "x": 0,
+          "z": -2.8,
+          "r": 3.5,
+          "types": [
+            "walker"
+          ],
+          "count": 1,
+          "maxAlive": 1,
+          "respawn": false,
+          "rate": 0
+        }
+      ],
+      "hotspots": [
+        {
+          "uid": "h_axe",
+          "type": "item",
+          "x": -5.4,
+          "z": 4.6,
+          "r": 2.2,
+          "label": "Behind the register",
+          "once": true,
+          "sets": "got_axe",
+          "text": "Bolted to the wall behind the register: HANSON'S \u2014 IN CASE OF FIRE. The axe is heavy, oiled, perfect.",
+          "gives": [
+            {
+              "kind": "weapon",
+              "item": "axe"
+            }
+          ]
+        },
+        {
+          "uid": "h_ledger",
+          "type": "note",
+          "x": -3.4,
+          "z": 4.4,
+          "r": 2.0,
+          "label": "IOU ledger",
+          "text": "Hanson's IOU ledger. Last entry, three days ago: \"D. Henderson \u2014 1 box roofing nails.\""
+        },
+        {
+          "uid": "h_exit",
+          "type": "exit",
+          "x": 0,
+          "z": 6.2,
+          "r": 2.4,
+          "label": "Door to the street",
+          "target": {
+            "level": "street1",
+            "hotspot": "h_hw_door"
+          }
+        }
+      ],
+      "ambient": null
+    },
+    "highway": {
+      "id": "highway",
+      "name": "Old Highway",
+      "kind": "outdoor",
+      "bounds": {
+        "hx": 20,
+        "hz": 56
+      },
+      "env": {
+        "preset": "night",
+        "floor": "street",
+        "floorColor": null,
+        "dayCycle": false
+      },
+      "roads": {
+        "vert": [
+          0
+        ],
+        "horiz": [],
+        "half": 6.5,
+        "sidewalk": 1.4
+      },
+      "playerStart": {
+        "x": 0,
+        "z": 50,
+        "yaw": 3.1416
+      },
+      "objects": [
+        {
+          "uid": "o_bus",
+          "model": "bus_wreck",
+          "x": 1,
+          "z": 2,
+          "rot": 0.25,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 3.0
+          }
+        },
+        {
+          "uid": "o_car1",
+          "model": "car_wreck",
+          "x": -3,
+          "z": 34,
+          "rot": 2.0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car2",
+          "model": "car_wreck_b",
+          "x": 4,
+          "z": 24,
+          "rot": -0.5,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car3",
+          "model": "car_broken",
+          "x": -4,
+          "z": 14,
+          "rot": 1.1,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car4",
+          "model": "car_wreck",
+          "x": 5,
+          "z": -12,
+          "rot": 2.9,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car5",
+          "model": "car_wreck_b",
+          "x": -5,
+          "z": -24,
+          "rot": 0.7,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car6",
+          "model": "car_broken",
+          "x": 2,
+          "z": -34,
+          "rot": -1.8,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_lamp1",
+          "model": "lamp_road",
+          "x": 8.2,
+          "z": 28,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp2",
+          "model": "lamp_road",
+          "x": -8.2,
+          "z": 8,
+          "rot": 3.1416,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp3",
+          "model": "lamp_road",
+          "x": 8.2,
+          "z": -16,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_sign",
+          "model": "roadsign",
+          "x": -8,
+          "z": 44,
+          "rot": 0.2,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        },
+        {
+          "uid": "o_mbar1",
+          "model": "barrier_dmg",
+          "x": -3,
+          "z": -42,
+          "rot": 0.05,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_mbar2",
+          "model": "barrier",
+          "x": 0,
+          "z": -42,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_mbar3",
+          "model": "barrier_dmg",
+          "x": 3,
+          "z": -42,
+          "rot": -0.1,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_brl1",
+          "model": "barrel",
+          "x": 6,
+          "z": -44,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_crt1",
+          "model": "crate",
+          "x": -6,
+          "z": -45,
+          "rot": 0.4,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        }
+      ],
+      "pickups": [
+        {
+          "uid": "p_med1",
+          "kind": "medkit",
+          "x": -7,
+          "z": 30
+        },
+        {
+          "uid": "p_med2",
+          "kind": "medkit",
+          "x": 6,
+          "z": -40
+        },
+        {
+          "uid": "p_ammo1",
+          "kind": "ammo",
+          "ammo": "9mm",
+          "n": 30,
+          "x": 3,
+          "z": 20
+        }
+      ],
+      "spawns": [
+        {
+          "uid": "s_mid",
+          "x": 0,
+          "z": 10,
+          "r": 10,
+          "types": [
+            "walker",
+            "woman",
+            "runner"
+          ],
+          "count": 6,
+          "maxAlive": 8,
+          "respawn": true,
+          "rate": 5
+        },
+        {
+          "uid": "s_south",
+          "x": 0,
+          "z": -20,
+          "r": 12,
+          "types": [
+            "walker",
+            "runner",
+            "skeleton"
+          ],
+          "count": 6,
+          "maxAlive": 8,
+          "respawn": true,
+          "rate": 5
+        },
+        {
+          "uid": "s_brute",
+          "x": -2,
+          "z": -36,
+          "r": 6,
+          "types": [
+            "brute"
+          ],
+          "count": 1,
+          "maxAlive": 1,
+          "respawn": false,
+          "rate": 0
+        }
+      ],
+      "hotspots": [
+        {
+          "uid": "h_ramp_back",
+          "type": "exit",
+          "x": 0,
+          "z": 52,
+          "r": 3.0,
+          "label": "Back to Maple Street",
+          "target": {
+            "level": "street1",
+            "hotspot": "h_ramp"
+          }
+        },
+        {
+          "uid": "h_supplies",
+          "type": "item",
+          "x": 4.6,
+          "z": -44.6,
+          "r": 2.4,
+          "label": "Abandoned duty bag",
+          "once": true,
+          "sets": "got_supplies",
+          "text": "A soldier's duty bag, dropped mid-run. Stripped magazines — and loose 9mm rolling around the bottom.",
+          "gives": [
+            {
+              "kind": "ammo",
+              "ammo": "9mm",
+              "n": 60
+            },
+            {
+              "kind": "medkit",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "uid": "h_checkpoint",
+          "type": "exit",
+          "x": 0,
+          "z": -52,
+          "r": 3.0,
+          "label": "Military checkpoint",
+          "target": {
+            "level": "street1",
+            "hotspot": "h_ramp"
+          },
+          "requires": "chapter2",
+          "lockedMsg": "The checkpoint gate is chained shut. Beyond it the road disappears into smoke. (To be continued.)"
+        }
+      ],
+      "ambient": {
+        "maxAlive": 14,
+        "types": [
+          "walker",
+          "woman",
+          "runner"
+        ],
+        "rate": 4,
+        "growth": true
+      }
+    },
+    "home": {
+      "id": "home",
+      "name": "Home",
+      "kind": "interior",
+      "bounds": {
+        "hx": 9,
+        "hz": 7
+      },
+      "env": {
+        "preset": "interior",
+        "floor": "wood",
+        "floorColor": "#b08a5e",
+        "dayCycle": false,
+        "wallH": 0.52
+      },
+      "roads": null,
+      "playerStart": {
+        "x": 4.6,
+        "z": -3.0,
+        "yaw": 2.4
+      },
+      "objects": [
+        {
+          "uid": "o_bed",
+          "model": "bed",
+          "x": 6.0,
+          "z": -4.0,
+          "rot": -1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.6
+          }
+        },
+        {
+          "uid": "o_tvtable",
+          "model": "tv_table",
+          "x": -6.6,
+          "z": -5.4,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.8
+          }
+        },
+        {
+          "uid": "o_tv",
+          "model": "television",
+          "x": -6.6,
+          "z": -5.4,
+          "y": 0.9,
+          "rot": 0.9425,
+          "scale": 1,
+          "collide": {
+            "type": "none"
+          }
+        },
+        {
+          "uid": "o_wardrobe",
+          "model": "wardrobe",
+          "x": 7.6,
+          "z": 3.0,
+          "rot": -1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.0
+          }
+        },
+        {
+          "uid": "o_shelf",
+          "model": "shelf",
+          "x": -7.7,
+          "z": 2.0,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.8
+          }
+        },
+        {
+          "uid": "o_table",
+          "model": "table_coffee",
+          "x": 0,
+          "z": -1.0,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.0
+          }
+        },
+        {
+          "uid": "o_chair",
+          "model": "chair",
+          "x": -2.4,
+          "z": -1.6,
+          "rot": 0.6,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        },
+        {
+          "uid": "o_rug",
+          "model": "rug",
+          "x": 0,
+          "z": -1.0,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "none"
+          }
+        },
+        {
+          "uid": "o_lamp",
+          "model": "lamp_floor",
+          "x": 7.4,
+          "z": -6.0,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "none"
+          }
+        },
+        {
+          "uid": "o_pc",
+          "model": "pc",
+          "x": -7.4,
+          "z": -1.5,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "none"
+          }
+        },
+        {
+          "uid": "o_gear1",
+          "model": "crate",
+          "x": 5.6,
+          "z": 5.4,
+          "rot": 0.4,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.7
+          }
+        },
+        {
+          "uid": "o_gear2",
+          "model": "crate",
+          "x": 4.2,
+          "z": 5.8,
+          "rot": -0.2,
+          "scale": 0.8,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        }
+      ],
+      "pickups": [
+        {
+          "uid": "p_med",
+          "kind": "medkit",
+          "x": -7.2,
+          "z": 4.6
+        }
+      ],
+      "spawns": [],
+      "hotspots": [
+        {
+          "uid": "h_tv",
+          "type": "dialog",
+          "x": -5.6,
+          "z": -4.0,
+          "r": 2.4,
+          "label": "TV",
+          "once": true,
+          "sets": "saw_tv",
+          "lines": [
+            {
+              "speaker": "TV",
+              "text": "\u2026ksshh\u2014 do not go outside \u2014 ksshh\u2014 they bite \u2014 \u2026"
+            },
+            {
+              "speaker": "TV",
+              "text": "\u2026if you are hearing this\u2026 arm yourself\u2026 \u2014zzzt\u2014"
+            },
+            {
+              "speaker": "You",
+              "text": "The broadcast is gone. Just static now."
+            }
+          ]
+        },
+        {
+          "uid": "h_gear",
+          "type": "item",
+          "x": 5.0,
+          "z": 5.2,
+          "r": 2.2,
+          "label": "Camping gear",
+          "once": true,
+          "sets": "got_bat",
+          "text": "Buried under the tent and the sleeping bags: your old baseball bat.",
+          "gives": [
+            {
+              "kind": "weapon",
+              "item": "bat"
+            }
+          ]
+        },
+        {
+          "uid": "h_pc",
+          "type": "note",
+          "x": -7.2,
+          "z": -0.8,
+          "r": 2.0,
+          "label": "Computer",
+          "text": "47 unread messages. The last one, from Jess: \"PLEASE tell me you're not still in Milton Creek.\""
+        },
+        {
+          "uid": "h_door",
+          "type": "exit",
+          "x": 0,
+          "z": 6.2,
+          "r": 2.4,
+          "label": "Front door",
+          "target": {
+            "level": "street1",
+            "hotspot": "h_home_door"
+          },
+          "requires": "got_bat",
+          "lockedMsg": "Not without something to swing. The camping gear is in here somewhere."
+        }
+      ],
+      "ambient": null
+    },
+    "street1": {
+      "id": "street1",
+      "name": "Maple Street",
+      "kind": "outdoor",
+      "bounds": {
+        "hx": 52,
+        "hz": 52
+      },
+      "env": {
+        "preset": "dusk",
+        "floor": "street",
+        "floorColor": null,
+        "dayCycle": true
+      },
+      "roads": {
+        "vert": [
+          0
+        ],
+        "horiz": [
+          -18,
+          18
+        ],
+        "half": 4.6,
+        "sidewalk": 1.8
+      },
+      "playerStart": {
+        "x": 14,
+        "z": 30,
+        "yaw": 3.1416
+      },
+      "objects": [
+        {
+          "uid": "o_home",
+          "model": "bld_family_a",
+          "x": 14,
+          "z": 38,
+          "rot": 3.1416,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 5
+          },
+          "label": "Home"
+        },
+        {
+          "uid": "o_hw",
+          "model": "bld_house_a",
+          "x": -18,
+          "z": 2,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 6
+          },
+          "label": "Hanson's Hardware"
+        },
+        {
+          "uid": "o_police",
+          "model": "bld_police",
+          "x": 22,
+          "z": -16,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 8,
+            "hz": 7
+          },
+          "label": "Police Station"
+        },
+        {
+          "uid": "o_cafe",
+          "model": "bld_cafe",
+          "x": -22,
+          "z": 28,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 5
+          },
+          "label": "Café"
+        },
+        {
+          "uid": "o_apts",
+          "model": "bld_block",
+          "x": 30,
+          "z": 10,
+          "rot": -1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 8,
+            "hz": 6
+          },
+          "label": "Apartments"
+        },
+        {
+          "uid": "o_burger",
+          "model": "bld_burger",
+          "x": 12,
+          "z": -36,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 5
+          },
+          "label": "Burger Joint"
+        },
+        {
+          "uid": "o_house2",
+          "model": "bld_house_b",
+          "x": -26,
+          "z": -26,
+          "rot": 0.7854,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 6
+          },
+          "label": "House"
+        },
+        {
+          "uid": "o_house3",
+          "model": "bld_family_b",
+          "x": -32,
+          "z": -6,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 6,
+            "hz": 5
+          },
+          "label": "House"
+        },
+        {
+          "uid": "o_cabin",
+          "model": "bld_cabin",
+          "x": 34,
+          "z": -38,
+          "rot": -0.6,
+          "scale": 1,
+          "collide": {
+            "type": "box",
+            "hx": 5,
+            "hz": 5
+          },
+          "label": "Cabin"
+        },
+        {
+          "uid": "o_cruiser",
+          "model": "car_police",
+          "x": 6,
+          "z": -18,
+          "rot": -0.7,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_bus",
+          "model": "bus_wreck",
+          "x": 2,
+          "z": 10,
+          "rot": 1.62,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 3
+          }
+        },
+        {
+          "uid": "o_car1",
+          "model": "car_wreck",
+          "x": -2,
+          "z": -6,
+          "rot": 0.4,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car2",
+          "model": "car_wreck_b",
+          "x": -14,
+          "z": 20,
+          "rot": 2.2,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car3",
+          "model": "car_broken",
+          "x": 24,
+          "z": 20,
+          "rot": -1.1,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car4",
+          "model": "car_wreck",
+          "x": -8,
+          "z": -34,
+          "rot": 1.9,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_car5",
+          "model": "car_broken",
+          "x": 8,
+          "z": 34,
+          "rot": 0.2,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 2.4
+          }
+        },
+        {
+          "uid": "o_lamp1",
+          "model": "lamp_road",
+          "x": 6.4,
+          "z": 24,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp2",
+          "model": "lamp_road",
+          "x": -6.4,
+          "z": 8,
+          "rot": 3.1416,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp3",
+          "model": "lamp_road",
+          "x": 6.4,
+          "z": -10,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp4",
+          "model": "lamp_road",
+          "x": -6.4,
+          "z": -28,
+          "rot": 3.1416,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp5",
+          "model": "lamp_city",
+          "x": 18,
+          "z": 24,
+          "rot": 1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_lamp6",
+          "model": "lamp_city",
+          "x": -18,
+          "z": 12,
+          "rot": -1.5708,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.5
+          }
+        },
+        {
+          "uid": "o_bar1",
+          "model": "barrier",
+          "x": 16,
+          "z": -9,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_bar2",
+          "model": "barrier",
+          "x": 19,
+          "z": -9,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_bar3",
+          "model": "barrier_dmg",
+          "x": 22,
+          "z": -9,
+          "rot": 0.1,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 1.2
+          }
+        },
+        {
+          "uid": "o_brl1",
+          "model": "barrel",
+          "x": -10,
+          "z": 26,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_brl2",
+          "model": "barrel",
+          "x": 26,
+          "z": -26,
+          "rot": 0,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_crt1",
+          "model": "crate",
+          "x": -24,
+          "z": 14,
+          "rot": 0.5,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_bin1",
+          "model": "bin",
+          "x": 8.2,
+          "z": 14,
+          "rot": 2.8,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_bin2",
+          "model": "bin",
+          "x": -8.2,
+          "z": -14,
+          "rot": 0.9,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.85
+          }
+        },
+        {
+          "uid": "o_sign1",
+          "model": "roadsign",
+          "x": 6.6,
+          "z": -40,
+          "rot": 0.15,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.6
+          }
+        },
+        {
+          "uid": "o_traf1",
+          "model": "barrier_traf",
+          "x": -3,
+          "z": -44,
+          "rot": 0.3,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        },
+        {
+          "uid": "o_traf2",
+          "model": "barrier_traf",
+          "x": 3.2,
+          "z": -45,
+          "rot": -0.2,
+          "scale": 1,
+          "collide": {
+            "type": "circle",
+            "r": 0.9
+          }
+        }
+      ],
+      "pickups": [
+        {
+          "uid": "p_med1",
+          "kind": "medkit",
+          "x": 16,
+          "z": 26
+        },
+        {
+          "uid": "p_med2",
+          "kind": "medkit",
+          "x": -13,
+          "z": 10
+        },
+        {
+          "uid": "p_ammo1",
+          "kind": "ammo",
+          "ammo": "9mm",
+          "n": 24,
+          "x": 8,
+          "z": -20
+        }
+      ],
+      "spawns": [
+        {
+          "uid": "s_plaza",
+          "x": 0,
+          "z": -30,
+          "r": 12,
+          "types": [
+            "walker",
+            "woman"
+          ],
+          "count": 5,
+          "maxAlive": 6,
+          "respawn": true,
+          "rate": 7
+        },
+        {
+          "uid": "s_west",
+          "x": -28,
+          "z": -2,
+          "r": 10,
+          "types": [
+            "walker",
+            "woman"
+          ],
+          "count": 4,
+          "maxAlive": 5,
+          "respawn": true,
+          "rate": 8
+        },
+        {
+          "uid": "s_east",
+          "x": 26,
+          "z": -4,
+          "r": 10,
+          "types": [
+            "walker",
+            "woman",
+            "runner"
+          ],
+          "count": 4,
+          "maxAlive": 5,
+          "respawn": true,
+          "rate": 8
+        },
+        {
+          "uid": "s_home",
+          "x": -4,
+          "z": 34,
+          "r": 8,
+          "types": [
+            "walker"
+          ],
+          "count": 2,
+          "maxAlive": 2,
+          "respawn": false,
+          "rate": 0
+        }
+      ],
+      "hotspots": [
+        {
+          "uid": "h_home_door",
+          "type": "exit",
+          "x": 14,
+          "z": 31.4,
+          "r": 2.4,
+          "label": "Home",
+          "target": {
+            "level": "home",
+            "hotspot": "h_door"
+          }
+        },
+        {
+          "uid": "h_hw_door",
+          "type": "exit",
+          "x": -10.6,
+          "z": 2,
+          "r": 2.4,
+          "label": "Hanson's Hardware",
+          "target": {
+            "level": "hardware",
+            "hotspot": "h_exit"
+          }
+        },
+        {
+          "uid": "h_neighbor",
+          "type": "dialog",
+          "x": 21,
+          "z": 30,
+          "r": 2.6,
+          "label": "Boarded window",
+          "once": true,
+          "sets": "met_neighbor",
+          "lines": [
+            {
+              "speaker": "Mrs. Ferro",
+              "text": "Psst! Off the street, boy! They hear everything."
+            },
+            {
+              "speaker": "Mrs. Ferro",
+              "text": "It got the Hendersons. All of them. Last night."
+            },
+            {
+              "speaker": "Mrs. Ferro",
+              "text": "That bat won't cut it. Hanson kept a fire axe by his register — the hardware store, west side of Main."
+            },
+            {
+              "speaker": "You",
+              "text": "Stay inside, Mrs. Ferro. Nail it shut."
+            }
+          ]
+        },
+        {
+          "uid": "h_cruiser",
+          "type": "item",
+          "x": 7.6,
+          "z": -16.4,
+          "r": 2.6,
+          "label": "Police cruiser",
+          "once": true,
+          "sets": "got_pistol",
+          "text": "The driver's door hangs open. A service pistol in the footwell — and a duty bag heavy with 9mm boxes on the seat.",
+          "gives": [
+            {
+              "kind": "weapon",
+              "item": "pistol"
+            },
+            {
+              "kind": "ammo",
+              "ammo": "9mm",
+              "n": 120
+            }
+          ]
+        },
+        {
+          "uid": "h_station",
+          "type": "note",
+          "x": 22,
+          "z": -8.4,
+          "r": 2.4,
+          "label": "Police station doors",
+          "text": "Chained from the outside. Whoever locked it wanted to keep something IN."
+        },
+        {
+          "uid": "h_qsign",
+          "type": "note",
+          "x": -3,
+          "z": -43.4,
+          "r": 2.4,
+          "label": "Quarantine sign",
+          "text": "STATE EMERGENCY — MILTON CREEK IS UNDER QUARANTINE. TURN BACK."
+        },
+        {
+          "uid": "h_ramp",
+          "type": "exit",
+          "x": 0,
+          "z": -49,
+          "r": 3,
+          "label": "Highway on-ramp",
+          "target": {
+            "level": "highway",
+            "hotspot": "h_ramp_back"
+          },
+          "requires": "got_pistol",
+          "lockedMsg": "The ramp crawls with the dead. Not without a firearm."
+        },
+        {
+          "uid": "h_wave",
+          "type": "trigger",
+          "x": 0,
+          "z": 2,
+          "r": 5,
+          "once": true,
+          "label": "",
+          "event": "wave",
+          "params": {
+            "count": 4,
+            "types": [
+              "walker",
+              "woman"
+            ],
+            "r": 16
+          }
+        }
+      ],
+      "ambient": {
+        "maxAlive": 10,
+        "types": [
+          "walker",
+          "woman",
+          "runner"
+        ],
+        "rate": 6,
+        "growth": true
+      }
+    }
+  },
+  "published_at": "2026-07-02T11:54:21Z"
+}

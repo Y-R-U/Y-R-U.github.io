@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deadtown Level Editor</title>
+  <link rel="stylesheet" href="editor.css" />
+</head>
+<body>
+  <div id="topbar">
+    <span id="brand">🧟 DEADTOWN <b>EDITOR</b></span>
+    <select id="level-select" title="Open level"></select>
+    <button id="btn-new" title="New level">✚</button>
+    <button id="btn-dup" title="Duplicate level">⧉</button>
+    <button id="btn-del" title="Delete level">🗑</button>
+    <span class="sep"></span>
+    <button id="btn-save" title="Save (⌘S)">💾 Save<i id="dirty-dot"></i></button>
+    <button id="btn-undo" title="Undo (⌘Z)">↩</button>
+    <button id="btn-redo" title="Redo (⇧⌘Z)">↪</button>
+    <span class="sep"></span>
+    <button id="btn-snap" class="tog on" title="Grid snap 0.5m (G)">🧲 snap</button>
+    <button id="btn-grid" class="tog on" title="Toggle grid">▦ grid</button>
+    <button id="btn-cam" title="Top / orbit camera (P)">🎥 top</button>
+    <button id="btn-frame" title="Frame level (F)">⛶</button>
+    <span class="sep"></span>
+    <button id="btn-versions" title="Named versions">🗂 versions</button>
+    <button id="btn-missions" title="Mission chain">🎯 missions</button>
+    <button id="btn-validate" title="Validate level">✔ check</button>
+    <span class="sep"></span>
+    <button id="btn-publish" title="Publish snapshot for static hosting">📤 publish</button>
+    <button id="btn-play" class="play" title="Save + play this level">▶ play</button>
+  </div>
+
+  <div id="cols">
+    <div id="palette">
+      <div class="pal-head">PALETTE</div>
+      <div id="pal-body"></div>
+    </div>
+    <div id="viewport"><div id="place-hint" class="hidden"></div></div>
+    <div id="sidebar">
+      <div class="side-tabs">
+        <button data-tab="inspect" class="on">Inspector</button>
+        <button data-tab="level">Level</button>
+      </div>
+      <div id="inspector" class="tabpane on"></div>
+      <div id="levelpane" class="tabpane"></div>
+    </div>
+  </div>
+
+  <div id="statusbar"><span id="status-level"></span><span id="status-msg"></span></div>
+
+  <div id="toasts"></div>
+  <div id="modal-wrap" class="hidden"><div id="modal"></div></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

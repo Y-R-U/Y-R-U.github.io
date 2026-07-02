@@ -1,0 +1,15 @@
+{
+  "startLevel": "home",
+  "title": "DEADTOWN",
+  "subtitle": "day one",
+  "missions": [
+    { "id": "m_tv",     "title": "Something woke you — check the TV", "type": "flag", "flag": "saw_tv" },
+    { "id": "m_bat",    "title": "Find something to swing", "hint": "your camping gear is stacked by the wardrobe", "type": "weapon", "weapon": "bat" },
+    { "id": "m_out",    "title": "Get outside", "type": "level", "level": "street1" },
+    { "id": "m_axe",    "title": "An axe at Hanson's Hardware", "hint": "west side of Main — Mrs. Ferro swears by it", "type": "weapon", "weapon": "axe", "reward": { "medkit": 1 } },
+    { "id": "m_cull",   "title": "Put down 10 of the dead", "type": "kills", "n": 10 },
+    { "id": "m_pistol", "title": "Search the wrecked police cruiser", "hint": "blue-and-white, south of the plaza", "type": "weapon", "weapon": "pistol" },
+    { "id": "m_ramp",   "title": "Reach the old highway", "hint": "the on-ramp at the south end of Main", "type": "level", "level": "highway", "reward": { "medkit": 1 } },
+    { "id": "m_hold",   "title": "Survive the highway — 30 total kills", "type": "kills", "n": 30, "reward": { "ammo": "9mm", "n": 30 } }
+  ]
+}

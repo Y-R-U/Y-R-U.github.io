@@ -1,0 +1,44 @@
+{
+  "id": "home",
+  "name": "Home",
+  "kind": "interior",
+  "bounds": { "hx": 9, "hz": 7 },
+  "env": { "preset": "interior", "floor": "wood", "floorColor": "#b08a5e", "dayCycle": false, "wallH": 0.52 },
+  "roads": null,
+  "playerStart": { "x": 4.6, "z": -3.0, "yaw": 2.4 },
+  "objects": [
+    { "uid": "o_bed",      "model": "bed",          "x": 6.0,  "z": -4.0, "rot": -1.5708, "scale": 1, "collide": { "type": "circle", "r": 1.6 } },
+    { "uid": "o_tvtable",  "model": "tv_table",     "x": -6.6, "z": -5.4, "rot": 0,       "scale": 1, "collide": { "type": "circle", "r": 0.8 } },
+    { "uid": "o_tv",       "model": "television",   "x": -6.6, "z": -5.4, "y": 0.9, "rot": 0.9425, "scale": 1, "collide": { "type": "none" } },
+    { "uid": "o_wardrobe", "model": "wardrobe",     "x": 7.6,  "z": 3.0,  "rot": -1.5708, "scale": 1, "collide": { "type": "circle", "r": 1.0 } },
+    { "uid": "o_shelf",    "model": "shelf",        "x": -7.7, "z": 2.0,  "rot": 1.5708,  "scale": 1, "collide": { "type": "circle", "r": 0.8 } },
+    { "uid": "o_table",    "model": "table_coffee", "x": 0,    "z": -1.0, "rot": 0,       "scale": 1, "collide": { "type": "circle", "r": 1.0 } },
+    { "uid": "o_chair",    "model": "chair",        "x": -2.4, "z": -1.6, "rot": 0.6,     "scale": 1, "collide": { "type": "circle", "r": 0.6 } },
+    { "uid": "o_rug",      "model": "rug",          "x": 0,    "z": -1.0, "rot": 0,       "scale": 1, "collide": { "type": "none" } },
+    { "uid": "o_lamp",     "model": "lamp_floor",   "x": 7.4,  "z": -6.0, "rot": 0,       "scale": 1, "collide": { "type": "none" } },
+    { "uid": "o_pc",       "model": "pc",           "x": -7.4, "z": -1.5, "rot": 1.5708,  "scale": 1, "collide": { "type": "none" } },
+    { "uid": "o_gear1",    "model": "crate",        "x": 5.6,  "z": 5.4,  "rot": 0.4,     "scale": 1, "collide": { "type": "circle", "r": 0.7 } },
+    { "uid": "o_gear2",    "model": "crate",        "x": 4.2,  "z": 5.8,  "rot": -0.2,    "scale": 0.8, "collide": { "type": "circle", "r": 0.6 } }
+  ],
+  "pickups": [
+    { "uid": "p_med", "kind": "medkit", "x": -7.2, "z": 4.6 }
+  ],
+  "spawns": [],
+  "hotspots": [
+    { "uid": "h_tv", "type": "dialog", "x": -5.6, "z": -4.0, "r": 2.4, "label": "TV", "once": true, "sets": "saw_tv",
+      "lines": [
+        { "speaker": "TV", "text": "…ksshh— do not go outside — ksshh— they bite — …" },
+        { "speaker": "TV", "text": "…if you are hearing this… arm yourself… —zzzt—" },
+        { "speaker": "You", "text": "The broadcast is gone. Just static now." }
+      ] },
+    { "uid": "h_gear", "type": "item", "x": 5.0, "z": 5.2, "r": 2.2, "label": "Camping gear", "once": true, "sets": "got_bat",
+      "text": "Buried under the tent and the sleeping bags: your old baseball bat.",
+      "gives": [ { "kind": "weapon", "item": "bat" } ] },
+    { "uid": "h_pc", "type": "note", "x": -7.2, "z": -0.8, "r": 2.0, "label": "Computer",
+      "text": "47 unread messages. The last one, from Jess: \"PLEASE tell me you're not still in Milton Creek.\"" },
+    { "uid": "h_door", "type": "exit", "x": 0, "z": 6.2, "r": 2.4, "label": "Front door",
+      "target": { "level": "street1", "hotspot": "h_home_door" },
+      "requires": "got_bat", "lockedMsg": "Not without something to swing. The camping gear is in here somewhere." }
+  ],
+  "ambient": null
+}

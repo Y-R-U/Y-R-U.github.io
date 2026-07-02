@@ -316,6 +316,10 @@ const PROJECTS = [
     desc: "Single-player Subspace-style space arena shooter. Pilot one of five inertial ships through Deathmatch, Team Battle, Capture the Flag and King of the Hill against AI opponents — energy doubles as health and ammo, grab green power-ups, and dodge bouncing bullets and bombs. Vanilla Canvas, no build step, touch joystick + keyboard, mobile-first portrait.",
     date: "2026-06-23", creator: "Opus 4.8" },
 
+  { name: "Deadtown: Day One",  path: "/gms/3d/f5_deadtown/", screenshot: "f5_deadtown", type: "game",
+    desc: "A story-driven rebuild of Deadtown around a database-backed level system. A procedural TV-news cinematic opens the outbreak (\"they're ZOMBIES—\" …static), then you wake at home with nothing: find the baseball bat in your camping gear, the fire axe at Hanson's Hardware, and the pistol — with a bag of ammo — in a wrecked police cruiser. Travel between sealed levels only through glowing exit hotspots; dialogs, searches, ambush triggers and a mission chain are all authored data. Ships with a full level editor (second port, undo/redo, named versions) and a Go+SQLite backend both apps share; plays static from a published snapshot too. Three.js, PolyPerfect art.",
+    date: "2026-07-02", creator: "Fable 5" },
+
   { name: "Deadtown",           path: "/gms/3d/deadtown/", screenshot: "deadtown", type: "game",
     desc: "A mobile-first 3D zombie shooter with a Diablo/RuneScape camera. Wake in your bedroom to a TV hissing a broken emergency broadcast, then take to the streets of an apocalyptic town. Hold and drag anywhere to move; a laser sights straight out of your weapon and auto-locks the nearest zombie, then auto-fires — scavenge a fire axe, pistols, shotgun, SMG, rifle and machine gun plus ammo and medkits dropped by the horde. Duck into buildings (the camera pulls in close, roofless, so nothing blocks your view), watch the minimap, and survive the endless spawn. Three.js, no build step, PolyPerfect art.",
     date: "2026-06-27", creator: "Opus 4.8" },
