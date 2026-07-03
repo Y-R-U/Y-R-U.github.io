@@ -1,0 +1,353 @@
+{
+ "id": "level19",
+ "name": "The Last March",
+ "theme": "ash",
+ "grid": {
+  "w": 20,
+  "h": 14
+ },
+ "paths": [
+  [
+   [
+    0,
+    2
+   ],
+   [
+    10,
+    2
+   ],
+   [
+    10,
+    7
+   ],
+   [
+    19,
+    7
+   ]
+  ],
+  [
+   [
+    0,
+    7
+   ],
+   [
+    10,
+    7
+   ],
+   [
+    19,
+    7
+   ]
+  ],
+  [
+   [
+    0,
+    12
+   ],
+   [
+    10,
+    12
+   ],
+   [
+    10,
+    7
+   ],
+   [
+    19,
+    7
+   ]
+  ]
+ ],
+ "blocked": [
+  [
+   13,
+   1
+  ],
+  [
+   0,
+   10
+  ],
+  [
+   14,
+   0
+  ],
+  [
+   4,
+   10
+  ],
+  [
+   2,
+   0
+  ],
+  [
+   18,
+   11
+  ],
+  [
+   5,
+   4
+  ],
+  [
+   2,
+   4
+  ]
+ ],
+ "decor": 0.6,
+ "gold": 700,
+ "lives": 20,
+ "waves": [
+  {
+   "groups": [
+    {
+     "type": "maiden",
+     "n": 4,
+     "gap": 1.3,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "warlock",
+     "n": 2,
+     "gap": 2.4,
+     "delay": 4.3,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "maiden",
+     "n": 6,
+     "gap": 1.3,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "warlock",
+     "n": 3,
+     "gap": 2.4,
+     "delay": 5.5,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "mummy",
+     "n": 6,
+     "gap": 1.7,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "warlock",
+     "n": 3,
+     "gap": 2.4,
+     "delay": 6.6,
+     "path": 1
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "knight",
+     "n": 4,
+     "gap": 1.9,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "raider",
+     "n": 17,
+     "gap": 1.1,
+     "delay": 5.4,
+     "path": 2
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 30,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 6,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "raider",
+     "n": 24,
+     "gap": 1.1,
+     "delay": 8.5,
+     "path": 2
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 19,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 2
+    },
+    {
+     "type": "bones",
+     "n": 30,
+     "gap": 0.85,
+     "delay": 11.4,
+     "path": 2
+    },
+    {
+     "type": "shade",
+     "n": 22,
+     "gap": 0.55,
+     "delay": 24.9,
+     "path": 2
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "mummy",
+     "n": 13,
+     "gap": 1.7,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "maiden",
+     "n": 18,
+     "gap": 1.3,
+     "delay": 11.9,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "maiden",
+     "n": 30,
+     "gap": 1.3,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "knight",
+     "n": 9,
+     "gap": 1.9,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "warlock",
+     "n": 10,
+     "gap": 2.4,
+     "delay": 9.7,
+     "path": 2
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 30,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 2
+    },
+    {
+     "type": "mummy",
+     "n": 18,
+     "gap": 1.7,
+     "delay": 16.9,
+     "path": 2
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shade",
+     "n": 30,
+     "gap": 0.55,
+     "delay": 0,
+     "path": 2
+    },
+    {
+     "type": "bones",
+     "n": 30,
+     "gap": 0.85,
+     "delay": 9.4,
+     "path": 2
+    },
+    {
+     "type": "warlock",
+     "n": 8,
+     "gap": 2.4,
+     "delay": 22.9,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 12,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 1
+    },
+    {
+     "type": "mummy",
+     "n": 21,
+     "gap": 1.7,
+     "delay": 15.0,
+     "path": 1
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 30,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "mummy",
+     "n": 22,
+     "gap": 1.7,
+     "delay": 16.9,
+     "path": 0
+    }
+   ]
+  }
+ ],
+ "tip": "THREE roads, one gate. Hold the centre and the merge."
+}

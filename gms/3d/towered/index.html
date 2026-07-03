@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#141a12" />
+  <title>Towered — a tower defence</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot / loading -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">TOWERED</div>
+      <div class="boot-sub">hold the line</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- title screen -->
+  <div id="menu" class="hidden">
+    <div class="menu-inner">
+      <div class="game-logo">TOWERED</div>
+      <div class="game-tag">The Hollow King marches. Raise your towers.</div>
+      <div class="menu-btns">
+        <button id="btn-play" class="big gold">⚔️&ensp;Play</button>
+        <button id="btn-editor" class="big">🛠️&ensp;Level Editor</button>
+        <button id="btn-help" class="big">📜&ensp;How to Play</button>
+        <button id="btn-mute" class="big">🔊&ensp;Sound</button>
+      </div>
+      <div class="menu-foot">a Y-R-U game</div>
+    </div>
+  </div>
+
+  <!-- level select -->
+  <div id="levelselect" class="hidden">
+    <div class="ls-head">
+      <button id="ls-back" class="iconbtn">←</button>
+      <h2>Choose your battle</h2>
+      <div class="ls-tabs">
+        <button id="tab-campaign" class="tab on">Campaign</button>
+        <button id="tab-custom" class="tab">Custom</button>
+      </div>
+    </div>
+    <div id="ls-campaign" class="ls-body"></div>
+    <div id="ls-custom" class="ls-body hidden"></div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div class="chip gold-chip">🪙 <b id="gold">0</b></div>
+      <div class="chip lives-chip">❤️ <b id="lives">20</b></div>
+      <div class="chip wave-chip">🌊 <b id="wave">1/10</b></div>
+      <div class="spacer"></div>
+      <button id="btn-speed" class="iconbtn">1×</button>
+      <button id="btn-pause" class="iconbtn">⏸</button>
+    </div>
+
+    <div id="bossbanner" class="hidden"></div>
+    <div id="wavebtn-wrap" class="hidden">
+      <div id="wave-preview"></div>
+      <button id="wavebtn"><b id="wavebtn-label">⚔️ Send the wave</b><small id="wavebtn-sub"></small></button>
+    </div>
+
+    <div id="toasts"></div>
+    <div id="tipbox" class="hidden"><span id="tip-text"></span><button id="tip-ok">Got it</button></div>
+    <div id="dmgflash"></div>
+    <button id="btn-backeditor" class="hidden">⏏ Back to editor</button>
+  </div>
+
+  <!-- bottom sheet (build / tower) -->
+  <div id="sheet" class="hidden">
+    <div id="sheet-card"></div>
+  </div>
+
+  <!-- generic modal -->
+  <div id="modal" class="hidden">
+    <div id="modal-card"></div>
+  </div>
+
+  <!-- cinematic intro -->
+  <div id="intro" class="hidden">
+    <div class="cine-bar top"></div>
+    <div class="cine-bar bot"></div>
+    <div id="intro-text"></div>
+    <button id="intro-skip">Skip ▸</button>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

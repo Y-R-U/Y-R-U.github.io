@@ -1,0 +1,185 @@
+{
+ "id": "level01",
+ "name": "The Green Road",
+ "theme": "meadow",
+ "grid": {
+  "w": 20,
+  "h": 14
+ },
+ "paths": [
+  [
+   [
+    0,
+    7
+   ],
+   [
+    7,
+    7
+   ],
+   [
+    7,
+    3
+   ],
+   [
+    14,
+    3
+   ],
+   [
+    14,
+    9
+   ],
+   [
+    19,
+    9
+   ]
+  ]
+ ],
+ "blocked": [
+  [
+   19,
+   0
+  ],
+  [
+   0,
+   10
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   18,
+   5
+  ],
+  [
+   0,
+   12
+  ],
+  [
+   19,
+   5
+  ],
+  [
+   1,
+   12
+  ],
+  [
+   17,
+   11
+  ]
+ ],
+ "decor": 0.55,
+ "gold": 250,
+ "lives": 20,
+ "waves": [
+  {
+   "groups": [
+    {
+     "type": "shambler",
+     "n": 2,
+     "gap": 1.0,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "rotter",
+     "n": 2,
+     "gap": 0.85,
+     "delay": 2.9,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 3,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "shambler",
+     "n": 3,
+     "gap": 1.0,
+     "delay": 3.1,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 5,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "shambler",
+     "n": 4,
+     "gap": 1.0,
+     "delay": 3.9,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 6,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "shambler",
+     "n": 6,
+     "gap": 1.0,
+     "delay": 4.3,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shambler",
+     "n": 7,
+     "gap": 1.0,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "rotter",
+     "n": 7,
+     "gap": 0.85,
+     "delay": 5.2,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shambler",
+     "n": 8,
+     "gap": 1.0,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "rotter",
+     "n": 8,
+     "gap": 0.85,
+     "delay": 5.6,
+     "path": 0
+    }
+   ]
+  }
+ ],
+ "tip": "Ballistas are cheap and fast \u2014 put two on the first bend."
+}

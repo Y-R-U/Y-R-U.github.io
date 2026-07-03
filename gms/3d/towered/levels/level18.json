@@ -1,0 +1,319 @@
+{
+ "id": "level18",
+ "name": "Ember Fields",
+ "theme": "ash",
+ "grid": {
+  "w": 22,
+  "h": 14
+ },
+ "paths": [
+  [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    1
+   ],
+   [
+    20,
+    5
+   ],
+   [
+    1,
+    5
+   ],
+   [
+    1,
+    9
+   ],
+   [
+    20,
+    9
+   ],
+   [
+    20,
+    13
+   ],
+   [
+    10,
+    13
+   ]
+  ]
+ ],
+ "blocked": [
+  [
+   11,
+   11
+  ],
+  [
+   8,
+   11
+  ],
+  [
+   13,
+   11
+  ],
+  [
+   15,
+   3
+  ],
+  [
+   15,
+   7
+  ],
+  [
+   16,
+   11
+  ],
+  [
+   9,
+   7
+  ],
+  [
+   9,
+   3
+  ]
+ ],
+ "decor": 0.6,
+ "gold": 640,
+ "lives": 20,
+ "waves": [
+  {
+   "groups": [
+    {
+     "type": "shade",
+     "n": 7,
+     "gap": 0.55,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "maiden",
+     "n": 4,
+     "gap": 1.3,
+     "delay": 3.7,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 6,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "warlock",
+     "n": 2,
+     "gap": 2.4,
+     "delay": 5.0,
+     "path": 0
+    },
+    {
+     "type": "maiden",
+     "n": 4,
+     "gap": 1.3,
+     "delay": 9.1,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "knight",
+     "n": 3,
+     "gap": 1.9,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "raider",
+     "n": 13,
+     "gap": 1.1,
+     "delay": 4.6,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "maiden",
+     "n": 19,
+     "gap": 1.3,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 10,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "knight",
+     "n": 11,
+     "gap": 1.9,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "mummy",
+     "n": 8,
+     "gap": 1.7,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "warlock",
+     "n": 4,
+     "gap": 2.4,
+     "delay": 8.1,
+     "path": 0
+    },
+    {
+     "type": "knight",
+     "n": 4,
+     "gap": 1.9,
+     "delay": 14.4,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 7,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "shade",
+     "n": 30,
+     "gap": 0.55,
+     "delay": 9.6,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 8,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "maiden",
+     "n": 19,
+     "gap": 1.3,
+     "delay": 10.6,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "warlock",
+     "n": 18,
+     "gap": 2.4,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shade",
+     "n": 30,
+     "gap": 0.55,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "mummy",
+     "n": 11,
+     "gap": 1.7,
+     "delay": 9.4,
+     "path": 0
+    },
+    {
+     "type": "knight",
+     "n": 6,
+     "gap": 1.9,
+     "delay": 19.8,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shade",
+     "n": 30,
+     "gap": 0.55,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "raider",
+     "n": 30,
+     "gap": 1.1,
+     "delay": 9.4,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "mummy",
+     "n": 13,
+     "gap": 1.7,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "maiden",
+     "n": 18,
+     "gap": 1.3,
+     "delay": 11.9,
+     "path": 0
+    },
+    {
+     "type": "shade",
+     "n": 30,
+     "gap": 0.55,
+     "delay": 24.5,
+     "path": 0
+    }
+   ]
+  }
+ ],
+ "tip": "Warlocks come in numbers now. Arcane obelisks earn their keep."
+}

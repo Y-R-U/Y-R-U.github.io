@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#141a12" />
+  <title>Towered — Level Editor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="editor.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title" style="font-size:44px">TOWERED</div>
+      <div class="boot-sub">level editor</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- top bar -->
+  <div id="ed-top">
+    <a id="ed-home" href="index.html" title="Back to game">⌂</a>
+    <input id="ed-name" type="text" maxlength="28" placeholder="Level name" />
+    <div class="ed-actions">
+      <button id="ed-new" title="New level">✚</button>
+      <button id="ed-load" title="Load level">📂</button>
+      <button id="ed-save" title="Save to My Levels">💾</button>
+      <button id="ed-export" title="Download JSON">⬇</button>
+      <button id="ed-import" title="Import JSON">⬆</button>
+      <button id="ed-copy" title="Copy JSON">📋</button>
+      <button id="ed-test" class="test" title="Test play">▶ Test</button>
+    </div>
+  </div>
+
+  <!-- tool rail -->
+  <div id="ed-rail">
+    <button data-tool="pan" class="on" title="Pan / orbit">✋</button>
+    <button data-tool="path" title="Draw road: tap cells to add waypoints">🛣️</button>
+    <button data-tool="block" title="Toggle no-build decor cells">🌲</button>
+    <button id="ed-preview" title="Toggle full preview">👁</button>
+  </div>
+
+  <!-- status strip -->
+  <div id="ed-status"></div>
+  <div id="ed-errors"></div>
+
+  <!-- side panel -->
+  <button id="ed-paneltoggle">⚙ Panel</button>
+  <div id="ed-panel">
+    <div class="ed-tabs">
+      <button data-tab="paths" class="on">Roads</button>
+      <button data-tab="waves">Waves</button>
+      <button data-tab="settings">Settings</button>
+    </div>
+    <div id="ed-tab-paths" class="ed-tabbody"></div>
+    <div id="ed-tab-waves" class="ed-tabbody hidden"></div>
+    <div id="ed-tab-settings" class="ed-tabbody hidden"></div>
+  </div>
+
+  <div id="toasts"></div>
+  <input id="ed-file" type="file" accept=".json,application/json" class="hidden" />
+
+  <!-- load modal -->
+  <div id="modal" class="hidden"><div id="modal-card"></div></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/editor.js"></script>
+</body>
+</html>

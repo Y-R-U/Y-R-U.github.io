@@ -1,0 +1,82 @@
+[
+ {
+  "id": "level01",
+  "name": "The Green Road"
+ },
+ {
+  "id": "level02",
+  "name": "Miller's Bend"
+ },
+ {
+  "id": "level03",
+  "name": "The Crossroads"
+ },
+ {
+  "id": "level04",
+  "name": "Long Meadow"
+ },
+ {
+  "id": "level05",
+  "name": "The Bone King's Gate"
+ },
+ {
+  "id": "level06",
+  "name": "Amber Hollow"
+ },
+ {
+  "id": "level07",
+  "name": "Harvest Row"
+ },
+ {
+  "id": "level08",
+  "name": "The Forked Road"
+ },
+ {
+  "id": "level09",
+  "name": "Wolfswood"
+ },
+ {
+  "id": "level10",
+  "name": "Jarl's Crossing"
+ },
+ {
+  "id": "level11",
+  "name": "First Snow"
+ },
+ {
+  "id": "level12",
+  "name": "Frozen Ford"
+ },
+ {
+  "id": "level13",
+  "name": "The Gauntlet"
+ },
+ {
+  "id": "level14",
+  "name": "Icebound Spiral"
+ },
+ {
+  "id": "level15",
+  "name": "Gravelord's Barrow"
+ },
+ {
+  "id": "level16",
+  "name": "Cinder Road"
+ },
+ {
+  "id": "level17",
+  "name": "The Ash Fork"
+ },
+ {
+  "id": "level18",
+  "name": "Ember Fields"
+ },
+ {
+  "id": "level19",
+  "name": "The Last March"
+ },
+ {
+  "id": "level20",
+  "name": "The Hollow King"
+ }
+]

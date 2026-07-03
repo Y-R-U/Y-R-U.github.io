@@ -1,0 +1,195 @@
+{
+ "id": "level06",
+ "name": "Amber Hollow",
+ "theme": "autumn",
+ "grid": {
+  "w": 20,
+  "h": 14
+ },
+ "paths": [
+  [
+   [
+    0,
+    10
+   ],
+   [
+    6,
+    10
+   ],
+   [
+    6,
+    4
+   ],
+   [
+    13,
+    4
+   ],
+   [
+    13,
+    10
+   ],
+   [
+    19,
+    10
+   ]
+  ]
+ ],
+ "blocked": [
+  [
+   13,
+   1
+  ],
+  [
+   16,
+   8
+  ],
+  [
+   16,
+   7
+  ],
+  [
+   0,
+   4
+  ],
+  [
+   14,
+   13
+  ]
+ ],
+ "decor": 0.65,
+ "gold": 330,
+ "lives": 20,
+ "waves": [
+  {
+   "groups": [
+    {
+     "type": "bones",
+     "n": 9,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "raider",
+     "n": 2,
+     "gap": 1.1,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "bones",
+     "n": 5,
+     "gap": 0.85,
+     "delay": 3.0,
+     "path": 0
+    },
+    {
+     "type": "rotter",
+     "n": 7,
+     "gap": 0.85,
+     "delay": 6.9,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shambler",
+     "n": 27,
+     "gap": 1.0,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 30,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 22,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "raider",
+     "n": 8,
+     "gap": 1.1,
+     "delay": 10.4,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 17,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "bones",
+     "n": 12,
+     "gap": 0.85,
+     "delay": 8.5,
+     "path": 0
+    },
+    {
+     "type": "shambler",
+     "n": 16,
+     "gap": 1.0,
+     "delay": 15.1,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "shambler",
+     "n": 30,
+     "gap": 1.0,
+     "delay": 0,
+     "path": 0
+    }
+   ]
+  },
+  {
+   "groups": [
+    {
+     "type": "rotter",
+     "n": 30,
+     "gap": 0.85,
+     "delay": 0,
+     "path": 0
+    },
+    {
+     "type": "shambler",
+     "n": 30,
+     "gap": 1.0,
+     "delay": 13.5,
+     "path": 0
+    }
+   ]
+  }
+ ],
+ "tip": "Mummies regenerate \u2014 focus fire, don't chip."
+}
