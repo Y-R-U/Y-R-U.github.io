@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0e1a14" />
+  <title>Firstfolk — a god-game village sim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔥</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot / loading -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">FIRSTFOLK</div>
+      <div class="boot-sub">shape the land · shepherd the folk</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">waking the island…</div>
+    </div>
+  </div>
+
+  <!-- title screen -->
+  <div id="menu" class="hidden">
+    <div class="menu-inner">
+      <div class="game-logo">FIRSTFOLK</div>
+      <div class="game-tag">Your folk are few and the world is young.<br>Shape the land. Shepherd them home.</div>
+      <div class="menu-btns">
+        <button id="btn-continue" class="big gold hidden">🌿&ensp;Continue</button>
+        <button id="btn-new" class="big">✨&ensp;New Island</button>
+        <button id="btn-help" class="big">📜&ensp;How to Play</button>
+        <button id="btn-mute" class="big">🔊&ensp;Sound</button>
+      </div>
+      <div class="menu-foot">a Y-R-U game</div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div class="chip" id="chip-food">🍎 <b id="r-food">0</b></div>
+      <div class="chip" id="chip-wood">🪵 <b id="r-wood">0</b></div>
+      <div class="chip hidden" id="chip-stone">🪨 <b id="r-stone">0</b></div>
+      <div class="chip" id="chip-pop">👥 <b id="r-pop">0/0</b></div>
+      <div class="spacer"></div>
+      <button id="btn-speed" class="iconbtn">1×</button>
+      <button id="btn-pause" class="iconbtn">⏸</button>
+      <button id="btn-menu" class="iconbtn">☰</button>
+    </div>
+    <div id="row2">
+      <div id="faith-wrap" title="Faith">
+        <span id="faith-ico">✨</span>
+        <div id="faith-bar"><i></i></div>
+        <b id="r-faith">0</b>
+      </div>
+      <div class="spacer"></div>
+      <div class="chip age-chip" id="chip-age">🔥 <b id="r-age">Age of Hearth</b></div>
+      <canvas id="clock" width="52" height="52"></canvas>
+    </div>
+    <div id="objective" class="hidden"></div>
+
+    <div id="banner" class="hidden"></div>
+    <div id="toasts"></div>
+    <div id="tipbox" class="hidden"><span id="tip-text"></span><button id="tip-ok">Got it</button></div>
+    <div id="dmgflash"></div>
+
+    <!-- bottom mode toolbar -->
+    <div id="toolbar">
+      <button class="mode on" data-mode="hand" title="Inspect">🖐<small>Look</small></button>
+      <button class="mode" data-mode="sculpt" title="Sculpt the land">⛰<small>Sculpt</small></button>
+      <button class="mode locked hidden" data-mode="leyline" title="Paint leylines">🌟<small>Leyline</small></button>
+      <button class="mode" data-mode="build" title="Build">🏠<small>Build</small></button>
+      <button class="mode" data-mode="miracle" title="Miracles">⚡<small>Miracle</small></button>
+    </div>
+    <!-- contextual sheet above the toolbar -->
+    <div id="sheet" class="hidden"><div id="sheet-card"></div></div>
+  </div>
+
+  <!-- generic modal -->
+  <div id="modal" class="hidden">
+    <div id="modal-card"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

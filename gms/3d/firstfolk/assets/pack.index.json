@@ -1,0 +1,393 @@
+{
+"key_hint": "firstfolk",
+"rigs": [
+"man_farm",
+"woman_farm",
+"man_lumberjack",
+"woman_lumberjack",
+"man_carpenter",
+"woman_carpenter",
+"man_casual",
+"woman_casual",
+"man_wizard",
+"man_knight",
+"man_viking",
+"woman_viking",
+"boy",
+"girl"
+],
+"entries": {
+"man_farm": {
+"off": 0,
+"len": 105297,
+"kind": "model",
+"raw": 274776
+},
+"woman_farm": {
+"off": 105297,
+"len": 97374,
+"kind": "model",
+"raw": 251136
+},
+"man_lumberjack": {
+"off": 202671,
+"len": 119104,
+"kind": "model",
+"raw": 304868
+},
+"woman_lumberjack": {
+"off": 321775,
+"len": 101060,
+"kind": "model",
+"raw": 257268
+},
+"man_carpenter": {
+"off": 422835,
+"len": 118238,
+"kind": "model",
+"raw": 304620
+},
+"woman_carpenter": {
+"off": 541073,
+"len": 111779,
+"kind": "model",
+"raw": 284400
+},
+"man_casual": {
+"off": 652852,
+"len": 85233,
+"kind": "model",
+"raw": 225524
+},
+"woman_casual": {
+"off": 738085,
+"len": 89473,
+"kind": "model",
+"raw": 235284
+},
+"man_wizard": {
+"off": 827558,
+"len": 112455,
+"kind": "model",
+"raw": 285824
+},
+"man_knight": {
+"off": 940013,
+"len": 90521,
+"kind": "model",
+"raw": 234552
+},
+"man_viking": {
+"off": 1030534,
+"len": 127837,
+"kind": "model",
+"raw": 342092
+},
+"woman_viking": {
+"off": 1158371,
+"len": 112674,
+"kind": "model",
+"raw": 297296
+},
+"boy": {
+"off": 1271045,
+"len": 295313,
+"kind": "model",
+"raw": 1266204
+},
+"girl": {
+"off": 1566358,
+"len": 306053,
+"kind": "model",
+"raw": 1282676
+},
+"hut": {
+"off": 1872411,
+"len": 22951,
+"kind": "model",
+"raw": 66408
+},
+"hut_med": {
+"off": 1895362,
+"len": 29682,
+"kind": "model",
+"raw": 89804
+},
+"house_big": {
+"off": 1925044,
+"len": 47125,
+"kind": "model",
+"raw": 145164
+},
+"storehouse": {
+"off": 1972169,
+"len": 54541,
+"kind": "model",
+"raw": 161216
+},
+"temple": {
+"off": 2026710,
+"len": 36339,
+"kind": "model",
+"raw": 113816
+},
+"windmill": {
+"off": 2063049,
+"len": 60142,
+"kind": "model",
+"raw": 169468
+},
+"lodge": {
+"off": 2123191,
+"len": 30394,
+"kind": "model",
+"raw": 100724
+},
+"watchtower": {
+"off": 2153585,
+"len": 27151,
+"kind": "model",
+"raw": 68760
+},
+"well": {
+"off": 2180736,
+"len": 12873,
+"kind": "model",
+"raw": 33368
+},
+"dock": {
+"off": 2193609,
+"len": 6301,
+"kind": "model",
+"raw": 18136
+},
+"boat": {
+"off": 2199910,
+"len": 21930,
+"kind": "model",
+"raw": 78184
+},
+"crane": {
+"off": 2221840,
+"len": 12232,
+"kind": "model",
+"raw": 40320
+},
+"barrel": {
+"off": 2234072,
+"len": 9041,
+"kind": "model",
+"raw": 28192
+},
+"crate": {
+"off": 2243113,
+"len": 2852,
+"kind": "model",
+"raw": 9124
+},
+"haystack": {
+"off": 2245965,
+"len": 2627,
+"kind": "model",
+"raw": 6280
+},
+"hay_pile": {
+"off": 2248592,
+"len": 2715,
+"kind": "model",
+"raw": 6856
+},
+"lantern": {
+"off": 2251307,
+"len": 2901,
+"kind": "model",
+"raw": 9800
+},
+"torch": {
+"off": 2254208,
+"len": 7463,
+"kind": "model",
+"raw": 18280
+},
+"fire": {
+"off": 2261671,
+"len": 1479,
+"kind": "model",
+"raw": 3380
+},
+"flag": {
+"off": 2263150,
+"len": 2318,
+"kind": "model",
+"raw": 5996
+},
+"fence": {
+"off": 2265468,
+"len": 6492,
+"kind": "model",
+"raw": 18400
+},
+"corn": {
+"off": 2271960,
+"len": 9269,
+"kind": "model",
+"raw": 23728
+},
+"log": {
+"off": 2281229,
+"len": 1694,
+"kind": "model",
+"raw": 3648
+},
+"logs": {
+"off": 2282923,
+"len": 4795,
+"kind": "model",
+"raw": 12104
+},
+"axe": {
+"off": 2287718,
+"len": 2071,
+"kind": "model",
+"raw": 5216
+},
+"gravestone": {
+"off": 2289789,
+"len": 3828,
+"kind": "model",
+"raw": 10660
+},
+"crystals": {
+"off": 2293617,
+"len": 6152,
+"kind": "model",
+"raw": 15284
+},
+"tree_beech": {
+"off": 2299769,
+"len": 7066,
+"kind": "model",
+"raw": 18072
+},
+"tree_birch": {
+"off": 2306835,
+"len": 11367,
+"kind": "model",
+"raw": 25880
+},
+"tree_birch_t": {
+"off": 2318202,
+"len": 17629,
+"kind": "model",
+"raw": 44992
+},
+"tree_spruce": {
+"off": 2335831,
+"len": 7313,
+"kind": "model",
+"raw": 15232
+},
+"tree_conifer": {
+"off": 2343144,
+"len": 2982,
+"kind": "model",
+"raw": 6708
+},
+"bush_big": {
+"off": 2346126,
+"len": 8161,
+"kind": "model",
+"raw": 20760
+},
+"bush_med": {
+"off": 2354287,
+"len": 6928,
+"kind": "model",
+"raw": 17392
+},
+"grass_g": {
+"off": 2361215,
+"len": 2057,
+"kind": "model",
+"raw": 4804
+},
+"flower_red": {
+"off": 2363272,
+"len": 3082,
+"kind": "model",
+"raw": 7576
+},
+"mushroom": {
+"off": 2366354,
+"len": 5287,
+"kind": "model",
+"raw": 14176
+},
+"rock_large": {
+"off": 2371641,
+"len": 7939,
+"kind": "model",
+"raw": 20812
+},
+"rock_sharp": {
+"off": 2379580,
+"len": 3512,
+"kind": "model",
+"raw": 8032
+},
+"rock_pillar": {
+"off": 2383092,
+"len": 6022,
+"kind": "model",
+"raw": 15212
+},
+"rocks_small": {
+"off": 2389114,
+"len": 4963,
+"kind": "model",
+"raw": 11596
+},
+"stone_big": {
+"off": 2394077,
+"len": 5857,
+"kind": "model",
+"raw": 12292
+},
+"stone_tall": {
+"off": 2399934,
+"len": 5185,
+"kind": "model",
+"raw": 12524
+},
+"sheep": {
+"off": 2405119,
+"len": 21877,
+"kind": "model",
+"raw": 64576
+},
+"deer": {
+"off": 2426996,
+"len": 27388,
+"kind": "model",
+"raw": 78316
+},
+"wolf": {
+"off": 2454384,
+"len": 29898,
+"kind": "model",
+"raw": 89008
+},
+"atlas_gradient": {
+"off": 2484282,
+"len": 208471,
+"kind": "tex",
+"raw": 208817
+},
+"atlas_specular": {
+"off": 2692753,
+"len": 1164,
+"kind": "tex",
+"raw": 4599
+}
+}
+}
