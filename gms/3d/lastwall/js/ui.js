@@ -43,7 +43,15 @@ export function updateHUD(P, run) {
   $('dmgflash').style.opacity = P.hurtFlash * .9;
 }
 
-export function setObjective(txt) { const o = $('objective'); if (!txt) { o.classList.add('hidden'); return; } o.classList.remove('hidden'); o.textContent = txt; }
+let objT = null;
+export function setObjective(txt) {
+  const o = $('objective');
+  if (!txt) { o.classList.add('hidden'); return; }
+  o.classList.remove('hidden'); o.textContent = txt;
+  o.style.opacity = 1;
+  clearTimeout(objT);
+  objT = setTimeout(() => { o.style.opacity = 0.15; }, 4000); // get out of the way once read
+}
 export function bossBar(name, frac) {
   const b = $('bossbar');
   if (name == null) { b.classList.add('hidden'); return; }
@@ -94,15 +102,17 @@ export function closeModal() { el.modal.classList.add('hidden'); }
 // ---------- transmissions (typewriter) ----------
 // Never a soft-lock: tap fast-forwards/dismisses, AND they auto-advance after
 // reading time (Aaron's mobile intro hung waiting for a tap that never landed).
-let txTimer = null, txDone = null, txFull = '', txAuto = null;
+let txTimer = null, txDone = null, txFull = '', txAuto = null, txManual = false;
 function txScheduleAuto() {
+  if (txManual) return; // gameplay-gating story waits for the player's tap
   clearTimeout(txAuto);
   txAuto = setTimeout(() => txSkip(), 1600 + txFull.length * 28);
 }
-export function transmit(from, text, onDone) {
+// opts.manual: no auto-advance — use when the game is paused behind the text
+export function transmit(from, text, onDone, opts = {}) {
   el.tx.classList.remove('hidden');
   $('tx-from').textContent = from;
-  txFull = text; txDone = onDone;
+  txFull = text; txDone = onDone; txManual = !!opts.manual;
   const t = $('tx-text');
   t.innerHTML = '<span class="cursor">&nbsp;</span>';
   let i = 0;
@@ -113,7 +123,7 @@ export function transmit(from, text, onDone) {
     if (i >= text.length) { clearInterval(txTimer); txTimer = null; t.textContent = text; txScheduleAuto(); }
   }, 24);
 }
-export function txSkip() { // tap: finish typing, next tap (or auto): dismiss
+export function txSkip() { // tap: finish typing, next tap (or auto) dismisses
   if (el.tx.classList.contains('hidden')) return false;
   if (txTimer) { clearInterval(txTimer); txTimer = null; $('tx-text').textContent = txFull; txScheduleAuto(); return true; }
   clearTimeout(txAuto);

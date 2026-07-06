@@ -144,16 +144,20 @@ function loadLevel(n, isRunStart = false) {
   ui.setObjective(def.boss ? `${def.name} — KILL THE GUARDIAN` : `${def.name} — REACH THE FAR GATE`);
   ui.announce(def.name.toUpperCase(), run.mode === 'story' ? 'the wall goes north' : 'no end to it');
 
-  // story beat
+  // level-start order: drafts → story (game PAUSED until tap) → play
   const beat = run.mode === 'story' ? (n === 100 ? FINALE : BEATS[n]) : null;
-  if (beat && !MODES.shot) ui.transmit(beat.from, beat.text);
-
-  // owed drafts (covers "start at gate 30 → 5 picks")
+  const begin = () => {
+    if (beat && !MODES.shot) {
+      state = 'STORY';
+      ui.transmit(beat.from, beat.text, () => { if (state === 'STORY') state = 'PLAY'; }, { manual: true });
+    } else state = 'PLAY';
+  };
   const owed = draftsOwed(n, run.claimed);
-  if (owed.length && !MODES.shot) { state = 'DRAFT'; chainDrafts(owed); }
-  else state = 'PLAY';
+  if (owed.length && !MODES.shot) { state = 'DRAFT'; chainDrafts(owed, begin); }
+  else begin();
 
   ui.el.hud.classList.remove('hidden');
+  ui.updateHUD(P, { ...run, kills: EN.kills() });
   if (isRunStart) ui.setHint(isTouch() ? 'drag to move · 2 fingers to orbit · weapons auto-aim' : 'WASD move · SPACE super · Q drop weapon · P pause');
   setTimeout(() => ui.setHint(null), 6000);
 }
@@ -166,7 +170,7 @@ function spawnPickup(type, x, z) {
   return p;
 }
 
-function chainDrafts(owed) {
+function chainDrafts(owed, then) {
   const k = owed[0];
   const roll = () => {
     ui.showDraft(rollChoices(run.taken), run.rerolls,
@@ -177,8 +181,8 @@ function chainDrafts(owed) {
         recomputePlayer(p);
         ui.hideDraft();
         const rest = owed.slice(1);
-        if (rest.length) chainDrafts(rest);
-        else state = 'PLAY';
+        if (rest.length) chainDrafts(rest, then);
+        else then();
       },
       () => { if (run.rerolls > 0) { run.rerolls--; roll(); } });
   };

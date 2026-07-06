@@ -119,8 +119,8 @@ b, .panel-title { letter-spacing:.06em; }
 .sup-track i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#7f6ae0,#c29cff); }
 .wchip.super.ready { box-shadow:0 0 14px rgba(160,120,255,.5); }
 
-#objective { position:absolute; top:max(10px,env(safe-area-inset-top)); left:50%; transform:translateX(-50%); background:rgba(20,14,10,.8); border:1px solid #3d2f24; border-radius:9px; padding:5px 14px; font-size:12px; letter-spacing:.08em; color:#cbbda6; }
-#bossbar { position:absolute; top:calc(max(10px,env(safe-area-inset-top)) + 34px); left:50%; transform:translateX(-50%); width:min(70vw,420px); text-align:center; }
+#objective { position:absolute; top:calc(max(10px,env(safe-area-inset-top)) + 64px); left:50%; transform:translateX(-50%); background:rgba(20,14,10,.8); border:1px solid #3d2f24; border-radius:9px; padding:5px 14px; font-size:12px; letter-spacing:.08em; color:#cbbda6; transition:opacity .8s; max-width:86vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#bossbar { position:absolute; top:calc(max(10px,env(safe-area-inset-top)) + 98px); left:50%; transform:translateX(-50%); width:min(70vw,420px); text-align:center; }
 #bossbar b { font-size:11px; letter-spacing:.2em; color:#ff7fc2; }
 #bossbar .track { height:9px; background:rgba(20,14,10,.8); border:1px solid #5a2438; border-radius:5px; overflow:hidden; margin-top:3px; }
 #bossbar .track i { display:block; height:100%; width:100%; background:linear-gradient(90deg,#8d1f4e,#ff4f8d); transition:width .15s; }

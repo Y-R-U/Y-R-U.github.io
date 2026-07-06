@@ -144,6 +144,14 @@ hits into launches; the best kill is a long drop off the wall.
   auto-advance after reading time (RULE: no transmission may ever block
   progress). Verified: hands-free intro→PLAY in 23s; tap-through in 7 taps.
   Aaron retest pending. Story beats 11–100 still Phase 5 (confirmed intended).
+- **S1.2 (2026-07-07, Fable 5)** — Aaron's 2nd mobile pass: objective banner
+  covered the health bar → moved below the vitals block + fades to 0.15 after
+  4s (bossbar moved down with it); level-start story was too fast to read →
+  level-start beats now PAUSE the game (state STORY, `transmit(...,{manual})`,
+  no auto-advance) until the player taps — the auto-advance rule now applies
+  only to non-blocking/cinematic transmissions. Verified on 390×844 viewport:
+  paused hands-off indefinitely, taps resume, no HUD overlap, fade works,
+  `?auto` soak still clears L1→L2. Aaron retest pending.
 
 ## Known debts / decisions pending
 
