@@ -109,7 +109,8 @@ export function createInput(dom, camera, T, cb) {
       inp.theta -= dx * 0.006;
       inp.phi = clamp(inp.phi - dy * 0.004, CFG.cam.phiMin, CFG.cam.phiMax);
     } else if (mode === 'pan') {
-      pan(-dx, -dy);
+      // touch: slide up = move forward (vertical inverted vs mouse, by request)
+      pan(-dx, ev.pointerType === 'touch' ? dy : -dy);
     }
   });
   const end = (ev) => {

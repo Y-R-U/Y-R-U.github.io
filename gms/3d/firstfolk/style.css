@@ -171,7 +171,7 @@ button.big.gold { background: linear-gradient(180deg, #caa64f, #96742c); border-
 .confirmrow .no { background: #22382a; border: 1px solid #33503b; }
 
 /* ── modal ── */
-#modal { position: fixed; inset: 0; z-index: 40; background: rgba(5, 9, 6, .62); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+#modal { position: fixed; inset: 0; z-index: 55; background: rgba(5, 9, 6, .62); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
 #modal-card {
   width: min(470px, 92vw); max-height: 82vh; overflow-y: auto; background: #13221a;
   border: 1px solid #40603f; border-radius: 18px; padding: 18px; box-shadow: 0 16px 60px rgba(0,0,0,.6);
