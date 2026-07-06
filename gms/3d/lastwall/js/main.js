@@ -140,6 +140,7 @@ function loadLevel(n, isRunStart = false) {
     };
   }
 
+  autoWp = 0; // reset the soak-bot's route for the new level
   ui.setObjective(def.boss ? `${def.name} — KILL THE GUARDIAN` : `${def.name} — REACH THE FAR GATE`);
   ui.announce(def.name.toUpperCase(), run.mode === 'story' ? 'the wall goes north' : 'no end to it');
 
@@ -271,11 +272,21 @@ function tickLevelEvents(dt) {
     ui.bossBar(boss.dead ? null : 'GATE GUARDIAN', Math.max(0, boss.hp / boss.maxHp));
     if (boss.dead) boss = null;
   }
-  // end gate
-  if (!bossLocked && Math.hypot(P.x - level.endGate.x, P.z - level.endGate.z) < 5.5) levelComplete();
+  // exit gate: portcullis rises as you approach (when unlocked); walking under
+  // the arch completes the level — no hidden trigger spot, no button to hunt for
+  const eg = level.endGate;
+  const gdx = P.x - eg.x, gdz = P.z - eg.gz;
+  if (!bossLocked && Math.hypot(gdx, gdz) < 26) {
+    if (!eg.opened) { eg.opened = true; sfx.gate(); ui.toast('THE GATE OPENS'); }
+    const bars = eg.gate.userData.bars;
+    bars.position.y = Math.min(bars.position.y + dt * 3.2, 5.2);
+  }
+  if (!bossLocked && gdz < 3.5 && Math.abs(gdx) < 9) levelComplete();
 }
 
 function levelComplete() {
+  if (state !== 'PLAY') return;
+  state = 'FADE';
   const n = run.n;
   const bonus = Math.round((CFG.serumLevelBonus + n * 4) * run.mods.serum);
   run.serum += bonus; meta.addSerum(bonus);
@@ -284,7 +295,7 @@ function levelComplete() {
   sfx.levelup();
   if (run.mode === 'story' && n >= 100) { winStory(); return; }
   ui.announce('SECTION CLEAR', `+${bonus} serum`);
-  loadLevel(n + 1);
+  ui.fadeBlack(() => loadLevel(n + 1));
 }
 
 function winStory() {
@@ -374,7 +385,7 @@ function playIntro(then) {
   meta.seenIntro = true;
   let i = 0;
   const next = () => {
-    if (i >= INTRO.length) { then(); return; }
+    if (i >= INTRO.length) { ui.fadeBlack(then); return; }
     const s = INTRO[i++];
     ui.transmit(s.from, s.text, next);
   };
@@ -389,8 +400,8 @@ function autoInput() {
   if (autoWp >= wps.length) autoWp = wps.length - 1;
   let t = wps[autoWp];
   if (Math.hypot(t.x - P.x, t.z - P.z) < 6 && autoWp < wps.length - 1) { autoWp++; t = wps[autoWp]; }
-  // final approach: the gate
-  if (autoWp === wps.length - 1) t = { x: level.endGate.x, z: level.endGate.z };
+  // final approach: walk through the arch
+  if (autoWp === wps.length - 1) t = { x: level.endGate.x, z: level.endGate.gz + 1 };
   const dx = t.x - P.x, dz = t.z - P.z, d = Math.hypot(dx, dz) || 1;
   if (P.super?.charge >= 1 && EN.enemies.filter(e => !e.dead && Math.hypot(e.x - P.x, e.z - P.z) < 8).length >= 3) P.superFire();
   return { x: dx / d, z: dz / d, mag: 1, sprint: d > 20 };

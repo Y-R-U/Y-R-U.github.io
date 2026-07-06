@@ -68,6 +68,13 @@ export function announce(big, small = '') {
 
 export function setHint(txt) { const h = $('hint'); if (!txt) { h.classList.add('hidden'); return; } h.classList.remove('hidden'); h.innerHTML = txt; }
 
+// quick fade-to-black level transition: darken → mid() → lighten
+export function fadeBlack(mid) {
+  const f = $('fade');
+  f.style.opacity = 1;
+  setTimeout(() => { mid?.(); setTimeout(() => { f.style.opacity = 0; }, 140); }, 430);
+}
+
 // ---------- modal ----------
 let modalCb = null;
 export function modal(title, bodyHTML, btns) {
@@ -85,7 +92,13 @@ export function modal(title, bodyHTML, btns) {
 export function closeModal() { el.modal.classList.add('hidden'); }
 
 // ---------- transmissions (typewriter) ----------
-let txTimer = null, txDone = null, txFull = '';
+// Never a soft-lock: tap fast-forwards/dismisses, AND they auto-advance after
+// reading time (Aaron's mobile intro hung waiting for a tap that never landed).
+let txTimer = null, txDone = null, txFull = '', txAuto = null;
+function txScheduleAuto() {
+  clearTimeout(txAuto);
+  txAuto = setTimeout(() => txSkip(), 1600 + txFull.length * 28);
+}
 export function transmit(from, text, onDone) {
   el.tx.classList.remove('hidden');
   $('tx-from').textContent = from;
@@ -93,21 +106,25 @@ export function transmit(from, text, onDone) {
   const t = $('tx-text');
   t.innerHTML = '<span class="cursor">&nbsp;</span>';
   let i = 0;
-  clearInterval(txTimer);
+  clearInterval(txTimer); clearTimeout(txAuto);
   txTimer = setInterval(() => {
     i += 2;
     t.innerHTML = text.slice(0, i) + '<span class="cursor">&nbsp;</span>';
-    if (i >= text.length) { clearInterval(txTimer); txTimer = null; t.textContent = text; }
+    if (i >= text.length) { clearInterval(txTimer); txTimer = null; t.textContent = text; txScheduleAuto(); }
   }, 24);
 }
-export function txSkip() { // tap: finish typing, second tap: dismiss
+export function txSkip() { // tap: finish typing, next tap (or auto): dismiss
   if (el.tx.classList.contains('hidden')) return false;
-  if (txTimer) { clearInterval(txTimer); txTimer = null; $('tx-text').textContent = txFull; return true; }
+  if (txTimer) { clearInterval(txTimer); txTimer = null; $('tx-text').textContent = txFull; txScheduleAuto(); return true; }
+  clearTimeout(txAuto);
   el.tx.classList.add('hidden');
-  txDone?.(); txDone = null;
+  const done = txDone; txDone = null;
+  done?.();
   return true;
 }
 export const txOpen = () => !el.tx.classList.contains('hidden');
+// tapping the panel itself ("tap to continue" is printed on it) must work
+el.tx.addEventListener('pointerdown', e => { e.stopPropagation(); sfx.click(); txSkip(); });
 
 // ---------- draft ----------
 export function showDraft(options, rerollsLeft, onPick, onReroll) {

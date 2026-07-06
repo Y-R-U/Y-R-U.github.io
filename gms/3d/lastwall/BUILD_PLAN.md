@@ -127,6 +127,24 @@ hits into launches; the best kill is a long drop off the wall.
   timing, player-ragdoll feel, `?shot` stage + screenshot) and Phase 5 story
   beats 11–100 + themes + more bosses.
 
+- **S1.1 (2026-07-07, Fable 5)** — Aaron's first mobile playtest fixes:
+  (1) left/right was genuinely reversed — sign error in the input rotation;
+  (2) movement "hard" — input was rotated through the LIVE camera frame while
+  the camera auto-chased travel, so holding a direction spiralled; fixed with
+  **direction latching** (world dir locks while the stick is held steady,
+  re-reads the camera frame only on >23° steer) + a deadband so backing up
+  doesn't whip the camera. Headless-verified: D→straight east, W→straight
+  north, touch-right→straight east, zero spiral.
+  (3) end-gate was an invisible 5.5m spot at the plaza CENTRE — now the
+  portcullis visibly rises as you approach and walking under the arch
+  completes the level with a fade-to-black (no button-hunting).
+  (4) story intro soft-locked on mobile — taps on the transmission panel were
+  swallowed and there was no auto-advance, so STORY hung in the flyby until a
+  refresh (seenIntro had saved). Now: panel taps skip, and transmissions
+  auto-advance after reading time (RULE: no transmission may ever block
+  progress). Verified: hands-free intro→PLAY in 23s; tap-through in 7 taps.
+  Aaron retest pending. Story beats 11–100 still Phase 5 (confirmed intended).
+
 ## Known debts / decisions pending
 
 - Mid-run save: runs are one-sitting; only meta persists. Fine for now; revisit at ship.

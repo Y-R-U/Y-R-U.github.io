@@ -135,6 +135,7 @@ b, .panel-title { letter-spacing:.06em; }
 @keyframes toastup { 0%{opacity:0; transform:translateY(10px)} 10%,80%{opacity:1; transform:translateY(0)} 100%{opacity:0; transform:translateY(-14px)} }
 
 #dmgflash { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at center, transparent 55%, rgba(200,30,10,.45)); opacity:0; transition:opacity .3s; }
+#fade { position:fixed; inset:0; pointer-events:none; background:#0a0705; opacity:0; transition:opacity .4s; z-index:70; }
 #hint { position:absolute; bottom:max(12px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); font-size:11px; color:#8a7a66; letter-spacing:.1em; background:rgba(20,14,10,.6); padding:4px 12px; border-radius:8px; white-space:nowrap; }
 #btn-pause { position:absolute; top:max(10px,env(safe-area-inset-top)); right:max(10px,env(safe-area-inset-right)); margin-top:86px; width:34px; height:34px; border-radius:9px; background:rgba(20,14,10,.75); border:1px solid #3d2f24; color:#8a7a66; font-weight:800; pointer-events:auto; cursor:pointer; }
 

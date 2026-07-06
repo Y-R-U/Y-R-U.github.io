@@ -2,7 +2,7 @@
 // the chase camera that follows the player's direction of travel.
 import * as THREE from 'three';
 import { CFG } from './config.js';
-import { clamp, damp, angLerp } from './utils.js';
+import { clamp, damp, angLerp, TAU } from './utils.js';
 
 export function makeControls(camera, dom, cb) {
   const keys = {};
@@ -61,10 +61,14 @@ export function makeControls(camera, dom, cb) {
   dom.addEventListener('contextmenu', e => e.preventDefault());
   addEventListener('wheel', e => { zoom = clamp(zoom + e.deltaY * 0.0009, 0.6, 1.7); }, { passive: true });
 
-  const fwd = new THREE.Vector3(), rgt = new THREE.Vector3();
+  const fwd = new THREE.Vector3();
+  let latch = null; // { la: local stick angle, wx, wz: unit world dir }
   return {
     get camYaw() { return camYaw; },
-    // camera-relative desired move (unit-ish), sprint bool
+    // camera-relative desired move (unit dir + mag), sprint bool.
+    // The world direction LATCHES while the stick is held steady: the camera
+    // realigning behind you must not rotate your input mid-stride (holding
+    // right would spiral). Only re-read the camera frame when you steer >~23°.
     read() {
       let x = 0, z = 0;
       if (keys.KeyW || keys.ArrowUp) z -= 1;
@@ -74,16 +78,31 @@ export function makeControls(camera, dom, cb) {
       const kl = Math.hypot(x, z); if (kl > 1) { x /= kl; z /= kl; }
       if (joyId !== -1) { x = joyVec.x; z = joyVec.y; }
       const mag = clamp(Math.hypot(x, z), 0, 1);
-      // rotate into world by camera yaw
-      const sin = Math.sin(camYaw), cos = Math.cos(camYaw);
-      const wx = x * cos - z * sin, wz = -x * sin - z * cos;
-      return { x: -wx, z: -wz, mag, sprint: !!keys.ShiftLeft || !!keys.ShiftRight || mag > 0.96 };
+      if (mag < 0.05) { latch = null; return { x: 0, z: 0, mag: 0, sprint: false }; }
+      const la = Math.atan2(x, z);
+      let steer = true;
+      if (latch) {
+        let d = (la - latch.la) % TAU;
+        if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU;
+        steer = Math.abs(d) > 0.4;
+      }
+      if (steer) {
+        // rotate into world by CURRENT camera yaw. Camera sits at +(sinθ,cosθ)·d,
+        // so screen-up (z=-1) → world (-sinθ,-cosθ), screen-right (x=1) → (cosθ,-sinθ).
+        const sin = Math.sin(camYaw), cos = Math.cos(camYaw);
+        const ux = x / mag, uz = z / mag;
+        latch = { la, wx: ux * cos + uz * sin, wz: -ux * sin + uz * cos };
+      }
+      return { x: latch.wx, z: latch.wz, mag, sprint: !!keys.ShiftLeft || !!keys.ShiftRight || mag > 0.96 };
     },
     updateCamera(dt, px, pz, vx, vz, speed) {
-      // camera yaw chases travel direction (+ manual orbit offset that decays)
+      // camera yaw chases travel direction (+ manual orbit offset that decays),
+      // but NOT when running toward the camera — backing up must not whip the view
       if (speed > 1.2) {
         const travel = Math.atan2(vx, vz) + Math.PI; // camera behind motion
-        camYaw = angLerp(camYaw, travel + orbit, 1 - Math.exp(-1.8 * dt));
+        let diff = (travel + orbit - camYaw) % (Math.PI * 2);
+        if (diff > Math.PI) diff -= Math.PI * 2; if (diff < -Math.PI) diff += Math.PI * 2;
+        if (Math.abs(diff) < 1.95) camYaw = angLerp(camYaw, travel + orbit, 1 - Math.exp(-1.5 * dt));
       } else {
         camYaw = angLerp(camYaw, camYaw + orbit, 1 - Math.exp(-2 * dt));
       }

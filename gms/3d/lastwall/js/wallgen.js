@@ -280,10 +280,10 @@ export function buildLevel(seed, n) {
     pole.add(cloth); group.add(pole);
   }
 
-  // gates
-  const endGate = { x: cx, z: cz, rect: prev };
+  // gates. gz = the exit arch line — walking through it completes the level
   buildGate(group, start.x, 13, false);           // behind start (clear of the camera)
-  buildGate(group, cx, cz - TW / 2 - 1, true);    // level exit (north side of last plaza)
+  const exitGate = buildGate(group, cx, cz - TW / 2 - 1, true);
+  const endGate = { x: cx, z: cz, gz: cz - TW / 2 - 1, rect: prev, gate: exitGate, opened: false };
 
   // materialize pickups
   for (const p of pickups) p.y = H + 1.0;
