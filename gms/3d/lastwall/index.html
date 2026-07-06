@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#14100e" />
+  <title>Lastwall — run the wall, carry the cure</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">LASTWALL</div>
+      <div class="boot-sub">run the wall · carry the cure</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- title menu -->
+  <div id="title" class="screen hidden">
+    <div class="title-inner">
+      <div class="game-logo">LAST<span>WALL</span></div>
+      <div class="tagline">100 sections. One cure. You.</div>
+      <div class="menu-col">
+        <button id="btn-story" class="mbtn primary">STORY <small id="story-sub"></small></button>
+        <button id="btn-endless" class="mbtn">ENDLESS <small id="endless-sub"></small></button>
+        <button id="btn-meta" class="mbtn">UPGRADES <small id="serum-sub"></small></button>
+        <button id="btn-help" class="mbtn ghost">HOW TO PLAY</button>
+      </div>
+      <div class="foot">a Y-R-U game · everything ragdolls</div>
+    </div>
+  </div>
+
+  <!-- gate select (story checkpoints / endless x10) -->
+  <div id="gatesel" class="screen hidden">
+    <div class="panel">
+      <div class="panel-title" id="gatesel-title">START AT GATE</div>
+      <div id="gatesel-grid" class="gate-grid"></div>
+      <div class="panel-btns"><button id="gatesel-back" class="mbtn ghost">BACK</button></div>
+    </div>
+  </div>
+
+  <!-- meta upgrades -->
+  <div id="metascreen" class="screen hidden">
+    <div class="panel wide">
+      <div class="panel-title">PERMANENT UPGRADES <span id="meta-serum" class="serum-big">0 ⬢</span></div>
+      <div id="meta-grid" class="meta-grid"></div>
+      <div class="panel-btns"><button id="meta-back" class="mbtn ghost">BACK</button></div>
+    </div>
+  </div>
+
+  <!-- powerup draft -->
+  <div id="draft" class="screen hidden">
+    <div class="draft-inner">
+      <div class="panel-title">CHOOSE A POWER</div>
+      <div id="draft-cards" class="draft-cards"></div>
+      <div class="panel-btns">
+        <button id="draft-reroll" class="mbtn">REROLL <b id="reroll-n">3</b></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- story / transmissions -->
+  <div id="transmission" class="hidden">
+    <div class="tx-head"><span class="tx-dot"></span><b id="tx-from">WARDEN</b><span id="tx-sig">▮▮▮▯▯</span></div>
+    <div id="tx-text"></div>
+    <div class="tx-foot">tap / space to continue</div>
+  </div>
+
+  <!-- generic modal (death / level complete / pause / help / confirm) -->
+  <div id="modal" class="screen hidden">
+    <div class="panel" id="modal-panel">
+      <div class="panel-title" id="modal-title"></div>
+      <div id="modal-body"></div>
+      <div class="panel-btns" id="modal-btns"></div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="vitals">
+      <div class="bar hp"><span class="ic">✚</span><div class="track"><i id="hp-fill"></i></div><b id="hp-num">100</b></div>
+      <div id="row2">
+        <div class="chip"><span>⬢</span><b id="serum">0</b></div>
+        <div class="chip lvl"><span id="mode-ic">§</span><b id="level-num">1</b></div>
+        <div class="chip"><span>💀</span><b id="kills">0</b></div>
+      </div>
+      <div id="boosts"></div>
+    </div>
+    <div id="weapon-hud">
+      <div id="wpn-main" class="wchip on"><b id="wpn-name">PIPE</b><small id="wpn-ammo">∞</small></div>
+      <div id="wpn-temp" class="wchip hidden"><b id="tmp-name"></b><small id="tmp-ammo"></small></div>
+      <div id="wpn-super" class="wchip super hidden"><b id="sup-name"></b><div class="sup-track"><i id="sup-fill"></i></div></div>
+    </div>
+    <div id="objective" class="hidden"></div>
+    <div id="bossbar" class="hidden"><b id="boss-name"></b><div class="track"><i id="boss-fill"></i></div></div>
+    <div id="announce" class="hidden"></div>
+    <div id="toasts"></div>
+    <div id="dmgflash"></div>
+    <div id="hint" class="hidden"></div>
+    <button id="btn-pause">II</button>
+    <div id="joy-base"></div><div id="joy-nub"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
