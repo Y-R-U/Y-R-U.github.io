@@ -183,9 +183,9 @@ export function tickRagdolls(dt) {
   }
 }
 
-function fadeOut(rag) {
-  rag.fade = (rag.fade || 1) - 0.02;
-  for (const s of rag.meshes) s.m.position.y -= 0.012;
+function fadeOut(rag, dt) { // dt-scaled so corpse cleanup pacing matches wall-clock on any fps
+  rag.fade = (rag.fade ?? 1) - 1.2 * dt;
+  for (const s of rag.meshes) s.m.position.y -= 0.72 * dt;
   if (rag.fade <= 0) despawn(rag);
 }
 

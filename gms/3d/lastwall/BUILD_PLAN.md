@@ -153,6 +153,22 @@ hits into launches; the best kill is a long drop off the wall.
   paused hands-off indefinitely, taps resume, no HUD overlap, fade works,
   `?auto` soak still clears L1→L2. Aaron retest pending.
 
+- **S1.3 (2026-07-07, Fable 5)** — 8-angle peer review (multi-agent) over the whole
+  game; 10 confirmed findings fixed + verified: death-flow races (new DYING state,
+  run-token on the death timer, ragdoll recovery before level teardown, alive-check
+  on the gate trigger); SECOND WIND / MULLIGAN / VOLATILE STRAIN were all silent
+  no-ops — now wired; all four kill paths funnel through one `killEnemy()` (bloater
+  self-detonation now drops serum, slam-killed bloaters pop); disposeLevel no longer
+  disposes the live player's / shared singleton materials (detach-before-traverse +
+  `material.userData.shared`); per-kill scene-graph husk leak fixed; enemy population
+  cap (45) + 85m straggler cull; fx hot path de-allocated (shared debris/pickup
+  geo+mats, idle blood skip, cached weapon meshes, HUD DOM writes only on change);
+  melee strike moved from setTimeout to sim time; knockback now scales with the FULL
+  damage multiplier per the design contract (crit ×2 both); `angDiff/inArc` helpers
+  replace 5 inline copies; climb-spawn `break`→`continue`; corpse fade dt-scaled;
+  CLAUDE.md API drift corrected (clampRects/spawnRagdoll/buildLevel shape/?nointro).
+  Full regression suite green (input/soak/ragdoll/crack/story-gate/death-flow).
+
 ## Known debts / decisions pending
 
 - Mid-run save: runs are one-sitting; only meta persists. Fine for now; revisit at ship.

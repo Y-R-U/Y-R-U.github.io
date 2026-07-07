@@ -136,6 +136,7 @@ const wmats = {
   metal: mat(0x5a5f66), dark: mat(0x2e3136), wood: mat(0x6e4a2a),
   glowP: mat(0x3a2a5e, 0x8a5aff, 1.6), glowO: mat(0x5e2a1a, 0xff7a2a, 1.5),
 };
+for (const m of Object.values(wmats)) m.userData.shared = true; // module singletons — never dispose
 function wbox(g, m, w, h, d, x, y, z, rx = 0) {
   const b = new THREE.Mesh(BOX, m); b.scale.set(w, h, d); b.position.set(x, y, z); b.rotation.x = rx; g.add(b); return b;
 }

@@ -2,7 +2,7 @@
 // temp override / manual super), boosts, damage intake incl. player-ragdoll.
 import * as THREE from 'three';
 import { CFG } from './config.js';
-import { clamp, clampRects, angLerp, rand } from './utils.js';
+import { clamp, clampRects, angLerp, inArc, rand } from './utils.js';
 import { makeHumanoid, makeWeaponMesh } from './models.js';
 import { WEAPONS, MELEE_TIERS, GUN_TIERS } from './weapons.js';
 import { spawnRagdoll, reattach } from './ragdoll.js';
@@ -14,12 +14,14 @@ export function makePlayer(scene, meta, runMods) {
   const h = makeHumanoid('hero');
   scene.add(h.group);
   const wm = { current: null, muzzle: null };
+  const meshCache = new Map(); // weapon id → built mesh, reused across swaps
 
   const P = {
     h, x: 0, z: 0, vx: 0, vz: 0, yaw: 0, alive: true, ragging: false, rag: null,
-    iframes: 0, swingT: -1, slamT: -1, hurtFlash: 0,
+    iframes: 0, swingT: -1, slamT: -1, hurtFlash: 0, strike: null, usedWind: false,
     mods: runMods, // { dmg, atk, kb, spd, hp, lifesteal, crit, boostDur, superRate, serum }
     maxHp: 0, hp: 0,
+    meleeId: MELEE_TIERS[meta.up('meleeTier')], gunId: GUN_TIERS[meta.up('gunTier')],
     melee: WEAPONS[MELEE_TIERS[meta.up('meleeTier')]],
     gun: WEAPONS[GUN_TIERS[meta.up('gunTier')]],
     temp: null,   // { id, def, ammo, time }
@@ -27,17 +29,23 @@ export function makePlayer(scene, meta, runMods) {
     boosts: { dmg: { mult: 1, t: 0 }, spd: { mult: 1, t: 0 }, shield: { t: 0 } },
     cd: 0, target: null, level: null,
 
-    place(x, z) { this.x = x; this.z = z; h.group.position.set(x, CFG.wallH, z); },
+    place(x, z) { this.x = x; this.z = z; this.strike = null; h.group.position.set(x, CFG.wallH, z); },
 
     dmgMult() { return this.mods.dmg * this.boosts.dmg.mult; },
-    kbMult() { return this.mods.kb * this.boosts.dmg.mult; }, // boosts launch — core pillar
+    // contract: knockback scales with the FULL damage multiplier — MUSCLE ranks,
+    // powerup damage and boosts all magnify launches, per the design pitch
+    kbMult() { return this.mods.kb * this.mods.dmg * this.boosts.dmg.mult; },
     speed() { return CFG.player.speed * this.mods.spd * this.boosts.spd.mult; },
 
     setWeaponMesh(id) {
       if (wm.id === id) return;
       if (wm.current) h.handR.remove(wm.current);
-      const w = makeWeaponMesh(id);
-      w.group.rotation.x = Math.PI / 2; // barrel forward when arm points ahead
+      let w = meshCache.get(id);
+      if (!w) {
+        w = makeWeaponMesh(id);
+        w.group.rotation.x = Math.PI / 2; // barrel forward when arm points ahead
+        meshCache.set(id, w);
+      }
       h.handR.add(w.group);
       wm.current = w.group; wm.muzzle = w.muzzle; wm.id = id;
     },
@@ -91,8 +99,15 @@ export function makePlayer(scene, meta, runMods) {
           else this.fire(def, dist);
         }
       }
-      this.setWeaponMesh(this.temp ? this.temp.id : (pose === 'melee' || (!this.target && moving < 1)) ? meleeId(this) : gunId(this));
+      this.setWeaponMesh(this.temp ? this.temp.id : (pose === 'melee' || (!this.target && moving < 1)) ? this.meleeId : this.gunId);
       this.posture(pose, dt, t);
+
+      // pending melee strike lands on SIM time (survives pause/hitstop cleanly,
+      // can't fire into a different level like a setTimeout could)
+      if (this.strike) {
+        this.strike.t -= dt;
+        if (this.strike.t <= 0) { const d = this.strike.def; this.strike = null; this.meleeHit(d); }
+      }
 
       // slam anim (super maul)
       if (this.slamT >= 0) {
@@ -132,31 +147,27 @@ export function makePlayer(scene, meta, runMods) {
     swing(def) {
       this.swingT = 0;
       sfx.swing();
-      // damage lands slightly into the swing
-      setTimeout(() => {
-        if (!this.alive) return;
-        const dm = this.dmgMult(), crit = Math.random() < this.mods.crit;
-        const dmg = def.dmg * dm * (crit ? 2 : 1);
-        const kbI = def.kb * this.kbMult() * (crit ? 1.6 : 1);
-        let hit = 0;
-        for (const e of [...enemies]) {
-          if (e.dead || e.state === 'rag') continue;
-          const dx = e.x - this.x, dz = e.z - this.z, d = Math.hypot(dx, dz);
-          if (d > def.range + .4) continue;
-          let ang = Math.atan2(dx, dz) - this.yaw;
-          while (ang > Math.PI) ang -= 2 * Math.PI; while (ang < -Math.PI) ang += 2 * Math.PI;
-          if (Math.abs(ang) > def.arc) continue;
-          damageEnemy(e, dmg, dx / (d || 1), dz / (d || 1), kbI);
-          hit++;
-        }
-        if (hit) { sfx.thud(); fx.hitstop(.045 * Math.min(3, hit)); fx.addShake(.12 * hit); this.heal(dmg * this.mods.lifesteal * hit); }
-        // crates
-        this.level.crates?.forEach(cr => {
-          if (cr.dead) return;
-          const d = Math.hypot(cr.x - this.x, cr.z - this.z);
-          if (d < def.range + .6) breakCrate(cr, this);
-        });
-      }, 120);
+      this.strike = { t: 0.12, def }; // damage lands slightly into the swing
+    },
+
+    meleeHit(def) {
+      const dm = this.dmgMult(), crit = Math.random() < this.mods.crit;
+      const dmg = def.dmg * dm * (crit ? 2 : 1);
+      const kbI = def.kb * this.kbMult() * (crit ? 2 : 1);
+      let hit = 0;
+      for (const e of [...enemies]) {
+        if (e.dead || e.state === 'rag') continue;
+        const dx = e.x - this.x, dz = e.z - this.z, d = Math.hypot(dx, dz);
+        if (d > def.range + .4) continue;
+        if (!inArc(dx, dz, this.yaw, def.arc)) continue;
+        damageEnemy(e, dmg, dx / (d || 1), dz / (d || 1), kbI);
+        hit++;
+      }
+      if (hit) { sfx.thud(); fx.hitstop(.045 * Math.min(3, hit)); fx.addShake(.12 * hit); this.heal(dmg * this.mods.lifesteal * hit); }
+      this.level.crates?.forEach(cr => {
+        if (cr.dead) return;
+        if (Math.hypot(cr.x - this.x, cr.z - this.z) < def.range + .6) breakCrate(cr, this);
+      });
     },
 
     fire(def, dist) {
@@ -166,18 +177,14 @@ export function makePlayer(scene, meta, runMods) {
       const pellets = def.pellets || 1;
       if (def.type === 'flame') sfx.flame(); else if (pellets > 1) sfx.scatter(); else if (def.cd < .15) sfx.smg(); else if (def.dmg > 30) sfx.heavyShot(); else sfx.shot();
       // multi-pellet weapons spray the cone and can hit several enemies
-      const coneTargets = pellets > 1 ? enemies.filter(o => {
-        if (o.dead || o.state === 'rag') return false;
-        const d = Math.hypot(o.x - this.x, o.z - this.z);
-        if (d > def.range + 1) return false;
-        let ang = Math.atan2(o.x - this.x, o.z - this.z) - this.yaw;
-        while (ang > Math.PI) ang -= 2 * Math.PI; while (ang < -Math.PI) ang += 2 * Math.PI;
-        return Math.abs(ang) < .5;
-      }) : null;
+      const coneTargets = pellets > 1 ? enemies.filter(o =>
+        !o.dead && o.state !== 'rag' &&
+        Math.hypot(o.x - this.x, o.z - this.z) <= def.range + 1 &&
+        inArc(o.x - this.x, o.z - this.z, this.yaw, .5)) : null;
       for (let i = 0; i < pellets; i++) {
         const crit = Math.random() < this.mods.crit;
         const dmg = def.dmg * dm * (crit ? 2 : 1);
-        const kbI = def.kb * this.kbMult() * (crit ? 1.6 : 1);
+        const kbI = def.kb * this.kbMult() * (crit ? 2 : 1);
         // hitscan at target with spread: chance to miss → tracer into distance
         const spread = (def.spread || 0) * (1 + i * .4);
         const missAng = rand(-spread, spread) * Math.PI * 2;
@@ -244,10 +251,7 @@ export function makePlayer(scene, meta, runMods) {
         for (const e of [...enemies]) {
           if (e.dead) continue;
           const dx = e.x - this.x, dz = e.z - this.z, d = Math.hypot(dx, dz);
-          if (d > def.range) continue;
-          let ang = Math.atan2(dx, dz) - this.yaw;
-          while (ang > Math.PI) ang -= 2 * Math.PI; while (ang < -Math.PI) ang += 2 * Math.PI;
-          if (Math.abs(ang) > def.cone) continue;
+          if (d > def.range || !inArc(dx, dz, this.yaw, def.cone)) continue;
           damageEnemy(e, def.dmg * dm, dx / (d || 1), dz / (d || 1), def.kb * this.kbMult() + def.lift);
         }
       }
@@ -268,7 +272,7 @@ export function makePlayer(scene, meta, runMods) {
       if (this.hp <= 0) { this.die(dirX, dirZ, kbImpulse); return; }
       if (kbImpulse >= CFG.player.ragdollThresh) {
         // player ragdolls but CANNOT leave the wall while alive
-        this.ragging = true;
+        this.ragging = true; this.strike = null;
         const v = new THREE.Vector3(dirX * kbImpulse * .35, 2 + kbImpulse * .16, dirZ * kbImpulse * .35);
         this.rag = spawnRagdoll(h, v, {
           onRagdollGone: () => {},
@@ -290,7 +294,15 @@ export function makePlayer(scene, meta, runMods) {
     },
 
     die(dirX, dirZ, kbImpulse) {
-      this.alive = false; this.ragging = true;
+      // SECOND WIND (permanent upgrade): survive one death per run at 40 HP
+      if (this.mods.secondWind && !this.usedWind) {
+        this.usedWind = true;
+        this.hp = Math.min(this.maxHp, 40);
+        this.iframes = 2;
+        this.onSecondWind?.();
+        return;
+      }
+      this.alive = false; this.ragging = true; this.strike = null;
       sfx.die();
       // death launch — the only time the hero can leave the wall
       const v = new THREE.Vector3(dirX * Math.max(20, kbImpulse) * .5, 6 + kbImpulse * .18, dirZ * Math.max(20, kbImpulse) * .5);
@@ -301,9 +313,6 @@ export function makePlayer(scene, meta, runMods) {
   };
   return P;
 }
-
-function meleeId(P) { return Object.entries(WEAPONS).find(([, d]) => d === P.melee)[0]; }
-function gunId(P) { return Object.entries(WEAPONS).find(([, d]) => d === P.gun)[0]; }
 
 export function breakCrate(cr, P) {
   cr.dead = true;

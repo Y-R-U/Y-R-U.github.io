@@ -7,14 +7,20 @@ import { mat } from './models.js';
 
 let scene = null;
 const BOX = new THREE.BoxGeometry(1, 1, 1);
+BOX.userData.shared = true; // never dispose on level teardown
 let shake = 0, stopT = 0, slowT = 0;
-const tracers = [], bloods = [], debris = [], rings = [], flashes = [];
-let bloodIM = null, bloodDat = [];
+const tracers = [], debris = [], rings = [], flashes = [];
+let bloodIM = null, bloodDat = [], bloodActive = false;
+// cached materials so debris/pickups create zero per-instance GPU resources
+const chunkMats = new Map();
+const chunkMat = c => { let m = chunkMats.get(c); if (!m) { m = mat(c); m.userData.shared = true; chunkMats.set(c, m); } return m; };
+// module-level scratch — tickFx runs every frame, no per-frame allocations
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(1, 1, 1), _p = new THREE.Vector3(), _hide = new THREE.Vector3(0, -100, 0);
 
 export function initFx(sc) {
   scene = sc;
-  tracers.length = bloods.length = debris.length = rings.length = flashes.length = 0;
-  shake = 0; stopT = 0; slowT = 0;
+  tracers.length = debris.length = rings.length = flashes.length = 0;
+  shake = 0; stopT = 0; slowT = 0; bloodActive = false;
   // blood: one instanced mesh pool
   const n = CFG.maxBlood;
   bloodIM = new THREE.InstancedMesh(new THREE.BoxGeometry(.14, .14, .14), new THREE.MeshBasicMaterial({ color: 0x4d0a06 }), n);
@@ -50,6 +56,7 @@ export function tracer(from, to, color = 0xffd28a) {
 }
 
 export function blood(pos, n = 8, pow = 4) {
+  bloodActive = true;
   let placed = 0;
   for (const d of bloodDat) {
     if (d.live > 0) continue;
@@ -62,7 +69,7 @@ export function blood(pos, n = 8, pow = 4) {
 // tumbling box debris (crates, gibs, collapse chunks)
 export function chunk(pos, vel, size = .5, color = 0x5a4a3a, life = 3) {
   if (debris.length > CFG.maxDebris) { const d = debris.shift(); scene.remove(d.m); }
-  const m = new THREE.Mesh(BOX, mat(color));
+  const m = new THREE.Mesh(BOX, chunkMat(color));
   m.scale.set(size * rand(.6, 1.4), size * rand(.6, 1.4), size * rand(.6, 1.4));
   m.position.copy(pos);
   scene.add(m);
@@ -107,16 +114,27 @@ export function collapseFx(box) {
   addShake(1.3);
 }
 
-// pickup visual: glowing box + ring, bobs & spins (tick moves them)
+// pickup visual: glowing box + ring, bobs & spins (tick moves them).
+// Geometries + materials are shared per type — orbs spawn per kill, so
+// per-instance GPU resources here would leak across a 100-level run.
 const PICKUP_STYLE = {
   boost: [0xff5a36, '⚡'], med: [0x7fe07f, '✚'], serum: [0x35ff88, '⬢'],
   loot: [0xffb056, '▣'], super: [0xa97fff, '★'],
 };
+const pickGeoCore = new THREE.BoxGeometry(.55, .55, .55);
+const pickGeoRing = new THREE.TorusGeometry(.75, .05, 6, 20);
+pickGeoCore.userData.shared = pickGeoRing.userData.shared = true;
+const pickMats = {};
 export function pickupMesh(type) {
   const [color] = PICKUP_STYLE[type] || PICKUP_STYLE.loot;
+  let pm = pickMats[type];
+  if (!pm) {
+    pm = pickMats[type] = { core: mat(0x1a1410, color, 1.4), ring: mat(0x1a1410, color, .9) };
+    pm.core.userData.shared = pm.ring.userData.shared = true;
+  }
   const g = new THREE.Group();
-  const core = new THREE.Mesh(new THREE.BoxGeometry(.55, .55, .55), mat(0x1a1410, color, 1.4));
-  const rg = new THREE.Mesh(new THREE.TorusGeometry(.75, .05, 6, 20), mat(0x1a1410, color, .9));
+  const core = new THREE.Mesh(pickGeoCore, pm.core);
+  const rg = new THREE.Mesh(pickGeoRing, pm.ring);
   rg.rotation.x = Math.PI / 2;
   g.add(core, rg); g.userData.spin = true;
   return g;
@@ -124,17 +142,21 @@ export function pickupMesh(type) {
 
 export function tickFx(dt, t) {
   for (let i = tracers.length - 1; i >= 0; i--) { const tr = tracers[i]; tr.t -= dt; tr.l.material.opacity = tr.t / .09; if (tr.t <= 0) { scene.remove(tr.l); tr.l.geometry.dispose(); tracers.splice(i, 1); } }
-  // blood
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(1, 1, 1), p = new THREE.Vector3(), hide = new THREE.Vector3(0, -100, 0);
-  bloodDat.forEach((d, i) => {
-    if (d.live <= 0) { m4.compose(hide, q, s); bloodIM.setMatrixAt(i, m4); return; }
-    d.live -= dt;
-    d.vy -= 26 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
-    if (d.y < CFG.wallH + .06 && d.vy < 0) { d.y = CFG.wallH + .06; d.vy = 0; d.vx *= .8; d.vz *= .8; }
-    p.set(d.x, d.y, d.z); m4.compose(p, q, s.setScalar(Math.min(1, d.live * 2)));
-    bloodIM.setMatrixAt(i, m4);
-  });
-  bloodIM.instanceMatrix.needsUpdate = true;
+  // blood — skipped entirely (no compose, no GPU upload) while nothing is live
+  if (bloodActive) {
+    let live = 0;
+    bloodDat.forEach((d, i) => {
+      if (d.live <= 0) { _m4.compose(_hide, _q, _s.setScalar(1)); bloodIM.setMatrixAt(i, _m4); return; }
+      live++;
+      d.live -= dt;
+      d.vy -= 26 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
+      if (d.y < CFG.wallH + .06 && d.vy < 0) { d.y = CFG.wallH + .06; d.vy = 0; d.vx *= .8; d.vz *= .8; }
+      _p.set(d.x, d.y, d.z); _m4.compose(_p, _q, _s.setScalar(Math.min(1, d.live * 2)));
+      bloodIM.setMatrixAt(i, _m4);
+    });
+    bloodIM.instanceMatrix.needsUpdate = true;
+    if (live === 0) bloodActive = false; // this pass just wrote the hides
+  }
   // debris
   for (let i = debris.length - 1; i >= 0; i--) {
     const d = debris[i]; d.t -= dt;

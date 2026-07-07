@@ -57,7 +57,8 @@ export function makeControls(camera, dom, cb) {
     if (e.pointerId === orbId) orbId = -1;
     if (e.pointerType === 'mouse') mouseDown = false;
   };
-  dom.addEventListener('pointerup', upTouch); dom.addEventListener('pointercancel', upTouch);
+  // window-level so a release over any UI overlay still ends the drag
+  addEventListener('pointerup', upTouch); addEventListener('pointercancel', upTouch);
   dom.addEventListener('contextmenu', e => e.preventDefault());
   addEventListener('wheel', e => { zoom = clamp(zoom + e.deltaY * 0.0009, 0.6, 1.7); }, { passive: true });
 

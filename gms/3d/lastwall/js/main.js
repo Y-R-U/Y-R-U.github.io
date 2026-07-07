@@ -60,26 +60,31 @@ function newRun(mode, startLevel) {
     mode, n: startLevel, serum: 0, kills: 0,
     mods: meta.runMods(), claimed: new Set(), taken: new Set(),
     salt: (Math.random() * 1e9) | 0,
-    usedWind: false,
   };
-  run.rerolls = run.mods.rerolls;
+  // rerolls live on run.mods.rerolls so the MULLIGAN powerup (+2) actually lands
   loadLevel(startLevel, true);
 }
 
 function disposeLevel() {
   if (!levelRoot) return;
+  // the player (and its weapon meshes/materials) persists across levels —
+  // pull it out BEFORE the dispose traversal or its materials get torn down
+  if (P?.h?.group?.parent) P.h.group.removeFromParent();
   scene.remove(levelRoot);
   levelRoot.traverse(o => {
     if (o.isMesh || o.isInstancedMesh || o.isLine || o.isPoints) {
       if (o.geometry && !o.geometry.userData?.shared) o.geometry.dispose();
       const mats = Array.isArray(o.material) ? o.material : [o.material];
-      for (const m of mats) { if (m?.map) m.map.dispose(); m?.dispose?.(); }
+      for (const m of mats) { if (!m || m.userData?.shared) continue; if (m.map) m.map.dispose(); m.dispose?.(); }
     }
   });
   levelRoot = null;
 }
 
 function loadLevel(n, isRunStart = false) {
+  // a knocked-down (alive) player must recover its ragdolled body parts
+  // BEFORE the old level (which owns them) is disposed
+  if (!isRunStart && P?.rag && P.alive) P.standUp(P.rag);
   disposeLevel();
   ui.bossBar(null); boss = null; bossLocked = false; bossMusic(false);
   const def = levelDef(run.mode, n, run.salt);
@@ -103,6 +108,7 @@ function loadLevel(n, isRunStart = false) {
     P = makePlayer(levelRoot, meta, run.mods);
     P.onDeath = onPlayerDeath;
     P.onTempGone = why => ui.toast(why === 'SPENT' ? 'WEAPON SPENT' : why);
+    P.onSecondWind = () => { ui.announce('SECOND WIND', 'the blood refuses to stop'); sfx.boost(); fx.slowmo(.6); };
     bindSuperBtn();
   } else {
     levelRoot.add(P.h.group);
@@ -116,6 +122,7 @@ function loadLevel(n, isRunStart = false) {
 
   EN.initEnemies(levelRoot, level, () => P, {
     toast: ui.toast,
+    mods: () => run.mods,
     serum(amt) { const a = Math.round(amt * run.mods.serum); run.serum += a; meta.addSerum(a); },
     bossDown() {
       bossLocked = false; ui.bossBar(null); bossMusic(false);
@@ -157,7 +164,7 @@ function loadLevel(n, isRunStart = false) {
   else begin();
 
   ui.el.hud.classList.remove('hidden');
-  ui.updateHUD(P, { ...run, kills: EN.kills() });
+  ui.updateHUD(P, run, EN.kills());
   if (isRunStart) ui.setHint(isTouch() ? 'drag to move · 2 fingers to orbit · weapons auto-aim' : 'WASD move · SPACE super · Q drop weapon · P pause');
   setTimeout(() => ui.setHint(null), 6000);
 }
@@ -173,7 +180,7 @@ function spawnPickup(type, x, z) {
 function chainDrafts(owed, then) {
   const k = owed[0];
   const roll = () => {
-    ui.showDraft(rollChoices(run.taken), run.rerolls,
+    ui.showDraft(rollChoices(run.taken), run.mods.rerolls,
       p => { // pick
         p.apply(run.mods);
         run.taken.add(p.id);
@@ -184,7 +191,7 @@ function chainDrafts(owed, then) {
         if (rest.length) chainDrafts(rest, then);
         else then();
       },
-      () => { if (run.rerolls > 0) { run.rerolls--; roll(); } });
+      () => { if (run.mods.rerolls > 0) { run.mods.rerolls--; roll(); } });
   };
   roll();
 }
@@ -285,7 +292,7 @@ function tickLevelEvents(dt) {
     const bars = eg.gate.userData.bars;
     bars.position.y = Math.min(bars.position.y + dt * 3.2, 5.2);
   }
-  if (!bossLocked && gdz < 3.5 && Math.abs(gdx) < 9) levelComplete();
+  if (!bossLocked && P.alive && !P.ragging && gdz < 3.5 && Math.abs(gdx) < 9) levelComplete();
 }
 
 function levelComplete() {
@@ -315,7 +322,11 @@ function winStory() {
 
 function onPlayerDeath() {
   if (run.mode === 'endless') meta.reachEndless(run.n);
-  setTimeout(() => { if (state === 'PLAY') { state = 'DEAD'; showDeathModal(); } }, 2400);
+  // DYING immediately: blocks pause, gate completion, cracks — the sim keeps
+  // running so the death ragdoll plays out. Token ties the modal to THIS run.
+  state = 'DYING';
+  const r = run;
+  setTimeout(() => { if (run === r && state === 'DYING') { state = 'DEAD'; showDeathModal(); } }, 2400);
 }
 
 function showDeathModal() {
@@ -428,7 +439,7 @@ function frame() {
   const t = clock.elapsedTime;
   fps = fps * .95 + (1 / Math.max(1e-3, rawDt)) * .05;
 
-  const playing = state === 'PLAY';
+  const playing = state === 'PLAY' || state === 'DYING'; // DYING: sim runs, triggers don't
   const dt = playing ? rawDt * fx.timeScale(rawDt) : 0;
 
   if (level && P) {
@@ -437,8 +448,8 @@ function frame() {
       P.tick(dt, t, input);
       EN.tickEnemies(dt, t);
       tickRagdolls(dt);
-      tickLevelEvents(dt);
-      ui.updateHUD(P, { ...run, serum: run.serum, kills: EN.kills() });
+      if (state === 'PLAY') tickLevelEvents(dt);
+      ui.updateHUD(P, run, EN.kills());
     }
     const px = P.ragging && P.rag ? P.rag.pts.hip.x : P.x;
     const pz = P.ragging && P.rag ? P.rag.pts.hip.z : P.z;

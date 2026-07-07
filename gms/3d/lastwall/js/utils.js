@@ -7,11 +7,14 @@ export const randi = (a, b) => Math.floor(rand(a, b + 1));
 export const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 export const TAU = Math.PI * 2;
 
-export function angLerp(a, b, t) {
-  let d = (b - a) % TAU;
+export function angDiff(a, b) { // shortest signed angle a-b, in [-π, π]
+  let d = (a - b) % TAU;
   if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU;
-  return a + d * t;
+  return d;
 }
+export const angLerp = (a, b, t) => a + angDiff(b, a) * t;
+// is the direction (dx,dz) within ±arc of facing yaw?
+export const inArc = (dx, dz, yaw, arc) => Math.abs(angDiff(Math.atan2(dx, dz), yaw)) <= arc;
 
 // deterministic RNG for level generation
 export function mulberry32(seed) {

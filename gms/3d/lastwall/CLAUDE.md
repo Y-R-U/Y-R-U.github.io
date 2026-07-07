@@ -15,16 +15,17 @@ meshes, and this keeps the repo fully committable.
 
 ## Architecture (one line per module)
 
-- `js/config.js` — ALL tuning numbers + URL modes (`?lvl=N ?endless ?nosave ?lite ?shot ?auto`)
+- `js/config.js` — ALL tuning numbers + URL modes (`?lvl=N ?endless ?nosave ?lite ?shot ?auto ?nointro`)
 - `js/utils.js` — math, seeded RNG (mulberry32), helpers
 - `js/world.js` — sky/fog/dusk sun/lights/bloom, ground + infected sea far below
 - `js/wallgen.js` — seeded level graph → wall spans/towers/gates meshes + parapet
   instancing + props + **rect-union colliders** + crack/collapse rigs + pickups.
-  Exports `buildLevel(seed, n)` → `{group, rects, spawnPts, gates, cracks, pickups…}`
+  Exports `buildLevel(seed, n)` → `{group, rects, cracks, pickups, spawns, climbs,
+  waypoints, crates, start, endGate{x,z,gz,gate,opened}, bodies}`
 - `js/models.js` — humanoid part factory (`makeHumanoid(kind)`) → `{group, parts,
-  animate(t, speed)}`; parts named (head/chest/pelvis/armL…) for ragdoll mapping
-- `js/ragdoll.js` — verlet particles+constraints; `fromHumanoid(h, impulse)`;
-  parapet slam damage, edge falls, get-up, gib/dismember helpers
+  animate(t, speed)}`; parts named (head/chest/pelvis/uarmL…) for ragdoll mapping
+- `js/ragdoll.js` — verlet particles+constraints; `spawnRagdoll(h, impulse, ent, opts)`;
+  parapet slam damage, edge falls, get-up (`reattach`), `dismember` helpers
 - `js/controls.js` — WASD + mouse-orbit / floating touch joystick + 2-finger orbit;
   chase camera
 - `js/player.js` — movement/HP/boosts/auto-aim combat/player-ragdoll-on-big-hit
@@ -42,12 +43,16 @@ meshes, and this keeps the repo fully committable.
 ## Key contracts
 
 1. **Rect-union walkable space**: `wallgen` returns axis-aligned rects (spans +
-   tower plazas). `clampToWall(pos)` keeps actors on; ragdoll particles ignore the
-   clamp and fall if outside all rects (that's how things fly off the wall).
-   A collapsed crack span REMOVES its rect at runtime.
-2. **Hit pipeline**: `damage(target, dmg, dir, kbFactor)` → hp; impulse = dmg ×
-   kbFactor × boostMult. impulse > `cfg.ragdollThresh` (or death) → convert to
-   ragdoll with that impulse. All knockback comedy flows from ONE multiplier path.
+   tower plazas, overlapping ≥2m at joins). `utils.clampRects(rects, x, z, pad)`
+   keeps actors on; ragdoll particles ignore the clamp and fall if outside all
+   rects (that's how things fly off the wall). A collapsed crack span sets
+   `rect.dead = true` — every rects consumer must skip dead rects.
+2. **Hit pipeline**: `enemies.damageEnemy(e, dmg, dirX, dirZ, kbImpulse)`.
+   Callers compute `kbImpulse = weapon.kb × mods.kb × mods.dmg × boostMult`
+   (knockback scales with the FULL damage multiplier — that's the launch pillar);
+   crit doubles both. impulse/mass > `CFG.ragdollThresh` (or death) → ragdoll.
+   ALL kill bookkeeping (count/serum/volatile/boss hook) goes through ONE
+   `killEnemy()` — never hand-roll `e.dead = true` at a call site.
 3. **Humanoid parts contract**: `models.makeHumanoid()` returns named parts whose
    meshes can be re-parented to ragdoll particles at conversion, and reattached on
    get-up. Never merge these geometries.

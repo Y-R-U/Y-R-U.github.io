@@ -62,8 +62,9 @@ export const CFG = {
     spurChance: 0.45, forkChance: 0.4, crackChance: 0.5,  // crack given fork
   },
 
-  // fx budgets
+  // budgets
   maxRagdolls: 14, maxDebris: 90, maxBlood: 220,
+  maxEnemies: 45,   // live population cap (boss exempt); stragglers >85m behind are culled
 };
 
 // quality: lite = no bloom/shadows, fewer instances (auto for small screens unless forced)

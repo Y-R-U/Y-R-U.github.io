@@ -39,6 +39,7 @@ export function initEnemies(sc, lvl, playerGetter, hk) {
 
 export function spawnEnemy(type, x, z, opts = {}) {
   const def = TYPES[type];
+  if (enemies.length >= CFG.maxEnemies && !def.boss) return null; // population cap
   const h = makeHumanoid(type === 'boss' ? 'boss' : type);
   h.group.position.set(x, CFG.wallH, z);
   scene.add(h.group);
@@ -57,7 +58,29 @@ export function spawnEnemy(type, x, z, opts = {}) {
 
 function removeEnemy(e) {
   const i = enemies.indexOf(e); if (i >= 0) enemies.splice(i, 1);
-  if (!e.rag) scene.remove(e.h.group);
+  // always drop the group: after ragdolling it's an empty invisible husk that
+  // would otherwise pile up in the scene graph one node per kill
+  scene.remove(e.h.group);
+}
+
+// ONE death-bookkeeping path (contract #2): flags, kill count, serum drop,
+// VOLATILE STRAIN shove, boss hook. Every kill route funnels through here.
+function killEnemy(e, opts = {}) {
+  if (e.dead) return false;
+  e.dead = true;
+  killCount++;
+  const amt = Math.round(randi(e.def.serum[0], e.def.serum[1]) * (opts.serumMult || 1));
+  drops.push({ x: opts.x ?? e.x, z: opts.z ?? e.z, amt, t: opts.dropT || 20, mesh: null });
+  if (hooks.mods?.().volatile) { // epic powerup: kills knock nearby infected back
+    for (const o of enemies) {
+      if (o === e || o.dead || o.state === 'rag') continue;
+      const dx = o.x - e.x, dz = o.z - e.z, d = Math.hypot(dx, dz) || 1;
+      if (d < 4.5) { o.shoveX += dx / d * 16; o.shoveZ += dz / d * 16; }
+    }
+    fx.ring(new THREE.Vector3(e.x, CFG.wallH + .5, e.z), 0xff7fc2, 4.5, .3);
+  }
+  if (e.boss) hooks.bossDown?.(e);
+  return true;
 }
 
 export function nearestEnemy(x, z, maxR = 1e9) {
@@ -78,10 +101,7 @@ export function damageEnemy(e, dmg, dirX, dirZ, kbImpulse, opts = {}) {
   fx.blood(pos, Math.min(14, 4 + dmg * 0.15), 3.5 + kbImpulse * 0.04);
   const imp = kbImpulse / e.def.mass;
   if (e.hp <= 0) {
-    e.dead = true;
-    killCount++;
-    const amt = Math.round(randi(e.def.serum[0], e.def.serum[1]) * (opts.serumMult || 1));
-    drops.push({ x: e.x, z: e.z, amt, t: 20, mesh: null });
+    killEnemy(e, { serumMult: opts.serumMult });
     if (e.def.boom && !opts.noBoom) { explodeBloater(e); return true; }
     // cap launch speed so the comedy arc stays on screen
     const hv = Math.min(imp * .55, 26), vv = Math.min(2.5 + imp * .28, 15);
@@ -94,7 +114,6 @@ export function damageEnemy(e, dmg, dirX, dirZ, kbImpulse, opts = {}) {
       for (const p of parts) if (dismember(e.rag, p)) fx.blood(pos, 10, 7);
     }
     sfx.squelch();
-    if (e.boss) { hooks.bossDown?.(e); }
     return true;
   }
   sfx.thud();
@@ -111,24 +130,29 @@ export function damageEnemy(e, dmg, dirX, dirZ, kbImpulse, opts = {}) {
   return false;
 }
 
-function explodeBloater(e) {
-  const pos = new THREE.Vector3(e.x, CFG.wallH + 1, e.z);
-  fx.explosion(pos, e.def.boom);
+// blast damage/launch around (x,z) — level-scaled; chains are allowed by design
+function boomAoE(e, x, z) {
+  fx.explosion(new THREE.Vector3(x, CFG.wallH + 1, z), e.def.boom);
   sfx.boom();
-  // gibs: pop several parts off a dead ragdoll flying outward
+  for (const o of [...enemies]) {
+    if (o === e || o.dead) continue;
+    const dx = o.x - x, dz = o.z - z, d = Math.hypot(dx, dz);
+    if (d < e.def.boom + 1.5) damageEnemy(o, 30 * mult.dmg, dx / (d || 1), dz / (d || 1), 46 * mult.dmg);
+  }
+  const P = getPlayer();
+  const pd = Math.hypot(P.x - x, P.z - z);
+  if (pd < e.def.boom + 1) P.hurt(e.def.dmg * mult.dmg, (P.x - x) / (pd || 1), (P.z - z) / (pd || 1), 40);
+}
+
+// full detonation for a still-standing bloater: gib ragdoll + AoE.
+// NEVER call on an already-ragdolled enemy (its meshes are owned by the rag) —
+// slam-kills use boomAoE + dismember on the existing rag instead.
+function explodeBloater(e) {
   const v = new THREE.Vector3(rand(-1, 1) * 14, 11, rand(-1, 1) * 14);
   e.rag = spawnRagdoll(e.h, v, e, { dead: true, spin: 3 });
   for (const p of ['head', 'farmL', 'farmR', 'shinR']) dismember(e.rag, p);
   e.state = 'rag';
-  // AoE to neighbours + player
-  const P = getPlayer();
-  for (const o of [...enemies]) {
-    if (o === e || o.dead) continue;
-    const d = Math.hypot(o.x - e.x, o.z - e.z);
-    if (d < e.def.boom + 1.5) damageEnemy(o, 30, (o.x - e.x) / (d || 1), (o.z - e.z) / (d || 1), 46, { noBoom: false });
-  }
-  const pd = Math.hypot(P.x - e.x, P.z - e.z);
-  if (pd < e.def.boom + 1) P.hurt(e.def.dmg * mult.dmg, (P.x - e.x) / (pd || 1), (P.z - e.z) / (pd || 1), 40);
+  boomAoE(e, e.x, e.z);
 }
 
 // ragdoll callbacks glue (main registers these on initRagdolls)
@@ -139,11 +163,11 @@ export const ragCallbacks = {
     const e = rag.ent;
     if (e && !e.dead && e.def) {
       e.hp -= CFG.slamDmg + spd * .6;
-      if (e.hp <= 0) {
-        e.dead = true; rag.dead = true; killCount++;
-        drops.push({ x: p.x, z: p.z, amt: randi(e.def.serum[0], e.def.serum[1]), t: 20, mesh: null });
+      if (e.hp <= 0 && killEnemy(e, { x: p.x, z: p.z })) {
+        rag.dead = true;
         hooks.toast?.('SLAMMED', 'drop');
-        if (e.boss) hooks.bossDown?.(e);
+        // a bloater smashed against the parapet still pops
+        if (e.def.boom) { boomAoE(e, p.x, p.z); dismember(rag, 'head'); dismember(rag, 'farmL'); }
       }
     }
   },
@@ -152,12 +176,10 @@ export const ragCallbacks = {
     const e = rag.ent;
     if (e && e.def && !e.fellCredit) {
       e.fellCredit = true;
-      if (!e.dead) {
-        e.dead = true; rag.dead = true; killCount++;
-        drops.push({ x: rag.pts.hip.x, z: rag.pts.hip.z, amt: Math.round(randi(e.def.serum[0], e.def.serum[1]) * 1.5), t: 8, mesh: null });
+      if (killEnemy(e, { x: rag.pts.hip.x, z: rag.pts.hip.z, serumMult: 1.5, dropT: 8 })) {
+        rag.dead = true;
         hooks.toast?.('LONG DROP +50%', 'drop');
         hooks.longDrop?.();
-        if (e.boss) hooks.bossDown?.(e);
       }
     }
   },
@@ -178,6 +200,13 @@ export const ragCallbacks = {
 // ---------- per-frame ----------
 export function tickEnemies(dt, t) {
   const P = getPlayer();
+  // cull live stragglers left far behind — they'd chase forever, and an
+  // unbounded population turns sprint-past play into an O(n²) slideshow
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    if (e.boss || e.dead || e.state === 'rag') continue;
+    if (Math.hypot(e.x - P.x, e.z - P.z) > 85) removeEnemy(e);
+  }
   // director: activate spawn/climb points near player
   for (const s of level.spawns) {
     if (s.used) continue;
@@ -197,7 +226,7 @@ export function tickEnemies(dt, t) {
       for (let i = 0; i < n; i++) {
         const along = rand(-4, 4);
         const r = level.rects.find(r => !r.dead && c.x >= r.x0 && c.x <= r.x1 && c.z >= r.z0 && c.z <= r.z1);
-        if (!r) break;
+        if (!r) continue; // this climber's spot is gone (collapsed span) — others still spawn
         let ex, ez;
         if (c.axis === 'x') { ex = c.edge === 'lo' ? r.x0 + .8 : r.x1 - .8; ez = c.z + along; }
         else { ez = c.edge === 'lo' ? r.z0 + .8 : r.z1 - .8; ex = c.x + along; }
@@ -240,7 +269,7 @@ export function tickEnemies(dt, t) {
         // telegraph: rear back
         e.h.parts.chest.pivot.rotation.x = -0.35;
         if (e.tmr <= 0) {
-          if (e.def.boom) { e.hp = 0; e.dead = true; killCount++; explodeBloater(e); break; }
+          if (e.def.boom) { e.hp = 0; killEnemy(e); explodeBloater(e); break; }
           e.state = 'attack'; e.tmr = .18;
           if (dist < e.def.reach + .6) {
             const kbI = e.def.kb * mult.dmg;

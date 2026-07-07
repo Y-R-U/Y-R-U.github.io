@@ -14,18 +14,17 @@ export const el = {
 export function bootProgress(p, txt) { el.bootBar.style.width = (p * 100) + '%'; if (txt) el.bootStatus.textContent = txt; }
 
 // ---------- HUD ----------
-export function updateHUD(P, run) {
+let lastBoostHtml = '';
+export function updateHUD(P, run, kills = 0) {
   $('hp-fill').style.width = Math.max(0, P.hp / P.maxHp * 100) + '%';
   $('hp-num').textContent = Math.max(0, Math.ceil(P.hp));
   $('serum').textContent = fmt(run.serum);
   $('level-num').textContent = run.n;
   $('mode-ic').textContent = run.mode === 'story' ? '§' : '∞';
-  $('kills').textContent = run.kills;
+  $('kills').textContent = kills;
   // weapons
-  const gun = P.activeGun();
-  $('wpn-name').textContent = P.temp ? P.temp.def.name : (P.target && !P.temp && Math.hypot(P.target.x - P.x, P.target.z - P.z) < 5 ? P.melee.name : P.gun.name);
+  $('wpn-name').textContent = P.temp ? P.temp.def.name : (P.target && Math.hypot(P.target.x - P.x, P.target.z - P.z) < 5 ? P.melee.name : P.gun.name);
   $('wpn-ammo').textContent = P.temp ? (P.temp.ammo !== undefined ? P.temp.ammo : Math.ceil(P.temp.time) + 's') : '∞';
-  $('wpn-temp').classList.add('hidden');
   const sup = $('wpn-super');
   if (P.super) {
     sup.classList.remove('hidden');
@@ -33,12 +32,13 @@ export function updateHUD(P, run) {
     $('sup-fill').style.width = (P.super.charge * 100) + '%';
     sup.classList.toggle('ready', P.super.charge >= 1);
   } else sup.classList.add('hidden');
-  // boosts
+  // boosts — only touch the DOM when the rendered content actually changes
   const bs = [];
   if (P.boosts.dmg.t > 0) bs.push(['⚡×' + P.boosts.dmg.mult.toFixed(0), P.boosts.dmg.t, P.boosts.dmg.max]);
   if (P.boosts.spd.t > 0) bs.push(['👟', P.boosts.spd.t, P.boosts.spd.max]);
   if (P.boosts.shield.t > 0) bs.push(['🛡', P.boosts.shield.t, P.boosts.shield.max]);
-  $('boosts').innerHTML = bs.map(([ic, t, max]) => `<div class="boost-chip">${ic}<div class="bt"><i style="width:${t / (max || 12) * 100}%"></i></div></div>`).join('');
+  const html = bs.map(([ic, t, max]) => `<div class="boost-chip">${ic}<div class="bt"><i style="width:${(t / (max || 12) * 100) | 0}%"></i></div></div>`).join('');
+  if (html !== lastBoostHtml) { lastBoostHtml = html; $('boosts').innerHTML = html; }
   // hurt vignette
   $('dmgflash').style.opacity = P.hurtFlash * .9;
 }
