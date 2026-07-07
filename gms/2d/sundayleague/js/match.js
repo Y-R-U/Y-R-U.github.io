@@ -725,18 +725,31 @@ export class Match {
     const b = this.ball;
     b.reset(r.x, r.y);
     if (r.type === 'throwin') b.z = 26;
+    // kickoffs follow a goal/half: everyone hustles the full pitch back
+    const kickoff = r.type === 'kickoff';
+    const hustle = kickoff ? 1.35 : 1.05;
+    const timeout = kickoff ? 3.6 : 2.4;
     let allNear = true;
     for (const f of this.all) {
-      if (f.grounded) { f.update(dt); continue; }
+      if (f.grounded) { f.update(dt); allNear = false; continue; }
       const d = dist(f.x, f.y, f.restX, f.restY);
       if (d > 26) allNear = false;
-      const sp = Math.min(f.maxSpeed() * 1.05, d * 3.5);
+      const sp = Math.min(f.maxSpeed() * hustle, d * 3.5);
       f.desX = d > 2 ? (f.restX - f.x) / d * sp : 0;
       f.desY = d > 2 ? (f.restY - f.y) / d * sp : 0;
       f.update(dt);
     }
     this._collisions();
-    if (allNear || this.stateT > 2.4) {
+    if (allNear || this.stateT > timeout) {
+      if (kickoff) {
+        // nobody may start a kickoff in the wrong half — snap stragglers
+        for (const f of this.all) {
+          if (dist(f.x, f.y, f.restX, f.restY) > 40) {
+            f.x = f.restX; f.y = f.restY; f.vx = 0; f.vy = 0;
+            if (f.grounded) { f.state = 'run'; f.stateT = 0; }
+          }
+        }
+      }
       this.state = 'ready';
       this.stateT = 0;
       if (r.whistle) AUDIO.whistle(1);
@@ -949,9 +962,13 @@ export class Match {
       if (f === kicker || f === keeper) continue;
       f.restX = CX + rand(-140, 140); f.restY = CY + rand(-80, 80);
     }
+    // the principals get up (kicker may be the fouled man) and walk over
+    kicker.state = 'run'; kicker.stateT = 0;
+    if (keeper.state !== 'run') { keeper.state = 'run'; keeper.stateT = 0; }
     kicker.restX = CX - 10; kicker.restY = spotY - atk.atkDir * 42;
-    keeper.restX = CX; keeper.restY = goal.y + atk.atkDir * -2 + (atk.atkDir === 1 ? -6 : 6);
     keeper.restY = goal.y - atk.atkDir * 6;
+    keeper.restX = CX;
+    if (attackTi === this.userTeam) { this.sel = kicker; kicker.controlBlend = 1; }
   }
 
   _penaltyUpdate(dt) {
@@ -963,15 +980,26 @@ export class Match {
       b.reset(p.spotX, p.spotY);
       let near = true;
       for (const f of this.all) {
-        if (f.grounded) { f.update(dt); continue; }
+        if (f.grounded) {
+          f.update(dt);
+          if (f === p.kicker || f === p.keeper) near = false; // still getting up
+          continue;
+        }
         const d = dist(f.x, f.y, f.restX, f.restY);
         if ((f === p.kicker || f === p.keeper) && d > 14) near = false;
-        const sp = Math.min(f.maxSpeed(), d * 3.4);
+        const sp = Math.min(f.maxSpeed() * 1.15, d * 3.4);
         f.desX = d > 2 ? (f.restX - f.x) / d * sp : 0;
         f.desY = d > 2 ? (f.restY - f.y) / d * sp : 0;
         f.update(dt);
       }
-      if (near || p.t > 2.6) {
+      if (near || p.t > 4.2) {
+        // never start the penalty without the principals in position
+        for (const f of [p.kicker, p.keeper]) {
+          if (dist(f.x, f.y, f.restX, f.restY) > 18) {
+            f.x = f.restX; f.y = f.restY; f.vx = 0; f.vy = 0;
+            f.state = 'run'; f.stateT = 0;
+          }
+        }
         p.phase = 'aim'; p.t = 0;
         AUDIO.whistle(1);
         if (p.userKicker) this.event('penaltyAim', {});
