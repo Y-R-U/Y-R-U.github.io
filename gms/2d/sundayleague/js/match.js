@@ -1011,7 +1011,7 @@ export class Match {
       b.reset(p.spotX, p.spotY);
       p.kicker.setFacing(0, p.atkDir);
       p.keeper.setFacing(0, -p.atkDir);
-      for (const f of this.all) { f.desX = 0; f.desY = 0; if (!f.grounded) { f.vx = 0; f.vy = 0; } f.update(dt); }
+      this._penaltyBystanders(dt);
       if (p.userKicker) {
         const inp = this.input;
         if (inp.stick.active) p.aimX = clamp(p.aimX + inp.stick.x * dt * 2.4, -1, 1);
@@ -1022,7 +1022,7 @@ export class Match {
         }
       } else {
         if (p.userKeeper && this.input.stick.active) p.keeperLean = Math.sign(this.input.stick.x);
-        if (p.t > rand(1.1, 1.8)) {
+        if (p.t > rand(1.5, 2.3)) {
           const err = this.teams[p.attackTi].aiPrm.err;
           this._penaltyKick(clamp(rand(-1, 1) * 1.1, -1, 1), rand(0.45, 0.95), err);
         }
@@ -1031,7 +1031,7 @@ export class Match {
     }
 
     if (p.phase === 'flight') {
-      for (const f of this.all) { f.update(dt); }
+      this._penaltyBystanders(dt);
       b.update(dt, this.pitchType);
       this._keeperUpdate(dt);
       // resolve: crossing line, keeper catch (handled by keeperUpdate), or dead
@@ -1044,6 +1044,26 @@ export class Match {
         this._penaltyNext();
       }
       return;
+    }
+  }
+
+  // kicker & keeper hold their marks; everyone else keeps clearing the box
+  // (only the goalie belongs anywhere near the goal during a penalty)
+  _penaltyBystanders(dt) {
+    const p = this.pen;
+    for (const f of this.all) {
+      if (f === p.kicker || f === p.keeper) {
+        f.desX = 0; f.desY = 0;
+        if (!f.grounded) { f.vx = 0; f.vy = 0; }
+        f.update(dt);
+        continue;
+      }
+      if (f.grounded || f.state === 'celeb') { f.update(dt); continue; }
+      const d = dist(f.x, f.y, f.restX, f.restY);
+      const sp = Math.min(f.maxSpeed(), d * 3);
+      f.desX = d > 4 ? (f.restX - f.x) / d * sp : 0;
+      f.desY = d > 4 ? (f.restY - f.y) / d * sp : 0;
+      f.update(dt);
     }
   }
 
