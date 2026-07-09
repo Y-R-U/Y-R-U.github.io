@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>HOTWIRE</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- ══ HUD ══ -->
+<div id="hud" class="hidden">
+  <div id="mm-wrap"><canvas id="minimap" width="232" height="232"></canvas><div id="mm-n">N</div></div>
+  <div id="stars"></div>
+  <div id="topright">
+    <div id="cash">$0</div>
+    <button id="btn-cog" aria-label="settings">⚙</button>
+  </div>
+  <div id="banner" class="hidden">
+    <div id="banner-title"></div>
+    <div id="banner-obj"></div>
+    <div id="banner-timer" class="hidden"></div>
+  </div>
+  <div id="hp-wrap"><div id="hp-fill"></div></div>
+  <div id="car-wrap" class="hidden"><div id="car-fill"></div><div id="car-name"></div></div>
+  <div id="weapon-chip" class="hidden"></div>
+  <div id="joy-base"></div><div id="joy-knob"></div>
+  <div id="btns">
+    <button id="btn-nitro" class="abtn hidden">⚡</button>
+    <button id="btn-enter" class="abtn hidden">🚗</button>
+    <button id="btn-fire" class="abtn hidden">✜</button>
+  </div>
+  <div id="toasts"></div>
+  <div id="endless-hud" class="hidden"><span id="endless-time">0:00</span><span id="endless-score">0</span></div>
+</div>
+
+<!-- ══ dialogue / cutscene ══ -->
+<div id="lbox-t" class="lbox"></div><div id="lbox-b" class="lbox"></div>
+<div id="dlg" class="hidden">
+  <div id="dlg-ava">A</div>
+  <div id="dlg-body"><div id="dlg-name"></div><div id="dlg-text"></div><div id="dlg-more">▸ tap</div></div>
+</div>
+<button id="btn-skip" class="hidden">SKIP ≫</button>
+
+<!-- ══ mission offer / generic choice ══ -->
+<div id="choice" class="hidden">
+  <div id="choice-card">
+    <div id="choice-tag"></div>
+    <h3 id="choice-title"></h3>
+    <p id="choice-text"></p>
+    <div id="choice-meta"></div>
+    <div id="choice-btns"></div>
+  </div>
+</div>
+
+<!-- ══ big result card (wasted / mission passed / ending) ══ -->
+<div id="bigcard" class="hidden">
+  <h1 id="big-title"></h1>
+  <p id="big-sub"></p>
+  <div id="big-btns"></div>
+</div>
+
+<!-- ══ title menu ══ -->
+<div id="menu">
+  <div id="menu-inner">
+    <div id="logo">HOT<span>WIRE</span></div>
+    <div id="menu-tag">palm bay is waiting</div>
+    <div id="menu-btns">
+      <button id="m-continue" class="mbtn primary hidden">CONTINUE</button>
+      <button id="m-story" class="mbtn">STORY</button>
+      <button id="m-missions" class="mbtn">MISSIONS</button>
+      <button id="m-endless" class="mbtn">MOST WANTED</button>
+      <div class="mrow">
+        <button id="m-garage" class="mbtn small">GARAGE</button>
+        <button id="m-editor" class="mbtn small">EDITOR</button>
+        <button id="m-settings" class="mbtn small">⚙</button>
+      </div>
+    </div>
+    <div id="menu-foot"></div>
+  </div>
+</div>
+
+<!-- ══ generic modal (settings / garage / dealer / mission board) ══ -->
+<div id="modal" class="hidden"><div id="modal-card">
+  <div id="modal-head"><h2 id="modal-title"></h2><button id="modal-x">✕</button></div>
+  <div id="modal-body"></div>
+</div></div>
+
+<div id="loading"><div id="load-logo">HOT<span>WIRE</span></div><div id="load-bar"><div id="load-fill"></div></div><div id="load-msg">warming up…</div></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

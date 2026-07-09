@@ -1,0 +1,544 @@
+{
+"key_hint": "hotwire",
+"rigs": [
+"hero",
+"ped_m",
+"ped_w",
+"ped_m2",
+"ped_w2",
+"cop",
+"swat",
+"gang_m",
+"gang_w",
+"rico",
+"marlowe",
+"vex",
+"knuckles",
+"dot",
+"dane"
+],
+"entries": {
+"hero": {
+"off": 0,
+"len": 116091,
+"kind": "model",
+"raw": 299672
+},
+"ped_m": {
+"off": 116091,
+"len": 85233,
+"kind": "model",
+"raw": 225524
+},
+"ped_w": {
+"off": 201324,
+"len": 89473,
+"kind": "model",
+"raw": 235284
+},
+"ped_m2": {
+"off": 290797,
+"len": 90099,
+"kind": "model",
+"raw": 236344
+},
+"ped_w2": {
+"off": 380896,
+"len": 108536,
+"kind": "model",
+"raw": 289732
+},
+"cop": {
+"off": 489432,
+"len": 113559,
+"kind": "model",
+"raw": 305056
+},
+"swat": {
+"off": 602991,
+"len": 112874,
+"kind": "model",
+"raw": 287824
+},
+"gang_m": {
+"off": 715865,
+"len": 141457,
+"kind": "model",
+"raw": 401752
+},
+"gang_w": {
+"off": 857322,
+"len": 159722,
+"kind": "model",
+"raw": 449808
+},
+"rico": {
+"off": 1017044,
+"len": 99077,
+"kind": "model",
+"raw": 251244
+},
+"marlowe": {
+"off": 1116121,
+"len": 98066,
+"kind": "model",
+"raw": 260260
+},
+"vex": {
+"off": 1214187,
+"len": 104294,
+"kind": "model",
+"raw": 271492
+},
+"knuckles": {
+"off": 1318481,
+"len": 75404,
+"kind": "model",
+"raw": 201136
+},
+"dot": {
+"off": 1393885,
+"len": 107374,
+"kind": "model",
+"raw": 280060
+},
+"dane": {
+"off": 1501259,
+"len": 120500,
+"kind": "model",
+"raw": 315944
+},
+"v_beater": {
+"off": 1621759,
+"len": 27455,
+"kind": "model",
+"raw": 87208
+},
+"v_sedan": {
+"off": 1649214,
+"len": 18441,
+"kind": "model",
+"raw": 62288
+},
+"v_taxi": {
+"off": 1667655,
+"len": 20561,
+"kind": "model",
+"raw": 68308
+},
+"v_pickup": {
+"off": 1688216,
+"len": 29113,
+"kind": "model",
+"raw": 97060
+},
+"v_van": {
+"off": 1717329,
+"len": 27287,
+"kind": "model",
+"raw": 88736
+},
+"v_hippie": {
+"off": 1744616,
+"len": 28182,
+"kind": "model",
+"raw": 85492
+},
+"v_sport": {
+"off": 1772798,
+"len": 17917,
+"kind": "model",
+"raw": 62284
+},
+"v_formula": {
+"off": 1790715,
+"len": 32031,
+"kind": "model",
+"raw": 103332
+},
+"v_police": {
+"off": 1822746,
+"len": 24227,
+"kind": "model",
+"raw": 82644
+},
+"v_tow": {
+"off": 1846973,
+"len": 33924,
+"kind": "model",
+"raw": 121160
+},
+"v_bus": {
+"off": 1880897,
+"len": 17197,
+"kind": "model",
+"raw": 75292
+},
+"v_fire": {
+"off": 1898094,
+"len": 42012,
+"kind": "model",
+"raw": 165592
+},
+"v_military": {
+"off": 1940106,
+"len": 34230,
+"kind": "model",
+"raw": 123832
+},
+"v_golf": {
+"off": 1974336,
+"len": 22740,
+"kind": "model",
+"raw": 77172
+},
+"v_armored": {
+"off": 1997076,
+"len": 22429,
+"kind": "model",
+"raw": 83192
+},
+"heli": {
+"off": 2019505,
+"len": 16906,
+"kind": "model",
+"raw": 48820
+},
+"bld_bank": {
+"off": 2036411,
+"len": 89653,
+"kind": "model",
+"raw": 375904
+},
+"bld_casino": {
+"off": 2126064,
+"len": 83697,
+"kind": "model",
+"raw": 335808
+},
+"bld_cinema": {
+"off": 2209761,
+"len": 39304,
+"kind": "model",
+"raw": 154796
+},
+"bld_hotel": {
+"off": 2249065,
+"len": 164200,
+"kind": "model",
+"raw": 673080
+},
+"bld_mall": {
+"off": 2413265,
+"len": 59259,
+"kind": "model",
+"raw": 227792
+},
+"bld_office": {
+"off": 2472524,
+"len": 60712,
+"kind": "model",
+"raw": 261916
+},
+"bld_tower": {
+"off": 2533236,
+"len": 134511,
+"kind": "model",
+"raw": 545408
+},
+"bld_police": {
+"off": 2667747,
+"len": 31626,
+"kind": "model",
+"raw": 122696
+},
+"bld_pgarage": {
+"off": 2699373,
+"len": 3622,
+"kind": "model",
+"raw": 12896
+},
+"bld_fire": {
+"off": 2702995,
+"len": 51588,
+"kind": "model",
+"raw": 199480
+},
+"bld_hospital": {
+"off": 2754583,
+"len": 108621,
+"kind": "model",
+"raw": 472088
+},
+"bld_diner": {
+"off": 2863204,
+"len": 23172,
+"kind": "model",
+"raw": 93764
+},
+"bld_nest": {
+"off": 2886376,
+"len": 74806,
+"kind": "model",
+"raw": 253124
+},
+"bld_garage": {
+"off": 2961182,
+"len": 36698,
+"kind": "model",
+"raw": 151824
+},
+"bld_house_a": {
+"off": 2997880,
+"len": 27648,
+"kind": "model",
+"raw": 110256
+},
+"bld_house_b": {
+"off": 3025528,
+"len": 23470,
+"kind": "model",
+"raw": 94008
+},
+"bld_house_c": {
+"off": 3048998,
+"len": 30444,
+"kind": "model",
+"raw": 106900
+},
+"bld_house_d": {
+"off": 3079442,
+"len": 25924,
+"kind": "model",
+"raw": 86124
+},
+"bld_block_a": {
+"off": 3105366,
+"len": 65209,
+"kind": "model",
+"raw": 283000
+},
+"bld_block_b": {
+"off": 3170575,
+"len": 77057,
+"kind": "model",
+"raw": 332472
+},
+"hangar": {
+"off": 3247632,
+"len": 29050,
+"kind": "model",
+"raw": 114812
+},
+"tree_a": {
+"off": 3276682,
+"len": 7066,
+"kind": "model",
+"raw": 18072
+},
+"tree_b": {
+"off": 3283748,
+"len": 17629,
+"kind": "model",
+"raw": 44992
+},
+"palm_a": {
+"off": 3301377,
+"len": 11741,
+"kind": "model",
+"raw": 28584
+},
+"palm_b": {
+"off": 3313118,
+"len": 10823,
+"kind": "model",
+"raw": 30344
+},
+"bush": {
+"off": 3323941,
+"len": 6928,
+"kind": "model",
+"raw": 17392
+},
+"rock_a": {
+"off": 3330869,
+"len": 7939,
+"kind": "model",
+"raw": 20812
+},
+"rock_b": {
+"off": 3338808,
+"len": 3512,
+"kind": "model",
+"raw": 8032
+},
+"lamp": {
+"off": 3342320,
+"len": 3934,
+"kind": "model",
+"raw": 10564
+},
+"tlight": {
+"off": 3346254,
+"len": 12705,
+"kind": "model",
+"raw": 39832
+},
+"barrier": {
+"off": 3358959,
+"len": 2021,
+"kind": "model",
+"raw": 7888
+},
+"busstop": {
+"off": 3360980,
+"len": 9680,
+"kind": "model",
+"raw": 34164
+},
+"cone": {
+"off": 3370660,
+"len": 2569,
+"kind": "model",
+"raw": 9236
+},
+"hydrant": {
+"off": 3373229,
+"len": 5759,
+"kind": "model",
+"raw": 17528
+},
+"bench": {
+"off": 3378988,
+"len": 3648,
+"kind": "model",
+"raw": 9916
+},
+"bin": {
+"off": 3382636,
+"len": 6090,
+"kind": "model",
+"raw": 19132
+},
+"dumpster": {
+"off": 3388726,
+"len": 7048,
+"kind": "model",
+"raw": 22132
+},
+"sign_stop": {
+"off": 3395774,
+"len": 3172,
+"kind": "model",
+"raw": 9284
+},
+"atm": {
+"off": 3398946,
+"len": 3034,
+"kind": "model",
+"raw": 8636
+},
+"tirepile": {
+"off": 3401980,
+"len": 3538,
+"kind": "model",
+"raw": 10760
+},
+"crate": {
+"off": 3405518,
+"len": 6085,
+"kind": "model",
+"raw": 20716
+},
+"stall_pizza": {
+"off": 3411603,
+"len": 19424,
+"kind": "model",
+"raw": 63128
+},
+"stall_soda": {
+"off": 3431027,
+"len": 15253,
+"kind": "model",
+"raw": 47324
+},
+"stall_coffee": {
+"off": 3446280,
+"len": 22151,
+"kind": "model",
+"raw": 72112
+},
+"stall_burger": {
+"off": 3468431,
+"len": 15341,
+"kind": "model",
+"raw": 48428
+},
+"cont_a": {
+"off": 3483772,
+"len": 9952,
+"kind": "model",
+"raw": 37408
+},
+"cont_b": {
+"off": 3493724,
+"len": 9938,
+"kind": "model",
+"raw": 37404
+},
+"cont_c": {
+"off": 3503662,
+"len": 9938,
+"kind": "model",
+"raw": 37416
+},
+"crane": {
+"off": 3513600,
+"len": 7179,
+"kind": "model",
+"raw": 26388
+},
+"ship": {
+"off": 3520779,
+"len": 67376,
+"kind": "model",
+"raw": 256000
+},
+"boat": {
+"off": 3588155,
+"len": 21834,
+"kind": "model",
+"raw": 75980
+},
+"plane": {
+"off": 3609989,
+"len": 66122,
+"kind": "model",
+"raw": 264072
+},
+"wrench": {
+"off": 3676111,
+"len": 4164,
+"kind": "model",
+"raw": 12300
+},
+"medkit": {
+"off": 3680275,
+"len": 3425,
+"kind": "model",
+"raw": 11296
+},
+"atlas_gradient": {
+"off": 3683700,
+"len": 208471,
+"kind": "tex",
+"raw": 208817
+},
+"atlas_specular": {
+"off": 3892171,
+"len": 1164,
+"kind": "tex",
+"raw": 4599
+}
+}
+}

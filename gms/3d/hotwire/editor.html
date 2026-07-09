@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>HOTWIRE — Level Editor</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { width:100%; height:100%; overflow:hidden; background:#0b0f14; color:#eef2ee;
+  font-family:-apple-system,"Segoe UI",Roboto,sans-serif; touch-action:none; user-select:none; }
+#app, #app canvas { position:fixed; inset:0; }
+button, select, input, textarea { font-family:inherit; }
+.hidden { display:none !important; }
+
+#topbar { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; gap:6px; align-items:center;
+  padding:8px 10px; background:rgba(10,14,20,.88); backdrop-filter:blur(8px); flex-wrap:wrap; }
+#topbar .tb { padding:7px 11px; border-radius:9px; border:0; background:rgba(255,255,255,.1);
+  color:#fff; font-weight:700; font-size:12.5px; cursor:pointer; }
+#topbar .tb.primary { background:linear-gradient(135deg,#ffb03e,#ff7d2e); color:#26130a; }
+#topbar .tb.on { background:#ffb03e; color:#26130a; }
+#lvname { width:110px; padding:7px 9px; border-radius:9px; border:0; background:rgba(255,255,255,.12); color:#fff; font-weight:700; font-size:12.5px; }
+#modes { position:fixed; top:52px; left:0; right:0; z-index:19; display:flex; gap:5px; padding:6px 10px;
+  background:rgba(10,14,20,.72); overflow-x:auto; }
+#modes button { padding:7px 12px; border-radius:9px; border:0; background:rgba(255,255,255,.09);
+  color:#fff; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap; }
+#modes button.on { background:#9adfff; color:#0a1420; }
+
+#panel { position:fixed; left:10px; top:104px; bottom:10px; width:212px; z-index:18;
+  background:rgba(12,17,24,.92); border-radius:14px; padding:10px; overflow-y:auto;
+  border:1px solid rgba(255,255,255,.1); touch-action:pan-y; }
+#panel h4 { font-size:11px; letter-spacing:2px; color:rgba(255,255,255,.5); margin:8px 0 6px; text-transform:uppercase; }
+.swatch { display:inline-block; width:44px; height:34px; border-radius:8px; margin:3px; cursor:pointer; border:2px solid transparent; }
+.swatch.on { border-color:#ffb03e; }
+.pal-item { display:block; width:100%; text-align:left; padding:6px 9px; border-radius:8px; border:0;
+  background:transparent; color:#dfe6ee; font-size:12.5px; cursor:pointer; }
+.pal-item.on { background:#ffb03e; color:#26130a; font-weight:800; }
+#panel label { font-size:11.5px; color:rgba(255,255,255,.65); display:block; margin:7px 0 3px; }
+#panel input[type=range] { width:100%; accent-color:#ffb03e; }
+#panel input[type=text], #panel input[type=number], #panel select, #panel textarea {
+  width:100%; padding:6px 8px; border-radius:8px; border:0; background:rgba(255,255,255,.1); color:#fff; font-size:12.5px; }
+#panel textarea { height:110px; font-family:ui-monospace,monospace; font-size:11px; }
+#panel .mini { display:flex; gap:6px; } #panel .mini > * { flex:1; }
+.hint { font-size:10.5px; color:rgba(255,255,255,.4); line-height:1.5; margin-top:4px; }
+#status { position:fixed; right:10px; bottom:10px; z-index:18; background:rgba(12,17,24,.85);
+  padding:7px 12px; border-radius:10px; font-size:12px; color:#9adfff; }
+.delbtn { width:100%; margin-top:8px; padding:8px; border-radius:8px; border:0; background:rgba(255,60,40,.2); color:#ff8a70; font-weight:800; cursor:pointer; }
+#toast { position:fixed; top:104px; left:50%; transform:translateX(-50%); z-index:30; background:rgba(8,14,10,.85);
+  color:#8ef0b2; font-weight:700; padding:8px 16px; border-radius:12px; font-size:13px; opacity:0; transition:opacity .2s; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="topbar">
+  <b style="font-style:italic">HOT<span style="color:#ffb03e">WIRE</span> editor</b>
+  <input id="lvname" placeholder="level id" value="mylevel">
+  <button class="tb" id="b-new">New</button>
+  <select id="b-load" class="tb"><option value="">Load…</option></select>
+  <button class="tb" id="b-save">💾 Save</button>
+  <button class="tb" id="b-export">⬇ Export</button>
+  <button class="tb" id="b-import">⬆ Import</button>
+  <button class="tb" id="b-undo">↩ Undo</button>
+  <button class="tb primary" id="b-test">▶ Test</button>
+  <button class="tb" id="b-back">◂ Game</button>
+  <input id="importfile" type="file" accept=".json" class="hidden">
+</div>
+<div id="modes">
+  <button data-m="terrain" class="on">🖌 Terrain</button>
+  <button data-m="objects">🏠 Objects</button>
+  <button data-m="cars">🚗 Cars</button>
+  <button data-m="guns">🔫 Weapons</button>
+  <button data-m="hotspots">⭐ Hotspots</button>
+  <button data-m="spawn">📍 Spawn</button>
+  <button data-m="erase">🧽 Erase</button>
+</div>
+<div id="panel"></div>
+<div id="status">…</div>
+<div id="toast"></div>
+<script type="module" src="js/editor.js"></script>
+</body>
+</html>
