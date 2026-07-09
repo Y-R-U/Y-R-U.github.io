@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#12222c" />
+  <title>Hexpire — hex empire strategy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">HEXPIRE</div>
+      <div class="boot-sub">claim every hex</div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- home menu -->
+  <div id="menu" class="screen hidden">
+    <div class="menu-inner">
+      <div class="game-logo">HEX<span>PIRE</span></div>
+      <div class="game-tag">Raise banners. Claim hexes. Raze rivals.</div>
+
+      <div class="empire-setup">
+        <label for="empire-name">Name your empire</label>
+        <input id="empire-name" maxlength="18" autocomplete="off" spellcheck="false" />
+        <div id="color-swatches" class="swatches"></div>
+      </div>
+
+      <div class="menu-btns">
+        <button id="btn-continue" class="big gold hidden">▶&ensp;Continue</button>
+        <button id="btn-story" class="big gold">📖&ensp;Story</button>
+        <button id="btn-skirmish" class="big">⚔️&ensp;Skirmish</button>
+        <button id="btn-editor" class="big">🛠️&ensp;Level Editor</button>
+        <button id="btn-help" class="big">📜&ensp;How to Play</button>
+        <button id="btn-options" class="big">⚙️&ensp;Options</button>
+      </div>
+      <div class="menu-foot">a Y-R-U game</div>
+    </div>
+  </div>
+
+  <!-- story chapter select -->
+  <div id="storyselect" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>Story</h2>
+    </div>
+    <div id="story-list" class="scr-body"></div>
+  </div>
+
+  <!-- skirmish setup -->
+  <div id="skirmish" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>Skirmish</h2>
+      <div class="ls-tabs">
+        <button id="tab-random" class="tab on">Random</button>
+        <button id="tab-custom" class="tab">Custom</button>
+      </div>
+    </div>
+    <div id="sk-random" class="scr-body">
+      <div class="form-row"><label>Map style</label><div id="sk-style" class="chips"></div></div>
+      <div class="form-row"><label>Map size</label><div id="sk-size" class="chips"></div></div>
+      <div class="form-row"><label>Rivals</label><div id="sk-rivals" class="chips"></div></div>
+      <div class="form-row"><label>Rival personalities</label><div id="sk-personalities"></div></div>
+      <div class="form-row"><label>Seed <small>(blank = random)</small></label>
+        <input id="sk-seed" placeholder="random" autocomplete="off" /></div>
+      <button id="sk-start" class="big gold">⚔️&ensp;Begin Conquest</button>
+    </div>
+    <div id="sk-custom" class="scr-body hidden">
+      <div id="custom-list"></div>
+    </div>
+  </div>
+
+  <!-- in-game HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-top">
+      <div class="hud-pill" id="hud-coins">🪙 0 <span id="hud-income">+0</span></div>
+      <div class="hud-pill" id="hud-round">Round 1</div>
+      <div class="hud-pill" id="hud-land">⬡ 0</div>
+    </div>
+    <div id="hud-empires"></div>
+    <div id="hud-corner">
+      <button id="btn-home" class="iconbtn">🏠</button>
+      <button id="btn-cog" class="iconbtn">⚙️</button>
+    </div>
+    <div id="panel" class="hidden"></div>
+    <button id="btn-endturn" class="hidden">End Turn<small id="et-sub"></small></button>
+    <div id="turnbanner" class="hidden"></div>
+  </div>
+
+  <!-- tutorial card -->
+  <div id="tutbox" class="hidden">
+    <div id="tut-text"></div>
+    <button id="tut-next" class="hidden">Next</button>
+  </div>
+
+  <!-- level editor UI -->
+  <div id="editor-ui" class="hidden">
+    <div id="ed-top">
+      <button id="ed-back" class="iconbtn">←</button>
+      <input id="ed-name" placeholder="Map name" maxlength="24" autocomplete="off" />
+      <button id="ed-menu" class="iconbtn">⋯</button>
+    </div>
+    <div id="ed-tools"></div>
+  </div>
+
+  <!-- generic modal + toasts -->
+  <div id="modal-root" class="hidden"></div>
+  <div id="toasts"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
