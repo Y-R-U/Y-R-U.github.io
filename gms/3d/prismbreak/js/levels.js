@@ -10,7 +10,7 @@ export function levelDef(n) {
 
   const colors = n < 8 ? 5 : 6;
   const moves = boss ? 30 : Math.max(18, 26 - tier);
-  const metalChance = Math.min(0.05 + tier * 0.03 + (boss ? 0.12 : 0), 0.34);
+  const metalChance = Math.min(0.11 + tier * 0.03 + (boss ? 0.12 : 0), 0.35);
 
   // target curve: gentle start, steepening tiers, bosses spike
   const base = 1200 + tier * 900 + inTier * 260;

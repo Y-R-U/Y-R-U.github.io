@@ -2,7 +2,8 @@
 
 Bejeweled-style match-3 with a glass/metal finish system, special-gem combos,
 daily/weekly/event rewards, shard economy, and fake "watch ad" bonuses (a 5s
-joke modal — never real ads). No build step; three.js 0.160 via importmap.
+joke modal — never real ads). No build step; three.js **0.180** via importmap
+(needs ≥0.168 for `dispersion` on the transmissive glass materials).
 
 ## Architecture
 
@@ -45,6 +46,13 @@ joke modal — never real ads). No build step; three.js 0.160 via importmap.
 
 ## Gotchas
 
+- **Tone mapping is NeutralToneMapping on purpose** — ACES washes the saturated
+  gem colours to pastel (Aaron flagged it). Don't "fix" it back.
+- Glass = real `transmission` (+ dispersion, attenuation); board tiles must stay
+  OPAQUE or they vanish from the transmission buffer and gems stop looking
+  see-through. `?lite=1` falls back to cheap opacity glass.
+- Crush choreography lives in `playClear()` (squash tween + `slamCrusher()`),
+  not in the engine — engine only reports `ev.crushes`.
 - Fake-ad reward flows all route through `ui.js watchAd(onDone)` — keep it fake.
 - `daily.claimed` only keeps the last 60 day-keys; month maths reads it, so
   don't trim below ~35.

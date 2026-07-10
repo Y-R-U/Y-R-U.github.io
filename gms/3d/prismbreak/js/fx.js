@@ -6,7 +6,7 @@ const active = []; // {mesh(es), update(dt,age)->alive, age}
 let shardGeo, sparkTex;
 
 export function initFx() {
-  shardGeo = new THREE.TetrahedronGeometry(0.11, 0);
+  shardGeo = new THREE.TetrahedronGeometry(0.14, 0);
   // radial-gradient sprite texture for particles
   const cv = document.createElement('canvas');
   cv.width = cv.height = 64;
@@ -68,20 +68,23 @@ export function burst(x, y, colorHex, count = 14, speed = 3.2, size = 0.22) {
 
 // ── glass shatter debris ──────────────────────────────────────────────
 let shardCount = 0;
-export function shatter(x, y, colorHex, metal = false, count = 7) {
-  if (R.lite || shardCount > 90) return;
-  count = Math.min(count, 110 - shardCount);
+export function shatter(x, y, colorHex, metal = false, count = 9) {
+  if (R.lite || shardCount > 110) return;
+  count = Math.min(count, 130 - shardCount);
   const mat = metal
-    ? new THREE.MeshStandardMaterial({ color: colorHex, metalness: 1, roughness: 0.3, envMapIntensity: 1.5 })
-    : new THREE.MeshPhysicalMaterial({ color: colorHex, transparent: true, opacity: 0.85, roughness: 0.05, clearcoat: 1, envMapIntensity: 1.5 });
+    ? new THREE.MeshStandardMaterial({ color: colorHex, metalness: 1, roughness: 0.12, envMapIntensity: 2.2 })
+    : new THREE.MeshPhysicalMaterial({
+        color: colorHex, transparent: true, opacity: 0.9, roughness: 0.03,
+        clearcoat: 1, envMapIntensity: 1.8, emissive: colorHex, emissiveIntensity: 0.25,
+      });
   const shards = [];
   for (let i = 0; i < count; i++) {
     const m = new THREE.Mesh(shardGeo, mat);
-    m.position.set(x + (Math.random() - 0.5) * 0.3, y + (Math.random() - 0.5) * 0.3, 0.3);
-    m.scale.setScalar(0.6 + Math.random() * 0.9);
+    m.position.set(x + (Math.random() - 0.5) * 0.3, y + (Math.random() - 0.5) * 0.3, 0.35);
+    m.scale.setScalar(0.6 + Math.random() * 1.1);
     const a = Math.random() * Math.PI * 2;
-    m.userData.v = new THREE.Vector3(Math.cos(a) * (1 + Math.random() * 2.5), 1.5 + Math.random() * 3, (Math.random()) * 2);
-    m.userData.rv = new THREE.Vector3(Math.random() * 8, Math.random() * 8, Math.random() * 8);
+    m.userData.v = new THREE.Vector3(Math.cos(a) * (1.2 + Math.random() * 3), 2 + Math.random() * 3.5, 0.5 + Math.random() * 2.2);
+    m.userData.rv = new THREE.Vector3(Math.random() * 9, Math.random() * 9, Math.random() * 9);
     R.fxLayer.add(m);
     shards.push(m);
   }
@@ -90,18 +93,40 @@ export function shatter(x, y, colorHex, metal = false, count = 7) {
     age: 0,
     update(dt, age) {
       for (const m of shards) {
-        m.userData.v.y -= 12 * dt;
+        m.userData.v.y -= 9 * dt;
         m.position.addScaledVector(m.userData.v, dt);
         m.rotation.x += m.userData.rv.x * dt; m.rotation.y += m.userData.rv.y * dt;
       }
-      if (!metal) mat.opacity = 0.85 * (1 - age / 1.1);
-      return age < 1.1;
+      if (!metal) mat.opacity = 0.9 * (1 - age / 1.4);
+      return age < 1.4;
     },
     dispose() {
       for (const m of shards) R.fxLayer.remove(m);
       mat.dispose();
       shardCount -= count;
     },
+  });
+}
+
+// ── bright pop flash at a cleared cell ────────────────────────────────
+export function popFlash(x, y, colorHex, size = 1.6) {
+  const mat = new THREE.SpriteMaterial({
+    map: sparkTex, color: colorHex, transparent: true, opacity: 1,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const sp = new THREE.Sprite(mat);
+  sp.position.set(x, y, 0.5);
+  sp.scale.setScalar(0.3);
+  R.fxLayer.add(sp);
+  active.push({
+    age: 0,
+    update(dt, age) {
+      const k = age / 0.28;
+      sp.scale.setScalar(0.3 + k * size);
+      mat.opacity = 1 - k;
+      return age < 0.28;
+    },
+    dispose() { R.fxLayer.remove(sp); mat.dispose(); },
   });
 }
 

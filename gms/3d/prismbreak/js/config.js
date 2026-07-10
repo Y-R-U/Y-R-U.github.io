@@ -4,12 +4,12 @@ export const GRID = { cols: 8, rows: 8 };
 
 // gem colors: index order is fixed (save-safe). hex = glass tint, metal = metal tint.
 export const GEM_COLORS = [
-  { name: 'ruby',     hex: 0xf0102e, metal: 0xc02038, glow: 0xff5566 },
-  { name: 'amber',    hex: 0xffa018, metal: 0xd98c1f, glow: 0xffc860 },
-  { name: 'emerald',  hex: 0x2eea6a, metal: 0x2bb95a, glow: 0x7cffab },
-  { name: 'sapphire', hex: 0x2e7bff, metal: 0x3567cf, glow: 0x74a9ff },
-  { name: 'amethyst', hex: 0xb44dff, metal: 0x9445cf, glow: 0xd393ff },
-  { name: 'ice',      hex: 0x35e0e8, metal: 0x39b6bc, glow: 0x9df3f7 },
+  { name: 'ruby',     hex: 0xf0102e, metal: 0xff5064, glow: 0xff5566 },
+  { name: 'amber',    hex: 0xffa018, metal: 0xffc054, glow: 0xffc860 },
+  { name: 'emerald',  hex: 0x2eea6a, metal: 0x5fe890, glow: 0x7cffab },
+  { name: 'sapphire', hex: 0x2e7bff, metal: 0x6f9dff, glow: 0x74a9ff },
+  { name: 'amethyst', hex: 0xb44dff, metal: 0xd07fff, glow: 0xd393ff },
+  { name: 'ice',      hex: 0x35e0e8, metal: 0x7fecf2, glow: 0x9df3f7 },
 ];
 
 export const SPECIALS = {

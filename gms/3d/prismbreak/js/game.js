@@ -52,7 +52,7 @@ const wait = (ms) => new Promise(res => setTimeout(res, ms));
 
 // ── setup / teardown ──────────────────────────────────────────────────
 export function initGame() {
-  initGemAssets();
+  initGemAssets(R.lite);
   input.onSwap = (a, b) => playerSwap(a, b);
   input.onTap = (cell) => tapTarget(cell);
   input.onSelect = (cell) => highlight(cell);
@@ -67,7 +67,7 @@ export function startGame({ mode, level = null, rng = Math.random, mods = {}, ra
   game.over = false; game.busy = false; game.paused = false; game.started = true;
   game.hintTimer = 0; game.hintMove = null; game.prismTimer = 0; game.zenPaid = 0;
 
-  const metalChance = mods.metalChance ?? level?.metalChance ?? 0.1;
+  const metalChance = mods.metalChance ?? level?.metalChance ?? 0.14;
   game.board = new Board({
     colors: level?.colors ?? 6,
     metalChance, rng,
@@ -269,15 +269,33 @@ async function playClear(ev, comboKind) {
     centroid.x += p.x; centroid.y += p.y;
     const isMetal = cell.gem.finish === 'metal';
     const crushed = crushKeys.has(cell.r * 100 + cell.c);
-    FX.burst(p.x, p.y, gemGlowColor(cell.gem), crushed ? 26 : 12, crushed ? 5 : 3.2);
-    FX.shatter(p.x, p.y, gemHexColor(cell.gem), isMetal, crushed ? 12 : 6);
     if (crushed) {
+      // THE CRUSH: metal above slams down, glass squashes flat, then explodes
       sfx.crush();
-      FX.shockwave(p.x, p.y, 0xffffff, game.mods.crushShockwave ? 3.6 : 1.6);
-      FX.floater(p.x, p.y, pick(Math.random, CALLOUTS.crush), 'crush');
+      slamCrusher(cell.r - 1, cell.c);
       game.forge = Math.min(game.forge + FORGE.crush, 100);
       save.data.stats.crushes++;
-    } else if (isMetal) { sfx.clang(i * 0.02); game.forge = Math.min(game.forge + FORGE.metal, 100); }
+      addShake(0.16);
+      if (gm) {
+        const grp = gm.group;
+        tween(0.13, k => { grp.scale.set(1 + k * 0.6, Math.max(1 - k * 1.1, 0.06), 1); }, {
+          onDone: () => {
+            R.gemLayer.remove(grp);
+            FX.popFlash(p.x, p.y, 0xffffff, 3);
+            FX.burst(p.x, p.y, gemGlowColor(cell.gem), 30, 5.5);
+            FX.shatter(p.x, p.y, gemHexColor(cell.gem), false, 16);
+            FX.shockwave(p.x, p.y, 0xffffff, game.mods.crushShockwave ? 3.6 : 2);
+          },
+        });
+        game.meshes.delete(cell.gem.id);
+      }
+      i++;
+      continue;
+    }
+    FX.popFlash(p.x, p.y, gemGlowColor(cell.gem), isMetal ? 2 : 1.4);
+    FX.burst(p.x, p.y, gemGlowColor(cell.gem), 12, 3.2);
+    FX.shatter(p.x, p.y, isMetal ? gemGlowColor(cell.gem) : gemHexColor(cell.gem), isMetal, isMetal ? 8 : 7);
+    if (isMetal) { sfx.clang(i * 0.02); game.forge = Math.min(game.forge + FORGE.metal, 100); }
     else sfx.pop(ev.cascade, i);
     if (cell.gem.special) { game.forge = Math.min(game.forge + FORGE.special, 100); save.data.stats.specials++; }
     if (gm) {
@@ -285,11 +303,11 @@ async function playClear(ev, comboKind) {
       tween(0.18, k => { grp.scale.setScalar(1 + k * 0.6); grp.rotation.z = k * 1.2; }, {
         onDone: () => R.gemLayer.remove(grp),
       });
-      tween(0.18, k => { grp.traverse(o => { if (o.material?.opacity !== undefined) o.material.transparent = true; }); });
       game.meshes.delete(cell.gem.id);
     }
     i++;
   }
+  if (ev.crushes.length) FX.bigText(pick(Math.random, CALLOUTS.crush), 'callout crushtx');
   if (ev.cells.length) {
     centroid.x /= ev.cells.length; centroid.y /= ev.cells.length;
     FX.floater(centroid.x, centroid.y, '+' + fmt(ev.points), ev.points > 400 ? 'big' : '');
@@ -332,6 +350,19 @@ async function playClear(ev, comboKind) {
   }
 
   await wait(ev.cascade === 1 ? 270 : 300);
+}
+
+// the metal gem above a crush dips down onto the glass and springs back
+function slamCrusher(r, c) {
+  const g = game.board.at(r, c);
+  if (!g || g.finish !== 'metal') return;
+  const gm = game.meshes.get(g.id);
+  if (!gm) return;
+  const baseY = cellToWorld(r, c).y;
+  tween(0.22, k => {
+    const d = k < 0.4 ? k / 0.4 : 1 - (k - 0.4) / 0.6;
+    gm.group.position.y = baseY - d * 0.5;
+  });
 }
 
 function playFall(ev) {
@@ -577,6 +608,20 @@ export function updateGame(t, dt) {
         FX.bigText('FREE PRISM!', 'callout');
         sfx.prismCast();
       }
+    }
+  }
+
+  // ambient sparkle glints on random gems
+  if (!R.lite) {
+    game.glintTimer = (game.glintTimer || 0) + dt;
+    if (game.glintTimer > 0.4) {
+      game.glintTimer = 0;
+      const arr = [...game.meshes.values()];
+      const gm = arr[Math.floor(Math.random() * arr.length)];
+      if (gm) FX.popFlash(
+        gm.group.position.x + (Math.random() - 0.5) * 0.5,
+        gm.group.position.y + (Math.random() - 0.5) * 0.5,
+        0xffffff, 0.45);
     }
   }
 

@@ -30,8 +30,11 @@ export function initRender(lite) {
   R.renderer = new THREE.WebGLRenderer({ antialias: !lite, powerPreference: 'high-performance' });
   R.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   R.renderer.setSize(window.innerWidth, window.innerHeight);
-  R.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  R.renderer.toneMappingExposure = 1.1;
+  // Neutral keeps saturated gem colours vivid where ACES washes them to pastel
+  R.renderer.toneMapping = THREE.NeutralToneMapping ?? THREE.ACESFilmicToneMapping;
+  R.renderer.toneMappingExposure = 1.15;
+  // gems use transmission — halve the refraction buffer, plenty for small meshes
+  if ('transmissionResolutionScale' in R.renderer) R.renderer.transmissionResolutionScale = 0.5;
   container.appendChild(R.renderer.domElement);
 
   R.scene = new THREE.Scene();
@@ -42,7 +45,7 @@ export function initRender(lite) {
   R.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
   // lights
-  R.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  R.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
   R.keyLight = new THREE.DirectionalLight(0xffffff, 1.6);
   R.keyLight.position.set(4, 8, 10);
   R.scene.add(R.keyLight);
@@ -73,10 +76,10 @@ export function initRender(lite) {
 }
 
 function buildBoardFrame() {
-  // checkered translucent tiles
+  // checkered tiles — kept OPAQUE so they show up refracted inside the glass gems
   const tileGeo = new THREE.BoxGeometry(0.96, 0.96, 0.12);
-  const matA = new THREE.MeshPhysicalMaterial({ color: 0x0d0b22, transparent: true, opacity: 0.55, roughness: 0.3, metalness: 0.2 });
-  const matB = matA.clone(); matB.opacity = 0.38;
+  const matA = new THREE.MeshStandardMaterial({ color: 0x14113a, roughness: 0.35, metalness: 0.35, envMapIntensity: 0.6 });
+  const matB = new THREE.MeshStandardMaterial({ color: 0x201b56, roughness: 0.35, metalness: 0.35, envMapIntensity: 0.6 });
   R.tileMatA = matA; R.tileMatB = matB;
   for (let r = 0; r < GRID.rows; r++) {
     for (let c = 0; c < GRID.cols; c++) {
@@ -98,6 +101,24 @@ function buildBoardFrame() {
   const W = BOARD_W + 0.35, H = BOARD_H + 0.35;
   bar(W + 0.3, 0.18, 0, H / 2); bar(W + 0.3, 0.18, 0, -H / 2);
   bar(0.18, H + 0.3, W / 2, 0); bar(0.18, H + 0.3, -W / 2, 0);
+
+  // soft radial glow halo behind the board
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 128;
+  const ctx = cv.getContext('2d');
+  const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 62);
+  grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+  grad.addColorStop(0.5, 'rgba(255,255,255,0.28)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  R.glowMat = new THREE.MeshBasicMaterial({
+    map: new THREE.CanvasTexture(cv), color: 0x6a5dff, transparent: true, opacity: 0.4,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(17, 17), R.glowMat);
+  glow.position.z = -1.6;
+  R.boardGroup.add(glow);
 }
 
 function buildBackground() {
@@ -123,9 +144,11 @@ function buildBackground() {
       color: 0x6a5dff, metalness: 0.3, roughness: 0.15, transparent: true, opacity: 0.35,
       emissive: 0x6a5dff, emissiveIntensity: 0.25, flatShading: true,
     }));
-    const s = 1.5 + Math.random() * 3.5;
+    const s = 1.2 + Math.random() * 2.4;
     m.scale.set(s, s * (1.2 + Math.random()), s);
-    m.position.set((Math.random() - 0.5) * 34, (Math.random() - 0.5) * 40, -14 - Math.random() * 14);
+    // keep the middle clear so the board stays readable
+    const side = Math.random() < 0.5 ? -1 : 1;
+    m.position.set(side * (8 + Math.random() * 10), (Math.random() - 0.5) * 40, -16 - Math.random() * 16);
     m.userData.spin = (Math.random() - 0.5) * 0.3;
     m.userData.drift = 0.1 + Math.random() * 0.25;
     m.userData.baseY = m.position.y;
@@ -153,9 +176,10 @@ export function applyTheme(theme) {
   R.bgMat.uniforms.bot.value.setHex(theme.bgBot);
   R.scene.fog = new THREE.Fog(theme.fog, 30, 70);
   R.frameMat.color.setHex(theme.frame);
-  R.tileMatA.color.setHex(theme.boardTint);
-  R.tileMatB.color.setHex(theme.boardTint);
+  R.tileMatA.color.setHex(theme.boardTint).multiplyScalar(2.2);
+  R.tileMatB.color.setHex(theme.boardTint).multiplyScalar(3.6);
   R.starMat.color.setHex(theme.star);
+  if (R.glowMat) R.glowMat.color.setHex(theme.crystal);
   for (const c of R.crystals) {
     c.material.color.setHex(theme.crystal);
     c.material.emissive.setHex(theme.crystal);

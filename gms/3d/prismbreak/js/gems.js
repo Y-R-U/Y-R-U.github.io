@@ -12,31 +12,47 @@ function buildGeometries() {
   const g3 = new THREE.SphereGeometry(0.44, 8, 5);                                     // sapphire faceted ball
   const g4 = new THREE.IcosahedronGeometry(0.44, 0);                                   // amethyst
   const g5 = new THREE.CylinderGeometry(0.06, 0.5, 0.7, 8); g5.rotateX(Math.PI);       // ice brilliant cut
-  for (const g of [g0, g1, g2, g3, g4, g5]) GEO.push(g.toNonIndexed());
+  for (const g of [g0, g1, g2, g3, g4, g5]) { g.scale(1.14, 1.14, 1.14); GEO.push(g.toNonIndexed()); }
   GEO.push(new THREE.IcosahedronGeometry(0.5, 1).toNonIndexed());                      // [6] prism orb
 }
 
 const glassMats = [], metalMats = [];
 let bandGeo, bandMat, rodGeo, coreGeo, orbGeo;
 
-export function initGemAssets() {
+export function initGemAssets(lite = false) {
   buildGeometries();
   for (let i = 0; i < GEM_COLORS.length; i++) {
     const col = GEM_COLORS[i];
-    glassMats.push(new THREE.MeshPhysicalMaterial({
-      color: col.hex, metalness: 0, roughness: 0.05,
-      transparent: true, opacity: 0.82,
-      clearcoat: 1, clearcoatRoughness: 0.08,
-      envMapIntensity: 1.15, flatShading: true,
-      emissive: col.hex, emissiveIntensity: 0.22,
-    }));
+    if (lite) {
+      // cheap fake-glass fallback (no transmission pass)
+      glassMats.push(new THREE.MeshPhysicalMaterial({
+        color: col.hex, metalness: 0, roughness: 0.05,
+        transparent: true, opacity: 0.72,
+        clearcoat: 1, clearcoatRoughness: 0.08,
+        envMapIntensity: 1.3, flatShading: true,
+        emissive: col.hex, emissiveIntensity: 0.25,
+      }));
+    } else {
+      // real refractive gem glass: see-through, bends light, stays saturated
+      glassMats.push(new THREE.MeshPhysicalMaterial({
+        color: col.hex, metalness: 0, roughness: 0.02,
+        transmission: 1, thickness: 1.2, ior: 1.8, dispersion: 0.4,
+        attenuationColor: new THREE.Color(col.hex), attenuationDistance: 0.25,
+        clearcoat: 1, clearcoatRoughness: 0.04,
+        envMapIntensity: 0.55, flatShading: true,
+        specularIntensity: 0.8,
+        emissive: col.hex, emissiveIntensity: 0.5,
+      }));
+    }
+    // polished chrome tinted by the gem colour — bright, mirror-shiny, clearly metal
     metalMats.push(new THREE.MeshStandardMaterial({
-      color: col.metal, metalness: 1, roughness: 0.24,
-      envMapIntensity: 1.8, flatShading: true,
+      color: col.metal, metalness: 1, roughness: 0.1,
+      envMapIntensity: 2.2, flatShading: true,
+      emissive: col.metal, emissiveIntensity: 0.25,
     }));
   }
-  bandGeo = new THREE.TorusGeometry(0.42, 0.05, 6, 18);
-  bandMat = new THREE.MeshStandardMaterial({ color: 0x3a3a44, metalness: 1, roughness: 0.4 });
+  bandGeo = new THREE.TorusGeometry(0.5, 0.08, 8, 22);
+  bandMat = new THREE.MeshStandardMaterial({ color: 0xcdd4e0, metalness: 1, roughness: 0.18, envMapIntensity: 2 });
   rodGeo = new THREE.CylinderGeometry(0.07, 0.07, 1.15, 6);
   coreGeo = new THREE.IcosahedronGeometry(0.2, 0);
   orbGeo = new THREE.SphereGeometry(0.07, 6, 4);
@@ -125,8 +141,10 @@ export class GemMesh {
       this.core.scale.setScalar(p);
       return;
     }
-    this.core.rotation.y = t * 0.6 + s;
-    this.core.position.y = Math.sin(t * 1.7 + s) * 0.035;
+    // metal is heavy: slow turn, no bob. glass twinkles and floats.
+    const heavy = g.finish === 'metal';
+    this.core.rotation.y = t * (heavy ? 0.25 : 0.7) + s;
+    this.core.position.y = heavy ? 0 : Math.sin(t * 1.7 + s) * 0.04;
     if (g.special === 'lineH' || g.special === 'lineV') {
       const rod = this.extras[0];
       if (rod) {
