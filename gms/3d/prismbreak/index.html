@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0b0918" />
+  <title>Prism Break — glass &amp; metal match-3</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-logo">PRISM<span>BREAK</span></div>
+      <div id="boot-status">polishing gems…</div>
+    </div>
+  </div>
+
+  <!-- home menu -->
+  <div id="menu" class="screen hidden">
+    <div class="menu-inner">
+      <div class="game-logo"><span class="pl">PRISM</span><span class="bl">BREAK</span></div>
+      <div class="game-tag">match glass · crush with metal</div>
+
+      <div id="event-banner" class="event-banner hidden"></div>
+
+      <div class="menu-btns">
+        <button id="btn-journey" class="big gold">💎&ensp;Journey</button>
+        <button id="btn-blitz" class="big">⚡&ensp;Blitz <small>90 seconds</small></button>
+        <button id="btn-zen" class="big">🌙&ensp;Zen <small>endless</small></button>
+        <button id="btn-weekly" class="big">🏆&ensp;Weekly Challenge<span id="weekly-dot" class="dot hidden"></span></button>
+      </div>
+
+      <div class="menu-row">
+        <button id="btn-daily" class="sq">🎁<small>Daily</small><span id="daily-dot" class="dot hidden"></span></button>
+        <button id="btn-shop" class="sq">🛒<small>Shop</small></button>
+        <button id="btn-help" class="sq">📖<small>Help</small></button>
+        <button id="btn-options" class="sq">⚙️<small>Options</small></button>
+      </div>
+
+      <div class="shard-pill" id="menu-shards">◆ 0</div>
+      <div class="menu-foot">a Y-R-U game</div>
+    </div>
+  </div>
+
+  <!-- level select -->
+  <div id="levelselect" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>Journey</h2>
+      <div class="shard-pill small" data-shards>◆ 0</div>
+    </div>
+    <div id="level-grid" class="scr-body level-grid"></div>
+  </div>
+
+  <!-- in-game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <button id="btn-pause" class="iconbtn">⏸</button>
+      <div class="hud-mid">
+        <div id="hud-goal" class="hud-goal"></div>
+        <div class="score-wrap">
+          <div id="score-bar"><i></i><em class="s1"></em><em class="s2"></em><em class="s3"></em></div>
+          <div id="hud-score">0</div>
+        </div>
+      </div>
+      <div id="hud-moves" class="hud-moves">30</div>
+    </div>
+    <div class="hud-bottom">
+      <div id="booster-bar">
+        <button class="boost" data-boost="hammer">🔨<b>0</b></button>
+        <button class="boost" data-boost="swap">🔁<b>0</b></button>
+        <button class="boost" data-boost="moves">➕<b>0</b></button>
+        <button class="boost" data-boost="shuffle">🎲<b>0</b></button>
+      </div>
+      <button id="forge-btn"><i id="forge-fill"></i><span>FORGE</span></button>
+    </div>
+    <div id="combo-meter" class="hidden"><b>×1</b></div>
+  </div>
+
+  <!-- big flashy text layer -->
+  <div id="bigtext"></div>
+  <!-- floating score labels -->
+  <div id="floaters"></div>
+  <!-- screen flash -->
+  <div id="flash"></div>
+
+  <!-- popup layer -->
+  <div id="popup-layer" class="hidden">
+    <div id="popup-card"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
