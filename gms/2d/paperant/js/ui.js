@@ -18,6 +18,10 @@ const UI = (() => {
     let onRetryLevel = null;
     let onBackToLevels = null;
     let onBackToTitle = null;
+    let onChallengeStart = null;
+
+    // Power-up buttons currently showing an active effect
+    const activePowerups = {};
 
     function init(callbacks) {
         onPlayClick = callbacks.onPlayClick;
@@ -26,11 +30,13 @@ const UI = (() => {
         onRetryLevel = callbacks.onRetryLevel;
         onBackToLevels = callbacks.onBackToLevels;
         onBackToTitle = callbacks.onBackToTitle;
+        onChallengeStart = callbacks.onChallengeStart;
 
         // Cache screen elements
         const ids = ['title-screen', 'how-to-play-screen', 'level-select-screen',
                      'level-complete-screen', 'level-failed-screen', 'settings-screen',
-                     'game-complete-screen', 'quit-confirm-screen'];
+                     'game-complete-screen', 'quit-confirm-screen',
+                     'daily-reward-screen', 'challenge-screen'];
         ids.forEach(id => { screens[id] = document.getElementById(id); });
 
         // Button bindings
@@ -63,6 +69,14 @@ const UI = (() => {
         // Quit confirm buttons
         bindBtn('quit-yes-btn', () => { GameAudio.SFX.buttonClick(); hideQuitConfirm(); onBackToLevels?.(); });
         bindBtn('quit-no-btn', () => { GameAudio.SFX.buttonClick(); hideQuitConfirm(); });
+
+        // Daily reward & challenge
+        bindBtn('daily-reward-btn', () => { GameAudio.SFX.buttonClick(); showDailyPopup(); });
+        bindBtn('daily-close-btn', () => { GameAudio.SFX.buttonClick(); showScreen('title-screen'); });
+        bindBtn('daily-claim-btn', () => { claimDailyReward(); });
+        bindBtn('daily-challenge-btn', () => { GameAudio.SFX.buttonClick(); showChallengePopup(); });
+        bindBtn('challenge-close-btn', () => { GameAudio.SFX.buttonClick(); showScreen('title-screen'); });
+        bindBtn('challenge-play-btn', () => { GameAudio.SFX.buttonClick(); onChallengeStart?.(); });
 
         // Settings
         bindBtn('settings-btn', () => { GameAudio.SFX.buttonClick(); toggleSettings(); });
@@ -135,6 +149,7 @@ const UI = (() => {
             screens[id].classList.add('active');
             currentScreen = id;
         }
+        if (id === 'title-screen') updateTitleBadges();
         // Update cog visibility
         updateCogVisibility(id);
     }
@@ -152,7 +167,7 @@ const UI = (() => {
         if (!cog) return;
         // Hide cog on title and level-select (they have their own full backgrounds)
         const hiddenOn = ['title-screen', 'how-to-play-screen', 'level-select-screen',
-                          'game-complete-screen'];
+                          'game-complete-screen', 'daily-reward-screen', 'challenge-screen'];
         if (hiddenOn.includes(screenId)) {
             cog.style.display = 'none';
         } else {
@@ -163,10 +178,12 @@ const UI = (() => {
     function showHUD(show) {
         const hud = document.getElementById('game-hud');
         hud.classList.toggle('hidden', !show);
+        const bar = document.getElementById('powerup-bar');
+        if (bar) bar.classList.toggle('hidden', !show);
     }
 
-    function updateHUD(levelNum, goalText, timeRemaining, inkFrac) {
-        document.getElementById('hud-level').textContent = 'Level ' + levelNum;
+    function updateHUD(label, goalText, timeRemaining, inkFrac) {
+        document.getElementById('hud-level').textContent = label;
         document.getElementById('hud-goal').textContent = goalText;
 
         const mins = Math.floor(timeRemaining / 60);
@@ -261,7 +278,7 @@ const UI = (() => {
         return s;
     }
 
-    function showLevelComplete(stars, time, levelNum) {
+    function renderCompleteStars(stars, time) {
         const starsEl = document.getElementById('level-stars');
         starsEl.innerHTML = '';
         for (let i = 0; i < 3; i++) {
@@ -274,6 +291,12 @@ const UI = (() => {
         const mins = Math.floor(time / 60);
         const secs = Math.floor(time % 60);
         document.getElementById('level-time').textContent = `Time: ${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function showLevelComplete(stars, time, levelNum) {
+        document.getElementById('complete-title').textContent = 'Level Complete!';
+        document.getElementById('complete-rewards').classList.add('hidden');
+        renderCompleteStars(stars, time);
 
         // Hide next button if last level
         const nextBtn = document.getElementById('complete-next-btn');
@@ -282,8 +305,174 @@ const UI = (() => {
         showScreen('level-complete-screen');
     }
 
+    // Challenge completion reuses the level-complete popup with a reward line
+    function showChallengeComplete(stars, time, rewardItems) {
+        document.getElementById('complete-title').textContent = 'Challenge Complete!';
+        renderCompleteStars(stars, time);
+
+        const rewardEl = document.getElementById('complete-rewards');
+        if (rewardItems) {
+            rewardEl.textContent = 'Reward: ' + formatItems(rewardItems);
+            GameAudio.SFX.reward();
+        } else {
+            rewardEl.textContent = 'Already completed today — played for glory!';
+        }
+        rewardEl.classList.remove('hidden');
+
+        // No "next level" from a challenge
+        document.getElementById('complete-next-btn').style.display = 'none';
+
+        showScreen('level-complete-screen');
+    }
+
     function showLevelFailed() {
         showScreen('level-failed-screen');
+    }
+
+    // === Power-up bar (in-game) ===
+
+    function updatePowerupBar() {
+        const bar = document.getElementById('powerup-bar');
+        if (!bar) return;
+        bar.innerHTML = '';
+        const inv = PowerUps.getAll();
+        for (const [type, def] of Object.entries(PowerUps.TYPES)) {
+            const count = inv[type] || 0;
+            const btn = document.createElement('button');
+            btn.className = 'powerup-btn';
+            btn.dataset.type = type;
+            btn.title = `${def.name}: ${def.desc}`;
+            btn.innerHTML = `<span class="pu-icon">${def.icon}</span><span class="pu-count">${count}</span>`;
+            if (count <= 0) btn.disabled = true;
+            if (activePowerups[type]) btn.classList.add('active');
+            btn.addEventListener('click', () => Game.activatePowerUp(type));
+            bar.appendChild(btn);
+        }
+    }
+
+    function setPowerupActive(type, isActive) {
+        activePowerups[type] = isActive;
+        const bar = document.getElementById('powerup-bar');
+        if (!bar) return;
+        const btn = bar.querySelector(`.powerup-btn[data-type="${type}"]`);
+        if (btn) btn.classList.toggle('active', !!isActive);
+    }
+
+    function resetPowerupActive() {
+        for (const key of Object.keys(activePowerups)) activePowerups[key] = false;
+    }
+
+    // === Daily reward & events ===
+
+    function formatItems(items) {
+        return Object.entries(items)
+            .map(([type, count]) => `${PowerUps.TYPES[type].icon}×${count}`)
+            .join('  ');
+    }
+
+    function renderDailyPopup(claimedNow) {
+        const info = Rewards.peekDaily();
+        document.getElementById('daily-title').textContent = `Daily Reward — Day ${info.day}`;
+
+        const eventLine = document.getElementById('daily-event-line');
+        if (info.event) {
+            eventLine.textContent = `${info.event.icon} ${info.event.name}: ${info.event.desc}`;
+            eventLine.classList.remove('hidden');
+        } else {
+            eventLine.classList.add('hidden');
+        }
+
+        // 7-day streak chips
+        const daysEl = document.getElementById('daily-days');
+        daysEl.innerHTML = '';
+        for (let i = 1; i <= 7; i++) {
+            const chip = document.createElement('span');
+            chip.className = 'day-chip' +
+                (i < info.day ? ' done' : '') +
+                (i === info.day ? ' today' : '');
+            chip.textContent = i;
+            daysEl.appendChild(chip);
+        }
+
+        // Reward items
+        const itemsEl = document.getElementById('daily-items');
+        itemsEl.innerHTML = '';
+        for (const [type, count] of Object.entries(info.items)) {
+            const def = PowerUps.TYPES[type];
+            const item = document.createElement('div');
+            item.className = 'reward-item';
+            item.innerHTML = `<span class="ri-icon">${def.icon}</span><span class="ri-label">${def.name} ×${count}</span>`;
+            itemsEl.appendChild(item);
+        }
+
+        const note = document.getElementById('daily-note');
+        const claimBtn = document.getElementById('daily-claim-btn');
+        if (claimedNow) {
+            note.textContent = 'Added to your satchel! Come back tomorrow to grow the streak.';
+            claimBtn.disabled = true;
+        } else if (info.claimable) {
+            note.textContent = 'Claim every day to grow your streak — day 7 is a mega bundle!';
+            claimBtn.disabled = false;
+        } else {
+            note.textContent = `Already claimed today (streak: ${Rewards.getStreak()}). Come back tomorrow!`;
+            claimBtn.disabled = true;
+        }
+    }
+
+    function showDailyPopup() {
+        renderDailyPopup(false);
+        showScreen('daily-reward-screen');
+    }
+
+    function claimDailyReward() {
+        const reward = Rewards.claimDaily();
+        if (!reward) return;
+        GameAudio.SFX.reward();
+        GameAudio.vibrate([20, 30, 20]);
+        renderDailyPopup(true);
+        updateTitleBadges();
+    }
+
+    function showChallengePopup() {
+        const level = Rewards.getChallengeLevel();
+        document.getElementById('challenge-desc').textContent =
+            `Today: ${level.description} (${level.ants.length} ant${level.ants.length > 1 ? 's' : ''}, ${level.timeLimit}s)`;
+        const status = document.getElementById('challenge-status');
+        if (Rewards.isChallengeDone()) {
+            status.textContent = '✓ Completed today — reward collected. Replay for glory!';
+        } else {
+            const event = Rewards.getTodayEvent();
+            status.textContent = (event && event.mult)
+                ? `Beat it once today for DOUBLED bonus power-ups! ${event.icon}`
+                : 'Beat it once today for bonus power-ups!';
+        }
+        showScreen('challenge-screen');
+    }
+
+    function updateTitleBadges() {
+        // Red dot on the daily reward button while unclaimed
+        const badge = document.getElementById('daily-badge');
+        if (badge) badge.classList.toggle('hidden', !Rewards.canClaimDaily());
+
+        // Challenge button shows a check once done
+        const chBtn = document.getElementById('daily-challenge-btn');
+        if (chBtn) {
+            chBtn.innerHTML = Rewards.isChallengeDone()
+                ? '&#9889; Daily Challenge ✓'
+                : '&#9889; Daily Challenge';
+        }
+
+        // Event banner
+        const banner = document.getElementById('event-banner');
+        if (banner) {
+            const event = Rewards.getTodayEvent();
+            if (event) {
+                banner.textContent = `${event.icon} ${event.name} — ${event.desc}`;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
     }
 
     function showGameComplete(totalStars, maxStars) {
@@ -295,5 +484,7 @@ const UI = (() => {
         init, showScreen, hideAllScreens, showHUD, updateHUD, flashInkEmpty,
         buildLevelGrid, showLevelComplete, showLevelFailed, showGameComplete,
         isSettingsOpen, hideSettings, isQuitOpen, hideQuitConfirm,
+        updatePowerupBar, setPowerupActive, resetPowerupActive, showChallengeComplete,
+        showDailyPopup, showChallengePopup, updateTitleBadges,
     };
 })();

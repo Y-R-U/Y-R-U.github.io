@@ -307,16 +307,17 @@ const AntSystem = (() => {
         // === Pencil line collision ===
         // ALWAYS checked (no cooldown skip) - lines are solid barriers.
         // On hit: reflect angle AND push ant out along the normal so it can't tunnel.
-        const lineThreshold = margin + CONFIG.PENCIL_WIDTH * dpr;
-
+        // Threshold is per line: Thick Pencil lines carry a larger width.
         let closestDist = Infinity;
         let closestNormalAngle = 0;
         let closestNx = 0;  // normal direction x
         let closestNy = 0;  // normal direction y
+        let closestThreshold = 0;
         let hitLine = false;
 
         for (const line of lines) {
             if (line.fading && line.opacity < 0.3) continue;
+            const lineThreshold = margin + (line.width || CONFIG.PENCIL_WIDTH) * dpr;
             for (let i = 1; i < line.points.length; i++) {
                 const p1 = line.points[i - 1];
                 const p2 = line.points[i];
@@ -327,6 +328,7 @@ const AntSystem = (() => {
 
                 if (dist < lineThreshold && dist < closestDist) {
                     closestDist = dist;
+                    closestThreshold = lineThreshold;
                     closestNormalAngle = getSegmentNormal(p1.x, p1.y, p2.x, p2.y, ant.angle);
                     // Compute push-out direction: from closest point on segment toward ant
                     if (dist > 0.01) {
@@ -346,7 +348,7 @@ const AntSystem = (() => {
             // Random bounce AWAY from the line (not reflection — avoids wiggle-stuck)
             ant.angle = bounceAwayAngle(closestNormalAngle);
             // Push ant well clear of the line along the normal direction
-            const pushDist = lineThreshold - closestDist + 4 * dpr;
+            const pushDist = closestThreshold - closestDist + 4 * dpr;
             nx += closestNx * pushDist;
             ny += closestNy * pushDist;
             // Kill any wander momentum so the bounce direction sticks

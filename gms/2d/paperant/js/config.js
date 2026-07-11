@@ -21,7 +21,7 @@ const CONFIG = {
 
     // Drawing / Pencil
     PENCIL_COLOR: '#4a4a4a',
-    PENCIL_WIDTH: 4,
+    PENCIL_WIDTH: 5,
     LINE_FADE_TIME: 3.5, // seconds before line starts fading
     LINE_FADE_DURATION: 1.0, // seconds to fully fade
     // Ink is now TIME-based (in seconds of drawing) instead of pixel-based.
@@ -47,6 +47,15 @@ const CONFIG = {
     // Particles
     MAX_PARTICLES: 80,
     PARTICLE_LIFE: 1.0,
+
+    // Power-ups
+    MAGNET_DURATION: 6,      // seconds the magnet attracts ants
+    MAGNET_TURN_RATE: 3.2,   // rad/s steering strength toward the magnet
+    FREEZE_DURATION: 6,      // seconds ants are slowed
+    FREEZE_FACTOR: 0.35,     // ant speed multiplier while frozen
+    EXTRA_TIME_BONUS: 15,    // seconds added by the Extra Time power-up
+    PENCIL_BOOST_WIDTH: 2.0, // width multiplier for Thick Pencil
+    PENCIL_BOOST_FADE: 1.6,  // fade-time multiplier for Thick Pencil
 };
 
 // Goal types with their appearance

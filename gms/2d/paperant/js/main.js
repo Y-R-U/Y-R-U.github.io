@@ -9,6 +9,8 @@
     Input.init(canvas);
     GameAudio.init();
     LevelManager.init();
+    PowerUps.init();
+    Rewards.init();
 
     // Draw initial paper background
     Renderer.drawPaper();
@@ -30,7 +32,14 @@
             }
         },
         onRetryLevel() {
-            Game.startLevel(Game.getCurrentLevel());
+            if (Game.isChallenge()) {
+                Game.startChallenge(Rewards.getChallengeLevel());
+            } else {
+                Game.startLevel(Game.getCurrentLevel());
+            }
+        },
+        onChallengeStart() {
+            Game.startChallenge(Rewards.getChallengeLevel());
         },
         onBackToLevels() {
             Game.stopLevel();

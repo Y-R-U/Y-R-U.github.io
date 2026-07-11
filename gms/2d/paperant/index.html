@@ -27,8 +27,13 @@
                 <div class="title-ant-decoration"></div>
                 <h1 class="game-title">Paper Ant</h1>
                 <p class="game-subtitle">Draw lines to guide the ant!</p>
+                <div id="event-banner" class="event-banner hidden"></div>
                 <button id="play-btn" class="paper-btn primary">Play</button>
                 <button id="how-to-play-btn" class="paper-btn">How to Play</button>
+                <div class="title-extras">
+                    <button id="daily-reward-btn" class="paper-btn small">&#127873; Daily Reward<span id="daily-badge" class="badge hidden"></span></button>
+                    <button id="daily-challenge-btn" class="paper-btn small">&#9889; Daily Challenge</button>
+                </div>
             </div>
         </div>
 
@@ -98,16 +103,52 @@
             </div>
         </div>
 
+        <!-- Power-up Bar (visible during gameplay) -->
+        <div id="powerup-bar" class="powerup-bar hidden"></div>
+
         <!-- Level Complete Popup -->
         <div id="level-complete-screen" class="screen">
             <div class="popup-overlay">
                 <div class="popup paper-popup level-complete">
-                    <h2>Level Complete!</h2>
+                    <h2 id="complete-title">Level Complete!</h2>
                     <div id="level-stars" class="stars"></div>
                     <p id="level-time" class="level-stat"></p>
+                    <p id="complete-rewards" class="level-stat reward-line hidden"></p>
                     <div class="popup-buttons">
                         <button id="complete-levels-btn" class="paper-btn">Levels</button>
                         <button id="complete-next-btn" class="paper-btn primary">Next Level</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Reward Popup -->
+        <div id="daily-reward-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup daily-popup">
+                    <h2 id="daily-title">Daily Reward</h2>
+                    <p id="daily-event-line" class="level-stat hidden"></p>
+                    <div id="daily-days" class="daily-days"></div>
+                    <div id="daily-items" class="reward-items"></div>
+                    <p id="daily-note" class="level-stat"></p>
+                    <div class="popup-buttons">
+                        <button id="daily-close-btn" class="paper-btn">Close</button>
+                        <button id="daily-claim-btn" class="paper-btn primary">Claim!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Challenge Popup -->
+        <div id="challenge-screen" class="screen">
+            <div class="popup-overlay">
+                <div class="popup paper-popup challenge-popup">
+                    <h2>&#9889; Daily Challenge</h2>
+                    <p id="challenge-desc" class="level-stat"></p>
+                    <p id="challenge-status" class="level-stat"></p>
+                    <div class="popup-buttons">
+                        <button id="challenge-close-btn" class="paper-btn">Close</button>
+                        <button id="challenge-play-btn" class="paper-btn primary">Play</button>
                     </div>
                 </div>
             </div>
@@ -178,6 +219,9 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/levels-ext.js"></script>
+    <script src="js/powerups.js"></script>
+    <script src="js/rewards.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/input.js"></script>
     <script src="js/renderer.js"></script>

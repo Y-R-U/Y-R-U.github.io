@@ -158,19 +158,27 @@ const Renderer = (() => {
             ctx.beginPath();
             ctx.roundRect(pos.x, pos.y, ow, oh, 8 * dpr);
 
-            // Gradient fill
+            // Gradient fill — moving obstacles get a warm amber tint so they
+            // read as hazards; static puddles stay blue
+            const moving = obs.moveX || obs.moveY;
             const grad = ctx.createRadialGradient(
                 pos.x + ow / 2, pos.y + oh / 2, 0,
                 pos.x + ow / 2, pos.y + oh / 2, Math.max(ow, oh) / 2
             );
-            grad.addColorStop(0, 'rgba(100, 170, 230, 0.35)');
-            grad.addColorStop(0.7, 'rgba(80, 140, 200, 0.25)');
-            grad.addColorStop(1, 'rgba(60, 120, 180, 0.15)');
+            if (moving) {
+                grad.addColorStop(0, 'rgba(230, 160, 90, 0.4)');
+                grad.addColorStop(0.7, 'rgba(210, 130, 60, 0.3)');
+                grad.addColorStop(1, 'rgba(190, 110, 40, 0.18)');
+            } else {
+                grad.addColorStop(0, 'rgba(100, 170, 230, 0.35)');
+                grad.addColorStop(0.7, 'rgba(80, 140, 200, 0.25)');
+                grad.addColorStop(1, 'rgba(60, 120, 180, 0.15)');
+            }
             ctx.fillStyle = grad;
             ctx.fill();
 
             // Border
-            ctx.strokeStyle = 'rgba(80, 140, 200, 0.3)';
+            ctx.strokeStyle = moving ? 'rgba(200, 120, 50, 0.45)' : 'rgba(80, 140, 200, 0.3)';
             ctx.lineWidth = 1.5;
             ctx.stroke();
 

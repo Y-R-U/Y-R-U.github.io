@@ -17,6 +17,9 @@ paperant/
 ├── index.html
 ├── css/style.css
 ├── js/config.js
+├── js/levels-ext.js
+├── js/powerups.js
+├── js/rewards.js
 ├── js/audio.js
 ├── js/input.js
 ├── js/renderer.js
@@ -49,6 +52,10 @@ paperant/
 - Ink meter limits drawing and regenerates while not drawing.
 - Goals include food, nest, friend, leaf, and sugar.
 - Star rating is based on completion speed.
+- 100 levels; 51+ use moving obstacles (`moveX`/`moveY` + `period` + `phase`).
+- Consumable power-ups (magnet, thick pencil, freeze, ink, extra time) in
+  `js/powerups.js`; daily rewards, weekday events, and the seeded daily
+  challenge in `js/rewards.js`.
 
 ## Working Rules
 

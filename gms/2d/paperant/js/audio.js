@@ -76,6 +76,17 @@ const GameAudio = (() => {
         buttonClick() { playTone(800, 0.06, 'sine', 0.1); },
         antBounce() { playTone(200, 0.08, 'triangle', 0.08); },
         starEarn() { playTone(880, 0.2, 'sine', 0.15); },
+        powerUp() {
+            playTone(440, 0.08, 'square', 0.08);
+            setTimeout(() => playTone(660, 0.08, 'square', 0.08), 70);
+            setTimeout(() => playTone(880, 0.12, 'square', 0.1), 140);
+        },
+        reward() {
+            playTone(587, 0.12, 'sine', 0.18);
+            setTimeout(() => playTone(740, 0.12, 'sine', 0.18), 100);
+            setTimeout(() => playTone(880, 0.12, 'sine', 0.18), 200);
+            setTimeout(() => playTone(1175, 0.25, 'sine', 0.2), 300);
+        },
     };
 
     function vibrate(pattern) {

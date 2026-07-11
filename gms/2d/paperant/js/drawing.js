@@ -2,16 +2,31 @@
 'use strict';
 
 const Drawing = (() => {
-    let lines = []; // { points: [{x,y}], createdAt, fading, opacity, fadeStart }
+    let lines = []; // { points: [{x,y}], createdAt, fading, opacity, fadeStart, width, fadeTime }
     let currentStroke = null;
     let ink = CONFIG.INK_MAX;
     let dpr = 1;
+    // Thick Pencil power-up: multiplies stroke width & fade time for the
+    // rest of the level. Reset on init().
+    let widthMult = 1;
+    let fadeMult = 1;
 
     function init() {
         lines = [];
         currentStroke = null;
         ink = CONFIG.INK_MAX;
+        widthMult = 1;
+        fadeMult = 1;
     }
+
+    function setBoost(wm, fm) {
+        widthMult = wm;
+        fadeMult = fm;
+    }
+
+    function getWidthMultiplier() { return widthMult; }
+
+    function refillInk() { ink = CONFIG.INK_MAX; }
 
     function setDpr(d) { dpr = d; }
 
@@ -28,6 +43,8 @@ const Drawing = (() => {
         currentStroke = {
             points: [clamped],
             createdAt: performance.now() / 1000,
+            width: CONFIG.PENCIL_WIDTH * widthMult,
+            fadeTime: CONFIG.LINE_FADE_TIME * fadeMult,
         };
         GameAudio.SFX.draw();
     }
@@ -87,7 +104,7 @@ const Drawing = (() => {
             const line = lines[i];
             const age = now - line.createdAt;
 
-            if (!line.fading && age > CONFIG.LINE_FADE_TIME) {
+            if (!line.fading && age > (line.fadeTime || CONFIG.LINE_FADE_TIME)) {
                 line.fading = true;
                 line.fadeStart = now;
             }
@@ -105,11 +122,11 @@ const Drawing = (() => {
     function drawLines(ctx) {
         // Draw completed lines
         for (const line of lines) {
-            drawStroke(ctx, line.points, line.opacity);
+            drawStroke(ctx, line.points, line.opacity, line.width);
         }
         // Draw current stroke
         if (currentStroke && currentStroke.points.length >= 2) {
-            drawStroke(ctx, currentStroke.points, 1);
+            drawStroke(ctx, currentStroke.points, 1, currentStroke.width);
         }
     }
 
@@ -121,13 +138,14 @@ const Drawing = (() => {
         return (h % 1000) / 1000 - 0.5; // -0.5 to 0.5
     }
 
-    function drawStroke(ctx, points, opacity) {
+    function drawStroke(ctx, points, opacity, width) {
         if (points.length < 2) return;
+        const lw = (width || CONFIG.PENCIL_WIDTH) * dpr;
 
         ctx.save();
         ctx.globalAlpha = opacity;
         ctx.strokeStyle = CONFIG.PENCIL_COLOR;
-        ctx.lineWidth = CONFIG.PENCIL_WIDTH * dpr;
+        ctx.lineWidth = lw;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -141,7 +159,7 @@ const Drawing = (() => {
 
         // Pencil texture - slight rough edge, deterministic per point
         ctx.globalAlpha = opacity * 0.2;
-        ctx.lineWidth = CONFIG.PENCIL_WIDTH * dpr * 1.5;
+        ctx.lineWidth = lw * 1.5;
         ctx.strokeStyle = '#6a6a6a';
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
@@ -163,5 +181,6 @@ const Drawing = (() => {
     return {
         init, setDpr, startStroke, addPoint, endStroke,
         update, drawLines, getLines, getInk, getInkFraction,
+        setBoost, getWidthMultiplier, refillInk,
     };
 })();

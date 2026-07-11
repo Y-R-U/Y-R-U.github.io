@@ -229,7 +229,7 @@ const PROJECTS = [
     date: "2026-04-07", creator: "Claude" },
 
   { name: "Paper Ant",          path: "/gms/2d/paperant/",       screenshot: "paperant",        type: "game",
-    desc: "Puzzle game with a hand-drawn paper theme. Draw pencil lines to guide ants to goals with reflection physics and ink management.",
+    desc: "Puzzle game with a hand-drawn paper theme. Draw pencil lines to guide ants through 100 levels — moving obstacles, power-ups (magnet, freeze, thick pencil), daily rewards, events and a daily challenge.",
     date: "2026-04-10", creator: "Claude" },
 
   { name: "Crow Tank 3D",       path: "/gms/3d/codex_3d_tank/",   screenshot: "codex-3d-tank",  type: "game",
