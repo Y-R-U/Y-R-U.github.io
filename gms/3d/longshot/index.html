@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0e12">
+<title>LONGSHOT</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- ══ boot ══ -->
+<div id="loading">
+  <div class="load-logo">LONG<span>SHOT</span></div>
+  <div id="load-bar"><div id="load-fill"></div></div>
+  <div id="load-tip">chambering…</div>
+</div>
+
+<!-- ══ title ══ -->
+<div id="title" class="screen hidden">
+  <div class="t-logo">LONG<span>SHOT</span></div>
+  <div class="t-sub">MERIDIAN CITY · CONTRACT MARKSMAN</div>
+  <div id="t-stats"></div>
+  <div class="t-menu">
+    <button id="bt-campaign" class="mbtn prime">CAMPAIGN</button>
+    <button id="bt-contracts" class="mbtn">CONTRACTS</button>
+    <button id="bt-armory" class="mbtn">ARMORY</button>
+    <button id="bt-range" class="mbtn">RANGE</button>
+  </div>
+  <button id="bt-settings" class="cog" aria-label="settings">⚙</button>
+  <div class="t-foot">Y-R-U · FABLE 5 · 2026</div>
+</div>
+
+<!-- ══ campaign (mission list) ══ -->
+<div id="campaign" class="screen panel hidden">
+  <div class="p-head"><button class="back" data-back>‹</button><h2>CAMPAIGN</h2><div id="camp-cash" class="cashchip"></div></div>
+  <div id="camp-list" class="p-body"></div>
+</div>
+
+<!-- ══ contracts ══ -->
+<div id="contracts" class="screen panel hidden">
+  <div class="p-head"><button class="back" data-back>‹</button><h2>CONTRACTS</h2><div id="con-cash" class="cashchip"></div></div>
+  <div id="con-list" class="p-body"></div>
+</div>
+
+<!-- ══ armory ══ -->
+<div id="armory" class="screen panel hidden">
+  <div class="p-head"><button class="back" data-back>‹</button><h2>ARMORY</h2><div id="arm-cash" class="cashchip"></div></div>
+  <div id="arm-tabs" class="tabs">
+    <button class="tab on" data-tab="rifle">RIFLES</button>
+    <button class="tab" data-tab="scope">SCOPES</button>
+    <button class="tab" data-tab="ammo">AMMO</button>
+    <button class="tab" data-tab="gear">GEAR</button>
+  </div>
+  <div id="arm-list" class="p-body"></div>
+</div>
+
+<!-- ══ briefing ══ -->
+<div id="briefing" class="screen panel hidden">
+  <div class="p-head"><button class="back" data-back>‹</button><h2 id="br-title"></h2><div id="br-pay" class="cashchip"></div></div>
+  <div class="p-body">
+    <div id="br-fixer" class="fixer-msg"></div>
+    <div id="br-intel"></div>
+    <div id="br-conditions" class="cond-row"></div>
+    <div id="br-objectives"></div>
+    <div class="br-load-h">LOADOUT</div>
+    <div id="br-loadout"></div>
+    <button id="br-insert" class="mbtn prime wide">INSERT ▸</button>
+  </div>
+</div>
+
+<!-- ══ results ══ -->
+<div id="results" class="screen hidden">
+  <div id="res-card">
+    <div id="res-verdict"></div>
+    <div id="res-medal"></div>
+    <div id="res-lines"></div>
+    <div id="res-total"></div>
+    <div id="res-btns">
+      <button id="res-retry" class="mbtn">RETRY</button>
+      <button id="res-next" class="mbtn prime">CONTINUE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ mission HUD ══ -->
+<div id="hud" class="hidden">
+  <div id="obj-banner"><div id="obj-title"></div><div id="obj-sub"></div></div>
+  <div id="wind-wrap"><div id="wind-arrow">➤</div><div id="wind-val"></div></div>
+  <div id="mtimer" class="hidden"></div>
+  <div id="breath-wrap"><div id="breath-fill"></div><div id="breath-lab">BREATH</div></div>
+  <div id="ammo-wrap"></div>
+  <div id="dist-chip" class="hidden"></div>
+  <button id="btn-scope" class="abtn" aria-label="scope">◎</button>
+  <button id="btn-fire" class="abtn fire hidden" aria-label="fire">✛</button>
+  <button id="btn-breath" class="abtn hidden" aria-label="hold breath">🫁</button>
+  <button id="btn-mark" class="abtn" aria-label="mark">◈</button>
+  <button id="btn-pause" class="cog" aria-label="pause">⚙</button>
+  <div id="zoom-wrap" class="hidden"><input id="zoom-slider" type="range" min="0" max="100" value="0"><div id="zoom-val">4×</div></div>
+  <div id="hitmark" class="hidden">✛</div>
+  <div id="toasts"></div>
+  <div id="vign"></div>
+  <div id="exposure-wrap" class="hidden"><div id="exposure-fill"></div><div class="exp-lab">EXPOSURE</div></div>
+</div>
+
+<!-- ══ scope overlay ══ -->
+<div id="scope" class="hidden">
+  <canvas id="scope-cv"></canvas>
+</div>
+
+<!-- ══ bullet cam ══ -->
+<button id="bcam-skip" class="hidden">SKIP ≫</button>
+<div id="bcam-bars" class="hidden"><div class="bcb t"></div><div class="bcb b"></div></div>
+
+<!-- ══ fixer dialogue (in-mission) ══ -->
+<div id="fixer" class="hidden"><div id="fixer-name">HALCYON</div><div id="fixer-text"></div></div>
+
+<!-- ══ generic popup (never alerts) ══ -->
+<div id="popup" class="hidden">
+  <div id="pop-card">
+    <h3 id="pop-title"></h3>
+    <div id="pop-body"></div>
+    <div id="pop-btns"></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
