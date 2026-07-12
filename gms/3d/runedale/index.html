@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#2a3a24" />
+  <title>Runedale — a pocket adventure</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot / loading -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">RUNEDALE</div>
+      <div class="boot-sub">skills, swords &amp; three small towns</div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-status">waking the world…</div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <!-- vitals top-left -->
+    <div id="vitals">
+      <div class="bar hp"><span class="ic">❤️</span><i></i><b>10</b></div>
+      <button id="runorb" title="Toggle run (R)"><i></i><span>🏃</span></button>
+      <div id="gold">🪙 <b>0</b></div>
+    </div>
+
+    <!-- buttons top-right -->
+    <div id="topbtns">
+      <button data-panel="skills" title="Skills">📊</button>
+      <button data-panel="inv" title="Pack">🎒</button>
+      <button data-panel="quests" title="Journal">📜</button>
+    </div>
+
+    <!-- floating xp drops -->
+    <div id="xpdrops"></div>
+
+    <!-- objective tracker -->
+    <div id="tracker" class="hidden"><button class="qt-x" title="Hide">✕</button><div class="qt-title">Objective</div><div class="qt-obj"></div></div>
+
+    <!-- centre interaction prompt + channel bar -->
+    <div id="prompt" class="hidden"></div>
+    <div id="channel" class="hidden"><div class="ch-label"></div><div class="ch-bar"><i></i></div></div>
+
+    <!-- bottom controls -->
+    <div id="actionbar">
+      <button id="act-eat" title="Eat best food (F)">🍗</button>
+      <button id="act-use" title="Interact (E / Space)">✋<small>Use</small></button>
+    </div>
+
+    <div id="hint">Tap ground to move · tap things to use them · drag to look · pinch to zoom</div>
+    <div id="toasts"></div>
+    <div id="dmgflash"></div>
+    <div id="levelpop" class="hidden"></div>
+  </div>
+
+  <!-- panels -->
+  <div id="panel-inv" class="modal hidden"></div>
+  <div id="panel-skills" class="modal hidden"></div>
+  <div id="panel-quests" class="modal hidden"></div>
+  <div id="panel-shop" class="modal hidden"></div>
+  <div id="panel-bank" class="modal hidden"></div>
+  <div id="panel-smelt" class="modal hidden"></div>
+  <div id="panel-smith" class="modal hidden"></div>
+  <div id="panel-dialog" class="modal hidden"></div>
+  <div id="panel-death" class="modal hidden"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

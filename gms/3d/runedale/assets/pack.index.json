@@ -1,0 +1,299 @@
+{
+"key_hint": "runedale",
+"entries": {
+"hero": {
+"off": 0,
+"len": 85233,
+"kind": "model",
+"raw": 225524
+},
+"rat": {
+"off": 85233,
+"len": 8161,
+"kind": "model",
+"raw": 23556
+},
+"hen": {
+"off": 93394,
+"len": 12634,
+"kind": "model",
+"raw": 38432
+},
+"cow": {
+"off": 106028,
+"len": 32568,
+"kind": "model",
+"raw": 95200
+},
+"sheep": {
+"off": 138596,
+"len": 21877,
+"kind": "model",
+"raw": 64576
+},
+"goblin": {
+"off": 160473,
+"len": 16119,
+"kind": "model",
+"raw": 45656
+},
+"tree": {
+"off": 176592,
+"len": 46652,
+"kind": "model",
+"raw": 140288
+},
+"tree_forest": {
+"off": 223244,
+"len": 12821,
+"kind": "model",
+"raw": 26068
+},
+"bush": {
+"off": 236065,
+"len": 6928,
+"kind": "model",
+"raw": 17392
+},
+"bush_small": {
+"off": 242993,
+"len": 5132,
+"kind": "model",
+"raw": 12060
+},
+"rock_large": {
+"off": 248125,
+"len": 7939,
+"kind": "model",
+"raw": 20812
+},
+"rocks_small": {
+"off": 256064,
+"len": 4963,
+"kind": "model",
+"raw": 11596
+},
+"ore": {
+"off": 261027,
+"len": 5102,
+"kind": "model",
+"raw": 12924
+},
+"stump": {
+"off": 266129,
+"len": 4039,
+"kind": "model",
+"raw": 10272
+},
+"stump_small": {
+"off": 270168,
+"len": 2837,
+"kind": "model",
+"raw": 6872
+},
+"wheat": {
+"off": 273005,
+"len": 7555,
+"kind": "model",
+"raw": 19748
+},
+"hay": {
+"off": 280560,
+"len": 2715,
+"kind": "model",
+"raw": 6856
+},
+"bank": {
+"off": 283275,
+"len": 89653,
+"kind": "model",
+"raw": 375904
+},
+"house": {
+"off": 372928,
+"len": 17333,
+"kind": "model",
+"raw": 73868
+},
+"barn": {
+"off": 390261,
+"len": 30394,
+"kind": "model",
+"raw": 100724
+},
+"store": {
+"off": 420655,
+"len": 10036,
+"kind": "model",
+"raw": 29916
+},
+"well": {
+"off": 430691,
+"len": 12873,
+"kind": "model",
+"raw": 33368
+},
+"furnace": {
+"off": 443564,
+"len": 4370,
+"kind": "model",
+"raw": 13856
+},
+"anvil": {
+"off": 447934,
+"len": 3278,
+"kind": "model",
+"raw": 10904
+},
+"campfire": {
+"off": 451212,
+"len": 9405,
+"kind": "model",
+"raw": 27620
+},
+"fire": {
+"off": 460617,
+"len": 1479,
+"kind": "model",
+"raw": 3380
+},
+"fence": {
+"off": 462096,
+"len": 3572,
+"kind": "model",
+"raw": 9112
+},
+"barrel": {
+"off": 465668,
+"len": 9041,
+"kind": "model",
+"raw": 28192
+},
+"crate": {
+"off": 474709,
+"len": 2852,
+"kind": "model",
+"raw": 9124
+},
+"lantern": {
+"off": 477561,
+"len": 2901,
+"kind": "model",
+"raw": 9800
+},
+"chest": {
+"off": 480462,
+"len": 6141,
+"kind": "model",
+"raw": 18404
+},
+"torch": {
+"off": 486603,
+"len": 2823,
+"kind": "model",
+"raw": 7200
+},
+"dock": {
+"off": 489426,
+"len": 6301,
+"kind": "model",
+"raw": 18136
+},
+"boat": {
+"off": 495727,
+"len": 20834,
+"kind": "model",
+"raw": 73224
+},
+"windmill": {
+"off": 516561,
+"len": 60142,
+"kind": "model",
+"raw": 169468
+},
+"flag": {
+"off": 576703,
+"len": 2318,
+"kind": "model",
+"raw": 5996
+},
+"scarecrow": {
+"off": 579021,
+"len": 8913,
+"kind": "model",
+"raw": 28040
+},
+"totem": {
+"off": 587934,
+"len": 10772,
+"kind": "model",
+"raw": 28660
+},
+"tent_war": {
+"off": 598706,
+"len": 5148,
+"kind": "model",
+"raw": 13512
+},
+"teepee": {
+"off": 603854,
+"len": 3832,
+"kind": "model",
+"raw": 9772
+},
+"axe": {
+"off": 607686,
+"len": 2071,
+"kind": "model",
+"raw": 5216
+},
+"pickaxe": {
+"off": 609757,
+"len": 3624,
+"kind": "model",
+"raw": 9872
+},
+"hammer": {
+"off": 613381,
+"len": 3062,
+"kind": "model",
+"raw": 8300
+},
+"sword": {
+"off": 616443,
+"len": 2548,
+"kind": "model",
+"raw": 7008
+},
+"log": {
+"off": 618991,
+"len": 1694,
+"kind": "model",
+"raw": 3648
+},
+"logs": {
+"off": 620685,
+"len": 4795,
+"kind": "model",
+"raw": 12104
+},
+"fishing_pole": {
+"off": 625480,
+"len": 6653,
+"kind": "model",
+"raw": 19312
+},
+"atlas_gradient": {
+"off": 632133,
+"len": 208471,
+"kind": "tex",
+"raw": 208817
+},
+"atlas_specular": {
+"off": 840604,
+"len": 1164,
+"kind": "tex",
+"raw": 4599
+}
+}
+}
