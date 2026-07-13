@@ -1,10 +1,11 @@
 // ---- match orchestration: states, user control, kicks, set pieces, penalties ----
 import {
-  PX, PY, PITCH_W, PITCH_H, CX, CY, GOAL_W, BAR_Z, BOX_W, BOX_H, SIX_H, SPOT_DIST,
+  PX, PY, PITCH_W, PITCH_H, CX, CY, GOAL_W, GOAL_DEPTH, POST_R, BALL_R,
+  BAR_Z, BOX_W, BOX_H, SIX_H, SPOT_DIST,
   CONTROL_RADIUS, KICK_REGAIN_CD, TAKEOVER_BLEND, SLIDE_TIME,
   PASS_SPEED_MIN, PASS_SPEED_MAX, SHOT_SPEED_MIN, SHOT_SPEED_MAX, SHOT_RANGE,
   PASS_CONE, AFTERTOUCH_TIME, GRAVITY, PITCH_TYPES, DIFFICULTY, FORMATION,
-  KEEPER_HOLD,
+  KEEPER_HOLD, YELLOW_CHANCE, RED_CHANCE, RED_CHANCE_MAX, BOOKINGS_OFF, MIN_PLAYERS,
 } from './const.js';
 import { clamp, lerp, dist, dist2, rand, chance, pick, vibrate } from './util.js';
 import { Ball } from './ball.js';
@@ -15,6 +16,22 @@ import { bakePlayerSheet } from './sprites.js';
 import { AUDIO } from './audio.js';
 
 const TMP = { x: 0, y: 0 };
+
+// first point along segment (x0,y0)->(x1,y1) that touches a circle of radius R at (cx,cy)
+function sweepHit(x0, y0, x1, y1, cx, cy, R) {
+  const dx = x1 - x0, dy = y1 - y0;
+  const fx = x0 - cx, fy = y0 - cy;
+  if (fx * fx + fy * fy <= R * R) return { x: x0, y: y0 };
+  const a = dx * dx + dy * dy;
+  if (a < 1e-6) return null;
+  const b = 2 * (fx * dx + fy * dy);
+  const c = fx * fx + fy * fy - R * R;
+  const disc = b * b - 4 * a * c;
+  if (disc < 0) return null;
+  const t = (-b - Math.sqrt(disc)) / (2 * a);
+  if (t < 0 || t > 1) return null;
+  return { x: x0 + dx * t, y: y0 + dy * t };
+}
 
 export class Match {
   // cfg: { teamA, teamB (defs), userTeam, halfLen, pitchType, difficulty, mode,
@@ -94,7 +111,7 @@ export class Match {
     return {
       def, kit, gkKit, players, atkDir, aiPrm,
       score: 0, scorers: [],
-      stats: { shots: 0, onTarget: 0, possession: 0.0001, corners: 0, fouls: 0 },
+      stats: { shots: 0, onTarget: 0, possession: 0.0001, corners: 0, fouls: 0, yellows: 0, reds: 0 },
     };
   }
 
@@ -148,7 +165,7 @@ export class Match {
   shoot(f, power, aimLat = 0, errMul = 0) {
     const goal = this.goalPos(f.team);
     const b = this.ball;
-    let tx = goal.x + aimLat * (GOAL_W / 2 - 8);
+    let tx = goal.x + aimLat * (GOAL_W / 2 - 13); // a clean corner: just inside the post
     if (errMul > 0) tx += rand(-1, 1) * errMul * 34;
     tx += rand(-1, 1) * power * 10; // power = risk
     const sp = SHOT_SPEED_MIN + power * (SHOT_SPEED_MAX - SHOT_SPEED_MIN);
@@ -599,38 +616,106 @@ export class Match {
   }
 
   _foulCheck() {
-    // sliders hitting bodies without the ball
-    for (const f of this.all) {
-      if (f.state !== 'slide' || f.slideWon || f.fouled) continue;
-      if (f.stateT > SLIDE_TIME * f.slideMul) continue;
+    // sliders hitting bodies without the ball (snapshot: a red card mutates this.all)
+    const sliders = this.all.filter(f => f.state === 'slide' && !f.slideWon && !f.fouled &&
+      f.stateT <= SLIDE_TIME * f.slideMul);
+    for (const f of sliders) {
       for (const v of this.teams[1 - f.team].players) {
         if (v.grounded) continue;
         if (dist2(f.x, f.y, v.x, v.y) < 14 * 14) {
           f.fouled = true;
+          const speed = Math.hypot(f.vx, f.vy);
+          const hadBall = this.ball.owner === v || dist2(this.ball.x, this.ball.y, v.x, v.y) < 40 * 40;
           v.fall();
-          if (chance(0.62)) this._awardFoul(f, v);
+          if (chance(0.62)) this._awardFoul(f, v, speed, hadBall);
           break;
         }
       }
     }
   }
 
-  _awardFoul(offender, victim) {
+  _awardFoul(offender, victim, speed = 0, hadBall = false) {
     const team = this.teams[offender.team];
     team.stats.fouls++;
     AUDIO.whistle(1);
     AUDIO.boo();
     this.fx.text(victim.x, victim.y, 'FOUL!', '#ffd94a');
     this.event('foul', { f: offender, v: victim });
-    // in the offender's own box -> penalty!
+
     const own = this.ownGoalPos(offender.team);
     const inBox = Math.abs(victim.x - CX) < BOX_W / 2 && Math.abs(victim.y - own.y) < BOX_H;
+    this._discipline(offender, victim, speed, hadBall, inBox);
+
     if (inBox) {
       this.fx.bigText('PENALTY!', { color: '#ff6a6a' });
       this._startPenalty(1 - offender.team, 'play');
     } else {
       this._setupRestart('freekick', victim.x, victim.y, 1 - offender.team);
     }
+  }
+
+  // most fouls are just fouls; reckless ones get booked, a straight red is rare.
+  // the ref is harsher on you (and softer on them) as difficulty goes up.
+  _discipline(offender, victim, speed, hadBall, inBox) {
+    const own = this.ownGoalPos(offender.team);
+    const lastMan = hadBall && dist(victim.x, victim.y, own.x, own.y) < 320;
+    const reckless = speed > 250;
+    const mul = offender.team === this.userTeam ? this.diff.cardYou : this.diff.cardThem;
+
+    let red = RED_CHANCE;
+    if (reckless) red += 0.02;
+    if (lastMan) red += 0.03;              // denying a clear chance
+    if (inBox && hadBall) red += 0.01;
+    const yellow = YELLOW_CHANCE + (reckless ? 0.16 : 0) + (lastMan ? 0.2 : 0);
+
+    if (chance(Math.min(red, RED_CHANCE_MAX) * mul)) { this._card(offender, 'red'); return; }
+    if (chance(yellow * mul)) this._card(offender, 'yellow');
+  }
+
+  _card(offender, kind) {
+    const team = this.teams[offender.team];
+    // keepers are spared the walk (there is no sub keeper) and the ref won't gut a team
+    const canSendOff = offender.role !== 'GK' && team.players.length > MIN_PLAYERS;
+    if (kind === 'red' && !canSendOff) kind = 'yellow';
+
+    if (kind === 'yellow') {
+      offender.yellows++;
+      team.stats.yellows++;
+      this.fx.card(offender.x, offender.y, 'yellow', offender.yellows);
+      AUDIO.whistle(1);
+      if (offender.yellows >= BOOKINGS_OFF && canSendOff) {
+        this._sendOff(offender, offender.yellows);
+        return;
+      }
+      this.event('card', { f: offender, kind: 'yellow', n: offender.yellows, team: offender.team });
+      return;
+    }
+    this._sendOff(offender, 0);
+  }
+
+  _sendOff(offender, bookings) {
+    const team = this.teams[offender.team];
+    team.stats.reds++;
+    this.fx.card(offender.x, offender.y, 'red');
+    this.fx.bigText('RED CARD!', {
+      sub: `${offender.person.name} — ${bookings ? `${bookings} bookings` : team.def.short}`,
+      color: '#ff4d4d',
+    });
+    AUDIO.whistle(2);
+    AUDIO.boo();
+    this.fx.addShake(6);
+    if (this.settings.vibration) vibrate([20, 60, 20]);
+
+    // off he goes: out of the squad, out of every update loop
+    if (this.ball.owner === offender) this.ball.owner = null;
+    if (this.sel === offender) this.sel = null;
+    const pi = team.players.indexOf(offender);
+    if (pi >= 0) team.players.splice(pi, 1);
+    const ai = this.all.indexOf(offender);
+    if (ai >= 0) this.all.splice(ai, 1);
+    this.replay.clear();  // buffered frames hold 22 players; the stride just changed
+
+    this.event('card', { f: offender, kind: 'red', bookings, team: offender.team });
   }
 
   // ================= restarts & out of play =================
@@ -853,6 +938,78 @@ export class Match {
     return best;
   }
 
+  // posts and bar are solid: swept test against this frame's travel, so a 900px/s
+  // shot can't tunnel through the frame. clipping the inside of a post sends it in.
+  _woodwork(dt) {
+    const b = this.ball;
+    this.postCD = Math.max(0, (this.postCD || 0) - dt);
+    if (b.owner || b.z > BAR_Z + BALL_R) return;
+    const RR = BALL_R + POST_R;
+
+    for (const lineY of [PY, PY + PITCH_H]) {
+      if (Math.min(b.py, b.y) > lineY + 40 || Math.max(b.py, b.y) < lineY - 40) continue;
+
+      // posts (vertical, ground to bar)
+      for (const side of [-1, 1]) {
+        const px = CX + side * GOAL_W / 2;
+        const hit = sweepHit(b.px, b.py, b.x, b.y, px, lineY, RR);
+        if (!hit) continue;
+        let nx = hit.x - px, ny = hit.y - lineY;
+        const nd = Math.hypot(nx, ny) || 1;
+        nx /= nd; ny /= nd;
+        b.x = px + nx * (RR + 0.6);
+        b.y = lineY + ny * (RR + 0.6);
+        const vn = b.vx * nx + b.vy * ny;
+        if (vn < 0) { b.vx -= 1.62 * vn * nx; b.vy -= 1.62 * vn * ny; }
+        b.vx *= 0.92; b.vy *= 0.92; b.spin = 0;
+        b.px = b.x; b.py = b.y;
+        this._postHit(b.x, b.y);
+        return;
+      }
+
+      // crossbar
+      const crossing = (b.py - lineY) * (b.y - lineY) <= 0;
+      if (crossing && Math.abs(b.x - CX) < GOAL_W / 2 && Math.abs(b.z - BAR_Z) < RR && b.z > 0) {
+        b.y = b.py + (lineY - b.py) * 0.9 - Math.sign(b.vy) * 3;
+        b.vy *= -0.35;
+        b.vz = -Math.abs(b.vz) * 0.5 - 40;
+        b.spin = 0;
+        b.px = b.x; b.py = b.y;
+        this._postHit(b.x, b.y);
+        return;
+      }
+    }
+  }
+
+  _postHit(x, y) {
+    if (this.pen && this.pen.phase === 'flight') this.pen.postHit = true;
+    if (this.postCD > 0) return;
+    this.postCD = 0.3;
+    AUDIO.post();
+    this.fx.text(x, y, 'POST!', '#ffd94a');
+    this.fx.addShake(4);
+    this.event('post', {});
+  }
+
+  // netting: a ball in the goal stays in the goal instead of sailing out the back
+  _netHold() {
+    const b = this.ball;
+    if (b.owner) return;
+    for (const lineY of [PY, PY + PITCH_H]) {
+      const dir = lineY === PY ? -1 : 1;              // net extends away from the pitch
+      const behind = (b.y - lineY) * dir;
+      if (behind <= 0 || b.z > BAR_Z || Math.abs(b.x - CX) > GOAL_W / 2) continue;
+      const back = GOAL_DEPTH - BALL_R - 2;
+      if (behind > back) {                            // back netting
+        b.y = lineY + dir * back;
+        b.vy *= -0.15; b.vx *= 0.4; b.vz *= 0.3; b.spin = 0;
+      }
+      const lim = GOAL_W / 2 - BALL_R - POST_R;       // side netting
+      if (b.x < CX - lim) { b.x = CX - lim; b.vx = Math.abs(b.vx) * 0.2; }
+      else if (b.x > CX + lim) { b.x = CX + lim; b.vx = -Math.abs(b.vx) * 0.2; }
+    }
+  }
+
   _outOfPlay() {
     const b = this.ball;
     if (this.state !== 'play') return;
@@ -882,22 +1039,6 @@ export class Match {
     if (goalLineY === null) return;
 
     const dx = b.x - CX;
-    // post / bar interactions
-    if (Math.abs(Math.abs(dx) - GOAL_W / 2) < 6 && b.z < BAR_Z + 4) {
-      b.vx *= -0.55; b.x = CX + Math.sign(dx) * (GOAL_W / 2 + (Math.abs(dx) > GOAL_W / 2 ? 7 : -7));
-      AUDIO.post();
-      this.fx.text(b.x, b.y, 'POST!', '#ffd94a');
-      this.event('post', {});
-      return;
-    }
-    if (Math.abs(dx) < GOAL_W / 2 && Math.abs(b.z - BAR_Z) < 6 && b.vz > -600 && b.z > 0) {
-      b.vz = -Math.abs(b.vz) * 0.5; b.vy *= -0.35;
-      b.y = goalLineY + (goalLineY === PY ? 4 : -4);
-      AUDIO.post();
-      this.event('post', {});
-      return;
-    }
-
     if (Math.abs(dx) < GOAL_W / 2 && b.z < BAR_Z) { this._goalScored(goalLineY); return; }
 
     // wide / over: corner or goal kick (which team defends this line?)
@@ -1033,13 +1174,19 @@ export class Match {
     if (p.phase === 'flight') {
       this._penaltyBystanders(dt);
       b.update(dt, this.pitchType);
+      this._woodwork(dt);
+      this._netHold();
       this._keeperUpdate(dt);
       // resolve: crossing line, keeper catch (handled by keeperUpdate), or dead
       const crossed = p.atkDir === 1 ? b.y >= p.goalY : b.y <= p.goalY;
       if (!p.resolved) {
         if (b.owner === p.keeper) { this._penaltyResolve(false, 'SAVED!'); }
         else if (crossed && Math.abs(b.x - CX) < GOAL_W / 2 && b.z < BAR_Z) { this._penaltyResolve(true, 'GOAL!'); }
-        else if (crossed || b.speed() < 60 || p.t > 2.6) { this._penaltyResolve(false, Math.abs(b.x - CX) < GOAL_W / 2 + 10 ? 'SAVED!' : 'WIDE!'); }
+        else if (crossed || b.speed() < 60 || p.t > 2.6) {
+          const label = p.postHit ? 'OFF THE WOODWORK!'
+            : Math.abs(b.x - CX) < GOAL_W / 2 + 10 ? 'SAVED!' : 'WIDE!';
+          this._penaltyResolve(false, label);
+        }
       } else if (p.t > 1.6) {
         this._penaltyNext();
       }
@@ -1070,7 +1217,7 @@ export class Match {
   _penaltyKick(aimX, power, err = 0) {
     const p = this.pen;
     const b = this.ball;
-    let tx = CX + aimX * (GOAL_W / 2 - 6);
+    let tx = CX + aimX * (GOAL_W / 2 - 12); // full aim = just inside the post, not off it
     if (err) tx += rand(-1, 1) * err * 30;
     if (power > 0.8) tx += rand(-1, 1) * (power - 0.8) * 130; // blasting = risky
     const T = 0.5 - power * 0.14;
@@ -1181,6 +1328,8 @@ export class Match {
   _goalStateUpdate(dt) {
     for (const f of this.all) f.update(dt);
     this.ball.update(dt, this.pitchType);
+    this._woodwork(dt);
+    this._netHold();
     // keep ball in the net
     this.ball.vx *= Math.exp(-4 * dt); this.ball.vy *= Math.exp(-4 * dt);
     if (this.stateT > 2.3) {
@@ -1294,6 +1443,8 @@ export class Match {
         for (const f of this.all) f.update(dt);
         this._collisions();
         b.update(dt, this.pitchType);
+        this._woodwork(dt);
+        this._netHold();
         this._possession(dt);
         this._keeperUpdate(dt);
         this._keeperDistribute(dt);

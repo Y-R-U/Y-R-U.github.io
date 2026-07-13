@@ -11,6 +11,7 @@ export class FX {
     }
     this.pi = 0;
     this.texts = [];        // world floating texts
+    this.cards = [];        // {x, y, kind, t, dur} — ref's card held aloft
     this.banner = null;     // {str, sub, t, dur, color}
     this.shake = 0;
     this.weather = null;    // 'rain' | 'snow'
@@ -49,6 +50,10 @@ export class FX {
     this.texts.push({ x, y, str, color, t: 0, dur: 1.1 });
   }
 
+  card(x, y, kind, n = 0) {
+    this.cards.push({ x, y, kind, n, t: 0, dur: 1.8 });
+  }
+
   bigText(str, { sub = '', color = '#ffd94a', dur = 1.8 } = {}) {
     this.banner = { str, sub, color, t: 0, dur };
   }
@@ -72,6 +77,11 @@ export class FX {
       const t = this.texts[i];
       t.t += dt;
       if (t.t > t.dur) this.texts.splice(i, 1);
+    }
+    for (let i = this.cards.length - 1; i >= 0; i--) {
+      const c = this.cards[i];
+      c.t += dt;
+      if (c.t > c.dur) this.cards.splice(i, 1);
     }
     if (this.banner) {
       this.banner.t += dt;
@@ -97,6 +107,32 @@ export class FX {
       ctx.globalAlpha = clamp(p.life / p.maxLife * 1.6, 0, 1);
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.z - p.size / 2, p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
+    for (const c of this.cards) {
+      const rise = Math.min(1, c.t / 0.22);
+      const a = clamp((c.dur - c.t) / 0.4, 0, 1);
+      const y = c.y - 24 - rise * 16;
+      const tilt = Math.sin(c.t * 7) * 0.09 * (1 - c.t / c.dur);
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.translate(c.x, y);
+      ctx.rotate(tilt);
+      ctx.scale(rise, rise);
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(-5, -8, 11, 16);
+      ctx.fillStyle = c.kind === 'red' ? '#e03131' : '#ffd43b';
+      ctx.fillRect(-5, -8, 10, 15);
+      ctx.fillStyle = c.kind === 'red' ? '#ff6b6b' : '#ffe98a';
+      ctx.fillRect(-5, -8, 10, 3);
+      if (c.n) {                       // which booking this is — 3rd one and he walks
+        ctx.fillStyle = '#5c4a00';
+        ctx.font = '800 9px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(c.n), 0, 1);
+      }
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
     for (const t of this.texts) {

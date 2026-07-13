@@ -10,6 +10,7 @@ export class Ball {
 
   reset(x, y) {
     this.x = x; this.y = y; this.z = 0;
+    this.px = x; this.py = y;  // previous frame (swept woodwork collision)
     this.vx = 0; this.vy = 0; this.vz = 0;
     this.spin = 0;            // lateral curl: accel perpendicular to velocity
     this.owner = null;        // Footballer dribbling it
@@ -41,6 +42,7 @@ export class Ball {
 
   update(dt, pitchType = 'grass') {
     this.regainT += dt;
+    this.px = this.x; this.py = this.y;
     const pt = PITCH_TYPES[pitchType] || PITCH_TYPES.grass;
 
     if (this.owner) {

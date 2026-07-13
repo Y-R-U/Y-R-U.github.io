@@ -64,6 +64,14 @@ const app = {
   forecastPitch(div) { return pickPitchType(div); },
   pitchLabel(pt) { return `${PITCH_EMOJI[pt] || ''} ${PITCH_TYPES[pt].name}`; },
 
+  // pre-match panel choices. folding them back into settings keeps one live settings
+  // object (so the pause menu still edits the running match) and makes them the default.
+  _applyOpts(o) {
+    if (!o) return;
+    Object.assign(this.settings, o);
+    this.applySettings();
+  },
+
   // ----- starting matches -----
   _begin(cfg, meta) {
     this.demo = null;
@@ -104,19 +112,27 @@ const app = {
     );
   },
 
-  startQuick(a, b, pitchType) {
-    this.lastQuick = [a, b, pitchType];
+  startQuick(a, b, pitchType, opts) {
+    this.lastQuick = [a, b, pitchType, opts];
+    this._applyOpts(opts);
     this._begin(
       { teamA: teamDef(a), teamB: teamDef(b), userTeam: 0, mode: 'friendly', pitchType },
       { kind: 'friendly' },
     );
   },
 
-  newCup(ni) { this.cup = newWorldCup(ni); },
+  newCup(ni, opts) {
+    this.cup = newWorldCup(ni);
+    this.cup.opts = opts || null;   // the whole tournament plays to these
+  },
 
   startWCMatch(cup, um) {
+    this._applyOpts(cup.opts);   // the cup keeps its own settings for every round
     this._begin(
-      { teamA: teamDef(NATIONS[cup.userNi]), teamB: teamDef(NATIONS[um.oppNi]), userTeam: 0, mode: 'cup', pitchType: pick(['grass', 'grass', 'dry', 'wet']), resolveDraw: true },
+      {
+        teamA: teamDef(NATIONS[cup.userNi]), teamB: teamDef(NATIONS[um.oppNi]), userTeam: 0,
+        mode: 'cup', pitchType: pick(['grass', 'grass', 'dry', 'wet']), resolveDraw: true,
+      },
       { kind: 'wc' },
     );
   },

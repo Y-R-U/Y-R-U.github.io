@@ -106,7 +106,7 @@ export class Renderer {
     // penalty reticle
     if (match.pen && match.pen.phase === 'aim' && match.pen.userKicker) {
       const p = match.pen;
-      const rx = CX + p.aimX * (GOAL_W / 2 - 6);
+      const rx = CX + p.aimX * (GOAL_W / 2 - 12); // matches _penaltyKick aim
       const rz = 6 + p.power * (BAR_Z - 4);
       const ry = p.goalY - rz;
       ctx.strokeStyle = 'rgba(255,235,90,0.95)';

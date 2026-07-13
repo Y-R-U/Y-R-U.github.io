@@ -161,6 +161,10 @@ h2.title {
 }
 .fixture-vs .at { color: #ffde59; font-size: 13px; }
 .kitdot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.4); vertical-align: -2px; margin-right: 6px; }
+.men {
+  display: inline-block; margin: 0 4px; padding: 1px 5px; border-radius: 4px;
+  background: #e03131; color: #fff; font-size: 10px; font-weight: 800; vertical-align: 1px;
+}
 .pitch-tag {
   display: inline-block; font-size: 12px; font-weight: 700;
   background: rgba(255,255,255,0.1); border-radius: 999px; padding: 3px 12px; margin-top: 2px;

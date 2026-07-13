@@ -40,6 +40,16 @@ const COMMENT = {
   kickoff: [],
 };
 
+function cardLine({ f, kind, n, bookings }) {
+  const name = f.person.name;
+  if (kind === 'yellow') {
+    if (n >= 2) return `🟨 Second yellow for ${name} — one more and he walks!`;
+    return pick([`🟨 Booked — ${name} goes in the notebook`, `🟨 Yellow for ${name}`, `🟨 ${name} is in the book`]);
+  }
+  if (bookings) return `🟥 Third booking — ${name} is OFF! Down to ten!`;
+  return pick([`🟥 RED! ${name} sees straight red!`, `🟥 ${name} is sent off — an early bath!`]);
+}
+
 class UISys {
   constructor() {
     this.app = null;
@@ -124,16 +134,26 @@ class UISys {
   // ---------- HUD ----------
   hudShow(match) {
     $('hud').classList.remove('hidden');
-    const t0 = match.teams[0], t1 = match.teams[1];
-    $('sbHome').innerHTML = `<span class="kitdot" style="background:${t0.kit.shirt}"></span>${t0.def.short}`;
-    $('sbAway').innerHTML = `${t1.def.short}<span class="kitdot" style="background:${t1.kit.shirt};margin:0 0 0 6px"></span>`;
+    this._men = [-1, -1];
+    this._hudTeams(match);
     this.hudTick(match);
   }
   hudHide() { $('hud').classList.add('hidden'); }
+  // team names, with a man-count badge once someone has been sent off
+  _hudTeams(match) {
+    const t0 = match.teams[0], t1 = match.teams[1];
+    const n0 = t0.players.length, n1 = t1.players.length;
+    if (n0 === this._men[0] && n1 === this._men[1]) return;
+    this._men = [n0, n1];
+    const men = (n) => (n < 11 ? `<span class="men">${n}</span>` : '');
+    $('sbHome').innerHTML = `<span class="kitdot" style="background:${t0.kit.shirt}"></span>${t0.def.short}${men(n0)}`;
+    $('sbAway').innerHTML = `${men(n1)}${t1.def.short}<span class="kitdot" style="background:${t1.kit.shirt};margin:0 0 0 6px"></span>`;
+  }
   hudTick(match) {
     $('sbScore').textContent = `${match.teams[0].score} : ${match.teams[1].score}`;
     const m = Math.floor(match.clockMin);
     $('sbClock').textContent = match.mode === 'practice' ? '∞' : (m < 10 ? '0' : '') + m + "'";
+    this._hudTeams(match);
   }
 
   comment(str) {
@@ -146,6 +166,7 @@ class UISys {
   }
 
   matchEvent(type, data) {
+    if (type === 'card') { this.comment(cardLine(data)); return; }
     const pool = COMMENT[type];
     if (pool && pool.length && (type === 'goal' || Math.random() < 0.7)) this.comment(pick(pool));
   }
@@ -427,7 +448,7 @@ class UISys {
             AUDIO.click();
             const a = lookup(selA.value), b = lookup(selB.value);
             const pt = pitchSel.value === 'random' ? this.app.forecastPitch(3) : pitchSel.value;
-            this.app.startQuick(a, b, pt);
+            this.matchOptsModal('Match Settings', null, (o) => this.app.startQuick(a, b, pt, o));
           },
         }, '▶ Kick Off'),
         h('button', { class: 'btn ghost small', onclick: () => this.showMenu() }, '← Back'),
@@ -450,7 +471,13 @@ class UISys {
         NATIONS.forEach((n, i) => {
           grid.append(h('button', {
             class: 'btn ghost small', style: `flex:0 0 47%; border-left:6px solid ${n.kit.shirt}`,
-            onclick: () => { AUDIO.click(); this.app.newCup(i); this.showCup(); },
+            onclick: () => {
+              AUDIO.click();
+              this.matchOptsModal('Tournament Settings', 'These apply to every match of the cup.', (o) => {
+                this.app.newCup(i, o);
+                this.showCup();
+              });
+            },
           }, n.name));
         });
         w.append(h('div', { class: 'panel' }, grid),
@@ -541,6 +568,48 @@ class UISys {
     });
   }
 
+  // pre-match panel: the three knobs worth asking about, pre-filled from settings.
+  // whatever you pick also becomes your new default.
+  matchOptsModal(title, note, onStart) {
+    const s = this.app.settings;
+    const opts = { halfLen: s.halfLen, difficulty: s.difficulty, replays: s.replays };
+    const wrap = h('div');
+    const seg = (key, values, labels) => {
+      const el = h('div', { class: 'seg' });
+      values.forEach((v, i) => {
+        const b = h('button', { class: opts[key] === v ? 'on' : '' }, labels[i]);
+        b.addEventListener('click', () => {
+          opts[key] = v;
+          el.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+          b.classList.add('on');
+          AUDIO.click();
+        });
+        el.append(b);
+      });
+      return el;
+    };
+    const row = (label, ctrl) => h('div', { class: 'set-row' }, h('span', { class: 'set-label' }, label), ctrl);
+    wrap.append(
+      row('Half length', seg('halfLen', HALF_CHOICES, ['1m', '1½m', '2m', '3m', '4m'])),
+      row('Difficulty', seg('difficulty', ['easy', 'normal', 'hard'], ['Easy', 'Norm', 'Hard'])),
+      row('Goal replays', seg('replays', [true, false], ['On', 'Off'])),
+    );
+    if (note) wrap.append(h('p', { class: 'sub', style: 'margin-top:10px' }, note));
+    this.popup({
+      title, node: wrap,
+      buttons: [
+        {
+          label: '▶ Kick Off', cls: 'gold', cb: () => {
+            Object.assign(s, opts);          // remembered as the default next time
+            this.app.applySettings();
+            onStart(opts);
+          },
+        },
+        { label: 'Back', cls: 'ghost' },
+      ],
+    });
+  }
+
   // ---------- match popups ----------
   pauseModal(meta) {
     const isCareer = meta.kind === 'career' || meta.kind === 'careerCC';
@@ -611,6 +680,11 @@ class UISys {
       stat('On target', r.statsA.onTarget, r.statsB.onTarget);
       stat('Corners', r.statsA.corners, r.statsB.corners);
       stat('Fouls', r.statsA.fouls, r.statsB.fouls);
+      const cards = (s) => (s.yellows || s.reds)
+        ? `${s.yellows ? s.yellows + '🟨' : ''}${s.yellows && s.reds ? ' ' : ''}${s.reds ? s.reds + '🟥' : ''}` : '—';
+      if (r.statsA.yellows + r.statsA.reds + r.statsB.yellows + r.statsB.reds > 0) {
+        stat('Cards', cards(r.statsA), cards(r.statsB));
+      }
       wrap.append(g);
     }
     return wrap;

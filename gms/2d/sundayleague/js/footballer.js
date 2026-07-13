@@ -31,6 +31,7 @@ export class Footballer {
     this.slideDX = 0; this.slideDY = 1;
     this.slideMul = 1;
     this.shadowScale = 1;
+    this.yellows = 0;         // 2 = off
   }
 
   get busy() { return this.state === 'slide' || this.state === 'fallen' || this.state === 'kick' || this.state === 'dive'; }

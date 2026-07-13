@@ -11,8 +11,9 @@ export const PY = MARGIN;               // pitch top
 export const CX = WORLD_W / 2;
 export const CY = WORLD_H / 2;
 
-export const GOAL_W = 130;              // goal mouth width
+export const GOAL_W = 130;              // goal mouth width (post centres)
 export const GOAL_DEPTH = 30;           // net depth (visual)
+export const POST_R = 2.5;              // post/bar half-thickness (collision)
 export const BAR_Z = 34;                // crossbar height in z units
 export const BOX_W = 340, BOX_H = 150;  // penalty box
 export const SIX_W = 170, SIX_H = 55;   // six yard box
@@ -60,15 +61,23 @@ export const PITCH_TYPES = {
   dry:   { name: 'Sun-Baked',   friction: 0.9,  slideMul: 1.05, speedMul: 1.02, weather: null },
 };
 
-// difficulty presets -> AI modifiers (rating fills in the rest)
+// difficulty presets -> AI modifiers (rating fills in the rest).
+// cardThem/cardYou: the ref's mood. on hard the opposition gets away with more.
 export const DIFFICULTY = {
-  easy:   { speed: 0.92, react: 0.7, err: 1.6, keeper: 0.75 },
-  normal: { speed: 1.0,  react: 1.0, err: 1.0, keeper: 1.0 },
-  hard:   { speed: 1.06, react: 1.25, err: 0.6, keeper: 1.2 },
+  easy:   { speed: 0.92, react: 0.7, err: 1.6, keeper: 0.75, cardThem: 1.55, cardYou: 0.65 },
+  normal: { speed: 1.0,  react: 1.0, err: 1.0, keeper: 1.0,  cardThem: 1.0,  cardYou: 1.0 },
+  hard:   { speed: 1.06, react: 1.25, err: 0.6, keeper: 1.2, cardThem: 0.5,  cardYou: 1.3 },
 };
 
 // camera view heights (world px visible vertically)
 export const ZOOMS = { near: 430, normal: 520, far: 640 };
+
+// discipline: fraction of awarded fouls that get a card
+export const YELLOW_CHANCE = 0.3;       // + more for reckless pace
+export const RED_CHANCE = 0.012;        // straight red is rare: + more for reckless / last man
+export const RED_CHANCE_MAX = 0.06;
+export const BOOKINGS_OFF = 3;          // third booking = off (two yellows are survivable)
+export const MIN_PLAYERS = 8;           // never send off below this (ref abandons at 7)
 
 // 4-4-2, attacking frame: x 0..1 across pitch width, y 0=own goal line, 1=opponent goal line
 export const FORMATION = [
