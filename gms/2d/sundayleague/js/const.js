@@ -73,6 +73,7 @@ export const DIFFICULTY = {
 export const ZOOMS = { near: 430, normal: 520, far: 640 };
 export const RESTART_ZOOM = 1.32;       // pull back at set-pieces so you can see your team
 export const GOAL_BALL_LINGER = 1.1;    // stay on the ball in the net before the celebration
+export const GOAL_REPLAY_TAIL = 1.2;    // keep filming after the goal so the replay ends in the net
 export const REPLAY_HOLD = 1.0;         // freeze on the last replay frame for a beat
 
 // discipline: fraction of awarded fouls that get a card

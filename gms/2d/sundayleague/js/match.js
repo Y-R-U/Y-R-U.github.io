@@ -6,7 +6,7 @@ import {
   PASS_SPEED_MIN, PASS_SPEED_MAX, SHOT_SPEED_MIN, SHOT_SPEED_MAX, SHOT_RANGE,
   PASS_CONE, AFTERTOUCH_TIME, GRAVITY, PITCH_TYPES, DIFFICULTY, FORMATION,
   KEEPER_HOLD, YELLOW_CHANCE, RED_CHANCE, RED_CHANCE_MAX, BOOKINGS_OFF, MIN_PLAYERS,
-  RESTART_ZOOM, GOAL_BALL_LINGER, REPLAY_HOLD,
+  RESTART_ZOOM, GOAL_BALL_LINGER, GOAL_REPLAY_TAIL, REPLAY_HOLD,
 } from './const.js';
 import { clamp, lerp, dist, dist2, rand, chance, pick, vibrate } from './util.js';
 import { Ball } from './ball.js';
@@ -1342,6 +1342,9 @@ export class Match {
     this._netHold();
     // keep ball in the net
     this.ball.vx *= Math.exp(-4 * dt); this.ball.vy *= Math.exp(-4 * dt);
+    // keep filming for a moment: the replay should end with the ball in the net,
+    // not with it crossing the line
+    if (this.stateT < GOAL_REPLAY_TAIL) this.replay.record(this, dt);
     if (this.stateT > 2.3 + GOAL_BALL_LINGER) {
       if (this.mode === 'practice') { this.ball.reset(CX, CY); this.state = 'play'; return; }
       if (this.mode !== 'demo' && this.settings.replays && this.replay.begin()) {
