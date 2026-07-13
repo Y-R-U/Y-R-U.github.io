@@ -158,10 +158,11 @@ export class Renderer {
     this._screenTransform();
     match.fx.drawScreen(ctx, this.w, this.h);
 
+    const inReplay = match.state === 'replay' || match.state === 'replayhold';
     if (!opts.demo) {
-      if (match.state === 'replay') this._replayOverlay(ctx);
+      if (inReplay) this._replayOverlay(ctx);
       if (match.pens) this._shootoutBoard(ctx, match);
-      if (match.userTeam >= 0 && match.state !== 'replay') {
+      if (match.userTeam >= 0 && !inReplay) {
         this._controls(ctx, match);
         if (match.settings.radar && match.mode !== 'shootout') this._radar(ctx, match);
       }

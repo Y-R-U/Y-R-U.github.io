@@ -6,6 +6,9 @@ export class Camera {
   constructor() {
     this.x = WORLD_W / 2; this.y = WORLD_H / 2;
     this.scale = 1;
+    this.baseScale = 1;
+    this.minScale = 0.1;
+    this.wide = 1;            // eased zoom-out factor (1 = normal framing)
     this.viewW = 100; this.viewH = 100;
     this.zoomKey = 'normal';
   }
@@ -14,14 +17,18 @@ export class Camera {
     this.viewW = viewW; this.viewH = viewH;
     this.zoomKey = zoomKey;
     const targetH = ZOOMS[zoomKey] || ZOOMS.normal;
-    this.scale = viewH / targetH;
     // never zoom so far out that the world doesn't cover the view
-    this.scale = Math.max(this.scale, Math.max(viewW / WORLD_W, viewH / WORLD_H));
+    this.minScale = Math.max(viewW / WORLD_W, viewH / WORLD_H);
+    this.baseScale = Math.max(viewH / targetH, this.minScale);
+    this.scale = Math.max(this.baseScale / this.wide, this.minScale);
   }
 
   snap(tx, ty) { this.x = tx; this.y = ty; this._clamp(); }
 
-  update(dt, tx, ty, lookVX = 0, lookVY = 0) {
+  // wideTarget > 1 pulls the camera back (set-pieces), and eases back in for play
+  update(dt, tx, ty, lookVX = 0, lookVY = 0, wideTarget = 1) {
+    this.wide += (wideTarget - this.wide) * damp(2.4, dt);
+    this.scale = Math.max(this.baseScale / this.wide, this.minScale);
     const gx = tx + lookVX * 0.3;
     const gy = ty + lookVY * 0.35;
     const k = damp(4.2, dt);

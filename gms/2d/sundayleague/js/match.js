@@ -6,6 +6,7 @@ import {
   PASS_SPEED_MIN, PASS_SPEED_MAX, SHOT_SPEED_MIN, SHOT_SPEED_MAX, SHOT_RANGE,
   PASS_CONE, AFTERTOUCH_TIME, GRAVITY, PITCH_TYPES, DIFFICULTY, FORMATION,
   KEEPER_HOLD, YELLOW_CHANCE, RED_CHANCE, RED_CHANCE_MAX, BOOKINGS_OFF, MIN_PLAYERS,
+  RESTART_ZOOM, GOAL_BALL_LINGER, REPLAY_HOLD,
 } from './const.js';
 import { clamp, lerp, dist, dist2, rand, chance, pick, vibrate } from './util.js';
 import { Ball } from './ball.js';
@@ -995,10 +996,12 @@ export class Match {
   _netHold() {
     const b = this.ball;
     if (b.owner) return;
+    // a scored ball gets gathered in even if it was drifting out past a post
+    const scored = this.state === 'goal' || (this.pen && this.pen.resolved && this.pen.scored);
     for (const lineY of [PY, PY + PITCH_H]) {
       const dir = lineY === PY ? -1 : 1;              // net extends away from the pitch
       const behind = (b.y - lineY) * dir;
-      if (behind <= 0 || b.z > BAR_Z || Math.abs(b.x - CX) > GOAL_W / 2) continue;
+      if (behind <= 0 || b.z > BAR_Z || Math.abs(b.x - CX) > GOAL_W / 2 + (scored ? 14 : 0)) continue;
       const back = GOAL_DEPTH - BALL_R - 2;
       if (behind > back) {                            // back netting
         b.y = lineY + dir * back;
@@ -1060,7 +1063,14 @@ export class Match {
     team.scorers.push({ name: scorerName, min: Math.floor(this.clockMin) });
     this.state = 'goal';
     this.stateT = 0;
-    b.vx *= 0.2; b.vy *= 0.2; b.spin = 0; b.shotAtGoal = -1;
+    // put it in the net for good: a shot from a tight angle used to keep drifting
+    // sideways past the post and read as a miss
+    const into = goalLineY === PY ? -1 : 1;
+    const lim = GOAL_W / 2 - BALL_R - POST_R - 2;
+    b.x = clamp(b.x, CX - lim, CX + lim);
+    b.vx *= 0.15;
+    b.vy = into * Math.max(70, Math.abs(b.vy) * 0.25);
+    b.vz *= 0.3; b.spin = 0; b.shotAtGoal = -1;
     this.scorer = kicker || team.players[9] || team.players[0];
     this.scorer.celebrate(this.scorer.x + rand(-60, 60), clamp(this.scorer.y - this.teams[scoringTi].atkDir * -120, PY + 60, PY + PITCH_H - 60));
     for (const f of team.players) {
@@ -1332,7 +1342,7 @@ export class Match {
     this._netHold();
     // keep ball in the net
     this.ball.vx *= Math.exp(-4 * dt); this.ball.vy *= Math.exp(-4 * dt);
-    if (this.stateT > 2.3) {
+    if (this.stateT > 2.3 + GOAL_BALL_LINGER) {
       if (this.mode === 'practice') { this.ball.reset(CX, CY); this.state = 'play'; return; }
       if (this.mode !== 'demo' && this.settings.replays && this.replay.begin()) {
         this.state = 'replay';
@@ -1347,14 +1357,26 @@ export class Match {
   }
 
   _replayUpdate(dt) {
-    if (this.input.tapEdge || this.input.kick.tapped) this.replay.skip();
+    if (this.input.tapEdge || this.input.kick.tapped) {
+      this.replay.skip();
+      this.event('replayEnd', {});
+      this._endReplay();                 // tapped to skip: get straight on with it
+      return;
+    }
     if (!this.replay.step(this, dt)) {
-      this.state = 'postreplay';
+      this.state = 'replayhold';         // hold on the ball in the net for a beat
       this.stateT = 0;
-      for (const f of this.all) { f.replayDir = undefined; f.replayPose = undefined; }
-      this._setupKickoff(this.scorer ? 1 - this.scorer.team : 0);
       this.event('replayEnd', {});
     }
+  }
+
+  _replayHoldUpdate(dt) {
+    if (this.stateT > REPLAY_HOLD || this.input.tapEdge || this.input.kick.tapped) this._endReplay();
+  }
+
+  _endReplay() {
+    for (const f of this.all) { f.replayDir = undefined; f.replayPose = undefined; }
+    this._setupKickoff(this.scorer ? 1 - this.scorer.team : 0);
   }
 
   _clock(dt) {
@@ -1430,6 +1452,7 @@ export class Match {
       case 'penalty': this._penaltyUpdate(dt); break;
       case 'goal': this._goalStateUpdate(dt); break;
       case 'replay': this._replayUpdate(dt); break;
+      case 'replayhold': this._replayHoldUpdate(dt); break;
       case 'halftime': break;
       case 'fulltime': {
         for (const f of this.all) { f.desX = 0; f.desY = 0; f.update(dt); }
@@ -1463,11 +1486,16 @@ export class Match {
 
     // camera target
     let camX = b.x, camY = b.y, lvx = b.vx, lvy = b.vy;
-    if (this.state === 'goal' && this.scorer) { camX = this.scorer.x; camY = this.scorer.y; lvx = lvy = 0; }
+    // stay on the ball as it hits the net, then swing over to the celebration
+    if (this.state === 'goal' && this.scorer && this.stateT > GOAL_BALL_LINGER) {
+      camX = this.scorer.x; camY = this.scorer.y; lvx = lvy = 0;
+    }
     if (this.state === 'penalty' && this.pen) {
       camX = CX; camY = (this.pen.spotY + this.pen.goalY) / 2; lvx = lvy = 0;
     }
-    this.camera.update(dt, camX, camY, lvx, lvy);
+    // pull back at set-pieces so your team is on screen, then ease in for play
+    const wide = (this.state === 'restart' || this.state === 'ready') ? RESTART_ZOOM : 1;
+    this.camera.update(dt, camX, camY, lvx, lvy, wide);
 
     this.fx.update(dt);
     AUDIO.update(dt);
