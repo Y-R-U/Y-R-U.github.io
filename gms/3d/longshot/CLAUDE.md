@@ -23,6 +23,13 @@ Built 2026-07-11 (Fable 5). Play: `index.html`.
   in slow-mo (world time-scale 0.1, 0.02 on impact) with an orbital drift, a
   trail, a doppler whoosh, and a held beat on the kill. Fires on final-target
   kills and on long headshots — not on every shot, so it never gets old.
+- **He owns the roof** (`js/walk.js`). The shooter is not a tripod: the 👣 stick
+  (WASD) paces the whole perch, so he can sidestep an obstruction for parallax
+  and **toe the coping at the rim to look straight down at the pavement below**.
+  He cannot fall off — the walk is clamped to the roof rectangle, and the
+  outermost strip *is* the coping, so pushing into the edge climbs onto it.
+  Look is a full **360°** and pitches to **−80°** (`VIEW.minPitch`): a mark in the
+  doorway at the foot of your own building has to be lookable-at.
 - **The city is built AROUND the shot** (see below — the single most important
   thing in this codebase).
 
@@ -71,6 +78,29 @@ ballistics insist the shot is clear. If you see that, check these first:
 
 Diagnose with a per-mesh `THREE.Raycaster` from `rig.eye` to the mark: if the
 first hit isn't the target's `SkinnedMesh`, the thing it names is the culprit.
+(Set `rc.camera = rig.camera` or `Sprite.raycast` throws on the sun/clouds.)
+
+4. **Perch furniture hangs off the roof.** The stand point is only ~3 m from the
+   lip, so anything placed *relative to it* can end up over thin air: the gravel
+   pad was 9 m square, overhung the edge by 1.5 m, and sat squarely in the
+   shooter's downward sightline the moment he could walk out and look at it.
+   Everything `city.setVantage` places is now clamped inside the footprint
+   (`inRoof`/`place`), and the gravel is a full-roof deck that *cannot* overhang.
+5. **Standing back from the lip blocks your own downward look.** `MOVE.edge` is
+   how close to the rim he may stand, and `atan(1.62 / MOVE.edge)` must stay
+   *steeper* than `VIEW.minPitch` — otherwise the coping he is standing on grazes
+   his own sightline and puts a strip of roof exactly where the pavement should
+   be. At 0.28 m it did, to the degree. It is 0.06 m: toes on the lip.
+
+### ⚠️ A building is not a tunnel
+
+`segAABB` returns **no hit for a segment that starts inside the box** (tmin stays
+0). So once a round enters a carved room (`city.holes`) it used to fly clean
+through thirty metres of tower and out the far side. `ballistics.js` now stops it
+at the room's back wall (`inSolid` in `simulate`, the room-exit clip in
+`raycast`) — and `losFrom` finally passes `city.holes`, so the LOS test and the
+ballistics agree about a man at a lit window instead of one calling him
+unreachable while the other kills him. Locked by node tests.
 
 ## Systems
 
@@ -85,6 +115,10 @@ first hit isn't the target's `SkinnedMesh`, the thing it names is the culprit.
   nobody can find a man in a city of ten thousand windows — the very first
   playtest failed on precisely this. Settings → *Target markers* turns them off.
   IDENTIFY contracts deliberately withhold the mark until you confirm it.
+- **Every button says what it is.** A bare `◈` in the corner reads as an empty
+  box: the second playtest tapped it, got "no one in the reticle", and had no
+  idea what the game wanted. Action buttons carry an icon *and* a word (`.ai` /
+  `.al`), and the pause menu opens with a controls card.
 - **Ballistics & aiming**: drop + wind drift are real. Scopes with a rangefinder
   show `430m ▼2.1 ◀0.8` (mils of drop/drift); the OWL T5 "smart" optic draws a
   **predicted-impact dot**. Holdover tables come from `buildTable()`.
@@ -137,12 +171,24 @@ birds, the rifle viewmodel, the scope reticle — is procedural.
 ## Testing
 
 - **Ballistics**: `node tools/test_ballistics.mjs` (drop, drift, solver accuracy,
-  head/torso/building/glass hits, subsonic). Must stay green.
+  head/torso/building/glass hits, subsonic, moving targets, carved rooms + the
+  no-tunnelling rule). Must stay green.
 - **Headless**: serve the site root (`python3 -m http.server 8823`), Chrome via
   puppeteer-core with `--use-angle=swiftshader --enable-unsafe-swiftshader`.
-  Poll `window.__state` (fps/mode/mission{state,score,shots,hits,targets,plates,
-  exposure}/scoped/errors); drive `window.__game` (`startMission`, `setAuto`,
-  `mission`, `city`, `pop`, `rig`, `solve`).
+  Poll `window.__state` (fps/mode/mission{…}/scoped/**eye**/**walk**/errors);
+  drive `window.__game` (`startMission`, `setAuto`, `mission`, `city`, `pop`,
+  `rig`, **`walker`**, `controls.move` — write `{x,y}` to walk the bot's feet).
+- **The visibility audit** is the tool for "I can't find/see the target": for
+  every mark, LOS-test it from a 7×7 grid of standable spots on the perch roof
+  (`walker.surfaceAt(x,z) + 1.62`, `mission._losClear`). It says both *is it
+  visible from the default stand* and *is there anywhere on the roof that sees
+  it* — the second question is why walking exists. Some marks are visible from
+  only ~9 of 49 spots, so "blocked" is normal; "0 of 49" is a bug.
+- **Bot losses that are not bugs**: the 4-wave `s10` protect and a clustered
+  `weekly` beat the `?auto` bot (it cannot lead panicked runners, whose direction
+  changes mid-flight). Both fail *identically on the shipped build* — always
+  A/B against `git archive HEAD` on a second port before believing a regression.
+  s10's win path is proven by cutting `setup.protect.waves` to 1.
 - **URL flags**: `?nosave` `?lite` `?shot` (thumbnail stage) `?auto` (the bot
   plays: it leads movers by iterating the flight solution against their velocity
   and takes the head on armour) `?m=<id|range|daily|weekly|endless>` `?cash=N`
@@ -158,7 +204,8 @@ thud, bolt, glass, ricochet, wind/city ambience, heartbeat, bullet whoosh, two
 music beds) · `js/charrig.js` rigged people · `js/city.js` **the generator + the
 corridor** · `js/people.js` population, routines, panic, death falls, analytic
 colliders · `js/ballistics.js` **pure sim + solver + tables** · `js/scope.js` the
-two views · `js/controls.js` input · `js/bulletcam.js` follow-bullet · `js/fx.js`
+two views · `js/walk.js` **walking the perch** · `js/controls.js` input (drag-look,
+the 👣 stick, keys) · `js/bulletcam.js` follow-bullet · `js/fx.js`
 particles/tracers/glint · `js/missions.js` the engine · `js/story.js` 21 missions
 · `js/events.js` daily/weekly/endless · `js/shop.js` armory · `js/ui.js` screens
 + HUD (popups, **never** alerts) · `js/main.js` boot/state machine/loop/bot.

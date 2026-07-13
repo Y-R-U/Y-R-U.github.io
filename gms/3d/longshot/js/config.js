@@ -109,9 +109,32 @@ export const CITY = {
   sidewalk: 3.2,
 };
 
+// The pitch limits are gameplay, not comfort: from a 38 m roof you must be able
+// to look at the pavement DIRECTLY BELOW you (−80°), or a mark in the doorway at
+// the foot of your own building is unfindable. Yaw is unclamped — full 360°.
 export const VIEW = {
   fov: 55, near: 0.1, far: 4000,
-  sensUnscoped: 0.0032, minPitch: -0.62, maxPitch: 0.55,
+  sensUnscoped: 0.0032, minPitch: -1.4, maxPitch: 0.8,
+};
+
+// Walking the perch. The shooter is never a fixed tripod: he can pace the roof,
+// toe the coping to look straight down, and slide left/right for parallax around
+// whatever is in the way.
+export const MOVE = {
+  speed: 2.9,              // m/s
+  scopedMul: 0.4,          // creeping while glassed
+  accel: 16, damp: 11,
+  eyeH: 1.62,              // eye above the surface underfoot
+  // He may stand with his TOES on the lip. Anything more than a few cm back and
+  // the coping he is standing on grazes his own downward sightline (atan(1.62 /
+  // edge) must stay steeper than the pitch limit), which puts a strip of his own
+  // roof exactly where the pavement below should be.
+  edge: 0.06,
+  coping: 0.32,            // the rim curb you step UP onto
+  copingW: 0.55,           // its width, in from the rim
+  stepUp: 0.5,             // anything shorter than this you walk on top of
+  climb: 4.0,              // m/s the feet rise/fall onto a ledge
+  bobHz: 1.75, bobAmp: 0.022,
 };
 
 export const FLAGS = new URLSearchParams(location.search);

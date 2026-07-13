@@ -63,6 +63,31 @@ function segAABB(p0, p1, box) {
   }
   return tmin > 0 ? tmin : -1;
 }
+// ── carved rooms ───────────────────────────────────────────────────────────
+// A round that enters an office room passes the facade — but the room has a
+// BACK WALL. segAABB cannot see it: a ray that STARTS inside a box reports no
+// hit (tmin stays 0), so without the tests below a bullet that clips one lit
+// window sails clean through thirty metres of tower and out the far side — and
+// the sightline test would call a man on the next street "visible" through two
+// concrete walls.
+const inBox = (p, b) =>
+  p.x >= b.minX && p.x <= b.maxX && p.z >= b.minZ && p.z <= b.maxZ && p.y >= 0 && p.y <= b.h;
+const inHoleBox = (p, h) =>
+  p.x >= h.minX && p.x <= h.maxX && p.y >= h.minY && p.y <= h.maxY && p.z >= h.minZ && p.z <= h.maxZ;
+const holeAt = (p, holes) => (holes || []).find(h => inHoleBox(p, h)) || null;
+// p is inside the box: distance along d until it leaves
+function exitDist(p, d, lo, hi) {
+  let tmax = Infinity;
+  const axes = [[p.x, d.x, lo.x, hi.x], [p.y, d.y, lo.y, hi.y], [p.z, d.z, lo.z, hi.z]];
+  for (const [o, dd, l, h] of axes) {
+    if (Math.abs(dd) < 1e-9) continue;
+    tmax = Math.min(tmax, Math.max((l - o) / dd, (h - o) / dd));
+  }
+  return tmax === Infinity ? 0 : Math.max(0, tmax);
+}
+// standing in concrete: inside a building and not inside one of its rooms
+const inSolid = (p, buildings, holes) =>
+  buildings.some(b => inBox(p, b)) && !holeAt(p, holes);
 // segment vs bounded pane {centre, nrm, w, h} → {t, point} or null
 function segPane(p0, p1, g) {
   const d = sub(p1, p0);
@@ -100,8 +125,7 @@ export function simulate(origin, dir, opts = {}) {
   const glass = opts.glass || [];
   const holes = opts.holes || [];
   const groundY = opts.groundY ?? 0;
-  const inHole = (p) => holes.some(h =>
-    p.x >= h.minX && p.x <= h.maxX && p.y >= h.minY && p.y <= h.maxY && p.z >= h.minZ && p.z <= h.maxZ);
+  const inHole = (p) => !!holeAt(p, holes);
 
   let t = 0, dist = 0, sampleAcc = 0;
   while (t < maxT) {
@@ -141,6 +165,8 @@ export function simulate(origin, dir, opts = {}) {
       const tg = (pos.y - groundY) / Math.max(1e-9, pos.y - p1.y);
       if (!hit || tg < hit.t) hit = { t: tg, type: 'ground' };
     }
+    // crossed the room and buried itself in the back wall
+    if (!hit && inSolid(p1, buildings, holes)) hit = { t: 1, type: 'building' };
 
     if (hit) {
       const hp = add(pos, scale(sub(p1, pos), hit.t));
@@ -210,14 +236,25 @@ export function raycast(origin, dir, opts = {}, _depth = 0) {
   }
   if (!hit) return { type: 'none', dist: max, point: p1 };
   const point = add(origin, scale(d, hit.t * max));
-  // building face inside a carved room: continue past the opening
-  if (hit.type === 'building' && _depth < 3 && (opts.holes || []).some(h => {
-    const p = add(point, scale(d, 0.1));
-    return p.x >= h.minX && p.x <= h.maxX && p.y >= h.minY && p.y <= h.maxY && p.z >= h.minZ && p.z <= h.maxZ;
-  })) {
+  // Facade hit at a carved room: sail on through the opening — but only as far
+  // as the room goes. Leave the room and you are in concrete.
+  const holes = opts.holes || [];
+  const h = hit.type === 'building' && _depth < 6 ? holeAt(add(point, scale(d, 0.1)), holes) : null;
+  if (h) {
+    const b = hit.building;
     const from = add(point, scale(d, 0.12));
-    const rest = raycast(from, d, { ...opts, max: max - hit.t * max - 0.12 }, _depth + 1);
-    return { ...rest, dist: hit.t * max + 0.12 + rest.dist };
+    const gone = hit.t * max + 0.12;                 // travelled to get in here
+    const tRoom = exitDist(from, d, { x: h.minX, y: h.minY, z: h.minZ }, { x: h.maxX, y: h.maxY, z: h.maxZ });
+    const tBld = exitDist(from, d, { x: b.minX, y: 0, z: b.minZ }, { x: b.maxX, y: b.h, z: b.maxZ });
+    // whatever is INSIDE the room (the man at the window) still gets hit first
+    const inner = raycast(from, d, { ...opts, max: Math.min(max - gone, tRoom) }, _depth + 1);
+    if (inner.type !== 'none') return { ...inner, dist: gone + inner.dist };
+    if (tRoom < tBld - 0.05) {                       // the room's back wall
+      return { type: 'building', building: b, dist: gone + tRoom, point: add(from, scale(d, tRoom)) };
+    }
+    const out = add(from, scale(d, tRoom + 0.02));   // the room opens out the far side
+    const rest = raycast(out, d, { ...opts, max: max - gone - tRoom - 0.02 }, _depth + 1);
+    return { ...rest, dist: gone + tRoom + 0.02 + rest.dist };
   }
   return { ...hit, dist: hit.t * max, point };
 }

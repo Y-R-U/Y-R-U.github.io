@@ -1,5 +1,5 @@
 // node tools/test_ballistics.mjs — sanity-check drop, drift, solver, hits.
-import { simulate, solve } from '../js/ballistics.js';
+import { simulate, solve, raycast } from '../js/ballistics.js';
 
 let fails = 0;
 const ok = (name, cond, extra = '') => {
@@ -117,6 +117,48 @@ const origin = { x: 0, y: 60, z: 0 };
   const resLead = simulate(o2, solLead.dir, { v0: 700, people: mkPeople(), groundY: 0 });
   ok('LEADING a runner hits', resLead.hit.type === 'head' || resLead.hit.type === 'torso',
     `hit=${resLead.hit.type} lead=${(vel.x * solLead.tof).toFixed(2)}m`);
+}
+
+// 11. carved rooms: a round reaches the man at the lit window, but a building
+//     is NOT a tunnel — leave the room and you are in concrete. (Without the
+//     back-wall test, a segment that starts inside an AABB reports no hit and
+//     the round flies through the whole tower — and the sightline test then
+//     calls a man on the NEXT street visible through two walls.)
+{
+  const o3 = { x: 0, y: 40, z: 0 };
+  // a 30 m deep tower at z 200..230, with a 4 m room carved behind its facade
+  const tower = { minX: -20, maxX: 20, minZ: 200, maxZ: 230, h: 60 };
+  const room = { minX: -4, maxX: 4, minY: 33, maxY: 37, minZ: 199, maxZ: 204 };
+  const at = (y, z) => ({ x: 0, y, z });
+  const dirTo = (p) => {
+    const d = { x: p.x - o3.x, y: p.y - o3.y, z: p.z - o3.z };
+    const L = Math.hypot(d.x, d.y, d.z);
+    return { x: d.x / L, y: d.y / L, z: d.z / L };
+  };
+  const manInRoom = [{
+    person: { id: 1 },
+    head: { c: at(36.4, 202), r: 0.15 },
+    torso: { a: at(35.6, 202), b: at(36.2, 202), r: 0.24 },
+  }];
+  // the man at the window: reachable through the opening
+  const hitRoom = raycast(o3, dirTo(at(35.9, 202)), { buildings: [tower], holes: [room] });
+  ok('sightline reaches a man in a carved room',
+    raycast(o3, dirTo(at(35.9, 202)), { buildings: [tower], holes: [room], people: manInRoom }).type !== 'building',
+    `los=${raycast(o3, dirTo(at(35.9, 202)), { buildings: [tower], holes: [room], people: manInRoom }).type}`);
+  ok('a round through the window kills him',
+    ['head', 'torso'].includes(simulate(o3, dirTo(at(35.9, 202)), {
+      v0: 700, buildings: [tower], holes: [room], people: manInRoom, groundY: 0,
+    }).hit.type));
+  // a man on the NEXT street, behind the tower, in line with that same window
+  const behind = { x: 0, y: 1.6, z: 300 };
+  ok('the tower still blocks the sightline behind it',
+    raycast(o3, dirTo(behind), { buildings: [tower], holes: [room] }).type === 'building',
+    `los=${raycast(o3, dirTo(behind), { buildings: [tower], holes: [room] }).type}`);
+  const thru = simulate(o3, dirTo(behind), { v0: 700, buildings: [tower], holes: [room], groundY: 0 });
+  ok('a round does not tunnel through the tower',
+    thru.hit.type === 'building' && thru.hit.point.z < 231,
+    `hit=${thru.hit.type} @z=${thru.hit.point.z.toFixed(1)}`);
+  ok('room raycast reports the opening, not the facade', hitRoom.dist > 195, `dist=${hitRoom.dist.toFixed(1)}`);
 }
 
 console.log(fails ? `\n${fails} FAILURES` : '\nall ballistics tests pass');

@@ -12,6 +12,7 @@ import { buildCity, perchReach } from './city.js';
 import { Population } from './people.js';
 import { FX } from './fx.js';
 import { ScopeRig } from './scope.js';
+import { Walker } from './walk.js';
 import { Controls } from './controls.js';
 import { BulletCam } from './bulletcam.js';
 import { MissionRun, convoyTyre } from './missions.js';
@@ -72,6 +73,7 @@ const G = {
 };
 
 const rig = new ScopeRig(camera, scene);
+const walker = new Walker(rig);
 const bcam = new BulletCam(scene, camera, null);
 const ui = new UI({
   startMission,
@@ -172,6 +174,8 @@ async function startMission(def) {
     console.error(err);
   }
   setLoad(0.95, 'in position');
+  // the shooter owns his roof: he can pace it, and toe the coping to look down
+  walker.setPerch(mission.vantageB, mission.roofY, rig.eye, G.city.vantage?.blockers || []);
   G.mission = mission;
   G.mode = 'mission';
   G.paused = false;
@@ -196,12 +200,18 @@ async function startMission(def) {
       hud.toast('◈ markers show your targets · arrows point off-screen', '');
     }
   }, 5200);
+  setTimeout(() => {
+    if (G.mission === mission && mission.state === 'active') {
+      hud.toast('👣 WALK the roof — go to the edge to see the street below', '');
+    }
+  }, 9000);
 }
 
 function endMission(result, aborted) {
   const def = result.def;
   G.lastResult = { id: def.id, won: result.won, reason: result.reason || null, score: result.score, shots: result.shots, hits: result.hits };
   controls.setEnabled(false);
+  walker.clear();
   rig.enabled = false;
   rig.breathHold(false);
   rig.setScoped(false);
@@ -317,6 +327,13 @@ function autoDrive(dt) {
     return vel.lengthSq() > 0.04 ? autoIntercept(m, at, vel) : at;
   };
 
+  // Shoot at what you can actually SEE. A bot that empties the magazine into the
+  // building a panicked mark just ran behind isn't testing the game, it's
+  // testing concrete — and it reports contracts as unwinnable that a player
+  // would simply switch targets on.
+  const seen = (p) => m._losClear(p.group.position.clone().add(new T.Vector3(0, 1.5 * p.scale, 0)));
+  const pickVisible = (list) => list.find(seen) || list[0];
+
   if (m.plates.length && m.plates.some(p => !p.hit)) {
     aim = m.plates.find(p => !p.hit).c;
   } else if (m.special.sniper?.alive) {
@@ -325,10 +342,11 @@ function autoDrive(dt) {
     const cv = m.special.convoy;
     aim = autoIntercept(m, convoyTyre(cv), autoVel(cv, cv.car.position, step));
   } else if (m.special.protect && m.special.protect.killers.some(k => k.alive)) {
-    const k = m.special.protect.killers.find(k => k.alive);
+    const k = pickVisible(m.special.protect.killers.filter(k => k.alive));
     aim = aimAt(k, k);
   } else {
-    const t = m.targets.find(t => !t.dead && !t.escaped && t.person && t.person.alive && !t.person.hidden && !t.person.gone);
+    const live = m.targets.filter(t => !t.dead && !t.escaped && t.person && t.person.alive && !t.person.hidden && !t.person.gone);
+    const t = live.find(t => seen(t.person)) || live[0];
     if (t) {
       aim = aimAt(t.person, t.person);
       if (m.identify && !m.identify.confirmed) markFirst = true;
@@ -363,7 +381,7 @@ async function stageShot() {
   const yaw = Math.atan2(G.city.zone.x - b.cx, G.city.zone.z - b.cz);
   const reach = perchReach(Math.min(b.w, b.d), yaw);
   const eye = new T.Vector3(b.cx + Math.sin(yaw) * reach, roofY + 1.62, b.cz + Math.cos(yaw) * reach);
-  G.city.setVantage(new T.Vector3(eye.x, roofY, eye.z), yaw);
+  G.city.setVantage(new T.Vector3(eye.x, roofY, eye.z), yaw, b);
   rig.setVantage(eye, yaw);
   rig.setLoadout(RIFLES[0], SCOPES[0], AMMOS[0], []);
   rig.enabled = true;
@@ -403,7 +421,12 @@ function loop(now) {
       if (G.auto) autoDrive(dt);
       G.mission.update(dt * ts);
       if (bcam.active) bcam.update(dt);
-      else rig.update(dt);
+      else {
+        // walk BEFORE the rig composes: rig.eye is the shot origin, and the
+        // walker mutates it in place (MissionRun holds the same Vector3)
+        if (!G.auto) walker.update(dt, controls.move, rig.yaw, rig.scoped);
+        rig.update(dt);
+      }
       if (bcam.active) markers.hideAll();
       else markers.update(G.mission.markerItems(), camera);
     }
@@ -449,6 +472,8 @@ Object.defineProperty(window, '__state', {
       plates: G.mission.plates.map(p => p.hit),
     } : null,
     scoped: rig.scoped, zoom: Math.round(rig.zoom * 10) / 10,
+    eye: { x: +rig.eye?.x.toFixed(2), y: +rig.eye?.y.toFixed(2), z: +rig.eye?.z.toFixed(2) },
+    walk: walker.enabled ? { x: +walker.pos.x.toFixed(2), y: +walker.pos.y.toFixed(2), z: +walker.pos.z.toFixed(2), spd: +walker.speed.toFixed(2) } : null,
     people: G.pop ? G.pop.list.length : 0,
     cash: save.cash, storyAt: save.storyAt,
     bcam: bcam.active,
@@ -457,6 +482,6 @@ Object.defineProperty(window, '__state', {
   }),
 });
 window.__clearResult = () => { G.lastResult = null; };
-window.__game = { startMission, rig, bcam, controls, ui, save, STORY, RANGE_DEF, dailyDef, weeklyDef, endlessDef, setAuto: (on) => { G.auto = on; }, get mission() { return G.mission; }, get city() { return G.city; }, get pop() { return G.pop; }, solve };
+window.__game = { startMission, rig, walker, bcam, controls, ui, save, STORY, RANGE_DEF, dailyDef, weeklyDef, endlessDef, setAuto: (on) => { G.auto = on; }, get mission() { return G.mission; }, get city() { return G.city; }, get pop() { return G.pop; }, solve };
 
 boot();

@@ -202,7 +202,7 @@ export class UI {
   hudShow(on) {
     $('hud').classList.toggle('hidden', !on);
     if (on) {
-      for (const id of ['btn-fire', 'btn-breath']) $(id).classList.remove('hidden');
+      for (const id of ['btn-fire', 'btn-breath', 'stick', 'btn-scope', 'btn-mark', 'breath-wrap']) $(id).classList.remove('hidden');
     } else {
       $('fixer').classList.add('hidden');
       $('scope').classList.add('hidden');
@@ -276,7 +276,7 @@ export class UI {
         hud._fx = setTimeout(() => $('fixer').classList.add('hidden'), 4200);
       },
       setBcam: (on) => {
-        for (const id of ['btn-fire', 'btn-scope', 'btn-breath', 'btn-mark', 'zoom-wrap', 'breath-wrap'])
+        for (const id of ['btn-fire', 'btn-scope', 'btn-breath', 'btn-mark', 'zoom-wrap', 'breath-wrap', 'stick'])
           $(id).classList.toggle('hidden', on);
         $('scope').classList.toggle('hidden', on || !this._scoped);
       },
@@ -313,6 +313,14 @@ export class UI {
   settingsPopup(inMission) {
     const s = save.settings;
     const body = this.popup('SETTINGS', `
+      ${inMission ? `<div class="helpbox">
+        <div><b>👣 WALK</b> the stick paces your rooftop — go to the edge to see the street below, or sidestep whatever is in your way</div>
+        <div><b>DRAG</b> look around, full 360°<span class="kb">WASD / arrows</span></div>
+        <div><b>◎ SCOPE</b> in · pinch or the slider to zoom<span class="kb">C · Q/E</span></div>
+        <div><b>🫁 BREATH</b> hold to steady the crosshair<span class="kb">Shift</span></div>
+        <div><b>✛ FIRE</b><span class="kb">Space</span></div>
+        <div><b>◈ MARK</b> tag the person under your crosshair<span class="kb">M</span></div>
+      </div>` : ''}
       <label>Look sensitivity <input id="set-sens" type="range" min="30" max="200" value="${Math.round(s.sens * 100)}"></label>
       <label>Invert Y <input id="set-inv" type="checkbox" ${s.invertY ? 'checked' : ''}></label>
       <label>Target markers <input id="set-mk" type="checkbox" ${s.markers !== false ? 'checked' : ''}></label>

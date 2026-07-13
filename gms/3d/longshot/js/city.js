@@ -670,7 +670,9 @@ export function buildCity(scene, spec) {
   };
 
   // ── vantage rooftop ── (`pos` = where the shooter STANDS, at roof-top height)
-  city.setVantage = (pos, faceYaw) => {
+  // `b` = the perch collider, so the roof can be furnished to its real footprint:
+  // the shooter WALKS this roof (js/walk.js), so it needs an edge to walk to.
+  city.setVantage = (pos, faceYaw, b) => {
     const vg = new T.Group();
     vg.position.set(pos.x, 0, pos.z);
     const y = pos.y;
@@ -679,18 +681,70 @@ export function buildCity(scene, spec) {
       const m = new T.Mesh(g, new T.MeshStandardMaterial({ color: c, roughness: 0.95 }));
       m.position.set(x, yy, z); vg.add(m); return m;
     };
-    // Gravel pad underfoot, sandbag rest ON THE DECK ahead, kit behind.
-    // The bags sit at ankle height: put them anywhere near the shooter's eye
-    // (roof + 1.6 m) and they become a wall filling the entire scope.
-    mk(new T.BoxGeometry(9, 0.12, 9), 0x53565d, 0, y + 0.06, 0);
-    const bag = mk(new T.BoxGeometry(1.6, 0.34, 0.55), 0x8a7850, fx2 * 3.2, y + 0.29, fz2 * 3.2);
+    // The stand point is only ~3 m from the lip, so ANY prop placed relative to
+    // it can hang out over thin air — a 9 m gravel pad centred here overhung the
+    // edge by 1.5 m and sat squarely in the shooter's downward sightline once he
+    // could walk out and look. Everything here is clamped inside the footprint.
+    const inRoof = (wx, wz, m) => !b ? [wx, wz] : [
+      Math.min(b.maxX - m, Math.max(b.minX + m, wx)),
+      Math.min(b.maxZ - m, Math.max(b.minZ + m, wz)),
+    ];
+    const place = (mesh, m) => {                     // mesh is in vg space (vg at pos)
+      const [wx, wz] = inRoof(pos.x + mesh.position.x, pos.z + mesh.position.z, m);
+      mesh.position.x = wx - pos.x; mesh.position.z = wz - pos.z;
+      return mesh;
+    };
+    // gravel roof deck — the whole roof, so it can never overhang
+    if (b) {
+      const deck = new T.Mesh(new T.BoxGeometry(b.w - 0.1, 0.1, b.d - 0.1),
+        new T.MeshStandardMaterial({ color: 0x53565d, roughness: 0.98 }));
+      deck.position.set(b.cx - pos.x, y + 0.05, b.cz - pos.z);
+      vg.add(deck);
+    }
+    // shooting mat + sandbag rest, ankle height: put bags anywhere near the eye
+    // (roof + 1.6 m) and they become a wall filling the entire scope
+    const mat = mk(new T.BoxGeometry(2.2, 0.04, 2.6), 0x3c4048, 0, y + 0.12, 0);
+    mat.rotation.y = faceYaw;
+    place(mat, 1.5);
+    const bag = mk(new T.BoxGeometry(1.6, 0.34, 0.55), 0x8a7850, fx2 * 1.7, y + 0.29, fz2 * 1.7);
     bag.rotation.y = faceYaw;
-    const bag2 = mk(new T.BoxGeometry(1.2, 0.3, 0.5), 0x7d6c48, fx2 * 3.1 + fz2 * 0.75, y + 0.27, fz2 * 3.1 - fx2 * 0.75);
+    place(bag, 1.0);
+    const bag2 = mk(new T.BoxGeometry(1.2, 0.3, 0.5), 0x7d6c48, fx2 * 1.6 + fz2 * 0.75, y + 0.27, fz2 * 1.6 - fx2 * 0.75);
     bag2.rotation.y = faceYaw;
-    mk(new T.BoxGeometry(2.6, 1.6, 2.2), 0x5a5e67, -fx2 * 4.5 - 2.2, y + 0.8, -fz2 * 4.5 - 1.4);   // AC unit
-    mk(new T.CylinderGeometry(0.09, 0.12, 7, 6), 0x6a6e77, -fx2 * 4 + 2.6, y + 3.5, -fz2 * 4 + 1.8); // antenna
+    place(bag2, 0.9);
+    const ac = mk(new T.BoxGeometry(2.6, 1.6, 2.2), 0x5a5e67, -fx2 * 4.5 - 2.2, y + 0.8, -fz2 * 4.5 - 1.4);
+    place(ac, 2.0);
+    const ant = mk(new T.CylinderGeometry(0.09, 0.12, 7, 6), 0x6a6e77, -fx2 * 4 + 2.6, y + 3.5, -fz2 * 4 + 1.8);
+    place(ant, 1.0);
+    // blockers are in WORLD space (vg is offset to the stand point)
+    const W = (m, r, top) => ({ x: pos.x + m.position.x, z: pos.z + m.position.z, r, top });
+    const blockers = [
+      W(bag, 1.0, 0.34),          // step up onto the rest
+      W(bag2, 0.8, 0.3),
+      W(ac, 1.9, 1.6),            // walk around the AC unit
+      W(ant, 0.35, 7),
+    ];
+
+    // The coping: a low curb around the rim. It gives the roof an EDGE to toe —
+    // step up onto it and there is nothing at all between you and the street
+    // below. Deliberately 0.32 m, not a 1.1 m parapet: a parapet three metres
+    // ahead of the eye sits exactly on the line of a downward shot.
+    if (b) {
+      const cw = 0.55, ch = 0.32, cy = y + ch / 2;
+      const cop = new T.Group();
+      const cmat = new T.MeshStandardMaterial({ color: 0x4c5057, roughness: 0.92 });
+      for (const [ox, oz, sw, sd] of [
+        [0, b.d / 2 - cw / 2, b.w, cw], [0, -b.d / 2 + cw / 2, b.w, cw],
+        [b.w / 2 - cw / 2, 0, cw, b.d], [-b.w / 2 + cw / 2, 0, cw, b.d],
+      ]) {
+        const m = new T.Mesh(new T.BoxGeometry(sw, ch, sd), cmat);
+        m.position.set(b.cx + ox, cy, b.cz + oz);
+        cop.add(m);
+      }
+      group.add(cop);
+    }
     group.add(vg);
-    city.vantage = { pos: pos.clone(), yaw: faceYaw, group: vg };
+    city.vantage = { pos: pos.clone(), yaw: faceYaw, group: vg, blockers, b: b || null };
   };
 
   // ── per-frame update ──

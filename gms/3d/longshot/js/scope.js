@@ -22,7 +22,6 @@ export class ScopeRig {
 
     this.yaw = 0; this.pitch = 0;
     this.baseYaw = 0;
-    this.yawRange = Math.PI * 0.75;
     this.scoped = false;
     this.zoomFrac = 0;
     this.fov = VIEW.fov;
@@ -82,12 +81,11 @@ export class ScopeRig {
     this.breath = BREATH.max * this.loadout.breathMul;
   }
 
-  setVantage(pos, yaw, yawRange = Math.PI * 0.75) {
+  setVantage(pos, yaw) {
     this.eye = pos.clone();
     this.baseYaw = yaw;
     this.yaw = yaw;
     this.pitch = -0.06;
-    this.yawRange = yawRange;
     this.camera.position.copy(this.eye);
   }
 
@@ -96,13 +94,17 @@ export class ScopeRig {
     return s.zmin + (s.zmax - s.zmin) * this.zoomFrac;
   }
 
+  // Yaw is free: a shooter on a roof can turn round. Only pitch is limited, and
+  // even that goes to −80° so you can look at the pavement at the foot of your
+  // own building — where marks on the ground actually are.
   look(dxPx, dyPx) {
     if (!this.enabled) return;
     const fovRad = this.fov * Math.PI / 180;
     const k = fovRad / innerHeight * 0.62 * (save.settings.sens || 1);
     this.yaw -= dxPx * k;
     this.pitch -= dyPx * k * (save.settings.invertY ? -1 : 1);
-    this.yaw = clamp(this.yaw, this.baseYaw - this.yawRange, this.baseYaw + this.yawRange);
+    if (this.yaw > Math.PI * 3) this.yaw -= Math.PI * 2;
+    if (this.yaw < -Math.PI * 3) this.yaw += Math.PI * 2;
     this.pitch = clamp(this.pitch, VIEW.minPitch, VIEW.maxPitch);
   }
 

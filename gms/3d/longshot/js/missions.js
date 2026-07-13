@@ -19,11 +19,16 @@ export function convoyTyre(cv) {
 }
 
 // straight line from `eye` to `pt` unblocked by `buildings`?
-function losFrom(eye, pt, buildings) {
+// `holes` are the carved office rooms. Without them the LOS test calls every
+// man-at-a-window BLIND — it sees only the facade AABB — while the ballistics
+// happily put a round through the opening and kill him. Two systems disagreeing
+// about what you can see is how a target ends up "visible but unmarkable", or a
+// fleeing mark picks an escape route it thinks you can't watch.
+function losFrom(eye, pt, buildings, holes) {
   const d = { x: pt.x - eye.x, y: pt.y - eye.y, z: pt.z - eye.z };
   const dist = Math.hypot(d.x, d.y, d.z);
   if (dist < 2) return true;
-  const rc = raycast(eye, d, { buildings, groundY: -5, max: dist - 1.5 });
+  const rc = raycast(eye, d, { buildings, holes, groundY: -5, max: dist - 1.5 });
   return rc.type === 'none';
 }
 
@@ -123,8 +128,9 @@ export class MissionRun {
     const reach = perchReach(Math.min(best.w, best.d), yaw);   // 3 m short of the edge he faces
     const eye = new T.Vector3(
       best.cx + Math.sin(yaw) * reach, roofY + 1.62, best.cz + Math.cos(yaw) * reach);
-    city.setVantage(new T.Vector3(eye.x, roofY, eye.z), yaw);
+    city.setVantage(new T.Vector3(eye.x, roofY, eye.z), yaw, best);
     rig.setVantage(eye, yaw);
+    this.roofY = roofY;              // main.js hands this to the Walker
     rig.setLoadout(this.rifle, this.scope, this.ammo, this.gear);
     this.origin = rig.eye;
     pop.losTest = (pt) => this._losClear(pt);   // fleeing marks stay shootable
@@ -183,7 +189,8 @@ export class MissionRun {
   }
 
   _losClear(pt, ignore) {
-    return losFrom(this.origin, pt, ignore ? this.simB.filter(b => b !== ignore) : this.simB);
+    return losFrom(this.origin, pt,
+      ignore ? this.simB.filter(b => b !== ignore) : this.simB, this.ctx.city.holes);
   }
   // building near `want` metres out with a sightline to ptOf(b)
   _pickBuilding(want, hWant, hW, ptOf, filter) {
@@ -773,7 +780,7 @@ export class MissionRun {
     const ray = rig.aimRay();
     const cone = rig.scoped ? 0.012 + rig.fov * 0.0004 : 0.05;
     const p = pop.pick(ray.origin, ray.dir, cone);
-    if (!p) { hud.toast('no one in the reticle', ''); return; }
+    if (!p) { hud.toast('MARK ◈ tags a person — put the crosshair on one first', ''); return; }
     if (this.identify && !this.identify.confirmed) {
       if (p.role === 'target') {
         this.identify.confirmed = true;
