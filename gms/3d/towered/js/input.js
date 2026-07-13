@@ -53,6 +53,18 @@ export function createInput(dom, camera, cb) {
     inp.target.z = clamp(inp.target.z, -inp.bounds.z, inp.bounds.z);
   }
 
+  // Screen drag → ground movement, used to slide the build ghost under the
+  // finger. Vertical drags cover more ground than horizontal ones because the
+  // ground recedes from a tilted camera — hence the cos(phi) stretch.
+  const _dv = new THREE.Vector3();
+  inp.dragToWorld = (dx, dy) => {
+    const perPx = 2 * cr * Math.tan((camera.fov * Math.PI / 180) / 2) / Math.max(innerHeight, 1);
+    const sx = perPx, sz = perPx / Math.max(Math.cos(cphi), 0.25);
+    const sright = new THREE.Vector3(Math.cos(ctheta), 0, -Math.sin(ctheta));  // screen-right on the ground
+    const sdown = new THREE.Vector3(Math.sin(ctheta), 0, Math.cos(ctheta));    // screen-down on the ground
+    return _dv.set(0, 0, 0).addScaledVector(sright, dx * sx).addScaledVector(sdown, dy * sz);
+  };
+
   const ray = new THREE.Raycaster();
   const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const ndc = new THREE.Vector2();
@@ -77,12 +89,13 @@ export function createInput(dom, camera, cb) {
   // ── pointer wrangling ──
   const ptrs = new Map();
   let moved = 0, downT = 0, pinch0 = 0, angle0 = 0, r0 = 0, theta0 = 0, mode = null;
+  let placeDragged = false;   // did this gesture actually slide the build ghost?
 
   dom.addEventListener('pointerdown', (ev) => {
     if (!inp.enabled) return;
     dom.setPointerCapture(ev.pointerId);
     ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY, b: ev.button });
-    if (ptrs.size === 1) { moved = 0; downT = performance.now(); mode = ev.button === 2 ? 'orbit' : 'pan'; }
+    if (ptrs.size === 1) { moved = 0; downT = performance.now(); placeDragged = false; mode = ev.button === 2 ? 'orbit' : 'pan'; }
     if (ptrs.size === 2) {
       const [a, b] = [...ptrs.values()];
       pinch0 = Math.hypot(a.x - b.x, a.y - b.y);
@@ -112,6 +125,8 @@ export function createInput(dom, camera, cb) {
       inp.theta -= dx * 0.006;
       inp.phi = clamp(inp.phi - dy * 0.004, CFG.cam.phiMin, CFG.cam.phiMax);
     } else if (mode === 'pan') {
+      // while placing a tower, one finger drags the ghost instead of the camera
+      if (inp.placing) { placeDragged = true; cb.onPlaceDrag?.(dx, dy); return; }
       pan(-dx, -dy);
     }
     cb.onDrag?.();
@@ -121,6 +136,10 @@ export function createInput(dom, camera, cb) {
     ptrs.delete(ev.pointerId);
     if (p && ptrs.size === 0 && moved < 7 && performance.now() - downT < 450 && p.b !== 2)
       tap(ev.clientX, ev.clientY);
+    // lifting the finger after sliding the ghost around commits the build
+    // (a pinch that happened to end here must not count as a place)
+    else if (p && ptrs.size === 0 && inp.placing && placeDragged && p.b !== 2)
+      cb.onPlaceRelease?.();
     if (ptrs.size < 2 && mode === 'pinch') mode = ptrs.size === 1 ? 'pan' : null;
   };
   dom.addEventListener('pointerup', end);

@@ -85,21 +85,128 @@ const hoverMark = mesh(new THREE.PlaneGeometry(CELL * 0.94, CELL * 0.94).rotateX
 hoverMark.visible = false;
 scene.add(hoverMark);
 
-game.showRange = (pos, range) => {
+game.showRange = (pos, range, color = 0xe3b653) => {
+  rangeRing.material.color.setHex(color);
+  rangeFill.material.color.setHex(color);
   rangeRing.position.set(pos.x, 0.06, pos.z);
   rangeRing.scale.setScalar(range);
   rangeRing.visible = true;
 };
 game.clearSelection = () => { rangeRing.visible = false; cellMark.visible = false; };
 
+// ── placing a tower: a draggable ghost + its range, committed on release ─────
+const OK = 0x86e06a, NO = 0xff6a56;
+const placeMark = mesh(new THREE.PlaneGeometry(CELL * 0.94, CELL * 0.94).rotateX(-Math.PI / 2),
+  new THREE.MeshBasicMaterial({ color: OK, transparent: true, opacity: 0.4, depthWrite: false }), 0, 0.05, 0, false);
+placeMark.visible = false; placeMark.renderOrder = 4;
+scene.add(placeMark);
+
+let place = null;   // { type, def, cx, cz, at: Vector3, ghost, valid }
+
+// Where to start the ghost when there's no plot in mind: the buildable cell
+// nearest the middle of the screen.
+function cellNearScreenCentre() {
+  const p = input.groundPoint(innerWidth / 2, innerHeight * 0.52);
+  const c = p ? LV.worldToCell(game.level, p.x, p.z) : { cx: 0, cz: 0 };
+  for (let r = 0; r <= 10; r++) {
+    for (let dz = -r; dz <= r; dz++) for (let dx = -r; dx <= r; dx++) {
+      if (Math.max(Math.abs(dx), Math.abs(dz)) !== r) continue;
+      const cx = c.cx + dx, cz = c.cz + dz;
+      if (isBuildable(game.world, cx, cz) && !game.towers.at(cx, cz)) return { cx, cz };
+    }
+  }
+  return c;
+}
+
+function refreshPlace() {
+  if (!place) return;
+  const { cx, cz } = LV.worldToCell(game.level, place.at.x, place.at.z);
+  place.cx = cx; place.cz = cz;
+  const buildable = isBuildable(game.world, cx, cz) && !game.towers.at(cx, cz);
+  place.valid = buildable && game.gold >= place.def.cost[0];
+  const { x, z } = LV.cellToWorld(game.level, cx, cz);
+  place.ghost?.position.set(x, 0, z);
+  placeMark.position.set(x, 0.05, z);
+  placeMark.material.color.setHex(place.valid ? OK : NO);
+  placeMark.visible = true;
+  game.showRange({ x, z }, place.def.range[0], place.valid ? OK : NO);
+  game.ui.updatePlaceBar(place);
+}
+
+game.beginPlace = async (type, cx = null, cz = null) => {
+  if (game.state !== 'game' || game.phase !== 'playing') return;
+  const def = TOWERS[type];
+  if (game.gold < def.cost[0]) { AU.sfx.nogold(); game.ui.toast('Not enough gold'); return; }
+  game.endPlace();
+  game.ui.closeSheet();
+  const startOk = cx != null && isBuildable(game.world, cx, cz) && !game.towers.at(cx, cz);
+  const start = startOk ? { cx, cz } : cellNearScreenCentre();
+  const w = LV.cellToWorld(game.level, start.cx, start.cz);
+  place = { type, def, cx: start.cx, cz: start.cz, at: new THREE.Vector3(w.x, 0, w.z), ghost: null, valid: true };
+  input.placing = true;
+  hoverMark.visible = false;
+  game.ui.showPlaceBar(def);
+  refreshPlace();
+  const ghost = await game.towers.ghost(type);
+  if (!place) { game.towers.removeGhost(ghost); return; }   // cancelled while loading
+  place.ghost = ghost;
+  refreshPlace();
+  game.ui.tip('place', 'Drag anywhere to slide the plot around — the ring shows what it will cover. Lift your finger to raise it.');
+};
+
+game.dragPlace = (dx, dy) => {
+  if (!place) return;
+  const d = input.dragToWorld(dx, dy);
+  const hw = game.level.grid.w / 2 * CELL, hh = game.level.grid.h / 2 * CELL;
+  place.at.x = clamp(place.at.x + d.x, -hw, hw);
+  place.at.z = clamp(place.at.z + d.z, -hh, hh);
+  refreshPlace();
+};
+
+game.movePlaceTo = (cx, cz) => {
+  if (!place) return;
+  const { x, z } = LV.cellToWorld(game.level, cx, cz);
+  place.at.set(x, 0, z);
+  refreshPlace();
+  AU.sfx.click();
+};
+
+game.confirmPlace = () => {
+  if (!place) return;
+  if (!place.valid) {
+    AU.sfx.nogold();
+    game.ui.toast(game.gold < place.def.cost[0] ? 'Not enough gold' : 'No room to build there');
+    return;
+  }
+  const { type, cx, cz } = place;
+  game.endPlace();
+  game.buildAt(type, cx, cz);
+};
+
+game.endPlace = () => {
+  if (!place) return;
+  if (place.ghost) game.towers.removeGhost(place.ghost);
+  place = null;
+  input.placing = false;
+  placeMark.visible = false;
+  rangeRing.visible = false;
+  game.ui.hidePlaceBar();
+};
+game.isPlacing = () => !!place;
+game.placeInfo = () => place ? { type: place.type, cx: place.cx, cz: place.cz, valid: place.valid } : null;
+game.canBuild = (cx, cz) => isBuildable(game.world, cx, cz) && !game.towers.at(cx, cz);
+
 // ── UI + menus + input ───────────────────────────────────────────────────────
 game.ui = createUI(game);
 const menus = createMenus(game);
 
 const input = createInput(renderer.domElement, camera, {
+  onPlaceDrag(dx, dy) { game.dragPlace(dx, dy); },
+  onPlaceRelease() { game.confirmPlace(); },
   onTapCell(cx, cz) {
     if (game.state !== 'game' || game.phase === 'won' || game.phase === 'lost') return;
     AU.unlock();
+    if (place) { game.movePlaceTo(cx, cz); return; }   // tap moves the ghost, drag-release builds
     const t = game.towers.at(cx, cz);
     if (t) {
       game.selected = t;
@@ -120,10 +227,10 @@ const input = createInput(renderer.domElement, camera, {
       game.ui.closeSheet();
     }
   },
-  onTapMiss() { game.ui.closeSheet(); },
+  onTapMiss() { if (!place) game.ui.closeSheet(); },
   onDrag() { /* camera moved */ },
   onHover(cx, cz) {
-    if (game.state !== 'game' || !game.world) { hoverMark.visible = false; return; }
+    if (game.state !== 'game' || !game.world || place) { hoverMark.visible = false; return; }
     if (isBuildable(game.world, cx, cz) && !game.towers.at(cx, cz)) {
       const { x, z } = LV.cellToWorld(game.level, cx, cz);
       hoverMark.position.set(x, 0.03, z);
@@ -142,13 +249,24 @@ game.buildAt = async (type, cx, cz) => {
   if (!isBuildable(game.world, cx, cz) || game.towers.at(cx, cz)) return;
   game.gold -= def.cost[0];
   game.ui.closeSheet();
-  await game.towers.build(type, cx, cz);
-  AU.sfx.build();
+  game.clearSelection();
+  AU.sfx.click();
+  await game.towers.build(type, cx, cz, { instant: game.shotMode });
   if (type === 'catapult') game.ui.tip('catapult', 'Catapults can’t hit enemies up close — keep them a couple of plots back from the road.');
   if (type === 'frost') game.ui.tip('frost', 'Frost Spires chill everything near them. Pair one with heavy hitters just down the road.');
 };
+// a tower finished being raised (bus.onBuilt) — it starts working now
+game.onTowerBuilt = () => AU.sfx.build();
+game.cancelBuild = (t) => {
+  const refund = game.towers.cancelBuild(t);
+  if (!refund) return;
+  game.gold += refund;
+  AU.sfx.sell();
+  game.ui.toast(`Build cancelled +${refund} 🪙`, true);
+  game.ui.closeSheet();
+};
 game.upgradeTower = (t) => {
-  if (t.lvl >= 2) return;
+  if (t.lvl >= 2 || t.building > 0) return;
   const cost = t.def.cost[t.lvl + 1];
   if (game.gold < cost) { AU.sfx.nogold(); game.ui.toast('Not enough gold'); return; }
   game.gold -= cost;
@@ -159,6 +277,7 @@ game.upgradeTower = (t) => {
   });
 };
 game.sellTower = (t) => {
+  if (t.building > 0) { game.cancelBuild(t); return; }
   const refund = game.towers.sell(t);
   game.gold += refund;
   AU.sfx.sell();
@@ -197,6 +316,7 @@ game.startCustom = (level) => startLevel(level, { isCustom: true });
 
 // ── level lifecycle ──────────────────────────────────────────────────────────
 function teardownLevel() {
+  game.endPlace?.();
   game.enemies?.clear();
   game.towers?.clear();
   clearProjectiles();
@@ -267,6 +387,7 @@ async function startLevel(level, { isCustom = false, levelNum = 0 } = {}) {
       s[tw.def.proj]?.();
     },
     onExplode() { AU.sfx.boom(); },
+    onBuilt() { game.onTowerBuilt(); },
   };
 
   game.enemies = createEnemies(scene, game.world, bus);
@@ -302,7 +423,7 @@ async function startLevel(level, { isCustom = false, levelNum = 0 } = {}) {
   }
   AU.startMusic(level.theme);
   if (level.tip) game.ui.toast(`📜 ${level.tip}`);
-  game.ui.tip('build1', 'Tap any empty plot beside the road to build a tower. The first wave is coming!');
+  game.ui.tip('build1', 'Hit 🔨 Build (or tap an empty plot) to raise a tower. The first wave is coming!');
 
   if (game.shotMode) setupShot();
   if (game.autoMode) setupAuto();
@@ -314,6 +435,7 @@ function starCount() {
 }
 function win() {
   game.phase = 'won';
+  game.endPlace();
   AU.sfx.win();
   const stars = starCount();
   if (!game.isCustom && !game.testMode && game.levelNum) LV.recordWin(game.level.id, stars);
@@ -326,6 +448,7 @@ function win() {
 }
 function lose() {
   game.phase = 'lost';
+  game.endPlace();
   AU.sfx.lose();
   game.ui.showLose({ wave: game.waves.idx + 1, kills: game.kills });
 }
@@ -348,7 +471,7 @@ async function setupShot() {
   game.ui.hide();
   const plan = [['ballista', 5, 5], ['cannon', 7, 4], ['frost', 6, 8], ['arcane', 12, 4], ['ballista', 13, 9], ['catapult', 9, 9]];
   for (const [type, cx, cz] of plan)
-    if (isBuildable(game.world, cx, cz)) await game.towers.build(type, cx, cz);
+    if (isBuildable(game.world, cx, cz)) await game.towers.build(type, cx, cz, { instant: true });
   const kinds = ['shambler', 'rotter', 'bones', 'raider', 'shambler', 'rotter', 'shambler', 'knight'];
   for (let i = 0; i < kinds.length; i++) {
     const e = await game.enemies.spawn(kinds[i], 0);
@@ -431,6 +554,7 @@ function loop() {
       input.update(dt);
       game.ui.updateHud();
       game.ui.updateWaveButton();
+      game.ui.updateBuildBar();
     }
   }
   renderer.render(scene, camera);

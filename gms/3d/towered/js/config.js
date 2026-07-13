@@ -7,6 +7,9 @@ export const ECON = {
   sellRefund: 0.7,                     // fraction of invested gold returned
   earlyBonusPerSec: 2,                 // gold per second left on the clock
   waveGap: 18,                         // seconds between waves (auto-start)
+  buildTime: 3,                        // sim seconds a tower spends being raised
+                                       // (it can't fire yet — and can be cancelled
+                                       //  for a full refund until it's done)
   waveBonus: (i) => 12 + i * 3,        // gold for clearing wave i (0-based)
 };
 

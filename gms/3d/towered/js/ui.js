@@ -19,12 +19,18 @@ export function createUI(game) {
     boss: $('bossbanner'), flash: $('dmgflash'),
     sheet: $('sheet'), sheetCard: $('sheet-card'),
     modal: $('modal'), modalCard: $('modal-card'),
+    build: $('btn-build'), placebar: $('placebar'), pbIcon: $('pb-icon'),
+    pbName: $('pb-name'), pbHint: $('pb-hint'), pbCost: $('pb-cost'), pbOk: $('pb-ok'),
+    raising: $('raising'),
   };
 
   el.speed.onclick = () => { sfx.click(); game.cycleSpeed(); };
   el.pause.onclick = () => { sfx.click(); game.openPause(); };
   el.waveBtn.onclick = () => game.callWave();
   $('tip-ok').onclick = () => { el.tipbox.classList.add('hidden'); sfx.click(); };
+  el.build.onclick = () => { sfx.click(); ui.openPicker(); };
+  el.pbOk.onclick = () => game.confirmPlace();
+  $('pb-cancel').onclick = () => { sfx.click(); game.endPlace(); };
 
   // ── HUD ──
   let lastGold = -1, lastLives = -1, lastWaveTxt = '';
@@ -37,6 +43,52 @@ export function createUI(game) {
   ui.setSpeedLabel = (s) => { el.speed.textContent = `${s}×`; };
   ui.show = () => el.hud.classList.remove('hidden');
   ui.hide = () => el.hud.classList.add('hidden');
+
+  // ── placing a tower ──
+  ui.showPlaceBar = (def) => {
+    el.pbIcon.textContent = def.icon;
+    el.pbName.textContent = def.name;
+    el.pbCost.textContent = `🪙 ${def.cost[0]}`;
+    el.placebar.classList.remove('hidden');
+    el.hud.classList.add('placing');
+  };
+  ui.updatePlaceBar = (place) => {
+    const bad = !place.valid;
+    el.placebar.classList.toggle('bad', bad);
+    el.pbOk.disabled = bad;
+    el.pbHint.textContent = bad
+      ? (game.gold < place.def.cost[0] ? 'Not enough gold' : 'Can’t build on the road or the scenery')
+      : 'Drag anywhere to move · lift to build';
+  };
+  ui.hidePlaceBar = () => {
+    el.placebar.classList.add('hidden');
+    el.hud.classList.remove('placing');
+  };
+
+  // ── towers being raised: progress + a cancel while there's still time ──
+  const raisingRows = new Map();
+  ui.updateBuildBar = () => {
+    const building = game.towers ? game.towers.list.filter(t => t.building > 0) : [];
+    for (const [t, row] of raisingRows) {
+      if (!building.includes(t)) { row.remove(); raisingRows.delete(t); }
+    }
+    for (const t of building) {
+      let row = raisingRows.get(t);
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'raise-row';
+        row.innerHTML = `<span class="ic">${t.def.icon}</span>
+          <div class="rr-mid"><b>Raising ${t.def.name}…</b><div class="rr-bar"><i></i></div></div>
+          <button class="rr-x">✕ Cancel</button>`;
+        row.querySelector('.rr-x').onclick = () => { sfx.click(); game.cancelBuild(t); };
+        el.raising.appendChild(row);
+        raisingRows.set(t, row);
+      }
+      const p = 1 - t.building / ECON.buildTime;
+      row.querySelector('.rr-bar i').style.width = `${Math.round(p * 100)}%`;
+    }
+    el.raising.classList.toggle('hidden', building.length === 0);
+  };
 
   ui.hurtFlash = () => {
     el.flash.classList.remove('on'); void el.flash.offsetWidth; el.flash.classList.add('on');
@@ -114,30 +166,57 @@ export function createUI(game) {
     ui.sheetOpen = null;
     game.clearSelection();
   };
+  let armTimer = 0;
   function openSheet(html) {
     el.sheetCard.innerHTML = html;
     el.sheet.classList.remove('hidden');
+    // A touch that opens the sheet also fires a compatibility click a moment
+    // later — right on top of whatever row just appeared under the finger.
+    // Stay inert until the finger is long gone.
+    el.sheet.style.pointerEvents = 'none';
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => { el.sheet.style.pointerEvents = ''; }, 350);
     el.sheetCard.querySelector('.sheet-x')?.addEventListener('click', () => { sfx.click(); ui.closeSheet(); });
   }
 
-  ui.openBuild = (cx, cz) => {
-    ui.sheetOpen = { kind: 'build', cx, cz };
-    const rows = Object.entries(TOWERS).map(([id, d]) => {
+  // The tower picker: from a tapped plot (cx,cz) or from the Build button
+  // (no plot — the ghost starts mid-screen and gets dragged into place).
+  function towerRows() {
+    return Object.entries(TOWERS).map(([id, d]) => {
       const can = game.gold >= d.cost[0];
       return `<button class="tw-row ${can ? '' : 'cant'}" data-t="${id}">
         <span class="ic">${d.icon}</span>
         <span class="inf"><b>${d.name}</b><small>${d.desc}</small></span>
         <span class="cost">🪙 ${d.cost[0]}</span></button>`;
     }).join('');
-    openSheet(`<div class="sheet-title">Build a tower <small>on this plot</small><button class="sheet-x">✕</button></div>${rows}`);
+  }
+  function wirePicker(cx, cz) {
     el.sheetCard.querySelectorAll('[data-t]').forEach(b => {
-      b.onclick = () => game.buildAt(b.dataset.t, cx, cz);
+      b.onclick = () => { sfx.click(); game.beginPlace(b.dataset.t, cx, cz); };
     });
+  }
+
+  ui.openBuild = (cx, cz) => {
+    ui.sheetOpen = { kind: 'build', cx, cz };
+    openSheet(`<div class="sheet-title">Build a tower <small>on this plot</small><button class="sheet-x">✕</button></div>${towerRows()}`);
+    wirePicker(cx, cz);
+  };
+
+  ui.openPicker = () => {
+    ui.sheetOpen = { kind: 'build' };
+    openSheet(`<div class="sheet-title">Build a tower <small>then drag it into place</small><button class="sheet-x">✕</button></div>${towerRows()}`);
+    wirePicker(null, null);
   };
 
   ui.openTower = (t) => {
     ui.sheetOpen = { kind: 'tower', t };
     const d = t.def, lvl = t.lvl, maxed = lvl >= 2;
+    if (t.building > 0) {   // still going up — nothing to upgrade yet, but you can back out
+      openSheet(`<div class="sheet-title">${d.icon} ${d.name} <small>being raised…</small><button class="sheet-x">✕</button></div>
+        <div class="sheet-btns"><button class="b-sell">✕ Cancel build · refund 🪙 ${t.invested}</button></div>`);
+      el.sheetCard.querySelector('.b-sell').onclick = () => game.cancelBuild(t);
+      return;
+    }
     const pips = '●'.repeat(lvl + 1) + `<span class="off">${'●'.repeat(2 - lvl)}</span>`;
     const nxt = (arr) => maxed ? '' : ` <i>→ ${arr[lvl + 1]}</i>`;
     const stats = [
@@ -222,8 +301,13 @@ export function createUI(game) {
         the gate costs ❤️ hearts — lose them all and the castle falls. Survive
         every wave to win. Fewer hearts lost = more ★.
         <h3>Build &amp; upgrade</h3>
-        Tap any empty plot beside the road to build. Tap a tower to upgrade it
-        (two upgrades each) or sell it back for ${Math.round(ECON.sellRefund * 100)}% of its gold.
+        Hit <b>🔨 Build</b> (or tap an empty plot) and pick a tower. A ghost of it
+        appears with its range ring — <b>drag anywhere on screen</b> to slide it to the
+        perfect plot, then lift your finger to raise it. Green means it fits; red
+        means the road, scenery or your purse says no.<br>
+        Towers take ${ECON.buildTime}s to raise and can't fire until they're up —
+        cancel during that time for <b>all</b> your gold back. Tap a finished tower to
+        upgrade it (two upgrades each) or sell it for ${Math.round(ECON.sellRefund * 100)}% of its gold.
         <h3>The towers</h3>${towers}
         <h3>Know your enemy</h3>
         <div class="hp-row"><span class="ic">⚔️</span><div><b>Armoured</b> foes (knights, shieldmaidens) shrug off small hits — use cannons and catapults.</div></div>

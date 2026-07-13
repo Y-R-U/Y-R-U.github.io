@@ -9,7 +9,7 @@ import { model } from './assets.js';
 import { cellToWorld, cellKey } from './levels.js';
 import { launchBolt, launchBall, boltTime, flightTime } from './projectiles.js';
 import { explosion, frostPulse, zapArc, glowSprite } from './fx.js';
-import { M, mesh, lerpAngle, damp } from './utils.js';
+import { M, mesh, lerpAngle, damp, clamp } from './utils.js';
 
 const fitScale = (inst, targetW, targetH) => {
   const s = inst.userData.size;
@@ -25,7 +25,7 @@ export function createTowers(scene, world, enemies, bus) {
 
   mgr.at = (cx, cz) => mgr.byCell.get(cellKey(cx, cz)) || null;
 
-  mgr.build = async (type, cx, cz) => {
+  mgr.build = async (type, cx, cz, { instant = false } = {}) => {
     const def = TOWERS[type];
     const { x, z } = cellToWorld(world.level, cx, cz);
     const group = new THREE.Group();
@@ -36,7 +36,15 @@ export function createTowers(scene, world, enemies, bus) {
       type, def, lvl: 0, cx, cz, group,
       pos: group.position, cd: def.period[0] * 0.4, invested: def.cost[0],
       head: null, headYaw: 0, baseH: 0, kills: 0,
+      building: instant ? 0 : ECON.buildTime,   // sim seconds left before it works
     };
+    if (t.building > 0) {
+      group.scale.y = 0.12;                     // rises out of the ground as it's raised
+      const ring = mesh(new THREE.TorusGeometry(CELL * 0.44, 0.05, 6, 20).rotateX(Math.PI / 2),
+        M(0xd8ae4e, { emissive: 0x6a4f14 }), 0, 0.08, 0, false);
+      group.add(ring);
+      t.scaffold = ring;
+    }
 
     // base (untinted — tint is for the head only)
     if (def.base) {
@@ -101,8 +109,62 @@ export function createTowers(scene, world, enemies, bus) {
     return t;
   };
 
+  // A translucent stand-in shown while the player picks a plot, so what you
+  // drag around is exactly what gets raised.
+  mgr.ghost = async (type) => {
+    const def = TOWERS[type];
+    const group = new THREE.Group();
+    const soften = (o) => o.traverse(m => {
+      if (!m.isMesh) return;
+      m.material = m.material.clone();
+      m.material.transparent = true; m.material.opacity = 0.45; m.material.depthWrite = false;
+      m.castShadow = false; m.receiveShadow = false;
+    });
+    let baseH = 0;
+    if (def.base) {
+      const base = await model(def.base, { ownMaterial: true });
+      const scl = fitScale(base, CELL * 0.92, 1.9);
+      base.scale.setScalar(scl);
+      soften(base);
+      group.add(base);
+      baseH = base.userData.size.y * scl;
+    } else if (type === 'catapult') {
+      baseH = 0.24;
+    } else {
+      const obelisk = mesh(new THREE.CylinderGeometry(0.22, 0.44, 1.7, 6),
+        M(0x3d3a4a, { transparent: true, opacity: 0.45, depthWrite: false }), 0, 0.85, 0, false);
+      group.add(obelisk);
+      baseH = 2.0;
+    }
+    if (def.head) {
+      const head = await model(def.head, { ownMaterial: true });
+      const scl = type === 'catapult' ? fitScale(head, CELL * 1.06, 2.2)
+        : type === 'frost' ? fitScale(head, 0.95, 0.9)
+        : type === 'arcane' ? fitScale(head, 0.6, 0.6)
+        : fitScale(head, 1.7, 1.35);
+      head.scale.setScalar(scl);
+      head.position.y = baseH + 0.02;
+      soften(head);
+      group.add(head);
+    }
+    scene.add(group);
+    return group;
+  };
+  mgr.removeGhost = (g) => scene.remove(g);
+
+  // Abandon a half-raised tower — the gold spent on it comes straight back.
+  mgr.cancelBuild = (t) => {
+    if (!(t.building > 0)) return 0;
+    const refund = t.invested;
+    scene.remove(t.group);
+    mgr.byCell.delete(cellKey(t.cx, t.cz));
+    const i = mgr.list.indexOf(t);
+    if (i >= 0) mgr.list.splice(i, 1);
+    return refund;
+  };
+
   mgr.upgrade = async (t) => {
-    if (t.lvl >= 2) return false;
+    if (t.lvl >= 2 || t.building > 0) return false;
     t.lvl++;
     t.invested += t.def.cost[t.lvl];
     const s = 1 + t.lvl * 0.09;
@@ -165,6 +227,19 @@ export function createTowers(scene, world, enemies, bus) {
 
   mgr.update = (dt, t) => {
     for (const tw of mgr.list) {
+      if (tw.building > 0) {                 // still being raised: grows, doesn't fire
+        tw.building -= dt;
+        const p = clamp(1 - tw.building / ECON.buildTime, 0, 1);
+        tw.group.scale.y = 0.12 + 0.88 * p;
+        if (tw.scaffold) tw.scaffold.rotation.z += dt * 2.2;
+        if (tw.building <= 0) {
+          tw.building = 0;
+          tw.group.scale.y = 1;
+          if (tw.scaffold) { tw.group.remove(tw.scaffold); tw.scaffold = null; }
+          bus.onBuilt?.(tw);
+        }
+        continue;
+      }
       tw.cd -= dt;
       if (tw.halo) tw.halo.material.rotation += dt;
       if (tw.type === 'frost' && tw.headModel) tw.headModel.rotation.y += dt * 0.8;

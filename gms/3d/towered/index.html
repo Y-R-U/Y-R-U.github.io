@@ -68,6 +68,22 @@
       <button id="wavebtn"><b id="wavebtn-label">⚔️ Send the wave</b><small id="wavebtn-sub"></small></button>
     </div>
 
+    <button id="btn-build">🔨 <b>Build</b></button>
+
+    <!-- choosing where a tower goes: drag the ghost, lift to raise it -->
+    <div id="placebar" class="hidden">
+      <span id="pb-icon">🏹</span>
+      <div class="pb-inf"><b id="pb-name">Ballista</b><small id="pb-hint"></small></div>
+      <span id="pb-cost" class="cost">🪙 0</span>
+      <div class="pb-btns">
+        <button id="pb-cancel">✕</button>
+        <button id="pb-ok">✓ Build here</button>
+      </div>
+    </div>
+
+    <!-- towers mid-construction: progress + cancel for a full refund -->
+    <div id="raising" class="hidden"></div>
+
     <div id="toasts"></div>
     <div id="tipbox" class="hidden"><span id="tip-text"></span><button id="tip-ok">Got it</button></div>
     <div id="dmgflash"></div>

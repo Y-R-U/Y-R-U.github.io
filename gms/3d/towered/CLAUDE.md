@@ -15,6 +15,18 @@ towers auto-target the frontmost enemy in range and fire → kills pay bounty �
 build/upgrade between (or during) waves → castle loses hearts per leak →
 clear every wave to win 1–3 stars (stars = hearts kept).
 
+**Building** (`js/main.js` placement block + `js/ui.js`): 🔨 Build (or tapping a
+plot) opens the picker → a translucent ghost + range ring appears (at the tapped
+plot, else nearest the screen centre) → **one finger dragged anywhere** slides it
+(`input.dragToWorld`, camera-relative, ghost tracks the finger) → lifting the
+finger builds it (green = fits, red = road/scenery/too poor, and the release is
+refused). The tower then spends `ECON.buildTime` (3 sim s) **being raised**: it
+grows out of the ground, can't fire, and can be cancelled for a **full** refund
+from the "Raising…" bar or its tower sheet. Note the mobile trap this replaced:
+the sheet opens on pointerup and the touch's compatibility click lands on
+whatever row is now under the finger — `openSheet` keeps the sheet
+`pointer-events: none` for 350 ms so it can't self-click.
+
 ## Asset protection (same scheme as deadtown/whoami)
 
 PolyPerfect packs are commercial — **no raw GLB/PNG in the repo**. Everything is
@@ -112,6 +124,8 @@ waits, and `window.__game.step(dt)` to hand-step. Editor exposes
 
 - Realms: 1–5 Meadow, 6–10 Autumn, 11–15 Winter, 16–20 Ashlands; bosses at
   5/10/15/20; dual paths from level 8.
+- Towers take 3 sim seconds to raise (`ECON.buildTime`) and don't fire until up;
+  cancelling mid-raise refunds 100 %, selling a finished tower refunds 70 %.
 - Damage = `max(1, dmg - armor)`; frost slows ×0.55 for 1.6 s (no stack);
   arcane chains with 0.7 falloff; catapult has a min range.
 - Early wave call bonus = 2 gold / remaining second.
