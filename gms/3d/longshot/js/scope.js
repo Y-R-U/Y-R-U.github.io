@@ -21,7 +21,6 @@ export class ScopeRig {
     this.scopeEl = document.getElementById('scope');
 
     this.yaw = 0; this.pitch = 0;
-    this.baseYaw = 0;
     this.scoped = false;
     this.zoomFrac = 0;
     this.fov = VIEW.fov;
@@ -83,7 +82,6 @@ export class ScopeRig {
 
   setVantage(pos, yaw) {
     this.eye = pos.clone();
-    this.baseYaw = yaw;
     this.yaw = yaw;
     this.pitch = -0.06;
     this.camera.position.copy(this.eye);

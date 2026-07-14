@@ -66,7 +66,12 @@ export class Controls {
       this.move.x = dx / R;
       this.move.y = -dy / R;                          // screen-up = forward
     };
-    const stickEnd = () => {
+    // Release on ANY way the pointer can go away, not just a clean pointerup:
+    // the bullet cam hides #stick mid-drag, and a capture lost on a hidden
+    // element never delivers its pointerup — which would leave `move` latched at
+    // whatever the thumb last held and the shooter walking off by himself.
+    const stickEnd = (e) => {
+      if (e && e.pointerId !== undefined && this._stickId !== null && e.pointerId !== this._stickId) return;
       this._stickId = null;
       knob.style.transform = '';
       this.move.x = this._keyMove.x; this.move.y = this._keyMove.y;
@@ -74,7 +79,7 @@ export class Controls {
     };
     stick.addEventListener('pointerdown', (e) => {
       e.preventDefault(); e.stopPropagation();
-      if (!this.enabled) return;
+      if (!this.enabled || this._stickId !== null) return;   // one thumb owns the stick
       this._stickId = e.pointerId;
       stick.setPointerCapture(e.pointerId);
       stick.classList.add('held');
@@ -87,6 +92,7 @@ export class Controls {
     });
     stick.addEventListener('pointerup', stickEnd);
     stick.addEventListener('pointercancel', stickEnd);
+    stick.addEventListener('lostpointercapture', stickEnd);
 
     // buttons
     const press = (id, down, upFn) => {

@@ -124,13 +124,16 @@ export class MissionRun {
     // roof-top + 1.6 m — miss this and the shooter is lying flat on the gravel
     // with the rooftop filling two-thirds of the screen (and the whole scope).
     const roofY = best.h + 1.4;
+    this.roofY = roofY;              // main.js hands this + vantageB to the Walker.
+    // Both are set BEFORE anything that can throw: the rest of setup() is allowed
+    // to fail (main.js catches it and keeps the contract playable), and a perch
+    // that is half-described would take the walker down with it.
     const yaw = Math.atan2(this.zone.x - best.cx, this.zone.z - best.cz);
     const reach = perchReach(Math.min(best.w, best.d), yaw);   // 3 m short of the edge he faces
     const eye = new T.Vector3(
       best.cx + Math.sin(yaw) * reach, roofY + 1.62, best.cz + Math.cos(yaw) * reach);
     city.setVantage(new T.Vector3(eye.x, roofY, eye.z), yaw, best);
     rig.setVantage(eye, yaw);
-    this.roofY = roofY;              // main.js hands this to the Walker
     rig.setLoadout(this.rifle, this.scope, this.ammo, this.gear);
     this.origin = rig.eye;
     pop.losTest = (pt) => this._losClear(pt);   // fleeing marks stay shootable
@@ -177,8 +180,7 @@ export class MissionRun {
     const look = this.plates.length ? this.plates[0].c
       : (this.targets.find(t => t.person)?.person.group.position.clone().setY(1.4) || this.zone);
     const dv = new T.Vector3().subVectors(look, this.origin);
-    rig.baseYaw = Math.atan2(dv.x, dv.z);
-    rig.yaw = rig.baseYaw;
+    rig.yaw = Math.atan2(dv.x, dv.z);
     rig.pitch = Math.atan2(dv.y, Math.hypot(dv.x, dv.z));
 
     hud.setWind(this.windDir, this.windNow, this.scope.windmeter);

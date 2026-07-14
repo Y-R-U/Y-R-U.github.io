@@ -23,7 +23,7 @@ export class Walker {
     this.pos = new T.Vector3();      // feet, on the surface underfoot
     this.vel = new T.Vector3();
     this.footY = 0;                  // smoothed height of that surface
-    this.bobT = 0;
+    this.bobT = 0; this.bob = 0;
     this.speed = 0;                  // current ground speed (m/s) — HUD/fx
     this.blockers = [];
   }
@@ -39,6 +39,7 @@ export class Walker {
     this.blockers = blockers;
     this.pos.set(start.x, roofY, start.z);
     this.vel.set(0, 0, 0);
+    this.speed = 0; this.bob = 0; this.bobT = 0;
     this.footY = this.surfaceAt(start.x, start.z);
     this.pos.y = this.footY;
     this.enabled = true;
@@ -84,16 +85,22 @@ export class Walker {
     let nx = this.pos.x + this.vel.x * dt;
     let nz = this.pos.z + this.vel.z * dt;
 
-    // solid rooftop clutter: slide around it, never through it
+    // Resolve the roof first and the clutter second, then the roof again: the
+    // rim is the hard constraint (you may NEVER be off it), and a lone push-out
+    // pass can shove you over the edge only for the clamp to shove you straight
+    // back inside the thing you were pushed out of.
+    const onRoof = () => {
+      nx = Math.min(this.maxX, Math.max(this.minX, nx));
+      nz = Math.min(this.maxZ, Math.max(this.minZ, nz));
+    };
+    onRoof();
     for (const o of this.blockers) {
-      if (o.top <= MOVE.stepUp) continue;
+      if (o.top <= MOVE.stepUp) continue;                      // low enough to step on
       const dx = nx - o.x, dz = nz - o.z;
       const d = Math.hypot(dx, dz);
       if (d < o.r && d > 1e-4) { nx = o.x + dx / d * o.r; nz = o.z + dz / d * o.r; }
     }
-    // the roof is the world: you cannot walk off it
-    nx = Math.min(this.maxX, Math.max(this.minX, nx));
-    nz = Math.min(this.maxZ, Math.max(this.minZ, nz));
+    onRoof();
 
     this.pos.x = nx; this.pos.z = nz;
     this.speed = Math.hypot(this.vel.x, this.vel.z);
@@ -105,7 +112,13 @@ export class Walker {
     this.footY += Math.abs(dy) <= step ? dy : Math.sign(dy) * step;
     this.pos.y = this.footY;
 
+    // Head-bob SETTLES when he stops. Freeze the phase instead and the eye keeps
+    // whatever offset it happened to stop on — so two shots from the same spot
+    // are taken from two different eye heights.
     this.bobT += dt * this.speed;
+    const amp = MOVE.bobAmp * Math.min(1, this.speed / (MOVE.speed * 0.4));
+    const wantBob = Math.sin(this.bobT * MOVE.bobHz * 6.28) * amp;
+    this.bob += (wantBob - this.bob) * Math.min(1, dt * 9);
     this._writeEye();
   }
 
@@ -113,7 +126,6 @@ export class Walker {
     // Mutate the rig's eye IN PLACE: MissionRun holds it as `this.origin`, and
     // ballistics/LOS/markers all read through that same object. Replacing it
     // would silently leave the whole game shooting from where you used to stand.
-    const bob = Math.sin(this.bobT * MOVE.bobHz * 6.28) * MOVE.bobAmp;
-    this.rig.eye.set(this.pos.x, this.pos.y + MOVE.eyeH + bob, this.pos.z);
+    this.rig.eye.set(this.pos.x, this.pos.y + MOVE.eyeH + this.bob, this.pos.z);
   }
 }

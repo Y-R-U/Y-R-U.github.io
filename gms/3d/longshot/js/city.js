@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import * as BGU from 'three/addons/utils/BufferGeometryUtils.js';
-import { CITY, TIMES, LITE } from './config.js';
+import { CITY, TIMES, LITE, MOVE } from './config.js';
 import { rng } from './utils.js';
 
 const T = THREE;
@@ -712,25 +712,33 @@ export function buildCity(scene, spec) {
     const bag2 = mk(new T.BoxGeometry(1.2, 0.3, 0.5), 0x7d6c48, fx2 * 1.6 + fz2 * 0.75, y + 0.27, fz2 * 1.6 - fx2 * 0.75);
     bag2.rotation.y = faceYaw;
     place(bag2, 0.9);
+    // A SOLID prop must sit at least its own radius (plus the walk margin) in
+    // from the rim: the walker pushes out of it and is then clamped back onto
+    // the roof, so a blocker that overlaps the walkable edge would trap him
+    // inside itself, seeing through an AC unit.
+    const AC_R = 1.9, ANT_R = 0.35, keepIn = (r) => r + MOVE.edge + 0.05;
     const ac = mk(new T.BoxGeometry(2.6, 1.6, 2.2), 0x5a5e67, -fx2 * 4.5 - 2.2, y + 0.8, -fz2 * 4.5 - 1.4);
-    place(ac, 2.0);
+    place(ac, keepIn(AC_R));
     const ant = mk(new T.CylinderGeometry(0.09, 0.12, 7, 6), 0x6a6e77, -fx2 * 4 + 2.6, y + 3.5, -fz2 * 4 + 1.8);
-    place(ant, 1.0);
+    place(ant, keepIn(ANT_R));
     // blockers are in WORLD space (vg is offset to the stand point)
     const W = (m, r, top) => ({ x: pos.x + m.position.x, z: pos.z + m.position.z, r, top });
     const blockers = [
       W(bag, 1.0, 0.34),          // step up onto the rest
       W(bag2, 0.8, 0.3),
-      W(ac, 1.9, 1.6),            // walk around the AC unit
-      W(ant, 0.35, 7),
+      W(ac, AC_R, 1.6),           // walk around the AC unit
+      W(ant, ANT_R, 7),
     ];
 
     // The coping: a low curb around the rim. It gives the roof an EDGE to toe —
     // step up onto it and there is nothing at all between you and the street
-    // below. Deliberately 0.32 m, not a 1.1 m parapet: a parapet three metres
+    // below. Deliberately ~0.3 m, not a 1.1 m parapet: a parapet three metres
     // ahead of the eye sits exactly on the line of a downward shot.
+    // Its size comes from MOVE, because walk.js stands the shooter ON it: two
+    // copies of these numbers is how the drawn roof and the walked roof drift
+    // apart, which is the whole family of bugs this module keeps producing.
     if (b) {
-      const cw = 0.55, ch = 0.32, cy = y + ch / 2;
+      const cw = MOVE.copingW, ch = MOVE.coping, cy = y + ch / 2;
       const cop = new T.Group();
       const cmat = new T.MeshStandardMaterial({ color: 0x4c5057, roughness: 0.92 });
       for (const [ox, oz, sw, sd] of [

@@ -174,8 +174,15 @@ async function startMission(def) {
     console.error(err);
   }
   setLoad(0.95, 'in position');
-  // the shooter owns his roof: he can pace it, and toe the coping to look down
-  walker.setPerch(mission.vantageB, mission.roofY, rig.eye, G.city.vantage?.blockers || []);
+  // The shooter owns his roof: he can pace it, and toe the coping to look down.
+  // Guarded, because setup() above is ALLOWED to fail — the catch keeps a broken
+  // contract playable, and throwing here instead would strand the loading screen.
+  if (mission.vantageB) {
+    walker.setPerch(mission.vantageB, mission.roofY, rig.eye, G.city.vantage?.blockers || []);
+  } else {
+    walker.clear();
+    errors.push('setup: no perch — walking disabled');
+  }
   G.mission = mission;
   G.mode = 'mission';
   G.paused = false;
