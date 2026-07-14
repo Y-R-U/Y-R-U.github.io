@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#101c14" />
+  <title>Grudge Bugs — 3D insect artillery</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- boot -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">GRUDGE<span>BUGS</span></div>
+      <div class="boot-sub">the last sandwich must fall</div>
+      <div id="boot-status">loading…</div>
+    </div>
+  </div>
+
+  <!-- home menu -->
+  <div id="menu" class="screen hidden">
+    <div class="menu-inner">
+      <div class="game-logo">GRUDGE<span>BUGS</span></div>
+      <div class="game-tag">tiny bugs · narrow ledges · enormous grudges</div>
+      <div class="menu-btns">
+        <button id="btn-continue" class="big gold hidden">▶&ensp;Continue Story</button>
+        <button id="btn-story" class="big gold">🥪&ensp;Story</button>
+        <button id="btn-quick" class="big">💥&ensp;Quick Grudge</button>
+        <button id="btn-shop" class="big">🎩&ensp;Hat Shop <span id="menu-coins" class="coinpill">🪙 0</span></button>
+        <button id="btn-help" class="big">📖&ensp;How to Play</button>
+        <button id="btn-options" class="big">⚙️&ensp;Options</button>
+      </div>
+      <div class="menu-foot">a Y-R-U game</div>
+    </div>
+  </div>
+
+  <!-- story chapter select -->
+  <div id="storyselect" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>The Last Sandwich</h2>
+      <button id="btn-replay-intro" class="iconbtn" title="replay intro">🎬</button>
+    </div>
+    <div id="story-list" class="scr-body"></div>
+  </div>
+
+  <!-- quick battle setup -->
+  <div id="quick" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>Quick Grudge</h2>
+    </div>
+    <div class="scr-body">
+      <div class="form-row"><label>Your faction</label><div id="qk-faction" class="chips"></div></div>
+      <div class="form-row"><label>Rivals</label><div id="qk-rivals" class="chips"></div></div>
+      <div class="form-row"><label>Bugs per team</label><div id="qk-size" class="chips"></div></div>
+      <div class="form-row"><label>Arena</label><div id="qk-theme" class="chips"></div></div>
+      <div class="form-row"><label>AI menace</label><div id="qk-diff" class="chips"></div></div>
+      <button id="qk-start" class="big gold">💥&ensp;Start the Feud</button>
+    </div>
+  </div>
+
+  <!-- hat shop -->
+  <div id="shop" class="screen hidden">
+    <div class="scr-head">
+      <button class="iconbtn back-btn" data-back="menu">←</button>
+      <h2>Hat Shop</h2>
+      <div id="shop-coins" class="coinpill big-pill">🪙 0</div>
+    </div>
+    <div id="shop-list" class="scr-body"></div>
+  </div>
+
+  <!-- in-battle HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-top">
+      <div id="hud-teams"></div>
+      <div id="hud-wind"><span id="wind-arrow">→</span><span id="wind-label">calm</span></div>
+      <div id="hud-timer" class="hidden">45</div>
+    </div>
+    <div id="hud-turn" class="hidden"></div>
+    <div id="hud-corner">
+      <button id="btn-pause" class="iconbtn">⏸️</button>
+      <button id="btn-cam" class="iconbtn" title="free camera">🎥</button>
+    </div>
+    <!-- bottom controls -->
+    <div id="controls" class="hidden">
+      <div id="ctl-left">
+        <button id="btn-walk-l" class="padbtn">◀</button>
+        <button id="btn-walk-r" class="padbtn">▶</button>
+        <div id="walk-meter"><div id="walk-fill"></div></div>
+      </div>
+      <div id="ctl-right">
+        <button id="btn-weapon" class="padbtn wide"><span id="weapon-icon">🚀</span><small id="weapon-name">Acorn RPG</small><em id="weapon-ammo"></em></button>
+        <button id="btn-fire" class="firebtn">FIRE<div id="power-ring"></div></button>
+      </div>
+      <div id="aim-hint" class="hidden">drag to aim · hold FIRE for power</div>
+    </div>
+    <!-- weapon wheel -->
+    <div id="wheel" class="hidden"><div id="wheel-items"></div></div>
+    <!-- power bar -->
+    <div id="powerbar" class="hidden"><div id="power-fill"></div></div>
+  </div>
+
+  <!-- cinematics: letterbox, banners, subtitles -->
+  <div id="cine" class="hidden">
+    <div class="bar top"></div><div class="bar bot"></div>
+    <div id="cine-banner" class="hidden"></div>
+    <div id="cine-sub" class="hidden"></div>
+    <button id="cine-skip" class="hidden">skip ⏭</button>
+  </div>
+  <div id="replay-tag" class="hidden">📼 INSTANT REPLAY<span id="replay-angle"></span></div>
+
+  <!-- speech bubbles layer -->
+  <div id="bubbles"></div>
+
+  <!-- generic modal + toasts -->
+  <div id="modal-root" class="hidden"></div>
+  <div id="toasts"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
