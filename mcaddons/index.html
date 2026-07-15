@@ -104,12 +104,13 @@
     text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
     cursor: pointer;
   }
-  .mc-btn:hover {
-    background: linear-gradient(#8a9dd8, #6f83c4 45%, #5b6ea8);
-  }
   .mc-btn:active { box-shadow: inset -2px -2px 0 rgba(255,255,255,0.2), inset 2px 2px 0 rgba(0,0,0,0.5); }
   .mc-btn.green { background: linear-gradient(#7ccf58, #5da83e 45%, #4a8c30); }
-  .mc-btn.green:hover { background: linear-gradient(#8ee06a, #6cbb4c 45%, #57a03a); }
+  /* hover tints only on devices with a real pointer — no stuck buttons on touch */
+  @media (hover: hover) {
+    .mc-btn:hover { background: linear-gradient(#8a9dd8, #6f83c4 45%, #5b6ea8); }
+    .mc-btn.green:hover { background: linear-gradient(#8ee06a, #6cbb4c 45%, #57a03a); }
+  }
 
   /* ---------- downloads ---------- */
   #file-list {
@@ -144,7 +145,9 @@
     padding: 18px;
     transition: transform 0.12s ease, outline-color 0.12s ease;
   }
-  .item-card:hover { transform: translateY(-3px); outline-color: var(--grass); }
+  @media (hover: hover) {
+    .item-card:hover { transform: translateY(-3px); outline-color: var(--grass); }
+  }
   .item-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
   .item-head img { width: 56px; height: 56px; background: var(--panel2); border: 2px solid #000; padding: 4px; }
   .item-head .sky-swatch { width: 56px; height: 56px; border: 2px solid #000; }
@@ -296,7 +299,7 @@ function renderFiles(files, meta, source) {
       <p class="fc-desc">${m.desc || "Minecraft Bedrock addon."}</p>
       <div class="fc-actions">
         <a class="mc-btn green" href="files/${encodeURIComponent(f.name)}" download>⬇ DOWNLOAD</a>
-        ${m.details ? `<a class="mc-btn" href="#details-${m.details}">📜 DETAILS</a>` : ""}
+        ${m.details ? `<a class="mc-btn" href="#details-${m.details}" data-details="${m.details}">📜 DETAILS</a>` : ""}
       </div>`;
     list.appendChild(card);
   }
@@ -461,22 +464,39 @@ function showDetails(key, scroll = true) {
     const el = document.getElementById("details-" + k);
     if (el) el.style.display = k === key ? "" : "none";
   }
-  if (scroll) document.getElementById("details-" + key).scrollIntoView({ behavior: "smooth", block: "start" });
+  if (scroll) {
+    const el = document.getElementById("details-" + key);
+    try {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (e) {
+      el.scrollIntoView(true);
+    }
+  }
 }
 
-// DETAILS buttons on the download cards switch the visible block
+// The DETAILS buttons are plain #details-<key> anchors. Switching is driven
+// by the hash, so taps, back/forward and shared deep links all take the same
+// path — no reliance on the click being intercepted.
+function detailsKeyFromHash() {
+  return (location.hash.match(/^#details-([a-z0-9_-]+)$/i) || [])[1];
+}
+window.addEventListener("hashchange", () => {
+  const key = detailsKeyFromHash();
+  if (key && DETAILS[key]) showDetails(key);
+});
+// tapping the button for the already-set hash fires no hashchange — handle it
 document.getElementById("file-list").addEventListener("click", (e) => {
   const a = e.target.closest("a[data-details]");
   if (!a) return;
-  e.preventDefault();
-  const key = a.dataset.details;
-  history.replaceState(null, "", "#details-" + key);
-  showDetails(key);
+  if ("#details-" + a.dataset.details === location.hash) {
+    e.preventDefault();
+    showDetails(a.dataset.details);
+  }
 });
 
 renderDetails();
 // deep links like #details-muffins open on that addon's details
-const initialKey = (location.hash.match(/^#details-([a-z0-9_-]+)$/i) || [])[1];
+const initialKey = detailsKeyFromHash();
 showDetails(DETAILS[initialKey] ? initialKey : "trolling", false);
 </script>
 </body>
