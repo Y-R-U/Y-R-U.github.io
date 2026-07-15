@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "trolling:speed_minecart_item",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "trolling_speed_minecart",
+      "minecraft:display_name": {
+        "value": "§cSpeed Minecart"
+      },
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

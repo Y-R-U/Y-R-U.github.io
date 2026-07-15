@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Trolling Addon [Resources]",
+    "description": "Textures, models and animations for the Trolling Addon. By Y-R-U.",
+    "uuid": "993d060f-5e5e-4d9c-ba4b-29b42e424fe0",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "6ab68d1e-36ce-4baa-81aa-459b86aeafc8",
+      "version": [1, 0, 0]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "format_version": "1.21.30",
+  "minecraft:block": {
+    "description": {
+      "identifier": "trolling:pure_sky_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.75
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6
+      },
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "trolling_pure_sky",
+          "render_method": "opaque",
+          "ambient_occlusion": false,
+          "face_dimming": false
+        }
+      },
+      "minecraft:map_color": "#7ca8ff",
+      "minecraft:light_dampening": 0,
+      "minecraft:loot": "loot_tables/blocks/empty.json"
+    }
+  }
+}

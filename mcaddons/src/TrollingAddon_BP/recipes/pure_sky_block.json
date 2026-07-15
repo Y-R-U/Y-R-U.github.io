@@ -1,0 +1,24 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "trolling:recipe_pure_sky_block"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      " F ",
+      "FDF",
+      " F "
+    ],
+    "key": {
+      "F": { "item": "minecraft:feather" },
+      "D": { "item": "minecraft:diamond_block" }
+    },
+    "unlock": [
+      { "item": "minecraft:diamond_block" }
+    ],
+    "result": {
+      "item": "trolling:pure_sky_block"
+    }
+  }
+}

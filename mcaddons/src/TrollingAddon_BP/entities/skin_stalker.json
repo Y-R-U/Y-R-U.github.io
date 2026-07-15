@@ -1,0 +1,46 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "trolling:skin_stalker",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": ["trolling_mock", "inanimate"]
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.9
+      },
+      "minecraft:health": {
+        "value": 40,
+        "max": 40
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:breathable": {
+        "breathes_water": true
+      },
+      "minecraft:nameable": {
+        "always_show": true,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:persistent": {}
+    }
+  }
+}

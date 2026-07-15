@@ -1,0 +1,11 @@
+item.trolling:speed_minecart_item=Speed Minecart
+item.trolling:skin_mocker_item=Skin Mocker
+item.trolling:skin_stalker_item=Skin Mock Stalker
+item.trolling:skin_hunter_item=Skin Mock Hunter
+item.trolling:god_pickaxe=God Pickaxe
+item.trolling:chunk_miner=Chunk Miner
+tile.trolling:pure_sky_block.name=Pure Sky Block
+entity.trolling:speed_minecart.name=Speed Minecart
+entity.trolling:skin_mocker.name=Skin Mocker
+entity.trolling:skin_stalker.name=Skin Mock Stalker
+entity.trolling:skin_hunter.name=Skin Mock Hunter

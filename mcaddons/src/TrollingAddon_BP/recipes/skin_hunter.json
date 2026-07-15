@@ -1,0 +1,19 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "trolling:recipe_skin_hunter"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "trolling:skin_stalker_item" },
+      { "item": "minecraft:wooden_sword" }
+    ],
+    "unlock": [
+      { "item": "trolling:skin_stalker_item" }
+    ],
+    "result": {
+      "item": "trolling:skin_hunter_item"
+    }
+  }
+}

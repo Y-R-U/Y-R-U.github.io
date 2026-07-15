@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y-R-U MC Addons</title>
+<link rel="icon" href="img/pack_icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0e13;
+    --panel: #17191f;
+    --panel2: #1e212b;
+    --edge: #2c2f3a;
+    --grass: #6cc349;
+    --dirt: #6b4a2f;
+    --dirt-dark: #4a3220;
+    --gold: #ffc83c;
+    --red: #ff4a3c;
+    --sky: #7ca8ff;
+    --text: #d8dae2;
+    --dim: #8b8e9c;
+    --pixel: 'Press Start 2P', 'Courier New', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  img.px { image-rendering: pixelated; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    text-align: center;
+    padding: 64px 16px 88px;
+    background:
+      linear-gradient(rgba(13,14,19,0.55), rgba(13,14,19,0.92)),
+      repeating-linear-gradient(45deg, #14161d 0 24px, #12141a 24px 48px);
+    border-bottom: 4px solid var(--grass);
+    box-shadow: 0 4px 0 var(--dirt), 0 8px 0 var(--dirt-dark);
+  }
+  .hero h1 {
+    font-family: var(--pixel);
+    font-size: clamp(20px, 5vw, 42px);
+    color: var(--grass);
+    text-shadow: 3px 3px 0 #1d3a12, 6px 6px 0 rgba(0,0,0,0.5);
+    margin-bottom: 18px;
+    letter-spacing: 2px;
+  }
+  .hero p {
+    font-family: var(--pixel);
+    font-size: clamp(9px, 1.8vw, 13px);
+    color: var(--dim);
+  }
+  .hero .float {
+    position: absolute;
+    width: 48px; height: 48px;
+    image-rendering: pixelated;
+    opacity: 0.85;
+    animation: bob 6s ease-in-out infinite;
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.6));
+    pointer-events: none;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-18px) rotate(4deg); }
+  }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+  h2.section {
+    font-family: var(--pixel);
+    font-size: clamp(13px, 2.6vw, 20px);
+    margin: 56px 0 20px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.7);
+  }
+  h2.section::before { content: "▚ "; color: var(--grass); }
+
+  /* ---------- MC panels & buttons ---------- */
+  .panel {
+    background: var(--panel);
+    border: 2px solid #000;
+    outline: 2px solid var(--edge);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .mc-btn {
+    display: inline-block;
+    font-family: var(--pixel);
+    font-size: 11px;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 22px;
+    background: linear-gradient(#7d7f88, #6c6e77 45%, #5c5e66);
+    border: 2px solid #000;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,0.35), inset -2px -2px 0 rgba(0,0,0,0.45);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+    cursor: pointer;
+  }
+  .mc-btn:hover {
+    background: linear-gradient(#8a9dd8, #6f83c4 45%, #5b6ea8);
+  }
+  .mc-btn:active { box-shadow: inset -2px -2px 0 rgba(255,255,255,0.2), inset 2px 2px 0 rgba(0,0,0,0.5); }
+  .mc-btn.green { background: linear-gradient(#7ccf58, #5da83e 45%, #4a8c30); }
+  .mc-btn.green:hover { background: linear-gradient(#8ee06a, #6cbb4c 45%, #57a03a); }
+
+  /* ---------- downloads ---------- */
+  .file-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+  }
+  .file-card img { width: 84px; height: 84px; flex: 0 0 auto; border: 2px solid #000; outline: 2px solid var(--edge); }
+  .file-info { flex: 1 1 260px; }
+  .file-info h3 { font-family: var(--pixel); font-size: 14px; color: #fff; margin-bottom: 8px; }
+  .file-info .meta { font-family: var(--pixel); font-size: 8px; color: var(--dim); margin-bottom: 10px; letter-spacing: 1px; }
+  .file-info p { color: var(--text); font-size: 14px; }
+  .file-dl { flex: 0 0 auto; }
+  #file-status { font-family: var(--pixel); font-size: 9px; color: var(--dim); margin-top: 4px; }
+
+  /* ---------- item showcase ---------- */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 18px;
+  }
+  .item-card {
+    background: var(--panel);
+    border: 2px solid #000;
+    outline: 2px solid var(--edge);
+    padding: 18px;
+    transition: transform 0.12s ease, outline-color 0.12s ease;
+  }
+  .item-card:hover { transform: translateY(-3px); outline-color: var(--grass); }
+  .item-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .item-head img { width: 56px; height: 56px; background: var(--panel2); border: 2px solid #000; padding: 4px; }
+  .item-head .sky-swatch { width: 56px; height: 56px; border: 2px solid #000; }
+  .item-head h3 { font-family: var(--pixel); font-size: 11px; line-height: 1.7; }
+  .item-card p { font-size: 13.5px; color: var(--dim); margin-bottom: 12px; }
+  .item-card p strong { color: var(--text); }
+  .tag { display: inline-block; font-family: var(--pixel); font-size: 7px; padding: 4px 7px; border: 1px solid var(--edge); color: var(--dim); margin: 0 6px 6px 0; letter-spacing: 1px; }
+
+  /* ---------- crafting grid ---------- */
+  .craft { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+  .craft-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 42px);
+    grid-template-rows: repeat(3, 42px);
+    gap: 3px;
+    background: #2a2c34;
+    border: 2px solid #000;
+    padding: 5px;
+  }
+  .craft-cell {
+    background: #383b45;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), inset -1px -1px 0 rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    position: relative;
+  }
+  .craft-cell img { width: 32px; height: 32px; }
+  .craft-arrow { font-family: var(--pixel); font-size: 16px; color: var(--dim); }
+  .craft-out {
+    width: 52px; height: 52px;
+    background: #383b45;
+    border: 2px solid #000;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .craft-out img { width: 40px; height: 40px; }
+  .craft-cell[title]:hover::after, .craft-out[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #100d1c;
+    color: #fff;
+    border: 1px solid #5a4a9c;
+    font-family: var(--pixel);
+    font-size: 7px;
+    padding: 5px 7px;
+    white-space: nowrap;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  /* ---------- install steps ---------- */
+  ol.steps { margin-left: 22px; }
+  ol.steps li { margin-bottom: 10px; font-size: 14.5px; }
+  ol.steps b { color: var(--gold); }
+  .note { border-left: 4px solid var(--sky); background: var(--panel2); padding: 12px 14px; font-size: 13.5px; color: var(--dim); margin-top: 14px; }
+  .note b { color: var(--sky); }
+
+  footer {
+    margin-top: 70px;
+    padding: 26px 16px 34px;
+    text-align: center;
+    font-family: var(--pixel);
+    font-size: 8px;
+    color: var(--dim);
+    border-top: 4px solid var(--dirt);
+    background: #101117;
+    letter-spacing: 1px;
+  }
+  footer a { color: var(--grass); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="float px" src="img/god_pickaxe.png" alt="" style="left:8%;  top:22%; animation-delay:0s">
+  <img class="float px" src="img/speed_minecart.png" alt="" style="left:20%; top:62%; animation-delay:1.2s">
+  <img class="float px" src="img/pure_sky_block.png" alt="" style="right:20%; top:60%; animation-delay:2.1s">
+  <img class="float px" src="img/skin_hunter.png" alt="" style="right:8%;  top:20%; animation-delay:0.6s">
+  <h1>Y-R-U MC ADDONS</h1>
+  <p>Minecraft Bedrock Edition &middot; .mcaddon downloads</p>
+</header>
+
+<div class="wrap">
+
+  <h2 class="section" id="downloads">Downloads</h2>
+  <div id="file-list"></div>
+  <div id="file-status">scanning addon folder…</div>
+
+  <h2 class="section">Trolling Addon — What's Inside</h2>
+  <div class="items-grid" id="items"></div>
+
+  <h2 class="section">How To Install</h2>
+  <div class="panel">
+    <ol class="steps">
+      <li>Hit <b>Download</b> above and grab the <b>.mcaddon</b> file.</li>
+      <li><b>Open the file</b> — Minecraft Bedrock imports both packs automatically (Windows, iOS, Android).</li>
+      <li>Create or edit a world → <b>Behavior Packs</b> → activate <b>Trolling Addon</b> (the resource pack comes with it).</li>
+      <li>Craft, place, troll.</li>
+    </ol>
+    <div class="note"><b>Heads up:</b> Bedrock addons can't read a player's real skin, so the Skin Mocker family uses a creepy mannequin body that <b>takes the name of whoever places it</b> — stalking, teleport rules and hunt mode all work as designed. Needs Minecraft Bedrock <b>1.21+</b>.</div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="/">Y-R-U.GITHUB.IO</a> &middot; TROLLING ADDON V1.0.0 &middot; MADE FOR BEDROCK
+</footer>
+
+<script>
+// ---------------------------------------------------------------- downloads
+// Live listing of everything in files/ via the GitHub API, with the committed
+// files.json manifest as offline/rate-limit fallback for metadata + list.
+const REPO_API = "https://api.github.com/repos/Y-R-U/Y-R-U.github.io/contents/mcaddons/files";
+
+function fmtSize(bytes) {
+  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
+  return Math.max(1, Math.round(bytes / 1024)) + " KB";
+}
+
+function renderFiles(files, meta, source) {
+  const list = document.getElementById("file-list");
+  const status = document.getElementById("file-status");
+  list.innerHTML = "";
+  const shown = files.filter(f => f.name !== "files.json");
+  if (!shown.length) {
+    status.textContent = "no addon files found";
+    return;
+  }
+  for (const f of shown) {
+    const m = meta[f.name] || {};
+    const card = document.createElement("div");
+    card.className = "panel file-card";
+    card.innerHTML = `
+      <img class="px" src="img/pack_icon.png" alt="">
+      <div class="file-info">
+        <h3>${m.title || f.name}</h3>
+        <div class="meta">${f.name} &middot; ${fmtSize(f.size)}${m.version ? " &middot; v" + m.version : ""}${m.minVersion ? " &middot; " + m.minVersion : ""}</div>
+        <p>${m.desc || "Minecraft Bedrock addon."}</p>
+      </div>
+      <div class="file-dl"><a class="mc-btn green" href="files/${encodeURIComponent(f.name)}" download>⬇ DOWNLOAD</a></div>`;
+    list.appendChild(card);
+  }
+  status.textContent = shown.length + " file" + (shown.length > 1 ? "s" : "") + " in /mcaddons/files/ (" + source + ")";
+}
+
+async function loadFiles() {
+  let meta = {};
+  let manifest = null;
+  try {
+    manifest = await (await fetch("files/files.json", { cache: "no-cache" })).json();
+    for (const f of manifest.files) meta[f.name] = f;
+  } catch (e) {}
+  try {
+    const res = await fetch(REPO_API);
+    if (!res.ok) throw new Error(res.status);
+    const gh = await res.json();
+    renderFiles(gh.map(f => ({ name: f.name, size: f.size })), meta, "live");
+    return;
+  } catch (e) {}
+  if (manifest) renderFiles(manifest.files, meta, "manifest");
+  else document.getElementById("file-status").textContent = "couldn't list files — open files/ directly";
+}
+loadFiles();
+
+// ---------------------------------------------------------------- showcase
+const IMG = n => `<img class="px" src="img/${n}.png" alt="">`;
+const EMO = (e, size) => `<span style="font-size:${size || 21}px">${e}</span>`;
+
+// cell: [display, tooltip]
+const R = ["🔴", "Redstone Dust"], FE = ["🪶", "Feather"], BOOT = ["🥾", "Leather Boots"],
+      CHEST = ["🎽", "Leather Chestplate"], STAND = ["🧍", "Armor Stand"], SWORD = ["🗡️", "Wooden Sword"],
+      STONE = ["🪨", "Stone (not cobble!)"], IRONB = ["⬜", "Iron Block"], DIAB = ["💎", "Diamond Block"],
+      CART = ["🚃", "Minecart"], WPICK = ["⛏️", "Wooden Pickaxe"], X = null;
+
+const ITEMS = [
+  {
+    icon: "speed_minecart", name: "Speed Minecart",
+    desc: "A minecart with <strong>no chill</strong>. Every powered rail it crosses stacks MORE speed on top — up to a ludicrous 80 m/s. Mobs still hop in on contact, just like vanilla.",
+    tags: ["VEHICLE", "VERY FAST"],
+    grid: [X, X, X, X, R, X, X, CART, X], out: ["speed_minecart", "Speed Minecart"]
+  },
+  {
+    icon: "skin_mocker", name: "Skin Mocker",
+    desc: "A two-block-tall copy of <strong>whoever places it</strong> (wears their name). Won't budge until broken — punch or any tool works, but only a <strong>pickaxe</strong> gives the item back.",
+    tags: ["DECOY", "2 BLOCKS TALL"],
+    grid: [X, R, CHEST, X, X, X, X, STAND, X], out: ["skin_mocker", "Skin Mocker"]
+  },
+  {
+    icon: "skin_stalker", name: "Skin Mock Stalker",
+    desc: "A Mocker that <strong>follows the nearest player who didn't place it</strong>, always keeping a 30-block stalking distance. Walks and jumps like a player when watched; <strong>teleports only when nobody can see it</strong> (except its owner — they get to watch).",
+    tags: ["STALKS", "TELEPORTS UNSEEN"],
+    grid: [X, BOOT, X, X, ["skin_mocker", "Skin Mocker", true], X, X, BOOT, X], out: ["skin_stalker", "Skin Mock Stalker"]
+  },
+  {
+    icon: "skin_hunter", name: "Skin Mock Hunter",
+    desc: "Stalks like the Stalker… then after a <strong>random amount of time</strong> near its prey it snaps and <strong>hunts them down</strong>, hitting like a wooden sword. It cannot be killed — you have to <strong>break</strong> it.",
+    tags: ["HUNTS", "UNKILLABLE"],
+    grid: [X, X, X, ["skin_stalker", "Skin Mock Stalker", true], SWORD, X, X, X, X], out: ["skin_hunter", "Skin Mock Hunter"]
+  },
+  {
+    icon: "pure_sky_block", name: "Pure Sky Block", swatch: true,
+    desc: "Looks like <strong>plain empty sky</strong> from every angle — no shading, no shadows. Perfect ceilings for trap rooms. Breaks with anything, but <strong>only drops with a diamond pickaxe</strong>.",
+    tags: ["CAMO", "DIAMOND PICK TO KEEP"],
+    grid: [X, FE, X, FE, DIAB, FE, X, FE, X], out: ["pure_sky_block", "Pure Sky Block"]
+  },
+  {
+    icon: "god_pickaxe", name: "God Pickaxe",
+    desc: "Mines like a <strong>netherite pickaxe</strong> with <strong>infinite durability</strong>. It simply never breaks. Ever.",
+    tags: ["TOOL", "UNBREAKABLE"],
+    grid: [R, R, R, X, WPICK, X, X, IRONB, X], out: ["god_pickaxe", "God Pickaxe"]
+  },
+  {
+    icon: "chunk_miner", name: "Chunk Miner",
+    desc: "Break ONE block and the <strong>entire chunk</strong> pours away layer by layer like falling sand — everything except bedrock, <strong>no drops</strong>. The ultimate 'oops'.",
+    tags: ["CHUNK ERASER", "NO DROPS"],
+    grid: [STONE, STONE, STONE, STONE, ["god_pickaxe", "God Pickaxe", true], STONE, STONE, STONE, STONE], out: ["chunk_miner", "Chunk Miner"]
+  }
+];
+
+const itemsEl = document.getElementById("items");
+for (const it of ITEMS) {
+  const cells = it.grid.map(c => {
+    if (!c) return `<div class="craft-cell"></div>`;
+    if (c[2]) return `<div class="craft-cell" title="${c[1]}">${IMG(c[0])}</div>`;
+    return `<div class="craft-cell" title="${c[1]}">${EMO(c[0])}</div>`;
+  }).join("");
+  const head = it.swatch
+    ? `<img class="px" src="img/${it.icon}.png" alt="" style="padding:0">`
+    : IMG(it.icon).replace("<img ", `<img style="width:56px;height:56px" `);
+  const card = document.createElement("div");
+  card.className = "item-card";
+  card.innerHTML = `
+    <div class="item-head">${head}<h3>${it.name}</h3></div>
+    <div>${it.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+    <p>${it.desc}</p>
+    <div class="craft">
+      <div class="craft-grid">${cells}</div>
+      <div class="craft-arrow">→</div>
+      <div class="craft-out" title="${it.out[1]}">${IMG(it.out[0])}</div>
+    </div>`;
+  itemsEl.appendChild(card);
+}
+</script>
+</body>
+</html>

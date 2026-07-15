@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "trolling",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "trolling_speed_minecart": { "textures": "textures/items/speed_minecart" },
+    "trolling_skin_mocker": { "textures": "textures/items/skin_mocker" },
+    "trolling_skin_stalker": { "textures": "textures/items/skin_stalker" },
+    "trolling_skin_hunter": { "textures": "textures/items/skin_hunter" },
+    "trolling_god_pickaxe": { "textures": "textures/items/god_pickaxe" },
+    "trolling_chunk_miner": { "textures": "textures/items/chunk_miner" }
+  }
+}

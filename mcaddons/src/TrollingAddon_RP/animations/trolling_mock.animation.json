@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "animations": {
+    "animation.trolling_mock.walk": {
+      "loop": true,
+      "bones": {
+        "rightLeg": { "rotation": ["math.sin(query.anim_time * 400) * 42", 0, 0] },
+        "leftLeg": { "rotation": ["-math.sin(query.anim_time * 400) * 42", 0, 0] },
+        "rightArm": { "rotation": ["-math.sin(query.anim_time * 400) * 38", 0, 0] },
+        "leftArm": { "rotation": ["math.sin(query.anim_time * 400) * 38", 0, 0] }
+      }
+    },
+    "animation.trolling_mock.idle": {
+      "loop": true,
+      "bones": {
+        "rightArm": { "rotation": ["math.sin(query.anim_time * 60) * 2", 0, 2.5] },
+        "leftArm": { "rotation": ["-math.sin(query.anim_time * 60) * 2", 0, -2.5] },
+        "head": { "rotation": ["math.sin(query.anim_time * 45) * 1.5", 0, 0] }
+      }
+    }
+  }
+}

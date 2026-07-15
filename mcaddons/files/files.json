@@ -1,0 +1,14 @@
+{
+  "generated": "2026-07-15",
+  "files": [
+    {
+      "name": "Trolling-Addon-v1.0.0.mcaddon",
+      "size": 26381,
+      "date": "2026-07-15",
+      "title": "Trolling Addon",
+      "version": "1.0.0",
+      "desc": "Speed Minecarts that stack speed on every powered rail, Skin Mockers that stalk and hunt players, Pure Sky camo blocks, the God Pickaxe and the chunk-erasing Chunk Miner.",
+      "minVersion": "Minecraft Bedrock 1.21+"
+    }
+  ]
+}

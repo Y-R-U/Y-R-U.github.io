@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "trolling:recipe_skin_mocker"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      " RC",
+      "   ",
+      " A "
+    ],
+    "key": {
+      "R": { "item": "minecraft:redstone" },
+      "C": { "item": "minecraft:leather_chestplate" },
+      "A": { "item": "minecraft:armor_stand" }
+    },
+    "unlock": [
+      { "item": "minecraft:armor_stand" }
+    ],
+    "result": {
+      "item": "trolling:skin_mocker_item"
+    }
+  }
+}

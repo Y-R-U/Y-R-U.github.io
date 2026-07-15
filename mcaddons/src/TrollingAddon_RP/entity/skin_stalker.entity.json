@@ -1,0 +1,18 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "trolling:skin_stalker",
+      "materials": { "default": "entity_alphatest" },
+      "textures": { "default": "textures/entity/trolling_stalker" },
+      "geometry": { "default": "geometry.trolling_mock" },
+      "animations": {
+        "walk": "animation.trolling_mock.walk",
+        "idle": "animation.trolling_mock.idle",
+        "controller": "controller.animation.trolling_mock"
+      },
+      "scripts": { "animate": ["controller"] },
+      "render_controllers": ["controller.render.default"]
+    }
+  }
+}

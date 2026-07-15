@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "trolling:skin_mocker_item",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "trolling_skin_mocker",
+      "minecraft:display_name": {
+        "value": "§7Skin Mocker"
+      },
+      "minecraft:max_stack_size": 16
+    }
+  }
+}

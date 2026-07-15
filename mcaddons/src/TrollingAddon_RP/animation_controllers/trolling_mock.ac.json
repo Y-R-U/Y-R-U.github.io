@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.trolling_mock": {
+      "initial_state": "idle",
+      "states": {
+        "idle": {
+          "animations": ["idle"],
+          "transitions": [{ "walk": "query.ground_speed > 0.5" }],
+          "blend_transition": 0.15
+        },
+        "walk": {
+          "animations": ["walk"],
+          "transitions": [{ "idle": "query.ground_speed < 0.35" }],
+          "blend_transition": 0.15
+        }
+      }
+    }
+  }
+}

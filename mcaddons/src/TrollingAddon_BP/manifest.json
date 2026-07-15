@@ -1,0 +1,34 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Trolling Addon [Behavior]",
+    "description": "Speed Minecarts, Skin Mockers that stalk and hunt, Pure Sky camo blocks, the God Pickaxe and the Chunk Miner. By Y-R-U.",
+    "uuid": "8ebca420-ef29-4228-a947-44790fac2845",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "01fba851-4ea7-420b-853e-a3a1f4b96002",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "797c1f61-6d73-4543-950f-68c51e2f8ab2",
+      "entry": "scripts/main.js",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "1.13.0"
+    },
+    {
+      "uuid": "993d060f-5e5e-4d9c-ba4b-29b42e424fe0",
+      "version": [1, 0, 0]
+    }
+  ]
+}
