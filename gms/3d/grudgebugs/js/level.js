@@ -1,14 +1,23 @@
-// GRUDGE BUGS — arenas. Narrow-ledge layout generation, themed skies and
-// abysses (pond/sink/jam/coals), destructible plank meshes rebuilt from
-// physics solidSpans after every bite, oversized background props that sell
-// the "you are 6 mm tall" joke, and the Sandwich itself.
+// GRUDGE BUGS — arenas. Narrow-ridge layout generation, themed skies and
+// abysses (pond/sink/jam/coals), destructible grass-topped earth ridges
+// (worms-style ground: dirt strata, charred crater faces, tufts, hanging
+// roots) re-meshed from physics solidSpans after every bite, oversized
+// background props that sell the "you are 6 mm tall" joke, and the Sandwich.
 
 import * as THREE from 'three';
 import { PHYS, THEMES } from './config.js';
 import { solidSpans, posAt } from './physics.js';
 import { mat } from './bugs.js';
+import { lerp } from './utils.js';
 
 const T = THREE;
+
+// terrain noise keyed on absolute ledge position — re-meshing after a bite
+// must NOT reshuffle the untouched dirt, so never key on span-relative s
+const tn = (a, b, c = 0) => {
+  const s = Math.sin(a * 12.9898 + b * 78.233 + c * 37.719) * 43758.5453;
+  return s - Math.floor(s);
+};
 
 // ---------------- layout generation (pure data) ----------------
 // returns ledgeDefs: [{pts:[{x,y,z}...], w?}]
@@ -57,7 +66,33 @@ export function generateLayout(rng, { size = 3 } = {}) {
       });
     }
   }
-  return defs;
+  return defs.map(d => organicify(d, rng));
+}
+
+// resample the straight art-lines into wobbly mountain-ridge polylines:
+// gentle height undulation + sideways meander. Endpoints stay put so the
+// layout's spacing guarantees hold.
+function organicify(def, rng) {
+  const pts = def.pts;
+  const out = [{ ...pts[0] }];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const n = Math.max(1, Math.round(Math.hypot(b.x - a.x, b.z - a.z) / 2.0));
+    for (let k = 1; k <= n; k++)
+      out.push({ x: lerp(a.x, b.x, k / n), y: lerp(a.y, b.y, k / n), z: lerp(a.z, b.z, k / n) });
+  }
+  const ph1 = rng() * 9, ph2 = rng() * 9;
+  const amp = 0.26 + rng() * 0.28, mea = 0.22 + rng() * 0.28;
+  let acc = 0;
+  for (let i = 1; i < out.length - 1; i++) {
+    const p = out[i], q = out[i - 1];
+    const dx = p.x - q.x, dz = p.z - q.z, seg = Math.hypot(dx, dz) || 1;
+    acc += seg;
+    p.x += (dz / seg) * Math.sin(acc * 0.42 + ph2) * mea;
+    p.z += (-dx / seg) * Math.sin(acc * 0.42 + ph2) * mea;
+    p.y = Math.max(0.35, p.y + Math.sin(acc * 0.5 + ph1) * amp + Math.sin(acc * 1.35 + ph2) * amp * 0.35);
+  }
+  return { ...def, pts: out };
 }
 
 // spaced spawn points: [{li, s}] — round-robin across ledges, away from ends
@@ -101,50 +136,154 @@ function gradientTex(top, bottom) {
   return tex;
 }
 
-// ---------------- plank meshes ----------------
+// ---------------- earth ridge meshes ----------------
+// cross-section of a ridge, closed ring (x × halfWidth, y>0 as-is, y<0 × depth)
+const PROFILE = [
+  { x: 0.00, y: -1.00, c: 'deep' },
+  { x: -0.52, y: -0.80, c: 'deep' },
+  { x: -0.88, y: -0.46, c: 'dirt2' },
+  { x: -1.02, y: -0.18, c: 'dirt' },
+  { x: -1.14, y: -0.045, c: 'grass2' },   // grass lip overhangs the dirt
+  { x: -0.60, y: 0.045, c: 'grass' },
+  { x: 0.00, y: 0.07, c: 'grass' },
+  { x: 0.60, y: 0.045, c: 'grass' },
+  { x: 1.14, y: -0.045, c: 'grass2' },
+  { x: 1.02, y: -0.18, c: 'dirt' },
+  { x: 0.88, y: -0.46, c: 'dirt2' },
+  { x: 0.52, y: -0.80, c: 'deep' },
+];
+
 export function buildLedgeMesh(L, theme) {
   const g = new T.Group();
-  const wood = mat(theme.wood, { rough: 0.85 });
-  const woodSide = mat(theme.wood2, { rough: 0.9 });
-  const char = mat(0x241a12, { rough: 1 });
+  const terra = theme.terra;
+  const terraMat = new T.MeshStandardMaterial({
+    vertexColors: true, roughness: 0.96, metalness: 0, flatShading: true, side: T.DoubleSide,
+  });
+  const col = new T.Color();
+  const P = PROFILE.length;
+
   for (const [a, b] of solidSpans(L)) {
-    // walk the polyline between s=a..b emitting one box per overlapped segment
-    let acc = 0;
-    for (let k = 0; k < L.segLen.length; k++) {
-      const s0 = Math.max(a, acc), s1 = Math.min(b, acc + L.segLen[k]);
-      if (s1 - s0 > 0.05) {
-        const pa = posAt(L, s0), pb = posAt(L, s1);
-        const len = s1 - s0;
-        const mid = new T.Vector3(
-          (pa.pos.x + pb.pos.x) / 2, (pa.pos.y + pb.pos.y) / 2 - PHYS.ledgeThick / 2, (pa.pos.z + pb.pos.z) / 2);
-        const box = new T.Mesh(new T.BoxGeometry(L.w * 2, PHYS.ledgeThick, len), wood);
-        box.position.copy(mid);
-        box.rotation.y = Math.atan2(pb.pos.x - pa.pos.x, pb.pos.z - pa.pos.z);
-        box.castShadow = true; box.receiveShadow = true;
-        g.add(box);
-        // side rails for a hand-built look
-        for (const sgn of [-1, 1]) {
-          const rail = new T.Mesh(new T.BoxGeometry(0.09, PHYS.ledgeThick * 1.15, len), woodSide);
-          rail.position.copy(mid);
-          rail.rotation.y = box.rotation.y;
-          rail.translateX(sgn * (L.w - 0.05));
-          rail.receiveShadow = true;
-          g.add(rail);
-        }
-        // charred bite ends (where a span edge isn't the ledge end)
-        for (const [sEdge, atEnd] of [[s0, a > 0.06 && Math.abs(s0 - a) < 1e-6], [s1, b < L.len - 0.06 && Math.abs(s1 - b) < 1e-6]]) {
-          if (!atEnd) continue;
-          const pe = posAt(L, sEdge);
-          const capMesh = new T.Mesh(new T.BoxGeometry(L.w * 2.04, PHYS.ledgeThick * 1.04, 0.12), char);
-          capMesh.position.set(pe.pos.x, pe.pos.y - PHYS.ledgeThick / 2, pe.pos.z);
-          capMesh.rotation.y = Math.atan2(pb.pos.x - pa.pos.x, pb.pos.z - pa.pos.z);
-          g.add(capMesh);
-        }
+    // ring stations on a GLOBAL grid so bites don't reshape surviving dirt
+    const step = 0.6;
+    const stations = [a];
+    for (let s = Math.ceil(a / step) * step; s < b - 0.15; s += step)
+      if (s > a + 0.15) stations.push(s);
+    stations.push(b);
+
+    const bitStart = a > 0.05, bitEnd = b < L.len - 0.05;
+    const pos = [], color = [], idx = [];
+    const rings = [];
+
+    for (const s of stations) {
+      const at = posAt(L, s);
+      const side = { x: at.dir.z, z: -at.dir.x };
+      const qs = Math.round(s * 5) / 5;                     // stable noise key
+      const depth = PHYS.ledgeThick * (0.8 + tn(L.i, qs, 99) * 0.5);
+      // char blend near blown-out edges
+      const dEdge = Math.min(bitStart ? s - a : 9, bitEnd ? b - s : 9);
+      const charK = dEdge < 0.28 ? 0.8 : dEdge < 0.8 ? 0.35 : 0;
+      const ring = [];
+      for (let k = 0; k < P; k++) {
+        const pt = PROFILE[k];
+        const top = pt.y >= 0;
+        const jx = (tn(L.i, qs, k) - 0.5) * (top ? 0.14 : 0.3);
+        const jy = (tn(L.i, qs, k + 40) - 0.5) * (top ? 0.04 : 0.24);
+        const lx = (pt.x + jx) * L.w;
+        const ly = top ? pt.y + jy : pt.y * depth + jy;
+        ring.push(pos.length / 3);
+        pos.push(at.pos.x + side.x * lx, at.pos.y + ly, at.pos.z + side.z * lx);
+        col.setHex(terra[pt.c]).multiplyScalar(0.86 + 0.26 * tn(L.i, qs, k + 77));
+        if (charK) col.lerp(new T.Color(terra.char), charK);
+        color.push(col.r, col.g, col.b);
       }
-      acc += L.segLen[k];
+      rings.push({ ring, s, at, depth });
     }
+    // skin between rings
+    for (let i = 0; i < rings.length - 1; i++) {
+      const r0 = rings[i].ring, r1 = rings[i + 1].ring;
+      for (let k = 0; k < P; k++) {
+        const k2 = (k + 1) % P;
+        idx.push(r0[k], r0[k2], r1[k], r0[k2], r1[k2], r1[k]);
+      }
+    }
+    // end caps: charred crater face at bites, bare soil at natural ends
+    for (const [ri, bitten] of [[0, bitStart], [rings.length - 1, bitEnd]]) {
+      const r = rings[ri];
+      const ci = pos.length / 3;
+      pos.push(r.at.pos.x, r.at.pos.y - r.depth * 0.45, r.at.pos.z);
+      col.setHex(bitten ? terra.char : terra.dirt2).multiplyScalar(bitten ? 1 : 0.8);
+      color.push(col.r, col.g, col.b);
+      for (let k = 0; k < P; k++) idx.push(r.ring[k], r.ring[(k + 1) % P], ci);
+    }
+
+    const geo = new T.BufferGeometry();
+    geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('color', new T.Float32BufferAttribute(color, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    const mesh = new T.Mesh(geo, terraMat);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    g.add(mesh);
+
+    decorateSpan(g, L, a, b, terra);
   }
   return g;
+}
+
+// grass tufts, pebbles and flowers on top; roots dangling underneath.
+// All placed on the global grid too, so surviving scenery stays put.
+function decorateSpan(g, L, a, b, terra) {
+  for (let s = Math.ceil((a + 0.45) / 0.9) * 0.9; s < b - 0.45; s += 0.9) {
+    const r = tn(L.i, s * 1.7, 5);
+    const at = posAt(L, s);
+    const side = { x: at.dir.z, z: -at.dir.x };
+    const off = (tn(L.i, s * 1.7, 6) - 0.5) * 1.3 * L.w;
+    const px = at.pos.x + side.x * off, pz = at.pos.z + side.z * off;
+    if (r < 0.4) {                                     // grass tuft
+      for (let i = 0; i < 3; i++) {
+        const h = 0.14 + tn(L.i, s, 10 + i) * 0.18;
+        const blade = new T.Mesh(new T.ConeGeometry(0.035, h, 4),
+          mat(i % 2 ? terra.grass2 : terra.grass, { flat: true }));
+        blade.position.set(px + (tn(L.i, s, 20 + i) - 0.5) * 0.16, at.pos.y + h / 2 + 0.02,
+          pz + (tn(L.i, s, 30 + i) - 0.5) * 0.16);
+        blade.rotation.z = (tn(L.i, s, 40 + i) - 0.5) * 0.7;
+        g.add(blade);
+      }
+    } else if (r < 0.55) {                             // pebble
+      const p = new T.Mesh(new T.SphereGeometry(0.07 + tn(L.i, s, 11) * 0.07, 5, 4),
+        mat(0x97907f, { flat: true, rough: 1 }));
+      p.position.set(px, at.pos.y + 0.05, pz);
+      p.scale.y = 0.65;
+      p.rotation.y = tn(L.i, s, 12) * 3;
+      g.add(p);
+    } else if (r < 0.62) {                             // tiny flower
+      const stem = new T.Mesh(new T.CylinderGeometry(0.012, 0.018, 0.22, 4), mat(terra.grass2));
+      stem.position.set(px, at.pos.y + 0.13, pz);
+      g.add(stem);
+      const petalC = [0xf2e28a, 0xf2a4b0, 0xf5f2e8][Math.floor(tn(L.i, s, 13) * 3)];
+      for (let i = 0; i < 4; i++) {
+        const pet = new T.Mesh(new T.SphereGeometry(0.035, 5, 4), mat(petalC, { flat: true }));
+        const ang = (i / 4) * Math.PI * 2;
+        pet.position.set(px + Math.cos(ang) * 0.05, at.pos.y + 0.25, pz + Math.sin(ang) * 0.05);
+        g.add(pet);
+      }
+      const core = new T.Mesh(new T.SphereGeometry(0.028, 5, 4), mat(0xd9a514, { flat: true }));
+      core.position.set(px, at.pos.y + 0.26, pz);
+      g.add(core);
+    }
+  }
+  // hanging roots
+  for (let s = Math.ceil((a + 0.6) / 2.3) * 2.3; s < b - 0.6; s += 2.3) {
+    if (tn(L.i, s, 50) > 0.45) continue;
+    const at = posAt(L, s);
+    const side = { x: at.dir.z, z: -at.dir.x };
+    const off = (tn(L.i, s, 51) - 0.5) * 0.9 * L.w;
+    const len = 0.5 + tn(L.i, s, 52) * 0.9;
+    const root = new T.Mesh(new T.CylinderGeometry(0.012, 0.05, len, 5), mat(terra.root, { rough: 1 }));
+    root.position.set(at.pos.x + side.x * off, at.pos.y - PHYS.ledgeThick * 0.8 - len / 2, at.pos.z + side.z * off);
+    root.rotation.z = (tn(L.i, s, 53) - 0.5) * 0.5;
+    g.add(root);
+  }
 }
 
 // ---------------- big silly props ----------------
@@ -258,6 +397,7 @@ export class ArenaView {
   constructor(scene, themeId, ledges, rng, opts = {}) {
     this.scene = scene;
     this.theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+    this.terra = this.theme.terra;
     this.ledges = ledges;
     this.group = new T.Group();
     this.ledgeGroups = new Map();
@@ -268,7 +408,7 @@ export class ArenaView {
     scene.fog = new T.Fog(th.fog, 26, 78);
 
     // lights
-    this.hemi = new T.HemisphereLight(th.sky[0], 0x33402a, 0.85);
+    this.hemi = new T.HemisphereLight(th.sky[0], 0x5a4630, 0.9);   // warm dirt bounce
     this.sun = new T.DirectionalLight(th.sun, th.id === 'kitchen' ? 1.0 : 1.5);
     this.sun.position.set(10, 18, 6);
     if (!opts.lite) {
@@ -308,19 +448,6 @@ export class ArenaView {
         pad.rotation.x = -Math.PI / 2;
         pad.position.set((rng() - 0.5) * 50, PHYS.killY + 0.46, (rng() - 0.5) * 50);
         this.group.add(pad);
-      }
-    }
-
-    // support posts under ledge ends
-    const postMat = mat(th.wood2, { rough: 0.9 });
-    for (const L of ledges) {
-      for (const pi of [0, L.pts.length - 1]) {
-        const p = L.pts[pi];
-        const h = p.y - PHYS.killY + 2;
-        const post = new T.Mesh(new T.CylinderGeometry(0.16, 0.22, h, 8), postMat);
-        post.position.set(p.x, p.y - h / 2 - PHYS.ledgeThick, p.z);
-        post.castShadow = true;
-        this.group.add(post);
       }
     }
 

@@ -213,6 +213,12 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
 .toast { padding: 10px 20px; border-radius: 22px; background: #1a2b16f2; border: 2px solid #ffd94a99;
   font-size: 14.5px; font-weight: 800; color: #ffe9ad; box-shadow: 0 6px 20px #000b; animation: bubblein .2s; }
 
+/* target tag (name + HP over the 🎯 marker) */
+.tgt-tag { position: absolute; transform: translate(-50%, -100%); padding: 4px 10px;
+  border-radius: 12px; background: #000b; font-size: 12.5px; font-weight: 800;
+  white-space: nowrap; text-shadow: 0 1px 3px #000; pointer-events: none;
+  animation: bubblein .15s ease-out; }
+
 /* damage floaters */
 .dmg-float { position: absolute; font-size: 17px; font-weight: 900; color: #ff8a6a;
   text-shadow: 0 2px 4px #000; pointer-events: none; transform: translate(-50%, -50%);

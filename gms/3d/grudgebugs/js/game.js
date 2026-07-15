@@ -86,6 +86,25 @@ export class Battle {
     this.moveInput = 0; this.moveLeft = RULES.moveBudget;
     this.graves = [];
 
+    // target marker: bouncing chevron over the focused enemy, drawn through walls
+    {
+      const mkMat = () => new T.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true, opacity: 0.95 });
+      const cone = new T.Mesh(new T.ConeGeometry(0.2, 0.4, 4), mkMat());
+      cone.rotation.x = Math.PI;
+      const ring = new T.Mesh(new T.TorusGeometry(0.3, 0.045, 6, 20), mkMat());
+      ring.rotation.x = Math.PI / 2; ring.position.y = -0.28;
+      this.marker = new T.Group();
+      this.marker.add(cone, ring);
+      this.marker.renderOrder = 30;
+      cone.renderOrder = 30; ring.renderOrder = 30;
+      this.marker.visible = false;
+      this.markerMats = [cone.material, ring.material];
+      this.group.add(this.marker);
+      this.markerTag = document.createElement('div');
+      this.markerTag.className = 'tgt-tag hidden';
+      document.getElementById('bubbles')?.appendChild(this.markerTag);
+    }
+
     if (!opts.cinematic) this._nextTurn(true);
   }
 
@@ -160,10 +179,18 @@ export class Battle {
     this.moveLeft = RULES.moveBudget;
     this.timer = RULES.turnTime;
     this.aim.power = 0; this.aim.charging = false;
-    this.aim.pitch = 0.55;
-    const dir = phys.posAt(this.L(bug), bug.s).dir;
-    this.aim.yaw = Math.atan2(dir.x * bug.faceDir, dir.z * bug.faceDir);
     this.targeting = false;
+    // open every turn already facing the nearest enemy — never the sky
+    this._tgtIx = 0;
+    const foe = this._nearestEnemy(bug);
+    if (foe) {
+      this._faceEnemy(bug, foe);
+      this.cams.orbit.yaw = this.aim.yaw + Math.PI;
+    } else {
+      this.aim.pitch = 0.55;
+      const dir = phys.posAt(this.L(bug), bug.s).dir;
+      this.aim.yaw = Math.atan2(dir.x * bug.faceDir, dir.z * bug.faceDir);
+    }
 
     this.phase = 'fly';
     this.opts.onPhase?.('turn', bug);
@@ -186,6 +213,11 @@ export class Battle {
     voice.say(bug, 'turn', { prob: 0.85 });
     this.opts.onHUD?.(this);
     if (this.activeTeam().isAI) this._aiGo();
+    else {
+      // point out who you're facing; first 🎯 tap then hops to the next one
+      const foe = this._nearestEnemy(bug);
+      if (foe && !this.opts.fast) { this._markTarget(foe, 2.2); this._tgtIx = 1; }
+    }
   }
 
   _v3(p) { return new T.Vector3(p.x, p.y, p.z); }
@@ -412,7 +444,7 @@ export class Battle {
     const w = W(rec.weaponId);
     const at = rec.impact.pos;
     if (!noBoom) {
-      this.fx.explosion(at, w.radius);
+      this.fx.explosion(at, w.radius, this.arena.terra);
       audio.boom(w.radius / 1.7);
       this.cams.addShake(0.35 + w.radius * 0.18);
       if (navigator.vibrate && !this.opts.fast) try { navigator.vibrate(40); } catch {}
@@ -555,6 +587,75 @@ export class Battle {
     return best;
   }
 
+  // swing yaw/pitch (and the bug's face) toward an enemy so they're on screen
+  _faceEnemy(bug, en) {
+    if (!en) return;
+    const p = this.bugPos(bug), q = this.bugPos(en);
+    this.aim.yaw = Math.atan2(q.x - p.x, q.z - p.z);
+    const dxz = Math.hypot(q.x - p.x, q.z - p.z);
+    this.aim.pitch = clamp(Math.atan2(q.y - p.y, Math.max(0.5, dxz)) + 0.32, -0.35, 1.1);
+    const dir = phys.posAt(this.L(bug), bug.s).dir;
+    const fw = Math.sin(this.aim.yaw) * dir.x + Math.cos(this.aim.yaw) * dir.z;
+    if (Math.abs(fw) > 0.2) bug.faceDir = fw >= 0 ? 1 : -1;
+    this._trajDirty = true;
+  }
+
+  // 🎯 button: hop the aim (and camera) through living enemies, nearest first
+  cycleTarget() {
+    if (this.phase !== 'play' || !this._active) return null;
+    const bug = this._active;
+    const p = this.bugPos(bug);
+    const foes = this.allBugs
+      .filter(b => b.alive && b.team !== bug.team)
+      .sort((x, y) => {
+        const a = this.bugPos(x), b2 = this.bugPos(y);
+        return Math.hypot(a.x - p.x, a.y - p.y, a.z - p.z) - Math.hypot(b2.x - p.x, b2.y - p.y, b2.z - p.z);
+      });
+    if (!foes.length) return null;
+    this._tgtIx = (this._tgtIx ?? 0) % foes.length;
+    const en = foes[this._tgtIx];
+    this._tgtIx = (this._tgtIx + 1) % foes.length;
+    this._faceEnemy(bug, en);
+    this.cams.orbit.yaw = this.aim.yaw + Math.PI;
+    if (this.targeting) { const q = this.bugPos(en); this._setReticle(new T.Vector3(q.x, q.y, q.z)); }
+    this._markTarget(en);
+    return en;
+  }
+
+  _markTarget(en, dur = 2.8) {
+    this.markerBug = en;
+    this.markerT = dur;
+    this.marker.visible = true;
+    for (const m of this.markerMats) m.color.setHex(en.faction.color);
+    this.markerTag.textContent = `🎯 ${en.name} · ${Math.max(0, en.hp)} HP`;
+    this.markerTag.style.color = en.faction.ui;
+    this.markerTag.classList.remove('hidden');
+  }
+
+  _markerStep(unscaledDt) {
+    if (!this.markerBug) return;
+    this.markerT -= unscaledDt;
+    const en = this.markerBug;
+    if (this.markerT <= 0 || !en.alive || en.airborne) {
+      this.marker.visible = false;
+      this.markerTag.classList.add('hidden');
+      this.markerBug = null;
+      return;
+    }
+    const p = this.bugPos(en);
+    const bob = Math.sin(performance.now() / 1000 * 5) * 0.1;
+    const top = p.y + PHYS.bugHeight * (en.faction.boss ? 2.4 : 1.4) + 0.75 + bob;
+    this.marker.position.set(p.x, top, p.z);
+    this.marker.rotation.y += unscaledDt * 2.2;
+    // DOM tag floats above the chevron
+    const v = new T.Vector3(p.x, top + 0.55, p.z).project(this.cams.cam);
+    if (v.z < 1) {
+      this.markerTag.style.left = `${(v.x * 0.5 + 0.5) * innerWidth}px`;
+      this.markerTag.style.top = `${(-v.y * 0.5 + 0.5) * innerHeight}px`;
+      this.markerTag.classList.remove('hidden');
+    } else this.markerTag.classList.add('hidden');
+  }
+
   // ---------------- AI ----------------
   _aiGo() {
     const bug = this._active, team = this.activeTeam();
@@ -642,13 +743,16 @@ export class Battle {
       if (bug.alive) bug.rig.root.visible = false;
       ghosts[ghosts.length - 1].bugRef = bug;
     }
-    this.replay = { rec: shot, ghosts, playT: tStart, tStart, end: tStart + dur, boomed: false };
+    const rp = { rec: shot, ghosts, playT: tStart, tStart, end: tStart + dur, boomed: false };
+    this.replay = rp;
     this.phase = 'replay';
     this.opts.onPhase?.('replay');
     const tag = document.getElementById('replay-tag');
     tag.classList.remove('hidden');
     tag.querySelector('#replay-angle').textContent = angle.label;
-    this.cams.setMode('replay', { rec: shot, angle: angle.id, getT: () => this.replay.playT });
+    // close over rp, not this.replay — the camera stays in replay mode for a
+    // few frames after the replay object is cleared
+    this.cams.setMode('replay', { rec: shot, angle: angle.id, getT: () => rp.playT });
   }
 
   skipReplay() { if (this.replay) this.replay.playT = this.replay.end; }
@@ -674,7 +778,7 @@ export class Battle {
     if (!rp.boomed && rp.playT >= rp.rec.dur) {
       rp.boomed = true;
       const w = W(rp.rec.weaponId);
-      this.fx.explosion(rp.rec.impact.pos, (w?.radius || 1.4) * 0.9);
+      this.fx.explosion(rp.rec.impact.pos, (w?.radius || 1.4) * 0.9, this.arena.terra);
       audio.boom(0.8);
     }
     if (rp.playT >= rp.end) {
@@ -706,6 +810,7 @@ export class Battle {
     }
     this.arena.update(dt, performance.now() / 1000);
     this.reticle.rotation.y += dt * 1.5;
+    this._markerStep(unscaledDt);
 
     if (this.over) return;
 
@@ -888,6 +993,7 @@ export class Battle {
   dispose() {
     this.scene.remove(this.group);
     this.arena.dispose();
+    this.markerTag?.remove();
     voice.clear();
     audio.whooshStop(); audio.chargeStop();
   }

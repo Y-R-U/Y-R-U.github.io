@@ -6,8 +6,8 @@ export const PHYS = {
   dt: 1 / 120,               // fixed sim step
   maxFlight: 12,             // s — projectile watchdog
   killY: -6,                 // below this = splash
-  ledgeHalfW: 0.55,          // walkable half-width of a ledge
-  ledgeThick: 0.42,
+  ledgeHalfW: 0.85,          // walkable half-width of a ridge top
+  ledgeThick: 1.35,          // earth depth below the walk line (solid to shots)
   bugRadius: 0.34,           // body sphere for hits
   bugHeight: 0.55,
   ragDrag: 0.15,             // knocked-bug air drag
@@ -105,15 +105,20 @@ export const HATS = [
 ];
 
 // ---------------- arenas ----------------
+// terra: worms-style earth ridge palette — grass top, dirt strata, dark belly
 export const THEMES = [
   { id: 'garden', name: 'Garden Fence', emoji: '🌻', sky: [0x8ec9ef, 0xdff2f7], fog: 0xbfe4ee,
-    sun: 0xfff2d0, ground: 'pond', wood: 0x9a7648, wood2: 0x7d5c34 },
+    sun: 0xfff2d0, ground: 'pond',
+    terra: { grass: 0x6cb648, grass2: 0x4e9433, dirt: 0x8f6138, dirt2: 0x70492a, deep: 0x54371f, char: 0x281c11, root: 0x5c4327 } },
   { id: 'kitchen', name: 'Midnight Kitchen', emoji: '🍳', sky: [0x1a2136, 0x3c4668], fog: 0x232c47,
-    sun: 0xaac4ff, ground: 'sink', wood: 0xb8b2a4, wood2: 0x8f8878 },
+    sun: 0xaac4ff, ground: 'sink',
+    terra: { grass: 0x4d7f54, grass2: 0x3a6441, dirt: 0x6e5847, dirt2: 0x574539, deep: 0x3e322a, char: 0x1d1610, root: 0x4a3b2c } },
   { id: 'picnic', name: 'Picnic Blanket', emoji: '🧺', sky: [0x86c7ec, 0xfbe9c4], fog: 0xcfe8e0,
-    sun: 0xffedc0, ground: 'jam', wood: 0xc46a4f, wood2: 0xa14e36 },
+    sun: 0xffedc0, ground: 'jam',
+    terra: { grass: 0x77c24c, grass2: 0x59a53a, dirt: 0x976743, dirt2: 0x795334, deep: 0x5b3c22, char: 0x2a1d12, root: 0x63482b } },
   { id: 'bbq', name: 'BBQ at Dusk', emoji: '🔥', sky: [0x3a2333, 0xd96f3a], fog: 0x59333a,
-    sun: 0xffb070, ground: 'coals', wood: 0x5a4a44, wood2: 0x42332f },
+    sun: 0xffb070, ground: 'coals',
+    terra: { grass: 0xb1993f, grass2: 0x8c7530, dirt: 0x7d5030, dirt2: 0x623d24, deep: 0x452b19, char: 0x211408, root: 0x4f3620 } },
 ];
 
 export const WIND_LABELS = [

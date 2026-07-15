@@ -1,20 +1,30 @@
 # GRUDGE BUGS — 3D worms-with-insects artillery
 
-Turn-based Worms-style artillery in 3D, fought on **narrow ledges** over a
-lethal drop. Four insect factions (one procedural googly-eyed model each, plus
-a mantis boss), destructible planks, cinematic cameras, instant replays,
-talking bugs, a 10-chapter story with an in-engine intro cutscene, and a
-mobile-game meta (coins / hat shop / daily streak). Three.js 0.160 CDN
+Turn-based Worms-style artillery in 3D, fought on **narrow grass-topped earth
+ridges** (floating mountain-edge outcrops, worms-style destructible ground)
+over a lethal drop. Four insect factions (one procedural googly-eyed model
+each, plus a mantis boss), craterable terrain, cinematic cameras, instant
+replays, talking bugs, a 10-chapter story with an in-engine intro cutscene,
+and a mobile-game meta (coins / hat shop / daily streak). Three.js 0.160 CDN
 importmap, **no build step**, fully procedural art + Web Audio.
-Built 2026-07-15 (Fable 5). Play: `index.html`.
+Built 2026-07-15, terrain + targeting rework same day (Fable 5).
+Play: `index.html`.
 
 ## The pillars
 
-- **The ledge IS the game.** Levels are polyline walk-paths (`js/physics.js`
-  ledges); bugs live at `(ledgeIndex, s)` along them. Explosions `biteLedges()`
-  — gaps merge, walkable spans shrink, planks re-mesh, bugs left standing over
-  a fresh gap drop. Knockback ragdolls (`simulateRag`) either land on a lower
-  ledge (fall damage past `landDmgV`) or splash: instant death.
+- **The ridge IS the game.** Levels are polyline walk-paths (`js/physics.js`
+  ledges); bugs live at `(ledgeIndex, s)` along them. `generateLayout` art
+  lines get an `organicify` pass (resample + height undulation + meander).
+  Explosions `biteLedges()` — gaps merge, walkable spans shrink, the earth
+  re-meshes with charred crater faces, bugs left standing over a fresh gap
+  drop. Knockback ragdolls (`simulateRag`) either land on a lower ridge
+  (fall damage past `landDmgV`) or splash: instant death.
+- **Terrain looks like ground, not planks**: `buildLedgeMesh` extrudes a
+  12-point cross-section (grass dome + overhanging lip, dirt strata, dark
+  tapering belly) along each solid span with vertex colours from
+  `THEMES[].terra`, plus grass tufts / pebbles / flowers on top and roots
+  underneath. One `MeshStandardMaterial` (vertexColors, flatShading,
+  DoubleSide — winding-proof).
 - **Physics is pure `{x,y,z}` math** — no THREE — so node tests it:
   `node tools/test_physics.mjs` (ledge param math, wind drift, grenade
   bounce, rolling dung, explosion falloff/impulse, bites, rag landings).
@@ -57,6 +67,13 @@ boot/modes/loop/flags.
 - Weapons: bazooka & grenade & loogie & slap infinite; cluster/dung ×2,
   SHOE/Bee-52 ×1 per battle. Strikes aim with a draggable reticle
   (`battle.targeting`), fired by the FIRE button.
+- **Every turn opens facing the nearest enemy** (`_faceEnemy` in `_nextTurn`
+  sets aim yaw/pitch + `cams.orbit.yaw = aim.yaw + π`) — never the sky. The
+  HUD 🎯 button / `e` key (`battle.cycleTarget()`) hops aim + camera through
+  living enemies nearest-first, drops a faction-coloured chevron marker
+  (depthTest off — shows through terrain) with a name+HP DOM tag, and moves
+  the strike reticle when targeting. `_beginPlay` auto-marks the nearest foe
+  on human turns and sets `_tgtIx = 1` so the first tap hops onward.
 - Wind (bazooka/loogie only) is biased low (`rng()*rng()`), labelled from
   "dead calm" to "ABSOLUTE HURRICANE".
 - Sudden death: round > `suddenDeathRound` ⇒ THE JAM RISES — killY climbs
@@ -86,6 +103,14 @@ boot/modes/loop/flags.
   lens dips under the abyss plane — both already clamp; keep it when adding
   camera modes.
 - Ledge meshes rebuild only via `arena.refreshDirty()` after `biteLedges`.
+- **Terrain noise must stay bite-stable**: ring stations sit on a GLOBAL 0.6
+  grid and all jitter comes from `tn()` keyed on absolute s (`qs`) + `L.i` —
+  never key on span-relative position or every crater visibly reshuffles the
+  surviving dirt. Decorations/roots use the same global grid.
+- Replay camera opts must close over the local replay object (`rp`), not
+  `this.replay` — the director stays in replay mode a few frames after
+  `_replayStep` nulls the field (this threw `null.playT` for ~4 frames per
+  replay before being fixed).
 - Voice bubbles anchor to `bug.rig.head` world position each frame; battles
   must `voice.clear()` on dispose.
 

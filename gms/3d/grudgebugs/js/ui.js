@@ -198,11 +198,12 @@ export function optionsModal() {
 
 export function helpModal() {
   modal(`<h3>📖 How to Grudge</h3>
-    <p>🐜 Teams of bugs take turns lobbing things at each other across <b>very narrow ledges</b>. Last team standing eats the sandwich.</p>
-    <p>👉 <b>Drag</b> to aim (your bug turns to follow). <b>◀ ▶</b> walk the ledge — the meter is your legs.</p>
+    <p>🐜 Teams of bugs take turns lobbing things at each other across <b>crumbling dirt ridges</b>. Last team standing eats the sandwich.</p>
+    <p>👉 <b>Drag</b> to aim (your bug turns to follow). <b>◀ ▶</b> walk the ridge — the meter is your legs.</p>
+    <p>🎯 Every turn opens facing your nearest enemy. Tap <b>🎯</b> to hop the camera between targets — the marker shows through terrain.</p>
     <p>🔥 <b>Hold FIRE</b> to charge power, release to launch. Full charge auto-fires.</p>
     <p>🚀 Tap the weapon button to open the arsenal. 🩴 THE SHOE and 🐝 BEE-52 are aimed by dragging the target ring.</p>
-    <p>💨 Mind the wind. 💥 Explosions <b>bite chunks out of ledges</b>. 🌊 Knockback is lethal — the drop below is not a suggestion.</p>
+    <p>💨 Mind the wind. 💥 Explosions <b>blow craters out of the ground</b>. 🌊 Knockback is lethal — the drop below is not a suggestion.</p>
     <p>🍓 Take too long and <b>THE JAM RISES</b>.</p>
     <p>🎥 The camera button lets you free-orbit; pinch to zoom. Tap during a replay to skip it.</p>`);
 }

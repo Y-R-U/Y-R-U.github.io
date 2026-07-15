@@ -45,6 +45,9 @@ export class Input {
       () => { if (this._myTurn()) { this.getBattle().startCharge(); $('btn-fire').classList.add('charging'); } },
       () => { const b = this.getBattle(); if (b) b.releaseCharge(); $('btn-fire').classList.remove('charging'); });
     $('btn-weapon').addEventListener('click', () => { if (this._myTurn()) this.ui.toggleWheel(); });
+    $('btn-target').addEventListener('click', () => {
+      if (this._myTurn()) { audio.resume(); this.getBattle().cycleTarget(); }
+    });
     $('btn-cam').addEventListener('click', () => {
       this.freeCam = !this.freeCam;
       $('btn-cam').classList.toggle('on', this.freeCam);
@@ -64,6 +67,7 @@ export class Input {
       if (e.key === 'd' || e.key === 'ArrowRight') this._walk(1);
       if (e.key === ' ') { if (this._myTurn()) { b.startCharge(); $('btn-fire').classList.add('charging'); } e.preventDefault(); }
       if (e.key === 'Tab' || e.key === 'q') { if (this._myTurn()) this.ui.toggleWheel(); e.preventDefault(); }
+      if (e.key === 'e') { if (this._myTurn()) b.cycleTarget(); }
       if (e.key === 'Escape') this.ui.togglePause();
     });
     window.addEventListener('keyup', (e) => {

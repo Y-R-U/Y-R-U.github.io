@@ -26,7 +26,7 @@ export class FX {
     this.parts.push({ mesh: m, vel, life, life0: life, grav, spin, shrink, fade });
   }
 
-  explosion(p, radius = 1.6) {
+  explosion(p, radius = 1.6, terra = null) {
     const pos = new T.Vector3(p.x, p.y, p.z);
     // flash
     const flash = new T.Mesh(this._sphereGeo,
@@ -52,11 +52,13 @@ export class FX {
         radius * (0.1 + Math.random() * 0.14), pos, vel,
         { life: fire ? 0.5 : 1.1, grav: fire ? -4 : 1.5, shrink: true });
     }
-    // wood chips
-    for (let i = 0; i < 6; i++) {
+    // flying ground: dirt clods and torn grass tufts
+    const clods = terra ? [terra.dirt, terra.dirt2, terra.deep, terra.grass, terra.grass2]
+      : [0x8a6a3a, 0x6e4a2b, 0x54371f];
+    for (let i = 0; i < 9; i++) {
       const a = Math.random() * Math.PI * 2;
-      this._spawn(mat(0x8a6a3a, { flat: true }), 0.07 + Math.random() * 0.06, pos,
-        new T.Vector3(Math.cos(a) * 4, 3 + Math.random() * 4, Math.sin(a) * 4),
+      this._spawn(mat(clods[i % clods.length], { flat: true }), 0.06 + Math.random() * 0.08, pos,
+        new T.Vector3(Math.cos(a) * (3 + Math.random() * 2.5), 3 + Math.random() * 4.5, Math.sin(a) * (3 + Math.random() * 2.5)),
         { life: 1.3, grav: -13 });
     }
   }
