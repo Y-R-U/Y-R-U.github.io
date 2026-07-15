@@ -112,19 +112,24 @@
   .mc-btn.green:hover { background: linear-gradient(#8ee06a, #6cbb4c 45%, #57a03a); }
 
   /* ---------- downloads ---------- */
+  #file-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 18px;
+  }
   .file-card {
     display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 0;
   }
-  .file-card img { width: 84px; height: 84px; flex: 0 0 auto; border: 2px solid #000; outline: 2px solid var(--edge); }
-  .file-info { flex: 1 1 260px; }
-  .file-info h3 { font-family: var(--pixel); font-size: 14px; color: #fff; margin-bottom: 8px; }
-  .file-info .meta { font-family: var(--pixel); font-size: 8px; color: var(--dim); margin-bottom: 10px; letter-spacing: 1px; }
-  .file-info p { color: var(--text); font-size: 14px; }
-  .file-dl { flex: 0 0 auto; }
-  #file-status { font-family: var(--pixel); font-size: 9px; color: var(--dim); margin-top: 4px; }
+  .fc-top { display: flex; gap: 14px; align-items: center; }
+  .fc-top img { width: 64px; height: 64px; flex: 0 0 auto; border: 2px solid #000; outline: 2px solid var(--edge); }
+  .fc-top h3 { font-family: var(--pixel); font-size: 13px; color: #fff; margin-bottom: 7px; line-height: 1.5; }
+  .fc-top .meta { font-family: var(--pixel); font-size: 7.5px; color: var(--dim); letter-spacing: 1px; line-height: 1.8; word-break: break-all; }
+  .fc-desc { color: var(--text); font-size: 13.5px; flex: 1; }
+  .fc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  #file-status { font-family: var(--pixel); font-size: 9px; color: var(--dim); margin-top: 14px; }
 
   /* ---------- item showcase ---------- */
   .items-grid {
@@ -234,8 +239,13 @@
   <div id="file-list"></div>
   <div id="file-status">scanning addon folder…</div>
 
-  <h2 class="section">Trolling Addon — What's Inside</h2>
-  <div class="items-grid" id="items"></div>
+  <!-- Per-addon detail blocks live in .addon-details divs keyed by id
+       (details-<key>). Once more addons have details, the Details buttons
+       will hide/show these; for now the Trolling block always shows. -->
+  <div class="addon-details" id="details-trolling">
+    <h2 class="section">Trolling Addon — What's Inside</h2>
+    <div class="items-grid" id="items"></div>
+  </div>
 
   <h2 class="section">How To Install</h2>
   <div class="panel">
@@ -251,7 +261,7 @@
 </div>
 
 <footer>
-  <a href="/">Y-R-U.GITHUB.IO</a> &middot; TROLLING ADDON V1.0.0 &middot; MADE FOR BEDROCK
+  <a href="/">Y-R-U.GITHUB.IO</a> &middot; MC ADDONS &middot; MADE FOR BEDROCK
 </footer>
 
 <script>
@@ -279,13 +289,18 @@ function renderFiles(files, meta, source) {
     const card = document.createElement("div");
     card.className = "panel file-card";
     card.innerHTML = `
-      <img class="px" src="img/pack_icon.png" alt="">
-      <div class="file-info">
-        <h3>${m.title || f.name}</h3>
-        <div class="meta">${f.name} &middot; ${fmtSize(f.size)}${m.version ? " &middot; v" + m.version : ""}${m.minVersion ? " &middot; " + m.minVersion : ""}</div>
-        <p>${m.desc || "Minecraft Bedrock addon."}</p>
+      <div class="fc-top">
+        <img class="px" src="${m.icon || "img/pack_icon.png"}" alt="">
+        <div>
+          <h3>${m.title || f.name}</h3>
+          <div class="meta">${f.name} &middot; ${fmtSize(f.size)}${m.version ? " &middot; v" + m.version : ""}${m.minVersion ? " &middot; " + m.minVersion : ""}</div>
+        </div>
       </div>
-      <div class="file-dl"><a class="mc-btn green" href="files/${encodeURIComponent(f.name)}" download>⬇ DOWNLOAD</a></div>`;
+      <p class="fc-desc">${m.desc || "Minecraft Bedrock addon."}</p>
+      <div class="fc-actions">
+        <a class="mc-btn green" href="files/${encodeURIComponent(f.name)}" download>⬇ DOWNLOAD</a>
+        ${m.details ? `<a class="mc-btn" href="#details-${m.details}">📜 DETAILS</a>` : ""}
+      </div>`;
     list.appendChild(card);
   }
   status.textContent = shown.length + " file" + (shown.length > 1 ? "s" : "") + " in /mcaddons/files/ (" + source + ")";
