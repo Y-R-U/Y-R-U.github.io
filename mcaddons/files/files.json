@@ -20,7 +20,8 @@
       "version": "1.0.0",
       "desc": "Bakeable snacks! Craft Blueberries from sweet berries + blue dye, fold paper and sugar into Muffin Wrappers, then bake Choc and Blueberry Muffins — each trades a touch of Weakness for bursts of Speed, Haste and Jump Boost.",
       "minVersion": "Minecraft Bedrock 1.21+",
-      "icon": "img/muffins_pack_icon.png"
+      "icon": "img/muffins_pack_icon.png",
+      "details": "muffins"
     }
   ]
 }

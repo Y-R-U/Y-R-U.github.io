@@ -239,20 +239,17 @@
   <div id="file-list"></div>
   <div id="file-status">scanning addon folder…</div>
 
-  <!-- Per-addon detail blocks live in .addon-details divs keyed by id
-       (details-<key>). Once more addons have details, the Details buttons
-       will hide/show these; for now the Trolling block always shows. -->
-  <div class="addon-details" id="details-trolling">
-    <h2 class="section">Trolling Addon — What's Inside</h2>
-    <div class="items-grid" id="items"></div>
-  </div>
+  <!-- Per-addon detail blocks (details-<key> divs) are rendered here from
+       the DETAILS data below; the download cards' DETAILS buttons switch
+       which one is visible. -->
+  <div id="details-container"></div>
 
   <h2 class="section">How To Install</h2>
   <div class="panel">
     <ol class="steps">
       <li>Hit <b>Download</b> above and grab the <b>.mcaddon</b> file.</li>
       <li><b>Open the file</b> — Minecraft Bedrock imports both packs automatically (Windows, iOS, Android).</li>
-      <li>Create or edit a world → <b>Behavior Packs</b> → activate <b>Trolling Addon</b> (the resource pack comes with it).</li>
+      <li>Create or edit a world → <b>Behavior Packs</b> → activate the addon (its resource pack comes with it).</li>
       <li>Craft, place, troll.</li>
     </ol>
     <div class="note"><b>Heads up:</b> Bedrock addons can't read a player's real skin, so the Skin Mocker family uses a creepy mannequin body that <b>takes the name of whoever places it</b> — stalking, teleport rules and hunt mode all work as designed. Needs Minecraft Bedrock <b>1.21+</b>.</div>
@@ -333,9 +330,40 @@ const EMO = (e, size) => `<span style="font-size:${size || 21}px">${e}</span>`;
 const R = ["🔴", "Redstone Dust"], FE = ["🪶", "Feather"], BOOT = ["🥾", "Leather Boots"],
       CHEST = ["🎽", "Leather Chestplate"], STAND = ["🧍", "Armor Stand"], SWORD = ["🗡️", "Wooden Sword"],
       STONE = ["🪨", "Stone (not cobble!)"], IRONB = ["⬜", "Iron Block"], DIAB = ["💎", "Diamond Block"],
-      CART = ["🚃", "Minecart"], WPICK = ["⛏️", "Wooden Pickaxe"], X = null;
+      CART = ["🚃", "Minecart"], WPICK = ["⛏️", "Wooden Pickaxe"], X = null,
+      PAPER = ["📄", "Paper"], SUGAR = ["🍬", "Sugar"], BERRY = ["🍒", "Sweet Berries"],
+      DYE = ["🔵", "Blue Dye"], WHEAT = ["🌾", "Wheat"], COCOA = ["🍫", "Cocoa Beans"];
 
-const ITEMS = [
+const MUFFIN_ITEMS = [
+  {
+    icon: "muffins_muffin_wrapper", name: "Muffin Wrapper",
+    desc: "Two sheets of paper folded around a pinch of sugar. Not edible — it's the <strong>crinkly foundation</strong> every proper muffin gets baked in.",
+    tags: ["INGREDIENT"],
+    grid: [X, X, X, PAPER, X, PAPER, X, SUGAR, X], out: ["muffins_muffin_wrapper", "Muffin Wrapper"]
+  },
+  {
+    icon: "muffins_blueberry", name: "Blueberry",
+    desc: "A quick snack and the key ingredient for the good muffin. Yes, it's a <strong>sweet berry dunked in blue dye</strong>. Don't think about it too hard.",
+    tags: ["FOOD", "SNACK"],
+    grid: [X, X, X, BERRY, DYE, X, X, X, X], out: ["muffins_blueberry", "Blueberry"]
+  },
+  {
+    icon: "muffins_choc_muffin", name: "Choc Muffin",
+    desc: "Cocoa ring around wheat, baked in a wrapper. Eating one grants <strong>Speed II</strong> (15s) and <strong>Jump Boost I</strong> (25s) — with a sugar-crash side of Weakness I (20s).",
+    tags: ["FOOD", "SPEED II", "JUMP BOOST I"],
+    grid: [X, COCOA, X, COCOA, WHEAT, COCOA, X, ["muffins_muffin_wrapper", "Muffin Wrapper", true], X],
+    out: ["muffins_choc_muffin", "Choc Muffin"]
+  },
+  {
+    icon: "muffins_blueberry_muffin", name: "Blueberry Muffin",
+    desc: "The premium bake. Grants <strong>Haste II</strong> (35s) and <strong>Jump Boost III</strong> (30s), plus the same little Weakness I wobble (20s). Mine faster, jump higher, punch softer.",
+    tags: ["FOOD", "HASTE II", "JUMP BOOST III"],
+    grid: [X, ["muffins_blueberry", "Blueberry", true], X, ["muffins_blueberry", "Blueberry", true], WHEAT, ["muffins_blueberry", "Blueberry", true], X, ["muffins_muffin_wrapper", "Muffin Wrapper", true], X],
+    out: ["muffins_blueberry_muffin", "Blueberry Muffin"]
+  }
+];
+
+const TROLLING_ITEMS = [
   {
     icon: "speed_minecart", name: "Speed Minecart",
     desc: "A minecart with <strong>no chill</strong>. Every powered rail it crosses stacks MORE speed on top — up to a ludicrous 80 m/s. Mobs still hop in on contact, just like vanilla.",
@@ -380,8 +408,12 @@ const ITEMS = [
   }
 ];
 
-const itemsEl = document.getElementById("items");
-for (const it of ITEMS) {
+const DETAILS = {
+  trolling: { title: "Trolling Addon — What's Inside", items: TROLLING_ITEMS },
+  muffins: { title: "Muffins & Blueberries — What's Inside", items: MUFFIN_ITEMS }
+};
+
+function itemCard(it) {
   const cells = it.grid.map(c => {
     if (!c) return `<div class="craft-cell"></div>`;
     if (c[2]) return `<div class="craft-cell" title="${c[1]}">${IMG(c[0])}</div>`;
@@ -401,8 +433,51 @@ for (const it of ITEMS) {
       <div class="craft-arrow">→</div>
       <div class="craft-out" title="${it.out[1]}">${IMG(it.out[0])}</div>
     </div>`;
-  itemsEl.appendChild(card);
+  return card;
 }
+
+function renderDetails() {
+  const container = document.getElementById("details-container");
+  for (const [key, d] of Object.entries(DETAILS)) {
+    const block = document.createElement("div");
+    block.className = "addon-details";
+    block.id = "details-" + key;
+    block.style.display = "none";
+    const h = document.createElement("h2");
+    h.className = "section";
+    h.textContent = d.title;
+    const grid = document.createElement("div");
+    grid.className = "items-grid";
+    for (const it of d.items) grid.appendChild(itemCard(it));
+    block.appendChild(h);
+    block.appendChild(grid);
+    container.appendChild(block);
+  }
+}
+
+function showDetails(key, scroll = true) {
+  if (!DETAILS[key]) return;
+  for (const k of Object.keys(DETAILS)) {
+    const el = document.getElementById("details-" + k);
+    if (el) el.style.display = k === key ? "" : "none";
+  }
+  if (scroll) document.getElementById("details-" + key).scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// DETAILS buttons on the download cards switch the visible block
+document.getElementById("file-list").addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-details]");
+  if (!a) return;
+  e.preventDefault();
+  const key = a.dataset.details;
+  history.replaceState(null, "", "#details-" + key);
+  showDetails(key);
+});
+
+renderDetails();
+// deep links like #details-muffins open on that addon's details
+const initialKey = (location.hash.match(/^#details-([a-z0-9_-]+)$/i) || [])[1];
+showDetails(DETAILS[initialKey] ? initialKey : "trolling", false);
 </script>
 </body>
 </html>
