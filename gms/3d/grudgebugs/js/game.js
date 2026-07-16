@@ -31,7 +31,7 @@ export class Battle {
     this.killY = PHYS.killY;
     this.wind = { x: 0, z: 0, mag: 0 };
     this.round = 0; this.turnCount = -1; this.suddenDeath = false;
-    this.phase = 'boot';
+    this.phase = 'boot'; this.over = false;
     this.timer = RULES.turnTime;
     this.projectiles = [];      // live playbacks {rec, playT, mesh, done}
     this.rags = [];             // {bug, path, end, playT}

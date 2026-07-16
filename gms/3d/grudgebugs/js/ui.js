@@ -246,6 +246,9 @@ function renderWheel() {
     el.title = w.desc;
     el.addEventListener('click', () => {
       if (ammo === 0) return;
+      // stale-wheel guard: the turn may have changed since render
+      const live = cb.getBattle();
+      if (live !== b || b.phase !== 'play' || b.activeTeam()?.isAI) return toggleWheel(false);
       audio.ui();
       b.selectWeapon(w.id);
       toggleWheel(false);
@@ -283,11 +286,13 @@ export function updateHUD(b) {
     const ammo = team.ammo.get(w.id);
     $('weapon-ammo').textContent = ammo < 0 ? '' : `×${ammo}`;
   }
-  // controls only on the human's turn
-  const mine = b.phase === 'play' && team && !team.isAI;
-  $('controls').classList.toggle('hidden', !mine || b.over);
-  $('hud-timer').classList.toggle('hidden', !mine || b.over);
+  // controls only on the human's turn — force arg must be a real boolean:
+  // toggle('hidden', undefined) flips instead of forcing (b.over bit us here)
+  const mine = b.phase === 'play' && !!team && !team.isAI && !b.over;
+  $('controls').classList.toggle('hidden', !mine);
+  $('hud-timer').classList.toggle('hidden', !mine);
   $('aim-hint').classList.toggle('hidden', !mine || b.turnCount > 1);
+  if (!mine && wheelOpen) toggleWheel(false); // don't linger over AI turns
 }
 
 // called every frame — cheap updates only

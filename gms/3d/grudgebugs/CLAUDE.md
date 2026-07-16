@@ -113,6 +113,11 @@ boot/modes/loop/flags.
   replay before being fixed).
 - Voice bubbles anchor to `bug.rig.head` world position each frame; battles
   must `voice.clear()` on dispose.
+- **`classList.toggle(cls, force)` needs a real boolean** — `undefined` force
+  means "no force" and flip-toggles. `updateHUD` passed `!mine || b.over`
+  with `b.over` undefined mid-battle, so every weapon select flipped the
+  bottom controls invisible. `over` is now initialised `false` in the Battle
+  ctor AND folded into `mine`; keep force args `!!`-coerced.
 
 ## Testing
 
