@@ -105,8 +105,14 @@ export function activeEvent(now = new Date()) {
   }
   const def = EVENTS[id];
   const evKey = `${weekKey(now)}-${id}`;
-  if (!save.data.events[evKey]) {
-    save.data.events[evKey] = { best: 0, claimed: def.tiers.map(() => false) };
+  const st = save.data.events[evKey];
+  if (!st) {
+    save.data.events[evKey] = { best: 0, total: 0, claimed: def.tiers.map(() => false) };
+    persist();
+  } else if (st.total == null || st.claimed.length !== def.tiers.length) {
+    // pre-cumulative save state: credit the best run, reset claims to new tier list
+    if (st.total == null) st.total = st.best;
+    if (st.claimed.length !== def.tiers.length) st.claimed = def.tiers.map(() => false);
     persist();
   }
   return { active: true, id, def, key: evKey, state: save.data.events[evKey], endsIn };
@@ -116,13 +122,16 @@ export function eventRecord(evKey, score) {
   const e = save.data.events[evKey];
   if (!e) return;
   e.best = Math.max(e.best, score);
+  e.total = (e.total || 0) + score;
   persist();
 }
 
 export function eventClaim(evKey, def, tierIdx) {
   const e = save.data.events[evKey];
   const tier = def.tiers[tierIdx];
-  if (!e || !tier || e.claimed[tierIdx] || e.best < tier.score) return false;
+  if (!e || !tier) return false;
+  const have = tier.type === 'best' ? e.best : (e.total || 0);
+  if (e.claimed[tierIdx] || have < tier.score) return false;
   e.claimed[tierIdx] = true;
   addShards(tier.shards);
   persist();

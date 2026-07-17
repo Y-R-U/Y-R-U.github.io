@@ -176,7 +176,8 @@ function onGameEnd(result) {
   }
   if (result.mode === 'event' && game.eventKey) {
     eventRecord(game.eventKey, result.score);
-    extra = `<div class="rline">event best: <b>${fmt(save.data.events[game.eventKey].best)}</b></div>`;
+    const es = save.data.events[game.eventKey];
+    extra = `<div class="rline">event total: <b>${fmt(es.total)}</b> · best: <b>${fmt(es.best)}</b></div>`;
   }
   if (result.mode === 'blitz') {
     save.data.best.blitz = Math.max(save.data.best.blitz, result.score);
@@ -413,17 +414,19 @@ function eventPopup() {
     return;
   }
   const tiers = ev.def.tiers.map((t, i) => {
-    const hit = ev.state.best >= t.score;
+    const isBest = t.type === 'best';
+    const have = isBest ? ev.state.best : (ev.state.total || 0);
+    const hit = have >= t.score;
     const claimed = ev.state.claimed[i];
     return `<div class="tier ${hit ? 'hit' : ''} ${claimed ? 'claimed' : ''}">
-      <span class="tsc">${fmt(t.score)}</span><span class="trw">${t.shards} ◆</span>
+      <span class="tsc">${fmt(t.score)}</span><span class="ttyp">${isBest ? '★ best run' : 'total'}</span><span class="trw">${t.shards} ◆</span>
       ${claimed ? '<span class="tok">✓</span>' : hit ? `<button class="tiny gold" data-tier="${i}">CLAIM</button>` : '<span class="tlock">🔒</span>'}
     </div>`;
   }).join('');
   const card = popup(`
     <div class="ptitle">${ev.def.icon} ${ev.def.name}</div>
     <div class="rline">${ev.def.desc}</div>
-    <div class="rline">ends in <b>${fmtCountdown(ev.endsIn)}</b> · your best: <b class="goldtx">${fmt(ev.state.best)}</b></div>
+    <div class="rline">ends in <b>${fmtCountdown(ev.endsIn)}</b> · total: <b class="goldtx">${fmt(ev.state.total || 0)}</b> · best: <b class="goldtx">${fmt(ev.state.best)}</b></div>
     <div class="tiers">${tiers}</div>
     <button class="big gold" id="e-play">${ev.def.mode === 'zen' ? '🌙' : '⚡'} PLAY EVENT</button>
   `);

@@ -99,30 +99,51 @@ export const WEEKLY_TIERS = [
 
 // ── events: deterministic schedule from the date ──────────────────────────
 // weekend event Fri–Sun rotates by ISO week; midweek event every Wednesday.
+// Tier types: 'total' = cumulative score across all runs of this event
+// (the bread-and-butter track), 'best' = single-run stretch target.
 export const EVENTS = {
   goldrush: {
     name: 'GOLD RUSH', icon: '🪙', mode: 'blitz',
     desc: 'Metal gems everywhere and worth triple. Crush sandwiches pay out huge.',
     mods: { metalChance: 0.28, metalScoreMult: 3 },
-    tiers: [ { score: 10000, shards: 250 }, { score: 25000, shards: 500 }, { score: 50000, shards: 1200 } ],
+    tiers: [
+      { type: 'total', score: 25000,  shards: 250 },
+      { type: 'total', score: 50000,  shards: 500 },
+      { type: 'total', score: 100000, shards: 1000 },
+      { type: 'best',  score: 12000,  shards: 400 },
+    ],
   },
   shatterstorm: {
     name: 'SHATTERSTORM', icon: '🥂', mode: 'blitz',
     desc: 'Glass is fragile tonight — crushes score 4× and set off shockwaves.',
     mods: { metalChance: 0.2, crushScoreMult: 4, crushShockwave: true },
-    tiers: [ { score: 9000, shards: 250 }, { score: 22000, shards: 500 }, { score: 45000, shards: 1200 } ],
+    tiers: [
+      { type: 'total', score: 25000,  shards: 250 },
+      { type: 'total', score: 50000,  shards: 500 },
+      { type: 'total', score: 100000, shards: 1000 },
+      { type: 'best',  score: 11000,  shards: 400 },
+    ],
   },
   prismfrenzy: {
     name: 'PRISM FRENZY', icon: '🌈', mode: 'blitz',
     desc: 'A free Prism Orb drops onto the board every 15 seconds. Go wild.',
     mods: { prismEvery: 15 },
-    tiers: [ { score: 12000, shards: 250 }, { score: 30000, shards: 500 }, { score: 60000, shards: 1200 } ],
+    tiers: [
+      { type: 'total', score: 25000,  shards: 250 },
+      { type: 'total', score: 50000,  shards: 500 },
+      { type: 'total', score: 100000, shards: 1000 },
+      { type: 'best',  score: 14000,  shards: 400 },
+    ],
   },
   twilightzen: {
     name: 'TWILIGHT ZEN', icon: '🌒', mode: 'zen',
     desc: 'Midweek wind-down: every zen milestone pays double shards.',
     mods: { zenShardMult: 2 },
-    tiers: [ { score: 15000, shards: 300 }, { score: 40000, shards: 700 } ],
+    tiers: [
+      { type: 'total', score: 20000, shards: 300 },
+      { type: 'total', score: 50000, shards: 700 },
+      { type: 'best',  score: 15000, shards: 300 },
+    ],
   },
 };
 export const WEEKEND_ROTATION = ['goldrush', 'shatterstorm', 'prismfrenzy'];
