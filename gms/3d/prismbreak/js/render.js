@@ -67,7 +67,7 @@ export function initRender(lite) {
   if (!lite) {
     R.composer = new EffectComposer(R.renderer);
     R.composer.addPass(new RenderPass(R.scene, R.camera));
-    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.75, 0.6, 0.82);
+    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.6, 0.88);
     R.composer.addPass(bloom);
   }
 
@@ -91,7 +91,7 @@ function buildBoardFrame() {
     }
   }
   // metallic frame
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x8fa3ff, metalness: 1, roughness: 0.35, envMapIntensity: 1.5 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x8fa3ff, metalness: 1, roughness: 0.35, envMapIntensity: 0.9 });
   R.frameMat = frameMat;
   const bar = (w, h, x, y) => {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.3), frameMat);

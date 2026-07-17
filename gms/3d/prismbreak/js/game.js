@@ -1,7 +1,7 @@
 // Gameplay controller: replays board events as animation + FX, owns HUD,
 // modes (journey/blitz/zen/weekly/event), boosters, forge meter, hints, auto.
 import { Board } from './board.js';
-import { GemMesh, initGemAssets, gemGlowColor, gemHexColor } from './gems.js';
+import { GemMesh, initGemAssets, gemGlowColor, gemHexColor, getInnerAsset } from './gems.js';
 import { R, cellToWorld, addShake } from './render.js';
 import * as FX from './fx.js';
 import { sfx } from './audio.js';
@@ -119,7 +119,7 @@ function tapTarget(cell) {
     game.forgeArmed = false;
     game.forge = 0;
     sfx.forge();
-    FX.flash('rgba(255,180,60,0.3)');
+    FX.flash('rgba(255,180,60,0.18)');
     runActivation(cell.r, cell.c, 1);
     return true;
   }
@@ -224,10 +224,10 @@ async function playClear(ev, comboKind) {
   for (const act of ev.activations) {
     const p = cellToWorld(act.r, act.c);
     switch (act.kind) {
-      case 'lineH': FX.beam(p, true, 0xffffff); sfx.beam(); break;
-      case 'lineV': FX.beam(p, false, 0xffffff); sfx.beam(); break;
+      case 'lineH': FX.beam(p, true, 0xbfe0ff); sfx.beam(); break;
+      case 'lineV': FX.beam(p, false, 0xbfe0ff); sfx.beam(); break;
       case 'burst': FX.shockwave(p.x, p.y, 0xffcc66, 2.4); sfx.boom(); break;
-      case 'nova': FX.shockwave(p.x, p.y, 0xff66aa, 4.2); FX.flash('rgba(255,120,220,0.25)'); sfx.nova(); break;
+      case 'nova': FX.shockwave(p.x, p.y, 0xff66aa, 4.2); FX.flash('rgba(255,120,220,0.14)'); sfx.nova(); break;
       case 'prism': {
         sfx.prismCast();
         const col = act.color >= 0 ? GEM_COLORS[act.color].glow : 0xffffff;
@@ -241,18 +241,18 @@ async function playClear(ev, comboKind) {
       }
       case 'comboLL': FX.beam(p, true, 0x88eeff); FX.beam(p, false, 0x88eeff); sfx.beam(); sfx.beam(); break;
       case 'comboLB': for (let d = -(act.rad || 1); d <= (act.rad || 1); d++) { FX.beam({ x: p.x, y: p.y + d }, true, 0xffee88); FX.beam({ x: p.x + d, y: p.y }, false, 0xffee88); } sfx.nova(); break;
-      case 'comboBB': FX.shockwave(p.x, p.y, 0xffaa44, 5); FX.flash('rgba(255,180,80,0.3)'); sfx.nova(); break;
+      case 'comboBB': FX.shockwave(p.x, p.y, 0xffaa44, 5); FX.flash('rgba(255,180,80,0.16)'); sfx.nova(); break;
       case 'comboPC': case 'comboPL': case 'comboPB': {
         sfx.prismCast();
-        FX.shockwave(p.x, p.y, 0xffffff, 5);
-        FX.flash('rgba(200,240,255,0.35)');
+        FX.shockwave(p.x, p.y, 0xbfe0ff, 5);
+        FX.flash('rgba(200,240,255,0.18)');
         for (const cell of ev.cells) {
           const q = cellToWorld(cell.r, cell.c);
           FX.zapBolt(p.x, p.y, q.x, q.y, gemGlowColor(cell.gem));
         }
         break;
       }
-      case 'comboPP': FX.flash('rgba(255,255,255,0.6)', 500); FX.shockwave(p.x, p.y, 0xffffff, 8); sfx.mega(); addShake(0.4); break;
+      case 'comboPP': FX.flash('rgba(190,225,255,0.32)', 400); FX.shockwave(p.x, p.y, 0xbfe0ff, 8); sfx.mega(); addShake(0.4); break;
     }
   }
   if (comboKind && ev.cascade === 1 && CALLOUTS[comboKind.replace('combo', 'combo')]) {
@@ -269,6 +269,21 @@ async function playClear(ev, comboKind) {
     centroid.x += p.x; centroid.y += p.y;
     const isMetal = cell.gem.finish === 'metal';
     const crushed = crushKeys.has(cell.r * 100 + cell.c);
+    // glass shell + inner gem → crack, shatter the shell, gem tumbles free
+    const isShelled = !isMetal && cell.gem.color >= 0 && cell.gem.special !== 'prism';
+    const breakShell = (smash) => {
+      if (isShelled) {
+        FX.popFlash(p.x, p.y, gemGlowColor(cell.gem), smash ? 2.2 : 1);
+        FX.burst(p.x, p.y, gemGlowColor(cell.gem), smash ? 24 : 10, smash ? 5 : 3);
+        FX.shatter(p.x, p.y, gemHexColor(cell.gem), false, smash ? 14 : 8);
+        const inner = getInnerAsset(cell.gem.color);
+        FX.dropGem(p.x, p.y, inner.geo, inner.mat, smash);
+      } else {
+        FX.popFlash(p.x, p.y, gemGlowColor(cell.gem), isMetal ? 1.6 : 1.2);
+        FX.burst(p.x, p.y, gemGlowColor(cell.gem), 12, 3.2);
+        FX.shatter(p.x, p.y, gemGlowColor(cell.gem), isMetal, 8);
+      }
+    };
     if (crushed) {
       // THE CRUSH: metal above slams down, glass squashes flat, then explodes
       sfx.crush();
@@ -281,10 +296,8 @@ async function playClear(ev, comboKind) {
         tween(0.13, k => { grp.scale.set(1 + k * 0.6, Math.max(1 - k * 1.1, 0.06), 1); }, {
           onDone: () => {
             R.gemLayer.remove(grp);
-            FX.popFlash(p.x, p.y, 0xffffff, 3);
-            FX.burst(p.x, p.y, gemGlowColor(cell.gem), 30, 5.5);
-            FX.shatter(p.x, p.y, gemHexColor(cell.gem), false, 16);
-            FX.shockwave(p.x, p.y, 0xffffff, game.mods.crushShockwave ? 3.6 : 2);
+            breakShell(true);
+            FX.shockwave(p.x, p.y, gemGlowColor(cell.gem), game.mods.crushShockwave ? 3.6 : 2);
           },
         });
         game.meshes.delete(cell.gem.id);
@@ -292,18 +305,29 @@ async function playClear(ev, comboKind) {
       i++;
       continue;
     }
-    FX.popFlash(p.x, p.y, gemGlowColor(cell.gem), isMetal ? 2 : 1.4);
-    FX.burst(p.x, p.y, gemGlowColor(cell.gem), 12, 3.2);
-    FX.shatter(p.x, p.y, isMetal ? gemGlowColor(cell.gem) : gemHexColor(cell.gem), isMetal, isMetal ? 8 : 7);
     if (isMetal) { sfx.clang(i * 0.02); game.forge = Math.min(game.forge + FORGE.metal, 100); }
     else sfx.pop(ev.cascade, i);
     if (cell.gem.special) { game.forge = Math.min(game.forge + FORGE.special, 100); save.data.stats.specials++; }
     if (gm) {
       const grp = gm.group;
-      tween(0.18, k => { grp.scale.setScalar(1 + k * 0.6); grp.rotation.z = k * 1.2; }, {
-        onDone: () => R.gemLayer.remove(grp),
-      });
+      if (isShelled) {
+        if (i === 0) sfx.glass(0.04);
+        // crack: quick jitter + swell, then the shell bursts and the gem falls out
+        tween(0.12, k => {
+          grp.rotation.z = Math.sin(k * 26) * 0.07 * (1 - k * 0.5);
+          grp.scale.setScalar(1 + k * 0.1);
+        }, {
+          onDone: () => { R.gemLayer.remove(grp); breakShell(false); },
+        });
+      } else {
+        breakShell(false);
+        tween(0.18, k => { grp.scale.setScalar(1 + k * 0.6); grp.rotation.z = k * 1.2; }, {
+          onDone: () => R.gemLayer.remove(grp),
+        });
+      }
       game.meshes.delete(cell.gem.id);
+    } else {
+      breakShell(false);
     }
     i++;
   }
@@ -621,7 +645,7 @@ export function updateGame(t, dt) {
       if (gm) FX.popFlash(
         gm.group.position.x + (Math.random() - 0.5) * 0.5,
         gm.group.position.y + (Math.random() - 0.5) * 0.5,
-        0xffffff, 0.45);
+        0xdfeaff, 0.35);
     }
   }
 

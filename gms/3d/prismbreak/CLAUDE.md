@@ -48,11 +48,22 @@ joke modal — never real ads). No build step; three.js **0.180** via importmap
 
 - **Tone mapping is NeutralToneMapping on purpose** — ACES washes the saturated
   gem colours to pastel (Aaron flagged it). Don't "fix" it back.
-- Glass = real `transmission` (+ dispersion, attenuation); board tiles must stay
-  OPAQUE or they vanish from the transmission buffer and gems stop looking
-  see-through. `?lite=1` falls back to cheap opacity glass.
+- Glass gems = smooth round transmissive bubble (`shellGeo` sphere) + smaller
+  OPAQUE faceted gem inside (`GemMesh.inner`). Anything that must be visible
+  *through* the shell — inner gem, special glow rods/cores, board tiles — must
+  be opaque, or it vanishes from the transmission buffer. The see-through look
+  is fragile; each of these kills it if "improved": shell must have NO emissive
+  (reads solid), NO flat shading (facets scramble refraction), LOW ior/thickness
+  (1.12/0.35 — lensing smears the inner gem), WHITE body colour (tint dims the
+  interior), low envMapIntensity (sheen reads as a rubber ball).
+  `?lite=1` falls back to a cheap transparent shell.
+- Clearing a glass gem: crack jitter → shell shatters (pale shards) → inner gem
+  tumbles out via `FX.dropGem` (shares gem geo/mats — never dispose them there).
 - Crush choreography lives in `playClear()` (squash tween + `slamCrusher()`),
   not in the engine — engine only reports `ev.crushes`.
+- Keep flashes tame: full-screen `FX.flash` alphas ≤ ~0.3, no pure-white
+  popFlash/shockwaves on routine clears — Aaron flagged the game as too
+  white-flashy once already. Bloom is 0.4/0.6/0.88 on purpose.
 - Fake-ad reward flows all route through `ui.js watchAd(onDone)` — keep it fake.
 - `daily.claimed` only keeps the last 60 day-keys; month maths reads it, so
   don't trim below ~35.

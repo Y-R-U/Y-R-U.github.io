@@ -74,8 +74,10 @@ export function shatter(x, y, colorHex, metal = false, count = 9) {
   const mat = metal
     ? new THREE.MeshStandardMaterial({ color: colorHex, metalness: 1, roughness: 0.12, envMapIntensity: 2.2 })
     : new THREE.MeshPhysicalMaterial({
-        color: colorHex, transparent: true, opacity: 0.9, roughness: 0.03,
-        clearcoat: 1, envMapIntensity: 1.8, emissive: colorHex, emissiveIntensity: 0.25,
+        // broken shell pieces: pale near-clear glass, not glowing colour chips
+        color: new THREE.Color(colorHex).lerp(new THREE.Color(0xffffff), 0.55),
+        transparent: true, opacity: 0.7, roughness: 0.05,
+        clearcoat: 1, envMapIntensity: 1.6, emissive: colorHex, emissiveIntensity: 0.08,
       });
   const shards = [];
   for (let i = 0; i < count; i++) {
@@ -97,7 +99,7 @@ export function shatter(x, y, colorHex, metal = false, count = 9) {
         m.position.addScaledVector(m.userData.v, dt);
         m.rotation.x += m.userData.rv.x * dt; m.rotation.y += m.userData.rv.y * dt;
       }
-      if (!metal) mat.opacity = 0.9 * (1 - age / 1.4);
+      if (!metal) mat.opacity = 0.7 * (1 - age / 1.4);
       return age < 1.4;
     },
     dispose() {
@@ -105,6 +107,37 @@ export function shatter(x, y, colorHex, metal = false, count = 9) {
       mat.dispose();
       shardCount -= count;
     },
+  });
+}
+
+// ── freed inner gem tumbles out of its broken shell ───────────────────
+let dropCount = 0;
+export function dropGem(x, y, geo, mat, smash = false) {
+  if (R.lite || dropCount > 24) return;
+  const m = new THREE.Mesh(geo, mat); // geo/mat are shared gem assets — never disposed here
+  m.position.set(x, y, 0.5);
+  const s0 = 0.6;
+  m.scale.setScalar(s0);
+  // crushed gems get smacked downward; popped ones hop up, then gravity wins
+  const v = new THREE.Vector3(
+    (Math.random() - 0.5) * 1.8,
+    smash ? -(2 + Math.random() * 1.5) : 1.6 + Math.random() * 1.4,
+    0.8 + Math.random() * 0.8);
+  const rv = new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+  R.fxLayer.add(m);
+  dropCount++;
+  const life = 0.9;
+  active.push({
+    age: 0,
+    update(dt, age) {
+      v.y -= 10 * dt;
+      m.position.addScaledVector(v, dt);
+      m.rotation.x += rv.x * dt; m.rotation.y += rv.y * dt; m.rotation.z += rv.z * dt;
+      const k = age / life;
+      if (k > 0.7) m.scale.setScalar(s0 * (1 - (k - 0.7) / 0.3)); // opaque mat: shrink out
+      return age < life;
+    },
+    dispose() { R.fxLayer.remove(m); dropCount--; },
   });
 }
 
