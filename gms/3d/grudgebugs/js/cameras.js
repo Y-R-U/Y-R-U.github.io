@@ -137,7 +137,14 @@ export class CameraDirector {
           .addScaledVector(dir, -CAM.followBack - Math.sin(prog * Math.PI) * 0.7)
           .addScaledVector(side, Math.cos(ang) * 0.9)
           .add(V(0, CAM.followUp + Math.sin(ang) * 0.3, 0));
-        return { pos, look: p.clone().addScaledVector(dir, 4), snap: 14 };
+        // crane up over the last half-second so the hit isn't watched from
+        // inside the dirt — rise, and tilt the look down onto the landing spot
+        const rem = o.remain?.() ?? 9;
+        const near = easeOut(clamp((0.55 - rem) / 0.55, 0, 1));
+        pos.y += near * 2.4;
+        const look = p.clone().addScaledVector(dir, 4);
+        if (near > 0) look.lerp(o.impact || p, near * 0.7);
+        return { pos, look, snap: 14 };
       }
       case 'impact': {
         const p = o.pos;
@@ -214,12 +221,23 @@ export class CameraDirector {
     }
   }
 
+  // keep a position above the terrain ridges — groundAt is lent to us by the
+  // live Battle (null in menus/cutscenes). Only ever raises y, never lowers.
+  _clampGround(pos, clearance) {
+    if (!this.groundAt) return;
+    const g = this.groundAt(pos.x, pos.z);
+    if (g > -1e8 && pos.y < g + clearance) pos.y = g + clearance;
+  }
+
   // ---------------- frame update ----------------
   update(dt, unscaledDt) {
     this.t += unscaledDt;
     this.tGlobal = (this.tGlobal || 0) + unscaledDt;
     const d = this._desired(dt);
+    const clampable = this.mode !== 'menu' && this.mode !== 'cine';
+    const clr = this.mode === 'impact' ? 0.7 : this.mode === 'replay' ? 0.3 : 0.5;
     if (d) {
+      if (clampable) this._clampGround(d.pos, clr);
       if (d.snap <= 0) { this.smoothPos.copy(d.pos); this.smoothLook.copy(d.look); }
       else {
         const k = 1 - Math.exp(-d.snap * unscaledDt);
@@ -227,6 +245,7 @@ export class CameraDirector {
         this.smoothLook.lerp(d.look, Math.min(1, k * 1.3));
       }
     }
+    if (clampable) this._clampGround(this.smoothPos, clr);
     // trauma shake
     this.trauma = Math.max(0, this.trauma - unscaledDt * 1.6);
     const sh = this.trauma * this.trauma * (this.shakeOn === false ? 0 : 1);

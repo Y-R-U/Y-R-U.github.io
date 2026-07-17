@@ -45,6 +45,7 @@ export class Battle {
     this.ledges = phys.buildLedges(defs);
     this.arena = new ArenaView(scene, opts.theme, this.ledges, this.rng,
       { lite: opts.lite, sandwich: opts.sandwich, sandwichPos: opts.sandwichPos });
+    this.cams.groundAt = (x, z) => this._groundY(x, z);
 
     // teams & bugs
     this.teams = opts.teams.map((td, ti) => {
@@ -363,6 +364,7 @@ export class Battle {
       },
       progress: () => pb.playT / Math.max(0.1, rec.dur),
       remain: () => rec.dur - pb.playT,
+      impact: rec.impact ? new T.Vector3(rec.impact.pos.x, rec.impact.pos.y, rec.impact.pos.z) : null,
     });
   }
 
@@ -573,6 +575,20 @@ export class Battle {
     }
     this.group.remove(bug.rig.root);
     this.opts.onHUD?.(this);
+  }
+
+  // highest surviving ridge surface under (x,z), or -Infinity over the void —
+  // the camera director uses this to stay out of the dirt
+  _groundY(x, z) {
+    let g = -Infinity;
+    const p = { x, z };
+    for (const L of this.ledges) {
+      const n = phys.nearestS(L, p);
+      if (n.distXZ > L.w * 1.2 + 0.35) continue;  // past the grass lip
+      if (!phys.spanAt(L, n.s)) continue;         // crater — ground is gone
+      if (n.y > g) g = n.y;
+    }
+    return g;
   }
 
   _nearestEnemy(bug, maxDist = 1e9) {
@@ -991,6 +1007,7 @@ export class Battle {
   }
 
   dispose() {
+    if (this.cams.groundAt) this.cams.groundAt = null;
     this.scene.remove(this.group);
     this.arena.dispose();
     this.markerTag?.remove();

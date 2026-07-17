@@ -102,6 +102,12 @@ boot/modes/loop/flags.
 - Impact/fall cameras must clamp above `battle.killY` (rising jam!) or the
   lens dips under the abyss plane — both already clamp; keep it when adding
   camera modes.
+- **Cameras must also stay out of the dirt**: Battle lends the director
+  `cams.groundAt(x,z)` (`_groundY` — highest surviving ridge under a point,
+  gap-aware), and `update()` clamps every mode except menu/cine above it.
+  The follow cam additionally cranes up ~2.4 in the last 0.55s
+  (`o.remain()` is SECONDS) and tilts the look onto `o.impact` so the hit
+  is never watched from inside the ridge. Null `groundAt` on dispose.
 - Ledge meshes rebuild only via `arena.refreshDirty()` after `biteLedges`.
 - **Terrain noise must stay bite-stable**: ring stations sit on a GLOBAL 0.6
   grid and all jitter comes from `tn()` keyed on absolute s (`qs`) + `L.i` —
