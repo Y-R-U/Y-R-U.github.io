@@ -421,11 +421,13 @@ export function showStoryResult(m, ctx) {
   }
   if (m.won) {
     const nextLvl = storyLevel(Math.min(100, App.save.story));
+    const nextCh = CHAPTERS[nextLvl.chapter];
     modal(`<h2>${ctx.wasBoss ? "CHAPTER CLEARED!" : "VICTORY!"}</h2>
       <div class="big-emoji">${ctx.wasBoss ? "⚔️" : "🎉"}</div>
       ${ctx.wasBoss ? `<p style="color:#7ee6a1;font-weight:800">${esc(CHAPTERS[Math.min(9, ctx.newChapter)].emo + " " + CHAPTERS[Math.min(9, ctx.newChapter)].name)} unlocked!</p>` : ""}
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}
-      <p style="font-size:12px;font-style:italic;opacity:.85">Next: ${esc(nextLvl.line)}</p>`,
+      <div class="modal-story"><div class="ms-tag">${nextCh.emo} LEVEL ${nextLvl.n}</div>
+        <div class="ms-line">${nextLvl.isBoss ? "⚔️ " : ""}${esc(nextLvl.line)}</div></div>`,
       [{ label: "NEXT LEVEL ▶", fn: () => App.playStory() },
        { label: "Story map", cls: "ghost", fn: () => { buildStory(); showScreen("story"); } }]);
   } else {

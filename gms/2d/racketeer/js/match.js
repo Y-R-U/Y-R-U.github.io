@@ -58,6 +58,11 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     if (ev) EV.startEvent(m, ev, Infinity);
   }
   beginPreServe(m, true);
+  if (tier.mode === "story" && tier.flavour) {
+    // The story beat also opens the match, so it's never missed
+    sayBanner(m, `LEVEL ${tier.level}`, "#ffe24a", 1.2);
+    ticker(m, tier.flavour, 6);
+  }
   return m;
 }
 
@@ -145,9 +150,10 @@ function scheduleContact(m) {
     t: m.time + p.t,
     x: clamp(p.x, -COURT.W / 2 - 3, COURT.W / 2 + 3),
     y: clamp(p.y, you ? 0.6 : COURT.NET_Y + 1.3, you ? COURT.NET_Y - 1.3 : COURT.L - 0.6),
-    z: p.z,
+    z: p.z, total: p.t,
   };
   else m.contact = null;
+  if (!you) m.aiRead = null;                 // opponent must re-read the new ball
   // Rattled players mistime: the "right moment" secretly drifts when composure is low
   if (m.ballTo === "you") m.timingWobble = (1 - m.comp / 100) * rand(-0.15, 0.15);
 }
@@ -206,8 +212,7 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
   }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz; b.curve = curve; b.live = true;
   sfx.pock(0.8 + quality + powBonus);
-  if (quality > 0.9) FX.floatText(b.x, b.y, b.z + 0.4, "PERFECT!", "#ffe24a", 0.8);
-  else if (quality < 0.25) FX.floatText(b.x, b.y, b.z + 0.4, "SHANK!", "#ff8a5c", 0.7);
+  if (!you && quality < 0.25) FX.floatText(b.x, b.y, b.z + 0.4, "SHANK!", "#ff8a5c", 0.7);
   if (Math.abs(curve) > 4) FX.floatText(b.x, b.y, b.z + 0.7, "🍌 CURVE!", "#ffd34a", 0.7);
   FX.burst(b.x, b.y, b.z, 6, "#f4ff9a", 2.5);
   m.ballTo = you ? "opp" : "you";
@@ -383,6 +388,12 @@ function qualityFromDt(m, dt) {
 
 function commitSwing(m, dt, aim, curve, swipePow) {
   let q = qualityFromDt(m, dt);
+  // Instant timing feedback so players can learn the rhythm
+  const fx = q === 1 ? ["PERFECT!", "#7ee6a1", 0.9]
+    : q >= 0.75 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffe24a", 0.8]
+    : q >= 0.45 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffab5c", 0.8]
+    : [dt > 0 ? "WAY EARLY!" : "WAY LATE!", "#ff6b6b", 0.85];
+  FX.floatText(m.you.x, m.you.y + 1.4, 1.6, fx[0], fx[1], fx[2]);
   m.youWindowShrink = 1;
   if (m.zoneShots > 0) m.zoneShots--;
   m.pendingQuality = q;
