@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#070c10">
+<title>UUID WORLDS</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- HUD -->
+<div id="chip" class="hidden"></div>
+<button id="audio" aria-label="sound">🔊</button>
+<div id="poi"></div>
+<button id="resume" class="hidden">resume tour</button>
+<button id="speed" class="hidden">1×</button>
+<button id="exitcar" class="hidden">leave car</button>
+<div id="joy" class="hidden"><div id="joy-knob"></div></div>
+<div id="toasts"></div>
+
+<!-- connect overlay -->
+<div id="connect" class="hidden">
+  <div id="connect-box">
+    <div id="connect-label">resolving world</div>
+    <div id="connect-uuid"></div>
+    <div id="connect-lines"></div>
+  </div>
+</div>
+
+<!-- modal -->
+<div id="modal" class="hidden">
+  <div id="modal-card">
+    <button id="modal-close">✕</button>
+    <div id="modal-title"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="fade" class="black"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

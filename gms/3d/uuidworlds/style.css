@@ -1,0 +1,149 @@
+/* UUID WORLDS — quiet terminal chrome over a full-bleed canvas */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: #070c10; }
+body {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  color: #cfe3e8;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+#app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
+.hidden { display: none !important; }
+
+/* ── HUD ─────────────────────────────────────────────── */
+#chip {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: 0.14em; color: rgba(190,220,230,0.6);
+  background: rgba(7,12,16,0.55); padding: 5px 10px; border-radius: 20px;
+  border: 1px solid rgba(120,180,200,0.18);
+  z-index: 10; cursor: pointer; max-width: 92vw;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#audio {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px);
+  right: 12px; z-index: 10;
+  background: none; border: none; font-size: 17px; opacity: 0.55; cursor: pointer;
+}
+#poi {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
+  left: 50%; transform: translateX(-50%);
+  font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(210,235,240,0); transition: color 0.8s;
+  z-index: 9; pointer-events: none; text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+#poi.on { color: rgba(210,235,240,0.75); }
+
+button#resume {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+  left: 50%; transform: translateX(-50%);
+  z-index: 11; cursor: pointer;
+  font-family: inherit; font-size: 14px; letter-spacing: 0.18em;
+  color: #a8f0dc; background: rgba(14,42,38,0.72);
+  border: 1px solid rgba(90,232,200,0.55); border-radius: 26px;
+  padding: 12px 26px;
+  animation: resume-glow 2.2s ease-in-out infinite;
+}
+@keyframes resume-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(80,232,200,0.25); }
+  50% { box-shadow: 0 0 26px rgba(80,232,200,0.6); }
+}
+button#speed {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+  right: 18px; z-index: 11; cursor: pointer;
+  font-family: inherit; font-size: 14px; color: rgba(200,225,232,0.85);
+  background: rgba(7,12,16,0.6); border: 1px solid rgba(140,190,205,0.3);
+  border-radius: 22px; padding: 10px 16px;
+}
+button#exitcar {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+  right: 18px; z-index: 11; cursor: pointer;
+  font-family: inherit; font-size: 13px; color: #f0c8a8;
+  background: rgba(40,24,10,0.7); border: 1px solid rgba(240,180,120,0.4);
+  border-radius: 22px; padding: 10px 16px;
+}
+
+/* drive joystick */
+#joy {
+  position: fixed; left: 20px; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  width: 128px; height: 128px; border-radius: 50%;
+  background: rgba(120,160,180,0.10);
+  border: 1px solid rgba(150,200,215,0.25);
+  z-index: 11; touch-action: none;
+}
+#joy-knob {
+  position: absolute; left: 50%; top: 50%; margin: -26px 0 0 -26px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(160,220,235,0.28);
+  border: 1px solid rgba(170,230,240,0.5);
+  pointer-events: none;
+}
+
+/* ── toasts ──────────────────────────────────────────── */
+#toasts {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 46px);
+  left: 50%; transform: translateX(-50%);
+  z-index: 30; display: flex; flex-direction: column; gap: 8px; align-items: center;
+  pointer-events: none; width: 92vw;
+}
+.toast {
+  background: rgba(10,20,26,0.9); color: #bfe8dc;
+  border: 1px solid rgba(90,220,190,0.35); border-radius: 10px;
+  font-size: 12.5px; letter-spacing: 0.05em; padding: 9px 16px;
+  opacity: 0; transform: translateY(-8px); transition: all 0.35s;
+  max-width: 100%; text-align: center;
+}
+.toast.on { opacity: 1; transform: translateY(0); }
+
+/* ── connect overlay ─────────────────────────────────── */
+#connect {
+  position: fixed; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(4,8,11,0.55);
+}
+#connect-box { text-align: center; padding: 20px; max-width: 560px; }
+#connect-label {
+  font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase;
+  color: rgba(120,200,190,0.7); margin-bottom: 14px;
+  animation: pulse-dim 1.4s ease-in-out infinite;
+}
+@keyframes pulse-dim { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+#connect-uuid {
+  font-size: clamp(13px, 4.4vw, 21px); letter-spacing: 0.12em;
+  color: #9fd8ff; word-break: break-all; margin-bottom: 22px;
+  text-shadow: 0 0 18px rgba(110,200,255,0.45);
+}
+#connect-lines { font-size: 13px; line-height: 1.9; text-align: left; display: inline-block; min-height: 160px; }
+#connect-lines .ck { color: rgba(130,150,160,0.85); display: inline-block; width: 108px; }
+#connect-lines .cv { color: #d8f0e8; }
+
+/* ── modal ───────────────────────────────────────────── */
+#modal {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(3,6,9,0.7); padding: 22px;
+}
+#modal-card {
+  position: relative; max-width: 460px; width: 100%;
+  background: #0b141a; border: 1px solid rgba(90,200,190,0.35);
+  border-radius: 14px; padding: 26px 24px 24px;
+  box-shadow: 0 12px 60px rgba(0,0,0,0.6), 0 0 30px rgba(60,200,180,0.08);
+}
+#modal-title { font-size: 16px; color: #a8ecd8; margin-bottom: 14px; letter-spacing: 0.04em; }
+#modal-body { font-size: 14px; line-height: 1.65; color: #c4d6da; white-space: pre-line; }
+#modal-body.mono { font-size: 12.5px; }
+#modal-close {
+  position: absolute; top: 10px; right: 12px;
+  background: none; border: none; color: rgba(160,200,205,0.6);
+  font-size: 16px; cursor: pointer; padding: 6px;
+}
+
+/* ── fade ────────────────────────────────────────────── */
+#fade {
+  position: fixed; inset: 0; z-index: 45; pointer-events: none;
+  background: #000; opacity: 0; transition: opacity 0.6s ease;
+}
+#fade.black { opacity: 1; }
