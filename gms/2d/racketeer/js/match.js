@@ -351,7 +351,7 @@ export function inputRelease(m) {
     aim = { x: aimX, y: aimY };
     const dur = Math.max(0.03, B.t - A.t);
     swipePow = clamp(len / dur / 6, 0, 0.18);         // fast flick = extra zip
-    curve = gestureCurve(pts, dx, dy) * 9;            // signed m/s² sideways
+    curve = gestureCurve(pts, dx, dy) * -9;           // signed m/s² sideways (bow right = ball curves right)
   }
   commitSwing(m, dtc, aim, curve, swipePow);
 }
