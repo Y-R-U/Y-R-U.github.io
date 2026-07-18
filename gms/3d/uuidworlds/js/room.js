@@ -4,7 +4,9 @@
 import * as THREE from 'three';
 import {
   posterCanvas, quoteFrameCanvas, bookCoverCanvas, windowViewCanvas, toTexture,
+  inspoPosterCanvas,
 } from './canvastex.js';
+import { INSPO } from './tables.js';
 
 const SCREEN_W = 640, SCREEN_H = 480;
 const MONO = 'ui-monospace, Menlo, Consolas, monospace';
@@ -94,6 +96,8 @@ export class Room {
     this.towerLed = led;
     const kb = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.03, 0.2), lam(0x2a2d33));
     kb.position.set(0, 1.03, -1.85);
+    kb.userData.action = 'help';   // the keyboard remembers
+    this.clickables.push(kb);
     const mouse = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.12), lam(0x2a2d33));
     mouse.position.set(0.45, 1.04, -1.83);
     this.scene.add(tower, led, kb, mouse);
@@ -118,6 +122,8 @@ export class Room {
     // mug + lamp + plant + papers (micro-variation stream)
     const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.045, 0.11, 10), lam(spec.vehPal.colors[0]));
     mug.position.set(0.78, 1.08, -2.05);
+    mug.userData.action = 'mug';
+    this.clickables.push(mug);
     this.scene.add(mug);
     if (r.chance(0.8)) {
       const armMat = lam(0x3a3d44);
@@ -138,6 +144,8 @@ export class Room {
       const fol = new THREE.Mesh(new THREE.IcosahedronGeometry(0.3, 0), lam(spec.nature.foliage[0]));
       fol.position.set(2.55, 0.5, -2.2);
       fol.scale.y = 1.5;
+      fol.userData.action = 'plant';
+      this.clickables.push(fol);
       this.scene.add(pot, fol);
     }
     for (let i = 0; i < r.int(1, 4); i++) {
@@ -145,6 +153,7 @@ export class Room {
       paper.rotation.x = -Math.PI / 2;
       paper.rotation.z = r.range(-0.8, 0.8);
       paper.position.set(r.range(-0.6, 0.6), 1.021 + i * 0.002, -1.9 + r.range(-0.1, 0.1));
+      if (i === 0) { paper.userData.action = 'papers'; this.clickables.push(paper); }
       this.scene.add(paper);
     }
 
@@ -184,6 +193,16 @@ export class Room {
       this.clickables.push(m);
       this.scene.add(m);
     }
+    // one inspirational poster, always — its own stream, its own spot
+    const ir = spec.rand('inspo');
+    this.inspo = INSPO[ir.int(0, INSPO.length - 1)];
+    const it = this.tex(inspoPosterCanvas(this.inspo, spec.posterSet.hue, ir));
+    const im = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.0), new THREE.MeshBasicMaterial({ map: it }));
+    im.position.set(-0.45, 1.95, 2.38);
+    im.rotation.y = Math.PI;
+    im.userData.action = 'inspo';
+    this.clickables.push(im);
+    this.scene.add(im);
 
     // window with a view of THIS world
     const wr = spec.rand('window-view');
@@ -204,17 +223,23 @@ export class Room {
     winLight.position.set(2.5, 1.8, -0.3);
     this.scene.add(winLight);
 
-    // door on the south wall — where you "came in"
+    // door on the south wall — where you "came in". It is not locked.
     const door = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 2.1), lam(0x322a22));
     door.rotation.y = Math.PI;
     door.position.set(-1.8, 1.05, 2.39);
+    door.userData.action = 'door';
+    this.clickables.push(door);
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), lam(0xb8a060));
     knob.position.set(-1.45, 1.05, 2.35);
+    knob.userData.action = 'door';
+    this.clickables.push(knob);
     this.scene.add(door, knob);
 
     // shelf with books
     const shelf = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.05, 0.28), lam(pal.desk));
     shelf.position.set(1.9, 2.5, 2.25);
+    shelf.userData.action = 'shelf';
+    this.clickables.push(shelf);
     this.scene.add(shelf);
     let bx = 1.25;
     const br = spec.rand('shelf');
@@ -305,7 +330,7 @@ export class Room {
     ctx.fillText('random', W / 2, 388);
 
     // rotating whisper-hint, very dim
-    const hints = ['', '', 'tap the code', '', 'tap the code twice', '', 'the wall quote is out there', '', 'tap the code three times', ''];
+    const hints = ['', '', 'tap the code', '', 'the user has a story — tap the name', '', 'tap the code twice', '', 'the wall quote is out there', '', 'the door is not locked', '', 'tap the code three times', '', 'the keyboard remembers', ''];
     const hint = hints[this.hintIdx % hints.length];
     if (hint) {
       ctx.font = `400 14px ${MONO}`;

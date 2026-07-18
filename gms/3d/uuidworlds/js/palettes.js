@@ -27,7 +27,7 @@ const SKY_ARCHES = [
   { name: 'Clear Noon',   h: 210, top: [0.65, 0.45], mid: [0.60, 0.62], hor: [0.35, 0.80], sunH: 45,  stars: 0 },
   { name: 'First Light',  h: 25,  top: [0.45, 0.35], mid: [0.70, 0.60], hor: [0.85, 0.72], sunH: 30,  stars: 0.2 },
   { name: 'Ember Dusk',   h: 15,  top: [0.60, 0.18], mid: [0.85, 0.42], hor: [0.95, 0.58], sunH: 20,  stars: 0.3 },
-  { name: 'Vapor Haze',   h: 320, top: [0.55, 0.45], mid: [0.65, 0.62], hor: [0.50, 0.78], sunH: 300, stars: 0.1 },
+  { name: 'Vapor Haze',   h: 320, top: [0.38, 0.48], mid: [0.45, 0.64], hor: [0.40, 0.78], sunH: 300, stars: 0.1 },   // soft lilac dusk
   { name: 'Toxic Bloom',  h: 95,  top: [0.55, 0.22], mid: [0.75, 0.45], hor: [0.90, 0.60], sunH: 70,  stars: 0.2 },
   { name: 'Deep Night',   h: 235, top: [0.60, 0.06], mid: [0.55, 0.12], hor: [0.45, 0.22], sunH: 230, stars: 1 },
   { name: 'Storm Slate',  h: 215, top: [0.20, 0.20], mid: [0.15, 0.32], hor: [0.12, 0.45], sunH: 210, stars: 0 },
@@ -39,19 +39,47 @@ const SKY_ARCHES = [
   { name: 'Abyss Teal',   h: 190, top: [0.70, 0.10], mid: [0.65, 0.20], hor: [0.55, 0.32], sunH: 175, stars: 0.8 },
   { name: 'Ink & Gold',   h: 230, top: [0.35, 0.08], mid: [0.30, 0.14], hor: [0.90, 0.45], sunH: 45,  stars: 0.7 },
 ];
+// extra authored DRAMA skies — the rare surprises (never in the first pass)
+const SKY_DRAMA = [
+  { name: 'Neon Violet',   h: 285, top: [0.75, 0.14], mid: [0.85, 0.35], hor: [0.95, 0.55], sunH: 320, stars: 0.5 },
+  { name: 'Acid Dawn',     h: 62,  top: [0.65, 0.30], mid: [0.85, 0.50], hor: [0.95, 0.62], sunH: 80,  stars: 0.1 },
+  { name: 'Magenta Storm', h: 320, top: [0.60, 0.16], mid: [0.75, 0.32], hor: [0.85, 0.48], sunH: 335, stars: 0.4 },
+  { name: 'Emerald Night', h: 150, top: [0.70, 0.08], mid: [0.70, 0.16], hor: [0.60, 0.30], sunH: 130, stars: 0.9 },
+];
+
+// Curated 80/20 build: the first 14 slots are the canonical archetypes
+// (index 2 = Ember Dusk = genesis — always pretty on first run). The 48
+// repeat slots cycle the PRETTY archetypes with only gentle hue/light
+// tweaks; every 5th repeat slot is a deliberate DRAMA surprise.
 export const SKY_PALETTES = assert62('SKY_PALETTES', (() => {
-  const out = [];
-  for (let i = 0; i < 62; i++) {
-    const a = SKY_ARCHES[i % SKY_ARCHES.length];
-    const drift = Math.floor(i / SKY_ARCHES.length) * 16; // repeats drift hue; first pass is canonical
-    out.push({
-      name: drift === 0 ? a.name : `${a.name} ${['I', 'II', 'III', 'IV', 'V'][Math.floor(i / SKY_ARCHES.length)]}`,
-      top: hsl(a.h + drift, a.top[0], a.top[1]),
-      mid: hsl(a.h + drift * 0.7, a.mid[0], a.mid[1]),
-      hor: hsl(a.h + drift * 0.4, a.hor[0], a.hor[1]),
-      sun: hsl(a.sunH + drift * 0.3, 0.85, 0.75),
+  const mk = (a, name, hueShift = 0, lShift = 0) => {
+    const cl = (l) => Math.max(0.04, Math.min(0.95, l + lShift));
+    return {
+      name,
+      top: hsl(a.h + hueShift, a.top[0], cl(a.top[1])),
+      mid: hsl(a.h + hueShift * 0.7, a.mid[0], cl(a.mid[1])),
+      hor: hsl(a.h + hueShift * 0.4, a.hor[0], cl(a.hor[1])),
+      sun: hsl(a.sunH + hueShift * 0.3, 0.85, 0.75),
       stars: a.stars,
-    });
+    };
+  };
+  const out = SKY_ARCHES.map((a) => mk(a, a.name));
+  // pretty = sunrises, sunsets, daytime blues, soft nights, weather greys
+  const PRETTY = [0, 1, 2, 3, 5, 6, 7, 8, 9, 11].map((i) => SKY_ARCHES[i]);
+  const DRAMA = [SKY_ARCHES[4], SKY_ARCHES[10], SKY_ARCHES[12], SKY_ARCHES[13], ...SKY_DRAMA];
+  let p = 0, d = 0;
+  for (let k = 0; k < 48; k++) {
+    if (k % 5 === 4) {
+      const a = DRAMA[d % DRAMA.length];
+      out.push(mk(a, `${a.name} ${['II', 'III'][Math.floor(d / DRAMA.length)] ?? 'IV'}`, (d % 3 - 1) * 7));
+      d++;
+    } else {
+      const a = PRETTY[p % PRETTY.length];
+      const tv = Math.floor(p / PRETTY.length);
+      out.push(mk(a, `${a.name} ${['II', 'III', 'IV', 'V'][tv] ?? 'VI'}`,
+        [-8, 6, -14, 12][tv % 4], [0.03, -0.03, 0.05, -0.04][tv % 4]));
+      p++;
+    }
   }
   return out;
 })());

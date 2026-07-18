@@ -306,6 +306,80 @@ export function posterCanvas(set, rand, uuid, w = 256, h = 320) {
   return c;
 }
 
+// ── inspirational poster: big word, small subline, geometric sunrise ─────────
+export function inspoPosterCanvas(entry, hue, rand, w = 256, h = 320) {
+  const [word, sub] = entry;
+  const c = makeCanvas(w, h);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0c0e14'; ctx.fillRect(0, 0, w, h);
+  // image field: horizon, sun, rays or peak (classic motivational framing)
+  const fy = h * 0.56;
+  const g = ctx.createLinearGradient(0, 20, 0, fy);
+  g.addColorStop(0, `hsl(${hue},55%,14%)`); g.addColorStop(1, `hsl(${(hue + 30) % 360},65%,34%)`);
+  ctx.fillStyle = g; ctx.fillRect(18, 20, w - 36, fy - 20);
+  const cx = w / 2, sy = fy - 24;
+  ctx.fillStyle = `hsl(${(hue + 45) % 360},85%,62%)`;
+  ctx.beginPath(); ctx.arc(cx, sy, 26, Math.PI, 0); ctx.fill();
+  ctx.strokeStyle = `hsla(${(hue + 45) % 360},85%,62%,0.5)`;
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 7; i++) {
+    const a = Math.PI + (i / 6) * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * 34, sy + Math.sin(a) * 34);
+    ctx.lineTo(cx + Math.cos(a) * (44 + (i % 2) * 8), sy + Math.sin(a) * (44 + (i % 2) * 8));
+    ctx.stroke();
+  }
+  if (rand.chance(0.5)) { // mountain silhouette in front of the sun
+    ctx.fillStyle = 'rgba(10,10,18,0.85)';
+    ctx.beginPath(); ctx.moveTo(18, fy);
+    ctx.lineTo(w * 0.38, fy - 40); ctx.lineTo(w * 0.52, fy - 12);
+    ctx.lineTo(w * 0.68, fy - 52); ctx.lineTo(w - 18, fy);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(10,10,18,1)'; ctx.fillRect(18, fy - 4, w - 36, 4);
+  // the word
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#f0ead9';
+  let size = 34;
+  ctx.font = fontFor('serif', size, 700);
+  while (ctx.measureText(word).width > w - 44 && size > 14) { size -= 2; ctx.font = fontFor('serif', size, 700); }
+  ctx.fillText(word, cx, h * 0.72);
+  ctx.font = fontFor('sans', 13, 400);
+  ctx.fillStyle = `hsl(${(hue + 45) % 360},45%,62%)`;
+  let ssize = 13;
+  while (ctx.measureText(sub).width > w - 36 && ssize > 8) { ssize -= 1; ctx.font = fontFor('sans', ssize, 400); }
+  ctx.fillText(sub, cx, h * 0.82);
+  ctx.strokeStyle = 'rgba(240,234,217,0.35)'; ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, w - 20, h - 20);
+  return c;
+}
+
+// ── city data board: live date/time + this world's (seeded) temperature ──────
+// Draws in place so the world can refresh it every few seconds.
+export function drawDataBoard(canvas, spec, tempC) {
+  const w = canvas.width, h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#08090c'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = '#2a3038'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, w - 6, h - 6);
+  const now = new Date();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = fontFor('mono', 64, 700);
+  ctx.fillStyle = '#ffb830';
+  ctx.shadowColor = '#ffb830'; ctx.shadowBlur = 12;
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const blink = now.getSeconds() % 2 ? ':' : ' ';
+  ctx.fillText(`${hh}${blink}${mm}`, w * 0.30, h * 0.40);
+  ctx.font = fontFor('mono', 52, 700);
+  ctx.fillText(`${tempC}°C`, w * 0.74, h * 0.40);
+  ctx.shadowBlur = 0;
+  ctx.font = fontFor('mono', 24, 400);
+  ctx.fillStyle = '#7a8894';
+  ctx.fillText(now.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase(), w * 0.30, h * 0.78);
+  ctx.fillText(spec.weather.name.toUpperCase(), w * 0.74, h * 0.78);
+  return canvas;
+}
+
 // ── framed wall quote (room) ─────────────────────────────────────────────────
 export function quoteFrameCanvas(quote, hue, w = 512, h = 256) {
   const c = makeCanvas(w, h);
@@ -383,6 +457,29 @@ export function shopCanvas(name, theme, w = 256, h = 64) {
   ctx.shadowBlur = 0;
   ctx.strokeStyle = neon ? `hsl(${hue},80%,45%)` : 'rgba(0,0,0,.35)';
   ctx.lineWidth = 3; ctx.strokeRect(2, 2, w - 4, h - 4);
+  return c;
+}
+
+// vertical banner sign: letters stacked down a building edge
+export function verticalSignCanvas(name, hue, neon, w = 96, h = 448) {
+  const c = makeCanvas(w, h);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = neon ? '#0c0a12' : `hsl(${hue},30%,78%)`;
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = neon ? `hsl(${hue},85%,50%)` : 'rgba(0,0,0,.4)';
+  ctx.lineWidth = 4; ctx.strokeRect(3, 3, w - 6, h - 6);
+  const letters = name.replace(/[^A-Za-z0-9&]/g, '').toUpperCase().slice(0, 9).split('');
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const step = (h - 40) / Math.max(letters.length, 1);
+  ctx.font = fontFor('sans', Math.min(52, step * 0.8), 800);
+  if (neon) {
+    ctx.shadowColor = `hsl(${hue},95%,65%)`; ctx.shadowBlur = 14;
+    ctx.fillStyle = `hsl(${hue},95%,78%)`;
+  } else {
+    ctx.fillStyle = `hsl(${hue},55%,22%)`;
+  }
+  letters.forEach((ch, i) => ctx.fillText(ch, w / 2, 26 + step * (i + 0.5)));
+  ctx.shadowBlur = 0;
   return c;
 }
 

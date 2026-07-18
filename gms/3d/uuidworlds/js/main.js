@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { nextUuid, randomUuid, isUuid, ALPHABET } from './prng.js';
 import { decode, readout } from './genome.js';
+import { PEOPLE, PERSON_LINES, POSTER_LORE, QUOTE_NOTES, BILLBOARD_LORE } from './tables.js';
 import { World } from './world.js';
 import { buildEffects } from './effects.js';
 import { Flythrough } from './flythrough.js';
@@ -78,6 +79,7 @@ const G = {
 const SPEEDS = [1, 2, 3];
 const audio = new AudioEngine();
 const free = new FreeFly(renderer.domElement, camera);
+free.sticks = { move: ui.flyMove, look: ui.flyLook, vert: () => ui.flyVert, prefs: ui.flyPrefs };
 const drive = new DriveController(camera, ui.joy);
 const raycaster = new THREE.Raycaster();
 
@@ -150,7 +152,8 @@ function enterRoom(instant = false) {
     seatLook();
   }
   ui.showChip(false); ui.showResume(false); ui.showSpeed(false);
-  ui.showExitCar(false); ui.showJoy(false); ui.poi('');
+  ui.showExitCar(false); ui.showJoy(false); ui.showFlyJoys(false); ui.poi('');
+  ui.setResumeLabel('resume tour');
 }
 
 function seatLook() {
@@ -170,6 +173,9 @@ async function travel(uuid, mode) {
   free.enabled = false;
 
   const spec = decode(uuid);
+  G.walk = false;
+  ui.showFlyJoys(false); ui.showResume(false); ui.showJoy(false); ui.showExitCar(false);
+  ui.setResumeLabel('resume tour');
   ui.showConnect(uuid, readout(spec));
   await ui.fade(true, FAST ? 80 : 500);
 
@@ -232,7 +238,9 @@ function interruptTour() {
   free.enabled = true;
   free.lookOnly = false;
   free.syncFromCamera();
+  ui.setResumeLabel('resume tour');
   ui.showResume(true);
+  ui.showFlyJoys(true);
   ui.showSpeed(false);
   ui.poi('');
   audio.blip();
@@ -241,9 +249,12 @@ function interruptTour() {
 function resumeTour() {
   if (G.state === 'drive') exitCar(true);
   if (G.state !== 'free') return;
+  // after the tour has ended (room exit walkabout) resume = back to the room
+  if (G.walk || !G.fly) { returnToRoom(); return; }
   G.state = 'resuming';
   free.enabled = false;
   ui.showResume(false);
+  ui.showFlyJoys(false);
   const from = camera.position.clone();
   const fq = camera.quaternion.clone();
   const { pos, look } = G.fly.poseAt(G.fly.t);
@@ -270,6 +281,7 @@ function tryEnterCar(ndc) {
   free.enabled = false;
   drive.enter(G.world, v);
   ui.showJoy(true);
+  ui.showFlyJoys(false);
   ui.showExitCar(true);
   ui.showResume(true);
   audio.carStart();
@@ -282,6 +294,7 @@ function exitCar(silent = false) {
   const v = drive.exit();
   G.state = 'free';
   ui.showJoy(false);
+  ui.showFlyJoys(true);
   ui.showExitCar(false);
   if (v) {
     camera.position.set(v.x + Math.cos(v.yaw) * 4, G.world.plateauY + 2.2, v.z - Math.sin(v.yaw) * 4);
@@ -292,7 +305,7 @@ function exitCar(silent = false) {
   if (!silent) audio.blip();
 }
 
-// ── room taps: the discoverable surface ──────────────────────────────────────
+// ── room taps: the discoverable surface — everything has a story ─────────────
 function roomTap(ndc) {
   raycaster.setFromCamera(ndc, camera);
   const hits = raycaster.intersectObjects(G.room.clickables, false);
@@ -306,21 +319,120 @@ function roomTap(ndc) {
     if (sa === 'connect') travel(nextUuid(G.uuid), 'chained');
     else if (sa === 'random') travel(randomUuid(), 'random');
     else if (sa === 'uuid') uuidTap();
-    else if (sa === 'person') { ui.toast(`logged in: ${G.spec.person}`); audio.blip(); }
+    else if (sa === 'person') { audio.blip(); personModal(); }
     else if (sa === 'header') { ui.toast(`session #${G.journey.length} · uuidnet stays up forever`); audio.blip(); }
   } else if (action === 'book') {
     audio.blip();
-    ui.modal({ title: G.spec.book.t, body: `${G.spec.book.by}\n\n${firstLine()}\n\n(the only copy in ${62 ** 32 > 0 ? '2.27×10⁵⁷' : ''} worlds)` });
+    ui.modal({ title: G.spec.book.t, body: `${G.spec.book.by}\n\nFirst line:\n${firstLine()}\n\n(the only copy in 2.27×10⁵⁷ worlds)` });
   } else if (action === 'quote') {
     audio.blip();
-    ui.toast('this quote hangs somewhere else in this world too');
+    quoteModal(false);
   } else if (action === 'poster') {
     audio.blip();
-    ui.toast(`poster series: ${G.spec.posterSet.fam.style}`);
+    const style = G.spec.posterSet.fam.style;
+    ui.modal({ title: `poster series: ${style}`, body: POSTER_LORE[style] ?? '' });
+  } else if (action === 'inspo') {
+    audio.blip();
+    const [word, sub] = G.room.inspo;
+    ui.modal({ title: word, body: `${sub}\n\nMotivational posters exist in all 2.27×10⁵⁷ worlds. Nobody prints them. They are simply always already on the wall.` });
   } else if (action === 'window') {
     audio.blip();
-    ui.toast(`${G.spec.sky.name} over ${G.spec.layout.name.toLowerCase()}`);
+    ui.modal({
+      title: 'the window',
+      body: `${G.spec.sky.name} over ${G.spec.layout.name.toLowerCase()} — ${G.spec.weather.name.toLowerCase()}, ${G.spec.time.name.toLowerCase()}.\n\nPainted from this world's genome. Same seed, same view, forever.`,
+    });
+  } else if (action === 'help') {
+    audio.blip();
+    ui.modal({
+      title: 'field notes', mono: true,
+      body: '· CONNECT follows the chain — random jumps anywhere\n· tap the code once: copy the NEXT world\n· tap it twice: a sense of scale\n· a third tap copies THIS world\n· the user\'s name has a story · so does the book\n· the posters know their own mathematics\n· the wall quote hangs in exactly one other place\n· the door is not locked\n· out there: tap a car to drive it\n· tap the big animated screens · tap the billboards\n· the glowing doorway always leads home\n· ⚙ tunes how you fly\n\n(some things are not written down)',
+    });
+  } else if (action === 'door') {
+    exitRoom();
+  } else if (action === 'mug') {
+    audio.blip();
+    const shop = G.spec.shops.names[G.spec.rand('mug').int(0, G.spec.shops.names.length - 1)];
+    ui.modal({ title: 'the mug', body: `A souvenir from ${shop}, a few streets from here.\n\nYou have never been there. You have always had this mug.` });
+  } else if (action === 'plant') {
+    audio.blip();
+    const kind = { cone: 'pine', round: 'broadleaf', palm: 'palm', dead: 'bare-branch', crystal: 'crystal' }[G.spec.nature.shape] ?? 'small';
+    ui.modal({ title: 'the plant', body: `A ${kind} sapling from beyond the ring road. It is doing fine.\n\nIt will always be doing fine. That is what deterministic means.` });
+  } else if (action === 'papers') {
+    audio.blip();
+    const pl = PERSON_LINES[G.spec.personIdx];
+    ui.modal({ title: 'a loose page', body: `Personnel file, corner torn:\n\n${G.spec.person} — ${pl.known}\n\nThe rest of the page is a hand-drawn map of somewhere that is probably this city.` });
+  } else if (action === 'shelf') {
+    audio.blip();
+    ui.modal({ title: 'the shelf', body: `Sixty-two spines, none of the titles quite readable. Every world shelves the same books in a different order.\n\nThe one that matters is on the desk: “${G.spec.book.t}”.` });
   }
+}
+
+// operator profile: who is logged in, what they did, what they said
+function personModal() {
+  const pl = PERSON_LINES[G.spec.personIdx];
+  let body = `${pl.known}\n\n${pl.fact}`;
+  if (pl.qs.length) body += `\n\n“${G.spec.rand('person-line').pick(pl.qs)}”`;
+  body += '\n\n(logged in from this terminal, allegedly)';
+  ui.modal({ title: G.spec.person, body });
+}
+
+// the wall quote, with a note on its author when we know them
+function quoteModal(isTwin) {
+  const q = G.spec.quote;
+  let body = `“${q.t}”\n${q.by ? '— ' + q.by : '— unattributed; native to this universe'}`;
+  const pi = PEOPLE.indexOf(q.by);
+  if (pi >= 0) body += `\n\n${PERSON_LINES[pi].known}`;
+  else if (QUOTE_NOTES[q.by]) body += `\n\n${QUOTE_NOTES[q.by]}`;
+  body += isTwin
+    ? '\n\nThe other copy hangs framed in the room.'
+    : '\n\nIts twin is painted on a billboard somewhere in this world. The tour sometimes passes it.';
+  ui.modal({ title: isTwin ? 'the wall quote — its twin' : 'the wall quote', body });
+}
+
+// ── leaving the room on foot ─────────────────────────────────────────────────
+async function exitRoom() {
+  if (G.state !== 'room') return;
+  G.state = 'connecting';
+  audio.ensure();
+  audio.whoosh();
+  await ui.fade(true, FAST ? 100 : 600);
+  if (G.room) { G.room.dispose(); G.room = null; }
+  await frame();
+  G.world = new World(G.spec);          // deterministic: the same world you toured
+  await frame();
+  G.effects = buildEffects(G.world, G.spec);
+  G.fly = null;
+  G.worldT = 0;
+  const A = G.world.arrival;
+  camera.position.copy(A.door).addScaledVector(A.out, 5).setY(G.world.plateauY + 1.7);
+  camera.lookAt(A.door.clone().addScaledVector(A.out, 40).setY(G.world.plateauY + 4));
+  audio.setWorld(G.spec.sound);
+  G.state = 'free';
+  G.walk = true;
+  free.enabled = true;
+  free.lookOnly = false;
+  free.syncFromCamera();
+  ui.setChip(G.uuid);
+  ui.showChip(true);
+  ui.setResumeLabel('return to room');
+  ui.showResume(true);
+  ui.showFlyJoys(true);
+  await ui.fade(false, FAST ? 100 : 600);
+  ui.toast('outside — the glowing doorway leads back');
+}
+
+async function returnToRoom() {
+  if (!G.world || G.state === 'descend') return;
+  G.state = 'descend';
+  G.walk = false;
+  free.enabled = false;
+  audio.whoosh();
+  ui.showFlyJoys(false); ui.showResume(false); ui.showSpeed(false);
+  ui.showJoy(false); ui.showExitCar(false); ui.poi('');
+  await ui.fade(true, FAST ? 100 : 700);
+  disposeWorld();
+  enterRoom(true);
+  await ui.fade(false, FAST ? 100 : 600);
 }
 
 // single = copy next · double = how-big fact · triple = copy current
@@ -354,13 +466,54 @@ function firstLine() {
   return `“${r.pick(openers)} ${r.pick(mids)}, ${r.pick(ends)}”`;
 }
 
+// ── world taps: cars, the glowing door, displays, billboards ─────────────────
+function tryDoor(ndc) {
+  if (!G.world?.doorMesh) return false;
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObject(G.world.doorMesh, false);
+  if (!hits.length || hits[0].distance > 80) return false;
+  audio.blip();
+  ui.toast('you found the door');
+  returnToRoom();
+  return true;
+}
+
+function tryDisplay(ndc) {
+  const ds = G.world?.displays ?? [];
+  if (!ds.length) return false;
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(ds.map((d) => d.mesh), false);
+  if (!hits.length || hits[0].distance > 170) return false;
+  const name = G.world.cycleDisplay(hits[0].object);
+  if (name) { audio.blip(); ui.toast(`display: ${name}`); }
+  return true;
+}
+
+function tryBillboard(ndc) {
+  const bs = G.world?.billboardMeshes ?? [];
+  if (!bs.length) return false;
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(bs, false);
+  if (!hits.length || hits[0].distance > 150) return false;
+  const bb = hits[0].object.userData.bb;
+  audio.blip();
+  if (bb.quote) quoteModal(true);
+  else ui.modal({ title: bb.famName, body: `“${bb.msg.replace(/\n/g, ' — ')}”\n\n${BILLBOARD_LORE[bb.famId] ?? ''}` });
+  return true;
+}
+
 // ── tap routing ──────────────────────────────────────────────────────────────
 free.onTap = (ndc, e) => {
   if (e.target !== renderer.domElement) return;
   if (ui.modalOpen()) { ui.closeModal(); return; }
   if (G.state === 'room') roomTap(ndc);
   else if (G.state === 'tour') interruptTour();
-  else if (G.state === 'free') tryEnterCar(ndc);
+  else if (G.state === 'free') {
+    if (tryEnterCar(ndc)) return;
+    if (tryDoor(ndc)) return;
+    if (tryDisplay(ndc)) return;
+    tryBillboard(ndc);
+  }
 };
 
 // ── main loop ────────────────────────────────────────────────────────────────
@@ -383,9 +536,7 @@ function loop() {
       camera.lookAt(look);
       if (f >= 1) { G.state = 'room'; seatLook(); }
     } else {
-      // clamped seat look-around
-      free.yaw = Math.max(free.baseYaw - 0.9, Math.min(free.baseYaw + 0.9, free.yaw));
-      free.pitch = Math.max(free.basePitch - 0.5, Math.min(free.basePitch + 0.55, free.pitch));
+      // full look-around from the chair — the room deserves it
       free.update(dt);
     }
     renderer.render(G.room.scene, camera);
@@ -442,10 +593,11 @@ window.__uw = {
     G.state = 'drive';
     free.enabled = false;
     drive.enter(G.world, best);
-    ui.showJoy(true); ui.showExitCar(true); ui.showResume(true);
+    ui.showJoy(true); ui.showFlyJoys(false); ui.showExitCar(true); ui.showResume(true);
     return true;
   },
   exitCar,
+  exitRoom, returnToRoom,
   camera, free,
   G,
 };

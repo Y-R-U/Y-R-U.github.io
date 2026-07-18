@@ -49,9 +49,35 @@ localStorage `uw-current` → genesis.
   (node ≥22 has global WebSocket; scratchpad cdp.mjs pattern). Screenshots
   alone miss interaction bugs — use Input.dispatchMouseEvent clicks.
 
+## Post-ship expansion (2026-07-18, same day)
+
+- Playtest fixes: book-modal click-through (modal guard `_modalAt` — the click
+  after the opening pointerup landed on the backdrop and closed it), windows
+  floating off setback/pyramid tiers (per-tier window volumes) and buried in
+  cylinders (ring placement), tour captions out of sync (labels[] aligned
+  with control points + dwell pacing: 0.62× at pois, 1.25× between).
+- New: dual flight joysticks (left move / right look) + ▲▼ climb + ⚙ settings
+  (swap sticks, invert look, look speed; localStorage `uw-fly`); full room
+  look-around; door exits to walkabout (world rebuilt deterministically,
+  resume button = "return to room", glowing doorway also returns); person
+  profile modals (PERSON_LINES), poster math-history lore, tappable
+  billboards/mug/papers/plant/shelf, keyboard = field-notes help; animated
+  shader math displays (tap to cycle) + live data board (time + seeded temp);
+  wall signs + vertical neon banners; inspirational posters (INSPO); sky
+  table re-curated 80% pretty / 20% drama (genesis stays Ember Dusk).
+
 ## Gotchas learned building this
 
 - `#fade` starts black in the HTML; every boot path must lift it.
+- Opening a modal from a pointerup: the browser's follow-up `click` hits the
+  modal backdrop and instantly closes it — `ui.modal` stamps `_modalAt` and
+  the backdrop handler ignores clicks within 400 ms.
+- Window quads must be emitted per drawn box TIER (setback/pyramid) and on
+  the circumference for cylinders, or they float in the air / hide inside.
+- Flythrough captions must be one label per CONTROL POINT (midpoints get '')
+  — indexing pois directly desyncs because paths insert midpoints.
+- The `driveNearest` debug hook must mirror tryEnterCar's UI calls exactly
+  (fly sticks/joy handoff) or headless soaks show ghost HUD states.
 - Palette hue-drift must be 0 for the first pass through an archetype table,
   or the curated names lie (bug found: room rendered pink).
 - Flythrough control points get pushed above any building footprint they

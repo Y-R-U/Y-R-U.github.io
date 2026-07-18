@@ -4,8 +4,10 @@
 import * as THREE from 'three';
 import {
   billboardCanvas, quoteBillboardCanvas, signCanvas, posterCanvas,
-  shopCanvas, toTexture, softSprite,
+  shopCanvas, toTexture, softSprite, makeCanvas, drawDataBoard,
+  verticalSignCanvas, inspoPosterCanvas,
 } from './canvastex.js';
+import { INSPO } from './tables.js';
 
 const CITY_R = 150;        // city plateau radius
 const WORLD_R = 420;       // hard travel bound
@@ -184,6 +186,62 @@ void main(){
   float fogF = 1.0 - exp(-uFogDensity * uFogDensity * vFogDepth * vFogDepth);
   col = mix(col, uFogColor, clamp(fogF, 0.0, 1.0));
   gl_FragColor = vec4(col, 0.93);
+}`;
+
+// ── animated math display shader (uMode picks the pattern) ───────────────────
+export const DISPLAY_MODES = ['plasma field', 'interference', 'lissajous', 'polar rose', 'the tunnel', 'digital rain'];
+const DISPLAY_VERT = `
+varying vec2 vUv;
+void main(){
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+const DISPLAY_FRAG = `
+uniform float uTime, uMode, uSeed;
+uniform vec3 uColA, uColB;
+varying vec2 vUv;
+float h21(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
+void main(){
+  vec2 p = vUv * 2.0 - 1.0;
+  float t = uTime;
+  float v = 0.0;
+  int m = int(uMode + 0.5);
+  if (m == 0) {            // plasma
+    v = sin(p.x*3.0+t) + sin(p.y*4.0-t*1.3) + sin((p.x+p.y)*3.5+t*0.7) + sin(length(p)*5.0-t*1.7);
+    v = 0.5 + 0.5*sin(v*1.57);
+  } else if (m == 1) {     // two-source interference (a moving moire)
+    vec2 a = vec2(sin(t*0.3)*0.5, cos(t*0.23)*0.4);
+    v = 0.5 + 0.5*sin(length(p-a)*26.0 - t*2.0) * sin(length(p+a)*26.0 + t*1.6);
+    v = v*v;
+  } else if (m == 2) {     // lissajous with a comet trail
+    for (int i = 0; i < 22; i++) {
+      float ft = t*0.9 - float(i)*0.055;
+      vec2 q = vec2(sin(ft*(2.0+floor(uSeed*3.0))+1.0), sin(ft*3.0)) * 0.78;
+      v += (0.028 * (1.0 - float(i)/22.0)) / max(0.012, length(p - q));
+    }
+    v = min(v, 1.4);
+  } else if (m == 3) {     // polar rose, slowly turning
+    float ang = atan(p.y, p.x);
+    float rr = length(p);
+    float k = 3.0 + floor(uSeed*3.0);
+    float target = 0.75 * abs(cos(k*ang + t*0.5));
+    v = smoothstep(0.10, 0.0, abs(rr - target)) + smoothstep(0.03, 0.0, abs(rr - target));
+  } else if (m == 4) {     // log-polar tunnel
+    float ang = atan(p.y, p.x);
+    float rr = max(length(p), 1e-3);
+    v = 0.5 + 0.5*sin(10.0*ang) * sin(14.0*log(rr) - t*3.0);
+    v *= smoothstep(1.4, 0.4, rr);
+  } else {                 // digital rain
+    float col = floor(vUv.x*13.0);
+    float speed = 1.5 + h21(vec2(col, 3.7))*3.0;
+    float ph = fract(vUv.y + t*speed*0.13 + h21(vec2(col, 9.1)));
+    float cell = h21(vec2(col, floor(vUv.y*22.0) + floor(t*speed*3.0)));
+    v = step(0.35, cell) * pow(1.0 - ph, 2.4) * 1.5;
+  }
+  vec3 col3 = mix(uColA, uColB, clamp(v, 0.0, 1.0)) * clamp(v*1.3+0.05, 0.0, 1.6);
+  col3 *= 0.88 + 0.12*sin(vUv.y*220.0);                       // scanlines
+  col3 *= smoothstep(1.12, 0.75, abs(p.x)) * smoothstep(1.12, 0.75, abs(p.y)); // vignette
+  gl_FragColor = vec4(col3, 1.0);
 }`;
 
 export class World {
@@ -460,16 +518,17 @@ export class World {
         cylB.add(x, y, z, rad * 2, h, rad * 2, base);
         this.colliders.push({ x, z, r: rad + 1 });
         this.buildings.push({ x, z, w: rad * 2, d: rad * 2, h, round: true });
-        windows.push({ x, z, w: rad * 1.6, d: rad * 1.6, h, floors });
+        windows.push({ x, z, rad, h, floors, round: true });
       } else if (fam === 'pyramid') {
         const steps = r.int(2, 4);
         for (let s = 0; s < steps; s++) {
           const f = 1 - s / steps;
           boxB.add(x, y + (h / steps) * s, z, w * f, h / steps, d * f, base);
+          // windows hug each tier's real footprint (they floated off the steps before)
+          windows.push({ x, z, w: w * f, d: d * f, h: h / steps, floors: Math.max(1, Math.floor(h / steps / 3)), y0: (h / steps) * s });
         }
         this.colliders.push({ x, z, r: Math.max(w, d) * 0.6 });
         this.buildings.push({ x, z, w, d, h });
-        windows.push({ x, z, w: w * 0.8, d: d * 0.8, h: h * 0.6, floors: Math.ceil(floors * 0.6) });
       } else if (fam === 'setback' && floors > 6) {
         const tiers = r.int(2, 3);
         let ty = y, th = h;
@@ -477,11 +536,11 @@ export class World {
           const f = 1 - s * 0.28;
           const hh = th / (tiers - s * 0.4);
           boxB.add(x, ty, z, w * f, hh, d * f, base);
+          windows.push({ x, z, w: w * f, d: d * f, h: hh, floors: Math.max(1, Math.floor(hh / 3)), y0: ty - y });
           ty += hh; th -= hh;
         }
         this.colliders.push({ x, z, r: Math.max(w, d) * 0.62 });
         this.buildings.push({ x, z, w, d, h });
-        windows.push({ x, z, w, d, h, floors });
       } else if (fam === 'slab') {
         boxB.add(x, y, z, w * 1.25, FLOOR_H * 2, d * 1.25, pal.bases[0]); // podium
         boxB.add(x, y + FLOOR_H * 2, z, w * 0.6, h, d, base);
@@ -522,7 +581,18 @@ export class World {
     this._billboards(r);
     this._signs(r);
     this._shops(r);
+    this._wallSigns();
+    this._displays();
     this._lamps(r);
+  }
+
+  // road-facing facade of a building: returns outward unit direction
+  _facade(b) {
+    const gx = Math.round(b.x / GRID) * GRID, gz = Math.round(b.z / GRID) * GRID;
+    const faceX = Math.abs(b.x - gx) > Math.abs(b.z - gz);
+    const sx = faceX ? Math.sign(gx - b.x) || 1 : 0;
+    const sz = faceX ? 0 : Math.sign(gz - b.z) || 1;
+    return { sx, sz, faceX };
   }
 
   _windows(list) {
@@ -535,6 +605,21 @@ export class World {
     const quads = [];
     for (const b of list) {
       const y0 = this.plateauY + (b.y0 ?? 0);
+      if (b.round) {
+        // ring the cylinder: quads on the actual curved wall, facing outward
+        const rr2 = b.rad + 0.08;
+        const n = Math.max(4, Math.floor((Math.PI * 2 * b.rad) / 2.8));
+        for (let f = 0; f < b.floors; f++) {
+          const wy = y0 + f * 3 + 1.7;
+          if (wy > y0 + b.h - 1) break;
+          for (let k = 0; k < n; k++) {
+            if (!r.chance(density)) continue;
+            const a = ((k + 0.5) / n) * Math.PI * 2;
+            quads.push([b.x + Math.cos(a) * rr2, wy, b.z + Math.sin(a) * rr2, Math.PI / 2 - a]);
+          }
+        }
+        continue;
+      }
       const cols = Math.max(1, Math.floor(b.w / 2.6));
       const colsD = Math.max(1, Math.floor(b.d / 2.6));
       for (let f = 0; f < b.floors; f++) {
@@ -580,12 +665,13 @@ export class World {
       out: new THREE.Vector3(sx, 0, sz),
     };
     // glowing doorway — "you'll know it"
-    const doorMat = new THREE.MeshBasicMaterial({ color: 0x9fe8ff, transparent: true, opacity: 0.9 });
+    const doorMat = new THREE.MeshBasicMaterial({ color: 0x9fe8ff, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
     const frame = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.4), doorMat);
     frame.position.copy(door).add(new THREE.Vector3(sx * 0.15, 1.7, sz * 0.15));
     frame.rotation.y = Math.atan2(sx, sz);
     this.scene.add(frame);
     this.doorGlow = doorMat;
+    this.doorMesh = frame;   // tappable: leads back to the room
     const glowTex = this.tex(softSprite(64, 'rgba(159,232,255,0.8)', 'rgba(159,232,255,0)'));
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false }));
     spr.scale.set(8, 8, 1);
@@ -624,6 +710,10 @@ export class World {
         new THREE.PlaneGeometry(13, 6.5),
         new THREE.MeshBasicMaterial({ map: tex }),
       );
+      panel.userData.bb = i === quoteIdx
+        ? { quote: true }
+        : { famId: set.fam.id, famName: set.fam.name, msg: msgs[i % msgs.length] };
+      (this.billboardMeshes ??= []).push(panel);
       const g = new THREE.Group();
       panel.position.y = 5.4;
       const legMat = new THREE.MeshLambertMaterial({ color: 0x3a3d42 });
@@ -640,7 +730,8 @@ export class World {
       this.scene.add(g);
       const front = new THREE.Vector3(Math.sin(ry), 0, Math.cos(ry));
       this.billboardPois.push({
-        pos: new THREE.Vector3(x, y + 6, z).add(front.clone().multiplyScalar(26)),
+        // close enough to read — the tour lingers at pois
+        pos: new THREE.Vector3(x, y + 6, z).add(front.clone().multiplyScalar(19)),
         look: new THREE.Vector3(x, y + 5, z),
         name: i === quoteIdx ? 'the quote' : 'a billboard', kind: 'billboard',
       });
@@ -711,6 +802,142 @@ export class World {
       this.scene.add(p);
       posters++;
     }
+  }
+
+  // ── signs mounted ON buildings + vertical banners + the live data board ────
+  _wallSigns() {
+    const { spec } = this;
+    const r = spec.rand('wall-signs');
+    const theme = spec.signs;
+    const msgs = r.shuffle(theme.fam.msgs.slice());
+    // horizontal wall signs, a few shared textures
+    const texPool = [];
+    for (let i = 0; i < 4; i++) texPool.push(this.tex(signCanvas(msgs[i % msgs.length], theme)));
+    let mounted = 0;
+    for (const b of this.buildings) {
+      if (mounted >= 7) break;
+      if (b.round || b.h < 10 || Math.hypot(b.x, b.z) > 120) continue;
+      if (!r.chance(0.4)) continue;
+      const { sx, sz } = this._facade(b);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.2),
+        new THREE.MeshBasicMaterial({ map: texPool[mounted % texPool.length] }));
+      m.position.set(
+        b.x + sx * (b.w / 2 + 0.14),
+        this.plateauY + r.range(6, Math.max(7, Math.min(b.h - 3, 20))),
+        b.z + sz * (b.d / 2 + 0.14),
+      );
+      m.rotation.y = Math.atan2(sx, sz);
+      this.scene.add(m);
+      mounted++;
+    }
+    // vertical neon banners down tall facades
+    let banners = 0;
+    for (const b of this.buildings) {
+      if (banners >= 3) break;
+      if (b.round || b.h < 22 || Math.hypot(b.x, b.z) > 100) continue;
+      if (!r.chance(0.45)) continue;
+      const { sx, sz } = this._facade(b);
+      const name = spec.shops.names[(banners + 3) % spec.shops.names.length];
+      const tex = this.tex(verticalSignCanvas(name, (spec.shops.hue + banners * 60) % 360, spec.shops.neon));
+      const bh = Math.min(b.h * 0.6, 16);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(bh * 0.21, bh), new THREE.MeshBasicMaterial({ map: tex }));
+      // hang it off a corner of the road-facing facade
+      const lateral = r.pick([-1, 1]) * ((sx ? b.d : b.w) / 2 - 1.2);
+      m.position.set(
+        b.x + sx * (b.w / 2 + 0.15) + (sx ? 0 : lateral),
+        this.plateauY + bh / 2 + 3,
+        b.z + sz * (b.d / 2 + 0.15) + (sz ? 0 : lateral),
+      );
+      m.rotation.y = Math.atan2(sx, sz);
+      this.scene.add(m);
+      banners++;
+    }
+    // one inspirational poster out in the city (its siblings hang in the room)
+    const ib = this.buildings.find((b) => !b.round && Math.hypot(b.x, b.z) < 90);
+    if (ib) {
+      const entry = INSPO[r.int(0, INSPO.length - 1)];
+      const tex = this.tex(inspoPosterCanvas(entry, spec.posterSet.hue, r));
+      const { sx, sz } = this._facade(ib);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.25), new THREE.MeshLambertMaterial({ map: tex }));
+      m.position.set(ib.x + sx * (ib.w / 2 + 0.1), this.plateauY + 3, ib.z + sz * (ib.d / 2 + 0.1));
+      m.rotation.y = Math.atan2(sx, sz);
+      this.scene.add(m);
+    }
+    // the data board: live time + this world's temperature
+    const cand = this.buildings.find((b) => !b.round && b.h > 18 && Math.hypot(b.x, b.z) < 90);
+    if (cand) {
+      const { sx, sz } = this._facade(cand);
+      const canvas = makeCanvas(512, 160);
+      const temp = this._temperature();
+      drawDataBoard(canvas, spec, temp);
+      const tex = this.tex(canvas);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.1), new THREE.MeshBasicMaterial({ map: tex }));
+      m.position.set(cand.x + sx * (cand.w / 2 + 0.16), this.plateauY + Math.min(cand.h - 3, 14), cand.z + sz * (cand.d / 2 + 0.16));
+      m.rotation.y = Math.atan2(sx, sz);
+      this.scene.add(m);
+      this.dataBoard = { canvas, tex, temp, acc: 0 };
+    }
+  }
+
+  // temperature is part of the genome too: weather + time of day
+  _temperature() {
+    const { weather, time } = this.spec;
+    const precip = weather.precip === 2 ? -26 : weather.precip === 1 ? -7 : 0;
+    return Math.round(24 - weather.fog * 8 + precip + (time.dayness - 0.5) * 8);
+  }
+
+  // ── animated math displays: shader screens on facades, tap to change mode ──
+  _displays() {
+    const { spec } = this;
+    const r = spec.rand('displays');
+    this.displays = [];
+    const cands = this.buildings.filter((b) => !b.round && b.h > 15 && Math.hypot(b.x, b.z) < 110);
+    const picked = r.shuffle(cands.slice()).slice(0, Math.min(cands.length, 2 + r.int(0, 1)));
+    for (const b of picked) {
+      const { sx, sz, faceX } = this._facade(b);
+      const W = Math.max(6, Math.min((faceX ? b.d : b.w) * 0.85, 15));
+      const H = W * 0.62;
+      const hue = (spec.billboards.hue + this.displays.length * 90) % 360;
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uMode: { value: r.int(0, DISPLAY_MODES.length - 1) },
+          uSeed: { value: r.float() },
+          uColA: { value: new THREE.Color().setHSL(hue / 360, 0.8, 0.06) },
+          uColB: { value: new THREE.Color().setHSL(((hue + 40) % 360) / 360, 0.9, 0.62) },
+        },
+        vertexShader: DISPLAY_VERT, fragmentShader: DISPLAY_FRAG, fog: false,
+      });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(W, H), mat);
+      m.position.set(
+        b.x + sx * (b.w / 2 + 0.18),
+        this.plateauY + Math.max(H / 2 + 2, Math.min(b.h - H / 2 - 1, 9 + H / 2)),
+        b.z + sz * (b.d / 2 + 0.18),
+      );
+      m.rotation.y = Math.atan2(sx, sz);
+      const frame = new THREE.Mesh(new THREE.PlaneGeometry(W + 1, H + 1), new THREE.MeshLambertMaterial({ color: 0x14161a }));
+      frame.position.copy(m.position).addScaledVector(new THREE.Vector3(sx, 0, sz), -0.06);
+      frame.rotation.y = m.rotation.y;
+      this.scene.add(frame, m);
+      m.userData.display = { mat, idx: this.displays.length };
+      this.displays.push({ mesh: m, mat, out: new THREE.Vector3(sx, 0, sz) });
+    }
+    if (this.displays.length) {
+      const d = this.displays[0];
+      this.displayPoi = {
+        pos: d.mesh.position.clone().addScaledVector(d.out, 17).add(new THREE.Vector3(0, 1.5, 0)),
+        look: d.mesh.position.clone(),
+        name: 'the big screen', kind: 'display',
+      };
+    }
+  }
+
+  // cycle a tapped display to its next pattern; returns the new pattern name
+  cycleDisplay(mesh) {
+    const d = mesh.userData.display;
+    if (!d) return null;
+    d.mat.uniforms.uMode.value = (d.mat.uniforms.uMode.value + 1) % DISPLAY_MODES.length;
+    return DISPLAY_MODES[d.mat.uniforms.uMode.value];
   }
 
   _lamps(r2) {
@@ -1090,6 +1317,7 @@ export class World {
       }
     }
     if (this.signPoi) all.push(this.signPoi);
+    if (this.displayPoi) all.push(this.displayPoi);
     if (this.vehicles.length) {
       const L = this.carLoop?.L ?? 75;
       all.push({
@@ -1110,6 +1338,15 @@ export class World {
     this.skyUniforms.uTime.value = t;
     if (this.waterUniforms) this.waterUniforms.uTime.value = t;
     if (this.doorGlow) this.doorGlow.opacity = 0.6 + Math.sin(t * 2.2) * 0.3;
+    for (const d of this.displays ?? []) d.mat.uniforms.uTime.value = t;
+    if (this.dataBoard) {
+      this.dataBoard.acc += dt;
+      if (this.dataBoard.acc > 1) {   // blink the colon, keep the clock honest
+        this.dataBoard.acc = 0;
+        drawDataBoard(this.dataBoard.canvas, this.spec, this.dataBoard.temp);
+        this.dataBoard.tex.needsUpdate = true;
+      }
+    }
     for (const fn of this.animFns) fn(t);
     if (this.vehicles.length && this.carLoop) {
       for (const v of this.vehicles) this._placeVehicle(v, dt, this.carLoop.perim, this.carLoop.L);

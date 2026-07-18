@@ -15,6 +15,7 @@ export class FreeFly {
     this.vel = new THREE.Vector3();
     this.moveIn = new THREE.Vector3();  // accumulated touch move input
     this.keys = new Set();
+    this.sticks = null;  // {move:{x,y}, look:{x,y}, vert:()=>-1..1, prefs} from ui
     this.onTap = null;
     this.getGroundH = () => 0;
     this.pointers = new Map();
@@ -91,8 +92,21 @@ export class FreeFly {
       this.cam.quaternion.setFromEuler(new THREE.Euler(this.pitch, this.yaw, 0, 'YXZ'));
       return;
     }
+    // virtual sticks (free-fly): right stick looks, left stick moves
+    if (this.sticks) {
+      const s = this.sticks;
+      const inv = s.prefs.invertY ? -1 : 1;
+      this.yaw -= s.look.x * dt * 2.5 * s.prefs.sens;
+      this.pitch += s.look.y * dt * 1.9 * s.prefs.sens * inv;
+      this.pitch = Math.max(-1.45, Math.min(1.45, this.pitch));
+    }
     const sp = this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') ? 66 : 26;
     const acc = new THREE.Vector3();
+    if (this.sticks) {
+      acc.x += this.sticks.move.x;
+      acc.z -= this.sticks.move.y;
+      acc.y += this.sticks.vert();
+    }
     if (this.keys.has('KeyW') || this.keys.has('ArrowUp')) acc.z -= 1;
     if (this.keys.has('KeyS') || this.keys.has('ArrowDown')) acc.z += 1;
     if (this.keys.has('KeyA') || this.keys.has('ArrowLeft')) acc.x -= 1;

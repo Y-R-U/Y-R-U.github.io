@@ -26,6 +26,23 @@
 <button id="speed" class="hidden">1×</button>
 <button id="exitcar" class="hidden">leave car</button>
 <div id="joy" class="hidden"><div id="joy-knob"></div></div>
+
+<!-- free-fly dual sticks -->
+<div id="fjl" class="fstick hidden"><div id="fjl-knob" class="fknob"></div></div>
+<div id="fjr" class="fstick hidden"><div id="fjr-knob" class="fknob"></div></div>
+<button id="fly-up" class="fvert hidden">▲</button>
+<button id="fly-down" class="fvert hidden">▼</button>
+<button id="fly-cog" class="hidden">⚙</button>
+<div id="flyset" class="hidden">
+  <div class="fs-title">flight</div>
+  <button id="fs-swap" class="fs-toggle">swap sticks</button>
+  <button id="fs-invert" class="fs-toggle">invert look</button>
+  <label class="fs-row">look speed
+    <input id="fs-sens" type="range" min="0.4" max="2" step="0.1" value="1">
+  </label>
+  <button id="fs-close">done</button>
+</div>
+
 <div id="toasts"></div>
 
 <!-- connect overlay -->

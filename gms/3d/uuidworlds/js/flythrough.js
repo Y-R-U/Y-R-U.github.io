@@ -15,6 +15,7 @@ export class Flythrough {
 
     const center = new THREE.Vector3(0, world.plateauY + 10, 0);
     const hs = style.h;
+    const labels = [];   // one caption per control point, aligned with P
 
     if (style.fam === 'spiral') {
       const turns = 2.2;
@@ -25,16 +26,20 @@ export class Flythrough {
         const a = a0 + f * turns * Math.PI * 2;
         const rr = 320 - f * 200;
         const h = (200 - f * 150) * hs;
+        const poi = pois[Math.min(pois.length - 1, Math.floor(f * pois.length))];
         P.push(new THREE.Vector3(Math.cos(a) * rr, world.plateauY + h, Math.sin(a) * rr));
-        L.push(pois[Math.min(pois.length - 1, Math.floor(f * pois.length))].look);
+        L.push(poi.look);
+        labels.push(poi.name);
       }
     } else if (style.fam === 'orbit') {
       const n = 8;
       const a0 = r.float() * Math.PI * 2;
       for (let i = 0; i < n; i++) {
         const a = a0 + (i / (n - 1)) * Math.PI * 1.7;
+        const poi = pois[Math.min(pois.length - 1, Math.floor((i / n) * pois.length))];
         P.push(new THREE.Vector3(Math.cos(a) * 250, world.plateauY + 110 * hs, Math.sin(a) * 250));
-        L.push(pois[Math.min(pois.length - 1, Math.floor((i / n) * pois.length))].look);
+        L.push(poi.look);
+        labels.push(poi.name);
       }
     } else {
       // poi-visiting styles: drone / chase / balcony / skyfall / shoreline
@@ -42,7 +47,7 @@ export class Flythrough {
       const inDir = first.pos.clone().setY(0).normalize();
       const start = first.pos.clone().add(inDir.multiplyScalar(160));
       start.y = style.fam === 'skyfall' ? 420 : (120 + 80 * hs);
-      P.push(start); L.push(center.clone());
+      P.push(start); L.push(center.clone()); labels.push('');
       for (let i = 0; i < pois.length; i++) {
         const poi = pois[i];
         const p = poi.pos.clone();
@@ -59,12 +64,14 @@ export class Flythrough {
         }
         P.push(p);
         L.push(poi.look.clone());
+        labels.push(poi.name);
         // raised midpoint between pois keeps sweeps airborne
         if (i < pois.length - 1 && style.fam !== 'chase') {
           const mid = p.clone().lerp(pois[i + 1].pos, 0.5);
           mid.y += 18 * hs;
           P.push(mid);
           L.push(pois[i + 1].look.clone());
+          labels.push('');   // travelling, not sightseeing — no caption
         }
       }
     }
@@ -73,11 +80,11 @@ export class Flythrough {
     const A = world.arrival;
     const doorEye = A.door.clone().add(A.out.clone().multiplyScalar(7)).setY(world.plateauY + 1.7);
     P.push(A.roof.clone().add(new THREE.Vector3(A.out.x * 20, 10, A.out.z * 20)));
-    L.push(A.roof.clone());
+    L.push(A.roof.clone()); labels.push('');
     P.push(A.door.clone().add(A.out.clone().multiplyScalar(16)).setY(world.plateauY + 8));
-    L.push(A.door.clone().setY(world.plateauY + 2));
+    L.push(A.door.clone().setY(world.plateauY + 2)); labels.push('arrival');
     P.push(doorEye);
-    L.push(A.door.clone().setY(world.plateauY + 1.8));
+    L.push(A.door.clone().setY(world.plateauY + 1.8)); labels.push('arrival');
 
     // keep every control point above the terrain…
     for (const p of P) {
@@ -99,6 +106,7 @@ export class Flythrough {
 
     this.curve = new THREE.CatmullRomCurve3(P, false, 'centripetal', 0.4);
     this.looks = L;
+    this.labels = labels;
     const len = this.curve.getLength();
     this.dur = Math.max(24, Math.min(85, len / (17 * style.s)));
     this.t = 0;
@@ -120,18 +128,17 @@ export class Flythrough {
     return { pos, look };
   }
 
-  // the poi you're currently flying toward (for the whisper label)
+  // the caption for where the camera is actually looking right now
   currentLabel() {
-    const seg = this.t * (this.looks.length - 1);
-    // looks 1..pois.length map to pois (0 is the approach)
-    const idx = Math.round(seg) - 1;
-    if (idx >= 0 && idx < this.pois.length) return this.pois[idx].name;
-    if (this.t > 0.86) return 'arrival';
-    return '';
+    const seg = this.t * (this.labels.length - 1);
+    const idx = Math.max(0, Math.min(this.labels.length - 1, Math.round(seg)));
+    return this.labels[idx];
   }
 
   update(camera, dt) {
-    this.t += (dt * this.mult) / this.dur;
+    // linger at sights, hurry through the travel in between
+    const pace = this.currentLabel() ? 0.62 : 1.25;
+    this.t += (dt * this.mult * pace) / this.dur;
     const { pos, look } = this.poseAt(this.t);
     // never clip the ground
     const h = this.world.terrainH(pos.x, pos.z);

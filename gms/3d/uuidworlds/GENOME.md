@@ -13,7 +13,7 @@ length    32 characters  →  62³² ≈ 2.27 × 10⁵⁷ possible worlds
 
 | pos | trait | table (62 entries each) |
 |----:|-------|-------------------------|
-| 0 | **Sky palette** | 14 authored archetypes (Clear Noon, Ember Dusk, Deep Night, Blood Sky, Ink & Gold…) × hue-drifted repeats. First pass through the table is canonical. |
+| 0 | **Sky palette** | 14 authored archetypes (Clear Noon, Ember Dusk, Deep Night, Blood Sky, Ink & Gold…). First pass is canonical; repeat slots are *gentle* variants of the pretty archetypes only, with deliberate DRAMA surprises (Neon Violet, Acid Dawn, Blood Sky II…) in ~20% of slots. Genesis (index 2, Ember Dusk) is always pretty. |
 | 1 | **Time of day** | a 62-step day wheel (midnight → noon → night). Controls sun position, light intensity, "dayness". Independent of pos 0 — a dark palette at noon is a legitimate mood. |
 | 2 | **Weather / fog** | 8 fog bands (crystal clear → pea soup); indices 44–53 add rain, 54–61 add snow. |
 | 3 | **Water hue** | greens → blues walk (120°→250°), shallow/deep/foam triplets. |
@@ -56,6 +56,27 @@ All randomness beyond the 27 trait chars comes from labelled streams:
 `sfc32(xmur3(uuid + '·' + label))` — e.g. `windows`, `billboards`, `flypath`,
 `book-line`. Every stream hashes the *entire* UUID, so equal prefixes diverge.
 
+## Stream-only content (no genome chars consumed)
+
+Later content rides existing trait chars through NEW streams — the char map
+above never grows or renumbers:
+
+- **Person lore** (`PERSON_LINES`, aligned 1:1 with PEOPLE): what they did,
+  a story, real famous quotes. Streams `person-line`. Papers/mug/plant/shelf
+  in the room each tell a piece of the world (`mug` stream).
+- **Poster lore** (`POSTER_LORE`): the real mathematics & history behind each
+  poster style — tapping a poster teaches it.
+- **Inspirational posters** (`INSPO`): one in every room (stream `inspo`),
+  one in every city (`wall-signs`).
+- **Wall signs & banners** (stream `wall-signs`): facade-mounted sign quads,
+  vertical neon banners, plus ONE live data board per city showing real
+  date/time and the world's seeded temperature (weather + time of day).
+- **Animated math displays** (stream `displays`): 2–3 shader screens on
+  facades — plasma / interference / lissajous / polar rose / tunnel /
+  digital rain. Tapping one cycles its pattern. The first is a POI.
+- **Billboard lore** (`BILLBOARD_LORE`): tapping a billboard in free-fly
+  opens its ad + family lore; the quote billboard opens the quote's story.
+
 ## The chain
 
 The next world is a pure function of the current one:
@@ -85,3 +106,10 @@ room — same archetype, contents seeded by the *current* world: wall/floor
 palette (22), posters (13), framed quote (12), book (14), window view painted
 from the sky/lights genome, clutter from entropy streams. The PC screen shows
 the *next* UUID. The loop is infinite.
+
+You can look all the way around the room, and the door is not locked: it
+re-materialises the current world (deterministically — it is the same world)
+outside the arrival building. Out there the glowing doorway, or the glowing
+button, leads back. Nearly everything in the room answers a tap: the person,
+the book, the posters, the quote, the window, the mug, the papers, the plant,
+the shelf, the keyboard (field notes).

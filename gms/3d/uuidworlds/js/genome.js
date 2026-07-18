@@ -30,7 +30,7 @@ export function decode(uuid) {
     vehCount: Math.round(g(9) * 20 / 61),           // 0..20 vehicles
     vehPal: VEHICLE_PALETTES[g(10)],
     // 11–17: culture
-    person: PEOPLE[g(11)],
+    person: PEOPLE[g(11)], personIdx: g(11),
     quote: QUOTES[g(12)],
     posterSet: POSTER_SETS[g(13)],
     book: BOOKS[g(14)],
