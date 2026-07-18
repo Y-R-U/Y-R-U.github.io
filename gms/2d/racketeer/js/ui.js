@@ -1,5 +1,5 @@
 // All DOM UI: menus, mode screens, skill shop, loadout, modals, HUD wiring.
-import { el, esc, fmtMoney, fmtRank } from "./util.js";
+import { el, esc, fmtMoney, fmtRank, fmtSpeed } from "./util.js";
 import { SKILLS, SKILL_ORDER, upgradeCost } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
@@ -83,19 +83,37 @@ export function buildMenu() {
   stack.appendChild(shop);
 
   const foot = el("div", "menu-foot");
-  const mute = el("button", "chip-btn", isMuted() ? "🔇" : "🔊");
-  mute.onclick = () => { setMuted(!isMuted()); mute.textContent = isMuted() ? "🔇" : "🔊"; };
-  const how = el("button", "chip-btn", "❓ How to play");
-  how.onclick = showHelp;
-  const reset = el("button", "chip-btn", "🗑️ Reset");
-  reset.onclick = () => modal(`<h2>Start over?</h2><p>Everything — story, rank, cash, skills, trophies — wiped. Gary awaits.</p>`,
-    [{ label: "Wipe it", cls: "danger", fn: () => { career.wipe(); App.save = career.load(); buildMenu(); } },
-     { label: "Cancel", cls: "ghost" }]);
-  foot.append(mute, how, reset);
+  if (save.bestSpeed) {
+    foot.appendChild(el("div", "chip-btn speed-chip",
+      `🚀 Top speed <b>${fmtSpeed(save.bestSpeed, save.settings?.units || "kph")}</b>`));
+  }
+  const cog = el("button", "chip-btn", "⚙️ Settings");
+  cog.onclick = () => { initAudio(); sfx.click(); showSettings(); };
+  foot.append(cog);
   stack.appendChild(foot);
   s.appendChild(stack);
 
   function go(builder, screen) { initAudio(); sfx.click(); builder(); showScreen(screen); }
+}
+
+function showSettings() {
+  const save = App.save;
+  if (!save.settings) save.settings = { units: "kph" };
+  const units = save.settings.units || "kph";
+  modal(`<h2>⚙️ Settings</h2>
+    ${save.bestSpeed ? `<p>🚀 All-time top speed: <b>${fmtSpeed(save.bestSpeed, units)}</b></p>` : ""}`,
+    [
+      { label: `Speed units: ${units === "kph" ? "km/h → switch to mph" : "mph → switch to km/h"}`, cls: "ghost",
+        fn: () => { save.settings.units = units === "kph" ? "mph" : "kph"; career.persist(save); showSettings(); } },
+      { label: isMuted() ? "🔇 Sound is OFF — turn on" : "🔊 Sound is ON — mute", cls: "ghost",
+        fn: () => { setMuted(!isMuted()); showSettings(); } },
+      { label: "❓ How to play", cls: "ghost", fn: showHelp },
+      { label: "🗑️ Reset career", cls: "danger",
+        fn: () => modal(`<h2>Start over?</h2><p>Everything — story, rank, cash, skills, trophies, top speed — wiped. Gary awaits.</p>`,
+          [{ label: "Wipe it", cls: "danger", fn: () => { career.wipe(); App.save = career.load(); buildMenu(); } },
+           { label: "Cancel", cls: "ghost", fn: showSettings }]) },
+      { label: "Done", fn: () => buildMenu() },
+    ]);
 }
 
 function showHelp() {
@@ -385,7 +403,7 @@ export const matchHooks = {
 
 /* ---------------- Result modals per mode ---------------- */
 const statLine = (m) =>
-  `<p style="font-size:12px;opacity:.75">Winners: ${m.stats.winners} · Aces: ${m.stats.aces} · Outrageous: ${m.stats.outrageous} · Longest rally: ${m.stats.longestRally}</p>`;
+  `<p style="font-size:12px;opacity:.75">Winners: ${m.stats.winners} · Aces: ${m.stats.aces} · Outrageous: ${m.stats.outrageous} · Longest rally: ${m.stats.longestRally}${m.stats.topSpeed ? ` · 🚀 ${fmtSpeed(m.stats.topSpeed, App.save.settings?.units || "kph")}` : ""}</p>`;
 
 export function showRankedResult(m, s) {
   let html;

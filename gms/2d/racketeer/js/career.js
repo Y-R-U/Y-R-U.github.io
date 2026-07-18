@@ -15,6 +15,8 @@ export function newSave() {
     story: 1, storyDone: false,                       // story mode progress (level 1..100)
     trophies: { local: 0, national: 0, world: 0 },
     dailyWin: null,                                   // date string of last daily-challenge win
+    bestSpeed: 0,                                     // fastest shot ever, km/h
+    settings: { units: "kph" },
   };
 }
 

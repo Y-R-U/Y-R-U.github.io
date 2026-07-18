@@ -1,7 +1,7 @@
 // The match engine: state machine + rules + skills + events. One instance per match.
 // `tier` is a config object: { id, name, games, oppSkills, crowd, prize, boss?, eventChance?, modifier? }
 import { COURT, SWING, SHOT_T, PTS, BALL_R, PLAYER, METERS } from "./const.js";
-import { clamp, lerp, rand, pick, pickBag } from "./util.js";
+import { clamp, lerp, rand, pick, pickBag, fmtSpeed } from "./util.js";
 import { makeBall, stepBall, predictAtDepth, aimVelocity, netClearance, drawBall } from "./ball.js";
 import { makePlayer, setState, updatePlayer, drawPlayer } from "./player.js";
 import { drawScene, drawNet, setCrowd, project, view, pokeUmpire } from "./court.js";
@@ -14,6 +14,7 @@ import { aiUpdate, aiBetweenPoints } from "./ai.js";
 
 const YOU_Y = 1.1, OPP_Y = COURT.L - 1.1;
 const SERVE_WINDOW = 0.4;      // s of grace around ideal serve contact
+const TOSS_T = 0.85;           // s from toss to ideal contact (higher toss = more time)
 
 export function makeMatch(save, opp, tier, gear, hooks) {
   const m = {
@@ -80,6 +81,20 @@ function earn(m, base, wx, wy) {
 }
 function addHype(m, n) { m.hype = clamp(m.hype + n, 0, 100); setCrowdLevel(m.hype / 100); pushHud(m); }
 function pushHud(m) { m.hooks.onHud && m.hooks.onHud(m); }
+
+// Shot-speed tracking: per-match top + all-time record with fanfare.
+function recordSpeed(m, v, show) {
+  const kph = Math.hypot(v.vx, v.vy) * 3.6;
+  if (kph > (m.stats.topSpeed || 0)) m.stats.topSpeed = Math.round(kph);
+  const units = m.save.settings?.units || "kph";
+  if (kph > (m.save.bestSpeed || 0) + 0.5) {
+    m.save.bestSpeed = Math.round(kph);
+    sayBanner(m, `NEW TOP SPEED! ${fmtSpeed(kph, units)} 🔥`, "#ff9d2e", 1.1);
+    sfx.cheer(0.6);
+  } else if (show) {
+    FX.floatText(m.ball.x, m.ball.y, m.ball.z + 0.9, fmtSpeed(kph, units), "#cfe8ff", 0.62);
+  }
+}
 export function skillLevel(m, id) { return m.save.skills[id] || 0; }
 
 function ptLabel(m, mine) {
@@ -136,6 +151,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
   setState(byYou ? m.you : m.oppP, "serve");
   sfx.pock(1 + quality);
+  if (byYou) recordSpeed(m, v, true);        // serve speed always shown — it's tennis law
   m.ballTo = byYou ? "opp" : "you";
   scheduleContact(m);
   m.state = "rally"; m.stateT = 0;
@@ -212,6 +228,7 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
   }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz; b.curve = curve; b.live = true;
   sfx.pock(0.8 + quality + powBonus);
+  if (you) recordSpeed(m, v, quality >= 0.75 || !!opts.power);
   if (!you && quality < 0.25) FX.floatText(b.x, b.y, b.z + 0.4, "SHANK!", "#ff8a5c", 0.7);
   if (Math.abs(curve) > 4) FX.floatText(b.x, b.y, b.z + 0.7, "🍌 CURVE!", "#ffd34a", 0.7);
   FX.burst(b.x, b.y, b.z, 6, "#f4ff9a", 2.5);
@@ -302,7 +319,7 @@ export function inputPress(m, nx, ny) {
     // Tap = toss; the swipe comes next
     m.tossed = true;
     m.state = "serveWait"; m.stateT = 0;
-    m.serveContactT = m.time + 0.55;
+    m.serveContactT = m.time + TOSS_T;
     sfx.serveToss();
     return;
   }
@@ -334,6 +351,10 @@ export function inputRelease(m) {
     const dt = m.serveContactT - m.time;
     if (dt > SERVE_WINDOW) return;                    // way early — let them try again
     const q = clamp(1 - Math.abs(dt) / SERVE_WINDOW, 0.12, 1);
+    const fx = Math.abs(dt) <= 0.1 ? ["PERFECT!", "#7ee6a1", 0.9]
+      : Math.abs(dt) <= 0.22 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffe24a", 0.8]
+      : [dt > 0 ? "WAY EARLY!" : "WAY LATE!", "#ff6b6b", 0.85];
+    FX.floatText(m.you.x, m.you.y + 1.4, 2.2, fx[0], fx[1], fx[2]);
     const tx = clamp(dx * 14, -1, 1) * (COURT.W / 2 - 0.3);
     serveNow(m, q, tx);
     return;
@@ -652,9 +673,9 @@ export function updateMatch(m, rawDt) {
     }
     case "serveWait": {
       // Toss animation: ball rises from hand to apex at serveContactT
-      const k = clamp(1 - (m.serveContactT - m.time) / 0.55, 0, 1.6);
+      const k = clamp(1 - (m.serveContactT - m.time) / TOSS_T, 0, 1.6);
       m.ball.x = m.serveSide * 2.0; m.ball.y = YOU_Y - 0.1;
-      m.ball.z = 1.0 + Math.sin(Math.min(k, 1.3) * Math.PI * 0.62) * 1.9;
+      m.ball.z = 1.0 + Math.sin(Math.min(k, 1.3) * Math.PI * 0.62) * 2.6;
       if (m.autoPilot && m.serveContactT - m.time < 0.06 && m.serveContactT - m.time > 0) {
         serveNow(m, rand(0.6, 1), rand(-2.5, 2.5));
       }
@@ -778,6 +799,15 @@ function onBallEvent(m, ev, data) {
     }
     endPoint(m, hitter === "you" ? "opp" : "you", hitter === "you" ? "netYou" : "oppError");
   } else if (ev === "netcord") {
+    // A serve clipping the tape is a LET — replay it, no fault counted
+    if (m.state === "rally" && m.stats.rally === 0) {
+      sfx.whistle();
+      sayBanner(m, "LET! ⚠️", "#6fd3ff", 1.1);
+      ticker(m, m.server === "you" ? "Clipped the tape — replay the serve." : "Let — they'll serve again.");
+      m.state = "preServe"; m.stateT = 0;
+      m.ball.live = false; m.tossed = false; m.contact = null;
+      return;
+    }
     FX.floatText(m.ball.x, COURT.NET_Y, 1.3, "net cord!", "#fff", 0.7);
     scheduleContact(m);
   }

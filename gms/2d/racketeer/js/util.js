@@ -24,6 +24,10 @@ export function fmtMoney(n) {
   return "$" + Math.round(n).toLocaleString("en-US");
 }
 
+export function fmtSpeed(kph, units) {
+  return units === "mph" ? Math.round(kph * 0.621371) + " mph" : Math.round(kph) + " km/h";
+}
+
 export function fmtRank(r) {
   if (r === null || r === undefined) return "UNRANKED";
   return "#" + Math.round(r).toLocaleString("en-US");

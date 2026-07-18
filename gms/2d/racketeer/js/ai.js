@@ -63,6 +63,7 @@ export function aiUpdate(m, dt) {
       // Can't reach — whiff, ball double bounces
       setState(p, "swing"); sfx.swishMiss();
       FX.floatText(p.x, p.y, 1.5, "!!", "#ff8a5c", 0.8);
+      m.stats.oppMisses = (m.stats.oppMisses || 0) + 1;
       return;
     }
     // Even in reach, hard balls get missed: fast/curved/deep-in-a-long-rally
@@ -72,13 +73,14 @@ export function aiUpdate(m, dt) {
     let miss = (pace - 9) * 0.030                          // shot speed (power/perfect = fast)
       + Math.abs(b.curve || 0) * 0.022                     // curve is hard to clean-hit
       + m.stats.rally * 0.010 * (1.3 - stars * 0.2)        // rally fatigue
-      + (1 - stars / 5) * 0.06                             // plain scrubbiness
+      + (1 - stars / 5) * 0.10                             // plain scrubbiness
       + clamp(gap - 0.8, 0, 2) * 0.10;                     // stretching at full reach
     miss *= (1.35 - stars * 0.22);
     if (m.opp.boss) miss *= 0.25;
     if (m.oppFx.zoneShots > 0) miss *= 0.3;
     miss = clamp(miss, 0.02, 0.75);
     if (Math.random() < miss) {
+      m.stats.oppMisses = (m.stats.oppMisses || 0) + 1;
       if (Math.random() < 0.5) {
         setState(p, "swing"); sfx.swishMiss();             // clean air-shot
         FX.floatText(p.x, p.y, 1.6, pick(["WHIFF!", "SWING AND A MISS!", "AIR!"]), "#7ee6a1", 0.8);
