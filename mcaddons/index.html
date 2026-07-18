@@ -411,31 +411,76 @@ const TROLLING_ITEMS = [
   }
 ];
 
+// The Watcher isn't crafted — these are behaviour cards (no crafting grids).
+const WATCHER_ITEMS = [
+  {
+    emoji: "🌘", name: "He Appears",
+    desc: "In your world from the moment it's created. Shows up <strong>mostly at night, sometimes by day — and not every night</strong>: a randomized appearance scheduler decides when He comes, and there is only ever <strong>one</strong> of Him.",
+    tags: ["NIGHT (MOSTLY)", "RANDOM SCHEDULE", "ONLY ONE"]
+  },
+  {
+    emoji: "👁️", name: "The Stare",
+    desc: "He stalks and follows you with real pathfinding, then just… <strong>stands and watches</strong>. Stare back while He's near and after a random <strong>10–45 seconds</strong> He snaps — and chases.",
+    tags: ["STALKS", "WATCHES", "SNAPS"]
+  },
+  {
+    emoji: "💀", name: "One-Hit Kill",
+    desc: "The attack is a <strong>violent lunge with a shriek</strong> — and it kills in <strong>one shot</strong>. There's no guaranteed kill on His side though: sometimes He lets you run.",
+    tags: ["ONE-SHOT", "LUNGE", "SHRIEK"]
+  },
+  {
+    emoji: "🛡️", name: "Impossible To Kill",
+    desc: "1,000,000 HP with <strong>all damage nullified</strong>. Fire immune, knockback immune, can't even be pushed. You do not fight Him. You avoid Him.",
+    tags: ["UNKILLABLE", "IMMUNE", "UNPUSHABLE"]
+  },
+  {
+    emoji: "🔊", name: "The Torment",
+    desc: "Eerie ambient drones, whispers and footsteps loop while He's near — plus <strong>fake distant sounds</strong> placed around you, so you hear Him where He isn't.",
+    tags: ["CREEPY AUDIO", "FAKE SOUNDS"]
+  },
+  {
+    emoji: "🛏️", name: "No Sleep",
+    desc: "Within <strong>20 blocks</strong> He cancels your bed: <strong>&ldquo;You may not sleep now; It is nearby.&rdquo;</strong> The night is His.",
+    tags: ["SLEEP BLOCKED", "20 BLOCKS"]
+  }
+];
+
 const DETAILS = {
+  watcher: {
+    title: "The One Who Watches — What He Does",
+    items: WATCHER_ITEMS,
+    note: "<b>Notes:</b> the four ambient/attack sounds are synthesized placeholders — swap the .ogg files in <b>RP/sounds/mob/scary_stalker/</b> for your own if you have better ones. The skin texture is 512&times;512 on UVs laid out for 64&times;64, so it may look stretched in-game (fix = re-UV in Blockbench). Uses the stable Script API (@minecraft/server 1.14.0), so no experimental toggles needed on Bedrock 1.21+."
+  },
   trolling: { title: "Trolling Addon — What's Inside", items: TROLLING_ITEMS },
   muffins: { title: "Muffins & Blueberries — What's Inside", items: MUFFIN_ITEMS }
 };
 
 function itemCard(it) {
-  const cells = it.grid.map(c => {
-    if (!c) return `<div class="craft-cell"></div>`;
-    if (c[2]) return `<div class="craft-cell" title="${c[1]}">${IMG(c[0])}</div>`;
-    return `<div class="craft-cell" title="${c[1]}">${EMO(c[0])}</div>`;
-  }).join("");
-  const head = it.swatch
-    ? `<img class="px" src="img/${it.icon}.png" alt="" style="padding:0">`
-    : IMG(it.icon).replace("<img ", `<img style="width:56px;height:56px" `);
-  const card = document.createElement("div");
-  card.className = "item-card";
-  card.innerHTML = `
-    <div class="item-head">${head}<h3>${it.name}</h3></div>
-    <div>${it.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
-    <p>${it.desc}</p>
+  let craft = "";
+  if (it.grid) {
+    const cells = it.grid.map(c => {
+      if (!c) return `<div class="craft-cell"></div>`;
+      if (c[2]) return `<div class="craft-cell" title="${c[1]}">${IMG(c[0])}</div>`;
+      return `<div class="craft-cell" title="${c[1]}">${EMO(c[0])}</div>`;
+    }).join("");
+    craft = `
     <div class="craft">
       <div class="craft-grid">${cells}</div>
       <div class="craft-arrow">→</div>
       <div class="craft-out" title="${it.out[1]}">${IMG(it.out[0])}</div>
     </div>`;
+  }
+  const head = it.emoji
+    ? `<div class="item-head" style="font-size:38px;line-height:1">${it.emoji}<h3 style="margin-left:2px">${it.name}</h3></div>`
+    : `<div class="item-head">${it.swatch
+        ? `<img class="px" src="img/${it.icon}.png" alt="" style="padding:0">`
+        : IMG(it.icon).replace("<img ", `<img style="width:56px;height:56px" `)}<h3>${it.name}</h3></div>`;
+  const card = document.createElement("div");
+  card.className = "item-card";
+  card.innerHTML = `
+    ${head}
+    <div>${it.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+    <p>${it.desc}</p>${craft}`;
   return card;
 }
 
@@ -454,6 +499,12 @@ function renderDetails() {
     for (const it of d.items) grid.appendChild(itemCard(it));
     block.appendChild(h);
     block.appendChild(grid);
+    if (d.note) {
+      const n = document.createElement("div");
+      n.className = "note";
+      n.innerHTML = d.note;
+      block.appendChild(n);
+    }
     container.appendChild(block);
   }
 }
