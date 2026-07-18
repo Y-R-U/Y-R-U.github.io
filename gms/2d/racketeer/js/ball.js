@@ -3,7 +3,7 @@ import { project } from "./court.js";
 
 export function makeBall() {
   return { x: 0, y: 2, z: 1, vx: 0, vy: 0, vz: 0, live: false, bounces: 0,
-    lastHitBy: null, trail: [], spinT: 0 };
+    lastHitBy: null, trail: [], spinT: 0, curve: 0, wind: 0 };
 }
 
 // Advance physics; returns "bounce" | "net" | null events via callback.
@@ -11,6 +11,7 @@ export function stepBall(b, dt, onEvent) {
   if (!b.live) return;
   const prevY = b.y;
   b.vz += PHYS.G * dt;
+  b.vx += (b.curve + b.wind) * dt;          // sidespin curve + event wind
   b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
   b.vx *= PHYS.AIR_DRAG; b.vy *= PHYS.AIR_DRAG;
   b.spinT += dt * 12;
@@ -36,6 +37,7 @@ export function stepBall(b, dt, onEvent) {
     b.z = BALL_R;
     b.vz = -b.vz * PHYS.BOUNCE;
     b.vx *= 0.85; b.vy *= 0.82;
+    b.curve *= 0.35;                        // spin scrubs off on the bounce
     b.bounces++;
     onEvent && onEvent("bounce", { x: b.x, y: b.y });
   }
@@ -48,9 +50,10 @@ export function stepBall(b, dt, onEvent) {
 // Landing spot prediction (first future bounce) — used by AI and player auto-run.
 export function predictLanding(b) {
   let { x, y, z, vx, vy, vz } = b;
+  const acc = (b.curve || 0) + (b.wind || 0);
   const dt = 1 / 60;
   for (let i = 0; i < 240; i++) {
-    vz += PHYS.G * dt; x += vx * dt; y += vy * dt; z += vz * dt;
+    vz += PHYS.G * dt; vx += acc * dt; x += vx * dt; y += vy * dt; z += vz * dt;
     vx *= PHYS.AIR_DRAG; vy *= PHYS.AIR_DRAG;
     if (z <= BALL_R && vz < 0) return { x, y, t: i * dt };
   }
@@ -58,16 +61,27 @@ export function predictLanding(b) {
 }
 
 // Predict when/where ball reaches a given depth line (for contact timing).
+// Find where/when the receiver can meet the ball: the crossing of `targetY`,
+// or — for short balls that would die first — just before the second bounce.
 export function predictAtDepth(b, targetY) {
   let { x, y, z, vx, vy, vz } = b;
+  let acc = (b.curve || 0) + (b.wind || 0);
+  let bounces = b.bounces;
   const dt = 1 / 60;
   if ((targetY - y) * vy <= 0) return null;   // moving away
+  let post = null;                            // best point after the first bounce (apex-ish)
   for (let i = 0; i < 300; i++) {
     const py = y;
-    vz += PHYS.G * dt; x += vx * dt; y += vy * dt; z += vz * dt;
+    vz += PHYS.G * dt; vx += acc * dt; x += vx * dt; y += vy * dt; z += vz * dt;
     vx *= PHYS.AIR_DRAG; vy *= PHYS.AIR_DRAG;
-    if (z <= BALL_R && vz < 0) { vz = -vz * PHYS.BOUNCE; vx *= 0.85; vy *= 0.82; z = BALL_R; }
+    if (z <= BALL_R && vz < 0) {
+      bounces++;
+      if (bounces >= 2) return post || { x, y, z: BALL_R, t: i * dt, short: true };
+      vz = -vz * PHYS.BOUNCE; vx *= 0.85; vy *= 0.82; acc *= 0.35; z = BALL_R;
+    }
     if ((py - targetY) * (y - targetY) <= 0) return { x, y, z, t: i * dt };
+    // Remember a comfortable strike point after the bounce (waist-ish height, falling)
+    if (bounces >= 1 && vz < 0 && z < 1.1 && z > 0.5) post = { x, y, z, t: i * dt, short: true };
   }
   return null;
 }

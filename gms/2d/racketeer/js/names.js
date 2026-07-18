@@ -48,7 +48,7 @@ export function makeOpponent(tier, idx, total, stars) {
     : `${pick(FIRST)} ${pick(LAST)}`;
   return {
     name: nm, face: pick(FACES), stars,
-    bio: `${useNick ? "Legend says they" : "This one"} ${pickBag("bioj", BIO_JOB)}. ${pickBag("bios", BIO_STYLE)}`,
+    bio: `${useNick ? "Word is this one" : "This one"} ${pickBag("bioj", BIO_JOB)}. ${pickBag("bios", BIO_STYLE)}`,
   };
 }
 

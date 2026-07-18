@@ -12,15 +12,27 @@ import { opponentHit, endPoint, ticker, sayBanner, YOU_Y, OPP_Y } from "./match.
 
 export function aiPointStart(m) {}
 
+// Cooldown gate for opponent skills: passes at most once per `cd` seconds.
+function cdOk(m, id, cd) {
+  if ((m.oppCd[id] || 0) > m.time) return false;
+  m.oppCd[id] = m.time + cd;
+  return true;
+}
+
 export function aiUpdate(m, dt) {
   const p = m.oppP;
   const speed = (3.6 + m.opp.stars * 0.9) * (m.oppStam < 25 ? 0.7 : 1);
-  // Movement
-  let target = 0;
-  if (m.ballTo === "opp" && m.contact) target = clamp(m.contact.x, -COURT.W / 2 - 1.5, COURT.W / 2 + 1.5);
-  const d = target - p.x;
-  if (Math.abs(d) > 0.1) {
-    p.x += clamp(d, -speed * dt, speed * dt);
+  // Movement (2D: chases short balls up the court)
+  let tx = 0, ty = OPP_Y;
+  if (m.ballTo === "opp" && m.contact) {
+    tx = clamp(m.contact.x, -COURT.W / 2 - 1.5, COURT.W / 2 + 1.5);
+    ty = m.contact.y ?? OPP_Y;
+  }
+  const d = tx - p.x, dy2 = ty - p.y;
+  const dist = Math.hypot(d, dy2);
+  if (dist > 0.1) {
+    const step = Math.min(dist, speed * dt) / dist;
+    p.x += d * step; p.y += dy2 * step;
     p.facing = d > 0 ? 1 : -1;
     if (p.state === "idle") setState(p, "run");
   } else if (p.state === "run") setState(p, "idle");
@@ -28,7 +40,7 @@ export function aiUpdate(m, dt) {
   // Contact
   if (m.ballTo === "opp" && m.contact && m.time >= m.contact.t) {
     m.contact = null;
-    if (Math.abs(m.ball.x - p.x) > SWING.REACH_X + 0.55 + m.opp.stars * 0.12) {
+    if (Math.hypot(m.ball.x - p.x, m.ball.y - p.y) > SWING.REACH_X + 0.55 + m.opp.stars * 0.12) {
       // Can't reach — whiff, ball double bounces
       setState(p, "swing"); sfx.swishMiss();
       return;
@@ -50,8 +62,7 @@ function aiHit(m) {
   const skills = m.tier.oppSkills;
   const opts = {};
   const aggression = 0.1 + stars * 0.05;
-  if (skills.includes("grunt") && m.oppMojo > 30 && Math.random() < aggression) {
-    m.oppMojo -= 20;
+  if (skills.includes("grunt") && Math.random() < aggression && cdOk(m, "grunt", 9)) {
     const g = pick(NAMES.GRUNTS);
     FX.floatText(m.oppP.x, OPP_Y - 1, 2.2, g, "#ff8a5c", 1.1);
     sfx.grunt(2);
@@ -61,13 +72,12 @@ function aiHit(m) {
       ticker(m, "That grunt rattled you — smaller sweet spot!");
     }
   }
-  if (skills.includes("power") && m.oppMojo > 35 && Math.random() < aggression * 0.8) {
-    m.oppMojo -= 25; m.oppStam = clamp(m.oppStam - 15, 0, 100);
+  if (skills.includes("power") && Math.random() < aggression * 0.8 && cdOk(m, "power", 8)) {
+    m.oppStam = clamp(m.oppStam - 15, 0, 100);
     opts.power = (opts.power || 0) + 0.28;
     FX.floatText(m.oppP.x, OPP_Y - 1, 2.4, "💥", "#fff", 1.2);
   }
-  if (skills.includes("outrageous") && m.oppMojo > 45 && Math.random() < aggression * 0.5) {
-    m.oppMojo -= 40;
+  if (skills.includes("outrageous") && Math.random() < aggression * 0.5 && cdOk(m, "outrageous", 14)) {
     if (Math.random() < 0.6) {
       sayBanner(m, "OPPONENT " + pick(NAMES.OUTRAGEOUS_NAMES) + "!", "#ff8a5c", 1.1);
       sfx.cheer(1); opts.power = (opts.power || 0) + 0.2; opts.flip = true;
@@ -141,8 +151,8 @@ export function aiBetweenPoints(m) {
     sayBanner(m, "OPPONENT SMASHES THEIR RACKET!", "#ff8a5c", 1);
     return;
   }
-  if (skills.includes("zone") && m.oppMojo > 50 && Math.random() < chance * 0.6) {
-    m.oppMojo -= 50; m.oppFx.zoneShots = 3;
+  if (skills.includes("zone") && Math.random() < chance * 0.6 && cdOk(m, "zone", 20)) {
+    m.oppFx.zoneShots = 3;
     FX.floatText(m.oppP.x, OPP_Y - 1, 2.6, "🧠", "#b06cff", 1.3);
     ticker(m, "Opponent has entered The Zone. Uh oh.");
     return;

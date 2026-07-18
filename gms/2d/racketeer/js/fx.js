@@ -38,6 +38,12 @@ export function speech(wx, wy, str, life = 2.2) {
   bubbles.push({ wx, wy, str, life, max: life });
 }
 
+let dogs = [];
+// A dog runs across the court with a ball in its mouth. Non-negotiable.
+export function runDog() {
+  dogs.push({ t: 0, dur: 3.2, dir: Math.random() < 0.5 ? 1 : -1, y: rand(6, 17) });
+}
+
 export function launchPigeon(fromFar) {
   // Pigeon flies from crowd toward the victim's head, flaps about, exits.
   pigeons.push({ t: 0, dur: 2.4, fromFar,
@@ -45,7 +51,7 @@ export function launchPigeon(fromFar) {
     tx: rand(-1, 1), ty: fromFar ? 21.5 : 2.2 });
 }
 
-export function clearFx() { parts.length = 0; texts.length = 0; bubbles.length = 0; pigeons = []; shake = 0; }
+export function clearFx() { parts.length = 0; texts.length = 0; bubbles.length = 0; pigeons = []; dogs = []; shake = 0; }
 
 export function updateFx(dt) {
   shake = Math.max(0, shake - dt * 30);
@@ -69,6 +75,10 @@ export function updateFx(dt) {
   for (let i = pigeons.length - 1; i >= 0; i--) {
     pigeons[i].t += dt;
     if (pigeons[i].t > pigeons[i].dur) pigeons.splice(i, 1);
+  }
+  for (let i = dogs.length - 1; i >= 0; i--) {
+    dogs[i].t += dt;
+    if (dogs[i].t > dogs[i].dur) dogs.splice(i, 1);
   }
 }
 
@@ -101,6 +111,29 @@ export function drawFx(ctx) {
     ctx.lineTo(p.x + s * 0.1, p.y); ctx.closePath(); ctx.fill();
     ctx.fillStyle = "#e8b23a";
     ctx.beginPath(); ctx.arc(p.x + s * 0.16, p.y - s * 0.02, s * 0.035, 0, 7); ctx.fill();
+  }
+
+  for (const dg of dogs) {
+    const k = dg.t / dg.dur;
+    const wx = dg.dir * (9 - k * 18), wy = dg.y + Math.sin(k * 20) * 0.4;
+    const p = project(wx, wy, 0);
+    const s = p.s, gallop = Math.sin(dg.t * 18);
+    ctx.fillStyle = "rgba(0,0,0,.25)";
+    ctx.beginPath(); ctx.ellipse(p.x, p.y, s * 0.45, s * 0.1, 0, 0, 7); ctx.fill();
+    // Body + head + ears + tail, mid-gallop
+    ctx.fillStyle = "#b3763e";
+    ctx.beginPath(); ctx.ellipse(p.x, p.y - s * 0.3 - Math.abs(gallop) * s * 0.08, s * 0.4, s * 0.22, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x + dg.dir * -s * 0.42, p.y - s * 0.44, s * 0.16, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#b3763e"; ctx.lineWidth = s * 0.08; ctx.lineCap = "round";
+    for (const off of [-0.22, 0.2]) {
+      ctx.beginPath(); ctx.moveTo(p.x + off * s, p.y - s * 0.2);
+      ctx.lineTo(p.x + off * s + gallop * s * 0.15, p.y); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(p.x + dg.dir * s * 0.38, p.y - s * 0.36);
+    ctx.lineTo(p.x + dg.dir * s * 0.58, p.y - s * 0.52 + gallop * s * 0.06); ctx.stroke();
+    // The stolen ball
+    ctx.fillStyle = "#d8ec4a";
+    ctx.beginPath(); ctx.arc(p.x + dg.dir * -s * 0.56, p.y - s * 0.42, s * 0.08, 0, 7); ctx.fill();
   }
 
   for (const b of bubbles) {

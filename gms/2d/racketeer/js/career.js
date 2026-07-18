@@ -12,6 +12,9 @@ export function newSave() {
     wins: 0, losses: 0, champion: false,
     opp: null,                                        // pending opponent (persisted so it doesn't reroll)
     seenIntro: false,
+    story: 1, storyDone: false,                       // story mode progress (level 1..100)
+    trophies: { local: 0, national: 0, world: 0 },
+    dailyWin: null,                                   // date string of last daily-challenge win
   };
 }
 

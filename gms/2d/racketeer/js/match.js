@@ -1,20 +1,23 @@
-// The match engine: state machine + rules + skills. One instance per match.
-import { COURT, SWING, SHOT_T, PLAYER, METERS, PTS, BALL_R } from "./const.js";
+// The match engine: state machine + rules + skills + events. One instance per match.
+// `tier` is a config object: { id, name, games, oppSkills, crowd, prize, boss?, eventChance?, modifier? }
+import { COURT, SWING, SHOT_T, PTS, BALL_R, PLAYER, METERS } from "./const.js";
 import { clamp, lerp, rand, pick, pickBag } from "./util.js";
-import { makeBall, stepBall, predictLanding, predictAtDepth, aimVelocity, netClearance, drawBall } from "./ball.js";
+import { makeBall, stepBall, predictAtDepth, aimVelocity, netClearance, drawBall } from "./ball.js";
 import { makePlayer, setState, updatePlayer, drawPlayer } from "./player.js";
 import { drawScene, drawNet, setCrowd, project, view, pokeUmpire } from "./court.js";
 import * as FX from "./fx.js";
 import { sfx, setCrowdLevel } from "./audio.js";
-import { skillFx, SKILLS } from "./skills.js";
+import { skillFx, skillCd, SKILLS } from "./skills.js";
 import * as NAMES from "./names.js";
-import { aiUpdate, aiPointStart, aiBetweenPoints } from "./ai.js";
+import * as EV from "./events.js";
+import { aiUpdate, aiBetweenPoints } from "./ai.js";
 
 const YOU_Y = 1.1, OPP_Y = COURT.L - 1.1;
+const SERVE_WINDOW = 0.4;      // s of grace around ideal serve contact
 
 export function makeMatch(save, opp, tier, gear, hooks) {
   const m = {
-    save, opp, tier, gear, hooks,          // hooks: {onHud, onTicker, onSkillDock, onMatchOver, onPause}
+    save, opp, tier, gear, hooks,
     time: 0, timeScale: 1, state: "preServe", stateT: 0,
     you: makePlayer({ col: "#ffd23e", col2: "#1d3557", skin: "#f2c79c" }),
     oppP: makePlayer({ far: true, boss: opp.boss, col: opp.boss ? "#3d4450" : pick(["#e63946", "#9b5de5", "#00b4d8", "#f77f00", "#43aa8b"]), col2: "#333", skin: pick(["#f2c79c", "#d9a066", "#a56a3a", "#ffdbac"]) }),
@@ -22,28 +25,38 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     server: "you", serveNum: 1, serveSide: 1,
     ptsYou: 0, ptsOpp: 0, gamesYou: 0, gamesOpp: 0, targetGames: tier.games,
     stam: 100, comp: 100, oppStam: 100, oppComp: 100,
-    hype: 10, mojo: 25, oppMojo: 20,
+    hype: 10,
     earnings: 0, over: false, won: false,
     // Swing state
     contact: null,            // {t, x, z} predicted contact for whoever ball approaches
-    ballTo: null,             // "you" | "opp" — who the ball is travelling toward
-    pendingQuality: null, pendingAim: null,
-    aim: { x: 0, y: OPP_Y - 3.5 },     // player aim reticle (world, opp side)
-    aiming: false,
+    ballTo: null,             // "you" | "opp"
+    pendingQuality: null, pendingAim: null, pendingCurve: 0,
+    timingWobble: 0,          // hidden per-ball timing offset when rattled
+    // Gesture
+    gest: null,               // {pts:[{x,y,t}]} while finger is down
+    trail: [],                // fading on-screen swipe trail
     // Serve
-    serveMeter: 0, serveDir: 1, tossed: false,
-    // Skill effects
-    armedPower: false, armedOutrageous: false, gruntNext: 0, zoneShots: 0, zoneWiden: 1,
-    oppNextError: 0, youNextError: 0, youWindowShrink: 1, underarmServe: false,
-    injuriesUsed: 0, cooldowns: {}, lastPointWonBy: null, canArgue: false, argued: false,
-    oppFx: { gruntNext: 0, zoneShots: 0, armedPower: false, armedOutrageous: false, injuriesUsed: 0, underarm: false },
-    autoPilot: false, pointNum: 0, netcordPending: null,
+    tossed: false, serveContactT: 0,
+    // Skill state
+    armedPower: false, armedOutrageous: false, armedGrunt: false, underarmServe: false,
+    cooldowns: {}, usesLeft: {},
+    zoneShots: 0, zoneWiden: 1,
+    oppNextError: 0, youNextError: 0, youWindowShrink: 1,
+    lastPointWonBy: null, canArgue: false, argued: false,
+    oppFx: { zoneShots: 0, injuriesUsed: 0 }, oppCd: {},
+    // Events
+    activeEvent: null, eventWind: 0, modifier: tier.modifier || null,
+    autoPilot: false, netcordPending: null,
     stats: { winners: 0, aces: 0, outrageous: 0, longestRally: 0, rally: 0 },
-    msg: null, msgT: 0,
   };
+  for (const id of Object.keys(SKILLS)) if (SKILLS[id].uses) m.usesLeft[id] = SKILLS[id].uses;
   setCrowd(tier.crowd);
   m.you.x = 0; m.you.y = YOU_Y; m.oppP.x = 0; m.oppP.y = OPP_Y;
   if (opp.boss) sayBanner(m, pick(NAMES.BOSS_LINES), "#ff5c5c", 1.0);
+  if (m.modifier) {
+    const ev = EV.EVENTS.find(e => e.id === m.modifier);
+    if (ev) EV.startEvent(m, ev, Infinity);
+  }
   beginPreServe(m, true);
   return m;
 }
@@ -60,7 +73,6 @@ function earn(m, base, wx, wy) {
   pushHud(m);
   return amt;
 }
-function addMojo(m, n) { m.mojo = clamp(m.mojo + n, 0, METERS.MOJO_MAX); pushHud(m); }
 function addHype(m, n) { m.hype = clamp(m.hype + n, 0, 100); setCrowdLevel(m.hype / 100); pushHud(m); }
 function pushHud(m) { m.hooks.onHud && m.hooks.onHud(m); }
 export function skillLevel(m, id) { return m.save.skills[id] || 0; }
@@ -77,10 +89,10 @@ export function scoreLine(m) {
 /* ---------------- state transitions ---------------- */
 function beginPreServe(m, first) {
   m.state = "preServe"; m.stateT = 0;
-  m.ball.live = false; m.ball.trail.length = 0;
-  m.contact = null; m.ballTo = null; m.pendingQuality = null;
-  m.armedPower = false; m.armedOutrageous = false; m.canArgue = false;
-  m.tossed = false; m.underarmServe = false;
+  m.ball.live = false; m.ball.trail.length = 0; m.ball.curve = 0; m.ball.wind = 0;
+  m.contact = null; m.ballTo = null; m.pendingQuality = null; m.pendingCurve = 0;
+  m.armedPower = false; m.armedOutrageous = false; m.armedGrunt = false; m.canArgue = false;
+  m.tossed = false; m.underarmServe = false; m.gest = null;
   m.stam = clamp(m.stam + METERS.STAM_POINT_REST, 0, 100);
   m.oppStam = clamp(m.oppStam + METERS.STAM_POINT_REST, 0, 100);
   m.serveSide = ((m.ptsYou + m.ptsOpp) % 2 === 0) ? 1 : -1;
@@ -91,26 +103,30 @@ function beginPreServe(m, first) {
   m.ball.y = m.server === "you" ? YOU_Y - 0.2 : OPP_Y + 0.2;
   m.ball.z = 1.0;
   setState(m.you, "idle"); setState(m.oppP, "idle");
-  if (!first) aiBetweenPoints(m);
+  if (!first) {
+    aiBetweenPoints(m);
+    EV.rollEvent(m, m.tier.eventChance ?? (0.04 + (m.tier.id || 0) * 0.03));
+  }
   m.hooks.onSkillDock && m.hooks.onSkillDock(m);
   pushHud(m);
-  if (m.server === "you") ticker(m, m.serveNum === 2 ? "Second serve — tap to toss, tap to hit!" : "Your serve — tap to toss, tap to hit!", 3);
+  if (m.server === "you") ticker(m, m.serveNum === 2 ? "Second serve — tap to toss, then SWIPE!" : "Your serve — tap to toss, then SWIPE to hit!", 3);
   else ticker(m, `${m.opp.name.split(" ")[0]} to serve...`, 2);
 }
 
-function startRallyFromServe(m, byYou, quality) {
+function startRallyFromServe(m, byYou, quality, aimTx) {
   const b = m.ball;
-  b.live = true; b.bounces = 0; b.lastHitBy = byYou ? "you" : "opp";
+  b.live = true; b.bounces = 0; b.curve = 0; b.lastHitBy = byYou ? "you" : "opp";
   m.stats.rally = 0;
-  const serveBonus = byYou ? skillFx("luckyballs", skillLevel(m, "luckyballs") || 1, "serve") * (skillLevel(m, "luckyballs") ? 1 : 0) : 0;
+  const lbLvl = skillLevel(m, "luckyballs");
+  const serveBonus = byYou && lbLvl ? skillFx("luckyballs", lbLvl, "serve") : 0;
   const fromY = byYou ? YOU_Y : OPP_Y;
   const dir = byYou ? 1 : -1;
   b.x = (byYou ? 1 : -1) * m.serveSide * 2.0; b.y = fromY; b.z = 2.5;
-  // Serve target: service box depth
   const depth = COURT.NET_Y + dir * rand(2.2, 5.0);
   const err = (1 - quality) * 2.6;
-  const tx = clamp(-m.serveSide * dir * rand(0.6, 3.2) + rand(-err, err), -COURT.W / 2 - err, COURT.W / 2 + err);
-  const T = lerp(0.95, 0.62, quality) * (1 - serveBonus);
+  let tx = aimTx !== undefined ? aimTx : -m.serveSide * dir * rand(0.6, 3.2);
+  tx = clamp(tx + rand(-err, err), -COURT.W / 2 - err, COURT.W / 2 + err);
+  const T = lerp(0.95, 0.62, quality) * (1 - serveBonus) * EV.eventShotSlow(m);
   const v = aimVelocity(b.x, b.y, b.z, tx, depth + rand(-err, err) * dir, T);
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
   setState(byYou ? m.you : m.oppP, "serve");
@@ -122,10 +138,18 @@ function startRallyFromServe(m, byYou, quality) {
 
 /* ---------------- shots ---------------- */
 function scheduleContact(m) {
-  const targetY = m.ballTo === "you" ? YOU_Y : OPP_Y;
+  const you = m.ballTo === "you";
+  const targetY = you ? YOU_Y : OPP_Y;
   const p = predictAtDepth(m.ball, targetY);
-  if (p) m.contact = { t: m.time + p.t, x: clamp(p.x, -COURT.W / 2 - 3, COURT.W / 2 + 3), z: p.z };
+  if (p) m.contact = {
+    t: m.time + p.t,
+    x: clamp(p.x, -COURT.W / 2 - 3, COURT.W / 2 + 3),
+    y: clamp(p.y, you ? 0.6 : COURT.NET_Y + 1.3, you ? COURT.NET_Y - 1.3 : COURT.L - 0.6),
+    z: p.z,
+  };
   else m.contact = null;
+  // Rattled players mistime: the "right moment" secretly drifts when composure is low
+  if (m.ballTo === "you") m.timingWobble = (1 - m.comp / 100) * rand(-0.15, 0.15);
 }
 
 // quality: 0..1 (1 = perfect). Executes a groundstroke for `who`.
@@ -136,38 +160,43 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
   setState(P, opts.flip ? "flip" : "swing");
   b.lastHitBy = who; b.bounces = 0;
   m.stats.rally++;
-  if (you) addMojo(m, METERS.MOJO_PER_RALLY_HIT);
-  else m.oppMojo = clamp(m.oppMojo + 8, 0, 100);
 
-  // Error from quality + composure + forced effects
   const comp = you ? m.comp : m.oppComp;
   let err = (1 - quality) * 3.2 + (1 - comp / 100) * 1.4;
   if (you && m.youNextError) { err += m.youNextError; m.youNextError = 0; }
   if (!you && m.oppNextError) { err += m.oppNextError; m.oppNextError = 0; }
-  if (you && skillLevel(m, "luckyballs")) err *= (1 - skillFx("luckyballs", skillLevel(m, "luckyballs"), "mercy"));
+  const lbLvl = you ? skillLevel(m, "luckyballs") : 0;
+  if (lbLvl) err *= (1 - skillFx("luckyballs", lbLvl, "mercy"));
 
-  // Power
   let powBonus = you ? m.gear.pow : (m.opp.stars * 0.05);
   let T = lerp(SHOT_T.shank, SHOT_T.perfect, quality);
-  const gruntNow = you ? m.gruntNext : m.oppFx.gruntNext;
-  if (gruntNow) {
-    powBonus += gruntNow;
-    if (you) m.gruntNext = 0; else m.oppFx.gruntNext = 0;
+  if (you && m.armedGrunt) {
+    m.armedGrunt = false;
+    const lvl = skillLevel(m, "grunt");
+    powBonus += skillFx("grunt", lvl, "pow");
+    const g = pick(NAMES.GRUNTS);
+    FX.floatText(m.you.x, YOU_Y + 1, 2.2, g, "#ffd34a", 1.2);
+    sfx.grunt(lvl); FX.addShake(3 + lvl);
+    if (Math.random() < skillFx("grunt", lvl, "startle")) {
+      m.oppNextError = 1.6;
+      FX.floatText(m.oppP.x, OPP_Y, 2.4, "😨", "#fff", 1.2);
+    }
   }
   if (opts.power) powBonus += opts.power;
+  if (opts.swipePow) powBonus += opts.swipePow;
   T *= (1 - clamp(powBonus, 0, 0.6) * 0.45);
+  T *= EV.eventShotSlow(m);
   const lowStam = (you ? m.stam : m.oppStam) < 25;
   if (lowStam) T *= 1.25;
 
-  // Final target with error scatter
   const dir = you ? 1 : -1;
-  let tx = aimX + rand(-err, err) * 0.9;
+  const curve = opts.curve || 0;
+  // Compensate aim so a curved shot still lands near the intended spot (banana flight)
+  let tx = aimX - 0.5 * curve * T * T + rand(-err, err) * 0.9;
   let ty = aimY + rand(-err, err) * 1.1 * dir;
-  // Terrible shots sometimes just hit the net
   const netFlub = quality < 0.25 && Math.random() < 0.5;
   const v = aimVelocity(b.x, b.y, Math.max(b.z, 0.3), tx, ty, T);
   if (!netFlub) {
-    // Auto-loft to clear the net for decent-quality shots
     let tries = 0;
     while (netClearance(b.x, b.y, Math.max(b.z, 0.3), v) < 0.06 && tries++ < 5) {
       T *= 1.13;
@@ -175,10 +204,11 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
       v.vx = v2.vx; v.vy = v2.vy; v.vz = v2.vz;
     }
   }
-  b.vx = v.vx; b.vy = v.vy; b.vz = v.vz; b.live = true;
+  b.vx = v.vx; b.vy = v.vy; b.vz = v.vz; b.curve = curve; b.live = true;
   sfx.pock(0.8 + quality + powBonus);
   if (quality > 0.9) FX.floatText(b.x, b.y, b.z + 0.4, "PERFECT!", "#ffe24a", 0.8);
   else if (quality < 0.25) FX.floatText(b.x, b.y, b.z + 0.4, "SHANK!", "#ff8a5c", 0.7);
+  if (Math.abs(curve) > 4) FX.floatText(b.x, b.y, b.z + 0.7, "🍌 CURVE!", "#ffd34a", 0.7);
   FX.burst(b.x, b.y, b.z, 6, "#f4ff9a", 2.5);
   m.ballTo = you ? "opp" : "you";
   scheduleContact(m);
@@ -194,17 +224,17 @@ function endPoint(m, winner, why) {
   m.state = "pointOver"; m.stateT = 0;
   m.lastPointWonBy = winner; m.argued = false;
   m.ball.live = false;
-  m.contact = null;
+  m.contact = null; m.gest = null;
   m.stats.longestRally = Math.max(m.stats.longestRally, m.stats.rally);
+  EV.tickEvent(m);
   const youWon = winner === "you";
-  m.canArgue = !youWon && skillLevel(m, "argue") > 0 && m.mojo >= SKILLS.argue.mojo && why !== "netYou";
+  m.canArgue = !youWon && skillLevel(m, "argue") > 0 && (m.usesLeft.argue || 0) > 0 && why !== "netYou";
 
   if (youWon) {
     m.ptsYou++;
-    addMojo(m, METERS.MOJO_POINT_WIN);
     addHype(m, why === "winner" || why === "ace" ? METERS.HYPE_WINNER : 3);
     m.comp = clamp(m.comp + 2, 0, 100);
-    const base = 4 + m.tier.id * 6;
+    const base = 4 + (m.tier.id || 0) * 6;
     earn(m, base, m.you.x, YOU_Y);
     setState(m.you, "celebrate"); setState(m.oppP, "sad");
     sfx.cheer(0.7 + m.hype / 150);
@@ -222,12 +252,9 @@ function endPoint(m, winner, why) {
   }
   pushHud(m);
   m.hooks.onSkillDock && m.hooks.onSkillDock(m);
-  // Game / match?
   const a = m.ptsYou, b = m.ptsOpp;
-  if ((a >= 4 || b >= 4) && Math.abs(a - b) >= 2) {
-    const youGame = a > b;
-    m.pendingGame = youGame ? "you" : "opp";
-  } else m.pendingGame = null;
+  if ((a >= 4 || b >= 4) && Math.abs(a - b) >= 2) m.pendingGame = a > b ? "you" : "opp";
+  else m.pendingGame = null;
 }
 
 function settleGame(m) {
@@ -242,7 +269,7 @@ function settleGame(m) {
     return true;
   }
   sayBanner(m, youGame ? "GAME YOU! 🎾" : "GAME " + m.opp.name.split(" ")[0].toUpperCase(), youGame ? "#7ee6a1" : "#ff8a5c", 1.3);
-  if (youGame) { sfx.fanfare(); earn(m, 15 + m.tier.id * 10, 0, YOU_Y + 2); }
+  if (youGame) { sfx.fanfare(); earn(m, 15 + (m.tier.id || 0) * 10, 0, YOU_Y + 2); }
   return false;
 }
 
@@ -262,48 +289,87 @@ function finishMatch(m, won) {
   setTimeout(() => m.hooks.onMatchOver && m.hooks.onMatchOver(m), 2200);
 }
 
-/* ---------------- player input API (called from input.js / ui.js) ---------------- */
+/* ---------------- gesture input (from input.js) ---------------- */
 export function inputPress(m, nx, ny) {
   if (m.over) return;
-  if (m.state === "preServe" && m.server === "you") {
-    if (!m.tossed) {
-      if (m.underarmServe) return;      // underarm resolves itself
-      m.tossed = true; m.serveMeter = 0; m.serveDir = 1;
-      sfx.serveToss();
-      m.state = "serveMeter"; m.stateT = 0;
-    }
+  if (m.state === "preServe" && m.server === "you" && !m.tossed) {
+    if (m.underarmServe) return;
+    // Tap = toss; the swipe comes next
+    m.tossed = true;
+    m.state = "serveWait"; m.stateT = 0;
+    m.serveContactT = m.time + 0.55;
+    sfx.serveToss();
     return;
   }
-  if (m.state === "serveMeter") {
-    // Second tap = hit serve; meter near 1 = great
-    const q = clamp(1 - Math.abs(1 - m.serveMeter) * 1.6, 0.1, 1);
-    serveNow(m, q);
-    return;
-  }
-  if (m.state === "rally") {
-    m.aiming = true;
-    updateAim(m, nx, ny);
+  if (m.state === "rally" || m.state === "serveWait") {
+    m.gest = { pts: [{ x: nx, y: ny, t: m.time }] };
   }
 }
 
 export function inputMove(m, nx, ny) {
-  if (m.aiming) updateAim(m, nx, ny);
+  if (!m.gest) return;
+  const pts = m.gest.pts;
+  const lp = pts[pts.length - 1];
+  if (Math.hypot(nx - lp.x, ny - lp.y) > 0.004) pts.push({ x: nx, y: ny, t: m.time });
+  m.trail.push({ x: nx * view.w, y: ny * view.h, a: 1 });
+  if (m.trail.length > 24) m.trail.shift();
 }
 
 export function inputRelease(m) {
-  if (!m.aiming) return;
-  m.aiming = false;
+  const g = m.gest;
+  m.gest = null;
+  if (!g || m.over) return;
+  const pts = g.pts;
+  const A = pts[0], B = pts[pts.length - 1];
+  const dx = B.x - A.x, dy = B.y - A.y;
+  const len = Math.hypot(dx, dy);
+
+  if (m.state === "serveWait") {
+    // Any decisive gesture hits the serve; direction aims it
+    const dt = m.serveContactT - m.time;
+    if (dt > SERVE_WINDOW) return;                    // way early — let them try again
+    const q = clamp(1 - Math.abs(dt) / SERVE_WINDOW, 0.12, 1);
+    const tx = clamp(dx * 14, -1, 1) * (COURT.W / 2 - 0.3);
+    serveNow(m, q, tx);
+    return;
+  }
+
   if (m.state !== "rally" || m.ballTo !== "you" || !m.contact) return;
-  const dt = m.contact.t - m.time;
-  if (dt > SWING.WINDOW) return;              // way too early: ignore, keep aiming chances
-  commitSwing(m, dt);
+  const dtc = m.contact.t - m.time + m.timingWobble;
+  if (dtc > SWING.WINDOW) return;                     // far too early: ignore
+
+  let aim, curve = 0, swipePow = 0;
+  if (len < 0.045) {
+    // Tap = safe centre return
+    aim = { x: rand(-1.2, 1.2), y: COURT.NET_Y + rand(3.5, 7) };
+  } else {
+    // Swipe: direction = aim, length = depth, speed = power, bend = curve
+    const lateral = clamp((dx / Math.max(0.06, Math.abs(dy))) * 1.15, -1, 1);
+    const aimX = lateral * (COURT.W / 2 + 0.4);
+    const depth = clamp((len - 0.06) / 0.34, 0, 1);   // long swipe = deep
+    const aimY = lerp(COURT.NET_Y + 2.0, OPP_Y - 0.35, depth);
+    aim = { x: aimX, y: aimY };
+    const dur = Math.max(0.03, B.t - A.t);
+    swipePow = clamp(len / dur / 6, 0, 0.18);         // fast flick = extra zip
+    curve = gestureCurve(pts, dx, dy) * 9;            // signed m/s² sideways
+  }
+  commitSwing(m, dtc, aim, curve, swipePow);
 }
 
-function updateAim(m, nx, ny) {
-  // Map screen to opponent court: x across width, y (0.05..0.6 of screen) to depth
-  m.aim.x = clamp((nx - 0.5) * 2 * (COURT.W / 2 + 0.6), -COURT.W / 2 - 1, COURT.W / 2 + 1);
-  const t = clamp((ny - 0.06) / 0.5, 0, 1);   // top of screen = deep
-  m.aim.y = lerp(OPP_Y - 0.4, COURT.NET_Y + 1.6, t);
+// Signed curvature of the swipe path: + = bows right of the chord.
+function gestureCurve(pts, chx, chy) {
+  if (pts.length < 5) return 0;
+  const A = pts[0];
+  const chLen = Math.hypot(chx, chy);
+  if (chLen < 0.05) return 0;
+  let sum = 0, n = 0;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const ox = pts[i].x - A.x, oy = pts[i].y - A.y;
+    sum += (chx * oy - chy * ox) / chLen;             // perpendicular offset, signed
+    n++;
+  }
+  const avg = sum / Math.max(1, n);
+  return clamp(avg / 0.05, -1, 1);                    // ~5% screen bow = full curve
 }
 
 function qualityFromDt(m, dt) {
@@ -315,25 +381,26 @@ function qualityFromDt(m, dt) {
   return 0.15;
 }
 
-function commitSwing(m, dt) {
+function commitSwing(m, dt, aim, curve, swipePow) {
   let q = qualityFromDt(m, dt);
   m.youWindowShrink = 1;
   if (m.zoneShots > 0) m.zoneShots--;
   m.pendingQuality = q;
-  m.pendingAim = { x: m.aim.x, y: m.aim.y };
-  // If commit is at/after contact, execute immediately
+  m.pendingAim = aim;
+  m.pendingCurve = curve;
+  m.pendingSwipePow = swipePow;
   if (dt <= 0.02) executePlayerSwing(m);
 }
 
 function executePlayerSwing(m) {
-  const q = m.pendingQuality, aim = m.pendingAim || { x: m.aim.x, y: m.aim.y };
-  m.pendingQuality = null; m.pendingAim = null;
-  // Out of reach → whiff
-  if (Math.abs(m.ball.x - m.you.x) > SWING.REACH_X + 0.4) {
+  const q = m.pendingQuality, aim = m.pendingAim || { x: 0, y: COURT.NET_Y + 5 };
+  const curve = m.pendingCurve || 0, swipePow = m.pendingSwipePow || 0;
+  m.pendingQuality = null; m.pendingAim = null; m.pendingCurve = 0; m.pendingSwipePow = 0;
+  if (Math.hypot(m.ball.x - m.you.x, m.ball.y - m.you.y) > SWING.REACH_X + 0.6) {
     setState(m.you, "swing"); sfx.swishMiss();
     return;
   }
-  const opts = {};
+  const opts = { curve, swipePow };
   if (m.armedPower) {
     const lvl = skillLevel(m, "power");
     opts.power = skillFx("power", lvl, "pow");
@@ -346,33 +413,29 @@ function executePlayerSwing(m) {
     const lvl = skillLevel(m, "outrageous");
     m.stam = clamp(m.stam - 15, 0, 100);
     if (Math.random() < skillFx("outrageous", lvl, "landChance") * (q > 0.4 ? 1 : 0.5)) {
-      // SPECTACLE: guaranteed screamer to a corner
       const name = pick(NAMES.OUTRAGEOUS_NAMES);
       sayBanner(m, name + "!", "#ff5ce1", 1.4);
       sfx.cheer(1.4); FX.addShake(10);
       addHype(m, skillFx("outrageous", lvl, "hype"));
       earn(m, skillFx("outrageous", lvl, "cash"), m.you.x, YOU_Y);
       m.stats.outrageous++;
-      opts.flip = true;
       hitShot(m, "you", 1, pick([-1, 1]) * (COURT.W / 2 - 0.35), OPP_Y - rand(0.3, 1.2), { ...opts, power: (opts.power || 0) + 0.25, flip: true });
       return;
     }
-    // Faceplant
     setState(m.you, "faceplant");
     sfx.gasp(); sfx.boo(); FX.addShake(6);
     sayBanner(m, "FACEPLANT!", "#ff8a5c", 1.2);
-    addHype(m, 6);   // crowd still enjoys it
-    return;          // no contact — ball will bounce twice
+    addHype(m, 6);
+    return;
   }
   hitShot(m, "you", q, aim.x, aim.y, opts);
   m.hooks.onSkillDock && m.hooks.onSkillDock(m);
 }
 
-function serveNow(m, q) {
-  m.serveQuality = q;
+function serveNow(m, q, tx) {
+  m.serveQuality = q; m.serveTx = tx;
   m.state = "serving"; m.stateT = 0;
   setState(m.you, "serve");
-  setTimeout(() => {}, 0);
 }
 
 /* ---------------- skills (player) ---------------- */
@@ -381,15 +444,17 @@ export function canUseSkill(m, id) {
   if (!lvl || m.over) return false;
   const def = SKILLS[id];
   if (def.type === "passive") return false;
-  if (m.mojo < def.mojo) return false;
   if (m.cooldowns[id] && m.time < m.cooldowns[id]) return false;
+  if (def.uses && (m.usesLeft[id] || 0) <= 0) return false;
   if (def.betweenPoints && m.state !== "preServe") return false;
   if (def.serveOnly && !(m.state === "preServe" && m.server === "you" && !m.tossed)) return false;
   if (def.afterLoss && !(m.state === "pointOver" && m.canArgue && !m.argued)) return false;
   if (id === "power" || id === "outrageous") {
-    if (!(m.state === "rally" || m.state === "preServe")) return false;
+    if (!(m.state === "rally" || m.state === "preServe" || m.state === "serveWait")) return false;
     if (m.stam < 20) return false;
   }
+  if (id === "grunt" && !(m.state === "rally" || m.state === "preServe" || m.state === "serveWait")) return false;
+  if (id === "pigeon" && !(m.state === "rally" || m.state === "preServe")) return false;
   if (id === "racketsmash" && m.save.money + m.earnings < skillFx("racketsmash", lvl, "cashCost")) return false;
   return true;
 }
@@ -398,27 +463,20 @@ export function useSkill(m, id) {
   if (!canUseSkill(m, id)) return false;
   const lvl = skillLevel(m, id);
   const def = SKILLS[id];
-  m.mojo -= def.mojo;
-  if (def.cd) m.cooldowns[id] = m.time + def.cd;
+  const cd = skillCd(id, lvl);
+  if (cd) m.cooldowns[id] = m.time + cd;
+  if (def.uses) m.usesLeft[id] = (m.usesLeft[id] || 0) - 1;
   switch (id) {
     case "power":
-      m.armedPower = !m.armedPower ? true : m.armedPower;
+      m.armedPower = true;
       ticker(m, "POWER HIT ARMED 💥");
       sfx.click();
       break;
-    case "grunt": {
-      m.gruntNext = skillFx("grunt", lvl, "pow");
-      const g = pick(NAMES.GRUNTS);
-      FX.floatText(m.you.x, YOU_Y + 1, 2.2, g, "#ffd34a", 1.2);
-      sfx.grunt(lvl);
-      FX.addShake(3 + lvl);
-      if (Math.random() < skillFx("grunt", lvl, "startle")) {
-        m.oppNextError = 1.6;
-        FX.floatText(m.oppP.x, OPP_Y, 2.4, "😨", "#fff", 1.2);
-        ticker(m, "Opponent startled by sheer volume!");
-      }
+    case "grunt":
+      m.armedGrunt = true;
+      ticker(m, "GRUNT LOADED 📢 — next shot");
+      sfx.click();
       break;
-    }
     case "heckle": {
       const line = pickBag("heck", NAMES.HECKLES);
       setState(m.you, "heckle");
@@ -438,7 +496,6 @@ export function useSkill(m, id) {
       setTimeout(() => {
         if (m.over) return;
         if (r < skillFx("argue", lvl, "win")) {
-          // Point stolen back!
           m.ptsOpp = Math.max(0, m.ptsOpp - 1); m.ptsYou++;
           sayBanner(m, pick(NAMES.UMPIRE_OK), "#7ee6a1", 0.9);
           sfx.cheer(0.8); addHype(m, 6);
@@ -485,7 +542,6 @@ export function useSkill(m, id) {
       break;
     }
     case "injury": {
-      m.injuriesUsed++;
       setState(m.you, "injury");
       FX.speech(m.you.x, YOU_Y + 0.5, pick(NAMES.INJURY_LINES), 2.6);
       sfx.whistle();
@@ -493,7 +549,7 @@ export function useSkill(m, id) {
       m.stam = clamp(m.stam + heal, 0, 100);
       m.comp = clamp(m.comp + heal * 0.6, 0, 100);
       m.oppComp = clamp(m.oppComp - 5, 5, 100);
-      if (m.injuriesUsed > 1) {
+      if ((m.usesLeft.injury || 0) < 1) {
         sfx.boo(); addHype(m, -12);
         ticker(m, "The crowd is NOT buying it any more...");
       } else ticker(m, "Medical timeout! Miraculous recovery incoming.");
@@ -547,13 +603,13 @@ function recheckGamePending(m) {
 
 /* ---------------- update ---------------- */
 export function updateMatch(m, rawDt) {
-  // Zone slows time while the ball approaches you
   m.timeScale = (m.zoneShots > 0 && m.ballTo === "you" && m.state === "rally") ? 0.55 : 1;
   const dt = Math.min(rawDt, 0.05) * m.timeScale;
   m.time += dt; m.stateT += dt;
 
   updatePlayer(m.you, dt); updatePlayer(m.oppP, dt);
   FX.updateFx(rawDt);
+  for (const t of m.trail) t.a *= (1 - rawDt * 5);
 
   if (m.over) return;
 
@@ -563,78 +619,72 @@ export function updateMatch(m, rawDt) {
     if (id && canUseSkill(m, id)) useSkill(m, id);
   }
 
-  // Meters drift
   if (m.state === "rally") {
     m.stam = clamp(m.stam + METERS.STAM_REGEN * dt * 0.3, 0, 100);
     m.hype = clamp(m.hype - dt * 0.8, 0, 100);
+    EV.eventFrame(m, dt);
   }
 
   switch (m.state) {
     case "preServe": {
-      // Players walk to positions
-      movePlayerTo(m.you, m.you.tx, dt, playerSpeed(m));
-      movePlayerTo(m.oppP, m.oppP.tx, dt, 5);
-      // Opponent serves automatically after a beat
+      movePlayerTo(m.you, m.you.tx, dt, playerSpeed(m), YOU_Y);
+      movePlayerTo(m.oppP, m.oppP.tx, dt, 5, OPP_Y);
       if (m.server === "opp" && m.stateT > 1.6) {
         const q = aiServeQuality(m);
         startRallyFromServe(m, false, q);
       }
-      // Auto-pilot serves for you
       if (m.server === "you" && m.autoPilot && m.stateT > 1.2 && !m.tossed) {
-        serveNow(m, rand(0.5, 0.95));
+        m.tossed = true; m.state = "serveWait"; m.stateT = 0;
+        m.serveContactT = m.time + 0.55;
       }
       break;
     }
-    case "serveMeter": {
-      m.serveMeter += m.serveDir * dt * 2.2;
-      if (m.serveMeter > 1.35) { m.serveMeter = 1.35; m.serveDir = -1; }
-      if (m.serveMeter < 0) { // let it lapse = weak serve
-        serveNow(m, 0.2);
+    case "serveWait": {
+      // Toss animation: ball rises from hand to apex at serveContactT
+      const k = clamp(1 - (m.serveContactT - m.time) / 0.55, 0, 1.6);
+      m.ball.x = m.serveSide * 2.0; m.ball.y = YOU_Y - 0.1;
+      m.ball.z = 1.0 + Math.sin(Math.min(k, 1.3) * Math.PI * 0.62) * 1.9;
+      if (m.autoPilot && m.serveContactT - m.time < 0.06 && m.serveContactT - m.time > 0) {
+        serveNow(m, rand(0.6, 1), rand(-2.5, 2.5));
       }
-      if (m.autoPilot && m.serveMeter > 0.9) serveNow(m, rand(0.7, 1));
+      if (m.time > m.serveContactT + SERVE_WINDOW) {
+        // Fluffed the toss — weak auto serve keeps things moving
+        ticker(m, "Awkward toss... a gentle pat over.");
+        serveNow(m, 0.22, rand(-1.5, 1.5));
+      }
       break;
     }
     case "serving": {
-      if (m.stateT > 0.35) {
-        const q = m.serveQuality;
-        // Fault chance on wild meter timing
-        if (q < 0.3 && Math.random() < 0.5) {
-          m.ball.live = true; m.ball.lastHitBy = "you";
-          startRallyFromServe(m, true, q * 0.6);
-          // mark: likely lands out and triggers fault logic below via bounce position
-        } else startRallyFromServe(m, true, q);
-      }
+      if (m.stateT > 0.3) startRallyFromServe(m, true, m.serveQuality, m.serveTx);
       break;
     }
     case "rally": {
       stepBall(m.ball, dt, (ev, data) => onBallEvent(m, ev, data));
-      // Move players
       updateRallyMovement(m, dt);
       aiUpdate(m, dt);
-      // Player contact handling
       if (m.ballTo === "you" && m.contact) {
         const dtc = m.contact.t - m.time;
-        if (m.autoPilot && dtc < 0.09 && dtc > 0 && !m.pendingQuality) {
-          m.aim.x = rand(-3.4, 3.4); m.aim.y = rand(COURT.NET_Y + 2.5, OPP_Y - 0.5);
-          m.pendingQuality = pick([1, 0.75, 0.75, 0.45]); m.pendingAim = { ...m.aim };
+        if (m.autoPilot && dtc < 0.09 && dtc > 0 && m.pendingQuality == null) {
+          m.pendingQuality = pick([1, 0.75, 0.75, 0.45]);
+          m.pendingAim = { x: rand(-3.4, 3.4), y: rand(COURT.NET_Y + 2.5, OPP_Y - 0.5) };
+          m.pendingCurve = pick([0, 0, rand(-8, 8)]);
         }
-        if (dtc <= 0 && m.pendingQuality !== null && m.pendingQuality !== undefined) {
+        if (dtc <= 0 && m.pendingQuality != null) {
           executePlayerSwing(m);
         } else if (dtc < -0.12 && m.pendingQuality == null) {
-          // Assist: automatic weak lob back (keeps beginners rallying)
-          if (Math.abs(m.ball.x - m.you.x) <= SWING.REACH_X + 0.5) {
+          if (Math.hypot(m.ball.x - m.you.x, m.ball.y - m.you.y) <= SWING.REACH_X + 0.7) {
+            // Assist: automatic weak lob back keeps beginners rallying
             m.pendingQuality = 0.4; m.pendingAim = { x: rand(-2, 2), y: COURT.NET_Y + rand(2, 6) };
             executePlayerSwing(m);
-          } else m.contact = null;   // out of reach — whiff, ball will double bounce
+          } else m.contact = null;
         }
       }
-      // Double bounce / ball dead → resolve point
       resolveDeadBall(m);
       break;
     }
     case "pointOver": {
-      movePlayerTo(m.you, 0, dt, 3);
-      movePlayerTo(m.oppP, 0, dt, 3);
+      movePlayerTo(m.you, 0, dt, 3, YOU_Y);
+      movePlayerTo(m.oppP, 0, dt, 3, OPP_Y);
       const wait = m.canArgue && !m.argued ? 3.2 : 1.7;
       if (m.stateT > wait) {
         if (!settleGame(m)) beginPreServe(m);
@@ -648,30 +698,35 @@ function playerSpeed(m) {
   return PLAYER.SPEED * (1 + m.gear.spd) * (m.stam < 25 ? 0.7 : 1);
 }
 
-function movePlayerTo(p, tx, dt, speed) {
+function movePlayerTo(p, tx, dt, speed, ty) {
   const d = tx - p.x;
-  if (Math.abs(d) > 0.08) {
-    p.x += clamp(d, -speed * dt, speed * dt);
+  const dy = ty === undefined ? 0 : ty - p.y;
+  const dist = Math.hypot(d, dy);
+  if (dist > 0.08) {
+    const step = Math.min(dist, speed * dt) / dist;
+    p.x += d * step;
+    if (ty !== undefined) p.y += dy * step;
     p.facing = d > 0 ? 1 : -1;
     if (p.state === "idle") setState(p, "run");
   } else if (p.state === "run") setState(p, "idle");
 }
 
 function updateRallyMovement(m, dt) {
-  // You: chase predicted contact x; otherwise drift to centre
-  let target = 0;
-  if (m.ballTo === "you" && m.contact) target = clamp(m.contact.x, -COURT.W / 2 - 1.5, COURT.W / 2 + 1.5);
-  movePlayerTo(m.you, target, dt, playerSpeed(m));
+  let tx = 0, ty = YOU_Y;
+  if (m.ballTo === "you" && m.contact) {
+    tx = clamp(m.contact.x, -COURT.W / 2 - 1.5, COURT.W / 2 + 1.5);
+    ty = m.contact.y ?? YOU_Y;
+  }
+  movePlayerTo(m.you, tx, dt, playerSpeed(m), ty);
 }
 
 function onBallEvent(m, ev, data) {
   if (ev === "bounce") {
     sfx.bounce();
     FX.burst(data.x, data.y, 0.05, 4, "#cfe8ff", 1.5);
+    EV.eventBounce(m);
     const b = m.ball;
     if (b.bounces === 1) {
-      // First bounce decides in/out
-      const onYourSide = data.y < COURT.NET_Y;
       const hitter = b.lastHitBy;
       if (!inCourt(data.x, data.y)) {
         FX.floatText(data.x, clamp(data.y, 1, COURT.L - 1), 0.4, "OUT!", "#ff8a5c", 1);
@@ -692,14 +747,12 @@ function onBallEvent(m, ev, data) {
         }
         return;
       }
-      // In: reset serve count once a legal rally ball lands
       m.serveNum = 1;
     }
   } else if (ev === "net") {
     sfx.netHit();
     FX.burst(m.ball.x, COURT.NET_Y, data.zAt, 6, "#ffffff", 2);
     const hitter = m.ball.lastHitBy;
-    // Net cord karma: chance the ball flops over anyway
     if (hitter === "you" && skillLevel(m, "netcord") &&
         Math.random() < skillFx("netcord", skillLevel(m, "netcord"), "luck")) {
       m.ball.y = COURT.NET_Y + 0.3; m.ball.vy = 1.6; m.ball.vz = 2.2; m.ball.vx *= 0.3;
@@ -723,15 +776,9 @@ function resolveDeadBall(m) {
   const b = m.ball;
   if (!b.live || m.state !== "rally") return;
   if (b.bounces >= 2) {
-    // Double bounce on someone's side
     const winner = b.y < COURT.NET_Y ? "opp" : "you";
-    const wasWinner = m.stats.rally > 0 || true;
-    endPoint(m, winner, winner === "you" ? "winner" : (m.ballTo === "you" ? "winner2" : "youError"));
-    if (winner === "opp" && m.ballTo === "you") {
-      // You failed to reach it — opponent winner
-    }
+    endPoint(m, winner, winner === "you" ? "winner" : "youError");
   }
-  // Safety: ball rolled far away
   if (b.y < -6 || b.y > COURT.L + 6 || Math.abs(b.x) > 14) {
     endPoint(m, b.y < COURT.NET_Y ? "opp" : "you", "rollaway");
   }
@@ -752,57 +799,50 @@ export function drawMatch(m, ctx) {
   drawScene(ctx, m.time, m.hype, m.hype > 80);
   drawPlayer(ctx, m.oppP);
   drawNet(ctx);
-  // Aim reticle
-  if (m.state === "rally" && m.ballTo === "you") drawReticle(m, ctx);
   drawBall(ctx, m.ball);
   drawPlayer(ctx, m.you);
-  // Swing timing ring
-  if (m.state === "rally" && m.ballTo === "you" && m.contact) drawTimingRing(m, ctx);
-  if (m.state === "serveMeter") drawServeMeter(m, ctx);
+  if ((m.state === "rally" && m.ballTo === "you" && m.contact) || m.state === "serveWait") drawTimingRing(m, ctx);
+  drawSwipeTrail(m, ctx);
   FX.drawFx(ctx);
   FX.drawZoneVignette(ctx, m.zoneShots > 0 ? 1 : 0);
+  EV.eventOverlay(m, ctx);
   ctx.restore();
 }
 
-function drawReticle(m, ctx) {
-  const p = project(m.aim.x, m.aim.y, 0);
-  const r = Math.max(10, p.s * 0.5);
-  const pulse = 1 + Math.sin(m.time * 8) * 0.08;
-  ctx.strokeStyle = m.aiming ? "#ffe24a" : "rgba(255,226,74,.5)";
-  ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.arc(p.x, p.y, r * pulse, 0, 7); ctx.stroke();
-  ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, 7); ctx.fillStyle = ctx.strokeStyle; ctx.fill();
+function drawSwipeTrail(m, ctx) {
+  if (m.trail.length < 2) return;
+  ctx.lineCap = "round";
+  for (let i = 1; i < m.trail.length; i++) {
+    const a = m.trail[i - 1], b = m.trail[i];
+    if (b.a < 0.03) continue;
+    ctx.strokeStyle = `rgba(255,226,74,${b.a * 0.85})`;
+    ctx.lineWidth = 3 + b.a * 6;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
 }
 
 function drawTimingRing(m, ctx) {
-  const dtc = m.contact.t - m.time;
-  if (dtc > SWING.WINDOW || dtc < -0.2) return;
+  const isServe = m.state === "serveWait";
+  const contactT = isServe ? m.serveContactT : m.contact.t;
+  const dtc = contactT - m.time + (isServe ? 0 : m.timingWobble);
+  const windowLen = isServe ? SERVE_WINDOW * 2 : SWING.WINDOW;
+  if (dtc > windowLen || dtc < -0.25) return;
   const p = project(m.ball.x, m.ball.y, m.ball.z);
-  const widen = (m.zoneShots > 0 ? m.zoneWiden : 1) / m.youWindowShrink;
-  const k = clamp(dtc / SWING.WINDOW, 0, 1);
+  const widen = isServe ? 1 : (m.zoneShots > 0 ? m.zoneWiden : 1) / m.youWindowShrink;
+  const k = clamp(dtc / windowLen, 0, 1);
   const rBall = Math.max(4, p.s * 0.16);
   const r = rBall + k * Math.max(30, view.w * 0.09);
-  const inPerfect = Math.abs(dtc) <= SWING.PERFECT * widen;
-  const inGood = Math.abs(dtc) <= SWING.GOOD * widen;
+  const perfectBand = (isServe ? 0.1 : SWING.PERFECT) * widen;
+  const goodBand = (isServe ? 0.22 : SWING.GOOD) * widen;
+  const inPerfect = Math.abs(dtc) <= perfectBand;
+  const inGood = Math.abs(dtc) <= goodBand;
   ctx.lineWidth = inPerfect ? 4 : 2.5;
   ctx.strokeStyle = inPerfect ? "#7ee6a1" : inGood ? "#ffe24a" : "rgba(255,255,255,.7)";
   ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.stroke();
-  // Sweet-spot ring marker
   ctx.strokeStyle = "rgba(126,230,161,.4)"; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(p.x, p.y, rBall + SWING.PERFECT * widen / SWING.WINDOW * Math.max(30, view.w * 0.09), 0, 7); ctx.stroke();
-}
-
-function drawServeMeter(m, ctx) {
-  const w = Math.min(260, view.w * 0.6), h = 18;
-  const x = (view.w - w) / 2, y = view.h * 0.68;
-  ctx.fillStyle = "rgba(0,0,0,.6)";
-  ctx.beginPath(); ctx.roundRect(x - 4, y - 4, w + 8, h + 8, 8); ctx.fill();
-  // Sweet zone near the top (value 1.0 of 1.35)
-  const sweetX = x + (0.88 / 1.35) * w, sweetW = (0.24 / 1.35) * w;
-  ctx.fillStyle = "rgba(126,230,161,.5)"; ctx.fillRect(sweetX, y, sweetW, h);
-  ctx.fillStyle = "#ffd34a";
-  ctx.fillRect(x, y, clamp(m.serveMeter / 1.35, 0, 1) * w, h);
-  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
-  ctx.fillStyle = "#fff"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center";
-  ctx.fillText("TAP TO SERVE!", view.w / 2, y - 12);
+  ctx.beginPath(); ctx.arc(p.x, p.y, rBall + perfectBand / windowLen * Math.max(30, view.w * 0.09), 0, 7); ctx.stroke();
+  if (isServe) {
+    ctx.fillStyle = "#fff"; ctx.font = `bold ${Math.max(12, view.w * 0.032)}px sans-serif`; ctx.textAlign = "center";
+    ctx.fillText("SWIPE!", p.x, p.y - r - 14);
+  }
 }

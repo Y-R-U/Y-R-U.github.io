@@ -29,12 +29,6 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .m-fill.comp { background:linear-gradient(90deg,#6fd3ff,#3b8dff); }
 .m-fill.hype { background:linear-gradient(90deg,#ff7043,#ff2e63); }
 
-#mojoWrap { position:absolute; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom, 0px) + 96px);
-  width:44%; max-width:220px; text-align:center; }
-#mojoBar { height:10px; background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.2); border-radius:6px; overflow:hidden; }
-#mMojo { height:100%; width:0%; background:linear-gradient(90deg,#b06cff,#ff5ce1); transition:width .3s; }
-#mojoLbl { font-size:9px; letter-spacing:2px; opacity:.7; }
-
 #skillDock { position:absolute; left:0; right:0; bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);
   display:flex; justify-content:center; gap:10px; pointer-events:none; }
 .skill-btn { pointer-events:auto; width:64px; height:64px; border-radius:16px; border:2px solid rgba(255,255,255,.25);
@@ -43,6 +37,7 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .skill-btn .sk-name { font-size:8px; letter-spacing:.4px; opacity:.85; margin-top:1px; }
 .skill-btn .sk-cost { position:absolute; top:-6px; right:-6px; background:#b06cff; color:#fff; font-size:9px;
   font-weight:800; border-radius:8px; padding:1px 5px; }
+.skill-btn .sk-cost.uses { background:#3fbf6f; }
 .skill-btn:active { transform:scale(.93); }
 .skill-btn.disabled { opacity:.35; filter:grayscale(.8); }
 .skill-btn.cooling::after { content:""; position:absolute; inset:0; border-radius:14px;
@@ -116,6 +111,35 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff; }
 .gear-chip.owned { border-color:#7ee6a1; }
 .gear-chip.equipped { background:#3fbf6f; color:#08150c; border-color:#3fbf6f; }
+
+/* ---------- Menu extras ---------- */
+.btn-sub { display:block; font-size:11px; font-weight:600; opacity:.75; margin-top:2px; }
+.menu-foot { display:flex; gap:8px; justify-content:center; margin-top:14px; }
+.chip-btn { padding:9px 13px; border-radius:12px; font-size:13px; font-weight:700;
+  border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.07); color:#eef7ee; }
+
+/* ---------- Story ---------- */
+.story-prog { height:10px; background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.15);
+  border-radius:6px; overflow:hidden; margin-top:6px; }
+.story-fill { height:100%; background:linear-gradient(90deg,#ffe96b,#ff9d2e); border-radius:6px; }
+.ch-dots { display:flex; gap:4px; margin-top:8px; flex-wrap:wrap; }
+.ch-dot { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:15px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); filter:grayscale(1) opacity(.45); }
+.ch-dot.done { filter:none; background:rgba(63,191,111,.25); border-color:#3fbf6f; }
+.ch-dot.now { filter:none; background:rgba(255,211,74,.25); border-color:#ffd34a; animation:pulse 1.6s infinite; }
+@keyframes pulse { 50% { transform:scale(1.12); } }
+.story-card { border-left:4px solid #ffd34a; }
+.story-line { font-size:15px; font-weight:700; line-height:1.45; font-style:italic; }
+
+/* ---------- Tournament bracket ---------- */
+.brk { text-align:left; margin-top:10px; }
+.brk-row { padding:8px 10px; border-radius:10px; font-size:13px; margin-bottom:6px;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+.brk-row.beat { opacity:.55; text-decoration:line-through; }
+.brk-row.next { border-color:#ffd34a; background:rgba(255,211,74,.12); }
+.brk-rnd { display:inline-block; width:26px; font-weight:800; color:#ffd34a; }
+
+.modal .row.stack { flex-direction:column; }
 
 /* ---------- Modal ---------- */
 #modal-root:empty { display:none; }

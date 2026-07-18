@@ -1,9 +1,10 @@
-// Bootstrap + game loop + state routing.
+// Bootstrap + game loop + mode routing.
 import { resize } from "./court.js";
 import * as career from "./career.js";
 import { makeMatch, updateMatch, drawMatch } from "./match.js";
 import { bindInput } from "./input.js";
 import * as UI from "./ui.js";
+import * as MODES from "./modes.js";
 import { initAudio, setCrowdLevel } from "./audio.js";
 import { clearFx } from "./fx.js";
 
@@ -12,49 +13,145 @@ const ctx = canvas.getContext("2d");
 
 const App = {
   save: career.load(),
-  match: null,
-  startMatch,
+  match: null, tstate: null, pendingStory: null,
+  playStory, playRanked, playQuick, playDaily, playTournament, playTournRound, peekStory,
 };
 UI.initUI(App);
 
 const params = new URLSearchParams(location.search);
 const AUTO = params.has("auto");        // headless soak-test: bot plays both sides
-if (params.has("tier")) {               // quick-jump for testing: ?tier=3
+const AUTOMODE = params.get("mode") || "ranked";
+if (params.has("tier")) {               // ranked quick-jump: ?tier=3
   App.save.tier = Math.min(7, +params.get("tier") || 0);
   App.save.rank = App.save.tier === 0 ? null : 1000000;
   App.save.opp = null;
-  App.save.money = +params.get("money") || App.save.money;
-  if (params.has("skills")) {           // ?skills=all for testing
-    for (const id of Object.keys(App.save.skills = { power: 3, grunt: 3, heckle: 3, argue: 3, outrageous: 3, underarm: 3, injury: 3, pigeon: 3, racketsmash: 3, crowdwork: 3, zone: 3, luckyballs: 3, netcord: 3 })) ;
-    App.save.loadout = ["power", "heckle", "outrageous", "pigeon"];
-  }
+}
+if (params.has("level")) App.save.story = Math.min(100, Math.max(1, +params.get("level") || 1));
+if (params.has("money")) App.save.money = +params.get("money") || App.save.money;
+if (params.has("skills")) {             // ?skills=all for testing
+  App.save.skills = { power: 3, grunt: 3, heckle: 3, argue: 3, outrageous: 3, underarm: 3, injury: 3, pigeon: 3, racketsmash: 3, crowdwork: 3, zone: 3, luckyballs: 3, netcord: 3 };
+  App.save.loadout = ["power", "heckle", "outrageous", "pigeon"];
 }
 
 function doResize() { resize(canvas); }
 window.addEventListener("resize", doResize);
 doResize();
 
-function startMatch() {
-  const tier = career.currentTier(App.save);
-  const opp = career.nextOpponent(App.save);
+/* ---------------- generic match launcher ---------------- */
+function launch(cfg, opp, onOver) {
   clearFx();
   const gear = career.gearBonus(App.save);
   const hooks = {
     ...UI.matchHooks,
     onMatchOver(m) {
-      const summary = career.applyResult(App.save, m.won, m.earnings);
       App.match = null;
       setCrowdLevel(0);
-      UI.showMatchResult(m, summary);
-      if (AUTO) setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; startMatch(); }, 800);
+      onOver(m);
+      career.persist(App.save);
+      if (AUTO) setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; autoNext(); }, 800);
     },
   };
-  App.match = makeMatch(App.save, opp, tier, gear, hooks);
+  App.match = makeMatch(App.save, opp, cfg, gear, hooks);
   if (AUTO) App.match.autoPilot = true;
   UI.showScreen("hud");
   hooks.onHud(App.match);
   hooks.onSkillDock(App.match);
   window.__match = App.match;   // test hook
+}
+
+/* ---------------- modes ---------------- */
+let storyRoll = null;           // cached opponent for the story screen preview
+function peekStory() {
+  if (!storyRoll || storyRoll.n !== App.save.story) {
+    storyRoll = { n: App.save.story, ...MODES.storyMatch(App.save) };
+  }
+  return storyRoll;
+}
+
+function playStory() {
+  const { cfg, opp, lvl } = peekStory();
+  launch(cfg, opp, (m) => {
+    App.save.money += Math.max(0, m.earnings);
+    const wasBoss = lvl.isBoss, level = lvl.n;
+    let finale = false, newChapter = lvl.chapter + 1;
+    if (m.won) {
+      if (level >= 100) { App.save.storyDone = true; finale = true; }
+      else App.save.story = level + 1;
+      storyRoll = null;
+    }
+    UI.showStoryResult(m, { wasBoss: wasBoss && m.won, finale, newChapter });
+  });
+}
+
+function playRanked() {
+  const tier = career.currentTier(App.save);
+  const opp = career.nextOpponent(App.save);
+  const cfg = { ...tier, mode: "ranked" };
+  launch(cfg, opp, (m) => {
+    const summary = career.applyResult(App.save, m.won, m.earnings);
+    UI.showRankedResult(m, summary);
+  });
+}
+
+function playQuick(stars) {
+  const { cfg, opp } = MODES.quickMatch(stars);
+  launch(cfg, opp, (m) => {
+    App.save.money += Math.max(0, m.earnings);
+    UI.showQuickResult(m);
+  });
+}
+
+function playDaily() {
+  const d = MODES.dailyMatch();
+  const already = App.save.dailyWin === d.date;
+  if (already) d.cfg.prize = 25;
+  launch(d.cfg, d.opp, (m) => {
+    App.save.money += Math.max(0, m.earnings);
+    const firstToday = m.won && !already;
+    if (firstToday) App.save.dailyWin = d.date;
+    UI.showDailyResult(m, { mod: d.mod, firstToday });
+  });
+}
+
+function playTournament(kind) {
+  const t = MODES.TOURNAMENTS[kind];
+  if (App.save.money < t.entry) return;
+  App.save.money -= t.entry;
+  career.persist(App.save);
+  App.tstate = MODES.startTournament(kind);
+  UI.showTournBracket(App.tstate, () => playTournRound());
+}
+
+function playTournRound() {
+  const ts = App.tstate;
+  const { cfg, opp, roundName } = MODES.tournamentMatch(ts);
+  launch(cfg, opp, (m) => {
+    App.save.money += Math.max(0, m.earnings);
+    if (m.won) {
+      ts.round++;
+      if (ts.round >= 3) {
+        App.save.trophies[ts.kind] = (App.save.trophies[ts.kind] || 0) + 1;
+        UI.showTournResult(m, { kind: ts.kind, champion: true });
+        App.tstate = null;
+      } else {
+        UI.showTournResult(m, { tstate: ts, kind: ts.kind });
+      }
+    } else {
+      UI.showTournResult(m, { roundName, kind: ts.kind });
+      App.tstate = null;
+    }
+  });
+}
+
+/* ---------------- auto-soak routing ---------------- */
+function autoNext() {
+  if (AUTOMODE === "story") playStory();
+  else if (AUTOMODE === "daily") playDaily();
+  else if (AUTOMODE === "quick") playQuick(2.5);
+  else if (AUTOMODE === "tourn") {
+    if (App.tstate) playTournRound();
+    else { App.save.money += 2000; playTournament("local"); setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; playTournRound(); }, 400); }
+  } else playRanked();
 }
 
 document.getElementById("pauseBtn").addEventListener("click", () => {
@@ -64,17 +161,17 @@ document.getElementById("pauseBtn").addEventListener("click", () => {
   UI.showPause(m,
     () => { m.paused = false; },
     () => {
-      // Forfeit = loss
       m.over = true; m.won = false;
-      const summary = career.applyResult(App.save, false, Math.round(m.earnings * 0.5));
-      App.match = null;
-      UI.showMatchResult(m, summary);
+      App.save.money += Math.round(m.earnings * 0.5);
+      career.persist(App.save);
+      App.match = null; App.tstate = null;
+      UI.buildMenu(); UI.showScreen("menu");
     });
 });
 
 bindInput(canvas, () => (App.match && !App.match.paused && !App.match.over) ? App.match : null);
 
-// First-run intro
+/* ---------------- boot ---------------- */
 function boot() {
   if (!App.save.seenIntro && !AUTO) {
     App.save.seenIntro = true;
@@ -87,7 +184,7 @@ function boot() {
     UI.buildMenu();
     UI.showScreen("menu");
   }
-  if (AUTO) { initAudio(); startMatch(); }
+  if (AUTO) { initAudio(); autoNext(); }
 }
 
 let last = performance.now();
@@ -99,11 +196,9 @@ function frame(now) {
   if (m && !m.paused) {
     updateMatch(m, dt);
     drawMatch(m, ctx);
-    // Refresh skill button states periodically (mojo/cooldowns change)
     dockTimer += dt;
     if (dockTimer > 0.5) { dockTimer = 0; UI.matchHooks.onSkillDock(m); UI.matchHooks.onHud(m); }
   } else if (!m) {
-    // Idle attract: gentle court render behind menus
     ctx.fillStyle = "#0b1f14";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
