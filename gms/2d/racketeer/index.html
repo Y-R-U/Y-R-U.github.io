@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#123524">
+<title>Racketeer 🎾</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <!-- In-match HUD -->
+  <div id="hud" class="hidden">
+    <div id="scorebar">
+      <div class="sb-row"><span id="sbYouName" class="sb-name you"></span><span id="sbYouGames" class="sb-games"></span><span id="sbYouPts" class="sb-pts"></span></div>
+      <div class="sb-row"><span id="sbOppName" class="sb-name"></span><span id="sbOppGames" class="sb-games"></span><span id="sbOppPts" class="sb-pts"></span></div>
+    </div>
+    <div id="meters">
+      <div class="meter"><span class="m-ico">⚡</span><div class="m-bar"><div id="mStam" class="m-fill stam"></div></div></div>
+      <div class="meter"><span class="m-ico">🧘</span><div class="m-bar"><div id="mComp" class="m-fill comp"></div></div></div>
+      <div class="meter"><span class="m-ico">🔥</span><div class="m-bar"><div id="mHype" class="m-fill hype"></div></div></div>
+    </div>
+    <div id="mojoWrap"><div id="mojoBar"><div id="mMojo"></div></div><span id="mojoLbl">MOJO</span></div>
+    <div id="skillDock"></div>
+    <div id="ticker"></div>
+    <button id="pauseBtn" aria-label="Pause">II</button>
+  </div>
+
+  <!-- Menu screens (content built by ui.js) -->
+  <section id="scr-menu" class="screen hidden"></section>
+  <section id="scr-career" class="screen hidden"></section>
+  <section id="scr-shop" class="screen hidden"></section>
+  <section id="scr-loadout" class="screen hidden"></section>
+
+  <div id="modal-root"></div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
