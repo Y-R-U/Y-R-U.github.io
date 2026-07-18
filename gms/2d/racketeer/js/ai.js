@@ -64,6 +64,7 @@ export function aiUpdate(m, dt) {
       setState(p, "swing"); sfx.swishMiss();
       FX.floatText(p.x, p.y, 1.5, "!!", "#ff8a5c", 0.8);
       m.stats.oppMisses = (m.stats.oppMisses || 0) + 1;
+      if (m.stats.rally === 0) sayBanner(m, "ACE! 🎯", "#7ee6a1", 1.1);
       return;
     }
     // Even in reach, hard balls get missed: fast/curved/deep-in-a-long-rally
@@ -74,7 +75,8 @@ export function aiUpdate(m, dt) {
       + Math.abs(b.curve || 0) * 0.022                     // curve is hard to clean-hit
       + m.stats.rally * 0.010 * (1.3 - stars * 0.2)        // rally fatigue
       + (1 - stars / 5) * 0.10                             // plain scrubbiness
-      + clamp(gap - 0.8, 0, 2) * 0.10;                     // stretching at full reach
+      + clamp(gap - 0.8, 0, 2) * 0.10                      // stretching at full reach
+      + (m.stats.rally === 0 ? clamp((pace - 15) * 0.035, 0, 0.3) : 0);  // big serves rush the return
     miss *= (1.35 - stars * 0.22);
     if (m.opp.boss) miss *= 0.25;
     if (m.oppFx.zoneShots > 0) miss *= 0.3;

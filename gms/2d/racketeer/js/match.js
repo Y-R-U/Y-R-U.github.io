@@ -133,6 +133,20 @@ function beginPreServe(m, first) {
   else ticker(m, `${m.opp.name.split(" ")[0]} to serve...`, 2);
 }
 
+// Dry-run the real physics to see if this serve would die at the net
+// (the analytic clearance check ignores air drag and lies for fast serves).
+function serveNets(b, v) {
+  const t = { x: b.x, y: b.y, z: b.z, vx: v.vx, vy: v.vy, vz: v.vz,
+    live: true, bounces: 0, curve: 0, wind: 0, spinT: 0, trail: [] };
+  let netted = false;
+  for (let i = 0; i < 180 && !netted; i++) {
+    stepBall(t, 1 / 60, (ev) => { if (ev === "net" || ev === "netcord") netted = true; });
+    if (t.bounces > 0 || Math.abs(t.y - COURT.NET_Y) > COURT.L) break;
+    if ((b.y < COURT.NET_Y) === (t.y > COURT.NET_Y)) break;  // crossed safely
+  }
+  return netted;
+}
+
 function startRallyFromServe(m, byYou, quality, aimTx) {
   const b = m.ball;
   b.live = true; b.bounces = 0; b.curve = 0; b.lastHitBy = byYou ? "you" : "opp";
@@ -141,13 +155,27 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   const serveBonus = byYou && lbLvl ? skillFx("luckyballs", lbLvl, "serve") : 0;
   const fromY = byYou ? YOU_Y : OPP_Y;
   const dir = byYou ? 1 : -1;
-  b.x = (byYou ? 1 : -1) * m.serveSide * 2.0; b.y = fromY; b.z = 2.5;
-  const depth = COURT.NET_Y + dir * rand(2.2, 5.0);
-  const err = (1 - quality) * 2.6;
+  b.x = (byYou ? 1 : -1) * m.serveSide * 2.0; b.y = fromY; b.z = 3.0;
+  // Bad timing can dump the serve short — those die in the net.
+  const netFlub = quality < 0.45 && Math.random() < 0.55;
+  const depth = COURT.NET_Y + dir * (netFlub ? rand(0.5, 2.5) : rand(5.5, 9.5));
+  let err = (1 - quality) * 2.6;
   let tx = aimTx !== undefined ? aimTx : -m.serveSide * dir * rand(0.6, 3.2);
+  let T = lerp(1.2, 0.78, quality) * (1 - serveBonus) * EV.eventShotSlow(m);
+  if (netFlub) T = 0.62;                       // flat mishit -> dies at the tape
+  if (m.serveNum === 2) { err *= 0.5; tx *= 0.7; T *= 1.12; }  // careful second serve
   tx = clamp(tx + rand(-err, err), -COURT.W / 2 - err, COURT.W / 2 + err);
-  const T = lerp(0.95, 0.62, quality) * (1 - serveBonus) * EV.eventShotSlow(m);
-  const v = aimVelocity(b.x, b.y, b.z, tx, depth + rand(-err, err) * dir, T);
+  const ty = depth + rand(-err, err) * dir;
+  const v = aimVelocity(b.x, b.y, b.z, tx, ty, T);
+  // A well-timed serve always clears the tape (slowing only as much as needed).
+  if (!netFlub) {
+    let tries = 0;
+    while (serveNets(b, v) && tries++ < 6) {
+      T *= 1.1;
+      const v2 = aimVelocity(b.x, b.y, b.z, tx, ty, T);
+      v.vx = v2.vx; v.vy = v2.vy; v.vz = v2.vz;
+    }
+  }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
   setState(byYou ? m.you : m.oppP, "serve");
   sfx.pock(1 + quality);
@@ -350,12 +378,14 @@ export function inputRelease(m) {
     // Any decisive gesture hits the serve; direction aims it
     const dt = m.serveContactT - m.time;
     if (dt > SERVE_WINDOW) return;                    // way early — let them try again
-    const q = clamp(1 - Math.abs(dt) / SERVE_WINDOW, 0.12, 1);
-    const fx = Math.abs(dt) <= 0.1 ? ["PERFECT!", "#7ee6a1", 0.9]
-      : Math.abs(dt) <= 0.22 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffe24a", 0.8]
+    // Inside the PERFECT band quality is a true 1 — a perfect serve goes in.
+    const off = Math.abs(dt);
+    const q = off <= 0.1 ? 1 : clamp(1 - (off - 0.1) / (SERVE_WINDOW - 0.1), 0.12, 1);
+    const fx = off <= 0.1 ? ["PERFECT!", "#7ee6a1", 0.9]
+      : off <= 0.22 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffe24a", 0.8]
       : [dt > 0 ? "WAY EARLY!" : "WAY LATE!", "#ff6b6b", 0.85];
     FX.floatText(m.you.x, m.you.y + 1.4, 2.2, fx[0], fx[1], fx[2]);
-    const tx = clamp(dx * 14, -1, 1) * (COURT.W / 2 - 0.3);
+    const tx = clamp(dx * 6, -1, 1) * (COURT.W / 2 - 0.55);
     serveNow(m, q, tx);
     return;
   }

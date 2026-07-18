@@ -13,7 +13,10 @@ export function stepBall(b, dt, onEvent) {
   b.vz += PHYS.G * dt;
   b.vx += (b.curve + b.wind) * dt;          // sidespin curve + event wind
   b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
-  b.vx *= PHYS.AIR_DRAG; b.vy *= PHYS.AIR_DRAG;
+  // Drag is per-second (calibrated to the old 60fps per-frame value) so
+  // physics are identical on 60Hz and 120Hz screens.
+  const drag = Math.pow(PHYS.AIR_DRAG, dt * 60);
+  b.vx *= drag; b.vy *= drag;
   b.spinT += dt * 12;
 
   // Net collision — crossing the net plane below tape height
