@@ -4,6 +4,7 @@ export const COURT = {
   L: 23.77,         // baseline to baseline
   NET_Y: 23.77 / 2,
   NET_H: 0.95,
+  SVC: 5.485,        // service line distance from the net (matches the drawn box)
   MARGIN_X: 3.4,    // run-off around court (visual + player roam)
   MARGIN_Y: 3.2,
 };

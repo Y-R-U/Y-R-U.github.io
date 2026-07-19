@@ -48,52 +48,49 @@ export function buildMenu() {
   const save = App.save;
   const s = $("scr-menu");
   s.innerHTML = "";
-  s.appendChild(el("div", "title-logo",
-    `<h1>RACKETEER</h1><div class="tag">Cheat your way from the car park to World&nbsp;#1 🎾</div>`));
-  const stack = el("div", "menu-stack");
+  App.wantDemo && App.wantDemo();   // AI exhibition plays behind the menu
 
-  const story = el("button", "btn", save.storyDone
-    ? "📖 STORY — COMPLETE 🏆"
-    : `📖 STORY MODE <span class="btn-sub">Level ${Math.min(100, save.story)}/100</span>`);
-  story.onclick = () => { go(buildStory, "story"); };
-  stack.appendChild(story);
+  s.appendChild(el("div", "title-logo mini",
+    `<h1>RACKETEER</h1><div class="tag">Cheat your way to World&nbsp;#1 🎾</div>`));
 
-  const ranked = el("button", "btn alt", `🏅 RANKED CAREER <span class="btn-sub">${fmtRank(save.rank)}</span>`);
-  ranked.onclick = () => { go(buildRanked, "career"); };
-  stack.appendChild(ranked);
-
-  const tourn = el("button", "btn alt", `🏆 TOURNAMENTS <span class="btn-sub">${save.trophies.local + save.trophies.national + save.trophies.world} trophies</span>`);
-  tourn.onclick = () => { go(buildTourn, "tourn"); };
-  stack.appendChild(tourn);
-
+  const go = (builder, screen) => { initAudio(); sfx.click(); builder(); showScreen(screen); };
+  const L = [
+    { emo: "📖", lab: "STORY", sub: save.storyDone ? "DONE 🏆" : `${Math.min(100, save.story)}/100`,
+      fn: () => go(buildStory, "story") },
+    { emo: "🏅", lab: "RANKED", sub: fmtRank(save.rank).replace("Rank ", "#").replace("Unranked", "—"),
+      fn: () => go(buildRanked, "career") },
+    { emo: "🏆", lab: "CUPS", sub: `${save.trophies.local + save.trophies.national + save.trophies.world} 🏆`,
+      fn: () => go(buildTourn, "tourn") },
+  ];
   const dailyDone = save.dailyWin === todayStr();
-  const daily = el("button", "btn alt", dailyDone
-    ? `📅 DAILY CHALLENGE <span class="btn-sub">✅ beaten today</span>`
-    : `📅 DAILY CHALLENGE <span class="btn-sub">${dailyMatch().mod.emo} ${esc(dailyMatch().mod.name)}</span>`);
-  daily.onclick = () => { initAudio(); sfx.click(); confirmDaily(); };
-  stack.appendChild(daily);
-
-  const quick = el("button", "btn alt", "⚡ QUICK MATCH");
-  quick.onclick = () => { initAudio(); sfx.click(); pickQuick(); };
-  stack.appendChild(quick);
-
-  stack.appendChild(el("div", null, "<div style='height:4px'></div>"));
-  const shop = el("button", "btn ghost", `🃏 Skills &amp; Loadout · 🛒 Pro Shop`);
-  shop.onclick = () => { go(buildShop, "shop"); };
-  stack.appendChild(shop);
-
-  const foot = el("div", "menu-foot");
-  if (save.bestSpeed) {
-    foot.appendChild(el("div", "chip-btn speed-chip",
-      `🚀 Top speed <b>${fmtSpeed(save.bestSpeed, save.settings?.units || "kph")}</b>`));
+  const R = [
+    { emo: "📅", lab: "DAILY", sub: dailyDone ? "✅" : dailyMatch().mod.emo,
+      fn: () => { initAudio(); sfx.click(); confirmDaily(); } },
+    { emo: "⚡", lab: "QUICK", sub: "vs ★",
+      fn: () => { initAudio(); sfx.click(); pickQuick(); } },
+    { emo: "🃏", lab: "SKILLS", sub: "🛒",
+      fn: () => go(buildShop, "shop") },
+  ];
+  for (const [cls, defs] of [["menu-col left", L], ["menu-col right", R]]) {
+    const col = el("div", cls);
+    for (const d of defs) {
+      const b = el("button", "sq-btn",
+        `<span class="sq-emo">${d.emo}</span><span class="sq-lab">${d.lab}</span><span class="sq-sub">${d.sub}</span>`);
+      b.onclick = d.fn;
+      col.appendChild(b);
+    }
+    s.appendChild(col);
   }
-  const cog = el("button", "chip-btn", "⚙️ Settings");
-  cog.onclick = () => { initAudio(); sfx.click(); showSettings(); };
-  foot.append(cog);
-  stack.appendChild(foot);
-  s.appendChild(stack);
 
-  function go(builder, screen) { initAudio(); sfx.click(); builder(); showScreen(screen); }
+  const bot = el("div", "menu-bot");
+  const cog = el("button", "sq-btn small", `<span class="sq-emo">⚙️</span>`);
+  cog.onclick = () => { initAudio(); sfx.click(); showSettings(); };
+  bot.appendChild(cog);
+  if (save.bestSpeed) {
+    bot.appendChild(el("div", "chip-btn speed-chip",
+      `🚀 <b>${fmtSpeed(save.bestSpeed, save.settings?.units || "kph")}</b>`));
+  }
+  s.appendChild(bot);
 }
 
 function showSettings() {
@@ -105,6 +102,13 @@ function showSettings() {
     [
       { label: `Speed units: ${units === "kph" ? "km/h → switch to mph" : "mph → switch to km/h"}`, cls: "ghost",
         fn: () => { save.settings.units = units === "kph" ? "mph" : "kph"; career.persist(save); showSettings(); } },
+      { label: `Default match length: ${(MATCH_LENS.find(l => l.id === (save.settings.matchLen || "1g")) || MATCH_LENS[0]).name}`, cls: "ghost",
+        fn: () => {
+          const ids = MATCH_LENS.map(l => l.id);
+          const cur = save.settings.matchLen || "1g";
+          save.settings.matchLen = ids[(ids.indexOf(cur) + 1) % ids.length];
+          career.persist(save); showSettings();
+        } },
       { label: isMuted() ? "🔇 Sound is OFF — turn on" : "🔊 Sound is ON — mute", cls: "ghost",
         fn: () => { setMuted(!isMuted()); showSettings(); } },
       { label: "❓ How to play", cls: "ghost", fn: showHelp },
@@ -127,6 +131,52 @@ function showHelp() {
     [{ label: "Got it" }]);
 }
 
+/* ---------------- Match length picker ---------------- */
+export const MATCH_LENS = [
+  { id: "1g",    name: "1 GAME",     sub: "Quick — a single game, you serve" },
+  { id: "2g",    name: "2 GAMES",    sub: "First to 2 — one serve each" },
+  { id: "set",   name: "1 SET",      sub: "First to 6 games" },
+  { id: "match", name: "FULL MATCH", sub: "Best of 3 sets — the real deal" },
+];
+export function showMatchLen(onPick) {
+  const save = App.save;
+  const cur = save.settings?.matchLen || "1g";
+  modal(`<h2>🎾 Match length</h2><p class="sub">How long do you want this one to be?</p>`,
+    MATCH_LENS.map(l => ({
+      label: `${l.id === cur ? "▶ " : ""}${l.name} <span class="btn-sub">${l.sub}</span>`,
+      cls: l.id === cur ? "" : "ghost",
+      fn: () => {
+        if (!save.settings) save.settings = {};
+        save.settings.matchLen = l.id;
+        career.persist(save);
+        onPick(l.id);
+      },
+    })));
+}
+
+/* ---------------- Storybook (read the tale so far) ---------------- */
+export function showStorybook(all) {
+  const save = App.save;
+  const upto = all || save.storyDone ? 100 : Math.min(100, save.story);
+  let html = `<h2>📖 The Story So Far</h2><div class="storybook">`;
+  html += `<div class="sb-line sb-intro">${esc(INTRO)}</div>`;
+  for (let c = 0; c < CHAPTERS.length; c++) {
+    const first = c * 10 + 1;
+    if (first > upto && !all) break;
+    const ch = CHAPTERS[c];
+    html += `<div class="sb-ch">${ch.emo} Chapter ${c + 1}: ${esc(ch.name)}</div>`;
+    for (let n = first; n < first + 10; n++) {
+      if (n > upto && !all) break;
+      const lv = storyLevel(n);
+      html += `<div class="sb-line">${lv.isBoss ? "⚔️ " : ""}<b>${n}.</b> ${esc(lv.line)}</div>`;
+    }
+  }
+  if (all || save.storyDone) html += `<div class="sb-line sb-intro">${esc(FINALE)}</div>`;
+  else html += `<div class="sb-line sb-more">…to be continued. Win level ${Math.min(100, save.story)} to write the next line.</div>`;
+  html += `</div>`;
+  modal(html, [{ label: "Close" }]);
+}
+
 /* ---------------- Story ---------------- */
 export function buildStory() {
   const save = App.save;
@@ -139,6 +189,9 @@ export function buildStory() {
     const replay = el("button", "btn", "REPLAY THE FINAL 🌕");
     replay.onclick = () => { sfx.click(); save.story = 100; career.persist(save); App.playStory(); };
     s.appendChild(replay);
+    const book = el("button", "btn ghost", "📖 Read the whole story");
+    book.onclick = () => { sfx.click(); showStorybook(true); };
+    s.appendChild(book);
     return;
   }
 
@@ -160,7 +213,7 @@ export function buildStory() {
   // The story beat + opponent
   const beat = el("div", "card story-card");
   beat.innerHTML = `<div class="story-line">${lvl.isBoss ? "⚔️ " : ""}${esc(lvl.line)}</div>
-    <div class="sub" style="margin-top:8px">📍 ${esc(lvl.venue)} · First to ${lvl.games} game${lvl.games > 1 ? "s" : ""} · Prize ${fmtMoney(lvl.prize)}</div>`;
+    <div class="sub" style="margin-top:8px">📍 ${esc(lvl.venue)} · Prize ${fmtMoney(lvl.prize)}</div>`;
   s.appendChild(beat);
 
   const { opp } = App.peekStory();
@@ -175,6 +228,10 @@ export function buildStory() {
   const play = el("button", "btn", lvl.isBoss ? "FIGHT THE BOSS ⚔️" : "PLAY LEVEL " + n + " 🎾");
   play.onclick = () => { sfx.click(); App.playStory(); };
   s.appendChild(play);
+
+  const book = el("button", "btn ghost", "📖 Read the story so far");
+  book.onclick = () => { sfx.click(); showStorybook(false); };
+  s.appendChild(book);
 }
 
 /* ---------------- Ranked (the original career ladder) ---------------- */
@@ -191,7 +248,7 @@ export function buildRanked() {
 
   const tc = el("div", "card");
   tc.innerHTML = `<h3>${esc(tier.name)} ${tier.boss ? "🤖" : ""}</h3>
-    <div class="sub">📍 ${esc(tier.venue)} · Match ${Math.min(save.tierMatch + 1, tier.matches)} of ${tier.matches} · First to ${tier.games} game${tier.games > 1 ? "s" : ""} · Prize ${fmtMoney(tier.prize)}</div>
+    <div class="sub">📍 ${esc(tier.venue)} · Match ${Math.min(save.tierMatch + 1, tier.matches)} of ${tier.matches} · Prize ${fmtMoney(tier.prize)}</div>
     <div class="sub" style="margin-top:6px;font-style:italic">${esc(tier.flavour)}</div>`;
   s.appendChild(tc);
 
@@ -365,7 +422,8 @@ export const matchHooks = {
     const sc = scoreLine(m);
     $("sbYouName").textContent = "YOU" + (m.server === "you" ? " 🎾" : "");
     $("sbOppName").textContent = m.opp.name.split(" ")[0] + (m.server === "opp" ? " 🎾" : "");
-    $("sbYouGames").textContent = sc.youGames; $("sbOppGames").textContent = sc.oppGames;
+    $("sbYouGames").textContent = sc.youSets !== undefined ? `${sc.youSets}·${sc.youGames}` : sc.youGames;
+    $("sbOppGames").textContent = sc.oppSets !== undefined ? `${sc.oppSets}·${sc.oppGames}` : sc.oppGames;
     $("sbYouPts").textContent = sc.youPts; $("sbOppPts").textContent = sc.oppPts;
     $("mStam").style.width = m.stam + "%";
     $("mComp").style.width = m.comp + "%";
@@ -424,7 +482,7 @@ export function showRankedResult(m, s) {
       <p style="font-size:12px;opacity:.75">Rank slips to <b>${fmtRank(s.newRank)}</b>.</p>`;
   }
   modal(html, [
-    { label: "Continue", fn: () => { buildRanked(); showScreen("career"); } },
+    { label: "Continue", fn: () => { buildMenu(); showScreen("menu"); } },
     { label: "Spend winnings 🛒", cls: "ghost", fn: () => { buildShop(); showScreen("shop"); } },
   ]);
 }
@@ -446,22 +504,22 @@ export function showStoryResult(m, ctx) {
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}
       <div class="modal-story"><div class="ms-tag">${nextCh.emo} LEVEL ${nextLvl.n}</div>
         <div class="ms-line">${nextLvl.isBoss ? "⚔️ " : ""}${esc(nextLvl.line)}</div></div>`,
-      [{ label: "NEXT LEVEL ▶", fn: () => App.playStory() },
-       { label: "Story map", cls: "ghost", fn: () => { buildStory(); showScreen("story"); } }]);
+      [{ label: "Continue", fn: () => { buildMenu(); showScreen("menu"); } },
+       { label: "NEXT LEVEL ▶", cls: "ghost", fn: () => App.playStory() }]);
   } else {
     modal(`<h2>Defeat...</h2><div class="big-emoji">😩</div>
       <p>${esc(m.opp.name)} halts the story. For now.</p>
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
       [{ label: "RETRY ⟳", fn: () => App.playStory() },
-       { label: "Story map", cls: "ghost", fn: () => { buildStory(); showScreen("story"); } }]);
+       { label: "Menu", cls: "ghost", fn: () => { buildMenu(); showScreen("menu"); } }]);
   }
 }
 
 export function showQuickResult(m) {
   modal(`<h2>${m.won ? "VICTORY!" : "Defeat..."}</h2><div class="big-emoji">${m.won ? "🎉" : "😩"}</div>
     <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}`,
-    [{ label: "Again!", fn: () => pickQuick() },
-     { label: "Menu", cls: "ghost", fn: () => { buildMenu(); showScreen("menu"); } }]);
+    [{ label: "Menu", fn: () => { buildMenu(); showScreen("menu"); } },
+     { label: "Again!", cls: "ghost", fn: () => pickQuick() }]);
 }
 
 export function showDailyResult(m, ctx) {
@@ -481,14 +539,14 @@ export function showTournResult(m, ctx) {
     modal(`<h2>OUT OF THE CUP</h2><div class="big-emoji">🫗</div>
       <p>${esc(m.opp.name)} sends you packing in the ${ctx.roundName}. The entry fee is a fond memory.</p>
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
-      [{ label: "Tournaments", fn: () => { buildTourn(); showScreen("tourn"); } }]);
+      [{ label: "Menu", fn: () => { buildMenu(); showScreen("menu"); } }]);
     return;
   }
   if (ctx.champion) {
     modal(`<h2>CUP CHAMPION! ${TOURNAMENTS[ctx.kind].emo}</h2><div class="big-emoji">🏆</div>
       <p>The ${esc(TOURNAMENTS[ctx.kind].name)} is YOURS${ctx.kind === "local" ? " — kettle and all" : ""}!</p>
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}`,
-      [{ label: "GLORIOUS", fn: () => { buildTourn(); showScreen("tourn"); } }]);
+      [{ label: "GLORIOUS", fn: () => { buildMenu(); showScreen("menu"); } }]);
   } else {
     showTournBracket(ctx.tstate, () => App.playTournRound());
   }

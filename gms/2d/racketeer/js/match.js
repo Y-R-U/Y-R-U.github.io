@@ -24,7 +24,10 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     oppP: makePlayer({ far: true, boss: opp.boss, col: opp.boss ? "#3d4450" : pick(["#e63946", "#9b5de5", "#00b4d8", "#f77f00", "#43aa8b"]), col2: "#333", skin: pick(["#f2c79c", "#d9a066", "#a56a3a", "#ffdbac"]) }),
     ball: makeBall(),
     server: "you", serveNum: 1, serveSide: 1,
-    ptsYou: 0, ptsOpp: 0, gamesYou: 0, gamesOpp: 0, targetGames: tier.games,
+    ptsYou: 0, ptsOpp: 0, gamesYou: 0, gamesOpp: 0,
+    mlen: tier.mlen || "1g",  // "1g" | "2g" | "set" | "match"
+    targetGames: { "1g": 1, "2g": 2, set: 6, match: 6 }[tier.mlen || "1g"] || 1,
+    setsYou: 0, setsOpp: 0,
     stam: 100, comp: 100, oppStam: 100, oppComp: 100,
     hype: 10,
     earnings: 0, over: false, won: false,
@@ -103,7 +106,9 @@ function ptLabel(m, mine) {
   return PTS[Math.min(a, 3)];
 }
 export function scoreLine(m) {
-  return { youPts: ptLabel(m, true), oppPts: ptLabel(m, false), youGames: m.gamesYou, oppGames: m.gamesOpp };
+  const sc = { youPts: ptLabel(m, true), oppPts: ptLabel(m, false), youGames: m.gamesYou, oppGames: m.gamesOpp };
+  if (m.mlen === "match") { sc.youSets = m.setsYou; sc.oppSets = m.setsOpp; }
+  return sc;
 }
 
 /* ---------------- state transitions ---------------- */
@@ -133,18 +138,19 @@ function beginPreServe(m, first) {
   else ticker(m, `${m.opp.name.split(" ")[0]} to serve...`, 2);
 }
 
-// Dry-run the real physics to see if this serve would die at the net
-// (the analytic clearance check ignores air drag and lies for fast serves).
-function serveNets(b, v) {
+// Dry-run the real physics for a proposed serve: does it die at the net,
+// and where does it actually land? (Analytic maths ignore air drag and lie.)
+function simServe(b, v) {
   const t = { x: b.x, y: b.y, z: b.z, vx: v.vx, vy: v.vy, vz: v.vz,
     live: true, bounces: 0, curve: 0, wind: 0, spinT: 0, trail: [] };
-  let netted = false;
-  for (let i = 0; i < 180 && !netted; i++) {
-    stepBall(t, 1 / 60, (ev) => { if (ev === "net" || ev === "netcord") netted = true; });
-    if (t.bounces > 0 || Math.abs(t.y - COURT.NET_Y) > COURT.L) break;
-    if ((b.y < COURT.NET_Y) === (t.y > COURT.NET_Y)) break;  // crossed safely
+  let net = false, land = null;
+  for (let i = 0; i < 240 && !net && !land; i++) {
+    stepBall(t, 1 / 60, (ev, d) => {
+      if (ev === "net" || ev === "netcord") net = true;
+      else if (ev === "bounce" && !land) land = { x: d.x, y: d.y };
+    });
   }
-  return netted;
+  return { net, land };
 }
 
 function startRallyFromServe(m, byYou, quality, aimTx) {
@@ -158,22 +164,28 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   b.x = (byYou ? 1 : -1) * m.serveSide * 2.0; b.y = fromY; b.z = 3.0;
   // Bad timing can dump the serve short — those die in the net.
   const netFlub = quality < 0.45 && Math.random() < 0.55;
-  const depth = COURT.NET_Y + dir * (netFlub ? rand(0.5, 2.5) : rand(5.5, 9.5));
   let err = (1 - quality) * 2.6;
+  // Intended landing: a perfect serve dips onto the service line; worse timing
+  // drifts shorter or long past the box (fault).
+  let land = netFlub ? rand(0.5, 2.5) : lerp(4.0, COURT.SVC - 0.15, quality) + rand(-err, err) * 0.8;
   let tx = aimTx !== undefined ? aimTx : -m.serveSide * dir * rand(0.6, 3.2);
   let T = lerp(1.2, 0.78, quality) * (1 - serveBonus) * EV.eventShotSlow(m);
   if (netFlub) T = 0.62;                       // flat mishit -> dies at the tape
   if (m.serveNum === 2) { err *= 0.5; tx *= 0.7; T *= 1.12; }  // careful second serve
   tx = clamp(tx + rand(-err, err), -COURT.W / 2 - err, COURT.W / 2 + err);
-  const ty = depth + rand(-err, err) * dir;
-  const v = aimVelocity(b.x, b.y, b.z, tx, ty, T);
-  // A well-timed serve always clears the tape (slowing only as much as needed).
+  let ty = COURT.NET_Y + dir * (land + (netFlub ? 0 : 2.6));   // drag lands it short of the aim point
+  let v = aimVelocity(b.x, b.y, b.z, tx, ty, T);
+  // Walk the aim until the real-physics landing matches the intent (and clears the tape).
   if (!netFlub) {
-    let tries = 0;
-    while (serveNets(b, v) && tries++ < 6) {
-      T *= 1.1;
-      const v2 = aimVelocity(b.x, b.y, b.z, tx, ty, T);
-      v.vx = v2.vx; v.vy = v2.vy; v.vz = v2.vz;
+    for (let i = 0; i < 6; i++) {
+      const s = simServe(b, v);
+      if (s.net) T *= 1.1;
+      else if (s.land) {
+        const actual = (s.land.y - COURT.NET_Y) * dir;
+        if (Math.abs(actual - land) < 0.2) break;
+        ty += dir * clamp(land - actual, -2.5, 2.5);
+      } else break;
+      v = aimVelocity(b.x, b.y, b.z, tx, ty, T);
     }
   }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
@@ -315,6 +327,22 @@ function settleGame(m) {
   m.server = m.server === "you" ? "opp" : "you"; m.serveNum = 1;
   m.pendingGame = null;
   if (m.gamesYou >= m.targetGames || m.gamesOpp >= m.targetGames) {
+    if (m.mlen === "match") {
+      // Best of 3 sets: bank the set, reset games, play on until someone has 2
+      const youSet = m.gamesYou > m.gamesOpp;
+      if (youSet) m.setsYou++; else m.setsOpp++;
+      m.gamesYou = 0; m.gamesOpp = 0;
+      if (m.setsYou >= 2 || m.setsOpp >= 2) {
+        finishMatch(m, m.setsYou > m.setsOpp);
+        return true;
+      }
+      sayBanner(m, youSet ? "SET YOU! 🎾" : "SET " + m.opp.name.split(" ")[0].toUpperCase(),
+        youSet ? "#7ee6a1" : "#ff8a5c", 1.4);
+      if (youSet) { sfx.fanfare(); earn(m, 40 + (m.tier.id || 0) * 15, 0, YOU_Y + 2); }
+      ticker(m, `Sets: ${m.setsYou}–${m.setsOpp}. ${m.setsYou === m.setsOpp ? "Decider!" : "Next set."}`, 3.5);
+      pushHud(m);
+      return false;
+    }
     finishMatch(m, m.gamesYou > m.gamesOpp);
     return true;
   }
@@ -327,7 +355,7 @@ function finishMatch(m, won) {
   m.over = true; m.won = won; m.state = "matchOver"; m.stateT = 0;
   if (won) {
     m.earnings += Math.round(m.tier.prize * hypeMult(m));
-    sfx.fanfare(); setTimeout(() => sfx.cheer(1.5), 300);
+    sfx.fanfare(); setTimeout(() => { if (!m.silent) sfx.cheer(1.5); }, 300);
     FX.confetti(90);
     setState(m.you, "celebrate"); setState(m.oppP, "sad");
     sayBanner(m, "MATCH WON!", "#ffe24a", 1.8);
@@ -790,8 +818,17 @@ function onBallEvent(m, ev, data) {
     const b = m.ball;
     if (b.bounces === 1) {
       const hitter = b.lastHitBy;
-      if (!inCourt(data.x, data.y)) {
-        FX.floatText(data.x, clamp(data.y, 1, COURT.L - 1), 0.4, "OUT!", "#ff8a5c", 1);
+      const isServe = m.state === "rally" && m.stats.rally === 0;
+      // Bouncing on your own side of the net is always your error;
+      // a serve must also land inside the service box (net → service line).
+      const ownSide = hitter === "you" ? data.y < COURT.NET_Y : data.y > COURT.NET_Y;
+      const svcDepth = hitter === "you" ? data.y - COURT.NET_Y : COURT.NET_Y - data.y;
+      const bad = isServe
+        ? (svcDepth <= 0 || svcDepth > COURT.SVC + BALL_R || Math.abs(data.x) > COURT.W / 2 + BALL_R)
+        : (ownSide || !inCourt(data.x, data.y));
+      if (bad) {
+        FX.floatText(data.x, clamp(data.y, 1, COURT.L - 1), 0.4,
+          isServe && svcDepth > COURT.SVC ? "LONG!" : "OUT!", "#ff8a5c", 1);
         if (hitter === "you") {
           if (m.state === "rally" && m.stats.rally === 0 && m.server === "you" && m.serveNum === 1) {
             m.serveNum = 2; ticker(m, "FAULT! Second serve."); sfx.gasp();

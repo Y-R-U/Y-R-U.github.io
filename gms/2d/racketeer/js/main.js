@@ -5,7 +5,7 @@ import { makeMatch, updateMatch, drawMatch } from "./match.js";
 import { bindInput } from "./input.js";
 import * as UI from "./ui.js";
 import * as MODES from "./modes.js";
-import { initAudio, setCrowdLevel } from "./audio.js";
+import { initAudio, setCrowdLevel, setMuted, isMuted } from "./audio.js";
 import { clearFx } from "./fx.js";
 
 const canvas = document.getElementById("game");
@@ -39,6 +39,8 @@ doResize();
 
 /* ---------------- generic match launcher ---------------- */
 function launch(cfg, opp, onOver) {
+  if (AUTO) cfg.mlen = params.get("mlen") || cfg.mlen || "1g";
+  if (!cfg.mlen) return UI.showMatchLen((len) => { cfg.mlen = len; launch(cfg, opp, onOver); });
   clearFx();
   const gear = career.gearBonus(App.save);
   const hooks = {
@@ -125,6 +127,7 @@ function playTournament(kind) {
 function playTournRound() {
   const ts = App.tstate;
   const { cfg, opp, roundName } = MODES.tournamentMatch(ts);
+  if (ts.round > 0) cfg.mlen = App.save.settings?.matchLen || "1g";
   launch(cfg, opp, (m) => {
     App.save.money += Math.max(0, m.earnings);
     if (m.won) {
@@ -142,6 +145,27 @@ function playTournRound() {
     }
   });
 }
+
+if (params.has("storybook")) setTimeout(() => UI.showStorybook(true), 400);
+
+/* ---------------- menu exhibition (attract mode) ---------------- */
+let demoWait = 0;
+function newDemo() {
+  const dsave = Object.assign(career.newSave(), {
+    skills: { power: 3, grunt: 3, outrageous: 3, heckle: 2 },
+    loadout: ["power", "grunt", "outrageous", "heckle"],
+    racket: "graph", shoes: "run",
+    bestSpeed: 999,                   // never fires record banners on the menu
+    settings: App.save.settings || {},
+  });
+  const { cfg, opp } = MODES.quickMatch(2 + Math.random() * 2);
+  cfg.mlen = "set"; cfg.eventChance = 0.18;
+  cfg.oppSkills = ["heckle", "grunt", "argue", "power", "outrageous", "pigeon", "underarm"];
+  App.demo = makeMatch(dsave, opp, cfg, career.gearBonus(dsave), {});
+  App.demo.autoPilot = true;
+  App.demo.silent = true;
+}
+App.wantDemo = () => { if (!App.demo || App.demo.over) newDemo(); };
 
 /* ---------------- auto-soak routing ---------------- */
 function autoNext() {
@@ -199,8 +223,22 @@ function frame(now) {
     dockTimer += dt;
     if (dockTimer > 0.5) { dockTimer = 0; UI.matchHooks.onSkillDock(m); UI.matchHooks.onHud(m); }
   } else if (!m) {
-    ctx.fillStyle = "#0b1f14";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const menuVisible = !document.getElementById("scr-menu").classList.contains("hidden");
+    if (menuVisible && (!App.demo || App.demo.over)) {
+      demoWait += dt;
+      if (!App.demo || demoWait > 2.5) { demoWait = 0; newDemo(); }
+    }
+    if (App.demo && menuVisible && !App.demo.over) {
+      const was = isMuted(); setMuted(true);
+      updateMatch(App.demo, dt);
+      setMuted(was);
+      drawMatch(App.demo, ctx);
+    } else if (App.demo && menuVisible) {
+      drawMatch(App.demo, ctx);
+    } else {
+      ctx.fillStyle = "#0b1f14";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }
   requestAnimationFrame(frame);
 }

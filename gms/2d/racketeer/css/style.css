@@ -159,3 +159,34 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .modal .row { display:flex; gap:10px; margin-top:14px; }
 .modal .row .btn { flex:1; }
 .money-pop { color:#7ee6a1; font-weight:900; font-size:20px; }
+
+/* Storybook reader */
+.storybook { max-height: 58vh; overflow-y: auto; text-align: left; margin-top: 8px;
+  -webkit-overflow-scrolling: touch; padding-right: 4px; }
+.storybook .sb-ch { font-weight: 800; margin: 12px 0 4px; color: var(--gold, #ffe24a); }
+.storybook .sb-line { font-size: 13px; line-height: 1.45; margin: 3px 0; opacity: .92; }
+.storybook .sb-intro { font-style: italic; opacity: .8; margin-bottom: 6px; }
+.storybook .sb-more { font-style: italic; opacity: .6; margin-top: 10px; }
+
+/* Live menu: AI exhibition visible behind edge buttons */
+#scr-menu { background: linear-gradient(rgba(6,16,10,.72) 0%, rgba(6,16,10,.18) 26%,
+  rgba(6,16,10,.05) 55%, rgba(6,16,10,.55) 100%); overflow: hidden; padding: 0; }
+.title-logo.mini { margin-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+.title-logo.mini h1 { font-size: 30px; }
+.title-logo.mini .tag { font-size: 11px; }
+.menu-col { position: absolute; top: 50%; transform: translateY(-58%);
+  display: flex; flex-direction: column; gap: 14px; }
+.menu-col.left  { left:  calc(env(safe-area-inset-left, 0px) + 10px); }
+.menu-col.right { right: calc(env(safe-area-inset-right, 0px) + 10px); }
+.sq-btn { width: 64px; height: 64px; border-radius: 16px; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(8,22,13,.78); color: #fff; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px; padding: 0; font-weight: 800;
+  box-shadow: 0 4px 14px rgba(0,0,0,.45); backdrop-filter: blur(2px); }
+.sq-btn:active { transform: scale(.93); }
+.sq-emo { font-size: 21px; line-height: 1.1; }
+.sq-lab { font-size: 8.5px; letter-spacing: .5px; }
+.sq-sub { font-size: 8px; opacity: .75; font-weight: 700; }
+.sq-btn.small { width: 46px; height: 46px; border-radius: 13px; }
+.menu-bot { position: absolute; left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  display: flex; gap: 10px; justify-content: center; align-items: center; }
