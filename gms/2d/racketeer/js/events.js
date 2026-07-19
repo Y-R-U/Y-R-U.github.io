@@ -136,5 +136,5 @@ export function dailyChallenge(dateStr) {
   const seed = dailySeed(dateStr);
   const mod = DAILY_MODS[seed % DAILY_MODS.length];
   const stars = 1.5 + (seed >> 4) % 30 / 10;      // 1.5 .. 4.4
-  return { mod, stars, prize: 150 + (seed % 5) * 50, games: 1 };
+  return { mod, stars, prize: (150 + (seed % 5) * 50) * 10, games: 1 };
 }

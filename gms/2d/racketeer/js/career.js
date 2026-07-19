@@ -51,32 +51,41 @@ export function quickStars(save) {                  // 0 = quick match locked en
 }
 
 /* ---- World rank, driven by story + cups (friendlies don't count) ---- */
-// Tuned so the ranking matches the story beats: tour card (~L60) lands around #800,
-// "crack the top 100" (~L75) actually does, and the world #2 (L90) sits at single digits.
+export const START_RANK = 100000000;   // 100 million nobodies, and you
+
+// Story climbs from #100,000,000 to about #100,000 — respectable, but nowhere near
+// the top. The last stretch to #1 is earned in the cups, above all the World Cup.
 export function rankFromStory(n) {
-  return Math.max(2, Math.round(Math.pow(10, 6 * Math.pow((100 - n) / 99, 0.8))));
+  return Math.round(Math.pow(10, 5 + 3 * Math.pow((100 - n) / 99, 0.85)));
 }
 
 // Story result → rank movement. Returns {oldRank, newRank}.
 export function applyStoryRank(save, won, level) {
   const oldRank = save.rank;
   if (won) {
-    const r = level >= 100 ? 1 : rankFromStory(level);
-    save.rank = save.rank === null ? Math.min(1000000, r) : Math.min(save.rank, r);
+    const r = rankFromStory(level);
+    save.rank = save.rank === null ? Math.min(START_RANK, r) : Math.min(save.rank, r);
   } else if (save.rank !== null) {
-    save.rank = Math.min(1000000, Math.round(save.rank * rand(1.03, 1.1)));
+    save.rank = Math.min(START_RANK, Math.round(save.rank * rand(1.03, 1.1)));
   }
   persist(save);
   return { oldRank, newRank: save.rank };
 }
 
-const CUP_RANK_FLOOR = { local: 20000, national: 2000, world: 50 };
+// Cup wins are the real ranking engine. The World Cup is a rocket: each one cuts your
+// rank number to a twentieth, so a handful of them take you from #100,000 to #1.
+const CUP_RANK = {
+  local:    { mult: 0.75, floor: 500000 },
+  national: { mult: 0.30, floor: 20000 },
+  world:    { mult: 0.05, floor: 1 },
+};
 
-// Winning a whole cup halves your rank number, down to the cup's floor.
 export function applyCupRank(save, kind) {
   const oldRank = save.rank;
-  const cur = save.rank === null ? 1000000 : save.rank;
-  save.rank = Math.min(cur, Math.max(CUP_RANK_FLOOR[kind] || 20000, Math.round(cur * 0.5)));
+  const c = CUP_RANK[kind] || CUP_RANK.local;
+  const cur = save.rank === null ? START_RANK : save.rank;
+  save.rank = Math.min(cur, Math.max(c.floor, Math.round(cur * c.mult)));
+  if (save.rank <= 1) { save.rank = 1; save.champion = true; }
   persist(save);
   return { oldRank, newRank: save.rank };
 }

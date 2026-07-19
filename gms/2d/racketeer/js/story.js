@@ -258,7 +258,8 @@ export function storyLevel(n) {   // n = 1..100
     n, chapter: ch, inChapter: inCh, isBoss,
     line: LINES[n - 1],
     stars, games: isBoss ? Math.min(3, games + (n > 40 ? 0 : 1)) : games,
-    prize: Math.round((20 + n * 6) * (isBoss ? 3 : 1)),
+    // Purses grow steeply late on — by the Slam you need cup-entry money, not pub money.
+    prize: Math.round((20 + n * 6) * (isBoss ? 3 : 1) * Math.pow(1 + n / 100, 5)),
     crowd: chapter.crowd,
     venue: chapter.venue,
     eventChance: Math.min(0.5, 0.05 + n * 0.004),

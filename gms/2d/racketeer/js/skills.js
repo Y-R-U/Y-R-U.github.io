@@ -1,108 +1,125 @@
 // Skill definitions. Actual in-match effects are applied in match.js via skill id.
-// lvl runs 1..5; effect numbers are indexed by lvl-1.
+// lvl runs 1..10; effect numbers are indexed by lvl-1.
 // Actives are simple: tap to fire (or arm before a shot), then a cooldown (cd, seconds).
 // `uses` caps activations per match. Passives always apply.
+export const MAX_LVL = 10;
+
+// Level curves are generated rather than hand-written — 13 skills x 10 levels of
+// hand-typed numbers is a typo farm. `ramp` eases off so late levels cost a fortune
+// for a smaller gain; `costs` triples each level, landing in the millions at 10.
+const ramp = (from, to, curve = 0.75) =>
+  Array.from({ length: MAX_LVL }, (_, i) =>
+    Math.round((from + (to - from) * Math.pow(i / (MAX_LVL - 1), curve)) * 1000) / 1000);
+const steps = (from, to) =>            // integer curves (cooldowns, uses)
+  Array.from({ length: MAX_LVL }, (_, i) =>
+    Math.round(from + (to - from) * (i / (MAX_LVL - 1))));
+const costs = (base) =>
+  Array.from({ length: MAX_LVL }, (_, i) => {
+    const c = base * Math.pow(3, i);
+    return c < 1000 ? Math.round(c / 10) * 10 : Math.round(c / 100) * 100;
+  });
+
 export const SKILLS = {
   power: {
     id: "power", name: "Power Hit", emo: "💥", type: "active", start: true, arm: true,
     desc: "Arm it, and your next shot is a monster. Costs stamina.",
-    cost: [0, 120, 300, 700, 1500],
-    cd: [6, 6, 5, 5, 4],
-    fx: { pow: [0.22, 0.3, 0.38, 0.46, 0.58], stam: [18, 17, 16, 14, 12] },
+    cost: [0, ...costs(150).slice(0, MAX_LVL - 1)],
+    cd: steps(6, 3),
+    fx: { pow: ramp(0.22, 0.9), stam: ramp(18, 8) },
     flavour: "The oldest trick in the book: hit it really, really hard.",
   },
   grunt: {
     id: "grunt", name: "Grunt", emo: "📢", type: "active", arm: true,
     desc: "Arm a competition-grade grunt: extra pace on your next shot, and at higher levels the sheer noise startles your opponent.",
-    cost: [100, 200, 450, 900, 1800],
-    cd: [10, 9, 8, 7, 6],
-    fx: { pow: [0.12, 0.16, 0.2, 0.24, 0.3], startle: [0, 0.15, 0.3, 0.45, 0.6] },
+    cost: costs(100),
+    cd: steps(10, 4),
+    fx: { pow: ramp(0.12, 0.45), startle: ramp(0, 0.8) },
     flavour: "Sports scientists agree: louder = better.",
   },
   heckle: {
     id: "heckle", name: "Heckle", emo: "🗯️", type: "active",
     desc: "Yell something devastating between points. Torches opponent composure — rattled opponents mistime everything.",
-    cost: [120, 240, 500, 1000, 2000],
-    cd: [14, 13, 12, 10, 8], betweenPoints: true,
-    fx: { comp: [10, 15, 20, 26, 34] },
+    cost: costs(120),
+    cd: steps(14, 6), betweenPoints: true,
+    fx: { comp: ramp(10, 55) },
     flavour: "\"YOUR SHORTS ARE ON BACKWARDS\" — devastating at any level of the sport.",
   },
   argue: {
     id: "argue", name: "Umpire Argument", emo: "👨‍⚖️", type: "active",
     desc: "After losing a point, contest it! The umpire may overturn it, replay it... or penalise your cheek. 3 arguments per match.",
-    cost: [150, 300, 600, 1200, 2400],
-    cd: [0, 0, 0, 0, 0], uses: 3, afterLoss: true,
-    fx: { win: [0.22, 0.28, 0.34, 0.4, 0.48], replay: [0.3, 0.32, 0.34, 0.36, 0.38] },
+    cost: costs(150),
+    cd: steps(0, 0), uses: 3, afterLoss: true,
+    fx: { win: ramp(0.22, 0.7), replay: ramp(0.3, 0.45) },
     flavour: "Justice is blind. This umpire is also quite sleepy.",
   },
   outrageous: {
     id: "outrageous", name: "Outrageous Shot", emo: "🤸", type: "active", arm: true,
     desc: "Arm it: your next ball becomes a tweener/backflip smash. Massive hype and bonus cash if it lands — total faceplant if it doesn't.",
-    cost: [200, 400, 800, 1600, 3200],
-    cd: [12, 11, 10, 9, 8],
-    fx: { landChance: [0.55, 0.65, 0.72, 0.8, 0.9], hype: [22, 26, 30, 36, 45], cash: [15, 25, 40, 65, 100] },
+    cost: costs(200),
+    cd: steps(12, 6),
+    fx: { landChance: ramp(0.55, 0.97), hype: ramp(22, 70), cash: ramp(15, 400) },
     flavour: "The crowd didn't come for tennis. They came for THIS.",
   },
   underarm: {
     id: "underarm", name: "Underarm Serve", emo: "🥷", type: "active",
     desc: "The cheekiest serve in tennis. Great ace odds against a rattled opponent, and it infuriates them either way.",
-    cost: [150, 300, 650, 1300, 2600],
-    cd: [18, 16, 14, 12, 10], serveOnly: true,
-    fx: { ace: [0.3, 0.38, 0.46, 0.54, 0.65], tilt: [8, 10, 12, 15, 20] },
+    cost: costs(150),
+    cd: steps(18, 8), serveOnly: true,
+    fx: { ace: ramp(0.3, 0.85), tilt: ramp(8, 35) },
     flavour: "Not illegal. Just deeply, deeply rude.",
   },
   injury: {
     id: "injury", name: "Fake Injury", emo: "🤕", type: "active",
     desc: "Take a theatrical medical timeout: refills your stamina and composure. Twice per match, and the crowd boos the sequel.",
-    cost: [180, 350, 700, 1400, 2800],
-    cd: [0, 0, 0, 0, 0], uses: 2, betweenPoints: true,
-    fx: { heal: [35, 45, 55, 70, 90] },
+    cost: costs(180),
+    cd: steps(0, 0), uses: 2, betweenPoints: true,
+    fx: { heal: ramp(35, 100) },
     flavour: "Both ankles. Somehow three ankles.",
   },
   pigeon: {
     id: "pigeon", name: "Pigeon Whisperer", emo: "🐦", type: "active",
     desc: "Release a trained pigeon to dive-bomb your opponent. Their next shot will be garbage.",
-    cost: [250, 500, 1000, 2000, 4000],
-    cd: [20, 18, 16, 14, 12],
-    fx: { weaken: [0.5, 0.6, 0.7, 0.8, 0.9] },
+    cost: costs(250),
+    cd: steps(20, 9),
+    fx: { weaken: ramp(0.5, 0.98) },
     flavour: "His name is Clive. He has never missed.",
   },
   racketsmash: {
     id: "racketsmash", name: "Racket Smash", emo: "🎇", type: "active",
     desc: "Obliterate your racket on the court. Fully restores composure, thrills the crowd — but a new racket costs cash.",
-    cost: [150, 300, 600, 1200, 2400],
-    cd: [20, 18, 16, 14, 12], betweenPoints: true,
-    fx: { hype: [12, 15, 18, 22, 28], cashCost: [25, 22, 19, 15, 10] },
+    cost: costs(150),
+    cd: steps(20, 9), betweenPoints: true,
+    fx: { hype: ramp(12, 45), cashCost: ramp(25, 5) },
     flavour: "Therapy, but louder and more expensive.",
   },
   crowdwork: {
     id: "crowdwork", name: "Crowd Work", emo: "😘", type: "active",
     desc: "Blow kisses, dab, start the wave. Big hype boost — and hype multiplies every dollar you earn.",
-    cost: [130, 260, 550, 1100, 2200],
-    cd: [16, 14, 12, 10, 9], betweenPoints: true,
-    fx: { hype: [14, 18, 22, 28, 36] },
+    cost: costs(130),
+    cd: steps(16, 7), betweenPoints: true,
+    fx: { hype: ramp(14, 60) },
     flavour: "They love you. They just don't know it yet.",
   },
   zone: {
     id: "zone", name: "The Zone", emo: "🧠", type: "active",
     desc: "Time slows. Your swing timing becomes very forgiving for the next few shots.",
-    cost: [300, 600, 1200, 2400, 4800],
-    cd: [22, 20, 18, 16, 14],
-    fx: { shots: [2, 2, 3, 3, 4], widen: [1.6, 1.8, 2.0, 2.2, 2.5] },
+    cost: costs(300),
+    cd: steps(22, 10),
+    fx: { shots: steps(2, 6), widen: ramp(1.6, 3.5) },
     flavour: "You can hear the ball's thoughts. It's scared.",
   },
   luckyballs: {
     id: "luckyballs", name: "Lucky Balls", emo: "🍀", type: "passive",
     desc: "PASSIVE: Your serves are faster and your shanks a little less shameful.",
-    cost: [200, 400, 800, 1600, 3200],
-    fx: { serve: [0.06, 0.1, 0.14, 0.18, 0.24], mercy: [0.1, 0.15, 0.2, 0.25, 0.3] },
+    cost: costs(200),
+    fx: { serve: ramp(0.06, 0.35), mercy: ramp(0.1, 0.5) },
     flavour: "Definitely not tampered with. Definitely.",
   },
   netcord: {
     id: "netcord", name: "Net Cord Karma", emo: "🕸️", type: "passive",
     desc: "PASSIVE: When the ball clips the tape, the universe leans your way.",
-    cost: [250, 500, 1000, 2000, 4000],
-    fx: { luck: [0.15, 0.25, 0.35, 0.45, 0.6] },
+    cost: costs(250),
+    fx: { luck: ramp(0.15, 0.9) },
     flavour: "You apologised to the net once. It remembers.",
   },
 };
@@ -113,4 +130,4 @@ export const SKILL_ORDER = ["power", "grunt", "heckle", "argue", "outrageous", "
 export function skillLvl(save, id) { return save.skills[id] || 0; }
 export function skillFx(id, lvl, key) { return SKILLS[id].fx[key][Math.max(0, lvl - 1)]; }
 export function skillCd(id, lvl) { const c = SKILLS[id].cd; return c ? c[Math.max(0, lvl - 1)] : 0; }
-export function upgradeCost(id, lvl) { return lvl >= 5 ? null : SKILLS[id].cost[lvl]; }
+export function upgradeCost(id, lvl) { return lvl >= MAX_LVL ? null : SKILLS[id].cost[lvl]; }

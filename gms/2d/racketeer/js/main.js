@@ -135,13 +135,13 @@ function playDaily() {
 
 function playTournament(kind) {
   const t = MODES.TOURNAMENTS[kind];
-  if (App.save.money < t.entry) return;
+  if (App.save.money < t.entry || MODES.cupLocked(App.save, kind)) return;
   // Charge the entry fee only once the length is confirmed — cancelling costs nothing.
   const begin = () => {
     App.save.money -= t.entry;
     sfx.cash();
     career.persist(App.save);
-    App.tstate = MODES.startTournament(kind);
+    App.tstate = MODES.startTournament(kind, App.save);
     UI.showTournBracket(App.tstate, () => playTournRound());
   };
   // Cups are the only mode that asks; every round of the cup uses this length.
@@ -155,18 +155,23 @@ function playTournRound() {
   cfg.mlen = App.save.settings?.matchLen || "1g";
   launch(cfg, opp, (m) => {
     App.save.money += Math.max(0, m.earnings);
-    if (m.won) {
-      ts.round++;
-      if (ts.round >= 3) {
-        App.save.trophies[ts.kind] = (App.save.trophies[ts.kind] || 0) + 1;
-        const rank = career.applyCupRank(App.save, ts.kind);
-        UI.showTournResult(m, { kind: ts.kind, champion: true, rank });
-        App.tstate = null;
-      } else {
-        UI.showTournResult(m, { tstate: ts, kind: ts.kind });
-      }
+    // Best-of-3 shows sets on the bracket; everything else shows games.
+    const bySets = m.mlen === "match";
+    const youG = bySets ? m.setsYou : m.gamesYou;
+    const oppG = bySets ? m.setsOpp : m.gamesOpp;
+    const target = bySets ? 2 : m.targetGames || 1;
+    const wasFinal = ts.round >= ts.rounds.length - 1;
+    MODES.advanceRound(ts, m.won, youG, oppG, target);
+    if (m.won && wasFinal) {
+      App.save.trophies[ts.kind] = (App.save.trophies[ts.kind] || 0) + 1;
+      const rank = career.applyCupRank(App.save, ts.kind);
+      UI.showTournResult(m, { kind: ts.kind, champion: true, rank, tstate: ts });
+      App.tstate = null;
+    } else if (m.won) {
+      UI.showTournResult(m, { tstate: ts, kind: ts.kind });
     } else {
-      UI.showTournResult(m, { roundName, kind: ts.kind });
+      MODES.simulateRest(ts, target);   // the cup carries on without you
+      UI.showTournResult(m, { roundName, kind: ts.kind, tstate: ts });
       App.tstate = null;
     }
   });
@@ -202,7 +207,13 @@ function autoNext() {
   else if (AUTOMODE === "quick") playQuick(2.5);
   else if (AUTOMODE === "tourn") {
     if (App.tstate) playTournRound();
-    else { App.save.money += 2000; playTournament("local"); setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; playTournRound(); }, 400); }
+    else {
+      const kind = params.get("cup") || "local";
+      App.save.money += MODES.TOURNAMENTS[kind].entry + 2000;
+      if (kind !== "local") App.save.story = 100;   // soaks bypass the story-level gate
+      playTournament(kind);
+      setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; playTournRound(); }, 400);
+    }
   } else playRanked();
 }
 
@@ -276,3 +287,4 @@ boot();
 window.__game = App;   // test hooks
 window.__ui = UI;
 window.__c = career;
+window.__m = MODES;

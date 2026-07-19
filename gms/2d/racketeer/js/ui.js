@@ -1,12 +1,12 @@
 // All DOM UI: menus, mode screens, skill shop, loadout, modals, HUD wiring.
 import { el, esc, fmtMoney, fmtRank, fmtSpeed } from "./util.js";
-import { SKILLS, SKILL_ORDER, upgradeCost } from "./skills.js";
+import { SKILLS, SKILL_ORDER, upgradeCost, MAX_LVL } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
 import { haptic, setHaptics, hapticsOn, supportsHaptics } from "./haptics.js";
 import { canUseSkill, useSkill, scoreLine } from "./match.js";
 import { CHAPTERS, INTRO, FINALE, storyLevel, CUTSCENES } from "./story.js";
-import { TOURNAMENTS, todayStr, dailyMatch } from "./modes.js";
+import { TOURNAMENTS, todayStr, dailyMatch, cupLocked } from "./modes.js";
 
 const $ = (id) => document.getElementById(id);
 let App = null;   // set by main.js
@@ -324,17 +324,20 @@ export function buildTourn() {
   const s = $("scr-tourn");
   s.innerHTML = "";
   hdr(s, "Tournaments", () => { buildMenu(); showScreen("menu"); });
-  s.appendChild(el("div", "card", `<div class="sub">Knockout cups: three rounds back-to-back, entry fee up front, lose and you're OUT. Winner takes the pot (and the glory, and the kettle).</div>`));
+  s.appendChild(el("div", "card", `<div class="sub">Knockout cups: a full draw played back-to-back, entry fee up front, lose and you're OUT. Winner takes the pot — and cups are how you climb the world rankings.</div>`));
 
   for (const kind of ["local", "national", "world"]) {
     const t = TOURNAMENTS[kind];
     const won = save.trophies[kind] || 0;
-    const card = el("div", "card");
+    const locked = cupLocked(save, kind);
+    const card = el("div", "card" + (locked ? " cup-locked" : ""));
     card.innerHTML = `<h3>${t.emo} ${esc(t.name)} ${won ? `<span class="stars">×${won} 🏆</span>` : ""}</h3>
       <div class="sub">${esc(t.desc)}</div>
-      <div class="sub" style="margin-top:6px">Entry ${fmtMoney(t.entry)} · Winner's pot ${fmtMoney(t.prize)}</div>`;
-    const enter = el("button", "btn", save.money >= t.entry ? `ENTER — ${fmtMoney(t.entry)}` : `Need ${fmtMoney(t.entry)}`);
-    enter.disabled = save.money < t.entry;
+      <div class="sub" style="margin-top:6px">${t.size}-player draw · Entry ${fmtMoney(t.entry)} · Winner's pot ${fmtMoney(t.prize)}</div>`;
+    const enter = el("button", "btn",
+      locked ? `🔒 Reach story level ${locked}`
+        : save.money >= t.entry ? `ENTER — ${fmtMoney(t.entry)}` : `Need ${fmtMoney(t.entry)}`);
+    enter.disabled = !!locked || save.money < t.entry;
     enter.style.marginTop = "10px";
     enter.onclick = () => { sfx.click(); haptic.tap(); App.playTournament(kind); };
     card.appendChild(enter);
@@ -342,16 +345,56 @@ export function buildTourn() {
   }
 }
 
-export function showTournBracket(tstate, onPlay) {
-  const t = TOURNAMENTS[tstate.kind];
-  const names = ["QF", "SF", "F"];
-  const rows = tstate.opps.map((o, i) => {
-    const cls = i < tstate.round ? "beat" : i === tstate.round ? "next" : "";
-    return `<div class="brk-row ${cls}"><span class="brk-rnd">${names[i]}</span> ${o.face} ${esc(o.name)} ${i < tstate.round ? "✅" : ""}</div>`;
+/* ---------------- Tournament bracket ---------------- */
+// A real draw: every entrant, every round, with results filled in as they happen.
+export function renderBracket(ts) {
+  const isYou = (i) => i === ts.youIdx;
+  // Bracket cells are narrow: drop the "nickname" and fall back to a first name.
+  const shortName = (n) => {
+    const clean = n.replace(/\s*"[^"]*"\s*/g, " ").replace(/\s+/g, " ").trim();
+    return clean.length > 15 ? clean.split(" ")[0] : clean;
+  };
+  const nameOf = (i) => i === null ? "TBC" : isYou(i) ? "YOU" : shortName(ts.field[i].name);
+  const faceOf = (i) => i === null ? "·" : isYou(i) ? "🎾" : ts.field[i].face;
+  const cols = ts.rounds.map((rd) => {
+    const ms = rd.matches.map((m) => {
+      const done = m.w !== null;
+      const row = (idx, score) => {
+        const cls = ["brk-p",
+          idx === null ? "tbd" : "",
+          isYou(idx) ? "you" : "",
+          done ? (m.w === idx ? "won" : "lost") : ""].filter(Boolean).join(" ");
+        return `<div class="${cls}"><span class="brk-face">${faceOf(idx)}</span>` +
+          `<span class="brk-nm">${esc(nameOf(idx))}</span>` +
+          `<span class="brk-sc">${done ? score : ""}</span></div>`;
+      };
+      const live = !done && (m.a === ts.youIdx || m.b === ts.youIdx);
+      return `<div class="brk-m${live ? " live" : ""}">${row(m.a, m.sa)}${row(m.b, m.sb)}</div>`;
+    }).join("");
+    return `<div class="brk-col"><div class="brk-hd">${rd.key}</div><div class="brk-ms">${ms}</div></div>`;
   }).join("");
-  modal(`<h2>${t.emo} ${esc(t.name)}</h2><div class="brk">${rows}</div>`,
-    [{ label: tstate.round === 2 ? "PLAY THE FINAL 🏆" : `Play ${names[tstate.round] === "QF" ? "Quarter-Final" : "Semi-Final"} 🎾`, fn: onPlay },
+  const champ = ts.championIdx !== null && ts.championIdx !== undefined
+    ? `<div class="brk-champ">🏆 Champion: <b>${esc(nameOf(ts.championIdx))}</b></div>` : "";
+  const h = Math.max(180, ts.rounds[0].matches.length * 46);
+  return `<div class="brk-wrap"><div class="brk-tree" style="height:${h}px">${cols}</div></div>${champ}`;
+}
+
+export function showTournBracket(ts, onPlay) {
+  const t = TOURNAMENTS[ts.kind];
+  const rd = ts.rounds[ts.round];
+  const last = ts.round === ts.rounds.length - 1;
+  modal(`<h2>${t.emo} ${esc(t.name)}</h2>
+    <p class="sub">${esc(rd.name)} · ${ts.size}-player draw</p>
+    ${renderBracket(ts)}`,
+    [{ label: last ? "PLAY THE FINAL 🏆" : `Play ${esc(rd.name)} 🎾`, fn: onPlay },
      { label: "Forfeit cup", cls: "ghost", fn: () => { buildTourn(); showScreen("tourn"); } }]);
+  // A 32-draw is taller than the panel — scroll your own match into view.
+  const live = document.querySelector(".brk-m.live");
+  const wrap = document.querySelector(".brk-wrap");
+  if (live && wrap) {
+    const lr = live.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+    wrap.scrollTop += (lr.top - wr.top) - (wr.height / 2 - lr.height / 2);
+  }
 }
 
 /* ---------------- Daily + Quick ---------------- */
@@ -414,7 +457,7 @@ export function buildShop() {
     card.innerHTML = `<div class="ico">${def.emo}</div><div class="body">
       <div class="nm">${esc(def.name)} ${def.type === "passive" ? "<span style='font-size:10px;color:#6fd3ff'>PASSIVE</span>" : ""}</div>
       <div class="desc">${esc(def.desc)}</div>
-      <div class="lvl">${lvl ? `Level ${lvl}/5${cdStr}` : "LOCKED"}</div></div>`;
+      <div class="lvl">${lvl ? `Level ${lvl}/${MAX_LVL}${cdStr}` : "LOCKED"}</div></div>`;
     const btns = el("div", null, "");
     btns.style.cssText = "display:flex;flex-direction:column;gap:6px";
     if (cost !== null) {
@@ -585,10 +628,14 @@ export function showRankedResult(m, s) {
 
 export function showStoryResult(m, ctx) {
   if (m.won && ctx.finale) {
-    modal(`<h2>WORLD #1 👑</h2><div class="big-emoji">🏆</div>
+    modal(`<h2>THE STORY ENDS 👑</h2><div class="big-emoji">🏆</div>
       <p style="font-style:italic">${esc(FINALE)}</p>
-      <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
-      [{ label: "Roll credits 🎾", fn: () => { buildStory(); showScreen("story"); } }]);
+      ${rankMove(ctx.rank)}
+      <p class="money-pop">+${fmtMoney(m.earnings)}</p>
+      <div class="modal-story"><div class="ms-tag">🏆 ONE THING LEFT</div>
+        <div class="ms-line">Beating Voss made your name — but the rankings are earned on tour. The <b>World Cup</b> is open to you now, and that is where #1 actually lives.</div></div>`,
+      [{ label: "To the World Cup 🏆", fn: () => { buildTourn(); showScreen("tourn"); } },
+       { label: "Roll credits 🎾", cls: "ghost", fn: () => { buildStory(); showScreen("story"); } }]);
     return;
   }
   if (m.won) {
@@ -635,17 +682,23 @@ export function showDailyResult(m, ctx) {
 
 export function showTournResult(m, ctx) {
   if (!m.won) {
+    const ts = ctx.tstate;
+    const champ = ts && ts.championIdx !== null && ts.championIdx !== undefined
+      ? ts.field[ts.championIdx] : null;
     modal(`<h2>OUT OF THE CUP</h2><div class="big-emoji">🫗</div>
-      <p>${esc(m.opp.name)} sends you packing in the ${ctx.roundName}. The entry fee is a fond memory.</p>
-      <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
+      <p>${esc(m.opp.name)} sends you packing in the ${esc(ctx.roundName)}. The entry fee is a fond memory.</p>
+      ${champ ? `<p class="sub">${champ.face} <b>${esc(champ.name)}</b> went on to win the whole thing.</p>` : ""}
+      <p class="money-pop">+${fmtMoney(m.earnings)}</p>
+      ${ts ? renderBracket(ts) : ""}`,
       [{ label: "Menu", fn: () => { buildMenu(); showScreen("menu"); } }]);
     return;
   }
   if (ctx.champion) {
     modal(`<h2>CUP CHAMPION! ${TOURNAMENTS[ctx.kind].emo}</h2><div class="big-emoji">🏆</div>
-      <p>The ${esc(TOURNAMENTS[ctx.kind].name)} is YOURS${ctx.kind === "local" ? " — kettle and all" : ""}!</p>
+      <p>${esc(TOURNAMENTS[ctx.kind].name)} is YOURS${ctx.kind === "local" ? " — kettle and all" : ""}!</p>
       ${rankMove(ctx.rank)}
-      <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}`,
+      <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}
+      ${ctx.tstate ? renderBracket(ctx.tstate) : ""}`,
       [{ label: "GLORIOUS", fn: () => { buildMenu(); showScreen("menu"); } }]);
   } else {
     showTournBracket(ctx.tstate, () => App.playTournRound());
