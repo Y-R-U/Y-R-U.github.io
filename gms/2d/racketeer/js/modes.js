@@ -18,7 +18,9 @@ export function storyMatch(save) {
   const lvl = storyLevel(n);
   const ch = CHAPTERS[lvl.chapter];
   let opp;
-  if (lvl.boss) {
+  if (lvl.fixed) {
+    opp = { name: lvl.fixed.name, face: lvl.fixed.face, stars: lvl.stars, bio: lvl.fixed.bio };
+  } else if (lvl.boss) {
     opp = { name: lvl.boss.name, face: lvl.boss.face, stars: lvl.stars,
       bio: lvl.boss.bio, boss: !!lvl.boss.boss3000 };
   } else {

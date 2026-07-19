@@ -5,6 +5,7 @@ import { makeMatch, updateMatch, drawMatch } from "./match.js";
 import { bindInput } from "./input.js";
 import * as UI from "./ui.js";
 import * as MODES from "./modes.js";
+import * as STORY from "./story.js";
 import { initAudio, setCrowdLevel, setMuted, isMuted } from "./audio.js";
 import { clearFx } from "./fx.js";
 
@@ -31,6 +32,8 @@ if (params.has("money")) App.save.money = +params.get("money") || App.save.money
 if (params.has("skills")) {             // ?skills=all for testing
   App.save.skills = { power: 3, grunt: 3, heckle: 3, argue: 3, outrageous: 3, underarm: 3, injury: 3, pigeon: 3, racketsmash: 3, crowdwork: 3, zone: 3, luckyballs: 3, netcord: 3 };
   App.save.loadout = ["power", "heckle", "outrageous", "pigeon"];
+  // Slots are story-gated, so a skills soak needs the story progress to match.
+  if (!params.has("level")) App.save.story = Math.max(App.save.story, 40);
 }
 
 function doResize() { resize(canvas); }
@@ -39,8 +42,9 @@ doResize();
 
 /* ---------------- generic match launcher ---------------- */
 function launch(cfg, opp, onOver) {
+  // Only tournaments ask (in playTournament); everything else uses the saved default.
   if (AUTO) cfg.mlen = params.get("mlen") || cfg.mlen || "1g";
-  if (!cfg.mlen) return UI.showMatchLen((len) => { cfg.mlen = len; launch(cfg, opp, onOver); });
+  cfg.mlen = cfg.mlen || App.save.settings?.matchLen || "1g";
   clearFx();
   const gear = career.gearBonus(App.save);
   const hooks = {
@@ -72,6 +76,12 @@ function peekStory() {
 
 function playStory() {
   const { cfg, opp, lvl } = peekStory();
+  // The opening cutscene plays once, before the very first match of the story.
+  if (!AUTO && lvl.n === 1 && !App.save.csStart) {
+    App.save.csStart = true;
+    career.persist(App.save);
+    return UI.showCutscene(STORY.CUTSCENES.start, () => playStory());
+  }
   launch(cfg, opp, (m) => {
     App.save.money += Math.max(0, m.earnings);
     const wasBoss = lvl.isBoss, level = lvl.n;
@@ -81,7 +91,12 @@ function playStory() {
       else App.save.story = level + 1;
       storyRoll = null;
     }
-    UI.showStoryResult(m, { wasBoss: wasBoss && m.won, finale, newChapter });
+    const rank = career.applyStoryRank(App.save, m.won, level);
+    const ctx = { wasBoss: wasBoss && m.won, finale, newChapter, level, rank };
+    const result = () => UI.showStoryResult(m, ctx);
+    const cs = m.won ? (finale ? STORY.CUTSCENES.end : STORY.CUTSCENES[level]) : null;
+    if (cs && !AUTO) UI.showCutscene(cs, result);
+    else result();
   });
 }
 
@@ -121,20 +136,24 @@ function playTournament(kind) {
   App.save.money -= t.entry;
   career.persist(App.save);
   App.tstate = MODES.startTournament(kind);
-  UI.showTournBracket(App.tstate, () => playTournRound());
+  const bracket = () => UI.showTournBracket(App.tstate, () => playTournRound());
+  // Cups are the only mode that asks — every round of the cup uses this length.
+  if (AUTO) bracket();
+  else UI.showMatchLen(() => bracket());
 }
 
 function playTournRound() {
   const ts = App.tstate;
   const { cfg, opp, roundName } = MODES.tournamentMatch(ts);
-  if (ts.round > 0) cfg.mlen = App.save.settings?.matchLen || "1g";
+  cfg.mlen = App.save.settings?.matchLen || "1g";
   launch(cfg, opp, (m) => {
     App.save.money += Math.max(0, m.earnings);
     if (m.won) {
       ts.round++;
       if (ts.round >= 3) {
         App.save.trophies[ts.kind] = (App.save.trophies[ts.kind] || 0) + 1;
-        UI.showTournResult(m, { kind: ts.kind, champion: true });
+        const rank = career.applyCupRank(App.save, ts.kind);
+        UI.showTournResult(m, { kind: ts.kind, champion: true, rank });
         App.tstate = null;
       } else {
         UI.showTournResult(m, { tstate: ts, kind: ts.kind });
@@ -155,6 +174,8 @@ function newDemo() {
     skills: { power: 3, grunt: 3, outrageous: 3, heckle: 2 },
     loadout: ["power", "grunt", "outrageous", "heckle"],
     racket: "graph", shoes: "run",
+    story: 100, storyDone: true,      // demo players have every skill slot
+
     bestSpeed: 999,                   // never fires record banners on the menu
     settings: App.save.settings || {},
   });
@@ -201,8 +222,8 @@ function boot() {
     App.save.seenIntro = true;
     career.persist(App.save);
     UI.modal(`<h2>RACKETEER</h2><div class="big-emoji">🎾</div>
-      <p>You are <b>unranked</b>. Not "low ranked" — the rankings do not know you exist.</p>
-      <p>Climb from the car park to <b>World #1</b> using tennis, and when tennis fails: heckling, pigeons, fake injuries and sheer audacity.</p>`,
+      <p>You are <b>unranked</b>, unfit, and two pints into a Tuesday.</p>
+      <p>A 63-year-old at the bar says he was world #4 in 1987, and bets he can still beat you. Climb from that pub court to <b>World #1</b> using tennis — and when tennis fails: heckling, pigeons, fake injuries and sheer audacity.</p>`,
       [{ label: "LET'S GO", fn: () => { UI.buildMenu(); UI.showScreen("menu"); } }]);
   } else {
     UI.buildMenu();
@@ -245,4 +266,6 @@ function frame(now) {
 requestAnimationFrame(frame);
 boot();
 
-window.__game = App;   // test hook
+window.__game = App;   // test hooks
+window.__ui = UI;
+window.__c = career;

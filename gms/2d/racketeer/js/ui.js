@@ -4,7 +4,7 @@ import { SKILLS, SKILL_ORDER, upgradeCost } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
 import { canUseSkill, useSkill, scoreLine } from "./match.js";
-import { CHAPTERS, INTRO, FINALE, storyLevel } from "./story.js";
+import { CHAPTERS, INTRO, FINALE, storyLevel, CUTSCENES } from "./story.js";
 import { TOURNAMENTS, todayStr, dailyMatch } from "./modes.js";
 
 const $ = (id) => document.getElementById(id);
@@ -52,12 +52,15 @@ export function buildMenu() {
 
   s.appendChild(el("div", "title-logo mini",
     `<h1>RACKETEER</h1><div class="tag">Cheat your way to World&nbsp;#1 🎾</div>`));
+  s.appendChild(el("div", "home-chip left", `🏅 ${fmtRank(save.rank).replace("Rank ", "#")}`));
+  s.appendChild(el("div", "home-chip right", `💰 ${fmtMoney(save.money)}`));
 
   const go = (builder, screen) => { initAudio(); sfx.click(); builder(); showScreen(screen); };
+  const qStars = career.quickStars(save);
   const L = [
     { emo: "📖", lab: "STORY", sub: save.storyDone ? "DONE 🏆" : `${Math.min(100, save.story)}/100`,
       fn: () => go(buildStory, "story") },
-    { emo: "🏅", lab: "RANKED", sub: fmtRank(save.rank).replace("Rank ", "#").replace("Unranked", "—"),
+    { emo: "🤝", lab: "FRIENDLY", sub: `${save.wins}W-${save.losses}L`,
       fn: () => go(buildRanked, "career") },
     { emo: "🏆", lab: "CUPS", sub: `${save.trophies.local + save.trophies.national + save.trophies.world} 🏆`,
       fn: () => go(buildTourn, "tourn") },
@@ -66,7 +69,7 @@ export function buildMenu() {
   const R = [
     { emo: "📅", lab: "DAILY", sub: dailyDone ? "✅" : dailyMatch().mod.emo,
       fn: () => { initAudio(); sfx.click(); confirmDaily(); } },
-    { emo: "⚡", lab: "QUICK", sub: "vs ★",
+    { emo: "⚡", lab: "QUICK", sub: qStars ? "vs ★" : "🔒 lv5",
       fn: () => { initAudio(); sfx.click(); pickQuick(); } },
     { emo: "🃏", lab: "SKILLS", sub: "🛒",
       fn: () => go(buildShop, "shop") },
@@ -154,12 +157,40 @@ export function showMatchLen(onPick) {
     })));
 }
 
+/* ---------------- Cutscenes ---------------- */
+const csLine = (l) => l.who
+  ? `<div class="cs-line"><span class="cs-face">${l.face || "🙂"}</span><span class="cs-body"><b class="cs-who">${esc(l.who)}</b>${esc(l.txt)}</span></div>`
+  : `<div class="cs-line cs-narr">${esc(l.txt)}</div>`;
+
+// Plays a cutscene one line per tap. onDone fires on the last line or Skip.
+export function showCutscene(cs, onDone) {
+  if (!cs) return onDone && onDone();
+  const done = () => onDone && onDone();
+  const render = (i) => {
+    const shown = cs.lines.slice(0, i + 1).map(csLine).join("");
+    const last = i >= cs.lines.length - 1;
+    modal(`<div class="cs-head"><span class="cs-bg">${cs.bg || "🎾"}</span>
+        <h2 class="cs-title">${esc(cs.title)}</h2></div>
+      <div class="cutscene">${shown}</div>`,
+      last ? [{ label: "Continue ▶", fn: done }]
+           : [{ label: "▶", fn: () => render(i + 1) },
+              { label: "Skip", cls: "ghost", fn: done }]);
+    const box = document.querySelector(".cutscene");
+    if (box) box.scrollTop = box.scrollHeight;
+  };
+  render(0);
+}
+
 /* ---------------- Storybook (read the tale so far) ---------------- */
 export function showStorybook(all) {
   const save = App.save;
   const upto = all || save.storyDone ? 100 : Math.min(100, save.story);
+  const scene = (cs) => cs
+    ? `<div class="sb-cs"><div class="sb-cs-title">${cs.bg} ${esc(cs.title)}</div>${cs.lines.map(csLine).join("")}</div>`
+    : "";
   let html = `<h2>📖 The Story So Far</h2><div class="storybook">`;
   html += `<div class="sb-line sb-intro">${esc(INTRO)}</div>`;
+  html += scene(CUTSCENES.start);
   for (let c = 0; c < CHAPTERS.length; c++) {
     const first = c * 10 + 1;
     if (first > upto && !all) break;
@@ -169,10 +200,15 @@ export function showStorybook(all) {
       if (n > upto && !all) break;
       const lv = storyLevel(n);
       html += `<div class="sb-line">${lv.isBoss ? "⚔️ " : ""}<b>${n}.</b> ${esc(lv.line)}</div>`;
+      if (n < upto || all || save.storyDone) html += scene(CUTSCENES[n]);
     }
   }
-  if (all || save.storyDone) html += `<div class="sb-line sb-intro">${esc(FINALE)}</div>`;
-  else html += `<div class="sb-line sb-more">…to be continued. Win level ${Math.min(100, save.story)} to write the next line.</div>`;
+  if (all || save.storyDone) {
+    html += scene(CUTSCENES.end);
+    html += `<div class="sb-line sb-intro">${esc(FINALE)}</div>`;
+  } else {
+    html += `<div class="sb-line sb-more">…to be continued. Win level ${Math.min(100, save.story)} to write the next line.</div>`;
+  }
   html += `</div>`;
   modal(html, [{ label: "Close" }]);
 }
@@ -234,17 +270,17 @@ export function buildStory() {
   s.appendChild(book);
 }
 
-/* ---------------- Ranked (the original career ladder) ---------------- */
+/* ---------------- Friendly ladder (venue tour — doesn't move world rank) ---------------- */
 export function buildRanked() {
   const save = App.save;
   const tier = career.currentTier(save);
   const opp = career.nextOpponent(save);
   const s = $("scr-career");
   s.innerHTML = "";
-  hdr(s, "Ranked", () => { buildMenu(); showScreen("menu"); });
+  hdr(s, "Friendly Match", () => { buildMenu(); showScreen("menu"); });
 
-  s.appendChild(el("div", "card", `<div class="sub">World ranking</div><div class="rank-big">${fmtRank(save.rank)}</div>
-    <div class="sub">${save.champion ? "🏆 UNDISPUTED CHAMPION OF EVERYTHING" : `${save.wins}W – ${save.losses}L`}</div>`));
+  s.appendChild(el("div", "card", `<div class="sub">Friendlies: cash and bragging rights, no ranking points — climb the world rankings in <b>Story</b> and <b>Cups</b>.</div>
+    <div class="sub" style="margin-top:4px">${save.champion ? "🏆 CONQUERED EVERY VENUE" : `Record: ${save.wins}W – ${save.losses}L`}</div>`));
 
   const tc = el("div", "card");
   tc.innerHTML = `<h3>${esc(tier.name)} ${tier.boss ? "🤖" : ""}</h3>
@@ -314,12 +350,26 @@ function confirmDaily() {
 }
 
 function pickQuick() {
+  const save = App.save;
+  const stars = career.quickStars(save);
+  if (!stars) {
+    modal(`<h2>⚡ Quick Match</h2><div class="big-emoji">🔒</div>
+      <p>Ray shakes his head. <i>"Exhibitions? You've barely left the pub."</i></p>
+      <p>Reach <b>story level ${career.STAR_UNLOCKS[0]}</b> to unlock quick matches.</p>`,
+      [{ label: "Back to the story 📖", fn: () => { buildStory(); showScreen("story"); } },
+       { label: "OK", cls: "ghost" }]);
+    return;
+  }
   modal(`<h2>⚡ Quick Match</h2><p>Pick your poison. Tougher = richer.</p>`,
-    [1, 2, 3, 4, 5].map(st => ({
-      label: "★".repeat(st) + "☆".repeat(5 - st),
-      cls: st > 1 ? "ghost" : "",
-      fn: () => App.playQuick(st + Math.random() * 0.4 - 0.2),
-    })));
+    [1, 2, 3, 4, 5].map(st => {
+      const locked = st > stars;
+      return {
+        label: "★".repeat(st) + "☆".repeat(5 - st) +
+          (locked ? ` <span class="btn-sub">🔒 Unlock: story lv${career.STAR_UNLOCKS[st - 1]}</span>` : ""),
+        cls: (st > 1 ? "ghost" : "") + (locked ? " locked-btn" : ""),
+        fn: () => { if (locked) { sfx.boo(); pickQuick(); } else App.playQuick(st + Math.random() * 0.4 - 0.2); },
+      };
+    }));
 }
 
 /* ---------------- Skills shop + loadout ---------------- */
@@ -332,7 +382,9 @@ export function buildShop() {
   gearBtn.style.marginBottom = "12px";
   gearBtn.onclick = () => { sfx.click(); buildGear(); showScreen("loadout"); };
   s.appendChild(gearBtn);
-  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. Equip up to <b>4 active skills</b> — tap ✔ to toggle. Passives are always on. Levels lower cooldowns and raise power.</div>`));
+  const slots = career.skillSlots(save);
+  const nextSlot = career.SLOT_UNLOCKS[slots];
+  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. You have <b>${slots} skill slot${slots > 1 ? "s" : ""}</b>${nextSlot ? ` (next at story lv${nextSlot})` : " (max)"} — tap ✔ to toggle. Passives are always on. Levels lower cooldowns and raise power.</div>`));
 
   for (const id of SKILL_ORDER) {
     const def = SKILLS[id];
@@ -354,7 +406,7 @@ export function buildShop() {
         initAudio();
         save.money -= cost;
         save.skills[id] = lvl + 1;
-        if (lvl === 0 && def.type === "active" && save.loadout.length < 4) save.loadout.push(id);
+        if (lvl === 0 && def.type === "active" && save.loadout.length < slots) save.loadout.push(id);
         career.persist(save);
         sfx.cash();
         buildShop();
@@ -365,7 +417,7 @@ export function buildShop() {
       const eq = el("button", "buy" + (equipped ? " equip-on" : ""), equipped ? "✔ ON" : "EQUIP");
       eq.onclick = () => {
         if (equipped) save.loadout = save.loadout.filter(x => x !== id);
-        else if (save.loadout.length < 4) save.loadout.push(id);
+        else if (save.loadout.length < slots) save.loadout.push(id);
         else { sfx.boo(); return; }
         career.persist(save); sfx.click(); buildShop();
       };
@@ -439,7 +491,19 @@ export const matchHooks = {
   onSkillDock(m) {
     const dock = $("skillDock");
     dock.innerHTML = "";
-    for (const id of m.save.loadout) {
+    const slots = career.skillSlots(m.save);
+    for (let i = 0; i < career.SLOT_UNLOCKS.length; i++) {
+      if (i >= slots) {
+        dock.appendChild(el("button", "skill-btn slot-locked",
+          `<span>🔒</span><span class="sk-name">LVL ${career.SLOT_UNLOCKS[i]}</span>`));
+        continue;
+      }
+      const id = m.save.loadout[i];
+      if (!id) {
+        dock.appendChild(el("button", "skill-btn slot-empty",
+          `<span>＋</span><span class="sk-name">EMPTY</span>`));
+        continue;
+      }
       const def = SKILLS[id];
       const cooling = m.cooldowns[id] && m.time < m.cooldowns[id];
       const badge = cooling ? `<span class="sk-cost">${Math.ceil(m.cooldowns[id] - m.time)}s</span>`
@@ -463,23 +527,37 @@ export const matchHooks = {
 const statLine = (m) =>
   `<p style="font-size:12px;opacity:.75">Winners: ${m.stats.winners} · Aces: ${m.stats.aces} · Outrageous: ${m.stats.outrageous} · Longest rally: ${m.stats.longestRally}${m.stats.topSpeed ? ` · 🚀 ${fmtSpeed(m.stats.topSpeed, App.save.settings?.units || "kph")}` : ""}</p>`;
 
+// Story + cup wins are the only things that move the world ranking.
+const rankMove = (r) => {
+  if (!r || r.newRank === r.oldRank) return "";
+  if (r.oldRank === null) return `<p>You are officially ranked!<br><span class="rank-big" style="font-size:26px">${fmtRank(r.newRank)}</span></p>`;
+  if (r.newRank > r.oldRank) return `<p style="font-size:12px;opacity:.75">World rank slips to <b>${fmtRank(r.newRank)}</b>.</p>`;
+  return `<p>World rank: <b>${fmtRank(r.oldRank)}</b> → <span class="rank-big" style="font-size:26px">${fmtRank(r.newRank)}</span> 🏅</p>`;
+};
+
+// Winning story level N takes you to N+1, which may cross an unlock threshold.
+function unlockNote(level) {
+  const reached = (level || 0) + 1;
+  const bits = [];
+  const slot = career.SLOT_UNLOCKS.indexOf(reached);
+  if (slot > 0) bits.push(`🃏 <b>Skill slot ${slot + 1}</b> unlocked!`);
+  const star = career.STAR_UNLOCKS.indexOf(reached);
+  if (star >= 0) bits.push(`⚡ Quick Match <b>${"★".repeat(star + 1)}</b> unlocked!`);
+  return bits.length ? `<p style="color:#ffd479;font-weight:800">${bits.join("<br>")}</p>` : "";
+}
+
 export function showRankedResult(m, s) {
   let html;
   if (m.won) {
-    let rankLine;
-    if (s.firstRank) rankLine = `You are now officially ranked!<br><span class="rank-big">#1,000,000</span><br><span style="font-size:11px;opacity:.7">(There are 999,999 better players. For now.)</span>`;
-    else if (s.champion) rankLine = `<span class="rank-big">WORLD #1 🏆</span><br>THE BALL MACHINE HAS BEEN UNPLUGGED.`;
-    else rankLine = `Rank: <b>${fmtRank(s.oldRank)}</b> → <span class="rank-big" style="font-size:26px">${fmtRank(s.newRank)}</span>`;
-    html = `<h2>${s.champion ? "CHAMPION!!!" : "VICTORY!"}</h2>
+    html = `<h2>${s.champion ? "EVERY VENUE CONQUERED!" : "VICTORY!"}</h2>
       <div class="big-emoji">${s.champion ? "🏆" : "🎉"}</div>
-      <p>${rankLine}</p>
+      <p>${esc(m.opp.name)} shakes your hand. A friendly — no ranking points, all bragging rights.</p>
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}
-      ${s.tierUp ? `<p style="color:#7ee6a1;font-weight:800">PROMOTED: ${esc(career.currentTier(App.save).name)}!</p>` : ""}`;
+      ${s.tierUp ? `<p style="color:#7ee6a1;font-weight:800">NEW VENUE: ${esc(career.currentTier(App.save).name)}!</p>` : ""}`;
   } else {
     html = `<h2>Defeat...</h2><div class="big-emoji">😩</div>
-      <p>${esc(m.opp.name)} takes it. The crowd files out quietly.</p>
-      <p class="money-pop">+${fmtMoney(m.earnings)} <span style="font-size:11px;color:#fff;opacity:.6">(appearance money)</span></p>
-      <p style="font-size:12px;opacity:.75">Rank slips to <b>${fmtRank(s.newRank)}</b>.</p>`;
+      <p>${esc(m.opp.name)} takes it. Only a friendly — your ranking never noticed.</p>
+      <p class="money-pop">+${fmtMoney(m.earnings)} <span style="font-size:11px;color:#fff;opacity:.6">(appearance money)</span></p>`;
   }
   modal(html, [
     { label: "Continue", fn: () => { buildMenu(); showScreen("menu"); } },
@@ -489,7 +567,7 @@ export function showRankedResult(m, s) {
 
 export function showStoryResult(m, ctx) {
   if (m.won && ctx.finale) {
-    modal(`<h2>WORLD #1 🌕</h2><div class="big-emoji">🏆</div>
+    modal(`<h2>WORLD #1 👑</h2><div class="big-emoji">🏆</div>
       <p style="font-style:italic">${esc(FINALE)}</p>
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
       [{ label: "Roll credits 🎾", fn: () => { buildStory(); showScreen("story"); } }]);
@@ -501,6 +579,8 @@ export function showStoryResult(m, ctx) {
     modal(`<h2>${ctx.wasBoss ? "CHAPTER CLEARED!" : "VICTORY!"}</h2>
       <div class="big-emoji">${ctx.wasBoss ? "⚔️" : "🎉"}</div>
       ${ctx.wasBoss ? `<p style="color:#7ee6a1;font-weight:800">${esc(CHAPTERS[Math.min(9, ctx.newChapter)].emo + " " + CHAPTERS[Math.min(9, ctx.newChapter)].name)} unlocked!</p>` : ""}
+      ${unlockNote(ctx.level)}
+      ${rankMove(ctx.rank)}
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}
       <div class="modal-story"><div class="ms-tag">${nextCh.emo} LEVEL ${nextLvl.n}</div>
         <div class="ms-line">${nextLvl.isBoss ? "⚔️ " : ""}${esc(nextLvl.line)}</div></div>`,
@@ -509,6 +589,7 @@ export function showStoryResult(m, ctx) {
   } else {
     modal(`<h2>Defeat...</h2><div class="big-emoji">😩</div>
       <p>${esc(m.opp.name)} halts the story. For now.</p>
+      ${rankMove(ctx.rank)}
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>`,
       [{ label: "RETRY ⟳", fn: () => App.playStory() },
        { label: "Menu", cls: "ghost", fn: () => { buildMenu(); showScreen("menu"); } }]);
@@ -545,6 +626,7 @@ export function showTournResult(m, ctx) {
   if (ctx.champion) {
     modal(`<h2>CUP CHAMPION! ${TOURNAMENTS[ctx.kind].emo}</h2><div class="big-emoji">🏆</div>
       <p>The ${esc(TOURNAMENTS[ctx.kind].name)} is YOURS${ctx.kind === "local" ? " — kettle and all" : ""}!</p>
+      ${rankMove(ctx.rank)}
       <p class="money-pop">+${fmtMoney(m.earnings)}</p>${statLine(m)}`,
       [{ label: "GLORIOUS", fn: () => { buildMenu(); showScreen("menu"); } }]);
   } else {

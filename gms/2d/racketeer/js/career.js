@@ -1,5 +1,5 @@
 import { SAVE_KEY, TIERS, RACKETS, SHOES, OUTFITS } from "./const.js";
-import { makeOpponent, firstOpponent, rankDropForWin } from "./names.js";
+import { makeOpponent, firstOpponent } from "./names.js";
 import { lerp, rand } from "./util.js";
 
 export function newSave() {
@@ -13,6 +13,7 @@ export function newSave() {
     opp: null,                                        // pending opponent (persisted so it doesn't reroll)
     seenIntro: false,
     story: 1, storyDone: false,                       // story mode progress (level 1..100)
+    csStart: false,                                   // opening cutscene seen
     trophies: { local: 0, national: 0, world: 0 },
     dailyWin: null,                                   // date string of last daily-challenge win
     bestSpeed: 0,                                     // fastest shot ever, km/h
@@ -23,9 +24,61 @@ export function newSave() {
 export function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return Object.assign(newSave(), JSON.parse(raw));
+    if (raw) {
+      const s = Object.assign(newSave(), JSON.parse(raw));
+      s.loadout = s.loadout.slice(0, skillSlots(s));
+      return s;
+    }
   } catch (e) { /* corrupted save -> fresh */ }
   return newSave();
+}
+
+/* ---- Story-gated unlocks ---- */
+export const SLOT_UNLOCKS = [1, 5, 10, 20];        // story level needed for loadout slot i
+export function skillSlots(save) {
+  if (save.storyDone) return SLOT_UNLOCKS.length;
+  let n = 0;
+  for (const lvl of SLOT_UNLOCKS) if (save.story >= lvl) n++;
+  return Math.max(1, n);
+}
+
+export const STAR_UNLOCKS = [5, 10, 20, 30, 40];   // story level needed for quick-match ★(i+1)
+export function quickStars(save) {                  // 0 = quick match locked entirely
+  if (save.storyDone) return 5;
+  let n = 0;
+  for (const lvl of STAR_UNLOCKS) if (save.story >= lvl) n++;
+  return n;
+}
+
+/* ---- World rank, driven by story + cups (friendlies don't count) ---- */
+// Tuned so the ranking matches the story beats: tour card (~L60) lands around #800,
+// "crack the top 100" (~L75) actually does, and the world #2 (L90) sits at single digits.
+export function rankFromStory(n) {
+  return Math.max(2, Math.round(Math.pow(10, 6 * Math.pow((100 - n) / 99, 0.8))));
+}
+
+// Story result → rank movement. Returns {oldRank, newRank}.
+export function applyStoryRank(save, won, level) {
+  const oldRank = save.rank;
+  if (won) {
+    const r = level >= 100 ? 1 : rankFromStory(level);
+    save.rank = save.rank === null ? Math.min(1000000, r) : Math.min(save.rank, r);
+  } else if (save.rank !== null) {
+    save.rank = Math.min(1000000, Math.round(save.rank * rand(1.03, 1.1)));
+  }
+  persist(save);
+  return { oldRank, newRank: save.rank };
+}
+
+const CUP_RANK_FLOOR = { local: 20000, national: 2000, world: 50 };
+
+// Winning a whole cup halves your rank number, down to the cup's floor.
+export function applyCupRank(save, kind) {
+  const oldRank = save.rank;
+  const cur = save.rank === null ? 1000000 : save.rank;
+  save.rank = Math.min(cur, Math.max(CUP_RANK_FLOOR[kind] || 20000, Math.round(cur * 0.5)));
+  persist(save);
+  return { oldRank, newRank: save.rank };
 }
 
 export function persist(save) {
@@ -52,37 +105,22 @@ export function nextOpponent(save) {
   return opp;
 }
 
-// Apply a match result. Returns a summary object for the UI.
+// Apply a FRIENDLY match result (tier ladder progress only — friendlies never move
+// world rank; that's earned in story mode and cups). Returns a summary for the UI.
 export function applyResult(save, won, earnings) {
   const tier = currentTier(save);
-  const sum = { won, earnings, oldRank: save.rank, newRank: save.rank, tierUp: false, champion: false };
+  const sum = { won, earnings, tierUp: false, champion: false };
   save.money += earnings;
   save.opp = null;
   if (won) {
     save.wins++;
     save.tierMatch++;
-    // Rank movement
-    if (save.rank === null) { save.rank = 1000000; sum.newRank = 1000000; sum.firstRank = true; }
-    else {
-      const target = tier.rankEnd;
-      const left = tier.matches - save.tierMatch + 1;
-      save.rank = rankDropForWin(save.rank, target, left);
-      sum.newRank = save.rank;
-    }
     if (save.tierMatch >= tier.matches) {
-      save.rank = tier.rankEnd;
-      sum.newRank = save.rank;
       if (save.tier >= TIERS.length - 1) { save.champion = true; sum.champion = true; }
       else { save.tier++; save.tierMatch = 0; sum.tierUp = true; }
     }
   } else {
     save.losses++;
-    // Losing stings a little: rank drifts up (worse), never past tier start
-    if (save.rank !== null) {
-      const cap = tier.rankStart || 1000000;
-      save.rank = Math.min(cap, Math.round(save.rank * rand(1.05, 1.18)));
-      sum.newRank = save.rank;
-    }
   }
   persist(save);
   return sum;

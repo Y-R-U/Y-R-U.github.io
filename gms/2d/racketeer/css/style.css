@@ -171,7 +171,7 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 /* Live menu: AI exhibition visible behind edge buttons */
 #scr-menu { background: linear-gradient(rgba(6,16,10,.72) 0%, rgba(6,16,10,.18) 26%,
   rgba(6,16,10,.05) 55%, rgba(6,16,10,.55) 100%); overflow: hidden; padding: 0; }
-.title-logo.mini { margin-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+.title-logo.mini { margin-top: calc(env(safe-area-inset-top, 0px) + 48px); }  /* clears the rank/cash chips */
 .title-logo.mini h1 { font-size: 30px; }
 .title-logo.mini .tag { font-size: 11px; }
 .menu-col { position: absolute; top: 50%; transform: translateY(-58%);
@@ -190,3 +190,41 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .menu-bot { position: absolute; left: 0; right: 0;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
   display: flex; gap: 10px; justify-content: center; align-items: center; }
+
+/* ---- Home screen rank + money chips ---- */
+.home-chip { position:absolute; top: calc(env(safe-area-inset-top, 0px) + 10px);
+  font-size:11px; font-weight:800; padding:5px 9px; border-radius:11px;
+  background:rgba(0,0,0,.42); border:1px solid rgba(255,255,255,.16); color:#ffe24a;
+  backdrop-filter:blur(3px); white-space:nowrap; max-width:42%; overflow:hidden; text-overflow:ellipsis; }
+.home-chip.left  { left:  calc(env(safe-area-inset-left, 0px) + 10px); }
+.home-chip.right { right: calc(env(safe-area-inset-right, 0px) + 10px); color:#7ee6a1; }
+
+/* ---- Locked / empty skill slots in the match dock ---- */
+.skill-btn.slot-locked, .skill-btn.slot-empty {
+  pointer-events:none; opacity:.42; background:rgba(0,0,0,.3);
+  border-style:dashed; border-color:rgba(255,255,255,.22); box-shadow:none; }
+.skill-btn.slot-locked .sk-name { font-size:8px; letter-spacing:.2px; }
+.btn.locked-btn { opacity:.45; filter:grayscale(.7); }
+
+/* ---- Cutscenes ---- */
+.cs-head { display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:6px; }
+.cs-head .cs-bg { font-size:30px; }
+.cs-head .cs-title { font-size:19px; margin:0; }
+.cutscene { max-height:52vh; overflow-y:auto; text-align:left; margin-top:6px;
+  padding-right:4px; -webkit-overflow-scrolling:touch; }
+.cs-line { display:flex; gap:9px; align-items:flex-start; margin:9px 0;
+  font-size:14px; line-height:1.45; animation:csIn .18s ease-out; }
+.cs-line .cs-face { font-size:26px; line-height:1.1; flex:0 0 auto; }
+.cs-line .cs-body { flex:1; }
+.cs-line .cs-who { display:block; font-size:10px; letter-spacing:1.3px;
+  font-weight:800; color:#ffd34a; margin-bottom:1px; }
+.cs-line.cs-narr { font-style:italic; opacity:.72; font-size:13px; padding-left:2px; }
+@keyframes csIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+/* ---- Cutscenes inside the storybook ---- */
+.storybook .sb-cs { margin:10px 0 12px; padding:9px 11px; border-radius:12px;
+  background:rgba(255,255,255,.05); border-left:3px solid #ffd34a; }
+.storybook .sb-cs-title { font-size:11px; letter-spacing:1.2px; font-weight:800;
+  color:#ffd34a; margin-bottom:4px; text-transform:uppercase; }
+.storybook .sb-cs .cs-line { margin:6px 0; font-size:13px; }
+.storybook .sb-cs .cs-face { font-size:20px; }
