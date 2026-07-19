@@ -17,7 +17,7 @@ export function newSave() {
     trophies: { local: 0, national: 0, world: 0 },
     dailyWin: null,                                   // date string of last daily-challenge win
     bestSpeed: 0,                                     // fastest shot ever, km/h
-    settings: { units: "kph" },
+    settings: { units: "kph", haptics: true },
   };
 }
 

@@ -6,7 +6,8 @@ import { bindInput } from "./input.js";
 import * as UI from "./ui.js";
 import * as MODES from "./modes.js";
 import * as STORY from "./story.js";
-import { initAudio, setCrowdLevel, setMuted, isMuted } from "./audio.js";
+import { initAudio, setCrowdLevel, setMuted, isMuted, sfx } from "./audio.js";
+import { setHaptics, setHapticsSilent } from "./haptics.js";
 import { clearFx } from "./fx.js";
 
 const canvas = document.getElementById("game");
@@ -35,6 +36,8 @@ if (params.has("skills")) {             // ?skills=all for testing
   // Slots are story-gated, so a skills soak needs the story progress to match.
   if (!params.has("level")) App.save.story = Math.max(App.save.story, 40);
 }
+
+setHaptics(App.save.settings?.haptics !== false);
 
 function doResize() { resize(canvas); }
 window.addEventListener("resize", doResize);
@@ -133,13 +136,17 @@ function playDaily() {
 function playTournament(kind) {
   const t = MODES.TOURNAMENTS[kind];
   if (App.save.money < t.entry) return;
-  App.save.money -= t.entry;
-  career.persist(App.save);
-  App.tstate = MODES.startTournament(kind);
-  const bracket = () => UI.showTournBracket(App.tstate, () => playTournRound());
-  // Cups are the only mode that asks — every round of the cup uses this length.
-  if (AUTO) bracket();
-  else UI.showMatchLen(() => bracket());
+  // Charge the entry fee only once the length is confirmed — cancelling costs nothing.
+  const begin = () => {
+    App.save.money -= t.entry;
+    sfx.cash();
+    career.persist(App.save);
+    App.tstate = MODES.startTournament(kind);
+    UI.showTournBracket(App.tstate, () => playTournRound());
+  };
+  // Cups are the only mode that asks; every round of the cup uses this length.
+  if (AUTO) begin();
+  else UI.showMatchLen(begin, () => { UI.buildTourn(); UI.showScreen("tourn"); });
 }
 
 function playTournRound() {
@@ -250,9 +257,9 @@ function frame(now) {
       if (!App.demo || demoWait > 2.5) { demoWait = 0; newDemo(); }
     }
     if (App.demo && menuVisible && !App.demo.over) {
-      const was = isMuted(); setMuted(true);
+      const was = isMuted(); setMuted(true); setHapticsSilent(true);
       updateMatch(App.demo, dt);
-      setMuted(was);
+      setMuted(was); setHapticsSilent(false);
       drawMatch(App.demo, ctx);
     } else if (App.demo && menuVisible) {
       drawMatch(App.demo, ctx);

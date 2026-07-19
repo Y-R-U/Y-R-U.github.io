@@ -11,6 +11,7 @@ import { skillFx, skillCd, SKILLS } from "./skills.js";
 import * as NAMES from "./names.js";
 import * as EV from "./events.js";
 import { aiUpdate, aiBetweenPoints } from "./ai.js";
+import { haptic } from "./haptics.js";
 
 const YOU_Y = 1.1, OPP_Y = COURT.L - 1.1;
 const SERVE_WINDOW = 0.4;      // s of grace around ideal serve contact
@@ -191,7 +192,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
   setState(byYou ? m.you : m.oppP, "serve");
   sfx.pock(1 + quality);
-  if (byYou) recordSpeed(m, v, true);        // serve speed always shown — it's tennis law
+  if (byYou) { haptic.serve(); recordSpeed(m, v, true); }   // serve speed always shown — it's tennis law
   m.ballTo = byYou ? "opp" : "you";
   scheduleContact(m);
   m.state = "rally"; m.stateT = 0;
@@ -300,6 +301,7 @@ function endPoint(m, winner, why) {
     earn(m, base, m.you.x, YOU_Y);
     setState(m.you, "celebrate"); setState(m.oppP, "sad");
     sfx.cheer(0.7 + m.hype / 150);
+    if (why === "ace") haptic.ace(); else haptic.pointWon();
     if (why === "ace") { m.stats.aces++; sayBanner(m, pick(NAMES.COMMENT_ACE), "#ffe24a"); }
     else if (why === "winner") { m.stats.winners++; sayBanner(m, pick(NAMES.COMMENT_WINNER), "#7ee6a1", 1.1); }
     else if (why === "oppError") ticker(m, pick(NAMES.COMMENT_ERROR));
@@ -308,6 +310,7 @@ function endPoint(m, winner, why) {
     m.oppComp = clamp(m.oppComp + 2, 0, 100);
     m.comp = clamp(m.comp - (why === "youError" ? METERS.COMP_ERR_PENALTY : 3), 5, 100);
     setState(m.oppP, "celebrate"); setState(m.you, "sad");
+    haptic.pointLost();
     if (why === "youError") { sfx.gasp(); ticker(m, pick(NAMES.COMMENT_ERROR)); }
     else sfx.cheer(0.3);
     if (m.opp.boss && Math.random() < 0.4) sayBanner(m, pick(NAMES.BOSS_LINES), "#ff5c5c", 0.9);
@@ -322,7 +325,7 @@ function endPoint(m, winner, why) {
 function settleGame(m) {
   if (!m.pendingGame) return false;
   const youGame = m.pendingGame === "you";
-  if (youGame) m.gamesYou++; else m.gamesOpp++;
+  if (youGame) { m.gamesYou++; haptic.gameWon(); } else m.gamesOpp++;
   m.ptsYou = 0; m.ptsOpp = 0;
   m.server = m.server === "you" ? "opp" : "you"; m.serveNum = 1;
   m.pendingGame = null;
@@ -353,6 +356,7 @@ function settleGame(m) {
 
 function finishMatch(m, won) {
   m.over = true; m.won = won; m.state = "matchOver"; m.stateT = 0;
+  if (won) haptic.matchWon(); else haptic.matchLost();
   if (won) {
     m.earnings += Math.round(m.tier.prize * hypeMult(m));
     sfx.fanfare(); setTimeout(() => { if (!m.silent) sfx.cheer(1.5); }, 300);
@@ -473,6 +477,7 @@ function commitSwing(m, dt, aim, curve, swipePow) {
     : q >= 0.45 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffab5c", 0.8]
     : [dt > 0 ? "WAY EARLY!" : "WAY LATE!", "#ff6b6b", 0.85];
   FX.floatText(m.you.x, m.you.y + 1.4, 1.6, fx[0], fx[1], fx[2]);
+  if (q === 1) haptic.perfect(); else haptic.hit(q);
   m.youWindowShrink = 1;
   if (m.zoneShots > 0) m.zoneShots--;
   m.pendingQuality = q;

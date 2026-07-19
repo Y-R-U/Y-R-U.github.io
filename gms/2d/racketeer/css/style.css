@@ -219,6 +219,11 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .cs-line .cs-who { display:block; font-size:10px; letter-spacing:1.3px;
   font-weight:800; color:#ffd34a; margin-bottom:1px; }
 .cs-line.cs-narr { font-style:italic; opacity:.72; font-size:13px; padding-left:2px; }
+/* Already-read lines fade back so the newest one reads as "new". */
+.cutscene .cs-line { transition:opacity .25s ease, filter .25s ease; }
+.cutscene .cs-line.cs-old { opacity:.32; filter:saturate(.5); }
+.cutscene .cs-line.cs-old.cs-narr { opacity:.26; }
+.cutscene .cs-line.cs-old .cs-who { color:#c9b46a; }
 @keyframes csIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
 
 /* ---- Cutscenes inside the storybook ---- */
@@ -228,3 +233,4 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   color:#ffd34a; margin-bottom:4px; text-transform:uppercase; }
 .storybook .sb-cs .cs-line { margin:6px 0; font-size:13px; }
 .storybook .sb-cs .cs-face { font-size:20px; }
+.btn.disabled-row { opacity:.45; }

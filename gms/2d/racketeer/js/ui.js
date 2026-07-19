@@ -3,6 +3,7 @@ import { el, esc, fmtMoney, fmtRank, fmtSpeed } from "./util.js";
 import { SKILLS, SKILL_ORDER, upgradeCost } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
+import { haptic, setHaptics, hapticsOn, supportsHaptics } from "./haptics.js";
 import { canUseSkill, useSkill, scoreLine } from "./match.js";
 import { CHAPTERS, INTRO, FINALE, storyLevel, CUTSCENES } from "./story.js";
 import { TOURNAMENTS, todayStr, dailyMatch } from "./modes.js";
@@ -26,7 +27,7 @@ export function modal(html, buttons) {
   const row = el("div", "row" + (buttons.length > 2 ? " stack" : ""));
   for (const b of buttons) {
     const btn = el("button", "btn " + (b.cls || ""), b.label);
-    btn.onclick = () => { initAudio(); sfx.click(); root.innerHTML = ""; b.fn && b.fn(); };
+    btn.onclick = () => { initAudio(); sfx.click(); haptic.tap(); root.innerHTML = ""; b.fn && b.fn(); };
     row.appendChild(btn);
   }
   box.appendChild(row);
@@ -55,7 +56,7 @@ export function buildMenu() {
   s.appendChild(el("div", "home-chip left", `🏅 ${fmtRank(save.rank).replace("Rank ", "#")}`));
   s.appendChild(el("div", "home-chip right", `💰 ${fmtMoney(save.money)}`));
 
-  const go = (builder, screen) => { initAudio(); sfx.click(); builder(); showScreen(screen); };
+  const go = (builder, screen) => { initAudio(); sfx.click(); haptic.tap(); builder(); showScreen(screen); };
   const qStars = career.quickStars(save);
   const L = [
     { emo: "📖", lab: "STORY", sub: save.storyDone ? "DONE 🏆" : `${Math.min(100, save.story)}/100`,
@@ -114,6 +115,17 @@ function showSettings() {
         } },
       { label: isMuted() ? "🔇 Sound is OFF — turn on" : "🔊 Sound is ON — mute", cls: "ghost",
         fn: () => { setMuted(!isMuted()); showSettings(); } },
+      supportsHaptics()
+        ? { label: hapticsOn() ? "📳 Vibration is ON — turn off" : "📴 Vibration is OFF — turn on", cls: "ghost",
+            fn: () => {
+              setHaptics(!hapticsOn());
+              save.settings.haptics = hapticsOn();
+              career.persist(save);
+              if (hapticsOn()) haptic.pointWon();   // buzz once so you can feel the setting
+              showSettings();
+            } }
+        : { label: "📴 Vibration — not supported here", cls: "ghost disabled-row",
+            fn: () => showSettings() },
       { label: "❓ How to play", cls: "ghost", fn: showHelp },
       { label: "🗑️ Reset career", cls: "danger",
         fn: () => modal(`<h2>Start over?</h2><p>Everything — story, rank, cash, skills, trophies, top speed — wiped. Gary awaits.</p>`,
@@ -141,33 +153,38 @@ export const MATCH_LENS = [
   { id: "set",   name: "1 SET",      sub: "First to 6 games" },
   { id: "match", name: "FULL MATCH", sub: "Best of 3 sets — the real deal" },
 ];
-export function showMatchLen(onPick) {
+export function showMatchLen(onPick, onCancel) {
   const save = App.save;
   const cur = save.settings?.matchLen || "1g";
-  modal(`<h2>🎾 Match length</h2><p class="sub">How long do you want this one to be?</p>`,
-    MATCH_LENS.map(l => ({
-      label: `${l.id === cur ? "▶ " : ""}${l.name} <span class="btn-sub">${l.sub}</span>`,
-      cls: l.id === cur ? "" : "ghost",
-      fn: () => {
-        if (!save.settings) save.settings = {};
-        save.settings.matchLen = l.id;
-        career.persist(save);
-        onPick(l.id);
-      },
-    })));
+  const opts = MATCH_LENS.map(l => ({
+    label: `${l.id === cur ? "▶ " : ""}${l.name} <span class="btn-sub">${l.sub}</span>`,
+    cls: l.id === cur ? "" : "ghost",
+    fn: () => {
+      if (!save.settings) save.settings = {};
+      save.settings.matchLen = l.id;
+      career.persist(save);
+      onPick(l.id);
+    },
+  }));
+  opts.push({ label: "← Cancel", cls: "ghost", fn: () => onCancel && onCancel() });
+  modal(`<h2>🎾 Match length</h2><p class="sub">How long do you want this one to be?</p>`, opts);
 }
 
 /* ---------------- Cutscenes ---------------- */
-const csLine = (l) => l.who
-  ? `<div class="cs-line"><span class="cs-face">${l.face || "🙂"}</span><span class="cs-body"><b class="cs-who">${esc(l.who)}</b>${esc(l.txt)}</span></div>`
-  : `<div class="cs-line cs-narr">${esc(l.txt)}</div>`;
+const csLine = (l, old) => {
+  const dim = old ? " cs-old" : "";
+  return l.who
+    ? `<div class="cs-line${dim}"><span class="cs-face">${l.face || "🙂"}</span><span class="cs-body"><b class="cs-who">${esc(l.who)}</b>${esc(l.txt)}</span></div>`
+    : `<div class="cs-line cs-narr${dim}">${esc(l.txt)}</div>`;
+};
 
-// Plays a cutscene one line per tap. onDone fires on the last line or Skip.
+// Plays a cutscene one line per tap; already-read lines fade back so the newest
+// line is obvious. onDone fires on the last line or Skip.
 export function showCutscene(cs, onDone) {
   if (!cs) return onDone && onDone();
   const done = () => onDone && onDone();
   const render = (i) => {
-    const shown = cs.lines.slice(0, i + 1).map(csLine).join("");
+    const shown = cs.lines.slice(0, i + 1).map((l, j) => csLine(l, j < i)).join("");
     const last = i >= cs.lines.length - 1;
     modal(`<div class="cs-head"><span class="cs-bg">${cs.bg || "🎾"}</span>
         <h2 class="cs-title">${esc(cs.title)}</h2></div>
@@ -319,7 +336,7 @@ export function buildTourn() {
     const enter = el("button", "btn", save.money >= t.entry ? `ENTER — ${fmtMoney(t.entry)}` : `Need ${fmtMoney(t.entry)}`);
     enter.disabled = save.money < t.entry;
     enter.style.marginTop = "10px";
-    enter.onclick = () => { sfx.cash(); App.playTournament(kind); };
+    enter.onclick = () => { sfx.click(); haptic.tap(); App.playTournament(kind); };
     card.appendChild(enter);
     s.appendChild(card);
   }
@@ -360,16 +377,17 @@ function pickQuick() {
        { label: "OK", cls: "ghost" }]);
     return;
   }
-  modal(`<h2>⚡ Quick Match</h2><p>Pick your poison. Tougher = richer.</p>`,
-    [1, 2, 3, 4, 5].map(st => {
-      const locked = st > stars;
-      return {
-        label: "★".repeat(st) + "☆".repeat(5 - st) +
-          (locked ? ` <span class="btn-sub">🔒 Unlock: story lv${career.STAR_UNLOCKS[st - 1]}</span>` : ""),
-        cls: (st > 1 ? "ghost" : "") + (locked ? " locked-btn" : ""),
-        fn: () => { if (locked) { sfx.boo(); pickQuick(); } else App.playQuick(st + Math.random() * 0.4 - 0.2); },
-      };
-    }));
+  const opts = [1, 2, 3, 4, 5].map(st => {
+    const locked = st > stars;
+    return {
+      label: "★".repeat(st) + "☆".repeat(5 - st) +
+        (locked ? ` <span class="btn-sub">🔒 Unlock: story lv${career.STAR_UNLOCKS[st - 1]}</span>` : ""),
+      cls: (st > 1 ? "ghost" : "") + (locked ? " locked-btn" : ""),
+      fn: () => { if (locked) { sfx.boo(); pickQuick(); } else App.playQuick(st + Math.random() * 0.4 - 0.2); },
+    };
+  });
+  opts.push({ label: "← Back", cls: "ghost", fn: () => { buildMenu(); showScreen("menu"); } });
+  modal(`<h2>⚡ Quick Match</h2><p>Pick your poison. Tougher = richer.</p>`, opts);
 }
 
 /* ---------------- Skills shop + loadout ---------------- */
@@ -512,7 +530,7 @@ export const matchHooks = {
       if (!canUseSkill(m, id)) b.classList.add("disabled");
       if (cooling) b.classList.add("cooling");
       if ((id === "power" && m.armedPower) || (id === "outrageous" && m.armedOutrageous) || (id === "grunt" && m.armedGrunt)) b.classList.add("power-armed");
-      const useIt = (e) => { e.preventDefault(); e.stopPropagation(); initAudio(); useSkill(m, id); };
+      const useIt = (e) => { e.preventDefault(); e.stopPropagation(); initAudio(); haptic.tap(); useSkill(m, id); };
       b.addEventListener("touchstart", useIt, { passive: false });
       b.addEventListener("mousedown", useIt);
       dock.appendChild(b);

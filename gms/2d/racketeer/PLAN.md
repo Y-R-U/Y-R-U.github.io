@@ -23,6 +23,20 @@ added to the story victory modal announcing slot/★ unlocks as they happen.
 New test hooks: `window.__ui`, `window.__c`. Scratchpad `check.mjs` + `SCRIPT_FILE=`
 is the harness used for all of the verification below.
 
+### Follow-up pass (same day, Aaron's feedback)
+- Cutscene lines already read now dim (`.cs-old`, opacity .32) so the newest line
+  is obvious; the storybook renders them all at full strength.
+- Quick-match star picker gained "← Back", match-length gained "← Cancel".
+  **Cup entry fees are now charged inside `begin()` AFTER the length is confirmed**
+  — cancelling must never cost money. Every modal in the game now has an exit.
+- `haptics.js`: `navigator.vibrate` wrapper (Android only — iOS Safari has no
+  equivalent, so settings shows "not supported here" rather than a dead toggle).
+  Fires on UI taps, swing quality, serve, point won/lost, game/match end.
+  Stored in `save.settings.haptics`; the menu attract match is silenced via
+  `setHapticsSilent` exactly like `setMuted`.
+- Aaron's note on the intro cutscene: "wasn't what I was expecting, but it will do
+  for now" — if revisiting, that's the piece to rework.
+
 ## Context (do not rediscover)
 
 - Game: `~/cc/yru/site/gms/2d/racketeer/` — vanilla ES modules, NO build step.
