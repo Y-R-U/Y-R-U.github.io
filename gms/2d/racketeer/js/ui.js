@@ -170,6 +170,65 @@ export function showMatchLen(onPick, onCancel) {
   modal(`<h2>🎾 Match length</h2><p class="sub">How long do you want this one to be?</p>`, opts);
 }
 
+/* ---------------- In-match skill swap ---------------- */
+// Reachable between points: tap an empty dock slot, or hold a filled one.
+export function showSkillSwap(m, slot, onClose) {
+  const save = m.save;
+  const cur = save.loadout[slot];
+  const render = () => {
+    const rows = SKILL_ORDER.filter(takesSlot).map((id) => {
+      const def = SKILLS[id];
+      const lvl = save.skills[id] || 0;
+      const at = save.loadout.indexOf(id);
+      const cost = lvl ? null : upgradeCost(id, 0);
+      const poor = cost !== null && save.money < cost;
+      let act, cls = "";
+      if (at === slot) { act = "✔ EQUIPPED"; cls = " sw-on"; }
+      else if (at >= 0) { act = `SWAP (slot ${at + 1})`; }
+      else if (lvl) { act = "EQUIP"; }
+      else { act = `BUY ${fmtMoney(cost)}`; cls = poor ? " sw-poor" : ""; }
+      const sub = lvl ? `Level ${lvl}/${MAX_LVL}${def.cd && def.cd[0] ? ` · ${def.cd[lvl - 1]}s` : def.uses ? ` · ${def.uses}/match` : ""}`
+        : esc(def.desc);
+      return `<button class="sw-row${cls}" data-id="${id}" ${poor ? "disabled" : ""}>
+        <span class="sw-ico">${def.emo}</span>
+        <span class="sw-body"><b>${esc(def.name)}</b><span class="sw-sub">${sub}</span></span>
+        <span class="sw-act">${act}</span></button>`;
+    }).join("");
+    modal(`<h2>Slot ${slot + 1}</h2>
+      <p class="sub">${cur ? `Currently <b>${esc(SKILLS[cur].name)}</b>.` : "Empty."}
+      Pick a skill to put here — buying costs banked cash (${fmtMoney(save.money)}), not this match's winnings.</p>
+      <div class="sw-list">${rows}</div>`,
+      [{ label: "Done", fn: () => onClose && onClose() }]);
+    for (const b of document.querySelectorAll(".sw-row")) {
+      b.onclick = () => {
+        const id = b.dataset.id;
+        const lvl = save.skills[id] || 0;
+        const at = save.loadout.indexOf(id);
+        initAudio(); haptic.tap();
+        if (at === slot) { save.loadout.splice(slot, 1); sfx.click(); }
+        else if (at >= 0) {                                  // swap the two slots over
+          if (slot < save.loadout.length) { save.loadout[at] = save.loadout[slot]; save.loadout[slot] = id; }
+          else { save.loadout.splice(at, 1); save.loadout.push(id); }
+          sfx.click();
+        } else {
+          if (!lvl) {
+            const cost = upgradeCost(id, 0);
+            if (save.money < cost) { sfx.boo(); return; }
+            save.money -= cost; save.skills[id] = 1; sfx.cash();
+          } else sfx.click();
+          // Empty slots are always at the end, so appending keeps the loadout dense.
+          if (slot < save.loadout.length) save.loadout[slot] = id;
+          else save.loadout.push(id);
+        }
+        career.persist(save);
+        matchHooks.onSkillDock(m);
+        render();
+      };
+    }
+  };
+  render();
+}
+
 /* ---------------- Cutscenes ---------------- */
 const csLine = (l, old) => {
   const dim = old ? " cs-old" : "";
@@ -534,6 +593,44 @@ export function buildGear() {
 
 /* ---------------- Match HUD ---------------- */
 let tickerTO = null;
+
+/* Dock long-press: hold a skill between points to swap it out. The dock is rebuilt
+   twice a second, so the press is tracked here rather than on the (doomed) button. */
+const LONG_PRESS_MS = 480;
+let dockPress = null;
+function endDockPress() {
+  if (!dockPress) return;
+  clearTimeout(dockPress.timer);
+  const p = dockPress;
+  dockPress = null;
+  p.btn.classList.remove("holding");
+  if (!p.long) { haptic.tap(); useSkill(p.m, p.id); }   // a short press is just a normal tap
+}
+for (const ev of ["touchend", "touchcancel", "mouseup"]) window.addEventListener(ev, endDockPress);
+
+function openSwap(m, slot) {
+  if (m.state !== "preServe" || m.over) return;
+  m.paused = true;
+  showSkillSwap(m, slot, () => { m.paused = false; matchHooks.onSkillDock(m); });
+}
+
+// Explained once — the first time every slot is full, since that's when tapping an
+// empty slot stops being an option and the hold is the only way in.
+function maybeSwapHint(m, slots) {
+  const save = m.save;
+  if (save.hintSwap || m.autoPilot || m.over) return;
+  if (m.state !== "preServe" || save.loadout.length < slots) return;
+  if ($("modal-root").children.length) return;        // never land on top of another popup
+  save.hintSwap = true;
+  career.persist(save);
+  m.paused = true;
+  modal(`<h2>🃏 Swapping mid-match</h2><div class="big-emoji">👇</div>
+    <p>Your skill slots are full — but you're not stuck with them.</p>
+    <p><b>Between points</b>, hold down any skill in the dock to open the picker and
+    swap it for another, or buy a new one on the spot.</p>
+    <p class="sub">An empty slot just needs a tap.</p>`,
+    [{ label: "Got it", fn: () => { m.paused = false; } }]);
+}
 export const matchHooks = {
   onHud(m) {
     const sc = scoreLine(m);
@@ -555,8 +652,10 @@ export const matchHooks = {
   },
   onSkillDock(m) {
     const dock = $("skillDock");
+    if (dockPress) return;                  // mid long-press: don't rebuild under the finger
     dock.innerHTML = "";
     const slots = career.skillSlots(m.save);
+    const between = m.state === "preServe" && !m.over && !m.autoPilot;
     for (let i = 0; i < career.SLOT_UNLOCKS.length; i++) {
       if (i >= slots) {
         dock.appendChild(el("button", "skill-btn slot-locked",
@@ -565,8 +664,15 @@ export const matchHooks = {
       }
       const id = m.save.loadout[i];
       if (!id) {
-        dock.appendChild(el("button", "skill-btn slot-empty",
-          `<span>＋</span><span class="sk-name">EMPTY</span>`));
+        // Between points an empty slot is a shortcut into the skill picker.
+        const e = el("button", "skill-btn slot-empty" + (between ? " slot-open" : ""),
+          `<span>＋</span><span class="sk-name">${between ? "ADD" : "EMPTY"}</span>`);
+        if (between) {
+          const open = (ev) => { ev.preventDefault(); ev.stopPropagation(); openSwap(m, i); };
+          e.addEventListener("touchstart", open, { passive: false });
+          e.addEventListener("mousedown", open);
+        }
+        dock.appendChild(e);
         continue;
       }
       const def = SKILLS[id];
@@ -577,12 +683,27 @@ export const matchHooks = {
       if (!canUseSkill(m, id)) b.classList.add("disabled");
       if (cooling) b.classList.add("cooling");
       if ((id === "power" && m.armedPower) || (id === "outrageous" && m.armedOutrageous) || (id === "grunt" && m.armedGrunt)) b.classList.add("power-armed");
-      const useIt = (e) => { e.preventDefault(); e.stopPropagation(); initAudio(); haptic.tap(); useSkill(m, id); };
-      b.addEventListener("touchstart", useIt, { passive: false });
-      b.addEventListener("mousedown", useIt);
+      // During a rally the skill fires the instant you touch it — timing matters there.
+      // Between points it fires on release, so a hold can open the swap picker instead.
+      const down = (e) => {
+        e.preventDefault(); e.stopPropagation(); initAudio();
+        if (!between) { haptic.tap(); useSkill(m, id); return; }
+        b.classList.add("holding");
+        dockPress = { m, id, slot: i, btn: b, long: false };
+        dockPress.timer = setTimeout(() => {
+          dockPress.long = true;
+          b.classList.remove("holding");
+          haptic.perfect();
+          const p = dockPress; dockPress = null;
+          openSwap(p.m, p.slot);
+        }, LONG_PRESS_MS);
+      };
+      b.addEventListener("touchstart", down, { passive: false });
+      b.addEventListener("mousedown", down);
       dock.appendChild(b);
     }
     matchHooks.onArgue(m);
+    maybeSwapHint(m, slots);
   },
   // The umpire argument costs no dock slot — it offers itself mid-court when it's legal.
   onArgue(m) {

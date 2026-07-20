@@ -15,6 +15,7 @@ export function newSave() {
     seenIntro: false,
     story: 1, storyDone: false,                       // story mode progress (level 1..100)
     csStart: false,                                   // opening cutscene seen
+    hintSwap: false,                                  // mid-match skill-swap hint shown
     trophies: { local: 0, national: 0, world: 0 },
     dailyWin: null,                                   // date string of last daily-challenge win
     bestSpeed: 0,                                     // fastest shot ever, km/h
