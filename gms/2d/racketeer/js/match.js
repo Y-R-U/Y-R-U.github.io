@@ -118,6 +118,7 @@ function beginPreServe(m, first) {
   m.ball.live = false; m.ball.trail.length = 0; m.ball.curve = 0; m.ball.wind = 0;
   m.contact = null; m.ballTo = null; m.pendingQuality = null; m.pendingCurve = 0;
   m.armedPower = false; m.armedOutrageous = false; m.armedGrunt = false; m.canArgue = false;
+  m.hooks.onArgue && m.hooks.onArgue(m);                   // window closed — pull the prompt
   m.tossed = false; m.underarmServe = false; m.gest = null;
   m.stam = clamp(m.stam + METERS.STAM_POINT_REST, 0, 100);
   m.oppStam = clamp(m.oppStam + METERS.STAM_POINT_REST, 0, 100);
@@ -292,6 +293,7 @@ function endPoint(m, winner, why) {
   EV.tickEvent(m);
   const youWon = winner === "you";
   m.canArgue = !youWon && skillLevel(m, "argue") > 0 && (m.usesLeft.argue || 0) > 0 && why !== "netYou";
+  if (m.canArgue) m.hooks.onArgue && m.hooks.onArgue(m);   // offer it now, not on the next dock poll
 
   if (youWon) {
     m.ptsYou++;
@@ -710,7 +712,7 @@ export function updateMatch(m, rawDt) {
 
   // Soak-test bot: sprinkle random skill usage
   if (m.autoPilot && Math.random() < dt * 0.4) {
-    const id = pick(m.save.loadout);
+    const id = pick(m.save.loadout.concat("argue"));   // argue has no slot, so add it back in
     if (id && canUseSkill(m, id)) useSkill(m, id);
   }
 

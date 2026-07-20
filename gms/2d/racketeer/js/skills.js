@@ -45,8 +45,8 @@ export const SKILLS = {
     flavour: "\"YOUR SHORTS ARE ON BACKWARDS\" — devastating at any level of the sport.",
   },
   argue: {
-    id: "argue", name: "Umpire Argument", emo: "👨‍⚖️", type: "active",
-    desc: "After losing a point, contest it! The umpire may overturn it, replay it... or penalise your cheek. 3 arguments per match.",
+    id: "argue", name: "Umpire Argument", emo: "👨‍⚖️", type: "active", noSlot: true,
+    desc: "NO SLOT: lose a point and the option to contest it pops up on court. The umpire may overturn it, replay it... or penalise your cheek. 3 arguments per match.",
     cost: costs(150),
     cd: steps(0, 0), uses: 3, afterLoss: true,
     fx: { win: ramp(0.22, 0.7), replay: ramp(0.3, 0.45) },
@@ -126,6 +126,13 @@ export const SKILLS = {
 
 export const SKILL_ORDER = ["power", "grunt", "heckle", "argue", "outrageous", "underarm",
   "injury", "pigeon", "racketsmash", "crowdwork", "zone", "luckyballs", "netcord"];
+
+// Passives are always on once owned, and `noSlot` actives (the umpire argument) offer
+// themselves on court when they're valid — neither ever costs you a dock slot.
+export function takesSlot(id) {
+  const d = SKILLS[id];
+  return !!d && d.type === "active" && !d.noSlot;
+}
 
 export function skillLvl(save, id) { return save.skills[id] || 0; }
 export function skillFx(id, lvl, key) { return SKILLS[id].fx[key][Math.max(0, lvl - 1)]; }

@@ -1,6 +1,6 @@
 // All DOM UI: menus, mode screens, skill shop, loadout, modals, HUD wiring.
 import { el, esc, fmtMoney, fmtRank, fmtSpeed } from "./util.js";
-import { SKILLS, SKILL_ORDER, upgradeCost, MAX_LVL } from "./skills.js";
+import { SKILLS, SKILL_ORDER, upgradeCost, MAX_LVL, takesSlot } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
 import { haptic, setHaptics, hapticsOn, supportsHaptics } from "./haptics.js";
@@ -445,7 +445,7 @@ export function buildShop() {
   s.appendChild(gearBtn);
   const slots = career.skillSlots(save);
   const nextSlot = career.SLOT_UNLOCKS[slots];
-  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. You have <b>${slots} skill slot${slots > 1 ? "s" : ""}</b>${nextSlot ? ` (next at story lv${nextSlot})` : " (max)"} — tap ✔ to toggle. Passives are always on. Levels lower cooldowns and raise power.</div>`));
+  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. You have <b>${slots} skill slot${slots > 1 ? "s" : ""}</b>${nextSlot ? ` (next at story lv${nextSlot})` : " (max)"} — tap ✔ to toggle. <b>Passives never use a slot</b> (always on), and the umpire argument offers itself on court. Levels lower cooldowns and raise power.</div>`));
 
   for (const id of SKILL_ORDER) {
     const def = SKILLS[id];
@@ -454,8 +454,10 @@ export function buildShop() {
     const cost = upgradeCost(id, lvl);
     const equipped = save.loadout.includes(id);
     const cdStr = def.cd && def.cd[0] ? ` · ${def.cd[Math.max(0, lvl - 1)]}s cooldown` : def.uses ? ` · ${def.uses}/match` : "";
+    const tag = def.type === "passive" ? "<span class='sk-tag'>PASSIVE · NO SLOT</span>"
+      : def.noSlot ? "<span class='sk-tag'>NO SLOT</span>" : "";
     card.innerHTML = `<div class="ico">${def.emo}</div><div class="body">
-      <div class="nm">${esc(def.name)} ${def.type === "passive" ? "<span style='font-size:10px;color:#6fd3ff'>PASSIVE</span>" : ""}</div>
+      <div class="nm">${esc(def.name)} ${tag}</div>
       <div class="desc">${esc(def.desc)}</div>
       <div class="lvl">${lvl ? `Level ${lvl}/${MAX_LVL}${cdStr}` : "LOCKED"}</div></div>`;
     const btns = el("div", null, "");
@@ -467,14 +469,16 @@ export function buildShop() {
         initAudio();
         save.money -= cost;
         save.skills[id] = lvl + 1;
-        if (lvl === 0 && def.type === "active" && save.loadout.length < slots) save.loadout.push(id);
+        if (lvl === 0 && takesSlot(id) && save.loadout.length < slots) save.loadout.push(id);
         career.persist(save);
         sfx.cash();
         buildShop();
       };
       btns.appendChild(buy);
     }
-    if (lvl && def.type === "active") {
+    if (lvl && !takesSlot(id)) {
+      btns.appendChild(el("div", "always-on", def.type === "passive" ? "ALWAYS ON" : "ON COURT"));
+    } else if (lvl) {
       const eq = el("button", "buy" + (equipped ? " equip-on" : ""), equipped ? "✔ ON" : "EQUIP");
       eq.onclick = () => {
         if (equipped) save.loadout = save.loadout.filter(x => x !== id);
@@ -578,9 +582,26 @@ export const matchHooks = {
       b.addEventListener("mousedown", useIt);
       dock.appendChild(b);
     }
-    if (m.canArgue && !m.argued && m.save.loadout.includes("argue")) {
-      matchHooks.onTicker("Point lost! ARGUE IT? 👨‍⚖️ (tap the skill!)", 2.5);
-    }
+    matchHooks.onArgue(m);
+  },
+  // The umpire argument costs no dock slot — it offers itself mid-court when it's legal.
+  onArgue(m) {
+    const box = $("arguePrompt");
+    const offer = m.canArgue && !m.argued && canUseSkill(m, "argue");
+    if (!offer) { box.classList.remove("show"); box.innerHTML = ""; return; }
+    if (box.classList.contains("show")) return;    // already up — don't rebuild under the finger
+    const left = m.usesLeft.argue ?? SKILLS.argue.uses;
+    box.innerHTML = `<div class="ap-ttl">POINT LOST</div>
+      <button class="ap-btn">👨‍⚖️ ARGUE IT!<span class="ap-uses">${left} left</span></button>`;
+    const fire = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      initAudio(); haptic.tap(); useSkill(m, "argue");
+      box.classList.remove("show"); box.innerHTML = "";
+    };
+    const b = box.querySelector(".ap-btn");
+    b.addEventListener("touchstart", fire, { passive: false });
+    b.addEventListener("mousedown", fire);
+    box.classList.add("show");
   },
 };
 

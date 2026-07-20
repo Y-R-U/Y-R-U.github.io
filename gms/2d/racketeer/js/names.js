@@ -76,28 +76,28 @@ export const ARGUE_LINES = [
 
 export const UMPIRE_OK = ["The umpire squints... POINT OVERTURNED!", "\"Upon review... you're right, somehow.\"",
   "The umpire checks a coin. Heads! Point yours!"];
-export const UMPIRE_BAD = ["\"CODE VIOLATION. Also your shoes are untied.\"", "The umpire docks you a point AND your snack privileges.",
+export const UMPIRE_BAD = ["\"CODE VIOLATION. Also your shoes are untied.\"", "Point docked. Snacks too.",
   "\"Overruled. And frankly, hurtful.\""];
-export const UMPIRE_REPLAY = ["\"Let's just... play it again and never speak of this.\"", "The umpire was asleep. REPLAY THE POINT."];
+export const UMPIRE_REPLAY = ["\"Play it again. Never speak of this.\"", "The umpire was asleep. REPLAY THE POINT."];
 
 export const CROWD_LINES = ["The crowd goes WILD!", "A grown adult faints with excitement!",
-  "Someone throws a bouquet! And a shoe!", "The wave breaks out! Nobody can stop the wave!",
-  "A sponsor waves a contract in the air!"];
+  "Someone throws a bouquet! And a shoe!", "Nobody can stop the wave!",
+  "A sponsor waves a contract!"];
 
 export const COMMENT_WINNER = ["Outstanding winner!", "Painted the line!", "An absolute rocket!",
-  "The opponent is still looking for that one!", "Kissed the chalk!"];
-export const COMMENT_ERROR = ["Straight into the net. Oof.", "That's out. WAY out. Different postcode out.",
+  "Still looking for that one!", "Kissed the chalk!"];
+export const COMMENT_ERROR = ["Straight into the net. Oof.", "OUT. Different postcode out.",
   "The less said about that one, the better.", "A bold choice. The wrong one, but bold."];
-export const COMMENT_ACE = ["ACE! Untouchable!", "ACE! The opponent waves it goodbye!", "Served like a legend!"];
+export const COMMENT_ACE = ["ACE! Untouchable!", "ACE! Waved goodbye!", "Served like a legend!"];
 
 export const INJURY_LINES = ["*clutches hamstring theatrically*", "*collapses like a deckchair*",
-  "*points at ankle, then other ankle, then a third ankle somehow*"];
+  "*points at ankle. Then the other ankle.*"];
 
 export const OUTRAGEOUS_NAMES = ["THE TWEENER", "BACKFLIP SMASH", "BEHIND-THE-BACK BULLET",
   "NO-LOOK DROP SHOT", "THE HELICOPTER", "360° TORNADO SLICE"];
 
-export const BOSS_LINES = ["BEEP. HUMAN DETECTED. RESISTANCE: ADORABLE.", "CALCULATING YOUR DEFEAT... DONE.",
-  "I HAVE FIRED 4,000,000 BALLS. I REMEMBER EVERY ONE.", "ERROR 404: YOUR RANKING NOT FOUND."];
+export const BOSS_LINES = ["HUMAN DETECTED. RESISTANCE: ADORABLE.", "CALCULATING YOUR DEFEAT... DONE.",
+  "4,000,000 BALLS FIRED. I RECALL EACH.", "ERROR 404: YOUR RANKING NOT FOUND."];
 
 export function rankDropForWin(current, target, matchesLeft) {
   // Big satisfying rank chunks each win, hitting `target` on the tier's final win.

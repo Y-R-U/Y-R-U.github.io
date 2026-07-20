@@ -1,6 +1,7 @@
 import { SAVE_KEY, TIERS, RACKETS, SHOES, OUTFITS } from "./const.js";
 import { makeOpponent, firstOpponent } from "./names.js";
 import { lerp, rand } from "./util.js";
+import { takesSlot } from "./skills.js";
 
 export function newSave() {
   return {
@@ -26,7 +27,8 @@ export function load() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const s = Object.assign(newSave(), JSON.parse(raw));
-      s.loadout = s.loadout.slice(0, skillSlots(s));
+      // Older saves could equip the umpire argument; it no longer costs a slot.
+      s.loadout = s.loadout.filter(takesSlot).slice(0, skillSlots(s));
       return s;
     }
   } catch (e) { /* corrupted save -> fresh */ }

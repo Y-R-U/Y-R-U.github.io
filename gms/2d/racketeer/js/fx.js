@@ -34,6 +34,27 @@ export function bannerText(str, col = "#ffe24a", size = 1.6) {
     size: size * Math.max(20, view.w * 0.055), wob: rand(0, 7), banner: true });
 }
 
+// Banners are plain canvas fillText, so nothing wraps for free — a long commentary
+// line used to run off both edges of a phone. Shrink first (keeps one punchy line),
+// then wrap onto as many lines as it takes.
+function fitBanner(ctx, str, size) {
+  const maxW = view.w * 0.9;
+  ctx.font = `900 ${size}px sans-serif`;
+  if (ctx.measureText(str).width <= maxW) return { size, lines: [str] };
+  const small = Math.max(size * 0.66, 15);
+  ctx.font = `900 ${small}px sans-serif`;
+  if (ctx.measureText(str).width <= maxW) return { size: small, lines: [str] };
+  const lines = [];
+  let cur = "";
+  for (const w of str.split(" ")) {
+    const test = cur ? cur + " " + w : w;
+    if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return { size: small, lines };
+}
+
 export function speech(wx, wy, str, life = 2.2) {
   bubbles.push({ wx, wy, str, life, max: life });
 }
@@ -140,7 +161,12 @@ export function drawFx(ctx) {
     const p = project(b.wx, b.wy, 2.2);
     const alpha = Math.min(1, b.life * 2, (b.max - b.life) * 5);
     ctx.globalAlpha = alpha;
-    ctx.font = `bold ${Math.max(11, view.w * 0.03)}px sans-serif`;
+    let fs = Math.max(11, view.w * 0.03);
+    ctx.font = `bold ${fs}px sans-serif`;
+    // Long bubbles (the fake-injury monologues) have to shrink or they hang off both edges.
+    while (ctx.measureText(b.str).width > view.w - 30 && fs > 8) {
+      fs -= 1; ctx.font = `bold ${fs}px sans-serif`;
+    }
     const tw = ctx.measureText(b.str).width;
     const bw = tw + 18, bh = Math.max(24, view.w * 0.05);
     const bx = Math.max(6, Math.min(view.w - bw - 6, p.x - bw / 2)), by = p.y - bh - 14;
@@ -157,13 +183,17 @@ export function drawFx(ctx) {
     const a = Math.min(1, t.life * 2.2);
     ctx.globalAlpha = a;
     const wob = t.banner ? Math.sin(t.life * 9 + t.wob) * 0.03 : 0;
+    const fit = t.banner ? fitBanner(ctx, t.str, t.size) : { size: t.size, lines: [t.str] };
     ctx.save();
     ctx.translate(t.sx, t.sy); ctx.rotate(wob);
-    ctx.font = `900 ${t.size}px sans-serif`;
-    ctx.lineWidth = t.size * 0.14; ctx.strokeStyle = "rgba(0,0,0,.75)"; ctx.lineJoin = "round";
-    ctx.strokeText(t.str, 0, 0);
+    ctx.font = `900 ${fit.size}px sans-serif`;
+    ctx.lineWidth = fit.size * 0.14; ctx.strokeStyle = "rgba(0,0,0,.75)"; ctx.lineJoin = "round";
     ctx.fillStyle = t.col;
-    ctx.fillText(t.str, 0, 0);
+    const lh = fit.size * 1.08, y0 = -(fit.lines.length - 1) * lh / 2;
+    for (let i = 0; i < fit.lines.length; i++) {
+      ctx.strokeText(fit.lines[i], 0, y0 + i * lh);
+      ctx.fillText(fit.lines[i], 0, y0 + i * lh);
+    }
     ctx.restore();
   }
   ctx.globalAlpha = 1;

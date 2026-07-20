@@ -44,6 +44,20 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   background:rgba(0,0,0,.55); }
 .skill-btn.power-armed { border-color:#ffd34a; box-shadow:0 0 16px #ffd34acc; }
 
+/* Slot-free skills that offer themselves mid-court (currently just the umpire argument) */
+#arguePrompt { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%) scale(.9);
+  display:none; flex-direction:column; align-items:center; gap:6px; pointer-events:none; }
+#arguePrompt.show { display:flex; animation:apPop .22s ease-out forwards; }
+@keyframes apPop { from { opacity:0; transform:translate(-50%,-50%) scale(.85); }
+  to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.ap-ttl { font-size:11px; font-weight:800; letter-spacing:2px; color:#ff8a5c; text-shadow:0 2px 4px #000; }
+.ap-btn { pointer-events:auto; background:linear-gradient(#2a1533,#160a1e); color:#fff;
+  border:2px solid #b06cff; border-radius:14px; padding:11px 18px; font-size:17px; font-weight:900;
+  box-shadow:0 0 22px rgba(176,108,255,.55), 0 4px 12px rgba(0,0,0,.6);
+  display:flex; flex-direction:column; align-items:center; gap:2px; }
+.ap-btn:active { transform:scale(.94); }
+.ap-btn .ap-uses { font-size:10px; font-weight:700; opacity:.7; letter-spacing:.5px; }
+
 #ticker { position:absolute; left:50%; transform:translateX(-50%); top:calc(env(safe-area-inset-top, 8px) + 64px);
   font-size:13px; font-weight:700; text-shadow:0 2px 4px #000; text-align:center; max-width:88%;
   opacity:0; transition:opacity .3s; pointer-events:none; }
@@ -199,6 +213,9 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   border-style:dashed; border-color:rgba(255,255,255,.22); box-shadow:none; }
 .skill-btn.slot-locked .sk-name { font-size:8px; letter-spacing:.2px; }
 .btn.locked-btn { opacity:.45; filter:grayscale(.7); }
+.sk-tag { font-size:9px; color:#6fd3ff; letter-spacing:.5px; white-space:nowrap; }
+.always-on { font-size:9px; font-weight:800; letter-spacing:.5px; color:#7ee6a1; text-align:center;
+  border:1px dashed rgba(126,230,161,.5); border-radius:8px; padding:5px 6px; }
 
 /* ---- Cutscenes ---- */
 .cs-head { display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:6px; }
