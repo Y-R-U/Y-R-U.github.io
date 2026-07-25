@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0d1116" />
+  <meta name="description" content="IRONHAIL — drone-spotted 3D tank warfare with real ballistics, destructible terrain, an RPG garage and a world ladder." />
+  <title>IRONHAIL</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d1116'/%3E%3Crect x='4' y='17' width='24' height='7' fill='%23616b47'/%3E%3Crect x='9' y='11' width='13' height='6' fill='%23788457'/%3E%3Crect x='20' y='12' width='11' height='3' fill='%232b2f26'/%3E%3Crect x='4' y='24' width='24' height='3' fill='%23ffc24d'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- ══════════════════ BATTLE HUD ══════════════════ -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-tl">
+        <div class="pilot">
+          <span id="hud-name">—</span>
+          <span id="hud-rank" class="rank-chip">—</span>
+        </div>
+        <div class="bar hull"><i id="hull-fill"></i><span id="hull-text">0</span></div>
+        <div class="chips">
+          <span id="chip-hull" class="chip"></span>
+          <span id="chip-gun" class="chip"></span>
+        </div>
+        <div id="status-row"></div>
+        <button id="btn-pause" aria-label="Pause">❙❙ PAUSE</button>
+      </div>
+
+      <div class="hud-tc">
+        <div id="obj-label">—</div>
+        <div id="obj-bar"><i id="obj-fill"></i></div>
+        <div id="obj-sub"></div>
+      </div>
+
+      <div class="hud-tr">
+        <canvas id="minimap" width="184" height="184"></canvas>
+        <div class="tr-chips">
+          <div id="wind-chip"><b id="wind-arrow">↑</b><span id="wind-text">0</span></div>
+          <div id="drone-chip">
+            <span class="dc-label">UPLINK</span>
+            <div class="dc-bar"><i id="drone-fill"></i></div>
+            <span id="drone-mode">ORBIT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tags"></div>
+    <div id="markers"></div>
+    <div id="arrows"></div>
+    <div id="floaters"></div>
+    <div id="feed"></div>
+
+    <div id="reticle">
+      <div class="ret-box"></div>
+      <span id="ret-range"></span>
+    </div>
+    <div id="hitmark"></div>
+
+    <div id="scope-overlay" class="hidden">
+      <div class="scope-vig"></div>
+      <div class="scope-cross"></div>
+      <div class="scope-ticks"></div>
+    </div>
+    <div id="drone-overlay" class="hidden">
+      <div class="dv-frame"></div>
+      <div class="dv-scan"></div>
+      <div class="dv-label">UPLINK · DRONE FEED</div>
+    </div>
+
+    <div id="banner" class="hidden"><span id="banner-text"></span></div>
+    <div id="toast" class="hidden"></div>
+    <div id="streak" class="hidden"></div>
+
+    <div class="hud-bottom">
+      <div id="reload-wrap">
+        <div id="reload-bar"><i id="reload-fill"></i></div>
+        <span id="reload-text">—</span>
+      </div>
+    </div>
+
+    <div id="hit-flash" class="hidden"></div>
+  </div>
+
+  <!-- Touch / click action pad -->
+  <div id="btn-pad" class="hidden">
+    <button id="btn-fire" class="pad-fire">FIRE</button>
+    <button id="btn-util" class="pad-btn"><b>UTIL</b><small>2</small></button>
+    <button id="btn-drone" class="pad-btn"><b>DRONE</b><small>Q</small></button>
+    <button id="btn-scope" class="pad-btn"><b>SCOPE</b><small>TAB</small></button>
+    <button id="btn-mark" class="pad-btn"><b>MARK</b><small>F</small></button>
+  </div>
+
+  <!-- ══════════════════ MENUS ══════════════════ -->
+  <div id="menu" class="screen"></div>
+
+  <!-- Callsign modal (never an alert) -->
+  <div id="name-modal" class="popup hidden">
+    <div class="popup-content">
+      <h2>CALLSIGN</h2>
+      <input id="name-input" type="text" maxlength="12" autocomplete="off"
+             spellcheck="false" placeholder="YOUR NAME" />
+      <div class="menu-row">
+        <button id="btn-name-random" class="btn-mini">RANDOM</button>
+        <button id="btn-name-cancel" class="btn-mini">CANCEL</button>
+        <button id="btn-name-save" class="btn-primary">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
