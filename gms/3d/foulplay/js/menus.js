@@ -246,7 +246,10 @@ export function renderStory() {
 export function renderQuick() {
   const t = rankTier();
   const open = [], locked = [];
-  for (const d of TRACK_DEFS) {
+  // Locked circuits sort by how close you are to opening them, so the next one
+  // to chase is always the one at the top of the list.
+  const sorted = TRACK_DEFS.slice().sort((a, b) => gateDistance(a.id) - gateDistance(b.id));
+  for (const d of sorted) {
     const unlocked = trackUnlocked(d.id);
     const gates = trackGates(d.id);
     const buy = gates.find((g) => g.kind === 'buy');
@@ -364,6 +367,24 @@ function showBookmaker() {
       n.addEventListener('click', () => { sfx('ui'); stake = +n.dataset.st; draw(); }));
   };
   draw();
+}
+
+// Roughly "how much work is left", normalised across the gate kinds so they can
+// be compared. Only ever used for ordering a list, so approximate is fine.
+function gateDistance(trackId) {
+  const gates = trackGates(trackId);
+  if (!gates.length || trackUnlocked(trackId)) return -1;
+  let best = Infinity;
+  for (const g of gates) {
+    let d;
+    if (g.kind === 'story') d = Math.max(0, g.level - storyCleared());
+    else if (g.kind === 'team') d = Math.max(0, g.level - teamLevel()) * 25;
+    else if (g.kind === 'buy') d = profile.money >= g.cost ? 1 : 40;
+    else if (g.kind === 'win') d = 30;
+    else d = 50;
+    best = Math.min(best, d);
+  }
+  return best;
 }
 
 // A padlock nobody can read is just a wall. Every locked thing in this game
