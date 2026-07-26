@@ -62,6 +62,9 @@ function wire(root) {
   root.querySelectorAll('[data-act]').forEach((node) => {
     node.addEventListener('click', (e) => {
       e.preventDefault();
+      // A row can be tappable and still contain its own buttons — without this,
+      // pressing BUY inside a car row would also fire the row's own action.
+      e.stopPropagation();
       const fn = actions[node.dataset.act];
       sfx('ui');
       if (fn) fn(node.dataset, node);
@@ -747,23 +750,36 @@ function statLine(p) {
 }
 
 // ═══════════════════════════════ SHOWROOM ═══════════════════════════════
+// Tapping any car puts it on the turntable. That is a *look*, not a purchase —
+// a showroom you cannot walk around is just a price list, and deciding whether
+// you want the van is much easier once you have seen how enormous it is.
+let showroomPick = null;
+
 export function renderShowroom() {
   const active = activeCar();
+  const shown = carById(showroomPick && CARS.some((c) => c.id === showroomPick) ? showroomPick : active.id);
+  const showingMine = ownsCar(shown.id);
+  const isActive = shown.id === active.id;
+  const canBuy = profile.money >= shown.price;
+  const owned = ownedCars();
+
   const rows = CARS.map((c) => {
     const have = ownsCar(c.id);
-    const on = active.id === c.id;
+    const inBay = active.id === c.id;
+    const looking = shown.id === c.id;
     const can = profile.money >= c.price;
-    let action;
-    if (on) action = '<span class="tagline-src" style="color:var(--brand)">IN THE BAY</span>';
-    else if (have) action = `<button class="btn-mini on" data-act="use" data-id="${c.id}">DRIVE IT</button>`;
-    else if (c.src === 'shop') action = `<button class="btn-mini ${can ? 'on' : ''}" data-act="buy" data-id="${c.id}"><span class="price ${can ? '' : 'cant'}">${fmtMoney(c.price)}</span></button>`;
-    else action = `<span class="tagline-src" style="color:var(--good)">${esc(c.tag)}</span>`;
+    // The chip beside the name already says IN THE BAY, so the right-hand slot
+    // only ever answers "what happens if I tap this".
+    const action = looking
+      ? '<span class="tagline-src" style="color:var(--cool)">👁 ON THE FLOOR</span>'
+      : '<span class="tagline-src" style="color:var(--dim)">👁 VIEW</span>';
 
     return `
-      <div class="item ${on ? 'on' : ''} ${have ? '' : 'rar-common'}">
+      <div class="item ${looking ? 'on' : ''} ${have ? '' : 'rar-common'}"
+           data-act="peek" data-id="${c.id}" style="cursor:pointer">
         <span class="ic" style="width:20px;height:20px;border-radius:5px;background:#${c.body.toString(16).padStart(6, '0')};border:1px solid rgba(255,255,255,.25)"></span>
-        <span class="nm">${esc(c.name)}
-          <small>${esc(c.maker)} · ${esc((c.style || '').toUpperCase())} · ${esc(c.tag)}</small>
+        <span class="nm">${esc(c.name)}${inBay ? '<span class="mark" style="background:rgba(255,90,43,.22);color:var(--brand)">IN THE BAY</span>' : ''}
+          <small>${esc(c.maker)} · ${esc((c.style || '').toUpperCase())} · ${have ? 'OWNED' : c.src === 'shop' ? fmtMoney(c.price) : esc(c.tag)}</small>
           <small style="color:#b6c0ca;letter-spacing:0">${esc(c.blurb)}</small>
           <small style="color:var(--warn);letter-spacing:0">${esc(statLine(c) || 'No bias — it is exactly as good as the parts in it.')}</small>
           ${!have && c.unlock ? `<small style="color:var(--good)">🏆 ${esc(conditionText(c.unlock))}</small>` : ''}
@@ -772,20 +788,56 @@ export function renderShowroom() {
       </div>`;
   }).join('');
 
+  // What the button under the turntable does depends entirely on what you are
+  // looking at, so there is only ever one and it is never ambiguous.
+  let mainAction;
+  if (isActive) {
+    mainAction = owned.length > 1
+      ? `<p style="text-align:center;color:var(--dim);font-size:12px;letter-spacing:.14em;margin:10px 0 0">
+           THIS IS THE ONE YOU DRIVE · TAP ANOTHER TO LOOK AT IT</p>`
+      : '';
+  } else if (showingMine) {
+    mainAction = `<button class="btn primary" data-act="use" data-id="${shown.id}">
+        🔧 PUT THE ${esc(shown.name)} IN THE BAY<small>SWITCH TO THIS CAR</small></button>`;
+  } else if (shown.src === 'shop') {
+    mainAction = `<button class="btn ${canBuy ? 'primary' : ''}" data-act="buy" data-id="${shown.id}">
+        BUY THE ${esc(shown.name)}
+        <small>${fmtMoney(shown.price)}${canBuy ? '' : ` — ${fmtMoney(shown.price - profile.money)} SHORT`}</small></button>`;
+  } else {
+    mainAction = `<div class="card" style="border-color:rgba(55,194,106,.5)">
+        <div class="stat"><span>🏆 NOT FOR SALE</span><b class="good">${esc(shown.tag)}</b></div>
+        ${shown.unlock ? `<p style="color:#b6c0ca;font-weight:500;font-size:13px;margin:6px 0 0">${esc(conditionText(shown.unlock))}.</p>` : ''}
+      </div>`;
+  }
+
+  // Quick switcher, only when there is actually something to switch between.
+  const switcher = owned.length > 1 ? `
+    <div class="card" style="padding-bottom:8px">
+      <h3 style="margin-bottom:8px">YOUR CARS</h3>
+      <div class="btn-row" style="flex-wrap:wrap">
+        ${owned.map((c) => `<button class="btn-mini ${c.id === active.id ? 'on' : ''}" data-act="use" data-id="${c.id}">
+          ${c.id === active.id ? '✓ ' : ''}${esc(c.name)}</button>`).join('')}
+      </div>
+    </div>` : '';
+
   paint(`
     <div class="room" id="show-room">
-      <div class="room-cap">${esc(active.name)} · ${esc(active.maker)}</div>
+      <div class="room-cap">${esc(shown.name)} · ${esc(shown.maker)}${
+        isActive ? ' · YOURS' : showingMine ? ' · IN YOUR GARAGE' : ' · JUST LOOKING'}</div>
     </div>
+    ${mainAction}
+    ${switcher}
     <div class="card">
       <div class="stat"><span>IN THE ACCOUNT</span><b class="good">${fmtMoney(profile.money)}</b></div>
       <p style="color:var(--dim);font-size:12px;font-weight:500;margin:6px 0 0">
         A chassis decides what the car <i>is</i> — its shape, its weight and what it is naturally good at. The
-        parts you bolt on decide how good it is at that.</p>
+        parts you bolt on decide how good it is at that. Drag the car to spin it.</p>
     </div>
     <div class="card">${rows}</div>
   `, {
     back: () => emit('nav', { to: 'title' }),
-    use: (d) => { selectCar(d.id); rebuildRoom(); renderShowroom(); },
+    peek: (d) => { showroomPick = d.id; renderShowroom(); },
+    use: (d) => { selectCar(d.id); showroomPick = d.id; renderShowroom(); },
     buy: (d) => {
       const c = carById(d.id);
       if (profile.money < c.price) { toast3(`THAT IS ${fmtMoney(c.price - profile.money)} MORE THAN YOU HAVE`); return; }
@@ -794,11 +846,20 @@ export function renderShowroom() {
         <p><span class="price">${fmtMoney(c.price)}</span> — leaving you ${fmtMoney(profile.money - c.price)}. It goes straight into the bay.</p>
       `, [
         { label: 'CANCEL', act: () => closePopup() },
-        { label: 'BUY IT', primary: true, act: () => { buyCar(d.id); closePopup(); rebuildRoom(); renderShowroom(); } },
+        { label: 'BUY IT', primary: true, act: () => { buyCar(d.id); closePopup(); showroomPick = d.id; renderShowroom(); } },
       ]);
     },
   }, { key: 'showroom', head: head('SHOWROOM') });
-  mountRoom('show-room', 'showroom');
+
+  // Your own paint on anything you own; anything else sits in factory colours,
+  // because you have not had the chance to have it resprayed.
+  const wearsYourPaint = showingMine && profile.livery >= 0;
+  const liv = playerLivery();
+  mountRoom('show-room', 'showroom', {
+    style: shown.style,
+    body: wearsYourPaint ? liv.body : shown.body,
+    trim: wearsYourPaint ? liv.trim : shown.trim,
+  });
 }
 
 // ═══════════════════════════════ CHESTS ═══════════════════════════════

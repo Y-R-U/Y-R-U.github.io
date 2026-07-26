@@ -24,6 +24,9 @@ let kind = '';
 let t = 0;
 let spin = 0;
 let drag = null;
+// A car to show instead of the one you actually drive, so the showroom can put
+// something you have not bought on the turntable.
+let carOverride = null;
 
 const DISPOSE = (obj) => {
   if (!obj) return;
@@ -50,14 +53,19 @@ const emissive = (hex) => {
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 
 // ---------------------------------------------------------------------------
-export function mountRoom(nodeOrId, which) {
+// `carSpec` puts a specific car on the turntable instead of the one you drive.
+// It is passed in rather than set afterwards so a re-render builds one car, not
+// two — every menu repaint would otherwise construct the whole mesh twice.
+export function mountRoom(nodeOrId, which, carSpec) {
   const node = typeof nodeOrId === 'string' ? document.getElementById(nodeOrId) : nodeOrId;
   if (!node) return;
   host = node;
   ensure();
   node.appendChild(renderer.domElement);
   renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;touch-action:none';
-  if (kind !== which) { kind = which; buildRoom(); }
+  // Changing room drops any preview — the garage always shows the car you drive.
+  if (kind !== which) { kind = which; carOverride = null; buildRoom(); }
+  carOverride = carSpec || null;
   rebuildCar();
   resize();
   bindDrag(renderer.domElement);
@@ -458,13 +466,20 @@ export function rebuildRoom() {
   rebuildCar();
 }
 
+// Put a specific car on the turntable. Pass null to go back to your own.
+export function setRoomCar(spec) {
+  carOverride = spec || null;
+  rebuildCar();
+}
+
 function rebuildCar() {
   if (!scene) return;
   DISPOSE(car);
   car = null;
   if (kind === 'trophy') return;
   const liv = playerLivery();
-  car = buildCar({ style: playerStyle(), body: liv.body, trim: liv.trim, partHp: 1 });
+  const spec = carOverride || { style: playerStyle(), body: liv.body, trim: liv.trim };
+  car = buildCar({ style: spec.style, body: spec.body, trim: spec.trim, partHp: 1 });
   car.position.set(0, kind === 'showroom' ? 0.34 : 0, 0);
   scene.add(car);
 }
