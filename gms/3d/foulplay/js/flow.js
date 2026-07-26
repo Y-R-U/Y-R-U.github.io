@@ -339,6 +339,17 @@ function onRaceDone(results) {
     results.rankAfter = applyLadder(results.position, results.fieldSize, ev.purseTier || 1);
   }
 
+  // --- the bookmaker -------------------------------------------------------
+  // Settles on any ranked result, so you cannot park a bet and go and win an
+  // easy story level with it.
+  if (profile.bet && (ev.mode === 'quick' || ev.mode === 'event') && !ev.attract) {
+    const bet = profile.bet;
+    const won = betPaysOut(bet.id, results);
+    results.bet = { ...bet, won, payout: won ? Math.round(bet.stake * bet.odds) : 0 };
+    if (won) addMoney(results.bet.payout);
+    profile.bet = null;
+  }
+
   // --- what you actually won ----------------------------------------------
   // Recorded before anything reads it, because half the gates in the game are
   // phrased as "win at X" and the prize checker runs immediately after.
@@ -425,6 +436,16 @@ function onRaceDone(results) {
   }
 }
 
+function betPaysOut(id, r) {
+  switch (id) {
+    case 'win': return r.position === 1;
+    case 'podium': return r.position <= 3;
+    case 'wreck': return r.wrecksCaused >= 3 && r.finished && !r.retired;
+    case 'clean': return r.position <= 3 && r.investigations === 0;
+    default: return false;
+  }
+}
+
 function checkObjective(ev, r) {
   const o = ev.objective;
   if (!o) return r.position <= (ev.targetPos || 3);
@@ -457,13 +478,17 @@ function checkObjective(ev, r) {
 export function openChest(tierHint) {
   const tier = takeChest() || tierHint;
   if (!tier) { goto('garage'); return; }
-  const loot = rollChest(tier, { parts: profile.garage.parts, skills: profile.garage.skills }, team().crateLuck);
+  const owned = { parts: profile.garage.parts, skills: profile.garage.skills };
+  const pity = (profile.dryCrates || 0) >= 9;
+  const loot = rollChest(tier, owned, team().crateLuck, pity);
   let cash = 0;
+  let gotSomething = false;
   for (const item of loot.items) {
     if (item.kind === 'cash') cash += item.amount;
-    else if (item.kind === 'part') ownPart(item.id);
-    else if (item.kind === 'skill') ownSkill(item.id);
+    else if (item.kind === 'part') { ownPart(item.id); gotSomething = true; }
+    else if (item.kind === 'skill') { ownSkill(item.id); gotSomething = true; }
   }
+  profile.dryCrates = gotSomething ? 0 : (profile.dryCrates || 0) + 1;
   if (cash) addMoney(cash);
   profile.stats.chestsOpened++;
   saveProfile(true);

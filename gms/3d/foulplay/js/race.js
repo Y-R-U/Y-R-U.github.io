@@ -18,7 +18,7 @@ import { updateDebris, clearDebris } from './debris.js';
 import { updateCamera, resetCamera } from './camera.js';
 import { initHighlights, recordFrame, markHighlight, harvestHighlights, clearHighlights } from './highlights.js';
 import { state, resetRaceState, addShake } from './state.js';
-import { profile, playerStats, playerStyle, playerLivery } from './save.js';
+import { profile, playerStats, playerStyle, playerLivery, addGrudge, pickGrudge } from './save.js';
 import { statsFor, partById, trackPickup } from './arsenal.js';
 import { emit, on } from './bus.js';
 import { clamp, clamp01, lerp, rand, randInt, sign, pick, shuffled, wrap } from './utils.js';
@@ -126,6 +126,12 @@ function buildField(ev, track) {
         skill: d.skill, aggression: d.aggression,
         rubber: ev.rubber != null ? ev.rubber : 0.35,
       });
+      if (d.grudge) {
+        car.grudgeCount = d.grudge;
+        // They start the race already looking for you.
+        car.ai.grudge = state.player || null;
+        car.ai.grudgeT = 999;
+      }
     }
 
     const row = Math.floor(slot / 2);
@@ -138,6 +144,15 @@ function buildField(ev, track) {
 
   state.cars = cars;
   state.order = cars.slice();
+
+  // The grudge-holder needs the player object, which does not exist until the
+  // whole grid is built — hence the second pass.
+  for (const c of cars) {
+    if (c.grudgeCount && c.ai) {
+      c.ai.grudge = state.player;
+      emit('race:grudge', { car: c, wrecks: c.grudgeCount });
+    }
+  }
 }
 
 function makeRivals(n, ev) {
@@ -157,6 +172,23 @@ function makeRivals(n, ev) {
       stats: rivalStats(strength),
       skills: rivalSkills(strength),
     });
+  }
+
+  // Somebody you have wrecked before turns up on most grids, meaner than the
+  // rest and with the equipment to prove a point. This is what makes the field
+  // feel like a paddock you have to live in rather than a random draw.
+  if (!ev.attract && out.length && Math.random() < 0.62) {
+    const g = pickGrudge();
+    if (g) {
+      const slot = out[randInt(0, out.length - 1)];
+      slot.name = g.name;
+      slot.team = g.team || slot.team;
+      if (g.livery) slot.livery = g.livery;
+      slot.aggression = clamp(slot.aggression + 0.22 + Math.min(0.2, g.wrecks * 0.05), 0.1, 1);
+      slot.skill = clamp(slot.skill + 0.05, 0.3, 1);
+      slot.skills = rivalSkills(clamp(tier / 6 + 0.25, 0, 1));
+      slot.grudge = g.wrecks;
+    }
   }
   return out;
 }
@@ -629,6 +661,8 @@ on('car:wreck', ({ car, by }) => {
   if (by && by.isPlayer && car !== by) {
     state.wrecksCaused++;
     addHype(26, 'wreck');
+    // They will remember this next season, and the season after.
+    if (!(state.event && state.event.attract)) addGrudge(car.name, car.team, car.livery);
   }
   if (car.isPlayer) addHype(8, 'spectacle');
 });

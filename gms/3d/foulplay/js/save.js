@@ -35,6 +35,9 @@ const DEFAULTS = () => ({
   events: { cleared: {}, seen: [] },
   titles: {},                  // bracket state per title series
   memories: [],                // replays the player chose to keep
+  grudges: {},                 // drivers you have wrecked, and how often
+  bet: null,                   // an open side bet on your next result
+  dryCrates: 0,                // crates in a row that produced nothing good
   chests: [],                  // unopened chest tier ids
   stats: {
     races: 0, wins: 0, podiums: 0, dnf: 0, laps: 0,
@@ -192,6 +195,36 @@ export function takeChest() {
 // ---------------------------------------------------------------------------
 // Buying, upgrading and owning
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Grudges. Wreck somebody and they remember it after the chequered flag — the
+// series is small and the drivers all know each other. A driver you have put
+// out twice will be on your grid again, angrier, and looking for you.
+// ---------------------------------------------------------------------------
+export function addGrudge(name, team, livery) {
+  if (!name) return;
+  const g = profile.grudges[name] || (profile.grudges[name] = { team, livery, wrecks: 0, since: Date.now() });
+  g.wrecks++;
+  g.team = team || g.team;
+  if (livery) g.livery = livery;
+  // Somebody has to be forgotten eventually, or the grid never changes again.
+  const names = Object.keys(profile.grudges);
+  if (names.length > 12) {
+    names.sort((a, b) => profile.grudges[a].wrecks - profile.grudges[b].wrecks);
+    delete profile.grudges[names[0]];
+  }
+  saveProfile();
+}
+
+export function pickGrudge() {
+  const names = Object.keys(profile.grudges);
+  if (!names.length) return null;
+  // The one you have wronged most is the one most likely to turn up.
+  names.sort((a, b) => profile.grudges[b].wrecks - profile.grudges[a].wrecks);
+  const pool = names.slice(0, 4);
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  return { name, ...profile.grudges[name] };
+}
+
 export const owns = (id) =>
   profile.garage.parts.includes(id) || profile.garage.skills.includes(id);
 

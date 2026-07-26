@@ -144,6 +144,20 @@ export class AIDriver {
       car.useBoost();
     }
 
+    // A rival about to use something on you winds up for a beat first, and the
+    // HUD says so. Losing control to a trick you never saw coming reads as the
+    // game cheating; losing control to one you were warned about reads as them
+    // cheating, which is the entire point of the game.
+    if (this.windUp > 0) {
+      this.windUp -= dt;
+      if (this.windUp <= 0) {
+        const r = fireAttack(car, cars);
+        this.attackCd = rand(5, 13) / (0.4 + this.aggression);
+        if (r && r.target && r.target.isPlayer) emit('ai:attackedPlayer', { car, skill: r.skill });
+      }
+      return;
+    }
+
     this.attackCd -= dt;
     if (this.attackCd <= 0) {
       const near = findTargets(car, cars, 26, { radial: true });
@@ -151,9 +165,17 @@ export class AIDriver {
       const pickIt = wantsPlayer || near[0];
       const roll = this.aggression * (wantsPlayer ? 1.5 : 0.7) + (this.grudge ? 0.3 : 0);
       if (pickIt && Math.random() < roll) {
-        const r = fireAttack(car, cars);
-        this.attackCd = rand(5, 13) / (0.4 + this.aggression);
-        if (r && r.target && r.target.isPlayer) emit('ai:attackedPlayer', { car, skill: r.skill });
+        // Only warn when they are close enough that the shot will still be on
+        // when the wind-up ends. Warning about every rival who happens to be
+        // within twenty-six metres is crying wolf: it fired twenty-one times a
+        // race and landed once, which teaches the player to ignore it.
+        if (wantsPlayer && wantsPlayer.dist < 16) {
+          this.windUp = rand(0.38, 0.6);
+          emit('ai:winding', { car, target: wantsPlayer.car, dist: wantsPlayer.dist });
+        } else {
+          fireAttack(car, cars);
+          this.attackCd = rand(5, 13) / (0.4 + this.aggression);
+        }
       } else {
         this.attackCd = rand(1.5, 3.5);
       }

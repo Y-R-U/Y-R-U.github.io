@@ -59,6 +59,7 @@ export function initHaptics() {
   });
 
   // --- the game telling you something --------------------------------------
+  on('ai:winding', () => buzz([10, 50, 10], 1.4, 0.5));
   on('steward:investigating', () => buzz([14, 60, 14, 60, 14], 2));
   on('steward:verdict', ({ cleared }) => buzz(cleared ? [20, 50, 20] : [90, 50, 90], 2.6));
   on('race:playerFinish', () => buzz([40, 60, 40, 60, 120], 4));

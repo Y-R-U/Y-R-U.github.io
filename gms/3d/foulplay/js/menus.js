@@ -271,6 +271,7 @@ export function renderQuick() {
       <div class="stat"><span>RACES · WINS · PODIUMS</span><b>${profile.quick.races} · ${profile.quick.wins} · ${profile.quick.podiums}</b></div>
       <div class="stat"><span>CIRCUITS OPEN</span><b>${open.length} / ${TRACK_DEFS.length}</b></div>
     </div>
+    ${bookmakerCard()}
     <button class="btn primary" data-act="random">RACE ANYWHERE<small>RANDOM OPEN CIRCUIT · RANKED</small></button>
     <div class="sec-head"><h3>OPEN TO YOU</h3><span>${open.length} CIRCUITS</span></div>
     <div class="grid two">${open.join('')}</div>
@@ -282,7 +283,87 @@ export function renderQuick() {
     random: () => emit('race:begin', quickEvent({})),
     go: (d) => emit('race:begin', quickEvent({ track: d.id })),
     why: (d) => showTrackLock(d.id),
+    bet: () => showBookmaker(),
+    cancelbet: () => { profile.bet = null; saveProfile(true); renderQuick(); },
   }, { key: 'quick', head: head('QUICK RACE'), backdrop: true });
+}
+
+// ── the bookmaker ──────────────────────────────────────────────────────────
+// A series where hitting people is legal has a betting market, obviously. It is
+// also the one place a large pile of cash can turn into a larger one, which
+// gives the money somewhere to go once the garage is full.
+export const BETS = [
+  { id: 'win',    label: 'WIN IT',        odds: 4.0, blurb: 'First place. Nothing else pays.' },
+  { id: 'podium', label: 'TOP THREE',     odds: 1.8, blurb: 'A podium. The safe money.' },
+  { id: 'wreck',  label: 'WRECK THREE',   odds: 3.2, blurb: 'Put three rivals out and finish the race.' },
+  { id: 'clean',  label: 'PODIUM, CLEAN', odds: 5.5, blurb: 'Top three with no investigation at all.' },
+];
+export const betById = (id) => BETS.find((b) => b.id === id) || null;
+
+function bookmakerCard() {
+  const b = profile.bet;
+  if (b) {
+    const kind = betById(b.id);
+    return `
+      <div class="card" style="border-color:rgba(183,101,240,.55)">
+        <div class="stat"><span>🎲 BET PLACED · ${esc(kind ? kind.label : b.id)}</span>
+          <b class="good">${fmtMoney(b.stake)} → ${fmtMoney(Math.round(b.stake * (kind ? kind.odds : 1)))}</b></div>
+        <p style="color:var(--dim);font-size:12px;font-weight:500;margin:6px 0 8px">
+          Settles on your next ranked race, win or lose. The stake is already gone.</p>
+        <button class="btn-mini" data-act="cancelbet">TEAR IT UP (NO REFUND)</button>
+      </div>`;
+  }
+  return `<button class="pick" data-act="bet" style="border-color:rgba(183,101,240,.45)">
+      <div class="pick-grade">UP TO 5.5×</div>
+      <div class="pick-name">🎲 THE BOOKMAKER</div>
+      <div class="pick-sub">STAKE ON YOUR OWN RESULT · SETTLES NEXT RANKED RACE</div>
+      <div class="pick-desc">A man with a folding table takes bets on the drivers. He will happily take yours.</div>
+    </button>`;
+}
+
+function showBookmaker() {
+  const max = Math.min(profile.money, 50000);
+  if (max < 500) { toast3('COME BACK WHEN YOU HAVE SOMETHING TO STAKE'); return; }
+  const stakes = [500, 2500, 10000, 50000].filter((s) => s <= max);
+  if (!stakes.length) stakes.push(Math.floor(max));
+  let stake = stakes[0];
+  let kindId = 'podium';
+
+  const draw = () => {
+    const kind = betById(kindId);
+    popup('🎲 THE BOOKMAKER', `
+      <p>He does not care whether you deserve to win. He cares what you are willing to lose.</p>
+      <p style="color:var(--dim);letter-spacing:.14em;font-size:12px;margin-bottom:2px">WHAT ARE YOU BACKING?</p>
+      ${BETS.map((b) => `<div class="stat" style="${b.id === kindId ? '' : 'opacity:.5'}">
+        <span>${esc(b.label)} — ${esc(b.blurb)}</span><b>${b.odds.toFixed(1)}×</b></div>`).join('')}
+      <div class="btn-row" style="margin:8px 0 12px;flex-wrap:wrap">
+        ${BETS.map((b) => `<button class="btn-mini ${b.id === kindId ? 'on' : ''}" data-bk="${b.id}">${esc(b.label)}</button>`).join('')}
+      </div>
+      <p style="color:var(--dim);letter-spacing:.14em;font-size:12px;margin-bottom:2px">STAKE</p>
+      <div class="btn-row" style="flex-wrap:wrap">
+        ${stakes.map((s) => `<button class="btn-mini ${s === stake ? 'on' : ''}" data-st="${s}">${fmtMoney(s)}</button>`).join('')}
+      </div>
+      <p style="margin-top:10px">Returns <span class="price">${fmtMoney(Math.round(stake * kind.odds))}</span> if it comes in.</p>
+    `, [
+      { label: 'WALK AWAY', act: () => closePopup() },
+      {
+        label: `PUT ${fmtMoney(stake)} ON IT`, primary: true, act: () => {
+          if (profile.money < stake) { closePopup(); toast3('NOT ENOUGH IN THE ACCOUNT'); return; }
+          profile.money -= stake;
+          profile.bet = { id: kindId, stake, odds: kind.odds };
+          saveProfile(true);
+          closePopup();
+          renderQuick();
+        },
+      },
+    ]);
+    // The popup body is rebuilt each time, so rewire its own little buttons.
+    $('popup-body').querySelectorAll('[data-bk]').forEach((n) =>
+      n.addEventListener('click', () => { sfx('ui'); kindId = n.dataset.bk; draw(); }));
+    $('popup-body').querySelectorAll('[data-st]').forEach((n) =>
+      n.addEventListener('click', () => { sfx('ui'); stake = +n.dataset.st; draw(); }));
+  };
+  draw();
 }
 
 // A padlock nobody can read is just a wall. Every locked thing in this game
@@ -813,6 +894,9 @@ export function renderResults(r) {
         <span>STEWARDS' FINES (${r.investigations} INVESTIGATION${r.investigations === 1 ? '' : 'S'})</span>
         <b>${r.fines ? '-' + fmtMoney(r.fines) : '$0'}</b></div>
       <div class="money-row total"><span>NET</span><b class="${r.net >= 0 ? 'good' : 'bad'}">${fmtMoney(r.net)}</b></div>
+      ${r.bet ? `<div class="money-row ${r.bet.won ? 'plus' : 'minus'}">
+        <span>🎲 ${esc((betById(r.bet.id) || {}).label || 'BET')} AT ${r.bet.odds.toFixed(1)}× — ${r.bet.won ? 'CAME IN' : 'NOTHING DOING'}</span>
+        <b>${r.bet.won ? fmtMoney(r.bet.payout) : '-' + fmtMoney(r.bet.stake)}</b></div>` : ''}
       ${r.crates ? `<div class="money-row plus"><span>CRATES FOR ${ordinal(r.position)}</span><b>📦 × ${r.crates}</b></div>` : ''}
     </div>
 

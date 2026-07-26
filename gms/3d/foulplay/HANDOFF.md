@@ -1,15 +1,10 @@
 # FOUL PLAY — handoff / next session
 
-**Status: v1 is built, tested, committed and pushed to `main` (commit `3fa8290`).**
-It is registered in `/projects.js` with a screenshot at
-`/assets/screenshots/foulplay.jpg`, so it is live on Pages.
+**Status: shipped and pushed to `main`.** Registered in `/projects.js` with a
+screenshot at `/assets/screenshots/foulplay.jpg`, so it is live on Pages.
 
 Read `CLAUDE.md` in this folder first — it explains the architecture and the
-gotchas. This file is only "what to do next".
-
----
-
-## Play it
+gotchas. This file is only "what happened, and what to do next".
 
 - Live: https://y-r-u.github.io/gms/3d/foulplay/
 - Local: `python3 -m http.server 8977` from `~/cc/yru/site`, then
@@ -17,100 +12,109 @@ gotchas. This file is only "what to do next".
 
 ---
 
-## Fixed on Aaron's first mobile report
+## Feedback rounds so far
 
-**The chase camera was inverted** — it sat *ahead* of the car looking back down
-the road you had already driven. Fixed in `camera.js:frameChase` (`dir` was the
-wrong sign) and verified programmatically: the car now sits 17m ahead of the
-camera with the camera facing track-forward. Also made hold-buttons release on a
-global `pointerup` so the look-back button cannot stick.
+### 1. "I am looking backward"
+The chase camera sat *ahead* of the car looking back down the road you had
+already driven. `camera.js:frameChase` — `dir` was the wrong sign. Verified: the
+car now sits 17m ahead of the camera, facing track-forward. Hold-buttons also
+release on a global `pointerup` so the look-back button cannot stick.
+
+### 2. "Too easy to fly off track"
+Rebalanced around one rule: **you only leave the circuit if somebody put you
+there.** A barrier hit bounces you back whatever your speed or angle; going
+*through* one is gated on `car.slammed`, a 0.9s window set only by an attack or
+a car-to-car closing speed over `CRASH.slamSpeed`. Field wrecks per 2-lap auto
+race went 18 → 0 at circus and 3–9 → 1 at skyline.
+
+### 3. The big one — economy, menus, carnage
+Everything below was built in one pass and is verified. See the sections after
+this for what is worth checking by hand.
 
 ---
 
-## Second feedback round: "too easy to fly off track" (done, needs a play check)
+## What round 3 changed
 
-Aaron: *"if I slam into the side via fast driving it should bump me back into
-play with very little damage. Most damage should only come from attacks or
-slamming into other cars — driving should be the easy/fun part that allows you
-to concentrate on attacking."*
+**Economy.** Crates come from the flag by position (4th+ = 1, podium = 2/3/4,
+only a winner gets the good one); roadside crates pay cash and nitro. A crate is
+mostly money now — high tiers are far rarer and a scrap crate cannot produce a
+legendary at all. Nine dry crates in a row arms a pity roll. Almost everything is
+buyable and expensive; two parts per slot are not for sale at any price (one
+crate-only, the best one a prize). Everything you own takes four marks, cheap at
+first and then steep. The team is a facility you buy for a prize share, cheaper
+repairs, better crates and circuits your licence would not cover.
 
-Rebalanced around one rule: **you only leave the circuit if somebody put you
-there.** A barrier hit now bounces you back in whatever your speed or angle;
-going *through* one is gated on `car.slammed`, a 0.9s window set only by an
-attack impulse or a car-to-car closing speed over `CRASH.slamSpeed` (12 m/s).
-Also: rail damage only starts above a `railScuff` of 9 m/s and is ~4× lighter,
-rail spin and speed-scrub roughly halved, post-hit straightening assist stronger,
-car-to-car damage raised (1.9 → 2.5), and airborne cars get 9m of latitude past
-the rail line so a jump lands them back on the road instead of deleting them.
+**Cars.** Eight chassis. The starter is white and plain on purpose. Four are
+bought, three are prizes.
 
-Measured on 2-lap auto races, field wrecks per race:
+**What is open to you.** One circuit at the start; the rest come from the season,
+the team, or a cash licence. Every padlock explains itself when tapped.
 
-| | before | after |
-|---|---|---|
-| circus | 18 (all "through the barrier") | **0** |
-| skyline | 3–9 | **1** |
-| grinder | — | 0 |
+**Events.** Sorted available-first, with countdowns when they are calendar-gated.
+Four new ones including a Baron who only holds his derby on Saturdays.
 
-**Open question for the play check:** with driving made safe, wrecks now depend
-entirely on attacks and deliberate slams, and the auto-race harness does not
-attack hard enough to prove they still land. `CRASH.railVault` is 34 m/s once
-shunted — if a well-aimed SIDE SLAM beside a barrier does *not* put rivals out,
-lower it; if it feels twitchy, raise it. This is the one number most likely to
-need your thumb rather than my telemetry.
+**Titles.** Three single-elimination brackets with a visible tree. Each round is
+one named rival in the field and beating *them* is the only thing that counts.
+Krieg is seeded into the world final.
 
-Rivals already escalate to real tricks late in the season (`story.js:rivalSkillSet`
-gives chapters 8–10 the EMP / shockwave / ramjet / scattergun pool, and bosses
-get the wrecking ball from chapter 9). That now announces itself with a toast as
-well as a feed line, so it reads as "they cheated at me" rather than as an
-unexplained loss of control.
+**Menus.** Header no longer scrolls, back button is a proper target, lists keep
+their scroll position. A real race runs behind the browsing screens and the
+title screen puts its buttons on the two edges so you can see it. Modelled 3D
+rooms for the garage, showroom and career cabinet.
+
+**Carnage.** Barriers fade when the camera is jammed against them and throw a
+proper shower. Panels tear loose and hang there for a few seconds, dragging on
+the tarmac and clouting whoever is alongside. Wrecks in the replay get a
+slow-motion orbit while the car comes apart. Replays have next/previous and a
+KEEP button; kept clips live in CAREER → MEMORIES.
+
+**Driving.** No nitro while leading, so the reliable way to win is to stay in the
+pack. Haptics scaled so a barrier scrape feels smaller than being rammed.
+
+**Extras I added on top** (Aaron asked for ranked ideas, best implemented):
+grudges that persist between races and put somebody you have wrecked back on
+your grid angrier; a wind-up warning before a rival uses equipment on you; a
+bookmaker who takes stakes on your own result.
 
 ---
 
 ## TODO — next session, in priority order
 
-### 1. Playtest on a real phone (highest value, needs Aaron)
-Everything below was verified in headless Chrome. These need a human thumb:
-- **Steering feel.** Drag-to-steer sensitivity is `DRAG_FULL = 78` px in
-  `input.js`. If it feels twitchy, raise it; if unresponsive, lower it.
-- **Brake-by-dragging-down.** `DRAG_BRAKE` 34px deadzone → full at 120px. This
-  is the least-proven control; it may want to be a separate button.
-- **Tilt steering** (Settings → TILT). The iOS permission prompt path
-  (`input.js:enableTilt`) has never run on a real device.
-- **Audio on iOS.** It arms on first touch; unverified on hardware.
-- **Whether the LOOK (👁) button earns its place.** It sits at the top of the
-  right-hand cluster in portrait. If it keeps getting mis-tapped, delete it from
-  `index.html` — the brief only ever asked for two buttons.
+### 1. The play checks only Aaron can do
 
-### 2. Balance passes (use the telemetry, do not guess)
-`?dev=1` exposes `window.__game.tel` — speed samples, position, suspicion, hype,
-and **wreck counts by cause**. Current readings on a 2-lap auto race:
+- **Does a well-aimed SIDE SLAM beside a barrier still put a rival out?**
+  `CRASH.railVault` is 34 m/s once shunted. The auto-race harness does not
+  attack hard enough to prove it either way. Lower it if slams do not finish
+  people; raise it if it feels twitchy. Still the number most likely to need a
+  thumb rather than telemetry.
+- **The economy pace.** Roughly $3k a race early, and a tier 2 part is $3,500.
+  If the grind bites, the dials are `TIER_PRICE` and `CHEST_TIERS[*].cash` in
+  `arsenal.js`, and `PRIZE_SHARE` in `config.js`.
+- **Does the menu backdrop cost frames on the phone?** It self-disables after
+  six seconds under 20fps and there is a settings toggle, but the threshold is
+  a guess (`flow.js:watchAttract`).
+- **Steering feel.** `DRAG_FULL = 78` px in `input.js`. Brake-by-dragging-down
+  (`DRAG_BRAKE`) is still the least-proven control.
+- **Tilt steering and iOS audio arming** have never run on real hardware.
 
-| circuit | avg km/h | top | wrecks (field) | notes |
-|---|---|---|---|---|
-| hometown (grade 1) | 166 | 290 | 5 | good |
-| twinrings (grade 5) | 177 | 395 | 9 | 6% of the race inverted |
-| circus (grade 5) | 173 | 331 | 18 | **may be too much carnage** |
-| skyline (grade 4) | 163 | 296 | 3 | 8% airborne, 21m peak air |
+### 2. Unverified by eye
+- Chapter cutscenes 2–9 (the intro and finale were both watched).
+- The wreck showcase camera — confirmed to fire with the right shot and slow
+  motion, never actually watched.
+- The trophy-tap raycast works; the popup it opens has not been seen on a phone.
 
-- Circus at 18 wrecks per 2 laps is the outlier. If it feels chaotic rather than
-  dramatic, soften the corkscrew (`trackgen.js`, `corkscrew(90, 58)`) or raise
-  `CRASH.railVault`.
-- 21m of air on Skyline is enormous. Fun, but check it does not read as a bug.
-
-### 3. Unverified by eye (works programmatically, never watched)
-- **The highlights reel.** Confirmed to produce clips, rebuild ghost cars, apply
-  recorded part-visibility and run the slow-motion beat. Never actually watched.
-- **Special events and the daily** — smoke-tested only. Knockout was verified
-  properly (5 eliminations, correct classification).
-- **Chapter cutscenes 2–10.** The intro and the finale were both watched; the
-  middle nine are the same code path with different data.
-
-### 4. Ideas not yet built
-- Rivals should *telegraph* an incoming attack (a HUD warning before the hit).
-  There is already an `ai:attackedPlayer` event to hang it on.
-- Panel dents are subtle — parts offset and rotate slightly as HP drops
-  (`car.js:dentPart`). Could scorch or crumple more visibly.
-- No pit stop / repair mechanic. Damage carries only within a race.
+### 3. Ideas ranked but not built
+Kept here rather than guessed at:
+- **Sponsors** (★★★★) — contracts taken in the garage that pay a bonus for a
+  specific thing over several races. Good structure between races, good cash
+  faucet. The biggest one left.
+- **Damage carrying between races** (★★★) — a repair bill you can decline.
+  Real decisions, but it cuts against "driving should be the relaxing part".
+- **A team-mate car** (★★★) — a second car on your team that can block for you.
+  Fits the fiction; a lot of new AI.
+- **Stewards who remember you between races** (★★★) — a season-long heat level.
+  Overlaps suspicion; might just be noise.
+- **Photo mode** (★★) and **best-lap ghost** (★★) — nice, not important.
 
 ---
 
@@ -121,11 +125,11 @@ SCRATCH=<scratchpad>
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --disable-gpu --use-angle=swiftshader --enable-unsafe-swiftshader \
   --remote-debugging-port=9333 --user-data-dir="$SCRATCH/chrome" about:blank &
-node cdp.mjs "<url>" --wait="<expr>" --evalFile=script.js --shot=out.png
+node cdp.mjs "<url>" --wait="<expr>" --evalFile=script.js --await --shot=out.png
 ```
 
-`cdp.mjs` lives in the session scratchpad; it is ~90 lines of raw CDP over the
-built-in `WebSocket`. **Three hard-won rules:**
+`cdp.mjs` lives in the session scratchpad; ~90 lines of raw CDP over the built-in
+`WebSocket`. **Four hard-won rules:**
 
 1. **Always `--evalFile`, never inline `--eval`** for anything with backticks or
    `${}` — bash expands them before node sees them and you get silent nonsense.
@@ -134,30 +138,32 @@ built-in `WebSocket`. **Three hard-won rules:**
 3. **`--wait` on a real condition**, e.g.
    `window.__game && window.__game.state.screen==='results'`. Chrome's
    `--virtual-time-budget` does not advance a WebGL sim.
+4. **To count events during a race, arm the listeners inside an async eval that
+   then polls for `state.results`.** There is no way to attach to a page the
+   harness has already navigated.
 
 Useful URLs:
 - `?dev=1&auto=1&start=race&track=circus&speed=3` — soak a race at 3× speed
 - `?dev=1&wipe=1&level=1` — story from scratch, intro cutscene first
 - `?shot=1&track=circus&at=13` — clean frame for a thumbnail
 - `dev.html` — builds all 15 circuits and reports geometry. **Every circuit must
-  report `gap 0`** after any `trackgen.js` change.
+  report `gap 0`** after any `trackgen.js` change. (Checked after round 3: all
+  15 still exact.)
 
 ---
 
-## Task state
+## What is verified
 
-Everything in the original brief is built:
-
-- [x] Variety of tracks, some curved/banked, some with loops — 15 circuits
-- [x] Very good AI competitors that also slam you off the road
-- [x] Cheat-but-don't-get-caught: distance-scaled suspicion, sweeping cameras
-- [x] Fines, and a crowd that talks the stewards out of them
-- [x] Guardrail bounce-back + auto-steer recovery; fly off and you roll
-- [x] Cars shed parts and keep driving; scared-face speech bubbles
-- [x] Boost pads on track + collectible boosts on a button
-- [x] Two buttons only (boost, attack); attack fires a random equipped trick
-- [x] Chests upgrading the car (6 slots, 36 parts, 15 tricks, 4 crate tiers)
-- [x] End-of-race highlights reel of the best wrecks and flips
-- [x] One-off ranked mode starting at #250,000
-- [x] Special events + knockout events
-- [x] 100-level story with cutscenes at the intro, every 10 levels, and the end
+- Boots clean; every menu screen renders with no console errors.
+- All 100 story levels generate: 15 tracks, 9 objective kinds, 13 knockouts,
+  10 bosses, 40 crate rewards, purse $2,200–$51,150, 11 cutscenes.
+- A full race runs to results with the new money rows, crate awards by position
+  and prize granting.
+- Crate rates simulated over 3,000 openings per tier.
+- All three title brackets run to champion with the right number of rounds;
+  losing knocks you out; Krieg is in the world final.
+- A memory saves (30KB), survives a reload and replays from cold on a rebuilt
+  stage.
+- Leader boost lockout: nitro and boost pads both dead in P1, both live in P4.
+- Dangling panels, flail hits on rivals, rail scrape sparks and grudge grids all
+  fire in a live race.

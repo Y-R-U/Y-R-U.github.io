@@ -123,6 +123,43 @@ rhythm is the skill the game is really teaching.
 
 ---
 
+## The economy is a set of taps, and each one is deliberate
+
+Money is the main road through the game. Almost everything is buyable and
+almost everything is expensive, which is what makes a race worth running.
+
+| tap | pays | why |
+|---|---|---|
+| prize money | most of it | the reason to finish well |
+| crates, by finishing position | 1 / 2 / 3 / 4 | position matters more than volume |
+| roadside crates | cash, nitro, rarely a crate | a racing decision, not a slot machine |
+| the bookmaker | 1.8×–5.5× a stake | somewhere for a big pile to go |
+| the team facility | a % of every prize | a long-term purchase that pays back |
+
+**A crate is mostly an envelope of cash.** `CHEST_TIERS` in `arsenal.js` owns
+the rates: a scrap crate cannot produce a legendary at all, and the good tiers
+only come from winning. Nine crates in a row with nothing in them arms a pity
+roll (`flow.js:openChest`), because a long dry run stops reading as bad luck
+and starts reading as a bug.
+
+**Every item carries its own `src`** — `shop` / `crate` / `prize` / `start` —
+so the shop, the crate roller and the prize checker read one list and cannot
+disagree. Two parts per slot are not for sale at any price. `PRIZE_ITEMS` and
+`save.js:checkPrizes()` hand the prize ones over the moment their condition
+becomes true, wherever that happens.
+
+**Marks** are the cheap route up: `upgradeCost` starts around $1,200 and
+multiplies by 2.7 each time, so a fully upgraded tier 3 costs about what a
+tier 4 does and gets you most of the way there.
+
+## Every padlock says what would open it
+
+`progress.js` owns all three gates — the team facility, the season, and things
+you have actually won — and returns a *reason* alongside the boolean.
+`conditionText()` turns any gate into a sentence, so no screen ever shows a
+lock it cannot explain. Circuits and events list several gates and satisfying
+**any one** opens them; most also offer a cash licence as the impatient route.
+
 ## Files
 
 | file | what it owns |
@@ -131,20 +168,51 @@ rhythm is the skill the game is really teaching.
 | `track.js` | frames, parallel transport, `worldAt`/`quatAt`/`nearestS`, `loopAhead` |
 | `trackgen.js` | the path builder and all 15 circuits |
 | `trackmesh.js` | road ribbon, kerbs, rails, verges, stands, cameras, scenery |
-| `car.js` | the driving model, damage, wrecks, respawns |
+| `car.js` | the driving model, damage, dangling panels, wrecks, respawns |
 | `carfactory.js` | part-separable car meshes, five body styles |
+| `cars.js` | the eight chassis you can own — static data only |
+| `arsenal.js` | parts, tricks, prices, sources, marks, crate tables |
+| `progress.js` | the team, circuit gates, gate *reasons*, the trophy list |
 | `ai.js` | racing line, braking to the grip limit, aggression, grudges |
 | `attacks.js` | the fifteen dirty tricks, targeting, hazards |
 | `stewards.js` | suspicion, camera coverage, hype, investigations, verdicts |
 | `race.js` | grid, contact, pickups, positions, knockouts, results |
 | `story.js` | 10 chapters × 10 levels, generated; 11 hand-written cutscenes |
-| `events.js` | quick races, 10 special events, the daily |
-| `highlights.js` | 20Hz ring buffer + ghost-car replay |
-| `flow.js` | screen routing; the only module that acts on menu intent |
+| `events.js` | quick races, 13 special events, the daily |
+| `titles.js` | three single-elimination brackets |
+| `highlights.js` | 20Hz ring buffer, ghost-car replay, saved memories |
+| `rooms.js` | the modelled 3D rooms behind the garage, showroom and career |
+| `haptics.js` | vibration; a pure bus listener, knows nothing about the game |
+| `flow.js` | screen routing, attract mode; the only module that acts on menu intent |
 | `menus.js` | every screen; emits on the bus, never calls game systems |
 
 Menus emit intentions, `flow.js` acts on them. That is what keeps the UI free of
 game logic and the game free of DOM.
+
+## Menus
+
+`paint(html, acts, opts)` is the whole contract. Two rules came out of watching
+somebody use this on a phone:
+
+1. **The header does not scroll.** `.screen` is `overflow:hidden` with a fixed
+   `.screen-head` and a scrolling `.screen-body`, so the title and the way back
+   stay under your thumb however long the list is.
+2. **Re-rendering the same screen keeps its scroll position.** `opts.key`
+   defines "the same screen" and *includes the open tab*, so switching tab
+   starts at the top while equipping a part halfway down a list does not.
+
+The browsing screens run a real race behind them (`flow.js:startAttract`) — the
+same race loop with the AI on the player's car and the HUD off. Screens with
+their own 3D room do not, because two WebGL contexts fighting is a bad trade.
+
+## Rooms are modelled, not painted
+
+The garage, the showroom and the career cabinet are Three scenes in a small
+second renderer, not backdrop images. Three reasons, all of which turned out to
+matter: the camera moves, so a flat photo would slide against the car; the
+cabinet fills up as you win things, so it cannot be baked; and a photographic
+backdrop behind flat-shaded low-poly cars looks like a cut-out. A modelled room
+lights the car with the lights that lit the room.
 
 ---
 
@@ -172,6 +240,24 @@ inline** — backticks and `${}` get expanded by bash before node ever sees them
 which produces silent nonsense.
 
 ## Gotchas earned the hard way
+
+- **A solid box is not a cabinet.** The first trophy case was a `BoxGeometry`
+  with shelves inside it, so the camera saw its front face and the collection
+  looked empty. Anything you are meant to see *into* has to be built from
+  slabs, not from a block with things buried in it.
+- **Point lights are in candela.** A `PointLight` parked a metre off a panel
+  washes it to a white blob. Everything in `rooms.js` is lit from well in front
+  of what it is lighting.
+- **Promoting a highlight has to promote its presentation.** The dedup path
+  upgraded a clip's label but not its shot, so wrecks were coming out with a
+  chase camera and no slow motion — the one thing the reel exists to show.
+- **Resolve a bracket round from one snapshot.** Eliminating the player's
+  opponent and then re-reading the alive list makes the count odd, which drifts
+  the pairing and leaves a seed with no match — a three-round bracket that
+  plays two finals.
+- **A frame-rate guard that fires on a stutter is worse than no guard**, because
+  it removes a feature the player asked for. The attract-mode one needs six
+  seconds under 20fps after a five-second warm-up.
 
 - **A frozen page blocks `Page.navigate` too.** One hang poisons every later
   test on that tab, so restart the browser between runs when debugging.

@@ -75,6 +75,17 @@ function wireEvents() {
   });
   on('race:eliminated', ({ car }) => feed(`${car.name} ELIMINATED`, 'bad'));
   on('pickup:chest', ({ tier }) => toast('CRATE SECURED', 'good'));
+  on('race:grudge', ({ car, wrecks }) => {
+    feed(`${car.name} IS ON THIS GRID — YOU HAVE WRECKED THEM ${wrecks}×`, 'bad');
+    setTimeout(() => banner(`${car.name} WANTS A WORD`, 'bad', 1.8), 1400);
+  });
+  // Throttled hard: a warning you see every five seconds stops being a warning.
+  let lastWarn = -99;
+  on('ai:winding', ({ car }) => {
+    if (state.raceTime - lastWarn < 4.5) return;
+    lastWarn = state.raceTime;
+    toast(`⚠ ${car.name} IS LINING YOU UP`, 'bad', 0.9);
+  });
   on('pickup:boost', () => toast('NITRO +1', 'good'));
   on('pickup:cash', ({ amount }) => toast(`+$${amount.toLocaleString('en-US')}`, 'good'));
   // Explained in full the first couple of times, then just a nudge, because

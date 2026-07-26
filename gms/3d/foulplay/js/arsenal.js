@@ -380,7 +380,7 @@ const cratePool = (list, rarity) => list.filter((x) => x.rarity === rarity && x.
 
 // Rolls the contents of a crate. `owned` lets us prefer things you do not have
 // yet, which keeps mid-game crates from being three duplicate tyres.
-export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0) {
+export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0, pity = false) {
   const tier = CHEST_TIERS[tierId] || CHEST_TIERS.scrap;
   const items = [];
 
@@ -415,6 +415,21 @@ export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0) {
   }
 
   items.push({ kind: 'cash', amount: Math.round(rand(tier.cash[0], tier.cash[1])) });
+
+  // The rates above are stingy on purpose, and a long enough run of nothing
+  // stops feeling like bad luck and starts feeling like the game is broken.
+  // After a dry spell the next crate owes you something you do not have.
+  if (pity && !items.some((it) => it.kind !== 'cash')) {
+    const want = ['epic', 'rare'].find((r) => cratePool(PARTS, r).some((p) => !owned.parts.includes(p.id))
+      || cratePool(SKILLS, r).some((s) => !owned.skills.includes(s.id)));
+    if (want) {
+      const parts = cratePool(PARTS, want).filter((p) => !owned.parts.includes(p.id));
+      const skills = cratePool(SKILLS, want).filter((s) => !owned.skills.includes(s.id));
+      const takeSkill = skills.length && (!parts.length || Math.random() < 0.35);
+      const got = takeSkill ? pick(skills) : pick(parts);
+      items.unshift({ kind: takeSkill ? 'skill' : 'part', id: got.id, rarity: got.rarity, pity: true });
+    }
+  }
   return { tier: tierId, items };
 }
 
