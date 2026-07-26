@@ -34,6 +34,7 @@ export function resetCamera(car) {
 export function updateCamera(dt) {
   const car = state.player;
   if (state.camMode === 'cine' || state.camMode === 'replay') return;   // owned elsewhere
+  if (state.camMode === 'attract') { frameAttract(dt); return; }
 
   if (!car) return;
   if (car.mode === 'wreck' || car.respawnTimer > 0) frameWreck(car, dt);
@@ -90,6 +91,64 @@ function frameChase(car, dt, snap) {
 }
 
 const UP_WORLD = new THREE.Vector3(0, 1, 0);
+
+// ---------------------------------------------------------------------------
+// The menu backdrop camera. Cuts between four shots on a timer, always pointed
+// at whatever is happening near the front of the field, so a menu you leave
+// open turns into a broadcast rather than a screensaver.
+// ---------------------------------------------------------------------------
+const attract = { t: 0, shot: 0, subject: 0, hold: 0 };
+
+function frameAttract(dt) {
+  const cars = state.cars;
+  const tr = state.track;
+  if (!cars.length || !tr) return;
+
+  attract.t += dt;
+  if (attract.t > attract.hold) {
+    attract.t = 0;
+    attract.hold = rand(4.2, 7.5);
+    attract.shot = (attract.shot + 1 + Math.floor(Math.random() * 3)) % 4;
+    // Prefer somebody in a fight: the tightest gap in the top half of the field.
+    const front = state.order.filter((c) => c.alive && c.mode !== 'wreck').slice(0, Math.max(2, Math.ceil(cars.length / 2)));
+    attract.subject = cars.indexOf(front[Math.floor(Math.random() * front.length)] || cars[0]);
+    rig.ready = false;
+  }
+
+  const car = cars[clamp(attract.subject, 0, cars.length - 1)] || cars[0];
+  if (!car) return;
+  const f = car.frame.p ? car.frame : tr.frameAt(car.s);
+  const w = tr.widthAt(car.s);
+
+  if (attract.shot === 0) {                       // low chase, wide
+    _pos.copy(car.worldPos).addScaledVector(f.tan, -11).addScaledVector(f.up, 2.4);
+    _look.copy(car.worldPos).addScaledVector(f.tan, 10).addScaledVector(f.up, 1);
+    rig.fov = baseFov() + 6;
+  } else if (attract.shot === 1) {                // trackside pan
+    const side = car.t >= 0 ? 1 : -1;
+    tr.worldAt(car.s + 22, side * (w + 12), 4.5, _pos);
+    _look.copy(car.worldPos);
+    rig.fov = 40;
+  } else if (attract.shot === 2) {                // helicopter
+    tr.worldAt(car.s + 34, 0, 26, _pos);
+    _look.copy(car.worldPos);
+    rig.fov = 52;
+  } else {                                        // wheel-height, looking back
+    tr.worldAt(car.s + 30, car.t * 0.7, 0.8, _pos);
+    _look.copy(car.worldPos);
+    rig.fov = 36;
+  }
+
+  const rate = rig.ready ? damp(3.2, dt) : 1;
+  if (!rig.ready) { rig.pos.copy(_pos); rig.look.copy(_look); rig.ready = true; }
+  else { rig.pos.lerp(_pos, rate); rig.look.lerp(_look, damp(5, dt)); }
+  rig.up.lerp(UP_WORLD, damp(4, dt)).normalize();
+
+  camera.up.copy(rig.up);
+  camera.position.copy(rig.pos);
+  camera.lookAt(rig.look);
+  setFov(rig.fov);
+}
 
 function frameWreck(car, dt) {
   rig.orbit += dt * 0.75;

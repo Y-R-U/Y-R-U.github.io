@@ -13,26 +13,34 @@ import { shadeHex, rand, pick } from './utils.js';
 // ---------------------------------------------------------------------------
 // Body styles
 // ---------------------------------------------------------------------------
+// `topW`/`topD` pull the cabin roof in so the glasshouse tapers; `rake` drops
+// the leading edge of the bonnet; `waist` is the shoulder crease down the
+// flanks. Together they are the difference between a car and a shoebox.
 export const BODY_STYLES = {
   muscle: {
     name: 'MUSCLE', len: 4.5, wide: 2.0, ride: 0.42,
     bonnet: 1.55, boot: 1.0, roofLen: 1.55, roofH: 0.52, nose: 0.06, wheel: 0.46, spoiler: 'lip',
+    topW: 0.8, topD: 0.72, rake: 0.1, waist: 0.9, grille: 'slot',
   },
   wedge: {
     name: 'WEDGE', len: 4.4, wide: 2.05, ride: 0.34,
     bonnet: 1.7, boot: 0.85, roofLen: 1.35, roofH: 0.42, nose: 0.16, wheel: 0.42, spoiler: 'wing',
+    topW: 0.66, topD: 0.6, rake: 0.16, waist: 0.78, grille: 'splitter',
   },
   stock: {
     name: 'STOCK', len: 4.3, wide: 1.95, ride: 0.46,
-    bonnet: 1.25, boot: 1.15, roofLen: 1.8, roofH: 0.6, nose: 0.02, wheel: 0.44, spoiler: 'none',
+    bonnet: 1.25, boot: 1.15, roofLen: 1.7, roofH: 0.56, nose: 0.02, wheel: 0.44, spoiler: 'none',
+    topW: 0.82, topD: 0.8, rake: 0.06, waist: 0.94, grille: 'mesh',
   },
   van: {
     name: 'HAULER', len: 4.7, wide: 2.15, ride: 0.56,
     bonnet: 0.85, boot: 0.5, roofLen: 2.9, roofH: 1.0, nose: 0.0, wheel: 0.5, spoiler: 'none',
+    topW: 0.93, topD: 0.96, rake: 0.05, waist: 1.0, grille: 'mesh',
   },
   buggy: {
     name: 'BUGGY', len: 4.0, wide: 2.1, ride: 0.62,
     bonnet: 1.1, boot: 1.1, roofLen: 1.5, roofH: 0.55, nose: 0.0, wheel: 0.56, spoiler: 'cage', open: true,
+    topW: 0.8, topD: 0.8, rake: 0.08, waist: 0.86, grille: 'bar',
   },
 };
 
@@ -63,6 +71,38 @@ export const PART_IDS = Object.keys(PART_SPEC);
 export const partSpec = (id) => PART_SPEC[id];
 
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+
+// A box whose top face is pulled in and pushed back. One helper turns every
+// slab in this file into something with a shoulder line: the cabin gets a
+// proper glasshouse, the body gets a waist, and none of it costs a triangle
+// or breaks the "every panel is its own mesh" rule the damage model needs.
+function taperedBox(w, h, d, topW = 1, topD = 1, rake = 0) {
+  const g = new THREE.BoxGeometry(w, h, d);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    if (p.getY(i) <= 0) continue;
+    p.setX(i, p.getX(i) * topW);
+    p.setZ(i, p.getZ(i) * topD + rake);
+  }
+  p.needsUpdate = true;
+  g.computeVertexNormals();
+  return g;
+}
+
+// A wedge: the front of the box is lower than the back. Bonnets and boots stop
+// reading as planks the moment they have a couple of degrees of rake in them.
+function rakedSlab(w, h, d, drop) {
+  const g = new THREE.BoxGeometry(w, h, d);
+  const p = g.attributes.position;
+  const half = d / 2;
+  for (let i = 0; i < p.count; i++) {
+    const k = (half - p.getZ(i)) / d;       // 0 at the back, 1 at the front
+    p.setY(i, p.getY(i) - k * drop);
+  }
+  p.needsUpdate = true;
+  g.computeVertexNormals();
+  return g;
+}
 
 function meshPart(id, geo, mat, pos, spec, partHpBudget) {
   const m = new THREE.Mesh(geo, mat);
@@ -111,7 +151,9 @@ export function buildCar(opts = {}) {
   const cabinZ = (style.boot - style.bonnet) * 0.35;
 
   // --- chassis: the one thing that never leaves -----------------------------
-  const chassis = new THREE.Mesh(box(W * 0.94, 0.5, L), bodyMat);
+  // A waisted tub rather than a brick: the shoulder line comes in above the
+  // sills, which is the single change that stops these reading as boxes.
+  const chassis = new THREE.Mesh(taperedBox(W * 0.94, 0.5, L, style.waist, 0.985), bodyMat);
   chassis.position.set(0, R + 0.25, 0);
   chassis.castShadow = quality.shadows;
   chassis.name = 'chassis';
@@ -124,36 +166,56 @@ export function buildCar(opts = {}) {
     skirt.position.set(sx * W * 0.48, R + 0.08, 0);
     skirt.name = 'skirt';
     g.add(skirt);
+    // Shoulder crease — a thin strip of the trim colour along the flank.
+    const crease = new THREE.Mesh(box(0.05, 0.055, L * 0.66), bodyDark);
+    crease.position.set(sx * W * 0.47, R + 0.46, cabinZ * 0.4);
+    crease.name = 'crease';
+    g.add(crease);
+  }
+
+  // Wheel arches. Four flared lips that break up the slab-sided look and give
+  // the wheels somewhere to live instead of hanging off the side.
+  const archGeo = taperedBox(0.2, style.wheel * 0.95, style.wheel * 2.5, 1, 0.62);
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const arch = new THREE.Mesh(archGeo, bodyDark);
+    arch.position.set(sx * W * 0.5, R + 0.12, sz * (halfL - style.wheel - 0.32));
+    arch.name = 'arch';
+    g.add(arch);
   }
 
   // --- bonnet and boot -----------------------------------------------------
   const bonnetZ = -(cabinZ + style.roofLen / 2 + style.bonnet / 2);
-  const bonnet = meshPart('bonnet', box(W * 0.88, 0.16, style.bonnet), bodyMat,
+  const bonnet = meshPart('bonnet', rakedSlab(W * 0.88, 0.16, style.bonnet, style.rake), bodyMat,
     [0, R + 0.55, bonnetZ], PART_SPEC.bonnet, partHp);
   g.add(bonnet);
 
   const bootZ = cabinZ + style.roofLen / 2 + style.boot / 2;
-  const boot = meshPart('boot', box(W * 0.88, 0.16, style.boot), bodyMat,
+  const boot = meshPart('boot', rakedSlab(W * 0.88, 0.16, style.boot, -style.rake * 0.5), bodyMat,
     [0, R + 0.55, bootZ], PART_SPEC.boot, partHp);
   g.add(boot);
 
   // --- cabin: roof, glass, driver ------------------------------------------
   if (!style.open) {
     const roof = new THREE.Group();
-    const shell = new THREE.Mesh(box(W * 0.8, style.roofH, style.roofLen), bodyMat);
+    // The glasshouse: narrower and shorter at the top than at the belt, pushed
+    // back a touch so there is a windscreen rake rather than a wall.
+    const shell = new THREE.Mesh(
+      taperedBox(W * 0.8, style.roofH, style.roofLen, style.topW, style.topD, style.roofLen * 0.06),
+      bodyMat);
     shell.position.y = style.roofH / 2;
     shell.castShadow = quality.shadows;
     roof.add(shell);
-    // pillars
+    // pillars — the fronts lean back with the screen, the rears stay upright
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
-        const pillar = new THREE.Mesh(box(0.12, style.roofH, 0.12), bodyDark);
-        pillar.position.set(sx * W * 0.38, style.roofH / 2, sz * style.roofLen * 0.46);
+        const pillar = new THREE.Mesh(box(0.11, style.roofH * 1.04, 0.12), bodyDark);
+        pillar.position.set(sx * W * 0.37, style.roofH / 2, sz * style.roofLen * 0.45);
+        pillar.rotation.x = sz < 0 ? -0.2 : 0.12;
         roof.add(pillar);
       }
     }
-    const stripe = new THREE.Mesh(box(W * 0.2, 0.03, style.roofLen * 0.98), trimMat);
-    stripe.position.y = style.roofH + 0.005;
+    const stripe = new THREE.Mesh(box(W * 0.2 * style.topW, 0.03, style.roofLen * style.topD), trimMat);
+    stripe.position.set(0, style.roofH + 0.005, style.roofLen * 0.06);
     roof.add(stripe);
     roof.position.set(0, R + 0.6, cabinZ);
     roof.name = 'roof';
@@ -234,13 +296,45 @@ export function buildCar(opts = {}) {
   // headlights / tail lights ride on the body, not the bumpers
   for (const sx of [-1, 1]) {
     const hl = new THREE.Mesh(box(0.4, 0.16, 0.08), lightMat);
-    hl.position.set(sx * W * 0.3, R + 0.52, -halfL + 0.04);
+    hl.position.set(sx * W * 0.3, R + 0.52 - style.rake, -halfL + 0.04);
     g.add(hl);
     const tl = new THREE.Mesh(box(0.36, 0.14, 0.08), brakeMat);
     tl.position.set(sx * W * 0.3, R + 0.52, halfL - 0.04);
     tl.name = 'brakelight';
     g.add(tl);
   }
+
+  // A face. Cheap, but a car with a grille reads as a car from the front and a
+  // car without one reads as a fridge.
+  const face = new THREE.Group();
+  if (style.grille === 'splitter') {
+    const lip = new THREE.Mesh(box(W * 1.0, 0.06, 0.42), darkMat);
+    lip.position.set(0, R + 0.08, -halfL - 0.16);
+    face.add(lip);
+    const duct = new THREE.Mesh(box(W * 0.5, 0.14, 0.1), darkMat);
+    duct.position.set(0, R + 0.3 - style.rake, -halfL + 0.02);
+    face.add(duct);
+  } else if (style.grille === 'slot') {
+    for (let i = -1; i <= 1; i++) {
+      const bar = new THREE.Mesh(box(W * 0.22, 0.1, 0.09), darkMat);
+      bar.position.set(i * W * 0.24, R + 0.34 - style.rake, -halfL + 0.02);
+      face.add(bar);
+    }
+    // bonnet scoop
+    const scoop = new THREE.Mesh(taperedBox(W * 0.34, 0.13, style.bonnet * 0.5, 0.7, 0.7), bodyDark);
+    scoop.position.set(0, R + 0.66, bonnetZ - style.bonnet * 0.12);
+    face.add(scoop);
+  } else if (style.grille === 'bar') {
+    const bar = new THREE.Mesh(box(W * 0.9, 0.12, 0.12), rimMat);
+    bar.position.set(0, R + 0.42, -halfL - 0.1);
+    face.add(bar);
+  } else {
+    const mesh = new THREE.Mesh(box(W * 0.62, 0.2, 0.07), darkMat);
+    mesh.position.set(0, R + 0.34 - style.rake, -halfL + 0.02);
+    face.add(mesh);
+  }
+  face.name = 'face';
+  g.add(face);
 
   // --- spoiler -------------------------------------------------------------
   if (style.spoiler !== 'none') {

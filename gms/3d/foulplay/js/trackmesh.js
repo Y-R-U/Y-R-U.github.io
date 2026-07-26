@@ -222,12 +222,39 @@ function buildRails(track, env) {
   geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   geo.setIndex(idx);
   geo.computeVertexNormals();
-  const mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({
-    vertexColors: true, side: THREE.DoubleSide,
-  }));
+  const mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+  fadeNearCamera(mat);
+  mat.__owned = true;
+  const mesh = new THREE.Mesh(geo, mat);
   mesh.name = 'rails';
   mesh.castShadow = false;
+  mesh.renderOrder = 1;
   return mesh;
+}
+
+// Barriers go see-through when the lens is jammed against them. Get pinned
+// against the steel and the camera ends up *outside* the circuit looking in —
+// without this you spend the most spectacular two seconds of the race staring
+// at a fence. Anything more than sixteen metres away stays completely solid,
+// so the track never looks like it is made of glass.
+export function fadeNearCamera(mat, near = 5, far = 17, floor = 0.12) {
+  mat.transparent = true;
+  mat.depthWrite = true;
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.fadeNear = { value: near };
+    shader.uniforms.fadeFar = { value: far };
+    shader.uniforms.fadeFloor = { value: floor };
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vLensDist;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvLensDist = -mvPosition.z;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>',
+        '#include <common>\nvarying float vLensDist;\nuniform float fadeNear;\nuniform float fadeFar;\nuniform float fadeFloor;')
+      .replace('#include <dithering_fragment>',
+        '#include <dithering_fragment>\ngl_FragColor.a *= mix(fadeFloor, 1.0, smoothstep(fadeNear, fadeFar, vLensDist));');
+  };
+  mat.needsUpdate = true;
+  return mat;
 }
 
 function buildPosts(track, env) {
@@ -243,8 +270,10 @@ function buildPosts(track, env) {
   }
   if (!spots.length) return null;
   const geo = new THREE.BoxGeometry(0.26, RAIL_HEIGHT + 0.5, 0.26);
-  const mesh = new THREE.InstancedMesh(geo,
-    new THREE.MeshLambertMaterial({ color: env.neon ? 0x4a3a70 : 0x6b737d }), spots.length);
+  const postMat = new THREE.MeshLambertMaterial({ color: env.neon ? 0x4a3a70 : 0x6b737d });
+  fadeNearCamera(postMat);
+  postMat.__owned = true;
+  const mesh = new THREE.InstancedMesh(geo, postMat, spots.length);
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const up = new THREE.Vector3();

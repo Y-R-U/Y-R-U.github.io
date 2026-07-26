@@ -1,27 +1,40 @@
 // Persistent profile. One object in localStorage, written through a debounced
 // flush so a race can bump counters every frame without thrashing storage.
 
-import { SAVE_KEY, WIPE_ARG, LADDER, NAME_POOL } from './config.js';
-import { STARTER_PARTS, STARTER_SKILLS, statsFor, powerRating } from './arsenal.js';
+import { SAVE_KEY, WIPE_ARG, LADDER, NAME_POOL, LIVERY as LIVERY_LIST } from './config.js';
+import {
+  STARTER_PARTS, STARTER_SKILLS, statsFor, powerRating, partById, skillById,
+  MAX_LEVEL, upgradeCost, PRIZE_ITEMS,
+} from './arsenal.js';
+import { CARS, CAR_BY_ID, carById, STARTER_CAR, carStats, bodyStyleOf } from './cars.js';
 import { pick, clamp } from './utils.js';
 
 const DEFAULTS = () => ({
-  v: 1,
+  v: 2,
   name: '',
   money: 3200,
   rank: LADDER.startRank,
   bestRank: LADDER.startRank,
-  livery: 0,
+  livery: -1,                  // -1 = however the car left the factory
+
   fame: 0,                     // lifetime hype, unlocks flavour on the ladder
+  car: STARTER_CAR,
+  cars: [STARTER_CAR],
+  team: { level: 1 },
+  tracks: [],                  // circuit licences bought outright
+  wins: {},                    // trackId / 'ev:id' → times won
   garage: {
     equipped: { ...STARTER_PARTS },
     parts: Object.values(STARTER_PARTS),
     skills: [...STARTER_SKILLS],
     loadout: [...STARTER_SKILLS],
+    levels: {},                // itemId → mark 1..5
   },
   story: { level: 1, cleared: {}, seenCine: [], intro: false },
   quick: { races: 0, wins: 0, podiums: 0, best: 99, streak: 0, bestStreak: 0 },
   events: { cleared: {}, seen: [] },
+  titles: {},                  // bracket state per title series
+  memories: [],                // replays the player chose to keep
   chests: [],                  // unopened chest tier ids
   stats: {
     races: 0, wins: 0, podiums: 0, dnf: 0, laps: 0,
@@ -88,12 +101,17 @@ function migrate(saved) {
   if (!out.garage.skills || !out.garage.skills.length) out.garage.skills = [...STARTER_SKILLS];
   if (!out.garage.loadout || !out.garage.loadout.length) out.garage.loadout = out.garage.skills.slice(0, 3);
   out.garage.loadout = out.garage.loadout.filter((s) => out.garage.skills.includes(s)).slice(0, 3);
+  out.garage.levels = out.garage.levels || {};
   for (const slot of Object.keys(STARTER_PARTS)) {
     if (!out.garage.equipped[slot] || !out.garage.parts.includes(out.garage.equipped[slot])) {
       out.garage.equipped[slot] = STARTER_PARTS[slot];
       if (!out.garage.parts.includes(STARTER_PARTS[slot])) out.garage.parts.push(STARTER_PARTS[slot]);
     }
   }
+  // A save from before the showroom existed still has to have a car in it.
+  if (!out.cars || !out.cars.length) out.cars = [STARTER_CAR];
+  if (!CAR_BY_ID[out.car] || !out.cars.includes(out.car)) out.car = out.cars[0] || STARTER_CAR;
+  if (!out.team || !out.team.level) out.team = { level: 1 };
   return out;
 }
 
@@ -171,8 +189,108 @@ export function takeChest() {
   return t || null;
 }
 
-export const playerStats = () => statsFor(profile.garage.equipped);
-export const playerPower = () => powerRating(profile.garage.equipped);
+// ---------------------------------------------------------------------------
+// Buying, upgrading and owning
+// ---------------------------------------------------------------------------
+export const owns = (id) =>
+  profile.garage.parts.includes(id) || profile.garage.skills.includes(id);
+
+export const itemById = (id) => partById(id) || skillById(id);
+
+// One entry point for "can I have this", so the shop, the crate opener and the
+// prize checker can never disagree about what counts as owned.
+export function buyItem(id) {
+  const item = itemById(id);
+  if (!item || item.src !== 'shop' || owns(id)) return false;
+  if (profile.money < item.price) return false;
+  profile.money -= item.price;
+  if (partById(id)) ownPart(id); else ownSkill(id);
+  saveProfile(true);
+  return true;
+}
+
+export const levelOf = (id) => clamp(profile.garage.levels[id] || 1, 1, MAX_LEVEL);
+
+export function nextUpgradeCost(id) {
+  const item = itemById(id);
+  const lvl = levelOf(id);
+  if (!item || lvl >= MAX_LEVEL) return 0;
+  return upgradeCost(item, lvl);
+}
+
+export function upgradeItem(id) {
+  const cost = nextUpgradeCost(id);
+  if (!cost || !owns(id) || profile.money < cost) return false;
+  profile.money -= cost;
+  profile.garage.levels[id] = levelOf(id) + 1;
+  saveProfile(true);
+  return true;
+}
+
+export const ownedCars = () => CARS.filter((c) => (profile.cars || []).includes(c.id));
+export const ownsCar = (id) => (profile.cars || []).includes(id);
+export const activeCar = () => carById(ownsCar(profile.car) ? profile.car : STARTER_CAR);
+
+export function buyCar(id) {
+  const c = CAR_BY_ID[id];
+  if (!c || c.src !== 'shop' || ownsCar(id) || profile.money < c.price) return false;
+  profile.money -= c.price;
+  profile.cars.push(id);
+  profile.car = id;
+  saveProfile(true);
+  return true;
+}
+
+export function grantCar(id) {
+  if (!CAR_BY_ID[id] || ownsCar(id)) return false;
+  profile.cars.push(id);
+  saveProfile();
+  return true;
+}
+
+export function selectCar(id) {
+  if (!ownsCar(id)) return false;
+  profile.car = id;
+  saveProfile();
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Prizes. Anything gated on "win this" is handed over the moment the condition
+// becomes true, wherever that happens — so a prize can never be missed by
+// finishing a race from an odd screen or quitting before a results card.
+// ---------------------------------------------------------------------------
+export function checkPrizes(conditionMet) {
+  const won = [];
+  for (const p of PRIZE_ITEMS) {
+    if (owns(p.id) || !conditionMet(p.cond)) continue;
+    if (p.kind === 'part') ownPart(p.id); else ownSkill(p.id);
+    won.push({ kind: p.kind, id: p.id, name: p.name });
+  }
+  for (const c of CARS) {
+    if (c.src !== 'prize' || ownsCar(c.id) || !c.unlock || !conditionMet(c.unlock)) continue;
+    profile.cars.push(c.id);
+    won.push({ kind: 'car', id: c.id, name: c.name });
+  }
+  if (won.length) saveProfile(true);
+  return won;
+}
+
+export const playerStats = () =>
+  statsFor(profile.garage.equipped, profile.garage.levels, carStats(activeCar().id));
+export const playerPower = () => powerRating(profile.garage.equipped, profile.garage.levels);
+export const playerStyle = () => bodyStyleOf(activeCar().id);
+
+// livery -1 means "however it left the factory", which is how a car you just
+// bought should look until you decide otherwise. The white starter saloon is
+// the whole reason this exists.
+export function playerLivery() {
+  const car = activeCar();
+  if (profile.livery == null || profile.livery < 0) {
+    return { body: car.body, trim: car.trim, name: 'Factory' };
+  }
+  return LIVERY_LIST[profile.livery % LIVERY_LIST.length];
+}
 
 // ---------------------------------------------------------------------------
 // World ranking. A simulated 3.1M-driver ladder: a win takes a big bite out of

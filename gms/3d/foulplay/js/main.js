@@ -4,6 +4,7 @@ import { loadProfile, profile } from './save.js';
 import { initRenderer, render } from './render.js';
 import { initInput } from './input.js';
 import { initAudio } from './audio.js';
+import { initHaptics } from './haptics.js';
 import { boot, update, present } from './flow.js';
 import { state } from './state.js';
 import { $, clamp } from './utils.js';
@@ -15,6 +16,7 @@ const container = $('game-container');
 initRenderer(container);
 initInput();
 initAudio();
+initHaptics();
 
 // The saved control scheme decides whether the on-screen arrows exist.
 if (profile.settings.steer === 'buttons') {

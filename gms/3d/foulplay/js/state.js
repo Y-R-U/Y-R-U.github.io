@@ -51,11 +51,13 @@ export const state = {
   boostsUsed: 0,
   attacksUsed: 0,
   chestsFound: 0,
+  pickupCash: 0,
   topSpeedSeen: 0,
 
   // ---- camera / presentation ----
   camMode: 'chase',     // chase | wreck | cine | replay | orbit
   lookBack: false,
+  attract: false,       // a race running behind the menus, nobody driving
   shake: 0,
   cine: false,
   cineLine: null,
@@ -95,6 +97,7 @@ export function resetRaceState() {
   state.boostsUsed = 0;
   state.attacksUsed = 0;
   state.chestsFound = 0;
+  state.pickupCash = 0;
   state.foundChests = [];
   state.topSpeedSeen = 0;
   state.results = null;

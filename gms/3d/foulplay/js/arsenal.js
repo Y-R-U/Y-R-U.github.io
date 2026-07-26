@@ -8,6 +8,25 @@
 
 import { pick, randInt, rand } from './utils.js';
 
+// Where a thing can come from. Keeping this on the item itself means the shop,
+// the crate roller and the prize checker all read the same list and can never
+// disagree about whether something is for sale.
+//   shop  — buyable outright, and expensive
+//   crate — only ever falls out of a crate
+//   prize — only ever handed over for winning something specific
+//   start — you already have it
+export const SOURCES = {
+  start: { name: 'OWNED', css: '#9fb0c0' },
+  shop:  { name: 'FOR SALE', css: '#ffb020' },
+  crate: { name: 'CRATE ONLY', css: '#b765f0' },
+  prize: { name: 'PRIZE ONLY', css: '#37c26a' },
+};
+
+// Sticker price by tier. The curve is deliberately brutal at the top: a tier 6
+// part should be most of a season's earnings, not an afternoon's.
+export const TIER_PRICE = [0, 0, 3500, 12000, 38000, 95000, 250000];
+const RARITY_PRICE = { common: 2600, rare: 11000, epic: 42000, legendary: 160000 };
+
 export const RARITY = {
   common:    { name: 'COMMON',    color: 0x9fb0c0, css: '#9fb0c0', mul: 1.0 },
   rare:      { name: 'RARE',      color: 0x4aa3ef, css: '#4aa3ef', mul: 1.0 },
@@ -113,6 +132,25 @@ export const SKILLS = [
   },
 ];
 
+// How each trick is obtained. Most are for sale — cash has to be able to buy
+// its way to a full loadout — but the two that decide races are not.
+const SKILL_SOURCE = {
+  slam: 'start', bullbar: 'start', smoke: 'start',
+  jetwash: 'shop', oilslick: 'shop', pitspin: 'shop', tacks: 'shop',
+  hooksaw: 'shop', grapple: 'shop', anchor: 'shop',
+  emp: 'shop', shockwave: 'shop', ramjet: 'shop',
+  scattergun: 'crate',
+  wreckingball: 'prize',
+};
+const SKILL_PRIZE = {
+  wreckingball: { kind: 'win', event: 'gauntlet', eventName: 'THE GAUNTLET' },
+};
+for (const s of SKILLS) {
+  s.src = SKILL_SOURCE[s.id] || 'shop';
+  s.price = s.src === 'shop' ? RARITY_PRICE[s.rarity] : 0;
+  if (SKILL_PRIZE[s.id]) s.prize = SKILL_PRIZE[s.id];
+}
+
 export const SKILL_BY_ID = Object.fromEntries(SKILLS.map((s) => [s.id, s]));
 export const skillById = (id) => SKILL_BY_ID[id] || null;
 
@@ -179,11 +217,66 @@ export const PARTS = [
   { id: 'stl6', slot: 'stealth', name: 'Ghost Protocol',   rarity: 'legendary', tier: 6, stats: { stealth: 0.44, hypeGain: 1.2 } },
 ];
 
+// Each slot has a different shape of ladder, so no two upgrade paths feel the
+// same: one slot's tier 5 is on the shelf, another's only ever falls out of a
+// crate, and every slot's tier 6 is something you had to go and win.
+const PART_SOURCE = {
+  eng1: 'start', eng2: 'shop',  eng3: 'shop',  eng4: 'shop',  eng5: 'crate', eng6: 'prize',
+  tyr1: 'start', tyr2: 'shop',  tyr3: 'shop',  tyr4: 'crate', tyr5: 'shop',  tyr6: 'prize',
+  arm1: 'start', arm2: 'shop',  arm3: 'shop',  arm4: 'shop',  arm5: 'crate', arm6: 'crate',
+  nit1: 'start', nit2: 'shop',  nit3: 'crate', nit4: 'shop',  nit5: 'shop',  nit6: 'prize',
+  frm1: 'start', frm2: 'shop',  frm3: 'shop',  frm4: 'crate', frm5: 'shop',  frm6: 'prize',
+  stl1: 'start', stl2: 'shop',  stl3: 'shop',  stl4: 'shop',  stl5: 'crate', stl6: 'prize',
+};
+const PART_PRIZE = {
+  eng6: { kind: 'story', level: 100 },
+  tyr6: { kind: 'win', event: 'ringoffire', eventName: 'RING OF FIRE' },
+  nit6: { kind: 'win', event: 'championsinvite', eventName: "CHAMPION'S INVITE" },
+  frm6: { kind: 'win', event: 'derby', eventName: 'DEMOLITION DERBY' },
+  stl6: { kind: 'win', event: 'blackout', eventName: 'BLACKOUT RUN' },
+};
+for (const p of PARTS) {
+  p.src = PART_SOURCE[p.id] || 'shop';
+  p.price = p.src === 'shop' ? TIER_PRICE[p.tier] : 0;
+  if (PART_PRIZE[p.id]) p.prize = PART_PRIZE[p.id];
+}
+
 export const PART_BY_ID = Object.fromEntries(PARTS.map((p) => [p.id, p]));
 export const partById = (id) => PART_BY_ID[id] || null;
 export const partsForSlot = (slot) => PARTS.filter((p) => p.slot === slot);
 
 export const STARTER_PARTS = { engine: 'eng1', tyres: 'tyr1', armour: 'arm1', nitro: 'nit1', frame: 'frm1', stealth: 'stl1' };
+
+// Everything with a `prize` on it, for the checker that hands them over.
+export const PRIZE_ITEMS = [
+  ...PARTS.filter((p) => p.prize).map((p) => ({ kind: 'part', id: p.id, name: p.name, cond: p.prize })),
+  ...SKILLS.filter((s) => s.prize).map((s) => ({ kind: 'skill', id: s.id, name: s.name, cond: s.prize })),
+];
+
+// ---------------------------------------------------------------------------
+// Upgrades
+// ---------------------------------------------------------------------------
+// Anything you own can be taken up four marks. A mark scales how far the part
+// departs from stock, so upgrading a good tier 3 gets you most of the way to a
+// stock tier 4 — the cheap route to a fast car, right up until it isn't.
+export const MAX_LEVEL = 5;
+const LEVEL_GAIN = 0.16;
+export const MARKS = ['', 'I', 'II', 'III', 'IV', 'V'];
+
+export const levelMul = (lvl) => 1 + LEVEL_GAIN * (clampLevel(lvl) - 1);
+const clampLevel = (l) => Math.max(1, Math.min(MAX_LEVEL, l || 1));
+
+// Cost of going from `lvl` to `lvl + 1`. Cheap at first, then it runs away —
+// the last mark on a tier 5 part costs more than most tier 5 parts do.
+export function upgradeCost(item, lvl) {
+  if (!item || clampLevel(lvl) >= MAX_LEVEL) return 0;
+  const base = Math.max(1200, (item.price || TIER_PRICE[item.tier || 2] || 3500) * 0.18);
+  const raw = base * Math.pow(2.7, clampLevel(lvl) - 1);
+  // Round to something that reads like a price rather than a calculation.
+  const mag = Math.pow(10, Math.max(2, Math.floor(Math.log10(raw)) - 1));
+  return Math.round(raw / mag) * mag;
+}
+
 
 // ---------------------------------------------------------------------------
 // Aggregated stats
@@ -195,80 +288,127 @@ const BASE_STATS = {
 
 const ADDITIVE = new Set(['top', 'boostTime', 'boostMax']);
 
-export function statsFor(equipped) {
-  const out = { ...BASE_STATS };
-  for (const slot of SLOTS) {
-    const p = partById(equipped && equipped[slot.id]);
-    if (!p) continue;
-    for (const [k, v] of Object.entries(p.stats)) {
-      if (out[k] == null) out[k] = ADDITIVE.has(k) ? 0 : 1;
-      if (ADDITIVE.has(k)) out[k] += v;
-      else out[k] *= v;
-    }
+// Fold one stat block into another, respecting whether a key adds or multiplies.
+export function foldStats(out, stats, mul = 1) {
+  for (const [k, v] of Object.entries(stats || {})) {
+    if (out[k] == null) out[k] = ADDITIVE.has(k) ? 0 : 1;
+    if (ADDITIVE.has(k)) out[k] += v * mul;
+    else out[k] *= 1 + (v - 1) * mul;    // scale the *departure from stock*
   }
   return out;
 }
 
+// `levels` maps part id → mark (1..5); `chassis` is the car's own stat block.
+export function statsFor(equipped, levels, chassis) {
+  const out = { ...BASE_STATS };
+  for (const slot of SLOTS) {
+    const p = partById(equipped && equipped[slot.id]);
+    if (!p) continue;
+    foldStats(out, p.stats, levelMul(levels && levels[p.id]));
+  }
+  if (chassis) foldStats(out, chassis, 1);
+  return out;
+}
+
 // A single number for "how good is this car", used to seed rival strength and
-// to show a bar in the garage.
-export function powerRating(equipped) {
+// to show a bar in the garage. Marks count for a fraction of a tier each, so
+// a fully upgraded tier 4 outranks a stock tier 5.
+export function powerRating(equipped, levels) {
   let sum = 0;
   for (const slot of SLOTS) {
     const p = partById(equipped && equipped[slot.id]);
-    sum += p ? p.tier : 1;
+    if (!p) { sum += 1; continue; }
+    sum += p.tier + (clampLevel(levels && levels[p.id]) - 1) * 0.3;
   }
-  return Math.round((sum / (SLOTS.length * 6)) * 100);
+  return Math.round((sum / (SLOTS.length * 7.2)) * 100);
 }
 
 // ---------------------------------------------------------------------------
 // Chests
 // ---------------------------------------------------------------------------
+// A crate is mostly an envelope of cash. That is deliberate: cash buys almost
+// everything in this game now, so a crate that pays out is still a crate that
+// got you closer to the part you actually want. The good stuff is rare enough
+// that pulling it is an event, and a legendary out of a scrap crate is not a
+// thing that happens at all.
 export const CHEST_TIERS = {
-  scrap:   { name: 'SCRAP CRATE',  css: '#9fb0c0', color: 0x9fb0c0, cash: [140, 340],   weights: { common: 74, rare: 24, epic: 2,  legendary: 0 } },
-  parts:   { name: 'PARTS CRATE',  css: '#4aa3ef', color: 0x4aa3ef, cash: [320, 780],   weights: { common: 48, rare: 42, epic: 9,  legendary: 1 } },
-  contra:  { name: 'CONTRABAND',   css: '#b765f0', color: 0xb765f0, cash: [700, 1600],  weights: { common: 20, rare: 46, epic: 29, legendary: 5 } },
-  sponsor: { name: 'SPONSOR VAULT', css: '#ffb020', color: 0xffb020, cash: [1600, 3600], weights: { common: 4,  rare: 30, epic: 46, legendary: 20 } },
+  scrap: {
+    name: 'SCRAP CRATE', css: '#9fb0c0', color: 0x9fb0c0,
+    cash: [400, 950], picks: 1, cashChance: 0.72,
+    weights: { common: 94, rare: 6, epic: 0, legendary: 0 },
+  },
+  parts: {
+    name: 'PARTS CRATE', css: '#4aa3ef', color: 0x4aa3ef,
+    cash: [950, 2300], picks: 2, cashChance: 0.58,
+    weights: { common: 78, rare: 21, epic: 1, legendary: 0 },
+  },
+  contra: {
+    name: 'CONTRABAND', css: '#b765f0', color: 0xb765f0,
+    cash: [2300, 5400], picks: 2, cashChance: 0.42,
+    weights: { common: 52, rare: 40, epic: 7.6, legendary: 0.4 },
+  },
+  sponsor: {
+    name: 'SPONSOR VAULT', css: '#ffb020', color: 0xffb020,
+    cash: [6200, 14500], picks: 3, cashChance: 0.28,
+    weights: { common: 26, rare: 51, epic: 20, legendary: 3 },
+  },
 };
 
-function rollRarity(weights) {
+// `luck` (0..0.25, from the team facility) shifts weight up the rarity ladder
+// without ever letting a scrap crate produce something it should not.
+function rollRarity(weights, luck = 0) {
+  const order = ['common', 'rare', 'epic', 'legendary'];
+  const w = {};
   let total = 0;
-  for (const k in weights) total += weights[k];
+  for (let i = 0; i < order.length; i++) {
+    const k = order[i];
+    const base = weights[k] || 0;
+    w[k] = base > 0 ? base * (1 + luck * i * 1.6) : 0;
+    total += w[k];
+  }
   let r = Math.random() * total;
-  for (const k in weights) {
-    r -= weights[k];
+  for (const k of order) {
+    r -= w[k];
     if (r <= 0) return k;
   }
   return 'common';
 }
 
-// Rolls the contents of a chest. `owned` lets us prefer things you do not have
-// yet, which keeps mid-game chests from being three duplicate tyres.
-export function rollChest(tierId, owned = { parts: [], skills: [] }) {
+// Prize items never appear in a crate — the whole point of them is that you had
+// to go and win something.
+const cratePool = (list, rarity) => list.filter((x) => x.rarity === rarity && x.src !== 'prize');
+
+// Rolls the contents of a crate. `owned` lets us prefer things you do not have
+// yet, which keeps mid-game crates from being three duplicate tyres.
+export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0) {
   const tier = CHEST_TIERS[tierId] || CHEST_TIERS.scrap;
   const items = [];
-  const picks = tierId === 'sponsor' ? 3 : tierId === 'contra' ? 3 : 2;
 
-  for (let i = 0; i < picks; i++) {
-    const rarity = rollRarity(tier.weights);
-    const wantSkill = Math.random() < (tierId === 'contra' ? 0.45 : 0.26);
+  for (let i = 0; i < tier.picks; i++) {
+    if (Math.random() < tier.cashChance) {
+      items.push({ kind: 'cash', amount: Math.round(rand(tier.cash[0], tier.cash[1]) * 0.55) });
+      continue;
+    }
+    const rarity = rollRarity(tier.weights, luck);
+    const wantSkill = Math.random() < (tierId === 'contra' ? 0.42 : 0.24);
 
     if (wantSkill) {
-      const pool = SKILLS.filter((s) => s.rarity === rarity);
+      const pool = cratePool(SKILLS, rarity);
       const fresh = pool.filter((s) => !owned.skills.includes(s.id));
-      const s = pick(fresh.length ? fresh : pool.length ? pool : SKILLS);
-      if (owned.skills.includes(s.id)) {
-        items.push({ kind: 'cash', amount: randInt(180, 460), why: `duplicate ${s.name}` });
+      const s = pick(fresh.length ? fresh : pool.length ? pool : SKILLS.filter((x) => x.src !== 'prize'));
+      if (!s || owned.skills.includes(s.id)) {
+        items.push({ kind: 'cash', amount: randInt(400, 1100), why: s ? `duplicate ${s.name}` : 'nothing you need' });
       } else {
         items.push({ kind: 'skill', id: s.id, rarity: s.rarity });
       }
       continue;
     }
 
-    const pool = PARTS.filter((p) => p.rarity === rarity);
+    const pool = cratePool(PARTS, rarity);
     const fresh = pool.filter((p) => !owned.parts.includes(p.id));
-    const p = pick(fresh.length ? fresh : pool.length ? pool : PARTS);
-    if (owned.parts.includes(p.id)) {
-      items.push({ kind: 'cash', amount: randInt(200, 520), why: `duplicate ${p.name}` });
+    const p = pick(fresh.length ? fresh : pool.length ? pool : PARTS.filter((x) => x.src !== 'prize'));
+    if (!p || owned.parts.includes(p.id)) {
+      items.push({ kind: 'cash', amount: randInt(450, 1300), why: p ? `duplicate ${p.name}` : 'nothing you need' });
     } else {
       items.push({ kind: 'part', id: p.id, rarity: p.rarity });
     }
@@ -278,11 +418,24 @@ export function rollChest(tierId, owned = { parts: [], skills: [] }) {
   return { tier: tierId, items };
 }
 
-// What the on-track pickup crates contain — weighted toward the cheap end.
-export function trackChestTier() {
+// What finishing in a given position is worth. The brief: fourth or worse gets
+// one crate, the podium gets two, three and four — and the extra ones a winner
+// gets are the good ones, so position matters more than volume.
+export function crateAward(position, eventTier = 1) {
+  const rich = eventTier >= 4.5 ? 'sponsor' : eventTier >= 2.5 ? 'contra' : 'parts';
+  const mid = eventTier >= 4.5 ? 'contra' : 'parts';
+  if (position === 1) return [rich, mid, 'scrap', 'scrap'];
+  if (position === 2) return [mid, 'scrap', 'scrap'];
+  if (position === 3) return [mid, 'scrap'];
+  return ['scrap'];
+}
+
+// What an on-track pickup crate is worth. Almost always cash or a boost — the
+// crates you actually open are the ones you earned at the flag.
+export function trackPickup() {
   const r = Math.random();
-  if (r < 0.62) return 'scrap';
-  if (r < 0.9) return 'parts';
-  if (r < 0.99) return 'contra';
-  return 'sponsor';
+  if (r < 0.5) return { kind: 'cash', amount: randInt(300, 900) };
+  if (r < 0.82) return { kind: 'boost' };
+  if (r < 0.97) return { kind: 'crate', tier: 'scrap' };
+  return { kind: 'crate', tier: 'parts' };
 }

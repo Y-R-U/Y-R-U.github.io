@@ -31,6 +31,7 @@ export function initHud() {
     hypeFill: $('hype-fill'), hypeVal: $('hype-val'), hypeWrap: $('hype-wrap'),
     camWarn: $('cam-warn'), camDist: $('cam-dist'),
     boostBtn: $('btn-boost'), boostCount: $('boost-count'), boostFill: $('boost-fill'),
+    boostLabel: $('boost-label'),
     atkBtn: $('btn-attack'), atkRing: $('atk-ring'), atkName: $('atk-name'), atkRisk: $('atk-risk'),
     banner: $('banner'), bannerText: $('banner-text'),
     toast: $('toast'),
@@ -75,6 +76,14 @@ function wireEvents() {
   on('race:eliminated', ({ car }) => feed(`${car.name} ELIMINATED`, 'bad'));
   on('pickup:chest', ({ tier }) => toast('CRATE SECURED', 'good'));
   on('pickup:boost', () => toast('NITRO +1', 'good'));
+  on('pickup:cash', ({ amount }) => toast(`+$${amount.toLocaleString('en-US')}`, 'good'));
+  // Explained in full the first couple of times, then just a nudge, because
+  // once you know the rule you only need reminding that it is still on.
+  on('boost:denied', () => {
+    const seen = (profile.tutorial.leadBoost = (profile.tutorial.leadBoost || 0) + 1);
+    if (seen <= 2) toast('NO NITRO IN FIRST — GET BACK IN THE PACK', 'warn', 2.2);
+    else toast("LEADER'S HANDICAP", 'warn', 1);
+  });
   on('car:lap', ({ car }) => {
     if (car.isPlayer && car.lap >= 0) banner(`LAP ${clamp(car.lap + 1, 1, state.laps)}`, 'plain');
   });
@@ -161,11 +170,16 @@ export function updateHud(dt) {
   }
 
   // --- kit -----------------------------------------------------------------
+  // The leader's handicap has to be visible or it reads as a bug. The button
+  // says why it is dead, every frame it is dead.
+  const locked = p.boostLocked && state.phase === 'racing';
   setText(el.boostCount, p.boosts);
   if (el.boostBtn) {
-    el.boostBtn.classList.toggle('empty', p.boosts <= 0);
+    el.boostBtn.classList.toggle('empty', p.boosts <= 0 || locked);
     el.boostBtn.classList.toggle('firing', p.boosting);
+    el.boostBtn.classList.toggle('locked-lead', locked);
   }
+  if (el.boostLabel) setText(el.boostLabel, locked ? 'NO BOOST IN P1' : 'BOOST');
   if (el.boostFill) el.boostFill.style.width = (clamp01(p.boostTime / (DRIVE.boostTime + p.stats.boostTime)) * 100) + '%';
 
   updateAttackButton(p, dt);

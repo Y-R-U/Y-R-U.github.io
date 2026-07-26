@@ -18,8 +18,8 @@ import { updateDebris, clearDebris } from './debris.js';
 import { updateCamera, resetCamera } from './camera.js';
 import { initHighlights, recordFrame, markHighlight, harvestHighlights, clearHighlights } from './highlights.js';
 import { state, resetRaceState, addShake } from './state.js';
-import { profile, playerStats } from './save.js';
-import { statsFor, partById, trackChestTier } from './arsenal.js';
+import { profile, playerStats, playerStyle, playerLivery } from './save.js';
+import { statsFor, partById, trackPickup } from './arsenal.js';
 import { emit, on } from './bus.js';
 import { clamp, clamp01, lerp, rand, randInt, sign, pick, shuffled, wrap } from './utils.js';
 
@@ -108,8 +108,8 @@ function buildField(ev, track) {
         track, index: slot, isPlayer: true,
         name: profile.name,
         team: 'You',
-        style: ev.playerStyle || 'muscle',
-        livery: LIVERY[profile.livery % LIVERY.length],
+        style: ev.playerStyle || playerStyle(),
+        livery: playerLivery(),
         stats: playerStats(),
         skills: profile.garage.loadout.slice(),
       });
@@ -292,10 +292,17 @@ function resolveContacts(dt, cars) {
       if (!b.alive || b.mode === 'wreck' || b.respawnTimer > 0) continue;
 
       const ds = tr.delta(a.s, b.s);
-      if (Math.abs(ds) > LEN) continue;
+      if (Math.abs(ds) > LEN + 2) continue;
       const dtt = b.t - a.t;
-      if (Math.abs(dtt) > WID) continue;
       if (Math.abs((b.h || 0) - (a.h || 0)) > 1.7) continue;
+
+      // Something hanging off one car reaches further than the car does. Run
+      // alongside a rival trailing half a door and it will find you.
+      if (Math.abs(dtt) < WID + 1.7 && (a.hasDangler() || b.hasDangler())) {
+        flailHit(a, b, dtt);
+        flailHit(b, a, -dtt);
+      }
+      if (Math.abs(ds) > LEN || Math.abs(dtt) > WID) continue;
 
       const overS = LEN - Math.abs(ds);
       const overT = WID - Math.abs(dtt);
@@ -344,6 +351,26 @@ function resolveContacts(dt, cars) {
         }
       }
     }
+  }
+}
+
+// `owner` is trailing wreckage; `victim` is alongside. It is not much of a hit,
+// but it sparks, it nudges them off line and it can finish the job of tearing
+// the panel free — which is exactly what it looks like it should do.
+function flailHit(owner, victim, dtt) {
+  if (!owner.hasDangler() || owner.flailAt > state.raceTime - 0.35) return;
+  owner.flailAt = state.raceTime;
+  const dir = sign(dtt) || 1;
+  const bite = clamp01(Math.abs(owner.forwardSpeed) / 50);
+  victim.shove(dir * (3 + bite * 7), 0, { by: owner });
+  victim.damage(2 + bite * 7, dir > 0 ? 'left' : 'right', { by: owner, source: 'debris' });
+  _v1.copy(victim.worldPos).lerp(owner.worldPos, 0.5);
+  ring(_v1, 0xffb43a, 2.2, 0.24);
+  emit('race:flail', { owner, victim });
+  // Half the time the impact is what finally rips it off.
+  if (Math.random() < 0.5) {
+    const id = owner.danglers[0];
+    if (id) owner.detachPart(id, { by: victim, dir: _v1.set(dir, 0.6, 0).normalize() });
   }
 }
 
@@ -434,21 +461,30 @@ function updateCrateMeshes() {
   }
 }
 
+// What is in a roadside crate. Crates you take home are earned at the flag now;
+// the ones on the circuit are pocket money and nitro, so grabbing one is a
+// racing decision rather than a slot machine you drive into.
 function collectCrate(car, crate) {
   ring(car.worldPos, crate.kind === 'boost' ? 0x35d7ff : 0xffc44d, 4, 0.4);
   if (crate.kind === 'boost') {
     car.giveBoost(1);
     if (car.isPlayer) emit('pickup:boost', { car });
+    return;
+  }
+  if (!car.isPlayer) { car.giveBoost(1); return; }
+
+  const loot = trackPickup();
+  if (loot.kind === 'cash') {
+    state.pickupCash = (state.pickupCash || 0) + loot.amount;
+    emit('pickup:cash', { car, amount: loot.amount });
+  } else if (loot.kind === 'boost') {
+    car.giveBoost(1);
+    emit('pickup:boost', { car });
   } else {
-    if (car.isPlayer) {
-      state.chestsFound++;
-      const tier = trackChestTier();
-      state.foundChests = state.foundChests || [];
-      state.foundChests.push(tier);
-      emit('pickup:chest', { car, tier });
-    } else {
-      car.giveBoost(1);
-    }
+    state.chestsFound++;
+    state.foundChests = state.foundChests || [];
+    state.foundChests.push(loot.tier);
+    emit('pickup:chest', { car, tier: loot.tier });
   }
 }
 

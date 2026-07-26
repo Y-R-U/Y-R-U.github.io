@@ -6,12 +6,15 @@
 // can show a roof still attached that came off thirty seconds ago.
 
 import * as THREE from 'three';
-import { scene } from './render.js';
+import { scene, setEnvironment, disposeGroup } from './render.js';
 import { buildCar, PART_IDS } from './carfactory.js';
 import { setCamera } from './camera.js';
 import { setFov } from './render.js';
+import { buildTrack } from './trackgen.js';
+import { buildTrackMesh } from './trackmesh.js';
+import { TRACK_BY_ID } from './trackgen.js';
 import { state } from './state.js';
-import { profile } from './save.js';
+import { profile, saveProfile } from './save.js';
 import { on, emit } from './bus.js';
 import * as fx from './particles.js';
 import { clamp, clamp01, lerp, rand, pick, wrap } from './utils.js';
@@ -20,8 +23,14 @@ const HZ = 20;
 const DT = 1 / HZ;
 const PRE = 2.3;               // seconds of lead-in kept in the ring
 const POST = 1.6;              // seconds recorded after the trigger
+// A car actually coming apart takes longer than that, and it is the best thing
+// in the game to watch, so wrecks get their own, longer tail.
+const POST_WRECK = 3.4;
 const STRIDE = 9;              // floats per car per sample
 const MAX_CLIPS = 26;
+const MAX_MEMORIES = 8;
+
+const isWreck = (kind) => kind === 'WRECKED THEM' || kind === 'WIPEOUT' || kind === 'WRECK';
 
 let cars = [];
 let ring = [];                 // Float32Array frames
@@ -131,7 +140,20 @@ function mark(kind, car, score, label) {
   const now = state.raceTime;
   if (pending.some((c) => now - c.at < 1.2) || clips.some((c) => now - c.at < 1.0)) {
     const latest = pending[pending.length - 1] || clips[clips.length - 1];
-    if (latest && score > latest.score) { latest.score = score; latest.kind = kind; latest.label = label; }
+    if (latest && score > latest.score) {
+      latest.score = score;
+      latest.kind = kind;
+      latest.label = label;
+      // Promoting a clip has to promote its *presentation* too. Upgrading only
+      // the label was leaving wrecks with a chase shot and no slow motion,
+      // which is the one thing this whole system exists to show.
+      if (isWreck(kind) && !latest.wreck) {
+        latest.wreck = true;
+        latest.shot = 'showcase';
+        latest.focus = cars.indexOf(car);
+        if (latest.left != null) latest.left = Math.max(latest.left, POST_WRECK - (now - latest.at));
+      }
+    }
     return;
   }
 
@@ -140,12 +162,16 @@ function mark(kind, car, score, label) {
     const idx = (ringAt + k) % ringLen;
     frames.push(Float32Array.from(ring[idx]));
   }
+  const wreck = isWreck(kind);
   pending.push({
     kind, label, score, at: now,
     focus: cars.indexOf(car),
     frames,
-    left: POST,
-    shot: pick(['chase', 'trackside', 'low', 'orbit']),
+    left: wreck ? POST_WRECK : POST,
+    // A wreck gets the showcase shot: in close, slowed right down, orbiting the
+    // car while it sheds panels. Everything else cuts around as before.
+    shot: wreck ? 'showcase' : pick(['chase', 'trackside', 'low', 'orbit']),
+    wreck,
     trigger: frames.length,
   });
 }
@@ -168,21 +194,22 @@ export function harvestHighlights() {
 // ---------------------------------------------------------------------------
 let ghosts = [];
 let play = null;
+let stageMesh = null;          // a track built purely to replay a saved memory
 
 export function playHighlights(list, onDone) {
   if (!list || !list.length) { onDone && onDone(); return false; }
-  buildGhosts();
+  buildGhosts(state.cars.map((c) => ({ style: c.style, body: c.livery.body, trim: c.livery.trim })));
   for (const c of state.cars) c.mesh.visible = false;
-  play = { list, i: 0, t: 0, onDone, clip: list[0], rate: 1 };
+  play = { list, i: 0, t: 0, onDone, clip: list[0], rate: 1, saved: false };
   state.camMode = 'replay';
-  emit('replay:clip', { clip: play.clip, index: 0, total: list.length });
+  announce();
   return true;
 }
 
-function buildGhosts() {
+function buildGhosts(specs) {
   disposeGhosts();
-  for (const c of state.cars) {
-    const g = buildCar({ style: c.style, body: c.livery.body, trim: c.livery.trim, partHp: 1 });
+  for (const s of specs) {
+    const g = buildCar({ style: s.style, body: s.body, trim: s.trim, partHp: 1 });
     scene.add(g);
     g.visible = false;
     ghosts.push({ mesh: g, parts: g.userData.parts, lastMask: -1 });
@@ -200,19 +227,134 @@ function disposeGhosts() {
   ghosts = [];
 }
 
+function announce() {
+  if (!play) return;
+  emit('replay:clip', {
+    clip: play.clip, index: play.i, total: play.list.length,
+    canSave: !play.saved && (profile.memories || []).length < MAX_MEMORIES,
+    saved: !!play.clip.savedAlready,
+  });
+}
+
 export function stopPlayback() {
   if (play) {
     for (const c of state.cars) if (c.mesh) c.mesh.visible = !c.retired;
     play = null;
   }
   disposeGhosts();
+  if (stageMesh) { disposeGroup(stageMesh); stageMesh = null; state.track = null; }
   if (state.camMode === 'replay') state.camMode = 'chase';
+}
+
+// ---------------------------------------------------------------------------
+// Scrubbing between incidents, which is the first thing anybody wants when a
+// reel shows them something good and then moves on.
+// ---------------------------------------------------------------------------
+export function stepClip(dir) {
+  if (!play) return;
+  const next = clamp(play.i + dir, 0, play.list.length - 1);
+  if (next === play.i && dir > 0) { finish(); return; }
+  play.i = next;
+  play.clip = play.list[next];
+  play.t = 0;
+  for (const g of ghosts) g.lastMask = -1;
+  announce();
+}
+
+function finish() {
+  const done = play ? play.onDone : null;
+  stopPlayback();
+  done && done();
+}
+
+// ---------------------------------------------------------------------------
+// Memories — a clip kept on purpose
+// ---------------------------------------------------------------------------
+// Stored as base64 of the raw sample buffer plus just enough about the cars and
+// the circuit to build the stage again. Small enough for localStorage, and it
+// survives the race it came from being long gone.
+export function saveCurrentClip() {
+  if (!play || play.saved || play.clip.savedAlready) return false;
+  const list = profile.memories || (profile.memories = []);
+  if (list.length >= MAX_MEMORIES) list.shift();
+  const clip = play.clip;
+  const n = clip.frames.length;
+  const per = clip.frames[0].length;
+  const flat = new Float32Array(n * per);
+  for (let i = 0; i < n; i++) flat.set(clip.frames[i], i * per);
+
+  list.push({
+    kind: clip.kind,
+    label: clip.label,
+    shot: clip.shot,
+    wreck: !!clip.wreck,
+    focus: clip.focus,
+    trigger: clip.trigger,
+    frames: n,
+    stride: STRIDE,
+    cars: state.cars.map((c) => ({ style: c.style, body: c.livery.body, trim: c.livery.trim })),
+    track: state.track ? state.track.def.id : 'hometown',
+    where: state.track ? state.track.def.name : '',
+    at: Date.now(),
+    data: b64encode(flat.buffer),
+  });
+  clip.savedAlready = true;
+  saveProfile(true);
+  announce();
+  return true;
+}
+
+export function playSaved(mem, onDone) {
+  if (!mem) { onDone && onDone(); return false; }
+  stopPlayback();
+  // Build the circuit purely as a stage. Nothing drives on it.
+  const track = buildTrack(mem.track);
+  state.track = track;
+  setEnvironment(track.env);
+  stageMesh = buildTrackMesh(track);
+  scene.add(stageMesh);
+
+  const buf = b64decode(mem.data);
+  const flat = new Float32Array(buf);
+  const per = mem.cars.length * (mem.stride || STRIDE);
+  const frames = [];
+  for (let i = 0; i < mem.frames; i++) frames.push(flat.subarray(i * per, (i + 1) * per));
+
+  buildGhosts(mem.cars);
+  const clip = {
+    kind: mem.kind, label: mem.label, shot: mem.shot, wreck: mem.wreck,
+    focus: mem.focus, trigger: mem.trigger, frames, at: 0, savedAlready: true,
+  };
+  play = { list: [clip], i: 0, t: 0, onDone, clip, rate: 1, saved: true };
+  state.screen = 'replay';
+  state.camMode = 'replay';
+  announce();
+  return true;
+}
+
+function b64encode(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let s = '';
+  const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) {
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  }
+  return btoa(s);
+}
+
+function b64decode(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
 }
 
 const _p = new THREE.Vector3();
 const _p2 = new THREE.Vector3();
 const _q = new THREE.Quaternion();
+const _qb = new THREE.Quaternion();
 const _look = new THREE.Vector3();
+const _up = new THREE.Vector3(0, 1, 0);
 
 export function updateHighlightPlayback(dt) {
   if (!play) return false;
@@ -221,7 +363,15 @@ export function updateHighlightPlayback(dt) {
   // Slow the moment of impact down; run the lead-in a touch quick.
   const triggerT = (clip.trigger / n);
   const phase = play.t / (n * DT);
-  play.rate = phase > triggerT - 0.08 && phase < triggerT + 0.22 ? 0.34 : 1.0;
+  if (clip.wreck) {
+    // A wreck gets held right down through the whole break-up, then eased back
+    // to normal speed on the way out. This is the shot the game is *for*.
+    play.rate = phase < triggerT - 0.06 ? 1.0
+      : phase < triggerT + 0.55 ? 0.22
+      : lerp(0.22, 0.85, clamp01((phase - triggerT - 0.55) / 0.3));
+  } else {
+    play.rate = phase > triggerT - 0.08 && phase < triggerT + 0.22 ? 0.34 : 1.0;
+  }
   play.t += dt * play.rate;
 
   const fi = clamp(play.t / DT, 0, n - 1.001);
@@ -238,8 +388,8 @@ export function updateHighlightPlayback(dt) {
     if (!vis) continue;
     _p.set(lerp(a[o], b[o], f), lerp(a[o + 1], b[o + 1], f), lerp(a[o + 2], b[o + 2], f));
     _q.set(a[o + 3], a[o + 4], a[o + 5], a[o + 6]);
-    const qb = new THREE.Quaternion(b[o + 3], b[o + 4], b[o + 5], b[o + 6]);
-    _q.slerp(qb, f);
+    _qb.set(b[o + 3], b[o + 4], b[o + 5], b[o + 6]);
+    _q.slerp(_qb, f);
     g.mesh.position.copy(_p);
     g.mesh.quaternion.copy(_q);
 
@@ -249,7 +399,11 @@ export function updateHighlightPlayback(dt) {
         const part = g.parts[PART_IDS[k]];
         if (!part) continue;
         const shown = (mask & (1 << k)) !== 0;
-        if (part.visible && !shown) fx.sparkBurst(_p, new THREE.Vector3(0, 1, 0), 6, 0xffc470, 7);
+        if (part.visible && !shown) {
+          // A panel leaving in slow motion deserves more than six sparks.
+          fx.sparkBurst(_p, _up, clip.wreck ? 22 : 8, 0xffc470, clip.wreck ? 13 : 7);
+          if (clip.wreck) fx.smokePuff(_p, 3, 0xb8b0a2, 1.6, 1.4);
+        }
         part.visible = shown;
       }
       g.lastMask = mask;
@@ -271,7 +425,8 @@ export function updateHighlightPlayback(dt) {
     }
     play.clip = play.list[play.i];
     play.t = 0;
-    emit('replay:clip', { clip: play.clip, index: play.i, total: play.list.length });
+    for (const g of ghosts) g.lastMask = -1;
+    announce();
   }
   return true;
 }
@@ -280,6 +435,19 @@ function aimReplayCamera(clip, target, phase) {
   const tr = state.track;
   const near = tr ? tr.nearestS(target, clip.hintS == null ? null : clip.hintS, 200) : null;
   if (near) clip.hintS = near.s;
+
+  // The showcase: start wide enough to see who did it, then close in and walk
+  // around the car while it comes apart. Slow motion does the rest.
+  if (clip.shot === 'showcase') {
+    const t = clamp01(phase);
+    const a = clip.at * 0.7 + t * 3.1;
+    const r = lerp(19, 7.5, clamp01((t - 0.15) / 0.55));
+    const up = lerp(6.5, 2.6, clamp01((t - 0.2) / 0.5));
+    _p.set(target.x + Math.cos(a) * r, target.y + up, target.z + Math.sin(a) * r);
+    setCamera(_p, target);
+    setFov(lerp(54, 38, t));
+    return;
+  }
 
   if (clip.shot === 'orbit' || !near) {
     const a = phase * 2.4 + clip.at;

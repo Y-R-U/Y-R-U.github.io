@@ -3,24 +3,34 @@
 // game logic and the game free of DOM.
 
 import { state, resetRaceState } from './state.js';
-import { profile, saveProfile, addMoney, applyLadder, grantChest, takeChest, ownPart, ownSkill } from './save.js';
+import {
+  profile, saveProfile, addMoney, applyLadder, grantChest, takeChest, ownPart, ownSkill,
+  checkPrizes, ownsCar,
+} from './save.js';
 import { startRace, updateRace, teardownRace, forceEnd } from './race.js';
 import { updateHud, showHud, initHud, resetHud, banner } from './hud.js';
-import { playHighlights, updateHighlightPlayback, isReplaying, stopPlayback } from './highlights.js';
+import {
+  playHighlights, updateHighlightPlayback, isReplaying, stopPlayback,
+  playSaved, stepClip, saveCurrentClip, clearHighlights,
+} from './highlights.js';
 import { playCutscene, updateCine, cineActive, stopCine } from './cine.js';
 import * as menus from './menus.js';
 import { levelEvent, cutsceneFor, storyLength, isLevelUnlocked } from './story.js';
 import { eventById, quickEvent, dailyEvent } from './events.js';
-import { rollChest } from './arsenal.js';
+import { rollChest, crateAward } from './arsenal.js';
+import { team, conditionMet, recordWin, trackUnlocked } from './progress.js';
+import { titleRoundEvent, resolveRound, titleById, roundName } from './titles.js';
+import { TRACK_DEFS } from './trackgen.js';
 import { render, setEnvironment } from './render.js';
 import { updateAudio, playMusic, sfx } from './audio.js';
 import { clearInput } from './input.js';
 import { emit, on } from './bus.js';
-import { $, clamp } from './utils.js';
+import { $, clamp, pick } from './utils.js';
 import { START_ARG, TRACK_ARG, LEVEL_ARG, LAPS_ARG, CARS_ARG, MODE_ARG, AUTO_MODE, DEV_MODE, SHOT_MODE } from './config.js';
 
 let pendingResults = null;
 let afterRace = null;
+let activeTitle = null;
 
 export function boot() {
   initHud();
@@ -92,15 +102,91 @@ function wire() {
     });
   });
 
+  on('replay:step', ({ dir }) => stepClip(dir));
+  on('replay:keep', () => {
+    if (saveCurrentClip()) banner('SAVED TO MEMORIES', 'good', 1.2);
+  });
+
+  on('title:race', ({ id }) => {
+    const ev = titleRoundEvent(id);
+    if (!ev) return;
+    beginEvent(ev);
+  });
+
+  // A memory is a saved clip plus enough of the field to rebuild it. Watching
+  // one spins up an empty race on the right circuit purely as a stage.
+  on('memory:play', ({ index }) => {
+    const mem = (profile.memories || [])[index];
+    if (!mem) return;
+    playSaved(mem, () => goto('career'));
+  });
+
   const pause = $('btn-pause');
   if (pause) pause.addEventListener('click', () => togglePause());
+}
+
+// ---------------------------------------------------------------------------
+// Attract mode — a real race, nobody driving, running behind the menus
+// ---------------------------------------------------------------------------
+// It is the same race code with the AI on the player's car and the HUD off,
+// which is why it costs almost nothing to maintain. If the frame rate cannot
+// carry it the loop switches itself off and remembers, so a slow phone quietly
+// gets a still menu instead of a bad one.
+const ATTRACT_SCREENS = new Set(['title', 'story', 'quick', 'events', 'titles', 'bracket', 'ladder']);
+let attractWatch = 0;
+let attractSlow = 0;
+
+function attractAllowed() {
+  return profile.settings.attract !== false && !SHOT_MODE && !AUTO_MODE;
+}
+
+function startAttract() {
+  if (state.attract || !attractAllowed()) return;
+  const open = TRACK_DEFS.filter((d) => trackUnlocked(d.id));
+  const def = pick(open.length ? open : TRACK_DEFS);
+  const ev = quickEvent({ track: def.id, cars: 6, laps: 40 });
+  ev.attract = true;
+  startRace(ev);
+  state.attract = true;
+  state.camMode = 'attract';
+  attractWatch = 0;
+  attractSlow = 0;
+  for (const c of state.cars) c.autoDrive = true;
+  // Nobody is going to watch a highlights reel of the menu, so stop recording
+  // one — that is a ring buffer and a pile of event listeners for nothing.
+  clearHighlights();
+  showHud(false);
+}
+
+function stopAttract() {
+  if (!state.attract) return;
+  state.attract = false;
+  teardownRace();
+  state.camMode = 'chase';
+}
+
+// One cheap guard, deliberately hard to trip: five seconds of grace to warm up,
+// then six seconds spent under twenty frames a second before we give up on it.
+// A guard that fires on a single stutter is worse than no guard, because it
+// takes away a feature the player asked for over a hiccup.
+function watchAttract(dt) {
+  if (!state.attract || DEV_MODE) return;
+  attractWatch += dt;
+  if (attractWatch < 5) return;
+  if (dt > 1 / 20) attractSlow += dt; else attractSlow = Math.max(0, attractSlow - dt * 0.6);
+  if (attractSlow > 6) {
+    profile.settings.attract = false;
+    saveProfile();
+    stopAttract();
+    menus.notify('The racing behind the menus was costing you frames, so it has been switched off. Settings will turn it back on.');
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Routing
 // ---------------------------------------------------------------------------
 export function goto(screen, arg) {
-  if (state.screen === 'race' && screen !== 'race') {
+  if (state.screen === 'race' && screen !== 'race' && !state.attract) {
     teardownRace();
     showHud(false);
     document.getElementById('btn-pause').classList.remove('show');
@@ -109,15 +195,25 @@ export function goto(screen, arg) {
   state.paused = false;
   clearInput();
 
+  // The browsing screens get a live race behind them; the ones with their own
+  // 3D room do not, because two WebGL contexts fighting is a bad trade.
+  if (ATTRACT_SCREENS.has(screen)) startAttract();
+  else stopAttract();
+
   switch (screen) {
     case 'title': menus.renderTitle(); playMusic('menu'); break;
     case 'story': menus.renderStory(); playMusic('menu'); break;
     case 'quick': menus.renderQuick(); playMusic('menu'); break;
     case 'events': menus.renderEvents(); playMusic('menu'); break;
+    case 'titles': menus.renderTitles(); playMusic('menu'); break;
+    case 'bracket': menus.renderBracket(arg); playMusic('menu'); break;
     case 'garage': menus.renderGarage(arg); playMusic('menu'); break;
+    case 'shop': menus.renderShop(arg); playMusic('menu'); break;
+    case 'showroom': menus.renderShowroom(); playMusic('menu'); break;
+    case 'career': menus.renderCareer(arg); playMusic('menu'); break;
     case 'ladder': menus.renderLadder(); break;
     case 'settings': menus.renderSettings(); break;
-    case 'stats': menus.renderStats(); break;
+    case 'stats': menus.renderCareer('numbers'); break;
     case 'results': menus.renderResults(pendingResults); break;
     case 'chests': menus.renderChestQueue(profile.chests); break;
     case 'race': menus.hideScreen(); break;
@@ -131,9 +227,13 @@ export function goto(screen, arg) {
 // ---------------------------------------------------------------------------
 export function beginEvent(ev) {
   if (!ev) return;
+  stopAttract();
   menus.hideScreen();
   state.screen = 'race';
-  afterRace = ev.mode === 'story' ? 'story' : ev.mode === 'event' ? 'events' : 'quick';
+  afterRace = ev.mode === 'story' ? 'story'
+    : ev.mode === 'event' ? 'events'
+    : ev.mode === 'title' ? 'titles' : 'quick';
+  activeTitle = ev.mode === 'title' ? ev.titleId : null;
   startRace(ev);
   showHud(true);
   document.getElementById('btn-pause').classList.add('show');
@@ -199,6 +299,17 @@ function onRaceDone(results) {
   const ev = results.event || {};
 
   // --- money -------------------------------------------------------------
+  // The team takes its cut of the good news and softens the bad: a bigger
+  // outfit negotiates better prizes and repairs its own cars cheaper.
+  const tm = team();
+  const teamCut = Math.round(results.prize * (tm.prize - 1));
+  const repairSaved = Math.round(results.damageBill * (1 - tm.repair));
+  results.teamBonus = teamCut;
+  results.damageBill -= repairSaved;
+  results.pickupCash = state.pickupCash || 0;
+  results.net = results.prize + results.hypeBonus + teamCut + results.pickupCash
+    - results.damageBill - results.fines;
+
   const net = results.net;
   addMoney(net);
   profile.stats.races++;
@@ -228,6 +339,11 @@ function onRaceDone(results) {
     results.rankAfter = applyLadder(results.position, results.fieldSize, ev.purseTier || 1);
   }
 
+  // --- what you actually won ----------------------------------------------
+  // Recorded before anything reads it, because half the gates in the game are
+  // phrased as "win at X" and the prize checker runs immediately after.
+  if (results.position === 1) recordWin(ev.track, ev.mode === 'event' ? ev.id : null);
+
   // --- objectives / progression -------------------------------------------
   if (ev.mode === 'story') {
     const pass = checkObjective(ev, results);
@@ -243,9 +359,25 @@ function onRaceDone(results) {
     const pass = checkObjective(ev, results);
     results.objectivePassed = pass;
     results.objective = ev.objective;
-    if (pass && !profile.events.cleared[ev.id]) {
-      profile.events.cleared[ev.id] = true;
-      if (ev.chestOnClear) grantChest(ev.chestOnClear);
+    if (pass) {
+      recordWin(null, ev.id);
+      if (!profile.events.cleared[ev.id]) {
+        profile.events.cleared[ev.id] = true;
+        if (ev.chestOnClear) grantChest(ev.chestOnClear);
+      }
+    }
+  } else if (ev.mode === 'title') {
+    const pass = checkObjective(ev, results);
+    results.objectivePassed = pass;
+    results.objective = ev.objective;
+    const out = resolveRound(ev.titleId, pass);
+    results.titleOutcome = out;
+    results.titleName = titleById(ev.titleId).name;
+    if (pass && ev.chestOnClear) grantChest(ev.chestOnClear);
+    if (out && out.champion) {
+      grantChest('sponsor');
+      grantChest('sponsor');
+      recordWin(null, 'title-' + ev.titleId);
     }
   }
 
@@ -253,9 +385,16 @@ function onRaceDone(results) {
   // unopened crates does not quietly throw them away.
   const before = profile.chests.length;
   for (const t of results.chests || []) grantChest(t);
-  // A podium always pays a crate — the loop has to keep feeding the garage.
-  if (results.position <= 3 && ev.mode !== 'story') grantChest(results.position === 1 ? 'parts' : 'scrap');
+  // The flag pays the crates now, by position: fourth or worse gets one, and a
+  // winner gets four with the good one on top. It is the only reliable source
+  // of them, which is what stops a lucky lap being worth a season of racing.
+  if (!ev.attract) {
+    for (const t of crateAward(results.position, ev.tier || 1)) grantChest(t);
+  }
   results.crates = profile.chests.length - before;
+
+  // Anything gated on "win this" is handed over the moment it becomes true.
+  results.prizesWon = checkPrizes(conditionMet);
 
   saveProfile(true);
   state.screen = 'results';
@@ -301,6 +440,13 @@ function checkObjective(ev, r) {
     case 'hype': return r.hype >= (o.n || 60) && r.position <= (o.pos || 5);
     case 'survive': return !r.retired;
     case 'nofines': return r.fines === 0 && r.position <= (o.pos || 3);
+    // A bracket round is not about winning the race, it is about beating one
+    // specific person in it. If they are not classified at all, you beat them.
+    case 'beat': {
+      const them = (r.classified || []).find((c) => c.name === o.name);
+      if (!them) return !r.retired;
+      return !r.retired && r.position < them.pos;
+    }
     default: return r.position <= 3;
   }
 }
@@ -311,7 +457,7 @@ function checkObjective(ev, r) {
 export function openChest(tierHint) {
   const tier = takeChest() || tierHint;
   if (!tier) { goto('garage'); return; }
-  const loot = rollChest(tier, { parts: profile.garage.parts, skills: profile.garage.skills });
+  const loot = rollChest(tier, { parts: profile.garage.parts, skills: profile.garage.skills }, team().crateLuck);
   let cash = 0;
   for (const item of loot.items) {
     if (item.kind === 'cash') cash += item.amount;
@@ -365,6 +511,12 @@ export function update(dt) {
   if (state.screen === 'race' && !state.paused) {
     updateRace(dt);
     updateHud(dt);
+    return;
+  }
+  // The menu backdrop is the same race loop with nobody at the wheel.
+  if (state.attract) {
+    updateRace(dt);
+    watchAttract(dt);
   }
 }
 

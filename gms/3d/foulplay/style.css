@@ -357,6 +357,11 @@ button {
 
 .pad-btn.boost { border-color: rgba(53, 214, 255, 0.55); }
 .pad-btn.boost.empty { opacity: 0.42; border-color: var(--line); }
+/* Leading means no nitro. Say so on the button rather than letting it read as
+   a bug the first time somebody in front presses it and nothing happens. */
+.pad-btn.boost.locked-lead { opacity: 0.62; border-color: var(--warn); background: rgba(58, 40, 8, 0.72); }
+.pad-btn.boost.locked-lead .pb-label { color: var(--warn); }
+.pad-btn.boost.locked-lead .pb-icon { filter: grayscale(1); opacity: 0.6; }
 .pad-btn.boost.firing { background: rgba(20, 120, 160, 0.8); border-color: #6fe6ff; }
 
 .pad-btn.atk .pb-label { font-size: clamp(8px, 1.25vmin, 13px); }
@@ -452,25 +457,163 @@ button {
 }
 
 /* ══════════════════════════════ SCREENS ══════════════════════════════ */
+/* The shell never scrolls. Only .screen-body does, so the title and the back
+   button stay nailed to the top of the phone where your thumb expects them. */
 .screen {
   position: fixed; inset: 0; z-index: 8;
   display: none;
   flex-direction: column;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   background:
     radial-gradient(90% 70% at 50% 0%, rgba(255, 90, 43, 0.14), transparent 62%),
-    linear-gradient(180deg, rgba(8, 10, 15, 0.94), rgba(8, 10, 15, 0.97));
+    linear-gradient(180deg, rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.96));
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
-  padding: calc(var(--pad) + env(safe-area-inset-top)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom));
   touch-action: pan-y;
 }
 .screen.show { display: flex; }
 .screen.clear { background: none; backdrop-filter: none; }
 
+/* Live racing behind the menu: keep the middle of the screen readable but let
+   the picture through at the edges rather than painting over it. */
+.screen.backdrop {
+  background:
+    radial-gradient(120% 80% at 50% 50%, rgba(6, 8, 12, 0.86) 0%, rgba(6, 8, 12, 0.5) 58%, rgba(6, 8, 12, 0.24) 100%);
+  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px);
+}
+
+.screen-head {
+  flex: 0 0 auto;
+  padding: calc(var(--pad) + env(safe-area-inset-top)) var(--pad) calc(var(--pad) * 0.6);
+  background: linear-gradient(180deg, rgba(6, 9, 14, 0.96), rgba(6, 9, 14, 0.72));
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+.screen-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--pad) var(--pad) calc(var(--pad) * 2 + env(safe-area-inset-bottom));
+}
+.screen-body::-webkit-scrollbar { width: 6px; }
+.screen-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 4px; }
+
 .wrap { width: min(1080px, 100%); margin: 0 auto; }
+
+/* ── the back button has to be the most obvious thing on the screen ── */
+.btn-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px 9px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: clamp(12px, 1.8vmin, 16px);
+  letter-spacing: 0.16em;
+  min-height: 44px;
+  flex: 0 0 auto;
+}
+.btn-back:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.2); }
+.btn-back .chev { font-size: 1.3em; line-height: 0.8; margin-top: -2px; }
+
+.head-row { display: flex; align-items: center; gap: 10px; }
+.head-row h1 { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.head-purse { text-align: right; flex: 0 0 auto; }
+.head-purse .money { font-family: var(--mono); color: var(--warn); font-size: clamp(13px, 2vmin, 20px); display: block; }
+.head-purse .rank { font-size: clamp(9px, 1.3vmin, 13px); color: var(--dim); letter-spacing: 0.1em; }
+
+/* ── title screen: buttons hug the edges, the racing shows through ── */
+.title-stage {
+  flex: 1 1 auto; display: flex; flex-direction: column;
+  padding: calc(var(--pad) + env(safe-area-inset-top)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+.title-rails { flex: 1 1 auto; display: flex; justify-content: space-between; align-items: stretch; gap: var(--pad); min-height: 0; }
+.title-rail {
+  display: flex; flex-direction: column; justify-content: space-evenly;
+  gap: clamp(6px, 1.2vmin, 12px); width: min(34vw, 200px);
+  padding: clamp(4px, 1.5vh, 20px) 0;
+}
+.tile {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  padding: clamp(7px, 1.4vmin, 14px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(10, 14, 21, 0.72);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-align: left; min-height: clamp(48px, 9vmin, 76px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.tile:active { transform: scale(0.96); }
+.tile .tl-ic { font-size: clamp(15px, 2.6vmin, 26px); line-height: 1; }
+.tile .tl-name { font-size: clamp(11px, 1.8vmin, 18px); letter-spacing: 0.08em; }
+.tile .tl-sub { font-size: clamp(8px, 1.1vmin, 11px); color: var(--dim); letter-spacing: 0.08em; font-weight: 500; line-height: 1.15; }
+.tile.hero { border-color: var(--brand); background: linear-gradient(120deg, rgba(255,90,43,0.88), rgba(255,138,61,0.78)); color: #180a03; }
+.tile.hero .tl-sub { color: rgba(24, 10, 3, 0.75); }
+.tile.badge { position: relative; }
+.tile.badge::after {
+  content: attr(data-badge);
+  position: absolute; top: -6px; right: -5px;
+  background: var(--brand); color: #180a03;
+  font-size: 10px; padding: 2px 6px; border-radius: 9px; letter-spacing: 0.06em;
+}
+.title-foot { flex: 0 0 auto; display: flex; justify-content: center; align-items: center; gap: 8px; padding-top: clamp(4px, 1vmin, 10px); flex-wrap: wrap; }
+.title-logo { flex: 0 0 auto; text-align: center; }
+.title-logo .logo { margin: 0; font-size: clamp(30px, 8vmin, 84px); }
+.title-logo .logo span { display: inline; }
+.title-logo .tagline { margin: 2px 0 0; font-size: clamp(8px, 1.2vmin, 13px); }
+
+/* ── shop / showroom rows ── */
+.buyrow { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.buyrow .btn { margin: 0; flex: 1 1 130px; padding: 9px 12px; font-size: clamp(11px, 1.5vmin, 15px); }
+.price { font-family: var(--mono); color: var(--warn); }
+.price.cant { color: var(--hot); }
+.tagline-src { font-size: clamp(8px, 1.1vmin, 11px); letter-spacing: 0.16em; }
+.mark {
+  display: inline-block; padding: 1px 6px; border-radius: 6px; margin-left: 6px;
+  background: rgba(255,176,32,0.2); color: var(--warn); font-size: 0.8em; letter-spacing: 0.1em;
+}
+.lock-note { color: var(--warn); font-size: clamp(10px, 1.4vmin, 13px); font-weight: 500; margin-top: 6px; }
+
+/* ── event ordering ── */
+.sec-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 16px 0 8px; gap: 10px;
+}
+.sec-head h3 { color: var(--ink); }
+.sec-head span { font-size: clamp(9px, 1.2vmin, 12px); color: var(--dim); letter-spacing: 0.16em; }
+.countdown { font-family: var(--mono); color: var(--cool); }
+
+/* ── bracket tree ── */
+.bracket { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 10px; }
+.bracket-round { display: flex; flex-direction: column; justify-content: space-around; gap: 8px; min-width: 148px; }
+.bracket-round h4 { margin: 0 0 2px; font-size: 10px; letter-spacing: 0.2em; color: var(--dim); font-weight: 700; }
+.seed {
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px;
+  font-size: clamp(10px, 1.4vmin, 13px); background: rgba(255,255,255,0.04);
+  display: flex; justify-content: space-between; gap: 6px; align-items: center;
+}
+.seed.me { border-color: var(--brand); background: rgba(255,90,43,0.18); }
+.seed.won { border-color: rgba(55,194,106,0.55); }
+.seed.out { opacity: 0.36; text-decoration: line-through; }
+.seed b { font-family: var(--mono); color: var(--dim); font-size: 0.85em; }
+
+/* ── 3D room behind a menu panel ── */
+.room {
+  position: relative; width: 100%;
+  height: clamp(180px, 34vh, 340px);
+  border-radius: var(--r); overflow: hidden;
+  background: #05070b;
+}
+.room canvas { display: block; width: 100%; height: 100%; }
+.room-cap {
+  position: absolute; left: 10px; bottom: 8px; right: 10px;
+  font-size: clamp(9px, 1.2vmin, 12px); letter-spacing: 0.18em; color: var(--dim);
+  pointer-events: none;
+}
+.room-tap { position: absolute; inset: 0; }
 
 .logo {
   font-size: clamp(44px, 12vmin, 130px);
@@ -694,4 +837,16 @@ table.standings .sw { display: inline-block; width: 9px; height: 9px; border-rad
   #loop-warn { top: 64%; }
   #order-list li:nth-child(n+5) { display: none; }
   #feed { max-width: 60vw; bottom: calc(24vmin + var(--pad)); }
+
+  /* Portrait: the rails go right up against the bezels so the racing behind
+     them stays visible down the middle of the phone. */
+  .title-rail { width: min(38vw, 210px); }
+  .title-logo .logo { font-size: clamp(28px, 11vmin, 70px); }
+  .room { height: clamp(160px, 26vh, 260px); }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .title-logo .logo { font-size: clamp(22px, 6vmin, 44px); }
+  .title-logo .tagline { display: none; }
+  .tile { min-height: 40px; padding: 6px 9px; }
+  .tile .tl-sub { display: none; }
 }

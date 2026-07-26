@@ -71,6 +71,9 @@ export class Car {
     this.maxHp = this.hp;
     this.partsLost = [];
     this.wheelsLost = 0;
+    this.danglers = [];          // part ids hanging off but not yet gone
+    this.trackTime = 0;          // this car's own clock, for wobble phases
+    this.flailAt = -99;          // last time trailing wreckage hit somebody
 
     // --- kit ---
     this.boosts = Math.min(DRIVE.boostMax + (this.stats.boostMax || 0), 1);
@@ -175,9 +178,11 @@ export class Car {
     }
     if (this.mode === 'wreck') { this.updateWreck(dt); return; }
 
+    this.trackTime += dt;
     this.tickEffects(dt);
     this.drive(dt);
     this.sanity();
+    this.updateDanglers(dt);
     this.syncMesh(dt);
   }
 
@@ -455,9 +460,21 @@ export class Car {
     // almost immediately rather than fighting the car.
     this.recover = Math.max(this.recover, DRIVE.recoverTime * clamp01(impact / 12));
 
+    // Sparks. A thump throws a shower; grinding along the steel throws a
+    // continuous rooster tail for as long as you keep leaning on it, which is
+    // the shot the broadcast actually wants.
+    _v1.copy(f.right).multiplyScalar(-side);
     if (impact > 2) {
-      fx.sparkBurst(this.worldPos, _v1.copy(f.right).multiplyScalar(-side), Math.min(20, impact), 0xffd27a, impact * 0.9);
+      fx.sparkBurst(this.worldPos, _v1, Math.min(46, 8 + impact * 2.2), 0xffd27a, 8 + impact * 1.5);
+      fx.smokePuff(this.worldPos, 2, 0xd8d0c4, 1.2, 1.1);
       emit('car:railHit', { car: this, impact });
+    }
+    const along = Math.abs(this.forwardSpeed);
+    if (along > 8) {
+      const heat = clamp01(along / 55);
+      fx.sparkBurst(this.worldPos, _v1, 3 + Math.round(heat * 7), 0xffbe55, 5 + heat * 16);
+      this.scrubbing = 0.25;
+      if (this.isPlayer) emit('car:railScrape', { car: this, speed: along });
     }
     // Paint and noise below the scuff threshold; only a real thump costs hp.
     if (impact > CRASH.railScuff) {
@@ -518,13 +535,13 @@ export class Car {
       const obj = this.parts[id];
       if (!obj) { candidates.splice(idx, 1); continue; }
       const p = obj.userData.part;
-      const share = Math.min(pool, p.hp);
+      const share = Math.max(1, Math.min(pool, p.hp));
       p.hp -= share;
       pool -= share;
       p.dent = clamp01(1 - p.hp / p.maxHp);
       this.dentPart(obj, p);
       if (p.hp <= 0) {
-        this.detachPart(id, opts);
+        this.breakPart(id, opts);
         candidates.splice(idx, 1);
       }
     }
@@ -561,10 +578,72 @@ export class Car {
     }
   }
 
+  // A panel that has run out of hit points does not usually leave cleanly. It
+  // tears loose at one corner and hangs there — banging on the bodywork, dragging
+  // on the tarmac, throwing sparks and occasionally clouting whoever is alongside
+  // — and only then does it go. That few seconds is where all the drama is.
+  breakPart(id, opts = {}) {
+    const obj = this.parts[id];
+    if (!obj) return;
+    const p = obj.userData.part;
+    if (p.dangling > 0 || p.glass || p.wheel || p.mass < 0.3 || Math.random() > 0.78) {
+      this.detachPart(id, opts);
+      return;
+    }
+    p.dangling = rand(1.8, 4.2);
+    p.dangleBy = opts.by || null;
+    p.dangleSeed = rand(0, 6.28);
+    p.dangleHinge = Math.random() < 0.5 ? -1 : 1;
+    if (!this.danglers.includes(id)) this.danglers.push(id);
+    fx.sparkBurst(this.worldPos, _v2.set(0, 1, 0), 10, 0xffc470, 9);
+    emit('car:dangling', { car: this, part: id, by: opts.by });
+    const [face, line] = bubbleForDamage(id);
+    if (Math.random() < (this.isPlayer ? 0.5 : 0.9)) showBubble(this, face, line);
+  }
+
+  // Swing whatever is still hanging on, scrape it along the road and count it
+  // down to the moment it finally lets go.
+  updateDanglers(dt) {
+    if (!this.danglers.length) return;
+    const speed = Math.abs(this.forwardSpeed);
+    for (let i = this.danglers.length - 1; i >= 0; i--) {
+      const id = this.danglers[i];
+      const obj = this.parts[id];
+      if (!obj) { this.danglers.splice(i, 1); continue; }
+      const p = obj.userData.part;
+      p.dangling -= dt;
+
+      // Flop harder the faster you are going — a loose bonnet at 200km/h is
+      // trying very hard to leave.
+      const flap = clamp01(speed / 50);
+      const wob = Math.sin(this.trackTime * (7 + flap * 16) + p.dangleSeed);
+      obj.position.copy(p.home);
+      obj.position.y -= 0.16 + flap * 0.2;
+      obj.position.x += p.dangleHinge * (0.12 + flap * 0.16);
+      obj.rotation.z = p.dangleHinge * (0.35 + flap * 0.6) + wob * 0.22;
+      obj.rotation.x = wob * (0.2 + flap * 0.45);
+
+      // Dragging on the tarmac. This is the good bit.
+      if (this.h < 0.3 && speed > 7 && Math.random() < dt * (10 + flap * 26)) {
+        obj.getWorldPosition(_v1);
+        _v1.y = this.worldPos.y + 0.06;
+        fx.sparkBurst(_v1, _v2.set(0, 0.5, 0), 5, 0xffb43a, 6 + flap * 9);
+        if (this.isPlayer && Math.random() < 0.2) emit('car:scrape', { car: this, part: id });
+      }
+      if (p.dangling <= 0) this.detachPart(id, { by: p.dangleBy, dir: _v1.set(p.dangleHinge, 0.5, 0.4).normalize() });
+    }
+  }
+
+  // A panel swinging off the side of a car is a weapon nobody meant to fit.
+  hasDangler() { return this.danglers.length > 0; }
+
   detachPart(id, opts = {}) {
     const obj = this.parts[id];
     if (!obj) return;
     const p = obj.userData.part;
+    const di = this.danglers.indexOf(id);
+    const wasDangling = di >= 0;
+    if (wasDangling) this.danglers.splice(di, 1);
     this.parts[id] = null;
     this.partsLost.push(id);
 
@@ -597,8 +676,11 @@ export class Car {
     }
 
     emit('car:partOff', { car: this, part: id, by: opts.by });
-    const [face, line] = bubbleForDamage(id);
-    if (Math.random() < (this.isPlayer ? 0.45 : 0.85)) showBubble(this, face, line);
+    // The driver already pulled a face when it tore loose; do not do it twice.
+    if (!wasDangling) {
+      const [face, line] = bubbleForDamage(id);
+      if (Math.random() < (this.isPlayer ? 0.45 : 0.85)) showBubble(this, face, line);
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -720,8 +802,18 @@ export class Car {
     this.boosts = Math.min(this.maxBoosts, this.boosts + n);
   }
 
+  // The leader's handicap. Nitro is cut off for whoever is in front, which is
+  // the rule that makes this a fighting game instead of a running-away game:
+  // build a lead and you lose your best tool for keeping it, so the reliable
+  // way to win is to stay in the pack and take people apart.
+  get boostLocked() { return this.position === 1 && !this.finished; }
+
   useBoost() {
     if (this.boosts <= 0 || this.boostTime > 0.6) return false;
+    if (this.boostLocked) {
+      if (this.isPlayer) emit('boost:denied', { car: this });
+      return false;
+    }
     this.boosts--;
     this.boostTime = DRIVE.boostTime + (this.stats.boostTime || 0);
     emit('car:boost', { car: this });
@@ -729,6 +821,10 @@ export class Car {
   }
 
   padBoost() {
+    if (this.boostLocked) {
+      if (this.isPlayer) emit('boost:denied', { car: this, pad: true });
+      return;
+    }
     this.boostTime = Math.max(this.boostTime, DRIVE.padBoostTime);
     emit('car:padBoost', { car: this });
   }
