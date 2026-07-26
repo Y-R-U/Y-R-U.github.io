@@ -95,20 +95,30 @@ export const CRASH = {
   carWide: 2.05,
   carHigh: 1.35,
 
-  railRestitution: 0.42,    // how much of the sideways speed comes back
-  railSpin: 0.55,           // heading kick per m/s of impact
-  railScrub: 0.35,          // forward speed lost, scaled by impact
-  railVault: 40,            // lateral m/s that sends you over the barrier, before
-                            // the heading and freshly-slammed modifiers in car.js
-  railDamage: 1.35,         // hp per m/s of impact
+  // Barriers exist to keep you racing. Driving badly should cost you time and
+  // paint, never the race — the damage in this game is supposed to come from
+  // attacks and from other cars, so that driving is the part you can relax
+  // into while you think about who to hit next.
+  railRestitution: 0.5,     // how much of the sideways speed comes back
+  railSpin: 0.34,           // heading kick per m/s of impact
+  railScrub: 0.18,          // forward speed lost, scaled by impact
+  // Going over a barrier is gated on having just been shunted (see car.js), so
+  // this number does not need to be high to be safe — it only needs to be low
+  // enough that a well-aimed slam beside a barrier actually finishes somebody.
+  railVault: 34,            // lateral m/s over the barrier, once shunted
+  railDamage: 0.3,          // hp per m/s of impact above railScuff
+  railScuff: 9,             // impact below this is a scrape: noise, no damage
 
   carPush: 0.95,            // lateral impulse share in a car-to-car shunt
-  carDamage: 1.9,           // hp per m/s of closing speed
+  carDamage: 2.5,           // hp per m/s of closing speed — this is where it hurts
+  slamSpeed: 12,            // closing m/s that counts as a deliberate slam
   slamImpulse: 30,          // lateral m/s an attack SLAM adds
   slamDamage: 34,
+  slamWindow: 0.9,          // seconds a shunt leaves you liable to go over a barrier
 
-  landHard: 16,             // vertical m/s where a landing hurts
-  landDamage: 2.4,
+  landHard: 18,             // vertical m/s where a landing hurts
+  landDamage: 1.6,
+  landSpinOut: 1.25,        // heading (rad) at which a heavy landing flips you
 
   // World-space wreck simulation (once you actually leave the track)
   wreckGravity: 26,

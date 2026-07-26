@@ -316,6 +316,13 @@ function resolveContacts(dt, cars) {
           b.vl += (jimp / mb) * dir;
           const closing = Math.abs(rel);
           if (closing > 2.5) contactDamage(a, b, closing, dir, 'side');
+          // A real slam — not a rub — leaves both cars liable to go over the
+          // next barrier they touch. This is how you put somebody out with the
+          // car alone, no equipment and no suspicion.
+          if (closing > CRASH.slamSpeed) {
+            a.slammed = CRASH.slamWindow;
+            b.slammed = CRASH.slamWindow;
+          }
         }
       } else {
         // Nose to tail.

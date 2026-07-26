@@ -79,7 +79,12 @@ function wireEvents() {
     if (car.isPlayer && car.lap >= 0) banner(`LAP ${clamp(car.lap + 1, 1, state.laps)}`, 'plain');
   });
   on('race:overtake', ({ position }) => toast(`P${position}`, 'good'));
-  on('ai:attackedPlayer', ({ car, skill }) => feed(`${car.name}: ${skill.name}`, 'bad'));
+  // Rivals get their own dirty tricks late in the season — make sure it lands
+  // as "they cheated at me", not as an unexplained loss of control.
+  on('ai:attackedPlayer', ({ car, skill }) => {
+    feed(`${car.name}: ${skill.icon} ${skill.name}`, 'bad');
+    toast(`${car.name} USED ${skill.name}`, 'bad', 1.4);
+  });
   on('hype:gain', ({ why }) => { if (why) pulse(el.hypeWrap); });
   on('attack:notReady', () => toast('NOTHING READY', 'dim'));
   on('attack:noTarget', () => toast('NOBODY IN RANGE', 'dim'));

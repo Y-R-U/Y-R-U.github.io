@@ -18,7 +18,7 @@ import { spawnDetached, spawnScrap } from './debris.js';
 import * as fx from './particles.js';
 import { showBubble, bubbleForDamage } from './bubbles.js';
 import { emit } from './bus.js';
-import { clamp, clamp01, damp, lerp, rand, randInt, wrap, angDiff, sign } from './utils.js';
+import { clamp, clamp01, damp, lerp, rand, randInt, wrap, angDiff, sign, smoothstep } from './utils.js';
 
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
@@ -422,40 +422,47 @@ export class Car {
       return;
     }
 
-    // Airborne above the barrier: you are leaving.
-    if (this.h > RAIL_HEIGHT * 0.85) {
-      this.wreck('cleared the barrier');
+    // Airborne over the barrier line. Do not delete a car for clipping the rail
+    // in mid-air off a jump — let it sail, and let it land back on the road.
+    // Only somebody genuinely heading for the scenery actually leaves.
+    if (this.h > RAIL_HEIGHT * 0.9) {
+      if (over > 9) { this.wreck('cleared the barrier'); return; }
+      this.vl *= 0.9;
       return;
     }
 
-    // Whether you go over the top depends far more on *how* you arrive than on
-    // how fast. Square on, even a huge sideways slide is a scrape and a bounce.
-    // Spun sideways, or freshly shunted by somebody, and you ride up over it —
-    // which is exactly what a well-timed slam next to a barrier is for.
     const impact = Math.abs(this.vl);
-    let vaultAt = CRASH.railVault;
-    vaultAt *= 1 - 0.46 * clamp01(Math.abs(this.psi) / 1.1);
-    if (this.slammed > 0) vaultAt *= 0.66;
-    if (impact > vaultAt && type !== 'wall') {
-      this.wreck('through the barrier');
-      return;
+
+    // You only go THROUGH a barrier if somebody put you there. Driving into it
+    // at any speed — however sideways — bounces you back onto the road. That is
+    // the deal: the circuit is forgiving so that the danger is other drivers.
+    if (this.slammed > 0 && type !== 'wall') {
+      const vaultAt = CRASH.railVault * (1 - 0.5 * smoothstep(0.55, 1.4, Math.abs(this.psi)));
+      if (impact > vaultAt) {
+        this.wreck('put into the barrier');
+        return;
+      }
     }
 
-    // Bounce. This is the promise in the brief: hit the rail, come back in,
-    // maybe spinning, but back on the road.
+    // Bounce. Hit the rail, come back in, maybe a bit crossed up, but racing.
     this.t = side * w;
     this.vl = -this.vl * CRASH.railRestitution;
-    const spin = clamp(impact * CRASH.railSpin * 0.02, 0, 0.9);
-    this.psi -= side * spin * rand(0.6, 1.4);
-    const scrub = clamp(impact * CRASH.railScrub * 0.05, 0, 0.55);
+    const spin = clamp(impact * CRASH.railSpin * 0.02, 0, 0.6);
+    this.psi -= side * spin * rand(0.6, 1.3);
+    const scrub = clamp(impact * CRASH.railScrub * 0.05, 0, 0.34);
     this.va *= 1 - scrub;
-    this.recover = Math.max(this.recover, DRIVE.recoverTime * clamp01(impact / 18));
+    // Straighten hard afterwards so the player is pointed down the road again
+    // almost immediately rather than fighting the car.
+    this.recover = Math.max(this.recover, DRIVE.recoverTime * clamp01(impact / 12));
 
-    if (impact > 3) {
-      const dmg = impact * CRASH.railDamage;
-      this.damage(dmg, side > 0 ? 'right' : 'left', { source: 'barrier' });
+    if (impact > 2) {
       fx.sparkBurst(this.worldPos, _v1.copy(f.right).multiplyScalar(-side), Math.min(20, impact), 0xffd27a, impact * 0.9);
       emit('car:railHit', { car: this, impact });
+    }
+    // Paint and noise below the scuff threshold; only a real thump costs hp.
+    if (impact > CRASH.railScuff) {
+      const dmg = (impact - CRASH.railScuff) * CRASH.railDamage;
+      this.damage(dmg, side > 0 ? 'right' : 'left', { source: 'barrier' });
     }
   }
 
@@ -465,8 +472,8 @@ export class Car {
     this.recover = Math.max(this.recover, 0.5);
     fx.smokePuff(this.worldPos, 5, 0xbdb6a6, 1.8, 1.4);
     emit('car:land', { car: this, impact });
-    // A bad landing while sideways flips you clean off the circuit.
-    if (Math.abs(this.psi) > 1.0 && impact > CRASH.landHard * 1.6) {
+    // Only a genuinely sideways landing off a big jump throws you out.
+    if (Math.abs(this.psi) > CRASH.landSpinOut && impact > CRASH.landHard * 1.7) {
       this.wreck('landed sideways');
     }
   }
@@ -480,8 +487,8 @@ export class Car {
     const massMul = 1 / (this.stats.mass || 1);
     this.vl += lateral * massMul;
     this.va += (forward || 0) * massMul;
-    // A fresh shunt makes the next barrier much more dangerous.
-    if (Math.abs(lateral) > 12) this.slammed = 0.9;
+    // A fresh shunt is the only thing that makes a barrier dangerous.
+    if (Math.abs(lateral) > 12) this.slammed = CRASH.slamWindow;
     if (opts.spin) this.psi += opts.spin * massMul * (opts.spinSign || sign(lateral) || 1);
     if (opts.air) this.vh = Math.max(this.vh, opts.air);
     this.recover = Math.max(this.recover, DRIVE.recoverTime);

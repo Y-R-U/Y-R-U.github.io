@@ -27,6 +27,45 @@ global `pointerup` so the look-back button cannot stick.
 
 ---
 
+## Second feedback round: "too easy to fly off track" (done, needs a play check)
+
+Aaron: *"if I slam into the side via fast driving it should bump me back into
+play with very little damage. Most damage should only come from attacks or
+slamming into other cars — driving should be the easy/fun part that allows you
+to concentrate on attacking."*
+
+Rebalanced around one rule: **you only leave the circuit if somebody put you
+there.** A barrier hit now bounces you back in whatever your speed or angle;
+going *through* one is gated on `car.slammed`, a 0.9s window set only by an
+attack impulse or a car-to-car closing speed over `CRASH.slamSpeed` (12 m/s).
+Also: rail damage only starts above a `railScuff` of 9 m/s and is ~4× lighter,
+rail spin and speed-scrub roughly halved, post-hit straightening assist stronger,
+car-to-car damage raised (1.9 → 2.5), and airborne cars get 9m of latitude past
+the rail line so a jump lands them back on the road instead of deleting them.
+
+Measured on 2-lap auto races, field wrecks per race:
+
+| | before | after |
+|---|---|---|
+| circus | 18 (all "through the barrier") | **0** |
+| skyline | 3–9 | **1** |
+| grinder | — | 0 |
+
+**Open question for the play check:** with driving made safe, wrecks now depend
+entirely on attacks and deliberate slams, and the auto-race harness does not
+attack hard enough to prove they still land. `CRASH.railVault` is 34 m/s once
+shunted — if a well-aimed SIDE SLAM beside a barrier does *not* put rivals out,
+lower it; if it feels twitchy, raise it. This is the one number most likely to
+need your thumb rather than my telemetry.
+
+Rivals already escalate to real tricks late in the season (`story.js:rivalSkillSet`
+gives chapters 8–10 the EMP / shockwave / ramjet / scattergun pool, and bosses
+get the wrecking ball from chapter 9). That now announces itself with a toast as
+well as a feed line, so it reads as "they cheated at me" rather than as an
+unexplained loss of control.
+
+---
+
 ## TODO — next session, in priority order
 
 ### 1. Playtest on a real phone (highest value, needs Aaron)
