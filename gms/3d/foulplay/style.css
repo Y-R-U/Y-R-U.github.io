@@ -491,6 +491,50 @@ button {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
   z-index: 2;
 }
+/* A band pinned under the header for the one thing that must stay on screen
+   while the list moves under it — the showroom turntable. Anything in here is
+   outside .screen-body, so it never scrolls. */
+.screen-stage {
+  flex: 0 0 auto;
+  padding: var(--pad) var(--pad) calc(var(--pad) * 0.5);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(6, 9, 14, 0.5), rgba(6, 9, 14, 0.2));
+  z-index: 1;
+}
+/* Shorter than a free-standing room: the list underneath needs the height. */
+.screen-stage .room { height: clamp(140px, 24vh, 280px); }
+
+.stage-note {
+  margin-top: 8px;
+  font-size: clamp(10px, 1.4vmin, 13px);
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  text-align: center;
+}
+.stage-note.prize { color: #b6c0ca; }
+.stage-note b { color: var(--good); }
+
+/* One row of chips, scrolled sideways rather than wrapped, so the band keeps
+   its height however many cars you end up owning. */
+.stage-switch {
+  display: flex; gap: 6px;
+  margin-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+.stage-switch::-webkit-scrollbar { display: none; }
+.stage-switch .btn-mini { flex: 0 0 auto; white-space: nowrap; }
+
+.btn.slim {
+  margin: 8px 0 0;
+  padding: clamp(8px, 1.3vmin, 13px) clamp(11px, 1.7vmin, 16px);
+  font-size: clamp(13px, 1.9vmin, 18px);
+  text-align: center;
+}
+.btn.slim small { display: inline; margin-left: 9px; }
+
 .screen-body {
   flex: 1 1 auto;
   overflow-y: auto;

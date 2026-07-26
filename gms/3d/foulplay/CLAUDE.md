@@ -200,6 +200,10 @@ somebody use this on a phone:
 2. **Re-rendering the same screen keeps its scroll position.** `opts.key`
    defines "the same screen" and *includes the open tab*, so switching tab
    starts at the top while equipping a part halfway down a list does not.
+3. **`opts.stage` is a third band that does not scroll.** The showroom puts the
+   turntable, the car switcher and the one contextual button there, so tapping
+   a car at the bottom of the list still shows you the car and the answer.
+   Anything pinned costs the list height, which is why only one screen uses it.
 
 The browsing screens run a real race behind them (`flow.js:startAttract`) — the
 same race loop with the AI on the player's car and the HUD off. Screens with

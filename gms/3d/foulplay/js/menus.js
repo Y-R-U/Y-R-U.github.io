@@ -55,6 +55,10 @@ export function hideScreen() {
 //
 // `key` is what "the same screen" means: it includes the open tab, so switching
 // tabs sensibly starts at the top while toggling an item does not.
+//
+// `opts.stage` is a third band, pinned between the header and the list, for the
+// one thing on a screen you must be able to see while you scroll: the car you
+// are looking at in the showroom.
 const scrollMemory = {};
 let currentKey = '';
 
@@ -84,6 +88,7 @@ function paint(html, acts = {}, opts = {}) {
   m.classList.toggle('backdrop', !!opts.backdrop);
   m.innerHTML = `
     ${opts.head == null ? '' : `<div class="screen-head"><div class="wrap">${opts.head}</div></div>`}
+    ${opts.stage ? `<div class="screen-stage"><div class="wrap">${opts.stage}</div></div>` : ''}
     <div class="screen-body"><div class="wrap">${html}</div></div>`;
   const body = m.querySelector('.screen-body');
   body.scrollTop = scrollMemory[key] || 0;
@@ -789,44 +794,34 @@ export function renderShowroom() {
   }).join('');
 
   // What the button under the turntable does depends entirely on what you are
-  // looking at, so there is only ever one and it is never ambiguous.
+  // looking at, so there is only ever one and it is never ambiguous. It rides in
+  // the pinned band with the car, because tapping a row at the bottom of the
+  // list has to put the answer somewhere you can still see.
   let mainAction;
   if (isActive) {
-    mainAction = owned.length > 1
-      ? `<p style="text-align:center;color:var(--dim);font-size:12px;letter-spacing:.14em;margin:10px 0 0">
-           THIS IS THE ONE YOU DRIVE · TAP ANOTHER TO LOOK AT IT</p>`
-      : '';
+    mainAction = `<div class="stage-note">🔑 THE ONE YOU DRIVE · TAP ANY CAR TO VIEW IT</div>`;
   } else if (showingMine) {
-    mainAction = `<button class="btn primary" data-act="use" data-id="${shown.id}">
-        🔧 PUT THE ${esc(shown.name)} IN THE BAY<small>SWITCH TO THIS CAR</small></button>`;
+    mainAction = `<button class="btn primary slim" data-act="use" data-id="${shown.id}">
+        🔧 PUT IT IN THE BAY<small>DRIVE THE ${esc(shown.name)}</small></button>`;
   } else if (shown.src === 'shop') {
-    mainAction = `<button class="btn ${canBuy ? 'primary' : ''}" data-act="buy" data-id="${shown.id}">
-        BUY THE ${esc(shown.name)}
-        <small>${fmtMoney(shown.price)}${canBuy ? '' : ` — ${fmtMoney(shown.price - profile.money)} SHORT`}</small></button>`;
+    mainAction = `<button class="btn slim ${canBuy ? 'primary' : ''}" data-act="buy" data-id="${shown.id}">
+        BUY IT — ${fmtMoney(shown.price)}
+        <small>${canBuy ? `LEAVES YOU ${fmtMoney(profile.money - shown.price)}` : `${fmtMoney(shown.price - profile.money)} SHORT`}</small></button>`;
   } else {
-    mainAction = `<div class="card" style="border-color:rgba(55,194,106,.5)">
-        <div class="stat"><span>🏆 NOT FOR SALE</span><b class="good">${esc(shown.tag)}</b></div>
-        ${shown.unlock ? `<p style="color:#b6c0ca;font-weight:500;font-size:13px;margin:6px 0 0">${esc(conditionText(shown.unlock))}.</p>` : ''}
-      </div>`;
+    mainAction = `<div class="stage-note prize">
+        🏆 NOT FOR SALE — <b>${esc(shown.tag)}</b>${shown.unlock ? ` · ${esc(conditionText(shown.unlock))}` : ''}</div>`;
   }
 
-  // Quick switcher, only when there is actually something to switch between.
+  // Quick switcher, only when there is actually something to switch between. It
+  // scrolls sideways rather than wrapping, so the band stays one row tall
+  // however big the collection gets.
   const switcher = owned.length > 1 ? `
-    <div class="card" style="padding-bottom:8px">
-      <h3 style="margin-bottom:8px">YOUR CARS</h3>
-      <div class="btn-row" style="flex-wrap:wrap">
-        ${owned.map((c) => `<button class="btn-mini ${c.id === active.id ? 'on' : ''}" data-act="use" data-id="${c.id}">
-          ${c.id === active.id ? '✓ ' : ''}${esc(c.name)}</button>`).join('')}
-      </div>
+    <div class="stage-switch">
+      ${owned.map((c) => `<button class="btn-mini ${c.id === active.id ? 'on' : ''}" data-act="use" data-id="${c.id}">
+        ${c.id === active.id ? '✓ ' : ''}${esc(c.name)}</button>`).join('')}
     </div>` : '';
 
   paint(`
-    <div class="room" id="show-room">
-      <div class="room-cap">${esc(shown.name)} · ${esc(shown.maker)}${
-        isActive ? ' · YOURS' : showingMine ? ' · IN YOUR GARAGE' : ' · JUST LOOKING'}</div>
-    </div>
-    ${mainAction}
-    ${switcher}
     <div class="card">
       <div class="stat"><span>IN THE ACCOUNT</span><b class="good">${fmtMoney(profile.money)}</b></div>
       <p style="color:var(--dim);font-size:12px;font-weight:500;margin:6px 0 0">
@@ -849,7 +844,17 @@ export function renderShowroom() {
         { label: 'BUY IT', primary: true, act: () => { buyCar(d.id); closePopup(); showroomPick = d.id; renderShowroom(); } },
       ]);
     },
-  }, { key: 'showroom', head: head('SHOWROOM') });
+  }, {
+    key: 'showroom',
+    head: head('SHOWROOM'),
+    stage: `
+      <div class="room" id="show-room">
+        <div class="room-cap">${esc(shown.name)} · ${esc(shown.maker)}${
+          isActive ? ' · YOURS' : showingMine ? ' · IN YOUR GARAGE' : ' · JUST LOOKING'}</div>
+      </div>
+      ${switcher}
+      ${mainAction}`,
+  });
 
   // Your own paint on anything you own; anything else sits in factory colours,
   // because you have not had the chance to have it resprayed.
@@ -860,6 +865,14 @@ export function renderShowroom() {
     body: wearsYourPaint ? liv.body : shown.body,
     trim: wearsYourPaint ? liv.trim : shown.trim,
   });
+
+  // The chip row scrolls sideways, so make sure the car you actually drive is
+  // never the one parked off the edge of it.
+  const sw = menu().querySelector('.stage-switch');
+  const onChip = sw && sw.querySelector('.btn-mini.on');
+  if (onChip) {
+    sw.scrollLeft += onChip.getBoundingClientRect().left - sw.getBoundingClientRect().left - 10;
+  }
 }
 
 // ═══════════════════════════════ CHESTS ═══════════════════════════════
