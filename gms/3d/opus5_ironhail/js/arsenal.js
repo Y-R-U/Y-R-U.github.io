@@ -136,6 +136,35 @@ export const UTILITIES = {
 };
 
 // ---------------------------------------------------------------------------
+// Modules — one-off systems you either have bolted on or you do not. Unlike
+// the upgrade tracks these have no levels, and a couple of them change how
+// the game is played rather than what the numbers are.
+// ---------------------------------------------------------------------------
+
+export const MODULES = {
+  firecon: {
+    id: 'firecon', name: 'FIRE CONTROL COMPUTER', short: 'FIRE CONTROL',
+    icon: '🎚', cost: 900, unlockLevel: 1,
+    blurb: 'Lays the gun on the nearest contact, leads it perfectly, corrects ' +
+           'the full crosswind and stabilises the shot on the move.',
+    note: 'On loan through act one. Switch it off in Settings any time you ' +
+          'want the shot to be yours.',
+  },
+  rangefinder: {
+    id: 'rangefinder', name: 'LASER RANGEFINDER', short: 'RANGEFINDER',
+    icon: '📐', cost: 1400, unlockLevel: 3,
+    blurb: 'Paints the exact impact point and the drop to it, so a cold ' +
+           'first round lands where the second one would have.',
+    note: 'Widens the aim-assist cone and keeps the impact marker lit even ' +
+          'when the shell is going where you pointed.',
+  },
+};
+
+export function moduleCost(id) {
+  return (MODULES[id] && MODULES[id].cost) || 0;
+}
+
+// ---------------------------------------------------------------------------
 // Upgrade tracks — five levels each, each level multiplies a derived stat.
 // ---------------------------------------------------------------------------
 
@@ -289,6 +318,8 @@ export function derivedStats(profile) {
   const hp = ch.hp * (1 + 0.11 * u.hull);
   const dmgTakenMul = (1 / ch.armour) * (1 - 0.04 * u.hull);
   const gunMul = (1 + 0.08 * u.gunnery) * (1 + 0.1 * wl);
+  const mods = (profile.owned && profile.owned.modules) || [];
+  const hasRangefinder = mods.indexOf('rangefinder') >= 0;
 
   return {
     chassis: ch,
@@ -298,7 +329,8 @@ export function derivedStats(profile) {
     traverse: ch.traverse * (1 + 0.13 * u.turret),
     dmgTakenMul,
     regen: 0.7 * u.workshop,
-    assistRange: 3.0 + 0.9 * u.optics,
+    modules: { firecon: mods.indexOf('firecon') >= 0, rangefinder: hasRangefinder },
+    assistRange: 3.0 + 0.9 * u.optics + (hasRangefinder ? 2.4 : 0),
     leadQuality: clamp01(0.35 + 0.16 * u.optics),
     zoomMax: 1.85 + 0.28 * u.optics,
     droneMul: ch.droneMul * (1 + 0.16 * u.uplink),

@@ -1,7 +1,7 @@
 // IRONHAIL — boot, screen routing and the main loop.
 
 import * as THREE from 'three';
-import { SHOT_MODE, DEV_MODE, START_ARG, MISSION_ARG, ENV_ARG, SEED_ARG } from './config.js';
+import { SHOT_MODE, DEV_MODE, AUTO_MODE, START_ARG, MISSION_ARG, ENV_ARG, SEED_ARG } from './config.js';
 import { $, fmtTime } from './utils.js';
 import { loadProfile, profile, saveProfile, markDirty, markDailyClaimed, todayKey } from './save.js';
 import { initRender, render, renderer, camera, lastFrame, actorRoot, scene } from './render.js';
@@ -11,7 +11,7 @@ import { props } from './props.js';
 import { aimSolution, fireWeapon, activeShellCount } from './projectiles.js';
 import { useUtility } from './utility.js';
 import { UTILITIES } from './arsenal.js';
-import { initInput, consume, setSensitivity } from './input.js';
+import { initInput, consume, setSensitivity, setAimSide, setInvertY } from './input.js';
 import { updateCamera, orbitCamera, endKillCam, resetCamera } from './camera.js';
 import { AudioFX } from './audio.js';
 import { state } from './state.js';
@@ -30,7 +30,19 @@ import { showPreview, hidePreview, updatePreview, previewVisible } from './previ
 // ---------------------------------------------------------------------------
 
 loadProfile();
-setSensitivity(profile.settings.sens || 1);
+
+// Everything the settings screen can change, pushed into the live systems.
+// Called at boot and after every settings write, so a control-layout change
+// takes effect without leaving the pause menu.
+function applySettings() {
+  const s = profile.settings;
+  setSensitivity(s.sens || 1);
+  setAimSide(s.aimSide);
+  setInvertY(!!s.invertY);
+  document.body.classList.toggle('pad-left', s.padSide === 'left');
+}
+applySettings();
+
 initRender($('game-container'));
 initBattleSystems();
 initInput(renderer.domElement);
@@ -55,7 +67,7 @@ initMenus({
     leaveBattle();
     if (next) showBrief(next.id); else showCampaign();
   },
-  onSens: (s) => setSensitivity(s),
+  onSettings: () => applySettings(),
 });
 
 initRenameModal((name) => {
@@ -121,6 +133,16 @@ function pauseGame(on) {
   if (on) showPause();
   else if (state.screen === 'battle') { /* nothing to restore */ }
 }
+
+// A phone call, a notification or a switched tab should not cost you a hull.
+// Backgrounded pages stop getting rAF anyway; this makes the stop explicit so
+// you come back to the pause menu instead of a burning wreck.
+function autoPause() {
+  if (AUTO_MODE) return;        // unattended soak runs must keep running
+  if (state.inBattle && !state.paused) pauseGame(true);
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
+window.addEventListener('blur', autoPause);
 
 on('battle-over', (res) => {
   if (res.mission.daily) markDailyClaimed();
@@ -251,6 +273,8 @@ window.__game = {
     return fireWeapon(p);
   },
   shells: activeShellCount,
+  setSetting: (k, v) => { profile.settings[k] = v; applySettings(); markDirty(); refreshCurrentScreen(); },
+  giveModule: (id) => { if (!profile.owned.modules.includes(id)) profile.owned.modules.push(id); markDirty(); },
   utils: { useUtility, UTILITIES },
   THREE, camera, actorRoot, scene,
   info: () => ({

@@ -4,7 +4,8 @@
 
 import * as THREE from 'three';
 
-import { damp } from './utils.js';
+import { clamp, damp } from './utils.js';
+import { FIRECON, GRAVITY } from './config.js';
 import { camera, actorRoot } from './render.js';
 import { input, consume, keyboardMove } from './input.js';
 import { terrainHeight, raycastTerrain } from './terrain.js';
@@ -12,8 +13,10 @@ import { aimSolution, predictImpact, fireWeapon, newestPlayerShell } from './pro
 import { setCamMode, cycleCamMode, adjustZoom, startKillCam } from './camera.js';
 import { useUtility } from './utility.js';
 import { AudioFX } from './audio.js';
+import { profile } from './save.js';
 import { state } from './state.js';
 import { emit } from './bus.js';
+import { thump } from './haptics.js';
 
 const raycaster = new THREE.Raycaster();
 const _v = new THREE.Vector3();
@@ -61,6 +64,10 @@ function buildAimFx(accent) {
   actorRoot.add(arcLine);
 }
 
+// Flat-ground ballistic reach: v²/g at 45°. Good enough to stop the computer
+// laying on something it could never hit.
+function maxRange(gun) { return (gun.speed * gun.speed) / GRAVITY; }
+
 export function showAimFx(on) {
   if (!reticleRing) return;
   reticleRing.visible = on;
@@ -92,6 +99,9 @@ export class PlayerController {
     this.sol = null;
     this.range = 0;
     this.moveVec = new THREE.Vector2();
+    this.manualT = 0;                 // seconds since the commander last hand-aimed
+    this.lastAim = new THREE.Vector2(input.aim.x, input.aim.y);
+    this.autoActive = false;
     buildAimFx(tank.accent);
     showAimFx(true);
   }
@@ -100,12 +110,23 @@ export class PlayerController {
     const me = this.tank;
     me.utilCd = Math.max(0, me.utilCd - dt);
 
+    // a zoomed sight should crawl, not skate
+    input.aimSpeedMul = state.camMode === 'scope'
+      ? 0.45 / clamp(state.zoom, 0.7, 1.6)
+      : 1;
+
     this.handleActions();
     this.handleZoom();
     this.drive(dt);
     this.aim(dt);
     this.shoot(dt);
     this.updateAimFx();
+  }
+
+  // The computer is fitted (bought, or on loan in act one) and switched on,
+  // and the commander is not currently hand-aiming over the top of it.
+  fireControlOn() {
+    return !!state.fcFitted && profile.settings.autoAim !== false;
   }
 
   // ---- actions ----------------------------------------------------------
@@ -206,6 +227,13 @@ export class PlayerController {
   aim(dt) {
     const me = this.tank;
 
+    // 0. hand-aiming always outranks the computer, and for a whole second
+    //    afterwards, so nudging the reticle onto a wall does not get undone.
+    const moved = Math.hypot(input.aim.x - this.lastAim.x, input.aim.y - this.lastAim.y);
+    if (moved > FIRECON.manualDelta) this.manualT = FIRECON.manualHold;
+    else this.manualT = Math.max(0, this.manualT - dt);
+    this.lastAim.set(input.aim.x, input.aim.y);
+
     // 1. reticle to ground
     raycaster.setFromCamera(input.aim, camera);
     const hit = raycastTerrain(raycaster.ray.origin, raycaster.ray.direction, 700, 2.0);
@@ -218,16 +246,27 @@ export class PlayerController {
       groundPoint.lerp(_v, damp(14, dt));
     }
 
-    // 2. aim assist — snap to a visible contact near the reticle
-    this.lock = this.findLock();
+    // 2. aim assist — snap to a visible contact near the reticle. Hands off,
+    //    the computer sweeps most of the screen and will go hunting if it
+    //    finds nothing; hands on, the cone tightens so you can still put a
+    //    round into the fuel drum standing next to the tank.
+    const fc = this.fireControlOn();
+    const cone = fc
+      ? (this.manualT > 0 ? FIRECON.acquireNdc * 0.28 : FIRECON.acquireNdc)
+      : 0;
+    this.lock = this.findLock(cone);
+    if (fc && !this.lock && this.manualT <= 0) this.lock = this.pickAutoTarget();
+    this.autoActive = fc && !!this.lock;
+
     let targetPoint = _p.copy(groundPoint);
     targetPoint.y += 0.6;
 
     me.turretG.getWorldPosition(_v);
     if (this.lock) {
-      // lead the target by however good our optics are
-      let sol = aimSolution(_v, this.lock.pos, me.gun, me.stats.leadQuality);
-      const q = me.stats.leadQuality;
+      // lead the target by however good our optics are — the computer's are
+      // perfect, which is the whole point of paying for it
+      const q = this.autoActive ? 1 : me.stats.leadQuality;
+      const sol = aimSolution(_v, this.lock.pos, me.gun, q);
       targetPoint.set(
         this.lock.pos.x + this.lock.vel.x * sol.tof * q,
         this.lock.pos.y + 1.1,
@@ -235,7 +274,8 @@ export class PlayerController {
     }
 
     // 3. firing solution
-    const sol = aimSolution(_v, targetPoint, me.gun, me.stats.leadQuality);
+    const windQ = this.autoActive ? 1 : me.stats.leadQuality;
+    const sol = aimSolution(_v, targetPoint, me.gun, windQ);
     this.sol = sol;
     this.range = sol.dist;
     me.aimSolution = sol;
@@ -243,6 +283,11 @@ export class PlayerController {
     state.aimRange = sol.dist;
     state.aimValid = sol.valid;
     state.lockTarget = this.lock;
+    state.autoAiming = this.autoActive;
+    // The computer holds the gun steady on the move; without it, driving and
+    // shooting at the same time is the mistake it has always been.
+    me.extraSpread = this.autoActive ? FIRECON.spreadMul : 1;
+    me.stabilised = this.autoActive ? FIRECON.moveStabilise : 0;
     // the gunner's sight tracks the aim point independently of gun elevation
     state.aimGround.x = targetPoint.x;
     state.aimGround.y = targetPoint.y;
@@ -251,9 +296,11 @@ export class PlayerController {
     predictImpact(_v, { ...sol, yaw: me.turretYaw, pitch: me.barrelPitch }, me.gun, impactPoint);
   }
 
-  findLock() {
+  // `minThresh` widens the cone — the fire-control computer will pull a
+  // contact in from most of the screen, bare optics only from under the sight.
+  findLock(minThresh = 0) {
     const me = this.tank;
-    const thresh = 0.055 + me.stats.assistRange * 0.011;
+    const thresh = Math.max(0.055 + me.stats.assistRange * 0.011, minThresh);
     let best = null, bd = 1e9;
     for (const t of state.tanks) {
       if (!t.alive || t.faction === me.faction) continue;
@@ -272,9 +319,38 @@ export class PlayerController {
     }
     if (best && best !== this.lastLock) {
       AudioFX.lock();
+      thump('lock');
       this.lastLock = best;
     } else if (!best) {
       this.lastLock = null;
+    }
+    return best;
+  }
+
+  // Hands-off acquisition: the closest contact the crew actually knows about
+  // and the gun can actually reach. Prefers what is already on screen so the
+  // turret does not go hunting behind you while you are looking forwards.
+  pickAutoTarget() {
+    const me = this.tank;
+    const reach = maxRange(me.gun) * FIRECON.maxRangeMul;
+    let best = null, bs = 1e9;
+    for (const t of state.tanks) {
+      if (!t.alive || t.faction === me.faction) continue;
+      if (t.smokeTimer > 0) continue;
+      const d = t.pos.distanceTo(me.pos);
+      if (d > reach) continue;
+      if (t.spottedUntil <= state.time && d > 78) continue;   // not seen, not close
+      _ndc.copy(t.pos);
+      _ndc.y += 1.4;
+      _ndc.project(camera);
+      const onScreen = _ndc.z < 1 && Math.abs(_ndc.x) < 1 && Math.abs(_ndc.y) < 1;
+      const score = d + (onScreen ? 0 : 70);
+      if (score < bs) { bs = score; best = t; }
+    }
+    if (best && best !== this.lastLock) {
+      AudioFX.lock();
+      thump('lock');
+      this.lastLock = best;
     }
     return best;
   }
@@ -284,10 +360,17 @@ export class PlayerController {
   shoot(dt) {
     const me = this.tank;
     // A tap while reloading is remembered briefly, so the shot goes the instant
-    // the breech closes instead of being swallowed.
-    if (input.fire) this.fireBuffer = 0.4;
+    // the breech closes instead of being swallowed. With the computer on the
+    // gun the tap is remembered for longer, because it is also waiting for the
+    // turret to finish coming round.
+    const laying = this.autoActive && !!this.lock;
+    if (input.fire) this.fireBuffer = laying ? 1.6 : 0.4;
     else this.fireBuffer = Math.max(0, (this.fireBuffer || 0) - dt);
     if (this.fireBuffer <= 0 || me.fireTimer > 0) return;
+    // A computer that fires mid-traverse is worse than no computer, so it
+    // holds — but only until the buffer runs down, so a held trigger always
+    // eventually produces a shell.
+    if (laying && me.aimError > 0.03 && this.fireBuffer > 0.12) return;
     this.fireBuffer = 0;
 
     // The shell leaves along the barrel, wherever the barrel happens to be
@@ -300,8 +383,10 @@ export class PlayerController {
 
     if (fireWeapon(me)) {
       emit('player-fired', { range: this.range, lock: this.lock });
+      thump(me.gun.speed < 90 ? 'bigfire' : 'fire');
       // ride the shell on the long ones — the artillery money shot
-      if (this.range > 62 && state.camMode !== 'scope' && !state.killcam &&
+      if (profile.settings.camAuto !== false &&
+          this.range > 62 && state.camMode !== 'scope' && !state.killcam &&
           Math.random() < 0.4) {
         const shell = newestPlayerShell();
         if (shell) {
@@ -322,11 +407,14 @@ export class PlayerController {
     reticleRing.position.set(groundPoint.x, terrainHeight(groundPoint.x, groundPoint.z) + 0.3, groundPoint.z);
     reticleRing.scale.setScalar(1 + this.range * 0.006);
     reticleRing.material.opacity = ready ? 0.6 : 0.25;
-    reticleRing.rotation.z += 0.01;
+    reticleRing.rotation.z += this.autoActive ? 0.03 : 0.01;
 
     impactRing.position.set(impactPoint.x, terrainHeight(impactPoint.x, impactPoint.z) + 0.35, impactPoint.z);
     const drift = Math.hypot(impactPoint.x - groundPoint.x, impactPoint.z - groundPoint.z);
-    impactRing.material.opacity = drift > 1.6 ? 0.85 : 0.0;
+    // The rangefinder keeps the impact mark lit even when the shell is going
+    // exactly where you pointed — that confirmation is what you paid for.
+    const rf = me.stats.modules && me.stats.modules.rangefinder;
+    impactRing.material.opacity = drift > 1.6 ? 0.85 : (rf ? 0.4 : 0.0);
     impactRing.scale.setScalar(1.2 + drift * 0.05);
 
     // ballistic arc preview

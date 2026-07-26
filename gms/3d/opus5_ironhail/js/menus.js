@@ -6,15 +6,15 @@ import {
   $, el, clamp01, fmtTime, fmtBig, fmtRank, sanitizeName, mulberry32, hashStr,
 } from './utils.js';
 import {
-  CHASSIS, WEAPONS, UTILITIES, UPGRADES, CAMOS, MAX_UP_LEVEL, MAX_WEAPON_LEVEL, upgradeCost, weaponLevelCost, derivedStats, bpForRank, tierFor, nextTier, TIERS, LADDER_SIZE, weaponStats,
+  CHASSIS, WEAPONS, UTILITIES, UPGRADES, MODULES, CAMOS, MAX_UP_LEVEL, MAX_WEAPON_LEVEL, upgradeCost, weaponLevelCost, derivedStats, bpForRank, tierFor, nextTier, TIERS, LADDER_SIZE, weaponStats,
 } from './arsenal.js';
 import {
-  profile, saveProfile, spend, canAfford, acquire, owns, worldRank, commanderLevel, totalStars, missionRecord, markDirty, resetProfile, dailyAvailable, todayKey,
+  profile, saveProfile, spend, canAfford, acquire, owns, hasModule, fireControlFitted, worldRank, commanderLevel, totalStars, missionRecord, markDirty, resetProfile, dailyAvailable, todayKey,
 } from './save.js';
 import {
   MISSIONS, ACTS, missionsOfAct, missionUnlocked, SKIRMISH_TIERS, suggestedTier,
 } from './missions.js';
-import { LADDER_TAGS, ENEMY_NAMES } from './config.js';
+import { LADDER_TAGS, ENEMY_NAMES, IS_TOUCH } from './config.js';
 import { AudioFX } from './audio.js';
 import { state } from './state.js';
 
@@ -39,7 +39,10 @@ function route(action, arg) {
     case 'attack': showAttack(); break;
     case 'garage': showGarage(); break;
     case 'ladder': showLadder(); break;
-    case 'settings': showSettings(); break;
+    case 'settings': showSettings('title'); break;
+    case 'settings-pause': showSettings('pause'); break;
+    case 'settings-return': showSettings(); break;   // keeps the back target
+    case 'resume-settings': showPause(); break;
     case 'brief': showBrief(arg); break;
     case 'deploy': handlers.onDeployMission(arg); break;
     case 'deploy-skirmish': handlers.onDeploySkirmish(parseInt(arg, 10), false); break;
@@ -47,6 +50,7 @@ function route(action, arg) {
     case 'tab': currentTab = arg; showGarage(); break;
     case 'equip': doEquip(arg); break;
     case 'buy': doBuy(arg); break;
+    case 'buy-module': doBuyModule(arg); break;
     case 'upgrade': doUpgrade(arg); break;
     case 'gunlevel': doGunLevel(arg); break;
     case 'rename': openRename(); break;
@@ -57,6 +61,12 @@ function route(action, arg) {
     case 'again': handlers.onRestart(); break;
     case 'mute': toggleMute(); break;
     case 'quality': toggleQuality(); break;
+    case 'aimside': setSetting('aimSide', arg); break;
+    case 'padside': setSetting('padSide', arg); break;
+    case 'inverty': setSetting('invertY', !profile.settings.invertY); break;
+    case 'haptics': setSetting('haptics', profile.settings.haptics === false); break;
+    case 'autoaim': setSetting('autoAim', profile.settings.autoAim === false); break;
+    case 'camauto': setSetting('camAuto', profile.settings.camAuto === false); break;
     case 'wipe': confirmWipe(); break;
     case 'wipe-yes': resetProfile(); showTitle(); break;
     case 'reload': location.reload(); break;
@@ -254,6 +264,7 @@ export function showBrief(id) {
   grid.appendChild(infoBlock('OBJECTIVE', objectiveDetail(m)));
   if (m.intel) grid.appendChild(infoBlock('INTEL', m.intel));
   if (m.unlock) grid.appendChild(infoBlock('ON COMPLETION', 'UNLOCKS ' + unlockName(m.unlock)));
+  grid.appendChild(infoBlock('FIRE CONTROL', fireControlBrief(m)));
   w.appendChild(grid);
 
   const st = el('div', 'stars big');
@@ -266,6 +277,19 @@ export function showBrief(id) {
   row.appendChild(bigButton('DEPLOY', 'deploy', m.id, 'btn-primary'));
   row.appendChild(bigButton('GARAGE', 'garage', null, 'btn-secondary'));
   w.appendChild(row);
+}
+
+// The one line that tells a commander whether the gun lays itself this trip.
+function fireControlBrief(m) {
+  const fc = fireControlFitted(m);
+  const off = profile.settings.autoAim === false;
+  if (fc.owned) return off ? 'INSTALLED — switched off in Settings.' : 'INSTALLED — the computer lays the gun.';
+  if (fc.trial) {
+    return off
+      ? 'LOANER FITTED for act one, but switched off in Settings.'
+      : 'LOANER FITTED for act one. It lays the gun, leads the target and reads the wind for you.';
+  }
+  return 'NOT FITTED. Every shot is yours to judge — or buy the computer in the garage.';
 }
 
 function infoBlock(title, body) {
@@ -423,6 +447,8 @@ function addStat(cont, label, value) {
 
 function renderUpgrades(scroll) {
   const lvl = commanderLevel().level;
+  renderModules(scroll, lvl);
+  scroll.appendChild(el('div', 'section-head', 'UPGRADE TRACKS'));
   for (const key of Object.keys(UPGRADES)) {
     const u = UPGRADES[key];
     const level = profile.upgrades[key] || 0;
@@ -448,6 +474,38 @@ function renderUpgrades(scroll) {
       b.dataset.arg = key;
       b.appendChild(el('span', null, '⬢ ' + fmtBig(cost)));
       b.appendChild(el('small', null, 'LVL ' + (level + 1)));
+      r.appendChild(b);
+    }
+    row.appendChild(r);
+    scroll.appendChild(row);
+  }
+}
+
+// One-off systems. No levels: you have it bolted on or you do not.
+function renderModules(scroll, lvl) {
+  scroll.appendChild(el('div', 'section-head', 'MODULES · bought once, fitted for good'));
+  for (const key of Object.keys(MODULES)) {
+    const mo = MODULES[key];
+    const has = hasModule(key);
+    const locked = !has && lvl < mo.unlockLevel;
+    const row = el('div', 'item' + (has ? ' equipped' : ''));
+
+    const l = el('div', 'item-l');
+    l.appendChild(el('b', null, mo.icon + '  ' + mo.name));
+    l.appendChild(el('small', null, mo.blurb));
+    if (mo.note) l.appendChild(el('small', 'nums', mo.note));
+    row.appendChild(l);
+
+    const r = el('div', 'item-r');
+    if (has) {
+      r.appendChild(el('span', 'equipped-tag', 'INSTALLED'));
+    } else if (locked) {
+      r.appendChild(el('span', 'locked-tag', 'CMDR ' + mo.unlockLevel));
+    } else {
+      const b = el('button', 'buy' + (canAfford(mo.cost) ? '' : ' poor'));
+      b.dataset.act = 'buy-module';
+      b.dataset.arg = key;
+      b.appendChild(el('span', null, '⬢ ' + fmtBig(mo.cost)));
       r.appendChild(b);
     }
     row.appendChild(r);
@@ -637,6 +695,19 @@ function doBuy(arg) {
   if (kind === 'weapons' && profile.weaponLevels[id] == null) profile.weaponLevels[id] = 0;
   markDirty();
   AudioFX.pickup();
+  showGarage();
+}
+
+function doBuyModule(id) {
+  const mo = MODULES[id];
+  if (!mo || hasModule(id)) return;
+  if (commanderLevel().level < mo.unlockLevel) return;
+  if (!spend(mo.cost)) { flashPoor(); return; }
+  acquire('modules', id);
+  // a computer you paid for should be switched on when you leave the garage
+  if (id === 'firecon') profile.settings.autoAim = true;
+  markDirty();
+  AudioFX.levelUp();
   showGarage();
 }
 
@@ -872,6 +943,9 @@ export function showPause() {
   }
   const col = el('div', 'menu-col');
   col.appendChild(bigButton('RESUME', 'resume', null, 'btn-primary'));
+  // Controls are exactly the thing you want to change mid-battle, when you
+  // have just discovered the buttons are under the wrong thumb.
+  col.appendChild(bigButton('SETTINGS & CONTROLS', 'settings-pause', null, 'btn-secondary'));
   col.appendChild(bigButton('RESTART', 'restart', null, 'btn-secondary'));
   col.appendChild(bigButton('ABORT MISSION', 'abort', null, 'btn-secondary'));
   const row = el('div', 'menu-row');
@@ -883,40 +957,51 @@ export function showPause() {
   }
 }
 
-export function showSettings() {
+// Where ‹ BACK goes — SETTINGS is reachable from the title and from the
+// pause menu, and dumping a paused commander back to the title would be rude.
+let settingsBack = 'title';
+
+export function showSettings(from) {
+  if (from) settingsBack = from;
   state.screen = 'settings';
   const w = frame('list-screen');
-  backRow(w, 'title');
+  backRow(w, settingsBack === 'pause' ? 'resume-settings' : settingsBack);
   w.appendChild(el('h2', 'screen-title', 'SETTINGS'));
 
   const scroll = el('div', 'scroll');
+
+  // ---- controls -----------------------------------------------------------
+  scroll.appendChild(el('div', 'section-head', 'CONTROLS'));
+  scroll.appendChild(layoutDiagram());
+  scroll.appendChild(sideRow('AIM THUMB', profile.settings.aimSide, 'aimside',
+    'Which half of the screen drags the reticle. The other half is your drive stick.'));
+  scroll.appendChild(sideRow('FIRE BUTTONS', profile.settings.padSide, 'padside',
+    'Which side FIRE and the action buttons sit on. Put them under your other thumb.'));
+  scroll.appendChild(sliderRow('AIM SENSITIVITY', 'sens', 0.4, 2.4, 0.1,
+    'How fast a thumb drag or mouse sweep moves the reticle.',
+    (v) => v.toFixed(1) + '×'));
+  scroll.appendChild(toggleRow('INVERT AIM (Y)', !!profile.settings.invertY, 'inverty',
+    'Drag down to raise the sight.'));
+  if (IS_TOUCH) {
+    scroll.appendChild(toggleRow('VIBRATION', profile.settings.haptics !== false, 'haptics',
+      'A short buzz on firing, hits and kills.'));
+  }
+
+  // ---- gunnery ------------------------------------------------------------
+  scroll.appendChild(el('div', 'section-head', 'GUNNERY'));
+  scroll.appendChild(fireControlRow());
+  scroll.appendChild(toggleRow('CINEMATIC SHELL CAM', profile.settings.camAuto !== false, 'camauto',
+    'Occasionally rides the shell in on the long shots. Turn it off if you would rather keep the wheel.'));
+
+  // ---- presentation -------------------------------------------------------
+  scroll.appendChild(el('div', 'section-head', 'PRESENTATION'));
   scroll.appendChild(toggleRow('SOUND', !AudioFX.muted, 'mute'));
   scroll.appendChild(toggleRow('LOW QUALITY MODE', !!profile.settings.lite, 'quality',
     'Turns off bloom and shadows. Applies after a reload.'));
 
-  // aim sensitivity
-  const sr = el('div', 'item');
-  const sl = el('div', 'item-l');
-  sl.appendChild(el('b', null, 'AIM SENSITIVITY'));
-  sl.appendChild(el('small', null, 'How fast a thumb drag or mouse sweep moves the reticle.'));
-  const slider = el('input');
-  slider.type = 'range';
-  slider.min = '0.4';
-  slider.max = '2.4';
-  slider.step = '0.1';
-  slider.value = String(profile.settings.sens || 1);
-  slider.className = 'slider';
-  slider.addEventListener('input', () => {
-    profile.settings.sens = parseFloat(slider.value);
-    markDirty();
-    handlers.onSens(profile.settings.sens);
-    val.textContent = profile.settings.sens.toFixed(1) + '×';
-  });
-  sl.appendChild(slider);
-  sr.appendChild(sl);
-  const val = el('div', 'item-r', (profile.settings.sens || 1).toFixed(1) + '×');
-  sr.appendChild(val);
-  scroll.appendChild(sr);
+  // ---- reference ----------------------------------------------------------
+  scroll.appendChild(el('div', 'section-head', 'CONTROL REFERENCE'));
+  scroll.appendChild(controlReference());
 
   const wipe = el('div', 'item');
   const wl = el('div', 'item-l');
@@ -937,19 +1022,165 @@ export function showSettings() {
   w.appendChild(scroll);
 }
 
-function toggleRow(label, on, action, sub) {
+function toggleRow(label, on, action, sub, disabled = false) {
   const row = el('div', 'item');
   const l = el('div', 'item-l');
   l.appendChild(el('b', null, label));
   if (sub) l.appendChild(el('small', null, sub));
   row.appendChild(l);
   const r = el('div', 'item-r');
-  const b = el('button', 'toggle' + (on ? ' on' : ''));
-  b.dataset.act = action;
-  b.appendChild(el('span', null, on ? 'ON' : 'OFF'));
+  const b = el('button', 'toggle' + (on ? ' on' : '') + (disabled ? ' disabled' : ''));
+  if (!disabled) b.dataset.act = action;
+  b.appendChild(el('span', null, disabled ? '—' : (on ? 'ON' : 'OFF')));
   r.appendChild(b);
   row.appendChild(r);
   return row;
+}
+
+// A two-way LEFT / RIGHT switch. Clearer than a toggle labelled "SOUTHPAW",
+// because the label never has to say which way round "on" means.
+function sideRow(label, value, action, sub) {
+  const row = el('div', 'item');
+  const l = el('div', 'item-l');
+  l.appendChild(el('b', null, label));
+  if (sub) l.appendChild(el('small', null, sub));
+  row.appendChild(l);
+  const r = el('div', 'item-r');
+  const seg = el('div', 'seg');
+  for (const side of ['left', 'right']) {
+    const b = el('button', 'seg-b' + (value === side ? ' on' : ''), side.toUpperCase());
+    b.dataset.act = action;
+    b.dataset.arg = side;
+    seg.appendChild(b);
+  }
+  r.appendChild(seg);
+  row.appendChild(r);
+  return row;
+}
+
+function sliderRow(label, key, min, max, step, sub, fmt) {
+  const row = el('div', 'item');
+  const l = el('div', 'item-l');
+  l.appendChild(el('b', null, label));
+  if (sub) l.appendChild(el('small', null, sub));
+  const slider = el('input');
+  slider.type = 'range';
+  slider.min = String(min);
+  slider.max = String(max);
+  slider.step = String(step);
+  slider.value = String(profile.settings[key]);
+  slider.className = 'slider';
+  slider.addEventListener('input', () => {
+    profile.settings[key] = parseFloat(slider.value);
+    markDirty();
+    handlers.onSettings();
+    val.textContent = fmt(profile.settings[key]);
+  });
+  l.appendChild(slider);
+  row.appendChild(l);
+  const val = el('div', 'item-r', fmt(profile.settings[key]));
+  row.appendChild(val);
+  return row;
+}
+
+// A live picture of the thumb layout, because two words on a switch never
+// beat seeing which half of the glass does what.
+function layoutDiagram() {
+  const aimRight = profile.settings.aimSide !== 'left';
+  const padRight = profile.settings.padSide !== 'left';
+  const wrap = el('div', 'layout-demo');
+  const screen = el('div', 'ld-screen');
+
+  const drive = el('div', 'ld-zone drive' + (aimRight ? ' l' : ' r'));
+  drive.appendChild(el('b', null, '⊕'));
+  drive.appendChild(el('span', null, 'DRIVE'));
+  screen.appendChild(drive);
+
+  const aim = el('div', 'ld-zone aim' + (aimRight ? ' r' : ' l'));
+  aim.appendChild(el('b', null, '✛'));
+  aim.appendChild(el('span', null, 'AIM'));
+  screen.appendChild(aim);
+
+  const fire = el('div', 'ld-fire' + (padRight ? ' r' : ' l'), 'FIRE');
+  screen.appendChild(fire);
+  const stack = el('div', 'ld-stack' + (padRight ? ' r' : ' l'));
+  for (const t of ['UTIL', 'DRONE', 'SCOPE']) stack.appendChild(el('i', null, t));
+  screen.appendChild(stack);
+
+  wrap.appendChild(screen);
+  wrap.appendChild(el('small', null,
+    aimRight === padRight
+      ? 'Aim and fire with the same thumb — drive with the other.'
+      : 'Aim with one thumb, fire with the other.'));
+  return wrap;
+}
+
+// The auto-aim row. Live while the computer is fitted — bought, or on loan
+// through act one — and an honest shopfront when it is not.
+function fireControlRow() {
+  const fc = fireControlFitted(null);
+  const owned = fc.owned;
+  const usable = fc.fitted;
+  const mo = MODULES.firecon;
+
+  if (!usable) {
+    const row = el('div', 'item');
+    const l = el('div', 'item-l');
+    l.appendChild(el('b', null, 'FIRE CONTROL (AUTO-AIM)'));
+    l.appendChild(el('small', null,
+      'Your loaner went back at the end of act one. ' + mo.blurb));
+    row.appendChild(l);
+    const r = el('div', 'item-r');
+    const b = el('button', 'buy' + (canAfford(mo.cost) ? '' : ' poor'));
+    b.dataset.act = 'garage';
+    b.appendChild(el('span', null, '⬢ ' + fmtBig(mo.cost)));
+    b.appendChild(el('small', null, 'GARAGE'));
+    r.appendChild(b);
+    row.appendChild(r);
+    return row;
+  }
+
+  return toggleRow('FIRE CONTROL (AUTO-AIM)', profile.settings.autoAim !== false, 'autoaim',
+    owned
+      ? 'Installed. Lays the gun on the nearest contact, leads it and reads the wind. Nudge the reticle any time to take the shot back.'
+      : 'On loan through act one. Lays the gun for you — buy the computer in the garage to keep it.');
+}
+
+// Not a manual, just the six things a commander actually needs to be told.
+function controlReference() {
+  const box = el('div', 'keyref');
+  const aimRight = profile.settings.aimSide !== 'left';
+  const rows = IS_TOUCH ? [
+    [aimRight ? 'RIGHT OF SCREEN' : 'LEFT OF SCREEN', 'drag to aim'],
+    [aimRight ? 'LEFT OF SCREEN' : 'RIGHT OF SCREEN', 'drag to drive'],
+    ['FIRE', 'hold or tap — a tap while reloading still goes off'],
+    ['DRONE', 'switch to the uplink camera; the stick then flies the drone'],
+    ['MARK', 'paint what the drone can see for a strike'],
+    ['PINCH', 'zoom the chase camera or the sight'],
+  ] : [
+    ['W A S D', 'drive (relative to the camera)'],
+    ['MOUSE', 'aim · LEFT CLICK fire · RIGHT CLICK utility'],
+    ['Q / R', 'drone camera / recall the drone'],
+    ['TAB · 1 2 3', 'scope · chase, scope, drone'],
+    ['E · F', 'utility · mark a target'],
+    ['WHEEL · P · M', 'zoom · pause · mute'],
+  ];
+  for (const [k, v] of rows) {
+    const r = el('div', 'kr');
+    r.appendChild(el('b', null, k));
+    r.appendChild(el('span', null, v));
+    box.appendChild(r);
+  }
+  return box;
+}
+
+// One door for every settings write: store it, persist it, push it into the
+// live systems, redraw. Nothing else in here pokes profile.settings directly.
+function setSetting(key, value) {
+  profile.settings[key] = value;
+  markDirty();
+  handlers.onSettings();
+  showSettings();
 }
 
 function toggleMute() {
@@ -967,7 +1198,7 @@ function toggleQuality() {
   w.appendChild(el('p', 'screen-sub', 'The renderer rebuilds on reload.'));
   const col = el('div', 'menu-col');
   col.appendChild(bigButton('RELOAD NOW', 'reload', null, 'btn-primary'));
-  col.appendChild(bigButton('LATER', 'settings', null, 'btn-secondary'));
+  col.appendChild(bigButton('LATER', 'settings-return', null, 'btn-secondary'));
   w.appendChild(col);
 }
 
@@ -977,7 +1208,7 @@ function confirmWipe() {
   w.appendChild(el('p', 'screen-sub',
     'Campaign stars, garage, scrap and your world rank all go back to zero. There is no undo.'));
   const col = el('div', 'menu-col');
-  col.appendChild(bigButton('KEEP MY PROGRESS', 'settings', null, 'btn-primary'));
+  col.appendChild(bigButton('KEEP MY PROGRESS', 'settings-return', null, 'btn-primary'));
   col.appendChild(bigButton('WIPE IT', 'wipe-yes', null, 'btn-secondary'));
   w.appendChild(col);
 }

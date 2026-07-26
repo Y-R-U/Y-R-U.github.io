@@ -32,8 +32,21 @@ let joyId = null, aimId = null;
 let joyOrigin = { x: 0, y: 0 };
 const pinch = { a: null, b: null, dist: 0 };
 let sens = 1;
+let aimSide = 'right';      // which half of the screen the aiming thumb owns
+let invertY = false;
 
 export function setSensitivity(s) { sens = s; }
+export function setAimSide(side) { aimSide = side === 'left' ? 'left' : 'right'; }
+export function setInvertY(on) { invertY = !!on; }
+export function getAimSide() { return aimSide; }
+
+// The drive stick keeps the outer 44% of its side; everything else — including
+// the middle of the screen — belongs to the aiming thumb, because a reticle
+// drag that runs out of room mid-sweep is worse than a stick that does.
+function isDriveZone(clientX) {
+  const frac = clientX / window.innerWidth;
+  return aimSide === 'right' ? frac < 0.44 : frac > 0.56;
+}
 
 const KEY_ACTIONS = {
   KeyQ: 'drone', Tab: 'scope', KeyE: 'util', KeyF: 'mark', KeyR: 'recall',
@@ -76,16 +89,16 @@ export function initInput(dom) {
     input.zoomDelta += Math.sign(e.deltaY) * 0.09;
   }, { passive: true });
 
-  // ---- touch: left half drives, right half aims ------------------------
+  // ---- touch: one side drives, the other aims (swappable in Settings) ---
   dom.addEventListener('touchstart', (e) => {
     for (const t of e.changedTouches) {
-      const leftSide = t.clientX < window.innerWidth * 0.44;
-      if (leftSide && joyId === null) {
+      const driveSide = isDriveZone(t.clientX);
+      if (driveSide && joyId === null) {
         joyId = t.identifier;
         joyOrigin = { x: t.clientX, y: t.clientY };
         input.joyActive = true;
         input.move.set(0, 0);
-      } else if (!leftSide && aimId === null) {
+      } else if (!driveSide && aimId === null) {
         aimId = t.identifier;
         input.aimActive = true;
       }
@@ -111,10 +124,11 @@ export function initInput(dom) {
       } else if (t.identifier === aimId) {
         const prev = aimPrev[t.identifier];
         if (prev) {
-          const sx = (t.clientX - prev.x) / window.innerWidth * 2.6 * sens * input.aimSpeedMul;
-          const sy = -(t.clientY - prev.y) / window.innerHeight * 2.6 * sens * input.aimSpeedMul;
+          const k = 2.6 * sens * input.aimSpeedMul;
+          const sx = (t.clientX - prev.x) / window.innerWidth * k;
+          const sy = -(t.clientY - prev.y) / window.innerHeight * k;
           input.aim.x = clamp(input.aim.x + sx, -0.96, 0.96);
-          input.aim.y = clamp(input.aim.y + sy, -0.6, 0.9);
+          input.aim.y = clamp(input.aim.y + (invertY ? -sy : sy), -0.6, 0.9);
         }
         aimPrev[t.identifier] = { x: t.clientX, y: t.clientY };
       }

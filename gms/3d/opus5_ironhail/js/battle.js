@@ -9,6 +9,7 @@ import { ENEMY_NAMES } from './config.js';
 import { CHASSIS, CAMOS, weaponStats, derivedStats, payout } from './arsenal.js';
 import {
   profile, applyBP, addScrap, addXp, recordBattle, setMissionResult, acquire, owns,
+  fireControlFitted, markDirty,
 } from './save.js';
 import { actorRoot } from './render.js';
 import { applyEnvironment, rollWind, BIOMES } from './env.js';
@@ -150,6 +151,13 @@ export function startBattle(mission) {
   });
   placeObjectiveProps(mission, biome, rng, { x: px, z: pz });
   resettleDetail();
+
+  // Fire control is either bolted on for good, or on loan while you learn the
+  // arc in act one.
+  const fc = fireControlFitted(mission);
+  state.fcFitted = fc.fitted;
+  state.fcTrial = fc.trial;
+  state.autoAiming = false;
 
   // ---- player ----
   const stats = derivedStats(profile);
@@ -542,6 +550,20 @@ export function failBattle(reason) {
 // Frame
 // ---------------------------------------------------------------------------
 
+// Said once, on the first battle of a save, and never again. A commander who
+// does not know the gun is laying itself will fight it.
+function firstBattleHint() {
+  if (profile.seen.intro || AUTO_MODE) return;
+  profile.seen.intro = true;
+  markDirty();
+  const msg = state.fcFitted
+    ? (profile.settings.autoAim !== false
+      ? 'FIRE CONTROL ON LOAN — HOLD FIRE AND IT LAYS THE GUN'
+      : 'FIRE CONTROL IS SWITCHED OFF — EVERY SHOT IS YOURS')
+    : 'NO FIRE CONTROL — READ THE WIND AND LEAD THEM';
+  setTimeout(() => emit('toast', msg), 1400);
+}
+
 export function updateBattle(dt, rawDt) {
   if (state.phase === 'countdown') {
     state.countdown -= rawDt;
@@ -555,6 +577,7 @@ export function updateBattle(dt, rawDt) {
       state.phase = 'playing';
       emit('banner', { text: 'ENGAGE', small: false });
       AudioFX.horn();
+      firstBattleHint();
     }
     updateAllTanks(dt);
     if (state.drone) state.drone.update(dt);

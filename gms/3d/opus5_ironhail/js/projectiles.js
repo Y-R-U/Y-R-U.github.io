@@ -208,10 +208,11 @@ function fireOneShell(tank) {
   const yaw = tank.turretYaw;
   const pitch = tank.barrelPitch;
 
-  // firing on the move throws the shot off — stop to shoot straight.
+  // firing on the move throws the shot off — stop to shoot straight, unless a
+  // fire-control computer is holding the gun steady for you (tank.stabilised).
   // extraSpread is how the AI's crew quality becomes dispersion.
-  const spreadMul = (1 + clamp01((tank.speed || 0) / 18) * 1.6) *
-    (tank.extraSpread || 1);
+  const moveErr = clamp01((tank.speed || 0) / 18) * 1.6 * (1 - (tank.stabilised || 0));
+  const spreadMul = (1 + moveErr) * (tank.extraSpread || 1);
   const b = launch({
     from: _v, pitch, yaw, gun, owner: tank, byPlayer: tank.isPlayer,
     spreadMul: spreadMul * (gun.kind === 'salvo' ? 1.5 : 1),

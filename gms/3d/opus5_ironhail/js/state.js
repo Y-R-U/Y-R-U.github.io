@@ -38,6 +38,9 @@ export const state = {
   aimRange: 0,
   aimValid: true,
   lockTarget: null,
+  fcFitted: false,       // fire-control computer available this battle
+  fcTrial: false,        // ...and it is the act-one loaner, not a bought one
+  autoAiming: false,     // the computer currently has the gun
 
   // ---- camera ----
   camMode: 'chase',      // chase | scope | drone

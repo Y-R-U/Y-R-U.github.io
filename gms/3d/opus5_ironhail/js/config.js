@@ -67,6 +67,19 @@ export const DRONE = {
   pingInterval: 3.0,
 };
 
+// Fire-control computer — the assist that lays the gun for you. Issued on
+// loan through act one so a new commander learns the arc before paying for
+// the crutch; after that it is a garage module.
+export const FIRECON = {
+  trialActs: [1],            // acts where the loaner computer is fitted free
+  acquireNdc: 0.5,           // how far off the reticle it will grab a contact
+  manualHold: 1.2,           // seconds of hand-aiming that stand the computer down
+  manualDelta: 0.0035,       // reticle movement per frame that counts as hand-aiming
+  spreadMul: 0.34,           // dispersion while the computer has the gun
+  moveStabilise: 0.55,       // fraction of the firing-on-the-move penalty it cancels
+  maxRangeMul: 1.05,         // will not lay on targets past the gun's reach
+};
+
 export const CAM = {
   chaseDist: 21,
   chaseHeight: 10.5,

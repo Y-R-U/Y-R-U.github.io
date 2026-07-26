@@ -1,7 +1,7 @@
 // Persistent commander profile. One localStorage blob, deep-merged over the
 // defaults on load so adding fields never breaks an existing save.
 
-import { SAVE_KEY, WIPE_ARG, NAME_POOL } from './config.js';
+import { SAVE_KEY, WIPE_ARG, NAME_POOL, FIRECON } from './config.js';
 import { pickRandom, clamp } from './utils.js';
 import { levelFromXp, rankFromBP, CHASSIS, WEAPONS, UTILITIES, CAMOS } from './arsenal.js';
 
@@ -24,6 +24,7 @@ function defaults() {
       weapons: ['ap76'],
       utilities: ['repair'],
       camos: ['olive'],
+      modules: [],
     },
     campaign: {},              // missionId -> { stars, bestScore, done }
     act: 1,                    // furthest act reached
@@ -32,7 +33,13 @@ function defaults() {
       shots: 0, hits: 0, props: 0, bestKills: 0, streak: 0, bestStreak: 0,
       bpEarned: 0, scrapEarned: 0, longestKill: 0, dronesLost: 0,
     },
-    settings: { muted: false, lite: false, sens: 1, invertY: false, haptics: true, camAuto: true },
+    settings: {
+      muted: false, lite: false, sens: 1, invertY: false, haptics: true,
+      camAuto: true,            // let the camera ride the occasional long shot
+      autoAim: true,            // use the fire-control computer when it is fitted
+      aimSide: 'right',         // which half of the screen the aim thumb owns
+      padSide: 'right',         // which side FIRE and the action buttons sit on
+    },
     daily: { day: '', claimed: false },
     seen: { intro: false, garage: false, drone: false },
   };
@@ -76,6 +83,11 @@ export function loadProfile() {
   for (const k of Object.keys(profile.upgrades)) {
     profile.upgrades[k] = clamp(profile.upgrades[k] | 0, 0, 5);
   }
+  // saves written before modules existed have no bucket at all
+  if (!Array.isArray(profile.owned.modules)) profile.owned.modules = [];
+  const st = profile.settings;
+  if (st.aimSide !== 'left') st.aimSide = 'right';
+  if (st.padSide !== 'left') st.padSide = 'right';
   return profile;
 }
 
@@ -92,9 +104,14 @@ export function markDirty() {
 }
 
 export function resetProfile() {
+  // A wipe erases progress. Which thumb you aim with is not progress, and
+  // having to set the controls up again after every reset would be a punishment
+  // nobody asked for.
+  const keep = { ...profile.settings };
   const fresh = defaults();
   for (const k of Object.keys(profile)) delete profile[k];
   Object.assign(profile, fresh);
+  profile.settings = keep;
   saveProfile();
 }
 
@@ -132,6 +149,23 @@ export function commanderLevel() {
 
 export function owns(kind, id) {
   return profile.owned[kind].includes(id);
+}
+
+export function hasModule(id) {
+  return Array.isArray(profile.owned.modules) && profile.owned.modules.includes(id);
+}
+
+// The one rule for "does the gun lay itself", shared by the battle runner, the
+// mission brief and the settings screen so they can never disagree. Bought is
+// forever; otherwise there is a loaner until you have finished the act it was
+// issued for — including in skirmishes taken during that time.
+export function fireControlFitted(mission = null) {
+  if (hasModule('firecon')) return { owned: true, trial: false, fitted: true };
+  const lastTrialAct = Math.max.apply(null, FIRECON.trialActs);
+  const trial = mission && mission.act
+    ? FIRECON.trialActs.indexOf(mission.act) >= 0
+    : (profile.act || 1) <= lastTrialAct;
+  return { owned: false, trial, fitted: trial };
 }
 
 export function acquire(kind, id) {

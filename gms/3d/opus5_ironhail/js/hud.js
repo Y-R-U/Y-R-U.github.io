@@ -14,6 +14,7 @@ import { terrainHeight } from './terrain.js';
 import { props } from './props.js';
 import { on } from './bus.js';
 import { AudioFX } from './audio.js';
+import { thump } from './haptics.js';
 
 const _v = new THREE.Vector3();
 let mini = null, miniCtx = null;
@@ -47,9 +48,13 @@ export function initHUD(h) {
     else if (state.player) showToast('ENEMY ' + kind + ' HIT');
   });
   on('utility', ({ label }) => showToast(label));
-  on('player-hit', (e) => { floatDamage(e); hitMark(!e.tank.alive); });
+  on('player-hit', (e) => {
+    floatDamage(e);
+    hitMark(!e.tank.alive);
+    thump(e.tank.alive ? 'hit' : 'kill');
+  });
   on('tank-killed', ({ victim, attacker }) => addFeed(attacker, victim));
-  on('damage', (e) => { if (e.tank.isPlayer) flashHit(); });
+  on('damage', (e) => { if (e.tank.isPlayer) { flashHit(); thump('hurt'); } });
   on('drone-down', () => showToast('UPLINK LOST'));
   on('drone-online', () => showToast('DRONE RELAUNCHED'));
   on('drone-contacts', (n) => showToast(n === 1 ? 'CONTACT MARKED' : n + ' CONTACTS MARKED'));
@@ -181,6 +186,7 @@ export function updateHUD(dt) {
 function updateStatus(p) {
   const row = $('status-row');
   const parts = [];
+  if (state.autoAiming) parts.push(['AUTO', 'auto']);
   if (p.trackTimer > 0) parts.push(['TRACKS', 'bad']);
   if (p.turretTimer > 0) parts.push(['TURRET', 'bad']);
   if (p.empTimer > 0) parts.push(['EMP', 'bad']);
@@ -240,6 +246,7 @@ function updateReticle(p) {
   const y = (-input.aim.y * 0.5 + 0.5) * window.innerHeight;
   r.style.transform = `translate(${x}px, ${y}px)`;
   r.classList.toggle('locked', !!state.lockTarget);
+  r.classList.toggle('auto', !!state.autoAiming);
   r.classList.toggle('ready', p.fireTimer <= 0);
   r.classList.toggle('invalid', state.aimValid === false);
   const rng = $('ret-range');
@@ -311,7 +318,9 @@ function updateTags() {
     e.tag.style.transform = `translate(${sx}px, ${sy}px)`;
     e.tag.className = 'tag' + (hostile ? ' hostile' : ' friendly') +
       (spotted ? ' spotted' : '') + (t.boss ? ' boss' : '') +
-      (t.markedUntil > state.time ? ' marked' : '');
+      (t.markedUntil > state.time ? ' marked' : '') +
+      // the gun may be laid somewhere the reticle is not — say which hull
+      (t === state.lockTarget ? (state.autoAiming ? ' auto-lock' : ' lock') : '');
     if (e.nameCache !== t.name) { e.name.textContent = t.name; e.nameCache = t.name; }
     e.name.style.color = t.accentCss;
     e.fill.style.width = (t.hpFrac * 100) + '%';
