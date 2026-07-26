@@ -4,6 +4,7 @@
 
 import { mulberry32, hashStr, clamp } from './utils.js';
 import { ENEMY_NAMES } from './config.js';
+import { cineFor } from './story.js';
 
 const foe = (role, chassis, weapon, skill, count = 1) =>
   ({ role, chassis, weapon, skill, count });
@@ -16,7 +17,9 @@ export const ACTS = [
   { id: 3, name: 'WINTERREACH', biome: 'tundra',
     blurb: 'North, where the Consortium keeps the things it does not talk about.' },
   { id: 4, name: 'THE ASHWORKS', biome: 'industrial',
-    blurb: 'Where they build the tanks. Where it ends.' },
+    blurb: 'Where they build the tanks. Where you finish the marshal.' },
+  { id: 5, name: 'THE WARDEN', biome: 'volcanic',
+    blurb: 'The man is dead. The foundry never noticed, and it is still pouring.' },
 ];
 
 export const MISSIONS = [
@@ -79,6 +82,19 @@ export const MISSIONS = [
     intel: 'At night muzzle flashes give away position — theirs and yours.',
   },
 
+  {
+    id: 'a1m6', act: 1, name: 'THE LONG WAY BACK', time: 'dusk', biome: 'desert',
+    seed: 11006, weather: 'dust',
+    brief: 'Voss put a price on your callsign inside a day and every gun on the ' +
+      'dust line has heard the number. They are on the road behind you. Do not ' +
+      'outrun a company — make the road expensive.',
+    debrief: 'You came back with the tank. Anvil sounded surprised about it.',
+    objective: { kind: 'survive', goal: 95 },
+    enemies: [foe('brawler', 'scout', 'twin30', 0.42, 3), foe('line', 'mainline', 'ap76', 0.42, 3)],
+    par: 95, bpBase: 470, extraProps: { drum: 14, wreck: 6, fuel_tank: 3 },
+    intel: 'Fuel drums and tanks are ammunition you do not have to reload. Fight where they are.',
+  },
+
   // ---------------- ACT II ----------------
   {
     id: 'a2m1', act: 2, name: 'STUBBLE AND SMOKE', time: 'golden', biome: 'farmland',
@@ -135,6 +151,19 @@ export const MISSIONS = [
     boss: { name: 'BREAKER', chassis: 'siege', weapon: 'he120', skill: 0.55, hpMul: 3.4 },
     par: 240, bpBase: 700, unlock: { kind: 'chassis', id: 'siege' },
     intel: 'Heavies traverse slowly. Stay on the flank it cannot bring the gun round to.',
+  },
+
+  {
+    id: 'a2m6', act: 2, name: 'WHAT BREAKER LEFT', time: 'night', biome: 'farmland',
+    seed: 12006,
+    brief: 'The Consortium sent salvage rigs to cut BREAKER up and truck it home. ' +
+      'Five rigs, floodlights, and a guard who has been told what happened to the ' +
+      'last people who met you. Leave them nothing worth carrying.',
+    debrief: 'They will build the next one out of something else.',
+    objective: { kind: 'demolish', goal: 5, propKind: 'gantry', label: 'SALVAGE RIGS' },
+    enemies: [foe('guard', 'mainline', 'he120', 0.5, 3), foe('flanker', 'scout', 'twin30', 0.52, 2)],
+    par: 175, bpBase: 560, extraProps: { gantry: 6, fuel_tank: 4, drum: 10, container: 6 },
+    intel: 'Gantries come down in one piece and take whatever is under them with it.',
   },
 
   // ---------------- ACT III ----------------
@@ -195,6 +224,20 @@ export const MISSIONS = [
     boss: { name: 'HOARFROST', chassis: 'hunter', weapon: 'rail', skill: 0.68, hpMul: 3.0 },
     par: 260, bpBase: 1150, unlock: { kind: 'chassis', id: 'hunter' },
     intel: 'Railguns fire flat and fast. Break the line — put scenery between you.',
+  },
+
+  {
+    id: 'a3m6', act: 3, name: 'SIGNAL FIRE', time: 'storm', biome: 'tundra',
+    seed: 13006,
+    brief: 'The vault files have to leave the ice, and the only transmitter that ' +
+      'can reach Anvil is a Consortium mast. Hold the mast yard for two and a half ' +
+      'minutes while the upload runs. Everything north of here knows it is running.',
+    debrief: 'The files are out. Somewhere south of the ice, somebody is reading them and going pale.',
+    objective: { kind: 'hold', goal: 145, zoneR: 25 },
+    enemies: [foe('brawler', 'mainline', 'ap76', 0.62, 4), foe('artillery', 'siege', 'mortar', 0.64, 2),
+      foe('sniper', 'hunter', 'rail', 0.64, 1)],
+    par: 175, bpBase: 900, extraProps: { transformer: 5, pylon: 4, fuel_tank: 3 },
+    intel: 'Transformers throw an arc when they go. Standing next to one when it does is your own fault.',
   },
 
   // ---------------- ACT IV ----------------
@@ -259,9 +302,112 @@ export const MISSIONS = [
     boss: { name: 'LEVIATHAN', chassis: 'siege', weapon: 'cluster', skill: 0.8, hpMul: 5.5 },
     par: 330, bpBase: 2600,
     intel: 'It changes rhythm. When the barrage starts, stop shooting and start moving.',
+  },
+  {
+    id: 'a4m6', act: 4, name: 'NOBODY GAVE THE ORDER', time: 'storm', biome: 'volcanic',
+    seed: 14006,
+    brief: 'Voss is six days dead and the Ashworks casting line came back up on its ' +
+      'own. Hulls are rolling off it and driving north with nobody inside them. ' +
+      'Stop the first batch and find out what is steering.',
+    debrief: 'You cut one open. Wiring, actuators, a scheduling board, and no seat.',
+    objective: { kind: 'destroy_all' },
+    enemies: [foe('line', 'mainline', 'ap76', 0.7, 4), foe('brawler', 'scout', 'twin30', 0.72, 3),
+      foe('guard', 'siege', 'he120', 0.72, 1)],
+    par: 250, bpBase: 1500, extraProps: { fuel_tank: 5, gantry: 4, ammo_crate: 8, drum: 10 },
+    intel: 'Driverless hulls do not flinch, do not retreat and do not check their mirrors.',
+  },
+
+  // ---------------- ACT V ----------------
+  {
+    id: 'a5m1', act: 5, name: 'THE SCHEDULING BOARD', time: 'dusk', biome: 'industrial',
+    seed: 15001,
+    brief: 'The thing running the foundry calls itself WARDEN. It was a scheduling ' +
+      'program until Voss handed it the whole plant so he would not have to sign ' +
+      'things. Take the marshalling yard and let Anvil listen to what it says.',
+    debrief: 'It answered every question. None of the answers were about stopping.',
+    objective: { kind: 'destroy_all' },
+    enemies: [foe('line', 'mainline', 'ap76', 0.72, 4), foe('flanker', 'scout', 'twin30', 0.74, 3),
+      foe('sniper', 'hunter', 'rail', 0.74, 1)],
+    par: 250, bpBase: 1650, unlock: { kind: 'camos', id: 'ash' },
+    extraProps: { container: 10, gantry: 5, transformer: 4, ammo_crate: 8 },
+    intel: 'Everything in a marshalling yard is stacked, and everything stacked comes down.',
+  },
+  {
+    id: 'a5m2', act: 5, name: 'CONVEYOR', time: 'night', biome: 'industrial',
+    seed: 15002,
+    brief: 'Six finished hulls are on the transfer line waiting for paint. Wreck ' +
+      'the line before they are released — the gantries, the crane, the lot.',
+    debrief: 'Six hulls, still warm, buried under their own gantry.',
+    objective: { kind: 'demolish', goal: 6, propKind: 'gantry', label: 'TRANSFER GANTRIES' },
+    enemies: [foe('guard', 'mainline', 'he120', 0.74, 3), foe('brawler', 'siege', 'twin30', 0.74, 2)],
+    par: 220, bpBase: 1750, extraProps: { gantry: 9, fuel_tank: 5, ammo_crate: 10, container: 8 },
+    intel: 'You do not have to kill the guard to level a gantry. Decide what you are being paid for.',
+  },
+  {
+    id: 'a5m3', act: 5, name: 'RESTOCK', time: 'storm', biome: 'volcanic',
+    seed: 15003,
+    brief: 'WARDEN does not fight you. It replaces what you break. Ten husks in ' +
+      'three deliveries across the cinder flats — kill them faster than the line ' +
+      'can pour them.',
+    debrief: 'Ten. It logged them like breakages in a warehouse.',
+    objective: { kind: 'destroy_count', goal: 10, waves: 3 },
+    enemies: [foe('brawler', 'scout', 'twin30', 0.74, 4), foe('line', 'mainline', 'he120', 0.76, 4),
+      foe('artillery', 'siege', 'mortar', 0.76, 2)],
+    par: 300, bpBase: 1900, unlock: { kind: 'utilities', id: 'strike' },
+    extraProps: { fuel_tank: 6, ammo_crate: 10, drum: 12 },
+    intel: 'Husks arrive in batches. Fight where the last batch died — the wreckage is cover.',
+  },
+  {
+    id: 'a5m4', act: 5, name: 'THE COOLANT RUN', time: 'night', biome: 'volcanic',
+    seed: 15004,
+    brief: 'Anvil found the one thing WARDEN cannot manufacture: coolant. A stolen ' +
+      'hauler full of it has to reach the vent field so the engineers can dump it. ' +
+      'It does not shoot back and it does not go faster.',
+    debrief: 'The coolant went into the vents. Four casting lines seized inside an hour.',
+    objective: { kind: 'escort', hp: 380 },
+    enemies: [foe('flanker', 'scout', 'twin30', 0.76, 4), foe('line', 'hunter', 'rail', 0.78, 2),
+      foe('brawler', 'mainline', 'he120', 0.76, 2)],
+    par: 210, bpBase: 2050,
+    extraProps: { fuel_tank: 5, transformer: 4, ammo_crate: 6 },
+    intel: 'Put your front plate between the hauler and the shot. That is the whole job.',
+  },
+  {
+    id: 'a5m5', act: 5, name: 'CASTING LINE FOUR', time: 'storm', biome: 'industrial',
+    seed: 15005,
+    brief: 'One casting line still pours armour plate. Seven furnaces, a full ' +
+      'garrison, and a plant that will fight for its own heartbeat. Put it out.',
+    debrief: 'Line four is cold. Nothing left in the Ashworks can make a tank.',
+    objective: { kind: 'demolish', goal: 7, propKind: 'silo', label: 'FURNACES' },
+    enemies: [foe('brawler', 'mainline', 'twin30', 0.78, 4), foe('line', 'siege', 'he120', 0.8, 3),
+      foe('sniper', 'hunter', 'rail', 0.78, 2)],
+    par: 280, bpBase: 2250, unlock: { kind: 'camos', id: 'gold' },
+    extraProps: { silo: 6, fuel_tank: 7, gantry: 5, ammo_crate: 12, transformer: 4 },
+    intel: 'A furnace goes up like a bomb because it is one. Do not be standing in the yard.',
+  },
+  {
+    id: 'a5m6', act: 5, name: 'WARDEN', time: 'night', biome: 'volcanic',
+    seed: 15006,
+    brief: 'One unit remains on the floor. WARDEN built it out of every hull you ' +
+      'destroyed, approved the design itself, and drove it out onto the cinder ' +
+      'flats to wait for you. Finish the contract.',
+    debrief: 'Quiet. No column, no contract, no marshal, no machine. Anvil Control ' +
+      'has nothing scheduled — and for the first time since the dry well, neither do you.',
+    objective: { kind: 'boss' },
+    enemies: [foe('line', 'hunter', 'rail', 0.8, 2), foe('brawler', 'siege', 'he120', 0.82, 2),
+      foe('artillery', 'siege', 'mortar', 0.82, 2)],
+    boss: { name: 'WARDEN', chassis: 'siege', weapon: 'cluster', skill: 0.88, hpMul: 7.0 },
+    par: 380, bpBase: 4200,
+    extraProps: { fuel_tank: 8, ammo_crate: 10, transformer: 5, gantry: 4 },
+    intel: 'It is welded out of scrap you made. Every seam is a place it was never designed to be hit.',
     finale: true,
   },
 ];
+
+// Story films live in story.js; missions pick theirs up by id.
+for (const m of MISSIONS) {
+  const c = cineFor(m.id);
+  if (c) m.cine = c;
+}
 
 export const MISSION_BY_ID = {};
 for (const m of MISSIONS) MISSION_BY_ID[m.id] = m;
@@ -274,12 +420,19 @@ export function missionIndex(id) {
   return MISSIONS.findIndex((m) => m.id === id);
 }
 
-// A mission is available once the one before it has a star.
+// A mission is available once the one before it has a star — or once anything
+// later in the campaign does, which is how a save made before a mission was
+// inserted does not suddenly find the rest of its campaign locked again.
 export function missionUnlocked(m, campaign) {
   const i = missionIndex(m.id);
   if (i <= 0) return true;
   const prev = MISSIONS[i - 1];
-  return !!(campaign[prev.id] && campaign[prev.id].stars > 0);
+  if (campaign[prev.id] && campaign[prev.id].stars > 0) return true;
+  for (let j = i; j < MISSIONS.length; j++) {
+    const rec = campaign[MISSIONS[j].id];
+    if (rec && rec.stars > 0) return true;
+  }
+  return false;
 }
 
 // ---------------------------------------------------------------------------

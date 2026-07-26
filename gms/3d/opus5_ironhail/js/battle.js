@@ -25,6 +25,7 @@ import { PlayerController, showAimFx } from './player.js';
 import { Drone } from './drone.js';
 import { updateUtilities, clearUtilities } from './utility.js';
 import { resetCamera, endKillCam } from './camera.js';
+import { playCutscene, cancelCutscene } from './cine.js';
 import { AudioFX } from './audio.js';
 import { state, resetBattleTallies, enemyTanks } from './state.js';
 import { emit, on } from './bus.js';
@@ -121,6 +122,8 @@ function wireEvents() {
 
 export function startBattle(mission) {
   endedFlag = false;
+  battleForce = forceCine;
+  forceCine = null;
   clearBattle();
   resetBattleTallies();
   killsThisBattle = 0;
@@ -219,6 +222,62 @@ export function startBattle(mission) {
   AudioFX.droneHum(true);
   flushTerrain();
   emit('battle-start', mission);
+
+  // The opening cutscene runs before the countdown, over a battlefield that
+  // already exists — which is why the shots can point at real hulls.
+  midCine = (mission.cine && mission.cine.mid) || null;
+  midFired = false;
+  const intro = cutsceneFor(mission, 'intro');
+  if (intro) {
+    state.phase = 'cine';
+    playCutscene(intro, () => {
+      state.phase = 'countdown';
+      state.countdown = 2.2;
+      resetCamera(state.player);
+    });
+  }
+}
+
+// Cutscenes play the first time you see them and whenever you ask for a replay;
+// a fifth attempt at a mission should not make you watch the film again. The
+// request is consumed by the deploy it was made for, not left armed.
+let forceCine = null;
+let battleForce = null;
+export function requestCutscene(id) { forceCine = id; }
+
+function cutsceneFor(mission, slot) {
+  if (AUTO_MODE || profile.settings.cutscenes === false) return null;
+  const c = mission.cine && mission.cine[slot];
+  if (!c) return null;
+  const key = c.id || (mission.id + ':' + slot);
+  if (profile.seenCine[key] && battleForce !== mission.id) return null;
+  profile.seenCine[key] = true;
+  markDirty();
+  return c;
+}
+
+// Mid-mission beat: armed at deploy, fired once when its condition comes true.
+let midCine = null;
+let midFired = false;
+
+function checkMidCine() {
+  if (!midCine || midFired || state.phase !== 'playing') return;
+  const at = midCine.at || {};
+  let go = false;
+  if (at.kills != null && killsThisBattle >= at.kills) go = true;
+  if (at.time != null && state.battleTime >= at.time) go = true;
+  if (at.bossHp != null && state.boss && state.boss.alive &&
+      state.boss.hpFrac <= at.bossHp) go = true;
+  if (!go) return;
+  midFired = true;
+  const c = cutsceneFor(state.mission, 'mid');
+  if (!c) return;
+  const resume = state.phase;
+  state.phase = 'cine';
+  playCutscene(c, () => {
+    state.phase = resume;
+    resetCamera(state.player);
+  });
 }
 
 function nextName() {
@@ -565,6 +624,17 @@ function firstBattleHint() {
 }
 
 export function updateBattle(dt, rawDt) {
+  // During a cutscene the world holds its breath: scenery and smoke keep
+  // moving so the shot is not a photograph, but nobody drives and nobody
+  // shoots.
+  if (state.phase === 'cine') {
+    updateProps(rawDt);
+    updateParticles(rawDt);
+    if (state.drone) state.drone.update(rawDt * 0.4);
+    flushTerrain();
+    return;
+  }
+
   if (state.phase === 'countdown') {
     state.countdown -= rawDt;
     const n = Math.ceil(state.countdown);
@@ -613,6 +683,7 @@ export function updateBattle(dt, rawDt) {
   updateUtilities(dt);
   updateParticles(dt);
   updateObjective(dt);
+  checkMidCine();
   flushTerrain();
 
   // engine note follows the player's throttle
@@ -703,11 +774,19 @@ export function endBattle(win) {
   };
   state.results = results;
   if (win) AudioFX.fanfare(); else AudioFX.dirge();
-  emit('battle-over', results);
+
+  // A victory cutscene plays over the burning field, and the results panel
+  // waits for it. Losing never gets a film.
+  const outro = win ? cutsceneFor(mission, 'win') : null;
+  if (outro) {
+    playCutscene(outro, () => emit('battle-over', results));
+  } else {
+    emit('battle-over', results);
+  }
   return results;
 }
 
-const MISSION_ACT_LAST = { 1: 'a1m5', 2: 'a2m5', 3: 'a3m5', 4: 'a4m5' };
+const MISSION_ACT_LAST = { 1: 'a1m6', 2: 'a2m6', 3: 'a3m6', 4: 'a4m6', 5: 'a5m6' };
 
 // ---------------------------------------------------------------------------
 // Attract mode — a live firefight behind the menus
@@ -786,6 +865,7 @@ export function updateAttract(dt) {
 // ---------------------------------------------------------------------------
 
 export function clearBattle() {
+  cancelCutscene();
   for (const t of state.tanks) t.dispose();
   state.tanks = [];
   state.player = null;

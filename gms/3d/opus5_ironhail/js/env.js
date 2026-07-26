@@ -25,7 +25,8 @@ export const BIOMES = {
     cLow: C(0x7d6a2e), cMid: C(0x9a8038), cHigh: C(0xb59a4a),
     cRock: C(0x5d5236), cFar: C(0x3b4230),
     detail: { kind: 'grass', count: 620, colour: 0xc4a253, scale: 1.0 },
-    props: { haybale: 9, tree_oak: 12, fence: 7, silo: 2, shack: 3, drum: 6, rock: 5, wagon: 2 },
+    props: { haybale: 9, tree_oak: 11, fence: 6, silo: 2, shack: 3, drum: 6, rock: 4, wagon: 2,
+      fuel_tank: 2, ammo_crate: 3, gas_bottles: 3, truck: 3, water_tower: 2, statue: 1 },
     decor: { kind: 'tree_oak', count: 26 },
   },
   desert: {
@@ -34,7 +35,8 @@ export const BIOMES = {
     cLow: C(0x9c7f4e), cMid: C(0xbb9a62), cHigh: C(0xd4b57c),
     cRock: C(0x8a5c40), cFar: C(0x8a6c50),
     detail: { kind: 'rock', count: 300, colour: 0xb08a5e, scale: 1.0 },
-    props: { cactus: 10, rock: 14, ruin: 7, drum: 6, shack: 3, pylon: 4, wreck: 4 },
+    props: { cactus: 9, rock: 12, ruin: 6, drum: 6, shack: 3, pylon: 4, wreck: 4,
+      fuel_tank: 3, ammo_crate: 3, gas_bottles: 3, truck: 3, water_tower: 2, billboard: 2 },
     decor: { kind: 'spire', count: 20 },
   },
   tundra: {
@@ -43,7 +45,8 @@ export const BIOMES = {
     cLow: C(0xbfc9d2), cMid: C(0xd8e2ea), cHigh: C(0xeef4f8),
     cRock: C(0x6a7280), cFar: C(0x8e9dae),
     detail: { kind: 'rock', count: 240, colour: 0xc6d0da, scale: 0.9 },
-    props: { pine: 13, rock: 9, hut: 4, fence: 5, drum: 4, wreck: 4, pylon: 3 },
+    props: { pine: 12, rock: 8, hut: 4, fence: 4, drum: 4, wreck: 4, pylon: 3,
+      fuel_tank: 2, ammo_crate: 3, gas_bottles: 2, truck: 3, transformer: 3, water_tower: 2 },
     decor: { kind: 'pine', count: 30 },
   },
   forest: {
@@ -52,7 +55,8 @@ export const BIOMES = {
     cLow: C(0x39492c), cMid: C(0x4d6136), cHigh: C(0x637a42),
     cRock: C(0x4a4740), cFar: C(0x2c3a2a),
     detail: { kind: 'grass', count: 700, colour: 0x7ba04e, scale: 1.1 },
-    props: { pine: 16, tree_oak: 12, rock: 8, log: 6, shack: 2, drum: 4, fence: 4 },
+    props: { pine: 15, tree_oak: 11, rock: 7, log: 6, shack: 2, drum: 4, fence: 4,
+      ammo_crate: 2, gas_bottles: 2, truck: 2, fuel_tank: 1, statue: 1 },
     decor: { kind: 'pine', count: 34 },
   },
   industrial: {
@@ -61,7 +65,9 @@ export const BIOMES = {
     cLow: C(0x4a4a4e), cMid: C(0x5c5a58), cHigh: C(0x6e6a62),
     cRock: C(0x3e3a38), cFar: C(0x2e2c30),
     detail: { kind: 'rock', count: 260, colour: 0x76726a, scale: 0.95 },
-    props: { wall: 12, container: 10, silo: 4, pylon: 6, drum: 9, ruin: 7, wreck: 5 },
+    props: { wall: 10, container: 9, silo: 4, pylon: 5, drum: 8, ruin: 6, wreck: 4,
+      fuel_tank: 5, ammo_crate: 5, gas_bottles: 4, transformer: 5, gantry: 4,
+      chimney: 3, truck: 4, billboard: 2 },
     decor: { kind: 'tower', count: 16 },
   },
   volcanic: {
@@ -70,7 +76,8 @@ export const BIOMES = {
     cLow: C(0x554442), cMid: C(0x685049), cHigh: C(0x7c5c4c),
     cRock: C(0x453637), cFar: C(0x342a2e), ember: true,
     detail: { kind: 'rock', count: 280, colour: 0x6a5450, scale: 1.05 },
-    props: { spire: 10, dead_tree: 9, rock: 11, ruin: 6, drum: 7, wreck: 5, pylon: 3 },
+    props: { spire: 9, dead_tree: 8, rock: 9, ruin: 5, drum: 7, wreck: 5, pylon: 3,
+      fuel_tank: 4, ammo_crate: 4, gas_bottles: 3, transformer: 3, gantry: 3, chimney: 2 },
     decor: { kind: 'spire', count: 24 },
   },
 };

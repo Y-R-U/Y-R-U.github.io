@@ -48,6 +48,11 @@ export const state = {
   shake: 0,
   killcam: null,
 
+  // ---- cutscenes ----
+  cine: false,           // a cutscene owns the camera right now
+  cineLine: null,        // { who, text } currently on screen
+  objectiveMark: null,   // world point a script can point the camera at
+
   // ---- tallies for the results screen ----
   score: 0,
   kills: 0,

@@ -45,6 +45,7 @@ function route(action, arg) {
     case 'resume-settings': showPause(); break;
     case 'brief': showBrief(arg); break;
     case 'deploy': handlers.onDeployMission(arg); break;
+    case 'deploy-cine': handlers.onDeployMission(arg, true); break;
     case 'deploy-skirmish': handlers.onDeploySkirmish(parseInt(arg, 10), false); break;
     case 'deploy-daily': handlers.onDeploySkirmish(0, true); break;
     case 'tab': currentTab = arg; showGarage(); break;
@@ -67,6 +68,7 @@ function route(action, arg) {
     case 'haptics': setSetting('haptics', profile.settings.haptics === false); break;
     case 'autoaim': setSetting('autoAim', profile.settings.autoAim === false); break;
     case 'camauto': setSetting('camAuto', profile.settings.camAuto === false); break;
+    case 'cutscenes': setSetting('cutscenes', profile.settings.cutscenes === false); break;
     case 'wipe': confirmWipe(); break;
     case 'wipe-yes': resetProfile(); showTitle(); break;
     case 'reload': location.reload(); break;
@@ -276,6 +278,9 @@ export function showBrief(id) {
   const row = el('div', 'menu-row');
   row.appendChild(bigButton('DEPLOY', 'deploy', m.id, 'btn-primary'));
   row.appendChild(bigButton('GARAGE', 'garage', null, 'btn-secondary'));
+  if (m.cine && profile.settings.cutscenes !== false) {
+    row.appendChild(bigButton('▶ REPLAY STORY', 'deploy-cine', m.id, 'btn-mini'));
+  }
   w.appendChild(row);
 }
 
@@ -992,6 +997,8 @@ export function showSettings(from) {
   scroll.appendChild(fireControlRow());
   scroll.appendChild(toggleRow('CINEMATIC SHELL CAM', profile.settings.camAuto !== false, 'camauto',
     'Occasionally rides the shell in on the long shots. Turn it off if you would rather keep the wheel.'));
+  scroll.appendChild(toggleRow('STORY CUTSCENES', profile.settings.cutscenes !== false, 'cutscenes',
+    'The films between the fighting. Every one is skippable, and none of them repeat unless you ask.'));
 
   // ---- presentation -------------------------------------------------------
   scroll.appendChild(el('div', 'section-head', 'PRESENTATION'));

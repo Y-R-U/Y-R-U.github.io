@@ -10,7 +10,7 @@ import { fieldRoot } from './render.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Parts, G, solidMat, mixHex } from './meshkit.js';
 import { terrainHeight } from './terrain.js';
-import { spawnDebris, spawnSmoke, spawnExplosion, spawnSparks, volAt } from './particles.js';
+import { spawnDebris, spawnChunks, spawnSmoke, spawnExplosion, spawnSparks, volAt } from './particles.js';
 import { AudioFX } from './audio.js';
 import { emit } from './bus.js';
 
@@ -330,6 +330,180 @@ const DEFS = {
       return { r: 3.6, h: 3.7 };
     },
   },
+  // ---- things that are mostly there to come apart -----------------------
+  fuel_tank: {
+    hp: 90, mass: 2.4, r: 3.2, h: 7.4, tall: true, fall: 'explode',
+    explosive: { dmg: 120, radius: 20, craterR: 10, craterD: 2.0, fuse: 0.22, big: true },
+    chunks: 9,
+    build(P, rng, c) {
+      const r = rand(3.0, 4.2);
+      // fuel tanks are painted pale on purpose, so they read as "that one is
+      // full of something" from across the field in any light
+      const tint = mixHex(0xb9c2c6, c.metal, 0.22);
+      P.add(G.cyl(14), tint, [0, r + 1.4, 0], [0, 0, 0], [r * 2, r * 1.5, r * 2]);
+      P.add(G.cyl(14), mixHex(tint, 0x000000, 0.3), [0, r * 1.9 + 1.4, 0], [0, 0, 0], [r * 2.06, 0.3, r * 2.06]);
+      // legs
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + 0.4;
+        P.add(G.box(), c.rust, [Math.cos(a) * r * 0.72, 0.7, Math.sin(a) * r * 0.72],
+          [0, -a, 0], [0.34, 1.5, 0.34]);
+      }
+      // hazard stripe and a ladder, so it reads as a fuel tank at 80 metres
+      P.add(G.box(), 0xd4a017, [0, r + 1.4, r * 0.99], [0, 0, 0], [r * 1.1, 0.7, 0.12]);
+      P.add(G.box(), c.dark, [r * 0.9, r + 1.4, 0], [0, 0, 0], [0.14, r * 2.2, 0.5]);
+      return { r: r * 1.05, h: r * 2 + 1.8 };
+    },
+  },
+  ammo_crate: {
+    hp: 26, mass: 0.5, r: 1.3, h: 2.2, crush: 10, fall: 'explode',
+    explosive: { dmg: 48, radius: 11, craterR: 4.5, craterD: 0.8, fuse: 0.3, cookoff: 5 },
+    chunks: 4,
+    build(P, rng, c) {
+      const n = randInt(2, 4);
+      for (let i = 0; i < n; i++) {
+        const s = rand(1.1, 1.7);
+        P.add(G.box(), mixHex(0x4a5a3a, c.dark, rand(0, 0.25)),
+          [rand(-0.8, 0.8), s * 0.5 + i * 0.9, rand(-0.8, 0.8)], [0, rng() * 3, 0],
+          [s * 1.5, s * 0.8, s]);
+        P.add(G.box(), 0xc8a020, [rand(-0.8, 0.8), s * 0.5 + i * 0.9, rand(-0.8, 0.8)],
+          [0, rng() * 3, 0], [s * 1.52, 0.12, s * 0.3]);
+      }
+      return { r: 1.3, h: 1.2 + n * 0.9 };
+    },
+  },
+  gas_bottles: {
+    hp: 20, mass: 0.35, r: 1.1, h: 2.0, crush: 12, fall: 'explode',
+    explosive: { dmg: 40, radius: 10, craterR: 3.6, craterD: 0.6, fuse: 0.16, cookoff: 4 },
+    chunks: 3,
+    build(P, rng, c) {
+      const n = randInt(3, 6);
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const tint = [0xd0402c, 0xd8a020, 0x2f7ac0][i % 3];
+        P.add(G.cyl(8), tint, [Math.cos(a) * 0.7, 0.95, Math.sin(a) * 0.7], [0, 0, 0], [0.62, 1.9, 0.62]);
+        P.add(G.cyl(6), mixHex(tint, 0x000000, 0.4), [Math.cos(a) * 0.7, 2.0, Math.sin(a) * 0.7],
+          [0, 0, 0], [0.24, 0.4, 0.24]);
+      }
+      return { r: 1.2, h: 2.2 };
+    },
+  },
+  transformer: {
+    hp: 70, mass: 1.4, r: 1.8, h: 4.2, tall: true, fall: 'explode',
+    explosive: { dmg: 58, radius: 13, craterR: 4.2, craterD: 0.7, fuse: 0.1, arc: true },
+    chunks: 5,
+    build(P, rng, c) {
+      P.add(G.box(), mixHex(c.metal, 0x2a3038, 0.4), [0, 1.5, 0], [0, 0, 0], [3.0, 3.0, 2.2]);
+      for (let i = 0; i < 3; i++) {
+        P.add(G.cyl(8), 0x9aa4ac, [(i - 1) * 0.9, 3.6, 0], [0, 0, 0], [0.42, 1.4, 0.42]);
+        P.add(G.cyl(8), 0x6a7480, [(i - 1) * 0.9, 4.3, 0], [0, 0, 0], [0.6, 0.16, 0.6]);
+      }
+      for (let i = 0; i < 6; i++) {
+        P.add(G.box(), mixHex(c.metal, 0x000000, 0.3), [-1.55, 1.5, (i - 2.5) * 0.36], [0, 0, 0], [0.16, 2.6, 0.18]);
+      }
+      P.add(G.box(), 0xd4a017, [0, 1.0, 1.13], [0, 0, 0], [1.0, 0.7, 0.1]);
+      return { r: 1.7, h: 4.6 };
+    },
+  },
+  gantry: {
+    hp: 300, mass: 3.6, r: 4.6, h: 11, tall: true, fall: 'collapse',
+    explosive: { dmg: 34, radius: 12, craterR: 5, craterD: 0.9, fuse: 0.45 },
+    chunks: 12,
+    build(P, rng, c) {
+      const w = rand(9, 13);
+      const h = rand(8, 12);
+      const steel = mixHex(c.metal, 0xffc24d, 0.12);
+      for (const s of [-1, 1]) {
+        for (const z of [-1, 1]) {
+          P.add(G.box(), steel, [s * w * 0.42, h * 0.5, z * 1.5], [0, 0, -s * 0.03], [0.4, h, 0.4]);
+        }
+        for (let i = 1; i <= 3; i++) {
+          P.add(G.box(), steel, [s * w * 0.42, h * (i / 4), 0], [0, 0, 0], [0.22, 0.22, 3.0]);
+        }
+      }
+      P.add(G.box(), steel, [0, h, 0], [0, 0, 0], [w, 0.6, 1.2]);
+      P.add(G.box(), steel, [0, h - 1.1, 0], [0, 0, 0], [w * 0.92, 0.3, 0.9]);
+      // the hoist, hanging where a shell can find it
+      P.add(G.box(), c.rust, [rand(-w * 0.25, w * 0.25), h - 2.4, 0], [0, 0, 0], [1.8, 1.6, 1.6]);
+      P.add(G.cyl(6), 0x8a8a8a, [0, h - 3.6, 0], [0, 0, 0], [0.1, 2.4, 0.1]);
+      return { r: w * 0.46, h: h + 0.6 };
+    },
+  },
+  water_tower: {
+    hp: 160, mass: 2.4, r: 2.6, h: 14, tall: true, fall: 'topple',
+    chunks: 8,
+    build(P, rng, c) {
+      const h = rand(10, 15);
+      const tint = mixHex(c.metal, c.rust, 0.35);
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + 0.7;
+        P.add(G.box(), tint, [Math.cos(a) * 2.2, h * 0.42, Math.sin(a) * 2.2],
+          [Math.sin(a) * 0.1, -a, -Math.cos(a) * 0.1], [0.3, h * 0.84, 0.3]);
+      }
+      P.add(G.cyl(12), tint, [0, h * 0.86, 0], [0, 0, 0], [5.2, h * 0.34, 5.2]);
+      P.add(G.cone(12), mixHex(tint, 0x000000, 0.25), [0, h * 1.06, 0], [0, 0, 0], [5.4, 1.8, 5.4]);
+      P.add(G.cyl(8), tint, [0, h * 0.6, 0], [0, 0, 0], [0.5, h * 0.3, 0.5]);
+      return { r: 2.6, h: h * 1.14 };
+    },
+  },
+  chimney: {
+    hp: 280, mass: 4.2, r: 2.2, h: 20, tall: true, fall: 'topple',
+    chunks: 14,
+    build(P, rng, c) {
+      const h = rand(14, 22);
+      const seg = 5;
+      for (let i = 0; i < seg; i++) {
+        const k = i / seg;
+        const w = lerp(3.4, 2.2, k);
+        P.add(G.cyl(10), mixHex(c.concrete, c.rust, 0.15 + k * 0.2),
+          [0, h * (k + 0.5 / seg), 0], [0, 0, 0], [w, h / seg + 0.05, w]);
+      }
+      P.add(G.cyl(10), mixHex(c.concrete, 0x000000, 0.4), [0, h, 0], [0, 0, 0], [2.5, 0.5, 2.5]);
+      return { r: 1.9, h: h + 0.6 };
+    },
+  },
+  statue: {
+    hp: 190, mass: 2.4, r: 1.6, h: 7, tall: true, fall: 'shatter',
+    chunks: 10,
+    build(P, rng, c) {
+      const stone = mixHex(c.concrete, 0xffffff, 0.18);
+      P.add(G.box(), mixHex(stone, 0x000000, 0.25), [0, 0.7, 0], [0, rng(), 0], [3.4, 1.4, 3.4]);
+      P.add(G.box(), stone, [0, 2.4, 0], [0, 0.3, 0], [1.6, 2.2, 1.2]);
+      P.add(G.ico(0), stone, [0, 4.1, 0], [rng(), rng(), rng()], 0.8);
+      P.add(G.box(), stone, [0.9, 3.2, 0], [0, 0, -0.9], [0.4, 2.0, 0.4]);
+      P.add(G.box(), stone, [-0.85, 3.0, 0.2], [0.3, 0, 0.5], [0.4, 1.8, 0.4]);
+      return { r: 1.8, h: 5 };
+    },
+  },
+  billboard: {
+    hp: 45, mass: 0.7, r: 3.0, h: 6.5, tall: true, fall: 'fly',
+    chunks: 5,
+    build(P, rng, c) {
+      const w = rand(6, 9);
+      for (const s of [-1, 1]) {
+        P.add(G.box(), c.metal, [s * w * 0.3, 2.0, 0], [0, 0, 0], [0.3, 4.0, 0.3]);
+      }
+      P.add(G.box(), mixHex(c.concrete, 0xffffff, 0.3), [0, 5.0, 0], [0, 0, 0], [w, 3.4, 0.22]);
+      P.add(G.box(), [0xb03828, 0x2f6a7a, 0xc8a020][randInt(0, 2)], [0, 5.0, 0.14], [0, 0, 0], [w * 0.86, 2.6, 0.06]);
+      return { r: w * 0.42, h: 6.8 };
+    },
+  },
+  truck: {
+    hp: 95, mass: 1.6, r: 2.6, h: 3.4, crush: 2, fall: 'explode',
+    explosive: { dmg: 66, radius: 13, craterR: 4.6, craterD: 0.8, fuse: 0.5, cookoff: 3 },
+    chunks: 8,
+    build(P, rng, c) {
+      const tint = [0x5a6a4a, 0x6a5040, 0x40505a][randInt(0, 2)];
+      P.add(G.box(), tint, [0, 1.5, -0.6], [0, 0, 0], [2.8, 1.6, 6.4]);
+      P.add(G.box(), mixHex(tint, 0xffffff, 0.12), [0, 2.2, 2.4], [0, 0, 0], [2.7, 2.0, 2.6]);
+      P.add(G.box(), 0x1a2026, [0, 2.6, 3.62], [0, 0, 0], [2.2, 1.1, 0.14]);
+      P.add(G.box(), mixHex(tint, 0x000000, 0.35), [0, 2.9, -1.6], [0, 0, 0], [2.9, 2.4, 4.2]);
+      for (const sx of [-1, 1]) for (const sz of [-1.4, 1.2, 2.9]) {
+        P.add(G.cyl(9), 0x201c1a, [sx * 1.5, 0.75, sz], [0, 0, Math.PI / 2], [1.5, 0.5, 1.5]);
+      }
+      return { r: 2.3, h: 4.0 };
+    },
+  },
+
   tower: {   // decor only
     hp: 999, mass: 9, r: 2, h: 22, tall: true, fall: 'shatter',
     build(P, rng, c) {
@@ -437,6 +611,7 @@ export function addProp(kind, x, z, rng = Math.random, pal = null, opts = {}) {
     hp: def.hp * hpMul, maxHp: def.hp * hpMul,
     mass: def.mass, tall: !!def.tall, crush: def.crush || 0,
     fall: def.fall, explosive: def.explosive || null,
+    chunks: def.chunks || 0, chunkColour: averageColour(mesh),
     alive: true, state: 'alive', blocks: true,
     fuse: 0, fadeT: 0, ttl: 0,
     vel: null, spin: null, tipAxis: null, tipT: 0, tipDur: 1,
@@ -445,6 +620,25 @@ export function addProp(kind, x, z, rng = Math.random, pal = null, opts = {}) {
   };
   props.push(p);
   return p;
+}
+
+// The mean vertex colour of a built prop, so its wreckage is made of the same
+// stuff it was. Cheap: a few hundred vertices, once, at spawn.
+function averageColour(mesh) {
+  const attr = mesh.geometry.getAttribute('color');
+  if (!attr) return 0x8a8078;
+  let r = 0, g = 0, b = 0;
+  const n = attr.count;
+  const step = Math.max(1, Math.floor(n / 240));
+  let taken = 0;
+  for (let i = 0; i < n; i += step) {
+    r += attr.getX(i); g += attr.getY(i); b += attr.getZ(i);
+    taken++;
+  }
+  if (!taken) return 0x8a8078;
+  // vertex colours are linear; nudge back up so the chunks are not mud
+  const to = (v) => clamp(Math.round(Math.pow(v / taken, 0.85) * 255), 0, 255);
+  return (to(r) << 16) | (to(g) << 8) | to(b);
 }
 
 // Background scenery is static and indestructible, so the whole skyline is
@@ -660,14 +854,23 @@ export function killProp(p, fromPos, impulse = 0, byPlayer = false) {
 
 function shatter(p) {
   const pos = p.grp.position;
-  const n = clamp(Math.round(4 + p.mass * 3), 4, 14);
+  const n = clamp(Math.round(6 + p.mass * 4), 5, 20);
   spawnDebris(_v.copy(pos).setY(pos.y + p.h * 0.4), n, 0.8 + p.mass * 0.2);
+  spawnChunks(_v.copy(pos).setY(pos.y + p.h * 0.35), chunkCount(p), {
+    colour: p.chunkColour, scale: 0.8 + p.mass * 0.35, spread: 0.9 + p.mass * 0.12,
+  });
   spawnSmoke(_v.copy(pos).setY(pos.y + p.h * 0.3), {
     scale: 1.4 + p.mass * 0.4, life: 1.5, colour: 0x8a8478, rise: 2.4, opacity: 0.45,
   });
   AudioFX.boom(false, volAt(pos) * 0.6);
   p.grp.visible = false;
   rebuildObstacles();
+}
+
+// How many big pieces a prop leaves. Defs can say; otherwise mass decides.
+function chunkCount(p) {
+  if (p.chunks) return p.chunks;
+  return clamp(Math.round(2 + p.mass * 2), 2, 10);
 }
 
 // Splash: damage every prop in radius, with impulse falling off from the centre.
@@ -704,16 +907,54 @@ export function updateProps(dt) {
         const e = p.explosive;
         const pos = _v.copy(p.grp.position).setY(p.grp.position.y + p.h * 0.4);
         spawnExplosion(pos, {
-          scale: 1.5 + p.mass * 0.2, colour: 0xffa030,
+          scale: (e.big ? 2.6 : 1.5) + p.mass * 0.25,
+          colour: e.arc ? 0x9adcff : 0xffa030,
           craterR: e.craterR, craterD: e.craterD,
         });
+        spawnChunks(pos, chunkCount(p), {
+          colour: p.chunkColour, scale: 0.9 + p.mass * 0.3,
+          spread: 1.5 + p.mass * 0.2, up: 1.3,
+        });
+        if (e.big) {
+          // a fuel tank throws a column, not a puff
+          for (let s = 0; s < 4; s++) {
+            spawnSmoke(_v2.set(pos.x + rand(-3, 3), pos.y + 2 + s * 3.4, pos.z + rand(-3, 3)), {
+              scale: 3.4, life: 3.6 + s * 0.4, colour: 0x3a3230, rise: 4.2,
+              opacity: 0.6, grow: 3.0,
+            });
+          }
+          spawnSparks(pos, 22, null, 2.2);
+        }
+        if (e.arc) spawnSparks(pos, 26, null, 2.6);
+        // Cook-off: the crate keeps going off after the crate has stopped
+        // existing, which is exactly what an ammunition fire does.
+        if (e.cookoff) {
+          p.cook = e.cookoff;
+          p.cookT = 0.24;
+          p.cookPos = pos.clone();
+        }
         emit('chain-blast', {
           pos: pos.clone(), radius: e.radius, dmg: e.dmg,
           byPlayer: !!p.lastHitBy, source: p,
         });
         p.grp.visible = false;
-        p.state = 'dead';
+        p.state = p.cook ? 'cooking' : 'dead';
         obstaclesDirty = true;
+      }
+      continue;
+    }
+
+    if (p.state === 'cooking') {
+      p.cookT -= dt;
+      if (p.cookT <= 0) {
+        p.cook--;
+        p.cookT = rand(0.18, 0.55);
+        const q = _v.set(
+          p.cookPos.x + rand(-5, 5), p.cookPos.y + rand(0, 3), p.cookPos.z + rand(-5, 5));
+        spawnExplosion(q, { scale: 0.9, colour: 0xffc050, shake: false, sound: false });
+        spawnSparks(q, 8, null, 1.6);
+        AudioFX.boom(false, volAt(q) * 0.45);
+        if (p.cook <= 0) p.state = 'dead';
       }
       continue;
     }
@@ -761,7 +1002,11 @@ export function updateProps(dt) {
         p.state = 'settling';
         p.ttl = 6;
         const pos = p.grp.position;
-        spawnDebris(_v.copy(pos).setY(pos.y + 0.4), 5, 0.9);
+        spawnDebris(_v.copy(pos).setY(pos.y + 0.4), 6, 0.9);
+        // a tree sheds branches; a chimney sheds a chimney
+        spawnChunks(_v.copy(pos).setY(pos.y + 0.8), Math.min(chunkCount(p), 6), {
+          colour: p.chunkColour, scale: 0.7 + p.mass * 0.25, spread: 0.5, up: 0.4,
+        });
         spawnSmoke(_v.copy(pos).setY(pos.y + 0.5), {
           scale: 1.6, life: 1.2, colour: 0xa89878, rise: 1.6, opacity: 0.3,
         });
@@ -802,7 +1047,10 @@ export function updateProps(dt) {
 
 function shatterQuiet(p) {
   const pos = p.grp.position;
-  spawnDebris(_v.copy(pos).setY(pos.y + 1), 8, 1.2);
+  spawnDebris(_v.copy(pos).setY(pos.y + 1), 10, 1.2);
+  spawnChunks(_v.copy(pos).setY(pos.y + 1.4), chunkCount(p), {
+    colour: p.chunkColour, scale: 1.0 + p.mass * 0.3, spread: 0.7, up: 0.55,
+  });
   for (let i = 0; i < 3; i++) {
     spawnSmoke(_v.copy(pos).setY(pos.y + 1 + i), {
       scale: 2.4, life: 2.2, colour: 0x9a9084, rise: 2.2, opacity: 0.4,

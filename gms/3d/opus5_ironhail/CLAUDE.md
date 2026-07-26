@@ -2,7 +2,7 @@
 
 Mobile-first Three.js (0.160 via CDN importmap, **no build step**). Descended from
 `fable5_crow_tank_battle`, but rebuilt: real ballistics, a heightfield you can dig
-craters into, an RPG garage, a 20-mission campaign and a simulated world ladder.
+craters into, an RPG garage, a 30-mission campaign and a simulated world ladder.
 
 ## The two ideas everything else hangs off
 
@@ -40,6 +40,25 @@ Hand-aiming always wins: any reticle movement over `FIRECON.manualDelta` sets
 `manualT`, which narrows the cone and stops the computer hunting for its own
 target for `FIRECON.manualHold` seconds.
 
+## Cutscenes
+
+`cine.js` is a small director; `story.js` is the script. A cutscene is a list
+of shots, and **a shot never holds world coordinates** — it hangs off an anchor
+(`player`, `enemy`, `far`, `boss`, `drone`, `objective`, `field`) that is
+resolved to a real position the instant the shot starts. That is the whole
+trick: the same film works on a battlefield that is generated fresh every time.
+
+- Offsets can be rotated to sit behind their subject with `facing`, or replaced
+  entirely by `orbit: [from, to, radius, height]` for a circling shot.
+- `{name}` in a line becomes the commander's callsign.
+- Slots per mission: `intro` (before the countdown), `mid` (fires once on
+  `at: {kills|time|bossHp}`), `win` (over the burning field; the results panel
+  waits for it). Losing never gets a film.
+- Phase `'cine'` runs scenery, smoke and the drone — nobody drives, nobody
+  shoots. Skipping is always available (button, or the pause key).
+- A film plays once per save (`profile.seenCine`), plus whenever the brief's
+  ▶ REPLAY STORY button asks for it, and never in `?auto` runs.
+
 ## Controls
 
 The touch layout is two independent settings, because "aim with my left, fire
@@ -72,6 +91,8 @@ wrong thumb is mid-battle.
 | `terrain.js` | heightfield, craters, scorch, ground clutter, ray-marching |
 | `env.js` | 6 biomes × 7 times of day × weather; one parametric sky shader |
 | `props.js` | destructible scenery: topple / launch / shatter / cook off |
+| `cine.js` | the cutscene director — anchored camera moves, dialogue, skip |
+| `story.js` | the films themselves, keyed `<missionId>-intro|mid|win` |
 | `particles.js` | pooled debris, flashes, rings, smoke, sparks |
 | `projectiles.js` | the solver, shell flight, ricochets, splash, `updateFiring` |
 | `tank.js` | terrain-following physics, armour facing, crits, death |
@@ -83,7 +104,7 @@ wrong thumb is mid-battle.
 | `camera.js` | chase / scope / drone / kill-cam / menu orbit |
 | `utility.js` | smoke, repair, nitro, EMP, mines, drone strike |
 | `battle.js` | mission → battlefield, objectives, waves, scoring, attract mode |
-| `missions.js` | the 20-mission campaign + the Tank Attack generator |
+| `missions.js` | the 30-mission campaign (5 acts) + the Tank Attack generator |
 | `hud.js` | in-battle DOM: bars, minimap, tags, arrows, damage numbers, pad |
 | `menus.js` | title, campaign, brief, garage, ladder, results, settings, pause |
 | `preview.js` | the garage turntable |
@@ -117,6 +138,15 @@ wrong thumb is mid-battle.
   time needs the same escape hatch.
 - **A wipe keeps `profile.settings`.** Control layout is not progress; making
   someone re-pick their aiming thumb after a reset is a punishment.
+- **`missionUnlocked` also checks for a star *later* in the campaign.** Missions
+  were appended to the end of acts 1–4; without that clause an existing save
+  would have found the rest of its campaign locked again.
+- **`.click()` does nothing on touch.** `bindTap` only binds `click` when
+  `!IS_TOUCH`, so a headless test with touch emulation on has to dispatch a real
+  `touchstart` — a `.click()` that silently no-ops looks exactly like a bug in
+  the game.
+- **Explosive props keep running after they are invisible.** State `cooking`
+  fires the secondaries of an ammunition fire; do not fold it into `dead`.
 
 ## Testing
 
@@ -155,3 +185,8 @@ Useful battle probes: `state.fcFitted` / `state.fcTrial` / `state.autoAiming`,
 - BP per battle is `bpBase × (0.72 + 0.28 × stars/3) × (1 + accuracy × 0.3)`;
   a loss costs 26% of base. `RANK_ANCHORS` in `arsenal.js` maps BP to world rank
   and is the one place to retune the climb from #150,000 to #1.
+- Act five runs `bpBase` 1650 → 4200, which is where the top of the ladder
+  actually becomes reachable in one campaign.
+- The explosive props are a weapon the player did not have to buy. Missions that
+  want that fight ask for them by name in `extraProps`; the biome tables carry a
+  smaller baseline so every field has something worth shooting.

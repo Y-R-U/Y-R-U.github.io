@@ -37,11 +37,13 @@ function defaults() {
       muted: false, lite: false, sens: 1, invertY: false, haptics: true,
       camAuto: true,            // let the camera ride the occasional long shot
       autoAim: true,            // use the fire-control computer when it is fitted
+      cutscenes: true,          // play the story films
       aimSide: 'right',         // which half of the screen the aim thumb owns
       padSide: 'right',         // which side FIRE and the action buttons sit on
     },
     daily: { day: '', claimed: false },
     seen: { intro: false, garage: false, drone: false },
+    seenCine: {},              // cutscene id -> true, so a replay is not a rerun
   };
 }
 

@@ -7,7 +7,7 @@ import { loadProfile, profile, saveProfile, markDirty, markDailyClaimed, todayKe
 import { initRender, render, renderer, camera, lastFrame, actorRoot, scene } from './render.js';
 import { updateEnvironment, applyEnvironment } from './env.js';
 import { flushTerrain, terrainHeight } from './terrain.js';
-import { props } from './props.js';
+import { props, damageProp } from './props.js';
 import { aimSolution, fireWeapon, activeShellCount } from './projectiles.js';
 import { useUtility } from './utility.js';
 import { UTILITIES } from './arsenal.js';
@@ -16,7 +16,8 @@ import { updateCamera, orbitCamera, endKillCam, resetCamera } from './camera.js'
 import { AudioFX } from './audio.js';
 import { state } from './state.js';
 import { on, emit } from './bus.js';
-import { initBattleSystems, startBattle, updateBattle, startAttract, updateAttract } from './battle.js';
+import { initBattleSystems, startBattle, updateBattle, startAttract, updateAttract, requestCutscene } from './battle.js';
+import { skipCutscene, cineActive } from './cine.js';
 import { MISSIONS, MISSION_BY_ID, makeSkirmish, dailySeed, suggestedTier } from './missions.js';
 import { initHUD, updateHUD, showHUD, resetHUD, showBanner, showToast } from './hud.js';
 import {
@@ -52,7 +53,10 @@ initHUD({
 });
 
 initMenus({
-  onDeployMission: (id) => deployMission(id),
+  onDeployMission: (id, replayCine) => {
+    if (replayCine) requestCutscene(id);
+    deployMission(id);
+  },
   onDeploySkirmish: (tier, daily) => deploySkirmish(tier, daily),
   onResume: () => pauseGame(false),
   onRestart: () => {
@@ -170,7 +174,10 @@ function tick() {
   updateEnvironment(rawDt, state.time);
 
   if (consume('pause')) {
-    if (state.inBattle) pauseGame(!state.paused);
+    // during a film the pause key is a skip key — pausing over a cutscene
+    // gives you a menu on top of a moving camera and no way to read either
+    if (state.cine) skipCutscene();
+    else if (state.inBattle) pauseGame(!state.paused);
   }
   if (consume('mute')) {
     AudioFX.init();
@@ -251,6 +258,7 @@ window.__game = {
   // test helpers
   terrainHeight,
   propList: props,
+  damageProp,
   props: () => props.map((p) => ({ kind: p.kind, alive: p.alive, state: p.state, hp: Math.round(p.hp) })),
   aimAt: (x, z) => {
     const p = state.player;

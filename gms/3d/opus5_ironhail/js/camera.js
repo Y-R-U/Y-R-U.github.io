@@ -7,6 +7,7 @@ import { CAM } from './config.js';
 import { clamp, lerp, damp, rand, angLerp } from './utils.js';
 import { camera } from './render.js';
 import { terrainHeight } from './terrain.js';
+import { updateCine } from './cine.js';
 import { state } from './state.js';
 
 const goal = new THREE.Vector3();
@@ -46,6 +47,11 @@ export function resetCamera(tank) {
 export function updateCamera(dt, rawDt) {
   const p = state.player;
 
+  // a cutscene owns the camera outright — no chase smoothing underneath it
+  if (state.cine) {
+    updateCine(rawDt);
+    return;
+  }
   if (state.killcam && state.killcam.bolt && state.killcam.bolt.active) {
     updateKillCam(rawDt);
     return;

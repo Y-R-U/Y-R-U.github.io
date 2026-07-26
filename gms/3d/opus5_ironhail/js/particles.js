@@ -10,6 +10,7 @@ import { AudioFX } from './audio.js';
 import { camera } from './render.js';
 
 const debris = [];
+const chunks = [];
 const flashes = [];
 const rings = [];
 const smokes = [];
@@ -36,6 +37,31 @@ export function initParticles() {
     debris.push({
       mesh, vel: new THREE.Vector3(), spin: new THREE.Vector3(),
       life: 0, maxLife: 1, active: false, bounced: 0,
+    });
+  }
+
+  // Chunks are the big recognisable pieces — a slab of silo wall, a length of
+  // gantry. Each keeps its own material so it can be tinted to whatever it
+  // just broke off, which is the difference between "debris" and "that used to
+  // be the water tower".
+  const chunkGeos = [
+    new THREE.BoxGeometry(1, 0.5, 1.4),
+    new THREE.BoxGeometry(0.5, 1.6, 0.5),
+    new THREE.TetrahedronGeometry(0.9),
+    new THREE.CylinderGeometry(0.42, 0.5, 1.5, 6),
+  ];
+  const chunkN = lowQuality ? 16 : 34;
+  for (let i = 0; i < chunkN; i++) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x8a8078, flatShading: true, roughness: 0.88, metalness: 0.05,
+    });
+    const mesh = new THREE.Mesh(chunkGeos[i % chunkGeos.length], mat);
+    mesh.visible = false;
+    mesh.castShadow = false;
+    actorRoot.add(mesh);
+    chunks.push({
+      mesh, mat, vel: new THREE.Vector3(), spin: new THREE.Vector3(),
+      life: 0, maxLife: 1, active: false, bounced: 0, s0: 1,
     });
   }
 
@@ -114,6 +140,27 @@ export function spawnDebris(pos, n, spread, colourHint) {
     p.maxLife = p.life = rand(1.0, 2.2);
     p.s0 = rand(0.5, 1.5) * spread;
     p.mesh.scale.setScalar(p.s0);
+  }
+}
+
+// Big tumbling pieces of whatever just came apart. `colour` should be the
+// prop's own so the wreckage reads as belonging to the thing that was there.
+export function spawnChunks(pos, n, { colour = 0x8a8078, scale = 1, spread = 1, up = 1 } = {}) {
+  for (let i = 0; i < n; i++) {
+    const c = freeOf(chunks);
+    if (!c) return;
+    c.active = true;
+    c.bounced = 0;
+    c.mesh.visible = true;
+    c.mesh.position.set(pos.x + rand(-1, 1) * scale, pos.y + rand(-0.4, 1.2) * scale, pos.z + rand(-1, 1) * scale);
+    c.mesh.rotation.set(rand(0, 6), rand(0, 6), rand(0, 6));
+    c.mat.color.setHex(colour);
+    c.vel.set(rand(-1, 1), rand(0.5, 1.5) * up, rand(-1, 1)).normalize()
+      .multiplyScalar(rand(5, 15) * spread);
+    c.spin.set(rand(-7, 7), rand(-7, 7), rand(-7, 7));
+    c.maxLife = c.life = rand(3.4, 6.0);
+    c.s0 = rand(0.7, 1.9) * scale;
+    c.mesh.scale.setScalar(c.s0);
   }
 }
 
@@ -244,6 +291,34 @@ export function updateParticles(dt) {
     p.mesh.scale.setScalar(p.s0 * (k > 0.34 ? 1 : Math.max(0.05, k / 0.34)));
   }
 
+  // Chunks are heavier than debris: they bounce less, roll further and hang
+  // around long enough that a wrecked building leaves a mess on the ground.
+  for (const c of chunks) {
+    if (!c.active) continue;
+    c.life -= dt;
+    if (c.life <= 0) { c.active = false; c.mesh.visible = false; continue; }
+    c.vel.y -= 24 * dt;
+    c.mesh.position.addScaledVector(c.vel, dt);
+    c.mesh.rotation.x += c.spin.x * dt;
+    c.mesh.rotation.y += c.spin.y * dt;
+    c.mesh.rotation.z += c.spin.z * dt;
+    const gh = terrainHeight(c.mesh.position.x, c.mesh.position.z) + 0.24 * c.s0;
+    if (c.mesh.position.y < gh) {
+      c.mesh.position.y = gh;
+      if (c.bounced++ > 1) {
+        c.vel.set(0, 0, 0);
+        c.spin.multiplyScalar(0.12);
+      } else {
+        c.vel.y *= -0.24;
+        c.vel.x *= 0.5;
+        c.vel.z *= 0.5;
+        c.spin.multiplyScalar(0.45);
+      }
+    }
+    const k = clamp01(c.life / c.maxLife);
+    c.mesh.scale.setScalar(c.s0 * (k > 0.2 ? 1 : Math.max(0.04, k / 0.2)));
+  }
+
   for (const f of flashes) {
     if (!f.active) continue;
     f.life -= dt;
@@ -288,7 +363,7 @@ export function updateParticles(dt) {
 }
 
 export function clearParticles() {
-  for (const pool of [debris, flashes, rings, smokes, sparks]) {
+  for (const pool of [debris, chunks, flashes, rings, smokes, sparks]) {
     for (const p of pool) { p.active = false; p.mesh.visible = false; }
   }
 }

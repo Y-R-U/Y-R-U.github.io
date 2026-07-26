@@ -15,6 +15,7 @@ import { props } from './props.js';
 import { on } from './bus.js';
 import { AudioFX } from './audio.js';
 import { thump } from './haptics.js';
+import { skipCutscene } from './cine.js';
 
 const _v = new THREE.Vector3();
 let mini = null, miniCtx = null;
@@ -60,6 +61,32 @@ export function initHUD(h) {
   on('drone-contacts', (n) => showToast(n === 1 ? 'CONTACT MARKED' : n + ' CONTACTS MARKED'));
   on('drone-marked', (t) => showToast('TARGET PAINTED: ' + t.name));
   on('lightning', () => AudioFX.thunder());
+
+  // ---- cutscenes --------------------------------------------------------
+  on('cine-start', () => {
+    $('cine').classList.remove('hidden');
+    $('hud').classList.add('filmed');
+    $('btn-pad').classList.add('hidden');
+    $('cine-line').classList.add('hidden');
+  });
+  on('cine-line', (line) => {
+    const box = $('cine-line');
+    if (!line || !line.text) { box.classList.add('hidden'); return; }
+    $('cine-who').textContent = line.who || '';
+    $('cine-text').textContent = line.text;
+    box.classList.remove('hidden');
+    // retrigger the type-on wipe
+    box.classList.remove('in');
+    void box.offsetWidth;
+    box.classList.add('in');
+    AudioFX.blip(520, 0.05, 0.03);
+  });
+  on('cine-end', () => {
+    $('cine').classList.add('hidden');
+    $('hud').classList.remove('filmed');
+    if (state.inBattle) $('btn-pad').classList.remove('hidden');
+  });
+  bindTap('cine-skip', () => skipCutscene());
 }
 
 function bindHold(id, fn) {
@@ -90,7 +117,8 @@ function bindTap(id, fn) {
 export function showHUD(on) {
   $('hud').classList.toggle('hidden', !on);
   document.body.classList.toggle('in-battle', !!on);
-  $('btn-pad').classList.toggle('hidden', !on);
+  // the battle starts behind its own opening film — no thumb pad over the top
+  $('btn-pad').classList.toggle('hidden', !on || state.cine);
 }
 
 // ---------------------------------------------------------------------------
