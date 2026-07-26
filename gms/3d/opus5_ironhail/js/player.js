@@ -10,12 +10,12 @@ import { camera, actorRoot } from './render.js';
 import { input, consume, keyboardMove } from './input.js';
 import { terrainHeight, raycastTerrain } from './terrain.js';
 import { aimSolution, predictImpact, fireWeapon, newestPlayerShell } from './projectiles.js';
-import { setCamMode, cycleCamMode, adjustZoom, startKillCam } from './camera.js';
+import { setCamMode, cycleCamMode, adjustZoom, startKillCam, killCamYaw } from './camera.js';
 import { useUtility } from './utility.js';
 import { AudioFX } from './audio.js';
 import { profile } from './save.js';
 import { state } from './state.js';
-import { emit } from './bus.js';
+import { emit, on } from './bus.js';
 import { thump } from './haptics.js';
 
 const raycaster = new THREE.Raycaster();
@@ -68,12 +68,34 @@ function buildAimFx(accent) {
 // laying on something it could never hit.
 function maxRange(gun) { return (gun.speed * gun.speed) / GRAVITY; }
 
+// Shell-cam gates. Under ~55m the flight is a blink and the cut is just a
+// flinch; the cooldown stops a lucky run of finishing shots turning the fight
+// into a slideshow.
+const RIDE_MIN_RANGE = 55;
+const RIDE_COOLDOWN = 7;
+
 export function showAimFx(on) {
   if (!reticleRing) return;
   reticleRing.visible = on;
   impactRing.visible = on;
   arcLine.visible = on;
 }
+
+// The ground reticle, the impact mark and the arc are the gunner's furniture.
+// Nothing that is not the gunner's view should be showing them — not a film,
+// not the action replay, not a camera currently strapped to a shell.
+function aimFxWanted() {
+  const p = state.player;
+  return !!p && p.alive && !state.cine && !state.killcam &&
+    state.phase !== 'won' && state.phase !== 'lost';
+}
+
+// A cutscene can start on a frame where the player controller is not running
+// (phase 'cine' parks every hull), so the furniture is switched from the film
+// as well as from the controller. showAimFx is three boolean writes — calling
+// it from both places costs nothing and can never disagree.
+on('cine-start', () => showAimFx(false));
+on('cine-end', () => showAimFx(aimFxWanted()));
 
 export function disposeAimFx() {
   for (const m of [reticleRing, impactRing, arcLine]) {
@@ -102,6 +124,8 @@ export class PlayerController {
     this.manualT = 0;                 // seconds since the commander last hand-aimed
     this.lastAim = new THREE.Vector2(input.aim.x, input.aim.y);
     this.autoActive = false;
+    this.fireBuffer = 0;
+    this.rideCd = 0;                  // earliest clock the shell cam may go up again
     buildAimFx(tank.accent);
     showAimFx(true);
   }
@@ -120,7 +144,9 @@ export class PlayerController {
     this.drive(dt);
     this.aim(dt);
     this.shoot(dt);
-    this.updateAimFx();
+    const wanted = aimFxWanted();
+    showAimFx(wanted);
+    if (wanted) this.updateAimFx();
   }
 
   // The computer is fitted (bought, or on loan in act one) and switched on,
@@ -213,8 +239,13 @@ export class PlayerController {
     }
     if (drone) drone.flyInput.set(0, 0);
 
-    // camera-relative: push the stick where you want to go on screen
-    camera.getWorldDirection(_v);
+    // camera-relative: push the stick where you want to go on screen. While
+    // the shell cam is up the camera is a mile downrange, so steering falls
+    // back to the bearing it will hand back — otherwise a held stick spins the
+    // hull for the length of the clip.
+    const kcYaw = killCamYaw();
+    if (kcYaw != null) _v.set(-Math.sin(kcYaw), 0, -Math.cos(kcYaw));
+    else camera.getWorldDirection(_v);
     _v.y = 0;
     if (_v.lengthSq() < 1e-5) _v.set(0, 0, -1);
     _v.normalize();
@@ -226,6 +257,13 @@ export class PlayerController {
 
   aim(dt) {
     const me = this.tank;
+
+    // The shell cam is a different camera. Reticle rays and screen-space locks
+    // both come off `camera`, so from out there they mean nothing — findLock()
+    // would grab whatever happened to be near the middle of the *shell's* view
+    // and traverse the turret onto it mid-flight. The gun holds the lay it
+    // fired with until the clip is over.
+    if (state.killcam) return;
 
     // 0. hand-aiming always outranks the computer, and for a whole second
     //    afterwards, so nudging the reticle onto a wall does not get undone.
@@ -384,17 +422,33 @@ export class PlayerController {
     if (fireWeapon(me)) {
       emit('player-fired', { range: this.range, lock: this.lock });
       thump(me.gun.speed < 90 ? 'bigfire' : 'fire');
-      // ride the shell on the long ones — the artillery money shot
-      if (profile.settings.camAuto !== false &&
-          this.range > 62 && state.camMode !== 'scope' && !state.killcam &&
-          Math.random() < 0.4) {
-        const shell = newestPlayerShell();
-        if (shell) {
-          startKillCam(shell);
-          state.timeScale = 0.55;
-        }
-      }
+      this.maybeRideShell();
     }
+  }
+
+  // The shell cam is a *kill* cam. It used to ride any long shot on a dice
+  // roll, which meant it fired most often during a firefight and dropped you
+  // back with the next contact already shooting at you. Now it only goes up
+  // when the round in the air is going to finish something, so it reads as a
+  // reward instead of an interruption.
+  maybeRideShell() {
+    const me = this.tank;
+    if (profile.settings.camAuto === false) return;
+    if (state.camMode === 'scope' || state.killcam) return;
+    if (state.time < this.rideCd) return;
+    const t = this.lock;
+    if (!t || !t.alive || t === me) return;
+    if (me.pos.distanceTo(t.pos) < RIDE_MIN_RANGE) return;   // too close to be worth a film
+    // Armour facing can still save them, so the estimate is deliberately shy:
+    // a shell cam over a target that shrugs it off is worse than one you never
+    // got. Splash only half counts, since it may not all land.
+    const lethal = me.gun.dmg + me.gun.splashDmg * 0.5;
+    if (t.hp > lethal * 0.85) return;
+    const shell = newestPlayerShell();
+    if (!shell) return;
+    startKillCam(shell, me.turretYaw);
+    state.timeScale = 0.45;
+    this.rideCd = state.time + RIDE_COOLDOWN;
   }
 
   // ---- 3D aim furniture -------------------------------------------------

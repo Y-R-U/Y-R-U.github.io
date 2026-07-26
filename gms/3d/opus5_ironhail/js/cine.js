@@ -28,6 +28,13 @@ const _lookGoal = new THREE.Vector3();
 // Resolve an anchor name to a world position. Everything falls back to the
 // middle of the field so a script can never point the camera at undefined.
 function anchorPos(name, out) {
+  // A generated script (the highlight reel) knows exactly where it wants the
+  // camera, so an anchor may also just be a point.
+  if (name && typeof name === 'object') {
+    out.copy(name);
+    out.y = Math.max(out.y, terrainHeight(out.x, out.z));
+    return out;
+  }
   out.set(0, 0, 0);
   const p = state.player;
   switch (name) {
@@ -199,6 +206,7 @@ function nextShot() {
   if (s.sound === 'horn') AudioFX.horn();
   if (s.sound === 'thunder') AudioFX.thunder();
   if (s.sound === 'lock') AudioFX.lock();
+  if (s.onStart) s.onStart();
 }
 
 export function updateCine(rawDt) {
@@ -241,6 +249,10 @@ export function updateCine(rawDt) {
     camera.updateProjectionMatrix();
   }
 
+  // A shot may take the camera over entirely — the reel's shell-ride needs a
+  // path no from/to lerp can describe. It runs last so it wins.
+  if (s.onTick) s.onTick(e, rawDt, k);
+
   // one-shot effects fire partway through so they land on a moving camera
   if (!cine.fxDone && k >= (s.fxAt != null ? s.fxAt : 0.5)) {
     cine.fxDone = true;
@@ -251,6 +263,7 @@ export function updateCine(rawDt) {
 }
 
 function fireShotFx(s) {
+  if (s.fxFn) s.fxFn();
   if (!s.fx) return;
   const at = anchorPos(s.fxAnchor || s.lookAt || s.anchor || 'player', _a);
   switch (s.fx) {

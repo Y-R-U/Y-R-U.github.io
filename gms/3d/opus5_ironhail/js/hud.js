@@ -84,7 +84,12 @@ export function initHUD(h) {
   on('cine-end', () => {
     $('cine').classList.add('hidden');
     $('hud').classList.remove('filmed');
-    if (state.inBattle) $('btn-pad').classList.remove('hidden');
+    // The action replay runs with the HUD already down, on the way to the
+    // results panel — `inBattle` is still true there, so the pad has to check
+    // that anyone is actually driving before it comes back.
+    if (state.inBattle && !$('hud').classList.contains('hidden')) {
+      $('btn-pad').classList.remove('hidden');
+    }
   });
   bindTap('cine-skip', () => skipCutscene());
 }

@@ -40,6 +40,49 @@ Hand-aiming always wins: any reticle movement over `FIRECON.manualDelta` sets
 `manualT`, which narrows the cone and stops the computer hunting for its own
 target for `FIRECON.manualHold` seconds.
 
+## The kill cam and the action replay
+
+Two different things, and keeping them apart is the point.
+
+**The kill cam** (`camera.js`, armed by `PlayerController.maybeRideShell`) rides
+a shell in — but only one that is *going to finish something*: there has to be
+a lock, it has to be past `RIDE_MIN_RANGE`, and its remaining HP has to be
+under a deliberately shy damage estimate. It used to fire on a dice roll for
+any long shot, which meant it went up most often mid-firefight and handed you
+back with the next contact already shooting. Three rules make it behave:
+
+- `startKillCam(bolt, turretYaw)` remembers **the bearing the gun fired on**,
+  and `endKillCam()` puts the rig back on it. `resetCamera()` cannot do this
+  job — it frames the hull, and after a traverse the hull is nowhere near what
+  you were shooting at.
+- `PlayerController.aim()` returns immediately while `state.killcam` is set.
+  Reticle rays and `findLock()` both project through `camera`, so from out
+  there they describe the shell's view, not the gunner's — leave them running
+  and the turret walks onto whatever is near the middle of the shell cam.
+- The clip holds ~0.55s on the impact after the bolt retires, because the
+  explosion is the payoff.
+
+**The action replay** (`highlights.js`) plays between the battle and the
+results panel. Nothing is recorded frame by frame; what gets written down is
+the shape of a moment — muzzle, impact, victim — and the reel re-stages it from
+the wreckage still standing on the field:
+
+1. `Tank.showAsLive(true)` puts the victim back on its tracks (both poses are
+   saved in `die()` before the wreck jitter is applied),
+2. a ghost tracer flies the arc, rebuilt from gravity, with the camera on it,
+3. `showAsLive(false)` knocks it over again and the explosion goes.
+
+Up to three clips — best kills by range, plus at most one demolition so it is
+not three fireballs in a row — ordered chronologically. Straight off the back
+of a victory film it drops to one clip and no title card, because the WARDEN
+outro already runs half a minute. `restoreField()` runs between clips, at the
+end and on teardown, so a skip can never strand a wreck looking freshly
+painted.
+
+`cine.js` grew three hooks for this: an anchor may be a `Vector3` as well as a
+name, and a shot may carry `onStart`, `onTick(e, dt, k)` (runs last, so it can
+take the camera over outright) and `fxFn`.
+
 ## Cutscenes
 
 `cine.js` is a small director; `story.js` is the script. A cutscene is a list
@@ -93,6 +136,7 @@ wrong thumb is mid-battle.
 | `props.js` | destructible scenery: topple / launch / shatter / cook off |
 | `cine.js` | the cutscene director — anchored camera moves, dialogue, skip |
 | `story.js` | the films themselves, keyed `<missionId>-intro|mid|win` |
+| `highlights.js` | records the shape of the good moments, re-stages them as the post-battle reel |
 | `particles.js` | pooled debris, flashes, rings, smoke, sparks |
 | `projectiles.js` | the solver, shell flight, ricochets, splash, `updateFiring` |
 | `tank.js` | terrain-following physics, armour facing, crits, death |
@@ -147,6 +191,22 @@ wrong thumb is mid-battle.
   the game.
 - **Explosive props keep running after they are invisible.** State `cooking`
   fires the secondaries of an ammunition fire; do not fold it into `dead`.
+- **`resetCamera()` frames the hull, not the gun.** It takes `tank.yaw`, while
+  the chase camera rides `turretYaw`. Using it to come out of a shell cam threw
+  the view a full 180° off the shot on a rear-facing turret. Anything that
+  hands the camera back mid-fight wants the turret bearing.
+- **The aim furniture is the gunner's, and only the gunner's.** The ground
+  reticle, impact mark and ballistic arc are world meshes, so they draw over
+  cutscenes and replays unless something switches them off. `aimFxWanted()` in
+  `player.js` is that something, called from the controller *and* from
+  `cine-start` / `cine-end` — during phase `'cine'` no hull ticks, so the
+  controller alone is not enough.
+- **`state.inBattle` is still true over the results panel.** Anything that
+  re-enables in-battle chrome on `cine-end` has to check that the HUD is
+  actually up, or the thumb pad reappears over the results.
+- **Headless tests must budget for the reel.** A win now runs film → replay →
+  panel; a test that waited four seconds for `screen === 'results'` will report
+  `'battle'` and look like a hang. `?auto` runs skip the reel entirely.
 
 ## Testing
 
@@ -172,7 +232,7 @@ URL hooks:
 `window.__game` exposes `state`, `profile`, `terrainHeight`, `propList`,
 `aimAt(x,z)`, `fireNow()`, `win()`, `info()` (draw calls/triangles),
 `setSetting(k,v)` (writes and applies), `giveModule(id)`, `giveScrap(n)`,
-`utils.useUtility` and the screen functions.
+`reelCount()`, `playReel()`, `utils.useUtility` and the screen functions.
 
 Useful battle probes: `state.fcFitted` / `state.fcTrial` / `state.autoAiming`,
 `state.player.controller.manualT`, `state.player.extraSpread`.

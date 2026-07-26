@@ -52,7 +52,7 @@ export function updateCamera(dt, rawDt) {
     updateCine(rawDt);
     return;
   }
-  if (state.killcam && state.killcam.bolt && state.killcam.bolt.active) {
+  if (state.killcam) {
     updateKillCam(rawDt);
     return;
   }
@@ -141,15 +141,27 @@ function updateKillCam(rawDt) {
   const b = kc.bolt;
   kc.t += rawDt;
   fov = 46;
-  _v.copy(b.vel).normalize();
-  goal.set(
-    b.mesh.position.x - _v.x * 9 + kc.side * 3.2,
-    b.mesh.position.y - _v.y * 4 + 2.6,
-    b.mesh.position.z - _v.z * 9 + kc.side * 1.6);
+  if (b.active) {
+    // riding the shell in
+    _v.copy(b.vel).normalize();
+    kc.impact.copy(b.mesh.position);
+    goal.set(
+      b.mesh.position.x - _v.x * 9 + kc.side * 3.2,
+      b.mesh.position.y - _v.y * 4 + 2.6,
+      b.mesh.position.z - _v.z * 9 + kc.side * 1.6);
+  } else {
+    // the shell has landed — hold on the impact for a beat so the kill lands,
+    // easing in a touch so the hold reads as a shot, not a frozen frame
+    goal.set(
+      kc.impact.x - _v.x * 7.2 + kc.side * 3.6,
+      kc.impact.y + 3.4,
+      kc.impact.z - _v.z * 7.2 + kc.side * 1.8);
+    look.lerp(kc.impact, damp(6, rawDt));
+  }
   const gh = terrainHeight(goal.x, goal.z) + 1.6;
   if (goal.y < gh) goal.y = gh;
-  camera.position.lerp(goal, damp(11, rawDt));
-  look.copy(b.mesh.position);
+  camera.position.lerp(goal, damp(b.active ? 11 : 3.4, rawDt));
+  if (b.active) look.copy(b.mesh.position);
   camera.lookAt(look);
   if (Math.abs(camera.fov - fov) > 0.05) {
     camera.fov = lerp(camera.fov, fov, damp(8, rawDt));
@@ -188,11 +200,50 @@ export function adjustZoom(delta, maxZoom = CAM.zoomMax) {
   state.zoom = clamp(state.zoom + delta, CAM.zoomMin, maxZoom);
 }
 
-export function startKillCam(bolt) {
-  state.killcam = { bolt, t: 0, side: Math.random() < 0.5 ? -1 : 1 };
+// `homeYaw` is the bearing the gun fired on. Keeping it is the whole point:
+// see endKillCam().
+export function startKillCam(bolt, homeYaw = null) {
+  state.killcam = {
+    bolt, t: 0, hold: null,
+    side: Math.random() < 0.5 ? -1 : 1,
+    homeYaw: homeYaw != null ? homeYaw : camYaw,
+    impact: new THREE.Vector3().copy(bolt.mesh.position),
+  };
 }
 
+// Put the rig back down the line the shot went. resetCamera() cannot do this
+// job — it frames the *hull*, and the hull is not where you were looking. Come
+// out of a shell cam on hull yaw after a traverse and the view is suddenly
+// pointing off to one side of the target you just shot at, which is exactly
+// the moment you need to see.
 export function endKillCam() {
+  const kc = state.killcam;
   state.killcam = null;
   state.timeScale = 1;
+  const t = state.player;
+  if (!kc || !t || !t.alive) return;
+  camYaw = kc.homeYaw;
+  fov = CAM.baseFov;
+  const zoom = state.zoom;
+  const dist = CAM.chaseDist * zoom;
+  goal.set(
+    t.pos.x + Math.sin(camYaw) * dist,
+    t.pos.y + CAM.chaseHeight * (0.62 + zoom * 0.42),
+    t.pos.z + Math.cos(camYaw) * dist);
+  const gh = terrainHeight(goal.x, goal.z) + 3.4;
+  if (goal.y < gh) goal.y = gh;
+  camera.position.copy(goal);
+  look.set(
+    t.pos.x - Math.sin(camYaw) * CAM.chaseLook,
+    t.pos.y + 2.6 + zoom * 1.2,
+    t.pos.z - Math.cos(camYaw) * CAM.chaseLook);
+  camera.lookAt(look);
+  camera.fov = fov;
+  camera.updateProjectionMatrix();
+}
+
+// The bearing the shell cam will hand back — the player controller freezes the
+// turret against it so nothing wanders off mid-flight.
+export function killCamYaw() {
+  return state.killcam ? state.killcam.homeYaw : null;
 }

@@ -38,6 +38,7 @@ function defaults() {
       camAuto: true,            // let the camera ride the occasional long shot
       autoAim: true,            // use the fire-control computer when it is fitted
       cutscenes: true,          // play the story films
+      highlights: true,         // the action replay between the battle and the results
       aimSide: 'right',         // which half of the screen the aim thumb owns
       padSide: 'right',         // which side FIRE and the action buttons sit on
     },

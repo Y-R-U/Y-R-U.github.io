@@ -12,12 +12,13 @@ import { aimSolution, fireWeapon, activeShellCount } from './projectiles.js';
 import { useUtility } from './utility.js';
 import { UTILITIES } from './arsenal.js';
 import { initInput, consume, setSensitivity, setAimSide, setInvertY } from './input.js';
-import { updateCamera, orbitCamera, endKillCam, resetCamera } from './camera.js';
+import { updateCamera, orbitCamera, endKillCam } from './camera.js';
 import { AudioFX } from './audio.js';
 import { state } from './state.js';
 import { on, emit } from './bus.js';
 import { initBattleSystems, startBattle, updateBattle, startAttract, updateAttract, requestCutscene } from './battle.js';
 import { skipCutscene, cineActive } from './cine.js';
+import { playHighlights, highlightCount } from './highlights.js';
 import { MISSIONS, MISSION_BY_ID, makeSkirmish, dailySeed, suggestedTier } from './missions.js';
 import { initHUD, updateHUD, showHUD, resetHUD, showBanner, showToast } from './hud.js';
 import {
@@ -72,6 +73,8 @@ initMenus({
     if (next) showBrief(next.id); else showCampaign();
   },
   onSettings: () => applySettings(),
+  onReplayHighlights: () => replayHighlights(),
+  highlightCount: () => highlightCount(),
 });
 
 initRenameModal((name) => {
@@ -148,15 +151,32 @@ function autoPause() {
 document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
 window.addEventListener('blur', autoPause);
 
+let lastResults = null;
+
 on('battle-over', (res) => {
   if (res.mission.daily) markDailyClaimed();
   saveProfile();
+  lastResults = res;
   setTimeout(() => {
     showHUD(false);
-    showMenu(true);
-    showResults(res);
+    // The reel goes between the fight and the paperwork, because that is where
+    // it is still about the fight. If there is nothing worth showing it never
+    // interrupts — playHighlights says so and the results come straight up.
+    if (!playHighlights(() => openResults(res))) openResults(res);
   }, res.win ? 1500 : 1900);
 });
+
+function openResults(res) {
+  showMenu(true);
+  showResults(res);
+}
+
+function replayHighlights() {
+  const res = lastResults;
+  if (!res) return;
+  showMenu(false);
+  if (!playHighlights(() => openResults(res))) openResults(res);
+}
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -215,10 +235,11 @@ function tick() {
 function updateKillCam(dt) {
   const kc = state.killcam;
   if (!kc) return;
-  if (!kc.bolt.active || kc.t > 2.4) {
-    endKillCam();
-    if (state.player) resetCamera(state.player);
-  }
+  // once the shell has landed, hang on the impact for a beat — the explosion
+  // is the payoff, and cutting on the frame of contact throws it away
+  if (!kc.bolt.active && kc.hold == null) kc.hold = 0.55;
+  if (kc.hold != null) kc.hold -= dt;
+  if ((kc.hold != null && kc.hold <= 0) || kc.t > 3.4) endKillCam();
 }
 
 // ---------------------------------------------------------------------------
@@ -284,6 +305,8 @@ window.__game = {
   setSetting: (k, v) => { profile.settings[k] = v; applySettings(); markDirty(); refreshCurrentScreen(); },
   giveModule: (id) => { if (!profile.owned.modules.includes(id)) profile.owned.modules.push(id); markDirty(); },
   utils: { useUtility, UTILITIES },
+  reelCount: () => highlightCount(),
+  playReel: () => replayHighlights(),
   THREE, camera, actorRoot, scene,
   info: () => ({
     calls: lastFrame.calls,

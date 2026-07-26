@@ -26,6 +26,7 @@ import { Drone } from './drone.js';
 import { updateUtilities, clearUtilities } from './utility.js';
 import { resetCamera, endKillCam } from './camera.js';
 import { playCutscene, cancelCutscene } from './cine.js';
+import { resetHighlights } from './highlights.js';
 import { AudioFX } from './audio.js';
 import { state, resetBattleTallies, enemyTanks } from './state.js';
 import { emit, on } from './bus.js';
@@ -866,6 +867,7 @@ export function updateAttract(dt) {
 
 export function clearBattle() {
   cancelCutscene();
+  resetHighlights();
   for (const t of state.tanks) t.dispose();
   state.tanks = [];
   state.player = null;

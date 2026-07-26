@@ -69,6 +69,8 @@ function route(action, arg) {
     case 'autoaim': setSetting('autoAim', profile.settings.autoAim === false); break;
     case 'camauto': setSetting('camAuto', profile.settings.camAuto === false); break;
     case 'cutscenes': setSetting('cutscenes', profile.settings.cutscenes === false); break;
+    case 'highlights': setSetting('highlights', profile.settings.highlights === false); break;
+    case 'reel': handlers.onReplayHighlights(); break;
     case 'wipe': confirmWipe(); break;
     case 'wipe-yes': resetProfile(); showTitle(); break;
     case 'reload': location.reload(); break;
@@ -902,6 +904,17 @@ export function showResults(res) {
     w.appendChild(el('div', 'unlock', 'UNLOCKED: ' + unlockName(u)));
   }
 
+  // Only offered when there is something to show — the reel decides that, not
+  // the kill count, because a mine kill with nothing standing near it makes a
+  // poor film.
+  const reel = handlers.highlightCount ? handlers.highlightCount() : 0;
+  if (reel > 0) {
+    const rr = el('div', 'menu-row');
+    rr.appendChild(bigButton('▶ ACTION REPLAY', 'reel', null, 'btn-secondary',
+      reel === 1 ? '1 MOMENT' : reel + ' MOMENTS'));
+    w.appendChild(rr);
+  }
+
   const row = el('div', 'menu-row');
   if (res.win && !m.skirmish) {
     const idx = MISSIONS.findIndex((x) => x.id === m.id);
@@ -995,10 +1008,13 @@ export function showSettings(from) {
   // ---- gunnery ------------------------------------------------------------
   scroll.appendChild(el('div', 'section-head', 'GUNNERY'));
   scroll.appendChild(fireControlRow());
-  scroll.appendChild(toggleRow('CINEMATIC SHELL CAM', profile.settings.camAuto !== false, 'camauto',
-    'Occasionally rides the shell in on the long shots. Turn it off if you would rather keep the wheel.'));
+  scroll.appendChild(toggleRow('KILL CAM', profile.settings.camAuto !== false, 'camauto',
+    'Rides the shell in when the round in the air is going to finish something. ' +
+    'Never on an ordinary shot — it hands the view back down the same line you fired on.'));
   scroll.appendChild(toggleRow('STORY CUTSCENES', profile.settings.cutscenes !== false, 'cutscenes',
     'The films between the fighting. Every one is skippable, and none of them repeat unless you ask.'));
+  scroll.appendChild(toggleRow('ACTION REPLAY', profile.settings.highlights !== false, 'highlights',
+    'Your best kills and biggest demolitions, re-staged on the wreckage, between the battle and the results.'));
 
   // ---- presentation -------------------------------------------------------
   scroll.appendChild(el('div', 'section-head', 'PRESENTATION'));

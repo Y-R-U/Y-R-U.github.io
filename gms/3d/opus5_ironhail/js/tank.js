@@ -449,11 +449,33 @@ export class Tank {
     if (this.turretMesh) this.turretMesh.material = burntMat;
     if (this.barrelMesh) this.barrelMesh.material = burntMat;
     for (const m of this.accentMeshes) m.visible = false;
+    // Both poses are kept so the highlight reel can put the hull back the way
+    // it sat a moment before the hit, then knock it over again.
+    const livePose = { tilt: this.tiltG.rotation.z, turret: this.turretG.rotation.y };
     this.tiltG.rotation.z += rand(-0.14, 0.14);
     this.turretG.rotation.y += rand(-0.5, 0.5);
+    this.poses = {
+      live: livePose,
+      wreck: { tilt: this.tiltG.rotation.z, turret: this.turretG.rotation.y },
+    };
 
     if (attacker && attacker !== this) attacker.kills++;
     emit('tank-killed', { victim: this, attacker, fromPos });
+  }
+
+  // Replay support: show a dead hull as it was, or as it ended up. Only ever
+  // called on wrecks, and only from the reel — the battle never un-kills.
+  showAsLive(live) {
+    if (this.alive || !this.savedMats || !this.poses) return;
+    const [h, t, b] = this.savedMats;
+    this.hullMesh.material = live && h ? h : burntMat;
+    if (this.turretMesh) this.turretMesh.material = live && t ? t : burntMat;
+    if (this.barrelMesh) this.barrelMesh.material = live && b ? b : burntMat;
+    for (const m of this.accentMeshes) m.visible = live;
+    const p = live ? this.poses.live : this.poses.wreck;
+    this.tiltG.rotation.z = p.tilt;
+    this.turretG.rotation.y = p.turret;
+    if (live) this.smokePlume = 0;
   }
 
   heal(amount) {
