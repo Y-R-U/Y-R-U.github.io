@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FOUL PLAY — dev harness</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #06080c; color: #cfe; font: 12px ui-monospace, monospace; }
+    #log { position: fixed; left: 0; top: 0; padding: 8px; white-space: pre; z-index: 10; text-shadow: 0 1px 2px #000; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="log">building…</div>
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { TRACK_DEFS, buildTrack } from './js/trackgen.js';
+    import { initRenderer, setEnvironment, render, scene, camera, renderer } from './js/render.js';
+    import { buildTrackMesh } from './js/trackmesh.js';
+    import { loadProfile } from './js/save.js';
+
+    const log = document.getElementById('log');
+    const lines = [];
+    const results = [];
+    loadProfile();
+
+    // ---- 1. build every circuit and report its geometry -------------------
+    for (const def of TRACK_DEFS) {
+      try {
+        const t = buildTrack(def.id);
+        let minR = Infinity, maxBank = 0, invertedFrames = 0, maxStep = 0;
+        for (let i = 0; i < t.count; i++) {
+          const c = Math.abs(t.curv[i]);
+          if (c > 1e-4) minR = Math.min(minR, 1 / c);
+          maxBank = Math.max(maxBank, Math.abs(t.bank[i]));
+          if (t.inverted[i]) invertedFrames++;
+          maxStep = Math.max(maxStep, t.pos[i].distanceTo(t.pos[(i + 1) % t.count]));
+        }
+        // Continuity of the frame ring: neighbouring ups should be close.
+        let maxTwist = 0;
+        for (let i = 0; i < t.count; i++) {
+          const a = t.up[i], b = t.up[(i + 1) % t.count];
+          maxTwist = Math.max(maxTwist, Math.acos(Math.min(1, Math.max(-1, a.dot(b)))) * 180 / Math.PI);
+        }
+        // Radius percentiles: a single tight frame is a spline blip, a tight
+        // 5th percentile is a corner nobody can take.
+        const radii = [];
+        for (let i = 0; i < t.count; i++) {
+          const c = Math.abs(t.curv[i]);
+          radii.push(c > 1e-4 ? 1 / c : 9999);
+        }
+        radii.sort((a, b) => a - b);
+        const pct = (p) => +radii[Math.floor(radii.length * p)].toFixed(1);
+        const r = {
+          id: def.id, len: +t.length.toFixed(0), frames: t.count,
+          minR: +minR.toFixed(1), p2: pct(0.02), p8: pct(0.08),
+          gap: +(t.def.closureGap || 0).toFixed(1),
+          maxBank: +(maxBank * 57.3).toFixed(0),
+          inverted: invertedFrames, maxStep: +maxStep.toFixed(2),
+          maxTwistDeg: +maxTwist.toFixed(2),
+          pads: t.pads.length, crates: t.crates.length, cams: t.cams.length,
+          yRange: [+t.bounds.min.y.toFixed(1), +t.bounds.max.y.toFixed(1)],
+        };
+        results.push(r);
+        lines.push(`${def.id.padEnd(13)} ${String(r.len).padStart(5)}m  minR ${String(r.minR).padStart(6)} p2 ${String(r.p2).padStart(6)} p8 ${String(r.p8).padStart(6)}  gap ${String(r.gap).padStart(5)}  bank ${String(r.maxBank).padStart(3)}°  inv ${String(r.inverted).padStart(3)}  y ${r.yRange.join('..')}`);
+      } catch (e) {
+        lines.push(`${def.id}: FAILED ${e.message}`);
+        results.push({ id: def.id, error: String(e && e.stack || e) });
+      }
+    }
+    log.textContent = lines.join('\n');
+    window.__trackReport = results;
+    console.log('TRACK_REPORT ' + JSON.stringify(results));
+
+    // ---- 2. render one of them -------------------------------------------
+    const which = new URLSearchParams(location.search).get('t') || 'circus';
+    const t = buildTrack(which);
+    initRenderer(document.body);
+    setEnvironment(t.env);
+    scene.add(buildTrackMesh(t));
+    camera.position.set(t.center.x + t.radius * 1.1, t.radius * 0.85, t.center.z + t.radius * 1.1);
+    camera.lookAt(t.center.x, t.center.y, t.center.z);
+    render();
+    window.__ready = true;
+
+    let a = 0;
+    function loop() {
+      a += 0.0016;
+      camera.position.set(
+        t.center.x + Math.cos(a) * t.radius * 1.35,
+        t.radius * 0.7 + 40,
+        t.center.z + Math.sin(a) * t.radius * 1.35
+      );
+      camera.lookAt(t.center.x, t.center.y + 10, t.center.z);
+      render();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

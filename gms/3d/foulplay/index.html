@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0b0e14" />
+  <meta name="description" content="FOUL PLAY — a 3D racing series where cheating is the point. Wreck your rivals, work the cameras, and let the crowd talk the stewards out of the fine." />
+  <title>FOUL PLAY</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0e14'/%3E%3Crect x='3' y='14' width='26' height='8' rx='2' fill='%23e23c3c'/%3E%3Crect x='8' y='9' width='14' height='6' rx='2' fill='%23ff7a3d'/%3E%3Ccircle cx='9' cy='23' r='3.5' fill='%23171a20'/%3E%3Ccircle cx='23' cy='23' r='3.5' fill='%23171a20'/%3E%3Crect x='2' y='4' width='28' height='3' fill='%23ffb020'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+  <div id="broadcast-grade"></div>
+
+  <!-- ═══════════════════════ RACE HUD ═══════════════════════ -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-tl">
+        <div class="chip pos-chip"><b id="hud-pos">1</b><span>/<i id="hud-pos-total">8</i></span></div>
+        <div class="chip lap-chip">LAP <b id="hud-lap">1</b><span>/<i id="hud-lap-total">3</i></span></div>
+        <div class="times">
+          <span id="lap-time">0:00.00</span>
+          <span class="best">BEST <i id="best-time">--:--</i></span>
+        </div>
+        <div class="condition">
+          <div class="bar hp"><i id="hp-fill"></i></div>
+          <span id="parts-lost"></span>
+        </div>
+      </div>
+
+      <div class="hud-tc">
+        <div id="susp-wrap" class="meter susp">
+          <span class="meter-label">👁 STEWARDS</span>
+          <div class="bar"><i id="susp-fill"></i></div>
+          <b id="susp-val">0</b>
+        </div>
+        <div id="hype-wrap" class="meter hype">
+          <span class="meter-label">📣 CROWD</span>
+          <div class="bar"><i id="hype-fill"></i></div>
+          <b id="hype-val">NOBODY IS WATCHING</b>
+        </div>
+        <div id="cam-warn" class="cam-warn hidden">🔴 <span id="cam-dist">CAM</span></div>
+      </div>
+
+      <div class="hud-tr">
+        <canvas id="minimap" width="190" height="190"></canvas>
+        <ol id="order-list"></ol>
+      </div>
+    </div>
+
+    <div id="investigation" class="hidden">
+      <span>STEWARDS ARE REVIEWING THE INCIDENT</span>
+      <div class="inv-bar"><i></i></div>
+    </div>
+
+    <div id="loop-warn" class="hidden">⟳ <b>MORE SPEED</b><span>OR YOU WILL FALL OUT OF IT</span></div>
+
+    <ul id="feed"></ul>
+    <div id="banner" class="banner"><span id="banner-text"></span></div>
+    <div id="toast" class="toast"></div>
+
+    <div class="hud-bottom">
+      <div class="speedo">
+        <div id="speed-arc"></div>
+        <b id="hud-speed">0</b>
+        <span id="hud-speed-unit">KM/H</span>
+      </div>
+    </div>
+
+    <div id="hit-flash"></div>
+  </div>
+
+  <!-- Touch controls -->
+  <div id="btn-pad" class="hidden">
+    <div class="pad-left-zone">
+      <button id="pad-left" class="arrow hidden">◀</button>
+      <button id="pad-brake" class="arrow hidden">▼</button>
+      <button id="pad-right" class="arrow hidden">▶</button>
+      <div id="steer-hint" class="steer-hint">DRAG TO STEER · PULL DOWN TO BRAKE</div>
+    </div>
+    <div class="pad-right-zone">
+      <button id="btn-boost" class="pad-btn boost">
+        <span class="pb-icon">🔥</span>
+        <span class="pb-label">BOOST</span>
+        <span class="pb-count" id="boost-count">1</span>
+        <i class="pb-fill" id="boost-fill"></i>
+      </button>
+      <button id="btn-attack" class="pad-btn atk">
+        <span id="atk-ring"></span>
+        <span class="pb-label" id="atk-name">SIDE SLAM</span>
+        <span class="pb-risk" id="atk-risk">LOOKS LIKE RACING</span>
+      </button>
+      <button id="btn-look" class="pad-btn look">👁</button>
+    </div>
+  </div>
+
+  <button id="btn-pause" class="hidden">❙❙</button>
+
+  <!-- ═══════════════════════ CUTSCENES ═══════════════════════ -->
+  <div id="cine" class="hidden">
+    <div class="cine-bar top"></div>
+    <div class="cine-bar bottom"></div>
+    <div id="cine-caption" class="hidden"></div>
+    <div id="cine-line" class="hidden">
+      <span id="cine-who"></span>
+      <p id="cine-text"></p>
+    </div>
+    <button id="cine-skip">SKIP ▸</button>
+  </div>
+
+  <!-- ═══════════════════════ SCREENS ═══════════════════════ -->
+  <div id="menu" class="screen"></div>
+
+  <!-- Popups are always in-page, never alert() -->
+  <div id="popup" class="popup hidden">
+    <div class="popup-card">
+      <h2 id="popup-title">TITLE</h2>
+      <div id="popup-body"></div>
+      <div class="popup-row" id="popup-actions"></div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">
+    <div class="load-logo">FOUL<span>PLAY</span></div>
+    <div class="load-bar"><i></i></div>
+    <p id="load-text">WARMING UP</p>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
