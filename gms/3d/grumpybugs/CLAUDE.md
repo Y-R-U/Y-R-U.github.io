@@ -29,6 +29,20 @@ berry and THE SHOE can be judged side by side:
 Iterating on a weapon by starting a battle and waiting for someone to fire it
 is not a workflow.
 
+Terrain carries three layers of variation, all keyed on absolute `s` so a
+crater never reshuffles surviving ground: `band()` for the big slow patches of
+lush/dry grass, `tn()` for per-facet grain, and the cross-section index `k` for
+strata. The grass palette is deliberately stretched **past** `terra.grass` and
+`terra.grass2` (`LUSH`/`DRY`/`WORN` in `buildLedgeMesh`) — the interval between
+the two theme greens alone is invisible from the play camera. The edge fringe
+is what actually sells the ground: short blades hung off both lips, which break
+the hard polygon silhouette.
+
+An explosion is five layers fired together — core flash, a real pooled
+`PointLight`, ground ring + vertical halo, fireball/embers/clods, and smoke
+that outlives the rest. The light is the part that matters; drop it and the
+blast stops touching the world.
+
 ## The pillars
 
 - **The ridge IS the game.** Levels are polyline walk-paths (`js/physics.js`
@@ -120,6 +134,14 @@ boot/modes/loop/flags.
   `scene.environment` set. `ArenaView` builds the probe from
   `opts.renderer` — if a Battle is constructed without a renderer in `deps`,
   every bug goes dull and dark.
+- **Anything leaning off a ledge must lean in the LEDGE's frame.** The fringe
+  blades rotate about world Z inside a holder yawed to `atan2(dir.x, dir.z)`;
+  do it in world space and every blade on an east-west ridge stabs sideways
+  through the cliff instead of hanging over the drop. Note the sign: a positive
+  Z-rotation tips +Y toward −X, so the lean is `-dir * angle`.
+- **Trails belong only on things that leave one** (the acorn's motor, the
+  loogie). A lobbed berry emitting smoke draws a dotted line of pale beads
+  across the sky that reads as a rendering fault, not a weapon.
 - **Shard chains**: `_detonate` looks the weapon up by `rec.weaponId`, so
   cluster shards re-read `shards:4` from config — shard recs carry
   `isShard`, and the spawn block is gated `w.shards && !rec.isShard`.

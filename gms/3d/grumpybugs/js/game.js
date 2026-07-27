@@ -341,7 +341,9 @@ export class Battle {
     this._consumeAmmo(team, wid);
     this.traj.visible = false;
     const vel = phys.muzzleVel(this.aim.yaw, this.aim.pitch, power, w.speed);
-    const rec = phys.simulate({ pos: this._muzzle(bug), vel, w, shooterId: bug.id }, this.physWorld());
+    const muzzle = this._muzzle(bug);
+    this.fx.poof(muzzle, wid === 'loogie' ? 0xd6f0a0 : 0xcfc6b4, 5);
+    const rec = phys.simulate({ pos: muzzle, vel, w, shooterId: bug.id }, this.physWorld());
     rec.weaponId = wid; rec.shooter = bug;
     rec.shotPath = rec.path; rec.dur = rec.impact.t;
     this._startShotPlayback(rec);
@@ -855,6 +857,12 @@ export class Battle {
           this.aim.yaw = Math.atan2(dir.x * bug.faceDir, dir.z * bug.faceDir);
           this._trajDirty = true;
           this._placeBug(bug);
+          // a scuff of dust under the feet, roughly one per stride
+          this._dustT = (this._dustT || 0) + dt;
+          if (this._dustT > 0.22) {
+            this._dustT = 0;
+            this.fx.dust(this.bugPos(bug), this.arena.terra.dirt);
+          }
         } else bug.rig.walkAmt *= 0.85;
       } else if (this._active) this._active.rig.walkAmt *= 0.85;
       this._placeBug(bug);
@@ -893,6 +901,19 @@ export class Battle {
       // relative rotate applied after it — assigning rotation.z did nothing
       animateProjectile(pb.mesh, dt, dt * (pb.mesh.userData.spin === 'roll' ? 9 : 7));
       const w = W(pb.rec.weaponId);
+      // Exhaust trail — only for the two things that actually leave one. A
+      // lobbed berry trailing smoke just draws a dotted line of pale beads
+      // across the sky, which looks like a rendering fault, not a weapon.
+      const trailC = pb.rec.weaponId === 'bazooka' ? 0x9a8f80
+        : pb.rec.weaponId === 'loogie' ? 0x9fc45a : null;
+      if (trailC) {
+        pb.trailT = (pb.trailT || 0) + dt;
+        if (pb.trailT > 0.028) {
+          pb.trailT = 0;
+          const rocket = pb.rec.weaponId === 'bazooka';
+          this.fx.trail(pb.mesh.position, trailC, rocket ? 0.17 : 0.09, rocket ? 0.3 : 0.16);
+        }
+      }
       if (w.fuse && pb.playT - pb.lastFuse > 0.5) { pb.lastFuse = pb.playT; audio.fuseTick(); }
       audio.whooshSet(1 - pb.playT / Math.max(0.5, pb.rec.dur));
       if (pb.playT >= pb.rec.dur) {
