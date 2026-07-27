@@ -204,6 +204,20 @@
     pointer-events: none;
   }
 
+  /* ---------- guide ---------- */
+  .guide-panel { border-left: 4px solid var(--gold); }
+  .guide-top { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+  .guide-book {
+    font-size: 40px; line-height: 1; flex: 0 0 auto;
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--panel2); border: 2px solid #000; outline: 2px solid var(--edge);
+  }
+  .guide-top h3 { font-family: var(--pixel); font-size: 12px; color: #fff; line-height: 1.6; margin-bottom: 8px; }
+  .guide-meta { font-family: var(--pixel); font-size: 7.5px; color: var(--dim); letter-spacing: 1px; }
+  .guide-desc { font-size: 13.5px; color: var(--text); margin-bottom: 16px; }
+  .guide-desc strong, .guide-desc b { color: var(--gold); }
+
   /* ---------- install steps ---------- */
   ol.steps { margin-left: 22px; }
   ol.steps li { margin-bottom: 10px; font-size: 14.5px; }
@@ -234,6 +248,7 @@
   <img class="float px" src="img/skin_hunter.png" alt="" style="right:8%;  top:20%; animation-delay:0.6s">
   <h1>Y-R-U MC ADDONS</h1>
   <p>Minecraft Bedrock Edition &middot; .mcaddon downloads</p>
+  <p style="margin-top:14px"><a href="#guide" style="color:var(--gold)">▸ make your own — read the guide</a></p>
 </header>
 
 <div class="wrap">
@@ -246,6 +261,31 @@
        the DETAILS data below; the download cards' DETAILS buttons switch
        which one is visible. -->
   <div id="details-container"></div>
+
+  <h2 class="section" id="guide">Make Your Own</h2>
+  <div class="panel guide-panel">
+    <div class="guide-top">
+      <div class="guide-book">📖</div>
+      <div>
+        <h3>The Complete Guide To Advanced Bedrock Addons</h3>
+        <div class="guide-meta">17 SECTIONS &middot; ~150 PAGES &middot; BEDROCK 1.21+</div>
+      </div>
+    </div>
+    <p class="guide-desc">
+      Everything used to build the addons above, written down properly — custom
+      <strong>mobs</strong>, <strong>items</strong> and <strong>blocks</strong> from an empty folder
+      to a finished <b>.mcaddon</b>. Which apps to install and how to drive them
+      (Blockbench, VS Code, bridge.), modelling and texturing, the full folder layout,
+      behaviour JSON, Molang, animations, spawn rules, loot tables, the Script API,
+      manifests, packaging — plus three big "common mistakes" checkpoints for when
+      something breaks.
+    </p>
+    <div class="fc-actions">
+      <a class="mc-btn green" href="guide/">📖 READ ONLINE</a>
+      <a class="mc-btn" href="guide/bedrock-addon-guide.pdf" download>⬇ PDF</a>
+      <a class="mc-btn" href="guide/bedrock-addon-guide.docx" download>⬇ WORD</a>
+    </div>
+  </div>
 
   <h2 class="section">How To Install</h2>
   <div class="panel">
