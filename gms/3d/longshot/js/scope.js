@@ -8,6 +8,7 @@ import { SWAY, BREATH, VIEW } from './config.js';
 import { clamp } from './utils.js';
 import { save } from './save.js';
 import * as audio from './audio.js';
+import { buildRifleViewmodel, disposeViewmodel } from './viewmodel.js';
 
 const T = THREE;
 
@@ -45,29 +46,28 @@ export class ScopeRig {
     this._resize();
   }
 
-  _buildViewmodel() {
-    const g = new T.Group();
-    const dark = new T.MeshStandardMaterial({ color: 0x23262b, roughness: 0.55, metalness: 0.5 });
-    const wood = new T.MeshStandardMaterial({ color: 0x3d2f22, roughness: 0.8 });
-    const mk = (geo, mat, x, y, z, rx = 0, rz = 0) => {
-      const m = new T.Mesh(geo, mat);
-      m.position.set(x, y, z);
-      m.rotation.x = rx; m.rotation.z = rz;
-      g.add(m); return m;
-    };
-    mk(new T.CylinderGeometry(0.016, 0.02, 1.15, 8), dark, 0.26, -0.19, -1.25, Math.PI / 2);   // barrel
-    mk(new T.BoxGeometry(0.07, 0.1, 0.65), wood, 0.26, -0.245, -0.72);                          // fore stock
-    mk(new T.BoxGeometry(0.075, 0.16, 0.4), wood, 0.26, -0.28, -0.28);                          // butt
-    mk(new T.CylinderGeometry(0.035, 0.035, 0.3, 10), dark, 0.26, -0.13, -0.65, Math.PI / 2);   // scope tube
-    mk(new T.CylinderGeometry(0.045, 0.04, 0.06, 10), dark, 0.26, -0.13, -0.49, Math.PI / 2);   // ocular
-    mk(new T.CylinderGeometry(0.02, 0.02, 0.09, 6), dark, 0.315, -0.16, -0.42, 0, Math.PI / 3); // bolt
-    // Shouldered at the bottom-right, barrel receding toward the target: it
-    // frames the shot instead of pressing its stock into your eye.
-    g.scale.setScalar(0.95);
-    g.position.set(0.12, -0.28, -0.52);
-    g.rotation.y = -0.07;
+  // Shouldered at the bottom-right, barrel receding toward the target: it
+  // frames the shot instead of pressing its stock into your eye. The model
+  // itself is per-rifle (js/viewmodel.js), so buying up the armory visibly
+  // changes the gun in your hands.
+  _buildViewmodel(rifle, scope) {
+    if (this.viewmodel) {
+      this.camera.remove(this.viewmodel);
+      disposeViewmodel(this.viewmodel);
+    }
+    const g = buildRifleViewmodel(rifle || null, scope || null);
+    g.scale.setScalar(0.88);
+    // NOTE: keep the rest pose here — update() only ADDS to it. Writing
+    // position.y absolutely (as the breath bob used to) throws the rifle back
+    // up to eye level and it stops reading as shouldered.
+    this.vmBase = new T.Vector3(0.158, -0.238, -0.50);
+    g.position.copy(this.vmBase);
+    g.rotation.set(0.02, 0.05, 0.03);
+    this.vmRestRot = g.rotation.clone();
     this.viewmodel = g;
+    this.vmKick = 0;
     this.camera.add(g);
+    if (this.scoped) g.visible = false;
   }
 
   setLoadout(rifle, scope, ammo, gear) {
@@ -78,6 +78,11 @@ export class ScopeRig {
     };
     this.zoomFrac = 0;
     this.breath = BREATH.max * this.loadout.breathMul;
+    const id = rifle && rifle.id, sid = scope && scope.id;
+    if (id !== this._vmRifleId || sid !== this._vmScopeId) {
+      this._vmRifleId = id; this._vmScopeId = sid;
+      this._buildViewmodel(rifle, scope);
+    }
   }
 
   setVantage(pos, yaw) {
@@ -133,6 +138,8 @@ export class ScopeRig {
     const k = SWAY.fireKick * (0.75 + r.sway * 0.5);
     this.recoilP += k * (0.8 + Math.random() * 0.4);
     this.recoilY += (Math.random() - 0.5) * k * 0.7;
+    // the rifle itself jumps, not just the view — heavier guns jump harder
+    this.vmKick = 0.075 * (0.7 + (r.sway || 1) * 0.45);
   }
 
   swayAmp() {
@@ -194,11 +201,21 @@ export class ScopeRig {
       Math.PI + this.yaw + this.swayY + this.recoilY,
       Math.sin(t * 0.5) * 0.002
     );
-    // viewmodel micro-lag
-    if (this.viewmodel.visible) {
-      this.viewmodel.rotation.y = -this.swayY * 6;
-      this.viewmodel.rotation.x = -this.swayP * 6;
-      this.viewmodel.position.y = Math.sin(t * SWAY.breathHz * 6.28) * 0.004;
+    // viewmodel: micro-lag behind the sway, breath bob, and a recoil kick that
+    // shoves the rifle back and up then settles. All RELATIVE to the rest pose.
+    if (this.viewmodel && this.viewmodel.visible) {
+      this.vmKick += (0 - this.vmKick) * Math.min(1, dt * 9);
+      const vm = this.viewmodel;
+      vm.rotation.set(
+        this.vmRestRot.x - this.swayP * 6 + this.vmKick * 1.15,
+        this.vmRestRot.y - this.swayY * 6,
+        this.vmRestRot.z + this.vmKick * 0.5
+      );
+      vm.position.set(
+        this.vmBase.x + this.swayY * 1.6,
+        this.vmBase.y + Math.sin(t * SWAY.breathHz * 6.28) * 0.005 - this.vmKick * 0.18,
+        this.vmBase.z + this.vmKick * 0.42
+      );
     }
 
     if (this.scoped) this.drawOverlay();

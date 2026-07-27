@@ -156,6 +156,31 @@ unreachable while the other kills him. Locked by node tests.
   marks, three escapes and you're out.
 - **The Range**: free practice, three steel plates, no stakes.
 
+## The rifle in your hands (`js/viewmodel.js`)
+
+One procedural builder covers **all seven guns in the armory**, so buying up the
+catalogue visibly changes the thing you are holding — the R700's walnut gives
+way to a chassis stock, the barrel grows and gets fluted, brakes and bipods
+appear, the DMR-8 swaps its bolt for a charging handle and a long box mag, the
+Whisper wears an integral can, the AMR is a bigger gun all over, and the
+Meridian is a rail gun with coils that glow. The **scope** tier drives the tube,
+bell and glass too, and the OWL gets a lit electronics box.
+
+- **Local frame, non-negotiable: `-Z` = muzzle, `+X` = right, `+Y` = up.** The
+  origin is at the grip/magwell so the butt never pokes behind the eye. There is
+  a `group.userData.muzzle` Object3D at the crown — hang muzzle flash and smoke
+  off *that*, not off a hardcoded point in camera space, or it drifts off the
+  barrel the moment somebody buys a longer gun.
+- Parts are collected per material and **merged once** at build time: ~9 draw
+  calls for ~150 primitives. Rebuilt only when the rifle or scope id changes
+  (`ScopeRig.setLoadout`).
+- ⚠️ `ScopeRig.update()` must only ever **add** to `vmBase`/`vmRestRot`. Writing
+  `viewmodel.position.y` absolutely (the old breath bob did) throws the rifle
+  back up to eye level and it stops reading as shouldered.
+- ⚠️ Lens discs are `CircleGeometry`, not cylinder caps — a capped cylinder's
+  radial triangles shade into a visible pinwheel under a directional light. The
+  ocular is nearly black on purpose; a bright disc there dominates the frame.
+
 ## Art
 
 All humans are the rigged PolyPerfect "Animated People" (28 of them: suits,
@@ -204,7 +229,7 @@ thud, bolt, glass, ricochet, wind/city ambience, heartbeat, bullet whoosh, two
 music beds) · `js/charrig.js` rigged people · `js/city.js` **the generator + the
 corridor** · `js/people.js` population, routines, panic, death falls, analytic
 colliders · `js/ballistics.js` **pure sim + solver + tables** · `js/scope.js` the
-two views · `js/walk.js` **walking the perch** · `js/controls.js` input (drag-look,
+two views · `js/viewmodel.js` **the per-rifle viewmodel** · `js/walk.js` **walking the perch** · `js/controls.js` input (drag-look,
 the 👣 stick, keys) · `js/bulletcam.js` follow-bullet · `js/fx.js`
 particles/tracers/glint · `js/missions.js` the engine · `js/story.js` 21 missions
 · `js/events.js` daily/weekly/endless · `js/shop.js` armory · `js/ui.js` screens

@@ -79,14 +79,51 @@ export class FX {
     this.live.push({ kind: 'fade', obj: line, life: 0.6, age: 0 });
   }
 
-  muzzleFlash(camera) {
-    const s = new T.Sprite(new T.SpriteMaterial({
-      map: this.glintTex, color: 0xffd9a0, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+  // Hung off the rifle's actual muzzle anchor (js/viewmodel.js) rather than a
+  // hardcoded point in camera space, so it stays on the crown when the barrel
+  // length changes between rifles. A suppressed gun barely shows.
+  muzzleFlash(camera, anchor, { suppressed = false, heavy = false } = {}) {
+    const at = new T.Vector3(0.30, -0.22, -1.5);
+    if (anchor) {
+      anchor.updateWorldMatrix(true, false);
+      at.setFromMatrixPosition(anchor.matrixWorld);
+      camera.worldToLocal(at);
+    }
+    const big = (suppressed ? 0.34 : 1) * (heavy ? 1.45 : 1);
+
+    const core = new T.Sprite(new T.SpriteMaterial({
+      map: this.glintTex, color: suppressed ? 0xffc890 : 0xfff0c8,
+      transparent: true, depthWrite: false, blending: T.AdditiveBlending,
     }));
-    s.scale.setScalar(0.5);
-    s.position.set(0.32, -0.22, -1.6);
-    camera.add(s);
-    this.live.push({ kind: 'fade', obj: s, life: 0.08, age: 0, parent: camera });
+    core.scale.setScalar(0.34 * big);
+    core.position.copy(at);
+    camera.add(core);
+    this.live.push({ kind: 'fade', obj: core, life: 0.05, age: 0, parent: camera });
+
+    if (!suppressed) {
+      // a wider, dimmer bloom behind the core so the flash reads as light
+      const halo = new T.Sprite(new T.SpriteMaterial({
+        map: this.glintTex, color: 0xff9a3c, opacity: 0.75,
+        transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+      }));
+      halo.scale.setScalar(0.9 * big);
+      halo.position.copy(at);
+      camera.add(halo);
+      this.live.push({ kind: 'fade', obj: halo, life: 0.09, age: 0, parent: camera });
+    }
+
+    // smoke off the crown — lingers, drifts forward, and grows
+    const puff = new T.Sprite(new T.SpriteMaterial({
+      map: this.puffTex, color: 0x8d8b85, opacity: suppressed ? 0.5 : 0.34,
+      transparent: true, depthWrite: false,
+    }));
+    puff.scale.setScalar(0.16 * big);
+    puff.position.copy(at);
+    camera.add(puff);
+    this.live.push({
+      kind: 'smoke', obj: puff, life: suppressed ? 0.9 : 0.55, age: 0, parent: camera,
+      grow: 1.7 * big, drift: new T.Vector3(0, 0.10, -0.24),
+    });
   }
 
   glint(pos) {
@@ -135,6 +172,17 @@ export class FX {
         if (e.age >= e.life) {
           (e.parent || this.scene).remove(e.obj);
           e.obj.geometry && e.obj.geometry.dispose();
+          m && m.dispose();
+          this.live.splice(i, 1);
+        }
+      } else if (e.kind === 'smoke') {
+        const k = Math.max(0, 1 - e.age / e.life);
+        const m = e.obj.material;
+        if (m) m.opacity = (m.userData.o0 ?? (m.userData.o0 = m.opacity)) * k * k;
+        e.obj.scale.setScalar(e.obj.scale.x + e.grow * dt);
+        e.obj.position.addScaledVector(e.drift, dt);
+        if (e.age >= e.life) {
+          (e.parent || this.scene).remove(e.obj);
           m && m.dispose();
           this.live.splice(i, 1);
         }

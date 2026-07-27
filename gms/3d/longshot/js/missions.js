@@ -504,7 +504,8 @@ export class MissionRun {
     save.stats.shots++;
     this.chamberT = this.rifle.chamber;
     audio.shot(this.suppressed);
-    fx.muzzleFlash(rig.camera);
+    fx.muzzleFlash(rig.camera, rig.viewmodel && rig.viewmodel.userData.muzzle,
+      { suppressed: this.suppressed, heavy: !!this.rifle.heavy });
     rig.fire();
 
     const ray = rig.aimRay();
