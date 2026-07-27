@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Grumpy Bugs — art gallery</title>
+<style>
+  html,body{margin:0;height:100%;background:#11161d;font:13px/1.3 ui-monospace,Menlo,monospace;color:#cdd6e2;overflow:hidden}
+  #c{position:fixed;inset:0}
+  #tags{position:fixed;inset:0;pointer-events:none}
+  .tag{position:absolute;transform:translate(-50%,0);color:#fff;text-shadow:0 1px 3px #000;font-weight:700;letter-spacing:.5px}
+  #bar{position:fixed;left:10px;top:10px;z-index:5;display:flex;gap:6px}
+  #bar button{background:#1e2733;color:#cdd6e2;border:1px solid #37455a;border-radius:6px;padding:5px 10px;cursor:pointer;font:inherit}
+  #bar button.on{background:#3a6ea8;color:#fff}
+</style>
+</head>
+<body>
+<div id="c"></div>
+<div id="tags"></div>
+<div id="bar">
+  <button data-set="weapons" class="on">weapons</button>
+  <button data-set="bugs">bugs</button>
+  <button data-set="hats">hats</button>
+  <button data-set="fx">fx</button>
+</div>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module">
+// Dev-only prop viewer. Lays the procedural art out on a turntable under the
+// same lighting rig the arena uses, so weapon/bug silhouettes can be judged
+// without playing a whole turn. ?set=weapons|bugs|hats|fx  ?spin=0  ?y=<yaw>
+import * as THREE from 'three';
+import * as W from '../js/weapons.js';
+import * as B from '../js/bugs.js';
+import { FX } from '../js/fx.js';
+import { applyRenderProfile, lightRig } from '../js/render.js';
+import { FACTIONS, THEMES } from '../js/config.js';
+
+const T = THREE;
+const q = new URLSearchParams(location.search);
+const renderer = new T.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setSize(innerWidth, innerHeight);
+applyRenderProfile(renderer, { lite: false });
+document.getElementById('c').appendChild(renderer.domElement);
+
+const scene = new T.Scene();
+scene.background = new T.Color(0x2a3340);
+const camera = new T.PerspectiveCamera(38, innerWidth / innerHeight, 0.05, 200);
+
+const theme = THEMES[0];
+const rig = lightRig(theme, { lite: false });
+scene.add(...rig.lights);
+
+// a matte floor so shadows land somewhere
+const floor = new T.Mesh(new T.PlaneGeometry(60, 60),
+  new T.MeshStandardMaterial({ color: 0x39434f, roughness: 1 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+scene.add(floor);
+
+const stage = new T.Group(); scene.add(stage);
+const tagEls = [];
+const items = [];   // {obj, label, y}
+
+function clearStage() {
+  for (const el of tagEls) el.remove();
+  tagEls.length = 0; items.length = 0;
+  while (stage.children.length) stage.remove(stage.children[0]);
+}
+
+// Every prop is normalised into a cell of the same size, so a berry and THE
+// SHOE can be judged side by side without one of them being a speck.
+function place(list, { cell = 1.6, cols = 0, standing = false } = {}) {
+  const only = q.get('only');
+  if (only) { list = list.filter(x => x.label.toLowerCase() === only.toLowerCase()); cols = 1; }
+  const n = list.length;
+  const C = cols || Math.min(n, 5);
+  const rows = Math.ceil(n / C);
+  const box = new T.Box3(), size = new T.Vector3(), mid = new T.Vector3();
+  list.forEach(({ obj, label }, i) => {
+    const cx = (i % C) - (C - 1) / 2, cz = Math.floor(i / C) - (rows - 1) / 2;
+    box.setFromObject(obj); box.getSize(size); box.getCenter(mid);
+    const k = (cell * 0.78) / Math.max(size.x, size.y, size.z, 0.001);
+    obj.scale.multiplyScalar(k);
+    obj.position.sub(mid.multiplyScalar(k));
+    if (standing) obj.position.y += (size.y * k) / 2;
+    const holder = new T.Group();
+    holder.position.set(cx * cell, standing ? 0 : cell * 0.55, cz * cell * 1.15);
+    holder.add(obj);
+    stage.add(holder);
+    const el = document.createElement('div');
+    el.className = 'tag'; el.textContent = label;
+    document.getElementById('tags').appendChild(el);
+    tagEls.push(el);
+    items.push({ holder, obj, el, label, cell });
+  });
+  const spanX = C * cell, spanZ = rows * cell * 1.15;
+  camera.position.set(0, Math.max(spanX, spanZ) * 0.62 + 0.7, Math.max(spanX, spanZ) * 1.02 + 1.4);
+  camera.userData.look = standing ? cell * 0.35 : cell * 0.55;
+}
+
+let fx = null, fxTimer = 0;
+
+const SETS = {
+  weapons() {
+    place([
+      ...['bazooka', 'grenade', 'cluster', 'dungball', 'loogie'].map(id => ({ obj: W.makeProjectile(id), label: id })),
+      { obj: W.makeBeeBomb(), label: 'beebomb' },
+      { obj: W.makeShoe(), label: 'THE SHOE' },
+      { obj: W.makeBomber(), label: 'bee-52' },
+      { obj: W.makeReticle(), label: 'reticle' },
+      { obj: W.makeFuseGlow(), label: 'fuse' },
+    ], { cell: 1.6, cols: 5 });
+  },
+  bugs() {
+    place(FACTIONS.map(f => ({
+      obj: B.buildBugMesh(f.species, f.color, f.accent, { outfit: f.outfit, hat: 'none', big: 1 }).root,
+      label: f.species,
+    })), { cell: 1.8, cols: 5, standing: true });
+  },
+  hats() {
+    place(['cone', 'party', 'chef', 'cowboy', 'viking', 'crown', 'halo'].map(id => ({
+      obj: B.makeHat(id), label: id,
+    })), { cell: 1.1, cols: 4 });
+  },
+  fx() {
+    fx = new FX(scene, camera, renderer.domElement);
+    camera.position.set(0, 3.2, 9);
+  },
+};
+
+let set = q.get('set') || 'weapons';
+function build() {
+  clearStage();
+  if (fx) { fx.clear(); fx = null; }
+  SETS[set]();
+  for (const b of document.querySelectorAll('#bar button')) b.classList.toggle('on', b.dataset.set === set);
+}
+for (const b of document.querySelectorAll('#bar button'))
+  b.onclick = () => { set = b.dataset.set; build(); };
+build();
+
+const spin = q.get('spin') !== '0';
+let yaw = Number(q.get('y') || 0);
+const clock = new T.Clock();
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  if (spin) yaw += dt * 0.5;
+  for (const it of items) it.obj.rotation.y = yaw;
+  if (window.__animate) window.__animate(t, dt);
+  if (fx) {
+    fxTimer -= dt;
+    if (fxTimer <= 0) {
+      fxTimer = 1.6;
+      fx.explosion({ x: -3, y: 1.4, z: 0 }, 1.8, theme.terra);
+      fx.splash({ x: 3, y: 0.6, z: 0 }, 0xa8202f);
+      fx.poof({ x: 0, y: 1.2, z: 2 });
+    }
+    fx.update(dt);
+  }
+  camera.lookAt(0, camera.userData.look ?? 0.8, 0);
+  renderer.render(scene, camera);
+  // project labels
+  for (const it of items) {
+    const p = new T.Vector3(); it.holder.getWorldPosition(p); p.y -= it.cell * 0.45;
+    p.project(camera);
+    it.el.style.left = `${(p.x * 0.5 + 0.5) * innerWidth}px`;
+    it.el.style.top = `${(-p.y * 0.5 + 0.5) * innerHeight}px`;
+    it.el.style.opacity = p.z > 1 ? 0 : 1;
+  }
+}
+frame();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+window.__gallery = { scene, camera, renderer, stage, items, setSet: (s) => { set = s; build(); } };
+window.__ready = true;
+</script>
+</body>
+</html>
