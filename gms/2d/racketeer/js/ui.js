@@ -7,6 +7,7 @@ import { haptic, setHaptics, hapticsOn, supportsHaptics } from "./haptics.js";
 import { canUseSkill, useSkill, scoreLine } from "./match.js";
 import { CHAPTERS, INTRO, FINALE, storyLevel, CUTSCENES } from "./story.js";
 import { TOURNAMENTS, todayStr, dailyMatch, cupLocked } from "./modes.js";
+import { MATCH_LENS, mlenInfo } from "./const.js";
 
 const $ = (id) => document.getElementById(id);
 let App = null;   // set by main.js
@@ -106,7 +107,7 @@ function showSettings() {
     [
       { label: `Speed units: ${units === "kph" ? "km/h → switch to mph" : "mph → switch to km/h"}`, cls: "ghost",
         fn: () => { save.settings.units = units === "kph" ? "mph" : "kph"; career.persist(save); showSettings(); } },
-      { label: `Default match length: ${(MATCH_LENS.find(l => l.id === (save.settings.matchLen || "1g")) || MATCH_LENS[0]).name}`, cls: "ghost",
+      { label: `Default match length: ${mlenInfo(save.settings.matchLen).name}<span class="btn-sub">Purse ×${mlenInfo(save.settings.matchLen).bonus}</span>`, cls: "ghost",
         fn: () => {
           const ids = MATCH_LENS.map(l => l.id);
           const cur = save.settings.matchLen || "1g";
@@ -139,7 +140,8 @@ function showHelp() {
   modal(`<h2>How to play</h2>
     <p style="text-align:left">🎾 <b>You run automatically.</b> When the ball comes, <b>SWIPE</b> — the ring closing on the ball is your timing (green = perfect).</p>
     <p style="text-align:left">👉 Swipe <b>direction</b> aims. Swipe <b>long</b> for deep &amp; hard, short for a drop shot. <b>Bend your swipe</b> to curve the ball 🍌. A simple <b>tap</b> plays a safe return.</p>
-    <p style="text-align:left">🚀 <b>Serve:</b> tap to toss, then swipe as the ball peaks.</p>
+    <p style="text-align:left">🚀 <b>Serve:</b> tap to toss, then swipe as the ball peaks. It must land in the <b>glowing box</b> — always the one diagonally across from where you're standing.</p>
+    <p style="text-align:left">🕸️ Clip the tape mid-rally and the ball carries on: <b>play on</b>. On a serve it's a let — take it again.</p>
     <p style="text-align:left">🃏 <b>Skills</b> are one tap: some arm your next shot (💥📢🤸), some fire instantly between points. They come back after a cooldown. Passives always work.</p>
     <p style="text-align:left">🗯️ Getting heckled rattles your composure — your timing ring starts <i>lying to you</i>. Stay calm. Or smash a racket.</p>
     <p style="text-align:left">🔥 <b>Hype</b> multiplies every dollar. Show off constantly.</p>`,
@@ -147,17 +149,21 @@ function showHelp() {
 }
 
 /* ---------------- Match length picker ---------------- */
-export const MATCH_LENS = [
-  { id: "1g",    name: "1 GAME",     sub: "Quick — a single game, you serve" },
-  { id: "2g",    name: "2 GAMES",    sub: "First to 2 — one serve each" },
-  { id: "set",   name: "1 SET",      sub: "First to 6 games" },
-  { id: "match", name: "FULL MATCH", sub: "Best of 3 sets — the real deal" },
-];
+// Every mode but the cups silently uses your saved default length, so the prizes on
+// the mode screens are shown at the multiplier you'll actually be paid.
+function purse(base) { return Math.round(base * mlenInfo(App.save.settings?.matchLen).bonus); }
+function lenNote() {
+  const l = mlenInfo(App.save.settings?.matchLen);
+  return l.bonus > 1 ? ` <span style="color:#7ee6a1">(${l.name} +${Math.round((l.bonus - 1) * 100)}%)</span>` : "";
+}
+export function bonusTag(l) {
+  return l.bonus > 1 ? ` · <b style="color:#7ee6a1">+${Math.round((l.bonus - 1) * 100)}% purse</b>` : "";
+}
 export function showMatchLen(onPick, onCancel) {
   const save = App.save;
   const cur = save.settings?.matchLen || "1g";
   const opts = MATCH_LENS.map(l => ({
-    label: `${l.id === cur ? "▶ " : ""}${l.name} <span class="btn-sub">${l.sub}</span>`,
+    label: `${l.id === cur ? "▶ " : ""}${l.name} <span class="btn-sub">${l.sub}${bonusTag(l)}</span>`,
     cls: l.id === cur ? "" : "ghost",
     fn: () => {
       if (!save.settings) save.settings = {};
@@ -167,7 +173,9 @@ export function showMatchLen(onPick, onCancel) {
     },
   }));
   opts.push({ label: "← Cancel", cls: "ghost", fn: () => onCancel && onCancel() });
-  modal(`<h2>🎾 Match length</h2><p class="sub">How long do you want this one to be?</p>`, opts);
+  modal(`<h2>🎾 Match length</h2>
+    <p class="sub">How long do you want this one to be? The more tennis you sign up for,
+    the bigger the winner's purse.</p>`, opts);
 }
 
 /* ---------------- In-match skill swap ---------------- */
@@ -325,7 +333,7 @@ export function buildStory() {
   // The story beat + opponent
   const beat = el("div", "card story-card");
   beat.innerHTML = `<div class="story-line">${lvl.isBoss ? "⚔️ " : ""}${esc(lvl.line)}</div>
-    <div class="sub" style="margin-top:8px">📍 ${esc(lvl.venue)} · Prize ${fmtMoney(lvl.prize)}</div>`;
+    <div class="sub" style="margin-top:8px">📍 ${esc(lvl.venue)} · Prize ${fmtMoney(purse(lvl.prize))}${lenNote()}</div>`;
   s.appendChild(beat);
 
   const { opp } = App.peekStory();
@@ -360,7 +368,7 @@ export function buildRanked() {
 
   const tc = el("div", "card");
   tc.innerHTML = `<h3>${esc(tier.name)} ${tier.boss ? "🤖" : ""}</h3>
-    <div class="sub">📍 ${esc(tier.venue)} · Match ${Math.min(save.tierMatch + 1, tier.matches)} of ${tier.matches} · Prize ${fmtMoney(tier.prize)}</div>
+    <div class="sub">📍 ${esc(tier.venue)} · Match ${Math.min(save.tierMatch + 1, tier.matches)} of ${tier.matches} · Prize ${fmtMoney(purse(tier.prize))}${lenNote()}</div>
     <div class="sub" style="margin-top:6px;font-style:italic">${esc(tier.flavour)}</div>`;
   s.appendChild(tc);
 
@@ -392,7 +400,7 @@ export function buildTourn() {
     const card = el("div", "card" + (locked ? " cup-locked" : ""));
     card.innerHTML = `<h3>${t.emo} ${esc(t.name)} ${won ? `<span class="stars">×${won} 🏆</span>` : ""}</h3>
       <div class="sub">${esc(t.desc)}</div>
-      <div class="sub" style="margin-top:6px">${t.size}-player draw · Entry ${fmtMoney(t.entry)} · Winner's pot ${fmtMoney(t.prize)}</div>`;
+      <div class="sub" style="margin-top:6px">${t.size}-player draw · Entry ${fmtMoney(t.entry)} · Winner's pot ${fmtMoney(t.prize)} <span style="opacity:.7">(× your match length)</span></div>`;
     const enter = el("button", "btn",
       locked ? `🔒 Reach story level ${locked}`
         : save.money >= t.entry ? `ENTER — ${fmtMoney(t.entry)}` : `Need ${fmtMoney(t.entry)}`);
@@ -427,15 +435,37 @@ export function renderBracket(ts) {
           `<span class="brk-nm">${esc(nameOf(idx))}</span>` +
           `<span class="brk-sc">${done ? score : ""}</span></div>`;
       };
-      const live = !done && (m.a === ts.youIdx || m.b === ts.youIdx);
-      return `<div class="brk-m${live ? " live" : ""}">${row(m.a, m.sa)}${row(m.b, m.sb)}</div>`;
+      const yours = m.a === ts.youIdx || m.b === ts.youIdx;
+      const live = !done && yours;
+      return `<div class="brk-m${live ? " live" : ""}${yours ? " mine" : ""}">` +
+        `${row(m.a, m.sa)}${row(m.b, m.sb)}</div>`;
     }).join("");
     return `<div class="brk-col"><div class="brk-hd">${rd.key}</div><div class="brk-ms">${ms}</div></div>`;
   }).join("");
   const champ = ts.championIdx !== null && ts.championIdx !== undefined
     ? `<div class="brk-champ">🏆 Champion: <b>${esc(nameOf(ts.championIdx))}</b></div>` : "";
   const h = Math.max(180, ts.rounds[0].matches.length * 46);
+  focusBracket();
   return `<div class="brk-wrap"><div class="brk-tree" style="height:${h}px">${cols}</div></div>${champ}`;
+}
+
+// A 32-draw is both taller and wider than the panel, so centre YOUR tie in it: the one
+// you're about to play, or — once you're out — the last one you were in. Runs on the
+// next frame because the modal HTML this is embedded in hasn't been laid out yet.
+export function focusBracket() {
+  requestAnimationFrame(() => {
+    const wrap = document.querySelector(".brk-wrap");
+    if (!wrap) return;
+    const mine = wrap.querySelectorAll(".brk-m.mine");
+    const tgt = wrap.querySelector(".brk-m.live") || mine[mine.length - 1];
+    if (!tgt) return;
+    // Offsets, not bounding rects: the modal is mid-pop-animation, so everything on
+    // screen is still scaled and measuring it in page pixels lands you nowhere near.
+    let top = 0, left = 0;
+    for (let n = tgt; n && n !== wrap; n = n.offsetParent) { top += n.offsetTop; left += n.offsetLeft; }
+    wrap.scrollTop = top - (wrap.clientHeight - tgt.offsetHeight) / 2;
+    wrap.scrollLeft = left - (wrap.clientWidth - tgt.offsetWidth) / 2;
+  });
 }
 
 export function showTournBracket(ts, onPlay) {
@@ -447,13 +477,6 @@ export function showTournBracket(ts, onPlay) {
     ${renderBracket(ts)}`,
     [{ label: last ? "PLAY THE FINAL 🏆" : `Play ${esc(rd.name)} 🎾`, fn: onPlay },
      { label: "Forfeit cup", cls: "ghost", fn: () => { buildTourn(); showScreen("tourn"); } }]);
-  // A 32-draw is taller than the panel — scroll your own match into view.
-  const live = document.querySelector(".brk-m.live");
-  const wrap = document.querySelector(".brk-wrap");
-  if (live && wrap) {
-    const lr = live.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
-    wrap.scrollTop += (lr.top - wr.top) - (wr.height / 2 - lr.height / 2);
-  }
 }
 
 /* ---------------- Daily + Quick ---------------- */
@@ -463,7 +486,7 @@ function confirmDaily() {
   const done = save.dailyWin === todayStr();
   modal(`<h2>📅 Daily Challenge</h2><div class="big-emoji">${d.mod.emo}</div>
     <p><b>${esc(d.mod.name)}</b></p><p>${esc(d.mod.desc)}</p>
-    <p class="money-pop">${done ? "Already beaten today — replay for fun (small purse)." : "Win today: " + fmtMoney(d.cfg.prize)}</p>`,
+    <p class="money-pop">${done ? "Already beaten today — replay for fun (small purse)." : "Win today: " + fmtMoney(purse(d.cfg.prize)) + lenNote()}</p>`,
     [{ label: "PLAY IT", fn: () => App.playDaily() },
      { label: "Tomorrow", cls: "ghost" }]);
 }
@@ -558,6 +581,7 @@ export function buildGear() {
   const s = $("scr-loadout");
   s.innerHTML = "";
   hdr(s, "Pro Shop", () => { buildShop(); showScreen("shop"); });
+  s.appendChild(el("div", "card", `<div class="sub">Every bit of it is worn on court — racket, shoes and all. Yes, including the chicken suit.</div>`));
 
   const kinds = [
     ["racket", "Rackets", "Power & control"],

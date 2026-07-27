@@ -57,6 +57,17 @@ export const PTS = ["0", "15", "30", "40"];
 
 export const SAVE_KEY = "racketeer_save_v1";
 
+// Commit to more tennis, take home more money. The winner's purse is multiplied by
+// the length you agreed to play — a full match pays three and a half times a one-gamer.
+export const MATCH_LENS = [
+  { id: "1g",    name: "1 GAME",     bonus: 1,    sub: "Quick — a single game, you serve" },
+  { id: "2g",    name: "2 GAMES",    bonus: 1.5,  sub: "First to 2 — one serve each" },
+  { id: "set",   name: "1 SET",      bonus: 2.25, sub: "First to 6 games" },
+  { id: "match", name: "FULL MATCH", bonus: 3.5,  sub: "Best of 3 sets — the real deal" },
+];
+export function mlenInfo(id) { return MATCH_LENS.find(l => l.id === id) || MATCH_LENS[0]; }
+export function mlenBonus(id) { return mlenInfo(id).bonus; }
+
 export const TIERS = [
   { id: 0, name: "Car Park Open",        venue: "Tesco Overflow Car Park", matches: 3,
     rankStart: null, rankEnd: 1000000, prize: 40,  games: 1, oppStars: [0.5, 1.2],

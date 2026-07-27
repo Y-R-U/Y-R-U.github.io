@@ -1,10 +1,10 @@
 // The match engine: state machine + rules + skills + events. One instance per match.
 // `tier` is a config object: { id, name, games, oppSkills, crowd, prize, boss?, eventChance?, modifier? }
-import { COURT, SWING, SHOT_T, PTS, BALL_R, PLAYER, METERS } from "./const.js";
+import { COURT, SWING, SHOT_T, PTS, BALL_R, PLAYER, METERS, mlenInfo } from "./const.js";
 import { clamp, lerp, rand, pick, pickBag, fmtSpeed } from "./util.js";
-import { makeBall, stepBall, predictAtDepth, aimVelocity, netClearance, drawBall } from "./ball.js";
+import { makeBall, stepBall, predictAtDepth, aimVelocity, drawBall } from "./ball.js";
 import { makePlayer, setState, updatePlayer, drawPlayer } from "./player.js";
-import { drawScene, drawNet, setCrowd, project, view, pokeUmpire } from "./court.js";
+import { drawScene, drawNet, setCrowd, project, view, pokeUmpire, drawServeTarget } from "./court.js";
 import * as FX from "./fx.js";
 import { sfx, setCrowdLevel } from "./audio.js";
 import { skillFx, skillCd, SKILLS } from "./skills.js";
@@ -21,7 +21,8 @@ export function makeMatch(save, opp, tier, gear, hooks) {
   const m = {
     save, opp, tier, gear, hooks,
     time: 0, timeScale: 1, state: "preServe", stateT: 0,
-    you: makePlayer({ col: "#ffd23e", col2: "#1d3557", skin: "#f2c79c" }),
+    you: makePlayer({ col: "#ffd23e", col2: "#1d3557", skin: "#f2c79c",
+      outfit: save.outfit, racket: save.racket, shoes: save.shoes }),   // wear what you bought
     oppP: makePlayer({ far: true, boss: opp.boss, col: opp.boss ? "#3d4450" : pick(["#e63946", "#9b5de5", "#00b4d8", "#f77f00", "#43aa8b"]), col2: "#333", skin: pick(["#f2c79c", "#d9a066", "#a56a3a", "#ffdbac"]) }),
     ball: makeBall(),
     server: "you", serveNum: 1, serveSide: 1,
@@ -113,10 +114,15 @@ export function scoreLine(m) {
 }
 
 /* ---------------- state transitions ---------------- */
+// The service box a serve must find: always diagonally opposite the server.
+// Server stands at x = ±serveSide·2, so the target is the far side of the centre line.
+function serveBoxSide(m, byYou) { return (byYou ? -1 : 1) * m.serveSide; }
+
 function beginPreServe(m, first) {
   m.state = "preServe"; m.stateT = 0;
   m.ball.live = false; m.ball.trail.length = 0; m.ball.curve = 0; m.ball.wind = 0;
   m.contact = null; m.ballTo = null; m.pendingQuality = null; m.pendingCurve = 0;
+  refundArmed(m);                                          // armed but never swung = give it back
   m.armedPower = false; m.armedOutrageous = false; m.armedGrunt = false; m.canArgue = false;
   m.hooks.onArgue && m.hooks.onArgue(m);                   // window closed — pull the prompt
   m.tossed = false; m.underarmServe = false; m.gest = null;
@@ -124,8 +130,10 @@ function beginPreServe(m, first) {
   m.oppStam = clamp(m.oppStam + METERS.STAM_POINT_REST, 0, 100);
   m.serveSide = ((m.ptsYou + m.ptsOpp) % 2 === 0) ? 1 : -1;
   const sx = m.serveSide * 2.0;
-  m.you.tx = m.server === "you" ? sx : 0;
-  m.oppP.tx = m.server === "opp" ? -sx : 0;
+  // Both players line up on the diagonal: server behind their half of the baseline,
+  // receiver across from them, in front of the box the serve has to land in.
+  m.you.tx = sx;
+  m.oppP.tx = -sx;
   m.ball.x = m.server === "you" ? sx : -sx;
   m.ball.y = m.server === "you" ? YOU_Y - 0.2 : OPP_Y + 0.2;
   m.ball.z = 1.0;
@@ -136,15 +144,35 @@ function beginPreServe(m, first) {
   }
   m.hooks.onSkillDock && m.hooks.onSkillDock(m);
   pushHud(m);
-  if (m.server === "you") ticker(m, m.serveNum === 2 ? "Second serve — tap to toss, then SWIPE!" : "Your serve — tap to toss, then SWIPE to hit!", 3);
+  if (m.server === "you") ticker(m, m.serveNum === 2 ? "Second serve — into the glowing box!" : "Your serve — tap to toss, SWIPE into the glowing box!", 3);
   else ticker(m, `${m.opp.name.split(" ")[0]} to serve...`, 2);
 }
 
-// Dry-run the real physics for a proposed serve: does it die at the net,
-// and where does it actually land? (Analytic maths ignore air drag and lie.)
-function simServe(b, v) {
+// Skills you arm before a shot, and the flag that says they're still waiting.
+const ARMED_FLAGS = { power: "armedPower", grunt: "armedGrunt", outrageous: "armedOutrageous" };
+
+// Armed a skill and never got to play the shot — they netted it, hit it out, the point
+// died first? Then it was never used: hand the cooldown (and the charge) straight back.
+function refundArmed(m) {
+  const back = [];
+  for (const id of Object.keys(ARMED_FLAGS)) {
+    if (!m[ARMED_FLAGS[id]]) continue;
+    delete m.cooldowns[id];
+    const max = SKILLS[id].uses;
+    if (max) m.usesLeft[id] = Math.min(max, (m.usesLeft[id] || 0) + 1);
+    back.push(SKILLS[id].emo);
+  }
+  if (back.length) {
+    ticker(m, `${back.join("")} never played — ready again.`, 2);
+    m.hooks.onSkillDock && m.hooks.onSkillDock(m);
+  }
+}
+
+// Dry-run the real physics for a proposed shot: does it touch the net, and where does
+// it actually land? (Analytic maths ignore air drag and over-promise by up to a metre.)
+function simShot(b, v, curve) {
   const t = { x: b.x, y: b.y, z: b.z, vx: v.vx, vy: v.vy, vz: v.vz,
-    live: true, bounces: 0, curve: 0, wind: 0, spinT: 0, trail: [] };
+    live: true, bounces: 0, curve: curve || 0, wind: 0, spinT: 0, trail: [] };
   let net = false, land = null;
   for (let i = 0; i < 240 && !net && !land; i++) {
     stepBall(t, 1 / 60, (ev, d) => {
@@ -170,7 +198,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   // Intended landing: a perfect serve dips onto the service line; worse timing
   // drifts shorter or long past the box (fault).
   let land = netFlub ? rand(0.5, 2.5) : lerp(4.0, COURT.SVC - 0.15, quality) + rand(-err, err) * 0.8;
-  let tx = aimTx !== undefined ? aimTx : -m.serveSide * dir * rand(0.6, 3.2);
+  let tx = aimTx !== undefined ? aimTx : serveBoxSide(m, byYou) * rand(0.6, 3.2);
   let T = lerp(1.2, 0.78, quality) * (1 - serveBonus) * EV.eventShotSlow(m);
   if (netFlub) T = 0.62;                       // flat mishit -> dies at the tape
   if (m.serveNum === 2) { err *= 0.5; tx *= 0.7; T *= 1.12; }  // careful second serve
@@ -180,7 +208,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   // Walk the aim until the real-physics landing matches the intent (and clears the tape).
   if (!netFlub) {
     for (let i = 0; i < 6; i++) {
-      const s = simServe(b, v);
+      const s = simShot(b, v);
       if (s.net) T *= 1.1;
       else if (s.land) {
         const actual = (s.land.y - COURT.NET_Y) * dir;
@@ -259,12 +287,16 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
   let tx = aimX - 0.5 * curve * T * T + rand(-err, err) * 0.9;
   let ty = aimY + rand(-err, err) * 1.1 * dir;
   const netFlub = quality < 0.25 && Math.random() < 0.5;
-  const v = aimVelocity(b.x, b.y, Math.max(b.z, 0.3), tx, ty, T);
+  const z0 = Math.max(b.z, 0.3);
+  const v = aimVelocity(b.x, b.y, z0, tx, ty, T);
   if (!netFlub) {
+    // Loft until the shot really clears the tape. The old analytic estimate ignored
+    // drag, so trusting it left ordinary rally balls clipping the cord every point.
+    const from = { x: b.x, y: b.y, z: z0 };
     let tries = 0;
-    while (netClearance(b.x, b.y, Math.max(b.z, 0.3), v) < 0.06 && tries++ < 5) {
+    while (simShot(from, v, curve).net && tries++ < 5) {
       T *= 1.13;
-      const v2 = aimVelocity(b.x, b.y, Math.max(b.z, 0.3), tx, ty, T);
+      const v2 = aimVelocity(b.x, b.y, z0, tx, ty, T);
       v.vx = v2.vx; v.vy = v2.vy; v.vz = v2.vz;
     }
   }
@@ -360,7 +392,10 @@ function finishMatch(m, won) {
   m.over = true; m.won = won; m.state = "matchOver"; m.stateT = 0;
   if (won) haptic.matchWon(); else haptic.matchLost();
   if (won) {
-    m.earnings += Math.round(m.tier.prize * hypeMult(m));
+    // Longer formats pay a bigger purse — that's the deal you took at the length picker.
+    const len = mlenInfo(m.mlen);
+    m.earnings += Math.round(m.tier.prize * hypeMult(m) * len.bonus);
+    if (len.bonus > 1) ticker(m, `${len.name} bonus: +${Math.round((len.bonus - 1) * 100)}% purse!`, 4);
     sfx.fanfare(); setTimeout(() => { if (!m.silent) sfx.cheer(1.5); }, 300);
     FX.confetti(90);
     setState(m.you, "celebrate"); setState(m.oppP, "sad");
@@ -419,7 +454,12 @@ export function inputRelease(m) {
       : off <= 0.22 ? [dt > 0 ? "EARLY!" : "LATE!", "#ffe24a", 0.8]
       : [dt > 0 ? "WAY EARLY!" : "WAY LATE!", "#ff6b6b", 0.85];
     FX.floatText(m.you.x, m.you.y + 1.4, 2.2, fx[0], fx[1], fx[2]);
-    const tx = clamp(dx * 6, -1, 1) * (COURT.W / 2 - 0.55);
+    // The serve has to land in the box diagonally opposite you. A straight swipe finds
+    // the middle of it; swipe toward that sideline for the wide corner, or the other
+    // way to go down the T — far enough that way and you fault into the wrong box.
+    const box = serveBoxSide(m, true);
+    const lat = clamp(dx * 6, -1, 1) * box;             // +1 = toward the box's sideline
+    const tx = box * lerp(-0.9, COURT.W / 2 - 0.45, (lat + 1) / 2);
     serveNow(m, q, tx);
     return;
   }
@@ -742,12 +782,12 @@ export function updateMatch(m, rawDt) {
       m.ball.x = m.serveSide * 2.0; m.ball.y = YOU_Y - 0.1;
       m.ball.z = 1.0 + Math.sin(Math.min(k, 1.3) * Math.PI * 0.62) * 2.6;
       if (m.autoPilot && m.serveContactT - m.time < 0.06 && m.serveContactT - m.time > 0) {
-        serveNow(m, rand(0.6, 1), rand(-2.5, 2.5));
+        serveNow(m, rand(0.6, 1), serveBoxSide(m, true) * rand(0.6, 3.2));
       }
       if (m.time > m.serveContactT + SERVE_WINDOW) {
         // Fluffed the toss — weak auto serve keeps things moving
         ticker(m, "Awkward toss... a gentle pat over.");
-        serveNow(m, 0.22, rand(-1.5, 1.5));
+        serveNow(m, 0.22, serveBoxSide(m, true) * rand(0.6, 2.2));
       }
       break;
     }
@@ -826,19 +866,22 @@ function onBallEvent(m, ev, data) {
     if (b.bounces === 1) {
       const hitter = b.lastHitBy;
       const isServe = m.state === "rally" && m.stats.rally === 0;
-      // Bouncing on your own side of the net is always your error;
-      // a serve must also land inside the service box (net → service line).
+      // Bouncing on your own side of the net is always your error; a serve must also
+      // land inside the service box DIAGONALLY OPPOSITE the server — right box only.
       const ownSide = hitter === "you" ? data.y < COURT.NET_Y : data.y > COURT.NET_Y;
       const svcDepth = hitter === "you" ? data.y - COURT.NET_Y : COURT.NET_Y - data.y;
+      const box = serveBoxSide(m, hitter === "you");
+      const wrongBox = isServe && svcDepth > 0 && box * data.x < -BALL_R;
       const bad = isServe
-        ? (svcDepth <= 0 || svcDepth > COURT.SVC + BALL_R || Math.abs(data.x) > COURT.W / 2 + BALL_R)
+        ? (svcDepth <= 0 || svcDepth > COURT.SVC + BALL_R || Math.abs(data.x) > COURT.W / 2 + BALL_R || wrongBox)
         : (ownSide || !inCourt(data.x, data.y));
       if (bad) {
         FX.floatText(data.x, clamp(data.y, 1, COURT.L - 1), 0.4,
-          isServe && svcDepth > COURT.SVC ? "LONG!" : "OUT!", "#ff8a5c", 1);
+          wrongBox ? "WRONG BOX!" : isServe && svcDepth > COURT.SVC ? "LONG!" : "OUT!", "#ff8a5c", 1);
         if (hitter === "you") {
           if (m.state === "rally" && m.stats.rally === 0 && m.server === "you" && m.serveNum === 1) {
-            m.serveNum = 2; ticker(m, "FAULT! Second serve."); sfx.gasp();
+            m.serveNum = 2; sfx.gasp();
+            ticker(m, wrongBox ? "FAULT! Wrong box — serve across into the far one." : "FAULT! Second serve.");
             m.state = "preServe"; m.stateT = 0; m.ball.live = false; m.tossed = false; m.contact = null;
             return;
           }
@@ -882,10 +925,14 @@ function onBallEvent(m, ev, data) {
       m.ball.live = false; m.tossed = false; m.contact = null;
       return;
     }
-    FX.floatText(m.ball.x, COURT.NET_Y, 1.3, "net cord!", "#fff", 0.7);
+    // Mid-rally the ball touched the tape and still went over: PLAY ON.
+    FX.floatText(m.ball.x, COURT.NET_Y, 1.3, "NET CORD — PLAY ON!", "#ffe24a", 0.8);
+    sfx.netHit();
+    ticker(m, "Off the net and over — play on!", 1.6);
     scheduleContact(m);
   }
 }
+
 
 function resolveDeadBall(m) {
   const b = m.ball;
@@ -912,6 +959,10 @@ export function drawMatch(m, ctx) {
   ctx.save();
   if (FX.shake > 0) ctx.translate(rand(-FX.shake, FX.shake) * 0.5, rand(-FX.shake, FX.shake) * 0.5);
   drawScene(ctx, m.time, m.hype, m.hype > 80);
+  if (m.server === "you" && !m.over &&
+      (m.state === "preServe" || m.state === "serveWait" || m.state === "serving")) {
+    drawServeTarget(ctx, serveBoxSide(m, true), true, m.time);
+  }
   drawPlayer(ctx, m.oppP);
   drawNet(ctx);
   drawBall(ctx, m.ball);

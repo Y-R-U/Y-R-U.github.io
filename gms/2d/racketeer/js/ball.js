@@ -19,19 +19,21 @@ export function stepBall(b, dt, onEvent) {
   b.vx *= drag; b.vy *= drag;
   b.spinT += dt * 12;
 
-  // Net collision — crossing the net plane below tape height
+  // Net collision — crossing the net plane at or below tape height.
+  // Ball centre BELOW the tape = it never got over, dead. Centre above the tape but
+  // within a ball's radius of it = it clipped the cord and carried on: play on.
   const crossed = (prevY - COURT.NET_Y) * (b.y - COURT.NET_Y) < 0;
   if (crossed) {
     const t = (COURT.NET_Y - prevY) / (b.y - prevY);
     const zAt = b.z - b.vz * dt * (1 - t);
-    if (zAt < COURT.NET_H + BALL_R && Math.abs(b.x) < COURT.W / 2 + 1) {
+    if (zAt < COURT.NET_H && Math.abs(b.x) < COURT.W / 2 + 1) {
       onEvent && onEvent("net", { zAt });
       // Ball dies at the net: drop it on the hitter's side
       b.y = COURT.NET_Y + (prevY < COURT.NET_Y ? -0.25 : 0.25);
       b.vy = -b.vy * 0.08; b.vx *= 0.2; b.vz = Math.min(b.vz, 0);
-    } else if (zAt < COURT.NET_H + BALL_R + 0.12 && Math.abs(b.x) < COURT.W / 2 + 1) {
-      onEvent && onEvent("netcord", { zAt });   // clipped the tape
-      b.vy *= 0.55; b.vz = Math.max(b.vz * 0.4, 1.2);
+    } else if (zAt < COURT.NET_H + BALL_R && Math.abs(b.x) < COURT.W / 2 + 1) {
+      onEvent && onEvent("netcord", { zAt });   // clipped the tape and tumbled over
+      b.vy *= 0.62; b.vz = Math.max(b.vz * 0.4, 1.4);
     }
   }
 
@@ -96,14 +98,6 @@ export function aimVelocity(x, y, z, tx, ty, T) {
     vy: (ty - y) / T,
     vz: (BALL_R - z) / T - 0.5 * PHYS.G * T,
   };
-}
-
-// Net clearance for a proposed shot; returns metres above tape (negative = into net).
-export function netClearance(x, y, z, v) {
-  if ((COURT.NET_Y - y) * v.vy <= 0) return 99;
-  const t = (COURT.NET_Y - y) / v.vy;
-  const zAt = z + v.vz * t + 0.5 * PHYS.G * t * t;
-  return zAt - COURT.NET_H;
 }
 
 export function drawBall(ctx, b) {

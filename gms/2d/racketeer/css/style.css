@@ -272,7 +272,7 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 
 /* ---- Tournament bracket (a real draw: rounds as columns, scrolls sideways) ---- */
 .brk-wrap { overflow:auto; max-height:46vh; margin-top:10px; padding-bottom:4px;
-  -webkit-overflow-scrolling:touch; text-align:left; }
+  -webkit-overflow-scrolling:touch; text-align:left; position:relative; }
 .brk-tree { display:flex; gap:8px; align-items:stretch; min-width:min-content; }
 .brk-col { display:flex; flex-direction:column; flex:0 0 116px; width:116px; }
 .brk-hd { font-size:9px; letter-spacing:1.4px; font-weight:800; color:#ffd34a;
@@ -280,6 +280,7 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .brk-ms { flex:1; display:flex; flex-direction:column; justify-content:space-around; gap:4px; }
 .brk-m { border:1px solid rgba(255,255,255,.14); border-radius:8px; overflow:hidden;
   background:rgba(0,0,0,.25); }
+.brk-m.mine { border-color:rgba(255,211,74,.42); background:rgba(255,211,74,.06); }
 .brk-m.live { border-color:#ffd34a; box-shadow:0 0 10px rgba(255,211,74,.45); }
 .brk-p { display:flex; align-items:center; gap:5px; padding:3px 6px; font-size:11px;
   line-height:1.3; border-bottom:1px solid rgba(255,255,255,.08); }

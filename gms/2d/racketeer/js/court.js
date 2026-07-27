@@ -102,6 +102,26 @@ export function drawScene(ctx, t, hype, flash) {
   drawUmpire(ctx, t);
 }
 
+// Glowing target box for a serve. `side` is the x sign it must land in; `far` picks
+// the opponent's half. Without this the diagonal rule is invisible and feels unfair.
+export function drawServeTarget(ctx, side, far, t) {
+  const HW = COURT.W / 2;
+  const y0 = far ? COURT.NET_Y : COURT.NET_Y - COURT.SVC;
+  const y1 = far ? COURT.NET_Y + COURT.SVC : COURT.NET_Y;
+  const x0 = side < 0 ? -HW : 0, x1 = side < 0 ? 0 : HW;
+  const pulse = 0.5 + 0.5 * Math.sin(t * 3.4);
+  ctx.fillStyle = `rgba(255,226,74,${0.07 + pulse * 0.07})`;
+  quad(ctx, [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
+  ctx.strokeStyle = `rgba(255,226,74,${0.45 + pulse * 0.35})`;
+  ctx.lineWidth = Math.max(2, view.w / 230);
+  ctx.beginPath();
+  [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].forEach(([x, y], i) => {
+    const p = project(x, y, 0);
+    i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+  });
+  ctx.closePath(); ctx.stroke();
+}
+
 function drawCrowd(ctx, t, hype) {
   const excite = clamp(hype / 100, 0, 1);
   for (const c of crowd) {
