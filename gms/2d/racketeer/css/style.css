@@ -87,7 +87,10 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .btn.danger { background:linear-gradient(180deg,#ff8f6b,#ff4d4d); box-shadow:0 4px 0 #8c1f1f; color:#fff; }
 .btn:disabled { opacity:.45; }
 
-.hdr { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+/* padding-right keeps the cash figure at the end of this row out from under
+   the account avatar. */
+.hdr { display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  padding-right: var(--br8t-account-space, 0px); }
 .hdr .back { width:40px; height:40px; border-radius:12px; border:1px solid rgba(255,255,255,.2);
   background:rgba(255,255,255,.08); color:#fff; font-size:18px; flex:none; }
 .hdr h2 { font-size:22px; font-weight:900; flex:1; }
@@ -205,7 +208,10 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   background:rgba(0,0,0,.42); border:1px solid rgba(255,255,255,.16); color:#ffe24a;
   backdrop-filter:blur(3px); white-space:nowrap; max-width:42%; overflow:hidden; text-overflow:ellipsis; }
 .home-chip.left  { left:  calc(env(safe-area-inset-left, 0px) + 10px); }
-.home-chip.right { right: calc(env(safe-area-inset-right, 0px) + 10px); color:#7ee6a1; }
+/* Shifted clear of the br8t account avatar, which floats in the top-right
+   corner. --br8t-account-space is published by /lib/auth/ui.js and falls back
+   to 0 when the account layer isn't loaded. */
+.home-chip.right { right: calc(env(safe-area-inset-right, 0px) + 10px + var(--br8t-account-space, 0px)); color:#7ee6a1; }
 
 /* ---- Locked / empty skill slots in the match dock ---- */
 .skill-btn.slot-locked, .skill-btn.slot-empty {
