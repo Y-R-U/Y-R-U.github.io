@@ -195,8 +195,17 @@ function nameTaken(kind, short) { return getThings().some(t => t.kind === kind &
 // ---------------------------------------------------------- registry files --
 function readOrInit(path, initFn) { return fs.readJSON(path) || initFn(); }
 
+/**
+ * Swap a short name only where it stands on its own — "geometry.cow", "textures/entity/cow".
+ * A plain substring swap would also rewrite "cow" inside "cowbell" and "scarecrow", quietly
+ * corrupting unrelated identifiers the moment a child picks a short name.
+ */
+function swapWord(text, from, to) {
+  return text.replace(new RegExp('\\b' + from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g'), to);
+}
+
 function updateRegistryReferences(kind, oldShort, newShort, oldId, newId) {
-  const fixTex = t => typeof t === 'string' ? t.replace(oldShort, newShort) : t.map(x => x.replace(oldShort, newShort));
+  const fixTex = t => typeof t === 'string' ? swapWord(t, oldShort, newShort) : t.map(x => swapWord(x, oldShort, newShort));
   if (kind === 'item') {
     const p = 'RP/textures/item_texture.json';
     const j = fs.readJSON(p);
@@ -222,7 +231,7 @@ function updateRegistryReferences(kind, oldShort, newShort, oldId, newId) {
     if (bj && bj[oldId]) {
       const entry = bj[oldId];
       delete bj[oldId];
-      if (entry.textures) entry.textures = String(entry.textures).replace(oldShort, newShort);
+      if (entry.textures) entry.textures = swapWord(String(entry.textures), oldShort, newShort);
       bj[newId] = entry;
       fs.writeJSON(bp, bj);
     }
@@ -232,14 +241,14 @@ function duplicateRegistryEntry(kind, short, newShort) {
   const p = kind === 'item' ? 'RP/textures/item_texture.json' : 'RP/textures/terrain_texture.json';
   const j = fs.readJSON(p); if (!j || !j.texture_data || !j.texture_data[short]) return;
   const entry = JSON.parse(JSON.stringify(j.texture_data[short]));
-  if (entry.textures) entry.textures = typeof entry.textures === 'string' ? entry.textures.replace(short, newShort) : entry.textures.map(x => x.replace(short, newShort));
+  if (entry.textures) entry.textures = typeof entry.textures === 'string' ? swapWord(entry.textures, short, newShort) : entry.textures.map(x => swapWord(x, short, newShort));
   j.texture_data[newShort] = entry;
   fs.writeJSON(p, j);
 }
 function duplicateBlocksJsonEntry(oldId, newId, short, newShort) {
   const bj = fs.readJSON('RP/blocks.json'); if (!bj || !bj[oldId]) return;
   const entry = JSON.parse(JSON.stringify(bj[oldId]));
-  if (entry.textures) entry.textures = String(entry.textures).replace(short, newShort);
+  if (entry.textures) entry.textures = swapWord(String(entry.textures), short, newShort);
   bj[newId] = entry;
   fs.writeJSON('RP/blocks.json', bj);
 }
@@ -263,7 +272,7 @@ function renameThing(kind, oldShort, newShort, newDisplay) {
   for (const k of Object.keys(F)) {
     const p = F[k]; if (!fs.exists(p)) continue;
     if (fs.isBinary(p)) { const b = fs.read(p); fs.delete(p); fs.write(NF[k], b); continue; }
-    const txt = fs.readText(p).split(oldId).join(newId).split(oldShort).join(newShort);
+    const txt = swapWord(fs.readText(p).split(oldId).join(newId), oldShort, newShort);
     fs.delete(p); fs.write(NF[k], txt);
   }
   updateRegistryReferences(kind, oldShort, newShort, oldId, newId);
@@ -285,7 +294,7 @@ function duplicateThing(kind, short) {
   for (const k of Object.keys(F)) {
     const p = F[k]; if (!fs.exists(p)) continue;
     if (fs.isBinary(p)) { fs.write(NF[k], fs.read(p)); continue; }
-    const txt = fs.readText(p).split(oldId).join(newId).split(short).join(newShort);
+    const txt = swapWord(fs.readText(p).split(oldId).join(newId), short, newShort);
     fs.write(NF[k], txt);
   }
   if (kind === 'item') duplicateRegistryEntry('item', short, newShort);
@@ -1067,7 +1076,7 @@ function show(args) {
     { title: 'Welcome to Build!', text: 'This is where you make mobs, items and blocks. Pick a card and I will ask a few easy questions.' },
     { el: '.bd-cards', title: 'Pick something', text: 'Tap a card to start. You can cancel any time with the ✕.' },
     { el: '.bd-things', title: 'Everything you make', text: 'Shows up down here — you can edit, rename, copy or delete it any time.' }
-  ]);
+  ], { tool: 'build' });
 }
 function hide() {}
 function onFileChange() { if (view === 'home') render(); }

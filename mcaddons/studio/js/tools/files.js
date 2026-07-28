@@ -41,13 +41,18 @@ const CSS = `
 .ed-gutter i { display:block; font-style:normal; }
 .ed-gutter i.err { color:var(--red); font-weight:800; }
 .ed-scroll { position:relative; flex:1; overflow:auto; }
+/* The editor is a transparent textarea sitting exactly on top of a highlighted copy of the same
+   text. Both grow to fit their content and the SCROLL CONTAINER does all the scrolling — if the
+   textarea were viewport-sized with its own inner scroll, moving the caret past the bottom would
+   scroll the text but not the highlight, and the two layers would drift apart. */
 .ed-hi, .ed-ta { font-family:var(--mono); font-size:13.5px; line-height:20px; padding:12px;
   white-space:pre; tab-size:2; border:0; margin:0; }
-.ed-hi { position:absolute; inset:0; pointer-events:none; color:#dfe3ee; min-width:100%; }
-.ed-ta { position:absolute; inset:0; width:100%; height:100%; background:transparent; color:transparent;
+.ed-hi { position:absolute; left:0; top:0; pointer-events:none; color:#dfe3ee; min-width:100%; }
+.ed-ta { position:absolute; left:0; top:0; min-width:100%; background:transparent; color:transparent;
   caret-color:var(--grass); resize:none; outline:none; overflow:hidden; }
 .ed-ta::selection { background:rgba(108,195,73,.28); }
-.ed-band { position:absolute; left:0; right:0; height:20px; background:rgba(255,90,73,.13);
+.ed-bands { position:absolute; left:0; top:0; min-width:100%; height:100%; pointer-events:none; }
+.ed-band { position:absolute; left:0; width:100%; height:20px; background:rgba(255,90,73,.13);
   border-left:3px solid var(--red); pointer-events:none; }
 .tk-key { color:#7ca8ff; }
 .tk-str { color:#a8e06b; }
@@ -86,7 +91,7 @@ const CSS = `
   border-right:none; border-bottom:2px solid #000; } }
 `;
 
-let root, treeEl, mainEl, pathEl, edWrap, gutter, hi, ta, bandHost, errBar, imgWrap, probsEl, probsBtn;
+let root, treeEl, mainEl, pathEl, edWrap, gutter, hi, ta, bandHost, scrollEl, errBar, imgWrap, probsEl, probsBtn;
 let openPath = null, dirty = false, saveTimer = null, problems = [], collapsed = new Set();
 
 function injectCSS() {
@@ -133,13 +138,18 @@ function highlight(text, lang) {
   return out.join('');
 }
 
+const LINE_H = 20, ED_PAD = 12;
+
 function syncEditor() {
   const text = ta.value;
   hi.innerHTML = highlight(text, extOf(openPath)) + '\n';
   const lines = text.split('\n').length;
   clear(gutter);
   for (let n = 1; n <= lines; n++) gutter.appendChild(el('i', { text: String(n), dataset: { line: n } }));
-  gutter.scrollTop = ta.parentElement.scrollTop;
+  // Size the textarea to its content so it never scrolls internally (see the CSS note above).
+  ta.style.height = (lines * LINE_H + ED_PAD * 2) + 'px';
+  ta.style.width = Math.max(hi.offsetWidth, scrollEl.clientWidth) + 'px';
+  gutter.scrollTop = scrollEl.scrollTop;
 }
 
 function markErrorLine(line) {
@@ -149,7 +159,7 @@ function markErrorLine(line) {
   const g = gutter.querySelector(`i[data-line="${line}"]`);
   if (g) g.classList.add('err');
   const band = el('div.ed-band');
-  band.style.top = (12 + (line - 1) * 20) + 'px';
+  band.style.top = (ED_PAD + (line - 1) * LINE_H) + 'px';
   bandHost.appendChild(band);
 }
 
@@ -282,7 +292,8 @@ async function openFile(path) {
   dirty = false;
   syncEditor();
   checkCurrent();
-  ta.scrollTop = 0;
+  scrollEl.scrollTop = 0;
+  scrollEl.scrollLeft = 0;
 }
 
 // ---------------------------------------------------------------- editing ---
@@ -328,7 +339,7 @@ function gotoLine(line) {
   const pos = ta.value.split('\n').slice(0, line - 1).join('\n').length + (line > 1 ? 1 : 0);
   ta.focus();
   ta.setSelectionRange(pos, pos);
-  ta.parentElement.scrollTop = Math.max(0, (line - 6) * 20);
+  scrollEl.scrollTop = Math.max(0, (line - 6) * LINE_H);
 }
 
 function handleKeys(e) {
@@ -443,15 +454,16 @@ export default {
     treeEl = el('div.fl-tree');
     gutter = el('div.ed-gutter');
     hi = el('div.ed-hi');
-    ta = el('textarea.ed-ta', { spellcheck: false, autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off' });
-    bandHost = el('div', { style: { position: 'absolute', inset: '0', pointerEvents: 'none' } });
-    const scroll = el('div.ed-scroll', {}, [hi, bandHost, ta]);
-    scroll.addEventListener('scroll', () => { gutter.scrollTop = scroll.scrollTop; });
+    // wrap="off": a soft-wrapped line would occupy two rows in the textarea but one in the
+    // highlight layer, and every line below it would be out by 20px.
+    ta = el('textarea.ed-ta', { spellcheck: false, autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off', wrap: 'off' });
+    bandHost = el('div.ed-bands');
+    scrollEl = el('div.ed-scroll', {}, [hi, bandHost, ta]);
+    scrollEl.addEventListener('scroll', () => { gutter.scrollTop = scrollEl.scrollTop; });
     ta.addEventListener('input', onInput);
     ta.addEventListener('keydown', handleKeys);
-    ta.addEventListener('scroll', () => { scroll.scrollTop = ta.scrollTop; });
 
-    edWrap = el('div.ed', { style: { display: 'none' } }, [gutter, scroll]);
+    edWrap = el('div.ed', { style: { display: 'none' } }, [gutter, scrollEl]);
     imgWrap = el('div.fl-img', { style: { display: 'none' } });
     errBar = el('div.fl-err', { style: { display: 'none' } });
     probsEl = el('div.fl-probs.hid');
@@ -487,7 +499,7 @@ export default {
       { el: '.fl-tree', title: 'BP and RP', text: '<b>BP</b> is the brain — how things behave. <b>RP</b> is the look — models, pictures and animations.' },
       { el: '.ed-ta', title: 'You can type here', text: 'If you break something, I will tell you which line and how to fix it. You cannot break Minecraft from here.' },
       { el: '.fl-head .btn.primary', title: 'Check everything', text: 'This looks through every file and lists anything that would go wrong in game.' }
-    ]);
+    ], { tool: 'files' });
   },
 
   hide() { saveFile(true); },

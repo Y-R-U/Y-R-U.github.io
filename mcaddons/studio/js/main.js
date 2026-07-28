@@ -4,7 +4,7 @@ import { settings, flag, applyBodyFlags } from './core/store.js';
 import { project } from './core/project.js';
 import { fs } from './core/fs.js';
 import { el, toast, busy } from './core/ui.js';
-import { tour, say } from './core/coach.js';
+import { tour, say, dismissTour, hush } from './core/coach.js';
 import { sfx } from './core/sfx.js';
 
 const TOOLS = [
@@ -13,7 +13,9 @@ const TOOLS = [
   { id: 'paint',    title: 'Paint',   icon: '🎨', load: () => import('./tools/paint.js'), needsProject: true },
   { id: 'model',    title: 'Model',   icon: '🧱', load: () => import('./tools/model.js'), needsProject: true },
   { id: 'anim',     title: 'Animate', icon: '🤸', load: () => import('./tools/anim.js'), needsProject: true },
-  { id: 'test',     title: 'Play',    icon: '🎮', load: () => import('./tools/test.js'), needsProject: true },
+  // Play owns the keyboard while it is open (WASD, digits for the hotbar), so the global
+  // number-key tool shortcuts must stand down or "pick hotbar slot 3" also leaps to Paint.
+  { id: 'test',     title: 'Play',    icon: '🎮', load: () => import('./tools/test.js'), needsProject: true, grabsKeys: true },
   { id: 'files',    title: 'Files',   icon: '📁', load: () => import('./tools/files.js'), needsProject: true },
   { id: 'packer',   title: 'Export',  icon: '📦', load: () => import('./tools/packer.js'), needsProject: true },
   { id: 'settings', title: 'Settings', icon: '⚙️', load: () => import('./tools/settings.js') }
@@ -57,11 +59,16 @@ export async function openTool(id, args) {
     id = 'home';
   }
   if (currentTool && currentTool !== id) {
+    // A tour or a Blocky speech bubble belongs to the tool that opened it — leaving it on screen
+    // would spotlight a button that is no longer there.
+    dismissTour();
+    hush();
     const prev = loaded.get(currentTool);
     if (prev && prev.hide) { try { prev.hide(); } catch (e) { console.error(e); } }
     panes.get(currentTool) && panes.get(currentTool).classList.remove('on');
   }
   currentTool = id;
+  document.body.dataset.tool = id;   // read by coach.tour() to drop tours whose tool has gone
   syncNav();
 
   let mod = loaded.get(id);
@@ -117,9 +124,12 @@ document.getElementById('btnExport').addEventListener('click', () => openTool('p
 
 // ------------------------------------------------------------- shortcuts ---
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input, textarea, select, [contenteditable]')) return;
+  // e.target is not always an Element (it can be the document itself), and .matches would throw.
+  if (!e.target || !e.target.matches || e.target.matches('input, textarea, select, [contenteditable]')) return;
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); project.save(); toast('Saved', 'good', 1200); return; }
   if (e.altKey || e.ctrlKey || e.metaKey) return;
+  const cur = TOOLS.find(t => t.id === currentTool);
+  if (cur && cur.grabsKeys) return;
   const map = { '1': 'home', '2': 'build', '3': 'paint', '4': 'model', '5': 'anim', '6': 'test', '7': 'files', '8': 'packer' };
   if (map[e.key]) { openTool(map[e.key]); e.preventDefault(); }
 });

@@ -10,7 +10,7 @@ import { tour, say, award } from '../core/coach.js';
 import { sfx } from '../core/sfx.js';
 import { bus } from '../core/bus.js';
 import { project } from '../core/project.js';
-import { parseGeoFile, faceRects } from '../lib/geo.js';
+import { parseGeoFile, faceRects, withBoneMirror } from '../lib/geo.js';
 import { itemTexture, terrainTexture } from '../lib/bedrock.js';
 
 // ---------------------------------------------------------------------- CSS ---
@@ -339,7 +339,7 @@ async function show(args) {
     { el: '#ptNewBtn', title: 'Start here', text: 'Tap here to make a brand new picture.' },
     { el: '.pt-tools', title: 'Your tools', text: 'Pencil draws, Eraser rubs out, Fill pours a colour into a whole area.' },
     { el: '#ptUvBtn', title: 'See where it goes', text: 'Turn this on to see squares — colour inside one and it shows up on the right part of your mob!' }
-  ]), 500);
+  ], { tool: 'paint' }), 500);
 }
 
 function hide() {
@@ -937,7 +937,7 @@ function redrawOverlay() {
   if (showUV && geoCache) {
     for (const bone of geoCache.bones) {
       for (const cube of bone.cubes) {
-        const rects = faceRects(cube);
+        const rects = faceRects(withBoneMirror(bone, cube));
         rects.forEach((r, i) => {
           const x0 = Math.min(r.x0, r.x1), x1 = Math.max(r.x0, r.x1);
           const y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);
@@ -987,7 +987,7 @@ function showHeadFace() {
   if (!geoCache) { toast('This picture is not linked to a mob shape yet.', 'warn'); return; }
   const bone = geoCache.bones.find(b => /head/i.test(b.name)) || geoCache.bones[0];
   if (!bone || !bone.cubes.length) { toast('Could not find a head to show.', 'warn'); return; }
-  const rects = faceRects(bone.cubes[0]);
+  const rects = faceRects(withBoneMirror(bone, bone.cubes[0]));
   const r = rects[5]; // north, per FACE_NAMES
   const x0 = Math.min(r.x0, r.x1), x1 = Math.max(r.x0, r.x1);
   const y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);

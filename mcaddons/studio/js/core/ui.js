@@ -222,12 +222,28 @@ export function slider(value, { min = 0, max = 100, step = 1, onInput, format })
   return el('span.slider-wrap', {}, [s, out]);
 }
 
-/** Ask the user for a file. accept e.g. '.mcaddon,.zip' or 'image/png' */
+/**
+ * Ask the user for a file. accept e.g. '.mcaddon,.zip' or 'image/png'
+ * Resolves with null when they cancel — an unresolved promise would leave the caller (and its
+ * "Opening…" overlay) hanging for the rest of the session.
+ */
 export function pickFile(accept = '', multiple = false) {
   return new Promise(res => {
     const inp = el('input', { type: 'file', accept, multiple, style: { display: 'none' } });
+    let done = false;
+    const finish = (value) => {
+      if (done) return;
+      done = true;
+      window.removeEventListener('focus', onFocus);
+      inp.remove();
+      res(value);
+    };
+    // 'cancel' fires in modern browsers; the focus fallback covers the rest.
+    const onFocus = () => setTimeout(() => { if (!inp.files || !inp.files.length) finish(multiple ? [] : null); }, 400);
+    inp.addEventListener('change', () => finish(multiple ? [...inp.files] : (inp.files[0] || null)));
+    inp.addEventListener('cancel', () => finish(multiple ? [] : null));
     document.body.appendChild(inp);
-    inp.addEventListener('change', () => { res(multiple ? [...inp.files] : (inp.files[0] || null)); inp.remove(); });
     inp.click();
+    setTimeout(() => window.addEventListener('focus', onFocus), 0);
   });
 }

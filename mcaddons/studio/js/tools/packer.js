@@ -382,7 +382,7 @@ function show() {
     { title: 'Ready to ship it?', text: 'This tool checks your add-on, builds the real <b>.mcaddon</b> file, and tells you how to install it.' },
     { el: '.pk-hero .btn.big', title: 'One big button', text: 'Tap this when you are ready. It fixes nothing for you — but it will tell you exactly what to fix.' },
     { el: '.pk-tabs', title: 'Installing it', text: 'Pick your device here for short steps.' }
-  ]);
+  ], { tool: 'packer' });
 }
 function hide() {}
 function onFileChange() { /* summary refreshes next time this tool is shown */ }

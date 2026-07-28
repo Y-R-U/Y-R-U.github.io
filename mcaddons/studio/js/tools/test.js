@@ -2,6 +2,7 @@
 // One file. See CLAUDE.md "module contract" + lib/geo.js + lib/anim.js + lib/molang.js.
 import * as THREE from 'three';
 import { fs } from '../core/fs.js';
+import { bus } from '../core/bus.js';
 import { el, toast, modal } from '../core/ui.js';
 import { tour, say, award } from '../core/coach.js';
 import { sfx } from '../core/sfx.js';
@@ -102,10 +103,6 @@ const CSS = `
 .tw-btn-jump { right: 18px; bottom: 168px; }
 .tw-btn-use { right: 96px; bottom: 96px; }
 .tw-btn-break { right: 18px; bottom: 96px; }
-@media (max-width: 900px) {
-  .tw-bars { bottom: 150px; }
-  .tw-hotbar { bottom: 74px; }
-}
 /* mobile-only controls: hidden unless touch is detected at runtime (must come after the
    component rules above so it wins the cascade — same specificity, later wins). */
 .tw-mobile { display: none !important; }
@@ -199,6 +196,7 @@ function freshState() {
     mobs: [], nextMobId: 1,
     hotbar: [], selected: 0,
     runtimeIssues: [], firstMobSpawned: false,
+    worldBuilt: false, needsRescan: false,
     joy: { active: false, id: null, dx: 0, dy: 0 }, look: { active: false, id: null },
     fps: 60, fpsAcc: 0, fpsN: 0,
     domMobBars: new Map()
@@ -1471,25 +1469,66 @@ function tick() {
 }
 
 // ------------------------------------------------------------------- build --
-async function buildWorld() {
+function clearChunkMeshes() {
+  for (const m of S.chunkMeshes) if (m) { S.scene.remove(m); m.geometry.dispose(); }
+  S.chunkMeshes = new Array(N_CHUNKS).fill(null);
+}
+
+/** Free the GPU objects made from the child's own pictures, but never the shared missing-texture
+ *  material — every unresolved block, item and mob points at that one. */
+function disposeProjectMaterials() {
+  const keep = missingMaterial();
+  const drop = m => { if (m && m !== keep) { if (m.map) m.map.dispose(); m.dispose(); } };
+  if (S.materials) for (const [, m] of S.materials) drop(m);
+  if (S.mobTypes) for (const [, t] of S.mobTypes) drop(t.material);
+}
+
+/** A block the child placed can outlive the definition it came from (they deleted that block in
+ *  Build). Turn those orphaned voxels back into air rather than leaving invisible solid ghosts. */
+function sanitiseVoxels() {
+  if (!S.voxels) return;
+  for (let i = 0; i < S.voxels.length; i++) if (S.voxels[i] && !S.blocks[S.voxels[i]]) S.voxels[i] = BLOCK.AIR;
+}
+
+/**
+ * Re-read the add-on — blocks, items, mob types, pictures, hotbar, content log.
+ * Deliberately leaves the terrain and the player alone: coming back from Paint must not bulldoze
+ * the house they built.
+ */
+async function scanProject() {
   S.runtimeIssues = [];
+  for (const m of [...S.mobs]) removeMob(m);   // they hold a stale type (and its material)
+  clearChunkMeshes();                          // they hold the old block materials
+  disposeProjectMaterials();
+
   S.customBlockDefs = scanCustomBlocks();
   S.customItemDefs = scanCustomItems();
   buildBlockRegistry();
   await buildMaterials();
   await scanMobTypes();
 
+  sanitiseVoxels();
+  if (S.voxels) rebuildAllChunks();
+  buildHotbar(); renderHotbar();
+  refreshContentLog();
+  S.needsRescan = false;
+}
+
+/** Fresh terrain + a fresh spawn. Only on the first visit and on "Rebuild world". */
+function generateTerrain() {
   const flowerSpots = generateVoxels();
-  if (S.chunkMeshes.length) for (const m of S.chunkMeshes) if (m) { S.scene.remove(m); m.geometry.dispose(); }
-  S.chunkMeshes = new Array(N_CHUNKS).fill(null);
+  clearChunkMeshes();
   rebuildAllChunks();
   buildFlowers(flowerSpots);
   buildWater();
-
   for (const m of [...S.mobs]) removeMob(m);
-  buildHotbar(); renderHotbar();
   resetPlayer();
-  refreshContentLog();
+  S.worldBuilt = true;
+}
+
+async function buildWorld() {
+  await scanProject();
+  generateTerrain();
 }
 
 function rebuildWorld() {
@@ -1508,7 +1547,16 @@ function ensureThree() {
 }
 
 // ------------------------------------------------------------- rebuild hook --
-let rebuildDebounce = null;
+let rescanTimer = null;
+
+/** Something changed on disk. Re-read the pack (never the terrain), now if we are on screen and
+ *  otherwise the next time we are opened. */
+function noteFileChange() {
+  if (!S) return;
+  S.needsRescan = true;
+  clearTimeout(rescanTimer);
+  if (S.active) rescanTimer = setTimeout(() => { if (S && S.active && S.needsRescan) scanProject(); }, 600);
+}
 
 // -------------------------------------------------------------- lifecycle --
 export default {
@@ -1516,6 +1564,9 @@ export default {
 
   mount(root) {
     buildDOM(root);
+    bus.on('file:change', noteFileChange);
+    // A different add-on means a different everything — start that one from scratch.
+    bus.on('project:open', () => { if (S) { S.worldBuilt = false; S.needsRescan = true; } });
   },
 
   async show() {
@@ -1524,7 +1575,8 @@ export default {
     S.active = true;
     ensureThree();
     onResize();
-    await buildWorld();
+    if (!S.worldBuilt) await buildWorld();
+    else if (S.needsRescan) await scanProject();
     S.clock.getDelta();
     cancelAnimationFrame(S.rafId);
     S.rafId = requestAnimationFrame(tick);
@@ -1539,20 +1591,17 @@ export default {
       { el: '.tw-topbar button', title: 'Summon your mob', text: 'Puts your custom mob in the world so you can see it move.' },
       { title: 'Break & place', text: 'Left click (or the ⛏ button) breaks blocks and hits mobs. Right click (or ✋) places blocks and uses items.' },
       { title: 'Content Log', text: 'The 📋 Content Log button lists anything wrong with your files, and how to fix it.' }
-    ]);
+    ], { tool: 'test' });
   },
 
   hide() {
     if (!S) return;
     S.active = false;
     cancelAnimationFrame(S.rafId);
+    clearTimeout(rescanTimer);
     if (document.pointerLockElement) document.exitPointerLock();
     closeCmdBar();
   },
 
-  onFileChange(path) {
-    if (!S || !dom) return;
-    clearTimeout(rebuildDebounce);
-    rebuildDebounce = setTimeout(() => { if (S.active) buildWorld(); }, 500);
-  }
+  onFileChange: noteFileChange
 };

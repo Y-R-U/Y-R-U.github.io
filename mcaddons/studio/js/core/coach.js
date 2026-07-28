@@ -20,6 +20,10 @@ let active = null;
  * Returns a Promise that resolves when finished/skipped.
  */
 export function tour(id, steps, opts = {}) {
+  // opts.tool: only run if that tool is still the one on screen. Tools start their tour after an
+  // await or a short delay, and a child who taps twice quickly would otherwise get Paint's
+  // spotlight pointing at buttons that belong to Model.
+  if (opts.tool && document.body.dataset.tool !== opts.tool) return Promise.resolve(false);
   if (!opts.force) {
     if (!settings.get('popups')) return Promise.resolve(false);
     if (flag.get('tour:' + id)) return Promise.resolve(false);
@@ -105,12 +109,22 @@ export function tour(id, steps, opts = {}) {
       flag.set('tour:' + id, completed ? 'done' : 'skipped');
       resolve(!!completed);
     },
+    // Taken off screen by something else (a tool switch). Do NOT record it as seen — the child
+    // never got the chance to read it, so it should come back next time they open that tool.
+    dismiss() {
+      window.removeEventListener('resize', onResize);
+      back.remove(); active = null;
+      resolve(false);
+    },
     id
   };
   active = api;
   render();
   return done;
 }
+
+/** Close whatever tour is on screen without marking it seen. Used when the tool changes under it. */
+export function dismissTour() { if (active) active.dismiss(); }
 
 export function tourSeen(id) { return !!flag.get('tour:' + id); }
 export function resetTours() {
@@ -140,15 +154,15 @@ export function hideHint() { if (hintBubble) { hintBubble.remove(); hintBubble =
 let hintTimer = null;
 document.addEventListener('mouseover', e => {
   if (!settings.get('hints')) return;
-  const t = e.target.closest('[data-hint]');
+  const t = e.target && e.target.closest && e.target.closest('[data-hint]');
   if (!t) return;
   clearTimeout(hintTimer);
   hintTimer = setTimeout(() => showHint(t, t.dataset.hint), 380);
 });
-document.addEventListener('mouseout', e => { if (e.target.closest('[data-hint]')) { clearTimeout(hintTimer); hideHint(); } });
+document.addEventListener('mouseout', e => { if (e.target && e.target.closest && e.target.closest('[data-hint]')) { clearTimeout(hintTimer); hideHint(); } });
 document.addEventListener('touchstart', e => {
   if (!settings.get('hints')) return;
-  const t = e.target.closest('[data-hint]');
+  const t = e.target && e.target.closest && e.target.closest('[data-hint]');
   if (!t) return;
   clearTimeout(hintTimer);
   hintTimer = setTimeout(() => showHint(t, t.dataset.hint), 550);

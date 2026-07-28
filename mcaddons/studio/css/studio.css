@@ -369,7 +369,10 @@ select.field { cursor: pointer; }
   }
   #mobileNav .rail-btn { flex: 1 0 66px; padding: 5px 2px; font-size: 10px; border-radius: 8px; }
   #mobileNav .rail-btn .ico { font-size: 20px; }
-  #panes { padding-bottom: 62px; }
+  /* Panes are absolutely positioned, so padding on #panes would NOT shorten them — inset:0 is
+     measured against the padding box. Lift each pane's bottom edge instead, or the last 62px of
+     every tool (colour palette, timeline, hotbar) hides behind the fixed nav bar. */
+  .pane { bottom: 62px; }
   .side { width: 190px; }
   .modal-foot { justify-content: stretch; }
   .modal-foot .btn { flex: 1; }

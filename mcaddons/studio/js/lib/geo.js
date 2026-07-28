@@ -145,6 +145,11 @@ export function faceRects(cube) {
   return r;
 }
 
+/** A cube with its bone's mirror flag folded in. The cube's own flag wins when it has one. */
+export function withBoneMirror(bone, cube) {
+  return (cube.mirror === undefined && bone && bone.mirror) ? { ...cube, mirror: true } : cube;
+}
+
 const FACE_KEY = ['east', 'west', 'up', 'down', 'south', 'north'];
 function perFaceRects(cube) {
   return FACE_KEY.map(k => {
@@ -225,10 +230,10 @@ export function buildGeo(geo, material, opts = {}) {
     base.set(b.name, { pos: g.position.clone(), rot: g.rotation.clone(), scale: g.scale.clone() });
 
     b.cubes.forEach((c, ci) => {
-      const mesh = cubeMesh(c, geo, material);
+      // A cube with no "mirror" of its own inherits the bone's — Blockbench writes it that way,
+      // and reading the UV off cube.mirror alone puts the left leg's texture on backwards.
+      const mesh = cubeMesh(withBoneMirror(b, c), geo, material);
       mesh.userData = { bone: b.name, cubeIndex: ci, cube: c };
-      const inheritMirror = c.mirror === undefined ? b.mirror : c.mirror;
-      if (inheritMirror !== c.mirror) { /* rects computed from cube.mirror only */ }
       const centre = cubeCentre(c);
       if (c.rotation && c.rotation.some(v => v)) {
         const piv = c.pivot || centre;

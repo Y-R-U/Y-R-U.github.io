@@ -212,7 +212,7 @@ async function show(args) {
       { el: '.md-shapes', title: 'Quick shapes', text: 'Tap one of these to add a ready-made part like a head or a leg.' },
       { el: '.md-gizmo-bar', title: 'Move it about', text: 'Pick a box, then use these to move, resize or rotate it right in the 3D view.' },
       { el: '.md-tree', title: 'Everything you have made', text: 'All your parts and boxes are listed here. Tap one to select it.' }
-    ]), 500);
+    ], { tool: 'model' }), 500);
   }
 }
 
@@ -471,13 +471,13 @@ function fullRebuild() {
   updateBoundsHelper();
 }
 
-function buildCubeGeometry(cube) {
+function buildCubeGeometry(cube, bone) {
   const inf = cube.inflate || 0;
   const w = Math.max(0.0001, Math.abs(cube.size[0]) + inf * 2);
   const h = Math.max(0.0001, Math.abs(cube.size[1]) + inf * 2);
   const d = Math.max(0.0001, Math.abs(cube.size[2]) + inf * 2);
   const bg = new THREE.BoxGeometry(w * G.UNIT, h * G.UNIT, d * G.UNIT);
-  G.applyCubeUV(bg, cube, geo.tw, geo.th);
+  G.applyCubeUV(bg, G.withBoneMirror(bone, cube), geo.tw, geo.th);
   return bg;
 }
 
@@ -494,7 +494,7 @@ function refreshCube(bone, cubeIndex) {
   const hadHolder = !!mesh.userData.holder;
   if (needsHolder !== hadHolder) { fullRebuild(); return; }
   const oldGeo = mesh.geometry;
-  mesh.geometry = buildCubeGeometry(cube);
+  mesh.geometry = buildCubeGeometry(cube, b);
   oldGeo.dispose();
   const centre = G.cubeCentre(cube);
   if (needsHolder) {
@@ -1057,7 +1057,7 @@ function showUVMapPreview() {
     for (const cube of b.cubes) {
       if (!Array.isArray(cube.uv)) continue;
       const col = colors[ci++ % colors.length];
-      const rects = G.faceRects(cube);
+      const rects = G.faceRects(G.withBoneMirror(b, cube));
       ctx.strokeStyle = col; ctx.lineWidth = 2;
       for (const r of rects) {
         const x0 = Math.min(r.x0, r.x1) * scale, x1 = Math.max(r.x0, r.x1) * scale;

@@ -78,9 +78,12 @@ export function entityBP(id, opts = {}) {
     'minecraft:can_climb': {},
     'minecraft:physics': {},
     'minecraft:pushable': { is_pushable: true, is_pushable_by_piston: true },
-    'minecraft:nameable': {},
-    'minecraft:despawn': { despawn_from_distance: {} }
+    'minecraft:nameable': {}
   };
+  // Match vanilla: monsters fade away when you walk off, animals stay put. A friendly mob a child
+  // has just made and named vanishing 40 blocks later reads as "my add-on is broken".
+  if (o.hostile) comps['minecraft:despawn'] = { despawn_from_distance: {} };
+  else comps['minecraft:persistent'] = {};
   if (o.scale !== 1) comps['minecraft:scale'] = { value: o.scale };
   if (o.flying) {
     delete comps['minecraft:navigation.walk'];
@@ -105,7 +108,6 @@ export function entityBP(id, opts = {}) {
   if (o.follows) comps['minecraft:behavior.follow_owner'] = { priority: 4, speed_multiplier: 1, start_distance: 10, stop_distance: 2 };
   if (o.tame) {
     comps['minecraft:tameable'] = { probability: 0.33, tame_items: o.tameItems || ['bone'], tame_event: { event: 'minecraft:on_tame', target: 'self' } };
-    comps['minecraft:is_tamed'] = undefined; delete comps['minecraft:is_tamed'];
   }
   if (o.rideable) comps['minecraft:rideable'] = { seat_count: 1, family_types: ['player'], seats: { position: [0, o.collision.h * 0.6, 0] } };
   if (o.drops && o.drops.length) comps['minecraft:loot'] = { table: `loot_tables/entities/${id.split(':')[1]}.json` };

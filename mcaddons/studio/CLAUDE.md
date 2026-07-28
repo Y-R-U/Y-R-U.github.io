@@ -123,8 +123,10 @@ references (geometry / texture / animation / render controller) resolving.
   spawn-rule evaluation and the Script API are not simulated.
 - Mobs steer in straight lines — they do not path around trees or rocks.
 - Loot drops appear as a message, not a pickup entity.
-- Repeated "Rebuild world" in one session does not dispose old GPU textures.
 - The Animate tool animates the first geometry in a multi-geometry `.geo.json`.
+- Leaving Play and coming back keeps the island, the blocks you placed and where you were standing;
+  only "Rebuild world" starts a new island. Editing files re-reads the pack (`scanProject`) without
+  touching the terrain, but it does clear the mobs, because each one holds its type's material.
 - Real Minecraft is still the final word: the Export tab says so, and always should.
 
 ---
@@ -138,6 +140,8 @@ references (geometry / texture / animation / render controller) resolving.
   inverts rotation X and Y" rule, which falls straight out of that Z mirror.
   Animation space is model space turned 180° about Y, so an animated *position* also flips X;
   see `ANIM_AXIS` in `lib/anim.js` — it is one constant, flip it there if it ever looks wrong.
+- **A cube inherits `mirror` from its bone** when it has none of its own. Always read UVs through
+  `withBoneMirror(bone, cube)`, never `cube.mirror` alone, or one leg's texture comes out backwards.
 - **Box UV layout** lives in `lib/geo.js: faceRects()`. Up/down are rotated 180° relative to the
   side faces. Get this wrong and every hat is on backwards.
 - **`_geotest.html` is the regression check for both of the above.** It renders one 16³ cube with a
@@ -148,6 +152,21 @@ references (geometry / texture / animation / render controller) resolving.
   (rather than the X-mirror most web viewers use) was confirmed.
 - **`DecompressionStream('deflate-raw')`** is required to read real `.mcaddon` files. Store-only
   fallback exists for writing if `CompressionStream` is missing.
+- **`main.js` never calls a tool's `onFileChange`** — tools subscribe to `bus.on('file:change')`
+  themselves in `mount()`. Export `onFileChange` if you like, but the bus is what actually runs.
+- **Panes are `position:absolute; inset:0`,** so padding on `#panes` cannot shorten them (inset is
+  measured against the padding box). The mobile nav clearance is `.pane { bottom: 62px }` — do not
+  "tidy" it back into padding, and do not re-add per-tool `bottom:` offsets to compensate for an
+  overlap that no longer exists.
+- **The Files editor** is a transparent `<textarea>` over a highlighted `<div>` of the same text.
+  Both must grow to fit their content (`syncEditor()` sizes the textarea; `wrap="off"`) and the
+  `.ed-scroll` container does all the scrolling. Give the textarea its own inner scroll and the
+  caret will drag the text out of alignment with the highlight on any file taller than the pane.
+- **Play grabs the keyboard** (`grabsKeys: true` in the `TOOLS` table). Without it the digit keys
+  that pick a hotbar slot also fire the global tool shortcuts.
+- Tools start their tour with `tour(id, steps, { tool: '<id>' })` and `main.js` calls
+  `dismissTour()` on every tool switch — a tour is delayed or preceded by an `await`, so without
+  both it can land on top of a tool the child has already moved on from.
 - Textures are stored as PNG bytes; `fs.dataURL(path)` caches the base64 form — it is invalidated
   on write, so never cache it yourself in a tool.
 - IndexedDB can't structured-clone a `Uint8Array` view reliably across browsers here — binary is

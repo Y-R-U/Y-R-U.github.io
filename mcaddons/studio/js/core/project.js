@@ -8,6 +8,9 @@ import * as B from '../lib/bedrock.js';
 
 const LIST = 'projects';
 const key = id => 'proj:' + id;
+// Random suffix, not just the clock: duplicating twice inside one millisecond would otherwise
+// give both copies the same id, and the second would overwrite the first.
+const newId = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 let current = null;      // meta of the open project
 let saveTimer = null;
@@ -19,7 +22,7 @@ export const project = {
   async list() { return (await idb.get(LIST)) || []; },
 
   async create({ name, namespace, author, template = 'mob' }) {
-    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const id = newId();
     const meta = {
       id,
       name: name || 'My Add-On',
@@ -70,7 +73,7 @@ export const project = {
   async duplicate(id) {
     const rec = await idb.get(key(id));
     if (!rec) return null;
-    const meta = { ...rec.meta, id: 'p' + Date.now().toString(36), name: rec.meta.name + ' copy', created: Date.now(), modified: Date.now(), bpUuid: B.uuid(), bpModUuid: B.uuid(), rpUuid: B.uuid(), rpModUuid: B.uuid() };
+    const meta = { ...rec.meta, id: newId(), name: rec.meta.name + ' copy', created: Date.now(), modified: Date.now(), bpUuid: B.uuid(), bpModUuid: B.uuid(), rpUuid: B.uuid(), rpModUuid: B.uuid() };
     await idb.set(key(meta.id), { meta, files: rec.files });
     const list = await project.list();
     list.unshift(stripMeta(meta));

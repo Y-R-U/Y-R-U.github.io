@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { fs, baseName } from '../core/fs.js';
+import { bus } from '../core/bus.js';
 import { el, clear, toast, button, confirmBox, promptBox, select } from '../core/ui.js';
 import { settings } from '../core/store.js';
 import { tour, say, award } from '../core/coach.js';
@@ -127,6 +128,9 @@ function mount(root) {
   $mainArea = el('div', { style: { flex: '1', minHeight: '0', display: 'flex' } });
   $root.appendChild($mainArea);
   buildScene(); // built exactly once — the renderer/scene live for the tool's whole lifetime
+  // main.js does not dispatch onFileChange, so subscribe directly or a texture painted next door
+  // never reaches the model standing in this viewport.
+  bus.on('file:change', ({ path }) => onFileChange(path));
 }
 
 function buildTop() {
@@ -353,6 +357,7 @@ function rebuildSelect(node, opts, value, onChange) {
 
 async function selectModel(path) {
   if (!fs.exists(path)) return;
+  flushUnsaved();
   const list = parseGeoFile(fs.readJSON(path));
   if (!list.length) { toast('That model file has no shapes in it yet.', 'bad'); return; }
   state.modelPath = path;
@@ -396,7 +401,14 @@ function refreshFileSelect(defPath) {
   rebuildSelect($fileSel, opts, state.animPath || defPath, v => v && selectAnimFile(v));
 }
 
+/** Switching model or animation file throws away state.anims — write it out first, or a whole
+ *  preset the child just tapped disappears with no warning. */
+function flushUnsaved() {
+  if (state.dirty && state.animPath) saveAnimFile(false);
+}
+
 function selectAnimFile(path) {
+  if (path !== state.animPath) flushUnsaved();
   state.animPath = path;
   const json = fs.exists(path) ? fs.readJSON(path) : { animations: {} };
   state.anims = parseAnimFile(json) || {};
@@ -663,9 +675,19 @@ function buildPresets() {
   }
 }
 
-function applyPreset(def) {
+async function applyPreset(def) {
   if (!state.built || !state.geo) { toast('Pick a model first!', 'warn'); return; }
   const { anim, used } = def.gen(state.geo.bones, state.modelShort);
+  // The starter pack already ships idle + walk. Quietly making "walk_2" would leave the child
+  // watching a lovely new walk cycle that their mob is not wired to play.
+  if (state.anims[anim.name]) {
+    const replace = await confirmBox({
+      title: `You already have a ${def.label} animation`,
+      body: `Your mob is set up to play <b>${niceAnimLabel(anim.name)}</b>. Replace that one with this new ${def.label.toLowerCase()}, or keep both?`,
+      icon: def.icon, ok: 'Replace it', cancel: 'Keep both'
+    });
+    if (replace) delete state.anims[anim.name];
+  }
   anim.name = uniqueAnimName(anim.name);
   state.anims[anim.name] = anim;
   state.animName = anim.name;
@@ -1226,7 +1248,7 @@ function show(args) {
     { el: '#anPresets', title: 'Instant animations', text: 'Tap one of these and I will build a whole animation for you — Walk, Dance, Wave and more!' },
     { el: '#anTimeline', title: 'The timeline', text: 'Each little diamond ◆ is a <b>keyframe</b> — a pose you saved. Drag the red bar to see time move.' },
     { el: '#anWireRow', title: 'Make it real', text: 'Pick when this should play on your mob — Always, When walking, or Never (just for testing).' }
-  ]);
+  ], { tool: 'anim' });
 }
 function hide() {
   stopLoop();
