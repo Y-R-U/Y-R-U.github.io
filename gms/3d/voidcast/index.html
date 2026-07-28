@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05070f">
+<meta name="description" content="VOIDCAST — you are an alien clearance worker with a micro-black-hole rig, and your power comes from your viewers.">
+<title>VOIDCAST</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+<div id="fxlayer"></div>
+<div id="stick"><i></i></div>
+
+<!-- ══════════ boot ══════════ -->
+<div id="boot">
+  <div class="logo big">VOID<span>CAST</span></div>
+  <div class="tag">clearance work · live</div>
+  <div class="loadbar"><i id="boot-fill"></i></div>
+  <div id="boot-status">warming the aperture…</div>
+</div>
+
+<!-- ══════════ home ══════════ -->
+<div id="home" class="screen hidden">
+  <div class="home-top">
+    <div class="brand">
+      <div class="logo">VOID<span>CAST</span></div>
+      <div class="tag">you are being watched. that is the job.</div>
+    </div>
+    <div class="home-topright">
+      <button class="pill subs no-drag" id="home-subs" data-go="upgrades"><b>◈</b> <span>0</span></button>
+      <button class="iconbtn no-drag" id="home-settings" aria-label="settings">⚙</button>
+    </div>
+  </div>
+
+  <div class="home-left">
+    <button class="edge no-drag" data-go="upgrades"><b>⬆</b><span>Upgrades</span></button>
+    <button class="edge no-drag" data-go="skins"><b>◍</b><span>Rig Skins</span></button>
+    <button class="edge no-drag" data-go="help"><b>?</b><span>How to Play</span></button>
+  </div>
+
+  <div class="home-right">
+    <button class="edge right no-drag" data-go="ladder"><b>▲</b><span>Ladder</span><i id="home-rank">#10,000,000,000</i></button>
+    <button class="edge right no-drag hot" id="home-event"><b>★</b><span>Live Event</span><i id="home-eventname">—</i></button>
+  </div>
+
+  <div class="home-bottom">
+    <button class="big prime no-drag" id="home-story">
+      <b>STORY</b><i id="home-storysub">Contract 1 — Orientation Rock</i>
+    </button>
+    <button class="big no-drag" id="home-oneoff">
+      <b>OPEN CONTRACT</b><i>one run · global ladder</i>
+    </button>
+  </div>
+
+  <div class="home-demo"><span class="livedot"></span> AUTO-CLEARANCE DEMO</div>
+</div>
+
+<!-- ══════════ story select ══════════ -->
+<div id="story" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>STORY</h2><button class="iconbtn no-drag" id="story-replay" title="replay a cutscene">🎬</button></div>
+  <div class="pbody" id="story-body"></div>
+</div>
+
+<!-- ══════════ upgrades ══════════ -->
+<div id="upgrades" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>PERMANENT RIG</h2><div class="pill subs" id="up-subs"><b>◈</b> <span>0</span></div></div>
+  <div class="pbody" id="up-body"></div>
+</div>
+
+<!-- ══════════ skins ══════════ -->
+<div id="skins" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>RIG SKINS</h2><div class="pill subs" id="sk-subs"><b>◈</b> <span>0</span></div></div>
+  <div class="pbody" id="sk-body"></div>
+</div>
+
+<!-- ══════════ ladder ══════════ -->
+<div id="ladder" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>GUILD LADDER</h2></div>
+  <div class="pbody" id="ld-body"></div>
+</div>
+
+<!-- ══════════ event ══════════ -->
+<div id="event" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>LIMITED CONTRACT</h2></div>
+  <div class="pbody" id="ev-body"></div>
+</div>
+
+<!-- ══════════ help ══════════ -->
+<div id="help" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>HOW TO PLAY</h2></div>
+  <div class="pbody">
+    <div class="card">
+      <h3>Drag anywhere to steer</h3>
+      <p>Your rig projects a micro-singularity onto the surface. Drag anywhere on screen and it follows. Keyboard works too — WASD or the arrows.</p>
+    </div>
+    <div class="card">
+      <h3>Small things first</h3>
+      <p>You can only swallow objects up to your current tier. Eat enough and the aperture widens: debris → clutter → vehicles → structures → buildings → towers → megaliths → landmarks.</p>
+    </div>
+    <div class="card accent">
+      <h3>Your size is your audience</h3>
+      <p>Mass is only half of it. <b>Hype</b> multiplies your effective mass, and hype comes from being watchable — fast chains, huge single bites, near misses, catching things that are running away.</p>
+      <p>Go quiet for a few seconds and the audience drifts off, and the aperture narrows with them. Hype can only ever add to what your mass already earned — you will never shrink below what you have eaten.</p>
+    </div>
+    <div class="card">
+      <h3>Sponsor offers</h3>
+      <p>Cross a viewer milestone mid-run and sponsors pitch you three upgrades. They last for that broadcast only. SUBS you earn are permanent — spend them on the rig itself.</p>
+    </div>
+    <div class="card">
+      <h3>Rivals and defences</h3>
+      <p>Other clearance workers stream the same planet. Anything they eat does not count toward your quota, and if one gets 20% bigger than you it will take a bite out of you. Planetary turrets knock your audience loose — swallow them once you are big enough.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ settings ══════════ -->
+<div id="settings" class="screen panel hidden">
+  <div class="phead"><button class="back no-drag" data-back>‹</button><h2>SETTINGS</h2></div>
+  <div class="pbody">
+    <div class="card row"><span>Sound effects</span><button class="toggle no-drag" data-set="sfx"></button></div>
+    <div class="card row"><span>Music</span><button class="toggle no-drag" data-set="music"></button></div>
+    <div class="card"><span>Graphics</span>
+      <div class="chips" id="set-quality">
+        <button class="chip no-drag" data-q="auto">Auto</button>
+        <button class="chip no-drag" data-q="high">High</button>
+        <button class="chip no-drag" data-q="low">Low</button>
+      </div>
+      <p class="muted">Low turns off shadows, glow and bloom, and thins out the sector. Use it if the frame rate dips.</p>
+    </div>
+    <div class="card"><span>Progress</span>
+      <p class="muted" id="set-stats">—</p>
+      <button class="btn danger no-drag" id="set-wipe">Erase all progress</button>
+    </div>
+    <div class="card"><p class="muted">VOIDCAST · a Y-R-U game · everything you can see was generated in code.</p></div>
+  </div>
+</div>
+
+<!-- ══════════ in-run HUD ══════════ -->
+<div id="hud" class="hidden">
+  <div class="hud-tl">
+    <div class="viewrow"><span class="livedot" id="hud-live"></span><div id="hud-viewers">0</div></div>
+    <div class="viewlabel" id="hud-viewlabel">VIEWERS</div>
+    <div class="bar hype"><i class="bar-fill" id="hud-hype-fill"></i><em id="hud-hypemul">×1.00</em></div>
+  </div>
+
+  <div class="hud-tr">
+    <button class="iconbtn no-drag" id="hud-pause" aria-label="pause">❚❚</button>
+    <div class="timer" id="hud-timer">0:00</div>
+    <div class="clearrow"><div class="bar clear"><i class="bar-fill" id="hud-clear-fill"></i><u id="hud-target"></u></div><span id="hud-clear">0%</span></div>
+  </div>
+
+  <div class="hud-obj" id="hud-obj"></div>
+  <div class="hud-tier" id="hud-tier"></div>
+  <div class="hud-combo" id="hud-combo"></div>
+  <div class="hud-banner" id="hud-banner"></div>
+  <div class="hud-chat" id="hud-chat"></div>
+  <canvas class="hud-map" id="hud-map" width="132" height="132"></canvas>
+  <div class="hud-board" id="hud-board"></div>
+</div>
+
+<!-- ══════════ boon draft ══════════ -->
+<div id="boon" class="modal hidden">
+  <div class="modal-in wide">
+    <div class="mhead"><span class="kicker">SPONSOR OFFERS</span><h2 id="boon-title">Pick one</h2><p class="muted">These last until the broadcast ends.</p></div>
+    <div id="boon-cards" class="boon-cards"></div>
+  </div>
+</div>
+
+<!-- ══════════ brief ══════════ -->
+<div id="brief" class="modal hidden">
+  <div class="modal-in">
+    <div class="mhead"><span class="kicker" id="brief-kicker">CONTRACT</span><h2 id="brief-title">—</h2></div>
+    <p class="brief-text" id="brief-text"></p>
+    <div class="brief-obj" id="brief-obj"></div>
+    <div class="brief-stats" id="brief-stats"></div>
+    <div class="mfoot">
+      <button class="btn ghost no-drag" data-close="brief">Back</button>
+      <button class="btn prime no-drag" id="brief-go">GO LIVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ pause ══════════ -->
+<div id="pause" class="modal hidden">
+  <div class="modal-in">
+    <div class="mhead"><span class="kicker">FEED PAUSED</span><h2 id="pause-title">—</h2></div>
+    <div class="brief-stats" id="pause-stats"></div>
+    <div id="pause-boons" class="boonlist"></div>
+    <div class="mfoot col">
+      <button class="btn prime no-drag" id="pause-resume">Resume</button>
+      <button class="btn ghost no-drag" id="pause-restart">Restart</button>
+      <button class="btn danger no-drag" id="pause-quit">End broadcast</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ results ══════════ -->
+<div id="results" class="modal hidden">
+  <div class="modal-in">
+    <div class="mhead"><span class="kicker" id="res-kicker">BROADCAST ENDED</span><h2 id="res-title">—</h2><div id="res-stars" class="stars"></div></div>
+    <div class="res-big"><span id="res-viewers">0</span><em>PEAK VIEWERS</em></div>
+    <div class="brief-stats" id="res-stats"></div>
+    <div id="res-extra"></div>
+    <div class="mfoot" id="res-foot"></div>
+  </div>
+</div>
+
+<!-- ══════════ cutscene ══════════ -->
+<div id="cutscene" class="hidden">
+  <div class="cs-bar top"></div>
+  <div class="cs-bar bottom"></div>
+  <div class="cs-title" id="cs-title"></div>
+  <div class="cs-text" id="cs-text"><span id="cs-who"></span><p></p></div>
+  <button class="cs-skip no-drag" id="cs-skip">SKIP ▸</button>
+</div>
+
+<!-- ══════════ toast ══════════ -->
+<div id="toast"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
