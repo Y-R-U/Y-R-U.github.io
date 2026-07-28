@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0d0e13">
+<meta name="description" content="Addon Studio — make Minecraft Bedrock add-ons in your browser. Model, paint, animate, check and test, then export a real .mcaddon.">
+<title>Addon Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%236cc349'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%2384d95e'/%3E%3Crect x='3' y='5' width='3' height='3' fill='%2312200c'/%3E%3Crect x='10' y='5' width='3' height='3' fill='%2312200c'/%3E%3Crect x='5' y='10' width='6' height='2' fill='%2312200c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/studio.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="app">
+  <nav id="rail">
+    <div class="logo">ADDON<br>STUDIO</div>
+    <div id="railBtns"></div>
+  </nav>
+
+  <div id="main">
+    <header id="topbar">
+      <button class="iconbtn" id="btnProjects" title="Your add-ons" data-hint="All of your add-ons live here.">📚</button>
+      <div>
+        <div class="proj-name" id="projName">No add-on open</div>
+        <div class="proj-ns" id="projNs"></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn tiny ghost" id="btnCheck" data-hint="Checks every file for mistakes and tells you how to fix them.">🔍 Check</button>
+      <button class="btn tiny good" id="btnExport" data-hint="Builds the .mcaddon file you tap to install into Minecraft.">📦 Export</button>
+      <div id="saveDot" title="Saved"></div>
+    </header>
+
+    <div id="panes"></div>
+  </div>
+
+  <nav id="mobileNav"></nav>
+</div>
+
+<noscript>
+  <div style="padding:40px;text-align:center">Addon Studio needs JavaScript turned on.</div>
+</noscript>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

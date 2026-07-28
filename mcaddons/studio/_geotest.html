@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>geo test</title>
+<style>body{margin:0;background:#11131a;color:#ddd;font:13px system-ui}
+#row{display:flex;flex-wrap:wrap}canvas{display:block}div.lbl{position:absolute;bottom:2px;left:4px;color:#8f8;font:12px monospace}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head><body>
+<div id="row"></div>
+<script type="module">
+import * as THREE from 'three';
+import { buildGeo, makeTexture, makeMaterial, parseGeoFile } from './js/lib/geo.js';
+
+// One 16x16x16 cube at uv 0,0 on a 128x128 sheet.
+// Box-UV regions (pixels): east 0-16, north 16-32, west 32-48, south 48-64  (y 16-32)
+//                          up 16-32, down 32-48                            (y 0-16)
+// Each region gets a big blocky "F" — an F is unmistakable when mirrored or upside down.
+function tex() {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#1a1a1a'; x.fillRect(0, 0, 128, 128);
+  const F = (ox, oy, bg) => {
+    x.fillStyle = bg; x.fillRect(ox, oy, 16, 16);
+    x.fillStyle = '#000';
+    x.fillRect(ox + 4, oy + 2, 3, 12);   // spine (left)
+    x.fillRect(ox + 4, oy + 2, 9, 3);    // top arm
+    x.fillRect(ox + 4, oy + 7, 7, 3);    // middle arm
+  };
+  F(0, 16, '#ff7070');    // east
+  F(16, 16, '#70ff70');   // north
+  F(32, 16, '#7090ff');   // west
+  F(48, 16, '#ffe070');   // south
+  F(16, 0, '#ff70ff');    // up
+  F(32, 0, '#70ffff');    // down
+  return c;
+}
+
+const geoJSON = {
+  format_version: '1.12.0',
+  'minecraft:geometry': [{
+    description: { identifier: 'geometry.t', texture_width: 128, texture_height: 128 },
+    bones: [{ name: 'b', pivot: [0, 0, 0], cubes: [{ origin: [-8, 0, -8], size: [16, 16, 16], uv: [0, 0] }] }]
+  }]
+};
+
+const geo = parseGeoFile(geoJSON)[0];
+const mat = makeMaterial(makeTexture(tex()));
+
+const views = [
+  ['FRONT cam -Z : want green F', new THREE.Vector3(0, 0.5, -2.6)],
+  ['BACK cam +Z : want yellow F', new THREE.Vector3(0, 0.5, 2.6)],
+  ['cam +X : want red F (east)', new THREE.Vector3(2.6, 0.5, 0)],
+  ['cam -X : want blue F (west)', new THREE.Vector3(-2.6, 0.5, 0)],
+  ['TOP : want magenta F', new THREE.Vector3(0.001, 3, 0)],
+  ['BOTTOM : want cyan F', new THREE.Vector3(0.001, -2.2, 0)]
+];
+
+for (const [label, pos] of views) {
+  const wrap = document.createElement('div');
+  wrap.style.position = 'relative';
+  const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label;
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(300, 300);
+  renderer.setClearColor(0x11131a);
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xffffff, 3));
+  const built = buildGeo(geo, mat);
+  scene.add(built.root);
+  const cam = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  cam.position.copy(pos);
+  cam.lookAt(0, 0.5, 0);
+  cam.up.set(0, 1, 0);
+  renderer.render(scene, cam);
+  wrap.append(renderer.domElement, l);
+  document.getElementById('row').appendChild(wrap);
+}
+</script>
+</body></html>
