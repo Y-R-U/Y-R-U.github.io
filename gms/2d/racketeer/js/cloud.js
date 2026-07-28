@@ -16,8 +16,24 @@ let App = null;
 
 // A cloud save arriving mid-session can't be patched into the live App object
 // safely (screens hold references), so we write it down and restart clean.
+//
+// The reload makes this the most dangerous function in the game: adopt on every
+// boot and you have an infinite refresh loop. Two things prevent that — we only
+// adopt a save that is strictly NEWER than the local one, and this session-
+// scoped guard means we can never reload twice for the same cloud save even if
+// that comparison is somehow wrong again.
+const ADOPTED = "racketeer_adopted_at";
+
 function adopt(data) {
   if (!data) return;
+  const stamp = String(data.savedAt || 0);
+  try {
+    if (sessionStorage.getItem(ADOPTED) === stamp) {
+      console.warn("[racketeer] already adopted this cloud save — not reloading again");
+      return;
+    }
+    sessionStorage.setItem(ADOPTED, stamp);
+  } catch (e) { /* private mode: fall through, the newer-than check still holds */ }
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch (e) { /* private mode */ }
   location.reload();
 }
@@ -50,14 +66,20 @@ export function initCloud(app) {
   // Every career.persist() also goes to the cloud (debounced inside cloud.js).
   career.setSyncHook(save => slot.save(save));
 
-  // On boot, a signed-in player's account wins over whatever is on this device —
-  // they explicitly signed in to get their progress back. The two-saves chooser
-  // only appears at link time, where the ambiguity is real.
+  // On boot, whichever save was written last wins. Never compare the objects
+  // themselves: career.load() merges newSave() defaults into whatever it read,
+  // so a save that round-tripped through the cloud comes back with different
+  // key order and possibly extra keys, and byte equality reports a difference
+  // that isn't there.
   auth.ready().then(async () => {
     if (!auth.user || auth.user.anon) return;
     const remote = await slot.load();
     if (!remote || !remote.data) { slot.save(App.save); return; }
-    if (JSON.stringify(remote.data) !== JSON.stringify(App.save)) adopt(remote.data);
+    const theirs = remote.data.savedAt || 0;
+    const ours = App.save.savedAt || 0;
+    if (theirs > ours) adopt(remote.data);
+    else if (ours > theirs) slot.save(App.save);
+    // Equal stamps mean it's the same save. Do nothing at all.
   });
 }
 

@@ -99,6 +99,10 @@ let syncHook = null;
 export function setSyncHook(fn) { syncHook = fn; }
 
 export function persist(save) {
+  // When this save was last written. The cloud layer compares this instead of
+  // comparing the objects themselves — key order and merged-in defaults make
+  // two identical saves serialise differently, which is worse than useless.
+  save.savedAt = Date.now();
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* private mode */ }
   if (syncHook) { try { syncHook(save); } catch (e) { /* cloud problems never break play */ } }
 }
