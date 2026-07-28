@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// br8t games — every player can touch their own document tree and nothing else.
+//
+// There is deliberately no public/shared collection here yet. Anything global
+// (leaderboards, for instance) needs its own rules written for it; until then,
+// the default deny at the bottom of this file is the whole security model.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      // users/{uid}/games/{gameId} — one save document per game.
+      match /{sub=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Everything else is closed, including to signed-in users.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

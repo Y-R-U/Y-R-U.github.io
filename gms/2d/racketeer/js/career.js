@@ -93,8 +93,14 @@ export function applyCupRank(save, kind) {
   return { oldRank, newRank: save.rank };
 }
 
+// Optional mirror of every save to the player's br8t account (see cloud.js).
+// Stays null when the auth layer isn't available, which keeps the game offline-clean.
+let syncHook = null;
+export function setSyncHook(fn) { syncHook = fn; }
+
 export function persist(save) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* private mode */ }
+  if (syncHook) { try { syncHook(save); } catch (e) { /* cloud problems never break play */ } }
 }
 
 export function wipe() { localStorage.removeItem(SAVE_KEY); }

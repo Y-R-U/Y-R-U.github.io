@@ -1,0 +1,98 @@
+/* br8t games — the hub. Vanilla CSS, no build step, no webfonts:
+   the arcade should be on screen before a font request would have resolved. */
+
+:root {
+  --bg:     #0b0d12;
+  --card:   #141821;
+  --ink:    #eef2f8;
+  --dim:    #8b95a6;
+  --amber:  #ffb45c;
+  --line:   rgba(255,255,255,.10);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh;
+  background: var(--bg); color: var(--ink);
+  font: 400 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+
+/* Three slow-drifting colour fields. Cheaper than a canvas and it never
+   competes with a game's own framerate once one is running in an iframe. */
+.glow { position: fixed; inset: 0; z-index: -1; overflow: hidden; filter: blur(90px); opacity: .55; }
+.glow i {
+  position: absolute; display: block; border-radius: 50%;
+  width: 46vmax; height: 46vmax;
+  animation: drift 34s ease-in-out infinite alternate;
+}
+.glow i:nth-child(1) { background: #ff9a3c; top: -18vmax; left: -12vmax; }
+.glow i:nth-child(2) { background: #3d7dff; top: 22vmax; right: -18vmax; animation-duration: 44s; animation-delay: -8s; }
+.glow i:nth-child(3) { background: #b44dff; bottom: -24vmax; left: 26vmax; animation-duration: 52s; animation-delay: -20s; }
+@keyframes drift {
+  from { transform: translate3d(0,0,0) scale(1); }
+  to   { transform: translate3d(6vmax,-5vmax,0) scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) { .glow i { animation: none; } }
+
+header {
+  display: flex; align-items: center;
+  padding: 22px clamp(18px, 5vw, 56px) 0;
+}
+.wordmark {
+  font-size: 19px; font-weight: 700; letter-spacing: -.01em; text-decoration: none;
+}
+.wordmark span { color: var(--amber); font-weight: 400; }
+
+.hero { padding: clamp(46px, 11vh, 110px) clamp(18px, 5vw, 56px) clamp(30px, 6vh, 60px); max-width: 760px; }
+.hero h1 {
+  margin: 0 0 16px; font-size: clamp(34px, 7.2vw, 62px); line-height: 1.06;
+  letter-spacing: -.028em; font-weight: 700;
+}
+.hero h1 em { font-style: normal; color: var(--amber); }
+.hero p { margin: 0; max-width: 52ch; color: var(--dim); font-size: clamp(15px, 1.9vw, 17.5px); }
+
+.grid {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  padding: 0 clamp(18px, 5vw, 56px) 70px;
+}
+
+.card {
+  position: relative; display: block; overflow: hidden; text-decoration: none;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.card:hover, .card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent, var(--amber));
+  box-shadow: 0 16px 44px rgba(0,0,0,.5);
+  outline: none;
+}
+.card .shot { aspect-ratio: 16 / 10; background: #0e1117; overflow: hidden; }
+.card .shot img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .5s ease; opacity: .92;
+}
+.card:hover .shot img { transform: scale(1.05); opacity: 1; }
+.card .body { padding: 15px 17px 18px; }
+.card h2 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: -.01em; }
+.card .tag { display: block; margin: 2px 0 9px; font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--accent, var(--amber)); }
+.card p { margin: 0; font-size: 13.6px; line-height: 1.55; color: var(--dim); }
+
+.card.soon { pointer-events: none; }
+.card.soon .shot img { filter: grayscale(1) brightness(.55); }
+.card .flag {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  font-size: 10.5px; font-weight: 650; letter-spacing: .12em; text-transform: uppercase;
+  padding: 5px 9px; border-radius: 999px;
+  background: rgba(8,10,14,.72); border: 1px solid var(--line); color: var(--dim);
+  backdrop-filter: blur(6px);
+}
+.card:not(.soon) .flag { color: var(--accent, var(--amber)); border-color: var(--accent, var(--amber)); }
+
+footer { padding: 0 clamp(18px, 5vw, 56px) 44px; color: var(--dim); font-size: 13px; }
+footer a { color: var(--dim); }
+footer a:hover { color: var(--ink); }

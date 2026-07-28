@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#040404">
+<title>8:20 — the light hitting your screen is eight minutes old · br8t</title>
+<meta name="description" content="The sunlight around you right now is eight minutes and twenty seconds old — plus a hundred-thousand-year prison break. Scroll one photon's journey from the Sun's core to your retina. Drawn live by your GPU: no images, no video, no libraries.">
+<meta property="og:title" content="8:20 — br8t">
+<meta property="og:description" content="The life of the light hitting your screen right now, from the Sun's core to the back of your eye. Every frame drawn live by your GPU.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23ffb45c'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23ff6b1a' stroke-width='1.4' opacity='.6'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/InstrumentSerif-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SpaceMono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div id="curtain"></div>
+
+<header class="hud-top">
+  <div class="mark">BR8T <span>· 8:20</span></div>
+  <nav class="hud-right">
+    <a id="games" href="https://games.br8t.com">GAMES</a>
+    <button id="snd" aria-label="toggle sound">SOUND <b>OFF</b></button>
+  </nav>
+</header>
+
+<div id="rail" aria-hidden="true"><div id="railFill"></div></div>
+
+<div id="readout" aria-hidden="true">
+  <div id="roT">T+ 00:00.00</div>
+  <div id="roKM">0 km</div>
+  <div>v = c &nbsp;·&nbsp; m = 0</div>
+</div>
+
+<div id="cue">SCROLL</div>
+
+<main id="story">
+
+  <section class="ch hero" data-a="-0.08" data-b="0.09">
+    <div class="inner">
+      <p class="label">The light hitting your screen has a life story</p>
+      <h1>Eight minutes,<br><em>twenty seconds.</em></h1>
+      <p class="sub">Every ray of sunlight falling outside right now left the Sun at
+        <b class="dep">—:—:—</b> — after spending a hundred thousand years fighting
+        its way out. This is the journey. You are the destination.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-a="0.118" data-b="0.20">
+    <div class="inner">
+      <p class="label">Chapter I · The core · T−100,000 years</p>
+      <h2>Born in <em>a furnace.</em></h2>
+      <p>Fifteen million degrees. Two hundred and fifty billion atmospheres.
+        In the Sun's core, hydrogen nuclei are crushed into helium — and the
+        sliver of mass left over becomes a flash of pure energy.</p>
+      <p>A photon. This one is yours.</p>
+    </div>
+  </section>
+
+  <section class="ch right" data-a="0.228" data-b="0.332">
+    <div class="inner">
+      <p class="label">Chapter II · The radiative zone</p>
+      <h2>Then it gets <em>lost.</em></h2>
+      <p>The plasma here is so dense that light travels about a centimetre
+        before being absorbed and spat back out — in a random direction.
+        Your photon will do this some 10²⁵ times. The exit is only
+        500,000&nbsp;km away. The walk takes millennia.</p>
+      <p class="count">TIME TRAPPED INSIDE THE SUN — <b id="years">0</b> YEARS</p>
+      <p class="foot">Run your cursor through the plasma. It notices.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-a="0.352" data-b="0.42">
+    <div class="inner">
+      <p class="label">Chapter III · The photosphere · T+00:00</p>
+      <h2>Daylight, <em>at last.</em></h2>
+      <p>At the surface the plasma thins to transparency and — for the first
+        time since the Stone Age — nothing stands in the way. The photon
+        leaves at 299,792,458 metres per second. It will never slow down,
+        and it will never stop.</p>
+      <p>The clock starts now.</p>
+    </div>
+  </section>
+
+  <section class="ch right" data-a="0.445" data-b="0.545">
+    <div class="inner">
+      <p class="label">T+03:13 · 58,000,000 km</p>
+      <h2>Three minutes <em>to Mercury.</em></h2>
+      <p>Space is silent, black, and almost insultingly empty. Nothing to
+        bounce off. Nothing to slow for. Mercury slides past — 430&nbsp;°C on
+        the sunlit side, −180&nbsp;°C in the shade — and the photon doesn't
+        even wave.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-a="0.565" data-b="0.65">
+    <div class="inner">
+      <p class="label">T+06:01 · 108,000,000 km</p>
+      <h2>Six minutes. <em>Venus.</em></h2>
+      <p>A greenhouse with no exit: clouds of sulphuric acid over a surface
+        hot enough to melt lead. A warning shot of a world.</p>
+      <p>Dead ahead, a pale blue dot is getting bigger.</p>
+    </div>
+  </section>
+
+  <section class="ch right" data-a="0.685" data-b="0.775">
+    <div class="inner">
+      <p class="label">T+08:19 · The last 100 km</p>
+      <h2>The sky takes <em>its cut.</em></h2>
+      <p>Air, finally. Nitrogen and oxygen scatter the bluest light in every
+        direction — the sky is blue because of all the photons that
+        <i>didn't</i> make it to you directly. Yours threads through the
+        entire atmosphere in a third of a millisecond.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-a="0.80" data-b="0.885">
+    <div class="inner">
+      <p class="label">T+08:20.000 · Arrival</p>
+      <h2>The last <em>nanosecond.</em></h2>
+      <p>Through a pupil two millimetres wide, onto a curved screen of a
+        hundred million cells. One molecule of rhodopsin folds. One
+        electrical whisper rides the optic nerve.</p>
+      <p>150 million kilometres, spent in an instant, to become something
+        new: a thought.</p>
+      <p class="foot">That's your pupil. It's doing this right now.</p>
+    </div>
+  </section>
+
+  <section class="ch outro" data-a="0.915" data-b="1.02">
+    <div class="inner">
+      <h2>You never see <em>the present.</em></h2>
+      <p>Everything you look at is history. The Sun, as it was eight minutes
+        ago. The nearest star, four years. The Moon, a second and a half.
+        This screen — about two nanoseconds.</p>
+      <p>Old light is the only light there is.</p>
+      <p class="count">PHOTONS THAT HAVE ENTERED YOUR EYES SINCE YOU OPENED
+        THIS PAGE ≈ <b id="photons">0</b></p>
+      <button id="again">LIVE IT AGAIN ⟲</button>
+      <p class="colophon"><span class="mark2">BR8T</span><br>
+        No images · No video · No libraries<br>
+        Every frame of this page is drawn live by your GPU, from mathematics.<br>
+        The sunlight arriving as you read this left the Sun at <b class="dep">—:—:—</b>.</p>
+    </div>
+  </section>
+
+</main>
+
+<div style="height:2200vh" aria-hidden="true"></div>
+
+<div id="nogl" hidden>
+  <div class="inner">
+    <h1>Eight minutes, <em>twenty seconds.</em></h1>
+    <p>That's how old the sunlight around you is. This page draws that journey
+      live with WebGL2, and your browser just declined the job — try a current
+      Chrome, Firefox, Safari or Edge with hardware acceleration on.</p>
+  </div>
+</div>
+
+<script>
+if (location.search.includes('nocur')) document.getElementById('curtain').remove();
+// surfaced only with ?diag — turns any boot error into readable DOM text
+if (location.search.includes('diag')) {
+  addEventListener('error', (e) => {
+    const n = document.getElementById('nogl');
+    n.hidden = false;
+    n.querySelector('p').textContent = 'DIAG: ' + (e.message || e.error || 'unknown') + ' @ ' + (e.filename || '') + ':' + (e.lineno || '');
+  }, true);
+}
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

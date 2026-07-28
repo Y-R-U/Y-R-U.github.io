@@ -39,6 +39,16 @@ if (params.has("skills")) {             // ?skills=all for testing
 
 setHaptics(App.save.settings?.haptics !== false);
 
+// br8t account + cloud save. Loaded dynamically and deliberately optional: any
+// failure (offline, blocked, opened from file://) leaves the game fully playable
+// on its local save. Skipped entirely under ?auto so soak tests stay hermetic.
+let Cloud = null;
+if (!AUTO) {
+  import("./cloud.js")
+    .then(m => { Cloud = m; m.initCloud(App); })
+    .catch(e => console.warn("[racketeer] account layer unavailable", e));
+}
+
 function doResize() { resize(canvas); }
 window.addEventListener("resize", doResize);
 doResize();
@@ -57,6 +67,9 @@ function launch(cfg, opp, onOver) {
       setCrowdLevel(0);
       onOver(m);
       career.persist(App.save);
+      // Fires on the results screen, never mid-match. No-op until (and unless)
+      // the account layer has loaded.
+      if (!AUTO && Cloud) Cloud.matchFinished();
       if (AUTO) setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; autoNext(); }, 800);
     },
   };
