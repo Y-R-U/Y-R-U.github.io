@@ -74,22 +74,11 @@ body {
 }
 .mark span { color: var(--amber); }
 /* right-hand cluster: the games doorway, then the sound toggle */
-.hud-right { display: flex; align-items: center; gap: 9px; }
-#games {
-  pointer-events: auto; text-decoration: none;
-  font: 400 10px/1 var(--mono); letter-spacing: .22em;
-  color: var(--dim);
-  background: rgba(0,0,0,.35);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 999px;
-  padding: 8px 14px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: color .3s, border-color .3s;
-}
-#games:hover { color: var(--amber); border-color: rgba(255,180,92,.4); }
+.hud-right { display: flex; align-items: center; gap: 9px; pointer-events: auto; }
+#games { text-decoration: none; }
 
-#snd {
+/* One rule for both pills, so they can never drift apart. */
+#snd, #games {
   pointer-events: auto; cursor: pointer;
   font: 400 10px/1 var(--mono); letter-spacing: .22em;
   color: var(--dim);
@@ -103,7 +92,7 @@ body {
 }
 #snd b { color: var(--dim); font-weight: 700; }
 #snd.on, #snd.on b { color: var(--amber); border-color: rgba(255,180,92,.4); }
-#snd:hover { color: var(--ink); }
+#snd:hover, #games:hover { color: var(--ink); }
 
 /* progress rail — the photon's altimeter */
 #rail {
