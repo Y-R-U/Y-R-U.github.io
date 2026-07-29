@@ -111,9 +111,12 @@ html, body {
 .paper-btn.primary:hover { background: #4a7340; }
 
 /* === Settings Cog === */
+/* right shifts clear of the br8t account avatar, which floats in the top-right
+   corner. --br8t-account-space is published by /lib/auth/ui.js and falls back
+   to 0 when the account layer isn't loaded. */
 .cog-btn {
     position: absolute;
-    top: 12px; right: 12px;
+    top: 12px; right: calc(12px + var(--br8t-account-space, 0px));
     z-index: 50;
     width: 44px; height: 44px;
     border-radius: 50%;
@@ -272,7 +275,7 @@ html, body {
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    padding-right: 56px; /* space for cog */
+    padding-right: calc(56px + var(--br8t-account-space, 0px)); /* space for cog + account avatar */
     z-index: 20;
     pointer-events: none;
     background: linear-gradient(180deg, rgba(245,240,225,0.85) 0%, rgba(245,240,225,0) 100%);

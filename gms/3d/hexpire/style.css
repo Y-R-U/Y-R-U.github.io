@@ -146,6 +146,9 @@ button.big.gold { background: linear-gradient(180deg, #e8c355, #c99b2e); color: 
 #hud-top {
   position: absolute; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px;
   display: flex; gap: 8px; justify-content: space-between; pointer-events: none;
+  /* keep the land pill clear of the br8t account avatar (top-right, 40+10px);
+     the var is published by /lib/auth/ui.js and is 0 when it isn't mounted */
+  padding-right: var(--br8t-account-space, 0px);
 }
 .hud-pill {
   background: rgba(9, 22, 30, .82); border: 1px solid rgba(240, 214, 138, .25);
@@ -244,6 +247,7 @@ button.big.gold { background: linear-gradient(180deg, #e8c355, #c99b2e); color: 
 #ed-top {
   position: absolute; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px;
   display: flex; gap: 8px; align-items: center;
+  padding-right: var(--br8t-account-space, 0px);   /* clear the account avatar */
 }
 #ed-name { flex: 1; background: rgba(9, 22, 30, .85); }
 #ed-tools {

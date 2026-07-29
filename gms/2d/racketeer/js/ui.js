@@ -67,7 +67,7 @@ export function buildMenu() {
     { emo: "🏆", lab: "CUPS", sub: `${save.trophies.local + save.trophies.national + save.trophies.world} 🏆`,
       fn: () => go(buildTourn, "tourn") },
   ];
-  const dailyDone = save.dailyWin === todayStr();
+  const dailyDone = !!save.dailyWin && save.dailyWin >= todayStr();
   const R = [
     { emo: "📅", lab: "DAILY", sub: dailyDone ? "✅" : dailyMatch().mod.emo,
       fn: () => { initAudio(); sfx.click(); confirmDaily(); } },

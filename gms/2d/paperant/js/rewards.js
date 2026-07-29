@@ -30,19 +30,21 @@ const Rewards = (() => {
 
     let state = null; // { lastClaim, streak, lastChallenge }
 
+    // UTC, not local time. Reward state now follows the player between devices,
+    // and two devices in different timezones must agree on what "today" is —
+    // otherwise one of them thinks the daily is unclaimed and pays out twice.
     function todayStr() {
-        const d = new Date();
-        return d.getFullYear() + '-' +
-            String(d.getMonth() + 1).padStart(2, '0') + '-' +
-            String(d.getDate()).padStart(2, '0');
+        return new Date().toISOString().slice(0, 10);
     }
 
     function yesterdayStr() {
-        const d = new Date();
-        d.setDate(d.getDate() - 1);
-        return d.getFullYear() + '-' +
-            String(d.getMonth() + 1).padStart(2, '0') + '-' +
-            String(d.getDate()).padStart(2, '0');
+        return new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+    }
+
+    // A claim recorded for today OR LATER counts as claimed: a save synced from
+    // a device whose clock is ahead must not reopen the reward here.
+    function claimedOnOrAfterToday(stamp) {
+        return !!stamp && stamp >= todayStr();
     }
 
     function init() {
@@ -75,7 +77,7 @@ const Rewards = (() => {
     // === Daily reward ===
 
     function canClaimDaily() {
-        return state.lastClaim !== todayStr();
+        return !claimedOnOrAfterToday(state.lastClaim);
     }
 
     /** The streak day (1-7) that today's claim would be / was. */
@@ -122,7 +124,7 @@ const Rewards = (() => {
     // === Daily challenge ===
 
     function isChallengeDone() {
-        return state.lastChallenge === todayStr();
+        return claimedOnOrAfterToday(state.lastChallenge);
     }
 
     // Deterministic LCG seeded from the date so everyone gets the same

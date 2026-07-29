@@ -136,7 +136,9 @@ function playQuick(stars) {
 
 function playDaily() {
   const d = MODES.dailyMatch();
-  const already = App.save.dailyWin === d.date;
+  // >= not ===: a save synced from a device whose clock is ahead can carry a
+  // dailyWin dated later than our own "today", and that still means claimed.
+  const already = !!App.save.dailyWin && App.save.dailyWin >= d.date;
   if (already) d.cfg.prize = 25;
   launch(d.cfg, d.opp, (m) => {
     App.save.money += Math.max(0, m.earnings);

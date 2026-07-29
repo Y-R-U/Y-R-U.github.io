@@ -202,9 +202,11 @@ export function tournamentMatch(ts) {
 }
 
 /* ---------------- Daily challenge ---------------- */
+// UTC, not local time. Daily state now follows the player between devices, and
+// two devices in different timezones must agree on what "today" is — otherwise
+// one of them thinks the daily is unclaimed and hands out a second reward.
 export function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function dailyMatch() {

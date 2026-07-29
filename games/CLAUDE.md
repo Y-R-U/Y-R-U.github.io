@@ -60,6 +60,20 @@ resolves identically on games.br8t.com and on GitHub Pages.
 4. Shift any top-right furniture with `calc(… + var(--br8t-account-space, 0px))`.
 5. Add the path to `GAMES` in `games/deploy.sh`, and flip `soon` in `games/js/games.js`.
 
+### The dailies rule (applies to EVERY game with a daily)
+
+Daily-claim state syncs like everything else, so a second device must be able to
+tell the daily has already been claimed. Two requirements, both mandatory:
+
+1. **Store the day as a UTC date** — `new Date().toISOString().slice(0, 10)`.
+   Local dates mean two devices disagree about what "today" is.
+2. **Test `last >= today`, never `last === today`.** A save synced from a device
+   whose clock is ahead carries a stamp later than our own today; equality reads
+   that as "not today" and pays out a second time.
+
+Applied in Racketeer (`dailyWin`), Grudge Bugs (`daily.last`), Paper Ant
+(`lastClaim`, `lastChallenge`) and Ironhail. Match it in any game added later.
+
 **Never sync in-progress match state.** Career progress, unlocks, settings,
 competitions and stats travel between devices; a half-played match does not.
 Aaron was explicit about this. Hexpire's `hexpire.resume` is the clearest case.

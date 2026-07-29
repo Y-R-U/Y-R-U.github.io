@@ -1,5 +1,5 @@
 // ---- boot, game loop, match lifecycle, app facade ----
-import { SETTINGS_KEY, DEFAULT_HALF, PITCH_TYPES } from './const.js';
+import { SETTINGS_KEY, WORLDCUP_KEY, DEFAULT_HALF, PITCH_TYPES } from './const.js';
 import { clamp, pick, irand } from './util.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
@@ -42,13 +42,28 @@ function loadSettings() {
 
 const PITCH_EMOJI = { grass: '🌱', wet: '🌧', mud: '🟤', ice: '❄️', dry: '☀️' };
 
+// The World Cup bracket is plain data — nations still in, results so far, which
+// stage. No live match hides in it, so it is safe to restore straight into.
+function loadCup() {
+  try { const raw = localStorage.getItem(WORLDCUP_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (e) { return null; }
+}
+function saveCup(cup) {
+  try {
+    if (cup) localStorage.setItem(WORLDCUP_KEY, JSON.stringify(cup));
+    else localStorage.removeItem(WORLDCUP_KEY);
+  } catch (e) { /* full or blocked */ }
+}
+
 // ---------- app facade ----------
 const app = {
   settings: loadSettings(),
   match: null,
   meta: null,
   demo: null,
-  cup: null,
+  _cup: loadCup(),
+  get cup() { return this._cup; },
+  set cup(v) { this._cup = v; saveCup(v); },
   lastQuick: null,
   pauseClose: null,
 
@@ -230,6 +245,7 @@ const app = {
   _onFullTime(m) {
     const meta = this.meta;
     if (params.get('auto')) { this._autoNext(m); return; }
+    if (cloud) cloud.matchFinished();
     UI.fullTimeModal(m, meta, () => this._afterMatch(m, meta));
   },
 
@@ -270,6 +286,7 @@ const app = {
     }
     if (meta.kind === 'wc') {
       wcReport(this.cup, won, r.a, r.b, r.pens);
+      saveCup(this.cup);          // wcReport mutates in place, so the setter never fires
       UI.showCup();
       return;
     }
@@ -351,6 +368,13 @@ app.applySettings();
 resize();
 
 window.__game = app; // debug/test hook
+
+// Account / cloud save. Loaded late and optionally so a missing or blocked auth
+// layer costs nothing, and skipped under the test hooks so soaks stay hermetic.
+let cloud = null;
+if (!params.get('auto') && !params.get('play') && !params.get('half')) {
+  import('./cloud.js').then(m => { cloud = m; }).catch(() => {});
+}
 
 if (params.get('auto')) {
   app._autoNext(null);

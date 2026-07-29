@@ -97,3 +97,6 @@ export const ROLE_PULL = { GK: 0.0, DF: 0.22, MF: 0.34, FW: 0.38 };
 
 export const SAVE_KEY = 'sundayleague.career.v1';
 export const SETTINGS_KEY = 'sundayleague.settings.v1';
+// A World Cup run is a competition, not a match: it spans several games, so it
+// survives a closed tab and follows the player to another device.
+export const WORLDCUP_KEY = 'sundayleague.worldcup.v1';

@@ -71,6 +71,16 @@
         }
     });
 
+    // Optional br8t account layer: cloud saves + the avatar. Kept out of the way
+    // of the level-geometry harness and any automated run (?auto / ?test), which
+    // must stay hermetic and offline.
+    const params = new URLSearchParams(location.search);
+    if (!params.has('auto') && !params.has('test')) {
+        import('./cloud.js')
+            .then(m => { window.PaperAntCloud = m; })
+            .catch(() => { /* offline, blocked, or file:// — play on locally */ });
+    }
+
     // Start game loop (RAF-based, safe to call once)
     Game.startLoop();
 

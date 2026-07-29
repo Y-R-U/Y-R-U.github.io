@@ -224,14 +224,18 @@ export function totalStars() {
   return Object.values(profile.campaign).reduce((a, m) => a + (m.stars || 0), 0);
 }
 
+// UTC, not local time. The profile now follows the player between devices, and
+// two devices in different timezones must agree on what "today" is — otherwise
+// one of them thinks the daily is unclaimed and hands out a second run.
 export function todayKey() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
-         String(d.getDate()).padStart(2, '0');
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function dailyAvailable() {
-  return profile.daily.day !== todayKey() || !profile.daily.claimed;
+  // `>=` not `!==`: a profile synced from a device whose clock is ahead carries
+  // a day later than our own today, and that still means claimed.
+  const claimedToday = !!profile.daily.day && profile.daily.day >= todayKey() && profile.daily.claimed;
+  return !claimedToday;
 }
 
 export function markDailyClaimed() {

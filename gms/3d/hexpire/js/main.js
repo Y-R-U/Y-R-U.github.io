@@ -30,6 +30,15 @@ const AUTO = P.get('auto') === '1';
 const LITE = P.get('lite') === '1' || SHOT;
 const MAPP = P.get('map');
 
+// Optional br8t account layer. Skipped under the headless test flags so soak /
+// screenshot runs stay hermetic, and non-fatal if it can't load at all.
+let cloudMatchFinished = null;
+if (!AUTO && !SHOT) {
+  import('./cloud.js')
+    .then(m => { cloudMatchFinished = m.matchFinished; })
+    .catch(() => { /* offline, blocked, or file:// — play on with a local save */ });
+}
+
 const G = {
   st: null,
   humanIdx: 0,
@@ -424,6 +433,7 @@ function checkGameEnd() {
   setTimeout(() => {
     if (win) Sfx.victory(); else Sfx.defeat();
     if (AUTO) return; // soak: leave the modal out, __done is set
+    if (cloudMatchFinished) cloudMatchFinished();
     const nextCh = win && G.story ? STORY[STORY.findIndex(s => s.id === G.story.id) + 1] : null;
     UI.resultModal({
       win,

@@ -21,6 +21,13 @@ const FLAG = { lite: params.has('lite'), shot: params.has('shot'), auto: params.
 const errors = [];
 window.addEventListener('error', (e) => errors.push(String(e.message)));
 
+// br8t account / cloud save — optional, and never loaded for a run that asked
+// not to be saved or for a headless test, so those stay hermetic.
+let cloud = null;
+if (!params.has('nosave') && !FLAG.auto && !FLAG.shot && !FLAG.fast) {
+  import('./cloud.js').then(m => { cloud = m; }).catch(() => { /* play on, local save only */ });
+}
+
 // ---------------- three boot ----------------
 const container = $('game-container');
 const renderer = new T.WebGLRenderer({ antialias: !FLAG.lite, powerPreference: 'high-performance' });
@@ -162,6 +169,7 @@ function onBattleOver(res, ch, rematch) {
   p.coins += coins;
   save.save();
   if (FLAG.auto) { window.__result = res; return; }
+  cloud?.battleFinished();
   ui.hudVisible(false);
   ui.resultsModal(res, coins, stars, { isStory: !!ch, hasNext }, (i) => {
     if (ch && res.playerWon && hasNext && i === 0) return startStory(CHAPTERS[CHAPTERS.indexOf(ch) + 1]);

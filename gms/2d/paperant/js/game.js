@@ -308,6 +308,8 @@ const Game = (() => {
 
         if (celebrationTimer <= 0) {
             state = 'levelComplete';
+            // One count per finished level, on the results screen only.
+            window.PaperAntCloud?.levelFinished();
             if (challengeMode) {
                 const rewardItems = Rewards.completeChallenge();
                 UI.showChallengeComplete(celebrationStars, timeUsed, rewardItems);

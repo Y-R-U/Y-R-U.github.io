@@ -64,7 +64,9 @@ button { font-family: inherit; color: inherit; cursor: pointer; border: none; ba
   position: absolute;
   top: var(--pad-t);
   left: var(--pad-l);
-  right: var(--pad-r);
+  /* the account avatar floats in this corner; --br8t-account-space is published
+     by /lib/auth/ui.js and is 0 when the account layer is not loaded */
+  right: calc(var(--pad-r) + var(--br8t-account-space, 0px));
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -836,11 +838,23 @@ body.pad-left #btn-mark  { right: auto; left: calc(var(--pad-r) + 24px); }
   justify-content: space-between;
   gap: 10px;
   padding-bottom: 8px;
+  /* the account avatar floats over this corner. Reserving the space is only
+     half the job — on a phone the row is already full, so it is allowed to
+     wrap the rank/scrap group onto its own line rather than run under it */
+  padding-right: var(--br8t-account-space, 0px);
+  flex-wrap: wrap;
+  row-gap: 6px;
   border-bottom: 1px solid var(--line);
   flex: none;
 }
-.sb-left, .sb-right { display: flex; align-items: center; gap: 8px; }
+.sb-left, .sb-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sb-right { margin-left: auto; }
+/* a long callsign is truncated rather than pushing the rank off the sheet */
 .sb-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 2px;

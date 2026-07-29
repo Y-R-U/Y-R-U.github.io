@@ -36,15 +36,17 @@ export function addCoins(n) { load().coins = Math.max(0, load().coins + n); save
 
 export function todayStr() { return new Date().toISOString().slice(0, 10); }
 
-// returns {day, amount} if a daily chest is claimable today, else null
+// returns {day, amount} if a daily chest is claimable today, else null.
+// `>=` rather than `===`: the profile now syncs between devices, and one whose
+// clock is ahead can leave `last` dated later than our own today — still claimed.
 export function dailyAvailable() {
   const d = load().daily;
-  return d.last === todayStr() ? null : true;
+  return d.last && d.last >= todayStr() ? null : true;
 }
 export function claimDaily(amounts) {
   const p = load();
   const today = todayStr();
-  if (p.daily.last === today) return null;
+  if (p.daily.last && p.daily.last >= today) return null;
   const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
   p.daily.streak = p.daily.last === yesterday ? Math.min(7, p.daily.streak + 1) : 1;
   p.daily.last = today;

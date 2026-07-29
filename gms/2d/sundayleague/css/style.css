@@ -57,10 +57,12 @@ html, body {
 }
 #ticker.show { opacity: 1; }
 
+/* The account avatar floats in the top-right corner; --br8t-account-space is
+   published by /lib/auth/ui.js and falls back to 0 when it isn't loaded. */
 #pauseBtn {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 8px);
-  right: calc(env(safe-area-inset-right, 0px) + 10px);
+  right: calc(env(safe-area-inset-right, 0px) + 10px + var(--br8t-account-space, 0px));
   pointer-events: auto;
   width: 38px; height: 38px;
   border-radius: 12px;

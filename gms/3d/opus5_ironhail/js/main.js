@@ -86,6 +86,15 @@ initRenameModal((name) => {
 
 AudioFX.init();
 
+// The br8t account layer is optional scenery: if it will not load, the game is
+// unchanged. Unattended runs skip it so a soak never touches a real account.
+let cloud = null;
+if (!AUTO_MODE && !SHOT_MODE) {
+  import('./cloud.js')
+    .then((m) => { cloud = m; })
+    .catch(() => { /* offline, blocked or file:// — local save only */ });
+}
+
 // ---------------------------------------------------------------------------
 // Screen routing
 // ---------------------------------------------------------------------------
@@ -169,6 +178,10 @@ on('battle-over', (res) => {
 function openResults(res) {
   showMenu(true);
   showResults(res);
+  // Counted here, not on `battle-over`: the account prompt must not open over
+  // the victory film or the replay reel. The flag keeps a reel replay — which
+  // comes back through this same panel — from counting as a second mission.
+  if (cloud && !res.counted) { res.counted = true; cloud.missionFinished(); }
 }
 
 function replayHighlights() {

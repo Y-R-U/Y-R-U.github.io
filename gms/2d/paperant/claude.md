@@ -62,6 +62,7 @@ paperant/
 │   ├── ui.js           - Screens, popups, HUD, level grid, power-up bar, daily/challenge UI
 │   ├── levels.js       - Level state, save/load progress, stars
 │   ├── game.js         - Game loop, state machine, power-up effects, challenge mode
+│   ├── cloud.js        - Optional br8t account layer (cloud save of the 4 keys below)
 │   └── main.js         - Entry point, wiring all systems together
 └── music/              - Optional: theme1.mp3 through theme9.mp3
 ```
@@ -70,6 +71,11 @@ paperant/
 - `paperant_progress` — per-level unlocked/completed/stars/bestTime
 - `paperant_powerups` — power-up inventory (starter pack granted on first run)
 - `paperant_rewards` — `{ lastClaim, streak, lastChallenge }` (local YYYY-MM-DD)
+- `paperant_audio` — `{ sfx, music, vibrate }` prefs
+
+All four are mirrored to the player's br8t account by `js/cloud.js` (see
+`/games/CLAUDE.md`). `main.js` imports it dynamically and skips it entirely
+under `?auto` / `?test`, so automated runs stay hermetic.
 
 ## Architecture
 - Module pattern (IIFE singletons) for each system
