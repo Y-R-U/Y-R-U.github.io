@@ -101,6 +101,17 @@ Aaron was explicit about this. Hexpire's `hexpire.resume` is the clearest case.
 - **Screenshots don't prove interactivity.** A `pointer-events: none` bug on the
   br8t.com GAMES link passed every screenshot. Test real clicks.
 
+## Order of work: change → commit → deploy
+
+Git is the source of truth. `deploy.sh` pushes files from a working tree
+straight to a live box that nothing else tracks, so **deploying before
+committing leaves the live site running code with no commit behind it** and
+nothing clean to roll back to.
+
+Commit first, then deploy from committed code. If a live test then finds
+something, fix it and commit again — an extra commit is cheaper than a deploy
+nobody can trace.
+
 ## Testing
 
 Headless Chrome + raw CDP from node, no puppeteer:
