@@ -106,9 +106,26 @@ Cloudflare account ID: `923cdf859ffb1c6b2d38f267d9521078`
 
 ---
 
+---
+
+## games.br8t.com — READ `/games/CLAUDE.md` FIRST
+
+If the work involves **games.br8t.com**, the games hub, player **sign-in /
+accounts**, **cloud saves**, `/lib/auth/`, or any game with a `js/cloud.js` —
+read **`/games/CLAUDE.md`** before doing anything. It holds the architecture,
+the deploy story, the state of play, and a list of gotchas that have already
+cost real debugging time (an infinite reload loop, a stale-cache false alarm, a
+sign-in that silently didn't persist).
+
+`games.br8t.com` is a **separate host** from this GitHub Pages site: a Caddy box
+reached by `games/deploy.sh`. Pushing to `main` does NOT deploy it.
+
+---
+
 ## Per-Project CLAUDE.md Files
 
 Some projects have their own `CLAUDE.md` with architecture details:
+- `/games/CLAUDE.md` — **the games.br8t.com hub + the shared account layer** (see above)
 - `/gms/3d/crowd/CLAUDE.md` — Crowd Rush 3D (Three.js, multi-file)
 - `/gms/2d/paperant/claude.md` — Paper Ant puzzle game
 

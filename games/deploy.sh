@@ -16,6 +16,11 @@ SITE="/srv/apps/br8tgames/site"
 # Games that ship. Add a path here when you flip `soon` off in js/games.js.
 GAMES=(
   "gms/2d/racketeer"
+  "gms/3d/opus5_ironhail"
+  "gms/3d/hexpire"
+  "gms/3d/grudgebugs"
+  "gms/2d/sundayleague"
+  "gms/2d/paperant"
 )
 
 echo ">> ensuring dirs"
