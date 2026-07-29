@@ -46,22 +46,36 @@ class AudioManager {
     }));
   }
 
-  // Probe which music files actually exist
+  // Probe which music files actually exist. Ten HEAD requests on every session
+  // is a lot of noise for an answer that changes only when files are added, so
+  // the result is cached for a day.
   async checkAvailableTracks() {
     if (this.tracksChecked) return;
-    this.tracksChecked = true;
-    this.availableTracks = [];
 
-    const checks = [];
-    for (let i = 1; i <= this.totalTracks; i++) {
-      checks.push(
-        fetch(`./music/theme${i}.mp3`, { method: 'HEAD' })
-          .then(res => { if (res.ok) this.availableTracks.push(i); })
-          .catch(() => { /* file not available */ })
-      );
-    }
-    await Promise.all(checks);
-    this.availableTracks.sort((a, b) => a - b);
+    const cached = this.readTrackCache();
+    if (cached) { this.availableTracks = cached; this.tracksChecked = true; return; }
+
+    this.tracksChecked = true;
+    const found = [];
+    await Promise.all(Array.from({ length: this.totalTracks }, (_, i) =>
+      fetch(`./music/theme${i + 1}.mp3`, { method: 'HEAD' })
+        .then(res => { if (res.ok) found.push(i + 1); })
+        .catch(() => { /* file not available */ })
+    ));
+    found.sort((a, b) => a - b);
+    this.availableTracks = found;
+    try {
+      localStorage.setItem('sudokuTracks', JSON.stringify({ at: Date.now(), tracks: found }));
+    } catch (e) { /* private mode */ }
+  }
+
+  readTrackCache() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('sudokuTracks') || 'null');
+      if (!raw || !Array.isArray(raw.tracks)) return null;
+      if (Date.now() - (raw.at || 0) > 86400000) return null;
+      return raw.tracks.filter(n => Number.isInteger(n) && n >= 1 && n <= this.totalTracks);
+    } catch (e) { return null; }
   }
 
   async setMusic(enabled) {

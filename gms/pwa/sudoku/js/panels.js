@@ -4,10 +4,21 @@ class PanelManager {
     this.audio = audioManager;
     this.onOpen = hooks.onOpen || (() => {});
     this.onClose = hooks.onClose || (() => {});
-    this.getStats = hooks.getStats || (() => JSON.parse(localStorage.getItem('sudokuStats')) || {});
+    this.getStats = hooks.getStats || (() => JSON.parse(localStorage.getItem('sudokuStats') || '{}'));
+    this.getHintPref = hooks.getHintPref || (() => true);
+    this.setHintPref = hooks.setHintPref || (() => {});
     this.initSettingsPanel();
     this.initStatsPanel();
     this.initHelpPanel();
+    // Esc closes whichever panel is on top, so a keyboard user is never stuck.
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      const open = document.querySelector('.panel-overlay.active');
+      if (!open) return;
+      open.classList.remove('active');
+      this.onClose();
+      e.preventDefault();
+    });
   }
 
   // ── Settings Panel ──────────────────────────────────────────────────────────
@@ -20,16 +31,15 @@ class PanelManager {
 
     const musicToggle = document.getElementById('musicToggle');
     const soundToggle = document.getElementById('soundToggle');
+    const hintToggle  = document.getElementById('hintToggle');
 
     musicToggle.checked = this.audio.musicEnabled;
     soundToggle.checked = this.audio.soundEnabled;
+    hintToggle.checked  = this.getHintPref();
 
-    musicToggle.addEventListener('change', () => {
-      this.audio.setMusic(musicToggle.checked);
-    });
-    soundToggle.addEventListener('change', () => {
-      this.audio.setSound(soundToggle.checked);
-    });
+    musicToggle.addEventListener('change', () => this.audio.setMusic(musicToggle.checked));
+    soundToggle.addEventListener('change', () => this.audio.setSound(soundToggle.checked));
+    hintToggle.addEventListener('change', () => this.setHintPref(hintToggle.checked));
 
     document.getElementById('helpBtn').addEventListener('click', () => {
       this.closeSettings();
@@ -38,6 +48,10 @@ class PanelManager {
   }
 
   openSettings() {
+    // Cloud sync can change these underneath us, so re-read on open.
+    document.getElementById('musicToggle').checked = this.audio.musicEnabled;
+    document.getElementById('soundToggle').checked = this.audio.soundEnabled;
+    document.getElementById('hintToggle').checked = this.getHintPref();
     document.getElementById('settingsOverlay').classList.add('active');
     this.onOpen();
   }
@@ -67,32 +81,41 @@ class PanelManager {
     this.onClose();
   }
 
+  static get LEVEL_CARDS() {
+    return [
+      { level: 'basic',  label: 'Basic',  color: '#43a047' },
+      { level: 'simple', label: 'Simple', color: '#66bb6a' },
+      { level: 'easy',   label: 'Easy',   color: '#4a90e2' },
+      { level: 'medium', label: 'Medium', color: '#ffa726' },
+      { level: 'hard',   label: 'Hard',   color: '#ef5350' },
+      { level: 'crazy',  label: 'Crazy',  color: '#ab47bc' },
+    ];
+  }
+
   renderStats() {
     const stats = this.getStats();
-    const levels = ['basic', 'simple', 'easy', 'medium', 'hard', 'crazy'];
-    const labels = ['Basic', 'Simple', 'Easy', 'Medium', 'Hard', 'Crazy'];
-    const colors = ['#43a047', '#66bb6a', '#4a90e2', '#ffa726', '#ef5350', '#ab47bc'];
-
     const grid = document.getElementById('statsGrid');
     grid.innerHTML = '';
 
     let totalWins = 0;
-    levels.forEach((level, i) => {
-      const entry = stats[level] || { wins: 0, bestMs: null };
+    for (const { level, label, color } of PanelManager.LEVEL_CARDS) {
+      const entry = stats[level] || {};
       const wins = entry.wins || 0;
-      const bestMs = entry.bestMs;
       totalWins += wins;
-      const best = bestMs != null ? this.formatTime(bestMs) : '—';
+      const best = entry.bestMs != null ? this.formatTime(entry.bestMs) : '—';
+      const hints = entry.hints || 0;
+
       const card = document.createElement('div');
       card.className = 'stats-card';
       card.innerHTML = `
-        <div class="stats-card-label" style="color:${colors[i]}">${labels[i]}</div>
-        <div class="stats-card-value" style="color:${colors[i]}">${wins}</div>
+        <div class="stats-card-label" style="color:${color}">${label}</div>
+        <div class="stats-card-value" style="color:${color}">${wins}</div>
         <div class="stats-card-sub">wins</div>
-        <div class="stats-card-best" title="Best time">${best}</div>
+        <div class="stats-card-best" title="Best time, no hints">${best}</div>
+        <div class="stats-card-hints">${hints ? `${hints} hint${hints === 1 ? '' : 's'}` : '&nbsp;'}</div>
       `;
       grid.appendChild(card);
-    });
+    }
 
     document.getElementById('statsTotalWins').textContent = totalWins;
   }

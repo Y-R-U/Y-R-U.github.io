@@ -44,6 +44,11 @@ export const GAMES = [
     blurb: "Draw the ant's path in pencil across a hundred levels of magnets, freezes and ink.",
   },
   {
+    id: "sudoku", name: "Sudoku", tag: "Graded, not guessed",
+    path: "/gms/pwa/sudoku/", shot: "sudoku", accent: "#4a90e2",
+    blurb: "Six difficulties set by what solving actually demands, not by how many cells are blank. Pencil marks, hints and a board that waits for you.",
+  },
+  {
     id: "voidcast", name: "Voidcast", tag: "Eat the planet",
     path: "/gms/3d/voidcast/", shot: "voidcast", accent: "#b489ff", soon: true,
     blurb: "A hole that grows by swallowing a world — and the bigger you get, the bigger your audience.",

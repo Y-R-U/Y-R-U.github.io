@@ -26,30 +26,43 @@ body{
 }
 
 /* ── Layout ───────────────────────────────────────────── */
-.container{max-width:600px;width:100%;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);padding:16px;display:flex;flex-direction:column;gap:12px;}
+.container{max-width:600px;width:100%;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);padding:16px;display:flex;flex-direction:column;gap:10px;}
 
 /* ── Header with icons ────────────────────────────────── */
 .header{display:flex;align-items:center;justify-content:center;position:relative;min-height:40px;}
 .header h1{text-align:center;color:#4a90e2;font-size:clamp(1.4rem,5vw,2.2rem);text-shadow:2px 2px 4px rgba(0,0,0,0.1);}
 .header-icons{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
-.timer{position:absolute;left:0;top:50%;transform:translateY(-50%);font-variant-numeric:tabular-nums;font-weight:700;color:#667eea;font-size:0.95rem;background:#f0f4f8;padding:6px 10px;border-radius:8px;min-width:60px;text-align:center;}
-.timer.paused{opacity:0.5;}
+/* The br8t account avatar floats in the viewport's top-right corner and
+   publishes its footprint as --br8t-account-space. On a wide screen the card is
+   nowhere near it; on a narrow one they collide, so the icons step aside. The
+   0px fallback means this is a no-op when the account layer isn't loaded. */
+@media (max-width:660px){
+  .header-icons{right:var(--br8t-account-space,0px);}
+}
 .icon-btn{width:38px;height:38px;border-radius:10px;border:none;background:#f0f4f8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#667eea;}
 .icon-btn:hover{background:#e3f2fd;transform:scale(1.1);}
 .icon-btn svg{width:20px;height:20px;}
 
 /* ── Difficulty ───────────────────────────────────────── */
 .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.diff-btn{padding:14px 6px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-size:clamp(0.7rem,2.2vw,0.85rem);font-weight:600;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.3px;min-height:48px;}
+.diff-btn{padding:12px 6px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-size:clamp(0.7rem,2.2vw,0.85rem);font-weight:600;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.3px;min-height:44px;}
 .diff-btn:hover{background:#4a90e2;color:white;transform:translateY(-2px);box-shadow:0 4px 12px rgba(74,144,226,0.3);}
 .diff-btn.active{background:#4a90e2;color:white;box-shadow:0 4px 12px rgba(74,144,226,0.3);}
 
+/* ── Status bar (timer + mistakes) ────────────────────── */
+.statusbar{display:flex;align-items:center;justify-content:center;gap:8px;}
+.stat-chip{display:flex;align-items:center;gap:6px;background:#f0f4f8;color:#667eea;border-radius:8px;padding:5px 10px;font-weight:700;font-size:0.85rem;font-variant-numeric:tabular-nums;}
+.stat-chip svg{width:15px;height:15px;}
+.stat-chip.has-mistakes{background:#ffe9e9;color:#d32f2f;}
+#timer.paused{opacity:0.45;}
+
 /* ── Message ──────────────────────────────────────────── */
-.message{text-align:center;padding:10px;border-radius:8px;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.message{text-align:center;padding:8px 10px;border-radius:8px;font-weight:600;font-size:0.9rem;min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
 .message.error{background:#ffe0e0;color:#d32f2f;border:2px solid #d32f2f;}
 .message.success{background:#e0f7e9;color:#2e7d32;border:2px solid #2e7d32;}
 .message.hidden{display:none;}
-.restart-link{color:inherit;text-decoration:underline;cursor:pointer;font-weight:700;}
+.msg-btn{font:inherit;font-size:0.82rem;color:inherit;background:rgba(255,255,255,0.7);border:1.5px solid currentColor;border-radius:6px;padding:5px 12px;cursor:pointer;font-weight:700;}
+.msg-btn:hover{background:white;}
 
 /* ── Grid ────────────────────────────────────────────── */
 .game-container{aspect-ratio:1;width:100%;max-width:500px;margin:0 auto;position:relative;}
@@ -65,13 +78,26 @@ body{
 .cell.related.given{background:#e3eaf3;}
 .cell.same-number-highlight{background:#fff59d;font-weight:700;}
 .cell.selected{background:#bbdefb;box-shadow:inset 0 0 0 2px #4a90e2;}
-.cell.conflict{background:#ffcccc;color:#d32f2f;}
+/* Conflicts carry an underline as well as the red tint, so they're still
+   visible without colour vision. */
+.cell.conflict{background:#ffcccc;color:#d32f2f;text-decoration:underline;text-decoration-color:#d32f2f;text-decoration-thickness:2px;text-underline-offset:2px;}
+.cell.wrong{background:#ffb3b3;color:#b71c1c;box-shadow:inset 0 0 0 2px #d32f2f;}
 .cell:hover:not(.given){background:#e3f2fd;}
 
 /* ── Notes in cells ───────────────────────────────────── */
 .cell-notes{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:1px;pointer-events:none;}
 .cell-note{display:flex;align-items:center;justify-content:center;font-size:clamp(0.45rem,1.5vw,0.75rem);color:#555;font-weight:500;line-height:1;}
+.cell-note.note-match{color:#b58900;font-weight:800;}
 .cell.selected .cell-note{color:#1a237e;}
+
+/* ── Digit counter strip ──────────────────────────────── */
+.digit-counts{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;max-width:500px;width:100%;margin:0 auto;}
+.digit-chip{background:#f0f4f8;border-radius:6px;padding:4px 2px;text-align:center;line-height:1.15;}
+.digit-chip-n{display:block;font-weight:800;font-size:0.85rem;color:#4a90e2;}
+.digit-chip-left{display:block;font-size:0.62rem;color:#8b93a1;font-variant-numeric:tabular-nums;}
+.digit-chip.done{background:#e8f5e9;}
+.digit-chip.done .digit-chip-n{color:#9aa5a0;}
+.digit-chip.done .digit-chip-left{color:#66bb6a;}
 
 /* ── Popup ────────────────────────────────────────────── */
 .popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;
@@ -84,12 +110,9 @@ body{
 .number-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
 .number-btn{padding:18px 8px;background:#f0f4f8;border:2px solid #4a90e2;border-radius:8px;font-size:1.4rem;font-weight:bold;cursor:pointer;transition:all 0.15s;color:#4a90e2;min-height:56px;display:flex;align-items:center;justify-content:center;}
 .number-btn:hover{background:#4a90e2;color:white;transform:scale(1.05);}
-.pos-btn{background:#f5f5f5;border:2px dashed #aaa;color:#999;font-size:0.85rem;}
-.pos-btn.has-note{background:#e8f4fd;border-color:#4a90e2;color:#1565c0;font-size:1.2rem;font-weight:700;}
-.pos-btn.clear-mode{background:#fff3e0;border-color:#ff9800;color:#e65100;}
-.pos-btn:hover{background:#e3f2fd;border-color:#4a90e2;color:#4a90e2;}
-.pos-btn.has-note:hover{background:#bbdefb;}
-.pos-spacer{visibility:hidden;pointer-events:none;}
+.number-btn.note-btn{border-style:dashed;border-color:#aaa;color:#999;background:#fafafa;font-size:1.15rem;}
+.number-btn.note-btn.note-on{border-style:solid;border-color:#7c4dff;background:#efe7ff;color:#5b32c9;}
+.number-btn.note-btn:hover{border-color:#7c4dff;color:#5b32c9;background:#efe7ff;transform:none;}
 .popup-actions{display:flex;gap:8px;}
 .popup-btn{flex:1;padding:11px 6px;border:2px solid #4a90e2;background:white;color:#4a90e2;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;transition:all 0.2s;}
 .popup-btn:hover{background:#4a90e2;color:white;}
@@ -100,6 +123,8 @@ body{
 .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
 .control-btn{padding:9px 18px;border:2px solid #666;background:white;color:#666;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:0.9rem;}
 .control-btn:hover{background:#666;color:white;transform:translateY(-2px);}
+.control-btn.hint{border-color:#f0a52c;color:#c97f10;}
+.control-btn.hint:hover{background:#f0a52c;border-color:#f0a52c;color:white;}
 .install-btn{background:#4caf50;color:white;border:2px solid #4caf50;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;display:none;font-size:0.9rem;}
 .install-btn:hover{background:#45a049;transform:translateY(-2px);box-shadow:0 4px 12px rgba(76,175,80,0.3);}
 
@@ -109,19 +134,19 @@ body{
   padding-bottom:max(16px,env(safe-area-inset-bottom));
 }
 .panel-overlay.active{display:flex;}
-.panel{background:white;border-radius:16px;padding:0;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;animation:panelSlideIn 0.3s ease;}
+.panel{background:white;border-radius:16px;padding:0;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;animation:panelSlideIn 0.3s ease;max-height:100%;display:flex;flex-direction:column;}
 @keyframes panelSlideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #eee;}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #eee;flex-shrink:0;}
 .panel-header h2{font-size:1.2rem;color:#333;margin:0;}
 .panel-close{width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f0;cursor:pointer;font-size:1.2rem;color:#666;display:flex;align-items:center;justify-content:center;transition:all 0.2s;line-height:1;}
 .panel-close:hover{background:#e0e0e0;color:#333;}
-.panel-body{padding:16px 20px 20px;}
+.panel-body{padding:16px 20px 20px;overflow-y:auto;}
 
 /* ── Settings panel ───────────────────────────────────── */
 .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;}
 .setting-row:last-of-type{border-bottom:none;}
 .setting-label{display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:500;color:#333;}
-.setting-label svg{width:20px;height:20px;color:#667eea;}
+.setting-label svg{width:20px;height:20px;color:#667eea;flex-shrink:0;}
 
 /* Toggle switch */
 .toggle{position:relative;width:48px;height:26px;flex-shrink:0;}
@@ -130,6 +155,7 @@ body{
 .toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
 .toggle input:checked + .toggle-slider{background:#667eea;}
 .toggle input:checked + .toggle-slider::before{transform:translateX(22px);}
+.toggle input:focus-visible + .toggle-slider{outline:2px solid #4a90e2;outline-offset:2px;}
 
 .help-btn{width:100%;margin-top:12px;padding:14px;border:2px solid #667eea;background:white;color:#667eea;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.95rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .help-btn:hover{background:#667eea;color:white;}
@@ -145,6 +171,8 @@ body{
 .stats-card-value{font-size:1.5rem;font-weight:800;margin-bottom:2px;}
 .stats-card-sub{font-size:0.65rem;color:#999;text-transform:uppercase;letter-spacing:0.5px;}
 .stats-card-best{font-size:0.85rem;color:#555;font-weight:600;font-variant-numeric:tabular-nums;margin-top:6px;padding-top:6px;border-top:1px solid #e6e9ee;}
+.stats-card-hints{font-size:0.62rem;color:#aaa;margin-top:3px;}
+.stats-note{font-size:0.72rem;color:#aaa;text-align:center;margin-top:12px;line-height:1.4;}
 
 /* ── Help panel ───────────────────────────────────────── */
 .help-content{padding:0;}
@@ -153,88 +181,119 @@ body{
 .help-content p,.help-content ul{font-size:0.85rem;color:#555;line-height:1.5;margin:0 0 6px;}
 .help-content ul{padding-left:18px;}
 .help-content li{margin-bottom:4px;}
+
+/* ── Reduced motion ───────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  .grid.error-border{animation:none;}
+  .diff-btn:hover,.control-btn:hover,.icon-btn:hover,.number-btn:hover,.stats-card:hover{transform:none;}
+}
+:focus-visible{outline:2px solid #4a90e2;outline-offset:2px;}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <div class="timer" id="timer" title="Elapsed time">0:00</div>
     <h1>Sudoku</h1>
     <div class="header-icons">
-      <button class="icon-btn" id="statsBtn" title="Statistics">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="3" width="4" height="18" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="2" y="13" width="4" height="8" rx="1"/></svg>
+      <button class="icon-btn" id="statsBtn" title="Statistics" aria-label="Statistics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="18" y="3" width="4" height="18" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="2" y="13" width="4" height="8" rx="1"/></svg>
       </button>
-      <button class="icon-btn" id="settingsBtn" title="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
   </div>
 
-  <div class="difficulty">
-    <button class="diff-btn" data-level="basic">Basic</button>
-    <button class="diff-btn" data-level="simple">Simple</button>
-    <button class="diff-btn active" data-level="easy">Easy</button>
-    <button class="diff-btn" data-level="medium">Medium</button>
-    <button class="diff-btn" data-level="hard">Hard</button>
-    <button class="diff-btn" data-level="crazy">Crazy</button>
+  <div class="difficulty" role="group" aria-label="Difficulty">
+    <button class="diff-btn" data-level="basic" aria-pressed="false">Basic</button>
+    <button class="diff-btn" data-level="simple" aria-pressed="false">Simple</button>
+    <button class="diff-btn active" data-level="easy" aria-pressed="true">Easy</button>
+    <button class="diff-btn" data-level="medium" aria-pressed="false">Medium</button>
+    <button class="diff-btn" data-level="hard" aria-pressed="false">Hard</button>
+    <button class="diff-btn" data-level="crazy" aria-pressed="false">Crazy</button>
   </div>
 
-  <div class="message hidden" id="message"></div>
+  <div class="statusbar">
+    <div class="stat-chip" id="timerChip" title="Elapsed time">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span id="timer" aria-label="Elapsed time">0:00</span>
+    </div>
+    <div class="stat-chip" id="mistakeChip" title="Numbers placed that don't match the solution">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+      <span id="mistakes" aria-label="Mistakes">0</span>
+    </div>
+  </div>
+
+  <div class="message hidden" id="message" role="status" aria-live="polite"></div>
 
   <div class="game-container">
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid" role="grid" aria-label="Sudoku board"></div>
   </div>
+
+  <div class="digit-counts" id="digitCounts" aria-label="Digits left to place"></div>
 
   <div class="controls">
     <button class="control-btn" id="newGame">New Game</button>
     <button class="control-btn" id="undoBtn">Undo</button>
+    <button class="control-btn hint" id="hintBtn">Hint</button>
     <button class="install-btn" id="installBtn">Install App</button>
   </div>
 </div>
 
 <!-- Number / Notes popup -->
-<div class="popup" id="popup">
+<div class="popup" id="popup" role="dialog" aria-modal="true" aria-label="Choose a number">
   <div class="popup-content">
     <div class="popup-header" id="popupHeader"></div>
     <div class="number-grid" id="numberGrid"></div>
     <div class="popup-actions">
       <button class="popup-btn" id="clearCell">Clear</button>
-      <button class="popup-btn" id="notesToggle">Notes</button>
-      <button class="popup-btn" id="closePopup">Cancel</button>
+      <button class="popup-btn" id="notesToggle" aria-pressed="false">Notes</button>
+      <button class="popup-btn" id="closePopup">Done</button>
     </div>
   </div>
 </div>
 
 <!-- Settings Panel -->
 <div class="panel-overlay" id="settingsOverlay">
-  <div class="panel">
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Settings">
     <div class="panel-header">
       <h2>Settings</h2>
-      <button class="panel-close" id="settingsClose">&times;</button>
+      <button class="panel-close" id="settingsClose" aria-label="Close settings">&times;</button>
     </div>
     <div class="panel-body">
       <div class="setting-row">
         <div class="setting-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
           Music
         </div>
         <label class="toggle">
-          <input type="checkbox" id="musicToggle">
+          <input type="checkbox" id="musicToggle" aria-label="Music">
           <span class="toggle-slider"></span>
         </label>
       </div>
       <div class="setting-row">
         <div class="setting-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
           Sounds
         </div>
         <label class="toggle">
-          <input type="checkbox" id="soundToggle">
+          <input type="checkbox" id="soundToggle" aria-label="Sounds">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+          Hint button
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="hintToggle" aria-label="Show the hint button">
           <span class="toggle-slider"></span>
         </label>
       </div>
       <button class="help-btn" id="helpBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         How to Play
       </button>
     </div>
@@ -243,24 +302,25 @@ body{
 
 <!-- Stats Panel -->
 <div class="panel-overlay" id="statsOverlay">
-  <div class="panel">
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Statistics">
     <div class="panel-header">
       <h2>Statistics</h2>
-      <button class="panel-close" id="statsClose">&times;</button>
+      <button class="panel-close" id="statsClose" aria-label="Close statistics">&times;</button>
     </div>
     <div class="panel-body">
       <div class="stats-total">Total Wins<strong id="statsTotalWins">0</strong></div>
       <div class="stats-grid" id="statsGrid"></div>
+      <p class="stats-note">Best times come from wins solved without a hint.</p>
     </div>
   </div>
 </div>
 
 <!-- Help Panel -->
 <div class="panel-overlay" id="helpOverlay">
-  <div class="panel">
+  <div class="panel" role="dialog" aria-modal="true" aria-label="How to play">
     <div class="panel-header">
       <h2>How to Play</h2>
-      <button class="panel-close" id="helpClose">&times;</button>
+      <button class="panel-close" id="helpClose" aria-label="Close help">&times;</button>
     </div>
     <div class="panel-body help-content">
       <h3>Goal</h3>
@@ -270,27 +330,29 @@ body{
       <ul>
         <li><strong>Tap a cell</strong> to select it. If you recently placed a number, tapping an empty cell will auto-fill that number (only if it's fully valid — otherwise the picker opens).</li>
         <li><strong>Long press or right-click</strong> a cell to open the number picker.</li>
-        <li><strong>Keyboard:</strong> arrow keys move the selection, <strong>1-9</strong> places a number, <strong>Backspace/Delete</strong> clears, <strong>Esc</strong> closes the picker, <strong>N</strong> toggles notes mode.</li>
-        <li><strong>Notes mode</strong> lets you pencil in candidate numbers at specific positions within a cell.</li>
-        <li><strong>Undo</strong> reverts your last move.</li>
+        <li><strong>Notes</strong> pencils in candidates: turn Notes on, then tap digits to add or remove them. Placing a number wipes that candidate from its row, column and box for you.</li>
+        <li><strong>Keyboard:</strong> arrow keys move the selection, <strong>1-9</strong> place a number (or toggle a note), <strong>Backspace/Delete</strong> clears, <strong>Esc</strong> closes the picker, <strong>N</strong> toggles notes, <strong>H</strong> takes a hint, <strong>U</strong> undoes.</li>
+        <li>The strip under the board counts how many of each digit are still unplaced.</li>
       </ul>
 
       <h3>Difficulty Levels</h3>
+      <p>Difficulty is set by what solving actually demands, not just how many cells are blank.</p>
       <ul>
-        <li><strong>Basic</strong> &mdash; 56 given cells (great for beginners)</li>
-        <li><strong>Simple</strong> &mdash; 51 given cells</li>
-        <li><strong>Easy</strong> &mdash; 46 given cells</li>
-        <li><strong>Medium</strong> &mdash; 36 given cells</li>
-        <li><strong>Hard</strong> &mdash; 26 given cells</li>
-        <li><strong>Crazy</strong> &mdash; 21 given cells (expert only!)</li>
+        <li><strong>Basic</strong> &mdash; 50 clues, spot-the-single throughout</li>
+        <li><strong>Simple</strong> &mdash; 45 clues, still singles only</li>
+        <li><strong>Easy</strong> &mdash; 40 clues, singles only but sparser</li>
+        <li><strong>Medium</strong> &mdash; needs locked candidates or a naked pair at least once</li>
+        <li><strong>Hard</strong> &mdash; needs more than pairs: triples, an X-wing, or a chain</li>
+        <li><strong>Crazy</strong> &mdash; the same, with around six fewer clues to work from</li>
       </ul>
 
       <h3>Tips</h3>
       <ul>
         <li>Look for rows, columns, or boxes that are nearly complete.</li>
         <li>Use notes to track possible candidates for tricky cells.</li>
-        <li>Conflicts are highlighted in red to help you spot mistakes.</li>
+        <li>Conflicts are highlighted in red and underlined to help you spot mistakes.</li>
         <li>Every puzzle has exactly one valid solution.</li>
+        <li>Hints still count as a win, but they don't set a best time.</li>
       </ul>
     </div>
   </div>
@@ -300,5 +362,6 @@ body{
 <script src="./js/audio.js"></script>
 <script src="./js/panels.js"></script>
 <script src="./js/game.js"></script>
+<script src="./js/boot-cloud.js"></script>
 </body>
 </html>

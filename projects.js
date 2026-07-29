@@ -137,7 +137,7 @@ const PROJECTS = [
     date: "2025-07-23", creator: "Claude" },
 
   { name: "Sudoku",             path: "/gms/pwa/sudoku/",        screenshot: "sudoku",          type: "game",
-    desc: "Full-featured Sudoku PWA with three difficulties, note-taking, undo, and offline play.",
+    desc: "Sudoku PWA with six difficulties graded by the solving technique they demand, pencil marks, hints and offline play.",
     date: "2025-12-04", creator: "Claude" },
 
   { name: "Zombie Horde",       path: "/gms/z/",                screenshot: "tululoo",         type: "game",
