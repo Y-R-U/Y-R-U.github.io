@@ -111,7 +111,9 @@ button {
   z-index: 31;
   top: max(10px, env(safe-area-inset-top));
   left: max(10px, env(safe-area-inset-left));
-  width: min(370px, calc(100dvw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  /* --br8t-account-space is set by the shared account layer when the avatar is
+     mounted top-right; keep the HUD strip clear of it. */
+  width: min(370px, calc(100dvw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right) - var(--br8t-account-space, 0px)));
   display: grid;
   gap: 7px;
   pointer-events: none;
@@ -361,7 +363,7 @@ button {
   position: fixed;
   z-index: 62;
   top: max(9px, env(safe-area-inset-top));
-  left: min(calc(100dvw - 42px - env(safe-area-inset-right)), 348px);
+  left: min(calc(100dvw - 42px - env(safe-area-inset-right) - var(--br8t-account-space, 0px)), 348px);
   right: auto;
   width: 32px;
   height: 32px;
@@ -1686,7 +1688,7 @@ h3 {
   .settings-button {
     top: max(12px, env(safe-area-inset-top));
     left: auto;
-    right: max(14px, env(safe-area-inset-right));
+    right: calc(max(14px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px));
   }
 
   .station-console {

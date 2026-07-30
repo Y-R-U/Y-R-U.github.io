@@ -812,6 +812,11 @@ function makeDefaultStats() {
     bestCargo: 8,
     escapePods: 0,
     confiscations: 0,
+    runs: 0,
+    bestWave: 1,
+    bestDistance: 0,
+    totalDistance: 0,
+    flightSeconds: 0,
   };
 }
 
@@ -900,12 +905,25 @@ function makeDefaultSave() {
   };
 }
 
+// Load-with-defaults. Anything this build does not know about is carried
+// forward untouched, so a save written by a newer version (or synced down from
+// another device running one) is never quietly trimmed on the way through.
 function loadSave() {
   const save = makeDefaultSave();
+  let parsed = null;
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return save;
-    const parsed = JSON.parse(raw);
+    parsed = JSON.parse(raw);
+  } catch {
+    return save;
+  }
+  if (!parsed || typeof parsed !== 'object') return save;
+  try {
+    const known = new Set(Object.keys(save));
+    for (const key of Object.keys(parsed)) {
+      if (!known.has(key)) save[key] = parsed[key];
+    }
     save.credits = Math.max(0, Number(parsed.credits) || 0);
     save.debt = Number.isFinite(Number(parsed.debt)) ? Math.max(0, Math.round(Number(parsed.debt))) : STARTING_DEBT;
     save.route = Math.max(1, Math.round(Number(parsed.route) || 1));
@@ -913,13 +931,14 @@ function loadSave() {
       save.upgrades[def.id] = clamp(Number(parsed.upgrades?.[def.id]) || 0, 0, def.max);
     }
     save.stats = { ...makeDefaultStats(), ...(parsed.stats || {}) };
-    for (const key of Object.keys(save.stats)) {
+    for (const key of Object.keys(makeDefaultStats())) {
       save.stats[key] = Math.max(0, Number(save.stats[key]) || 0);
     }
     save.stats.bestCargo = Math.max(save.stats.bestCargo, getCargoCapacity(save.upgrades.cargo || 0));
+    save.stats.bestWave = Math.max(1, save.stats.bestWave);
     save.story = normalizeStory(parsed.story);
   } catch {
-    return save;
+    return makeDefaultSave();
   }
   return save;
 }
@@ -938,13 +957,34 @@ function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return settings;
     const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return settings;
+    const known = new Set(Object.keys(settings));
+    for (const key of Object.keys(parsed)) {
+      if (!known.has(key)) settings[key] = parsed[key];
+    }
     settings.sound = parsed.sound !== false;
     settings.music = Boolean(parsed.music);
     settings.haptics = parsed.haptics !== false;
   } catch {
-    return settings;
+    return makeDefaultSettings();
   }
   return settings;
+}
+
+// `outpace-best` replaced `void-cockpit-best` when the game was renamed. Fold
+// the old value in once so the account only ever carries the current key, then
+// drop the legacy one. Demo runs never touch stored progress.
+function migrateLegacyBest() {
+  if (DEMO_MODE) return;
+  try {
+    const legacy = localStorage.getItem(LEGACY_BEST_KEY);
+    if (legacy === null) return;
+    const merged = Math.max(Number(localStorage.getItem(BEST_KEY)) || 0, Number(legacy) || 0);
+    localStorage.setItem(BEST_KEY, String(merged));
+    localStorage.removeItem(LEGACY_BEST_KEY);
+  } catch {
+    /* private mode / quota — the in-memory best still works for this session */
+  }
 }
 
 let deferredSaveTimer = 0;
@@ -969,7 +1009,29 @@ function saveProgress({ defer = false } = {}) {
 }
 
 function saveSettings() {
+  if (DEMO_MODE) return;
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+}
+
+/* ---------------------------------------------------------- br8t account ---
+ * Optional. cloud.mjs mirrors the durable save keys to the player's br8t
+ * account so progress follows them between devices. Nothing here is
+ * load-bearing: if the account layer cannot load — offline, blocked, opened
+ * from file:// — the import rejects, we swallow it, and the game plays on with
+ * its ordinary local save. Demo and automated runs stay hermetic.
+ */
+let accountCloud = null;
+
+function setupAccountCloud() {
+  if (DEMO_MODE || params.has('test') || params.has('soak') || params.has('nocloud')) return;
+  if (location.protocol === 'file:') return;
+  import('./cloud.mjs')
+    .then((mod) => { accountCloud = mod; })
+    .catch(() => { /* play on locally */ });
+}
+
+function notifyRunCompleted() {
+  try { accountCloud?.runFinished?.(); } catch { /* never block the results screen */ }
 }
 
 function getUpgradeLevel(id) {
@@ -1123,6 +1185,8 @@ function applyDemoStoryState() {
     board.quests[DEMO_QUEST].lastMessage ||= getStoryMessage(board.quests[DEMO_QUEST]);
   }
 }
+
+migrateLegacyBest();
 
 const state = {
   running: false,
@@ -3119,6 +3183,7 @@ function openStation(type = getStationType()) {
   state.save.stats.totalCredits += payout;
   state.save.stats.bestCargo = Math.max(state.save.stats.bestCargo, getShipStats().cargo);
   state.score += payout;
+  recordRunCompleted({ distance: Math.max(state.routeDistance, state.routeLength) });
   saveProgress();
   renderMenuAchievements();
   playSfx('dock');
@@ -3137,6 +3202,20 @@ function openStation(type = getStationType()) {
 function launchNextRun() {
   saveProgress();
   resetGame();
+}
+
+// One call per finished run, whichever way it ended: reaching the berth or
+// losing the ship. Feeds the lifetime totals that travel with the account.
+function recordRunCompleted({ distance = state.routeDistance } = {}) {
+  if (DEMO_MODE) return;
+  const stats = state.save.stats;
+  const travelled = Math.max(0, Math.round(Number(distance) || 0));
+  stats.runs += 1;
+  stats.bestWave = Math.max(stats.bestWave || 1, Math.round(state.wave) || 1);
+  stats.bestDistance = Math.max(stats.bestDistance || 0, travelled);
+  stats.totalDistance += travelled;
+  stats.flightSeconds += Math.max(0, Math.round(state.time));
+  notifyRunCompleted();
 }
 
 function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit. The lender seized your ship at berth.') {
@@ -3238,6 +3317,8 @@ function finishGame() {
   const previousBest = state.best;
   state.best = Math.max(state.best, finalScore);
   if (!DEMO_MODE) localStorage.setItem(BEST_KEY, String(state.best));
+  recordRunCompleted();
+  saveProgress();
   resultScore.textContent = String(finalScore);
   resultBest.textContent = String(state.best);
   resultWave.textContent = String(state.wave);
@@ -4007,6 +4088,7 @@ async function boot() {
   renderMenuAchievements();
   document.documentElement.dataset.gameReady = '1';
   animate();
+  setupAccountCloud();
 
   if (state.demo) {
     setTimeout(resetGame, 350);
