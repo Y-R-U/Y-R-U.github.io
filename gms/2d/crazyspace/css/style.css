@@ -84,7 +84,13 @@ html, body {
 .row .btn { min-width: 0; flex: 1; }
 
 /* ---- topbar ---- */
-.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+/* The br8t account avatar is fixed at the top-right of the page; the extra
+   right padding keeps a screen heading clear of it. var() falls back to 0px
+   when the account layer isn't loaded, so this is a no-op offline. */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+  padding-right: var(--br8t-account-space, 0px);
+}
 .topbar h2 { margin: 0; font-size: 20px; letter-spacing: 1px; }
 .topbar span { width: 44px; }
 .icon-btn {
@@ -151,6 +157,56 @@ kbd { background: rgba(255, 255, 255, 0.12); border-radius: 5px; padding: 1px 6p
 .srow .nm { display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .srow span:nth-child(n+3) { text-align: right; font-variant-numeric: tabular-nums; }
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* ---- settings screen ---- */
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.setting > label { color: #9fb0e8; font-size: 13px; }
+.field {
+  pointer-events: auto; -webkit-user-select: text; user-select: text; touch-action: auto;
+  appearance: none; background: rgba(255, 255, 255, 0.06); color: #fff;
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; font: 600 15px system-ui; width: 160px; text-align: right;
+}
+.field:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(53, 227, 255, 0.25); }
+.slide-row { display: flex; align-items: center; gap: 10px; }
+.slide-row .val { color: #cdd8ff; font: 600 12px ui-monospace, monospace; width: 38px; text-align: right; }
+.slider {
+  pointer-events: auto; touch-action: auto;
+  -webkit-appearance: none; appearance: none; width: 150px; height: 22px; background: transparent;
+}
+.slider::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+.slider::-moz-range-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin-top: -7px;
+  border-radius: 50%; border: none; background: linear-gradient(135deg, var(--gold), var(--cyan));
+  box-shadow: 0 0 10px rgba(53, 227, 255, 0.6);
+}
+.slider::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, var(--gold), var(--cyan));
+}
+.hint { color: #7f8fc8; font-size: 12px; line-height: 1.45; margin: 14px 0 0; }
+
+/* ---- career screen ---- */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 359px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile {
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line);
+  border-radius: 12px; padding: 10px 6px; text-align: center;
+}
+.tile b { display: block; font-size: 17px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.tile span { display: block; font-size: 10px; color: #8fa0d8; margin-top: 3px; }
+h3.sec { margin: 18px 0 8px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #7f8fc8; }
+.stat-table { display: flex; flex-direction: column; gap: 2px; }
+.trow {
+  display: grid; grid-template-columns: 1fr 44px 38px 42px; align-items: center;
+  padding: 6px 8px; border-radius: 8px; font-size: 12.5px; background: rgba(255, 255, 255, 0.03);
+}
+.trow.head { background: none; color: #7f8fc8; font-size: 10.5px; text-transform: uppercase; }
+.trow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trow span:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+.career-screen .panel .btn { width: 100%; margin-top: 18px; }
+.career-line { text-align: center; color: #8fa0d8; font-size: 11.5px; margin: -8px 0 14px; }
 
 /* ---- in-game small buttons ---- */
 .game-btns {

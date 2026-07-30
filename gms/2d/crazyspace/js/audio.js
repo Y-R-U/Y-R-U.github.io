@@ -5,6 +5,7 @@ export class Audio {
     this.ctx = null;
     this.master = null;
     this.muted = false;
+    this.volume = 0.5;   // 0..1, persisted in crazyspace.settings.v1
     this.ready = false;
     this.lastGun = 0;
   }
@@ -15,14 +16,24 @@ export class Audio {
     if (!AC) return;
     this.ctx = new AC();
     this.master = this.ctx.createGain();
-    this.master.gain.value = 0.5;
+    this.master.gain.value = this._gain();
     this.master.connect(this.ctx.destination);
     this.ready = true;
     this._noise = this._makeNoise();
   }
 
+  _gain() { return this.muted ? 0 : this.volume; }
+  _apply() { if (this.master) this.master.gain.value = this._gain(); }
+
+  setVolume(v) {
+    this.volume = Math.max(0, Math.min(1, Number(v) || 0));
+    this._apply();
+    return this.volume;
+  }
+  setMuted(m) { this.muted = !!m; this._apply(); return this.muted; }
+
   resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
-  toggleMute() { this.muted = !this.muted; if (this.master) this.master.gain.value = this.muted ? 0 : 0.5; return this.muted; }
+  toggleMute() { this.muted = !this.muted; this._apply(); return this.muted; }
 
   _makeNoise() {
     const ctx = this.ctx;

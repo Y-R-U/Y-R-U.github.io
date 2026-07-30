@@ -18,12 +18,13 @@ function ffaColor(h) {
 }
 
 export class Game {
-  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6 }) {
+  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You' }) {
     this.input = input;
     this.audio = audio;
     this.modeKey = modeKey;
     this.shipKey = shipKey;
     this.difficulty = difficulty;
+    this.playerName = String(playerName || 'You').slice(0, 14) || 'You';
 
     this.world = generateMap(modeKey);
     this.mode = createMode(modeKey, this);
@@ -65,7 +66,7 @@ export class Game {
 
     // player
     const playerColor = this.mode.ffa ? TEAMS[0] : TEAMS[0];
-    const player = new Ship(SHIPS[this.shipKey], 0, { isPlayer: true, name: 'You', color: playerColor });
+    const player = new Ship(SHIPS[this.shipKey], 0, { isPlayer: true, name: this.playerName, color: playerColor });
     this.player = player;
     this._addShip(player, 0);
 
@@ -437,6 +438,37 @@ export class Game {
       ctx.fillText(p.text, p.x, p.y);
     }
     ctx.restore();
+  }
+
+  /** Did the human win? Draws and losses are both false. */
+  playerWon() {
+    const m = this.mode;
+    if (!m || !m.over) return false;
+    if (m.ffa) return m.winnerShip === this.player;
+    return m.winnerTeam === this.player.team;
+  }
+
+  /**
+   * Everything the career save needs from a FINISHED match. Read once, on the
+   * results screen — nothing here is written while the match is running.
+   */
+  matchSummary() {
+    const p = this.player;
+    const st = (p && p.stats) || {};
+    const hold = (this.mode && this.mode.holdSec && p) ? (this.mode.holdSec[p.team] || 0) : 0;
+    return {
+      mode: this.modeKey,
+      ship: this.shipKey,
+      kills: st.kills || 0,
+      deaths: st.deaths || 0,
+      bestStreak: st.bestStreak || 0,
+      caps: st.caps || 0,
+      returns: st.returns || 0,
+      holdSec: hold,
+      score: (st.score || 0) + (st.kills || 0),   // same total the scoreboard shows
+      playSec: this.time || 0,
+      won: this.playerWon(),
+    };
   }
 
   // sorted scoreboard rows

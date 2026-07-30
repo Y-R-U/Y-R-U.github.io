@@ -217,7 +217,8 @@ export class Ship {
     this.shieldTime = opts.spawnShield || 0;
     this.flashTime = 0; this.thrustVisual = 0;
 
-    this.stats = { kills: 0, deaths: 0, score: 0, caps: 0, returns: 0 };
+    // streak = kills since last death; bestStreak survives the whole match
+    this.stats = { kills: 0, deaths: 0, score: 0, caps: 0, returns: 0, streak: 0, bestStreak: 0 };
     this.carryingFlag = null;
 
     this.resetLoadout();
@@ -383,6 +384,7 @@ export class Ship {
     this.alive = false; this.vx = 0; this.vy = 0;
     this.respawnTimer = RESPAWN_DELAY;
     this.stats.deaths++;
+    this.stats.streak = 0;
     game.onKill(attackerId, this);
   }
 

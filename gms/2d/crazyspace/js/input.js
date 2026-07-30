@@ -29,22 +29,42 @@ export class Input {
     this.joy = { active: false, baseX: 0, baseY: 0, x: 0, y: 0, r: 78 };
     this.buttons = [];           // laid out in layout()
     this.insets = { top: 0, right: 0, bottom: 0, left: 0 };
+    this.handed = 'left';        // which side the steering thumb lives on
 
     this._bind();
   }
 
   setInsets(i) { this.insets = i; }
 
+  /** 'left' (default) = joystick left / fire buttons right. 'right' mirrors it. */
+  setHanded(side) {
+    const h = side === 'right' ? 'right' : 'left';
+    if (h === this.handed) return this.handed;
+    this.handed = h;
+    this.reset();
+    if (this.W) this.layout(this.W, this.H);
+    return this.handed;
+  }
+
   layout(W, H) {
     this.W = W; this.H = H;
     const bottom = this.insets.bottom + 18;
-    const right = this.insets.right + 14;
-    const fx = W - right - 70, fy = H - bottom - 78;
+    const mirror = this.handed === 'right';
+    // fire cluster hugs the edge opposite the steering thumb
+    const edge = mirror ? this.insets.left + 14 : this.insets.right + 14;
+    const fx = mirror ? edge + 70 : W - edge - 70;
+    const fy = H - bottom - 78;
+    const s = mirror ? -1 : 1;   // horizontal fan direction
     this.buttons = [
-      { id: 'gun',     label: '🔫', sub: 'FIRE',  x: fx,        y: fy,        r: 62, held: false, color: '#ff5d8f' },
-      { id: 'bomb',    label: '💣', sub: 'BOMB',  x: fx - 104,  y: fy - 30,   r: 46, held: false, color: '#ff7b3d' },
-      { id: 'special', label: '✦',  sub: 'SP',    x: fx - 22,   y: fy - 132,  r: 44, held: false, color: '#35e3ff' },
+      { id: 'gun',     label: '🔫', sub: 'FIRE',  x: fx,              y: fy,        r: 62, held: false, color: '#ff5d8f' },
+      { id: 'bomb',    label: '💣', sub: 'BOMB',  x: fx - 104 * s,    y: fy - 30,   r: 46, held: false, color: '#ff7b3d' },
+      { id: 'special', label: '✦',  sub: 'SP',    x: fx - 22 * s,     y: fy - 132,  r: 44, held: false, color: '#35e3ff' },
     ];
+  }
+
+  /** True when (x) falls in the steering-thumb half of the screen. */
+  _inJoyZone(x) {
+    return this.handed === 'right' ? x > this.W * 0.38 : x < this.W * 0.62;
   }
 
   _bind() {
@@ -85,8 +105,8 @@ export class Input {
       this._syncButtons();
       return;
     }
-    // left ~60% becomes joystick zone if not already engaged
-    if (this.joyId === null && p.x < this.W * 0.62) {
+    // the steering half becomes the joystick zone if not already engaged
+    if (this.joyId === null && this._inJoyZone(p.x)) {
       this.joyId = e.pointerId;
       this.joy.active = true;
       this.joy.baseX = p.x; this.joy.baseY = p.y;
@@ -207,8 +227,11 @@ export class Input {
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(this.joy.x, this.joy.y, 30, 0, TAU); ctx.fill();
     } else {
-      // hint puck bottom-left
-      const hx = this.insets.left + 86, hy = this.H - this.insets.bottom - 96;
+      // hint puck on the steering side
+      const hx = this.handed === 'right'
+        ? this.W - this.insets.right - 86
+        : this.insets.left + 86;
+      const hy = this.H - this.insets.bottom - 96;
       this._ring(ctx, hx, hy, this.joy.r, 'rgba(120,150,255,0.10)', 2);
       ctx.fillStyle = 'rgba(160,185,255,0.16)';
       ctx.beginPath(); ctx.arc(hx, hy, 26, 0, TAU); ctx.fill();

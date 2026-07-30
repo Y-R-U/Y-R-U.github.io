@@ -20,11 +20,17 @@ export class Hud {
     const top = insets.top + 8;
     const player = game.player;
 
-    this._statusBar(ctx, game, W, top, s);
+    // The br8t account avatar sits fixed at the top-right of the page, above the
+    // canvas. `insets.account` is --br8t-account-space (0 when the account layer
+    // isn't loaded); everything top-right steps in by that much so the avatar
+    // never lands on the radar or the kill feed.
+    const right = insets.right + (insets.account || 0);
+
+    this._statusBar(ctx, game, W, top, s, insets.account || 0);
     const radarSize = Math.min(W, H) * 0.27;
-    this._radar(ctx, game, W - insets.right - radarSize - 10, top + 38 * s, radarSize, s);
-    this._vitals(ctx, game, insets.left + 10, top + 38 * s, W - insets.left - insets.right - radarSize - 32, s);
-    this._killFeed(ctx, game, W - insets.right - 12, top + 44 * s + radarSize + 10, s);
+    this._radar(ctx, game, W - right - radarSize - 10, top + 38 * s, radarSize, s);
+    this._vitals(ctx, game, insets.left + 10, top + 38 * s, W - insets.left - right - radarSize - 32, s);
+    this._killFeed(ctx, game, W - right - 12, top + 44 * s + radarSize + 10, s);
     this._objectiveArrows(ctx, game, W, H, insets);
     this._banner(ctx, game, W, H, s);
     if (player && !player.alive && game.state === 'playing') this._respawn(ctx, player, W, H, s);
@@ -39,13 +45,14 @@ export class Hud {
     roundRect(ctx, x, y, w, h, r); ctx.stroke();
   }
 
-  _statusBar(ctx, game, W, top, s) {
+  _statusBar(ctx, game, W, top, s, account = 0) {
     const txt = game.mode.statusLine();
     const time = fmtTime(game.matchTime);
     ctx.font = `bold ${Math.round(15 * s)}px system-ui`;
     const tw = ctx.measureText(txt).width;
     const timeW = ctx.measureText(time).width + 22 * s;
-    const w = Math.min(W - 24, tw + 40 * s + timeW);
+    // stays centred, but narrows so it can't slide under the account avatar
+    const w = Math.min(W - 24 - account * 2, tw + 40 * s + timeW);
     const x = (W - w) / 2;
     this._panel(ctx, x, top, w, 30 * s, 10);
     ctx.textBaseline = 'middle';

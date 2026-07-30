@@ -6,6 +6,11 @@ import { Hud } from './hud.js';
 import { Menu } from './menu.js';
 import { Game } from './game.js';
 import { Starfield } from './starfield.js';
+import { loadCareer, loadSettings, saveSettings, recordMatch, resetCareer } from './save.js';
+
+const QS = new URLSearchParams(location.search);
+// `?test` keeps automated / soak runs hermetic: no account layer, no avatar.
+const TEST = QS.has('test') || QS.has('soak');
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -17,19 +22,45 @@ const hud = new Hud();
 const menuBg = new Starfield();
 const menuCam = { x: 1000, y: 1000, zoom: 1, sx: 0, sy: 0 };
 
+// ---- durable save (local first; the account layer only mirrors these) ----
+const settings = loadSettings();
+audio.setVolume(settings.volume);
+audio.setMuted(settings.muted);
+input.setHanded(settings.handed);
+
 let W = 0, H = 0, dpr = 1;
-let insets = { top: 0, right: 0, bottom: 0, left: 0 };
+let insets = { top: 0, right: 0, bottom: 0, left: 0, account: 0 };
 let game = null;
 let app = { scene: 'menu', paused: false, resultsShown: false };
-let lastParams = { mode: 'deathmatch', ship: 'warbird', diff: 0.62 };
+let lastParams = { mode: settings.lastMode, ship: settings.lastShip, diff: 0.62 };
 
 input.enabled = false;
+
+// ---- optional br8t account layer -------------------------------------------
+// Fire-and-forget: if it can't load (offline, blocked, file://) the game plays
+// on with its purely local save and the only thing missing is the avatar.
+let cloudMod = null;
+if (!TEST) {
+  import('./cloud.js')
+    .then(m => { cloudMod = m; window.CrazySpaceCloud = m; resize(); })
+    .catch(() => { /* play on locally */ });
+}
 
 // ---- safe-area probe ----
 const probe = document.createElement('div');
 probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;' +
   'padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);';
 document.body.append(probe);
+
+// How much top-right room the br8t account avatar takes. 0 when the account
+// layer isn't loaded, thanks to the fallback — the canvas HUD reads this the
+// same way CSS furniture would use calc(… + var(--br8t-account-space, 0px)).
+function accountSpace() {
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--br8t-account-space');
+    return parseFloat(v) || 0;
+  } catch (e) { return 0; }
+}
 
 function readInsets() {
   const cs = getComputedStyle(probe);
@@ -38,6 +69,7 @@ function readInsets() {
     right: parseFloat(cs.paddingRight) || 0,
     bottom: parseFloat(cs.paddingBottom) || 0,
     left: parseFloat(cs.paddingLeft) || 0,
+    account: accountSpace(),
   };
 }
 
@@ -63,7 +95,18 @@ window.addEventListener('pointerdown', unlock, { once: true });
 window.addEventListener('keydown', unlock, { once: true });
 
 // ---- menu wiring ----
-const menu = new Menu(uiRoot, { onStart: startGame });
+const menu = new Menu(uiRoot, {
+  onStart: startGame,
+  settings,
+  getCareer: () => loadCareer(),
+  onResetCareer: () => resetCareer(),
+  onSettings: (patch) => {
+    saveSettings(patch);
+    if ('volume' in patch) { audio.setVolume(settings.volume); audio.init(); audio.resume(); audio.click(); }
+    if ('muted' in patch) audio.setMuted(settings.muted);
+    if ('handed' in patch) { input.setHanded(settings.handed); input.layout(W, H); }
+  },
+});
 menu.bindInGame((a) => {
   if (a === 'pause') { if (game && game.state === 'playing') togglePause(); }
   else if (a === 'scoresOn') input.showScores = true;
@@ -72,7 +115,7 @@ menu.bindInGame((a) => {
 
 function startGame(mode, ship, diff) {
   lastParams = { mode, ship, diff };
-  game = new Game({ input, audio, modeKey: mode, shipKey: ship, difficulty: diff });
+  game = new Game({ input, audio, modeKey: mode, shipKey: ship, difficulty: diff, playerName: settings.name });
   game.setViewport(W, H);
   game.onEnd = () => { if (!app.resultsShown) setTimeout(showResults, 1400); };
   app.scene = 'game'; app.paused = false; app.resultsShown = false;
@@ -84,6 +127,12 @@ function startGame(mode, ship, diff) {
 function showResults() {
   if (app.resultsShown || !game) return;
   app.resultsShown = true;
+
+  // The one place the career is written, and the one place matchCompleted()
+  // fires: a FINISHED match, on the results screen. Never mid-match.
+  try { recordMatch(game.matchSummary()); } catch (e) { console.warn('career save failed', e); }
+  if (cloudMod) cloudMod.matchFinished();
+
   menu.showInGameButtons(false);
   menu.showResults(
     { winner: game.winnerText || 'Match Over', modeName: game.mode.name, rows: game.scoreboard() },
@@ -111,7 +160,29 @@ function handlePause(a) {
   else if (a === 'restart') { app.paused = false; menu.hidePause(); startGame(lastParams.mode, lastParams.ship, lastParams.diff); }
   else if (a === 'quit') { app.paused = false; menu.hidePause(); quitToMenu(); }
 }
-function doMute() { const m = audio.toggleMute(); menu.setMuteLabel(m); }
+function doMute() {
+  const m = audio.toggleMute();
+  menu.setMuteLabel(m);
+  saveSettings({ muted: m });
+}
+
+// ---- test / soak hooks ------------------------------------------------------
+// Used by the headless CDP suite; harmless in normal play.
+window.__crazyspace = {
+  get game() { return game; },
+  get app() { return app; },
+  get insets() { return insets; },
+  get cloudLoaded() { return !!cloudMod; },
+  settings,
+  career: loadCareer,
+  startGame,
+  showResults,
+  endMatch: (text = 'Test Over') => { if (game) game.endMatch(text); },
+  quitToMenu,
+  menu,
+  input,
+  step: (dt = 1 / 60, n = 1) => { for (let i = 0; i < n; i++) if (game) game.update(dt); },
+};
 
 // ---- main loop ----
 let last = performance.now();

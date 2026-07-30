@@ -16,6 +16,10 @@ class Mode {
     this.teamScore = [0, 0, 0, 0];
     this.over = false;
     this.winnerText = '';
+    // who actually won — read by Game.playerWon() when the career is recorded.
+    // Both stay null on a draw.
+    this.winnerTeam = null;
+    this.winnerShip = null;
   }
   init() {}
   update(dt) {}
@@ -27,6 +31,8 @@ class Mode {
     if (killer && killer !== victim && this.areEnemies(killer, victim)) {
       killer.stats.kills++;
       killer.stats.score += 1;
+      killer.stats.streak++;
+      if (killer.stats.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.stats.streak;
       killer.bounty += 1;
       if (!this.ffa) this.teamScore[killer.team]++;
       this.game.killFeed.push({ a: killer.name, b: victim.name, ac: killer.color.color, bc: victim.color.color, t: 4 });
@@ -40,10 +46,10 @@ class Mode {
     if (this.ffa) {
       let best = null;
       for (const s of this.game.ships) if (!best || s.stats.kills > best.stats.kills) best = s;
-      if (best && best.stats.kills >= this.scoreLimit) this.end(best.name + ' wins!');
+      if (best && best.stats.kills >= this.scoreLimit) this.end(best.name + ' wins!', { ship: best });
     } else {
       for (let t = 0; t < this.teamCount; t++)
-        if (this.teamScore[t] >= this.scoreLimit) this.end(TEAMS[t].name + ' Team wins!');
+        if (this.teamScore[t] >= this.scoreLimit) this.end(TEAMS[t].name + ' Team wins!', { team: t });
     }
   }
 
@@ -51,14 +57,22 @@ class Mode {
     if (this.ffa) {
       let best = null;
       for (const s of this.game.ships) if (!best || s.stats.kills > best.stats.kills) best = s;
-      this.end((best ? best.name : 'Nobody') + ' wins on time!');
+      this.end((best ? best.name : 'Nobody') + ' wins on time!', best ? { ship: best } : {});
     } else {
       const a = this.teamScore[0], b = this.teamScore[1];
-      this.end(a === b ? "Time — it's a draw!" : (TEAMS[a > b ? 0 : 1].name + ' Team wins on time!'));
+      if (a === b) this.end("Time — it's a draw!");
+      else { const t = a > b ? 0 : 1; this.end(TEAMS[t].name + ' Team wins on time!', { team: t }); }
     }
   }
 
-  end(text) { if (!this.over) { this.over = true; this.winnerText = text; this.game.endMatch(text); } }
+  end(text, winner = {}) {
+    if (this.over) return;
+    this.over = true;
+    this.winnerText = text;
+    this.winnerTeam = typeof winner.team === 'number' ? winner.team : null;
+    this.winnerShip = winner.ship || null;
+    this.game.endMatch(text);
+  }
 
   // HUD top-bar string
   statusLine() {
@@ -128,7 +142,7 @@ class CTF extends Mode {
           this.game.popup('CAPTURE!', s.x, s.y, '#fff', 1.4);
           this.game.audio && this.game.audio.capture();
           this.game.bigEvent(TEAMS[s.team].name + ' scores! ' + this.teamScore[s.team] + '/' + this.scoreLimit);
-          if (this.teamScore[s.team] >= this.scoreLimit) this.end(TEAMS[s.team].name + ' Team wins!');
+          if (this.teamScore[s.team] >= this.scoreLimit) this.end(TEAMS[s.team].name + ' Team wins!', { team: s.team });
         }
       }
     }
@@ -170,6 +184,7 @@ class KOTH extends Mode {
     this.game.zone = this.zone;
     this.fscore = [0, 0];
     this.holder = -1; // -1 none/contested
+    this.holdSec = [0, 0];  // seconds each team has held the hill this match
   }
   update(dt) {
     const counts = [0, 0];
@@ -182,9 +197,10 @@ class KOTH extends Mode {
     else this.holder = -1;
 
     if (this.holder >= 0) {
+      this.holdSec[this.holder] += dt;
       this.fscore[this.holder] += dt * 11;
       this.teamScore[this.holder] = Math.floor(this.fscore[this.holder]);
-      if (this.teamScore[this.holder] >= this.scoreLimit) this.end(TEAMS[this.holder].name + ' Team wins!');
+      if (this.teamScore[this.holder] >= this.scoreLimit) this.end(TEAMS[this.holder].name + ' Team wins!', { team: this.holder });
     }
     this.contested = counts[0] > 0 && counts[1] > 0;
   }
