@@ -363,9 +363,8 @@ button {
   position: fixed;
   z-index: 62;
   top: max(9px, env(safe-area-inset-top));
-  /* Sits immediately left of the account badge. There used to be a `min(…,
-     348px)` cap here, which only bites above ~442px wide and parked the gear in
-     the middle of the screen on portrait tablets. */
+  /* Left of the account badge. A `min(…, 348px)` cap here used to park it mid
+     screen on anything wider than ~442px. */
   left: calc(100dvw - 42px - env(safe-area-inset-right) - var(--br8t-account-space, 0px));
   right: auto;
   width: 32px;
@@ -540,12 +539,8 @@ button {
   pointer-events: none;
 }
 
-/* left/top/width/height and --face-h are all written from JS by
- * layoutStationPlate(). The lounge is a single portrait photograph shown with
- * object-fit: cover, so where the terminal actually lands on screen depends on
- * how the picture got cropped — percentages of the VIEWPORT drift right off it
- * on any shape but the plate's own. Everything inside sizes off --face-h so
- * the shine and the hint scale with the terminal, not with the window. */
+/* Geometry and --face-h are written from JS by layoutStationPlate(); the plate
+ * is object-fit: cover, so viewport percentages do not track the terminal. */
 .station-terminal-hotspot {
   position: absolute;
   z-index: 4;
@@ -589,8 +584,6 @@ button {
     0 0 calc(var(--face-h, 60px) * 0.5) rgba(85, 230, 255, 0.18);
 }
 
-/* A specular bar crossing the glass every few seconds — the cheapest possible
- * "this is a live screen, not a dark panel". */
 .terminal-glass::after {
   content: "";
   position: absolute;

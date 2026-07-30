@@ -1956,11 +1956,8 @@ function createStation() {
     if (child.material === materials.beaconRed || child.material === materials.beaconWhite) beacons.push(child);
   });
 
-  // Scenery, not an obstacle — nothing in the collision pass looks at a
-  // station. So it must never be anywhere the ship can reach, or you fly clean
-  // through a structure the size of a town and the game says nothing. It used
-  // to spawn at x 16..30 and drift INWARD at up to 1.8/s for ten seconds, which
-  // walked it straight down the corridor and through the cockpit.
+  // Scenery — the collision pass ignores stations, so one must never be
+  // anywhere the ship can reach.
   const side = Math.random() > 0.5 ? 1 : -1;
   const scale = rand(1, 1.6);
   group.position.set(side * rand(38, 74), rand(-16, 20), rand(-340, -260));
@@ -1972,10 +1969,7 @@ function createStation() {
     hp: 999,
     value: 0,
     speedScale: 0.5,
-    // Outward, so it opens away from the flight path as it comes past.
-    drift: -side * rand(0.3, 1.0),
-    // Belt and braces: whatever the drift does, it stays this far off the
-    // corridor. The player can reach roughly x ±11, y ±7.5.
+    drift: -side * rand(0.3, 1.0),          // outward
     minClearX: 10 * scale + 22,
     beacons,
     beaconPhase: rand(0, Math.PI * 2),
@@ -2030,9 +2024,7 @@ function createDockStation(type = getStationType()) {
   addDockBlock(group, -width * 0.28, 0, -depth * 0.62, 0.26, height * 0.44, 0.34, materials.dockDark);
   addDockBlock(group, width * 0.28, 0, -depth * 0.62, 0.26, height * 0.44, 0.34, materials.dockDark);
 
-  // The landing strip belongs on the deck. It used to run down the middle of
-  // the aperture at y=0, which from the cockpit read as a shelf across the hole
-  // you were being told to fly through.
+  // On the deck, not across the middle of the aperture.
   const deckY = -height * 0.3;
   addDockBlock(group, 0, deckY, -1.2, width * 0.62, 0.34, depth * 1.2, materials.dockRunway);
   addDockBlock(group, 0, deckY + 0.5, -1.1, width * 0.42, 0.16, depth * 1.24, materials.dockWarning);
@@ -2082,20 +2074,8 @@ function createDockStation(type = getStationType()) {
     addGlowPanel(group, px, py, pz + 1.9, 0.34, 0.28, 0.2, materials.amberGlow);
   }
 
-  /* ------------------------------------------- the berth you fly into ---
-   * The dock used to be four painted beams around a hole: less structure than
-   * the stations you merely pass, and no cue at all that you were flying INTO
-   * anything. Three things fix that, and they scale with `type` so a small
-   * depot stays a small depot.
-   *   1. hull mass behind the opening, so it is a building with a bay in it
-   *      rather than a picture frame floating in space;
-   *   2. a funnel of guide pylons reaching back toward the ship, which is what
-   *      actually reads as "aim here";
-   *   3. a lit bay behind the throat, so the hole goes somewhere.
-   */
-
-  // 1. Mass. A deeper outer shell set back from the aperture, with lit cabins
-  // along it and solid corner blocks tying the beams together.
+  /* --- the berth you fly into: mass, a lit gate, and a bay behind the throat.
+   * All of it scales with `type`, so a small depot stays a small depot. */
   const shellDepth = depth * 1.55;
   const shellZ = -depth * 0.34;
   addDockBlock(group, 0, height * 0.5, shellZ, width * 1.06, 3.1, shellDepth, materials.dockHull);
@@ -2111,16 +2091,8 @@ function createDockStation(type = getStationType()) {
   addDockBlock(group, 0, height * 0.515, shellZ, width * 0.92, 0.12, shellDepth * 0.5, materials.hullWindows);
   addDockBlock(group, 0, -height * 0.515, shellZ, width * 0.92, 0.12, shellDepth * 0.5, materials.hullWindows);
 
-  // 2. The gate. A lit rectangular mouth around the aperture, with short
-  // buttresses angled forward at the corners.
-  //
-  // This started as a long flaring funnel of guide pylons, which is the obvious
-  // idea and was wrong: a funnel is widest at the end nearest you, and the game
-  // is played in portrait, where the horizontal field of view is narrow. The
-  // arms measured out at x ±34 while the frame reached ±31, so the whole thing
-  // sat off screen and the approach looked exactly as bare as before. What
-  // reads in a tall thin frame is a bright mouth you aim at and a lit tube
-  // behind it, so that is what this is now.
+  // A mouth, not a funnel: a funnel is widest at the end nearest you, and in
+  // portrait its arms fall outside the frame entirely.
   const gateZ = depth * 0.58;
   const gateX = width * 0.47;
   const gateY = height * 0.42;
@@ -2136,8 +2108,7 @@ function createDockStation(type = getStationType()) {
     }
   }
 
-  // 3. The bay behind the throat. Without this the aperture is a window onto
-  // empty space, which is exactly why it never felt like arriving anywhere.
+  // The bay, so the aperture opens onto somewhere rather than onto space.
   const bayZ = -depth * 1.05;
   addDockBlock(group, 0, 0, bayZ, width * 0.74, height * 0.72, 0.6, materials.dockDark);
   addDockBlock(group, 0, -height * 0.2, bayZ + 0.5, width * 0.62, 0.34, 0.3, materials.dockRunway);
@@ -2146,7 +2117,6 @@ function createDockStation(type = getStationType()) {
     addDockBlock(group, sx * width * 0.26, -height * 0.04, bayZ + 1.4, 1.5, 1.1, 2.6, materials.hullPaint);
     addGlowPanel(group, sx * width * 0.26, -height * 0.04, bayZ + 2.9, 0.3, 0.24, 0.18, materials.amberGlow);
   }
-  // Rib lights down the throat, so the tube itself is lit rather than implied.
   const ribs = HIGH_DETAIL ? 4 : 2;
   for (let i = 0; i < ribs; i += 1) {
     const z = depth * 0.4 - i * (depth * 1.2 / ribs);
@@ -2460,26 +2430,16 @@ const stationView = {
 };
 
 /* ------------------------------------------------ lounge plate placement ---
- * The lounge is one portrait photograph (941x1672) drawn with object-fit:
- * cover, and the dock terminal happens to sit in its bottom-right corner. On
- * any viewport that is not the plate's own shape, cover crops it — so a hotspot
- * pinned with percentages of the SCREEN slides off the terminal, which is
- * exactly what it did: on a 1440x900 desktop the terminal was ~280px right of
- * where the button was.
- *
- * So nothing here is expressed in screen percentages. Everything is measured in
- * plate-image coordinates and mapped through the same cover transform the
- * browser uses — and the crop is deliberately biased to keep the terminal on
- * screen instead of centring the picture. The window panes are in the same
- * coordinates, which is also what lets the exterior scene stage itself inside
- * whichever pane is actually visible.
+ * The lounge is one portrait photograph drawn with object-fit: cover, so where
+ * anything in it lands on screen depends on how it got cropped. Coordinates
+ * here are plate-image fractions, mapped through the same cover transform the
+ * browser uses. Do not reach for viewport percentages — that is the bug this
+ * replaced.
  */
 const PLATE = {
   width: 941,
   height: 1672,
-  // Panes measured by flood-filling the asset's alpha channel; the terminal
-  // face measured from its cyan bezel. Biggest first — the stage picker walks
-  // this list and takes whichever has the most visible area.
+  // Window holes, from flood-filling the asset's alpha channel.
   panes: [
     { x0: 0.268, y0: 0.117, x1: 0.729, y1: 0.429 },
     { x0: 0.272, y0: 0.458, x1: 0.725, y1: 0.584 },
@@ -2491,9 +2451,7 @@ const PLATE = {
 
 const plateFit = { width: 0, height: 0, scale: 1, offX: 0, offY: 0, posX: 0.5, posY: 0.5 };
 
-// Resolve the cover transform for a container, biased so the terminal face
-// lands low and right — where it would be if you were standing in the room —
-// and clamped so it can never be cropped off an edge.
+// Cover transform, biased to keep the terminal face on screen.
 function fitPlate(containerWidth, containerHeight) {
   if (containerWidth === plateFit.width && containerHeight === plateFit.height) return plateFit;
   const scale = Math.max(containerWidth / PLATE.width, containerHeight / PLATE.height);
@@ -2501,9 +2459,7 @@ function fitPlate(containerWidth, containerHeight) {
   const scaledHeight = PLATE.height * scale;
   const overflowX = Math.max(0, scaledWidth - containerWidth);
   const overflowY = Math.max(0, scaledHeight - containerHeight);
-  // Preferred: face's far edge just inside the container's far edge. Then the
-  // near-edge guard, in case the container is so small the face would run off
-  // the other side. Clamp last, because only the clamp is a hard limit.
+  // Preferred placement, then the near-edge guard, then the hard clamp.
   let offX = Math.min(PLATE.face.x1 * scaledWidth - containerWidth * 0.985, PLATE.face.x0 * scaledWidth - containerWidth * 0.02);
   let offY = Math.min(PLATE.face.y1 * scaledHeight - containerHeight * 0.94, PLATE.face.y0 * scaledHeight - containerHeight * 0.06);
   offX = clamp(offX, 0, overflowX);
@@ -2515,13 +2471,11 @@ function fitPlate(containerWidth, containerHeight) {
   plateFit.scaledHeight = scaledHeight;
   plateFit.offX = offX;
   plateFit.offY = offY;
-  // What object-position needs to be for the browser to crop it the same way.
   plateFit.posX = overflowX > 0 ? offX / overflowX : 0.5;
   plateFit.posY = overflowY > 0 ? offY / overflowY : 0.5;
   return plateFit;
 }
 
-// A plate-space rect in container pixels.
 function plateRect(rect, fit) {
   return {
     left: rect.x0 * fit.scaledWidth - fit.offX,
@@ -2545,9 +2499,7 @@ function layoutStationPlate() {
     style.top = `${box.top.toFixed(1)}px`;
     style.width = `${box.width.toFixed(1)}px`;
     style.height = `${box.height.toFixed(1)}px`;
-    // Everything inside the button sizes off this, so the shine and the hint
-    // text scale with the terminal rather than with the viewport.
-    style.setProperty('--face-h', `${box.height.toFixed(1)}px`);
+    style.setProperty('--face-h', `${box.height.toFixed(1)}px`);   // the button's contents size off this
   }
   return fit;
 }
@@ -2564,11 +2516,6 @@ function makeRadialTexture(stops) {
   return texture;
 }
 
-/* Every dock used to look out on the same blue-green world in the same corner
- * of the same window, which made forty berths across the galaxy read as one
- * berth you kept coming back to. A world is rolled per dock instead: palette,
- * surface style, apparent size, where it sits in the pane — including half out
- * of frame — and whether it has rings. */
 const PLANET_PALETTES = [
   { id: 'ocean',  halo: 0x74c8ff, sky: ['#d8e6ee', '#2f6c8e', '#1b4a68', '#2c6076', '#cfe2ea'], band: [60, 150, 110, 190, 120, 200], cloud: '224, 240, 246' },
   { id: 'ember',  halo: 0xff8a4a, sky: ['#ffd9ab', '#c9603a', '#6f2a1e', '#a8482c', '#ffcf9a'], band: [150, 220, 70, 130, 44, 90],    cloud: '255, 226, 190' },
@@ -2597,7 +2544,6 @@ function makePlanetTexture(palette, style) {
   const [r0, r1, g0, g1, b0, b1] = palette.band;
 
   if (style === 'banded') {
-    // A gas giant: hard horizontal bands and one big storm.
     for (let i = 0; i < 30; i += 1) {
       const y = rand(4, 124);
       ctx.fillStyle = `rgba(${Math.round(rand(r0, r1))}, ${Math.round(rand(g0, g1))}, ${Math.round(rand(b0, b1))}, ${rand(0.12, 0.36).toFixed(3)})`;
@@ -2608,7 +2554,6 @@ function makePlanetTexture(palette, style) {
     ctx.ellipse(rand(40, 216), rand(40, 92), rand(20, 40), rand(8, 16), 0, 0, Math.PI * 2);
     ctx.fill();
   } else {
-    // A rocky or ocean world: landmasses rather than bands.
     for (let i = 0; i < 22; i += 1) {
       ctx.fillStyle = `rgba(${Math.round(rand(r0, r1))}, ${Math.round(rand(g0, g1))}, ${Math.round(rand(b0, b1))}, ${rand(0.2, 0.55).toFixed(3)})`;
       ctx.beginPath();
@@ -2617,7 +2562,6 @@ function makePlanetTexture(palette, style) {
     }
   }
 
-  // Weather, and the polar caps that sell it as a sphere rather than a disc.
   for (let i = 0; i < 16; i += 1) {
     ctx.fillStyle = `rgba(${palette.cloud}, ${rand(0.1, 0.32).toFixed(3)})`;
     ctx.beginPath();
@@ -2637,15 +2581,13 @@ function makePlanetTexture(palette, style) {
   return texture;
 }
 
-// Ring band: one row of pixels read along the radius, so the ring gets Cassini
-// gaps instead of being a flat washer.
+// One row of pixels, read along the radius.
 function makeRingTexture(tint) {
   const element = makeCanvas(128, 1);
   const ctx = element.getContext('2d');
   ctx.clearRect(0, 0, 128, 1);
   for (let x = 0; x < 128; x += 1) {
     const t = x / 127;
-    // Two dark gaps at fixed-ish radii, plus fine noise for the banding.
     const gap = Math.min(Math.abs(t - 0.34), Math.abs(t - 0.63));
     const shadow = gap < 0.035 ? 0.12 : 1;
     const noise = 0.55 + 0.45 * Math.sin(t * 47) * Math.sin(t * 13.7);
@@ -2658,8 +2600,8 @@ function makeRingTexture(tint) {
   return texture;
 }
 
-// RingGeometry's own UVs map onto a square, which smears a radial band texture
-// into a plaid. Re-map u to normalised radius so it reads along the ring.
+// RingGeometry's own UVs map onto a square, which smears the band texture into
+// a plaid. Re-map u to normalised radius.
 function makeRingGeometry(inner, outer) {
   const geometry = new THREE.RingGeometry(inner, outer, 96, 1);
   const position = geometry.attributes.position;
@@ -2672,9 +2614,8 @@ function makeRingGeometry(inner, outer) {
   return geometry;
 }
 
-// One roll = one berth's view. Positions are normalised inside whichever window
-// pane is on screen, so "u: 1.06" genuinely means half out of frame at every
-// viewport rather than only on the shape the numbers were tuned on.
+// One roll = one berth's view. u/v are normalised inside the visible pane, so
+// values outside 0..1 clip on its edge at every viewport.
 function rollSkyLook() {
   const palette = pick(PLANET_PALETTES);
   const banded = Math.random() < 0.55;
@@ -2775,9 +2716,7 @@ function buildStationView() {
   }
   scene3d.add(sunGroup);
 
-  // Planet with an additive back-side shell for the atmosphere rim, and a ring
-  // that is hidden on most berths. The whole group scales as one, so the ring
-  // keeps its proportion whatever size the world is rolled at.
+  // The group scales as one, so the ring keeps its proportion at any size.
   const planetGroup = new THREE.Group();
   const planet = new THREE.Mesh(
     new THREE.SphereGeometry(1, HIGH_DETAIL ? 40 : 24, HIGH_DETAIL ? 28 : 18),
@@ -2842,9 +2781,7 @@ function buildStationView() {
     const hull = new THREE.Mesh(UNIT_BOX, hullMaterial);
     hull.scale.set(6.4, 0.9, 1.2);
     group.add(hull);
-    // A box with a bridge on top is a slab at this distance. A tapered nose, a
-    // pair of outrigger pods and a lit window strip give it a silhouette that
-    // still reads as a ship when it is forty pixels long.
+    // Silhouette, so it still reads as a ship at forty pixels long.
     const nose = new THREE.Mesh(UNIT_CYL, hullMaterial);
     nose.position.set(3.7, 0, 0);
     nose.scale.set(0.95, 1.6, 0.95);
@@ -2896,8 +2833,7 @@ function buildStationView() {
       dir: i % 2 ? -1 : 1,
       ny: rand(0.12, 0.82),
       distance: rand(900, 2600),
-      // A fraction of the visible pane, not of the screen — a pane is roughly a
-      // third of the canvas, so these are larger numbers for the same result.
+      // Fraction of the visible pane, not of the screen.
       sizeRatio: rand(0.026, 0.058),
       speedRatio: rand(0.03, 0.07),
       progress: rand(-1, 1),
@@ -2921,9 +2857,8 @@ function buildStationView() {
   applySkyLook();
 }
 
-// Repaint the world for the current roll. Called on build and on every dock.
-// The old canvas textures are disposed because a forty-berth career would
-// otherwise leak forty of them.
+// Repaint for the current roll. Old canvas textures are disposed — a long
+// career would otherwise leak one per berth.
 function applySkyLook() {
   const look = state.skyLook || (state.skyLook = rollSkyLook());
   const { planet, halo, ring, moons } = stationView;
@@ -2947,11 +2882,8 @@ function applySkyLook() {
   stationView.sun.children[0].material.color.setHex(look.sunTint);
 }
 
-/* The plate is opaque everywhere except its window panes, so anything staged
- * outside a pane is simply not there. Which pane is on screen depends entirely
- * on how the plate got cropped — the tall centre pane on a phone, the lower
- * band on a wide desktop — so the stage is chosen from the live crop rather
- * than assumed, and everything is placed in normalised stage coordinates. */
+/* Which pane is visible depends on the crop — the tall centre one on a phone,
+ * the lower band on a wide desktop — so pick it from the live layout. */
 function stationStage() {
   const width = stationView.width || window.innerWidth;
   const height = stationView.height || window.innerHeight;
@@ -2967,22 +2899,17 @@ function stationStage() {
     const area = Math.max(0, right - left) * Math.max(0, bottom - top);
     if (area > bestArea) { bestArea = area; best = { left, top, width: right - left, height: bottom - top }; }
   }
-  // Every pane off screen (a viewport shape we never anticipated): fall back to
-  // the whole canvas rather than staging the scene into a sliver of nothing.
   if (!best || best.width < 8 || best.height < 8) best = { left: 0, top: 0, width, height };
   best.viewWidth = width;
   best.viewHeight = height;
   return best;
 }
 
-// A point inside the stage, in stage-normalised coords, resolved to world space
-// at `distance`. Values outside 0..1 land outside the pane on purpose.
 function stagePoint(camera3d, stage, u, v, distance) {
   const px = stage.left + u * stage.width;
   const py = stage.top + v * stage.height;
   const at = ndcToViewWorld(camera3d, (px / stage.viewWidth) * 2 - 1, 1 - (py / stage.viewHeight) * 2, distance);
-  // World height of one stage-height, so sizes can be expressed as a fraction
-  // of the visible pane instead of a fraction of the screen.
+  // Sizes are a fraction of the visible pane, not of the screen.
   at.stageH = 2 * at.halfH * (stage.height / stage.viewHeight);
   return at;
 }
@@ -2995,8 +2922,7 @@ function layoutStationView() {
   const sunAt = stagePoint(camera3d, stage, look.sunU, look.sunV, 4200);
   sun.position.set(sunAt.x, sunAt.y, sunAt.z);
   sun.scale.setScalar(sunAt.stageH * look.sunSize);
-  // Key light from the sun's side but well off its axis: lighting straight down
-  // the sun's own vector turns every body in frame into a thin crescent.
+  // Off the sun's own axis — lighting down it makes every body a thin crescent.
   sunLight.position.set((look.sunU < 0.5 ? -1 : 1) * 900, 1150, 1500);
 
   const planetAt = stagePoint(camera3d, stage, look.u, look.v, 3600);
@@ -3012,8 +2938,7 @@ function layoutStationView() {
     moons[i].scale.setScalar(at.stageH * look.moonSize[i]);
   }
 
-  // The limb of the station you are standing on, hard against the pane edge the
-  // planet is furthest from, so it never sits on top of the view.
+  // Pushed to whichever pane edge the planet is furthest from.
   const limbAt = stagePoint(camera3d, stage, look.u > 0.5 ? -0.34 : 1.34, 0.5, 1500);
   stationLimb.position.set(limbAt.x, limbAt.y, limbAt.z);
   stationLimb.scale.setScalar(limbAt.stageH * 0.55);
@@ -3067,8 +2992,6 @@ function resetStationTraffic() {
     size: rand(0.65, 1.35),
     color: pick(['#55e6ff', '#ffb352', '#7dff9d', '#ffffff']),
   }));
-  // A different world at every berth. Rolled here rather than in the renderer
-  // so it changes once per dock and not once per frame.
   state.skyLook = rollSkyLook();
   if (stationView.freighters.length) {
     for (const ship of stationView.freighters) {
@@ -3082,10 +3005,6 @@ function resetStationTraffic() {
   }
 }
 
-/* The terminal is a dark rectangle on a dark kiosk in a dark room, and nothing
- * about it says "press me". A slow shine crosses the glass (CSS), and a line of
- * text surfaces for about three seconds in every seven — long enough to be read
- * on the way past, short enough not to nag once you know. */
 const TERMINAL_HINTS = ['Dock terminal', 'Tap to open', 'Upgrades · Cargo · Brief', 'Spend your credits'];
 const TERMINAL_HINT_CYCLE = 7;
 let terminalHintPhase = -1;
@@ -4350,9 +4269,7 @@ function openStation(type = getStationType()) {
   resetStationTraffic();
   updateStationUi(payout, type);
   stationEl.classList.remove('hidden');
-  // The plate has no measurable size while the overlay is hidden, so the
-  // terminal hotspot can only be placed once it is on screen.
-  layoutStationPlate();
+  layoutStationPlate();      // needs the overlay visible to measure
   setStationTerminalOpen(state.demoTerminal);
   drawStationWindow(0);
   hudEl.classList.add('hidden');
@@ -4716,8 +4633,6 @@ function spawnObjects(delta) {
 
   if (state.stationTimer <= 0) {
     createStation();
-    // Rarer than it was (9-15s): passing a settlement should be an event on the
-    // route, not street furniture.
     state.stationTimer = rand(17, 27);
   }
 
@@ -4769,7 +4684,6 @@ function updateObjects(delta) {
     } else if (data.kind === 'station') {
       object.rotation.z += delta * 0.04;
       object.position.x -= data.drift * delta;
-      // A station is never a collider, so it is never allowed within reach.
       if (data.minClearX && Math.abs(object.position.x) < data.minClearX) {
         object.position.x = Math.sign(object.position.x || 1) * data.minClearX;
       }
@@ -4794,11 +4708,8 @@ function updateObjects(delta) {
       }
       object.position.x = lerp(object.position.x, 0, delta * 1.4);
       object.position.y = lerp(object.position.y, 0, delta * 1.4);
-      // Approach guidance. A small depot's aperture is narrower than the ship
-      // can range, so you could be well outside the frame at the moment the
-      // dock fires and it read as arriving beside the station rather than in
-      // it. The pull starts gently at 90 units out and is firm by the time the
-      // funnel is around you — steering still works, it just recentres.
+      // A small depot's aperture is narrower than the ship can range, so ease
+      // it back to centre or you dock alongside the station rather than in it.
       if (state.running && object.position.z > -90) {
         const pull = clamp((object.position.z + 90) / 74, 0, 1) * delta * 2.1;
         state.target.x = lerp(state.target.x, 0, pull);
