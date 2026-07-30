@@ -2,13 +2,13 @@
 // so distant fights sound distant. Ambience is dusk wind + a low drone;
 // the murder gets a raspy crow caw.
 
-import { MUTE_KEY } from './config.js';
+import { loadSettings, saveSettings } from './career.js';
 
 export const AudioFX = {
   ctx: null,
   master: null,
   noiseBuf: null,
-  muted: localStorage.getItem(MUTE_KEY) === '1',
+  muted: loadSettings().muted,
 
   init() {
     if (this.ctx) return;
@@ -33,7 +33,7 @@ export const AudioFX = {
 
   setMuted(m) {
     this.muted = m;
-    localStorage.setItem(MUTE_KEY, m ? '1' : '0');
+    saveSettings({ muted: m });
     if (this.master) this.master.gain.value = m ? 0 : 0.5;
   },
 

@@ -3,7 +3,8 @@
 
 import * as THREE from 'three';
 import { NAME_POOL, IS_TOUCH } from './config.js';
-import { $, clamp, pickRandom } from './utils.js';
+import { MODES, nemesis, prey, callsignPoolSize } from './career.js';
+import { $, clamp, pickRandom, fmtTime } from './utils.js';
 import { camera } from './world.js';
 import { state, aliveTanks } from './state.js';
 
@@ -29,6 +30,8 @@ export function initUI(h) {
   $('btn-edit-name').addEventListener('click', () => openNameModal());
   $('btn-title-edit').addEventListener('click', () => openNameModal());
   $('btn-mute').addEventListener('click', () => handlers.onToggleMute());
+  $('career-strip').addEventListener('click', () => handlers.onCareer());
+  $('btn-career-close').addEventListener('click', closeCareerPanel);
 
   for (const pill of document.querySelectorAll('.mode-pill')) {
     pill.addEventListener('click', () => {
@@ -95,6 +98,154 @@ export function setPlayerNameUI(name) {
 }
 
 // ---------------------------------------------------------------------------
+// Career strip + panel
+// ---------------------------------------------------------------------------
+
+function row(parent, label, value, cls) {
+  const r = document.createElement('div');
+  r.className = 'stat-row' + (cls ? ' ' + cls : '');
+  const a = document.createElement('span');
+  a.textContent = label;
+  const b = document.createElement('span');
+  b.textContent = value;
+  r.append(a, b);
+  parent.appendChild(r);
+  return r;
+}
+
+/** The one-line teaser under the callsign on the title screen. */
+export function updateCareerStrip(career, modeId) {
+  const el = $('career-strip');
+  const t = career.totals;
+  if (!t.played) {
+    el.textContent = 'CAREER — NO MATCHES YET ▸';
+    return;
+  }
+  const m = career.modes[modeId] || {};
+  const bits = [
+    t.played + (t.played === 1 ? ' MATCH' : ' MATCHES'),
+    t.wins + ' WON',
+    t.kills + ' KILLS',
+  ];
+  if (m.bestPlace) bits.push('BEST #' + m.bestPlace);
+  el.textContent = 'CAREER — ' + bits.join(' · ') + ' ▸';
+}
+
+export function openCareerPanel(career, modeId) {
+  const body = $('career-body');
+  body.textContent = '';
+  const t = career.totals;
+
+  const overall = document.createElement('div');
+  overall.className = 'career-block';
+  const winRate = t.played ? Math.round((t.wins / t.played) * 100) : 0;
+  row(overall, 'Matches', t.played);
+  row(overall, 'Victories', `${t.wins} (${winRate}%)`);
+  row(overall, 'Kills / deaths', `${t.kills} / ${t.deaths}`);
+  row(overall, 'Best kill streak', t.bestStreak);
+  row(overall, 'Best score', t.bestScore);
+  row(overall, 'Time in the field', fmtTime(t.playTime));
+  body.appendChild(overall);
+
+  const head = document.createElement('div');
+  head.className = 'career-head';
+  head.textContent = 'BY MODE';
+  body.appendChild(head);
+
+  const table = document.createElement('div');
+  table.className = 'career-table';
+  const cells = ['MODE', 'PLAYED', 'WON', 'BEST', 'KILLS', 'LONGEST', 'SCORE'];
+  for (const c of cells) {
+    const h = document.createElement('span');
+    h.className = 'ct-h';
+    h.textContent = c;
+    table.appendChild(h);
+  }
+  for (const mode of MODES) {
+    const s = career.modes[mode.id] || {};
+    const vals = [
+      mode.label, s.played || 0, s.wins || 0,
+      s.bestPlace ? '#' + s.bestPlace : '—',
+      s.kills || 0, s.bestTime ? fmtTime(s.bestTime) : '—', s.bestScore || 0,
+    ];
+    vals.forEach((v, i) => {
+      const c = document.createElement('span');
+      c.className = 'ct-c' + (mode.id === modeId ? ' ct-now' : '') + (i === 0 ? ' ct-mode' : '');
+      c.textContent = v;
+      table.appendChild(c);
+    });
+  }
+  body.appendChild(table);
+
+  const notes = document.createElement('div');
+  notes.className = 'career-block';
+  const n = nemesis(career);
+  const p = prey(career);
+  row(notes, 'Nemesis',
+    n ? `${n.name.toUpperCase()} ×${n.n}` : 'nobody yet');
+  row(notes, 'Favourite prey',
+    p ? `${p.name.toUpperCase()} ×${p.n}` : 'nobody yet');
+  row(notes, 'Callsigns felled',
+    `${career.callsigns.felled.length} of ${callsignPoolSize()}`);
+  row(notes, 'Deployed as',
+    career.callsigns.used.length
+      ? career.callsigns.used.slice(-4).join(', ')
+      : (state.playerName || '—'));
+  body.appendChild(notes);
+
+  $('career-popup').classList.remove('hidden');
+}
+
+export function closeCareerPanel() {
+  $('career-popup').classList.add('hidden');
+}
+
+/** Results-screen footer: this match's score plus any records it broke. */
+function renderSummary(hostId, summary) {
+  const host = $(hostId);
+  host.textContent = '';
+  if (!summary) { host.classList.add('hidden'); return; }
+  host.classList.remove('hidden');
+
+  const score = document.createElement('div');
+  score.className = 'res-score';
+  score.textContent = summary.score + ' PTS';
+  host.appendChild(score);
+
+  const r = summary.records;
+  const badges = [];
+  if (r.firstWinInMode) badges.push('FIRST ' + summary.mode.label + ' WIN');
+  if (r.bestStreak && summary.streak > 1) badges.push('BEST STREAK ×' + summary.streak);
+  // "You beat your own record" is meaningless on the first match in a mode —
+  // there was nothing to beat.
+  if (!r.firstInMode) {
+    if (r.bestScore) badges.push('BEST SCORE');
+    if (r.bestPlace) badges.push('BEST PLACEMENT');
+    if (r.bestKills) badges.push('MOST KILLS');
+    if (r.bestTime) badges.push('LONGEST SURVIVAL');
+  }
+  badges.splice(4);
+  if (badges.length) {
+    const wrap = document.createElement('div');
+    wrap.className = 'res-badges';
+    for (const b of badges) {
+      const el = document.createElement('span');
+      el.className = 'res-badge';
+      el.textContent = b;
+      wrap.appendChild(el);
+    }
+    host.appendChild(wrap);
+  }
+
+  const t = summary.career.totals;
+  const line = document.createElement('div');
+  line.className = 'res-career';
+  line.textContent = `CAREER ${t.played} ${t.played === 1 ? 'MATCH' : 'MATCHES'}`
+    + ` · ${t.wins} WON · ${t.kills} KILLS`;
+  host.appendChild(line);
+}
+
+// ---------------------------------------------------------------------------
 // Screens / HUD chrome
 // ---------------------------------------------------------------------------
 
@@ -131,13 +282,15 @@ export function hidePopups() {
   $('gameover-popup').classList.add('hidden');
   $('victory-popup').classList.add('hidden');
   $('name-modal').classList.add('hidden');
+  $('career-popup').classList.add('hidden');
 }
 
-export function showDefeat({ place, total, kills, time, killer }) {
+export function showDefeat({ place, total, kills, time, killer, summary }) {
   $('go-place').textContent = '#' + place + ' / ' + total;
   $('go-kills').textContent = kills;
   $('go-time').textContent = time;
   $('go-killer').textContent = killer;
+  renderSummary('go-summary', summary);
   $('gameover-popup').classList.remove('hidden');
   $('crosshair').classList.add('hidden');
   $('touch-left').classList.add('hidden');
@@ -145,9 +298,10 @@ export function showDefeat({ place, total, kills, time, killer }) {
   document.body.classList.remove('playing');
 }
 
-export function showVictory({ kills, time }) {
+export function showVictory({ kills, time, summary }) {
   $('win-kills').textContent = kills;
   $('win-time').textContent = time;
+  renderSummary('win-summary', summary);
   $('victory-popup').classList.remove('hidden');
   $('crosshair').classList.add('hidden');
   $('touch-left').classList.add('hidden');

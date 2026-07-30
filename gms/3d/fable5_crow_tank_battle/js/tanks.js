@@ -49,6 +49,7 @@ export class Tank {
     this.wantFire = false;
 
     this.lastAttacker = null;
+    this.killedBy = null;      // who landed the killing blow (null = the murder)
     this.lastHitT = -99;
   }
 
@@ -147,11 +148,15 @@ export class Tank {
 
   die(attacker) {
     this.alive = false;
+    this.killedBy = attacker && attacker !== this ? attacker : null;
     this.place = state.placeCounter--;
     spawnExplosion(_tmpV.copy(this.pos).setY(1.2), 2.0, this.accent);
     spawnDebris(_tmpV, 6, 1.4);
     this.grp.visible = false;
-    if (attacker && attacker !== this) attacker.kills++;
+    if (attacker && attacker !== this) {
+      attacker.kills++;
+      if (state.hooks.onKill) state.hooks.onKill(attacker, this);
+    }
     addFeed(attacker, this);
     updateLeaderboard();
   }
@@ -169,6 +174,8 @@ export class Tank {
     this.alive = true;
     this.kills = 0;
     this.place = 0;
+    this.lastAttacker = null;
+    this.killedBy = null;
     this.grp.visible = true;
     this.grp.rotation.y = this.yaw;
   }

@@ -3,8 +3,12 @@
 import * as THREE from 'three';
 import {
   MURDER, PERSONALITIES, ACCENTS, NAME_POOL,
-  NAME_KEY, MODE_KEY, DEFAULT_TANK_COUNT, SHOT_MODE, AUTO_MODE,
+  DEFAULT_TANK_COUNT, SHOT_MODE, AUTO_MODE, NO_CLOUD,
 } from './config.js';
+import {
+  loadCareer, loadSettings, saveSettings, beginMatch, noteKill, recordMatch,
+  matchRecorded, resetCareer, modeFor, CAREER_KEY, SETTINGS_KEY,
+} from './career.js';
 import { $, rand, clamp, damp, fmtTime, pickRandom, shuffled } from './utils.js';
 import { state, aliveTanks } from './state.js';
 import { AudioFX } from './audio.js';
@@ -28,9 +32,23 @@ initMurder();
 initParticles();
 initCombat();
 
-state.playerName = localStorage.getItem(NAME_KEY) || pickRandom(NAME_POOL);
-state.tankCount = clamp(parseInt(localStorage.getItem(MODE_KEY), 10)
-  || DEFAULT_TANK_COUNT, 2, 16);
+// Settings load (and the one-time legacy f5mr_* migration inside it) must run
+// here, before the cloud import below — see the note in career.js.
+const settings = loadSettings();
+state.tankCount = clamp(parseInt(settings.mode, 10) || DEFAULT_TANK_COUNT, 2, 16);
+state.playerName = settings.name || pickRandom(NAME_POOL);
+if (!settings.name) saveSettings({ name: state.playerName });   // first-run callsign sticks
+
+// Optional br8t account layer — mirrors the career + settings keys to the
+// player's account so progress follows them between devices. Deliberately
+// fire-and-forget: if it can't load (offline, blocked, opened from file://) the
+// import throws, we swallow it, and the game plays on with a purely local save
+// with nothing missing but the avatar. Skipped under the staged/automated
+// modes so test runs stay hermetic.
+let cloudApi = null;
+if (!NO_CLOUD) {
+  import('./cloud.js').then((m) => { cloudApi = m; }).catch(() => { /* play on locally */ });
+}
 
 function toggleMute() {
   AudioFX.init();
@@ -50,7 +68,7 @@ ui.initUI({
   },
   onNameSave: (name) => {
     state.playerName = name;
-    localStorage.setItem(NAME_KEY, name);
+    saveSettings({ name });
     ui.setPlayerNameUI(name);
     if (state.player) {
       state.player.name = name;
@@ -60,14 +78,17 @@ ui.initUI({
   },
   onModeChange: (count) => {
     state.tankCount = count;
-    localStorage.setItem(MODE_KEY, String(count));
+    saveSettings({ mode: count });
+    ui.updateCareerStrip(loadCareer(), modeFor(count).id);
   },
   onToggleMute: toggleMute,
+  onCareer: () => ui.openCareerPanel(loadCareer(), modeFor(state.tankCount).id),
 });
 
 ui.setPlayerNameUI(state.playerName);
 ui.selectModePill(state.tankCount);
 ui.updateMuteBtn(AudioFX.muted);
+ui.updateCareerStrip(loadCareer(), modeFor(state.tankCount).id);
 
 // ---------------------------------------------------------------------------
 // Match setup / teardown
@@ -130,10 +151,20 @@ function spawnTanks(count, withPlayer, spawnR = 38) {
   state.placeCounter = count;
 }
 
+// Career: count the player's kills as they land, so a streak can be measured.
+// The tally lives in memory only until the results screen banks it.
+state.hooks.onKill = (attacker, victim) => {
+  if (state.phase !== 'playing' && state.phase !== 'spectate') return;
+  if (!state.player || attacker !== state.player) return;
+  noteKill(victim.name, victim.personality ? victim.personality.label : null,
+    state.matchTime);
+};
+
 function startMatch() {
   clearMatch();
   resetZone();
   spawnTanks(state.tankCount, true);
+  beginMatch(state.tankCount);
   state.phase = 'countdown';
   state.countdown = 3.8;
   state.matchTime = 0;
@@ -213,6 +244,27 @@ function updateZone(dt) {
 // Match end / spectate
 // ---------------------------------------------------------------------------
 
+// Bank the player's match into the career, exactly once, as the results screen
+// goes up. Never called mid-match, and never from the attract loop.
+function bankMatch(won) {
+  if (SHOT_MODE || !state.player || matchRecorded()) return null;
+  const p = state.player;
+  const killer = won ? null : p.killedBy;
+  const summary = recordMatch({
+    tankCount: state.tankCount,
+    place: won ? 1 : p.place,
+    kills: p.kills,
+    timeAlive: state.matchTime,
+    won,
+    killerLabel: killer && killer.personality ? killer.personality.label : null,
+    name: p.name,
+  });
+  ui.updateCareerStrip(summary.career, summary.mode.id);
+  // One nudge per player, on their third match — shown by the account layer.
+  if (cloudApi && cloudApi.matchFinished) cloudApi.matchFinished();
+  return summary;
+}
+
 function checkMatchEnd() {
   if (SHOT_MODE) return;
   const alive = aliveTanks();
@@ -223,12 +275,14 @@ function checkMatchEnd() {
     state.spectating = (state.player.lastAttacker && state.player.lastAttacker.alive)
       ? state.player.lastAttacker : alive[0] || null;
     AudioFX.dirge();
+    const summary = bankMatch(false);
     ui.showDefeat({
       place: state.player.place,
       total: state.tankCount,
       kills: state.player.kills,
       time: fmtTime(state.matchTime),
-      killer: state.player.lastAttacker ? state.player.lastAttacker.name : 'THE MURDER',
+      killer: state.player.killedBy ? state.player.killedBy.name : 'THE MURDER',
+      summary,
     });
   }
 
@@ -240,9 +294,11 @@ function checkMatchEnd() {
     if (winner && winner.isPlayer) {
       state.phase = 'over';
       AudioFX.fanfare();
-      ui.showVictory({ kills: winner.kills, time: fmtTime(state.matchTime) });
+      const summary = bankMatch(true);
+      ui.showVictory({ kills: winner.kills, time: fmtTime(state.matchTime), summary });
     } else {
       state.phase = 'over';
+      // The player is already dead here, so their match was banked on defeat.
       ui.showBanner(winner ? 'WINNER: ' + winner.name : 'NO SURVIVORS', true);
       state.spectating = winner;
       // if the defeat popup was dismissed for spectating, surface the bar
@@ -389,6 +445,10 @@ function tick() {
 // ---------------------------------------------------------------------------
 
 window.__state = state;   // debugging / test hook
+window.__career = {       // test hook: inspect / wipe the career save
+  keys: { career: CAREER_KEY, settings: SETTINGS_KEY },
+  load: loadCareer, settings: loadSettings, reset: resetCareer,
+};
 
 if (SHOT_MODE) {
   // staged, photogenic frame for thumbnails: all-AI brawl in a tight ring

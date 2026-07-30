@@ -66,13 +66,22 @@ export const NAME_POOL = [
   'VESPER', 'HUSK', 'THORN', 'MAGPIE', 'STARLING', 'SHRIKE', 'DUSKY', 'OWL',
 ];
 
+// Legacy single-value keys. Nothing writes these any more — `js/career.js`
+// reads them exactly once to fold an existing player's callsign / mute / mode
+// into the namespaced `f5mr.settings.v1` blob, then leaves them be.
 export const NAME_KEY = 'f5mr_name';
 export const MUTE_KEY = 'f5mr_mute';
 export const MODE_KEY = 'f5mr_mode';
 
-export const SHOT_MODE = new URLSearchParams(location.search).has('shot');
+const Q = new URLSearchParams(location.search);
+
+export const SHOT_MODE = Q.has('shot');
 // lite: skip bloom + shadows (testing / low-end devices)
-export const LITE_MODE = new URLSearchParams(location.search).has('lite');
+export const LITE_MODE = Q.has('lite');
 // auto: AI drives the player tank too (end-to-end match testing)
-export const AUTO_MODE = new URLSearchParams(location.search).has('auto');
+export const AUTO_MODE = Q.has('auto');
+// test: keep automated runs hermetic — no account layer, no cloud save
+export const TEST_MODE = Q.has('test');
+// The br8t account layer is skipped under any staged/automated mode.
+export const NO_CLOUD = TEST_MODE || SHOT_MODE || AUTO_MODE;
 export const IS_TOUCH = 'ontouchstart' in window || navigator.maxTouchPoints > 0;

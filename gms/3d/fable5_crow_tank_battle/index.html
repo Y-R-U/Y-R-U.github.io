@@ -70,6 +70,8 @@
       <button id="btn-title-edit" aria-label="Change callsign">&#x270E;</button>
     </div>
 
+    <button id="career-strip">CAREER &#x25B8;</button>
+
     <div id="mode-row">
       <button class="mode-pill" data-count="2">DUEL<small>1v1</small></button>
       <button class="mode-pill" data-count="5">SKIRMISH<small>5 tanks</small></button>
@@ -102,6 +104,7 @@
         <div class="stat-row"><span>Survived</span><span id="go-time">0:00</span></div>
         <div class="stat-row"><span>Destroyed by</span><span id="go-killer">—</span></div>
       </div>
+      <div id="go-summary" class="res-summary hidden"></div>
       <div class="menu-buttons">
         <button id="btn-spectate" class="btn-secondary">SPECTATE</button>
         <button id="btn-retry" class="btn-primary">PLAY AGAIN</button>
@@ -120,9 +123,21 @@
         <div class="stat-row"><span>Kills</span><span id="win-kills">0</span></div>
         <div class="stat-row"><span>Match time</span><span id="win-time">0:00</span></div>
       </div>
+      <div id="win-summary" class="res-summary hidden"></div>
       <div class="menu-buttons">
         <button id="btn-win-retry" class="btn-primary">PLAY AGAIN</button>
         <button id="btn-win-menu" class="btn-secondary">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Career panel -->
+  <div id="career-popup" class="popup hidden">
+    <div class="popup-content career">
+      <h2>CAREER</h2>
+      <div id="career-body"></div>
+      <div class="menu-buttons">
+        <button id="btn-career-close" class="btn-primary">CLOSE</button>
       </div>
     </div>
   </div>

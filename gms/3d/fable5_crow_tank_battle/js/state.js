@@ -26,6 +26,12 @@ export const state = {
   winner: null,
 
   shake: 0,                // camera shake amplitude, decayed by main loop
+
+  // Match-lifecycle hooks, filled in by main.js. Systems fire them without
+  // needing to know that a career layer exists — keeps the graph acyclic.
+  hooks: {
+    onKill: null,          // (attacker, victim) => void
+  },
 };
 
 export function addShake(s) {
