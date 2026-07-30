@@ -363,7 +363,10 @@ button {
   position: fixed;
   z-index: 62;
   top: max(9px, env(safe-area-inset-top));
-  left: min(calc(100dvw - 42px - env(safe-area-inset-right) - var(--br8t-account-space, 0px)), 348px);
+  /* Sits immediately left of the account badge. There used to be a `min(…,
+     348px)` cap here, which only bites above ~442px wide and parked the gear in
+     the middle of the screen on portrait tablets. */
+  left: calc(100dvw - 42px - env(safe-area-inset-right) - var(--br8t-account-space, 0px));
   right: auto;
   width: 32px;
   height: 32px;
@@ -537,48 +540,77 @@ button {
   pointer-events: none;
 }
 
+/* left/top/width/height and --face-h are all written from JS by
+ * layoutStationPlate(). The lounge is a single portrait photograph shown with
+ * object-fit: cover, so where the terminal actually lands on screen depends on
+ * how the picture got cropped — percentages of the VIEWPORT drift right off it
+ * on any shape but the plate's own. Everything inside sizes off --face-h so
+ * the shine and the hint scale with the terminal, not with the window. */
 .station-terminal-hotspot {
   position: absolute;
   z-index: 4;
-  left: 54%;
-  top: 58%;
-  width: 43%;
-  height: 25%;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
 }
 
-.station-terminal-hotspot::before,
-.station-terminal-hotspot span {
+.station-terminal-hotspot::before {
   content: "";
   position: absolute;
+  inset: -6%;
   pointer-events: none;
-}
-
-.station-terminal-hotspot::before {
-  inset: 0;
-  border-radius: 12px;
+  border-radius: 14px;
   background:
-    radial-gradient(ellipse at 70% 25%, rgba(85, 230, 255, 0.14), transparent 42%),
-    radial-gradient(ellipse at 58% 64%, rgba(255, 179, 82, 0.09), transparent 52%);
-  opacity: 0.9;
-  animation: terminal-hotspot-breathe 1.7s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 50% 40%, rgba(85, 230, 255, 0.16), transparent 62%),
+    radial-gradient(ellipse at 58% 76%, rgba(255, 179, 82, 0.08), transparent 58%);
+  animation: terminal-hotspot-breathe 1.9s ease-in-out infinite alternate;
 }
 
-.station-terminal-hotspot span {
-  left: 28%;
-  top: 12%;
-  width: 63%;
-  height: 38%;
-  border: 1px solid rgba(124, 232, 255, 0.72);
-  border-radius: 8px;
+.terminal-glass {
+  position: absolute;
+  left: 5%;
+  right: 4%;
+  top: 9%;
+  bottom: 9%;
+  overflow: hidden;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(124, 232, 255, 0.66);
+  border-radius: calc(var(--face-h, 60px) * 0.09);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
-    0 0 24px rgba(85, 230, 255, 0.46),
-    0 0 54px rgba(85, 230, 255, 0.20);
-  opacity: 0.86;
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 0 calc(var(--face-h, 60px) * 0.24) rgba(85, 230, 255, 0.42),
+    0 0 calc(var(--face-h, 60px) * 0.5) rgba(85, 230, 255, 0.18);
+}
+
+/* A specular bar crossing the glass every few seconds — the cheapest possible
+ * "this is a live screen, not a dark panel". */
+.terminal-glass::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  width: 26%;
+  background: linear-gradient(105deg, transparent, rgba(180, 244, 255, 0.42), transparent);
+  transform: rotate(9deg);
+  animation: terminal-shine 5.4s ease-in-out infinite;
+}
+
+.terminal-hint {
+  font-weight: 700;
+  font-size: clamp(0.52rem, calc(var(--face-h, 60px) * 0.15), 1.05rem);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #d6f7ff;
+  text-shadow: 0 0 12px rgba(85, 230, 255, 0.9), 0 1px 4px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  white-space: nowrap;
 }
 
 .terminal-open .station-terminal-hotspot {
@@ -587,13 +619,32 @@ button {
 
 @keyframes terminal-hotspot-breathe {
   from {
-    opacity: 0.42;
-    transform: scale(0.985);
+    opacity: 0.45;
   }
 
   to {
     opacity: 1;
-    transform: scale(1.015);
+  }
+}
+
+@keyframes terminal-shine {
+  0% {
+    left: -34%;
+  }
+
+  38% {
+    left: 116%;
+  }
+
+  100% {
+    left: 116%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station-terminal-hotspot::before,
+  .terminal-glass::after {
+    animation: none;
   }
 }
 
@@ -1704,13 +1755,6 @@ h3 {
     right: auto;
     bottom: max(18px, env(safe-area-inset-bottom));
     width: min(360px, 42vw);
-  }
-
-  .station-terminal-hotspot {
-    left: 58%;
-    top: 58%;
-    width: 30%;
-    height: 28%;
   }
 }
 
