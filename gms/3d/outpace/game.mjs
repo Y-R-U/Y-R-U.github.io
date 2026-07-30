@@ -6,7 +6,9 @@ const cockpitCtx = cockpitCanvas.getContext('2d');
 const laserCanvas = document.getElementById('laser-canvas');
 const laserCtx = laserCanvas.getContext('2d');
 const stationWindowCanvas = document.getElementById('station-window-canvas');
-const stationWindowCtx = stationWindowCanvas?.getContext('2d');
+// Claimed lazily, and only by the 2D fallback painter: a canvas can hold one
+// context type, and the docked window normally wants WebGL on this element.
+let stationWindowCtx = null;
 const gameEl = document.getElementById('game');
 const hudEl = document.getElementById('hud');
 const menuEl = document.getElementById('menu');
@@ -1271,7 +1273,10 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x050608, 0.0066);
+// Eased back a touch from 0.0066: the extra station and rock detail is only
+// worth having if you can see it before it is on top of you. Things still fade
+// out of the dark, just a little sooner.
+scene.fog = new THREE.FogExp2(0x050608, 0.0058);
 
 const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 900);
 camera.position.set(0, 0, 4);
@@ -1291,21 +1296,152 @@ const warmLight = new THREE.PointLight(0xff743a, 1.4, 42, 1.7);
 warmLight.position.set(7, -8, 3);
 scene.add(warmLight);
 
+/* ---------------------------------------------------------- shared assets ---
+ * Stations are built out of scaled instances of a handful of geometries rather
+ * than a fresh BoxGeometry per block. A dock station used to allocate ~70
+ * geometries (and 70 GPU buffer uploads) every time you docked; now it uploads
+ * nothing. `userData.shared` is what stops removeObject() disposing them.
+ */
+const shareGeometry = (geometry) => { geometry.userData.shared = true; return geometry; };
+const UNIT_BOX = shareGeometry(new THREE.BoxGeometry(1, 1, 1));
+const UNIT_CYL = shareGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 12, 1));
+const UNIT_SPHERE = shareGeometry(new THREE.SphereGeometry(0.5, 14, 10));
+const UNIT_DISH = shareGeometry(new THREE.SphereGeometry(0.5, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.44));
+const RING_THIN = shareGeometry(new THREE.TorusGeometry(1, 0.03, 6, 40));
+const RING_THICK = shareGeometry(new THREE.TorusGeometry(1, 0.072, 8, 44));
+
+const HIGH_DETAIL = !isCoarsePointer();
+
+function makeCanvas(width, height) {
+  const element = document.createElement('canvas');
+  element.width = width;
+  element.height = height;
+  return element;
+}
+
+function wrapTexture(canvasElement, repeatX = 1, repeatY = 1) {
+  const texture = new THREE.CanvasTexture(canvasElement);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(repeatX, repeatY);
+  texture.anisotropy = 2;
+  return texture;
+}
+
+// Panel seams and tonal blotches. Kept deliberately soft and non-directional
+// because it is stretched over boxes of wildly different proportions.
+const hullPanelCanvas = (() => {
+  const element = makeCanvas(256, 256);
+  const ctx = element.getContext('2d');
+  ctx.fillStyle = '#9aa3ad';
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 90; i += 1) {
+    const w = rand(18, 92);
+    const h = rand(18, 92);
+    const shade = Math.round(rand(126, 196));
+    ctx.fillStyle = `rgba(${shade}, ${shade + 4}, ${shade + 10}, ${rand(0.18, 0.5).toFixed(3)})`;
+    ctx.fillRect(rand(0, 256), rand(0, 256), w, h);
+  }
+  ctx.strokeStyle = 'rgba(48, 56, 66, 0.55)';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i <= 4; i += 1) {
+    const p = i * 64;
+    ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, 256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(256, p); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(36, 42, 50, 0.6)';
+  for (let i = 0; i < 60; i += 1) ctx.fillRect(rand(0, 256), rand(0, 256), rand(2, 7), rand(2, 5));
+  return element;
+})();
+
+// Rows of lit cabins. Used as an emissiveMap, so one canvas lights every
+// habitat block and every ring on every station.
+const windowRowCanvas = (() => {
+  const element = makeCanvas(256, 64);
+  const ctx = element.getContext('2d');
+  ctx.fillStyle = '#04060a';
+  ctx.fillRect(0, 0, 256, 64);
+  for (let row = 0; row < 4; row += 1) {
+    for (let i = 0; i < 32; i += 1) {
+      const roll = Math.random();
+      if (roll < 0.24) continue;
+      const level = rand(0.5, 1);
+      const warm = roll > 0.8;
+      const r = Math.round((warm ? 255 : 152) * level);
+      const g = Math.round((warm ? 190 : 238) * level);
+      const b = Math.round((warm ? 112 : 255) * level);
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+      ctx.fillRect(i * 8 + 2, row * 16 + 5, 4, 6);
+    }
+  }
+  return element;
+})();
+
+const solarCellCanvas = (() => {
+  const element = makeCanvas(128, 128);
+  const ctx = element.getContext('2d');
+  const sheen = ctx.createLinearGradient(0, 0, 128, 128);
+  sheen.addColorStop(0, '#1b2a5c');
+  sheen.addColorStop(0.5, '#101a3a');
+  sheen.addColorStop(1, '#243a72');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.strokeStyle = 'rgba(120, 160, 220, 0.42)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 8; i += 1) {
+    const p = i * 16;
+    ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, 128); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(128, p); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(190, 220, 255, 0.14)';
+  for (let i = 0; i < 12; i += 1) ctx.fillRect(rand(0, 128), rand(0, 128), rand(6, 18), rand(4, 12));
+  return element;
+})();
+
+const hullPanelTexture = wrapTexture(hullPanelCanvas, 1, 1);
+const windowRowTexture = wrapTexture(windowRowCanvas, 1, 1);
+const windowRingTexture = wrapTexture(windowRowCanvas, 22, 1);
+const solarCellTexture = wrapTexture(solarCellCanvas, 2, 1);
+
 const materials = {
-  asteroid: [
+  // Rock types. Plain rock keeps the original palette; ice is smooth and pale
+  // so it catches the sun, metal is dark and specular with an ochre variant.
+  rock: [
     new THREE.MeshStandardMaterial({ color: 0x6d5b4d, roughness: 0.92, metalness: 0.08, flatShading: true }),
     new THREE.MeshStandardMaterial({ color: 0x50423a, roughness: 0.96, metalness: 0.04, flatShading: true }),
     new THREE.MeshStandardMaterial({ color: 0x7c7468, roughness: 0.9, metalness: 0.1, flatShading: true }),
+    new THREE.MeshStandardMaterial({ color: 0x8a6f52, roughness: 0.88, metalness: 0.06, flatShading: true }),
+  ],
+  ice: [
+    new THREE.MeshStandardMaterial({ color: 0xa9d8e8, roughness: 0.34, metalness: 0.06, emissive: 0x0d2b3a, emissiveIntensity: 0.5 }),
+    new THREE.MeshStandardMaterial({ color: 0xc4e6f2, roughness: 0.26, metalness: 0.04, emissive: 0x102f3d, emissiveIntensity: 0.45 }),
+  ],
+  metalRock: [
+    new THREE.MeshStandardMaterial({ color: 0x6b7480, roughness: 0.34, metalness: 0.86, flatShading: true }),
+    new THREE.MeshStandardMaterial({ color: 0x7d6a4c, roughness: 0.42, metalness: 0.78, flatShading: true }),
   ],
   drone: new THREE.MeshStandardMaterial({ color: 0x243642, roughness: 0.42, metalness: 0.72, flatShading: true }),
   droneWing: new THREE.MeshStandardMaterial({ color: 0x11181f, roughness: 0.48, metalness: 0.78, flatShading: true }),
   droneGlow: new THREE.MeshStandardMaterial({ color: 0xff7b39, emissive: 0xff3d1c, emissiveIntensity: 2.8, roughness: 0.22, metalness: 0.2 }),
-  station: new THREE.MeshStandardMaterial({ color: 0x1b2730, roughness: 0.36, metalness: 0.86, flatShading: true }),
-  stationDark: new THREE.MeshStandardMaterial({ color: 0x080c11, roughness: 0.5, metalness: 0.7, flatShading: true }),
+  station: new THREE.MeshStandardMaterial({ color: 0x2c3a44, map: hullPanelTexture, roughness: 0.36, metalness: 0.86 }),
+  stationDark: new THREE.MeshStandardMaterial({ color: 0x0d1218, map: hullPanelTexture, roughness: 0.5, metalness: 0.7 }),
   stationGlow: new THREE.MeshStandardMaterial({ color: 0x56e4ff, emissive: 0x19cfff, emissiveIntensity: 2.1, roughness: 0.25, metalness: 0.25 }),
   amberGlow: new THREE.MeshStandardMaterial({ color: 0xffb455, emissive: 0xff7e2f, emissiveIntensity: 2.1, roughness: 0.28, metalness: 0.25 }),
-  dockHull: new THREE.MeshStandardMaterial({ color: 0x202d33, roughness: 0.44, metalness: 0.8, flatShading: true }),
-  dockDark: new THREE.MeshStandardMaterial({ color: 0x080c10, roughness: 0.52, metalness: 0.75, flatShading: true }),
+  dockHull: new THREE.MeshStandardMaterial({ color: 0x33424a, map: hullPanelTexture, roughness: 0.44, metalness: 0.8 }),
+  dockDark: new THREE.MeshStandardMaterial({ color: 0x0d1116, map: hullPanelTexture, roughness: 0.52, metalness: 0.75 }),
+  // The material split: bare metal, painted hull, glass and lit cabins all
+  // catch the sun differently, which is what stops a station reading as one
+  // grey lump.
+  hullMetal: new THREE.MeshStandardMaterial({ color: 0x9aa6b4, map: hullPanelTexture, roughness: 0.32, metalness: 0.9 }),
+  hullPaint: new THREE.MeshStandardMaterial({ color: 0xa9b0b8, map: hullPanelTexture, roughness: 0.66, metalness: 0.12 }),
+  hullAccent: new THREE.MeshStandardMaterial({ color: 0xa8672c, map: hullPanelTexture, roughness: 0.58, metalness: 0.18 }),
+  hullGlass: new THREE.MeshStandardMaterial({ color: 0x0b1a24, roughness: 0.06, metalness: 0.24, emissive: 0x0a2836, emissiveIntensity: 0.6 }),
+  hullWindows: new THREE.MeshStandardMaterial({ color: 0x05070b, emissive: 0xffffff, emissiveMap: windowRowTexture, emissiveIntensity: 1.55, roughness: 0.42, metalness: 0.3 }),
+  ringWindows: new THREE.MeshStandardMaterial({ color: 0x05070b, emissive: 0xffffff, emissiveMap: windowRingTexture, emissiveIntensity: 1.7, roughness: 0.42, metalness: 0.3 }),
+  solarPanel: new THREE.MeshStandardMaterial({ color: 0x3b539a, map: solarCellTexture, roughness: 0.34, metalness: 0.45, side: THREE.DoubleSide }),
+  beaconRed: new THREE.MeshStandardMaterial({ color: 0xff5a3a, emissive: 0xff2a12, emissiveIntensity: 3.2, roughness: 0.3 }),
+  beaconWhite: new THREE.MeshStandardMaterial({ color: 0xdff6ff, emissive: 0xbfeeff, emissiveIntensity: 3, roughness: 0.3 }),
   dockRunway: new THREE.MeshStandardMaterial({ color: 0x74f2ff, emissive: 0x20d7ff, emissiveIntensity: 2.4, roughness: 0.18, metalness: 0.35 }),
   dockWarning: new THREE.MeshStandardMaterial({ color: 0xffb04b, emissive: 0xff6e2f, emissiveIntensity: 2.3, roughness: 0.22, metalness: 0.3 }),
   collect: new THREE.MeshStandardMaterial({ color: 0x89ffb0, emissive: 0x39ff74, emissiveIntensity: 1.8, roughness: 0.2, metalness: 0.45 }),
@@ -1435,37 +1571,122 @@ for (let i = 0; i < 9; i += 1) {
   nebulae.push(sprite);
 }
 
-function makeAsteroidGeometry(radius) {
-  const geometry = new THREE.IcosahedronGeometry(radius, 2);
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i += 1) {
-    tmpVector.fromBufferAttribute(position, i).normalize();
-    const crag = 0.72 + Math.random() * 0.48;
-    const ridge = Math.sin(tmpVector.x * 7.1 + tmpVector.y * 4.3) * 0.12;
-    position.setXYZ(i, tmpVector.x * radius * (crag + ridge), tmpVector.y * radius * (crag - ridge * 0.4), tmpVector.z * radius * (crag + ridge * 0.7));
-  }
-  geometry.computeVertexNormals();
-  return geometry;
+/* ----------------------------------------------------------- asteroid rock ---
+ * Displaced icosahedra rather than obvious low-poly spheres: three octaves of
+ * cheap sine noise for the lumps, a random axis squash so silhouettes differ
+ * even at equal scale, and a few cosine craters punched in. The displacement is
+ * a pure function of the normalised vertex position, so the duplicated verts
+ * along PolyhedronGeometry's seams move together and no cracks open up.
+ */
+function rockNoise(x, y, z, f) {
+  return Math.sin(x * f * 1.7 + y * f * 0.9 + 1.3) * Math.cos(z * f * 1.31 - x * f * 0.62)
+    + Math.sin(y * f * 2.13 - z * f * 1.07) * 0.62;
 }
 
-const asteroidGeometries = Array.from({ length: 14 }, () => {
-  const geometry = makeAsteroidGeometry(1);
-  geometry.userData.shared = true;
-  return geometry;
-});
+const ROCK_PROFILES = {
+  rock: { lumpiness: 1, grain: 1, craters: 4, craterDepth: 1, materials: 'rock', flat: true },
+  ice: { lumpiness: 0.62, grain: 0.5, craters: 2, craterDepth: 0.55, materials: 'ice', flat: false },
+  metal: { lumpiness: 1.25, grain: 1.4, craters: 3, craterDepth: 0.8, materials: 'metalRock', flat: true },
+};
+
+function makeAsteroidGeometry(detail, profile) {
+  const geometry = new THREE.IcosahedronGeometry(1, detail);
+  const position = geometry.attributes.position;
+  const squash = { x: rand(0.72, 1.2), y: rand(0.6, 1.14), z: rand(0.74, 1.22) };
+  const phase = rand(0, 30);
+  const craters = Array.from({ length: profile.craters }, () => {
+    const dir = new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1));
+    if (dir.lengthSq() < 1e-4) dir.set(0, 1, 0);
+    return {
+      dir: dir.normalize(),
+      radius: rand(0.24, 0.56),
+      depth: rand(0.1, 0.27) * profile.craterDepth,
+    };
+  });
+
+  for (let i = 0; i < position.count; i += 1) {
+    tmpVector.fromBufferAttribute(position, i).normalize();
+    const { x, y, z } = tmpVector;
+    let r = 0.9;
+    r += rockNoise(x + phase, y + phase, z + phase, 1.6) * 0.155 * profile.lumpiness;
+    r += rockNoise(x + phase * 1.7, y + phase * 1.7, z + phase * 1.7, 3.7) * 0.07 * profile.lumpiness;
+    r += rockNoise(x - phase, y - phase, z - phase, 8.3) * 0.024 * profile.grain;
+    for (const crater of craters) {
+      const rim = 1 - crater.radius;
+      const t = (x * crater.dir.x + y * crater.dir.y + z * crater.dir.z - rim) / crater.radius;
+      if (t > 0) r -= Math.sin(Math.min(1, t) * Math.PI * 0.5) * crater.depth;
+    }
+    r = clamp(r, 0.42, 1.5);
+    position.setXYZ(i, x * r * squash.x, y * r * squash.y, z * r * squash.z);
+  }
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return shareGeometry(geometry);
+}
+
+// Built on demand and cached: small rocks get a coarse mesh, big ones a finer
+// one, and coarse-pointer devices never build the highest tier at all.
+const asteroidGeometryCache = new Map();
+
+function getAsteroidGeometries(type, detail) {
+  const key = `${type}:${detail}`;
+  let pool = asteroidGeometryCache.get(key);
+  if (!pool) {
+    pool = Array.from({ length: 4 }, () => makeAsteroidGeometry(detail, ROCK_PROFILES[type]));
+    asteroidGeometryCache.set(key, pool);
+  }
+  return pool;
+}
 
 function addGlowPanel(parent, x, y, z, sx, sy, sz, material = materials.stationGlow) {
-  const panel = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+  const panel = new THREE.Mesh(UNIT_BOX, material);
   panel.position.set(x, y, z);
+  panel.scale.set(sx, sy, sz);
   parent.add(panel);
   return panel;
 }
 
 function addDockBlock(parent, x, y, z, sx, sy, sz, material = materials.dockHull) {
-  const block = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+  const block = new THREE.Mesh(UNIT_BOX, material);
   block.position.set(x, y, z);
+  block.scale.set(sx, sy, sz);
   parent.add(block);
   return block;
+}
+
+function addShape(parent, geometry, material, x, y, z, scale) {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  if (typeof scale === 'number') mesh.scale.setScalar(scale);
+  else if (scale) mesh.scale.set(scale.x ?? 1, scale.y ?? 1, scale.z ?? 1);
+  parent.add(mesh);
+  return mesh;
+}
+
+// A habitat ring plus the band of lit cabins around its inner face. Two draw
+// calls for the single most recognisable piece of station silhouette.
+function addHabitatRing(parent, radius, z, hullMaterial = materials.hullPaint) {
+  const ring = addShape(parent, RING_THICK, hullMaterial, 0, 0, z, radius);
+  const cabins = addShape(parent, RING_THIN, materials.ringWindows, 0, 0, z, radius * 0.985);
+  return { ring, cabins };
+}
+
+// A trussed solar wing. `dir` is -1 or 1 for which side it hangs off.
+function addSolarWing(parent, dir, x, y, z, span, chord) {
+  addDockBlock(parent, x + dir * span * 0.28, y, z, span * 0.56, 0.16, 0.16, materials.hullMetal);
+  addShape(parent, UNIT_BOX, materials.solarPanel, x + dir * span * 0.62, y, z + chord * 0.02, { x: span * 0.62, y: 0.04, z: chord });
+  addDockBlock(parent, x + dir * span * 0.62, y, z, 0.1, 0.1, chord * 1.02, materials.hullMetal);
+}
+
+// Static children never move again, so stop three.js recomputing their local
+// matrices every frame. The parent group still animates normally.
+function freezeStatic(group) {
+  group.traverse((child) => {
+    if (child === group) return;
+    child.updateMatrix();
+    child.matrixAutoUpdate = false;
+  });
+  return group;
 }
 
 function createStationSignTexture(name, type) {
@@ -1550,15 +1771,24 @@ function createAsteroid() {
     : sizeClass === 'medium'
       ? 27 + state.wave * 0.8
       : 48 + state.wave * 1.25;
-  const mesh = new THREE.Mesh(pick(asteroidGeometries), pick(materials.asteroid));
+  // Rock type is cosmetic only — it never changes hp, damage or value.
+  const typeRoll = Math.random();
+  const rockType = typeRoll < 0.68 ? 'rock' : typeRoll < 0.86 ? 'ice' : 'metal';
+  const detail = sizeClass === 'large' && HIGH_DETAIL ? 3 : 2;
+  const mesh = new THREE.Mesh(pick(getAsteroidGeometries(rockType, detail)), pick(materials[ROCK_PROFILES[rockType].materials]));
   mesh.scale.setScalar(size);
   mesh.position.set(rand(-18, 18), rand(-10, 11), rand(-185, -120));
   mesh.rotation.set(rand(0, Math.PI), rand(0, Math.PI), rand(0, Math.PI));
+  // One random axis, and the bigger the rock the slower it turns — reads as mass.
+  const spinAxis = new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1));
+  if (spinAxis.lengthSq() < 1e-4) spinAxis.set(0, 1, 0);
+  spinAxis.normalize().multiplyScalar(rand(0.16, 0.62) / (0.55 + size * 0.2));
   mesh.userData = {
     kind: 'asteroid',
     sizeClass,
+    rockType,
     radius: size * 0.9,
-    spin: new THREE.Vector3(rand(-1.2, 1.2), rand(-1.2, 1.2), rand(-1.2, 1.2)),
+    spin: spinAxis,
     baseScale: size,
     hitFlash: 0,
     hp,
@@ -1634,33 +1864,100 @@ function createCollector() {
   state.objects.push(group);
 }
 
-function createStation() {
+/* -------------------------------------------------------- passing stations ---
+ * Built once into a couple of prototypes at first use, then cloned per spawn.
+ * clone() shares geometry and materials, so a spawn costs no GPU upload and no
+ * geometry allocation at all — it is just a tree of Object3Ds.
+ */
+function buildStationPrototype(variant) {
   const group = new THREE.Group();
-  const core = new THREE.Mesh(new THREE.BoxGeometry(10, 3.8, 7), materials.station);
-  group.add(core);
 
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(8.2, 0.55, 14, 58), materials.stationDark);
-  ring.position.z = -0.9;
-  group.add(ring);
+  // Core spine: metal hull, painted collar, a band of lit cabins, glass nose.
+  addShape(group, UNIT_CYL, materials.hullMetal, 0, 0, 0, { x: 4.6, y: 12.4, z: 4.6 }).rotation.x = Math.PI / 2;
+  addDockBlock(group, 0, 0, 0, 6.6, 4.2, 5.2, materials.hullPaint);
+  addDockBlock(group, 0, 0, 0.1, 6.9, 1.7, 5.4, materials.hullWindows);
+  addShape(group, UNIT_CYL, materials.hullAccent, 0, 0, 4.2, { x: 3.6, y: 1.5, z: 3.6 }).rotation.x = Math.PI / 2;
+  addShape(group, UNIT_SPHERE, materials.hullGlass, 0, 0, 5.4, 2.6);
 
-  const armGeometry = new THREE.BoxGeometry(18, 0.7, 1.1);
-  const armA = new THREE.Mesh(armGeometry, materials.station);
-  const armB = armA.clone();
-  armB.rotation.z = Math.PI / 2;
-  group.add(armA, armB);
-
-  for (let i = 0; i < 10; i += 1) {
-    const angle = (i / 10) * Math.PI * 2;
-    addGlowPanel(group, Math.cos(angle) * 8.4, Math.sin(angle) * 8.4, 0.2, 0.36, 0.72, 0.14, i % 3 ? materials.stationGlow : materials.amberGlow);
+  // Habitat ring and its spokes.
+  addHabitatRing(group, 8.2, -0.9);
+  const spokes = variant === 0 ? 4 : 3;
+  for (let i = 0; i < spokes; i += 1) {
+    const angle = (i / spokes) * Math.PI * 2 + 0.3;
+    const spoke = addDockBlock(group, Math.cos(angle) * 4.4, Math.sin(angle) * 4.4, -0.9, 8.4, 0.5, 0.5, materials.hullMetal);
+    spoke.rotation.z = angle;
   }
 
+  // Docking arms with clamp heads.
+  for (const rot of [0, Math.PI / 2]) {
+    const arm = addDockBlock(group, 0, 0, 0, 18, 0.7, 1.1, materials.hullMetal);
+    arm.rotation.z = rot;
+    for (const side of [-1, 1]) {
+      const clamp3d = addDockBlock(group, Math.cos(rot) * side * 8.4, Math.sin(rot) * side * 8.4, 0, 1.5, 1.5, 2.1, materials.hullPaint);
+      clamp3d.rotation.z = rot;
+    }
+  }
+
+  // Solar wings, angled off the spine.
+  addSolarWing(group, -1, -3.4, 0, -3.6, 9.5, 5.2);
+  addSolarWing(group, 1, 3.4, 0, -3.6, 9.5, 5.2);
+
+  // Comms mast and dish.
+  addDockBlock(group, 0, 3.1, -2.2, 0.18, 4.4, 0.18, materials.hullMetal);
+  const dish = addShape(group, UNIT_DISH, materials.hullPaint, 0, 5.2, -2.2, 3.1);
+  dish.rotation.x = -0.6;
+
+  // Greebles: tanks, crates and pipe runs. The detail you only see up close,
+  // so coarse-pointer devices skip it.
+  if (HIGH_DETAIL) {
+    for (let i = 0; i < 7; i += 1) {
+      const side = i % 2 ? -1 : 1;
+      addDockBlock(
+        group,
+        side * rand(1.4, 3.2), rand(-2.4, 2.4), rand(-2.6, 3.4),
+        rand(0.5, 1.5), rand(0.5, 1.3), rand(0.6, 1.9),
+        i % 3 === 0 ? materials.hullAccent : materials.stationDark,
+      );
+    }
+    for (const side of [-1, 1]) {
+      addShape(group, UNIT_CYL, materials.hullMetal, side * 2.9, -1.9, 1.2, { x: 0.8, y: 3.4, z: 0.8 }).rotation.x = Math.PI / 2;
+    }
+  }
+
+  // Running lights around the ring, plus a red/white beacon pair.
+  const beacons = [];
+  for (let i = 0; i < 8; i += 1) {
+    const angle = (i / 8) * Math.PI * 2;
+    addGlowPanel(group, Math.cos(angle) * 8.4, Math.sin(angle) * 8.4, 0.2, 0.34, 0.68, 0.14, i % 3 ? materials.stationGlow : materials.amberGlow);
+  }
   addGlowPanel(group, -2.8, 2.2, 3.75, 1.7, 0.26, 0.18, materials.stationGlow);
   addGlowPanel(group, 2.7, -2.1, 3.75, 1.5, 0.26, 0.18, materials.amberGlow);
+  beacons.push(addShape(group, UNIT_SPHERE, materials.beaconRed, 0, 6.9, -2.2, 0.5));
+  beacons.push(addShape(group, UNIT_SPHERE, materials.beaconWhite, -9.1, 0, 0, 0.44));
+  beacons.push(addShape(group, UNIT_SPHERE, materials.beaconRed, 9.1, 0, 0, 0.44));
+
+  freezeStatic(group);
+  // Deliberately NOT stored in userData: Object3D.copy() round-trips userData
+  // through JSON, and a mesh reference in there makes clone() throw on the
+  // circular parent/children link. The clone re-finds its beacons by material.
+  return group;
+}
+
+let stationPrototypes = null;
+
+function createStation() {
+  if (!stationPrototypes) stationPrototypes = [buildStationPrototype(0), buildStationPrototype(1)];
+  const group = pick(stationPrototypes).clone(true);
+  // clone() copies the array by reference; re-resolve against the clone's tree.
+  const beacons = [];
+  group.traverse((child) => {
+    if (child.material === materials.beaconRed || child.material === materials.beaconWhite) beacons.push(child);
+  });
 
   const side = Math.random() > 0.5 ? 1 : -1;
-  group.position.set(side * rand(18, 34), rand(-7, 11), rand(-335, -245));
+  group.position.set(side * rand(16, 30), rand(-7, 11), rand(-305, -230));
   group.rotation.set(rand(-0.2, 0.2), side * rand(0.28, 0.62), rand(-0.3, 0.3));
-  const scale = rand(0.9, 1.45);
+  const scale = rand(1, 1.6);
   group.scale.setScalar(scale);
   group.userData = {
     kind: 'station',
@@ -1669,6 +1966,8 @@ function createStation() {
     value: 0,
     speedScale: 0.5,
     drift: side * rand(0.8, 1.8),
+    beacons,
+    beaconPhase: rand(0, Math.PI * 2),
     passed: false,
   };
   scene.add(group);
@@ -1683,10 +1982,16 @@ function createDockStation(type = getStationType()) {
   const depth = type === 'mega' ? 12 : type === 'large' ? 10 : 8;
   const stationName = getStationName(state.save.route, type);
 
-  addDockBlock(group, 0, height * 0.42, 0, width, 2.2, depth, materials.dockHull);
-  addDockBlock(group, 0, -height * 0.42, 0, width, 2.2, depth, materials.dockHull);
-  addDockBlock(group, -width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
-  addDockBlock(group, width * 0.47, 0, 0, 2.4, height, depth, materials.dockHull);
+  // Outer frame: painted hull outside, bare metal inner face, and a row of lit
+  // cabins along each beam so the thing reads as inhabited at any distance.
+  addDockBlock(group, 0, height * 0.42, 0, width, 2.2, depth, materials.hullPaint);
+  addDockBlock(group, 0, -height * 0.42, 0, width, 2.2, depth, materials.hullPaint);
+  addDockBlock(group, -width * 0.47, 0, 0, 2.4, height, depth, materials.hullMetal);
+  addDockBlock(group, width * 0.47, 0, 0, 2.4, height, depth, materials.hullMetal);
+  addDockBlock(group, 0, height * 0.42, depth * 0.51, width * 0.9, 0.9, 0.1, materials.hullWindows);
+  addDockBlock(group, 0, -height * 0.42, depth * 0.51, width * 0.9, 0.9, 0.1, materials.hullWindows);
+  addDockBlock(group, -width * 0.47, 0, depth * 0.51, 0.9, height * 0.82, 0.1, materials.hullWindows);
+  addDockBlock(group, width * 0.47, 0, depth * 0.51, 0.9, height * 0.82, 0.1, materials.hullWindows);
   addStationSign(group, stationName, width, height, depth, type);
 
   const railX = width * 0.33;
@@ -1699,9 +2004,10 @@ function createDockStation(type = getStationType()) {
     }
   }
 
-  for (let i = 0; i < 6; i += 1) {
-    const z = -depth * 0.28 + i * (tunnelLength / 5);
-    const material = i % 2 ? materials.dockHull : materials.dockDark;
+  const rungSteps = HIGH_DETAIL ? 6 : 4;
+  for (let i = 0; i < rungSteps; i += 1) {
+    const z = -depth * 0.28 + i * (tunnelLength / (rungSteps - 1));
+    const material = i % 2 ? materials.hullMetal : materials.dockDark;
     addDockBlock(group, 0, railY, z, railX * 2.08, 0.22, 0.42, material);
     addDockBlock(group, 0, -railY, z, railX * 2.08, 0.22, 0.42, material);
     addDockBlock(group, -railX, 0, z, 0.22, railY * 2.08, 0.42, material);
@@ -1717,37 +2023,74 @@ function createDockStation(type = getStationType()) {
   addDockBlock(group, 0, 1.32, -1.1, width * 0.42, 0.22, depth * 1.24, materials.dockWarning);
   addDockBlock(group, 0, -1.32, -1.1, width * 0.42, 0.22, depth * 1.24, materials.dockWarning);
 
-  for (let i = 0; i < 10 + (type === 'mega' ? 10 : type === 'large' ? 5 : 0); i += 1) {
+  const greebleCount = (HIGH_DETAIL ? 10 : 6) + (type === 'mega' ? 10 : type === 'large' ? 5 : 0);
+  for (let i = 0; i < greebleCount; i += 1) {
     const side = i % 2 ? -1 : 1;
     const x = side * rand(width * 0.58, width * 0.86);
     const y = rand(-height * 0.46, height * 0.46);
     const z = rand(-depth * 0.85, depth * 0.45);
-    addDockBlock(group, x, y, z, rand(1.1, 3.8), rand(0.8, 2.4), rand(1.5, 4.5), i % 4 === 0 ? materials.dockDark : materials.dockHull);
+    const material = i % 5 === 0 ? materials.hullAccent : i % 4 === 0 ? materials.dockDark : materials.hullPaint;
+    addDockBlock(group, x, y, z, rand(1.1, 3.8), rand(0.8, 2.4), rand(1.5, 4.5), material);
   }
 
+  // Approach lights down each side of the aperture. Kept in userData so the
+  // chase can be run from updateObjects without re-querying the tree.
+  const chaseLights = [];
   for (let i = 0; i < 18; i += 1) {
     const side = i % 2 ? -1 : 1;
     const y = -height * 0.42 + (i % 9) * (height * 0.84 / 8);
     const material = i % 3 === 0 ? materials.dockWarning : materials.dockRunway;
-    addGlowPanel(group, side * width * 0.36, y, depth * 0.52, 0.32, 0.22, 0.18, material);
+    chaseLights.push(addGlowPanel(group, side * width * 0.36, y, depth * 0.52, 0.32, 0.22, 0.18, material));
   }
 
-  if (type !== 'small') {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(width * 0.42, 0.36, 12, 52), materials.dockDark);
-    ring.position.z = -depth * 0.48;
-    ring.rotation.z = Math.PI / 2;
-    group.add(ring);
+  // The habitat ring behind the aperture, and its lit cabins.
+  if (type !== 'small') addHabitatRing(group, width * 0.42, -depth * 0.48, materials.hullMetal);
+
+  // Solar wings and a comms mast — the modules that tell you how big this is.
+  const wingSpan = width * (type === 'mega' ? 0.52 : 0.44);
+  addSolarWing(group, -1, -width * 0.5, height * 0.2, -depth * 0.3, wingSpan, height * 0.5);
+  addSolarWing(group, 1, width * 0.5, -height * 0.2, -depth * 0.3, wingSpan, height * 0.5);
+  addDockBlock(group, width * 0.2, height * 0.5, -depth * 0.2, 0.2, height * 0.42, 0.2, materials.hullMetal);
+  const dockDish = addShape(group, UNIT_DISH, materials.hullPaint, width * 0.2, height * 0.74, -depth * 0.2, height * 0.3);
+  dockDish.rotation.x = -0.7;
+
+  // Freighters parked along the outer hull. Nothing sells scale like something
+  // ship-sized looking small against the structure.
+  const parkedCount = type === 'mega' ? 3 : type === 'large' ? 2 : 1;
+  for (let i = 0; i < parkedCount; i += 1) {
+    const side = i % 2 ? -1 : 1;
+    const px = side * width * rand(0.52, 0.62);
+    const py = rand(-height * 0.3, height * 0.3);
+    const pz = -depth * rand(0.1, 0.5);
+    addDockBlock(group, px, py, pz, 1.1, 0.8, 3.4, materials.hullPaint);
+    addDockBlock(group, px, py, pz - 1.9, 0.7, 0.55, 0.9, materials.hullMetal);
+    addGlowPanel(group, px, py, pz + 1.9, 0.34, 0.28, 0.2, materials.amberGlow);
+  }
+
+  // Beacons at the aperture corners, re-lit every frame during the approach.
+  const beacons = [];
+  for (const sx of [-1, 1]) {
+    for (const sy of [-1, 1]) {
+      beacons.push(addShape(
+        group,
+        UNIT_SPHERE,
+        sx * sy > 0 ? materials.beaconRed : materials.beaconWhite,
+        sx * width * 0.47, sy * height * 0.42, depth * 0.56,
+        0.62,
+      ));
+    }
   }
 
   if (type === 'mega') {
     for (let i = 0; i < 4; i += 1) {
-      const arm = addDockBlock(group, 0, 0, -depth * 0.72, width * 1.15, 0.58, 1.2, materials.dockDark);
+      const arm = addDockBlock(group, 0, 0, -depth * 0.72, width * 1.15, 0.58, 1.2, materials.hullMetal);
       arm.rotation.z = i * Math.PI / 4;
     }
   }
 
   group.position.set(0, 0, -205);
   group.scale.setScalar(scale);
+  freezeStatic(group);
   group.userData = {
     kind: 'dock',
     stationType: type,
@@ -1755,6 +2098,8 @@ function createDockStation(type = getStationType()) {
     radius: width * scale * 0.55,
     hp: 999,
     speedScale: 0.82,
+    chaseLights,
+    beacons,
     passed: false,
   };
   scene.add(group);
@@ -1993,6 +2338,322 @@ function drawLaserOverlay(delta) {
   }
 }
 
+/* ------------------------------------------------------- the docked window ---
+ * What you see out of the lounge window while docked: a real 3D exterior with a
+ * local sun, a planet and moon, and freighters drifting past. It used to be a
+ * flat 2D painting of triangles on a gradient, which read as stickers on glass.
+ *
+ * The budget rules it plays by:
+ *   - its own low-power WebGL context on the window canvas, created on the first
+ *     dock and never rebuilt;
+ *   - a reduced pixel ratio, because most of the canvas is behind the lounge
+ *     plate anyway;
+ *   - capped at 24 fps, and only stepped while the station overlay is actually
+ *     on screen — motion still uses real delta, so it never runs fast or slow;
+ *   - the main flight scene stops rendering entirely while docked, so this
+ *     costs less than what it replaced.
+ * If the second context cannot be created it falls back to the old 2D painter.
+ */
+const STATION_VIEW_STEP = 1 / 24;
+const stationView = {
+  ready: false,
+  failed: false,
+  renderer: null,
+  scene: null,
+  camera: null,
+  accum: 0,
+  width: 0,
+  height: 0,
+  planet: null,
+  moon: null,
+  sun: null,
+  freighters: [],
+  anchors: [],
+};
+
+function makeRadialTexture(stops) {
+  const element = makeCanvas(128, 128);
+  const ctx = element.getContext('2d');
+  const gradient = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
+  stops.forEach(([offset, color]) => gradient.addColorStop(offset, color));
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(element);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makePlanetTexture() {
+  const element = makeCanvas(256, 128);
+  const ctx = element.getContext('2d');
+  const base = ctx.createLinearGradient(0, 0, 0, 128);
+  base.addColorStop(0, '#d8e6ee');
+  base.addColorStop(0.18, '#2f6c8e');
+  base.addColorStop(0.52, '#1b4a68');
+  base.addColorStop(0.84, '#2c6076');
+  base.addColorStop(1, '#cfe2ea');
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 256, 128);
+  for (let i = 0; i < 26; i += 1) {
+    const y = rand(8, 120);
+    ctx.fillStyle = `rgba(${Math.round(rand(60, 150))}, ${Math.round(rand(110, 190))}, ${Math.round(rand(120, 200))}, ${rand(0.1, 0.3).toFixed(3)})`;
+    ctx.fillRect(0, y, 256, rand(2, 9));
+  }
+  for (let i = 0; i < 16; i += 1) {
+    ctx.fillStyle = `rgba(224, 240, 246, ${rand(0.12, 0.34).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.ellipse(rand(0, 256), rand(14, 114), rand(14, 46), rand(3, 9), rand(-0.3, 0.3), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const texture = new THREE.CanvasTexture(element);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeMoonTexture() {
+  const element = makeCanvas(128, 64);
+  const ctx = element.getContext('2d');
+  ctx.fillStyle = '#8d8a84';
+  ctx.fillRect(0, 0, 128, 64);
+  for (let i = 0; i < 60; i += 1) {
+    const r = rand(1.5, 7);
+    ctx.fillStyle = `rgba(${Math.round(rand(84, 140))}, ${Math.round(rand(82, 136))}, ${Math.round(rand(80, 130))}, 0.75)`;
+    ctx.beginPath();
+    ctx.arc(rand(0, 128), rand(0, 64), r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const texture = new THREE.CanvasTexture(element);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+// Depth + on-screen anchor in NDC, resolved to world space whenever the canvas
+// changes shape. Doing it this way keeps the sun, planet and traffic inside the
+// visible pane in portrait AND landscape without hard-coded coordinates.
+function ndcToViewWorld(camera3d, nx, ny, distance) {
+  const halfH = Math.tan(THREE.MathUtils.degToRad(camera3d.fov * 0.5)) * distance;
+  const halfW = halfH * camera3d.aspect;
+  return { x: nx * halfW, y: ny * halfH, z: -distance, halfH, halfW };
+}
+
+function buildStationView() {
+  const scene3d = new THREE.Scene();
+  scene3d.background = new THREE.Color(0x03060d);
+  const camera3d = new THREE.PerspectiveCamera(52, 1, 1, 9000);
+
+  const starPositions = new Float32Array(760 * 3);
+  const starTints = new Float32Array(760 * 3);
+  for (let i = 0; i < 760; i += 1) {
+    const theta = rand(0, Math.PI * 2);
+    const phi = Math.acos(rand(-0.45, 1));
+    const radius = 5200;
+    starPositions[i * 3] = Math.sin(phi) * Math.cos(theta) * radius;
+    starPositions[i * 3 + 1] = Math.cos(phi) * radius * 0.8;
+    starPositions[i * 3 + 2] = -Math.abs(Math.sin(phi) * Math.sin(theta)) * radius - 600;
+    tmpColor.setHSL(pick([0.08, 0.55, 0.6, 0.02]), rand(0.1, 0.6), rand(0.6, 1));
+    starTints[i * 3] = tmpColor.r;
+    starTints[i * 3 + 1] = tmpColor.g;
+    starTints[i * 3 + 2] = tmpColor.b;
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(starTints, 3));
+  scene3d.add(new THREE.Points(starGeo, new THREE.PointsMaterial({
+    size: 13, sizeAttenuation: true, vertexColors: true, transparent: true,
+    opacity: 0.92, depthWrite: false, blending: THREE.AdditiveBlending,
+  })));
+
+  scene3d.add(new THREE.HemisphereLight(0x6f9ec4, 0x140b06, 0.55));
+  // Aimed from over the camera's left shoulder rather than from the visible sun
+  // disc. Lighting straight from an in-frame sun turns every body into a thin
+  // crescent; this keeps the terminator on the planet where you can read it, and
+  // still falls from the same side as the sun so it does not look wrong.
+  const sunLight = new THREE.DirectionalLight(0xffe9c6, 2.3);
+  sunLight.position.set(-900, 1150, 1500);
+  scene3d.add(sunLight);
+
+  // Sun: a hot disc with two additive sprites for the bloom.
+  const sunGroup = new THREE.Group();
+  const glowTexture = makeRadialTexture([[0, 'rgba(255,246,222,0.95)'], [0.24, 'rgba(255,186,104,0.44)'], [1, 'rgba(0,0,0,0)']]);
+  sunGroup.add(new THREE.Mesh(UNIT_SPHERE, new THREE.MeshBasicMaterial({ color: 0xfff6e2 })));
+  for (const [scale, opacity] of [[3.4, 0.85], [9, 0.3]]) {
+    const flare = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTexture, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending,
+    }));
+    flare.scale.setScalar(scale);
+    sunGroup.add(flare);
+  }
+  scene3d.add(sunGroup);
+
+  // Planet with an additive back-side shell for the atmosphere rim.
+  const planetGroup = new THREE.Group();
+  const planet = new THREE.Mesh(
+    new THREE.SphereGeometry(1, HIGH_DETAIL ? 40 : 24, HIGH_DETAIL ? 28 : 18),
+    new THREE.MeshStandardMaterial({ map: makePlanetTexture(), roughness: 0.92, metalness: 0.02 }),
+  );
+  planetGroup.add(planet);
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(1.035, 26, 18),
+    new THREE.MeshBasicMaterial({ color: 0x74c8ff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false }),
+  );
+  planetGroup.add(halo);
+  scene3d.add(planetGroup);
+
+  const moon = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 20, 14),
+    new THREE.MeshStandardMaterial({ map: makeMoonTexture(), roughness: 0.96, metalness: 0.02 }),
+  );
+  scene3d.add(moon);
+
+  // A limb of the station you are standing on, off to one side: a hull drum,
+  // a ring and a few running lights. Parallax plus a reminder of where you are.
+  const limbHull = new THREE.MeshStandardMaterial({ color: 0x39424c, map: wrapTexture(hullPanelCanvas, 2, 3), roughness: 0.5, metalness: 0.78 });
+  const stationLimb = new THREE.Group();
+  const drum = new THREE.Mesh(UNIT_CYL, limbHull);
+  drum.scale.set(0.5, 1.7, 0.5);
+  stationLimb.add(drum);
+  const limbWindows = new THREE.Mesh(UNIT_CYL, new THREE.MeshStandardMaterial({
+    color: 0x05070b, emissive: 0xffffff, emissiveMap: wrapTexture(windowRowCanvas, 4, 2), emissiveIntensity: 1.25, roughness: 0.5,
+  }));
+  limbWindows.scale.set(0.505, 0.34, 0.505);
+  limbWindows.position.y = -0.2;
+  stationLimb.add(limbWindows);
+  for (let i = 0; i < 3; i += 1) {
+    const lamp = new THREE.Mesh(UNIT_SPHERE, new THREE.MeshBasicMaterial({ color: i % 2 ? 0xffb455 : 0x7fe9ff }));
+    lamp.position.set(0.27, 0.62 - i * 0.62, 0.25);
+    lamp.scale.setScalar(0.014);
+    stationLimb.add(lamp);
+  }
+  freezeStatic(stationLimb);
+  scene3d.add(stationLimb);
+
+  // Freighters. Slow, calm, and looped by wrapping x — never respawned.
+  const freighterCount = HIGH_DETAIL ? 4 : 2;
+  const freighters = [];
+  const hullMaterial = new THREE.MeshStandardMaterial({ color: 0x5d6874, map: wrapTexture(hullPanelCanvas, 3, 1), roughness: 0.46, metalness: 0.72 });
+  const cargoMaterial = new THREE.MeshStandardMaterial({ color: 0x54402a, map: wrapTexture(hullPanelCanvas, 2, 1), roughness: 0.74, metalness: 0.18 });
+  const engineMaterial = new THREE.MeshBasicMaterial({ color: 0x9fe8ff });
+  const navMaterial = new THREE.MeshBasicMaterial({ color: 0xff6a44 });
+  for (let i = 0; i < freighterCount; i += 1) {
+    const group = new THREE.Group();
+    const hull = new THREE.Mesh(UNIT_BOX, hullMaterial);
+    hull.scale.set(6.4, 0.9, 1.2);
+    group.add(hull);
+    const bridge = new THREE.Mesh(UNIT_BOX, hullMaterial);
+    bridge.position.set(2.4, 0.8, 0);
+    bridge.scale.set(1.3, 0.8, 1);
+    group.add(bridge);
+    for (const cx of [-1.4, 0.3]) {
+      const crate = new THREE.Mesh(UNIT_BOX, cargoMaterial);
+      crate.position.set(cx, 0.85, 0);
+      crate.scale.set(2.1, 0.9, 1.1);
+      group.add(crate);
+    }
+    const engine = new THREE.Mesh(UNIT_SPHERE, engineMaterial);
+    engine.position.set(-3.3, 0, 0);
+    engine.scale.setScalar(0.85);
+    group.add(engine);
+    const nav = new THREE.Mesh(UNIT_SPHERE, navMaterial);
+    nav.position.set(3.3, 0.4, 0);
+    nav.scale.setScalar(0.3);
+    group.add(nav);
+    // At this size a hull is a few pixels wide, so the engine bloom is what
+    // actually reads as "a ship went past" rather than "a rectangle".
+    const wash = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTexture, color: 0x8fdcff, transparent: true, opacity: 0.72, depthWrite: false, blending: THREE.AdditiveBlending,
+    }));
+    wash.position.set(-4.4, 0, 0);
+    wash.scale.setScalar(5.4);
+    group.add(wash);
+    freezeStatic(group);
+    group.userData = {
+      dir: i % 2 ? -1 : 1,
+      ny: rand(0.2, 0.72),
+      distance: rand(900, 2600),
+      sizeRatio: rand(0.013, 0.03),
+      speedRatio: rand(0.03, 0.07),
+      progress: rand(-1, 1),
+      bobPhase: rand(0, Math.PI * 2),
+    };
+    scene3d.add(group);
+    freighters.push(group);
+  }
+
+  stationView.scene = scene3d;
+  stationView.camera = camera3d;
+  stationView.sun = sunGroup;
+  stationView.sunLight = sunLight;
+  stationView.planet = planet;
+  stationView.planetGroup = planetGroup;
+  stationView.moon = moon;
+  stationView.stationLimb = stationLimb;
+  stationView.freighters = freighters;
+}
+
+/* The lounge plate hides everything outside roughly ndc x ±0.55, y +0.15..+0.78,
+ * so the set pieces are anchored inside that band and re-solved from the live
+ * frustum whenever the canvas changes shape. That is what keeps the planet in
+ * the pane in portrait and in landscape without two sets of coordinates. */
+function layoutStationView() {
+  const { camera: camera3d, sun, planetGroup, planet, moon, stationLimb, freighters } = stationView;
+
+  const sunAt = ndcToViewWorld(camera3d, -0.32, 0.62, 4200);
+  sun.position.set(sunAt.x, sunAt.y, sunAt.z);
+  sun.scale.setScalar(sunAt.halfH * 0.022);
+
+  const planetAt = ndcToViewWorld(camera3d, 0.14, 0.3, 3600);
+  planetGroup.position.set(planetAt.x, planetAt.y, planetAt.z);
+  planetGroup.scale.setScalar(planetAt.halfH * 0.17);
+  planet.rotation.z = 0.22;
+
+  const moonAt = ndcToViewWorld(camera3d, -0.2, 0.7, 2500);
+  moon.position.set(moonAt.x, moonAt.y, moonAt.z);
+  moon.scale.setScalar(moonAt.halfH * 0.032);
+
+  const limbAt = ndcToViewWorld(camera3d, -0.82, 0.24, 1500);
+  stationLimb.position.set(limbAt.x, limbAt.y, limbAt.z);
+  stationLimb.scale.setScalar(limbAt.halfH * 0.62);
+  stationLimb.rotation.set(0, 0.5, 0.06);
+
+  for (const ship of freighters) {
+    const at = ndcToViewWorld(camera3d, 0, ship.userData.ny, ship.userData.distance);
+    ship.userData.spanX = at.halfW * 1.15;
+    ship.userData.baseY = at.y;
+    ship.userData.z = at.z;
+    ship.userData.size = at.halfH * ship.userData.sizeRatio;
+    ship.userData.speed = at.halfW * ship.userData.speedRatio;
+    ship.scale.setScalar(ship.userData.size);
+  }
+}
+
+function stepStationView(delta) {
+  const { camera: camera3d, planet, moon, freighters } = stationView;
+  const t = state.stationWindowTime;
+
+  planet.rotation.y += delta * 0.008;
+  moon.rotation.y += delta * 0.012;
+
+  for (const ship of freighters) {
+    const data = ship.userData;
+    data.progress += (data.speed * data.dir * delta) / Math.max(1, data.spanX);
+    if (data.progress > 1.05) data.progress = -1.05;
+    if (data.progress < -1.05) data.progress = 1.05;
+    ship.position.set(
+      data.progress * data.spanX,
+      data.baseY + Math.sin(t * 0.16 + data.bobPhase) * data.size * 0.9,
+      data.z,
+    );
+    ship.rotation.set(
+      Math.sin(t * 0.08 + data.bobPhase) * 0.05,
+      data.dir > 0 ? 0 : Math.PI,
+      Math.sin(t * 0.11 + data.bobPhase) * 0.04,
+    );
+  }
+
+  // A barely-there drift so the view is never a frozen postcard.
+  camera3d.rotation.set(Math.sin(t * 0.07) * 0.006, Math.sin(t * 0.05) * 0.009, 0);
+}
+
 function resetStationTraffic() {
   state.stationTraffic = Array.from({ length: 8 }, (_, index) => ({
     x: rand(0.05, 0.95),
@@ -2001,10 +2662,72 @@ function resetStationTraffic() {
     size: rand(0.65, 1.35),
     color: pick(['#55e6ff', '#ffb352', '#7dff9d', '#ffffff']),
   }));
+  if (stationView.freighters.length) {
+    for (const ship of stationView.freighters) ship.userData.progress = rand(-1.2, 1.2);
+  }
 }
 
 function drawStationWindow(delta = 0) {
-  if (!stationWindowCanvas || !stationWindowCtx) return;
+  if (!stationWindowCanvas) return;
+  if (stationView.failed) {
+    drawStationWindowFallback(delta);
+    return;
+  }
+
+  if (!stationView.ready) {
+    try {
+      stationView.renderer = new THREE.WebGLRenderer({
+        canvas: stationWindowCanvas,
+        // Worth it here: the buffer is small, it redraws at most 24 times a
+        // second, and a planet limb without it reads as a staircase.
+        antialias: true,
+        alpha: false,
+        powerPreference: 'low-power',
+      });
+      stationView.renderer.setClearColor(0x03060d, 1);
+      stationView.renderer.outputColorSpace = THREE.SRGBColorSpace;
+      stationView.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      stationView.renderer.toneMappingExposure = 1.05;
+      buildStationView();
+      stationView.ready = true;
+    } catch (error) {
+      stationView.failed = true;
+      stationView.renderer = null;
+      console.warn('[outpace] window view fell back to 2D', error);
+      drawStationWindowFallback(delta);
+      return;
+    }
+  }
+
+  const rect = stationWindowCanvas.getBoundingClientRect();
+  const cssWidth = Math.max(1, Math.round(rect.width || stationWindowCanvas.clientWidth || 320));
+  const cssHeight = Math.max(1, Math.round(rect.height || stationWindowCanvas.clientHeight || 180));
+  if (cssWidth !== stationView.width || cssHeight !== stationView.height) {
+    stationView.width = cssWidth;
+    stationView.height = cssHeight;
+    // Most of this canvas is hidden behind the lounge plate, so it renders well
+    // under device resolution — a soft window view is the right trade.
+    stationView.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isCoarsePointer() ? 1 : 1.4));
+    stationView.renderer.setSize(cssWidth, cssHeight, false);
+    stationView.camera.aspect = cssWidth / cssHeight;
+    stationView.camera.updateProjectionMatrix();
+    layoutStationView();
+    stationView.accum = STATION_VIEW_STEP;
+  }
+
+  state.stationWindowTime += delta;
+  stepStationView(delta);
+
+  stationView.accum += delta;
+  if (stationView.accum < STATION_VIEW_STEP) return;
+  stationView.accum = 0;
+  stationView.renderer.render(stationView.scene, stationView.camera);
+}
+
+function drawStationWindowFallback(delta = 0) {
+  if (!stationWindowCanvas) return;
+  if (!stationWindowCtx) stationWindowCtx = stationWindowCanvas.getContext('2d');
+  if (!stationWindowCtx) return;
   const rect = stationWindowCanvas.getBoundingClientRect();
   const cssWidth = Math.max(1, Math.round(rect.width || stationWindowCanvas.clientWidth || 320));
   const cssHeight = Math.max(1, Math.round(rect.height || stationWindowCanvas.clientHeight || 180));
@@ -3605,9 +4328,25 @@ function updateObjects(delta) {
     } else if (data.kind === 'station') {
       object.rotation.z += delta * 0.04;
       object.position.x -= data.drift * delta;
+      // Beacons blink by visibility rather than by touching the shared emissive
+      // material, so every station can keep its own phase for free.
+      if (data.beacons) {
+        const beat = state.time * 1.6 + data.beaconPhase;
+        for (let b = 0; b < data.beacons.length; b += 1) {
+          data.beacons[b].visible = Math.sin(beat + b * 2.1) > -0.25;
+        }
+      }
     } else if (data.kind === 'dock') {
       object.rotation.z = Math.sin(state.time * 0.45) * 0.025;
       object.rotation.y = Math.sin(state.time * 0.26) * 0.035;
+      if (data.chaseLights) {
+        const step = Math.floor(state.time * 6) % 3;
+        for (let c = 0; c < data.chaseLights.length; c += 1) data.chaseLights[c].visible = (c % 3) !== step;
+      }
+      if (data.beacons) {
+        const beat = state.time * 2.2;
+        for (let b = 0; b < data.beacons.length; b += 1) data.beacons[b].visible = Math.sin(beat + b * 1.6) > -0.2;
+      }
       object.position.x = lerp(object.position.x, 0, delta * 1.4);
       object.position.y = lerp(object.position.y, 0, delta * 1.4);
       if (object.position.z > -18 && state.running) {
@@ -3785,7 +4524,11 @@ function animate() {
   updateBeams(delta);
   updateParticles(delta);
   drawLaserOverlay(delta);
-  if (state.docked || gameEl.dataset.state === 'station') drawStationWindow(delta);
+  // While docked, the lounge covers the flight canvas completely, so the window
+  // view renders instead of the flight scene rather than on top of it. That is
+  // what pays for a real 3D exterior on a phone.
+  const stationOnScreen = gameEl.dataset.state === 'station' && !stationEl.classList.contains('hidden');
+  if (state.docked || stationOnScreen) drawStationWindow(delta);
 
   if (state.running) {
     state.hudTimer -= delta;
@@ -3796,7 +4539,7 @@ function animate() {
   }
   if (state.demo && state.running && state.time > 18) finishGame();
 
-  renderer.render(scene, camera);
+  if (!stationOnScreen) renderer.render(scene, camera);
 }
 
 function processCockpitImage(img) {
@@ -3900,7 +4643,9 @@ function resize() {
   camera.updateProjectionMatrix();
   drawCockpit();
   resizeLaserCanvas();
-  drawStationWindow(0);
+  // Only refresh the window view if it has already been built — resizing must
+  // not be what creates its WebGL context. That waits for the first dock.
+  if (stationView.ready || stationView.failed) drawStationWindow(0);
   updateReticle();
 }
 
@@ -4087,6 +4832,13 @@ async function boot() {
   renderSettingsState();
   renderMenuAchievements();
   document.documentElement.dataset.gameReady = '1';
+  // Render/perf probe for automated testing only — never present in normal play.
+  if (params.has('probe')) {
+    window.__outpace = {
+      THREE, renderer, scene, camera, state, materials, stationView,
+      spawn: { asteroid: createAsteroid, station: createStation, dock: createDockStation, drone: createDrone },
+    };
+  }
   animate();
   setupAccountCloud();
 
