@@ -49,6 +49,26 @@ export const GAMES = [
     blurb: "Six difficulties set by what solving actually demands, not by how many cells are blank. Pencil marks, hints and a board that waits for you.",
   },
   {
+    id: "snakeeee", name: "Snake-eee", tag: "Grow, hunt, dominate",
+    path: "/gms/pwa/snake/", shot: "snake-io", accent: "#4CAF50",
+    blurb: "An arena of snakes with a 10,000 finish line. Steer with a thumb or the arrow keys, spend your winnings on a very long upgrade ladder, and watch the bots get cleverer as you do.",
+  },
+  {
+    id: "crazyspace", name: "Crazy Space", tag: "Neon dogfights",
+    path: "/gms/2d/crazyspace/", shot: "crazyspace", accent: "#39c0ed",
+    blurb: "Subspace in your browser. Five ships, four modes, energy that is both your health and your ammo, and bots that play the objective.",
+  },
+  {
+    id: "murderroyale", name: "Murder Royale", tag: "Last tank standing",
+    path: "/gms/3d/fable5_crow_tank_battle/", shot: "fable5-crow-tank-battle", accent: "#c2603a", soon: true,
+    blurb: "A dusk farm, nine AI personalities and a circling murder of crows closing the field. Duel, skirmish, royale or frenzy.",
+  },
+  {
+    id: "outpace", name: "Outpace", tag: "Run the gauntlet",
+    path: "/gms/3d/outpace/", shot: "outpace", accent: "#6ea8ff", soon: true,
+    blurb: "Thread a course of stations and asteroid fields at speed, and dock when your nerve runs out.",
+  },
+  {
     id: "voidcast", name: "Voidcast", tag: "Eat the planet",
     path: "/gms/3d/voidcast/", shot: "voidcast", accent: "#b489ff", soon: true,
     blurb: "A hole that grows by swallowing a world — and the bigger you get, the bigger your audience.",

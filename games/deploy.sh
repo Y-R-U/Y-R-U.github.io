@@ -22,6 +22,10 @@ GAMES=(
   "gms/2d/sundayleague"
   "gms/2d/paperant"
   "gms/pwa/sudoku"
+  "gms/pwa/snake"
+  "gms/2d/crazyspace"
+  "gms/3d/fable5_crow_tank_battle"
+  "gms/3d/outpace"
 )
 
 echo ">> ensuring dirs"
