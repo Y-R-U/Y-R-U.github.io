@@ -60,7 +60,7 @@ export const GAMES = [
   },
   {
     id: "murderroyale", name: "Murder Royale", tag: "Last tank standing",
-    path: "/gms/3d/fable5_crow_tank_battle/", shot: "fable5-crow-tank-battle", accent: "#c2603a", soon: true,
+    path: "/gms/3d/fable5_crow_tank_battle/", shot: "fable5-crow-tank-battle", accent: "#c2603a",
     blurb: "A dusk farm, nine AI personalities and a circling murder of crows closing the field. Duel, skirmish, royale or frenzy.",
   },
   {
