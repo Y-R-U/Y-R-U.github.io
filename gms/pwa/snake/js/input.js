@@ -1,7 +1,16 @@
 /**
  * Input handler - touch, mouse, keyboard
- * Both mobile touch and desktop mouse use a click-and-hold joystick.
- * Boost: right-click, Space, or ArrowUp on desktop; dedicated boost button on mobile.
+ *
+ * Steering, in order of precedence — whichever the player last used wins:
+ *   - touch / mouse: click-and-hold floating joystick, absolute heading
+ *   - keyboard: hold Left/Right (or A/D) to rotate, like a classic Asteroids ship
+ *
+ * Boost: Space, ArrowUp/W, right-click, or the on-screen button.
+ *
+ * The keyboard integrates a *target* heading rather than driving the snake
+ * directly, and that target is clamped to a small window ahead of the snake's
+ * real heading. Without the clamp the target races off while you hold the key
+ * and the snake keeps curving for a moment after you let go.
  */
 class Input {
     constructor(canvas) {
@@ -24,6 +33,13 @@ class Input {
         this.joystickRadius = 50;
         this.joystickDeadzone = 10;
 
+        // Keyboard steering
+        this.turnLeft = false;
+        this.turnRight = false;
+        this.source = 'pointer';    // 'pointer' | 'keys'
+        this.keyTurnRate = CONFIG.SNAKE_MAX_TURN_RATE * 1.2;  // rad/sec
+        this.keyLeadClamp = 0.35;   // rad the target may run ahead of the snake
+
         this._bindEvents();
     }
 
@@ -42,6 +58,11 @@ class Input {
         // Keyboard events
         window.addEventListener('keydown', e => this._onKeyDown(e));
         window.addEventListener('keyup', e => this._onKeyUp(e));
+        // Losing focus with a key held would otherwise leave the snake spinning.
+        window.addEventListener('blur', () => {
+            this.turnLeft = this.turnRight = false;
+            this.boosting = false;
+        });
 
         // Prevent context menu during gameplay (so right-click boost works)
         window.addEventListener('contextmenu', e => {
@@ -50,6 +71,11 @@ class Input {
                 e.preventDefault();
             }
         });
+    }
+
+    _inGame() {
+        const gameScreen = document.getElementById('game-screen');
+        return !!(gameScreen && gameScreen.classList.contains('active'));
     }
 
     // ======================== TOUCH ========================
@@ -64,6 +90,7 @@ class Input {
                 this.joystickPos = { x, y };
                 this.joystickCurrent = { x, y };
                 this.active = true;
+                this.source = 'pointer';
             }
         }
     }
@@ -96,8 +123,7 @@ class Input {
 
     _onMouseDown(e) {
         // Only handle during gameplay (game-screen is active)
-        const gameScreen = document.getElementById('game-screen');
-        if (!gameScreen || !gameScreen.classList.contains('active')) return;
+        if (!this._inGame()) return;
 
         if (e.button === 0) {
             // Left click: create joystick at click position
@@ -105,6 +131,7 @@ class Input {
             this.joystickPos = { x: e.clientX, y: e.clientY };
             this.joystickCurrent = { x: e.clientX, y: e.clientY };
             this.active = true;
+            this.source = 'pointer';
             e.preventDefault();
         } else if (e.button === 2) {
             // Right click: boost
@@ -139,33 +166,98 @@ class Input {
     // ======================== KEYBOARD ========================
 
     _onKeyDown(e) {
-        if (e.code === 'Space' || e.code === 'ArrowUp') {
-            this.boosting = true;
+        switch (e.code) {
+            case 'Space':
+            case 'ArrowUp':
+            case 'KeyW':
+                this.boosting = true;
+                if (this._inGame()) e.preventDefault();
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this.turnLeft = true;
+                this.source = 'keys';
+                if (this._inGame()) e.preventDefault();
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this.turnRight = true;
+                this.source = 'keys';
+                if (this._inGame()) e.preventDefault();
+                break;
         }
     }
 
     _onKeyUp(e) {
-        if (e.code === 'Space' || e.code === 'ArrowUp') {
-            this.boosting = false;
+        switch (e.code) {
+            case 'Space':
+            case 'ArrowUp':
+            case 'KeyW':
+                this.boosting = false;
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this.turnLeft = false;
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this.turnRight = false;
+                break;
         }
     }
 
     // ======================== PUBLIC API ========================
 
     /**
-     * Get the target angle for the player snake.
-     * Uses unified joystick data from either touch or mouse input.
+     * Advance the steering target and return it.
+     * @param {number} dt        frame time in ms
+     * @param {number} snakeAngle the player snake's actual heading, for clamping
      */
-    getAngle() {
+    update(dt, snakeAngle) {
+        // A live joystick always wins — picking up the mouse mid-game should just work.
         if (this.joystickCurrent && this.joystickPos) {
             const dx = this.joystickCurrent.x - this.joystickPos.x;
             const dy = this.joystickCurrent.y - this.joystickPos.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist > this.joystickDeadzone) {
+            if (dx * dx + dy * dy > this.joystickDeadzone * this.joystickDeadzone) {
                 this.angle = Math.atan2(dy, dx);
+                this.source = 'pointer';
+                return this.angle;
+            }
+        }
+
+        const dir = (this.turnRight ? 1 : 0) - (this.turnLeft ? 1 : 0);
+        if (dir !== 0) {
+            this.source = 'keys';
+            this.angle += dir * this.keyTurnRate * (dt / 1000);
+        }
+
+        if (this.source === 'keys' && typeof snakeAngle === 'number') {
+            // Keep the target within a short lead of where the snake actually
+            // points, so releasing the key stops the turn immediately.
+            const lead = Utils.angleDiff(snakeAngle, this.angle);
+            if (Math.abs(lead) > this.keyLeadClamp) {
+                this.angle = snakeAngle + Math.sign(lead) * this.keyLeadClamp;
             }
         }
         return this.angle;
+    }
+
+    /** Last computed steering target. */
+    getAngle() {
+        return this.angle;
+    }
+
+    /** Seed the steering target, so a new run does not inherit the last one. */
+    reset(angle) {
+        this.angle = angle || 0;
+        this.turnLeft = this.turnRight = false;
+        this.boosting = false;
+        this.mouseDown = false;
+        this.touchId = null;
+        this.joystickPos = null;
+        this.joystickCurrent = null;
+        this.active = false;
+        this.source = 'pointer';
     }
 
     /** Get joystick visual data for rendering */

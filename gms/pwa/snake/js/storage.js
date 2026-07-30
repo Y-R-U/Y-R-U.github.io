@@ -24,7 +24,9 @@ const Storage = {
                 totalMassEaten: 0,
                 totalTimePlayed: 0,
                 longestSnake: 0,
-                bestKillStreak: 0
+                bestKillStreak: 0,
+                victories: 0,       // runs that reached WIN_MASS
+                bestWinTime: 0      // seconds, fastest victory
             },
             settings: {
                 musicVolume: 0.5,
@@ -87,11 +89,29 @@ const Storage = {
         return meta.perLevel * level;
     },
 
-    /** Calculate coins earned from a game */
-    calculateCoins(mass, kills, coinBonusLevel) {
+    /** Calculate coins earned from a game. `won` adds the victory bonus. */
+    calculateCoins(mass, kills, coinBonusLevel, won) {
         const baseMassCoins = Math.floor(mass / CONFIG.COINS_PER_MASS_DIVISOR);
         const killCoins = kills * CONFIG.COINS_PER_KILL;
+        const winBonus = won ? CONFIG.WIN_COIN_BONUS : 0;
         const bonus = 1 + Storage.getUpgradeValue('coinBonus', coinBonusLevel);
-        return Math.max(CONFIG.COINS_MIN_PER_GAME, Math.floor((baseMassCoins + killCoins) * bonus));
+        return Math.max(
+            CONFIG.COINS_MIN_PER_GAME,
+            Math.floor((baseMassCoins + killCoins + winBonus) * bonus)
+        );
+    },
+
+    /**
+     * How hard the AI should be, 0..1, derived from the whole career rather than
+     * the session — difficulty follows the account between devices. Games played
+     * ramps it; a high score or a win pulls it up faster so a good player is not
+     * stuck against beginners' bots.
+     */
+    aiPressure(data) {
+        const s = (data && data.stats) || {};
+        const byGames = Utils.clamp((s.gamesPlayed || 0) / CONFIG.AI_PRESSURE_GAMES, 0, 1);
+        const byScore = Utils.clamp((s.highScore || 0) / CONFIG.WIN_MASS, 0, 1);
+        const byWins = Utils.clamp((s.victories || 0) / 3, 0, 1);
+        return Utils.clamp(Math.max(byGames, byScore * 0.9, byWins), 0, 1);
     }
 };

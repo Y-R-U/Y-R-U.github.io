@@ -11,9 +11,9 @@ class Game {
         this.collision = new CollisionSystem();
         this.particles = new ParticleSystem();
         this.audio = new Audio();
-        this.ai = new AI();
+        this.ai = new AI(this.collision);
 
-        this.state = 'menu'; // menu, playing, dead
+        this.state = 'menu'; // menu, playing, dead, won
         this.player = null;
         this.snakes = [];
         this.gameStartTime = 0;
@@ -21,6 +21,9 @@ class Game {
         this.lastBoostSound = 0;
         this.lastEatSound = 0;
         this.gameStats = { mass: 0, kills: 0, time: 0 };
+        this.resolved = false;   // this run has already ended in a death or a win
+        this._eatenIndices = new Set();
+        this._puIndices = new Set();
 
         this.saveData = Storage.load();
 
@@ -97,6 +100,24 @@ class Game {
             this._renderUpgrades();
         });
 
+        // Win screen
+        document.getElementById('win-again-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._startGame();
+        });
+
+        document.getElementById('win-upgrades-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._showScreen('upgrades-screen');
+            this._renderUpgrades();
+        });
+
+        document.getElementById('win-menu-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._showScreen('menu-screen');
+            this.state = 'menu';
+        });
+
         // Boost button
         const boostBtn = document.getElementById('boost-btn');
         if (boostBtn) {
@@ -166,7 +187,12 @@ class Game {
         // Snap camera to player position immediately
         this.camera.x = this.player.x;
         this.camera.y = this.player.y;
-        this.ai = new AI();
+        this.input.reset(this.player.angle);
+
+        // A fresh AI, with difficulty set from the player's whole career rather
+        // than this session — see Storage.aiPressure.
+        this.ai = new AI(this.collision);
+        this.ai.setPressure(Storage.aiPressure(this.saveData));
 
         // Create snakes array and spawn bots
         this.snakes = [this.player];
@@ -174,6 +200,7 @@ class Game {
 
         // Game state
         this.state = 'playing';
+        this.resolved = false;
         this.gameStartTime = performance.now();
         this.lastUpdate = performance.now();
         this.lastEatSound = 0;
@@ -184,16 +211,21 @@ class Game {
         this.audio.resume();
     }
 
-    _spawnBots(count) {
-        for (let i = 0; i < count; i++) {
-            const bot = AI.createBot(this.saveData);
-            this.snakes.push(bot);
-            this.ai.register(bot);
+    /** Mass of the biggest live snake — what new bots are sized against. */
+    _leaderMass() {
+        let m = 0;
+        for (const s of this.snakes) {
+            if (s.alive && s.mass > m) m = s.mass;
         }
+        return m;
+    }
+
+    _spawnBots(count) {
+        for (let i = 0; i < count; i++) this._respawnBot();
     }
 
     _respawnBot() {
-        const bot = AI.createBot(this.saveData);
+        const bot = AI.createBot(this.saveData, this._leaderMass());
         this.snakes.push(bot);
         this.ai.register(bot);
     }
@@ -204,7 +236,7 @@ class Game {
 
         if (this.state !== 'playing') {
             // Still render menu background
-            if (this.state === 'menu' || this.state === 'dead') {
+            if (this.state === 'menu' || this.state === 'dead' || this.state === 'won') {
                 this.renderer.clear();
             }
             return;
@@ -222,7 +254,7 @@ class Game {
     _update(dt, now) {
         // Update player input
         if (this.player && this.player.alive) {
-            const angle = this.input.getAngle();
+            const angle = this.input.update(dt, this.player.angle);
             this.player.setTarget(angle);
             this.player.setBoost(this.input.boosting);
 
@@ -233,7 +265,9 @@ class Game {
             }
         }
 
-        // Update AI
+        // Update AI. The bots read the spatial hashes built at the end of the
+        // last frame — one frame stale is a few pixels of error and saves
+        // rebuilding the whole thing twice per frame.
         this.ai.update(dt, this.snakes, this.world.food, this.world.powerups);
 
         // Update all snakes
@@ -265,7 +299,11 @@ class Game {
             if (snake.boosting && !snake.hasPowerup('speed')) {
                 const pellet = snake.getBoostPellet();
                 if (pellet) {
-                    this.world.addBoostPellet(pellet.x, pellet.y, snake.getColorAt(snake.segments.length - 1));
+                    this.world.addBoostPellet(
+                        pellet.x, pellet.y,
+                        snake.getColorAt(snake.segCount - 1),
+                        pellet.value, pellet.owner, now
+                    );
                     if (snake.isPlayer) {
                         this.particles.emitBoost(pellet.x, pellet.y, snake.getColorAt(0));
                     }
@@ -273,8 +311,9 @@ class Game {
             }
         }
 
-        // Build collision grid
+        // Build the spatial hashes for this frame's collision resolution
         this.collision.buildFromSnakes(this.snakes);
+        this.collision.buildFoodHash(this.world.food);
 
         // Check snake-to-snake collisions
         const bodyCollisions = this.collision.checkSnakeCollisions(this.snakes);
@@ -299,15 +338,18 @@ class Game {
             this.ai.unregister(victim.id);
         }
 
-        // Check food collisions
+        // Check food collisions. removeFood is swap-with-last, so indices MUST be
+        // removed in descending order — the element swapped into a freed slot
+        // always comes from a higher index that we have already dealt with.
         const eaten = this.collision.checkFoodCollisions(this.snakes, this.world.food);
-        // Sort by index descending to splice safely
         eaten.sort((a, b) => b.foodIndex - a.foodIndex);
-        const removedIndices = new Set();
+        const removedIndices = this._eatenIndices;
+        removedIndices.clear();
         for (const { snake, foodIndex, food } of eaten) {
             if (removedIndices.has(foodIndex)) continue;
             removedIndices.add(foodIndex);
-            snake.grow(food.value);
+            // Reclaiming your own boost trail never benefits from 2x Growth.
+            snake.grow(food.value, food.owner === snake.id);
             this.world.removeFood(foodIndex);
 
             if (snake.isPlayer) {
@@ -323,7 +365,8 @@ class Game {
         // Check powerup collisions
         const collected = this.collision.checkPowerupCollisions(this.snakes, this.world.powerups);
         collected.sort((a, b) => b.powerupIndex - a.powerupIndex);
-        const removedPU = new Set();
+        const removedPU = this._puIndices;
+        removedPU.clear();
         for (const { snake, powerupIndex, powerup } of collected) {
             if (removedPU.has(powerupIndex)) continue;
             removedPU.add(powerupIndex);
@@ -335,6 +378,12 @@ class Game {
                 this.audio.playPowerup();
                 this._showPowerupNotification(powerup.type);
             }
+        }
+
+        // Victory check — reaching WIN_MASS ends the run as a win.
+        if (!this.resolved && this.player && this.player.alive &&
+            this.player.mass >= CONFIG.WIN_MASS) {
+            this._onPlayerWin();
         }
 
         // Replenish food and spawn powerups
@@ -354,7 +403,7 @@ class Game {
 
         // Update camera
         if (this.player && this.player.alive) {
-            this.camera.follow(this.player.x, this.player.y, this.player.mass);
+            this.camera.follow(this.player.x, this.player.y, this.player.bodyRadius);
         }
 
         // Update particles
@@ -387,19 +436,19 @@ class Game {
         r.drawJoystick(this.input.getJoystickData());
     }
 
-    /** Handle player death */
-    _onPlayerDeath() {
+    /**
+     * Record a finished run and bank the coins. Shared by death and victory so
+     * the two can never disagree about what a run was worth.
+     */
+    _settleRun(won) {
         const gameTime = (performance.now() - this.gameStartTime) / 1000;
-        const mass = this.player.mass;
+        const mass = Math.floor(this.player.mass);
         const kills = this.player.kills;
 
         // Capture previous high score BEFORE saving
         const previousHighScore = this.saveData.stats.highScore;
+        const coins = Storage.calculateCoins(mass, kills, this.saveData.upgrades.coinBonus, won);
 
-        // Calculate coins
-        const coins = Storage.calculateCoins(mass, kills, this.saveData.upgrades.coinBonus);
-
-        // Update save data
         this.saveData = Storage.update(data => {
             data.coins += coins;
             data.stats.gamesPlayed++;
@@ -409,14 +458,68 @@ class Game {
             if (mass > data.stats.highScore) data.stats.highScore = mass;
             if (mass > data.stats.longestSnake) data.stats.longestSnake = mass;
             if (kills > data.stats.bestKillStreak) data.stats.bestKillStreak = kills;
+            if (won) {
+                data.stats.victories = (data.stats.victories || 0) + 1;
+                if (!data.stats.bestWinTime || gameTime < data.stats.bestWinTime) {
+                    data.stats.bestWinTime = gameTime;
+                }
+            }
         });
 
+        // One completed run, once — this is what decides when the account layer
+        // offers to save progress. Never called mid-run.
+        if (this.cloud) this.cloud.runFinished();
+
+        return { mass, kills, coins, gameTime, isNewHighScore: mass > previousHighScore };
+    }
+
+    /** Handle player death */
+    _onPlayerDeath() {
+        if (this.resolved) return;
+        this.resolved = true;
+        const r = this._settleRun(false);
+
         // Show death screen after brief delay
-        const isNewHighScore = mass > previousHighScore;
         setTimeout(() => {
             this.state = 'dead';
-            this._showDeathScreen(mass, kills, coins, gameTime, isNewHighScore);
+            this._showDeathScreen(r.mass, r.kills, r.coins, r.gameTime, r.isNewHighScore);
         }, 1500);
+    }
+
+    /** Handle reaching WIN_MASS — the run ends here, as a win. */
+    _onPlayerWin() {
+        if (this.resolved) return;
+        this.resolved = true;
+        const r = this._settleRun(true);
+
+        this.audio.playPowerup();
+        this.camera.shake(10);
+        this.particles.emitDeath(this.player.x, this.player.y, ['#ffd700', '#ffffff', '#ffcc00']);
+
+        setTimeout(() => {
+            this.state = 'won';
+            this._showWinScreen(r.mass, r.kills, r.coins, r.gameTime);
+        }, 1400);
+    }
+
+    _showWinScreen(mass, kills, coins, time) {
+        this._showScreen('win-screen');
+        const set = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+        set('win-score', Utils.formatNumber(mass));
+        set('win-kills', kills);
+        set('win-coins', '+' + coins);
+        set('win-time', this._formatTime(time));
+
+        const best = this.saveData.stats.bestWinTime;
+        const total = this.saveData.stats.victories;
+        set('win-note', total === 1
+            ? 'First victory!'
+            : `Victory ${total} · best time ${this._formatTime(best)}`);
+
+        this._updateCoinsDisplay();
     }
 
     _showDeathScreen(mass, kills, coins, time, isNewHighScore) {
@@ -470,10 +573,13 @@ class Game {
                     <div class="upgrade-bar">
                         <div class="upgrade-bar-fill" style="width:${(item.level / item.maxLevel) * 100}%"></div>
                     </div>
+                    <div class="upgrade-effect">${item.effectNow}${
+                        item.effectNext ? ` <span class="upgrade-next">→ ${item.effectNext}</span>` : ''
+                    }</div>
                 </div>
                 <button class="upgrade-buy-btn" data-key="${item.key}"
                     ${item.maxed || !item.canAfford ? 'disabled' : ''}>
-                    ${item.maxed ? 'MAX' : `${item.cost} coins`}
+                    ${item.maxed ? 'MAX' : `${Utils.formatNumber(item.cost)}<small>coins</small>`}
                 </button>
             </div>
         `).join('');
@@ -544,6 +650,8 @@ class Game {
 
         container.innerHTML = `
             <div class="stat-row"><span>Games Played</span><span>${s.gamesPlayed}</span></div>
+            <div class="stat-row"><span>Victories</span><span>${s.victories || 0}</span></div>
+            ${s.bestWinTime ? `<div class="stat-row"><span>Fastest Victory</span><span>${this._formatTime(s.bestWinTime)}</span></div>` : ''}
             <div class="stat-row"><span>High Score</span><span>${Utils.formatNumber(s.highScore)}</span></div>
             <div class="stat-row"><span>Total Kills</span><span>${s.totalKills}</span></div>
             <div class="stat-row"><span>Best Kill Streak</span><span>${s.bestKillStreak}</span></div>
@@ -557,6 +665,16 @@ class Game {
 // Start game when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.game = new Game();
+
+    // Player accounts are strictly optional. Load the glue dynamically and
+    // swallow any failure, so offline, blocked, or file:// still plays — just
+    // without progress following the player between devices.
+    const params = new URLSearchParams(location.search);
+    if (!params.has('test') && !params.has('soak')) {
+        import('./cloud.js')
+            .then(mod => { window.game.cloud = mod; })
+            .catch(() => { /* no account layer available; carry on locally */ });
+    }
 });
 
 // Register service worker

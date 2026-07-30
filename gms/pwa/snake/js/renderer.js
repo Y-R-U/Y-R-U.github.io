@@ -21,6 +21,23 @@ class Renderer {
         this.height = window.innerHeight;
     }
 
+    /**
+     * How much room the br8t account avatar is taking in the top-right corner,
+     * in CSS pixels. Zero when the account layer is not loaded. Polled rather
+     * than read every frame — getComputedStyle is far too expensive for that,
+     * and the value only changes when the avatar mounts.
+     */
+    _accountSpace() {
+        const now = performance.now();
+        if (this._accountSpaceAt === undefined || now - this._accountSpaceAt > 500) {
+            this._accountSpaceAt = now;
+            const v = getComputedStyle(document.documentElement)
+                .getPropertyValue('--br8t-account-space');
+            this._accountSpaceVal = parseFloat(v) || 0;
+        }
+        return this._accountSpaceVal;
+    }
+
     /** Draw a rounded rect (polyfill for older browsers) */
     _roundRect(x, y, w, h, r) {
         const ctx = this.ctx;
@@ -106,29 +123,39 @@ class Renderer {
         }
     }
 
-    /** Draw all food pellets */
+    /**
+     * Draw all food pellets.
+     * The world-to-screen transform is inlined here and in drawSnake: the object
+     * that camera.worldToScreen returns is harmless once, but this runs thousands
+     * of times a frame and the garbage was showing up in profiles.
+     */
     drawFood(food, camera) {
         const ctx = this.ctx;
         const bounds = camera.getViewBounds();
+        const zoom = camera.zoom;
+        const ox = this.width / 2 - camera.x * zoom + camera.shakeX;
+        const oy = this.height / 2 - camera.y * zoom + camera.shakeY;
 
-        for (const f of food) {
+        for (let i = 0; i < food.length; i++) {
+            const f = food[i];
             if (f.x < bounds.left || f.x > bounds.right ||
                 f.y < bounds.top || f.y > bounds.bottom) continue;
 
-            const s = camera.worldToScreen(f.x, f.y);
-            const r = f.radius * camera.zoom;
+            const sx = f.x * zoom + ox;
+            const sy = f.y * zoom + oy;
+            const r = f.radius * zoom;
 
             // Glow (skip tiny food glow for performance)
             if (r > 2) {
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, r * 2, 0, Math.PI * 2);
+                ctx.arc(sx, sy, r * 2, 0, Math.PI * 2);
                 ctx.fillStyle = Utils.hexToRgba(f.color, 0.15);
                 ctx.fill();
             }
 
             // Core
             ctx.beginPath();
-            ctx.arc(s.x, s.y, Math.max(r, 1.5), 0, Math.PI * 2);
+            ctx.arc(sx, sy, Math.max(r, 1.5), 0, Math.PI * 2);
             ctx.fillStyle = f.color;
             ctx.fill();
         }
@@ -174,43 +201,66 @@ class Renderer {
         }
     }
 
-    /** Draw a snake with body outline for depth */
+    /**
+     * Draw a snake.
+     *
+     * The dark border is one continuous stroked polyline rather than a second
+     * full pass of circles. That is both cheaper and better looking — the old
+     * two-pass version needed every outline drawn before every fill to avoid
+     * dark rings between segments, which meant touching each segment twice.
+     * Sub-paths are broken whenever a run of segments goes off screen, otherwise
+     * the stroke would draw a line straight across the view.
+     */
     drawSnake(snake, camera, isPlayer) {
         if (!snake.alive) return;
         const ctx = this.ctx;
+        const bounds = camera.getViewBounds();
+        const zoom = camera.zoom;
+        const ox = this.width / 2 - camera.x * zoom + camera.shakeX;
+        const oy = this.height / 2 - camera.y * zoom + camera.shakeY;
+        const n = snake.segCount;
+        const segX = snake.segX, segY = snake.segY;
 
-        // Draw body outline first (darker border for depth)
-        for (let i = snake.segments.length - 1; i >= 1; i--) {
-            const seg = snake.segments[i];
-            if (!camera.isVisible(seg.x, seg.y, 20)) continue;
-            const s = camera.worldToScreen(seg.x, seg.y);
-            const r = snake.getRadiusAt(i) * camera.zoom;
+        const pad = snake.bodyRadius + 20;
+        const left = bounds.left - pad, right = bounds.right + pad;
+        const top = bounds.top - pad, bottom = bounds.bottom + pad;
+        const screenR = snake.bodyRadius * zoom;
 
+        // Border pass: one path, drawn tail to head.
+        if (screenR >= CONFIG.RENDER_OUTLINE_MIN_RADIUS) {
             ctx.beginPath();
-            ctx.arc(s.x, s.y, r + 1, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.fill();
+            let pen = false;
+            for (let i = n - 1; i >= 0; i--) {
+                const wx = segX[i], wy = segY[i];
+                if (wx < left || wx > right || wy < top || wy > bottom) { pen = false; continue; }
+                const sx = wx * zoom + ox, sy = wy * zoom + oy;
+                if (pen) ctx.lineTo(sx, sy);
+                else { ctx.moveTo(sx, sy); pen = true; }
+            }
+            ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+            ctx.lineWidth = (snake.bodyRadius + 1.5) * 2 * zoom;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
         }
 
-        // Draw body segments from tail to head
-        for (let i = snake.segments.length - 1; i >= 1; i--) {
-            const seg = snake.segments[i];
-            if (!camera.isVisible(seg.x, seg.y, 20)) continue;
+        // Body fill: tail to head so the head sits on top.
+        for (let i = n - 1; i >= 1; i--) {
+            const wx = segX[i], wy = segY[i];
+            if (wx < left || wx > right || wy < top || wy > bottom) continue;
 
-            const s = camera.worldToScreen(seg.x, seg.y);
-            const r = snake.getRadiusAt(i) * camera.zoom;
-            const color = snake.getColorAt(i);
+            const sx = wx * zoom + ox, sy = wy * zoom + oy;
+            const r = snake.getRadiusAt(i) * zoom;
 
             ctx.beginPath();
-            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-            ctx.fillStyle = color;
+            ctx.arc(sx, sy, r, 0, Math.PI * 2);
+            ctx.fillStyle = snake.getColorAt(i);
             ctx.fill();
         }
 
         // Draw head
-        const head = snake.segments[0];
-        const hs = camera.worldToScreen(head.x, head.y);
-        const hr = snake.getRadiusAt(0) * camera.zoom;
+        const hs = { x: snake.x * zoom + ox, y: snake.y * zoom + oy };
+        const hr = snake.getRadiusAt(0) * zoom;
         const headColor = snake.getColorAt(0);
 
         // Head glow for player
@@ -259,7 +309,7 @@ class Renderer {
         }
 
         // Name tag (only if reasonably zoomed)
-        if (camera.zoom > 0.4) {
+        if (camera.zoom > CONFIG.NAME_TAG_MIN_ZOOM) {
             ctx.fillStyle = isPlayer ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.7)';
             ctx.font = `bold ${Math.round(11 * camera.zoom)}px sans-serif`;
             ctx.textAlign = 'center';
@@ -324,6 +374,8 @@ class Renderer {
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.font = '12px sans-serif';
             ctx.fillText('MASS', this.width / 2, 44);
+
+            this._drawGoal(playerSnake.mass);
         }
 
         // Leaderboard - top right
@@ -332,8 +384,10 @@ class Renderer {
             .sort((a, b) => b.mass - a.mass);
         const top10 = sorted.slice(0, 10);
 
+        // The account avatar publishes its top-right footprint as a CSS var; drop
+        // the leaderboard below it rather than squeezing it into the mass counter.
         const lbX = this.width - 12;
-        const lbY = 16;
+        const lbY = 16 + this._accountSpace();
         const lbW = 140;
 
         // Find player rank
@@ -376,13 +430,45 @@ class Renderer {
             ctx.fillText(Utils.formatNumber(playerSnake.mass), lbX - 8, y);
         }
 
-        // Kill count - below score
+        // Kill count - below the score and goal bar
         if (playerSnake && playerSnake.alive && playerSnake.kills > 0) {
+            const y = playerSnake.mass / CONFIG.WIN_MASS >= 0.1 ? 82 : 60;
             ctx.fillStyle = '#ff4444';
             ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(`${playerSnake.kills} kill${playerSnake.kills > 1 ? 's' : ''}`, this.width / 2, 60);
+            ctx.textBaseline = 'top';
+            ctx.fillText(`${playerSnake.kills} kill${playerSnake.kills > 1 ? 's' : ''}`, this.width / 2, y);
         }
+    }
+
+    /**
+     * Progress toward the 10,000 win. Hidden early on — nobody needs a progress
+     * bar at 40 mass — and it turns gold as it fills.
+     */
+    _drawGoal(mass) {
+        const goal = CONFIG.WIN_MASS;
+        const frac = Utils.clamp(mass / goal, 0, 1);
+        if (frac < 0.1) return;
+
+        const ctx = this.ctx;
+        const w = Math.min(180, this.width * 0.45);
+        const h = 5;
+        const x = (this.width - w) / 2;
+        const y = 62;
+
+        ctx.fillStyle = 'rgba(255,255,255,0.14)';
+        this._roundRect(x, y, w, h, h / 2);
+        ctx.fill();
+
+        ctx.fillStyle = frac >= 1 ? '#ffd700' : (frac > 0.75 ? '#ffcc00' : '#4CAF50');
+        this._roundRect(x, y, Math.max(h, w * frac), h, h / 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`${Utils.formatNumber(goal)} TO WIN`, this.width / 2, y + h + 3);
     }
 
     /** Draw minimap */
@@ -412,7 +498,7 @@ class Renderer {
             if (!snake.alive) continue;
             const sx = x + size / 2 + snake.x * scale;
             const sy = y + size / 2 + snake.y * scale;
-            const r = Utils.clamp(snake.mass / 30, 1.5, 4);
+            const r = Utils.clamp(1 + Math.sqrt(snake.mass) / 12, 1.5, 5);
 
             if (snake.isPlayer) {
                 ctx.fillStyle = '#ffcc00';

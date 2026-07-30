@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snakeio-v1';
+const CACHE_NAME = 'snakeio-v3';
 const ASSETS = [
     './',
     './index.html',
@@ -17,10 +17,26 @@ const ASSETS = [
     './js/renderer.js',
     './js/audio.js',
     './js/main.js',
+    './js/cloud.js',
     './manifest.json',
     './icons/icon-192.svg',
     './icons/icon-512.svg'
 ];
+
+// A service worker sees EVERY request its clients make, not just requests for
+// files in its own scope. Left alone, this one would start caching
+// /lib/auth/*.js and Firebase's own endpoints, and the player would be stuck
+// running whatever version of the account layer happened to be cached the day
+// they installed the PWA. Only ever handle our own directory.
+const SCOPE_PATH = new URL('./', self.location).pathname;
+
+function isOurs(request) {
+    if (request.method !== 'GET') return false;
+    let url;
+    try { url = new URL(request.url); } catch (e) { return false; }
+    if (url.origin !== self.location.origin) return false;
+    return url.pathname.startsWith(SCOPE_PATH);
+}
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
@@ -37,6 +53,7 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+    if (!isOurs(e.request)) return;   // let the network handle everything else
     e.respondWith(
         caches.match(e.request).then(cached =>
             fetch(e.request)

@@ -53,6 +53,20 @@ const Upgrades = {
         });
     },
 
+    /**
+     * Format an upgrade's cumulative effect for display. With twenty-level
+     * ladders the player needs to see what they are actually buying, not just a
+     * level number.
+     */
+    formatEffect(meta, value) {
+        switch (meta.fmt) {
+            case 'pct':   return `+${Math.round(value * 100)}% ${meta.unit}`;
+            case 'plus2': return `+${value.toFixed(2)} ${meta.unit}`;
+            case 'plus':
+            default:      return `+${Math.round(value)} ${meta.unit}`;
+        }
+    },
+
     /** Build upgrade UI data for display */
     getUpgradeDisplayData() {
         const data = Storage.load();
@@ -63,6 +77,8 @@ const Upgrades = {
             const cost = Storage.getUpgradeCost(key, level);
             const maxed = level >= meta.maxLevel;
             const canAfford = data.coins >= cost;
+            const current = Storage.getUpgradeValue(key, level);
+            const next = maxed ? null : Storage.getUpgradeValue(key, level + 1);
 
             items.push({
                 key,
@@ -72,9 +88,11 @@ const Upgrades = {
                 cost: maxed ? null : cost,
                 maxed,
                 canAfford: !maxed && canAfford,
-                currentValue: Storage.getUpgradeValue(key, level),
-                nextValue: maxed ? null : Storage.getUpgradeValue(key, level + 1),
-                unit: meta.unit
+                currentValue: current,
+                nextValue: next,
+                unit: meta.unit,
+                effectNow: level > 0 ? Upgrades.formatEffect(meta, current) : 'No bonus yet',
+                effectNext: maxed ? null : Upgrades.formatEffect(meta, next)
             });
         }
         return items;

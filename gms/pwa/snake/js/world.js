@@ -1,5 +1,10 @@
 /**
  * World - manages food, power-ups, and arena
+ *
+ * Food removal is swap-with-last, not splice: at high mass a snake eats dozens
+ * of pellets a frame and the array runs into the thousands, so an O(n) memmove
+ * per pellet showed up in profiles. Order is meaningless here, so swap-pop is
+ * free. Callers must remove indices in DESCENDING order for it to be safe.
  */
 class World {
     constructor() {
@@ -24,13 +29,16 @@ class World {
             radius: CONFIG.FOOD_RADIUS,
             value: CONFIG.FOOD_VALUE,
             color: Utils.hslToHex(Math.random() * 360, 70, 60),
-            glow: CONFIG.FOOD_GLOW_RADIUS
+            glow: CONFIG.FOOD_GLOW_RADIUS,
+            owner: null,
+            armAt: 0
         };
     }
 
     /** Add death pellets to the food array */
     addDeathPellets(pellets) {
         for (const p of pellets) {
+            if (this.food.length >= CONFIG.FOOD_MAX) break;
             this.food.push({
                 x: p.x,
                 y: p.y,
@@ -38,29 +46,46 @@ class World {
                 value: p.value,
                 color: p.color,
                 glow: p.radius * 2,
-                isDeath: true
+                isDeath: true,
+                owner: null,
+                armAt: 0
             });
         }
     }
 
-    /** Add a boost trail pellet */
-    addBoostPellet(x, y, color) {
+    /**
+     * Add a boost trail pellet. Tagged with its owner and a short arming delay
+     * so a snake cannot turn on the spot and eat its own trail back.
+     */
+    addBoostPellet(x, y, color, value, ownerId, now) {
+        if (this.food.length >= CONFIG.FOOD_MAX) return;
+        // Take the value as given — the snake has already decided how much mass
+        // this pellet carries, and rounding it up here would mint mass.
+        const v = value > 0 ? value : CONFIG.FOOD_VALUE;
         this.food.push({
             x, y,
-            radius: CONFIG.FOOD_RADIUS + 1,
-            value: 1,
+            radius: CONFIG.FOOD_RADIUS + Utils.clamp(Math.sqrt(v) * 0.6, 1, 6),
+            value: v,
             color: color,
             glow: CONFIG.FOOD_GLOW_RADIUS,
-            isBoost: true
+            isBoost: true,
+            owner: ownerId || null,
+            armAt: (now || performance.now()) + CONFIG.OWN_PELLET_ARM_MS
         });
     }
 
-    /** Remove food at index */
+    /**
+     * Remove food at index by swapping in the last element.
+     * Safe only when called with descending indices within one frame.
+     */
     removeFood(index) {
-        this.food.splice(index, 1);
+        const last = this.food.length - 1;
+        if (index < 0 || index > last) return;
+        if (index !== last) this.food[index] = this.food[last];
+        this.food.pop();
     }
 
-    /** Replenish food to maintain count */
+    /** Replenish ambient food to maintain count */
     replenish() {
         while (this.food.length < CONFIG.FOOD_COUNT) {
             this.food.push(this._createFood());
@@ -88,7 +113,10 @@ class World {
 
     /** Remove power-up at index */
     removePowerup(index) {
-        this.powerups.splice(index, 1);
+        const last = this.powerups.length - 1;
+        if (index < 0 || index > last) return;
+        if (index !== last) this.powerups[index] = this.powerups[last];
+        this.powerups.pop();
     }
 
     /** Check if a point is outside the boundary */

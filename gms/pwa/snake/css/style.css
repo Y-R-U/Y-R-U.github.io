@@ -424,6 +424,57 @@ html, body {
     background: var(--accent);
 }
 
+/* With twenty-level ladders the level number alone says nothing — show the
+   cumulative effect and what the next level adds. */
+.upgrade-effect {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 6px;
+}
+
+.upgrade-next {
+    color: var(--primary);
+}
+
+.upgrade-buy-btn small {
+    display: block;
+    font-size: 9px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+/* ========== WIN SCREEN ========== */
+#win-screen {
+    background: rgba(6, 10, 4, 0.88);
+    justify-content: center;
+    gap: 16px;
+    padding: 30px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.win-title {
+    font-size: 38px;
+    font-weight: 900;
+    text-align: center;
+    color: #ffd700;
+    text-shadow: 0 0 24px rgba(255, 215, 0, 0.45);
+}
+
+.win-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.win-note {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    min-height: 16px;
+}
+
 /* ========== SKINS SCREEN ========== */
 #skins-list {
     display: grid;
