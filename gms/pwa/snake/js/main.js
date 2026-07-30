@@ -149,6 +149,8 @@ class Game {
         if (gameUI) {
             gameUI.style.display = screenId === 'game-screen' ? 'block' : 'none';
         }
+
+        if (screenId === 'menu-screen' && this.cloud) this.cloud.checkpoint();
     }
 
     _updateCoinsDisplay() {
@@ -694,7 +696,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(location.search);
     if (!params.has('test') && !params.has('soak')) {
         import('./cloud.js')
-            .then(mod => { window.game.cloud = mod; })
+            .then(mod => {
+                window.game.cloud = mod;
+                // The menu is already up by the time this lands, so it missed its
+                // own checkpoint; let the first screen settle, then offer.
+                setTimeout(() => mod.checkpoint(), 1500);
+            })
             .catch(() => { /* no account layer available; carry on locally */ });
     }
 });

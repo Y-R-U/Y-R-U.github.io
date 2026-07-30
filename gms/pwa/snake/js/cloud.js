@@ -62,3 +62,8 @@ export const cloud = syncLocalKeys({
 export function runFinished() {
     try { cloud.matchCompleted(); } catch (e) { /* never block the results screen */ }
 }
+
+/** Called when a menu screen comes up; the layer decides if a nudge is due. */
+export function checkpoint() {
+    try { cloud.checkpoint(); } catch (e) { /* a nudge is never worth an error */ }
+}

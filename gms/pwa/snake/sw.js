@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snakeio-v5';
+const CACHE_NAME = 'snakeio-v6';
 const ASSETS = [
     './',
     './index.html',
