@@ -342,6 +342,18 @@ html, body {
     margin-bottom: 20px;
 }
 
+/* The br8t account avatar is fixed to the top-right corner (40px at 10px in,
+   published as --br8t-account-space by /lib/auth/ui.js, 0 when it isn't
+   mounted). This header is centred and capped at 400px, so only once the
+   viewport is narrow enough for it to reach that corner does the Back button
+   end up underneath the avatar — above ~500px wide there is already room to
+   spare and shifting would just knock Back out of line with the cards below. */
+@media (max-width: 560px) {
+    .screen-header {
+        padding-right: var(--br8t-account-space, 0px);
+    }
+}
+
 .screen-title {
     font-size: 22px;
     font-weight: 800;

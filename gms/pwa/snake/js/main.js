@@ -466,11 +466,31 @@ class Game {
             }
         });
 
-        // One completed run, once — this is what decides when the account layer
-        // offers to save progress. Never called mid-run.
-        if (this.cloud) this.cloud.runFinished();
+        // NB: the account layer is told about the finished run from
+        // _runFinishedOnResults(), not here — see the note there.
 
         return { mass, kills, coins, gameTime, isNewHighScore: mass > previousHighScore };
+    }
+
+    /**
+     * Tell the account layer a run is over. This is what eventually triggers its
+     * "sign in and keep your progress" nudge, so WHEN it is called matters.
+     *
+     * Death and victory both settle the run at the instant it ends, then hold
+     * the arena for ~1.5s of death animation before the results screen appears.
+     * Announcing the run there put the sign-in modal on top of a still-moving
+     * arena, so it read as a popup interrupting play rather than a question
+     * asked at the end of it. Call it only once the results screen is actually
+     * up — and only if it really is the screen in front of the player, so a
+     * quick PLAY AGAIN can never leave the modal hanging over a live run.
+     */
+    _runFinishedOnResults(screenId) {
+        if (!this.cloud) return;
+        setTimeout(() => {
+            const active = document.querySelector('.screen.active');
+            if (!active || active.id !== screenId) return;   // player has moved on
+            this.cloud.runFinished();
+        }, 700);
     }
 
     /** Handle player death */
@@ -520,6 +540,7 @@ class Game {
             : `Victory ${total} · best time ${this._formatTime(best)}`);
 
         this._updateCoinsDisplay();
+        this._runFinishedOnResults('win-screen');
     }
 
     _showDeathScreen(mass, kills, coins, time, isNewHighScore) {
@@ -541,6 +562,7 @@ class Game {
         }
 
         this._updateCoinsDisplay();
+        this._runFinishedOnResults('death-screen');
     }
 
     _showPowerupNotification(type) {
