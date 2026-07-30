@@ -65,8 +65,8 @@ export const GAMES = [
   },
   {
     id: "outpace", name: "Outpace", tag: "Run the gauntlet",
-    path: "/gms/3d/outpace/", shot: "outpace", accent: "#6ea8ff", soon: true,
-    blurb: "Thread a course of stations and asteroid fields at speed, and dock when your nerve runs out.",
+    path: "/gms/3d/outpace/", shot: "outpace", accent: "#6ea8ff",
+    blurb: "Haul cargo through asteroid fields to pay off a ship you cannot afford. Dock, bank the credits, and take the next route out.",
   },
   {
     id: "voidcast", name: "Voidcast", tag: "Eat the planet",
