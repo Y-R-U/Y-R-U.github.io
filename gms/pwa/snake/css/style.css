@@ -233,11 +233,12 @@ html, body {
 }
 
 /* Power-up notification */
+/* Below the arena, not over the leaderboard it used to sit on top of. */
 #powerup-notification {
     position: fixed;
-    top: 80px;
+    bottom: calc(120px + var(--safe-bottom));
     left: 50%;
-    transform: translateX(-50%) translateY(-20px);
+    transform: translateX(-50%) translateY(20px);
     background: rgba(0,0,0,0.7);
     padding: 10px 20px;
     border-radius: 10px;
@@ -634,4 +635,202 @@ html, body {
         height: 80px;
         font-size: 26px;
     }
+}
+
+/* ---------------------------------------------------------- pause */
+
+#pause-btn {
+    position: fixed;
+    top: calc(12px + var(--safe-top));
+    left: calc(12px + var(--safe-left));
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--text-mid);
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 20;
+}
+
+#pause-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6,9,18,0.72);
+    backdrop-filter: blur(3px);
+    z-index: 30;
+    pointer-events: auto;
+}
+#pause-overlay.show { display: flex; }
+
+.pause-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    padding: 28px 24px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.pause-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+.pause-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    max-width: 240px;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+/* The BOOST ability: a charge ring that fills, then lights up. */
+#boost-btn {
+    background:
+        conic-gradient(rgba(255,215,0,0.55) var(--charge, 0%), rgba(255,255,255,0.06) 0)
+        border-box;
+    font-size: 15px;
+}
+#boost-btn.ready {
+    background: rgba(255,200,0,0.22);
+    border-color: rgba(255,215,0,0.75);
+    color: var(--accent);
+    animation: boost-ready 1.6s ease-in-out infinite;
+}
+@keyframes boost-ready {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.35); }
+    50%      { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+}
+
+/* ---------------------------------------------------------- ladder */
+
+#ladder-preview {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 18px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+}
+
+.ladder-head {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+}
+
+.ladder-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--text-mid);
+}
+.ladder-row.me {
+    background: rgba(255,215,0,0.12);
+    color: var(--accent);
+    font-weight: 800;
+}
+.ladder-pos {
+    width: 26px;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+}
+.ladder-row.me .ladder-pos { color: var(--accent); }
+.ladder-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ladder-rating {
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+}
+
+/* The header stays put and the table scrolls under it — the whole screen
+   scrolling meant scrolling the player's own row into view took the Back
+   button off the top of the screen with it. */
+#ladder-screen {
+    background: var(--bg);
+    padding: 20px 20px 0;
+    padding-top: calc(20px + var(--safe-top));
+}
+
+#ladder-list {
+    width: 100%;
+    max-width: 420px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(20px + var(--safe-bottom));
+}
+#ladder-list .ladder-row:nth-child(even) { background: rgba(255,255,255,0.03); }
+#ladder-list .ladder-row.me { background: rgba(255,215,0,0.14); }
+
+.ladder-note {
+    max-width: 420px;
+    padding: 4px 14px 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+/* Rating move on a results screen */
+.ladder-move {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 10px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+}
+.ladder-move-pts {
+    font-size: 18px;
+    font-weight: 900;
+}
+.ladder-move.up .ladder-move-pts { color: var(--primary); }
+.ladder-move.down .ladder-move-pts { color: var(--danger); }
+.ladder-move-rank {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+#resume-btn small {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+/* The menu grew a resume button and a ladder; on a short phone that can now be
+   taller than the viewport, and a centred flex column clips its own top when it
+   overflows. `safe center` keeps the scroll usable where it is supported. */
+#menu-screen {
+    overflow-y: auto;
+    justify-content: safe center;
+}
+@media (max-height: 700px) {
+    .game-title { font-size: 38px; }
+    .game-subtitle { margin-bottom: 4px; }
+    #menu-screen { gap: 10px; }
 }

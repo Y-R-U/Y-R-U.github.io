@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snakeio-v6';
+const CACHE_NAME = 'snakeio-v7';
 const ASSETS = [
     './',
     './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
     './js/config.js',
     './js/utils.js',
     './js/storage.js',
+    './js/ladder.js',
     './js/snake.js',
     './js/world.js',
     './js/input.js',

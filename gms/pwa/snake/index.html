@@ -19,8 +19,17 @@
 
     <!-- Game UI overlay (boost button, notifications) -->
     <div id="game-ui">
-        <button id="boost-btn">BOOST</button>
+        <button id="pause-btn" aria-label="Pause" aria-pressed="false">II</button>
+        <button id="boost-btn" class="ready">BOOST</button>
         <div id="powerup-notification"></div>
+        <div id="pause-overlay">
+            <div class="pause-card">
+                <div class="pause-title">PAUSED</div>
+                <div class="pause-note">Your run is saved — a reload will pick it back up.</div>
+                <button class="btn btn-primary" id="pause-resume-btn">RESUME</button>
+                <button class="btn btn-secondary" id="pause-quit-btn">Quit run</button>
+            </div>
+        </div>
     </div>
 
     <!-- Menu Screen -->
@@ -38,13 +47,19 @@
         </div>
 
         <div class="menu-buttons">
+            <button class="btn btn-accent" id="resume-btn" style="display:none">RESUME</button>
             <button class="btn btn-primary" id="play-btn">PLAY</button>
             <div class="menu-row">
                 <button class="btn btn-secondary" id="upgrades-btn">Upgrades</button>
                 <button class="btn btn-secondary" id="skins-btn">Skins</button>
             </div>
-            <button class="btn btn-secondary" id="stats-btn">Stats</button>
+            <div class="menu-row">
+                <button class="btn btn-secondary" id="ladder-btn">Ladder</button>
+                <button class="btn btn-secondary" id="stats-btn">Stats</button>
+            </div>
         </div>
+
+        <div id="ladder-preview"></div>
     </div>
 
     <!-- Game Screen (just shows canvas + HUD) -->
@@ -73,6 +88,8 @@
                 <div class="death-stat-label">Time</div>
             </div>
         </div>
+
+        <div id="death-ladder" class="ladder-move"></div>
 
         <div class="death-buttons">
             <button class="btn btn-primary" id="play-again-btn">PLAY AGAIN</button>
@@ -107,6 +124,8 @@
                 <div class="death-stat-label">Time</div>
             </div>
         </div>
+
+        <div id="win-ladder" class="ladder-move"></div>
 
         <div class="death-buttons">
             <button class="btn btn-primary" id="win-again-btn">PLAY AGAIN</button>
@@ -143,6 +162,16 @@
         <div id="skins-list"></div>
     </div>
 
+    <!-- Ladder Screen -->
+    <div id="ladder-screen" class="screen">
+        <div class="screen-header">
+            <div class="screen-title">Global Ladder</div>
+            <button class="back-btn">Back</button>
+        </div>
+        <div id="ladder-note" class="ladder-note"></div>
+        <div id="ladder-list"></div>
+    </div>
+
     <!-- Stats Screen -->
     <div id="stats-screen" class="screen">
         <div class="screen-header">
@@ -156,6 +185,7 @@
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/ladder.js"></script>
     <script src="js/snake.js"></script>
     <script src="js/world.js"></script>
     <script src="js/input.js"></script>

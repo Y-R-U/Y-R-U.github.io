@@ -37,7 +37,16 @@ class Snake {
         this.angle = options.angle ?? (Math.random() * Math.PI * 2);
         this.targetAngle = this.angle;
         this.speed = CONFIG.SNAKE_BASE_SPEED;
-        this.baseSpeed = CONFIG.SNAKE_BASE_SPEED + (options.speedBonus || 0);
+
+        // Bought speed, in upgrade levels. Only SPEED_START_LEVEL_CAP of them
+        // apply at level 1; the rest are released one per level-up.
+        this.speedLevels = options.speedLevels || 0;
+        this.speedPerLevel = options.speedPerLevel || 0;
+        this.bonusSpeed = options.bonusSpeed || 0;           // flat, for named rivals
+        this.levelSpeed = !!options.levelSpeed;              // per-level step: the player's
+        this.boostTimeBonus = options.boostTimeBonus || 0;   // ms added to every power-up
+        this.level = 1;
+        this.baseSpeed = CONFIG.SNAKE_BASE_SPEED;
 
         // State
         this.alive = true;
@@ -110,6 +119,37 @@ class Snake {
             this.segX = new Float32Array(this.segCount + 32);
             this.segY = new Float32Array(this.segCount + 32);
         }
+
+        const levels = CONFIG.LEVELS;
+        let lvl = 1;
+        for (let i = levels.length - 1; i >= 0; i--) {
+            if (m >= levels[i].mass) { lvl = i + 1; break; }
+        }
+        this.level = lvl;
+        this._recomputeSpeed();
+    }
+
+    /**
+     * Speed. Levels and bought upgrades belong to the player — an upgrade that
+     * quietly speeds up all fifteen bots buys a harder game and no advantage.
+     * Ordinary bots stay at base speed; regulars get a share via bonusSpeed.
+     */
+    _recomputeSpeed() {
+        const released = Math.min(
+            this.speedLevels,
+            CONFIG.SPEED_START_LEVEL_CAP + (this.level - 1)
+        );
+        const fromLevels = this.levelSpeed ? (this.level - 1) * CONFIG.LEVEL_SPEED_STEP : 0;
+        this.baseSpeed = Math.min(
+            CONFIG.SNAKE_BASE_SPEED + released * this.speedPerLevel + fromLevels + this.bonusSpeed,
+            CONFIG.SNAKE_MAX_SPEED
+        );
+    }
+
+    /** Camera zoom this snake's level asks for. */
+    get levelZoom() {
+        const row = CONFIG.LEVELS[Math.min(this.level, CONFIG.LEVELS.length) - 1];
+        return row ? row.zoom : CONFIG.CAMERA_ZOOM_MAX;
     }
 
     /** Arc length of the whole body, in world pixels. */
@@ -389,12 +429,17 @@ class Snake {
         };
     }
 
-    /** Apply a power-up */
-    applyPowerup(type) {
+    /**
+     * Apply a power-up. `duration` overrides the collected length — that is how
+     * the BOOST ability grants a shorter version of the same thing. The Boost
+     * Duration upgrade adds to both.
+     */
+    applyPowerup(type, duration) {
         const config = CONFIG.POWERUP_TYPES[type.toUpperCase()];
-        if (config) {
-            this.powerups[config.id] = performance.now() + config.duration;
-        }
+        if (!config) return 0;
+        const ms = (duration || config.duration) + this.boostTimeBonus;
+        this.powerups[config.id] = performance.now() + ms;
+        return ms;
     }
 
     /** Check if snake has a specific power-up active */

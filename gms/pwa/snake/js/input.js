@@ -5,7 +5,11 @@
  *   - touch / mouse: click-and-hold floating joystick, absolute heading
  *   - keyboard: hold Left/Right (or A/D) to rotate, like a classic Asteroids ship
  *
- * Boost: Space, ArrowUp/W, right-click, or the on-screen button.
+ * Boost: Space, ArrowUp/W, right-click, or the on-screen button. It is a
+ * one-shot press, not a hold — the button fires a charged ability now rather
+ * than burning mass for as long as you lean on it.
+ *
+ * Pause: P or Escape.
  *
  * The keyboard integrates a *target* heading rather than driving the snake
  * directly, and that target is clamped to a small window ahead of the snake's
@@ -17,7 +21,9 @@ class Input {
         this.canvas = canvas;
         this.active = false;
         this.angle = 0;
-        this.boosting = false;
+        this.boosting = false;      // bots still use this; the player no longer does
+        this.boostPressed = false;  // one-shot, cleared by consumeBoostPress()
+        this.pausePressed = false;
 
         // Touch state
         this.touchId = null;
@@ -134,8 +140,7 @@ class Input {
             this.source = 'pointer';
             e.preventDefault();
         } else if (e.button === 2) {
-            // Right click: boost
-            this.boosting = true;
+            this.boostPressed = true;
             e.preventDefault();
         }
     }
@@ -158,20 +163,23 @@ class Input {
                 this.joystickCurrent = null;
                 this.active = false;
             }
-        } else if (e.button === 2) {
-            this.boosting = false;
         }
     }
 
     // ======================== KEYBOARD ========================
 
     _onKeyDown(e) {
+        if (e.repeat && (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW')) return;
         switch (e.code) {
             case 'Space':
             case 'ArrowUp':
             case 'KeyW':
-                this.boosting = true;
+                this.boostPressed = true;
                 if (this._inGame()) e.preventDefault();
+                break;
+            case 'KeyP':
+            case 'Escape':
+                this.pausePressed = true;
                 break;
             case 'ArrowLeft':
             case 'KeyA':
@@ -190,11 +198,6 @@ class Input {
 
     _onKeyUp(e) {
         switch (e.code) {
-            case 'Space':
-            case 'ArrowUp':
-            case 'KeyW':
-                this.boosting = false;
-                break;
             case 'ArrowLeft':
             case 'KeyA':
                 this.turnLeft = false;
@@ -247,11 +250,26 @@ class Input {
         return this.angle;
     }
 
+    /** True once per press, so a held key can't fire the ability repeatedly. */
+    consumeBoostPress() {
+        const v = this.boostPressed;
+        this.boostPressed = false;
+        return v;
+    }
+
+    consumePausePress() {
+        const v = this.pausePressed;
+        this.pausePressed = false;
+        return v;
+    }
+
     /** Seed the steering target, so a new run does not inherit the last one. */
     reset(angle) {
         this.angle = angle || 0;
         this.turnLeft = this.turnRight = false;
         this.boosting = false;
+        this.boostPressed = false;
+        this.pausePressed = false;
         this.mouseDown = false;
         this.touchId = null;
         this.joystickPos = null;

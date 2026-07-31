@@ -7,7 +7,10 @@ const Upgrades = {
         const ups = saveData.upgrades;
         return {
             startLength: Math.round(CONFIG.SNAKE_START_LENGTH + Storage.getUpgradeValue('startSize', ups.startSize)),
+            speedLevels: ups.baseSpeed || 0,
+            speedPerLevel: CONFIG.META_UPGRADES.baseSpeed.perLevel,
             speedBonus: Storage.getUpgradeValue('baseSpeed', ups.baseSpeed),
+            boostTimeBonus: Storage.getUpgradeValue('boostTime', ups.boostTime) * 1000,
             magnetRange: Storage.getUpgradeValue('magnetRange', ups.magnetRange),
             boostCostReduction: Storage.getUpgradeValue('boostEff', ups.boostEff),
             coinMultiplier: 1 + Storage.getUpgradeValue('coinBonus', ups.coinBonus)

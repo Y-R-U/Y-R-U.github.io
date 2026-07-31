@@ -1,10 +1,9 @@
 /**
  * Camera - follows player, handles world-to-screen transform
  *
- * Zoom tracks the player's *body radius*, not raw mass. The old formula
- * (ZOOM_MAX - mass * 0.003) bottomed out at about mass 310 and then never
- * changed again, so from there on the snake grew and grew while the view stayed
- * put and you could no longer see your own body.
+ * Zoom comes from the player's LEVEL, in steps, so growing is punctuated rather
+ * than a slow drift you never notice. It still lerps between steps — the point
+ * is that the pull-back happens at a moment, not that it snaps.
  *
  * View bounds are cached and returned as the same object every call. This is
  * read once per segment during rendering — allocating a fresh object each time
@@ -35,14 +34,13 @@ class Camera {
         this._boundsDirty = true;
     }
 
-    /** Follow a target position, zooming out as the snake gets fatter. */
-    follow(targetX, targetY, bodyRadius) {
+    /** Follow a target position at the zoom its level asks for. */
+    follow(targetX, targetY, levelZoom) {
         this.x = Utils.lerp(this.x, targetX, CONFIG.CAMERA_LERP);
         this.y = Utils.lerp(this.y, targetY, CONFIG.CAMERA_LERP);
 
-        const r = Math.max(1, bodyRadius || CONFIG.SNAKE_BODY_RADIUS);
         this.targetZoom = Utils.clamp(
-            CONFIG.CAMERA_ZOOM_RADIUS_REF / r,
+            levelZoom || CONFIG.CAMERA_ZOOM_MAX,
             CONFIG.CAMERA_ZOOM_MIN,
             CONFIG.CAMERA_ZOOM_MAX
         );
@@ -116,8 +114,8 @@ class Camera {
     reset() {
         this.x = 0;
         this.y = 0;
-        this.zoom = CONFIG.CAMERA_ZOOM_MAX;
-        this.targetZoom = CONFIG.CAMERA_ZOOM_MAX;
+        this.zoom = CONFIG.LEVELS[0].zoom;
+        this.targetZoom = this.zoom;
         this.shakeIntensity = 0;
         this._boundsDirty = true;
         this.updateViewSize();

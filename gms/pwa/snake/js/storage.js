@@ -13,9 +13,15 @@ const Storage = {
             upgrades: {
                 startSize: 0,
                 baseSpeed: 0,
+                boostTime: 0,
                 magnetRange: 0,
                 boostEff: 0,
                 coinBonus: 0
+            },
+            ladder: {
+                rating: CONFIG.LADDER_START_RATING,
+                peak: CONFIG.LADDER_START_RATING,
+                bestRank: 0
             },
             stats: {
                 gamesPlayed: 0,
@@ -50,6 +56,7 @@ const Storage = {
                 unlockedSkins: data.unlockedSkins ?? defaults.unlockedSkins,
                 coins: data.coins ?? defaults.coins,
                 upgrades: { ...defaults.upgrades, ...(data.upgrades || {}) },
+                ladder: { ...defaults.ladder, ...(data.ladder || {}) },
                 stats: { ...defaults.stats, ...(data.stats || {}) },
                 settings: { ...defaults.settings, ...(data.settings || {}) }
             };
@@ -73,6 +80,37 @@ const Storage = {
         fn(data);
         this.save(data);
         return data;
+    },
+
+    /**
+     * The in-progress run, in its own key — the one thing here that must never
+     * join the account sync. A half-played arena restored on another device is
+     * nobody's progress. cloud.js lists only `snakeio_save` for this reason.
+     */
+    saveRun(run) {
+        try {
+            localStorage.setItem(CONFIG.RESUME_KEY, JSON.stringify({ ...run, savedAt: Date.now() }));
+        } catch (e) { /* private mode; the run just won't survive a reload */ }
+    },
+
+    loadRun() {
+        try {
+            const raw = localStorage.getItem(CONFIG.RESUME_KEY);
+            if (!raw) return null;
+            const run = JSON.parse(raw);
+            if (!run || !run.player) return null;
+            if (Date.now() - (run.savedAt || 0) > CONFIG.RESUME_MAX_AGE_MS) {
+                this.clearRun();
+                return null;
+            }
+            return run;
+        } catch (e) {
+            return null;
+        }
+    },
+
+    clearRun() {
+        try { localStorage.removeItem(CONFIG.RESUME_KEY); } catch (e) { /* nothing to do */ }
     },
 
     /** Get upgrade cost for a specific upgrade at current level */

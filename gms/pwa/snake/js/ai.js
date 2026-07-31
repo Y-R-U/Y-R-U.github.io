@@ -477,25 +477,33 @@ class AI {
      * lobby always contains a credible rival. Fixed 8-25 mass bots made the late
      * game an empty grind with nothing worth eating.
      */
-    static createBot(userData, leaderMass) {
+    /**
+     * Spawn a bot. `rival` makes it one of the session's regulars: fixed name,
+     * bigger spawn, and the caller's `rival.bonusSpeed`.
+     */
+    static createBot(userData, leaderMass, rival) {
         const skinIndex = Utils.randInt(0, CONFIG.SKINS.length - 1);
         const skin = CONFIG.SKINS[skinIndex];
-        const name = Utils.randPick(CONFIG.BOT_NAMES) + Utils.randInt(1, 99);
+        const name = rival ? rival.name : Utils.randPick(CONFIG.BOT_NAMES) + Utils.randInt(1, 99);
 
         const base = Utils.randInt(CONFIG.BOT_SPAWN_BASE_MIN, CONFIG.BOT_SPAWN_BASE_MAX);
         const lead = Math.max(0, leaderMass || 0);
         const share = lead * Utils.rand(CONFIG.BOT_RIVAL_FRACTION_MIN, CONFIG.BOT_RIVAL_FRACTION_MAX);
+        const mult = rival ? CONFIG.RIVAL_MASS_BONUS : 1;
         const startLength = Utils.clamp(
-            Math.round(base + share),
+            Math.round((base + share) * mult),
             CONFIG.BOT_SPAWN_BASE_MIN,
-            Math.max(CONFIG.BOT_SPAWN_BASE_MAX, Math.round(lead * CONFIG.BOT_RIVAL_CAP))
+            Math.max(CONFIG.BOT_SPAWN_BASE_MAX, Math.round(lead * CONFIG.BOT_RIVAL_CAP * mult))
         );
 
-        return new Snake({
+        const snake = new Snake({
             name: name,
             skinId: skin.id,
             isPlayer: false,
-            startLength: startLength
+            startLength: startLength,
+            bonusSpeed: rival ? rival.bonusSpeed || 0 : 0
         });
+        if (rival) snake.rivalName = rival.name;
+        return snake;
     }
 }

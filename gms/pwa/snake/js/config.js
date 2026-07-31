@@ -18,6 +18,7 @@ const CONFIG = {
     SNAKE_START_LENGTH: 10,          // starting mass
     SNAKE_BASE_SPEED: 3,
     SNAKE_BOOST_SPEED: 6,
+    SNAKE_MAX_SPEED: 5.6,            // hard ceiling; boost and Speed still beat it
     SNAKE_MAX_TURN_RATE: 7.2,        // radians per second at minimum size
     SNAKE_HEAD_RADIUS: 10,
     SNAKE_HEAD_RADIUS_BONUS: 1.15,   // head is a little fatter than the body
@@ -122,6 +123,18 @@ const CONFIG = {
         { p: 0.70, w: [ 22, 44, 29,  5] },
         { p: 1.00, w: [ 10, 34, 41, 15] }
     ],
+    // Regulars. Most of the arena is nobodies who move at the standard speed —
+    // if everyone matched the speed you bought, the upgrade would buy you a
+    // harder game and nothing else. Only these few carry any of it, never all
+    // of it, and they keep their names for the whole session so you learn who
+    // is worth watching.
+    RIVAL_MIN: 1,
+    RIVAL_MAX: 4,
+    RIVAL_SPEED_SHARE: [0.85, 0.60, 0.42, 0.28],   // of the speed the player has bought
+    RIVAL_TIER_MIN: 2,               // rivals are drawn from 'smart' upward
+    RIVAL_MASS_BONUS: 1.5,           // they spawn bigger, so they are visibly doing well
+    RIVAL_SESSION_KEY: 'snakeio_rivals',
+
     AI_PRESSURE_GAMES: 40,           // games played for the ramp to reach full
     AI_RINGER_CHANCE: 0.28,          // chance (× pressure) that one bot is a ringer
     AI_CIRCLE_TURNS: 2.2,            // net rotations before an anti-circle bot breaks out
@@ -129,14 +142,35 @@ const CONFIG = {
     AI_CIRCLE_ESCAPE_MS: 1600,       // how long it runs straight to escape
     AI_AVOID_MARGIN: 24,             // extra clearance a bot wants around obstacles
 
-    // Camera. Zoom tracks body radius rather than raw mass — the old formula
-    // bottomed out at mass ~310 and then never changed again, so from there on
-    // you could not see your own snake.
+    // Growth levels. The camera steps back at each one rather than drifting
+    // out on a smooth curve, so growing is something that happens rather than
+    // something you notice later.
+    //
+    // The speed step matters because what you feel is speed × zoom: at level 1
+    // that is 3 × 1.20, and a level-9 snake without it would be 3 × 0.34.
+    LEVELS: [
+        { mass: 0,    zoom: 1.20 },
+        { mass: 60,   zoom: 1.02 },
+        { mass: 180,  zoom: 0.88 },
+        { mass: 420,  zoom: 0.76 },
+        { mass: 900,  zoom: 0.65 },
+        { mass: 1700, zoom: 0.56 },
+        { mass: 3000, zoom: 0.47 },
+        { mass: 5200, zoom: 0.40 },
+        { mass: 8000, zoom: 0.34 }
+    ],
+    LEVEL_SPEED_STEP: 0.13,          // the player only — see RIVAL_SPEED_SHARE
+
+    // Bought speed is rationed at the start of a run: the first few levels
+    // apply immediately and the rest unlock one per level-up. A fully upgraded
+    // player is fast, but has to grow into it rather than opening at top speed.
+    SPEED_START_LEVEL_CAP: 3,
+
+    // Camera
     CAMERA_LERP: 0.08,
     CAMERA_ZOOM_MIN: 0.20,
     CAMERA_ZOOM_MAX: 1.2,
     CAMERA_ZOOM_LERP: 0.03,
-    CAMERA_ZOOM_RADIUS_REF: 10,      // zoom = REF / bodyRadius, clamped
 
     // Rendering
     BG_COLOR: '#0a0e1a',
@@ -147,14 +181,23 @@ const CONFIG = {
     RENDER_OUTLINE_MIN_RADIUS: 3.5,  // below this on-screen radius, skip the outline pass
     NAME_TAG_MIN_ZOOM: 0.28,
 
-    // Power-up types
+    // Power-up types. Durations are what a *collected* power-up gives you,
+    // before the Boost Duration upgrade adds to them.
     POWERUP_TYPES: {
-        MAGNET:    { id: 'magnet',    duration: 20000, color: '#ff44ff', icon: '🧲', name: 'Magnet',    desc: 'Attract nearby food' },
-        SHIELD:    { id: 'shield',    duration: 8000,  color: '#44aaff', icon: '🛡️', name: 'Shield',    desc: 'Survive one collision' },
-        SPEED:     { id: 'speed',     duration: 15000, color: '#ffff44', icon: '⚡', name: 'Speed',     desc: 'Move faster, no mass cost' },
-        DOUBLE:    { id: 'double',    duration: 20000, color: '#44ff44', icon: '✕2', name: '2x Growth', desc: 'Double food value' }
+        MAGNET:    { id: 'magnet',    duration: 40000, color: '#ff44ff', icon: '🧲', name: 'Magnet',    desc: 'Attract nearby food' },
+        SHIELD:    { id: 'shield',    duration: 16000, color: '#44aaff', icon: '🛡️', name: 'Shield',    desc: 'Survive one collision' },
+        SPEED:     { id: 'speed',     duration: 60000, color: '#ffff44', icon: '⚡', name: 'Speed',     desc: 'Move faster, no mass cost' },
+        DOUBLE:    { id: 'double',    duration: 40000, color: '#44ff44', icon: '✕2', name: '2x Growth', desc: 'Double food value' }
     },
     SHIELD_GRACE_MS: 700,            // brief invulnerability after a shield absorbs a hit
+
+    // The BOOST button. Burning mass for a speed nudge was never worth pressing,
+    // so the button is a charged ability instead: when it is lit, it rolls one
+    // of the four power-ups and gives it to you for a shorter run than a
+    // collected one — free, repeatable, but only once a minute.
+    BOOST_ABILITY_MS: 30000,
+    BOOST_RECHARGE_MS: 60000,
+    BOOST_STARTS_READY: true,
 
     // Scoring
     COINS_PER_MASS_DIVISOR: 20,   // 1 coin per 20 mass
@@ -182,11 +225,34 @@ const CONFIG = {
     // saved up, and maxing the whole board is a few hundred runs.
     META_UPGRADES: {
         startSize:    { name: 'Starting Size',     maxLevel: 20, baseCost: 20,  costScale: 1.45, perLevel: 3,    unit: 'mass',       fmt: 'plus' },
-        baseSpeed:    { name: 'Base Speed',        maxLevel: 12, baseCost: 60,  costScale: 1.72, perLevel: 0.05, unit: 'speed',      fmt: 'plus2' },
+        baseSpeed:    { name: 'Base Speed',        maxLevel: 12, baseCost: 60,  costScale: 1.72, perLevel: 0.12, unit: 'speed',      fmt: 'plus2' },
+        boostTime:    { name: 'Boost Duration',    maxLevel: 10, baseCost: 80,  costScale: 1.42, perLevel: 5,    unit: 'seconds',    fmt: 'plus' },
         magnetRange:  { name: 'Magnet Range',      maxLevel: 20, baseCost: 40,  costScale: 1.38, perLevel: 15,   unit: 'px',         fmt: 'plus' },
         boostEff:     { name: 'Boost Efficiency',  maxLevel: 15, baseCost: 70,  costScale: 1.46, perLevel: 0.03, unit: 'cheaper',    fmt: 'pct' },
         coinBonus:    { name: 'Coin Bonus',        maxLevel: 15, baseCost: 100, costScale: 1.50, perLevel: 0.06, unit: 'more coins', fmt: 'pct' }
     },
+
+    // The ladder. A run that ends in a win climbs it, a run that ends badly
+    // slides back down, and a decent death roughly holds station — see
+    // Ladder.delta for the numbers.
+    LADDER_START_RATING: 1000,
+    LADDER_MIN_RATING: 0,
+    LADDER_WIN_GAIN: 150,
+    LADDER_MASS_PAR: 2500,           // die above this and you still gain
+    LADDER_MASS_DIV: 100,            // mass per point either side of par
+    LADDER_KILL_POINTS: 3,
+    LADDER_MAX_GAIN: 90,             // on a run that ended in death
+    LADDER_MAX_LOSS: 40,
+    LADDER_RIVALS: 60,
+    LADDER_DRIFT: 90,                // how far a rival's rating wanders per day
+
+    // Resume. The run is written to its own local slot every RESUME_SAVE_MS so a
+    // reload — accidental or otherwise — does not throw the run away. It is
+    // never synced to the account: a half-played arena restored on another
+    // device is nobody's idea of progress.
+    RESUME_KEY: 'snakeio_resume',
+    RESUME_SAVE_MS: 2000,
+    RESUME_MAX_AGE_MS: 45 * 60 * 1000,
 
     // Bot names
     BOT_NAMES: [

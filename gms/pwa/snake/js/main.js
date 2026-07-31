@@ -14,6 +14,7 @@ class Game {
         this.ai = new AI(this.collision);
 
         this.state = 'menu'; // menu, playing, dead, won
+        this.paused = false;
         this.player = null;
         this.snakes = [];
         this.gameStartTime = 0;
@@ -24,6 +25,12 @@ class Game {
         this.resolved = false;   // this run has already ended in a death or a win
         this._eatenIndices = new Set();
         this._puIndices = new Set();
+
+        this.rivalRoster = [];
+        this.playerLevel = 1;
+        this.boostReadyAt = 0;   // performance.now() at which the ability recharges
+        this._lastRunSave = 0;
+        this._boostBtnState = '';
 
         this.saveData = Storage.load();
 
@@ -118,26 +125,72 @@ class Game {
             this.state = 'menu';
         });
 
-        // Boost button
+        document.getElementById('ladder-btn')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.playClick();
+            this._showScreen('ladder-screen');
+            this._renderLadder();
+        });
+
+        document.getElementById('resume-btn')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.resume();
+            this.audio.playClick();
+            const run = Storage.loadRun();
+            if (run) this._startGame(run);
+            else this._refreshResumeButton();
+        });
+
         const boostBtn = document.getElementById('boost-btn');
         if (boostBtn) {
-            boostBtn.addEventListener('touchstart', e => {
+            const press = e => {
                 e.preventDefault();
-                this.input.boosting = true;
-                boostBtn.classList.add('active');
-            }, { passive: false });
-            boostBtn.addEventListener('touchend', e => {
-                e.preventDefault();
-                this.input.boosting = false;
-                boostBtn.classList.remove('active');
-            }, { passive: false });
+                this.input.boostPressed = true;
+            };
+            boostBtn.addEventListener('touchstart', press, { passive: false });
+            boostBtn.addEventListener('mousedown', press);
         }
+
+        document.getElementById('pause-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._setPaused(!this.paused);
+        });
+
+        document.getElementById('pause-resume-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._setPaused(false);
+        });
+
+        // The overlay covers the pause button, so tapping the backdrop has to
+        // work as well — otherwise the obvious way back in is the one that fails.
+        document.getElementById('pause-overlay')?.addEventListener('click', e => {
+            if (e.target.id === 'pause-overlay') this._setPaused(false);
+        });
+
+        document.getElementById('pause-quit-btn')?.addEventListener('click', () => {
+            this.audio.playClick();
+            this._quitRun();
+        });
+
+        // Leaving the tab pauses the run rather than letting it die unattended.
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') return;
+            if (this.state === 'playing') {
+                this._saveRun(true);
+                this._setPaused(true);
+            }
+        });
+        window.addEventListener('pagehide', () => {
+            if (this.state === 'playing') this._saveRun(true);
+        });
 
         // Update coins display
         this._updateCoinsDisplay();
 
         // Show menu
         this._showScreen('menu-screen');
+        this._refreshResumeButton();
+        this._renderLadderPreview();
     }
 
     _showScreen(screenId) {
@@ -150,7 +203,11 @@ class Game {
             gameUI.style.display = screenId === 'game-screen' ? 'block' : 'none';
         }
 
-        if (screenId === 'menu-screen' && this.cloud) this.cloud.checkpoint();
+        if (screenId === 'menu-screen') {
+            this._refreshResumeButton();
+            this._renderLadderPreview();
+            if (this.cloud) this.cloud.checkpoint();
+        }
     }
 
     _updateCoinsDisplay() {
@@ -159,7 +216,13 @@ class Game {
         });
     }
 
-    _startGame() {
+    /**
+     * Start a run, or pick a saved one back up. A resumed snake comes back at
+     * its own mass, position and power-ups; the bots do not — they are
+     * strangers, and restoring fifteen of them exactly is a lot of state for
+     * nothing the player would notice.
+     */
+    _startGame(resume) {
         // Save username
         const usernameInput = document.getElementById('username-input');
         if (usernameInput) {
@@ -170,22 +233,36 @@ class Game {
 
         // Get player stats from upgrades
         const stats = Upgrades.getPlayerStats(this.saveData);
+        const saved = resume && resume.player;
 
         // Create player snake
         this.player = new Snake({
             name: this.saveData.username || 'Player',
             isPlayer: true,
             skinId: this.saveData.selectedSkin,
-            startLength: stats.startLength,
-            speedBonus: stats.speedBonus,
+            startLength: saved ? saved.mass : stats.startLength,
+            speedLevels: stats.speedLevels,
+            speedPerLevel: stats.speedPerLevel,
+            levelSpeed: true,
+            boostTimeBonus: stats.boostTimeBonus,
             magnetRange: stats.magnetRange,
-            boostCostReduction: stats.boostCostReduction
+            boostCostReduction: stats.boostCostReduction,
+            position: saved ? { x: saved.x, y: saved.y } : undefined,
+            angle: saved ? saved.angle : undefined
         });
+        if (saved) {
+            this.player.kills = saved.kills || 0;
+            const now = performance.now();
+            for (const [id, left] of Object.entries(saved.powerups || {})) {
+                if (left > 0) this.player.powerups[id] = now + left;
+            }
+        }
 
         // Reset world
         this.world.reset();
         this.particles.clear();
         this.camera.reset();
+        this.camera.zoom = this.camera.targetZoom = this.player.levelZoom;
         // Snap camera to player position immediately
         this.camera.x = this.player.x;
         this.camera.y = this.player.y;
@@ -193,8 +270,14 @@ class Game {
 
         // A fresh AI, with difficulty set from the player's whole career rather
         // than this session — see Storage.aiPressure.
+        const pressure = Storage.aiPressure(this.saveData);
         this.ai = new AI(this.collision);
-        this.ai.setPressure(Storage.aiPressure(this.saveData));
+        this.ai.setPressure(pressure);
+
+        // The regulars: same names all session, and the only bots carrying any
+        // of the speed edge this player has. Their share is worked out when
+        // each one spawns — see _playerSpeedEdge.
+        this.rivalRoster = Rivals.session(this.saveData, pressure).map(r => ({ ...r }));
 
         // Create snakes array and spawn bots
         this.snakes = [this.player];
@@ -202,13 +285,20 @@ class Game {
 
         // Game state
         this.state = 'playing';
+        this.paused = false;
         this.resolved = false;
-        this.gameStartTime = performance.now();
+        this.gameStartTime = performance.now() - (resume ? resume.elapsed || 0 : 0);
         this.lastUpdate = performance.now();
         this.lastEatSound = 0;
+        this.playerLevel = this.player.level;
+        this.boostReadyAt = performance.now() +
+            (resume ? resume.boostIn || 0 : (CONFIG.BOOST_STARTS_READY ? 0 : CONFIG.BOOST_RECHARGE_MS));
+        this._lastRunSave = performance.now();
         this.gameStats = { mass: 0, kills: 0, time: 0 };
 
         this._showScreen('game-screen');
+        this._setPaused(false);
+        this._saveRun(true);
 
         this.audio.resume();
     }
@@ -227,9 +317,29 @@ class Game {
     }
 
     _respawnBot() {
-        const bot = AI.createBot(this.saveData, this._leaderMass());
+        const rival = this._openRivalSlot();
+        if (rival) rival.bonusSpeed = Rivals.speedBonus(rival, this._playerSpeedEdge());
+        const bot = AI.createBot(this.saveData, this._leaderMass(), rival);
         this.snakes.push(bot);
-        this.ai.register(bot);
+        this.ai.register(bot, undefined, rival ? rival.tier : undefined);
+    }
+
+    /**
+     * How much faster than a plain snake the player is right now. A regular
+     * gets a share of *this*, never of what the player has bought, or one could
+     * spawn into a level-1 arena faster than a player who hasn't unlocked it.
+     */
+    _playerSpeedEdge() {
+        if (!this.player) return 0;
+        return Math.max(0, this.player.baseSpeed - CONFIG.SNAKE_BASE_SPEED);
+    }
+
+    /** The first regular who isn't currently in the arena, if any. */
+    _openRivalSlot() {
+        for (const r of this.rivalRoster) {
+            if (!this.snakes.some(s => s.alive && s.rivalName === r.name)) return r;
+        }
+        return null;
     }
 
     /** Main game loop */
@@ -244,6 +354,13 @@ class Game {
             return;
         }
 
+        if (this.input.consumePausePress()) this._setPaused(!this.paused);
+
+        if (this.paused) {
+            this._render();
+            return;
+        }
+
         const now = performance.now();
         const dt = Math.min(now - this.lastUpdate, 50); // Cap at 50ms
         this.lastUpdate = now;
@@ -252,19 +369,110 @@ class Game {
         this._render();
     }
 
+    _setPaused(on) {
+        if (this.state !== 'playing') on = false;
+        this.paused = !!on;
+
+        const overlay = document.getElementById('pause-overlay');
+        if (overlay) overlay.classList.toggle('show', this.paused);
+        const btn = document.getElementById('pause-btn');
+        if (btn) btn.setAttribute('aria-pressed', this.paused ? 'true' : 'false');
+
+        // Resuming after any length of pause must not hand the world one huge
+        // frame — dt is capped, but the clock still has to be re-based.
+        if (!this.paused) this.lastUpdate = performance.now();
+        else this._saveRun(true);
+    }
+
+    /** Leave a run without dying: the run is abandoned, nothing is banked. */
+    _quitRun() {
+        Storage.clearRun();
+        this.state = 'menu';
+        this.paused = false;
+        const overlay = document.getElementById('pause-overlay');
+        if (overlay) overlay.classList.remove('show');
+        this._showScreen('menu-screen');
+    }
+
+    /** The BOOST ability: a free power-up, at random, once a minute. */
+    _fireBoost(now) {
+        if (!this.player || !this.player.alive) return;
+        if (now < this.boostReadyAt) return;
+
+        const types = Object.values(CONFIG.POWERUP_TYPES);
+        const type = Utils.randPick(types);
+        const ms = this.player.applyPowerup(type.id, CONFIG.BOOST_ABILITY_MS);
+        this.boostReadyAt = now + CONFIG.BOOST_RECHARGE_MS;
+
+        this.audio.playPowerup();
+        this.particles.emitPowerup(this.player.x, this.player.y, type.color);
+        this._showPowerupNotification(type, Math.round(ms / 1000) + 's');
+    }
+
+    /** Keep the button's charge readable without writing to the DOM every frame. */
+    _updateBoostButton(now) {
+        const btn = document.getElementById('boost-btn');
+        if (!btn) return;
+        const left = Math.max(0, this.boostReadyAt - now);
+        const ready = left <= 0;
+        const pct = ready ? 100 : Math.round(100 - (left / CONFIG.BOOST_RECHARGE_MS) * 100);
+        const key = ready ? 'ready' : String(Math.round(left / 1000));
+        if (key === this._boostBtnState) return;
+        this._boostBtnState = key;
+
+        btn.classList.toggle('ready', ready);
+        btn.style.setProperty('--charge', pct + '%');
+        btn.textContent = ready ? 'BOOST' : Math.ceil(left / 1000) + 's';
+    }
+
+    /** Write the run to its local slot, at most every RESUME_SAVE_MS. */
+    _saveRun(force) {
+        if (this.state !== 'playing' || !this.player || !this.player.alive || this.resolved) return;
+        const now = performance.now();
+        if (!force && now - this._lastRunSave < CONFIG.RESUME_SAVE_MS) return;
+        this._lastRunSave = now;
+
+        const powerups = {};
+        for (const id in this.player.powerups) {
+            const left = Math.round(this.player.powerups[id] - now);
+            if (left > 0) powerups[id] = left;
+        }
+
+        Storage.saveRun({
+            elapsed: Math.round(now - this.gameStartTime),
+            boostIn: Math.max(0, Math.round(this.boostReadyAt - now)),
+            player: {
+                x: this.player.x,
+                y: this.player.y,
+                angle: this.player.angle,
+                mass: Math.round(this.player.mass),
+                kills: this.player.kills,
+                powerups
+            }
+        });
+    }
+
+    /** Offer to pick up an abandoned run, if there is one worth picking up. */
+    _refreshResumeButton() {
+        const btn = document.getElementById('resume-btn');
+        if (!btn) return;
+        const run = Storage.loadRun();
+        if (!run) {
+            btn.style.display = 'none';
+            return;
+        }
+        btn.style.display = '';
+        const mass = Utils.formatNumber(run.player.mass || 0);
+        btn.innerHTML = `RESUME <small>${mass} mass · ${this._formatTime((run.elapsed || 0) / 1000)}</small>`;
+    }
+
     /** Update game state */
     _update(dt, now) {
         // Update player input
         if (this.player && this.player.alive) {
             const angle = this.input.update(dt, this.player.angle);
             this.player.setTarget(angle);
-            this.player.setBoost(this.input.boosting);
-
-            // Boost sound
-            if (this.player.boosting && now - this.lastBoostSound > 300) {
-                this.lastBoostSound = now;
-                this.audio.playBoost();
-            }
+            if (this.input.consumeBoostPress()) this._fireBoost(now);
         }
 
         // Update AI. The bots read the spatial hashes built at the end of the
@@ -372,13 +580,13 @@ class Game {
         for (const { snake, powerupIndex, powerup } of collected) {
             if (removedPU.has(powerupIndex)) continue;
             removedPU.add(powerupIndex);
-            snake.applyPowerup(powerup.type.id);
+            const ms = snake.applyPowerup(powerup.type.id);
             this.world.removePowerup(powerupIndex);
             this.particles.emitPowerup(powerup.x, powerup.y, powerup.type.color);
 
             if (snake.isPlayer) {
                 this.audio.playPowerup();
-                this._showPowerupNotification(powerup.type);
+                this._showPowerupNotification(powerup.type, Math.round(ms / 1000) + 's');
             }
         }
 
@@ -403,13 +611,36 @@ class Game {
             this.snakes = this.snakes.filter(s => s.alive || s.isPlayer);
         }
 
+        // Levelling up: the camera step, the speed step and the flourish all
+        // happen here, once, on the frame the level actually changes.
+        if (this.player && this.player.alive && this.player.level > this.playerLevel) {
+            this.playerLevel = this.player.level;
+            this._onLevelUp(this.playerLevel);
+        }
+
         // Update camera
         if (this.player && this.player.alive) {
-            this.camera.follow(this.player.x, this.player.y, this.player.bodyRadius);
+            this.camera.follow(this.player.x, this.player.y, this.player.levelZoom);
         }
+
+        this._updateBoostButton(now);
+        this._saveRun(false);
 
         // Update particles
         this.particles.update(dt);
+    }
+
+    _onLevelUp(level) {
+        this.audio.playPowerup();
+        this.particles.emitPowerup(this.player.x, this.player.y, '#ffd700');
+
+        const notif = document.getElementById('powerup-notification');
+        if (!notif) return;
+        notif.innerHTML =
+            `<span style="color:#ffd700">LEVEL ${level}</span><br><small>Faster, and a wider view</small>`;
+        notif.classList.add('show');
+        clearTimeout(this._notifTimer);
+        this._notifTimer = setTimeout(() => notif.classList.remove('show'), 2200);
     }
 
     /** Render everything */
@@ -468,10 +699,16 @@ class Game {
             }
         });
 
+        // The run is over, so the resume slot must go before anything can offer
+        // to pick it back up.
+        Storage.clearRun();
+
+        const ladder = Ladder.apply({ won, mass, kills });
+
         // NB: the account layer is told about the finished run from
         // _runFinishedOnResults(), not here — see the note there.
 
-        return { mass, kills, coins, gameTime, isNewHighScore: mass > previousHighScore };
+        return { mass, kills, coins, gameTime, ladder, isNewHighScore: mass > previousHighScore };
     }
 
     /**
@@ -505,6 +742,7 @@ class Game {
         setTimeout(() => {
             this.state = 'dead';
             this._showDeathScreen(r.mass, r.kills, r.coins, r.gameTime, r.isNewHighScore);
+            this._showLadderMove('death-ladder', r.ladder);
         }, 1500);
     }
 
@@ -521,6 +759,7 @@ class Game {
         setTimeout(() => {
             this.state = 'won';
             this._showWinScreen(r.mass, r.kills, r.coins, r.gameTime);
+            this._showLadderMove('win-ladder', r.ladder);
         }, 1400);
     }
 
@@ -567,18 +806,81 @@ class Game {
         this._runFinishedOnResults('death-screen');
     }
 
-    _showPowerupNotification(type) {
+    _showPowerupNotification(type, note) {
         const notif = document.getElementById('powerup-notification');
         if (!notif) return;
-        notif.innerHTML = `<span style="color:${type.color}">${type.icon} ${type.name}</span><br><small>${type.desc}</small>`;
+        notif.innerHTML = `<span style="color:${type.color}">${type.icon} ${type.name}</span><br>` +
+            `<small>${type.desc}${note ? ' · ' + note : ''}</small>`;
         notif.classList.add('show');
-        setTimeout(() => notif.classList.remove('show'), 2000);
+        clearTimeout(this._notifTimer);
+        this._notifTimer = setTimeout(() => notif.classList.remove('show'), 2000);
     }
 
     _formatTime(seconds) {
         const m = Math.floor(seconds / 60);
         const s = Math.floor(seconds % 60);
         return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    /** What the run did to the player's ladder position, on a results screen. */
+    _showLadderMove(elId, move) {
+        const el = document.getElementById(elId);
+        if (!el || !move) return;
+        const up = move.delta >= 0;
+        const moved = move.climbed;
+        const movement = moved > 0 ? `up ${moved}` : moved < 0 ? `down ${-moved}` : 'holding';
+        el.className = 'ladder-move ' + (up ? 'up' : 'down');
+        el.innerHTML =
+            `<span class="ladder-move-pts">${up ? '+' : ''}${move.delta}</span>` +
+            `<span class="ladder-move-rank">Rank ${move.rank} of ${Ladder.size()} · ${movement}</span>`;
+    }
+
+    /** The few rows either side of the player, for the menu. */
+    _renderLadderPreview() {
+        const box = document.getElementById('ladder-preview');
+        if (!box) return;
+
+        this.saveData = Storage.load();
+        const rows = Ladder.board(this.saveData);
+        const me = rows.findIndex(r => r.isPlayer);
+        const from = Utils.clamp(me - 1, 0, Math.max(0, rows.length - 3));
+        const slice = rows.slice(from, from + 3);
+
+        box.innerHTML =
+            `<div class="ladder-head">GLOBAL LADDER<span>#${me + 1} of ${rows.length}</span></div>` +
+            slice.map((r, i) => `
+                <div class="ladder-row ${r.isPlayer ? 'me' : ''}">
+                    <span class="ladder-pos">${from + i + 1}</span>
+                    <span class="ladder-name">${Utils.escapeHtml(r.name)}</span>
+                    <span class="ladder-rating">${r.rating}</span>
+                </div>`).join('');
+    }
+
+    /** The whole table. */
+    _renderLadder() {
+        const list = document.getElementById('ladder-list');
+        if (!list) return;
+
+        this.saveData = Storage.load();
+        const rows = Ladder.board(this.saveData);
+        const state = Ladder.state(this.saveData);
+        const me = rows.findIndex(r => r.isPlayer) + 1;
+
+        const note = document.getElementById('ladder-note');
+        if (note) {
+            note.textContent = `Rating ${state.rating} · best rank ${state.bestRank || me}. ` +
+                'Win a run to climb; a short run drops you back.';
+        }
+
+        list.innerHTML = rows.map((r, i) => `
+            <div class="ladder-row ${r.isPlayer ? 'me' : ''}">
+                <span class="ladder-pos">${i + 1}</span>
+                <span class="ladder-name">${Utils.escapeHtml(r.name)}</span>
+                <span class="ladder-rating">${r.rating}</span>
+            </div>`).join('');
+
+        const mine = list.querySelector('.ladder-row.me');
+        if (mine) mine.scrollIntoView({ block: 'center' });
     }
 
     /** Render upgrades screen */

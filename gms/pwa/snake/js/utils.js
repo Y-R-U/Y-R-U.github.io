@@ -32,6 +32,13 @@ const Utils = {
         return a + (b - a) * t;
     },
 
+    /** Player-chosen names end up in innerHTML on the ladder. */
+    escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+        ));
+    },
+
     /** Clamp value between min and max */
     clamp(v, min, max) {
         return v < min ? min : v > max ? max : v;

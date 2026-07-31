@@ -375,6 +375,13 @@ class Renderer {
             ctx.font = '12px sans-serif';
             ctx.fillText('MASS', this.width / 2, 44);
 
+            // Below the pause button, which owns the top-left corner.
+            ctx.fillStyle = 'rgba(255,215,0,0.75)';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('LV ' + playerSnake.level, 16, 66);
+            ctx.textAlign = 'center';
+
             this._drawGoal(playerSnake.mass);
         }
 
