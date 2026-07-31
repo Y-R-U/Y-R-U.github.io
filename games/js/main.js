@@ -24,7 +24,8 @@ grid.innerHTML = GAMES.map(g => {
 }).join("");
 
 // The hub has no progress of its own — no gameId, so no save wiring, just the
-// avatar and the sign-in panel.
+// avatar and the sign-in panel. It is also the front door, and nothing here is
+// ever mid-match, so the nudge is always welcome.
 import("/lib/auth/ui.js")
-  .then(m => m.mountAccount({}))
+  .then(m => m.mountAccount({ nudge: "callout", canPester: () => true }))
   .catch(e => console.warn("[hub] account layer unavailable", e));

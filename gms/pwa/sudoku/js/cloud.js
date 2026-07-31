@@ -56,7 +56,23 @@ export function describe(s) {
   return out;
 }
 
-export const cloud = syncLocalKeys({ gameId: GAME_ID, keys: KEYS, describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+//
+// Sudoku is the exception to "menus and results screens only": it has neither.
+// The grid is up from the first frame to the last, so a rule that waited for a
+// menu would mean this game never asks at all. A pill in the far corner of a
+// still board is not an interruption — the one moment that is, is choosing a
+// digit, so that's the only thing we hold off for.
+function canPester() {
+  const popup = document.getElementById("popup");
+  return !popup || !popup.classList.contains("active");
+}
+
+export const cloud = syncLocalKeys({
+  gameId: GAME_ID, keys: KEYS, describe,
+  nudge: "callout",
+  canPester,
+});
 
 /** Called from the win message — never mid-puzzle. */
 export function puzzleFinished() {

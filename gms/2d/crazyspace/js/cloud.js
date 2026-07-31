@@ -63,7 +63,21 @@ export function describe(s) {
   return out;
 }
 
-export const cloud = syncLocalKeys({ gameId: GAME_ID, keys: KEYS, describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+// `app.scene` is 'menu' between matches; in a match, the pause card and the
+// results board are both moments the player is reading rather than flying.
+function canPester() {
+  const cs = window.__crazyspace;
+  if (!cs || !cs.app) return false;
+  const app = cs.app;
+  return app.scene !== 'game' || app.paused || app.resultsShown;
+}
+
+export const cloud = syncLocalKeys({
+  gameId: GAME_ID, keys: KEYS, describe,
+  nudge: 'callout',
+  canPester,
+});
 
 /** Called from the results screen — once per finished match, never mid-match. */
 export function matchFinished() {

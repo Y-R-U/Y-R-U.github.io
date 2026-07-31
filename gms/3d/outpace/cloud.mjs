@@ -60,7 +60,23 @@ export function describe(s) {
   return out;
 }
 
-export const cloud = syncLocalKeys({ gameId: GAME_ID, keys: KEYS, describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+// Flying is the only thing we don't interrupt: the title menu, the results card
+// and the station lounge are all screens the player is reading.
+const SAFE = ["menu", "result", "station"];
+
+function canPester() {
+  return SAFE.some((id) => {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains("hidden");
+  });
+}
+
+export const cloud = syncLocalKeys({
+  gameId: GAME_ID, keys: KEYS, describe,
+  nudge: "callout",
+  canPester,
+});
 
 /** Called once per finished run, from the results screen / dock — never mid-flight. */
 export function runFinished() {

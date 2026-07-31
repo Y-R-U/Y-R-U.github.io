@@ -8,6 +8,7 @@
 
 import { syncLocalKeys } from "/lib/auth/localsync.js";
 import { CAREER_KEY, SETTINGS_KEY, MODES, nemesis } from "./career.js";
+import { state } from "./state.js";
 
 const GAME_ID = "murderroyale";
 
@@ -47,11 +48,22 @@ export function describe(parsed) {
   return out;
 }
 
-export const cloud = syncLocalKeys({ gameId: GAME_ID, keys: KEYS, describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+// 'title' is the menu and 'over' is the results board; the rest is the match,
+// spectating included — the player is still watching their own killer.
+function canPester() {
+  return state.phase === "title" || state.phase === "over";
+}
+
+export const cloud = syncLocalKeys({
+  gameId: GAME_ID, keys: KEYS, describe,
+  nudge: "callout",
+  canPester,
+});
 
 /**
- * Called once from the results screen — never mid-match. Counts matches for the
- * one-time "sign in so you don't lose this" prompt.
+ * Called once from the results screen — never mid-match. Counts matches towards
+ * the sign-in nudge.
  */
 export function matchFinished() {
   try { cloud.matchCompleted(); } catch (e) { /* never block the results screen */ }

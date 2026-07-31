@@ -13,8 +13,15 @@ import { SAVE_KEY, NAME_KEY } from './config.js';
 import { MISSIONS } from './missions.js';
 import { rankFromBP } from './arsenal.js';
 import { syncLocalKeys } from '/lib/auth/localsync.js';
+import { state } from './state.js';
 
 const GAME_ID = 'ironhail';
+
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+// Anything but a live battle is a shell screen and safe to nudge on.
+function canPester() {
+  return state.screen !== 'battle';
+}
 
 // Shown when the player has to choose between two saves, so it lists the things
 // that actually hurt to lose.
@@ -35,10 +42,15 @@ function describe(keys) {
   return out;
 }
 
-const sync = syncLocalKeys({ gameId: GAME_ID, keys: [SAVE_KEY, NAME_KEY], describe });
+const sync = syncLocalKeys({
+  gameId: GAME_ID,
+  keys: [SAVE_KEY, NAME_KEY],
+  describe,
+  nudge: 'callout',
+  canPester,
+});
 
-// Called from the results panel — counts finished missions and shows the
-// one-time "sign in to keep this" prompt on the third.
+// Called from the results panel — counts finished missions towards the nudge.
 export function missionFinished() {
   try { sync.matchCompleted(); } catch (e) { /* never block the results screen */ }
 }

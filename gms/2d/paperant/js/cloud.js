@@ -43,7 +43,20 @@ export function describe(s) {
   return out;
 }
 
-export const cloud = syncLocalKeys({ gameId: GAME_ID, keys: KEYS, describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing.
+// Playing a level means no screen is up at all; the settings and quit overlays
+// can appear over one, so they don't count as being out of a level either.
+function canPester() {
+  const active = document.querySelector(".screen.active");
+  if (!active) return false;
+  return active.id !== "settings-screen" && active.id !== "quit-confirm-screen";
+}
+
+export const cloud = syncLocalKeys({
+  gameId: GAME_ID, keys: KEYS, describe,
+  nudge: "callout",
+  canPester,
+});
 
 /** Called from the level-complete screen — never mid-level. */
 export function levelFinished() {

@@ -52,13 +52,30 @@ resolves identically on games.br8t.com and on GitHub Pages.
 
 ### Wiring a new game (the whole job)
 
-1. `js/cloud.js` in the game folder calling `syncLocalKeys({ gameId, keys, describe })`.
+1. `js/cloud.js` in the game folder calling
+   `syncLocalKeys({ gameId, keys, describe, nudge: "callout", canPester })`.
 2. Dynamic `import().then().catch()` from the game's entry module, so the game
    still runs when the account layer can't load. Skip it under the game's own
    test/soak flags.
 3. `matchCompleted()` once per completed match/level, on the results screen.
 4. Shift any top-right furniture with `calc(… + var(--br8t-account-space, 0px))`.
 5. Add the path to `GAMES` in `games/deploy.sh`, and flip `soon` in `games/js/games.js`.
+
+### The sign-in nudge
+
+Every game on the hub uses the non-blocking callout pill: first visit, then 3
+games later, then every 5, plus once whenever the player comes back after an
+hour away. The count is shared across games on the origin (`br8t_pester`).
+
+**`canPester` is the whole per-game job.** The layer watches on a timer for a
+moment when it returns true and puts the pill up then, so a game cannot forget
+to ask — an earlier design needed every menu to call `checkpoint()`, one game
+did not, and Aaron played a long session without ever seeing a nudge.
+`checkpoint()` still exists and only skips the wait.
+
+Make `canPester` false for anything the player is actively playing, and true for
+menus and results screens. Sudoku is the deliberate exception: it has neither, so
+its rule is only "not while the digit popup is open".
 
 ### The dailies rule (applies to EVERY game with a daily)
 
@@ -135,12 +152,10 @@ deliberately not used — it prompts in Firefox and Safari ignores it.
 
 ## State of play
 
-**Live:** the hub, and **Racketeer** fully wired (cloud saves, third-match
-prompt, avatar clear of the money chip). Rules deployed and verified, including
-that one player cannot read or write another's document.
-
-**In flight (2026-07-29):** Ironhail, Hexpire, Grudge Bugs, Sunday League and
-Paper Ant being wired to the account layer, one agent per game.
+**Live:** the hub and eleven games — Racketeer, Ironhail, Hexpire, Grudge Bugs,
+Sunday League, Paper Ant, Sudoku, Snake-eee, Crazy Space, Murder Royale and
+Outpace. All of them carry cloud saves and the callout nudge. Rules deployed and
+verified, including that one player cannot read or write another's document.
 
 **Deliberately not on the hub yet:** Prism Break, Towered, Hotwire — they want
 more play testing first. Voidcast stays as a "coming soon" card.

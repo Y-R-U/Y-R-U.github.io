@@ -61,6 +61,10 @@ export function initCloud(app) {
     getLocal: () => App.save,
     applyRemote: adopt,
     describe,
+    nudge: "callout",
+    // A live match is the one thing we never interrupt. App.match is cleared in
+    // onMatchOver before the results screen goes up, so results count as a menu.
+    canPester: () => !App || !App.match,
   });
 
   // Every career.persist() also goes to the cloud (debounced inside cloud.js).
@@ -83,8 +87,7 @@ export function initCloud(app) {
   });
 }
 
-// Called from the results screen — counts matches and shows the one-time
-// "sign in to keep this" prompt on the third.
+// Called from the results screen — counts matches towards the sign-in nudge.
 export function matchFinished() {
   try { matchCompleted(GAME_ID); } catch (e) { /* never block the results screen */ }
 }

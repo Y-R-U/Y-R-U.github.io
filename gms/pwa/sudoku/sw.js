@@ -10,7 +10,7 @@
 // able to reach players on their next load — while images and audio, which are
 // immutable in practice, are cache-first.
 
-const CACHE_NAME = 'sudoku-v5';
+const CACHE_NAME = 'sudoku-v6';
 const APP_SHELL = [
   './',
   './index.html',

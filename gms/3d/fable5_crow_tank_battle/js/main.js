@@ -260,7 +260,7 @@ function bankMatch(won) {
     name: p.name,
   });
   ui.updateCareerStrip(summary.career, summary.mode.id);
-  // One nudge per player, on their third match — shown by the account layer.
+  // Counts the match towards the sign-in nudge; the account layer picks when.
   if (cloudApi && cloudApi.matchFinished) cloudApi.matchFinished();
   return summary;
 }

@@ -44,14 +44,23 @@ function describe(keys) {
 
 // WORLDCUP_KEY carries an in-progress World Cup bracket — a competition spanning
 // several matches, so it travels. A live match never does; none is ever stored.
+// The layer's veto on the sign-in nudge, checked at the moment of showing. The
+// menu's attract-mode demo (app.demo) is not a match and is fine to nudge over;
+// a real one is not, until full time sets `finished`.
+function canPester() {
+  const app = window.__game;
+  return !app || !app.match || !!app.match.finished;
+}
+
 const sync = syncLocalKeys({
   gameId: GAME_ID,
   keys: [SAVE_KEY, SETTINGS_KEY, WORLDCUP_KEY],
   describe,
+  nudge: 'callout',
+  canPester,
 });
 
-// Called from the full-time screen — counts completed matches and shows the
-// one-time "sign in to keep this" prompt on the third.
+// Called from the full-time screen — counts matches towards the sign-in nudge.
 export function matchFinished() {
   try { sync.matchCompleted(); } catch (e) { /* never block the results screen */ }
 }

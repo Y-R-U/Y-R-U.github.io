@@ -33,10 +33,22 @@ function describe(parsed) {
   return out;
 }
 
-const sync = syncLocalKeys({ gameId: GAME_ID, keys: [SAVE_KEY], describe });
+// The layer's veto on the sign-in nudge, checked at the moment of showing. The
+// HUD is up for the whole battle and comes down before the results modal, so
+// that plus "not mid-cutscene" leaves only the menu and the results.
+function canPester() {
+  const hud = document.getElementById("hud");
+  if (hud && !hud.classList.contains("hidden")) return false;
+  return (window.__game && window.__game.mode) !== "cutscene";
+}
 
-// Called from the results screen — counts battles and shows the one-time
-// "sign in to keep this" prompt on the third.
+const sync = syncLocalKeys({
+  gameId: GAME_ID, keys: [SAVE_KEY], describe,
+  nudge: "callout",
+  canPester,
+});
+
+// Called from the results screen — counts battles towards the sign-in nudge.
 export function battleFinished() {
   try { sync.matchCompleted(); } catch (e) { /* never block the results screen */ }
 }

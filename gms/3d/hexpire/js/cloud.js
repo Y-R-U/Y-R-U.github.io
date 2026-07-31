@@ -26,14 +26,24 @@ function describe(k) {
   return out;
 }
 
+// The layer's veto on the sign-in nudge, checked at the moment of showing. The
+// HUD is up for exactly as long as a board is in play — including the result
+// modal, which is fine to wait through, because the count is already banked and
+// the pill goes up the moment they are back at the menu.
+function canPester() {
+  const hud = document.getElementById("hud");
+  return !hud || hud.classList.contains("hidden");
+}
+
 const sync = syncLocalKeys({
   gameId: GAME_ID,
   keys: ["hexpire.settings", "hexpire.progress", "hexpire.customs"],
   describe,
+  nudge: "callout",
+  canPester,
 });
 
-// Counts finished matches for the one-time "sign in to save your progress"
-// prompt. Must never be called mid-match.
+// Counts finished matches towards the sign-in nudge. Never call mid-match.
 export function matchFinished() {
   try { sync.matchCompleted(); } catch (e) { /* never block the result modal */ }
 }
