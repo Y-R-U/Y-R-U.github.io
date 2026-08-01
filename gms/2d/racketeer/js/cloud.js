@@ -107,8 +107,9 @@ export function initCloud(app) {
       theirsPlayed: played(remote.data),
     });
     reconciled = true;
-    if (verdict === "adopt") { held = false; adopt(remote.data); return; }
+    if (verdict === "adopt") { held = false; cloud.markSynced(GAME_ID); adopt(remote.data); return; }
     if (verdict === "push" || held) slot.save(App.save);
+    else cloud.markSynced(GAME_ID);      // already identical: the account has this
     held = false;
     // "keep" with nothing held means it's the same save. Do nothing at all.
   });
