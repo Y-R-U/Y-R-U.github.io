@@ -23,6 +23,14 @@ export function newSave() {
   };
 }
 
+// savedAt of the save as it was found on disk at startup, and 0 when there was
+// nothing to find. persist() rewrites save.savedAt on its way to the menu, so by
+// the time the cloud layer finishes loading, App.save.savedAt says "a moment
+// ago" even on a device that has never been played. The cloud layer must compare
+// against this instead — see loadedStamp() below.
+let loadedAt = 0;
+export function loadedStamp() { return loadedAt; }
+
 export function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -30,9 +38,11 @@ export function load() {
       const s = Object.assign(newSave(), JSON.parse(raw));
       // Older saves could equip the umpire argument; it no longer costs a slot.
       s.loadout = s.loadout.filter(takesSlot).slice(0, skillSlots(s));
+      loadedAt = s.savedAt || 0;
       return s;
     }
   } catch (e) { /* corrupted save -> fresh */ }
+  loadedAt = 0;
   return newSave();
 }
 

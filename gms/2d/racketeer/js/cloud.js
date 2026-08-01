@@ -8,6 +8,7 @@
 import { SAVE_KEY } from "./const.js";
 import * as career from "./career.js";
 import { mountAccount, matchCompleted, auth, cloud } from "/lib/auth/ui.js";
+import { pickSave } from "/lib/auth/cloud.js";
 
 const GAME_ID = "racketeer";
 const slot = cloud.game(GAME_ID);
@@ -53,6 +54,17 @@ function describe(save) {
   return out;
 }
 
+// Has anyone actually played this save, or is it the blank one every fresh
+// device builds on its way to the menu? An unplayed save is never allowed to win
+// a comparison, in either direction — a first visit on the desktop once pushed
+// story 1 / 0 wins over a level 19 career on the phone, because the blank save
+// was, quite truthfully, the more recent of the two.
+function played(s) {
+  if (!s) return false;
+  return (s.wins || 0) > 0 || (s.losses || 0) > 0 || (s.story || 1) > 1 ||
+         (s.money || 0) > 0 || !!s.storyDone || (s.tier || 0) > 0;
+}
+
 export function initCloud(app) {
   App = app;
 
@@ -67,23 +79,38 @@ export function initCloud(app) {
     canPester: () => !App || !App.match,
   });
 
-  // Every career.persist() also goes to the cloud (debounced inside cloud.js).
-  career.setSyncHook(save => slot.save(save));
+  // Every career.persist() also goes to the cloud (debounced inside cloud.js) —
+  // but not one byte leaves this device until the boot reconcile below has
+  // decided who wins. The game persists on its way to the menu, and an unheld
+  // push races the reconcile's own read: the blank save lands in the account
+  // before we have looked at what was in it. Anything saved while we wait goes
+  // up once the local save is confirmed the winner, or is dropped because we are
+  // adopting and about to reload anyway.
+  let reconciled = false, held = false;
+  career.setSyncHook(save => { if (reconciled) slot.save(save); else held = true; });
 
-  // On boot, whichever save was written last wins. Never compare the objects
-  // themselves: career.load() merges newSave() defaults into whatever it read,
-  // so a save that round-tripped through the cloud comes back with different
-  // key order and possibly extra keys, and byte equality reports a difference
-  // that isn't there.
+  // On boot: an unplayed save never wins, then whichever was written last does.
+  // Never compare the objects themselves: career.load() merges newSave()
+  // defaults into whatever it read, so a save that round-tripped through the
+  // cloud comes back with different key order and possibly extra keys, and byte
+  // equality reports a difference that isn't there.
   auth.ready().then(async () => {
-    if (!auth.user || auth.user.anon) return;
+    if (!auth.user || auth.user.anon) { reconciled = true; held = false; return; }
     const remote = await slot.load();
-    if (!remote || !remote.data) { slot.save(App.save); return; }
-    const theirs = remote.data.savedAt || 0;
-    const ours = App.save.savedAt || 0;
-    if (theirs > ours) adopt(remote.data);
-    else if (ours > theirs) slot.save(App.save);
-    // Equal stamps mean it's the same save. Do nothing at all.
+    if (!remote || !remote.data) { reconciled = true; held = false; slot.save(App.save); return; }
+    const verdict = pickSave({
+      // career.loadedStamp(), NOT App.save.savedAt: persist() has very likely
+      // moved the latter to "just now" while we were loading.
+      ourStamp: career.loadedStamp(),
+      theirStamp: remote.data.savedAt || 0,
+      oursPlayed: played(App.save),
+      theirsPlayed: played(remote.data),
+    });
+    reconciled = true;
+    if (verdict === "adopt") { held = false; adopt(remote.data); return; }
+    if (verdict === "push" || held) slot.save(App.save);
+    held = false;
+    // "keep" with nothing held means it's the same save. Do nothing at all.
   });
 }
 
