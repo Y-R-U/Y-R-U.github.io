@@ -106,6 +106,23 @@ Aaron was explicit about this. Hexpire's `hexpire.resume` is the clearest case.
   `savedAt` timestamp. `localsync.js` mirrors **raw strings** for this reason.
 - **Any reload-on-adopt needs a session-scoped once-guard**, so a future mistake
   degrades to a stale save instead of an unusable game.
+- **"Newest wins" is not enough on its own, and it cost a real career.** A device
+  opening a game for the first time builds a blank save and the game persists it
+  on the way to the menu — Racketeer writes `seenIntro` — which stamps `savedAt`
+  with the current time. That blank save is then genuinely newer than the
+  account's real progress, so the reconcile pushed story 1 / 0 wins over a level
+  19 career. Three rules now, all in `pickSave()` in `lib/auth/cloud.js`:
+  compare the stamp the save had **on disk at startup** (`career.loadedStamp()`,
+  or localsync's `bootStamp`) and never the live one a boot persist has moved;
+  **emptiness outranks recency**, so an unplayed save never wins in either
+  direction; and **hold every cloud push until the reconcile has decided**, or a
+  boot-time save races the reconcile's own read and lands first.
+- **Never write a save with `{ merge: true }`.** Firestore's merge recurses into
+  nested maps, so an overwriting save blends with the one underneath instead of
+  replacing it. The clobbered Racketeer document came back still carrying the
+  phone's `skills` levels and its `settings.matchLen`, which is exactly the kind
+  of hybrid that makes a bug unreadable. The doc holds only data/gameId/updatedAt
+  — write it whole.
 - **`onAuthStateChanged` does not fire on `linkWithPopup`** — linking mutates the
   current user rather than swapping it. Listen on `onIdTokenChanged`.
 - **Don't `deleteUser()` the orphaned anonymous user** after adopting an account:
@@ -165,6 +182,9 @@ more play testing first. Voidcast stays as a "coming soon" card.
   disabled separately, so anyone with the public API key can create junk
   accounts. Harmless under the current rules, but worth closing.
 - The **two-saves chooser** has never fired in anger — it needs genuinely
-  different progress on two devices.
+  different progress on two devices. Note it only fires on `AccountConflict`
+  during sign-in linking, **never at boot**: two saves that have both been played
+  still resolve silently by newest-wins, which is a real way to lose progress.
+  `pickSave()` only rules out the blank-save case.
 - `firebase deploy` needs Aaron to run `firebase login --reauth` when the
   firebase-tools token in `~/.config/configstore/` expires.
