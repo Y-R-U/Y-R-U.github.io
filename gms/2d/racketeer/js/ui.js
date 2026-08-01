@@ -1,6 +1,6 @@
 // All DOM UI: menus, mode screens, skill shop, loadout, modals, HUD wiring.
 import { el, esc, fmtMoney, fmtRank, fmtSpeed } from "./util.js";
-import { SKILLS, SKILL_ORDER, upgradeCost, MAX_LVL, takesSlot } from "./skills.js";
+import { SKILLS, SKILL_ORDER, upgradeCost, MAX_LVL, takesSlot, skillStats } from "./skills.js";
 import * as career from "./career.js";
 import { sfx, initAudio, setMuted, isMuted } from "./audio.js";
 import { haptic, setHaptics, hapticsOn, supportsHaptics } from "./haptics.js";
@@ -24,6 +24,7 @@ export function showScreen(id) {
 export function modal(html, buttons) {
   const root = $("modal-root");
   root.innerHTML = "";
+  root.classList.remove("comic-mode");     // a cutscene may have been up; it owns the whole screen
   const box = el("div", "modal", html);
   const row = el("div", "row" + (buttons.length > 2 ? " stack" : ""));
   for (const b of buttons) {
@@ -143,6 +144,7 @@ function showHelp() {
     <p style="text-align:left">🚀 <b>Serve:</b> tap to toss, then swipe as the ball peaks. It must land in the <b>glowing box</b> — always the one diagonally across from where you're standing.</p>
     <p style="text-align:left">🕸️ Clip the tape mid-rally and the ball carries on: <b>play on</b>. On a serve it's a let — take it again.</p>
     <p style="text-align:left">🃏 <b>Skills</b> are one tap: some arm your next shot (💥📢🤸), some fire instantly between points. They come back after a cooldown. Passives always work.</p>
+    <p style="text-align:left">🤸 <b>Stack them.</b> Arm several skills onto the <i>same</i> ball with an Outrageous Shot and it gets harder to land — but a double, triple or quadruple that comes off pays out several times the cash on the spot.</p>
     <p style="text-align:left">🗯️ Getting heckled rattles your composure — your timing ring starts <i>lying to you</i>. Stay calm. Or smash a racket.</p>
     <p style="text-align:left">🔥 <b>Hype</b> multiplies every dollar. Show off constantly.</p>`,
     [{ label: "Got it" }]);
@@ -195,7 +197,8 @@ export function showSkillSwap(m, slot, onClose) {
       else if (at >= 0) { act = `SWAP (slot ${at + 1})`; }
       else if (lvl) { act = "EQUIP"; }
       else { act = `BUY ${fmtMoney(cost)}`; cls = poor ? " sw-poor" : ""; }
-      const sub = lvl ? `Level ${lvl}/${MAX_LVL}${def.cd && def.cd[0] ? ` · ${def.cd[lvl - 1]}s` : def.uses ? ` · ${def.uses}/match` : ""}`
+      const sub = lvl
+        ? `Lv ${lvl}/${MAX_LVL} · ` + skillStats(id, lvl).map(s => `${esc(s.name)} ${esc(s.val)}`).join(" · ")
         : esc(def.desc);
       return `<button class="sw-row${cls}" data-id="${id}" ${poor ? "disabled" : ""}>
         <span class="sw-ico">${def.emo}</span>
@@ -245,24 +248,58 @@ const csLine = (l, old) => {
     : `<div class="cs-line cs-narr${dim}">${esc(l.txt)}</div>`;
 };
 
-// Plays a cutscene one line per tap; already-read lines fade back so the newest
-// line is obvious. onDone fires on the last line or Skip.
+// New story beats play as a comic strip: your speech bubble on the left, the reply
+// a little lower on the right, zig-zagging down the page one tap at a time. (The
+// storybook still shows old beats as the plain script above — that reads better
+// when you're catching up on twenty of them at once.)
+function comicPanel(l) {
+  if (!l.who) return el("div", "cm-narr", esc(l.txt));
+  const mine = l.who === "YOU";
+  const row = el("div", "cm-row " + (mine ? "left" : "right"));
+  row.innerHTML = `<div class="cm-face">${l.face || "🙂"}</div>
+    <div class="cm-bub"><b>${esc(l.who)}</b><span>${esc(l.txt)}</span></div>`;
+  return row;
+}
+
 export function showCutscene(cs, onDone) {
   if (!cs) return onDone && onDone();
-  const done = () => onDone && onDone();
-  const render = (i) => {
-    const shown = cs.lines.slice(0, i + 1).map((l, j) => csLine(l, j < i)).join("");
-    const last = i >= cs.lines.length - 1;
-    modal(`<div class="cs-head"><span class="cs-bg">${cs.bg || "🎾"}</span>
-        <h2 class="cs-title">${esc(cs.title)}</h2></div>
-      <div class="cutscene">${shown}</div>`,
-      last ? [{ label: "Continue ▶", fn: done }]
-           : [{ label: "▶", fn: () => render(i + 1) },
-              { label: "Skip", cls: "ghost", fn: done }]);
-    const box = document.querySelector(".cutscene");
-    if (box) box.scrollTop = box.scrollHeight;
+  const root = $("modal-root");
+  root.innerHTML = "";
+  root.classList.add("comic-mode");
+  const wrap = el("div", "comic", `
+    <div class="cm-head"><span class="cm-bg">${cs.bg || "🎾"}</span>
+      <span class="cm-title">${esc(cs.title)}</span></div>
+    <div class="cm-scroll"></div>
+    <div class="cm-foot">
+      <button class="cm-next">TAP TO CONTINUE ▼</button>
+      <button class="cm-skip">SKIP STORY ▶▶</button>
+    </div>`);
+  root.appendChild(wrap);
+  const scroll = wrap.querySelector(".cm-scroll");
+  const nextBtn = wrap.querySelector(".cm-next");
+
+  let i = -1, over = false;
+  const finish = () => {
+    if (over) return;
+    over = true;
+    root.classList.remove("comic-mode");
+    root.innerHTML = "";
+    onDone && onDone();
   };
-  render(0);
+  const next = () => {
+    if (over) return;
+    if (++i >= cs.lines.length) return finish();
+    scroll.appendChild(comicPanel(cs.lines[i]));
+    requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; });
+    initAudio(); sfx.click(); haptic.tap();
+    if (i >= cs.lines.length - 1) nextBtn.textContent = "CONTINUE ▶";
+  };
+  // Tapping anywhere advances — except the skip button, which bails out entirely.
+  wrap.addEventListener("click", (e) => {
+    if (e.target.closest(".cm-skip")) { sfx.click(); haptic.tap(); finish(); return; }
+    next();
+  });
+  next();
 }
 
 /* ---------------- Storybook (read the tale so far) ---------------- */
@@ -516,6 +553,18 @@ function pickQuick() {
 }
 
 /* ---------------- Skills shop + loadout ---------------- */
+// Every stat a level moves, with the value the next level would buy alongside it.
+// Without this an upgrade reads as "shorter cooldown" and nothing else.
+function statChips(id, lvl) {
+  const shown = Math.max(1, lvl);
+  const cur = skillStats(id, shown);
+  const nxt = shown < MAX_LVL ? skillStats(id, shown + 1) : null;
+  return cur.map((s, i) => {
+    const up = lvl && nxt && nxt[i] && nxt[i].val !== s.val ? `<i>→ ${esc(nxt[i].val)}</i>` : "";
+    return `<span class="sk-stat">${esc(s.name)} <b>${esc(s.val)}</b>${up}</span>`;
+  }).join("");
+}
+
 export function buildShop() {
   const save = App.save;
   const s = $("scr-shop");
@@ -527,7 +576,7 @@ export function buildShop() {
   s.appendChild(gearBtn);
   const slots = career.skillSlots(save);
   const nextSlot = career.SLOT_UNLOCKS[slots];
-  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. You have <b>${slots} skill slot${slots > 1 ? "s" : ""}</b>${nextSlot ? ` (next at story lv${nextSlot})` : " (max)"} — tap ✔ to toggle. <b>Passives never use a slot</b> (always on), and the umpire argument offers itself on court. Levels lower cooldowns and raise power.</div>`));
+  s.appendChild(el("div", "card", `<div class="sub">Buy &amp; upgrade dirty tricks. You have <b>${slots} skill slot${slots > 1 ? "s" : ""}</b>${nextSlot ? ` (next at story lv${nextSlot})` : " (max)"} — tap ✔ to toggle. <b>Passives never use a slot</b> (always on), and the umpire argument offers itself on court. Every level moves <b>all</b> of a skill's numbers — the chips below show what you have now and what the next level buys.</div>`));
 
   for (const id of SKILL_ORDER) {
     const def = SKILLS[id];
@@ -535,13 +584,13 @@ export function buildShop() {
     const card = el("div", "card skill-card" + (lvl ? "" : " locked"));
     const cost = upgradeCost(id, lvl);
     const equipped = save.loadout.includes(id);
-    const cdStr = def.cd && def.cd[0] ? ` · ${def.cd[Math.max(0, lvl - 1)]}s cooldown` : def.uses ? ` · ${def.uses}/match` : "";
     const tag = def.type === "passive" ? "<span class='sk-tag'>PASSIVE · NO SLOT</span>"
       : def.noSlot ? "<span class='sk-tag'>NO SLOT</span>" : "";
     card.innerHTML = `<div class="ico">${def.emo}</div><div class="body">
       <div class="nm">${esc(def.name)} ${tag}</div>
       <div class="desc">${esc(def.desc)}</div>
-      <div class="lvl">${lvl ? `Level ${lvl}/${MAX_LVL}${cdStr}` : "LOCKED"}</div></div>`;
+      <div class="lvl">${lvl ? `Level ${lvl}/${MAX_LVL}` : "LOCKED"}</div>
+      <div class="sk-stats">${statChips(id, lvl)}</div></div>`;
     const btns = el("div", null, "");
     btns.style.cssText = "display:flex;flex-direction:column;gap:6px";
     if (cost !== null) {
@@ -752,7 +801,11 @@ export const matchHooks = {
 
 /* ---------------- Result modals per mode ---------------- */
 const statLine = (m) =>
-  `<p style="font-size:12px;opacity:.75">Winners: ${m.stats.winners} · Aces: ${m.stats.aces} · Outrageous: ${m.stats.outrageous} · Longest rally: ${m.stats.longestRally}${m.stats.topSpeed ? ` · 🚀 ${fmtSpeed(m.stats.topSpeed, App.save.settings?.units || "kph")}` : ""}</p>`;
+  `<p style="font-size:12px;opacity:.75">Winners: ${m.stats.winners} · Aces: ${m.stats.aces}` +
+  `${m.stats.dfs ? ` · Double faults: ${m.stats.dfs}` : ""}` +
+  ` · Outrageous: ${m.stats.outrageous}${m.stats.bestCombo > 1 ? ` (best ×${m.stats.bestCombo} combo)` : ""}` +
+  ` · Longest rally: ${m.stats.longestRally}` +
+  `${m.stats.topSpeed ? ` · 🚀 ${fmtSpeed(m.stats.topSpeed, App.save.settings?.units || "kph")}` : ""}</p>`;
 
 // Story + cup wins are the only things that move the world ranking.
 const rankMove = (r) => {

@@ -73,8 +73,8 @@ function launch(cfg, opp, onOver) {
       if (AUTO) setTimeout(() => { document.getElementById("modal-root").innerHTML = ""; autoNext(); }, 800);
     },
   };
+  if (AUTO) cfg.autoPilot = true;
   App.match = makeMatch(App.save, opp, cfg, gear, hooks);
-  if (AUTO) App.match.autoPilot = true;
   UI.showScreen("hud");
   hooks.onHud(App.match);
   hooks.onSkillDock(App.match);
@@ -207,10 +207,9 @@ function newDemo() {
     settings: App.save.settings || {},
   });
   const { cfg, opp } = MODES.quickMatch(2 + Math.random() * 2);
-  cfg.mlen = "set"; cfg.eventChance = 0.18;
+  cfg.mlen = "set"; cfg.eventChance = 0.18; cfg.autoPilot = true;
   cfg.oppSkills = ["heckle", "grunt", "argue", "power", "outrageous", "pigeon", "underarm"];
   App.demo = makeMatch(dsave, opp, cfg, career.gearBonus(dsave), {});
-  App.demo.autoPilot = true;
   App.demo.silent = true;
 }
 App.wantDemo = () => { if (!App.demo || App.demo.over) newDemo(); };

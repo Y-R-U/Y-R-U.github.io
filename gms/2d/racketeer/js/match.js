@@ -17,6 +17,13 @@ const YOU_Y = 1.1, OPP_Y = COURT.L - 1.1;
 const SERVE_WINDOW = 0.4;      // s of grace around ideal serve contact
 const TOSS_T = 0.85;           // s from toss to ideal contact (higher toss = more time)
 
+// Serves are played from BEHIND the baseline and returned from on it. Standing
+// inside the court to serve is a foot fault, and looks wrong even to people who
+// don't know that. Baselines are y = 0 (yours) and y = COURT.L (theirs).
+const SERVE_BACK = 0.5, RECV_BACK = 0.2;
+const serveStandY = (byYou) => (byYou ? -SERVE_BACK : COURT.L + SERVE_BACK);
+const recvStandY = (byYou) => (byYou ? -RECV_BACK : COURT.L + RECV_BACK);
+
 export function makeMatch(save, opp, tier, gear, hooks) {
   const m = {
     save, opp, tier, gear, hooks,
@@ -48,11 +55,14 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     cooldowns: {}, usesLeft: {},
     zoneShots: 0, zoneWiden: 1,
     oppNextError: 0, youNextError: 0, youWindowShrink: 1,
-    lastPointWonBy: null, canArgue: false, argued: false,
+    lastPointWonBy: null, canArgue: false, argued: false, arguePending: false,
     oppFx: { zoneShots: 0, injuriesUsed: 0 }, oppCd: {},
     // Events
     activeEvent: null, eventWind: 0, modifier: tier.modifier || null,
-    autoPilot: false, netcordPending: null,
+    // Set from the config, not after the fact: makeMatch fires the dock hooks while
+    // it builds, and a soak bot that isn't flagged yet catches the one-time hint
+    // popup — which pauses the match and stalls the whole run.
+    autoPilot: !!tier.autoPilot, netcordPending: null,
     stats: { winners: 0, aces: 0, outrageous: 0, longestRally: 0, rally: 0 },
   };
   for (const id of Object.keys(SKILLS)) if (SKILLS[id].uses) m.usesLeft[id] = SKILLS[id].uses;
@@ -74,6 +84,10 @@ export function makeMatch(save, opp, tier, gear, hooks) {
 
 /* ---------------- helpers ---------------- */
 function ticker(m, str, dur = 2.4) { m.hooks.onTicker && m.hooks.onTicker(str, dur); }
+// The umpire answers back from the chair, so an argument reads as a conversation.
+function umpireSays(m, str, col) {
+  FX.speech(COURT.W / 2 + 1.7, COURT.NET_Y, str, 2.6, { z: 3.4, col, small: true });
+}
 function sayBanner(m, str, col, size = 1.4) { FX.bannerText(str, col, size); }
 function hypeMult(m) { return 1 + (m.hype / 100) * (1 + m.gear.hyp); }
 function earn(m, base, wx, wy) {
@@ -124,18 +138,22 @@ function beginPreServe(m, first) {
   m.contact = null; m.ballTo = null; m.pendingQuality = null; m.pendingCurve = 0;
   refundArmed(m);                                          // armed but never swung = give it back
   m.armedPower = false; m.armedOutrageous = false; m.armedGrunt = false; m.canArgue = false;
+  m.arguePending = false;
   m.hooks.onArgue && m.hooks.onArgue(m);                   // window closed — pull the prompt
   m.tossed = false; m.underarmServe = false; m.gest = null;
   m.stam = clamp(m.stam + METERS.STAM_POINT_REST, 0, 100);
   m.oppStam = clamp(m.oppStam + METERS.STAM_POINT_REST, 0, 100);
   m.serveSide = ((m.ptsYou + m.ptsOpp) % 2 === 0) ? 1 : -1;
   const sx = m.serveSide * 2.0;
+  const youServe = m.server === "you";
   // Both players line up on the diagonal: server behind their half of the baseline,
-  // receiver across from them, in front of the box the serve has to land in.
+  // receiver across from them, on the baseline in front of the box the serve must find.
   m.you.tx = sx;
   m.oppP.tx = -sx;
-  m.ball.x = m.server === "you" ? sx : -sx;
-  m.ball.y = m.server === "you" ? YOU_Y - 0.2 : OPP_Y + 0.2;
+  m.you.ty = youServe ? serveStandY(true) : recvStandY(true);
+  m.oppP.ty = youServe ? recvStandY(false) : serveStandY(false);
+  m.ball.x = youServe ? sx : -sx;
+  m.ball.y = serveStandY(youServe);
   m.ball.z = 1.0;
   setState(m.you, "idle"); setState(m.oppP, "idle");
   if (!first) {
@@ -189,7 +207,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   m.stats.rally = 0;
   const lbLvl = skillLevel(m, "luckyballs");
   const serveBonus = byYou && lbLvl ? skillFx("luckyballs", lbLvl, "serve") : 0;
-  const fromY = byYou ? YOU_Y : OPP_Y;
+  const fromY = byYou ? m.you.y : m.oppP.y;   // wherever the server actually stands
   const dir = byYou ? 1 : -1;
   b.x = (byYou ? 1 : -1) * m.serveSide * 2.0; b.y = fromY; b.z = 3.0;
   // Bad timing can dump the serve short — those die in the net.
@@ -220,6 +238,7 @@ function startRallyFromServe(m, byYou, quality, aimTx) {
   }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz;
   setState(byYou ? m.you : m.oppP, "serve");
+  if (byYou) m.stats.serves = (m.stats.serves || 0) + 1;
   sfx.pock(1 + quality);
   if (byYou) { haptic.serve(); recordSpeed(m, v, true); }   // serve speed always shown — it's tennis law
   m.ballTo = byYou ? "opp" : "you";
@@ -265,13 +284,18 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
   if (you && m.armedGrunt) {
     m.armedGrunt = false;
     const lvl = skillLevel(m, "grunt");
-    powBonus += skillFx("grunt", lvl, "pow");
-    const g = pick(NAMES.GRUNTS);
-    FX.floatText(m.you.x, YOU_Y + 1, 2.2, g, "#ffd34a", 1.2);
+    const gPow = skillFx("grunt", lvl, "pow");
+    powBonus += gPow;
+    // Louder with every level, and it says so: the grunt is pace and noise, not
+    // just a shorter cooldown.
+    const g = pick(NAMES.GRUNTS) + "!".repeat(Math.max(1, Math.round(lvl / 2)));
+    FX.floatText(m.you.x, m.you.y, 2.4, g, "#ffd34a", 0.95 + lvl * 0.075);
+    FX.floatText(m.you.x, m.you.y, 1.5, `📢 +${Math.round(gPow * 100)}% PACE`, "#ffe24a", 0.6);
+    FX.shockwave(m.you.x, m.you.y, 1.9, 1 + lvl * 0.35);
     sfx.grunt(lvl); FX.addShake(3 + lvl);
     if (Math.random() < skillFx("grunt", lvl, "startle")) {
       m.oppNextError = 1.6;
-      FX.floatText(m.oppP.x, OPP_Y, 2.4, "😨", "#fff", 1.2);
+      FX.floatText(m.oppP.x, m.oppP.y, 2.4, "😨", "#fff", 1.2);
     }
   }
   if (opts.power) powBonus += opts.power;
@@ -521,6 +545,7 @@ function commitSwing(m, dt, aim, curve, swipePow) {
   FX.floatText(m.you.x, m.you.y + 1.4, 1.6, fx[0], fx[1], fx[2]);
   if (q === 1) haptic.perfect(); else haptic.hit(q);
   m.youWindowShrink = 1;
+  m.pendingZone = m.zoneShots > 0;        // note it before spending the shot
   if (m.zoneShots > 0) m.zoneShots--;
   m.pendingQuality = q;
   m.pendingAim = aim;
@@ -529,10 +554,17 @@ function commitSwing(m, dt, aim, curve, swipePow) {
   if (dt <= 0.02) executePlayerSwing(m);
 }
 
+// Stack names for piling skills onto one outrageous shot.
+const COMBO_NAME = ["", "", "DOUBLE", "TRIPLE", "QUADRUPLE"];
+
 function executePlayerSwing(m) {
   const q = m.pendingQuality, aim = m.pendingAim || { x: 0, y: COURT.NET_Y + 5 };
   const curve = m.pendingCurve || 0, swipePow = m.pendingSwipePow || 0;
+  // How many tricks are riding on this one ball. Read before anything is spent,
+  // because the armed flags are consumed on the way through.
+  const stack = 1 + (m.armedPower ? 1 : 0) + (m.armedGrunt ? 1 : 0) + (m.pendingZone ? 1 : 0);
   m.pendingQuality = null; m.pendingAim = null; m.pendingCurve = 0; m.pendingSwipePow = 0;
+  m.pendingZone = false;
   if (Math.hypot(m.ball.x - m.you.x, m.ball.y - m.you.y) > SWING.REACH_X + 0.6) {
     setState(m.you, "swing"); sfx.swishMiss();
     return;
@@ -549,20 +581,32 @@ function executePlayerSwing(m) {
     m.armedOutrageous = false;
     const lvl = skillLevel(m, "outrageous");
     m.stam = clamp(m.stam - 15, 0, 100);
-    if (Math.random() < skillFx("outrageous", lvl, "landChance") * (q > 0.4 ? 1 : 0.5)) {
+    // Every extra skill riding along makes the trick harder to land — and pays out
+    // far more when it does. Showing off is supposed to be a gamble worth taking.
+    const risk = Math.pow(0.82, stack - 1);
+    const reward = Math.pow(2.2, stack - 1);
+    if (Math.random() < skillFx("outrageous", lvl, "landChance") * risk * (q > 0.4 ? 1 : 0.5)) {
       const name = pick(NAMES.OUTRAGEOUS_NAMES);
-      sayBanner(m, name + "!", "#ff5ce1", 1.4);
+      sayBanner(m, (stack > 1 ? COMBO_NAME[stack] + " " : "") + name + "!", "#ff5ce1", 1.4);
       sfx.cheer(1.4); FX.addShake(10);
-      addHype(m, skillFx("outrageous", lvl, "hype"));
-      earn(m, skillFx("outrageous", lvl, "cash"), m.you.x, YOU_Y);
+      addHype(m, skillFx("outrageous", lvl, "hype") * (1 + (stack - 1) * 0.5));
+      const paid = earn(m, Math.round(skillFx("outrageous", lvl, "cash") * reward), m.you.x, m.you.y);
+      if (stack > 1) {
+        sfx.cash(4);
+        FX.floatText(m.you.x, m.you.y, 3.4, `×${reward.toFixed(1)} COMBO BONUS`, "#ffd34a", 0.85);
+        ticker(m, `${stack} skills on one ball — ×${reward.toFixed(1)} payout: +$${paid}!`, 3.5);
+      }
       m.stats.outrageous++;
+      m.stats.bestCombo = Math.max(m.stats.bestCombo || 1, stack);
       hitShot(m, "you", 1, pick([-1, 1]) * (COURT.W / 2 - 0.35), OPP_Y - rand(0.3, 1.2), { ...opts, power: (opts.power || 0) + 0.25, flip: true });
       return;
     }
+    m.armedGrunt = false;                 // it was played, badly — no refund for that
     setState(m.you, "faceplant");
     sfx.gasp(); sfx.boo(); FX.addShake(6);
     sayBanner(m, "FACEPLANT!", "#ff8a5c", 1.2);
-    addHype(m, 6);
+    if (stack > 1) ticker(m, `${stack} skills, nought to show for it. Magnificent.`, 3);
+    addHype(m, 6 + (stack - 1) * 4);
     return;
   }
   hitShot(m, "you", q, aim.x, aim.y, opts);
@@ -606,18 +650,21 @@ export function useSkill(m, id) {
   switch (id) {
     case "power":
       m.armedPower = true;
-      ticker(m, "POWER HIT ARMED 💥");
+      ticker(m, `POWER HIT ARMED 💥 next shot: +${Math.round(skillFx("power", lvl, "pow") * 100)}% power`, 3);
       sfx.click();
       break;
-    case "grunt":
+    case "grunt": {
       m.armedGrunt = true;
-      ticker(m, "GRUNT LOADED 📢 — next shot");
+      const st = Math.round(skillFx("grunt", lvl, "startle") * 100);
+      ticker(m, `GRUNT LOADED 📢 next shot: +${Math.round(skillFx("grunt", lvl, "pow") * 100)}% pace`
+        + (st > 0 ? `, ${st}% chance to startle them` : ""), 3);
       sfx.click();
       break;
+    }
     case "heckle": {
       const line = pickBag("heck", NAMES.HECKLES);
       setState(m.you, "heckle");
-      FX.speech(m.you.x, YOU_Y + 0.5, line, 2.6);
+      FX.shoutSpeech(m.you.x, m.you.y + 0.5, line, 3);
       sfx.heckleLaugh();
       m.oppComp = clamp(m.oppComp - skillFx("heckle", lvl, "comp"), 5, 100);
       addHype(m, 4);
@@ -626,24 +673,37 @@ export function useSkill(m, id) {
     }
     case "argue": {
       m.argued = true;
+      // Freeze the point-over clock until the umpire has ruled. Without this the
+      // state machine walks on to the next serve while the verdict is still in the
+      // air, and a won argument that finishes the game only lands a point later.
+      m.arguePending = true;
       setState(m.you, "argue");
       pokeUmpire(); sfx.umpBeep();
-      FX.speech(m.you.x, YOU_Y + 0.5, pick(NAMES.ARGUE_LINES), 2.4);
+      FX.rageSpeech(m.you.x, m.you.y + 0.5, NAMES.argueLine(), 3.4);
+      for (let i = 0; i < 3; i++) {                          // swearing, flying off
+        FX.floatText(m.you.x + rand(-1.2, 1.2), m.you.y, 2.4 + rand(0, 1.2),
+          NAMES.bleep(2, 3), "#ff4d4d", 0.55);
+      }
       const r = Math.random();
       setTimeout(() => {
+        m.arguePending = false;
         if (m.over) return;
+        m.stateT = 0;                        // a beat to read the ruling before serving
         if (r < skillFx("argue", lvl, "win")) {
           m.ptsOpp = Math.max(0, m.ptsOpp - 1); m.ptsYou++;
           sayBanner(m, pick(NAMES.UMPIRE_OK), "#7ee6a1", 0.9);
+          umpireSays(m, "POINT TO YOU.", "#7ee6a1");
           sfx.cheer(0.8); addHype(m, 6);
           recheckGamePending(m);
         } else if (r < skillFx("argue", lvl, "win") + skillFx("argue", lvl, "replay")) {
           m.ptsOpp = Math.max(0, m.ptsOpp - 1);
           sayBanner(m, pick(NAMES.UMPIRE_REPLAY), "#6fd3ff", 0.9);
+          umpireSays(m, "REPLAY THE POINT.", "#6fd3ff");
           recheckGamePending(m);
         } else {
           m.comp = clamp(m.comp - 8, 5, 100);
           sayBanner(m, pick(NAMES.UMPIRE_BAD), "#ff8a5c", 0.9);
+          umpireSays(m, pick(NAMES.UMPIRE_SNAP), "#ff8a5c");
           sfx.boo();
         }
         pushHud(m);
@@ -652,7 +712,8 @@ export function useSkill(m, id) {
     }
     case "outrageous":
       m.armedOutrageous = true;
-      ticker(m, "OUTRAGEOUS SHOT ARMED 🤸 — next ball!");
+      ticker(m, `OUTRAGEOUS ARMED 🤸 ${Math.round(skillFx("outrageous", lvl, "landChance") * 100)}% to land`
+        + " — arm more skills on the same ball for a riskier, richer combo", 3.5);
       sfx.click();
       break;
     case "underarm": {
@@ -680,7 +741,7 @@ export function useSkill(m, id) {
     }
     case "injury": {
       setState(m.you, "injury");
-      FX.speech(m.you.x, YOU_Y + 0.5, pick(NAMES.INJURY_LINES), 2.6);
+      FX.speech(m.you.x, m.you.y + 0.5, pick(NAMES.INJURY_LINES), 2.8);
       sfx.whistle();
       const heal = skillFx("injury", lvl, "heal");
       m.stam = clamp(m.stam + heal, 0, 100);
@@ -764,8 +825,7 @@ export function updateMatch(m, rawDt) {
 
   switch (m.state) {
     case "preServe": {
-      movePlayerTo(m.you, m.you.tx, dt, playerSpeed(m), YOU_Y);
-      movePlayerTo(m.oppP, m.oppP.tx, dt, 5, OPP_Y);
+      walkToServePositions(m, dt);
       if (m.server === "opp" && m.stateT > 1.6) {
         const q = aiServeQuality(m);
         startRallyFromServe(m, false, q);
@@ -777,9 +837,10 @@ export function updateMatch(m, rawDt) {
       break;
     }
     case "serveWait": {
+      walkToServePositions(m, dt);
       // Toss animation: ball rises from hand to apex at serveContactT
       const k = clamp(1 - (m.serveContactT - m.time) / TOSS_T, 0, 1.6);
-      m.ball.x = m.serveSide * 2.0; m.ball.y = YOU_Y - 0.1;
+      m.ball.x = m.you.x; m.ball.y = m.you.y;
       m.ball.z = 1.0 + Math.sin(Math.min(k, 1.3) * Math.PI * 0.62) * 2.6;
       if (m.autoPilot && m.serveContactT - m.time < 0.06 && m.serveContactT - m.time > 0) {
         serveNow(m, rand(0.6, 1), serveBoxSide(m, true) * rand(0.6, 3.2));
@@ -792,6 +853,7 @@ export function updateMatch(m, rawDt) {
       break;
     }
     case "serving": {
+      walkToServePositions(m, dt);
       if (m.stateT > 0.3) startRallyFromServe(m, true, m.serveQuality, m.serveTx);
       break;
     }
@@ -822,6 +884,7 @@ export function updateMatch(m, rawDt) {
     case "pointOver": {
       movePlayerTo(m.you, 0, dt, 3, YOU_Y);
       movePlayerTo(m.oppP, 0, dt, 3, OPP_Y);
+      if (m.arguePending) break;             // umpire is still deliberating
       const wait = m.canArgue && !m.argued ? 3.2 : 1.7;
       if (m.stateT > wait) {
         if (!settleGame(m)) beginPreServe(m);
@@ -833,6 +896,14 @@ export function updateMatch(m, rawDt) {
 
 function playerSpeed(m) {
   return PLAYER.SPEED * (1 + m.gear.spd) * (m.stam < 25 ? 0.7 : 1);
+}
+
+// Both players walk to their serve marks and hold them through the toss and the
+// swing — otherwise the server drifts to their rally depth and serves from inside
+// the court, which is a foot fault everywhere except here.
+function walkToServePositions(m, dt) {
+  movePlayerTo(m.you, m.you.tx, dt, playerSpeed(m), m.you.ty ?? YOU_Y);
+  movePlayerTo(m.oppP, m.oppP.tx, dt, 5, m.oppP.ty ?? OPP_Y);
 }
 
 function movePlayerTo(p, tx, dt, speed, ty) {
@@ -857,6 +928,13 @@ function updateRallyMovement(m, dt) {
   movePlayerTo(m.you, tx, dt, playerSpeed(m), ty);
 }
 
+// Serve faults are a real tennis stat, and the only honest way to tell whether a
+// change to the serve made it harder to land.
+function countFault(m) {
+  m.stats.faults = (m.stats.faults || 0) + 1;
+  if (m.serveNum === 2) m.stats.dfs = (m.stats.dfs || 0) + 1;
+}
+
 function onBallEvent(m, ev, data) {
   if (ev === "bounce") {
     sfx.bounce();
@@ -878,6 +956,7 @@ function onBallEvent(m, ev, data) {
       if (bad) {
         FX.floatText(data.x, clamp(data.y, 1, COURT.L - 1), 0.4,
           wrongBox ? "WRONG BOX!" : isServe && svcDepth > COURT.SVC ? "LONG!" : "OUT!", "#ff8a5c", 1);
+        if (isServe && m.server === "you") countFault(m);
         if (hitter === "you") {
           if (m.state === "rally" && m.stats.rally === 0 && m.server === "you" && m.serveNum === 1) {
             m.serveNum = 2; sfx.gasp();
@@ -909,6 +988,7 @@ function onBallEvent(m, ev, data) {
       m.ballTo = "opp"; scheduleContact(m);
       return;
     }
+    if (hitter === "you" && m.state === "rally" && m.stats.rally === 0 && m.server === "you") countFault(m);
     if (hitter === "you" && m.state === "rally" && m.stats.rally === 0 && m.server === "you" && m.serveNum === 1) {
       m.serveNum = 2; ticker(m, "FAULT! Into the net. Second serve.");
       m.state = "preServe"; m.stateT = 0; m.ball.live = false; m.tossed = false; m.contact = null;
@@ -997,7 +1077,7 @@ function drawTimingRing(m, ctx) {
   const widen = isServe ? 1 : (m.zoneShots > 0 ? m.zoneWiden : 1) / m.youWindowShrink;
   const k = clamp(dtc / windowLen, 0, 1);
   const rBall = Math.max(4, p.s * 0.16);
-  const r = rBall + k * Math.max(30, view.w * 0.09);
+  const r = rBall + k * Math.max(30, view.stageW * 0.09);
   const perfectBand = (isServe ? 0.1 : SWING.PERFECT) * widen;
   const goodBand = (isServe ? 0.22 : SWING.GOOD) * widen;
   const inPerfect = Math.abs(dtc) <= perfectBand;
@@ -1006,9 +1086,9 @@ function drawTimingRing(m, ctx) {
   ctx.strokeStyle = inPerfect ? "#7ee6a1" : inGood ? "#ffe24a" : "rgba(255,255,255,.7)";
   ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.stroke();
   ctx.strokeStyle = "rgba(126,230,161,.4)"; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(p.x, p.y, rBall + perfectBand / windowLen * Math.max(30, view.w * 0.09), 0, 7); ctx.stroke();
+  ctx.beginPath(); ctx.arc(p.x, p.y, rBall + perfectBand / windowLen * Math.max(30, view.stageW * 0.09), 0, 7); ctx.stroke();
   if (isServe) {
-    ctx.fillStyle = "#fff"; ctx.font = `bold ${Math.max(12, view.w * 0.032)}px sans-serif`; ctx.textAlign = "center";
+    ctx.fillStyle = "#fff"; ctx.font = `bold ${Math.max(12, view.stageW * 0.032)}px sans-serif`; ctx.textAlign = "center";
     ctx.fillText("SWIPE!", p.x, p.y - r - 14);
   }
 }

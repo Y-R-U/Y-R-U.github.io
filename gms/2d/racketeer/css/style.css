@@ -7,9 +7,15 @@ html, body { height:100%; overflow:hidden; background:#0b1f14; touch-action:none
 canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block; }
 .hidden { display:none !important; }
 
+/* Everything in the HUD hangs off the edges of the COURT, not the window: on a
+   desktop the court is a centred column with crowd either side, and a scorebar
+   pinned to the far corner of a 27" monitor is unreadable.
+   --stage-w is published by court.js resize(). */
+:root { --stage-gap: max(8px, calc(50% - var(--stage-w, 100vw) / 2 + 8px)); }
+
 /* ---------- HUD ---------- */
 #hud { position:absolute; inset:0; pointer-events:none; }
-#scorebar { position:absolute; top:env(safe-area-inset-top, 8px); left:8px; margin-top:6px;
+#scorebar { position:absolute; top:env(safe-area-inset-top, 8px); left:var(--stage-gap); margin-top:6px;
   background:rgba(6,20,12,.82); border:1px solid rgba(255,255,255,.12); border-radius:10px;
   padding:5px 9px; font-size:12px; line-height:1.5; min-width:148px; backdrop-filter:blur(4px); }
 .sb-row { display:flex; gap:8px; align-items:baseline; }
@@ -18,7 +24,7 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .sb-games { font-weight:800; min-width:14px; text-align:right; }
 .sb-pts { font-weight:800; min-width:26px; text-align:right; color:#7ee6a1; }
 
-#meters { position:absolute; top:env(safe-area-inset-top, 8px); right:8px; margin-top:6px; width:96px;
+#meters { position:absolute; top:env(safe-area-inset-top, 8px); right:var(--stage-gap); margin-top:6px; width:96px;
   display:flex; flex-direction:column; gap:4px; }
 .meter { display:flex; align-items:center; gap:4px; }
 .m-ico { font-size:11px; width:14px; text-align:center; }
@@ -63,7 +69,11 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   opacity:0; transition:opacity .3s; pointer-events:none; }
 #ticker.show { opacity:1; }
 
-#pauseBtn { position:absolute; top:calc(env(safe-area-inset-top, 8px) + 108px); right:10px; width:34px; height:30px;
+/* Menu/shop screens read as a column on a wide window rather than one long line. */
+.screen:not(#scr-menu) { padding-left: max(16px, calc(50% - 215px));
+  padding-right: max(16px, calc(50% - 215px)); }
+
+#pauseBtn { position:absolute; top:calc(env(safe-area-inset-top, 8px) + 108px); right:var(--stage-gap); width:34px; height:30px;
   pointer-events:auto; background:rgba(6,20,12,.8); color:#fff; border:1px solid rgba(255,255,255,.2);
   border-radius:8px; font-weight:800; font-size:12px; }
 
@@ -122,6 +132,12 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .skill-card .buy:disabled { opacity:.4; }
 .skill-card.locked { opacity:.85; }
 .skill-card .buy.equip-on { background:linear-gradient(180deg,#8be3a6,#3fbf6f); box-shadow:0 3px 0 #1d6b3c; }
+/* What a level actually buys — value now, and what the next level makes it. */
+.sk-stats { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.sk-stat { font-size:10px; line-height:1.3; padding:2px 6px; border-radius:7px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); opacity:.85; }
+.sk-stat b { color:#ffd479; font-weight:800; }
+.sk-stat i { color:#7ee6a1; font-style:normal; font-weight:800; margin-left:3px; }
 
 .gear-opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .gear-chip { padding:8px 10px; border-radius:12px; font-size:12px; font-weight:700;
@@ -187,8 +203,13 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .title-logo.mini .tag { font-size: 11px; }
 .menu-col { position: absolute; top: 50%; transform: translateY(-58%);
   display: flex; flex-direction: column; gap: 14px; }
-.menu-col.left  { left:  calc(env(safe-area-inset-left, 0px) + 10px); }
-.menu-col.right { right: calc(env(safe-area-inset-right, 0px) + 10px); }
+/* --stage-w is the court's on-screen width, published by court.js resize(). On a
+   wide desktop the court is centred and narrower than the window, so the menu
+   buttons hug it instead of drifting out to the far corners. */
+.menu-col.left  { left:  max(env(safe-area-inset-left, 0px) + 10px,
+                            calc(50% - var(--stage-w, 100vw) / 2 + 10px)); }
+.menu-col.right { right: max(env(safe-area-inset-right, 0px) + 10px,
+                             calc(50% - var(--stage-w, 100vw) / 2 + 10px)); }
 .sq-btn { width: 64px; height: 64px; border-radius: 16px; border: 1px solid rgba(255,255,255,.22);
   background: rgba(8,22,13,.78); color: #fff; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 1px; padding: 0; font-weight: 800;
@@ -207,11 +228,11 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
   font-size:11px; font-weight:800; padding:5px 9px; border-radius:11px;
   background:rgba(0,0,0,.42); border:1px solid rgba(255,255,255,.16); color:#ffe24a;
   backdrop-filter:blur(3px); white-space:nowrap; max-width:42%; overflow:hidden; text-overflow:ellipsis; }
-.home-chip.left  { left:  calc(env(safe-area-inset-left, 0px) + 10px); }
+.home-chip.left  { left:  max(env(safe-area-inset-left, 0px) + 10px, calc(50% - var(--stage-w, 100vw) / 2 + 10px)); }
 /* Shifted clear of the br8t account avatar, which floats in the top-right
    corner. --br8t-account-space is published by /lib/auth/ui.js and falls back
    to 0 when the account layer isn't loaded. */
-.home-chip.right { right: calc(env(safe-area-inset-right, 0px) + 10px + var(--br8t-account-space, 0px)); color:#7ee6a1; }
+.home-chip.right { right: max(env(safe-area-inset-right, 0px) + 10px + var(--br8t-account-space, 0px), calc(50% - var(--stage-w, 100vw) / 2 + 10px)); color:#7ee6a1; }
 
 /* ---- Locked / empty skill slots in the match dock ---- */
 .skill-btn.slot-locked, .skill-btn.slot-empty {
@@ -266,6 +287,51 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .cutscene .cs-line.cs-old.cs-narr { opacity:.26; }
 .cutscene .cs-line.cs-old .cs-who { color:#c9b46a; }
 @keyframes csIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+/* ---- Comic-strip cutscenes (new story beats) ----
+   Your bubble on the left, the reply a little lower on the right, zig-zagging
+   down the page. One panel per tap; skip lives at the bottom. */
+#modal-root.comic-mode { padding:0; align-items:stretch; }
+.comic { display:flex; flex-direction:column; width:100%; height:100%;
+  background:linear-gradient(180deg,#12301c 0%,#0a1c11 100%);
+  padding:calc(env(safe-area-inset-top, 0px) + 10px) 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  animation:pop .25s cubic-bezier(.2,1.6,.4,1); }
+/* Left-aligned, with the top-right corner left free: the br8t account avatar and
+   its sign-in nudge float there over every game. */
+.cm-head { display:flex; align-items:center; gap:8px; flex:none; padding:0 0 8px 4px;
+  padding-right:calc(var(--br8t-account-space, 0px) + 8px);
+  border-bottom:1px solid rgba(255,255,255,.1); }
+.cm-head .cm-bg { font-size:24px; }
+.cm-head .cm-title { font-size:15px; font-weight:900; color:#ffe24a; letter-spacing:.5px; }
+.cm-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y;
+  padding:10px 2px 4px; max-width:520px; width:100%; margin:0 auto; }
+.cm-narr { font-size:13px; font-style:italic; opacity:.72; text-align:center; margin:12px auto;
+  max-width:86%; line-height:1.5; animation:cmIn .22s ease-out; }
+.cm-row { display:flex; align-items:flex-end; gap:8px; margin:12px 0; animation:cmIn .22s ease-out; }
+.cm-row.left { padding-right:20%; }
+.cm-row.right { flex-direction:row-reverse; padding-left:20%; }
+.cm-face { flex:0 0 auto; width:44px; height:44px; border-radius:50%; font-size:25px;
+  display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.1);
+  border:2px solid rgba(255,255,255,.22); }
+.cm-bub { position:relative; background:#fff; color:#15200f; border-radius:14px;
+  padding:9px 12px; font-size:14px; line-height:1.42; font-weight:600; }
+.cm-bub b { display:block; font-size:9.5px; letter-spacing:1.4px; font-weight:900;
+  color:#8a6b1f; margin-bottom:2px; }
+/* Tail pointing back at the speaker's face. */
+.cm-bub::after { content:""; position:absolute; bottom:9px; width:0; height:0;
+  border:7px solid transparent; }
+.cm-row.left  .cm-bub { border-bottom-left-radius:3px; }
+.cm-row.left  .cm-bub::after { left:-12px; border-right-color:#fff; border-left-width:5px; }
+.cm-row.right .cm-bub { border-bottom-right-radius:3px; background:#ffeec2; }
+.cm-row.right .cm-bub::after { right:-12px; border-left-color:#ffeec2; border-right-width:5px; }
+@keyframes cmIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+.cm-foot { flex:none; display:flex; flex-direction:column; align-items:center; gap:7px;
+  padding-top:9px; max-width:520px; width:100%; margin:0 auto; }
+.cm-next { width:100%; padding:12px; border:none; border-radius:13px; font-size:14px; font-weight:900;
+  color:#08150c; background:linear-gradient(180deg,#ffe96b,#ffc93a); box-shadow:0 3px 0 #a3541d; }
+.cm-next:active { transform:translateY(2px); box-shadow:0 1px 0 #a3541d; }
+.cm-skip { background:none; border:none; color:#eef7ee; opacity:.55; font-size:11.5px;
+  font-weight:800; letter-spacing:1.2px; padding:5px 14px; }
 
 /* ---- Cutscenes inside the storybook ---- */
 .storybook .sb-cs { margin:10px 0 12px; padding:9px 11px; border-radius:12px;

@@ -1,10 +1,11 @@
 // Juice: particles, floating text, speech bubbles, pigeon, screenshake, slow-mo vignette.
 import { project, view } from "./court.js";
-import { rand, pick } from "./util.js";
+import { rand, pick, clamp } from "./util.js";
 
 const parts = [];      // particles {x,y,z,vx,vy,vz,life,col,r}
 const texts = [];      // floating texts {sx,sy,vy,life,str,col,size,wob}
-const bubbles = [];    // speech bubbles {wx,wy,str,life,flip}
+const bubbles = [];    // speech bubbles {wx,wy,z,str,life,style}
+const waves = [];      // expanding noise rings {wx,wy,wz,t,dur,k}
 let pigeons = [];
 export let shake = 0;
 export function addShake(n) { shake = Math.min(22, shake + n); }
@@ -26,19 +27,19 @@ export function confetti(n = 60) {
 
 export function floatText(wx, wy, wz, str, col = "#fff", size = 1) {
   const p = project(wx, wy, wz);
-  texts.push({ sx: p.x, sy: p.y, vy: -50, life: 1.3, str, col, size: size * Math.max(16, view.w * 0.05), wob: rand(0, 7) });
+  texts.push({ sx: p.x, sy: p.y, vy: -50, life: 1.3, str, col, size: size * Math.max(16, view.stageW * 0.05), wob: rand(0, 7) });
 }
 
 export function bannerText(str, col = "#ffe24a", size = 1.6) {
   texts.push({ sx: view.w / 2, sy: view.h * 0.42, vy: -14, life: 1.8, str, col,
-    size: size * Math.max(20, view.w * 0.055), wob: rand(0, 7), banner: true });
+    size: size * Math.max(20, view.stageW * 0.055), wob: rand(0, 7), banner: true });
 }
 
 // Banners are plain canvas fillText, so nothing wraps for free — a long commentary
 // line used to run off both edges of a phone. Shrink first (keeps one punchy line),
 // then wrap onto as many lines as it takes.
 function fitBanner(ctx, str, size) {
-  const maxW = view.w * 0.9;
+  const maxW = Math.min(view.w * 0.9, view.stageW * 1.15);
   ctx.font = `900 ${size}px sans-serif`;
   if (ctx.measureText(str).width <= maxW) return { size, lines: [str] };
   const small = Math.max(size * 0.66, 15);
@@ -55,8 +56,23 @@ function fitBanner(ctx, str, size) {
   return { size: small, lines };
 }
 
-export function speech(wx, wy, str, life = 2.2) {
-  bubbles.push({ wx, wy, str, life, max: life });
+// Speech bubbles. `style` picks the shape: "plain" is a rounded box, "shout" is a
+// bigger louder one, and "rage" is the spiky cartoon cloud people yell out of.
+export function speech(wx, wy, str, life = 2.2, opts = {}) {
+  bubbles.push({ wx, wy, z: opts.z ?? 2.2, str, life, max: life,
+    style: opts.style || "plain", col: opts.col || null, scale: opts.scale || 1,
+    small: !!opts.small });
+}
+export function rageSpeech(wx, wy, str, life = 3.4) {
+  speech(wx, wy, str, life, { style: "rage", scale: 1.3 });
+}
+export function shoutSpeech(wx, wy, str, life = 2.8) {
+  speech(wx, wy, str, life, { style: "shout", scale: 1.12 });
+}
+
+// Expanding rings — a grunt you can see. Bigger `k` = louder.
+export function shockwave(wx, wy, wz, k = 1) {
+  waves.push({ wx, wy, wz, t: 0, dur: 0.55, k });
 }
 
 let dogs = [];
@@ -72,7 +88,7 @@ export function launchPigeon(fromFar) {
     tx: rand(-1, 1), ty: fromFar ? 21.5 : 2.2 });
 }
 
-export function clearFx() { parts.length = 0; texts.length = 0; bubbles.length = 0; pigeons = []; dogs = []; shake = 0; }
+export function clearFx() { parts.length = 0; texts.length = 0; bubbles.length = 0; waves.length = 0; pigeons = []; dogs = []; shake = 0; }
 
 export function updateFx(dt) {
   shake = Math.max(0, shake - dt * 30);
@@ -92,6 +108,10 @@ export function updateFx(dt) {
   for (let i = bubbles.length - 1; i >= 0; i--) {
     bubbles[i].life -= dt;
     if (bubbles[i].life <= 0) bubbles.splice(i, 1);
+  }
+  for (let i = waves.length - 1; i >= 0; i--) {
+    waves[i].t += dt;
+    if (waves[i].t > waves[i].dur) waves.splice(i, 1);
   }
   for (let i = pigeons.length - 1; i >= 0; i--) {
     pigeons[i].t += dt;
@@ -157,26 +177,21 @@ export function drawFx(ctx) {
     ctx.beginPath(); ctx.arc(p.x + dg.dir * -s * 0.56, p.y - s * 0.42, s * 0.08, 0, 7); ctx.fill();
   }
 
-  for (const b of bubbles) {
-    const p = project(b.wx, b.wy, 2.2);
-    const alpha = Math.min(1, b.life * 2, (b.max - b.life) * 5);
-    ctx.globalAlpha = alpha;
-    let fs = Math.max(11, view.w * 0.03);
-    ctx.font = `bold ${fs}px sans-serif`;
-    // Long bubbles (the fake-injury monologues) have to shrink or they hang off both edges.
-    while (ctx.measureText(b.str).width > view.w - 30 && fs > 8) {
-      fs -= 1; ctx.font = `bold ${fs}px sans-serif`;
+  for (const w of waves) {
+    const k = w.t / w.dur;
+    const p = project(w.wx, w.wy, w.wz);
+    ctx.globalAlpha = (1 - k) * 0.7;
+    ctx.strokeStyle = "#ffe24a";
+    for (let i = 0; i < 3; i++) {
+      const r = p.s * (0.3 + 2.2 * w.k) * (k + i * 0.22);
+      if (r <= 0) continue;
+      ctx.lineWidth = Math.max(1, 3 * (1 - k));
+      ctx.beginPath(); ctx.ellipse(p.x, p.y - p.s * 1.3, r, r * 0.55, 0, 0, 7); ctx.stroke();
     }
-    const tw = ctx.measureText(b.str).width;
-    const bw = tw + 18, bh = Math.max(24, view.w * 0.05);
-    const bx = Math.max(6, Math.min(view.w - bw - 6, p.x - bw / 2)), by = p.y - bh - 14;
-    ctx.fillStyle = "#fff";
-    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 10); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(p.x - 6, by + bh); ctx.lineTo(p.x + 6, by + bh); ctx.lineTo(p.x, by + bh + 9); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = "#111"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-    ctx.fillText(b.str, bx + 9, by + bh / 2);
     ctx.globalAlpha = 1;
   }
+
+  for (const b of bubbles) drawBubble(ctx, b);
 
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
   for (const t of texts) {
@@ -196,6 +211,79 @@ export function drawFx(ctx) {
     }
     ctx.restore();
   }
+  ctx.globalAlpha = 1;
+}
+
+function wrapLines(ctx, str, maxW) {
+  const lines = [];
+  let cur = "";
+  for (const w of str.split(" ")) {
+    const test = cur ? cur + " " + w : w;
+    if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+// The jagged cloud a cartoon character yells out of. Alternating radii around an
+// ellipse, so the spikes sit proud of the text block on every side.
+function spikyPath(ctx, rx, ry, spikes, spike, phase) {
+  ctx.beginPath();
+  for (let i = 0; i < spikes; i++) {
+    const a = (i / spikes) * Math.PI * 2 + phase;
+    const k = i % 2 ? 1 : 1 + spike;
+    const x = Math.cos(a) * rx * k, y = Math.sin(a) * ry * k;
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function drawBubble(ctx, b) {
+  const p = project(b.wx, b.wy, b.z);
+  const rage = b.style === "rage", loud = rage || b.style === "shout";
+  ctx.globalAlpha = Math.min(1, b.life * 2, (b.max - b.life) * 6);
+
+  const maxW = Math.min(view.stageW * 0.74, view.w - 34);
+  let fs = Math.max(11, view.stageW * 0.034) * b.scale * (b.small ? 0.78 : 1);
+  const font = () => ctx.font = `${loud ? 900 : "bold"} ${fs}px sans-serif`;
+  font();
+  let lines = wrapLines(ctx, b.str, maxW);
+  while (lines.length > 3 && fs > 10) { fs -= 1; font(); lines = wrapLines(ctx, b.str, maxW); }
+  if (!lines.length) return;                 // nothing to say
+
+  const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+  const lh = fs * 1.18;
+  const padX = fs * (rage ? 1.0 : 0.55), padY = fs * (rage ? 0.8 : 0.4);
+  const bw = tw + padX * 2, bh = lines.length * lh + padY * 2;
+  // Rage bubbles get a spiky border outside the box, so they need room for it.
+  const halo = rage ? Math.max(bw, bh) * 0.1 : 0;
+  const cx = clamp(p.x, bw / 2 + halo + 6, view.w - bw / 2 - halo - 6);
+  const cy = Math.max(bh / 2 + halo + 8, p.y - bh / 2 - fs * 1.4);
+  const wob = rage ? Math.sin(b.life * 34) * 2.2 : 0;
+
+  // Tail first, hidden under the body — it reads as poking out of the bubble.
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.moveTo(cx - fs * 0.34, cy); ctx.lineTo(cx + fs * 0.34, cy);
+  ctx.lineTo(p.x, p.y - fs * 0.3); ctx.closePath(); ctx.fill();
+
+  ctx.save();
+  ctx.translate(cx + wob, cy);
+  if (rage) {
+    spikyPath(ctx, bw / 2, bh / 2, 20, 0.19, b.life * 1.5);
+    ctx.fillStyle = "#fff"; ctx.fill();
+    ctx.strokeStyle = "#c1121f"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.roundRect(-bw / 2, -bh / 2, bw, bh, fs * 0.55);
+    ctx.fillStyle = "#fff"; ctx.fill();
+    if (loud) { ctx.strokeStyle = "#e8a020"; ctx.lineWidth = 2.5; ctx.stroke(); }
+  }
+  ctx.fillStyle = b.col || (rage ? "#c1121f" : "#111");
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const y0 = -(lines.length - 1) * lh / 2;
+  for (let i = 0; i < lines.length; i++) ctx.fillText(lines[i], 0, y0 + i * lh);
+  ctx.restore();
   ctx.globalAlpha = 1;
 }
 

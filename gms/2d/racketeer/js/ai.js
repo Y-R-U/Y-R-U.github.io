@@ -153,7 +153,7 @@ export function aiBetweenPoints(m) {
 
   if (skills.includes("heckle") && Math.random() < chance) {
     setState(m.oppP, "heckle");
-    FX.speech(m.oppP.x, OPP_Y - 0.5, pickBag("oppheck", NAMES.HECKLES), 2.4);
+    FX.shoutSpeech(m.oppP.x, m.oppP.y - 0.5, pickBag("oppheck", NAMES.HECKLES), 3);
     sfx.heckleLaugh();
     m.comp = clamp(m.comp - (6 + stars * 3), 5, 100);
     ticker(m, "You've been heckled! Composure shaken.");
@@ -169,7 +169,7 @@ export function aiBetweenPoints(m) {
   if (skills.includes("argue") && m.lastPointWonBy === "you" && Math.random() < chance * 0.7) {
     setState(m.oppP, "argue");
     pokeUmpire(); sfx.umpBeep();
-    FX.speech(m.oppP.x, OPP_Y - 0.5, pick(NAMES.ARGUE_LINES), 2.2);
+    FX.rageSpeech(m.oppP.x, m.oppP.y - 0.5, NAMES.argueLine(), 3.2);
     if (Math.random() < 0.25) {
       // They steal your point!
       m.ptsYou = Math.max(0, m.ptsYou - 1); m.ptsOpp++;
@@ -183,7 +183,7 @@ export function aiBetweenPoints(m) {
   if (skills.includes("injury") && (m.oppStam < 40 || m.oppComp < 40) && m.oppFx.injuriesUsed < 1 && Math.random() < 0.5) {
     m.oppFx.injuriesUsed++;
     setState(m.oppP, "injury");
-    FX.speech(m.oppP.x, OPP_Y - 0.5, pick(NAMES.INJURY_LINES), 2.4);
+    FX.speech(m.oppP.x, m.oppP.y - 0.5, pick(NAMES.INJURY_LINES), 2.6);
     sfx.whistle();
     m.oppStam = clamp(m.oppStam + 50, 0, 100);
     m.oppComp = clamp(m.oppComp + 35, 0, 100);

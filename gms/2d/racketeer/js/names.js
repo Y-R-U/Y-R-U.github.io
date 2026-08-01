@@ -68,17 +68,37 @@ export const HECKLES = [
 export const GRUNTS = ["HNNGYAAA!", "WRYYAAAGH!", "EEEYUUURGH!", "BLAAARGH!", "HUUUURKKK!", "NYOOOM!",
   "GRAAAHHH!", "YEEEEET!", "WAAAHOOO!", "SKRRRAAA!"];
 
+// Comic-book swearing. `{*}` in a line is swapped for a fresh run of symbols every
+// time it's said, so the same line never bleeps the same way twice.
+const CENSOR_CHARS = "@#$%&!*§¤?";
+export function bleep(min = 3, max = 6) {
+  let s = "";
+  for (let i = randi(min, max); i > 0; i--) s += CENSOR_CHARS[randi(0, CENSOR_CHARS.length - 1)];
+  return s;
+}
+
 export const ARGUE_LINES = [
-  "THAT BALL WAS SO IN IT BOUGHT PROPERTY THERE!", "ARE YOU BLIND OR JUST FASHIONABLY LATE?",
-  "I DEMAND A RECOUNT!", "THE CHALK DUST FLEW! EVERYONE SAW THE DUST!",
-  "MY LAWYER WILL HEAR ABOUT THIS!", "YOU CALL THAT A CALL? I CALL THAT A CRIME!",
+  "THAT BALL WAS SO {*} IN IT BOUGHT PROPERTY THERE!",
+  "ARE YOU {*} BLIND OR JUST FASHIONABLY LATE?",
+  "I DEMAND A {*} RECOUNT!",
+  "THE CHALK DUST FLEW! EVERYONE SAW THE {*} DUST!",
+  "MY LAWYER WILL HEAR ABOUT THIS, YOU {*}!",
+  "YOU CALL THAT A CALL? I CALL THAT A {*} CRIME!",
+  "IN! IT WAS IN! ASK THE {*} PIGEONS, THEY SAW IT!",
+  "GET YOUR {*} EYES TESTED, YOU ABSOLUTE DECKCHAIR!",
+  "I'VE SEEN BETTER CALLS OUT OF A {*} PHONE BOX!",
+  "THAT WAS ON THE LINE! THE {*} LINE! IT'S RIGHT THERE!",
 ];
+export function argueLine() { return pick(ARGUE_LINES).replace(/\{\*\}/g, () => bleep()); }
 
 export const UMPIRE_OK = ["The umpire squints... POINT OVERTURNED!", "\"Upon review... you're right, somehow.\"",
   "The umpire checks a coin. Heads! Point yours!"];
 export const UMPIRE_BAD = ["\"CODE VIOLATION. Also your shoes are untied.\"", "Point docked. Snacks too.",
   "\"Overruled. And frankly, hurtful.\""];
 export const UMPIRE_REPLAY = ["\"Play it again. Never speak of this.\"", "The umpire was asleep. REPLAY THE POINT."];
+// What the chair actually says back, in its own bubble.
+export const UMPIRE_SNAP = ["OVERRULED. SIT DOWN.", "CODE VIOLATION!", "THAT'S QUITE ENOUGH.",
+  "THE BALL WAS OUT. NEXT POINT.", "ONE MORE WORD."];
 
 export const CROWD_LINES = ["The crowd goes WILD!", "A grown adult faints with excitement!",
   "Someone throws a bouquet! And a shoe!", "Nobody can stop the wave!",

@@ -30,7 +30,7 @@ export const SKILLS = {
   },
   grunt: {
     id: "grunt", name: "Grunt", emo: "📢", type: "active", arm: true,
-    desc: "Arm a competition-grade grunt: extra pace on your next shot, and at higher levels the sheer noise startles your opponent.",
+    desc: "Arm a competition-grade grunt. Every level makes it LOUDER: more pace on your next shot, a better chance the noise startles your opponent into a mistake — and a shorter cooldown.",
     cost: costs(100),
     cd: steps(10, 4),
     fx: { pow: ramp(0.12, 0.45), startle: ramp(0, 0.8) },
@@ -132,6 +132,39 @@ export const SKILL_ORDER = ["power", "grunt", "heckle", "argue", "outrageous", "
 export function takesSlot(id) {
   const d = SKILLS[id];
   return !!d && d.type === "active" && !d.noSlot;
+}
+
+/* ---------------- what a level actually buys you ----------------
+   "Upgrade" used to show nothing but a shrinking cooldown, so every skill looked
+   like it only levelled its timer. These name every number behind a level, and the
+   shop puts the next level's value beside it. */
+const pct = (v) => Math.round(v * 100) + "%";
+const STAT_OF = {
+  power: (fx) => [["power", "+" + pct(fx.pow)], ["stamina", "−" + Math.round(fx.stam)]],
+  grunt: (fx) => [["pace", "+" + pct(fx.pow)], ["startle chance", pct(fx.startle)]],
+  heckle: (fx) => [["their composure", "−" + Math.round(fx.comp)]],
+  argue: (fx) => [["overturned", pct(fx.win)], ["replayed", pct(fx.replay)]],
+  outrageous: (fx) => [["lands", pct(fx.landChance)], ["hype", "+" + Math.round(fx.hype)],
+    ["cash", "$" + Math.round(fx.cash)]],
+  underarm: (fx) => [["ace chance", pct(fx.ace)], ["their composure", "−" + Math.round(fx.tilt)]],
+  injury: (fx) => [["recovers", "+" + Math.round(fx.heal)]],
+  pigeon: (fx) => [["their next error", "+" + pct(fx.weaken)]],
+  racketsmash: (fx) => [["hype", "+" + Math.round(fx.hype)], ["racket bill", "$" + Math.round(fx.cashCost)]],
+  crowdwork: (fx) => [["hype", "+" + Math.round(fx.hype)]],
+  zone: (fx) => [["shots", fx.shots], ["timing window", "×" + fx.widen.toFixed(1)]],
+  luckyballs: (fx) => [["serve speed", "+" + pct(fx.serve)], ["shank error", "−" + pct(fx.mercy)]],
+  netcord: (fx) => [["tape luck", pct(fx.luck)]],
+};
+
+export function skillStats(id, lvl) {
+  const def = SKILLS[id];
+  const i = Math.max(0, Math.min(MAX_LVL, lvl) - 1);
+  const fx = {};
+  for (const k of Object.keys(def.fx)) fx[k] = def.fx[k][i];
+  const bits = (STAT_OF[id] || (() => []))(fx).map(([name, val]) => ({ name, val: String(val) }));
+  if (def.cd && def.cd[0]) bits.push({ name: "cooldown", val: def.cd[i] + "s" });
+  if (def.uses) bits.push({ name: "per match", val: String(def.uses) });
+  return bits;
 }
 
 export function skillLvl(save, id) { return save.skills[id] || 0; }

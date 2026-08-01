@@ -1,21 +1,31 @@
 // Pseudo-3D projection + court/crowd/umpire rendering.
 // World: x lateral (0 = centre), y depth (0 = near baseline .. L = far baseline), z up. Metres.
 import { COURT, CAM } from "./const.js";
-import { clamp } from "./util.js";
+import { clamp, lerp } from "./util.js";
 
-export const view = { w: 0, h: 0, dpr: 1 };
+export const view = { w: 0, h: 0, dpr: 1, stageW: 0 };
+
+// The game is drawn portrait. Let the court stretch to the full width of a desktop
+// window and it becomes a comically wide letterbox, so the playing area is capped
+// at a bit under one screen-height wide, centred — and the space left over at the
+// sides fills with crowd instead.
+const STAGE_MAX_AR = 0.85;
 
 export function resize(canvas) {
   view.dpr = Math.min(2, window.devicePixelRatio || 1);
   view.w = window.innerWidth; view.h = window.innerHeight;
+  view.stageW = Math.min(view.w, view.h * STAGE_MAX_AR);
+  // Published so the DOM menus can hug the same centre column as the court.
+  document.documentElement.style.setProperty("--stage-w", view.stageW + "px");
   canvas.width = view.w * view.dpr; canvas.height = view.h * view.dpr;
   canvas.getContext("2d").setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+  reseedCrowd();
 }
 
 const f = (y) => 1 / (y + CAM.DEPTH);
 
 export function pxPerM(y) {
-  return (view.w * 1.06 / COURT.W) * (CAM.DEPTH * f(y));
+  return (view.stageW * 1.06 / COURT.W) * (CAM.DEPTH * f(y));
 }
 
 export function groundY(y) {
@@ -43,20 +53,49 @@ function quad(ctx, pts) {
   ctx.closePath(); ctx.fill();
 }
 
-// Crowd members are stable per-match; seeded on setCrowd().
-let crowd = [];
-export function setCrowd(n) {
+// Crowd members are stable per-match; seeded on setCrowd() and again on resize,
+// because how far out they have to reach depends on the window.
+let crowd = [], crowdN = 0;
+const SKINS = ["#f2c79c", "#d9a066", "#a56a3a", "#7c4a24", "#ffdbac"];
+
+// How far out (in metres) the crowd has to go at this depth to reach the edge of
+// the frame. On a phone that's barely past the run-off; on a desktop it's miles.
+function edgeX(y) { return (view.w / 2 + 40) / pxPerM(y); }
+
+export function setCrowd(n) { crowdN = n; reseedCrowd(); }
+
+export function reseedCrowd() {
   crowd = [];
-  for (let i = 0; i < n; i++) {
-    const side = Math.random() < 0.5 ? -1 : 1;
-    crowd.push({
-      x: side * (COURT.W / 2 + 1.8 + Math.random() * 2.4),
-      y: 3 + Math.random() * (COURT.L - 6),
-      hue: Math.floor(Math.random() * 360),
-      skin: ["#f2c79c", "#d9a066", "#a56a3a", "#7c4a24", "#ffdbac"][Math.floor(Math.random() * 5)],
-      ph: Math.random() * 7, amp: 0.5 + Math.random(),
-    });
+  if (!crowdN || !view.stageW) return;
+  // Seats are laid out in rows that stay evenly spaced ON SCREEN, so they read as
+  // banked seating rather than people scattered on a lawn. How many of those seats
+  // actually have somebody in them is the venue's business: a Tesco car park gets a
+  // sprinkling, Centre Court gets a wall of faces.
+  const density = clamp(crowdN / 70, 0.07, 0.92);
+  const inner = COURT.W / 2 + COURT.MARGIN_X + 0.5;   // outside the run-off, not on it
+  // Nothing in front of the near baseline: at that depth a spectator fills a third
+  // of the screen, and the run-off has nowhere to put them anyway.
+  const yMin = -1.2, yMax = COURT.L + COURT.MARGIN_Y + 2;
+  for (let y = yMin; y < yMax; y += 0.9 + Math.max(0, y + 1.2) * 0.055) {
+    const step = Math.max(0.85, 34 / pxPerM(y));
+    const out = edgeX(y);
+    for (let x = inner; x < out; x += step) {
+      // Courtside fills before the cheap seats, so a quiet venue still looks like a
+      // venue rather than a scattering of people in a field.
+      const near = density * lerp(1.5, 0.55, (x - inner) / Math.max(1, out - inner));
+      for (const side of [-1, 1]) {
+        if (Math.random() > near) continue;
+        crowd.push({
+          x: side * (x + Math.random() * step * 0.6),
+          y: y + Math.random() * 0.6,
+          hue: Math.floor(Math.random() * 360),
+          skin: SKINS[Math.floor(Math.random() * SKINS.length)],
+          ph: Math.random() * 7, amp: 0.5 + Math.random(),
+        });
+      }
+    }
   }
+  crowd.sort((a, b) => b.y - a.y);          // far rows painted first
 }
 
 export function drawScene(ctx, t, hype, flash) {
@@ -68,12 +107,14 @@ export function drawScene(ctx, t, hype, flash) {
   // Stadium band
   ctx.fillStyle = "#132c1c";
   ctx.fillRect(0, h * CAM.HORIZON - 26, w, 70);
-  // Floodlights
-  for (const fx of [0.12, 0.88]) {
+  // Floodlights — pinned to the court, not the window, so they still frame it on a
+  // wide screen instead of drifting off to the corners.
+  for (const s of [-1, 1]) {
+    const fx = w / 2 + s * view.stageW * 0.4;
     ctx.strokeStyle = "#0a1a10"; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(w * fx, h * CAM.HORIZON - 20); ctx.lineTo(w * fx, h * CAM.HORIZON - 78); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(fx, h * CAM.HORIZON - 20); ctx.lineTo(fx, h * CAM.HORIZON - 78); ctx.stroke();
     ctx.fillStyle = flash ? "#fff8d0" : "#ffec9e";
-    ctx.beginPath(); ctx.ellipse(w * fx, h * CAM.HORIZON - 84, 16, 9, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(fx, h * CAM.HORIZON - 84, 16, 9, 0, 0, 7); ctx.fill();
   }
 
   // Outer ground
@@ -89,7 +130,7 @@ export function drawScene(ctx, t, hype, flash) {
   quad(ctx, [[-HW, 0], [HW, 0], [HW, L], [-HW, L]]);
 
   // Lines
-  ctx.strokeStyle = "rgba(255,255,255,.92)"; ctx.lineWidth = Math.max(1.5, view.w / 260);
+  ctx.strokeStyle = "rgba(255,255,255,.92)"; ctx.lineWidth = Math.max(1.5, view.stageW / 260);
   line(ctx, -HW, 0, HW, 0); line(ctx, -HW, L, HW, L);           // baselines
   line(ctx, -HW, 0, -HW, L); line(ctx, HW, 0, HW, L);           // sidelines
   const sv = COURT.L / 2 - 5.485;                                // service lines
@@ -113,7 +154,7 @@ export function drawServeTarget(ctx, side, far, t) {
   ctx.fillStyle = `rgba(255,226,74,${0.07 + pulse * 0.07})`;
   quad(ctx, [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
   ctx.strokeStyle = `rgba(255,226,74,${0.45 + pulse * 0.35})`;
-  ctx.lineWidth = Math.max(2, view.w / 230);
+  ctx.lineWidth = Math.max(2, view.stageW / 230);
   ctx.beginPath();
   [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].forEach(([x, y], i) => {
     const p = project(x, y, 0);
@@ -184,7 +225,7 @@ export function drawNet(ctx) {
     ctx.stroke();
   }
   // Tape
-  ctx.strokeStyle = "#f5f5f5"; ctx.lineWidth = Math.max(2, view.w / 200);
+  ctx.strokeStyle = "#f5f5f5"; ctx.lineWidth = Math.max(2, view.stageW / 200);
   ctx.beginPath(); ctx.moveTo(at.x, at.y); ctx.lineTo(bt.x, bt.y); ctx.stroke();
   // Posts
   ctx.strokeStyle = "#222"; ctx.lineWidth = 3;
