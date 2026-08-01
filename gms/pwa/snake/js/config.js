@@ -232,19 +232,40 @@ const CONFIG = {
         coinBonus:    { name: 'Coin Bonus',        maxLevel: 15, baseCost: 100, costScale: 1.50, perLevel: 0.06, unit: 'more coins', fmt: 'pct' }
     },
 
-    // The ladder. A run that ends in a win climbs it, a run that ends badly
-    // slides back down, and a decent death roughly holds station — see
-    // Ladder.delta for the numbers.
-    LADDER_START_RATING: 1000,
+    // The ladder.
+    //
+    // A quarter of a million players, so it is a CURVE, not a table: rating maps
+    // to a rank and back again, and only the rows actually on screen are ever
+    // built. Everyone starts at the bottom of it.
+    LADDER_POPULATION: 246000,       // before the daily drift below
+    LADDER_POP_DRIFT: 0.012,         // ±1.2% a day — people arrive and give up
+    LADDER_TOP_RATING: 10000,
+    LADDER_START_RATING: 0,
     LADDER_MIN_RATING: 0,
-    LADDER_WIN_GAIN: 150,
-    LADDER_MASS_PAR: 2500,           // die above this and you still gain
-    LADDER_MASS_DIV: 100,            // mass per point either side of par
+    LADDER_RANK_CURVE: 3,            // >1 packs the beginners in at the bottom
+
+    // What a run is worth. The bar you are measured against is LADDER_PAR_MIN
+    // mass while you are down among the two hundred thousand, and climbs to
+    // LADDER_PAR_TOP — nearly a win — by the time you are in the top hundred.
+    // Tuned in a whole-career sim, not by eye: at these numbers a strong player
+    // needs ~93 wins to reach the top 100 and a player who never wins at all
+    // tops out around rank 15,000.
+    LADDER_PAR_MIN: 500,
+    LADDER_PAR_TOP: 9200,
+    LADDER_PAR_CURVE: 6,             // flat for most of the table, then it bites
+    LADDER_STEP: 34,                 // rating per doubling of mass over par
+    LADDER_MAX_STEPS: 4.5,           // ceiling on that, in doublings
+    LADDER_MIN_STEPS: -2.5,          // and the floor, so one bad start is survivable
+    LADDER_WIN_GAIN: 26,             // on top of the mass, for actually winning
     LADDER_KILL_POINTS: 3,
-    LADDER_MAX_GAIN: 90,             // on a run that ended in death
-    LADDER_MAX_LOSS: 40,
-    LADDER_RIVALS: 60,
-    LADDER_DRIFT: 90,                // how far a rival's rating wanders per day
+
+    // The regulars you meet again and again. They keep their own rating in the
+    // save and move it every game you play, so they climb roughly with you —
+    // and can be overtaken, or lost to.
+    LADDER_CAREER_RIVALS: 6,
+    LADDER_RIVAL_SPREAD: 420,        // how far above/below you they start
+    LADDER_RIVAL_PACE: 0.85,         // their gain per game, against your average
+    LADDER_RIVAL_SWING: 0.9,         // how erratic that is, 0 = clockwork
 
     // Resume. The run is written to its own local slot every RESUME_SAVE_MS so a
     // reload — accidental or otherwise — does not throw the run away. It is

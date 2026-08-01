@@ -748,12 +748,32 @@ html, body {
     font-weight: 800;
 }
 .ladder-pos {
-    width: 26px;
+    width: 54px;             /* six figures of rank, comma and all */
     font-size: 11px;
+    font-variant-numeric: tabular-nums;
     color: var(--text-dim);
     text-align: right;
 }
 .ladder-row.me .ladder-pos { color: var(--accent); }
+
+/* The regulars — the snakes you actually keep meeting in the arena. */
+.ladder-row.rival .ladder-name {
+    color: var(--text);
+    font-weight: 700;
+}
+.ladder-row.rival .ladder-name::after {
+    content: "·";
+    margin-left: 6px;
+    color: var(--accent);
+}
+
+.ladder-gap {
+    padding: 4px 12px;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+}
 .ladder-name {
     flex: 1;
     overflow: hidden;

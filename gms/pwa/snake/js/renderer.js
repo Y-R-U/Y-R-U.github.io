@@ -5,20 +5,47 @@ class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
+        this.width = 0;
+        this.height = 0;
         this.resize();
+
         this._resizeHandler = () => this.resize();
         window.addEventListener('resize', this._resizeHandler);
+        window.addEventListener('orientationchange', this._resizeHandler);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', this._resizeHandler);
+
+        // The one that actually catches everything: the canvas fills the
+        // viewport by CSS, so if its box changes for any reason we hear about
+        // it — including the cases where mobile browsers never fire `resize`.
+        if (window.ResizeObserver) {
+            this._ro = new ResizeObserver(() => this.resize());
+            this._ro.observe(this.canvas);
+        }
     }
 
+    /**
+     * Size the backing store to the canvas ELEMENT, never to window.innerWidth.
+     *
+     * Those two disagree the moment the visual viewport does — the on-screen
+     * keyboard opening on the name field, the URL bar collapsing — and iOS in
+     * particular does not reliably fire `resize` when the keyboard goes away.
+     * That left the game drawing into a slice of the screen with stale pixels
+     * around it until the page was reloaded.
+     */
     resize() {
+        const rect = this.canvas.getBoundingClientRect();
+        const w = Math.round(rect.width) || window.innerWidth;
+        const h = Math.round(rect.height) || window.innerHeight;
+        if (!w || !h) return;                          // laid out at zero; try again later
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        this.canvas.width = window.innerWidth * dpr;
-        this.canvas.height = window.innerHeight * dpr;
-        this.canvas.style.width = window.innerWidth + 'px';
-        this.canvas.style.height = window.innerHeight + 'px';
-        this.ctx.scale(dpr, dpr);
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        if (this.width === w && this.height === h && this._dpr === dpr) return;
+
+        this._dpr = dpr;
+        this.canvas.width = Math.round(w * dpr);
+        this.canvas.height = Math.round(h * dpr);
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);   // canvas.width already reset it; be explicit
+        this.width = w;
+        this.height = h;
     }
 
     /**

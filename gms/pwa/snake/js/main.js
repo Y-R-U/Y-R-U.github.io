@@ -229,7 +229,12 @@ class Game {
             const name = usernameInput.value.trim() || 'Player';
             this.saveData.username = name;
             Storage.save(this.saveData);
+            usernameInput.blur();   // drop the keyboard before we measure anything
         }
+
+        // Typing a name opens the on-screen keyboard, which changes the viewport
+        // under us. Measure once more now that it's gone.
+        this.renderer.resize();
 
         // Get player stats from upgrades
         const stats = Upgrades.getPlayerStats(this.saveData);
@@ -828,11 +833,22 @@ class Game {
         if (!el || !move) return;
         const up = move.delta >= 0;
         const moved = move.climbed;
-        const movement = moved > 0 ? `up ${moved}` : moved < 0 ? `down ${-moved}` : 'holding';
+        const climb = moved > 0 ? ` · up ${Utils.thousands(moved)}` : moved < 0 ? ` · down ${Utils.thousands(-moved)}` : '';
         el.className = 'ladder-move ' + (up ? 'up' : 'down');
         el.innerHTML =
             `<span class="ladder-move-pts">${up ? '+' : ''}${move.delta}</span>` +
-            `<span class="ladder-move-rank">Rank ${move.rank} of ${Ladder.size()} · ${movement}</span>`;
+            `<span class="ladder-move-rank">#${Utils.thousands(move.rank)} of ${Utils.thousands(Ladder.size())}${climb}</span>`;
+    }
+
+    _ladderRows(rows) {
+        // The bottom of a quarter-million-deep table really is everyone on zero,
+        // and a column of noughts reads as a bug rather than as the truth.
+        return rows.map(r => `
+            <div class="ladder-row ${r.isPlayer ? 'me' : ''} ${r.isRival ? 'rival' : ''}">
+                <span class="ladder-pos">${Utils.thousands(r.rank)}</span>
+                <span class="ladder-name">${Utils.escapeHtml(r.name)}</span>
+                <span class="ladder-rating">${r.rating > 0 ? r.rating : '–'}</span>
+            </div>`).join('');
     }
 
     /** The few rows either side of the player, for the menu. */
@@ -841,43 +857,41 @@ class Game {
         if (!box) return;
 
         this.saveData = Storage.load();
-        const rows = Ladder.board(this.saveData);
-        const me = rows.findIndex(r => r.isPlayer);
-        const from = Utils.clamp(me - 1, 0, Math.max(0, rows.length - 3));
-        const slice = rows.slice(from, from + 3);
+        const rows = Ladder.around(3, this.saveData);
+        const rank = Ladder.rank(this.saveData);
 
         box.innerHTML =
-            `<div class="ladder-head">GLOBAL LADDER<span>#${me + 1} of ${rows.length}</span></div>` +
-            slice.map((r, i) => `
-                <div class="ladder-row ${r.isPlayer ? 'me' : ''}">
-                    <span class="ladder-pos">${from + i + 1}</span>
-                    <span class="ladder-name">${Utils.escapeHtml(r.name)}</span>
-                    <span class="ladder-rating">${r.rating}</span>
-                </div>`).join('');
+            `<div class="ladder-head">GLOBAL LADDER` +
+            `<span>#${Utils.thousands(rank)} of ${Utils.thousands(Ladder.size())}</span></div>` +
+            this._ladderRows(rows);
     }
 
-    /** The whole table. */
+    /** The neighbourhood, plus the top of the world for something to aim at. */
     _renderLadder() {
         const list = document.getElementById('ladder-list');
         if (!list) return;
 
         this.saveData = Storage.load();
-        const rows = Ladder.board(this.saveData);
         const state = Ladder.state(this.saveData);
-        const me = rows.findIndex(r => r.isPlayer) + 1;
+        const rank = Ladder.rank(this.saveData);
+        const par = Math.round(Ladder.par(state.rating));
 
         const note = document.getElementById('ladder-note');
         if (note) {
-            note.textContent = `Rating ${state.rating} · best rank ${state.bestRank || me}. ` +
-                'Win a run to climb; a short run drops you back.';
+            const best = state.bestRank && state.bestRank < rank
+                ? ` · best #${Utils.thousands(state.bestRank)}` : '';
+            note.textContent =
+                `Rating ${state.rating}${best}. ` +
+                `Beat ${Utils.thousands(par)} mass in a run to climb — that bar rises with you.`;
         }
 
-        list.innerHTML = rows.map((r, i) => `
-            <div class="ladder-row ${r.isPlayer ? 'me' : ''}">
-                <span class="ladder-pos">${i + 1}</span>
-                <span class="ladder-name">${Utils.escapeHtml(r.name)}</span>
-                <span class="ladder-rating">${r.rating}</span>
-            </div>`).join('');
+        const top = Ladder.top(5);
+        const near = Ladder.around(41, this.saveData);
+
+        list.innerHTML =
+            this._ladderRows(top) +
+            (near[0].rank > top.length + 1 ? '<div class="ladder-gap">···</div>' : '') +
+            this._ladderRows(near);
 
         const mine = list.querySelector('.ladder-row.me');
         if (mine) mine.scrollIntoView({ block: 'center' });

@@ -39,6 +39,11 @@ const Utils = {
         ));
     },
 
+    /** 245386 → "245,386". Ranks are big numbers now. */
+    thousands(n) {
+        return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    },
+
     /** Clamp value between min and max */
     clamp(v, min, max) {
         return v < min ? min : v > max ? max : v;

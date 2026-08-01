@@ -19,9 +19,11 @@ const Storage = {
                 coinBonus: 0
             },
             ladder: {
+                v: 2,            // bumped when the rating scale changes under old saves
                 rating: CONFIG.LADDER_START_RATING,
                 peak: CONFIG.LADDER_START_RATING,
-                bestRank: 0
+                bestRank: 0,
+                rivals: []       // the regulars; seeded on first play, then they live here
             },
             stats: {
                 gamesPlayed: 0,
@@ -56,7 +58,7 @@ const Storage = {
                 unlockedSkins: data.unlockedSkins ?? defaults.unlockedSkins,
                 coins: data.coins ?? defaults.coins,
                 upgrades: { ...defaults.upgrades, ...(data.upgrades || {}) },
-                ladder: { ...defaults.ladder, ...(data.ladder || {}) },
+                ladder: this._migrateLadder(defaults.ladder, data),
                 stats: { ...defaults.stats, ...(data.stats || {}) },
                 settings: { ...defaults.settings, ...(data.settings || {}) }
             };
@@ -64,6 +66,30 @@ const Storage = {
             console.warn('Failed to load save data:', e);
             return this._defaults();
         }
+    },
+
+    /**
+     * The first ladder was a 60-row table where everyone started on 1000 and a
+     * win was worth 150. The new one is a quarter of a million deep and starts
+     * at zero, so those old numbers would drop a two-game player straight into
+     * the top few thousand. Rebuild the rating from what the career actually
+     * shows instead: wins first, then best run, then games played.
+     */
+    _migrateLadder(defaults, data) {
+        const saved = data.ladder || {};
+        // The raw save, not a merge with the defaults — the defaults carry the
+        // current `v`, so merging first would make every old save look current.
+        if (saved.v === 2) return { ...defaults, ...saved };
+        const s = data.stats || {};
+        const wins = s.victories || 0;
+        const best = s.highScore || 0;
+        const games = s.gamesPlayed || 0;
+        const earned =
+            wins * 90 +
+            Math.min(4200, Math.sqrt(best / CONFIG.WIN_MASS) * 4200) +
+            Math.min(900, games * 18);
+        const rating = Utils.clamp(Math.round(earned), 0, CONFIG.LADDER_TOP_RATING);
+        return { v: 2, rating, peak: rating, bestRank: 0, rivals: [] };
     },
 
     save(data) {
@@ -144,12 +170,18 @@ const Storage = {
      * the session — difficulty follows the account between devices. Games played
      * ramps it; a high score or a win pulls it up faster so a good player is not
      * stuck against beginners' bots.
+     *
+     * Ladder rating is in here too, and it is the one that keeps mattering: the
+     * other three saturate within about forty games, and the climb from there to
+     * the top hundred is most of the career. Low ranks stay easy on purpose.
      */
     aiPressure(data) {
         const s = (data && data.stats) || {};
         const byGames = Utils.clamp((s.gamesPlayed || 0) / CONFIG.AI_PRESSURE_GAMES, 0, 1);
         const byScore = Utils.clamp((s.highScore || 0) / CONFIG.WIN_MASS, 0, 1);
         const byWins = Utils.clamp((s.victories || 0) / 3, 0, 1);
-        return Utils.clamp(Math.max(byGames, byScore * 0.9, byWins), 0, 1);
+        const rating = ((data && data.ladder) || {}).rating || 0;
+        const byRank = Utils.clamp(rating / CONFIG.LADDER_TOP_RATING, 0, 1);
+        return Utils.clamp(Math.max(byGames, byScore * 0.9, byWins, byRank), 0, 1);
     }
 };
