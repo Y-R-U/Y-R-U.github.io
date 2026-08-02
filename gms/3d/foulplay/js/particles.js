@@ -222,6 +222,37 @@ function shade(hex, k) {
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// One shared ceiling on CONTINUOUS spark sources for the whole field — rims
+// grinding, panels dragging, debris skidding down the road. A token bucket in
+// REAL time, not sim time, because it exists to protect the GPU.
+//
+// It lives here rather than in car.js because loose debris needs it too, and
+// debris.js cannot import car.js without a cycle. Everything that sparks *every
+// frame while a condition holds* must go through this; one-off bursts (an
+// impact, a panel tearing off) bypass it, because those are the ones the player
+// is actually meant to notice and there are never many at once.
+let sparkPool = 0;
+let sparkLast = 0;
+export function sparkAllow(want) {
+  if (want <= 0) return 0;
+  const t = performance.now();
+  const cap = SPARK_BUDGET * (quality.particles || 1);
+  if (!sparkLast) { sparkLast = t; sparkPool = cap; }
+  const el = Math.min(0.25, (t - sparkLast) / 1000);
+  sparkLast = t;
+  sparkPool = Math.min(cap, sparkPool + cap * el);
+  const give = Math.min(want, Math.floor(sparkPool));
+  sparkPool -= give;
+  return give;
+}
+// Bursts per second across the whole field. Raised from 170 when loose panels
+// and skidding debris became spark sources of their own: at the old ceiling a
+// couple of cars on their rims ate the entire budget and every flapping panel
+// in the race went dry, which is exactly the "I haven't noticed any sparks"
+// report. One car on its floorpan wants ~45/s.
+const SPARK_BUDGET = 420;
+
 // Emitters
 // ---------------------------------------------------------------------------
 // Sparks are the workhorse: rim grinding, panel strikes, rail scrapes. Fast,

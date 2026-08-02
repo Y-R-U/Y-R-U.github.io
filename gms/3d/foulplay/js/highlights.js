@@ -495,6 +495,9 @@ export function updateHighlightPlayback(dt) {
 // The ghost is built fresh at full health, so without this a highlight showed a
 // factory-clean car — even one that had lost eight panels earlier in the race.
 const _gpose = { ax: 0, ay: 0, az: 0, s: 0, clampGround: true, dragY: 0 };
+// Bursts per second per hanging panel during a replay. Generous: slow motion
+// stretches a clip out, and a shower that reads well at 1x disappears at 0.38x.
+const REPLAY_SPARK_RATE = 14;
 function poseGhost(g, dangMask, dmg, t) {
   for (let k = 0; k < PART_IDS.length; k++) {
     const obj = g.parts[PART_IDS[k]];
@@ -508,6 +511,20 @@ function poseGhost(g, dangMask, dmg, t) {
       // Replay has no history, so drive `loose` off the clip clock: the panel
       // is visibly tearing further open across the shot.
       danglePose(obj, p, t * 6, 0.8, clamp01(t * 0.5), _gpose);
+      // …and let it throw sparks. The live car sparks off its hinges, but none
+      // of that is recorded, so the reel — the one place you are watching a
+      // crash in slow motion with nothing else to look at — was showing silent
+      // bodywork. Sparks are cheap and this is the shot they exist for.
+      p.hingeAcc = (p.hingeAcc || 0) + REPLAY_SPARK_RATE * (1 / 60);
+      let n = Math.floor(p.hingeAcc);
+      if (n > 0) {
+        p.hingeAcc -= n;
+        n = fx.sparkAllow(Math.min(n, 2));
+        for (let j = 0; j < n; j++) {
+          obj.getWorldPosition(_p2);
+          fx.sparkBurst(_p2, _up, 3 + (j & 1), 0xffc470, 9);
+        }
+      }
       continue;
     }
     if (p.wheel) continue;                 // a wheel does not dent, it comes off

@@ -244,12 +244,25 @@ export function updateDebris(dt, cars) {
     if (it.cool > 0) it.cool -= dt;
 
     it.vel.y -= CRASH.wreckGravity * dt;
+
+    // Air drag. A torn panel is a flat plate tumbling at 200 km/h, not a
+    // bullet: it should visibly wash off the car's speed over a second or two
+    // and fall behind. There was NO drag at all before, so a panel left the car
+    // at exactly the car's velocity and held it in a dead straight line until
+    // it faded out — which reads as a panel that keeps pace and then vanishes.
+    // Light panels slow faster than heavy ones.
+    const air = Math.exp(-CRASH.debrisDrag * dt / Math.max(0.35, it.mass));
+    it.vel.x *= air;
+    it.vel.z *= air;
+    it.spin.multiplyScalar(Math.exp(-CRASH.debrisSpinDrag * dt));
+
     it.mesh.position.addScaledVector(it.vel, dt);
 
     _e.set(it.spin.x * dt, it.spin.y * dt, it.spin.z * dt);
     _q.setFromEuler(_e);
     it.mesh.quaternion.multiply(_q);
 
+    it.sliding = false;
     if (it.mesh.position.y < it.groundY + 0.18) {
       it.mesh.position.y = it.groundY + 0.18;
       if (it.vel.y < -1.5) {
@@ -259,13 +272,43 @@ export function updateDebris(dt, cars) {
         it.spin.multiplyScalar(0.6);
         it.bounced++;
         if (it.hazard && it.bounced < 4 && Math.abs(it.vel.y) > 3) {
-          fx.sparkBurst(it.mesh.position, _v.set(0, 1, 0), 5, 0xffb43a, 7);
+          fx.sparkBurst(it.mesh.position, _v.set(0, 1, 0), 9, 0xffb43a, 9);
         }
       } else {
         it.vel.y = 0;
-        it.vel.x *= 0.9;
-        it.vel.z *= 0.9;
-        it.spin.multiplyScalar(0.86);
+        // Was `*= 0.9` per FRAME, which is frame-rate dependent and, at 60Hz,
+        // stopped a panel dead in about a fifth of a second — so debris went
+        // from "keeping up with the car" to "nailed to the road" with nothing
+        // in between. Now it scrubs off over roughly a second, on any device.
+        const grip = Math.exp(-CRASH.debrisSlide * dt);
+        it.vel.x *= grip;
+        it.vel.z *= grip;
+        it.spin.multiplyScalar(Math.exp(-3.2 * dt));
+        it.sliding = true;
+      }
+    }
+
+    // Sparks off a panel skidding down the tarmac. This is the one the owner
+    // kept asking for: a bonnet scraping along the road at 150 km/h should be
+    // throwing a rooster tail the whole way, not lying there silently. Rate and
+    // throw both scale with how fast it is actually sliding.
+    if (it.hazard && it.sliding) {
+      const sp = Math.hypot(it.vel.x, it.vel.z);
+      if (sp > 4) {
+        const heat = clamp(sp / 40, 0, 1);
+        it.sparkAcc = (it.sparkAcc || 0) + dt * CRASH.debrisSparkRate * (0.3 + heat);
+        let want = Math.floor(it.sparkAcc);
+        if (want > 0) {
+          it.sparkAcc -= want;
+          want = fx.sparkAllow(Math.min(want, 2));
+          for (let k = 0; k < want; k++) {
+            _v.set(-it.vel.x, 0, -it.vel.z).normalize().multiplyScalar(0.75);
+            _v.y = 0.45;
+            fx.sparkBurst(it.mesh.position, _v, 3 + Math.round(heat * 6),
+              0xffb43a, 7 + heat * 20);
+          }
+          if (Math.random() < 0.12) fx.smokePuff(it.mesh.position, 1, 0xb9b2a6, 0.9, 0.8);
+        }
       }
     }
 

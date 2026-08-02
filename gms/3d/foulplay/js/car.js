@@ -16,6 +16,7 @@ import { scene, quality } from './render.js';
 import { buildCar, animateCarMesh, partSpec } from './carfactory.js';
 import { spawnDetached, spawnScrap, addDebrisTarget, removeDebrisTarget } from './debris.js';
 import * as fx from './particles.js';
+import { sparkAllow as grindAllow } from './particles.js';
 import { showBubble, bubbleForDamage } from './bubbles.js';
 import { emit } from './bus.js';
 import { clamp, clamp01, damp, lerp, rand, randInt, wrap, angDiff, sign, smoothstep } from './utils.js';
@@ -160,26 +161,6 @@ const BUBBLE_ALIAS = {
 const MAX_LAT = 26;
 
 let nextId = 1;
-
-// One shared ceiling on grinding sparks for the whole field. A token bucket in
-// REAL time, not sim time, because it exists to protect the GPU: refilling on
-// elapsed milliseconds means whoever calls first in a frame gets the tokens and
-// everybody after it in the same frame gets what is left, with no frame counter
-// to plumb through from the render loop.
-let grindPool = 0;
-let grindLast = 0;
-function grindAllow(want) {
-  if (want <= 0) return 0;
-  const t = performance.now();
-  const cap = CRASH.grindBudget * (quality.particles || 1);
-  if (!grindLast) { grindLast = t; grindPool = cap; }
-  const el = Math.min(0.25, (t - grindLast) / 1000);
-  grindLast = t;
-  grindPool = Math.min(cap, grindPool + cap * el);
-  const give = Math.min(want, Math.floor(grindPool));
-  grindPool -= give;
-  return give;
-}
 
 function bubbleFor(id) {
   const r = bubbleForDamage(BUBBLE_ALIAS[id] || id);
@@ -1177,6 +1158,31 @@ export class Car {
           fx.sparkBurst(_v3, _v2.set(0, 0.6, 0), 4, 0xffc470, 7);
         }
         if (this.isPlayer) emit('car:scrape', { car: this, part: id, speed });
+      } else if (speed > 8 || this.mode === 'wreck') {
+        // Everything else that is hanging off. Sparks used to need a `drag`
+        // corner AND that corner to be within 6cm of the road AND the car to be
+        // on the track — so a bonnet, a roof, a spoiler or a mirror threw none
+        // at all, ever, and NOTHING sparked during a wreck because `grounded`
+        // excludes wreck mode. That is most of "I haven't noticed any sparks":
+        // the flapping was silent unless a door corner happened to be down.
+        //
+        // A panel tearing at its hinge is metal working against metal whatever
+        // it is attached to, so it throws a little the whole time it is loose,
+        // and more the harder it is being thrown about.
+        p.hingeAcc = (p.hingeAcc || 0) + dt * CRASH.hingeSparkRate
+          * (0.35 + flapK) * (0.5 + loose);
+        let n = Math.floor(p.hingeAcc);
+        if (n > 0) {
+          p.hingeAcc -= n;
+          n = grindAllow(Math.min(n, 2));
+          for (let k = 0; k < n; k++) {
+            obj.getWorldPosition(_v3);
+            const up = (this.frame && this.frame.up) || _up;
+            _v2.copy(up).multiplyScalar(0.45);
+            if (this.frame && this.frame.tan) _v2.addScaledVector(this.frame.tan, -0.6);
+            fx.sparkBurst(_v3, _v2, 2 + Math.round(flapK * 4), 0xffc470, 6 + flapK * 16);
+          }
+        }
       }
 
       if (p.dangling <= 0) {

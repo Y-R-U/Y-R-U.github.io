@@ -170,6 +170,11 @@ export const CRASH = {
   dangleMass: 6.6,          // …plus this per unit of panel mass
   sympathy: 0.30,           // chance a panel going pulls a dented neighbour with it
   dragSparkRate: 17,        // spark bursts/sec off a panel that is on the tarmac
+  // …and off one that is merely hanging there. A panel tearing at its hinge is
+  // metal on metal whatever it is bolted to, so a bonnet, a roof or a mirror
+  // throws sparks too — none of them have a `drag` corner, so before this they
+  // threw none at all, and neither did anything on a car that was mid-wreck.
+  hingeSparkRate: 7,
 
   // --- car-to-car contact ---------------------------------------------------
   // Contact used to have NO visual event at all — the damage model ran, the
@@ -191,6 +196,15 @@ export const CRASH = {
   debrisPush: 0.34,         // lateral m/s per m/s of closing speed
   debrisPushMax: 9,
   debrisCool: 0.6,          // seconds before the same piece can hit again
+  // A torn panel is a flat plate tumbling at speed, not a bullet. With no drag
+  // at all it left the car at the car's exact velocity and held it in a dead
+  // straight line until it faded — "it keeps pace with me and then vanishes".
+  // Exponential, divided by mass: a mirror washes off almost at once, a roof
+  // carries. At 0.85 a bonnet at 60 m/s is down to ~15 m/s after two seconds.
+  debrisDrag: 0.85,         // 1/s of horizontal air drag, per unit of mass
+  debrisSpinDrag: 0.55,     // 1/s — tumbling settles as it slows
+  debrisSlide: 2.6,         // 1/s of friction once it is ON the road
+  debrisSparkRate: 20,      // spark bursts/sec off a panel skidding on tarmac
 
   // --- driving on the rims --------------------------------------------------
   grindRate: 11,            // spark bursts/second from ONE grinding corner
@@ -199,7 +213,8 @@ export const CRASH = {
   // grinding side by side is the case that multiplies out of control. The FIELD
   // shares one ceiling rather than every car getting its own. Set generously:
   // one car on its floorpan wants ~45/s, so this only bites on a pile-up.
-  grindBudget: 170,         // spark bursts/second across every car on track
+  // (the field-wide spark ceiling now lives in particles.js:SPARK_BUDGET, so
+  // that loose debris can draw on the same bucket without importing car.js)
   wheelSpeedLoss: 0.05,     // it is a silly game: 5% of everything per wheel
   wheelSag: 0.115,          // metres the body drops per missing wheel
   wheelDrag: 0.85,          // extra rolling resistance per missing wheel

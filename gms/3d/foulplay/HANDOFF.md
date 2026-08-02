@@ -404,6 +404,72 @@ car's position data.
 (plus a `__ghosts()` accessor), because the reel is on screen for a few seconds
 after a race and nothing else could see inside it.
 
+---
+
+# ROUND 5c — sparks, and debris that actually slows down
+
+Owner: *"should be lots of sparks but I haven't noticed any… loose panels appear
+to flap for a bit then vanish? They are going the same speed as the car — they
+will slow from wind resistance, but you should see them do so over a second or
+3, not just vanish."*
+
+## Almost nothing was allowed to spark
+
+Three separate gates, and between them they silenced most of the carnage:
+
+1. **A flapping panel could only spark from a `drag` corner touching the road.**
+   It needed `f.drag` AND that corner within 6cm of the surface AND the car on
+   the track. Only sills, arches, doors, bumpers and wheels even *have* a drag
+   point — so a bonnet, roof, boot, spoiler or mirror hanging off the car threw
+   **no sparks at all, ever**. Measured over a race: 38 of 206 dangler-seconds
+   were on panels that could never spark under any circumstances.
+2. **`grounded` excludes wreck mode**, so during the one moment the whole
+   feature exists for — a car cartwheeling down the road shedding panels —
+   nothing sparked.
+3. **The field-wide budget was 170 bursts/sec.** One car on its floorpan wants
+   ~45/s, so two or three cars grinding ate the entire allowance and every
+   flapping panel in the race went dry.
+
+Fixes: a new `hingeSparkRate` throws sparks off *any* loose panel the whole time
+it is hanging (metal working at the hinge, whatever it is bolted to, wreck or
+not); loose debris sparks while it skids (`debrisSparkRate`); and the ceiling
+went 170 → **420**, moved out of `car.js` into `particles.js:SPARK_BUDGET` so
+that `debris.js` can draw on the same bucket without importing `car.js` (which
+would be a cycle — `car.js` imports `debris.js`).
+
+**Measured**, same track, same 2-lap auto race, identical dangler counts on
+field: live spark particles **median 124 → 276, p90 176 → 322**. Only 5% of
+frames now have no sparks at all.
+
+## Debris had no air drag, and frame-rate-dependent friction
+
+`updateDebris` applied gravity and nothing else horizontally. A panel left the
+car at the car's exact velocity and held it in a **dead straight line** until it
+faded out. Then, the instant it touched down, `vel.x *= 0.9` **per frame** — at
+60Hz that is a factor of 500 per second, so it stopped dead in about a fifth of
+a second (and behaved differently on a 30fps phone).
+
+So the life of a panel was: keeps pace with the car → nailed to the road →
+fades. Which is exactly "goes the same speed as the car, then vanishes".
+
+Now: exponential air drag divided by mass (`debrisDrag`, so a mirror washes off
+almost at once and a roof carries), spin settles as it slows
+(`debrisSpinDrag`), and ground friction is dt-based (`debrisSlide`).
+
+**Measured**, speed of a loose panel after it leaves the car:
+
+| | 0.2s | 1s | 2s | 3s |
+|---|---|---|---|---|
+| before | 38–52 m/s | 28–35 m/s | 0 | 0 |
+| after | 7–29 m/s | 2–15 m/s | 0–12 | ~0 |
+
+## The reel was silent too
+
+Replay ghosts flap but the live spark calls are not recorded, so the one place
+you watch a crash in slow motion with nothing else to look at had no sparks in
+it. `poseGhost` now throws them per hanging panel at `REPLAY_SPARK_RATE` (14/s,
+deliberately generous — a shower that reads at 1× disappears at 0.38×).
+
 ## Still open (unchanged from round 4)
 
 - Shadow map offset from its caster, applied to one vehicle only.
