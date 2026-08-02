@@ -3,47 +3,94 @@
 Owned files: `js/world/people.js`, `js/player.js`, `js/input.js`.
 Touched, minimally: `js/main.js` (wiring), `style.css` (the touch block only).
 
+Round 3 rewrote the figure. Rounds 1 and 2 both scored 2.7–2.8 blind; round 2's mistake was
+polishing shading while every complaint was about the outline. Everything in §1 changes the black
+shape of the figure against the sky.
+
 ---
 
-## 1. The figure — round 2
+## 1. What round 3 removed
 
-Round 1 was a lathe, and the blind critic killed it in one line: *"every figure is a cone of
-rotation with a knob on top … you cannot shade or light your way out of it."* Everything below
-exists to give light something to catch.
+**The scarf is gone.** It was a double-wound ribbon trailing 1.7 m off one shoulder, and on a phone
+it read as a flat plank sticking out sideways — Aaron's words were "the robes have a cape? cape
+doesn't look good". The `ribbon()` builder, `SCARF`, `SCARF_AXES`, `SCARF_SHADE`, `scarf()` and the
+`cape` term in the cloth shader are all deleted, not disabled. `aCloth` was `vec2 (amplitude, part)`
+where `part` only existed to redirect the scarf's motion; it is now `attribute float aCloth`, one
+component.
 
-**Robe — a faceted fold prism, not a revolve.** 5 rings, `SEG = 12` around, **flat-shaded**
-(face normals baked in `Build.flatTri`, not `material.flatShading`, so the props keep smooth
-normals). Each vertex is pushed radially by
+**The black face plate is gone.** Round 2 filled the hood opening with a coplanar fan at vertex
+colour 0.05. It rendered as a letterbox decal. There is now a real socket: one 45° segment of the
+jaw→brow band is left out, and the four boundary vertices run back 13 cm to a near-black point.
+The boundary keeps the fabric's own value scaled by 0.3, so the edge is continuous with the hood
+and only the depth of the cavity makes it dark. It is `flatTri`, not `tri`, so the four facets keep
+distinct normals and the socket still has a shading gradient inside it.
+
+Two things that did **not** work on the way there, both visible in `scratch/fig_front.png` history:
+
+- Leaving the boundary vertices at full hood brightness. One of the four socket facets catches the
+  sun and lights up like a facet of the head — you get a bright triangle next to a black one.
+- Authoring the socket normals to point *into* the cavity so it can never catch light. That gives a
+  perfectly uniform unlit quad, which is exactly the black rectangle again.
+
+## 2. The figure — a nine-ring loft
+
+Five robe rings, five hood rings, `SEG = 10` around the body and `HSEG = 8` around the hood, all
+flat-shaded via `Build.flatTri` (face normals baked in, not `material.flatShading`, so the props
+keep smooth normals).
+
+| ring | y | r | baked AO |
+|---|---|---|---|
+| hem | 0.00 | 0.402 | 0.36 |
+| shin | 0.31 | 0.302 | 0.72 |
+| knee | 0.67 | 0.270 | 0.86 |
+| waist | 0.98 | **0.216** | 0.62 |
+| neck | 1.22 | 0.182 | 0.74 |
+| hood mantle | 1.145 | **0.264** | 0.62 |
+| jaw | 1.352 | 0.214 | 0.64 |
+| brow | 1.462 | 0.194 | 0.74 |
+| temple | 1.566 | 0.152 | 0.94 |
+| crown | 1.672 | 0.086 | 1.00 |
+
+The profile changes direction five times: flare out to the hem, in to the waist, out to the cowl
+mantle, in to the jaw, out again over the brow. That is the whole point — round 1 and 2 were a
+monotone taper and the critic called it a cone of rotation both times.
+
+**The shoulder flare is the hood's mantle ring, not a robe ring.** 0.264 against the 0.216 waist is
+22 % wider. The robe's own neck ring is deliberately narrow (0.182) and lives entirely inside the
+cowl. This was rebuilt: the first attempt put the flare on the robe at 0.258 and the hood's bottom
+ring at 0.262 sitting *above* it, and the hood read as a lampshade balanced on a body, with the
+robe's open top ring poking 5 mm out through the hood at some azimuths.
+
+**Folds.** Each ring carries its own fold depth `f`, so the waist creases tight (0.088) and the hem
+swings loose (0.155):
 
 ```
-fold = cos(SEG/2 · a + phase) · (0.118 − 0.014·ring) + cos(2a + phase·1.7) · 0.042
+fold = cos(SEG/2 · a + ph)·R.f + cos(2a + ph·1.7)·0.040 + cos(3a − ph·0.8)·0.030
 ```
 
-`cos(SEG/2 · a)` lands on exactly ±1 at every vertex, so it is a clean in/out alternation; the
-phase advances 0.66 rad per ring, which is what makes the fold lines wander down the body instead
-of running dead vertical. The second, low-frequency term breaks the outline so the silhouette is
-not a regular 12-gon. That is ~96 triangles and it is more than half the value of the whole
-rebuild.
+`cos(SEG/2 · a)` lands on exactly ±1 at every vertex (SEG must stay even), so it is a clean in/out
+alternation; `ph` advances 0.66 rad per ring so the fold lines wander instead of running vertical.
+The 2- and 3-lobe terms stop the outline being a regular 10-gon.
 
-**Hem.** The bottom ring's `y` is offset per vertex — outward folds hang low, plus a hash jitter —
-so it scallops between roughly −0.10 and +0.05. It therefore pokes above the ground on a slope,
-which is why there is still a 12-triangle dark cap underneath.
+**Hem.** The bottom ring's `y` is `−0.045 − 0.085·fn` plus a hash jitter, so outward folds hang low
+and the bottom edge scallops between roughly −0.16 and +0.06 rather than cutting a clean ellipse.
+It therefore pokes above the ground in places, which is why there is still a 10-triangle dark cap
+underneath at vertex colour 0.12.
 
-**Hood.** Three rings (rim / brow / crown) plus an apex. The rim is *wider than the shoulders*
-(0.226 against 0.198) so it overhangs with a real lip, and the underside is closed by a dark fan.
-**The two front quads of the rim→brow band are simply not built**, and the six-vertex hole is
-filled by a flat inset at vertex colour 0.05. That black void is the whole reason the shape reads
-as hooded at thumbnail size — it was the single biggest legibility win. Rim/brow vertices at
-j = 1 and 3 are pinched to 0.82 so the mouth is not a letterbox the full width of the head.
+**Hood.** `dx` and `dz` sweep the peak 15 cm back and 3 cm to one side, so the side profile is a
+flopped cowl and not a bishop's mitre. The mantle's underside is a flat dark disc at 0.10 — that is
+the baked occlusion under the cowl, and it is also what closes the robe's open neck ring.
 
-**Held props are attached.** A 6-sided, 2-segment arm tube leaves the shoulder under the hood
-drape and ends on the grip at y ≈ 1.05; the staff/pitchfork is authored to pass through that
-point, and its base is pushed out to x 0.425 so it clears the hem instead of growing out of it.
-Only variant 0 carries anything — *a floating spear is worse than no spear*.
+**Props are welded into the body.** The staff base is at x 0.318 against a hem that reaches 0.40+,
+so it starts *inside* the silhouette and emerges around knee height. A 10-triangle sleeve leaves
+the robe at x 0.150 (inside the 0.20 body radius there) and ends on the shaft at y 1.00. The
+combined shape reads as one figure holding something; round 2's staff started at x 0.425, clear of
+the hem, and read as a separate floating stick.
 
-**Two geometry variants per zone**, so a crowd is not clones: variant 0 has the prop, the arm and
-a short scarf; variant 1 has no prop and a scarf half again as long, mirrored to the other
-shoulder, and a different fold phase seed. Costs +3 draw calls; see §3.
+**Two geometry variants per zone.** Variant 0 carries the prop and sleeve. Variant 1 has neither, a
+different fold seed, and the whole geometry is run through `makeScale(1.055, 0.935, 1.055)` — a
+shorter, stouter build for free. That replaced the long-scarf variant as the source of crowd
+variety.
 
 Per zone, still only from `zones.js`:
 
@@ -53,125 +100,129 @@ Per zone, still only from `zones.js`:
 | neutral | `#9c8a72` | pitchfork |
 | dark | `#3c3a3e` | staff + black spike |
 
-`robeColor()` clips the tint's brightest channel to 0.72 in sRGB before it reaches the material.
-The light robe at `#dedbd2` is 0.87 and rendered as a flat white cutout.
+## 3. Value and the light-zone blowout
 
-Value comes from a baked `color` attribute, and every shade goes through `tone(s)`, which drops
-red faster than blue so darks are cool rather than a single crushed near-black:
+`robeColor()` clips the tint's brightest channel to `ROBE_CEIL` in sRGB before it reaches the
+material. Round 2 had this at 0.72 and the light robe still rendered as a flat white cutout with no
+folds. **0.64** is where it stops clipping: the brightest pixel on a light robe in `people_day` is
+now 193, and the whole 1280×720 frame has zero pixels above 246.
 
-- hem 0.50 rising to 1.0 by the third ring — the bottom-25 % ramp the critic asked for;
-- ±0.11 on top of that from the fold term, so folds read even in flat frontal light;
-- hood underside 0.13, cowl inset 0.05;
-- `instanceColor` carries a ±13 % value jitter *and* a small warm/cool hue jitter per figure.
+0.56 was tried first. It works too, but at 0.56 the light robe drops to a peak of 176 and the
+neutral robe gets clipped as well (its own max channel is 0.61), which collapses the value gap
+between the two zones. At 0.64 neutral is untouched and the zones separate on hue as well as value.
 
-**Scarf shade is deliberately off the robe's own value** (`SCARF_SHADE`), so on the dark zone it
-is a vertex colour of **2.0** — above 1, which is fine, attributes are not clamped. Without that
-the tail vanishes into a dark robe.
+Value otherwise comes from a baked `color` attribute through `tone(s)`, which drops red faster than
+blue so darks are cool rather than a single crushed near-black. The `sh` column in the table above
+is **ambient occlusion, baked, not lighting**: dark at the ground, dark in the waist pinch, dark
+where the cowl overhangs, bright on the sky-facing crown. On top of that the fold term adds ±0.18,
+and `instanceColor` carries a ±13 % value jitter and a small warm/cool hue jitter per figure.
 
-`envMapIntensity` is **not** left at 1. `lighting.js` drives env intensity through `materials.js`
-only, so an outside material sits at 1.0 while the whole town runs at ~0.28 — the robes came out
-blown to white. `People.update` reads the live value back off `getMaterial(<zone>, 'crest')` and
-copies it onto the three robe materials, so they track time of day exactly.
-
-## 1b. Shading — zero triangles
+## 4. Shading — zero triangles
 
 Injected after `<opaque_fragment>` in `robeMaterial`, reading three's own `directionalLights[0]`:
 
 - **Wrap diffuse** `max(0, (N·L + w)/(1 + w))`, `w = 0.4`, added as the *difference* from the hard
-  lambert so the standard lighting is untouched elsewhere. Mix is 0.45. It was 0.6 and that
-  compressed the robe into a 30-value band; 0.45 keeps the soft terminator and gets the range
-  back. Knob: `robeWrap`.
-- **Fresnel rim** `pow(1 − N·V, 3)` tinted with `scene.fog.color` (the live sky/haze colour,
-  which is why `update` now takes `app`) and **multiplied by saturate(N·L)**, so it only fires on
-  the sunward edge. Round 1's ungated rim ringed the whole figure and washed the tints out.
-  Knob: `robeRim`, default 0.22.
+  lambert so the standard lighting is untouched elsewhere. Mix 0.45. Knob: `robeWrap`.
+- **Fresnel rim** `pow(1 − N·V, 2.4)` tinted with `scene.fog.color` and multiplied by
+  `saturate(N·L·1.8)` so it only fires on the sunward edge. Knob: `robeRim`, **now 0.5, was 0.22**.
+
+  **Round 2's note claimed the rim was working. It was compiling and running, but at 0.22 with an
+  exponent of 3 it moved a silhouette pixel by 4/255 — invisible.** Measured by rendering
+  `people_dusk`, reading the framebuffer with `gl.readPixels` at three known edge pixels, and
+  re-rendering with `uRim.x` at 0 / 0.22 / 0.6 inside a single synchronous `--eval`. At 0.5 / 2.4
+  it reads as a warm edge at dusk without ringing the whole figure.
 - A small cool `uShade` fill on the unlit side.
 
-**Contact occlusion** is a separate `InstancedMesh` of 10-triangle discs — `MultiplyBlending`,
-`toneMapped: false`, `fog: false`, `depthWrite: false`, radius 0.8, centre vertex darkened by the
-`contactAO` knob. **One draw call for the whole crowd**, no shadow pass. `fog: false` matters: a
-fogged multiply quad fades to the fog colour, which at distance darkens the ground by a flat 0.8
-in a visible disc. The player has no disc — it builds its own mesh in `player.js`, which I do not
-own.
+## 5. Contact occlusion — this had never once rendered
 
-## 2. Cloth
+One `InstancedMesh` of discs, one draw call for the whole crowd, no shadow pass. **Round 2's note
+said this worked. It did not, and it cost me most of an afternoon to prove.** Three separate bugs,
+all of which had to be fixed before a single pixel changed:
+
+1. **`MultiplyBlending` draws nothing here.** Switched to the recipe `terrain.js` already uses for
+   its own ground decals: `CustomBlending`, `blendSrc: Zero`, `blendDst: OneMinusSrcAlpha`, with the
+   strength carried in a **vec4** vertex-colour alpha channel.
+2. **Those factors also run on the alpha channel**, which zeroes the framebuffer alpha and punches a
+   hole straight through to the page background — a bright blue halo round every figure in an
+   isolated harness. Fixed with `blendSrcAlpha: Zero, blendDstAlpha: One`. `terrain.js` gets away
+   without this; do not copy that part of it.
+3. **The disc was positioned with `heightAt()`, which is the analytic height field, not the rendered
+   mesh.** `terrain.surfaceY()` is the mesh, and they differ by enough to bury the disc. Even at the
+   right height a flat disc on undulating ground depth-fails almost everywhere, so it is now also
+   **tilted onto the local surface normal** (four `surfaceY` samples at ±0.6 m) and lifted 7 cm.
+   The figures themselves were floating/sinking for the same reason; `People.update` now places
+   them on `surfaceY` too. `player.js` still uses `heightAt` — I do not own it.
+
+A `CircleGeometry` cannot carry this. Its only interior vertex is the centre, so alpha ramps
+linearly from a point that is entirely hidden behind the robe hem, and the visible ring outside the
+hem comes out nearly clear. The disc is now hand-built: centre + inner ring at 0.46 R at full alpha
++ outer rim at zero, 9 segments, 27 triangles, so the ramp starts *outside* the body. `AO_R` 0.86,
+`contactAO` default raised 0.65 → 0.8.
+
+**How to prove a decal renders, since screenshots are taken before `--eval` runs:** do it all in one
+synchronous eval — install `onBeforeRender` as a counter, call
+`app.renderer.render(app.scene, app.camera)` directly, then `gl.readPixels` a box before and after
+toggling `mesh.visible`. `scratch/px.mjs` decodes a PNG and prints sRGB values plus a clipped-pixel
+census, which is how the light-robe numbers above were measured. Do not A/B two `shot.mjs` runs
+without `&ct=` pinned — the crowd animates between runs and the pixel differences are meaningless.
+
+## 6. Cloth
 
 Vertex shader, no solver. `MeshStandardMaterial` + `onBeforeCompile`, injected into
 `<beginnormal_vertex>` and `<begin_vertex>`.
 
-Per-vertex `attribute vec2 aCloth` = **(amplitude, part)**. Amplitude is `((1.26 - y)/1.26)^1.5`
-on the robe — 1.0 at the hem, exactly 0 at the shoulders, so the body never moves — 1.45 at the
-free end of the scarf, and **0 on the hood, the arm and the staff**, which is why the prop stays a
-rigid stick and the hand stays on it while everything around them moves. `part` is 1 for the
-scarf, which redirects its motion backward instead of radially.
+Per-vertex `attribute float aCloth` is amplitude only: `((1.22 − y)/1.22)^1.5` on the robe — 1.0 at
+the hem, 0 at the neck — and **0 on the hood, the sleeve and the staff**, which is why the prop
+stays a rigid stick and the hand stays on it while everything around them moves.
 
-Per-figure phase comes from an instanced `attribute vec4 aInst` = (phase, speed, gait, kick), so
-36 figures are never in lockstep. The non-instanced player reads the same four numbers from a
-`uSelf` uniform under `#ifdef USE_INSTANCING`, which is how one material serves both.
+Per-figure phase comes from an instanced `attribute vec4 aInst` = (phase, speed, gait, kick). The
+non-instanced player reads the same four numbers from a `uSelf` uniform under `#ifdef USE_INSTANCING`,
+which is how one material serves both.
 
-Four terms, in rough order of how much they matter:
-
-1. **Ripple** — two counter-running travelling waves in azimuth and height, displaced along the
-   outward normal. This is the fabric.
-2. **Wind** — a low-frequency double-sine gust along a world direction. The world direction is
-   rotated into object space in the shader using `instanceMatrix[2].xz` as the figure's heading,
-   so the whole crowd leans the same way regardless of which way each one faces.
-3. **Drag** — the hem and scarf trail backwards proportional to walk speed, and to `kick` during
-   an attack.
-4. **Gait sway** — a lateral swing at footfall frequency.
+Four terms: a two-wave **ripple** displaced along the outward normal (this is the fabric); a
+low-frequency **wind** gust along a world direction rotated into object space via
+`instanceMatrix[2].xz` so the whole crowd leans the same way; **drag** on the hem proportional to
+walk speed and to `kick` during an attack; and a lateral **gait sway** at footfall frequency.
 
 **Normals.** Central difference around the body axis, but only the *change* the cloth causes is
-applied: `objectNormal += (nA - nRef) * 1.2`. Swapping in the raw cross product instead — which
-is what I wrote first — replaces the authored facet normal with a purely radial one, and every
-fold flattens out. That single line is most of the difference between "cloth" and "cardboard".
+applied: `objectNormal += (nA − nRef) * 1.2`. Swapping in the raw cross product replaces the
+authored facet normal with a purely radial one and every fold flattens out. (The old
+`* (1 - aCloth.y * 0.85)` scale existed only to stop the scarf's normals flipping and went with it.)
 
-The delta is scaled by `(1 - aCloth.y * 0.85)`. At the scarf's amplitude the finite difference is
-large enough to throw the normal right round, and the tail renders black.
+Shadows use a `MeshDepthMaterial` with the same displacement injected (`customDepthMaterial`), so
+the shadow matches the moving silhouette. If you change `clothOff`, it is shared — both materials
+compile the same `PARS` string, so they cannot drift.
 
-Shadows use a `MeshDepthMaterial` with the same displacement injected (`customDepthMaterial`),
-so the shadow matches the moving silhouette. Without it the shadow is a static bell.
+## 7. Costs
 
-**The scarf is double-wound and every triangle is flat-shaded from its own winding.** That is not
-a style choice: the winding is also what the renderer culls on, so the two can never disagree.
-The first version authored normals separately and mirrored variant 1's ribbon in x — mirroring
-flips handedness, so half the crowd's scarves rendered as black planks. Flat-shading off the
-winding makes that class of bug impossible. `curl()` warps the two edges of the strip apart so no
-quad is planar, which stops it reading as a sheet of paper.
+`__forge.people.triangleCost()`, `[variant 0, variant 1]`:
 
-## 3. Costs
-
-Measured, not estimated (`__forge.people.triangleCost()`), `[variant 0, variant 1]`:
-
-| | prop carrier | long-scarf |
+| | round 2 | round 3 |
 |---|---|---|
-| light | **224** | 192 |
-| neutral (pitchfork) | **240** | 192 |
-| dark | **224** | 192 |
+| light | 224, 192 | **198, 172** |
+| neutral (pitchfork) | 240, 192 | **214, 172** |
+| dark | 224, 192 | **198, 172** |
 
-Mobile gate (`--preset=medium --dpr=1 --w=844 --h=390`), `street_dusk`:
+Mobile gate, `--preset=medium --dpr=1 --w=844 --h=390`, `street_dusk`:
 
-| crowd | draw calls | triangles |
-|---|---|---|
-| 0 | 68 | 490 k |
-| **36 (default)** | **80** | **504 k** |
-| 120 (max) | 81 | 542 k |
+| crowd | draw calls | triangles | people's own share |
+|---|---|---|---|
+| 0 | 65 | 485 519 | — |
+| **36 (default)** | **77** | **498 889** | **+13 370, +12 calls** |
+| 120 (max) | 78 | 534 011 | +48 492, +13 calls |
 
-So the whole system is **+12 draw calls and +14 k triangles**, and the draw calls do not grow with
-crowd size. Triangles count twice per figure because the shadow pass redraws them.
+Round 2's equivalent was +14 000 triangles and +12 calls at crowd 36, and the crowd's geometry sum
+went **7 504 → 6 694** (−11 %). Draw calls are unchanged. The contact discs went the other way,
+360 → 972, because they went from 10 triangles to 27 *and* started actually drawing; net people
+cost is still down.
 
-Draw calls: 6 `InstancedMesh` (zone × variant) + 1 player mesh, ×2 for the shadow pass, plus 1
-contact-disc mesh that casts nothing. Round 1 was +6; the extra 6 buys the prop/no-prop split,
-which is the only per-instance silhouette variety available without per-instance geometry.
-If they ever need clawing back, collapse the two variants and lose that.
-
-**The scene was already over the triangle gate before this work** — 490 k against 350 k. People
-add 2.9 % on top. I have not tried to claw that back; it is `scatter.js`'s `CAP` and the merged
-`wall`/`trim` batches, not people. GPU p95 is unchanged inside measurement noise and every shot
-still holds 60 fps.
+**The scene was already 40 % over the triangle gate before any of this** — 485 k against 350 k with
+zero people on screen. That is `scatter.js` and the merged wall/trim batches, not people. GPU p95 is
+unchanged inside measurement noise and every shot still holds 60 fps.
 
 Textures: **zero**. Nothing to track through `budget.js`.
 
-## 4. Crowd placement
+## 8. Crowd placement
 
 `spawn()` uses **quotas, not dice**. A uniform roll put everyone on the three streets and left
 `wall_day`, `creek_day` and `town_night` empty. The rota, cycled per district, is:
@@ -180,83 +231,73 @@ Textures: **zero**. Nothing to track through `budget.js`.
 road, front, road, outer, road, meadow, road, bank, front, road, outer, meadow
 ```
 
-- `road` — walks the district street from z −32 (through the wall gate) to past the creek bridge,
-  reversing at each end
+- `road` — walks the district street from z −32 (through the wall gate) to past the creek bridge
 - `front` — stands at a building frontage, turning slowly
 - `outer` — strolls the meadow north of the curtain wall (this is `wall_day`)
 - `meadow` / `bank` — strolls south of / just above the creek (this is `creek_day`)
 
-At the default crowd of 36 that is exactly one full rota per district.
+**`terrain.blocked()` is the scatter-occupancy mask and it includes the roads**, because scatter must
+not drop grass on a road. People want the opposite. Using it as a walkability test rejected every
+road walker and deadlocked `spawn()` at zero agents. Walkability is tested against
+`terrain.footprints` directly.
 
-**`terrain.blocked()` is the scatter-occupancy mask and it includes the roads**, because scatter
-must not drop grass on a road. People want the opposite. Using it as a walkability test rejected
-every road walker and, because the rota only advances when an agent is accepted, deadlocked
-`spawn()` at zero agents. Walkability is now tested against `terrain.footprints` directly.
+**Coupling to watch:** `roadOf()` mirrors the road control points `demo.js` lays down per district.
+If that array changes in `demo.js`, walkers drift off the road. A `roadOf(zoneId)` export from
+`demo.js` or `terrain.js` would kill the duplication.
 
-**Coupling to watch:** `roadOf()` in `people.js` mirrors the road control points `demo.js` lays
-down per district. If that road array changes in `demo.js`, walkers will drift off it. It is seven
-numbers and I did not want to widen a `demo.js` export I do not own; a `roadOf(zoneId)` export
-from `demo.js` or `terrain.js` would kill the duplication.
+## 9. Player, camera, input
 
-## 5. Player, camera, input
-
-- **Camera**: spring-follow, behind and above, `1 - exp(-11·dt)`. Lifted clear of terrain
-  (`heightAt + 0.7`) so it does not sink into a bank. Feet track `heightAt(x, z)` every frame.
-  No collision — you walk through buildings.
-- **Attack**: a 0.38 s body arc plus a lean, and `kick` spikes the cloth drag. There are no bones,
-  so the staff swings because the whole figure does. Good enough to read; not an animation system.
-- **Robe switching**: `playerZone` select (Controls group). Swaps geometry and material — 1 line.
+- **Camera**: spring-follow, behind and above, `1 − exp(−11·dt)`, lifted clear of terrain. No
+  collision — you walk through buildings.
+- **Attack**: a 0.38 s body arc plus a lean; `kick` spikes the cloth drag. No bones.
+- **Robe switching**: `playerZone` select (Controls group) swaps `people.geo[id]` / `people.mat[id]`.
 - **Keyboard**: WASD / arrows, Shift sprint, Space attack, left-drag to look.
-- **Touch**: floating stick — it appears wherever the thumb lands on the move half, not in a fixed
-  corner. The other half is attack on tap (< 240 ms, < 16 px) and look on drag; a pure attack pad
-  would leave a phone with no way to turn the camera.
-- **`flipTouch`** (Controls) swaps the halves and moves the attack ring with them.
-
-Verified by driving the real page over CDP (keyboard walk, mouse-drag look, robe switch, floating
-stick appear/track/release, right-half tap → swing, flip → left-half tap → swing and the stick
-moves to the right half).
+- **Touch**: floating stick that appears wherever the thumb lands on the move half; the other half
+  is attack on tap (< 240 ms, < 16 px) and look on drag. `flipTouch` swaps the halves.
 
 ### `freeCam` — read this before you change it
 
-`freeCam` (Controls) defaults to **true on desktop and false on a coarse pointer**. On desktop
-FORGE is the level editor and `js/editor/editor.js` is built on `OrbitControls`; on a phone it is
-the game. When `freeCam` is on, `Player.update` drives nothing and calls `controls.update()`
-itself — `main.js` no longer adds its own orbit updater, because `OrbitControls.update()` calls
-`lookAt()` unconditionally and would fight the follow camera. `?freeCam=0` forces third person.
+Defaults to **true on desktop and false on a coarse pointer**. On desktop FORGE is the level editor
+and `js/editor/editor.js` is built on `OrbitControls`; on a phone it is the game. When `freeCam` is
+on, `Player.update` drives nothing and calls `controls.update()` itself — `main.js` no longer adds
+its own orbit updater, because `OrbitControls.update()` calls `lookAt()` unconditionally and would
+fight the follow camera. `?freeCam=0` forces third person.
 
-## 6. Dev-only scenarios
-
-`?dev=1` registers `people_day`, `people_dusk` and `people_macro` — three figures, one per zone,
-plus a walking one behind. They are gated on the query param so `--shot.mjs --all` keeps rendering
-only the five the critic scores.
-
-`?ct=<seconds>` pins cloth time. A still frame cannot show motion; render the same scenario at
-two `ct` values and diff:
+## 10. Rendering and checking
 
 ```bash
-node tools/shot.mjs --shot=people_macro --outdir=scratch --set="dev=1&ct=0.0"
-node tools/shot.mjs --shot=people_macro --outdir=scratch --set="dev=1&ct=0.55"
+node tools/shot.mjs --shot=people_day  --set="dev=1&ct=0.4" --w=1280 --h=720 --dpr=1
+node tools/shot.mjs --shot=people_dusk --set="dev=1&ct=0.4" --w=1280 --h=720 --dpr=1
+node tools/shot.mjs --shot=people_macro --set="dev=1&ct=0.4" --w=1280 --h=720 --dpr=1
 ```
 
-## 7. Still open
+`?dev=1` registers the three; `?ct=<seconds>` pins cloth time so two runs are comparable. Every
+registered knob is settable from the query string (`&contactAO=0.9&crowd=0`), which is the fastest
+way to A/B one of them.
 
-- **No collision.** The player walks through walls and across the creek. Not asked for, and a
-  real answer wants `terrain.footprints` plus a capsule sweep.
-- **Crowd walkers ignore buildings while moving.** Only the spawn point is validated; a walker
-  whose road segment was later built over would clip. Has not happened with the current layout.
-- **The cowl inset is coplanar, not recessed.** Pushing it back would need a side wall around the
-  opening (~12 more triangles) or it gaps at grazing angles. At vertex colour 0.05 it reads as a
-  void anyway, and that was the cheap win.
+**`scratch/figures.html` + `scratch/figshot.mjs` render the six figure geometries alone**, on a
+plain plane with a plain sun, and print the triangle counts. That page imports only `people.js` and
+`zones.js`, so it kept working through a whole afternoon in which `demo.js` would not boot at all
+because another agent's `scatter.js` was mid-edit against a `zones.js` field that had not landed
+yet. Iterate there, confirm in the real scene. `view=front|side|macro|top`, `ao=`, `spin=`, `ct=`.
+`scratch/` is gitignored.
+
+## 11. Still open
+
+- **The robe's mid-body is still a large smooth expanse at macro range.** The fold shading reads at
+  crowd distance but a single figure filling the frame is flat. More rings is the honest answer and
+  costs triangles; a normal map costs a texture.
+- **No collision.** The player walks through walls and across the creek.
 - **The player has no contact disc.** The disc mesh is instanced from `People.update` over crowd
-  agents only; the player builds its own mesh in `player.js`, which I do not own. One reserved
-  instance slot plus a hook would fix it.
-- **The scarf still reads slightly stiff at macro range.** Four (or six) segments is not many for
-  1.7 m of cloth. Another two segments is 8 triangles if it is ever worth it.
-- **No idle animation beyond cloth.** Standing figures move their robe and nothing else. A slow
-  breathing scale would be nearly free and I did not add it.
+  agents only; the player builds its own mesh in `player.js`, which I do not own. Round 2's notes
+  said `player.js` builds one — **it does not, and never did**; the player has simply never had one.
+  One reserved instance slot plus a hook would fix it.
+- **The player still stands on `heightAt`, not `surfaceY`.** Same floating/sinking bug the crowd
+  had, one line in `player.js`.
+- **Crowd walkers ignore buildings while moving.** Only the spawn point is validated.
+- **No idle animation beyond cloth.** A slow breathing scale would be nearly free.
 - **Nobody sits, carries or works.** Every figure walks, strolls or stands.
-- **Zone tint only.** `zones.js` gives one robe colour per district. Two or three tints per zone
-  (`robe: ['#…','#…']`) would break up a crowd better than the value/hue jitter does — additive
-  change, worth asking for.
-- **Fold phase is per geometry, not per instance.** Two variants is all the shared-geometry
-  instancing allows. A third variant is +3 draw calls if the crowd ever reads as clones again.
+- **Zone tint only.** Two or three tints per zone (`robe: ['#…','#…']`) would break up a crowd
+  better than the value/hue jitter does — additive `zones.js` change, worth asking for.
+- **Fold phase is per geometry, not per instance.** Two variants is all shared-geometry instancing
+  allows; a third is +3 draw calls.

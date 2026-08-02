@@ -32,7 +32,15 @@ export const ZONES = {
     // ── ground ──
     road: 'marbleCobble',
     groundTint: '#c9c8bf',
-    foliage: { grass: ['#8fa878', '#a3b98c', '#7d9668'], trunk: '#8a7f6d', leaf: '#9fbe93' },
+    // every array is [mid, light, dark] — the order `grass` has always used
+    foliage: {
+      grass: ['#8fa878', '#a3b98c', '#7d9668'], trunk: '#8a7f6d', leaf: '#9fbe93',
+      leaves: ['#82a070', '#c2d9a4', '#41573a'],
+      bush: ['#7d9569', '#99ad85', '#54694b'],
+      dirt: ['#a3927a', '#c2b39a', '#7f7059'],
+      sand: ['#d5c9a8', '#eae0c6', '#b3a586'],
+      rim: '#d6cd9c', density: 1.15, trees: 0.85,
+    },
     // ── people ──
     robe: '#dedbd2', staff: 'light',
     // ── interior ──
@@ -62,7 +70,14 @@ export const ZONES = {
     edges: 'flat',
     road: 'dirt',
     groundTint: '#8b8163',
-    foliage: { grass: ['#7f8a55', '#909a63', '#6c7748'], trunk: '#6b5a44', leaf: '#7f8f5c' },
+    foliage: {
+      grass: ['#7f8a55', '#909a63', '#6c7748'], trunk: '#6b5a44', leaf: '#7f8f5c',
+      leaves: ['#77873f', '#b9c47e', '#333f22'],
+      bush: ['#68763f', '#84915a', '#3e472a'],
+      dirt: ['#8a7a58', '#a89871', '#645640'],
+      sand: ['#c2b489', '#dbd0ab', '#9d9068'],
+      rim: '#c4b878', density: 1.0, trees: 1.0,
+    },
     robe: '#9c8a72', staff: 'pitchfork',
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
   },
@@ -91,7 +106,14 @@ export const ZONES = {
     edges: 'sharp',
     road: 'cobble',
     groundTint: '#4b4a46',
-    foliage: { grass: ['#4e5a48', '#5c684f', '#3d4739'], trunk: '#3b342f', leaf: '#4a5745' },
+    foliage: {
+      grass: ['#4e5a48', '#5c684f', '#3d4739'], trunk: '#3b342f', leaf: '#4a5745',
+      leaves: ['#44553f', '#6f8064', '#1a2219'],
+      bush: ['#3f4d3a', '#586552', '#212a20'],
+      dirt: ['#4c483f', '#605b4f', '#332f29'],
+      sand: ['#6e6a5c', '#877f6d', '#514d43'],
+      rim: '#7b8a65', density: 0.85, trees: 1.25,
+    },
     robe: '#3c3a3e', staff: 'dark',
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
   },

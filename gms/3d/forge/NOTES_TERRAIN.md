@@ -3,6 +3,10 @@
 Owned files: `js/world/terrain.js`, `js/world/scatter.js`, `js/world/demo.js`, `js/world/buildings.js`,
 `js/world/details.js`. One three-line change to `js/main.js` (see the bug below).
 
+> **`scatter.js` has since been rewritten — see `NOTES_FOLIAGE.md`.** Section 3 below (foliage) and
+> the tree parts of section 2 describe the round-3 state and are superseded. Everything about the
+> terrain, the creek, the ground transitions and the building dressing still holds.
+
 ---
 
 # Round 3 — what changed and why

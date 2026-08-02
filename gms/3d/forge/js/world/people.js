@@ -9,9 +9,10 @@ import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 
 const TAU = Math.PI * 2;
-const SEG = 12;
+const UP = new THREE.Vector3(0, 1, 0);
+const SEG = 10;
 const HSEG = 8;
-const SHOULDER = 1.26;
+const SHOULDER = 1.22;
 
 const hemAmp = y => Math.pow(Math.max(0, (SHOULDER - y) / SHOULDER), 1.5);
 const hash = n => { const s = Math.sin(n * 127.1) * 43758.5453; return s - Math.floor(s); };
@@ -33,7 +34,7 @@ class Build {
     const q = n || v.n;
     this.n.push(q[0], q[1], q[2]);
     this.c.push(v.c[0], v.c[1], v.c[2]);
-    this.k.push(v.k[0], v.k[1]);
+    this.k.push(v.k);
   }
   tri(a, b, c) { this.vert(a); this.vert(b); this.vert(c); this.tris++; }
   quad(a, b, c, d) { this.tri(a, b, c); this.tri(a, c, d); }
@@ -44,37 +45,43 @@ class Build {
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
-    g.setAttribute('aCloth', new THREE.Float32BufferAttribute(this.k, 2));
+    g.setAttribute('aCloth', new THREE.Float32BufferAttribute(this.k, 1));
     return g;
   }
 }
 
+// hem / shin / knee / waist / neck. `sh` is baked ambient occlusion, not lighting: dark at the
+// ground, dark in the waist pinch, dark again where the cowl overhangs. `f` is the fold depth, so
+// the waist creases tight and the hem swings loose. The shoulder flare is the hood's mantle ring,
+// not a robe ring — the neck ring is narrow and lives entirely inside the cowl.
 const ROBE = [
-  { y: 0.00, r: 0.348, sh: 0.50 },
-  { y: 0.34, r: 0.320, sh: 0.80 },
-  { y: 0.72, r: 0.284, sh: 0.95 },
-  { y: 1.02, r: 0.238, sh: 1.00 },
-  { y: 1.26, r: 0.198, sh: 1.00 },
+  { y: 0.00, r: 0.402, sh: 0.36, f: 0.155 },
+  { y: 0.31, r: 0.302, sh: 0.72, f: 0.138 },
+  { y: 0.67, r: 0.270, sh: 0.86, f: 0.122 },
+  { y: 0.98, r: 0.216, sh: 0.62, f: 0.088 },
+  { y: 1.22, r: 0.182, sh: 0.74, f: 0.070 },
 ];
 
 // Alternating radial push (cos at half the segment count hits ±1 exactly on every vertex),
 // phase-rotated per ring so the fold lines wander down the body instead of running vertical.
+// The 2- and 3-lobe terms stop the outline being a regular polygon and scallop the hem.
 function robeVert(i, j, seed) {
   const R = ROBE[i];
   const a = (((j % SEG) + SEG) % SEG) / SEG * TAU;
   const ph = seed + i * 0.66;
-  const fold = Math.cos(SEG * 0.5 * a + ph) * (0.118 - 0.014 * i)
-             + Math.cos(a * 2 + ph * 1.7) * 0.042;
-  const fn = fold / 0.16;
+  const fold = Math.cos(SEG * 0.5 * a + ph) * R.f
+             + Math.cos(a * 2 + ph * 1.7) * 0.040
+             + Math.cos(a * 3 - ph * 0.8) * 0.030;
+  const fn = fold / (R.f + 0.07);
   const r = R.r * (1 + fold);
   const y = i === 0
-    ? -0.02 - 0.075 * fn + 0.04 * (hash(j * 3.7 + seed * 11) - 0.5)
+    ? -0.045 - 0.085 * fn + 0.05 * (hash(j * 3.7 + seed * 11) - 0.5)
     : R.y;
   return {
     p: [r * Math.cos(a), y, r * Math.sin(a)],
-    n: [Math.cos(a), 0.18, Math.sin(a)],
-    c: tone(R.sh * (1 + 0.11 * fn - 0.05 * Math.abs(fn))),
-    k: [hemAmp(R.y), 0],
+    n: [Math.cos(a), i === 0 ? -0.06 : 0.18, Math.sin(a)],
+    c: tone(R.sh * (1 + 0.18 * fn - 0.07 * Math.abs(fn))),
+    k: hemAmp(R.y),
   };
 }
 
@@ -83,58 +90,64 @@ function robe(B, seed) {
   for (let i = 0; i < ROBE.length - 1; i++) {
     for (let j = 0; j < SEG; j++) B.flatQuad(v(i, j), v(i + 1, j), v(i + 1, j + 1), v(i, j + 1));
   }
-  const hub = { p: [0, -0.135, 0], n: [0, -1, 0], c: tone(0.16), k: [1, 0] };
+  const hub = { p: [0, -0.20, 0], n: [0, -1, 0], c: tone(0.12), k: 1 };
   for (let j = 0; j < SEG; j++) B.flatTri(v(0, j), v(0, j + 1), hub);
-
-  const neck = { p: [0, 1.42, -0.012], n: [0, 1, 0], c: tone(0.55), k: [0, 0] };
-  for (let j = 0; j < SEG; j++) B.flatTri(v(4, j), neck, v(4, j + 1));
 }
 
-// Triangulates a boundary loop, flipping the fan if it would face away from `ref`.
-function fan(B, loop, ref) {
-  _a.fromArray(loop[0].p);
-  _b.fromArray(loop[1].p).sub(_a);
-  _c.fromArray(loop[2].p).sub(_a);
-  const flip = _b.cross(_c).dot(_a.fromArray(ref)) < 0;
-  for (let i = 1; i < loop.length - 1; i++) {
-    if (flip) B.tri(loop[0], loop[i + 1], loop[i]);
-    else B.tri(loop[0], loop[i], loop[i + 1]);
-  }
-}
+// mantle / jaw / brow / temple / crown. The mantle is the figure's shoulder line — it flares 22%
+// past the waist and swallows the robe's narrow neck ring whole. `dx` and `dz` sweep the peak back
+// and off to one side so the profile is a flopped cowl rather than a mitre.
+const HOOD = [
+  { y: 1.145, r: 0.264, sh: 0.62, ny: -0.34, dz: 0.010, dx: 0.000 },
+  { y: 1.352, r: 0.214, sh: 0.64, ny: -0.02, dz: 0.032, dx: 0.006 },
+  { y: 1.462, r: 0.194, sh: 0.74, ny: 0.16, dz: 0.018, dx: 0.010 },
+  { y: 1.566, r: 0.152, sh: 0.94, ny: 0.34, dz: -0.046, dx: 0.018 },
+  { y: 1.672, r: 0.086, sh: 1.00, ny: 0.62, dz: -0.096, dx: 0.028 },
+];
+const MOUTH = 1;   // the one jaw→brow quad left out; the half-segment offset centres it on +z
 
-// Cone whose rim is wider than the shoulders, with the two front segments left out and filled
-// by a near-black inset. That void is what makes the shape read as hooded at thumbnail size.
 function hood(B, seed) {
-  const rim = [], brow = [], crown = [];
-  for (let j = 0; j < HSEG; j++) {
-    const a = j / HSEG * TAU;
-    const co = Math.cos(a), si = Math.sin(a);
-    const front = Math.max(0, si);
-    const fold = Math.cos(a * 3 + seed * 2.3) * 0.05;
-    const pinch = (j === 1 || j === 3) ? 0.82 : 1;          // narrows the mouth of the cowl
-    const ring = (r, y, dz, sh, ny) => ({
-      p: [r * pinch * co, y, r * pinch * si * 1.04 + dz], n: [co, ny, si],
-      c: tone(sh * (1 + 1.8 * fold)), k: [0, 0],
-    });
-    rim.push(ring(0.226 * (1 + fold), 1.392 - 0.05 * front, 0.03 * front - 0.012, 0.88, -0.3));
-    brow.push(ring(0.196 * (1 + fold * 0.8), 1.492 - 0.03 * front, -0.018, 0.97, 0.1));
-    crown.push(ring(0.118 * (1 + fold * 0.6), 1.632, -0.034, 1.0, 0.55));
-  }
-  const apex = { p: [0, 1.712, -0.052], n: [0, 1, 0], c: tone(1.0), k: [0, 0] };
-  const under = { p: [0, 1.452, -0.012], n: [0, -1, 0], c: tone(0.13), k: [0, 0] };
+  const rings = HOOD.map((R, i) => {
+    const out = [];
+    for (let j = 0; j < HSEG; j++) {
+      const a = (j + 0.5) / HSEG * TAU;
+      const co = Math.cos(a), si = Math.sin(a);
+      const fold = Math.cos(a * 3 + seed * 2.3 + i * 0.5) * 0.05;
+      // The two lip vertices are squeezed toward the centre line and toward each other in y, which
+      // turns a 45° segment of the ring into a face-sized opening instead of a letterbox.
+      const lip = (i === 1 || i === 2) && (j === MOUTH || j === MOUTH + 1);
+      const r = R.r * (1 + fold);
+      out.push({
+        p: [r * co * (lip ? 0.60 : 1) + R.dx, R.y + (lip ? (i === 1 ? 0.026 : -0.020) : 0),
+          r * si * (lip ? 0.95 : 1) + R.dz],
+        n: [co, R.ny, si],
+        c: tone(R.sh * (1 + 1.5 * fold) * (lip ? 0.82 : 1)),
+        k: 0,
+      });
+    }
+    return out;
+  });
+  const apex = { p: [0.034, 1.734, -0.150], n: [0, 1, 0], c: tone(1.0), k: 0 };
+  const under = { p: [0, HOOD[0].y, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
 
-  for (let j = 0; j < HSEG; j++) {
-    if (j === 1 || j === 2) continue;
-    B.flatQuad(rim[j], brow[j], brow[(j + 1) % HSEG], rim[(j + 1) % HSEG]);
+  for (let i = 0; i < rings.length - 1; i++) {
+    for (let j = 0; j < HSEG; j++) {
+      if (i === 1 && j === MOUTH) continue;
+      B.flatQuad(rings[i][j], rings[i + 1][j], rings[i + 1][(j + 1) % HSEG], rings[i][(j + 1) % HSEG]);
+    }
   }
   for (let j = 0; j < HSEG; j++) {
-    B.flatQuad(brow[j], crown[j], crown[(j + 1) % HSEG], brow[(j + 1) % HSEG]);
-    B.flatTri(crown[j], apex, crown[(j + 1) % HSEG]);
-    B.flatTri(rim[j], rim[(j + 1) % HSEG], under);
+    B.flatTri(rings[4][j], apex, rings[4][(j + 1) % HSEG]);
+    B.flatTri(rings[0][j], rings[0][(j + 1) % HSEG], under);
   }
 
-  const void_ = v => ({ p: v.p, n: [0, 0.2, 0.98], c: tone(0.05), k: [0, 0] });
-  fan(B, [rim[1], rim[2], rim[3], brow[3], brow[2], brow[1]].map(void_), [0, 0.2, 1]);
+  // The face is a socket, not a plate: four facets running 13 cm back to a near-black point. They
+  // keep facet normals so the cavity still has some shading gradient, but at 0.3 of the fabric's
+  // value the brightest of them stays well under the hood around it.
+  const sock = { p: [0.006, 1.408, 0.092], n: [0, -0.1, -1], c: tone(0.05), k: 0 };
+  const loop = [rings[1][MOUTH], rings[2][MOUTH], rings[2][MOUTH + 1], rings[1][MOUTH + 1]]
+    .map(v => ({ p: v.p, n: v.n, k: 0, c: [v.c[0] * 0.3, v.c[1] * 0.3, v.c[2] * 0.3] }));
+  for (let k = 0; k < 4; k++) B.flatTri(loop[k], loop[(k + 1) % 4], sock);
 }
 
 function tube(B, pts, radii, seg, shade, k) {
@@ -152,7 +165,7 @@ function tube(B, pts, radii, seg, shade, k) {
       p: [pts[i][0] + n.x * radii[i], pts[i][1] + n.y * radii[i], pts[i][2] + n.z * radii[i]],
       n: [n.x, n.y, n.z],
       c: tone(typeof shade === 'function' ? shade(t) : shade),
-      k: [typeof k === 'function' ? k(t) : k, 0],
+      k: typeof k === 'function' ? k(t) : k,
     };
   };
   for (let i = 0; i < pts.length - 1; i++) {
@@ -160,57 +173,8 @@ function tube(B, pts, radii, seg, shade, k) {
   }
 }
 
-// Double-wound so both faces light correctly — DoubleSide flips the normal and blackens the back.
-// Every triangle is flat-shaded off its own winding, which is also what decides which side the
-// renderer culls, so a mirrored ribbon can never end up lit from behind.
-// `axes` banks the ribbon along its length; `curl` warps the two edges apart so no quad is planar.
-function ribbon(B, pts, axes, halfW, curl, shade, amp) {
-  const P = pts.map(p => new THREE.Vector3(...p));
-  const W = axes.map(a => new THREE.Vector3(...a).normalize());
-  const U = P.map((p, i) => {
-    const a = P[Math.max(0, i - 1)], b = P[Math.min(P.length - 1, i + 1)];
-    return new THREE.Vector3().crossVectors(_a.subVectors(b, a), W[i]).normalize();
-  });
-  const v = (i, s) => {
-    const t = i / (P.length - 1), w = halfW(t) * s, u = curl(t) * s;
-    return {
-      p: [P[i].x + W[i].x * w + U[i].x * u,
-        P[i].y + W[i].y * w + U[i].y * u,
-        P[i].z + W[i].z * w + U[i].z * u],
-      n: [0, 1, 0],
-      c: tone(shade(t)),
-      k: [amp(t), 1],
-    };
-  };
-  for (let i = 0; i < P.length - 1; i++) {
-    B.flatQuad(v(i, -1), v(i, 1), v(i + 1, 1), v(i + 1, -1));
-    B.flatQuad(v(i, 1), v(i, -1), v(i + 1, -1), v(i + 1, 1));
-  }
-}
-
-const SCARF = [
-  [0.02, 1.250, -0.16], [0.06, 1.160, -0.45], [0.13, 1.030, -0.73],
-  [0.19, 0.885, -0.99], [0.23, 0.750, -1.23], [0.25, 0.635, -1.45], [0.25, 0.550, -1.66],
-];
-const SCARF_AXES = [
-  [1, 0, 0], [0.94, 0.34, 0], [0.70, 0.71, 0.05], [0.90, -0.44, 0],
-  [0.99, 0.14, 0], [0.72, 0.69, 0], [0.95, -0.31, 0],
-];
-
-// Kept deliberately off the robe's own value so the tail reads as a separate cloth on every
-// zone — on the dark robe that means a vertex colour above 1.
-const SCARF_SHADE = { light: 0.52, neutral: 0.60, dark: 2.0 };
-
-function scarf(B, zoneId, len, side) {
-  const pts = SCARF.slice(0, len + 1).map(p => [p[0] * side, p[1], p[2]]);
-  const axes = SCARF_AXES.slice(0, len + 1).map(a => [a[0] * side, a[1], a[2]]);
-  const base = SCARF_SHADE[zoneId] ?? 0.6;
-  ribbon(B, pts, axes,
-    t => 0.04 + 0.075 * Math.sin(Math.pow(t, 0.7) * Math.PI * 0.9),
-    t => 0.05 * Math.sin(t * 6.4 + 0.9),
-    t => base * (1 - 0.18 * t),
-    t => 0.10 + 1.35 * t * t);
-}
+// Variant 1: a shorter, stouter build off the same rings, for nothing.
+const STOUT = new THREE.Matrix4().makeScale(1.055, 0.935, 1.055);
 
 function figureGeometry(zoneId, variant) {
   const B = new Build();
@@ -220,29 +184,29 @@ function figureGeometry(zoneId, variant) {
   robe(B, seed);
   hood(B, seed);
 
-  if (variant) {
-    scarf(B, zoneId, 6, -1);
-  } else {
-    scarf(B, zoneId, 4, 1);
-    tube(B, [[0.145, 1.205, 0.015], [0.248, 1.135, 0.052], [0.318, 1.05, 0.088]],
-      [0.078, 0.062, 0.05], 6, t => 0.84 - 0.18 * t, 0);
+  if (!variant) {
+    // Sleeve starts inside the body and ends on the shaft: the three parts have to overlap or the
+    // staff reads as a stick standing next to a figure rather than one held by it.
+    tube(B, [[0.150, 1.085, 0.045], [0.284, 1.000, 0.086]], [0.072, 0.046], 5,
+      t => 0.78 - 0.16 * t, 0);
 
     if (z.staff === 'pitchfork') {
-      tube(B, [[0.425, 0.02, 0.145], [0.292, 1.60, 0.055]], [0.030, 0.024], 4, 0.30, 0);
-      const hy = 1.60, hx = 0.292;
-      tube(B, [[hx - 0.10, hy, 0.055], [hx + 0.10, hy, 0.055]], [0.019, 0.019], 3, 0.26, 0);
-      for (const d of [-0.092, 0, 0.092]) {
-        tube(B, [[hx + d, hy, 0.055], [hx + d, hy + 0.20, 0.055]], [0.016, 0.004], 3, 0.26, 0);
+      const hy = 1.74, hx = 0.246;
+      tube(B, [[0.318, 0.03, 0.115], [hx, hy, 0.045]], [0.030, 0.024], 4, 0.30, 0);
+      tube(B, [[hx - 0.095, hy, 0.045], [hx + 0.095, hy, 0.045]], [0.018, 0.018], 3, 0.26, 0);
+      for (const d of [-0.088, 0, 0.088]) {
+        tube(B, [[hx + d, hy, 0.045], [hx + d, hy + 0.21, 0.045]], [0.015, 0.004], 3, 0.26, 0);
       }
     } else {
-      tube(B, [[0.425, 0.02, 0.145], [0.288, 1.66, 0.055]], [0.031, 0.024], 4, 0.30, 0);
+      tube(B, [[0.318, 0.03, 0.115], [0.242, 1.86, 0.045]], [0.030, 0.023], 4, 0.30, 0);
       const dark = zoneId === 'dark';
-      tube(B, [[0.288, 1.66, 0.055], [0.284, 1.66 + (dark ? 0.28 : 0.15), 0.052]],
-        [dark ? 0.034 : 0.048, 0.004], 4, dark ? 0.20 : 0.86, 0);
+      tube(B, [[0.242, 1.86, 0.045], [0.238, 1.86 + (dark ? 0.28 : 0.15), 0.042]],
+        [dark ? 0.032 : 0.046, 0.004], 4, dark ? 0.20 : 0.78, 0);
     }
   }
 
   const g = B.geometry();
+  if (variant) g.applyMatrix4(STOUT);
   g.userData.tris = B.tris;
   return g;
 }
@@ -252,14 +216,14 @@ uniform float uTime;
 uniform vec4 uWind;
 uniform vec4 uSelf;
 uniform float uCloth;
-attribute vec2 aCloth;
+attribute float aCloth;
 #ifdef USE_INSTANCING
 attribute vec4 aInst;
 #endif
 
-vec3 clothOff(vec3 p, vec2 cl, vec4 self, vec2 wind) {
-  if (cl.x < 0.001) return vec3(0.0);
-  float spd = self.y, cape = cl.y;
+vec3 clothOff(vec3 p, float cl, vec4 self, vec2 wind) {
+  if (cl < 0.001) return vec3(0.0);
+  float spd = self.y;
   float t = uTime + self.x;
 
   float az = atan(p.z, p.x);
@@ -267,15 +231,15 @@ vec3 clothOff(vec3 p, vec2 cl, vec4 self, vec2 wind) {
                + sin(t * 2.9 - az * 3.0 + 1.7) * 0.38;
   float gust = 0.40 + 0.60 * sin(t * uWind.w) * sin(t * uWind.w * 0.41 + 2.1);
   float swing = sin(t * (5.2 + spd * 2.4) + self.z);
-  vec3 out3 = mix(normalize(vec3(p.x, 0.45, p.z - 0.001)), vec3(0.3, 0.15, -0.94), cape);
+  vec3 out3 = normalize(vec3(p.x, 0.45, p.z - 0.001));
 
   vec3 o = vec3(0.0);
-  o.xz += wind * (uWind.z * gust * (0.42 + cape * 0.9));
+  o.xz += wind * (uWind.z * gust * 0.42);
   o.z -= spd * 0.26 + self.w * 0.42;
-  o.x += swing * (0.034 + spd * 0.085) + cape * sin(t * 3.4 + p.y * 6.2) * 0.075;
-  o += out3 * ripple * (0.055 + spd * 0.055 + cape * 0.10);
+  o.x += swing * (0.034 + spd * 0.085);
+  o += out3 * ripple * (0.055 + spd * 0.055);
   o.y -= abs(ripple) * 0.032;
-  return o * (cl.x * uCloth);
+  return o * (cl * uCloth);
 }
 
 vec2 clothWind() {
@@ -314,7 +278,7 @@ const NORMAL = `
   vec3 nRef = normalize(cross(cB, cT));
   vec3 nA = normalize(cross(cB + clothOff(position + cB, aCloth, cSelf, cWind) - cOff,
                             cT + clothOff(position + cT, aCloth, cSelf, cWind) - cOff));
-  objectNormal = normalize(objectNormal + (nA - nRef) * 1.2 * (1.0 - aCloth.y * 0.85));
+  objectNormal = normalize(objectNormal + (nA - nRef) * 1.2);
 `;
 
 // Wrap diffuse rolls the terminator like fabric; the fresnel band is gated on N·L so it only
@@ -345,15 +309,18 @@ function patchVertex(shader, uniforms, withNormal) {
   }
 }
 
-// zones.js tints are authored for a UI swatch; clipping whites to 0.72 stops the robe reading as
-// a blown-out cutout the moment the sun is anywhere near it.
+// zones.js tints are authored for a UI swatch. At 0.72 the light robe still clipped to a flat
+// white cutout in direct sun; 0.56 is the highest value that keeps the folds readable there, and
+// the zones stay tellable because they are 0.56 / 0.45 / 0.23 apart, not because one is white.
+const ROBE_CEIL = 0.64;
+
 function robeColor(hex) {
   const c = new THREE.Color(hex);
   const s = { r: 0, g: 0, b: 0 };
   c.getRGB(s, THREE.SRGBColorSpace);
   const mx = Math.max(s.r, s.g, s.b);
-  if (mx > 0.72) {
-    const k = 0.72 / mx;
+  if (mx > ROBE_CEIL) {
+    const k = ROBE_CEIL / mx;
     c.setRGB(s.r * k, s.g * k, s.b * k, THREE.SRGBColorSpace);
   }
   return c;
@@ -380,15 +347,38 @@ function robeDepth(uniforms) {
   return m;
 }
 
-const AO_R = 0.8;
+const AO_R = 0.86;
+const AO_SEG = 9;
+const AO_CORE = 0.46;   // the robe hides everything inside this, so the ramp has to start outside it
 
+// Same recipe terrain.js proves works for its own ground decals: dst * (1 - srcAlpha), with the
+// strength in the alpha channel. A CircleGeometry cannot do this — its only interior vertex is the
+// centre, so the alpha ramps linearly from under the hem and the visible ring is nearly clear.
 function aoDisc() {
-  const g = new THREE.CircleGeometry(AO_R, 10);
-  g.rotateX(-Math.PI / 2);
-  g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.getAttribute('position').count * 3).fill(1), 3));
+  const pos = [0, 0, 0], col = [0, 0, 0, 1], idx = [];
+  for (let ring = 0; ring < 2; ring++) {
+    for (let j = 0; j < AO_SEG; j++) {
+      const a = j / AO_SEG * TAU;
+      const r = ring ? AO_R : AO_R * AO_CORE;
+      pos.push(Math.cos(a) * r, 0, Math.sin(a) * r);
+      col.push(0, 0, 0, ring ? 0 : 1);
+    }
+  }
+  for (let j = 0; j < AO_SEG; j++) {
+    const a = 1 + j, b = 1 + (j + 1) % AO_SEG;
+    idx.push(0, b, a, a, b, 1 + AO_SEG + (j + 1) % AO_SEG, a, 1 + AO_SEG + (j + 1) % AO_SEG, 1 + AO_SEG + j);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+  g.setIndex(idx);
   const m = new THREE.MeshBasicMaterial({
-    vertexColors: true, blending: THREE.MultiplyBlending, transparent: true,
-    depthWrite: false, fog: false, toneMapped: false, name: 'robe:contact',
+    vertexColors: true, transparent: true, depthWrite: false, fog: false, toneMapped: false,
+    blending: THREE.CustomBlending, blendSrc: THREE.ZeroFactor,
+    blendDst: THREE.OneMinusSrcAlphaFactor, blendEquation: THREE.AddEquation,
+    // without these the same factors run on the alpha channel and punch a hole in the framebuffer
+    blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
+    name: 'robe:contact',
   });
   return { g, m };
 }
@@ -426,7 +416,7 @@ export class People {
       uWind: { value: new THREE.Vector4(0.82, 0.57, 0.34, 0.55) },
       uCloth: { value: 1 },
       uSelf: { value: new THREE.Vector4(0, 0, 0, 0) },
-      uRim: { value: new THREE.Vector2(0.22, 3.0) },
+      uRim: { value: new THREE.Vector2(0.5, 2.4) },
       uRimCol: { value: new THREE.Color(0xcfd8dd) },
       uWrap: { value: new THREE.Vector2(0.4, 0.45) },
       uShade: { value: new THREE.Color(0x2f4a68).multiplyScalar(0.22) },
@@ -557,18 +547,17 @@ export class People {
     this.ao.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.ao.frustumCulled = false;
     this.ao.renderOrder = 2;
+    this.ao.castShadow = false;
     this.ao.count = 0;
     this.object3D.add(this.ao);
-    this.setAO(0.65);
+    this.setAO(0.8);
   }
 
   setAO(v) {
     const g = this.ao.geometry;
     const pos = g.getAttribute('position'), col = g.getAttribute('color');
     for (let i = 0; i < pos.count; i++) {
-      const r = Math.min(1, Math.hypot(pos.getX(i), pos.getZ(i)) / AO_R);
-      const k = 1 - v * Math.pow(1 - r, 1.5);
-      col.setXYZ(i, k, k + (1 - k) * 0.05, k + (1 - k) * 0.14);
+      col.setW(i, Math.hypot(pos.getX(i), pos.getZ(i)) > AO_R * 0.9 ? 0 : v);
     }
     col.needsUpdate = true;
   }
@@ -596,11 +585,11 @@ export class People {
       v => { this.uniforms.uCloth.value = v; });
     q.register({ key: 'wind', label: 'Wind', type: 'range', min: 0, max: 1.2, step: 0.02, default: 0.34, group: 'People' },
       v => { this.uniforms.uWind.value.z = v; });
-    q.register({ key: 'robeRim', label: 'Robe rim light', type: 'range', min: 0, max: 0.6, step: 0.01, default: 0.22, group: 'People' },
+    q.register({ key: 'robeRim', label: 'Robe rim light', type: 'range', min: 0, max: 1.2, step: 0.02, default: 0.5, group: 'People' },
       v => { this.uniforms.uRim.value.x = v; });
     q.register({ key: 'robeWrap', label: 'Robe wrap light', type: 'range', min: 0, max: 1.2, step: 0.02, default: 0.45, group: 'People' },
       v => { this.uniforms.uWrap.value.y = v; });
-    q.register({ key: 'contactAO', label: 'Figure contact shade', type: 'range', min: 0, max: 0.9, step: 0.05, default: 0.65, group: 'People' },
+    q.register({ key: 'contactAO', label: 'Figure contact shade', type: 'range', min: 0, max: 1, step: 0.05, default: 0.8, group: 'People' },
       v => this.setAO(v));
   }
 
@@ -623,6 +612,8 @@ export class People {
     const pos = new THREE.Vector3();
     const scl = new THREE.Vector3();
     const flat = new THREE.Quaternion();
+    const up = new THREE.Vector3();
+    const T = this.terrain;
     let ai = 0;
 
     for (const mesh of this.meshes) {
@@ -658,7 +649,9 @@ export class People {
           heading = a.heading;
         }
 
-        const gy = heightAt(x, z);
+        // The rendered mesh is not the analytic field, and the difference is enough to float a
+        // figure or bury its contact disc under the ground.
+        const gy = T ? T.surfaceY(x, z) : heightAt(x, z);
         const bob = a.speed > 0 ? Math.sin(this.time * (5.2 + a.speed * 2.4) * 2 + a.gait) * 0.022 * a.speed : 0;
         e.set(a.speed * 0.045, heading, 0);
         q.setFromEuler(e);
@@ -667,8 +660,15 @@ export class People {
         m4.compose(pos, q, scl);
         mesh.setMatrixAt(i, m4);
 
+        // A flat disc on undulating ground depth-fails almost everywhere, so it is tilted onto the
+        // local surface normal first. Without this the contact shade is a two-pixel sliver.
         if (ai < POOL) {
-          pos.set(x, gy + 0.045, z);
+          if (T) {
+            up.set(T.surfaceY(x - 0.6, z) - T.surfaceY(x + 0.6, z), 1.2,
+              T.surfaceY(x, z - 0.6) - T.surfaceY(x, z + 0.6)).normalize();
+            flat.setFromUnitVectors(UP, up);
+          }
+          pos.set(x, gy + 0.07, z);
           scl.set(a.scale, 1, a.scale);
           m4.compose(pos, flat, scl);
           this.ao.setMatrixAt(ai++, m4);
@@ -697,6 +697,6 @@ export class People {
     const per = {};
     for (const id of ZONE_IDS) per[id] = [this.geo[id].userData.tris, this.geoB[id].userData.tris];
     const crowd = this.meshes.reduce((s, m, i) => s + m.count * per[ZONE_IDS[i >> 1]][i & 1], 0);
-    return { per, crowd, contact: this.ao.count * 10, drawn: this.meshes.filter(m => m.count).length + 1 };
+    return { per, crowd, contact: this.ao.count * AO_SEG * 3, drawn: this.meshes.filter(m => m.count).length + 1 };
   }
 }

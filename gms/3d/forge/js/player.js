@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { ZONE_IDS } from './world/zones.js';
-import { heightAt, CENTERS } from './world/terrain.js';
+import { heightAt as fieldY, CENTERS } from './world/terrain.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const PITCH_MIN = -0.35, PITCH_MAX = 1.05;
@@ -28,7 +28,7 @@ export class Player {
     this.object3D.visible = false;
 
     this.pos = new THREE.Vector3(CENTERS[1] + 1, 0, 22);
-    this.pos.y = heightAt(this.pos.x, this.pos.z);
+    this.pos.y = this.groundY(this.pos.x, this.pos.z);
     this.vel = new THREE.Vector3();
     this.yaw = Math.PI;
     this.camYaw = Math.PI;
@@ -65,6 +65,13 @@ export class Player {
       v => { this.sens = v; });
     q.register({ key: 'camFollow', label: 'Camera follow (0 = manual)', type: 'range', min: 0, max: 6, step: 0.2, default: 2.6, group: 'Controls' },
       v => { this.follow = v; });
+  }
+
+  // The ground renders from the terrain mesh, not the analytic field, and the two disagree by
+  // enough to sink the feet or float them.
+  groundY(x, z) {
+    const T = this.people.terrain;
+    return T ? T.surfaceY(x, z) : fieldY(x, z);
   }
 
   setZone(id) {
@@ -115,7 +122,7 @@ export class Player {
     this.pos.addScaledVector(this.vel, dt);
     this.pos.x = THREE.MathUtils.clamp(this.pos.x, -145, 145);
     this.pos.z = THREE.MathUtils.clamp(this.pos.z, -100, 108);
-    this.pos.y = heightAt(this.pos.x, this.pos.z);
+    this.pos.y = this.groundY(this.pos.x, this.pos.z);
 
     const sp = Math.hypot(this.vel.x, this.vel.z);
     if (sp > 0.15) {
@@ -137,7 +144,7 @@ export class Player {
     const cp = Math.cos(this.camPitch);
     const back = new THREE.Vector3(-camFwd.x * cp, Math.sin(this.camPitch), -camFwd.z * cp)
       .multiplyScalar(this.dist).add(aim);
-    back.y = Math.max(back.y, heightAt(back.x, back.z) + 0.7);
+    back.y = Math.max(back.y, this.groundY(back.x, back.z) + 0.7);
 
     if (!this.started) { this.camPos.copy(back); this.started = true; }
     this.camPos.lerp(back, 1 - Math.exp(-11 * dt));
