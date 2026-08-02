@@ -6,6 +6,9 @@ import { heightAt, CENTERS } from './world/terrain.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const PITCH_MIN = -0.35, PITCH_MAX = 1.05;
+const LOOK_HOLD = 0.8;
+
+const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
 
 export class Player {
   constructor(people, input, controls) {
@@ -29,6 +32,7 @@ export class Player {
     this.vel = new THREE.Vector3();
     this.yaw = Math.PI;
     this.camYaw = Math.PI;
+    this.moveYaw = Math.PI;
     this.camPitch = 0.26;
     this.camPos = new THREE.Vector3();
     this.camAim = new THREE.Vector3();
@@ -37,6 +41,8 @@ export class Player {
     this.dist = 6.2;
     this.height = 1.62;
     this.sens = 0.0042;
+    this.follow = 2.6;
+    this.lookHold = 0;
     this.started = false;
   }
 
@@ -57,6 +63,8 @@ export class Player {
       v => { this.height = v; });
     q.register({ key: 'lookSens', label: 'Look sensitivity', type: 'range', min: 0.001, max: 0.012, step: 0.0005, default: 0.0042, group: 'Controls' },
       v => { this.sens = v; });
+    q.register({ key: 'camFollow', label: 'Camera follow (0 = manual)', type: 'range', min: 0, max: 6, step: 0.2, default: 2.6, group: 'Controls' },
+      v => { this.follow = v; });
   }
 
   setZone(id) {
@@ -82,9 +90,22 @@ export class Player {
 
     this.camYaw -= cmd.lx * this.sens;
     this.camPitch = Math.min(PITCH_MAX, Math.max(PITCH_MIN, this.camPitch + cmd.ly * this.sens));
+    // The stick is read against the camera angle as it was when the stick was pressed, not the
+    // live one. Holding a direction then walks a straight line while the camera swings in behind;
+    // reading it live would feed the swing back into the move vector and curve the walk into a
+    // circle, because the heading is defined by the camera in the first place.
+    const stick = Math.hypot(cmd.mx, cmd.my);
+    if (cmd.lx || cmd.ly) this.lookHold = LOOK_HOLD;
+    else this.lookHold = Math.max(0, this.lookHold - dt);
+    if (stick < 0.02 || this.lookHold) this.moveYaw = this.camYaw;
 
-    const fwd = new THREE.Vector3(Math.sin(this.camYaw), 0, Math.cos(this.camYaw));
-    const right = new THREE.Vector3(fwd.z, 0, -fwd.x);
+    if (this.follow > 0 && stick > 0.02 && !this.lookHold && Math.hypot(this.vel.x, this.vel.z) > 0.6) {
+      this.camYaw += wrapPi(this.yaw - this.camYaw) * (1 - Math.exp(-this.follow * dt));
+    }
+
+    const fwd = new THREE.Vector3(Math.sin(this.moveYaw), 0, Math.cos(this.moveYaw));
+    const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+    const camFwd = new THREE.Vector3(Math.sin(this.camYaw), 0, Math.cos(this.camYaw));
     const want = new THREE.Vector3()
       .addScaledVector(fwd, cmd.my).addScaledVector(right, cmd.mx);
     const mag = Math.min(1, want.length());
@@ -98,10 +119,7 @@ export class Player {
 
     const sp = Math.hypot(this.vel.x, this.vel.z);
     if (sp > 0.15) {
-      const target = Math.atan2(this.vel.x, this.vel.z);
-      let d = target - this.yaw;
-      while (d > Math.PI) d -= Math.PI * 2;
-      while (d < -Math.PI) d += Math.PI * 2;
+      const d = wrapPi(Math.atan2(this.vel.x, this.vel.z) - this.yaw);
       this.yaw += d * (1 - Math.exp(-11 * dt));
     }
 
@@ -117,7 +135,7 @@ export class Player {
 
     const aim = this.camAim.set(this.pos.x, this.pos.y + this.height, this.pos.z);
     const cp = Math.cos(this.camPitch);
-    const back = new THREE.Vector3(-fwd.x * cp, Math.sin(this.camPitch), -fwd.z * cp)
+    const back = new THREE.Vector3(-camFwd.x * cp, Math.sin(this.camPitch), -camFwd.z * cp)
       .multiplyScalar(this.dist).add(aim);
     back.y = Math.max(back.y, heightAt(back.x, back.z) + 0.7);
 

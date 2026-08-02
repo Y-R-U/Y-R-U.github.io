@@ -2,7 +2,7 @@
 // Screen halves: one moves, one looks and attacks. `flip` swaps them for left-handers.
 
 const STICK_R = 62;
-const TAP_MS = 240, TAP_PX = 16;
+const TAP_MS = 400, TAP_PX = 16;
 
 export class Input {
   constructor() {
