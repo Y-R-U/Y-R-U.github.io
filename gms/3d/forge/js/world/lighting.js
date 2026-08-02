@@ -17,8 +17,8 @@ const _upY = new THREE.Vector3(0, 1, 0), _upZ = new THREE.Vector3(0, 0, 1);
 const _cA = new THREE.Color(), _cB = new THREE.Color(), _cC = new THREE.Color(), _cD = new THREE.Color();
 
 const LUT = [
-  { el: -0.50, zen: '#152a68', hor: '#3465c4', gnd: '#16224a', glow: '#3f63ad' },
-  { el: -0.16, zen: '#243a86', hor: '#5a6ac0', gnd: '#1e2a52', glow: '#8a6aa4' },
+  { el: -0.50, zen: '#080d1c', hor: '#1a2742', gnd: '#080c16', glow: '#33456b' },
+  { el: -0.16, zen: '#161f45', hor: '#3c4370', gnd: '#131829', glow: '#7a5f92' },
   { el: -0.02, zen: '#584a8c', hor: '#e28fa4', gnd: '#3c3244', glow: '#ff8a52' },
   { el: 0.16, zen: '#8b7fc0', hor: '#f0a6b4', gnd: '#61504a', glow: '#ffab63' },
   { el: 0.42, zen: '#6f9cd2', hor: '#dbe7ea', gnd: '#6d6456', glow: '#ffeed0' },
@@ -135,7 +135,7 @@ export class Lighting {
       () => this.apply());
     q.register({ key: 'moonPower', label: 'Moon', type: 'range', min: 0, max: 3, step: 0.02, default: 1.5, group: 'Light' },
       () => this.apply());
-    q.register({ key: 'nightLift', label: 'Night lift', type: 'range', min: 0, max: 5, step: 0.02, default: 3.2, group: 'Light' },
+    q.register({ key: 'nightLift', label: 'Night lift', type: 'range', min: 0, max: 5, step: 0.02, default: 2.2, group: 'Light' },
       () => this.apply());
     q.register({ key: 'stoneVary', label: 'Stone variation', type: 'range', min: 0, max: 2, step: 0.05, default: 1, group: 'World' },
       v => setVariation(v));
@@ -211,8 +211,10 @@ export class Lighting {
     // blue. At a low sun the sky genuinely is the pink one, and pulling the fill toward a
     // midday blue there paints the whole frame the wrong colour.
     const high = smoothstep(0.10, 0.42, el);
-    const skyTarget = _cA.setHex(0xbf9bd6).lerp(_cB.setHex(0x7fa8d8), high).lerp(_cD.setHex(0x3d78f2), this.night);
-    const gndTarget = _cC.setHex(0xb08a72).lerp(_cD.setHex(0x9d8464), high).lerp(_cB.setHex(0x1d47ad), this.night);
+    // Moonlight is desaturated, not blue. A saturated night fill paints every surface the same
+    // hue and the frame reads as a blue filter over a day scene rather than as darkness.
+    const skyTarget = _cA.setHex(0xbf9bd6).lerp(_cB.setHex(0x7fa8d8), high).lerp(_cD.setHex(0x3a4a63), this.night);
+    const gndTarget = _cC.setHex(0xb08a72).lerp(_cD.setHex(0x9d8464), high).lerp(_cB.setHex(0x1c212c), this.night);
     const desat = lerp(lerp(0.26, 0.66, smoothstep(0.02, 0.45, el)), 0.92, this.night);
     this.fill.color.copy(zen).lerp(skyTarget, desat);
     this.fill.groundColor.copy(hor).lerp(gndTarget, desat * 1.1);
@@ -284,12 +286,14 @@ export class Lighting {
         }
         r += sky.glow[0] * glow; g += sky.glow[1] * glow; b += sky.glow[2] * glow;
 
-        if (this.night > 0.25 && e > 0.02) {
+        // One equirect texel is ~6 screen pixels wide, so a bright star magnifies into a soft
+        // disc the size of a moon. They have to stay dim enough to read as a dusting.
+        if (this.night > 0.25 && e > 0.0) {
           const h = ((x * 1103515245 + y * 12345) ^ (y << 7)) >>> 0;
-          if ((h % 9973) > 9960) {
-            const s2 = 90 + (h % 120);
-            const f = (this.night - 0.25) * 1.34 * smoothstep(0.02, 0.35, e);
-            r += s2 * f; g += s2 * f; b += (s2 + 30) * f;
+          if ((h % 9973) > 9946) {
+            const s2 = 16 + (h % 46) * (h % 31 === 0 ? 2.4 : 1);
+            const f = (this.night - 0.25) * 1.34 * smoothstep(0, 0.20, e);
+            r += s2 * f; g += s2 * f; b += (s2 + 14) * f;
           }
         }
 

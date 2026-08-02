@@ -27,7 +27,8 @@ export function buildPanel(app) {
   }
   body.innerHTML = html;
 
-  body.addEventListener('input', e => {
+  // Safari does not fire `input` on <select>, so a phone user's zone change silently did nothing.
+  for (const evt of ['input', 'change']) body.addEventListener(evt, e => {
     const key = e.target.dataset.knob;
     if (!key) return;
     const raw = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
