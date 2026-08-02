@@ -535,6 +535,21 @@ button {
 }
 .btn.slim small { display: inline; margin-left: 9px; }
 
+/* The mirror of .screen-head: a band pinned to the BOTTOM of the shell, for the
+   one button a screen exists to get you to. A "RACE" button that lives at the
+   end of a card stack is a scroll away on a phone every single time, and it is
+   the only thing on the screen anybody came for. Bottom rather than top because
+   that is where the thumb already is. */
+.screen-foot {
+  flex: 0 0 auto;
+  padding: calc(var(--pad) * 0.7) var(--pad) calc(var(--pad) * 0.7 + env(safe-area-inset-bottom));
+  background: linear-gradient(0deg, rgba(6, 9, 14, 0.97), rgba(6, 9, 14, 0.8));
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+.screen-foot .btn { margin: 0; }
+
 .screen-body {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -580,20 +595,25 @@ button {
   gap: clamp(6px, 1.2vmin, 12px); width: min(34vw, 200px);
   padding: clamp(4px, 1.5vh, 20px) 0;
 }
+/* On a phone every one of these clamps sits on its LOWER bound — 1.8vmin of a
+   400-odd px viewport is 7px, so the minimum is the number that actually
+   renders. Making the menu bigger on a phone therefore means raising the
+   floors, not the vmin terms, which is why the mid values are untouched: a
+   desktop window is unchanged and the phone gets about a third more button. */
 .tile {
-  display: flex; flex-direction: column; justify-content: center; gap: 2px;
-  padding: clamp(7px, 1.4vmin, 14px);
+  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  padding: clamp(10px, 1.4vmin, 14px) clamp(11px, 1.5vmin, 15px);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   background: rgba(10, 14, 21, 0.72);
   -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  text-align: left; min-height: clamp(48px, 9vmin, 76px);
+  text-align: left; min-height: clamp(64px, 9vmin, 76px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 .tile:active { transform: scale(0.96); }
-.tile .tl-ic { font-size: clamp(15px, 2.6vmin, 26px); line-height: 1; }
-.tile .tl-name { font-size: clamp(11px, 1.8vmin, 18px); letter-spacing: 0.08em; }
-.tile .tl-sub { font-size: clamp(8px, 1.1vmin, 11px); color: var(--dim); letter-spacing: 0.08em; font-weight: 500; line-height: 1.15; }
+.tile .tl-ic { font-size: clamp(20px, 2.6vmin, 26px); line-height: 1; }
+.tile .tl-name { font-size: clamp(15px, 1.8vmin, 18px); letter-spacing: 0.08em; }
+.tile .tl-sub { font-size: clamp(10px, 1.1vmin, 11px); color: var(--dim); letter-spacing: 0.08em; font-weight: 500; line-height: 1.15; }
 .tile.hero { border-color: var(--brand); background: linear-gradient(120deg, rgba(255,90,43,0.88), rgba(255,138,61,0.78)); color: #180a03; }
 .tile.hero .tl-sub { color: rgba(24, 10, 3, 0.75); }
 .tile.badge { position: relative; }
@@ -710,9 +730,9 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
 .btn-row .btn { margin: 6px 0; }
 
 .btn-mini {
-  padding: 7px 14px; border-radius: 9px;
+  padding: 9px 16px; border-radius: 10px;
   background: rgba(255,255,255,0.07); border: 1px solid var(--line);
-  font-size: clamp(11px, 1.5vmin, 14px); letter-spacing: 0.1em;
+  font-size: clamp(13px, 1.5vmin, 15px); letter-spacing: 0.1em;
 }
 .btn-mini.on { background: var(--brand); color: #180a03; border-color: transparent; }
 
@@ -794,8 +814,31 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
 
 /* results */
 .result-hero { text-align: center; padding: 3vh 0 2vh; }
-.result-pos { font-size: clamp(60px, 16vmin, 190px); font-weight: 800; line-height: 0.82; }
-.result-pos small { font-size: 0.34em; }
+/* The results header. It carries the only three things worth pressing, so it
+   has to stay small enough that the standings still show underneath it — the
+   finishing position is one line high here, not a 16vmin hero number. */
+.result-head { display: flex; align-items: center; gap: 12px; }
+.result-pos { font-size: clamp(34px, 7vmin, 62px); font-weight: 800; line-height: 0.85; flex: 0 0 auto; }
+.result-pos small { font-size: 0.4em; }
+.result-head-tag { flex: 1 1 auto; min-width: 0; }
+.result-head-tag b {
+  display: block; letter-spacing: 0.18em; font-size: clamp(12px, 1.9vmin, 17px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.result-head-tag span {
+  display: block; letter-spacing: 0.16em; color: var(--dim); font-size: clamp(9px, 1.3vmin, 13px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.result-net { font-family: var(--mono); font-size: clamp(15px, 2.4vmin, 24px); flex: 0 0 auto; }
+.result-net.good { color: var(--good); }
+.result-net.bad { color: var(--hot); }
+.result-acts { margin-top: 10px; }
+.result-acts .btn {
+  margin: 0; flex: 1 1 0; min-width: 0;
+  text-align: center; line-height: 1.15;
+  padding: clamp(10px, 1.5vmin, 15px) 6px;
+  font-size: clamp(13px, 1.9vmin, 18px);
+}
 .result-tag { letter-spacing: 0.3em; color: var(--dim); font-size: clamp(11px, 1.7vmin, 16px); }
 
 .money-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: clamp(12px, 1.7vmin, 17px); }
@@ -884,7 +927,9 @@ table.standings .sw { display: inline-block; width: 9px; height: 9px; border-rad
 
   /* Portrait: the rails go right up against the bezels so the racing behind
      them stays visible down the middle of the phone. */
-  .title-rail { width: min(38vw, 210px); }
+  /* Wider rails to carry the bigger tiles. Two at 43vw still leave 14vw of the
+     racing showing down the middle, which is the point of the layout. */
+  .title-rail { width: min(43vw, 230px); }
   .title-logo .logo { font-size: clamp(28px, 11vmin, 70px); }
   .room { height: clamp(160px, 26vh, 260px); }
 }

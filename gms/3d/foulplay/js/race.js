@@ -317,13 +317,23 @@ export function updateRace(dt) {
 // ---------------------------------------------------------------------------
 function resolveContacts(dt, cars) {
   const tr = state.track;
-  const LEN = CRASH.carLen, WID = CRASH.carWide;
   for (let i = 0; i < cars.length; i++) {
     const a = cars[i];
     if (!a.alive || a.mode === 'wreck' || a.respawnTimer > 0) continue;
     for (let j = i + 1; j < cars.length; j++) {
       const b = cars[j];
       if (!b.alive || b.mode === 'wreck' || b.respawnTimer > 0) continue;
+
+      // Two boxes touch when the gap between their centres closes to the sum of
+      // their half-extents — and those come off each car's own mesh now, not
+      // from one pair of constants shared by every chassis. The old numbers
+      // (4.3 x 2.05) were the style table's nominal size; the built car is
+      // 4.4-5.2 long and 2.5-2.7 wide once its bumpers and wheels are on. So a
+      // rival could put a wheel inside your door, or a bumper through your
+      // boot, and the solver saw no contact at all: no push, no damage, no
+      // sparks. That gap is the whole of "they pass right through you".
+      const LEN = a.halfLen + b.halfLen;
+      const WID = a.halfWide + b.halfWide;
 
       const ds = tr.delta(a.s, b.s);
       if (Math.abs(ds) > LEN + 2) continue;
@@ -346,7 +356,7 @@ function resolveContacts(dt, cars) {
       if (overT < overS) {
         // Side-by-side: the classic lean.
         const dir = sign(dtt) || (Math.random() < 0.5 ? -1 : 1);
-        const push = (overT + 0.04) * 0.55;
+        const push = (overT + 0.04) * CRASH.separate;
         a.t -= dir * push * (mb / tot);
         b.t += dir * push * (ma / tot);
 
@@ -368,7 +378,7 @@ function resolveContacts(dt, cars) {
       } else {
         // Nose to tail.
         const dir = sign(ds) || 1;
-        const push = (overS + 0.05) * 0.5;
+        const push = (overS + 0.05) * CRASH.separate;
         const rel = (b.va - a.va) * dir;
         a.s = wrap(a.s - dir * push * (mb / tot), tr.length);
         b.s = wrap(b.s + dir * push * (ma / tot), tr.length);

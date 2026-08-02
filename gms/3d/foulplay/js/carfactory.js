@@ -865,7 +865,40 @@ export function buildCar(opts = {}) {
   g.userData.driver = driver;
   g.userData.seat = seat;
   g.userData.chassis = chassis;
+  g.userData.hull = measureHull(g);
   return g;
+}
+
+// The box the rest of the game is allowed to think this car is.
+//
+// `CRASH.carLen/carWide` were one pair of numbers for every chassis, and they
+// were the numbers the STYLE table asks for rather than the ones the factory
+// then builds: a stock car is nominally 4.3 x 1.95, and the mesh that comes out
+// of here is 4.96 x 2.50, because the bumpers hang off each end and the wheels
+// stand proud of the bodyside. So contact was being resolved on a box a quarter
+// narrower and up to 0.86m shorter than the thing on screen — two cars could
+// overlap by a wheel and half a bumper with the solver seeing daylight between
+// them, which is exactly "they pass right through you".
+//
+// Measured once, from the geometry, so a new body style cannot get this wrong.
+// Trimmed a little because the extremes are a round tyre wall and a bumper
+// corner, not a flat slab, and racing wheel-to-wheel has to stay possible.
+function measureHull(g) {
+  g.updateMatrixWorld(true);
+  const b = new THREE.Box3();
+  b.makeEmpty();
+  const tmp = new THREE.Box3();
+  g.traverse((o) => {
+    if (!o.geometry || o.userData.noHull) return;
+    o.geometry.computeBoundingBox();
+    tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
+    b.union(tmp);
+  });
+  return {
+    halfLen: Math.max(-b.min.z, b.max.z) * 0.97,
+    halfWide: Math.max(-b.min.x, b.max.x) * 0.95,
+    high: Math.max(b.max.y, 0.9),
+  };
 }
 
 // ---------------------------------------------------------------------------

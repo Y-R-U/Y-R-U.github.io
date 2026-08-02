@@ -94,6 +94,18 @@ ago to `debris.js`, which gives it velocity and spin. The car keeps driving
 without it: losing a wheel adds `wheelPull`, losing the roof reveals the driver,
 glass shatters instead of flying off in one piece.
 
+**Wheels are the exception, and they are a ladder.** `CRASH.wheelSpeed` is
+indexed by how many are gone — 1, 0.9, 0.74, 0.5, **0** — so the first is cheap
+and funny and the fourth ends the drive: no throttle, no steering, the floorpan
+scrubbing speed off until the truck comes for it. `CRASH.wheelResist` and
+`wheelPickBias` make each successive wheel harder to take off than the last, in
+both the roll that picks a panel and the damage that panel then soaks.
+
+**A car also knows how big it is.** `carfactory:measureHull` measures the built
+mesh and every collision reads that, because the style table's nominal size is
+not what comes out of the factory — a stock car is nominally 4.3 x 1.95 and
+builds at 4.96 x 2.50 once its bumpers and wheels are on.
+
 `PART_SPEC` in `carfactory.js` maps each panel to a region (`front`/`rear`/
 `left`/`right`/`top`), and `damage(amount, region)` spreads a hit over the panels
 facing it. `CHASSIS_HP` is deliberately huge — the brief is "takes a lot of

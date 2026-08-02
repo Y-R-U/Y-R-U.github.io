@@ -529,6 +529,149 @@ confirm the original symptom is gone.**
   check whether anything is being drawn — `preserveDrawingBuffer` is false, so
   it comes back blank even when the scene is fine. Use a CDP screenshot.
 
+---
+
+# ROUND 6 — the car is now the size it looks (2026-08-02)
+
+Four reports: cars still ending up underground after an off-track crash; rivals
+passing straight through you on track; a very damaged car should catch fire and
+smoke; and losing wheels should be a ladder that ends with a car you cannot
+drive. Then a fifth, on the UI: the results buttons are below the fold.
+
+## 1. Underground, again — and this time it was the car, not the ground
+
+Round 5 fixed the ground probe and the numbers said the wrecks were clearing the
+surface. They were: the probe reports where the surface is and the ORIGIN was
+above it. The origin is not the bottom of the car, though — it is on the floor
+of the car, between the wheels, and a wreck tumbles about it. Roll the body
+ninety degrees and half its width is now below that point; roll it onto its roof
+and the whole height is. Holding the origin a flat `WRECK_REST = 0.45` above the
+ground therefore buried anything not sitting flat.
+
+Measured over a race, **every wreck frame had the shell under the tarmac — 111
+of 153 frames deeper than 15cm, worst 1.97m.** A whole car swallowed at the
+exact moment the replay camera cuts to it.
+
+`Car.wreckRest()` now asks the box: world-up expressed in car space, dotted
+against the body half-extents, gives the lowest corner at the current attitude.
+Upright it returns ~0, on its side half the width, on its roof the full height.
+
+Second, smaller cause, on the ground side: the probe handed the floor over to
+the terrain heightfield at 24m beyond the road edge and took `min(apron, terra)`
+while doing it — but **the verge MESH runs out to 46m**. So across twenty-two
+metres of drawn green the floor was being pulled down to the terrain plane,
+which on a raised section is several metres lower. Hand-over now happens at the
+verge's own outer edge, blended over the last few metres, and takes the terrain
+straight rather than the min, so a hill you slide up stops you.
+
+## 2. "They pass right through you" — the collision box was never the car
+
+`CRASH.carLen/carWide` was one pair of numbers, 4.3 x 2.05, for all five body
+styles — and it was the *style table's nominal size*, not what the factory
+builds. Measured off the meshes:
+
+| style | nominal | built |
+|---|---|---|
+| muscle | 4.5 x 2.00 | 5.16 x 2.55 |
+| wedge | 4.4 x 2.05 | 5.06 x 2.60 |
+| stock | 4.3 x 1.95 | 4.96 x 2.50 |
+| van | 4.7 x 2.15 | 5.07 x 2.70 |
+| buggy | 4.0 x 2.10 | 4.37 x 2.65 |
+
+Every car in the game is about a quarter wider than the box the solver used and
+up to 0.86m longer. A rival could put a wheel inside your door or a bumper
+through your boot with **no push, no damage, no sparks** — there was no contact
+to resolve. `carfactory:measureHull` now measures the built mesh once and every
+collision reads it: car-to-car, the barrier clamp, impact scuffs, debris strikes.
+
+`CRASH.separate` (0.55 → 0.72) went with it, because two cars leaning on each
+other at 55% of overlap per step stay visibly inside one another for as long as
+the lean lasts.
+
+## 3. Fire and soot
+
+`updateBurn` reads `hp` and nothing else: past `CRASH.smokeAt` (50% gone) black
+smoke off the tail, past `fireAt` (78%) a fire in the engine bay. Both carry
+through the wreck. **Cosmetic on purpose** — a fire that ate hp would kill cars
+for reasons the player never saw coming. `particles.js:engineFire/sootPlume`.
+
+## 4. Wheels are a ladder now
+
+`CRASH.wheelSpeed` indexed by wheels lost: `[1, 0.9, 0.74, 0.5, 0]`. The fourth
+is zero, and zero means it: no throttle, no steering authority, `beachedDrag`
+scrubbing speed off the floorpan, and once it is under `beachedStop` a *gentle*
+wreck (`wreck(reason, null, {gentle: true})` — no fireball, no launch) hands it
+to the truck.
+
+`wheelResist` and `wheelPickBias` make each successive wheel harder in both the
+roll that picks a panel and the damage that panel then soaks. **Every route to
+losing a wheel has to respect the ladder or the ladder does nothing** — the one
+that nearly defeated the whole change was `stripDown()`, which picked uniformly
+at random from the living parts, so roughly one strip in six took a wheel and a
+stripped car strips constantly. It rolls through `pickPanel` now.
+
+Share of sampled car-frames by wheels missing, hometown, 3 laps, 8 cars:
+
+| | 0 | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|---|
+| flat 5%/wheel (before) | 29% | 39% | 28% | 3.6% | 0.9%¹ |
+| after | 34-58% | 31-46% | 11-18% | 0-1.2% | 0-1.9% |
+
+¹ and in an earlier sample **85% of frames** had somebody in the field on zero
+wheels, because the old model let them keep racing at 85% pace indefinitely.
+
+## 5. The results screen buttons were below the fold
+
+Measured on a real race at a 412x740 viewport: **all three buttons offscreen,
+153px of scroll to reach them**, every single race. They sat under the finishing
+position, the objective, the prize list, seven money rows, two stat cards and an
+eight-row classification table.
+
+They are in `opts.head` now — pinned, with the position, the event and the net
+alongside them. The stats are all still there, they are just the thing you
+scroll to rather than the thing between you and the next race.
+
+`paint()` also grew `opts.foot`, the mirror of `opts.head`: a band pinned to the
+bottom of the shell for the one button a screen exists to get you to. The world
+ladder and the title bracket use it — a bracket tree is taller than a phone, so
+the button that plays the next round cannot live underneath it.
+
+**Title tiles are bigger on a phone.** Every clamp on them sits on its LOWER
+bound at phone width (`1.8vmin` of a 412px viewport is 7px), so the floors are
+what render and the floors are what changed. Desktop is untouched. 157x57 →
+177x89 at 412px wide, name 11px → 15px, icon 15px → 20px.
+
+## Verified
+
+| | before | after |
+|---|---|---|
+| wreck frames with the shell under the ground | 111/153, 128/178 | 0/148, 1/118, 1/166 (all at t=0) |
+| worst depth, wrecks during a race | 1.97m | 0.18m |
+| worst depth, wrecks forced 8-70m off the road (skyline) | 0.64-2.07m at **every** distance | **0.00m** at every distance, 280 frames |
+| car-pair frames overlapping by >12cm | 138, 556 | 0-4 |
+| frames with any hull overlap at all | 160, 578 | 3-30 |
+| contact events per race | 30, 34 | 29-44 |
+| engine fires per race | 0 | 2-11 |
+| results buttons offscreen (412x740, real race) | 3 of 3 | 0 of 3 |
+
+## Gotchas
+
+- **Disable the CDP cache when testing, or you test the old build.** ES modules
+  and the stylesheet are cached per URL and `Page.navigate` will happily reuse
+  them. A whole round of measurements said the new collision hull had done
+  nothing, because the page was still running the previous `carfactory.js`.
+  `Network.enable` + `Network.setCacheDisabled` before navigating.
+- **One CDP port drives ONE tab.** Two probe processes against the same port
+  fight over the same page — the second one's `Page.navigate` yanks the first
+  out from under itself. Run a second Chrome on another port instead.
+- **`Box3.setFromObject` on a live car includes its dangling panels**, which
+  swing below the body, so it is useless for asking "is the car underground".
+  Measure `mesh.userData.chassis`.
+- **Measuring a hull off a car that is in the scene inflates it.** Taking a
+  geometry AABB to world space and back expands it on each trip — that is where
+  a 2.7m-wide van came back as 5.0m. Measure a freshly built car whose only
+  transforms are local ones, which is what `measureHull` does at build time.
+
 ## Still open (unchanged from round 4)
 
 - Shadow map offset from its caster, applied to one vehicle only.

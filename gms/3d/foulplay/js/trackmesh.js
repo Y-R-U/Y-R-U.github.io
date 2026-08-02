@@ -530,6 +530,11 @@ const VERGE_DROP = [-3.0, -1.5, -1.5, -0.72, -0.72, -0.28, -0.28, -0.10, -0.10, 
 // finding. There was never a missing shadow; there was a missing FLOOR.
 const VERGE_E = [0, 3.2, 9, 20, 46];
 const VERGE_Y = [-0.10, -0.28, -0.72, -1.5, -3.0];
+// How far out the verge is still the ground, and the band over which the floor
+// hands over to the terrain heightfield. Must match the last VERGE_E entry, or
+// the ground probe and the mesh disagree and cars sink into drawn scenery.
+const VERGE_FAR = VERGE_E[VERGE_E.length - 1];
+const VERGE_BLEND = 8;
 function vergeDrop(e) {
   if (e <= 0) return VERGE_Y[0];
   for (let k = 1; k < VERGE_E.length; k++) {
@@ -572,11 +577,21 @@ function attachGroundProbe(track, height) {
     probe.onRoad = e <= 0.5;
     if (e <= 0) return roadY;
     const apron = roadY + vergeDrop(e);
-    if (e < 24) return apron;
-    // Past the apron the terrain owns the floor. Blend rather than step, or a
-    // car sliding out of the run-off drops through a seam.
+    // The verge MESH runs out to 46m beyond the road edge (VERGE_OFF), so that
+    // is how far the apron profile is the ground. Handing the floor over to the
+    // terrain heightfield at 24m — and taking `min(apron, terra)` while doing
+    // it — pulled the floor down to the terrain plane across twenty-two metres
+    // of ground the verge is still being DRAWN on, so a car that slid a little
+    // way into the run-off sank into visible green. On a raised section the
+    // terrain sits several metres lower and it sank out of sight completely.
+    // That is most of "cars still end up underground outside the track".
+    if (e < VERGE_FAR) return apron;
+    // Past the verge the terrain really is the floor, and it is allowed to be
+    // higher than the apron would have been — a hill you slide up should stop
+    // you, not swallow you. Blended over the last few metres so there is no
+    // step at the seam.
     const terra = height(pos.x, pos.z);
-    return lerp(apron, Math.min(apron, terra), clamp((e - 24) / 22, 0, 1));
+    return lerp(apron, terra, clamp((e - VERGE_FAR) / VERGE_BLEND, 0, 1));
   };
   probe.s = 0;
   probe.t = 0;

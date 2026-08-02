@@ -89,7 +89,8 @@ function paint(html, acts = {}, opts = {}) {
   m.innerHTML = `
     ${opts.head == null ? '' : `<div class="screen-head"><div class="wrap">${opts.head}</div></div>`}
     ${opts.stage ? `<div class="screen-stage"><div class="wrap">${opts.stage}</div></div>` : ''}
-    <div class="screen-body"><div class="wrap">${html}</div></div>`;
+    <div class="screen-body"><div class="wrap">${html}</div></div>
+    ${opts.foot ? `<div class="screen-foot"><div class="wrap">${opts.foot}</div></div>` : ''}`;
   const body = m.querySelector('.screen-body');
   body.scrollTop = scrollMemory[key] || 0;
   wire(m);
@@ -954,14 +955,33 @@ export function renderResults(r) {
         </b></div>
     </div>` : '';
 
-  paint(`
-    <div class="result-hero">
+  // The three things you might actually want to do next go in the PINNED band,
+  // not at the bottom of the card stack. They were under a finishing position,
+  // an objective, a prize list, seven money rows, two stat cards and an
+  // eight-row classification table — which on a phone is a scroll and a half
+  // before you can press "race again", every single race.
+  //
+  // The stats are still all there. They are just now the thing you scroll to if
+  // you want them, rather than the thing between you and the next race.
+  const headBar = `
+    <div class="result-head">
       <div class="result-pos" style="color:${win ? 'var(--warn)' : podium ? 'var(--ink)' : 'var(--dim)'}">
         ${r.retired ? 'OUT' : ordinal(r.position).replace(/^(\d+)/, '$1<small>').replace(/(st|nd|rd|th)$/, '$1</small>')}
       </div>
-      <div class="result-tag">${esc(ev.title || 'RACE')} · ${esc(ev.subtitle || '')}</div>
+      <div class="result-head-tag">
+        <b>${esc(ev.title || 'RACE')}</b>
+        <span>${esc(ev.subtitle || '')}</span>
+      </div>
+      <div class="result-net ${r.net >= 0 ? 'good' : 'bad'}">${fmtMoney(r.net)}</div>
     </div>
+    <div class="btn-row result-acts">
+      ${r.highlights && r.highlights.length
+        ? `<button class="btn ghost" data-act="replay">▶ HIGHLIGHTS</button>` : ''}
+      <button class="btn" data-act="again">RACE AGAIN</button>
+      <button class="btn primary" data-act="next">${nextLabel(ev, r)}</button>
+    </div>`;
 
+  paint(`
     ${objectiveRow}
 
     ${r.titleOutcome ? `
@@ -1018,12 +1038,6 @@ export function renderResults(r) {
       <h3>CLASSIFICATION</h3>
       <table class="standings">${standings}</table>
     </div>
-
-    ${r.highlights && r.highlights.length ? `<button class="btn ghost" data-act="replay">▶ WATCH THE HIGHLIGHTS AGAIN<small>${r.highlights.length} MOMENTS</small></button>` : ''}
-    <div class="btn-row">
-      <button class="btn" data-act="again">RACE AGAIN</button>
-      <button class="btn primary" data-act="next">${nextLabel(ev, r)}</button>
-    </div>
   `, {
     again: () => emit('race:begin', ev),
     next: () => {
@@ -1033,7 +1047,7 @@ export function renderResults(r) {
       else emit('nav', { to: ev.mode === 'story' ? 'story' : ev.mode === 'event' ? 'events' : 'quick' });
     },
     replay: () => emit('replay:again', r),
-  }, { key: 'results' });
+  }, { key: 'results', head: headBar });
 }
 
 function nextLabel(ev, r) {
@@ -1073,11 +1087,13 @@ export function renderLadder() {
       <div class="stat"><span>FINES PAID</span><b class="bad">${fmtMoney(profile.stats.finesPaid)}</b></div>
       <div class="stat"><span>FOULS THAT PASSED AS RACING</span><b class="good">${profile.stats.cleanFouls}</b></div>
     </div>
-    <button class="btn primary" data-act="race">RACE FOR POSITIONS</button>
   `, {
     back: () => emit('nav', { to: 'title' }),
     race: () => emit('nav', { to: 'quick' }),
-  }, { key: 'ladder', head: head('WORLD LADDER'), backdrop: true });
+  }, {
+    key: 'ladder', head: head('WORLD LADDER'), backdrop: true,
+    foot: `<button class="btn primary" data-act="race">RACE FOR POSITIONS</button>`,
+  });
 }
 
 // ═══════════════════════════════ TITLES ═══════════════════════════════
@@ -1151,7 +1167,16 @@ export function renderBracket(id) {
       ${st && st.titles ? `<div class="stat"><span>TITLES HELD</span><b class="good">${st.titles}</b></div>` : ''}
     </div>
     ${st ? `<div class="card" style="padding-bottom:4px"><div class="bracket">${tree}</div></div>` : ''}
-    ${pair && pair.them ? `
+    ${logRows}
+  `, {
+    back: () => renderTitles(),
+    enter: () => { enterTitle(id); renderBracket(id); },
+    race: () => emit('title:race', { id }),
+  }, {
+    key: 'bracket:' + id, head: head(t.name), backdrop: true,
+    // A full bracket tree is taller than a phone, so the one button that plays
+    // the next round cannot live underneath it.
+    foot: pair && pair.them ? `
       <button class="btn primary" data-act="race">
         RACE ${esc(roundName(t, st.round))}
         <small>VS ${esc(pair.them.name)} · ${esc(pair.them.team)}</small>
@@ -1159,13 +1184,8 @@ export function renderBracket(id) {
       <button class="btn primary" data-act="enter">
         ${st && st.attempts ? 'ENTER AGAIN' : 'ENTER THE BRACKET'}
         <small>${st && st.attempts ? 'A COMPLETELY NEW DRAW' : `${t.size} SEEDS · ${roundCount(t)} ROUNDS`}</small>
-      </button>`}
-    ${logRows}
-  `, {
-    back: () => renderTitles(),
-    enter: () => { enterTitle(id); renderBracket(id); },
-    race: () => emit('title:race', { id }),
-  }, { key: 'bracket:' + id, head: head(t.name), backdrop: true });
+      </button>`,
+  });
 }
 
 // ═══════════════════════════════ CAREER ═══════════════════════════════

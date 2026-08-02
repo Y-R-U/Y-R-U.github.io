@@ -374,6 +374,45 @@ export function boostFlame(pos, dir, hot = 1) {
   }
 }
 
+// A fire in the engine bay. Small, and it has to STAY small — a big flame on a
+// car doing 200km/h reads as an explosion, and this one has to burn for laps.
+// Three pieces per call: a hot core that barely moves, a lick of flame carried
+// back over the screen by the airflow, and the soot it makes. `k` is 0..1 of
+// how far gone the car is, and it only widens the flame, never brightens it.
+export function engineFire(pos, back, k = 1) {
+  const n = Math.max(1, Math.round(2 * budget()));
+  for (let i = 0; i < n; i++) {
+    const sp = rand(1.4, 4.2) * (0.7 + k * 0.6);
+    emit(sparks, pos.x + rand(-0.16, 0.16), pos.y, pos.z + rand(-0.2, 0.2),
+      back.x * sp + rand(-1.1, 1.1), rand(2.2, 5.0), back.z * sp + rand(-1.1, 1.1),
+      rand(0.16, 0.34), rand(0.1, 0.17 + k * 0.09),
+      shade(Math.random() < 0.35 ? 0xfff0b0 : Math.random() < 0.6 ? 0xff8c14 : 0xff4a08, rand(0.8, 1.15)),
+      -3, 0.9, { shape: CHUNK, grow: 0.5, spin: rand(-4, 4), peak: rand(0.55, 0.85) });
+  }
+  // The plume off the top of it. Dark, thin, and it wants to be READ as smoke
+  // from a distance rather than fill the frame.
+  if (Math.random() < 0.55 * budget()) {
+    emit(smoke, pos.x + rand(-0.2, 0.2), pos.y + 0.28, pos.z + rand(-0.2, 0.2),
+      back.x * rand(2, 6) + rand(-0.8, 0.8), rand(2.2, 4.6), back.z * rand(2, 6) + rand(-0.8, 0.8),
+      rand(0.8, 1.5), rand(0.22, 0.42), shade(0x33302c, rand(0.7, 1.3)), 1.0, 0.94,
+      { shape: CHUNK, grow: 0.75, spin: rand(-1.6, 1.6), peak: rand(0.22, 0.36) });
+  }
+}
+
+// Black smoke out of the back of a car whose engine is on its way out. Blown
+// backwards along the car's own axis and left hanging, so from behind it is a
+// trail you follow rather than a puff you drive past.
+export function sootPlume(pos, back, k = 1) {
+  const n = Math.max(1, Math.round((1 + k) * budget()));
+  for (let i = 0; i < n; i++) {
+    emit(smoke, pos.x + rand(-0.3, 0.3), pos.y + rand(-0.1, 0.25), pos.z + rand(-0.3, 0.3),
+      back.x * rand(3, 9) + rand(-1.2, 1.2), rand(0.9, 2.6), back.z * rand(3, 9) + rand(-1.2, 1.2),
+      rand(0.7, 1.6), rand(0.2, 0.36 + k * 0.18),
+      shade(0x2a2724, rand(0.65, 1.35)), 0.9, 0.93,
+      { shape: CHUNK, grow: 0.6 + k * 0.5, spin: rand(-1.5, 1.5), peak: rand(0.18, 0.3 + k * 0.12) });
+  }
+}
+
 // Glass does not puff. It bursts into shards that catch the light and wink out.
 export function glassBurst(pos) {
   const n = Math.max(4, Math.round(14 * budget()));

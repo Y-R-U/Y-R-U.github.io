@@ -138,6 +138,11 @@ export const CRASH = {
   railGrindWear: 8,        // per second of leaning on the steel, at full speed
   offTrackWear: 6,         // per second of being off the racing surface
 
+  // Fraction of an overlap that gets pushed out per step. Under half and two
+  // cars leaning on each other stay visibly inside one another for as long as
+  // the lean lasts, which reads as clipping rather than as contact.
+  separate: 0.72,
+
   carPush: 0.95,            // lateral impulse share in a car-to-car shunt
   carDamage: 3.9,           // hp per m/s of closing speed — this is where it hurts
   slamSpeed: 12,            // closing m/s that counts as a deliberate slam
@@ -175,6 +180,14 @@ export const CRASH = {
   // throws sparks too — none of them have a `drag` corner, so before this they
   // threw none at all, and neither did anything on a car that was mid-wreck.
   hingeSparkRate: 7,
+
+  // --- a car that is close to finished --------------------------------------
+  // Fractions of the chassis pool. Under the first one the car is just battered;
+  // past it the engine starts throwing soot out of the back, and past the second
+  // there is a fire under what is left of the bonnet. Both are cosmetic — they
+  // are the tell that says "this one is nearly out" from three cars back.
+  smokeAt: 0.5,
+  fireAt: 0.78,
 
   // --- car-to-car contact ---------------------------------------------------
   // Contact used to have NO visual event at all — the damage model ran, the
@@ -215,9 +228,37 @@ export const CRASH = {
   // one car on its floorpan wants ~45/s, so this only bites on a pile-up.
   // (the field-wide spark ceiling now lives in particles.js:SPARK_BUDGET, so
   // that loose debris can draw on the same bucket without importing car.js)
-  wheelSpeedLoss: 0.05,     // it is a silly game: 5% of everything per wheel
+  // --- losing wheels --------------------------------------------------------
+  // Indexed by how many are already gone. The first one is cheap and funny; by
+  // the third the car is a liability; the fourth is the end of the drive. A
+  // flat 5% a wheel meant a car on four rims did 85% of the speed of a whole
+  // one, and — measured over a race — SOMETHING in the field was down to zero
+  // wheels in 85% of sampled frames, so "all four gone" was the normal state of
+  // a race rather than a disaster anybody ever saw happen.
+  wheelSpeed: [1, 0.9, 0.74, 0.5, 0],
+  // …and how much harder each successive wheel is to knock off. The pool a hit
+  // spends is unchanged — the wheel just soaks a fraction of it — so a car does
+  // not become invincible, it becomes a car whose last wheel is welded on.
+  // Measured over 3-lap races at hometown, as the share of sampled car-frames
+  // running on 0/1/2/3/4 missing wheels:
+  //
+  //   flat 5%, as it was    ~1%  10%   4%   0%  85%   losing the lot was NORMAL
+  //   [1, 2, 3.4, 5.5]      50%  29%  10%  8.3% 3.2%  three cars a race beached
+  //   [1, 2.6, 5.2, 10]     <- here
+  //
+  // The far end of that is the one to be careful with. Every wheel is easier to
+  // knock off than it looks, because the collision hull is now the size of the
+  // car, so the field trades a lot more paint than it used to and the fourth
+  // wheel has to be defended against a much bigger stream of hits than these
+  // numbers were first fitted against.
+  wheelResist: [1, 2.6, 5.2, 10],
+  wheelPickBias: 0.55,      // multiplier on a wheel's odds of being picked, per wheel already lost
   wheelSag: 0.115,          // metres the body drops per missing wheel
   wheelDrag: 0.85,          // extra rolling resistance per missing wheel
+  // With nothing left to roll on the car is a sledge: it scrubs off speed on
+  // its floorpan and, once it is barely moving, the truck comes for it.
+  beachedDrag: 11,          // m/s² of floorpan friction with no wheels at all
+  beachedStop: 4,           // m/s below which a wheelless car gives up
 
   landHard: 15,             // vertical m/s where a landing hurts
   landDamage: 2.2,

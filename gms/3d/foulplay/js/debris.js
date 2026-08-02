@@ -153,8 +153,6 @@ function kill(it) {
 // cooldown, so the common case is one squared-distance test per car.
 function strikeCars(it, list) {
   const p = it.mesh.position;
-  const reach = it.radius + CRASH.carLen * 0.46;
-  const reach2 = reach * reach;
   for (let i = 0; i < list.length; i++) {
     const car = list[i];
     if (!car || car.retired) continue;
@@ -165,9 +163,12 @@ function strikeCars(it, list) {
     const cp = car.worldPos;
     const dy = p.y - cp.y;
     if (dy < -1.5 || dy > 2.4) continue;
+    // Each car knows how big it actually is (carfactory:measureHull); a van is
+    // a metre longer than a buggy and should be a metre easier to hit.
+    const reach = it.radius + (car.halfLen || CRASH.carLen * 0.5) * 0.92;
     const dx = p.x - cp.x, dz = p.z - cp.z;
     const d2 = dx * dx + dz * dz;
-    if (d2 > reach2) continue;
+    if (d2 > reach * reach) continue;
 
     // How fast are the two actually converging? A panel lying still that a car
     // drives over is a clatter; one still travelling is a proper hit.

@@ -28,10 +28,24 @@ const _q1 = new THREE.Quaternion();
 const _e1 = new THREE.Euler();
 const _up = new THREE.Vector3(0, 1, 0);
 
-// How far a wrecked car's origin floats above the surface it has come to rest
-// on. The mesh origin sits AT road level (see `pose`), so this is really "a car
-// lying on its side is about this far off the deck" — not a ride height.
-const WRECK_REST = 0.45;
+// Clearance under a wrecked car's ORIGIN, which sits at road level between the
+// wheels — so this is not a ride height, it is however much of the car is
+// currently below its own origin.
+//
+// It used to be the flat 0.45 below, and that one number is why a crash still
+// ended with the car in the ground after the ground probe was fixed. A wreck
+// tumbles about its origin, and the origin is on the FLOOR of the car: roll the
+// body ninety degrees and half its width is now underneath that point, roll it
+// onto its roof and the whole height is. Holding the origin a fixed 45cm up
+// therefore buried anything that was not sitting flat — measured over a race,
+// every single wreck frame had bodywork under the tarmac, by up to 1.25m, which
+// is a whole car swallowed at the moment the replay camera arrives.
+//
+// So ask the box. `u` is world-up expressed in the car's own space; the lowest
+// corner of the body box along it is exactly what the floor has to clear.
+const WRECK_CLEAR = 0.06;      // a few cm so the shell does not z-fight the road
+const _rest = new THREE.Vector3();
+const _rq = new THREE.Quaternion();
 
 // Impact scuffs — see `addScuff`. Capped because they are permanent: a car that
 // spends a whole race in the pack would otherwise end up as a collage.
@@ -44,6 +58,7 @@ const _fe = new THREE.Euler();
 const _fp = new THREE.Vector3();
 const _fd = new THREE.Vector3();
 const _drag = new THREE.Vector3();     // car-space point that is on the tarmac
+const _pos = new THREE.Vector3();      // world point an effect is thrown from
 const _pose = { ax: 0, ay: 0, az: 0, s: 0, clampGround: true, dragY: 0 };
 
 // Pose a panel that is hanging off its hinge. Rotating a mesh about its own
@@ -210,6 +225,7 @@ export class Car {
     this.trackTime = 0;          // this car's own clock, for wobble phases
     this.flailAt = -99;          // last time trailing wreckage hit somebody
     this.stripped = false;       // no structure left, but still very much racing
+    this.burning = false;        // fire in the engine bay (see updateBurn)
     // Where the wheels USED to be, in car space. Sparks have to come off the
     // corner that is actually grinding, not out of the middle of the car.
     this.stumps = [];
@@ -257,6 +273,12 @@ export class Car {
       partHp: this.stats.partHp,
     });
     this.parts = this.mesh.userData.parts;
+    // The box other cars are allowed to hit, measured off this chassis's own
+    // mesh rather than shared between all five body styles. See measureHull.
+    const hull = this.mesh.userData.hull || {};
+    this.halfLen = hull.halfLen || CRASH.carLen * 0.5;
+    this.halfWide = hull.halfWide || CRASH.carWide * 0.5;
+    this.bodyHigh = hull.high || CRASH.carHigh;
     scene.add(this.mesh);
     addDebrisTarget(this);
 
@@ -334,6 +356,7 @@ export class Car {
     this.updateDanglers(dt);
     this.syncMesh(dt);
     this.updateGrind(dt);
+    this.updateBurn(dt);
   }
 
   // A physics sim that can produce a NaN or an Infinity will eventually produce
@@ -398,13 +421,18 @@ export class Car {
     const onGrid = this.mode === 'grid';
 
     // --- how good is this car right now -----------------------------------
-    // Five per cent a wheel. A car down to one corner still does 85% of the
-    // speed of a whole one, which is the joke: it should be embarrassing to
-    // lose to, not impossible to drive.
-    const wheelPenalty = Math.max(0.5, 1 - this.wheelsLost * CRASH.wheelSpeedLoss);
+    // Wheels, in order of how much each one costs. Losing the first is cheap
+    // and funny; the third makes the car a liability; the fourth ends the
+    // drive, because a car with nothing to roll on is not a slow car, it is a
+    // sledge. See CRASH.wheelSpeed.
+    const wheelPenalty = this.wheelGrade;
+    const beached = wheelPenalty <= 0;
+    // No tyres at all still means friction — a lot of it, and the same in every
+    // direction, because what is on the road is the floorpan.
+    const gripK = beached ? 0.55 : wheelPenalty;
     const offTrack = Math.abs(this.t) > f.width;
-    let gripRate = DRIVE.grip * this.stats.grip * wheelPenalty;
-    let maxLat = MAX_LAT * this.stats.grip * wheelPenalty;
+    let gripRate = DRIVE.grip * this.stats.grip * gripK;
+    let maxLat = MAX_LAT * this.stats.grip * gripK;
     if (c.brake > 0.45) { gripRate = DRIVE.driftGrip * this.stats.grip; maxLat *= 0.72; }
     if (this.oil > 0) { gripRate *= 0.3; maxLat *= 0.34; }
     if (this.shred > 0) { gripRate *= 0.62; maxLat *= 0.7; }
@@ -427,7 +455,7 @@ export class Car {
     // --- longitudinal ------------------------------------------------------
     const topSpeed = (DRIVE.topSpeed + this.stats.top) * (this.boosting ? DRIVE.boostMul : 1) * this.slowMul;
     let accel = 0;
-    if (!onGrid && this.stun <= 0) {
+    if (!onGrid && this.stun <= 0 && !beached) {
       const throttle = c.throttle;
       if (throttle > 0 && vf < topSpeed) {
         const head = clamp01(1 - Math.max(0, vf) / topSpeed);
@@ -445,12 +473,23 @@ export class Car {
     // drag and rolling resistance
     accel -= DRIVE.drag * vf * Math.abs(vf);
     accel -= DRIVE.rollResist * sign(vf);
-    // A corner on its rim drags. Small, so the 5%-a-wheel promise holds.
+    // A corner on its rim drags; a car with no corners left drags a great deal.
     if (this.wheelsLost > 0) accel -= CRASH.wheelDrag * this.wheelsLost * sign(vf);
+    if (beached) accel -= CRASH.beachedDrag * sign(vf);
     if (offTrack) accel -= DRIVE.offTrackDrag * (2 - this.stats.offroad) * sign(vf);
     if (this.h > 0.35) accel *= 0.12;
     vf += accel * dt;
     if (vf < -DRIVE.reverse) vf = -DRIVE.reverse;
+
+    // Out of wheels and out of momentum: the drive is over. Not an elimination
+    // — the truck picks it up and bolts something on, same as any other wreck —
+    // but it is over, and it should end with the car grinding to a halt on its
+    // belly rather than trundling round on four rims at 85% pace.
+    if (beached && this.h <= 0.35 && Math.abs(vf) < CRASH.beachedStop) {
+      this.va = vf * cs; this.vl = vf * sn;
+      this.wreck('nothing left to drive on', null, { gentle: true });
+      return;
+    }
 
     // --- steering ----------------------------------------------------------
     if (!onGrid) {
@@ -563,6 +602,25 @@ export class Car {
     else if (this.s > tr.length - half * 0.5 && this.prevS < half * 0.5) this.onLapLine(-1);
   }
 
+  // How much car is left, as a fraction, given how many wheels are on it.
+  // Zero means it cannot drive at all.
+  get wheelGrade() {
+    const t = CRASH.wheelSpeed;
+    return t[Math.min(this.wheelsLost, t.length - 1)];
+  }
+
+  // How much harder the NEXT wheel is to knock off than the last one. The first
+  // is meant to be easy — it is the funniest thing that can happen to a car —
+  // and the fourth is meant to be something you see once in a season, so the
+  // resistance climbs steeply rather than linearly.
+  get wheelResist() {
+    const t = CRASH.wheelResist;
+    return t[Math.min(this.wheelsLost, t.length - 1)];
+  }
+
+  // The odds of a hit picking a wheel at all, on top of the mass weighting.
+  get wheelOdds() { return Math.pow(CRASH.wheelPickBias, this.wheelsLost); }
+
   // The car pulls toward the missing corner. Worked out from where the wheels
   // actually were rather than from a list of names, so a chassis with six of
   // them — or three — behaves without anyone editing this.
@@ -606,7 +664,7 @@ export class Car {
     // barrier" you can see from the chase camera. The limit is where the car's
     // FLANK meets the rail, so the bodywork stops at the barrier instead of in
     // it, and the contact point below is a real point on the car.
-    const railT = w + RAIL_FACE - CRASH.carWide * 0.5;
+    const railT = w + RAIL_FACE - this.halfWide;
     const over = Math.abs(this.t) - railT;
     if (over <= 0) return;
 
@@ -656,7 +714,7 @@ export class Car {
     // sill height. Throwing the shower from the car's centre put the sparks
     // inside the bodywork, where most of them are never seen.
     _v3.copy(this.worldPos)
-      .addScaledVector(f.right, side * CRASH.carWide * 0.5)
+      .addScaledVector(f.right, side * this.halfWide)
       .addScaledVector(f.up || _up, 0.3);
     if (impact > 2) {
       fx.sparkBurst(_v3, _v1, Math.min(64, 14 + impact * 3.4), 0xffd27a, 10 + impact * 1.9);
@@ -764,8 +822,12 @@ export class Car {
         pool -= 2;
         continue;
       }
-      const share = Math.max(1, Math.min(pool, p.hp));
-      p.hp -= share;
+      // A wheel soaks a fraction of what it is given, and less of it each time
+      // one has already gone. The POOL still drains at full rate, so the hit is
+      // not wasted — it goes into the bodywork around the wheel instead.
+      const resist = p.wheel ? this.wheelResist : 1;
+      const share = Math.max(1, Math.min(pool, p.hp * resist));
+      p.hp -= share / resist;
       pool -= share;
       p.dent = clamp01(1 - p.hp / p.maxHp);
       this.dentPart(obj, p);
@@ -794,17 +856,26 @@ export class Car {
   // fall into the right band on their own.
   pickPanel(cands, sev) {
     const bias = sev * 3 - 1.1;      // -1.1 (favour trim) .. 1.9 (favour panels)
+    // Wheels are the heaviest thing on the car, so a mass-weighted roll picks
+    // them first every time a hit is hard — which is how a field ended up
+    // spending most of a race on its floorpan. Each one already gone makes the
+    // next one less likely to be chosen as well as harder to break.
+    const odds = this.wheelOdds;
+    const weight = (o) => {
+      const p = o.userData.part;
+      return Math.pow(p.mass || 0.5, bias) * (p.wheel ? odds : 1);
+    };
     let total = 0;
     for (let i = 0; i < cands.length; i++) {
       const o = this.parts[cands[i]];
-      if (o) total += Math.pow(o.userData.part.mass || 0.5, bias);
+      if (o) total += weight(o);
     }
     if (!(total > 0)) return randInt(0, cands.length - 1);
     let r = Math.random() * total;
     for (let i = 0; i < cands.length; i++) {
       const o = this.parts[cands[i]];
       if (!o) continue;
-      r -= Math.pow(o.userData.part.mass || 0.5, bias);
+      r -= weight(o);
       if (r <= 0) return i;
     }
     return cands.length - 1;
@@ -821,7 +892,13 @@ export class Car {
     }
     const alive = this.livingParts();
     if (!alive.length) { this.shred = Math.max(this.shred, 2); return; }
-    this.breakPart(alive[randInt(0, alive.length - 1)], {
+    // Rolled the same way an ordinary hit rolls, NOT uniformly. A stripped car
+    // sheds something every time anything touches it, and a flat random pick
+    // over the living parts meant roughly one strip in six took a wheel — which
+    // is how cars kept arriving at zero wheels however hard the damage model
+    // made them to knock off. Every route to losing a wheel has to respect the
+    // ladder or the ladder does nothing.
+    this.breakPart(alive[this.pickPanel(alive, 0.6)], {
       by: opts.by, severity: Math.max(0.55, opts.severity || 0),
     });
   }
@@ -869,8 +946,9 @@ export class Car {
       if (!obj) { cands.splice(idx, 1); continue; }
       const p = obj.userData.part;
       if (p.dangling > 0) { cands.splice(idx, 1); continue; }
-      const share = Math.max(1, Math.min(pool, p.hp));
-      p.hp -= share;
+      const resist = p.wheel ? this.wheelResist : 1;
+      const share = Math.max(1, Math.min(pool, p.hp * resist));
+      p.hp -= share / resist;
       pool -= share;
       p.dent = clamp01(1 - p.hp / p.maxHp);
       this.dentPart(obj, p);
@@ -973,7 +1051,7 @@ export class Car {
     // even when the two cars overlapped by half a metre.
     _v1.copy(worldPoint);
     this.mesh.worldToLocal(_v1);
-    const hw = CRASH.carWide * 0.5, hl = CRASH.carLen * 0.5;
+    const hw = this.halfWide, hl = this.halfLen;
     const side = region === 'left' ? -1 : region === 'right' ? 1 : 0;
     const end = region === 'front' ? -1 : region === 'rear' ? 1 : 0;
     let nx = 0, nz = 0;
@@ -1197,6 +1275,54 @@ export class Car {
   // A panel swinging off the side of a car is a weapon nobody meant to fit.
   hasDangler() { return this.danglers.length > 0; }
 
+  // -------------------------------------------------------------------------
+  // A car that is nearly finished should LOOK nearly finished
+  // -------------------------------------------------------------------------
+  // Panels coming off tell you a car has been in a fight; they do not tell you
+  // how much fight it has left, because a car can lose its whole nose and still
+  // be on full structure. This does: black smoke out of the back once the
+  // chassis is half gone, and a fire under what is left of the bonnet once it
+  // is nearly out. Both are read from `hp`, so they come on for the same reason
+  // the car is about to be written off, and they carry through the wreck.
+  //
+  // Cosmetic on purpose. It is a warning, not a second damage model — a fire
+  // that ate hp would kill cars for reasons the player never saw coming.
+  updateBurn(dt) {
+    const wrecked = this.mode === 'wreck';
+    const hurt = clamp01(1 - this.hp / this.maxHp);
+    if (hurt < CRASH.smokeAt && !wrecked) return;
+
+    // Forward and up in world space. In wreck mode there is no track frame to
+    // read — the car is tumbling — so both come off the car's own orientation.
+    _v1.set(0, 0, -1).applyQuaternion(this.worldQuat);
+    _v2.set(0, 1, 0).applyQuaternion(this.worldQuat);
+    const back = _v3.copy(_v1).multiplyScalar(-1);
+
+    // Soot from the tail. Thicker the worse it is, and a wreck smokes whatever
+    // its hp says, because it has just been dropped on its roof.
+    const soot = wrecked ? 1 : clamp01((hurt - CRASH.smokeAt) / (1 - CRASH.smokeAt));
+    if (soot > 0 && Math.random() < dt * (7 + soot * 16)) {
+      _pos.copy(this.worldPos).addScaledVector(_v1, -this.halfLen * 0.92)
+        .addScaledVector(_v2, 0.34);
+      fx.sootPlume(_pos, back, soot);
+    }
+
+    // Fire in the engine bay. Held to a couple of licks a frame at most — this
+    // has to be able to burn for a lap and a half without owning the screen.
+    const fire = clamp01((hurt - CRASH.fireAt) / (1 - CRASH.fireAt));
+    if (fire <= 0 && !(wrecked && this.stripped)) return;
+    const k = Math.max(fire, wrecked ? 0.5 : 0);
+    if (Math.random() < dt * (18 + k * 22)) {
+      _pos.copy(this.worldPos).addScaledVector(_v1, this.halfLen * 0.55)
+        .addScaledVector(_v2, this.bodyHigh * 0.42);
+      fx.engineFire(_pos, back, k);
+      if (!this.burning) {
+        this.burning = true;
+        emit('car:fire', { car: this });
+      }
+    }
+  }
+
   // Sparks come off the corner that is ACTUALLY on its rim, in world space —
   // one wheel gone is a steady stream from that hub, two is both of them, and
   // three or four is the whole underside on the tarmac.
@@ -1320,7 +1446,7 @@ export class Car {
   // -------------------------------------------------------------------------
   // Wrecks
   // -------------------------------------------------------------------------
-  wreck(reason, extraImpulse) {
+  wreck(reason, extraImpulse, opts = {}) {
     if (this.mode === 'wreck' || this.mode === 'out') return;
     this.mode = 'wreck';
     this.wreckTime = 0;
@@ -1330,12 +1456,27 @@ export class Car {
     this.wreckPos.copy(this.worldPos);
     this.wreckVel.copy(this.worldVel);
     if (extraImpulse) this.wreckVel.add(extraImpulse);
-    this.wreckVel.y = Math.max(this.wreckVel.y, 4) + rand(2, 8);
-    this.wreckSpin.set(rand(-3, 3), rand(-4, 4), rand(-5, 5)).multiplyScalar(CRASH.wreckSpin * 0.4);
-    this.groundY = this.groundLevel();
+    // A crash throws the car; a car that has simply run out of wheels is
+    // already lying on the road and should stay there. Launching it four metres
+    // into the air with a fireball would read as an explosion that never
+    // happened.
+    if (opts.gentle) {
+      this.wreckSpin.set(0, rand(-0.5, 0.5), 0);
+      this.groundY = this.groundLevel();
+      fx.smokePuff(this.worldPos, 5, 0x8f8677, 2.2, 1.4);
+    } else {
+      this.wreckVel.y = Math.max(this.wreckVel.y, 4) + rand(2, 8);
+      this.wreckSpin.set(rand(-3, 3), rand(-4, 4), rand(-5, 5)).multiplyScalar(CRASH.wreckSpin * 0.4);
+      this.groundY = this.groundLevel();
+      fx.explode(this.worldPos, 14, 0xffa040);
+    }
+
+    // The clamp in updateWreck does not run until the next frame, so without
+    // this the very first frame of every wreck is drawn with the shell already
+    // through the road — which is the one frame the replay camera cuts to.
+    this.wreckPos.y = Math.max(this.wreckPos.y, this.groundY + this.wreckRest());
 
     this.startBreakUp(reason);
-    fx.explode(this.worldPos, 14, 0xffa040);
     showBubble(this, this.isPlayer ? 'shock' : 'scared');
     emit('car:wreck', { car: this, reason, by: this.recentContact() });
   }
@@ -1388,8 +1529,12 @@ export class Car {
   }
 
   // Every wreck except a structural write-off happened because the car left the
-  // circuit, and that is the one that is allowed to disintegrate.
-  wreckOffTrack(reason) { return reason !== 'written off'; }
+  // circuit, and that is the one that is allowed to disintegrate. A car that
+  // simply ran out of wheels is still ON the road and gets picked up, so it
+  // sheds a third like a write-off rather than coming apart completely.
+  wreckOffTrack(reason) {
+    return reason !== 'written off' && reason !== 'nothing left to drive on';
+  }
 
   // Let the queued panels go, one moment at a time, for as long as the wreck is
   // still on screen. Each one throws its own shower rather than sharing the
@@ -1437,7 +1582,7 @@ export class Car {
     // meant a car that crashed on a crest and then slid fifty metres down the
     // run-off kept the crest's height and buried itself in the hill.
     this.groundY = this.groundLevel(this.wreckPos);
-    const floor = this.groundY + WRECK_REST;
+    const floor = this.groundY + this.wreckRest();
     if (this.wreckPos.y < floor) {
       this.wreckPos.y = floor;
       const hit = -this.wreckVel.y;
@@ -1467,6 +1612,7 @@ export class Car {
     this.worldVel.copy(this.wreckVel);
 
     this.shedTick(dt);
+    this.updateBurn(dt);
 
     // Do not send the truck while the car is still shedding — the break-up IS
     // the shot, and `wreckMaxTime` is still there as the hard cap.
@@ -1501,6 +1647,7 @@ export class Car {
     this._wheelPull = 0;
     this.grindAcc = 0;
     this.stripped = false;
+    this.burning = false;
     emit('car:rejoin', { car: this });
   }
 
@@ -1508,6 +1655,16 @@ export class Car {
     this.retired = true;
     this.mode = 'out';
     this.mesh.visible = false;
+  }
+
+  // How far the origin has to stay off the deck at the car's CURRENT attitude.
+  // Upright this is ~0 (the origin is already on the road); on its side it is
+  // half the width; on its roof it is the full height.
+  wreckRest() {
+    _rest.set(0, 1, 0).applyQuaternion(_rq.copy(this.worldQuat).invert());
+    const ex = this.halfWide, ey = this.bodyHigh * 0.5, ez = this.halfLen;
+    const support = Math.abs(_rest.x) * ex + Math.abs(_rest.y) * ey + Math.abs(_rest.z) * ez;
+    return Math.max(0, support - _rest.y * ey) + WRECK_CLEAR;
   }
 
   // Where a panel that has just come off should settle. Sampled once, at the
