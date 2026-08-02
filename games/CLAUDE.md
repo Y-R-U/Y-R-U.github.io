@@ -132,6 +132,18 @@ Aaron was explicit about this. Hexpire's `hexpire.resume` is the clearest case.
   heuristically cached `auth.js` and Aaron kept retesting old code after every
   deploy. Both vhosts now send `no-cache` for js/css/html and a week for images.
   Keep it that way.
+- **The `apiKey` in `lib/auth/config.js` is not a secret — don't "fix" it.**
+  GitHub's scanner flags it as a leaked Google API key (it did on 2026-08-02,
+  commit e5c1e261). A Firebase Web API key is a public project identifier that
+  ships to every browser by design; the security boundary is `firestore.rules`
+  (own-`uid`-only, default deny) plus the authorized-domains list. Rotating it
+  breaks every game on the hub and gains nothing — dismiss the alert.
+  Two things that *are* worth checking in the console, neither yet done:
+  the key should carry **API restrictions** in GCP → Credentials (harmless while
+  the project only runs Auth + Firestore, but it becomes a billing hole the day a
+  metered API is enabled), and the Identity Toolkit REST endpoint accepts the key
+  from any origin regardless of authorized domains, so scripted signup abuse is
+  possible — **App Check** is the answer if the user list ever fills with junk.
 - **Screenshots don't prove interactivity.** A `pointer-events: none` bug on the
   br8t.com GAMES link passed every screenshot. Test real clicks.
 
