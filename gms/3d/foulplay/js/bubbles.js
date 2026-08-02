@@ -6,6 +6,8 @@ import { scene, camera } from './render.js';
 import { pick, clamp01 } from './utils.js';
 
 const MAX = 9;
+const HIDE = 7;          // closer than this and it is beside you anyway
+const MAX_SCREEN = 0.13; // fraction of the viewport height a bubble may cover
 const pool = [];
 const texCache = new Map();
 
@@ -178,7 +180,9 @@ function roundRect(g, x, y, w, h, r) {
 export function initBubbles() {
   if (pool.length) return;
   for (let i = 0; i < MAX; i++) {
-    const mat = new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false });
+    // depthTest back on: a bubble for a car behind a barrier was floating in
+    // front of it. depthWrite stays off so bubbles never occlude each other.
+    const mat = new THREE.SpriteMaterial({ transparent: true, depthTest: true, depthWrite: false });
     const sp = new THREE.Sprite(mat);
     sp.visible = false;
     sp.renderOrder = 20;
@@ -226,11 +230,16 @@ export function updateBubbles(dt) {
     // is beside or behind you anyway, so hide it rather than blind the player —
     // but keep the slot alive so it comes back as the car falls away.
     const d = camera.position.distanceTo(p.sp.position);
-    p.sp.visible = d >= 7;
+    p.sp.visible = d >= HIDE;
     if (!p.sp.visible) continue;
-    const s = 3.4 * (0.6 + 0.4 * pop) * Math.min(1, 15 / d);
+    // Cap what it covers on the SCREEN, not what it measures in the world. A
+    // 3.4m sprite is 3.4m whatever the lens is doing, and at 8m through the
+    // portrait camera's wide one that was a third of the phone — with cars in a
+    // pack sitting at exactly that range.
+    const frame = 2 * d * Math.tan(camera.fov * Math.PI / 360);
+    const s = Math.min(3.4 * Math.min(1, 15 / d), frame * MAX_SCREEN) * (0.6 + 0.4 * pop);
     p.sp.scale.set(s * 1.25, s, 1);
-    p.sp.material.opacity = fade * Math.min(1, (d - 7) / 3);
+    p.sp.material.opacity = fade * Math.min(1, (d - HIDE) / 3);
   }
 }
 

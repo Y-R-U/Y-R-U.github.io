@@ -37,7 +37,7 @@ const rig = {
 // ten metres back and shrinking the car to a dot. Smoothing the *offsets* and
 // the *basis* instead gives the same softness with zero distance drift.
 // ---------------------------------------------------------------------------
-const CHASE = {
+const WIDE = {
   // The speed terms are deliberately small. Distance and field of view both
   // shrink the car, and stacking a generous version of each put it back to the
   // dot in the distance at exactly the moment the shot should be at its most
@@ -119,6 +119,47 @@ const CHASE = {
   shakeFreq: 38,
   shakeFov: 3.2,
 };
+
+// ---------------------------------------------------------------------------
+// Portrait is a different shot, and the numbers above are not it. Held upright
+// the frame is a third as wide and nearly twice as tall, so the same 4.2m at
+// bonnet height puts the player's own bodywork across the bottom half of the
+// screen and leaves a corridor of road you could measure in pixels. Back off,
+// climb, and lift the aim point — the last one is what does most of the work,
+// because raising where the lens points drops the car down the frame without
+// shrinking it any further.
+//
+// Only the chase rig reads this. SHOT_MODE, landscape, and the replay, attract
+// and wreck cameras all keep the close one — that is where the beauty shots are.
+// ---------------------------------------------------------------------------
+const TALL = {
+  dist: 7.4,
+  distSpeed: 1.6,
+  distMin: 7.0,
+  clearUp: 2.4,
+  height: 3.0,
+  heightSpeed: 0.5,
+  look: 8.5,
+  lookUp: 3.5,
+  side: 0.85,
+  minGround: 2.1,
+  // render.js already opens the portrait lens 12° and setFov will not go more
+  // than 6° under that, so this mostly buys back the speed and boost terms:
+  // the shot sits at the floor until you are near the top of the gearing.
+  fovTrim: -14,
+  lensLift: 1.0,
+  lensSide: 2.2,
+};
+
+const CHASE = Object.assign({}, WIDE);
+
+function fitChase() {
+  const tall = !SHOT_MODE && window.innerHeight > window.innerWidth;
+  Object.assign(CHASE, WIDE, tall ? TALL : null);
+}
+fitChase();
+window.addEventListener('resize', fitChase, { passive: true });
+window.addEventListener('orientationchange', fitChase, { passive: true });
 
 // The rig's own basis, trailing the road frame. Positioning the camera off
 // THESE rather than off the live frame is what makes corners feel sprung, and

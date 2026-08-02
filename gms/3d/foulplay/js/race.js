@@ -29,6 +29,7 @@ let finishOrder = 0;
 let knockoutTimer = 0;
 let endTimer = 0;
 let started = false;
+let nearMissAt = -9;
 
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
@@ -80,6 +81,7 @@ export function startRace(ev) {
   finishOrder = 0;
   knockoutTimer = RACE.knockoutInterval;
   endTimer = 0;
+  nearMissAt = -9;
   started = false;
   state.phase = 'countdown';
   state.countdown = RACE.countdown;
@@ -300,8 +302,10 @@ export function updateRace(dt) {
   // --- presentation ----------------------------------------------------------
   updateDebris(dt);
   updateParticles(dt);
-  updateBubbles(dt);
+  // Camera first: bubbles size themselves against its distance, and reading a
+  // frame-stale position let them overshoot their cap at speed.
   updateCamera(dt);
+  updateBubbles(dt);
   if (p) trackShadow(p.worldPos);
   if (trackMesh) updateCrowd(trackMesh, state.raceTime, state.hype);
   recordFrame(dt, cars);
@@ -346,6 +350,15 @@ function resolveContacts(dt, cars) {
       if (Math.abs(dtt) < WID + 1.7 && (a.hasDangler() || b.hasDangler())) {
         flailHit(a, b, dtt);
         flailHit(b, a, -dtt);
+      }
+      // A pass that did not touch. Nothing in the game acts on this — it exists
+      // so the crowd can react to the thing they came to see.
+      if ((a.isPlayer || b.isPlayer) && Math.abs(ds) < LEN + 1.4
+          && Math.abs(dtt) > WID && Math.abs(dtt) < WID + 1
+          && Math.abs(a.va - b.va) > 4 && state.raceTime - nearMissAt > 0.9) {
+        nearMissAt = state.raceTime;
+        const p = a.isPlayer ? a : b;
+        emit('race:nearMiss', { car: p, other: p === a ? b : a, gap: Math.abs(dtt) - WID });
       }
       if (Math.abs(ds) > LEN || Math.abs(dtt) > WID) continue;
 

@@ -16,6 +16,7 @@ let mini = null;
 let miniCtx = null;
 let miniPath = null;
 let feedItems = [];
+let feedDown = false;
 let bannerT = 0;
 let toastT = 0;
 let riskT = 0;
@@ -64,7 +65,9 @@ function wireEvents() {
     else toast(`+${Math.round(susp)} SUSPICION`, 'warn');
     feed(`${skill ? skill.icon + ' ' + skill.name : 'FOUL'}`, clean ? 'good' : 'warn');
   });
-  on('steward:investigating', () => banner('STEWARDS ARE REVIEWING', 'bad'));
+  // No banner for `steward:investigating` — the #investigation panel IS the
+  // banner for that event, and it carries the countdown as well. Both fired at
+  // once and said almost the same three words, one printed over the other.
   on('steward:verdict', ({ cleared, fine, text }) => {
     banner(text, cleared ? 'good' : 'bad');
     feed(cleared ? 'NO FURTHER ACTION' : `FINED $${fine.toLocaleString()}`, cleared ? 'good' : 'bad');
@@ -181,10 +184,15 @@ export function updateHud(dt) {
   }
 
   // --- suspicion / hype ----------------------------------------------------
+  // reportFoul clamps at STEWARD.max × 1.4, so the last 40 used to be a number
+  // climbing against a bar that had stopped moving. Past the line the bar goes
+  // hazard-striped and the readout splits into "at the line, and this far past".
+  const over = state.suspicion - STEWARD.max;
   const suspPct = clamp01(state.suspicion / STEWARD.max) * 100;
   if (el.suspFill) el.suspFill.style.width = suspPct.toFixed(1) + '%';
-  setText(el.suspVal, Math.round(state.suspicion));
+  setText(el.suspVal, over > 0.5 ? STEWARD.max + ' +' + Math.round(over) : Math.round(state.suspicion));
   if (el.suspWrap) {
+    el.suspWrap.classList.toggle('over', over > 0.5);
     el.suspWrap.classList.toggle('hot', state.suspicion > 70);
     el.suspWrap.classList.toggle('warn', state.suspicion > 40 && state.suspicion <= 70);
   }
@@ -210,6 +218,17 @@ export function updateHud(dt) {
     if (state.investigating > 0) {
       el.invest.style.setProperty('--k', (1 - state.investigating / STEWARD.investigateHold).toFixed(3));
     }
+  }
+
+  // --- kill feed -----------------------------------------------------------
+  // A wreck is one second of the best-looking thing this game makes, and five
+  // rows of feed sit straight over the debris field. Take it off the screen
+  // entirely while the player is down, and empty it so it comes back clean.
+  const down = p.mode === 'wreck' || p.respawnTimer > 0;
+  if (down !== feedDown) {
+    feedDown = down;
+    if (el.feed) el.feed.classList.toggle('hidden', down);
+    if (down && feedItems.length) { feedItems = []; renderFeed(); }
   }
 
   // --- loop warning --------------------------------------------------------
@@ -396,7 +415,7 @@ export function toast(text, kind = 'plain', time = 1.1) {
 }
 
 export function feed(text, kind = 'plain') {
-  if (!el.feed) return;
+  if (!el.feed || feedDown) return;
   feedItems.unshift({ text, kind, t: 4.2 });
   if (feedItems.length > 5) feedItems.pop();
   renderFeed();
@@ -440,6 +459,7 @@ function pulse(node) {
 export function resetHud() {
   miniPath = null;
   feedItems = [];
+  feedDown = false;
   lastPos = 0;
-  if (el.feed) el.feed.innerHTML = '';
+  if (el.feed) { el.feed.innerHTML = ''; el.feed.classList.remove('hidden'); }
 }
