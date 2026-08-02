@@ -3,7 +3,7 @@
 // lives here; the cars themselves only know about the road.
 
 import * as THREE from 'three';
-import { RACE, CRASH, DRIVE, LIVERY, RIVAL_NAMES, TEAM_NAMES, AUTO_MODE, PRIZE_SHARE } from './config.js';
+import { RACE, CRASH, DRIVE, HYPE, LIVERY, RIVAL_NAMES, TEAM_NAMES, AUTO_MODE, PRIZE_SHARE, PAYOUT } from './config.js';
 import { scene, setEnvironment, trackShadow, disposeGroup } from './render.js';
 import { buildTrack } from './trackgen.js';
 import { buildTrackMesh, setStartLights, setStartLightsGreen, updateCrowd } from './trackmesh.js';
@@ -726,8 +726,9 @@ function collectCrate(car, crate) {
 
   const loot = trackPickup();
   if (loot.kind === 'cash') {
-    state.pickupCash = (state.pickupCash || 0) + loot.amount;
-    emit('pickup:cash', { car, amount: loot.amount });
+    const amount = Math.round(loot.amount * PAYOUT.pickupScale);
+    state.pickupCash = (state.pickupCash || 0) + amount;
+    emit('pickup:cash', { car, amount });
   } else if (loot.kind === 'boost') {
     car.giveBoost(1);
     emit('pickup:boost', { car });
@@ -770,7 +771,7 @@ function updatePositions(dt, cars) {
     c.position = i + 1;
     if (c.isPlayer && was && c.position < was && state.phase === 'racing') {
       state.overtakes++;
-      addHype(6, 'overtake');
+      addHype(HYPE.perOvertake, 'overtake');
       emit('race:overtake', { car: c, position: c.position });
     }
   }
@@ -833,9 +834,18 @@ function buildResults(fines) {
   const purse = (event && event.purse) || 4000;
   const share = PRIZE_SHARE[Math.min(pos - 1, PRIZE_SHARE.length - 1)] || 0.03;
   const prize = Math.round(purse * share);
-  const crowd = Math.max(averageHype(), state.hypePeak * 0.5);
-  const hypeBonus = Math.round(purse * 0.3 * (crowd / 100));
-  const damageBill = Math.round(clamp(1 - p.hp / p.maxHp, 0, 1) * purse * 0.1);
+  // Paid on the loudest the crowd ever got and on what you actually did to earn
+  // it, not on the time-average — which spends most of a race at nothing and so
+  // paid the whole cheating pillar about a tenth of what winning paid.
+  const crowd = clamp01(state.hypePeak / HYPE.max);
+  const spectacle = Math.min(PAYOUT.spectacleCap,
+    state.wrecksCaused * PAYOUT.perWreck
+    + state.partsKnockedOff * PAYOUT.perPart
+    + Math.min(state.bestAir, 14) * PAYOUT.perAir
+    + Math.min(state.driftTime, 24) * PAYOUT.perDrift
+    + state.flips * PAYOUT.perFlip);
+  const hypeBonus = Math.round(purse * (PAYOUT.crowdShare * crowd + spectacle));
+  const damageBill = Math.round(clamp(1 - p.hp / p.maxHp, 0, 1) * purse * PAYOUT.damageShare);
 
   return {
     event,
@@ -854,8 +864,9 @@ function buildResults(fines) {
     prize, hypeBonus, damageBill,
     fines: fines.fines,
     net: prize + hypeBonus - damageBill - fines.fines,
-    hype: crowd,
+    hype: Math.round(state.hypePeak),
     hypePeak: state.hypePeak,
+    hypeAvg: Math.round(averageHype()),
     suspicionPeak: state.suspicionPeak,
     investigations: state.investigations,
     fouls: state.fouls,
@@ -875,22 +886,24 @@ function buildResults(fines) {
 // Scoring hooks. Registered once at module load — every one of them checks the
 // phase, so they are inert outside a live race.
 // ---------------------------------------------------------------------------
+// Every amount below comes out of HYPE. They were hard-coded here and the
+// config keys sat unread, so a balance pass editing them did nothing at all.
 on('car:wreck', ({ car, by }) => {
   if (state.phase !== 'racing') return;
   if (by && by.isPlayer && car !== by) {
     state.wrecksCaused++;
-    addHype(26, 'wreck');
+    addHype(HYPE.perWreck, 'wreck');
     // They will remember this next season, and the season after.
     if (!(state.event && state.event.attract)) addGrudge(car.name, car.team, car.livery);
   }
-  if (car.isPlayer) addHype(8, 'spectacle');
+  if (car.isPlayer) addHype(HYPE.perSpin, 'spectacle');
 });
 
 on('car:partOff', ({ car, by }) => {
   if (state.phase !== 'racing') return;
   if (by && by.isPlayer && car !== by) {
     state.partsKnockedOff++;
-    addHype(4, 'panel');
+    addHype(HYPE.perPartOff, 'panel');
   }
 });
 
@@ -898,21 +911,27 @@ on('car:landed', ({ car, air, peak }) => {
   if (state.phase !== 'racing' || !car.isPlayer) return;
   state.airTime += air;
   state.bestAir = Math.max(state.bestAir, peak);
-  if (peak > 1.2) addHype(peak * 0.9, 'air');
+  if (peak > 1.2) addHype(peak * HYPE.perAir, 'air');
 });
 
 on('car:tumble', ({ car, impact }) => {
   if (state.phase !== 'racing') return;
   if (impact > 7) {
     state.flips++;
-    if (car.isPlayer || (car.recentContact() && car.recentContact().isPlayer)) addHype(9, 'flip');
+    if (car.isPlayer || (car.recentContact() && car.recentContact().isPlayer)) addHype(HYPE.perFlip, 'flip');
   }
 });
 
 on('car:driftEnd', ({ car, time }) => {
   if (state.phase !== 'racing' || !car.isPlayer) return;
   state.driftTime += time;
-  addHype(Math.min(time, 5) * 5.5, 'drift');
+  addHype(Math.min(time, 5) * HYPE.perDrift, 'drift');
+});
+
+// A pass that did not touch. It was already emitted and already nothing.
+on('race:nearMiss', () => {
+  if (state.phase !== 'racing') return;
+  addHype(HYPE.perNearMiss, 'near miss');
 });
 
 on('attack:hit', ({ attacker, target }) => {

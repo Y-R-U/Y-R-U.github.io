@@ -5,7 +5,7 @@
 import { state, resetRaceState } from './state.js';
 import {
   profile, saveProfile, addMoney, applyLadder, grantChest, takeChest, ownPart, ownSkill,
-  checkPrizes, ownsCar, markUp, levelOf, itemById,
+  checkPrizes, ownsCar, markUp, levelOf, itemById, autoFitPart,
 } from './save.js';
 import { startRace, updateRace, teardownRace, forceEnd } from './race.js';
 import { updateHud, showHud, initHud, resetHud, banner } from './hud.js';
@@ -22,11 +22,12 @@ import { team, conditionMet, recordWin, trackUnlocked } from './progress.js';
 import { titleRoundEvent, resolveRound, titleById, roundName } from './titles.js';
 import { TRACK_DEFS } from './trackgen.js';
 import { render, setEnvironment } from './render.js';
-import { updateAudio, playMusic, sfx } from './audio.js';
+import { updateAudio, playMusic } from './audio.js';
 import { clearInput } from './input.js';
 import { emit, on } from './bus.js';
 import { $, clamp, pick } from './utils.js';
-import { START_ARG, TRACK_ARG, LEVEL_ARG, LAPS_ARG, CARS_ARG, MODE_ARG, AUTO_MODE, DEV_MODE, SHOT_MODE } from './config.js';
+import { START_ARG, TRACK_ARG, LEVEL_ARG, LAPS_ARG, CARS_ARG, MODE_ARG, AUTO_MODE, DEV_MODE, SHOT_MODE, STEWARD } from './config.js';
+import { previewAttack } from './attacks.js';
 
 let pendingResults = null;
 let afterRace = null;
@@ -192,6 +193,7 @@ export function goto(screen, arg) {
     showHud(false);
     document.getElementById('btn-pause').classList.remove('show');
   }
+  menus.hideCallout();
   state.screen = screen;
   state.paused = false;
   clearInput();
@@ -240,36 +242,56 @@ export function beginEvent(ev) {
   document.getElementById('btn-pause').classList.add('show');
   playMusic('race');
   banner('GET READY', 'plain', 1.4);
-  // ?auto and ?shot are unattended hooks — nothing may block the race.
-  if (!profile.tutorial.steer && !AUTO_MODE && !SHOT_MODE) showTutorial();
+  // The grid used to stop dead here for a 230-word modal. All it says now is
+  // the one thing needed in the next four seconds, under the thumb that has to
+  // do it; the rest is taught where it happens (teach()) and the long version
+  // waits in SETTINGS ▸ HOW THIS WORKS.
+  const firstRace = !profile.tutorial.steer && !AUTO_MODE && !SHOT_MODE;
+  menus.armSteerHint(firstRace);
+  if (firstRace) { profile.tutorial.steer = true; saveProfile(true); }
+  menus.hideCallout();
+  teachT = 0;
+  teachHold = 5;
 }
 
-// The core rule of this game is not guessable from the buttons, so it gets said
-// out loud exactly once, on the grid, with the race paused behind it.
-function showTutorial() {
-  profile.tutorial.steer = true;
-  saveProfile(true);
-  state.paused = true;
-  menus.popup('HOW THIS WORKS', `
-    <p><b>DRIVE:</b> hold anywhere on the left of the screen and slide to steer.
-    Pull your thumb down to brake and get the back out. The throttle looks after itself,
-    and if you get knocked sideways the car straightens itself back up.</p>
-    <p><b>🔥 BOOST</b> spends one nitro. <b>💥 ATTACK</b> fires whichever dirty trick you have
-    equipped that is loaded and has somebody in range.</p>
-    <p><b>THE RULE:</b> hitting people with your car is completely legal — it is a free-for-all.
-    Using the <i>equipment</i> is not. But a trick used from right alongside somebody looks
-    exactly like a racing incident, and a trick used from the other side of the circuit looks
-    like exactly what it is. The attack button tells you which one it will be before you press it.</p>
-    <p><b>👁 STEWARDS</b> fills up when you are seen. Fill it and they open an investigation.
-    <b>📣 CROWD</b> fills up when you do something worth watching — and a crowd that is enjoying
-    itself will talk the stewards out of the fine.</p>
-    <p>Watch for the red <b>ON AIR</b> light. The cameras do not all point at you all the time.</p>
-  `, [{
-    label: "GO RACING", primary: true, act: () => {
-      menus.closePopup();
-      state.paused = false;
-    },
-  }]);
+// ---------------------------------------------------------------------------
+// Teaching, at the moment the thing being taught starts to matter
+// ---------------------------------------------------------------------------
+// Each of these fires once per career off `profile.tutorial`, as a callout that
+// does not pause anything and goes away on its own.
+let teachT = 0;
+let teachHold = 0;
+
+function teach(dt) {
+  if (AUTO_MODE || SHOT_MODE || state.attract || state.paused) return;
+  if (profile.tutorial.attack && profile.tutorial.steward) return;
+  const p = state.player;
+  if (!p || state.phase !== 'racing') return;
+  // One thing at a time. The first few seconds belong to DRAG TO STEER, and two
+  // callouts on top of each other teach neither.
+  teachHold -= dt;
+  if (teachHold > 0) return;
+
+  if (!profile.tutorial.steward && state.inCameraCone) {
+    profile.tutorial.steward = true;
+    saveProfile();
+    teachHold = 9;
+    menus.callout('🔴 ON AIR',
+      'A broadcast camera is live on this stretch. Anything it films counts double with the stewards — the cameras sweep, so there is always a window.');
+    return;
+  }
+
+  teachT -= dt;
+  if (teachT > 0 || profile.tutorial.attack) return;
+  teachT = 0.25;
+  const pv = previewAttack(p, state.cars);
+  if (!pv || !pv.target || pv.dist > STEWARD.contactRange) return;
+  profile.tutorial.attack = true;
+  saveProfile();
+  teachHold = 9;
+  menus.callout('💥 CLOSE IN, THEN CHEAT',
+    'From this close a dirty trick reads as a racing incident. From across the circuit it reads as exactly what it is — the attack button says which before you press it.');
+  menus.pulseAttackButton();
 }
 
 export function startStoryLevel(level) {
@@ -326,7 +348,10 @@ function onRaceDone(results) {
   profile.stats.partsOff += results.partsKnockedOff;
   profile.stats.bestAir = Math.max(profile.stats.bestAir, results.bestAir || 0);
   profile.stats.driftTime += results.driftTime || 0;
-  profile.fame += Math.round(results.hype);
+  // Deliberately the average, not the peak `results.hype` now carries: a
+  // lifetime total that suddenly banks ~100 a race would not line up with the
+  // number already in anyone's save.
+  profile.fame += Math.round(results.hypeAvg || 0);
 
   // --- ladder ------------------------------------------------------------
   if (ev.mode === 'quick' || ev.mode === 'event') {
@@ -413,6 +438,7 @@ function onRaceDone(results) {
   saveProfile(true);
   state.screen = 'results';
   showHud(false);
+  menus.hideCallout();
 
   // Roll the highlights first, then the results card — and if that was the last
   // race of the season, the closing scene comes before either of them.
@@ -509,7 +535,9 @@ function openInto(haul, tierHint) {
     if (got) {
       // New. Note that `owned` above is a live reference into the profile, so
       // the next pick in this same crate already knows we have it.
-      haul.fresh.push({ kind: item.kind, id: item.id });
+      // A part that beats what is bolted on goes straight on the car — winning
+      // something and driving off without it is the loop stopping one step short.
+      haul.fresh.push({ kind: item.kind, id: item.id, fit: isPart ? autoFitPart(item.id) : null });
       gotSomething = true;
       continue;
     }
@@ -523,6 +551,9 @@ function openInto(haul, tierHint) {
       });
       m.n += n;
       m.to = levelOf(item.id);
+      // Marks move a part up the same ladder a tier does, so a racked part can
+      // overtake the fitted one without ever being new.
+      if (isPart) m.fit = autoFitPart(item.id) || m.fit;
       gotSomething = true;
     } else {
       haul.cash += dupeValue(itemById(item.id));
@@ -537,7 +568,8 @@ function openInto(haul, tierHint) {
 function finishHaul(haul) {
   if (haul.cash) addMoney(haul.cash);
   saveProfile(true);
-  sfx('chest');
+  // The arpeggio belongs on the burst, not on the paint — renderChestResult
+  // owns it now.
   menus.renderChestResult(haul, () => {
     if (profile.chests.length) goto('chests');
     else goto(afterRace === 'story' ? 'story' : afterRace === 'events' ? 'events' : 'garage');
@@ -616,6 +648,7 @@ export function update(dt) {
   if (state.screen === 'race' && !state.paused) {
     updateRace(dt);
     updateHud(dt);
+    teach(dt);
     return;
   }
   // The menu backdrop is the same race loop with nobody at the wheel.

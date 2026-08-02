@@ -7,7 +7,7 @@ import { state } from './state.js';
 import { profile } from './save.js';
 import { STEWARD, HYPE, DRIVE, LOOP } from './config.js';
 import { previewAttack, cooldownFrac, readySkills } from './attacks.js';
-import { estimateRisk, hypeTier } from './stewards.js';
+import { estimateRisk, hypeTier, letOffChance } from './stewards.js';
 import { skillById } from './arsenal.js';
 import { on } from './bus.js';
 
@@ -30,6 +30,8 @@ export function initHud() {
     speed: $('hud-speed'), speedUnit: $('hud-speed-unit'),
     suspFill: $('susp-fill'), suspVal: $('susp-val'), suspWrap: $('susp-wrap'),
     hypeFill: $('hype-fill'), hypeVal: $('hype-val'), hypeWrap: $('hype-wrap'),
+    hypeLabel: $('hype-wrap') && $('hype-wrap').querySelector('.meter-label'),
+    investText: $('investigation') && $('investigation').querySelector('span'),
     camWarn: $('cam-warn'), camDist: $('cam-dist'),
     boostBtn: $('btn-boost'), boostCount: $('boost-count'), boostFill: $('boost-fill'),
     boostLabel: $('boost-label'),
@@ -198,9 +200,25 @@ export function updateHud(dt) {
   }
   const hypePct = clamp01(state.hype / HYPE.max) * 100;
   if (el.hypeFill) el.hypeFill.style.width = hypePct.toFixed(1) + '%';
-  const ht = hypeTier();
-  setText(el.hypeVal, ht.name);
-  if (el.hypeWrap) el.hypeWrap.style.setProperty('--hype', ht.css);
+  // While an investigation is open the crowd meter stops being flavour and
+  // becomes the verdict: it reads out the live odds of no further action, and
+  // a wreck, a drift or an overtake in the window moves it while you watch.
+  const reviewing = state.investigating > 0;
+  if (reviewing) {
+    const odds = letOffChance();
+    setText(el.hypeVal, `${Math.round(odds * 100)}% — THEY'LL LET YOU OFF`);
+    setText(el.hypeLabel, '📣 THE CROWD IS YOUR DEFENCE');
+    if (el.hypeWrap) {
+      el.hypeWrap.style.setProperty('--hype',
+        odds < 0.3 ? '#ff5a4a' : odds < 0.55 ? '#ffb020' : '#4ce07a');
+    }
+  } else {
+    const ht = hypeTier();
+    setText(el.hypeVal, ht.name);
+    setText(el.hypeLabel, '📣 CROWD');
+    if (el.hypeWrap) el.hypeWrap.style.setProperty('--hype', ht.css);
+  }
+  if (el.hypeWrap) el.hypeWrap.classList.toggle('reviewing', reviewing);
 
   // --- camera warning ------------------------------------------------------
   if (el.camWarn) {
@@ -214,9 +232,10 @@ export function updateHud(dt) {
 
   // --- investigation -------------------------------------------------------
   if (el.invest) {
-    el.invest.classList.toggle('hidden', state.investigating <= 0);
-    if (state.investigating > 0) {
+    el.invest.classList.toggle('hidden', !reviewing);
+    if (reviewing) {
       el.invest.style.setProperty('--k', (1 - state.investigating / STEWARD.investigateHold).toFixed(3));
+      setText(el.investText, 'REVIEWING — GIVE THEM A SHOW');
     }
   }
 
@@ -416,14 +435,22 @@ export function toast(text, kind = 'plain', time = 1.1) {
 
 export function feed(text, kind = 'plain') {
   if (!el.feed || feedDown) return;
-  feedItems.unshift({ text, kind, t: 4.2 });
-  if (feedItems.length > 5) feedItems.pop();
+  // Three panels off the same car in three frames is three identical rows.
+  // Collapse a repeat into a count and put its clock back to the top.
+  const top = feedItems[0];
+  if (top && top.text === text) {
+    top.n = (top.n || 1) + 1;
+    top.t = 4.2;
+  } else {
+    feedItems.unshift({ text, kind, t: 4.2, n: 1 });
+    if (feedItems.length > 5) feedItems.pop();
+  }
   renderFeed();
 }
 
 function renderFeed() {
   el.feed.innerHTML = feedItems
-    .map((f) => `<li class="${f.kind}">${esc(f.text)}</li>`).join('');
+    .map((f) => `<li class="${f.kind}">${esc(f.text)}${f.n > 1 ? ' ×' + f.n : ''}</li>`).join('');
 }
 
 function tickBanners(dt) {

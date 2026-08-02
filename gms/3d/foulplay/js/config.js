@@ -390,11 +390,21 @@ export const CHASSIS_HP = 320;
 // ---------------------------------------------------------------------------
 // The steward system — the actual game
 // ---------------------------------------------------------------------------
+// The decay used to run at 2.6-4.2/s against a starting loadout that could
+// generate 2.7/s firing all three tricks flat out, so suspicion mathematically
+// could not reach 100 and the whole system never fired. It is a notebook, not
+// an engine temperature: fouls stay on it and driving clean slowly talks them
+// down. `foulFloor` is the other half — `contactMul` was doing double duty as
+// both "that looked like racing" and "that cost nothing", so every foul now
+// banks a fixed amount the distance never touches. A contact foul is CHEAP,
+// not FREE. And the soft knee stops the far end being a cliff: SCATTER GUN
+// across the circuit used to put 147 on the board in one press, which went from
+// never investigated to instantly investigated the moment you bought one.
 export const STEWARD = {
   max: 100,                 // suspicion at which they open an investigation
-  decay: 2.6,               // suspicion bled per second
-  decayIdle: 4.2,           // faster once you have been clean for a while
-  calmAfter: 3.5,           // seconds clean before the faster decay kicks in
+  decay: 0.8,               // suspicion bled per second
+  decayIdle: 2.1,           // faster once you have been clean for a while
+  calmAfter: 4.5,           // seconds clean before the faster decay kicks in
 
   // Distance bands. Touching paint reads as a racing incident; a hit from
   // across the track reads as exactly what it is.
@@ -402,30 +412,41 @@ export const STEWARD = {
   contactMul: 0.16,
   closeRange: 12,
   farMul: 1.75,             // multiplier at maximum range
+  foulFloor: 5,             // every foul is worth filing, however close you were
+  softKnee: 26,             // past here a foul stops counting for full value
+  softMax: 78,              // and no single press may reach the line from cold
+  cleanBelow: 11,           // under this it reads as a racing incident
 
   camMul: 2.05,             // multiplier while inside a broadcast camera cone
   camWarnDist: 60,          // how far ahead the HUD warns about a camera
 
+  letOffBase: 0.1,          // odds of no further action with a dead crowd
   hypeShield: 0.62,         // fraction of a fine the crowd can wave away at max hype
-  investigateHold: 3.2,     // seconds of "STEWARDS REVIEWING" before the verdict
+  investigateHold: 4.5,     // seconds of "STEWARDS REVIEWING" before the verdict
+  investigateHypeMul: 2,    // crowd earned during the review counts double
   clearedReset: 34,         // suspicion left after being let off
   finedReset: 18,
+  postRaceAt: 0.8,          // fraction of max still showing at the flag that costs you
 
   fineBase: 900,            // $ per investigation, scaled by the level's purse
   fineRamp: 1.35,           // each fine in a race costs more
 };
 
+// The crowd is slow to lose now and slower to win. Losing them was the least
+// fun thing in the game: 3.4/s meant a quiet corner undid a wreck, and the
+// investigation window — the one place the meter decides anything — was a
+// slide rather than a climb. These are the live numbers; race.js reads them.
 export const HYPE = {
   max: 100,
-  decay: 3.4,               // crowds forget fast
-  perWreck: 26,             // you put a rival into the wall
-  perFlip: 14,
-  perAir: 0.9,              // per metre of air time height
-  perDrift: 5.5,            // per second of a long drift
-  perNearMiss: 7,
-  perOvertake: 6,
-  perPartOff: 4,            // per part you knock off someone
-  perSpin: 9,
+  decay: 0.85,              // crowds drift off, they do not walk out
+  perWreck: 16,             // you put a rival into the wall
+  perFlip: 8,               // anybody's car end over end
+  perAir: 0.55,             // per metre of air time height
+  perDrift: 3.2,            // per second of a long drift
+  perNearMiss: 4,
+  perOvertake: 3.5,
+  perPartOff: 2.4,          // per part you knock off someone
+  perSpin: 5,               // your own car coming apart counts too
 };
 
 // ---------------------------------------------------------------------------
@@ -465,6 +486,29 @@ export const RACE = {
 
 // Prize money by finishing position (index 0 = winner), scaled by purse.
 export const PRIZE_SHARE = [1, 0.62, 0.42, 0.3, 0.22, 0.16, 0.11, 0.07, 0.05, 0.04];
+
+// What the crowd is worth, as fractions of the purse. The bonus used to be paid
+// off the time-AVERAGE hype at 0.3 — which lands around 8-30 in practice, so the
+// entire cheat/crowd/steward pillar paid about a tenth of what finishing first
+// did. It pays off the PEAK and off the things you actually did now, so a feral
+// afternoon is worth roughly the gap between a win and a podium. `spectacleCap`
+// stops a demolition derby out-earning the race itself.
+// Most of it hangs off the EVENTS rather than off the meter, because a busy
+// race pins the meter and then the meter stops telling you anything.
+export const PAYOUT = {
+  crowdShare: 0.35,         // a maxed-out crowd, against 1.0 for winning
+  perWreck: 0.07,
+  perPart: 0.008,
+  perAir: 0.005,            // per metre of the biggest jump
+  perDrift: 0.003,          // per second sideways
+  perFlip: 0.015,
+  spectacleCap: 0.45,       // a demolition derby must not out-earn the race
+  damageShare: 0.1,
+  // Roadside crates out-earned prize money 2.5x in a measured result, which
+  // quietly made "hoover up the boxes off the racing line" the best strategy in
+  // a bad race. The roll itself lives in arsenal.js:trackPickup.
+  pickupScale: 0.5,
+};
 
 // ---------------------------------------------------------------------------
 // World ranking — you start as a nobody in a very big series.

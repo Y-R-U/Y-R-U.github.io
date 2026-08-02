@@ -152,6 +152,13 @@ button {
 .meter.hype .bar i { background: linear-gradient(90deg, #35b6ff, #b765f0 50%, #ffb020); width: 0%; }
 .meter.hype b { color: var(--hype, #9fb0c0); }
 .meter.hype.pulse { animation: hypePop 0.4s ease-out; }
+/* While the stewards are reviewing, the crowd meter IS the verdict — it carries
+   the live odds of getting off, so it borrows the suspicion meter's alarm. */
+.meter.hype.reviewing {
+  border-color: rgba(255, 106, 106, 0.75);
+  animation: suspAlarm 0.85s ease-in-out infinite;
+}
+.meter.hype.reviewing b { font-size: clamp(11px, 1.5vmin, 15px); }
 /* Y only: in portrait the meter is already the full width of the phone, so the
    X half of the pop hung 3px off both edges for the length of the animation.
    The brightness makes up for the width that is no longer there. */
@@ -206,6 +213,9 @@ button {
 #order-list li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #order-list li em { font-style: normal; font-family: var(--mono); font-size: 0.85em; color: var(--dim); }
 #order-list li.me { background: rgba(255, 90, 43, 0.28); border-color: rgba(255, 140, 90, 0.6); }
+/* `--dim` against the orange fill left your own position unreadable — the one
+   row on the list you actually look for. */
+#order-list li.me b { color: #fff; }
 #order-list li.out { opacity: 0.4; text-decoration: line-through; }
 
 /* ---- centre banners ---- */
@@ -338,17 +348,75 @@ button {
   display: flex; align-items: flex-end; gap: clamp(6px, 1.3vmin, 14px);
 }
 
+/* Grey on grey over a moving road is not a hint, it is a smudge. It reads now,
+   and on the very first race it is the size of the thing it is asking for —
+   which is the whole tutorial the grid used to stop for. */
+/* Fixed, not absolute: the hint used to be centred on the 52%-wide drag zone
+   and its own pill ran off the left of the phone. It sits over the middle of
+   that zone now and is allowed to wrap rather than overflow. */
 .steer-hint {
-  position: absolute; left: 50%; bottom: 12%;
+  position: fixed; left: 26%; bottom: 15%;
   transform: translateX(-50%);
-  font-size: clamp(9px, 1.2vmin, 12px);
+  max-width: min(46vw, 300px);
+  font-size: clamp(11px, 1.5vmin, 15px);
   letter-spacing: 0.16em;
-  color: rgba(255,255,255,0.42);
-  white-space: nowrap;
+  text-align: center;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 2px 10px #000;
+  background: rgba(6, 9, 14, 0.62);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 20px;
+  padding: 6px 14px;
   animation: hintFade 7s ease-out forwards;
   pointer-events: none;
 }
 @keyframes hintFade { 0%, 55% { opacity: 1; } 100% { opacity: 0; } }
+
+#btn-pad.teach-steer .steer-hint {
+  font-size: clamp(14px, 3.8vmin, 23px);
+  color: #fff;
+  border-color: var(--brand);
+  background: rgba(255, 90, 43, 0.86);
+  animation: hintTeach 9s ease-out forwards;
+}
+@keyframes hintTeach {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.9); }
+  6%, 66% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+
+/* The attack button, pointed at the first time there is somebody to use it on. */
+#btn-pad.teach-atk .pad-btn.atk {
+  animation: teachAtk 0.85s ease-in-out infinite;
+}
+@keyframes teachAtk {
+  50% { transform: scale(1.09); box-shadow: 0 0 0 6px rgba(255, 90, 43, 0.28); }
+}
+
+/* A callout says one thing, over the racing, and takes itself away. It is
+   never in the way of a thumb: nothing here takes a tap. */
+#callout {
+  position: fixed; z-index: 7;
+  left: calc(var(--pad) + env(safe-area-inset-left));
+  bottom: calc(19% + env(safe-area-inset-bottom));
+  max-width: min(44vw, 320px);
+  padding: 9px 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 90, 43, 0.55);
+  border-left-width: 4px;
+  background: rgba(10, 13, 19, 0.9);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.55);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.28s, transform 0.28s;
+}
+#callout.show { opacity: 1; transform: translateY(0); }
+#callout b { display: block; font-size: clamp(12px, 1.8vmin, 17px); letter-spacing: 0.1em; }
+#callout span {
+  display: block; margin-top: 3px; font-weight: 500;
+  font-size: clamp(10px, 1.4vmin, 14px); line-height: 1.32; color: #c3ccd5;
+}
 
 .pad-btn {
   position: relative;
@@ -796,6 +864,13 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
   font-size: clamp(10px, 1.5vmin, 14px); letter-spacing: 0.12em;
 }
 .tab.on { background: var(--ink); color: #0b0e14; border-color: transparent; }
+/* Something you own outranks what is on the car. */
+.tab.nudge { position: relative; border-color: rgba(55,194,106,0.6); }
+.tab.nudge::after {
+  content: ''; position: absolute; top: -3px; right: -3px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--good); box-shadow: 0 0 8px var(--good);
+}
 
 /* track / event cards */
 .pick {
@@ -812,8 +887,20 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
 .pick .pick-name { font-size: clamp(14px, 2.1vmin, 22px); font-weight: 800; }
 .pick .pick-sub { font-size: clamp(9px, 1.25vmin, 12px); color: var(--dim); letter-spacing: 0.1em; margin-top: 1px; }
 .pick .pick-desc { font-size: clamp(10px, 1.4vmin, 14px); color: #b6c0ca; margin-top: 6px; font-weight: 500; line-height: 1.3; }
-.pick .pick-grade { position: absolute; top: 10px; right: 12px; font-size: 11px; letter-spacing: 0.1em; color: var(--warn); }
-.pick.locked { opacity: 0.42; }
+/* Floated, not absolute. Absolute put `PARTS CRATE` straight through the top of
+   `HURRICANE` on a 412px phone; a float makes the name wrap around it instead. */
+.pick .pick-grade {
+  float: right; margin: 0 0 4px 10px;
+  max-width: 46%; text-align: right;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--warn); line-height: 1.2;
+}
+/* A locked card is still a card you have to read. It was transparent enough
+   that the attract race showed through the text, so it dims to its own solid
+   panel rather than to nothing. */
+.pick.locked { opacity: 1; background: rgba(9, 12, 17, 0.86); border-color: rgba(255,255,255,0.1); }
+.pick.locked .pick-name { color: #96a3b0; }
+.pick.locked .pick-grade { color: #6f7b88; }
+.pick.locked .pick-desc { color: #8b95a0; }
 .pick.done { border-color: rgba(55,194,106,0.45); }
 .pick .mini-map { width: 100%; height: 90px; margin-top: 8px; opacity: 0.8; }
 
@@ -827,14 +914,21 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
   font-size: clamp(11px, 1.5vmin, 15px);
 }
 .item .ic { font-size: clamp(16px, 2.6vmin, 26px); }
-.item .nm { flex: 1; }
+/* On a narrow phone the buttons used to squeeze the name down to two words a
+   line. It keeps 42% of the row and the buttons drop underneath instead. */
+.item { flex-wrap: wrap; }
+.item .nm { flex: 1 1 42%; min-width: 42%; }
+.item > .buyrow { justify-content: flex-end; }
 .item .nm small { display: block; color: var(--dim); font-size: clamp(9px, 1.15vmin, 11px); letter-spacing: 0.08em; }
 .item.on { border-color: var(--brand); background: rgba(255, 90, 43, 0.18); }
 .item.rar-common { border-left: 4px solid #9fb0c0; }
 .item.rar-rare { border-left: 4px solid #4aa3ef; }
 .item.rar-epic { border-left: 4px solid #b765f0; }
 .item.rar-legendary { border-left: 4px solid #ffb020; }
-.item.locked { opacity: 0.38; }
+/* Not 0.38: a locked trophy row now carries what it would take to win it, and
+   an unreadable to-do list is not a to-do list. */
+.item.locked { opacity: 0.72; }
+.item .nm small.need { color: var(--warn); letter-spacing: 0.1em; }
 
 .pipbar { display: flex; gap: 2px; }
 .pipbar i { width: 9px; height: 9px; border-radius: 2px; background: rgba(255,255,255,0.16); }
@@ -887,9 +981,86 @@ table.standings .sw { display: inline-block; width: 9px; height: 9px; border-rad
 .chest-stage { text-align: center; padding: 4vh 0; }
 .chest-icon { font-size: clamp(60px, 14vmin, 150px); animation: chestShake 0.6s ease-in-out infinite; }
 @keyframes chestShake { 25% { transform: rotate(-7deg) scale(1.04); } 75% { transform: rotate(7deg) scale(1.04); } }
+/* Sealed: no tier, no colour, no name. Whatever is in it is in it. */
+.chest-icon.sealed {
+  filter: grayscale(1) brightness(0.4) contrast(1.5);
+  animation: chestBreathe 2.6s ease-in-out infinite;
+}
+@keyframes chestBreathe { 50% { transform: scale(1.05); filter: grayscale(1) brightness(0.55) contrast(1.5); } }
+
+/* The reveal. The seams glow the TIER colour as it shakes — that glow IS the
+   escalation, and it is the first time the tier has been said out loud. */
+/* Deep enough that a two-row haul is a composition rather than two rows in the
+   top fifth of the screen over 400px of black. */
+.crate-open {
+  position: relative; text-align: center; padding: 3vh 0 1vh;
+  min-height: 30vh;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.crate-open .crate-box {
+  font-size: clamp(64px, 17vmin, 170px);
+  line-height: 1;
+  filter: grayscale(1) brightness(0.45) contrast(1.5);
+  transition: font-size 0.34s ease, filter 0.34s ease;
+}
+.crate-open.shaking .crate-box {
+  animation: crateRattle 0.16s linear infinite;
+  filter: grayscale(0.2) brightness(1) drop-shadow(0 0 3px var(--tier));
+}
+@keyframes crateRattle {
+  0% { transform: rotate(-3deg) translateX(-2px); }
+  50% { transform: rotate(3deg) translateX(2px) scale(1.03); }
+  100% { transform: rotate(-3deg) translateX(-2px); }
+}
+.crate-open .crate-flash {
+  position: absolute; left: 50%; top: 0; width: 1px; height: 1px;
+  border-radius: 50%; opacity: 0; pointer-events: none;
+}
+.crate-open.open { position: relative; }
+.crate-open.open .crate-box {
+  animation: crateBurst 0.42s cubic-bezier(.2,1.4,.4,1) forwards;
+  filter: none;
+}
+@keyframes crateBurst {
+  0% { transform: scale(1.16); }
+  40% { transform: scale(1.34); }
+  100% { transform: scale(0.62); }
+}
+.crate-open.open .crate-flash {
+  animation: crateFlash 0.5s ease-out forwards;
+  box-shadow: 0 0 60px 30px var(--tier);
+  top: 22%;
+}
+@keyframes crateFlash { 0% { opacity: 0.9; transform: scale(0.2); } 100% { opacity: 0; transform: scale(2.6); } }
+.crate-open .crate-name,
+.crate-open .crate-sub { opacity: 0; }
+.crate-open.open .crate-name {
+  color: var(--tier);
+  animation: crateName 0.4s ease-out 0.16s forwards;
+}
+.crate-open.open .crate-sub {
+  color: var(--dim); letter-spacing: 0.2em; font-size: 12px; margin: 2px 0 0;
+  animation: crateName 0.4s ease-out 0.26s forwards;
+}
+@keyframes crateName { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
 .loot { display: flex; flex-direction: column; gap: 8px; margin-top: var(--pad); }
-.loot .item { animation: lootIn 0.4s cubic-bezier(.2,1.5,.4,1) backwards; }
-@keyframes lootIn { from { opacity: 0; transform: translateY(18px) scale(0.9); } }
+/* Rows are dealt one at a time by the setTimeout ladder in menus.js, worst
+   first — a `.in` class rather than a stack of animation-delays, because a tap
+   has to be able to bring the whole lot in at once. */
+.loot .item { opacity: 0; transform: translateY(18px) scale(0.94); }
+.loot .item.in { animation: lootIn 0.34s cubic-bezier(.2,1.5,.4,1) forwards; }
+@keyframes lootIn { to { opacity: 1; transform: none; } }
+.loot .item .fitline { color: var(--good); letter-spacing: 0.1em; font-weight: 700; }
+/* Rarity behind the row, not just a stripe beside it — a legendary cannot look
+   like a $679 payout with a different left border. */
+.loot .item.rar-rare { background: linear-gradient(100deg, rgba(74,163,239,0.22), rgba(255,255,255,0.045) 62%); }
+.loot .item.rar-epic { background: linear-gradient(100deg, rgba(183,101,240,0.26), rgba(255,255,255,0.045) 62%); }
+.loot .item.rar-legendary {
+  background: linear-gradient(100deg, rgba(255,176,32,0.34), rgba(255,255,255,0.045) 66%);
+  border-color: rgba(255,176,32,0.5);
+  box-shadow: 0 0 22px rgba(255,176,32,0.22);
+}
 
 /* popup */
 .popup {

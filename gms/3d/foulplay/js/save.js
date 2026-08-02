@@ -153,6 +153,44 @@ export function ownPart(id) {
   return false;
 }
 
+// How good a part you own actually is. Tier first, marks worth a third of a
+// tier each — the same ladder `powerRating` climbs, so the auto-fit and the
+// power number in the garage can never disagree about which part is better.
+export function partScore(id) {
+  const p = partById(id);
+  if (!p) return -1;
+  return p.tier + (levelOf(id) - 1) * 0.3;
+}
+
+// The best thing sitting in the rack for a slot that beats what is bolted on.
+// Null when the car is already wearing the best of what you own.
+export function betterInRack(slot) {
+  const fitted = profile.garage.equipped[slot];
+  const beat = partScore(fitted);
+  let best = null;
+  for (const id of profile.garage.parts) {
+    const p = partById(id);
+    if (!p || p.slot !== slot || id === fitted) continue;
+    if (partScore(id) > beat && (!best || partScore(id) > partScore(best))) best = id;
+  }
+  return best;
+}
+
+// Winning a part and not fitting it is the reward loop stopping one step short:
+// the crate says NEW, the car carries on with the tier 1 item. Anything that
+// outranks what is on the car goes straight on, and hands back the before/after
+// so the screen that gave it to you can say what changed.
+export function autoFitPart(id) {
+  const p = partById(id);
+  if (!p || !profile.garage.parts.includes(id)) return null;
+  const from = profile.garage.equipped[p.slot];
+  if (from === id || partScore(id) <= partScore(from)) return null;
+  const before = playerStats();
+  profile.garage.equipped[p.slot] = id;
+  saveProfile();
+  return { slot: p.slot, from, to: id, before, after: playerStats() };
+}
+
 export function ownSkill(id) {
   if (!profile.garage.skills.includes(id)) {
     profile.garage.skills.push(id);
@@ -312,7 +350,7 @@ export function checkPrizes(conditionMet) {
   for (const p of PRIZE_ITEMS) {
     if (owns(p.id) || !conditionMet(p.cond)) continue;
     if (p.kind === 'part') ownPart(p.id); else ownSkill(p.id);
-    won.push({ kind: p.kind, id: p.id, name: p.name });
+    won.push({ kind: p.kind, id: p.id, name: p.name, fit: p.kind === 'part' ? autoFitPart(p.id) : null });
   }
   for (const c of CARS) {
     if (c.src !== 'prize' || ownsCar(c.id) || !c.unlock || !conditionMet(c.unlock)) continue;

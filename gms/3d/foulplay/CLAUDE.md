@@ -19,15 +19,24 @@ distance judgement:
 | across the circuit | exactly what it is | up to ×1.75 |
 | any of the above, on camera | worse | ×2.05 |
 
+`susp = (base × distanceFactor + foulFloor) × camMul × stealth`, then a soft knee
+above `softKnee`. **The floor is what stops contact fouls being free** — the
+multiplier alone was doing double duty as "looks like racing" *and* "costs
+nothing", and the starter loadout could not outrun the decay at all. The knee
+stops a long-range trick going 0 → over 100 in a single press while leaving the
+ordering between tricks intact.
+
 `STEWARD` in `config.js` owns those bands; `stewards.js:distanceFactor()` is the
 curve. The attack button shows the verdict **before you press it**
 (`hud.js:updateAttackButton` → `stewards.estimateRisk`), which is the entire
 tutorial.
 
 The counterweight is the crowd. `HYPE` fills from wrecks, air, flips, drifts and
-overtakes, and at the verdict `resolveInvestigation()` rolls
-`0.1 + hypeShield × crowd` for "no further action". Spectacular driving is not a
-score bonus, it is legal defence.
+overtakes, and at the verdict `resolveInvestigation()` rolls `letOffChance()` for
+"no further action" — **read live off `state.hype` when the timer expires**, so
+the crowd you build during the review decides it. The meter shows that number
+while it runs, and hype does not decay at all inside the window. Spectacular
+driving is not a score bonus, it is legal defence.
 
 ---
 
@@ -198,7 +207,8 @@ almost everything is expensive, which is what makes a race worth running.
 
 | tap | pays | why |
 |---|---|---|
-| prize money | most of it | the reason to finish well |
+| prize money | most of a clean race | the reason to finish well |
+| the crowd | can rival a win, off peak hype + what you actually did | spectacle has to be a living, or the game's title is a lie |
 | crates, by finishing position | 1 / 2 / 3 / 4 | position matters more than volume |
 | roadside crates | cash, nitro, rarely a crate | a racing decision, not a slot machine |
 | the bookmaker | 1.8×–5.5× a stake | somewhere for a big pile to go |
@@ -309,7 +319,7 @@ lights the car with the lights that lit the room.
 ```
 ?dev=1      window.__game = { state, profile, tel } — tel samples speed/position
             /suspicion/hype 4× a second and records wreck reasons by cause
-?auto=1     the AI drives the player car (also suppresses the tutorial popup)
+?auto=1     the AI drives the player car (also suppresses the teaching callouts)
 ?shot=1     races for `?at=` seconds, then drops the UI for a clean thumbnail
 ?lite=1     no shadows, fewer props, lower pixel ratio
 ?speed=N    time scale — soak a 3-lap race in a third of the time
@@ -349,8 +359,10 @@ which produces silent nonsense.
 
 - **A frozen page blocks `Page.navigate` too.** One hang poisons every later
   test on that tab, so restart the browser between runs when debugging.
-- **`?wipe=1` re-arms the first-race tutorial**, which pauses the race. That is
-  why `AUTO_MODE`/`SHOT_MODE` skip it.
+- **`?wipe=1` re-arms the first-race teaching**, which is now three non-blocking
+  callouts rather than the modal that used to pause the grid.
+- **`hud.js:updateHud` rewrites `#btn-attack`'s className every 100ms.** Anything
+  decorating that button has to hang off an ancestor — `#btn-pad` — or be wiped.
 - **Non-finite car state used to hang the tab**, because `loopAhead`/
   `speedLimitAhead` derived loop bounds from speed and `for (k = 0; k < Infinity)`
   never ends. Both clamp now, and `Car.sanity()` catches the state itself.

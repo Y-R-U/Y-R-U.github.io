@@ -101,16 +101,27 @@ export function distanceFactor(dist) {
   return lerp(1, STEWARD.farMul, k);
 }
 
+// One place decides what a press is worth, so the button and the meter cannot
+// disagree. The floor is outside the distance term on purpose: distance decides
+// how much of it they can pin on you, but somebody always files something.
+function suspicionFor(car, base, dist, cover) {
+  const raw = (base * distanceFactor(dist) + STEWARD.foulFloor)
+    * (1 + cover * (STEWARD.camMul - 1)) * (car.stats.stealth || 1);
+  if (raw <= STEWARD.softKnee) return raw;
+  // A knee rather than a clamp: a hard cap made every long-range trick cost the
+  // same, and the order of the tricks is most of what the player is learning.
+  const span = STEWARD.softMax - STEWARD.softKnee;
+  return STEWARD.softKnee + span * (1 - Math.exp(-(raw - STEWARD.softKnee) / span));
+}
+
 // What the HUD shows before you press the button.
 export function estimateRisk(car, skill, dist) {
-  const base = skill ? skill.susp : 30;
   const cover = cameraCoverage(car.s);
-  const mul = distanceFactor(dist == null ? 30 : dist) * (1 + cover * (STEWARD.camMul - 1));
-  const susp = base * mul * (car.stats.stealth || 1);
+  const susp = suspicionFor(car, skill ? skill.susp : 30, dist == null ? 30 : dist, cover);
   return {
     susp,
     cover,
-    tier: susp < 8 ? 'clean' : susp < 22 ? 'low' : susp < 48 ? 'mid' : 'high',
+    tier: susp < STEWARD.cleanBelow ? 'clean' : susp < 26 ? 'low' : susp < 46 ? 'mid' : 'high',
   };
 }
 
@@ -120,13 +131,11 @@ export function reportFoul(car, opts = {}) {
   const base = opts.susp != null ? opts.susp : (skill ? skill.susp : 25);
   const dist = opts.dist == null ? 30 : opts.dist;
   const cover = cameraCoverage(car.s);
-  const dMul = distanceFactor(dist);
-  const camMul = 1 + cover * (STEWARD.camMul - 1);
-  const susp = base * dMul * camMul * (car.stats.stealth || 1);
+  const susp = suspicionFor(car, base, dist, cover);
 
   state.fouls++;
   state.cleanFor = 0;
-  const clean = susp < 6;
+  const clean = susp < STEWARD.cleanBelow;
   if (clean) state.cleanFouls++;
 
   state.suspicion = clamp(state.suspicion + susp, 0, STEWARD.max * 1.4);
@@ -151,7 +160,10 @@ function openInvestigation() {
 // Hype
 // ---------------------------------------------------------------------------
 export function addHype(amount, why) {
-  const mul = state.player ? (state.player.stats.hypeGain || 1) : 1;
+  let mul = state.player ? (state.player.stats.hypeGain || 1) : 1;
+  // The review window is the one moment the crowd decides anything, so what you
+  // do in it has to move the number enough to be worth doing.
+  if (state.investigating > 0) mul *= STEWARD.investigateHypeMul;
   const before = state.hype;
   state.hype = clamp(state.hype + amount * mul, 0, HYPE.max);
   state.hypePeak = Math.max(state.hypePeak || 0, state.hype);
@@ -163,6 +175,14 @@ export function addHype(amount, why) {
 // on whatever is left on the meter when the flag drops.
 export function averageHype() {
   return state.raceTime > 1 ? (state.hypeAccum || 0) / state.raceTime : state.hype;
+}
+
+// The odds the stewards take no further action, live. This is what the crowd
+// meter reads out while an investigation is open — the whole point being that
+// the 4.5 seconds you spend building it is what decides the verdict, and until
+// now nothing on the screen said so.
+export function letOffChance() {
+  return clamp01(STEWARD.letOffBase + STEWARD.hypeShield * clamp01(state.hype / HYPE.max));
 }
 
 export function hypeTier() {
@@ -184,8 +204,8 @@ export function updateStewards(dt, time) {
   const decay = state.cleanFor > STEWARD.calmAfter ? STEWARD.decayIdle : STEWARD.decay;
   if (state.investigating <= 0) {
     state.suspicion = Math.max(0, state.suspicion - decay * dt);
+    state.hype = Math.max(0, state.hype - HYPE.decay * dt);
   }
-  state.hype = Math.max(0, state.hype - HYPE.decay * dt);
 
   if (state.player) {
     const cover = cameraCoverage(state.player.s);
@@ -203,8 +223,7 @@ export function updateStewards(dt, time) {
 
 function resolveInvestigation() {
   const crowd = clamp01(state.hype / HYPE.max);
-  const letOff = 0.1 + STEWARD.hypeShield * crowd;
-  const cleared = Math.random() < letOff;
+  const cleared = Math.random() < letOffChance();
 
   if (cleared) {
     state.suspicion = STEWARD.clearedReset;
@@ -228,7 +247,7 @@ export function settleRace() {
   if (state.investigating > 0) {
     resolveInvestigation();
   }
-  if (state.suspicion > STEWARD.max * 0.7) {
+  if (state.suspicion > STEWARD.max * STEWARD.postRaceAt) {
     const crowd = clamp01(state.hype / HYPE.max);
     extra = Math.round(STEWARD.fineBase * fineScale * 0.5 * (1 - crowd * 0.5));
     state.finesTotal += extra;

@@ -5,12 +5,12 @@
 import { $, esc, fmtMoney, fmtRank, fmtTime, ordinal, clamp, clamp01, pick } from './utils.js';
 import {
   profile, saveProfile, rankTier, equipPart, toggleLoadout, addMoney, playerPower, playerStats,
-  owns, itemById, buyItem, levelOf, nextUpgradeCost, upgradeItem,
+  owns, itemById, buyItem, levelOf, nextUpgradeCost, upgradeItem, betterInRack,
   ownedCars, ownsCar, activeCar, buyCar, selectCar, playerLivery,
 } from './save.js';
 import {
   SLOTS, PARTS, SKILLS, RARITY, SOURCES, partById, skillById, partsForSlot,
-  CHEST_TIERS, statsFor, powerRating, MAX_LEVEL, MARKS,
+  CHEST_TIERS, statsFor, powerRating, MAX_LEVEL, MARKS, levelMul,
 } from './arsenal.js';
 import { CARS, carById } from './cars.js';
 import {
@@ -37,9 +37,30 @@ let currentTab = { garage: 'engine', story: null, quick: 'track', shop: 'engine'
 
 export function showScreen() { menu().classList.add('show'); }
 export function hideScreen() {
+  stopCrateSequence();
   menu().classList.remove('show', 'backdrop');
   menu().innerHTML = '';
   currentKey = '';
+}
+
+// The one number per slot that says what fitting something actually did. Same
+// readings as the garage summary card, so the two can never disagree.
+const SLOT_HEADLINE = {
+  engine:  { name: 'TOP SPEED', read: (s) => Math.round((74 + s.top) * 3.6) + ' KM/H' },
+  tyres:   { name: 'GRIP',      read: (s) => Math.round(s.grip * 100) + '%' },
+  armour:  { name: 'ARMOUR',    read: (s) => Math.round((1 - s.armour) * 100) + '%' },
+  nitro:   { name: 'BOOST',     read: (s) => Math.round((s.boostPow - 1) * 100) + '%' },
+  frame:   { name: 'WEIGHT',    read: (s) => Math.round(s.mass * 100) + '%' },
+  stealth: { name: 'STEALTH',   read: (s) => Math.round((1 - s.stealth) * 100) + '%' },
+};
+
+// "FITTED — STEALTH 0% → 8%". This line is the whole reward loop closing.
+function fitLine(fit) {
+  if (!fit) return '';
+  const h = SLOT_HEADLINE[fit.slot];
+  if (!h) return 'FITTED';
+  const a = h.read(fit.before), b = h.read(fit.after);
+  return a === b ? `FITTED — ${h.name} ${b}` : `FITTED — ${h.name} ${a} → ${b}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -77,6 +98,10 @@ function wire(root) {
 }
 
 function paint(html, acts = {}, opts = {}) {
+  // Any new screen kills a crate reveal still in flight — its timers would be
+  // poking at detached nodes, and its tap-to-skip would eat the first press on
+  // whatever came next.
+  stopCrateSequence();
   const m = menu();
   const key = opts.key || 'screen';
   const oldBody = m.querySelector('.screen-body');
@@ -529,8 +554,12 @@ export function renderGarage(tab) {
   const st = playerStats();
   const car = activeCar();
 
+  // A dot on the tab whenever something you already own outranks what is on the
+  // car. Crates auto-fit, but a shop purchase or an old save can still leave a
+  // better part sitting in the rack.
   const tabs = SLOTS.map((s) => `
-    <button class="tab ${s.id === slotId ? 'on' : ''}" data-act="tab" data-id="${s.id}">${s.icon} ${s.name}</button>`).join('')
+    <button class="tab ${s.id === slotId ? 'on' : ''} ${betterInRack(s.id) ? 'nudge' : ''}"
+            data-act="tab" data-id="${s.id}">${s.icon} ${s.name}</button>`).join('')
     + `<button class="tab ${isTricks ? 'on' : ''}" data-act="tab" data-id="tricks">🔧 TRICKS</button>`;
 
   let body;
@@ -540,7 +569,9 @@ export function renderGarage(tab) {
     const slot = SLOTS.find((s) => s.id === slotId);
     const mine = partsForSlot(slotId).filter((p) => profile.garage.parts.includes(p.id));
     const missing = partsForSlot(slotId).length - mine.length;
+    const better = betterInRack(slotId);
     body = `<h3 style="margin-bottom:6px">${slot.icon} ${slot.name} — ${esc(slot.blurb)}</h3>
+      ${better ? `<p class="lock-note" style="margin:0 0 8px">▲ ${esc(partById(better).name)} is in the rack and beats what is on the car.</p>` : ''}
       ${mine.map((p) => itemRow(p, slot.icon, profile.garage.equipped[slotId] === p.id, 'equip')).join('')}
       ${missing ? `<p style="color:var(--dim);font-size:12px;font-weight:500;margin-top:10px">
         ${missing} more ${slot.name.toLowerCase()} exist. <button class="btn-mini" data-act="shop">GO TO THE SHOP ▸</button></p>` : ''}`;
@@ -611,6 +642,7 @@ function itemRow(item, icon, equipped, act) {
       <span class="ic">${icon}</span>
       <span class="nm">${esc(item.name)}${lvl > 1 ? `<span class="mark">MK ${MARKS[lvl]}</span>` : ''}
         <small>${RARITY[item.rarity].name}${item.tier ? ` · TIER ${item.tier}` : ''} · ${equipped ? 'FITTED' : 'IN THE RACK'}</small>
+        ${item.stats ? `<small style="color:#b6c0ca;letter-spacing:0">${esc(statLine(item, lvl))}</small>` : ''}
       </span>
       ${tierPips}
       <div class="buyrow" style="flex:0 0 auto;margin:0">
@@ -651,15 +683,13 @@ function renderTricks() {
   const mine = SKILLS.filter((s) => profile.garage.skills.includes(s.id));
   const rows = mine.map((s) => {
     const on = lo.includes(s.id);
-    const band = { contact: 'CONTACT', close: 'CLOSE', mid: 'MID-RANGE', long: 'LONG RANGE', drop: 'DROPPED' }[s.band];
-    const heat = s.susp < 30 ? 'LOW HEAT' : s.susp < 60 ? 'HOT' : 'RADIOACTIVE';
     const lvl = levelOf(s.id);
     const cost = nextUpgradeCost(s.id);
     return `
       <div class="item rar-${s.rarity} ${on ? 'on' : ''}">
         <span class="ic">${s.icon}</span>
         <span class="nm">${esc(s.name)}${lvl > 1 ? `<span class="mark">MK ${MARKS[lvl]}</span>` : ''}
-          <small>${band} · ${s.range ? Math.round(s.range) + 'm' : 'BEHIND YOU'} · ${s.cd}s · ${heat}</small>
+          <small>${esc(skillLine(s))}</small>
           <small style="color:#b6c0ca;letter-spacing:0">${esc(s.blurb)}</small>
         </span>
         <div class="buyrow" style="flex:0 0 auto;margin:0">
@@ -746,15 +776,25 @@ export function renderShop(tab) {
   }, { key: 'shop:' + slotId, head: head('PARTS SHOP') });
 }
 
-function statLine(p) {
+// What a part actually does, at the mark it is currently at — the same fold
+// arsenal.js applies, so the line matches what the car will feel.
+function statLine(p, lvl = 1) {
   const bits = [];
+  const mul = levelMul(lvl);
   const nice = { top: 'top speed', accel: 'acceleration', grip: 'grip', armour: 'damage taken', ram: 'damage dealt', mass: 'weight', partHp: 'panel strength', stealth: 'suspicion', boostPow: 'boost', boostTime: 'boost time', boostMax: 'boost capacity', offroad: 'off-road', hypeGain: 'crowd' };
   for (const [k, v] of Object.entries(p.stats || {})) {
-    if (k === 'top') bits.push(`${v >= 0 ? '+' : ''}${Math.round(v * 3.6)} km/h`);
-    else if (k === 'boostMax' || k === 'boostTime') bits.push(`+${v} ${nice[k]}`);
-    else bits.push(`${nice[k] || k} ${v > 1 ? '+' : ''}${Math.round((v - 1) * 100)}%`);
+    if (k === 'top') { if (v) bits.push(`${v >= 0 ? '+' : ''}${Math.round(v * 3.6 * mul)} km/h`); }
+    else if (k === 'boostMax' || k === 'boostTime') { if (v) bits.push(`+${Math.round(v * mul * 10) / 10} ${nice[k]}`); }
+    else bits.push(`${nice[k] || k} ${v > 1 ? '+' : ''}${Math.round((v - 1) * mul * 100)}%`);
   }
-  return bits.join(' · ');
+  return bits.join(' · ') || 'stock';
+}
+
+// The four things that decide whether a trick is worth an attack-button press.
+const BAND_NAME = { contact: 'CONTACT', close: 'CLOSE', mid: 'MID-RANGE', long: 'LONG RANGE', drop: 'DROPPED' };
+function skillLine(s) {
+  const heat = s.susp < 30 ? 'LOW HEAT' : s.susp < 60 ? 'HOT' : 'RADIOACTIVE';
+  return `${BAND_NAME[s.band] || ''} · ${s.range ? Math.round(s.range) + 'm' : 'BEHIND YOU'} · ${s.cd}s · ${heat}`;
 }
 
 // ═══════════════════════════════ SHOWROOM ═══════════════════════════════
@@ -879,12 +919,15 @@ export function renderShowroom() {
 }
 
 // ═══════════════════════════════ CHESTS ═══════════════════════════════
+// The queue screen used to name the tier, colour it in and caption it — so the
+// reveal had already happened before the box was touched. It is a silhouette
+// now. The one thing it still says out loud is what is in the *pile*, and only
+// when there is more than one, because that is the OPEN ALL decision rather
+// than the crate in your hands.
 export function renderChestQueue(queue) {
   const list = queue && queue.length ? queue : profile.chests;
   if (!list.length) { emit('nav', { to: 'garage' }); return; }
-  const tier = CHEST_TIERS[list[0]] || CHEST_TIERS.scrap;
-  // What is actually in the pile, best first, so OPEN ALL is not a leap of
-  // faith — you can see the sponsor vault in there before you tap it.
+  const many = list.length > 1;
   const counts = {};
   for (const t of list) counts[t] = (counts[t] || 0) + 1;
   const stack = Object.keys(CHEST_TIERS).filter((k) => counts[k]).reverse()
@@ -893,13 +936,13 @@ export function renderChestQueue(queue) {
 
   paint(`
     <div class="chest-stage">
-      <div class="chest-icon">📦</div>
-      <h1 style="color:${tier.css};margin-top:10px">${esc(tier.name)}</h1>
-      <p style="color:var(--dim);letter-spacing:.2em;font-size:13px">${list.length} WAITING</p>
-      <p style="font-size:12px;letter-spacing:.06em;margin-top:6px">${stack}</p>
+      <div class="chest-icon sealed">📦</div>
+      <h1 style="margin-top:10px">${list.length} CRATE${many ? 'S' : ''} WAITING</h1>
+      <p style="color:var(--dim);letter-spacing:.2em;font-size:13px">SEALED</p>
+      ${many ? `<p style="font-size:12px;letter-spacing:.06em;margin-top:8px">${stack}</p>` : ''}
     </div>
     <button class="btn primary" data-act="open">CRACK IT OPEN</button>
-    ${list.length > 1 ? `<button class="btn" data-act="all">OPEN ALL ${list.length}</button>` : ''}
+    ${many ? `<button class="btn" data-act="all">OPEN ALL ${list.length}</button>` : ''}
     <button class="btn ghost" data-act="later">LATER</button>
   `, {
     // flow.openChest takes it off the profile queue — do not shift here too.
@@ -921,11 +964,13 @@ export function renderChestResult(haul, onDone) {
   const tier = CHEST_TIERS[haul.best] || CHEST_TIERS.scrap;
   const many = haul.crates > 1;
   const rows = [];
-  let i = 0;
-  const delay = () => `animation-delay:${(i++) * 0.09}s`;
+  const RANK = { common: 1, rare: 2, epic: 3, legendary: 4 };
+  // Rows come out best last, so the sequence escalates instead of leading with
+  // the legendary and finishing on eight hundred quid.
+  const add = (rank, html) => rows.push({ rank, html });
 
   if (haul.cash) {
-    rows.push(`<div class="item rar-common" style="${delay()}">
+    add(0, `<div class="item rar-common">
       <span class="ic">💵</span><span class="nm">${fmtMoney(haul.cash)}
       <small>${many ? `PRIZE MONEY FROM ${haul.crates} CRATES` : 'PRIZE MONEY'}</small></span></div>`);
   }
@@ -946,15 +991,19 @@ export function renderChestResult(haul, onDone) {
     if (it.kind === 'part') {
       const p = partById(it.id);
       const slot = SLOTS.find((s) => s.id === p.slot);
-      rows.push(`<div class="item rar-${p.rarity}" style="${delay()}">
+      const fit = fitLine(it.fit || (haul.marks[it.id] || {}).fit);
+      add(RANK[p.rarity] * 2 + 1, `<div class="item rar-${p.rarity}">
         <span class="ic">${slot.icon}</span>
-        <span class="nm">${esc(p.name)}<small>${RARITY[p.rarity].name} ${slot.name} · TIER ${p.tier}</small></span>
+        <span class="nm">${esc(p.name)}<small>${RARITY[p.rarity].name} ${slot.name} · TIER ${p.tier}</small>
+          <small style="color:#b6c0ca;letter-spacing:0">${esc(statLine(p, levelOf(p.id)))}</small>
+          ${fit ? `<small class="fitline">${esc(fit)}</small>` : ''}</span>
         <span style="color:var(--good);font-weight:700;letter-spacing:.1em">NEW${extra}</span></div>`);
     } else {
       const s = skillById(it.id);
-      rows.push(`<div class="item rar-${s.rarity}" style="${delay()}">
+      add(RANK[s.rarity] * 2 + 1, `<div class="item rar-${s.rarity}">
         <span class="ic">${s.icon}</span>
-        <span class="nm">${esc(s.name)}<small>${RARITY[s.rarity].name} TRICK · ${esc(s.tip)}</small></span>
+        <span class="nm">${esc(s.name)}<small>${RARITY[s.rarity].name} TRICK · ${esc(skillLine(s))}</small>
+          <small style="color:#b6c0ca;letter-spacing:0">${esc(s.tip)}</small></span>
         <span style="color:var(--good);font-weight:700;letter-spacing:.1em">NEW${extra}</span></div>`);
     }
   }
@@ -969,31 +1018,105 @@ export function renderChestResult(haul, onDone) {
     const icon = m.kind === 'part'
       ? (SLOTS.find((s) => s.id === it.slot) || { icon: '🔧' }).icon : it.icon;
     const maxed = m.to >= MAX_LEVEL ? ' · MAXED' : '';
-    rows.push(`<div class="item rar-${it.rarity}" style="${delay()}">
+    const fit = fitLine(m.fit);
+    add(RANK[it.rarity] * 2, `<div class="item rar-${it.rarity}">
       <span class="ic">${icon}</span>
       <span class="nm">${esc(it.name)}
-        <small>DUPLICATE${m.n > 1 ? ` ×${m.n}` : ''} · ${MARKS[m.from] || '—'} → ${MARKS[m.to]}${maxed}</small></span>
+        <small>DUPLICATE${m.n > 1 ? ` ×${m.n}` : ''} · ${MARKS[m.from] || '—'} → ${MARKS[m.to]}${maxed}</small>
+        ${it.stats ? `<small style="color:#b6c0ca;letter-spacing:0">${esc(statLine(it, m.to))}</small>` : ''}
+        ${fit ? `<small class="fitline">${esc(fit)}</small>` : ''}</span>
       <span style="color:var(--brand);font-weight:700;letter-spacing:.1em">+${m.n} MARK${m.n > 1 ? 'S' : ''}</span></div>`);
   }
 
   if (!rows.length) {
-    rows.push(`<div class="item rar-common"><span class="ic">🕸️</span>
+    add(0, `<div class="item rar-common"><span class="ic">🕸️</span>
       <span class="nm">NOTHING IN IT<small>THE NEXT ONE OWES YOU</small></span></div>`);
   }
 
+  rows.sort((a, b) => a.rank - b.rank);
+
   paint(`
-    <div class="chest-stage" style="padding:2vh 0">
-      <h1 style="color:${tier.css}">${esc(tier.name)}</h1>
-      ${many ? `<p style="color:var(--dim);letter-spacing:.2em;font-size:13px">${haul.crates} CRATES OPENED</p>` : ''}
-      ${haul.pity ? '<p style="color:var(--brand);letter-spacing:.1em;font-size:12px">THE HOUSE OWED YOU ONE</p>' : ''}
+    <div class="crate-open" id="crate-open" style="--tier:${tier.css}">
+      <div class="crate-box">📦</div>
+      <div class="crate-flash"></div>
+      <h1 class="crate-name">${esc(tier.name)}</h1>
+      <p class="crate-sub">${many ? `${haul.crates} CRATES OPENED` : 'OPENED'}${
+        haul.pity ? ' · THE HOUSE OWED YOU ONE' : ''}</p>
     </div>
-    <div class="loot">${rows.join('')}</div>
+    <div class="loot">${rows.map((r) => r.html).join('')}</div>
   `, { ok: () => onDone && onDone() }, {
     key: 'chestresult',
     // Twenty crates is a list taller than a phone, and the button that gets you
     // out of it cannot live underneath that. Same lesson as the results screen.
     foot: '<button class="btn primary" data-act="ok">TAKE IT</button>',
   });
+
+  runCrateSequence(rows.length);
+}
+
+// ---------------------------------------------------------------------------
+// The reveal
+// ---------------------------------------------------------------------------
+// A crate with no build-up is a list. This is a shake, a seam glow in the tier
+// colour, a burst and then the rows laddering in worst-first — CSS keyframes
+// and a setTimeout ladder, no new systems.
+//
+// Two rules it must never break: a tap anywhere fast-forwards the whole thing,
+// and twenty crates cannot take twenty times as long as one. Only the row
+// ladder scales with the haul, and it is capped.
+let crateTimers = [];
+let crateSkip = null;
+
+function stopCrateSequence() {
+  for (const t of crateTimers) clearTimeout(t);
+  crateTimers = [];
+  if (crateSkip) {
+    document.removeEventListener('click', crateSkip, true);
+    crateSkip = null;
+  }
+}
+
+function runCrateSequence(rowCount) {
+  stopCrateSequence();
+  const m = menu();
+  const stage = m.querySelector('#crate-open');
+  const items = [...m.querySelectorAll('.loot .item')];
+  if (!stage) return;
+
+  stage.classList.add('shaking');
+  const shake = rowCount > 6 ? 700 : 850;
+  const step = clamp(1100 / Math.max(1, rowCount), 50, 130);
+  const at = (ms, fn) => crateTimers.push(setTimeout(fn, ms));
+
+  const reveal = (n) => {
+    for (let k = 0; k < n && k < items.length; k++) items[k].classList.add('in');
+  };
+  const burst = () => {
+    if (stage.classList.contains('open')) return;
+    stage.classList.remove('shaking');
+    stage.classList.add('open');
+    sfx('chest');
+  };
+
+  for (let k = 1; k <= 3; k++) at(shake * k * 0.26, () => sfx('light'));
+  at(shake, burst);
+  for (let k = 0; k < items.length; k++) {
+    at(shake + 240 + k * step, () => { reveal(k + 1); if (k) sfx('pickup'); });
+  }
+  const total = shake + 240 + items.length * step;
+
+  // Tap anywhere to have all of it now. Capture phase, and it swallows the tap
+  // so the same press cannot also fall through onto TAKE IT.
+  crateSkip = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    stopCrateSequence();
+    burst();
+    stage.classList.add('done');
+    reveal(items.length);
+  };
+  document.addEventListener('click', crateSkip, true);
+  at(total, () => { stage.classList.add('done'); stopCrateSequence(); });
 }
 
 // ═══════════════════════════════ RESULTS ═══════════════════════════════
@@ -1067,13 +1190,14 @@ export function renderResults(r) {
     ${r.prizesWon && r.prizesWon.length ? `
       <div class="card" style="border-color:rgba(55,194,106,.6)">
         <h3 style="color:var(--good)">🏆 EARNED</h3>
-        ${r.prizesWon.map((p) => `<div class="stat"><span>${p.kind === 'car' ? 'NEW CAR' : p.kind === 'skill' ? 'NEW TRICK' : 'NEW PART'}</span><b class="good">${esc(p.name)}</b></div>`).join('')}
+        ${r.prizesWon.map((p) => `<div class="stat"><span>${p.kind === 'car' ? 'NEW CAR' : p.kind === 'skill' ? 'NEW TRICK' : 'NEW PART'}</span><b class="good">${esc(p.name)}</b></div>${
+          p.fit ? `<div class="stat"><span></span><b class="good">${esc(fitLine(p.fit))}</b></div>` : ''}`).join('')}
       </div>` : ''}
 
     <div class="card">
       <div class="money-row plus"><span>PRIZE MONEY</span><b>${fmtMoney(r.prize)}</b></div>
       ${r.teamBonus ? `<div class="money-row plus"><span>${esc(team().name)} SHARE</span><b>${fmtMoney(r.teamBonus)}</b></div>` : ''}
-      <div class="money-row ${r.hypeBonus ? 'plus' : ''}"><span>CROWD BONUS (${Math.round(r.hype)} HYPE)</span><b>${fmtMoney(r.hypeBonus)}</b></div>
+      <div class="money-row ${r.hypeBonus ? 'plus' : ''}"><span>CROWD BONUS (PEAK ${Math.round(r.hype)})</span><b>${fmtMoney(r.hypeBonus)}</b></div>
       ${r.pickupCash ? `<div class="money-row plus"><span>PICKED UP ON TRACK</span><b>${fmtMoney(r.pickupCash)}</b></div>` : ''}
       <div class="money-row ${r.damageBill ? 'minus' : ''}"><span>REPAIRS</span><b>${r.damageBill ? '-' + fmtMoney(r.damageBill) : '$0'}</b></div>
       <div class="money-row ${r.fines ? 'minus' : ''}">
@@ -1295,6 +1419,44 @@ export function renderCareer(tab) {
   }
 }
 
+// Twenty-four named goals is the strongest retention hook the game already
+// owns, and every one of them used to read `NOT YET`. The blurb IS the
+// condition; this only adds the count where there is one to count.
+const TROPHY_COUNT = {
+  'first-win':  () => [profile.stats.wins, 1, 'WINS'],
+  'ten-wins':   () => [profile.stats.wins, 10, 'WINS'],
+  'fifty-wins': () => [profile.stats.wins, 50, 'WINS'],
+  season:       () => [storyCleared(), 100, 'LEVELS CLEARED'],
+  clean:        () => [profile.stats.cleanFouls, 100, 'RACING INCIDENTS'],
+  wrecker:      () => [profile.stats.wrecksCaused, 100, 'RIVALS WRECKED'],
+  airtime:      () => [Math.round(profile.stats.bestAir || 0), 20, 'METRES OF AIR'],
+  collector:    () => [profile.garage.skills.length, 15, 'TRICKS'],
+  factory:      () => [teamLevel(), 5, 'TEAM LEVELS'],
+  topten:       () => [null, null, `BEST RANK SO FAR ${fmtRank(profile.bestRank)}`],
+  champion:     () => [null, null, `BEST RANK SO FAR ${fmtRank(profile.bestRank)}`],
+};
+
+// Everything else is a "win this specific thing", and the key already says
+// which — so no trophy in the cabinet is a bare grey row any more.
+function trophyNeed(tr) {
+  const f = TROPHY_COUNT[tr.id];
+  if (f) {
+    const [have, need, label] = f();
+    return need == null ? label : `${Math.min(have, need)} / ${need} ${label}`;
+  }
+  const k = tr.key || '';
+  if (k.startsWith('ev:')) {
+    const e = SPECIAL_EVENTS.find((x) => x.id === k.slice(3));
+    return `WIN ${e ? e.name : k.slice(3).toUpperCase()}`;
+  }
+  if (k.startsWith('title:')) {
+    const t = TITLES.find((x) => x.id === k.slice(6));
+    return `WIN THE ${t ? t.name : k.slice(6).toUpperCase()}`;
+  }
+  if (k && TRACK_BY_ID[k]) return `WIN A RACE AT ${TRACK_BY_ID[k].name.toUpperCase()}`;
+  return '';
+}
+
 function trophyPanel() {
   const won = earnedTrophies();
   const rows = TROPHIES.map((tr) => {
@@ -1304,7 +1466,8 @@ function trophyPanel() {
       <button class="item ${has ? 'on' : 'locked'}" data-act="trophy" data-id="${tr.id}">
         <span class="ic">${has ? '🏆' : '▫️'}</span>
         <span class="nm">${esc(tr.name)}
-          <small>${has ? esc(tr.blurb) : 'NOT YET'}${times > 1 ? ` · WON ${times}×` : ''}</small></span>
+          <small>${esc(tr.blurb)}${times > 1 ? ` · WON ${times}×` : ''}</small>
+          ${has ? '' : `<small class="need">TO DO — ${esc(trophyNeed(tr) || 'NOT YET')}</small>`}</span>
       </button>`;
   }).join('');
   return `
@@ -1325,7 +1488,8 @@ function showTrophy(id) {
     ${has ? `
       ${times ? `<div class="stat"><span>TIMES WON</span><b class="good">${times}</b></div>` : ''}
       ${first ? `<div class="stat"><span>FIRST WON</span><b>${new Date(first).toLocaleDateString()}</b></div>` : ''}`
-      : '<p style="color:var(--warn)">Still an empty space on the shelf.</p>'}
+      : `<p style="color:var(--warn)">Still an empty space on the shelf.${
+        trophyNeed(tr) ? ` <b>${esc(trophyNeed(tr))}</b>.` : ''}</p>`}
   `, [{ label: 'CLOSE', primary: true, act: () => closePopup() }]);
 }
 
@@ -1468,6 +1632,7 @@ export function renderSettings() {
   const s = profile.settings;
   const seg = (act, val, cur, label) => `<button class="btn-mini ${val === cur ? 'on' : ''}" data-act="${act}" data-v="${val}">${label}</button>`;
   paint(`
+    <button class="btn" data-act="how">📖 HOW THIS WORKS<small>THE RULES, IN FULL — THE STEWARDS, THE CAMERAS AND THE CROWD</small></button>
     <div class="card">
       <h3>STEERING</h3>
       <div class="btn-row" style="margin:8px 0">
@@ -1516,6 +1681,7 @@ export function renderSettings() {
     </div>
   `, {
     back: () => emit('nav', { to: 'title' }),
+    how: () => showHowItWorks(),
     steer: (d) => {
       profile.settings.steer = d.v;
       saveProfile();
@@ -1631,6 +1797,74 @@ export function popup(title, bodyHtml, buttons) {
 }
 
 export function closePopup() { $('popup').classList.add('hidden'); }
+
+// ═══════════════════════════════ CALLOUT ═══════════════════════════════
+// The opposite of a popup: it does not stop the race, it does not want a tap,
+// and it takes itself away. Everything the grid used to explain in five
+// paragraphs is said through one of these, at the moment it starts mattering.
+let calloutEl = null;
+let calloutTimer = 0;
+
+export function callout(title, line, secs = 5) {
+  if (!calloutEl) {
+    calloutEl = document.createElement('div');
+    calloutEl.id = 'callout';
+    document.body.appendChild(calloutEl);
+  }
+  calloutEl.innerHTML = `<b>${esc(title)}</b><span>${esc(line)}</span>`;
+  calloutEl.classList.remove('show');
+  void calloutEl.offsetWidth;              // restart the entry animation
+  calloutEl.classList.add('show');
+  clearTimeout(calloutTimer);
+  calloutTimer = setTimeout(() => calloutEl.classList.remove('show'), secs * 1000);
+}
+
+// The hint lives inside `#btn-pad`, which is only ever display-toggled — so its
+// fade had already run to nothing during the loading screen and every race
+// after the first started with an invisible hint. Restart it by hand.
+export function armSteerHint(first) {
+  const pad = $('btn-pad');
+  const hint = $('steer-hint');
+  if (pad) pad.classList.toggle('teach-steer', !!first);
+  if (!hint) return;
+  hint.style.animation = 'none';
+  void hint.offsetWidth;
+  hint.style.animation = '';
+}
+
+export function hideCallout() {
+  clearTimeout(calloutTimer);
+  if (calloutEl) calloutEl.classList.remove('show');
+}
+
+// hud.js rewrites the attack button's className every tenth of a second, so the
+// pulse hangs off the pad instead of the button.
+export function pulseAttackButton(secs = 5.2) {
+  const pad = $('btn-pad');
+  if (!pad) return;
+  pad.classList.add('teach-atk');
+  setTimeout(() => pad.classList.remove('teach-atk'), secs * 1000);
+}
+
+// The long version of the rules, kept word for word from the grid popup that
+// used to block the first race. Nothing is lost — it just waits to be asked.
+export function showHowItWorks() {
+  popup('HOW THIS WORKS', `
+    <p><b>DRIVE:</b> hold anywhere on the left of the screen and slide to steer.
+    Pull your thumb down to brake and get the back out. The throttle looks after itself,
+    and if you get knocked sideways the car straightens itself back up.</p>
+    <p><b>🔥 BOOST</b> spends one nitro. <b>💥 ATTACK</b> fires whichever dirty trick you have
+    equipped that is loaded and has somebody in range.</p>
+    <p><b>THE RULE:</b> hitting people with your car is completely legal — it is a free-for-all.
+    Using the <i>equipment</i> is not. But a trick used from right alongside somebody looks
+    exactly like a racing incident, and a trick used from the other side of the circuit looks
+    like exactly what it is. The attack button tells you which one it will be before you press it.</p>
+    <p><b>👁 STEWARDS</b> fills up when you are seen. Fill it and they open an investigation.
+    <b>📣 CROWD</b> fills up when you do something worth watching — and a crowd that is enjoying
+    itself will talk the stewards out of the fine.</p>
+    <p>Watch for the red <b>ON AIR</b> light. The cameras do not all point at you all the time.</p>
+  `, [{ label: 'GOT IT', primary: true, act: () => closePopup() }]);
+}
 
 function toast3(msg) {
   popup('NOT SO FAST', `<p>${esc(msg)}</p>`, [{ label: 'OK', primary: true, act: () => closePopup() }]);
