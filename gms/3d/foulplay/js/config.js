@@ -95,6 +95,24 @@ export const DRIVE = {
   offTrackGrip: 0.45,       // grip multiplier off the racing surface
 };
 
+// ---------------------------------------------------------------------------
+// The two auto-fire slots
+// ---------------------------------------------------------------------------
+// What loadout slots 1 and 2 wait for before going off on their own. Every
+// number here is "how close does the shot have to be to be worth taking", as a
+// fraction of the trick's own range — so a trick that gets upgraded keeps its
+// own idea of close. Nothing here suppresses an auto because a camera is live:
+// an auto going off at the worst possible moment is the trouble the game is
+// about, it just has to be visible when it happens.
+export const AUTOFIRE = {
+  dropRange: 26,            // m behind you a rival has to be for a drop to be worth laying
+  lane: 4.2,                // m of lateral offset that still counts as "in your line"
+  lungeRange: 18,           // m ahead worth spending a ram jet on
+  contact: 0.85,            // fraction of range for a contact trick
+  close: 0.8,               // …and for everything else
+  ringClose: 0.6,           // a lone target has to be this close for a radial trick
+};
+
 // Loops. The physics needs no special case — the normal force formula in
 // car.js already produces "too slow and you fall off" — but a real loop needs
 // a suicidal entry speed, so arcade gravity gets turned down inside one and
@@ -313,6 +331,14 @@ export const CRASH = {
   wheelSparkRate: 46,       // spark bursts/sec off a wobbling wheel on the tarmac
   wheelSag: 0.115,          // metres the body drops per missing wheel
   wheelDrag: 0.85,          // extra rolling resistance per missing wheel
+  shredDrag: 1.6,           // …and a tyre shredded by caltrops, which had cost nothing
+  // The one clamp on everything damage costs you in speed (car.js:drive). A
+  // wrecked car is meant to look wrecked and be hard to drive — not to be too
+  // slow to catch anybody with two laps to go. Below this fraction of the clean
+  // top end no damage drag applies at all, which floors a fully broken car at
+  // ~90% of the pace of a whole one and keeps a boost worth spending.
+  damageFloor: 0.8,
+  damageFloorFade: 6,       // m/s over which the damage drag fades back in
   // With nothing left to roll on the car is a sledge: it scrubs off speed on
   // its floorpan and, once it is barely moving, the truck comes for it.
   beachedDrag: 11,          // m/s² of floorpan friction with no wheels at all
@@ -482,6 +508,28 @@ export const RACE = {
   finishHold: 5,
   aiFinishTime: 26,         // seconds after the winner before stragglers are called in
   knockoutInterval: 22,     // seconds between eliminations in knockout events
+
+  // The catch-up handicap (ai.js). It writes `car.rubberMul`, which drive()
+  // reads on its own, so it can no longer stamp on an attack's `slowMul` — it
+  // used to, which is why DRAG ANCHOR was half as strong against an AI car as
+  // against the player. A car `rubberGap` up the road eases off by
+  // `rubberSpan × the event's rubber` of its top end; one that far behind gets
+  // the same back. Fitted over 12 3-lap races at hometown per value — field
+  // spread is the gap from the winner to P6:
+  //
+  //   span   leader runs at   field spread   player's gap to the winner
+  //   0      100%             5.8s           5.8s   (as shipped: it never ran)
+  //   0.22    95%             5.6s           5.9s   real, but inside the noise
+  //   0.45    90%             4.7s           5.8s   <- here
+  //   0.9     80%             4.7s           4.9s   leader visibly held; stop short of this
+  //
+  // 0.45 is where the field closes up without the order changing: the player's
+  // finishing position is distributed exactly as it is with the handicap off,
+  // which is the line between "catchable" and "position stopped meaning
+  // anything". Only top speed is scaled, so it bites on the straights and lets
+  // a corner still be won by the driver.
+  rubberGap: 240,           // metres of gap at which the handicap is at full strength
+  rubberSpan: 0.45,         // top-speed swing at full gap, before the event's `rubber`
 };
 
 // Prize money by finishing position (index 0 = winner), scaled by purse.

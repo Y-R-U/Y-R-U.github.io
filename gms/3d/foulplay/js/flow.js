@@ -285,7 +285,7 @@ function teach(dt) {
   if (teachT > 0 || profile.tutorial.attack) return;
   teachT = 0.25;
   const pv = previewAttack(p, state.cars);
-  if (!pv || !pv.target || pv.dist > STEWARD.contactRange) return;
+  if (!pv || !pv.ready || !pv.target || pv.dist > STEWARD.contactRange) return;
   profile.tutorial.attack = true;
   saveProfile();
   teachHold = 9;

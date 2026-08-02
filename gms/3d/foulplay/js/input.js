@@ -2,7 +2,8 @@
 //   • drag anywhere on the left of the screen  → steer (horizontal)
 //                                              → brake / drift (drag down)
 //   • BOOST button  → spend a stored nitro
-//   • ATTACK button → fire a random ready trick from your loadout
+//   • ATTACK button → fire loadout slot 1, exactly what the button says
+//   • two AUTO buttons above it → slots 2 and 3, which fire themselves
 // Tilt and on-screen arrows are alternatives, chosen in settings. Desktop gets
 // keys for everything.
 
@@ -18,6 +19,7 @@ export const input = {
   drifting: false,
   boostEdge: false,
   attackEdge: false,
+  slotEdge: 0,       // an auto slot tapped to fire early (1 or 2)
   lookBack: false,
   active: false,     // a steering pointer is down
 };
@@ -49,6 +51,10 @@ export function initInput() {
   // yanks the steering.
   bindButton('btn-boost', () => { input.boostEdge = true; emit('input:boost'); });
   bindButton('btn-attack', () => { input.attackEdge = true; emit('input:attack'); });
+  // The auto slots fire themselves, but a tap brings one forward — you can see
+  // the gap opening before the condition does.
+  bindButton('btn-auto-1', () => { input.slotEdge = 1; });
+  bindButton('btn-auto-2', () => { input.slotEdge = 2; });
   bindHold('btn-look', (v) => { input.lookBack = v; });
 
   // On-screen arrows (settings: steer = 'buttons')
@@ -221,11 +227,18 @@ export function consumeAttack() {
   return v;
 }
 
+export function consumeSlot() {
+  const v = input.slotEdge;
+  input.slotEdge = 0;
+  return v;
+}
+
 export function clearInput() {
   keys.clear();
   resetSteer();
   input.steer = 0;
   input.boostEdge = false;
   input.attackEdge = false;
+  input.slotEdge = 0;
   padLeft = padRight = 0;
 }

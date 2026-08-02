@@ -88,11 +88,25 @@
         <span class="pb-count" id="boost-count">1</span>
         <i class="pb-fill" id="boost-fill"></i>
       </button>
-      <button id="btn-attack" class="pad-btn atk">
-        <span id="atk-ring"></span>
-        <span class="pb-label" id="atk-name">SIDE SLAM</span>
-        <span class="pb-risk" id="atk-risk">LOOKS LIKE RACING</span>
-      </button>
+      <!-- Three slots, bottom-up: the loadout's first trick is the one under
+           your thumb, the other two fire themselves. -->
+      <div class="atk-stack">
+        <button id="btn-auto-2" class="pad-btn auto hidden">
+          <span class="auto-ring"></span>
+          <span class="pb-slot">⚙3</span>
+          <span class="pb-label"></span>
+        </button>
+        <button id="btn-auto-1" class="pad-btn auto hidden">
+          <span class="auto-ring"></span>
+          <span class="pb-slot">⚙2</span>
+          <span class="pb-label"></span>
+        </button>
+        <button id="btn-attack" class="pad-btn atk">
+          <span id="atk-ring"></span>
+          <span class="pb-label" id="atk-name">SIDE SLAM</span>
+          <span class="pb-risk" id="atk-risk">LOOKS LIKE RACING</span>
+        </button>
+      </div>
       <button id="btn-look" class="pad-btn look">👁</button>
     </div>
   </div>

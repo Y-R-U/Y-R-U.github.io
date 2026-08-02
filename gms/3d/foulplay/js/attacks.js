@@ -1,6 +1,7 @@
-// The dirty tricks. One button fires whichever equipped skill is off cooldown
-// and has something to hit — the player never picks, they only choose *when*,
-// and when is the entire game.
+// The dirty tricks. The loadout is three slots and the HUD is three buttons:
+// slot 0 sits under your thumb and fires EXACTLY what it previewed, slots 1 and
+// 2 fire themselves the moment their trick has the shot it wants. The player
+// still never picks a target, they only choose when — and when is the game.
 
 import * as THREE from 'three';
 import { scene } from './render.js';
@@ -10,8 +11,8 @@ import { state } from './state.js';
 import { emit } from './bus.js';
 import * as fx from './particles.js';
 import { showBubble } from './bubbles.js';
-import { HYPE } from './config.js';
-import { clamp, clamp01, pick, rand, sign, shuffled } from './utils.js';
+import { HYPE, AUTOFIRE } from './config.js';
+import { clamp01, pick, rand, sign, shuffled } from './utils.js';
 
 let track = null;
 const hazards = [];
@@ -51,19 +52,34 @@ export function findTargets(car, cars, range, opts = {}) {
 const canFire = (car) => car.mode !== 'wreck' && car.mode !== 'out'
   && car.mode !== 'grid' && !(car.respawnTimer > 0);
 
-// Which skill would fire right now, and at whom — the HUD needs this to show
-// the risk before you commit.
-export function previewAttack(car, cars) {
-  if (!canFire(car)) return null;
-  const ready = readySkills(car);
-  if (!ready.length) return null;
-  for (const sk of ready) {
-    if (sk.band === 'drop') return { skill: sk, target: null, dist: 0 };
+// ---------------------------------------------------------------------------
+// Slots. Loadout order IS button order: 0 is the manual button, 1 and 2 auto.
+// ---------------------------------------------------------------------------
+export const slotSkill = (car, i) => skillById((car.skills || [])[i]);
+
+// What slot `i` would do if it went off this instant. The manual button's whole
+// job is that this and `fireSlot` cannot disagree — a random pick behind a fixed
+// preview is what made the risk verdict a coin toss in a pack.
+export function previewSlot(car, cars, i) {
+  const sk = slotSkill(car, i);
+  if (!sk) return null;
+  const cd = car.cooldowns[sk.id] || 0;
+  const full = sk.cd * (car.stats.cd || 1);
+  const out = {
+    skill: sk, slot: i,
+    ready: cd <= 0 && canFire(car),
+    frac: cd > 0 ? clamp01(1 - cd / full) : 1,
+    target: null,
+    dist: sk.band === 'drop' ? 0 : sk.range,
+  };
+  if (sk.band !== 'drop') {
     const ts = findTargets(car, cars, sk.range, { rear: sk.rear, radial: sk.radial });
-    if (ts.length) return { skill: sk, target: ts[0].car, dist: ts[0].dist };
+    if (ts.length) { out.target = ts[0].car; out.dist = ts[0].dist; }
   }
-  return { skill: ready[0], target: null, dist: ready[0].range };
+  return out;
 }
+
+export const previewAttack = (car, cars) => previewSlot(car, cars, 0);
 
 export function readySkills(car) {
   return (car.skills || [])
@@ -71,22 +87,34 @@ export function readySkills(car) {
     .filter((s) => s && (car.cooldowns[s.id] || 0) <= 0);
 }
 
-export function cooldownFrac(car) {
-  const ids = car.skills || [];
-  if (!ids.length) return 1;
-  let best = 1;
-  for (const id of ids) {
-    const sk = skillById(id);
-    if (!sk) continue;
-    const cd = car.cooldowns[id] || 0;
-    best = Math.min(best, cd <= 0 ? 0 : cd / sk.cd);
+// What an auto slot is waiting for, worked out from what the trick actually
+// does rather than from its id: a drop needs somebody close enough behind to
+// drive through it, a ring needs a crowd, a lunge needs somebody square in
+// front, a long shot needs a clear line. Firing on cooldown alone would empty a
+// scatter gun at nobody with a camera live on you, which is a bug, not tension.
+function autoWants(car, cars, sk) {
+  if (sk.band === 'drop') {
+    // Nobody behind means the road eats it. `rear` keeps cars level or behind.
+    const behind = findTargets(car, cars, AUTOFIRE.dropRange, { rear: true });
+    return behind.some((o) => Math.abs(o.dt) < AUTOFIRE.lane);
   }
-  return 1 - best;
+  const ts = findTargets(car, cars, sk.range, { rear: sk.rear, radial: sk.radial });
+  if (!ts.length) return false;
+  const t = ts[0];
+  if (sk.radial) return ts.length >= 2 || t.dist < sk.range * AUTOFIRE.ringClose;
+  if (sk.rear) return t.dist < sk.range * AUTOFIRE.close;      // they are drafting you
+  if (sk.lunge) return t.ds > 1 && t.ds < AUTOFIRE.lungeRange && Math.abs(t.dt) < AUTOFIRE.lane;
+  if (sk.pull || sk.slow) return t.ds > 2;                     // both want the car in front
+  if (sk.band === 'long') return t.ds > 2 && Math.abs(t.dt) < AUTOFIRE.lane;
+  if (sk.band === 'contact') return t.dist < sk.range * AUTOFIRE.contact;
+  return t.dist < sk.range * AUTOFIRE.close;
 }
 
 // ---------------------------------------------------------------------------
 // Firing
 // ---------------------------------------------------------------------------
+// The rivals have no buttons: they still take a random ready trick that has
+// something to hit.
 export function fireAttack(car, cars) {
   if (!canFire(car)) return null;
   const ready = readySkills(car);
@@ -95,14 +123,11 @@ export function fireAttack(car, cars) {
     return null;
   }
 
-  // "It just triggers randomly from your selected skills" — but a skill with
-  // nobody in range would be a wasted press, so anything with a target wins.
   const withTarget = [];
-  const without = [];
   for (const sk of shuffled(ready)) {
     if (sk.band === 'drop') { withTarget.push({ sk, ts: [] }); continue; }
     const ts = findTargets(car, cars, sk.range, { rear: sk.rear, radial: sk.radial });
-    (ts.length ? withTarget : without).push({ sk, ts });
+    if (ts.length) withTarget.push({ sk, ts });
   }
   // Firing at nobody would burn a cooldown and hand the stewards a clip of you
   // brandishing something for no reason. Refuse the press instead.
@@ -111,12 +136,47 @@ export function fireAttack(car, cars) {
     return null;
   }
   const choice = pick(withTarget);
+  return fire(car, choice.sk, choice.ts, {});
+}
 
-  const sk = choice.sk;
+// Fire one slot and only that slot. Same refusals as the old single button —
+// nothing out of a wreck, nothing at nobody — but an auto slot keeps them quiet
+// because it is not answering a press.
+export function fireSlot(car, cars, i, opts = {}) {
+  if (!canFire(car)) return null;
+  const say = car.isPlayer && !opts.auto;
+  const sk = slotSkill(car, i);
+  if (!sk || (car.cooldowns[sk.id] || 0) > 0) {
+    if (say) emit('attack:notReady', { car });
+    return null;
+  }
+  const ts = sk.band === 'drop'
+    ? [] : findTargets(car, cars, sk.range, { rear: sk.rear, radial: sk.radial });
+  if (sk.band !== 'drop' && !ts.length) {
+    if (say) emit('attack:noTarget', { car });
+    return null;
+  }
+  return fire(car, sk, ts, { ...opts, slot: i });
+}
+
+// The two auto slots, once a frame. One at a time: two tricks landing on the
+// same frame reports two fouls the player cannot tell apart.
+export function updateAutoSlots(car, cars) {
+  if (!canFire(car)) return null;
+  const n = (car.skills || []).length;
+  for (let i = 1; i < n; i++) {
+    const sk = slotSkill(car, i);
+    if (!sk || (car.cooldowns[sk.id] || 0) > 0) continue;
+    if (!autoWants(car, cars, sk)) continue;
+    return fireSlot(car, cars, i, { auto: true, slot: i });
+  }
+  return null;
+}
+
+function fire(car, sk, targets, opts) {
   car.cooldowns[sk.id] = sk.cd * (car.stats.cd || 1);
   car.attackCount = (car.attackCount || 0) + 1;
 
-  const targets = choice.ts;
   const primary = targets[0];
   const dist = primary ? primary.dist : (sk.band === 'drop' ? 0 : sk.range);
 
@@ -154,7 +214,12 @@ export function fireAttack(car, cars) {
     }
   }
 
-  emit('attack:fired', { car, skill: sk, target: result.target, dist, hits: result.hits });
+  result.auto = !!opts.auto;
+  result.slot = opts.slot != null ? opts.slot : -1;
+  emit('attack:fired', {
+    car, skill: sk, target: result.target, dist, hits: result.hits,
+    auto: result.auto, slot: result.slot,
+  });
 
   if (car.isPlayer) {
     state.attacksUsed++;

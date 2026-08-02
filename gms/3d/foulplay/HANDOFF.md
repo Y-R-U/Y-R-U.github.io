@@ -1023,3 +1023,143 @@ Measured on a phone-shaped viewport, all still open:
 - Won parts are never fitted (`ownPart` adds an id and stops), the crate reveals
   its tier before the reveal, and the 230-word tutorial modal is the most modal
   thing in the build.
+
+---
+
+# ROUND 10 — the design review, built (2026-08-02/03)
+
+Round 9's review was argued through with the owner and then built in three
+waves, each wave a pair of agents on disjoint file sets. What follows is what
+changed and, more usefully, what the measurements said when they disagreed with
+the plan.
+
+## 1. You can see the road (portrait camera)
+
+`CHASE` split into `WIDE` (unchanged) and a `TALL` override chosen off
+`innerHeight > innerWidth`, rebuilt by `fitChase()` on resize and
+orientationchange. Landscape, `?shot=1` and the replay/attract/wreck rigs are
+untouched.
+
+| portrait 500×860 | before | after |
+|---|---|---|
+| road ahead of the car | 12.8% | **29.2%** |
+| car height on screen | 49.6% | 23.7% |
+| camera → car | 5.61m | 10.14m |
+
+**The lever was `lookUp`, not distance.** Pulling back shrinks the car
+symmetrically and barely moves its top edge — 7.6m bought 36px. Raising the aim
+point pitches the lens up and drops the car down the frame. `fovTrim −14` is
+partly absorbed by `render.js:setFov`'s `base−6` clamp, so it mostly cancels the
+speed widening; do not "fix" that.
+
+## 2. The stewards could not fire, arithmetically
+
+All three starter tricks are contact-band, so `distanceFactor` returned
+`contactMul 0.16` on every use: ~2.7 susp/s against a decay of 2.6–4.2/s. **18
+races across three loadouts produced zero investigations.**
+
+Fixed with a flat `foulFloor` added **outside** the distance term, plus decay
+2.6 → 0.8. The floor is the point: `contactMul` was doing double duty as "looks
+like racing" *and* "costs nothing".
+
+A hard cap on the top end was built, measured and **reverted** — it flattened
+MAG HOOK, DRAG ANCHOR, SCATTER GUN and WRECKING BALL to identical numbers, which
+deletes the thing the player is learning. A soft knee keeps the ordering.
+
+| | peak suspicion | investigations/race |
+|---|---|---|
+| starter, before | 27 | 0.00 |
+| starter, after | 103 | 1.17 |
+| scattergun, before | 24 | 0.00 |
+| scattergun, after | 111 | 1.00 |
+
+SCATTER GUN went 147 per press → 73: still 8× a slam, but never 0 → 100 in one.
+
+## 3. The investigation is playable now
+
+`resolveInvestigation` always read hype at the moment the timer expired, so the
+crowd built during the window genuinely decided the verdict — and nothing said
+so, while decay made doing nothing worse. The crowd meter now carries the live
+`letOffChance()`, hype does not decay inside the window, and crowd earned there
+counts double. Measured through one review: **13% → 65%** as the AI kept hitting
+things. Decay cut globally 3.4 → 0.85 on the owner's direction — hyping the
+crowd is the fun part, losing it is not — with earn cut ~40% to compensate.
+
+## 4. Spectacle pays
+
+Crowd bonus now comes off `hypePeak` **plus events**, not the time-average,
+which was pinned low by definition. A feral last place: 33% → **78%** of a clean
+win. Roadside pickups halved — they were out-earning prize money 2.5×.
+
+Eight `HYPE.*` keys were dead; the amounts were hard-coded in race.js, so a
+balance pass editing them would have done nothing. Wired.
+
+**`results.hype` changed meaning** (average → peak). `profile.fame` deliberately
+banks `hypeAvg` instead, so a number already in someone's save keeps its rate.
+
+## 5. Three buttons, and the button stops lying
+
+`previewAttack` showed the FIRST ready trick; `fireAttack` fired a RANDOM one.
+The pre-press risk verdict — "the entire tutorial" — was a coin toss in a pack.
+Loadout order is now button order, bottom up: slot 0 is the manual button and
+fires exactly what it previewed (**9/9 and 6/6 presses matched**), slots 1 and 2
+fire themselves via `autoWants`, a condition derived from what the trick *does*
+rather than its id. Autos are never suppressed for camera coverage — that is the
+tension — only made legible (`⚙ AUTO ·` on the feed row).
+
+## 6. Rubber band: dead code, and it halved DRAG ANCHOR
+
+`ai.update` wrote `car.slowMul` with `slowT = 0.0001`; `tickEffects` reset it
+the same frame, so `drive()` never saw it. Worse, that write stomped attack
+slows: DRAG ANCHOR on an AI car measured **mean 0.795 instead of 0.55**.
+
+Now `car.rubberMul`, read separately. Tuned by measurement over 12 races per
+value: `rubberSpan 0.45` closes the field ~19% (P1→P6 spread 5.8s → 4.7s)
+**without moving the player's finishing-position distribution at all**. 0.9 was
+tried and rejected — it starts flattening position.
+
+## 7. Damage: one clamp, and a finding that contradicts the brief
+
+Every damage-derived drag now sums into one `dmgDrag` behind one clamp
+(`CRASH.damageFloor 0.8`), so a term added later is capped with the rest. A
+3-wheels-gone car runs at **93% of healthy** (was 84.9%) and boost still roughly
+doubles it.
+
+**But the 25 km/h death spiral was not in the damage terms.** Measured before
+touching anything: a wrecked car ran 84.9% of healthy straight-line speed and
+86.5% of healthy lap pace, even with the AI degraded to skill 0.4. The
+hand-driven collapse was almost certainly wreck downtime plus repeated barrier
+contact. **If it recurs, instrument wreck/respawn frequency, not speed.**
+
+And the real bite is untouched: **`CRASH.wheelSpeed` is a GRIP and steering
+multiplier despite its name**, so three wheels gone halves cornering authority.
+That is what makes a damaged car crash more, which is what ends races. Left
+alone because the owner does not want the destruction toned down — but it is the
+lever if "wrecked ends your race" survives.
+
+## 8. Everything else
+
+Accounts and cloud saves (`js/cloud.js` on the shared br8t layer). Won parts
+auto-fit and say so (`FITTED — STEALTH 0% → 8%`), including when a duplicate
+marks a racked part past the fitted one. Crates get a reveal — tier hidden until
+the box opens, best row last, **1.40s for one crate and 2.09s for twenty**
+because the row stagger is clamped. The 230-word grid modal is gone, replaced by
+callouts fired when the thing happens; the steer hint under it turned out to be
+invisible in **every** race, its fade having run to nothing during the loading
+screen. Crowd audio that reacts, an investigation bed that tracks hype, four
+foul stings, a rim-grinding layer. Trophies read as a to-do list. Bubbles
+clamped by projection to 13% of screen height with depth testing back on.
+
+## Still open
+
+- Shadow map offset from its caster, applied to one vehicle only.
+- Boost pad reads as a sprite on the road rather than in it.
+- Replay ghosts do not show impact scuffs.
+- `frameWreck` has no scenery occlusion: measured, the blocker is the startline
+  gantry (2/99 frames at circus, 8/98 at carverpass), NOT the ground — the lens
+  never went under the tarmac across 42 forced wrecks.
+- Hype saturates: all 18 measured races peaked at 100. The harness is ~2× as
+  busy as a human, so a real race should land nearer 30–50 — unverified.
+- Fines compound within a race (`×1.35`); untested past two investigations.
+- Auto-fit is tier-and-mark only, so `Rally Knobblies` (offroad 1.5) loses its
+  slot to a tier-4 tarmac tyre. Never destructive — the rack keeps everything.

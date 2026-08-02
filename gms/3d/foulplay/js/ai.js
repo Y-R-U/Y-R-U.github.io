@@ -6,6 +6,7 @@
 import { fireAttack, findTargets } from './attacks.js';
 import { state } from './state.js';
 import { emit } from './bus.js';
+import { RACE } from './config.js';
 import { clamp, clamp01, lerp, rand, sign, damp } from './utils.js';
 
 const MAX_LAT = 26;   // matches car.js
@@ -16,6 +17,7 @@ export class AIDriver {
     this.skill = clamp(opts.skill != null ? opts.skill : 0.85, 0.35, 1);
     this.aggression = clamp(opts.aggression != null ? opts.aggression : 0.4, 0, 1);
     this.rubber = opts.rubber != null ? opts.rubber : 0.35;
+    this.attacks = opts.attacks !== false;
     this.lineBias = rand(-0.34, 0.34);
     this.attackCd = rand(3, 9);
     this.noise = 0;
@@ -132,17 +134,24 @@ export class AIDriver {
     car.controls.throttle = brake > 0.35 ? 0 : 1;
 
     // --- rubber band --------------------------------------------------------
+    // Its own multiplier, read separately in drive(). It used to write straight
+    // into `slowMul` with a token `slowT`, which tickEffects zeroed later the
+    // same frame — so it had never once run, AND it overwrote whatever an
+    // attack had put there, quietly halving DRAG ANCHOR against an AI car.
     if (this.rubber > 0 && state.player) {
       const gap = (car.progress - state.player.progress);
-      const k = clamp(gap / 260, -1, 1);
-      car.slowMul = lerp(car.slowMul, 1 - k * this.rubber * 0.13, damp(0.7, dt));
-      if (car.slowT <= 0) car.slowT = 0.0001;   // keep slowMul from being reset
+      const k = clamp(gap / RACE.rubberGap, -1, 1);
+      car.rubberMul = lerp(car.rubberMul, 1 - k * this.rubber * RACE.rubberSpan, damp(0.7, dt));
     }
 
     // --- kit ----------------------------------------------------------------
     if (!inCorner && car.boosts > 0 && !car.boosting && Math.random() < dt * (0.4 + this.skill * 0.5)) {
       car.useBoost();
     }
+
+    // The auto-pilot on the player's own car leaves the kit alone: it goes
+    // through the slot buttons like a thumb does.
+    if (!this.attacks) return;
 
     // A rival about to use something on you winds up for a beat first, and the
     // HUD says so. Losing control to a trick you never saw coming reads as the

@@ -484,6 +484,53 @@ button {
 
 .pad-btn.look { width: clamp(46px, 8vmin, 70px); height: clamp(46px, 8vmin, 70px); font-size: 18px; opacity: 0.6; }
 
+/* The three trick slots. The manual one keeps the round button and the risk
+   verdict; the two autos are flat pills above it, about a third of the height,
+   because everything added down here is road you cannot see. Right-aligned:
+   the pills are wider than the round buttons and grow inward over the verge
+   rather than out past the edge of the phone. */
+.atk-stack {
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: clamp(4px, 0.8vmin, 8px);
+}
+.pad-btn.auto {
+  flex-direction: row; justify-content: flex-start;
+  width: clamp(128px, 26vmin, 210px);
+  height: clamp(26px, 5vmin, 42px);
+  border-radius: 999px;
+  gap: 5px; padding: 0 8px;
+  border-color: rgba(255, 255, 255, 0.24);
+  opacity: 0.74;
+}
+.pad-btn.auto .pb-slot {
+  flex: 0 0 auto;
+  font-size: clamp(8px, 1.1vmin, 12px); letter-spacing: 0.04em; color: var(--dim); line-height: 1;
+}
+.pad-btn.auto .pb-label {
+  font-size: clamp(8px, 1.15vmin, 12px); letter-spacing: 0.05em; line-height: 1.1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Cooldown reads left-to-right on a pill rather than around a ring. */
+.pad-btn.auto .auto-ring {
+  position: absolute; left: 0; bottom: 0; height: 3px;
+  width: calc(var(--cd, 1) * 100%);
+  background: rgba(255, 255, 255, 0.4);
+}
+/* Loaded and hunting for its shot… */
+.pad-btn.auto.armed { opacity: 0.95; border-color: rgba(255, 255, 255, 0.44); }
+/* …or still reloading, which is the only reason it is not going to go off. */
+.pad-btn.auto.cooling { opacity: 0.5; }
+/* …and when it does, it has to be obvious, or the suspicion it just earned you
+   arrives with no cause attached. */
+.pad-btn.auto.fired {
+  opacity: 1; border-color: var(--brand); background: rgba(255, 90, 43, 0.85);
+  animation: autoFired 0.5s ease-out;
+}
+@keyframes autoFired {
+  0% { transform: scale(1.14); box-shadow: 0 0 0 8px rgba(255, 90, 43, 0.34); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 90, 43, 0); }
+}
+
 .arrow {
   position: absolute; bottom: 14%;
   pointer-events: auto;

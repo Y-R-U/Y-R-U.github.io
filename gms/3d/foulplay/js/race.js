@@ -9,8 +9,8 @@ import { buildTrack } from './trackgen.js';
 import { buildTrackMesh, setStartLights, setStartLightsGreen, updateCrowd } from './trackmesh.js';
 import { Car } from './car.js';
 import { AIDriver } from './ai.js';
-import { input, updateInput, consumeBoost, consumeAttack, clearInput } from './input.js';
-import { initAttacks, updateAttacks, fireAttack, tickHazardCooldowns, clearHazards } from './attacks.js';
+import { input, updateInput, consumeBoost, consumeAttack, consumeSlot, clearInput } from './input.js';
+import { initAttacks, updateAttacks, fireSlot, updateAutoSlots, tickHazardCooldowns, clearHazards } from './attacks.js';
 import { initStewards, updateStewards, addHype, settleRace, averageHype } from './stewards.js';
 import { initParticles, updateParticles, clearParticles, explode, ring, smokePuff, sparkBurst } from './particles.js';
 import { initBubbles, updateBubbles, clearBubbles, showBubble } from './bubbles.js';
@@ -263,20 +263,28 @@ export function updateRace(dt) {
   const p = state.player;
   if (p && p.alive) {
     if (AUTO_MODE || p.autoDrive) {
-      if (!p.ai) p.ai = new AIDriver(p, { skill: 0.92, aggression: 0.55, rubber: 0 });
+      // `attacks: false` — the player car's kit goes through the same slot path
+      // a thumb uses, so a soak run exercises what a player actually fires.
+      if (!p.ai) p.ai = new AIDriver(p, { skill: 0.92, aggression: 0.55, rubber: 0, attacks: false });
       p.ai.update(dt, cars);
     } else if (state.phase === 'racing' || state.phase === 'finished') {
       p.controls.steer = input.steer;
       p.controls.brake = input.brake;
       p.controls.throttle = input.throttle;
       if (consumeBoost() && p.useBoost()) state.boostsUsed++;
-      if (consumeAttack()) fireAttack(p, cars);
+      if (consumeAttack()) fireSlot(p, cars, 0);
+      const slot = consumeSlot();
+      if (slot > 0) fireSlot(p, cars, slot);
     } else {
       p.controls.steer = 0; p.controls.brake = 0; p.controls.throttle = 0;
-      consumeBoost(); consumeAttack();
+      consumeBoost(); consumeAttack(); consumeSlot();
     }
+    // The auto slots run whoever is holding the phone, and they keep running
+    // through `finished` for the same reason the manual button does: the seconds
+    // after the flag are still the circuit, with the rest of the field on it.
+    if (state.phase === 'racing' || state.phase === 'finished') updateAutoSlots(p, cars);
     if (AUTO_MODE && state.phase === 'racing') {
-      if (Math.random() < dt * 0.6) fireAttack(p, cars);
+      if (Math.random() < dt * 0.6) fireSlot(p, cars, 0);
       if (p.boosts > 0 && Math.random() < dt * 0.5) p.useBoost();
     }
   }

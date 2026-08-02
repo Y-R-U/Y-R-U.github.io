@@ -682,18 +682,20 @@ function renderTricks() {
   const lo = profile.garage.loadout;
   const mine = SKILLS.filter((s) => profile.garage.skills.includes(s.id));
   const rows = mine.map((s) => {
-    const on = lo.includes(s.id);
+    const slot = lo.indexOf(s.id);
+    const on = slot >= 0;
     const lvl = levelOf(s.id);
     const cost = nextUpgradeCost(s.id);
     return `
       <div class="item rar-${s.rarity} ${on ? 'on' : ''}">
         <span class="ic">${s.icon}</span>
         <span class="nm">${esc(s.name)}${lvl > 1 ? `<span class="mark">MK ${MARKS[lvl]}</span>` : ''}
+          ${on ? `<span class="mark">${slot === 0 ? 'SLOT 1 · YOUR BUTTON' : `SLOT ${slot + 1} · AUTO`}</span>` : ''}
           <small>${esc(skillLine(s))}</small>
           <small style="color:#b6c0ca;letter-spacing:0">${esc(s.blurb)}</small>
         </span>
         <div class="buyrow" style="flex:0 0 auto;margin:0">
-          <button class="btn-mini ${on ? 'on' : ''}" data-act="trick" data-id="${s.id}">${on ? 'EQUIPPED' : 'EQUIP'}</button>
+          <button class="btn-mini ${on ? 'on' : ''}" data-act="trick" data-id="${s.id}">${on ? `SLOT ${slot + 1}` : 'EQUIP'}</button>
           ${lvl >= MAX_LEVEL
             ? '<span class="tagline-src" style="color:var(--good)">MK V</span>'
             : `<button class="btn-mini" data-act="up" data-id="${s.id}">MK ${MARKS[lvl + 1]} · ${fmtMoney(cost)}</button>`}
@@ -704,8 +706,15 @@ function renderTricks() {
   return `
     <h3 style="margin-bottom:4px">EQUIPPED ${lo.length}/3</h3>
     <p style="color:var(--dim);font-size:12px;font-weight:500;margin:0 0 10px">
-      One button fires whichever equipped trick is ready and has a target. Close range reads as a racing
-      incident; long range reads as exactly what it is.</p>
+      Three slots, three buttons, in this order. <b style="color:#e7edf3">SLOT 1</b> is the big button under your
+      thumb and fires exactly what it says it will. <b style="color:#e7edf3">SLOTS 2 and 3</b> sit above it and
+      fire themselves the moment their trick has the shot it wants — including with a camera on you.
+      Equipping again re-orders them: unequip a trick to move it down the stack.</p>
+    ${lo.length ? `<p style="color:var(--dim);font-size:12px;font-weight:600;margin:0 0 10px;letter-spacing:0.08em">
+      ${lo.map((id, i) => {
+        const s = SKILLS.find((x) => x.id === id);
+        return `${i === 0 ? '👆' : '⚙'} ${i + 1} ${s ? s.icon + ' ' + esc(s.name) : '—'}`;
+      }).join(' &nbsp;·&nbsp; ')}</p>` : ''}
     ${rows}
     ${missing ? `<p style="color:var(--dim);font-size:12px;font-weight:500;margin-top:10px">
       ${missing} more tricks exist. <button class="btn-mini" data-act="shop">GO TO THE SHOP ▸</button></p>` : ''}`;

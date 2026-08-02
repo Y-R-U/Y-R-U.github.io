@@ -6,7 +6,7 @@ import { $, clamp, clamp01, lerp, fmtTime, fmtGap, esc, ordinal } from './utils.
 import { state } from './state.js';
 import { profile } from './save.js';
 import { STEWARD, HYPE, DRIVE, LOOP } from './config.js';
-import { previewAttack, cooldownFrac, readySkills } from './attacks.js';
+import { previewSlot } from './attacks.js';
 import { estimateRisk, hypeTier, letOffChance } from './stewards.js';
 import { skillById } from './arsenal.js';
 import { on } from './bus.js';
@@ -21,6 +21,8 @@ let bannerT = 0;
 let toastT = 0;
 let riskT = 0;
 let lastPos = 0;
+let firedT = [0, 0, 0];
+let lastWasAuto = false;
 
 export function initHud() {
   el = {
@@ -36,6 +38,7 @@ export function initHud() {
     boostBtn: $('btn-boost'), boostCount: $('boost-count'), boostFill: $('boost-fill'),
     boostLabel: $('boost-label'),
     atkBtn: $('btn-attack'), atkRing: $('atk-ring'), atkName: $('atk-name'), atkRisk: $('atk-risk'),
+    auto: [null, autoEls('btn-auto-1'), autoEls('btn-auto-2')],
     banner: $('banner'), bannerText: $('banner-text'),
     toast: $('toast'),
     feed: $('feed'),
@@ -52,7 +55,14 @@ export function initHud() {
   miniCtx = mini ? mini.getContext('2d') : null;
   miniPath = null;
   feedItems = [];
+  firedT = [0, 0, 0];
   wireEvents();
+}
+
+function autoEls(id) {
+  const b = $(id);
+  if (!b) return null;
+  return { btn: b, ring: b.querySelector('.auto-ring'), name: b.querySelector('.pb-label') };
 }
 
 function wireEvents() {
@@ -65,7 +75,10 @@ function wireEvents() {
     if (clean) toast('RACING INCIDENT', 'good');
     else if (cover > 0.3) toast(`SEEN — +${Math.round(susp)} SUSPICION`, 'bad');
     else toast(`+${Math.round(susp)} SUSPICION`, 'warn');
-    feed(`${skill ? skill.icon + ' ' + skill.name : 'FOUL'}`, clean ? 'good' : 'warn');
+    // `attack:fired` lands just before this one, so the row can say whether the
+    // suspicion you are looking at was your thumb or one of the auto slots.
+    feed(`${lastWasAuto ? '⚙ AUTO · ' : ''}${skill ? skill.icon + ' ' + skill.name : 'FOUL'}`,
+      clean ? 'good' : 'warn');
   });
   // No banner for `steward:investigating` — the #investigation panel IS the
   // banner for that event, and it carries the countdown as well. Both fired at
@@ -146,6 +159,14 @@ function wireEvents() {
     toast(`${car.name} USED ${skill.name}`, 'bad', 1.4);
   });
   on('hype:gain', ({ why }) => { if (why) pulse(el.hypeWrap); });
+  // An auto going off while a camera is live is the trouble this game is about,
+  // so it is never suppressed — but the player has to be able to join the
+  // suspicion to its cause, which is what the flash and the feed prefix do.
+  on('attack:fired', ({ car, auto, slot }) => {
+    if (!car.isPlayer) return;
+    lastWasAuto = !!auto;
+    if (auto && slot >= 1 && slot <= 2) firedT[slot] = 0.5;
+  });
   on('attack:notReady', () => toast('NOTHING READY', 'dim'));
   on('attack:noTarget', () => toast('NOBODY IN RANGE', 'dim'));
   on('race:bestLap', ({ lap }) => toast('BEST LAP ' + fmtTime(lap), 'good'));
@@ -287,17 +308,20 @@ export function updateHud(dt) {
 }
 
 function updateAttackButton(p, dt) {
+  updateAutoButtons(p, dt);
   if (!el.atkBtn) return;
-  const cd = cooldownFrac(p);
-  if (el.atkRing) el.atkRing.style.setProperty('--cd', cd.toFixed(3));
+  const pv0 = previewSlot(p, state.cars, 0);
+  if (el.atkRing) el.atkRing.style.setProperty('--cd', (pv0 ? pv0.frac : 1).toFixed(3));
 
   riskT -= dt;
   if (riskT <= 0) {
     riskT = 0.1;
-    const pv = previewAttack(p, state.cars);
+    // Slot 0 and nothing else — the risk verdict is only a tutorial if the
+    // press that follows it fires the trick the verdict was about.
+    const pv = pv0 && pv0.ready ? pv0 : null;
     if (!pv) {
       el.atkBtn.className = 'pad-btn atk empty';
-      setText(el.atkName, 'RELOADING');
+      setText(el.atkName, pv0 ? pv0.skill.icon + ' RELOADING' : 'NO TRICK');
       setText(el.atkRisk, '');
     } else if (!pv.target && pv.skill.band !== 'drop') {
       // Loaded, but nothing to point it at. Say so rather than showing a risk
@@ -314,6 +338,29 @@ function updateAttackButton(p, dt) {
           : risk.tier === 'low' ? 'LOW RISK'
             : risk.tier === 'mid' ? 'RISKY' : 'BLATANT');
     }
+  }
+}
+
+// The two that fire themselves: which trick each holds, how far off cooldown it
+// is, and a flash when it goes. Only two live states, because an auto fires the
+// same frame its condition comes true — "armed and waiting for a shot" is an
+// instant, not something you can watch.
+function updateAutoButtons(p, dt) {
+  for (let i = 1; i <= 2; i++) {
+    const a = el.auto[i];
+    if (!a) continue;
+    if (firedT[i] > 0) firedT[i] -= dt;
+    const pv = previewSlot(p, state.cars, i);
+    if (!pv) { a.btn.classList.add('hidden'); continue; }
+    a.btn.classList.remove('hidden');
+    // Name only: WRECKING BALL plus an emoji does not fit a pill this size, and
+    // a truncated name is worse than no icon.
+    setText(a.name, pv.skill.name);
+    if (a.ring) a.ring.style.setProperty('--cd', pv.frac.toFixed(3));
+    const fired = firedT[i] > 0;
+    a.btn.classList.toggle('fired', fired);
+    a.btn.classList.toggle('armed', !fired && pv.ready);
+    a.btn.classList.toggle('cooling', !fired && !pv.ready);
   }
 }
 

@@ -31,6 +31,24 @@ curve. The attack button shows the verdict **before you press it**
 (`hud.js:updateAttackButton` → `stewards.estimateRisk`), which is the entire
 tutorial.
 
+**Which is why the loadout is three slots and the HUD is three buttons.** The
+verdict was a coin toss in a pack: `previewAttack` showed the FIRST ready trick
+and `fireAttack` fired a RANDOM one. Loadout order is now button order, bottom
+up — **slot 0 is the manual button and fires exactly what it previewed**
+(`attacks.js:previewSlot`/`fireSlot`, one skill, one cooldown, no pick), and
+slots 1 and 2 are auto: `updateAutoSlots` fires them the moment `autoWants`
+says the trick has the shot it wants. That condition is derived from what the
+trick *does*, not from its id — a drop needs somebody within `AUTOFIRE.dropRange`
+behind and in your lane, a ring needs two targets or one close one, a lunge
+needs somebody square in front, a long shot needs a clear line. Firing on
+cooldown alone would put a scatter gun through empty air with a camera live.
+
+**An auto is never suppressed to protect you from the stewards** — one going off
+at the worst possible moment is the trouble this game is about. It only has to
+be legible: the pill flashes, and the feed row says `⚙ AUTO ·` so the suspicion
+that follows has a cause attached. The two autos are also tappable, to bring one
+forward before its condition arrives.
+
 The counterweight is the crowd. `HYPE` fills from wrecks, air, flips, drifts and
 overtakes, and at the verdict `resolveInvestigation()` rolls `letOffChance()` for
 "no further action" — **read live off `state.hype` when the timer expires**, so
@@ -152,6 +170,20 @@ this game does not do to you. A lap of grinding sparks and a steering pull that
 comes and goes is something you watch coming and drive around, rather than
 something that happens to you between corners.
 
+**But damage is not allowed to end your race.** Hand-driven telemetry went P1 at
+8.4s to P8 at 25 km/h by 26.4s with two laps still to run. The terms compound —
+missing wheels, wobbling wheels, a shredded tyre — and each had been tuned
+against a whole car, so `drive()` now sums every damage-derived drag into one
+`dmgDrag` and puts ONE clamp on it: below `CRASH.damageFloor` of the clean top
+end, none of it bites. A term added later joins the clamp for free, which is the
+point of doing it once. Measured, that floors a car with three wheels gone, one
+wobbling and a shredded tyre at **92% of a whole car's pace** (was 85%), and a
+boost still adds 82–90% on top of that. `beachedDrag` is deliberately *outside*
+the clamp: with nothing left to roll on the drive is over, not merely slower.
+The visuals, sparks, wobble and part loss are untouched — a wrecked car still
+looks wrecked and still handles like it, it just is not too slow to catch
+anybody.
+
 `p.dangleUnit` is `'m'` for a wheel and `'s'` for everything else, and
 `dangleForever` takes the last one off the clock entirely. **Every route to
 taking a wheel off has to respect that or it does nothing** — `flailHit`,
@@ -257,7 +289,7 @@ lock it cannot explain. Circuits and events list several gates and satisfying
 | `cars.js` | the eight chassis you can own — static data only |
 | `arsenal.js` | parts, tricks, prices, sources, marks, crate tables |
 | `progress.js` | the team, circuit gates, gate *reasons*, the trophy list |
-| `ai.js` | racing line, braking to the grip limit, aggression, grudges |
+| `ai.js` | racing line, braking to the grip limit, aggression, grudges, the catch-up handicap |
 | `attacks.js` | the fifteen dirty tricks, targeting, hazards |
 | `stewards.js` | suspicion, camera coverage, hype, investigations, verdicts |
 | `race.js` | grid, contact, pickups, positions, knockouts, results |
@@ -353,6 +385,11 @@ which produces silent nonsense.
   opponent and then re-reading the alive list makes the count odd, which drifts
   the pairing and leaves a seed with no match — a three-round bracket that
   plays two finals.
+- **Two multipliers on the top end, not one.** The AI's catch-up handicap used to
+  write `car.slowMul` with a token `slowT`, which `tickEffects` zeroed later the
+  same frame — so it had *never once run*, and it also overwrote whatever an
+  attack had put there, quietly halving DRAG ANCHOR against an AI car. It writes
+  `car.rubberMul` now (`RACE.rubberGap`/`rubberSpan`) and `drive()` reads both.
 - **A frame-rate guard that fires on a stutter is worse than no guard**, because
   it removes a feature the player asked for. The attract-mode one needs six
   seconds under 20fps after a five-second warm-up.

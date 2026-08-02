@@ -260,6 +260,9 @@ export class Car {
     // --- effects ---
     this.stun = 0;
     this.slowT = 0; this.slowMul = 1;
+    // The AI's catch-up handicap. Separate from `slowMul` on purpose: sharing
+    // one field meant a rubber-band lerp overwrote an attack's slow every frame.
+    this.rubberMul = 1;
     this.oil = 0;
     this.shred = 0;
     this.recover = 0;
@@ -401,6 +404,9 @@ export class Car {
     if (!Number.isFinite(this.wheelsLost)) this.wheelsLost = this.stumps.length;
     this.wheelsLost = clamp(this.wheelsLost, 0, 8);
     if (!Number.isFinite(this._wheelPull)) this._wheelPull = 0;
+    // Two multipliers on the top end. A NaN in either stops the car dead.
+    if (!Number.isFinite(this.rubberMul)) this.rubberMul = 1;
+    if (!Number.isFinite(this.slowMul)) this.slowMul = 1;
     if (!Number.isFinite(this.roll)) this.roll = 0;
     if (!Number.isFinite(this.pitchV)) this.pitchV = 0;
     if (!bad && !wild) return;
@@ -485,7 +491,8 @@ export class Car {
     let vs = -this.va * sn + this.vl * cs;
 
     // --- longitudinal ------------------------------------------------------
-    const topSpeed = (DRIVE.topSpeed + this.stats.top) * (this.boosting ? DRIVE.boostMul : 1) * this.slowMul;
+    const clean = DRIVE.topSpeed + this.stats.top;
+    const topSpeed = clean * (this.boosting ? DRIVE.boostMul : 1) * this.slowMul * this.rubberMul;
     let accel = 0;
     if (!onGrid && this.stun <= 0 && !beached) {
       const throttle = c.throttle;
@@ -509,9 +516,23 @@ export class Car {
     // A wheel folded onto its hub is still a wheel — it is just a bad one. It
     // costs about half of what losing it would, which is what makes a wobble
     // something you feel for a lap rather than a decoration.
+    //
+    // They compound, and each was tuned against a whole car — a hand-driven
+    // race went P1 to P8 at 25 km/h with two laps left. So every damage-derived
+    // drag goes into ONE accumulator and through ONE clamp: below `damageFloor`
+    // of the clean top end none of it bites, whatever is missing, which is what
+    // keeps a boost a way back in. A term added later is capped with the rest.
+    let dmgDrag = 0;
     if (this.wheelsLost > 0 || this.wobbling > 0) {
-      accel -= CRASH.wheelDrag * (this.wheelsLost + this.wobbling * 0.5) * sign(vf);
+      dmgDrag += CRASH.wheelDrag * (this.wheelsLost + this.wobbling * 0.5);
     }
+    if (this.shred > 0) dmgDrag += CRASH.shredDrag;
+    if (dmgDrag > 0) {
+      const floor = clean * CRASH.damageFloor;
+      accel -= dmgDrag * clamp01((Math.abs(vf) - floor) / CRASH.damageFloorFade) * sign(vf);
+    }
+    // Not part of that clamp: with nothing left to roll on the drive is over,
+    // not merely slower, and the floorpan has to be allowed to stop the car.
     if (beached) accel -= CRASH.beachedDrag * sign(vf);
     if (offTrack) accel -= DRIVE.offTrackDrag * (2 - this.stats.offroad) * sign(vf);
     if (this.h > 0.35) accel *= 0.12;
