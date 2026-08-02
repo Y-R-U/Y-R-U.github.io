@@ -78,6 +78,20 @@ Three modes: `track` → `air` (same coordinates, road gone from under you) →
 `wreck` (full world-space rigid body, tumbling and shedding panels until the
 recovery truck arrives, then `rejoin()` puts you back on at the nearest `s`).
 
+**A wreck is still an obstacle.** `race.js:resolveWreckHits` is the one place
+the two coordinate systems meet: a world-space circle test, with the separation
+normal decomposed onto the running car's own track frame so the racer is shoved
+in the coordinates it drives in while the wreck takes a world-space punt. Clamp
+the closing speed before it reaches the physics (`CRASH.wreckHitMax`) — a
+stationary wreck and a boosting car close at over 90 m/s.
+
+**Leaving the circuit is the only thing that really costs you.**
+`Car.wreckOffTrack()` lists the wrecks that happened ON the tarmac; those get a
+third of the car off, `homeMinTime`/`homeMaxTime` of downtime and a
+`FRAME AUTO-REPAIR` banner. Off it you lose almost all of the car, are down for
+twice as long, and it says `WIPEOUT`. Nothing here ever retires a car — the only
+elimination in the game is the knockout event type.
+
 `checkEdges()` decides bounce vs vault, and it weights **how** you arrive far
 more than how fast: square-on is a scrape however sideways you are sliding,
 `|psi|` over about a radian cuts the threshold by 46%, and a fresh shunt

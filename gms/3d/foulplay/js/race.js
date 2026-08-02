@@ -289,6 +289,7 @@ export function updateRace(dt) {
   if (p) state.topSpeedSeen = Math.max(state.topSpeedSeen, p.forwardSpeed);
 
   resolveContacts(dt, cars);
+  resolveWreckHits(dt, cars);
   checkPickups(dt, cars);
   tickHazardCooldowns(dt, cars);
   updateAttacks(dt, cars);
@@ -396,6 +397,119 @@ function resolveContacts(dt, cars) {
       }
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Running into a car that is already wrecked
+// ---------------------------------------------------------------------------
+// A wreck used to be intangible. `resolveContacts` skips anything in wreck mode
+// on both sides, so a two-tonne car lying across the racing line was something
+// the rest of the field drove straight through — the single least convincing
+// thing left in a game about hitting people.
+//
+// It is skipped there for a good reason: a wreck is simulated in WORLD space
+// and everything else lives in track space, so there is no shared frame to
+// resolve in. This pass builds one per hit. The test is a world-space circle,
+// and the separation direction is then decomposed onto the running car's own
+// track frame — its `right` gives the sideways shove and its `tan` the fore/aft
+// one — so the racer is pushed in the coordinates it actually drives in while
+// the wreck takes a plain world-space punt.
+//
+// Nobody is eliminated by this and nobody can be held down by it: the delay it
+// adds to a recovery is capped (CRASH.wreckHitDelayMax). Being repeatedly
+// punted down the road while you wait for the frame to weld itself back
+// together is meant to be the funniest thing on the circuit, not a way to be
+// removed from the race.
+function resolveWreckHits(dt, cars) {
+  const t = state.raceTime;
+  for (let i = 0; i < cars.length; i++) {
+    const w = cars[i];
+    if (w.mode !== 'wreck' || !w.mesh.visible || w.respawnTimer > 0) continue;
+    if (t - (w.wreckHitAt || -99) < CRASH.wreckHitCool) continue;
+
+    for (let j = 0; j < cars.length; j++) {
+      const c = cars[j];
+      if (c === w || !c.alive || c.mode === 'wreck' || c.mode === 'grid') continue;
+      if (c.respawnTimer > 0 || c.invuln > 0) continue;
+
+      const dy = c.worldPos.y - w.wreckPos.y;
+      if (dy < -2.2 || dy > 2.6) continue;
+      const dx = c.worldPos.x - w.wreckPos.x, dz = c.worldPos.z - w.wreckPos.z;
+      const d2 = dx * dx + dz * dz;
+      // Both are tumbling or sliding, so a circle is the honest shape here —
+      // a box would need an orientation the wreck no longer meaningfully has.
+      const reach = c.halfLen * 0.86 + w.halfLen * 0.86;
+      if (d2 > reach * reach) continue;
+
+      const d = Math.sqrt(d2) || 0.001;
+      _v1.set(dx / d, 0, dz / d);            // wreck -> runner
+      // Closing speed along that line. A wreck the field is driving past at a
+      // metre's clearance must not detonate; only something genuinely arriving.
+      _v2.copy(c.worldVel).sub(w.wreckVel);
+      const closing = -_v2.dot(_v1);
+      if (closing < 3) continue;
+
+      w.wreckHitAt = t;
+      hitTheWreck(w, c, closing, _v1);
+      break;                                  // one collision per wreck per tick
+    }
+  }
+}
+
+function hitTheWreck(w, c, closing, n) {
+  const mw = w.stats.mass || 1, mc = c.stats.mass || 1;
+  const share = mc / (mw + mc);
+  // The physics runs on the clamped speed; the fireworks below run on the real
+  // one. See CRASH.wreckHitMax.
+  const bite = Math.min(closing, CRASH.wreckHitMax);
+
+  // The wreck gets launched down the road. It is already a ragdoll, so this is
+  // a straight velocity add plus a fresh tumble.
+  const punt = bite * CRASH.wreckHitPush * share * 2;
+  w.wreckVel.addScaledVector(n, -punt);
+  w.wreckVel.y += punt * CRASH.wreckHitLift;
+  w.wreckSpin.x += rand(-1, 1) * bite * CRASH.wreckHitSpin;
+  w.wreckSpin.y += rand(-1, 1) * bite * CRASH.wreckHitSpin;
+  w.wreckSpin.z += rand(-1, 1) * bite * CRASH.wreckHitSpin;
+  w.addWreckDelay(CRASH.wreckHitDelay);
+
+  // …and sheds more of itself, which is the point of leaving it hittable.
+  w.damage(bite * CRASH.wreckHitTakes, 'all', { by: c, source: 'wreck', force: true });
+  if (Math.random() < CRASH.wreckHitShed) {
+    const alive = w.livingParts();
+    if (alive.length) {
+      w.detachPart(alive[w.pickPanel(alive, 0.7)], {
+        by: c, dir: _v3.copy(n).setY(0.8).normalize(),
+      });
+    }
+  }
+
+  // The runner takes it in the bodywork and gets knocked off line. The world
+  // normal is decomposed onto the car's own frame so the shove lands in the
+  // coordinates it drives in.
+  const f = c.frame;
+  const lat = f && f.right ? n.dot(f.right) : 0;
+  const fwd = f && f.tan ? n.dot(f.tan) : 1;
+  const kick = bite * CRASH.wreckHitBack * (1 - share);
+  c.shove(lat * kick * 1.4, fwd * kick, {
+    by: w, spin: clamp01(bite / 30) * 0.5, spinSign: sign(lat) || 1,
+  });
+  const region = Math.abs(fwd) > Math.abs(lat)
+    ? (fwd > 0 ? 'front' : 'rear') : (lat > 0 ? 'right' : 'left');
+  c.damage(bite * CRASH.wreckHitDamage / (c.stats.ram || 1), region,
+    { by: w, source: 'wreck' });
+
+  // The bang. Between the two of them, thrown up and back the way the runner
+  // came, which is where the debris would actually go.
+  _v1.copy(c.worldPos).lerp(w.wreckPos, 0.5);
+  _v1.y += 0.5;
+  _v2.copy(n).setY(1);
+  const sev = clamp01(closing / 26);
+  sparkBurst(_v1, _v2, Math.round(16 + sev * 50), 0xffd27a, 11 + closing * 1.4);
+  smokePuff(_v1, 3 + Math.round(sev * 4), 0xcfc7ba, 1.6, 1.4);
+  ring(_v1, 0xffb040, 4 + sev * 5, 0.3);
+  if (c.isPlayer || w.isPlayer) addShake(clamp01(closing / 22) * 0.6);
+  emit('race:wreckHit', { wreck: w, car: c, closing });
 }
 
 // `owner` is trailing wreckage; `victim` is alongside. It is not much of a hit,

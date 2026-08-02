@@ -154,7 +154,7 @@ export function levelEvent(level) {
     title: `${ch.name} ${i + 1}/${LEVELS_PER_CHAPTER}`,
     subtitle: boss ? `RIVAL: ${CHAPTER_RIVALS[ch.n - 1].name}` : ch.sub,
     track,
-    laps: track === 'saltflats' ? 2 : (ch.n >= 7 && rng() < 0.4 ? 4 : 3),
+    laps: ch.n >= 7 && rng() < 0.4 ? 4 : 3,
     cars,
     aiSkill: skill,
     aiAggro: aggro,

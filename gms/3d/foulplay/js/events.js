@@ -72,7 +72,7 @@ export const SPECIAL_EVENTS = [
   {
     id: 'openroad', name: 'NO BARRIERS', icon: '🏜️',
     blurb: 'They took the guardrails away. All of them. Nobody will say who authorised it.',
-    track: 'saltflats', laps: 2, cars: 8, aiSkill: 0.82, aiAggro: 0.75,
+    track: 'saltflats', laps: 3, cars: 8, aiSkill: 0.82, aiAggro: 0.75,
     objective: { kind: 'podium', label: 'PODIUM WITH NOTHING TO BOUNCE OFF' },
     purse: 10000, chest: 'parts',
     gates: [{ kind: 'team', level: 3 }],

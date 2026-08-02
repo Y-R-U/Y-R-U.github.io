@@ -274,11 +274,42 @@ export const CRASH = {
   // allowed to disintegrate — and the pieces have to come off ACROSS the crash
   // rather than all on the frame it landed on. Panels are queued to let go at
   // their own moment over this many seconds.
-  breakUpSpread: 2.4,
-  wreckMinTime: 2.2,        // seconds of tumbling before the recovery truck comes
-  wreckMaxTime: 5.0,
-  respawnTime: 1.35,        // seconds of blackout before you rejoin
+  breakUpSpread: 1.8,
+
+  // --- how long you are out of the race -------------------------------------
+  // Two profiles, because leaving the circuit and being written off ON it are
+  // not the same event. This game is meant to be a mostly-continuous drive, so
+  // an on-track wreck is a stumble the frame welds itself back together from,
+  // and only actually leaving the track costs you real time.
+  wreckMinTime: 2.0,        // OFF the circuit: tumbling before the truck comes
+  wreckMaxTime: 4.0,
+  homeMinTime: 1.0,         // ON it: written off, or out of wheels
+  homeMaxTime: 2.4,
+  respawnTime: 0.8,         // seconds of blackout before you rejoin
   respawnBack: 14,          // metres behind the crash point you rejoin
+
+  // --- being hit while you are already down ---------------------------------
+  // A wreck used to be intangible: the field drove straight through it. It is a
+  // two-tonne obstacle lying on the racing line and it should behave like one,
+  // for both parties — you get punted further down the road and whoever ran
+  // into you takes it in the bodywork.
+  wreckHitCool: 0.22,       // seconds before the same wreck can be hit again
+  // Everything below is driven by the closing speed CLAMPED to this. A wreck
+  // lying still and a boosting car arriving at 345 km/h close at over 90 m/s,
+  // and at the unclamped rates that punted the wreck nine metres into the air
+  // and took a quarter of the runner's chassis in one touch. The spark count
+  // still scales with the real number — the spectacle is allowed to be as big
+  // as the hit was, the physics is not.
+  wreckHitMax: 30,
+  wreckHitPush: 0.85,       // world m/s given to the wreck per m/s of closing
+  wreckHitLift: 0.3,        // …and this much of it straight up, so it hops
+  wreckHitSpin: 0.16,       // rad/s of tumble per m/s of closing
+  wreckHitBack: 0.55,       // fraction of the closing speed the runner loses
+  wreckHitDamage: 2.1,      // hp per m/s to the car that hit it
+  wreckHitTakes: 1.3,       // hp per m/s to the wreck — more panels, no penalty
+  wreckHitShed: 0.55,       // chance a hit rips another piece off the wreck
+  wreckHitDelay: 0.28,      // seconds added to the recovery per hit…
+  wreckHitDelayMax: 1.3,    // …and the most it can ever add in total
 };
 
 // Total structural HP of a car body. Parts have their own pools on top, so the
@@ -365,7 +396,11 @@ export const RACE = {
   countdown: 3.6,
   gridSpacing: 8.5,
   gridStagger: 4.6,
-  finishHold: 2.4,          // seconds the camera lingers after you cross
+  // Seconds you keep driving after taking the flag, before the results come up.
+  // The race does not stop when you cross the line — the rest of the field is
+  // still coming in and you are still on the circuit with them, which is both
+  // the honest thing and the last chance to put somebody in the wall.
+  finishHold: 5,
   aiFinishTime: 26,         // seconds after the winner before stragglers are called in
   knockoutInterval: 22,     // seconds between eliminations in knockout events
 };

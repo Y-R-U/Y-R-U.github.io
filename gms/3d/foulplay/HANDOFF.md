@@ -672,6 +672,90 @@ what render and the floors are what changed. Desktop is untouched. 157x57 →
   a 2.7m-wide van came back as 5.0m. Measure a freshly built car whose only
   transforms are local ones, which is what `measureHull` does at build time.
 
+---
+
+# ROUND 7 — a wreck is an obstacle, not a hole in the world (2026-08-02)
+
+The brief: a wrecked car should still be hittable; it should say the frame is
+repairing itself rather than reading as game over; you should be driving again
+sooner, with each further hit costing you a little more; **leaving the circuit
+should be the only thing that genuinely costs you**, and cars should limp home
+rather than be removed. Plus: three full laps as standard, a LAST LAP that stays
+up, and the position called at the flag with a few seconds of driving after it.
+
+## A wreck was intangible
+
+`resolveContacts` skips anything in wreck mode on both sides, so a two-tonne car
+lying across the racing line was something the whole field drove straight
+through. It is skipped there for a real reason — **a wreck is simulated in world
+space and everything else lives in track space**, so there is no shared frame to
+resolve in.
+
+`race.js:resolveWreckHits` builds one per hit: the test is a world-space circle,
+and the separation normal is then decomposed onto the RUNNING car's own track
+frame — its `right` gives the sideways shove and its `tan` the fore/aft one — so
+the racer is pushed in the coordinates it drives in while the wreck takes a
+plain world-space punt.
+
+**Clamp the closing speed before it touches the physics.** A wreck lying still
+and a boosting car arriving at 345 km/h close at over 90 m/s, and unclamped that
+punted the wreck **nine metres into the air** and took a quarter of the runner's
+chassis in one touch. `CRASH.wreckHitMax` caps what the physics sees; the spark
+count still scales with the real number, because the spectacle is allowed to be
+as big as the hit was and the physics is not.
+
+| forced hits, before/after the clamp | before | after |
+|---|---|---|
+| wreck flung upward | 8.4-9.1m | 1.0-1.6m |
+| runner's chassis lost in one hit | 78.8 of 320 | 20.1 of 320 |
+| wreck shoved along | 7.3-24.9m | 3.5-6.3m |
+
+5 of 5 forced trials connected, both before and after.
+
+## Two recovery profiles, and only one of them hurts
+
+`wreckOffTrack()` is now a list of what stayed ON the tarmac — written off, out
+of wheels, landed sideways — rather than an exclusion, so the next reason
+somebody adds has to declare which kind it is. (`landed sideways` moved: it
+happens on the road and was being treated as though you had left the circuit,
+which cost it 78-100% of the car.)
+
+| | before | after |
+|---|---|---|
+| on-track wreck, down for | 3.55-6.35s | **1.8-3.6s** |
+| off-track wreck, down for | 3.55-6.35s | 2.8-4.9s |
+| HUD says | `WIPEOUT` | `FRAME AUTO-REPAIR` on track, `WIPEOUT` only off it |
+
+Each further hit while you are down adds `wreckHitDelay` (0.28s), capped at
+`wreckHitDelayMax` (1.3s) — being repeatedly punted down the road is meant to be
+the funniest thing on the circuit, not a way to be removed from the race.
+**Nobody was retired in any of the measured races**; the only elimination in the
+game remains the knockout event type.
+
+## Laps and the flag
+
+`speedbowl` (4) and `saltflats` (2) were the only circuits not running the
+standard three; both are 3 now, which puts saltflats at ~105s, in line with
+skyline. The `saltflats ? 2` special case came out of `story.js` too.
+
+- **LAST LAP** gets its own banner at 3.4s instead of a 1.7s `LAP 3`.
+- The lap banner is suppressed on the crossing that finishes the race — two
+  banners fighting over the same instant is how you read neither.
+- `race:playerFinish` now says `FINISHED 3RD` at the moment you cross.
+- `RACE.finishHold` 2.4 → **5s** of continued driving while the rest come in.
+  Measured: 4.95-5.0s on every circuit.
+
+## Verified
+
+Full auto races on circus, skyline, saltflats, hometown and grinder: 3 laps
+each, ~5s of driving after the flag, **zero cars retired, zero errors, zero
+warnings**. On-track recoveries 1.8-3.6s, off-track 2.8-4.9s.
+
+## Gotcha
+
+- **A probe that reads `car.wreckDelay` on `car:rejoin` always reads zero**,
+  because `rejoin()` clears it before it emits. Sample it during the wreck.
+
 ## Still open (unchanged from round 4)
 
 - Shadow map offset from its caster, applied to one vehicle only.

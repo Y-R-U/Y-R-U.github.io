@@ -335,7 +335,7 @@ export const TRACK_DEFS = [
     deco: { seed: 22 },
   },
   {
-    id: 'speedbowl', name: 'THE SPEEDBOWL', env: 'dusk', grade: 2, laps: 4,
+    id: 'speedbowl', name: 'THE SPEEDBOWL', env: 'dusk', grade: 2, laps: 3,
     flavour: 'Banked to the roof. Flat out the whole way if your nerve holds.',
     build: () => new PathBuilder({ width: 14 })
       .repeat(2, (b) => b.straight(300).turn(180, 118, { bank: 0.42, hardBank: true }))
@@ -383,7 +383,7 @@ export const TRACK_DEFS = [
     deco: { seed: 66, padMul: 1.3 },
   },
   {
-    id: 'saltflats', name: 'SALT FLATS', env: 'dust', grade: 2, laps: 2,
+    id: 'saltflats', name: 'SALT FLATS', env: 'dust', grade: 2, laps: 3,
     flavour: 'No barriers. No walls. A painted line and a very long way down.',
     build: () => new PathBuilder({ width: 15 })
       .set({ railL: 'open', railR: 'open' })

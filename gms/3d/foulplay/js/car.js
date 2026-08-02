@@ -52,6 +52,13 @@ const _rq = new THREE.Quaternion();
 const MAX_SCUFFS = 10;
 const SCUFF_COLOUR = 0x4a4038;   // scraped-back paint over primer
 
+// Wrecks that happened on the racing surface. See `wreckOffTrack`.
+const ON_TRACK_WRECKS = new Set([
+  'written off',
+  'nothing left to drive on',
+  'landed sideways',
+]);
+
 // --- hinged panels ---------------------------------------------------------
 const _fq = new THREE.Quaternion();
 const _fe = new THREE.Euler();
@@ -254,6 +261,10 @@ export class Car {
     this.airPeak = 0;
     this.spinCount = 0;
     this.wreckTime = 0;
+    this.wreckLeft = false;      // did this wreck take you off the circuit
+    this.wreckDelay = 0;         // extra seconds down, from being hit while there
+    this.wreckHits = 0;
+    this.wreckHitAt = -99;
     this.respawnTimer = 0;
     this.lastContact = null;
     this.lastContactAt = -99;
@@ -1453,6 +1464,14 @@ export class Car {
     this.wreckReason = reason;
     if (DMG) DMG.wrecks[reason] = (DMG.wrecks[reason] || 0) + 1;
 
+    // Did this take you off the circuit, or merely apart on it? Everything
+    // downstream — how much of the car comes off, how long you are out, and
+    // whether the HUD calls it a wipeout or a repair — hangs off this one flag.
+    this.wreckLeft = this.wreckOffTrack(reason);
+    this.wreckDelay = 0;
+    this.wreckHitAt = -99;
+    this.wreckHits = 0;
+
     this.wreckPos.copy(this.worldPos);
     this.wreckVel.copy(this.worldVel);
     if (extraImpulse) this.wreckVel.add(extraImpulse);
@@ -1528,13 +1547,15 @@ export class Car {
     queue.sort((a, b) => a.at - b.at);
   }
 
-  // Every wreck except a structural write-off happened because the car left the
-  // circuit, and that is the one that is allowed to disintegrate. A car that
-  // simply ran out of wheels is still ON the road and gets picked up, so it
-  // sheds a third like a write-off rather than coming apart completely.
-  wreckOffTrack(reason) {
-    return reason !== 'written off' && reason !== 'nothing left to drive on';
-  }
+  // Leaving the circuit is the only thing in this game that is allowed to
+  // genuinely cost you. Everything else on this list happened ON the road, and
+  // an on-track wreck is a stumble: a third of the car comes off, the frame
+  // welds itself together and you rejoin where you fell. Off it, the car is
+  // finished — almost all of it goes and you are down for twice as long.
+  //
+  // Listed by what stayed on the tarmac rather than by exclusion, because the
+  // next reason somebody adds should have to say which kind it is.
+  wreckOffTrack(reason) { return !ON_TRACK_WRECKS.has(reason); }
 
   // Let the queued panels go, one moment at a time, for as long as the wreck is
   // still on screen. Each one throws its own shower rather than sharing the
@@ -1615,15 +1636,27 @@ export class Car {
     this.updateBurn(dt);
 
     // Do not send the truck while the car is still shedding — the break-up IS
-    // the shot, and `wreckMaxTime` is still there as the hard cap.
+    // the shot, and the max time is still there as the hard cap. A car that is
+    // still being shunted around is not settled either, which is what makes
+    // "they kept hitting me while I was down" cost you a moment.
     const settled = this.wreckVel.lengthSq() < 9 && Math.abs(this.wreckPos.y - floor) < 0.4
       && !this.shedQueue.length;
-    if (this.wreckTime > CRASH.wreckMinTime && (settled || this.wreckTime > CRASH.wreckMaxTime)) {
+    const min = (this.wreckLeft ? CRASH.wreckMinTime : CRASH.homeMinTime) + this.wreckDelay;
+    const max = (this.wreckLeft ? CRASH.wreckMaxTime : CRASH.homeMaxTime) + this.wreckDelay;
+    if (this.wreckTime > min && (settled || this.wreckTime > max)) {
       this.respawnTimer = CRASH.respawnTime;
       this.mesh.visible = false;
       fx.smokePuff(this.wreckPos, 8, 0x8a8f96, 3, 2.4);
-      emit('car:recovering', { car: this });
+      emit('car:recovering', { car: this, left: this.wreckLeft });
     }
+  }
+
+  // Somebody ran into you while you were lying there. Costs a moment, never
+  // more than `wreckHitDelayMax` in total — being repeatedly punted down the
+  // road is meant to be funny, not a way to be removed from the race.
+  addWreckDelay(sec) {
+    this.wreckDelay = Math.min(CRASH.wreckHitDelayMax, (this.wreckDelay || 0) + sec);
+    this.wreckHits = (this.wreckHits || 0) + 1;
   }
 
   rejoin() {
@@ -1640,6 +1673,8 @@ export class Car {
     this.recover = 1.4;
     this.invuln = 1.6;
     this.shedQueue.length = 0;   // whatever the truck did not get round to
+    this.wreckDelay = 0;
+    this.wreckHits = 0;
     this.mesh.visible = true;
     if (this.hp <= 0) this.hp = this.maxHp * 0.35;
     this.wheelsLost = 0;   // the truck bolts something on

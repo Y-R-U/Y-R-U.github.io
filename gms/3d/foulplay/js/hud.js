@@ -65,10 +65,24 @@ function wireEvents() {
     feed(cleared ? 'NO FURTHER ACTION' : `FINED $${fine.toLocaleString()}`, cleared ? 'good' : 'bad');
   });
   on('steward:rivalPenalty', ({ car }) => feed(`${car.name} PENALISED`, 'dim'));
-  on('car:wreck', ({ car, by }) => {
+  // Being written off ON the circuit is not the end of your afternoon — the
+  // frame welds itself back together and you rejoin where you fell. Only
+  // actually leaving the track is a wipeout, and saying so is what keeps a
+  // spin from reading as a race you have just lost.
+  on('car:wreck', ({ car, by, reason }) => {
     if (by && by.isPlayer) { feed(`${car.name} WRECKED`, 'good'); banner('WRECKED THEM', 'good'); }
-    else if (car.isPlayer) banner('WIPEOUT', 'bad');
-    else feed(`${car.name} IS OUT OF SHAPE`, 'dim');
+    else if (car.isPlayer) {
+      if (car.wreckLeft) banner('WIPEOUT', 'bad', 1.9);
+      else banner('FRAME AUTO-REPAIR', 'warn', 1.6);
+      feed(String(reason || 'WRECKED').toUpperCase(), 'warn');
+    } else feed(`${car.name} IS OUT OF SHAPE`, 'dim');
+  });
+  on('car:rejoin', ({ car }) => { if (car.isPlayer) banner('BACK IN', 'good', 1.1); });
+  // Getting run over while you are lying there. Worth a line, because the extra
+  // second you spend down is otherwise unexplained.
+  on('race:wreckHit', ({ wreck, car }) => {
+    if (car.isPlayer) feed(`RAN STRAIGHT OVER ${wreck.name}`, 'good');
+    else if (wreck.isPlayer) toast(`${car.name} PILED INTO YOU`, 'bad', 1);
   });
   on('car:partOff', ({ car, by }) => {
     if (by && by.isPlayer) feed(`${car.name} LOSES A PANEL`, 'good');
@@ -96,7 +110,23 @@ function wireEvents() {
     else toast("LEADER'S HANDICAP", 'warn', 1);
   });
   on('car:lap', ({ car }) => {
-    if (car.isPlayer && car.lap >= 0) banner(`LAP ${clamp(car.lap + 1, 1, state.laps)}`, 'plain');
+    if (!car.isPlayer || car.lap < 0) return;
+    // The crossing that finishes the race is not the start of a lap — the flag
+    // announces itself a moment later, and two banners fighting over the same
+    // instant is how you end up reading neither.
+    if (car.lap >= state.laps) return;
+    const n = clamp(car.lap + 1, 1, state.laps);
+    // The last lap is the only one that changes how you drive, so it gets its
+    // own words and stays up long enough to be read at 250km/h.
+    if (n >= state.laps) banner('LAST LAP', 'warn', 3.4);
+    else banner(`LAP ${n}`, 'plain');
+  });
+  // Crossing the line. You keep driving for a few seconds while the rest of the
+  // field comes in, so the position has to be said out loud at the moment it
+  // happens rather than waiting for the results screen.
+  on('race:playerFinish', ({ position }) => {
+    banner(`FINISHED ${ordinal(position).toUpperCase()}`, position <= 3 ? 'good' : 'plain', 2.8);
+    feed(`CHEQUERED FLAG — ${ordinal(position).toUpperCase()}`, position <= 3 ? 'good' : 'plain');
   });
   on('race:overtake', ({ position }) => toast(`P${position}`, 'good'));
   // Rivals get their own dirty tricks late in the season — make sure it lands
