@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.br8t.filestore-backup</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>/Users/aaronair/cc/yru/site/app/filestore/backup.sh</string>
+  </array>
+
+  <!-- Every 8 hours. Unlike cron, launchd runs a missed job once the Mac wakes,
+       so a laptop asleep at 02:15 still gets its backup. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>15</integer></dict>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/Users/aaronair/Backups/filestore/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/aaronair/Backups/filestore/launchd.log</string>
+</dict>
+</plist>

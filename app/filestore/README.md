@@ -124,13 +124,28 @@ ssh br8t 'sqlite3 /srv/data/filestore/filestore.db "SELECT username,role FROM us
 ssh br8t 'du -sh /srv/data/filestore/files/*'
 ```
 
-**Backups.** Not configured yet — this is the first app on the box holding data
-you can't regenerate. Until restic → B2 is set up (see `~/cc/ionos/PLAN.md`), pull a
-copy by hand:
+**Backups.** The VPS keeps no copies of its own, so `backup.sh` pulls the whole
+store to Aaron's Mac at `~/Backups/filestore/`, driven by the launch agent in
+`com.br8t.filestore-backup.plist` (installed to `~/Library/LaunchAgents/`):
 
 ```
-rsync -av br8t:/srv/data/filestore/ ~/backup/filestore/
+./backup.sh              take a backup now, then prune
+./backup.sh --prune      apply the retention rules only
+launchctl kickstart -k gui/$(id -u)/com.br8t.filestore-backup    # force a run
+tail ~/Backups/filestore/backup.log
 ```
+
+Runs at 02:15, 10:15 and 18:15. Retention: every backup from today, the most
+recent one from each earlier day, nothing over 7 days old.
+
+It's launchd rather than cron for two reasons — `crontab` needs Full Disk Access
+on modern macOS, and launchd runs a missed job when the Mac wakes, where cron
+just skips it.
+
+The database is snapshotted with `sqlite3 .backup` before archiving. Copying a
+live `.db` without its `-wal` can restore as a corrupt or stale database, so
+don't "simplify" that into an `rsync`. To restore, stop the service, unpack the
+archive over `/srv/data/filestore/`, and start it again.
 
 Each project can also be downloaded as a `.zip` from its own page.
 
@@ -140,7 +155,9 @@ walking the directory.
 
 ## Not done yet
 
-- Backups (above) — the main open item.
+- Off-site backups. `backup.sh` covers disk failure on the VPS, but every copy
+  then lives on one Mac. restic → B2 (see `~/cc/ionos/PLAN.md`) is still the
+  answer for fire-and-theft.
 - No email: password resets are handed over out of band by whoever created the
   account. Deliberate, given there's no mail sending on the box.
 - Reassigning a project to a different lead — an admin currently can't, so a
