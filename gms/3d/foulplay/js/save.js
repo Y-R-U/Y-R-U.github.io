@@ -55,6 +55,7 @@ const DEFAULTS = () => ({
     music: true,
     quality: 'auto',           // auto | high | low
     camShake: true,
+    attract: true,             // a race running behind the menus
     speedUnit: 'kmh',
     assist: true,              // extra straightening help
     highlights: true,

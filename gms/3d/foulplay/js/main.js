@@ -8,9 +8,16 @@ import { initHaptics } from './haptics.js';
 import { boot, update, present, pauseForBlur } from './flow.js';
 import { state } from './state.js';
 import { $, clamp } from './utils.js';
-import { SPEED_ARG, DEV_MODE, SHOT_MODE, AUTO_MODE } from './config.js';
+import { SPEED_ARG, DEV_MODE, SHOT_MODE, AUTO_MODE, WIPE_ARG } from './config.js';
 
 loadProfile();
+
+// br8t account and cloud save — never fatal: offline or blocked just means the
+// local save stands alone. Skipped for the unattended flags, not least because
+// a signed-in ?wipe would pull the save straight back down again.
+if (!AUTO_MODE && !SHOT_MODE && !WIPE_ARG) {
+  import('./cloud.js').catch(() => { /* play on with a purely local save */ });
+}
 
 const container = $('game-container');
 initRenderer(container);

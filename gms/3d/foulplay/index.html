@@ -97,7 +97,9 @@
     </div>
   </div>
 
-  <button id="btn-pause" class="hidden">❙❙</button>
+  <!-- No `hidden` class: it is display:none in the stylesheet already, and
+       `.hidden !important` beat the `.show` the HUD puts on to reveal it. -->
+  <button id="btn-pause">❙❙</button>
 
   <!-- ═══════════════════════ CUTSCENES ═══════════════════════ -->
   <div id="cine" class="hidden">

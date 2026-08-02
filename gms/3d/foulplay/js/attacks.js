@@ -46,9 +46,15 @@ export function findTargets(car, cars, range, opts = {}) {
   return out;
 }
 
+// `car.alive` stays true through a wreck, so without this a car on its roof
+// could still put a scatter gun through someone.
+const canFire = (car) => car.mode !== 'wreck' && car.mode !== 'out'
+  && car.mode !== 'grid' && !(car.respawnTimer > 0);
+
 // Which skill would fire right now, and at whom — the HUD needs this to show
 // the risk before you commit.
 export function previewAttack(car, cars) {
+  if (!canFire(car)) return null;
   const ready = readySkills(car);
   if (!ready.length) return null;
   for (const sk of ready) {
@@ -82,6 +88,7 @@ export function cooldownFrac(car) {
 // Firing
 // ---------------------------------------------------------------------------
 export function fireAttack(car, cars) {
+  if (!canFire(car)) return null;
   const ready = readySkills(car);
   if (!ready.length) {
     if (car.isPlayer) emit('attack:notReady', { car });
@@ -292,6 +299,9 @@ function killHazard(h) {
 export function clearHazards() {
   for (const h of hazards) killHazard(h);
   hazards.length = 0;
+  // Emptying the array alone left the Lines in the scene with nothing to expire
+  // them — an attract loop drew a new set every time you changed menu.
+  for (const t of tethers) killTether(t);
   tethers.length = 0;
 }
 
@@ -306,6 +316,12 @@ function spawnTether(a, b, life) {
   const line = new THREE.Line(geo, mat);
   scene.add(line);
   tethers.push({ line, a, b, age: 0, life });
+}
+
+function killTether(t) {
+  scene.remove(t.line);
+  t.line.geometry.dispose();
+  t.line.material.dispose();
 }
 
 // ---------------------------------------------------------------------------
@@ -371,9 +387,7 @@ export function updateAttacks(dt, cars) {
     const t = tethers[i];
     t.age += dt;
     if (t.age >= t.life) {
-      scene.remove(t.line);
-      t.line.geometry.dispose();
-      t.line.material.dispose();
+      killTether(t);
       tethers.splice(i, 1);
       continue;
     }

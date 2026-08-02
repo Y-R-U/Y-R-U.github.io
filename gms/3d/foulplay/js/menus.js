@@ -226,7 +226,9 @@ export function renderStory() {
       <button class="pick ${open ? '' : 'locked'} ${stars ? 'done' : ''}" data-act="level" data-n="${n}" ${open ? '' : 'disabled'}>
         <div class="pick-grade">${open ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : '🔒'}</div>
         <div class="pick-name">${n}. ${open ? esc(TRACK_BY_ID[ev.track].name) : 'LOCKED'}</div>
-        <div class="pick-sub">${open ? esc(ev.objective.label) : 'WIN THE PREVIOUS RACE'}</div>
+        <!-- A level opens on the previous one's OBJECTIVE, rarely a win — level
+             1's is FINISH TOP 5 — so the old padlock text was simply wrong. -->
+        <div class="pick-sub">${open ? esc(ev.objective.label) : 'CLEAR THE PREVIOUS LEVEL'}</div>
         ${open && ev.rivals && ev.rivals[0] && ev.rivals[0].boss
           ? `<div class="pick-desc">⚔ ${esc(ev.rivals[0].name)} — ${esc(ev.rivals[0].team)}</div>` : ''}
         ${open && ev.knockout ? `<div class="pick-desc">☠️ KNOCKOUT — last car every 22 seconds</div>` : ''}

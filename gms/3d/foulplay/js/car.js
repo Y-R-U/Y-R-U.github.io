@@ -1332,7 +1332,7 @@ export class Car {
       // flat out on a straight or crawling out of a wreck.
       if (!p.dangleForever) p.dangling -= p.dangleUnit === 'm' ? speed * dt : dt;
       const f = p.flap;
-      if (!f || !p.home) { if (p.dangling <= 0) this.detachPart(id, { by: p.dangleBy }); continue; }
+      if (!f || !p.home) { if (p.dangling <= 0) this.detachPart(id, { by: p.dangleBy, wobbled: true }); continue; }
 
       // A panel tears a little looser every second it hangs on: `loose` runs 0
       // (just went) to 1 (about to leave), and everything gets bigger with it.
@@ -1564,6 +1564,13 @@ export class Car {
     // some of the distance off. `opts.wobbled` is the clock itself calling.
     if (p.wheel && p.dangling > 0 && this.mode !== 'wreck' && !opts.wobbled) {
       p.dangling = Math.max(60, p.dangling * 0.75);
+      return;
+    }
+    // …and a wheel that is not wobbling yet does not skip the wobble either:
+    // the shearing attacks reached past `breakPart` into here and took one off
+    // in a single frame. Onto its hub instead, and its own clock takes over.
+    if (p.wheel && this.mode !== 'wreck' && !opts.wobbled) {
+      this.startDangle(id, p, 0.8, opts.by);
       return;
     }
     const di = this.danglers.indexOf(id);

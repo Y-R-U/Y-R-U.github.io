@@ -53,6 +53,11 @@ export function initHud() {
 }
 
 function wireEvents() {
+  // The cached minimap projection is per circuit, and `resetHud` was exported
+  // but never actually called — so every race after the first drew the first
+  // circuit's outline, with this race's cars projected through its scale.
+  on('race:start', () => resetHud());
+
   on('steward:foul', ({ susp, clean, cover, skill }) => {
     if (clean) toast('RACING INCIDENT', 'good');
     else if (cover > 0.3) toast(`SEEN — +${Math.round(susp)} SUSPICION`, 'bad');
@@ -146,6 +151,10 @@ export function showHud(v) {
   if (el.hud) el.hud.classList.toggle('hidden', !v);
   const pad = $('btn-pad');
   if (pad) pad.classList.toggle('hidden', !v);
+  // `onRaceDone` drops the HUD without going through `goto`, so the pause
+  // button has to come off here or it sits over the replay and the results.
+  const pause = $('btn-pause');
+  if (pause) pause.classList.toggle('show', !!v);
 }
 
 export function updateHud(dt) {

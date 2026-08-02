@@ -564,8 +564,11 @@ function flailHit(owner, victim, dtt) {
 
 function contactDamage(a, b, closing, dir, kind) {
   const dmg = closing * CRASH.carDamage;
-  const regionA = kind === 'side' ? (dir > 0 ? 'right' : 'left') : (dir > 0 ? 'rear' : 'front');
-  const regionB = kind === 'side' ? (dir > 0 ? 'left' : 'right') : (dir > 0 ? 'front' : 'rear');
+  // `dir > 0` means b is the car in front, so a arrived nose-first and takes it
+  // on the FRONT while b takes it on the back. Reading those the other way round
+  // put every rear-end hit on the wrong end of both cars.
+  const regionA = kind === 'side' ? (dir > 0 ? 'right' : 'left') : (dir > 0 ? 'front' : 'rear');
+  const regionB = kind === 'side' ? (dir > 0 ? 'left' : 'right') : (dir > 0 ? 'rear' : 'front');
   // Ramming is rewarded, and it was not rewarded by anything like enough: the
   // rammer used to take 0.65 of the hit against the rammed car's 0.81, so the
   // player deliberately using their car as the weapon came off barely better

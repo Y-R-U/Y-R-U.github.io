@@ -925,3 +925,101 @@ single crate still renders with no OPEN ALL and no "N CRATES OPENED".
   taunt feed and the LEADER'S HANDICAP pill sit directly over the player's car.
 - Boost pad reads as a sprite on the road rather than in it.
 - Replay ghosts do not show impact scuffs.
+
+---
+
+# ROUND 9 — accounts, and a peer review that found ten real bugs (2026-08-02)
+
+No new features asked for. Three parallel passes: a bug hunt, a design review,
+and the br8t account layer. The design review's findings are **not** in this
+round — they are listed at the bottom for a future session to argue with.
+
+## 1. Cross-device saves
+
+`js/cloud.js`, the same ~50-line shape every other game on the hub uses:
+`syncLocalKeys({ gameId: 'foulplay', keys: ['foulplay_save_v1'], … })`. Loaded
+by a dynamic `import().catch()` from main.js, so offline, blocked or `file://`
+just means the local save stands alone.
+
+The profile is progress-only — a race lives entirely in `state` and is wiped by
+`resetRaceState()`, so nothing race-shaped is ever written and **no key had to
+be excluded**. `memories` are base64 replay buffers but cap at 8 × ~1.9 s at
+20 Hz ≈ 145 KB, well inside the 1 MB document limit. The daily already keys off
+`daily-<UTC date>` in `events.cleared`, so the dailies rule needed no change.
+
+`canPester` reads `state.screen` and is false for `race | replay | cine |
+results`. Attract mode is deliberately allowed: that is a race running *behind*
+a menu, and `state.screen` is the menu you are looking at. Race counting is a
+`race:done` listener **inside cloud.js**, so flow.js needed no edit at all.
+
+`--br8t-account-space` moves the minimap, the purse, the title rail and the
+pause button out from under the avatar; the `0px` fallback means the layout is
+identical when the layer is not loaded. `?auto`, `?shot` and `?wipe` do not load
+it at all — a signed-in `?wipe` would pull the save straight back down.
+
+## 2. Bugs found and fixed
+
+| | what a player saw |
+|---|---|
+| `race.js` contactDamage | **`dir` was read backwards.** Rear-end hits landed on the wrong end of BOTH cars: ram someone and your own boot flew off while they lost their bonnet. Scuffs and torn flaps were placed wrong too. Measured 0/21 rear hits correct → 19/19. |
+| `index.html` + `hud.js` | The in-race **pause button never rendered** — `class="hidden"` beat `.show`. Fixing that exposed two more: it then survived onto the results screen (`onRaceDone` drops the HUD without `goto`), and it sat over the right half of the minimap. |
+| `hud.js` | **`resetHud` was exported and called from nowhere**, so every race after the first drew the FIRST circuit's minimap outline with this race's cars projected through the wrong scale. A/B: 52 differing pixels without the fix, 2,580 with. |
+| `attacks.js` | **You could fire dirty tricks out of a wreck.** `car.alive` stays true through a wreck, so a car on its roof could put a scatter gun across the crash site, foul and all. |
+| `attacks.js` | Grapple tethers **leaked into the scene forever** — `clearHazards` emptied the array without removing the Lines. Worst with attract mode, which tears a race down on every menu change. 24 live → 0. |
+| `car.js` | Shearing attacks (hook saw, scatter gun, wrecking ball) **reached past `breakPart` and took a fresh wheel off in one frame**, bypassing round 8's whole wobble ladder. 22 of 34 removals were instant; now 0 on a running car. |
+| `titles.js` | **RACE AGAIN corrupted a title bracket** — the round resolved a second time off the same descriptor, eliminating another pair of seeds, skipping the player up the tree and paying `chestOnClear` again every replay. |
+| `save.js` | ATTRACT needed **two taps to turn off** — absent from DEFAULTS, so the UI read `!== false` and the toggle wrote `!undefined`. |
+| `flow.js` | One junk queue entry **stranded the rest of the pile** in OPEN ALL (`break` → `continue`). |
+| `menus.js` | The story padlock **stated the wrong requirement** — "WIN THE PREVIOUS RACE" when levels open on the previous level's *objective*, and level 1's is FINISH TOP 5. |
+
+**Verified**: full race → replay → results at 500×860, zero console errors, wheel
+floor held at 1, pause button present in the race and gone on results. Plus a
+deliberately ancient/damaged profile (bad team index, unknown car, bogus
+loadout, null in the crate queue, missing `titles`/`levels`/`memories`) loads
+clean and renders all 12 screens.
+
+## 3. Left alone deliberately
+
+- **AI rubber-banding is dead code.** `ai.update` writes `car.slowMul` with
+  `slowT = 0.0001`; `tickEffects` runs later the same frame and resets it, so
+  `drive()` never sees it. Worse, that same write overwrites an attack's
+  `slowMul`, so **DRAG ANCHOR is roughly half as strong against an AI car as
+  against the player**. Fixing it switches rubber-banding on for the first time
+  — a balance change, not a bug fix.
+- **`frameWreck` occlusion.** The wreck camera does sometimes show a black
+  polygon, but not for the reason it looked like: across 42 forced wrecks the
+  lens never went under the ground (worst clearance 3.56 m), and the blocker is
+  the **startline gantry**, on 2/99 frames at circus and 8/98 at carverpass. A
+  ground clamp would be dead code; this needs a real occlusion test.
+- Hype meter overhangs 3 px during its pop; suspicion reads 100–140 against a
+  bar capped at 100%; speech bubbles use `depthTest: false`. All three are
+  visual trade-offs rather than defects.
+- Dead config keys that a balance pass would silently edit to no effect:
+  `HYPE.perWreck/perFlip/perAir/perDrift/perOvertake/perPartOff/perNearMiss/perSpin`
+  (the amounts are hard-coded in race.js), `RACE.aiFinishTime`,
+  `CRASH.carPush/slamImpulse/slamDamage`, `DRIVE.steerReturn`.
+
+## 4. The design review — argued about, not yet acted on
+
+Measured on a phone-shaped viewport, all still open:
+
+- **In portrait the road is ~15 px tall.** The HUD owns rows 0–285 and the
+  player's own bodywork owns 282–653. `CHASE.dist 4.2 / height 1.7` was tuned in
+  round 4 against promo stills; nobody re-checked the play frame.
+- **The stewards cannot fire with the starting kit.** All three starter tricks
+  are contact-band (`contactMul 0.16`), generating ~2.7 suspicion/s against a
+  decay of 2.6–4.2/s. One full race: 12 fouls, peak suspicion 24/100, zero
+  investigations. Then SCATTER GUN puts 147 on the board in one press.
+- **The investigation is a hidden coin flip.** `0.1 + 0.62 × hype/100`, read
+  when the timer expires — so the 3.2 s of crowd you build genuinely decides the
+  verdict and nothing says so, while hype decay makes doing nothing worse.
+- **Damage spirals with no recovery valve.** Hand-driven: P1 at 8.4 s → P8 at
+  25 km/h by 26.4 s, 17 parts gone, two laps still to run.
+- **Spectacle does not pay.** Crowd bonus is 6–10% of purse against 100% for
+  winning, and roadside pickups out-earned prize money 2.5× in a real result.
+- **`fireAttack` picks a random ready skill; `previewAttack` shows the first**,
+  so the risk verdict on the button — "the entire tutorial" — is wrong about
+  half the time in a pack.
+- Won parts are never fitted (`ownPart` adds an id and stops), the crate reveals
+  its tier before the reveal, and the 230-word tutorial modal is the most modal
+  thing in the build.

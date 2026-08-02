@@ -259,6 +259,16 @@ lock it cannot explain. Circuits and events list several gates and satisfying
 | `haptics.js` | vibration; a pure bus listener, knows nothing about the game |
 | `flow.js` | screen routing, attract mode; the only module that acts on menu intent |
 | `menus.js` | every screen; emits on the bus, never calls game systems |
+| `cloud.js` | br8t account + cloud save; optional, imported dynamically |
+
+`cloud.js` mirrors the one save key to the player's br8t account through
+`/lib/auth/localsync.js`. `main.js` imports it with a `.catch()` and skips it
+under `?auto`, `?shot` and `?wipe`, so a failed load — or a harness run — is
+just a local save. It counts finished races off the bus (`race:done`) and vetoes
+the sign-in callout whenever `state.screen` is a race, replay, cutscene or the
+results card. The avatar floats top-right and publishes its width as
+`--br8t-account-space`; `.hud-top`, `.screen-head`, `.title-stage` and
+`#btn-pause` all move out from under it with a `0px` fallback.
 
 Menus emit intentions, `flow.js` acts on them. That is what keeps the UI free of
 game logic and the game free of DOM.

@@ -382,10 +382,12 @@ function onRaceDone(results) {
     const pass = checkObjective(ev, results);
     results.objectivePassed = pass;
     results.objective = ev.objective;
-    const out = resolveRound(ev.titleId, pass);
+    const out = resolveRound(ev.titleId, pass, ev.round);
     results.titleOutcome = out;
     results.titleName = titleById(ev.titleId).name;
-    if (pass && ev.chestOnClear) grantChest(ev.chestOnClear);
+    // Only when the round actually resolved — otherwise re-running a settled
+    // round from RACE AGAIN pays its crate again, every time.
+    if (pass && out && ev.chestOnClear) grantChest(ev.chestOnClear);
     if (out && out.champion) {
       grantChest('sponsor');
       grantChest('sponsor');
@@ -555,7 +557,9 @@ export function openAllChests() {
   const haul = newHaul();
   let guard = 0;
   while (profile.chests.length && guard++ < 200) {
-    if (!openInto(haul)) break;
+    // `continue`, not `break`: takeChest always shifts, so a junk entry from an
+    // old save cannot loop here, and must not strand the rest of the pile.
+    if (!openInto(haul)) continue;
   }
   if (!haul.crates) { goto('garage'); return; }
   finishHaul(haul);

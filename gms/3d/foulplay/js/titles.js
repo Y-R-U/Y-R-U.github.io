@@ -221,11 +221,15 @@ function buildRoundField(t, st, pair) {
 // ---------------------------------------------------------------------------
 // Resolving a round
 // ---------------------------------------------------------------------------
-export function resolveRound(id, playerWon) {
+// `round` is the round the race was started for. RACE AGAIN re-runs the same
+// event descriptor, and resolving an already-settled round a second time
+// eliminates another pair of seeds and skips the player up the tree.
+export function resolveRound(id, playerWon, round) {
   const t = titleById(id);
   const st = titleState(id);
   const pair = currentPairing(id);
   if (!t || !st || !pair) return null;
+  if (round != null && round !== st.round) return null;
 
   // Resolve every match in the round from ONE snapshot of who was still in it.
   // Eliminating the player's opponent first and then re-reading the list makes
