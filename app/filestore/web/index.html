@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>br8t files</title>
+<link rel="stylesheet" href="/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📦</text></svg>">
+</head>
+<body>
+
+<div id="boot" class="boot">loading…</div>
+
+<!-- ───────────────────────────────────────────────── sign in -->
+<section id="view-login" class="view center" hidden>
+  <form class="card auth" id="login-form">
+    <h1 class="brand">br8t <span>files</span></h1>
+    <p class="sub">Project file store for Addon Studio</p>
+    <label>Username<input id="login-user" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+    <label>Password<input id="login-pass" type="password" autocomplete="current-password" required></label>
+    <p class="err" id="login-err" hidden></p>
+    <button class="btn primary" type="submit">Sign in</button>
+  </form>
+</section>
+
+<!-- ───────────────────────────────────── forced password reset -->
+<section id="view-reset" class="view center" hidden>
+  <form class="card auth" id="reset-form">
+    <h1 class="brand">Choose a password</h1>
+    <p class="sub">Your account was created with a temporary password. Pick your own to continue.</p>
+    <label>Temporary password<input id="reset-current" type="password" autocomplete="current-password" required></label>
+    <label>New password<input id="reset-new" type="password" autocomplete="new-password" minlength="8" required></label>
+    <label>Confirm new password<input id="reset-new2" type="password" autocomplete="new-password" minlength="8" required></label>
+    <p class="hint">At least 8 characters.</p>
+    <p class="err" id="reset-err" hidden></p>
+    <button class="btn primary" type="submit">Set password &amp; continue</button>
+  </form>
+</section>
+
+<!-- ───────────────────────────────────────────────── main app -->
+<div id="app" class="app" hidden>
+  <header class="topbar">
+    <button class="brandbtn" id="nav-home">br8t <span>files</span></button>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="who">
+      <span class="badge" id="who-role"></span>
+      <span id="who-name"></span>
+      <button class="btn ghost sm" id="btn-changepw">Password</button>
+      <button class="btn ghost sm" id="btn-logout">Sign out</button>
+    </div>
+  </header>
+
+  <main id="main"></main>
+</div>
+
+<!-- generic modal host -->
+<div id="modal-host" class="modal-host" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal" role="dialog" aria-modal="true" id="modal"></div>
+</div>
+
+<div id="toasts" class="toasts"></div>
+
+<script src="/app.js" type="module"></script>
+</body>
+</html>

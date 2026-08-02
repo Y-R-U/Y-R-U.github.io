@@ -1,0 +1,227 @@
+package main
+
+import (
+	"database/sql"
+	"errors"
+	"log"
+	"strconv"
+	"time"
+
+	_ "modernc.org/sqlite"
+)
+
+var db *sql.DB
+
+const schema = `
+CREATE TABLE IF NOT EXISTS users (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  username    TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  email       TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
+  pass_hash   TEXT NOT NULL,
+  role        TEXT NOT NULL CHECK (role IN ('admin','lead','user')),
+  must_reset  INTEGER NOT NULL DEFAULT 0,
+  disabled    INTEGER NOT NULL DEFAULT 0,
+  created_by  INTEGER,
+  created_at  INTEGER NOT NULL,
+  last_login  INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT NOT NULL,
+  slug        TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  owner_id    INTEGER NOT NULL REFERENCES users(id),
+  quota_bytes INTEGER NOT NULL,
+  created_at  INTEGER NOT NULL
+);
+
+-- Explicit grants. A project's owner (lead) and any admin always have access
+-- without a row here; this table is only for the extra users a lead adds.
+CREATE TABLE IF NOT EXISTS project_members (
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  added_at   INTEGER NOT NULL,
+  PRIMARY KEY (project_id, user_id)
+);
+
+-- Mirrors what is on disk. The filesystem is the source of truth for bytes;
+-- this table is the index we query for listings and quota sums, so it must be
+-- written in the same critical section as the file itself.
+CREATE TABLE IF NOT EXISTS files (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id  INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  path        TEXT NOT NULL,
+  size        INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL,
+  updated_by  INTEGER,
+  UNIQUE (project_id, path)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  token      TEXT PRIMARY KEY,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS audit (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  at         INTEGER NOT NULL,
+  user_id    INTEGER,
+  username   TEXT NOT NULL DEFAULT '',
+  project_id INTEGER,
+  action     TEXT NOT NULL,
+  detail     TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS idx_files_project  ON files(project_id);
+CREATE INDEX IF NOT EXISTS idx_members_user   ON project_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_at       ON audit(at DESC);
+`
+
+func openDB(path string) {
+	var err error
+	// _busy_timeout keeps concurrent uploads from failing outright on a lock;
+	// WAL lets reads continue while a large upload is committing.
+	db, err = sql.Open("sqlite", path+"?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)")
+	if err != nil {
+		log.Fatalf("open db: %v", err)
+	}
+	// modernc's driver is not safe to hammer from many connections on a 1 vCPU
+	// box, and SQLite serialises writes anyway.
+	db.SetMaxOpenConns(1)
+	if _, err := db.Exec(schema); err != nil {
+		log.Fatalf("schema: %v", err)
+	}
+}
+
+/* ------------------------------------------------------------- settings */
+
+func setting(key string, def int64) int64 {
+	var v string
+	if err := db.QueryRow(`SELECT value FROM settings WHERE key=?`, key).Scan(&v); err != nil {
+		return def
+	}
+	n, err := strconv.ParseInt(v, 10, 64)
+	if err != nil {
+		return def
+	}
+	return n
+}
+
+func setSetting(key string, v int64) error {
+	_, err := db.Exec(`INSERT INTO settings(key,value) VALUES(?,?)
+	                   ON CONFLICT(key) DO UPDATE SET value=excluded.value`,
+		key, strconv.FormatInt(v, 10))
+	return err
+}
+
+// Admin-tunable limits. Defaults match the brief: 100 MB per project.
+func defaultQuota() int64 { return setting("default_quota_bytes", 100<<20) }
+func globalCap() int64    { return setting("global_cap_bytes", 3<<30) }
+func maxUpload() int64    { return setting("max_upload_bytes", 100<<20) }
+
+/* ---------------------------------------------------------------- users */
+
+type User struct {
+	ID        int64  `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	MustReset bool   `json:"mustReset"`
+	Disabled  bool   `json:"disabled"`
+	CreatedBy int64  `json:"createdBy"`
+	CreatedAt int64  `json:"createdAt"`
+	LastLogin int64  `json:"lastLogin"`
+}
+
+const userCols = `id, username, email, role, must_reset, disabled,
+                  COALESCE(created_by,0), created_at, COALESCE(last_login,0)`
+
+func scanUser(row interface{ Scan(...any) error }) (*User, error) {
+	var u User
+	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Role, &u.MustReset,
+		&u.Disabled, &u.CreatedBy, &u.CreatedAt, &u.LastLogin)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+func userByID(id int64) (*User, error) {
+	return scanUser(db.QueryRow(`SELECT `+userCols+` FROM users WHERE id=?`, id))
+}
+
+func userByName(name string) (*User, error) {
+	return scanUser(db.QueryRow(`SELECT `+userCols+` FROM users WHERE username=?`, name))
+}
+
+var errNoRows = sql.ErrNoRows
+
+func isNoRows(err error) bool { return errors.Is(err, sql.ErrNoRows) }
+
+/* -------------------------------------------------------------- projects */
+
+type Project struct {
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Slug       string `json:"slug"`
+	OwnerID    int64  `json:"ownerId"`
+	OwnerName  string `json:"ownerName"`
+	QuotaBytes int64  `json:"quotaBytes"`
+	UsedBytes  int64  `json:"usedBytes"`
+	FileCount  int64  `json:"fileCount"`
+	CreatedAt  int64  `json:"createdAt"`
+}
+
+const projectSelect = `
+SELECT p.id, p.name, p.slug, p.owner_id, COALESCE(u.username,'?'), p.quota_bytes,
+       COALESCE((SELECT SUM(size) FROM files f WHERE f.project_id=p.id),0),
+       COALESCE((SELECT COUNT(*)  FROM files f WHERE f.project_id=p.id),0),
+       p.created_at
+FROM projects p LEFT JOIN users u ON u.id=p.owner_id`
+
+func scanProject(row interface{ Scan(...any) error }) (*Project, error) {
+	var p Project
+	err := row.Scan(&p.ID, &p.Name, &p.Slug, &p.OwnerID, &p.OwnerName,
+		&p.QuotaBytes, &p.UsedBytes, &p.FileCount, &p.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
+
+func projectByID(id int64) (*Project, error) {
+	return scanProject(db.QueryRow(projectSelect+` WHERE p.id=?`, id))
+}
+
+// Total bytes stored across every project — the figure the global cap guards.
+func totalUsed() int64 {
+	var n int64
+	db.QueryRow(`SELECT COALESCE(SUM(size),0) FROM files`).Scan(&n)
+	return n
+}
+
+/* ----------------------------------------------------------------- audit */
+
+func logAudit(u *User, projectID int64, action, detail string) {
+	var uid any
+	name := ""
+	if u != nil {
+		uid, name = u.ID, u.Username
+	}
+	var pid any
+	if projectID > 0 {
+		pid = projectID
+	}
+	if _, err := db.Exec(`INSERT INTO audit(at,user_id,username,project_id,action,detail)
+	                      VALUES(?,?,?,?,?,?)`,
+		time.Now().Unix(), uid, name, pid, action, detail); err != nil {
+		log.Printf("audit: %v", err)
+	}
+}

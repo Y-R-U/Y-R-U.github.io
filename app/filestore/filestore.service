@@ -1,0 +1,29 @@
+[Unit]
+Description=filestore — files.br8t.com project file store
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/apps/filestore
+ExecStart=/srv/apps/filestore/filestore
+Restart=on-failure
+RestartSec=3
+Environment=FILESTORE_ADDR=127.0.0.1:8005
+Environment=FILESTORE_DATA=/srv/data/filestore
+Environment=FILESTORE_ADMIN_USER=aaron@br8t.com
+# The bootstrap admin password is generated on first start and written to the
+# journal once (journalctl -u filestore | grep one-time). Set it explicitly here
+# only if you'd rather choose it — it must still be changed at first login.
+# Environment=FILESTORE_ADMIN_PASSWORD=
+
+# hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/data/filestore
+
+[Install]
+WantedBy=multi-user.target

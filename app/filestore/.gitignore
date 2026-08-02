@@ -1,0 +1,6 @@
+# Local build artefacts and data — never the uploaded files.
+filestore
+data/
+*.db
+*.db-wal
+*.db-shm
