@@ -1,11 +1,11 @@
 // Boot and the frame loop. Everything else is behind flow.js.
 
 import { loadProfile, profile } from './save.js';
-import { initRenderer, render } from './render.js';
+import { initRenderer, render, isContextLost, refreshAfterResume } from './render.js';
 import { initInput } from './input.js';
 import { initAudio } from './audio.js';
 import { initHaptics } from './haptics.js';
-import { boot, update, present } from './flow.js';
+import { boot, update, present, pauseForBlur } from './flow.js';
 import { state } from './state.js';
 import { $, clamp } from './utils.js';
 import { SPEED_ARG, DEV_MODE, SHOT_MODE, AUTO_MODE } from './config.js';
@@ -43,6 +43,12 @@ function frame(now) {
   last = now;
   if (dt > 0.5) dt = 1 / 60;    // tab was hidden: do not teleport everything
   dt = Math.min(dt, 0.1) * scale;
+
+  // Nothing to draw into. Keep the clock ticking over so the first frame after
+  // a restore is an ordinary one, but do not simulate or render — issuing GL
+  // calls at a dead context is what turns "backgrounded for a minute" into a
+  // permanently black screen.
+  if (isContextLost()) { acc = 0; return; }
   state.dt = dt;
   state.time += dt;
 
@@ -64,12 +70,33 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 // ---------------------------------------------------------------------------
+// Coming back from the home screen
+// ---------------------------------------------------------------------------
+// Three things have to happen, and none of them were happening. The clock has
+// to be re-based, or the first frame back carries however long you were away
+// (the 0.5s guard above catches the worst of it, but the accumulator can still
+// be holding a step); the canvas has to be re-measured, because a phone hands
+// it back at a different size once the address bar has been in and out; and a
+// race in progress should not have been running while you were not looking.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { pauseForBlur(); return; }
+  last = performance.now();
+  acc = 0;
+  refreshAfterResume();
+});
+// Safari on iOS does not reliably fire visibilitychange when the app is swiped
+// away, but it does fire pagehide. Window `blur` is deliberately NOT used: it
+// goes off for devtools, for another window taking focus, and in a headless run
+// that never had focus at all, which would silently pause every soak test.
+window.addEventListener('pagehide', pauseForBlur);
+
 if (DEV_MODE) {
   window.__game = { state, profile };
   // The highlights reel is the hardest thing in the game to check by eye — it
   // only exists for a few seconds after a race — so dev mode hands the whole
   // module over and a headless run can harvest, replay and measure it.
   import('./highlights.js').then((hl) => { window.__game.highlights = hl; });
+  import('./render.js').then((r) => { window.__game.render = r; });
   console.log('[foulplay] dev mode — window.__game available');
 
   // Telemetry for balance passes: speed, position and heat, sampled 4×/second.

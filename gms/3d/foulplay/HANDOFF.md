@@ -470,6 +470,65 @@ you watch a crash in slow motion with nothing else to look at had no sparks in
 it. `poseGhost` now throws them per hanging panel at `REPLAY_SPARK_RATE` (14/s,
 deliberately generous — a shower that reads at 1× disappears at 0.38×).
 
+---
+
+# ROUND 5d — surviving a trip to the home screen
+
+Owner: *"I minimised screen on my phone, came back to an in-progress background
+and most of screen black."*
+
+**There was no WebGL context-loss handling anywhere in the game.** No
+`webglcontextlost`, no `webglcontextrestored`, no `visibilitychange`.
+
+A phone browser drops the GL context whenever it feels like it, and
+backgrounding the tab is the usual trigger — a game holding a shadow map, a sky
+shader and eight cars of geometry is exactly what it drops first. The important
+part is that **the default behaviour of the lost event is that the context is
+never restorable**; you have to call `preventDefault()` to opt into a restore.
+Nobody had. So minimising and coming back left three.js issuing GL calls at a
+dead context forever: the HUD is DOM so it kept drawing, and everything behind
+it was black. That is precisely the reported picture.
+
+Now:
+
+- `render.js:watchContext` preventDefaults the loss, flags it, and on restore
+  re-runs `onResize` and forces a shadow-map redraw. Both fire `render:*` events
+  on the bus in case anything else ever needs to know.
+- `render()` and the frame loop both **bail while the context is down**, rather
+  than spending a frame issuing GL at a dead context.
+- `refreshAfterResume()` re-measures the canvas, because a phone hands it back
+  at a different size once the address bar has been in and out — on its own that
+  leaves a black band down the side of an otherwise live picture.
+- A race no longer runs while you are not looking. `flow.js:pauseForBlur` puts
+  the ordinary PAUSE screen up, so you come back to a paused race and choose
+  when to go again instead of being dropped into a corner at 250km/h.
+
+## What could and could not be tested
+
+**Verified headlessly:** both handlers fire with no errors and the scene renders
+perfectly after a full `WEBGL_lose_context` lose→restore cycle; the frame loop
+survives; `visibilitychange` pauses the race and puts PAUSE up; it stays paused
+on return; the canvas matches the window after resume; auto races still run to
+results on hometown and circus.
+
+**NOT reproducible headlessly, be honest about it:** the actual phone failure.
+`WEBGL_lose_context.restoreContext()` is a *forced* restore that bypasses the
+`preventDefault` requirement, so the OLD build also recovers in that test. The
+thing `preventDefault` buys is the browser's own *automatic* restore after a
+real backgrounding, and there is no way to trigger that from CDP. The fix is
+spec-correct and the handlers demonstrably run — but **only a real phone can
+confirm the original symptom is gone.**
+
+## Gotchas
+
+- **Do not listen on window `blur`.** It fires for devtools, for another window
+  taking focus, and in a headless run that never had focus at all — which would
+  silently pause every soak test. `visibilitychange` + `pagehide` are the
+  reliable mobile signals; `pauseForBlur` also no-ops under `?auto=1`/`?shot=1`.
+- **A WebGL canvas cannot be sampled with `drawImage` into a 2D canvas** to
+  check whether anything is being drawn — `preserveDrawingBuffer` is false, so
+  it comes back blank even when the scene is fine. Use a CDP screenshot.
+
 ## Still open (unchanged from round 4)
 
 - Shadow map offset from its caster, applied to one vehicle only.

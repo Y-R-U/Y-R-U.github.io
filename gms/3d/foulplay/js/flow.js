@@ -502,6 +502,20 @@ export function openChest(tierHint) {
 // ---------------------------------------------------------------------------
 // Pause
 // ---------------------------------------------------------------------------
+// The phone went to the home screen mid-race. Stop the world, and put the
+// ordinary pause screen up so the player chooses when to go again rather than
+// being dropped back into a corner at 250km/h. Deliberately NOT togglePause:
+// a race that was already paused has to stay paused, and toggling would let it
+// go the moment they came back.
+export function pauseForBlur() {
+  if (state.screen !== 'race' || state.paused) return;
+  if (AUTO_MODE || SHOT_MODE) return;      // a harness has no home screen
+  state.paused = true;
+  menus.renderPause();
+  menus.showScreen();
+  clearInput();
+}
+
 export function togglePause() {
   if (state.screen !== 'race') return;
   state.paused = !state.paused;

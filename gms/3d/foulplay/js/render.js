@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { LITE_MODE, IS_TOUCH, CAM } from './config.js';
 import { profile } from './save.js';
 import { clamp, lerp } from './utils.js';
+import { emit } from './bus.js';
 
 export let renderer = null;
 export let scene = null;
@@ -453,7 +454,58 @@ export function initRenderer(mount) {
   buildBlobs();
   window.addEventListener('resize', onResize, { passive: true });
   onResize();
+  watchContext();
   return renderer;
+}
+
+// ---------------------------------------------------------------------------
+// Surviving a trip to the home screen
+// ---------------------------------------------------------------------------
+// A phone browser drops the WebGL context whenever it wants — backgrounding the
+// tab is the usual one, and a game holding a shadow map, a sky shader and eight
+// cars' worth of geometry is exactly what it drops first.
+//
+// None of this was handled at all, and the *default* behaviour of the lost
+// event is that the context is never restorable. So minimising the game and
+// coming back left three.js issuing GL calls into a dead context forever: the
+// HUD is DOM so it kept drawing, and everything behind it was black. That is
+// the "came back to most of the screen black".
+//
+// `preventDefault()` is the whole fix for the restore path — three.js
+// reinitialises its own GL state on `webglcontextrestored` and re-uploads
+// geometries and textures lazily — but the frame loop must not run while the
+// context is down, and a couple of phones only ever restore after a resize.
+let contextLost = false;
+export const isContextLost = () => contextLost;
+
+function watchContext() {
+  const canvas = renderer.domElement;
+  canvas.addEventListener('webglcontextlost', (e) => {
+    // Without this the browser will NOT restore the context, ever.
+    e.preventDefault();
+    contextLost = true;
+    console.warn('[foulplay] WebGL context lost — waiting for restore');
+    emit('render:contextLost', {});
+  }, false);
+
+  canvas.addEventListener('webglcontextrestored', () => {
+    contextLost = false;
+    console.warn('[foulplay] WebGL context restored');
+    // The drawing buffer comes back at whatever size the browser feels like,
+    // and shadow maps have to be told to redraw at least once.
+    onResize();
+    if (renderer.shadowMap) renderer.shadowMap.needsUpdate = true;
+    emit('render:contextRestored', {});
+  }, false);
+}
+
+// Called when the tab comes back. iOS in particular hands the canvas back at
+// the wrong size after the address bar has been in and out, which on its own
+// leaves a black band down the side of an otherwise live picture.
+export function refreshAfterResume() {
+  if (!renderer) return;
+  onResize();
+  if (renderer.shadowMap) renderer.shadowMap.needsUpdate = true;
 }
 
 function onResize() {
@@ -992,7 +1044,7 @@ export function trackShadow(target) {
 }
 
 export function render() {
-  if (!renderer) return;
+  if (!renderer || contextLost) return;
   const cp = camera.position;
   skyMesh.position.copy(cp);
   starField.position.copy(cp);
