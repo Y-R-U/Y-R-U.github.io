@@ -1,13 +1,22 @@
 // The highlights reel. Everything on track is sampled into a ring buffer at
-// 20Hz; when something worth watching happens we copy the last two seconds out
-// of the ring and keep appending for another second and a half.
+// 20Hz; when something worth watching happens we copy the last second out of
+// the ring and keep appending for another second (or two and a half, for a
+// wreck).
 //
-// Playback rebuilds fresh cars and drives them from the recording, so a clip
-// can show a roof still attached that came off thirty seconds ago.
+// Playback rebuilds fresh cars and drives them from the recording. The samples
+// therefore have to carry every bit of car state the clip needs to look right —
+// which panels are still on, which are HANGING OFF, and how beaten up the shell
+// is. Recording only "present or gone" is what used to make every highlight
+// show a factory-clean car with panels popping out of existence.
+//
+// `STRIDE` is versioned into each saved memory, because a memory in
+// localStorage outlives the layout it was written with.
 
 import * as THREE from 'three';
 import { scene, setEnvironment, disposeGroup } from './render.js';
 import { buildCar, PART_IDS } from './carfactory.js';
+import { danglePose } from './car.js';
+import { spawnScrap } from './debris.js';
 import { setCamera } from './camera.js';
 import { setFov } from './render.js';
 import { buildTrack } from './trackgen.js';
@@ -21,12 +30,20 @@ import { clamp, clamp01, lerp, rand, pick, wrap } from './utils.js';
 
 const HZ = 20;
 const DT = 1 / HZ;
-const PRE = 2.3;               // seconds of lead-in kept in the ring
-const POST = 1.6;              // seconds recorded after the trigger
+// Short. A highlight is the moment and just enough run-up to see it coming —
+// these used to be 2.3s of lead-in and, once the slow motion was integrated, a
+// wreck clip ran for EIGHTEEN SECONDS of wall clock. A six-clip reel was over
+// two minutes, which is why the reel felt like it was showing nothing: it was
+// mostly a car driving normally, in slow motion.
+const PRE = 1.0;               // seconds of lead-in kept in the ring
+const POST = 0.9;              // seconds recorded after the trigger
 // A car actually coming apart takes longer than that, and it is the best thing
-// in the game to watch, so wrecks get their own, longer tail.
-const POST_WRECK = 3.4;
-const STRIDE = 9;              // floats per car per sample
+// in the game to watch, so wrecks get their own, longer tail — long enough to
+// cover `CRASH.breakUpSpread`, and no longer.
+const POST_WRECK = 2.6;
+// floats per car per sample: position(3) quat(4) visible(1) attached(1)
+// dangling(1) damage(1)
+const STRIDE = 11;
 const MAX_CLIPS = 26;
 const MAX_MEMORIES = 8;
 
@@ -109,6 +126,8 @@ export function recordFrame(dt, list) {
     f[o + 5] = c.worldQuat.z; f[o + 6] = c.worldQuat.w;
     f[o + 7] = c.mesh.visible && c.alive ? 1 : 0;
     f[o + 8] = partMask(c);
+    f[o + 9] = dangleMask(c);
+    f[o + 10] = c.maxHp ? clamp01(1 - c.hp / c.maxHp) : 0;
   }
   ringAt = (ringAt + 1) % ringLen;
 
@@ -128,6 +147,21 @@ function partMask(car) {
   let m = 0;
   for (let i = 0; i < PART_IDS.length; i++) {
     if (car.parts[PART_IDS[i]]) m |= (1 << i);
+  }
+  return m;
+}
+
+// Which panels are hanging half off. Recording only "present or gone" is why
+// the reel never showed any damage: a dangling panel is still present, so the
+// replay drew it perfectly bolted on in its home position, and then popped it
+// out of existence when it finally let go. All the flapping — the single best
+// thing in a crash — happened entirely off camera.
+function dangleMask(car) {
+  if (!car.danglers.length) return 0;
+  let m = 0;
+  for (let i = 0; i < PART_IDS.length; i++) {
+    const o = car.parts[PART_IDS[i]];
+    if (o && o.userData.part.dangling > 0) m |= (1 << i);
   }
   return m;
 }
@@ -167,6 +201,7 @@ function mark(kind, car, score, label) {
     kind, label, score, at: now,
     focus: cars.indexOf(car),
     frames,
+    stride: STRIDE,
     left: wreck ? POST_WRECK : POST,
     // A wreck gets the showcase shot: in close, slowed right down, orbiting the
     // car while it sheds panels. Everything else cuts around as before.
@@ -212,7 +247,7 @@ function buildGhosts(specs) {
     const g = buildCar({ style: s.style, body: s.body, trim: s.trim, partHp: 1 });
     scene.add(g);
     g.visible = false;
-    ghosts.push({ mesh: g, parts: g.userData.parts, lastMask: -1 });
+    ghosts.push({ mesh: g, parts: g.userData.parts, lastMask: -1, lastDangle: -1 });
   }
 }
 
@@ -257,7 +292,7 @@ export function stepClip(dir) {
   play.i = next;
   play.clip = play.list[next];
   play.t = 0;
-  for (const g of ghosts) g.lastMask = -1;
+  for (const g of ghosts) { g.lastMask = -1; g.lastDangle = -1; }
   announce();
 }
 
@@ -324,6 +359,9 @@ export function playSaved(mem, onDone) {
   const clip = {
     kind: mem.kind, label: mem.label, shot: mem.shot, wreck: mem.wreck,
     focus: mem.focus, trigger: mem.trigger, frames, at: 0, savedAlready: true,
+    // A memory saved before the dangle/damage fields existed is 9 wide. Reading
+    // it at the current stride would walk straight into the next car's data.
+    stride: mem.stride || 9,
   };
   play = { list: [clip], i: 0, t: 0, onDone, clip, rate: 1, saved: true };
   state.screen = 'replay';
@@ -364,13 +402,14 @@ export function updateHighlightPlayback(dt) {
   const triggerT = (clip.trigger / n);
   const phase = play.t / (n * DT);
   if (clip.wreck) {
-    // A wreck gets held right down through the whole break-up, then eased back
-    // to normal speed on the way out. This is the shot the game is *for*.
-    play.rate = phase < triggerT - 0.06 ? 1.0
-      : phase < triggerT + 0.55 ? 0.22
-      : lerp(0.22, 0.85, clamp01((phase - triggerT - 0.55) / 0.3));
+    // Held down through the break-up, then eased back out. 0.22 over half the
+    // clip made a wreck take eighteen seconds to watch — long enough that you
+    // stopped seeing the crash and started waiting for it to end.
+    play.rate = phase < triggerT - 0.04 ? 1.0
+      : phase < triggerT + 0.38 ? 0.38
+      : lerp(0.38, 0.9, clamp01((phase - triggerT - 0.38) / 0.25));
   } else {
-    play.rate = phase > triggerT - 0.08 && phase < triggerT + 0.22 ? 0.34 : 1.0;
+    play.rate = phase > triggerT - 0.08 && phase < triggerT + 0.22 ? 0.45 : 1.0;
   }
   play.t += dt * play.rate;
 
@@ -380,9 +419,11 @@ export function updateHighlightPlayback(dt) {
   const a = clip.frames[i0];
   const b = clip.frames[Math.min(n - 1, i0 + 1)];
 
+  const S = clip.stride || STRIDE;
+  const rich = S >= 11;            // does this clip carry dangle + damage?
   for (let i = 0; i < ghosts.length; i++) {
     const g = ghosts[i];
-    const o = i * STRIDE;
+    const o = i * S;
     const vis = a[o + 7] > 0.5;
     g.mesh.visible = vis;
     if (!vis) continue;
@@ -394,24 +435,41 @@ export function updateHighlightPlayback(dt) {
     g.mesh.quaternion.copy(_q);
 
     const mask = a[o + 8];
+    const dang = rich ? a[o + 9] : 0;
+    const dmg = rich ? (a[o + 10] || 0) : 0;
     if (mask !== g.lastMask) {
       for (let k = 0; k < PART_IDS.length; k++) {
         const part = g.parts[PART_IDS[k]];
         if (!part) continue;
         const shown = (mask & (1 << k)) !== 0;
         if (part.visible && !shown) {
-          // A panel leaving in slow motion deserves more than six sparks.
-          fx.sparkBurst(_p, _up, clip.wreck ? 22 : 8, 0xffc470, clip.wreck ? 13 : 7);
-          if (clip.wreck) fx.smokePuff(_p, 3, 0xb8b0a2, 1.6, 1.4);
+          // A panel leaving in slow motion deserves more than six sparks, and
+          // it should leave from WHERE IT WAS, not from the middle of the car.
+          part.getWorldPosition(_p2);
+          fx.sparkBurst(_p2, _up, clip.wreck ? 26 : 10, 0xffc470, clip.wreck ? 13 : 7);
+          if (clip.wreck) {
+            fx.smokePuff(_p2, 3, 0xb8b0a2, 1.6, 1.4);
+            // Something has to actually leave. The ring buffer never recorded
+            // debris, so a replay wreck used to shed its panels into thin air.
+            const tr = state.track;
+            const floor = tr && tr.groundProbe ? tr.groundProbe(_p2, null) : _p2.y - 1;
+            spawnScrap(_p2, 3, 0xb0b6bd, floor, 9);
+          }
         }
         part.visible = shown;
       }
       g.lastMask = mask;
     }
+
+    // Flap whatever was hanging off, and beat up whatever is left. The ghost
+    // has the same meshes and the same hinge specs as a real car, so it can
+    // run its own swing — it does not need to match the original frame for
+    // frame, it needs to LOOK like a car with its bodywork coming off.
+    poseGhost(g, dang, dmg, play.t);
   }
 
   // camera
-  const fo = clamp(clip.focus, 0, ghosts.length - 1) * STRIDE;
+  const fo = clamp(clip.focus, 0, ghosts.length - 1) * S;
   _look.set(lerp(a[fo], b[fo], f), lerp(a[fo + 1], b[fo + 1], f), lerp(a[fo + 2], b[fo + 2], f));
   aimReplayCamera(clip, _look, phase);
 
@@ -425,10 +483,48 @@ export function updateHighlightPlayback(dt) {
     }
     play.clip = play.list[play.i];
     play.t = 0;
-    for (const g of ghosts) g.lastMask = -1;
+    for (const g of ghosts) { g.lastMask = -1; g.lastDangle = -1; }
     announce();
   }
   return true;
+}
+
+// Pose one ghost's bodywork: hanging panels swing, surviving panels carry a
+// dent proportional to how beaten up the car was at that moment.
+//
+// The ghost is built fresh at full health, so without this a highlight showed a
+// factory-clean car — even one that had lost eight panels earlier in the race.
+const _gpose = { ax: 0, ay: 0, az: 0, s: 0, clampGround: true, dragY: 0 };
+function poseGhost(g, dangMask, dmg, t) {
+  for (let k = 0; k < PART_IDS.length; k++) {
+    const obj = g.parts[PART_IDS[k]];
+    if (!obj || !obj.visible) continue;
+    const p = obj.userData.part;
+    if (!p || !p.home) continue;
+    const hanging = (dangMask & (1 << k)) !== 0;
+
+    if (hanging && p.flap) {
+      if (!p.dangleSeed) p.dangleSeed = (k * 1.7) % 6.28;
+      // Replay has no history, so drive `loose` off the clip clock: the panel
+      // is visibly tearing further open across the shot.
+      danglePose(obj, p, t * 6, 0.8, clamp01(t * 0.5), _gpose);
+      continue;
+    }
+    if (p.wheel) continue;                 // a wheel does not dent, it comes off
+
+    // Dents. Deterministic per part, so a panel does not jitter between frames.
+    // The rotation is always written: a panel that was flapping a moment ago
+    // would otherwise keep the quaternion `danglePose` left on it and sit at a
+    // permanent angle after it had been re-seated.
+    const d = dmg * 0.85;
+    if (d < 0.02) { obj.position.copy(p.home); obj.rotation.set(0, 0, 0); continue; }
+    obj.position.set(
+      p.home.x + Math.sin(k * 7.7) * d * 0.09,
+      p.home.y - d * 0.05,
+      p.home.z + Math.cos(k * 5.3) * d * 0.07
+    );
+    obj.rotation.set(0, 0, Math.sin(k * 3.1) * d * 0.22);
+  }
 }
 
 function aimReplayCamera(clip, target, phase) {
@@ -474,6 +570,10 @@ function aimReplayCamera(clip, target, phase) {
   setCamera(_p, target);
   setFov(44);
 }
+
+// Debug accessor: the reel is on screen for a few seconds and nothing else can
+// see inside it, so a headless test can check the ghosts are actually posed.
+export const __ghosts = () => ghosts;
 
 export const isReplaying = () => !!play;
 export const replayInfo = () => (play ? { clip: play.clip, index: play.i, total: play.list.length } : null);

@@ -66,6 +66,10 @@ requestAnimationFrame(frame);
 // ---------------------------------------------------------------------------
 if (DEV_MODE) {
   window.__game = { state, profile };
+  // The highlights reel is the hardest thing in the game to check by eye — it
+  // only exists for a few seconds after a race — so dev mode hands the whole
+  // module over and a headless run can harvest, replay and measure it.
+  import('./highlights.js').then((hl) => { window.__game.highlights = hl; });
   console.log('[foulplay] dev mode — window.__game available');
 
   // Telemetry for balance passes: speed, position and heat, sampled 4×/second.

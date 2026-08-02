@@ -43,6 +43,7 @@ const _fe = new THREE.Euler();
 const _fp = new THREE.Vector3();
 const _fd = new THREE.Vector3();
 const _drag = new THREE.Vector3();     // car-space point that is on the tarmac
+const _pose = { ax: 0, ay: 0, az: 0, s: 0, clampGround: true, dragY: 0 };
 
 // Pose a panel that is hanging off its hinge. Rotating a mesh about its own
 // centre makes it float away from the car; a torn panel has to stay ATTACHED at
@@ -62,6 +63,87 @@ function poseFlap(obj, home, flap, ax, ay, az) {
   _fd.copy(flap.drag).sub(P).applyQuaternion(_fq);
   _drag.set(home.x + P.x + _fd.x, home.y + P.y + _fd.y, home.z + P.z + _fd.z);
   return _drag.y;
+}
+
+// How a hinged panel sits RIGHT NOW. Pulled out of `updateDanglers` so the
+// highlights reel can drive it too: a replay ghost has the same part meshes and
+// the same flap specs, so it can flap for itself rather than being shown a
+// pristine car with panels popping out of existence.
+//
+// `loose` runs 0 (just tore) to 1 (about to leave); `flapK` is speed 0..1. The
+// three angles are written onto `out` because the caller needs them again to
+// clamp the swing against the road.
+export function danglePose(obj, p, t, flapK, loose, out) {
+  const f = p.flap;
+  const seed = p.dangleSeed || 0;
+  const w = t * f.rate * (0.55 + 0.95 * flapK) + seed;
+  // A hinged panel does not swing like a pendulum, it gets thrown open and
+  // banged shut, so the drive is one-sided rather than a sine.
+  const s = 0.5 - 0.5 * Math.cos(w);
+  const swing = f.ang0 + (f.ang - f.ang0) * (0.44 + 0.56 * loose) * (0.45 + 0.55 * flapK);
+  const buzz = f.buzz ? Math.sin(t * f.buzz + seed * 3) * 0.055 * (0.35 + flapK) * (0.4 + loose) : 0;
+  let ax = 0, ay = 0, az = 0, clampGround = true;
+
+  switch (f.style) {
+    case 'bonnet':      // hinged at the scuttle: stands up, slams back down
+    case 'boot':        // hinged at the cabin: flaps up and down at the tail
+      ax = f.dir * swing * (0.34 + 0.66 * Math.pow(s, 0.65)) + buzz;
+      ay = buzz * 0.6;
+      az = Math.sin(w * 0.53 + seed) * 0.09 * loose;
+      break;
+    case 'roof':        // peels back off the pillars
+      ax = f.dir * swing * (0.35 + 0.65 * s);
+      az = f.twist * swing * Math.sin(w * 0.7 + seed) * 0.6;
+      ay = buzz;
+      break;
+    case 'door':        // swings out on its hinge and scrapes its back corner
+      ay = f.dir * swing * (0.3 + 0.7 * s);
+      ax = f.sag * swing * (0.35 + 0.65 * s) + buzz;
+      az = buzz * 0.5;
+      break;
+    case 'bumper':      // hanging by one corner, ploughing the road
+      az = f.dir * swing * (0.28 + 0.72 * s);
+      ay = f.twist * swing * (0.3 + 0.7 * s);
+      ax = buzz * 1.4;
+      break;
+    case 'spoiler':     // waggles and twists, never touches anything
+      az = f.dir * swing * Math.sin(w) + buzz * 2;
+      ay = f.twist * swing * Math.sin(w * 0.71 + 1.1);
+      ax = buzz;
+      break;
+    case 'wing':        // vibrates itself loose, then tears outward
+      az = f.dir * swing * (0.12 + 0.88 * loose * s) + buzz * 2.2;
+      ax = buzz * 2.6;
+      ay = f.twist * swing * loose * Math.sin(w * 1.3);
+      break;
+    case 'sill':        // drops its trailing end and grinds the whole way
+      ax = f.dir * swing * (0.35 + 0.65 * s) + buzz;
+      az = f.twist * swing * Math.sin(w * 0.8 + seed);
+      break;
+    case 'mirror':      // flutters on its stalk
+      az = f.dir * swing * (0.35 + 0.65 * s) + buzz * 3;
+      ay = f.twist * swing * Math.sin(w * 1.7 + seed);
+      break;
+    case 'wheel':       // hanging off the stub axle, still turning
+      az = f.dir * swing * (0.4 + 0.6 * s);
+      ay = f.twist * swing * Math.sin(w * 0.6);
+      ax = p.spin || 0;
+      clampGround = false;      // it is already sitting on the road
+      break;
+    default:
+      az = f.dir * swing * (0.3 + 0.7 * s) + buzz;
+      ax = buzz;
+  }
+
+  out.ax = ax; out.ay = ay; out.az = az;
+  out.s = s; out.clampGround = clampGround;
+  out.dragY = poseFlap(obj, p.home, f, ax, ay, az);
+  return out;
+}
+
+// Re-pose a panel at a fraction of its swing, for the ground clamp.
+export function danglePoseScaled(obj, p, out, k) {
+  return poseFlap(obj, p.home, p.flap, out.ax * k, out.ay * k, out.az * k);
 }
 
 // Panels that are only *called* by their own name in one place. New part ids
@@ -1045,83 +1127,25 @@ export class Car {
       // A panel tears a little looser every second it hangs on: `loose` runs 0
       // (just went) to 1 (about to leave), and everything gets bigger with it.
       const loose = clamp01(1 - p.dangling / (p.dangleFor || 4));
-      const seed = p.dangleSeed;
-      const w = t * f.rate * (0.55 + 0.95 * flapK) + seed;
-      // A hinged panel does not swing like a pendulum, it gets thrown open and
-      // banged shut, so the drive is one-sided rather than a sine.
-      const s = 0.5 - 0.5 * Math.cos(w);
-      const swing = f.ang0 + (f.ang - f.ang0) * (0.44 + 0.56 * loose) * (0.45 + 0.55 * flapK);
-      const buzz = f.buzz ? Math.sin(t * f.buzz + seed * 3) * 0.055 * (0.35 + flapK) * (0.4 + loose) : 0;
-      let ax = 0, ay = 0, az = 0, clampGround = true;
+      const pose = danglePose(obj, p, t, flapK, loose, _pose);
+      const s = pose.s;
 
-      switch (f.style) {
-        case 'bonnet':      // hinged at the scuttle: stands up, slams back down
-        case 'boot':        // hinged at the cabin: flaps up and down at the tail
-          ax = f.dir * swing * (0.34 + 0.66 * Math.pow(s, 0.65)) + buzz;
-          ay = buzz * 0.6;
-          az = Math.sin(w * 0.53 + seed) * 0.09 * loose;
-          break;
-        case 'roof':        // peels back off the pillars
-          ax = f.dir * swing * (0.35 + 0.65 * s);
-          az = f.twist * swing * Math.sin(w * 0.7 + seed) * 0.6;
-          ay = buzz;
-          break;
-        case 'door':        // swings out on its hinge and scrapes its back corner
-          ay = f.dir * swing * (0.3 + 0.7 * s);
-          ax = f.sag * swing * (0.35 + 0.65 * s) + buzz;
-          az = buzz * 0.5;
-          break;
-        case 'bumper':      // hanging by one corner, ploughing the road
-          az = f.dir * swing * (0.28 + 0.72 * s);
-          ay = f.twist * swing * (0.3 + 0.7 * s);
-          ax = buzz * 1.4;
-          break;
-        case 'spoiler':     // waggles and twists, never touches anything
-          az = f.dir * swing * Math.sin(w) + buzz * 2;
-          ay = f.twist * swing * Math.sin(w * 0.71 + 1.1);
-          ax = buzz;
-          break;
-        case 'wing':        // vibrates itself loose, then tears outward
-          az = f.dir * swing * (0.12 + 0.88 * loose * s) + buzz * 2.2;
-          ax = buzz * 2.6;
-          ay = f.twist * swing * loose * Math.sin(w * 1.3);
-          break;
-        case 'sill':        // drops its trailing end and grinds the whole way
-          ax = f.dir * swing * (0.35 + 0.65 * s) + buzz;
-          az = f.twist * swing * Math.sin(w * 0.8 + seed);
-          break;
-        case 'mirror':      // flutters on its stalk
-          az = f.dir * swing * (0.35 + 0.65 * s) + buzz * 3;
-          ay = f.twist * swing * Math.sin(w * 1.7 + seed);
-          break;
-        case 'wheel':       // hanging off the stub axle, still turning
-          az = f.dir * swing * (0.4 + 0.6 * s);
-          ay = f.twist * swing * Math.sin(w * 0.6);
-          ax = p.spin || 0;
-          clampGround = false;      // it is already sitting on the road
-          break;
-        default:
-          az = f.dir * swing * (0.3 + 0.7 * s) + buzz;
-          ax = buzz;
-      }
-
-      let dragY = poseFlap(obj, p.home, f, ax, ay, az);
       let touching = false;
       if (f.drag && grounded) {
-        if (clampGround && dragY < 0.06) {
+        if (pose.clampGround && pose.dragY < 0.06) {
           // Hold it ON the road: back the swing off until the corner rests on
           // the surface. Five halvings is smooth enough at 60Hz and stops a
           // door from swinging down through the tarmac.
           let lo = 0, hi = 1;
           for (let k = 0; k < 5; k++) {
             const mid = (lo + hi) * 0.5;
-            if (poseFlap(obj, p.home, f, ax * mid, ay * mid, az * mid) < 0.06) hi = mid;
+            if (danglePoseScaled(obj, p, pose, mid) < 0.06) hi = mid;
             else lo = mid;
           }
-          poseFlap(obj, p.home, f, ax * lo, ay * lo, az * lo);
+          danglePoseScaled(obj, p, pose, lo);
           touching = true;
-        } else if (!clampGround) {
-          touching = dragY < 0.14;
+        } else if (!pose.clampGround) {
+          touching = pose.dragY < 0.14;
         }
       }
 

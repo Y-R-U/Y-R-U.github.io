@@ -347,6 +347,63 @@ most of them were never visible.
 - Field carnage unchanged in volume (131–141 parts off per 2-lap race) — this
   round changed *when and where* pieces come off, not how many.
 
+---
+
+# ROUND 5b — the highlights reel
+
+Owner: *"the highlights don't appear to show loose panels? damage etc? each
+highlight can be shorter as well, e.g. 1s before the crash and the actual crash
+only."*
+
+Both were real, and the first one was a recording bug, not a playback one.
+
+## The reel recorded one bit per panel
+
+`recordFrame` sampled a `partMask` — present or gone — and playback rebuilt a
+**fresh, full-health car** and toggled `part.visible`. So:
+
+- **A dangling panel is still present**, so the replay drew it perfectly bolted
+  on in its home position, then popped it out of existence the moment it let go.
+  Every bit of flapping — the best thing in a crash — happened off camera.
+- **Dents never appeared at all**; ghosts are built with `partHp: 1`.
+- The car in the clip was always factory-clean apart from missing panels.
+
+`STRIDE` goes 9 → 11: a **dangle mask** and a **damage fraction** join the part
+mask. Playback runs `poseGhost`, which flaps hanging panels using the *real*
+swing code and dents the survivors. To get one copy of that maths, the 60-line
+style switch came out of `car.js:updateDanglers` into an exported
+`danglePose(obj, p, t, flapK, loose, out)` that both callers share.
+
+Panels also now spark **from where the panel actually was** rather than from the
+car's origin, and a wreck throws real scrap in the replay — the ring buffer never
+recorded debris, so a replay wreck used to shed its panels into thin air.
+
+**Measured** on a forced wreck: recording holds 5–8 panels dangling
+simultaneously through the break-up while parts go 20 → 11; the ghost swings
+panels up to 0.92m open across 802 samples.
+
+## A wreck clip took eighteen seconds to watch
+
+`PRE` 2.3s + `POST_WRECK` 3.4s is 5.7s of footage, but the slow-motion ran at
+**0.22× over half the clip**. Integrated, that is **18.5s of wall clock per
+wreck** and a six-clip reel of **over two minutes** — which is most of why the
+reel felt like it showed nothing. It was mostly a car driving normally, slowly.
+
+Now `PRE` 1.0 / `POST` 0.9 / `POST_WRECK` 2.6, and the slow section is 0.38×
+over a narrower window: **wreck 6.7s, normal 2.6s, a full six-clip reel 24.8s.**
+
+## Gotcha worth keeping
+
+**`STRIDE` is versioned into every saved memory.** A memory in localStorage
+outlives the layout it was written with, so `playSaved` carries `mem.stride || 9`
+onto the clip and playback uses *that*, not the constant. Without it every
+memory saved before this round would have read the dangle field out of the next
+car's position data.
+
+`?dev=1` now exposes the whole highlights module as `window.__game.highlights`
+(plus a `__ghosts()` accessor), because the reel is on screen for a few seconds
+after a race and nothing else could see inside it.
+
 ## Still open (unchanged from round 4)
 
 - Shadow map offset from its caster, applied to one vehicle only.
@@ -355,3 +412,6 @@ most of them were never visible.
   attack-status pill all stack directly over the crashing car, which is exactly
   the moment you want to see it.
 - Boost pad reads as a sprite on the road rather than in it.
+- **Replay ghosts do not show impact scuffs.** The scuff parts are created at
+  runtime and are not in `PART_IDS`, so the mask cannot address them. Would need
+  a couple of reserved slots in the part table.
