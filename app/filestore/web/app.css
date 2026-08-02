@@ -196,6 +196,11 @@ td.right, th.right { text-align: right; }
 .tree { max-height: 62vh; overflow: auto; padding: 6px; }
 .tree .row.up { color: var(--fg-dim); }
 .tree .row.up:hover { color: var(--fg); }
+
+/* Tree view: the folder new files and uploads will land in. */
+.tree .row.target { background: var(--bg-3); box-shadow: inset 2px 0 0 var(--accent); }
+
+.viewtoggle { font-size: 15px; line-height: 1; padding: 5px 8px; }
 .tree .row {
   display: flex; align-items: center; gap: 7px; width: 100%;
   padding: 5px 8px; border-radius: 7px; cursor: pointer;

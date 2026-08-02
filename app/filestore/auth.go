@@ -127,7 +127,9 @@ func requireUser(fn func(http.ResponseWriter, *http.Request, *User)) http.Handle
 			writeErr(w, http.StatusUnauthorized, "not signed in")
 			return
 		}
-		if u.MustReset && !strings.HasSuffix(r.URL.Path, "/password") {
+		// Exact match, not a suffix: "/api/projects/1/password" must not slip
+		// through the forced-reset gate.
+		if u.MustReset && r.URL.Path != "/api/password" {
 			writeJSON(w, http.StatusForbidden, map[string]any{
 				"error": "password reset required", "code": "must_reset",
 			})

@@ -3,6 +3,7 @@ package main
 import (
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -23,32 +24,32 @@ var (
 )
 
 func clientIP(r *http.Request) string {
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		if i := len(xff); i > 0 {
-			for j := 0; j < len(xff); j++ {
-				if xff[j] == ',' {
-					return trimSpace(xff[:j])
-				}
-			}
-			return trimSpace(xff)
-		}
-	}
+	// Only trust X-Forwarded-For from the local reverse proxy. The app binds
+	// 127.0.0.1 today so this is always true, but if the listen address is ever
+	// widened this fails closed rather than letting anyone spoof the header and
+	// walk straight through the login throttle.
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		return r.RemoteAddr
+		host = r.RemoteAddr
+	}
+	ip := net.ParseIP(host)
+	if ip == nil || !ip.IsLoopback() {
+		return host
+	}
+	// Behind the proxy: the first entry is the original client.
+	xff := r.Header.Get("X-Forwarded-For")
+	if xff == "" {
+		return host
+	}
+	if i := strings.IndexByte(xff, ','); i >= 0 {
+		xff = xff[:i]
+	}
+	if v := strings.TrimSpace(xff); v != "" {
+		return v
 	}
 	return host
 }
 
-func trimSpace(s string) string {
-	for len(s) > 0 && (s[0] == ' ' || s[0] == '\t') {
-		s = s[1:]
-	}
-	for len(s) > 0 && (s[len(s)-1] == ' ' || s[len(s)-1] == '\t') {
-		s = s[:len(s)-1]
-	}
-	return s
-}
 
 // loginAllowed records an attempt and reports whether it may proceed.
 func loginAllowed(r *http.Request) bool {

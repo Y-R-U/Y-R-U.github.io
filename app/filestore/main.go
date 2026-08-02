@@ -252,6 +252,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
+	// POST only: a GET would be reachable by top-level cross-site navigation,
+	// which SameSite=Lax still sends the cookie with.
+	if r.Method != http.MethodPost {
+		writeErr(w, http.StatusMethodNotAllowed, "POST only")
+		return
+	}
 	clearSession(w, r)
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }

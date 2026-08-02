@@ -11,6 +11,10 @@ const S = {
   files: [],       // FileEntry[] for the active project
   dirs: [],        // folder paths, incl. empty ones (they aren't in `files`)
   cwd: "",         // folder being browsed; "" is the project root
+  // "browse" shows one folder at a time; "tree" shows the whole nested
+  // structure. Both share S.cwd as the target for new files and uploads.
+  view: localStorage.getItem("fs_view") === "tree" ? "tree" : "browse",
+  expanded: new Set(),  // tree view: which folders are open
   open: null,      // { path, text, dirty }
   ownerFilter: "", // admin: filter projects by lead
 };
@@ -27,6 +31,16 @@ const el = (tag, props = {}, ...kids) => {
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Extension of a path's final segment, lowercased ("" when there isn't one).
+// A bare lastIndexOf(".") on the whole path picks up dots in parent folder
+// names, and returns -1 for extension-less names — slicing off the last
+// character instead of nothing. Matches Go's path.Ext, including ".gitignore".
+function extOf(p) {
+  const base = String(p).slice(String(p).lastIndexOf("/") + 1);
+  const i = base.lastIndexOf(".");
+  return i >= 0 ? base.slice(i).toLowerCase() : "";
 }
 
 function fmtBytes(n) {
@@ -110,7 +124,7 @@ function confirmDanger({ title, warning, detail, confirmLabel = "Delete", typeTo
       <h3>${esc(title)}</h3>
       <div class="danger-head">
         <div class="mark">⚠️</div>
-        <div><strong>${esc(warning)}</strong><span>${detail || ""}</span></div>
+        <div><strong>${esc(warning)}</strong><span>${detail ? esc(detail) : ""}</span></div>
       </div>
       ${typeToConfirm ? `
         <div class="confirmbox">
@@ -494,6 +508,70 @@ function goTo(dir) {
   render();
 }
 
+function setView(v) {
+  S.view = v;
+  localStorage.setItem("fs_view", v);
+  // Moving to the tree, open the path down to wherever the user was, so the
+  // folder they were just in is on screen rather than collapsed away.
+  if (v === "tree" && S.cwd) {
+    let acc = "";
+    for (const seg of S.cwd.split("/")) { acc = joinPath(acc, seg); S.expanded.add(acc); }
+  }
+  render();
+}
+
+// All folders in the project, nested — built from the on-disk dir list plus
+// any folder implied by a file path.
+function buildTreeModel() {
+  const root = { dirs: new Map(), files: [] };
+  const ensure = segs => {
+    let node = root;
+    for (const s of segs) {
+      if (!node.dirs.has(s)) node.dirs.set(s, { dirs: new Map(), files: [] });
+      node = node.dirs.get(s);
+    }
+    return node;
+  };
+  for (const d of S.dirs) ensure(d.split("/"));
+  for (const f of S.files) {
+    const parts = f.path.split("/");
+    ensure(parts.slice(0, -1)).files.push({ ...f, name: parts[parts.length - 1] });
+  }
+  return root;
+}
+
+function renderTreeNode(host, node, prefix, depth) {
+  for (const [name, child] of [...node.dirs.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const full = joinPath(prefix, name);
+    const isOpen = S.expanded.has(full);
+    const row = el("button", { className: "row" + (S.cwd === full ? " target" : "") });
+    row.style.paddingLeft = `${8 + depth * 14}px`;
+    row.innerHTML = `<span class="ico">${isOpen ? "📂" : "📁"}</span>
+                     <span class="nm">${esc(name)}</span>
+                     <span class="sz">${dirSummary(full)}</span>`;
+    // One click both expands and makes this the target folder, so "+ File" and
+    // uploads land where the user is looking — same meaning as in browse view.
+    row.onclick = () => {
+      if (isOpen && S.cwd === full) S.expanded.delete(full);
+      else S.expanded.add(full);
+      goTo(full);
+    };
+    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(full, true); };
+    host.append(row);
+    if (isOpen) renderTreeNode(host, child, full, depth + 1);
+  }
+  for (const f of node.files.sort((a, b) => a.name.localeCompare(b.name))) {
+    const row = el("button", { className: "row" + (S.open?.path === f.path ? " on" : "") });
+    row.style.paddingLeft = `${8 + depth * 14}px`;
+    row.innerHTML = `<span class="ico">${iconFor(f.name)}</span>
+                     <span class="nm">${esc(f.name)}</span>
+                     <span class="sz">${fmtBytes(f.size)}</span>`;
+    row.onclick = () => openFile(f.path);
+    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(f.path, false); };
+    host.append(row);
+  }
+}
+
 function buildBreadcrumb() {
   const bar = el("div", { className: "crumbs" });
   const parts = S.cwd ? S.cwd.split("/") : [];
@@ -518,7 +596,7 @@ function buildBreadcrumb() {
 }
 
 function iconFor(name) {
-  const ext = name.slice(name.lastIndexOf(".")).toLowerCase();
+  const ext = extOf(name);
   if ([".png", ".jpg", ".jpeg", ".gif", ".webp", ".tga", ".bmp"].includes(ext)) return "🖼";
   if ([".mp4", ".webm", ".mov", ".mkv"].includes(ext)) return "🎬";
   if ([".mp3", ".ogg", ".wav", ".m4a", ".fsb"].includes(ext)) return "🎵";
@@ -530,14 +608,28 @@ function iconFor(name) {
 
 function buildTreePanel() {
   const panel = el("div", { className: "panel" });
-  const header = el("header", {}, el("span", { textContent: "Files" }), el("div", { className: "spacer" }));
+  const header = el("header", {}, el("span", { textContent: "Files" }));
+
+  const isTree = S.view === "tree";
+  const toggle = el("button", {
+    className: "btn ghost sm viewtoggle",
+    title: isTree ? "Switch to folder view" : "Switch to tree view",
+    "aria-label": isTree ? "Switch to folder view" : "Switch to tree view",
+    textContent: isTree ? "🌳" : "🗂",
+  });
+  toggle.onclick = () => setView(isTree ? "browse" : "tree");
+  header.append(toggle, el("div", { className: "spacer" }));
 
   if (canWrite()) {
     const add = el("button", { className: "btn ghost sm", textContent: "+ File", title: "New file here" });
     add.onclick = () => newEntry("newfile");
     const addDir = el("button", { className: "btn ghost sm", textContent: "+ Folder", title: "New folder here" });
     addDir.onclick = () => newEntry("newfolder");
-    const up = el("button", { className: "btn ghost sm", textContent: "⬆ Upload" });
+    // Icon-only: the panel is 300px and the row wraps otherwise.
+    const up = el("button", {
+      className: "btn ghost sm viewtoggle", textContent: "⬆",
+      title: "Upload files here", "aria-label": "Upload files here",
+    });
     up.onclick = pickUpload;
     header.append(add, addDir, up);
   }
@@ -545,6 +637,20 @@ function buildTreePanel() {
   panel.append(buildBreadcrumb());
 
   const list = el("div", { className: "tree" });
+
+  if (isTree) {
+    if (!S.files.length && !S.dirs.length) {
+      list.append(el("div", { className: "empty", style: "padding:26px 12px" },
+        canWrite() ? "No files yet — upload or create one." : "No files yet."));
+    } else {
+      renderTreeNode(list, buildTreeModel(), "", 0);
+    }
+    panel.append(list);
+    const treeDz = buildDropzone();
+    if (treeDz) panel.append(treeDz);
+    return panel;
+  }
+
   const { dirs, files } = currentEntries();
 
   // "Up one level" — the counterpart to clicking a folder to descend.
@@ -582,21 +688,26 @@ function buildTreePanel() {
         : (canWrite() ? "No files yet — upload or create one." : "No files yet.")));
   }
   panel.append(list);
-
-  if (canWrite()) {
-    const dz = el("div", { className: "dropzone" });
-    dz.textContent = S.cwd ? `Drop files here → ${S.cwd}` : "Drop files here to upload";
-    dz.style.margin = "0 12px 12px";
-    dz.ondragover = e => { e.preventDefault(); dz.classList.add("over"); };
-    dz.ondragleave = () => dz.classList.remove("over");
-    dz.ondrop = e => {
-      e.preventDefault(); dz.classList.remove("over");
-      // Dropped files land in the folder being browsed, not the project root.
-      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files, S.cwd);
-    };
-    panel.append(dz);
-  }
+  const dz = buildDropzone();
+  if (dz) panel.append(dz);
   return panel;
+}
+
+// Shared by both views. Returns null for read-only accounts, which append()
+// simply ignores.
+function buildDropzone() {
+  if (!canWrite()) return null;
+  const dz = el("div", { className: "dropzone" });
+  dz.textContent = S.cwd ? `Drop files here → ${S.cwd}` : "Drop files here to upload";
+  dz.style.margin = "0 12px 12px";
+  dz.ondragover = e => { e.preventDefault(); dz.classList.add("over"); };
+  dz.ondragleave = () => dz.classList.remove("over");
+  dz.ondrop = e => {
+    e.preventDefault(); dz.classList.remove("over");
+    // Dropped files land in the current folder, not the project root.
+    if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files, S.cwd);
+  };
+  return dz;
 }
 
 // "3 files" / "empty" for a folder row — counts everything nested beneath it.
@@ -613,7 +724,7 @@ const TEXT_EXT = new Set([".json", ".txt", ".md", ".js", ".mjs", ".ts", ".css", 
   ".conf", ".sh", ".py", ".go", ".toml", ".gitignore", ".env", ".log", ".material",
   ".fragment", ".vertex", ".glsl", ".svg"]);
 
-const isText = p => TEXT_EXT.has(p.slice(p.lastIndexOf(".")).toLowerCase());
+const isText = p => TEXT_EXT.has(extOf(p));
 
 function buildEditorPanel() {
   const panel = el("div", { className: "panel" });
@@ -680,7 +791,7 @@ function buildEditorPanel() {
 
 function buildPreview(path) {
   const url = `/api/projects/${S.project.id}/files?path=${encodeURIComponent(path)}&inline=1`;
-  const ext = path.slice(path.lastIndexOf(".")).toLowerCase();
+  const ext = extOf(path);
   const wrap = el("div", { className: "preview" });
 
   if ([".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"].includes(ext)) {
@@ -787,7 +898,10 @@ async function entryMenu(path, isDir) {
       await api(`/api/projects/${S.project.id}/files`, {
         method: "POST", body: { action: "rename", path, to },
       });
+      // Renaming a folder moves the open file with it — without remapping the
+      // prefix a later save would write back to the old, now-gone path.
       if (S.open?.path === path) S.open.path = to;
+      else if (S.open?.path.startsWith(path + "/")) S.open.path = to + S.open.path.slice(path.length);
       await loadFiles(); render(); toast("Renamed", "good");
     } catch (e) { toast(e.message, "bad"); }
   } else if (choice === "delete") {
@@ -892,14 +1006,16 @@ function runUpload(url, fd, label) {
     xhr.onload = async () => {
       let data = {};
       try { data = JSON.parse(xhr.responseText); } catch {}
+      // loadFiles() rejects on a dropped session; without a catch that surfaces
+      // as an unhandled rejection and the toast below never fires.
       if (xhr.status >= 200 && xhr.status < 300) {
         close(true);
-        await loadFiles(); render();
+        try { await loadFiles(); render(); } catch { /* api() has already routed to login */ }
         toast(data.extracted != null ? `Extracted ${data.extracted} file(s)` : "Upload complete", "good");
       } else {
         close(null);
         toast(data.error || `Upload failed (${xhr.status})`, "bad");
-        await loadFiles(); render();
+        try { await loadFiles(); render(); } catch { /* as above */ }
       }
     };
     xhr.onerror = () => { close(null); toast("Upload failed — connection lost", "bad"); };

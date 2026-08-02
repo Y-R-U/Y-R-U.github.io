@@ -60,6 +60,9 @@ check "admin is flagged for a forced reset"           "$r" '"mustReset":true'
 
 r=$(req admin GET /api/projects)
 check "forced-reset account is blocked from the app" "$r" 'must_reset'
+# The gate is an exact path match, not a "/password" suffix.
+r=$(req admin GET /api/projects/1/password)
+check "a /password suffix does not slip past the reset gate" "$r" 'must_reset'
 
 r=$(req admin POST /api/password '{"current":"wrong","new":"admin-pw-12345"}')
 check "wrong current password is rejected" "$r" 'incorrect'
@@ -140,6 +143,40 @@ check "deleting a folder removes it" "$r" '"ok":true'
 r=$(req lead GET "/api/projects/$PID/files")
 checkno "folder is gone from the listing"  "$r" 'textures'
 checkno "its files went with it"           "$r" 'note.txt'
+
+head1 "LIKE wildcards in folder names don't hit their neighbours"
+# "a_b" as a raw LIKE prefix would also match "axb/..." — deleting or renaming
+# one folder must never touch the index rows of another.
+req lead POST "/api/projects/$PID/files" '{"action":"newfile","path":"a_b/keep.txt"}' >/dev/null
+req lead POST "/api/projects/$PID/files" '{"action":"newfile","path":"axb/keep.txt"}' >/dev/null
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"rename","path":"a_b","to":"a_c"}')
+check "renames an underscore folder" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+check "the neighbour's path is untouched by the rename" "$r" 'axb/keep.txt'
+check "the renamed folder's file moved"                 "$r" 'a_c/keep.txt'
+r=$(req lead DELETE "/api/projects/$PID/files?path=a_c&dir=1")
+check "deletes an underscore folder" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+check "the neighbour survives the delete" "$r" 'axb/keep.txt'
+checkno "the underscore folder is gone"   "$r" 'a_c/keep.txt'
+req lead DELETE "/api/projects/$PID/files?path=axb&dir=1" >/dev/null
+
+# substr() counts characters, so a non-ASCII folder name must still rewrite
+# descendant paths correctly.
+req lead POST "/api/projects/$PID/files" '{"action":"newfile","path":"café/deep/n.txt"}' >/dev/null
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"rename","path":"café","to":"bar"}')
+check "renames a non-ASCII folder" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+check "descendant path of a non-ASCII folder is rewritten correctly" "$r" 'bar/deep/n.txt'
+req lead DELETE "/api/projects/$PID/files?path=bar&dir=1" >/dev/null
+
+head1 "state-changing endpoints refuse GET"
+c=$(code lead GET /api/logout)
+check "logout is POST only"  "$c" "405"
+c=$(code lead GET "/api/projects/$PID/reindex")
+check "reindex is POST only" "$c" "405"
+c=$(code lead POST "/api/projects/$PID/reindex" '{}')
+check "reindex still works over POST" "$c" "200"
 
 head1 "path traversal is refused"
 for p in '../escape.txt' '/etc/passwd' 'a/../../b.txt' '../../../../../../tmp/x'; do
@@ -317,6 +354,9 @@ check "empty project names are refused" "$r" '1-80'
 r=$(req lead DELETE "/api/projects/$PID")
 check "lead deletes the main project" "$r" '"ok":true'
 [ -d "$TMP/data/files/p$PID" ] && bad "project files removed from disk" || ok "project files removed from disk"
+# The delete stages the directory aside as a rollback point; on success the
+# staging copy must not survive.
+[ -d "$TMP/data/files/p$PID.trash" ] && bad "no staging dir is left behind" || ok "no staging dir is left behind"
 
 printf '\n\033[1m%d passed, %d failed\033[0m\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

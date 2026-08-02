@@ -67,6 +67,15 @@ func cleanRelPath(p string) (string, error) {
 	return c, nil
 }
 
+// likeEscape makes a string safe to use as a literal prefix in a SQL LIKE
+// pattern. Without it a folder called "a_b" would also match "axb/..." (and a
+// "%" in a name would match anything), silently hitting unrelated index rows.
+// Used with ESCAPE '\'.
+func likeEscape(s string) string {
+	r := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+	return r.Replace(s)
+}
+
 // absFor resolves a project-relative path to an absolute one and re-verifies
 // containment — belt and braces against a cleanRelPath bug or a symlinked root.
 func absFor(projectID int64, rel string) (string, error) {
@@ -169,8 +178,8 @@ func deletePath(projectID int64, rel string, isDir bool) error {
 		if err := os.RemoveAll(abs); err != nil {
 			return err
 		}
-		_, err = db.Exec(`DELETE FROM files WHERE project_id=? AND (path=? OR path LIKE ?)`,
-			projectID, rel, rel+"/%")
+		_, err = db.Exec(`DELETE FROM files WHERE project_id=? AND (path=? OR path LIKE ? ESCAPE '\')`,
+			projectID, rel, likeEscape(rel)+"/%")
 		return err
 	}
 	if err := os.Remove(abs); err != nil && !os.IsNotExist(err) {
@@ -202,10 +211,12 @@ func movePath(projectID int64, from, to string, isDir bool) error {
 	}
 	if isDir {
 		// SQLite has no regex; rebuild each descendant path by trimming the old
-		// prefix and prepending the new one.
+		// prefix and prepending the new one. substr() counts characters, not
+		// bytes, so the offset has to be a rune count or a non-ASCII folder name
+		// would rewrite every descendant path wrongly.
 		_, err = db.Exec(`UPDATE files SET path = ? || substr(path, ?)
-		                  WHERE project_id=? AND path LIKE ?`,
-			to, len(from)+1, projectID, from+"/%")
+		                  WHERE project_id=? AND path LIKE ? ESCAPE '\'`,
+			to, len([]rune(from))+1, projectID, likeEscape(from)+"/%")
 		return err
 	}
 	_, err = db.Exec(`UPDATE files SET path=? WHERE project_id=? AND path=?`, to, projectID, from)
@@ -246,7 +257,13 @@ func zipProject(p *Project, w io.Writer) error {
 			// rather than aborting an otherwise good download.
 			continue
 		}
-		hdr := &zip.FileHeader{Name: rel, Method: zip.Deflate, Modified: time.Now()}
+		// Carry the real modification time so a downloaded pack round-trips as a
+		// faithful copy rather than having every file stamped with "now".
+		mod := time.Now()
+		if st, serr := f.Stat(); serr == nil {
+			mod = st.ModTime()
+		}
+		hdr := &zip.FileHeader{Name: rel, Method: zip.Deflate, Modified: mod}
 		dst, err := zw.CreateHeader(hdr)
 		if err != nil {
 			f.Close()

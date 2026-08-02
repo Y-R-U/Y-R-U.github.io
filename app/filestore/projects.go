@@ -252,6 +252,12 @@ func handleProjectSub(w http.ResponseWriter, r *http.Request, u *User) {
 	case "reindex":
 		// Maintenance, not authoring: the owning lead or an admin may heal a
 		// drifted index.
+		if r.Method != http.MethodPost {
+			// POST only: a state-changing GET is reachable by cross-site
+			// top-level navigation, which SameSite=Lax still carries the cookie on.
+			writeErr(w, http.StatusMethodNotAllowed, "POST only")
+			return
+		}
 		if !canManage(u, p) && u.Role != "admin" {
 			writeErr(w, http.StatusForbidden, "not allowed")
 			return
@@ -322,13 +328,25 @@ func deleteProject(w http.ResponseWriter, u *User, p *Project) {
 	storeMu.Lock()
 	defer storeMu.Unlock()
 
-	// Remove the files first: if that fails the project stays visible (and so
-	// recoverable) rather than becoming an orphaned directory nobody can reach.
-	if err := os.RemoveAll(projectDir(p.ID)); err != nil {
-		writeErr(w, http.StatusInternalServerError, "could not delete project files")
-		return
+	// This is the one operation that can destroy a whole team's work, so it gets
+	// a rollback point: move the directory aside first (atomic, same filesystem),
+	// commit the delete, and only then remove the bytes. If anything fails before
+	// the commit the directory goes back and the project is untouched.
+	dir := projectDir(p.ID)
+	trash := dir + ".trash"
+	os.RemoveAll(trash) // a leftover from an earlier interrupted delete
+	staged := false
+	if _, err := os.Stat(dir); err == nil {
+		if err := os.Rename(dir, trash); err != nil {
+			writeErr(w, http.StatusInternalServerError, "could not delete project files")
+			return
+		}
+		staged = true
 	}
 	if _, err := db.Exec(`DELETE FROM projects WHERE id=?`, p.ID); err != nil {
+		if staged {
+			os.Rename(trash, dir)
+		}
 		writeErr(w, http.StatusInternalServerError, "could not delete project")
 		return
 	}
@@ -336,6 +354,11 @@ func deleteProject(w http.ResponseWriter, u *User, p *Project) {
 	// go regardless of pragma state.
 	db.Exec(`DELETE FROM files WHERE project_id=?`, p.ID)
 	db.Exec(`DELETE FROM project_members WHERE project_id=?`, p.ID)
+	// Past the point of no return; the bytes can go. A failure here only leaves
+	// an orphaned .trash directory for an operator to sweep.
+	if staged {
+		os.RemoveAll(trash)
+	}
 	logAudit(u, 0, "project_delete", p.Name)
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }
