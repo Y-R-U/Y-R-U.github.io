@@ -167,3 +167,191 @@ Useful URLs:
 - Leader boost lockout: nitro and boost pads both dead in P1, both live in P4.
 - Dangling panels, flail hits on rivals, rail scrape sparks and grudge grids all
   fire in a live race.
+
+---
+
+# ROUND 4 — the AAA low-poly visual pass (overnight, 2026-08-02)
+
+Target: match the craft of shipped low-poly racers (reference images in
+`~/Downloads/low_poly_car_examples/`). Method: fan out single-file builder
+agents, then judge with a **blind** art-director agent that compares a capture
+against the reference side by side without being told which is which.
+
+**Blind score went 3 → 5 out of 10** (reference scores 8). 14 builder rounds,
+8 critic rounds, ~3.8M subagent tokens.
+
+## Nine real bugs found — none of these were art problems
+
+1. **The road ribbon was wound backwards.** `buildRoad` pushed indices
+   clockwise-from-above with up-facing normals, so the surface you drive on was
+   the material *back* face. three.js flips the shading normal there, so the
+   asphalt was lit with a normal pointing into the earth — `dot(N,sun) = -0.70`,
+   clamped to 0. **The road received zero directional sunlight.** No car could
+   ever cast a visible shadow on it.
+2. **The sun direction vector was flattening every surface.** Noon ran
+   `sunPos [0.62,0.50,0.40]`. Those normalised components *are* the dot products
+   a flat-shaded box hands the key, so side/top/end lit at 1.55:1.25:1 — about
+   12 display levels between an up-face and a lens-facing face. Now 0.80/0.57/0.19.
+3. **The ACES tone curve shoulder was discarding 5/6 of the car's form.** White
+   paint arrived at 0.95 (up-face) and 1.26 (side-face); log-slope up there is
+   ~0.26. Replaced with a linear segment + exponential shoulder.
+4. **The mobile shadow box excluded every prop.** `medium` used a 50m span while
+   the roadside band sits 24–58m out. Not one tree was inside the shadow camera
+   on the tier that ships to phones.
+5. **Detached panels faded the whole car.** A car's 10 body meshes share one
+   `bodyMat`; `debris.js` faded debris by mutating `material.opacity`. Panels now
+   get cloned materials on detach.
+6. **Danglers were truncated to under 0.6s** by `p.dangling = Math.min(...)` in
+   `damage()` on *any* later hit — which is why nothing ever flapped.
+7. **The blob-shadow fallback never once fired.** `collectBlobRoots` capped
+   candidates at 40 meshes; a car is 78–86.
+8. **Vertex-colour bands need bracketing columns.** The centre line (`±0.016`
+   next to tyre columns at `±0.44`) and the whole verge table smeared instead of
+   drawing. Same class of bug twice.
+9. **The belt line sat exactly level with the tyre tops**, so there was no
+   bodywork above a wheel to cut an arch into — every previous "add wheel arches"
+   attempt was geometrically impossible.
+
+## Destruction (the owner's headline ask) — delivered and measured
+
+Panels half-off then gone; **dangling is now the default, not a 22% edge case**;
+danglers drag and spark **from the real contact point**; debris **hits other
+cars**; the car drives on chassis + seat + one wheel (verified at **zero**
+wheels, 121–216 km/h); **5% speed per wheel**. Player's own car sheds a **median
+of 13 parts per race** (owner had seen 1). Stripped cars appear in ~6 races in 13
+(`CHASSIS_HP` 320, chosen from a 36-race sweep). Every panel is a separate mesh
+over a **steel/rust skeleton** — rollcage, engine bay, bucket seat, stub axles —
+so losing bodywork exposes a frame instead of more paint.
+
+## Still open
+
+- **Shadow map is offset from its caster and only applied to one vehicle**, with
+  no contact term at the tyres. This is the single biggest remaining visual gap
+  ("right lamp, wrong ground").
+- An **AI car's rear wheel/sill intersects the road plane** (clipping).
+- **HUD/UI pass never done** — clipped on three edges, LAP and taunt banners draw
+  over the player's car, speech bubbles eat a third of the screen. Flagged in the
+  first review, never owned by any agent.
+- Boost pad reads as a sprite laid *on* the road, not *in* it.
+- Horizon instancing spam; midground density thinner than the reference.
+
+## Testing notes worth keeping (round 4)
+
+- **Headless Chrome renders on the real GPU if you DON'T pass
+  `--disable-gpu --use-angle=swiftshader`.** SwiftShader renders **no shadow map
+  at all** — that flag invalidated several rounds of shadow work and produced a
+  false "no shadows anywhere" critique.
+- `readPixels` returns zeros unless you call `render()` in the same tick.
+- Prove a shadow exists by toggling `sunLight.castShadow` and diffing frames,
+  rather than arguing about screenshots.
+- `?shot=1&at=N` is not a stable test frame — `at=13` and `at=28` often catch a
+  crash with the car half out of shot. Capture 3 and pick one.
+
+---
+
+# ROUND 5 — the crash pass (2026-08-02)
+
+Owner's report: *"a crash either on or off track had the car vanish underground.
+A crash should see multiple panels coming loose… the highlights often don't show
+much… I saw a car impact another, no sparks, just two rigid bodies hitting each
+other… cars also appear to go partially through the barrier."*
+
+Five bugs, all of them real, all now measured rather than eyeballed.
+
+## 1. The car vanished underground — two separate wrong numbers
+
+`car.js:groundLevel()` was a guess, and it was wrong in both of its branches.
+
+- **On the circuit** it returned `roadY - 2.2`. `updateWreck` then rested the
+  car at `groundY + 0.7`, so a wrecked car settled **1.5m below the tarmac it
+  had just crashed on**. Every on-track wreck sank.
+- **Off the circuit** it returned one flat plane at `bounds.min.y - 3` — the
+  lowest point of the whole circuit. Crash off a raised section of skyline
+  (`y 0..51`) and the car fell fifty metres past the visible ground.
+- `groundY` was also sampled **once**, at the moment of impact, so a car that
+  crashed on a crest and slid down the run-off kept the crest's height.
+
+Meanwhile `trackmesh.js` already had `terrainHeightFn` — the real heightfield —
+and `vergeDrop`, the real apron profile. Nothing outside that file could reach
+either. `attachGroundProbe` now hangs `track.groundProbe(worldPos, sHint)` off
+the track: tarmac (at the banked offset, not the centreline) → apron → terrain,
+blended. `groundLevel` is a call to it and the wreck re-reads it every frame.
+
+**Measured:** clearance during a wreck now pins at `WRECK_REST` (0.45) and never
+goes negative except for sub-frame transients during a bounce. On track the
+probe agrees with the car's own road position to **within 0.02m across a 22m
+elevation change**, and it is right on loop circuits with inverted frames.
+
+## 2. A wrecked car was a rigid brick
+
+`update()` returned at `if (this.mode === 'wreck')` **before reaching
+`updateDanglers`**. So every panel torn half-off in the impact froze mid-pose
+and never let go — the replay camera was orbiting a solid object, which is most
+of why the highlights showed nothing. Wreck mode now advances `trackTime` and
+runs the danglers (which already knew not to drag on the road in wreck mode).
+
+## 3. The break-up happened on one frame
+
+`wreck()` detached 2–5 parts in a single tick and then tumbled a shell.
+`startBreakUp` replaces it: two go outright on impact, four more tear loose and
+flap through the tumble, and the rest are **queued to let go at their own moment
+across `CRASH.breakUpSpread` (2.4s)**, each with its own shower. Leaving the
+circuit is an instant loss so it takes 78–100% of what is left; a write-off
+*on* track — where you rejoin — only loses 28–45%. Anything that tears during a
+wreck gets its dangle capped to ~1–2s so it visibly goes before the truck comes.
+The truck also will not come while the shed queue is non-empty.
+
+**Measured**, forced off-track wreck: 25 parts → 19 → 16 → 15 → 11 → 8 → **6**
+over 2.1s, with **3–7 panels flapping simultaneously** throughout.
+
+## 4. Car-to-car contact drew literally nothing
+
+`contactDamage` ran the whole damage model and emitted no visual event at all —
+no sparks, no mark. Hence "two rigid bodies". `race.js:impactFx` now throws a
+double spark shower from the point between the cars, plus smoke and a shock ring
+on a hard one, and calls `car.addScuff` **on both cars**.
+
+`addScuff` is the owner's suggested cheat, taken literally: it scars the paint
+where the hit landed and lifts a **torn flap of bodywork off that scar**. The
+flap is registered as a real part, so it flaps, drags, sparks, clouts whoever is
+alongside and eventually leaves — and when it goes **the scar stays**, so a car
+carries a record of every hit it took. Thresholds are `contactSparkSev` /
+`scuffSev` / `scuffFlapSev` in `config.js`.
+
+**Measured:** 37 scuffs in a 2-lap 8-car auto race; both cars in a forced
+side-slam get marks and live `scuffN` flap parts.
+
+## 5. Cars sat two thirds of a metre inside the barrier
+
+`t` is the car's **centre** and the rail's inner face stands at `width + 0.35`,
+but `checkEdges` clamped the centre to `width` — parking 0.67m of a 2.05m-wide
+car inside the steel, on every single barrier contact. The limit is now
+`width + RAIL_FACE - carWide/2`, so the flank stops at the rail. `RAIL_FACE` is
+exported from `config.js` and `trackmesh.js` builds the rail ribbon from the
+same constant, so the two cannot drift apart again.
+
+Restitution also ramps `railRestitution` (0.5) → `railRestitutionHard` (0.86)
+with impact, so a real thump is thrown back off the steel instead of leaning on
+it, and the sparks come off the car's **flank** rather than its centre, where
+most of them were never visible.
+
+**Measured:** worst-case penetration by a grounded car across a full race went
+0.67m (by construction) → **0.02m**. The 5m readings you get without an
+`h < 1.0` filter are airborne cars sailing over jumps, which is intended.
+
+## Verified
+
+- 15/15 circuits still report `gap 0` in `dev.html`.
+- Auto races to results with zero console errors on hometown, carverpass,
+  loopyard (+ the rest of the sweep in the commit message).
+- Field carnage unchanged in volume (131–141 parts off per 2-lap race) — this
+  round changed *when and where* pieces come off, not how many.
+
+## Still open (unchanged from round 4)
+
+- Shadow map offset from its caster, applied to one vehicle only.
+- **HUD/UI pass still never done** — and it is now the most visible problem
+  left: in the wreck captures the speech bubble, the WIPEOUT banner and the
+  attack-status pill all stack directly over the crashing car, which is exactly
+  the moment you want to see it.
+- Boost pad reads as a sprite on the road rather than in it.

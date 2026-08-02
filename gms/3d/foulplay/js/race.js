@@ -12,7 +12,7 @@ import { AIDriver } from './ai.js';
 import { input, updateInput, consumeBoost, consumeAttack, clearInput } from './input.js';
 import { initAttacks, updateAttacks, fireAttack, tickHazardCooldowns, clearHazards } from './attacks.js';
 import { initStewards, updateStewards, addHype, settleRace, averageHype } from './stewards.js';
-import { initParticles, updateParticles, clearParticles, explode, ring, smokePuff } from './particles.js';
+import { initParticles, updateParticles, clearParticles, explode, ring, smokePuff, sparkBurst } from './particles.js';
 import { initBubbles, updateBubbles, clearBubbles, showBubble } from './bubbles.js';
 import { updateDebris, clearDebris } from './debris.js';
 import { updateCamera, resetCamera } from './camera.js';
@@ -31,6 +31,8 @@ let endTimer = 0;
 let started = false;
 
 const _v1 = new THREE.Vector3();
+const _v2 = new THREE.Vector3();
+const _v3 = new THREE.Vector3();
 
 // ---------------------------------------------------------------------------
 // Setup
@@ -420,7 +422,45 @@ function contactDamage(a, b, closing, dir, kind) {
   if (a.ai) a.ai.remember(b);
   const p = a.isPlayer ? a : b.isPlayer ? b : null;
   if (p) addShake(clamp01(closing / 24) * 0.5);
+
+  impactFx(a, b, closing, regionA, regionB);
   emit('race:contact', { a, b, closing, kind });
+}
+
+// What a hit LOOKS like. This is the half that was missing: the damage model
+// has always run on contact, but nothing was ever drawn, so two cars trading
+// paint at closing speed read as two rigid bodies passing through each other.
+//
+// People are here to see a demolition derby, so this exaggerates on purpose —
+// sparks well past what steel on steel would really throw, and a scar plus a
+// flap of torn bodywork on BOTH cars, because there are always two of them in
+// a hit and either one can be the one the camera is on.
+function impactFx(a, b, closing, regionA, regionB) {
+  const sev = clamp01(closing / 26);
+  if (sev < CRASH.contactSparkSev) return;
+
+  // Between the two cars, at about sill height — the point they are touching.
+  _v1.copy(a.worldPos).lerp(b.worldPos, 0.5);
+  _v1.y += 0.45;
+  // Thrown up and back out of the gap, the way a real shower of sparks goes.
+  _v2.copy(b.worldPos).sub(a.worldPos).setY(0).normalize().multiplyScalar(0.7);
+  _v2.y += 1;
+
+  const n = Math.round(10 + sev * 46);
+  sparkBurst(_v1, _v2, n, 0xffd27a, 9 + closing * 1.3);
+  sparkBurst(_v1, _v3.copy(_v2).negate().setY(0.9), Math.round(n * 0.6), 0xffe9a8, 7 + closing);
+  if (sev > 0.3) smokePuff(_v1, 2 + Math.round(sev * 3), 0xd0c8ba, 1.3, 1.2);
+  if (sev > 0.55) ring(_v1, 0xffc470, 3.4, 0.26);
+
+  if (sev < CRASH.scuffSev) return;
+  scuff(a, _v1, regionA, sev);
+  scuff(b, _v1, regionB, sev);
+}
+
+function scuff(car, at, region, sev) {
+  if (state.raceTime - (car.scuffAt || -9) < CRASH.scuffCool) return;
+  car.scuffAt = state.raceTime;
+  car.addScuff(at, region, sev);
 }
 
 // ---------------------------------------------------------------------------

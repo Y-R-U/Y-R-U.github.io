@@ -19,6 +19,21 @@ export const CARS_ARG   = parseInt(Q.get('cars') || '0', 10) || 0;
 export const SPEED_ARG  = parseFloat(Q.get('speed') || '0') || 0;   // time scale
 export const MODE_ARG   = Q.get('mode') || '';        // quick | knockout | event
 
+// Carnage counters. `?dev=1` publishes them as window.__dmg so a headless run
+// can COUNT panels off, danglers and debris strikes rather than eyeball them.
+// A field-wide total of 80 parts is eight cars losing ten each, and the player
+// can still be one of the ones that lost none. `player` is the number that
+// actually decides whether this feature exists, so it is counted on its own.
+export const DMG = DEV_MODE ? (window.__dmg = {
+  hits: 0, dealt: 0, sev: [], amt: [],
+  breaks: 0, dangles: 0, instant: 0, partsOff: 0, wheelsOff: 0,
+  debrisHits: 0, debrisDealt: 0, maxWheelsLost: 0, stripped: 0, wrecks: {},
+  player: {
+    hits: 0, dealt: 0, parts: 0, dangles: 0, instant: 0, wheels: 0,
+    maxDang: 0, dangSecs: 0, multiSecs: 0, lost: [], src: {},
+  },
+}) : null;
+
 export const IS_TOUCH = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 export const IS_SMALL = Math.min(window.innerWidth, window.innerHeight) < 520;
 
@@ -34,6 +49,10 @@ export const SAVE_KEY = 'foulplay_save_v1';
 export const GRAVITY = 22;            // arcade gravity — heavier than real, reads better
 export const ROAD_HALF = 11;          // default half-width of the racing surface
 export const RAIL_HEIGHT = 1.15;      // guardrail crest; clear it and you leave the track
+// Metres beyond the road edge that the rail's inner face stands at. trackmesh
+// builds the barrier ribbon here and car.js stops the bodywork against it, so
+// the two must agree or the cars sink into the steel.
+export const RAIL_FACE = 0.35;
 
 // ---------------------------------------------------------------------------
 // Driving model
@@ -99,25 +118,94 @@ export const CRASH = {
   // paint, never the race — the damage in this game is supposed to come from
   // attacks and from other cars, so that driving is the part you can relax
   // into while you think about who to hit next.
-  railRestitution: 0.5,     // how much of the sideways speed comes back
+  railRestitution: 0.5,     // how much of the sideways speed comes back, at a graze
+  // …rising to this on a real thump. A car that arrives at the steel hard is
+  // supposed to be thrown back off it, not to lean on it and slide.
+  railRestitutionHard: 0.86,
   railSpin: 0.34,           // heading kick per m/s of impact
   railScrub: 0.18,          // forward speed lost, scaled by impact
   // Going over a barrier is gated on having just been shunted (see car.js), so
   // this number does not need to be high to be safe — it only needs to be low
   // enough that a well-aimed slam beside a barrier actually finishes somebody.
   railVault: 34,            // lateral m/s over the barrier, once shunted
-  railDamage: 0.3,          // hp per m/s of impact above railScuff
-  railScuff: 9,             // impact below this is a scrape: noise, no damage
+  railDamage: 1.15,         // hp per m/s of impact above railScuff
+  railScuff: 5,             // impact below this is a scrape: noise, no damage
+  // Grinding wear, in hp/second, spent ONLY on bodywork — no chassis damage, no
+  // hit flash. A player who never lays a glove on anybody still spends a race
+  // scraping barriers and running wide, and that has to be enough on its own to
+  // strip the trim off the car. It was worth nothing at all before, which is
+  // why an ordinary lap left the car looking factory fresh.
+  railGrindWear: 8,        // per second of leaning on the steel, at full speed
+  offTrackWear: 6,         // per second of being off the racing surface
 
   carPush: 0.95,            // lateral impulse share in a car-to-car shunt
-  carDamage: 2.5,           // hp per m/s of closing speed — this is where it hurts
+  carDamage: 3.9,           // hp per m/s of closing speed — this is where it hurts
   slamSpeed: 12,            // closing m/s that counts as a deliberate slam
   slamImpulse: 30,          // lateral m/s an attack SLAM adds
-  slamDamage: 34,
+  slamDamage: 54,
   slamWindow: 0.9,          // seconds a shunt leaves you liable to go over a barrier
 
-  landHard: 18,             // vertical m/s where a landing hurts
-  landDamage: 1.6,
+  // --- how hard a hit reads -------------------------------------------------
+  // Every hit is scored 0..1 for severity from the hp it dealt, and that one
+  // number decides the whole outcome: which panel gets picked, how much of the
+  // hit goes into bodywork, whether it flaps or leaves, and how long it flaps.
+  sevMin: 4,                // dealt hp below this is a scuff — severity 0
+  sevFull: 44,              // dealt hp at which it is a full-blooded slam
+  panelWear: 1.45,          // multiplier from car hp onto the panel pool
+  shearWear: 1.7,           // extra for a shearing hit (attacks pass shear:true)
+  panelAbsorb: 0.42,        // pool left over after a panel actually comes off
+  writeOffHit: 48,          // dealt hp that can still write off a stripped car
+
+  // --- the flapping stage ---------------------------------------------------
+  // The whole point of the damage model. A panel that fails does NOT leave: it
+  // tears at one corner, hangs there banging on the car and dragging on the
+  // road, and only then goes. It used to last about four seconds for a bonnet,
+  // which is not long enough to notice, let alone enjoy — and far too short for
+  // two of them ever to overlap. A bonnet now hangs on for eight to fourteen
+  // seconds, which at three laps means the next panel to fail almost always
+  // joins one that is already flapping.
+  tearOff: 0.02,            // chance a failed panel skips the flapping stage…
+  tearOffSev: 0.16,         // …plus this much at maximum severity
+  dangleBase: 6.4,          // seconds a torn panel hangs on…
+  dangleMass: 6.6,          // …plus this per unit of panel mass
+  sympathy: 0.30,           // chance a panel going pulls a dented neighbour with it
+  dragSparkRate: 17,        // spark bursts/sec off a panel that is on the tarmac
+
+  // --- car-to-car contact ---------------------------------------------------
+  // Contact used to have NO visual event at all — the damage model ran, the
+  // paint stayed perfect, and a hard shunt read as two boxes touching. These
+  // three numbers are the fake: sparks at the point of impact, a scar in the
+  // paint, and a torn flap of bodywork lifting off that scar. See car.js:addScuff.
+  contactSparkSev: 0.10,    // severity at which a hit starts throwing sparks
+  scuffSev: 0.24,           // …at which it leaves a permanent mark
+  scuffFlapSev: 0.38,       // …at which a flap of metal peels off the mark
+  scuffCool: 0.9,           // seconds before the same car can be scuffed again
+
+  // --- loose panels ---------------------------------------------------------
+  maxDebris: 88,
+  debrisLife: 10,           // seconds a small piece survives…
+  debrisLifeMass: 8,        // …plus this per unit of mass, so a roof stays about
+  debrisDamage: 0.5,        // hp per m/s of closing speed against a car
+  debrisDamageMax: 26,
+  debrisMinSpeed: 7,        // relative m/s below which it is only a clatter
+  debrisPush: 0.34,         // lateral m/s per m/s of closing speed
+  debrisPushMax: 9,
+  debrisCool: 0.6,          // seconds before the same piece can hit again
+
+  // --- driving on the rims --------------------------------------------------
+  grindRate: 11,            // spark bursts/second from ONE grinding corner
+  grindStack: 0.6,          // extra rate per additional missing wheel
+  // Additive sparks are the most expensive thing on a phone GPU, and four cars
+  // grinding side by side is the case that multiplies out of control. The FIELD
+  // shares one ceiling rather than every car getting its own. Set generously:
+  // one car on its floorpan wants ~45/s, so this only bites on a pile-up.
+  grindBudget: 170,         // spark bursts/second across every car on track
+  wheelSpeedLoss: 0.05,     // it is a silly game: 5% of everything per wheel
+  wheelSag: 0.115,          // metres the body drops per missing wheel
+  wheelDrag: 0.85,          // extra rolling resistance per missing wheel
+
+  landHard: 15,             // vertical m/s where a landing hurts
+  landDamage: 2.2,
   landSpinOut: 1.25,        // heading (rad) at which a heavy landing flips you
 
   // World-space wreck simulation (once you actually leave the track)
@@ -126,16 +214,33 @@ export const CRASH = {
   wreckFriction: 0.86,
   wreckSpin: 2.4,
   wreckShedChance: 0.55,    // per impact, chance a part rips off
+  // Leaving the circuit is an instant loss, so it is also the moment the car is
+  // allowed to disintegrate — and the pieces have to come off ACROSS the crash
+  // rather than all on the frame it landed on. Panels are queued to let go at
+  // their own moment over this many seconds.
+  breakUpSpread: 2.4,
   wreckMinTime: 2.2,        // seconds of tumbling before the recovery truck comes
   wreckMaxTime: 5.0,
   respawnTime: 1.35,        // seconds of blackout before you rejoin
   respawnBack: 14,          // metres behind the crash point you rejoin
 };
 
-// Total structural HP of a car body. Parts have their own pools on top; the
-// chassis number is deliberately huge because the brief is "takes a lot of
-// punishment on track, but sheds pieces the whole way".
-export const CHASSIS_HP = 520;
+// Total structural HP of a car body. Parts have their own pools on top, so the
+// chassis number is high enough to take a lot of punishment while shedding
+// pieces the whole way — but not so high that "stripped to the tub" is a state
+// nobody ever sees. Measured over headless batches at hometown, 3 laps, 8 cars:
+//
+//   520 → 0.17 stripped cars/race (1 race in 6)    too rare to be a feature
+//   360 → 0.38                    (3 races in 8)
+//   320 → 0.69                    (6 races in 13)  <- here
+//   300 → 1.00                    (6 races in 9)   reads as "every race"
+//
+// Every other race, roughly — enough that a stripped car is a thing you have
+// seen, not enough that it stops being an event.
+//
+// Nobody retired at any of those settings; hitting zero forces a wreck plus a
+// 35% rebuild, not an elimination.
+export const CHASSIS_HP = 320;
 
 // ---------------------------------------------------------------------------
 // The steward system — the actual game
