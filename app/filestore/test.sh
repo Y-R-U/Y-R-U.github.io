@@ -118,6 +118,29 @@ check "nested paths work" "$r" '"ok":true'
 r=$(req lead GET "/api/projects/$PID/files")
 check "listing includes the nested file" "$r" 'textures/blocks/x.json'
 
+head1 "subfolders"
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"newfolder","path":"textures"}')
+check "creates a folder" "$r" '"ok":true'
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"newfolder","path":"textures/blocks/deep"}')
+check "creates a nested folder" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+check "empty folder is listed (not just files)" "$r" '"textures"'
+check "nested folder is listed"                 "$r" 'textures/blocks/deep'
+
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"newfile","path":"textures/blocks/deep/note.txt"}')
+check "file inside a nested folder" "$r" '"ok":true'
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"rename","path":"textures/blocks","to":"textures/items"}')
+check "renaming a folder moves its contents" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+check "descendant paths follow the rename"  "$r" 'textures/items/deep/note.txt'
+checkno "the old folder path is gone"       "$r" 'textures/blocks'
+
+r=$(req lead DELETE "/api/projects/$PID/files?path=textures&dir=1")
+check "deleting a folder removes it" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files")
+checkno "folder is gone from the listing"  "$r" 'textures'
+checkno "its files went with it"           "$r" 'note.txt'
+
 head1 "path traversal is refused"
 for p in '../escape.txt' '/etc/passwd' 'a/../../b.txt' '../../../../../../tmp/x'; do
   c=$(code lead POST "/api/projects/$PID/files" "{\"action\":\"newfile\",\"path\":\"$p\"}")

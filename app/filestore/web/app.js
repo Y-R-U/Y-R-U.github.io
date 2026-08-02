@@ -9,8 +9,9 @@ const S = {
   tab: "projects",
   project: null,   // active project record
   files: [],       // FileEntry[] for the active project
+  dirs: [],        // folder paths, incl. empty ones (they aren't in `files`)
+  cwd: "",         // folder being browsed; "" is the project root
   open: null,      // { path, text, dirty }
-  expanded: new Set(),
   ownerFilter: "", // admin: filter projects by lead
 };
 
@@ -389,7 +390,7 @@ async function openProject(id) {
     S.project = r.project;
     S.project.canManage = r.canManage;
     S.open = null;
-    S.expanded = new Set();
+    S.cwd = "";
     await loadFiles();
     render();
   } catch (e) { toast(e.message, "bad"); }
@@ -398,7 +399,11 @@ async function openProject(id) {
 async function loadFiles() {
   const r = await api(`/api/projects/${S.project.id}/files`);
   S.files = r.files;
+  S.dirs = r.dirs || [];
   if (r.project) Object.assign(S.project, r.project);
+  // The folder being browsed may have just been deleted or renamed out from
+  // under us; walk back up until we land somewhere that still exists.
+  while (S.cwd && !S.dirs.includes(S.cwd)) S.cwd = parentOf(S.cwd);
 }
 
 /* ───────────────────────────────────────────── project workspace */
@@ -449,21 +454,67 @@ function renderProject(m) {
   m.append(work);
 }
 
-/* ---- file tree ---- */
+/* ---- file browser ---- */
 
-// Builds a nested tree from the flat path list the API returns.
-function buildTree(files) {
-  const root = { dirs: new Map(), files: [] };
-  for (const f of files) {
-    const parts = f.path.split("/");
-    let node = root;
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (!node.dirs.has(parts[i])) node.dirs.set(parts[i], { dirs: new Map(), files: [] });
-      node = node.dirs.get(parts[i]);
-    }
-    node.files.push({ ...f, name: parts[parts.length - 1] });
+// Everything below works on S.cwd, the folder currently being browsed ("" is
+// the project root). Paths sent to the API are always full and project-relative.
+const joinPath = (dir, name) => (dir ? `${dir}/${name}` : name);
+const parentOf = p => (p.includes("/") ? p.slice(0, p.lastIndexOf("/")) : "");
+
+// The immediate children of S.cwd: subfolders first, then files.
+function currentEntries() {
+  const cwd = S.cwd;
+  const prefix = cwd ? cwd + "/" : "";
+
+  const dirs = new Set();
+  // Folders come from both the on-disk list (so empty ones show up) and from
+  // the paths of files, which covers any folder the walk somehow missed.
+  for (const d of S.dirs) {
+    if (!d.startsWith(prefix)) continue;
+    const rest = d.slice(prefix.length);
+    if (rest && !rest.includes("/")) dirs.add(rest);
   }
-  return root;
+  const files = [];
+  for (const f of S.files) {
+    if (!f.path.startsWith(prefix)) continue;
+    const rest = f.path.slice(prefix.length);
+    if (!rest) continue;
+    if (rest.includes("/")) dirs.add(rest.slice(0, rest.indexOf("/")));
+    else files.push({ ...f, name: rest });
+  }
+  return {
+    dirs: [...dirs].sort((a, b) => a.localeCompare(b)),
+    files: files.sort((a, b) => a.name.localeCompare(b.name)),
+  };
+}
+
+// Navigates to a folder, clearing it if it no longer exists.
+function goTo(dir) {
+  S.cwd = dir || "";
+  render();
+}
+
+function buildBreadcrumb() {
+  const bar = el("div", { className: "crumbs" });
+  const parts = S.cwd ? S.cwd.split("/") : [];
+
+  const root = el("button", { className: "crumb-btn" + (parts.length ? "" : " on"), textContent: "📦 " + S.project.name });
+  root.onclick = () => goTo("");
+  bar.append(root);
+
+  let acc = "";
+  parts.forEach((seg, i) => {
+    acc = joinPath(acc, seg);
+    const target = acc;
+    bar.append(el("span", { className: "crumb-sep", textContent: "›" }));
+    const b = el("button", {
+      className: "crumb-btn" + (i === parts.length - 1 ? " on" : ""),
+      textContent: seg,
+    });
+    b.onclick = () => goTo(target);
+    bar.append(b);
+  });
+  return bar;
 }
 
 function iconFor(name) {
@@ -482,61 +533,77 @@ function buildTreePanel() {
   const header = el("header", {}, el("span", { textContent: "Files" }), el("div", { className: "spacer" }));
 
   if (canWrite()) {
-    const add = el("button", { className: "btn ghost sm", textContent: "+ File", title: "New file" });
+    const add = el("button", { className: "btn ghost sm", textContent: "+ File", title: "New file here" });
     add.onclick = () => newEntry("newfile");
-    const addDir = el("button", { className: "btn ghost sm", textContent: "+ Folder", title: "New folder" });
+    const addDir = el("button", { className: "btn ghost sm", textContent: "+ Folder", title: "New folder here" });
     addDir.onclick = () => newEntry("newfolder");
     const up = el("button", { className: "btn ghost sm", textContent: "⬆ Upload" });
     up.onclick = pickUpload;
     header.append(add, addDir, up);
   }
   panel.append(header);
+  panel.append(buildBreadcrumb());
 
-  const tree = el("div", { className: "tree" });
-  if (!S.files.length) {
-    tree.append(el("div", { className: "empty", style: "padding:26px 12px",
-      textContent: canWrite() ? "No files yet — upload or create one." : "No files yet." }));
-  } else {
-    renderNode(tree, buildTree(S.files), "", 0);
+  const list = el("div", { className: "tree" });
+  const { dirs, files } = currentEntries();
+
+  // "Up one level" — the counterpart to clicking a folder to descend.
+  if (S.cwd) {
+    const up = el("button", { className: "row up" });
+    up.innerHTML = `<span class="ico">↩</span><span class="nm">..</span>`;
+    up.onclick = () => goTo(parentOf(S.cwd));
+    list.append(up);
   }
-  panel.append(tree);
+
+  for (const name of dirs) {
+    const full = joinPath(S.cwd, name);
+    const row = el("button", { className: "row" });
+    row.innerHTML = `<span class="ico">📁</span><span class="nm">${esc(name)}</span>
+                     <span class="sz">${dirSummary(full)}</span>`;
+    row.onclick = () => goTo(full);
+    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(full, true); };
+    list.append(row);
+  }
+
+  for (const f of files) {
+    const row = el("button", { className: "row" + (S.open?.path === f.path ? " on" : "") });
+    row.innerHTML = `<span class="ico">${iconFor(f.name)}</span>
+                     <span class="nm">${esc(f.name)}</span>
+                     <span class="sz">${fmtBytes(f.size)}</span>`;
+    row.onclick = () => openFile(f.path);
+    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(f.path, false); };
+    list.append(row);
+  }
+
+  if (!dirs.length && !files.length) {
+    list.append(el("div", { className: "empty", style: "padding:26px 12px" },
+      S.cwd
+        ? (canWrite() ? "This folder is empty — upload or create something here." : "This folder is empty.")
+        : (canWrite() ? "No files yet — upload or create one." : "No files yet.")));
+  }
+  panel.append(list);
 
   if (canWrite()) {
-    const dz = el("div", { className: "dropzone", textContent: "Drop files here to upload" });
+    const dz = el("div", { className: "dropzone" });
+    dz.textContent = S.cwd ? `Drop files here → ${S.cwd}` : "Drop files here to upload";
     dz.style.margin = "0 12px 12px";
     dz.ondragover = e => { e.preventDefault(); dz.classList.add("over"); };
     dz.ondragleave = () => dz.classList.remove("over");
     dz.ondrop = e => {
       e.preventDefault(); dz.classList.remove("over");
-      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+      // Dropped files land in the folder being browsed, not the project root.
+      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files, S.cwd);
     };
     panel.append(dz);
   }
   return panel;
 }
 
-function renderNode(host, node, prefix, depth) {
-  for (const [name, child] of [...node.dirs.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-    const full = prefix ? `${prefix}/${name}` : name;
-    const isOpen = S.expanded.has(full);
-    const row = el("button", { className: "row" });
-    row.style.paddingLeft = `${8 + depth * 13}px`;
-    row.innerHTML = `<span class="ico">${isOpen ? "📂" : "📁"}</span><span class="nm">${esc(name)}</span>`;
-    row.onclick = () => { isOpen ? S.expanded.delete(full) : S.expanded.add(full); render(); };
-    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(full, true); };
-    host.append(row);
-    if (isOpen) renderNode(host, child, full, depth + 1);
-  }
-  for (const f of node.files.sort((a, b) => a.name.localeCompare(b.name))) {
-    const row = el("button", { className: "row" + (S.open?.path === f.path ? " on" : "") });
-    row.style.paddingLeft = `${8 + depth * 13}px`;
-    row.innerHTML = `<span class="ico">${iconFor(f.name)}</span>
-                     <span class="nm">${esc(f.name)}</span>
-                     <span class="sz">${fmtBytes(f.size)}</span>`;
-    row.onclick = () => openFile(f.path);
-    if (canWrite()) row.oncontextmenu = e => { e.preventDefault(); entryMenu(f.path, false); };
-    host.append(row);
-  }
+// "3 files" / "empty" for a folder row — counts everything nested beneath it.
+function dirSummary(dir) {
+  const prefix = dir + "/";
+  const n = S.files.filter(f => f.path.startsWith(prefix)).length;
+  return n ? `${n} file${n === 1 ? "" : "s"}` : "empty";
 }
 
 /* ---- editor / preview ---- */
@@ -679,18 +746,22 @@ async function saveOpenFile() {
 
 async function newEntry(action) {
   const isDir = action === "newfolder";
+  const where = S.cwd ? ` in ${S.cwd}` : "";
   const name = await promptModal({
-    title: isDir ? "New folder" : "New file",
-    label: "Path (use / for folders)",
-    placeholder: isDir ? "textures/items" : "manifest.json",
+    title: (isDir ? "New folder" : "New file") + where,
+    label: "Name (you can still use / to nest deeper)",
+    placeholder: isDir ? "textures" : "manifest.json",
     okLabel: "Create",
   });
   if (!name) return;
+  // Names are relative to the folder being browsed, so creating "textures"
+  // inside "pack" makes "pack/textures" rather than a second root folder.
+  const full = joinPath(S.cwd, name);
   try {
-    await api(`/api/projects/${S.project.id}/files`, { method: "POST", body: { action, path: name } });
+    await api(`/api/projects/${S.project.id}/files`, { method: "POST", body: { action, path: full } });
     await loadFiles();
-    if (!isDir) await openFile(name); else { S.expanded.add(name); render(); }
-    toast(isDir ? "Folder created" : "File created", "good");
+    if (isDir) { goTo(full); toast("Folder created", "good"); }
+    else { await openFile(full); toast("File created", "good"); }
   } catch (e) { toast(e.message, "bad"); }
 }
 
@@ -750,7 +821,7 @@ function pickUpload() {
   const inp = el("input", { type: "file", multiple: true });
   inp.style.display = "none";
   document.body.append(inp);
-  inp.onchange = () => { if (inp.files.length) uploadFiles(inp.files); inp.remove(); };
+  inp.onchange = () => { if (inp.files.length) uploadFiles(inp.files, S.cwd); inp.remove(); };
   inp.click();
 }
 
@@ -782,7 +853,7 @@ function importZip() {
         <p><b>${esc(f.name)}</b> (${fmtBytes(f.size)}) will be extracted into this project.
            Existing files with the same paths will be overwritten.</p>
         <label>Extract into folder <span class="dim">(optional)</span>
-          <input id="iz-dest" placeholder="leave empty for the project root" spellcheck="false"></label>
+          <input id="iz-dest" value="${esc(S.cwd)}" placeholder="leave empty for the project root" spellcheck="false"></label>
         <div class="actions">
           <button class="btn" id="iz-cancel">Cancel</button>
           <button class="btn primary" id="iz-ok">Upload &amp; extract</button>

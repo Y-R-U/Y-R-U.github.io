@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -408,7 +410,39 @@ func listFiles(w http.ResponseWriter, p *Project) {
 		out = append(out, f)
 	}
 	np, _ := projectByID(p.ID)
-	writeJSON(w, http.StatusOK, map[string]any{"files": out, "project": np})
+	writeJSON(w, http.StatusOK, map[string]any{
+		"files": out, "dirs": listDirs(p.ID), "project": np,
+	})
+}
+
+// listDirs returns every folder in the project, relative and slash-separated.
+//
+// The index only tracks files, so a folder the user created but hasn't put
+// anything in yet exists solely on disk — without this it would be invisible
+// the moment they navigated away from it.
+func listDirs(projectID int64) []string {
+	root := projectDir(projectID)
+	out := []string{}
+	filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			// Unreadable subtree: skip it rather than failing the whole listing.
+			if info != nil && info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !info.IsDir() || p == root {
+			return nil
+		}
+		rel, rerr := filepath.Rel(root, p)
+		if rerr != nil {
+			return nil
+		}
+		out = append(out, filepath.ToSlash(rel))
+		return nil
+	})
+	sort.Strings(out)
+	return out
 }
 
 // Extensions we are willing to open in the browser's text editor. Anything else
