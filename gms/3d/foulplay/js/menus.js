@@ -881,48 +881,117 @@ export function renderChestQueue(queue) {
   const list = queue && queue.length ? queue : profile.chests;
   if (!list.length) { emit('nav', { to: 'garage' }); return; }
   const tier = CHEST_TIERS[list[0]] || CHEST_TIERS.scrap;
+  // What is actually in the pile, best first, so OPEN ALL is not a leap of
+  // faith — you can see the sponsor vault in there before you tap it.
+  const counts = {};
+  for (const t of list) counts[t] = (counts[t] || 0) + 1;
+  const stack = Object.keys(CHEST_TIERS).filter((k) => counts[k]).reverse()
+    .map((k) => `<span style="color:${CHEST_TIERS[k].css}">${counts[k]}× ${esc(CHEST_TIERS[k].name)}</span>`)
+    .join('<span style="color:var(--dim)"> · </span>');
+
   paint(`
     <div class="chest-stage">
       <div class="chest-icon">📦</div>
       <h1 style="color:${tier.css};margin-top:10px">${esc(tier.name)}</h1>
       <p style="color:var(--dim);letter-spacing:.2em;font-size:13px">${list.length} WAITING</p>
+      <p style="font-size:12px;letter-spacing:.06em;margin-top:6px">${stack}</p>
     </div>
     <button class="btn primary" data-act="open">CRACK IT OPEN</button>
+    ${list.length > 1 ? `<button class="btn" data-act="all">OPEN ALL ${list.length}</button>` : ''}
     <button class="btn ghost" data-act="later">LATER</button>
   `, {
     // flow.openChest takes it off the profile queue — do not shift here too.
     open: () => emit('chest:open', { tier: list[0] }),
+    all: () => emit('chest:openAll', {}),
     later: () => emit('nav', { to: 'garage' }),
-  }, { key: 'chests', head: head('CRATE', false) });
+  }, { key: `chests${list.length}`, head: head('CRATE', false) });
 }
 
-export function renderChestResult(tierId, loot, onDone) {
-  const tier = CHEST_TIERS[tierId] || CHEST_TIERS.scrap;
-  const rows = loot.items.map((it, i) => {
-    if (it.kind === 'cash') {
-      return `<div class="item rar-common" style="animation-delay:${i * 0.12}s">
-        <span class="ic">💵</span><span class="nm">${fmtMoney(it.amount)}<small>${it.why ? esc('DUPLICATE — ' + it.why) : 'PRIZE MONEY'}</small></span></div>`;
-    }
+// One screen for one crate and for twenty. The haul is already accumulated by
+// flow.js: all the money is one number, everything new is listed once, and a
+// second copy of something you own has been turned into marks on it.
+//
+// The old version listed every pick from one crate in order, which meant a run
+// of crates was a run of screens each saying "$900" — and a duplicate said
+// "DUPLICATE — Turbo Six" over a consolation payout, which is the least
+// interesting sentence a reward screen can contain.
+export function renderChestResult(haul, onDone) {
+  const tier = CHEST_TIERS[haul.best] || CHEST_TIERS.scrap;
+  const many = haul.crates > 1;
+  const rows = [];
+  let i = 0;
+  const delay = () => `animation-delay:${(i++) * 0.09}s`;
+
+  if (haul.cash) {
+    rows.push(`<div class="item rar-common" style="${delay()}">
+      <span class="ic">💵</span><span class="nm">${fmtMoney(haul.cash)}
+      <small>${many ? `PRIZE MONEY FROM ${haul.crates} CRATES` : 'PRIZE MONEY'}</small></span></div>`);
+  }
+
+  // A long enough run of crates can hand you a thing AND then a second copy of
+  // it, so a mark that landed on something new in this same haul is folded into
+  // that item's row — "NEW +2 MARKS" — rather than listed twice.
+  const foldedIn = new Set();
+  const markTag = (id) => {
+    const m = haul.marks[id];
+    if (!m) return '';
+    foldedIn.add(id);
+    return ` +${m.n} MARK${m.n > 1 ? 'S' : ''}`;
+  };
+
+  for (const it of haul.fresh) {
+    const extra = markTag(it.id);
     if (it.kind === 'part') {
       const p = partById(it.id);
       const slot = SLOTS.find((s) => s.id === p.slot);
-      return `<div class="item rar-${p.rarity}" style="animation-delay:${i * 0.12}s">
+      rows.push(`<div class="item rar-${p.rarity}" style="${delay()}">
         <span class="ic">${slot.icon}</span>
-        <span class="nm">${esc(p.name)}<small>${RARITY[p.rarity].name} ${slot.name} · TIER ${p.tier}</small></span></div>`;
+        <span class="nm">${esc(p.name)}<small>${RARITY[p.rarity].name} ${slot.name} · TIER ${p.tier}</small></span>
+        <span style="color:var(--good);font-weight:700;letter-spacing:.1em">NEW${extra}</span></div>`);
+    } else {
+      const s = skillById(it.id);
+      rows.push(`<div class="item rar-${s.rarity}" style="${delay()}">
+        <span class="ic">${s.icon}</span>
+        <span class="nm">${esc(s.name)}<small>${RARITY[s.rarity].name} TRICK · ${esc(s.tip)}</small></span>
+        <span style="color:var(--good);font-weight:700;letter-spacing:.1em">NEW${extra}</span></div>`);
     }
-    const s = skillById(it.id);
-    return `<div class="item rar-${s.rarity}" style="animation-delay:${i * 0.12}s">
-      <span class="ic">${s.icon}</span>
-      <span class="nm">${esc(s.name)}<small>${RARITY[s.rarity].name} TRICK · ${esc(s.tip)}</small></span></div>`;
-  }).join('');
+  }
+
+  // Duplicates. The count matters — three copies of the same part in one haul is
+  // three marks and the screen has to say so, or the crates read as empty.
+  for (const id in haul.marks) {
+    if (foldedIn.has(id)) continue;
+    const m = haul.marks[id];
+    const it = m.kind === 'part' ? partById(id) : skillById(id);
+    if (!it) continue;
+    const icon = m.kind === 'part'
+      ? (SLOTS.find((s) => s.id === it.slot) || { icon: '🔧' }).icon : it.icon;
+    const maxed = m.to >= MAX_LEVEL ? ' · MAXED' : '';
+    rows.push(`<div class="item rar-${it.rarity}" style="${delay()}">
+      <span class="ic">${icon}</span>
+      <span class="nm">${esc(it.name)}
+        <small>DUPLICATE${m.n > 1 ? ` ×${m.n}` : ''} · ${MARKS[m.from] || '—'} → ${MARKS[m.to]}${maxed}</small></span>
+      <span style="color:var(--brand);font-weight:700;letter-spacing:.1em">+${m.n} MARK${m.n > 1 ? 'S' : ''}</span></div>`);
+  }
+
+  if (!rows.length) {
+    rows.push(`<div class="item rar-common"><span class="ic">🕸️</span>
+      <span class="nm">NOTHING IN IT<small>THE NEXT ONE OWES YOU</small></span></div>`);
+  }
 
   paint(`
     <div class="chest-stage" style="padding:2vh 0">
       <h1 style="color:${tier.css}">${esc(tier.name)}</h1>
+      ${many ? `<p style="color:var(--dim);letter-spacing:.2em;font-size:13px">${haul.crates} CRATES OPENED</p>` : ''}
+      ${haul.pity ? '<p style="color:var(--brand);letter-spacing:.1em;font-size:12px">THE HOUSE OWED YOU ONE</p>' : ''}
     </div>
-    <div class="loot">${rows}</div>
-    <button class="btn primary" data-act="ok" style="margin-top:16px">TAKE IT</button>
-  `, { ok: () => onDone && onDone() }, { key: 'chestresult' });
+    <div class="loot">${rows.join('')}</div>
+  `, { ok: () => onDone && onDone() }, {
+    key: 'chestresult',
+    // Twenty crates is a list taller than a phone, and the button that gets you
+    // out of it cannot live underneath that. Same lesson as the results screen.
+    foot: '<button class="btn primary" data-act="ok">TAKE IT</button>',
+  });
 }
 
 // ═══════════════════════════════ RESULTS ═══════════════════════════════

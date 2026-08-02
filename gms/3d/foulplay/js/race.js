@@ -377,22 +377,52 @@ function resolveContacts(dt, cars) {
           }
         }
       } else {
-        // Nose to tail.
+        // Nose to tail. Running up the back of somebody is the cleanest hit in
+        // the game and it should read as one thing: they get fired down the
+        // road, you drive through the gap. Not two cars stopping dead, and not
+        // two cars pinballing into the scenery.
         const dir = sign(ds) || 1;
         const push = (overS + 0.05) * CRASH.separate;
         const rel = (b.va - a.va) * dir;
         a.s = wrap(a.s - dir * push * (mb / tot), tr.length);
         b.s = wrap(b.s + dir * push * (ma / tot), tr.length);
         if (rel < 0) {
-          const jimp = -(1 + 0.2) * rel / (1 / ma + 1 / mb);
-          a.va -= (jimp / ma) * dir;
-          b.va += (jimp / mb) * dir;
           const closing = Math.abs(rel);
-          if (closing > 3.5) contactDamage(a, b, closing, dir, 'rear');
-          // A shunt from behind unsettles the car in front.
           const front = dir > 0 ? b : a;
-          front.psi += rand(-0.12, 0.12) * clamp01(Math.abs(rel) / 14);
-          front.recover = Math.max(front.recover, 0.4);
+          const rear = dir > 0 ? a : b;
+          const mf = front.stats.mass || 1, mr = rear.stats.mass || 1;
+          // The exchange is deliberately lopsided. A symmetric impulse gave the
+          // rammer as much of a shock as the rammed, which is not what running
+          // into the back of a lighter car feels like from inside the heavy one.
+          // `rearBias` sends most of it forward and `rearSteal` decides how much
+          // of it the car behind actually pays for.
+          // Both cars race along +s, so the front one always gains and the one
+          // behind always loses — `dir` only ever said which of a and b was in
+          // front, and reading it into the impulse twice is how that used to be
+          // written.
+          const jimp = -(1 + 0.2) * rel / (1 / mf + 1 / mr);
+          front.va += (jimp / mf) * (1 + CRASH.rearBias);
+          rear.va -= (jimp / mr) * CRASH.rearSteal;
+          // The jerk you can see: the front car's nose comes up and its tail
+          // squats, which is what sells a shunt from the car behind.
+          front.kick(CRASH.rearJerk * clamp01(closing / 20));
+          rear.kick(-CRASH.rearJerk * 0.4 * clamp01(closing / 20));
+          front.recover = Math.max(front.recover, 0.5);
+          front.psi += rand(-0.12, 0.12) * clamp01(closing / 14);
+          if (closing > 3.5) contactDamage(a, b, closing, dir, 'rear');
+          // Both of them are now the circuit's problem for a moment: the rails
+          // will not let either one through and the verge hands them back.
+          a.contactGuard = Math.max(a.contactGuard, CRASH.contactGuard);
+          b.contactGuard = Math.max(b.contactGuard, CRASH.contactGuard);
+          // Only a genuinely enormous shunt puts a car in the air, and then only
+          // the one that got hit, and then only a hop. The owner's line: either
+          // car MAY go airborne on a big one, but both should stay on the track
+          // almost all of the time.
+          if (closing > CRASH.rearAirAt && Math.random() < CRASH.rearAirChance) {
+            const lift = CRASH.rearAir * clamp01((closing - CRASH.rearAirAt) / 18);
+            front.vh = Math.max(front.vh, lift);
+            if (Math.random() < 0.3) rear.vh = Math.max(rear.vh, lift * 0.5);
+          }
         }
       }
     }
@@ -536,10 +566,19 @@ function contactDamage(a, b, closing, dir, kind) {
   const dmg = closing * CRASH.carDamage;
   const regionA = kind === 'side' ? (dir > 0 ? 'right' : 'left') : (dir > 0 ? 'rear' : 'front');
   const regionB = kind === 'side' ? (dir > 0 ? 'left' : 'right') : (dir > 0 ? 'front' : 'rear');
-  // Whoever was doing the closing takes a bit less — ramming is rewarded.
-  const aAgg = kind === 'rear' ? (dir > 0 ? 0.65 : 1.0) : 1.0;
-  a.damage(dmg * aAgg * (1 / (a.stats.ram || 1)), regionA, { by: b, source: 'contact' });
-  b.damage(dmg * (2 - aAgg) * 0.6 * (1 / (b.stats.ram || 1)), regionB, { by: a, source: 'contact' });
+  // Ramming is rewarded, and it was not rewarded by anything like enough: the
+  // rammer used to take 0.65 of the hit against the rammed car's 0.81, so the
+  // player deliberately using their car as the weapon came off barely better
+  // than the driver who never saw it coming. A bumper is a bumper — the car
+  // that chose the impact takes a third of it.
+  let aTake = 1, bTake = 0.6;
+  if (kind === 'rear') {
+    const aBehind = dir > 0;         // a is the one doing the running-into
+    aTake = aBehind ? CRASH.rammerTake : CRASH.rammedTake;
+    bTake = aBehind ? CRASH.rammedTake : CRASH.rammerTake;
+  }
+  a.damage(dmg * aTake * (1 / (a.stats.ram || 1)), regionA, { by: b, source: 'contact' });
+  b.damage(dmg * bTake * (1 / (b.stats.ram || 1)), regionB, { by: a, source: 'contact' });
   a.lastContact = b; a.lastContactAt = performance.now() / 1000;
   b.lastContact = a; b.lastContactAt = performance.now() / 1000;
   if (b.ai) b.ai.remember(a);

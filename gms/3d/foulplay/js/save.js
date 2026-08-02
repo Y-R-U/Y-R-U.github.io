@@ -251,6 +251,19 @@ export function nextUpgradeCost(id) {
   return upgradeCost(item, lvl);
 }
 
+// A mark handed over rather than bought — what a duplicate out of a crate is
+// worth. Returns how many marks actually landed, which is 0 once the thing is
+// at MAX_LEVEL and the crate has to pay in cash instead.
+export function markUp(id, n = 1) {
+  if (!owns(id)) return 0;
+  const from = levelOf(id);
+  const to = clamp(from + n, 1, MAX_LEVEL);
+  if (to === from) return 0;
+  profile.garage.levels[id] = to;
+  saveProfile();
+  return to - from;
+}
+
 export function upgradeItem(id) {
   const cost = nextUpgradeCost(id);
   if (!cost || !owns(id) || profile.money < cost) return false;

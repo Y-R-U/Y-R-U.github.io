@@ -395,8 +395,11 @@ function hitHazard(car, h) {
     car.shred = Math.max(car.shred, 6);
     car.damage(12, 'bottom', { source: 'tacks' });
     if (Math.random() < 0.4) {
+      // Through breakPart, not detachPart: caltrops shred a tyre, and a shredded
+      // tyre wobbles its way off over a lap like every other wheel in the game.
+      // Going straight to detach skipped the ladder AND the last-wheel guard.
       const wheels = ['wheelFL', 'wheelFR', 'wheelRL', 'wheelRR'].filter((w) => car.parts[w]);
-      if (wheels.length) car.detachPart(pick(wheels), {});
+      if (wheels.length) car.breakPart(pick(wheels), { severity: 0.9 });
     }
     fx.sparkBurst(car.worldPos, _v1.set(0, 1, 0), 10, 0xffcc66, 8);
   } else if (h.kind === 'smoke') {

@@ -92,11 +92,30 @@ third of the car off, `homeMinTime`/`homeMaxTime` of downtime and a
 twice as long, and it says `WIPEOUT`. Nothing here ever retires a car — the only
 elimination in the game is the knockout event type.
 
+**And there is an invisible bumper, admitted openly.** `Car.keepOnTrack` does
+nothing for the first 2.5m off the racing surface, then pushes inward, harder
+the further out you are, and past the band it eats outward speed outright. It is
+capped as an inward SPEED rather than acting as a wall, so you can still leave
+deliberately — it just takes longer — and a car that was put there by somebody
+else gets the corner back. It matters most where there is no barrier at all
+(`saltflats`, `quarry`, half of `carverpass`), which is exactly where the
+circuit used to stop being forgiving.
+
 `checkEdges()` decides bounce vs vault, and it weights **how** you arrive far
 more than how fast: square-on is a scrape however sideways you are sliding,
 `|psi|` over about a radian cuts the threshold by 46%, and a fresh shunt
 (`car.slammed`) cuts it by a third more. That is what makes a slam next to a
 barrier lethal and an ordinary rail scrape survivable.
+
+**Running up the back of somebody is not "somebody put you there".** A rear-end
+contact arms `car.contactGuard` on both cars for `CRASH.contactGuard` seconds,
+and that closes the vault door and puts the bumper at full strength — so a shunt
+ends with both cars still racing. A SIDE slam beside the steel is untouched by
+this and stays lethal, because it is the one way to put a rival out with the car
+alone. Ramming also pays: `rammerTake`/`rammedTake` give the car that chose the
+impact about a third of what the car in front takes, `rearBias`/`rearSteal` send
+most of the impulse forward, and `Car.kick()` puts a visible lurch on the pitch
+axis so the shunt looks like it landed.
 
 ---
 
@@ -109,11 +128,34 @@ without it: losing a wheel adds `wheelPull`, losing the roof reveals the driver,
 glass shatters instead of flying off in one piece.
 
 **Wheels are the exception, and they are a ladder.** `CRASH.wheelSpeed` is
-indexed by how many are gone — 1, 0.9, 0.74, 0.5, **0** — so the first is cheap
-and funny and the fourth ends the drive: no throttle, no steering, the floorpan
-scrubbing speed off until the truck comes for it. `CRASH.wheelResist` and
+indexed by how many are gone — 1, 0.9, 0.74, 0.5 — so the first is cheap and
+funny and the third makes the car a liability. `CRASH.wheelResist` and
 `wheelPickBias` make each successive wheel harder to take off than the last, in
 both the roll that picks a panel and the damage that panel then soaks.
+
+**And a wheel never simply comes off.** It goes onto its hub and wobbles for a
+measured distance of ROAD — `CRASH.wheelWobbleLaps`, in laps, so "a whole lap"
+means a whole lap on a 2km circuit and on a 1.3km one. The first takes 0.75–1.25
+laps, the second and third 1–2, and **there is no fourth entry: the last wheel
+wobbles for the rest of the race and never leaves**, because a car with nothing
+to roll on is a car you cannot drive, and taking the drive away is the one thing
+this game does not do to you. A lap of grinding sparks and a steering pull that
+comes and goes is something you watch coming and drive around, rather than
+something that happens to you between corners.
+
+`p.dangleUnit` is `'m'` for a wheel and `'s'` for everything else, and
+`dangleForever` takes the last one off the clock entirely. **Every route to
+taking a wheel off has to respect that or it does nothing** — `flailHit`,
+CALTROPS, `stripDown`, a hit landing on something already dangling and
+`breakPart` itself have each been the one that quietly bypassed it. `detachPart`
+is the choke point: it refuses a wheel that is mid-wobble unless the wobble's own
+clock is calling (`opts.wobbled`).
+
+**A detached wheel is stowed, not destroyed.** `rejoin()` has always said
+`wheelsLost = 0; // the truck bolts something on` — and bolted nothing on,
+because `debris.js` had taken the hub away and eventually deleted it, so a car
+came back from the truck with no wheels at all and full speed. Debris gets a
+*clone* now and `restoreWheels()` puts the original back.
 
 **A car also knows how big it is.** `carfactory:measureHull` measures the built
 mesh and every collision reads that, because the style table's nominal size is
@@ -162,7 +204,13 @@ almost everything is expensive, which is what makes a race worth running.
 | the bookmaker | 1.8×–5.5× a stake | somewhere for a big pile to go |
 | the team facility | a % of every prize | a long-term purchase that pays back |
 
-**A crate is mostly an envelope of cash.** `CHEST_TIERS` in `arsenal.js` owns
+**A crate is mostly an envelope of cash, and a duplicate is a mark.** A second
+copy of something you own upgrades it (`save.markUp`) instead of paying a
+consolation payout; only an item already at `MAX_LEVEL` falls back to cash.
+`flow.js` accumulates a **haul** across however many crates were opened at once
+— `{crates, cash, fresh[], marks{}}` — so one screen serves one crate and
+twenty: all the money on one row, everything new listed once, and the marks with
+their counts (`DUPLICATE ×2 · I → III`). `CHEST_TIERS` in `arsenal.js` owns
 the rates: a scrap crate cannot produce a legendary at all, and the good tiers
 only come from winning. Nine crates in a row with nothing in them arms a pity
 roll (`flow.js:openChest`), because a long dry run stops reading as bad luck

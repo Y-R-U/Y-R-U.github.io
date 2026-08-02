@@ -5,7 +5,7 @@
 import { state, resetRaceState } from './state.js';
 import {
   profile, saveProfile, addMoney, applyLadder, grantChest, takeChest, ownPart, ownSkill,
-  checkPrizes, ownsCar,
+  checkPrizes, ownsCar, markUp, levelOf, itemById,
 } from './save.js';
 import { startRace, updateRace, teardownRace, forceEnd } from './race.js';
 import { updateHud, showHud, initHud, resetHud, banner } from './hud.js';
@@ -17,7 +17,7 @@ import { playCutscene, updateCine, cineActive, stopCine } from './cine.js';
 import * as menus from './menus.js';
 import { levelEvent, cutsceneFor, storyLength, isLevelUnlocked } from './story.js';
 import { eventById, quickEvent, dailyEvent } from './events.js';
-import { rollChest, crateAward } from './arsenal.js';
+import { rollChest, crateAward, dupeValue } from './arsenal.js';
 import { team, conditionMet, recordWin, trackUnlocked } from './progress.js';
 import { titleRoundEvent, resolveRound, titleById, roundName } from './titles.js';
 import { TRACK_DEFS } from './trackgen.js';
@@ -81,6 +81,7 @@ function wire() {
   on('story:play', ({ level }) => startStoryLevel(level));
   on('race:done', (results) => onRaceDone(results));
   on('chest:open', ({ tier }) => openChest(tier));
+  on('chest:openAll', () => openAllChests());
   on('input:pause', () => togglePause());
   on('replay:skip', () => {
     stopPlayback();
@@ -475,28 +476,89 @@ function checkObjective(ev, r) {
 // ---------------------------------------------------------------------------
 // Chests
 // ---------------------------------------------------------------------------
-export function openChest(tierHint) {
+// Opening a crate produces one of three things and the screen has to be able to
+// say all three at once: money, a thing you did not have, and a mark on a thing
+// you did. A run of ten crates piles up a dozen cash rows and four copies of the
+// same part, so the results are ACCUMULATED — one money line, one line per item
+// — and a duplicate is a mark rather than a consolation payout.
+function newHaul() {
+  return { crates: 0, tiers: [], cash: 0, fresh: [], marks: {}, best: 'scrap', pity: false };
+}
+
+const TIER_ORDER = ['scrap', 'parts', 'contra', 'sponsor'];
+
+function openInto(haul, tierHint) {
   const tier = takeChest() || tierHint;
-  if (!tier) { goto('garage'); return; }
+  if (!tier) return false;
   const owned = { parts: profile.garage.parts, skills: profile.garage.skills };
   const pity = (profile.dryCrates || 0) >= 9;
   const loot = rollChest(tier, owned, team().crateLuck, pity);
-  let cash = 0;
   let gotSomething = false;
+
+  haul.crates++;
+  haul.tiers.push(tier);
+  if (TIER_ORDER.indexOf(tier) > TIER_ORDER.indexOf(haul.best)) haul.best = tier;
+
   for (const item of loot.items) {
-    if (item.kind === 'cash') cash += item.amount;
-    else if (item.kind === 'part') { ownPart(item.id); gotSomething = true; }
-    else if (item.kind === 'skill') { ownSkill(item.id); gotSomething = true; }
+    if (item.pity) haul.pity = true;
+    if (item.kind === 'cash') { haul.cash += item.amount; continue; }
+    const isPart = item.kind === 'part';
+    const got = isPart ? ownPart(item.id) : ownSkill(item.id);
+    if (got) {
+      // New. Note that `owned` above is a live reference into the profile, so
+      // the next pick in this same crate already knows we have it.
+      haul.fresh.push({ kind: item.kind, id: item.id });
+      gotSomething = true;
+      continue;
+    }
+    // A second copy of something you own is a mark on it — the crate hands over
+    // the upgrade you would otherwise have paid for. Once it is at the top mark
+    // there is nowhere left to put it and it pays out instead.
+    const n = markUp(item.id, 1);
+    if (n) {
+      const m = haul.marks[item.id] || (haul.marks[item.id] = {
+        kind: item.kind, id: item.id, n: 0, from: levelOf(item.id) - n,
+      });
+      m.n += n;
+      m.to = levelOf(item.id);
+      gotSomething = true;
+    } else {
+      haul.cash += dupeValue(itemById(item.id));
+    }
   }
+
   profile.dryCrates = gotSomething ? 0 : (profile.dryCrates || 0) + 1;
-  if (cash) addMoney(cash);
   profile.stats.chestsOpened++;
+  return true;
+}
+
+function finishHaul(haul) {
+  if (haul.cash) addMoney(haul.cash);
   saveProfile(true);
   sfx('chest');
-  menus.renderChestResult(tier, loot, () => {
+  menus.renderChestResult(haul, () => {
     if (profile.chests.length) goto('chests');
     else goto(afterRace === 'story' ? 'story' : afterRace === 'events' ? 'events' : 'garage');
   });
+}
+
+export function openChest(tierHint) {
+  const haul = newHaul();
+  if (!openInto(haul, tierHint)) { goto('garage'); return; }
+  finishHaul(haul);
+}
+
+// The whole queue in one go. Six crates after a good event is six identical
+// taps on CRACK IT OPEN and six screens that each say $900, which is not a
+// reward, it is a chore.
+export function openAllChests() {
+  const haul = newHaul();
+  let guard = 0;
+  while (profile.chests.length && guard++ < 200) {
+    if (!openInto(haul)) break;
+  }
+  if (!haul.crates) { goto('garage'); return; }
+  finishHaul(haul);
 }
 
 // ---------------------------------------------------------------------------

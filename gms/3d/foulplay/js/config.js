@@ -145,6 +145,49 @@ export const CRASH = {
 
   carPush: 0.95,            // lateral impulse share in a car-to-car shunt
   carDamage: 3.9,           // hp per m/s of closing speed — this is where it hurts
+
+  // --- running up the back of somebody --------------------------------------
+  // Ramming is the game. The car doing it should come out of it better off than
+  // the car it hit, in damage AND in control: a rear-ender is supposed to read
+  // as "they got launched down the road and I drove through it", not as two
+  // cars both spinning into the scenery. These are the fraction of the hit each
+  // side takes; the rest of the asymmetry is in the impulse split below.
+  rammerTake: 0.3,          // share of the damage taken by the car behind…
+  rammedTake: 0.92,         // …and by the car in front
+  // How the impulse is split. An even exchange gives the rammer as much of a
+  // shock as the car it hit, which is not what running into the back of
+  // somebody feels like from inside the heavy one. The car in front takes half
+  // again as much as momentum would give it and the rammer pays a third of what
+  // it owes — a deliberate cheat, in the direction the player is aiming.
+  rearBias: 0.5,            // extra share of the impulse the front car takes
+  rearSteal: 0.32,          // fraction of the exchange the rammer actually pays
+  rearJerk: 0.16,           // radians of visible nose-up lurch, at a big hit
+  // Only a genuinely big shunt puts anybody in the air, and not far. Both cars
+  // are supposed to stay on the tarmac almost all of the time.
+  rearAirAt: 26,            // closing m/s below which nothing leaves the ground
+  rearAirChance: 0.35,
+  rearAir: 3.2,             // vertical m/s of the hop, at most
+
+  // --- the invisible bumper -------------------------------------------------
+  // The circuit is forgiving by design (see checkEdges) but "forgiving" used to
+  // stop at the barrier line, and the parts of a circuit with no barrier had
+  // nothing at all holding a shunted car in. This is the cheat, in the open: a
+  // soft inward push that starts a couple of metres off the racing surface and
+  // grows the further out you are, so a knock sends you onto the grass and the
+  // grass hands you back rather than swallowing you.
+  //
+  // It does NOT stop you driving off deliberately — the push is a nudge next to
+  // the throttle, and it only reaches full strength well beyond where anybody
+  // means to be.
+  bumpFrom: 2.5,            // metres past the road edge before it starts
+  bumpFull: 10,             // …and where it reaches full strength
+  bumpForce: 26,            // m/s² of inward push at full strength
+  bumpGuard: 40,            // …rising to this while a contact guard is live
+  // Seconds after a car-to-car impact during which the bumper is at full force
+  // and the barrier cannot be vaulted. Somebody else put you here; the circuit
+  // gives you the corner back.
+  contactGuard: 1.6,
+
   slamSpeed: 12,            // closing m/s that counts as a deliberate slam
   slamImpulse: 30,          // lateral m/s an attack SLAM adds
   slamDamage: 54,
@@ -220,8 +263,8 @@ export const CRASH = {
   debrisSparkRate: 20,      // spark bursts/sec off a panel skidding on tarmac
 
   // --- driving on the rims --------------------------------------------------
-  grindRate: 11,            // spark bursts/second from ONE grinding corner
-  grindStack: 0.6,          // extra rate per additional missing wheel
+  grindRate: 19,            // spark bursts/second from ONE grinding corner
+  grindStack: 0.7,          // extra rate per additional missing wheel
   // Additive sparks are the most expensive thing on a phone GPU, and four cars
   // grinding side by side is the case that multiplies out of control. The FIELD
   // shares one ceiling rather than every car getting its own. Set generously:
@@ -253,6 +296,21 @@ export const CRASH = {
   // numbers were first fitted against.
   wheelResist: [1, 2.6, 5.2, 10],
   wheelPickBias: 0.55,      // multiplier on a wheel's odds of being picked, per wheel already lost
+  // --- and how long one hangs there before it goes ---------------------------
+  // A wheel does not ping off the car the moment its hub gives up. It wobbles,
+  // for LAPS, throwing sparks the whole way, and losing it is a slow-motion
+  // thing you can see coming and drive around. Measured in laps of the current
+  // circuit rather than in seconds, so "a whole lap" means a whole lap whether
+  // that is 45 seconds at saltflats or 90 at skyline.
+  //
+  // Indexed by how many wheels have ALREADY gone, so this is the wobble the
+  // 1st / 2nd / 3rd wheel gets. There is no fourth entry, and that is the point:
+  // the last wheel wobbles for the rest of the race and never comes off, because
+  // a car on no wheels is a car that cannot be driven, and taking the drive away
+  // from the player is the one thing this game does not do.
+  wheelWobbleLaps: [[0.75, 1.25], [1, 2], [1, 2]],
+  wheelsKeep: 1,            // wheels that can never be knocked off a running car
+  wheelSparkRate: 46,       // spark bursts/sec off a wobbling wheel on the tarmac
   wheelSag: 0.115,          // metres the body drops per missing wheel
   wheelDrag: 0.85,          // extra rolling resistance per missing wheel
   // With nothing left to roll on the car is a sledge: it scrubs off speed on

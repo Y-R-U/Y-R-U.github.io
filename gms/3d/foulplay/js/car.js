@@ -236,6 +236,15 @@ export class Car {
     // Where the wheels USED to be, in car space. Sparks have to come off the
     // corner that is actually grinding, not out of the middle of the car.
     this.stumps = [];
+    // Wheels that are hanging off their hubs but still on the car. They cost
+    // speed and tug at the steering without taking the drive away.
+    this.wobbling = 0;
+    this.wobblePull = 0;
+    // Wheels the truck took off the car. Kept so `rejoin` can bolt the same ones
+    // back on — "the truck bolts something on" used to reset the COUNT without
+    // putting any wheels back, which is the whole of "it looks like I have no
+    // wheels but I keep driving".
+    this.stowed = {};
     this.grindAcc = 0;
     this.grindAt = -99;
     this.grindIx = 0;
@@ -256,6 +265,12 @@ export class Car {
     this.recover = 0;
     this.invuln = 0;
     this.hitFlash = 0;
+    this.slammed = 0;
+    // Somebody just ran into the back of you, or you into the back of them.
+    // While this is live the circuit holds both of you on it: the invisible
+    // bumper is at full strength and no barrier can be vaulted. A shunt is not
+    // supposed to be how either car's race ends.
+    this.contactGuard = 0;
     this.driftTime = 0;
     this.airTime = 0;
     this.airPeak = 0;
@@ -277,6 +292,7 @@ export class Car {
     this.worldVel = new THREE.Vector3();
     this.frame = {};
     this.roll = 0; this.pitchV = 0;
+    this.jolt = 0;               // a shunt's visible lurch, decays on its own
     this.mesh = buildCar({
       style: this.style,
       body: this.livery.body,
@@ -413,6 +429,11 @@ export class Car {
     if (this.invuln > 0) this.invuln -= dt;
     if (this.hitFlash > 0) this.hitFlash -= dt;
     if (this.slammed > 0) this.slammed -= dt;
+    if (this.contactGuard > 0) this.contactGuard -= dt;
+    if (this.jolt) {
+      this.jolt *= Math.max(0, 1 - dt * 6);
+      if (Math.abs(this.jolt) < 0.002) this.jolt = 0;
+    }
     if (this.boostTime > 0) {
       this.boostTime -= dt;
       if (this.boostTime <= 0) this.boostTime = 0;
@@ -485,7 +506,12 @@ export class Car {
     accel -= DRIVE.drag * vf * Math.abs(vf);
     accel -= DRIVE.rollResist * sign(vf);
     // A corner on its rim drags; a car with no corners left drags a great deal.
-    if (this.wheelsLost > 0) accel -= CRASH.wheelDrag * this.wheelsLost * sign(vf);
+    // A wheel folded onto its hub is still a wheel — it is just a bad one. It
+    // costs about half of what losing it would, which is what makes a wobble
+    // something you feel for a lap rather than a decoration.
+    if (this.wheelsLost > 0 || this.wobbling > 0) {
+      accel -= CRASH.wheelDrag * (this.wheelsLost + this.wobbling * 0.5) * sign(vf);
+    }
     if (beached) accel -= CRASH.beachedDrag * sign(vf);
     if (offTrack) accel -= DRIVE.offTrackDrag * (2 - this.stats.offroad) * sign(vf);
     if (this.h > 0.35) accel *= 0.12;
@@ -527,9 +553,14 @@ export class Car {
     // Sliding sideways scrubs speed off.
     vf -= Math.abs(vs) * DRIVE.slipScrub * dt;
 
-    // A wrecked corner pulls the car toward the missing wheel.
+    // A wrecked corner pulls the car toward the missing wheel — and a wobbling
+    // one tugs and lets go, which is a different, nastier feeling than a steady
+    // pull and the reason you want it fixed.
     if (this.wheelsLost > 0 && this.h <= 0.35) {
       this.psi += this.wheelPull * dt * 0.8;
+    }
+    if (this.wobblePull && this.h <= 0.35) {
+      this.psi += this.wobblePull * dt * 0.5 * (0.55 + 0.45 * Math.sin(this.trackTime * 7.3));
     }
 
     // --- recompose and advance ---------------------------------------------
@@ -662,6 +693,8 @@ export class Car {
     const side = sign(this.t);
     const type = side > 0 ? f.railR : f.railL;
 
+    this.keepOnTrack(f, dt);
+
     if (type === 'open') {
       // No barrier: you are on the dirt. Drivable, slow, and there is a limit.
       const over = Math.abs(this.t) - w;
@@ -693,7 +726,13 @@ export class Car {
     // You only go THROUGH a barrier if somebody put you there. Driving into it
     // at any speed — however sideways — bounces you back onto the road. That is
     // the deal: the circuit is forgiving so that the danger is other drivers.
-    if (this.slammed > 0 && type !== 'wall') {
+    //
+    // …and a shunt from behind is not "somebody put you there". A side slam
+    // beside the steel is still lethal — that is the one way to put a rival out
+    // with the car alone and it must stay lethal — but running up the back of
+    // somebody should end with both cars still racing, so a rear-end contact
+    // arms `contactGuard` and that closes this door for a moment.
+    if (this.slammed > 0 && this.contactGuard <= 0 && type !== 'wall') {
       const vaultAt = CRASH.railVault * (1 - 0.5 * smoothstep(0.55, 1.4, Math.abs(this.psi)));
       if (impact > vaultAt) {
         this.wreck('put into the barrier');
@@ -749,6 +788,47 @@ export class Car {
     }
   }
 
+  // The invisible bumper, admitted openly.
+  //
+  // The barrier logic above is generous, but it only applies where there IS a
+  // barrier — on an open stretch a shunt could send a car out across the grass
+  // with nothing between it and the scenery, and that is the one place the
+  // circuit stopped being forgiving. So the ground pushes back: nothing at all
+  // for the first couple of metres off the racing surface, then a hand in the
+  // small of the back that grows the further out you are.
+  //
+  // It cannot stop you leaving on purpose, because it is capped as an inward
+  // SPEED rather than as a wall: keep the wheel turned and you still go, it just
+  // takes longer. What it does do is give a car that was put there by somebody
+  // else the corner back, which is the whole point.
+  keepOnTrack(f, dt) {
+    if (this.h > 1.2) return;                     // in the air, nothing is touching
+    const out = Math.abs(this.t) - f.width;
+    if (out <= CRASH.bumpFrom) return;
+    const side = sign(this.t) || 1;
+    const k = clamp01((out - CRASH.bumpFrom) / Math.max(1, CRASH.bumpFull - CRASH.bumpFrom));
+    const guarded = this.contactGuard > 0;
+    const force = (guarded ? CRASH.bumpGuard : CRASH.bumpForce) * k;
+    // Terminal inward speed rather than an ever-growing shove, so the bumper
+    // returns a car to the road at a sensible pace instead of firing it back
+    // across the circuit into whoever was behind.
+    const inward = -side * this.vl;
+    const cap = (guarded ? 9 : 5.5) + 8 * k;
+    if (inward < cap) this.vl -= side * force * dt;
+    // Past the far edge of the band the ground stops being polite and starts
+    // eating the outward speed outright. Without this a car shoved off at 20 m/s
+    // sideways still covers thirty metres before an acceleration alone can turn
+    // it round — which on the open circuits is the far side of the run-off.
+    if (k >= 1 && inward < 0) this.vl *= 1 - damp(guarded ? 4.5 : 2.8, dt);
+    if (guarded) this.recover = Math.max(this.recover, 0.35);
+    // Dust off the tyres where it is happening, so the push at least has
+    // something on screen to be coming from.
+    if (k > 0.15 && Math.abs(this.forwardSpeed) > 8 && Math.random() < dt * 12) {
+      _v1.copy(this.worldPos).addScaledVector(f.right, -side * this.halfWide * 0.8);
+      fx.dust(_v1, 0.5 + k * 0.6);
+    }
+  }
+
   land(impact) {
     const dmg = (impact - CRASH.landHard) * CRASH.landDamage;
     if (dmg > 0) this.damage(dmg, 'bottom', { source: 'landing' });
@@ -778,6 +858,14 @@ export class Car {
     if (opts.stun) this.stun = Math.max(this.stun, opts.stun);
     this.hitFlash = 0.22;
     if (opts.by) { this.lastContact = opts.by; this.lastContactAt = performance.now() / 1000; }
+  }
+
+  // A visible lurch about the car's own pitch axis: nose up when somebody hits
+  // the back of you, nose down when you hit the back of them. Costs nothing in
+  // the physics — it exists so a shunt looks like it landed.
+  kick(amount) {
+    if (this.mode === 'wreck' || this.mode === 'out') return;
+    this.jolt = clamp(this.jolt + amount, -0.22, 0.22);
   }
 
   // How hard was that, on a scale of "paint" to "that will need a new car"?
@@ -828,7 +916,15 @@ export class Car {
       // end of the car is why, in practice, no panel ever hung on long enough
       // for anybody to notice it was hanging on.
       if (p.dangling > 0) {
-        p.dangling = Math.max(0.6, p.dangling - (0.8 + sev * 2.2));
+        // A wheel's countdown is in METRES, so the same bite has to be scaled
+        // into road distance or a hit knocks three metres off a fifteen-hundred
+        // metre wobble and reads as nothing. The last wheel is not on this
+        // clock at all.
+        if (!p.dangleForever) {
+          const far = p.dangleUnit === 'm';
+          const bite = (0.8 + sev * 2.2) * (far ? 34 : 1);
+          p.dangling = Math.max(far ? 80 : 0.6, p.dangling - bite);
+        }
         candidates.splice(idx, 1);
         pool -= 2;
         continue;
@@ -997,8 +1093,19 @@ export class Car {
     // Glass shatters, it does not flap. Everything else — panels, bumpers,
     // mirrors, wheels — gets its few seconds hanging off the side first, and
     // only a real slam rips a piece straight off the car.
-    const tearOff = p.glass || p.dangling > 0
-      || Math.random() < CRASH.tearOff + sev * CRASH.tearOffSev;
+    //
+    // A wheel is never in that last group. Whatever hit it, however hard, a
+    // wheel goes onto its hub and WOBBLES — for laps — and the last one on the
+    // car does not come off at all. See wobbleLapsFor.
+    const tearOff = !p.wheel && (p.glass || p.dangling > 0
+      || Math.random() < CRASH.tearOff + sev * CRASH.tearOffSev);
+    if (p.wheel && p.dangling > 0) {
+      // Already wobbling: another thump just knocks more of the hub out. It does
+      // not shorten a wheel that is meant to hang there for a lap, and it can
+      // never finish off the last one.
+      if (!this.lastWheel(id)) p.dangling = Math.max(1, p.dangling * 0.82);
+      return;
+    }
     if (tearOff) {
       if (DMG) DMG.instant++;
       this.detachPart(id, opts);
@@ -1138,6 +1245,28 @@ export class Car {
     this.startDangle(id, shard.userData.part, sev, null, rand(2.2, 5.5));
   }
 
+  // Is this the last wheel the car has left? That one wobbles for the rest of
+  // the race and never leaves — a car with nothing to roll on cannot be driven,
+  // and taking the drive away is the one thing this game will not do to you.
+  lastWheel(id) {
+    const o = this.parts[id];
+    if (!o || !o.userData.part.wheel) return false;
+    if (this.mode === 'wreck') return false;   // the truck bolts them back on
+    let left = 0;
+    for (const k in this.parts) {
+      const q = this.parts[k];
+      if (q && q.userData.part.wheel) left++;
+    }
+    return left <= CRASH.wheelsKeep;
+  }
+
+  // How long a wheel wobbles before it goes, in metres of road. Laps, not
+  // seconds, so "a whole lap" is a whole lap on any circuit.
+  wobbleMetres() {
+    const band = CRASH.wheelWobbleLaps[Math.min(this.wheelsLost, CRASH.wheelWobbleLaps.length - 1)];
+    return rand(band[0], band[1]) * (this.track ? this.track.length : 1600);
+  }
+
   // Put a panel into the flapping state and tell everyone about it.
   startDangle(id, p, sev, by, maxFor) {
     const mass = p.mass || 0.5;
@@ -1148,6 +1277,13 @@ export class Car {
     // that tears loose during the crash has to visibly go BEFORE the recovery
     // truck arrives, or the break-up ends with panels still politely attached.
     if (maxFor) p.dangleFor = Math.min(p.dangleFor, maxFor);
+    // A wheel is counted down in METRES rather than seconds. It is meant to sit
+    // there banging against the arch for a lap or two, showering the car behind,
+    // long enough that losing it is something you watch coming and drive around
+    // rather than something that happens to you between corners.
+    p.dangleUnit = p.wheel && this.mode !== 'wreck' ? 'm' : 's';
+    p.dangleForever = !!(p.wheel && this.lastWheel(id));
+    if (p.dangleUnit === 'm') p.dangleFor = this.wobbleMetres();
     p.dangling = p.dangleFor;
     p.dangleBy = by || null;
     p.dangleSeed = rand(0, 6.28);
@@ -1174,7 +1310,8 @@ export class Car {
   // corner rests on the surface, so the sparks come off the point that is
   // genuinely touching rather than out of the middle of the car.
   updateDanglers(dt) {
-    if (!this.danglers.length) return;
+    if (!this.danglers.length) { this.wobbling = 0; this.wobblePull = 0; return; }
+    let wob = 0, wobPull = 0;
     const speed = Math.abs(this.forwardSpeed);
     const flapK = clamp01(speed / 46);
     const t = this.trackTime;
@@ -1190,13 +1327,21 @@ export class Car {
       const obj = this.parts[id];
       if (!obj) { this.danglers.splice(i, 1); continue; }
       const p = obj.userData.part;
-      p.dangling -= dt;
+      // Wheels are counted down in metres of road, everything else in seconds.
+      // A wheel that has to last "a lap" has to last a lap whether the car is
+      // flat out on a straight or crawling out of a wreck.
+      if (!p.dangleForever) p.dangling -= p.dangleUnit === 'm' ? speed * dt : dt;
       const f = p.flap;
       if (!f || !p.home) { if (p.dangling <= 0) this.detachPart(id, { by: p.dangleBy }); continue; }
 
       // A panel tears a little looser every second it hangs on: `loose` runs 0
       // (just went) to 1 (about to leave), and everything gets bigger with it.
-      const loose = clamp01(1 - p.dangling / (p.dangleFor || 4));
+      // The last wheel never gets there — it sits at a permanent bad wobble.
+      const loose = p.dangleForever ? 0.62 : clamp01(1 - p.dangling / (p.dangleFor || 4));
+      if (p.wheel) {
+        wob++;
+        if (p.home) wobPull += sign(p.home.x) * (p.home.z < 0 ? 0.5 : 0.22) * (0.3 + loose * 0.7);
+      }
       const pose = danglePose(obj, p, t, flapK, loose, _pose);
       const s = pose.s;
 
@@ -1221,18 +1366,27 @@ export class Car {
 
       // Sparks off the corner that is genuinely on the tarmac.
       if (touching && speed > 5) {
-        p.sparkAcc = (p.sparkAcc || 0) + dt * CRASH.dragSparkRate * (0.35 + flapK);
+        // A wheel folded onto its hub is not a panel scraping — it is a rim and
+        // a hub cutting into the road under a corner of the car's weight, for
+        // the whole lap it takes to shake itself off. It gets its own rate, and
+        // it is a big one on purpose.
+        const wheelly = p.wheel;
+        const rate = wheelly ? CRASH.wheelSparkRate : CRASH.dragSparkRate;
+        p.sparkAcc = (p.sparkAcc || 0) + dt * rate * (0.35 + flapK);
         let n = Math.floor(p.sparkAcc);
         if (n > 0) {
           p.sparkAcc -= n;
-          n = grindAllow(Math.min(n, 2));
+          n = grindAllow(Math.min(n, wheelly ? 4 : 2));
           if (n > 0) {
             this.mesh.localToWorld(_v3.copy(_drag));
             const up = (this.frame && this.frame.up) || _up;
             _v2.copy(up).multiplyScalar(0.5);
             if (this.frame && this.frame.tan) _v2.addScaledVector(this.frame.tan, -0.8);
-            fx.sparkBurst(_v3, _v2, 3 + Math.round(flapK * 5), 0xffb43a, 8 + flapK * 20);
-            if (Math.random() < 0.22) fx.smokePuff(_v3, 1, 0xb9b2a6, 0.9, 0.8);
+            for (let k = 0; k < n; k++) {
+              fx.sparkBurst(_v3, _v2, (wheelly ? 5 : 3) + Math.round(flapK * (wheelly ? 9 : 5)),
+                0xffb43a, 8 + flapK * (wheelly ? 30 : 20));
+            }
+            if (Math.random() < (wheelly ? 0.5 : 0.22)) fx.smokePuff(_v3, 1, 0xb9b2a6, 0.9, 0.8);
           }
         }
         if (this.trackTime - (p.scrapeAt || -9) > 0.6) {
@@ -1274,13 +1428,16 @@ export class Car {
         }
       }
 
-      if (p.dangling <= 0) {
+      if (p.dangling <= 0 && !p.dangleForever) {
         this.detachPart(id, {
           by: p.dangleBy,
+          wobbled: true,
           dir: _v1.set(f.dir * 0.6, 0.7, f.style === 'boot' || f.style === 'spoiler' ? 0.6 : -0.2).normalize(),
         });
       }
     }
+    this.wobbling = wob;
+    this.wobblePull = clamp(wobPull, -1.4, 1.4);
   }
 
   // A panel swinging off the side of a car is a weapon nobody meant to fit.
@@ -1391,6 +1548,24 @@ export class Car {
     const obj = this.parts[id];
     if (!obj) return;
     const p = obj.userData.part;
+    // The last wheel is not for sale, whatever asked for it — a flailing panel
+    // catching it, a stripped car shedding, a wreck being run into. It goes into
+    // a permanent wobble instead. Every route to losing a wheel has to respect
+    // this or it does nothing (the same lesson as the wheelResist ladder).
+    if (p.wheel && this.lastWheel(id)) {
+      if (!(p.dangling > 0)) this.startDangle(id, p, 0.6, opts.by);
+      p.dangleForever = true;
+      return;
+    }
+    // …and a wheel that is ALREADY wobbling only comes off when its own clock
+    // says so. `flailHit` used to reach in and pull `danglers[0]` off a rival,
+    // which quietly took two wheels off a car inside six seconds of a wobble
+    // that was supposed to last a lap. Anything else asking for it just knocks
+    // some of the distance off. `opts.wobbled` is the clock itself calling.
+    if (p.wheel && p.dangling > 0 && this.mode !== 'wreck' && !opts.wobbled) {
+      p.dangling = Math.max(60, p.dangling * 0.75);
+      return;
+    }
     const di = this.danglers.indexOf(id);
     const wasDangling = di >= 0;
     if (wasDangling) this.danglers.splice(di, 1);
@@ -1411,7 +1586,22 @@ export class Car {
       vel.z += rand(-5, 5);
       vel.y += rand(3, 9);
       if (opts.dir) vel.addScaledVector(opts.dir, rand(3, 9));
-      spawnDetached(obj, _v1, _q1, vel, this.debrisFloor(), {
+      // A wheel leaves a COPY of itself bouncing down the road and the original
+      // is hidden on the car, so the truck has something to bolt back on when it
+      // drops you at the side of the track. Everything else goes for good.
+      let loose = obj;
+      if (p.wheel) {
+        // three.js deep-copies userData through JSON.stringify, and a part's
+        // userData holds `dangleBy` — a Car, which points back at this one. Hand
+        // the clone an empty userData and put the real one back afterwards.
+        const ud = obj.userData;
+        obj.userData = {};
+        loose = obj.clone();
+        obj.userData = ud;
+        obj.visible = false;
+        this.stowed[id] = obj;
+      }
+      spawnDetached(loose, _v1, _q1, vel, this.debrisFloor(), {
         mass, spin: 1 + mass * 0.4,
         // Big panels stay in play. A bonnet bouncing back through the field is
         // the thing the owner actually asked for, and it needs time to do it.
@@ -1677,13 +1867,53 @@ export class Car {
     this.wreckHits = 0;
     this.mesh.visible = true;
     if (this.hp <= 0) this.hp = this.maxHp * 0.35;
-    this.wheelsLost = 0;   // the truck bolts something on
-    this.stumps.length = 0;
-    this._wheelPull = 0;
+    this.restoreWheels();  // the truck bolts something on — and now it really does
     this.grindAcc = 0;
     this.stripped = false;
     this.burning = false;
     emit('car:rejoin', { car: this });
+  }
+
+  // The recovery truck puts wheels back on the car. `wheelsLost = 0` on its own
+  // was a lie the mesh never heard: the hubs had been handed to debris.js and
+  // deleted, so a car came back from a wreck sitting on its floorpan doing full
+  // speed — "it often looks like I have no wheels but I keep driving". Every
+  // wheel is stowed rather than destroyed (see detachPart), so this is a matter
+  // of putting them back where they were.
+  restoreWheels() {
+    for (const id in this.stowed) {
+      const obj = this.stowed[id];
+      delete this.stowed[id];
+      if (!obj) continue;
+      const p = obj.userData.part;
+      p.hp = p.maxHp;
+      p.dent = 0;
+      p.dangling = 0;
+      p.dangleForever = false;
+      obj.visible = true;
+      obj.position.copy(p.home);
+      obj.rotation.set(0, 0, 0);
+      obj.quaternion.identity();
+      this.parts[id] = obj;
+      const li = this.partsLost.indexOf(id);
+      if (li >= 0) this.partsLost.splice(li, 1);
+    }
+    // Anything still hanging on gets bolted back too, or a car can leave the
+    // recovery truck with a wheel already halfway off.
+    for (let i = this.danglers.length - 1; i >= 0; i--) {
+      const o = this.parts[this.danglers[i]];
+      if (!o || !o.userData.part.wheel) continue;
+      const p = o.userData.part;
+      p.dangling = 0; p.dangleForever = false; p.hp = p.maxHp; p.dent = 0;
+      o.position.copy(p.home);
+      o.quaternion.identity();
+      this.danglers.splice(i, 1);
+    }
+    this.wheelsLost = 0;
+    this.wobbling = 0;
+    this.wobblePull = 0;
+    this.stumps.length = 0;
+    this._wheelPull = 0;
   }
 
   retire() {
@@ -1776,7 +2006,8 @@ export class Car {
     const lat = clamp(this.sideSlip / 16, -1, 1);
     const targetRoll = -lat * 0.2 + this._wheelPull * 0.12
       + (this.hitFlash > 0 ? rand(-0.05, 0.05) : 0);
-    const targetPitch = clamp((this.controls.brake * 0.5 - (this.boosting ? 0.5 : 0.2)) * 0.09, -0.09, 0.09);
+    const targetPitch = clamp((this.controls.brake * 0.5 - (this.boosting ? 0.5 : 0.2)) * 0.09, -0.09, 0.09)
+      + this.jolt;
     this.roll = lerp(this.roll, targetRoll, damp(9, dt || 0.016));
     this.pitchV = lerp(this.pitchV, targetPitch, damp(7, dt || 0.016));
 

@@ -396,22 +396,19 @@ export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0, p
       const pool = cratePool(SKILLS, rarity);
       const fresh = pool.filter((s) => !owned.skills.includes(s.id));
       const s = pick(fresh.length ? fresh : pool.length ? pool : SKILLS.filter((x) => x.src !== 'prize'));
-      if (!s || owned.skills.includes(s.id)) {
-        items.push({ kind: 'cash', amount: randInt(400, 1100), why: s ? `duplicate ${s.name}` : 'nothing you need' });
-      } else {
-        items.push({ kind: 'skill', id: s.id, rarity: s.rarity });
-      }
+      if (!s) items.push({ kind: 'cash', amount: randInt(400, 1100), why: 'nothing you need' });
+      // A second copy of something is a MARK on the one you have. See openChest:
+      // the crate opener owns the decision, because only it knows what level the
+      // thing is already at and whether there is anywhere left for it to go.
+      else items.push({ kind: 'skill', id: s.id, rarity: s.rarity, dupe: owned.skills.includes(s.id) });
       continue;
     }
 
     const pool = cratePool(PARTS, rarity);
     const fresh = pool.filter((p) => !owned.parts.includes(p.id));
     const p = pick(fresh.length ? fresh : pool.length ? pool : PARTS.filter((x) => x.src !== 'prize'));
-    if (!p || owned.parts.includes(p.id)) {
-      items.push({ kind: 'cash', amount: randInt(450, 1300), why: p ? `duplicate ${p.name}` : 'nothing you need' });
-    } else {
-      items.push({ kind: 'part', id: p.id, rarity: p.rarity });
-    }
+    if (!p) items.push({ kind: 'cash', amount: randInt(450, 1300), why: 'nothing you need' });
+    else items.push({ kind: 'part', id: p.id, rarity: p.rarity, dupe: owned.parts.includes(p.id) });
   }
 
   items.push({ kind: 'cash', amount: Math.round(rand(tier.cash[0], tier.cash[1])) });
@@ -431,6 +428,13 @@ export function rollChest(tierId, owned = { parts: [], skills: [] }, luck = 0, p
     }
   }
   return { tier: tierId, items };
+}
+
+// What a duplicate is worth in cash, for the one case where it cannot be a
+// mark: the item is already at MAX_LEVEL and there is nowhere left to put it.
+export function dupeValue(item) {
+  const base = item && item.price ? item.price * 0.06 : 0;
+  return Math.max(500, Math.round((base + randInt(450, 1300)) / 50) * 50);
 }
 
 // What finishing in a given position is worth. The brief: fourth or worse gets

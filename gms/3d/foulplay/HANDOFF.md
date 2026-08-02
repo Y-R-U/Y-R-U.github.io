@@ -767,3 +767,161 @@ warnings**. On-track recoveries 1.8-3.6s, off-track 2.8-4.9s.
 - **Replay ghosts do not show impact scuffs.** The scuff parts are created at
   runtime and are not in `PART_IDS`, so the mask cannot address them. Would need
   a couple of reserved slots in the part table.
+
+---
+
+# ROUND 8 — wheels wobble, ramming pays, crates open in one tap (2026-08-02)
+
+Owner's report, four things: an OPEN ALL for the crate queue with the money as
+one line and duplicates turned into marks; running up the back of somebody
+should not be what puts *you* off the circuit, and the aggressor should take
+less of the damage; wheels come off far too easily and "it often looks like I
+have no wheels but keep driving"; and losing all four should be so rare it may
+as well not happen, because it takes the drive away.
+
+## 1. A wheel is a lap-long wobble, not a four-second event
+
+Every wheel now goes onto its hub and **wobbles for a measured distance of
+road** rather than a number of seconds — laps, so "a whole lap" is a whole lap
+at saltflats (2,035m) and at hometown alike. `CRASH.wheelWobbleLaps` is indexed
+by how many have already gone: **1st 0.75–1.25 laps, 2nd and 3rd 1–2 laps, and
+there is no fourth entry.** The last wheel wobbles for the rest of the race and
+**never comes off**, because a car on nothing cannot be driven and that is the
+one thing this game does not do to you.
+
+`p.dangleUnit` is `'m'` for wheels and `'s'` for everything else; `dangleForever`
+takes the last one off the clock entirely.
+
+**Four separate routes were taking wheels off behind the ladder's back**, which
+is the same lesson `stripDown` taught in round 6 — every route has to respect it
+or it does nothing:
+
+| route | was | now |
+|---|---|---|
+| `race.js:flailHit` | pulled `danglers[0]` clean off a rival | knocks 25% off the wobble, cannot finish it |
+| `attacks.js` CALTROPS | `detachPart` — instant | `breakPart`, so it wobbles like anything else |
+| `damage()` on a live dangler | took 0.8–3 off a **1,400 metre** countdown | scaled into distance (×34), floored at 80m |
+| `breakPart` on a wheel | rolled `tearOff` like a panel | wheels never tear off; a re-hit shortens the wobble |
+
+Measured, forced: 200 rounds of `detachPart` + `breakPart` + `stripDown` +
+`wearPanels` against a car's last wheel leave it **still on the car**, `forever:
+true`, driving at 153 km/h.
+
+Measured over full auto races on five circuits: **zero frames of any car driving
+on zero wheels**, on every circuit, and field-wide wheels-off is down by a third
+to a half (hometown 23 → 16, circus 51 → 25).
+
+## 2. "It looks like I have no wheels but I keep driving" — it really did
+
+`rejoin()` set `wheelsLost = 0` with the comment *"the truck bolts something
+on"*. It bolted nothing on: the hubs had been handed to `debris.js`, which
+reparents the object out of the car and eventually deletes it. So a car came
+back from the recovery truck **with no wheel meshes and a wheel count of zero**,
+doing full speed on its floorpan. That is the report, exactly.
+
+A wheel now leaves a **clone** bouncing down the road and the original is hidden
+and stowed on the car (`this.stowed`), so `restoreWheels()` has something real
+to put back. Gotcha: `Object3D.clone()` deep-copies `userData` through
+`JSON.stringify`, and a part's userData holds `dangleBy` — a `Car`, which points
+back at this one. **Cloning any part mesh throws `Converting circular structure
+to JSON` unless you swap `userData` out first.**
+
+## 3. Massive sparks, because that is what a wheel on a hub does
+
+A wobbling wheel gets its own rate (`CRASH.wheelSparkRate` 46/s vs the panel
+drag rate of 17) and up to four bursts a frame. `grindRate` 11 → 19, the
+field-wide ceiling 420 → **620**, and the particle pool 340 → **460** — at 340
+the pool was saturating and recycling sparks before their life was out, which
+thins the shower exactly when it should be at its worst.
+
+**Measured**, two wobbling wheels on the player's car: live sparks **mean 314,
+peak 460 (the whole pool)**, and **1 frame in ~500 with no sparks at all**.
+
+A wobble is not free, either: `wobbling` costs half of what a lost wheel costs
+in drag, and `wobblePull` tugs the steering on and off rather than pulling
+steadily — a different, nastier feeling than a missing corner, and the reason
+you want it fixed.
+
+## 4. Ramming from behind
+
+Three separate things, all of them the owner's words.
+
+**The aggressor took nearly as much as the victim.** 0.65 against 0.81 — the
+driver who chose the impact came off barely better than the one who never saw
+it coming. Now `CRASH.rammerTake` 0.3 / `rammedTake` 0.92. **Measured over full
+races: the median rear hit deals 7.7hp to the rammer and 25.7hp to the rammed —
+a ratio of 0.28, against 0.80 before.**
+
+**The impulse was symmetric.** `rearBias` 0.5 sends the front car half again as
+much as momentum would give it, and `rearSteal` 0.32 means the rammer pays a
+third of what it owes. Note the old code read `dir` into the impulse twice —
+both cars race along +s, so the front one always gains and the one behind always
+loses, and `dir` only ever said which of `a` and `b` was in front.
+
+**The jerk you can see.** `Car.kick()` puts a decaying lurch on the pitch axis:
+the front car's nose comes up, the rammer's dips. Costs nothing in the physics.
+
+Air is now the exception it should be: nothing leaves the ground under
+`rearAirAt` (26 m/s closing), and above it there is a 35% chance of a hop of at
+most 3.2 m/s — the owner's "a particular hard hit could cause either car to get
+airborne, but I would prefer both cars to stay on the track most of the time".
+
+## 5. The invisible bumper, admitted openly
+
+The owner suggested it: *"maybe cheat a little with an invisible bump back in
+from the side of the track?"* `Car.keepOnTrack` is exactly that. Nothing for the
+first 2.5m off the racing surface, then an inward push growing to 26 m/s² by
+10m (40 while a `contactGuard` is live), capped as an inward **speed** rather
+than acting as a wall — so you can still drive off deliberately, it just takes
+longer, and a car that was put there by somebody else gets the corner back.
+Past the band it also eats outward speed outright, because an acceleration
+alone lets a car shoved off at 20 m/s cover thirty metres before it turns round.
+
+**A rear-end contact arms `contactGuard` on both cars for 1.6s, and that closes
+the barrier-vault door.** A side slam beside the steel is still lethal — it is
+the one way to put a rival out with the car alone and it had to stay lethal —
+but running up the back of somebody now ends with both cars still racing.
+
+**Measured at saltflats** (the one circuit with no barriers at all, "No walls.
+A painted line and a very long way down"):
+
+| | before | after |
+|---|---|---|
+| worst distance off the racing surface | 30.1m | 15.0–17.9m |
+| wrecks | 3 (1 written off, **2 ran out of road**) | 1 written off, **0 off-track** |
+| off-track car-frames | 884 | 405–566 |
+
+Across hometown / circus / skyline / grinder / loopyard: 0–2 off-track wrecks a
+race, `put into the barrier` still fires, **0 cars retired, no console errors.**
+
+## 6. Crates
+
+`OPEN ALL n` on the queue screen, and the queue lists what is actually in the
+pile (`1× SPONSOR VAULT · 2× CONTRABAND · …`) so it is not a leap of faith.
+
+One results screen for one crate or for twenty. `flow.js` accumulates a **haul**
+— `{crates, cash, fresh[], marks{}}` — and `renderChestResult` takes that
+instead of a single crate's item list. **All the money is one row** ("$34,709 ·
+PRIZE MONEY FROM 7 CRATES"), everything new is listed once with a NEW badge, and
+**a duplicate is a mark on the thing you own** rather than a consolation payout:
+`+1 MARK`, or `DUPLICATE ×2 · I → III · +2 MARKS`. A duplicate that lands on
+something the same haul just gave you folds into that row (`NEW +2 MARKS`)
+rather than appearing twice. Only an item already at `MAX_LEVEL` pays cash
+(`arsenal.dupeValue`). TAKE IT is in `opts.foot`, pinned — twenty crates is a
+list taller than a phone.
+
+`save.markUp(id, n)` is the one entry point and returns how many marks actually
+landed, so the caller knows when to fall back to cash.
+
+**Verified**: 12 crates against a fully-owned garage → one cash row, 14 mark
+rows, one showing ×2; a fresh player → 11 new items + marks, nothing lost; every
+item at MAX_LEVEL → 10 crates pay cash and **no level exceeds MAX_LEVEL**; a
+single crate still renders with no OPEN ALL and no "N CRATES OPENED".
+
+## Still open (unchanged)
+
+- Shadow map offset from its caster, applied to one vehicle only.
+- **HUD/UI pass still never done.** Visible in this round's captures too: the
+  taunt feed and the LEADER'S HANDICAP pill sit directly over the player's car.
+- Boost pad reads as a sprite on the road rather than in it.
+- Replay ghosts do not show impact scuffs.

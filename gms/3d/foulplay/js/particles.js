@@ -17,7 +17,13 @@ import { scene, quality } from './render.js';
 import { DEV_MODE } from './config.js';
 import { rand, clamp01 } from './utils.js';
 
-const SPARK_MAX = 340;
+// A car dragging a wheel round on its hub for a lap and a half runs this pool
+// at 280-340 of 340 on its own, and a saturated ring buffer recycles particles
+// before their life is out — the streaks get cut short and the shower thins
+// exactly when it should be at its worst. `quality.particles` scales what is
+// EMITTED rather than the pool, so a phone never fills this and the extra
+// instances cost desktop only.
+const SPARK_MAX = 460;
 const SMOKE_MAX = 190;
 
 // Silhouettes. STREAK is the whole quad, SPIKE a wedge with its point trailing,
@@ -251,7 +257,12 @@ export function sparkAllow(want) {
 // couple of cars on their rims ate the entire budget and every flapping panel
 // in the race went dry, which is exactly the "I haven't noticed any sparks"
 // report. One car on its floorpan wants ~45/s.
-const SPARK_BUDGET = 420;
+// …and raised again when a wheel became something that wobbles on its hub for a
+// lap and a half instead of pinging off in four seconds. That is a corner
+// grinding on the tarmac for most of a race, on several cars at once, and it is
+// the single thing the owner asks for most: "it should be causing massive
+// amounts of sparks".
+const SPARK_BUDGET = 620;
 
 // Emitters
 // ---------------------------------------------------------------------------
