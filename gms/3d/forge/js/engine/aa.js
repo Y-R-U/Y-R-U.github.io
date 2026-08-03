@@ -49,9 +49,10 @@ export class AA {
   }
 
   registerKnobs(q) {
+    this.q = q;
     q.register({ key: 'aa', label: 'Anti-aliasing', type: 'select', options: AA_MODES, group: 'Renderer',
       default: this.app.nativeAA ? 'native' : 'off' }, v => this.setMode(v));
-    q.register({ key: 'a2c', label: 'Alpha to coverage', type: 'toggle', default: false, group: 'Renderer' },
+    q.register({ key: 'a2c', label: 'Leaf + grass edges', type: 'toggle', default: false, group: 'Renderer' },
       v => this.setA2C(v));
   }
 
@@ -75,6 +76,8 @@ export class AA {
 
   setA2C(v) {
     this.a2c = !!v;
+    // The coverage mask is one bit at one sample, so on its own this toggle did nothing at all.
+    if (this.a2c && !this.samples) this.q?.set('aa', 'msaa4');
     this.syncMaterials();
   }
 

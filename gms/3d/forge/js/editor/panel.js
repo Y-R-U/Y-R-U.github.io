@@ -3,6 +3,9 @@
 import { Quality } from '../engine/quality.js';
 import { allScenarios, getScenario } from '../scenarios.js';
 
+// Shown up front; the other ~57 knobs go one tap deeper. A phone cannot present them all.
+const PRIMARY = ['playerZone', 'time', 'nightSky', 'a2c', 'shadowRate'];
+
 // Anything registering a knob after the panel was built calls this to get its UI.
 let rebuild = null;
 export const refreshPanel = () => rebuild?.();
@@ -27,9 +30,21 @@ export function buildPanel(app) {
       </div>
       ${scenarios ? `<div class="grp"><h4>Camera</h4><div class="shots">${scenarios}</div></div>` : ''}`;
 
-    for (const [group, schemas] of app.quality.groups()) {
-      html += `<div class="grp"><h4>${group}</h4>${schemas.map(s => control(s, app.quality.get(s.key))).join('')}</div>`;
+    const groups = app.quality.groups();
+    const byKey = new Map();
+    for (const [, schemas] of groups) for (const s of schemas) byKey.set(s.key, s);
+
+    const top = PRIMARY.map(k => byKey.get(k)).filter(Boolean);
+    if (top.length) {
+      html += `<div class="grp"><h4>Test</h4>${top.map(s => control(s, app.quality.get(s.key))).join('')}</div>`;
     }
+
+    let adv = '';
+    for (const [group, schemas] of groups) {
+      const rest = schemas.filter(s => !PRIMARY.includes(s.key));
+      if (rest.length) adv += `<div class="grp"><h4>${group}</h4>${rest.map(s => control(s, app.quality.get(s.key))).join('')}</div>`;
+    }
+    html += `<details class="adv"><summary>Advanced</summary>${adv}</details>`;
     body.innerHTML = html;
   };
   rebuild();

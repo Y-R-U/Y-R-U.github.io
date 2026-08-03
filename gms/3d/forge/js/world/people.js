@@ -680,7 +680,7 @@ export class People {
     q.register({ key: 'contactAO', label: 'Figure contact shade', type: 'range', min: 0, max: 1, step: 0.05, default: 0.8, group: 'People' },
       v => this.setAO(v));
     // Off by design — two emissive shards per hood, colours from zones.js. Prototype only.
-    q.register({ key: 'robeEyes', label: 'Hood eyes', type: 'range', min: 0, max: 3, step: 0.1, default: 0, group: 'People' },
+    q.register({ key: 'robeEyes', label: 'Hood eyes', type: 'range', min: 0, max: 3, step: 0.1, default: 1.0, group: 'People' },
       v => { this.uniforms.uEye.value = v; });
   }
 
