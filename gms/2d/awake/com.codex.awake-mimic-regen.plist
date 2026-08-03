@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.codex.awake-mimic-regen</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>/Users/aaronair/cc/yru/site/gms/2d/awake/.scheduled_mimic_regen.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/aaronair/cc/yru/site/gms/2d/awake</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Month</key>
+    <integer>6</integer>
+    <key>Day</key>
+    <integer>13</integer>
+    <key>Hour</key>
+    <integer>2</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Users/aaronair/cc/yru/site/gms/2d/awake/mimic_regen_2am.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/aaronair/cc/yru/site/gms/2d/awake/mimic_regen_2am.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

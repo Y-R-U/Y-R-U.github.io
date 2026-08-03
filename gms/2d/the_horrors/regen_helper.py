@@ -377,7 +377,10 @@ class Project:
         if not os.path.isdir(self.ref_dir):
             return markers
         for file_name in sorted(os.listdir(self.ref_dir)):
-            if not file_name.lower().endswith((".jpg", ".jpeg", ".png")):
+            lower = file_name.lower()
+            if not lower.endswith((".jpg", ".jpeg", ".png")):
+                continue
+            if lower.startswith("monster_") and lower.endswith(".png"):
                 continue
             path = os.path.join(self.ref_dir, file_name)
             stat = os.stat(path)

@@ -23,8 +23,8 @@ import sys
 import time
 import urllib.request
 
-API_URL = "http://localhost:7861/sdapi/v1/txt2img"
-MODEL = "flux2-klein-4b"
+API_URL = "http://localhost:7867/sdapi/v1/txt2img"
+MODEL = "flux2-klein-9b-mlx-4bit"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(HERE, "original_files")
 LOG_PATH = os.path.join(HERE, "gen_images.log")

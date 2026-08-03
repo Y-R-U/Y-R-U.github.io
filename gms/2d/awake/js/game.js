@@ -108,6 +108,7 @@
     regenMarkerWrap: $("regen-marker-wrap"),
     regenMarkerToggle: $("regen-marker-toggle"),
     regenMarkerClear: $("regen-marker-clear"),
+    regenMarkerSelection: $("regen-marker-selection"),
     regenMarkerList: $("regen-marker-list"),
     regenDelete: $("regen-delete"),
     regenMove: $("regen-move"),
@@ -287,7 +288,10 @@
     });
     els.regenFrames.addEventListener("input", () => setRegenFrames(parseInt(els.regenFrames.value, 10), false));
     els.regenMarkerToggle.addEventListener("click", toggleMarkerList);
-    els.regenMarkerClear.addEventListener("click", () => selectRegenMarker(""));
+    els.regenMarkerClear.addEventListener("click", () => {
+      selectRegenMarker("");
+      setMarkerListOpen(false);
+    });
     els.markerSave.addEventListener("click", saveMarkerFrame);
     els.reverseDelete.addEventListener("click", () => submitReverse("delete"));
     els.reverseMove.addEventListener("click", () => submitReverse("move"));
@@ -1849,7 +1853,9 @@
       const result = await helperFetch("/status", { method: "GET" });
       helperOnline = true;
       debugTransitions = Array.isArray(result.transitions) ? result.transitions : [];
-      helperMarkers = Array.isArray(result.markers) ? result.markers : [];
+      helperMarkers = Array.isArray(result.markers)
+        ? result.markers.filter(marker => !/^monster_.*\.png$/i.test(marker.file || ""))
+        : [];
       renderHelperStatus(result);
     } catch (err) {
       helperOnline = false;
@@ -1918,9 +1924,15 @@
     selectedRegenMarker = "";
     const canUseMarkers = isEventTransition(transition);
     els.regenMarkerWrap.hidden = !canUseMarkers;
-    els.regenMarkerList.hidden = true;
+    setMarkerListOpen(false);
     renderMarkerList();
     selectRegenMarker("");
+  }
+
+  function setMarkerListOpen(open) {
+    els.regenMarkerList.hidden = !open;
+    els.regenMarkerToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    els.regenMarkerToggle.textContent = open ? "Hide Markers" : "Choose Marker";
   }
 
   function renderMarkerList() {
@@ -1939,7 +1951,7 @@
       button.innerHTML = `<img src="${UI.escapeHtml(marker.src)}" alt=""><span><strong>${UI.escapeHtml(marker.name)}</strong><small>${UI.escapeHtml(marker.modified || "")}</small></span>`;
       button.addEventListener("click", () => {
         selectRegenMarker(marker.file);
-        els.regenMarkerList.hidden = true;
+        setMarkerListOpen(false);
       });
       els.regenMarkerList.append(button);
     });
@@ -1948,11 +1960,12 @@
   function selectRegenMarker(file) {
     selectedRegenMarker = file || "";
     const marker = helperMarkers.find(item => item.file === selectedRegenMarker);
-    els.regenMarkerToggle.textContent = marker ? marker.name : "No marker selected";
+    const label = marker ? marker.name : (selectedRegenMarker ? selectedRegenMarker.replace(/\.[^.]+$/, "") : "No marker selected");
+    els.regenMarkerSelection.textContent = label;
   }
 
   function toggleMarkerList() {
-    els.regenMarkerList.hidden = !els.regenMarkerList.hidden;
+    setMarkerListOpen(els.regenMarkerList.hidden);
   }
 
   function defaultMarkerName(transition) {
@@ -1997,6 +2010,7 @@
         els.regenRefThumb.hidden = false;
       } else {
         els.regenRefThumb.hidden = true;
+        if (imageRedoInfo.monsterMarkerFile) selectRegenMarker(imageRedoInfo.monsterMarkerFile);
       }
       updateMonsterRefControls();
     }
@@ -2034,13 +2048,17 @@
   }
 
   function setRegenMode(mode) {
+    if (mode === "video" && imagePreviewToken && imageRedoInfo) {
+      UI.toast("Generated start frame is selected");
+      mode = "image";
+    }
     regenMode = mode === "image" && imageRedoInfo ? "image" : "video";
     const isImage = regenMode === "image";
     els.regenVideoMode.hidden = isImage;
     els.regenImageMode.hidden = !isImage;
     els.regenImageNote.hidden = !isImage;
-    els.regenTitle && (els.regenTitle.textContent = isImage ? "Redo Image" : "Redo Transition");
-    els.regenModeToggle.textContent = isImage ? "Redo Video" : "Redo Image";
+    els.regenTitle && (els.regenTitle.textContent = isImage ? "Redo Start Frame" : "Redo Transition");
+    els.regenModeToggle.textContent = isImage ? "Redo Video" : "Redo Start Frame";
     const verb = isImage ? "Accept" : "Regen";
     els.regenDelete.textContent = `${verb} + Delete`;
     els.regenMove.textContent = `${verb} + Possible`;
@@ -2063,7 +2081,10 @@
   async function generateImage(rerollRef) {
     if (!selectedTransition || !imageRedoInfo) return;
     const promptText = els.regenImagePrompt.value.trim();
-    if (!promptText) { UI.toast("Image prompt is required"); return; }
+    if (!promptText) { UI.toast("Start-frame prompt is required"); return; }
+    imagePreviewToken = "";
+    els.regenPreviewWrap.hidden = true;
+    els.regenPreviewImg.removeAttribute("src");
     setImageBusy(true, rerollRef ? "Re-rolling reference…" : "Generating image…");
     try {
       const result = await helperFetch("/image_preview", {
@@ -2110,8 +2131,9 @@
           updateCurrentRefDisplay();
         }
         setImageBusy(false);
+        setRegenMode("image");
         updateImageActionState();
-        UI.toast("Image ready — accept to redo the video(s)");
+        UI.toast("Start frame selected; accept to redo the video(s)");
         return;
       }
       if (job.status === "failed") {
@@ -2129,18 +2151,18 @@
     els.regenGenerateImage.disabled = busy;
     els.regenRegenImage.disabled = busy;
     els.regenRerollRef.disabled = busy;
-    els.regenGenerateImage.textContent = busy ? (label || "Working…") : "Generate Image";
+    els.regenGenerateImage.textContent = busy ? (label || "Working…") : "Generate Start Frame";
     if (busy) updateImageActionState();
   }
 
   function submitRedo(mode) {
-    if (regenMode === "image") return submitImageCommit(mode);
+    if (regenMode === "image" || (imageRedoInfo && imagePreviewToken)) return submitImageCommit(mode);
     return submitRegen(mode);
   }
 
   async function submitImageCommit(mode) {
     if (!selectedTransition || !imagePreviewToken) {
-      UI.toast("Generate an image first");
+      UI.toast("Generate a start frame first");
       return;
     }
     const label = mode === "delete" ? "Accept + Delete" : mode === "other" ? "Accept + Other" : "Accept + Possible";

@@ -6,3 +6,4 @@ gen_event_videos.log
 __pycache__/
 .debug_transition_metadata.json
 .image_previews/
+.scheduled_mimic_regen_state.json

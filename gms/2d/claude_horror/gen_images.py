@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate atmospheric room images for The Hollow via local MFLUX (port 7861).
+"""Generate atmospheric room images for The Hollow via local mflux-queue (port 7867).
 
 Re-runnable: skips images already on disk. Logs to gen_images.log next door.
 """
@@ -12,7 +12,7 @@ import time
 import urllib.request
 import urllib.error
 
-API_URL = "http://localhost:7861/sdapi/v1/txt2img"
+API_URL = "http://localhost:7867/sdapi/v1/txt2img"
 HERE    = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(HERE, "images")
 LOG     = os.path.join(HERE, "gen_images.log")
@@ -136,7 +136,7 @@ def log(msg):
 def generate(prompt, width, height, steps=8):
     body = json.dumps({
         "prompt": f"{prompt}, {STYLE}",
-        "model": "flux2-klein-4b",
+        "model": "flux2-klein-9b-mlx-4bit",
         "steps": steps,
         "width": width,
         "height": height,

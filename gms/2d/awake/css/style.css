@@ -1313,7 +1313,7 @@ button.tag {
 
 .regen-option-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 12px;
   align-items: start;
@@ -1358,29 +1358,42 @@ button.tag {
 }
 
 .marker-picker {
-  position: relative;
+  grid-column: 1 / -1;
 }
 
-.marker-picker .glass-button {
+.marker-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.marker-picker-row .glass-button {
   min-height: 38px;
   padding: 8px 10px;
 }
 
+.marker-selection {
+  color: var(--dim);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .marker-list {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 4;
   display: grid;
   gap: 8px;
-  width: min(360px, 86vw);
-  max-height: min(380px, 48dvh);
+  width: 100%;
+  max-height: min(320px, 38dvh);
   overflow: auto;
   border: 1px solid rgba(137, 238, 255, 0.24);
   border-radius: 8px;
   background: rgba(3, 8, 14, 0.98);
   box-shadow: var(--shadow);
   padding: 8px;
+}
+
+.marker-list[hidden] {
+  display: none;
 }
 
 .marker-choice {
