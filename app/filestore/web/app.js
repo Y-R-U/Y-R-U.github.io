@@ -23,6 +23,9 @@ const S = {
   // switched into lead mode, in which case S.user.role already reads "lead".
   realRole: "",
   acting: false,
+  here: [],        // other people in this project, from the heartbeat
+  behind: null,    // a newer save landed while this client had unsaved edits
+  beatSeconds: 8,
 };
 
 /* ─────────────────────────────────────────────────────── helpers */
@@ -279,6 +282,7 @@ $("#btn-changepw").onclick = () => modal((box, close) => {
 });
 
 $("#nav-home").onclick = () => { S.project = null; S.tab = "projects"; render(); };
+$("#who-name").onclick = changeNameFlow;
 
 /* ────────────────────────────────────────────────────────── boot */
 
@@ -297,7 +301,7 @@ async function boot() {
   $("#app").hidden = false;
   $("#app").classList.toggle("acting", S.acting);
 
-  $("#who-name").textContent = S.user.username;
+  $("#who-name").textContent = S.user.displayName || S.user.username;
   const role = $("#who-role");
   role.textContent = S.user.role;
   role.className = "badge " + S.user.role;
@@ -305,6 +309,7 @@ async function boot() {
   renderRoleSwitch();
   renderTabs();
   render();
+  startHeartbeat();
 }
 
 // The admin's ADMIN / LEAD switch. Admin can see everything and change almost
@@ -343,7 +348,7 @@ async function setActing(asLead) {
 
 function tabsFor() {
   const t = [["projects", "Projects"]];
-  if (S.user.role === "lead") t.push(["users", "Users"]);
+  if (S.user.role === "lead") t.push(["users", "Users"], ["people", "People"]);
   if (S.user.role === "admin") t.push(["users", "Leads"], ["admin", "Server"]);
   return t;
 }
@@ -363,6 +368,7 @@ function render() {
   const m = $("#main");
   m.innerHTML = "";
   if (S.project) return renderProject(m);
+  if (S.tab === "people") return renderPeople(m);
   if (S.tab === "users") return renderUsers(m);
   if (S.tab === "admin") return renderAdmin(m);
   return renderProjects(m);
@@ -517,12 +523,17 @@ function renderProject(m) {
       textContent: "You're signed in as admin — this view is read-only. Files are managed by the project's lead and users." }));
   }
 
+  // Filled in by the heartbeat rather than by render(), so it can update while
+  // somebody is typing.
+  m.append(el("div", { className: "here", id: "here", hidden: true }));
+
   const work = el("div", { className: "work" });
   work.style.marginTop = "14px";
   // Left column: the file list, with the project's pages listed under it.
   const side = el("div", { className: "sidecol" }, buildTreePanel(), buildPagesPanel());
   work.append(side, buildEditorPanel());
   m.append(work);
+  renderHere();
 }
 
 /* ---- file browser ---- */
@@ -677,26 +688,32 @@ function buildTreePanel() {
   toggle.onclick = () => setView(isTree ? "browse" : "tree");
   header.append(toggle, el("div", { className: "spacer" }));
 
+  // All icon-only: the panel is 300px, and labelled buttons wrapped the header
+  // onto a second row. The tooltip and aria-label carry the meaning.
+  const iconBtn = (glyph, label, fn) => {
+    const b = el("button", {
+      className: "btn ghost sm iconbtn", title: label, "aria-label": label,
+    });
+    b.innerHTML = `<span class="plus">+</span>${glyph}`;
+    b.onclick = fn;
+    return b;
+  };
+
   // Pages are the lead's to create, so this sits with the other authoring
   // buttons but appears only for them.
   if (S.project.canManage) {
-    const addPage = el("button", { className: "btn ghost sm", textContent: "+ Page", title: "Add a page" });
-    addPage.onclick = createPageFlow;
-    header.append(addPage);
+    header.append(iconBtn("📝", "Add a page", createPageFlow));
   }
-
   if (canWrite()) {
-    const add = el("button", { className: "btn ghost sm", textContent: "+ File", title: "New file here" });
-    add.onclick = () => newEntry("newfile");
-    const addDir = el("button", { className: "btn ghost sm", textContent: "+ Folder", title: "New folder here" });
-    addDir.onclick = () => newEntry("newfolder");
-    // Icon-only: the panel is 300px and the row wraps otherwise.
+    header.append(
+      iconBtn("📄", "New file here", () => newEntry("newfile")),
+      iconBtn("📁", "New folder here", () => newEntry("newfolder")));
     const up = el("button", {
       className: "btn ghost sm viewtoggle", textContent: "⬆",
       title: "Upload files here", "aria-label": "Upload files here",
     });
     up.onclick = pickUpload;
-    header.append(add, addDir, up);
+    header.append(up);
   }
   panel.append(header);
   panel.append(buildBreadcrumb());
@@ -807,6 +824,7 @@ function buildEditorPanel() {
   const o = S.open;
   const header = el("header", {},
     el("span", { className: "mono", textContent: o.path }),
+    presenceNote("file", o.path),
     el("div", { className: "spacer" }));
 
   const dl = el("button", { className: "btn ghost sm", textContent: "⬇ Download" });
@@ -814,6 +832,11 @@ function buildEditorPanel() {
     location.href = `/api/projects/${S.project.id}/files?path=${encodeURIComponent(o.path)}`;
   };
   header.append(dl);
+  if (o.text != null) {
+    const hist = el("button", { className: "btn ghost sm", textContent: "🕘 History", title: "Earlier versions" });
+    hist.onclick = () => openHistory("file", o.path, o.path);
+    header.append(hist);
+  }
 
   // Held so the textarea's input handler can flip it without a re-render —
   // re-rendering here would replace the textarea mid-keystroke and drop input.
@@ -832,6 +855,7 @@ function buildEditorPanel() {
   panel.append(header);
 
   if (o.text != null) {
+    panel.append(el("div", { className: "behind", hidden: true }));
     const ta = el("textarea", { className: "editor", value: o.text, spellcheck: false });
     const markDirty = () => {
       if (o.dirty || !saveBtn) return;
@@ -892,19 +916,21 @@ async function confirmDiscard() {
 async function openFile(path) {
   if (!(await confirmDiscard())) return;
   S.page = null;
-  if (!isText(path)) { S.open = { path, text: null, dirty: false }; render(); return; }
+  S.behind = null;
+  const at = S.files.find(f => f.path === path)?.updatedAt || 0;
+  if (!isText(path)) { S.open = { path, text: null, dirty: false, at }; render(); return; }
   try {
     const r = await api(`/api/projects/${S.project.id}/files?path=${encodeURIComponent(path)}&mode=text`);
-    S.open = { path, text: r.content, dirty: false };
+    S.open = { path, text: r.content, dirty: false, at };
   } catch (e) {
     // Too large, or not really text after all — fall back to the preview pane.
     toast(e.message, "bad");
-    S.open = { path, text: null, dirty: false };
+    S.open = { path, text: null, dirty: false, at };
   }
   render();
 }
 
-async function saveOpenFile() {
+async function saveOpenFile(force) {
   const o = S.open;
   if (!o || o.text == null || !o.dirty) return;
   // Re-rendering swaps in a fresh textarea, so remember where the caret was and
@@ -913,10 +939,12 @@ async function saveOpenFile() {
   const caret = before ? [before.selectionStart, before.selectionEnd, before.scrollTop] : null;
   const hadFocus = before && document.activeElement === before;
   try {
-    await api(`/api/projects/${S.project.id}/files`, {
-      method: "PUT", body: { path: o.path, content: o.text },
+    const r = await api(`/api/projects/${S.project.id}/files`, {
+      method: "PUT", body: { path: o.path, content: o.text, base: o.at || 0, force: !!force },
     });
     o.dirty = false;
+    o.at = r.at || o.at;
+    S.behind = null;
     await loadFiles();
     toast("Saved", "good");
     render();
@@ -925,7 +953,23 @@ async function saveOpenFile() {
       after.selectionStart = caret[0]; after.selectionEnd = caret[1]; after.scrollTop = caret[2];
       if (hadFocus) after.focus();
     }
-  } catch (e) { toast(e.message, "bad"); }
+  } catch (e) {
+    if (await askedToOverwrite(e)) saveOpenFile(true);
+    else toast(e.message, "bad");
+  }
+}
+
+// A 409 means somebody else saved while this editor was open. Rather than
+// picking a winner, ask — the other version is one click away in History either
+// way, so neither answer loses anything permanently.
+async function askedToOverwrite(err) {
+  if (!/saved this (file|page)/.test(err.message)) return false;
+  return !!(await confirmDanger({
+    title: "Someone else saved first",
+    warning: err.message,
+    detail: "Saving yours now replaces theirs. Their version stays in History, and you can cancel and reload instead.",
+    confirmLabel: "Save mine anyway",
+  }));
 }
 
 /* ---- file mutations ---- */
@@ -1035,7 +1079,7 @@ function buildPagesPanel() {
   if (!S.pages.length) {
     list.append(el("div", { className: "empty", style: "padding:20px 12px;font-size:13px" },
       S.project.canManage
-        ? "No pages yet. Use “+ Page” above the file list to add one."
+        ? "No pages yet. Use the 📝 button above the file list to add one."
         : "No pages have been shared with you."));
   }
   for (const g of S.pages) {
@@ -1082,6 +1126,17 @@ async function openPage(id) {
 // Held so the editor's input handler can flip it without a re-render, which
 // would swap in a fresh contenteditable and drop the caret mid-word.
 let pageSaveBtn = null;
+let autosaveTimer = null;
+
+// Pages autosave a few seconds after you stop typing. Prose doesn't want a
+// save button, and every save is a history entry, so nothing is lost by it.
+// Files deliberately don't do this: half-typed JSON shouldn't land on someone
+// else's screen.
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  if (!S.page?.canEdit) return;
+  autosaveTimer = setTimeout(() => { if (S.page?.dirty) savePage(false, true); }, 4000);
+}
 
 function markPageDirty() {
   const g = S.page;
@@ -1096,6 +1151,7 @@ function buildPageEditor() {
   const header = el("header", {},
     el("span", { className: "ico", textContent: ACCESS[g.access]?.icon || "📝" }),
     el("span", { textContent: g.name }),
+    presenceNote("page", g.id),
     el("div", { className: "spacer" }));
 
   pageSaveBtn = null;
@@ -1117,6 +1173,10 @@ function buildPageEditor() {
     del.onclick = deletePageFlow;
     header.append(share, ren, del);
   }
+  const hist = el("button", { className: "btn ghost sm", textContent: "🕘 History", title: "Earlier versions" });
+  hist.onclick = () => openHistory("page", String(g.id), g.name);
+  header.append(hist);
+
   const close = el("button", {
     className: "btn ghost sm viewtoggle", textContent: "✕",
     title: "Close this page", "aria-label": "Close this page",
@@ -1129,6 +1189,7 @@ function buildPageEditor() {
   panel.append(header);
 
   if (g.canEdit) panel.append(buildPageToolbar());
+  panel.append(el("div", { className: "behind", hidden: true }));
 
   const ed = el("div", { className: "pagedit" + (g.canEdit ? "" : " ro") });
   ed.contentEditable = g.canEdit ? "true" : "false";
@@ -1141,7 +1202,7 @@ function buildPageEditor() {
     // :empty placeholder shows until there's something to read.
     if (!ed.innerHTML.trim()) ed.innerHTML = "";
     ed.dataset.placeholder = "Start typing…";
-    ed.oninput = markPageDirty;
+    ed.oninput = () => { markPageDirty(); scheduleAutosave(); };
     ed.onpaste = e => {
       // Paste is the one way markup this editor can't produce gets in, so it is
       // filtered on the way rather than left for the save to reject.
@@ -1164,6 +1225,7 @@ function buildPageEditor() {
   foot.append(el("span", { textContent: g.canEdit
     ? `Saved ${fmtDate(g.updatedAt)}${g.updatedBy ? ` by ${g.updatedBy}` : ""}`
     : "You can read this page but not change it." }));
+  if (g.canEdit) foot.append(el("span", { className: "dim", textContent: "Saves itself a few seconds after you stop typing" }));
   if (S.project.canManage) foot.append(el("span", { className: "dim", textContent: ACCESS[g.access]?.hint || "" }));
   panel.append(foot);
   return panel;
@@ -1234,16 +1296,20 @@ async function pageLink() {
   markPageDirty();
 }
 
-async function savePage() {
+async function savePage(force, auto) {
   const g = S.page;
   if (!g || !g.canEdit) return;
   const ed = document.querySelector(".pagedit");
   if (!ed) return;
+  clearTimeout(autosaveTimer);
   const html = sanitizePageHTML(ed.innerHTML);
   try {
-    const r = await api(`/api/projects/${S.project.id}/pages/${g.id}`, { method: "PUT", body: { html } });
+    const r = await api(`/api/projects/${S.project.id}/pages/${g.id}`, {
+      method: "PUT", body: { html, base: g.updatedAt || 0, force: !!force },
+    });
     g.html = html;
     g.dirty = false;
+    S.behind = null;
     if (r.page) { g.updatedAt = r.page.updatedAt; g.updatedBy = r.page.updatedBy; }
     if (pageSaveBtn) { pageSaveBtn.disabled = true; pageSaveBtn.textContent = "Save"; }
     // Deliberately not a re-render: it would rebuild the contenteditable and
@@ -1254,9 +1320,19 @@ async function savePage() {
     const row = document.querySelector(`.pages .row[data-page="${g.id}"] .sz`);
     if (row) row.textContent = fmtDate(g.updatedAt);
     const foot = document.querySelector(".pagefoot span");
-    if (foot) foot.textContent = `Saved ${fmtDate(g.updatedAt)} by ${S.user.username}`;
-    toast("Page saved", "good");
-  } catch (e) { toast(e.message, "bad"); }
+    if (foot) foot.textContent = `Saved ${fmtDate(g.updatedAt)} by ${S.user.displayName}`;
+    if (!auto) toast("Page saved", "good");
+  } catch (e) {
+    if (auto) {
+      // An autosave that clashes must not throw a dialog at somebody mid-
+      // sentence; the strip says they're behind and Save asks properly.
+      S.page.dirty = true;
+      if (/saved this page/.test(e.message)) markBehind();
+      return;
+    }
+    if (await askedToOverwrite(e)) savePage(true);
+    else toast(e.message, "bad");
+  }
 }
 
 async function renamePageFlow() {
@@ -1845,6 +1921,586 @@ async function renderAdmin(m) {
   m.append(el("div", { className: "page-head", style: "margin:22px 0 0" },
     el("h2", { textContent: "Recent activity", style: "font-size:17px" })));
   m.append(aw);
+}
+
+/* ─────────────────────────────────────────────── your name */
+
+// Everyone can change what they're called. The username is the sign-in handle,
+// so it is only offered while it is still doing double duty as the display
+// name — and then with a warning, because it changes what they type to log in.
+function changeNameFlow() {
+  const sameAsLogin = S.user.displayName === S.user.username;
+  return modal((box, close) => {
+    box.innerHTML = `
+      <h3>Your name</h3>
+      <p>This is what everyone else sees next to your files, pages and edits.</p>
+      <label>Display name<input id="nm-name" value="${esc(S.user.displayName)}" maxlength="40" spellcheck="false"></label>
+      ${sameAsLogin ? `
+        <div class="checkrow" style="border:0;padding:0 0 4px">
+          <input type="checkbox" id="nm-login">
+          <label for="nm-login">Change the username I sign in with too</label>
+        </div>
+        <div class="danger-head" id="nm-warn" hidden>
+          <div class="mark">⚠️</div>
+          <div><strong>You'll sign in with the new name from now on.</strong>
+            <span>Your password doesn't change. If you forget the new username, your
+                  lead can look it up.</span></div>
+        </div>` : `
+        <p class="hint">You sign in as <b class="mono">${esc(S.user.username)}</b>. That doesn't change.</p>`}
+      <p class="err" id="nm-err" hidden></p>
+      <div class="actions">
+        <button class="btn" id="nm-cancel">Cancel</button>
+        <button class="btn primary" id="nm-ok">Save</button>
+      </div>`;
+    const err = $("#nm-err", box), inp = $("#nm-name", box);
+    const login = $("#nm-login", box);
+    if (login) login.onchange = () => { $("#nm-warn", box).hidden = !login.checked; };
+    $("#nm-cancel", box).onclick = () => close(null);
+    $("#nm-ok", box).onclick = async () => {
+      try {
+        const r = await api("/api/profile", {
+          method: "POST",
+          body: { displayName: inp.value, changeUsername: !!(login && login.checked) },
+        });
+        S.user = { ...S.user, ...r.user };
+        close(true);
+        toast(login && login.checked
+          ? `You're now “${r.user.displayName}” and sign in as ${r.user.username}`
+          : `You're now “${r.user.displayName}”`, "good");
+        await boot();
+      } catch (e) { err.hidden = false; err.textContent = e.message; }
+    };
+    inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("#nm-ok", box).click(); } };
+  });
+}
+
+/* ────────────────────────────────────── presence, orders, live updates */
+//
+// One heartbeat carries all three: it says where this client is, brings back
+// who else is in the project, and picks up anything a lead has sent — a kick, a
+// move, or news that the open document has been saved by somebody else.
+
+let beatTimer = null;
+
+function currentSpot() {
+  if (!S.project) return { projectId: 0, area: "", ref: "", editing: false };
+  if (S.page) return { projectId: S.project.id, area: "page", ref: String(S.page.id), editing: !!S.page.dirty };
+  if (S.open) return { projectId: S.project.id, area: "file", ref: S.open.path, editing: !!S.open.dirty };
+  return { projectId: S.project.id, area: "project", ref: "", editing: false };
+}
+
+function watchTarget() {
+  if (!S.project) return null;
+  if (S.page) return { kind: "page", ref: String(S.page.id) };
+  if (S.open && S.open.text != null) return { kind: "file", ref: S.open.path };
+  return null;
+}
+
+function startHeartbeat() {
+  clearTimeout(beatTimer);
+  const beat = async () => {
+    try { await heartbeat(); } catch { /* offline or signed out; the next one retries */ }
+    beatTimer = setTimeout(beat, (S.beatSeconds || 8) * 1000);
+  };
+  beat();
+}
+
+async function heartbeat() {
+  if (!S.user) return;
+  const r = await api("/api/presence", {
+    method: "POST", body: { ...currentSpot(), watch: watchTarget() },
+  });
+  S.beatSeconds = r.interval || 8;
+  S.here = r.people || [];
+  renderHere();
+  if (r.watch) noteRemoteSave(r.watch);
+  if (r.order) await handleOrder(r.order);
+  // The people console is a live view, so it refreshes itself — but never
+  // while a modal is open on top of it.
+  if (S.tab === "people" && !S.project && $("#modal-host").hidden) renderPeople($("#main"), true);
+}
+
+// Someone else's save landed. If this client has nothing unsaved, take it
+// silently; if it does, flag it rather than throwing away what they've typed.
+async function noteRemoteSave(watch) {
+  const mineAt = S.page ? S.page.updatedAt : S.open?.at;
+  if (!watch.at || !mineAt || watch.at <= mineAt) return;
+  const dirty = S.page?.dirty || S.open?.dirty;
+  if (dirty) {
+    S.behind = watch;
+    markBehind();
+    return;
+  }
+  await pullDoc(watch);
+}
+
+async function pullDoc(watch) {
+  try {
+    if (watch.kind === "page" && S.page && String(S.page.id) === watch.ref) {
+      const r = await api(`/api/projects/${S.project.id}/pages/${S.page.id}`);
+      S.page = { ...r.page, dirty: false };
+      const ed = document.querySelector(".pagedit");
+      if (ed) ed.innerHTML = sanitizePageHTML(S.page.html || "");
+      else render();
+    } else if (watch.kind === "file" && S.open && S.open.path === watch.ref) {
+      const r = await api(`/api/projects/${S.project.id}/files?path=${encodeURIComponent(watch.ref)}&mode=text`);
+      S.open.text = r.content;
+      S.open.at = watch.at;
+      const ta = document.querySelector(".editor");
+      if (ta) { const top = ta.scrollTop; ta.value = r.content; ta.scrollTop = top; }
+      else render();
+    } else return;
+    S.behind = null;
+    await loadFiles().catch(() => {});
+    // Your own restore, or your own save in another tab, doesn't need announcing.
+    if (watch.by && watch.by !== S.user.displayName) toast(`Updated by ${watch.by}`);
+  } catch { /* it'll come round again on the next beat */ }
+}
+
+// The "you're behind" strip, flipped in place — re-rendering would take the
+// unsaved edits it exists to protect.
+function markBehind() {
+  const foot = document.querySelector(".behind");
+  if (!foot || !S.behind) return;
+  foot.hidden = false;
+  foot.innerHTML = `<b>${esc(S.behind.by || "Someone")}</b> saved a newer version while you were editing.`;
+  const btn = el("button", { className: "btn sm", textContent: "Discard mine & load theirs" });
+  btn.onclick = async () => {
+    if (S.page) S.page.dirty = false; else if (S.open) S.open.dirty = false;
+    await pullDoc(S.behind);
+    render();
+  };
+  foot.append(btn);
+}
+
+// Who else is in this project, and what they have open.
+function renderHere() {
+  const host = document.querySelector("#here");
+  if (!host) return;
+  const people = S.here || [];
+  host.hidden = !people.length;
+  host.innerHTML = "";
+  for (const p of people) {
+    const what = p.area === "file" ? p.ref
+      : p.area === "page" ? (S.pages.find(g => String(g.id) === p.ref)?.name || "a page")
+      : "browsing";
+    const chip = el("div", { className: "chip who-chip" + (p.editing ? " editing" : "") });
+    chip.innerHTML = `<span class="dot"></span><b>${esc(p.name)}</b>
+      <span class="dim">${p.editing ? "editing" : "in"} ${esc(what)}</span>`;
+    host.append(chip);
+  }
+}
+
+// Same information, but on the document itself: who else has this open.
+function othersOn(kind, ref) {
+  return (S.here || []).filter(p => p.area === kind && p.ref === String(ref));
+}
+
+function presenceNote(kind, ref) {
+  const others = othersOn(kind, ref);
+  if (!others.length) return null;
+  const names = others.map(p => p.name).join(", ");
+  const editing = others.some(p => p.editing);
+  return el("span", {
+    className: "here-note" + (editing ? " editing" : ""),
+    textContent: `${names} ${others.length > 1 ? "are" : "is"} ${editing ? "editing this" : "here"}`,
+  });
+}
+
+/* ---- orders from a lead ---- */
+
+async function handleOrder(o) {
+  const lostWork = S.open?.dirty || S.page?.dirty;
+  if (o.type === "move") {
+    S.open = null; S.page = null;
+    if (S.project?.id !== o.projectId) await openProject(o.projectId);
+    if (o.area === "file" && o.ref) await openFile(o.ref);
+    else if (o.area === "page" && o.ref) await openPage(Number(o.ref));
+    else render();
+    await noticeModal("You've been moved", o,
+      "Your lead has sent you here.", lostWork);
+    return;
+  }
+  // kick
+  if (o.area === "file" || o.area === "page") { S.open = null; S.page = null; }
+  else { S.project = null; S.open = null; S.page = null; }
+  render();
+  await noticeModal("You've been asked to leave that", o,
+    o.area === "project" ? "Your lead has closed this project for you."
+                         : "Your lead has closed that document for you.", lostWork);
+}
+
+function noticeModal(title, o, lead, lostWork) {
+  return modal((box, close) => {
+    box.innerHTML = `
+      <h3>${esc(title)}</h3>
+      <p>${esc(lead)}${o.from ? ` — from <b>${esc(o.from)}</b>.` : ""}</p>
+      ${o.reason ? `<div class="confirmbox" style="margin-bottom:14px">${esc(o.reason)}</div>`
+                 : `<p class="hint">No reason was given.</p>`}
+      ${lostWork ? `<p class="err">Anything you hadn't saved there is gone.</p>` : ""}
+      <div class="actions"><button class="btn primary" id="ok">OK</button></div>`;
+    $("#ok", box).onclick = () => close(true);
+  });
+}
+
+/* ────────────────────────────────────────────────────── history */
+
+// Snapshots of a document, at most one a minute, for the last two days.
+async function openHistory(kind, ref, label) {
+  let data;
+  try {
+    data = await api(`/api/projects/${S.project.id}/history?kind=${kind}&ref=${encodeURIComponent(ref)}`);
+  } catch (e) { toast(e.message, "bad"); return; }
+
+  await modal((box, close) => {
+    box.className = "modal wide";
+    box.innerHTML = `
+      <h3>History of ${esc(label)}</h3>
+      <p>Saved versions from the last ${Math.round((data.keptHours || 48) / 24)} days,
+         one a minute at most. Older ones are removed automatically.</p>
+      <div class="histwrap"><div class="histlist" id="h-list"></div>
+        <div class="histview" id="h-view"><p class="dim">Pick a version to see it.</p></div></div>
+      <div class="actions">
+        <button class="btn" id="h-close">Close</button>
+        <button class="btn primary" id="h-restore" disabled>Restore this version</button>
+      </div>`;
+    const list = $("#h-list", box), view = $("#h-view", box), restore = $("#h-restore", box);
+    let picked = null;
+
+    if (!data.revisions.length) {
+      list.append(el("div", { className: "dim", style: "padding:12px",
+        textContent: "No versions yet — history starts at the next save." }));
+    }
+    for (const rev of data.revisions) {
+      const row = el("button", { className: "row" });
+      row.innerHTML = `<span class="nm">${esc(fmtWhen(rev.at))}</span>
+                       <span class="sz">${esc(rev.by || "—")} · ${fmtBytes(rev.size)}</span>`;
+      row.onclick = async () => {
+        [...list.children].forEach(c => c.classList?.remove("on"));
+        row.classList.add("on");
+        view.innerHTML = `<p class="dim">Loading…</p>`;
+        try {
+          const one = await api(`/api/projects/${S.project.id}/history?kind=${kind}&ref=${encodeURIComponent(ref)}&rev=${rev.id}`);
+          picked = rev.id;
+          restore.disabled = false;
+          view.innerHTML = "";
+          if (kind === "page") {
+            const wrap = el("div", { className: "pagedit ro", style: "min-height:0;max-height:46vh" });
+            wrap.innerHTML = sanitizePageHTML(one.revision.content || "");
+            view.append(wrap);
+          } else {
+            view.append(el("pre", { className: "mono", textContent: one.revision.content }));
+          }
+        } catch (e) { view.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+      };
+      list.append(row);
+    }
+    $("#h-close", box).onclick = () => close(null);
+    restore.onclick = async () => {
+      if (!picked) return;
+      restore.disabled = true;
+      try {
+        await api(`/api/projects/${S.project.id}/history`, {
+          method: "POST", body: { kind, ref, rev: picked },
+        });
+        close(true);
+        toast("Version restored", "good");
+        if (kind === "page" && S.page) { S.page.dirty = false; await openPageForce(S.page.id); }
+        else if (S.open) { S.open.dirty = false; await openFile(S.open.path); }
+        await loadFiles().catch(() => {});
+        render();
+      } catch (e) { restore.disabled = false; toast(e.message, "bad"); }
+    };
+  });
+}
+
+// openPage refuses to reopen what is already open; a restore needs it to.
+async function openPageForce(id) {
+  const keep = S.page;
+  S.page = null;
+  await openPage(id);
+  if (!S.page && keep) S.page = keep;
+}
+
+function fmtWhen(sec) {
+  const d = new Date(sec * 1000);
+  const today = new Date().toDateString() === d.toDateString();
+  return (today ? "Today" : d.toLocaleDateString([], { day: "numeric", month: "short" })) +
+    " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ──────────────────────────────────────────────── people (lead) */
+
+const AREA_LABEL = p => p.area === "file" ? `📄 ${p.ref}`
+  : p.area === "page" ? "📝 a page"
+  : p.area === "project" ? "browsing files" : "";
+
+async function renderPeople(m, quiet) {
+  let data;
+  try { data = await api("/api/people"); }
+  catch (e) { if (!quiet) m.append(el("p", { className: "err", textContent: e.message })); return; }
+  // The live refresh runs every few seconds; rebuilding the table when nothing
+  // has moved would fight with the mouse.
+  const sig = JSON.stringify(data);
+  if (quiet && sig === S.peopleSig) return;
+  S.peopleSig = sig;
+
+  m.innerHTML = "";
+  m.append(el("div", { className: "page-head" },
+    el("h2", { textContent: "People" }),
+    el("span", { className: "crumb", textContent: "live · refreshes itself" })));
+  m.append(el("p", { className: "hint" },
+    "Everyone you've created, and anyone signed in to one of your projects. You can move them out of an area, send them somewhere else, or block them from it."));
+
+  const wrap = el("div", { className: "tablewrap" });
+  const table = el("table");
+  table.innerHTML = `<thead><tr>
+      <th>Person</th><th>Where they are</th><th class="right">Actions</th></tr></thead>`;
+  const tb = el("tbody");
+  for (const p of data.people) {
+    const tr = el("tr");
+    const who = el("td", {}, el("b", { textContent: p.name }));
+    if (p.username && p.username !== p.name) {
+      who.append(el("div", { className: "dim mono", style: "font-size:12px", textContent: p.username }));
+    }
+    const whereText = !p.online ? "offline"
+      : p.elsewhere ? "signed in, in someone else's project"
+      : p.projectName ? `${p.projectName}${p.area && p.area !== "project" ? " · " : " · "}${AREA_LABEL(p)}`
+      : "signed in";
+    const where = el("td", {},
+      el("span", { className: "statusdot" + (p.online ? " on" : "") }),
+      el("span", { textContent: whereText }));
+    if (p.online && p.editing) where.append(el("span", { className: "badge", style: "margin-left:8px", textContent: "editing" }));
+
+    const acts = el("td", { className: "right nowrap" });
+    const kick = el("button", { className: "btn ghost sm", textContent: "Move out" });
+    kick.onclick = () => kickFlow(p);
+    kick.disabled = !p.online || !p.projectId;
+    const move = el("button", { className: "btn ghost sm", textContent: "Send to…" });
+    move.onclick = () => moveFlow(p, data.projects);
+    const ban = el("button", { className: "btn danger sm", textContent: "Block" });
+    ban.onclick = () => banFlow(p, data.projects);
+    acts.append(kick, move, ban);
+
+    tr.append(who, where, acts);
+    tb.append(tr);
+  }
+  if (!data.people.length) {
+    tb.append(el("tr", {}, el("td", { colSpan: 3, className: "dim", textContent: "No users yet — create some in the Users tab." })));
+  }
+  table.append(tb);
+  wrap.append(table);
+  m.append(wrap);
+
+  /* --- blocks --- */
+  m.append(el("div", { className: "page-head", style: "margin:22px 0 0" },
+    el("h2", { textContent: "Blocks", style: "font-size:17px" })));
+  const bw = el("div", { className: "tablewrap" });
+  const bt = el("table");
+  bt.innerHTML = `<thead><tr>
+      <th>Person</th><th>Blocked from</th><th>Reason</th><th>Until</th><th class="right">Actions</th></tr></thead>`;
+  const btb = el("tbody");
+  for (const b of data.bans) {
+    const what = b.scope === "project" ? `all of ${b.projectName}`
+      : b.scope === "file" ? `📄 ${b.ref} in ${b.projectName}`
+      : `📝 a page in ${b.projectName}`;
+    const tr = el("tr");
+    const acts = el("td", { className: "right nowrap" });
+    const time = el("button", { className: "btn ghost sm", textContent: b.until ? "Change time limit" : "Set a time limit" });
+    time.onclick = () => banTimeFlow(b);
+    const un = el("button", { className: "btn ghost sm", textContent: "Unblock" });
+    un.onclick = async () => {
+      try {
+        await api("/api/people/unban", { method: "POST", body: { banId: b.id } });
+        toast(`${b.userName} unblocked`, "good");
+        renderPeople($("#main"));
+      } catch (e) { toast(e.message, "bad"); }
+    };
+    acts.append(time, un);
+    tr.append(
+      el("td", {}, el("b", { textContent: b.userName })),
+      el("td", { textContent: what }),
+      el("td", { className: "dim", textContent: b.reason || "—" }),
+      el("td", { className: "nowrap", textContent: b.until ? fmtWhen(b.until) : "no limit" }),
+      acts);
+    btb.append(tr);
+  }
+  if (!data.bans.length) {
+    btb.append(el("tr", {}, el("td", { colSpan: 5, className: "dim", textContent: "Nobody is blocked." })));
+  }
+  bt.append(btb);
+  bw.append(bt);
+  m.append(bw);
+}
+
+// Shared by the kick and block dialogs: what exactly are we acting on.
+function scopeChoices(p) {
+  const out = [["project", `The whole ${p.projectName || "project"}`]];
+  if (p.area === "file" && p.ref) out.unshift(["file", `Just 📄 ${p.ref}`]);
+  if (p.area === "page" && p.ref) out.unshift(["page", "Just the page they have open"]);
+  return out;
+}
+
+async function kickFlow(p) {
+  const choices = scopeChoices(p);
+  const res = await modal((box, close) => {
+    box.innerHTML = `
+      <h3>Move ${esc(p.name)} out</h3>
+      <p>They'll be taken out of it straight away — within a few seconds — and told why.
+         Anything they hadn't saved there is lost.</p>
+      <div id="k-scope"></div>
+      <label>Reason <span class="dim">(they'll see this)</span>
+        <input id="k-reason" placeholder="I need to reorganise this folder" maxlength="300"></label>
+      <div class="actions">
+        <button class="btn" id="k-cancel">Cancel</button>
+        <button class="btn primary" id="k-ok">Move them out</button>
+      </div>`;
+    const host = $("#k-scope", box);
+    choices.forEach(([v, label], i) => {
+      const row = el("div", { className: "checkrow" });
+      row.append(el("input", { type: "radio", name: "kscope", id: "ks-" + v, value: v, checked: i === 0 }),
+        el("label", { htmlFor: "ks-" + v, textContent: label }));
+      host.append(row);
+    });
+    $("#k-cancel", box).onclick = () => close(null);
+    $("#k-ok", box).onclick = () => close({
+      scope: box.querySelector("input[name=kscope]:checked").value,
+      reason: $("#k-reason", box).value,
+    });
+  });
+  if (!res) return;
+  try {
+    await api("/api/people/kick", {
+      method: "POST",
+      body: { userId: p.userId, projectId: p.projectId, scope: res.scope, ref: p.ref, reason: res.reason },
+    });
+    toast(`${p.name} is being moved out`, "good");
+    renderPeople($("#main"));
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+async function moveFlow(p, projects) {
+  if (!projects.length) { toast("You have no projects to send them to", "bad"); return; }
+  const res = await modal((box, close) => {
+    box.innerHTML = `
+      <h3>Send ${esc(p.name)} somewhere</h3>
+      <p>Their screen will open this. They need access to the project already —
+         grant it from the project's <b>Access</b> button if they don't.</p>
+      <label>Project<select id="mv-project"></select></label>
+      <label>Where in it<select id="mv-where"><option value="">The file list</option></select></label>
+      <label>Reason <span class="dim">(optional, they'll see it)</span>
+        <input id="mv-reason" maxlength="300" placeholder="Have a look at this instead"></label>
+      <div class="actions">
+        <button class="btn" id="mv-cancel">Cancel</button>
+        <button class="btn primary" id="mv-ok">Send them there</button>
+      </div>`;
+    const sel = $("#mv-project", box), where = $("#mv-where", box);
+    for (const pr of projects) sel.append(el("option", { value: String(pr.id), textContent: pr.name }));
+    if (p.projectId) sel.value = String(p.projectId);
+
+    // The destinations inside a project are only fetched when one is chosen.
+    const loadWhere = async () => {
+      where.innerHTML = "";
+      where.append(el("option", { value: "", textContent: "The file list" }));
+      try {
+        const [f, g] = await Promise.all([
+          api(`/api/projects/${sel.value}/files`),
+          api(`/api/projects/${sel.value}/pages`),
+        ]);
+        for (const file of f.files) {
+          where.append(el("option", { value: "file:" + file.path, textContent: "📄 " + file.path }));
+        }
+        for (const page of g.pages) {
+          where.append(el("option", { value: "page:" + page.id, textContent: "📝 " + page.name }));
+        }
+      } catch { /* the file list is still a valid destination */ }
+    };
+    sel.onchange = loadWhere;
+    loadWhere();
+
+    $("#mv-cancel", box).onclick = () => close(null);
+    $("#mv-ok", box).onclick = () => {
+      const [area, ...rest] = (where.value || "").split(":");
+      close({
+        projectId: Number(sel.value), area: area || "project", ref: rest.join(":"),
+        reason: $("#mv-reason", box).value,
+      });
+    };
+  });
+  if (!res) return;
+  try {
+    await api("/api/people/move", { method: "POST", body: { userId: p.userId, ...res } });
+    toast(`${p.name} is being sent there`, "good");
+    renderPeople($("#main"));
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+const DURATIONS = [[0, "No time limit"], [15, "15 minutes"], [60, "1 hour"],
+  [240, "4 hours"], [1440, "1 day"], [10080, "1 week"]];
+
+async function banFlow(p, projects) {
+  const choices = p.projectId ? scopeChoices(p) : [["project", "The whole project"]];
+  const res = await modal((box, close) => {
+    box.innerHTML = `
+      <h3>Block ${esc(p.name)}</h3>
+      <p>They won't be able to open it until you unblock them, and they'll be
+         taken out of it now if they're in there.</p>
+      ${p.projectId ? "" : `<label>Project<select id="b-project"></select></label>`}
+      <div id="b-scope"></div>
+      <label>For how long<select id="b-mins"></select></label>
+      <label>Reason <span class="dim">(they'll see this)</span>
+        <input id="b-reason" maxlength="300" placeholder="Stop moving the texture files"></label>
+      <div class="actions">
+        <button class="btn" id="b-cancel">Cancel</button>
+        <button class="btn danger solid" id="b-ok">Block them</button>
+      </div>`;
+    const psel = $("#b-project", box);
+    if (psel) for (const pr of projects) psel.append(el("option", { value: String(pr.id), textContent: pr.name }));
+    const host = $("#b-scope", box);
+    choices.forEach(([v, label], i) => {
+      const row = el("div", { className: "checkrow" });
+      row.append(el("input", { type: "radio", name: "bscope", id: "bs-" + v, value: v, checked: i === 0 }),
+        el("label", { htmlFor: "bs-" + v, textContent: label }));
+      host.append(row);
+    });
+    const mins = $("#b-mins", box);
+    for (const [v, label] of DURATIONS) mins.append(el("option", { value: String(v), textContent: label }));
+    $("#b-cancel", box).onclick = () => close(null);
+    $("#b-ok", box).onclick = () => close({
+      projectId: psel ? Number(psel.value) : p.projectId,
+      scope: box.querySelector("input[name=bscope]:checked").value,
+      ref: p.ref, minutes: Number(mins.value), reason: $("#b-reason", box).value,
+    });
+  });
+  if (!res) return;
+  try {
+    await api("/api/people/ban", { method: "POST", body: { userId: p.userId, ...res } });
+    toast(`${p.name} blocked`, "good");
+    renderPeople($("#main"));
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+async function banTimeFlow(b) {
+  const mins = await modal((box, close) => {
+    box.innerHTML = `
+      <h3>Time limit</h3>
+      <p>How much longer <b>${esc(b.userName)}</b> stays blocked, counting from now.</p>
+      <label>Duration<select id="bt-mins"></select></label>
+      <div class="actions">
+        <button class="btn" id="bt-cancel">Cancel</button>
+        <button class="btn primary" id="bt-ok">Save</button>
+      </div>`;
+    const sel = $("#bt-mins", box);
+    for (const [v, label] of DURATIONS) sel.append(el("option", { value: String(v), textContent: label }));
+    $("#bt-cancel", box).onclick = () => close(null);
+    $("#bt-ok", box).onclick = () => close(Number(sel.value));
+  });
+  if (mins === null) return;
+  try {
+    await api("/api/people/bantime", { method: "POST", body: { banId: b.id, minutes: mins } });
+    toast(mins ? "Time limit set" : "Time limit removed", "good");
+    renderPeople($("#main"));
+  } catch (e) { toast(e.message, "bad"); }
 }
 
 /* ─────────────────────────────────────────────────────────── go */

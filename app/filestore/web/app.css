@@ -229,6 +229,67 @@ td.right, th.right { text-align: right; }
 .tree .row .sz { color: var(--fg-faint); font-size: 11.5px; }
 .tree .ico { width: 15px; text-align: center; opacity: .85; flex: none; }
 
+/* Your own name in the top bar, which is also the way to change it. */
+.namebtn {
+  font: inherit; font-size: 13px; color: var(--fg-dim);
+  background: none; border: 0; padding: 3px 7px; border-radius: 7px; cursor: pointer;
+  max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.namebtn:hover { background: var(--bg-3); color: var(--fg); }
+
+/* The + buttons above the file list: icon-only, so the header stays one row. */
+.iconbtn { font-size: 14px; line-height: 1; padding: 5px 7px; letter-spacing: -1px; }
+.iconbtn .plus { font-size: 12px; opacity: .7; margin-right: 1px; }
+
+/* Who else is in this project right now. */
+.here { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.who-chip { font-size: 12.5px; padding: 5px 11px; }
+.who-chip .dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--good); flex: none;
+}
+.who-chip.editing .dot { background: var(--warn); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+.here-note {
+  font-size: 12px; font-weight: 600; color: var(--good);
+  background: #14291d; border: 1px solid #235c3b; border-radius: 999px; padding: 2px 9px;
+}
+.here-note.editing { color: #ffcd6b; background: #2b2413; border-color: #6b571f; }
+
+/* "Someone saved a newer version while you were editing." */
+.behind {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 9px 14px; font-size: 13px;
+  background: #2b2413; border-bottom: 1px solid #6b571f; color: #ffcd6b;
+}
+
+/* Version history: list on the left, the chosen version on the right. */
+.histwrap { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: start; }
+@media (max-width: 620px) { .histwrap { grid-template-columns: 1fr; } }
+.histlist {
+  max-height: 46vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; padding: 5px;
+}
+.histlist .row {
+  display: block; width: 100%; text-align: left; background: none; border: 0;
+  color: var(--fg); font: inherit; padding: 7px 9px; border-radius: 7px; cursor: pointer;
+}
+.histlist .row:hover { background: var(--bg-3); }
+.histlist .row.on { background: #22344a; color: #cfe4ff; }
+.histlist .nm { display: block; font-size: 13.5px; }
+.histlist .sz { display: block; color: var(--fg-faint); font-size: 11.5px; }
+.histview {
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+  max-height: 46vh; overflow: auto; background: var(--bg);
+}
+.histview pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-size: 12.5px; }
+
+/* People console: online marker in the "where they are" column. */
+.statusdot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--line-2); margin-right: 8px;
+}
+.statusdot.on { background: var(--good); }
+
 /* Left column of the workspace: the file list, with the pages list under it. */
 .sidecol { display: grid; gap: 14px; align-content: start; min-width: 0; }
 .tree.pages { max-height: 34vh; }

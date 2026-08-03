@@ -26,6 +26,7 @@ DB `/srv/data/filestore/filestore.db` · files `/srv/data/filestore/files/p<id>/
 | Read / edit page contents | 👁 read-only | ✅ | per page (see *Pages*) |
 | See all projects + disk usage | ✅ (read-only) | own only | granted only |
 | Change storage limits | ✅ | — | — |
+| See who's online, kick, block | — | ✅ (their projects) | — |
 
 Admin can also step into a lead's shoes for a session — see *Acting as a lead*.
 
@@ -54,6 +55,18 @@ Two consequences worth knowing: projects created this way are owned by
 `aaron@br8t.com` and show up under that name in the admin project list, and to
 manage or delete one you have to be in lead mode — as plain admin it is
 read-only like any other project.
+
+### Names
+
+Everyone can change what they are called, from their name in the top bar. The
+**display name** is only a label — it is what shows next to files, pages and
+edits. The **username** is the sign-in handle and normally stays put.
+
+The one exception: while somebody still has no display name (so the username is
+doing double duty), the dialog also offers to change the username itself, with a
+warning that it is what they will type next time. Once a display name is set,
+that offer disappears — otherwise renaming yourself would quietly move your own
+login out from under you.
 
 ### First sign-in
 
@@ -106,6 +119,59 @@ same allow-list (`validatePageHTML` in `pages.go`). Neither side trusts the
 other: content posted straight at the API is rejected, and content already in
 the database is cleaned again before it is displayed.
 
+## Working at the same time
+
+Every open tab heartbeats to `/api/presence` every 8 seconds. One request
+carries the whole live layer:
+
+- **Who's here.** A strip under the project header shows everyone else in the
+  project and what they have open — "Sam · editing manifest.json" — with the
+  editing marker pulsing.
+- **Saves land on their own.** If someone else saves the document you have open
+  and you have nothing unsaved, your copy is replaced in place. If you *do*
+  have unsaved edits, a strip says so and offers to load theirs instead; your
+  typing is never thrown away for you.
+- **Clashing saves are refused, not merged.** A save carries the version it
+  started from; if that isn't the current one any more the server answers 409
+  and you are asked whether to overwrite. Either way the other version is still
+  in History.
+- **Orders** from a lead (see below) ride back on the same heartbeat.
+
+Pages **autosave** a few seconds after you stop typing. Files deliberately do
+not — half-typed JSON shouldn't land on someone else's screen — so they keep
+their Save button and ⌘S.
+
+### History
+
+Every save of a text file or a page is snapshotted, at most **one a minute per
+document** (saves inside the same minute replace the pending one), kept for
+**two days**. The 🕘 History button in either editor lists them with who and
+when, previews any of them, and restores one — which is itself a save, so an
+unwanted restore is undoable too.
+
+Only text is kept: a binary would put megabytes into SQLite for nothing.
+Renaming a file carries its history with it; deleting one takes it away.
+
+## People, kicks and blocks
+
+A lead's **People** tab (outside any project) lists everyone they created plus
+anyone signed in to one of their projects, with where each person is right now.
+For each: 
+
+- **Move out** — eject them from the file, the page, or the whole project.
+  They're taken out within a few seconds and told why.
+- **Send to…** — put them somewhere instead: another project, or a specific
+  file or page in it. Their screen follows.
+- **Block** — the durable version, with an optional time limit (15 minutes to a
+  week, or none) and a reason. Blocks are per project and can cover the whole
+  project, one file (a folder covers everything under it) or one page. A block
+  also kicks them out of it immediately if they're already inside.
+
+Every one of these carries a reason the person sees, and a blocked door explains
+itself rather than pretending the thing doesn't exist. Blocks apply only to
+ordinary users — a lead can't be shut out of their own project, and admin isn't
+in the moderation picture at all.
+
 ## Storage limits
 
 Three admin-tunable numbers (Server tab, or `/api/admin/settings`):
@@ -127,6 +193,8 @@ auth.go       bcrypt, sessions, role middleware, admin's lead mode
 db.go         schema, settings, user/project queries, audit log
 projects.go   project CRUD, file CRUD, upload, zip in/out
 pages.go      rich-text pages: CRUD, per-page access, markup allow-list
+presence.go   who's where, kicks/moves, bans and their enforcement
+revisions.go  document history: snapshots, pruning, restore
 users.go      user management, project membership, admin settings + stats
 storage.go    path safety, quota accounting, disk writes, zip, reindex
 web/          index.html + app.css + app.js (embedded in the binary)
@@ -166,8 +234,8 @@ vhost at `127.0.0.1:8005` → restarts → health-checks.
 ## Tests
 
 `test.sh` runs the real binary against a throwaway data dir and covers every
-role boundary, quota, traversal vector, page permission, the admin's lead mode
-and the zip round-trip — 164 assertions.
+role boundary, quota, traversal vector, page permission, name change, presence,
+history, save conflict, block and the admin's lead mode — 220 assertions.
 
 ```
 rsync -az test.sh br8t:/tmp/ && ssh br8t 'bash /tmp/test.sh /srv/apps/filestore/filestore'

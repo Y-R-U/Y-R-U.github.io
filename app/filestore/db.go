@@ -14,17 +14,20 @@ import (
 var db *sql.DB
 
 const schema = `
+-- display_name is what everyone else sees; username stays the sign-in handle.
+-- Empty means "no separate name chosen yet" and reads as the username.
 CREATE TABLE IF NOT EXISTS users (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  username    TEXT NOT NULL UNIQUE COLLATE NOCASE,
-  email       TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
-  pass_hash   TEXT NOT NULL,
-  role        TEXT NOT NULL CHECK (role IN ('admin','lead','user')),
-  must_reset  INTEGER NOT NULL DEFAULT 0,
-  disabled    INTEGER NOT NULL DEFAULT 0,
-  created_by  INTEGER,
-  created_at  INTEGER NOT NULL,
-  last_login  INTEGER
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  username     TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  display_name TEXT NOT NULL DEFAULT '',
+  email        TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
+  pass_hash    TEXT NOT NULL,
+  role         TEXT NOT NULL CHECK (role IN ('admin','lead','user')),
+  must_reset   INTEGER NOT NULL DEFAULT 0,
+  disabled     INTEGER NOT NULL DEFAULT 0,
+  created_by   INTEGER,
+  created_at   INTEGER NOT NULL,
+  last_login   INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS projects (
@@ -84,6 +87,36 @@ CREATE TABLE IF NOT EXISTS sessions (
   acting_lead INTEGER NOT NULL DEFAULT 0
 );
 
+-- Periodic snapshots of text files and pages, so a shared document can be
+-- wound back. Only text is kept (a binary would bloat the database), at most
+-- one snapshot a minute per document, and nothing older than the retention
+-- window — see revisions.go.
+CREATE TABLE IF NOT EXISTS revisions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  kind       TEXT NOT NULL CHECK (kind IN ('file','page')),
+  ref        TEXT NOT NULL,          -- file path, or page id as text
+  content    TEXT NOT NULL,
+  at         INTEGER NOT NULL,
+  user_id    INTEGER,
+  username   TEXT NOT NULL DEFAULT ''
+);
+
+-- A lead keeping someone out of part of their project. scope 'project' ignores
+-- ref; 'file' matches the path or anything under it; 'page' matches a page id.
+-- until = 0 means "no time limit".
+CREATE TABLE IF NOT EXISTS bans (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  scope      TEXT NOT NULL CHECK (scope IN ('project','file','page')),
+  ref        TEXT NOT NULL DEFAULT '',
+  reason     TEXT NOT NULL DEFAULT '',
+  until      INTEGER NOT NULL DEFAULT 0,
+  created_by INTEGER,
+  created_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS settings (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -101,6 +134,8 @@ CREATE TABLE IF NOT EXISTS audit (
 
 CREATE INDEX IF NOT EXISTS idx_files_project  ON files(project_id);
 CREATE INDEX IF NOT EXISTS idx_pages_project  ON pages(project_id);
+CREATE INDEX IF NOT EXISTS idx_rev_doc        ON revisions(project_id, kind, ref, at DESC);
+CREATE INDEX IF NOT EXISTS idx_bans_user      ON bans(user_id, project_id);
 CREATE INDEX IF NOT EXISTS idx_members_user   ON project_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_at       ON audit(at DESC);
 `
@@ -127,6 +162,7 @@ func openDB(path string) {
 // means this database already has it.
 var migrations = []string{
 	`ALTER TABLE sessions ADD COLUMN acting_lead INTEGER NOT NULL DEFAULT 0`,
+	`ALTER TABLE users ADD COLUMN display_name TEXT NOT NULL DEFAULT ''`,
 }
 
 func migrate() {
@@ -166,10 +202,11 @@ func maxUpload() int64    { return setting("max_upload_bytes", 100<<20) }
 /* ---------------------------------------------------------------- users */
 
 type User struct {
-	ID        int64  `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
+	ID          int64  `json:"id"`
+	Username    string `json:"username"`
+	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
 	MustReset bool   `json:"mustReset"`
 	Disabled  bool   `json:"disabled"`
 	CreatedBy int64  `json:"createdBy"`
@@ -192,12 +229,16 @@ func realRole(u *User) string {
 	return u.Role
 }
 
-const userCols = `id, username, email, role, must_reset, disabled,
+const userCols = `id, username, COALESCE(NULLIF(display_name,''), username), email,
+                  role, must_reset, disabled,
                   COALESCE(created_by,0), created_at, COALESCE(last_login,0)`
+
+// The same fallback in a join, for the "who touched this" columns.
+const displayNameExpr = `COALESCE(NULLIF(u.display_name,''), u.username, '')`
 
 func scanUser(row interface{ Scan(...any) error }) (*User, error) {
 	var u User
-	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Role, &u.MustReset,
+	err := row.Scan(&u.ID, &u.Username, &u.DisplayName, &u.Email, &u.Role, &u.MustReset,
 		&u.Disabled, &u.CreatedBy, &u.CreatedAt, &u.LastLogin)
 	if err != nil {
 		return nil, err
@@ -232,7 +273,8 @@ type Project struct {
 }
 
 const projectSelect = `
-SELECT p.id, p.name, p.slug, p.owner_id, COALESCE(u.username,'?'), p.quota_bytes,
+SELECT p.id, p.name, p.slug, p.owner_id,
+       COALESCE(NULLIF(u.display_name,''), u.username, '?'), p.quota_bytes,
        COALESCE((SELECT SUM(size) FROM files f WHERE f.project_id=p.id),0),
        COALESCE((SELECT COUNT(*)  FROM files f WHERE f.project_id=p.id),0),
        p.created_at

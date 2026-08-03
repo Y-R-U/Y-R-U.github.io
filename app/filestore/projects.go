@@ -67,6 +67,11 @@ func loadProject(w http.ResponseWriter, u *User, idStr string) *Project {
 		writeErr(w, http.StatusNotFound, "no such project")
 		return nil
 	}
+	// A project-wide block is checked here, at the one door into a project.
+	// Narrower blocks belong to the file and page handlers that know the target.
+	if banBlocked(w, u, p.ID, "", "") {
+		return nil
+	}
 	return p
 }
 
@@ -251,6 +256,8 @@ func handleProjectSub(w http.ResponseWriter, r *http.Request, u *User) {
 		handleMembers(w, r, u, p)
 	case "pages":
 		handlePages(w, r, u, p, parts[2:])
+	case "history":
+		handleHistory(w, r, u, p)
 	case "reindex":
 		// Maintenance, not authoring: the owning lead or an admin may heal a
 		// drifted index.
@@ -356,6 +363,8 @@ func deleteProject(w http.ResponseWriter, u *User, p *Project) {
 	// go regardless of pragma state.
 	db.Exec(`DELETE FROM files WHERE project_id=?`, p.ID)
 	db.Exec(`DELETE FROM pages WHERE project_id=?`, p.ID)
+	db.Exec(`DELETE FROM revisions WHERE project_id=?`, p.ID)
+	db.Exec(`DELETE FROM bans WHERE project_id=?`, p.ID)
 	db.Exec(`DELETE FROM project_members WHERE project_id=?`, p.ID)
 	// Past the point of no return; the bytes can go. A failure here only leaves
 	// an orphaned .trash directory for an operator to sweep.
@@ -378,7 +387,10 @@ type FileEntry struct {
 func handleFiles(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 	switch r.Method {
 	case http.MethodGet:
-		if r.URL.Query().Get("path") != "" {
+		if q := r.URL.Query().Get("path"); q != "" {
+			if rel, err := cleanRelPath(q); err == nil && banBlocked(w, u, p.ID, "file", rel) {
+				return
+			}
 			serveOneFile(w, r, p)
 			return
 		}
@@ -402,6 +414,9 @@ func handleFiles(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 			writeErr(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		if banBlocked(w, u, p.ID, "file", rel) {
+			return
+		}
 		isDir := r.URL.Query().Get("dir") == "1"
 		storeMu.Lock()
 		err = deletePath(p.ID, rel, isDir)
@@ -410,6 +425,7 @@ func handleFiles(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 			writeErr(w, http.StatusInternalServerError, "could not delete: "+err.Error())
 			return
 		}
+		dropRevisions(p.ID, "file", rel)
 		logAudit(u, p.ID, "file_delete", rel)
 		writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 	default:
@@ -418,7 +434,7 @@ func handleFiles(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 }
 
 func listFiles(w http.ResponseWriter, p *Project) {
-	rows, err := db.Query(`SELECT f.path, f.size, f.updated_at, COALESCE(u.username,'')
+	rows, err := db.Query(`SELECT f.path, f.size, f.updated_at, COALESCE(NULLIF(u.display_name,''), u.username, '')
 	                       FROM files f LEFT JOIN users u ON u.id=f.updated_by
 	                       WHERE f.project_id=? ORDER BY f.path`, p.ID)
 	if err != nil {
@@ -567,7 +583,13 @@ func urlEscape(s string) string {
 }
 
 func saveTextFile(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
-	var body struct{ Path, Content string }
+	var body struct {
+		Path, Content string
+		// What the editor had when it loaded the file, so a save can tell
+		// "nobody else touched this" from "you are about to overwrite Sam".
+		Base  int64 `json:"base"`
+		Force bool  `json:"force"`
+	}
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxEditBytes+(1<<16))).Decode(&body); err != nil {
 		writeErr(w, http.StatusBadRequest, "file is too large to save from the editor")
 		return
@@ -581,6 +603,18 @@ func saveTextFile(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 		writeErr(w, http.StatusBadRequest, "this file type can't be edited as text")
 		return
 	}
+	if banBlocked(w, u, p.ID, "file", rel) {
+		return
+	}
+	if at, by := docStamp(p.ID, "file", rel); body.Base > 0 && at > 0 && at != body.Base && !body.Force {
+		// Two people in the same file: say so rather than quietly keeping
+		// whichever save happened to land second.
+		writeJSON(w, http.StatusConflict, map[string]any{
+			"error": "someone else saved this file while you were editing it",
+			"code":  "conflict", "at": at, "by": by,
+		})
+		return
+	}
 	storeMu.Lock()
 	n, err := writeFile(p, rel, strings.NewReader(body.Content), u.ID)
 	storeMu.Unlock()
@@ -592,8 +626,10 @@ func saveTextFile(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 		writeErr(w, http.StatusInternalServerError, "could not save: "+err.Error())
 		return
 	}
+	recordRevision(p.ID, "file", rel, body.Content, u)
+	at, _ := docStamp(p.ID, "file", rel)
 	logAudit(u, p.ID, "file_save", rel)
-	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "size": n})
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "size": n, "at": at})
 }
 
 // fileAction covers the small mutations that aren't uploads: new file, new
@@ -607,6 +643,9 @@ func fileAction(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 	rel, err := cleanRelPath(body.Path)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if banBlocked(w, u, p.ID, "file", rel) {
 		return
 	}
 
@@ -652,6 +691,9 @@ func fileAction(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 			writeErr(w, http.StatusNotFound, "no such file")
 			return
 		}
+		if banBlocked(w, u, p.ID, "file", to) {
+			return
+		}
 		storeMu.Lock()
 		err = movePath(p.ID, rel, to, st.IsDir())
 		storeMu.Unlock()
@@ -659,6 +701,7 @@ func fileAction(w http.ResponseWriter, r *http.Request, u *User, p *Project) {
 			writeErr(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		renameRevisions(p.ID, rel, to)
 		logAudit(u, p.ID, "file_rename", rel+" -> "+to)
 
 	default:

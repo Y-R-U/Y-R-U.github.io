@@ -41,6 +41,75 @@ func canManageUser(actor, target *User) bool {
 	return false
 }
 
+/* ------------------------------------------------------ /api/profile */
+
+// handleProfile is the one bit of account management everyone has: their own
+// name. The display name is free — it is only a label. The username is the
+// sign-in handle, so changing it is offered only when the two are still the
+// same thing (i.e. no separate display name has been chosen), and the client
+// warns that the new one is what they will type next time.
+func handleProfile(w http.ResponseWriter, r *http.Request, u *User) {
+	if r.Method != http.MethodPost {
+		writeErr(w, http.StatusMethodNotAllowed, "POST only")
+		return
+	}
+	var body struct {
+		DisplayName    string `json:"displayName"`
+		ChangeUsername bool   `json:"changeUsername"`
+	}
+	if err := readJSON(r, &body); err != nil {
+		writeErr(w, http.StatusBadRequest, "bad request")
+		return
+	}
+	name := strings.TrimSpace(body.DisplayName)
+	name = strings.Map(func(r rune) rune {
+		if r < 0x20 || r == 0x7f {
+			return -1
+		}
+		return r
+	}, name)
+	if name == "" || len([]rune(name)) > 40 {
+		writeErr(w, http.StatusBadRequest, "your name must be 1-40 characters")
+		return
+	}
+
+	if body.ChangeUsername {
+		// Only from the state where the username is still doing double duty as
+		// the name — otherwise renaming the display name would silently move
+		// somebody's login out from under them.
+		if u.DisplayName != u.Username {
+			writeErr(w, http.StatusBadRequest,
+				"you already have a display name, so your username stays as it is")
+			return
+		}
+		if msg := validUsername(name); msg != "" {
+			writeErr(w, http.StatusBadRequest, msg)
+			return
+		}
+		if _, err := db.Exec(`UPDATE users SET username=?, display_name='' WHERE id=?`, name, u.ID); err != nil {
+			if strings.Contains(err.Error(), "UNIQUE") {
+				writeErr(w, http.StatusConflict, "that username is already taken")
+				return
+			}
+			writeErr(w, http.StatusInternalServerError, "could not change your username")
+			return
+		}
+		logAudit(u, 0, "username_change", u.Username+" -> "+name)
+	} else {
+		if _, err := db.Exec(`UPDATE users SET display_name=? WHERE id=?`, name, u.ID); err != nil {
+			writeErr(w, http.StatusInternalServerError, "could not change your name")
+			return
+		}
+		logAudit(u, 0, "name_change", name)
+	}
+	nu, err := userByID(u.ID)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "could not read your account")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"user": nu})
+}
+
 /* -------------------------------------------------------- /api/users */
 
 func handleUsers(w http.ResponseWriter, r *http.Request, u *User) {

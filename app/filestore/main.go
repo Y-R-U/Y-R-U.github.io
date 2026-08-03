@@ -18,6 +18,8 @@
 //	FILESTORE_ADMIN_USER      bootstrap admin       (default aaron@br8t.com)
 //	FILESTORE_ADMIN_PASSWORD  bootstrap password    (default: generated, logged once)
 //	FILESTORE_INSECURE_COOKIE set to 1 for local http testing
+//	FILESTORE_REVISION_SECONDS how close two saves must be to share one history
+//	                          entry (default 60; the test suite turns it down)
 package main
 
 import (
@@ -55,6 +57,7 @@ func main() {
 	go func() {
 		for {
 			sweepSessions()
+			sweepRevisions()
 			time.Sleep(time.Hour)
 		}
 	}()
@@ -71,6 +74,12 @@ func main() {
 	mux.HandleFunc("/api/me", handleMe)
 	mux.Handle("/api/password", requireUser(handlePassword))
 	mux.Handle("/api/acting", requireUser(handleActing))
+	mux.Handle("/api/profile", requireUser(handleProfile))
+
+	// --- who's where, and the lead's controls over it
+	mux.Handle("/api/presence", requireUser(handlePresence))
+	mux.Handle("/api/people", requireRole("lead", handlePeople))
+	mux.Handle("/api/people/", requireRole("lead", handlePeopleAction))
 
 	// --- projects
 	mux.Handle("/api/projects", requireUser(handleProjects))

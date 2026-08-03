@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -80,7 +81,7 @@ func requireLead(w http.ResponseWriter, u *User, p *Project) bool {
 
 const pageSelect = `
 SELECT g.id, g.name, g.access, g.html, g.created_at, g.updated_at,
-       COALESCE(u.username,'')
+       COALESCE(NULLIF(u.display_name,''), u.username, '')
 FROM pages g LEFT JOIN users u ON u.id = g.updated_by`
 
 func scanPage(row interface{ Scan(...any) error }) (*Page, error) {
@@ -124,6 +125,9 @@ func handlePages(w http.ResponseWriter, r *http.Request, u *User, p *Project, re
 		return
 	}
 	g.CanEdit = canEditPage(u, p, g.Access)
+	if banBlocked(w, u, p.ID, "page", rest[0]) {
+		return
+	}
 
 	switch r.Method {
 	case http.MethodGet:
@@ -143,7 +147,7 @@ func handlePages(w http.ResponseWriter, r *http.Request, u *User, p *Project, re
 // opened, so a project with a hundred long pages still lists instantly.
 func listPages(w http.ResponseWriter, u *User, p *Project) {
 	rows, err := db.Query(`SELECT g.id, g.name, g.access, '', g.created_at, g.updated_at,
-	                         COALESCE(u.username,'')
+	                         COALESCE(NULLIF(u.display_name,''), u.username, '')
 	                       FROM pages g LEFT JOIN users u ON u.id = g.updated_by
 	                       WHERE g.project_id=? ORDER BY g.name COLLATE NOCASE`, p.ID)
 	if err != nil {
@@ -225,9 +229,20 @@ func savePage(w http.ResponseWriter, r *http.Request, u *User, p *Project, g *Pa
 	}
 	var body struct {
 		HTML string `json:"html"`
+		// The version the editor started from; see the file editor's save for
+		// why this matters once two people share a document.
+		Base  int64 `json:"base"`
+		Force bool  `json:"force"`
 	}
 	if err := readJSON(r, &body); err != nil {
 		writeErr(w, http.StatusBadRequest, "bad request")
+		return
+	}
+	if body.Base > 0 && g.UpdatedAt != body.Base && !body.Force {
+		writeJSON(w, http.StatusConflict, map[string]any{
+			"error": "someone else saved this page while you were writing",
+			"code":  "conflict", "at": g.UpdatedAt, "by": g.UpdatedBy,
+		})
 		return
 	}
 	if len(body.HTML) > maxPageBytes {
@@ -247,6 +262,7 @@ func savePage(w http.ResponseWriter, r *http.Request, u *User, p *Project, g *Pa
 		writeErr(w, http.StatusInternalServerError, "could not save the page")
 		return
 	}
+	recordRevision(p.ID, "page", strconv.FormatInt(g.ID, 10), body.HTML, u)
 	logAudit(u, p.ID, "page_save", g.Name)
 	ng, _ := pageByID(p.ID, g.ID)
 	if ng != nil {
@@ -303,6 +319,7 @@ func deletePage(w http.ResponseWriter, u *User, p *Project, g *Page) {
 		writeErr(w, http.StatusInternalServerError, "could not delete the page")
 		return
 	}
+	dropRevisions(p.ID, "page", strconv.FormatInt(g.ID, 10))
 	logAudit(u, p.ID, "page_delete", g.Name)
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }

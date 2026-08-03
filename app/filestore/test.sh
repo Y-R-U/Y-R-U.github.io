@@ -48,6 +48,7 @@ FILESTORE_DATA="$TMP/data" \
 FILESTORE_ADMIN_USER="aaron@br8t.com" \
 FILESTORE_ADMIN_PASSWORD="bootstrap-pw-1" \
 FILESTORE_INSECURE_COOKIE=1 \
+FILESTORE_REVISION_SECONDS=2 \
   "$BIN" > "$TMP/server.log" 2>&1 &
 SRV=$!
 for i in $(seq 1 50); do curl -sf "$BASE/healthz" >/dev/null && break; sleep 0.2; done
@@ -389,6 +390,168 @@ check "admin can change the default limit" "$r" '"ok":true'
 r=$(req lead POST /api/projects '{"name":"Second Addon"}')
 check "new projects pick up the new default" "$r" '"quotaBytes":52428800'
 PID2=$(echo "$r" | jget "['project']['id']")
+
+head1 "display names"
+# Earlier sections left bob without access; everything below needs him inside.
+req lead POST "/api/projects/$PID/members" "{\"userId\":$UID2,\"granted\":true}" >/dev/null
+r=$(req bob POST /api/profile '{"displayName":"Bobby"}')
+check "anyone can set their own display name" "$r" '"displayName":"Bobby"'
+r=$(req lead GET "/api/projects/$PID/files")
+check "the display name shows on their edits" "$r" '"updatedBy":"Bobby"'
+r=$(req bob POST /api/profile '{"displayName":"","changeUsername":false}')
+check "an empty name is refused" "$r" '1-40'
+r=$(req bob POST /api/profile '{"displayName":"bobby2","changeUsername":true}')
+check "once a display name is set the username is left alone" "$r" 'username stays'
+
+# The username swap is offered only while the display name is still the
+# username, so it gets its own throwaway account rather than moving the sign-in
+# handle of one the rest of the suite depends on.
+r=$(req lead POST /api/users '{"username":"tempname"}')
+TMPPW=$(echo "$r" | jget "['password']")
+TMPID=$(echo "$r" | jget "['user']['id']")
+req tmpu POST /api/login "{\"username\":\"tempname\",\"password\":\"$TMPPW\"}" >/dev/null
+req tmpu POST /api/password "{\"current\":\"$TMPPW\",\"new\":\"temp-pw-12345\"}" >/dev/null
+r=$(req tmpu POST /api/profile '{"displayName":"renamed.one","changeUsername":true}')
+check "a user whose name is still their username can change both" "$r" '"username":"renamed.one"'
+r=$(req tmpu2 POST /api/login '{"username":"renamed.one","password":"temp-pw-12345"}')
+check "the new username signs in"  "$r" '"role":"user"'
+r=$(req tmpu3 POST /api/login '{"username":"tempname","password":"temp-pw-12345"}')
+check "the old one no longer does" "$r" 'incorrect username or password'
+r=$(req tmpu POST /api/profile '{"displayName":"Renamed","changeUsername":false}')
+check "and the display name is free after that" "$r" '"displayName":"Renamed"'
+r=$(req bob POST /api/profile '{"displayName":"renamed.one","changeUsername":true}')
+check "a taken username is refused" "$r" 'already'
+req lead DELETE "/api/users/$TMPID" >/dev/null
+
+head1 "presence"
+r=$(req bob POST /api/presence "{\"projectId\":$PID,\"area\":\"file\",\"ref\":\"manifest.json\",\"editing\":true}")
+check "a heartbeat is accepted"        "$r" '"interval"'
+r=$(req lead POST /api/presence "{\"projectId\":$PID,\"area\":\"project\"}")
+check "others in the project are reported" "$r" '"name":"Bobby"'
+check "including what they have open"      "$r" '"ref":"manifest.json"'
+check "and whether they are editing it"    "$r" '"editing":true'
+r=$(req lead POST /api/presence '{"projectId":0}')
+checkno "somewhere else, nobody is reported" "$r" '"name":"Bobby"'
+# A spot inside a project the account can't reach is not reported to anyone.
+r=$(req bob POST /api/presence '{"projectId":99999,"area":"project"}')
+check "an unreachable project is ignored" "$r" '"people":[]'
+r=$(req lead POST /api/presence "{\"projectId\":$PID,\"watch\":{\"kind\":\"file\",\"ref\":\"manifest.json\"}}")
+check "the heartbeat reports the open file's version" "$r" '"watch"'
+
+head1 "history"
+# Its own file: sharing one with the sections above makes the version counts
+# depend on how fast the suite happens to run.
+req lead POST "/api/projects/$PID/files" '{"action":"newfile","path":"notes.txt"}' >/dev/null
+r=$(req lead PUT "/api/projects/$PID/files" '{"path":"notes.txt","content":"one"}')
+r=$(req lead PUT "/api/projects/$PID/files" '{"path":"notes.txt","content":"two"}')
+check "a save reports the version it wrote" "$r" '"at"'
+r=$(req lead GET "/api/projects/$PID/history?kind=file&ref=notes.txt")
+n=$(echo "$r" | python3 -c "import sys,json;print(len(json.load(sys.stdin)['revisions']))")
+[ "$n" = "1" ] && ok "saves in the same window coalesce into one version" \
+               || bad "saves in the same window coalesce into one version" "got $n"
+REV=$(echo "$r" | jget "['revisions'][0]['id']")
+r=$(req lead GET "/api/projects/$PID/history?kind=file&ref=notes.txt&rev=$REV")
+check "a version can be read back"       "$r" '"content"'
+check "holding the newest state of it"   "$r" 'two'
+
+sleep 2.2
+r=$(req lead PUT "/api/projects/$PID/files" '{"path":"notes.txt","content":"three"}')
+r=$(req lead GET "/api/projects/$PID/history?kind=file&ref=notes.txt")
+n=$(echo "$r" | python3 -c "import sys,json;print(len(json.load(sys.stdin)['revisions']))")
+[ "$n" = "2" ] && ok "a later save starts a new version" \
+               || bad "a later save starts a new version" "got $n"
+r=$(req lead GET "/api/projects/$PID/files?path=notes.txt&mode=text")
+check "the file holds the newer content" "$r" 'three'
+
+r=$(req lead POST "/api/projects/$PID/history" "{\"kind\":\"file\",\"ref\":\"notes.txt\",\"rev\":$REV}")
+check "an older version restores" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/files?path=notes.txt&mode=text")
+check "and the file is back to it" "$r" 'two'
+
+r=$(req lead POST "/api/projects/$PID/files" '{"action":"rename","path":"notes.txt","to":"notes2.txt"}')
+r=$(req lead GET "/api/projects/$PID/history?kind=file&ref=notes2.txt")
+check "history follows a rename" "$r" '"revisions":[{'
+r=$(req lead DELETE "/api/projects/$PID/files?path=notes2.txt&dir=0")
+r=$(req lead GET "/api/projects/$PID/history?kind=file&ref=notes2.txt")
+check "and is dropped when the file is deleted" "$r" '"revisions":[]'
+
+c=$(code bob GET "/api/projects/$PID/history?kind=file&ref=manifest.json")
+check "a project member can read history" "$c" "200"
+c=$(code bob GET "/api/projects/$PID/history?kind=page&ref=99999")
+check "history is not a way into a page you can't open" "$c" "404"
+
+head1 "save conflicts"
+r=$(req lead PUT "/api/projects/$PID/files" '{"path":"manifest.json","content":"{\"who\":\"lead\"}"}')
+AT=$(echo "$r" | jget "['at']")
+r=$(req bob PUT "/api/projects/$PID/files" "{\"path\":\"manifest.json\",\"content\":\"{\\\"who\\\":\\\"bob\\\"}\",\"base\":1}")
+check "saving over someone else's newer version is refused" "$r" '"code":"conflict"'
+r=$(req bob PUT "/api/projects/$PID/files" "{\"path\":\"manifest.json\",\"content\":\"{\\\"who\\\":\\\"bob\\\"}\",\"base\":1,\"force\":true}")
+check "…unless you say so"                                  "$r" '"ok":true'
+r=$(req bob PUT "/api/projects/$PID/files" "{\"path\":\"manifest.json\",\"content\":\"{\\\"who\\\":\\\"bob2\\\"}\",\"base\":$AT}")
+checkno "saving from the current version is not a conflict"  "$r" 'conflict'
+
+head1 "kicks and blocks"
+req bob POST /api/presence "{\"projectId\":$PID,\"area\":\"file\",\"ref\":\"manifest.json\"}" >/dev/null
+GID2=$(req lead POST "/api/projects/$PID/pages" '{"name":"Team notes"}' | jget "['page']['id']")
+r=$(req lead GET /api/people)
+check "the lead sees their people"        "$r" '"name":"Bobby"'
+check "with where they are"               "$r" '"projectName":"My Addon"'
+check "and the (empty) block list"        "$r" '"bans":[]'
+c=$(code bob GET /api/people)
+check "a user CANNOT open the people console" "$c" "403"
+
+r=$(req lead POST /api/people/kick "{\"userId\":$UID2,\"projectId\":$PID,\"scope\":\"file\",\"ref\":\"manifest.json\",\"reason\":\"reorganising\"}")
+check "the lead can move someone out of a file" "$r" '"ok":true'
+r=$(req bob POST /api/presence "{\"projectId\":$PID,\"area\":\"file\",\"ref\":\"manifest.json\"}")
+check "the order reaches them on their next heartbeat" "$r" '"type":"kick"'
+check "with the reason attached"                       "$r" 'reorganising'
+r=$(req bob POST /api/presence "{\"projectId\":$PID,\"area\":\"file\",\"ref\":\"manifest.json\"}")
+checkno "and is delivered only once" "$r" '"order"'
+
+r=$(req lead POST /api/people/ban "{\"userId\":$UID2,\"projectId\":$PID,\"scope\":\"file\",\"ref\":\"manifest.json\",\"reason\":\"leave it alone\",\"minutes\":60}")
+check "the lead can block someone from one file" "$r" '"ok":true'
+r=$(req bob GET "/api/projects/$PID/files?path=manifest.json&mode=text")
+check "the blocked file refuses to open"  "$r" '"code":"banned"'
+check "and says why"                      "$r" 'leave it alone'
+c=$(code bob PUT "/api/projects/$PID/files" '{"path":"manifest.json","content":"x"}')
+check "and refuses writes"                "$c" "403"
+c=$(code bob GET "/api/projects/$PID/files?path=pack/manifest.json&mode=text")
+check "a different file is unaffected"    "$c" "200"
+c=$(code lead GET "/api/projects/$PID/files?path=manifest.json&mode=text")
+check "the lead is not caught by their own block" "$c" "200"
+BAN=$(req lead GET /api/people | jget "['bans'][0]['id']")
+r=$(req lead POST /api/people/bantime "{\"banId\":$BAN,\"minutes\":0}")
+check "a time limit can be cleared" "$r" '"until":0'
+r=$(req lead POST /api/people/unban "{\"banId\":$BAN}")
+check "and the block lifted"        "$r" '"bans":[]'
+c=$(code bob GET "/api/projects/$PID/files?path=manifest.json&mode=text")
+check "the file opens again"        "$c" "200"
+
+r=$(req lead POST /api/people/ban "{\"userId\":$UID2,\"projectId\":$PID,\"scope\":\"page\",\"ref\":\"$GID2\",\"reason\":\"not for you\"}")
+c=$(code bob GET "/api/projects/$PID/pages/$GID2")
+check "a page can be blocked too" "$c" "403"
+BAN=$(req lead GET /api/people | jget "['bans'][0]['id']")
+req lead POST /api/people/unban "{\"banId\":$BAN}" >/dev/null
+
+r=$(req lead POST /api/people/ban "{\"userId\":$UID2,\"projectId\":$PID,\"scope\":\"project\",\"reason\":\"take a break\",\"minutes\":1}")
+check "a whole project can be blocked" "$r" '"ok":true'
+r=$(req bob GET "/api/projects/$PID/files")
+check "every door into it is shut"     "$r" '"code":"banned"'
+r=$(req bob GET /api/projects)
+check "though they can still see the project exists" "$r" 'My Addon'
+BAN=$(req lead GET /api/people | jget "['bans'][0]['id']")
+req lead POST /api/people/unban "{\"banId\":$BAN}" >/dev/null
+c=$(code bob GET "/api/projects/$PID/files")
+check "unblocking lets them back in" "$c" "200"
+
+# Moderation stops at the edge of what a lead owns.
+c=$(code bob POST /api/people/kick "{\"userId\":$UID2,\"projectId\":$PID,\"scope\":\"project\"}")
+check "a user CANNOT kick anyone"                 "$c" "403"
+c=$(code lead POST /api/people/ban "{\"userId\":$LEADID,\"projectId\":$PID,\"scope\":\"project\"}")
+check "a lead CANNOT block another lead"          "$c" "403"
+c=$(code lead POST /api/people/kick "{\"userId\":$UID2,\"projectId\":99999,\"scope\":\"project\"}")
+check "nor act inside a project they don't own"   "$c" "403"
+req lead DELETE "/api/projects/$PID/pages/$GID2" >/dev/null
 
 head1 "admin acting as a lead"
 c=$(code lead POST /api/acting '{"asLead":true}')
