@@ -6,6 +6,7 @@ import { buildEditor } from './editor/editor.js';
 import { Post } from './engine/post.js';
 import { getScenario, allScenarios } from './scenarios.js';
 import { People } from './world/people.js';
+import { Chickens } from './world/chicken.js';
 import { Player } from './player.js';
 import { Doors } from './world/doors.js';
 import { walkStep, groundAt } from './world/colliders.js';
@@ -18,6 +19,7 @@ app.expose();
 const lighting = app.add(new Lighting());
 const demo = app.add(new Demo());
 const people = app.add(new People(demo.terrain));
+const chickens = app.add(new Chickens(demo.terrain));
 
 const controls = new OrbitControls(app.camera, app.renderer.domElement);
 controls.target.set(0, 4, 0);
@@ -36,6 +38,7 @@ app.post.registerKnobs(app.quality);
 buildPanel(app);
 
 window.__forge.people = people;
+window.__forge.chickens = chickens;
 window.__forge.player = player;
 window.__forge.doors = doors;
 window.__forge.walk = { walkStep, groundAt };

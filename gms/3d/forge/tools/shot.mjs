@@ -7,7 +7,7 @@
 //   node tools/shot.mjs --shot=wall_day --perf --headed     ← real GPU, for the budget gate
 
 import { spawn, execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
@@ -100,6 +100,7 @@ class CDP {
 async function main() {
   const server = await serve();
   const { proc, ws } = await chrome();
+  PROC = proc;
   const cdp = new CDP(ws);
   await cdp.connect();
 
@@ -159,7 +160,7 @@ async function main() {
   }
 
   await S('Browser.close').catch(() => {});
-  proc.kill();
+  cleanup(proc);
   server.close();
 
   if (args.perf && !HEADED) console.warn('\n⚠ perf numbers from headless are software-rendered — rerun with --headed for the budget gate');
@@ -199,8 +200,22 @@ async function listScenarios(S) {
   return await evalJSON(S, `window.__forge.scenarios.map(s=>s.id)`);
 }
 
+// A run that throws used to leave its browser and its profile dir behind. Enough of those and the
+// machine is loaded enough to make every timing on it meaningless — which is exactly what happened.
+let PROC = null;
+function cleanup(proc) {
+  const dir = `/tmp/forge-cdp-${process.pid}`;
+  try { (proc || PROC)?.kill(); } catch {}
+  // Killing the spawned parent leaves chrome's renderer and GPU children alive, and they keep
+  // rewriting the profile dir. Match on the dir so only this run's processes are touched.
+  try { execSync(`pkill -f ${dir} 2>/dev/null; sleep 0.4`, { stdio: 'ignore', shell: '/bin/sh' }); } catch {}
+  try { rmSync(dir, { recursive: true, force: true }); } catch {}
+}
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { cleanup(); process.exit(1); });
+
 main().catch(e => {
   console.error(e.message);
   for (const l of logs) console.error('  ' + l);
+  cleanup();
   process.exit(1);
 });

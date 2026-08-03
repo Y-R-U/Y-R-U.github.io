@@ -49,6 +49,8 @@ export const ZONES = {
     // `inner` is the brightest the hood cavity ever gets, just inside the rim; it falls to
     // near-black at the back. `eyes` is [core, tail] and only shows with the robeEyes knob up.
     hood: { inner: '#2b2d31', eyes: ['#e8f0f6', '#8fa6bb'] },
+    // ── fowl ──
+    fowl: { body: '#ddd1b6', dark: '#6f6047', comb: '#c0463f', beak: '#e0b657', leg: '#dbb277' },
     // ── interior ──
     wood: { base: '#cbb190', dark: '#a98f6f', roughness: 0.6 },
     // `pattern` names the stained-glass design; `cloth` is the room's one accent; `glow` scales
@@ -96,6 +98,7 @@ export const ZONES = {
     },
     robe: '#9c8a72', staff: 'pitchfork',
     hood: { inner: '#241a11', eyes: ['#9aa84e', '#4a3418'] },
+    fowl: { body: '#96602f', dark: '#33200f', comb: '#a8382f', beak: '#c99a4e', leg: '#b58c52' },
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
     interior: {
       pattern: 'quarry', floor: 'board', cloth: '#9d5a44', glow: 0.85, warmth: '#ffcf94',
@@ -139,6 +142,7 @@ export const ZONES = {
     },
     robe: '#3c3a3e', staff: 'dark', staffTip: { shape: 'spike', len: 0.28, wide: 0.032, shade: 0.20 },
     hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
+    fowl: { body: '#56535e', dark: '#1b1a21', comb: '#7a2436', beak: '#8f8264', leg: '#7d7259' },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
     interior: {
       pattern: 'rays', floor: 'flag', cloth: '#7a2436', glow: 1.15, warmth: '#ff9f62',

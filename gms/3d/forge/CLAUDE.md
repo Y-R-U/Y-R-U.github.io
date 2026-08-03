@@ -104,11 +104,17 @@ visible frame. The gate is on the total.
 
 A component that looks superb and blows the budget has failed. Beauty we can't draw isn't a result.
 
-**Headed GPU timings on this machine swing ±3.6 ms run to run** — three identical `wall_day` runs
-measured 7.8 / 11.4 / 10.9 ms. Do not report a regression or an improvement inside that band, and
-never compare a number from one browser launch against another. Counts (draw calls, triangles,
-texture MB) ARE deterministic and are the honest way to attribute cost. For a real timing
-comparison, measure both configurations inside one page load, interleaved.
+**Do not trust the GPU ms readout across runs. It is not a reliable instrument here.** On one
+evening, an unchanged `wall_day` reported 7.8 / 11.4 / 10.9, then 174, then 51 / 59 / 65 ms — while
+reporting a steady 60fps throughout, which those later figures cannot both be true of. Two causes
+found: `shot.mjs` leaked its Chrome and its `/tmp/forge-cdp-*` profile dir every run (69 stray
+browsers, load average 12; it cleans up after itself now — check `ps aux | grep forge-cdp` if
+numbers look wild), and the timer query itself appears unsound in the offscreen headed window.
+
+What IS trustworthy: **fps**, and the **counts** — draw calls, triangles, texture MB — which came
+back bit-identical across every one of those runs. Attribute cost with counts. For a genuine timing
+comparison, measure both configurations inside one page load, interleaved. The real gate is Aaron's
+phone, which is the only number that has ever been stable.
 
 ## How your work gets judged
 
