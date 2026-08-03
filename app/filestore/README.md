@@ -27,12 +27,33 @@ DB `/srv/data/filestore/filestore.db` · files `/srv/data/filestore/files/p<id>/
 | See all projects + disk usage | ✅ (read-only) | own only | granted only |
 | Change storage limits | ✅ | — | — |
 
+Admin can also step into a lead's shoes for a session — see *Acting as a lead*.
+
 There is exactly **one admin**, bootstrapped on first run: `aaron@br8t.com`.
 
 The split is deliberate. Admin is an *operator* account — it configures the
 server and manages leads, but cannot create projects, touch files, or delete a
 team's work. Leads own the day-to-day. A lead only ever sees the users they
 created, never another lead's.
+
+### Acting as a lead
+
+Admin sees everything and changes almost nothing, which makes it a poor seat to
+test from. The **ADMIN / LEAD** switch in the top bar drops the admin account
+into a real lead's shoes for that session: it creates and owns its own projects,
+pages and users, and sees exactly the lead view — the switch itself is the only
+thing a lead wouldn't have.
+
+It is implemented by masking the role in `currentUser`, not by granting admin
+extra powers, so there is no "admin except…" branch anywhere to drift out of
+sync with what a lead actually gets. The flag lives on the **session** row, so
+it dies at sign-out and never follows the account to another device. While the
+switch is on, the Server and Leads tabs 403 exactly as they would for a lead.
+
+Two consequences worth knowing: projects created this way are owned by
+`aaron@br8t.com` and show up under that name in the admin project list, and to
+manage or delete one you have to be in lead mode — as plain admin it is
+read-only like any other project.
 
 ### First sign-in
 
@@ -101,8 +122,8 @@ be raised individually by admin in the Server tab.
 ## Layout
 
 ```
-main.go       routing, bootstrap, session + password endpoints
-auth.go       bcrypt, sessions, role middleware
+main.go       routing, bootstrap, session + password + role-switch endpoints
+auth.go       bcrypt, sessions, role middleware, admin's lead mode
 db.go         schema, settings, user/project queries, audit log
 projects.go   project CRUD, file CRUD, upload, zip in/out
 pages.go      rich-text pages: CRUD, per-page access, markup allow-list
@@ -145,8 +166,8 @@ vhost at `127.0.0.1:8005` → restarts → health-checks.
 ## Tests
 
 `test.sh` runs the real binary against a throwaway data dir and covers every
-role boundary, quota, traversal vector, page permission and the zip
-round-trip — 144 assertions.
+role boundary, quota, traversal vector, page permission, the admin's lead mode
+and the zip round-trip — 164 assertions.
 
 ```
 rsync -az test.sh br8t:/tmp/ && ssh br8t 'bash /tmp/test.sh /srv/apps/filestore/filestore'

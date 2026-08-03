@@ -70,6 +70,7 @@ func main() {
 	mux.HandleFunc("/api/logout", handleLogout)
 	mux.HandleFunc("/api/me", handleMe)
 	mux.Handle("/api/password", requireUser(handlePassword))
+	mux.Handle("/api/acting", requireUser(handleActing))
 
 	// --- projects
 	mux.Handle("/api/projects", requireUser(handleProjects))
@@ -273,6 +274,41 @@ func handleMe(w http.ResponseWriter, r *http.Request) {
 		"limits":  map[string]int64{"defaultQuota": defaultQuota(), "maxUpload": maxUpload()},
 		"version": buildVersion,
 	})
+}
+
+// handleActing switches the admin account between its own role and a lead's.
+//
+// Admin can see everything and change almost nothing, which makes it a poor
+// place to try the app out. Rather than granting admin extra powers — which
+// would blur the role split the whole app is built around — this drops it into
+// a real lead's shoes for the current session: it owns the projects it creates
+// there and sees exactly what a lead sees, with only the switch itself left as
+// a way back. The admin/lead boundary is a working arrangement between Aaron
+// and his son, not a security perimeter, so a self-service switch on the one
+// bootstrapped admin account is the right shape for it.
+func handleActing(w http.ResponseWriter, r *http.Request, u *User) {
+	if r.Method != http.MethodPost {
+		writeErr(w, http.StatusMethodNotAllowed, "POST only")
+		return
+	}
+	// realRole, not Role: while lead mode is on the actor already reads as a lead.
+	if realRole(u) != "admin" {
+		writeErr(w, http.StatusForbidden, "only the admin account can switch role")
+		return
+	}
+	var body struct {
+		AsLead bool `json:"asLead"`
+	}
+	if err := readJSON(r, &body); err != nil {
+		writeErr(w, http.StatusBadRequest, "bad request")
+		return
+	}
+	if err := setActingLead(r, body.AsLead); err != nil {
+		writeErr(w, http.StatusInternalServerError, "could not switch role")
+		return
+	}
+	logAudit(u, 0, "acting_as", map[bool]string{true: "lead", false: "admin"}[body.AsLead])
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "actingAsLead": body.AsLead})
 }
 
 // handlePassword changes the signed-in user's own password. It is the one

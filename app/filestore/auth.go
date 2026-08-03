@@ -87,9 +87,9 @@ func currentUser(r *http.Request) *User {
 	if err != nil || c.Value == "" {
 		return nil
 	}
-	var uid, exp int64
-	if err := db.QueryRow(`SELECT user_id, expires_at FROM sessions WHERE token=?`,
-		c.Value).Scan(&uid, &exp); err != nil {
+	var uid, exp, acting int64
+	if err := db.QueryRow(`SELECT user_id, expires_at, acting_lead FROM sessions WHERE token=?`,
+		c.Value).Scan(&uid, &exp, &acting); err != nil {
 		return nil
 	}
 	if time.Now().Unix() > exp {
@@ -100,7 +100,32 @@ func currentUser(r *http.Request) *User {
 	if err != nil || u.Disabled {
 		return nil
 	}
+	// Lead mode: the admin asked to be treated as a lead for this session, so
+	// every role check downstream sees one. Masking the role here rather than
+	// special-casing each handler is what keeps the two views honestly
+	// identical — there is no "admin except…" path to drift out of sync.
+	// Only a real admin can be in it; the flag is ignored on any other account.
+	if acting == 1 && u.Role == "admin" {
+		u.RealRole = "admin"
+		u.ActingAsLead = true
+		u.Role = "lead"
+	}
 	return u
+}
+
+// setActingLead flips lead mode for the session the request arrived on. Other
+// devices signed in as the same account are left alone.
+func setActingLead(r *http.Request, on bool) error {
+	c, err := r.Cookie(sessionCookie)
+	if err != nil {
+		return err
+	}
+	v := 0
+	if on {
+		v = 1
+	}
+	_, err = db.Exec(`UPDATE sessions SET acting_lead=? WHERE token=?`, v, c.Value)
+	return err
 }
 
 // Drops every session belonging to a user — used when their password changes

@@ -19,6 +19,10 @@ const S = {
   pages: [],       // rich-text pages belonging to the project (metadata only)
   page: null,      // { id, name, access, html, dirty, canEdit } — the open page
   ownerFilter: "", // admin: filter projects by lead
+  // Admin only. `realRole` is what the account actually is; `acting` says it has
+  // switched into lead mode, in which case S.user.role already reads "lead".
+  realRole: "",
+  acting: false,
 };
 
 /* ─────────────────────────────────────────────────────── helpers */
@@ -285,18 +289,56 @@ async function boot() {
 
   S.user = me.user;
   S.limits = me.limits || {};
+  S.acting = !!me.user.actingAsLead;
+  S.realRole = me.user.realRole || me.user.role;
   $("#boot").hidden = true;
   $("#view-login").hidden = true;
   $("#view-reset").hidden = true;
   $("#app").hidden = false;
+  $("#app").classList.toggle("acting", S.acting);
 
   $("#who-name").textContent = S.user.username;
   const role = $("#who-role");
   role.textContent = S.user.role;
   role.className = "badge " + S.user.role;
 
+  renderRoleSwitch();
   renderTabs();
   render();
+}
+
+// The admin's ADMIN / LEAD switch. Admin can see everything and change almost
+// nothing, so testing anything real means being a lead: this puts the account
+// in a lead's shoes for the session, with the switch itself the only thing a
+// lead wouldn't have.
+function renderRoleSwitch() {
+  const host = $("#role-switch");
+  host.hidden = S.realRole !== "admin";
+  if (host.hidden) return;
+  host.innerHTML = "";
+  for (const [mode, label, title] of [
+    ["admin", "Admin", "Your own account: sees every project, changes none of them"],
+    ["lead", "Lead", "Act as a lead: create and edit your own projects, pages and users"],
+  ]) {
+    const on = (mode === "lead") === S.acting;
+    const b = el("button", { className: on ? "on" : "", textContent: label, title });
+    b.onclick = () => setActing(mode === "lead");
+    host.append(b);
+  }
+}
+
+async function setActing(asLead) {
+  if (S.acting === asLead) return;
+  if (!(await confirmDiscard())) return;
+  try {
+    await api("/api/acting", { method: "POST", body: { asLead } });
+    S.project = null; S.open = null; S.page = null;
+    S.tab = "projects"; S.ownerFilter = "";
+    await boot();
+    toast(asLead
+      ? "Acting as a lead — projects you create here are your own"
+      : "Back to your admin account", "good");
+  } catch (e) { toast(e.message, "bad"); }
 }
 
 function tabsFor() {
@@ -361,6 +403,11 @@ async function renderProjects(m) {
     head.append(b);
   }
   m.append(head);
+
+  if (S.acting) {
+    m.append(el("p", { className: "hint" },
+      "You're acting as a lead, so this is only the projects you own — switch back to Admin in the top bar to see everyone's."));
+  }
 
   if (!data.projects.length) {
     m.append(el("div", { className: "empty" },

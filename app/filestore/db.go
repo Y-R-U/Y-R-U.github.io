@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -73,11 +74,14 @@ CREATE TABLE IF NOT EXISTS pages (
   updated_by  INTEGER
 );
 
+-- acting_lead is the admin's "act as a lead" switch. It is per session rather
+-- than per account so it dies with a sign-out and never leaks to another device.
 CREATE TABLE IF NOT EXISTS sessions (
-  token      TEXT PRIMARY KEY,
-  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  created_at INTEGER NOT NULL,
-  expires_at INTEGER NOT NULL
+  token       TEXT PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  INTEGER NOT NULL,
+  expires_at  INTEGER NOT NULL,
+  acting_lead INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS settings (
@@ -114,6 +118,22 @@ func openDB(path string) {
 	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatalf("schema: %v", err)
+	}
+	migrate()
+}
+
+// Columns added after a release. CREATE TABLE IF NOT EXISTS leaves an existing
+// table alone, so each one needs its own ALTER; a duplicate-column error just
+// means this database already has it.
+var migrations = []string{
+	`ALTER TABLE sessions ADD COLUMN acting_lead INTEGER NOT NULL DEFAULT 0`,
+}
+
+func migrate() {
+	for _, m := range migrations {
+		if _, err := db.Exec(m); err != nil && !strings.Contains(err.Error(), "duplicate column") {
+			log.Fatalf("migrate %q: %v", m, err)
+		}
 	}
 }
 
@@ -155,6 +175,21 @@ type User struct {
 	CreatedBy int64  `json:"createdBy"`
 	CreatedAt int64  `json:"createdAt"`
 	LastLogin int64  `json:"lastLogin"`
+
+	// Set only on the actor of a request, and only while the admin has switched
+	// itself into lead mode: Role then reads "lead" so every permission check
+	// treats it as one, and these two remember what it really is. They are
+	// omitted from user listings, where they would always be empty.
+	RealRole     string `json:"realRole,omitempty"`
+	ActingAsLead bool   `json:"actingAsLead,omitempty"`
+}
+
+// realRole is the account's actual role, ignoring any lead mode it is in.
+func realRole(u *User) string {
+	if u.RealRole != "" {
+		return u.RealRole
+	}
+	return u.Role
 }
 
 const userCols = `id, username, email, role, must_reset, disabled,

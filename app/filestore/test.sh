@@ -390,6 +390,57 @@ r=$(req lead POST /api/projects '{"name":"Second Addon"}')
 check "new projects pick up the new default" "$r" '"quotaBytes":52428800'
 PID2=$(echo "$r" | jget "['project']['id']")
 
+head1 "admin acting as a lead"
+c=$(code lead POST /api/acting '{"asLead":true}')
+check "a lead CANNOT switch role"  "$c" "403"
+c=$(code bob POST /api/acting '{"asLead":true}')
+check "a user CANNOT switch role"  "$c" "403"
+c=$(code admin GET /api/acting '')
+check "switching role is POST only" "$c" "405"
+
+r=$(req admin POST /api/acting '{"asLead":true}')
+check "admin switches into lead mode" "$r" '"actingAsLead":true'
+r=$(req admin GET /api/me)
+check "it now reads as a lead"       "$r" '"role":"lead"'
+check "and remembers what it really is" "$r" '"realRole":"admin"'
+
+r=$(req admin POST /api/projects '{"name":"Admin Test Project"}')
+check "acting admin can create a project" "$r" '"name":"Admin Test Project"'
+APID=$(echo "$r" | jget "['project']['id']")
+r=$(req admin POST "/api/projects/$APID/files" '{"action":"newfile","path":"try.json"}')
+check "acting admin can create files"     "$r" '"ok":true'
+r=$(req admin POST "/api/projects/$APID/pages" '{"name":"Admin test page"}')
+check "acting admin can create pages"     "$r" '"name":"Admin test page"'
+
+r=$(req admin GET /api/projects)
+check "it sees the project it owns"          "$r" 'Admin Test Project'
+checkno "and only that one, like any lead"   "$r" 'My Addon'
+c=$(code admin GET /api/admin/stats)
+check "the Server tab is out of reach in lead mode" "$c" "403"
+r=$(req admin GET /api/users)
+checkno "the leads list is out of reach too"        "$r" 'leadjane'
+
+r=$(req admin POST /api/acting '{"asLead":false}')
+check "admin switches back"        "$r" '"actingAsLead":false'
+r=$(req admin GET /api/me)
+check "it is an admin again"       "$r" '"role":"admin"'
+r=$(req admin GET /api/projects)
+check "and sees every project once more" "$r" 'My Addon'
+c=$(code admin GET /api/admin/stats)
+check "the Server tab is back"     "$c" "200"
+c=$(code admin PUT "/api/projects/$APID/files" '{"path":"try.json","content":"x"}')
+check "as admin it is read-only again, even on its own project" "$c" "403"
+
+# The switch is per session: a second sign-in on the same account is unaffected.
+r=$(req admin2 POST /api/login '{"username":"aaron@br8t.com","password":"admin-pw-12345"}')
+req admin POST /api/acting '{"asLead":true}' >/dev/null
+r=$(req admin2 GET /api/me)
+check "another session of the same account stays admin" "$r" '"role":"admin"'
+req admin DELETE "/api/projects/$APID" >/dev/null
+r=$(req admin GET /api/projects)
+checkno "acting admin deletes its own test project" "$r" 'Admin Test Project'
+req admin POST /api/acting '{"asLead":false}' >/dev/null
+
 head1 "disable / delete users"
 r=$(req admin PATCH "/api/users/$LEADID" '{"disabled":true}')
 check "admin can disable a lead" "$r" '"disabled":true'
