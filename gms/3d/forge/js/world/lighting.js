@@ -308,7 +308,9 @@ export class Lighting {
     this.app.scene.fog.density = 1.15 * amt * lerp(1, 2.9, lowSun) * lerp(1, 0.6, this.night) / Math.max(40, vd);
 
     windows.setNight(this.night);
-    if (this.dirty) { this.drawSky(el, az); this.dirty = false; }
+    // drawSky is a 12 ms pixel loop; a slider drag calls apply() per pointer move, so the
+    // rebuild is deferred to update() and happens at most once a frame.
+    this.skyEl = el; this.skyAz = az;
   }
 
   drawSky(el, az) {
@@ -441,6 +443,7 @@ export class Lighting {
   }
 
   update(dt, app) {
+    if (this.dirty) { this.dirty = false; this.drawSky(this.skyEl, this.skyAz); }
     if (this.envDirty) this.refreshEnv();
     this.fitShadow(app);
     windows.update(dt, app);

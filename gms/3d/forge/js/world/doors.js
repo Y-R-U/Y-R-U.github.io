@@ -76,6 +76,7 @@ export class Doors {
   // each group in place with its transform and userData, which is exactly the handle needed.
   refresh() {
     const doc = this.demo.builder.doc;
+    this.rev = doc.rev | 0;
     this.colliders.rebuild(doc);
     this.demo.builder.object3D.updateMatrixWorld(true);
     this.doors = [];
@@ -97,7 +98,7 @@ export class Doors {
   // Every door leaf in the world is one instance of one box per zone. The alternative is a mesh
   // per house for the sake of the one door that is ever moving.
   buildLeaves() {
-    for (const mesh of this.leaves.values()) { mesh.geometry.dispose(); this.object3D.remove(mesh); }
+    for (const mesh of this.leaves.values()) { mesh.geometry.dispose(); mesh.dispose(); this.object3D.remove(mesh); }
     this.leaves.clear();
     const byZone = new Map();
     for (const d of this.doors) {
@@ -158,7 +159,7 @@ export class Doors {
       if (this.state !== 'out') this.abort();
       return;
     }
-    if (this.colliders.count !== this.demo.builder.doc.objects.length) this.refresh();
+    if (this.rev !== (this.demo.builder.doc.rev | 0)) this.refresh();
     if (this.snapTo >= 0 && this.state === 'out') { const i = this.snapTo; this.snapTo = -1; this.jump(i); }
 
     if (this.releasing) this.release(P, dt);

@@ -13,6 +13,8 @@ import { stainedTexture, stainedTint } from './textures/stained.js';
 // board as a shutter outdoors.
 const UV = { wood: 1.2, stone: 2.6, cloth: 1.0 };
 
+const _warm = new THREE.Color(), _warm2 = new THREE.Color();
+
 export class Interior {
   constructor(zoneId, house, opts = {}) {
     const z = zone(zoneId);
@@ -56,7 +58,7 @@ export class Interior {
   // `sun` is the direction toward the sun in this room's own frame.
   update(sun, env) {
     this.glass.update(sun, env);
-    const warm = new THREE.Color(this.z.interior.warmth);
+    const warm = _warm.set(this.z.interior.warmth);
     const flick = 0.88 + 0.12 * Math.sin(env.t * 7.3) * Math.sin(env.t * 2.9 + 1.1);
     this.lights[0].color.copy(warm);
     this.lights[0].intensity = 9.0 * this.z.interior.glow * env.power * flick;
@@ -305,7 +307,7 @@ function stainedGlass(I, z, opts) {
       const facing = Math.max(0, -sun.z);
       const up = Math.max(0, sun.y);
       state.day = facing * Math.min(1, up * 2.2) * env.day;
-      state.fill.copy(tint).lerp(new THREE.Color(z.interior.warmth), 1 - state.day);
+      state.fill.copy(tint).lerp(_warm2.set(z.interior.warmth), 1 - state.day);
 
       paneMat.emissiveIntensity = (0.16 + 1.15 * state.day) * env.glow;
       paneMat.color.setScalar(0.3 + 0.7 * state.day);

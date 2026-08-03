@@ -114,7 +114,10 @@ export class Player {
   update(dt, app) {
     // Editor mode switches the player off and expects the orbit camera back, so idle means orbit
     // rather than a frozen view. Scenario shots detach `controls` instead — see main.js.
+    // read() self-drains, and a drag the orbit camera owned must not be waiting to be applied
+    // the frame the player comes back — it arrives as one 400° whip.
     if (!this.enabled) {
+      this.input.read();
       this.object3D.visible = false;
       if (this.controls) { this.controls.enabled = true; this.controls.update(); }
       return;
@@ -122,6 +125,7 @@ export class Player {
     if (this.controls && this.controls.enabled !== this.free) this.controls.enabled = this.free;
     this.object3D.visible = !this.free;
     if (this.free) {
+      this.input.read();
       if (this.controls && !this.wasFree) {
         this.controls.target.set(this.pos.x, this.pos.y + this.height, this.pos.z);
         this.wasFree = true;
@@ -131,7 +135,8 @@ export class Player {
     }
     this.wasFree = false;
 
-    const cmd = this.driven ? null : this.input.read();
+    const raw = this.input.read();
+    const cmd = this.driven ? null : raw;
     let sp = 0;
 
     if (cmd) {

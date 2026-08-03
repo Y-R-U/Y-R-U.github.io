@@ -617,6 +617,7 @@ export class Terrain {
       for (let i = 0; i < n; i++) idx.push(base, base + 1 + ((i + 1) % n), base + 1 + i);
     }
 
+    this.decalMat = null;
     if (!idx.length) return;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));

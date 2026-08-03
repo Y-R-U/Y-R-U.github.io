@@ -40,6 +40,9 @@ export function buildPanel(app) {
     if (!key) return;
     const raw = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     const val = e.target.type === 'range' ? +raw : raw;
+    // both events fire for one gesture; compared as text because a select hands back "1024"
+    // for a preset's numeric 1024 and that is not a change
+    if (String(app.quality.get(key)) === String(val)) return;
     app.quality.set(key, val);
     const out = body.querySelector(`[data-out="${key}"]`);
     if (out) out.textContent = fmtVal(val);

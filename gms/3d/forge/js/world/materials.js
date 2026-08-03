@@ -45,6 +45,7 @@ const VARY = {
 const cache = new Map();
 const built = [];
 const lit = new Set();
+const envListeners = new Set();
 let envIntensity = 1;
 let varyScale = 1;
 let skirtScale = 1;
@@ -143,10 +144,17 @@ export function getMaterial(zoneId, surfaceName) {
   return m;
 }
 
+// The resolved figure, after lighting has folded time of day into the envPower knob. Anything
+// keeping its own materials outside `built` has to read this, not the raw knob, or it stops
+// tracking the sky the moment the sun goes down.
+export function getEnvIntensity() { return envIntensity; }
+export function onEnvIntensity(fn) { envListeners.add(fn); fn(envIntensity); }
+
 export function setEnvIntensity(v) {
   envIntensity = v;
   for (const { m } of built) m.envMapIntensity = v;
   for (const m of glassCache.values()) m.envMapIntensity = v;
+  for (const fn of envListeners) fn(v);
 }
 
 export function setVariation(v) {
@@ -408,6 +416,6 @@ export const windows = new Windows();
 export function disposeAll() {
   for (const m of cache.values()) m.dispose();
   for (const m of glassCache.values()) m.dispose();
-  cache.clear(); glassCache.clear(); built.length = 0;
+  cache.clear(); glassCache.clear(); lit.clear(); built.length = 0;
   dropAll();
 }

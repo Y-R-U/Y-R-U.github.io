@@ -185,9 +185,14 @@ class Editor {
 
   hideGhost() { this.ghost.visible = false; }
 
+  // Anything downstream that caches off the document — colliders, door hotspots — watches this.
+  // Object count is not enough: a move or a rotate leaves it identical.
+  bump() { this.doc.rev = (this.doc.rev | 0) + 1; }
+
   // Snapshot before the change. `key` merges a run of the same gesture — a drag, or a slider
   // being swept — into one undo entry instead of sixty.
   mutate(key = null) {
+    this.bump();
     const now = performance.now();
     if (!key || key !== this.mergeKey || now - this.mergeAt > MERGE_MS) {
       this.undoStack.push(JSON.parse(JSON.stringify(this.doc.objects)));
@@ -222,6 +227,7 @@ class Editor {
   history(from, to, what) {
     const objects = from.pop();
     if (!objects) return this.flash(`Nothing to ${what}`);
+    this.bump();
     to.push(JSON.parse(JSON.stringify(this.doc.objects)));
     this.dropLive();
     this.doc.objects = objects;
@@ -325,6 +331,7 @@ class Editor {
   revert(from) {
     const o = this.selected;
     if (!o || !from) return;
+    this.bump();
     o.x = from.x; o.z = from.z; o.dist = from.dist;
     this.placeLive();
     this.syncGizmo();

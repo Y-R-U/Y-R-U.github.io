@@ -4,23 +4,23 @@
 const PRESETS = {
   potato: {
     label: 'Potato', renderScale: 0.6, shadows: 'off', shadowMap: 512, shadowDist: 40,
-    aniso: 1, texCap: 512, foliage: 0.15, viewDist: 90, post: 'off', lightCap: 8, msaa: 0,
+    aniso: 1, texCap: 512, foliage: 0.15, viewDist: 90, lightCap: 8,
   },
   low: {
     label: 'Low', renderScale: 0.75, shadows: 'hard', shadowMap: 1024, shadowDist: 60,
-    aniso: 2, texCap: 512, foliage: 0.35, viewDist: 130, post: 'off', lightCap: 16, msaa: 0,
+    aniso: 2, texCap: 512, foliage: 0.35, viewDist: 130, lightCap: 16,
   },
   medium: {
     label: 'Medium', renderScale: 1.0, shadows: 'soft', shadowMap: 1024, shadowDist: 80,
-    aniso: 4, texCap: 1024, foliage: 0.6, viewDist: 180, post: 'bloom', lightCap: 24, msaa: 0,
+    aniso: 4, texCap: 1024, foliage: 0.6, viewDist: 180, lightCap: 24,
   },
   high: {
     label: 'High', renderScale: 1.0, shadows: 'soft', shadowMap: 2048, shadowDist: 120,
-    aniso: 8, texCap: 1024, foliage: 1.0, viewDist: 260, post: 'bloom', lightCap: 40, msaa: 4,
+    aniso: 8, texCap: 1024, foliage: 1.0, viewDist: 260, lightCap: 40,
   },
   ultra: {
     label: 'Ultra', renderScale: 1.25, shadows: 'softhigh', shadowMap: 4096, shadowDist: 180,
-    aniso: 16, texCap: 2048, foliage: 1.4, viewDist: 400, post: 'bloom', lightCap: 64, msaa: 4,
+    aniso: 16, texCap: 2048, foliage: 1.4, viewDist: 400, lightCap: 64,
   },
 };
 

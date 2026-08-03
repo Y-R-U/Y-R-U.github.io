@@ -97,6 +97,11 @@ Measured at `--preset=medium --dpr=1 --w=844 --h=390` (mid-phone profile), heade
 | Triangles | **< 350k** |
 | Texture memory | **< 60 MB** |
 
+Draw calls and triangles are the **total** the GPU drew that frame — shadow pass plus main pass —
+because that is what costs time. The HUD and `shot.mjs` now also show the main pass alone
+(`495.5k 290.1k main`), so a total blown by the shadow map is not mistaken for one blown by the
+visible frame. The gate is on the total.
+
 A component that looks superb and blows the budget has failed. Beauty we can't draw isn't a result.
 
 ## How your work gets judged

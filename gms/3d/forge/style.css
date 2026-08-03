@@ -29,6 +29,7 @@ body {
 .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; }
 .perf-grid b { font-weight: 600; font-variant-numeric: tabular-nums; }
 .perf-grid s { text-decoration: none; opacity: .45; font-size: 10px; margin-left: 4px; }
+.perf-grid i { font-style: normal; opacity: .5; font-weight: 400; }
 .perf-grid .warn b { color: #e0b24e; }
 .perf-grid .bad b { color: #e8705a; }
 .perf-grid .warn s, .perf-grid .bad s { opacity: .7; }

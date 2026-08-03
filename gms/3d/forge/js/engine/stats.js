@@ -46,6 +46,14 @@ export class Stats {
     this.last = performance.now();
   }
 
+  // Called between the shadow pass and the main pass (see App), so the readout can show what
+  // is actually in the visible frame as well as the total the GPU drew.
+  markShadow() {
+    const r = this.renderer.info.render;
+    this.shadowCalls = r.calls;
+    this.shadowTris = r.triangles;
+  }
+
   beginFrame() {
     const now = performance.now();
     this.frame.push(now - this.last);
@@ -121,6 +129,10 @@ export class Stats {
       gpuSupported: !!this.ext,
       calls: info.render.calls,
       tris: info.render.triangles,
+      shadowCalls: this.shadowCalls | 0,
+      shadowTris: this.shadowTris | 0,
+      mainCalls: info.render.calls - (this.shadowCalls | 0),
+      mainTris: info.render.triangles - (this.shadowTris | 0),
       programs: info.programs ? info.programs.length : 0,
       textures: info.memory.textures,
       geometries: info.memory.geometries,
@@ -142,6 +154,10 @@ export class Stats {
     const cell = (val, label, used, budget) =>
       `<div class="${budget ? grade(used / budget) : ''}"><b>${val}</b><s>${label}</s></div>`;
 
+    // The budget is graded on the total, because that is what the GPU draws. The split is shown
+    // so a total blown by the shadow pass is not mistaken for one blown by the visible frame.
+    const split = (v, s) => `${v} <i>${s} main</i>`;
+
     this.el.innerHTML = `
       <div class="perf-top ${v.cls}">
         <span class="perf-fps">${s.fps.toFixed(0)}<s>fps</s></span>
@@ -151,8 +167,8 @@ export class Stats {
       <div class="perf-grid">
         <div class="${s.gpuSupported ? grade(s.gpuP95 / BUDGETS.gpu) : ''}">${gpuLine}</div>
         ${cell(s.cpuP95.toFixed(1), 'ms cpu p95', s.cpuP95, BUDGETS.cpu)}
-        ${cell(s.calls, 'draw calls', s.calls, BUDGETS.calls)}
-        ${cell(fmt(s.tris), 'triangles', s.tris, BUDGETS.tris)}
+        ${cell(split(s.calls, s.mainCalls), 'draw calls +shadow', s.calls, BUDGETS.calls)}
+        ${cell(split(fmt(s.tris), fmt(s.mainTris)), 'triangles +shadow', s.tris, BUDGETS.tris)}
         ${cell(s.textures, 'textures')}
         ${cell(s.texMB ? s.texMB.toFixed(0) + 'MB' : '—', 'tex mem', s.texMB, BUDGETS.texMB)}
         ${cell(s.programs, 'shaders')}

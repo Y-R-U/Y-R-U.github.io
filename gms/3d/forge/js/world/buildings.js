@@ -46,6 +46,8 @@ export function endBatch(root) {
     }
     parts.clear();
   }
+  // trim is 72k of the shadow pass, but dropping its casting flattens the corbel and string
+  // courses against the wall at a low sun — checked at gate_night, it is not free triangles
   for (const { zoneId, surface, geos } of buckets.values()) out.add(mergedMesh(zoneId, surface, geos));
   return out;
 }

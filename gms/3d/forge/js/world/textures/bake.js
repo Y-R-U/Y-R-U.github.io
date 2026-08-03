@@ -6,17 +6,32 @@ import { track, untrack } from '../../engine/budget.js';
 
 const cfg = { texCap: 1024, aniso: 4 };
 const cache = new Map();
+// textures baked elsewhere (the foliage atlases) that still want the anisotropy knob
+const foreign = new Set();
 let onRebuild = null;
 
 export function configure(quality) {
-  const next = { texCap: quality.get('texCap') ?? 1024, aniso: quality.get('aniso') ?? 4 };
+  const next = { texCap: quality.get('texCap') ?? 1024, aniso: +quality.get('aniso') || 4 };
   const capChanged = next.texCap !== cfg.texCap;
+  const anisoChanged = next.aniso !== cfg.aniso;
   Object.assign(cfg, next);
-  for (const set of cache.values()) {
-    for (const t of Object.values(set)) if (t?.isTexture) t.anisotropy = cfg.aniso;
+  // three only writes sampler state when the version changes, so without needsUpdate the knob
+  // moved the number on the object and nothing else
+  if (anisoChanged) {
+    for (const set of cache.values()) for (const t of Object.values(set)) setAniso(t);
+    for (const t of foreign) setAniso(t);
   }
   if (capChanged && cache.size) { dropAll(); onRebuild?.(); }
 }
+
+function setAniso(t) {
+  if (!t?.isTexture || t.anisotropy === cfg.aniso) return;
+  t.anisotropy = cfg.aniso;
+  t.needsUpdate = true;
+}
+
+// For textures made outside surface() — they join the same knob instead of a hardcoded 4.
+export function trackAniso(t) { foreign.add(t); t.anisotropy = cfg.aniso; return t; }
 
 export function onTexturesRebuilt(fn) { onRebuild = fn; }
 

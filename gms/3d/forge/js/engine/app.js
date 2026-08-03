@@ -36,6 +36,9 @@ export class App {
     this.camera.lookAt(0, 3, 0);
 
     this.stats = new Stats(this.renderer, document.getElementById('perf'));
+    // three offers no hook between the shadow pass and the main one, and info.render sums both.
+    const sm = this.renderer.shadowMap, smRender = sm.render.bind(sm);
+    sm.render = (...a) => { smRender(...a); this.stats.markShadow(); };
 
     this.registerCoreKnobs();
     this.resize();
@@ -55,7 +58,9 @@ export class App {
         // The shadow type is a #define, so every program has to be rebuilt. Without this the three
         // soft modes were indistinguishable after boot and only `off` did anything.
         this.scene.traverse(o => {
-          if (o.isLight && o.shadow) o.castShadow = v !== 'off';
+          // directional only: every PointLight has a .shadow, and switching 18 window lights to
+          // cube shadows is 2185 draw calls
+          if (o.isDirectionalLight) o.castShadow = v !== 'off';
           if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true;
         });
         this.renderer.shadowMap.needsUpdate = true;

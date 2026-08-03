@@ -151,7 +151,8 @@ async function main() {
     results.push({ shot, png, stats });
     if (args.eval) console.log('  eval:', JSON.stringify(await evalJSON(S, args.eval)));
     for (const l of logs.splice(0)) console.log('  ' + l);
-    console.log(`${shot}  ${stats.fps.toFixed(0)}fps  gpu ${fmt(stats.gpuP95)}ms  cpu ${fmt(stats.cpuP95)}ms  ${stats.calls} calls  ${(stats.tris / 1000).toFixed(0)}k tris  → ${png}`);
+    // calls/tris are the total the GPU drew; the bracket is the main pass alone (total − shadow)
+    console.log(`${shot}  ${stats.fps.toFixed(0)}fps  gpu ${fmt(stats.gpuP95)}ms  cpu ${fmt(stats.cpuP95)}ms  ${stats.calls} calls (${stats.mainCalls} main)  ${(stats.tris / 1000).toFixed(0)}k tris (${(stats.mainTris / 1000).toFixed(0)}k main)  → ${png}`);
   }
 
   await S('Browser.close').catch(() => {});

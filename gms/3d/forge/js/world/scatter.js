@@ -6,6 +6,8 @@ import { ZONE_IDS, zone } from './zones.js';
 import { clamp, lerp, smoothstep } from './textures/noise.js';
 import { heightAt, waterY, creekZ, creekHalf, zoneAt, fbm, CENTERS, nearCamera, inCorridor, camDist } from './terrain.js';
 import { track } from '../engine/budget.js';
+import { getEnvIntensity, onEnvIntensity } from './materials.js';
+import { trackAniso } from './textures/bake.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 
 const CAP = { grass: 3100, flower: 300, bush: 300, rock: 150, tree: 66 };
@@ -85,7 +87,7 @@ function paint(w, h, draw, label) {
   bleed(px, w, h);
   const t = new THREE.DataTexture(px, w, h, THREE.RGBAFormat);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  trackAniso(t);
   t.generateMipmaps = true;
   t.minFilter = THREE.LinearMipmapLinearFilter;
   t.magFilter = THREE.LinearFilter;
@@ -1085,16 +1087,16 @@ export class Scatter {
     // a multiplier on `envPower`, not an absolute: leaves are translucent so a little above the
     // world's figure is right, but 3.6× above it was what put the treeline inside 0.06 of the sky
     q.register({ key: 'foliageEnv', label: 'Foliage sky bounce', type: 'range', min: 0, max: 3, step: 0.05, group: 'World', default: TUNING.level.env },
-      v => { this.envMul = v; this.applyEnv(q); });
+      v => { this.envMul = v; this.applyEnv(); });
     q.register({ key: 'canopyLevel', label: 'Canopy + shrub value', type: 'range', min: 0.3, max: 1.3, step: 0.02, group: 'World', default: TUNING.level.canopy },
       v => { for (const m of MADE.canopy) m.color.setScalar(v); });
     q.register({ key: 'grassLevel', label: 'Grass value', type: 'range', min: 0.3, max: 1.3, step: 0.02, group: 'World', default: TUNING.level.grass },
       v => { for (const m of MADE.grass) m.color.setScalar(v); });
-    q.onChange(k => { if (k === 'envPower' || k === '*') this.applyEnv(q); });
+    onEnvIntensity(() => this.applyEnv());
   }
 
-  applyEnv(q) {
-    const v = (q.get('envPower') ?? 0.28) * (this.envMul ?? 1);
+  applyEnv() {
+    const v = getEnvIntensity() * (this.envMul ?? 1);
     for (const m of MADE.all) m.envMapIntensity = v;
   }
 }
