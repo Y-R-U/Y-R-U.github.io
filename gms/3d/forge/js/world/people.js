@@ -272,9 +272,14 @@ function figureGeometry(zoneId, variant) {
       }
     } else {
       tube(B, [[-0.318, 0.03, 0.115], [-0.242, 1.86, 0.045]], [0.030, 0.023], 4, 0.30, 0);
-      const dark = zoneId === 'dark';
-      tube(B, [[-0.242, 1.86, 0.045], [-0.238, 1.86 + (dark ? 0.28 : 0.15), 0.042]],
-        [dark ? 0.032 : 0.046, 0.004], 4, dark ? 0.20 : 0.78, 0);
+      const t = z.staffTip;
+      // A bulb needs a waist below it or the swell reads as a blunt cut rather than a knob.
+      if (t.shape === 'bulb') {
+        tube(B, [[-0.242, 1.86, 0.045], [-0.240, 1.86 + t.len * 0.42, 0.043]], [0.020, t.wide], 5, t.shade, 0);
+        tube(B, [[-0.240, 1.86 + t.len * 0.42, 0.043], [-0.238, 1.86 + t.len, 0.042]], [t.wide, 0.014], 5, t.shade, 0);
+      } else {
+        tube(B, [[-0.242, 1.86, 0.045], [-0.238, 1.86 + t.len, 0.042]], [t.wide, 0.004], 4, t.shade, 0);
+      }
     }
   }
 

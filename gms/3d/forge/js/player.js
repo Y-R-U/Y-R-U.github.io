@@ -48,8 +48,7 @@ export class Player {
 
   registerKnobs(q, app) {
     this.app = app;
-    // Desktop keeps the orbit camera the editor is built around; a phone gets the player.
-    q.register({ key: 'freeCam', label: 'Free (orbit) camera', type: 'toggle', default: !matchMedia('(pointer: coarse)').matches, group: 'Controls' },
+    q.register({ key: 'freeCam', label: 'Free (orbit) camera', type: 'toggle', default: false, group: 'Controls' },
       v => { this.free = !!v; if (this.controls) this.controls.enabled = !!v; });
     q.register({ key: 'flipTouch', label: 'Flip move / attack side', type: 'toggle', default: false, group: 'Controls' },
       v => { this.input.flip = !!v; document.body.classList.toggle('flip', !!v); });
@@ -81,7 +80,14 @@ export class Player {
   }
 
   update(dt, app) {
-    if (!this.enabled) { this.object3D.visible = false; return; }
+    // Editor mode switches the player off and expects the orbit camera back, so idle means orbit
+    // rather than a frozen view. Scenario shots detach `controls` instead — see main.js.
+    if (!this.enabled) {
+      this.object3D.visible = false;
+      if (this.controls) { this.controls.enabled = true; this.controls.update(); }
+      return;
+    }
+    if (this.controls && this.controls.enabled !== this.free) this.controls.enabled = this.free;
     this.object3D.visible = !this.free;
     if (this.free) {
       if (this.controls && !this.wasFree) {

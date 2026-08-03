@@ -43,6 +43,7 @@ const shot = params.has('shot') ? getScenario(params.get('shot')) : null;
 if (shot) {
   shot.setup(app);
   controls.enabled = false;
+  player.controls = null;
   if (!params.has('hud')) document.body.classList.add('shotmode');
 } else {
   player.enabled = true;

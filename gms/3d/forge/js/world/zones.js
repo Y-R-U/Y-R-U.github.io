@@ -43,7 +43,7 @@ export const ZONES = {
       rim: '#d6cd9c', density: 1.15, trees: 0.85, conifer: 0.18,
     },
     // ── people ──
-    robe: '#dedbd2', staff: 'light',
+    robe: '#dedbd2', staff: 'light', staffTip: { shape: 'bulb', len: 0.16, wide: 0.062, shade: 0.86 },
     // `inner` is the brightest the hood cavity ever gets, just inside the rim; it falls to
     // near-black at the back. `eyes` is [core, tail] and only shows with the robeEyes knob up.
     hood: { inner: '#2b2d31', eyes: ['#e8f0f6', '#8fa6bb'] },
@@ -121,7 +121,7 @@ export const ZONES = {
       needles: ['#37472f', '#5a6a4e', '#121810'],
       rim: '#7b8a65', density: 0.85, trees: 1.25, conifer: 0.85,
     },
-    robe: '#3c3a3e', staff: 'dark',
+    robe: '#3c3a3e', staff: 'dark', staffTip: { shape: 'spike', len: 0.28, wide: 0.032, shade: 0.20 },
     hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
   },
