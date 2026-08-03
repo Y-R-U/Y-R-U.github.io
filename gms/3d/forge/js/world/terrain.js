@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { ZONE_IDS, zone } from './zones.js';
 import { getMaterial } from './materials.js';
+import { waterMaterial, setObstacles, registerWaterKnobs } from './water.js';
 import { clamp, lerp, smoothstep, hexRgb } from './textures/noise.js';
 
 export const DISTRICT_W = 70;
@@ -414,29 +415,48 @@ export class Terrain {
     return lo;
   }
 
-  // The surface is cut to the channel: the cross stations bunch towards the shore so the depth
-  // ramp resolves, alpha goes to zero at the water line so there is no hard vector edge, and the
-  // deep centre is dark enough to hold a sky reflection instead of glowing pale blue.
+  // The surface is cut to the channel and parameterised in channel space (metres along the creek,
+  // metres across it) so the shader can scroll ripples down a bend instead of across the world.
+  // Cross stations bunch towards the shore so the depth ramp resolves; depth reaches 0 exactly at
+  // the water line, which is what the foam lace and the alpha fade both key off.
   buildWater() {
     const CROSS = 10;
-    const pos = [], col = [], idx = [];
+    const pos = [], chan = [], flow = [], depth = [], tint = [], idx = [];
     const st = [];
     for (let x = X0; x <= X1 + 0.1; x += 2.6) st.push(x);
-    for (const x of st) {
+
+    const arc = [0];
+    for (let i = 1; i < st.length; i++) {
+      const dx = st[i] - st[i - 1];
+      arc.push(arc[i - 1] + Math.hypot(dx, creekZ(st[i]) - creekZ(st[i - 1])));
+    }
+    this.creekArc = x => {
+      const f = clamp((x - st[0]) / 2.6, 0, st.length - 1.001);
+      const i = f | 0;
+      return lerp(arc[i], arc[i + 1], f - i);
+    };
+
+    const tints = ZONE_IDS.map(id => zone(id).water);
+    const w = [0, 0, 0];
+    for (let i = 0; i < st.length; i++) {
+      const x = st[i];
       const cz = creekZ(x), wy = waterY(x), half = creekHalf(x);
+      // the channel drops to the east, so the flow tangent points along +x
+      const dz = creekZ(x + 0.5) - creekZ(x - 0.5);
+      const fl = 1 / Math.hypot(1, dz);
       for (let c = 0; c <= CROSS; c++) {
         const t = c / CROSS * 2 - 1;
         const off = Math.sign(t) * half * Math.pow(Math.abs(t), 0.62);
-        const y = wy + 0.05 * Math.sin(x * 0.42 + off * 0.9) + 0.028 * Math.sin(off * 2.3 - x * 0.17);
+        const y = wy + 0.04 * Math.sin(x * 0.42 + off * 0.9) + 0.022 * Math.sin(off * 2.3 - x * 0.17);
         pos.push(x, y, cz + off);
-        const dep = clamp(wy - heightAt(x, cz + off), 0, CHANNEL) / CHANNEL;
-        const deep = Math.pow(dep, 0.75);
-        col.push(
-          lerp(0.98, 0.20, deep),
-          lerp(0.94, 0.31, deep),
-          lerp(0.72, 0.38, deep),
-          smoothstep(0.0, 0.26, dep) * 0.95,
-        );
+        chan.push(arc[i], off);
+        flow.push(fl, dz * fl);
+        depth.push(clamp(wy - heightAt(x, cz + off), 0, CHANNEL) / CHANNEL);
+        zoneMix(x, cz + off, w);
+        for (let k = 0; k < 3; k++) {
+          tint.push(w[0] * tints[0].tint[k] + w[1] * tints[1].tint[k] + w[2] * tints[2].tint[k]);
+        }
+        tint.push(w[0] * tints[0].foam + w[1] * tints[1].foam + w[2] * tints[2].foam);
       }
     }
     const row = CROSS + 1;
@@ -448,23 +468,42 @@ export class Terrain {
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+    geo.setAttribute('aChan', new THREE.Float32BufferAttribute(chan, 2));
+    geo.setAttribute('aFlow', new THREE.Float32BufferAttribute(flow, 2));
+    geo.setAttribute('aDepth', new THREE.Float32BufferAttribute(depth, 1));
+    geo.setAttribute('aTint', new THREE.Float32BufferAttribute(tint, 4));
     geo.setIndex(idx);
     geo.computeVertexNormals();
 
-    const mat = new THREE.MeshStandardMaterial({
-      color: 0x4a6570, vertexColors: true, transparent: true, depthWrite: false,
-      roughness: 0.26, metalness: 0.0,
-    });
-    // there is no planar reflection here, so the env map is only ever the sky: turn it down or
-    // grazing Fresnel paints the whole creek the colour of the brightest thing in the scene
-    mat.envMapIntensity = 0.6;
+    const mat = waterMaterial();
     const mesh = new THREE.Mesh(geo, mat);
     mesh.name = 'water';
     mesh.renderOrder = 1;
     mesh.receiveShadow = true;
+    // no system owns Terrain's update, so the clock rides the draw. userData.freeze pins it for
+    // a repeatable shot.
+    const t0 = performance.now();
+    mesh.onBeforeRender = () => {
+      mat.uniforms.uTime.value = this.waterClock ?? (performance.now() - t0) / 1000;
+    };
+    mesh.userData.freeze = t => { this.waterClock = t; };
     this.object3D.add(mesh);
     this.water = mesh;
+    this.waterMat = mat;
+    this.applyObstacles();
+  }
+
+  // Anything standing in the channel throws a bow wave and a foam tail. The bridge registers a
+  // reflection quad, not its piers, so the pier offset here mirrors bridge() in editor/build.js.
+  applyObstacles() {
+    const list = [];
+    for (const { x, cz } of this.reflects) {
+      for (const s of [-1, 1]) {
+        const z = cz + s * 2.9;
+        list.push({ s: this.creekArc(x), n: z - creekZ(x), r: 2.4, tail: 9 });
+      }
+    }
+    setObstacles(this.waterMat, list);
   }
 
   addReflection(x, cz, w, h) { this.reflects.push({ x, cz, w, h }); }
@@ -640,6 +679,7 @@ export class Terrain {
   registerKnobs(q) {
     q.register({ key: 'groundAO', label: 'Contact shade', type: 'range', min: 0, max: 1.6, step: 0.05, default: 1, group: 'World' },
       v => { if (this.decalMat) this.decalMat.opacity = v; });
+    registerWaterKnobs(q, this.waterMat);
   }
 }
 

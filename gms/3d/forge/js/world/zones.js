@@ -32,6 +32,8 @@ export const ZONES = {
     // ── ground ──
     road: 'marbleCobble',
     groundTint: '#c9c8bf',
+    // multiplier on the creek's own depth ramp — a chalk stream, bright and slightly warm
+    water: { tint: [1.16, 1.16, 1.08], foam: 1.15 },
     // every array is [mid, light, dark] — the order `grass` has always used
     foliage: {
       grass: ['#8fa878', '#a3b98c', '#7d9668'], trunk: '#8a7f6d', leaf: '#9fbe93',
@@ -82,6 +84,7 @@ export const ZONES = {
     edges: 'flat',
     road: 'dirt',
     groundTint: '#8b8163',
+    water: { tint: [1.0, 1.0, 0.94], foam: 1.0 },
     foliage: {
       grass: ['#7f8a55', '#909a63', '#6c7748'], trunk: '#6b5a44', leaf: '#7f8f5c',
       leaves: ['#77873f', '#b9c47e', '#333f22'],
@@ -124,6 +127,7 @@ export const ZONES = {
     edges: 'sharp',
     road: 'cobble',
     groundTint: '#4b4a46',
+    water: { tint: [0.62, 0.74, 0.84], foam: 0.85 },
     foliage: {
       grass: ['#4e5a48', '#5c684f', '#3d4739'], trunk: '#3b342f', leaf: '#4a5745',
       leaves: ['#44553f', '#6f8064', '#1a2219'],
