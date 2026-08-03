@@ -11,9 +11,80 @@ shape of the figure against the sky.
 bar across a pale pointed hood, and the combination has an unfortunate real-world resemblance that
 was the first thing Aaron saw. The robe below the shoulders is untouched.
 
+**Round 5 rebuilt the head again against a photo reference** — see §0. Round 4's front read as a
+flat-topped bucket with a hole punched in it; all of its hoodness lived on the back half.
+
 ---
 
-## 1a. Round 4 — the hood opening
+## 0. Round 5 — the front has to read as a hood
+
+Aaron found `~/cc/yru/gms/3d/aaa_refs/refs/character/robe_hood.jpg` himself and sent it as "an
+example of a robe with front hood visible with just blackness". Read-only, never copied into `site/`.
+He said round 4 still looked like the figure was seen *from behind*, and that the opening "still
+looks like a small hole, not a hood". He was wrong that it was the back — the back is a closed
+dome — but rendering front and back side by side showed exactly why he said it: `r4_back.png` reads
+as a hood (a peak sweeping up and away, a mantle over the shoulders) and `r4_front.png` reads as a
+bucket. **Every cue that said "hood" was on the far side of the head.**
+
+Four changes, and they only work together. Cost: **zero triangles**, the counts in §7 are unchanged.
+
+**1. The hood is a garment lying on the body, not the top of the body.** The mantle ring went
+0.276 → **0.302** and is now the entire shoulder line; the robe's top ring came down 1.22 → **1.10**
+and narrowed to 0.196 so it lives wholly inside the collar. The mantle's two front vertices dive
+**21.5 cm** to a V at y 0.90 on the chest (`dy`, the same override slot the opening uses), and the
+whole ring's y is modulated by its own fold term (`hang`) so the collar edge scallops instead of
+cutting a flat brim. That V is the single strongest "separate garment" cue in the silhouette.
+
+**2. The opening is more than twice the size.** Ring radii above the mantle dropped to 0.222 /
+0.216 / 0.192 — a *narrow* cowl on a *wide* collar, which is the proportion in the photo — and the
+opening was re-specified by half-angle instead of by a lateral squash. `aw` places the two boundary
+vertices at 90°∓aw on the ring's own circle, so they slide round it rather than denting it inwards
+the way round 4's `wx` did. 40° / 43° / 28° gives a **28 cm arch, 29 cm across a 43 cm cowl** —
+67 % of the cowl's width, against round 4's 12 cm on a 45 cm cowl (27 %). `lr` then tucks the brow
+pair back to 0.84 of the ring radius, which is what puts a shadowed overhang over the top of the hole.
+
+**3. The cavity is flat black.** `SKY` went `[1.0 … 0.10]` to `[0.11 … 0.03]` and the back point to
+0.03. Round 4's readable gradient was a mistake: the photo has no value in the opening at all. Some
+gradient is still there so it is not a decal, but it is four to eight times darker.
+
+**4. There is a lit trim, and it is the rim band.** Round 4 made the folded-back rim band *dark*
+(0.13–0.30 of fabric) to kill the white "tooth". Round 5 does the opposite — the band is now the
+brightest thing on the figure — and reshapes it from a deep fold into a shallow flange: inner-loop
+scale 0.72 → **0.78**, `RIM` 0.034 → **0.024**. Deep and narrow reads as a lip you cannot see; wide
+and shallow reads as a ring of trim facing the camera. Two supports:
+
+- `TRIM_AO` = `[0.95, 0.95, 1.35, 1.85, 1.85, 1.35]`, **chin dimmest, brow brightest — the opposite
+  of the light**. The chin bevel faces the sky and the brow bevel faces the ground, so an even
+  albedo renders as a bright sliver along the bottom edge and nothing anywhere else. This is the
+  same problem round 4 hit and solved by giving up on brightness; baking against the light instead
+  keeps the ring even all the way round.
+- `SIDE` = per-column fabric value on every hood ring: 1.10 on the two panels flanking the opening,
+  down to 0.74 over the crown and back. Without it the pale trim had nothing to be pale *against* —
+  the first attempt raised the boundary vertices to 1.34 and nothing visible happened, because their
+  neighbours at `sh` 0.84 × the old flat multiplier were already at ~1.0 and the whole front was one
+  value. The trim only appears once the crown is darker than it.
+
+**The apex now leans forward** — `[0.020, 1.688, 0.118]` against round 4's 14 cm *behind* — so the
+peak is over the face and the side profile is a cowl tipped forward. First attempt put it at
+y 1.612, only 4.7 cm above the brow ring, and the **back view turned into a flat-topped bin**: from
+behind you saw the brow ring's rim and no peak at all. Raising it to 1.688 restored the back without
+losing the forward lean.
+
+**What did not work.**
+
+- **A five-ring hood with the cape as its own band.** A separate cape-hem ring below the mantle
+  costs +16 triangles, which the budget does not have. Folding the cape into the mantle ring — one
+  ring whose front pair dives — gives the same read for nothing.
+- **Hub level with the mantle ring.** The underside fan used to run to a hub at the mantle's own y.
+  With a collar this wide that leaves an annular slit between the collar's edge and the robe, and
+  from any camera near shoulder height **you see the sky through it** (visible in `r5_side.png`
+  before the fix). The hub is now at y 0.880, well below the robe's top ring, so the cone
+  intersects the robe instead of hovering above it. Note the fan's winding also flips sense as the
+  hub crosses the ring plane — below it the normals point outward and down, which is what you want.
+- **Eye shards at cavity value 0.5.** Fine against round 4's cavity, but against a black one they
+  are two visible pale flecks at gain 0. Now `cav(0.06)`.
+
+## 1a. Round 4 — the hood opening (superseded by §0, kept for what it proved)
 
 Round 3's socket was one 45° segment of one band, four facets to a point. Two things were wrong with
 it and only one of them was the shape.
@@ -93,22 +164,25 @@ keep smooth normals).
 | shin | 0.31 | 0.302 | 0.72 |
 | knee | 0.67 | 0.270 | 0.86 |
 | waist | 0.98 | **0.216** | 0.62 |
-| neck | 1.22 | 0.182 | 0.74 |
-| hood mantle | 1.120 | **0.276** | 0.60 |
-| chin | 1.298 | 0.234 | 0.66 |
-| eye | 1.418 | 0.226 | 0.76 |
-| brow | 1.530 | 0.196 | 0.92 |
-| apex (point) | 1.652 | — | 1.00 |
+| chest | 1.10 | 0.196 | 0.70 |
+| hood mantle | 1.115 | **0.302** | 0.50 |
+| chin | 1.235 | 0.222 | 0.64 |
+| eye | 1.400 | 0.216 | 0.72 |
+| brow | 1.565 | 0.192 | 0.84 |
+| apex (point) | 1.688 | — | 0.90 |
 
-The profile changes direction five times: flare out to the hem, in to the waist, out to the cowl
-mantle, in to the chin, then a long slow taper over the brow to the apex. That is the whole point —
-round 1 and 2 were a monotone taper and the critic called it a cone of rotation both times.
+The profile changes direction five times: flare out to the hem, in to the waist, out to the mantle
+collar, in to the cowl, then a taper over the brow to the apex. That is the whole point — round 1
+and 2 were a monotone taper and the critic called it a cone of rotation both times.
 
-**The shoulder flare is the hood's mantle ring, not a robe ring.** 0.276 against the 0.216 waist is
-28 % wider. The robe's own neck ring is deliberately narrow (0.182) and lives entirely inside the
-cowl. This was rebuilt: the first attempt put the flare on the robe at 0.258 and the hood's bottom
-ring at 0.262 sitting *above* it, and the hood read as a lampshade balanced on a body, with the
-robe's open top ring poking 5 mm out through the hood at some azimuths.
+**The shoulder flare is the hood's mantle ring, not a robe ring.** 0.302 against the 0.216 waist is
+40 % wider. The robe's own top ring is deliberately narrow (0.196) and lives entirely inside the
+collar. This was rebuilt twice: the round-3 attempt put the flare on the robe at 0.258 and the
+hood's bottom ring at 0.262 sitting *above* it, and the hood read as a lampshade balanced on a body,
+with the robe's open top ring poking 5 mm out through the hood at some azimuths. Round 5 moved the
+robe's top ring down from 1.22 to 1.10 so the far wider collar still swallows it — the invariant to
+keep is **top robe ring below the chin ring and narrower than it**, which is what hides its open rim
+from every camera angle.
 
 **Folds.** Each ring carries its own fold depth `f`, so the waist creases tight (0.088) and the hem
 swings loose (0.155):
@@ -126,15 +200,23 @@ and the bottom edge scallops between roughly −0.16 and +0.06 rather than cutti
 It therefore pokes above the ground in places, which is why there is still a 10-triangle dark cap
 underneath at vertex colour 0.12.
 
-**Hood.** `dx` and `dz` sweep the apex 16 cm back and 3 cm to one side, so the side profile is a
-flopped cowl and not a bishop's mitre. The mantle's underside is a flat dark disc at 0.10 — that is
-the baked occlusion under the cowl, and it is also what closes the robe's open neck ring.
+**Hood.** The apex sits 12 cm *forward* of centre, so the cowl leans over the face; the mantle's
+underside is a dark cone at 0.10 running to a hub at y 0.880, which is the baked occlusion under the
+collar and also what closes the robe's open top ring (§0).
 
-**Props are welded into the body.** The staff base is at x 0.318 against a hem that reaches 0.40+,
-so it starts *inside* the silhouette and emerges around knee height. A 10-triangle sleeve leaves
-the robe at x 0.150 (inside the 0.20 body radius there) and ends on the shaft at y 1.00. The
-combined shape reads as one figure holding something; round 2's staff started at x 0.425, clear of
-the hem, and read as a separate floating stick.
+**Props are welded into the body, in the figure's right hand.** With the figure facing +Z and up +Y
+the right hand is at **−x**, which is where the reference photo holds the staff; everything was at
++x through round 4, and a mirrored figure is one more reason a front view reads as a back view. The
+staff base is at x −0.318 against a hem that reaches 0.40+, so it starts *inside* the silhouette and
+emerges around knee height. A 10-triangle sleeve leaves the robe at x −0.120 and ends on the shaft
+at y 0.94 — it had to come down from round 4's y 1.00, because the mantle now hangs to 1.115 and an
+arm leaving above that is swallowed by the collar. The combined shape reads as one figure holding
+something; round 2's staff started at x 0.425, clear of the hem, and read as a separate floating
+stick.
+
+`player.js` swings on body yaw only, so mirroring the prop did not break the attack — but it does
+reverse which way the staff sweeps. It now comes *towards* the camera on a swing, which looks
+better, and it is luck rather than design.
 
 **Two geometry variants per zone.** Variant 0 carries the prop and sleeve. Variant 1 has neither, a
 different fold seed, and the whole geometry is run through `makeScale(1.055, 0.935, 1.055)` — a
@@ -264,23 +346,29 @@ compile the same `PARS` string, so they cannot drift.
 
 `__forge.people.triangleCost()`, `[variant 0, variant 1]`:
 
-| | round 2 | round 3 | round 4 |
-|---|---|---|---|
-| light | 224, 192 | 198, 172 | **196, 170** |
-| neutral (pitchfork) | 240, 192 | 214, 172 | **212, 170** |
-| dark | 224, 192 | 198, 172 | **196, 170** |
+| | round 2 | round 3 | round 4 | round 5 |
+|---|---|---|---|---|
+| light | 224, 192 | 198, 172 | 196, 170 | **196, 170** |
+| neutral (pitchfork) | 240, 192 | 214, 172 | 212, 170 | **212, 170** |
+| dark | 224, 192 | 198, 172 | 196, 170 | **196, 170** |
 
-The hood is 80 of the 170-triangle body: 44 shell (three bands of eight, two quads left out for the
-opening), 8 apex fan, 8 mantle underside, 12 rim band, 6 cavity, 2 eyes. Round 3's was 82 with no
-rim and no eyes — dropping the crown ring paid for the whole thing and left 2 over.
+**Round 5 is exactly triangle-neutral.** The hood is 80 of the 170-triangle body: 44 shell (three
+bands of eight, two quads left out for the opening), 8 apex fan, 8 mantle underside, 12 rim band,
+6 cavity, 2 eyes. Everything round 5 changed is ring positions and vertex colours; the one thing
+that would have cost — a separate cape band — was folded into the mantle ring instead (§0).
 
-Mobile gate, `--preset=medium --dpr=1 --w=844 --h=390`, `street_dusk`:
+Mobile gate, `--preset=medium --dpr=1 --w=844 --h=390`, `street_dusk`. The scene has moved under
+other agents since round 4, so the crowd-0 baseline is not the same number, but people's own share
+is identical:
 
 | crowd | draw calls | triangles | people's own share |
 |---|---|---|---|
-| 0 | 65 | 485 519 | — |
-| **36 (default)** | **77** | **498 755** | **+13 236, +12 calls** (r3: +13 370) |
-| 120 (max) | 78 | 533 531 | +48 012, +13 calls (r3: +48 492) |
+| 0 | 71 | 481 927 | — |
+| **36 (default)** | **83** | **495 163** | **+13 236, +12 calls** (r4: +13 236) |
+| 120 (max) | 84 | 529 939 | +48 012, +13 calls (r4: +48 012) |
+
+GPU p95 4.0 → 4.1 ms across the three, which is noise. No clipped pixels (census above 246) in
+`people_day` or `people_macro` at the new trim values.
 
 The scene-level figure is roughly twice the geometry sum because the shadow pass counts too. Round
 2's equivalent was +14 000 at crowd 36, and the crowd's geometry sum went **7 504 → 6 694 → 6 622**.
@@ -379,6 +467,17 @@ failed at 200 px. `--w=356 --h=200` on any `shot.mjs` scenario is the cheap chec
 - **Light vs neutral is still carried mostly by hue.** At `ROBE_CEIL` 0.70 the peaks are 204 and
   191, which is a real but small value gap (§3). Genuinely fixing it needs either a darker neutral
   robe tint or a lighter light one in `zones.js`, which is a revalue, not an addition.
+- **The trim ring is invisible along the top of the opening.** The brow bevel is edge-on to a camera
+  at head height whatever its albedo, so the trim reads as a C rather than a full ring; what closes
+  it at the top is the shadow the `lr` overhang casts, not the trim. In the photo the pale band
+  arches over the top too. Fixing it properly needs the opening plane tilted further back or a
+  seventh boundary vertex at the brow, which costs triangles.
+- **The mantle is a cone, not a shelf.** From the side it still reads as a slightly stiff brim
+  rather than draped cloth. `hang` scallops its edge, which helps, but a real drape wants a second
+  ring (+16 triangles).
+- **The front-to-back `SIDE` gradient is baked albedo.** It is right for a garment with pale front
+  panels, but it does mean a figure lit from behind has its darkest fabric facing the light. Nothing
+  has looked wrong yet; worth remembering if the sun ever ends up behind the crowd in a hero shot.
 - **The hood eyes are a prototype.** They are two flat shards at a fixed position 5.5 cm inside the
   cavity, so they do not track the camera. Measured at `spin=0.6` (34° off front) the near one is
   occluded by the cavity wall and only the far one shows — which reads acceptably, but it is luck

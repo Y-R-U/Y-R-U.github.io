@@ -55,16 +55,16 @@ class Build {
   }
 }
 
-// hem / shin / knee / waist / neck. `sh` is baked ambient occlusion, not lighting: dark at the
+// hem / shin / knee / waist / chest. `sh` is baked ambient occlusion, not lighting: dark at the
 // ground, dark in the waist pinch, dark again where the cowl overhangs. `f` is the fold depth, so
 // the waist creases tight and the hem swings loose. The shoulder flare is the hood's mantle ring,
-// not a robe ring — the neck ring is narrow and lives entirely inside the cowl.
+// not a robe ring — the chest ring is narrow and lives entirely inside the mantle.
 const ROBE = [
   { y: 0.00, r: 0.402, sh: 0.36, f: 0.155 },
   { y: 0.31, r: 0.302, sh: 0.72, f: 0.138 },
   { y: 0.67, r: 0.270, sh: 0.86, f: 0.122 },
   { y: 0.98, r: 0.216, sh: 0.62, f: 0.088 },
-  { y: 1.22, r: 0.182, sh: 0.74, f: 0.070 },
+  { y: 1.10, r: 0.196, sh: 0.70, f: 0.070 },
 ];
 
 // Alternating radial push (cos at half the segment count hits ±1 exactly on every vertex),
@@ -99,49 +99,55 @@ function robe(B, seed) {
   for (let j = 0; j < SEG; j++) B.flatTri(v(0, j), v(0, j + 1), hub);
 }
 
-// mantle / chin / eye / brow, then a point. The mantle is the figure's shoulder line — it flares
-// 28% past the waist and swallows the robe's narrow neck ring whole. The brow ring stays wide and
-// the apex is only 12 cm above it and 14 cm behind, so the top is a cowl flopped backwards rather
-// than the mitre round 3 had.
+// mantle / chin / eye / brow, then a point that leans forward over the opening. The mantle is a
+// draped collar and not just the top of the body: it carries the whole shoulder line at 0.302, its
+// front pair dives 21 cm to a V on the chest, and `hang` scallops its edge off the fold term so it
+// is a drape rather than a brim. The cowl above it is deliberately narrow, because the opening has
+// to be most of the cowl's width before the front reads as a hood instead of a hole in a bucket.
 const HOOD = [
-  { y: 1.120, r: 0.276, sh: 0.60, ny: -0.34, dz: 0.010, dx: 0.000 },
-  { y: 1.298, r: 0.234, sh: 0.66, ny: -0.05, dz: 0.030, dx: 0.006 },
-  { y: 1.418, r: 0.226, sh: 0.76, ny: 0.10, dz: 0.026, dx: 0.012 },
-  { y: 1.530, r: 0.196, sh: 0.92, ny: 0.40, dz: -0.020, dx: 0.020 },
+  { y: 1.115, r: 0.302, sh: 0.50, ny: -0.30, dz: 0.010, dx: 0.000, aw: 12, dy: -0.215, lr: 1.00, trim: 1.10, hang: 0.9 },
+  { y: 1.235, r: 0.222, sh: 0.64, ny: -0.02, dz: 0.022, dx: 0.006, aw: 40, dy: 0.020, lr: 1.00, trim: 1.34, hang: 0 },
+  { y: 1.400, r: 0.216, sh: 0.72, ny: 0.12, dz: 0.014, dx: 0.012, aw: 43, dy: 0, lr: 0.99, trim: 1.34, hang: 0 },
+  { y: 1.565, r: 0.192, sh: 0.84, ny: 0.44, dz: 0.030, dx: 0.020, aw: 28, dy: -0.030, lr: 0.84, trim: 1.26, hang: 0 },
 ];
-const APEX = [0.034, 1.652, -0.158];
+const APEX = [0.020, 1.688, 0.118];
 
-// The opening spans two whole bands of one 45° column. The half-segment offset in the ring puts the
-// seam between columns 1 and 2 dead on +z, so columns MOUTH and MOUTH+1 straddle the front.
-// `wx` narrows the mouth at chin and brow and leaves it wide at eye level — a vertical almond, not
-// a letterbox — and `dy` pinches its top and bottom in towards each other.
+// The opening spans two whole bands of the one column that straddles +z. `aw` is its half-angle at
+// that ring, measured from dead front, so the boundary vertices slide round the ring's own circle
+// instead of denting it inwards; `lr` then tucks them back inside it, which is what puts a brow
+// over the top of the hole. 40°/43°/28° gives a 28 cm arch, 29 cm across a cowl 43 cm wide.
 const MOUTH = 1;
-const LIP = [null, { wx: 0.34, dy: 0.030, wz: 0.96 }, { wx: 0.70, dy: 0, wz: 0.92 },
-  { wx: 0.38, dy: -0.034, wz: 0.98 }];
-const RIM = 0.034;       // how far the fabric edge folds back into the hood before the cavity starts
-const CAVITY = 0.175;    // mouth centre to the black point at the back of the hood
-const SKY = [1.0, 1.0, 0.56, 0.22, 0.22, 0.56];   // skylight reaching each rim vertex, chin to brow
+// Per-column fabric value: pale on the two panels flanking the opening, dark over the crown and
+// back. That front-to-back gradient plus `trim` is what stops this being a hole in a smooth surface.
+const SIDE = [1.10, 1, 1, 1.10, 0.90, 0.78, 0.74, 0.78];
+const RIM = 0.024;       // how far the fabric edge folds back into the hood before the cavity starts
+const CAVITY = 0.270;    // mouth centre to the black point at the back of the hood
+const SKY = [0.11, 0.11, 0.07, 0.03, 0.03, 0.07];   // skylight reaching each cavity vertex, chin to brow
+const TRIM_AO = [0.95, 0.95, 1.35, 1.85, 1.85, 1.35];
 
 function hood(B, seed, cav, eyes) {
   const rings = HOOD.map((R, i) => {
     const out = [];
     for (let j = 0; j < HSEG; j++) {
-      const a = (j + 0.5) / HSEG * TAU;
+      const L = j === MOUTH || j === MOUTH + 1;
+      const a = L ? Math.PI * 0.5 + (j === MOUTH ? -1 : 1) * R.aw * Math.PI / 180
+        : (j + 0.5) / HSEG * TAU;
       const co = Math.cos(a), si = Math.sin(a);
       const fold = Math.cos(a * 3 + seed * 2.3 + i * 0.5) * 0.05;
-      const L = (j === MOUTH || j === MOUTH + 1) ? LIP[i] : null;
-      const r = R.r * (1 + fold);
+      const r = R.r * (1 + fold) * (L ? R.lr : 1);
       out.push({
-        p: [r * co * (L ? L.wx : 1) + R.dx, R.y + (L ? L.dy : 0), r * si * (L ? L.wz : 1) + R.dz],
+        p: [r * co + R.dx, R.y + (L ? R.dy : 0) + fold * R.hang, r * si + R.dz],
         n: [co, R.ny, si],
-        c: tone(R.sh * (1 + 1.5 * fold) * (L ? 0.86 : 1)),
+        c: L ? [R.trim, R.trim, R.trim] : tone(R.sh * (1 + 1.5 * fold) * SIDE[j]),
         k: 0,
       });
     }
     return out;
   });
-  const apex = { p: APEX, n: [0, 1, 0], c: tone(1.0), k: 0 };
-  const under = { p: [0, HOOD[0].y, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
+  const apex = { p: APEX, n: [0, 1, 0], c: tone(0.90), k: 0 };
+  // The hub has to sit below the mantle ring, not level with it: a flat disc leaves a slit between
+  // the collar's edge and the robe that you see the sky through from any camera near shoulder height.
+  const under = { p: [0, 0.880, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
   const top = rings.length - 1;
 
   for (let i = 0; i < top; i++) {
@@ -155,10 +161,11 @@ function hood(B, seed, cav, eyes) {
     B.flatTri(rings[0][j], rings[0][(j + 1) % HSEG], under);
   }
 
-  // Rim then cavity. The rim is a band of fabric folded back into the hood, so the opening has a
-  // visible edge thickness; the cavity behind it runs from the zone's interior colour at the mouth
-  // to near-black at a single point inside the skull. A flat fill here is what made round 3's face
-  // read as a decal — the darkness has to come from a gradient the eye can follow inwards.
+  // Rim then cavity. The rim is the pale trim — a shallow flange of fabric folded back into the
+  // opening, the lightest thing on the figure, and the one element that makes this an edge of cloth
+  // rather than a hole. `TRIM_AO` runs against the sun rather than with it: the chin bevel faces the
+  // sky and the brow bevel faces the ground, so an even albedo renders as a bright sliver along the
+  // bottom and nothing anywhere else. Behind it the cavity is flat black.
   const loop = [rings[1][MOUTH], rings[1][MOUTH + 1], rings[2][MOUTH + 1],
     rings[3][MOUTH + 1], rings[3][MOUTH], rings[2][MOUTH]];
   const C = [0, 1, 2].map(k => loop.reduce((s, v) => s + v.p[k], 0) / 6);
@@ -167,15 +174,15 @@ function hood(B, seed, cav, eyes) {
     new THREE.Vector3().fromArray(loop[2].p).sub(o),
     new THREE.Vector3().fromArray(loop[4].p).sub(o)).normalize();
 
-  const step = (v, d) => [C[0] + (v.p[0] - C[0]) * 0.72 + inw.x * d,
-    C[1] + (v.p[1] - C[1]) * 0.72 + inw.y * d, C[2] + (v.p[2] - C[2]) * 0.72 + inw.z * d];
+  const step = (v, d) => [C[0] + (v.p[0] - C[0]) * 0.78 + inw.x * d,
+    C[1] + (v.p[1] - C[1]) * 0.78 + inw.y * d, C[2] + (v.p[2] - C[2]) * 0.78 + inw.z * d];
   const lip = loop.map((v, k) => {
-    const f = 0.13 + 0.17 * SKY[k];
+    const f = TRIM_AO[k];
     return { p: v.p, n: v.n, k: 0, c: [v.c[0] * f, v.c[1] * f, v.c[2] * f] };
   });
   const in3 = loop.map((v, k) => ({ p: step(v, RIM), n: v.n, k: 0, c: cav(SKY[k]) }));
   const back = { p: [C[0] + inw.x * CAVITY, C[1] + inw.y * CAVITY, C[2] + inw.z * CAVITY],
-    n: [-inw.x, -inw.y, -inw.z], c: cav(0.10), k: 0 };
+    n: [-inw.x, -inw.y, -inw.z], c: cav(0.03), k: 0 };
 
   for (let k = 0; k < 6; k++) {
     const k1 = (k + 1) % 6;
@@ -187,7 +194,7 @@ function hood(B, seed, cav, eyes) {
     const eb = [C[0] + inw.x * 0.055, C[1] + inw.y * 0.055, C[2] + inw.z * 0.055];
     for (const s of [-1, 1]) {
       const v = (dx, dy, e) => ({ p: [eb[0] + dx * s, eb[1] + dy, eb[2]], n: [0, 0.2, 1],
-        c: cav(0.5), k: 0, e });
+        c: cav(0.06), k: 0, e });
       const t = [v(0.010, 0.004, eyes[1]), v(0.046, 0.020, eyes[1]), v(0.026, 0.034, eyes[0])];
       if (s < 0) t.reverse();
       B.flatTri(t[0], t[1], t[2]);
@@ -248,22 +255,25 @@ function figureGeometry(zoneId, variant) {
   hood(B, seed, cavityTone(zoneId), eyeTones(zoneId));
 
   if (!variant) {
-    // Sleeve starts inside the body and ends on the shaft: the three parts have to overlap or the
-    // staff reads as a stick standing next to a figure rather than one held by it.
-    tube(B, [[0.150, 1.085, 0.045], [0.284, 1.000, 0.086]], [0.072, 0.046], 5,
-      t => 0.78 - 0.16 * t, 0);
+    // The figure's right hand is at -x when it faces +z, and the reference photo holds the staff
+    // there. The sleeve starts inside the body and ends on the shaft: the three parts have to
+    // overlap or the staff reads as a stick standing next to a figure rather than one held by it.
+    // It also has to leave the body below y ~1.07, where the mantle's edge hangs, or the collar
+    // swallows the arm whole.
+    tube(B, [[-0.120, 1.020, 0.030], [-0.282, 0.938, 0.079]], [0.070, 0.078], 5,
+      t => 0.74 - 0.20 * t, 0);
 
     if (z.staff === 'pitchfork') {
-      const hy = 1.74, hx = 0.246;
-      tube(B, [[0.318, 0.03, 0.115], [hx, hy, 0.045]], [0.030, 0.024], 4, 0.30, 0);
+      const hy = 1.74, hx = -0.246;
+      tube(B, [[-0.318, 0.03, 0.115], [hx, hy, 0.045]], [0.030, 0.024], 4, 0.30, 0);
       tube(B, [[hx - 0.095, hy, 0.045], [hx + 0.095, hy, 0.045]], [0.018, 0.018], 3, 0.26, 0);
       for (const d of [-0.088, 0, 0.088]) {
         tube(B, [[hx + d, hy, 0.045], [hx + d, hy + 0.21, 0.045]], [0.015, 0.004], 3, 0.26, 0);
       }
     } else {
-      tube(B, [[0.318, 0.03, 0.115], [0.242, 1.86, 0.045]], [0.030, 0.023], 4, 0.30, 0);
+      tube(B, [[-0.318, 0.03, 0.115], [-0.242, 1.86, 0.045]], [0.030, 0.023], 4, 0.30, 0);
       const dark = zoneId === 'dark';
-      tube(B, [[0.242, 1.86, 0.045], [0.238, 1.86 + (dark ? 0.28 : 0.15), 0.042]],
+      tube(B, [[-0.242, 1.86, 0.045], [-0.238, 1.86 + (dark ? 0.28 : 0.15), 0.042]],
         [dark ? 0.032 : 0.046, 0.004], 4, dark ? 0.20 : 0.78, 0);
     }
   }
