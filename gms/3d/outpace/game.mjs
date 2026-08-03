@@ -100,7 +100,6 @@ const DEMO_STORY_STATE = params.get('demoStory') || '';
 const DEMO_QUEST = params.get('demoQuest') || '';
 const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal') || params.has('demoStory') || params.has('demoQuest') || DEMO_SETTINGS || DEMO_DEBUG;
 const DEMO_STATION_TAB = params.get('demoTab') || '';
-const pointer = new THREE.Vector2();
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
 const tmpVectorC = new THREE.Vector3();
@@ -998,7 +997,11 @@ function flushProgressSave() {
   window.clearTimeout(deferredSaveTimer);
   deferredSaveTimer = 0;
   saveIsDirty = false;
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
+  } catch {
+    /* private mode / quota — never let a failed write abort the caller */
+  }
 }
 
 function saveProgress({ defer = false } = {}) {
@@ -1013,7 +1016,11 @@ function saveProgress({ defer = false } = {}) {
 
 function saveSettings() {
   if (DEMO_MODE) return;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+  } catch {
+    /* private mode / quota — settings just stay session-only */
+  }
 }
 
 /* ---------------------------------------------------------- br8t account ---
@@ -1217,6 +1224,7 @@ const state = {
   lastDebtAdded: 0,
   lastDebtInterest: 0,
   confiscated: false,
+  modalPaused: false,
   lastStationType: 'small',
   lastStationRoute: 1,
   lastStationName: '',
@@ -1283,6 +1291,12 @@ scene.fog = new THREE.FogExp2(0x050608, 0.0058);
 const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 900);
 camera.position.set(0, 0, 4);
 
+// How far the ship can actually slide off the centre line. Debris spawns across
+// roughly x +/-13..18, so this stays inside the field: you can dodge more than
+// before, never out of it entirely.
+const PLAYER_RANGE_X = 14;
+const PLAYER_RANGE_Y = 9;
+
 const ambient = new THREE.HemisphereLight(0x9ee8ff, 0x27170f, 1.25);
 scene.add(ambient);
 
@@ -1311,6 +1325,15 @@ const UNIT_SPHERE = shareGeometry(new THREE.SphereGeometry(0.5, 14, 10));
 const UNIT_DISH = shareGeometry(new THREE.SphereGeometry(0.5, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.44));
 const RING_THIN = shareGeometry(new THREE.TorusGeometry(1, 0.03, 6, 40));
 const RING_THICK = shareGeometry(new THREE.TorusGeometry(1, 0.072, 8, 44));
+
+// Drones and collectors spawn continuously during flight, so they get the same
+// treatment as the stations: build the shapes once, instance them per spawn.
+const DRONE_BODY = shareGeometry(new THREE.ConeGeometry(1.05, 3.1, 4));
+const DRONE_SPINE = shareGeometry(new THREE.BoxGeometry(0.55, 0.44, 3.2));
+const DRONE_WING = shareGeometry(new THREE.BoxGeometry(3.6, 0.22, 0.8));
+const DRONE_ENGINE = shareGeometry(new THREE.SphereGeometry(0.38, 12, 8));
+const COLLECTOR_RING = shareGeometry(new THREE.TorusGeometry(1.4, 0.12, 10, 42));
+const COLLECTOR_CORE = shareGeometry(new THREE.OctahedronGeometry(0.54, 0));
 
 const HIGH_DETAIL = !isCoarsePointer();
 
@@ -1501,22 +1524,27 @@ const starColors = new Float32Array(starCount * 3);
 const starSideSpeeds = new Float32Array(starCount);
 const starDepthSpeeds = new Float32Array(starCount);
 
-function resetStar(index, deep = true) {
+// Only the initial seeding writes colours: updateStars re-uploads positions but
+// never the colour attribute, so recolouring a recycled star was thousands of
+// HSL conversions a minute that could never reach the GPU.
+function resetStar(index, deep = true, colour = false) {
   const i = index * 3;
   const radius = rand(8, 180);
   const angle = rand(0, Math.PI * 2);
   starPositions[i] = Math.cos(angle) * radius + rand(-16, 16);
   starPositions[i + 1] = Math.sin(angle) * radius * 0.72 + rand(-22, 22);
   starPositions[i + 2] = deep ? rand(-780, -40) : rand(-780, -620);
-  tmpColor.setHSL(pick([0.08, 0.52, 0.58, 0.02]), rand(0.18, 0.72), rand(0.62, 1));
-  starColors[i] = tmpColor.r;
-  starColors[i + 1] = tmpColor.g;
-  starColors[i + 2] = tmpColor.b;
+  if (colour) {
+    tmpColor.setHSL(pick([0.08, 0.52, 0.58, 0.02]), rand(0.18, 0.72), rand(0.62, 1));
+    starColors[i] = tmpColor.r;
+    starColors[i + 1] = tmpColor.g;
+    starColors[i + 2] = tmpColor.b;
+  }
   starDepthSpeeds[index] = rand(0.64, 1.58);
 }
 
 for (let i = 0; i < starCount; i += 1) {
-  resetStar(i);
+  resetStar(i, true, true);
   starSideSpeeds[i] = rand(3.5, 9.5) * (i % 9 === 0 ? -0.45 : 1);
 }
 starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
@@ -1807,15 +1835,14 @@ function createAsteroid() {
 
 function createDrone() {
   const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.ConeGeometry(1.05, 3.1, 4), materials.drone);
+  const body = new THREE.Mesh(DRONE_BODY, materials.drone);
   body.rotation.x = -Math.PI / 2;
   group.add(body);
 
-  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.44, 3.2), materials.droneWing);
+  const spine = new THREE.Mesh(DRONE_SPINE, materials.droneWing);
   group.add(spine);
 
-  const wingGeometry = new THREE.BoxGeometry(3.6, 0.22, 0.8);
-  const wingA = new THREE.Mesh(wingGeometry, materials.droneWing);
+  const wingA = new THREE.Mesh(DRONE_WING, materials.droneWing);
   wingA.position.set(0, -0.15, -0.25);
   wingA.rotation.z = 0.16;
   group.add(wingA);
@@ -1824,7 +1851,7 @@ function createDrone() {
   wingB.rotation.z = -0.16;
   group.add(wingB);
 
-  const engine = new THREE.Mesh(new THREE.SphereGeometry(0.38, 12, 8), materials.droneGlow);
+  const engine = new THREE.Mesh(DRONE_ENGINE, materials.droneGlow);
   engine.position.set(0, -0.02, 1.42);
   group.add(engine);
 
@@ -1850,8 +1877,8 @@ function createDrone() {
 
 function createCollector() {
   const group = new THREE.Group();
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.12, 10, 42), materials.collect);
-  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.54, 0), materials.collect);
+  const ring = new THREE.Mesh(COLLECTOR_RING, materials.collect);
+  const core = new THREE.Mesh(COLLECTOR_CORE, materials.collect);
   group.add(ring, core);
   group.position.set(rand(-13, 13), rand(-8, 8), rand(-145, -110));
   group.userData = {
@@ -2240,8 +2267,8 @@ function getThreatScore(object, playerX, playerY, stats) {
 }
 
 function acquireTarget() {
-  const playerX = state.player.x * 11;
-  const playerY = state.player.y * 7.5;
+  const playerX = state.player.x * PLAYER_RANGE_X;
+  const playerY = state.player.y * PLAYER_RANGE_Y;
   const stats = getShipStats();
   let best = null;
   let bestScore = -Infinity;
@@ -3075,7 +3102,9 @@ function drawStationWindow(delta = 0) {
 
   stationView.accum += delta;
   if (stationView.accum < STATION_VIEW_STEP) return;
-  stationView.accum = 0;
+  // Subtract rather than zero, so the cap holds its rate instead of drifting
+  // with whatever the frame time happened to be.
+  stationView.accum = Math.min(stationView.accum - STATION_VIEW_STEP, STATION_VIEW_STEP);
   stationView.renderer.render(stationView.scene, stationView.camera);
 }
 
@@ -3310,9 +3339,12 @@ function clearResultLock() {
   resultUnlockTimeout = 0;
   resultCountdownTimer = 0;
   if (state.confiscated) {
-    state.resultLocked = true;
-    restartButton.disabled = true;
-    restartButton.textContent = 'Ship Confiscated';
+    // Seizure ends the ship, not the career. The button becomes the way out:
+    // without it the saved debt is still over the limit, so the next launch
+    // just confiscates again and the only escape is Settings > Reset Progress.
+    state.resultLocked = false;
+    restartButton.disabled = false;
+    restartButton.textContent = 'Sign New Hull';
     if (resultLockText) resultLockText.textContent = 'Debt limit exceeded';
     if (resultLockBar) resultLockBar.style.transform = 'scaleX(1)';
     return;
@@ -3369,6 +3401,14 @@ function renderSettingsState() {
 function showModal(modal) {
   if (!modal) return;
   closeAllModals();
+  // A modal covers the flight canvas, so leaving the run live means dying
+  // behind a settings panel you opened mid-flight.
+  if (state.running) {
+    state.running = false;
+    state.firing = false;
+    state.pointerDown = false;
+    state.modalPaused = true;
+  }
   state.modal = modal.id;
   modal.classList.remove('hidden');
   modal.setAttribute('aria-hidden', 'false');
@@ -3381,6 +3421,16 @@ function closeModal(modal) {
   modal.classList.add('hidden');
   modal.setAttribute('aria-hidden', 'true');
   if (state.modal === modal.id) state.modal = null;
+  if (!state.modal) resumeAfterModal();
+}
+
+// Only the run that showModal paused gets resumed. resetGame/resetProgress
+// clear the flag first so closing a modal there cannot restart a dead flight.
+function resumeAfterModal() {
+  if (!state.modalPaused) return;
+  state.modalPaused = false;
+  state.running = true;
+  clock.getDelta();
 }
 
 function closeAllModals() {
@@ -3518,10 +3568,32 @@ function toggleHaptics() {
   playSfx('click');
 }
 
+// Sign for a fresh hull after a seizure. The lender takes the ship and every
+// upgrade bolted to it, but the career — best score, stats, story board —
+// survives. This is the only way back out of confiscation.
+function claimNewHull() {
+  const fresh = makeDefaultSave();
+  state.save.credits = fresh.credits;
+  state.save.debt = fresh.debt;
+  state.save.route = fresh.route;
+  state.save.upgrades = fresh.upgrades;
+  state.confiscated = false;
+  state.lastRepairBill = 0;
+  state.lastRepairPaid = 0;
+  state.lastDebtAdded = 0;
+  saveProgress();
+  clearResultLock();
+  resetGame();
+}
+
 function resetProgress() {
-  localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(BEST_KEY);
-  localStorage.removeItem(LEGACY_BEST_KEY);
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(BEST_KEY);
+    localStorage.removeItem(LEGACY_BEST_KEY);
+  } catch {
+    /* private mode / quota — the in-memory reset below still happens */
+  }
   clearResultLock();
   clearDockTransition();
   clearDynamicScene();
@@ -3532,6 +3604,7 @@ function resetProgress() {
   state.lastRepairPaid = 0;
   state.lastDebtAdded = 0;
   state.confiscated = false;
+  state.modalPaused = false;
   state.currentPayout = 0;
   state.routeDistance = 0;
   state.routeLength = getRouteLength();
@@ -3712,9 +3785,22 @@ function createMediaFrame(item, className = 'story-media-frame') {
   return frame;
 }
 
+// Dropping a <video> with innerHTML leaves it decoding and holding its buffer
+// until GC gets round to it. The station panel re-renders on every purchase and
+// tab switch, so those abandoned MP4s pile up fast.
+function clearMediaContainer(el) {
+  if (!el) return;
+  for (const video of el.querySelectorAll('video')) {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+  el.innerHTML = '';
+}
+
 function renderDebugMediaList() {
   if (!debugMediaList) return;
-  debugMediaList.innerHTML = '';
+  clearMediaContainer(debugMediaList);
   if (debugMediaCount) debugMediaCount.textContent = String(DEBUG_MEDIA.length);
 
   for (const item of DEBUG_MEDIA) {
@@ -3846,7 +3932,7 @@ function renderMenuAchievements() {
 
 function renderAchievements() {
   upgradeList.className = 'upgrade-list achievement-list';
-  upgradeList.innerHTML = '';
+  clearMediaContainer(upgradeList);
   const rows = getAchievementRows()
     .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.ratio - a.ratio)
     .slice(0, 6);
@@ -3959,7 +4045,7 @@ function renderQuestBoard() {
 
 function renderStorySearch() {
   upgradeList.className = 'upgrade-list story-list';
-  upgradeList.innerHTML = '';
+  clearMediaContainer(upgradeList);
   const story = getActiveStory();
   if (!story) {
     renderQuestBoard();
@@ -4033,7 +4119,7 @@ function renderUpgrades() {
   const category = UPGRADE_CATEGORIES.find((item) => item.id === state.upgradeCategory) || UPGRADE_CATEGORIES[0];
   state.upgradeCategory = category.id;
   upgradeList.className = 'upgrade-list';
-  upgradeList.innerHTML = '';
+  clearMediaContainer(upgradeList);
   for (const def of UPGRADE_DEFS.filter((item) => item.category === category.id)) {
     const level = getUpgradeLevel(def.id);
     const cost = getUpgradeCost(def);
@@ -4059,7 +4145,7 @@ function renderUpgrades() {
 
 function renderTerminalCards(cards) {
   upgradeList.className = 'upgrade-list terminal-grid';
-  upgradeList.innerHTML = '';
+  clearMediaContainer(upgradeList);
   for (const cardData of cards) {
     const card = document.createElement('article');
     card.className = 'terminal-card';
@@ -4079,7 +4165,7 @@ function renderCargoOffice() {
   const nextName = getStationName(nextRoute, nextType);
   const nextPayout = getDeliveryPayout(nextRoute, nextType);
   upgradeList.className = 'upgrade-list terminal-grid';
-  upgradeList.innerHTML = '';
+  clearMediaContainer(upgradeList);
 
   const cards = [
     {
@@ -4321,6 +4407,7 @@ function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit.
 
 function resetGame() {
   if (state.resultLocked || state.confiscated) return;
+  state.modalPaused = false;
   if (!DEMO_MODE) {
     const interest = applyDebtInterest();
     if (state.save.debt > DEBT_LIMIT) {
@@ -4391,11 +4478,18 @@ function finishGame() {
   state.running = false;
   state.firing = false;
   state.pointerDown = false;
+  state.modalPaused = false;
   const repair = DEMO_MODE ? { bill: 0, paid: 0, addedDebt: 0 } : applyEscapePodRepair();
   const finalScore = Math.round(state.score);
   const previousBest = state.best;
   state.best = Math.max(state.best, finalScore);
-  if (!DEMO_MODE) localStorage.setItem(BEST_KEY, String(state.best));
+  if (!DEMO_MODE) {
+    try {
+      localStorage.setItem(BEST_KEY, String(state.best));
+    } catch {
+      /* a failed write must not abort the result screen below */
+    }
+  }
   recordRunCompleted();
   saveProgress();
   resultScore.textContent = String(finalScore);
@@ -4467,7 +4561,9 @@ function firePulse() {
       bestTarget.getWorldPosition(tmpVectorB);
       createExplosion(tmpVectorB, bestTarget.userData.kind === 'drone' ? 0xff7e40 : 0xffc175, bestTarget.userData.kind === 'drone' ? 34 : 24);
       state.score += bestTarget.userData.value;
-      state.objects.splice(state.objects.indexOf(bestTarget), 1);
+      const targetIndex = state.objects.indexOf(bestTarget);
+      if (targetIndex >= 0) state.objects.splice(targetIndex, 1);
+      if (state.lockedTarget === bestTarget) state.lockedTarget = null;
       removeObject(bestTarget);
     }
   }
@@ -4530,9 +4626,22 @@ function updateInputFromMovement(event) {
   updateReticle();
 }
 
+const FIRE_BUTTON_PAD = 24;
+
+function isNearFireButton(x, y) {
+  if (fireButton.classList.contains('hidden')) return false;
+  const rect = fireButton.getBoundingClientRect();
+  if (!rect.width || !rect.height) return false;
+  return x >= rect.left - FIRE_BUTTON_PAD && x <= rect.right + FIRE_BUTTON_PAD
+    && y >= rect.top - FIRE_BUTTON_PAD && y <= rect.bottom + FIRE_BUTTON_PAD;
+}
+
 function onPointerDown(event) {
   if (event.target.closest('button')) return;
-  if (event.clientX > window.innerWidth * 0.78) return;
+  // Reserve the fire button's actual rect (plus a thumb's margin) rather than a
+  // flat 22% of the screen, which on a landscape phone swallowed a lot of
+  // perfectly good steering area.
+  if (isNearFireButton(event.clientX, event.clientY)) return;
   if (state.movementPointerId !== null) return;
   event.preventDefault();
   state.movementPointerId = event.pointerId;
@@ -4563,11 +4672,11 @@ function onPointerUp(event) {
 
 function updateStars(delta) {
   const position = starGeometry.attributes.position;
-  const stationView = state.docked || gameEl.dataset.state === 'station';
+  const dockedView = state.docked || gameEl.dataset.state === 'station';
   const boost = state.running ? state.speed : 28;
   for (let i = 0; i < starCount; i += 1) {
     const p = i * 3;
-    if (stationView) {
+    if (dockedView) {
       starPositions[p] += starSideSpeeds[i] * delta;
       starPositions[p + 1] += Math.sin(state.time * 0.18 + i) * delta * 0.28;
       starPositions[p + 2] += delta * 0.45;
@@ -4588,9 +4697,9 @@ function updateStars(delta) {
 }
 
 function updateNebulae(delta) {
-  const stationView = state.docked || gameEl.dataset.state === 'station';
+  const dockedView = state.docked || gameEl.dataset.state === 'station';
   for (const sprite of nebulae) {
-    if (stationView) {
+    if (dockedView) {
       sprite.position.x += delta * 2.1;
       sprite.position.y += Math.sin(state.time * 0.12 + sprite.position.z) * delta * 0.08;
       sprite.material.rotation += sprite.userData.spin * delta * 0.28;
@@ -4648,8 +4757,8 @@ function updateObjects(delta) {
     return;
   }
 
-  const playerX = state.player.x * 11;
-  const playerY = state.player.y * 7.5;
+  const playerX = state.player.x * PLAYER_RANGE_X;
+  const playerY = state.player.y * PLAYER_RANGE_Y;
   let threat = 0;
 
   for (let i = state.objects.length - 1; i >= 0; i -= 1) {
@@ -4829,7 +4938,9 @@ function updateFlight(delta) {
   }
 
   const stats = getShipStats();
-  const inputLerp = 1 - Math.exp(-delta * 4.8);
+  // Nudged up with the wider range so a full dodge still lands in about the
+  // same reaction window rather than feeling sluggish.
+  const inputLerp = 1 - Math.exp(-delta * 5.6);
   state.player.x = lerp(state.player.x, state.target.x, inputLerp);
   state.player.y = lerp(state.player.y, state.target.y, inputLerp);
 
@@ -4912,7 +5023,7 @@ function processCockpitImage(img) {
   const offscreen = document.createElement('canvas');
   offscreen.width = img.naturalWidth;
   offscreen.height = img.naturalHeight;
-  const ctx = offscreen.getContext('2d');
+  const ctx = offscreen.getContext('2d', { willReadFrequently: true });
   ctx.drawImage(img, 0, 0);
   const frame = ctx.getImageData(0, 0, offscreen.width, offscreen.height);
   const pixels = frame.data;
@@ -5016,8 +5127,14 @@ function resize() {
   updateReticle();
 }
 
+// A tab return usually fires focus and visibilitychange together, which used to
+// mean two full resizes and two concurrent cockpit re-keys.
+let restoreCanvasesTimer = 0;
+
 function restoreCanvasesSoon() {
-  window.setTimeout(() => {
+  window.clearTimeout(restoreCanvasesTimer);
+  restoreCanvasesTimer = window.setTimeout(() => {
+    restoreCanvasesTimer = 0;
     resize();
     if (state.cockpitPlate) {
       drawCockpit();
@@ -5071,7 +5188,8 @@ function setupEvents() {
   restartButton.addEventListener('click', () => {
     playSfx('buy');
     syncMusic();
-    resetGame();
+    if (state.confiscated) claimNewHull();
+    else resetGame();
   });
   launchNextButton.addEventListener('click', () => {
     playSfx('buy');
@@ -5158,12 +5276,16 @@ function setupEvents() {
   }, { passive: false });
   fireButton.addEventListener('pointerup', onPointerUp, { passive: true });
   fireButton.addEventListener('pointercancel', onPointerUp, { passive: true });
+  const GAME_KEYS = new Set(['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
   window.addEventListener('keydown', (event) => {
     if (event.code === 'Escape' && state.modal) {
       closeAllModals();
       return;
     }
+    // Otherwise Space scrolls the page and the arrows fight the browser.
+    if (GAME_KEYS.has(event.code)) event.preventDefault();
     if (event.code === 'Space') {
+      if (event.repeat) return;
       state.firing = true;
       firePulse();
     }
@@ -5178,8 +5300,13 @@ function setupEvents() {
   });
 }
 
+// Keyed to one in-flight attempt: the chroma pass is expensive enough that two
+// overlapping loads are worth avoiding.
+let cockpitLoad = null;
+
 function loadCockpit() {
-  return new Promise((resolve, reject) => {
+  if (cockpitLoad) return cockpitLoad;
+  cockpitLoad = new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       processCockpitImage(img);
@@ -5187,13 +5314,16 @@ function loadCockpit() {
     };
     img.onerror = reject;
     img.src = 'assets/cockpit-chroma.png';
-  });
+  }).finally(() => { cockpitLoad = null; });
+  return cockpitLoad;
 }
 
 async function boot() {
   setupEvents();
   resize();
-  await loadCockpit();
+  // The cockpit plate is decoration: drawCockpit no-ops without it. A 404 or a
+  // decode failure must never stop the render loop from starting.
+  await loadCockpit().catch((error) => console.warn('cockpit plate unavailable', error));
   applyDemoStoryState();
   updateHud();
   renderSettingsState();
