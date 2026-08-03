@@ -83,11 +83,12 @@ const _cA = new THREE.Color(), _cB = new THREE.Color(), _cC = new THREE.Color(),
 // a low sun paints the whole frame the same pink and nothing has a cool side for the key to
 // disagree with.
 const LUT = [
-  // Saturated but dark. Matching the night plate's *mean* luminance makes the whole frame one blue
-  // value, because that plate is a tilt-shifted miniature and ours is a wide shot — the lit windows
-  // have to stay the brightest thing in frame or it reads as a filter over a day scene.
-  { el: -0.50, zen: '#0a1442', hor: '#152356', gnd: '#070c22', glow: '#2b4478', cool: '#0a1240' },
-  { el: -0.16, zen: '#1a2758', hor: '#39406f', gnd: '#121734', glow: '#6b5480', cool: '#1c2650' },
+  // Night loses saturation faster than it loses value: a dark but vivid navy is the day sky's own
+  // hue merely dimmed, which is what kept reading as daytime. Lit windows must stay the brightest
+  // thing in frame. Don't match the night plate's mean luminance — it is a tilt-shifted miniature
+  // and ours is a wide shot, and matching it turns the frame into one blue wash.
+  { el: -0.50, zen: '#080c1a', hor: '#0e1426', gnd: '#05070f', glow: '#22304e', cool: '#080c1c' },
+  { el: -0.16, zen: '#161d38', hor: '#2b3150', gnd: '#0d1120', glow: '#5a4c72', cool: '#181f42' },
   { el: -0.02, zen: '#584a8c', hor: '#e28fa4', gnd: '#3c3244', glow: '#ff8a52', cool: '#4a5590' },
   { el: 0.16, zen: '#8b7fc0', hor: '#f0a6b4', gnd: '#61504a', glow: '#ffab63', cool: '#93a3ca' },
   { el: 0.42, zen: '#6f9cd2', hor: '#dbe7ea', gnd: '#6d6456', glow: '#ffeed0', cool: '#b7cee0' },
@@ -216,6 +217,8 @@ export class Lighting {
       () => this.apply());
     q.register({ key: 'nightLift', label: 'Night lift', type: 'range', min: 0, max: 10, step: 0.05, default: 3.0, group: 'Light' },
       () => this.apply());
+    q.register({ key: 'nightSky', label: 'Night sky', type: 'range', min: 0, max: 2, step: 0.02, default: 1, group: 'Light' },
+      () => { this.dirty = true; this.apply(); });
     q.register({ key: 'stoneVary', label: 'Stone variation', type: 'range', min: 0, max: 2, step: 0.05, default: 1, group: 'World' },
       v => setVariation(v));
     q.register({ key: 'wallSkirt', label: 'Wall contact shade', type: 'range', min: 0, max: 2, step: 0.05, default: 1, group: 'World' },
@@ -241,12 +244,26 @@ export class Lighting {
     // which at village scale is invisible, so this is a storybook exaggeration
     q.register({ key: 'shadowSoft', label: 'Shadow spread', type: 'range', min: 0, max: 0.07, step: 0.005, default: 0.05, group: 'Renderer' },
       invalidateShadow);
-    q.register({ key: 'shadowRate', label: 'Shadow update', type: 'select', options: Object.keys(SHADOW_RATE), default: 'every frame', group: 'Renderer' },
+    q.register({ key: 'shadowRate', label: 'Shadow update', type: 'select', options: Object.keys(SHADOW_RATE), default: '15hz', group: 'Renderer' },
       invalidateShadow);
 
     this.ready = true;
     this.dirty = true;
     this.apply();
+  }
+
+  // The LUT scaled by the night-sky knob, so the sky texture, the fog and the PMREM env all
+  // move together — darkening only the drawn sky leaves the fog washing the distance.
+  skyAt(el) {
+    const s = lutAt(el);
+    const k = this.q?.get('nightSky') ?? 1;
+    if (k === 1 || !this.night) return s;
+    const f = lerp(1, k, this.night);
+    const out = { ...s };
+    for (const key of ['zen', 'hor', 'gnd', 'cool']) {
+      out[key] = [s[key][0] * f, s[key][1] * f, s[key][2] * f];
+    }
+    return out;
   }
 
   sunAngles(t) {
@@ -282,7 +299,7 @@ export class Lighting {
     this.key.color.copy(isNight ? _cA.setHex(MOON) : sunColorAt(el));
     this.key.intensity = isNight ? moonI : sunI;
 
-    const sky = lutAt(el);
+    const sky = this.skyAt(el);
     const hor = new THREE.Color().setRGB(sky.hor[0] / 255, sky.hor[1] / 255, sky.hor[2] / 255, THREE.SRGBColorSpace);
     const zen = new THREE.Color().setRGB(sky.zen[0] / 255, sky.zen[1] / 255, sky.zen[2] / 255, THREE.SRGBColorSpace);
 
@@ -328,7 +345,7 @@ export class Lighting {
 
   drawSky(el, az) {
     const p = this.skyImg.data;
-    const sky = lutAt(el);
+    const sky = this.skyAt(el);
     const cover = this.q.get('cloudCover');
     const dayF = smoothstep(-0.14, 0.06, el);
     // three's equirect lookup measures azimuth from +X toward +Z; the sun runs from -Z (north).

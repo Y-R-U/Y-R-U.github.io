@@ -247,7 +247,9 @@ export class Doors {
 
     P.yaw += wrapPi(this.faceYaw - P.yaw) * (1 - Math.exp(-9 * dt));
     P.camYaw += wrapPi(this.faceYaw - P.camYaw) * (1 - Math.exp(-6 * dt));
-    P.indoor = enter ? smooth(0.4, 0.88, u) : 1 - smooth(0.3, 0.72, u);
+    // On the way out the arm stays short for the whole walk — release() lets it grow only once
+    // the camera has real room, or it reaches its full length while still in the doorway.
+    P.indoor = enter ? smooth(0.4, 0.88, u) : 1;
     P.floorY = null;
     this.colliders.skip = this.skipRule(P);
 
@@ -272,7 +274,6 @@ export class Doors {
       this.colliders.interiorOnly = true;
     } else {
       this.state = 'out';
-      P.indoor = 0;
       P.confine = null;
       this.colliders.extra.length = 0;
       this.colliders.interiorOnly = false;
@@ -283,14 +284,19 @@ export class Doors {
     }
   }
 
+  // The house stays in the collider set here, so the arm is pushed off the wall rather than
+  // reaching through it. Growing it back is gated on the camera actually being out of the box,
+  // which is self-correcting: if growing puts it back inside, the next frame holds it again.
   release(P, dt) {
     const d = this.releasing;
-    this.colliders.skip = d.id;
+    this.colliders.skip = 0;
     this.held = (this.held || 0) + dt;
-    if (this.held < 1.2 && this.colliders.inside(d.id, P.camPos.x, P.camPos.y, P.camPos.z, 0.3)) return;
+    const blocked = this.colliders.inside(d.id, P.camPos.x, P.camPos.y, P.camPos.z, 0.3);
+    P.indoor += ((blocked ? 1 : 0) - P.indoor) * (1 - Math.exp(-3.5 * dt));
+    if (this.held < 4 && (blocked || P.indoor > 0.04)) return;
+    P.indoor = 0;
     this.held = 0;
     this.releasing = null;
-    this.colliders.skip = 0;
     this.close();
   }
 
