@@ -3,12 +3,16 @@
 import * as THREE from 'three';
 import { ZONE_IDS } from './world/zones.js';
 import { heightAt as fieldY, CENTERS } from './world/terrain.js';
+import { walkStep, groundAt, setStepUp } from './world/colliders.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const PITCH_MIN = -0.35, PITCH_MAX = 1.05;
+const PITCH_MAX_IN = 0.55;
 const LOOK_HOLD = 0.8;
 
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
+const lerp = THREE.MathUtils.lerp;
+const _off = new THREE.Vector3(), _back = new THREE.Vector3();
 
 export class Player {
   constructor(people, input, controls) {
@@ -44,6 +48,22 @@ export class Player {
     this.follow = 2.6;
     this.lookHold = 0;
     this.started = false;
+
+    // Set by the door system while it owns the player. `indoor` blends the camera arm from the
+    // outdoor trail to just behind the head; `driven` means the door script is writing pos/yaw.
+    this.colliders = null;
+    this.driven = false;
+    this.snap = false;
+    this.indoor = 0;
+    this.floorY = null;
+    this.confine = null;
+    this.distIn = 1.45;
+    this.heightIn = 1.90;
+    this.camRadius = 0.26;
+    this.armMin = 0.4;
+    this.collide = true;
+    this.walkRadius = 0.34;
+    this.stepEase = 16;
   }
 
   registerKnobs(q, app) {
@@ -64,6 +84,18 @@ export class Player {
       v => { this.sens = v; });
     q.register({ key: 'camFollow', label: 'Camera follow (0 = manual)', type: 'range', min: 0, max: 6, step: 0.2, default: 2.6, group: 'Controls' },
       v => { this.follow = v; });
+    q.register({ key: 'camDistIn', label: 'Camera distance indoors', type: 'range', min: 0.6, max: 3, step: 0.05, default: 1.45, group: 'Controls' },
+      v => { this.distIn = v; });
+    q.register({ key: 'camRadius', label: 'Camera collision radius', type: 'range', min: 0, max: 0.8, step: 0.02, default: 0.26, group: 'Controls' },
+      v => { this.camRadius = v; });
+    q.register({ key: 'walkCollide', label: 'World collision', type: 'toggle', default: true, group: 'Controls' },
+      v => { this.collide = !!v; });
+    q.register({ key: 'walkRadius', label: 'Walker radius', type: 'range', min: 0, max: 1, step: 0.02, default: 0.34, group: 'Controls' },
+      v => { this.walkRadius = v; });
+    q.register({ key: 'stepUp', label: 'Step-up height', type: 'range', min: 0.1, max: 1.2, step: 0.02, default: 0.62, group: 'Controls' },
+      v => setStepUp(v));
+    q.register({ key: 'stepEase', label: 'Step-up ease rate', type: 'range', min: 4, max: 40, step: 1, default: 16, group: 'Controls' },
+      v => { this.stepEase = v; });
   }
 
   // The ground renders from the terrain mesh, not the analytic field, and the two disagree by
@@ -99,44 +131,62 @@ export class Player {
     }
     this.wasFree = false;
 
-    const cmd = this.input.read();
+    const cmd = this.driven ? null : this.input.read();
+    let sp = 0;
 
-    this.camYaw -= cmd.lx * this.sens;
-    this.camPitch = Math.min(PITCH_MAX, Math.max(PITCH_MIN, this.camPitch + cmd.ly * this.sens));
-    // The stick is read against the camera angle as it was when the stick was pressed, not the
-    // live one. Holding a direction then walks a straight line while the camera swings in behind;
-    // reading it live would feed the swing back into the move vector and curve the walk into a
-    // circle, because the heading is defined by the camera in the first place.
-    const stick = Math.hypot(cmd.mx, cmd.my);
-    if (cmd.lx || cmd.ly) this.lookHold = LOOK_HOLD;
-    else this.lookHold = Math.max(0, this.lookHold - dt);
-    if (stick < 0.02 || this.lookHold) this.moveYaw = this.camYaw;
+    if (cmd) {
+      this.camYaw -= cmd.lx * this.sens;
+      this.camPitch += cmd.ly * this.sens;
+      // The stick is read against the camera angle as it was when the stick was pressed, not the
+      // live one. Holding a direction then walks a straight line while the camera swings in behind;
+      // reading it live would feed the swing back into the move vector and curve the walk into a
+      // circle, because the heading is defined by the camera in the first place.
+      const stick = Math.hypot(cmd.mx, cmd.my);
+      if (cmd.lx || cmd.ly) this.lookHold = LOOK_HOLD;
+      else this.lookHold = Math.max(0, this.lookHold - dt);
+      if (stick < 0.02 || this.lookHold) this.moveYaw = this.camYaw;
 
-    if (this.follow > 0 && stick > 0.02 && !this.lookHold && Math.hypot(this.vel.x, this.vel.z) > 0.6) {
-      this.camYaw += wrapPi(this.yaw - this.camYaw) * (1 - Math.exp(-this.follow * dt));
+      if (this.follow > 0 && stick > 0.02 && !this.lookHold && Math.hypot(this.vel.x, this.vel.z) > 0.6) {
+        this.camYaw += wrapPi(this.yaw - this.camYaw) * (1 - Math.exp(-this.follow * dt));
+      }
+
+      const fwd = new THREE.Vector3(Math.sin(this.moveYaw), 0, Math.cos(this.moveYaw));
+      const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+      const want = new THREE.Vector3()
+        .addScaledVector(fwd, cmd.my).addScaledVector(right, cmd.mx);
+      const mag = Math.min(1, want.length());
+      if (mag > 0.001) want.normalize().multiplyScalar(mag * this.speed * (cmd.sprint ? 1.7 : 1));
+
+      this.vel.lerp(want, 1 - Math.exp(-9 * dt));
+      const px = this.pos.x, pz = this.pos.z;
+      this.pos.addScaledVector(this.vel, dt);
+      this.pos.x = THREE.MathUtils.clamp(this.pos.x, -145, 145);
+      this.pos.z = THREE.MathUtils.clamp(this.pos.z, -100, 108);
+      this.confine?.(this.pos);
+      // Indoors the room's own walls do the confining, and the house is a solid blocker the
+      // player is legitimately standing inside.
+      if (this.collide && this.floorY === null && this.colliders) {
+        const r = walkStep(px, pz, this.pos.x, this.pos.z, this.pos.y, this.walkRadius);
+        this.pos.x = r.x;
+        this.pos.z = r.z;
+        if (dt > 1e-4) this.vel.set((r.x - px) / dt, 0, (r.z - pz) / dt);
+      }
+      // Eased rather than snapped, so a step or a bridge deck is floated up onto instead of
+      // walked into. Fast enough that a slope still reads as the feet being on the ground.
+      const gy = this.floorY ?? (this.colliders ? groundAt(this.pos.x, this.pos.z, this.pos.y) : this.groundY(this.pos.x, this.pos.z));
+      this.pos.y += (gy - this.pos.y) * (1 - Math.exp(-this.stepEase * dt));
+
+      sp = Math.hypot(this.vel.x, this.vel.z);
+      if (sp > 0.15) {
+        const d = wrapPi(Math.atan2(this.vel.x, this.vel.z) - this.yaw);
+        this.yaw += d * (1 - Math.exp(-11 * dt));
+      }
+      if (cmd.attack) this.swing = 1;
+    } else {
+      sp = this.walkSpeed || 0;
     }
 
-    const fwd = new THREE.Vector3(Math.sin(this.moveYaw), 0, Math.cos(this.moveYaw));
-    const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
-    const camFwd = new THREE.Vector3(Math.sin(this.camYaw), 0, Math.cos(this.camYaw));
-    const want = new THREE.Vector3()
-      .addScaledVector(fwd, cmd.my).addScaledVector(right, cmd.mx);
-    const mag = Math.min(1, want.length());
-    if (mag > 0.001) want.normalize().multiplyScalar(mag * this.speed * (cmd.sprint ? 1.7 : 1));
-
-    this.vel.lerp(want, 1 - Math.exp(-9 * dt));
-    this.pos.addScaledVector(this.vel, dt);
-    this.pos.x = THREE.MathUtils.clamp(this.pos.x, -145, 145);
-    this.pos.z = THREE.MathUtils.clamp(this.pos.z, -100, 108);
-    this.pos.y = this.groundY(this.pos.x, this.pos.z);
-
-    const sp = Math.hypot(this.vel.x, this.vel.z);
-    if (sp > 0.15) {
-      const d = wrapPi(Math.atan2(this.vel.x, this.vel.z) - this.yaw);
-      this.yaw += d * (1 - Math.exp(-11 * dt));
-    }
-
-    if (cmd.attack) this.swing = 1;
+    this.camPitch = Math.min(lerp(PITCH_MAX, PITCH_MAX_IN, this.indoor), Math.max(PITCH_MIN, this.camPitch));
     this.swing = Math.max(0, this.swing - dt * 2.6);
     const arc = Math.sin(this.swing * Math.PI) * 0.85;
 
@@ -146,14 +196,34 @@ export class Player {
     const u = this.people.uniforms.uSelf.value;
     u.set(0, Math.min(1.4, sp / 3), 0, arc * 0.7);
 
-    const aim = this.camAim.set(this.pos.x, this.pos.y + this.height, this.pos.z);
+    const dist = lerp(this.dist, this.distIn, this.indoor);
+    const aim = this.camAim.set(this.pos.x, this.pos.y + lerp(this.height, this.heightIn, this.indoor), this.pos.z);
     const cp = Math.cos(this.camPitch);
-    const back = new THREE.Vector3(-camFwd.x * cp, Math.sin(this.camPitch), -camFwd.z * cp)
-      .multiplyScalar(this.dist).add(aim);
-    back.y = Math.max(back.y, this.groundY(back.x, back.z) + 0.7);
+    const back = _back.set(Math.sin(this.camYaw), 0, Math.cos(this.camYaw))
+      .multiplyScalar(-cp).setY(Math.sin(this.camPitch))
+      .multiplyScalar(dist).add(aim);
+    const camFloor = this.floorY !== null ? this.floorY + 0.3
+      : (this.colliders ? groundAt(back.x, back.z, back.y) : this.groundY(back.x, back.z)) + 0.7;
+    back.y = Math.max(back.y, camFloor);
 
     if (!this.started) { this.camPos.copy(back); this.started = true; }
-    this.camPos.lerp(back, 1 - Math.exp(-11 * dt));
+    this.camPos.lerp(back, this.snap ? 1 : 1 - Math.exp(-11 * dt));
+
+    // Clamping the target alone is not enough: the smoothing lags behind it, and the lag is
+    // exactly what trails through a wall. Whatever the lerp did, the camera has to finish on the
+    // clear part of the line from the head.
+    if (this.colliders) {
+      const off = _off.subVectors(this.camPos, aim);
+      const len = off.length();
+      if (len > 1e-3) {
+        off.multiplyScalar(1 / len);
+        const clear = this.colliders.hit(aim.x, aim.y, aim.z, off.x, off.y, off.z, len, this.camRadius);
+        // Only pay the clearance margin on an actual hit: taking it unconditionally ratchets the
+        // arm a few centimetres shorter every frame and settles well short of the set distance.
+        if (clear < len) this.camPos.copy(aim).addScaledVector(off, Math.max(this.armMin, clear - 0.06));
+      }
+    }
+
     app.camera.position.copy(this.camPos);
     app.camera.up.copy(UP);
     app.camera.lookAt(aim);

@@ -126,6 +126,10 @@ function textured(m, z, set, mode, varyKey) {
   m.needsUpdate = true;
 }
 
+// The baked {map, normalMap} behind a surface, for the few things that want the texture but
+// not the outdoor projection — interiors, where the ground skirt would darken a whole room.
+export function textureSet(zoneId, set) { return texSets[set](zone(zoneId)); }
+
 export function getMaterial(zoneId, surfaceName) {
   const key = `${zoneId}:${surfaceName}`;
   if (cache.has(key)) return cache.get(key);

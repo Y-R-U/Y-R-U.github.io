@@ -6,6 +6,7 @@ import { ZONE_IDS, zone } from './zones.js';
 import { getMaterial } from './materials.js';
 import { rng, span } from './details.js';
 import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
+import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 
 const TAU = Math.PI * 2;
@@ -724,14 +725,18 @@ export class People {
           heading = Math.atan2(ahead - x, a.dir * 0.6);
         } else if (a.kind === 'stroll') {
           a.heading += a.turn * dt * Math.sin(this.time * 0.17 + a.gait);
-          a.x += Math.sin(a.heading) * a.speed * dt;
-          a.z += Math.cos(a.heading) * a.speed * dt;
+          const wx = a.x + Math.sin(a.heading) * a.speed * dt;
+          const wz = a.z + Math.cos(a.heading) * a.speed * dt;
+          const step = walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.3);
+          a.x = step.x; a.z = step.z;
           const b = a.box;
-          if (a.x < b[0] || a.x > b[1] || a.z < b[2] || a.z > b[3]) {
+          const out = a.x < b[0] || a.x > b[1] || a.z < b[2] || a.z > b[3];
+          if (out) {
             a.x = Math.min(b[1], Math.max(b[0], a.x));
             a.z = Math.min(b[3], Math.max(b[2], a.z));
-            a.heading += Math.PI * 0.87;
           }
+          // Turning away on a blocked step is what stops a stroller grinding along a wall forever.
+          if (out || step.hit) a.heading += Math.PI * 0.87;
           x = a.x; z = a.z; heading = a.heading;
         } else {
           x = a.x; z = a.z;
@@ -740,8 +745,12 @@ export class People {
         }
 
         // The rendered mesh is not the analytic field, and the difference is enough to float a
-        // figure or bury its contact disc under the ground.
-        const gy = T ? T.surfaceY(x, z) : heightAt(x, z);
+        // figure or bury its contact disc under the ground. groundAt then lets a bridge deck or a
+        // step win over the terrain under it — without it they walked through the bridge and down
+        // into the creek. Eased, so a step is climbed rather than snapped up.
+        const fall = T ? T.surfaceY(x, z) : heightAt(x, z);
+        const want = collidersReady() ? groundAt(x, z, a.y ?? fall) : fall;
+        const gy = a.y = a.y === undefined ? want : a.y + (want - a.y) * (1 - Math.exp(-9 * dt));
         const bob = a.speed > 0 ? Math.sin(this.time * (5.2 + a.speed * 2.4) * 2 + a.gait) * 0.022 * a.speed : 0;
         e.set(a.speed * 0.045, heading, 0);
         q.setFromEuler(e);

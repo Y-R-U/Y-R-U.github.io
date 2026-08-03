@@ -49,6 +49,14 @@ export const ZONES = {
     hood: { inner: '#2b2d31', eyes: ['#e8f0f6', '#8fa6bb'] },
     // ── interior ──
     wood: { base: '#cbb190', dark: '#a98f6f', roughness: 0.6 },
+    // `pattern` names the stained-glass design; `cloth` is the room's one accent; `glow` scales
+    // the hearth against the same zone's `window.litColor`.
+    interior: {
+      pattern: 'rose', floor: 'flag', cloth: '#a8bdd2', glow: 0.9, warmth: '#ffe0b4',
+      // the leaded light in the best room — richer than the tints the same zone glazes a
+      // street facade with, because this one is meant to be stood in front of
+      glass: ['#7fb2d8', '#e0c86a', '#c9788f', '#79bf9a', '#d9d2c2'],
+    },
   },
 
   neutral: {
@@ -86,6 +94,10 @@ export const ZONES = {
     robe: '#9c8a72', staff: 'pitchfork',
     hood: { inner: '#241a11', eyes: ['#9aa84e', '#4a3418'] },
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
+    interior: {
+      pattern: 'quarry', floor: 'board', cloth: '#9d5a44', glow: 0.85, warmth: '#ffcf94',
+      glass: ['#c08a3e', '#7d8a4e', '#a8552f', '#d8c48a'],
+    },
   },
 
   dark: {
@@ -124,6 +136,10 @@ export const ZONES = {
     robe: '#3c3a3e', staff: 'dark', staffTip: { shape: 'spike', len: 0.28, wide: 0.032, shade: 0.20 },
     hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
+    interior: {
+      pattern: 'rays', floor: 'flag', cloth: '#7a2436', glow: 1.15, warmth: '#ff9f62',
+      glass: ['#7a2436', '#3d2a63', '#1f5a52', '#c06a18'],
+    },
   },
 };
 

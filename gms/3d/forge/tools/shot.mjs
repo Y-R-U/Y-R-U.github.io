@@ -133,6 +133,11 @@ async function main() {
     await S('Page.navigate', { url });
     await waitFor(S, `window.__forge && window.__forge.ready`, 15000);
     // let it settle: shadow maps, texture uploads, then a stable perf window
+    // --pre runs before the frame is captured; --eval after it, on the frame you are looking at.
+    if (args.pre) {
+      await settle(S, 8);
+      console.log('  pre:', JSON.stringify(await evalJSON(S, args.pre)));
+    }
     await settle(S, args.perf ? 180 : 45);
 
     const stats = await evalJSON(S, `window.__forge.stats()`);

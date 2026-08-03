@@ -366,9 +366,11 @@ export function house(zoneId, { w = 8, d = 7, h = 6, seed: sv = 0 } = {}) {
   const kind = z.window.shape;
   const over = TUNING.eaves;
 
+  // The plinth is the floor. There is no solid core: the four panels, the gable ends, the roof
+  // slab and the plinth already close the shell, and a core would leave nowhere for interior.js
+  // to put a room.
   b.add(S.wall, taperBox(w + 0.3, d + 0.3, plinth, w + 1.0, d + 1.0), T(0, plinth / 2, 0));
   addSkirt(b, { m: T(0, 0, 0), length: w + 0.9, thickness: d + 0.9, h: 0.24, flare: 0.5, surface: S.wall });
-  b.add(S.wall, new THREE.BoxGeometry(w - 2 * t - 0.05, wallTop, d - 2 * t - 0.05), T(0, wallTop / 2 + plinth, 0));
 
   const rows = storeys === 2 ? [plinth + 1.0, plinth + (wallTop - plinth) * 0.55] : [plinth + (wallTop - plinth) * 0.32];
   const winH = storeys === 2 ? Math.min(1.7, (wallTop - plinth) * 0.3) : Math.min(2.1, (wallTop - plinth) * 0.44);
@@ -382,6 +384,7 @@ export function house(zoneId, { w = 8, d = 7, h = 6, seed: sv = 0 } = {}) {
   ];
 
   let doorFace = 0;
+  let door = null;
   for (const [fi, f] of faces.entries()) {
     const openings = [];
     const slots = Math.max(1, Math.floor((f.span - 1.2) / 2.0));
@@ -397,9 +400,13 @@ export function house(zoneId, { w = 8, d = 7, h = 6, seed: sv = 0 } = {}) {
     if (fi === doorFace) {
       const dw = 1.25, dh = 2.35;
       openings.push({ kind, w: dw, h: dh, x: 0, y: plinth - 0.02, glass: false, bars: false, sill: false, reveal: t * 0.9 });
-      b.add(S.trim, new THREE.BoxGeometry(dw - 0.1, dh - 0.08, 0.09), f.m.clone().multiply(T(0, plinth + (dh - 0.08) / 2 - 0.02, t - t * 0.85)));
-      b.add(S.trim, new THREE.BoxGeometry(0.1, dh - 0.5, 0.13), f.m.clone().multiply(T(-dw * 0.28, plinth + dh * 0.5, t - t * 0.8)));
       addSteps(b, { m: f.m.clone().multiply(T(0, plinth, t + 0.02)), w: dw + 0.5, count: 3, surface: S.trim });
+      // The leaf is not baked in: doors.js draws every door in the world from one instanced
+      // mesh per zone, which is what lets the one you walk through swing without a mesh each.
+      door = {
+        w: dw, h: dh, leafW: dw - 0.1, leafH: dh - 0.08,
+        z: d / 2, floor: plinth, leafZ: d / 2 - t * 0.85, leafY: plinth + (dh - 0.08) / 2 - 0.02,
+      };
       if (dressed) {
         b.add(S.trim, taperBox(dw + 1.5, 0.9, 0.22, dw + 1.3, 0.6), f.m.clone().multiply(T(0, plinth + dh + 0.55, t + 0.32)));
         for (const s of [-1, 1]) b.add(S.trim, new THREE.BoxGeometry(0.14, 0.75, 0.14), f.m.clone().multiply(T(s * (dw / 2 + 0.5), plinth + dh + 0.15, t + 0.55)));
@@ -509,6 +516,6 @@ export function house(zoneId, { w = 8, d = 7, h = 6, seed: sv = 0 } = {}) {
     addChimney(b, R, { m: T(cx, wallTop + rise - 0.4, cz), w: 0.9, h: span(R, 1.7, 3.1), surface: S.wall, cap: S.trim });
   }
 
-  g.userData = { kind: 'house', zoneId, w, d, h };
+  g.userData = { kind: 'house', zoneId, w, d, h, t, plinth, wallTop, door };
   return finish(b, g, zoneId);
 }

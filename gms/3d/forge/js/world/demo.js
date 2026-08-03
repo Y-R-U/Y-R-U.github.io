@@ -22,9 +22,6 @@ const SHOTS = [
     pos: [-52, 16, 80], look: [12, 1, 50], keep: 10, ref: '2198150_05' },
 ];
 
-// Working framings, not part of the critic contract. `fov` is honoured; keep this empty on a
-// clean tree so --all only renders the five the critic scores.
-const DEV = [];
 
 export class Demo {
   constructor() {
@@ -50,7 +47,7 @@ export class Demo {
   }
 
   registerScenarios() {
-    for (const s of SHOTS.concat(DEV)) {
+    for (const s of SHOTS.concat(devShots(this.doc))) {
       defineScenario({
         ...s,
         setup: app => {
@@ -61,6 +58,27 @@ export class Demo {
       });
     }
   }
+}
+
+// Working framings for the door kit, off unless ?dev=1 — --all lists whatever is registered,
+// and the critic scores exactly the five above. Derived from the scene rather than hardcoded so
+// they follow the layout.
+function devShots(doc) {
+  if (!new URLSearchParams(location.search).has('dev')) return [];
+  const out = [];
+  for (const [di, d] of doc.districts.entries()) {
+    const h = doc.objects.find(o => o.dist === di && o.type === 'house');
+    if (!h) continue;
+    const c = Math.cos(h.ry), s = Math.sin(h.ry);
+    const nx = s, nz = c;
+    const dx = h.x + nx * h.p.d / 2, dz = h.z + nz * h.p.d / 2;
+    const gy = heightAt(dx, dz);
+    out.push({
+      id: `door_${d.zone}`, label: `House door, ${d.zone}`, zone: d.zone, time: 14, fov: 45,
+      pos: [dx + nx * 7.5, gy + 3.0, dz + nz * 7.5], look: [dx, gy + 1.5, dz],
+    });
+  }
+  return out;
 }
 
 // A saved scene must never change what the critic renders, so `?shot=` always gets the demo.

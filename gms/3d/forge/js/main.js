@@ -7,13 +7,15 @@ import { Post } from './engine/post.js';
 import { getScenario, allScenarios } from './scenarios.js';
 import { People } from './world/people.js';
 import { Player } from './player.js';
+import { Doors } from './world/doors.js';
+import { walkStep, groundAt } from './world/colliders.js';
 import { Input } from './input.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const app = new App(document.getElementById('stage'));
 app.expose();
 
-app.add(new Lighting());
+const lighting = app.add(new Lighting());
 const demo = app.add(new Demo());
 const people = app.add(new People(demo.terrain));
 
@@ -22,7 +24,11 @@ controls.target.set(0, 4, 0);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * 0.495;
 
-const player = app.add(new Player(people, new Input(), controls));
+// Doors runs before the player: it owns the script that moves him and the arm length the
+// camera reads this frame.
+const player = new Player(people, new Input(), controls);
+const doors = app.add(new Doors(demo, player, lighting, [demo.object3D, people.object3D]));
+app.add(player);
 
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -31,6 +37,8 @@ buildPanel(app);
 
 window.__forge.people = people;
 window.__forge.player = player;
+window.__forge.doors = doors;
+window.__forge.walk = { walkStep, groundAt };
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
 window.__forge.setScenario = id => getScenario(id)?.setup(app);
 
