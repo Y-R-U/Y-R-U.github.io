@@ -8,6 +8,7 @@ import { zone } from './zones.js';
 import { Batch, T, openingPts, openingShape, flat, rng, span } from './details.js';
 import { textureSet } from './materials.js';
 import { stainedTexture, stainedTint } from './textures/stained.js';
+import { stairFits, stairFloor, stairBlock, build as buildStairs } from './stairs.js';
 
 // Texture metres per tile, matched to the outdoor kit so a floorboard indoors is the same
 // board as a shutter outdoors.
@@ -27,8 +28,22 @@ export class Interior {
     this.rx = w / 2 - t - 0.06;
     this.rz = d / 2 - t - 0.06;
     this.fy = plinth + 0.05;
-    this.roomH = THREE.MathUtils.clamp(wallTop - plinth - 0.25, 2.25, 3.15);
+    // Above this height the exterior already draws a second row of windows, so a loft is what the
+    // outside has been promising all along. The ground floor gives up some height to pay for it.
+    const twoUp = wallTop - plinth > 4.4;
+    this.roomH = twoUp
+      ? THREE.MathUtils.clamp((wallTop - plinth) * 0.52 - 0.14, 2.25, 3.0)
+      : THREE.MathUtils.clamp(wallTop - plinth - 0.25, 2.25, 3.15);
     this.ceil = this.fy + this.roomH;
+    this.loft = twoUp && stairFits(this);
+    if (this.loft) {
+      this.deck = this.ceil + 0.22;
+      this.roomH2 = THREE.MathUtils.clamp(wallTop - this.deck - 0.1, 2.0, 2.7);
+      this.ceil2 = this.deck + this.roomH2;
+    }
+    // Boarding runs to the underside of whatever is overhead. Stopping it at the dado-derived
+    // room height leaves a strip of daylight between the wall top and the deck.
+    this.wallH = this.loft ? this.deck - this.fy : this.roomH;
     // The aperture the closed leaf plugs. It has to be a shade smaller than the leaf and sit in
     // the leaf's own plane, because once you are inside the outdoor world stops being drawn and
     // any gap round the door is a hole straight to the sky.
@@ -42,6 +57,7 @@ export class Interior {
     shell(b, this, z, R);
     hearth(b, this);
     furniture(b, this, z, R);
+    if (this.loft) buildStairs(b, this, R);
     this.tris = emit(b, this.mats, this.object3D);
 
     this.glass = stainedGlass(this, z, opts);
@@ -55,6 +71,24 @@ export class Interior {
   // Local-frame half extents the player is allowed to walk in.
   get bounds() { return { rx: this.rx - 0.42, rz: this.rz - 0.42, y: this.fy }; }
 
+  get top() { return this.loft ? this.ceil2 : this.ceil; }
+
+  // Which floor is under a local point. Off the stair there are only ever two answers and the
+  // stair is the only way between them, so a threshold picks. Once the player is on the flight it
+  // stays authoritative even when they have run ahead of it — see stairBlock.
+  floorLocal(lx, lz, y) {
+    if (!this.loft) return this.fy;
+    const s = stairFloor(this, lx, lz);
+    if (s !== null && (this.onStair || Math.abs(s - y) < 0.7)) return s;
+    return y > this.deck - 0.5 ? this.deck : this.fy;
+  }
+
+  blockLocal(p, y) {
+    if (!this.loft) return;
+    this.onStair = stairBlock(this, p, y, this.onStair ? this.lastH : null);
+    if (this.onStair) this.lastH = stairFloor(this, p.x, p.z);
+  }
+
   // `sun` is the direction toward the sun in this room's own frame.
   update(sun, env) {
     this.glass.update(sun, env);
@@ -64,6 +98,10 @@ export class Interior {
     this.lights[0].intensity = 9.0 * this.z.interior.glow * env.power * flick;
     this.lights[1].color.copy(this.glass.fill);
     this.lights[1].intensity = (0.7 + 2.1 * this.glass.day) * env.power;
+    if (this.lights[2]) {
+      this.lights[2].color.copy(warm).lerp(this.glass.fill, 0.5);
+      this.lights[2].intensity = (1.1 + 2.4 * this.glass.day) * env.power;
+    }
   }
 
   dispose() {
@@ -119,12 +157,12 @@ function emit(b, mats, group) {
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 
 function shell(b, I, z, R) {
-  const { rx, rz, fy, ceil, roomH } = I;
+  const { rx, rz, fy, ceil, roomH, wallH } = I;
   const panelH = fy + roomH * 0.56;
   const board = z.interior.floor === 'board';
 
   b.add(board ? 'wood' : 'stone', box(rx * 2, 0.1, rz * 2), T(0, fy - 0.05, 0));
-  b.add('wood', box(rx * 2, 0.09, rz * 2), T(0, ceil + 0.045, 0));
+  if (!I.loft) b.add('wood', box(rx * 2, 0.09, rz * 2), T(0, ceil + 0.045, 0));
 
   // walls: full-height boarding, a proud panelled dado, a rail and a skirting
   const face = [
@@ -140,10 +178,10 @@ function shell(b, I, z, R) {
       const dw = Math.min(I.apW + 0.18, wide - 0.4), dh = I.apH + 0.09;
       const side = (wide - dw) / 2;
       for (const s of [-1, 1]) {
-        b.add('wood', box(side, roomH, 0.05), f.m.clone().multiply(T(s * (dw + side) / 2, fy + roomH / 2, 0.025)));
+        b.add('wood', box(side, wallH, 0.05), f.m.clone().multiply(T(s * (dw + side) / 2, fy + wallH / 2, 0.025)));
         b.add('wood', box(side * 0.94, panelH - fy, 0.06), f.m.clone().multiply(T(s * (dw + side) / 2, (fy + panelH) / 2, 0.075)));
       }
-      b.add('wood', box(dw, roomH - dh, 0.05), f.m.clone().multiply(T(0, fy + dh + (roomH - dh) / 2, 0.025)));
+      b.add('wood', box(dw, wallH - dh, 0.05), f.m.clone().multiply(T(0, fy + dh + (wallH - dh) / 2, 0.025)));
       // the last few centimetres out to the leaf, lined so the join reads as a reveal
       const gap = Math.max(0.02, I.plugZ - rz);
       for (const s of [-1, 1]) {
@@ -151,7 +189,7 @@ function shell(b, I, z, R) {
       }
       b.add('wood', box(I.apW + 0.18, 0.09, gap), T(0, fy + I.apH + 0.045, rz + gap / 2));
     } else {
-      b.add('wood', box(wide, roomH, 0.05), f.m.clone().multiply(T(0, fy + roomH / 2, 0.025)));
+      b.add('wood', box(wide, wallH, 0.05), f.m.clone().multiply(T(0, fy + wallH / 2, 0.025)));
       // the window wall is left plain, or the dado cuts the leaded light in half
       if (fi !== 0) b.add('wood', box(wide * 0.99, panelH - fy, 0.06), f.m.clone().multiply(T(0, (fy + panelH) / 2, 0.075)));
     }
@@ -159,7 +197,8 @@ function shell(b, I, z, R) {
     b.add('wood', box(wide, 0.17, 0.12), f.m.clone().multiply(T(0, fy + 0.085, 0.06)));
   }
 
-  // beams across the short axis
+  // beams across the short axis — with a loft the deck carries its own joists, which dodge the well
+  if (I.loft) return boards(b, I, R, board);
   const across = rx < rz;
   const n = Math.max(2, Math.round((across ? rz : rx) * 2 / 1.4));
   const runL = (across ? rx : rz) * 2;
@@ -169,11 +208,15 @@ function shell(b, I, z, R) {
     b.add('wood', g, across ? T(0, ceil - 0.09, u) : T(u, ceil - 0.09, 0, Math.PI / 2));
   }
 
-  if (board) {
-    for (let i = 0; i < 5; i++) {
-      const u = span(R, -rx * 0.8, rx * 0.8);
-      b.add('wood', box(0.04, 0.012, rz * 2), T(u, fy + 0.006, 0));
-    }
+  boards(b, I, R, board);
+}
+
+function boards(b, I, R, board) {
+  if (!board) return;
+  const { rx, rz, fy } = I;
+  for (let i = 0; i < 5; i++) {
+    const u = span(R, -rx * 0.8, rx * 0.8);
+    b.add('wood', box(0.04, 0.012, rz * 2), T(u, fy + 0.006, 0));
   }
 }
 
@@ -278,7 +321,21 @@ function stainedGlass(I, z, opts) {
   for (let i = 1; i < 3; i++) {
     bat.add('stone', box(0.045, gh * 0.99, 0.05), T(-gw / 2 + gw * i / 3, gy + gh / 2, zw + 0.03));
   }
-  const tris = emit(bat, I.mats, group) + pane.geometry.attributes.position.count / 3;
+  // The loft gets the same light in a smaller opening: it shares this pane's material, so it
+  // brightens and cools with the hour without a second set of state.
+  const panes = [pane];
+  if (I.loft) {
+    const lw = Math.min(rx * 0.7, 1.1), lh = 0.85, ly = I.deck + 0.5;
+    const p2 = new THREE.Mesh(uvUnit(flat(openingShape(kind, lw, lh)), lw, lh), paneMat);
+    p2.position.set(0, ly, zw);
+    group.add(p2);
+    panes.push(p2);
+    for (const s of [-1, 1]) bat.add('stone', box(0.14, lh + 0.3, 0.2), T(s * (lw / 2 + 0.07), ly + lh / 2, zw + 0.1));
+    bat.add('stone', box(lw + 0.28, 0.18, 0.2), T(0, ly + lh + 0.18, zw + 0.1));
+    bat.add('stone', box(lw + 0.48, 0.14, 0.3), T(0, ly - 0.06, zw + 0.15));
+  }
+
+  const tris = emit(bat, I.mats, group) + panes.reduce((n, p) => n + p.geometry.attributes.position.count / 3, 0);
 
   // patch + shaft, rebuilt only when the sun has actually moved
   const patchMat = new THREE.MeshBasicMaterial({
@@ -329,7 +386,8 @@ function stainedGlass(I, z, opts) {
       fillShaft(shaft.geometry, outline, zw, hits);
     },
     dispose() {
-      pane.geometry.dispose(); patch.geometry.dispose(); shaft.geometry.dispose();
+      for (const p of panes) p.geometry.dispose();
+      patch.geometry.dispose(); shaft.geometry.dispose();
       paneMat.dispose(); patchMat.dispose(); shaftMat.dispose();
     },
   };
@@ -408,5 +466,9 @@ function lights(I, z) {
   fire.position.copy(I.fire);
   const fill = new THREE.PointLight(0xffffff, 0, Math.max(I.rx, I.rz) * 4.5, 2);
   fill.position.set(0, I.fy + (I.ceil - I.fy) * 0.62, -I.rz * 0.2);
-  return [fire, fill];
+  if (!I.loft) return [fire, fill];
+  // The deck cuts the ground floor's fill off from the loft entirely, so upstairs needs its own.
+  const up = new THREE.PointLight(0xffffff, 0, Math.max(I.rx, I.rz) * 3.6, 2);
+  up.position.set(0, I.deck + I.roomH2 * 0.5, -I.rz * 0.25);
+  return [fire, fill, up];
 }

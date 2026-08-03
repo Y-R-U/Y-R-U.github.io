@@ -143,7 +143,9 @@ export class Doors {
       const dx = d.pos.x + d.n.x * s - p.x, dz = d.pos.z + d.n.z * s - p.z;
       const dy = d.pos.y - p.y;
       const q = dx * dx + dz * dz;
-      if (q > bd || Math.abs(dy) > 3.5) continue;
+      // Outdoors the slack absorbs the ground falling away from the step; indoors it must not,
+      // or standing on the loft directly over the door walks you out of the house.
+      if (q > bd || Math.abs(dy) > (inside ? 1.2 : 3.5)) continue;
       if (inside && d !== this.active) continue;
       bd = q; best = d;
     }
@@ -267,8 +269,8 @@ export class Doors {
     if (enter) {
       this.state = 'in';
       P.indoor = 1;
-      P.floorY = this.floorW;
-      P.pos.y = this.floorW;
+      P.floorY = this.floor;
+      P.pos.y = this.floor(P.pos.x, P.pos.z, P.pos.y);
       this.confineTo(d);
       this.wallColliders(d);
       this.colliders.interiorOnly = true;
@@ -318,7 +320,15 @@ export class Doors {
     this.interior = new Interior(zoneId, d.house);
     this.interior.object3D.applyMatrix4(d.m);
     this.object3D.add(this.interior.object3D);
-    this.floorW = d.m.elements[13] + this.interior.fy;
+    // The room is built in the house's own frame, so a world query has to go back into it and the
+    // answer come back out. Both floors and the stair between them live behind this one call.
+    const I = this.interior;
+    const ox = d.m.elements[12], oy = d.m.elements[13], oz = d.m.elements[14];
+    const cs = d.n.z, sn = d.n.x;
+    this.floor = (x, z, y) => {
+      const dx = x - ox, dz = z - oz;
+      return oy + I.floorLocal(dx * cs - dz * sn, dx * sn + dz * cs, y - oy);
+    };
   }
 
   setHidden(v) {
@@ -335,15 +345,17 @@ export class Doors {
   }
 
   confineTo(d) {
-    const { rx, rz } = this.interior.bounds;
+    const I = this.interior;
+    const { rx, rz } = I.bounds;
     const cs = d.n.z, sn = d.n.x;
+    const ox = d.m.elements[12], oy = d.m.elements[13], oz = d.m.elements[14];
     this.player.confine = p => {
-      const dx = p.x - d.m.elements[12], dz = p.z - d.m.elements[14];
-      let lx = dx * cs - dz * sn, lz = dx * sn + dz * cs;
-      lx = THREE.MathUtils.clamp(lx, -rx, rx);
-      lz = THREE.MathUtils.clamp(lz, -rz, rz);
-      p.x = d.m.elements[12] + lx * cs + lz * sn;
-      p.z = d.m.elements[14] - lx * sn + lz * cs;
+      const dx = p.x - ox, dz = p.z - oz;
+      _l.x = THREE.MathUtils.clamp(dx * cs - dz * sn, -rx, rx);
+      _l.z = THREE.MathUtils.clamp(dx * sn + dz * cs, -rz, rz);
+      I.blockLocal(_l, p.y - oy);
+      p.x = ox + _l.x * cs + _l.z * sn;
+      p.z = oz - _l.x * sn + _l.z * cs;
     };
   }
 
@@ -351,7 +363,7 @@ export class Doors {
     const I = this.interior;
     const ox = d.m.elements[12], oz = d.m.elements[14], oy = d.m.elements[13];
     const cs = d.n.z, sn = d.n.x;
-    const y0 = oy + I.fy, y1 = oy + I.ceil + 0.3;
+    const y0 = oy + I.fy, y1 = oy + I.top + 0.3;
     const th = 0.12;
     this.colliders.extra = [
       wallBox(0, -I.rz - th, I.rx + th, th, y0, y1, cs, sn, ox, oz),
@@ -394,6 +406,7 @@ export class Doors {
 
 const _m = new THREE.Matrix4(), _hinge = new THREE.Matrix4(), _s = new THREE.Vector3();
 const _sun = new THREE.Vector3();
+const _l = { x: 0, z: 0 };
 
 // Hinge edge at local x = 0, so the instance matrix is a plain rotation about it.
 function leafGeo(w, h) {

@@ -50,7 +50,8 @@ export class Player {
     this.started = false;
 
     // Set by the door system while it owns the player. `indoor` blends the camera arm from the
-    // outdoor trail to just behind the head; `driven` means the door script is writing pos/yaw.
+    // outdoor trail to just behind the head; `driven` means the door script is writing pos/yaw;
+    // `floorY` is null outdoors and a (x, z, y) → height query inside, so a room can have storeys.
     this.colliders = null;
     this.driven = false;
     this.snap = false;
@@ -178,7 +179,8 @@ export class Player {
       }
       // Eased rather than snapped, so a step or a bridge deck is floated up onto instead of
       // walked into. Fast enough that a slope still reads as the feet being on the ground.
-      const gy = this.floorY ?? (this.colliders ? groundAt(this.pos.x, this.pos.z, this.pos.y) : this.groundY(this.pos.x, this.pos.z));
+      const gy = this.floorY ? this.floorY(this.pos.x, this.pos.z, this.pos.y)
+        : (this.colliders ? groundAt(this.pos.x, this.pos.z, this.pos.y) : this.groundY(this.pos.x, this.pos.z));
       this.pos.y += (gy - this.pos.y) * (1 - Math.exp(-this.stepEase * dt));
 
       sp = Math.hypot(this.vel.x, this.vel.z);
@@ -207,7 +209,9 @@ export class Player {
     const back = _back.set(Math.sin(this.camYaw), 0, Math.cos(this.camYaw))
       .multiplyScalar(-cp).setY(Math.sin(this.camPitch))
       .multiplyScalar(dist).add(aim);
-    const camFloor = this.floorY !== null ? this.floorY + 0.3
+    // Asked with the player's height, not the camera's: on a stair the camera sits well above the
+    // tread, and letting it pick its own level snaps it up onto the floor above.
+    const camFloor = this.floorY ? this.floorY(back.x, back.z, this.pos.y) + 0.3
       : (this.colliders ? groundAt(back.x, back.z, back.y) : this.groundY(back.x, back.z)) + 0.7;
     back.y = Math.max(back.y, camFloor);
 
