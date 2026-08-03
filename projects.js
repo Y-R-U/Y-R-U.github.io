@@ -96,6 +96,10 @@ const PROJECTS = [
     desc: "Super-simple mobile-first calorie & exercise tracker. Time-of-day smart suggestions, deficit projections, and live progress charts. Full accounts + SQLite sync at caltrack.br8t.com; browser-only backup here.",
     date: "2026-06-04", creator: "Opus 4.8" },
 
+  { name: "FORGE",          path: "/gms/3d/forge/",     screenshot: "forge",          type: "app",
+    desc: "Three.js graphics test bed and level editor chasing Tiny Glade-grade visuals at 60fps on a phone. Walk the town, open the settings cog, change the time of day. Soft shadows, procedural sky and materials, a flowing creek, enterable houses, plus a built-in perf HUD, scene editor and a procedural audio lab. Nothing to win — it is for exploring and testing.",
+    date: "2026-08-03", creator: "Opus 5" },
+
   // ══════════════════════════════════════════
   //  GAMES (sorted by date, oldest first)
   // ══════════════════════════════════════════
