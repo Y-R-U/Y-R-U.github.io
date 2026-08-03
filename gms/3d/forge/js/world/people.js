@@ -27,14 +27,18 @@ function faceNormal(a, b, c) {
   return [_b.x, _b.y, _b.z];
 }
 
+const NO_EYE = [0, 0, 0];
+
 class Build {
-  constructor() { this.p = []; this.n = []; this.c = []; this.k = []; this.tris = 0; }
+  constructor() { this.p = []; this.n = []; this.c = []; this.k = []; this.e = []; this.tris = 0; }
   vert(v, n) {
     this.p.push(v.p[0], v.p[1], v.p[2]);
     const q = n || v.n;
     this.n.push(q[0], q[1], q[2]);
     this.c.push(v.c[0], v.c[1], v.c[2]);
     this.k.push(v.k);
+    const e = v.e || NO_EYE;
+    this.e.push(e[0], e[1], e[2]);
   }
   tri(a, b, c) { this.vert(a); this.vert(b); this.vert(c); this.tris++; }
   quad(a, b, c, d) { this.tri(a, b, c); this.tri(a, c, d); }
@@ -46,6 +50,7 @@ class Build {
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
     g.setAttribute('aCloth', new THREE.Float32BufferAttribute(this.k, 1));
+    g.setAttribute('aEye', new THREE.Float32BufferAttribute(this.e, 3));
     return g;
   }
 }
@@ -94,60 +99,100 @@ function robe(B, seed) {
   for (let j = 0; j < SEG; j++) B.flatTri(v(0, j), v(0, j + 1), hub);
 }
 
-// mantle / jaw / brow / temple / crown. The mantle is the figure's shoulder line — it flares 22%
-// past the waist and swallows the robe's narrow neck ring whole. `dx` and `dz` sweep the peak back
-// and off to one side so the profile is a flopped cowl rather than a mitre.
+// mantle / chin / eye / brow, then a point. The mantle is the figure's shoulder line — it flares
+// 28% past the waist and swallows the robe's narrow neck ring whole. The brow ring stays wide and
+// the apex is only 12 cm above it and 14 cm behind, so the top is a cowl flopped backwards rather
+// than the mitre round 3 had.
 const HOOD = [
-  { y: 1.145, r: 0.264, sh: 0.62, ny: -0.34, dz: 0.010, dx: 0.000 },
-  { y: 1.352, r: 0.214, sh: 0.64, ny: -0.02, dz: 0.032, dx: 0.006 },
-  { y: 1.462, r: 0.194, sh: 0.74, ny: 0.16, dz: 0.018, dx: 0.010 },
-  { y: 1.566, r: 0.152, sh: 0.94, ny: 0.34, dz: -0.046, dx: 0.018 },
-  { y: 1.672, r: 0.086, sh: 1.00, ny: 0.62, dz: -0.096, dx: 0.028 },
+  { y: 1.120, r: 0.276, sh: 0.60, ny: -0.34, dz: 0.010, dx: 0.000 },
+  { y: 1.298, r: 0.234, sh: 0.66, ny: -0.05, dz: 0.030, dx: 0.006 },
+  { y: 1.418, r: 0.226, sh: 0.76, ny: 0.10, dz: 0.026, dx: 0.012 },
+  { y: 1.530, r: 0.196, sh: 0.92, ny: 0.40, dz: -0.020, dx: 0.020 },
 ];
-const MOUTH = 1;   // the one jaw→brow quad left out; the half-segment offset centres it on +z
+const APEX = [0.034, 1.652, -0.158];
 
-function hood(B, seed) {
+// The opening spans two whole bands of one 45° column. The half-segment offset in the ring puts the
+// seam between columns 1 and 2 dead on +z, so columns MOUTH and MOUTH+1 straddle the front.
+// `wx` narrows the mouth at chin and brow and leaves it wide at eye level — a vertical almond, not
+// a letterbox — and `dy` pinches its top and bottom in towards each other.
+const MOUTH = 1;
+const LIP = [null, { wx: 0.34, dy: 0.030, wz: 0.96 }, { wx: 0.70, dy: 0, wz: 0.92 },
+  { wx: 0.38, dy: -0.034, wz: 0.98 }];
+const RIM = 0.034;       // how far the fabric edge folds back into the hood before the cavity starts
+const CAVITY = 0.175;    // mouth centre to the black point at the back of the hood
+const SKY = [1.0, 1.0, 0.56, 0.22, 0.22, 0.56];   // skylight reaching each rim vertex, chin to brow
+
+function hood(B, seed, cav, eyes) {
   const rings = HOOD.map((R, i) => {
     const out = [];
     for (let j = 0; j < HSEG; j++) {
       const a = (j + 0.5) / HSEG * TAU;
       const co = Math.cos(a), si = Math.sin(a);
       const fold = Math.cos(a * 3 + seed * 2.3 + i * 0.5) * 0.05;
-      // The two lip vertices are squeezed toward the centre line and toward each other in y, which
-      // turns a 45° segment of the ring into a face-sized opening instead of a letterbox.
-      const lip = (i === 1 || i === 2) && (j === MOUTH || j === MOUTH + 1);
+      const L = (j === MOUTH || j === MOUTH + 1) ? LIP[i] : null;
       const r = R.r * (1 + fold);
       out.push({
-        p: [r * co * (lip ? 0.60 : 1) + R.dx, R.y + (lip ? (i === 1 ? 0.026 : -0.020) : 0),
-          r * si * (lip ? 0.95 : 1) + R.dz],
+        p: [r * co * (L ? L.wx : 1) + R.dx, R.y + (L ? L.dy : 0), r * si * (L ? L.wz : 1) + R.dz],
         n: [co, R.ny, si],
-        c: tone(R.sh * (1 + 1.5 * fold) * (lip ? 0.82 : 1)),
+        c: tone(R.sh * (1 + 1.5 * fold) * (L ? 0.86 : 1)),
         k: 0,
       });
     }
     return out;
   });
-  const apex = { p: [0.034, 1.734, -0.150], n: [0, 1, 0], c: tone(1.0), k: 0 };
+  const apex = { p: APEX, n: [0, 1, 0], c: tone(1.0), k: 0 };
   const under = { p: [0, HOOD[0].y, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
+  const top = rings.length - 1;
 
-  for (let i = 0; i < rings.length - 1; i++) {
+  for (let i = 0; i < top; i++) {
     for (let j = 0; j < HSEG; j++) {
-      if (i === 1 && j === MOUTH) continue;
+      if ((i === 1 || i === 2) && j === MOUTH) continue;
       B.flatQuad(rings[i][j], rings[i + 1][j], rings[i + 1][(j + 1) % HSEG], rings[i][(j + 1) % HSEG]);
     }
   }
   for (let j = 0; j < HSEG; j++) {
-    B.flatTri(rings[4][j], apex, rings[4][(j + 1) % HSEG]);
+    B.flatTri(rings[top][j], apex, rings[top][(j + 1) % HSEG]);
     B.flatTri(rings[0][j], rings[0][(j + 1) % HSEG], under);
   }
 
-  // The face is a socket, not a plate: four facets running 13 cm back to a near-black point. They
-  // keep facet normals so the cavity still has some shading gradient, but at 0.3 of the fabric's
-  // value the brightest of them stays well under the hood around it.
-  const sock = { p: [0.006, 1.408, 0.092], n: [0, -0.1, -1], c: tone(0.05), k: 0 };
-  const loop = [rings[1][MOUTH], rings[2][MOUTH], rings[2][MOUTH + 1], rings[1][MOUTH + 1]]
-    .map(v => ({ p: v.p, n: v.n, k: 0, c: [v.c[0] * 0.3, v.c[1] * 0.3, v.c[2] * 0.3] }));
-  for (let k = 0; k < 4; k++) B.flatTri(loop[k], loop[(k + 1) % 4], sock);
+  // Rim then cavity. The rim is a band of fabric folded back into the hood, so the opening has a
+  // visible edge thickness; the cavity behind it runs from the zone's interior colour at the mouth
+  // to near-black at a single point inside the skull. A flat fill here is what made round 3's face
+  // read as a decal — the darkness has to come from a gradient the eye can follow inwards.
+  const loop = [rings[1][MOUTH], rings[1][MOUTH + 1], rings[2][MOUTH + 1],
+    rings[3][MOUTH + 1], rings[3][MOUTH], rings[2][MOUTH]];
+  const C = [0, 1, 2].map(k => loop.reduce((s, v) => s + v.p[k], 0) / 6);
+  const o = new THREE.Vector3().fromArray(loop[0].p);
+  const inw = new THREE.Vector3().crossVectors(
+    new THREE.Vector3().fromArray(loop[2].p).sub(o),
+    new THREE.Vector3().fromArray(loop[4].p).sub(o)).normalize();
+
+  const step = (v, d) => [C[0] + (v.p[0] - C[0]) * 0.72 + inw.x * d,
+    C[1] + (v.p[1] - C[1]) * 0.72 + inw.y * d, C[2] + (v.p[2] - C[2]) * 0.72 + inw.z * d];
+  const lip = loop.map((v, k) => {
+    const f = 0.13 + 0.17 * SKY[k];
+    return { p: v.p, n: v.n, k: 0, c: [v.c[0] * f, v.c[1] * f, v.c[2] * f] };
+  });
+  const in3 = loop.map((v, k) => ({ p: step(v, RIM), n: v.n, k: 0, c: cav(SKY[k]) }));
+  const back = { p: [C[0] + inw.x * CAVITY, C[1] + inw.y * CAVITY, C[2] + inw.z * CAVITY],
+    n: [-inw.x, -inw.y, -inw.z], c: cav(0.10), k: 0 };
+
+  for (let k = 0; k < 6; k++) {
+    const k1 = (k + 1) % 6;
+    B.flatQuad(lip[k], in3[k], in3[k1], lip[k1]);
+    B.flatTri(in3[k], back, in3[k1]);
+  }
+
+  if (eyes) {
+    const eb = [C[0] + inw.x * 0.055, C[1] + inw.y * 0.055, C[2] + inw.z * 0.055];
+    for (const s of [-1, 1]) {
+      const v = (dx, dy, e) => ({ p: [eb[0] + dx * s, eb[1] + dy, eb[2]], n: [0, 0.2, 1],
+        c: cav(0.5), k: 0, e });
+      const t = [v(0.010, 0.004, eyes[1]), v(0.046, 0.020, eyes[1]), v(0.026, 0.034, eyes[0])];
+      if (s < 0) t.reverse();
+      B.flatTri(t[0], t[1], t[2]);
+    }
+  }
 }
 
 function tube(B, pts, radii, seg, shade, k) {
@@ -176,13 +221,31 @@ function tube(B, pts, radii, seg, shade, k) {
 // Variant 1: a shorter, stouter build off the same rings, for nothing.
 const STOUT = new THREE.Matrix4().makeScale(1.055, 0.935, 1.055);
 
+// The cavity has to land on the zones.js colour whatever the fabric is, and vertexColors multiplies
+// the material tint — so divide it back out. Every interior value is far darker than every robe, so
+// the ratio never wants to exceed 1.
+function cavityTone(zoneId) {
+  const base = robeColor(zone(zoneId).robe);
+  const inner = new THREE.Color(zone(zoneId).hood.inner);
+  const ch = (a, b) => s => Math.min(1, a * s / Math.max(b, 1e-4));
+  const r = ch(inner.r, base.r), g = ch(inner.g, base.g), b = ch(inner.b, base.b);
+  return s => [r(s), g(s), b(s)];
+}
+
+function eyeTones(zoneId) {
+  return zone(zoneId).hood.eyes.map(hex => {
+    const c = new THREE.Color(hex);
+    return [c.r, c.g, c.b];
+  });
+}
+
 function figureGeometry(zoneId, variant) {
   const B = new Build();
   const z = zone(zoneId);
   const seed = variant ? 2.15 : 0.35;
 
   robe(B, seed);
-  hood(B, seed);
+  hood(B, seed, cavityTone(zoneId), eyeTones(zoneId));
 
   if (!variant) {
     // Sleeve starts inside the body and ends on the shaft: the three parts have to overlap or the
@@ -217,6 +280,8 @@ uniform vec4 uWind;
 uniform vec4 uSelf;
 uniform float uCloth;
 attribute float aCloth;
+attribute vec3 aEye;
+varying vec3 vEye;
 #ifdef USE_INSTANCING
 attribute vec4 aInst;
 #endif
@@ -263,6 +328,7 @@ vec4 clothSelf() {
 `;
 
 const CALC = `
+  vEye = aEye;
   vec4 cSelf = clothSelf();
   vec2 cWind = clothWind();
   vec3 cOff = clothOff(position, aCloth, cSelf, cWind);
@@ -294,7 +360,11 @@ const FRAG = `#include <opaque_fragment>
   #endif
   gl_FragColor.rgb += uShade * diffuseColor.rgb * (1.0 - clamp(rNdL, 0.0, 1.0));
   float rimF = 1.0 - clamp(dot(rN, normalize(vViewPosition)), 0.0, 1.0);
-  gl_FragColor.rgb += uRimCol * pow(rimF, uRim.y) * uRim.x * clamp(rNdL * 1.8, 0.0, 1.0);`;
+  // Every facet inside the hood is seen edge-on, so an unguarded fresnel puts a white sliver in the
+  // cavity. The baked value attribute is the only thing that knows fabric from interior.
+  float rimFab = smoothstep(0.12, 0.42, dot(vColor, vec3(0.3333)));
+  gl_FragColor.rgb += uRimCol * pow(rimF, uRim.y) * uRim.x * clamp(rNdL * 1.8, 0.0, 1.0) * rimFab;
+  gl_FragColor.rgb += vEye * uEye;`;
 
 function patchVertex(shader, uniforms, withNormal) {
   Object.assign(shader.uniforms, uniforms);
@@ -309,10 +379,10 @@ function patchVertex(shader, uniforms, withNormal) {
   }
 }
 
-// zones.js tints are authored for a UI swatch. At 0.72 the light robe still clipped to a flat
-// white cutout in direct sun; 0.56 is the highest value that keeps the folds readable there, and
-// the zones stay tellable because they are 0.56 / 0.45 / 0.23 apart, not because one is white.
-const ROBE_CEIL = 0.64;
+// zones.js tints are authored for a UI swatch, and the light one blows out under a ceiling that
+// leaves the neutral one (max channel 0.61) alone. Anything above 0.61 clips only the light robe;
+// anything below clips both and collapses the value gap between the two zones.
+const ROBE_CEIL = 0.70;
 
 function robeColor(hex) {
   const c = new THREE.Color(hex);
@@ -333,7 +403,8 @@ function robeMaterial(zoneId, uniforms) {
   });
   m.onBeforeCompile = shader => {
     patchVertex(shader, uniforms, true);
-    shader.fragmentShader = 'uniform vec2 uRim;\nuniform vec3 uRimCol;\nuniform vec2 uWrap;\nuniform vec3 uShade;\n'
+    shader.fragmentShader = 'uniform vec2 uRim;\nuniform vec3 uRimCol;\nuniform vec2 uWrap;\n'
+      + 'uniform vec3 uShade;\nuniform float uEye;\nvarying vec3 vEye;\n'
       + shader.fragmentShader.replace('#include <opaque_fragment>', FRAG);
   };
   m.customProgramCacheKey = () => 'robe';
@@ -420,6 +491,7 @@ export class People {
       uRimCol: { value: new THREE.Color(0xcfd8dd) },
       uWrap: { value: new THREE.Vector2(0.4, 0.45) },
       uShade: { value: new THREE.Color(0x2f4a68).multiplyScalar(0.22) },
+      uEye: { value: 0 },
     };
 
     this.geo = {}; this.geoB = {}; this.mat = {};
@@ -591,6 +663,9 @@ export class People {
       v => { this.uniforms.uWrap.value.y = v; });
     q.register({ key: 'contactAO', label: 'Figure contact shade', type: 'range', min: 0, max: 1, step: 0.05, default: 0.8, group: 'People' },
       v => this.setAO(v));
+    // Off by design — two emissive shards per hood, colours from zones.js. Prototype only.
+    q.register({ key: 'robeEyes', label: 'Hood eyes', type: 'range', min: 0, max: 3, step: 0.1, default: 0, group: 'People' },
+      v => { this.uniforms.uEye.value = v; });
   }
 
   update(dt, app) {

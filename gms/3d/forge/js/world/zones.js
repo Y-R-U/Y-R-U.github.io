@@ -39,10 +39,14 @@ export const ZONES = {
       bush: ['#7d9569', '#99ad85', '#54694b'],
       dirt: ['#a3927a', '#c2b39a', '#7f7059'],
       sand: ['#d5c9a8', '#eae0c6', '#b3a586'],
-      rim: '#d6cd9c', density: 1.15, trees: 0.85,
+      needles: ['#6d8b6a', '#9cb790', '#2f4030'],
+      rim: '#d6cd9c', density: 1.15, trees: 0.85, conifer: 0.18,
     },
     // ── people ──
     robe: '#dedbd2', staff: 'light',
+    // `inner` is the brightest the hood cavity ever gets, just inside the rim; it falls to
+    // near-black at the back. `eyes` is [core, tail] and only shows with the robeEyes knob up.
+    hood: { inner: '#2b2d31', eyes: ['#e8f0f6', '#8fa6bb'] },
     // ── interior ──
     wood: { base: '#cbb190', dark: '#a98f6f', roughness: 0.6 },
   },
@@ -76,9 +80,11 @@ export const ZONES = {
       bush: ['#68763f', '#84915a', '#3e472a'],
       dirt: ['#8a7a58', '#a89871', '#645640'],
       sand: ['#c2b489', '#dbd0ab', '#9d9068'],
-      rim: '#c4b878', density: 1.0, trees: 1.0,
+      needles: ['#5f7448', '#8e9d6c', '#26301c'],
+      rim: '#c4b878', density: 1.0, trees: 1.0, conifer: 0.4,
     },
     robe: '#9c8a72', staff: 'pitchfork',
+    hood: { inner: '#241a11', eyes: ['#9aa84e', '#4a3418'] },
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
   },
 
@@ -112,9 +118,11 @@ export const ZONES = {
       bush: ['#3f4d3a', '#586552', '#212a20'],
       dirt: ['#4c483f', '#605b4f', '#332f29'],
       sand: ['#6e6a5c', '#877f6d', '#514d43'],
-      rim: '#7b8a65', density: 0.85, trees: 1.25,
+      needles: ['#37472f', '#5a6a4e', '#121810'],
+      rim: '#7b8a65', density: 0.85, trees: 1.25, conifer: 0.85,
     },
     robe: '#3c3a3e', staff: 'dark',
+    hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
   },
 };
