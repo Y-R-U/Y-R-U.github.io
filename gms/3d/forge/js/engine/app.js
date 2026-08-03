@@ -52,7 +52,12 @@ export class App {
       v => {
         this.renderer.shadowMap.enabled = v !== 'off';
         this.renderer.shadowMap.type = SHADOW_TYPE[v] || THREE.PCFShadowMap;
-        this.scene.traverse(o => { if (o.isLight && o.shadow) o.castShadow = v !== 'off'; });
+        // The shadow type is a #define, so every program has to be rebuilt. Without this the three
+        // soft modes were indistinguishable after boot and only `off` did anything.
+        this.scene.traverse(o => {
+          if (o.isLight && o.shadow) o.castShadow = v !== 'off';
+          if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true;
+        });
         this.renderer.shadowMap.needsUpdate = true;
       });
 

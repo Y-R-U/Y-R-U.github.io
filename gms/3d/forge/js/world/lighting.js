@@ -11,21 +11,91 @@ import { groundField } from './textures/groundfield.js';
 
 const SKY_W = 1024, SKY_H = 512;
 
+// Replaces three's fixed-radius PCF with a blocker search, so the filter radius comes from how
+// far the caster is from the receiver — contact stays tight, distance goes soft. `shadowRadius`
+// is repurposed as the growth rate (see fitShadow): it is the only per-light float three lets us
+// reach without owning every material in the scene.
+const PENUMBRA = `
+const float FORGE_MAX_DZ = 0.11;
+const float FORGE_MIN_R = 0.75;
+#define FORGE_SEARCH(px,py) d = unpackRGBAToDepth( texture2D( shadowMap, sc.xy + vec2(px,py) * s ) ); if ( d < sc.z ) { zb += d; hit += 1.0; }
+#define FORGE_TAP(px,py) sum += texture2DCompare( shadowMap, sc.xy + vec2( (px)*rc.x - (py)*rc.y, (px)*rc.y + (py)*rc.x ) * f, sc.z );
+	float forgePenumbra( sampler2D shadowMap, vec2 shadowMapSize, float grow, vec3 sc ) {
+		vec2 texel = vec2( 1.0 ) / shadowMapSize;
+		vec2 s = texel * max( 1.0, grow * FORGE_MAX_DZ );
+		float hit = 0.0, zb = 0.0, d;
+		FORGE_SEARCH( 0.0, 0.0 )
+		FORGE_SEARCH( 0.55, 0.0 )
+		FORGE_SEARCH( 0.0, 0.55 )
+		FORGE_SEARCH( -0.55, 0.0 )
+		FORGE_SEARCH( 0.0, -0.55 )
+		FORGE_SEARCH( 0.707, 0.707 )
+		FORGE_SEARCH( -0.707, 0.707 )
+		FORGE_SEARCH( -0.707, -0.707 )
+		FORGE_SEARCH( 0.707, -0.707 )
+		if ( hit < 0.5 ) return 1.0;
+		if ( hit > 8.5 ) return 0.0;
+		float r = max( FORGE_MIN_R, grow * min( sc.z - zb / hit, FORGE_MAX_DZ ) );
+		vec2 f = texel * r;
+		float ang = 6.2831853 * fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) );
+		vec2 rc = vec2( cos( ang ), sin( ang ) );
+		float sum = 0.0;
+		FORGE_TAP( 0.177, 0.000 )
+		FORGE_TAP( -0.226, 0.207 )
+		FORGE_TAP( 0.035, -0.394 )
+		FORGE_TAP( 0.285, 0.371 )
+		FORGE_TAP( -0.522, -0.093 )
+		FORGE_TAP( 0.495, -0.315 )
+		FORGE_TAP( -0.166, 0.616 )
+		FORGE_TAP( -0.315, -0.608 )
+		FORGE_TAP( 0.685, 0.250 )
+		FORGE_TAP( -0.713, 0.294 )
+		FORGE_TAP( 0.343, -0.734 )
+		FORGE_TAP( 0.254, 0.809 )
+		FORGE_TAP( -0.764, -0.443 )
+		FORGE_TAP( 0.899, -0.188 )
+		FORGE_TAP( -0.547, 0.779 )
+		FORGE_TAP( -0.127, -0.976 )
+		return sum * 0.0625;
+	}
+`;
+
+(function installPenumbra() {
+  let s = THREE.ShaderChunk.shadowmap_pars_fragment;
+  const a = s.indexOf('\t\t#if defined( SHADOWMAP_TYPE_PCF )');
+  const b = s.indexOf('\t\t#elif defined( SHADOWMAP_TYPE_VSM )');
+  const g = s.indexOf('\tfloat getShadow(');
+  if (a < 0 || b < 0 || g < 0 || a > b) return;
+  s = s.slice(0, a) +
+    '\t\t#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )\n' +
+    '\t\t\tshadow = forgePenumbra( shadowMap, shadowMapSize, shadowRadius, shadowCoord.xyz );\n' +
+    s.slice(b);
+  THREE.ShaderChunk.shadowmap_pars_fragment =
+    s.slice(0, s.indexOf('\tfloat getShadow(')) + PENUMBRA + s.slice(s.indexOf('\tfloat getShadow('));
+})();
+
 const _fwd = new THREE.Vector3(), _c = new THREE.Vector3();
 const _bx = new THREE.Vector3(), _by = new THREE.Vector3(), _bz = new THREE.Vector3();
 const _upY = new THREE.Vector3(0, 1, 0), _upZ = new THREE.Vector3(0, 0, 1);
 const _cA = new THREE.Color(), _cB = new THREE.Color(), _cC = new THREE.Color(), _cD = new THREE.Color();
 
+// `cool` is the horizon opposite the sun. Without it the dome is one colour at every azimuth, so
+// a low sun paints the whole frame the same pink and nothing has a cool side for the key to
+// disagree with.
 const LUT = [
-  { el: -0.50, zen: '#080d1c', hor: '#1a2742', gnd: '#080c16', glow: '#33456b' },
-  { el: -0.16, zen: '#161f45', hor: '#3c4370', gnd: '#131829', glow: '#7a5f92' },
-  { el: -0.02, zen: '#584a8c', hor: '#e28fa4', gnd: '#3c3244', glow: '#ff8a52' },
-  { el: 0.16, zen: '#8b7fc0', hor: '#f0a6b4', gnd: '#61504a', glow: '#ffab63' },
-  { el: 0.42, zen: '#6f9cd2', hor: '#dbe7ea', gnd: '#6d6456', glow: '#ffeed0' },
-  { el: 0.85, zen: '#5d92cd', hor: '#d2e2e8', gnd: '#71695c', glow: '#fff7e4' },
+  // Saturated but dark. Matching the night plate's *mean* luminance makes the whole frame one blue
+  // value, because that plate is a tilt-shifted miniature and ours is a wide shot — the lit windows
+  // have to stay the brightest thing in frame or it reads as a filter over a day scene.
+  { el: -0.50, zen: '#0a1442', hor: '#152356', gnd: '#070c22', glow: '#2b4478', cool: '#0a1240' },
+  { el: -0.16, zen: '#1a2758', hor: '#39406f', gnd: '#121734', glow: '#6b5480', cool: '#1c2650' },
+  { el: -0.02, zen: '#584a8c', hor: '#e28fa4', gnd: '#3c3244', glow: '#ff8a52', cool: '#4a5590' },
+  { el: 0.16, zen: '#8b7fc0', hor: '#f0a6b4', gnd: '#61504a', glow: '#ffab63', cool: '#93a3ca' },
+  { el: 0.42, zen: '#6f9cd2', hor: '#dbe7ea', gnd: '#6d6456', glow: '#ffeed0', cool: '#b7cee0' },
+  { el: 0.85, zen: '#5d92cd', hor: '#d2e2e8', gnd: '#71695c', glow: '#fff7e4', cool: '#bcd6e4' },
 ];
 const LUT_RGB = LUT.map(e => ({
   el: e.el, zen: hexRgb(e.zen), hor: hexRgb(e.hor), gnd: hexRgb(e.gnd), glow: hexRgb(e.glow),
+  cool: hexRgb(e.cool),
 }));
 
 // Key colour by elevation. Midday sits around 5500 K rather than white, so it can disagree
@@ -34,11 +104,11 @@ const LUT_RGB = LUT.map(e => ({
 // whole dusk frame brown; the reference plate's low light is a pale warm cream, so the ramp
 // desaturates rather than saturates on the way down.
 const SUN_LUT = [
-  { el: -0.05, c: 0xffcaa0 }, { el: 0.10, c: 0xffe0bc }, { el: 0.30, c: 0xffe2b8 },
-  { el: 0.55, c: 0xffe4bc }, { el: 0.80, c: 0xffe8ca },
+  { el: -0.05, c: 0xffc79a }, { el: 0.10, c: 0xffdcae }, { el: 0.30, c: 0xffdcab },
+  { el: 0.55, c: 0xffdeb0 }, { el: 0.80, c: 0xffe3bc },
 ];
 
-const MOON = 0x7fa8ff;
+const MOON = 0x8ab0ff;
 
 function lutAt(el) {
   let i = 0;
@@ -46,7 +116,7 @@ function lutAt(el) {
   const a = LUT_RGB[i], b = LUT_RGB[i + 1];
   const t = smoothstep(a.el, b.el, el);
   const mix = k => [lerp(a[k][0], b[k][0], t), lerp(a[k][1], b[k][1], t), lerp(a[k][2], b[k][2], t)];
-  return { zen: mix('zen'), hor: mix('hor'), gnd: mix('gnd'), glow: mix('glow') };
+  return { zen: mix('zen'), hor: mix('hor'), gnd: mix('gnd'), glow: mix('glow'), cool: mix('cool') };
 }
 
 function sunColorAt(el) {
@@ -68,7 +138,6 @@ export class Lighting {
     this.key.shadow.camera.near = 0.5;
     this.key.shadow.bias = -0.0004;
     this.key.shadow.normalBias = 0.022;
-    this.key.shadow.radius = 2.4;
     this.object3D.add(this.key, this.key.target);
 
     // Hemisphere, not ambient: a flat ambient tints lit and shadowed faces identically, so the
@@ -127,15 +196,15 @@ export class Lighting {
     q.register({ key: 'cloudCover', label: 'Cloud cover', type: 'range', min: 0, max: 1, step: 0.05, default: 0.38, group: 'World' },
       () => { this.dirty = true; this.apply(); });
 
-    q.register({ key: 'sunPower', label: 'Sun power', type: 'range', min: 0, max: 8, step: 0.1, default: 5.6, group: 'Light' },
+    q.register({ key: 'sunPower', label: 'Sun power', type: 'range', min: 0, max: 8, step: 0.1, default: 4.4, group: 'Light' },
       () => this.apply());
-    q.register({ key: 'envPower', label: 'Sky bounce', type: 'range', min: 0, max: 4, step: 0.01, default: 0.28, group: 'Light' },
+    q.register({ key: 'envPower', label: 'Sky bounce', type: 'range', min: 0, max: 4, step: 0.01, default: 0.58, group: 'Light' },
       () => this.apply());
-    q.register({ key: 'skyFill', label: 'Sky fill', type: 'range', min: 0, max: 1, step: 0.01, default: 0.11, group: 'Light' },
+    q.register({ key: 'skyFill', label: 'Sky fill', type: 'range', min: 0, max: 1, step: 0.01, default: 0.21, group: 'Light' },
       () => this.apply());
-    q.register({ key: 'moonPower', label: 'Moon', type: 'range', min: 0, max: 3, step: 0.02, default: 1.5, group: 'Light' },
+    q.register({ key: 'moonPower', label: 'Moon', type: 'range', min: 0, max: 6, step: 0.05, default: 2.2, group: 'Light' },
       () => this.apply());
-    q.register({ key: 'nightLift', label: 'Night lift', type: 'range', min: 0, max: 5, step: 0.02, default: 2.2, group: 'Light' },
+    q.register({ key: 'nightLift', label: 'Night lift', type: 'range', min: 0, max: 10, step: 0.05, default: 3.0, group: 'Light' },
       () => this.apply());
     q.register({ key: 'stoneVary', label: 'Stone variation', type: 'range', min: 0, max: 2, step: 0.05, default: 1, group: 'World' },
       v => setVariation(v));
@@ -158,8 +227,10 @@ export class Lighting {
       });
     q.register({ key: 'shadowDist', label: 'Shadow distance', type: 'range', min: 20, max: 200, step: 5, group: 'Renderer' },
       () => this.apply());
-    q.register({ key: 'shadowSoft', label: 'Shadow softness', type: 'range', min: 0, max: 8, step: 0.2, default: 2.2, group: 'Renderer' },
-      v => { this.key.shadow.radius = v; });
+    // metres of penumbra radius per metre between caster and receiver — the real sun is 0.009,
+    // which at village scale is invisible, so this is a storybook exaggeration
+    q.register({ key: 'shadowSoft', label: 'Shadow spread', type: 'range', min: 0, max: 0.07, step: 0.005, default: 0.05, group: 'Renderer' },
+      () => {});
 
     this.ready = true;
     this.dirty = true;
@@ -211,11 +282,14 @@ export class Lighting {
     // blue. At a low sun the sky genuinely is the pink one, and pulling the fill toward a
     // midday blue there paints the whole frame the wrong colour.
     const high = smoothstep(0.10, 0.42, el);
-    // Moonlight is desaturated, not blue. A saturated night fill paints every surface the same
-    // hue and the frame reads as a blue filter over a day scene rather than as darkness.
-    const skyTarget = _cA.setHex(0xbf9bd6).lerp(_cB.setHex(0x7fa8d8), high).lerp(_cD.setHex(0x3a4a63), this.night);
-    const gndTarget = _cC.setHex(0xb08a72).lerp(_cD.setHex(0x9d8464), high).lerp(_cB.setHex(0x1c212c), this.night);
-    const desat = lerp(lerp(0.26, 0.66, smoothstep(0.02, 0.45, el)), 0.92, this.night);
+    // The night fill has to be a saturated blue, not a neutral grey. A neutral fill preserves
+    // every albedo's own hue, which is why the shrubs used to sit in a night frame as pale green
+    // balls while the stone around them went blue — grey light times a green albedo is green.
+    // What stops it reading as a blue filter over a daylight frame is the moon key being paler
+    // and warmer than the fill, so lit faces separate from shade by hue as well as by value.
+    const skyTarget = _cA.setHex(0xc3a6d2).lerp(_cB.setHex(0xbcc8cf), high).lerp(_cD.setHex(0x2f4f9a), this.night);
+    const gndTarget = _cC.setHex(0xb8977c).lerp(_cD.setHex(0x9d8464), high).lerp(_cB.setHex(0x17244e), this.night);
+    const desat = lerp(lerp(0.30, 0.88, smoothstep(0.02, 0.45, el)), 0.92, this.night);
     this.fill.color.copy(zen).lerp(skyTarget, desat);
     this.fill.groundColor.copy(hor).lerp(gndTarget, desat * 1.1);
     // The old low-sun boost was 2.6× on the fill alone, which put enough untinted ambient in
@@ -231,7 +305,7 @@ export class Lighting {
     const vd = q.get('viewDist');
     const amt = Math.max(0, q.get('fogAmount'));
     this.app.scene.fog.color.copy(fogCol);
-    this.app.scene.fog.density = 1.6 * amt * lerp(1, 2.2, lowSun) * lerp(1, 0.45, this.night) / Math.max(40, vd);
+    this.app.scene.fog.density = 1.15 * amt * lerp(1, 2.9, lowSun) * lerp(1, 0.6, this.night) / Math.max(40, vd);
 
     windows.setNight(this.night);
     if (this.dirty) { this.drawSky(el, az); this.dirty = false; }
@@ -250,6 +324,7 @@ export class Lighting {
     // warm everywhere and shadowed faces can never read cool. Wide at dusk, where it is the only
     // cue that there is a sun in a frame whose camera is not pointing at one.
     const broad = lerp(0.05, 0.26, 1 - smoothstep(0.10, 0.40, el));
+    const counter = lerp(0.20, 0.62, 1 - smoothstep(0.04, 0.44, el));
 
     const rowRGB = new Float32Array(SKY_H * 3);
     for (let y = 0; y < SKY_H; y++) {
@@ -284,14 +359,18 @@ export class Lighting {
             b = lerp(b, lerp(sky.hor[2], 240, 0.55) * lit, m);
           }
         }
+        if (dot < 0) {
+          const cm = counter * dot * dot;
+          r = lerp(r, sky.cool[0], cm); g = lerp(g, sky.cool[1], cm); b = lerp(b, sky.cool[2], cm);
+        }
         r += sky.glow[0] * glow; g += sky.glow[1] * glow; b += sky.glow[2] * glow;
 
         // One equirect texel is ~6 screen pixels wide, so a bright star magnifies into a soft
         // disc the size of a moon. They have to stay dim enough to read as a dusting.
         if (this.night > 0.25 && e > 0.0) {
           const h = ((x * 1103515245 + y * 12345) ^ (y << 7)) >>> 0;
-          if ((h % 9973) > 9946) {
-            const s2 = 16 + (h % 46) * (h % 31 === 0 ? 2.4 : 1);
+          if ((h % 9973) > 9908) {
+            const s2 = 10 + (h % 46) * (h % 31 === 0 ? 2.0 : 0.7);
             const f = (this.night - 0.25) * 1.34 * smoothstep(0, 0.20, e);
             r += s2 * f; g += s2 * f; b += (s2 + 14) * f;
           }
@@ -355,6 +434,10 @@ export class Lighting {
     c.updateProjectionMatrix();
     // bias has to track texel size or a tight fit acnes and a loose fit peter-pans
     this.key.shadow.normalBias = Math.max(0.012, Math.min(0.03, texel * 0.3));
+    // shadowRadius is the growth rate forgePenumbra reads: blur texels per unit of normalised
+    // shadow-map depth. Dividing the world rate by the texel size is what makes the look hold
+    // when shadowMap or shadowDist changes.
+    this.key.shadow.radius = Math.min(72, (q.get('shadowSoft') ?? 0) * (c.far - c.near) / texel);
   }
 
   update(dt, app) {
