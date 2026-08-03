@@ -114,3 +114,18 @@ both images without being told which is ours. Rubric:
 | Colour discipline — limited palette, one sparing accent, no saturated primaries | 10% |
 
 Up to 3 rounds. Losing badly three times means the approach gets rethought, not that you keep sanding.
+
+### Plate hygiene
+
+The reference plates are press screenshots taken in Tiny Glade's own editor, so most of them have
+its UI in frame. A critic that can see a game toolbar stops judging the render and starts reading
+the HUD — in round 4 it named the toolbar as its evidence on both sheets, which makes every
+"identified ours" result before that unreliable. The scores still stand; the identification does not.
+
+`refs/clean/` now holds only plates that are usable: `2198150_04`, `_05`, `_08` are UI-free,
+`_03` has a corner widget that `compare.mjs` trims off **both** images. `refs/contaminated/` holds
+what was pulled and why — including `_06`, which was never a game frame at all but a screenshot of
+the colour-grade preset picker.
+
+Before adding a plate, look at it full-size and check for UI, watermarks and letterboxing. If a
+tell cannot be cropped without also cropping our render, the plate is unusable.

@@ -40,7 +40,13 @@ const left = oursLeft ? ourPath : refPath;
 const right = oursLeft ? refPath : ourPath;
 const sheet = resolve(OUT, `${shot}_r${round}.png`);
 
-const prep = 'scale=900:506:force_original_aspect_ratio=increase,crop=900:506';
+// A critic that can see the reference game's UI stops judging the render and starts reading the
+// HUD — round 4 named the toolbar as its evidence on both sheets. Plates whose UI sits in a band
+// get that band cut off BOTH images, so the crop itself can't become the next tell.
+const TRIM = { '2198150_03': 0.14 };
+const cut = TRIM[refId] || 0;
+const prep = (cut ? `crop=iw:ih*${(1 - cut).toFixed(3)}:0:0,` : '')
+  + 'scale=900:506:force_original_aspect_ratio=increase,crop=900:506';
 
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error',
   '-i', left, '-i', right,

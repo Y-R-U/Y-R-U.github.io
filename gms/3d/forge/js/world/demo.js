@@ -19,7 +19,7 @@ const SHOTS = [
   { id: 'town_night', label: 'District at night', zone: 'neutral', time: 21,
     pos: [40, 30, 46], look: [0, 4, -16], keep: 10, ref: '2198150_04' },
   { id: 'creek_day', label: 'Creek through the zones', zone: 'neutral', time: 8.5,
-    pos: [-52, 16, 80], look: [12, 1, 50], keep: 10, ref: '2198150_00' },
+    pos: [-52, 16, 80], look: [12, 1, 50], keep: 10, ref: '2198150_05' },
 ];
 
 // Working framings, not part of the critic contract. `fov` is honoured; keep this empty on a
