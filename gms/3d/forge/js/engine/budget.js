@@ -4,8 +4,9 @@ const registry = new Map();
 
 const BYTES_PER_PX = { rgba: 4, rgb: 3, r: 1 };
 
-export function track(tex, { w, h, fmt = 'rgba', mips = true, label = 'unnamed' } = {}) {
-  const base = w * h * (BYTES_PER_PX[fmt] || 4);
+// mult covers a multisampled target, which stores `samples` copies of every pixel.
+export function track(tex, { w, h, fmt = 'rgba', mips = true, mult = 1, label = 'unnamed' } = {}) {
+  const base = w * h * (BYTES_PER_PX[fmt] || 4) * mult;
   const bytes = mips ? base * 1.34 : base;
   registry.set(tex, { bytes, label, w, h });
   return tex;

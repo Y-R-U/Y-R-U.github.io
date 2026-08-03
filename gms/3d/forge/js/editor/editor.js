@@ -7,6 +7,7 @@ import { dispose } from './build.js';
 import { saveScene, clearScene, saveSlot, storageHealthy, storageError } from './store.js';
 import { buildSheet } from './ui.js';
 import { refreshPanel } from './panel.js';
+import { invalidateShadow } from '../world/lighting.js';
 
 const UNDO_DEPTH = 24;
 const MERGE_MS = 900;
@@ -187,7 +188,7 @@ class Editor {
 
   // Anything downstream that caches off the document — colliders, door hotspots — watches this.
   // Object count is not enough: a move or a rotate leaves it identical.
-  bump() { this.doc.rev = (this.doc.rev | 0) + 1; }
+  bump() { this.doc.rev = (this.doc.rev | 0) + 1; invalidateShadow(); }
 
   // Snapshot before the change. `key` merges a run of the same gesture — a drag, or a slider
   // being swept — into one undo entry instead of sixty.

@@ -74,7 +74,7 @@ const float FORGE_MIN_R = 0.75;
     s.slice(0, s.indexOf('\tfloat getShadow(')) + PENUMBRA + s.slice(s.indexOf('\tfloat getShadow('));
 })();
 
-const _fwd = new THREE.Vector3(), _c = new THREE.Vector3();
+const _fwd = new THREE.Vector3(), _c = new THREE.Vector3(), _c2 = new THREE.Vector3();
 const _bx = new THREE.Vector3(), _by = new THREE.Vector3(), _bz = new THREE.Vector3();
 const _upY = new THREE.Vector3(0, 1, 0), _upZ = new THREE.Vector3(0, 0, 1);
 const _cA = new THREE.Color(), _cB = new THREE.Color(), _cC = new THREE.Color(), _cD = new THREE.Color();
@@ -109,6 +109,16 @@ const SUN_LUT = [
 ];
 
 const MOON = 0x8ab0ff;
+
+const SHADOW_RATE = { 'every frame': 0, '30hz': 30, '15hz': 15, '10hz': 10 };
+// Fraction of the fitted radius the view is allowed to drift before the map is refitted early.
+// The fit is padded by the same fraction, so drift inside it costs texel density, not shadows.
+const DRIFT = 0.06;
+
+// Anything that moves a caster between scheduled updates calls this, or a reduced rate shows
+// the previous frame's world.
+let staleFlag = false;
+export function invalidateShadow() { staleFlag = true; }
 
 function lutAt(el) {
   let i = 0;
@@ -230,7 +240,9 @@ export class Lighting {
     // metres of penumbra radius per metre between caster and receiver — the real sun is 0.009,
     // which at village scale is invisible, so this is a storybook exaggeration
     q.register({ key: 'shadowSoft', label: 'Shadow spread', type: 'range', min: 0, max: 0.07, step: 0.005, default: 0.05, group: 'Renderer' },
-      () => {});
+      invalidateShadow);
+    q.register({ key: 'shadowRate', label: 'Shadow update', type: 'select', options: Object.keys(SHADOW_RATE), default: 'every frame', group: 'Renderer' },
+      invalidateShadow);
 
     this.ready = true;
     this.dirty = true;
@@ -248,6 +260,7 @@ export class Lighting {
 
   apply() {
     if (!this.ready) return;
+    invalidateShadow();
     const q = this.q;
     const { el, az } = this.sunAngles(this.time);
     this.elev = el;
@@ -394,24 +407,29 @@ export class Lighting {
     this.envDirty = false;
   }
 
-  // Fit the shadow camera to the bounding sphere of the view frustum out to `shadowDist`.
-  // A sphere rather than a box because it does not change size as the camera turns, which is
-  // what lets the texel snap below actually hold still.
-  fitShadow(app) {
-    const q = this.q, cam = app.camera;
+  // Centre of the sphere bounding the view frustum out to `shadowDist`, and its radius on
+  // `this.fitRadius`. A sphere rather than a box because it does not change size as the camera
+  // turns, which is what lets the texel snap in fitShadow actually hold still.
+  shadowCentre(app, out) {
+    const cam = app.camera;
     // past ~90 m one 2048 map has no texels left to spare and contact shadows turn to mush;
     // fog has taken over by then anyway
-    const far = Math.min(q.get('shadowDist') || 80, 85, cam.far);
-    const near = cam.near;
+    const far = Math.min(this.q.get('shadowDist') || 80, 85, cam.far);
     const tanY = Math.tan(cam.fov * Math.PI / 360);
     const s = tanY * tanY * (1 + cam.aspect * cam.aspect);
-
-    let z = (far + near) * (1 + s) * 0.5;
+    let z = (far + cam.near) * (1 + s) * 0.5;
     if (z > far) z = far;
-    const radius = Math.sqrt((far - z) * (far - z) + s * far * far);
+    this.fitRadius = Math.sqrt((far - z) * (far - z) + s * far * far);
+    return out.copy(cam.position).addScaledVector(cam.getWorldDirection(_fwd), z);
+  }
 
-    const fwd = cam.getWorldDirection(_fwd);
-    const centre = _c.copy(cam.position).addScaledVector(fwd, z);
+  // Aim the shadow camera at that sphere. Only ever called on a frame whose map is re-rendered —
+  // fitting without rendering leaves the map's depth from the camera's previous position.
+  fitShadow(app, pad = 1) {
+    const q = this.q;
+    const centre = this.shadowCentre(app, _c);
+    const radius = this.fitRadius * pad;
+    (this.fitAt || (this.fitAt = new THREE.Vector3())).copy(centre);
 
     const up = Math.abs(this.keyDir.y) > 0.99 ? _upZ : _upY;
     this.key.up.copy(up);
@@ -442,10 +460,29 @@ export class Lighting {
     this.key.shadow.radius = Math.min(72, (q.get('shadowSoft') ?? 0) * (c.far - c.near) / texel);
   }
 
+  // Almost nothing in the scene moves, so re-rendering the map every frame buys very little.
+  // The fit has to freeze with it — see fitShadow.
+  stepShadow(dt, app) {
+    const sm = app.renderer.shadowMap;
+    const hz = SHADOW_RATE[this.q.get('shadowRate')] || 0;
+    if (!hz) { sm.autoUpdate = true; this.fitShadow(app); return; }
+
+    sm.autoUpdate = false;
+    this.shadowWait = (this.shadowWait || 0) - dt;
+    const drifted = !this.fitAt ||
+      this.shadowCentre(app, _c2).distanceTo(this.fitAt) > this.fitRadius * DRIFT;
+    if (this.shadowWait > 0 && !drifted && !staleFlag) return;
+
+    this.shadowWait = 1 / hz;
+    staleFlag = false;
+    this.fitShadow(app, 1 + DRIFT);
+    sm.needsUpdate = true;
+  }
+
   update(dt, app) {
     if (this.dirty) { this.dirty = false; this.drawSky(this.skyEl, this.skyAz); }
     if (this.envDirty) this.refreshEnv();
-    this.fitShadow(app);
+    this.stepShadow(dt, app);
     windows.update(dt, app);
   }
 
