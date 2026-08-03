@@ -72,7 +72,9 @@ body {
 .row { display: block; margin-bottom: 9px; }
 .row > span { display: flex; justify-content: space-between; font-size: 11.5px; opacity: .8; margin-bottom: 4px; }
 .row em { font-style: normal; font-family: ui-monospace, Menlo, monospace; opacity: .7; font-variant-numeric: tabular-nums; }
-.row input[type=range] { width: 100%; accent-color: #b9721f; }
+/* the panel scrolls, so without this a drag on a slider scrolls it instead of moving the knob
+   and the value never changes */
+.row input[type=range] { width: 100%; accent-color: #b9721f; touch-action: none; }
 .row select { width: 100%; background: rgba(255,255,255,.06); color: #dfe4e6; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 4px; }
 .row:not(.range) { display: flex; align-items: center; justify-content: space-between; }
 .row:not(.range) > span { margin-bottom: 0; }
