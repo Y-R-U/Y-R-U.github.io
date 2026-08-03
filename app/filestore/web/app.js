@@ -15,7 +15,9 @@ const S = {
   // structure. Both share S.cwd as the target for new files and uploads.
   view: localStorage.getItem("fs_view") === "tree" ? "tree" : "browse",
   expanded: new Set(),  // tree view: which folders are open
-  open: null,      // { path, text, dirty }
+  open: null,      // { path, text, dirty }  — the open file
+  pages: [],       // rich-text pages belonging to the project (metadata only)
+  page: null,      // { id, name, access, html, dirty, canEdit } — the open page
   ownerFilter: "", // admin: filter projects by lead
 };
 
@@ -404,8 +406,9 @@ async function openProject(id) {
     S.project = r.project;
     S.project.canManage = r.canManage;
     S.open = null;
+    S.page = null;
     S.cwd = "";
-    await loadFiles();
+    await Promise.all([loadFiles(), loadPages()]);
     render();
   } catch (e) { toast(e.message, "bad"); }
 }
@@ -418,6 +421,11 @@ async function loadFiles() {
   // The folder being browsed may have just been deleted or renamed out from
   // under us; walk back up until we land somewhere that still exists.
   while (S.cwd && !S.dirs.includes(S.cwd)) S.cwd = parentOf(S.cwd);
+}
+
+async function loadPages() {
+  const r = await api(`/api/projects/${S.project.id}/pages`);
+  S.pages = r.pages || [];
 }
 
 /* ───────────────────────────────────────────── project workspace */
@@ -464,7 +472,9 @@ function renderProject(m) {
 
   const work = el("div", { className: "work" });
   work.style.marginTop = "14px";
-  work.append(buildTreePanel(), buildEditorPanel());
+  // Left column: the file list, with the project's pages listed under it.
+  const side = el("div", { className: "sidecol" }, buildTreePanel(), buildPagesPanel());
+  work.append(side, buildEditorPanel());
   m.append(work);
 }
 
@@ -620,6 +630,14 @@ function buildTreePanel() {
   toggle.onclick = () => setView(isTree ? "browse" : "tree");
   header.append(toggle, el("div", { className: "spacer" }));
 
+  // Pages are the lead's to create, so this sits with the other authoring
+  // buttons but appears only for them.
+  if (S.project.canManage) {
+    const addPage = el("button", { className: "btn ghost sm", textContent: "+ Page", title: "Add a page" });
+    addPage.onclick = createPageFlow;
+    header.append(addPage);
+  }
+
   if (canWrite()) {
     const add = el("button", { className: "btn ghost sm", textContent: "+ File", title: "New file here" });
     add.onclick = () => newEntry("newfile");
@@ -727,11 +745,15 @@ const TEXT_EXT = new Set([".json", ".txt", ".md", ".js", ".mjs", ".ts", ".css", 
 const isText = p => TEXT_EXT.has(extOf(p));
 
 function buildEditorPanel() {
+  // A page and a file are never open at once — both live in this panel.
+  if (S.page) return buildPageEditor();
+  pageSaveBtn = null;
+
   const panel = el("div", { className: "panel" });
   if (!S.open) {
     panel.append(el("header", {}, el("span", { textContent: "Editor" })));
     panel.append(el("div", { className: "empty", style: "border:0" },
-      "Select a file on the left to view or edit it."));
+      "Select a file or a page on the left to view or edit it."));
     return panel;
   }
 
@@ -807,16 +829,22 @@ function buildPreview(path) {
   return wrap;
 }
 
+// Both editors share the panel, so anything that replaces what's in it has to
+// clear whichever of the two is holding unsaved work.
+async function confirmDiscard() {
+  const what = S.open?.dirty ? S.open.path : S.page?.dirty ? S.page.name : null;
+  if (!what) return true;
+  return !!(await confirmDanger({
+    title: "Discard unsaved changes?",
+    warning: `“${what}” has unsaved edits.`,
+    detail: "Opening something else will discard them.",
+    confirmLabel: "Discard changes",
+  }));
+}
+
 async function openFile(path) {
-  if (S.open?.dirty) {
-    const go = await confirmDanger({
-      title: "Discard unsaved changes?",
-      warning: `“${S.open.path}” has unsaved edits.`,
-      detail: "Opening another file will discard them.",
-      confirmLabel: "Discard changes",
-    });
-    if (!go) return;
-  }
+  if (!(await confirmDiscard())) return;
+  S.page = null;
   if (!isText(path)) { S.open = { path, text: null, dirty: false }; render(); return; }
   try {
     const r = await api(`/api/projects/${S.project.id}/files?path=${encodeURIComponent(path)}&mode=text`);
@@ -927,6 +955,410 @@ async function deleteEntry(path, isDir) {
     if (S.open && (S.open.path === path || S.open.path.startsWith(path + "/"))) S.open = null;
     await loadFiles(); render(); toast("Deleted", "good");
   } catch (e) { toast(e.message, "bad"); }
+}
+
+/* ---- pages ---- */
+//
+// A page is a rich-text document stored in the database rather than on disk, so
+// it never shows up in the file list. The lead who owns the project creates,
+// renames and deletes them; each page's own access setting says what the
+// project's other users may do with it.
+
+const ACCESS = {
+  lead: { icon: "🔒", short: "Only me", label: "Only me",
+          hint: "Nobody else on the project can see this page." },
+  view: { icon: "📝", short: "Read-only", label: "Users can read",
+          hint: "Everyone with access to this project can read it, but only you can change it." },
+  edit: { icon: "📝", short: "Editable", label: "Users can read and edit",
+          hint: "Everyone with access to this project can read and change it." },
+};
+
+function buildPagesPanel() {
+  const panel = el("div", { className: "panel" });
+  const header = el("header", {},
+    el("span", { textContent: "Pages" }),
+    el("div", { className: "spacer" }));
+  if (S.pages.length) {
+    header.append(el("span", { className: "dim", style: "font-weight:400;font-size:12px",
+      textContent: `${S.pages.length} page${S.pages.length === 1 ? "" : "s"}` }));
+  }
+  panel.append(header);
+
+  const list = el("div", { className: "tree pages" });
+  if (!S.pages.length) {
+    list.append(el("div", { className: "empty", style: "padding:20px 12px;font-size:13px" },
+      S.project.canManage
+        ? "No pages yet. Use “+ Page” above the file list to add one."
+        : "No pages have been shared with you."));
+  }
+  for (const g of S.pages) {
+    const row = el("button", { className: "row" + (S.page?.id === g.id ? " on" : "") });
+    row.dataset.page = g.id;
+    row.innerHTML = `<span class="ico">${ACCESS[g.access]?.icon || "📝"}</span>
+                     <span class="nm">${esc(g.name)}</span>
+                     <span class="sz">${fmtDate(g.updatedAt)}</span>`;
+    row.onclick = () => openPage(g.id);
+    list.append(row);
+  }
+  panel.append(list);
+  return panel;
+}
+
+async function createPageFlow() {
+  if (!(await confirmDiscard())) return;
+  const name = await promptModal({
+    title: "New page", label: "Page name",
+    placeholder: "Design notes", okLabel: "Create page",
+  });
+  if (!name) return;
+  try {
+    const r = await api(`/api/projects/${S.project.id}/pages`, { method: "POST", body: { name } });
+    await loadPages();
+    S.open = null;
+    S.page = { ...r.page, dirty: false };
+    render();
+    toast(`Created “${r.page.name}”`, "good");
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+async function openPage(id) {
+  if (S.page?.id === id) return;
+  if (!(await confirmDiscard())) return;
+  try {
+    const r = await api(`/api/projects/${S.project.id}/pages/${id}`);
+    S.open = null;
+    S.page = { ...r.page, dirty: false };
+    render();
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+// Held so the editor's input handler can flip it without a re-render, which
+// would swap in a fresh contenteditable and drop the caret mid-word.
+let pageSaveBtn = null;
+
+function markPageDirty() {
+  const g = S.page;
+  if (!g || !g.canEdit || g.dirty) return;
+  g.dirty = true;
+  if (pageSaveBtn) { pageSaveBtn.disabled = false; pageSaveBtn.textContent = "Save •"; }
+}
+
+function buildPageEditor() {
+  const g = S.page;
+  const panel = el("div", { className: "panel" });
+  const header = el("header", {},
+    el("span", { className: "ico", textContent: ACCESS[g.access]?.icon || "📝" }),
+    el("span", { textContent: g.name }),
+    el("div", { className: "spacer" }));
+
+  pageSaveBtn = null;
+  if (g.canEdit) {
+    pageSaveBtn = el("button", { className: "btn primary sm", textContent: g.dirty ? "Save •" : "Save" });
+    pageSaveBtn.disabled = !g.dirty;
+    pageSaveBtn.onclick = savePage;
+    header.append(pageSaveBtn);
+  }
+  if (S.project.canManage) {
+    const share = el("button", {
+      className: "btn ghost sm", textContent: ACCESS[g.access]?.short || "Sharing",
+      title: "Who else can use this page",
+    });
+    share.onclick = sharePageFlow;
+    const ren = el("button", { className: "btn ghost sm", textContent: "Rename" });
+    ren.onclick = renamePageFlow;
+    const del = el("button", { className: "btn danger sm", textContent: "Delete" });
+    del.onclick = deletePageFlow;
+    header.append(share, ren, del);
+  }
+  const close = el("button", {
+    className: "btn ghost sm viewtoggle", textContent: "✕",
+    title: "Close this page", "aria-label": "Close this page",
+  });
+  close.onclick = async () => {
+    if (!(await confirmDiscard())) return;
+    S.page = null; render();
+  };
+  header.append(close);
+  panel.append(header);
+
+  if (g.canEdit) panel.append(buildPageToolbar());
+
+  const ed = el("div", { className: "pagedit" + (g.canEdit ? "" : " ro") });
+  ed.contentEditable = g.canEdit ? "true" : "false";
+  ed.spellcheck = true;
+  // Sanitised before it goes anywhere near the live DOM — the markup came from
+  // whoever last edited the page, not necessarily from this browser.
+  ed.innerHTML = sanitizePageHTML(g.html || "");
+  if (g.canEdit) {
+    // Left genuinely empty rather than seeded with a paragraph, so the CSS
+    // :empty placeholder shows until there's something to read.
+    if (!ed.innerHTML.trim()) ed.innerHTML = "";
+    ed.dataset.placeholder = "Start typing…";
+    ed.oninput = markPageDirty;
+    ed.onpaste = e => {
+      // Paste is the one way markup this editor can't produce gets in, so it is
+      // filtered on the way rather than left for the save to reject.
+      e.preventDefault();
+      const html = e.clipboardData.getData("text/html");
+      if (html) document.execCommand("insertHTML", false, sanitizePageHTML(html));
+      else document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
+      markPageDirty();
+    };
+    ed.onkeydown = e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); savePage(); }
+    };
+    // Tags rather than inline styles, so what the toolbar produces matches what
+    // the server will accept.
+    try { document.execCommand("styleWithCSS", false, false); } catch { /* not fatal */ }
+  }
+  panel.append(ed);
+
+  const foot = el("div", { className: "pagefoot" });
+  foot.append(el("span", { textContent: g.canEdit
+    ? `Saved ${fmtDate(g.updatedAt)}${g.updatedBy ? ` by ${g.updatedBy}` : ""}`
+    : "You can read this page but not change it." }));
+  if (S.project.canManage) foot.append(el("span", { className: "dim", textContent: ACCESS[g.access]?.hint || "" }));
+  panel.append(foot);
+  return panel;
+}
+
+const PAGE_CMDS = [
+  ["bold", "B", "Bold", "b"],
+  ["italic", "I", "Italic", "i"],
+  ["underline", "U", "Underline", "u"],
+  ["strikeThrough", "S", "Strikethrough", "s"],
+];
+
+function buildPageToolbar() {
+  const bar = el("div", { className: "ptoolbar" });
+  const add = (label, title, fn, cls = "") => {
+    const b = el("button", { className: "pbtn " + cls, textContent: label, title, type: "button" });
+    // Keep the selection: without this the button steals focus first and the
+    // command applies to nothing.
+    b.onmousedown = e => e.preventDefault();
+    b.onclick = fn;
+    bar.append(b);
+    return b;
+  };
+  for (const [cmd, label, title, cls] of PAGE_CMDS) add(label, title, () => pageCmd(cmd), "f-" + cls);
+  bar.append(el("span", { className: "psep" }));
+  add("H1", "Big heading", () => pageCmd("formatBlock", "<h1>"));
+  add("H2", "Heading", () => pageCmd("formatBlock", "<h2>"));
+  add("¶", "Normal text", () => pageCmd("formatBlock", "<p>"));
+  bar.append(el("span", { className: "psep" }));
+  add("• List", "Bulleted list", () => pageCmd("insertUnorderedList"));
+  add("1. List", "Numbered list", () => pageCmd("insertOrderedList"));
+  add("❝", "Quote", () => pageCmd("formatBlock", "<blockquote>"));
+  bar.append(el("span", { className: "psep" }));
+  add("🔗", "Add a link", pageLink);
+  add("⌫", "Remove formatting", () => pageCmd("removeFormat"));
+  return bar;
+}
+
+function pageCmd(cmd, arg) {
+  const ed = document.querySelector(".pagedit");
+  if (!ed) return;
+  ed.focus();
+  try { document.execCommand(cmd, false, arg); } catch { /* unsupported: nothing to do */ }
+  markPageDirty();
+}
+
+async function pageLink() {
+  const ed = document.querySelector(".pagedit");
+  if (!ed) return;
+  // Opening the modal moves focus out of the editor and drops the selection, so
+  // it has to be remembered and put back afterwards.
+  const sel = window.getSelection();
+  const saved = sel && sel.rangeCount && ed.contains(sel.anchorNode) ? sel.getRangeAt(0).cloneRange() : null;
+
+  const url = await promptModal({
+    title: "Add a link", label: "Link address",
+    placeholder: "https://example.com", okLabel: "Add link",
+  });
+  if (!url) return;
+  if (!safeHref(url)) {
+    toast("Links must start with https://, http:// or mailto:", "bad");
+    return;
+  }
+  ed.focus();
+  if (saved) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(saved); }
+  if (saved && !saved.collapsed) document.execCommand("createLink", false, url);
+  else document.execCommand("insertHTML", false, `<a href="${esc(url)}">${esc(url)}</a>`);
+  markPageDirty();
+}
+
+async function savePage() {
+  const g = S.page;
+  if (!g || !g.canEdit) return;
+  const ed = document.querySelector(".pagedit");
+  if (!ed) return;
+  const html = sanitizePageHTML(ed.innerHTML);
+  try {
+    const r = await api(`/api/projects/${S.project.id}/pages/${g.id}`, { method: "PUT", body: { html } });
+    g.html = html;
+    g.dirty = false;
+    if (r.page) { g.updatedAt = r.page.updatedAt; g.updatedBy = r.page.updatedBy; }
+    if (pageSaveBtn) { pageSaveBtn.disabled = true; pageSaveBtn.textContent = "Save"; }
+    // Deliberately not a re-render: it would rebuild the contenteditable and
+    // throw the caret to the top. Only the two bits of text that went stale are
+    // patched in place.
+    const listed = S.pages.find(x => x.id === g.id);
+    if (listed) listed.updatedAt = g.updatedAt;
+    const row = document.querySelector(`.pages .row[data-page="${g.id}"] .sz`);
+    if (row) row.textContent = fmtDate(g.updatedAt);
+    const foot = document.querySelector(".pagefoot span");
+    if (foot) foot.textContent = `Saved ${fmtDate(g.updatedAt)} by ${S.user.username}`;
+    toast("Page saved", "good");
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+async function renamePageFlow() {
+  const g = S.page;
+  const name = await promptModal({
+    title: "Rename page", label: "Page name", value: g.name, okLabel: "Rename",
+  });
+  if (!name || name === g.name) return;
+  try {
+    const r = await api(`/api/projects/${S.project.id}/pages/${g.id}`, { method: "PATCH", body: { name } });
+    S.page = { ...r.page, dirty: g.dirty, html: g.html };
+    await loadPages();
+    render();
+    toast("Page renamed", "good");
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+// The per-page setting that decides what the project's users may do with it.
+async function sharePageFlow() {
+  const g = S.page;
+  const choice = await modal((box, close) => {
+    box.innerHTML = `
+      <h3>Who can use “${esc(g.name)}”</h3>
+      <p>You can always read and edit your own pages. This is what everyone else
+         with access to <b>${esc(S.project.name)}</b> can do with this one.</p>
+      <div id="sp-list"></div>
+      <div class="actions"><button class="btn" id="sp-cancel">Cancel</button></div>`;
+    const list = $("#sp-list", box);
+    for (const key of ["lead", "view", "edit"]) {
+      const a = ACCESS[key];
+      const row = el("div", { className: "checkrow" });
+      const rb = el("input", { type: "radio", name: "sp", id: `sp-${key}`, checked: g.access === key });
+      rb.onchange = () => close(key);
+      row.append(rb, el("label", { htmlFor: `sp-${key}` },
+        el("b", { textContent: `${a.icon} ${a.label}` }),
+        el("span", { className: "dim", style: "display:block;font-size:12.5px", textContent: a.hint })));
+      list.append(row);
+    }
+    $("#sp-cancel", box).onclick = () => close(null);
+  });
+  if (!choice || choice === g.access) return;
+  try {
+    const r = await api(`/api/projects/${S.project.id}/pages/${g.id}`, { method: "PATCH", body: { access: choice } });
+    S.page = { ...r.page, dirty: g.dirty, html: g.html };
+    await loadPages();
+    render();
+    toast(`“${g.name}” — ${ACCESS[choice].label.toLowerCase()}`, "good");
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+async function deletePageFlow() {
+  const g = S.page;
+  const ok = await confirmDanger({
+    title: `Delete “${g.name}”`,
+    warning: "This page and everything written on it will be deleted.",
+    detail: "Pages aren't in the project's .zip, so there's no backup copy — copy anything you need out first.",
+    confirmLabel: "Delete page",
+  });
+  if (!ok) return;
+  try {
+    await api(`/api/projects/${S.project.id}/pages/${g.id}`, { method: "DELETE" });
+    S.page = null;
+    await loadPages();
+    render();
+    toast("Page deleted", "good");
+  } catch (e) { toast(e.message, "bad"); }
+}
+
+/* ---- page markup filter ---- */
+
+// What the editor is allowed to produce. Anything else is unwrapped (its words
+// are kept, its tag is dropped); the few tags that would carry code with them
+// are removed outright.
+const PAGE_TAGS = new Set(["P", "BR", "DIV", "SPAN", "B", "STRONG", "I", "EM", "U", "S",
+  "STRIKE", "DEL", "H1", "H2", "H3", "UL", "OL", "LI", "BLOCKQUOTE", "PRE", "CODE", "A", "HR"]);
+const PAGE_DROP = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE",
+  "LINK", "META", "NOSCRIPT", "SVG", "MATH", "CANVAS", "AUDIO", "VIDEO", "IMG", "INPUT",
+  "BUTTON", "SELECT", "TEXTAREA"]);
+
+// Word and Google Docs paste inline styles instead of tags; mapping them back
+// keeps the formatting the user can see rather than stripping it on save.
+const STYLE_TAGS = [
+  [/font-weight\s*:\s*(bold|[6-9]00)/i, "b"],
+  [/font-style\s*:\s*italic/i, "i"],
+  [/text-decoration[^;]*underline/i, "u"],
+  [/text-decoration[^;]*line-through/i, "s"],
+];
+
+function safeHref(v) {
+  // Browsers ignore control characters inside a URL, so "java\nscript:" has to
+  // be judged with them removed.
+  const s = String(v).replace(/[\u0000-\u0020]/g, "").toLowerCase();
+  return /^(https?:\/\/|mailto:|[/#])/.test(s);
+}
+
+// Filters page markup against the allow-list above. Run on load, on paste and
+// again before saving. DOMParser builds an inert document, so nothing in the
+// markup can run while it is being cleaned.
+function sanitizePageHTML(html) {
+  const doc = new DOMParser().parseFromString("<body>" + String(html || ""), "text/html");
+
+  const walk = node => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 3) continue;                       // text
+      if (child.nodeType !== 1) { child.remove(); continue; }   // comments, PIs
+      const tag = child.tagName.toUpperCase();
+
+      if (PAGE_DROP.has(tag)) { child.remove(); continue; }
+      if (!PAGE_TAGS.has(tag)) {
+        // Unknown but harmless (tables, fonts, headers from a paste): keep the
+        // words, drop the tag.
+        walk(child);
+        const frag = doc.createDocumentFragment();
+        while (child.firstChild) frag.append(child.firstChild);
+        child.replaceWith(frag);
+        continue;
+      }
+
+      const style = child.getAttribute("style") || "";
+      const wraps = STYLE_TAGS.filter(([re]) => re.test(style)).map(([, t]) => t);
+      for (const a of [...child.attributes]) {
+        const keep = tag === "A" && a.name.toLowerCase() === "href" && safeHref(a.value);
+        if (!keep) child.removeAttribute(a.name);
+      }
+      if (tag === "A") {
+        if (!child.getAttribute("href")) {
+          // A link with nothing usable left on it is just text.
+          walk(child);
+          const frag = doc.createDocumentFragment();
+          while (child.firstChild) frag.append(child.firstChild);
+          child.replaceWith(frag);
+          continue;
+        }
+        child.setAttribute("target", "_blank");
+        child.setAttribute("rel", "noopener noreferrer");
+      }
+      walk(child);
+
+      if (wraps.length) {
+        const outer = doc.createElement(wraps[0]);
+        let inner = outer;
+        for (const t of wraps.slice(1)) { const n = doc.createElement(t); inner.append(n); inner = n; }
+        while (child.firstChild) inner.append(child.firstChild);
+        child.append(outer);
+      }
+    }
+  };
+  walk(doc.body);
+  return doc.body.innerHTML;
 }
 
 /* ---- uploads ---- */
@@ -1372,7 +1804,7 @@ async function renderAdmin(m) {
 
 // Guard against losing edits to a stray refresh or back-navigation.
 window.addEventListener("beforeunload", e => {
-  if (S.open?.dirty) { e.preventDefault(); e.returnValue = ""; }
+  if (S.open?.dirty || S.page?.dirty) { e.preventDefault(); e.returnValue = ""; }
 });
 
 boot().catch(() => showLogin());

@@ -22,6 +22,8 @@ DB `/srv/data/filestore/filestore.db` · files `/srv/data/filestore/files/p<id>/
 | Create / delete **projects** | — | ✅ (their own) | — |
 | Grant project access | — | ✅ | — |
 | Upload / edit / delete files | — | ✅ | ✅ (granted projects) |
+| Create / rename / delete **pages** | — | ✅ | — |
+| Read / edit page contents | 👁 read-only | ✅ | per page (see *Pages*) |
 | See all projects + disk usage | ✅ (read-only) | own only | granted only |
 | Change storage limits | ✅ | — | — |
 
@@ -47,6 +49,42 @@ journal once:
 ssh br8t 'sudo journalctl -u filestore | grep one-time'
 ```
 
+## Pages
+
+A **page** is a rich-text document that belongs to a project but is not a file:
+it lives in SQLite, never on disk, so it doesn't appear in the file listing, the
+`.zip` export or the storage figures. Notes, briefs and to-do lists go here;
+the add-on's actual contents stay in files.
+
+"+ Page" sits next to "+ File" above the file list, and the project's pages are
+listed in their own box underneath it. Clicking one opens it where the file
+editor goes, with a toolbar for bold, italic, underline, strikethrough,
+headings, lists, quotes and links.
+
+Only the **lead who owns the project** can create, rename or delete a page.
+Each page then carries its own setting for what everyone else with access to
+that project may do with it:
+
+| Setting | Project's users can |
+|---|---|
+| Only me | nothing — the page isn't listed for them at all |
+| Users can read | open and read it |
+| Users can read and edit | open, read and change it |
+
+New pages start at *Users can read*. Admin can read pages for oversight but,
+as everywhere else, cannot write them.
+
+Limits: 200 pages per project, 256 KB per page.
+
+**Markup is allow-listed twice.** Saved pages are rendered back into the app on
+this origin, so a page that carried a `<script>` or a `javascript:` link would be
+a stored XSS. The editor filters what it sends (`sanitizePageHTML` in `app.js`,
+which also rewrites pasted inline styles back into `<b>`/`<i>`/`<u>` so pasting
+from Word keeps its formatting), and the server refuses anything outside the
+same allow-list (`validatePageHTML` in `pages.go`). Neither side trusts the
+other: content posted straight at the API is rejected, and content already in
+the database is cleaned again before it is displayed.
+
 ## Storage limits
 
 Three admin-tunable numbers (Server tab, or `/api/admin/settings`):
@@ -67,6 +105,7 @@ main.go       routing, bootstrap, session + password endpoints
 auth.go       bcrypt, sessions, role middleware
 db.go         schema, settings, user/project queries, audit log
 projects.go   project CRUD, file CRUD, upload, zip in/out
+pages.go      rich-text pages: CRUD, per-page access, markup allow-list
 users.go      user management, project membership, admin settings + stats
 storage.go    path safety, quota accounting, disk writes, zip, reindex
 web/          index.html + app.css + app.js (embedded in the binary)
@@ -93,8 +132,8 @@ Everything under `web/` is `go:embed`-ed, so the binary is the whole deployment.
 
 ## Deploy
 
-Go isn't on the laptop and the laptop is arm64 while the box is amd64, so the
-build happens **on the box** (same pattern as `caltrack` / `vpstats`):
+The laptop is arm64 while the box is amd64, so the build happens **on the box**
+(same pattern as `caltrack` / `vpstats`):
 
 ```
 cd ~/cc/yru/site/app/filestore && ./deploy.sh
@@ -106,7 +145,8 @@ vhost at `127.0.0.1:8005` → restarts → health-checks.
 ## Tests
 
 `test.sh` runs the real binary against a throwaway data dir and covers every
-role boundary, quota, traversal vector and the zip round-trip — 88 assertions.
+role boundary, quota, traversal vector, page permission and the zip
+round-trip — 144 assertions.
 
 ```
 rsync -az test.sh br8t:/tmp/ && ssh br8t 'bash /tmp/test.sh /srv/apps/filestore/filestore'
@@ -147,7 +187,8 @@ live `.db` without its `-wal` can restore as a corrupt or stale database, so
 don't "simplify" that into an `rsync`. To restore, stop the service, unpack the
 archive over `/srv/data/filestore/`, and start it again.
 
-Each project can also be downloaded as a `.zip` from its own page.
+Each project can also be downloaded as a `.zip` from its own page. Pages are
+not in it — they live in the database, which the backup snapshots.
 
 **If the file index ever drifts from disk** (restored files, manual edits),
 the owning lead or admin can `POST /api/projects/<id>/reindex` to rebuild it by

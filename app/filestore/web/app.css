@@ -212,6 +212,63 @@ td.right, th.right { text-align: right; }
 .tree .row .sz { color: var(--fg-faint); font-size: 11.5px; }
 .tree .ico { width: 15px; text-align: center; opacity: .85; flex: none; }
 
+/* Left column of the workspace: the file list, with the pages list under it. */
+.sidecol { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.tree.pages { max-height: 34vh; }
+
+/* ───────────────────────────────────────────────────── page editor */
+
+.ptoolbar {
+  display: flex; align-items: center; gap: 3px; flex-wrap: wrap;
+  padding: 7px 10px; border-bottom: 1px solid var(--line); background: var(--bg);
+  position: sticky; top: 0; z-index: 1;
+}
+.pbtn {
+  font: inherit; font-size: 13px; line-height: 1;
+  min-width: 30px; padding: 7px 8px; border-radius: 7px;
+  background: none; border: 1px solid transparent; color: var(--fg-dim); cursor: pointer;
+}
+.pbtn:hover { background: var(--bg-3); color: var(--fg); border-color: var(--line-2); }
+.pbtn.f-b { font-weight: 800; }
+.pbtn.f-i { font-style: italic; }
+.pbtn.f-u { text-decoration: underline; }
+.pbtn.f-s { text-decoration: line-through; }
+.psep { width: 1px; height: 18px; background: var(--line-2); margin: 0 5px; flex: none; }
+
+.pagedit {
+  min-height: 52vh; max-height: 72vh; overflow: auto;
+  padding: 20px 22px; background: var(--bg-2); outline: none;
+  font-size: 15px; line-height: 1.65;
+}
+.pagedit.ro { background: var(--bg-2); color: var(--fg); }
+.pagedit:focus { outline: none; }
+/* An empty page would collapse to nothing without a prompt to type into. */
+.pagedit[data-placeholder]:empty::before,
+.pagedit[data-placeholder] > p:only-child:empty::before {
+  content: attr(data-placeholder); color: var(--fg-faint);
+}
+.pagedit > :first-child { margin-top: 0; }
+.pagedit p { margin: 0 0 12px; }
+.pagedit h1 { font-size: 25px; margin: 22px 0 10px; letter-spacing: -.4px; }
+.pagedit h2 { font-size: 20px; margin: 20px 0 9px; letter-spacing: -.2px; }
+.pagedit h3 { font-size: 17px; margin: 18px 0 8px; }
+.pagedit ul, .pagedit ol { margin: 0 0 12px; padding-left: 26px; }
+.pagedit li { margin-bottom: 4px; }
+.pagedit blockquote {
+  margin: 0 0 12px; padding: 4px 0 4px 14px;
+  border-left: 3px solid var(--line-2); color: var(--fg-dim);
+}
+.pagedit pre { background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+               padding: 12px; overflow: auto; font-family: var(--mono); font-size: 13px; }
+.pagedit code { font-family: var(--mono); font-size: 13.5px; background: var(--bg); padding: 1px 5px; border-radius: 5px; }
+.pagedit hr { border: 0; border-top: 1px solid var(--line-2); margin: 20px 0; }
+
+.pagefoot {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between;
+  padding: 9px 14px; border-top: 1px solid var(--line);
+  background: var(--bg-3); color: var(--fg-faint); font-size: 12.5px;
+}
+
 .editor { width: 100%; min-height: 58vh; resize: vertical;
           font-family: var(--mono); font-size: 13px; line-height: 1.6;
           background: #0b0e13; border-radius: 0; border: 0; padding: 14px; }

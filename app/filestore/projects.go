@@ -249,6 +249,8 @@ func handleProjectSub(w http.ResponseWriter, r *http.Request, u *User) {
 		handleImportZip(w, r, u, p)
 	case "members":
 		handleMembers(w, r, u, p)
+	case "pages":
+		handlePages(w, r, u, p, parts[2:])
 	case "reindex":
 		// Maintenance, not authoring: the owning lead or an admin may heal a
 		// drifted index.
@@ -353,6 +355,7 @@ func deleteProject(w http.ResponseWriter, u *User, p *Project) {
 	// Cascades depend on foreign_keys being on; delete explicitly so the rows
 	// go regardless of pragma state.
 	db.Exec(`DELETE FROM files WHERE project_id=?`, p.ID)
+	db.Exec(`DELETE FROM pages WHERE project_id=?`, p.ID)
 	db.Exec(`DELETE FROM project_members WHERE project_id=?`, p.ID)
 	// Past the point of no return; the bytes can go. A failure here only leaves
 	// an orphaned .trash directory for an operator to sweep.

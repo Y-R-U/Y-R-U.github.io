@@ -279,6 +279,91 @@ r=$(req lead POST "/api/projects/$PID/members" "{\"userId\":$UID2,\"granted\":fa
 r=$(req bob GET /api/projects)
 checkno "access can be revoked" "$r" 'My Addon'
 
+head1 "pages"
+req lead POST "/api/projects/$PID/members" "{\"userId\":$UID2,\"granted\":true}" >/dev/null
+
+c=$(code bob POST "/api/projects/$PID/pages" '{"name":"Bobs page"}')
+check "user CANNOT create a page" "$c" "403"
+r=$(req lead POST "/api/projects/$PID/pages" '{"name":"Design notes"}')
+check "lead creates a page"                 "$r" '"name":"Design notes"'
+check "pages start readable by the project" "$r" '"access":"view"'
+GID=$(echo "$r" | jget "['page']['id']")
+r=$(req lead POST "/api/projects/$PID/pages" '{"name":"   "}')
+check "empty page names are refused" "$r" '1-80'
+
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>Hello <b>world</b></p>"}')
+check "lead writes page content" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/pages/$GID")
+# Go's JSON encoder escapes angle brackets, so the tags come back as <…
+check "page content round-trips" "$r" '\u003cb\u003eworld\u003c/b\u003e'
+r=$(req lead GET "/api/projects/$PID/pages")
+check "the list carries names"          "$r" 'Design notes'
+checkno "the list leaves out the body"  "$r" 'Hello '
+
+head1 "pages: markup allow-list"
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>hi</p><script>alert(1)</script>"}')
+check "script tags are refused"        "$r" "doesn't support"
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<p onclick=\"steal()\">hi</p>"}')
+check "event handlers are refused"     "$r" "doesn't support"
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<a href=\"javascript:alert(1)\">x</a>"}')
+check "javascript: links are refused"  "$r" "doesn't allow"
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<a href=\"java\nscript:alert(1)\">x</a>"}')
+check "a split javascript: scheme is refused too" "$r" "doesn't allow"
+r=$(req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<a href=\"https://example.com\" target=\"_blank\" rel=\"noopener noreferrer\">ok</a>"}')
+check "a normal link is accepted"      "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/pages/$GID")
+checkno "the refused markup never landed" "$r" 'alert(1)'
+req lead PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>Hello <b>world</b></p>"}' >/dev/null
+
+head1 "pages: per-page access"
+r=$(req bob GET "/api/projects/$PID/pages/$GID")
+check "a shared page is readable by a project user" "$r" 'Hello '
+check "read-only sharing says so"                   "$r" '"canEdit":false'
+c=$(code bob PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>bob was here</p>"}')
+check "a read-only page refuses a user's edit" "$c" "403"
+
+r=$(req lead PATCH "/api/projects/$PID/pages/$GID" '{"access":"edit"}')
+check "lead can open a page up for editing" "$r" '"access":"edit"'
+r=$(req bob PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>bob was here</p>"}')
+check "the user can now edit it" "$r" '"ok":true'
+
+r=$(req lead PATCH "/api/projects/$PID/pages/$GID" '{"access":"lead"}')
+check "lead can make a page private" "$r" '"access":"lead"'
+c=$(code bob GET "/api/projects/$PID/pages/$GID")
+check "a private page is invisible to the user" "$c" "404"
+r=$(req bob GET "/api/projects/$PID/pages")
+checkno "and is left out of their page list" "$r" 'Design notes'
+req lead PATCH "/api/projects/$PID/pages/$GID" '{"access":"view"}' >/dev/null
+
+c=$(code bob PATCH "/api/projects/$PID/pages/$GID" '{"access":"edit"}')
+check "a user CANNOT re-share a page"  "$c" "403"
+c=$(code bob DELETE "/api/projects/$PID/pages/$GID")
+check "a user CANNOT delete a page"    "$c" "403"
+
+r=$(req admin GET "/api/projects/$PID/pages/$GID")
+check "admin can read pages for oversight" "$r" 'Design notes'
+check "admin is read-only on pages"        "$r" '"canEdit":false'
+c=$(code admin PUT "/api/projects/$PID/pages/$GID" '{"html":"<p>admin</p>"}')
+check "admin CANNOT edit a page"    "$c" "403"
+c=$(code admin POST "/api/projects/$PID/pages" '{"name":"Admin page"}')
+check "admin CANNOT create a page"  "$c" "403"
+c=$(code admin DELETE "/api/projects/$PID/pages/$GID")
+check "admin CANNOT delete a page"  "$c" "403"
+
+# A page id from another project must not be reachable through this one's URL.
+r=$(req lead POST /api/projects '{"name":"Page Neighbour"}')
+PID3=$(echo "$r" | jget "['project']['id']")
+c=$(code lead GET "/api/projects/$PID3/pages/$GID")
+check "a page id is scoped to its own project" "$c" "404"
+req lead DELETE "/api/projects/$PID3" >/dev/null
+
+r=$(req lead DELETE "/api/projects/$PID/pages/$GID")
+check "lead deletes a page" "$r" '"ok":true'
+r=$(req lead GET "/api/projects/$PID/pages")
+checkno "the deleted page is gone" "$r" 'Design notes'
+
+r=$(req lead POST "/api/projects/$PID/members" "{\"userId\":$UID2,\"granted\":false}")
+
 head1 "admin oversight"
 r=$(req admin GET /api/projects)
 check "admin sees every project"      "$r" 'My Addon'

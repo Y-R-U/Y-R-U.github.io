@@ -2,8 +2,8 @@
 # Deploy filestore (files.br8t.com) to the br8t VPS: sync source, build on the
 # box, install the systemd unit, point the Caddy vhost at it, restart.
 #
-# The laptop is arm64 and has no Go, so the build happens on the box — same
-# pattern as caltrack/vpstats. See ../ionos.readme.txt.
+# The laptop is arm64 and the box is amd64, so the build happens on the box —
+# same pattern as caltrack/vpstats. See ../ionos.readme.txt.
 set -euo pipefail
 
 HOST="${HOST:-br8t}"

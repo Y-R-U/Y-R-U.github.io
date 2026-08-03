@@ -57,6 +57,22 @@ CREATE TABLE IF NOT EXISTS files (
   UNIQUE (project_id, path)
 );
 
+-- Rich-text pages. Unlike files these live only here: a page belongs to the
+-- project but is never written to disk, so it stays out of the file listing,
+-- the zip export and the quota. The access column says what the project's users
+-- (not its lead, who always has both) may do: 'lead' hides it from them,
+-- 'view' lets them read it, 'edit' lets them write it too.
+CREATE TABLE IF NOT EXISTS pages (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id  INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name        TEXT NOT NULL,
+  html        TEXT NOT NULL DEFAULT '',
+  access      TEXT NOT NULL DEFAULT 'view' CHECK (access IN ('lead','view','edit')),
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL,
+  updated_by  INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS sessions (
   token      TEXT PRIMARY KEY,
   user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -80,6 +96,7 @@ CREATE TABLE IF NOT EXISTS audit (
 );
 
 CREATE INDEX IF NOT EXISTS idx_files_project  ON files(project_id);
+CREATE INDEX IF NOT EXISTS idx_pages_project  ON pages(project_id);
 CREATE INDEX IF NOT EXISTS idx_members_user   ON project_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_at       ON audit(at DESC);
 `
