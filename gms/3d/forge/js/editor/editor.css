@@ -27,6 +27,23 @@
 .ed-tabs button.on { color: #f0d2ac; border-bottom-color: #b9721f; }
 .ed-tabs .ed-close { flex: 0 0 44px; font-size: 15px; }
 
+.ed-bar:empty { display: none; }
+.ed-bar { flex: 0 0 auto; padding: 8px 12px 0; }
+.ed-note, .ed-warn, .ed-ask {
+  border-radius: 6px; padding: 9px 10px; font-size: 12.5px; line-height: 1.45;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+}
+.ed-note { display: flex; align-items: center; gap: 8px; }
+.ed-note span { flex: 1 1 auto; }
+.ed-note button {
+  flex: 0 0 34px; min-height: 34px; cursor: pointer;
+  background: none; border: 0; color: #8d979b; font-size: 14px;
+}
+.ed-warn { background: rgba(232,112,90,.14); border-color: rgba(232,112,90,.45); color: #f2b7a6; }
+.ed-ask { background: rgba(185,114,31,.16); border-color: rgba(185,114,31,.5); color: #f0d2ac; }
+.ed-ask p { margin-bottom: 9px; }
+.ed-ask .ed-acts button { min-height: 44px; }
+
 .ed-body { flex: 1 1 auto; overflow-y: auto; padding: 2px 12px 14px; -webkit-overflow-scrolling: touch; }
 .ed-grp { padding-top: 12px; }
 .ed-grp + .ed-grp { border-top: 1px solid rgba(255,255,255,.07); margin-top: 10px; }

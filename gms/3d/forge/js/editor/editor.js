@@ -4,14 +4,15 @@
 import * as THREE from 'three';
 import { footprint, tall, typeBox, makeObject, districtFor, newSeed } from './scene.js';
 import { dispose } from './build.js';
-import { saveScene, clearScene, saveSlot, storageHealthy } from './store.js';
+import { saveScene, clearScene, saveSlot, storageHealthy, storageError } from './store.js';
 import { buildSheet } from './ui.js';
+import { refreshPanel } from './panel.js';
 
 const UNDO_DEPTH = 24;
-// Touch slop, not mouse slop. A deliberate thumb tap drifts 16-24 px and can take a second;
-// only movement decides whether a press was a tap.
-const TAP_SLOP = 16;
 const MERGE_MS = 900;
+// A press is a tap until the finger has travelled this far — there is deliberately no time
+// limit, because a slow careful thumb tap is still a tap. A mouse is steady and gets far less.
+const MOUSE_SLOP = 4;
 
 export function buildEditor(app, demo, controls) {
   return new Editor(app, demo, controls);
@@ -24,9 +25,11 @@ class Editor {
     this.controls = controls;
     this.builder = demo.builder;
     this.doc = demo.doc;
+    this.on = false;
     this.selected = null;
     this.live = null;
     this.armed = null;
+    this.press = null;
     this.undoStack = [];
     this.redoStack = [];
     this.saveOk = true;
@@ -39,8 +42,16 @@ class Editor {
     this.ghost = outline(0x7fd6a0);
     app.scene.add(this.gizmo, this.ghost);
 
+    app.quality.register({
+      key: 'tapSlop', label: 'Tap slop', group: 'Editor',
+      type: 'range', min: 6, max: 44, step: 1, default: 18,
+    }, v => { this.slop = v; });
+    refreshPanel();
+
     this.ui = buildSheet(this);
     this.bindPointer();
+    addEventListener('pagehide', () => this.flush());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.flush(); });
     window.__forge.editor = this;
     this.reportLoad(demo.loadReport);
   }
@@ -54,7 +65,9 @@ class Editor {
       if (on) this.playerWas = player.enabled;
       player.enabled = on ? false : (this.playerWas ?? player.enabled);
     }
-    if (!on) { this.deselect(); this.armed = null; this.hideGhost(); }
+    this.abortPress();
+    if (!on) { this.deselect(); this.armed = null; this.question = null; this.hideGhost(); }
+    this.armNotice();
     this.syncGizmo();
     this.ui.sync();
   }
@@ -73,12 +86,19 @@ class Editor {
 
   flash(text) {
     this.notice = text;
-    clearTimeout(this.noticeTimer);
-    this.noticeTimer = setTimeout(() => { this.notice = null; this.ui.sync(); }, 8000);
+    this.armNotice();
     this.ui.sync();
   }
 
-  ask(text, onYes) { this.question = { text, onYes }; this.ui.sync(); }
+  // The sheet is the only place a notice is visible, so a notice raised while it is shut — the
+  // load report, mostly — waits instead of expiring unseen.
+  armNotice() {
+    clearTimeout(this.noticeTimer);
+    if (!this.notice || !this.on) return;
+    this.noticeTimer = setTimeout(() => { this.notice = null; this.ui.sync(); }, 8000);
+  }
+
+  ask(text, onYes, yes = 'Yes') { this.question = { text, onYes, yes }; this.ui.sync(); }
 
   answer(yes) {
     const q = this.question;
@@ -183,9 +203,15 @@ class Editor {
     this.saveTimer = setTimeout(() => this.saveNow(), 250);
   }
 
+  // Switching apps on a phone can end the page outright, and a debounced save is the one edit
+  // that would not have landed.
+  flush() { if (this.saveTimer) this.saveNow(); }
+
   saveNow() {
     clearTimeout(this.saveTimer);
+    this.saveTimer = 0;
     const ok = saveScene(this.doc);
+    // a failure raises the standing bar in the sheet rather than a notice, which would time out
     if (ok !== this.saveOk) { this.saveOk = ok; this.ui.sync(); }
     return ok;
   }
@@ -235,6 +261,7 @@ class Editor {
     this.placeLive();
     this.syncGizmo();
     this.saveSoon();
+    this.soon(false);
   }
 
   setParam(key, value) {
@@ -243,8 +270,19 @@ class Editor {
     this.mutate(`p${o.id}.${key}`);
     o.p[key] = value;
     this.saveSoon();
+    this.soon(true);
+  }
+
+  // Rebuilding the live copy costs a few ms and its contact collar about one; a slider sweep
+  // asks for both sixty times a second, so they collapse to one pass per frame.
+  soon(live) {
+    this.wantLive = this.wantLive || live;
     if (this.pendingLive) return;
-    this.pendingLive = requestAnimationFrame(() => { this.pendingLive = 0; this.refreshLive(); });
+    this.pendingLive = requestAnimationFrame(() => {
+      this.pendingLive = 0;
+      if (this.wantLive) { this.wantLive = false; this.refreshLive(); }
+      this.builder.refreshDecals(this.aoOpacity());
+    });
   }
 
   setZone(zoneId) {
@@ -290,6 +328,7 @@ class Editor {
     o.x = from.x; o.z = from.z; o.dist = from.dist;
     this.placeLive();
     this.syncGizmo();
+    this.builder.refreshDecals(this.aoOpacity());
     this.mergeKey = null;
     this.saveNow();
   }
@@ -306,7 +345,7 @@ class Editor {
     this.builder.refreshDecals(this.aoOpacity());
     this.saveNow();
     this.syncGizmo();
-    this.ui.sync();
+    this.flash('Deleted. Undo is in the Scene tab.');
   }
 
   duplicate() {
@@ -329,14 +368,20 @@ class Editor {
 
   // Roads, the creek crossing and the foliage are baked into the terrain at boot, so swapping
   // the whole scene goes through a reload rather than pretending it can be done live.
-  swapScene(doc, label = 'load') {
-    saveSlot(`Before ${label}`, this.doc);
-    if (!saveScene(doc)) return this.flash('Not loaded — storage is full, and the current scene would have been lost.');
+  swapScene(doc, label = 'load', force = false) {
+    if (!force && !saveSlot(`Before ${label}`, this.doc)) {
+      return this.ask(`The backup copy of this scene could not be saved — ${storageError()}. Continue and lose it?`,
+        () => this.swapScene(doc, label, true), 'Continue');
+    }
+    if (!saveScene(doc)) return this.flash(`Not loaded — ${storageError()}. This scene is untouched.`);
     location.reload();
   }
 
-  resetToDemo() {
-    saveSlot('Before reset', this.doc);
+  resetToDemo(force = false) {
+    if (!force && !saveSlot('Before reset', this.doc)) {
+      return this.ask(`The backup copy of this scene could not be saved — ${storageError()}. Reset anyway and lose it?`,
+        () => this.resetToDemo(true), 'Reset anyway');
+    }
     clearScene();
     location.reload();
   }
@@ -365,36 +410,54 @@ class Editor {
 
   setOrbit(on) { if (this.controls) this.controls.enabled = on; }
 
+  // A gesture that was interrupted — the editor closing, iOS taking the touch for its back
+  // swipe — has usually already written to the object. Putting it back is the only outcome
+  // that neither loses nor invents work.
+  abortPress() {
+    const p = this.press;
+    if (!p) return;
+    this.press = null;
+    this.hideGhost();
+    this.setOrbit(true);
+    if (!p.drag) return;
+    this.revert(p.from);
+    this.undoStack.length = Math.min(this.undoStack.length, p.undoAt);
+  }
+
   bindPointer() {
     const el = this.app.renderer.domElement;
-    // Only the pointer that started the gesture may finish it. Without this a second thumb
-    // commits the first one's drag, and an armed placement lands under the wrong finger.
-    let down = null;
-    const mine = e => down && e.pointerId === down.id;
+    // Only the pointer that started the gesture may move or finish it. Without this a second
+    // thumb commits the first one's drag, and an armed placement lands under the wrong finger.
+    const mine = e => this.press && e.pointerId === this.press.id;
     const grab = e => { try { el.setPointerCapture(e.pointerId); } catch { /* synthetic pointer */ } };
 
     el.addEventListener('pointerdown', e => {
-      if (!this.on || down || e.button > 0 || !e.isPrimary) return;
-      down = { id: e.pointerId, x: e.clientX, y: e.clientY, hit: null, drag: false, place: false };
+      if (!this.on || this.press || e.button > 0 || !e.isPrimary) return;
+      const p = {
+        id: e.pointerId, x: e.clientX, y: e.clientY,
+        slop: e.pointerType === 'mouse' ? MOUSE_SLOP : this.slop,
+        hit: null, held: false, drag: false, place: false,
+      };
+      this.press = p;
 
       if (this.armed) {
-        down.place = true;
+        p.place = true;
         this.setOrbit(false);
         this.showGhost(e);
         grab(e);
         return;
       }
 
-      const hit = this.pick(e);
-      down.hit = hit;
-      // The object rides the ground point under the pointer. Grabbing a spire silhouetted
+      p.hit = this.pick(e);
+      // Pressing the selected object only *offers* a drag: a thumb resting on a building must
+      // be able to tap it without nudging it, so nothing moves until the finger passes the slop.
+      // The object then rides the ground point under the pointer — grabbing a spire silhouetted
       // against the sky gives no ground point, so it simply centres on the first one it gets.
-      if (hit && this.selected && hit.id === this.selected.id) {
-        const p = this.groundPoint(e);
-        down.drag = true;
-        down.undoAt = this.undoStack.length;
-        down.from = { x: this.selected.x, z: this.selected.z, dist: this.selected.dist };
-        down.off = p ? { x: this.selected.x - p.x, z: this.selected.z - p.z } : { x: 0, z: 0 };
+      if (p.hit && this.selected && p.hit.id === this.selected.id) {
+        const g = this.groundPoint(e);
+        p.held = true;
+        p.from = { x: this.selected.x, z: this.selected.z, dist: this.selected.dist };
+        p.off = g ? { x: this.selected.x - g.x, z: this.selected.z - g.z } : { x: 0, z: 0 };
         this.setOrbit(false);
         grab(e);
       }
@@ -402,45 +465,45 @@ class Editor {
 
     el.addEventListener('pointermove', e => {
       if (!mine(e)) return;
-      if (down.place) return this.showGhost(e);
-      if (!down.drag) return;
-      const p = this.groundPoint(e);
-      if (p) this.moveTo(p.x + down.off.x, p.z + down.off.z);
+      const p = this.press;
+      if (p.place) return this.showGhost(e);
+      if (!p.held || !this.selected) return;
+      if (!p.drag) {
+        if (Math.hypot(e.clientX - p.x, e.clientY - p.y) < p.slop) return;
+        p.drag = true;
+        p.undoAt = this.undoStack.length;
+        this.builder.refreshDecals(this.aoOpacity(), this.selected.id);
+      }
+      const g = this.groundPoint(e);
+      if (g) this.moveTo(g.x + p.off.x, g.z + p.off.z);
     });
 
     el.addEventListener('pointerup', e => {
       if (!mine(e)) return;
-      const d = down;
-      down = null;
-      const moved = Math.hypot(e.clientX - d.x, e.clientY - d.y);
-      if (d.place) {
+      const p = this.press;
+      this.press = null;
+      this.setOrbit(true);
+      if (p.place) {
         this.hideGhost();
-        this.setOrbit(true);
-        const p = this.groundPoint(e);
-        if (p) this.placeAt(p.x, p.z);
+        const g = this.groundPoint(e);
+        if (g) this.placeAt(g.x, g.z);
+        else this.flash('Nothing to stand on there — aim at the ground.');
         return;
       }
-      if (d.drag) { this.setOrbit(true); this.commit(); return; }
-      if (moved >= TAP_SLOP) return;
-      if (d.hit) this.select(d.hit); else this.deselect();
+      if (p.drag) return this.commit();
+      if (Math.hypot(e.clientX - p.x, e.clientY - p.y) >= p.slop) return;
+      if (p.hit) this.select(p.hit); else this.deselect();
     });
 
-    // iOS back-swipe and system gestures land here mid-drag, after moveTo has already written
-    // to the object. Putting it back is the only outcome that does not lose or invent work.
-    el.addEventListener('pointercancel', e => {
-      if (!mine(e)) return;
-      const d = down;
-      down = null;
-      this.hideGhost();
-      this.setOrbit(true);
-      if (!d.drag) return;
-      this.revert(d.from);
-      this.undoStack.length = Math.min(this.undoStack.length, d.undoAt);
-    });
+    el.addEventListener('pointercancel', e => { if (mine(e)) this.abortPress(); });
 
     addEventListener('keydown', e => {
       if (!this.on || (e.target instanceof Element && e.target.matches('input, select, textarea'))) return;
-      if (e.key === 'Escape') this.deselect();
+      if (e.key === 'Escape') {
+        if (this.question) this.answer(false);
+        else if (this.armed) { this.armed = null; this.hideGhost(); this.ui.sync(); }
+        else this.deselect();
+      }
       if (e.key === 'Backspace' || e.key === 'Delete') this.remove();
       if (e.key.toLowerCase() === 'z' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); e.shiftKey ? this.redo() : this.undo(); }
       if (e.key.toLowerCase() === 'd' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); this.duplicate(); }

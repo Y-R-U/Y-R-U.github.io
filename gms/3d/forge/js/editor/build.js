@@ -91,25 +91,32 @@ export class SceneBuilder {
   liveObject(o) {
     const root = new THREE.Group();
     root.name = 'live';
+    const r = this.seat(o);
     if (o.type === 'mass') {
-      const r = this.seat(o);
       const local = { ...massRec(o, r), x: 0, z: 0, rot: 0, top: 0, bot: r.lo - r.hi };
       root.add(dressing(o.zone, b => plainHouse(b, rng(o.seed), zone(o.zone), local), o.seed));
     } else {
       root.add(BUILDERS[o.type](o.zone, { ...o.p, seed: o.seed }));
+      // the batch builds this object's skirt into the district's dressing, which it is currently
+      // lifted out of, so the live copy carries its own and takes it along on a drag
+      const [hw, hd] = footprint(o);
+      const dz = this.doc.districts[o.dist].zone;
+      root.add(dressing(dz, b => foundation(b, { x: 0, z: 0, hw, hd, rot: 0, top: 0, bot: r.lo - r.hi })));
     }
     return root;
   }
 
   // The contact collar under every building. Cheap to redo, and without it a freshly placed
   // object reads as a sticker lying on the grass.
-  refreshDecals(opacity = 1) {
+  // `skip` is for an object under the finger: its collar would otherwise sit where it was
+  // picked up. A merely selected object still gets one, or it reads as floating while you edit it.
+  refreshDecals(opacity = 1, skip = 0) {
     const T2 = this.terrain;
     const old = T2.object3D.getObjectByName('contactAO');
     if (old) { T2.object3D.remove(old); old.geometry.dispose(); old.material.dispose(); }
     T2.decalRings.length = 0;
     for (const o of this.doc.objects) {
-      if (o.id === this.held) continue;
+      if (o.id === skip) continue;
       const [hw, hd] = footprint(o);
       T2.decalRings.push({ x: o.x, z: o.z, hw, hd, rot: o.ry, ao: 1, grow: 0.4 });
     }

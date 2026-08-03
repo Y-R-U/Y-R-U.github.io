@@ -3,29 +3,36 @@
 import { Quality } from '../engine/quality.js';
 import { allScenarios, getScenario } from '../scenarios.js';
 
+// Anything registering a knob after the panel was built calls this to get its UI.
+let rebuild = null;
+export const refreshPanel = () => rebuild?.();
+
 export function buildPanel(app) {
   const body = document.getElementById('panel-body');
   const panel = document.getElementById('panel');
   document.getElementById('panel-toggle').onclick = () => panel.classList.toggle('open');
 
-  const presets = Object.entries(Quality.presets)
-    .map(([k, v]) => `<button data-preset="${k}" class="${k === app.quality.presetName ? 'on' : ''}">${v.label}</button>`)
-    .join('');
+  rebuild = () => {
+    const presets = Object.entries(Quality.presets)
+      .map(([k, v]) => `<button data-preset="${k}" class="${k === app.quality.presetName ? 'on' : ''}">${v.label}</button>`)
+      .join('');
 
-  const scenarios = allScenarios()
-    .map(s => `<button data-shot="${s.id}">${s.label}</button>`).join('');
+    const scenarios = allScenarios()
+      .map(s => `<button data-shot="${s.id}">${s.label}</button>`).join('');
 
-  let html = `
-    <div class="grp">
-      <h4>Preset</h4>
-      <div class="presets">${presets}</div>
-    </div>
-    ${scenarios ? `<div class="grp"><h4>Camera</h4><div class="shots">${scenarios}</div></div>` : ''}`;
+    let html = `
+      <div class="grp">
+        <h4>Preset</h4>
+        <div class="presets">${presets}</div>
+      </div>
+      ${scenarios ? `<div class="grp"><h4>Camera</h4><div class="shots">${scenarios}</div></div>` : ''}`;
 
-  for (const [group, schemas] of app.quality.groups()) {
-    html += `<div class="grp"><h4>${group}</h4>${schemas.map(s => control(s, app.quality.get(s.key))).join('')}</div>`;
-  }
-  body.innerHTML = html;
+    for (const [group, schemas] of app.quality.groups()) {
+      html += `<div class="grp"><h4>${group}</h4>${schemas.map(s => control(s, app.quality.get(s.key))).join('')}</div>`;
+    }
+    body.innerHTML = html;
+  };
+  rebuild();
 
   // Safari does not fire `input` on <select>, so a phone user's zone change silently did nothing.
   for (const evt of ['input', 'change']) body.addEventListener(evt, e => {

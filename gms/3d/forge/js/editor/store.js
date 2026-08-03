@@ -10,26 +10,48 @@ const LEGACY = 'forge.scenes';
 const slotKey = name => `forge.slot.${name}`;
 
 let healthy = true;
+let problem = '';
 export const storageHealthy = () => healthy;
+export const storageError = () => problem || 'storage is unavailable';
 
 function read(key) {
   try { return localStorage.getItem(key); } catch { return null; }
 }
 
 function write(key, value) {
-  try { localStorage.setItem(key, value); healthy = true; return true; } catch { healthy = false; return false; }
+  try {
+    localStorage.setItem(key, value);
+    healthy = true;
+    problem = '';
+    return true;
+  } catch (e) {
+    healthy = false;
+    problem = /quota|full/i.test(e?.name + e?.message) ? 'storage is full' : 'storage is blocked';
+    return false;
+  }
 }
 
 function drop(key) {
   try { localStorage.removeItem(key); return true; } catch { return false; }
 }
 
+// Private-mode Safari and a full quota both throw on write, never on read, so ask at boot.
+// Without this the editor reports itself healthy until the first edit has already been lost.
+if (write(`${KEY}.probe`, '1')) drop(`${KEY}.probe`);
+
 function parse(raw) {
   if (!raw) return null;
   try { return normalise(JSON.parse(raw)); } catch { return { doc: null, error: 'corrupt JSON', dropped: 0, warnings: [] }; }
 }
 
-export const loadScene = () => parse(read(KEY));
+// The editor autosaves over the working key as soon as anything is touched, so bytes we could
+// not read are put somewhere they survive that — the only chance of getting them back by hand.
+export function loadScene() {
+  const raw = read(KEY);
+  const r = parse(raw);
+  if (raw && r && !r.doc) write(`${KEY}.broken`, raw);
+  return r;
+}
 
 export const saveScene = doc => write(KEY, JSON.stringify(doc));
 
