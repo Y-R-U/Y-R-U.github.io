@@ -12,10 +12,15 @@ const CAP = { grass: 3100, flower: 300, bush: 300, rock: 150, tree: 66 };
 
 const TUNING = {
   grass: { cluster: [1, 5], clusterR: 0.78, footBlend: 0.5, footShade: 0.92, tip: 0.98, value: 0.82 },
-  canopy: { lobes: 5, amp: 0.50, sharp: 2.0, noise: 0.09, mottle: 0.30, flat: 0.34, sy: 1.0, join: 0.26, rim: 0.2 },
-  bush: { lobes: 3, amp: 0.44, sharp: 1.5, noise: 0.14, mottle: 0.2, flat: 0.68, sy: 0.70, join: 0.36, rim: 0.16 },
+  canopy: { lobes: 5, amp: 0.50, sharp: 2.0, noise: 0.09, mottle: 0.30, flat: 0.34, sy: 1.0, join: 0.26, rim: 0.14, top: 0.60 },
+  bush: { lobes: 3, amp: 0.44, sharp: 1.5, noise: 0.14, mottle: 0.2, flat: 0.68, sy: 0.70, join: 0.36, rim: 0.16, top: 0.68 },
   trunk: { prof: [[0.54, 0], [0.29, 0.13], [0.165, 1]], sides: 6, foot: 0.32 },
-  tree: { lift: 0.84, spread: 1.2, canopyDecal: 0.55, footDecal: 0.8 },
+  tree: { lift: 0.84, spread: 1.2, canopyDecal: 0.55, footDecal: 0.8, conifer: 'cone', style: 'mixed' },
+  cone: { tiers: 4, sides: 7, under: 0.34, jitter: 0.21, rim: 0.10, join: 0.30, top: 0.70 },
+  spire: { tiers: 4, sides: 8, under: 0, jitter: 0.24, rim: 0.12, join: 0.34, top: 0.70 },
+  prism: { rim: 0.10, join: 0.62, top: 0.72 },
+  needle: { alphaTest: 0.42 },
+  level: { canopy: 0.78, grass: 0.78, env: 1.4 },
   flowerHues: [0x7b62b8, 0x9a7fd0, 0xe4e2ea, 0xd8a94e],
 };
 
@@ -65,17 +70,46 @@ function footRatio(target, ref, blend, shade) {
 // enough of them. Every quad is emitted twice with opposite winding rather than using DoubleSide,
 // which flips the normal on the back face and turns half of each card black.
 
+// Deliberately not a CanvasTexture: uploading the element hands the shader premultiplied rgb, so
+// the mip level of a thin alpha shape arrives already multiplied down to near-black while its
+// alpha still clears alphaTest. getImageData is unpremultiplied, hence the DataTexture and the
+// manual row flip.
 function paint(w, h, draw, label) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   const g = c.getContext('2d');
   draw(g, w, h);
-  const t = new THREE.CanvasTexture(c);
+  const src = g.getImageData(0, 0, w, h).data;
+  const px = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) px.set(src.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
+  bleed(px, w, h);
+  const t = new THREE.DataTexture(px, w, h, THREE.RGBAFormat);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 4;
   t.generateMipmaps = true;
   t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.needsUpdate = true;
   return track(t, { w, h, fmt: 'rgba', label });
+}
+
+// Push the opaque pixels' colour out over every transparent one, so a mip only ever fades alpha.
+function bleed(px, w, h) {
+  const n = w * h;
+  const known = new Uint8Array(n), q = new Int32Array(n);
+  let head = 0, tail = 0;
+  for (let i = 0; i < n; i++) if (px[i * 4 + 3] > 6) { known[i] = 1; q[tail++] = i; }
+  while (head < tail) {
+    const k = q[head++], x = k % w, y = (k / w) | 0;
+    for (let e = 0; e < 4; e++) {
+      const nx = x + (e === 0 ? 1 : e === 1 ? -1 : 0), ny = y + (e === 2 ? 1 : e === 3 ? -1 : 0);
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+      const j = ny * w + nx;
+      if (known[j]) continue;
+      px[j * 4] = px[k * 4]; px[j * 4 + 1] = px[k * 4 + 1]; px[j * 4 + 2] = px[k * 4 + 2];
+      known[j] = 1; q[tail++] = j;
+    }
+  }
 }
 
 // Blades are painted near-white at the tip and only mildly darker at the root. The old map ran
@@ -135,16 +169,16 @@ function broadLeaves(g, x0p, w, h, R) {
 // A quad standing on the ground, uv v = 0 at the base. Emitted with both windings so the same
 // up-biased normal lights either side.
 function pushCard(pos, nrm, uv, col, idx, c, ramp) {
-  const { w, h, ry, ox = 0, oz = 0, lean = 0, u0 = 0, u1 = 1 } = c;
+  const { w, h, ry, ox = 0, oy = 0, oz = 0, lean = 0, u0 = 0, u1 = 1, up = 0.9 } = c;
   const cs = Math.cos(ry), sn = Math.sin(ry);
   const base = pos.length / 3;
   const corners = [[-w / 2, 0], [w / 2, 0], [w / 2, h], [-w / 2, h]];
   const nx = -sn * 0.42, nz = cs * 0.42;
-  const nl = Math.hypot(nx, 0.9, nz);
+  const nl = Math.hypot(nx, up, nz);
   for (const [lx, ly] of corners) {
     const dz = ly > 0 ? lean : 0;
-    pos.push(ox + lx * cs + dz * -sn, ly, oz + lx * sn + dz * cs);
-    nrm.push(nx / nl, 0.9 / nl, nz / nl);
+    pos.push(ox + lx * cs + dz * -sn, oy + ly, oz + lx * sn + dz * cs);
+    nrm.push(nx / nl, up / nl, nz / nl);
     uv.push(u0 + (lx / w + 0.5) * (u1 - u0), ly / h);
     const t = ramp ? ramp(ly / h) : null;
     col.push(t ? t.r : 1, t ? t.g : 1, t ? t.b : 1);
@@ -246,8 +280,162 @@ function blobGeo(detail, o) {
   return g;
 }
 
+// ── conifers ──
+// A conifer is the one tree shape cheap geometry is actually good at: the silhouette carries it,
+// so the surface can be almost nothing. All three variants are built in the unit box y 0..1,
+// radius ±1, so one instance matrix drives whichever is selected.
+
+function soup() {
+  const s = { pos: [], nrm: [], col: [], uv: [], c: new THREE.Color() };
+  s.v = (x, y, z, nx, ny, nz, t, k, u, v) => {
+    const l = Math.hypot(nx, ny, nz) || 1;
+    s.pos.push(x, y, z); s.nrm.push(nx / l, ny / l, nz / l); s.uv.push(u, v);
+    s.ramp(t, s.c);
+    s.col.push(s.c.r * k, s.c.g * k, s.c.b * k);
+  };
+  s.geo = () => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(s.pos, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(s.nrm, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(s.uv, 2));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(s.col, 3));
+    return g;
+  };
+  return s;
+}
+
+// A stack of skirts, each one a cone standing on its own rim. The overhang of a tier over the one
+// below is the whole trick — it casts the dark horizontal band that reads as a conifer at 40 m,
+// and it costs `sides` triangles. `under` > 0 closes each rim with a downward-facing fan so the
+// overhang is opaque and dark from below; `under` 0 leaves the skirts open and is half the price.
+function tierGeo({ tiers, sides, seed, under, jitter, ramp }) {
+  const R = rng(seed * 7919 + 977);
+  const s = soup();
+  s.ramp = ramp;
+  const [pu0, pu1] = PANEL[0];
+  for (let i = 0; i < tiers; i++) {
+    const t = tiers > 1 ? i / (tiers - 1) : 0;
+    const yb = lerp(0, 0.66, t);
+    const hh = lerp(0.46, 1 - 0.66, t);
+    const rb = lerp(1.0, 0.30, Math.pow(t, 0.85));
+    const off = R() * 6.284;
+    const rad = [], ry = [];
+    for (let k = 0; k < sides; k++) {
+      rad.push(rb * (1 + span(R, -jitter, jitter)));
+      // the rim droops unevenly; without this the tier edge is a perfect straight line in profile
+      ry.push(yb + span(R, -0.45, 0.2) * jitter * hh);
+    }
+    for (let k = 0; k < sides; k++) {
+      const a0 = off + (k / sides) * 6.284, a1 = off + ((k + 1) / sides) * 6.284;
+      const am = (a0 + a1) * 0.5;
+      const r0 = rad[k], r1 = rad[(k + 1) % sides];
+      const y0 = ry[k], y1 = ry[(k + 1) % sides];
+      const p = (a, r, y, u) => s.v(Math.cos(a) * r, y, Math.sin(a) * r,
+        Math.cos(a) * hh, rb, Math.sin(a) * hh, yb, 1, u, 0);
+      p(a1, r1, y1, pu1);
+      p(a0, r0, y0, pu0);
+      s.v(0, yb + hh, 0, Math.cos(am) * hh, rb, Math.sin(am) * hh, yb + hh, 1, (pu0 + pu1) * 0.5, 1);
+      if (!under) continue;
+      const yu = yb + 0.05;
+      s.v(0, yu, 0, 0, -1, 0, yb, under, (pu0 + pu1) * 0.5, 0.5);
+      s.v(Math.cos(a0) * r0, y0, Math.sin(a0) * r0, Math.cos(a0) * 0.4, -1, Math.sin(a0) * 0.4, yb, under, pu0, 0.42);
+      s.v(Math.cos(a1) * r1, y1, Math.sin(a1) * r1, Math.cos(a1) * 0.4, -1, Math.sin(a1) * 0.4, yb, under, pu1, 0.42);
+    }
+  }
+  return s.geo();
+}
+
+// Aaron's triangular prism taken literally: three tapered three-sided prisms of different heights
+// clustered on one trunk, flat-shaded, with the needle band alpha-tested across each face. Four
+// triangles a spike, twelve for the whole crown — an eighth of what the broadleaf crown costs.
+function prismGeo({ seed, ramp }) {
+  const R = rng(seed * 2654435 + 31);
+  const s = soup();
+  s.ramp = ramp;
+  const [pu0, pu1] = PANEL[0];
+  const um = (pu0 + pu1) * 0.5;
+  const spikes = [[0, 0, 1.0, 0, 1.0], [0.5, 0.62, 0.52, 0.0, 0.60], [0.42, 0.50, 0.46, 0.02, 0.46]];
+  for (const [dx, dz, rb, yb, ht] of spikes) {
+    const dir = R() * 6.284, off = R() * 6.284;
+    const ox = Math.cos(dir) * dx, oz = Math.sin(dir) * dz;
+    const base = [];
+    for (let k = 0; k < 3; k++) {
+      const a = off + (k / 3) * 6.284;
+      const r = rb * span(R, 0.86, 1.12);
+      base.push([ox + Math.cos(a) * r, yb, oz + Math.sin(a) * r]);
+    }
+    const apex = [ox * 0.45, yb + ht, oz * 0.45];
+    for (let k = 0; k < 3; k++) {
+      const a = base[k], b = base[(k + 1) % 3];
+      const e1 = [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+      const e2 = [apex[0] - b[0], apex[1] - b[1], apex[2] - b[2]];
+      const n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+      s.v(b[0], b[1], b[2], n[0], n[1], n[2], yb + 0.1, 1, pu1, 0);
+      s.v(a[0], a[1], a[2], n[0], n[1], n[2], yb + 0.1, 1, pu0, 0);
+      s.v(apex[0], apex[1], apex[2], n[0], n[1], n[2], yb + ht, 1, um, 1);
+    }
+    for (const k of [0, 2, 1]) s.v(base[k][0], base[k][1], base[k][2], 0, -1, 0, yb, 0.5, um, 0.5);
+  }
+  return s.geo();
+}
+
+// The needle atlas: left panel a band with a ragged hem for a prism face, right panel a spray card
+// with an empty middle for breaking a skirt's outline. Every needle is a filled polygon rather than
+// a stroke — a hairline is almost all antialiased edge and survives mipping only as a dark smudge.
+function sprig(g, x, y, a, len, wide, v) {
+  const c = Math.cos(a), s = Math.sin(a);
+  g.fillStyle = `rgb(${v},${v},${v})`;
+  g.beginPath();
+  g.moveTo(x - s * wide, y + c * wide);
+  g.lineTo(x + c * len, y + s * len);
+  g.lineTo(x + s * wide, y - c * wide);
+  g.closePath();
+  g.fill();
+}
+
+function needleBand(g, x0, w, h, R) {
+  const grd = g.createLinearGradient(0, h, 0, 0);
+  grd.addColorStop(0, 'rgb(170,170,170)');
+  grd.addColorStop(1, 'rgb(250,250,250)');
+  g.fillStyle = grd;
+  g.fillRect(x0, 0, w, h * 0.80);
+  for (let i = 0; i < 15; i++) {
+    const x = x0 + w * (i + span(R, 0.2, 0.8)) / 15;
+    const v = (176 + R() * 56) | 0;
+    sprig(g, x, h * 0.74, 1.571 + span(R, -0.5, 0.5), h * span(R, 0.05, 0.17), w * 0.05, v);
+  }
+  for (let i = 0; i < 20; i++) {
+    const x = x0 + w * span(R, 0.03, 0.97), y = h * span(R, 0.05, 0.7);
+    const v = (110 + R() * 60) | 0;
+    sprig(g, x, y, span(R, 1.0, 2.1), h * span(R, 0.12, 0.3), w * 0.035, v);
+  }
+  g.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < 14; i++) {
+    const y = h * span(R, 0.34, 0.79);
+    const side = R() < 0.5 ? x0 : x0 + w;
+    g.beginPath();
+    g.ellipse(side, y, w * span(R, 0.04, 0.13), h * span(R, 0.02, 0.05), 0, 0, 6.284);
+    g.fill();
+  }
+  g.globalCompositeOperation = 'source-over';
+}
+
+function needleSpray(g, x0, w, h, R) {
+  const cx = x0 + w / 2, cy = h * 0.5;
+  for (let i = 0; i < 26; i++) {
+    const a = R() * 6.284;
+    const rr = span(R, 0.3, 1.0);
+    const bx = cx + Math.cos(a) * rr * w * 0.26, by = cy + Math.sin(a) * rr * h * 0.2;
+    const v = (176 + R() * 72) | 0;
+    for (let k = 0; k < 4; k++) {
+      const b = a + span(R, -0.45, 0.45);
+      sprig(g, bx, by, b, span(R, 0.16, 0.34) * w, w * 0.038, v);
+    }
+  }
+}
+
 function rockGeo(R) {
-  const g = new THREE.IcosahedronGeometry(0.5, 0).toNonIndexed();
+  const g = new THREE.IcosahedronGeometry(0.5, 0);
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
     p.setXYZ(i, p.getX(i) * span(R, 0.85, 1.35), p.getY(i) * span(R, 0.6, 0.95), p.getZ(i) * span(R, 0.85, 1.35));
@@ -332,13 +520,26 @@ const TEX = {
   }, 'foliage:grass'),
   flower: paint(96, 96, (g, w, h) => flowerHeads(g, w, h, rng(0x22bb44)), 'foliage:flower'),
   leaf: paint(128, 128, (g, w, h) => leafRing(g, w, h, rng(0x5c31d9)), 'foliage:leaf'),
+  needle: paint(256, 128, (g, w, h) => {
+    needleBand(g, 0, w / 2, h, rng(0x1af09c));
+    needleSpray(g, w / 2, w / 2, h, rng(0x6b2d41));
+  }, 'foliage:needle'),
 };
 
 const PANEL = [[0.004, 0.496], [0.504, 0.996]];
 
-const foliageMat = (name, opts = {}) => new THREE.MeshStandardMaterial({
-  vertexColors: true, roughness: 0.92, metalness: 0, name, ...opts,
-});
+// Foliage builds its own materials, so materials.js `setEnvIntensity` never reached them and every
+// card and crown drew the sky at 1.0 while the world around it drew it at `envPower`. Collecting
+// them here is what lets `foliageEnv` and the two value knobs fix that.
+const MADE = { all: [], canopy: [], grass: [] };
+
+const foliageMat = (name, opts = {}) => {
+  const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0, name, ...opts });
+  MADE.all.push(m);
+  if (/canopy|fringe|cone|prism|spire|sprig|bush/.test(name)) MADE.canopy.push(m);
+  if (name === 'grass') MADE.grass.push(m);
+  return m;
+};
 
 class Kind {
   constructor(geo, mat, cap, { cast = true, receive = true } = {}) {
@@ -346,7 +547,7 @@ class Kind {
     this.items = [];
     this.pri = [];
   }
-  add(m, c, g) { this.items.push({ m, c, g: g ?? ++GID }); }
+  add(m, c, g) { const it = { m, c, g: g ?? ++GID }; this.items.push(it); return it; }
   // dressing that sits against a wall survives both the cap and the density knob
   addPri(m, c) { this.pri.push({ m, c }); }
 }
@@ -361,9 +562,25 @@ function leafRamp(f, cfg) {
   const rim = new THREE.Color(f.rim);
   return (t, out) => {
     if (t < 0.45) out.copy(dark).lerp(mid, smoothstep(0.0, 0.45, t));
-    else out.copy(mid).lerp(light, smoothstep(0.45, 0.96, t));
+    else out.copy(mid).lerp(light, smoothstep(0.45, 0.96, t) * cfg.top);
     out.lerp(rim, cfg.rim * smoothstep(0.68, 1.0, t));
     out.multiplyScalar(lerp(cfg.join, 1, smoothstep(0, 0.22, t)));
+  };
+}
+
+// Needles run darker and less yellow than leaves and the base is crushed harder — the bottom of a
+// conifer is in its own shade, which is most of what separates it from a lollipop.
+function needleRamp(f, cfg) {
+  const n = f.needles || f.leaves;
+  const dark = new THREE.Color(n[2]);
+  const mid = new THREE.Color(n[0]);
+  const light = new THREE.Color(n[1]);
+  const rim = new THREE.Color(f.rim);
+  return (t, out) => {
+    if (t < 0.5) out.copy(dark).lerp(mid, smoothstep(0.0, 0.5, t));
+    else out.copy(mid).lerp(light, smoothstep(0.5, 1.0, t) * cfg.top);
+    out.lerp(rim, cfg.rim * smoothstep(0.7, 1.0, t));
+    out.multiplyScalar(lerp(cfg.join, 1, smoothstep(0, 0.34, t)));
   };
 }
 
@@ -373,7 +590,7 @@ function bushRamp(f, cfg) {
   const light = new THREE.Color(f.bush[1]);
   return (t, out) => {
     if (t < 0.5) out.copy(dark).lerp(mid, smoothstep(0.0, 0.5, t));
-    else out.copy(mid).lerp(light, smoothstep(0.5, 1.0, t));
+    else out.copy(mid).lerp(light, smoothstep(0.5, 1.0, t) * cfg.top);
     out.multiplyScalar(lerp(cfg.join, 1, smoothstep(0, 0.3, t)));
   };
 }
@@ -385,12 +602,15 @@ export class Scatter {
     this.object3D.name = 'scatter';
     this.meshes = [];
     this.trees = [];
+    this.treeSets = [];
     this.density = 1;
+    this.treeStyle = TUNING.tree.style;
   }
 
   build(quality) {
     const T = this.terrain;
     const R = rng(0x51f3a2);
+    MADE.all.length = MADE.canopy.length = MADE.grass.length = 0;
     const kinds = ZONE_IDS.map((id, i) => {
       const z = zone(id);
       const f = z.foliage;
@@ -399,6 +619,10 @@ export class Scatter {
       const gramp = (t) => A.copy(foot).lerp(B.setRGB(TUNING.grass.tip, TUNING.grass.tip, TUNING.grass.tip), smoothstep(0.0, 0.42, t));
       const canopyRamp = leafRamp(f, TUNING.canopy);
       const fringeRamp = (t) => { canopyRamp(clamp(t * 0.78 + 0.03, 0, 1), A); return A.multiplyScalar(0.86); };
+      const nRamp = needleRamp(f, TUNING.cone);
+      const sRamp = needleRamp(f, TUNING.spire);
+      const sprigRamp = (t) => { sRamp(clamp(0.48 + t * 0.5, 0, 1), A); return A; };
+      const needleMat = (n) => foliageMat(n, { map: TEX.needle, alphaTest: TUNING.needle.alphaTest });
       return {
         grass: new Kind(cardGeo([
           { w: 1.5, h: 1.0, ry: 0, lean: 0.07, u0: PANEL[0][0], u1: PANEL[0][1] },
@@ -417,6 +641,17 @@ export class Scatter {
           { w: 2.3, h: 1.92, ry: 1.05, ox: -0.32, oz: 0.2 },
           { w: 2.2, h: 1.86, ry: 2.1, ox: 0.06, oz: -0.34 },
         ], fringeRamp), foliageMat('fringe', { map: TEX.leaf, alphaTest: 0.35 }), CAP.tree, { cast: false }),
+        cone: new Kind(tierGeo({ ...TUNING.cone, seed: 21 + i, ramp: nRamp }), foliageMat('cone'), CAP.tree),
+        prism: new Kind(prismGeo({ seed: 31 + i, ramp: needleRamp(f, TUNING.prism) }),
+          needleMat('prism'), CAP.tree),
+        spire: new Kind(tierGeo({ ...TUNING.spire, seed: 41 + i, ramp: sRamp }), foliageMat('spire'), CAP.tree),
+        sprig: new Kind(cardGeo([
+          { w: 2.36, h: 0.30, ry: 0.2, oy: -0.06, up: 3.8, u0: PANEL[1][0], u1: PANEL[1][1] },
+          { w: 1.58, h: 0.25, ry: 1.3, oy: 0.27, up: 3.8, u0: PANEL[1][0], u1: PANEL[1][1] },
+          { w: 0.96, h: 0.19, ry: 2.4, oy: 0.60, up: 3.8, u0: PANEL[1][0], u1: PANEL[1][1] },
+        // receive:false as well as cast:false — a sprig sits inside the skirt that would shadow it,
+        // and a shadowed alpha card against a lit crown reads as a black spike, not as needles
+        ], sprigRamp), needleMat('sprig'), CAP.tree, { cast: false, receive: false }),
         pend: [], z, f,
       };
     });
@@ -667,22 +902,34 @@ export class Scatter {
       const tr = span(R, 0.8, 1.1) * (0.8 + th * 0.05);
       const cs = span(R, 1.4, 2.4) * (1 + (th - 2.4) * 0.08);
       const ry = span(R, 0, 6.28);
+      // whether this tree is a conifer when the world is mixed; the single-style views ignore it
+      const con = R() < (f.conifer ?? 0);
       col.set(f.trunk).multiplyScalar(span(R, 0.72, 1.02));
-      kinds[zi].trunk.add(place(px, pz, tr, th, tr, ry).clone(), col.clone());
+      // a conifer carries its crown on a taller, much thinner bole, so the trunk needs its own
+      // matrix — everything else about a tree is shared between the two silhouettes
+      const hc = th * span(R, 1.15, 1.45);
+      const cw = hc * span(R, 0.19, 0.27);
+      const tk = kinds[zi].trunk.add(place(px, pz, tr, th, tr, ry).clone(), col.clone());
+      tk.mc = place(px, pz, tr * 0.58, hc * 0.72, tr * 0.58, ry).clone();
+      tk.con = con;
       // squat and tall crowns from the same blob: the outline changes, the material does not
       const cy = cs * span(R, 0.82, 1.45);
       const ct = tint(col, R, 0.82, 1.14, 0.05).clone();
       const m = place(px, pz, cs, cy, cs, ry).clone();
       m.elements[13] += th * TUNING.tree.lift;
-      kinds[zi].canopy.add(m, ct);
+      kinds[zi].canopy.add(m, ct).con = con;
       const fs = cs * TUNING.tree.spread / 1.2;
       const fr = place(px, pz, fs, cy * TUNING.tree.spread, fs, ry + span(R, 0.4, 1.2)).clone();
       fr.elements[13] += th * TUNING.tree.lift - cy * 0.92;
-      kinds[zi].fringe.add(fr, ct);
+      kinds[zi].fringe.add(fr, ct).con = con;
+      const nt = tint(col, R, 0.86, 1.1, 0.04).clone();
+      const cm = place(px, pz, cw, hc * 0.88, cw, ry + span(R, 0, 2.1)).clone();
+      cm.elements[13] += hc * 0.15;
+      for (const k of ['cone', 'prism', 'spire', 'sprig']) kinds[zi][k].add(cm, nt).con = con;
       // Ground dressing is deferred: roughly three times as many trees are generated as the cap
       // keeps, and paying for a decal and a litter clump per *candidate* spent about 6 k triangles
       // and a third of the grass budget on trees that never got drawn.
-      kinds[zi].pend.push({ x: px, z: pz, cs, tr, th });
+      kinds[zi].pend.push({ x: px, z: pz, cs, tr, th, cw, con });
       T.mark(px, pz, 0.85);
     };
 
@@ -703,17 +950,21 @@ export class Scatter {
       }
     }
 
+    const CROWNS = ['canopy', 'fringe', 'cone', 'prism', 'spire', 'sprig'];
     for (const set of kinds) {
-      // trunk, canopy and fringe are one tree, so they must be thinned in step
-      shuffle(set.trunk.items, R, set.canopy.items, set.fringe.items, set.pend);
+      // every crown variant plus the trunk is the same tree, so they must be thinned in step
+      shuffle(set.trunk.items, R, ...CROWNS.map(n => set[n].items), set.pend);
       const keep = Math.min(set.trunk.items.length, CAP.tree);
-      set.trunk.items.length = set.canopy.items.length = set.fringe.items.length = keep;
+      set.trunk.items.length = keep;
+      for (const n of CROWNS) set[n].items.length = keep;
       for (let i = 0; i < keep; i++) {
         const t = set.pend[i];
         this.trees.push(t);
         // two discs: the crown's own shade, then a tight one at the flare. Without the tight one
         // the trunk meets a lit patch of grass and the whole tree reads as a sticker.
-        T.addPropDecal(t.x, t.z, 0.9 + t.cs * 0.7, TUNING.tree.canopyDecal);
+        // The decals are baked into the terrain once, so a mixed world sizes them from the style
+        // the tree was born with — flipping `treeStyle` live does not move them.
+        T.addPropDecal(t.x, t.z, 0.9 + (t.con ? t.cw * 1.35 : t.cs) * 0.7, TUNING.tree.canopyDecal);
         T.addPropDecal(t.x, t.z, 0.42 + t.tr * 0.42, TUNING.tree.footDecal);
         clump(t.x + span(R, -0.5, 0.5), t.z + span(R, -0.5, 0.5),
           { n: 4, spread: 0.85, size: span(R, 0.7, 1.1), litter: 0.7 });
@@ -721,7 +972,7 @@ export class Scatter {
     }
 
     for (const [zi, set] of kinds.entries()) {
-      for (const name of ['grass', 'flower', 'bush', 'rock', 'trunk', 'canopy', 'fringe']) {
+      for (const name of ['grass', 'flower', 'bush', 'rock', 'trunk', ...CROWNS]) {
         const k = set[name];
         // thin by tuft, not by blade — shuffling individual cards turns every clump back into a
         // sprinkle the moment the density knob comes off 1
@@ -742,9 +993,11 @@ export class Scatter {
         mesh.computeBoundingSphere();
         this.object3D.add(mesh);
         this.meshes.push(mesh);
+        if (name === 'trunk' || CROWNS.includes(name)) this.treeSets.push({ mesh, items: k.items, name });
       }
     }
 
+    this.applyTreeStyle(this.treeStyle);
     this.applyDensity(quality?.get('foliage') ?? 1);
     if (new URLSearchParams(location.search).has('dev')) this.devScenarios();
   }
@@ -766,6 +1019,16 @@ export class Scatter {
       },
     });
     defineScenario({
+      id: 'tree_stand', label: 'Tree stand', zone: 'neutral',
+      setup: app => {
+        frameCamera(app, {
+          pos: [t.x + 26, heightAt(t.x + 26, t.z + 30) + 11, t.z + 30],
+          look: [t.x, heightAt(t.x, t.z) + t.th * 0.5, t.z], fov: 42,
+        });
+        app.quality.set('time', 10.5);
+      },
+    });
+    defineScenario({
       id: 'grass_macro', label: 'Grass macro', zone: 'neutral',
       setup: app => {
         frameCamera(app, {
@@ -782,9 +1045,57 @@ export class Scatter {
     for (const m of this.meshes) m.count = Math.max(0, Math.min(m.userData.max, Math.round(m.userData.max * f)));
   }
 
+  // Every tree carries an instance in every crown variant, so switching silhouette is a repack of
+  // 66 matrices per zone rather than a rebuild. Anything not wanted by the current style ends up
+  // with count 0 and is never drawn, so only one crown's triangles are ever paid for.
+  applyTreeStyle(style) {
+    this.treeStyle = style;
+    const mix = style === 'mixed';
+    const pick = mix ? TUNING.tree.conifer : style;
+    for (const { mesh, items, name } of this.treeSets) {
+      let n = 0;
+      for (const it of items) {
+        if (style === 'none') break;
+        const con = mix ? it.con : style !== 'broadleaf';
+        const want = name === 'trunk' ? true
+          : name === 'canopy' || name === 'fringe' ? !con
+            : con && (name === pick || (name === 'sprig' && pick === 'spire'));
+        if (!want) continue;
+        mesh.setMatrixAt(n, name === 'trunk' && con ? it.mc : it.m);
+        mesh.setColorAt(n, it.c);
+        n++;
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      mesh.userData.max = n;
+      // InstancedMesh.computeBoundingSphere only walks up to `count`, so this has to happen while
+      // count still covers the instances just written or the mesh gets an empty sphere and is culled
+      mesh.count = n;
+      mesh.computeBoundingSphere();
+    }
+    this.applyDensity(this.density);
+  }
+
   registerKnobs(q) {
     q.register({ key: 'foliage', label: 'Foliage density', type: 'range', min: 0, max: 1.5, step: 0.05, group: 'World' },
       v => this.applyDensity(v));
+    q.register({ key: 'treeStyle', label: 'Tree silhouette', type: 'select', group: 'World',
+      options: ['broadleaf', 'cone', 'prism', 'spire', 'mixed', 'none'], default: 'mixed' },
+      v => this.applyTreeStyle(v));
+    // a multiplier on `envPower`, not an absolute: leaves are translucent so a little above the
+    // world's figure is right, but 3.6× above it was what put the treeline inside 0.06 of the sky
+    q.register({ key: 'foliageEnv', label: 'Foliage sky bounce', type: 'range', min: 0, max: 3, step: 0.05, group: 'World', default: TUNING.level.env },
+      v => { this.envMul = v; this.applyEnv(q); });
+    q.register({ key: 'canopyLevel', label: 'Canopy + shrub value', type: 'range', min: 0.3, max: 1.3, step: 0.02, group: 'World', default: TUNING.level.canopy },
+      v => { for (const m of MADE.canopy) m.color.setScalar(v); });
+    q.register({ key: 'grassLevel', label: 'Grass value', type: 'range', min: 0.3, max: 1.3, step: 0.02, group: 'World', default: TUNING.level.grass },
+      v => { for (const m of MADE.grass) m.color.setScalar(v); });
+    q.onChange(k => { if (k === 'envPower' || k === '*') this.applyEnv(q); });
+  }
+
+  applyEnv(q) {
+    const v = (q.get('envPower') ?? 0.28) * (this.envMul ?? 1);
+    for (const m of MADE.all) m.envMapIntensity = v;
   }
 }
 

@@ -1,216 +1,266 @@
 # Foliage — grass, flowers, shrubs, loose stone, trees
 
 Owned file: `js/world/scatter.js`. Additive changes to the `foliage` block of `js/world/zones.js`.
-Nothing else was touched. `NOTES_TERRAIN.md` still covers the heightfield, creek and ground.
+Nothing else was touched.
 
-Brief was one line from Aaron on a phone: *"i think the trees may need a little work."*
-
----
-
-## What was wrong
-
-- **Trees.** Trunk + one smooth icosphere + a leaf fringe, all one flat colour. Read as a spiky
-  green cone on a stick. No dark underside, no lit crown, no occlusion where trunk meets earth.
-- **Grass.** Painted with a dark root (0.44 of the card's colour) so every card started on a hard
-  dark line against pale ground. Placed one card per grid sample, so it read as an even sprinkle
-  of sticks rather than tufts with bare ground between them.
-- **Zone identity.** Only `grass[3]` / `trunk` / `leaf` existed in `zones.js`. Bushes, canopies,
-  litter and the dry-bank tint were all hard-coded hexes in `scatter.js`, identical in all three
-  zones. The brief's "three shades each per zone" was true of grass and of nothing else.
+This round: **a conifer exploration** (Aaron: *"we could try a pine tree look? as this could be a
+triangle prism? with a texture?"*) plus **a real lighting bug** the blind critic found — foliage was
+being lit far brighter than everything else in the world.
 
 ---
 
-## 1. Trees
+## 1. The lighting bug — measured, confirmed, fixed
 
-**Crown geometry (`blobGeo`).** Still one closed icosahedron at detail 1 — 80 triangles, unchanged
-— but the displacement is now a sum of five wide overlapping lobes
-(`r += amp · lobeWeight · max(0, dot(dir, lobeDir))^sharp`) plus a small noise octave, instead of
-two octaves of value noise. Same cost, a clumped outline instead of an egg. Normals stay radial to
-the *undisplaced* sphere, which keeps the shading soft while the silhouette stays ragged. Merging
-several real spheres is still off the table — that is what produced the bright crack the previous
-round removed.
+The critic's read was that fog or hemisphere light was being *added* to foliage. That is not what
+was happening, but the effect was the same and the cause was worse.
 
-**Crown colour is baked into the geometry, not the instance.** Vertex colour runs
-`leaves[dark] → leaves[mid] → leaves[light]`, with `foliage.rim` mixed into the top third and the
-bottom 22 % crushed to 26 % so the trunk join is genuinely occluded. On top of that a low-frequency
-3-D noise mottles the crown ±30 %; **without the mottle a crown is one flat green mass at anything
-closer than about 15 m.** Instance colour is now a near-1 brightness/warmth jitter
-(`tint()`), because it multiplies the baked palette.
+`materials.js` owns `setEnvIntensity`, which walks the materials it built and sets
+`envMapIntensity = envPower` (default **0.28**). **Foliage builds its own materials inside
+`scatter.js`, so it was never in that list** and every grass card, crown, bush and rock kept the
+Three default of **1.0**. Foliage was drawing the sky IBL at **3.57× the rest of the world**.
 
-**Trunk.** Same 24-triangle three-point lathe, radii widened (0.46/0.22/0.115 → 0.54/0.29/0.165)
-and a vertex ramp darkens the bottom 26 % to 32 %. That ramp plus the tight ground decal below is
-what stops the tree reading as a sticker.
+Verified in-page before touching anything:
 
-**Fringe.** Three alpha cards, 12 triangles, now offset off the trunk axis (`ox`/`oz`) and the leaf
-texture is **rim-biased with an empty centre**. This matters: a card that fills its disc becomes a
-solid dark slab straight through the crown the moment it is seen edge-on, and with three cards per
-tree one always is. `cast: false` on the fringe as well — it was throwing a hairline shadow across
-the crown it exists to soften. Its ramp is the canopy ramp compressed and multiplied by 0.86 so the
-clumps read as leaves in front of the mass, not paper cutouts stuck on it.
+```
+["wall",0.28] ["trim",0.28] ["roof",0.28] ["road",0.28] ["water",0.6]
+["light:grass",1] ["light:canopy",1] ["light:fringe",1] ["light:bush",1] … all 1.0
+```
 
-**Ground dressing is deferred to after the cap.** This is the biggest single win in the file.
-`tree()` used to emit a `propDecal` and a litter `clump()` for every *candidate*; about 613 trees
-are generated and only 198 survive `CAP.tree`. So two thirds of the tree decals and two thirds of
-the tree-base litter were being paid for by trees that never got drawn — the litter was eating
-roughly a third of the grass instance budget. `tree()` now pushes a record into `set.pend`, which
-is shuffled in lockstep with trunk/canopy/fringe, truncated to the cap, and only then emits
-**two** decals (a wide crown shade and a tight one at the flare) and the litter clump.
-`contactAO` went **11 344 → 8 789 triangles** despite going from one decal per tree to two.
+Measured with `scratch/lum.mjs`, which renders each shot three times — full, `treeStyle=none`,
+`foliage=0` — and diffs to get an exact per-pixel mask for "tree", "tuft" and "the ground each
+stands on". sRGB Rec709 luminance, 800×450.
 
----
+| wall_day | before | after |
+|---|---|---|
+| sky | 0.694 | 0.694 |
+| canopy | **0.561** | **0.373** |
+| ground behind canopy | 0.674 | 0.674 |
+| canopy→ground separation | 0.113 | **0.301** |
+| tufts | 0.424 | 0.339 |
+| ground behind tufts | 0.432 | 0.468 |
+| tuft→ground separation | **−0.008** (tufts *brighter*) | **0.129** (tufts darker) |
+| canopy p97 | 0.866 | 0.730 |
 
-## 2. Grass
+| creek_day (after) | |
+|---|---|
+| sky | 0.772 |
+| canopy | 0.269, p97 **0.681** |
+| ground | 0.568 |
 
-**Two panels in one texture, no extra draw call.** `TEX.grass` is now a 512×160 atlas: left panel
-the blade fan, right panel a low skirt of short broad leaves with blades standing through it.
-`cardGeo` takes a `u0`/`u1` uv rect per card, so the two crossed quads of one clump take one panel
-each. Every tuft therefore has two different silhouettes for the same 8 triangles.
-*Pure* broad leaves (first attempt) read as agave at close range — the blades mixed back in fix it.
+Every target the critic set is met: peak foliage p97 0.681 against a 0.72 ceiling, canopy→ground
+separation ≥ 0.12 in both shots, tufts darker *and* more saturated than the mat they grow from.
+The treeline no longer dissolves into the horizon, and the frame passes a squint test.
 
-**The root takes the ground's hue.** `footRatio()` computes the per-channel linear ratio of
-`groundTint` to `grass[0]` **with the brightness difference divided out**, and that goes into the
-card's vertex colour at v = 0, fading to 1 by v = 0.42. Dividing out the luminance is essential:
-the light zone's ground is far paler than its grass, and the raw ratio bleached the bottom half of
-every blade white. The painted root also went 0.44 → 0.55, so a blade now starts in the earth
-rather than on a black line.
+Three new knobs, all in the World group:
 
-**Tufts, not a sprinkle.** The sample grid went 2.15 → 2.7 m and each accepted point drops
-`1..5` cards within 0.78 m, the count scaled by how near a scored camera it is. The cap then thins
-everything in proportion, which is how the near field ends up dense while the far ridge stays
-cheap. Colour varies *inside* a tuft (±23 %) as well as between tufts.
+- **`foliageEnv`** (default **1.4**) — a *multiplier* on `envPower`, not an absolute. Leaves are
+  translucent so a little above the world's figure is right; 3.57× above it was the bug. It
+  subscribes to `quality.onChange` so it still tracks the Sky bounce slider.
+- **`canopyLevel`** (default 0.78) — `material.color` scalar on canopy, fringe, bush and all three
+  conifer meshes.
+- **`grassLevel`** (default 0.78) — the same for grass cards.
 
-**Thinning is by tuft.** Items carry a group id and `groupShuffle()` shuffles whole groups. Without
-this the `foliage` density knob turned every clump straight back into a sprinkle at anything below
-1.0 — and `medium` runs at 0.6.
+`foliageEnv` at 1.0 looks correct in daylight but turns the shadowed verge in `street_dusk` into
+black spikes. 1.4 keeps the daylight separation and puts the dusk verge back.
+
+`TUNING.canopy.top` / `bush.top` / `cone.top` were also added: the ramp now only travels 60–72 % of
+the way to `leaves[1]`, because the light zone's `#c2d9a4` at full strength is a pale mint that
+reads as a highlight rather than a leaf. `canopy.rim` went 0.2 → 0.14 for the same reason.
 
 ---
 
-## 3. Flowers
+## 2. Three conifer candidates
 
-They were reading as solid purple sticks: the instance colour multiplies the whole card, so
-painting a flower like a blade of grass tints the stalk too. `flowerHeads()` paints the stalk at
-rgb 46 — dark enough that any hue times it reads as a stem — and only the head near-white.
-Count is down (440 → 300 cap, lower acceptance) and they are shorter. They are the one saturated
-accent and they were not being sparing.
+All three are built in a unit box (`y` 0..1, radius ±1) so **one instance matrix drives whichever
+is selected**, and every tree carries an instance in *every* variant. `treeStyle` is therefore a
+repack of 66 matrices per zone, not a rebuild — anything the current style does not want gets
+`count = 0` and is never drawn, so only one crown's triangles are ever paid for.
+
+### `cone` — 4 stacked tiered skirts, 56 tris
+
+Each tier is a cone standing on its own rim plus a downward-facing fan closing that rim
+(`under: 0.34` crushes it to 34 % value). The overhang of a tier over the one below is the whole
+trick: it casts the dark horizontal band that makes a conifer legible at 40 m. Rim radius *and* rim
+height are jittered per segment, so the tier edge is never a straight line in profile. No texture.
+
+### `prism` — Aaron's idea taken literally, 12 tris
+
+Three tapered three-sided prisms of different heights clustered on one trunk, flat-shaded, with the
+needle band alpha-tested across each face. **Four triangles a spike.** Reads as a cypress or a
+Lombardy poplar rather than a spruce — a narrow, very dark vertical accent. This is by far the
+cheapest thing in the file: 69 % less than the broadleaf crown.
+
+### `spire` — 4 open skirts + 3 needle spray cards, 36 tris
+
+The skirts without their undersides (24 tris) plus three alpha cards at the tier rims (12 tris) to
+break the outline. Softer and flatter than `cone` because nothing casts the tier shadow band.
+
+### `mixed` — per-zone fraction, and the current default
+
+`foliage.conifer` in `zones.js` gives the fraction of a zone's trees that are conifers: **light
+0.18, neutral 0.4, dark 0.85**. Broadleaf keeps the valleys and the light zone, conifers take the
+ridges and the dark zone. `TUNING.tree.conifer` names which conifer geometry `mixed` uses (`cone`).
+
+`treeStyle` also has a `none` option, which is what `scratch/lum.mjs` uses to isolate tree pixels.
 
 ---
 
-## 4. Bushes
+## 3. Numbers
 
-Same `blobGeo` with 3 lobes, flatter (`flat` 0.55 → 0.68, `sy` 0.82 → 0.70) and a
-`bush[dark→mid→light]` vertical ramp. Bushes dropped by verge/wall clumps are much smaller and sunk
-deeper (`0.35–0.78 × size`, sunk 24 %) — at the old size they were pale beach balls sitting on the
-road verge in `street_dusk`.
+Gate profile, `--preset=medium --dpr=1 --w=844 --h=390`, `foliage = 0.6` (119 trees).
+"tree tris" is trunk + whichever crown is drawn, counted by traversing the scene.
+
+| style | tree tris | foliage tris | renderer tris | calls | tex MB |
+|---|---|---|---|---|---|
+| `broadleaf` (previous round) | 13 920 | 76 780 | 499 735 | 78 | 50.60 |
+| `cone` | **9 600** (−31 %) | 72 460 | 492 535 | 75 | 50.60 |
+| `prism` | **4 320** (−69 %) | 67 180 | **481 975** | 75 | 50.60 |
+| `spire` | **8 160** (−41 %) | 71 020 | 488 215 | 78 | 50.60 |
+| `mixed` ← default | 11 776 (−15 %) | 74 636 | 496 143 | 84 | 50.60 |
+
+**Every conifer option is cheaper than the broadleaf.** An all-`prism` world is **18 k renderer
+triangles** below the previous round — if the project needs to claw back toward the 350 k budget,
+that is the lever, though it costs the broadleaf mass entirely.
+
+`mixed` costs +6 draw calls because both the broadleaf and the conifer crown meshes are live in
+all three zones. 84 of a 150 budget.
+
+Texture: **50.43 → 50.60 MB** of 60. The only addition is `foliage:needle`, a 256×128 RGBA atlas
+(0.17 MB with mips), tracked through `track()` like the rest. It is built in every configuration,
+so the figure does not change with `treeStyle`.
+
+Headed gate, all five scored shots:
+
+| shot | gpu p95 | cpu p95 | calls | tris |
+|---|---|---|---|---|
+| wall_day | 5.0 ms | 2.8 ms | 84 | 496 k |
+| street_dusk | 5.6 ms | 2.7 ms | 83 | 495 k |
+| gate_night | 5.7 ms | 2.5 ms | 53 | 313 k |
+| town_night | 7.9 ms | 3.0 ms | 84 | 496 k |
+| creek_day | 5.3 ms | 3.0 ms | 84 | 496 k |
+
+Budget 11 / 6 / 150 / 350 k / 60 MB. Inside everything except triangles, which this round reduced
+again (499.7 k → 496.1 k in `mixed`, 482.0 k in `prism`).
+
+---
+
+## 4. The premultiplied-alpha trap (this cost the most time)
+
+The needle cards rendered as **pure black spikes**. Two separate causes, both worth knowing about
+because they will bite any future alpha card:
+
+1. **A 2-D canvas stores partly transparent pixels premultiplied.** Uploading the element hands the
+   shader `rgb·a`, and once mipmapping averages a thin alpha shape, the level whose alpha still
+   clears `alphaTest` arrives with its colour already multiplied down to near-black. `paint()` now
+   goes `getImageData` (unpremultiplied) → manual row flip → **`DataTexture`**, and `bleed()` floods
+   the opaque pixels' colour out over every transparent one so a mip only ever fades the alpha.
+   Every foliage texture now goes through this, which also quietly cleaned up the grass and leaf
+   cards' dark fringes.
+2. **Non-uniform instance scale flattens a card's normal.** A conifer crown is scaled roughly
+   (1.2, 5, 1.2). The normal matrix is the inverse transpose, so a card's up-biased `(0.42, 0.9,
+   0.42)` normal comes out of it as `(0.35, 0.18, 0.35)` — nearly horizontal, catching cool sky
+   instead of sun. `pushCard` takes an `up` option for this; the sprig cards use `up: 3.8`.
+
+Neither is visible in a level-0 texture dump or a vertex-colour dump. The way to find it is to
+substitute a plain white material and see whether the *shading* or the *albedo* is wrong.
 
 ---
 
 ## 5. zones.js — exactly what was added
 
-Additive only. No existing key was renamed or changed in value. Every new array is **[mid, light,
-dark]**, matching the order `grass` has always used.
+Additive only. No existing key renamed or revalued. Another agent was editing the `robe` blocks at
+the same time; every edit here was a surgical `Edit` against a freshly read file.
 
 | key | light | neutral | dark |
 |---|---|---|---|
-| `foliage.leaves[3]` | `#82a070 #c2d9a4 #41573a` | `#77873f #b9c47e #333f22` | `#44553f #6f8064 #1a2219` |
-| `foliage.bush[3]` | `#7d9569 #99ad85 #54694b` | `#68763f #84915a #3e472a` | `#3f4d3a #586552 #212a20` |
-| `foliage.dirt[3]` | `#a3927a #c2b39a #7f7059` | `#8a7a58 #a89871 #645640` | `#4c483f #605b4f #332f29` |
-| `foliage.sand[3]` | `#d5c9a8 #eae0c6 #b3a586` | `#c2b489 #dbd0ab #9d9068` | `#6e6a5c #877f6d #514d43` |
-| `foliage.rim` | `#d6cd9c` | `#c4b878` | `#7b8a65` |
-| `foliage.density` | 1.15 | 1.0 | 0.85 |
-| `foliage.trees` | 0.85 | 1.0 | 1.25 |
+| `foliage.needles[3]` | `#6d8b6a #9cb790 #2f4030` | `#5f7448 #8e9d6c #26301c` | `#37472f #5a6a4e #121810` |
+| `foliage.conifer` | 0.18 | 0.4 | 0.85 |
 
-`rim` is the warm colour mixed into a sunlit crown. `density` scales grass acceptance and `trees`
-scales tree acceptance — both were requested in the previous round's notes. `dirt` replaced the
-hard-coded `0x8f7a4a` litter tint, `sand` replaced `0xa8a055` (waterline) and `0xb8b063` (dry bank).
-The old `foliage.leaf` and `foliage.trunk` keys are left in place and `trunk` is still used.
+`needles` is `[mid, light, dark]`, the same order as `grass` and `leaves`. It runs darker and less
+yellow than `leaves`, which is most of what tells a fir from an oak at 60 m.
 
 ---
 
-## Numbers
+## 6. Dev scenarios
 
-Measured at the gate profile, `--preset=medium --dpr=1 --w=844 --h=390`, foliage instance counts at
-`foliage = 0.6`. Triangles are per-mesh visible geometry, summed by traversing the scene, not the
-renderer's figure (which also counts the shadow passes).
-
-| mesh | before | after |
-|---|---|---|
-| grass ×3 | 43 920 | 44 640 |
-| bush ×3 | 10 800 | 10 800 |
-| canopy ×3 | 9 600 | 9 600 |
-| rock ×3 | 5 400 | 5 400 |
-| trunk ×3 | 2 880 | 2 880 |
-| flower ×3 | 3 168 | 2 020 |
-| fringe ×3 | 1 440 | 1 440 |
-| **foliage total** | **77 208** | **76 780** |
-| `contactAO` (terrain, mostly tree decals) | 11 344 | 8 789 |
-| whole scene, renderer figure | 505 k | 499 k |
-
-**Foliage is 428 triangles down and the scene is 6 k down**, with two ground decals per tree instead
-of one. `CAP.grass` is 3 100 (was 3 050); `CAP.flower` 300 (was 440). Nothing else moved.
-
-Texture memory: **50.18 → 50.43 MB** of a 60 MB budget. Foliage's own share went 0.26 → 0.55 MB
-(`foliage:grass` 512×160 = 0.42 MB, `foliage:leaf` 128×128, `foliage:flower` 96×96). All three go
-through `track()`.
-
-Headed perf gate, `--preset=medium --dpr=1 --w=844 --h=390 --headed --perf`:
-
-| shot | gpu p95 | cpu p95 | calls | tris |
-|---|---|---|---|---|
-| wall_day | 5.3 ms | 2.6 ms | 78 | 500 k |
-| street_dusk | 5.6 ms | 2.6 ms | 77 | 499 k |
-| gate_night | 5.5 ms | 2.2 ms | 48 | 317 k |
-| town_night | 7.4 ms | 3.1 ms | 78 | 500 k |
-| creek_day | 5.4 ms | 2.9 ms | 78 | 500 k |
-
-Budget 11 / 6 / 150 / 350 k / 60 MB. Inside everything except triangles, which the project was
-already 45 % over before this round and which this round reduced.
-
----
-
-## Dev scenarios
-
-`Scatter.devScenarios()` registers `tree_macro` and `grass_macro`, **only under `?dev=1`**, so
-`--all` still renders exactly the five the critic scores. `tree_macro` frames the tallest surviving
-tree that is still near a scored camera (`this.trees`, filled in the cap loop).
+`Scatter.devScenarios()` registers `tree_macro`, `tree_stand` and `grass_macro`, **only under
+`?dev=1`**, so `--all` still renders exactly the five the critic scores. `tree_stand` is the new one
+— a stand of a dozen trees at 30 m, which is the distance the choice actually has to work at.
 
 ```
-node tools/shot.mjs --shot=tree_macro --w=1280 --h=720 --dpr=1 --set=dev=1
+node tools/shot.mjs --shot=tree_stand --w=1280 --h=720 --dpr=1 --set="dev=1&treeStyle=cone"
 ```
 
----
+Side-by-side comparison sheets are in **`shots/styles/<style>/{creek_day,wall_day,tree_stand}.png`**
+for all five styles. Regenerate with:
 
-## Things that were tried and did not work
+```bash
+for s in broadleaf cone prism spire mixed; do for sh in creek_day wall_day tree_stand; do
+  node tools/shot.mjs --shot=$sh --w=1280 --h=720 --dpr=1 --set="dev=1&treeStyle=$s" --outdir=shots/styles/$s
+done; done
+```
 
-- **Brightening the blade root towards the ground colour with a raw channel ratio.** The light
-  zone's `groundTint` is roughly 2× its `grass[0]` in the red and blue channels; the bottom half of
-  every card came out near-white and the whole map looked frosted. Fixed by dividing the luminance
-  out of the ratio and keeping only the hue.
-- **Filling the fringe card's disc with leaves** so they'd read as clumps across the crown instead
-  of a necklace. Looks better head-on, but any card seen edge-on becomes a hard dark slab running
-  from the top of the crown to the ground. Reverted to a hollow centre and shortened the card.
-- **A pure broad-leaf second panel.** Reads as agave/aloe at road-verge distance in `street_dusk`.
-  Blades mixed back in over the top.
-- **Painting flowers with the grass blade painter.** The instance hue multiplies the stalk, so a
-  purple flower is a purple stick. Needed a dedicated painter with a near-black stalk.
-- **`side: DoubleSide` on the grass cards** to halve their triangles — still not viable, for the
-  reason already in the previous notes: Three flips the normal on back faces and an up-biased card
-  normal becomes a down-facing one, so half of every card goes black.
+`scratch/lum.mjs --shot=wall_day [--extra="foliageEnv=3.57&canopyLevel=1&grassLevel=1"]` reproduces
+the before/after luminance table; `--extra` with those values is exactly the previous round's
+lighting.
 
 ---
 
-## Still open
+## 7. Things that were tried and did not work
 
-- **The near field is instance-budget-limited, not design-limited.** 3 100 cards per zone over a
-  300 × 224 m map is about one card per 4 m² even with the camera weighting. Bare ground is visible
-  within ~8 m of a camera in `grass_macro`. A real build streams this; here the only lever is the
-  triangle budget, and the two big items in the scene (`wall` 95 k, `trim` 73 k) are not mine.
-- **A fringe card seen exactly edge-on still leaves a faint vertical line** through the crown at
-  macro distance. Invisible in all five scored shots. Killing it properly needs the fringe to be
-  billboarded, which instanced geometry cannot do without a custom vertex shader.
-- **Crowns are still smooth domes above the leaf ring.** The reference plates render the whole crown
-  as a cloud of discrete leaf clusters. The mottle approximates it at shot distance; it does not at
-  macro. That wants more cards, i.e. more triangles.
-- `rockGeo` calls `.toNonIndexed()` on geometry that is already non-indexed and logs three console
-  warnings per boot. Pre-existing, harmless, one-line fix if anyone cares.
-- Requests to `materials.js` and `lighting.js` in `NOTES_TERRAIN.md` still stand. The `lighting.js`
-  one ("grass reads as dark spikes at night") is much less bad now that the painted root is lighter.
+*(the previous round's list still stands — DoubleSide grass, raw-ratio blade roots, filled fringe
+discs, pure broad-leaf panels, painting flowers with the grass painter. New this round:)*
+
+- **Winding.** Both `tierGeo` and `prismGeo` were written apex-last in increasing angle order, which
+  is the *inward* face. Everything rendered as bare trunks. Going from a base ring at angle `a` to
+  `a+Δ` to the apex is backwards; it has to be `a+Δ`, `a`, apex.
+- **`InstancedMesh.computeBoundingSphere()` after setting `userData.max`.** It only walks up to
+  `mesh.count`, and at that moment `count` was still 0 from the previous style. Result: an empty
+  sphere with `radius = -1`, and the whole mesh silently frustum-culled. `count` has to be set
+  *before* the call.
+- **Bleeding the alpha map only a few pixels.** The first `bleed()` ran five dilation passes. That
+  is enough for the grass atlas and nowhere near enough for the needle spray, where the gaps between
+  needles are 20 px wide — a coarse mip averaged the remaining black straight back in. It has to
+  flood to saturation (it is a BFS now, one pass, O(N)).
+- **Thin `stroke()`d needles.** A 2 px line is almost entirely antialiased edge; there are no solid
+  interior texels for the mip chain to keep. Every needle is a filled triangle now.
+- **`receiveShadow` on the sprig cards.** They sit inside the skirt that shadows them, and a
+  shadowed alpha card against a lit crown reads as a black spike. `cast: false, receive: false`.
+  (This turned out to be a red herring for the *original* black spikes — the normal squash was the
+  real cause — but it is still the right setting.)
+- **`under` on all four `cone` tiers vs. the lower two only.** Skipping the upper undersides saves
+  14 triangles and loses the shadow band that makes the top of the tree read. Kept on all four.
+
+---
+
+## 8. Which one I would pick
+
+**`mixed`, which is what the default now is.** One knob (`treeStyle`) flips it to any of the five.
+
+- `cone` is the strongest single conifer: the tier undersides give it a value structure nothing else
+  here has, and it reads unmistakably as a conifer at every distance from 15 m to the far ridge.
+- An **all**-conifer world reads as taiga, not as a storybook village — the crowns are narrow, so
+  the wooded rim thins out and the frame loses mass. `mixed` keeps the broadleaf mass in the valleys
+  and uses the conifers as vertical accents and hard silhouettes on the ridges, which is better on
+  the *Silhouette* axis (varied heights, no unbroken horizontal edge) than either pure world.
+- `prism` is the one to reach for if triangles get tight, or as a *second species* rather than the
+  main conifer — it reads as cypress and would suit a formal avenue or a graveyard.
+- `spire` is the weakest of the three: without the tier undersides it is flatter than `cone` for
+  more triangles than `prism`.
+
+---
+
+## 9. Still open
+
+- **Bushes at night still read as pale green glowing balls** while the stone around them goes deep
+  blue (`town_night`, bottom right). The hemisphere fill at `nightLift` is desaturated grey, so a
+  green albedo stays green while a grey albedo takes the moon's blue. This is a `lighting.js`
+  question, not a `scatter.js` one — the fix is a hue pull toward the moon colour on the night fill.
+- **Ground decals are baked once and cannot follow `treeStyle`.** `terrain.finish()` runs after
+  `scatter.build()`, so the crown-shade disc is sized from whether the tree was *born* a conifer
+  (`foliage.conifer`). Flipping the knob to `cone` leaves broadleaf-width shade discs under narrow
+  crowns in the zones where `conifer` is low. Invisible at shot distance; worth knowing.
+- The near field is still instance-budget-limited, the fringe card still leaves a faint edge-on
+  line, and crowns are still smooth domes above the leaf ring — all three from the previous round.
+- The `rockGeo` `toNonIndexed()` console warning is gone (it was a no-op call on already
+  non-indexed geometry).
