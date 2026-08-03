@@ -104,6 +104,12 @@ visible frame. The gate is on the total.
 
 A component that looks superb and blows the budget has failed. Beauty we can't draw isn't a result.
 
+**Headed GPU timings on this machine swing ±3.6 ms run to run** — three identical `wall_day` runs
+measured 7.8 / 11.4 / 10.9 ms. Do not report a regression or an improvement inside that band, and
+never compare a number from one browser launch against another. Counts (draw calls, triangles,
+texture MB) ARE deterministic and are the honest way to attribute cost. For a real timing
+comparison, measure both configurations inside one page load, interleaved.
+
 ## How your work gets judged
 
 Renders go into a **blind** side-by-side against a Tiny Glade plate — an adversarial critic scores

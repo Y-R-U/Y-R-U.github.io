@@ -5,19 +5,18 @@ import * as THREE from 'three';
 import { ZONE_IDS, zone } from './zones.js';
 import { clamp, lerp, smoothstep } from './textures/noise.js';
 import { heightAt, waterY, creekZ, creekHalf, zoneAt, fbm, CENTERS, nearCamera, inCorridor, camDist } from './terrain.js';
-import { track } from '../engine/budget.js';
 import { getEnvIntensity, onEnvIntensity } from './materials.js';
-import { trackAniso } from './textures/bake.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
+import { paint, noFlip, SPECIES, barkGeo, crownGeo, LEAF_TEX, BARK_TEX, CROWN } from './tree.js';
 
 const CAP = { grass: 3100, flower: 300, bush: 300, rock: 150, tree: 66 };
 
 const TUNING = {
   grass: { cluster: [1, 5], clusterR: 0.78, footBlend: 0.5, footShade: 0.92, tip: 0.98, value: 0.82 },
-  canopy: { lobes: 5, amp: 0.50, sharp: 2.0, noise: 0.09, mottle: 0.30, flat: 0.34, sy: 1.0, join: 0.26, rim: 0.14, top: 0.60 },
+  crown: { join: 0.50, rim: 0.07, top: 0.36 },
   bush: { lobes: 3, amp: 0.44, sharp: 1.5, noise: 0.14, mottle: 0.2, flat: 0.68, sy: 0.70, join: 0.36, rim: 0.16, top: 0.68 },
   trunk: { prof: [[0.54, 0], [0.29, 0.13], [0.165, 1]], sides: 6, foot: 0.32 },
-  tree: { lift: 0.84, spread: 1.2, canopyDecal: 0.55, footDecal: 0.8, conifer: 'cone', style: 'mixed' },
+  tree: { canopyDecal: 0.55, footDecal: 0.8, conifer: 'cone', style: 'mixed' },
   cone: { tiers: 4, sides: 7, under: 0.34, jitter: 0.21, rim: 0.10, join: 0.30, top: 0.70 },
   spire: { tiers: 4, sides: 8, under: 0, jitter: 0.24, rim: 0.12, join: 0.34, top: 0.70 },
   prism: { rim: 0.10, join: 0.62, top: 0.72 },
@@ -27,6 +26,7 @@ const TUNING = {
 };
 
 let GID = 0;
+const BROAD = /^(bark|leaf)\d$/;
 
 function rng(seed) {
   let s = (seed >>> 0) || 0x9e3779b9;
@@ -71,48 +71,6 @@ function footRatio(target, ref, blend, shade) {
 // for three, which is why the grass read as isolated sticks: the triangle budget could never buy
 // enough of them. Every quad is emitted twice with opposite winding rather than using DoubleSide,
 // which flips the normal on the back face and turns half of each card black.
-
-// Deliberately not a CanvasTexture: uploading the element hands the shader premultiplied rgb, so
-// the mip level of a thin alpha shape arrives already multiplied down to near-black while its
-// alpha still clears alphaTest. getImageData is unpremultiplied, hence the DataTexture and the
-// manual row flip.
-function paint(w, h, draw, label) {
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const g = c.getContext('2d');
-  draw(g, w, h);
-  const src = g.getImageData(0, 0, w, h).data;
-  const px = new Uint8Array(w * h * 4);
-  for (let y = 0; y < h; y++) px.set(src.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
-  bleed(px, w, h);
-  const t = new THREE.DataTexture(px, w, h, THREE.RGBAFormat);
-  t.colorSpace = THREE.SRGBColorSpace;
-  trackAniso(t);
-  t.generateMipmaps = true;
-  t.minFilter = THREE.LinearMipmapLinearFilter;
-  t.magFilter = THREE.LinearFilter;
-  t.needsUpdate = true;
-  return track(t, { w, h, fmt: 'rgba', label });
-}
-
-// Push the opaque pixels' colour out over every transparent one, so a mip only ever fades alpha.
-function bleed(px, w, h) {
-  const n = w * h;
-  const known = new Uint8Array(n), q = new Int32Array(n);
-  let head = 0, tail = 0;
-  for (let i = 0; i < n; i++) if (px[i * 4 + 3] > 6) { known[i] = 1; q[tail++] = i; }
-  while (head < tail) {
-    const k = q[head++], x = k % w, y = (k / w) | 0;
-    for (let e = 0; e < 4; e++) {
-      const nx = x + (e === 0 ? 1 : e === 1 ? -1 : 0), ny = y + (e === 2 ? 1 : e === 3 ? -1 : 0);
-      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-      const j = ny * w + nx;
-      if (known[j]) continue;
-      px[j * 4] = px[k * 4]; px[j * 4 + 1] = px[k * 4 + 1]; px[j * 4 + 2] = px[k * 4 + 2];
-      known[j] = 1; q[tail++] = j;
-    }
-  }
-}
 
 // Blades are painted near-white at the tip and only mildly darker at the root. The old map ran
 // 0.44 → 1.0, and against pale ground that dark root is what made a lawn read as a field of spikes.
@@ -462,25 +420,6 @@ function trunkGeo(foot) {
   return g;
 }
 
-// The fringe card only has to break the canopy outline, so its alpha is pushed to the rim and the
-// centre is left empty. A card that fills its disc turns into a solid dark slab across the crown
-// the moment it is seen edge-on, and with three per tree one always is.
-function leafRing(g, w, h, R) {
-  const cx = w / 2, cy = h * 0.5;
-  for (let i = 0; i < 110; i++) {
-    const a = R() * 6.284;
-    const rr = R() < 0.18 ? span(R, 1.0, 1.26) : Math.sqrt(span(R, 0.5, 1.0));
-    const x = cx + Math.cos(a) * rr * w * 0.43;
-    const y = cy + Math.sin(a) * rr * h * 0.41;
-    const s = w * span(R, 0.05, 0.1) * (1.2 - 0.35 * rr);
-    const v = Math.round(255 * span(R, 0.72, 0.98));
-    g.fillStyle = `rgb(${v},${v},${v})`;
-    g.beginPath();
-    g.ellipse(x, y, s, s * span(R, 0.55, 0.95), a, 0, 6.284);
-    g.fill();
-  }
-}
-
 // The instance colour multiplies the whole card, so a flower painted like a blade of grass comes
 // out as a solid purple stick. The stalk is painted dark enough that any hue times it reads as a
 // stem, and only the head is near-white.
@@ -521,7 +460,6 @@ const TEX = {
     broadLeaves(g, GW, GW, h, rng(0x13ff02));
   }, 'foliage:grass'),
   flower: paint(96, 96, (g, w, h) => flowerHeads(g, w, h, rng(0x22bb44)), 'foliage:flower'),
-  leaf: paint(128, 128, (g, w, h) => leafRing(g, w, h, rng(0x5c31d9)), 'foliage:leaf'),
   needle: paint(256, 128, (g, w, h) => {
     needleBand(g, 0, w / 2, h, rng(0x1af09c));
     needleSpray(g, w / 2, w / 2, h, rng(0x6b2d41));
@@ -619,13 +557,14 @@ export class Scatter {
       // the blade root takes the ground's hue so a card starts in the earth rather than on it
       const foot = footRatio(z.groundTint, f.grass[0], TUNING.grass.footBlend, TUNING.grass.footShade);
       const gramp = (t) => A.copy(foot).lerp(B.setRGB(TUNING.grass.tip, TUNING.grass.tip, TUNING.grass.tip), smoothstep(0.0, 0.42, t));
-      const canopyRamp = leafRamp(f, TUNING.canopy);
-      const fringeRamp = (t) => { canopyRamp(clamp(t * 0.78 + 0.03, 0, 1), A); return A.multiplyScalar(0.86); };
+      const crownRamp = leafRamp(f, TUNING.crown);
       const nRamp = needleRamp(f, TUNING.cone);
       const sRamp = needleRamp(f, TUNING.spire);
       const sprigRamp = (t) => { sRamp(clamp(0.48 + t * 0.5, 0, 1), A); return A; };
       const needleMat = (n) => foliageMat(n, { map: TEX.needle, alphaTest: TUNING.needle.alphaTest });
-      return {
+      const barkMat = foliageMat('bark', { map: BARK_TEX, roughness: 0.88 });
+      const crownMat = noFlip(foliageMat('canopy', { map: LEAF_TEX, alphaTest: CROWN.alphaTest, roughness: 0.94 }));
+      const set = {
         grass: new Kind(cardGeo([
           { w: 1.5, h: 1.0, ry: 0, lean: 0.07, u0: PANEL[0][0], u1: PANEL[0][1] },
           { w: 1.28, h: 0.84, ry: 1.16, ox: 0.14, oz: -0.08, lean: -0.06, u0: PANEL[1][0], u1: PANEL[1][1] },
@@ -636,13 +575,6 @@ export class Scatter {
           foliageMat('bush'), CAP.bush),
         rock: new Kind(rockGeo(R), foliageMat('rock', { roughness: 0.85 }), CAP.rock),
         trunk: new Kind(trunkGeo(TUNING.trunk.foot), foliageMat('trunk', { roughness: 0.9 }), CAP.tree),
-        canopy: new Kind(blobGeo(1, { ...TUNING.canopy, seed: 11 + i, ground: false, ramp: canopyRamp }),
-          foliageMat('canopy'), CAP.tree),
-        fringe: new Kind(cardGeo([
-          { w: 2.4, h: 2.0, ry: 0, ox: 0.3, oz: 0.14 },
-          { w: 2.3, h: 1.92, ry: 1.05, ox: -0.32, oz: 0.2 },
-          { w: 2.2, h: 1.86, ry: 2.1, ox: 0.06, oz: -0.34 },
-        ], fringeRamp), foliageMat('fringe', { map: TEX.leaf, alphaTest: 0.35 }), CAP.tree, { cast: false }),
         cone: new Kind(tierGeo({ ...TUNING.cone, seed: 21 + i, ramp: nRamp }), foliageMat('cone'), CAP.tree),
         prism: new Kind(prismGeo({ seed: 31 + i, ramp: needleRamp(f, TUNING.prism) }),
           needleMat('prism'), CAP.tree),
@@ -656,6 +588,11 @@ export class Scatter {
         ], sprigRamp), needleMat('sprig'), CAP.tree, { cast: false, receive: false }),
         pend: [], z, f,
       };
+      SPECIES.forEach((sp, k) => {
+        set['bark' + k] = new Kind(barkGeo(sp, 5 + k * 7 + i * 3), barkMat, CAP.tree);
+        set['leaf' + k] = new Kind(crownGeo(sp, 9 + k * 11 + i * 5, crownRamp), crownMat, CAP.tree);
+      });
+      return set;
     });
 
     const m4 = new THREE.Matrix4();
@@ -899,39 +836,42 @@ export class Scatter {
       if (!free(px, pz, 0.45) || nearCamera(px, pz, 7)) return;
       if (inCorridor(px, pz, 34, 7) || T.slopeAt(px, pz) > 0.85) return;
       const zi = zoneAt(px, pz);
-      const f = kinds[zi].f;
+      const K = kinds[zi];
+      const f = K.f;
       const th = span(R, 2.4, 5.6) * boost * (1 + ridge * span(R, 0.1, 0.7));
       const tr = span(R, 0.8, 1.1) * (0.8 + th * 0.05);
-      const cs = span(R, 1.4, 2.4) * (1 + (th - 2.4) * 0.08);
       const ry = span(R, 0, 6.28);
       // whether this tree is a conifer when the world is mixed; the single-style views ignore it
       const con = R() < (f.conifer ?? 0);
+      const sp = Math.floor(R() * SPECIES.length);
       col.set(f.trunk).multiplyScalar(span(R, 0.72, 1.02));
-      // a conifer carries its crown on a taller, much thinner bole, so the trunk needs its own
-      // matrix — everything else about a tree is shared between the two silhouettes
+      const bark = col.clone();
+
+      // a conifer carries its crown on a taller, much thinner bole, so it needs its own matrices
       const hc = th * span(R, 1.15, 1.45);
       const cw = hc * span(R, 0.19, 0.27);
-      const tk = kinds[zi].trunk.add(place(px, pz, tr, th, tr, ry).clone(), col.clone());
-      tk.mc = place(px, pz, tr * 0.58, hc * 0.72, tr * 0.58, ry).clone();
-      tk.con = con;
-      // squat and tall crowns from the same blob: the outline changes, the material does not
-      const cy = cs * span(R, 0.82, 1.45);
-      const ct = tint(col, R, 0.82, 1.14, 0.05).clone();
-      const m = place(px, pz, cs, cy, cs, ry).clone();
-      m.elements[13] += th * TUNING.tree.lift;
-      kinds[zi].canopy.add(m, ct).con = con;
-      const fs = cs * TUNING.tree.spread / 1.2;
-      const fr = place(px, pz, fs, cy * TUNING.tree.spread, fs, ry + span(R, 0.4, 1.2)).clone();
-      fr.elements[13] += th * TUNING.tree.lift - cy * 0.92;
-      kinds[zi].fringe.add(fr, ct).con = con;
+      K.trunk.add(place(px, pz, tr * 0.58, hc * 0.72, tr * 0.58, ry).clone(), bark);
       const nt = tint(col, R, 0.86, 1.1, 0.04).clone();
       const cm = place(px, pz, cw, hc * 0.88, cw, ry + span(R, 0, 2.1)).clone();
       cm.elements[13] += hc * 0.15;
-      for (const k of ['cone', 'prism', 'spire', 'sprig']) kinds[zi][k].add(cm, nt).con = con;
+      for (const k of ['cone', 'prism', 'spire', 'sprig']) K[k].add(cm, nt);
+
+      // Broadleaf bark and crown share one matrix — geometry y 0..1 is the whole tree, so the
+      // limbs land inside the crown by construction instead of by two matrices agreeing.
+      const S = SPECIES[sp];
+      const sy = th * span(R, 1.1, 1.4);
+      const sx = sy * span(R, 0.85, 1.3);
+      const bm = place(px, pz, sx, sy, sx, ry).clone();
+      const lt = tint(col, R, 0.88, 1.08, 0.05).clone();
+      for (let k = 0; k < SPECIES.length; k++) {
+        K['bark' + k].add(bm, bark);
+        K['leaf' + k].add(bm, lt);
+      }
+      const cs = sx * (S.rx * 1.05 + S.size * 0.9);
       // Ground dressing is deferred: roughly three times as many trees are generated as the cap
       // keeps, and paying for a decal and a litter clump per *candidate* spent about 6 k triangles
       // and a third of the grass budget on trees that never got drawn.
-      kinds[zi].pend.push({ x: px, z: pz, cs, tr, th, cw, con });
+      K.pend.push({ x: px, z: pz, cs, tr: con ? tr : sx * S.trunk * 2.4, th: con ? hc : sy, cw, con, sp });
       T.mark(px, pz, 0.85);
     };
 
@@ -952,7 +892,8 @@ export class Scatter {
       }
     }
 
-    const CROWNS = ['canopy', 'fringe', 'cone', 'prism', 'spire', 'sprig'];
+    const CROWNS = ['cone', 'prism', 'spire', 'sprig',
+      ...SPECIES.map((_, k) => 'bark' + k), ...SPECIES.map((_, k) => 'leaf' + k)];
     for (const set of kinds) {
       // every crown variant plus the trunk is the same tree, so they must be thinned in step
       shuffle(set.trunk.items, R, ...CROWNS.map(n => set[n].items), set.pend);
@@ -962,6 +903,7 @@ export class Scatter {
       for (let i = 0; i < keep; i++) {
         const t = set.pend[i];
         this.trees.push(t);
+        for (const n of CROWNS) { set[n].items[i].con = t.con; set[n].items[i].sp = t.sp; }
         // two discs: the crown's own shade, then a tight one at the flare. Without the tight one
         // the trunk meets a lit patch of grass and the whole tree reads as a sticker.
         // The decals are baked into the terrain once, so a mixed world sizes them from the style
@@ -1059,11 +1001,11 @@ export class Scatter {
       for (const it of items) {
         if (style === 'none') break;
         const con = mix ? it.con : style !== 'broadleaf';
-        const want = name === 'trunk' ? true
-          : name === 'canopy' || name === 'fringe' ? !con
+        const want = name === 'trunk' ? con
+          : BROAD.test(name) ? !con && +name[4] === it.sp
             : con && (name === pick || (name === 'sprig' && pick === 'spire'));
         if (!want) continue;
-        mesh.setMatrixAt(n, name === 'trunk' && con ? it.mc : it.m);
+        mesh.setMatrixAt(n, it.m);
         mesh.setColorAt(n, it.c);
         n++;
       }

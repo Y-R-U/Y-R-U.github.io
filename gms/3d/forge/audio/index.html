@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1013">
+<meta name="description" content="FORGE audio lab — procedural music and sound effects, synthesized live with the Web Audio API.">
+<title>FORGE · Audio Lab</title>
+<link rel="stylesheet" href="css/lab.css">
+</head>
+<body>
+
+<header id="top">
+  <a id="back" href="../index.html" aria-label="Back to FORGE">‹</a>
+  <div id="title"><b>AUDIO LAB</b><s>procedural sound · web audio</s></div>
+  <div id="meter">
+    <canvas id="scope" width="180" height="34"></canvas>
+    <div id="meterbars"><i id="rms"></i><u id="pk"></u></div>
+    <div id="voices">0 voices</div>
+  </div>
+</header>
+
+<nav id="tabs">
+  <button data-tab="player" class="on">Player</button>
+  <button data-tab="inst">Instruments</button>
+  <button data-tab="sfx">SFX bench</button>
+</nav>
+
+<main>
+  <section id="tab-player" class="tab on"></section>
+  <section id="tab-inst" class="tab"></section>
+  <section id="tab-sfx" class="tab"></section>
+</main>
+
+<div id="gate">
+  <div class="gcard">
+    <div class="glogo">AUDIO LAB</div>
+    <p>Everything you hear is synthesized in the browser — there are no audio files.</p>
+    <button id="gbtn">Enable audio</button>
+    <small>Browsers only start audio from a real tap.</small>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

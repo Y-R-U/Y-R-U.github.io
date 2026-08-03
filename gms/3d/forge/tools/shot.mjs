@@ -132,6 +132,9 @@ async function main() {
     const url = `http://127.0.0.1:${PORT}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}${args.hud ? '&hud=1' : ''}${args.set ? '&' + args.set : ''}`;
     await S('Page.navigate', { url });
     await waitFor(S, `window.__forge && window.__forge.ready`, 15000);
+    // A reduced shadow rate makes captured frames bimodal — calls and triangles depend on whether
+    // the frame you landed on rebuilt the map. Perf runs measure the worst case, not the luck.
+    if (args.perf) await evalJSON(S, `(()=>{__forge.app.quality.set('shadowRate','every frame');return 1})()`);
     // let it settle: shadow maps, texture uploads, then a stable perf window
     // --pre runs before the frame is captured; --eval after it, on the frame you are looking at.
     if (args.pre) {
