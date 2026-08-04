@@ -40,6 +40,7 @@ export class Interior {
       this.deck = this.ceil + 0.22;
       this.roomH2 = THREE.MathUtils.clamp(wallTop - this.deck - 0.1, 2.0, 2.7);
       this.ceil2 = this.deck + this.roomH2;
+      this.level = this.fy;   // you always come in through a ground floor door
     }
     // Boarding runs to the underside of whatever is overhead. Stopping it at the dado-derived
     // room height leaves a strip of daylight between the wall top and the deck.
@@ -73,20 +74,34 @@ export class Interior {
 
   get top() { return this.loft ? this.ceil2 : this.ceil; }
 
-  // Which floor is under a local point. Off the stair there are only ever two answers and the
-  // stair is the only way between them, so a threshold picks. Once the player is on the flight it
-  // stays authoritative even when they have run ahead of it — see stairBlock.
+  // Which floor is under a local point. Off the stair there are only ever two answers, and the
+  // stair is the only way between them, so the answer is simply wherever the stair last left you.
+  // Reading it off the height instead fails at the top: the feet ease upward and lag a sprint by
+  // more than a metre, so you arrive on the deck still measuring as downstairs and drop through it.
   floorLocal(lx, lz, y) {
     if (!this.loft) return this.fy;
     const s = stairFloor(this, lx, lz);
     if (s !== null && (this.onStair || Math.abs(s - y) < 0.7)) return s;
-    return y > this.deck - 0.5 ? this.deck : this.fy;
+    return this.level;
   }
 
   blockLocal(p, y) {
     if (!this.loft) return;
-    this.onStair = stairBlock(this, p, y, this.onStair ? this.lastH : null);
-    if (this.onStair) this.lastH = stairFloor(this, p.x, p.z);
+    if (stairBlock(this, p, y, this.onStair ? this.lastH : null)) this.onFlight(stairFloor(this, p.x, p.z));
+    else this.onStair = false;
+  }
+
+  // The scripted climb writes the player's position itself, so it has to keep these up to date
+  // rather than leaving it to blockLocal, which only runs on a frame the player is steering.
+  onFlight(h) {
+    this.onStair = true;
+    this.lastH = h;
+    this.level = h > (this.fy + this.deck) / 2 ? this.deck : this.fy;
+  }
+
+  landed(top) {
+    this.onStair = false;
+    this.level = top ? this.deck : this.fy;
   }
 
   // `sun` is the direction toward the sun in this room's own frame.

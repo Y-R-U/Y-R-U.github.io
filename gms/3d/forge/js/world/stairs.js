@@ -5,12 +5,13 @@
 import * as THREE from 'three';
 import { T, flat } from './details.js';
 
-const R = 0.85;                       // outer radius of a tread
-export const WELL = R / Math.SQRT2;   // half-side of the square hole, inscribed so it is all stair
+const R = 0.85;                       // outer radius of a tread, and of the hole it comes up through
 const GAP = 0.30;                     // gap from the stair to the +z wall it backs onto
-const A0 = -Math.PI / 2;              // both landings face -z, into the room
+const A0 = -Math.PI / 2;              // the foot of the flight faces -z, into the room
 const TAU = Math.PI * 2;
 const REACH = 0.7;                    // how far from a tread still counts as standing on it
+const WALK_R = 0.52;                  // radius the scripted walk follows: the middle of a tread
+const LEAD = 0.58;                    // how far beyond the rim a landing sits
 
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 const wrap = a => { const t = a % TAU; return t < 0 ? t + TAU : t; };
@@ -34,6 +35,37 @@ export function stairFloor(I, lx, lz) {
   return I.fy + (I.deck - I.fy) * (wrap(Math.atan2(dz, dx) - A0) / TAU);
 }
 
+// The arc of rim you are allowed to step onto the flight from at deck level: anywhere else the
+// tread below you is more than a stride down. The loft railing is built to exactly this opening,
+// so the rail you can see and the rule you can feel are the same thing.
+export function gateArc(I) {
+  return THREE.MathUtils.clamp(TAU * REACH / (I.deck - I.fy), 0.6, 1.6);
+}
+
+// Where you stand to use the stair. The foot is just past the first tread; the head is inside the
+// gate, a little short of the seam so the last step onto the deck is a step and not a scramble.
+export function stairLanding(I, top) {
+  const { x: sx, z: sz } = stairPos(I);
+  const a = top ? headAngle(I) : A0 + 0.25;
+  return { x: sx + Math.cos(a) * (R + LEAD), z: sz + Math.sin(a) * (R + LEAD), y: top ? I.deck : I.fy };
+}
+
+const headAngle = I => A0 + TAU - Math.min(gateArc(I) / 2, 0.35);
+
+// The scripted walk, as local waypoints from the foot landing to the head one.
+export function stairPath(I, up) {
+  const { x: sx, z: sz } = stairPos(I);
+  const rise = I.deck - I.fy;
+  const a0 = A0 + 0.25, a1 = headAngle(I);
+  const pts = [stairLanding(I, false)];
+  for (let i = 0; i <= 26; i++) {
+    const a = a0 + (a1 - a0) * i / 26;
+    pts.push({ x: sx + Math.cos(a) * WALK_R, z: sz + Math.sin(a) * WALK_R, y: I.fy + rise * (a - A0) / TAU });
+  }
+  pts.push(stairLanding(I, true));
+  return up ? pts : pts.reverse();
+}
+
 // Pushed back out to the rim when you are beside the flight rather than on it, and told whether
 // you ended up on it. `ref` is the flight height you were on last frame, or null if you were off:
 // getting on needs a tread at your feet, staying on only needs the height to be continuous. A
@@ -44,7 +76,14 @@ export function stairBlock(I, p, y, ref) {
   const { x: sx, z: sz } = stairPos(I);
   const dx = p.x - sx, dz = p.z - sz;
   const d = Math.hypot(dx, dz);
-  if (d > R) return false;
+  if (d > R) {
+    // Mid-flight the rim is the handrail, so the two landings are the only ways off.
+    if (ref === null || ref < I.fy + 0.35 || ref > I.deck - 0.35) return false;
+    const k = (R - 0.02) / d;
+    p.x = sx + dx * k;
+    p.z = sz + dz * k;
+    return true;
+  }
   const h = stairFloor(I, p.x, p.z);
   if (ref === null ? Math.abs(h - y) < REACH : Math.abs(h - ref) < 0.6) return true;
   const k = (R + 0.02) / Math.max(d, 1e-3);
@@ -74,14 +113,18 @@ export function build(b, I, rand) {
     T(sx, I.fy + (rise + 1.02) / 2, sz));
 
   // one baluster per tread with a rail cap sloping to the next: a handrail for a quarter of what
-  // a swept tube costs
-  const rh = 0.92, pitch = Math.atan2(step, R * dA);
+  // a swept tube costs. The cap spans the chord to the next baluster, not the arc — an arc-length
+  // cap is half as long again as the gap it bridges and the run comes out a pile of crossed sticks.
+  const rr = R - 0.09;
+  const rh = 0.92, chord = Math.hypot(2 * rr * Math.sin(dA / 2), step);
+  const pitch = Math.atan2(step, 2 * rr * Math.sin(dA / 2));
   for (let i = 0; i < n; i++) {
-    const a = A0 + dA * (i + 0.6);
     const y = I.fy + step * (i + 1);
-    const px = sx + Math.cos(a) * (R - 0.09), pz = sz + Math.sin(a) * (R - 0.09);
+    if (y + rh > I.deck) break;   // above the deck the loft railing takes over; two rails read as a tangle
+    const a = A0 + dA * (i + 0.6);
+    const px = sx + Math.cos(a) * rr, pz = sz + Math.sin(a) * rr;
     b.add('wood', box(0.045, rh, 0.045), T(px, y + rh / 2, pz));
-    b.add('wood', box(0.075, 0.055, R * dA + 0.12), T(px, y + rh, pz, -a, -pitch));
+    b.add('wood', box(0.075, 0.055, chord + 0.05), T(px, y + rh, pz, -a - dA / 2, -pitch));
   }
 
   loft(b, I, rand, sx, sz);
@@ -89,34 +132,43 @@ export function build(b, I, rand) {
 
 function loft(b, I, rand, sx, sz) {
   const { rx, rz, deck } = I;
-  const x0 = sx - WELL, x1 = sx + WELL, z0 = sz - WELL, z1 = sz + WELL;
-  const strip = (ax, az, hw, hd) => b.add('wood', box(hw * 2, 0.12, hd * 2), T(ax, deck - 0.06, az));
 
-  // deck as four strips around the well, so the stair comes up through a real opening
-  strip(0, (z0 - rz) / 2, rx, (z0 + rz) / 2);
-  strip(0, (z1 + rz) / 2, rx, (rz - z1) / 2);
-  strip((x0 - rx) / 2, sz, (x0 + rx) / 2, WELL);
-  strip((x1 + rx) / 2, sz, (rx - x1) / 2, WELL);
+  // The opening is the stair circle itself, so every point of it has a tread under it and the rim
+  // is the same line the collision uses. A square well big enough to clear the handrail would put
+  // its corners out past the treads, leaving holes you cannot stand in and cannot fall through.
+  const slab = new THREE.Shape([
+    new THREE.Vector2(-rx, -rz), new THREE.Vector2(rx, -rz),
+    new THREE.Vector2(rx, rz), new THREE.Vector2(-rx, rz),
+  ]);
+  const hole = new THREE.Path();
+  hole.absarc(sx, sz, R, 0, TAU, true);
+  slab.holes.push(hole);
+  b.add('wood', new THREE.ExtrudeGeometry(slab, { depth: 0.12, bevelEnabled: false, curveSegments: 16 }),
+    T(0, deck, 0, 0, Math.PI / 2));
 
   const joists = Math.max(2, Math.round(rx * 2 / 1.5));
   for (let i = 0; i < joists; i++) {
     const x = -rx + rx * 2 * (i + 0.5) / joists;
-    if (x > x0 - 0.12 && x < x1 + 0.12) continue;
-    b.add('wood', box(0.16, 0.19, rz * 2), T(x, deck - 0.21, 0));
+    if (Math.abs(x - sx) < R + 0.12) continue;
+    b.add('wood', box(0.16, 0.19, rz * 2), T(x, deck - 0.215, 0));
   }
 
-  // railed on three sides; the gate is the -z side, which is where the flight tops out
-  const rail = (ax, az, len, along) => {
-    const posts = Math.max(2, Math.round(len / 0.4));
-    for (let i = 0; i <= posts; i++) {
-      const u = -len / 2 + len * i / posts;
-      b.add('wood', box(0.05, 0.86, 0.05), T(ax + (along ? u : 0), deck + 0.43, az + (along ? 0 : u)));
-    }
-    b.add('wood', box(len + 0.09, 0.07, 0.09), T(ax, deck + 0.89, az, along ? 0 : Math.PI / 2));
-  };
-  rail(sx, z1, WELL * 2, true);
-  rail(x0, sz, WELL * 2, false);
-  rail(x1, sz, WELL * 2, false);
+  // Railed right round the opening bar the gate, which starts at the seam — the post there is what
+  // stands between the loft and a three metre drop to the foot of the flight.
+  const rr = R + 0.11;
+  const span = TAU - gateArc(I);
+  const posts = Math.max(4, Math.round(span / 0.42));
+  for (let i = 0; i <= posts; i++) {
+    const a = A0 + span * i / posts;
+    b.add('wood', box(0.05, 0.9, 0.05), T(sx + Math.cos(a) * rr, deck + 0.45, sz + Math.sin(a) * rr));
+  }
+  // caps sit on the chord between two posts, which is inboard of the posts themselves
+  const half = span / posts / 2, cr = rr * Math.cos(half);
+  for (let i = 0; i < posts; i++) {
+    const a = A0 + span * (i + 0.5) / posts;
+    b.add('wood', box(0.08, 0.07, 2 * rr * Math.sin(half) + 0.05),
+      T(sx + Math.cos(a) * cr, deck + 0.92, sz + Math.sin(a) * cr, -a));
+  }
 
   // Walls stop at the eaves, where the sloping ceiling comes down to meet them.
   const rise = gableRise(I);

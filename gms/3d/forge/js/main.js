@@ -9,6 +9,7 @@ import { People } from './world/people.js';
 import { Chickens } from './world/chicken.js';
 import { Player } from './player.js';
 import { Doors } from './world/doors.js';
+import * as stairs from './world/stairs.js';
 import { walkStep, groundAt } from './world/colliders.js';
 import { Input } from './input.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -42,6 +43,7 @@ window.__forge.chickens = chickens;
 window.__forge.player = player;
 window.__forge.doors = doors;
 window.__forge.walk = { walkStep, groundAt };
+window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
 window.__forge.setScenario = id => getScenario(id)?.setup(app);
 

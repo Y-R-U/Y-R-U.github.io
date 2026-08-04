@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { getMaterial } from './materials.js';
 import { Colliders, wallBox } from './colliders.js';
 import { Interior } from './interior.js';
+import { Climb } from './climb.js';
 
 const OUT = 2.05;     // where you are taken to before the door opens
 const IN = 1.55;      // where you end up on the other side
@@ -31,6 +32,7 @@ export class Doors {
     this.u = 0;
     this.active = null;
     this.interior = null;
+    this.climb = new Climb(player);
     this.cool = 0;
     this.since = 0;
     this.radius = 1.5;
@@ -55,6 +57,10 @@ export class Doors {
       v => { this.env.shaft = v; });
     q.register({ key: 'doorSnap', label: 'Jump inside door #', type: 'range', min: -1, max: 40, step: 1, default: -1, group: 'Interiors' },
       v => { this.snapTo = v | 0; });
+    q.register({ key: 'autoStair', label: 'Auto-walk the stairs', type: 'toggle', default: true, group: 'Interiors' },
+      v => { this.climb.enabled = !!v; if (!v) this.climb.stop(); });
+    q.register({ key: 'stairPace', label: 'Stair walk speed', type: 'range', min: 0.8, max: 4, step: 0.1, default: 2.2, group: 'Interiors' },
+      v => { this.climb.pace = v; });
   }
 
   // Skips the walk and drops the player inside, for renders and tests. -1 does nothing.
@@ -166,7 +172,11 @@ export class Doors {
 
     if (this.releasing) this.release(P, dt);
     if (this.state === 'out') this.watchOutside(P);
-    else if (this.state === 'in') this.watchInside(P, dt);
+    else if (this.state === 'in') {
+      P.indoor = 1;
+      this.since += dt;
+      if (!this.climb.update(dt, P) && !this.climb.atLanding(P)) this.watchInside(P);
+    }
     else this.run(dt, P);
 
     if (this.interior) {
@@ -189,9 +199,7 @@ export class Doors {
     this.begin(d, 'entering');
   }
 
-  watchInside(P, dt) {
-    P.indoor = 1;
-    this.since += dt;
+  watchInside(P) {
     if (this.since < 0.6 || this.cool > 0) return;
     if (!this.nearest(P.pos)) return;
     const v = Math.hypot(P.vel.x, P.vel.z);
@@ -202,6 +210,7 @@ export class Doors {
 
   begin(d, state) {
     const P = this.player;
+    this.climb.stop();
     this.active = d;
     this.state = state;
     this.u = 0;
@@ -329,6 +338,7 @@ export class Doors {
       const dx = x - ox, dz = z - oz;
       return oy + I.floorLocal(dx * cs - dz * sn, dx * sn + dz * cs, y - oy);
     };
+    this.climb.bind(d, I);
   }
 
   setHidden(v) {
@@ -337,6 +347,7 @@ export class Doors {
   }
 
   close() {
+    this.climb.clear();
     if (this.hidden) this.setHidden(false);
     if (!this.interior) return;
     this.object3D.remove(this.interior.object3D);
@@ -393,6 +404,11 @@ export class Doors {
     return true;
   }
 
+  // Test hook: drives a climb without input.
+  triggerStair(up = true) {
+    return this.state === 'in' && this.climb.force(up, this.player);
+  }
+
   report() {
     const I = this.interior;
     return {
@@ -400,6 +416,7 @@ export class Doors {
       indoor: +this.player.indoor.toFixed(3),
       arm: +this.player.camPos.distanceTo(this.player.camAim).toFixed(3),
       tris: I ? I.tris : 0,
+      loft: !!I?.loft, level: I?.level, climb: this.climb.report(),
     };
   }
 }
