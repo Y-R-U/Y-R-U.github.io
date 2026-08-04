@@ -170,7 +170,7 @@ if (live) {
   hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
   const skip = () => camera.stopFly();
   addEventListener('pointerdown', function once(e) {
-    if (e.target.closest('#ui, #sheet, #knobs, #showroom')) return;
+    if (e.target.closest('#ui, #sheet, #knobs, #showroom, #intro')) return;
     removeEventListener('pointerdown', once);
     skip();
   });

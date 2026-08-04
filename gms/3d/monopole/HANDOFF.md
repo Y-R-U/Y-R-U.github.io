@@ -3191,3 +3191,189 @@ every scenario holds 60 fps with GPU p95 under 10 ms except `station_night` at 9
     two-way diff.** `git diff HEAD <branch>` on a branch that predates a merged pass shows that
     pass's work as *deletions*, and taking it deletes real code. The merge base told the truth in
     every one of the fifteen conflicts here.
+
+---
+
+# Session 13a — onboarding
+
+Wrote `js/ui/intro.js`, `content/intro.js` and `intro.css`. **Nothing else was touched** —
+`index.html` and `js/main.js` still do not know this layer exists. See **WIRING NEEDED** below; it
+is three edits and the feature is dead without them.
+
+## What it is
+
+Four things, all inside one `#intro` root:
+
+1. **First-run briefing.** Four tap-through cards over the cold-open fly-by. Bottom-anchored in the
+   lane between the sheet and the speed pill, translucent over a blur so the fly-by still reads
+   through them. Dots + **Skip** on every card, **Start** on the last. Escape skips.
+2. **A persistent objective chip.** One line of what to do now; tap it to unfold one sentence of
+   *why*; a `?` beside it opens the reference. Hides itself whenever a sheet is open.
+3. **A coach mark** on the dock button the current objective names.
+4. **How to play** — a scrolling reference in `#intro`, not a panel. Registered as showroom entry
+   `how_to_play` (group `misc`), and `intro.replay()` opens it.
+
+`intro.start({ app, sim, panels, hud, camera, reach, showroom, coldOpen, skip })`. Everything is
+optional except `sim`. `intro.brief()` forces the cards, `intro.replay()` opens the reference.
+
+## Layout — measured off `ui.css`, not guessed
+
+`--top` 46 px, `--dock` 58 px, `--ctrl` 42 px (40/50/38 under `max-height: 460px`). The free band
+in portrait 390×844 is y 49 → 744. Both the cards and the chip sit at
+`bottom: calc(var(--dock) + var(--ctrl) + 10px)` — the same line a `.sheet` uses, so nothing can
+overlap the speed pill, the recentre button or the dock. Cards cap at `min(44vh, 330px)`.
+
+`#intro` is `z-index: 40`, above `#ui`/`#sheet` (both 25) and the ⚙ panel (30), below the showroom
+(50). The chip is not hidden by stacking — it is hidden by `body.sheet-open`, which `panels.js`
+already toggles.
+
+Above 700 px wide the sheet becomes a right-hand column, so the cards and the chip clamp to
+`width: min(460px, 100vw - 20px)` on the left. `body.shotmode #intro { display: none }` lives in
+`intro.css`, so shot mode is safe whether or not `index.html` ever gets the rule.
+
+Verified at **390×844** and **844×390**: briefing cards 1 and 4, chip collapsed and expanded, chip
+hidden under an open sheet, the reference top and bottom. No console errors, no sideways scroll,
+`uishot`'s overlap report clean on every run.
+
+## The objective chain — the exact state each step watches
+
+Order is fixed; a step completes by observation and never un-completes. `DONE` in `js/ui/intro.js`;
+the copy is `objectives` in `content/intro.js`.
+
+| id | dock pulsed | done when |
+|---|---|---|
+| `rig` | `assign` | a ship with `shipDef(sh).mine > 0` has `sh.route` containing `'kestrel'`, **or** `sim.queued()` holds `{type:'assign', to:'kestrel'}` / `{type:'route', legs:[…'kestrel'…]}` — so the chip flips the moment the order is queued, not a week later |
+| `ore` | — | `sim.stock('ledger','ore') > 0` |
+| `halide` | `refinery` | `sim.stock('ledger','halide') > 0` **or** a `refine` event with `into === 'halide'` in `state.log` |
+| `sell` | `assign` | a `deliver` event with `credits > 0` in `state.log` |
+| `module` | `refinery` | a `module` event in `state.log`, **or** `sites.ledger.modules.length` above `content.get('station','ledger').modules.length` (3 — derived, not hard-coded) |
+| `tactic` | `tactics` | `state.tactics.owned.length > 0` or a `tactic` event in the log |
+| `hold` | — | never; the standing goal. Shows `holdStreak` as `n/4 wk` once `week >= 26`, otherwise the live `share.player` |
+
+Everything except `ore` is log-backed, and `state.log` is part of the state object, so the chain
+survives `serialise`/`deserialise` when save/resume lands.
+
+Driven live over CDP (assign the rig, tick, buy the Coil Line) the chip reads:
+
+```
+w0 rig(assign) → queued: ore → w1..w3 ore → w4 halide(refinery) → w5..w7 sell(assign)
+→ w8..w10 module(refinery) → w11 tactic(tactics)
+```
+
+## The one real design problem, and the fix
+
+**Ore lands and the refinery runs on the same tick.** `step()` unloads arrivals in stage 1 and
+produces in stage 2, so `stock.ore > 0` and the first `refine` event are always true in the same
+week. Evaluated naïvely the chain jumps `ore → sell` and the "Turn the ore into halide" step is
+structurally unreachable — it never gets a frame on screen. Confirmed, not theorised: the first run
+of the chain test printed exactly that.
+
+`current()` therefore latches **at most one completion per sim week**, except on its very first
+evaluation of the session, which catches up in one pass so a loaded save does not spend six ticks
+walking the chain. That is what `latched` is for.
+
+## Numbers in the copy come from `content/balance.js`
+
+`{token}`s in `content/intro.js` are substituted from `NUMBERS` in `js/ui/intro.js`, which reads
+`content.balance` and the ship defs. Move `win.duopoly`, `win.monopoly`, `win.checkFromWeek`,
+`win.holdWeeks`, `heat.threshold`, `loan.debtLimit`, `loan.interestWeekly`, `share.window`,
+`market.feedWeeks` or `start.cash/debt/share` and the briefing and the reference follow on their
+own. To add a token: add a key to `NUMBERS`, nothing else.
+
+## Persistence
+
+- `monopole.seen.v1` — written when the briefing is finished or skipped.
+- `?intro=1` forces it, `?intro=0` suppresses it, both regardless of storage.
+- **If `monopole.save.v1` exists the briefing does not auto-show**, even with no `seen` key, so the
+  agent adding save/resume does not have to do anything here.
+- All five combinations were tested in a real browser: fresh→cards, seen→chip, save-only→chip,
+  `?intro=1`+seen→cards, `?intro=0`+fresh→chip.
+- `localStorage` is wrapped in try/catch; private mode degrades to briefing every launch.
+
+## WIRING NEEDED
+
+**1. `index.html`** — after `<link rel="stylesheet" href="ui.css">`:
+
+```html
+<link rel="stylesheet" href="intro.css">
+```
+
+and after `<div id="sheet"></div>`:
+
+```html
+<div id="intro"></div>
+```
+
+Both are optional in the sense that `intro.js` creates the div and injects the `<link>` if they are
+missing, but the injected stylesheet loads a frame late and the first card flashes unstyled.
+
+**2. `js/main.js`** — import it with the other UI modules:
+
+```js
+import { intro } from './ui/intro.js';
+```
+
+and in the `if (live)` block, replace the tail of the cold open with:
+
+```js
+  const coldOpen = flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
+    camera.setTouchEnabled(true);
+    if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
+  });
+  intro.start({ app, sim, panels, hud, camera, reach, showroom, coldOpen, skip });
+  window.__mono.intro = intro;
+```
+
+`hud.ticker('Tap the belt to send the rig.', 6000)` in that `.then` should go — the objective chip
+says the same thing and does not time out.
+
+**3. `js/main.js`, the fly-by skip listener** — `#intro` is not in the ignore list:
+
+```js
+if (e.target.closest('#ui, #sheet, #knobs, #showroom, #intro')) return;
+```
+
+`intro.js` already calls `stopPropagation()` on `pointerdown` inside its own root so the bug cannot
+bite even without this, but the selector should say what it means.
+
+## Deliberately left undone
+
+- **`skip` is accepted and never called.** Skipping the briefing does not cut the fly-by short —
+  the fly-by is the best-looking thing in the game and 11 s is not long. One line if that is wrong.
+- **No win/lose screen.** The chip switches to "The company is out of money." / "You took the
+  Reach — duopoly." and stops. A real end screen is somebody else's component.
+- **The reference is not linked from the Dossier.** The `?` next to the chip and the showroom entry
+  are the only two ways in, because `screens.js` belongs to another agent this session. A row at
+  the bottom of the Dossier would be the natural third.
+- **No haptics, no sound, and nothing highlights the belt in the 3D.** The chip says "tap the
+  belt"; the scene itself gives no hint.
+- **A save loaded straight into week 30** shows only the standing goal. Correct, but flat.
+
+## Gotchas — session 13a
+
+73. **`panels.onStack` and `panels.onSim` hold ONE callback each,** not a set —
+    `onStack(fn) { onStackChange = fn; }`. `hud.js` registers both at build time, so a second
+    module calling `panels.onStack(...)` silently kills dock highlighting and the fixture swap.
+    The sheet-open state has to be read some other way; this layer uses a `MutationObserver` on
+    `document.body`'s class attribute, because `panels.draw()` already toggles `body.sheet-open`.
+74. **Ore arrival and refining are the same tick** (`step()` stages 1 and 2), so any tutorial that
+    treats "ore reached the station" and "the refinery produced" as consecutive steps loses one of
+    them. Above.
+75. **`main.js`'s cold-open skip listener is on `window` and ignores only
+    `#ui, #sheet, #knobs, #showroom`.** Anything new that draws over the scene during the fly-by
+    will cut the fly-by on its own first tap. `stopPropagation()` in the new layer's root is the
+    belt-and-braces fix; the selector is the real one.
+76. **A stylesheet injected from JS is not applied by the time the next statement runs.** Reading
+    `scrollHeight` on the reference immediately after `openGuide()` returned the unstyled height and
+    the scroll-to-bottom test silently did nothing. Any measurement of this layer's DOM has to wait
+    a frame — or `index.html` has to carry the `<link>` (WIRING NEEDED 1).
+77. **`uishot.mjs --eval` runs before `--wait`,** and it awaits the expression's promise. Driving
+    the sim and reading the result back wants `--eval` to stash on `window.__x` and `--report` to
+    read it; anything that needs a delay has to go in a `setTimeout` the eval does not await.
+78. **`--set=` with an empty value appends nothing** (`args.set` is falsy), which is the only way to
+    load the page with no query string at all through `uishot`. That is how default first-run
+    behaviour was tested.
+79. **`document.body`'s class changes several times a tick** — `hud.refresh()` toggles `paused` and
+    `panels.draw()` toggles `sheet-open`. A `MutationObserver` on it fires far more often than you
+    expect, so whatever it calls has to be idempotent and cheap. The chip compares a rendered key
+    string and returns early.
