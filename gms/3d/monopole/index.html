@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05070b">
+<meta name="description" content="MONOPOLE — a space company game.">
+<title>MONOPOLE</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ui.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<div id="hud">
+  <div id="perf"></div>
+</div>
+
+<div id="ui"></div>
+<div id="sheet"></div>
+
+<div id="panel">
+  <button id="panel-toggle" aria-label="Toggle settings">⚙</button>
+  <div id="panel-body"></div>
+</div>
+
+<button id="showroom-btn" aria-label="Showroom">▤</button>
+<div id="showroom">
+  <div id="showroom-bar">
+    <button id="sr-prev" aria-label="Previous">←</button>
+    <div id="sr-title">Showroom</div>
+    <button id="sr-next" aria-label="Next">→</button>
+    <button id="sr-close" aria-label="Close">✕</button>
+  </div>
+  <div id="showroom-list"></div>
+</div>
+
+<div id="boot">
+  <div class="logo">MONOPOLE</div>
+  <div class="tag">tamber reach</div>
+  <div id="boot-status">warming…</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

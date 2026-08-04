@@ -1,0 +1,6 @@
+# Comparison sheets embed copyrighted EVE / Homeworld press plates — never commit these.
+critique/
+.keys/
+# Render output and perf snapshots; regenerate with tools/shot.mjs.
+shots/
+scratch/

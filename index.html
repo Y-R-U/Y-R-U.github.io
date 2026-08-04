@@ -372,6 +372,21 @@
       border: 1px solid rgba(255,0,255,0.4);
     }
 
+    .card-wip-badge {
+      position: absolute;
+      top: 8px; left: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      pointer-events: none;
+      background: rgba(255,176,32,0.15);
+      color: #ffb020;
+      border: 1px solid rgba(255,176,32,0.45);
+    }
+
     /* ─── CARD BACK ─── */
     .card-back {
       transform: rotateY(180deg);
@@ -718,6 +733,7 @@
                  alt="${project.name}" loading="lazy">
             <div class="card-title"><span class="card-name">${lock}${project.name}</span></div>
             <div class="card-category-badge ${badgeClass}">${badgeLabel}</div>
+            ${project.wip ? '<div class="card-wip-badge">In progress</div>' : ''}
           </div>
           <div class="card-face card-back">
             <div class="card-back-header">${lock}${project.name}</div>
