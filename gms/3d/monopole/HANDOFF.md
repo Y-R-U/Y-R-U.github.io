@@ -2647,3 +2647,193 @@ it), and nothing else moved.
   limit, not a lighting one.
 - The four dock lamps are hand-placed. A station should return its lit dock points in `userData`,
   the way it should already return dock anchors.
+# Story content pass — fact re-verification + story plate images (2026-08-04)
+
+Scope was `content/stories.js` and the new `assets/story/` folder only. Nothing under `js/`,
+`tools/`, `ui.css` or `style.css` was touched.
+
+## Job 1 — the six stories were re-verified against sources
+
+The stories were **not** already accurate. One was materially stale, two had wrong facts, and one
+gave a one-sided account of a live dispute. Every correction below is sourced from a link now in
+that story's `links` array.
+
+### `meta_instagram` — stale, now corrected (this was the important one)
+
+The text stopped at "The FTC said in January 2026 that it would appeal", which was true when
+written and is no longer the current state. Verified and updated:
+
+- Notice of appeal **filed 20 January 2026**, D.C. Circuit, docket **No. 26-5028**.
+- FTC filed its **opening brief on 22 May 2026**, arguing Boasberg measured monopoly power at the
+  wrong moment — at trial rather than when the suit was filed in 2020.
+- Meta's answering brief is due **20 August 2026**; reply 29 September 2026. **No oral argument has
+  been scheduled and the appeal is undecided.** The `outcome` line now says so explicitly.
+- Confirmed correct and left alone: Boasberg, 18 November 2025, **six-week bench trial**, FTC suit
+  filed December 2020, the PSN market as Facebook / Instagram / Snapchat / MeWe, TikTok and YouTube
+  as the substitutes that broke the market definition.
+- Softened "Both deals were cleared by regulators" to "reviewed and allowed to proceed" — the FTC
+  closed its Instagram investigation rather than issuing a clearance.
+- Links replaced with the FTC's own press release and the CourtListener appellate docket.
+
+### `bunnings_guarantee` — was one-sided on a live dispute
+
+- Episode identified: Four Corners **"Hammered", broadcast 12 May 2025**. Added.
+- The **9,000 figure is Bunnings' own**, given in its media statement ("around 9,000 products
+  associated with Bunnings-owned brands", "more than 40 Bunnings-owned brands"). The story
+  previously attributed it to Four Corners. Corrected.
+- **The material fix.** The story asserted flatly that the guarantee "could not be triggered" on
+  those lines. Bunnings' media statement rejects exactly that: asked whether owned brands are used
+  to sidestep the promise it answered **"absolutely not"**, said the lowest prices policy applies
+  **"across like-for-like products"** rather than only identical ones, and cited its Ozito range
+  being cut to match comparable Black & Decker products. Both sides are now in the text.
+- The genuinely checkable tension is now stated instead of a conclusion: **Bunnings' published
+  price policy still reads "the same in-stock item"**, while its statement describes a like-for-like
+  practice. That gap is the contested part and the text says so.
+- No ACCC finding against the guarantee exists — checked, that claim stands.
+- Links: swapped the RNZ syndication for **Bunnings' own media statement (primary)** plus the price
+  policy page, keeping RNZ as the report-of-record for the programme. ABC's own domain blocks the
+  fetcher, hence RNZ rather than abc.net.au.
+
+### `bunnings_ryobi` — was accurate; sharpened and extended
+
+- 22 May 2008 assessment not opposing, Graeme Samuel's reasoning, "no single power tool brand
+  dominated" — all confirmed against the ACCC media release.
+- The Bosch objection was asserted without a source; **verified** — Robert Bosch (Australia) Pty Ltd
+  filed a submission arguing the public benefit did not outweigh the competition impact.
+- Corrected the legal test: revoking an exclusive dealing notification needs the ACCC satisfied of
+  SLC **and** that public benefit does not outweigh the harm. The story had only the first limb.
+- Added that the arrangement **still holds** — Bunnings confirmed to Four Corners in 2025 that Ryobi
+  is sold exclusively through Bunnings. Reflected in `outcome`.
+- Added the Techtronic notification N93330 alongside Bunnings' N93331.
+
+### `ford_rouge` — small factual tightening
+
+- 2,000-acre site confirmed (Ford bought 2,000 acres on the Rouge in 1915). Kept.
+- Supply-chain holdings verified via Britannica: ~16 coal mines (Kentucky, West Virginia **and
+  Pennsylvania** — Pennsylvania was missing), ~700,000 acres of timberland, iron mines and limestone
+  quarries in northern Michigan, Minnesota **and Wisconsin**, Great Lakes freighters, a railroad.
+- **Fordlandia corrected.** It was a **concession over roughly 2.5 million acres**, not a purchase
+  of "a tract". Sold back to Brazil in 1945 at a loss of **more than US$20 million**.
+- "a British cartel controlled the latex price" softened to "a British-backed scheme was restricting
+  output and holding up the latex price" — accurate to the restriction scheme without overclaiming.
+- "none of it was challenged" narrowed to "never the subject of an antitrust challenge", since Ford
+  faced unrelated antitrust matters in later decades.
+
+### `boral_predatory` — was accurate; detail added
+
+- High Court 7 February 2003, **6–1 with Kirby J dissenting**, in Boral's favour — confirmed.
+  Trial: **Heerey J, 1999**, dismissed. Full Federal Court reversed unanimously **2001**. Below-cost
+  period **April 1994 – October 1996**. C&M Brick. Section 46 TPA. Brooke Group 1993. All correct.
+- Named the 2007 provision properly: **s 46(1AA), the "Birdsville amendment"**, and added that it
+  **never produced a single case** before being repealed in 2017 on the Harper Review's
+  recommendation. The story previously implied it simply lapsed.
+
+### `phoebus_cartel` — two real errors fixed
+
+- **Wrong: "through its Paris subsidiary International General Electric".** GE was not a direct
+  member and IGE was not a Paris subsidiary. Corrected to: GE took part through **International
+  General Electric and the GE Overseas Group**, an arrangement usually read as keeping the American
+  parent at arm's length from US antitrust law. The causal claim is now attributed, not asserted.
+- **Wrong: "average bulb life fell to roughly 1,000 hours within a decade".** Krajewski's figures
+  are **about 1,800 hours in 1926 down to about 1,205 hours by the 1933–34 financial year**. The
+  story overstated the effect. Corrected to the actual numbers.
+- Members: added **Tokyo Electric (Japan)** and **ELIN (Austria)**, which were missing. `who` field
+  updated.
+- End date: the cartel was meant to run to **1955**, stopped working as the war broke it up and was
+  **nullified in 1940**. `year` changed **1924–1939 → 1924–1940**.
+- Attributed the efficiency counter-argument properly: **Britain's Monopolies and Restrictive
+  Practices Commission, 1951**, called 1,000 hours a reasonable compromise. Previously vague
+  ("British regulators later said as much").
+- Confirmed and kept: 23 December 1924 Geneva meeting, 15 January 1925 incorporation as Phoebus
+  S.A., the 1,000-hour standard against prior lives of 1,500–2,500 hours, Swiss-franc fines on a
+  published scale after central laboratory testing, and the **1949 US District Court (New Jersey)**
+  finding that GE violated the Sherman Act in the lamp business.
+
+## Job 2 — six story plate illustrations
+
+All six generated locally on mflux-queue `:7867`, `flux2-klein-9b-mlx-4bit`, 10 steps,
+**1024×432** to match the plate's 2.4:1 box. LTX `:7866` was checked idle before each submit (the
+script polls `worker_warm` and waits). Converted to JPG with `sips` at quality 80 — **26–58 KB
+each**, well inside the ~120 KB budget. `credit: 'illustration'` on all six; no PD photography used.
+
+Generator script (throwaway, not committed): `scratchpad/gen_story_images.py`. Every prompt appends
+a shared style tail:
+
+> flat vector editorial illustration, wide banner composition, clean geometric linework, plain dark
+> background, generous negative space, no lettering, no words, no numbers, no logos, no signage, no
+> watermark, no people, not a photograph
+
+Prompts as used (subject clause only; the style tail is appended to each):
+
+- **`bunnings_ryobi`** — "Left of frame, a long steel retail shelf carrying one plain rectangular
+  toolbox, and a heavy padlock hanging from the shelf rail directly above it. Right of frame, a
+  closed corrugated roller shutter fully down to the floor, with three identical plain toolboxes
+  stacked outside it on the ground, shut out. Deep hardware green toolboxes, warm grey steel,
+  near-black background."
+- **`ford_rouge`** — "Isometric blueprint diagram of an industrial supply chain drawn as one
+  connected vertical column: a mine shaft at the top, then a bulk ore ship, then a blast furnace,
+  then a long assembly hall at the bottom, one bold arrow running straight down through all four
+  stages. Muted ochre and slate blue technical linework on a dark ground."
+- **`bunnings_guarantee`** — "A large swing price tag stamped with a bold percent symbol, its string
+  tied to a long empty shelf holding exactly one plain product box. Beside it a second empty
+  comparison column with a magnifying glass hovering over nothing. Hardware green and warm grey on
+  near-black."
+- **`meta_instagram`** — "Abstract outline diagram, off-centre to the left, on a plain dark ground:
+  one large hollow square drawn in thin blue outline, and a smaller hollow square drawn in dotted
+  violet outline being pulled sideways through a gap in the large square's edge, half in and half
+  out. A long thin arrow runs in from the right edge of the frame pointing at the smaller square.
+  Two hues only, cool blue and violet, thin uniform line weight, unfilled shapes, wireframe
+  schematic. Absolutely not an app icon, not a rounded-square tile, not glossy, no gradient tile,
+  no logo."
+- **`boral_predatory`** — "A wide technical line chart filling the entire frame edge to edge, faint
+  grid across the whole width. A long horizontal dashed grey line spans the full width as a cost
+  threshold. A bold red line starts at the left edge above the dashed line, dives steeply beneath it
+  near the left and runs flat and low far below it all the way across to the right edge, then climbs
+  sharply at the far right. A thinner slate blue line starts above the dashed line, dips, and stops
+  abruptly a third of the way across, ending in a small hollow circle marker. Deep red, slate blue,
+  near black. Precise thin technical linework."
+- **`phoebus_cartel`** — "A single incandescent light bulb drawn in blueprint linework, a large
+  circular hour dial ringing the glass envelope with tick marks, its needle stopped hard at one
+  marked division. Warm amber glowing filament against deep blue-black."
+
+### Three were rejected on the first pass and re-prompted
+
+- **`meta_instagram` — rejected as a rule violation.** The first prompt produced a centred, glossy,
+  blue-to-violet **rounded-square gradient tile**: unmistakably an app icon, which amendment B
+  forbids. Re-prompted for an off-centre unfilled wireframe with explicit negatives ("not an app
+  icon, not a rounded-square tile, not glossy"). The replacement reads as a diagram.
+- **`boral_predatory` — rejected as incoherent.** The grid covered only the left half, the two lines
+  did not read as two lines, and nothing dived below the cost line and held. Re-prompted with
+  explicit edge-to-edge framing and a per-line description. The replacement now also shows the price
+  climbing at the far right, which happens to illustrate the recoupment point the story turns on.
+- **`bunnings_ryobi` — rejected as weak.** The shelf bracket held nothing and the excluded cases read
+  as wheelie bins. Re-prompted to put the toolbox on the shelf and stack the excluded ones at a
+  fully closed shutter.
+
+`ford_rouge`, `bunnings_guarantee` and `phoebus_cartel` passed first time. All six were opened and
+looked at, not merely generated. None contains text, a logo, a real person, a real storefront or
+anything photo-realistic.
+
+### Verified in the panel
+
+`node -e "import('./content/stories.js')..."` lists all six with a path and `illustration`.
+`tools/uishot.mjs --sr=story_phoebus_cartel` and `--sr=story_bunnings_ryobi` at 390×844 were both
+opened: the image fills the plate at the right ratio, the crop is negligible (source 2.37:1 into a
+2.4:1 box under `object-fit: cover`), and the `ILLUSTRATION` credit line renders beneath it. No
+console errors.
+
+## Notes for whoever comes next
+
+- **A PD upgrade is genuinely available for `phoebus_cartel`**, and only that one. 1920s–30s
+  incandescent lamp advertising and lamp-factory photography are out of copyright in most
+  jurisdictions and sit on Wikimedia Commons. Its `imagePrompt` carries that note. If it is taken,
+  `credit` must become `PD: <archive>, <item>`. `ford_rouge` has period Library of Congress Rouge
+  photography available too, but a real photograph of a real plant sits closer to the line amendment
+  B draws than lamp advertising does — the illustration is the safer choice there, and its
+  `imagePrompt` no longer suggests otherwise.
+- **`tools/uishot.mjs` has no `.jpg` entry in its MIME map**, so story images are served as
+  `application/octet-stream`. Chrome sniffs them and renders them fine, so this is cosmetic; I left
+  it alone rather than touch a file another agent may be editing. Worth a one-line fix later.
+- `meta_instagram` is the story that will go stale next. Meta's answering brief lands 20 August 2026
+  and the D.C. Circuit will rule some time after that. The `year` field, the last paragraph and
+  `outcome` all need revisiting when it does.
