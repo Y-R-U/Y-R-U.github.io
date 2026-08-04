@@ -10,6 +10,7 @@ import commodityList from '../../content/commodities.js';
 import tacticList from '../../content/tactics.js';
 import storyList from '../../content/stories.js';
 import rivalOptionList, { profile as rivalProfile, scoring as rivalScoring } from '../../content/rival.js';
+import eventList from '../../content/events.js';
 import balanceData from '../../content/balance.js';
 
 function deepFreeze(v) {
@@ -29,6 +30,7 @@ const registry = {
   tactic: tacticList,
   story: storyList,
   rivalOption: rivalOptionList,
+  event: eventList,
   palette: [],
   formation: [],
 };

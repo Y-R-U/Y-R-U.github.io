@@ -3377,3 +3377,334 @@ bite even without this, but the selector should say what it means.
     `panels.draw()` toggles `sheet-open`. A `MutationObserver` on it fires far more often than you
     expect, so whatever it calls has to be idempotent and cheap. The chip compares a rendered key
     string and returns early.
+
+# Session 13b — economy stakes and pacing
+
+**Scope: `js/sim/*`, `content/balance.js`, `content/tactics.js`, `content/events.js` (new),
+`sim.mjs`.** No renderer, no UI, no `js/world/`. Two other agents were in `js/ui/*` and
+`js/ui/intro.js` in parallel; nothing here touches their files.
+
+Three jobs from session 12's own "what is still short":
+
+1. Nothing in the economy could kill you — 0% bust from anything but a deterministic fine.
+2. The educational payload was unreachable — the tactic unlocks that show the Phoebus / Bunnings /
+   FTC stories arrived too late or never.
+3. Nothing told the player they were in danger.
+
+All three are done and `node sim.mjs 500` is green on eleven assertions.
+
+## What was added
+
+### The shock deck — `content/events.js` + `js/sim/shocks.js`
+
+Ten one-off cards, drawn from the seeded `rng`, at most one per draw. This is now the only thing
+in the economy that can reach the debt limit without a regulator.
+
+**Exposure, not bad luck.** `exposure(state)` returns six terms in 0..1 — `leverage` (draw beyond
+the founding loan), `thin` (weeks of runway left), `transit` (hulls committed to legs), `heat`,
+`fleet`, `share`. `strain` is a weighted dot product of four of them (`balance.shock.strain`), and
+it drives **both** halves of the draw:
+
+- *whether* a shock lands: `baseChance + strainChance × strain` per week, so a solvent company
+  sees ~2.6%/wk and a maxed-out one ~17.6%/wk;
+- *which* card lands: every card's `weight` is a dot product over the same terms. `margin_call`
+  is `leverage 3.4 + thin 1.9`; `salvage_claim` (the one good card) is
+  `base 1.5, leverage −1.3, thin −1.4` and clamps to zero weight the moment you are stretched.
+
+Cards: `hull_loss` `drive_failure` `contract_pulled` `demand_collapse` `fuel_spike` `berth_levy`
+`margin_call` `inquiry_letter` `seam_pinch` `salvage_claim`.
+
+Ops the deck can use — all data, no per-card code:
+`cash{of,mult,cap}` `ship{lose|layUp,payout}` `contract{cancel,breakFrac}`
+`mod{kind,commodity|stage,mult,weeks}` `heat{add}` `reserve{site,mult}`. `mod` pushes onto
+`state.shocks`, which `shocks.foldMods` folds into `mods` at the top of the *next* tick, so a
+demand collapse drawn this week bites from next week and is visible in the price panel.
+
+Bodies are templates with `{cash}` `{ship}` `{site}` `{weeks}` `{commodity}` `{brand}` `{payout}`
+filled at draw time. A selftest asserts no body ever ships an unfilled token.
+
+**Resolution order.** The deck runs as stage **8b** — after costs (so `lastCosts` is this week's
+burn, which is what `thin` and every `of:'burn'` amount are sized on) and before the share
+recompute and the bust check. §6's ten stages are unchanged and unreordered.
+
+### Standing warnings — `js/sim/warn.js`
+
+`state.warnings` is rebuilt every tick as the *current* set of danger flags, and a
+`{ t:'warn', id, week, level, body }` event fires when one appears, when its wording changes, and
+every `balance.warn.repeatWeeks` (5) while it stands. That gives the UI both a live strip and a
+non-spammy alert stream — emitting every week would have put ~90 junk entries in `state.log` per
+run.
+
+Four flags: `runway` (weeks of trading left at this burn), `leverage` (drawn well past the
+founding loan, with the weekly interest spelled out), `heat` (near or over the threshold),
+`contract:<id>` (Ledger cannot cover this week's contracted tonnage, with the shortfall bill).
+
+### `over: 'banned'`
+
+`state.convictions` counts investigations. A third conviction, or a second while `rep` is at the
+floor, revokes the operating licence: `over = 'banned'` and a `lose` event with
+`reason: 'banned'`. `win` and `lose` keep their existing shape. **It never fires in a 30-week
+run** — the investigation cooldown is 13 weeks. Over 52 weeks it fires 7 times in 300. It is a
+long-season condition, not a v0.1 beat.
+
+### Ship lay-ups
+
+`sh.laidUp` counts down in `shocks.tick`; a laid-up hull does not depart, load, mine or arrive,
+and still pays idle upkeep. A ship laid up mid-leg is put back at `leg.from` with its cargo, so
+the trip is lost. New `scrap` and `layup` events (see WIRING NEEDED).
+
+## Every balance number moved, and why
+
+### `content/balance.js`
+
+| Key | Was | Now | Why |
+|---|---|---|---|
+| `loan.debtLimit` | 22000 | **26000** | Gotcha 58 called this a cliff because the cash-at-catch spread was only 5k wide. **The shock deck is what turned it into a slope** — cash at a fine now spans −7.5k to +11.6k on the grey branch. 22000 with shocks on gave 28% bust; 26000 gives 14.4% and responds smoothly. This is the one number I would still expect a future session to move first. |
+| `heat.revokeAt` / `revokeRep` | — | **3 / 0.02** | new, gates `over: 'banned'` |
+| `shock.*` | — | **new block** | `graceWeeks 4` (nothing before the player has made a decision), `cooldownWeeks 4`, `baseChance 0.026`, `strainChance 0.15`, `safeRunway 9`, `fleetNorm 6`, `shareNorm 0.35`, `strain {leverage .34, thin .40, heat .14, transit .12}` |
+| `warn.*` | — | **new block** | `runwayWeeks 5, leverageFrac 0.55, heatFrac 0.7, repeatWeeks 5` |
+| `targets.tacticsByWeek20` | — | **3** | new. An unlock is when the player is *shown* the tactic and its real-world story, so this is the assertion that the educational payload exists in a real session at all. |
+| `targets.investigatedOnce` | — | **0.25** | new |
+| `targets.carefulBustMax` | — | **0.06** | new |
+| `targets.carelessBustMin` | — | **0.20** | new. These last two are the point of the whole deck: **if caution and greed bust at the same rate the shocks are noise.** They caught exactly that failure mid-session — see gotcha 64. |
+
+`bustRate {min .05, max .18}` is untouched and still asserted. Nothing in `targets` was loosened.
+
+### `content/tactics.js` — the pacing fix
+
+**Cash was the binding gate on every unlock, and it was set two to four times higher than the cash
+a real company ever holds.** Median cash at week 13 is ~10k and at week 30 ~2k; the gates were
+10k–40k. So the unlock — the moment the story panel appears — was gated on money the player never
+has, while `cost` was *already* doing the affordability job. Every `unlock.cash` is now roughly a
+third of the tactic's `cost`: "you could plausibly do this soon", not "you can do it now".
+
+| Tactic | Key | Was | Now |
+|---|---|---|---|
+| `exclusive_supply` | `unlock.cash` | 22000 | **8000** |
+| `vertical_integration` | `unlock` | share .18 / cash 40000 | **share .16 / cash 12000** |
+| `price_guarantee` | `unlock` | share .24 / cash 24000 | **share .20 / cash 5000** |
+| `brand_buyout` | `unlock` | share .22 / cash 30000 | **share .18 / cash 9000** |
+| `below_cost` | `unlock` | share .14 / cash 10000 | **share .15 / cash 6000** |
+| `below_cost` | `effect.ownPrice` | ×0.72 | **×0.75** |
+| `below_cost` | `penalty.fine` | 30000 | **22000** |
+| `spec_collusion` | `unlock` | share .20 / cash 22000 | **share .17 / cash 7000** |
+| `spec_collusion` | `penalty.fine` | 46000 | **40000** |
+
+`cost` is unchanged on all six, and so are every `duration`, `heat` and `shareLoss`. Module
+requirements are unchanged — `vertical_integration` still needs a refinery and a coil line, which
+is the interesting gate and the only one that is not a number.
+
+Three of these need their own line:
+
+- **`below_cost.unlock.share` went *up*, .14 → .15.** Mid-session I had it at .12 and it unlocked
+  around week 8. `below_cost` cuts your own price for 52 weeks, so eight extra weeks of it put the
+  grey styles underwater before the fine even landed and aggressive busted 38%. Earlier is not
+  always better pacing.
+- **`ownPrice ×0.72 → ×0.75`** for the same reason. Gotcha 60 still holds — the `demandPull` is
+  what makes it worth taking — but at 0.72 with shocks on it was a suicide button rather than a
+  gamble.
+- **`spec_collusion.penalty.fine` 46000 → 40000.** With shocks eroding cash-at-catch, 46000 killed
+  essentially every company it caught. 40000 against an illegal cash-at-catch of p10 4k / p50 15k /
+  p90 23k kills the poorer half and cripples the rest, which is the shape the brief asked for.
+
+### `content/events.js` numbers worth knowing
+
+- `hull_loss.payout` **0.55** of hull cost, and it is applied **to the debt, not the till** — hulls
+  are collateral. At 0.30-and-to-cash the card was unrecoverable (gotcha 66) *and* it reported a
+  positive `cash`, which the UI would have painted green on the week you lost a third of your
+  fleet. Paying the lender first makes the week read as the loss it is and still gives the player
+  the headroom to replace the hull.
+- `margin_call` needs `debt ≥ 68000` and takes 11% of debt capped at 10000. **Everyone starts on
+  60000 of debt**, so an unguarded version fired for the most cautious player in week 5 — see
+  gotcha 63.
+- `contract_pulled`'s break fee is capped at 4 weeks of the contract. Uncapped it was
+  `units × price × frac × weeksLeft` = ~90,000 on a 104-week contract, an instant unsurvivable
+  death.
+
+### `sim.mjs` — harness changes (not the sim)
+
+- **The tactic pick is now riskiest-affordable-band-first, not content order.** Gotcha 62 said a
+  cheap early grey tactic hides everything after it in the array; sorting by band makes each
+  style's intent explicit instead of an accident of file order. It also fixed a real bug: the
+  policy pushed tactics whose `requires.dominance` was unmet, `activate` silently refused, and the
+  style then took nothing for the rest of the run. The policy now calls `requirementsMet`.
+- **`repayAbove` on `cautious` (15000) and `standard` (22000).** No stand-in had ever used the
+  `repay` action, so no stand-in ever deleveraged — and deleveraging is the *only* move that
+  lowers shock exposure. Without it the deck had nothing to reward and every style busted at ~9%.
+  It repays only the draw **above the founding loan**, and never in a week that already borrowed or
+  bought (gotcha 65).
+- **Every style replaces a lost hull**, borrowing against the line if it has to. A real player
+  would, and without it `hull_loss` was a guaranteed slow death rather than a setback.
+- New tracking and report blocks: shocks per run and deck-draw histogram, weeks under each standing
+  warning, tactics met by week 20, investigated-at-least-once, and per-style shocks / tactics-met /
+  investigated columns.
+- New `--busts` flag: prints every losing run's seed, style, week, cash, debt, fleet size and its
+  last two shock/investigate events. This is what found the `hull_loss` death spiral in one run,
+  and it is the first thing to reach for when a bust rate moves and you do not know why.
+- Six new `--selftest` assertions: a shock fires for an overextended company, the shock event
+  carries the full render contract, no body ships an unfilled token, a broke company is warned
+  about its debt, `warn` carries its contract, `state.warnings` is a standing array, and a laid-up
+  hull does not depart.
+
+## `node sim.mjs 500` — the full output
+
+```
+MONOPOLE — 500 seeded games, 30 weeks each
+
+offer week histogram (exclusive_supply):
+  9:281  10:105  11:76  12:14  13:3  14:2  15:5  16:4  late:10
+  in window 9-13: 479/500 = 95.8%
+  coil line built in 483/500 (median week 5), deal taken 168/500
+
+player share at week 13:
+  p10 11.2%  p25 14.8%  median 22.7%  p75 25.9%  p90 27.4%
+  in band 12%-25%: 249/500
+
+cash:
+  week 13   p10 1,450  median 9,814  p90 18,057
+  week 30   p10 -27,621  median 1,870  p90 21,108
+  share w30 p10 12.8%  median 19.4%  p90 24.6%
+
+by style:
+  cautious    n 100  bust   4.0%  shocks/run 1.51  median tactics met by w20 6  investigated   0.0%  median share w13 11.4%
+  standard    n 100  bust   3.0%  shocks/run 1.62  median tactics met by w20 6  investigated   0.0%  median share w13 24.3%
+  aggressive  n 100  bust  15.0%  shocks/run 2.01  median tactics met by w20 4  investigated  81.0%  median share w13 26.6%
+  greedy      n 100  bust  26.0%  shocks/run 2.10  median tactics met by w20 6  investigated  55.0%  median share w13 22.1%
+  reckless    n 100  bust  24.0%  shocks/run 2.14  median tactics met by w20 5  investigated  82.0%  median share w13 26.5%
+
+shocks and warnings:
+  shocks per run   p10 1  median 2  p90 3  (total 938)
+  deck draws:      margin_call:175  berth_levy:150  hull_loss:136  fuel_spike:135  drive_failure:122
+                   seam_pinch:90  demand_collapse:87  inquiry_letter:20  salvage_claim:14  contract_pulled:9
+  busts within 2 weeks of a shock: 40
+  weeks under a standing warning, per run:  debt p50 35 p90 45   heat p50 2 p90 10   contract p50 0 p90 19  (of 30)
+
+content reach:
+  tactics met by week 20   p10 1  median 5  p90 6  (of 6)
+  investigated at least once 218/500 = 43.6%
+
+the shady half:
+  grey unlocked    473/500 = 94.6%  (median week 12, by w13 60.6%, by w16 82.6%)
+  grey taken       190/500 = 38.0%
+  illegal unlocked 460/500 = 92.0%  (median week 12)
+  illegal taken    89/500 = 17.8%, caught 57 = 64.0% of takers, banned 57
+  peak heat        p50 35  p90 80  (threshold 34)
+  cash the week the fine lands, pre-fine — grey    p10 -7,553  p50 4,938  p90 11,561
+                                          illegal p10 4,002  p50 15,045  p90 23,103
+
+outcomes: {"running":423,"bust":72,"duopoly":3,"monopoly":2}   investigations 218   busts within 2 weeks of a fine 59
+
+PASS  offer in weeks 9-13: 95.8%                (target 80.0%)
+PASS  bust rate: 14.4%                          (target 5.0%-18.0%)
+PASS  median share at week 13: 22.7%            (target 12.0%-25.0%)
+PASS  grey tactic reachable: 94.6%              (target 85.0%)
+PASS  grey reachable by week 16: 82.6%          (target 60.0%)
+PASS  illegal tactic taken: 17.8%               (target 15.0%)
+PASS  caught, of runs that went illegal: 64.0%  (target 35.0%-90.0%)
+PASS  median tactics met by week 20: 5          (target 3)
+PASS  investigated at least once: 43.6%         (target 25.0%)
+PASS  careful bust rate: 3.5%                   (target 6.0%)
+PASS  careless bust rate: 25.0%                 (target 20.0%)
+
+ALL TARGETS MET
+```
+
+`node sim.mjs --selftest` — **17 assertions, all clean**, including the no-mutation contract and
+the six new ones. Two 500-game runs diff clean; still fully deterministic from the seed. Nothing
+in `js/sim/` or `content/` imports three, touches `document`/`window`, or calls `Math.random`
+(grepped).
+
+### The three questions the brief asked, answered with numbers
+
+- **Bust rate with shocks on: 14.4%**, inside the 5–18% band.
+- **The split is real.** Careful (cautious + standard) **3.5%**; careless (greedy + reckless)
+  **25.0%** — a 7× gap, and `aggressive` sits between them at 15%. The two styles that never touch
+  a heat-bearing tactic and pay their line down are the two that survive.
+- **Tactics met by week 20: median 5 of 6** (p10 1, p90 6). Cautious and standard meet all six.
+- **Investigated at least once: 43.6%** of all runs; 81% and 82% of the two grey-capable styles.
+
+### Does the story still happen? Greedy, seed 1008, tick by tick
+
+Ryland offers at w9. **All six tactics unlock w11–w12** — the whole tactic panel, and every
+real-world story behind it, is open before the first quarter closes. w13 a drive fails: 9,000 to
+the yard and a rig laid up four weeks, and the next five weeks are visibly thinner for it. Climbs
+back to 29% share by w24 and takes `spec_collusion`; the cartel pays immediately, filament goes
+846 → 1,250 → 1,469 while the heat bar climbs 13/week. **w26 the investigation lands**: 40,000
+fine on 12,977 cash → −27,023, past the 26,000 limit. Bust, one week after the second quarter
+report. That is the arc the brief asked for and it is legible straight off the log.
+
+## Gotchas — session 13b
+
+63. **`start.debt` is 60,000 and `maxDraw` is 80,000, so debt only ever spans a 20k band.** Any
+    leverage metric written as `debt / maxDraw` reads **0.75 for the most cautious possible
+    player in week one**. Both `exposure.leverage` and the `leverage` warning now measure the draw
+    *above* `start.debt`. Before that fix, `margin_call` was the most-drawn card in the deck and it
+    was hitting people who had borrowed nothing.
+64. **A shock deck tuned only for severity flattens the difficulty curve instead of shaping it.**
+    First tuned pass: cautious 9%, greedy 10%. The deck was pure noise. What produced the split was
+    not any card's numbers — it was giving the careful stand-ins a *deleveraging move* (`repay`) so
+    that lowering exposure was something a player could actually do. **A hazard weighted on a state
+    the player cannot change is a tax, not a decision.** If a future session adds an exposure term,
+    add the move that reduces it in the same sitting.
+65. **`repay` and `loan` in the same tick cancel and burn the 2% draw fee.** The policy borrows to
+    afford a tactic, then the repay rule immediately paid it straight back, churning the fee every
+    week. Offer-in-window fell 96% → 62% and grey-by-w16 fell to 50% before I found it, and neither
+    metric has anything obvious to do with repayment. Guarded on `!acts.length`.
+66. **A shock that removes a permanent asset needs a route back or it is a slow, certain death.**
+    Every single careful-style bust was `hull_loss` — 14 of 15, all ending on two ships. Losing a
+    third of the fleet with no replacement is unrecoverable no matter how much slack you had, so
+    the card was not testing exposure, it was testing patience. Raising the payout and letting the
+    stand-in re-buy took careful bust from 7.5% to 3.5% and *left* careless at 25%.
+67. **A positive `cash` on a bad event will render as good news.** `hull_loss` paid an insurance
+    settlement straight to cash and reported `cash: +4,740` on the week you lost a ship. Anything
+    the UI colours by sign has to have its sign mean what the player feels. Paying the underwriter
+    settlement against the loan instead of the till fixed the reading and the fiction at once.
+68. **`seen.peakHeat` under-reports.** It samples `state.heat` *after* the tick, and a conviction
+    zeroes heat inside the same tick, so a run that crossed the threshold at 39 and got caught logs
+    `peakHeat: 26`. The report line is still useful for the runs that were never caught; do not
+    read it as the maximum heat ever reached. Pre-existing, not introduced here.
+69. **Every tactic gate was really a cash gate.** Five of six unlocks were bounded by `unlock.cash`
+    and not by `unlock.share`, and the cash figures were set at 2–4× the cash a run ever holds. If
+    a piece of content is not being reached, check which clause of its gate is actually binding
+    before moving the one you assume is.
+
+## WIRING NEEDED
+
+Nothing is required for the sim to run — `step.js` imports the new modules itself and every new
+event is additive. These are all UI/world opportunities:
+
+1. **`js/world/fleet.js`** ignores two new events. `{ t:'scrap', ship, class, reason:'lost',
+   payout }` should remove the hull from the scene; `{ t:'layup', ship, class, weeks, site }`
+   should park it at `site` with its running lights out. Right now a lost ship's mesh stays on
+   screen for the rest of the game.
+2. **`js/ui/hud.js` or a new strip** should render `sim.state.warnings` — an array of
+   `{ id, level: 'debt'|'heat'|'contract', body }`, rebuilt every tick, empty when nothing is
+   wrong. This is the standing display; the `warn` events are the one-off alerts.
+3. **`js/ui/screens.js`** fleet panel: show `sh.laidUp` (weeks remaining). A laid-up hull currently
+   renders as "Docked · no orders", which is wrong and unexplained.
+4. Optional: `state.convictions` is now tracked, and `over` can be `'banned'` as well as `'bust'`.
+   The end-of-game screen should have a line for it.
+
+## What is still short
+
+- **The shock hazard is flat per week and does not taper, so a long season is much deadlier than a
+  short one.** At the 30-week default, careful busts 3.5%. Run `node sim.mjs 300 52` and it is
+  20%, with pooled bust at 32% — outside the band. Everything here is tuned for the 30-week game
+  the win check implies (`win.checkFromWeek 26` + a 4-week hold). **If v0.2 lengthens the season,
+  `shock.baseChance` has to decay with company age or the late game becomes attrition.** This is
+  the first thing to look at, not the last.
+- **`p10` of tactics-met-by-week-20 is 1.** The median is 5 and the assertion is comfortable, but
+  the bottom decile — mostly early busts and the weakest cautious runs — still sees almost none of
+  the content. A run that busts at week 18 has seen one story.
+- **Cautious still ends on 11.4% median share at week 13**, unchanged from session 12's note. The
+  deleveraging helps it survive but not grow; being careful in this game still means being poor.
+  Same conclusion as before: this needs a per-style answer, not another global knob.
+- **`contract_pulled` draws 9 times in 500** and `inquiry_letter` 20. Both are gated on state most
+  runs never reach (a live contract; any heat at all). They are correct, not dead, but they are
+  effectively unseen — worth a second contract source in v0.2 rather than reweighting.
+- **Heat still only accrues from active tactics** plus the `inquiry_letter` card, which itself
+  needs `heat ≥ 1`. A dominant player running nothing but legal tactics is still invisible to the
+  regulator, by design (session 7's content says so). The heat bar is still flat until the first
+  grey tactic.
+- **`over: 'banned'` is unreachable in a 30-week run.** It fires 7 times in 300 over 52 weeks. The
+  code and the loss screen should exist, but do not expect to see it in a playtest.

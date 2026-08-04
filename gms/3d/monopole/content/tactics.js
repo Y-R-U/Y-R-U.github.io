@@ -12,7 +12,7 @@ export default Object.freeze([
     name: 'Exclusive Supply Agreement',
     band: 'legal',
     blurb: 'Ryland Coil Works sells filament in the Reach through you and nobody else.',
-    unlock: Object.freeze({ share: 0.08, cash: 22000 }),
+    unlock: Object.freeze({ share: 0.08, cash: 8000 }),
     cost: 22000, heat: 0, duration: 8,
     effect: Object.freeze([
       Object.freeze({ op: 'lockBrand', brand: 'ryland', commodity: 'filament' }),
@@ -28,7 +28,7 @@ export default Object.freeze([
     name: 'Vertical Integration',
     band: 'legal',
     blurb: 'Own the belt claim, the refinery and the hulls. Nobody prices you.',
-    unlock: Object.freeze({ share: 0.18, cash: 40000, modules: Object.freeze(['refinery', 'coilline']) }),
+    unlock: Object.freeze({ share: 0.16, cash: 12000, modules: Object.freeze(['refinery', 'coilline']) }),
     cost: 34000, heat: 0, duration: 0,
     effect: Object.freeze([
       Object.freeze({ op: 'ownCost', stage: 'transit', mult: 0.82 }),
@@ -44,7 +44,7 @@ export default Object.freeze([
     name: 'Lowest Price Guarantee',
     band: 'legal',
     blurb: 'Beat any filament price in the Reach by ten per cent. Costs nothing while you are the only seller.',
-    unlock: Object.freeze({ share: 0.24, cash: 24000 }),
+    unlock: Object.freeze({ share: 0.20, cash: 5000 }),
     requires: Object.freeze({ dominance: Object.freeze({ commodity: 'filament', share: 0.5 }) }),
     cost: 12000, heat: 0, duration: 6,
     effect: Object.freeze([
@@ -61,7 +61,7 @@ export default Object.freeze([
     name: 'Brand Buyout',
     band: 'grey',
     blurb: 'Buy Harrow Filament outright. Corvain loses the last brand anyone asks for by name.',
-    unlock: Object.freeze({ share: 0.22, cash: 30000 }),
+    unlock: Object.freeze({ share: 0.18, cash: 9000 }),
     cost: 26000, heat: 9, duration: 0,
     effect: Object.freeze([
       Object.freeze({ op: 'absorb', ships: 1, share: 0.05 }),
@@ -77,15 +77,15 @@ export default Object.freeze([
     name: 'Below-Cost Pricing',
     band: 'grey',
     blurb: 'Sell every hold under what it cost to fill. Whoever runs out of cash first stops.',
-    unlock: Object.freeze({ share: 0.14, cash: 10000 }),
+    unlock: Object.freeze({ share: 0.15, cash: 6000 }),
     cost: 0, heat: 6, duration: 4,
     effect: Object.freeze([
-      Object.freeze({ op: 'ownPrice', commodity: '*', mult: 0.72 }),
+      Object.freeze({ op: 'ownPrice', commodity: '*', mult: 0.75 }),
       Object.freeze({ op: 'demandPull', commodity: '*', frac: 0.24 }),
       Object.freeze({ op: 'rivalCash', perWeek: -2600 }),
       Object.freeze({ op: 'sharePull', perWeek: 0.012 }),
     ]),
-    penalty: Object.freeze({ fine: 30000, shareLoss: 0.05, repLoss: 0.2, ban: false }),
+    penalty: Object.freeze({ fine: 22000, shareLoss: 0.05, repLoss: 0.2, ban: false }),
     story: 'boral_predatory',
   }),
 
@@ -94,7 +94,7 @@ export default Object.freeze([
     name: 'Specification Collusion',
     band: 'illegal',
     blurb: 'Agree with Corvain on a coil that fails at a thousand hours. The Reach buys filament forever.',
-    unlock: Object.freeze({ share: 0.20, cash: 22000 }),
+    unlock: Object.freeze({ share: 0.17, cash: 7000 }),
     cost: 18000, heat: 14, duration: 8,
     effect: Object.freeze([
       Object.freeze({ op: 'decayMult', commodity: 'filament', mult: 2.2 }),
@@ -103,7 +103,7 @@ export default Object.freeze([
       Object.freeze({ op: 'rivalPrice', commodity: 'filament', mult: 1.22 }),
       Object.freeze({ op: 'rivalMood', set: 'cartel' }),
     ]),
-    penalty: Object.freeze({ fine: 46000, shareLoss: 0.14, repLoss: 0.5, ban: true }),
+    penalty: Object.freeze({ fine: 40000, shareLoss: 0.14, repLoss: 0.5, ban: true }),
     story: 'phoebus_cartel',
   }),
 ]);

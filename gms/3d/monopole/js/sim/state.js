@@ -35,7 +35,7 @@ export function newGame(seed = 1, systemId = 'tamber') {
     if (!def) throw new Error(`newGame: no ship class ${classId}`);
     return {
       id: `${classId}-${i + 1}`, class: classId, at: 'ledger',
-      leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false,
+      leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false, laidUp: 0,
     };
   });
 
@@ -78,6 +78,12 @@ export function newGame(seed = 1, systemId = 'tamber') {
     over: null,
     holdStreak: 0,
     investigateCooldown: 0,
+    convictions: 0,
+    shocks: [],
+    shockCooldown: 0,
+    lastCosts: b.costs.overheadWeekly,
+    warnings: [],
+    warned: {},
     log: [],
   };
 }

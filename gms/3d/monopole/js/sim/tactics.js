@@ -191,6 +191,7 @@ export function rollInvestigation(state, rng, emit) {
   state.share.rival = Math.min(1, state.share.rival + pen.shareLoss * 0.6);
   state.rep = Math.max(0, state.rep - pen.repLoss);
   state.heat = 0;
+  state.convictions = (state.convictions || 0) + 1;
   state.investigateCooldown = b.cooldownWeeks;
   state.tactics.active = state.tactics.active.filter(a => a !== dirty.a);
   for (const op of dirty.def.effect) if (op.op === 'lockBrand' && state.locks[op.commodity] === 'player') delete state.locks[op.commodity];

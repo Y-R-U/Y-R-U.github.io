@@ -6,6 +6,8 @@ import { clone } from './state.js';
 import * as market from './market.js';
 import * as tactics from './tactics.js';
 import * as rival from './rival.js';
+import * as shocks from './shocks.js';
+import * as warn from './warn.js';
 import { createRng } from './rng.js';
 
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
@@ -47,6 +49,7 @@ export function step(state, { actions = [], rng } = {}) {
 
   if (s.over) return { state: s, events };
 
+  if (!s.shocks) { s.shocks = []; s.shockCooldown = 0; s.warnings = []; s.warned = {}; s.convictions = 0; }
   s.week += 1;
   const sys = content.get('system', s.system);
   const b = content.balance;
@@ -57,12 +60,13 @@ export function step(state, { actions = [], rng } = {}) {
   applyActions(s, actions, emit);
 
   const mods = tactics.computeMods(s);
+  shocks.foldMods(s, mods);
   rival.foldEffects(s, mods);
 
   // 1 — advance ETAs; arrivals dock, unload, take on the next leg
   for (const sh of s.ships) {
     sh.arrived = false;
-    if (!sh.leg) continue;
+    if (sh.laidUp > 0 || !sh.leg) continue;
     sh.eta -= 1;
     if (sh.eta > 0) continue;
     sh.at = sh.leg.to;
@@ -98,7 +102,7 @@ export function step(state, { actions = [], rng } = {}) {
   }
 
   for (const sh of s.ships) {
-    if (sh.leg) continue;
+    if (sh.leg || sh.laidUp > 0) continue;
     const def = content.get('ship', sh.class);
     const site = s.sites[sh.at];
     const held = total(sh.cargo);
@@ -132,7 +136,7 @@ export function step(state, { actions = [], rng } = {}) {
   }
 
   for (const sh of s.ships) {
-    if (sh.leg || !sh.route || sh.route.length < 2) continue;
+    if (sh.leg || sh.laidUp > 0 || !sh.route || sh.route.length < 2) continue;
     const def = content.get('ship', sh.class);
     const site = s.sites[sh.at];
     const held = total(sh.cargo);
@@ -236,11 +240,15 @@ export function step(state, { actions = [], rng } = {}) {
   const interest = s.debt * b.loan.interestWeekly;
   const costs = wages + modUpkeep + fuel + interest + b.costs.overheadWeekly;
   s.cash -= costs;
+  s.lastCosts = costs;
   emit({
     t: 'cost', wages: Math.round(wages), modules: Math.round(modUpkeep), fuel: Math.round(fuel),
     interest: Math.round(interest), overhead: b.costs.overheadWeekly, total: Math.round(costs),
     cash: Math.round(s.cash), revenue: Math.round(revenue),
   });
+
+  // 8b — the shock deck, after costs so `lastCosts` is this week's and before the bust check
+  shocks.tick(s, gen, emit);
 
   // 9 — recompute share
   s.hist.player.push(revenue);
@@ -282,10 +290,15 @@ export function step(state, { actions = [], rng } = {}) {
     });
   }
 
+  warn.update(s, emit);
+
   // 10 — win / lose
   if (s.cash < -b.loan.debtLimit) {
     s.over = 'bust';
     emit({ t: 'lose', reason: 'bust', cash: Math.round(s.cash), week: s.week });
+  } else if (s.convictions >= b.heat.revokeAt || (s.convictions > 1 && s.rep <= b.heat.revokeRep)) {
+    s.over = 'banned';
+    emit({ t: 'lose', reason: 'banned', cash: Math.round(s.cash), week: s.week });
   } else if (s.week >= b.win.checkFromWeek) {
     const tier = s.share.player >= b.win.monopoly ? 'monopoly' : s.share.player >= b.win.duopoly ? 'duopoly' : null;
     s.holdStreak = tier ? s.holdStreak + 1 : 0;
@@ -332,7 +345,7 @@ function applyActions(s, actions, emit) {
         if (!def || s.cash < def.cost) break;
         s.cash -= def.cost;
         const id = `${def.id}-${s.ships.length + 1}`;
-        s.ships.push({ id, class: def.id, at: 'ledger', leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false });
+        s.ships.push({ id, class: def.id, at: 'ledger', leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false, laidUp: 0 });
         emit({ t: 'ship', ship: id, class: def.id, name: def.name, cost: def.cost });
         break;
       }

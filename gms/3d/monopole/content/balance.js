@@ -15,7 +15,7 @@ export default Object.freeze({
   // debtLimit is the overdraft the bank tolerates past zero cash, NOT the credit line
   // (that is maxDraw). Small on purpose — it is the whole bust lever.
   loan: Object.freeze({
-    interestWeekly: 0.012, debtLimit: 22000,
+    interestWeekly: 0.012, debtLimit: 26000,
     drawFee: 0.02, maxDraw: 80000,
   }),
 
@@ -60,6 +60,25 @@ export default Object.freeze({
     threshold: 34, decayWeekly: 1.0,
     investigateBase: 0.07, investigatePerPoint: 0.004,
     repShield: 0.25, cooldownWeeks: 13,
+    revokeAt: 3, revokeRep: 0.02,
+  }),
+
+  // baseChance is the weekly draw for a company with no exposure at all; strainChance is what
+  // the strain dot product adds on top. safeRunway is weeks of costs that count as slack.
+  shock: Object.freeze({
+    graceWeeks: 4, cooldownWeeks: 4,
+    baseChance: 0.033, strainChance: 0.15,
+    // A flat weekly hazard makes surviving strictly worse: a well-run company is ground down by
+    // nothing but time, and the live game has no week limit. The whole draw decays toward
+    // ageFloor over ageWeeks as the company proves itself — strain still sets the shape, so
+    // overextension is punished at week 60 exactly as hard relative to caution as at week 6.
+    ageFloor: 0.40, ageWeeks: 38,
+    safeRunway: 9, fleetNorm: 6, shareNorm: 0.35,
+    strain: Object.freeze({ leverage: 0.34, thin: 0.40, heat: 0.14, transit: 0.12 }),
+  }),
+
+  warn: Object.freeze({
+    runwayWeeks: 5, leverageFrac: 0.55, heatFrac: 0.7, repeatWeeks: 5,
   }),
 
   // the week window in which the first exclusivity offer may arrive
@@ -87,6 +106,14 @@ export default Object.freeze({
     greyReachableByWeek16: 0.60,
     illegalTaken: 0.15,
     caughtWhenIllegal: Object.freeze({ min: 0.35, max: 0.90 }),
+    // an unlock is when the player is shown the tactic and its real-world story, so this is the
+    // assertion that the educational payload is reachable at all
+    tacticsByWeek20: 3,
+    investigatedOnce: 0.25,
+    // the split is the whole point of the shock deck: if caution and greed bust at the same rate
+    // the shocks are noise
+    carefulBustMax: 0.06,
+    carelessBustMin: 0.20,
     runs: 500,
   }),
 });
