@@ -782,6 +782,7 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -802,6 +803,7 @@
     await transitionTo("hallway", { skipRevealAtEnd: true });
     await delay(150);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -825,6 +827,7 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -849,6 +852,92 @@
     await playMonsterRelease(peek);
     renderGame("You close the door and wait for the hallway to clear.");
     return true;
+  }
+
+  // Room scares escalate across a run: early ones are pure atmosphere,
+  // mid-run ones cost a turn, and late ones eject the player back down
+  // the room's own exit transition into the hallway — where the threat
+  // is, and where every death happens. Most room entries produce
+  // nothing at all.
+  const SCARE_TIERS = [
+    { upTo: 0.35, chance: 0.16, cost: 0, eject: false, deathChance: 0 },
+    { upTo: 0.70, chance: 0.26, cost: 1, eject: false, deathChance: 0 },
+    { upTo: Infinity, chance: 0.34, cost: 1, eject: true, deathChance: 0.45 },
+  ];
+
+  function scareTierForProgress() {
+    const limit = Math.max(1, state.turnLimit || 1);
+    const progress = (state.turn + state.threatPressure) / limit;
+    return SCARE_TIERS.find(tier => progress < tier.upTo) || SCARE_TIERS[SCARE_TIERS.length - 1];
+  }
+
+  // Seeded so a shared run key still replays the same scares.
+  function scareRoll(salt) {
+    const key = `${state.runKey}:${salt}`;
+    let hash = 2166136261;
+    for (let index = 0; index < key.length; index += 1) {
+      hash ^= key.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return ((hash >>> 0) % 10000) / 10000;
+  }
+
+  async function maybeRoomScare() {
+    if (!state || state.ended || state.ending || transitionLocked) return false;
+    const roomId = state.currentRoom;
+    if (roomId === "hallway") return false;
+    if (!Array.isArray(state.scaredRooms)) state.scaredRooms = [];
+    if (state.scaredRooms.includes(roomId)) return false;
+    const tier = scareTierForProgress();
+    if (scareRoll(`scare:${roomId}:${state.turn}`) >= tier.chance) return false;
+    const clip = (Story.roomScares || {})[roomId];
+    if (!(await clipAvailable(clip))) return false;
+    state.scaredRooms.push(roomId);
+
+    const room = Story.rooms[roomId];
+    await playRoomScare(clip);
+    if (!tier.cost) {
+      addHistory(`Something moved in the ${room.name}. You wait for your breathing to settle.`);
+      renderGame(`Something moved in the ${room.name}.`);
+      return true;
+    }
+    spendTurns(tier.cost);
+    if (isCaught()) {
+      addHistory(`The ${room.name} turned on you, and the hallway was already occupied.`);
+      finishRun("caught");
+      return true;
+    }
+    if (!tier.eject) {
+      addHistory(`The ${room.name} turned on you. You lose your place.`);
+      renderGame(`The ${room.name} turned on you.`);
+      return true;
+    }
+    addHistory(`The ${room.name} forced you out into the hallway.`);
+    await transitionTo("hallway");
+    if (isCaught() || (state.flags.monster_revealed && scareRoll(`death:${roomId}:${state.turn}`) < tier.deathChance)) {
+      addHistory(`You came out of the ${room.name} backwards, and the hallway was not empty.`);
+      finishRun("caught");
+      return true;
+    }
+    await afterTurn("You come out of the room backwards. The hallway is empty, for now.");
+    return true;
+  }
+
+  async function playRoomScare(clip) {
+    transitionLocked = true;
+    roomMediaToken += 1;
+    clearTimeout(transitionTimer);
+    els.roomFallback.classList.remove("visible");
+    els.roomVideo.dataset.src = mediaSrc(clip);
+    els.roomVideo.src = mediaSrc(clip);
+    els.roomVideo.load();
+    await videoReady(els.roomVideo, 4200);
+    try { els.roomVideo.currentTime = 0; } catch (err) {}
+    Audio.danger();
+    els.roomVideo.play().catch(() => {});
+    await waitForVideoWindow(els.roomVideo, 3600);
+    setRoomMedia(Story.rooms[state.currentRoom]);
+    transitionLocked = false;
   }
 
   async function afterTurn(message) {
@@ -1382,6 +1471,41 @@
     return group[state.threat && state.threat.id] || group.default || "";
   }
 
+  // Scare and death clips are generated in reviewed batches, so a file
+  // named in story.js may not be on disk yet — or may have been culled.
+  // Probe once per src and cache, so a missing clip degrades to "no
+  // scare happened" instead of a stalled cutscene.
+  const clipProbeCache = new Map();
+
+  function clipAvailable(src) {
+    if (!src) return Promise.resolve(false);
+    if (clipProbeCache.has(src)) return clipProbeCache.get(src);
+    const probe = new Promise(resolve => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.muted = true;
+      const settle = ok => {
+        clearTimeout(timer);
+        video.removeAttribute("src");
+        try { video.load(); } catch (err) {}
+        resolve(ok);
+      };
+      const timer = setTimeout(() => settle(false), 4000);
+      video.addEventListener("loadedmetadata", () => settle(true), { once: true });
+      video.addEventListener("error", () => settle(false), { once: true });
+      video.src = mediaSrc(src);
+      video.load();
+    });
+    clipProbeCache.set(src, probe);
+    return probe;
+  }
+
+  function deathVideoFor() {
+    const videos = Story.eventVideos || {};
+    const death = (videos.death || {})[state.threat && state.threat.id] || "";
+    return death || eventVideoFor("attack");
+  }
+
   function videoReady(video, timeoutMs) {
     if (video.readyState > 0) return Promise.resolve();
     return new Promise(resolve => {
@@ -1446,16 +1570,69 @@
     renderEnding(kind);
   }
 
+  // Keyed by clip filename so the copy always describes the escape the
+  // player is actually watching — eventVideoFor("victory") rotates
+  // through four routes.
+  const VICTORY_VARIANTS = {
+    "ending_victory_transport_tube.mp4": {
+      title: "Transport Burn",
+      text: state => `The transport tube fires. ${state.facility} becomes a thin scar of light behind you. Your memory has not returned, but your name has.`,
+    },
+    "ending_victory_shuttle_launch.mp4": {
+      title: "Shuttle Away",
+      text: state => `The shuttle clears the bay before the clamps finish arguing. ${state.facility} shrinks to a lit smudge, and nothing follows you out.`,
+    },
+    "ending_victory_escape_pod_drift.mp4": {
+      title: "Slow Drift",
+      text: state => `The pod seals with you inside and lets go. You watch ${state.facility} turn slowly in the dark until it is just another cold light, and you sleep.`,
+    },
+    "ending_victory_surface_dawn.mp4": {
+      title: "Thin Dawn",
+      text: state => `The airlock opens onto a pale planetary morning. The air is thin and freezing and real, and ${state.facility} is somewhere behind you, sealed.`,
+    },
+  };
+
+  const DEATH_VARIANTS = {
+    gene: { title: "Longer Arms Than Yours", text: t => `The ${t} was built for corridors exactly this wide. It does not hurry at the end.` },
+    alien: { title: "From Above", text: t => `You never look up in a hallway. The ${t} has been counting on that for a long time.` },
+    zombie: { title: "Crew Manifest", text: t => `The ${t} still wears the patch of someone who signed the same roster you did.` },
+    machine: { title: "Scheduled Maintenance", text: t => `The ${t} logs you as debris in the corridor and begins clearing it.` },
+    parasite: { title: "Rooted", text: t => `The ${t} reaches the walls before it reaches you. Then there is no difference.` },
+    shadow: { title: "Empty Suit", text: t => `The ${t} has no face to read. The helmet simply gets closer until it is all there is.` },
+    mimic: { title: "Rescue Arrives", text: t => `The ${t} opens its arms exactly the way help would. You go to it.` },
+    swarm: { title: "Dispersal", text: t => `The ${t} does not arrive so much as fill the space you were using.` },
+    frost: { title: "Cold Cycle", text: t => `The ${t} brings the hallway down to storage temperature with you still in it.` },
+    radiant: { title: "White Out", text: t => `The ${t} floods the corridor with something too bright to be light.` },
+    mirror: { title: "Matching Posture", text: t => `The ${t} copies you badly right up until the moment it does not need to.` },
+    siren: { title: "All Clear", text: t => `The ${t} sounds the alarm it was built to sound. The hallway strobes red and then stops.` },
+    warden: { title: "Contained", text: t => `The ${t} decides the corridor is a containment failure, and closes it.` },
+    spore: { title: "Bloom", text: t => `The ${t} breaks over you, and the air becomes something you should not have breathed.` },
+  };
+
   function renderEnding(kind) {
     stopIntroSlideshow();
     const success = kind === "escape";
     UI.showScreen("ending-screen");
+    let eventClip = "";
+    let title;
+    let text;
+    if (success) {
+      eventClip = eventVideoFor("victory");
+      const variant = VICTORY_VARIANTS[eventClip.split("/").pop()] || VICTORY_VARIANTS["ending_victory_transport_tube.mp4"];
+      title = variant.title;
+      text = variant.text(state);
+    } else {
+      eventClip = deathVideoFor();
+      const threatName = state.threat ? state.threat.name : "hunter";
+      const variant = DEATH_VARIANTS[state.threat && state.threat.id];
+      title = variant ? variant.title : "Caught In The Hallway";
+      text = variant
+        ? variant.text(threatName)
+        : `The hallway lights go out in order. The ${threatName} reaches you before the next door opens.`;
+    }
     els.endingKind.textContent = success ? "successful escape" : "bad ending";
-    els.endingTitle.textContent = success ? "Transport Burn" : "Caught In The Hallway";
-    els.endingText.textContent = success
-      ? `The transport tube fires. ${state.facility} becomes a thin scar of light behind you. Your memory has not returned, but your name has.`
-      : `The hallway lights go out in order. The ${state.threat.name} reaches you before the next door opens.`;
-    const eventClip = success ? eventVideoFor("victory") : eventVideoFor("attack");
+    els.endingTitle.textContent = title;
+    els.endingText.textContent = text;
     if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
     els.endingVideo.currentTime = 0;
     if (eventClip) hideEndingButtonsDuringPlayback();
@@ -1751,7 +1928,11 @@
   }
 
   function getDebugTransitions() {
-    const base = debugTransitions.length ? debugTransitions : (Story.transitions || []);
+    // Without the local helper there is no server-side listing, so fall back
+    // to the story graph plus the standalone event clips.
+    const base = debugTransitions.length
+      ? debugTransitions
+      : (Story.transitions || []).concat(Story.debugExtras || []);
     return base.map(transition => {
       const meta = debugMeta[transition.file] || {};
       return Object.assign({}, transition, {
@@ -1763,7 +1944,7 @@
   }
 
   function isEventTransition(transition) {
-    return ["ending_video", "monster_release", "monster_attack"].includes(transition.group);
+    return ["ending_video", "monster_release", "monster_attack", "room_scare", "ending_death"].includes(transition.group);
   }
 
   function canRedoTransition(transition) {
@@ -1789,6 +1970,8 @@
       ["ending_video", "Ending videos"],
       ["monster_release", "Monster release videos"],
       ["monster_attack", "Monster attack videos"],
+      ["room_scare", "Room scare videos"],
+      ["ending_death", "Hallway death videos"],
     ];
     if (debugFilter === "all") return groups;
     const map = {
@@ -1798,6 +1981,8 @@
       ending: "ending_video",
       release: "monster_release",
       attack: "monster_attack",
+      scare: "room_scare",
+      death: "ending_death",
     };
     return groups.filter(([groupId]) => groupId === map[debugFilter]);
   }

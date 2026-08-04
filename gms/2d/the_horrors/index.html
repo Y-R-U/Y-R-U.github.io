@@ -11,8 +11,11 @@
 <title>The Horrors</title>
 <link rel="preload" href="images/bedroom.jpg" as="image">
 <link rel="preload" href="images/hallway.jpg" as="image">
-<link rel="stylesheet" href="css/style.css?v=20260521-debug-upgrade">
-<link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260521-merge2048">
+<link rel="stylesheet" href="css/style.css?v=20260804-scares">
+<link rel="stylesheet" href="js/puzzles/puzzles.css?v=20260804-packs">
+<link rel="stylesheet" href="js/puzzles/pack-descent.css?v=20260804-packs">
+<link rel="stylesheet" href="js/puzzles/pack-sight.css?v=20260804-packs">
+<link rel="stylesheet" href="js/puzzles/pack-volley.css?v=20260804-packs">
 </head>
 <body>
 <main id="app">
@@ -200,6 +203,8 @@
         <button class="filter-chip" type="button" data-debug-filter="ending">ENDING</button>
         <button class="filter-chip" type="button" data-debug-filter="release">RELEASE</button>
         <button class="filter-chip" type="button" data-debug-filter="attack">ATTACK</button>
+        <button class="filter-chip" type="button" data-debug-filter="scare">SCARE</button>
+        <button class="filter-chip" type="button" data-debug-filter="death">DEATH</button>
         <button class="filter-chip" type="button" data-debug-filter="all">ALL</button>
         <button class="filter-chip" type="button" data-debug-filter="mini">MINI</button>
       </div>
@@ -437,11 +442,14 @@
 </div>
 <audio id="music" preload="none"></audio>
 
-<script src="js/puzzles/puzzles.js?v=20260521-merge2048"></script>
-<script src="js/story.js?v=20260521-merge2048"></script>
+<script src="js/puzzles/puzzles.js?v=20260804-packs"></script>
+<script src="js/puzzles/pack-descent.js?v=20260804-packs"></script>
+<script src="js/puzzles/pack-sight.js?v=20260804-packs"></script>
+<script src="js/puzzles/pack-volley.js?v=20260804-packs"></script>
+<script src="js/story.js?v=20260804-debugrows"></script>
 <script src="js/save.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/ui.js?v=20260521-debug-upgrade"></script>
-<script src="js/game.js?v=20260521-debug-upgrade"></script>
+<script src="js/ui.js?v=20260804-scares"></script>
+<script src="js/game.js?v=20260804-debugrows"></script>
 </body>
 </html>

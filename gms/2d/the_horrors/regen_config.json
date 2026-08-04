@@ -203,6 +203,16 @@
   },
   "extras": [],
   "extra_prefixes": {
+    "scare_": {
+      "group": "room_scare",
+      "status": "Room scare clip. Needs review.",
+      "default_poster": "images/hallway.jpg"
+    },
+    "ending_death_": {
+      "group": "ending_death",
+      "status": "Hallway death clip. Needs review.",
+      "default_poster": "images/hallway.jpg"
+    },
     "possible_": {
       "group": "possible_other_transition",
       "status": "Moved to possible by local regen helper.",

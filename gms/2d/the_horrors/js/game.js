@@ -878,6 +878,7 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -902,6 +903,7 @@
     await transitionTo("hallway", { skipRevealAtEnd: true });
     await delay(150);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -927,6 +929,7 @@
     }
     addHistory(`Hallway → ${Story.rooms[targetRoom].name}.`);
     await transitionTo(targetRoom);
+    if (await maybeRoomScare()) return;
     await afterTurn("");
   }
 
@@ -954,6 +957,92 @@
     await playMonsterRelease(peek);
     renderGame("You close the door and wait for the hallway to clear.");
     return true;
+  }
+
+  // Room scares escalate across a run: early ones are pure atmosphere,
+  // mid-run ones cost a turn, and late ones eject the player back down
+  // the room's own exit transition into the hallway — where the presence
+  // is, and where every death happens. Most room entries produce
+  // nothing at all.
+  const SCARE_TIERS = [
+    { upTo: 0.35, chance: 0.16, cost: 0, eject: false, deathChance: 0 },
+    { upTo: 0.70, chance: 0.26, cost: 1, eject: false, deathChance: 0 },
+    { upTo: Infinity, chance: 0.34, cost: 1, eject: true, deathChance: 0.45 },
+  ];
+
+  function scareTierForProgress() {
+    const limit = Math.max(1, state.turnLimit || 1);
+    const progress = (state.turn + state.threatPressure) / limit;
+    return SCARE_TIERS.find(tier => progress < tier.upTo) || SCARE_TIERS[SCARE_TIERS.length - 1];
+  }
+
+  // Seeded so a shared run key still replays the same scares.
+  function scareRoll(salt) {
+    const key = `${state.runKey}:${salt}`;
+    let hash = 2166136261;
+    for (let index = 0; index < key.length; index += 1) {
+      hash ^= key.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return ((hash >>> 0) % 10000) / 10000;
+  }
+
+  async function maybeRoomScare() {
+    if (!state || state.ended || state.ending || transitionLocked) return false;
+    const roomId = state.currentRoom;
+    if (roomId === "hallway") return false;
+    if (!Array.isArray(state.scaredRooms)) state.scaredRooms = [];
+    if (state.scaredRooms.includes(roomId)) return false;
+    const tier = scareTierForProgress();
+    if (scareRoll(`scare:${roomId}:${state.turn}`) >= tier.chance) return false;
+    const clip = (Story.roomScares || {})[roomId];
+    if (!(await clipAvailable(clip))) return false;
+    state.scaredRooms.push(roomId);
+
+    const room = Story.rooms[roomId];
+    await playRoomScare(clip);
+    if (!tier.cost) {
+      addHistory(`Something moved in the ${room.name}. You wait for your breathing to settle.`);
+      renderGame(`Something moved in the ${room.name}.`);
+      return true;
+    }
+    spendTurns(tier.cost);
+    if (isCaught()) {
+      addHistory(`The ${room.name} turned on you, and the hallway was already occupied.`);
+      finishRun("caught");
+      return true;
+    }
+    if (!tier.eject) {
+      addHistory(`The ${room.name} turned on you. You lose your place.`);
+      renderGame(`The ${room.name} turned on you.`);
+      return true;
+    }
+    addHistory(`The ${room.name} forced you out into the hallway.`);
+    await transitionTo("hallway");
+    if (isCaught() || (state.flags.monster_revealed && scareRoll(`death:${roomId}:${state.turn}`) < tier.deathChance)) {
+      addHistory(`You came out of the ${room.name} backwards, and the hallway was not empty.`);
+      finishRun("caught");
+      return true;
+    }
+    await afterTurn("You come out of the room backwards. The hallway is empty, for now.");
+    return true;
+  }
+
+  async function playRoomScare(clip) {
+    transitionLocked = true;
+    roomMediaToken += 1;
+    clearTimeout(transitionTimer);
+    els.roomFallback.classList.remove("visible");
+    els.roomVideo.dataset.src = mediaSrc(clip);
+    els.roomVideo.src = mediaSrc(clip);
+    els.roomVideo.load();
+    await videoReady(els.roomVideo, 4200);
+    try { els.roomVideo.currentTime = 0; } catch (err) {}
+    Audio.danger();
+    els.roomVideo.play().catch(() => {});
+    await waitForVideoWindow(els.roomVideo, 3600);
+    setRoomMedia(Story.rooms[state.currentRoom]);
+    transitionLocked = false;
   }
 
   async function afterTurn(message) {
@@ -1516,6 +1605,41 @@
     return group[state.threat && state.threat.id] || group.default || "";
   }
 
+  // Scare and death clips are generated in reviewed batches, so a file
+  // named in story.js may not be on disk yet — or may have been culled.
+  // Probe once per src and cache, so a missing clip degrades to "no
+  // scare happened" instead of a stalled cutscene.
+  const clipProbeCache = new Map();
+
+  function clipAvailable(src) {
+    if (!src) return Promise.resolve(false);
+    if (clipProbeCache.has(src)) return clipProbeCache.get(src);
+    const probe = new Promise(resolve => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.muted = true;
+      const settle = ok => {
+        clearTimeout(timer);
+        video.removeAttribute("src");
+        try { video.load(); } catch (err) {}
+        resolve(ok);
+      };
+      const timer = setTimeout(() => settle(false), 4000);
+      video.addEventListener("loadedmetadata", () => settle(true), { once: true });
+      video.addEventListener("error", () => settle(false), { once: true });
+      video.src = mediaSrc(src);
+      video.load();
+    });
+    clipProbeCache.set(src, probe);
+    return probe;
+  }
+
+  function deathVideoFor() {
+    const videos = Story.eventVideos || {};
+    const death = (videos.death || {})[state.threat && state.threat.id] || "";
+    return death || eventVideoFor("attack") || ((videos.endings || {}).caught || "");
+  }
+
   function videoReady(video, timeoutMs) {
     if (video.readyState > 0) return Promise.resolve();
     return new Promise(resolve => {
@@ -1574,6 +1698,21 @@
   }
 
   // Per-room success ending copy. Keys match Story.eventVideos.endings.escape.
+  const DEATH_VARIANTS = {
+    pale_woman: { title: "She Was Already Close", text: t => `${t} does not run. She does not have to; the hallway has been getting shorter all night.` },
+    lost_child: { title: "Found You", text: t => `${t} has been counting somewhere behind the walls for hours. The counting stops.` },
+    previous_tenant: { title: "His Rooms", text: t => `${t} never accepted that the house changed hands. He escorts you out of his hallway.` },
+    white_shadow: { title: "The Long Dark", text: t => `${t} does not so much reach you as remove the part of the hallway you were standing in.` },
+    silent_companion: { title: "No Sound At All", text: t => `${t} has walked beside you all evening. Here, at the end, she finally stops walking.` },
+    hollow_one: { title: "Under The Hood", text: t => `${t} lowers its head toward you, and there is a great deal of nothing inside the hood.` },
+    faceless_doctor: { title: "The Examination", text: t => `${t} raises one gloved hand, quite gently, the way a physician does before the difficult part.` },
+    bone_collector: { title: "Into The Bag", text: t => `${t} has carried that leather bag through every room of this house, and it was never full.` },
+    crawling_thing: { title: "Along The Floor", text: t => `${t} comes at you low and fast, and rises only at the very end.` },
+    mourning_groom: { title: "The Last Dance", text: t => `${t} offers a hand as if the music were still playing. Refusing was never one of the options.` },
+    paper_mask: { title: "A Face Like Paper", text: t => `${t} leans in until the folded paper is all you can see, and it does not blink because it cannot.` },
+    red_lady: { title: "Crimson", text: t => `${t} crosses the hallway without hurrying, and the red of her dress becomes the whole world.` },
+  };
+
   const ESCAPE_VARIANTS = {
     default: {
       title: "The Door Opens",
@@ -1614,10 +1753,14 @@
     stopIntroSlideshow();
     const endings = (Story.eventVideos && Story.eventVideos.endings) || {};
     const isSuccess = kind === "escape";
+    const threatName = state.threat ? state.threat.name : "the presence";
+    const deathVariant = DEATH_VARIANTS[state.threat && state.threat.id];
     let kindLabel = "bad ending";
-    let title = "Caught In The Hallway";
-    let text = `The hallway lights go out one by one. ${state.threat.name} reaches you before the next door opens.`;
-    let eventClip = eventVideoFor("attack") || endings.caught || "";
+    let title = deathVariant ? deathVariant.title : "Caught In The Hallway";
+    let text = deathVariant
+      ? deathVariant.text(threatName)
+      : `The hallway lights go out one by one. ${threatName} reaches you before the next door opens.`;
+    let eventClip = deathVideoFor();
     if (isSuccess) {
       const variantKey = pickEscapeVariant();
       const variant = ESCAPE_VARIANTS[variantKey] || ESCAPE_VARIANTS.default;
@@ -1978,7 +2121,11 @@
   }
 
   function getDebugTransitions() {
-    const base = debugTransitions.length ? debugTransitions : (Story.transitions || []);
+    // Without the local helper there is no server-side listing, so fall back
+    // to the story graph plus the standalone event clips.
+    const base = debugTransitions.length
+      ? debugTransitions
+      : (Story.transitions || []).concat(Story.debugExtras || []);
     return base.map(transition => {
       const meta = debugMeta[transition.file] || {};
       return Object.assign({}, transition, {
@@ -1990,7 +2137,7 @@
   }
 
   function isEventTransition(transition) {
-    return ["ending_video", "monster_release", "monster_attack"].includes(transition.group);
+    return ["ending_video", "monster_release", "monster_attack", "room_scare", "ending_death"].includes(transition.group);
   }
 
   function canRedoTransition(transition) {
@@ -2016,6 +2163,8 @@
       ["ending_video", "Ending videos"],
       ["monster_release", "Monster release videos"],
       ["monster_attack", "Monster attack videos"],
+      ["room_scare", "Room scare videos"],
+      ["ending_death", "Hallway death videos"],
     ];
     if (debugFilter === "all") return groups;
     const map = {
@@ -2025,6 +2174,8 @@
       ending: "ending_video",
       release: "monster_release",
       attack: "monster_attack",
+      scare: "room_scare",
+      death: "ending_death",
     };
     return groups.filter(([groupId]) => groupId === map[debugFilter]);
   }

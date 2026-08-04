@@ -678,6 +678,24 @@
       paper_mask: "videos/monster_attack_paper_mask.mp4",
       red_lady: "videos/monster_attack_red_lady.mp4",
     },
+    // Hallway death clips. The player is always ejected back to the
+    // hallway before dying, so one clip per presence covers every room.
+    // game.js falls back to the attack clip when a death clip is absent,
+    // so an unreviewed or deleted file never breaks the ending.
+    death: {
+      pale_woman: "videos/ending_death_pale_woman.mp4",
+      lost_child: "videos/ending_death_lost_child.mp4",
+      previous_tenant: "videos/ending_death_previous_tenant.mp4",
+      white_shadow: "videos/ending_death_white_shadow.mp4",
+      silent_companion: "videos/ending_death_silent_companion.mp4",
+      hollow_one: "videos/ending_death_hollow_one.mp4",
+      faceless_doctor: "videos/ending_death_faceless_doctor.mp4",
+      bone_collector: "videos/ending_death_bone_collector.mp4",
+      crawling_thing: "videos/ending_death_crawling_thing.mp4",
+      mourning_groom: "videos/ending_death_mourning_groom.mp4",
+      paper_mask: "videos/ending_death_paper_mask.mp4",
+      red_lady: "videos/ending_death_red_lady.mp4",
+    },
     endings: {
       window: "videos/ending_window.mp4",
       caught: "videos/monster_attack_pale_woman.mp4",
@@ -692,6 +710,58 @@
       },
     },
   };
+
+  // Per-room scare clips, keyed by room id. Every room has an entry; the
+  // file may not exist yet (or may have been culled during review), so
+  // game.js probes each clip before committing to a scare.
+  const roomScares = Object.keys(rooms).reduce((map, roomId) => {
+    map[roomId] = `videos/scare_${roomId}.mp4`;
+    return map;
+  }, {});
+
+  // Debug-panel rows for clips that sit outside the room-transition graph
+  // (scares, deaths, monster beats, endings). Deliberately NOT pushed into
+  // `transitions`: that array feeds the startup preload manifest, and adding
+  // ~50 more videos there would stall the intro cache. game.js merges these
+  // only when the local regen helper is not running, so the panel is usable
+  // from a plain static server and from GitHub Pages.
+  const debugExtras = [];
+  const threatNameById = {};
+  threats.forEach(t => { threatNameById[t.id] = t.name || t.id; });
+  const addExtra = (id, group, label, src, poster) => {
+    if (!src) return;
+    debugExtras.push({
+      id, group, label,
+      file: `${id}.mp4`,
+      src, poster,
+      status: "Generated clip. Needs review.",
+    });
+  };
+  Object.keys(rooms).forEach(roomId => {
+    addExtra(`scare_${roomId}`, "room_scare", `${rooms[roomId].name} scare`,
+      roomScares[roomId], `images/${roomId}.jpg`);
+  });
+  Object.entries(eventVideos.death || {}).forEach(([id, src]) => {
+    addExtra(`ending_death_${id}`, "ending_death", `${threatNameById[id] || id} death`, src, "images/hallway.jpg");
+  });
+  ["release", "attack"].forEach(kind => {
+    Object.entries(eventVideos[kind] || {}).forEach(([id, src]) => {
+      if (id === "default") return;
+      addExtra(`monster_${kind}_${id}`, `monster_${kind}`,
+        `${threatNameById[id] || id} ${kind}`, src, "images/hallway.jpg");
+    });
+  });
+  const endingMap = eventVideos.endings || {};
+  Object.entries(endingMap.escape || {}).forEach(([key, src]) => {
+    const id = src.split("/").pop().replace(/\.mp4$/, "");
+    addExtra(id, "ending_video", `escape: ${key}`, src, "images/hallway.jpg");
+  });
+  ["window", "caught"].forEach(key => {
+    const src = endingMap[key];
+    if (!src) return;
+    const id = src.split("/").pop().replace(/\.mp4$/, "");
+    addExtra(id, "ending_video", `${key} ending`, src, "images/hallway.jpg");
+  });
 
   transitions.forEach(transition => {
     // Any transition with a defined end-frame (room transitions, and success
@@ -2033,6 +2103,8 @@
     goals: goalPool.filter(g => g.core),
     transitions,
     eventVideos,
+    roomScares,
+    debugExtras,
     introPlaylist,
     mediaManifest,
     gameNames,
@@ -2098,6 +2170,8 @@
         playerRevealed: false,
         threat,
         threatPressure: 0,
+        // Rooms whose one-per-run scare has already fired.
+        scaredRooms: [],
         currentRoom: startRoom,
         startRoom,
         visitedRooms: [startRoom],

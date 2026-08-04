@@ -772,7 +772,72 @@
       "videos/ending_victory_escape_pod_drift.mp4",
       "videos/ending_victory_surface_dawn.mp4",
     ],
+    // Hallway death clips. The player is always ejected back to the
+    // hallway before dying, so one clip per threat covers every room.
+    // game.js falls back to the attack clip when a death clip is absent,
+    // so an unreviewed or deleted file never breaks the ending.
+    death: {
+      gene: "videos/ending_death_gene.mp4",
+      alien: "videos/ending_death_alien.mp4",
+      zombie: "videos/ending_death_zombie.mp4",
+      machine: "videos/ending_death_machine.mp4",
+      parasite: "videos/ending_death_parasite.mp4",
+      shadow: "videos/ending_death_shadow.mp4",
+      mimic: "videos/ending_death_mimic.mp4",
+      swarm: "videos/ending_death_swarm.mp4",
+      frost: "videos/ending_death_frost.mp4",
+      radiant: "videos/ending_death_radiant.mp4",
+      mirror: "videos/ending_death_mirror.mp4",
+      siren: "videos/ending_death_siren.mp4",
+      warden: "videos/ending_death_warden.mp4",
+      spore: "videos/ending_death_spore.mp4",
+    },
   };
+
+  // Per-room scare clips, keyed by room id. Every room has an entry; the
+  // file may not exist yet (or may have been culled during review), so
+  // game.js probes each clip before committing to a scare.
+  const roomScares = Object.keys(rooms).reduce((map, roomId) => {
+    map[roomId] = `videos/scare_${roomId}.mp4`;
+    return map;
+  }, {});
+
+  // Debug-panel rows for clips that sit outside the room-transition graph
+  // (scares, deaths, monster beats, endings). Deliberately NOT pushed into
+  // `transitions`: that array feeds the startup preload manifest, and adding
+  // ~50 more videos there would stall the intro cache. game.js merges these
+  // only when the local regen helper is not running, so the panel is usable
+  // from a plain static server and from GitHub Pages.
+  const debugExtras = [];
+  const threatNameById = {};
+  threats.forEach(t => { threatNameById[t.id] = t.name || t.id; });
+  const addExtra = (id, group, label, src, poster) => {
+    if (!src) return;
+    debugExtras.push({
+      id, group, label,
+      file: `${id}.mp4`,
+      src, poster,
+      status: "Generated clip. Needs review.",
+    });
+  };
+  Object.keys(rooms).forEach(roomId => {
+    addExtra(`scare_${roomId}`, "room_scare", `${rooms[roomId].name} scare`,
+      roomScares[roomId], `images/${roomId}.jpg`);
+  });
+  Object.entries(eventVideos.death || {}).forEach(([id, src]) => {
+    addExtra(`ending_death_${id}`, "ending_death", `${threatNameById[id] || id} death`, src, "images/hallway.jpg");
+  });
+  ["release", "attack"].forEach(kind => {
+    Object.entries(eventVideos[kind] || {}).forEach(([id, src]) => {
+      if (id === "default") return;
+      addExtra(`monster_${kind}_${id}`, `monster_${kind}`,
+        `${threatNameById[id] || id} ${kind}`, src, "images/hallway.jpg");
+    });
+  });
+  (eventVideos.victory || []).forEach(src => {
+    const id = src.split("/").pop().replace(/\.mp4$/, "");
+    addExtra(id, "ending_video", id.replace(/_/g, " "), src, "images/hallway.jpg");
+  });
 
   transitions.forEach(transition => {
     // Any transition with a defined end-frame (room transitions, and success
@@ -1861,6 +1926,8 @@
     goals: goalPool.filter(g => g.core),
     transitions,
     eventVideos,
+    roomScares,
+    debugExtras,
     introPlaylist,
     mediaManifest,
     gameNames,
@@ -1937,6 +2004,8 @@
         currentRoom: startRoom,
         startRoom,
         visitedRooms: [startRoom],
+        // Rooms whose one-per-run scare has already fired.
+        scaredRooms: [],
         runRooms,
         runLayout,
         placedActions,

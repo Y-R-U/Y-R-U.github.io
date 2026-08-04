@@ -1,7 +1,8 @@
 (function () {
-  const SYMBOLS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  const GLYPHS = ["A", "B", "C", "D", "E", "F"];
-  const CODE_WORDS = ["CODE", "EXE", "START", "WAKE", "LOCK", "OPEN", "EXIT", "SYNC", "NODE", "VOID", "SAFE", "SIGNAL"];
+  "use strict";
+
+  const MARKS = ["◆", "▲", "●", "■", "✦", "✕"];
+  const CARD_VERSION = "3";
 
   function hashText(text) {
     let hash = 2166136261;
@@ -31,351 +32,428 @@
     return out;
   }
 
-  function secondsForDifficulty(difficultyId) {
-    if (difficultyId === "hard") return 30;
-    if (difficultyId === "easy") return 60;
-    return 45;
+  // Mastermind scoring, kept pure so js/puzzles/test-lock.mjs can hammer it.
+  // Pass one takes the positional hits out of both sides; pass two counts the
+  // multiset intersection of what is left, so one answer mark can never pay out
+  // twice and a mark missing from the answer is worth nothing.
+  function scoreLock(guess, answer) {
+    const slots = Math.min(guess.length, answer.length);
+    let exact = 0;
+    const leftGuess = [];
+    const leftAnswer = [];
+    for (let i = 0; i < slots; i += 1) {
+      if (guess[i] === answer[i]) exact += 1;
+      else { leftGuess.push(guess[i]); leftAnswer.push(answer[i]); }
+    }
+    let near = 0;
+    leftAnswer.forEach(mark => {
+      const at = leftGuess.indexOf(mark);
+      if (at >= 0) { leftGuess.splice(at, 1); near += 1; }
+    });
+    return { exact, near };
   }
 
-  function codeFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:code`);
-    return Array.from({ length: 4 }, () => String(Math.floor(rng() * 10))).join("");
-  }
+  const pick = (list, rng) => list[Math.floor(rng() * list.length)];
+  const clamp = (value, lo, hi) => Math.max(lo, Math.min(hi, value));
+  const rangeInt = (rng, lo, hi) => lo + Math.floor(rng() * (hi - lo + 1));
 
-  function pick(list, rng) {
-    return list[Math.floor(rng() * list.length)];
-  }
+  // Difficulty is a real dial here: every puzzle reads its own block, so
+  // "hard" changes board size, tolerance and strike budget, not just the clock.
+  const TUNING = {
+    easy: {
+      seconds: 60, strikes: 3,
+      tiles: { grid: 3, scramble: 5, moves: 16 },
+      mirror: { grid: 3, wrong: 1, subtle: false },
+      steady: { bends: 2, width: 17, strikes: 3 },
+      lock: { slots: 3, marks: 4, attempts: 6, seconds: 55 },
+      echo: { rounds: 3, start: 2, speed: 580 },
+      hold: { passes: 2, span: 20, hold: [8, 10], air: 100, drain: 12, refill: 30, grace: 7 },
+      watch: { slots: 6, catches: 4, window: 1600, misses: 3, overlap: false },
+      face: { peak: 0.7, size: 0.34, tolerance: 0.2, strikes: 4 },
+    },
+    medium: {
+      seconds: 45, strikes: 3,
+      tiles: { grid: 3, scramble: 12, moves: 18 },
+      mirror: { grid: 3, wrong: 2, subtle: false },
+      steady: { bends: 3, width: 13, strikes: 3 },
+      lock: { slots: 3, marks: 5, attempts: 5, seconds: 50 },
+      echo: { rounds: 4, start: 3, speed: 460 },
+      hold: { passes: 3, span: 26, hold: [8, 11], air: 100, drain: 14, refill: 28, grace: 5 },
+      watch: { slots: 6, catches: 5, window: 1100, misses: 3, overlap: false },
+      face: { peak: 0.58, size: 0.29, tolerance: 0.16, strikes: 3 },
+    },
+    hard: {
+      seconds: 36, strikes: 2,
+      tiles: { grid: 4, scramble: 14, moves: 22 },
+      mirror: { grid: 4, wrong: 3, subtle: true },
+      steady: { bends: 4, width: 10, strikes: 2 },
+      lock: { slots: 3, marks: 6, attempts: 5, seconds: 45 },
+      echo: { rounds: 5, start: 3, speed: 360 },
+      hold: { passes: 4, span: 33, hold: [9, 13], air: 95, drain: 16, refill: 26, grace: 4 },
+      watch: { slots: 9, catches: 6, window: 820, misses: 2, overlap: true },
+      face: { peak: 0.44, size: 0.23, tolerance: 0.125, strikes: 3 },
+    },
+  };
 
-  function digits(rng, length) {
-    return Array.from({ length }, () => String(Math.floor(rng() * 10))).join("");
-  }
+  const tuningFor = id => TUNING[id] || TUNING.medium;
 
-  function codeTokenSet(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:code-tokens`);
-    const words = shuffle(CODE_WORDS, rng).slice(0, 3);
-    const patterns = [
-      word => `${digits(rng, 3)}-${word}`,
-      word => `${digits(rng, 1)}XX-${word}-${digits(rng, 2)}`,
-      word => `${digits(rng, 2)}-${word}`,
-    ];
-    return words.map((word, index) => patterns[index % patterns.length](word));
+  function normaliseImage(value) {
+    if (!value) return null;
+    if (typeof value === "string") return { src: value, label: "" };
+    if (!value.src) return null;
+    return { src: String(value.src), label: value.label ? String(value.label) : "" };
   }
 
   function imageChoicesFromContext(ctx) {
-    const choices = Array.isArray(ctx.imageChoices) ? ctx.imageChoices : [];
-    return choices
-      .map(choice => {
-        if (typeof choice === "string") return { src: choice, label: "" };
-        if (!choice || !choice.src) return null;
-        return {
-          src: String(choice.src),
-          label: choice.label ? String(choice.label) : "",
-        };
-      })
-      .filter(choice => choice && choice.src);
+    const choices = Array.isArray(ctx && ctx.imageChoices) ? ctx.imageChoices : [];
+    return choices.map(normaliseImage).filter(Boolean);
   }
 
-  function sequenceFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:sequence`);
-    const symbols = shuffle(GLYPHS, rng).slice(0, 4);
-    const sequence = Array.from({ length: 5 }, () => pick(symbols, rng));
-    return { symbols, sequence };
+  const ARTICLED = /^(the|a|an|this|that|these|those|your|its|their|his|her)\s/i;
+
+  function theLocation(location) {
+    const text = String(location || "this place").trim();
+    return ARTICLED.test(text) ? text : `the ${text}`;
   }
 
-  function equationFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:equation`);
-    const a = Math.floor(rng() * 5) + 2;
-    const b = Math.floor(rng() * 5) + 2;
-    const c = Math.floor(rng() * 4) + 1;
-    const symbols = shuffle(GLYPHS, rng).slice(0, 3);
+  function theThreat(threat) {
+    const name = String((threat && threat.name) || "the presence").trim();
+    return ARTICLED.test(name) ? name : `the ${name}`;
+  }
+
+  function sentenceCase(text) {
+    const s = String(text || "");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Generators. Everything below returns plain JSON-safe data so that a
+   * challenge can sit in localStorage across a reload.
+   * ------------------------------------------------------------------ */
+
+  function genImageTiles(seed, image, tune, location) {
+    const t = tune.tiles;
     return {
-      clues: [
-        `${symbols[0]} = ${a}`,
-        `${symbols[1]} = ${b}`,
-        `${symbols[0]} + ${symbols[1]} - ${symbols[2]} = ${a + b - c}`,
-      ],
-      target: symbols[2],
-      answer: String(c),
-      symbols,
+      type: "image_tiles",
+      title: "What It Looked Like",
+      kicker: location ? String(location) : "recall",
+      prompt: `Your picture of ${theLocation(location)} has come apart. Swap the pieces back into place.`,
+      image,
+      grid: t.grid,
+      scramble: t.scramble,
+      moves: t.moves,
+      seconds: tune.seconds,
+      seed: `${seed}:tiles`,
     };
   }
 
-  function memoryPatternFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:memory-grid`);
-    return shuffle(Array.from({ length: 9 }, (_, index) => index), rng).slice(0, 4);
-  }
-
-  function imagePuzzleChoice(ctx, baseSeed, suffix) {
-    const imageChoices = imageChoicesFromContext(ctx || {});
-    if (!imageChoices.length) return null;
-    return pick(imageChoices, rngFromSeed(`${baseSeed}:${suffix}:image-choice`));
-  }
-
-  function wirePuzzleFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:wire-match`);
-    const symbols = shuffle(["A", "B", "C", "D", "E", "F"], rng).slice(0, 4);
-    const pairs = {};
-    const right = shuffle(symbols, rngFromSeed(`${text}:${seed}:wire-right`));
-    symbols.forEach(symbol => { pairs[symbol] = symbol; });
-    return { left: symbols, right, pairs };
-  }
-
-  function pressurePuzzleFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:pressure-order`);
-    const controls = shuffle(["I", "II", "III", "IV"], rng);
+  function genMirrorCheck(seed, image, tune, location) {
+    const t = tune.mirror;
+    const rng = rngFromSeed(`${seed}:mirror`);
+    const count = t.grid * t.grid;
+    const wrong = shuffle(Array.from({ length: count }, (_, i) => i), rng)
+      .slice(0, t.wrong)
+      .map(index => ({ index, mode: t.subtle && rng() < 0.6 ? "turn" : "flip" }));
     return {
-      controls,
-      answer: shuffle(controls, rngFromSeed(`${text}:${seed}:pressure-answer`)),
+      type: "mirror_check",
+      title: "Turned Around",
+      kicker: location ? String(location) : "look again",
+      prompt: `Parts of ${theLocation(location)} are facing the wrong way. Tap only the pieces that are wrong.`,
+      image,
+      grid: t.grid,
+      wrong,
+      strikes: tune.strikes,
+      seconds: tune.seconds,
+      seed: `${seed}:mirror`,
     };
   }
 
-  function dialPuzzleFromText(text, seed) {
-    const rng = rngFromSeed(`${text}:${seed}:dial-align`);
-    const symbols = ["A", "B", "C", "D"];
+  function genSteadyHand(seed, tune, location) {
+    const t = tune.steady;
+    const rng = rngFromSeed(`${seed}:steady`);
+    const points = [[50, 132]];
+    let side = rng() < 0.5 ? -1 : 1;
+    for (let i = 1; i <= t.bends; i += 1) {
+      const y = 132 - (124 / (t.bends + 1)) * i;
+      const spread = 22 + rng() * 12;
+      points.push([clamp(50 + side * spread, 16, 84), Math.round(y)]);
+      side *= -1;
+    }
+    points.push([50, 8]);
     return {
-      symbols,
-      answer: Array.from({ length: 3 }, () => pick(symbols, rng)),
-      start: Array.from({ length: 3 }, () => pick(symbols, rng)),
+      type: "steady_hand",
+      title: "Steady Hand",
+      kicker: location ? String(location) : "do not shake",
+      prompt: `Draw the line through ${theLocation(location)} without touching the walls. Slow is fine. Shaking is not.`,
+      path: points.map(p => [Math.round(p[0]), Math.round(p[1])]),
+      width: t.width,
+      strikes: t.strikes,
+      seconds: tune.seconds,
+      seed: `${seed}:steady`,
     };
   }
 
-  function mergeTargetForDifficulty(difficultyId) {
-    if (difficultyId === "hard") return 128;
-    if (difficultyId === "easy") return 32;
-    return 64;
+  function genLockDeduce(seed, tune, location) {
+    const t = tune.lock;
+    const rng = rngFromSeed(`${seed}:lock`);
+    const marks = shuffle(MARKS, rng).slice(0, t.marks);
+    const answer = shuffle(marks, rngFromSeed(`${seed}:lock:answer`)).slice(0, t.slots);
+    return {
+      type: "lock_deduce",
+      title: "The Cold Lock",
+      kicker: location ? String(location) : "guess and listen",
+      prompt: `${sentenceCase(theLocation(location))} will not tell you the order. Try a set; it only says how close you were.`,
+      marks,
+      slots: t.slots,
+      answer,
+      attempts: t.attempts,
+      // Deduction needs more clock per attempt than the reflex puzzles do.
+      seconds: t.seconds || tune.seconds,
+      seed: `${seed}:lock`,
+    };
   }
 
-  function readMergeBest(gameId) {
+  function genSignalEcho(seed, tune, threat) {
+    const t = tune.echo;
+    const rng = rngFromSeed(`${seed}:echo`);
+    const length = t.start + t.rounds - 1;
+    return {
+      type: "signal_echo",
+      title: "It Repeats You",
+      kicker: (threat && threat.label) || "listen",
+      prompt: `${sentenceCase(theThreat(threat))} repeats what it hears. Answer back exactly, or it keeps talking.`,
+      whisper: (threat && threat.clue) || "",
+      sequence: Array.from({ length }, () => Math.floor(rng() * 4)),
+      rounds: t.rounds,
+      start: t.start,
+      speed: t.speed,
+      strikes: tune.strikes,
+      seconds: tune.seconds,
+      seed: `${seed}:echo`,
+    };
+  }
+
+  function genHoldStill(seed, tune, threat) {
+    const t = tune.hold;
+    const rng = rngFromSeed(`${seed}:hold`);
+    // A proximity curve built from spaced bumps: each bump is short enough
+    // to hold through, each gap is long enough to breathe back.
+    const ticks = t.span * 10;
+    const samples = new Array(ticks).fill(0.08);
+    const span = Array.isArray(t.hold) ? t.hold : [8, 11];
+    const slot = Math.floor(ticks / (t.passes + 1));
+    for (let i = 0; i < t.passes; i += 1) {
+      const centre = slot * (i + 1) + Math.floor((rng() - 0.5) * slot * 0.32);
+      const half = span[0] + Math.floor(rng() * (span[1] - span[0] + 1));
+      const ramp = 11;
+      for (let k = -half - ramp; k <= half + ramp; k += 1) {
+        const index = centre + k;
+        if (index < 0 || index >= ticks) continue;
+        const away = Math.max(0, Math.abs(k) - half);
+        const value = away === 0 ? 1 : Math.max(0, 1 - away / ramp);
+        samples[index] = Math.max(samples[index], 0.08 + value * 0.9);
+      }
+    }
+    return {
+      type: "hold_still",
+      title: "Hold Your Breath",
+      kicker: (threat && threat.label) || "it is listening",
+      prompt: `Hold while ${theThreat(threat)} is close. Breathe when it moves off — but never while it can hear you.`,
+      whisper: (threat && threat.clue) || "",
+      samples: samples.map(v => Math.round(v * 100) / 100),
+      threshold: 0.5,
+      air: t.air,
+      drain: t.drain,
+      refill: t.refill,
+      grace: t.grace,
+      seconds: t.span + 14,
+      seed: `${seed}:hold`,
+    };
+  }
+
+  function genDontLook(seed, tune, threat) {
+    const t = tune.watch;
+    const rng = rngFromSeed(`${seed}:watch`);
+    const events = [];
+    let at = 900;
+    let last = -1;
+    for (let i = 0; i < t.catches; i += 1) {
+      let slot = Math.floor(rng() * t.slots);
+      if (slot === last) slot = (slot + 1) % t.slots;
+      last = slot;
+      events.push({ slot, at, dur: t.window });
+      at += t.overlap && rng() < 0.45
+        ? Math.round(t.window * 0.55)
+        : t.window + rangeInt(rng, 260, 620);
+    }
+    return {
+      type: "dont_look",
+      title: "Keep Watch",
+      kicker: (threat && threat.label) || "movement",
+      prompt: `${sentenceCase(theThreat(threat))} moves between the openings. Tap it the instant it shows — and tap nothing else.`,
+      whisper: (threat && threat.clue) || "",
+      slots: t.slots,
+      events,
+      required: t.catches,
+      strikes: t.misses,
+      seconds: Math.max(tune.seconds, Math.ceil(at / 1000) + 8),
+      seed: `${seed}:watch`,
+    };
+  }
+
+  function genFindTheFace(seed, image, tune, threat) {
+    const t = tune.face;
+    const rng = rngFromSeed(`${seed}:face`);
+    // Same anatomy every time — lit mass, two sockets, a mouth — with seeded
+    // proportions, so no two runs draw the same head and all of them read as
+    // a head.
+    const face = {
+      tilt: Math.round((rng() * 11 - 5.5) * 10) / 10,
+      squash: Math.round((0.72 + rng() * 0.12) * 100) / 100,
+      gap: Math.round((0.19 + rng() * 0.05) * 100) / 100,
+      eyeY: Math.round((0.38 + rng() * 0.07) * 100) / 100,
+      eye: Math.round((0.17 + rng() * 0.05) * 100) / 100,
+      mouthY: Math.round((0.69 + rng() * 0.06) * 100) / 100,
+      mouthW: Math.round((0.3 + rng() * 0.14) * 100) / 100,
+      mouthH: Math.round((0.07 + rng() * 0.07) * 100) / 100,
+    };
+    return {
+      type: "find_the_face",
+      title: "It Is In The Picture",
+      kicker: (threat && threat.label) || "somewhere here",
+      prompt: `${sentenceCase(theThreat(threat))} is somewhere in this picture. Find it before it finishes finding you.`,
+      whisper: (threat && threat.clue) || "",
+      image,
+      x: Math.round((0.21 + rng() * 0.58) * 100) / 100,
+      y: Math.round((0.23 + rng() * 0.54) * 100) / 100,
+      size: t.size,
+      peak: t.peak,
+      tolerance: t.tolerance,
+      face,
+      strikes: t.strikes,
+      seconds: tune.seconds,
+      seed: `${seed}:face`,
+    };
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Registry. The 8 built-ins go through the same register() call a pack
+   * file uses, so a pack loaded after this module joins the run pools and
+   * the ?debug sample list without anything here knowing about it.
+   * ------------------------------------------------------------------ */
+
+  const REGISTRY = new Map();
+  const POOLS = ["location", "threat", "both"];
+
+  function register(type, def) {
     try {
-      const data = JSON.parse(localStorage.getItem("hubPuzzles.merge2048.best.v1") || "{}");
-      return Math.max(0, Number(data[gameId || "shared"]) || 0);
+      if (typeof type !== "string" || !type.trim()) throw new Error("type must be a non-empty string");
+      if (REGISTRY.has(type)) throw new Error(`"${type}" is already registered`);
+      if (!def || typeof def !== "object") throw new Error(`"${type}" needs a definition object`);
+      if (!POOLS.includes(def.pool)) throw new Error(`"${type}" needs pool "location", "threat" or "both"`);
+      if (typeof def.generate !== "function") throw new Error(`"${type}" needs generate(seed, tune, ctx)`);
+      if (typeof def.render !== "function") throw new Error(`"${type}" needs render(puzzle, api)`);
+      REGISTRY.set(type, {
+        type,
+        pool: def.pool,
+        label: String(def.label || type),
+        needsImage: !!def.needsImage,
+        generate: def.generate,
+        render: def.render,
+      });
+      return true;
     } catch (err) {
-      return 0;
+      console.error("[HubPuzzles.register]", (err && err.message) || err);
+      return false;
     }
   }
 
-  function writeMergeBest(gameId, value) {
+  const renderFor = type => {
+    const def = REGISTRY.get(type);
+    return def ? def.render : null;
+  };
+
+  function poolFor(kind, hasImage) {
+    const out = [];
+    REGISTRY.forEach(def => {
+      if (def.pool !== kind && def.pool !== "both") return;
+      if (def.needsImage && !hasImage) return;
+      out.push(def);
+    });
+    return out;
+  }
+
+  // Descriptors have to survive JSON in localStorage, so the round trip is the
+  // contract, not a nicety. A pack that throws or hands back something odd is
+  // dropped rather than allowed to cost the player a turn.
+  function buildDescriptor(def, seed, tune, genCtx) {
     try {
-      const key = gameId || "shared";
-      const data = JSON.parse(localStorage.getItem("hubPuzzles.merge2048.best.v1") || "{}");
-      data[key] = Math.max(Number(data[key]) || 0, Number(value) || 0);
-      localStorage.setItem("hubPuzzles.merge2048.best.v1", JSON.stringify(data));
+      const made = def.generate(seed, tune, genCtx);
+      if (!made || typeof made !== "object") throw new Error("generate() returned no descriptor");
+      const plain = JSON.parse(JSON.stringify(made));
+      if (!plain.type) plain.type = def.type;
+      if (plain.type !== def.type) throw new Error(`generate() returned type "${plain.type}"`);
+      return plain;
     } catch (err) {
-      // Local storage can be unavailable in private or embedded contexts.
+      console.error(`[HubPuzzles] ${def.type} could not generate`, err);
+      return null;
     }
   }
 
-  function locationChallenge(location, baseSeed, seconds, ctx) {
-    const rng = rngFromSeed(`${baseSeed}:location:kind`);
-    const image = imagePuzzleChoice(ctx, baseSeed, "location");
-    const roll = rng();
-    if (image && roll < 0.16) {
-      return {
-        label: "Restore the local image lock",
-        challenge: {
-          type: "image_tiles",
-          title: `${location} Image Lock`,
-          prompt: "Swap the image tiles until the picture is restored.",
-          image,
-          grid: 3,
-          seconds,
-          seed: `${baseSeed}:location:image-tiles:${image.src}`,
-        },
-        successText: `The ${location} image lock resolves and unlocks a safer route.`,
-        failText: `The ${location} image lock stays scrambled. The delay costs you a turn.`,
-      };
+  /* ------------------------------------------------------------------ *
+   * Run challenges
+   * ------------------------------------------------------------------ */
+
+  function buildTask(kind, slot, kindSeed, baseSeed, tune, ctx, extra) {
+    const images = imageChoicesFromContext(ctx);
+    const image = images.length ? pick(images, rngFromSeed(`${baseSeed}:${slot}:image`)) : null;
+    const rng = rngFromSeed(kindSeed);
+    const genCtx = Object.assign({}, ctx, extra, { image });
+    let candidates = poolFor(kind, !!image);
+    while (candidates.length) {
+      const index = Math.floor(rng() * candidates.length);
+      const def = candidates[index];
+      const challenge = buildDescriptor(def, `${baseSeed}:${slot}`, tune, genCtx);
+      if (challenge) return { label: def.label, challenge };
+      candidates = candidates.filter((_, i) => i !== index);
     }
-    if (image && roll < 0.3) {
-      return {
-        label: "Find the image fault",
-        challenge: {
-          type: "spot_difference",
-          title: `${location} Image Fault`,
-          prompt: "Find the altered tile in the room image.",
-          image,
-          seconds,
-          seed: `${baseSeed}:location:spot-difference:${image.src}`,
-        },
-        successText: `The ${location} image fault resolves and the panel grants access.`,
-        failText: `The ${location} image fault stays hidden. The delay costs you a turn.`,
-      };
-    }
-    if (roll < 0.48) {
-      const target = mergeTargetForDifficulty(ctx && ctx.difficultyId);
-      return {
-        label: "Merge the local power cells",
-        challenge: {
-          type: "merge_2048",
-          title: `${location} Power Merge`,
-          prompt: `Merge matching cells until you create ${target}.`,
-          seconds: 60,
-          target,
-          gameId: ctx && ctx.gameId,
-          seed: `${baseSeed}:location:merge-2048`,
-        },
-        successText: `The ${location} power cells reach ${target} and the panel grants access.`,
-        failText: `The ${location} power cells stall out. The delay costs you a turn.`,
-      };
-    }
-    if (roll < 0.62) {
-      const code = codeFromText(location, baseSeed);
-      return {
-        label: "Solve the local access code",
-        challenge: {
-          type: "code",
-          title: `${location} Access Code`,
-          prompt: "Memorise the four-digit code, then enter it before the timer expires.",
-          code,
-          seconds,
-          seed: `${baseSeed}:location:code`,
-        },
-        successText: `The ${location} access relay accepts the code and unlocks a safer route.`,
-        failText: `The ${location} relay rejects the attempt. The delay costs you a turn.`,
-      };
-    }
-    if (roll < 0.8) {
-      const sequence = sequenceFromText(location, baseSeed);
-      return {
-        label: "Repeat the local signal",
-        challenge: {
-          type: "sequence_repeat",
-          title: `${location} Signal Pattern`,
-          prompt: "Watch the signal pattern, then repeat it before the timer expires.",
-          seconds,
-          symbols: sequence.symbols,
-          sequence: sequence.sequence,
-          seed: `${baseSeed}:location:sequence`,
-        },
-        successText: `The ${location} signal repeats cleanly and the panel grants access.`,
-        failText: `The ${location} signal falls out of sync. The delay costs you a turn.`,
-      };
-    }
-    const pattern = memoryPatternFromText(location, baseSeed);
-    return {
-      label: "Repeat the local grid",
-      challenge: {
-        type: "memory_grid",
-        title: `${location} Memory Grid`,
-        prompt: "Watch the lit cells, then repeat them before the timer expires.",
-        seconds,
-        pattern,
-        seed: `${baseSeed}:location:memory-grid`,
-      },
-      successText: `The ${location} grid repeats cleanly and the panel grants access.`,
-      failText: `The ${location} grid falls out of sync. The delay costs you a turn.`,
-    };
+    // Last resort if every registered type refused: the lock needs nothing.
+    return { label: "Work out the lock", challenge: genLockDeduce(`${baseSeed}:${slot}`, tune, extra.location) };
   }
 
-  function monsterChallenge(threat, baseSeed, seconds) {
-    const threatName = threat.name || "the hunter";
-    const rng = rngFromSeed(`${baseSeed}:monster:kind:${threatName}`);
-    const roll = rng();
-    if (roll < 0.25) {
-      const codes = codeTokenSet(threatName, baseSeed);
-      const answer = shuffle(codes, rngFromSeed(`${baseSeed}:monster:${threatName}:answer`));
-      return {
-        label: "Arrange the ward codes",
-        challenge: {
-          type: "code_order",
-          title: `${threatName} Ward Codes`,
-          prompt: "Memorise the three-code order, then place the codes before the timer expires.",
-          answer,
-          tiles: shuffle(codes, rngFromSeed(`${baseSeed}:monster:${threatName}:tiles`)),
-          seconds: 10,
-          seed: `${baseSeed}:monster:codes`,
-        },
-        successText: `The ward codes lock in. For a moment, ${threatName} feels farther away.`,
-        failText: `The ward codes scramble. The mistake costs you a turn.`,
-      };
-    }
-    if (roll < 0.46) {
-      const puzzle = pressurePuzzleFromText(threatName, baseSeed);
-      return {
-        label: "Set the ward pressure",
-        challenge: {
-          type: "pressure_order",
-          title: `${threatName} Pressure Order`,
-          prompt: "Memorise the valve order, then press the controls before the timer expires.",
-          seconds: 16,
-          controls: puzzle.controls,
-          answer: puzzle.answer,
-          seed: `${baseSeed}:monster:pressure-order`,
-        },
-        successText: `The ward pressure locks in. For a moment, ${threatName} feels farther away.`,
-        failText: `The ward pressure vents in the wrong order. The mistake costs you a turn.`,
-      };
-    }
-    if (roll < 0.66) {
-      const puzzle = dialPuzzleFromText(threatName, baseSeed);
-      return {
-        label: "Align the ward dials",
-        challenge: {
-          type: "dial_align",
-          title: `${threatName} Dial Align`,
-          prompt: "Rotate each dial until the symbols match the target.",
-          seconds,
-          symbols: puzzle.symbols,
-          start: puzzle.start,
-          answer: puzzle.answer,
-          seed: `${baseSeed}:monster:dial-align`,
-        },
-        successText: `The ward dials align. For a moment, ${threatName} feels farther away.`,
-        failText: `The ward dials slip out of alignment. The mistake costs you a turn.`,
-      };
-    }
-    if (roll < 0.82) {
-      const puzzle = wirePuzzleFromText(threatName, baseSeed);
-      return {
-        label: "Match the ward wires",
-        challenge: {
-          type: "wire_match",
-          title: `${threatName} Wire Match`,
-          prompt: "Select a left terminal, then select its matching right terminal.",
-          seconds,
-          left: puzzle.left,
-          right: puzzle.right,
-          pairs: puzzle.pairs,
-          seed: `${baseSeed}:monster:wire-match`,
-        },
-        successText: `The ward wires pair cleanly. For a moment, ${threatName} feels farther away.`,
-        failText: `The ward wires spark apart. The mistake costs you a turn.`,
-      };
-    }
-    const equation = equationFromText(threatName, baseSeed);
-    return {
-      label: "Solve the ward equation",
-      challenge: {
-        type: "symbol_equation",
-        title: `${threatName} Ward Equation`,
-        prompt: `Use the clues to find the value of ${equation.target}.`,
-        seconds,
-        clues: equation.clues,
-        target: equation.target,
-        answer: equation.answer,
-        symbols: equation.symbols,
-        seed: `${baseSeed}:monster:equation`,
-      },
-      successText: `The ward equation balances. For a moment, ${threatName} feels farther away.`,
-      failText: `The ward equation collapses. The mistake costs you a turn.`,
-    };
+  function locationChallenge(location, baseSeed, tune, ctx) {
+    const where = sentenceCase(theLocation(location));
+    const made = buildTask("location", "location", `${baseSeed}:location:kind`, baseSeed, tune, ctx,
+      { location, threat: ctx.threat || {} });
+    made.successText = `${where} holds still long enough to let you through. You lose no time.`;
+    made.failText = `${where} refuses to line up, and the delay costs you a turn.`;
+    return made;
+  }
+
+  function monsterChallenge(threat, baseSeed, tune, ctx) {
+    const name = theThreat(threat);
+    const made = buildTask("threat", "monster", `${baseSeed}:monster:kind:${(threat && threat.id) || "x"}`,
+      baseSeed, tune, ctx, { threat, location: ctx.location || ctx.facility || "this place" });
+    made.successText = `You get it right. For a while ${name} is somewhere else, and you keep the time you had.`;
+    made.failText = `You get it wrong. ${sentenceCase(name)} is nearer than it was, and the mistake costs you a turn.`;
+    return made;
   }
 
   function createChallengeGroups(ctx) {
-    const gameId = ctx.gameId || "game";
-    const difficultyId = ctx.difficultyId || "medium";
-    const seconds = secondsForDifficulty(difficultyId);
-    const location = ctx.location || ctx.facility || "the site";
-    const threat = ctx.threat || {};
-    const threatName = threat.name || "the hunter";
-    const baseSeed = ctx.runKey || `${gameId}:${Date.now()}`;
-    const locationTask = locationChallenge(location, baseSeed, seconds, ctx);
-    const monsterTask = monsterChallenge(threat, baseSeed, seconds);
+    const context = ctx || {};
+    const gameId = context.gameId || "game";
+    const tune = tuningFor(context.difficultyId);
+    const location = context.location || context.facility || "this place";
+    const threat = context.threat || {};
+    const baseSeed = context.runKey || `${gameId}:${Date.now()}`;
+    const locationTask = locationChallenge(location, baseSeed, tune, context);
+    const monsterTask = monsterChallenge(threat, baseSeed, tune, context);
     return [
       {
         id: "challenge_location",
         mandatory: true,
         label: "Location challenge",
-        goalText: `Challenge: solve the ${location} access puzzle.`,
+        goalText: `Challenge: get past whatever ${theLocation(location)} is doing to your memory.`,
         steps: [{
           id: "solve_location_challenge",
           label: `Challenge: ${locationTask.label}`,
@@ -390,7 +468,7 @@
         id: "challenge_monster",
         mandatory: true,
         label: "Monster challenge",
-        goalText: `Challenge: solve a ward puzzle keyed to ${threatName}.`,
+        goalText: `Challenge: get one round ahead of ${theThreat(threat)}.`,
         steps: [{
           id: "solve_monster_challenge",
           label: `Challenge: ${monsterTask.label}`,
@@ -405,191 +483,87 @@
   }
 
   function samplePuzzles(ctx = {}) {
-    const imageChoices = imageChoicesFromContext(ctx);
-    const image = imageChoices[0] || { src: "images/hallway.jpg", label: "Hallway" };
-    return [
-      {
-        id: "code",
-        label: "Access Code",
-        puzzle: {
-          type: "code",
-          title: "Sample Access Code",
-          prompt: "Memorise the four-digit code, then enter it before the timer expires.",
-          code: "3816",
-          seconds: 20,
-          seed: "sample:code",
-        },
-      },
-      {
-        id: "sequence_repeat",
-        label: "Signal Repeat",
-        puzzle: {
-          type: "sequence_repeat",
-          title: "Sample Signal Pattern",
-          prompt: "Watch the signal pattern, then repeat it before the timer expires.",
-          symbols: ["A", "B", "C", "D"],
-          sequence: ["B", "D", "A", "C", "B"],
-          seconds: 20,
-          seed: "sample:sequence",
-        },
-      },
-      {
-        id: "code_order",
-        label: "Code Order",
-        puzzle: {
-          type: "code_order",
-          title: "Sample Ward Codes",
-          prompt: "Memorise the three-code order, then place the codes before the timer expires.",
-          answer: ["122-CODE", "1XX-EXE-22", "55-START"],
-          tiles: ["55-START", "122-CODE", "1XX-EXE-22"],
-          seconds: 10,
-          seed: "sample:code-order",
-        },
-      },
-      {
-        id: "symbol_equation",
-        label: "Ward Equation",
-        puzzle: {
-          type: "symbol_equation",
-          title: "Sample Ward Equation",
-          prompt: "Use the clues to find the value of C.",
-          clues: ["A = 4", "B = 3", "A + B - C = 5"],
-          target: "C",
-          answer: "2",
-          symbols: ["A", "B", "C"],
-          seconds: 25,
-          seed: "sample:equation",
-        },
-      },
-      {
-        id: "image_tiles",
-        label: "Image Tiles",
-        puzzle: {
-          type: "image_tiles",
-          title: "Sample Image Lock",
-          prompt: "Swap the image tiles until the picture is restored.",
-          image,
-          grid: 3,
-          seconds: 45,
-          seed: `sample:image:${image.src}`,
-        },
-      },
-      {
-        id: "word_order",
-        label: "Word Order Legacy",
-        puzzle: {
-          type: "word_order",
-          title: "Sample Word Phrase",
-          prompt: "Tap the words in the right order.",
-          answer: ["open", "the", "sealed", "door"],
-          tiles: ["door", "open", "sealed", "the"],
-          seconds: 20,
-          seed: "sample:word-order",
-        },
-      },
-      {
-        id: "merge_2048",
-        label: "2048 Merge",
-        puzzle: {
-          type: "merge_2048",
-          title: "Sample Power Merge",
-          prompt: "Merge matching cells until you create 64.",
-          target: 64,
-          seconds: 60,
-          gameId: ctx.gameId || "sample",
-          seed: "sample:merge-2048",
-        },
-      },
-      {
-        id: "wire_match",
-        label: "Wire Match",
-        puzzle: {
-          type: "wire_match",
-          title: "Sample Wire Match",
-          prompt: "Select a left terminal, then select its matching right terminal.",
-          left: ["A", "B", "C", "D"],
-          right: ["C", "A", "D", "B"],
-          pairs: { A: "A", B: "B", C: "C", D: "D" },
-          seconds: 25,
-          seed: "sample:wire-match",
-        },
-      },
-      {
-        id: "pressure_order",
-        label: "Pressure Order",
-        puzzle: {
-          type: "pressure_order",
-          title: "Sample Pressure Order",
-          prompt: "Memorise the valve order, then press the controls before the timer expires.",
-          controls: ["I", "II", "III", "IV"],
-          answer: ["III", "I", "IV", "II"],
-          seconds: 16,
-          seed: "sample:pressure-order",
-        },
-      },
-      {
-        id: "spot_difference",
-        label: "Spot Difference",
-        puzzle: {
-          type: "spot_difference",
-          title: "Sample Image Fault",
-          prompt: "Find the altered tile in the room image.",
-          image,
-          seconds: 25,
-          seed: `sample:spot:${image.src}`,
-        },
-      },
-      {
-        id: "memory_grid",
-        label: "Memory Grid",
-        puzzle: {
-          type: "memory_grid",
-          title: "Sample Memory Grid",
-          prompt: "Watch the lit cells, then repeat them before the timer expires.",
-          pattern: [0, 4, 6, 8],
-          seconds: 20,
-          seed: "sample:memory-grid",
-        },
-      },
-      {
-        id: "dial_align",
-        label: "Dial Align",
-        puzzle: {
-          type: "dial_align",
-          title: "Sample Dial Align",
-          prompt: "Rotate each dial until the symbols match the target.",
-          symbols: ["A", "B", "C", "D"],
-          start: ["D", "A", "C"],
-          answer: ["B", "D", "A"],
-          seconds: 25,
-          seed: "sample:dial-align",
-        },
-      },
-    ];
+    const images = imageChoicesFromContext(ctx);
+    const image = images[0] || { src: "images/hallway.jpg", label: "Hallway" };
+    const other = images[1] || image;
+    const tune = tuningFor(ctx.difficultyId);
+    const location = ctx.location || "this place";
+    const threat = ctx.threat && ctx.threat.name ? ctx.threat : {
+      id: "sample", name: "the presence", label: "presence detected",
+      clue: "It has been in every room you have already left.",
+    };
+    // Everything registered shows up here, so a pack appears in ?debug with
+    // no wiring: the sample always gets a still, whatever the host passed in.
+    const out = [];
+    let n = 0;
+    REGISTRY.forEach(def => {
+      n += 1;
+      const genCtx = Object.assign({}, ctx, {
+        location, threat, image: n % 2 ? image : other, imageChoices: [image, other],
+      });
+      const puzzle = buildDescriptor(def, `sample:${def.type}`, tune, genCtx);
+      if (puzzle) out.push({ id: def.type, label: def.label, puzzle });
+    });
+    return out;
   }
+
+  // Runs saved before this rewrite still hold retired descriptors. Rather
+  // than handing the player an empty board that always costs a turn, swap
+  // in a live puzzle seeded from the same data.
+  const LEGACY = {
+    code: "lock_deduce", code_order: "lock_deduce", symbol_equation: "lock_deduce",
+    dial_align: "lock_deduce", word_order: "lock_deduce",
+    sequence_repeat: "signal_echo", memory_grid: "signal_echo", pressure_order: "signal_echo",
+    wire_match: "steady_hand", merge_2048: "steady_hand",
+    spot_difference: "mirror_check",
+  };
+
+  function migrateLegacy(puzzle) {
+    const target = LEGACY[puzzle.type];
+    if (!target) return null;
+    const seconds = Number(puzzle.seconds) || 45;
+    const id = seconds >= 55 ? "easy" : (seconds <= 34 ? "hard" : "medium");
+    const tune = tuningFor(id);
+    const seed = puzzle.seed || puzzle.type;
+    const image = normaliseImage(puzzle.image);
+    if (target === "mirror_check" && image) return genMirrorCheck(seed, image, tune, "");
+    if (target === "signal_echo") return genSignalEcho(seed, tune, {});
+    if (target === "steady_hand") return genSteadyHand(seed, tune, "");
+    return genLockDeduce(seed, tune, "");
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Shell
+   * ------------------------------------------------------------------ */
 
   function ensureModal() {
     let modal = document.getElementById("puzzle-overlay");
-    if (modal) return modal;
+    if (modal && modal.dataset.v === CARD_VERSION) return modal;
+    if (modal) modal.remove();
     modal = document.createElement("aside");
     modal.id = "puzzle-overlay";
     modal.className = "puzzle-overlay";
+    modal.dataset.v = CARD_VERSION;
     modal.innerHTML = `
       <div class="puzzle-card" role="dialog" aria-modal="true" aria-labelledby="puzzle-title">
+        <div class="pz-grain" aria-hidden="true"></div>
         <div class="puzzle-head">
-          <div>
-            <p class="puzzle-kicker">challenge task</p>
+          <div class="pz-heading">
+            <p class="puzzle-kicker" id="puzzle-kicker"></p>
             <h2 id="puzzle-title"></h2>
           </div>
-          <div id="puzzle-timer" class="puzzle-timer">0</div>
+          <div class="puzzle-timer" id="puzzle-timer" style="--p:1"><span id="puzzle-timer-num">0</span></div>
         </div>
         <p id="puzzle-prompt" class="puzzle-prompt"></p>
+        <p id="puzzle-whisper" class="pz-whisper"></p>
+        <div id="puzzle-strikes" class="pz-strikes" aria-live="polite"></div>
         <div id="puzzle-body" class="puzzle-body"></div>
         <div id="puzzle-feedback" class="puzzle-feedback" aria-live="polite"></div>
         <div class="puzzle-actions">
           <button id="puzzle-submit" class="glass-button primary" type="button">Submit</button>
           <button id="puzzle-cancel" class="glass-button quiet" type="button">Back out</button>
         </div>
+        <div id="puzzle-result" class="pz-result" aria-hidden="true"><span></span></div>
       </div>
     `;
     document.body.append(modal);
@@ -597,590 +571,830 @@
   }
 
   function start(puzzle) {
-    if (!puzzle || !puzzle.type) return Promise.resolve({ success: false, reason: "missing" });
+    let spec = puzzle;
+    if (!spec || !spec.type) return Promise.resolve({ success: false, reason: "missing", noPenalty: true });
+    if (!renderFor(spec.type)) {
+      const migrated = migrateLegacy(spec);
+      if (!migrated) return Promise.resolve({ success: false, reason: "unsupported", noPenalty: true });
+      spec = migrated;
+    }
+
     const modal = ensureModal();
+    const card = modal.querySelector(".puzzle-card");
     const title = modal.querySelector("#puzzle-title");
+    const kicker = modal.querySelector("#puzzle-kicker");
     const prompt = modal.querySelector("#puzzle-prompt");
+    const whisper = modal.querySelector("#puzzle-whisper");
+    const strikeRow = modal.querySelector("#puzzle-strikes");
     const body = modal.querySelector("#puzzle-body");
     const timerEl = modal.querySelector("#puzzle-timer");
+    const timerNum = modal.querySelector("#puzzle-timer-num");
     const feedback = modal.querySelector("#puzzle-feedback");
     const submit = modal.querySelector("#puzzle-submit");
     const cancel = modal.querySelector("#puzzle-cancel");
-    let teardown = null;
-    let check = () => false;
-    title.textContent = puzzle.title || "Challenge";
-    prompt.textContent = puzzle.prompt || "";
+    const result = modal.querySelector("#puzzle-result");
+
+    card.className = "puzzle-card";
+    card.dataset.type = spec.type;
+    title.textContent = spec.title || "Challenge";
+    kicker.textContent = spec.kicker || "challenge task";
+    prompt.textContent = spec.prompt || "";
+    whisper.textContent = spec.whisper || "";
+    whisper.hidden = !spec.whisper;
     feedback.textContent = "";
+    feedback.className = "puzzle-feedback";
     body.innerHTML = "";
+    body.className = "puzzle-body";
+    result.className = "pz-result";
+    result.firstElementChild.textContent = "";
     submit.disabled = false;
-    if (puzzle.type === "code") {
-      const code = String(puzzle.code || "0000");
-      body.innerHTML = `
-        <div class="puzzle-code-preview">${code}</div>
-        <input class="puzzle-code-input" inputmode="numeric" maxlength="${code.length}" autocomplete="off" aria-label="Enter code">
-        <div class="puzzle-keypad"></div>
-      `;
-      const input = body.querySelector(".puzzle-code-input");
-      const preview = body.querySelector(".puzzle-code-preview");
-      const keypad = body.querySelector(".puzzle-keypad");
-      SYMBOLS.forEach(symbol => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = symbol;
-        btn.addEventListener("click", () => {
-          if (input.value.length < code.length) input.value += symbol;
-        });
-        keypad.append(btn);
-      });
-      const clear = document.createElement("button");
-      clear.type = "button";
-      clear.textContent = "clear";
-      clear.addEventListener("click", () => { input.value = ""; });
-      keypad.append(clear);
-      const hideTimer = setTimeout(() => { preview.textContent = "????"; }, 3200);
-      teardown = () => clearTimeout(hideTimer);
-      input.focus({ preventScroll: true });
-      check = () => input.value === code;
-    } else if (puzzle.type === "word_order") {
-      const answer = (puzzle.answer || []).map(String);
-      const picked = [];
-      body.innerHTML = `<div class="puzzle-word-target"></div><div class="puzzle-word-bank"></div>`;
-      const target = body.querySelector(".puzzle-word-target");
-      const bank = body.querySelector(".puzzle-word-bank");
-      const render = () => {
-        target.textContent = picked.length ? picked.join(" ") : "tap words below";
-        bank.innerHTML = "";
-        (puzzle.tiles || answer).forEach((word, index) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = word;
-          btn.disabled = picked.includes(`${index}:${word}`);
-          btn.addEventListener("click", () => {
-            picked.push(`${index}:${word}`);
-            render();
-          });
-          bank.append(btn);
-        });
-        if (picked.length) {
-          const undo = document.createElement("button");
-          undo.type = "button";
-          undo.textContent = "undo";
-          undo.addEventListener("click", () => {
-            picked.pop();
-            render();
-          });
-          bank.append(undo);
-        }
-      };
-      render();
-      check = () => picked.map(item => item.slice(item.indexOf(":") + 1)).join(" ") === answer.join(" ");
-    } else if (puzzle.type === "code_order") {
-      const answer = (puzzle.answer || []).map(String).slice(0, 3);
-      const tiles = (puzzle.tiles || answer).map(String).slice(0, 3);
-      const picked = Array.from({ length: answer.length }, () => "");
-      body.innerHTML = `
-        <div class="puzzle-code-order-preview"></div>
-        <div class="puzzle-code-slots"></div>
-        <div class="puzzle-code-bank"></div>
-      `;
-      const preview = body.querySelector(".puzzle-code-order-preview");
-      const slots = body.querySelector(".puzzle-code-slots");
-      const bank = body.querySelector(".puzzle-code-bank");
-      const targetText = answer.join("  ");
-      const render = () => {
-        slots.innerHTML = "";
-        picked.forEach((value, index) => {
-          const slot = document.createElement("button");
-          slot.type = "button";
-          slot.className = value ? "filled" : "";
-          slot.textContent = value || `spot ${index + 1}`;
-          slot.setAttribute("aria-label", value ? `Clear ${value}` : `Empty spot ${index + 1}`);
-          slot.addEventListener("click", () => {
-            picked[index] = "";
-            render();
-          });
-          slots.append(slot);
-        });
-        bank.innerHTML = "";
-        tiles.forEach(code => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = code;
-          btn.disabled = picked.includes(code);
-          btn.addEventListener("click", () => {
-            const openIndex = picked.findIndex(value => !value);
-            if (openIndex >= 0) picked[openIndex] = code;
-            render();
-          });
-          bank.append(btn);
-        });
-        const clearAll = document.createElement("button");
-        clearAll.type = "button";
-        clearAll.className = "utility";
-        clearAll.textContent = "Clear all";
-        clearAll.addEventListener("click", () => {
-          picked.fill("");
-          render();
-        });
-        bank.append(clearAll);
-      };
-      preview.textContent = targetText;
-      const hideTimer = setTimeout(() => { preview.textContent = "match the hidden three-code order"; }, 2600);
-      teardown = () => clearTimeout(hideTimer);
-      render();
-      check = () => picked.join(" ") === answer.join(" ");
-    } else if (puzzle.type === "sequence_repeat") {
-      const sequence = (puzzle.sequence || []).map(String);
-      const picked = [];
-      body.innerHTML = `
-        <div class="puzzle-sequence-preview"></div>
-        <div class="puzzle-sequence-bank"></div>
-      `;
-      const preview = body.querySelector(".puzzle-sequence-preview");
-      const bank = body.querySelector(".puzzle-sequence-bank");
-      const showPreview = () => { preview.textContent = sequence.join(" "); };
-      const hidePreview = () => { preview.textContent = "repeat the hidden pattern"; };
-      showPreview();
-      const hideTimer = setTimeout(hidePreview, 3600);
-      teardown = () => clearTimeout(hideTimer);
-      const render = () => {
-        bank.innerHTML = "";
-        (puzzle.symbols || GLYPHS.slice(0, 4)).forEach(symbol => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = symbol;
-          btn.addEventListener("click", () => {
-            picked.push(symbol);
-            preview.textContent = picked.join(" ") || "repeat the hidden pattern";
-          });
-          bank.append(btn);
-        });
-        const undo = document.createElement("button");
-        undo.type = "button";
-        undo.textContent = "undo";
-        undo.addEventListener("click", () => {
-          picked.pop();
-          preview.textContent = picked.join(" ") || "repeat the hidden pattern";
-        });
-        bank.append(undo);
-      };
-      render();
-      check = () => picked.join(" ") === sequence.join(" ");
-    } else if (puzzle.type === "symbol_equation") {
-      const answer = String(puzzle.answer || "");
-      body.innerHTML = `
-        <div class="puzzle-equation-clues"></div>
-        <div class="puzzle-equation-target">${puzzle.target || "?"} = ?</div>
-        <input class="puzzle-code-input" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Enter symbol value">
-        <div class="puzzle-keypad"></div>
-      `;
-      const clues = body.querySelector(".puzzle-equation-clues");
-      const input = body.querySelector(".puzzle-code-input");
-      const keypad = body.querySelector(".puzzle-keypad");
-      (puzzle.clues || []).forEach(clue => {
-        const row = document.createElement("div");
-        row.textContent = clue;
-        clues.append(row);
-      });
-      SYMBOLS.forEach(symbol => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = symbol;
-        btn.addEventListener("click", () => {
-          if (input.value.length < 2) input.value += symbol;
-        });
-        keypad.append(btn);
-      });
-      const clear = document.createElement("button");
-      clear.type = "button";
-      clear.textContent = "clear";
-      clear.addEventListener("click", () => { input.value = ""; });
-      keypad.append(clear);
-      input.focus({ preventScroll: true });
-      check = () => input.value === answer;
-    } else if (puzzle.type === "image_tiles") {
-      const grid = Math.max(2, Math.min(3, Number(puzzle.grid) || 3));
-      const count = grid * grid;
-      const image = typeof puzzle.image === "string" ? { src: puzzle.image, label: "" } : (puzzle.image || {});
-      const src = image.src || "images/hallway.jpg";
-      const rng = rngFromSeed(`${puzzle.seed || src}:image-tiles`);
-      const solved = Array.from({ length: count }, (_, index) => index);
-      let order = shuffle(solved, rng);
-      if (order.every((value, index) => value === index)) order = order.slice(1).concat(order[0]);
-      let selected = -1;
-      body.innerHTML = `
-        <div class="puzzle-image-wrap">
-          <div class="puzzle-image-reference" aria-hidden="true"></div>
-          <div class="puzzle-image-grid" role="group" aria-label="Image tile puzzle"></div>
-        </div>
-      `;
-      const reference = body.querySelector(".puzzle-image-reference");
-      const gridEl = body.querySelector(".puzzle-image-grid");
-      reference.style.backgroundImage = `url("${src}")`;
-      if (image.label) reference.setAttribute("title", image.label);
-      gridEl.style.setProperty("--puzzle-grid", String(grid));
-      const render = () => {
-        gridEl.innerHTML = "";
-        order.forEach((tileIndex, index) => {
-          const tile = document.createElement("button");
-          const x = tileIndex % grid;
-          const y = Math.floor(tileIndex / grid);
-          tile.type = "button";
-          tile.className = selected === index ? "selected" : "";
-          tile.style.backgroundImage = `url("${src}")`;
-          tile.style.backgroundSize = `${grid * 100}% ${grid * 100}%`;
-          tile.style.backgroundPosition = `${grid === 1 ? 0 : (x / (grid - 1)) * 100}% ${grid === 1 ? 0 : (y / (grid - 1)) * 100}%`;
-          tile.setAttribute("aria-label", `Tile ${index + 1}`);
-          tile.addEventListener("click", () => {
-            if (selected < 0) {
-              selected = index;
-            } else if (selected === index) {
-              selected = -1;
-            } else {
-              [order[selected], order[index]] = [order[index], order[selected]];
-              selected = -1;
-            }
-            render();
-          });
-          gridEl.append(tile);
-        });
-      };
-      render();
-      check = () => order.every((value, index) => value === index);
-    } else if (puzzle.type === "wire_match") {
-      const left = (puzzle.left || ["A", "B", "C"]).map(String);
-      const right = (puzzle.right || left).map(String);
-      const pairs = puzzle.pairs || {};
-      const matched = {};
-      let selected = "";
-      body.innerHTML = `
-        <div class="puzzle-wire-board">
-          <div class="puzzle-wire-column puzzle-wire-left"></div>
-          <div class="puzzle-wire-column puzzle-wire-right"></div>
-        </div>
-      `;
-      const leftCol = body.querySelector(".puzzle-wire-left");
-      const rightCol = body.querySelector(".puzzle-wire-right");
-      const render = () => {
-        leftCol.innerHTML = "";
-        rightCol.innerHTML = "";
-        left.forEach(symbol => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = symbol;
-          btn.className = selected === symbol ? "selected" : "";
-          btn.disabled = !!matched[symbol];
-          btn.addEventListener("click", () => {
-            selected = selected === symbol ? "" : symbol;
-            render();
-          });
-          leftCol.append(btn);
-        });
-        right.forEach(symbol => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = symbol;
-          btn.disabled = Object.values(matched).includes(symbol);
-          btn.addEventListener("click", () => {
-            if (!selected) return;
-            matched[selected] = symbol;
-            selected = "";
-            render();
-          });
-          rightCol.append(btn);
-        });
-      };
-      render();
-      check = () => left.every(symbol => matched[symbol] === (pairs[symbol] || symbol));
-    } else if (puzzle.type === "pressure_order") {
-      const controls = (puzzle.controls || ["I", "II", "III", "IV"]).map(String);
-      const answer = (puzzle.answer || controls).map(String);
-      const picked = [];
-      body.innerHTML = `
-        <div class="puzzle-pressure-preview"></div>
-        <div class="puzzle-pressure-picked"></div>
-        <div class="puzzle-pressure-bank"></div>
-      `;
-      const preview = body.querySelector(".puzzle-pressure-preview");
-      const pickedEl = body.querySelector(".puzzle-pressure-picked");
-      const bank = body.querySelector(".puzzle-pressure-bank");
-      preview.textContent = answer.join("  ");
-      const hideTimer = setTimeout(() => { preview.textContent = "repeat the hidden valve order"; }, 2600);
-      teardown = () => clearTimeout(hideTimer);
-      const render = () => {
-        pickedEl.textContent = picked.length ? picked.join("  ") : "no valves pressed";
-        bank.innerHTML = "";
-        controls.forEach(control => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = control;
-          btn.disabled = picked.includes(control);
-          btn.addEventListener("click", () => {
-            picked.push(control);
-            render();
-          });
-          bank.append(btn);
-        });
-        const clearAll = document.createElement("button");
-        clearAll.type = "button";
-        clearAll.className = "utility";
-        clearAll.textContent = "Clear all";
-        clearAll.addEventListener("click", () => {
-          picked.length = 0;
-          render();
-        });
-        bank.append(clearAll);
-      };
-      render();
-      check = () => picked.join(" ") === answer.join(" ");
-    } else if (puzzle.type === "spot_difference") {
-      const image = typeof puzzle.image === "string" ? { src: puzzle.image, label: "" } : (puzzle.image || {});
-      const src = image.src || "images/hallway.jpg";
-      const grid = 3;
-      const rng = rngFromSeed(`${puzzle.seed || src}:spot-difference`);
-      const oddIndex = Math.floor(rng() * 9);
-      let selected = -1;
-      body.innerHTML = `<div class="puzzle-spot-grid" role="group" aria-label="Spot difference puzzle"></div>`;
-      const gridEl = body.querySelector(".puzzle-spot-grid");
-      const render = () => {
-        gridEl.innerHTML = "";
-        Array.from({ length: 9 }, (_, index) => index).forEach(index => {
-          const x = index % grid;
-          const y = Math.floor(index / grid);
-          const tile = document.createElement("button");
-          tile.type = "button";
-          tile.className = `${index === oddIndex ? "odd" : ""} ${selected === index ? "selected" : ""}`.trim();
-          tile.style.backgroundImage = `url("${src}")`;
-          tile.style.backgroundSize = `${grid * 100}% ${grid * 100}%`;
-          tile.style.backgroundPosition = `${(x / (grid - 1)) * 100}% ${(y / (grid - 1)) * 100}%`;
-          tile.setAttribute("aria-label", `Image tile ${index + 1}`);
-          tile.addEventListener("click", () => {
-            selected = index;
-            render();
-          });
-          gridEl.append(tile);
-        });
-      };
-      render();
-      check = () => selected === oddIndex;
-    } else if (puzzle.type === "memory_grid") {
-      const pattern = (puzzle.pattern || [0, 4, 8]).map(Number).filter(index => index >= 0 && index < 9);
-      const picked = new Set();
-      let hidden = false;
-      body.innerHTML = `<div class="puzzle-memory-grid" role="group" aria-label="Memory grid puzzle"></div>`;
-      const grid = body.querySelector(".puzzle-memory-grid");
-      const render = () => {
-        grid.innerHTML = "";
-        Array.from({ length: 9 }, (_, index) => index).forEach(index => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = [
-            !hidden && pattern.includes(index) ? "lit" : "",
-            picked.has(index) ? "picked" : "",
-          ].filter(Boolean).join(" ");
-          btn.setAttribute("aria-label", `Grid cell ${index + 1}`);
-          btn.addEventListener("click", () => {
-            hidden = true;
-            if (picked.has(index)) picked.delete(index);
-            else picked.add(index);
-            render();
-          });
-          grid.append(btn);
-        });
-      };
-      const hideTimer = setTimeout(() => {
-        hidden = true;
-        render();
-      }, 2400);
-      teardown = () => clearTimeout(hideTimer);
-      render();
-      check = () => pattern.length === picked.size && pattern.every(index => picked.has(index));
-    } else if (puzzle.type === "dial_align") {
-      const symbols = (puzzle.symbols || ["A", "B", "C", "D"]).map(String);
-      const answer = (puzzle.answer || symbols.slice(0, 3)).map(String).slice(0, 3);
-      const values = (puzzle.start || answer).map(String).slice(0, answer.length);
-      while (values.length < answer.length) values.push(symbols[0]);
-      body.innerHTML = `
-        <div class="puzzle-dial-target"></div>
-        <div class="puzzle-dials"></div>
-      `;
-      const target = body.querySelector(".puzzle-dial-target");
-      const dials = body.querySelector(".puzzle-dials");
-      target.textContent = answer.join("  ");
-      const render = () => {
-        dials.innerHTML = "";
-        values.forEach((value, index) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = value;
-          btn.setAttribute("aria-label", `Dial ${index + 1}`);
-          btn.addEventListener("click", () => {
-            const current = symbols.indexOf(values[index]);
-            values[index] = symbols[(current + 1 + symbols.length) % symbols.length];
-            render();
-          });
-          dials.append(btn);
-        });
-      };
-      render();
-      check = () => values.join(" ") === answer.join(" ");
-    } else if (puzzle.type === "merge_2048") {
-      const targetValue = Math.max(32, Number(puzzle.target) || 64);
-      const gameId = puzzle.gameId || "shared";
-      const rng = rngFromSeed(`${puzzle.seed || "sample"}:merge-2048`);
-      let board = Array.from({ length: 16 }, () => 0);
-      let touchStart = null;
-      let bestEver = readMergeBest(gameId);
-      let bestRun = 0;
-      body.innerHTML = `
-        <div class="puzzle-2048-status">Target ${targetValue}</div>
-        <div class="puzzle-2048-wrap">
-          <button class="puzzle-2048-arrow top" type="button" aria-label="Move up">&#9650;</button>
-          <button class="puzzle-2048-arrow right" type="button" aria-label="Move right">&#9654;</button>
-          <button class="puzzle-2048-arrow bottom" type="button" aria-label="Move down">&#9660;</button>
-          <button class="puzzle-2048-arrow left" type="button" aria-label="Move left">&#9664;</button>
-          <div class="puzzle-2048-board" role="group" aria-label="2048 merge board"></div>
-        </div>
-      `;
-      const status = body.querySelector(".puzzle-2048-status");
-      const boardEl = body.querySelector(".puzzle-2048-board");
-      const cells = [];
-      const emptyCells = () => board.map((value, index) => value ? -1 : index).filter(index => index >= 0);
-      const maxTile = () => Math.max(...board);
-      const addTile = () => {
-        const empty = emptyCells();
-        if (!empty.length) return;
-        board[empty[Math.floor(rng() * empty.length)]] = rng() < 0.9 ? 2 : 4;
-      };
-      const mergeLine = line => {
-        const compact = line.filter(Boolean);
-        const merged = [];
-        for (let i = 0; i < compact.length; i += 1) {
-          if (compact[i] === compact[i + 1]) {
-            merged.push(compact[i] * 2);
-            i += 1;
-          } else {
-            merged.push(compact[i]);
-          }
-        }
-        while (merged.length < 4) merged.push(0);
-        return merged;
-      };
-      const linesFor = dir => {
-        if (dir === "left" || dir === "right") {
-          return Array.from({ length: 4 }, (_, row) => Array.from({ length: 4 }, (_, col) => row * 4 + col));
-        }
-        return Array.from({ length: 4 }, (_, col) => Array.from({ length: 4 }, (_, row) => row * 4 + col));
-      };
-      const canMove = () => {
-        if (emptyCells().length) return true;
-        return linesFor("left").concat(linesFor("up")).some(line => line.some((index, i) => i < 3 && board[index] === board[line[i + 1]]));
-      };
-      const move = dir => {
-        const before = board.join(",");
-        linesFor(dir).forEach(indices => {
-          const source = (dir === "right" || dir === "down") ? indices.slice().reverse() : indices;
-          const merged = mergeLine(source.map(index => board[index]));
-          source.forEach((index, i) => { board[index] = merged[i]; });
-        });
-        if (board.join(",") === before) return false;
-        addTile();
-        return true;
-      };
-      const render = () => {
-        boardEl.innerHTML = "";
-        cells.length = 0;
-        bestRun = Math.max(bestRun, maxTile());
-        if (bestRun > bestEver) {
-          bestEver = bestRun;
-          writeMergeBest(gameId, bestEver);
-        }
-        board.forEach(value => {
-          const cell = document.createElement("div");
-          cell.className = value ? `puzzle-2048-cell v${Math.min(value, 128)}` : "puzzle-2048-cell";
-          cell.textContent = value ? String(value) : "";
-          boardEl.append(cell);
-          cells.push(cell);
-        });
-        const max = maxTile();
-        status.textContent = max >= targetValue
-          ? `Target ${targetValue} reached · Run ${bestRun || 0} · Best ever ${bestEver || 0}`
-          : `Target ${targetValue} · Run ${bestRun || 0} · Best ever ${bestEver || 0}`;
-        if (max < targetValue && !canMove()) status.textContent = `No moves left · Run ${bestRun || 0} · Best ever ${bestEver || 0}`;
-      };
-      const doMove = dir => {
-        if (maxTile() >= targetValue) return;
-        if (move(dir)) render();
-      };
-      const onKey = event => {
-        const map = { ArrowUp: "up", ArrowRight: "right", ArrowDown: "down", ArrowLeft: "left" };
-        const dir = map[event.key];
-        if (!dir) return;
-        event.preventDefault();
-        doMove(dir);
-      };
-      body.querySelector(".puzzle-2048-arrow.top").addEventListener("click", () => doMove("up"));
-      body.querySelector(".puzzle-2048-arrow.right").addEventListener("click", () => doMove("right"));
-      body.querySelector(".puzzle-2048-arrow.bottom").addEventListener("click", () => doMove("down"));
-      body.querySelector(".puzzle-2048-arrow.left").addEventListener("click", () => doMove("left"));
-      boardEl.addEventListener("pointerdown", event => {
-        touchStart = { x: event.clientX, y: event.clientY };
-      });
-      boardEl.addEventListener("pointerup", event => {
-        if (!touchStart) return;
-        const dx = event.clientX - touchStart.x;
-        const dy = event.clientY - touchStart.y;
-        touchStart = null;
-        if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-        doMove(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
-      });
-      window.addEventListener("keydown", onKey);
-      teardown = () => window.removeEventListener("keydown", onKey);
-      addTile();
-      addTile();
-      render();
-      check = () => maxTile() >= targetValue;
-    }
+    submit.hidden = true;
+    submit.textContent = "Submit";
+
+    const total = Math.max(10, Number(spec.seconds) || 45);
+    let strikesLeft = Math.max(0, Number(spec.strikes) || 0);
+    const strikeMax = strikesLeft;
+
+    const drawStrikes = () => {
+      if (!strikeMax) { strikeRow.hidden = true; return; }
+      strikeRow.hidden = false;
+      strikeRow.innerHTML = "";
+      for (let i = 0; i < strikeMax; i += 1) {
+        const pip = document.createElement("i");
+        pip.className = i < strikesLeft ? "pz-pip" : "pz-pip out";
+        strikeRow.append(pip);
+      }
+      const label = document.createElement("span");
+      label.textContent = strikesLeft > 0 ? `${strikesLeft} left` : "no room left";
+      strikeRow.append(label);
+    };
+    drawStrikes();
 
     return new Promise(resolve => {
       let done = false;
-      let remaining = Math.max(10, Number(puzzle.seconds) || 45);
-      const finish = result => {
+      let raf = 0;
+      let last = performance.now();
+      let elapsed = 0;
+      let drain = 1;
+      const teardowns = [];
+
+      const settle = (outcome, word, reason) => {
         if (done) return;
         done = true;
-        clearInterval(interval);
-        if (teardown) teardown();
+        cancelAnimationFrame(raf);
+        teardowns.forEach(fn => { try { fn(); } catch (err) { /* ignore */ } });
         submit.removeEventListener("click", onSubmit);
         cancel.removeEventListener("click", onCancel);
-        modal.classList.remove("open");
-        resolve(result);
-      };
-      const tick = () => {
-        timerEl.textContent = String(remaining);
-        remaining -= 1;
-        if (remaining < 0) finish({ success: false, reason: "timeout" });
-      };
-      const onSubmit = () => {
-        if (check()) {
-          feedback.textContent = "Accepted.";
-          submit.disabled = true;
-          setTimeout(() => finish({ success: true, reason: "solved" }), 350);
-        } else {
-          feedback.textContent = "Not quite.";
+        body.classList.add("pz-locked");
+        if (outcome === "cancel") {
+          modal.classList.remove("open");
+          resolve({ success: false, reason: "cancelled", noPenalty: true });
+          return;
         }
+        result.className = `pz-result show ${outcome === "win" ? "win" : "fail"}`;
+        result.firstElementChild.textContent = word;
+        card.classList.add(outcome === "win" ? "pz-win" : "pz-fail");
+        setTimeout(() => {
+          modal.classList.remove("open");
+          resolve(outcome === "win"
+            ? { success: true, reason: "solved" }
+            : { success: false, reason: reason || "failed" });
+        }, outcome === "win" ? 760 : 900);
       };
-      const onCancel = () => finish({ success: false, reason: "cancelled", noPenalty: true });
+
+      const api = {
+        body,
+        win: word => settle("win", word || "CLEAR"),
+        lose: (word, reason) => settle("fail", word || "FAILED", reason || "failed"),
+        note: (text, tone) => {
+          feedback.textContent = text || "";
+          feedback.className = `puzzle-feedback${tone ? ` ${tone}` : ""}`;
+        },
+        shake: () => {
+          card.classList.remove("pz-shake");
+          void card.offsetWidth;
+          card.classList.add("pz-shake");
+        },
+        strike: (text) => {
+          api.shake();
+          if (text) api.note(text, "bad");
+          if (!strikeMax) return 0;
+          strikesLeft = Math.max(0, strikesLeft - 1);
+          drawStrikes();
+          if (strikesLeft <= 0) settle("fail", "TOO MANY", "strikes");
+          return strikesLeft;
+        },
+        strikesLeft: () => strikesLeft,
+        setDrain: value => { drain = Math.max(0, Number(value) || 0); },
+        timeFraction: () => clamp(1 - elapsed / (total * 1000), 0, 1),
+        teardown: fn => teardowns.push(fn),
+        setSubmit: (label, handler) => {
+          submit.hidden = false;
+          submit.textContent = label;
+          submitHandler = handler;
+        },
+      };
+
+      let submitHandler = null;
+      const onSubmit = () => { if (submitHandler) submitHandler(); };
+      const onCancel = () => settle("cancel");
       submit.addEventListener("click", onSubmit);
       cancel.addEventListener("click", onCancel);
+
+      try {
+        renderFor(spec.type)(spec, api);
+      } catch (err) {
+        settle("cancel");
+        return;
+      }
+
+      const frame = now => {
+        const dt = Math.min(250, now - last);
+        last = now;
+        elapsed += dt * drain;
+        const left = Math.max(0, total * 1000 - elapsed);
+        const frac = left / (total * 1000);
+        timerEl.style.setProperty("--p", String(frac));
+        timerNum.textContent = String(Math.ceil(left / 1000));
+        timerEl.classList.toggle("warn", frac <= 0.4 && frac > 0.18);
+        timerEl.classList.toggle("hot", frac <= 0.18);
+        card.classList.toggle("pz-panic", frac <= 0.18);
+        if (left <= 0) { settle("fail", "TOO SLOW", "timeout"); return; }
+        raf = requestAnimationFrame(frame);
+      };
       modal.classList.add("open");
-      tick();
-      const interval = setInterval(tick, 1000);
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
     });
   }
+
+  /* ------------------------------------------------------------------ *
+   * Renderers
+   * ------------------------------------------------------------------ */
+
+  function imageSrc(puzzle) {
+    const image = normaliseImage(puzzle.image);
+    return (image && image.src) || "images/hallway.jpg";
+  }
+
+  function tileBackground(el, src, grid, index) {
+    const x = index % grid;
+    const y = Math.floor(index / grid);
+    el.style.backgroundImage = `url("${src}")`;
+    el.style.backgroundSize = `${grid * 100}% ${grid * 100}%`;
+    el.style.backgroundPosition = `${(x / (grid - 1)) * 100}% ${(y / (grid - 1)) * 100}%`;
+  }
+
+  const RENDERERS = {};
+
+  RENDERERS.image_tiles = function (puzzle, api) {
+    const grid = clamp(Number(puzzle.grid) || 3, 2, 4);
+    const count = grid * grid;
+    const src = imageSrc(puzzle);
+    const rng = rngFromSeed(`${puzzle.seed || src}:tiles`);
+    const order = Array.from({ length: count }, (_, i) => i);
+    for (let i = 0; i < (Number(puzzle.scramble) || 8); i += 1) {
+      const a = Math.floor(rng() * count);
+      let b = Math.floor(rng() * count);
+      if (a === b) b = (b + 1) % count;
+      [order[a], order[b]] = [order[b], order[a]];
+    }
+    if (order.every((v, i) => v === i)) [order[0], order[1]] = [order[1], order[0]];
+
+    let moves = Number(puzzle.moves) || 18;
+    let selected = -1;
+
+    api.body.innerHTML = `
+      <div class="pz-tilewrap">
+        <div class="pz-tiles" style="--g:${grid}"></div>
+        <div class="pz-peek" aria-hidden="true"></div>
+      </div>
+      <div class="pz-bar">
+        <span class="pz-count"></span>
+        <button class="pz-mini pz-peekbtn" type="button">hold to remember</button>
+      </div>`;
+    const gridEl = api.body.querySelector(".pz-tiles");
+    const peek = api.body.querySelector(".pz-peek");
+    const peekBtn = api.body.querySelector(".pz-peekbtn");
+    const countEl = api.body.querySelector(".pz-count");
+    peek.style.backgroundImage = `url("${src}")`;
+
+    const tiles = [];
+    for (let i = 0; i < count; i += 1) {
+      const tile = document.createElement("button");
+      tile.type = "button";
+      tile.className = "pz-tile";
+      tile.setAttribute("aria-label", `Piece ${i + 1}`);
+      gridEl.append(tile);
+      tiles.push(tile);
+    }
+
+    const paint = () => {
+      order.forEach((value, index) => {
+        const tile = tiles[index];
+        tileBackground(tile, src, grid, value);
+        tile.classList.toggle("sel", selected === index);
+        tile.classList.toggle("set", value === index);
+      });
+      countEl.textContent = `${moves} swap${moves === 1 ? "" : "s"} left`;
+      countEl.classList.toggle("low", moves <= 3);
+    };
+
+    tiles.forEach((tile, index) => {
+      tile.addEventListener("click", () => {
+        if (selected < 0) { selected = index; paint(); return; }
+        if (selected === index) { selected = -1; paint(); return; }
+        [order[selected], order[index]] = [order[index], order[selected]];
+        tiles[selected].classList.add("pop");
+        tile.classList.add("pop");
+        setTimeout(() => { tiles.forEach(t => t.classList.remove("pop")); }, 240);
+        selected = -1;
+        moves -= 1;
+        paint();
+        if (order.every((v, i) => v === i)) { api.note("It matches.", "good"); api.win("RESTORED"); return; }
+        if (moves <= 0) api.lose("LOST IT", "moves");
+      });
+    });
+
+    const holdOn = () => { peek.classList.add("show"); api.setDrain(3); };
+    const holdOff = () => { peek.classList.remove("show"); api.setDrain(1); };
+    peekBtn.addEventListener("pointerdown", holdOn);
+    ["pointerup", "pointerleave", "pointercancel"].forEach(ev => peekBtn.addEventListener(ev, holdOff));
+    api.teardown(holdOff);
+    paint();
+  };
+
+  RENDERERS.mirror_check = function (puzzle, api) {
+    const grid = clamp(Number(puzzle.grid) || 3, 2, 4);
+    const count = grid * grid;
+    const src = imageSrc(puzzle);
+    const wrong = new Map((Array.isArray(puzzle.wrong) ? puzzle.wrong : [])
+      .filter(item => item && item.index >= 0 && item.index < count)
+      .map(item => [item.index, item.mode === "turn" ? "turn" : "flip"]));
+    if (!wrong.size) wrong.set(0, "flip");
+    let found = 0;
+
+    api.body.innerHTML = `
+      <div class="pz-tiles pz-mirror" style="--g:${grid}"></div>
+      <div class="pz-bar"><span class="pz-count"></span></div>`;
+    const gridEl = api.body.querySelector(".pz-tiles");
+    const countEl = api.body.querySelector(".pz-count");
+    const update = () => { countEl.textContent = `${wrong.size - found} of ${wrong.size} still wrong`; };
+
+    for (let i = 0; i < count; i += 1) {
+      const tile = document.createElement("button");
+      tile.type = "button";
+      tile.className = "pz-tile";
+      tile.setAttribute("aria-label", `Piece ${i + 1}`);
+      tileBackground(tile, src, grid, i);
+      if (wrong.has(i)) tile.classList.add(wrong.get(i) === "turn" ? "turned" : "flipped");
+      tile.addEventListener("click", () => {
+        if (tile.classList.contains("done")) return;
+        if (wrong.has(i)) {
+          tile.classList.remove("flipped", "turned");
+          tile.classList.add("done", "right");
+          found += 1;
+          update();
+          api.note("That one was backwards.", "good");
+          if (found >= wrong.size) api.win("SEEN");
+        } else {
+          tile.classList.add("done", "wrongpick");
+          tile.disabled = true;
+          api.strike("That one was fine.");
+        }
+      });
+      gridEl.append(tile);
+    }
+    update();
+  };
+
+  RENDERERS.steady_hand = function (puzzle, api) {
+    const path = (Array.isArray(puzzle.path) && puzzle.path.length > 1)
+      ? puzzle.path.map(p => [Number(p[0]) || 0, Number(p[1]) || 0])
+      : [[50, 132], [50, 8]];
+    const width = clamp(Number(puzzle.width) || 13, 6, 30);
+    const half = width / 2;
+    const d = path.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
+    const start = path[0];
+    const end = path[path.length - 1];
+
+    api.body.innerHTML = `
+      <div class="pz-steady">
+        <svg viewBox="0 0 100 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path class="pz-wall" d="${d}" stroke-width="${width + 3.4}"></path>
+          <path class="pz-lane" d="${d}" stroke-width="${width}"></path>
+          <path class="pz-trace" d="${d}" stroke-width="${Math.max(2, width * 0.34)}"></path>
+          <circle class="pz-goal" cx="${end[0]}" cy="${end[1]}" r="${half * 0.72}"></circle>
+          <circle class="pz-start" cx="${start[0]}" cy="${start[1]}" r="${half * 0.8}"></circle>
+          <circle class="pz-dot" cx="${start[0]}" cy="${start[1]}" r="${Math.max(2.4, half * 0.44)}"></circle>
+        </svg>
+        <div class="pz-bar"><span class="pz-count">press the lit end, then draw</span></div>
+      </div>`;
+    const wrap = api.body.querySelector(".pz-steady");
+    const svg = wrap.querySelector("svg");
+    const trace = wrap.querySelector(".pz-trace");
+    const dot = wrap.querySelector(".pz-dot");
+    const hint = wrap.querySelector(".pz-count");
+
+    const segLengths = [];
+    let totalLen = 0;
+    for (let i = 1; i < path.length; i += 1) {
+      const len = Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]);
+      segLengths.push(len);
+      totalLen += len;
+    }
+    // Dash units are viewBox units, so the visible trace is exactly the
+    // distance the pointer has covered along the polyline.
+    trace.style.strokeDasharray = String(totalLen);
+    trace.style.strokeDashoffset = String(totalLen);
+
+    const toVb = event => {
+      const rect = svg.getBoundingClientRect();
+      return [((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 140];
+    };
+
+    // Nearest point on the polyline: gives both "am I inside" and progress.
+    const project = (px, py) => {
+      let best = { dist: Infinity, along: 0 };
+      let acc = 0;
+      for (let i = 1; i < path.length; i += 1) {
+        const [ax, ay] = path[i - 1];
+        const [bx, by] = path[i];
+        const dx = bx - ax;
+        const dy = by - ay;
+        const len2 = dx * dx + dy * dy || 1;
+        const t = clamp(((px - ax) * dx + (py - ay) * dy) / len2, 0, 1);
+        const cx = ax + dx * t;
+        const cy = ay + dy * t;
+        const dist = Math.hypot(px - cx, py - cy);
+        if (dist < best.dist) best = { dist, along: acc + segLengths[i - 1] * t };
+        acc += segLengths[i - 1];
+      }
+      return best;
+    };
+
+    let active = false;
+    let progress = 0;
+
+    const reset = message => {
+      active = false;
+      progress = 0;
+      dot.setAttribute("cx", String(start[0]));
+      dot.setAttribute("cy", String(start[1]));
+      wrap.classList.remove("live");
+      trace.style.strokeDashoffset = String(totalLen);
+      hint.textContent = message || "press the lit end, then draw";
+    };
+
+    const onDown = event => {
+      const [x, y] = toVb(event);
+      if (Math.hypot(x - start[0], y - start[1]) > half * 2.1) return;
+      active = true;
+      progress = 0;
+      wrap.classList.add("live");
+      hint.textContent = "do not touch the walls";
+      svg.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    };
+
+    const onMove = event => {
+      if (!active) return;
+      event.preventDefault();
+      const [x, y] = toVb(event);
+      const near = project(x, y);
+      dot.setAttribute("cx", String(clamp(x, 0, 100)));
+      dot.setAttribute("cy", String(clamp(y, 0, 140)));
+      if (near.dist > half) {
+        wrap.classList.add("bad");
+        setTimeout(() => wrap.classList.remove("bad"), 260);
+        reset("you touched the wall");
+        api.strike("You touched the wall.");
+        return;
+      }
+      // The head of the line is the pointer's own projection, never a
+      // high-water mark: pull back and the line pulls back with you.
+      progress = near.along;
+      trace.style.strokeDashoffset = String(totalLen - progress);
+      if (progress >= totalLen - half * 0.6) {
+        active = false;
+        api.win("THROUGH");
+      }
+    };
+
+    const onUp = () => { if (active) reset("you let go — start again"); };
+
+    svg.addEventListener("pointerdown", onDown);
+    svg.addEventListener("pointermove", onMove);
+    svg.addEventListener("pointerup", onUp);
+    svg.addEventListener("pointercancel", onUp);
+    api.teardown(() => {
+      svg.removeEventListener("pointerdown", onDown);
+      svg.removeEventListener("pointermove", onMove);
+      svg.removeEventListener("pointerup", onUp);
+      svg.removeEventListener("pointercancel", onUp);
+    });
+  };
+
+  RENDERERS.lock_deduce = function (puzzle, api) {
+    const marks = (Array.isArray(puzzle.marks) && puzzle.marks.length ? puzzle.marks : MARKS).map(String);
+    const answer = (Array.isArray(puzzle.answer) && puzzle.answer.length ? puzzle.answer : marks.slice(0, 3)).map(String);
+    const slots = answer.length;
+    let attempts = Math.max(1, Number(puzzle.attempts) || 5);
+    const guess = answer.map((_, i) => marks[i % marks.length]);
+
+    api.body.innerHTML = `
+      <div class="pz-lock" style="--n:${slots}"></div>
+      <div class="pz-bar"><span class="pz-count"></span></div>
+      <div class="pz-tries"></div>
+      <p class="pz-legend"><b>&#9679;</b> right mark, right slot &nbsp; <b>&#9675;</b> right mark, wrong slot${
+        new Set(answer).size === answer.length ? "<br>no mark is used twice" : ""}</p>`;
+    const lock = api.body.querySelector(".pz-lock");
+    const countEl = api.body.querySelector(".pz-count");
+    const tries = api.body.querySelector(".pz-tries");
+
+    const dials = guess.map((value, index) => {
+      const dial = document.createElement("button");
+      dial.type = "button";
+      dial.className = "pz-dial";
+      dial.textContent = value;
+      dial.setAttribute("aria-label", `Slot ${index + 1}`);
+      dial.addEventListener("click", () => {
+        const next = (marks.indexOf(guess[index]) + 1) % marks.length;
+        guess[index] = marks[next];
+        dial.textContent = guess[index];
+        dial.classList.remove("spin");
+        void dial.offsetWidth;
+        dial.classList.add("spin");
+      });
+      lock.append(dial);
+      return dial;
+    });
+
+    const update = () => { countEl.textContent = `${attempts} ${attempts === 1 ? "try" : "tries"} left`; countEl.classList.toggle("low", attempts <= 2); };
+    update();
+
+    api.setSubmit("Try it", () => {
+      const { exact, near } = scoreLock(guess, answer);
+
+      if (exact === slots) {
+        dials.forEach(d => d.classList.add("open"));
+        api.note("It gives.", "good");
+        api.win("OPEN");
+        return;
+      }
+      attempts -= 1;
+      update();
+      const row = document.createElement("div");
+      row.className = "pz-try";
+      row.innerHTML = `<span class="pz-tryset">${guess.join(" ")}</span>`
+        + `<span class="pz-pips">${"●".repeat(exact)}${"○".repeat(near)}${exact + near === 0 ? "&mdash;" : ""}</span>`;
+      tries.prepend(row);
+      api.shake();
+      api.note(exact ? `${exact} in the right slot.` : "Nothing in the right slot.", exact ? "" : "bad");
+      if (attempts <= 0) api.lose("JAMMED", "attempts");
+    });
+  };
+
+  RENDERERS.signal_echo = function (puzzle, api) {
+    const full = (Array.isArray(puzzle.sequence) ? puzzle.sequence : [0, 1, 2, 3]).map(v => clamp(Number(v) || 0, 0, 3));
+    const rounds = Math.max(1, Number(puzzle.rounds) || 3);
+    const startLen = Math.max(1, Number(puzzle.start) || 2);
+    const speed = clamp(Number(puzzle.speed) || 460, 180, 900);
+
+    api.body.innerHTML = `
+      <div class="pz-echo">
+        ${[0, 1, 2, 3].map(i => `<button class="pz-pad p${i}" type="button" aria-label="Pad ${i + 1}"></button>`).join("")}
+      </div>
+      <div class="pz-bar"><span class="pz-count"></span></div>`;
+    const pads = Array.from(api.body.querySelectorAll(".pz-pad"));
+    const countEl = api.body.querySelector(".pz-count");
+
+    let round = 0;
+    let input = [];
+    let playing = true;
+    const timers = [];
+    const later = (fn, ms) => { timers.push(setTimeout(fn, ms)); };
+    api.teardown(() => timers.forEach(clearTimeout));
+
+    const current = () => full.slice(0, startLen + round);
+
+    const flash = (index, on) => pads[index].classList.toggle("lit", on);
+
+    const play = () => {
+      playing = true;
+      api.body.classList.add("pz-listening");
+      countEl.textContent = `round ${round + 1} of ${rounds} · listen`;
+      const seq = current();
+      seq.forEach((padIndex, i) => {
+        later(() => flash(padIndex, true), speed * i + 260);
+        later(() => flash(padIndex, false), speed * i + 260 + speed * 0.62);
+      });
+      later(() => {
+        playing = false;
+        input = [];
+        api.body.classList.remove("pz-listening");
+        countEl.textContent = `round ${round + 1} of ${rounds} · answer ${seq.length}`;
+      }, speed * seq.length + 320);
+    };
+
+    pads.forEach((pad, index) => {
+      pad.addEventListener("click", () => {
+        if (playing) return;
+        pad.classList.add("hit");
+        setTimeout(() => pad.classList.remove("hit"), 190);
+        input.push(index);
+        const seq = current();
+        const step = input.length - 1;
+        if (input[step] !== seq[step]) {
+          input = [];
+          playing = true;
+          api.strike("Not what it said.");
+          if (api.strikesLeft() > 0) later(play, 620);
+          return;
+        }
+        if (input.length === seq.length) {
+          playing = true;
+          round += 1;
+          if (round >= rounds) { api.note("It goes quiet.", "good"); api.win("ANSWERED"); return; }
+          api.note("It answers again.", "good");
+          later(play, 720);
+        }
+      });
+    });
+
+    play();
+  };
+
+  RENDERERS.hold_still = function (puzzle, api) {
+    const samples = (Array.isArray(puzzle.samples) && puzzle.samples.length ? puzzle.samples : [0.1, 0.9, 0.1])
+      .map(v => clamp(Number(v) || 0, 0, 1));
+    const threshold = clamp(Number(puzzle.threshold) || 0.5, 0.1, 0.95);
+    const airMax = Math.max(30, Number(puzzle.air) || 100);
+    const drain = Math.max(1, Number(puzzle.drain) || 15);
+    const refill = Math.max(1, Number(puzzle.refill) || 26);
+    let grace = Math.max(1, Number(puzzle.grace) || 5);
+    const graceMax = grace;
+
+    api.body.innerHTML = `
+      <div class="pz-hold">
+        <div class="pz-near"><i class="pz-nearfill"></i><i class="pz-nearmark" style="left:${threshold * 100}%"></i></div>
+        <p class="pz-nearlabel">it is far off</p>
+        <button class="pz-holdpad" type="button" aria-label="Hold your breath">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="pz-airtrack" cx="50" cy="50" r="44"></circle><circle class="pz-airfill" cx="50" cy="50" r="44"></circle></svg>
+          <span>HOLD</span>
+        </button>
+        <div class="pz-bar"><span class="pz-count"></span></div>
+      </div>`;
+    const holdWrap = api.body.querySelector(".pz-hold");
+    const nearFill = api.body.querySelector(".pz-nearfill");
+    const nearLabel = api.body.querySelector(".pz-nearlabel");
+    const pad = api.body.querySelector(".pz-holdpad");
+    const airFill = api.body.querySelector(".pz-airfill");
+    const countEl = api.body.querySelector(".pz-count");
+    const circumference = 2 * Math.PI * 44;
+    airFill.style.strokeDasharray = String(circumference);
+
+    let holding = false;
+    let air = airMax;
+    let index = 0;
+    let acc = 0;
+    let last = performance.now();
+    let raf = 0;
+
+    const down = event => { holding = true; pad.classList.add("down"); if (event.preventDefault) event.preventDefault(); };
+    const up = () => { holding = false; pad.classList.remove("down"); };
+    pad.addEventListener("pointerdown", down);
+    ["pointerup", "pointerleave", "pointercancel"].forEach(ev => pad.addEventListener(ev, up));
+
+    const step = now => {
+      const dt = Math.min(120, now - last);
+      last = now;
+      acc += dt;
+      while (acc >= 100 && index < samples.length) { acc -= 100; index += 1; }
+      if (index >= samples.length) { api.note("It has gone.", "good"); api.win("UNHEARD"); return; }
+
+      const value = samples[index];
+      const near = value >= threshold;
+      nearFill.style.width = `${Math.round(value * 100)}%`;
+      holdWrap.classList.toggle("near", near);
+      nearLabel.textContent = near ? "IT IS RIGHT THERE" : (value > threshold * 0.55 ? "something is moving" : "it is far off");
+
+      if (holding) air = Math.max(0, air - drain * (dt / 1000));
+      else air = Math.min(airMax, air + refill * (dt / 1000));
+      airFill.style.strokeDashoffset = String(circumference * (1 - air / airMax));
+      airFill.classList.toggle("low", air < airMax * 0.25);
+
+      if (holding && air <= 0) { api.lose("NO AIR", "air"); return; }
+      if (near && !holding) {
+        holdWrap.classList.add("caught");
+        setTimeout(() => holdWrap.classList.remove("caught"), 200);
+        grace -= 1;
+        countEl.textContent = `heard ${graceMax - grace} of ${graceMax}`;
+        if (grace <= 0) { api.lose("HEARD", "heard"); return; }
+      } else {
+        countEl.textContent = `${Math.max(0, Math.ceil((samples.length - index) / 10))}s until it passes`;
+      }
+      raf = requestAnimationFrame(step);
+    };
+
+    api.teardown(() => {
+      cancelAnimationFrame(raf);
+      pad.removeEventListener("pointerdown", down);
+      ["pointerup", "pointerleave", "pointercancel"].forEach(ev => pad.removeEventListener(ev, up));
+    });
+    last = performance.now();
+    raf = requestAnimationFrame(step);
+  };
+
+  RENDERERS.dont_look = function (puzzle, api) {
+    const slots = clamp(Number(puzzle.slots) || 6, 4, 9);
+    const cols = 3;
+    const events = (Array.isArray(puzzle.events) ? puzzle.events : []).map(e => ({
+      slot: clamp(Number(e.slot) || 0, 0, slots - 1),
+      at: Math.max(0, Number(e.at) || 0),
+      dur: Math.max(300, Number(e.dur) || 1200),
+      state: "waiting",
+    }));
+    const required = Math.max(1, Number(puzzle.required) || events.length || 4);
+    let caught = 0;
+
+    api.body.innerHTML = `
+      <div class="pz-watch" style="--c:${cols}">
+        ${Array.from({ length: slots }, (_, i) => `<button class="pz-slot" type="button" aria-label="Opening ${i + 1}"><span class="pz-figure ${(puzzle.shape || "figure")}"></span></button>`).join("")}
+      </div>
+      <div class="pz-bar"><span class="pz-count"></span></div>`;
+    const cells = Array.from(api.body.querySelectorAll(".pz-slot"));
+    const countEl = api.body.querySelector(".pz-count");
+    const update = () => { countEl.textContent = `${caught}/${required} caught`; };
+    update();
+
+    const startedAt = performance.now();
+    let raf = 0;
+
+    const missOne = (cell, text) => {
+      if (cell) {
+        cell.classList.remove("live");
+        cell.classList.add("missed");
+        setTimeout(() => cell.classList.remove("missed"), 420);
+      }
+      api.strike(text || "It moved on before you looked.");
+    };
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener("click", () => {
+        const hit = events.find(e => e.slot === index && e.state === "live");
+        if (hit) {
+          hit.state = "caught";
+          caught += 1;
+          cell.classList.remove("live");
+          cell.classList.add("got");
+          setTimeout(() => cell.classList.remove("got"), 360);
+          update();
+          if (caught >= required) { api.note("You saw all of it.", "good"); api.win("WATCHED"); }
+          return;
+        }
+        cell.classList.add("empty");
+        setTimeout(() => cell.classList.remove("empty"), 300);
+        missOne(null, "Nothing was there.");
+      });
+    });
+
+    const step = now => {
+      const t = now - startedAt;
+      events.forEach(e => {
+        if (e.state === "waiting" && t >= e.at) { e.state = "live"; cells[e.slot].classList.add("live"); }
+        else if (e.state === "live" && t > e.at + e.dur) { e.state = "gone"; missOne(cells[e.slot]); }
+      });
+      if (events.every(e => e.state !== "waiting" && e.state !== "live") && caught < required) {
+        api.lose("IT GOT PAST", "missed");
+        return;
+      }
+      raf = requestAnimationFrame(step);
+    };
+    api.teardown(() => cancelAnimationFrame(raf));
+    raf = requestAnimationFrame(step);
+  };
+
+  RENDERERS.find_the_face = function (puzzle, api) {
+    const src = imageSrc(puzzle);
+    const x = clamp(Number(puzzle.x) || 0.5, 0.18, 0.82);
+    const y = clamp(Number(puzzle.y) || 0.5, 0.2, 0.8);
+    const size = clamp(Number(puzzle.size) || 0.24, 0.1, 0.5);
+    const peak = clamp(Number(puzzle.peak) || 0.6, 0.12, 1);
+    const tolerance = clamp(Number(puzzle.tolerance) || 0.15, 0.07, 0.3);
+    // Descriptors saved before faces had anatomy still land on a valid face.
+    const f = puzzle.face && typeof puzzle.face === "object" ? puzzle.face : {};
+    const seeded = rngFromSeed(`${puzzle.seed || src}:facefallback`);
+    const num = (value, lo, hi) => clamp(Number(value) || (lo + seeded() * (hi - lo)), lo, hi);
+    const vars = {
+      "--tilt": `${clamp(Number(f.tilt) || 0, -8, 8)}deg`,
+      "--squash": String(num(f.squash, 0.68, 0.9)),
+      "--gap": String(num(f.gap, 0.16, 0.26)),
+      "--eyeY": String(num(f.eyeY, 0.34, 0.48)),
+      "--eye": String(num(f.eye, 0.14, 0.24)),
+      "--mouthY": String(num(f.mouthY, 0.64, 0.78)),
+      "--mouthW": String(num(f.mouthW, 0.26, 0.48)),
+      "--mouthH": String(num(f.mouthH, 0.06, 0.16)),
+    };
+
+    api.body.innerHTML = `
+      <div class="pz-scene" style="--peak:${peak}">
+        <div class="pz-photo"></div>
+        <span class="pz-face" style="left:${x * 100}%;top:${y * 100}%;width:${size * 100}%">
+          <i class="pz-face-skin"></i>
+          <i class="pz-face-eye l"></i>
+          <i class="pz-face-eye r"></i>
+          <i class="pz-face-mouth"></i>
+        </span>
+        <span class="pz-ring"></span>
+      </div>
+      <div class="pz-bar"><span class="pz-count">a face is in here, breathing</span></div>`;
+    const scene = api.body.querySelector(".pz-scene");
+    const photo = api.body.querySelector(".pz-photo");
+    const ghost = api.body.querySelector(".pz-face");
+    const ring = api.body.querySelector(".pz-ring");
+    Object.entries(vars).forEach(([key, value]) => ghost.style.setProperty(key, value));
+    const countEl = api.body.querySelector(".pz-count");
+    photo.style.backgroundImage = `url("${src}")`;
+
+    let mercy = false;
+    const watch = setInterval(() => {
+      if (mercy || api.timeFraction() > 0.36) return;
+      mercy = true;
+      scene.classList.add("warm");
+      countEl.textContent = "it is getting bolder";
+    }, 400);
+    api.teardown(() => clearInterval(watch));
+
+    scene.addEventListener("click", event => {
+      const rect = scene.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const dx = (px - x) * rect.width;
+      const dy = (py - y) * rect.height;
+      if (Math.hypot(dx, dy) <= tolerance * rect.width) {
+        scene.classList.add("found");
+        api.note("There it is.", "good");
+        setTimeout(() => api.win("FOUND"), 340);
+        return;
+      }
+      ring.style.left = `${px * 100}%`;
+      ring.style.top = `${py * 100}%`;
+      ring.classList.remove("go");
+      void ring.offsetWidth;
+      ring.classList.add("go");
+      api.strike("Nothing there.");
+    });
+  };
+
+  // The built-ins register exactly the way a pack does.
+  register("image_tiles", {
+    pool: "location", needsImage: true, label: "Put the room back together",
+    generate: (seed, tune, ctx) => genImageTiles(seed, ctx.image, tune, ctx.location),
+    render: RENDERERS.image_tiles,
+  });
+  register("mirror_check", {
+    pool: "location", needsImage: true, label: "Find what is turned around",
+    generate: (seed, tune, ctx) => genMirrorCheck(seed, ctx.image, tune, ctx.location),
+    render: RENDERERS.mirror_check,
+  });
+  register("steady_hand", {
+    pool: "location", label: "Keep your hand steady",
+    generate: (seed, tune, ctx) => genSteadyHand(seed, tune, ctx.location),
+    render: RENDERERS.steady_hand,
+  });
+  register("lock_deduce", {
+    pool: "location", label: "Work out the lock",
+    generate: (seed, tune, ctx) => genLockDeduce(seed, tune, ctx.location),
+    render: RENDERERS.lock_deduce,
+  });
+  register("find_the_face", {
+    pool: "threat", needsImage: true, label: "Find it in the picture",
+    generate: (seed, tune, ctx) => genFindTheFace(seed, ctx.image, tune, ctx.threat),
+    render: RENDERERS.find_the_face,
+  });
+  register("signal_echo", {
+    pool: "threat", label: "Answer what it repeats",
+    generate: (seed, tune, ctx) => genSignalEcho(seed, tune, ctx.threat),
+    render: RENDERERS.signal_echo,
+  });
+  register("hold_still", {
+    pool: "threat", label: "Hold your breath",
+    generate: (seed, tune, ctx) => genHoldStill(seed, tune, ctx.threat),
+    render: RENDERERS.hold_still,
+  });
+  register("dont_look", {
+    pool: "threat", label: "Keep watch on the openings",
+    generate: (seed, tune, ctx) => genDontLook(seed, tune, ctx.threat),
+    render: RENDERERS.dont_look,
+  });
 
   window.HubPuzzles = {
     createChallengeGroups,
     samplePuzzles,
     start,
+    register,
+    registered: () => Array.from(REGISTRY.keys()),
+    scoreLock,
   };
 })();

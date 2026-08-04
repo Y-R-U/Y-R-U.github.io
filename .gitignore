@@ -14,3 +14,4 @@ app/3d/gallery/models_all/
 app/3d/gallery/models/
 # Western shooter — still loads the raw local-only assets directly.
 gms/3d/western/
+gms/2d/scare_batch.log

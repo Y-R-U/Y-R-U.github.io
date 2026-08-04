@@ -1,0 +1,315 @@
+/* Descent pack styling. Same rule as puzzles.css: every colour resolves from
+   the host game's :root custom properties, taken through the --pz-* names the
+   shell exports and falling back to the raw host var, then to a literal. Awake
+   lands cold, The Horrors lands warm, and nothing here knows which. */
+.pz-descent,
+.pz-intercept {
+  --pd-ink: var(--pz-ink, var(--ink, #f2f6fb));
+  --pd-muted: var(--pz-muted, var(--muted, rgba(240, 245, 250, 0.74)));
+  --pd-dim: var(--pz-dim, var(--dim, rgba(240, 245, 250, 0.48)));
+  --pd-accent: var(--pz-accent, var(--cyan, #8deeff));
+  --pd-ok: var(--pz-ok, var(--green, #a9ffcb));
+  --pd-bad: var(--pz-bad, var(--red, #ff5574));
+  --pd-line: var(--pz-line, var(--line, rgba(255, 255, 255, 0.24)));
+  --pd-deep: var(--pz-deep, rgba(0, 0, 0, 0.34));
+  --pd-tint: var(--pz-tint, rgba(255, 255, 255, 0.09));
+  --pd-tint-soft: var(--pz-tint-soft, rgba(255, 255, 255, 0.06));
+  --pd-tint-hot: var(--pz-tint-hot, rgba(255, 255, 255, 0.2));
+  --pd-edge: var(--pz-edge, rgba(255, 255, 255, 0.3));
+  --pd-bad-tint: var(--pz-bad-tint, rgba(255, 80, 100, 0.16));
+  --pd-ok-tint: var(--pz-ok-tint, rgba(140, 255, 190, 0.16));
+
+  display: grid;
+  gap: 10px;
+}
+
+/* --- soft_landing -------------------------------------------------- */
+
+.pd-shaft {
+  --y: 0;
+  position: relative;
+  height: clamp(190px, 34vh, 300px);
+  border: 1px solid var(--pd-line);
+  border-radius: 16px;
+  overflow: hidden;
+  touch-action: none;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg, transparent, var(--pd-tint-soft) 88%),
+    var(--pd-deep);
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.pd-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--pd-line) 18%, var(--pd-line) 82%, transparent);
+  opacity: 0.7;
+}
+
+.pd-rail.l { left: 16%; }
+.pd-rail.r { right: 16%; }
+
+/* The line pays out from the top down to the load. */
+.pd-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: calc(var(--y) * 100%);
+  margin-left: -1px;
+  background: linear-gradient(180deg, var(--pd-line), var(--pd-accent));
+  opacity: 0.8;
+}
+
+.pd-load {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--y) * 100%);
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 5px;
+  transform: rotate(45deg);
+  background: var(--pd-accent);
+  box-shadow: 0 0 18px var(--pd-tint-hot), 0 0 40px var(--pd-tint);
+}
+
+.pd-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 9%;
+  border-top: 1px solid var(--pd-edge);
+  background: linear-gradient(180deg, var(--pd-tint-soft), transparent);
+}
+
+.pd-tag {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  color: var(--pd-dim);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+}
+
+.pd-gust {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12%;
+  text-align: center;
+  color: var(--pd-bad);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.pd-shaft.down { border-color: var(--pd-edge); box-shadow: inset 0 0 34px var(--pd-tint); }
+.pd-shaft.down .pd-load { box-shadow: 0 0 26px var(--pd-accent), 0 0 60px var(--pd-tint-hot); }
+
+.pd-shaft.gust { border-color: var(--pd-bad); }
+.pd-shaft.gust .pd-gust { opacity: 0.9; }
+.pd-shaft.gust::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background: repeating-linear-gradient(180deg, var(--pd-bad-tint) 0 2px, transparent 2px 16px);
+  animation: pd-fall 420ms linear infinite;
+}
+
+@keyframes pd-fall {
+  from { background-position: 0 0; }
+  to { background-position: 0 16px; }
+}
+
+.pd-shaft.soft { border-color: var(--pd-ok); }
+.pd-shaft.soft .pd-load { background: var(--pd-ok); box-shadow: 0 0 30px var(--pd-ok-tint); }
+.pd-shaft.hard { border-color: var(--pd-bad); }
+.pd-shaft.hard .pd-load { background: var(--pd-bad); box-shadow: 0 0 34px var(--pd-bad-tint); }
+.pd-shaft.hard .pd-floor { background: var(--pd-bad-tint); }
+
+.pd-gauges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pd-gauge {
+  position: relative;
+  height: 12px;
+  border: 1px solid var(--pd-line);
+  border-radius: 999px;
+  background: var(--pd-deep);
+  overflow: visible;
+}
+
+.pd-gauge i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--pd-accent);
+  opacity: 0.75;
+  transition: background 120ms linear;
+}
+
+.pd-gauge i.over { background: var(--pd-bad); opacity: 1; }
+.pd-gauge i.low { background: var(--pd-bad); }
+
+/* The mark is the loudness limit: cross it and the landing knocks. */
+.pd-gauge b {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--pd-ink);
+  opacity: 0.85;
+}
+
+.pd-gauge em {
+  position: absolute;
+  left: 2px;
+  top: 15px;
+  color: var(--pd-dim);
+  font-style: normal;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.pd-hold {
+  margin-top: 12px;
+  width: 100%;
+  min-height: 62px;
+  border: 1px solid var(--pd-edge);
+  border-radius: 16px;
+  color: var(--pd-ink);
+  background: radial-gradient(circle at 50% 120%, var(--pd-tint), transparent 70%), var(--pd-deep);
+  font: inherit;
+  font-size: 0.92rem;
+  letter-spacing: 0.24em;
+  touch-action: none;
+  cursor: pointer;
+  transition: transform 90ms ease, background 90ms ease;
+}
+
+.pd-hold.down {
+  transform: scale(0.98);
+  background: radial-gradient(circle at 50% 120%, var(--pd-tint-hot), transparent 74%), var(--pd-deep);
+}
+
+/* --- interceptor --------------------------------------------------- */
+
+.pi-field {
+  position: relative;
+  height: clamp(240px, 44vh, 360px);
+  border: 1px solid var(--pd-line);
+  border-radius: 16px;
+  overflow: hidden;
+  touch-action: none;
+  cursor: crosshair;
+  background:
+    linear-gradient(180deg, var(--pd-deep), transparent 40%),
+    linear-gradient(0deg, var(--pd-tint-soft), transparent 34%),
+    var(--pd-deep);
+}
+
+.pi-hair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background: repeating-linear-gradient(90deg, var(--pd-line) 0 1px, transparent 1px 13%);
+}
+
+.pi-lights {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 92%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* The line the pieces must not reach. */
+.pi-lights::before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  height: 1px;
+  background: var(--pd-line);
+}
+
+.pi-light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pd-ok);
+  box-shadow: 0 0 14px var(--pd-ok-tint), 0 0 34px var(--pd-ok-tint);
+  transition: background 220ms ease, box-shadow 220ms ease, opacity 220ms ease;
+}
+
+.pi-light.out {
+  background: transparent;
+  border: 1px solid var(--pd-line);
+  box-shadow: none;
+  opacity: 0.4;
+}
+
+.pi-mote {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 6px;
+  transform: rotate(45deg);
+  background: var(--pd-accent);
+  box-shadow: 0 0 16px var(--pd-tint-hot), 0 -22px 22px -14px var(--pd-tint);
+  pointer-events: none;
+}
+
+.pi-mote.tough {
+  background: transparent;
+  border: 3px solid var(--pd-bad);
+  box-shadow: 0 0 18px var(--pd-bad-tint);
+}
+
+.pi-mote.cracked {
+  background: var(--pd-bad);
+  border: 0;
+  box-shadow: 0 0 22px var(--pd-bad-tint);
+}
+
+.pi-mote.gone { animation: pi-snuff 300ms ease forwards; }
+.pi-mote.landed { animation: pi-splash 300ms ease forwards; }
+
+@keyframes pi-snuff {
+  to { transform: rotate(45deg) scale(0.2); opacity: 0; }
+}
+
+@keyframes pi-splash {
+  to { transform: rotate(45deg) scale(2.4); opacity: 0; }
+}
+
+.pi-field.hit { border-color: var(--pd-bad); box-shadow: inset 0 -40px 60px -40px var(--pd-bad); }
+.pi-field.miss { border-color: var(--pd-bad); cursor: not-allowed; }
+.pi-field.miss .pi-hair { opacity: 0.6; background-color: var(--pd-bad-tint); }
+
+@media (max-width: 420px) {
+  .pd-shaft { height: clamp(180px, 30vh, 250px); }
+  .pi-field { height: clamp(230px, 40vh, 320px); }
+  .pd-hold { min-height: 66px; }
+}
