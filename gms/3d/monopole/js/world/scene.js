@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { defineScenario, frameCamera, getScenario } from '../scenarios.js';
 import { shipClass, updateShipLighting, lodForDistance } from './kit/ship.js';
-import { station, stationModule, allStationModules, hazeSlab, setStationSpill } from './kit/station.js';
+import { station, stationModule, allStationModules, hazeSlab } from './kit/station.js';
 import { planet, updatePlanetLighting } from './kit/planet.js';
 import { belt, asteroid, allBelts } from './kit/belt.js';
 import { beams, engineTrails, motes, debris } from './fx.js';
@@ -123,11 +123,8 @@ export function registerBackdropScenarios(app, world) {
       q.set('starAz', -24);
       q.set('starEl', 10);
       q.set('keySwing', 0);
-      // the star sits low so it can stay in frame, but a 10° key only ever rakes the risers and
-      // leaves the deck black; lifting the key off the star bearing is what puts the light on the
-      // dorsal without moving the flare
-      q.set('keyLift', 28);
-      q.set('fogDensity', 0.0022);
+      q.set('keyLift', 0);
+      q.set('fogDensity', 0.0030);
       q.set('fogTint', 0.88);
       q.set('fogDesat', 0.30);
       q.set('rimDist', 110);
@@ -139,32 +136,19 @@ export function registerBackdropScenarios(app, world) {
       q.set('envPower', 0.16);
       q.set('envFloor', 0.06);
       q.set('ambient', 0.004);
-      q.set('keyPower', 19);
-      q.set('fillPower', 3.0);
+      q.set('keyPower', 41);
+      q.set('fillPower', 5.6);
+      // the shadow side is 0.07-albedo metal, so a multiplied fill returns nothing; this is the
+      // additive one that carries the plate map and puts plating back into the dark half
+      q.set('shadowFill', 0.26);
       q.set('fillAngle', 168);
       q.set('fillLift', -24);
       q.set('windowGlow', 4.4);
       q.set('hullRough', 0.30);
       q.set('hullDetail', 0.34);
-      q.set('hullPanel', 0.68);
-      q.set('engineWash', 1.5);
-      q.set('flareSize', 28);
-      q.set('bloomPower', 0.38);
-      q.set('bloomSize', 40);
-      // The hull has to hold a dark value against the red field, and it could not: at nebGain 1.9
-      // the cloud behind the dorsal was hotter than the deck in front of it, and the bloom off it
-      // put a white hole through the strongest part of the silhouette. Pulling the gain and the
-      // core, then rolling the top stop instead of clipping it, is the whole fix — everything the
-      // critic listed on that side of the frame was downstream of this.
-      q.set('nebGain', 1.05);
-      q.set('nebCore', 0.55);
-      q.set('nebGlow', 0.62);
-      q.set('nebHalo', 0.02);
-      q.set('nebDesat', 0.34);
-      q.set('bloomThreshold', 0.86);
-      q.set('bloomKnee', 0.16);
-      q.set('bloomStrength', 0.44);
-      q.set('bloomShoulder', 0.72);
+      q.set('flareSize', 32);
+      q.set('bloomPower', 0.55);
+      q.set('bloomSize', 44);
 
       const g = new THREE.Group();
       const hero = shipClass('hauler', { palette: 'ferrous', seed: 11 });
@@ -189,18 +173,22 @@ export function registerBackdropScenarios(app, world) {
         g.add(o);
       }
 
-      // the one scenario in the set that still rendered vacuum as literally empty. One extra draw
-      // call buys the near bank that puts the escorts behind something and stops the lower half of
-      // the frame being a flat black field the hull has nothing to sit in.
+      // known-huge: a 500 m yard at 700 m, nearly all of it lost to the fog, so the 84 m hauler
+      // in front of it has something to be small against
+      const yard = station('drayyard', { palette: 'corvain', seed: 3 });
+      yard.position.set(-260, -120, -820);
+      yard.rotation.set(0.05, 0.75, 0.02);
+      g.add(yard);
+
       g.add(atmosphere({
-        seed: 4,
+        seed: 11,
         layers: [
-          { count: 3, center: [-50, 26, -180], size: [320, 150, 220], scale: [120, 220],
-            aspect: 1.8, color: '#c8593a', power: 0.52, variant: 3 },
-          { count: 6, center: [10, -24, -130], size: [260, 130, 200], scale: [60, 140],
-            color: '#e08a6a', power: 0.30, variant: 2 },
-          { count: 4, center: [-95, -30, -95], size: [180, 110, 150], scale: [70, 150],
-            color: '#7d5cc0', power: 0.24, variant: 0 },
+          { count: 4, center: [-40, 10, -260], size: [420, 200, 320], scale: [180, 320],
+            aspect: 1.8, color: '#c07a6a', power: 0.42, variant: 3 },
+          { count: 10, center: [-30, 4, -120], size: [260, 120, 220], scale: [50, 130],
+            color: '#d8a08a', power: 0.24, variant: 2 },
+          { count: 5, center: [-58, -22, -70], size: [180, 90, 150], scale: [60, 150],
+            aspect: 1.6, color: '#e0a894', power: 0.30, variant: 0 },
         ],
       }));
 
@@ -268,26 +256,27 @@ export function registerStationScenarios(app, world) {
       q.set('starAz', 152);
       q.set('starEl', 33);
       q.set('keySwing', 0);
-      // one hard key, down onto the deck plane. At the star's own 33° every box top and every box
-      // side landed within a few percent of each other; the shot had no form at all.
-      q.set('keyLift', 34);
-      q.set('fogDensity', 0.00165);
+      q.set('keyLift', 0);
+      q.set('fogDensity', 0.00115);
       q.set('fogTint', 0.32);
       q.set('fogDesat', 0.34);
       q.set('fogLevel', 0.17);
-      q.set('keyPower', 6.2);
-      q.set('fillPower', 1.15);
-      q.set('fillAngle', 128);
-      q.set('fillLift', -34);
-      // the ambient and the env *were* the lighting here, which is why nothing had a dark side
-      q.set('ambient', 0.002);
-      q.set('envPower', 0.07);
-      q.set('envFloor', 0.03);
-      // a station's plates are painted, not bare metal: at metalness 0.9 a directional key has no
-      // diffuse term to give and every face falls back to the env map at one value
-      q.set('stationPaint', 0.86);
-      q.set('stationPlane', 0.30);
-      q.set('spillPower', 0.16);
+      q.set('keyPower', 17);
+      q.set('fillPower', 2.6);
+      q.set('fillAngle', 150);
+      q.set('fillLift', -30);
+      q.set('ambient', 0.004);
+      q.set('envPower', 0.15);
+      q.set('envFloor', 0.04);
+      q.set('stationPanel', 0.52);
+      q.set('stationDirt', 0.78);
+      q.set('exposure', 0.88);
+      // the plate's background is a dark busy field, never plain sky; the dust fill is what stops
+      // the top and right thirds reading as empty navy
+      q.set('dustField', 0.008);
+      q.set('nebGain', 0.30);
+      q.set('nebDesat', 0.62);
+      q.set('nebHalo', 0.05);
       q.set('windowGlow', 6.0);
       q.set('stripPower', 5.2);
       q.set('dockGlow', 3.0);
@@ -303,56 +292,30 @@ export function registerStationScenarios(app, world) {
       q.set('bloomThreshold', 0.52);
       q.set('bloomStrength', 0.92);
       q.set('bloomRadius', 1.35);
-      q.set('bloomShoulder', 0.80);
-      // the top-left quarter was dead black against a plate whose every corner is occupied; a flat
-      // dust floor is the cheapest thing that puts a value in it
-      q.set('dustField', 0.016);
-      q.set('nebAmbient', 0.030);
-      // the sharp band runs down the row, so the near bays at the bottom-left corner and the far
-      // yard at the top-right both defocus and the middle of the run stays crisp
-      q.set('dof', true);
-      q.set('dofAngle', -45);
-      q.set('dofCenter', 0.025);
-      q.set('dofSharp', 0.045);
-      q.set('dofFalloff', 0.21);
-      q.set('dofPower', 0.85);
-      q.set('dofNearSide', 0.16);
-      q.set('dofBlur', 2.4);
 
       const g = new THREE.Group();
       g.add(station('ledger', { seed: 4 }));
 
-      // What a lit window rectangle owes its own housing. These are not lights three knows about —
-      // the whole station is four merged meshes, so they ride the station shader as an inverse-
-      // square uniform array and cost no draw call. Sitting above the deck plane is the point:
-      // a source level with the mouth pools on the walls and never on the plates.
-      setStationSpill([
-        [118, 15, 90, 30, '#ff8a2a', 1.15],
-        [214, 14, 94, 28, '#ff9a3c', 1.00],
-        [306, 14, 88, 26, '#ff8a2a', 0.90],
-        [402, 13, 92, 24, '#ffa14e', 0.78],
-        [470, 12, 86, 22, '#ff8a2a', 0.62],
-        [150, 12, -86, 26, '#ff8a2a', 0.55],
-        // two cool sources against six warm ones: the plate's whole colour story is warm dock
-        // light pooling inside a cold structure, and one hue on its own is not a grade
-        [270, 34, 26, 70, '#4fc9e8', 0.55],
-        [560, 20, 40, 80, '#3fbcdd', 0.42],
-      ]);
-
       // the far structure layer. Haze between two layers of the same kit is what turns one row
       // of modules into a yard; there is nothing behind the near row to lose contrast against.
       const far = station('drayyard', { palette: 'corvain', seed: 7 });
-      far.position.set(950, -60, 60);
+      far.position.set(1160, -40, 230);
       far.rotation.set(0.04, 1.42, 0.03);
       g.add(far);
 
-      // the right half of the frame was empty sky against a plate that fills every pixel. A third
-      // layer costs one station's worth of calls and buys the whole side of the shot.
-      const right = station('drayyard', { palette: 'ferrous', seed: 12 });
-      right.position.set(1250, -330, 300);
-      right.rotation.set(-0.05, 2.35, 0.06);
-      right.scale.setScalar(1.6);
-      g.add(right);
+      // a third yard at half that distance fills the right of the frame, which was the one part
+      // of this shot the plate occupies and ours did not
+      const mid = station('drayyard', { palette: 'corvain', seed: 19 });
+      mid.position.set(900, -290, 40);
+      mid.rotation.set(0.05, 1.30, 0.02);
+      g.add(mid);
+
+      // a fourth layer, far enough that the fog has most of it: the plate never leaves a corner
+      // of frame as empty sky
+      const deep = station('ledger', { palette: 'corvain', seed: 41 });
+      deep.position.set(2210, 610, -1880);
+      deep.rotation.set(0.04, 2.2, 0.02);
+      g.add(deep);
 
       // known-small against known-huge: an 84 m hauler nosed into a 400 m row of bays
       const h = shipClass('hauler', { palette: 'ferrous', seed: 21 });

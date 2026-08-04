@@ -40,43 +40,12 @@ void main(){
   gl_FragColor = vec4(c, 1.0);
 }`;
 
-// The shoulder is the only thing standing between a bright nebula and a white hole where the
-// subject's silhouette should be: below uShoulder nothing moves, above it the excess is rolled
-// into the last stop instead of clipping. uShoulder = 1 is the old hard clamp.
-const SHOULDER = `
-vec3 shoulder(vec3 c, float k){
-  vec3 e = max(c - k, 0.0);
-  return min(c, vec3(k)) + e / (1.0 + e / max(1e-3, 1.0 - k));
-}`;
-
 const COMP_FRAG = `
 varying vec2 vUv;
 uniform sampler2D tDiffuse, tBloom;
-uniform float uStrength, uShoulder;
-${SHOULDER}
+uniform float uStrength;
 void main(){
-  gl_FragColor = vec4(shoulder(texture2D(tDiffuse, vUv).rgb
-    + texture2D(tBloom, vUv).rgb * uStrength, uShoulder), 1.0);
-}`;
-
-// A tilt band, not a depth blur: the sharp strip is a line across the frame and everything either
-// side of it defocuses. On a composition whose subject runs on one diagonal that is what a real
-// shallow depth of field looks like, and it costs no depth buffer and no per-pixel CoC.
-const DOF_FRAG = `
-varying vec2 vUv;
-uniform sampler2D tDiffuse, tBloom, tBlur;
-uniform float uStrength, uShoulder, uCenter, uIn, uOut, uMax, uNear;
-uniform vec2 uAxis;
-${SHOULDER}
-void main(){
-  vec2 p = vUv - 0.5;
-  // asymmetric on purpose: a subject that runs from 200 m to 600 m across the frame occupies most
-  // of the band's own axis, so a symmetric band defocuses the subject along with the background
-  float s = dot(p, uAxis) - uCenter;
-  float d = s > 0.0 ? s : -s * uNear;
-  float coc = smoothstep(uIn, uOut, d) * uMax;
-  vec3 c = mix(texture2D(tDiffuse, vUv).rgb, texture2D(tBlur, vUv).rgb, coc);
-  gl_FragColor = vec4(shoulder(c + texture2D(tBloom, vUv).rgb * uStrength, uShoulder), 1.0);
+  gl_FragColor = vec4(texture2D(tDiffuse, vUv).rgb + texture2D(tBloom, vUv).rgb * uStrength, 1.0);
 }`;
 
 const quadMat = (frag, uniforms) => new THREE.ShaderMaterial({
@@ -100,18 +69,8 @@ export class Post {
       tDiffuse: { value: null }, uDir: { value: new THREE.Vector2() },
     }));
     this.comp = new FullScreenQuad(quadMat(COMP_FRAG, {
-      tDiffuse: { value: null }, tBloom: { value: null },
-      uStrength: { value: 0.62 }, uShoulder: { value: 1.0 },
+      tDiffuse: { value: null }, tBloom: { value: null }, uStrength: { value: 0.62 },
     }));
-    this.dofComp = new FullScreenQuad(quadMat(DOF_FRAG, {
-      tDiffuse: { value: null }, tBloom: { value: null }, tBlur: { value: null },
-      uStrength: { value: 0.62 }, uShoulder: { value: 1.0 },
-      uAxis: { value: new THREE.Vector2(0, 1) },
-      uCenter: { value: 0 }, uIn: { value: 0.06 }, uOut: { value: 0.30 },
-      uMax: { value: 0.9 }, uNear: { value: 1 },
-    }));
-    this.dof = false;
-    this.dofRadius = 1.6;
     this.fxaaQuad = new FullScreenQuad(new THREE.ShaderMaterial({
       uniforms: THREE.UniformsUtils.clone(FXAAShader.uniforms),
       vertexShader: FXAAShader.vertexShader, fragmentShader: FXAAShader.fragmentShader,
@@ -133,32 +92,11 @@ export class Post {
     q.register({ key: 'bloomKnee', label: 'Bloom knee', type: 'range', min: 0.02, max: 0.6, step: 0.01, default: 0.22, group: G },
       v => { this.thresh.material.uniforms.uKnee.value = v; });
     q.register({ key: 'bloomStrength', label: 'Bloom strength', type: 'range', min: 0, max: 2, step: 0.01, default: 0.62, group: G },
-      v => { this.comp.material.uniforms.uStrength.value = v; this.dofComp.material.uniforms.uStrength.value = v; });
-    q.register({ key: 'bloomShoulder', label: 'Highlight shoulder', type: 'range', min: 0.4, max: 1, step: 0.01, default: 1.0, group: G },
-      v => { this.comp.material.uniforms.uShoulder.value = v; this.dofComp.material.uniforms.uShoulder.value = v; });
+      v => { this.comp.material.uniforms.uStrength.value = v; });
     q.register({ key: 'bloomRadius', label: 'Bloom radius', type: 'range', min: 0.3, max: 4, step: 0.05, default: 1.0, group: G },
       v => { this.radius = v; });
     q.register({ key: 'bloomScale', label: 'Bloom buffer', type: 'select', options: [0.5, 0.25, 0.125], default: 0.25, group: G },
       v => { const s = +v; if (s === this.scale) return; this.scale = s; this.free(); this.app.aa?.apply(); });
-
-    const D = 'Depth of field';
-    const u = this.dofComp.material.uniforms;
-    q.register({ key: 'dof', label: 'Depth of field', type: 'toggle', default: false, group: D },
-      v => { const on = !!v; if (on === this.dof) return; this.dof = on; this.free(); });
-    q.register({ key: 'dofAngle', label: 'Sharp band angle', type: 'range', min: -90, max: 90, step: 1, default: 0, group: D },
-      v => { const a = (v + 90) * Math.PI / 180; u.uAxis.value.set(Math.cos(a), Math.sin(a)); });
-    q.register({ key: 'dofCenter', label: 'Band offset', type: 'range', min: -0.5, max: 0.5, step: 0.005, default: 0, group: D },
-      v => { u.uCenter.value = v; });
-    q.register({ key: 'dofSharp', label: 'Band half-width', type: 'range', min: 0, max: 0.5, step: 0.005, default: 0.06, group: D },
-      v => { u.uIn.value = v; });
-    q.register({ key: 'dofFalloff', label: 'Defocus reach', type: 'range', min: 0.02, max: 0.8, step: 0.005, default: 0.30, group: D },
-      v => { u.uOut.value = Math.max(u.uIn.value + 0.01, v); });
-    q.register({ key: 'dofPower', label: 'Defocus amount', type: 'range', min: 0, max: 1, step: 0.02, default: 0.9, group: D },
-      v => { u.uMax.value = v; });
-    q.register({ key: 'dofNearSide', label: 'Near-side defocus', type: 'range', min: 0, max: 2, step: 0.02, default: 1, group: D },
-      v => { u.uNear.value = v; });
-    q.register({ key: 'dofBlur', label: 'Defocus radius', type: 'range', min: 0.4, max: 6, step: 0.05, default: 1.6, group: D },
-      v => { this.dofRadius = v; });
   }
 
   setEnabled(on) {
@@ -198,15 +136,6 @@ export class Post {
     track(this.a.texture, { w: bw, h: bh, mips: false, label: 'bloom a' });
     track(this.b.texture, { w: bw, h: bh, mips: false, label: 'bloom b' });
 
-    if (this.dof) {
-      const dw = Math.max(2, s.x >> 1), dh = Math.max(2, s.y >> 1);
-      this.c = half(); this.d = half();
-      this.c.setSize(dw, dh); this.d.setSize(dw, dh);
-      track(this.c.texture, { w: dw, h: dh, mips: false, label: 'dof a' });
-      track(this.d.texture, { w: dw, h: dh, mips: false, label: 'dof b' });
-      this.dw = dw; this.dh = dh;
-    }
-
     this.out = null;
     this.bw = bw; this.bh = bh;
     this.fxaaQuad.material.uniforms.resolution.value.set(1 / s.x, 1 / s.y);
@@ -217,9 +146,8 @@ export class Post {
     untrack(this.rt.texture); untrack(this.depthKey);
     untrack(this.a.texture); untrack(this.b.texture);
     this.rt.dispose(); this.a.dispose(); this.b.dispose();
-    if (this.c) { untrack(this.c.texture); untrack(this.d.texture); this.c.dispose(); this.d.dispose(); }
     if (this.out) { untrack(this.out.texture); this.out.dispose(); }
-    this.rt = this.a = this.b = this.c = this.d = this.out = null;
+    this.rt = this.a = this.b = this.out = null;
   }
 
   render() {
@@ -243,23 +171,8 @@ export class Post {
     renderer.setRenderTarget(this.a);
     this.blur.render(renderer);
 
-    let comp = this.comp;
-    if (this.dof && this.c) {
-      u.tDiffuse.value = this.rt.texture;
-      u.uDir.value.set(this.dofRadius / this.dw, 0);
-      renderer.setRenderTarget(this.c);
-      this.blur.render(renderer);
-
-      u.tDiffuse.value = this.c.texture;
-      u.uDir.value.set(0, this.dofRadius / this.dh);
-      renderer.setRenderTarget(this.d);
-      this.blur.render(renderer);
-
-      comp = this.dofComp;
-      comp.material.uniforms.tBlur.value = this.d.texture;
-    }
-    comp.material.uniforms.tDiffuse.value = this.rt.texture;
-    comp.material.uniforms.tBloom.value = this.a.texture;
+    this.comp.material.uniforms.tDiffuse.value = this.rt.texture;
+    this.comp.material.uniforms.tBloom.value = this.a.texture;
 
     if (this.wantsFXAA) {
       if (!this.out) {
@@ -267,13 +180,13 @@ export class Post {
         track(this.out.texture, { w: this.rt.width, h: this.rt.height, mips: false, label: 'post fxaa src' });
       }
       renderer.setRenderTarget(this.out);
-      comp.render(renderer);
+      this.comp.render(renderer);
       this.fxaaQuad.material.uniforms.tDiffuse.value = this.out.texture;
       renderer.setRenderTarget(null);
       this.fxaaQuad.render(renderer);
     } else {
       renderer.setRenderTarget(null);
-      comp.render(renderer);
+      this.comp.render(renderer);
     }
   }
 
