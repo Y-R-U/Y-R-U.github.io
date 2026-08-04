@@ -198,7 +198,7 @@ export class CameraRig {
     const h = this.home;
     this.stopFly();
     if (!h) return Promise.resolve(this);
-    if (h.object) return this.focus(h.object, { dist: h.dist, phi: h.phi, ms });
+    if (h.object) return this.focus(h.object, { dist: h.dist, phi: h.phi, theta: h.theta, ms });
     const sp = Math.sin(h.phi) * h.dist;
     return this.moveTo({
       pos: [h.target.x + sp * Math.sin(h.theta), h.target.y + Math.cos(h.phi) * h.dist, h.target.z + sp * Math.cos(h.theta)],

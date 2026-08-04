@@ -131,6 +131,9 @@ if (shot) {
 // ── the live game ────────────────────────────────────────────────────────────
 
 if (live) {
+  // theta matters: the default inherits whatever angle the camera was left on, which put the
+  // star directly behind Ledger and recentring returned a wall of orange.
+  const HOME = () => ({ object: reach.focusTarget('ledger'), dist: 900, phi: Math.PI * 0.42, theta: 1.2 });
   reachLighting(app.quality);
   reach = new ReachScene(app, world);
   window.__mono.reach = reach;
@@ -145,7 +148,8 @@ if (live) {
       world.resumeLive();
       camera.enable(true);
       camera.setTouchEnabled(true);
-      camera.focus(reach.focusTarget('ledger'), { dist: 900, phi: Math.PI * 0.42, ms: 0 });
+      camera.markHome(HOME());
+      camera.resetView(0);
     },
   });
 
@@ -172,7 +176,7 @@ if (live) {
   });
   const coldOpen = flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
     camera.setTouchEnabled(true);
-    camera.markHome({ object: reach.focusTarget('ledger'), dist: 900, phi: Math.PI * 0.42 });
+    camera.markHome(HOME());
     if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
   });
 
