@@ -58,7 +58,14 @@ const shot = params.has('shot') ? getScenario(params.get('shot')) : null;
 const live = !shot && !params.has('sr');
 
 let reach = null;
-const hud = buildHud(sim, { onFocus: () => { camera.enable(true); camera.focus(reach ? reach.focusTarget('ledger') : world.subject, { dist: 620, phi: Math.PI * 0.40 }); } });
+const hud = buildHud(sim, {
+  onFocus: () => {
+    camera.enable(true);
+    camera.setTouchEnabled(true);
+    if (camera.rig?.home) return camera.resetView();
+    camera.focus(reach ? reach.focusTarget('ledger') : world.subject, { dist: 620, phi: Math.PI * 0.40 });
+  },
+});
 
 // ── the tick clock ───────────────────────────────────────────────────────────
 // One tick is one week. Speed only changes the wall-clock gap between whole ticks, so a run at ×4
@@ -94,6 +101,15 @@ sim.on((kind, payload) => {
 showroom.onRun(e => {
   if (e.group !== 'panel' && e.group !== 'story' && panels.isOpen()) { panels.closeAll(); panels.useLive(); }
 });
+
+// Every entry is orbitable, and every entry knows the framing it was authored with, so the
+// reset button means something no matter which one you are standing in.
+showroom.onAfterRun(() => {
+  camera.enable(true);
+  camera.setTouchEnabled(true);
+  requestAnimationFrame(() => camera.markHome());
+});
+document.getElementById('sr-reset').onclick = () => { camera.setTouchEnabled(true); camera.resetView(); };
 
 Object.assign(window.__mono, {
   world, backdrop, lighting, showroom, camera, sim, panels, hud,
@@ -147,7 +163,7 @@ if (live) {
   camera.setTouchEnabled(false);
   sim.setSpeed(0);
   hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
-  const skip = () => { camera.rig.fly = null; camera.rig.syncFromCamera(camera.rig.dist); };
+  const skip = () => camera.stopFly();
   addEventListener('pointerdown', function once(e) {
     if (e.target.closest('#ui, #sheet, #knobs, #showroom')) return;
     removeEventListener('pointerdown', once);
@@ -155,6 +171,7 @@ if (live) {
   });
   flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
     camera.setTouchEnabled(true);
+    camera.markHome({ object: reach.focusTarget('ledger'), dist: 900, phi: Math.PI * 0.42 });
     if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
     hud.ticker('Tap the belt to send the rig.', 6000);
   });

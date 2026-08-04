@@ -6,6 +6,7 @@ const GROUPS = ['scene', 'camera', 'fleet', 'fx', 'panel', 'story', 'misc'];
 const entries = new Map();
 const expected = new Set();
 const hooks = new Set();
+const after = new Set();
 let ctx = null;
 let current = null;
 let ui = null;
@@ -30,6 +31,8 @@ export const showroom = {
   // Fires before an entry runs, so a component can stand down whatever it left on screen when
   // the sweep moves to somebody else's entry.
   onRun(fn) { hooks.add(fn); return () => hooks.delete(fn); },
+  // After the entry has placed its camera — that is when "this framing is home" is true.
+  onAfterRun(fn) { after.add(fn); return () => after.delete(fn); },
 
   run(id) {
     const e = entries.get(id);
@@ -37,10 +40,12 @@ export const showroom = {
     for (const fn of hooks) fn(e);
     current = id;
     e.run(ctx);
+    for (const fn of after) fn(e);
     const u = new URL(location.href);
     u.searchParams.set('sr', id);
     history.replaceState(null, '', u);
     ui?.sync();
+    if (ui && narrowScreen()) ui.mini();
     return true;
   },
 
@@ -54,6 +59,9 @@ export const showroom = {
   open() { ui?.open(); },
   close() { ui?.close(); },
 };
+
+// Desktop keeps the list beside the scene; a phone has to hand the screen over to the entry.
+const narrowScreen = () => matchMedia('(max-width: 759px)').matches;
 
 export function buildShowroom(app) {
   ctx = { app, showroom };
@@ -83,14 +91,18 @@ export function buildShowroom(app) {
     const e = current && entries.get(current);
     title.textContent = e ? e.label : 'Showroom';
     list.querySelectorAll('[data-sr]').forEach(b => b.classList.toggle('on', b.dataset.sr === current));
-    document.body.classList.toggle('sr-live', !!current);
   };
 
   ui = {
     rebuild: () => { rebuild(); sync(); },
     sync,
-    open() { root.classList.add('open'); rebuild(); sync(); },
-    close() { root.classList.remove('open'); document.body.classList.remove('sr-live'); },
+    open() { root.classList.add('open'); root.classList.remove('mini'); rebuild(); sync(); },
+    close() { root.classList.remove('open', 'mini'); },
+    mini() { root.classList.add('mini'); },
+    showList() {
+      root.classList.remove('mini');
+      list.querySelector(`[data-sr="${current}"]`)?.scrollIntoView({ block: 'center' });
+    },
   };
 
   list.addEventListener('click', e => {
@@ -100,14 +112,14 @@ export function buildShowroom(app) {
   document.getElementById('sr-close').onclick = () => ui.close();
   document.getElementById('sr-prev').onclick = () => showroom.step(-1);
   document.getElementById('sr-next').onclick = () => showroom.step(1);
-  // once an entry is live the list hides itself, so the title bar has to get it back
-  title.onclick = () => { current = null; document.body.classList.remove('sr-live'); sync(); };
+  document.getElementById('sr-list').onclick = () => ui.showList();
+  title.onclick = () => ui.showList();
   document.getElementById('showroom-btn').onclick = () => ui.open();
   addEventListener('keydown', e => {
     if (!root.classList.contains('open')) return;
     if (e.key === 'ArrowLeft') showroom.step(-1);
     if (e.key === 'ArrowRight') showroom.step(1);
-    if (e.key === 'Escape') ui.close();
+    if (e.key === 'Escape') root.classList.contains('mini') ? ui.showList() : ui.close();
   });
 
   ui.rebuild();

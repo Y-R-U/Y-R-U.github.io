@@ -134,7 +134,7 @@ export class CameraRig {
     const posCurve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
     const lookCurve = new THREE.CatmullRomCurve3(looks, false, 'catmullrom', 0.5);
     this.tween = null;
-    const handle = { stop: () => { this.fly = null; this.syncFromCamera(this.dist); } };
+    const handle = { stop: () => this.stopFly() };
     const p = new Promise(resolve => {
       this.fly = {
         t0: performance.now(), ms, loop, ease: EASE[ease] || EASE.inout,
@@ -166,6 +166,44 @@ export class CameraRig {
     this.touch = !!on;
     if (!on) { this.pointers.clear(); this.gesture = null; }
     return this;
+  }
+
+  // Cutting a fly-by short has to settle its promise, or whatever was waiting on the fly to
+  // finish never runs — that is how skipping the cold open used to leave the camera locked.
+  stopFly() {
+    const f = this.fly;
+    this.fly = null;
+    this.tween = null;
+    this.syncFromCamera(this.dist);
+    if (this.homePending) this.markHome();
+    f?.resolve?.(this);
+    return this;
+  }
+
+  // Where the player came in. Any scene that moves the camera sets this, so "reset view" means
+  // something everywhere rather than only in the live game. Called while a move is still playing
+  // it takes the move's destination, not the frame it happens to be passing through.
+  markHome(opts = null) {
+    if (opts) { this.home = opts; this.homePending = false; return this; }
+    if (this.fly) { this.homePending = true; return this; }
+    const t = this.tween;
+    this.home = t
+      ? { target: t.to.target.clone(), dist: t.to.dist, phi: t.to.phi, theta: t.to.theta, fov: t.to.fov }
+      : { target: this.target.clone(), dist: this.dist, phi: this.phi, theta: this.theta, fov: this.fov };
+    this.homePending = false;
+    return this;
+  }
+
+  resetView(ms = 620) {
+    const h = this.home;
+    this.stopFly();
+    if (!h) return Promise.resolve(this);
+    if (h.object) return this.focus(h.object, { dist: h.dist, phi: h.phi, ms });
+    const sp = Math.sin(h.phi) * h.dist;
+    return this.moveTo({
+      pos: [h.target.x + sp * Math.sin(h.theta), h.target.y + Math.cos(h.phi) * h.dist, h.target.z + sp * Math.cos(h.theta)],
+      look: [h.target.x, h.target.y, h.target.z], fov: h.fov, ms,
+    });
   }
 
   /* ── gestures ────────────────────────────────────────────────────────── */
@@ -279,6 +317,7 @@ export class CameraRig {
           this.fly = null;
           this.sampleFly(done, 1);
           this.syncFromCamera(this.dist);
+          if (this.homePending) this.markHome();
           done.resolve?.(this);
           return;
         }
@@ -376,6 +415,9 @@ export const camera = {
   },
   enable(on = true) { if (camera.rig) camera.rig.active = !!on; return camera; },
   get active() { return !!camera.rig?.active; },
+  stopFly() { camera.rig?.stopFly(); return camera; },
+  markHome(opts) { camera.rig?.markHome(opts); return camera; },
+  resetView(ms) { return camera.rig ? camera.rig.resetView(ms) : Promise.resolve(); },
   focus(object3D, opts) { return camera.rig ? camera.rig.focus(object3D, opts) : Promise.resolve(); },
   setTouchEnabled(on) { camera.rig?.setTouchEnabled(on); return camera; },
   setFrom(pos, look, fov) { camera.rig?.setFrom(pos, look, fov); return camera; },
