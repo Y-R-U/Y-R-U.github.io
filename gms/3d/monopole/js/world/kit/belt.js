@@ -11,11 +11,14 @@ const SIZES = { gravel: 1.4, small: 4.2, mid: 11, large: 26, huge: 60 };
 const CLASSES = ['gravel', 'small', 'mid', 'large', 'huge'];
 // geometry tier per class: icosahedron subdivision and how far the plate uv is stretched
 const TIER = { gravel: 0, small: 0, mid: 1, large: 2, huge: 2 };
-const TIER_DETAIL = [1, 2, 3];
+// PolyhedronGeometry subdivides each edge into detail+1, so faces are 20·(detail+1)², not 20·4^d.
+// Detail 3 is 320 triangles over a whole sphere and a crater lands on four of them.
+const TIER_DETAIL = [1, 3, 5];
+const HERO_BOOST = [2, 4, 6];
 // how many times the shared rock/vein maps repeat over the shape. Low on the big shapes on
 // purpose: at 7× the ore veins magnify into a speckle field that reads as lava confetti.
 const TIER_UV = [1.6, 2.4, 3.0];
-const TIER_SHAPES = [2, 2, 3];
+const TIER_SHAPES = [2, 3, 5];
 
 // A belt is a cone, not a box: the spread has to grow with distance or the near rocks all sit
 // outside the frustum and the far ones bunch into a small angular patch in the middle of frame.
@@ -80,12 +83,12 @@ function fbm3(x, y, z, oct) {
 
 // An icosahedron is non-indexed, so displacing by a function of the *undisplaced* position keeps
 // the shell watertight and computeVertexNormals then gives flat facets — which is what a rock is.
-function rockGeom(tier, index) {
-  const key = `${tier}:${index}`;
+function rockGeom(tier, index, boost = 0) {
+  const key = `${tier}:${index}:${boost}`;
   const hit = geoCache.get(key);
   if (hit) return hit;
 
-  const g = new THREE.IcosahedronGeometry(1, TIER_DETAIL[tier]);
+  const g = new THREE.IcosahedronGeometry(1, TIER_DETAIL[tier] + boost);
   const R = rnd(0x7f31 + tier * 977 + index * 24007);
   const off = [R() * 60, R() * 60, R() * 60];
 
@@ -94,6 +97,16 @@ function rockGeom(tier, index) {
   for (let i = 0, n = 3 + Math.floor(R() * 3); i < n; i++) {
     const u = R() * 2 - 1, a = R() * Math.PI * 2, s = Math.sqrt(1 - u * u);
     cuts.push([s * Math.cos(a), u, s * Math.sin(a), 0.52 + 0.34 * R()]);
+  }
+
+  // Craters, and they are the difference between a noise-bumped potato and a rock: a bowl with a
+  // raised rim casts its own terminator under a hard key, which no amount of displacement noise
+  // does. `cw` is the cosine of the angular radius, so the test is one dot product.
+  const craters = [];
+  for (let i = 0, n = 3 + Math.floor(R() * 4); i < n; i++) {
+    const u = R() * 2 - 1, a = R() * Math.PI * 2, s = Math.sqrt(1 - u * u);
+    const rad = 0.16 + 0.34 * R() * R();
+    craters.push([s * Math.cos(a), u, s * Math.sin(a), Math.cos(rad), 0.09 + 0.17 * R()]);
   }
 
   const p = g.attributes.position;
@@ -107,6 +120,14 @@ function rockGeom(tier, index) {
     for (const [nx, ny, nz, d] of cuts) {
       const t = x * nx + y * ny + z * nz - d;
       if (t > 0) { r -= t * 0.85; cav = Math.max(cav, Math.min(1, t * 2.6)); }
+    }
+    for (const [nx, ny, nz, cw, depth] of craters) {
+      const c = x * nx + y * ny + z * nz;
+      if (c <= cw) continue;
+      const u = (c - cw) / (1 - cw);
+      r -= depth * (u * u * (3 - 2 * u)) * 0.85;
+      r += depth * 0.34 * Math.exp(-((u - 0.10) / 0.13) * ((u - 0.10) / 0.13));
+      cav = Math.max(cav, u * 0.8);
     }
     p.setXYZ(i, x * r, y * r, z * r);
     // vertex cavity, used twice: it darkens the rock and it is inverted to place the ore glow
@@ -125,9 +146,38 @@ function rockGeom(tier, index) {
   return g;
 }
 
+// One vein map shared by every ore rock reads as the same lava network stencilled onto all of
+// them. The seed is hashed from the instance's own translation, which is the only per-rock value
+// available to a shader on an InstancedMesh, and it both slides the map and moves the threshold.
+const ORE_VERT_HEAD = `#include <common>
+varying float vOreSeed;
+varying vec3 vOrePos;`;
+
+const ORE_VERT = `#include <begin_vertex>
+  vec4 oreOrigin = modelMatrix *
+  #ifdef USE_INSTANCING
+    instanceMatrix *
+  #endif
+    vec4(0.0, 0.0, 0.0, 1.0);
+  vOreSeed = fract(sin(dot(oreOrigin.xyz, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+  vOrePos = position;`;
+
+const ORE_FRAG_HEAD = `#include <common>
+varying float vOreSeed;
+varying vec3 vOrePos;`;
+
 const ORE_PATCH = `#include <emissivemap_fragment>
-  float oreV = smoothstep(0.16, 0.52, texture2D(emissiveMap, vEmissiveMapUv).r);
-  totalEmissiveRadiance *= oreV * 2.0 * pow(1.0 - vColor.r, 1.3);`;
+  vec2 oreUv = vEmissiveMapUv + vec2(vOreSeed * 6.1, fract(vOreSeed * 17.3) * 4.7);
+  float lo = 0.13 + 0.20 * vOreSeed;
+  float oreV = smoothstep(lo, lo + 0.30, texture2D(emissiveMap, oreUv).r);
+  // ore lives in a few pockets, not over the whole shell. The vein atlas is far too sparse to
+  // gate itself at a coarse scale, so the region is three object-space sines — blobby, cheap and
+  // different on every rock because the seed rotates the phase.
+  float pocket = 0.5 + 0.5 * sin(vOrePos.x * 3.1 + vOreSeed * 19.0)
+                          * sin(vOrePos.y * 2.7 + vOreSeed * 7.0)
+                          * sin(vOrePos.z * 3.6 + vOreSeed * 11.0);
+  pocket = smoothstep(0.40, 0.76, pocket);
+  totalEmissiveRadiance *= oreV * pocket * 4.5 * pow(1.0 - vColor.r, 1.4);`;
 
 function materials() {
   if (rockMat) return;
@@ -145,7 +195,12 @@ function materials() {
   // pocket is, and the ore only glows where both agree. Without the cavity term the whole rock
   // lights up and reads as a painted orange ball rather than as molten cracks.
   oreMat.onBeforeCompile = s => {
-    s.fragmentShader = s.fragmentShader.replace('#include <emissivemap_fragment>', ORE_PATCH);
+    s.vertexShader = s.vertexShader
+      .replace('#include <common>', ORE_VERT_HEAD)
+      .replace('#include <begin_vertex>', ORE_VERT);
+    s.fragmentShader = s.fragmentShader
+      .replace('#include <common>', ORE_FRAG_HEAD)
+      .replace('#include <emissivemap_fragment>', ORE_PATCH);
   };
   // an onBeforeCompile edit is invisible to the program cache, so without this the ore can be
   // handed the rock's already-compiled program and the patch silently does nothing
@@ -174,12 +229,14 @@ function place(R, size) {
 
 // One standalone rock. Used for the hero rocks a scenario puts near the camera and by the
 // showroom; the field itself never calls this — it instances.
-export function asteroid(sizeClass, { seed = 0, ore = 0, palette = 'reach' } = {}) {
+// A hand-placed rock is a hero: one draw call either way, so it gets the extra subdivision the
+// craters need to read. The field never gets it — 45 instances at 5k tris is the whole budget.
+export function asteroid(sizeClass, { seed = 0, ore = 0, palette = 'reach', boost } = {}) {
   materials();
   const cls = SIZES[sizeClass] ? sizeClass : 'mid';
   const tier = TIER[cls];
   const R = rnd(0x1a37 + seed * 2654435761 + cls.length * 7919);
-  const g = rockGeom(tier, Math.floor(R() * TIER_SHAPES[tier]));
+  const g = rockGeom(tier, Math.floor(R() * TIER_SHAPES[tier]), boost ?? HERO_BOOST[tier]);
   const mesh = new THREE.Mesh(g, ore > 0 ? oreMat : rockMat);
   const { q, s } = place(R, SIZES[cls]);
   mesh.quaternion.copy(q);

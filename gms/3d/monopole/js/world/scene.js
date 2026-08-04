@@ -483,21 +483,25 @@ export function registerBeltScenarios(app, world) {
       // neutral, so the mix gets pulled toward its own luminance before it is dimmed.
       q.set('fogDensity', 0.00175);
       q.set('fogTint', 0.60);
-      q.set('fogDesat', 0.85);
+      q.set('fogDesat', 1.0);
       q.set('fogLevel', 0.16);
-      q.set('keyPower', 17.0);
-      q.set('fillPower', 0.35);
+      // one hard key and almost nothing else: the crater relief only exists as a terminator, and
+      // a lifted fill fills the bowls back in. Every value in the frame below is deliberate.
+      q.set('keyPower', 21.0);
+      q.set('fillPower', 0.18);
       q.set('fillAngle', 150);
       q.set('fillLift', -26);
-      q.set('ambient', 0.022);
+      q.set('ambient', 0.008);
       // the analytic env is built out of the nebula's own red mid-tone, and on a diffuse rock
       // that lands as a flat pink wash on every up-facing plane. Metal can carry it; rock cannot.
-      q.set('envPower', 0.075);
-      q.set('envFloor', 0.06);
-      q.set('windowGlow', 5.0);
-      q.set('oreGlow', 1.5);
-      q.set('beamGlow', 1.15);
-      q.set('beamWidth', 0.34);
+      q.set('envPower', 0.045);
+      q.set('envFloor', 0.03);
+      // 5.0 blew the rig's bridge glazing into one solid white rectangle the size of the
+      // deckhouse. A daylit belt does not need lit windows to read.
+      q.set('windowGlow', 1.5);
+      q.set('oreGlow', 2.4);
+      q.set('beamGlow', 1.60);
+      q.set('beamWidth', 0.50);
       q.set('rimPower', 2.4);
       q.set('rimDist', 230);
       q.set('rimNear', 120);
@@ -506,17 +510,26 @@ export function registerBeltScenarios(app, world) {
       // 8500_01's background is not black — it is a flat warm grey dust field the whole belt sits
       // in, and it is what every rock loses its contrast into. Fog cannot supply it: fog only
       // tints geometry, and most of this frame is empty. The deep-space floor does.
-      q.set('nebGain', 0.85);
-      q.set('nebRays', 0.4);
-      q.set('nebHalo', 0.02);
+      q.set('nebGain', 0.22);
+      q.set('nebRays', 0.25);
+      q.set('nebHalo', 0.01);
+      q.set('nebBlack', 0.34);
+      q.set('nebContrast', 2.4);
       q.set('nebCoolMass', 0.30);
-      q.set('nebCoolGain', 0.08);
-      q.set('nebAmbient', 0.014);
-      q.set('nebDesat', 0.70);
+      q.set('nebCoolGain', 0.06);
+      q.set('nebCoolNear', 0.55);
+      q.set('nebCoolFar', 1.10);
+      q.set('nebAmbient', 0.008);
+      q.set('nebDesat', 0.78);
       q.set('nebScale', 6.5);
-      q.set('dustField', 0.036);
-      q.set('starBright', 1.4);
-      q.set('starOcclude', 18);
+      q.set('dustField', 0.038);
+      // 8500_01 holds a dense starfield *through* the dust. Ours had none: starOcclude 18 against
+      // a lifted dust field is exp(−2.7), which deletes the whole sky. The stars are most of the
+      // information in that background and they cost nothing — the Points are already drawn.
+      q.set('stars', 1.0);
+      q.set('starBright', 3.4);
+      q.set('starSize', 1.3);
+      q.set('starOcclude', 2.2);
       q.set('flareSize', 16);
       q.set('bloomPower', 0);
 
@@ -530,19 +543,36 @@ export function registerBeltScenarios(app, world) {
       g.add(spur);
 
       // the plate reads five depth planes because every one of them is *occupied*; a mid-field
-      // with nothing in it is the single biggest thing rounds 1–2 were missing
+      // with nothing in it is the single biggest thing rounds 1–2 were missing. Four of these are
+      // cut by a frame edge, which is the other half of why the plate reads as a field the camera
+      // is inside rather than a diorama it is looking at.
       for (const [cls, seed, x, y, z, ore] of [
         ['huge', 4, -206, 104, -320, 0],
+        ['huge', 12, -310, -196, -400, 0],
         ['large', 9, -262, -168, -430, 0.5],
-        ['mid', 17, 96, -70, -215, 0],
+        ['mid', 17, 96, -70, -215, 0.6],
         ['huge', 21, 176, 52, -330, 1],
+        ['huge', 26, 60, 190, -380, 0.85],
+        ['large', 31, -70, 176, -330, 0.7],
+        ['large', 35, 122, -166, -300, 0.6],
+        ['mid', 37, 30, -128, -235, 0],
         ['mid', 33, 74, 96, -690, 0.6],
         ['large', 41, -34, 128, -430, 0.7],
         ['large', 47, 268, -118, -470, 0],
+        ['huge', 51, 372, 118, -470, 0.7],
         ['mid', 53, -104, 22, -300, 0.4],
-        ['mid', 61, 210, 130, -520, 0],
+        ['mid', 61, 210, 130, -520, 0.6],
+        ['huge', 63, -330, 210, -520, 0.8],
+        ['large', 65, 400, 160, -560, 0.75],
         ['large', 67, 60, -150, -560, 0.55],
         ['mid', 73, -240, -40, -540, 0],
+        ['large', 77, 300, -30, -640, 0.4],
+        ['mid', 83, -150, 90, -240, 0],
+        ['mid', 89, 250, -60, -350, 0.5],
+        ['large', 91, 130, -190, -420, 0],
+        ['mid', 97, 236, -130, -290, 0],
+        ['large', 103, 330, -150, -400, 0.5],
+        ['mid', 109, 176, -108, -250, 0.4],
         ['huge', 79, 470, 30, -900, 0.5],
       ]) {
         const r = asteroid(cls, { seed, ore });
@@ -550,17 +580,34 @@ export function registerBeltScenarios(app, world) {
         g.add(r);
       }
 
-      const rig = shipClass('rig', { palette: 'ferrous', seed: 12 });
-      rig.position.set(-50, -33, -124);
-      rig.rotation.set(0.06, -0.68, 0.12);
+      // the plate's subject is a barge across the bottom third at a third of the frame width, fully
+      // in shot. A 52 m rig tucked into the corner is a detail, not a subject — this is a hauler.
+      const rig = shipClass('hauler', { palette: 'ferrous', seed: 12 });
+      rig.position.set(-44, -38, -150);
+      rig.rotation.set(0.13, -0.86, -0.09);
       g.add(rig);
-      engineTrails(rig, { color: '#ffbe6a', length: 1.0, width: 1.15 });
+      engineTrails(rig, { color: '#ffbe6a', length: 1.1, width: 1.2 });
 
+      const mate = shipClass('rig', { palette: 'ferrous', lod: 1, seed: 12 });
+      mate.position.set(-176, 34, -300);
+      mate.rotation.set(0.08, -0.5, 0.06);
+      g.add(mate);
+      engineTrails(mate, { color: '#ffbe6a', length: 0.9, width: 0.9 });
+
+      // the scale pair: a 38 m escort parked against a 140 m rock at the same depth, and a tug a
+      // third that size further in. Nothing else in the frame tells you how big any of it is.
       const esc = shipClass('escort', { palette: 'corvain', seed: 4 });
-      esc.position.set(120, -110, -300);
+      esc.position.set(112, -32, -292);
       esc.rotation.set(0.04, -0.9, 0.03);
       g.add(esc);
       engineTrails(esc, { color: '#8fd6ff', length: 0.9, width: 1 });
+
+      const tug = shipClass('escort', { palette: 'ferrous', lod: 1, seed: 21 });
+      tug.position.set(196, 122, -286);
+      tug.rotation.set(0.1, -1.9, 0.05);
+      tug.scale.setScalar(0.42);
+      g.add(tug);
+      engineTrails(tug, { color: '#ffbe6a', length: 0.8, width: 0.7 });
 
       for (const [cls, x, y, z, ry] of [['hauler', -420, 160, -1500, 1.3], ['rig', 380, -180, -1000, 2.1]]) {
         const o = shipClass(cls, { palette: 'corvain', lod: 1, seed: Math.abs(x) });
@@ -569,29 +616,35 @@ export function registerBeltScenarios(app, world) {
         g.add(o);
       }
 
-      // both beams land on the same rock and cross the frame on its long diagonal
+      // two cuts on two different rocks, so the beams cross the frame on a diagonal and each
+      // other near the middle. Both emitters sit forward of the deckhouse — an emitter behind the
+      // hull's midpoint lays the core straight along the hull and blows the whole ship white.
       rig.updateMatrixWorld(true);
-      const em1 = rig.localToWorld(new THREE.Vector3(3.4, 4.2, -20));
-      const em2 = rig.localToWorld(new THREE.Vector3(-4.0, -1.6, 14));
+      const em1 = rig.localToWorld(new THREE.Vector3(6.0, 3.4, -30));
+      const em2 = rig.localToWorld(new THREE.Vector3(-6.4, 0.6, -22));
       g.add(beams([
         // the endpoints land on the rock's near face, not at its centre: an impact flare buried
         // inside the mesh is depth-tested away and the beam simply stops in mid air
         { from: em1, to: new THREE.Vector3(142, 46, -266) },
-        { from: em2, to: new THREE.Vector3(156, 30, -272) },
-      ], { color: '#8df0c8', width: 1.1, glow: 1, dust: 1.5, impact: 2.4, ejecta: 20 }));
+        { from: em2, to: new THREE.Vector3(48, 148, -338) },
+      ], { color: '#8df0c8', width: 1.25, glow: 1, dust: 1.5, impact: 2.2, ejecta: 22 }));
 
       g.add(motes({ count: 340, radius: 170, center: [-16, -18, -150], spread: [1.7, 0.7, 1.6], size: 0.4, seed: 9 }));
       g.add(debris({ count: 80, radius: 240, center: [10, -10, -300], spread: [1.5, 0.7, 1.4], size: 1.7, seed: 4 }));
+      // spall: lit chips coming off the cut, not additive. They are what stops the impact reading
+      // as a sprite — solid rock catching the same key as the rock it came off.
+      g.add(debris({ count: 34, radius: 40, center: [150, 40, -272], spread: [1, 1, 0.7], size: 2.6, seed: 77 }));
+      g.add(debris({ count: 22, radius: 34, center: [52, 142, -336], spread: [1, 1, 0.7], size: 2.2, seed: 91 }));
 
       g.add(atmosphere({
         seed: 4,
         layers: [
           { count: 5, center: [90, -30, -540], size: [800, 240, 200], scale: [460, 700],
-            aspect: 1.8, color: '#8e7d6c', power: 0.16, variant: 3 },
+            aspect: 1.8, color: '#8b8279', power: 0.17, variant: 3 },
           { count: 16, center: [20, -14, -260], size: [820, 360, 420], scale: [150, 340],
-            color: '#9b8571', power: 0.16, variant: 2 },
+            color: '#968b80', power: 0.17, variant: 2 },
           { count: 8, center: [-10, -34, -110], size: [460, 240, 140], scale: [80, 190],
-            color: '#b09a80', power: 0.18, variant: 2 },
+            color: '#a89d90', power: 0.19, variant: 2 },
         ],
       }));
 
@@ -731,114 +784,175 @@ export function registerBeltScenarios(app, world) {
 // ── planet ───────────────────────────────────────────────────────────────────
 
 export function registerPlanetScenarios(app, world) {
-  // 244160_15c is a backlight shot: the star sits *behind* the fleet, the hulls fall to near
-  // black on the camera side and hold a thin hot rim, and the medium around the star washes the
-  // far ranks pale. Rounds 1–2 put the key upper-left on the camera's own side and every hull
-  // came out front-lit into a mid-grey smudge at the same value as the gas behind it.
-  //
-  // The rim key is a point at rimDist along the star bearing, so rimNear/rimFall have to cover
-  // the depth the fleet actually occupies — at the old 90 m the rim was off for every hull here.
+  // 244160_15c is a night sky with a bloom in it, not a sunset. Two hues: a deep navy field with
+  // a dense starfield through it, and one pale wash around the star on the right. The hulls are
+  // *mid-value with surface on them* — the key is a three-quarter light from the camera's upper
+  // left and the star is a composition element, not the key. Round 4's version put the star
+  // behind the fleet, which turned every hull into a black cut-out and the sky into a sunset:
+  // both wrong, and both for the same reason — the star had been made to do the key's job.
   defineScenario({
     id: 'planet_limb',
     label: 'Ossian limb',
     ref: '244160_15c',
     setup(a) {
       const q = a.quality;
-      q.set('starAz', -30);
-      q.set('starEl', -9);
-      q.set('keySwing', 0);
-      q.set('keyLift', 0);
-      q.set('fogDensity', 0.0011);
-      q.set('fogTint', 0.52);
-      q.set('fogDesat', 0.45);
-      q.set('fogLevel', 0.60);
-      q.set('keyPower', 11.0);
-      q.set('fillPower', 0.55);
-      q.set('fillAngle', 150);
-      q.set('fillLift', -20);
-      q.set('ambient', 0.046);
-      q.set('envPower', 0.46);
-      q.set('envFloor', 0.03);
-      q.set('windowGlow', 4.2);
-      q.set('planetRim', 0.85);
-      q.set('planetScatter', 0.95);
-      q.set('planetBands', 1.1);
-      q.set('rimPower', 12.0);
-      q.set('rimWidth', 3.0);
+      q.set('starAz', 30);
+      q.set('starEl', -3);
+      // The star is in frame at −Z, so *any* swing under 60° is still a backlight — the key only
+      // starts front-lighting once keyDir.z goes positive, which for a star at az 30 needs a
+      // swing past 120°. 140° puts it over the camera's right shoulder, on the same side of frame
+      // as the star, which is where 244160_15c's key plainly is.
+      q.set('keySwing', 140);
+      q.set('keyLift', 24);
+      q.set('fogDensity', 0.00085);
+      q.set('fogTint', 0.94);
+      q.set('fogDesat', 0.30);
+      q.set('fogLevel', 0.55);
+      q.set('keyPower', 28.0);
+      q.set('fillPower', 1.55);
+      q.set('fillAngle', 118);
+      q.set('fillLift', -34);
+      q.set('ambient', 0.012);
+      // the analytic env ramps cool→mid→hot with distance from the star, so a wide falloff makes
+      // the whole sphere orange and every hull in frame with it. 5.5 keeps the warm inside 25°.
+      q.set('envPower', 0.90);
+      q.set('envFalloff', 5.5);
+      q.set('envFloor', 0.10);
+      q.set('windowGlow', 3.0);
+      q.set('planetRim', 0.9);
+      q.set('planetScatter', 0.55);
+      q.set('planetBands', 0.55);
+      q.set('planetTerm', 0.6);
+      q.set('planetTint', 0.72);
+      q.set('planetHalo', 7.5);
+      // the fleet spans 150–1400 m, so a rim key at the default 90 m is off for every hull in it.
+      // rimWidth is the *exponent*: at 2.6 with rimNear 340 the whole near half of the fleet was
+      // inside one broad orange wash and every hull read as an orange smear, which is exactly the
+      // mistake gotcha 34 records on the planet limb.
+      q.set('rimPower', 1.8);
+      q.set('rimWidth', 5.5);
       q.set('rimDist', 520);
       q.set('rimNear', 340);
       q.set('rimFall', 420);
       q.set('bouncePower', 0.15);
-      q.set('flareSize', 30);
-      q.set('flarePower', 0.85);
-      q.set('flareSpikes', 0.08);
-      q.set('flareStreak', 0.10);
-      q.set('flareHalo', 2.6);
-      q.set('bloomPower', 0.14);
-      q.set('bloomSize', 46);
-      // the plate's sky is a cool gradient with a pale wash round the star. A saturated warm
-      // field at the hulls' own value gives them nothing to be cut out of, which is the whole
-      // reason a backlight was worth moving the star for.
-      q.set('nebGain', 0.15);
-      q.set('nebDensity', 0.45);
-      q.set('nebContrast', 2.3);
-      q.set('nebBlack', 0.32);
-      q.set('nebDesat', 0.76);
-      q.set('nebScale', 3.0);
-      q.set('nebDetail', 0.20);
-      q.set('nebScatter', 0.40);
-      q.set('nebGlow', 0.40);
-      q.set('nebHalo', 0.07);
-      q.set('nebBroad', 9.5);
-      q.set('nebFalloff', 1800);
-      q.set('nebRays', 0.6);
+      q.set('flareSize', 26);
+      q.set('flarePower', 0.55);
+      q.set('flareSpikes', 0.0);
+      q.set('flareStreak', 0.04);
+      q.set('flareHalo', 4.6);
+      q.set('flareBreak', 0.16);
+      q.set('plumePower', 0.30);
+      q.set('engineGlow', 0.7);
+      q.set('flareTint', 1.0);
+      // the pale wash round the star is this quad, not the gas. starChromaB tops out at 0.8 rad,
+      // so the *baked* halo is already orange by 30° off the star and can never supply it — the
+      // bake's halo is off here and the tinted glow quad does the whole job.
+      q.set('bloomPower', 0.85);
+      q.set('bloomSize', 78);
+      q.set('bloomFalloff', 2.0);
+      q.set('bloomCore', 0);
+      // on a 78° quad the anamorphic streak is a bright line clean across the frame
+      q.set('bloomStreak', 0);
+      // two hues, and the warm one is switched almost all the way off. Everything that used to be
+      // orange here — gas, halo, flare, planet limb — is on a knob now and every one is cooled.
+      q.set('nebGain', 0.012);
+      q.set('nebHue', 0.30);
+      q.set('nebDensity', 0.30);
+      q.set('nebContrast', 2.6);
+      q.set('nebBlack', 0.36);
+      q.set('nebDesat', 0.80);
+      q.set('nebScale', 2.4);
+      q.set('nebScatter', 0.04);
+      q.set('nebGlow', 0.06);
+      q.set('nebHalo', 0.02);
+      q.set('nebBroad', 9.0);
+      q.set('nebFalloff', 2400);
+      q.set('nebCore', 0.20);
+      q.set('nebRays', 0.0);
+      // the blue is the whole sky here, not a patch at the edges: the plate's field is a lit navy
+      // (mean channel 46/52/72), not black. Cool mass wide, cool gain high, warm gain near zero.
       q.set('nebCoolMass', 2.0);
-      q.set('nebCoolGain', 0.95);
-      q.set('nebCool', 0.34);
-      q.set('nebCoolNear', 0.16);
-      q.set('nebCoolFar', 0.42);
-      q.set('nebAmbient', 0.012);
-      q.set('nebFloor', 0.16);
-      // the wide halo has to stay pale: an orange wash at the hulls' own value is not a backlight
-      q.set('starChromaA', 0.16);
+      q.set('nebCoolGain', 0.34);
+      q.set('nebCool', 0.30);
+      q.set('nebCoolNear', 0.02);
+      q.set('nebCoolFar', 1.20);
+      q.set('coolField', 0.17);
+      q.set('nebAmbient', 0.002);
+      q.set('nebFloor', 1.60);
+      q.set('starChromaA', 0.22);
       q.set('starChromaB', 0.80);
-      q.set('dustField', 0.008);
+      q.set('dustField', 0.004);
+      // the plate's black holds a full magnitude-sorted starfield right down to the halo's edge
+      q.set('stars', 1.0);
+      q.set('starBright', 4.2);
+      q.set('starSize', 1.5);
+      q.set('starOcclude', 2.0);
 
       const g = new THREE.Group();
-      // pushed out and down until the disc is a corner arc rather than half the frame: the plate
-      // gives the planet an eighth of the picture and the fleet the rest
+      // an eighth of the picture at most, in the corner opposite the star, and it must be a
+      // *lit* sliver — a black disc with a ring round it is not a limb, it is a hole
       const p = planet('ossian');
-      p.position.set(8490, -5210, -8505);
+      p.position.set(-9080, -8950, -9660);
       g.add(p);
 
-      // one hull big enough to survive a thumbnail, a 30 m escort beside it for the known-small,
-      // and four ranks running back into the wash
-      for (const [cls, x, y, z, ry, sc, lod] of [
-        ['hauler', -11, -18, -147, 1.22, 1, 0], ['escort', -74, -54, -186, 0.85, 1, 0],
-        ['hauler', 99, 16, -413, 1.34, 1, 0], ['escort', -170, -96, -300, 1.05, 1, 0],
-        ['rig', -423, -77, -679, 1.18, 1, 1], ['hauler', -348, 75, -760, 1.45, 1, 1],
-        ['escort', -288, 327, -1376, 1.6, 1, 2]]) {
-        const o = shipClass(cls, { palette: 'ferrous', lod, seed: Math.abs(x) });
+      // The scale ladder, and the reason round 4 failed it: sixteen hulls all broadside at 1.3 rad
+      // are sixteen horizontal slivers at the same apparent thickness, and no two of them tell you
+      // anything about each other's size. Three-quarter rear yaws (0.6–0.95) with real pitch show
+      // a hull's mass, and the near ones are close enough to *be* mass.
+      for (const [cls, x, y, z, rx, ry, rz, lod] of [
+        ['hauler', 30, -12, -122, 0.20, 0.78, 0.24, 0],
+        ['hauler', -108, 66, -205, 0.14, 0.92, -0.18, 0],
+        ['rig', -158, -76, -224, 0.26, 0.64, 0.30, 0],
+        ['escort', 128, 52, -268, 0.18, 0.84, 0.12, 0],
+        ['escort', -42, -104, -300, 0.22, 0.70, -0.14, 0],
+        ['rig', -190, 10, -330, 0.20, 0.80, 0.18, 1],
+        ['escort', -300, 96, -400, 0.16, 0.66, -0.10, 2],
+        ['escort', -100, -190, -470, 0.18, 0.92, 0.08, 2],
+        ['rig', 300, -38, -430, 0.16, 0.88, 0.10, 2],
+        ['hauler', -370, 148, -560, 0.12, 0.74, -0.08, 2],
+        ['escort', 190, 176, -520, 0.20, 0.96, 0.06, 2],
+        ['escort', -520, -150, -700, 0.18, 0.62, 0.14, 2],
+        ['hauler', 470, -140, -760, 0.10, 0.82, 0.04, 2],
+        ['rig', -260, 268, -900, 0.14, 0.90, -0.06, 2],
+        ['escort', 640, 120, -980, 0.16, 0.76, 0.08, 2],
+        ['hauler', 860, 236, -1420, 0.08, 0.80, 0.02, 2],
+      ]) {
+        const o = shipClass(cls, { palette: 'ferrous', lod, seed: Math.abs(x) + 3 });
         o.position.set(x, y, z);
-        o.rotation.set(0.04, ry, 0.03);
-        o.scale.setScalar(sc);
+        o.rotation.set(rx, ry, rz);
         g.add(o);
+        // engineTrails is two draw calls a ship — a merged ribbon and a Points — which makes it the
+        // biggest lever on this scenario's call count, bigger than the hulls
+        if (z > -320) engineTrails(o, { color: '#ffe7cf', length: 0.26, width: 0.5, power: 0.28 });
       }
 
-      // the medium the star is shining through — it is what turns a backlight into a halo the
-      // hulls can be cut out of
+      // the flight of escorts running in from the star side, cut out against the halo. Their
+      // trails are the only cool light in the frame and they are what the eye reads as "far".
+      for (const [x, y, z, ry] of [[780, 30, -760, 0.72], [880, 92, -860, 0.72],
+        [960, -30, -930, 0.72], [1070, 54, -1040, 0.72]]) {
+        const o = shipClass('escort', { palette: 'corvain', lod: 2, seed: x });
+        o.position.set(x, y, z);
+        o.rotation.set(0.1, ry, 0.02);
+        g.add(o);
+        engineTrails(o, { color: '#bfe8ff', length: 2.6, width: 0.5, power: 1.4 });
+      }
+
+      // dust between the ranks. Without it the gaps between hulls are the same value as the gaps
+      // at the frame edge and the fleet has no depth at all.
       g.add(atmosphere({
         seed: 11,
         layers: [
-          { count: 3, center: [-320, -180, -720], size: [900, 400, 300], scale: [620, 900],
-            aspect: 1.5, color: '#c98a4e', power: 0.16, variant: 3 },
-          { count: 10, center: [-180, -110, -320], size: [820, 420, 420], scale: [90, 260],
-            color: '#e2a86e', power: 0.11 },
+          { count: 4, center: [520, -60, -900], size: [1400, 700, 500], scale: [700, 1100],
+            aspect: 1.6, color: '#b9c6dc', power: 0.13, variant: 3 },
+          { count: 12, center: [60, -60, -420], size: [1200, 600, 600], scale: [140, 380],
+            color: '#8fa3c2', power: 0.085 },
+          { count: 8, center: [-260, 40, -240], size: [700, 380, 220], scale: [90, 220],
+            color: '#9db0cc', power: 0.075, variant: 2 },
         ],
       }));
 
       world.setSubject(g);
-      frameCamera(a, { pos: [0, 0, 0], look: [40, -20, -300], fov: 60 });
+      frameCamera(a, { pos: [0, 0, 0], look: [40, -12, -300], fov: 58 });
     },
   });
 

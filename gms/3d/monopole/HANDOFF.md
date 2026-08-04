@@ -2837,3 +2837,106 @@ console errors.
 - `meta_instagram` is the story that will go stale next. Meta's answering brief lands 20 August 2026
   and the D.C. Circuit will rule some time after that. The `year` field, the last paragraph and
   `outcome` all need revisiting when it does.
+# Session 12 — round 5 on `belt_work` and `planet_limb`
+
+Blind critics scored `belt_work` 4.3 / 8.0 and `planet_limb` 4.5 / 8.3. This session is those two
+shots only. Files touched: `js/world/kit/belt.js`, `js/world/kit/planet.js`, `js/world/fx.js`,
+`js/world/backdrop.js`, and **only** the two scenario blocks in `js/world/scene.js`.
+`station.js`, `ship.js`, `lighting.js` and `atmos.js` were not touched.
+
+## `belt_work` — 132 → 134 calls, 160k → 268k tris, 12.1 MB tex
+
+- **Craters.** `rockGeom` now carves 3–6 bowls with raised rims per shape. That is the whole
+  answer to "one noise-bumped potato": a bowl under a hard key casts its own terminator, and no
+  amount of displacement noise does. `TIER_SHAPES` 2/3/5 and `TIER_DETAIL` 1/3/5, plus a
+  `HERO_BOOST` so a hand-placed rock gets 2880 triangles instead of 320. The field does not — 45
+  instances at hero detail is the whole triangle budget.
+- **Per-rock ore.** The ore shader hashes the *instance translation* into `vOreSeed` (the only
+  per-rock value a shader can see on an `InstancedMesh`) and uses it to slide the vein uv and move
+  the threshold, so no two rocks carry the same network. A three-sine object-space `pocket` mask
+  confines the ore to a few regions; the vein atlas cannot gate itself because it is far too
+  sparse to survive being sampled at a coarse scale.
+- **Stars.** There were none. `starOcclude` 18 against a lifted `dustField` is `e^-2.7`, which
+  deletes the whole sky. 2.2 / `starBright` 3.4 / `stars` 1.0.
+- **Grade.** `nebGain` 0.85 → 0.22, `nebBlack` 0.34, `fogDesat` 1.0, key 17 → 21 with `ambient`
+  0.008 and `envPower` 0.045. Background is a neutral warm grey with a full starfield in it.
+- **Beams.** New **muzzle fan** in `fx.js` — a long shallow cone from 5 % to 82 % of the run,
+  widening away from the emitter. The impact flare stack went from a 46w blob to a 2.4w hot point
+  with a dim skirt, and two `debris()` clouds sit at the two cut faces as spall.
+- **Subject and scale.** The 52 m rig is now an 84 m hauler at a third of the frame width across
+  the bottom, one 38 m escort and one 0.42-scale tug parked against a 140 m rock, and twenty-three
+  hand-placed rocks with four cut by a frame edge.
+
+## `planet_limb` — 72 → 141 calls, 62k → 77k tris, 13.4 MB tex
+
+Round 4's premise was wrong. 244160_15c is a **night sky with a bloom in it**, not a sunset: two
+hues, a lit navy field and one pale wash, and the hulls are mid-value with surface on them. The
+star is a composition element, **not the key**.
+
+- **The key had to come over the camera's shoulder.** With the star in frame at −Z, any
+  `keySwing` under 60° is still a backlight — `keyDir.z` only goes positive past ~120° for a star
+  at az 30. 140° / lift 24 front-lights the hulls from the same side of frame the star is on.
+- **`rimWidth` was the orange.** At 2.6 with `rimNear` 340 every near hull sat inside one broad
+  wash and read as an orange smear — gotcha 34 again, on hulls this time. 1.8 / 5.5 gives an edge.
+- **`envFalloff` was the rest of it.** The analytic env ramps cool→mid→hot with angle from the
+  star, so a wide falloff makes the whole sphere orange. 5.5 keeps the warm inside 25°.
+- Three new knobs, all default-neutral so nothing else moves: **`flareTint`** (flare + glow toward
+  white — the palette's star is a K-type orange and every backlit shot inherited it),
+  **`coolField`** (a smooth cool sky field with a slow gradient toward the star; every other term
+  in the bake is cloud-modulated and far too lumpy to be a night sky), and **`bloomCore`** (the
+  glow quad carries the flare's core, so raising it for a wide wash also clipped a hard white disc
+  over the star — 0 leaves it pure halo). Plus **`planetTint`** in `planet.js`.
+- **The planet is lit by the star, never by the key.** `updatePlanetLighting` used
+  `lighting.keyDir`; a scene that swings the key round to front-light its hulls also front-lit the
+  planet and the crescent vanished. It reads `backdrop.dir` now — a no-op for every other
+  scenario, all of which run `keySwing 0`.
+- **Scale.** Eighteen hulls at three-quarter rear yaws (0.62–0.96) with real pitch, from an 84 m
+  hauler at 122 m down to lod-2 escorts at 1.4 km, plus a flight of four Corvain escorts cutting
+  across the halo. Round 4's sixteen broadside hulls at 1.3 rad were sixteen identical slivers.
+
+## Gotchas — session 12
+
+73. **`PolyhedronGeometry` subdivides each edge into `detail+1`, so faces are 20·(detail+1)², not
+    20·4^detail.** Raising `IcosahedronGeometry`'s detail from 3 to 4 is 320 → 500 triangles, not
+    1280 → 5120, and the "+1 for hero rocks" that was meant to make craters readable did nothing
+    at all — the triangle count moved by 1k and looked like a no-op bug.
+74. **The only per-instance value a shader can see on an `InstancedMesh` is `instanceMatrix`.**
+    `modelMatrix * instanceMatrix * vec4(0,0,0,1)` in the vertex shader hashed into a varying is
+    what makes one shared material paint every rock differently. Guard it with
+    `#ifdef USE_INSTANCING` so the standalone hero rocks still compile.
+75. **`veinAtlas` is far too sparse to be its own regional mask.** Roughly nothing is above 0.5, so
+    sampling it at a coarse uv to decide *where* ore lives returns zero nearly everywhere and the
+    ore disappears entirely. A product of three object-space sines is the cheap correct answer.
+76. **`engineTrails` is two draw calls a ship** — a merged ribbon mesh and a `Points`. Twelve
+    trails put `planet_limb` at 165 calls, over the 150 budget, and the hulls were not the problem.
+77. **The `bloomStreak` default of 0.2 on a 78° glow quad is a bright horizontal line clean across
+    the frame.** It reads as a compositing seam, not as an anamorphic flare.
+78. **A knob without a schema `default` leaks between showroom scenarios** (`stars`, `nebDetail`,
+    `viewDist`, …) because `resetDefaults` cannot restore it. `belt_work` and `planet_limb` both
+    set `stars` deliberately; `tools/shot.mjs` reloads the page per shot so `--all` is unaffected,
+    but the showroom will carry it into whatever scenario runs next.
+79. **`tools/compare.mjs`'s `REFS` path breaks inside a git worktree.** It is four levels up from
+    the project root, which is correct in `site/` and wrong anywhere else. Build the sheet by hand
+    with the same ffmpeg `hstack` if you are working in a worktree; do not "fix" the path.
+
+## Honest scores, judged on the comparison sheets at sheet scale
+
+- **`belt_work` ~6.5** (was 4.3). Reads as a sibling of the plate: crater relief with real
+  terminators, ore in pockets rather than stencilled on, a full starfield through a neutral grey
+  medium, beams with a muzzle fan and a hot compact impact, an 84 m hauler running off the left
+  edge with a known-small escort against a known-huge rock. Still short of the plate on hull
+  colour — the plate's subject is saturated yellow and blue and is the whole value story, ours is
+  grey with orange trim — and on the sheer count of ore rocks along the top.
+- **`planet_limb` ~6.5–7** (was 4.5). Now genuinely two hues, an unambiguous key direction, hulls
+  that are mid-value with panel detail against a pale halo, a real size ladder and a planet that
+  is a lit corner arc. Short of the plate on hull *mass*: the ship kit's 7:1 wedges will always
+  read thinner than the plate's blocky frigates, and no amount of framing fixes that.
+
+## What is short — next version
+
+- **A pale panel on the hauler's deckhouse blows to near-white at any `keyPower` over ~10** and it
+  is the one thing in `belt_work` that reads as a rendering artefact rather than as a ship. It is
+  albedo, not exposure — at key 2 it is a pale grey box with plate lines on it. A `ship.js` fix,
+  out of scope here; pitching the hull to 0.13 / −0.09 hides most of it.
+- `belt_work`'s hull wants the plate's saturated two-colour paint scheme. That is a palette job.
+- `planet_limb` could use two more *large* hulls; the plate has three that read as objects.
