@@ -2940,3 +2940,189 @@ star is a composition element, **not the key**.
   out of scope here; pitching the hull to 0.13 / −0.09 hides most of it.
 - `belt_work`'s hull wants the plate's saturated two-colour paint scheme. That is a palette job.
 - `planet_limb` could use two more *large* hulls; the plate has three that read as objects.
+# Session 12 — second pass on `hero_hull` and `station_night`
+
+Two shots, briefed off a critic that named one bug on `hero_hull` ("unclamped nebula bloom blows
+the upper hull to near-white, and every other weakness on that side is downstream of it") and one
+on `station_night` ("kill the flat ambient and put in one hard key — the boxes have no dark side").
+Both diagnoses were right, and in both cases the named fix was the cheap half of the work.
+
+**Owned this session:** `js/world/kit/station.js`, `js/world/kit/ship.js`, `js/engine/post.js`, and
+only the `hero_hull` / `station_night` blocks of `js/world/scene.js`. `geom.js`, `materials.js` and
+`lighting.js` were read and left alone — nothing needed changing in them.
+
+## `hero_hull`
+
+**The blowout was two things multiplied, and only one of them was the bloom.**
+
+1. `nebGain 1.9` put the cloud directly behind the dorsal *hotter than the deck in front of it*, so
+   the silhouette was inverted exactly where it should have been strongest.
+2. `post.js` composited `scene + bloom × strength` with **no clamp at all**. Anything over 1.0 hard
+   clipped to flat white, and the clipped region was a solid shape with no gradient in it.
+
+Fixes, in that order:
+
+- **`bloomShoulder` (new knob, default 1.0 = the old hard clamp).** `COMP_FRAG` now runs the sum
+  through `shoulder()`: below `k` nothing moves, above `k` the excess rolls into the last stop
+  (`e / (1 + e / (1 − k))`, which maps `k → k` and `∞ → 1`). `hero_hull` runs 0.72. **Default 1.0
+  is a genuine no-op, so no other scenario changed.**
+- Nebula pulled back for this shot only: `nebGain 1.05`, `nebCore 0.55`, `nebGlow 0.62`,
+  `nebHalo 0.02`; bloom `threshold 0.86 / knee 0.16 / strength 0.44`.
+- **`keyLift 28`.** With a 10° key the deck was dark and the *risers* were what blew — `keyPower 58`
+  was compensating for a key that never reached the dorsal. Lifting the key off the star bearing
+  (the star does not move, so the flare is untouched) put the light where it belongs and `keyPower`
+  came down to **19**.
+
+**Micro-panelling — `hullPanel`, new knob, default 0.** A world-space plate grid in `patch()`,
+projected onto whichever axis pair the normal is furthest from. Two rectangular-cell frequencies
+plus one fine square one, each row offset by `floor(cell.y) × k` — **a square grid reads as
+brickwork at every scale, and that was the first version.** Each cell gets a seam at its edges, a
+hash value jitter and a roughness bump in the seam. This is the detail that has to survive a
+thumbnail; the plate map alone averages to grey the moment the hull is 200 px wide. Runs 0.68 here.
+
+**The engine wash.**
+- `plume()` now emits **three nested open cones** instead of one tube — radius ×1.3/×2.2/×3.6,
+  length ×1.0/×1.45/×2.1, power ×1.0/×0.32/×0.11, falloff exponent 2.4/1.7/1.2. Additively they
+  integrate to a soft radial profile with a core, and because each shell dies at a different
+  distance the wash has no edge to find. That is what the critic meant by "flat white capsules that
+  terminate with a hard edge". It applies to every ship in every scene and improves all of them.
+- **`engineWash`, new knob, default 0.** A third bounce point (`uB2`) in the ship shader at the
+  nozzle plane, in the palette's engine hue, with the same inverse-square falloff the hangar and
+  bridge bounces already use. That is the "visible inverse-square falloff onto the hull skin".
+  Runs 1.5 here.
+- One `atmosphere()` call added (**+1 draw call**) — this was the only scenario in the set still
+  rendering vacuum as literally empty.
+
+## `station_night`
+
+**The flatness was a material bug, not a lighting one.** Station surfaces inherit the ship palette's
+`metalness` (0.86–0.9). A MeshStandardMaterial at that metalness **has no diffuse term**, so a
+directional key contributes a specular lobe nobody sees at this angle and every face falls back to
+whatever the env map hands it. That is why the last pass's key did nothing, and why its four
+short-range point lights "did not read" — they could not.
+
+- **`stationPaint`, new knob, default 0 (nothing changes).** Lerps `metalness → base × (1 − 0.86p)`
+  and `roughness → base + 0.22p`. At 0.86 the boxes are painted plate and the key finally has
+  something to shade. **This is the single change that gave the shot form.** Every other lighting
+  number then had to come *down*: `keyPower 13 → 6.2`, `ambient 0.006 → 0.002`,
+  `envPower 0.22 → 0.07`, `stationPlane 0.45 → 0.30`.
+- One hard key at `keyLift 34`, plus a real coloured fill (`fillPower 1.15`, `fillAngle 128`).
+
+**Dock spill — `setStationSpill(list)` + `spillPower`, default 0.** An eight-slot uniform array of
+`[x, y, z, radius, colour, gain]` read by the station shader: inverse-square from a finite radius,
+`N·L` so a wall facing away stays black. **Real point lights are wasted on this kit** — the whole
+station is four merged meshes, so the cost is per-fragment either way and the uniform array costs no
+draw call. Two things that matter:
+- **The source has to sit above the deck plane.** Level with the mouth it pools on walls and never
+  on the plates, which is the exact failure the critic described.
+- **0.42 floods the truss orange; 0.16 is right.** The falloff is not the limit, the count is.
+
+Six warm sources on the near dock line, two cool ones down the row — one hue on its own is not a
+grade.
+
+**Density that varies.** `bay()`'s greeble was a flat scatter over the whole module. It now runs
+through a two-lobe cluster function (peaks at the dock end and the inner end, near-zero over the
+middle third), and the kinds are pipe runs / stanchion-and-rail / crates instead of one box type.
+The middle third gets **five long shallow seams and nothing else** — the calm plate run is what
+makes the clusters read as clusters. A dead-regular railing runs the outer deck edge at the dock
+end only. All of it merges into the existing buckets: **zero extra draw calls.**
+
+**Value inside the bay.** The pale deck plates ran the full 38 m, which made the whole row one beige
+field. They are now `W × 0.30` with a dark coaming capping each outer edge, and 55 % of the deck
+greeble moved to the `dark` bucket. The plate is a *dark* machine with pale plates set into it, not
+a pale machine.
+
+**The dock mouth is a slot now,** not a lit wall the size of the bay — a flat emissive rectangle
+that big reads as a screen bolted to the front and swallows its own collar. `station_haze` gets this
+too and is better for it.
+
+**Composition.** `ledger`'s `spine` module moved from `[128, 52, −40]` to `[200, 44, 10]` — berthed
+*down the middle of the row* instead of floating off one shoulder. 8500_06 is twenty grey bays with
+one orange hull lying along them, and where that hull sits is most of the read. The far Dray Yard
+moved to `(950, −60, 60)` to bridge the gap at frame centre-right, and a **third structure layer**
+(ferrous Dray Yard, ×1.6, at `(1250, −330, 300)`) fills the right half, which was empty sky against
+a plate that fills every pixel. `dustField 0.016` puts a value in the top-left quarter.
+
+## Depth of field — `js/engine/post.js`, default off
+
+A **tilt band, not a depth blur**: no depth buffer, no per-pixel CoC. The scene is blurred once at
+half res (two separable taps) and the composite mixes sharp → blurred on
+`smoothstep(uIn, uOut, |dot(uv − 0.5, axis) − centre|)`.
+
+**Two things that will cost you time if you copy the numbers wrong:**
+1. **The band works in `vUv − 0.5`, which is half NDC.** Every threshold is half what the same
+   distance is in NDC. The first tuning pass was off by exactly 2× and the effect looked broken.
+2. **`dofNearSide` exists because a symmetric band defocuses the subject.** `station_night`'s row
+   runs 185 m → 600 m across the frame, so it occupies most of the band's own axis and a symmetric
+   band blurred the near bays along with the background. The near side's distance is scaled by
+   `dofNearSide` (0.16 here) so only the far half really goes.
+
+**Cost, measured at `--preset=medium --dpr=1 --w=844 --h=390`: +2 draw calls, +0.7 MB texture,
+0 triangles**, GPU delta inside run-to-run noise. `station_night` 121 → 123 calls.
+
+## Numbers — `--preset=medium --dpr=1 --w=844 --h=390`
+
+| | calls | tris | texMB |
+|---|---|---|---|
+| budget | < 150 | < 350k | < 60 |
+| `hero_hull` (was 65 / 19k / 13.4) | **66** | 20k | 13.4 |
+| `station_night` (was 107 / 77k / 13.4) | **123** | 111k | 14.1 |
+
+`station_night`'s +16 is the third structure layer (+14) and the DOF (+2). Nothing else in the
+session cost a draw call — the module vocabulary, the spill and the panelling are all free, which
+was the constraint.
+
+All eleven scenarios render clean. `station_haze` (dock-mouth slots, deck plates, greeble clusters),
+`belt_work`, `fleet_line`, `nebula_back` and `hull_close` (nested plumes) were checked frame by
+frame against their previous renders and all changed only for the better. Every new knob defaults to
+the old behaviour, so nothing outside these two scenarios moved by accident.
+
+## Gotchas — session 12
+
+50. **`-((t - c) / w) ** 2` is gotchas 11 and 38 for the third time.** It threw
+    `SyntaxError: Unary operator used immediately before exponentiation expression` in
+    `station.js`'s cluster function and cost one render. Wrap it: `-(((t - c) / w) ** 2)`.
+51. **A second composite quad needs the render call changed too.** Adding `dofComp` beside `comp`
+    and selecting between them at the top of `render()` still left `this.comp.render(renderer)` in
+    both branches at the bottom. The frame went **entirely black with no console error**, because
+    the quad that actually drew had never had its `tDiffuse` set. If a post pass renders black and
+    nothing is logged, look for a texture uniform that was assigned to the object you are not
+    drawing.
+52. **`roughnessmap_fragment`, not `map_fragment`, is where a hull shader wants to touch
+    `diffuseColor`.** Three emits `map_fragment` before `color_fragment`, so anything written there
+    is multiplied by the vertex colours afterwards, and `roughnessFactor` does not exist yet. The
+    panel grid needs both, so it hooks `roughnessmap_fragment` — `diffuseColor` is still in scope
+    there and vertex colours have already landed.
+53. **Two `.replace()` calls on the same `#include` both hit**, because each replacement re-emits
+    the include line. The order is the order you called them in, which is not obvious when the two
+    hooks are 40 lines apart. Bump `customProgramCacheKey` whenever either changes, or the program
+    cache serves the old shader (gotcha 39 again).
+54. **`--eval` runs after the screenshot; `--pre` runs before it.** An A/B done with `--eval` looks
+    identical to the control every time. It is documented in `shot.mjs` and still cost a render.
+
+## Honest scores, judged at sheet scale
+
+- **`hero_hull` ~6** (was 5.0). The named bug is gone: the hull holds a dark value against the red
+  field, the dorsal reads as continuous structure at thumbnail size, and the plumes are soft cones
+  that put light on the skin. Still short of the plate on two things — the plate fills its whole
+  frame with a light haze where our lower-left is mostly black, and its recess occlusion is real
+  where our seams are a shader trick.
+- **`station_night` ~6** (was 4.7). Form, a hero mass, three depth layers, warm spill on the deck
+  plates, real defocus. Still the weaker of the two: the plate's bay tops carry four or five
+  distinguishable sub-assemblies each and ours carry two, and its teal accent lighting is everywhere
+  where ours is two spill points.
+
+## What is short — next pass
+
+- **The bay module still has one silhouette.** The clusters and the coaming help, but the plate's
+  strength is that no two bays present the same shape. The `swaps` mechanism merges a substituted
+  module into the fixed buckets for free and is still used only three times across both stations —
+  that is the cheapest unspent density in the project.
+- **The DOF band cannot follow depth round a corner.** A shot that needs foreground *and* background
+  soft with the subject between them on a curve needs a real depth tap. The band is the right answer
+  for a subject that runs on one diagonal and nothing more.
+- `hullPanel`'s grid is world-space, so two hulls at different scales share a cell size. On the 84 m
+  hauler that is right; on a 30 m escort the cells are proportionally too big.
+- The station spill is authored by hand in the scenario. `station()` knows where every dock mouth it
+  built ended up and could emit the list itself — it does not, because the group's world transform
+  is not known at build time. Worth solving if a third station shot appears.

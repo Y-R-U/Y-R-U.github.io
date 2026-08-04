@@ -32,8 +32,15 @@ const TINT = {
 
 const MATS = new Map();
 const GLOWS = [];
+const PBR = [];
 let glowPower = 1.6;
 let detail = 1;
+let paint01 = 0;
+
+function applyMetal(m) {
+  m.metalness = m.userData.baseMetal * (1 - 0.86 * paint01);
+  m.roughness = Math.min(1, m.userData.baseRough + 0.22 * paint01);
+}
 
 // A station is thousands of axis-aligned boxes under one key. Without these two terms every face
 // of every box lands within a few percent of every other face and the whole thing reads as one
@@ -43,6 +50,28 @@ const SB = {
   uRough: { value: 0.30 }, uPlane: { value: 0.45 },
   uPanel: { value: 0.42 }, uDirt: { value: 0.55 },
 };
+
+// Dock spill. A window rectangle that emits nothing onto its own housing is the tell that a night
+// station is a texture and not a light, and real point lights are wasted on this kit: everything
+// is one merged mesh, so the cost is per-fragment either way and a uniform array is free of draw
+// calls. Inverse-square from a finite radius, N·L so a wall facing away stays black.
+const SPILL_MAX = 8;
+const SPILL = {
+  uSpillPos: { value: Array.from({ length: SPILL_MAX }, () => new THREE.Vector4(0, 0, 0, -1)) },
+  uSpillCol: { value: Array.from({ length: SPILL_MAX }, () => new THREE.Color(0, 0, 0)) },
+  uSpillPow: { value: 0 },
+};
+
+// world-space, because the shader reads world position. `[x, y, z, radius, colour, gain]`
+export function setStationSpill(list = []) {
+  for (let i = 0; i < SPILL_MAX; i++) {
+    const s = list[i];
+    if (!s) { SPILL.uSpillPos.value[i].set(0, 0, 0, -1); continue; }
+    const [x, y, z, r, col, gain = 1] = s;
+    SPILL.uSpillPos.value[i].set(x, y, z, r);
+    SPILL.uSpillCol.value[i].set(col).convertSRGBToLinear().multiplyScalar(gain);
+  }
+}
 
 const SNOISE = `
 float sh31(vec3 p){ p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419)); p *= 17.0;
@@ -56,16 +85,43 @@ function breakUp(m) {
   m.onBeforeCompile = sh => {
     sh.uniforms.uSRough = SB.uRough;
     sh.uniforms.uSPlane = SB.uPlane;
+<<<<<<< HEAD
     sh.uniforms.uSPanel = SB.uPanel;
     sh.uniforms.uSDirt = SB.uDirt;
+=======
+    sh.uniforms.uSpillPos = SPILL.uSpillPos;
+    sh.uniforms.uSpillCol = SPILL.uSpillCol;
+    sh.uniforms.uSpillPow = SPILL.uSpillPow;
+>>>>>>> worktree-agent-a746cf6059a2c4f32
     sh.vertexShader = `varying vec3 vSP; varying vec3 vSN;\n` + sh.vertexShader.replace(
       '#include <worldpos_vertex>',
       `#include <worldpos_vertex>
        vSP = (modelMatrix * vec4(transformed, 1.0)).xyz;
        vSN = normalize(mat3(modelMatrix) * objectNormal);`);
     sh.fragmentShader = `varying vec3 vSP; varying vec3 vSN;
+<<<<<<< HEAD
       uniform float uSRough, uSPlane, uSPanel, uSDirt;
+=======
+      uniform float uSRough, uSPlane, uSpillPow;
+      uniform vec4 uSpillPos[${SPILL_MAX}];
+      uniform vec3 uSpillCol[${SPILL_MAX}];
+>>>>>>> worktree-agent-a746cf6059a2c4f32
       ${SNOISE}\n` + sh.fragmentShader;
+    sh.fragmentShader = sh.fragmentShader.replace(
+      '#include <tonemapping_fragment>',
+      `{
+        vec3 SN = normalize(vSN);
+        for (int i = 0; i < ${SPILL_MAX}; i++) {
+          float r = uSpillPos[i].w;
+          if (r <= 0.0) continue;
+          vec3 dv = uSpillPos[i].xyz - vSP;
+          float dd = length(dv);
+          gl_FragColor.rgb += uSpillCol[i] * (uSpillPow
+            * max(0.0, dot(SN, dv / max(dd, 1e-4)))
+            / (1.0 + (dd * dd) / (r * r)));
+        }
+      }
+      #include <tonemapping_fragment>`);
     sh.fragmentShader = sh.fragmentShader.replace(
       '#include <roughnessmap_fragment>',
       `#include <roughnessmap_fragment>
@@ -115,6 +171,14 @@ function smat(paletteId, bucket) {
     m.vertexColors = true;
     m.color.multiply(new THREE.Color(...TINT[bucket]));
     if (m.normalMap) m.normalScale.set(0.6, 0.6);
+    // A hull is bare metal; a station's plate runs are painted, and the difference decides whether
+    // a key light can put a dark side on a box at all. At metalness 0.9 a MeshStandard box has no
+    // diffuse term, so a directional key contributes a specular lobe nobody sees at this angle and
+    // every face lands on whatever the env map gives it — which is the flat the critic named.
+    m.userData.baseMetal = m.metalness;
+    m.userData.baseRough = m.roughness;
+    PBR.push(m);
+    applyMetal(m);
     breakUp(m);
     adopt(m);
   }
@@ -227,6 +291,7 @@ const MODULES = {
       g.dark.push(box(1.2, H * 0.7, D * 0.96, s * (hw - 3.2), -1.5, D / 2, 0, 0, 0, 0.42));
     }
 
+<<<<<<< HEAD
     // pale deck plates either side of a dark slot — the value break that makes the run read.
     // The hot line down each plate edge is 8500_06's own trick: the containers are separated by
     // orange slot lights, not by shadow, so the run stays legible at thumbnail size.
@@ -238,6 +303,16 @@ const MODULES = {
       for (const e of [-1, 1]) {
         g.strip.push(box(0.5, 0.30, D * 0.86, s * W * 0.29 + e * W * 0.205, H / 2 + 1.55, D / 2));
       }
+=======
+    // Pale deck plates either side of a dark slot. They used to run the full 38 m of the module,
+    // which made the whole row one beige field; the plate reads as a *dark* machine with pale
+    // plates set into it, so the plates are narrower and a dark coaming caps each outer edge.
+    for (const s of [-1, 1]) {
+      g.hull.push(box(W * 0.30, 1.6, D * 0.90, s * W * 0.26, H / 2 + 0.8, D / 2, 0, 0, 0, 1.0));
+      g.hull.push(box(W * 0.30, 0.5, D * 0.30, s * W * 0.26, H / 2 + 1.8, D * 0.30, 0, 0, 0, 1.0));
+      g.trim.push(box(W * 0.26, 0.30, 1.1, s * W * 0.26, H / 2 + 1.7, D * 0.10));
+      g.dark.push(box(W * 0.13, 2.6, D * 0.94, s * W * 0.435, H / 2 + 0.7, D / 2, 0, 0, 0, 0.34));
+>>>>>>> worktree-agent-a746cf6059a2c4f32
     }
     g.dark.push(box(W * 0.22, 2.2, D * 0.88, 0, H / 2 - 0.3, D / 2, 0, 0, 0, 0.30));
     g.strip.push(box(W * 0.13, 0.22, D * 0.80, 0, H / 2 - 0.6, D / 2));
@@ -272,6 +347,13 @@ const MODULES = {
       g.panel.push(box(w, h, 3.0, x, y, 1.5, 0, 0, 0, 0.8));
     }
     g.trim.push(box(mw + 8.4, 0.30, 0.9, 0, mh / 2 + 2.3, 3.1));
+<<<<<<< HEAD
+=======
+    // the mouth is a slot in a dark recess, not a lit wall the size of the bay: a rectangle of
+    // flat emissive that big reads as a screen bolted to the front and swallows the collar
+    g.glow.push(glowQuad(mw * 0.90, mh * 0.40, '-z', 0, -mh * 0.10, -0.2, warm, 0.85, 1.5));
+    g.glow.push(glowQuad(mw * 0.72, 0.85, '-z', 0, mh * 0.26, -0.25, warm, 1.9, 1.1));
+>>>>>>> worktree-agent-a746cf6059a2c4f32
     g.dark.push(box(mw + 8, mh + 4, 1.0, 0, 0, 0.6, 0, 0, 0, 0.25));
     // A third of the row is shut. One identical lit rectangle on every bay is the loudest repeat
     // on the station, and a closed door is also the only thing that puts a dark hole in the run.
@@ -303,11 +385,45 @@ const MODULES = {
     dockLights(g.strip, { axis: 2, from: 5, to: D - 5, pitch: 5, x: -W * 0.10, y: H / 2 + 1.9, z: 0 });
     dockLights(g.strip, { axis: 2, from: 5, to: D - 5, pitch: 5, x: W * 0.10, y: H / 2 + 1.9, z: 0 });
 
+    // Density has to *vary* or the deck reads as noise at one frequency. The dock end (low z) is
+    // where the plate clusters its pipework and railings; the middle of the run is calm plate with
+    // nothing on it, which is what makes the clusters read as clusters.
     if (detail > 0.4) {
-      for (let i = 0; i < Math.round(14 * detail); i++) {
+      const cluster = t => 1.15 * Math.exp(-(((t - 0.10) / 0.13) ** 2))
+        + 0.85 * Math.exp(-(((t - 0.93) / 0.10) ** 2)) + 0.06;
+      for (let i = 0; i < Math.round(30 * detail); i++) {
+        const t = R();
+        if (R() > cluster(t)) continue;
         const s = R() < 0.5 ? -1 : 1;
-        g.panel.push(box(1.2 + 3.4 * R(), 0.5 + 1.6 * R() ** 2, 1.2 + 4.0 * R(),
-          s * (W * 0.12 + R() * W * 0.34), H / 2 + 2.0, D * (0.06 + 0.88 * R()), 0, 0, 0, 0.85));
+        const k = R();
+        const x = s * (W * 0.12 + R() * W * 0.34), z = D * (0.04 + 0.92 * t);
+        if (k < 0.30) {
+          // pipe runs: long, thin, low, and always along the module's length
+          const ln = 3 + 9 * R();
+          g.panel.push(box(0.5 + 0.5 * R(), 0.5 + 0.5 * R(), ln, x, H / 2 + 2.1, z, 0, 0, 0, 0.7));
+          g.dark.push(box(0.9, 1.0, 0.7, x, H / 2 + 1.9, z - ln * 0.5, 0, 0, 0, 0.5));
+          g.dark.push(box(0.9, 1.0, 0.7, x, H / 2 + 1.9, z + ln * 0.5, 0, 0, 0, 0.5));
+        } else if (k < 0.48) {
+          g.dark.push(box(0.45, 1.6 + 1.8 * R(), 0.45, x, H / 2 + 2.6, z, 0, 0, 0, 0.45));
+          g.trim.push(box(1.6, 0.22, 0.22, x, H / 2 + 3.9, z));
+        } else {
+          const bucket = R() < 0.55 ? g.dark : g.panel;
+          bucket.push(box(1.2 + 3.4 * R(), 0.5 + 1.6 * R() ** 2, 1.2 + 4.0 * R(),
+            x, H / 2 + 2.0, z, 0, 0, 0, 0.85));
+        }
+      }
+      // railing along the outer deck edge, dock end only: stanchions at a dead-regular pitch with
+      // a top rail over them, which is the scale cue the calm middle of the run cannot give
+      for (const s of [-1, 1]) {
+        const rx = s * (hw - 0.9);
+        for (let z = 2.5; z < D * 0.30; z += 2.2) g.dark.push(box(0.22, 1.5, 0.22, rx, H / 2 + 2.4, z, 0, 0, 0, 0.5));
+        g.trim.push(box(0.30, 0.22, D * 0.30, rx, H / 2 + 3.1, D * 0.155));
+        for (let z = D * 0.80; z < D - 2; z += 2.2) g.dark.push(box(0.22, 1.3, 0.22, rx, H / 2 + 2.3, z, 0, 0, 0, 0.5));
+      }
+      // calm plate: a few long shallow seams, nothing else, over the middle third
+      for (let i = 0; i < 5; i++) {
+        const z = D * (0.34 + i * 0.085);
+        g.dark.push(box(W * 0.86, 0.22, 0.34, 0, H / 2 + 1.75, z, 0, 0, 0, 0.35));
       }
     }
   },
@@ -687,10 +803,17 @@ const STATIONS = {
     parts: [
       ['hub', [0, 0, -42, 0]],
       ['refinery', [-104, 0, 0, Math.PI / 2]],
+<<<<<<< HEAD
       ['coilline', [530, 0, 0, Math.PI / 2]],
       ['spine', [326, 30, -6, Math.PI / 2]],
       ['mast', [300, 26, -8, Math.PI / 2]],
       ['radiator', [64, -46, 8, Math.PI / 2]],
+=======
+      ['coilline', [494, 0, 0, Math.PI / 2]],
+      // berthed along the spine, not floating off one shoulder: 8500_06 is twenty grey bays with
+      // one orange hull lying down the middle of them, and where it sits is most of that read
+      ['spine', [200, 44, 10, Math.PI / 2]],
+>>>>>>> worktree-agent-a746cf6059a2c4f32
     ],
     masts: [[196, -40, 10, 40], [396, -40, 10, 40]],
     swaps: { 8: { module: 'refinery', scale: 0.8, dy: -16 }, 15: { module: 'refinery', scale: 0.62, dy: -8 } },
@@ -886,10 +1009,17 @@ export function registerStationKnobs(q) {
     v => { SB.uRough.value = v; });
   q.register({ key: 'stationPlane', label: 'Plane value separation', type: 'range', min: 0, max: 1, step: 0.01, default: 0.45, group: G },
     v => { SB.uPlane.value = v; });
+<<<<<<< HEAD
   q.register({ key: 'stationPanel', label: 'Cladding panel break', type: 'range', min: 0, max: 1.2, step: 0.01, default: 0.42, group: G },
     v => { SB.uPanel.value = v; });
   q.register({ key: 'stationDirt', label: 'Cladding soot', type: 'range', min: 0, max: 1.2, step: 0.01, default: 0.55, group: G },
     v => { SB.uDirt.value = v; });
+=======
+  q.register({ key: 'stationPaint', label: 'Painted plate (metal → diffuse)', type: 'range', min: 0, max: 1, step: 0.02, default: 0, group: G },
+    v => { paint01 = v; for (const m of PBR) applyMetal(m); });
+  q.register({ key: 'spillPower', label: 'Dock light spill', type: 'range', min: 0, max: 4, step: 0.02, default: 0, group: G },
+    v => { SPILL.uSpillPow.value = v; });
+>>>>>>> worktree-agent-a746cf6059a2c4f32
   q.register({ key: 'hazePower', label: 'Haze slab', type: 'range', min: 0, max: 2.5, step: 0.02, default: 1, group: G },
     v => { HAZE.power = v; for (const m of HAZE_MATS) m.uniforms.uPower.value = v; });
   q.register({ key: 'hazeSoft', label: 'Haze slab edge', type: 'range', min: 0.05, max: 1, step: 0.01, default: 0.42, group: G },
