@@ -2837,3 +2837,99 @@ console errors.
 - `meta_instagram` is the story that will go stale next. Meta's answering brief lands 20 August 2026
   and the D.C. Circuit will rule some time after that. The `year` field, the last paragraph and
   `outcome` all need revisiting when it does.
+
+---
+
+# Session 13 — re-application of session 12 onto the correct base
+
+Session 12 (`hero_hull` + `station_night`, written up above) was done in a worktree branched from
+`82ab477`, i.e. **before the module-vocabulary pass landed**. Its `station.js` and `ship.js` had no
+`radiator` / `gantry` / `tankage` / `mast`, no `bakedModule` cache, no deck/spine work and no
+`shadowFill`, so merging it reverted all of that and broke the render. The merge was backed out and
+this session re-applies the *intent* on top of the current base. Its work survives on
+`worktree-agent-a746cf6059a2c4f32` if anything below needs checking against the original.
+
+**Nothing in session 12's write-up above is wrong — it just has to be read as describing a diff
+against `82ab477`, not against what shipped.** The material-bug finding in particular
+(`stationPaint`) is the most valuable thing in the project and it is now in.
+
+## How it was re-applied
+
+Not by taking the diff. `git merge-file ours base theirs` per file against the real merge base
+(`82ab477`), then every conflict resolved by hand as a **union**, never a replacement.
+
+- **`post.js`** — no conflict at all; the base and the current head are identical here, so the
+  branch's file was taken whole. `bloomShoulder` (default 1.0 = the old hard clamp) and the DOF
+  tilt band (default off) are in exactly as written up.
+- **`ship.js`** — four conflicts, all adjacency. `uShadCol/uShadDir/uShadPow` + the `shadowFill`
+  knob (this base) and `uPanel/uWash` + `hullPanel`/`engineWash` (session 12) are **both** present.
+  The shader hook needed real care: session 12 moved the plate-detail read from `map_fragment` to
+  `roughnessmap_fragment` and this base's `SHAD_DETAIL` token is emitted at `tonemapping_fragment`,
+  so the two `.replace()` calls now run in the order panel-grid-then-`SHAD_DETAIL` and the cache key
+  went to **`shiprim4`** — gotcha 39/53 applies, the program cache will serve the old shader if you
+  add a hook and leave the key alone.
+- **`station.js`** — six conflicts. `stationPaint` / `applyMetal` / the `PBR` list / `setStationSpill`
+  and the 8-slot spill array all land alongside this base's `uSPanel` / `uSDirt` cladding shader,
+  the `bakedModule` cache and the extra module types. Cache key → **`stationbreak3`**.
+  - **Deck plates: reconciled by hand.** This base had widened them and run a hot slot light down
+    each plate edge (8500_06's trick); session 12 had narrowed them and added dark coamings. Both
+    are right and they are the same intent from two directions, so the plates are session 12's
+    narrow `W × 0.30` at `±W × 0.26` **with** the edge strips re-centred on the new plate
+    (`±W × 0.155` from plate centre) and the dark underlay pulled to `W × 0.34` so it clears the
+    coaming at `±W × 0.435`. Take the numbers from either side alone and the strips float.
+  - **Dock mouth: the slot pair went into the *open* branch, not at the top.** Session 12 replaced
+    a single unconditional `glowQuad(mw, mh)`; this base had already deleted that and moved the
+    mouth into an open/closed branch where a third of the row is shut. The two slot quads now sit
+    inside the `else`, with the mouth's power still varying on `open`.
+  - `ledger`'s `spine` moved to `[200, 44, 10]` as session 12 had it, but this base's `coilline` at
+    530 and its extra `mast` / `radiator` parts are kept; the mast moved 300 → 326 so it is not
+    inside the newly-berthed spine.
+- **`scene.js`** — five conflicts, `hero_hull` and `station_night` only; every other block is
+  byte-identical to before (checked hunk by hunk).
+  - `hero_hull`: `keyLift 28`, `keyPower 19`, `fillPower 3.0`, `hullPanel 0.68`, `engineWash 1.5`,
+    the nebula pull-back and `bloomShoulder 0.72` — all as written. `shadowFill 0.26` and this
+    base's `fogDensity 0.0030` survive. **Session 12's extra `atmosphere()` call was dropped**: this
+    base already added one plus a far yard for the same reason, so re-applying it would have been a
+    second dust field and a draw call for nothing.
+  - `station_night`: the whole `stationPaint 0.86` block, `spillPower 0.16`, the eight spill
+    sources, `bloomShoulder 0.80`, `dustField 0.016` and the DOF settings, on top of this base's
+    `stationPanel` / `stationDirt` / `exposure` / neb grade. Session 12's third structure layer
+    (`right`, ferrous, ×1.6) replaces this base's `mid` one-for-one — both filled the same dead
+    right half — so the layer count and the cost are unchanged, and `far` and `deep` stay put.
+  - **The four `PointLight`s in `station_night` were removed.** They were this base's answer to
+    "the strips light nothing"; the spill array is session 12's answer to the same note and it is
+    the better one (no draw call, works on a merged mesh, and the source can sit above the deck
+    plane). More to the point, with `stationPaint 0.86` the boxes finally *have* a diffuse term, so
+    leaving both in double-lit the dock line — the spill gain of 0.16 is tuned with them gone.
+
+## Numbers — `--preset=medium --dpr=1 --w=844 --h=390`, all eleven
+
+| | calls | tris | texMB |
+|---|---|---|---|
+| budget | < 150 | < 350k | < 60 |
+| `hero_hull` | **94** | 57k | 13.4 |
+| `station_night` | **127** | 144k | 14.1 |
+| worst in the set | 127 (`station_night`) | 161k (`belt_work`) | 14.1 |
+
+These are higher than session 12's reported 66 / 123 because that run was against a base without
+the far yard, the extra modules or the deeper structure layers. Everything is inside the gate and
+every scenario holds 60 fps with GPU p95 under 10 ms except `station_night` at 9.7 ms.
+
+**All eleven scenarios render, no console errors.** `hero_hull`, `station_night`, `belt_work` and
+`planet_limb` were opened at 1280×720: none is black, blown out or missing geometry, and
+`planet_limb` is pixel-unchanged. Both sheets were rebuilt at `--round=7`.
+
+## Gotchas — session 13
+
+55. **`tools/shot.mjs --all` at its defaults (1600×900, dpr 2, preset high) is not viable headless
+    in a worktree** — that is 3200×1800 through ANGLE software and it produced no output at all in
+    fifteen minutes, twice, with an empty log that looks exactly like a hang. Run
+    `--all --preset=medium --dpr=1 --w=844 --h=390 --outdir=shots/gate` for the whole-set check
+    (~90 s) and render the two or three shots you actually want to look at individually.
+56. **`PORT = 8931 + pid % 200` collides with another agent's `shot.mjs`.** The failure is
+    `EADDRINUSE` and the fix is to run it again — a new pid picks a new port. If two runs are alive
+    at once one of them wedges silently instead.
+57. **Re-applying a stale branch: use `git merge-file` against the real merge base, never the
+    two-way diff.** `git diff HEAD <branch>` on a branch that predates a merged pass shows that
+    pass's work as *deletions*, and taking it deletes real code. The merge base told the truth in
+    every one of the fifteen conflicts here.

@@ -27,6 +27,8 @@ const RIM = {
   uShadCol: { value: new THREE.Color(0.25, 0.55, 0.72) },
   uShadDir: { value: new THREE.Vector3(0, -1, 0) },
   uShadPow: { value: 0 },
+  uPanel: { value: 0 },
+  uWash: { value: 0 },
 };
 
 const rnd = s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
@@ -50,6 +52,8 @@ function patch(m, bounce) {
     sh.uniforms.uB1 = { value: bounce[1] || new THREE.Vector4(0, 0, 0, -1) };
     sh.uniforms.uB0c = { value: bounce[2] || new THREE.Color(0, 0, 0) };
     sh.uniforms.uB1c = { value: bounce[3] || new THREE.Color(0, 0, 0) };
+    sh.uniforms.uB2 = { value: bounce[4] || new THREE.Vector4(0, 0, 0, -1) };
+    sh.uniforms.uB2c = { value: bounce[5] || new THREE.Color(0, 0, 0) };
 
     sh.vertexShader = `varying vec3 vWP; varying vec3 vWN;\n` + sh.vertexShader.replace(
       '#include <worldpos_vertex>',
@@ -61,10 +65,10 @@ function patch(m, bounce) {
     // it is enough, the renderer binds it to matrixWorld unconditionally
     sh.fragmentShader = `varying vec3 vWP; varying vec3 vWN;
       uniform mat4 modelMatrix;
-      uniform vec3 uKeyPos, uKeyCol, uB0c, uB1c;
-      uniform vec4 uB0, uB1;
+      uniform vec3 uKeyPos, uKeyCol, uB0c, uB1c, uB2c;
+      uniform vec4 uB0, uB1, uB2;
       uniform vec3 uShadCol, uShadDir;
-      uniform float uRimInt, uRimPow, uRimNear, uRimFall, uBouncePow, uRough, uShadPow;
+      uniform float uRimInt, uRimPow, uRimNear, uRimFall, uBouncePow, uRough, uShadPow, uPanel, uWash, uDetail;
       ${NOISE}\n` + sh.fragmentShader;
 
     // panel-to-panel roughness break-up at a frequency the plate map cannot reach, so the flank
@@ -113,26 +117,57 @@ function patch(m, bounce) {
         gl_FragColor.rgb += uB1c * (uBouncePow * step(0.0, uB1.w)
           / (1.0 + (d1 * d1) / max(uB1.w * uB1.w, 1e-4))
           * pow(max(0.0, dot(N, b1 / max(d1, 1e-4))), 0.65));
+
+        // the engine wash on the skin. Same inverse-square as the bounces but with its own gain,
+        // because a plume that lights nothing is a decal stuck on the stern.
+        vec3 b2 = (modelMatrix * vec4(uB2.xyz, 1.0)).xyz - vWP;
+        float d2 = length(b2);
+        gl_FragColor.rgb += uB2c * (uWash * step(0.0, uB2.w)
+          / (1.0 + (d2 * d2) / max(uB2.w * uB2.w, 1e-4))
+          * pow(max(0.0, dot(N, b2 / max(d2, 1e-4))), 0.55));
       }
       #include <tonemapping_fragment>`);
 
-    // A second read of the plate map with u and v swapped and scaled by an irrational-ish ratio.
-    // A narrow hull strip samples one thin column of the texture and repeats it down the length,
-    // which reads as corrugation; crossing the axes makes the combined period far longer.
+    // Two things on one hook. First a plate grid in world space, projected onto whichever axis
+    // pair the normal is furthest from: a seam line at every cell edge and a per-cell value jitter,
+    // at two frequencies. This is the detail that has to survive a thumbnail — the map alone is a
+    // texture, and a texture averages to grey the moment the hull is 200 px wide.
+    // Second, the map's own second read with u and v swapped and scaled by an irrational-ish ratio:
+    // a narrow hull strip samples one thin column and repeats it, which reads as corrugation.
+    let extra = `
+      {
+        vec3 an = abs(normalize(vWN));
+        vec2 q = an.y >= max(an.x, an.z) ? vWP.xz : (an.x >= an.z ? vWP.zy : vWP.xy);
+        float seam = 0.0, tone = 0.0;
+        // rectangular cells offset row by row, or a square grid reads as brickwork at every scale
+        vec2 c0 = q * vec2(0.155, 0.29);
+        c0.x += floor(c0.y) * 0.41;
+        vec2 e0 = 0.5 - abs(fract(c0) - 0.5);
+        seam = 1.0 - smoothstep(0.0, 0.045, min(e0.x, e0.y));
+        tone += (h31(vec3(floor(c0), 3.0)) - 0.5) * 0.26;
+        vec2 c1 = q * vec2(0.62, 1.05) + 0.37;
+        c1.x += floor(c1.y) * 0.29;
+        vec2 e1 = 0.5 - abs(fract(c1) - 0.5);
+        seam = max(seam, (1.0 - smoothstep(0.0, 0.07, min(e1.x, e1.y))) * 0.50);
+        tone += (h31(vec3(floor(c1), 9.0)) - 0.5) * 0.15;
+        vec2 e2 = 0.5 - abs(fract(q * 3.1 + 0.19) - 0.5);
+        seam = max(seam, (1.0 - smoothstep(0.0, 0.10, min(e2.x, e2.y))) * 0.22);
+        diffuseColor.rgb *= 1.0 + uPanel * (tone - seam * 0.85);
+        roughnessFactor = clamp(roughnessFactor + uPanel * seam * 0.30, 0.10, 0.95);
+      }`;
     if (m.map) {
-      sh.uniforms.uDetail = RIM.uDetail;
-      sh.fragmentShader = sh.fragmentShader
-        .replace('void main() {', 'uniform float uDetail;\nvoid main() {')
-        .replace('#include <map_fragment>',
-          `#include <map_fragment>
-           diffuseColor.rgb *= mix(1.0, texture2D(map,
-             vec2(vMapUv.y * 1.87 + 0.11, vMapUv.x * 2.63 + 0.44)).r * 1.6, uDetail);`);
+      extra += `
+      diffuseColor.rgb *= mix(1.0, texture2D(map,
+        vec2(vMapUv.y * 1.87 + 0.11, vMapUv.x * 2.63 + 0.44)).r * 1.6, uDetail);`;
     }
+    // roughnessFactor is declared by roughnessmap_fragment, which three emits *after* map_fragment
+    sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>',
+      `#include <roughnessmap_fragment>\n${extra}`);
 
     sh.fragmentShader = sh.fragmentShader.replace('SHAD_DETAIL',
       m.map ? '(0.62 + 0.62 * texture2D(map, vMapUv).r)' : '1.0');
   };
-  m.customProgramCacheKey = () => 'shiprim3' + (m.map ? 'd' : '');
+  m.customProgramCacheKey = () => 'shiprim4' + (m.map ? 'd' : '');
   return m;
 }
 
@@ -501,20 +536,32 @@ function glowDisc(r, x, y, z, col, power, fall = 2.4) {
   return g;
 }
 
-// the exhaust: an additive cone that starts at the bell mouth and fades out over its length
-function plume(r, x, y, z, L, col, power) {
-  const g = new THREE.CylinderGeometry(r * 1.45, r * 0.85, L, 12, 1, true);
-  g.applyMatrix4(M4.compose(new THREE.Vector3(x, y, z + L * 0.5),
-    new THREE.Quaternion().setFromEuler(EU.set(Math.PI / 2, 0, 0)), new THREE.Vector3(1, 1, 1)));
-  const p = g.attributes.position, n = p.count;
-  const c = new Float32Array(n * 3);
-  for (let i = 0; i < n; i++) {
-    const f = Math.max(0, Math.min(1, (p.getZ(i) - z) / L));
-    const v = power * (1 - f) ** 2.6;
-    c[i * 3] = col.r * v; c[i * 3 + 1] = col.g * v; c[i * 3 + 2] = col.b * v;
+// The exhaust. One additive tube is a flat white capsule with a hard rim, because every point
+// around its circumference is the same brightness and its end stops dead. Three nested open cones
+// at falling power, rising radius and rising length integrate to a soft radial profile with a
+// core, and each shell dies at a different distance so the wash has no edge to find.
+const PLUME_SHELLS = [
+  { r0: 1.30, r1: 0.80, len: 1.00, pow: 1.00, fall: 2.4 },
+  { r0: 2.20, r1: 1.35, len: 1.45, pow: 0.32, fall: 1.7 },
+  { r0: 3.60, r1: 1.90, len: 2.10, pow: 0.11, fall: 1.2 },
+];
+
+function plume(r, x, y, z, L, col, power, out) {
+  for (const s of PLUME_SHELLS) {
+    const ln = L * s.len;
+    const g = new THREE.CylinderGeometry(r * s.r0, r * s.r1, ln, 12, 1, true);
+    g.applyMatrix4(M4.compose(new THREE.Vector3(x, y, z + ln * 0.5),
+      new THREE.Quaternion().setFromEuler(EU.set(Math.PI / 2, 0, 0)), new THREE.Vector3(1, 1, 1)));
+    const p = g.attributes.position, n = p.count;
+    const c = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      const f = Math.max(0, Math.min(1, (p.getZ(i) - z) / ln));
+      const v = power * s.pow * (1 - f) ** s.fall;
+      c[i * 3] = col.r * v; c[i * 3 + 1] = col.g * v; c[i * 3 + 2] = col.b * v;
+    }
+    g.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
+    out.push(g);
   }
-  g.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
-  return g;
 }
 
 // Real depth: an outer housing, a cone bored forward into the hull with its winding flipped so
@@ -528,7 +575,7 @@ function engines(g, hot, { list, r, len, lod }) {
     g.dark.push(invert(cyl(rr * 1.13, rr * 0.34, L * 1.7, 14, x, y, z - L * 0.42, 0, 0.30, true)));
     g.eng.push(glowDisc(rr * 0.40, x, y, z - L * 1.22, hot, 2.6, 1.6));
     g.eng.push(glowDisc(rr * 0.98, x, y, z - L * 0.28, hot, 0.55, 3.2));
-    if (lod < 2) g.plume.push(plume(rr, x, y, z + L * 0.46, L * 3.0, hot, 0.22));
+    if (lod < 2) plume(rr, x, y, z + L * 0.46, L * 3.0, hot, 0.30, g.plume);
     nozzles.push(new THREE.Vector3(x, y, z + L * 0.5));
   }
   return nozzles;
@@ -851,6 +898,9 @@ export function shipClass(classId, { palette: paletteId = 'ferrous', lod = 0, se
     // the hangar throws the *opposing* faction's cool, so it never disappears into the warm hull
     new THREE.Color(paletteId === 'corvain' ? '#ffb45e' : '#39d7f0').multiplyScalar(0.32),
     new THREE.Color(p.window).multiplyScalar(0.16),
+    // the wash source sits a little aft of the bells, so the falloff runs forward up the hull
+    new THREE.Vector4(0, 0, c.len * 0.5 + 5.5, Math.max(6, c.len * 0.20)),
+    new THREE.Color(p.engine),
   ];
 
   const add = (geos, surface) => {
@@ -981,6 +1031,10 @@ export function registerShipKnobs(q, backdrop) {
     v => { RIM.uRough.value = v; });
   q.register({ key: 'shadowFill', label: 'Shadow-side structure', type: 'range', min: 0, max: 2.5, step: 0.02, default: 0, group: G },
     v => { RIM.uShadPow.value = v; });
+  q.register({ key: 'hullPanel', label: 'Micro panelling', type: 'range', min: 0, max: 1.2, step: 0.02, default: 0, group: G },
+    v => { RIM.uPanel.value = v; });
+  q.register({ key: 'engineWash', label: 'Engine wash on skin', type: 'range', min: 0, max: 4, step: 0.02, default: 0, group: G },
+    v => { RIM.uWash.value = v; });
   q.register({ key: 'engineGlow', label: 'Engine core', type: 'range', min: 0, max: 6, step: 0.05, default: 1.5, group: G },
     v => { GLOW.engine = v; for (const m of EMISSIVE) m.color.setScalar(v); });
   q.register({ key: 'plumePower', label: 'Exhaust plume', type: 'range', min: 0, max: 4, step: 0.02, default: 1.0, group: G },
