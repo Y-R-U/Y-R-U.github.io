@@ -154,4 +154,5 @@ body {
 #boot-status { font-size: 11px; opacity: .35; margin-top: 12px; }
 
 body.shotmode #hud, body.shotmode #panel, body.shotmode #showroom-btn,
-body.shotmode #showroom, body.shotmode #ui, body.shotmode #sheet { display: none !important; }
+body.shotmode #showroom, body.shotmode #ui, body.shotmode #sheet,
+body.shotmode #intro { display: none !important; }

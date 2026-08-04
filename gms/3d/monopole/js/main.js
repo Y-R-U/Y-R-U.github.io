@@ -19,6 +19,7 @@ import { createSimView } from './ui/simview.js';
 import { panels } from './ui/panels.js';
 import { buildHud } from './ui/hud.js';
 import { registerStoryEntries } from './ui/story.js';
+import { intro } from './ui/intro.js';
 import './ui/screens.js';
 
 const app = new App(document.getElementById('stage'));
@@ -169,12 +170,13 @@ if (live) {
     removeEventListener('pointerdown', once);
     skip();
   });
-  flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
+  const coldOpen = flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
     camera.setTouchEnabled(true);
     camera.markHome({ object: reach.focusTarget('ledger'), dist: 900, phi: Math.PI * 0.42 });
     if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
-    hud.ticker('Tap the belt to send the rig.', 6000);
   });
+
+  intro.start({ app, sim, panels, hud, camera, reach, showroom, coldOpen, skip });
 }
 
 // after the scenario, so --set=knob=value on the command line still wins
