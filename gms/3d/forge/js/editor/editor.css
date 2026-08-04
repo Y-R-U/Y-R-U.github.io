@@ -1,7 +1,7 @@
 /* Level editor UI. Thumb-first: a bottom sheet, big targets, nothing that needs a mouse. */
 
 .ed-toggle {
-  position: fixed; top: 8px; right: 52px; z-index: 30;
+  position: fixed; top: 8px; right: 52px; z-index: 30;   /* second slot; see #audio-link */
   width: 38px; height: 38px; font-size: 16px; cursor: pointer;
   background: rgba(10,13,15,.8); border: 1px solid rgba(255,255,255,.1);
   border-radius: 6px; color: #dfe4e6;
