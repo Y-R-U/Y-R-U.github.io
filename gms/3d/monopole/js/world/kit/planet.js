@@ -15,7 +15,8 @@ import { system } from '../palettes.js';
 
 const SUN = { value: new THREE.Vector3(0, 0, -1) };
 const TINT = { value: new THREE.Color(1, 0.85, 0.7) };
-const KNOB = { rim: 1, band: 1, term: 1, scatter: 1, edge: 5.5 };
+const KNOB = { rim: 1, band: 1, term: 1, scatter: 1, edge: 5.5, tint: 0, albedo: 1 };
+const PALE = new THREE.Color(0.86, 0.90, 1.0);
 const BODIES = [];
 
 const NOISE = `
@@ -162,12 +163,25 @@ export function registerPlanetKnobs(q) {
     v => set('band', 'uBand', v));
   q.register({ key: 'planetTerm', label: 'Terminator softness', type: 'range', min: 0.2, max: 4, step: 0.02, default: 1.0, group: G },
     v => set('term', 'uTerm', v));
+  // the limb takes the star's own hue, and Tamber is a K-type orange. A plate whose planet is a
+  // pale grey-blue crescent needs the arc off the palette without unfreezing the palette.
+  q.register({ key: 'planetTint', label: 'Limb toward white', type: 'range', min: 0, max: 1, step: 0.01, default: 0, group: G },
+    v => { KNOB.tint = v; applyTint(); });
+}
+
+let lastTint = new THREE.Color(1, 0.85, 0.7);
+
+function applyTint() {
+  TINT.value.copy(lastTint).lerp(PALE, KNOB.tint);
 }
 
 // The star is the key here as much as anywhere: the limb only exists where the light grazes.
-export function updatePlanetLighting(backdrop, lighting) {
+export function updatePlanetLighting(backdrop) {
   if (!backdrop) return;
-  // backdrop.dir points *at* the star, which is exactly the "toward the sun" vector a shader wants
-  SUN.value.copy(lighting?.keyDir || backdrop.dir).normalize();
-  TINT.value.set(backdrop.sys.starTint).convertSRGBToLinear();
+  // backdrop.dir points *at* the star, which is exactly the "toward the sun" vector a shader wants.
+  // A planet is lit by the star, never by the swung key — take the key and a scene that swings it
+  // round to front-light its hulls also front-lights the planet, and the crescent disappears.
+  SUN.value.copy(backdrop.dir).normalize();
+  lastTint.set(backdrop.sys.starTint).convertSRGBToLinear();
+  applyTint();
 }

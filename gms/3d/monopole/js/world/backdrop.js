@@ -47,7 +47,8 @@ varying vec2 vUv;
 uniform vec3 uStar, uHot, uMid, uCool, uCool2, uDeep, uStarOut;
 uniform float uSeed, uDensity, uDust, uGlow, uRays, uGain, uFall, uBroad, uScale, uCore, uAmbient,
               uHueBias, uWarp, uFil, uContrast, uFloor, uScatter, uReach, uCoolDim, uHalo, uDesat,
-              uDLo, uDHi, uCoolAmt, uCoolGain, uCoolNear, uCoolFar, uRayOcc, uChromA, uChromB, uHaze;
+              uDLo, uDHi, uCoolAmt, uCoolGain, uCoolNear, uCoolFar, uRayOcc, uChromA, uChromB, uHaze,
+              uCoolField;
 ${NOISE}
 const float PI = 3.14159265359;
 
@@ -174,6 +175,10 @@ void main(){
   // and by the star's falloff, which is what makes a sky; this one is neither, because 8500_01's
   // background is an even warm grey from corner to corner and rocks lose their contrast into it.
   col += vec3(1.0, 0.94, 0.86) * (uHaze * (0.80 + 0.20 * cloud));
+  // The same idea in the cool hue, but with a slow gradient toward the star instead of flat: a
+  // night sky is a lit navy field that brightens where the star is, and every cloud-modulated
+  // term in this shader is far too lumpy to be one.
+  col += mix(uCool, uCool2, 0.15) * (uCoolField * (0.30 + 0.70 * exp(-ang * ang * 0.55)));
 
   col = toSRGB(aces(col));
   // 8-bit banding is visible across a falloff this smooth
@@ -243,7 +248,7 @@ const FLARE_FRAG = `
 precision highp float;
 varying vec2 vUv;
 uniform vec3 uCore, uHalo, uOuter;
-uniform float uPower, uHaloPow, uSpikes, uStreak, uBreak;
+uniform float uPower, uHaloPow, uSpikes, uStreak, uBreak, uCoreMul;
 void main(){
   vec2 p = (vUv - 0.5) * 2.0;
   float r = length(p);
@@ -270,7 +275,7 @@ void main(){
   tint = mix(tint, uHalo, smoothstep(0.07, 0.30, r));
   tint = mix(tint, uOuter, smoothstep(0.26, 0.92, r));
 
-  vec3 c = tint * (core * 2.4 + lobes * 1.30) + uOuter * halo * 0.42
+  vec3 c = tint * ((core * 2.4 + lobes * 1.30) * uCoreMul) + uOuter * halo * 0.42
          + uCore * s * uSpikes + uHalo * streak * uStreak;
   gl_FragColor = vec4(c * uPower, 1.0);
 }`;
@@ -307,7 +312,7 @@ export class Backdrop {
         uDLo: { value: 0.10 }, uDHi: { value: 0.86 },
         uCoolAmt: { value: 1 }, uCoolGain: { value: 0.5 }, uCoolNear: { value: 0.10 }, uCoolFar: { value: 0.34 },
         uRayOcc: { value: 2.2 }, uChromA: { value: 0.035 }, uChromB: { value: 0.22 },
-        uHaze: { value: 0 },
+        uHaze: { value: 0 }, uCoolField: { value: 0 },
       },
       vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
       fragmentShader: BAKE_FRAG,
@@ -359,7 +364,8 @@ export class Backdrop {
         uCore: { value: new THREE.Color(this.sys.star).convertSRGBToLinear() },
         uHalo: { value: new THREE.Color(this.sys.starTint).convertSRGBToLinear() },
         uOuter: { value: new THREE.Color(this.sys.starOut).convertSRGBToLinear() },
-        uPower: { value: 1 }, uHaloPow: { value: 3.2 }, uSpikes: { value: 0.5 }, uStreak: { value: 0.4 }, uBreak: { value: 0.35 },
+        uPower: { value: 1 }, uHaloPow: { value: 3.2 }, uSpikes: { value: 0.5 }, uStreak: { value: 0.4 },
+        uBreak: { value: 0.35 }, uCoreMul: { value: 1 },
       },
       vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
       fragmentShader: FLARE_FRAG,
@@ -467,6 +473,8 @@ export class Backdrop {
     // not of the nebula, which is why it groups with the fog and the dust cards
     q.register({ key: 'dustField', label: 'Flat dust field', type: 'range', min: 0, max: 0.5, step: 0.002, default: 0, group: 'Atmosphere' },
       v => { this.bakeMat.uniforms.uHaze.value = v; bake(); });
+    q.register({ key: 'coolField', label: 'Cool sky field', type: 'range', min: 0, max: 0.5, step: 0.002, default: 0, group: 'Atmosphere' },
+      v => { this.bakeMat.uniforms.uCoolField.value = v; bake(); });
 
     q.register({ key: 'starAz', label: 'Star azimuth', type: 'range', min: -180, max: 180, step: 1, default: -5, group: G },
       () => this.setDir(q));
@@ -484,6 +492,11 @@ export class Backdrop {
 
     q.register({ key: 'flarePower', label: 'Flare power', type: 'range', min: 0, max: 6, step: 0.05, default: 1.5, group: G },
       v => { this.flareMat.uniforms.uPower.value = v; });
+    // The palette's star is a K-type orange and the flare inherits all three of its hues, which
+    // makes every backlit shot a sunset. A plate whose halo is a pale white wash needs the flare
+    // pulled off the palette without unfreezing it.
+    q.register({ key: 'flareTint', label: 'Flare toward white', type: 'range', min: 0, max: 1, step: 0.01, default: 0, group: G },
+      v => this.setFlareTint(v));
     q.register({ key: 'flareSize', label: 'Flare size (deg)', type: 'range', min: 2, max: 90, step: 0.5, default: 26, group: G },
       v => { const s = 2 * Math.tan(v * Math.PI / 360); this.flare.scale.set(s, s, 1); });
     q.register({ key: 'flareHalo', label: 'Flare halo falloff', type: 'range', min: 1, max: 8, step: 0.05, default: 4.2, group: G },
@@ -503,8 +516,21 @@ export class Backdrop {
       v => { this.bloomMat.uniforms.uHaloPow.value = v; });
     q.register({ key: 'bloomStreak', label: 'Glow streak', type: 'range', min: 0, max: 2, step: 0.02, default: 0.2, group: G },
       v => { this.bloomMat.uniforms.uStreak.value = v; });
+    // the glow quad carries the flare's core and lobes as well as its halo, so raising it to get
+    // a wide soft wash also clips a hard-edged white disc over the star. 0 leaves it pure halo.
+    q.register({ key: 'bloomCore', label: 'Glow keeps a core', type: 'range', min: 0, max: 1, step: 0.01, default: 1, group: G },
+      v => { this.bloomMat.uniforms.uCoreMul.value = v; });
 
     this.setDir(q);
+  }
+
+  setFlareTint(v) {
+    const pale = new THREE.Color(0.92, 0.95, 1.0);
+    for (const m of [this.flareMat, this.bloomMat]) {
+      m.uniforms.uCore.value = new THREE.Color(this.sys.star).convertSRGBToLinear().lerp(pale, v);
+      m.uniforms.uHalo.value = new THREE.Color(this.sys.starTint).convertSRGBToLinear().lerp(pale, v);
+      m.uniforms.uOuter.value = new THREE.Color(this.sys.starOut).convertSRGBToLinear().lerp(pale, v * 0.92);
+    }
   }
 
   setDir(q) {

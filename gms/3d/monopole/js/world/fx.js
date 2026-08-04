@@ -138,10 +138,26 @@ export function beams(list, { color = '#8df0c8', width = 0.55, glow = 1, dust = 
     // the core loses width and energy down its length, so the far end is not the same bar of
     // pixels as the near one — the impact puts the energy back where the rock is
     const cFar = cCore.clone().multiplyScalar(0.42);
+    const black = new THREE.Color(0, 0, 0);
     for (const ax of [a1, a2]) {
       geos.push(ribbon(from, to, w * 1.15, w * 0.72, ax, cCore, cFar));
       geos.push(ribbon(from, to, w * 5.0, w * 3.4, ax, cSheath, cSheath.clone().multiplyScalar(0.5)));
-      if (FX.dust > 0.001 && dust > 0.001) geos.push(ribbon(from, to, w * 3, w * 52, ax, cDustA, cDustB));
+      if (FX.dust > 0.001 && dust > 0.001) geos.push(ribbon(from, to, w * 4, w * 26, ax, cDustA, cDustB));
+    }
+
+    // The muzzle fan: scatter in the medium right at the emitter, widening away from it and gone
+    // by a third of the run. The plate's beams spread from the gun, not from the impact, and a
+    // cone that only opens at the far end reads as a searchlight pointed the wrong way.
+    if (FX.dust > 0.001 && dust > 0.001) {
+      const len = from.distanceTo(to);
+      // it starts clear of the muzzle: a cone whose apex sits on the hull washes the whole ship
+      const root = from.clone().addScaledVector(dir, len * 0.05);
+      const tip = from.clone().addScaledVector(dir, len * 0.82);
+      const cMuz = hue.clone().lerp(new THREE.Color(1, 0.97, 0.88), 0.4)
+        .multiplyScalar(0.026 * dust * FX.dust);
+      // long and shallow. A short fat cone is five quads wide and reads as a lit polygon hanging
+      // in the beam rather than as scatter.
+      for (const ax of [a1, a2]) geos.push(ribbon(root, tip, w * 3.0, w * 30, ax, cMuz, black));
     }
 
     const flares = [
@@ -172,11 +188,13 @@ export function beams(list, { color = '#8df0c8', width = 0.55, glow = 1, dust = 
         const cHot = ej.clone().multiplyScalar((0.35 + 1.5 * R() ** 2) * impact * glow);
         geos.push(ribbon(to, tip, w * 0.55, w * 0.10, e1, cHot, new THREE.Color(0, 0, 0)));
       }
+      // a small hot point with a long dim skirt, not a sun. A wide bright blob at the impact is
+      // the thing that reads as a soft sprite pasted on the rock.
       flares.push(
-        [to, w * 46 * impact, ej.clone().multiplyScalar(0.30 * impact * glow)],
-        [to, w * 20 * impact, ej.clone().multiplyScalar(0.95 * impact * glow)],
-        [to, w * 9 * impact, hue.clone().lerp(ej, 0.5).multiplyScalar(2.2 * impact * glow)],
-        [to, w * 3.6 * impact, new THREE.Color(1, 1, 1).multiplyScalar(4.0 * impact * glow)]);
+        [to, w * 40 * impact, ej.clone().multiplyScalar(0.13 * impact * glow)],
+        [to, w * 15 * impact, ej.clone().multiplyScalar(0.42 * impact * glow)],
+        [to, w * 6 * impact, hue.clone().lerp(ej, 0.5).multiplyScalar(1.9 * impact * glow)],
+        [to, w * 2.4 * impact, new THREE.Color(1, 1, 1).multiplyScalar(5.0 * impact * glow)]);
     } else {
       flares.push([to, w * 14, hue.clone().multiplyScalar(1.2 * glow)],
         [to, w * 5, core.clone().multiplyScalar(2.0 * glow)]);
