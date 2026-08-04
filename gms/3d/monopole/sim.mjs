@@ -14,12 +14,16 @@ const TRACE_SEED = parseInt((process.argv.find(a => a.startsWith('--seed=')) || 
 
 const b = content.balance;
 
-// Three stand-in players so the distribution is a distribution and not one deterministic line.
+// Five stand-in players so the distribution is a distribution and not one deterministic line.
+// `bands` is which tactic bands the style will touch — greedy skips the price war and saves
+// for the cartel, which is the only way a stand-in ever reaches the illegal branch.
+const LEGAL = ['legal'];
 const STYLES = [
-  { id: 'cautious', floor: 6000, coilWeek: 7, grey: false, extraRig: false },
-  { id: 'standard', floor: 3000, coilWeek: 5, grey: false, extraRig: false },
-  { id: 'aggressive', floor: 500, coilWeek: 4, grey: true, extraRig: true },
-  { id: 'reckless', floor: 0, coilWeek: 1, grey: true, extraRig: true, sprawl: true },
+  { id: 'cautious', floor: 6000, coilWeek: 7, bands: LEGAL, extraRig: false },
+  { id: 'standard', floor: 3000, coilWeek: 5, bands: LEGAL, extraRig: false },
+  { id: 'aggressive', floor: 500, coilWeek: 4, bands: ['legal', 'grey'], extraRig: true },
+  { id: 'greedy', floor: 500, coilWeek: 4, bands: ['legal', 'illegal'], extraRig: true },
+  { id: 'reckless', floor: 0, coilWeek: 1, bands: ['legal', 'grey', 'illegal'], extraRig: true, sprawl: true },
 ];
 
 function policy(state, style) {
@@ -63,7 +67,7 @@ function policy(state, style) {
   for (const id of state.tactics.unlocked) {
     if (state.tactics.owned.includes(id)) continue;
     const t = content.get('tactic', id);
-    if (t.band !== 'legal' && !style.grey) continue;
+    if (!style.bands.includes(t.band)) continue;
     if (state.cash < t.cost + style.floor) continue;
     acts.push({ type: 'tactic', tactic: id });
     break;
@@ -76,7 +80,12 @@ function run(seed, opts = {}) {
   const rng = createRng(seed);
   let state = newGame(seed);
   const style = opts.style || STYLES[seed % STYLES.length];
-  const seen = { style: style.id, offerWeek: null, coilWeek: null, tacticWeek: null, unlockWeek: null, investigations: 0, quarters: [] };
+  const seen = {
+    style: style.id, offerWeek: null, coilWeek: null, tacticWeek: null, unlockWeek: null,
+    investigations: 0, quarters: [], peakHeat: 0,
+    greyUnlockWeek: null, greyTakeWeek: null, illegalUnlockWeek: null, illegalTakeWeek: null,
+    caughtAfterIllegal: false, banned: false, bustAfterFine: false, lastFineWeek: null,
+  };
   const trace = [];
   for (let w = 0; w < WEEKS; w++) {
     const acts = policy(state, style);
@@ -85,11 +94,24 @@ function run(seed, opts = {}) {
     for (const e of r.events) {
       if (e.t === 'offer' && seen.offerWeek === null) seen.offerWeek = e.week;
       if (e.t === 'unlock' && e.tactic === b.offer.tactic && seen.unlockWeek === null) seen.unlockWeek = e.week;
+      if (e.t === 'unlock' && e.band === 'grey' && seen.greyUnlockWeek === null) seen.greyUnlockWeek = e.week;
+      if (e.t === 'unlock' && e.band === 'illegal' && seen.illegalUnlockWeek === null) seen.illegalUnlockWeek = e.week;
+      if (e.t === 'tactic' && e.band === 'grey' && seen.greyTakeWeek === null) seen.greyTakeWeek = e.week;
+      if (e.t === 'tactic' && e.band === 'illegal' && seen.illegalTakeWeek === null) seen.illegalTakeWeek = e.week;
       if (e.t === 'module' && e.module === 'coilline') seen.coilWeek = e.week;
       if (e.t === 'tactic' && e.tactic === b.offer.tactic) seen.tacticWeek = e.week;
-      if (e.t === 'investigate') seen.investigations++;
+      if (e.t === 'investigate') {
+        seen.investigations++;
+        seen.lastFineWeek = e.week;
+        seen.cashAtCatch = state.cash + e.fine;
+        seen.catchBand = e.band;
+        if (e.banned) seen.banned = true;
+        if (e.band === 'illegal') seen.caughtAfterIllegal = true;
+      }
+      if (e.t === 'lose' && seen.lastFineWeek !== null && e.week - seen.lastFineWeek <= 2) seen.bustAfterFine = true;
       if (e.t === 'quarter') seen.quarters.push(e);
     }
+    seen.peakHeat = Math.max(seen.peakHeat, state.heat);
     if (opts.trace) trace.push({ week: state.week, events: r.events, snap: snapshot(state) });
     if (state.week === 13) { seen.shareAt13 = state.share.player; seen.cashAt13 = state.cash; }
     if (state.over) break;
@@ -211,10 +233,28 @@ const offerWeeks = [], share13 = [], cash13 = [], cashEnd = [], shareEnd = [];
 const outcomes = {}; let busts = 0, coilBuilt = 0, tookDeal = 0, investigations = 0;
 let coilWeeks = [], offerInWindow = 0;
 const byStyle = {};
+const grey = { unlocked: 0, unlockWeeks: [], taken: 0, by13: 0, by16: 0 };
+const illegal = { unlocked: 0, unlockWeeks: [], taken: 0, caught: 0, banned: 0 };
+let bustAfterFine = 0, peakHeats = [], catchCash = [], catchCashIllegal = [];
 
 for (let i = 0; i < RUNS; i++) {
   const { state, seen } = run(1000 + i);
   offerWeeks.push(seen.offerWeek);
+  if (seen.greyUnlockWeek !== null) {
+    grey.unlocked++; grey.unlockWeeks.push(seen.greyUnlockWeek);
+    if (seen.greyUnlockWeek <= 13) grey.by13++;
+    if (seen.greyUnlockWeek <= 16) grey.by16++;
+  }
+  if (seen.greyTakeWeek !== null) grey.taken++;
+  if (seen.illegalUnlockWeek !== null) { illegal.unlocked++; illegal.unlockWeeks.push(seen.illegalUnlockWeek); }
+  if (seen.illegalTakeWeek !== null) {
+    illegal.taken++;
+    if (seen.caughtAfterIllegal) illegal.caught++;
+    if (seen.banned) illegal.banned++;
+  }
+  if (seen.bustAfterFine) bustAfterFine++;
+  if (seen.cashAtCatch != null) (seen.catchBand === 'illegal' ? catchCashIllegal : catchCash).push(seen.cashAtCatch);
+  peakHeats.push(seen.peakHeat);
   if (seen.offerWeek !== null && seen.offerWeek >= b.offer.weekMin && seen.offerWeek <= b.offer.weekMax) offerInWindow++;
   if (seen.shareAt13 != null) { share13.push(seen.shareAt13); cash13.push(seen.cashAt13); }
   if (seen.coilWeek) { coilBuilt++; coilWeeks.push(seen.coilWeek); }
@@ -257,14 +297,29 @@ for (const [name, v] of Object.entries(byStyle)) {
   console.log(`  ${name.padEnd(11)} n ${v.n}  bust ${f(v.bust / v.n)}  offer-in-window ${f(v.offer / v.n)}  median share w13 ${f(pct(v.share13, 0.5))}`);
 }
 console.log('');
-console.log(`outcomes: ${JSON.stringify(outcomes)}   investigations ${investigations}`);
+console.log('the shady half:');
+console.log(`  grey unlocked    ${grey.unlocked}/${RUNS} = ${f(grey.unlocked / RUNS)}  (median week ${pct(grey.unlockWeeks, 0.5)}, by w13 ${f(grey.by13 / RUNS)}, by w16 ${f(grey.by16 / RUNS)})`);
+console.log(`  grey taken       ${grey.taken}/${RUNS} = ${f(grey.taken / RUNS)}`);
+console.log(`  illegal unlocked ${illegal.unlocked}/${RUNS} = ${f(illegal.unlocked / RUNS)}  (median week ${pct(illegal.unlockWeeks, 0.5)})`);
+console.log(`  illegal taken    ${illegal.taken}/${RUNS} = ${f(illegal.taken / RUNS)}, caught ${illegal.caught} = ${f(illegal.caught / Math.max(1, illegal.taken))} of takers, banned ${illegal.banned}`);
+console.log(`  peak heat        p50 ${Math.round(pct(peakHeats, 0.5))}  p90 ${Math.round(pct(peakHeats, 0.9))}  (threshold ${b.heat.threshold})`);
+console.log(`  cash the week the fine lands, pre-fine — grey    p10 ${k(pct(catchCash, 0.1))}  p50 ${k(pct(catchCash, 0.5))}  p90 ${k(pct(catchCash, 0.9))}`);
+console.log(`                                          illegal p10 ${k(pct(catchCashIllegal, 0.1))}  p50 ${k(pct(catchCashIllegal, 0.5))}  p90 ${k(pct(catchCashIllegal, 0.9))}`);
+console.log('');
+console.log(`outcomes: ${JSON.stringify(outcomes)}   investigations ${investigations}   busts within 2 weeks of a fine ${bustAfterFine}`);
 console.log('');
 
 const medShare13 = pct(share13, 0.5);
+const greyRate = grey.unlocked / RUNS;
+const caughtRate = illegal.taken ? illegal.caught / illegal.taken : 0;
 const checks = [
   ['offer in weeks 9-13', offerInWindow / RUNS, b.targets.offerByWeek13, v => v >= b.targets.offerByWeek13, f],
-  ['bust rate', busts / RUNS, b.targets.bustRateMax, v => v <= b.targets.bustRateMax, f],
+  ['bust rate', busts / RUNS, b.targets.bustRate, v => v >= b.targets.bustRate.min && v <= b.targets.bustRate.max, f],
   ['median share at week 13', medShare13, b.targets.shareAtWeek13, v => v >= b.targets.shareAtWeek13.min && v <= b.targets.shareAtWeek13.max, f],
+  ['grey tactic reachable', greyRate, b.targets.greyReachable, v => v >= b.targets.greyReachable, f],
+  ['grey reachable by week 16', grey.by16 / RUNS, b.targets.greyReachableByWeek16, v => v >= b.targets.greyReachableByWeek16, f],
+  ['illegal tactic taken', illegal.taken / RUNS, b.targets.illegalTaken, v => v >= b.targets.illegalTaken, f],
+  ['caught, of runs that went illegal', caughtRate, b.targets.caughtWhenIllegal, v => v >= b.targets.caughtWhenIllegal.min && v <= b.targets.caughtWhenIllegal.max, f],
 ];
 let pass = true;
 for (const [name, val, target, ok, fmt] of checks) {

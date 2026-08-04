@@ -11,9 +11,11 @@ export default Object.freeze({
     share: Object.freeze({ player: 0.04, rival: 0.71, other: 0.25 }),
   }),
 
-  // interestWeekly is a weekly rate on outstanding debt; 0.006 is ~36% a year.
+  // interestWeekly is a weekly rate on outstanding debt; 0.012 is ~87% a year.
+  // debtLimit is the overdraft the bank tolerates past zero cash, NOT the credit line
+  // (that is maxDraw). Small on purpose — it is the whole bust lever.
   loan: Object.freeze({
-    interestWeekly: 0.006, debtLimit: 40000,
+    interestWeekly: 0.012, debtLimit: 22000,
     drawFee: 0.02, maxDraw: 80000,
   }),
 
@@ -26,7 +28,7 @@ export default Object.freeze({
 
   // priceStep is the fraction of the gap to the clearing price a market closes each week.
   market: Object.freeze({
-    priceStep: 0.35, noise: 0.03,
+    priceStep: 0.35, noise: 0.05,
     stockDecayMult: 1.0,
     demandDrift: 0.004,
     freightBase: 34,
@@ -43,7 +45,7 @@ export default Object.freeze({
   share: Object.freeze({
     window: 6, inertia: 0.35, otherFloor: 0.10, otherDrift: -0.002,
     rivalPerShip: 4850, otherBase: 6600, undercutBoost: 1.06,
-    reachTotal: 26500, reachDrift: 0.002,
+    reachTotal: 27600, reachDrift: 0.002,
   }),
 
   rival: Object.freeze({
@@ -55,8 +57,8 @@ export default Object.freeze({
 
   // threshold is heat points; heat accrues per week from active grey and illegal tactics.
   heat: Object.freeze({
-    threshold: 60, decayWeekly: 1.4,
-    investigateBase: 0.06, investigatePerPoint: 0.004,
+    threshold: 34, decayWeekly: 1.0,
+    investigateBase: 0.07, investigatePerPoint: 0.004,
     repShield: 0.25, cooldownWeeks: 13,
   }),
 
@@ -75,10 +77,16 @@ export default Object.freeze({
     tickSeconds: 6, weeksPerQuarter: 13, speeds: Object.freeze([0, 1, 2, 4]), maxDwell: 3,
   }),
 
+  // bustRate is a band, not a ceiling — a game you cannot lose has no decision in it.
+  // caughtWhenIllegal is measured over the runs that actually took an illegal tactic.
   targets: Object.freeze({
     offerByWeek13: 0.80,
-    bustRateMax: 0.10,
+    bustRate: Object.freeze({ min: 0.05, max: 0.18 }),
     shareAtWeek13: Object.freeze({ min: 0.12, max: 0.25 }),
+    greyReachable: 0.85,
+    greyReachableByWeek16: 0.60,
+    illegalTaken: 0.15,
+    caughtWhenIllegal: Object.freeze({ min: 0.35, max: 0.90 }),
     runs: 500,
   }),
 });

@@ -2314,3 +2314,194 @@ flares; a clean terminator).
   A/B with a critic rather than another guess.
 - `belt_work`'s beams still have no *muzzle* fan as wide as the plate's — the scatter cone widens
   toward the impact, the plate's widens from the emitter.
+
+---
+
+# Session 12 — sim/balance pass: the shady half, and a game you can lose
+
+**Scope: `content/balance.js`, `content/tactics.js`, `sim.mjs` only.** Nothing under `js/sim/`,
+`js/world/`, `js/ui/` or `js/engine/` was touched — **no sim code changed at all**, this is
+entirely numbers plus a wider stand-in-player set in the harness. Session 8 left two things on the
+"what is short" list; this pass closes both.
+
+## What was wrong
+
+1. **The shady half was unreachable.** Grey and illegal tactics gated on 20–28% share *and*
+   55–90k cash. Share arrives around week 12; that much cash never does inside a session. So a
+   v0.1 player never saw a grey tactic, never accrued a point of heat, never got investigated and
+   never reached the Phoebus story the whole commodity chain was designed around. 0 investigations
+   in 500 games.
+2. **You could not lose.** Bust 0% under every style, including one drawing the full 80k line and
+   buying three hulls. `bustRateMax: 0.10` is a *maximum*, so it passed.
+
+## `node sim.mjs 500` — after
+
+```
+offer week histogram (exclusive_supply):
+  9:300  10:98  11:75  12:22  13:1  16:1  late:3
+  in window 9-13: 496/500 = 99.2%
+  coil line built in 500/500 (median week 5), deal taken 288/500
+
+player share at week 13:
+  p10 11.6%  p25 21.8%  median 23.0%  p75 25.5%  p90 27.8%   in band 12-25%: 289/500
+
+cash:  week 13  p10 9,901  median 11,899  p90 25,646
+       week 30  p10 -22,090  median 13,040  p90 43,486
+
+by style:                bust     offer-in-window   median share w13
+  cautious    n 100       0.0%        96.0%             11.6%
+  standard    n 100       0.0%       100.0%             24.7%
+  aggressive  n 100      11.0%       100.0%             22.5%
+  greedy      n 100      32.0%       100.0%             22.7%
+  reckless    n 100      11.0%       100.0%             27.5%
+
+the shady half:
+  grey unlocked    500/500 = 100.0%  (median week 13, by w13 74.0%, by w16 99.2%)
+  grey taken       200/500 = 40.0%          <- every grey-capable style takes one
+  illegal unlocked 296/500 = 59.2%  (median week 18)
+  illegal taken    100/500 = 20.0%, caught 54 = 54.0% of takers, banned 54
+  peak heat        p50 39  p90 80  (threshold 34)
+  cash the week the fine lands, pre-fine — grey    p10 7,846  p50 10,382  p90 13,068
+                                          illegal p10 13,524  p50 22,614  p90 31,450
+
+outcomes: {"running":431,"bust":54,"duopoly":15}   investigations 231
+          busts within 2 weeks of a fine: 54  (i.e. every bust is a fine)
+
+PASS  offer in weeks 9-13: 99.2%              (target 80.0%)
+PASS  bust rate: 10.8%                        (target 5.0%-18.0%)
+PASS  median share at week 13: 23.0%          (target 12.0%-25.0%)
+PASS  grey tactic reachable: 100.0%           (target 85.0%)
+PASS  grey reachable by week 16: 99.2%        (target 60.0%)
+PASS  illegal tactic taken: 20.0%             (target 15.0%)
+PASS  caught, of runs that went illegal: 54.0% (target 35.0%-90.0%)
+```
+
+`--selftest` still clean, all ten assertions including the no-mutation contract. Two 500-game runs
+diff clean; the sim is still fully deterministic from the seed.
+
+## Does the story actually happen? Read tick by tick, seed 1008
+
+**Cautious** — never touches grey, never goes negative. Offer w11, unlock w12, takes the deal w18
+(4% → 23.6% → peaks 30.0% w21), ends w30 on 16.9% share and 29,415 cash. Safe, as briefed.
+
+**Greedy** (legal + illegal, skips the price war) — trough of −5,342 at w6 that reads as real
+danger. Takes the Ryland deal w21. `spec_collusion` unlocks w20, taken **w24**. The cartel visibly
+pays: share 32.2% → 38.0% and cash 6,139 → 22,396 in three weeks while the heat bar climbs
+13/week from 13 to 52. **w28 the investigation lands**: 46,000 fine, 14% of share gone, standing
+halved, tactic permanently banned, cash −19,909 — 2,091 credits off folding. It limps to w30 on
+32.8% share and no money. That is the arc the brief asked for, and it is legible in the log.
+
+**Aggressive** (legal + grey) takes `below_cost` w14 — share jumps 22.6% → 27.3% while cash goes
+flat, which is exactly what predatory pricing should feel like — heat grinds 5 → 45 over nine
+weeks, caught w23, −19,241, survives crippled. **Reckless** on the same seed is caught at w23 on
+−21,635, inside 400 credits of the limit.
+
+So: greedy gets tempted, takes the risk, and gets caught in 54% of the runs that go illegal — and
+32% of greedy runs end in bust. Cautious survives 100%.
+
+## Every number moved
+
+### `content/balance.js`
+
+| Key | Was | Now | Why |
+|---|---|---|---|
+| `loan.interestWeekly` | 0.006 | **0.012** | the session-8 bust lever, doubled. It does not bust anyone on its own — what it does is decide how thin your cash is when a fine lands, and that is what decides the bust. At 0.006 the same fines killed nobody. |
+| `loan.debtLimit` | 40000 | **22000** | 40k of overdraft on top of an 80k credit line meant nothing could reach it. This is now the single most sensitive number in the file — see gotcha 58. |
+| `market.noise` | 0.03 | **0.05** | weekly price movement the player can see. Tried 0.07; it widened the week-13 share spread enough to cost 8 points of offer-in-window on the cautious style. 0.05 was better on every metric. |
+| `heat.threshold` | 60 | **34** | 60 was 13 weeks of grey play before the first roll, in a game that is over at 30. At 34, `below_cost` (6/wk net 5) crosses in 7 weeks and `spec_collusion` (14/wk net 13) in 3. The 2:1 intent from session 7 is preserved. |
+| `heat.decayWeekly` | 1.4 | **1.0** | same reason; also makes the bar's cooldown legible next to the 6/wk and 14/wk accruals. |
+| `heat.investigateBase` | 0.06 | **0.07** | briefly ran 0.10 with `investigatePerPoint` 0.006 — it caught 81% of colluders, which made the illegal band a formality rather than a gamble. 0.07 lands at 54%. |
+| `heat.investigatePerPoint` | 0.004 | 0.004 | unchanged, after the experiment above |
+| `share.reachTotal` | 26500 | **27600** | the master share knob. The cheaper Ryland deal (below) pushed the week-13 median to 24.1%, within 0.9pp of failing its own assertion. This backed it off to 23.0% without touching the economy underneath. |
+| `targets.bustRateMax: 0.10` | — | **removed** | replaced by `targets.bustRate: { min: 0.05, max: 0.18 }`. **A ceiling cannot catch the failure we actually had** — 0% bust passed it for a whole version. The band asserts the game is losable *and* not punishing; the design target was 8–15% and we land at 10.8%. |
+| `targets.greyReachable` | — | **0.85** | new |
+| `targets.greyReachableByWeek16` | — | **0.60** | new |
+| `targets.illegalTaken` | — | **0.15** | new |
+| `targets.caughtWhenIllegal` | — | **{ min: 0.35, max: 0.90 }** | new — a band, because 100% caught is as broken as 0% caught |
+
+### `content/tactics.js`
+
+| Tactic | Key | Was | Now | Why |
+|---|---|---|---|---|
+| `exclusive_supply` | `unlock.cash` | 30000 | **22000** | at double interest, 30k arrives ~8 weeks later than it used to; the flagship legal beat was slipping to w20 |
+| `exclusive_supply` | `cost` | 26000 | **22000** | same — deal taken went 234/500 → 288/500 |
+| `brand_buyout` | `unlock` | share .22 / cash 90000 | **share .22 / cash 30000** | 90k is unreachable in a session; it unlocked in 33/500 runs at median w27 |
+| `brand_buyout` | `cost` | 78000 | **26000** | now unlocks 200/500 at median w21, i.e. it is a real choice on the panel |
+| `brand_buyout` | `penalty.fine` | 52000 | **30000** | scaled to the cash a player actually has when caught |
+| `below_cost` | `unlock` | share .20 / cash 55000 | **share .14 / cash 10000** | the main fix. Grey now unlocks in 100% of runs, 74% of them by week 13 |
+| `below_cost` | `penalty.fine` | 40000 | **30000** | sits just under the cash-at-catch cluster (p10 7,846) so the price war rarely kills — it bleeds |
+| `below_cost` | effect | — | **+ `demandPull{'*', 0.24}`** | **it was a strictly bad tactic.** `ownPrice ×0.72` cut revenue, which cut share, so it lost you money *and* market — nobody would ever take it. Selling cheap has to move volume. Now share climbs while cash goes flat, which is the actual lesson of predatory pricing. Uses an existing op; no code change. |
+| `spec_collusion` | `unlock` | share .28 / cash 60000 | **share .20 / cash 22000** | reachable ~w18–24 for a player who pushes |
+| `spec_collusion` | `penalty.fine` | 120000 | **46000** | 120k was an instant, unavoidable death sentence — not a gamble. 46k against a p50 cash-at-catch of 22,614 kills roughly half the companies that are caught and cripples the rest. Share loss, rep loss and the permanent ban are unchanged. |
+
+### `sim.mjs` (the harness, not the sim)
+
+- **Five stand-in styles, not four.** Added `greedy` — legal + illegal, *skipping* grey. With four
+  styles the illegal branch was structurally unreachable: the policy takes the first affordable
+  unlocked tactic, and `below_cost` is free and unlocks 5 weeks earlier, so a grey-capable style
+  never saved for the cartel. `greedy` is the player who thinks a price war is a mug's game.
+- `style.grey: bool` → `style.bands: ['legal'|'grey'|'illegal']`. Explicit; the old flag silently
+  allowed illegal too.
+- New per-run tracking: grey/illegal unlock and take weeks, peak heat, catch band, cash the week
+  the fine lands, and whether a bust followed a fine within two weeks.
+- New report block ("the shady half") and four new assertions, all reading `balance.targets`.
+
+**No UI reads `balance.targets`** (checked) — only `sim.mjs` did, so renaming `bustRateMax`
+breaks nothing. `js/ui/screens.js` reads `loan.debtLimit`, `loan.interestWeekly`,
+`heat.threshold`, `heat.decayWeekly` and `tactic.penalty.*` and picks up all the new values for
+free. One consequence worth knowing: **the heat strip in the tactics screen now actually moves in
+normal play** — before this pass it was permanently at zero.
+
+## Two design calls a reviewer should know about
+
+**Every bust in the 500 is a fine.** 54 busts, 54 of them within two weeks of an investigation.
+Nothing else in the economy can reach the debt limit. That is deliberate: an overextension bust
+at week 6 would be deterministic per style (the min-cash spread across seeds is only a few hundred
+credits — see gotcha 59) and would fire before the player has made a single interesting decision.
+Losing because a regulator caught you is a *story*; losing to compound interest in week 6 is a
+tutorial failure. Interest is still the lever that makes it possible — it is what leaves you with
+~11k when a 30k fine lands instead of ~30k.
+
+**`brand_buyout` and `vertical_integration` are unlocked but never taken by the harness.**
+`brand_buyout` now unlocks in 200/500 runs, but the policy always finds `below_cost` first because
+it is free and earlier in content order. `vertical_integration` needs a refinery, which only the
+sprawl style builds. Both are reachable for a human; neither is exercised by a stand-in. Not worth
+contorting the harness policy over — but do not read "taken 0" as "dead content".
+
+## Gotchas — session 12
+
+58. **`loan.debtLimit` is a cliff, not a slope.** The cash a player holds the week a fine lands is
+    *tightly* clustered (grey: p10 7,846 / p50 10,382 / p90 13,068 — a 5k spread across 500 games).
+    Bust fires iff `cash < fine − debtLimit`, so moving `debtLimit` by 2,000 moved the bust rate
+    from 5% to 33% in testing. Move it 1,000 at a time and re-run 500. **Keep the grey fines below
+    that cluster and the illegal fine above its middle** — that is what makes the rate come from
+    the illegal branch, where the cash spread is wide (13.5k–31k) and the response is smooth.
+59. **Seeds barely diverge.** Min-cash across 300 seeds of the same style varies by under 300
+    credits. The RNG only touches rich veins and price noise; everything else is the policy. Any
+    balance number you tune will therefore behave like a step function per style, not a
+    distribution — the distribution comes from having five styles, not from the seed.
+60. **A tactic whose only effect is a cost is a tactic nobody takes.** `below_cost` cut its own
+    share by cutting its own revenue, because share is measured in delivered credits (gotcha 53).
+    Any future "sacrifice margin for position" tactic needs a `demandPull` or a `sharePull` to
+    represent the position it buys, or the share model turns the sacrifice into a double loss.
+61. **A `Max` target cannot catch a floor failure.** `bustRateMax: 0.10` passed happily at 0% for
+    an entire version. Where a metric is broken at *both* ends, assert the band.
+62. **`sim.mjs`'s tactic loop takes the first affordable unlocked tactic in content order.** Making
+    a grey tactic cheap and early therefore hides everything after it in the array from every style
+    that can take it. If you add a tactic and its take count is 0, check the order before you
+    change its numbers.
+
+## What is still short
+
+- **Cautious ends on 11.6% median share at week 13**, just under the 12% band floor. The pooled
+  median (23.0%) is what is asserted and it passes, but the most careful play style is the one
+  closest to feeling flat. `share.reachTotal` moves everyone together, so this needs a per-style
+  answer (a cheaper early module, or the coil line one tick sooner) rather than another knob.
+- **The offer slipped from 100% to 99.2% in window** — 4 runs land at w16 or later, all cautious.
+  Caused by the extra price noise. Well inside the 80% target; noted so it is not a surprise.
+- **Nothing in the economy itself can bust you** (see the design call above). If v0.2 wants an
+  overextension death it needs an actual shock — a lost hull, a cancelled contract, a demand
+  collapse — not a bigger interest number.
+- **Heat only accrues from active tactics.** A dominant player running nothing but legal tactics
+  attracts no regulator attention at all. That is what session 7's content says should happen, and
+  it is left alone — but it does mean the heat bar is invisible until the first grey tactic.
