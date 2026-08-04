@@ -413,7 +413,13 @@ export class Lighting {
       }
     }
     this.skyCanvas.getContext('2d').putImageData(this.skyImg, 0, 0);
+    // An equirect texture used as scene.background is converted to a cube map ONCE by
+    // WebGLCubeMaps and cached against the texture object for the life of the renderer, so
+    // needsUpdate alone repaints the canvas and changes nothing on screen — the sky stays on
+    // whatever it was at the first frame. dispose() is the only thing that drops that cache.
+    this.skyTex.dispose();
     this.skyTex.needsUpdate = true;
+    this.lastDraw = performance.now();
     this.envDirty = true;
   }
 
@@ -497,7 +503,13 @@ export class Lighting {
   }
 
   update(dt, app) {
-    if (this.dirty) { this.dirty = false; this.drawSky(this.skyEl, this.skyAz); }
+    // Each redraw now also throws away a cube map three has to rebuild, so a slider drag is
+    // coalesced to ~8/s rather than one per frame. `dirty` stays set, so the value you stop on
+    // is always the one drawn.
+    if (this.dirty && performance.now() - (this.lastDraw || 0) > 120) {
+      this.dirty = false;
+      this.drawSky(this.skyEl, this.skyAz);
+    }
     if (this.envDirty) this.refreshEnv();
     this.stepShadow(dt, app);
     windows.update(dt, app);

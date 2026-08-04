@@ -121,9 +121,19 @@ async function main() {
       logs.push('[throw] ' + (d.exception?.description || d.text));
     }
   });
+  // --mobile is the whole point of some bugs: the app picks its preset off the user agent and its
+  // controls off (pointer: coarse), so a desktop window is not a test of what a phone does.
   await S('Emulation.setDeviceMetricsOverride', {
-    width: W, height: H, deviceScaleFactor: +DPR, mobile: false,
+    width: W, height: H, deviceScaleFactor: +DPR, mobile: !!args.mobile,
   });
+  if (args.mobile) {
+    await S('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+    await S('Emulation.setEmitTouchEventsForMouse', { enabled: true, configuration: 'mobile' });
+    await S('Network.setUserAgentOverride', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 '
+        + '(KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+    });
+  }
 
   const shots = args.all ? await listScenarios(S) : [args.shot || 'wall_day'];
   mkdirSync(OUTDIR, { recursive: true });
