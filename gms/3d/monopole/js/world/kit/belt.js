@@ -119,7 +119,8 @@ function rockGeom(tier, index, boost = 0) {
     let cav = 0;
     for (const [nx, ny, nz, d] of cuts) {
       const t = x * nx + y * ny + z * nz - d;
-      if (t > 0) { r -= t * 0.85; cav = Math.max(cav, Math.min(1, t * 2.6)); }
+      // A cut is a convex facet — the brightest thing on a real rock — so it must not feed cav.
+      if (t > 0) r -= t * 0.85;
     }
     for (const [nx, ny, nz, cw, depth] of craters) {
       const c = x * nx + y * ny + z * nz;
@@ -130,10 +131,12 @@ function rockGeom(tier, index, boost = 0) {
       cav = Math.max(cav, u * 0.8);
     }
     p.setXYZ(i, x * r, y * r, z * r);
-    // vertex cavity, used twice: it darkens the rock and it is inverted to place the ore glow.
-    // The floor is near black on purpose — a crater interior in the plate reads as a hole, and a
-    // 0.16 floor under any lift at all comes back as the same mid-grey as the rim beside it.
-    const ao = Math.max(0.05, Math.min(1.05, 0.44 + 0.92 * (r - 0.88) / 0.34 - 0.86 * cav));
+    // Vertex cavity, used twice: it darkens the rock and it is inverted to place the ore glow.
+    // Broad shape and crater interior are graded separately and only the crater may reach black.
+    // Sharing one ramp meant a ramp 0.34 wide had to cover r varying over 0.7, so the bottom
+    // third of every rock clamped to the floor and read as a hole punched through the frame.
+    const shape = Math.max(0.30, Math.min(1.05, 0.56 + 0.62 * (r - 0.95) / 0.62));
+    const ao = Math.max(0.06, shape - 0.74 * cav);
     col[i * 3] = ao; col[i * 3 + 1] = ao; col[i * 3 + 2] = ao;
   }
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
