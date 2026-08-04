@@ -124,8 +124,9 @@ export function registerBackdropScenarios(app, world) {
       q.set('starEl', 10);
       q.set('keySwing', 0);
       q.set('keyLift', 0);
-      q.set('fogDensity', 0.0022);
+      q.set('fogDensity', 0.0030);
       q.set('fogTint', 0.88);
+      q.set('fogDesat', 0.30);
       q.set('rimDist', 110);
       q.set('rimNear', 40);
       q.set('rimFall', 70);
@@ -135,8 +136,11 @@ export function registerBackdropScenarios(app, world) {
       q.set('envPower', 0.16);
       q.set('envFloor', 0.06);
       q.set('ambient', 0.004);
-      q.set('keyPower', 58);
-      q.set('fillPower', 4.5);
+      q.set('keyPower', 41);
+      q.set('fillPower', 5.6);
+      // the shadow side is 0.07-albedo metal, so a multiplied fill returns nothing; this is the
+      // additive one that carries the plate map and puts plating back into the dark half
+      q.set('shadowFill', 0.26);
       q.set('fillAngle', 168);
       q.set('fillLift', -24);
       q.set('windowGlow', 4.4);
@@ -161,12 +165,32 @@ export function registerBackdropScenarios(app, world) {
 
       for (const [cls, x, y, z, ry] of [
         ['escort', -120, 30, -210, 2.1], ['rig', -30, -40, -430, 1.4],
-        ['hauler', -300, 60, -1000, 1.9]]) {
+        ['hauler', -300, 60, -1000, 1.9], ['escort', -74, -26, -96, 0.9],
+        ['rig', -150, -52, -260, 2.4]]) {
         const o = shipClass(cls, { palette: 'corvain', lod: lodForDistance(Math.abs(z)), seed: x + 40 });
         o.position.set(x, y, z);
         o.rotation.set(0.04, ry, 0.03);
         g.add(o);
       }
+
+      // known-huge: a 500 m yard at 700 m, nearly all of it lost to the fog, so the 84 m hauler
+      // in front of it has something to be small against
+      const yard = station('drayyard', { palette: 'corvain', seed: 3 });
+      yard.position.set(-260, -120, -820);
+      yard.rotation.set(0.05, 0.75, 0.02);
+      g.add(yard);
+
+      g.add(atmosphere({
+        seed: 11,
+        layers: [
+          { count: 4, center: [-40, 10, -260], size: [420, 200, 320], scale: [180, 320],
+            aspect: 1.8, color: '#c07a6a', power: 0.42, variant: 3 },
+          { count: 10, center: [-30, 4, -120], size: [260, 120, 220], scale: [50, 130],
+            color: '#d8a08a', power: 0.24, variant: 2 },
+          { count: 5, center: [-58, -22, -70], size: [180, 90, 150], scale: [60, 150],
+            aspect: 1.6, color: '#e0a894', power: 0.30, variant: 0 },
+        ],
+      }));
 
       world.setSubject(g);
       frameCamera(a, { pos: [-12, 10, 30], look: [-13, 2.5, -11], fov: 46 });
@@ -218,8 +242,9 @@ export function registerBackdropScenarios(app, world) {
 // ── stations ─────────────────────────────────────────────────────────────────
 
 export function registerStationScenarios(app, world) {
-  // Down the dock spine of Ledger, camera between the two bay columns and above the truss, so
-  // the near bays run off the bottom and right edges and the row recedes to the hero blade.
+  // Three-quarter broadside on Ledger's dock row, near bays cropped by the left edge and the
+  // hero blade sitting on the spine deck at the far end — 8500_06's own arrangement. Four
+  // structure layers at 0 / 900 / 1200 / 2700 m so no corner of frame is empty sky.
   // The star is high and off the right shoulder: it lights the bay decks and the dock faces the
   // camera can see, and everything else is emissive.
   defineScenario({
@@ -236,13 +261,22 @@ export function registerStationScenarios(app, world) {
       q.set('fogTint', 0.32);
       q.set('fogDesat', 0.34);
       q.set('fogLevel', 0.17);
-      q.set('keyPower', 13);
-      q.set('fillPower', 1.5);
+      q.set('keyPower', 17);
+      q.set('fillPower', 2.6);
       q.set('fillAngle', 150);
       q.set('fillLift', -30);
-      q.set('ambient', 0.006);
-      q.set('envPower', 0.22);
-      q.set('envFloor', 0.05);
+      q.set('ambient', 0.004);
+      q.set('envPower', 0.15);
+      q.set('envFloor', 0.04);
+      q.set('stationPanel', 0.52);
+      q.set('stationDirt', 0.78);
+      q.set('exposure', 0.88);
+      // the plate's background is a dark busy field, never plain sky; the dust fill is what stops
+      // the top and right thirds reading as empty navy
+      q.set('dustField', 0.008);
+      q.set('nebGain', 0.30);
+      q.set('nebDesat', 0.62);
+      q.set('nebHalo', 0.05);
       q.set('windowGlow', 6.0);
       q.set('stripPower', 5.2);
       q.set('dockGlow', 3.0);
@@ -265,9 +299,23 @@ export function registerStationScenarios(app, world) {
       // the far structure layer. Haze between two layers of the same kit is what turns one row
       // of modules into a yard; there is nothing behind the near row to lose contrast against.
       const far = station('drayyard', { palette: 'corvain', seed: 7 });
-      far.position.set(1120, -70, 270);
+      far.position.set(1160, -40, 230);
       far.rotation.set(0.04, 1.42, 0.03);
       g.add(far);
+
+      // a third yard at half that distance fills the right of the frame, which was the one part
+      // of this shot the plate occupies and ours did not
+      const mid = station('drayyard', { palette: 'corvain', seed: 19 });
+      mid.position.set(900, -290, 40);
+      mid.rotation.set(0.05, 1.30, 0.02);
+      g.add(mid);
+
+      // a fourth layer, far enough that the fog has most of it: the plate never leaves a corner
+      // of frame as empty sky
+      const deep = station('ledger', { palette: 'corvain', seed: 41 });
+      deep.position.set(2210, 610, -1880);
+      deep.rotation.set(0.04, 2.2, 0.02);
+      g.add(deep);
 
       // known-small against known-huge: an 84 m hauler nosed into a 400 m row of bays
       const h = shipClass('hauler', { palette: 'ferrous', seed: 21 });
@@ -278,11 +326,25 @@ export function registerStationScenarios(app, world) {
         ['escort', 96, 30, 128, 2.4, 0], ['rig', 372, -46, 168, 1.1, 0],
         ['hauler', 620, 120, -520, 2.2, 1], ['escort', -180, 70, -260, 0.6, 1],
         ['hauler', 760, 60, 210, 1.7, 0], ['escort', 900, -30, 60, 2.0, 1],
-        ['rig', 1020, 130, 340, 0.8, 1], ['hauler', 1480, -20, 420, 2.4, 2]]) {
+        ['rig', 1020, 130, 340, 0.8, 1], ['hauler', 1480, -20, 420, 2.4, 2],
+        ['escort', 520, -120, 60, 1.2, 0], ['hauler', 880, -150, -60, 2.7, 1],
+        ['escort', 640, -60, -180, 0.4, 1], ['rig', 1180, -230, 120, 1.9, 2],
+        ['hauler', 300, -170, 90, 0.9, 0], ['escort', 180, -140, 20, 1.8, 0],
+        ['rig', 700, -220, 160, 2.3, 1], ['escort', 420, -90, 200, 0.2, 0]]) {
         const o = shipClass(cls, { palette: 'corvain', lod, seed: x });
         o.position.set(x, y, z);
         o.rotation.set(0.05, ry, 0.02);
         g.add(o);
+      }
+
+      // The critic's sharpest note was that the emissive strips light nothing at all, so the
+      // cladding beside them stays flat tan. Four short-range warm lamps at the dock line are
+      // what put a falloff on the boxes next to a lit mouth; they cost no draw call.
+      for (const [x, y, z, i, d] of [[150, 6, 96, 5200, 150], [330, 2, 92, 4200, 140],
+        [250, 46, -60, 5200, 190], [560, -6, -86, 3400, 130]]) {
+        const l = new THREE.PointLight(0xff9346, i, d, 2);
+        l.position.set(x, y, z);
+        g.add(l);
       }
 
       // the near structure and the far half of the row are the same value without something
@@ -300,7 +362,7 @@ export function registerStationScenarios(app, world) {
       }));
 
       world.setSubject(g);
-      frameCamera(a, { pos: [10, 132, 214], look: [420, -14, -34], fov: 48 });
+      frameCamera(a, { pos: [110, 128, 268], look: [356, -24, -26], fov: 42 });
     },
   });
 

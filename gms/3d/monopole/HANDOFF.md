@@ -2505,3 +2505,145 @@ contorting the harness policy over — but do not read "taken 0" as "dead conten
 - **Heat only accrues from active tactics.** A dominant player running nothing but legal tactics
   attracts no regulator attention at all. That is what session 7's content says should happen, and
   it is left alone — but it does mean the heat bar is invisible until the first grey tactic.
+# Session 12a — `station_night` and `hero_hull` (parallel worktree A)
+
+Two shots only. Files touched: `js/world/kit/station.js`, `js/world/kit/ship.js`, and the
+`station_night` / `hero_hull` scenario blocks in `js/world/scene.js`. Nothing else.
+
+## `station_night` — 4.25 → self-score **6.0**
+
+The critic's note was asset-level and this session is the modelling it asked for.
+
+### The row is no longer one module repeated
+
+**Instancing is gone.** `bakedModule(id, palette, seed)` merges a module to one geometry per
+bucket and caches it; every slot in the dock row `clone()`s those buffers and applies its matrix
+into the station's own `fixed` buckets. A station is now **7 draw calls instead of 14**, and the
+row can use as many module types as it likes for nothing. Three baked seeds per id
+(`seed + (i % 3) * 101`) so neighbours do not share a greeble layout. Cost is one memcpy per slot
+per bucket; build time did not move measurably.
+
+`spec.row` is a cycle of module ids consumed per slot (Ledger's is 11 long over 24 slots, so
+neither column repeats a rhythm). `spec.swaps` still works and still stands its neighbours down.
+
+### Four new modules, all bay-footprint, all on the dock-face convention
+
+| id | what it is |
+|---|---|
+| `radiator` | two flat wings angled off a boom, each combed with 15 ribs at a pitch four times finer than the bay ribs. The only non-boxy silhouette in the row. |
+| `gantry` | rail clutter — a deck with running rails, a travelling crane on two legs, and 16 containers at three sizes drawn from four tint buckets. |
+| `tankage` | three horizontal tanks in cradles with band ribs, a catwalk and a handrail at fixed pitch. |
+| `mast` | a 108 m lattice tower with three dishes. The vertical break in a row that is otherwise all horizontal. |
+
+Plus **nav points** (`navPoints` / `navRun`): 1–1.8 m cubes in the `glow` bucket carrying their
+hue in the vertex colour, red/amber/cyan, on every module and along the truss. They are below a
+pixel at sheet scale — the bloom is what turns each into a coloured dot, which is exactly what
+the plate's fourth density band is.
+
+### Four other model changes
+
+- **The spine deck.** `truss()` now carries a 34 m plated deck with pale strakes, cross ribs,
+  scattered greeble and two runs of dock lights. A bare lattice between two bay columns reads as
+  a rack of separate objects; this is what makes the row one mass, and it is the single biggest
+  change in the shot.
+- **The `spine` module has a chamfered section** — belly, lower chine, flank, upper chine, pale
+  deck: five faces at five angles. An accent-coloured extruded box has one normal per side, so
+  however hard you key it the whole flank comes back at one value and reads as a painted wall.
+  It also moved onto the deck at the far end (`x 326`), where 8500_06 puts its hero.
+- **A third of the dock mouths are shut.** One identical lit rectangle on every bay was the
+  loudest repeat on the station. Open mouths got gate bars across them and a dimmer, tighter
+  falloff; closed ones are a ribbed door with one red light.
+- **The hub's drum ends** got cap ribs, a boss and rim blocks. End-on it was a smooth grey circle
+  and read as a moon.
+
+### Cladding
+
+`breakUp()` gained `uSPanel` and `uSDirt` (knobs `stationPanel` 0.42, `stationDirt` 0.55).
+Hard-edged **world-space blocks at 6.5 / 21 / 61 m** drive albedo and roughness, plus a very
+low-frequency soot term and a downface darkening. Because the blocks are world-space, two
+identical modules at different x get different cladding for free.
+
+`TINT` was re-spread: `hull` 1.00 → **1.42**, `panel` 0.62 → **0.40**, `dark` 0.30 → **0.11**.
+Every bucket used to sit inside one stop of every other, which is what "flat tan" was.
+
+### Scenario
+
+Reframed to a three-quarter broadside (`pos [110,128,268] look [356,-24,-26] fov 42`) with the
+near bays cropped by the left edge. **Four structure layers** — Ledger at 0 m, a Dray Yard at
+~900 m, another at ~1200 m, a fourth at ~2700 m that the fog reduces to a pale ghost. Twelve
+hulls instead of eight. Grade: `keyPower` 13 → 17 (the pale decks now clip toward white while
+`dark` stays near black), `fillPower` 1.5 → 2.6, `envPower` 0.22 → 0.15, `exposure` 0.88,
+`nebGain` 0.30 so the background keeps its blacks.
+
+**Four `PointLight`s at the dock line** (`distance` 130–190, `decay` 2). The critic's sharpest
+line was that the emissive strips light nothing at all; these are the falloff on the cladding
+beside a lit mouth. They cost no draw call and live in the scenario's group, so they leave with it.
+
+## `hero_hull` — self-score **6.0** (last blind score 3.0, last self-score 5.5)
+
+The last session's own open note was "structure inside the shadow — the 0.07-albedo metal gives
+the fill nothing to land on". That is now fixed properly.
+
+**`shadowFill` (knob, group `Hulls`, default 0).** An *additive* term in the ship shader, gated by
+`smoothstep(0.34, -0.52, N·keyDir)` so it only exists where the key does not reach, shaped by
+`N·fillDir`, and multiplied by a read of the **plate map** — so what it lands on is the plating,
+not the albedo. A multiplied fill on 0.07 albedo returns nothing, which is why every previous
+attempt flattened instead of revealing. The tint is `sys.fill` lerped 45 % toward grey; at full
+saturation a 0.07-albedo metal reads as painted plastic.
+
+Scenario: `shadowFill 0.26`, `keyPower` 58 → 41 (the bow deck was clipping to a hard-edged white
+sticker), `fillPower` 4.5 → 5.6, `fogDensity` 0.0022 → 0.0030 with `fogDesat 0.30` so the mid
+distance actually grades. Added a **500 m Dray Yard at ~820 m** — nine tenths of it lost to fog,
+which is the known-huge the 84 m hauler needed — plus three card layers of warm dust and two more
+escorts in the near field.
+
+## Numbers — gate is `--preset=medium --dpr=1 --w=844 --h=390`
+
+| | budget | station_night | hero_hull |
+|---|---|---|---|
+| draw calls | < 150 | **125** | **94** |
+| triangles | < 350 k | **136 k** | **54 k** |
+| texture memory | < 60 MB | **13.4** | **13.4** |
+| CPU p95 | < 6 ms | 2.1–2.7 | 1.8–2.5 |
+| fps | 60 | 58–62 | 56–60 |
+
+At 1280×720 `--preset=high`: station_night 115 / 134 k, hero_hull 94 / 54 k. All eleven scenarios
+were re-rendered on this build; `station_haze` gains the new modules and the spine deck and looks
+better for it, `hull_close` is unchanged (`shadowFill` defaults to 0 and `resetDefaults` restores
+it), and nothing else moved.
+
+## Gotchas — session 12a
+
+38. **Instancing was costing draw calls here, not saving them.** Seven fixed meshes plus seven
+    `InstancedMesh`es is fourteen calls for a station whose bays could simply have been merged
+    into the fixed buckets — an instanced row only pays off if the bays are also the *only* thing
+    in the station. Baking each module once and cloning the merged buffer per slot is 7 calls,
+    unlimited module vocabulary, and the same triangle count (three counts an instanced draw as
+    `count × instances` anyway).
+39. **A shadow fill has to be additive and driven by the texture, not the albedo.** `0.07 × fill`
+    is 0.07 × nothing. Multiplying the *plate map read* instead puts panel structure into a dark
+    half at any fill level. Keep the map term soft, though — `0.30 + 1.10·t²` made the hull read
+    as a checkerboard at sheet scale; `0.62 + 0.62·t` is right.
+40. **A dish or a drum end face-on to the key reads as a golf ball or a moon.** Both were `panel`
+    bucket and both had a perfectly circular silhouette. Move them to `dark` and put something
+    proud of the rim.
+41. **A bright near-foreground module is worse than none.** The "near dark layer" trick needs the
+    module's unlit side toward the camera, and there is no shadow rig to guarantee that — the
+    1.8×-scaled gantry at 90 m came back as the brightest object in the frame. Cropping the near
+    bays with the frame edge does the same job for free.
+42. **`tools/compare.mjs`'s `REFS` path is four levels up from the project root**, which resolves
+    outside a `.claude/worktrees/<id>/` checkout. Symlink
+    `.claude/worktrees/gms/3d/aaa_refs → ~/cc/yru/gms/3d/aaa_refs` rather than editing the tool.
+
+## What is still short on these two
+
+- **`station_night`'s subject still does not dominate the frame the way the plate's barge does.**
+  Ours is ~45 % of the image against the plate's ~70 %, and closing that means either a longer
+  row or a much tighter lens, and the tighter lens costs the depth layers that were just added.
+- The bay decks read as a tiled floor at sheet scale. The plate's containers have individual
+  silhouette variation — different heights, some open, some tarped; ours vary only in tint.
+- `hero_hull` is still a lofted polygon with chines against a plate with compound curvature, and
+  it is still darker and more contrasty than the plate's high-key haze. That is the component-3
+  limit, not a lighting one.
+- The four dock lamps are hand-placed. A station should return its lit dock points in `userData`,
+  the way it should already return dock anchors.
