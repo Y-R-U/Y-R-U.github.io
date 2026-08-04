@@ -236,6 +236,13 @@ export function shipMover({ root, anchor, build, beamTarget = null, beamColor = 
         } else if (e.t === 'mine') {
           const a = ensure(e.ship);
           a.mining = 2;
+        } else if (e.t === 'scrap') {
+          const a = avatars.get(e.ship);
+          if (a) { root.remove(a.obj); if (a.beam) root.remove(a.beam); avatars.delete(e.ship); }
+        } else if (e.t === 'layup') {
+          const a = ensure(e.ship, e.class);
+          if (e.site) dock(a, e.site);
+          a.leg = null; a.curve = null; a.mining = 0; a.laidUp = true;
         }
       }
       for (const a of avatars.values()) setBeam(a, a.mining > 0);
