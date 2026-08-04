@@ -24,6 +24,9 @@ const RIM = {
   uBouncePow: { value: 1.0 },
   uDetail: { value: 0.55 },
   uRough: { value: 0.22 },
+  uShadCol: { value: new THREE.Color(0.25, 0.55, 0.72) },
+  uShadDir: { value: new THREE.Vector3(0, -1, 0) },
+  uShadPow: { value: 0 },
 };
 
 const rnd = s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
@@ -60,7 +63,8 @@ function patch(m, bounce) {
       uniform mat4 modelMatrix;
       uniform vec3 uKeyPos, uKeyCol, uB0c, uB1c;
       uniform vec4 uB0, uB1;
-      uniform float uRimInt, uRimPow, uRimNear, uRimFall, uBouncePow, uRough;
+      uniform vec3 uShadCol, uShadDir;
+      uniform float uRimInt, uRimPow, uRimNear, uRimFall, uBouncePow, uRough, uShadPow;
       ${NOISE}\n` + sh.fragmentShader;
 
     // panel-to-panel roughness break-up at a frequency the plate map cannot reach, so the flank
@@ -94,6 +98,16 @@ function patch(m, bounce) {
           / (1.0 + (d0 * d0) / max(uB0.w * uB0.w, 1e-4))
           * pow(max(0.0, dot(N, b0 / max(d0, 1e-4))), 0.65));
 
+        // Structure inside the shadow. The base metal is 0.07 albedo, so a fill multiplied by it
+        // returns nothing and the shadow side stays a flat black mass — which is exactly what the
+        // last critic saw. This is additive and carries the plate map and the mapped normal, so
+        // what it lands on is the plating, not the albedo.
+        vec3 Nw = normalize((vec4(normal, 0.0) * viewMatrix).xyz);
+        float shad = smoothstep(0.34, -0.52, dot(Nw, normalize(uKeyPos - vWP)));
+        gl_FragColor.rgb += uShadCol * (uShadPow * shad
+          * (0.30 + 0.70 * clamp(dot(Nw, uShadDir), 0.0, 1.0))
+          * SHAD_DETAIL);
+
         vec3 b1 = (modelMatrix * vec4(uB1.xyz, 1.0)).xyz - vWP;
         float d1 = length(b1);
         gl_FragColor.rgb += uB1c * (uBouncePow * step(0.0, uB1.w)
@@ -114,8 +128,11 @@ function patch(m, bounce) {
            diffuseColor.rgb *= mix(1.0, texture2D(map,
              vec2(vMapUv.y * 1.87 + 0.11, vMapUv.x * 2.63 + 0.44)).r * 1.6, uDetail);`);
     }
+
+    sh.fragmentShader = sh.fragmentShader.replace('SHAD_DETAIL',
+      m.map ? '(0.62 + 0.62 * texture2D(map, vMapUv).r)' : '1.0');
   };
-  m.customProgramCacheKey = () => 'shiprim2' + (m.map ? 'd' : '');
+  m.customProgramCacheKey = () => 'shiprim3' + (m.map ? 'd' : '');
   return m;
 }
 
@@ -937,6 +954,7 @@ function strip(g) {
 }
 const stripG = g => strip(g);
 
+const GREY = new THREE.Color(0.55, 0.56, 0.58);
 const GLOW = { engine: 1.5, plume: 1.0 };
 const EMISSIVE = [];
 const PLUMES = [];
@@ -961,6 +979,8 @@ export function registerShipKnobs(q, backdrop) {
     v => { RIM.uDetail.value = v; });
   q.register({ key: 'hullRough', label: 'Roughness break-up', type: 'range', min: 0, max: 0.6, step: 0.01, default: 0.24, group: G },
     v => { RIM.uRough.value = v; });
+  q.register({ key: 'shadowFill', label: 'Shadow-side structure', type: 'range', min: 0, max: 2.5, step: 0.02, default: 0, group: G },
+    v => { RIM.uShadPow.value = v; });
   q.register({ key: 'engineGlow', label: 'Engine core', type: 'range', min: 0, max: 6, step: 0.05, default: 1.5, group: G },
     v => { GLOW.engine = v; for (const m of EMISSIVE) m.color.setScalar(v); });
   q.register({ key: 'plumePower', label: 'Exhaust plume', type: 'range', min: 0, max: 4, step: 0.02, default: 1.0, group: G },
@@ -976,4 +996,7 @@ export function updateShipLighting(backdrop, lighting) {
   const d = lighting?.keyDir || backdrop.dir;
   RIM.uKeyPos.value.copy(d).multiplyScalar(RIM.dist ?? 120);
   RIM.uKeyCol.value.set(backdrop.sys.starTint).convertSRGBToLinear();
+  // a fully saturated fill hue on a 0.07-albedo metal reads as painted plastic
+  RIM.uShadCol.value.set(backdrop.sys.fill).convertSRGBToLinear().lerp(GREY, 0.45);
+  if (lighting?.fill) RIM.uShadDir.value.copy(lighting.fill.position).normalize();
 }

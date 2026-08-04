@@ -5,8 +5,9 @@
 // Module origin is its dock face — the face a ship approaches, at z = 0, approached from −Z, with
 // the body extending toward +Z. Station origin is the hub centre and the spine runs along X.
 //
-// Draw calls, not triangles, are the budget here: every module merges per material, the repeated
-// bays are one InstancedMesh per material, and a whole station is about fourteen calls.
+// Draw calls, not triangles, are the budget here: every module in a station bakes to one merged
+// geometry per material and every slot in the dock row clones that buffer into a shared bucket,
+// so a whole station is seven calls whatever mix of module types the row uses.
 
 import * as THREE from 'three';
 import { getMaterial, adopt } from '../materials.js';
@@ -20,10 +21,12 @@ const BUCKETS = ['hull', 'dark', 'panel', 'trim', 'win', 'strip', 'glow'];
 const SURFACE = { hull: 'hull', dark: 'hullDark', panel: 'panel', trim: 'trim', win: 'window', strip: 'strip' };
 const emptyBuckets = () => Object.fromEntries(BUCKETS.map(k => [k, []]));
 
+// The plate's whole value story is near-white deck plate against near-black structure. Ours ran
+// every bucket inside one stop of every other, which is what "flat tan" was.
 const TINT = {
-  hull: [1.00, 0.96, 0.90],
-  dark: [0.30, 0.30, 0.32],
-  panel: [0.62, 0.62, 0.64],
+  hull: [1.42, 1.38, 1.30],
+  dark: [0.11, 0.12, 0.16],
+  panel: [0.40, 0.41, 0.47],
   trim: [0.95, 0.80, 0.62],
 };
 
@@ -36,7 +39,10 @@ let detail = 1;
 // of every box lands within a few percent of every other face and the whole thing reads as one
 // extruded lump: world-space roughness break-up separates coplanar neighbours, and the normal
 // tilt gives a deck, a wall and a soffit three different values before the light is even applied.
-const SB = { uRough: { value: 0.30 }, uPlane: { value: 0.45 } };
+const SB = {
+  uRough: { value: 0.30 }, uPlane: { value: 0.45 },
+  uPanel: { value: 0.42 }, uDirt: { value: 0.55 },
+};
 
 const SNOISE = `
 float sh31(vec3 p){ p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419)); p *= 17.0;
@@ -50,13 +56,15 @@ function breakUp(m) {
   m.onBeforeCompile = sh => {
     sh.uniforms.uSRough = SB.uRough;
     sh.uniforms.uSPlane = SB.uPlane;
+    sh.uniforms.uSPanel = SB.uPanel;
+    sh.uniforms.uSDirt = SB.uDirt;
     sh.vertexShader = `varying vec3 vSP; varying vec3 vSN;\n` + sh.vertexShader.replace(
       '#include <worldpos_vertex>',
       `#include <worldpos_vertex>
        vSP = (modelMatrix * vec4(transformed, 1.0)).xyz;
        vSN = normalize(mat3(modelMatrix) * objectNormal);`);
     sh.fragmentShader = `varying vec3 vSP; varying vec3 vSN;
-      uniform float uSRough, uSPlane;
+      uniform float uSRough, uSPlane, uSPanel, uSDirt;
       ${SNOISE}\n` + sh.fragmentShader;
     sh.fragmentShader = sh.fragmentShader.replace(
       '#include <roughnessmap_fragment>',
@@ -64,14 +72,28 @@ function breakUp(m) {
        {
          vec3 pn = vSP * 0.021;
          float rn = svn(pn) * 0.6 + svn(pn * 5.1 + 7.0) * 0.4;
-         roughnessFactor = clamp(roughnessFactor + uSRough * (rn - 0.5) * 2.6, 0.20, 0.86);
+         roughnessFactor = clamp(roughnessFactor + uSRough * (rn - 0.5) * 2.6
+           + uSPanel * (sh31(floor(vSP / 6.5)) - 0.5) * 0.9, 0.20, 0.90);
        }`);
+    // The tiling plate map is one noise at one scale on every panel of every module, which is
+    // the fastest read of programmer art there is. These are hard-edged world-space blocks at
+    // two sizes, so identical modules placed at different x get different cladding, plus a very
+    // low-frequency soot gradient that runs across module boundaries.
     sh.fragmentShader = sh.fragmentShader.replace(
       '#include <map_fragment>',
       `#include <map_fragment>
-       diffuseColor.rgb *= 1.0 + uSPlane * (normalize(vSN).y * 0.62 - abs(normalize(vSN).x) * 0.20);`);
+       diffuseColor.rgb *= 1.0 + uSPlane * (normalize(vSN).y * 0.62 - abs(normalize(vSN).x) * 0.20);
+       {
+         float b1 = sh31(floor(vSP / 6.5));
+         float b2 = sh31(floor(vSP / 21.0) + 3.7);
+         float b3 = sh31(floor(vSP / 61.0) + 11.3);
+         diffuseColor.rgb *= 1.0 + uSPanel * ((b1 - 0.5) * 0.34 + (b2 - 0.5) * 0.66 + (b3 - 0.5) * 0.42);
+         float soot = svn(vSP * 0.0062) * 0.65 + svn(vSP * 0.019 + 4.0) * 0.35;
+         diffuseColor.rgb *= 1.0 - uSDirt * smoothstep(0.44, 0.86, soot) * 0.62;
+         diffuseColor.rgb *= 1.0 - uSDirt * 0.22 * clamp(-normalize(vSN).y, 0.0, 1.0);
+       }`);
   };
-  m.customProgramCacheKey = () => 'stationbreak1';
+  m.customProgramCacheKey = () => 'stationbreak2';
   return m;
 }
 
@@ -166,6 +188,26 @@ function dockLights(out, { axis, from, to, pitch, x, y, z, size = 0.34 }) {
   }
 }
 
+// The plate's fourth and finest density band: navigation points, a metre across, far too small
+// to model but bright enough that bloom turns each into a coloured dot. They ride the glow
+// bucket, whose material colour is a scalar, so the hue has to live in the vertex colour.
+const NAV = { red: [1.0, 0.13, 0.07], amber: [1.0, 0.55, 0.12], cyan: [0.35, 0.82, 1.0], white: [0.9, 0.95, 1.0] };
+
+function navPoints(out, hue, pts, size = 1.4, power = 1.1) {
+  for (const [x, y, z] of pts) {
+    const g = new THREE.BoxGeometry(size, size, size);
+    paint(g, [hue[0] * power, hue[1] * power, hue[2] * power]);
+    g.applyMatrix4(M4.makeTranslation(x, y, z));
+    out.push(g);
+  }
+}
+
+function navRun(out, hue, { axis, from, to, pitch, x, y, z, size = 1.2, power = 1.0 }) {
+  const pts = [];
+  for (let t = from; t <= to; t += pitch) { const p = [x, y, z]; p[axis] += t; pts.push(p); }
+  navPoints(out, hue, pts, size, power);
+}
+
 // ── modules ──────────────────────────────────────────────────────────────────
 
 const BAY_D = 54;
@@ -185,11 +227,17 @@ const MODULES = {
       g.dark.push(box(1.2, H * 0.7, D * 0.96, s * (hw - 3.2), -1.5, D / 2, 0, 0, 0, 0.42));
     }
 
-    // pale deck plates either side of a dark slot — the value break that makes the run read
+    // pale deck plates either side of a dark slot — the value break that makes the run read.
+    // The hot line down each plate edge is 8500_06's own trick: the containers are separated by
+    // orange slot lights, not by shadow, so the run stays legible at thumbnail size.
     for (const s of [-1, 1]) {
       g.hull.push(box(W * 0.40, 1.6, D * 0.90, s * W * 0.29, H / 2 + 0.8, D / 2, 0, 0, 0, 1.0));
       g.hull.push(box(W * 0.40, 0.5, D * 0.30, s * W * 0.29, H / 2 + 1.8, D * 0.30, 0, 0, 0, 1.0));
       g.trim.push(box(W * 0.35, 0.30, 1.1, s * W * 0.29, H / 2 + 1.7, D * 0.10));
+      g.dark.push(box(W * 0.46, 1.9, D * 0.94, s * W * 0.29, H / 2 + 0.6, D / 2, 0, 0, 0, 0.3));
+      for (const e of [-1, 1]) {
+        g.strip.push(box(0.5, 0.30, D * 0.86, s * W * 0.29 + e * W * 0.205, H / 2 + 1.55, D / 2));
+      }
     }
     g.dark.push(box(W * 0.22, 2.2, D * 0.88, 0, H / 2 - 0.3, D / 2, 0, 0, 0, 0.30));
     g.strip.push(box(W * 0.13, 0.22, D * 0.80, 0, H / 2 - 0.6, D / 2));
@@ -224,8 +272,25 @@ const MODULES = {
       g.panel.push(box(w, h, 3.0, x, y, 1.5, 0, 0, 0, 0.8));
     }
     g.trim.push(box(mw + 8.4, 0.30, 0.9, 0, mh / 2 + 2.3, 3.1));
-    g.glow.push(glowQuad(mw, mh, '-z', 0, 0, -0.2, warm, 0.9, 1.4));
     g.dark.push(box(mw + 8, mh + 4, 1.0, 0, 0, 0.6, 0, 0, 0, 0.25));
+    // A third of the row is shut. One identical lit rectangle on every bay is the loudest repeat
+    // on the station, and a closed door is also the only thing that puts a dark hole in the run.
+    const open = R();
+    if (open < 0.34) {
+      g.panel.push(box(mw, mh, 0.8, 0, 0, -0.5, 0, 0, 0, 0.55));
+      for (let i = -2; i <= 2; i++) g.dark.push(box(mw * 0.98, 0.5, 0.7, 0, i * mh * 0.19, -1.0, 0, 0, 0, 0.3));
+      g.trim.push(box(mw * 0.9, 0.24, 0.5, 0, -mh * 0.42, -1.1));
+      navPoints(g.glow, NAV.red, [[0, mh * 0.40, -1.2]], 1.1, 1.2);
+    } else {
+      g.glow.push(glowQuad(mw, mh, '-z', 0, 0, -0.2, warm, 0.30 + 0.34 * open, 2.3));
+      // a lit rectangle with nothing in front of it is a flat orange decal; the gate bars are
+      // what turn it into a mouth with something inside
+      for (const y of [-mh * 0.30, mh * 0.30]) g.dark.push(box(mw * 1.02, 0.6, 0.6, 0, y, -0.75, 0, 0, 0, 0.2));
+      for (const x of [-mw * 0.30, mw * 0.06, mw * 0.34]) g.dark.push(box(0.7, mh * 1.02, 0.6, x, 0, -0.75, 0, 0, 0, 0.2));
+      g.panel.push(box(mw * 0.36, mh * 0.30, 1.2, -mw * 0.16, -mh * 0.28, -1.1, 0, 0, 0, 0.5));
+    }
+    navPoints(g.glow, NAV.red, [[-(mw / 2 + 2.4), mh / 2 + 2.4, 0.4], [mw / 2 + 2.4, mh / 2 + 2.4, 0.4]], 1.2, 1.2);
+    navPoints(g.glow, NAV.cyan, [[0, -mh / 2 - 2.6, 0.4]], 1.0, 1.0);
 
     // flank windows on the bay body, low on the wall
     for (const f of ['+x', '-x']) {
@@ -300,6 +365,24 @@ const MODULES = {
     for (const z of [zc - 34, zc + 34]) g.trim.push(cyl(r * 1.06, r * 1.06, 1.4, 34, 0, 0, z, Math.PI / 2, 0));
     g.panel.push(cyl(r * 0.62, r * 0.72, 10, 24, 0, 0, -3, Math.PI / 2, 0, 0.8));
     g.dark.push(cyl(r * 0.34, r * 0.34, 30, 16, 0, 0, zc + L * 0.5 + 14, Math.PI / 2, 0, 0.6));
+    // seen end-on the drum is a plain disc and reads as a moon; the cap ribs and the hub boss are
+    // what stop that at the one angle a station shot is most likely to catch it
+    for (const [ze, s] of [[zc - L * 0.5 - 0.6, -1], [zc + L * 0.5 + 0.6, 1]]) {
+      g.dark.push(cyl(r * 0.86, r * 0.86, 2.0, 30, 0, 0, ze + s * 0.8, Math.PI / 2, 0, 0.5));
+      g.panel.push(cyl(r * 0.40, r * 0.46, 5.0, 20, 0, 0, ze + s * 2.6, Math.PI / 2, 0, 0.85));
+      g.trim.push(cyl(r * 0.16, r * 0.16, 6.0, 12, 0, 0, ze + s * 4.0, Math.PI / 2, 0));
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        g.dark.push(box(1.6, r * 0.9, 2.2, Math.sin(a) * r * 0.48, Math.cos(a) * r * 0.48, ze + s * 1.4, 0, 0, -a, 0.45));
+        // a smooth circle in silhouette reads as a moon, whatever is drawn on its face
+        if (i % 2 === 0) {
+          g.panel.push(box(7, 5, 9, Math.sin(a) * r * 1.02, Math.cos(a) * r * 1.02, ze - s * 5, 0, 0, -a, 0.8));
+          g.dark.push(box(2.0, 2.0, 16, Math.sin(a) * r * 1.10, Math.cos(a) * r * 1.10, ze - s * 10, 0, 0, 0, 0.45));
+        }
+      }
+      navRun(g.glow, NAV.red, { axis: 0, from: -r * 0.9, to: r * 0.9, pitch: r * 0.45,
+        x: 0, y: 0, z: ze + s * 1.2, size: 1.2, power: 1.1 });
+    }
 
     // three window bands round the drum: the densest emissive run on the station, and the only
     // curved row of lights in the frame
@@ -341,14 +424,31 @@ const MODULES = {
   // The break in the run. One mass that owns the frame, in the faction accent, with an emissive
   // edge line — 8500_06 is twenty grey bays and one orange spine, and the orange spine is the shot.
   spine(g, R, p) {
-    const L = 320, hot = new THREE.Color(p.strip);
+    const L = 320, sl = L / 9, hot = new THREE.Color(p.strip);
+    // An accent-coloured extruded box has one normal per side, so however hard the key hits it
+    // the whole flank comes back at one value and reads as a wall. The section is chamfered
+    // instead: belly, lower chine, flank, upper chine and pale deck are five faces at five
+    // angles, which is where the value range on the plate's hero actually comes from.
     for (let i = 0; i < 9; i++) {
       const t = i / 8;
       const w = 42 * (0.30 + 0.70 * Math.sin(Math.min(1, t * 1.15) * Math.PI) ** 0.55) + 5;
       const h = 21 * (0.34 + 0.66 * Math.sin(Math.min(1, t * 1.1) * Math.PI) ** 0.6) + 3;
-      g.trim.push(box(w, h, L / 9, 0, 0, L * (t * 0.98 + 0.02), 0, 0, 0, 1.0));
-      g.hull.push(box(w * 0.55, h * 0.28, L / 9 * 0.9, 0, h * 0.55, L * (t * 0.98 + 0.02), 0, 0, 0, 1.0));
-      if (i % 2 === 0) g.dark.push(box(w * 1.08, 1.4, 2.6, 0, -h * 0.30, L * (t * 0.98 + 0.02), 0, 0, 0, 0.5));
+      const z = L * (t * 0.98 + 0.02);
+      g.dark.push(box(w * 0.80, h * 0.52, sl, 0, -h * 0.36, z, 0, 0, 0, 0.42));
+      g.panel.push(box(w * 0.86, h * 0.90, sl * 0.99, 0, 0, z, 0, 0, 0, 0.9));
+      for (const s of [-1, 1]) {
+        const c = h * 0.34;
+        g.trim.push(box(c, c, sl, s * (w * 0.44 - c * 0.18), -h * 0.26, z, 0, 0, s * 0.80, 0.7));
+        g.trim.push(box(w * 0.10, h * 0.44, sl, s * w * 0.46, h * 0.02, z, 0, 0, 0, 0.95));
+        g.trim.push(box(c, c, sl, s * (w * 0.42 - c * 0.18), h * 0.30, z, 0, 0, -s * 0.72, 1.0));
+        g.dark.push(box(w * 0.11, h * 0.06, sl * 0.94, s * w * 0.47, h * 0.20, z, 0, 0, 0, 0.3));
+        if (i % 3 === 1) g.panel.push(box(3.0, 2.4, sl * 0.44, s * w * 0.46, -h * 0.02, z, 0, 0, 0, 0.75));
+      }
+      g.hull.push(box(w * 0.66, h * 0.14, sl * 0.96, 0, h * 0.48, z, 0, 0, 0, 1.0));
+      g.dark.push(box(w * 0.30, h * 0.30, sl * 0.86, 0, h * 0.66, z, 0, 0, 0, 0.5));
+      g.hull.push(box(w * 0.18, h * 0.10, sl * 0.72, 0, h * 0.84, z, 0, 0, 0, 1.0));
+      if (i % 2 === 0) g.dark.push(box(w * 0.94, 1.2, 2.4, 0, h * 0.56, z, 0, 0, 0, 0.4));
+      navPoints(g.glow, NAV.red, [[0, h * 0.90 + 1.0, z]], 1.3, 1.2);
     }
     for (const s of [-1, 1]) {
       g.strip.push(box(1.1, 1.1, L * 0.86, s * 18, 4.6, L * 0.5));
@@ -363,6 +463,140 @@ const MODULES = {
     }
     g.trim.push(box(0.6, 26, 0.6, 3, 42, L * 0.74));
     dockLights(g.strip, { axis: 2, from: 12, to: L - 12, pitch: 7, x: 0, y: 12.5, z: 0 });
+  },
+
+  // Ribbed radiators. Two flat wings out of a boom, combed at a pitch four times finer than the
+  // bay ribs — the plate's surfaces run smooth spine → radiators → rail clutter → nav points, and
+  // this is the second of those four densities. Flat wings are also the only non-boxy silhouette
+  // in the row.
+  radiator(g, R, p) {
+    const D = 50, warm = new THREE.Color(p.strip);
+    g.panel.push(box(17, 12, 13, 0, 0, 7.5, 0, 0, 0, 0.85));
+    g.dark.push(box(19.5, 2.6, 2.2, 0, 7.2, 7.5, 0, 0, 0, 0.5));
+    g.dark.push(box(4.6, 4.0, D, 0, 0, D / 2, 0, 0, 0, 0.42));
+    g.trim.push(box(14, 0.30, 1.0, 0, 6.6, 3.2));
+    g.glow.push(glowQuad(9, 6, '-z', 0, -1, -0.2, warm, 0.55, 2.2));
+    windowGrid(g.win, R, { face: '-z', x: 0, y: 2.5, z: 0.9, w: 11, h: 5, cols: 4, rows: 2, skip: 0.28 });
+
+    const fins = Math.max(6, Math.round(15 * detail));
+    for (const s of [-1, 1]) {
+      const tilt = s * 0.30, cx = s * 16.5;
+      for (const z of [14.5, D - 7.5]) g.dark.push(box(31, 1.2, 2.2, cx, 3.0, z, 0, 0, tilt, 0.4));
+      for (let i = 0; i < fins; i++) {
+        const z = 15.5 + i * ((D - 24) / (fins - 1));
+        g.panel.push(box(29.5, 0.5, 1.35, cx, 3.0, z, 0, 0, tilt, 0.95));
+      }
+      g.dark.push(box(2.0, 2.0, D - 22, cx * 0.30, 3.0, D / 2, 0, 0, 0, 0.45));
+      const tx = cx + s * 14.6 * Math.cos(tilt), ty = 3.0 + 14.6 * Math.abs(Math.sin(tilt));
+      navPoints(g.glow, NAV.red, [[tx, ty, 15.5], [tx, ty, D - 8.5]], 1.3, 1.2);
+    }
+    dockLights(g.strip, { axis: 2, from: 14, to: D - 8, pitch: 6, x: 0, y: 5.4, z: 0 });
+  },
+
+  // Rail clutter: a deck with running rails, a travelling crane and a yard of containers at three
+  // sizes and three tints. The plate's mid-frequency band, and the only place a warm cargo colour
+  // gets to sit next to the pale cladding.
+  gantry(g, R, p) {
+    const D = 54, W = 36, warm = new THREE.Color(p.strip);
+    g.dark.push(box(W, 1.8, D, 0, -6.5, D / 2, 0, 0, 0, 0.5));
+    g.panel.push(box(W * 0.86, 1.0, D * 0.9, 0, -5.4, D / 2, 0, 0, 0, 0.72));
+    for (const s of [-1, 1]) {
+      g.dark.push(box(1.0, 1.0, D * 0.94, s * W * 0.34, -4.6, D / 2, 0, 0, 0, 0.4));
+      g.dark.push(box(1.6, 5.0, 1.6, s * W * 0.46, -4.0, 6, 0, 0, 0, 0.45));
+      navRun(g.glow, NAV.amber, { axis: 2, from: 6, to: D - 6, pitch: 9, x: s * W * 0.47, y: -3.0, z: 0, size: 1.0, power: 0.9 });
+    }
+
+    const stacks = Math.max(6, Math.round(16 * detail));
+    const buckets = ['hull', 'panel', 'trim', 'dark'];
+    for (let i = 0; i < stacks; i++) {
+      const cw = 5.5 + 4.5 * R(), ch = 3.0 + 2.4 * R() ** 2, cd = 7 + 8 * R();
+      const x = (R() - 0.5) * W * 0.66, z = 6 + R() * (D - 14);
+      const lay = Math.floor(R() * 3);
+      for (let k = 0; k <= lay; k++) {
+        const b = buckets[Math.floor(R() * (k ? 3 : 4))];
+        g[b].push(box(cw, ch, cd, x + (R() - 0.5) * 1.2, -5.0 + ch * (k + 0.5), z, 0, 0, 0, 0.9 - 0.12 * k));
+        if (R() < 0.4) g.trim.push(box(cw * 0.8, 0.22, 0.7, x, -5.0 + ch * (k + 1) - 0.4, z - cd * 0.5 - 0.1));
+      }
+    }
+
+    // the crane: a bridge on two legs, the one thing on the row that is obviously a machine
+    const cz = D * (0.34 + 0.3 * R());
+    for (const s of [-1, 1]) g.dark.push(box(2.2, 20, 2.2, s * W * 0.38, 4, cz, 0, 0, 0, 0.45));
+    g.panel.push(box(W + 8, 2.4, 3.4, 0, 14.4, cz, 0, 0, 0, 0.85));
+    g.dark.push(box(W + 9, 0.8, 1.0, 0, 12.9, cz, 0, 0, 0, 0.4));
+    g.panel.push(box(4.4, 3.6, 4.4, W * 0.16, 12.0, cz, 0, 0, 0, 0.8));
+    g.dark.push(box(0.7, 9, 0.7, W * 0.16, 7.0, cz, 0, 0, 0, 0.4));
+    g.dark.push(box(4.0, 1.6, 4.0, W * 0.16, 2.2, cz, 0, 0, 0, 0.45));
+    windowGrid(g.win, R, { face: '-z', x: W * 0.16, y: 12.0, z: cz - 2.3, w: 3.0, h: 2.2, cols: 2, rows: 1, skip: 0.1 });
+    navPoints(g.glow, NAV.red, [[-W * 0.5 - 4.6, 15.8, cz], [W * 0.5 + 4.6, 15.8, cz]], 1.4, 1.3);
+
+    for (let i = 0; i < Math.round(7 * detail); i++) {
+      g.dark.push(cyl(1.6 + R(), 1.6 + R(), 4 + 4 * R(), 10,
+        (R() - 0.5) * W * 0.7, -3.4, 6 + R() * (D - 12), 0, 0, 0.7));
+    }
+    g.glow.push(glowQuad(11, 5, '-z', 0, -3, -0.2, warm, 0.5, 2.4));
+  },
+
+  // Tankage. Round where the row is square, and the cradles and catwalk give it a third rhythm
+  // between the radiator comb and the bay ribs.
+  tankage(g, R, p) {
+    const D = 58;
+    g.dark.push(box(34, 2.0, D, 0, -11, D / 2, 0, 0, 0, 0.5));
+    for (const [x, y, r, L, z0] of [[-9, 1, 9.5, 34, 12], [10, 0, 8.0, 40, 10], [0, 15, 6.2, 26, 22]]) {
+      g.panel.push(cyl(r, r, L, 16, x, y, z0 + L / 2, Math.PI / 2, 0, 0.95));
+      g.panel.push(cyl(r * 0.55, r * 0.9, 3.2, 14, x, y, z0 - 1.4, Math.PI / 2, 0, 0.8));
+      for (let i = 0; i <= 4; i++) {
+        g.dark.push(cyl(r * 1.05, r * 1.05, 0.9, 16, x, y, z0 + (L * i) / 4, Math.PI / 2, 0, 0.45));
+      }
+      for (const s of [-1, 1]) g.dark.push(box(1.6, r + 9, 1.6, x + s * r * 0.8, y - r * 0.5 - 4, z0 + L * 0.5, 0, 0, 0, 0.4));
+      navRun(g.glow, NAV.red, { axis: 2, from: z0 + 3, to: z0 + L - 3, pitch: 11, x, y: y + r + 0.9, z: 0, size: 1.1, power: 1.1 });
+    }
+    g.panel.push(box(15, 9, 12, 0, -4, 6.5, 0, 0, 0, 0.9));
+    windowGrid(g.win, R, { face: '-z', x: 0, y: -4, z: 0.4, w: 10, h: 5, cols: 4, rows: 2, skip: 0.25 });
+    g.dark.push(box(24, 1.2, 2.0, 0, -9.4, 4.0, 0, 0, 0, 0.45));
+    // catwalk with a handrail at a fixed pitch — a known-small thing to size the tanks against
+    for (const s of [-1, 1]) {
+      g.dark.push(box(3.4, 0.6, D * 0.82, s * 16, -8.4, D / 2, 0, 0, 0, 0.55));
+      for (let z = 10; z < D - 6; z += 3.4) g.dark.push(box(0.35, 2.2, 0.35, s * 17.4, -7.2, z, 0, 0, 0, 0.4));
+      g.trim.push(box(0.4, 0.4, D * 0.8, s * 17.4, -6.1, D / 2));
+      dockLights(g.strip, { axis: 2, from: 8, to: D - 6, pitch: 7, x: s * 16, y: -7.9, z: 0 });
+    }
+    for (let i = 0; i < Math.round(6 * detail); i++) {
+      g.dark.push(box(1.0, 1.0, 8 + 12 * R(), (R() - 0.5) * 26, -10 + R() * 22, 12 + R() * (D - 24), 0, 0, 0, 0.4));
+    }
+  },
+
+  // A lattice mast. Every other module on the row is horizontal; this is the vertical break, and
+  // its dishes and strobes are the smallest recognisable objects on the station.
+  mast(g, R, p) {
+    const H = 108, r = 3.4;
+    g.dark.push(box(20, 4.0, 22, 0, -2, 11, 0, 0, 0, 0.5));
+    g.panel.push(box(13, 7, 12, 0, 2.5, 10, 0, 0, 0, 0.85));
+    windowGrid(g.win, R, { face: '-z', x: 0, y: 2.5, z: 3.9, w: 8, h: 4, cols: 3, rows: 2, skip: 0.25 });
+    for (const [dx, dz] of [[r, r], [r, -r], [-r, r], [-r, -r]]) {
+      g.dark.push(box(1.1, H, 1.1, dx, H / 2 + 5, 11 + dz, 0, 0, 0, 0.45));
+    }
+    const rungs = Math.max(6, Math.round(14 * detail));
+    for (let i = 0; i <= rungs; i++) {
+      const y = 6 + (H - 4) * (i / rungs);
+      g.dark.push(box(r * 2 + 1.1, 0.7, 0.7, 0, y, 11 + r, 0, 0, 0, 0.4));
+      g.dark.push(box(r * 2 + 1.1, 0.7, 0.7, 0, y, 11 - r, 0, 0, 0, 0.4));
+      g.dark.push(box(0.7, 0.7, r * 2, r, y, 11, 0, 0, 0, 0.4));
+      g.dark.push(box(0.7, 0.7, r * 2, -r, y, 11, 0, 0, 0, 0.4));
+      if (i < rungs) {
+        const seg = (H - 4) / rungs, a = Math.atan2(r * 2, seg) * (i % 2 ? 1 : -1);
+        g.dark.push(box(0.6, Math.hypot(seg, r * 2), 0.6, r, y + seg / 2, 11, a, 0, 0, 0.35));
+        g.dark.push(box(0.6, Math.hypot(seg, r * 2), 0.6, -r, y + seg / 2, 11, -a, 0, 0, 0.35));
+      }
+    }
+    for (const [y, rr, s] of [[34, 5.2, 1], [58, 3.9, -1], [80, 4.5, 1]]) {
+      // panel-bright and face-on to the key a dish reads as a golf ball; these want to be dark
+      g.dark.push(cyl(rr, rr * 0.22, 2.6, 14, s * (r + rr * 0.8), y, 11, 0, s * 1.15, 0.55));
+      g.dark.push(box(0.7, 0.7, 4.0, s * (r + rr * 0.4), y, 11, 0, 0, 0, 0.4));
+    }
+    g.trim.push(box(1.2, 12, 1.2, 0, H + 12, 11));
+    navPoints(g.glow, NAV.red, [[0, H + 19, 11], [0, H + 6, 11]], 1.5, 1.5);
+    navRun(g.glow, NAV.red, { axis: 1, from: 12, to: H, pitch: 26, x: -r - 0.9, y: 0, z: 11 + r, size: 1.1, power: 1.1 });
   },
 
   // A tapered spire. Its only job is to be the near, dark, off-frame layer in a haze shot.
@@ -396,6 +630,28 @@ function buildBuckets(moduleId, paletteId, seed) {
   return g;
 }
 
+// A module baked to one merged geometry per bucket, cached by id/palette/seed/detail. Cloning a
+// baked buffer and applying a matrix costs a memcpy, so a row of twenty different modules merges
+// into the same seven meshes an instanced row of one module used to need — which is what makes
+// module vocabulary free in draw calls.
+const BAKED = new Map();
+
+function bakedModule(moduleId, paletteId, seed) {
+  const key = `${moduleId}:${paletteId}:${seed}:${detail}`;
+  let hit = BAKED.get(key);
+  if (hit) return hit;
+  const g = buildBuckets(moduleId, paletteId, seed);
+  hit = {};
+  for (const k of BUCKETS) hit[k] = mergeAll(g[k]);
+  BAKED.set(key, hit);
+  return hit;
+}
+
+function placeBaked(out, moduleId, paletteId, seed, m) {
+  const b = bakedModule(moduleId, paletteId, seed);
+  for (const k of BUCKETS) if (b[k]) out[k].push(b[k].clone().applyMatrix4(m));
+}
+
 function meshesFrom(g, paletteId, grp) {
   for (const k of BUCKETS) {
     const m = mergeAll(g[k]);
@@ -418,24 +674,32 @@ export function stationModule(moduleId, { palette: paletteId = 'ferrous', seed =
 // bays: laid out in two columns either side of the spine, dock faces outward. Everything else is
 // placed once. `at` is [x, y, z, rotY].
 
+// nominal depth along +Z, so a slot's strut knows how far out to reach
+const MOD_D = { bay: 54, radiator: 50, gantry: 54, tankage: 58, mast: 30, refinery: 74, coilline: 150, hub: 84, spine: 320, pylon: 300 };
+
 const STATIONS = {
   ledger: {
     palette: 'ferrous',
-    bays: { n: 18, x0: 84, pitch: 44, z: 80 },
-    truss: { from: 24, to: 500, r: 9 },
+    bays: { n: 24, x0: 80, pitch: 40, z: 66 },
+    truss: { from: 20, to: 560, r: 9 },
+    // an 11-long cycle over 20 alternating-column slots, so neither column repeats a rhythm
+    row: ['bay', 'radiator', 'bay', 'gantry', 'tankage', 'bay', 'radiator', 'bay', 'mast', 'gantry', 'bay'],
     parts: [
       ['hub', [0, 0, -42, 0]],
       ['refinery', [-104, 0, 0, Math.PI / 2]],
-      ['coilline', [494, 0, 0, Math.PI / 2]],
-      ['spine', [128, 52, -40, Math.PI / 2]],
+      ['coilline', [530, 0, 0, Math.PI / 2]],
+      ['spine', [326, 30, -6, Math.PI / 2]],
+      ['mast', [300, 26, -8, Math.PI / 2]],
+      ['radiator', [64, -46, 8, Math.PI / 2]],
     ],
     masts: [[196, -40, 10, 40], [396, -40, 10, 40]],
     swaps: { 8: { module: 'refinery', scale: 0.8, dy: -16 }, 15: { module: 'refinery', scale: 0.62, dy: -8 } },
   },
   drayyard: {
     palette: 'corvain',
-    bays: { n: 10, x0: 96, pitch: 48, z: 78 },
-    truss: { from: 30, to: 340, r: 8 },
+    bays: { n: 14, x0: 92, pitch: 42, z: 66 },
+    truss: { from: 26, to: 380, r: 8 },
+    row: ['bay', 'gantry', 'radiator', 'bay', 'mast', 'tankage', 'bay'],
     parts: [
       ['hub', [0, 0, -42, 0]],
       ['coilline', [-56, 30, 0, Math.PI / 2]],
@@ -473,8 +737,30 @@ function truss(g, { from, to, r }) {
     g.dark.push(box(Math.hypot(seg, r * 2), 0.9, 0.9, x, 0, r, 0, 0, a, 0.45));
     g.dark.push(box(Math.hypot(seg, r * 2), 0.9, 0.9, x, 0, -r, 0, 0, -a, 0.45));
   }
-  g.panel.push(box(L, 2.2, 5.0, mid, r + 2.2, 0, 0, 0, 0, 0.8));
-  for (let x = from + 6; x < to; x += 12) g.strip.push(box(0.6, 0.4, 0.6, x, r + 3.5, 0));
+  // A bare lattice between two columns of bays reads as a rack of separate objects. The spine
+  // deck is what makes the row one mass, which is the single thing 8500_06's barge has that a
+  // truss-and-modules layout does not.
+  const DW = 34;
+  g.panel.push(box(L, 1.8, DW, mid, r + 2.2, 0, 0, 0, 0, 0.75));
+  g.hull.push(box(L * 0.995, 0.7, DW * 0.42, mid, r + 3.3, -DW * 0.26, 0, 0, 0, 1.0));
+  g.hull.push(box(L * 0.995, 0.7, DW * 0.42, mid, r + 3.3, DW * 0.26, 0, 0, 0, 1.0));
+  g.dark.push(box(L, 1.1, DW * 0.13, mid, r + 3.5, 0, 0, 0, 0, 0.3));
+  g.strip.push(box(L * 0.98, 0.24, DW * 0.05, mid, r + 3.9, 0));
+  const RD = rnd(0x77a1);
+  for (let x = from + 4; x < to; x += 11) {
+    g.dark.push(box(1.4, 1.1, DW * 1.02, x, r + 3.4, 0, 0, 0, 0, 0.45));
+    if (RD() < 0.55) {
+      const w = 2.4 + 5 * RD(), h = 1.0 + 3.4 * RD() ** 2, d = 2.4 + 6 * RD();
+      g[RD() < 0.3 ? 'hull' : 'panel'].push(box(w, h, d, x + 3, r + 3.6 + h / 2,
+        (RD() - 0.5) * DW * 0.8, 0, 0, 0, 0.85));
+    }
+    if (RD() < 0.2) g.trim.push(box(3.0, 0.22, 0.8, x + 2, r + 3.7, (RD() - 0.5) * DW * 0.7));
+  }
+  for (const s of [-1, 1]) {
+    g.dark.push(box(L, 2.0, 1.6, mid, r + 2.0, s * DW * 0.5, 0, 0, 0, 0.4));
+    dockLights(g.strip, { axis: 0, from, to, pitch: 9, x: 0, y: r + 3.6, z: s * DW * 0.52, size: 0.5 });
+  }
+  for (let x = from + 6; x < to; x += 12) g.strip.push(box(0.6, 0.4, 0.6, x, r + 4.6, 0));
 }
 
 export function station(stationId, { palette: paletteId, seed = 0 } = {}) {
@@ -486,17 +772,18 @@ export function station(stationId, { palette: paletteId, seed = 0 } = {}) {
   const fixed = emptyBuckets();
   truss(fixed, spec.truss);
   for (const [id, [x, y, z, ry]] of spec.parts) {
-    const b = buildBuckets(id, pid, seed + id.length * 13);
-    const m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z),
-      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry, 0)), new THREE.Vector3(1, 1, 1));
-    for (const k of BUCKETS) for (const geo of b[k]) { geo.applyMatrix4(m); fixed[k].push(geo); }
+    placeBaked(fixed, id, pid, seed + id.length * 13, new THREE.Matrix4().compose(
+      new THREE.Vector3(x, y, z),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry, 0)), new THREE.Vector3(1, 1, 1)));
   }
   // The dock row. One module repeated at constant spacing cannot be lit into looking bespoke, so
-  // the slots carry ragged dock lines, height and depth scale, a little yaw, dropped bays and a
-  // couple of entirely different modules. Width never varies — the x pitch has 6 m of slack.
+  // the slots run a cycle of different module types, and on top of that carry ragged dock lines,
+  // height and depth scale, a little yaw and dropped bays. Width never varies — the x pitch has
+  // 6 m of slack.
   const { n, x0, pitch, z } = spec.bays;
   const r = spec.truss.r;
   const swaps = spec.swaps || {};
+  const row = spec.row || ['bay'];
   const RB = rnd((0x2c9f | 0) + (seed + 7) * 2654435761);
   const slots = [];
   for (let i = 0; i < n; i++) {
@@ -504,21 +791,25 @@ export function station(stationId, { palette: paletteId, seed = 0 } = {}) {
     const sw = swaps[i];
     // a swapped module is wider and deeper than a bay, so its same-column neighbours stand down
     if (!sw && (swaps[i - 2] || swaps[i + 2])) continue;
-    if (!sw && RB() < 0.13) continue;
+    if (!sw && RB() < 0.10) continue;
+    const e = sw || row[i % row.length];
+    const mod = sw ? sw.module : (typeof e === 'string' ? e : e.m);
+    const tall = mod === 'mast';
     slots.push({
-      i, col, sw,
+      i, col, mod,
+      scale: sw?.scale ?? (typeof e === 'string' ? 1 : e.s ?? 1),
       x: x0 + Math.floor(i / 2) * pitch + (RB() - 0.5) * 5,
-      y: (RB() - 0.5) * 13 + (sw?.dy || 0),
+      y: (RB() - 0.5) * (tall ? 5 : 13) + (sw?.dy ?? (typeof e === 'string' ? 0 : e.dy ?? 0)),
       z: col * (z + (RB() - 0.5) * 20),
       ry: (col > 0 ? Math.PI : 0) + (RB() - 0.5) * 0.22,
-      sy: 0.80 + 0.42 * RB(),
-      sz: 0.82 + 0.28 * RB(),
+      sy: mod === 'bay' ? 0.80 + 0.42 * RB() : 1,
+      sz: mod === 'bay' ? 0.82 + 0.28 * RB() : 1,
     });
   }
 
   // struts from the truss out to each slot's inner end, so nothing floats
   for (const s of slots) {
-    const gap = Math.max(3, Math.abs(s.z) - BAY_D * (s.sw ? 1.2 : s.sz) - r);
+    const gap = Math.max(3, Math.abs(s.z) - (MOD_D[s.mod] ?? BAY_D) * s.scale * s.sz - r);
     const zc = s.col * (r + gap * 0.5);
     for (const [dx, dy] of [[-7, 5], [7, 5], [0, -6]]) {
       fixed.dark.push(box(1.8, 1.8, gap + 3, s.x + dx, dy + s.y * 0.4, zc, 0, 0, 0, 0.5));
@@ -529,42 +820,23 @@ export function station(stationId, { palette: paletteId, seed = 0 } = {}) {
     fixed.dark.push(box(3.0, y1 - y0, 3.0, x, (y0 + y1) / 2, mz, 0, 0, 0, 0.5));
     fixed.panel.push(box(8, 1.4, 8, x, y1, mz, 0, 0, 0, 0.8));
     fixed.dark.push(box(2.0, 1.6, Math.abs(mz) + 8, x, y0 + 1, mz * 0.5, 0, 0, 0, 0.45));
+    navPoints(fixed.glow, NAV.red, [[x, y1 + 2.2, mz]], 1.4, 1.3);
   }
-  // the substituted modules merge into the fixed buckets, so breaking the run costs no draw call
+  // dock face outward: the −z column keeps the module's own +Z, the +z column is turned about.
+  // Three baked seeds per module id is enough that no two neighbours share a greeble layout
+  // without paying for eighteen separate merges.
   for (const s of slots) {
-    if (!s.sw) continue;
-    const b = buildBuckets(s.sw.module, pid, seed + s.i * 17);
-    const k = s.sw.scale ?? 1;
-    const m = new THREE.Matrix4().compose(new THREE.Vector3(s.x, s.y, s.z),
-      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s.ry, 0)), new THREE.Vector3(k, k, k));
-    for (const kk of BUCKETS) for (const geo of b[kk]) { geo.applyMatrix4(m); fixed[kk].push(geo); }
+    placeBaked(fixed, s.mod, pid, seed + (s.i % 3) * 101, new THREE.Matrix4().compose(
+      new THREE.Vector3(s.x, s.y, s.z),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s.ry, 0)),
+      new THREE.Vector3(s.scale, s.scale * s.sy, s.scale * s.sz)));
   }
+  navRun(fixed.glow, NAV.red, { axis: 0, from: spec.truss.from, to: spec.truss.to, pitch: 46,
+    x: 0, y: r + 5.0, z: 0, size: 1.3, power: 1.2 });
   meshesFrom(fixed, pid, grp);
 
-  const bay = buildBuckets('bay', pid, seed + 5);
-  const mats = [];
-  for (const k of BUCKETS) {
-    const m = mergeAll(bay[k]);
-    if (!m) continue;
-    mats.push([m, smat(pid, k)]);
-  }
-  // dock face outward: the −z column keeps the module's own +Z, the +z column is turned about
-  const mtx = slots.filter(s => !s.sw).map(s => new THREE.Matrix4().compose(
-    new THREE.Vector3(s.x, s.y, s.z),
-    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s.ry, 0)),
-    new THREE.Vector3(1, s.sy, s.sz)));
-  for (const [geo, m] of mats) {
-    const im = new THREE.InstancedMesh(geo, m, mtx.length);
-    // instances span 400 m of a geometry whose own bounds are one bay, so the computed sphere is
-    // wrong and three would cull the row the moment the origin bay left frame
-    im.frustumCulled = false;
-    mtx.forEach((t, i) => im.setMatrixAt(i, t));
-    im.instanceMatrix.needsUpdate = true;
-    grp.add(im);
-  }
-
   grp.userData.stationId = stationId;
-  grp.userData.bays = mtx.length;
+  grp.userData.bays = slots.length;
   return grp;
 }
 
@@ -614,6 +886,10 @@ export function registerStationKnobs(q) {
     v => { SB.uRough.value = v; });
   q.register({ key: 'stationPlane', label: 'Plane value separation', type: 'range', min: 0, max: 1, step: 0.01, default: 0.45, group: G },
     v => { SB.uPlane.value = v; });
+  q.register({ key: 'stationPanel', label: 'Cladding panel break', type: 'range', min: 0, max: 1.2, step: 0.01, default: 0.42, group: G },
+    v => { SB.uPanel.value = v; });
+  q.register({ key: 'stationDirt', label: 'Cladding soot', type: 'range', min: 0, max: 1.2, step: 0.01, default: 0.55, group: G },
+    v => { SB.uDirt.value = v; });
   q.register({ key: 'hazePower', label: 'Haze slab', type: 'range', min: 0, max: 2.5, step: 0.02, default: 1, group: G },
     v => { HAZE.power = v; for (const m of HAZE_MATS) m.uniforms.uPower.value = v; });
   q.register({ key: 'hazeSoft', label: 'Haze slab edge', type: 'range', min: 0.05, max: 1, step: 0.01, default: 0.42, group: G },
@@ -621,5 +897,5 @@ export function registerStationKnobs(q) {
   // build-time: greeble and window counts. A station already in the scene keeps what it was
   // built with; re-run the showroom entry to see a change.
   q.register({ key: 'stationDetail', label: 'Module detail (rebuild)', type: 'range', min: 0, max: 1.5, step: 0.05, default: 1, group: G },
-    v => { detail = v; });
+    v => { if (v === detail) return; detail = v; for (const b of BAKED.values()) for (const g of Object.values(b)) g?.dispose(); BAKED.clear(); });
 }
