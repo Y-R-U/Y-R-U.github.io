@@ -684,6 +684,546 @@ export const SFX = {
       }
     },
   },
+
+  // ── added after the first round of listening: noise-led, because the tonal ones were the
+  // ones that did not survive it ──────────────────────────────────────────────────────────
+
+  creak: {
+    name: 'Creak — hinge / timber', group: 'Foley', dur: 2.0,
+    params: {
+      length: { min: 0.3, max: 2.2, def: 1.1, step: 0.05, unit: 's' },
+      pitch: { min: 90, max: 900, def: 260, step: 5, unit: 'Hz' },
+      grip: { min: 4, max: 60, def: 22, step: 1, label: 'stickiness' },
+      body: { min: 0, max: 1, def: 0.5, step: 0.02 },
+      level: lvl(0.9), send: send(0.35),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.6, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // Stick-slip: the hinge grabs and lets go, fastest in the middle of the swing. Each release
+      // is one grain through a very narrow band, which is what makes it creak rather than hiss.
+      const n = Math.max(4, Math.round(o.grip * d * 2.2));
+      for (let i = 0; i < n; i++) {
+        const u = i / n, swell = 0.4 + Math.sin(u * Math.PI) * 0.8;
+        const f = o.pitch * (0.8 + Math.sin(u * Math.PI) * 1.5) * rnd(0.6, 1.4);
+        noiseHit(eng, out, { t: t + d * (u + (Math.random() - 0.5) * 0.02), dur: rnd(0.01, 0.05),
+          type: 'bandpass', f0: f, q: 14, peak: rnd(0.1, 0.45) * swell });
+      }
+      if (o.body > 0) tone(eng, out, { t, dur: d, type: 'sawtooth', f0: o.pitch * 0.42, f1: o.pitch * 0.3, peak: 0.06 * o.body });
+    },
+  },
+
+  coinsBag: {
+    name: 'Coins — into a bag', group: 'Pickups', dur: 1.4,
+    params: {
+      coins: { min: 2, max: 24, def: 9, step: 1 },
+      pitch: { min: 1200, max: 9000, def: 4200, step: 100, unit: 'Hz' },
+      spread: { min: 0.05, max: 0.9, def: 0.35, step: 0.02, unit: 's' },
+      muffle: { min: 0, max: 1, def: 0.55, step: 0.02, label: 'in the bag' },
+      level: lvl(0.6), send: send(0.2),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.spread + 0.8, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      const lp = biquad(eng.ctx, 'lowpass', 9000 - o.muffle * 6600, 0.7);
+      lp.connect(out);
+      for (let i = 0; i < Math.round(o.coins); i++) {
+        const st = t + Math.random() * o.spread, f = o.pitch * rnd(0.7, 1.45);
+        // a coin is two close partials struck together, then the cloth it lands in
+        tone(eng, lp, { t: st, dur: rnd(0.06, 0.16), type: 'triangle', f0: f, peak: rnd(0.05, 0.14) });
+        tone(eng, lp, { t: st, dur: rnd(0.04, 0.10), type: 'triangle', f0: f * 1.63, peak: rnd(0.02, 0.07) });
+        noiseHit(eng, lp, { t: st, dur: 0.02, type: 'bandpass', f0: f * 1.2, q: 2, peak: 0.08 });
+      }
+      noiseHit(eng, out, { t: t + o.spread * 0.4, dur: 0.24, type: 'lowpass', f0: 900, f1: 300, q: 0.7,
+        peak: 0.2 * o.muffle, attack: 0.02 });
+    },
+  },
+
+  swordClash: {
+    name: 'Sword — clash', group: 'Weapons', dur: 1.8,
+    params: {
+      pitch: { min: 400, max: 4000, def: 1500, step: 20, unit: 'Hz' },
+      ring: { min: 0.1, max: 1.6, def: 0.7, step: 0.05, unit: 's' },
+      scrape: { min: 0, max: 1, def: 0.4, step: 0.02 },
+      level: lvl(0.7), send: send(0.4),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.ring + 0.7, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.03, type: 'highpass', f0: 2500, q: 0.7, peak: 0.8 });
+      // inharmonic partials: a struck blade is not a note
+      for (const [m, p] of [[1, 0.5], [2.41, 0.3], [3.83, 0.18], [5.2, 0.1]]) {
+        tone(eng, out, { t, dur: o.ring * Math.max(0.15, 1 - 0.12 * m), type: 'triangle', f0: o.pitch * m, peak: p * 0.45 });
+      }
+      if (o.scrape > 0) {
+        noiseHit(eng, out, { t: t + 0.01, dur: 0.18 * o.scrape + 0.05, type: 'bandpass',
+          f0: o.pitch * 2.2, f1: o.pitch * 0.9, q: 3, peak: 0.35 * o.scrape });
+      }
+    },
+  },
+
+  bowShot: {
+    name: 'Bow — release', group: 'Weapons', dur: 1.0,
+    params: {
+      tension: { min: 60, max: 400, def: 170, step: 5, unit: 'Hz' },
+      flight: { min: 0.1, max: 0.8, def: 0.34, step: 0.02, unit: 's' },
+      level: lvl(0.65), send: send(0.25),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.flight + 0.5, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      tone(eng, out, { t, dur: 0.09, type: 'triangle', f0: o.tension, f1: o.tension * 0.55, peak: 0.4 });
+      noiseHit(eng, out, { t, dur: 0.05, type: 'bandpass', f0: 900, q: 1.4, peak: 0.5 });
+      // the shaft leaving, going away from you
+      noiseHit(eng, out, { t: t + 0.02, dur: o.flight, type: 'bandpass', f0: 2600, f1: 700, q: 1.1,
+        peak: 0.32, attack: 0.02 });
+    },
+  },
+
+  arrowHit: {
+    name: 'Arrow — impact', group: 'Weapons', dur: 1.0,
+    params: {
+      hard: { min: 0, max: 1, def: 0.6, step: 0.02, label: 'hardness' },
+      pitch: { min: 60, max: 500, def: 180, step: 5, unit: 'Hz' },
+      wobble: { min: 0, max: 1, def: 0.5, step: 0.02, label: 'shaft wobble' },
+      level: lvl(0.7), send: send(0.25),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 0.9, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.04 + 0.05 * (1 - o.hard), type: 'lowpass',
+        f0: 600 + 2600 * o.hard, f1: 200, q: 0.9, peak: 0.85 });
+      tone(eng, out, { t, dur: 0.14, type: 'sine', f0: o.pitch, f1: o.pitch * 0.6, peak: 0.45 });
+      if (o.wobble > 0) {
+        tone(eng, out, { t: t + 0.02, dur: 0.4 * o.wobble + 0.1, type: 'triangle',
+          f0: 420, f1: 380, peak: 0.08 * o.wobble });
+      }
+    },
+  },
+
+  spellCast: {
+    name: 'Spell — cast', group: 'Magic', dur: 1.6,
+    params: {
+      charge: { min: 0.1, max: 1.2, def: 0.42, step: 0.02, unit: 's' },
+      pitch: { min: 200, max: 3000, def: 900, step: 20, unit: 'Hz' },
+      grain: { min: 4, max: 50, def: 20, step: 1, label: 'sparkle' },
+      level: lvl(0.6), send: send(0.55),
+    },
+    play(eng, o) {
+      const t = o.t, c = o.charge;
+      const out = eng.voice(t, c + 0.9, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // the gather: a rising band of noise, sparkling, then a release that drops away
+      noiseHit(eng, out, { t, dur: c, type: 'bandpass', f0: o.pitch * 0.4, f1: o.pitch * 2.4, q: 2.2,
+        peak: 0.4, attack: c * 0.6 });
+      for (let i = 0, n = Math.round(o.grain); i < n; i++) {
+        const u = i / n;
+        noiseHit(eng, out, { t: t + c * u * u, dur: rnd(0.01, 0.04), type: 'bandpass',
+          f0: o.pitch * rnd(1.5, 5) * (0.5 + u), q: 9, peak: rnd(0.06, 0.2) * (0.3 + u) });
+      }
+      noiseHit(eng, out, { t: t + c, dur: 0.42, type: 'bandpass', f0: o.pitch * 2.6, f1: o.pitch * 0.5,
+        q: 1.3, peak: 0.55 });
+      tone(eng, out, { t: t + c, dur: 0.3, type: 'sine', f0: o.pitch * 0.7, f1: o.pitch * 0.22, peak: 0.18 });
+    },
+  },
+
+  spellHit: {
+    name: 'Spell — impact', group: 'Magic', dur: 2.2,
+    params: {
+      size: { min: 0.3, max: 2, def: 0.9, step: 0.05 },
+      pitch: { min: 40, max: 400, def: 120, step: 5, unit: 'Hz' },
+      shimmer: { min: 0, max: 1, def: 0.6, step: 0.02 },
+      level: lvl(0.75), send: send(0.6),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.size;
+      const out = eng.voice(t, d * 1.8 + 0.6, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      const sh = shaper(eng.ctx, 3); sh.connect(out);
+      noiseHit(eng, sh, { t, dur: d * 0.35, type: 'lowpass', f0: 4000, f1: 300, q: 0.9, peak: 0.9 });
+      tone(eng, sh, { t, dur: d * 0.8, type: 'sine', f0: o.pitch * 3, f1: o.pitch * 0.6, peak: 0.6 });
+      // the tail that says it was magic and not gunpowder
+      for (let i = 0, n = Math.round(18 * o.shimmer); i < n; i++) {
+        noiseHit(eng, out, { t: t + rnd(0.02, d * 1.2), dur: rnd(0.03, 0.14), type: 'bandpass',
+          f0: rnd(1800, 7000), q: 11, peak: rnd(0.04, 0.16) * o.shimmer });
+      }
+      noiseHit(eng, out, { t: t + 0.02, dur: d * 1.5, type: 'lowpass', f0: 700, f1: 90, q: 0.6,
+        peak: 0.35, attack: 0.04 });
+    },
+  },
+
+  footSnow: {
+    name: 'Footstep — snow', group: 'Foley', dur: 0.5,
+    params: {
+      squeak: { min: 0, max: 1, def: 0.6, step: 0.02 },
+      pitch: { min: 600, max: 5000, def: 2000, step: 50, unit: 'Hz' },
+      level: lvl(0.55), send: send(0.12),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 0.45, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.13, type: 'lowpass', f0: 700, f1: 200, q: 0.8, peak: 0.5, attack: 0.012 });
+      // the squeak is packed snow slipping against itself: narrow, short, several of them
+      for (let i = 0, n = Math.round(10 * o.squeak); i < n; i++) {
+        noiseHit(eng, out, { t: t + rnd(0.005, 0.12), dur: rnd(0.008, 0.03), type: 'bandpass',
+          f0: o.pitch * rnd(0.7, 1.5), q: 16, peak: rnd(0.05, 0.2) * o.squeak });
+      }
+    },
+  },
+
+  footStone: {
+    name: 'Footstep — stone', group: 'Foley', dur: 0.5,
+    params: {
+      pitch: { min: 300, max: 4000, def: 1400, step: 50, unit: 'Hz' },
+      hard: { min: 0, max: 1, def: 0.7, step: 0.02, label: 'hardness' },
+      level: lvl(0.5), send: send(0.3),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 0.5, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.03 + 0.04 * (1 - o.hard), type: 'bandpass', f0: o.pitch,
+        f1: o.pitch * 0.5, q: 1.2, peak: 0.7 });
+      noiseHit(eng, out, { t, dur: 0.09, type: 'lowpass', f0: 380, q: 0.9, peak: 0.3 });
+      tone(eng, out, { t, dur: 0.05, type: 'sine', f0: 160, f1: 110, peak: 0.12 * o.hard });
+    },
+  },
+
+  wade: {
+    name: 'Water — wading', group: 'Water', dur: 1.2,
+    params: {
+      depth: { min: 0.2, max: 1, def: 0.6, step: 0.02 },
+      length: { min: 0.2, max: 1.2, def: 0.55, step: 0.02, unit: 's' },
+      level: lvl(0.6), send: send(0.3),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.5, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: d, type: 'bandpass', f0: 900 - 500 * o.depth, f1: 400, q: 0.8,
+        peak: 0.45, attack: d * 0.25 });
+      for (let i = 0, n = Math.round(14 * o.depth) + 4; i < n; i++) {
+        noiseHit(eng, out, { t: t + Math.random() * d, dur: rnd(0.01, 0.05), type: 'bandpass',
+          f0: rnd(1200, 5000), q: 5, peak: rnd(0.04, 0.16) });
+      }
+    },
+  },
+
+  doorWood: {
+    name: 'Door — heavy timber', group: 'Foley', dur: 2.4,
+    params: {
+      swing: { min: 0.2, max: 1.6, def: 0.8, step: 0.05, unit: 's' },
+      pitch: { min: 90, max: 600, def: 220, step: 5, unit: 'Hz' },
+      thud: { min: 0, max: 1, def: 0.7, step: 0.02, label: 'closing thud' },
+      level: lvl(0.65), send: send(0.4),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.swing;
+      const out = eng.voice(t, d + 1.0, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      for (let i = 0, n = Math.round(18 * d) + 4; i < n; i++) {
+        const u = i / n;
+        noiseHit(eng, out, { t: t + d * u, dur: rnd(0.012, 0.05), type: 'bandpass',
+          f0: o.pitch * (1 + Math.sin(u * Math.PI) * 1.8) * rnd(0.7, 1.3), q: 12,
+          peak: rnd(0.08, 0.3) * (0.3 + Math.sin(u * Math.PI) * 0.8) });
+      }
+      if (o.thud > 0) {
+        noiseHit(eng, out, { t: t + d, dur: 0.16, type: 'lowpass', f0: 400, f1: 70, q: 0.8, peak: 0.8 * o.thud });
+        tone(eng, out, { t: t + d, dur: 0.22, type: 'sine', f0: 95, f1: 55, peak: 0.5 * o.thud });
+      }
+    },
+  },
+
+  chestLatch: {
+    name: 'Chest — latch & lid', group: 'Foley', dur: 1.6,
+    params: {
+      pitch: { min: 800, max: 6000, def: 2600, step: 50, unit: 'Hz' },
+      lid: { min: 0, max: 1, def: 0.7, step: 0.02, label: 'lid' },
+      level: lvl(0.65), send: send(0.35),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 1.4, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // latch: two metal clicks, close together and not quite the same
+      for (const [dt, p] of [[0, 0.7], [0.055, 0.45]]) {
+        noiseHit(eng, out, { t: t + dt, dur: 0.02, type: 'bandpass', f0: o.pitch * rnd(0.9, 1.2), q: 7, peak: p });
+        tone(eng, out, { t: t + dt, dur: 0.07, type: 'triangle', f0: o.pitch * 1.4, peak: 0.12 });
+      }
+      if (o.lid > 0) {
+        noiseHit(eng, out, { t: t + 0.12, dur: 0.5 * o.lid, type: 'bandpass', f0: 320, f1: 180, q: 4,
+          peak: 0.18 * o.lid, attack: 0.06 });
+        noiseHit(eng, out, { t: t + 0.12 + 0.5 * o.lid, dur: 0.12, type: 'lowpass', f0: 500, f1: 90, q: 0.8, peak: 0.5 * o.lid });
+      }
+    },
+  },
+
+  rain: {
+    name: 'Rain — bed', group: 'Weather', dur: 3.4,
+    params: {
+      heavy: { min: 0, max: 1, def: 0.5, step: 0.02, label: 'heaviness' },
+      length: { min: 0.5, max: 3, def: 2.4, step: 0.1, unit: 's' },
+      drops: { min: 0, max: 1, def: 0.5, step: 0.02, label: 'near drops' },
+      level: lvl(0.5), send: send(0.3),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.6, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: d, type: 'highpass', f0: 1200 + 1800 * (1 - o.heavy), q: 0.6,
+        peak: 0.35 + 0.3 * o.heavy, attack: 0.25 });
+      noiseHit(eng, out, { t, dur: d, type: 'lowpass', f0: 500 + 900 * o.heavy, q: 0.7,
+        peak: 0.2 * o.heavy, attack: 0.3 });
+      for (let i = 0, n = Math.round(60 * o.drops * d); i < n; i++) {
+        noiseHit(eng, out, { t: t + Math.random() * d, dur: rnd(0.004, 0.018), type: 'bandpass',
+          f0: rnd(2000, 8000), q: 8, peak: rnd(0.02, 0.1) * o.drops });
+      }
+    },
+  },
+
+  windGust: {
+    name: 'Wind — gust', group: 'Weather', dur: 3.6,
+    params: {
+      length: { min: 0.6, max: 3, def: 1.8, step: 0.1, unit: 's' },
+      pitch: { min: 200, max: 2000, def: 700, step: 20, unit: 'Hz' },
+      howl: { min: 0, max: 1, def: 0.4, step: 0.02 },
+      level: lvl(0.5), send: send(0.35),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.8, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // one long grain swept up and back down is the gust; the resonance on top is the howl
+      noiseHit(eng, out, { t, dur: d, type: 'bandpass', f0: o.pitch * 0.5, f1: o.pitch * 1.6, q: 0.9,
+        peak: 0.55, attack: d * 0.45 });
+      if (o.howl > 0) {
+        noiseHit(eng, out, { t: t + d * 0.15, dur: d * 0.7, type: 'bandpass', f0: o.pitch * 1.8,
+          f1: o.pitch * 2.6, q: 7, peak: 0.28 * o.howl, attack: d * 0.3 });
+      }
+    },
+  },
+
+  leaves: {
+    name: 'Leaves — rustle', group: 'Foley', dur: 1.4,
+    params: {
+      length: { min: 0.15, max: 1.2, def: 0.5, step: 0.02, unit: 's' },
+      pitch: { min: 1500, max: 9000, def: 4500, step: 100, unit: 'Hz' },
+      density: { min: 6, max: 80, def: 34, step: 1 },
+      level: lvl(0.85), send: send(0.25),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.4, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      for (let i = 0, n = Math.round(o.density); i < n; i++) {
+        const u = Math.random();
+        noiseHit(eng, out, { t: t + u * d, dur: rnd(0.006, 0.03), type: 'bandpass',
+          f0: o.pitch * rnd(0.5, 1.7), q: 4, peak: rnd(0.03, 0.14) * Math.sin(u * Math.PI) });
+      }
+    },
+  },
+
+  clothSwish: {
+    name: 'Cloth — swish', group: 'Foley', dur: 0.9,
+    params: {
+      length: { min: 0.1, max: 0.8, def: 0.3, step: 0.02, unit: 's' },
+      pitch: { min: 500, max: 6000, def: 2200, step: 50, unit: 'Hz' },
+      level: lvl(0.45), send: send(0.2),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.3, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: d, type: 'bandpass', f0: o.pitch * 0.6, f1: o.pitch * 1.5, q: 1.6,
+        peak: 0.5, attack: d * 0.4 });
+      noiseHit(eng, out, { t: t + d * 0.5, dur: d * 0.6, type: 'bandpass', f0: o.pitch * 1.3,
+        f1: o.pitch * 0.5, q: 2, peak: 0.3, attack: d * 0.2 });
+    },
+  },
+
+  dig: {
+    name: 'Dig — shovel in earth', group: 'Work', dur: 1.4,
+    params: {
+      grit: { min: 0, max: 1, def: 0.6, step: 0.02 },
+      pitch: { min: 200, max: 3000, def: 1100, step: 20, unit: 'Hz' },
+      level: lvl(0.65), send: send(0.2),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 1.2, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // the bite, then the lift, then what falls off the blade
+      noiseHit(eng, out, { t, dur: 0.14, type: 'bandpass', f0: o.pitch, f1: o.pitch * 0.35, q: 1.1, peak: 0.75 });
+      noiseHit(eng, out, { t, dur: 0.1, type: 'lowpass', f0: 320, q: 0.8, peak: 0.4 });
+      for (let i = 0, n = Math.round(22 * o.grit); i < n; i++) {
+        noiseHit(eng, out, { t: t + rnd(0.1, 0.6), dur: rnd(0.006, 0.024), type: 'bandpass',
+          f0: rnd(700, 4500), q: 6, peak: rnd(0.02, 0.1) * o.grit });
+      }
+    },
+  },
+
+  chopWood: {
+    name: 'Axe — chop', group: 'Work', dur: 1.6,
+    params: {
+      pitch: { min: 80, max: 700, def: 240, step: 5, unit: 'Hz' },
+      bite: { min: 0, max: 1, def: 0.7, step: 0.02 },
+      splinter: { min: 0, max: 1, def: 0.5, step: 0.02 },
+      level: lvl(0.75), send: send(0.35),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 1.4, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.03, type: 'highpass', f0: 3000, q: 0.7, peak: 0.6 * o.bite });
+      noiseHit(eng, out, { t, dur: 0.11, type: 'bandpass', f0: 900, f1: 260, q: 1.0, peak: 0.85 });
+      tone(eng, out, { t, dur: 0.2, type: 'sine', f0: o.pitch, f1: o.pitch * 0.55, peak: 0.5 });
+      tone(eng, out, { t, dur: 0.13, type: 'triangle', f0: o.pitch * 2.7, f1: o.pitch * 1.8, peak: 0.14 });
+      for (let i = 0, n = Math.round(10 * o.splinter); i < n; i++) {
+        noiseHit(eng, out, { t: t + rnd(0.03, 0.35), dur: rnd(0.01, 0.05), type: 'bandpass',
+          f0: rnd(1200, 5000), q: 9, peak: rnd(0.03, 0.13) * o.splinter });
+      }
+    },
+  },
+
+  anvil: {
+    name: 'Anvil — hammer strike', group: 'Work', dur: 2.6,
+    params: {
+      pitch: { min: 500, max: 5000, def: 2100, step: 20, unit: 'Hz' },
+      ring: { min: 0.2, max: 2.4, def: 1.3, step: 0.05, unit: 's' },
+      level: lvl(0.7), send: send(0.5),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.ring + 0.8, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.02, type: 'highpass', f0: 4000, q: 0.7, peak: 0.7 });
+      noiseHit(eng, out, { t, dur: 0.07, type: 'lowpass', f0: 700, f1: 160, q: 0.9, peak: 0.6 });
+      for (const [m, p] of [[1, 0.5], [1.72, 0.34], [2.94, 0.22], [4.31, 0.12], [6.1, 0.07]]) {
+        tone(eng, out, { t, dur: o.ring * Math.max(0.12, 1 - 0.13 * m), type: 'sine', f0: o.pitch * m, peak: p * 0.5 });
+      }
+    },
+  },
+
+  glassBreak: {
+    name: 'Glass — break', group: 'Impacts', dur: 2.2,
+    params: {
+      shards: { min: 6, max: 60, def: 26, step: 1 },
+      pitch: { min: 1500, max: 9000, def: 4800, step: 100, unit: 'Hz' },
+      spread: { min: 0.1, max: 1.4, def: 0.7, step: 0.02, unit: 's' },
+      level: lvl(0.65), send: send(0.4),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.spread + 0.8, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: 0.06, type: 'highpass', f0: 2500, q: 0.7, peak: 0.9 });
+      for (let i = 0, n = Math.round(o.shards); i < n; i++) {
+        const st = t + Math.pow(Math.random(), 1.6) * o.spread;
+        const f = o.pitch * rnd(0.5, 1.8);
+        tone(eng, out, { t: st, dur: rnd(0.03, 0.13), type: 'triangle', f0: f, peak: rnd(0.04, 0.16) });
+        noiseHit(eng, out, { t: st, dur: rnd(0.006, 0.02), type: 'bandpass', f0: f * 1.3, q: 10, peak: rnd(0.05, 0.2) });
+      }
+    },
+  },
+
+  owl: {
+    name: 'Owl — call', group: 'Animals', dur: 2.0,
+    params: {
+      pitch: { min: 200, max: 900, def: 420, step: 5, unit: 'Hz' },
+      calls: { min: 1, max: 4, def: 2, step: 1 },
+      breath: { min: 0, max: 1, def: 0.45, step: 0.02 },
+      level: lvl(0.55), send: send(0.55),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, 1.8, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      for (let i = 0, n = Math.round(o.calls); i < n; i++) {
+        const st = t + i * 0.42;
+        tone(eng, out, { t: st, dur: 0.3, type: 'sine', f0: o.pitch * 1.05, f1: o.pitch * 0.92, peak: 0.42, attack: 0.05 });
+        tone(eng, out, { t: st, dur: 0.26, type: 'sine', f0: o.pitch * 2.02, f1: o.pitch * 1.85, peak: 0.08, attack: 0.05 });
+        if (o.breath > 0) {
+          noiseHit(eng, out, { t: st, dur: 0.3, type: 'bandpass', f0: o.pitch * 2.4, q: 3,
+            peak: 0.12 * o.breath, attack: 0.06 });
+        }
+      }
+    },
+  },
+
+  heartbeat: {
+    name: 'Heartbeat', group: 'Animals', dur: 1.8,
+    params: {
+      pitch: { min: 30, max: 140, def: 58, step: 1, unit: 'Hz' },
+      gap: { min: 0.15, max: 0.6, def: 0.28, step: 0.01, unit: 's' },
+      beats: { min: 1, max: 4, def: 2, step: 1 },
+      level: lvl(0.8), send: send(0.15),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.beats * (o.gap + 0.5) + 0.4, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      for (let i = 0, n = Math.round(o.beats); i < n; i++) {
+        const st = t + i * (o.gap + 0.5);
+        // lub then dub, the second softer and a shade lower
+        tone(eng, out, { t: st, dur: 0.16, type: 'sine', f0: o.pitch * 1.6, f1: o.pitch * 0.7, peak: 0.9 });
+        noiseHit(eng, out, { t: st, dur: 0.07, type: 'lowpass', f0: 220, q: 0.8, peak: 0.28 });
+        tone(eng, out, { t: st + o.gap, dur: 0.2, type: 'sine', f0: o.pitch * 1.35, f1: o.pitch * 0.62, peak: 0.6 });
+        noiseHit(eng, out, { t: st + o.gap, dur: 0.08, type: 'lowpass', f0: 190, q: 0.8, peak: 0.18 });
+      }
+    },
+  },
+
+  stoneGrind: {
+    name: 'Stone — grinding slab', group: 'Work', dur: 3.0,
+    params: {
+      length: { min: 0.4, max: 2.4, def: 1.3, step: 0.05, unit: 's' },
+      pitch: { min: 60, max: 900, def: 260, step: 5, unit: 'Hz' },
+      rumble: { min: 0, max: 1, def: 0.7, step: 0.02 },
+      level: lvl(0.7), send: send(0.45),
+    },
+    play(eng, o) {
+      const t = o.t, d = o.length;
+      const out = eng.voice(t, d + 0.9, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      noiseHit(eng, out, { t, dur: d, type: 'bandpass', f0: o.pitch * 1.4, f1: o.pitch, q: 1.8,
+        peak: 0.5, attack: 0.12 });
+      if (o.rumble > 0) {
+        noiseHit(eng, out, { t, dur: d + 0.3, type: 'lowpass', f0: 160, q: 0.8, peak: 0.6 * o.rumble, attack: 0.15 });
+      }
+      // the slab catching and letting go as it slides
+      for (let i = 0, n = Math.round(24 * d); i < n; i++) {
+        noiseHit(eng, out, { t: t + Math.random() * d, dur: rnd(0.01, 0.06), type: 'bandpass',
+          f0: o.pitch * rnd(1.5, 6), q: 9, peak: rnd(0.03, 0.14) });
+      }
+      noiseHit(eng, out, { t: t + d, dur: 0.18, type: 'lowpass', f0: 300, f1: 60, q: 0.8, peak: 0.55 });
+    },
+  },
+
+  bubble: {
+    name: 'Bubbles — underwater', group: 'Water', dur: 1.6,
+    params: {
+      count: { min: 2, max: 30, def: 10, step: 1 },
+      pitch: { min: 200, max: 2500, def: 800, step: 20, unit: 'Hz' },
+      spread: { min: 0.1, max: 1.2, def: 0.6, step: 0.02, unit: 's' },
+      level: lvl(0.55), send: send(0.4),
+    },
+    play(eng, o) {
+      const t = o.t;
+      const out = eng.voice(t, o.spread + 0.6, o.send);
+      out.gain.value = o.level * (o.vel ?? 1);
+      // a bubble is a short pitch sweep upward — bigger bubbles start lower
+      for (let i = 0, n = Math.round(o.count); i < n; i++) {
+        const st = t + Math.random() * o.spread, f = o.pitch * rnd(0.5, 2);
+        tone(eng, out, { t: st, dur: rnd(0.04, 0.12), type: 'sine', f0: f * 0.55, f1: f * 1.5, peak: rnd(0.15, 0.45) });
+      }
+    },
+  },
 };
 
 export const SFX_IDS = Object.keys(SFX);

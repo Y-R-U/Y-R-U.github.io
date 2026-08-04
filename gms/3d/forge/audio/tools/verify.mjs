@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Renders every instrument, effect and piece in an OfflineAudioContext inside headless
-// Chrome and asserts each one actually makes sound.
+// Renders every effect in an OfflineAudioContext inside headless Chrome and asserts each one
+// actually makes sound. A broken envelope is silent and looks perfectly fine in source.
 //
 //   node audio/tools/verify.mjs
 //   node audio/tools/verify.mjs --json
@@ -144,43 +144,38 @@ async function main() {
 
   // the lab page itself must boot clean, and must respond to real clicks
   await S('Page.navigate', { url: `http://127.0.0.1:${PORT}/audio/index.html` });
-  const pageOk = await waitFor('window.__audiolab && window.__audiolab.ready');
+  const pageOk = await waitFor('window.__lab && window.__lab.ready');
   const domCount = (await S('Runtime.evaluate', { expression: 'document.querySelectorAll(".card,.sfx").length', returnByValue: true })).result.value;
   console.log(`page boot: ${pageOk ? 'ok' : 'FAILED'}  (${domCount} cards rendered)`);
   const smoke = await evalJSON(`(async () => {
-    const A = window.__audiolab, r = {};
+    const A = window.__lab, r = {};
     document.getElementById('gbtn').click();
     await new Promise(s => setTimeout(s, 300));
     r.ctxState = A.ctx.state;
     r.gateClosed = document.getElementById('gate').classList.contains('gone');
-    document.getElementById('play').click();
-    await new Promise(s => setTimeout(s, 3200));
-    r.playing = A.seq.playing;
-    r.activeVoices = A.eng.activeAt(A.ctx.currentTime);
-    r.scheduled = A.eng.live.length;
-    r.bar = A.seq.position().bar;
-    r.barLit = document.querySelectorAll('#bars i.on').length;
-    document.getElementById('play').click();
-    await new Promise(s => setTimeout(s, 200));
-    r.stopped = !A.seq.playing;
-    document.querySelector('#tabs button[data-tab=inst]').click();
-    document.querySelectorAll('#tab-inst .btn').forEach(b => /scale|chord|run/i.test(b.textContent) && b.click());
-    const k = document.querySelectorAll('#keys .w');
-    r.keys = k.length;
-    document.querySelector('#tabs button[data-tab=sfx]').click();
+    // every bucket open, so every card is in the DOM and clickable
+    document.querySelectorAll('.bucket.shut .buckethdr').forEach(h => h.click());
     const go = [...document.querySelectorAll('.sfx .go')];
     r.sfxButtons = go.length;
     go.forEach(b => b.click());
-    await new Promise(s => setTimeout(s, 200));
-    r.afterAll = A.eng.live.length;
+    await new Promise(s => setTimeout(s, 300));
+    r.voicesAfterAll = A.eng.live.length;
     r.sliders = document.querySelectorAll('input[type=range]').length;
+    r.notes = document.querySelectorAll('.field textarea').length;
+    r.renames = document.querySelectorAll('.field input[type=text]').length;
+    // move one sound between buckets and make sure it lands there
+    const first = document.querySelector('.b-review .sfx .v-keep');
+    const keepBefore = document.querySelectorAll('.b-keep .sfx').length;
+    if (first) first.click();
+    r.movedIntoKeep = document.querySelectorAll('.b-keep .sfx').length - keepBefore;
+    r.report = A.report().split('\\n').length;
     return r;
   })()`);
   console.log('page smoke: ' + JSON.stringify(smoke));
 
   if (args.shot) {
     const dir = resolve(HERE, '../out'); mkdirSync(dir, { recursive: true });
-    for (const [w, h, dpr, tab] of [[390, 1500, 2, 'player'], [390, 1500, 2, 'inst'], [390, 1700, 2, 'sfx'], [1100, 1500, 1, 'player']]) {
+    for (const [w, h, dpr, tab] of [[390, 2200, 2, 'sfx'], [1100, 1700, 1, 'sfx']]) {
       await S('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: dpr, mobile: w < 500 });
       await S('Runtime.evaluate', { expression: `document.querySelector('#tabs button[data-tab=${tab}]').click(); scrollTo(0,0)` });
       await sleep(250);
@@ -205,16 +200,10 @@ async function main() {
   const data = JSON.parse(r.result.value);
 
   let bad = 0;
-  bad += table('INSTRUMENTS — one note, 8s render, full master chain', data.instruments);
   bad += table('SFX — one shot, full master chain', data.sfx);
-  bad += table('PIECES — 20s, "strings + rhythm section"', data.pieces.map(p => ({ ...p, id: p.id, name: p.title })));
 
   const L = data.leak;
-  console.log('\nVOICE LEAK — 45s of Canon in D, "big beat"');
-  console.log(`  notes fired: ${L.notes}   voices scheduled: ${L.scheduled}   never-stopping: ${L.infinite}   last voice ends: ${L.maxTail}s`);
-  console.log('  active voices sampled: ' + L.samples.map(s => `${s.at}s=${s.active}`).join('  '));
-  console.log(`  rms ${L.rms}  peak ${L.peak}  dc ${L.dc}  nan ${L.nan}  clipped-samples ${L.clipped}`);
-  if (L.infinite || L.samples.at(-1).active > 0) bad++;
+
 
   for (const l of logs) console.log('  ' + l);
   if (args.json) {
