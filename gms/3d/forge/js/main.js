@@ -9,6 +9,7 @@ import { People } from './world/people.js';
 import { Chickens } from './world/chicken.js';
 import { Player } from './player.js';
 import { Doors } from './world/doors.js';
+import { Spells } from './world/spell.js';
 import * as stairs from './world/stairs.js';
 import { walkStep, groundAt } from './world/colliders.js';
 import { Input } from './input.js';
@@ -32,6 +33,8 @@ controls.maxPolarAngle = Math.PI * 0.495;
 const player = new Player(people, new Input(), controls);
 const doors = app.add(new Doors(demo, player, lighting, [demo.object3D, people.object3D]));
 app.add(player);
+// After the player: it reads the staff position the swing just produced.
+const spells = app.add(new Spells(player, demo.terrain));
 
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -42,6 +45,7 @@ window.__forge.people = people;
 window.__forge.chickens = chickens;
 window.__forge.player = player;
 window.__forge.doors = doors;
+window.__forge.spells = spells;
 window.__forge.walk = { walkStep, groundAt };
 window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));

@@ -55,6 +55,10 @@ export const ZONES = {
     wood: { base: '#cbb190', dark: '#a98f6f', roughness: 0.6 },
     // `pattern` names the stained-glass design; `cloth` is the room's one accent; `glow` scales
     // the hearth against the same zone's `window.litColor`.
+    // The cast. `core` is the bolt head, `edge` the trail, `bloom` what it leaves where it lands.
+    // Additive blending cannot draw darker than the sky, so the dark zone's spell is a deep violet
+    // read against a bright core rather than an actual black.
+    spell: { core: '#fffaf0', edge: '#ffd27a', bloom: '#ffe7b0' },
     interior: {
       pattern: 'rose', floor: 'flag', cloth: '#a8bdd2', glow: 0.9, warmth: '#ffe0b4',
       // the leaded light in the best room — richer than the tints the same zone glazes a
@@ -100,6 +104,7 @@ export const ZONES = {
     hood: { inner: '#241a11', eyes: ['#9aa84e', '#4a3418'] },
     fowl: { body: '#96602f', dark: '#33200f', comb: '#a8382f', beak: '#c99a4e', leg: '#b58c52' },
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
+    spell: { core: '#ffeccb', edge: '#b8762f', bloom: '#8f6335' },
     interior: {
       pattern: 'quarry', floor: 'board', cloth: '#9d5a44', glow: 0.85, warmth: '#ffcf94',
       glass: ['#c08a3e', '#7d8a4e', '#a8552f', '#d8c48a'],
@@ -144,6 +149,7 @@ export const ZONES = {
     hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
     fowl: { body: '#56535e', dark: '#1b1a21', comb: '#7a2436', beak: '#8f8264', leg: '#7d7259' },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
+    spell: { core: '#e4d2ff', edge: '#5a2b96', bloom: '#2f1a4d' },
     interior: {
       pattern: 'rays', floor: 'flag', cloth: '#7a2436', glow: 1.15, warmth: '#ff9f62',
       glass: ['#7a2436', '#3d2a63', '#1f5a52', '#c06a18'],

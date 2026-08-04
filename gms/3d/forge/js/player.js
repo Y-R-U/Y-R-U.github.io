@@ -41,6 +41,7 @@ export class Player {
     this.camPos = new THREE.Vector3();
     this.camAim = new THREE.Vector3();
     this.swing = 0;
+    this.castEdge = false;
     this.speed = 5.0;
     this.dist = 6.2;
     this.height = 1.62;
@@ -188,7 +189,7 @@ export class Player {
         const d = wrapPi(Math.atan2(this.vel.x, this.vel.z) - this.yaw);
         this.yaw += d * (1 - Math.exp(-11 * dt));
       }
-      if (cmd.attack) this.swing = 1;
+      if (cmd.attack) { this.swing = 1; this.castEdge = true; }
     } else {
       sp = this.walkSpeed || 0;
     }
