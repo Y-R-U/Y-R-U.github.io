@@ -481,60 +481,70 @@ export function registerBeltScenarios(app, world) {
       // 8500_01's whole depth story: five readable planes, and the far ones have lost ~60 % of
       // their contrast into a warm grey medium. The two palette hues never lerp through a
       // neutral, so the mix gets pulled toward its own luminance before it is dimmed.
-      q.set('fogDensity', 0.00175);
+      q.set('fogDensity', 0.00150);
       q.set('fogTint', 0.60);
       q.set('fogDesat', 1.0);
-      q.set('fogLevel', 0.16);
+      // the fog colour has to sit *under* the background, not over it: at 0.16 a fully fogged
+      // rock came back as a pale flat ellipse brighter than the sky behind it, which is a
+      // cut-out, not distance. Below the background value the far field dissolves instead.
+      q.set('fogLevel', 0.075);
       // one hard key and almost nothing else: the crater relief only exists as a terminator, and
       // a lifted fill fills the bowls back in. Every value in the frame below is deliberate.
       q.set('keyPower', 21.0);
-      q.set('fillPower', 0.18);
+      // the black point now comes from the sky, not from starving the rig — so the shadow side
+      // can carry a little structure without a grey wash landing on the background as well
+      q.set('fillPower', 0.44);
       q.set('fillAngle', 150);
       q.set('fillLift', -26);
-      q.set('ambient', 0.008);
+      q.set('ambient', 0.018);
       // the analytic env is built out of the nebula's own red mid-tone, and on a diffuse rock
       // that lands as a flat pink wash on every up-facing plane. Metal can carry it; rock cannot.
-      q.set('envPower', 0.045);
+      q.set('envPower', 0.10);
       q.set('envFloor', 0.03);
       // 5.0 blew the rig's bridge glazing into one solid white rectangle the size of the
       // deckhouse. A daylit belt does not need lit windows to read.
       q.set('windowGlow', 1.5);
-      q.set('oreGlow', 2.4);
+      q.set('oreGlow', 2.6);
       q.set('beamGlow', 1.60);
       q.set('beamWidth', 0.50);
+      // the belt's own dust cards are 900 m wide and hang right through the field. They were the
+      // other half of the wash: an even additive veil over the vacuum between the depth layers.
+      q.set('beltDust', 0.30);
+      q.set('beltDustSize', 0.55);
       q.set('rimPower', 2.4);
       q.set('rimDist', 230);
       q.set('rimNear', 120);
       q.set('rimFall', 170);
       q.set('bouncePower', 1.1);
-      // 8500_01's background is not black — it is a flat warm grey dust field the whole belt sits
-      // in, and it is what every rock loses its contrast into. Fog cannot supply it: fog only
-      // tints geometry, and most of this frame is empty. The deep-space floor does.
-      q.set('nebGain', 0.22);
-      q.set('nebRays', 0.25);
-      q.set('nebHalo', 0.01);
-      q.set('nebBlack', 0.34);
+      // The medium is real but it must not be a *fill*. dustField is additive over every pixel,
+      // so at 0.038 it lifted the whole frame off black and a critic read it as a missing light
+      // rig rather than as dust. At 0.027 the background is a dark neutral the rocks still lose
+      // contrast into — the depth cue is the fog *darkening* what is far away, not a wash
+      // brightening what is near. Every hue term is pulled down with it: the belt is one grey.
+      q.set('nebGain', 0.16);
+      q.set('nebRays', 0.10);
+      q.set('nebHalo', 0.0);
+      q.set('nebBlack', 0.46);
       q.set('nebContrast', 2.4);
-      q.set('nebCoolMass', 0.30);
-      q.set('nebCoolGain', 0.06);
+      q.set('nebCoolMass', 0.0);
+      q.set('nebCoolGain', 0.0);
       q.set('nebCoolNear', 0.55);
       q.set('nebCoolFar', 1.10);
-      q.set('nebAmbient', 0.008);
-      q.set('nebDesat', 0.78);
+      q.set('nebAmbient', 0.011);
+      q.set('nebDesat', 0.96);
       q.set('nebScale', 6.5);
-      q.set('dustField', 0.038);
-      // 8500_01 holds a dense starfield *through* the dust. Ours had none: starOcclude 18 against
-      // a lifted dust field is exp(−2.7), which deletes the whole sky. The stars are most of the
-      // information in that background and they cost nothing — the Points are already drawn.
-      q.set('stars', 1.0);
-      q.set('starBright', 3.4);
-      q.set('starSize', 1.3);
-      q.set('starOcclude', 2.2);
+      q.set('dustField', 0.027);
+      // 8500_01 holds a dense starfield *through* the dust, and the stars are what stop a dark
+      // background reading as an unlit hole. They cost nothing — the Points are already drawn.
+      q.set('stars', 1.9);
+      q.set('starBright', 4.4);
+      q.set('starSize', 1.2);
+      q.set('starOcclude', 1.2);
       q.set('flareSize', 16);
       q.set('bloomPower', 0);
 
       const g = new THREE.Group();
-      const field = belt('kestrel', { seed: 5, density: 1.45 });
+      const field = belt('kestrel', { seed: 5, density: 1.75 });
       field.position.set(40, -6, -70);
       g.add(field);
       const spur = belt('drift', { seed: 14, density: 1.1 });
@@ -546,36 +556,54 @@ export function registerBeltScenarios(app, world) {
       // with nothing in it is the single biggest thing rounds 1–2 were missing. Four of these are
       // cut by a frame edge, which is the other half of why the plate reads as a field the camera
       // is inside rather than a diorama it is looking at.
-      for (const [cls, seed, x, y, z, ore] of [
-        ['huge', 4, -206, 104, -320, 0],
-        ['huge', 12, -310, -196, -400, 0],
-        ['large', 9, -262, -168, -430, 0.5],
-        ['mid', 17, 96, -70, -215, 0.6],
-        ['huge', 21, 176, 52, -330, 1],
-        ['huge', 26, 60, 190, -380, 0.85],
-        ['large', 31, -70, 176, -330, 0.7],
-        ['large', 35, 122, -166, -300, 0.6],
-        ['mid', 37, 30, -128, -235, 0],
-        ['mid', 33, 74, 96, -690, 0.6],
-        ['large', 41, -34, 128, -430, 0.7],
-        ['large', 47, 268, -118, -470, 0],
-        ['huge', 51, 372, 118, -470, 0.7],
-        ['mid', 53, -104, 22, -300, 0.4],
-        ['mid', 61, 210, 130, -520, 0.6],
-        ['huge', 63, -330, 210, -520, 0.8],
-        ['large', 65, 400, 160, -560, 0.75],
-        ['large', 67, 60, -150, -560, 0.55],
-        ['mid', 73, -240, -40, -540, 0],
-        ['large', 77, 300, -30, -640, 0.4],
-        ['mid', 83, -150, 90, -240, 0],
-        ['mid', 89, 250, -60, -350, 0.5],
-        ['large', 91, 130, -190, -420, 0],
-        ['mid', 97, 236, -130, -290, 0],
-        ['large', 103, 330, -150, -400, 0.5],
-        ['mid', 109, 176, -108, -250, 0.4],
-        ['huge', 79, 470, 30, -900, 0.5],
+      // Three depth layers, and every one of them carries its own value spread — that is what
+      // separates a field from a texture. `v` is the rock's albedo against the kit's base: the
+      // near layer runs 0.36 to 1.44 so pale chalk sits beside near-black basalt with vacuum
+      // between them, the mid layer narrows, and the far layer is dark and lets fog take it.
+      for (const [cls, seed, x, y, z, ore, v] of [
+        // near — the value story, highest contrast, four cut by a frame edge
+        ['huge', 4, -206, 104, -320, 0, 1.44],
+        ['mid', 17, 96, -70, -215, 0.6, 0.52],
+        ['mid', 37, 30, -128, -235, 0, 1.30],
+        ['mid', 83, -150, 90, -240, 0, 0.38],
+        ['mid', 109, 176, -108, -250, 0.4, 1.16],
+        ['mid', 97, 236, -130, -290, 0, 0.42],
+        ['large', 35, 122, -166, -300, 0.6, 1.34],
+        ['mid', 53, -104, 22, -300, 0, 0.36],
+        ['large', 31, -70, 176, -330, 0.7, 0.46],
+        // mid
+        ['mid', 89, 250, -60, -350, 0.5, 1.10],
+        ['huge', 12, -310, -196, -400, 0, 1.20],
+        ['large', 103, 330, -150, -400, 0.5, 0.44],
+        ['large', 91, 130, -190, -420, 0, 0.96],
+        ['large', 9, -262, -168, -430, 0.5, 0.40],
+        ['large', 41, -34, 128, -430, 0.7, 1.06],
+        ['large', 47, 268, -118, -470, 0, 0.50],
+        ['huge', 51, 372, 118, -470, 0.7, 0.88],
+        // far — dark, low contrast, fog does the rest
+        ['mid', 61, 210, 130, -520, 0.6, 0.62],
+        ['huge', 63, -330, 210, -520, 0.8, 0.74],
+        ['mid', 73, -240, -40, -540, 0, 0.44],
+        ['large', 67, 60, -150, -560, 0.55, 0.58],
+        ['large', 65, 400, 160, -560, 0.75, 0.68],
+        ['large', 77, 300, -30, -640, 0.4, 0.50],
+        ['mid', 33, 74, 96, -690, 0.6, 0.60],
+        ['huge', 79, 470, 30, -900, 0.5, 0.55],
       ]) {
-        const r = asteroid(cls, { seed, ore });
+        const r = asteroid(cls, { seed, ore, value: v });
+        r.position.set(x, y, z);
+        g.add(r);
+      }
+
+      // Two ore rocks carry a real local light in the fissures. An emissive texel lights nothing;
+      // this is what puts warm falloff on the grey faces beside the crack, which is the plate's
+      // whole "lit from within" read. Two lights only — each one recompiles every material.
+      for (const [cls, seed, x, y, z, v, at, power, dist] of [
+        ['huge', 21, 300, 78, -330, 1.28, [-0.42, 0.06, 0.9], 8000, 400],
+        ['huge', 26, 60, 190, -380, 0.62, [-0.35, -0.2, 1], 6000, 300],
+      ]) {
+        const r = asteroid(cls, { seed, ore: 1, value: v,
+          ember: { power, distance: dist, color: '#ff6a20', at } });
         r.position.set(x, y, z);
         g.add(r);
       }
@@ -625,26 +653,31 @@ export function registerBeltScenarios(app, world) {
       g.add(beams([
         // the endpoints land on the rock's near face, not at its centre: an impact flare buried
         // inside the mesh is depth-tested away and the beam simply stops in mid air
-        { from: em1, to: new THREE.Vector3(142, 46, -266) },
+        { from: em1, to: new THREE.Vector3(252, 65, -277) },
         { from: em2, to: new THREE.Vector3(48, 148, -338) },
-      ], { color: '#8df0c8', width: 1.25, glow: 1, dust: 1.5, impact: 2.2, ejecta: 22 }));
+      ], { color: '#a8f4dd', width: 1.25, glow: 1, dust: 1.1, impact: 1.15, ejecta: 16 }));
 
       g.add(motes({ count: 340, radius: 170, center: [-16, -18, -150], spread: [1.7, 0.7, 1.6], size: 0.4, seed: 9 }));
       g.add(debris({ count: 80, radius: 240, center: [10, -10, -300], spread: [1.5, 0.7, 1.4], size: 1.7, seed: 4 }));
       // spall: lit chips coming off the cut, not additive. They are what stops the impact reading
       // as a sprite — solid rock catching the same key as the rock it came off.
-      g.add(debris({ count: 34, radius: 40, center: [150, 40, -272], spread: [1, 1, 0.7], size: 2.6, seed: 77 }));
+      g.add(debris({ count: 34, radius: 40, center: [258, 60, -282], spread: [1, 1, 0.7], size: 2.6, seed: 77 }));
       g.add(debris({ count: 22, radius: 34, center: [52, 142, -336], spread: [1, 1, 0.7], size: 2.2, seed: 91 }));
 
+      // Dust only where light is actually scattering: along the two beam corridors and around
+      // the two cuts. The old broad banks hung dust in the empty vacuum *between* depth layers,
+      // which is exactly the region the plate keeps black — that is what read as milk fog.
       g.add(atmosphere({
         seed: 4,
         layers: [
-          { count: 5, center: [90, -30, -540], size: [800, 240, 200], scale: [460, 700],
-            aspect: 1.8, color: '#8b8279', power: 0.17, variant: 3 },
-          { count: 16, center: [20, -14, -260], size: [820, 360, 420], scale: [150, 340],
-            color: '#968b80', power: 0.17, variant: 2 },
-          { count: 8, center: [-10, -34, -110], size: [460, 240, 140], scale: [80, 190],
-            color: '#a89d90', power: 0.19, variant: 2 },
+          { count: 9, center: [40, 20, -230], size: [230, 210, 200], scale: [60, 150],
+            color: '#b8ccbe', power: 0.13, variant: 2 },
+          { count: 6, center: [232, 62, -286], size: [180, 150, 160], scale: [50, 120],
+            color: '#c2b49c', power: 0.16, variant: 0 },
+          { count: 5, center: [52, 140, -336], size: [150, 130, 140], scale: [40, 100],
+            color: '#c2b49c', power: 0.14, variant: 0 },
+          { count: 4, center: [-60, -46, -150], size: [220, 110, 130], scale: [50, 120],
+            color: '#a89d90', power: 0.11, variant: 2 },
         ],
       }));
 

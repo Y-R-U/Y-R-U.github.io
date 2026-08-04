@@ -151,13 +151,18 @@ export function beams(list, { color = '#8df0c8', width = 0.55, glow = 1, dust = 
     if (FX.dust > 0.001 && dust > 0.001) {
       const len = from.distanceTo(to);
       // it starts clear of the muzzle: a cone whose apex sits on the hull washes the whole ship
-      const root = from.clone().addScaledVector(dir, len * 0.05);
-      const tip = from.clone().addScaledVector(dir, len * 0.82);
-      const cMuz = hue.clone().lerp(new THREE.Color(1, 0.97, 0.88), 0.4)
-        .multiplyScalar(0.026 * dust * FX.dust);
+      const root = from.clone().addScaledVector(dir, len * 0.04);
+      const tip = from.clone().addScaledVector(dir, len * 0.58);
+      const cMuz = hue.clone().lerp(new THREE.Color(1, 0.97, 0.88), 0.60)
+        .multiplyScalar(0.070 * dust * FX.dust);
       // long and shallow. A short fat cone is five quads wide and reads as a lit polygon hanging
-      // in the beam rather than as scatter.
-      for (const ax of [a1, a2]) geos.push(ribbon(root, tip, w * 3.0, w * 30, ax, cMuz, black));
+      // in the beam rather than as scatter. Two nested cones: a bright narrow one that carries
+      // the gun flare out into the medium, and a wide dim one that is the visible spread.
+      for (const ax of [a1, a2]) {
+        geos.push(ribbon(root, tip, w * 2.4, w * 52, ax, cMuz, black));
+        geos.push(ribbon(root, from.clone().addScaledVector(dir, len * 0.26),
+          w * 1.8, w * 17, ax, cMuz.clone().multiplyScalar(1.9), black));
+      }
     }
 
     const flares = [

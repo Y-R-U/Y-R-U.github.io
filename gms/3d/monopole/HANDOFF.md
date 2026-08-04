@@ -2940,3 +2940,158 @@ star is a composition element, **not the key**.
   out of scope here; pitching the hull to 0.13 / −0.09 hides most of it.
 - `belt_work`'s hull wants the plate's saturated two-colour paint scheme. That is a palette job.
 - `planet_limb` could use two more *large* hulls; the plate has three that read as objects.
+
+---
+
+# Session 13 — round 6 on `belt_work`: the black point, without losing the depth
+
+Blind critic: ours **4.9**, plate `8500_01` **8.3**. Its verdict was that "there is no black point
+anywhere in the frame — a grey ambient wash sits over every pixel, which reads as a missing light
+rig rather than a style", and that the plate's rock field varies "in mesh, size and value across
+three depth layers with deep black between them" while ours was "two meshes repeated at one
+mid-grey value in a uniform milk fog".
+
+**We caused the wash ourselves.** Session 11 was told by a *different* critic that the belt had no
+depth and answered with `dustField` — a flat additive fill in the nebula bake — plus fog and dust
+cards. That fixed depth and it is why this shot stopped looking flat. But it is additive, so it
+lifts every pixel off black, and a later critic reads the same medium as ambient. Both critics were
+right. This session keeps the depth cue and gets the black point back.
+
+Files: `js/world/kit/belt.js`, `js/world/fx.js`, and **only** the `belt_work` block in
+`js/world/scene.js`. `atmos.js` and `backdrop.js` were deliberately **not** touched — every knob
+this shot needed already existed there, and both are shared by all eleven scenarios.
+
+## The medium: darken with distance instead of brightening everything
+
+The target is the plate's own histogram. Plate: 2.5 % of pixels under luminance 8, median 39. Ours
+before: **0.2 %** under 8, median 41 — a frame with no black in it at all. After: **5.2 %** under 8,
+median 30.
+
+- **`dustField` 0.038 → 0.027**, and every hue term under it: `nebGain` 0.22 → 0.16, `nebDesat`
+  0.78 → 0.96, `nebBlack` 0.34 → 0.46, `nebCoolMass` / `nebCoolGain` → **0**. The mauve blotches in
+  the mid-left of the old frame were the bake's low-`hmix` hue (`uMid * vec3(0.34,0.30,0.52)`)
+  showing through a gain five times what the shot needed.
+- **`fogLevel` 0.16 → 0.075.** The single biggest visual bug and worth writing down: a fully fogged
+  rock came back at *higher* luminance than the sky behind it, so the far field was a scatter of
+  **flat pale ellipses** — cut-outs, not distance. The fog colour has to sit under the background
+  value; then the far layer dissolves. `fogDensity` 0.00175 → 0.00150.
+- **The dust moved to where light actually scatters.** The three broad `atmosphere()` banks
+  (800×240 and 820×360 boxes centred on the whole field) hung dust in exactly the empty vacuum
+  *between* the depth layers that the plate keeps black. They are now four small layers on the two
+  beam corridors and the two cuts. `beltDust` 1 → **0.30**, `beltDustSize` → 0.55: the belt's own
+  900 m cards were the other half of the veil.
+- **Starfield up** (`stars` 1.0 → 1.9, `starBright` 3.4 → 4.4, `starOcclude` 2.2 → 1.2). A dark
+  background reads as an unlit hole without them and as space with them. They are free — the
+  `Points` is already drawn.
+- Because the black now comes from the *sky*, the rig could stop being starved: `fillPower` 0.18 →
+  **0.44**, `ambient` 0.008 → 0.018, `envPower` 0.045 → 0.10. A directional fill puts structure in a
+  shadow side without touching a single background pixel.
+
+## Rock value — `instanceColor`, not more meshes
+
+The gap the critic named was *value*, not shape. There is no draw-call budget for more rock meshes
+(this is the heaviest shot in the project) and there did not need to be.
+
+- **`rockTint()` and `setColorAt`.** Every rock in the field and every hand-placed rock carries its
+  own albedo multiplier on `instanceColor`, `0.30 + 1.28·R^0.85` over a cool-biased hue axis. One
+  shared material, one extra buffer, **zero extra draw calls and zero extra programs**. Dark basalt
+  now sits beside pale chalk, which is what "three depth layers with deep black between them" is.
+- **`asteroid()` takes `value`**, so the scenario designs the value story instead of accepting a
+  hash. The twenty-five hand-placed rocks are grouped into three explicit depth bands: the near band
+  runs 0.36–1.44, the mid band narrows, the far band is dark and lets fog take it.
+- **Hand-placed rocks are `InstancedMesh(…, 1)`.** That is the only way a per-object tint reaches
+  the shader without cloning a material per rock. Same draw call, same triangles.
+- **Cavity floor 0.16 → 0.05** and the cavity coefficient 0.55 → 0.86. A crater interior in the
+  plate is a hole; at a 0.16 floor under any lift at all it came back the same mid-grey as its rim.
+- Rock base colour pulled off the kit's tan to a neutral `#a8a9ac` (ore `#87888c`), and the tint's
+  hue axis biased cool — the key is a K-type orange and the albedo map is tan, so a *neutral* spread
+  still lands warm.
+
+## Emission that spills — `ember`
+
+`asteroid()` takes `ember: { power, distance, color, at }` and hangs one **PointLight** in an ore
+pocket. Our veins were emissive texels that lit nothing, which is exactly the difference between a
+decal and the plate's lit-from-within read. Two ore rocks carry one each; the warm falloff on the
+grey faces beside the fissures is the whole point. Also in the ore shader: `diffuseColor` now sinks
+62 % where the ore mask is hottest, so the glow sits *inside* a crack rather than on top of a
+mid-grey face.
+
+The hero ore rock moved from x 176 to **x 300**, so it is cut by the right frame edge the way the
+plate's ore rocks are instead of sitting fully in frame as a black disc. Beam endpoint, spall and
+one dust layer moved with it.
+
+## Beams — the muzzle fan the last two sessions kept flagging
+
+`fx.js`: the fan is now **two nested cones** (a wide dim one to 58 % of the run, a bright narrow one
+to 26 %) at 0.070 instead of 0.026, and lerped further toward white. At 0.026 it did not exist at
+sheet scale, which is why the plate's beams read as energy and ours read as two green tubes. The
+impact came down from `impact 2.2 / ejecta 22` to **1.15 / 16** — ours were orange starbursts the
+size of the rock, the plate's are compact hot points. Beam hue whitened to `#a8f4dd`.
+
+`beltDensity` 1.45 → 1.75 fills the mid-field: instanced, so it costs triangles and no calls.
+
+## Numbers — gate is `--preset=medium --dpr=1 --w=844 --h=390`, headed
+
+| | budget | before | after |
+|---|---|---|---|
+| draw calls | < 150 | 134 | **135** |
+| triangles | < 350 k | 268 k | **297 k** |
+| texture memory | < 60 MB | 12.1 | **12.1** |
+| GPU p95 | < 11 ms | — | **9.8** |
+| CPU p95 | < 6 ms | — | **2.8** |
+| fps | 60 | 60 | **60** |
+
+The one extra draw call is the denser field crossing a bucket boundary. Triangles are the tight
+metric: `beltDensity` was tried at 1.95 (317 k) and pulled back to 1.75 for headroom. The two
+`PointLight`s cost no draw call.
+
+**All eleven scenarios re-rendered.** `nebula_back` 64/20k, `hero_hull` 94/54k, `hull_close` 16/6k,
+`station_night` 115/134k, `station_haze` 65/91k, `planet_limb` 141/77k, `star_flare` 69/62k,
+`fleet_line` 50/42k, `fleet_scale` — all at the same counts as sessions 12/12a and all visually
+unchanged; none of them touches `belt.js` or `beams()`. **`planet_limb` is untouched and holds at
+6.0.** `belt_fog` does change — it shares `belt()` and `beams()` — and it improves: its rocks gained
+the value spread and dark fissures, its beams gained the muzzle fan. 54 calls / 159 k.
+
+## Gotchas — session 13
+
+80. **A point light placed at `radius × 0.86` is *inside* the rock.** `place()` scales the shell to
+    ~1.3 × the largest axis, so the "obvious" offset buries the light in the mesh where it lights
+    only back faces. An A/B with the light off moved 0.11 % of pixels — it looked like the light was
+    never wired up. `radius × 1.42` is outside the shell and works.
+81. **Fog brighter than the background makes far objects into pale cut-outs.** Fog is doing its job
+    when a fully fogged object is *darker* than the sky behind it. Every "flat grey blob" in a
+    fogged field is this bug, not a modelling problem.
+82. **`instanceColor` also multiplies `vColor`**, so any shader patch reading `vColor` as an AO or
+    mask term silently breaks the moment you add a tint. Carry the raw attribute in its own varying
+    (`vRockAo = color.r` in the vertex shader) and read that instead.
+83. **Adding a call to the same seeded `R()` reorders everything downstream.** `rockTint(R)` placed
+    before `place(R, …)` in `asteroid()` re-rolled every hand-placed rock's orientation, and the
+    hero rock turned its unlit hemisphere to camera — which reads as a bug in the light rig, not as
+    a reseed. Draw in the order the composition was tuned in.
+84. **`node tools/shot.mjs --all` hangs in this repo.** It navigates to `index.html` with no
+    `?shot=` first, to enumerate the scenarios, and never gets past it: two 15-minute runs produced
+    zero PNGs while single-shot runs worked every time. Loop `--shot=<id>` over the eleven ids
+    instead. Check `pgrep -f tools/shot` first — two agents rendering at once on one machine is very
+    slow — and note that `pkill -f "shot.mjs --all"` matches its *own* shell and kills the caller.
+
+## Honest score
+
+**`belt_work` ~6.5–7** (blind 4.9, and 4.3 the session before that). It now has a real black point —
+5.2 % of pixels under luminance 8 against the plate's 2.5 % and our own 0.2 % last round — with
+rocks running from near-black basalt to near-white chalk across three depth layers, deep vacuum
+between them, an ore rock cut by the frame edge that is genuinely lit from within, and beams with a
+muzzle fan. Side by side at sheet scale it reads as a sibling of the plate rather than as a render
+of one.
+
+## What is still short
+
+- **The ship is the biggest remaining tell.** The plate's subject is a saturated yellow-and-blue
+  mass carrying most of the frame's value range; ours is a thin dark rust sliver. That is `ship.js`
+  and `palettes.js` — a two-colour scheme with a *pale* upper deck, not a lighting fix.
+- **The plate's rocks are clumps**, three to five lobes fused into one silhouette. Ours are single
+  potatoes, however well valued. A `cluster()` in `belt.js` merging 3–4 shapes into one geometry
+  would close it for one draw call.
+- Our histogram is bimodal — background at 30, lit rock at 48+ — where the plate fills the 32–64
+  band. The plate's rocks hold more *mid* value across a lit face than one hard key can give.
+- The far ore rocks still share shape 0 of their tier, because the ore bucket cannot multiply the
+  draw-call count by the shape count. At this density it is visible if you look for it.

@@ -130,8 +130,10 @@ function rockGeom(tier, index, boost = 0) {
       cav = Math.max(cav, u * 0.8);
     }
     p.setXYZ(i, x * r, y * r, z * r);
-    // vertex cavity, used twice: it darkens the rock and it is inverted to place the ore glow
-    const ao = Math.max(0.16, Math.min(1, 0.42 + 0.85 * (r - 0.88) / 0.34 - 0.55 * cav));
+    // vertex cavity, used twice: it darkens the rock and it is inverted to place the ore glow.
+    // The floor is near black on purpose — a crater interior in the plate reads as a hole, and a
+    // 0.16 floor under any lift at all comes back as the same mid-grey as the rim beside it.
+    const ao = Math.max(0.05, Math.min(1.05, 0.44 + 0.92 * (r - 0.88) / 0.34 - 0.86 * cav));
     col[i * 3] = ao; col[i * 3 + 1] = ao; col[i * 3 + 2] = ao;
   }
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -151,7 +153,8 @@ function rockGeom(tier, index, boost = 0) {
 // available to a shader on an InstancedMesh, and it both slides the map and moves the threshold.
 const ORE_VERT_HEAD = `#include <common>
 varying float vOreSeed;
-varying vec3 vOrePos;`;
+varying vec3 vOrePos;
+varying float vRockAo;`;
 
 const ORE_VERT = `#include <begin_vertex>
   vec4 oreOrigin = modelMatrix *
@@ -160,11 +163,13 @@ const ORE_VERT = `#include <begin_vertex>
   #endif
     vec4(0.0, 0.0, 0.0, 1.0);
   vOreSeed = fract(sin(dot(oreOrigin.xyz, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
-  vOrePos = position;`;
+  vOrePos = position;
+  vRockAo = color.r;`;
 
 const ORE_FRAG_HEAD = `#include <common>
 varying float vOreSeed;
-varying vec3 vOrePos;`;
+varying vec3 vOrePos;
+varying float vRockAo;`;
 
 const ORE_PATCH = `#include <emissivemap_fragment>
   vec2 oreUv = vEmissiveMapUv + vec2(vOreSeed * 6.1, fract(vOreSeed * 17.3) * 4.7);
@@ -176,18 +181,28 @@ const ORE_PATCH = `#include <emissivemap_fragment>
   float pocket = 0.5 + 0.5 * sin(vOrePos.x * 3.1 + vOreSeed * 19.0)
                           * sin(vOrePos.y * 2.7 + vOreSeed * 7.0)
                           * sin(vOrePos.z * 3.6 + vOreSeed * 11.0);
-  pocket = smoothstep(0.40, 0.76, pocket);
-  totalEmissiveRadiance *= oreV * pocket * 4.5 * pow(1.0 - vColor.r, 1.4);`;
+  pocket = smoothstep(0.40, 0.78, pocket);
+  // the cavity term reads the raw attribute, not vColor: vColor now also carries the per-rock
+  // albedo tint, and on a pale rock that alone would delete the ore.
+  float oreMask = oreV * pocket;
+  totalEmissiveRadiance *= oreMask * 4.5 * pow(1.0 - vRockAo, 1.4);
+  // a fissure is a hole, not a decal. Sinking the albedo where the ore is hottest is what makes
+  // the glow read as molten rock under a crust rather than as orange paint on a grey face.
+  diffuseColor.rgb *= 1.0 - 0.62 * smoothstep(0.42, 0.98, oreMask);`;
 
 function materials() {
   if (rockMat) return;
   rockMat = getMaterial('reach', 'rock').clone();
   rockMat.vertexColors = true;
+  // neutral, and a stop brighter than the kit's tan. Every rock's own value comes off
+  // instanceColor now, so the base has to sit where a *pale* rock still has headroom.
+  rockMat.color.set('#a8a9ac');
   rockMat.userData = { palette: 'reach', surface: 'rock', envMul: 0.5 };
   adopt(rockMat);
 
   oreMat = getMaterial('reach', 'ore').clone();
   oreMat.vertexColors = true;
+  oreMat.color.set('#87888c');
   oreMat.emissive.set('#ff5010');
   oreMat.emissiveIntensity = BELT.ore;
   oreMat.userData = { palette: 'reach', surface: 'ore', envMul: 0.5 };
@@ -209,14 +224,30 @@ function materials() {
   adopt(oreMat);
 }
 
-function inst(geom, mat, mats) {
+function inst(geom, mat, mats, cols) {
   const m = new THREE.InstancedMesh(geom, mat, mats.length);
   // the bounding sphere is one rock, so a field spread over kilometres disappears the moment
   // the origin rock leaves frame
   m.frustumCulled = false;
-  for (let i = 0; i < mats.length; i++) m.setMatrixAt(i, mats[i]);
+  for (let i = 0; i < mats.length; i++) {
+    m.setMatrixAt(i, mats[i]);
+    if (cols) m.setColorAt(i, cols[i]);
+  }
   m.instanceMatrix.needsUpdate = true;
+  if (m.instanceColor) m.instanceColor.needsUpdate = true;
   return m;
+}
+
+// A belt plate's rocks differ in albedo at least as much as in shape — dark basalt beside pale
+// chalk, a full stop and a half apart. instanceColor carries it, so the whole spread costs one
+// buffer and no extra material. Numeric Color components are already in the working (linear)
+// space, which is what instanceColor multiplies into.
+function rockTint(R, out = new THREE.Color()) {
+  const v = 0.30 + 1.28 * R() ** 0.85;
+  // the hue axis is biased cool: the key is a K-type orange and the rock albedo map is tan, so a
+  // neutral spread still lands warm. A belt plate's stone is grey.
+  const w = R() * 1.35 - 1.0;
+  return out.setRGB(v * (1 + 0.14 * w), v * (1 + 0.01 * w), v * (1 - 0.21 * w));
 }
 
 function place(R, size) {
@@ -231,20 +262,45 @@ function place(R, size) {
 // showroom; the field itself never calls this — it instances.
 // A hand-placed rock is a hero: one draw call either way, so it gets the extra subdivision the
 // craters need to read. The field never gets it — 45 instances at 5k tris is the whole budget.
-export function asteroid(sizeClass, { seed = 0, ore = 0, palette = 'reach', boost } = {}) {
+// `value` overrides the seeded albedo (1 = the material's own base). `ember` hangs a PointLight
+// in an ore pocket so the fissures actually throw warmth onto the faces around them — an
+// emissive texel lights nothing, which is the whole difference between a decal and a lit-from-
+// within read. It is one light: they are not free, every extra one recompiles every material.
+export function asteroid(sizeClass, { seed = 0, ore = 0, palette = 'reach', boost, value, ember } = {}) {
   materials();
   const cls = SIZES[sizeClass] ? sizeClass : 'mid';
   const tier = TIER[cls];
   const R = rnd(0x1a37 + seed * 2654435761 + cls.length * 7919);
   const g = rockGeom(tier, Math.floor(R() * TIER_SHAPES[tier]), boost ?? HERO_BOOST[tier]);
-  const mesh = new THREE.Mesh(g, ore > 0 ? oreMat : rockMat);
+  // count 1 so the tint rides instanceColor exactly as the field's does, and one shared material
+  // still covers every rock in the game
+  const mesh = new THREE.InstancedMesh(g, ore > 0 ? oreMat : rockMat, 1);
+  mesh.setMatrixAt(0, new THREE.Matrix4());
+  // place() before rockTint(): both draw from R, and a hand-placed rock's orientation is a
+  // composition decision every scenario has already tuned around
   const { q, s } = place(R, SIZES[cls]);
+  const tint = rockTint(R);
+  if (value != null) tint.setScalar(value);
+  mesh.setColorAt(0, tint);
+  mesh.instanceColor.needsUpdate = true;
   mesh.quaternion.copy(q);
   mesh.scale.copy(s);
+  mesh.computeBoundingSphere();
   const grp = new THREE.Group();
   grp.name = `asteroid:${cls}`;
   grp.add(mesh);
-  grp.userData = { sizeClass: cls, ore, radius: Math.max(s.x, s.y, s.z) };
+  const radius = Math.max(s.x, s.y, s.z);
+  if (ember) {
+    const { power = 40, distance = 0, color = '#ff5a1e', at } = ember;
+    const d = at ? new THREE.Vector3(...at).normalize() : new THREE.Vector3(0.4, 0.15, 1).normalize();
+    const L = new THREE.PointLight(new THREE.Color(color), power, distance || radius * 3.4, 2);
+    // *outside* the shell. `radius` is the largest scale axis and the displaced shell runs out to
+    // ~1.3 of it, so anything under that buries the light inside the mesh, where it lights only
+    // back faces and reads as no light at all.
+    L.position.copy(d).multiplyScalar(radius * 1.42);
+    grp.add(L);
+  }
+  grp.userData = { sizeClass: cls, ore, radius };
   return grp;
 }
 
@@ -297,14 +353,16 @@ export function belt(beltId, { seed = 0, density = 1 } = {}) {
       far = Math.max(far, z);
       const { q, s } = place(R, SIZES[cls]);
       const key = `${tier}:${shape}:${isOre ? 1 : 0}`;
-      if (!buckets.has(key)) buckets.set(key, { tier, shape, ore: isOre, mats: [] });
-      buckets.get(key).mats.push(new THREE.Matrix4().compose(v.clone(), q.clone(), s.clone()));
+      if (!buckets.has(key)) buckets.set(key, { tier, shape, ore: isOre, mats: [], cols: [] });
+      const b = buckets.get(key);
+      b.mats.push(new THREE.Matrix4().compose(v.clone(), q.clone(), s.clone()));
+      b.cols.push(rockTint(R));
       if (isOre) oreRocks.push({ pos: v.clone(), radius: Math.max(s.x, s.y, s.z), sizeClass: cls });
     }
   }
 
   for (const b of buckets.values()) {
-    grp.add(inst(rockGeom(b.tier, b.shape), b.ore ? oreMat : rockMat, b.mats));
+    grp.add(inst(rockGeom(b.tier, b.shape), b.ore ? oreMat : rockMat, b.mats, b.cols));
   }
 
   const dust = dustCards(def, R, far);
