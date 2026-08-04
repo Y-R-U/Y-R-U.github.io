@@ -125,6 +125,9 @@ function draw() {
   if (!root) return;
   const entry = stack[stack.length - 1];
   document.body.classList.toggle('sheet-open', !!entry);
+  // whatever is on top is on the body, so a panel can restyle the shell around it (the end card
+  // takes the whole screen) and get it back on every dismissal path for free
+  document.body.dataset.panel = entry ? entry.id : '';
   onStackChange?.(entry ? entry.id : null, stack.length);
 
   if (!entry) { root.innerHTML = ''; return; }

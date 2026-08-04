@@ -78,11 +78,18 @@ body.paused #tickline i { opacity: .25; }
 #sharebar .them { background: var(--them); }
 #sharebar .other { background: var(--other); }
 
-#ticker {
-  position: fixed; top: calc(var(--top) + 9px); left: 10px; right: 10px; z-index: 23;
-  pointer-events: none; opacity: 0; transform: translateY(-6px); transition: opacity .3s, transform .3s;
+/* The ⚙ toggle owns the top-left corner in game mode and the top-right everywhere else (style.css
+   + `body.game #panel` below), and it is z-30 over this. The column is indented past whichever
+   side it is on, or it eats the first three words of every line the game says. */
+#feed {
+  position: fixed; top: calc(var(--top) + 9px); left: 54px; right: 10px; z-index: 23;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  pointer-events: none;
 }
-#ticker.on { opacity: 1; transform: none; }
+body:not(.game) #feed { left: 10px; right: 54px; }
+
+#ticker { display: none; max-width: 100%; }
+#ticker.on { display: block; animation: feed-in .3s cubic-bezier(.22, .8, .3, 1) both; }
 #ticker span {
   display: inline-block; max-width: 100%; padding: 5px 11px;
   background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -562,3 +569,160 @@ body.game.perf-on #perf { display: block; }
 body.game #panel { top: calc(var(--top) + 12px); left: 8px; right: auto; }
 body.game #panel-toggle { left: 0; right: auto; }
 body.game #showroom-btn { bottom: calc(var(--dock) + 4px); }
+
+/* ── the week feed ─────────────────────────────────────────────────────── */
+
+.feed-row {
+  pointer-events: auto; max-width: 100%;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 9px;
+  padding: 5px 10px 6px; border-radius: 4px;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line); border-left: 2px solid var(--tone);
+  animation: feed-in .28s cubic-bezier(.22, .8, .3, 1) both;
+}
+.feed-row.out { animation: feed-out .24s ease both; }
+.feed-row b {
+  flex: 1 1 auto; min-width: 0; color: var(--ink); font-size: 11.5px; font-weight: 400; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.feed-row em {
+  flex: 0 0 auto; font-style: normal; font: 500 11px/1.35 var(--mono);
+  font-variant-numeric: tabular-nums; color: var(--tone);
+}
+.feed-row s {
+  flex: 1 1 100%; text-decoration: none; font-size: 10.5px; line-height: 1.4; color: var(--faint);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* f- prefixed, because a bare `.warn` is already a global text colour */
+.feed-row.f-good { --tone: var(--up); }
+.feed-row.f-bad { --tone: var(--down); }
+.feed-row.f-warn { --tone: var(--grey); }
+.feed-row.f-flat { --tone: var(--them); }
+
+@keyframes feed-in { from { opacity: 0; transform: translateY(-7px); } to { opacity: 1; transform: none; } }
+@keyframes feed-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-4px); } }
+
+/* ── the share line ────────────────────────────────────────────────────── */
+
+.curve { display: block; width: 100%; height: auto; overflow: visible; }
+.curve-axis { stroke: var(--line2); }
+.curve-mark { stroke: rgba(255, 255, 255, .14); stroke-dasharray: 3 4; }
+.curve-tag { fill: var(--faint); font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; }
+.curve-tick { fill: var(--faint); font-size: 8.5px; font-family: var(--mono); }
+.curve-fill { fill: rgba(232, 163, 74, .13); }
+.curve-them { fill: none; stroke: var(--them); stroke-width: 1.3; stroke-linejoin: round; }
+.curve-you { fill: none; stroke: var(--you); stroke-width: 1.9; stroke-linejoin: round; stroke-linecap: round; }
+.curve-dot { fill: var(--you); }
+.curve-read { font-size: 11.5px; line-height: 1.5; color: var(--dim); margin-top: 9px; }
+.q-curve { margin-bottom: 4px; }
+
+/* ── resume ────────────────────────────────────────────────────────────── */
+
+.resume-card { margin-bottom: 12px; }
+.resume-week { display: flex; align-items: baseline; gap: 9px; margin: 6px 0 4px; }
+.resume-week em { font-style: normal; font: 600 34px/1 var(--mono); color: var(--you); }
+.resume-week s { text-decoration: none; font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+.sheet-cta .primary.danger { background: var(--down); border-color: var(--down); color: #1c0c08; }
+
+/* ── the end card ──────────────────────────────────────────────────────── */
+/* The one full-screen thing in the game. `data-panel` is written on the body by panels.js, so the
+   shell comes back on every dismissal path — ✕, Escape, a drag, or the button. */
+
+.sheet[data-panel="gameover"] {
+  top: 0; left: 0; right: 0; bottom: 0; width: auto; max-height: none;
+  border: 0; border-radius: 0; box-shadow: none;
+  background: linear-gradient(180deg, rgba(8, 11, 17, .94), rgba(4, 6, 10, .97));
+}
+body[data-panel="gameover"] #topbar,
+body[data-panel="gameover"] #sharebar,
+body[data-panel="gameover"] #tickline,
+body[data-panel="gameover"] #feed,
+body[data-panel="gameover"] #controls,
+body[data-panel="gameover"] #dock,
+body[data-panel="gameover"] #panel,
+body[data-panel="gameover"] #showroom-btn { display: none; }
+
+.over {
+  max-width: 620px; margin: 0 auto; padding: 0 14px 8px;
+  /* the horizontal radius is half the box, so the glow has faded out before the block's own edge
+     and no rectangle shows on a screen wider than the column */
+  background: radial-gradient(50% 250px at 50% 0%, color-mix(in srgb, var(--band) 20%, transparent), transparent 72%);
+}
+.over-kicker { font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); }
+.over h1 { font: 300 42px/1.04 var(--serif); letter-spacing: .01em; margin: 9px 0 14px; }
+.over-win h1 { color: var(--you); text-shadow: 0 0 30px rgba(232, 163, 74, .34); }
+.over-lose h1 { color: var(--down); text-shadow: 0 0 30px rgba(224, 118, 92, .26); }
+.over-line { font: 300 16px/1.5 var(--serif); color: var(--ink); padding-left: 13px; border-left: 2px solid var(--accent); }
+.over-lose .over-line { border-left-color: var(--down); }
+
+.over-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 22px; }
+.over-tile { padding: 9px 11px 10px; border-radius: 11px; background: var(--glass2); border: 1px solid var(--line); }
+.over-tile s { text-decoration: none; display: block; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.over-tile em { font-style: normal; display: block; margin-top: 4px; font: 600 20px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.over-tile.hot em { color: var(--illegal); }
+
+.over-bands { display: flex; gap: 7px; margin-top: 7px; }
+.over-band {
+  flex: 1 1 0; min-width: 0; padding: 8px 10px; border-radius: 11px; opacity: .45;
+  background: var(--glass2); border: 1px solid var(--line); border-left: 2px solid var(--band);
+}
+.over-band.on { opacity: 1; background: color-mix(in srgb, var(--band) 9%, transparent); }
+.over-band em { font-style: normal; display: block; font: 600 17px/1 var(--mono); color: var(--band); }
+.over-band s { text-decoration: none; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+
+.over-curve { margin-top: 26px; }
+.over-curve .legend { margin-top: 8px; }
+.over-curve .legend li { padding: 4px 0; }
+
+.over-verdict { margin-top: 26px; }
+.over-curve > h2,
+.over-verdict > h2 {
+  font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--faint);
+  font-weight: 500; margin-bottom: 9px; display: flex; align-items: center; gap: 9px;
+}
+.over-curve > h2::after,
+.over-verdict > h2::after { content: ''; flex: 1 1 auto; height: 1px; background: var(--line); }
+.over-why { font-size: 11px; letter-spacing: .04em; color: var(--dim); margin-bottom: 9px; }
+.verdict-card {
+  border-radius: 12px; padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--band) 30%, transparent);
+  background: color-mix(in srgb, var(--band) 7%, rgba(255, 255, 255, .02));
+}
+.verdict-card b { display: block; font: 400 19px/1.24 var(--serif); margin-bottom: 4px; }
+.verdict-card s { text-decoration: none; display: block; font-size: 10.5px; color: var(--faint); letter-spacing: .04em; margin-bottom: 11px; }
+.verdict-card p { font-size: 13.5px; line-height: 1.6; color: rgba(230, 238, 242, .82); }
+.verdict-outcome {
+  font: 300 15px/1.5 var(--serif); color: var(--ink);
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
+}
+
+.over-cta { flex-wrap: wrap; width: 100%; max-width: 620px; margin: 0 auto; }
+.over-cta .primary { flex: 1 1 100%; }
+.over-cta button:not(.primary) { flex: 1 1 0; min-width: 0; padding: 0 10px; font-size: 12px; }
+
+@media (max-height: 460px) {
+  .over h1 { font-size: 28px; margin: 5px 0 9px; }
+  .over-line { font: 300 14px/1.45 var(--serif); }
+  .over-stats { grid-template-columns: repeat(4, 1fr); margin-top: 14px; }
+  .over-tile { padding: 7px 10px 8px; }
+  .over-tile em { font-size: 17px; }
+  .over-band em { font-size: 15px; }
+  .over-curve, .over-verdict { margin-top: 16px; }
+  .over-cta { flex-wrap: nowrap; }
+  .over-cta .primary { flex: 1 1 auto; }
+}
+
+/* A landscape phone is two columns wide and barely one card tall: the verdict goes beside the
+   ending rather than a screen below it. */
+@media (min-width: 700px) and (max-height: 560px) {
+  .over {
+    max-width: none; display: grid; align-content: start;
+    grid-template-columns: 1fr 1fr; column-gap: 24px;
+    grid-template-areas: "crown verdict" "stats verdict" "bands verdict" "curve verdict";
+  }
+  .over-crown { grid-area: crown; }
+  .over-stats { grid-area: stats; grid-template-columns: 1fr 1fr; }
+  .over-bands { grid-area: bands; }
+  .over-curve { grid-area: curve; }
+  .over-verdict { grid-area: verdict; margin-top: 4px; }
+}

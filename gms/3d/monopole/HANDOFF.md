@@ -3708,3 +3708,218 @@ event is additive. These are all UI/world opportunities:
   grey tactic.
 - **`over: 'banned'` is unreachable in a 30-week run.** It fires 7 times in 300 over 52 weeks. The
   code and the loss screen should exist, but do not expect to see it in a playtest.
+
+---
+
+# Session 13c — feedback and endgame
+
+Wrote `js/ui/gameover.js` and `js/ui/save.js`. Edited `js/ui/screens.js`, `js/ui/panels.js`,
+`js/ui/hud.js`, `js/ui/format.js`, `js/ui/simview.js` and `ui.css`. **Nothing outside that list was
+touched** — `js/sim/`, `content/`, `js/main.js`, `index.html` and `style.css` are all untouched, and
+two other agents were editing `js/sim/*` + `content/{balance,tactics}.js` and `js/ui/intro.js` +
+`content/intro.js` in parallel.
+
+Four things landed: an end card, save/resume, a week feed, and a quarterly report that actually
+interrupts. Ten panels now (was eight); `showroom.missing()` is **0** and
+`tools/uishot.mjs --all-panels` is clean at **390×844 and 844×390** — no overlap problems, no
+console output. `node sim.mjs --selftest` is still ten-for-ten.
+
+## 1. The end card — `js/ui/gameover.js`, panel `gameover`
+
+The one full-screen thing in the game, and the only one allowed to be. It opens by itself from
+`hud.react` on the tick `state.over` becomes truthy.
+
+- **`state.over` is treated as any string.** `ENDINGS` knows `monopoly` / `duopoly` / `bust` /
+  `banned`; anything else falls through to a generic lose-toned card titled with
+  `titleCase(over)`. A fifth ending in the sim needs no UI change to render, only copy to read well.
+- **The run in numbers:** weeks survived, peak share (max over every `share` event, not just the
+  final one), credits earned (sum of `revenue` across `cost` events), times investigated, and the
+  tactics split as three band-coloured counts off `state.tactics.owned`.
+- **The share line for the whole run**, player against rival, with the duopoly and monopoly
+  thresholds drawn as dashed rules.
+- **The verdict is the point.** `pickCase()` reads the log and names the real case the run just
+  re-ran:
+  1. if the run ended badly **and** there is an `investigate` event, the case is that tactic's —
+     getting caught is the story of that run whatever else was running;
+  2. otherwise every `tactic` event is scored `weeks-it-ran × BAND_WEIGHT` (legal 1, grey 1.7,
+     illegal 2.8) and the winner's `story` is used. Weeks come from the gap between the `tactic`
+     event and the matching `expire` / `investigate`, or the end of the run;
+  3. if no tactic was ever taken, `UNTOUCHED` supplies an honest fallback — Ford's Rouge for a win
+     ("you never touched the playbook, you just ran the chain better"), Boral for a loss ("you lost
+     the ordinary way") — with its own copy that does **not** claim the player ran the tactic.
+
+  A player who wins on the exclusive gets Bunnings and Ryobi, and the card says why. Verified: a
+  bust after 18 weeks of Below-Cost Pricing and one investigation draws Boral's *lose* verdict.
+- Buttons: **Play again** (`clearSave()` + `sim.reset(newSeed())` + speed 1), **Review the
+  dossier** (pushes the dossier over the card; ‹ comes back to it), **Keep looking around**
+  (dismiss, 3D keeps running). ✕, Escape and a drag do the same as the third.
+
+## 2. Save and resume — `js/ui/save.js`
+
+`localStorage['monopole.save.v1']`, one slot, written on every tick.
+
+```js
+{ f: 1, sv: SAVE_VERSION, at: <epoch ms>, state: <sim.state> }
+```
+
+**Two version fields, and both must match or the save is deleted.**
+
+- `f` is this file's envelope shape. Bump `FORMAT` in `save.js` when the envelope changes.
+- `sv` is `SAVE_VERSION` imported from `js/sim/state.js`. **Whoever changes the sim state shape
+  bumps that and every old save is dropped for free** — nothing else needs to know.
+- On top of the versions, `readable()` walks the state against the live content pack: the system,
+  every site in it, every commodity's market row, every ship's class, every module on every site,
+  and every tactic id in `owned/unlocked/banned/offered/active`. A build that renames a ship class
+  leaves a save that parses fine and throws three ticks later; this catches it at boot. Verified
+  against seven bad shapes — old envelope, old state version, truncated state, unknown ship class,
+  unknown tactic, missing commodity, unparseable JSON. All seven dropped and the key deleted; the
+  good one kept.
+- **Anything that fails is deleted, never repaired.** `state.js` exports a `migrate()` — it is not
+  used, deliberately. There is no shipped version to migrate from yet, and a wrong migration is
+  worse than a lost run.
+- Reads and writes are wrapped in `try/catch`: Safari private mode throws on `setItem`.
+- **The save is cleared, not written, on the tick that sets `state.over`.** There is nothing to
+  resume from a finished run, and Play again clears it too.
+
+`initSave()` is called at the bottom of `screens.js`, which `main.js` already imports. It defers
+its work with `setTimeout(0)`, which lands after main.js's synchronous body has built the sim and
+the scene — so nothing in `main.js` had to change. It no-ops when the URL carries `sr`, `shot` or
+`panel`, so the showroom and `uishot` are never interrupted by a resume prompt.
+
+**Panel `resume`** shows week, quarter, share, cash, debt, hulls and tactics held, with "New run"
+behind a confirm step. Two rules keep a fresh boot from eating the save it is offering:
+
+1. the autosave listener returns early while `panels.isOpen('resume')`, and
+2. a `speed` listener forces the speed back to 0 while the prompt is up — the cold-open fly-by
+   calls `sim.setSpeed(1)` when it resolves at 11 s and would otherwise start ticking over the
+   prompt. Verified: 15 s after boot with a save present, the game behind the prompt is still at
+   week 0, paused, and the save still says week 8.
+
+Dismissing the prompt without answering is treated as "start the new game": both guards are keyed
+on `panels.isOpen('resume')`, so nothing can deadlock.
+
+## 3. The week feed — `js/ui/hud.js`
+
+`#ticker` moved *inside* a new `#feed` flex column, so the hint line and the week's lines stack
+instead of overlapping. `hud.ticker()` is unchanged and `main.js`'s two calls still work.
+
+`feedRows(events, sim)` turns one tick into at most four one-line rows (two under 560 px tall),
+ordered by a priority number, not by event order:
+
+| p | rows |
+|---|---|
+| 0 | `shock` (title + a second line + signed cash), `investigate` |
+| 1 | `warn` |
+| 2 | `shortfall`, `offer`, `unlock`, `tactic` |
+| 3 | `expire`, `contractEnd`, `module`, `ship` |
+| 4 | deliveries (aggregated to one line: biggest commodity + total credits), a week that closed in the red with its biggest bill named |
+| 5 | share movement in points, rival action |
+| 6 | mining, refining |
+
+`arrive` / `depart` / `load` / `price` are deliberately absent — the 3D already shows them.
+
+Rows carry a tone (`f-good` / `f-bad` / `f-warn` / `f-flat`) driving a 2 px left rule and the
+number's colour. They retire themselves after ~6.4 s, staggered; a tap on the stack clears it; a
+new week replaces the lot immediately.
+
+**The `shock` and `warn` contract is built to and verified**, driven through the real `feedRows`
+with synthetic events — the sim agent's events render the moment they start arriving. `warn` falls
+back to a per-level sentence if `body` is missing.
+
+## 4. The quarterly report — `js/ui/screens.js`
+
+- **It opens itself and stops the clock.** `hud.react` opens `quarterly` on a `quarter` event and
+  then calls `sim.hold()`.
+- **`sim.hold()` / `sim.release()` are new on `js/ui/simview.js`** — `hold()` remembers the current
+  speed and pauses, `release()` gives it back. `hud.refresh()` releases automatically whenever the
+  quarterly is no longer on the stack, so ✕, Escape, a drag and the "Carry on" button all resume at
+  the speed the player was running. Verified at ×2: boundary → speed 0, held 2; carry on → 2;
+  plain dismiss → 2.
+- **The share curve.** `shareCurve(rows, { marks })` in `format.js` builds an inline SVG from the
+  `share` events: a filled player line, the rival line behind it, dashed rules at 35 % and 50 %
+  labelled `duo` and `mono`, first and last week ticked. Under it a sentence says how many points
+  the line has moved and what holding 35 % for four weeks would mean. The same function draws the
+  curve on the end card.
+
+## Things worth knowing before touching this
+
+- **`document.body.dataset.panel` is now written by `panels.js`** with the id of whatever sheet is
+  on top (empty when none). That is the whole mechanism behind the full-screen end card:
+  `body[data-panel="gameover"]` hides the top bar, share bar, tick line, feed, speed row, dock, ⚙
+  panel and showroom button, and `.sheet[data-panel="gameover"]` fills the viewport. Because it is
+  written on every draw, **every dismissal path restores the shell for free** — no unmount hook was
+  needed, and opening the dossier over the card brings the dock back, which is correct.
+- **The end card's landscape layout is a two-column grid** (`min-width: 700px and
+  max-height: 560px`): ending and numbers on the left, verdict beside them. At 844×390 both are on
+  screen at once.
+- The showroom's `gameover` fixture **forces `over: 'duopoly'`** onto the week-13 canned company,
+  so the card reads "Duopoly" at 24 % share. That is the fixture being a fixture, not a bug.
+
+## What I deliberately left undone
+
+- **`VERDICT` and `ENDINGS` are copy tables inside `js/ui/gameover.js`, not content.** CLAUDE.md
+  says content lives under `content/`, and I was not allowed to create files there this session.
+  Moving them to `content/verdicts.js` (keyed by story id, with `win` / `lose`) is a mechanical
+  lift and should happen next time someone owns that folder.
+- **No migration path.** See above — stale saves are dropped, not upgraded. The first shipped
+  version is when `migrate()` starts earning its keep.
+- **One save slot, no cloud, no export.** The `games.br8t.com` account layer is not wired into
+  MONOPOLE at all.
+- **The end card has no share or screenshot action.** It is the obvious next thing on it.
+- **No sound and no haptics**, on any of this.
+- **Feed rows take pointer events** so a tap can dismiss them. In landscape the second row can sit
+  ~30 px into the top of the middle third for a few seconds, and a drag started exactly there
+  orbits nothing. Cheap fix if it ever annoys: dismiss on a document-level pointerdown instead and
+  make the rows `pointer-events: none`.
+- **The verdict does not push the story panel automatically** — it is a link, because the card is
+  the payoff and the case is the follow-up.
+
+## WIRING NEEDED
+
+Nothing. Every piece of this is reachable from files I own: `screens.js` is already imported by
+`main.js`, `initSave()` self-schedules after main.js's body, and the end card opens from
+`hud.react`, which is already subscribed to the sim. **`js/main.js`, `index.html` and `style.css`
+are unchanged and need no change.**
+
+One optional tidy for whoever owns `js/main.js` next: the cold-open fly-by still runs when a save
+is resumed, and its `if (sim.speed === 0 && sim.week === 0)` guard is the only reason it does not
+start the clock underneath the resume prompt. `save.js` defends against that with its own speed
+listener; if the fly-by ever learns to skip on resume, that listener can go.
+
+## The ticker/gear bug (coordinator's addendum)
+
+`#ticker` was `left: 10px` and `#panel-toggle` sits at `left: 8px` at z-30 in game mode, so the ⚙
+covered the first ~40 px of every hint the game gave — "Tap the belt to send the rig." rendered as
+"…the belt to send the rig.". Fixed in `ui.css` by indenting the whole `#feed` column (which now
+contains the ticker) to `left: 54px` in game mode, and to `right: 54px` outside it, where the ⚙
+lives in the top-*right* instead. `style.css` was not touched.
+
+## Gotchas — session 13c
+
+73. **`sim.hold()` must come *after* `panels.open('quarterly')`, not before.** `hold()` calls
+    `setSpeed(0)`, which emits `speed`, which runs `hud.refresh()`, which releases the hold if the
+    quarterly is not already on the stack. Held it, released it, and the clock never paused —
+    silent, and only visible by reading `sim.speed` right after the boundary tick.
+74. **A bare `.warn` is already a global text colour in `ui.css`.** A feed row classed
+    `feed-row warn` picked up `color: var(--down)` and every regulator warning rendered red instead
+    of amber. All four tones are `f-` prefixed now. Anything adding a state class to a new component
+    has the same trap waiting: `warn`, `ok`, `up`, `down`, `on`, `hot` are all taken.
+75. **A retire-on-a-timer swap piles rows up under a synchronous tick loop.** Twenty-four ticks
+    driven from `--eval` left 37 feed rows on screen because no timeout ever ran between them. Last
+    week's rows are removed synchronously when the new week arrives now; only the auto-expiry is on
+    a timer.
+76. **`--eval` runs once, on the first navigation.** Code after an in-page `location.reload()` never
+    executes, which makes a naive save/resume round-trip test silently do nothing. Test the reload
+    path by `sim.reset()`-ing and calling `initSave()` again through a dynamic `import()` of the
+    module — same module instance, real code path.
+77. **An exception thrown by `--eval` is invisible.** `Runtime.evaluate` returns it in
+    `exceptionDetails` rather than firing `Runtime.exceptionThrown`, and `uishot.mjs` only logs the
+    latter. Wrap a driving eval in `try/catch` and return the message, or you will debug the wrong
+    thing for twenty minutes. It went the other way here once too: the end card *was* opening and my
+    own test's `panels.closeAll()` was closing it again.
+78. **A radial gradient on a `max-width`-capped block draws a visible rectangle on a wider screen.**
+    The end card's band tint was `130%` wide and got clipped at the 620 px column edge. Sizing the
+    horizontal radius at `50%` makes it fade out before the block's own edge and the seam is gone.
+79. **`tools/uishot.mjs` occasionally times out waiting for `window.__mono.ready` on the first run
+    of a session** and is fine on an immediate retry. Same class of thing as gotcha 56 (the port
+    clash) — retry before investigating.

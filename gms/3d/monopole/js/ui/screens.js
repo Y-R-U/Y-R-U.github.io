@@ -6,7 +6,10 @@ import content from '../sim/content.js';
 import { definePanel, panels } from './panels.js';
 import {
   esc, cr, credits, crShort, delta, pct, tonnes, quarterOf, weekInQuarter, duration, arrow,
+  shareCurve,
 } from './format.js';
+import './gameover.js';
+import { initSave } from './save.js';
 
 const sys = content.get('system', 'tamber');
 const SITE = Object.fromEntries(sys.sites.map(s => [s.id, s]));
@@ -626,6 +629,9 @@ definePanel({
 
   <p class="headline">${esc(headline(q, dShare, rev - out))}</p>
 
+  <h4 class="sec">The line, so far</h4>
+  ${curveBlock(api, q)}
+
   <h4 class="sec">Freight in the Reach</h4>
   <div class="share-split">
     <div class="bar split3">
@@ -665,10 +671,40 @@ definePanel({
 
 <div class="sheet-cta">
   <button data-open="holdings" data-swap>Holdings</button>
-  <button class="primary" data-sheet-close>Carry on</button>
+  <button class="primary" data-a="carry">Carry on</button>
 </div>`;
   },
+
+  // the clock is held while the report is up; hud.refresh hands it back on any other dismissal
+  mount(el, props, api) {
+    wire(el, { carry: () => { api.close(); api.sim.release(); } });
+  },
 });
+
+// Weeks the player has lived through, against the two thresholds that end the game. This is the
+// whole reason the quarterly exists: one glance says whether the line is bending your way.
+function curveBlock(api, q) {
+  const rows = api.sim.all('share').filter(e => e.week <= q.week);
+  const svg = shareCurve(rows, {
+    marks: [
+      { at: content.balance.win.monopoly, label: 'mono' },
+      { at: content.balance.win.duopoly, label: 'duo' },
+    ],
+  });
+  if (!svg) return `<p class="dim">Two quarters of trading and this becomes a line worth reading.</p>`;
+  const first = rows[0], last = rows[rows.length - 1];
+  const d = last.player - first.player;
+  const moved = (Math.abs(d) * 100).toFixed(1);
+  return `
+<div class="q-curve">
+  ${svg}
+  <p class="curve-read">${esc(d > 0.005
+    ? `Up ${moved} points since week ${first.week}. Hold ${pct(content.balance.win.duopoly, 0)} for ${content.balance.win.holdWeeks} weeks and it is a duopoly.`
+    : d < -0.005
+      ? `Down ${moved} points since week ${first.week}. The line is bending the wrong way.`
+      : 'Flat since the first week on the chart. Nothing you have done has moved it yet.')}</p>
+</div>`;
+}
 
 function headline(q, dShare, net) {
   const s = pct(q.share.player, 1);
@@ -689,5 +725,7 @@ function rivalLine(action, st) {
     hold: `Held. Nothing moved.`,
   }[action] || 'Held.';
 }
+
+initSave();
 
 export default { definePanel };

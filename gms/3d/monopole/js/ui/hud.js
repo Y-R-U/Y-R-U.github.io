@@ -3,7 +3,7 @@
 
 import content from '../sim/content.js';
 import { panels } from './panels.js';
-import { esc, cr, crShort, delta, pct, quarterLabel, weekLabel } from './format.js';
+import { esc, cr, crShort, delta, pct, pts, quarterLabel, weekLabel } from './format.js';
 
 const ICON = {
   assign: '<path d="M2.5 8.4 15 2.2 9.6 15l-2-5.2z"/>',
@@ -43,7 +43,9 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
 
 <div id="sharebar"><i class="you"></i><i class="them"></i><i class="other"></i></div>
 
-<div id="ticker"><span></span></div>
+<div id="feed">
+  <div id="ticker"><span></span></div>
+</div>
 
 <div id="controls">
   ${onFocus ? `<button class="hud-focus" data-hud-focus aria-label="Recentre">${icon('focus')}</button>` : ''}
@@ -65,10 +67,13 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
     bar: root.querySelector('#sharebar'),
     ticker: root.querySelector('#ticker'),
     tickerText: root.querySelector('#ticker span'),
+    feed: root.querySelector('#feed'),
     tickline: root.querySelector('#tickline i'),
     speed: root.querySelector('#speed'),
     dock: root.querySelector('#dock'),
   };
+
+  el.feed.addEventListener('click', () => { for (const r of el.feed.querySelectorAll('.feed-row')) retire(r, 0); });
 
   root.addEventListener('click', e => {
     const b = e.target.closest('[data-hud]');
@@ -103,6 +108,7 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
     },
 
     refresh() {
+      if (sim.held !== null && !panels.isOpen('quarterly')) sim.release();
       const st = sim.state;
       const c = sim.last('cost');
       el.cash.textContent = crShort(st.cash);
@@ -130,23 +136,53 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
       tickerTimer = setTimeout(() => el.ticker.classList.remove('on'), ms);
     },
 
+    // The week's account, newest week only. Rows retire themselves and a tap clears the lot; it is
+    // never a log, and it never takes the middle of the screen.
+    feed(rows) {
+      // last week's lines go at once, not on a timer: a ×4 run would otherwise stack them
+      for (const old of el.feed.querySelectorAll('.feed-row')) { clearTimeout(old.__t); old.remove(); }
+      const cap = innerHeight < 560 ? 2 : 4;
+      rows.slice(0, cap).forEach((r, i) => {
+        const n = document.createElement('div');
+        n.className = `feed-row f-${r.tone || 'flat'}`;
+        n.innerHTML = `<b>${esc(r.label)}</b>${r.value ? `<em>${esc(r.value)}</em>` : ''}${r.sub ? `<s>${esc(r.sub)}</s>` : ''}`;
+        el.feed.appendChild(n);
+        retire(n, 6400 + i * 260);
+      });
+    },
+
     // The UI's own reaction to a tick's events. Sheets never stop the clock, so this only ever
-    // slides something up over a scene that keeps running.
+    // slides something up over a scene that keeps running — except the end card, which is the end.
     react(events) {
-      for (const e of events) {
-        if (e.t === 'offer') hud.ticker(`${brand(e.brand)} wants a supply agreement.`);
-        if (e.t === 'rival') hud.ticker(`${content.rival.profile.name}: ${rivalWord(e.action)}`);
-        if (e.t === 'investigate') hud.ticker(`Investigated over ${e.name}. Fine ${cr(e.fine)} cr.`);
-        if (e.t === 'win') hud.ticker(`${e.tier === 'monopoly' ? 'Monopoly' : 'Duopoly'} — ${pct(e.share, 1)} of the Reach.`);
-        if (e.t === 'lose') hud.ticker('The company is out of money.');
+      hud.feed(feedRows(events, sim));
+
+      if (sim.state.over) {
+        sim.held = null;
+        sim.setSpeed(0);
+        // nothing from the run sits behind the end card — a ‹ back to last quarter's report is not
+        // a thing anyone wants at that point
+        if (!panels.isOpen('gameover')) { panels.closeAll(); panels.open('gameover', { over: sim.state.over }); }
+        hud.refresh();
+        return;
       }
-      const unlock = events.find(e => e.t === 'unlock' && e.story);
+
       const quarter = events.find(e => e.t === 'quarter');
+      const unlock = events.find(e => e.t === 'unlock' && e.story);
+      // Thirteen weeks is the game's rhythm: the clock stops and the report is read. The panel has
+      // to be on the stack BEFORE the hold — `refresh` hands the speed straight back if it is not.
+      if (quarter) { panels.open('quarterly', { event: quarter }); sim.hold(); }
       if (unlock) panels.open('story', { story: unlock.story, tactic: unlock.tactic });
-      else if (quarter) panels.open('quarterly', { event: quarter });
       hud.refresh();
     },
   };
+
+  function retire(node, ms) {
+    clearTimeout(node.__t);
+    node.__t = setTimeout(() => {
+      node.classList.add('out');
+      setTimeout(() => node.remove(), 260);
+    }, ms);
+  }
 
   hud.bind(liveSim);
   panels.onSim(view => hud.bind(view));
@@ -154,6 +190,72 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
   document.body.classList.add('game');
   return hud;
 }
+
+// One tick of events → at most a handful of readable lines, ordered by how much the player needs
+// to know. `p` is priority, not position; the stack is capped, so a bad week pushes the routine
+// lines out rather than burying itself under them.
+function feedRows(events, sim) {
+  const rows = [];
+  const of = t => events.filter(e => e.t === t);
+  const add = (p, tone, label, value = '', sub = '') => rows.push({ p, tone, label, value, sub });
+  const site = id => SITE[id] || id;
+  const comm = id => content.get('commodity', id)?.name.toLowerCase() || id;
+  const sum = (list, k) => list.reduce((n, e) => n + (e[k] || 0), 0);
+
+  for (const e of of('shock')) add(0, e.cash < 0 ? 'bad' : 'good', e.title || 'Something landed', e.cash ? delta(e.cash) : '', e.body || '');
+  for (const e of of('investigate')) {
+    add(0, 'bad', `Investigated over ${e.name}`, '−' + crShort(e.fine),
+      e.banned ? 'Struck off for the rest of the run.' : `Lost ${pct(e.shareLoss, 1)} of the Reach with it.`);
+  }
+  for (const e of of('warn')) add(1, 'warn', e.body || WARN_WORD[e.level] || 'A letter arrived', WARN_TAG[e.level] || '');
+  for (const e of of('shortfall')) add(2, 'bad', `Short ${e.units} t on the contract`, '−' + crShort(e.fee));
+  for (const e of of('offer')) add(2, 'good', `${brand(e.brand)} wants a supply agreement`);
+  for (const e of of('unlock')) add(2, 'good', `${e.name} unlocked`, BAND_TAG[e.band] || '');
+  for (const e of of('tactic')) add(2, 'good', `${e.name} is running`, e.cost ? '−' + crShort(e.cost) : 'free');
+  for (const e of of('expire')) add(3, 'warn', `${e.name} has run out`);
+  for (const e of of('contractEnd')) add(3, 'warn', `The ${brand(e.with)} contract has ended`);
+  for (const e of of('module')) add(3, 'good', `${e.name} built at Ledger`, '−' + crShort(e.cost));
+  for (const e of of('ship')) add(3, 'good', `${e.name} ordered`, '−' + crShort(e.cost));
+
+  const del = of('deliver');
+  if (del.length) {
+    const units = {};
+    for (const e of del) units[e.commodity] = (units[e.commodity] || 0) + e.units;
+    const [cid, u] = Object.entries(units).sort((a, b) => b[1] - a[1])[0];
+    const extra = Object.keys(units).length - 1;
+    add(4, 'good', `Sold ${Math.round(u)} t of ${comm(cid)}${extra > 0 ? ` and ${extra} more` : ''}`, '+' + crShort(sum(del, 'credits')));
+  }
+
+  const c = events.find(e => e.t === 'cost');
+  if (c && c.revenue - c.total < 0) {
+    const worst = [['wages', c.wages], ['module upkeep', c.modules], ['fuel', c.fuel], ['interest', c.interest], ['overhead', c.overhead]]
+      .sort((a, b) => b[1] - a[1])[0];
+    add(4, 'bad', `The week closed in the red · ${worst[0]} ${cr(worst[1])}`, delta(c.revenue - c.total));
+  }
+
+  const sh = sim.all('share');
+  if (sh.length > 1) {
+    const d = sh[sh.length - 1].player - sh[sh.length - 2].player;
+    if (Math.abs(d) >= 0.001) add(5, d > 0 ? 'good' : 'bad', `Reach share ${pct(sh[sh.length - 1].player, 1)}`, pts(d));
+  }
+
+  for (const e of of('rival')) add(5, 'flat', `${content.rival.profile.name}: ${rivalWord(e.action)}`);
+
+  const mined = of('mine');
+  if (mined.length) add(6, 'flat', `Cut ${Math.round(sum(mined, 'units'))} t of ore at ${site('kestrel')}`, mined.some(e => e.rich) ? 'rich vein' : '');
+  const refined = of('refine');
+  if (refined.length) {
+    const into = refined[refined.length - 1].into;
+    add(6, 'flat', `Refined ${Math.round(sum(refined, 'units'))} t of ${comm(into)}`);
+  }
+
+  return rows.sort((a, b) => a.p - b.p);
+}
+
+const SITE = Object.fromEntries((content.get('system', 'tamber')?.sites || []).map(s => [s.id, s.name]));
+const BAND_TAG = { legal: 'legal', grey: 'contested', illegal: 'illegal' };
+const WARN_WORD = { debt: 'The bank is watching the overdraft', heat: 'The regulator is reading your filings', contract: 'A contract is running short' };
+const WARN_TAG = { debt: 'debt', heat: 'heat', contract: 'contract' };
 
 const brand = id => ({ ryland: 'Ryland Coil Works', harrow: 'Harrow Filament' }[id] || id);
 const rivalWord = a => ({

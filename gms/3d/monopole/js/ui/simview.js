@@ -15,6 +15,7 @@ export function createSimView({ seed = 1, state = null } = {}) {
     events: [],
     pending: [],
     speed: 0,
+    held: null,
     speeds: content.balance.tick.speeds,
     tickSeconds: content.balance.tick.tickSeconds,
     rng: createRng(seed),
@@ -31,6 +32,15 @@ export function createSimView({ seed = 1, state = null } = {}) {
       if (view.speed === n) return;
       view.speed = n;
       view.emit('speed', n);
+    },
+
+    // A pause the UI can undo without knowing what the speed was — the quarterly report holds the
+    // clock while it is on screen and hands it back on any dismissal.
+    hold() { if (view.held === null) view.held = view.speed; view.setSpeed(0); },
+    release() {
+      const s = view.held;
+      view.held = null;
+      if (s > 0) view.setSpeed(s);
     },
 
     act(action) {
