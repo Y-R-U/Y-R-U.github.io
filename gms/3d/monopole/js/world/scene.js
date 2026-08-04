@@ -139,11 +139,11 @@ export function registerBackdropScenarios(app, world) {
       q.set('envPower', 0.16);
       q.set('envFloor', 0.06);
       q.set('ambient', 0.004);
-      q.set('keyPower', 19);
-      q.set('fillPower', 3.0);
+      q.set('keyPower', 38);
+      q.set('fillPower', 3.4);
       // the shadow side is 0.07-albedo metal, so a multiplied fill returns nothing; this is the
       // additive one that carries the plate map and puts plating back into the dark half
-      q.set('shadowFill', 0.26);
+      q.set('shadowFill', 0.10);
       q.set('fillAngle', 168);
       q.set('fillLift', -24);
       q.set('windowGlow', 4.4);
@@ -323,7 +323,9 @@ export function registerStationScenarios(app, world) {
       q.set('nebAmbient', 0.030);
       // the sharp band runs down the row, so the near bays at the bottom-left corner and the far
       // yard at the top-right both defocus and the middle of the run stays crisp
-      q.set('dof', true);
+      // DOF tilt band off: at sheet scale it blurred geometry at the same depth as the sharp
+      // foreground, and a blind critic read the whole station as unreadable because of it.
+      q.set('dof', false);
       q.set('dofAngle', -45);
       q.set('dofCenter', 0.025);
       q.set('dofSharp', 0.045);
