@@ -116,7 +116,10 @@ export class CameraRig {
       this.copyWant(); this.place();
       return Promise.resolve(this);
     }
-    this.fly = null;
+    // Interrupting a move has to settle the one it replaces, or a caller awaiting the old
+    // destination hangs forever. `cut` says it never arrived — the intro reads it to tell a
+    // completed beat from one the player paged past.
+    this.cancelMove();
     return new Promise(resolve => {
       this.tween = {
         t0: performance.now(), ms, ease: EASE[ease] || EASE.inout, resolve,
@@ -162,6 +165,14 @@ export class CameraRig {
     });
   }
 
+  cancelMove() {
+    const t = this.tween;
+    this.tween = null;
+    this.fly = null;
+    t?.resolve?.({ cut: true });
+    return this;
+  }
+
   setTouchEnabled(on) {
     this.touch = !!on;
     if (!on) { this.pointers.clear(); this.gesture = null; }
@@ -195,14 +206,37 @@ export class CameraRig {
   }
 
   resetView(ms = 620) {
-    const h = this.home;
     this.stopFly();
+    return this.goTo(this.home, ms);
+  }
+
+  // Orbit state as a plain object, and the move back to one. Anything that takes the camera
+  // somewhere temporarily — the inspect card's fly-to — grabs one of these first so its Back
+  // button means "exactly where I was", not "roughly the middle".
+  snapshot() {
+    return { target: this.want.target.clone(), dist: this.want.dist, phi: this.want.phi, theta: this.want.theta, fov: this.want.fov };
+  }
+
+  goTo(h, ms = 700) {
     if (!h) return Promise.resolve(this);
     if (h.object) return this.focus(h.object, { dist: h.dist, phi: h.phi, theta: h.theta, ms });
     const sp = Math.sin(h.phi) * h.dist;
     return this.moveTo({
       pos: [h.target.x + sp * Math.sin(h.theta), h.target.y + Math.cos(h.phi) * h.dist, h.target.z + sp * Math.cos(h.theta)],
       look: [h.target.x, h.target.y, h.target.z], fov: h.fov, ms,
+    });
+  }
+
+  // Same as focus() but for something with no Object3D of its own — one rock out of an instanced
+  // field, say, where all we have is where the finger landed and how big the thing is.
+  focusPoint(p, r = 40, { ms = 800, phi, theta } = {}) {
+    const d = clamp(r * 3.4, this.opt.distMin, this.opt.distMax);
+    const ph = clamp(phi ?? this.phi, PHI_EPS, Math.PI - PHI_EPS);
+    const th = theta ?? this.theta;
+    const sp = Math.sin(ph) * d;
+    return this.moveTo({
+      pos: [p.x + sp * Math.sin(th), p.y + Math.cos(ph) * d, p.z + sp * Math.cos(th)],
+      look: [p.x, p.y, p.z], ms,
     });
   }
 
@@ -416,9 +450,14 @@ export const camera = {
   enable(on = true) { if (camera.rig) camera.rig.active = !!on; return camera; },
   get active() { return !!camera.rig?.active; },
   stopFly() { camera.rig?.stopFly(); return camera; },
+  cancelMove() { camera.rig?.cancelMove(); return camera; },
+  moveTo(opts) { return camera.rig ? camera.rig.moveTo(opts) : Promise.resolve({ cut: true }); },
   markHome(opts) { camera.rig?.markHome(opts); return camera; },
   resetView(ms) { return camera.rig ? camera.rig.resetView(ms) : Promise.resolve(); },
   focus(object3D, opts) { return camera.rig ? camera.rig.focus(object3D, opts) : Promise.resolve(); },
+  focusPoint(p, r, opts) { return camera.rig ? camera.rig.focusPoint(p, r, opts) : Promise.resolve(); },
+  snapshot() { return camera.rig?.snapshot() || null; },
+  goTo(h, ms) { return camera.rig ? camera.rig.goTo(h, ms) : Promise.resolve(); },
   setTouchEnabled(on) { camera.rig?.setTouchEnabled(on); return camera; },
   setFrom(pos, look, fov) { camera.rig?.setFrom(pos, look, fov); return camera; },
   onTap(fn) { if (camera.rig) camera.rig.onTap = fn; return camera; },

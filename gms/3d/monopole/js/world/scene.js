@@ -10,6 +10,7 @@ import { belt, asteroid, allBelts } from './kit/belt.js';
 import { beams, engineTrails, motes, debris } from './fx.js';
 import { atmosphere } from './atmos.js';
 import { fleet, shipMover, allFormations } from './fleet.js';
+import { beacons, tenders, beaconRing } from './traffic.js';
 import { getMaterial } from './materials.js';
 import content from '../sim/content.js';
 import { showroom } from '../showroom/index.js';
@@ -1153,11 +1154,17 @@ export class ReachScene {
     this.oreRock = asteroid('huge', { seed: 3, ore: 1 });
     this.oreRock.position.set(...ORE_ROCK);
     this.oreRock.scale.setScalar(1.7);
-    this.oreRock.userData.siteId = 'kestrel';
+    Object.assign(this.oreRock.userData, {
+      siteId: 'kestrel',
+      rock: { field: 'kestrel', index: 1, ore: 1, radius: (this.oreRock.userData.radius || 90) * 1.7, worked: true },
+    });
     g.add(this.oreRock);
     const rock2 = asteroid('large', { seed: 12, ore: 0.5 });
     rock2.position.set(-1210, -70, -1560);
-    rock2.userData.siteId = 'kestrel';
+    Object.assign(rock2.userData, {
+      siteId: 'kestrel',
+      rock: { field: 'kestrel', index: 2, ore: 0.5, radius: rock2.userData.radius || 60 },
+    });
     g.add(rock2);
 
     // Corvain's hulls: static set dressing, so they merge across ships and cost one bucket set
@@ -1167,11 +1174,21 @@ export class ReachScene {
     ], { spacing: 1.6 });
     corvain.position.set(1180, 300, 2860);
     corvain.rotation.y = -2.3;
-    corvain.userData.siteId = 'drayyard';
+    Object.assign(corvain.userData, { siteId: 'drayyard', rivalId: 'echelon' });
     g.add(corvain);
 
     g.add(motes({ count: 220, radius: 520, center: [120, -20, 120], spread: [1.6, 0.6, 1.6], size: 0.7, seed: 5 }));
     g.add(motes({ count: 200, radius: 620, center: [-1360, 20, -1420], spread: [1.6, 0.7, 1.6], size: 0.6, seed: 17 }));
+
+    // Chips off the working face, drifting. They tumble with everything else in `update`, which
+    // is what stops the belt reading as a photograph of a belt.
+    this.chips = debris({ count: 40, radius: 190, center: ORE_ROCK, spread: [1.4, 0.8, 1.4], size: 2.6, seed: 21 });
+    g.add(this.chips);
+
+    this.beacons = beacons(reachBeacons());
+    if (this.beacons) g.add(this.beacons);
+    this.tenders = tenders(reachLoops());
+    if (this.tenders) g.add(this.tenders);
 
     this.mover = shipMover({
       root: g,
@@ -1207,8 +1224,20 @@ export class ReachScene {
     const def = content.all('ship').find(s => s.id === classId);
     const o = shipClass(def?.mesh || 'hauler', { palette: def?.palette || 'ferrous', seed: hashId(id) });
     o.userData.shipId = id;
-    // the mover hides these while the hull is docked, so they cost nothing at rest
     engineTrails(o, { color: '#ffbe6a', length: 1.1, width: 1.0 });
+    // Navigation lights, in hull space so they ride the ship. Red to port, green to starboard,
+    // a white anti-collision strobe on the spine and a steady stern lamp — the real convention,
+    // and one Points call per hull. This is most of what stops a docked ship reading as scenery.
+    const L = o.userData.length || 60;
+    const p = hashId(id) / 997;
+    const nav = beacons([
+      { pos: [-L * 0.19, L * 0.02, L * 0.06], color: '#ff2f2f', size: L * 0.025, rate: 0.55, phase: p, steady: true, gain: 1.4 },
+      { pos: [L * 0.19, L * 0.02, L * 0.06], color: '#39ff88', size: L * 0.025, rate: 0.55, phase: p, steady: true, gain: 1.4 },
+      { pos: [0, L * 0.14, -L * 0.10], color: '#ffffff', size: L * 0.035, rate: 0.62, phase: p, gain: 2.0 },
+      { pos: [0, L * 0.05, L * 0.34], color: '#ffd08a', size: L * 0.020, rate: 0.31, phase: p + 0.4, steady: true },
+      // a lamp this close to the camera would otherwise cover a quarter of the screen
+    ], { seed: hashId(id), max: 22 });
+    if (nav) { o.add(nav); o.userData.nav = nav; }
     return o;
   }
 
@@ -1218,32 +1247,115 @@ export class ReachScene {
 
   setTickPhase(f) { this.phase = f; }
 
+  // Pause stops the company, not the system. `rate` is the clock's own multiplier so a ×4 run
+  // reads as a busier system, and 0 is never passed — a paused Reach still ticks over.
+  setAmbientRate(r) { this.rate = Math.max(0.35, r || 1); }
+
   update(dt) {
-    this.t += dt;
-    this.mover.update(this.phase || 0, this.t);
+    this.t += dt * (this.rate || 1);
+    const t = this.t;
+    this.mover.update(this.phase || 0, t);
+    this.beacons?.update(t);
+    this.tenders?.update(t);
+    // hung off the avatar rather than a list of our own, so a scrapped hull takes its lights with it
+    for (const a of this.mover.avatars.values()) a.obj.userData.nav?.update(t);
+    this.oreRock.rotation.set(t * 0.013, t * 0.021, t * 0.008);
+    this.chips.rotation.y = t * 0.006;
+    this.chips.rotation.x = Math.sin(t * 0.05) * 0.06;
     const q = this.app.quality;
     const lvl = q.get('windowGlow');
-    const pulse = 1 + Math.sin(this.t * 0.55) * 0.045 + Math.sin(this.t * 1.9 + 1.4) * 0.018;
+    const pulse = 1 + Math.sin(t * 0.55) * 0.045 + Math.sin(t * 1.9 + 1.4) * 0.018;
     for (const m of this.win) m.emissiveIntensity = lvl * pulse;
   }
 
   // What a tap on the 3D landed on. The whole hit list, not just the first: a docked hull sits
   // inside its site's tap proxy, so the nearest hit is the region and the ship is behind it.
+  //
+  // Order of preference is specific-before-general — a hull, then a named rock, then the region
+  // it is standing in — because the region proxies are 600 m spheres and would otherwise swallow
+  // everything inside them.
   siteAt(hit, hits) {
-    const tags = (hits && hits.length ? hits : hit ? [hit] : []).map(h => tagOf(h.object)).filter(Boolean);
-    return tags.find(t => t.kind === 'ship') || tags[0] || null;
+    const list = hits && hits.length ? hits : hit ? [hit] : [];
+    const tags = list.map(h => tagOf(h.object, h)).filter(Boolean);
+    return tags.find(t => t.kind === 'ship') || tags.find(t => t.kind === 'rock')
+      || tags.find(t => t.kind === 'rival') || tags[0] || null;
   }
 
   focusTarget(id) { return this.sites[id] || this.group; }
 }
 
-function tagOf(o) {
-  while (o) {
-    if (o.userData?.shipId) return { kind: 'ship', ship: o.userData.shipId };
-    if (o.userData?.siteId) return { kind: 'site', site: o.userData.siteId };
-    o = o.parent;
+// Ledger's spine runs along X and its bays hang at z = ±80, so the truss lamps are a row down X
+// and the yard markers ring the dock. Dray Yard gets cool ones — it is Corvain's, and the colour
+// is how you tell whose lights you are looking at from a long way off.
+function reachBeacons() {
+  const out = [];
+  const L = REACH.ledger.pos, K = REACH.kestrel.dock, D = REACH.drayyard.pos;
+  for (let i = 0; i < 11; i++) {
+    const x = L[0] - 240 + i * 48;
+    out.push({ pos: [x, L[1] + 34, L[2] - 82], color: '#ff5a3c', size: 7, rate: 0.34, phase: i / 11 });
+    out.push({ pos: [x, L[1] - 26, L[2] + 82], color: '#ffd08a', size: 5, gain: 0.7, rate: 0.34, phase: (i + 5.5) / 11, steady: true });
+  }
+  out.push(...beaconRing(REACH.ledger.dock, 96, 6, { color: '#8df0c8', size: 9, rate: 0.5 }));
+  out.push(...beaconRing(K, 210, 5, { color: '#ff8a3c', size: 12, rate: 0.22 }));
+  out.push({ pos: [ORE_ROCK[0], ORE_ROCK[1] + 120, ORE_ROCK[2]], color: '#ffffff', size: 14, rate: 0.7 });
+  for (let i = 0; i < 7; i++) {
+    out.push({ pos: [D[0] - 180 + i * 62, D[1] + 26, D[2] - 40], color: '#7ec8ff', size: 8, rate: 0.29, phase: i / 7 });
+  }
+  return out;
+}
+
+// Closed loops the tenders run forever. They exist to put something small and moving next to
+// something huge and still — the cheapest scale cue in the file, and it never stops.
+function reachLoops() {
+  const L = REACH.ledger.pos, D = REACH.drayyard.pos, K = REACH.kestrel.dock;
+  return [
+    { count: 3, speed: 0.017, size: 5.5,
+      points: [[L[0] - 300, 60, L[2] - 150], [L[0] + 260, 20, L[2] - 210], [L[0] + 380, -40, L[2] + 190], [L[0] - 220, 10, L[2] + 240]] },
+    { count: 2, speed: 0.010, size: 6.5,
+      points: [[L[0] + 240, 6, L[2] + 168], [620, 90, 900], [1180, 260, 2100], [D[0] - 210, D[1] - 28, D[2] - 220], [700, 180, 1400], [280, 40, 520]] },
+    { count: 2, speed: 0.021, size: 4.5,
+      points: [[K[0] - 240, K[1] + 90, K[2] + 60], [ORE_ROCK[0] + 130, ORE_ROCK[1] + 40, ORE_ROCK[2] - 120], [K[0] + 260, K[1] - 60, K[2] - 200], [K[0] + 40, K[1] + 120, K[2] + 260]] },
+    { count: 2, speed: 0.014, size: 5,
+      points: [[D[0] - 320, D[1] + 40, D[2] - 260], [D[0] + 240, D[1] - 30, D[2] - 180], [D[0] + 180, D[1] + 60, D[2] + 240], [D[0] - 260, D[1] - 10, D[2] + 200]] },
+  ];
+}
+
+// `hit` carries what the raycaster knows that the object does not: where the finger landed, and
+// which instance of a belt field it landed on. That instanceId is what lets every rock in a
+// 400-rock InstancedMesh have its own name for nothing.
+function tagOf(o, hit) {
+  const at = hit?.point ? hit.point.clone() : null;
+  let node = o;
+  while (node) {
+    const u = node.userData || {};
+    if (u.shipId) return { kind: 'ship', ship: u.shipId, object: node, at };
+    if (u.rock) return { kind: 'rock', rock: u.rock, object: node, at, radius: u.rock.radius };
+    if (u.rivalId) return { kind: 'rival', rival: u.rivalId, site: u.siteId, object: node, at };
+    if (u.beltId && hit && hit.instanceId !== undefined && hit.instanceId !== null) {
+      // the bucket index has to come from the child order, not a uuid — a designation that
+      // changed between sessions would not be a designation
+      const bucket = Math.max(0, node.children.indexOf(hit.object));
+      return {
+        kind: 'rock', object: null, at,
+        rock: { field: u.beltId, index: hit.instanceId * 13 + bucket },
+        radius: instanceRadius(hit.object, hit.instanceId),
+      };
+    }
+    if (u.siteId) return { kind: 'site', site: u.siteId, object: node, at };
+    node = node.parent;
   }
   return null;
+}
+
+// A field rock's real size, so the readout is not the same number for every rock in the belt.
+const _m4 = new THREE.Matrix4();
+const _sc = new THREE.Vector3();
+function instanceRadius(mesh, i) {
+  mesh.getMatrixAt(i, _m4);
+  _m4.decompose(new THREE.Vector3(), new THREE.Quaternion(), _sc);
+  if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
+  // the belt kit's own `radius` is the largest scale axis, so match it rather than averaging
+  return Math.max(1, mesh.geometry.boundingSphere.radius * Math.max(_sc.x, _sc.y, _sc.z));
 }
 
 const hashId = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return (h >>> 0) % 997; };
@@ -1257,6 +1369,22 @@ export function coldOpenKeys() {
     { pos: [470, 54, -10], look: [700, 10, -230], fov: 52, t: 0.48 },
     { pos: [340, 240, -560], look: [b[0] * 0.4, 60, b[2] * 0.5], fov: 46, t: 0.72 },
     { pos: [b[0] + 430, b[1] + 150, b[2] + 330], look: b, fov: 44, t: 1 },
+  ];
+}
+
+// One framing per intro beat, in the order content/intro.js lists them. Index 0 is the title
+// hold — the camera sits on it, nothing moving but the world's own ambience — and every later
+// entry is where the card of the same index takes the camera. They are absolute framings rather
+// than a spline so paging backwards is the same operation as paging forwards.
+export function introShots() {
+  const b = REACH.kestrel.dock;
+  const d = REACH.drayyard.pos;
+  return [
+    { pos: [-150, 26, 250], look: [130, 4, 60], fov: 44, ms: 0 },
+    { pos: [96, 22, 178], look: [400, -6, 22], fov: 48, ms: 4200 },
+    { pos: [d[0] - 980, d[1] - 90, d[2] - 1420], look: [d[0] - 260, d[1] - 60, d[2] - 640], fov: 40, ms: 5200 },
+    { pos: [520, 1480, 1980], look: [260, 40, 460], fov: 56, ms: 5200 },
+    { pos: [b[0] + 430, b[1] + 150, b[2] + 330], look: b, fov: 44, ms: 5600 },
   ];
 }
 

@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shipClass, lodForDistance } from './kit/ship.js';
-import { beams } from './fx.js';
+import { beams, flameLevel, beamLevel } from './fx.js';
 
 // x, y, z in hull lengths; ry in radians; lod is a hint the caller can override.
 const FORMATIONS = {
@@ -248,12 +248,16 @@ export function shipMover({ root, anchor, build, beamTarget = null, beamColor = 
       for (const a of avatars.values()) setBeam(a, a.mining > 0);
     },
 
-    // f is 0..1 through the current week; t is wall time, for the drift that keeps a docked hull
-    // from looking frozen.
+    // f is 0..1 through the current week; t is ambient time, which runs whether or not the
+    // company's clock does. Nothing in here reads the sim — a docked hull still burns its
+    // station-keeping thrusters and a running beam still flickers with the game paused.
     update(f, t) {
       for (const a of avatars.values()) {
         const trail = a.trail !== undefined ? a.trail : (a.trail = a.obj.getObjectByName('trails') || null);
-        if (trail) trail.visible = !!a.leg;
+        if (trail) {
+          trail.visible = !a.laidUp;
+          trail.userData.setPower?.(flameLevel(t, a.bob, !a.leg));
+        }
         if (a.leg && a.curve) {
           const u = Math.max(0, Math.min(1, (a.elapsed + f) / a.leg.weeks));
           a.curve.getPoint(u, P);
@@ -262,8 +266,12 @@ export function shipMover({ root, anchor, build, beamTarget = null, beamColor = 
           if (Q.distanceToSquared(P) > 1e-6) faceAt(a.obj, Q);
         } else {
           a.obj.position.y += Math.sin(t * 0.35 + a.bob) * 0.012;
+          a.obj.rotation.z = Math.sin(t * 0.21 + a.bob * 1.7) * 0.014;
         }
-        if (a.beam?.visible) a.beam.scale.setScalar(1 + Math.sin(t * 3.1 + a.bob) * 0.012);
+        if (a.beam?.visible) {
+          a.beam.userData.setPower?.(beamLevel(t, a.bob));
+          a.beam.scale.setScalar(1 + Math.sin(t * 3.1 + a.bob) * 0.012);
+        }
       }
     },
 

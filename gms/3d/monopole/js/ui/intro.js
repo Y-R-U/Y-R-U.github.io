@@ -2,7 +2,7 @@
 // dock coach mark, and the How to play reference. Owns #intro and nothing else on the page.
 
 import content from '../sim/content.js';
-import { cr, pct, esc } from './format.js';
+import { credits, pct, esc } from './format.js';
 import data from '../../content/intro.js';
 
 const SEEN_KEY = 'monopole.seen.v1';
@@ -10,8 +10,8 @@ const SAVE_KEY = 'monopole.save.v1';
 
 const b = content.balance;
 const NUMBERS = {
-  cash: cr(b.start.cash),
-  debt: cr(b.start.debt),
+  cash: credits(b.start.cash),
+  debt: credits(b.start.debt),
   playerShare: pct(b.start.share.player),
   rivalShare: pct(b.start.share.rival),
   duopoly: pct(b.win.duopoly),
@@ -19,7 +19,7 @@ const NUMBERS = {
   holdWeeks: String(b.win.holdWeeks),
   fromWeek: String(b.win.checkFromWeek),
   heat: String(b.heat.threshold),
-  debtLimit: cr(b.loan.debtLimit),
+  debtLimit: credits(b.loan.debtLimit),
   interest: pct(b.loan.interestWeekly, 1),
   feedWeeks: String(b.market.feedWeeks),
   window: String(b.share.window),
@@ -29,17 +29,24 @@ const NUMBERS = {
 
 const fill = s => String(s).replace(/\{(\w+)\}/g, (m, k) => NUMBERS[k] ?? m);
 
+// Every panel the player has opened this session. The tour's reading steps complete on being
+// looked at, which is the only honest test for "have you seen the Market yet".
+const seenPanel = new Set();
+
 // Each objective completes by observation. Every read here is a real field in js/sim/state.js;
 // the log-backed ones are monotonic on purpose so a step cannot un-finish itself.
 const DONE = {
   rig: sim => sim.state.ships.some(sh => (sim.shipDef(sh)?.mine || 0) > 0 && Array.isArray(sh.route) && sh.route.includes('kestrel'))
     || sim.queued().some(a => (a.type === 'assign' && a.to === 'kestrel') || (a.type === 'route' && a.legs?.includes('kestrel'))),
+  market: () => seenPanel.has('market'),
   ore: sim => sim.stock('ledger', 'ore') > 0,
   halide: sim => sim.stock('ledger', 'halide') > 0 || sim.state.log.some(e => e.t === 'refine' && e.into === 'halide'),
   sell: sim => sim.state.log.some(e => e.t === 'deliver' && e.credits > 0),
+  books: () => seenPanel.has('holdings'),
   module: sim => sim.state.log.some(e => e.t === 'module')
     || (sim.state.sites.ledger?.modules?.length || 0) > (content.get('station', 'ledger')?.modules.length || 0),
   tactic: sim => sim.state.tactics.owned.length > 0 || sim.state.log.some(e => e.t === 'tactic'),
+  dossier: () => seenPanel.has('dossier') || seenPanel.has('story'),
 };
 
 let ctx = null;
@@ -51,6 +58,7 @@ let expanded = false;
 let chipKey = '';
 let coached = null;
 let latched = -1;
+let started = false;
 
 export const intro = {
   start(opts = {}) {
@@ -74,8 +82,7 @@ export const intro = {
     });
     watchSheet();
 
-    if (brief) showCard(0);
-    else ctx.coldOpen ? ctx.coldOpen.then(sync) : sync();
+    coldOpen(brief);
     return intro;
   },
 
@@ -83,6 +90,34 @@ export const intro = {
   replay() { ensureRoot(); openGuide(); },
   get guideOpen() { return !!guideEl && !guideEl.hidden; },
 };
+
+/* ── the cold open ──────────────────────────────────────────────────────── */
+
+// The name over the live system with no card in front of it. Two seconds of nothing but the
+// scene is the whole point of the beat, so the first card is not scheduled until it is up.
+function coldOpen(brief) {
+  const t = data.title;
+  const el = document.createElement('div');
+  el.className = 'intro-title';
+  el.innerHTML = `<b>${esc(t.name)}</b><s>${esc(t.sub)}</s>`;
+  root.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('in'));
+
+  setTimeout(() => {
+    el.classList.remove('in');
+    setTimeout(() => el.remove(), 700);
+    if (brief) showCard(0);
+    else finishCards();
+  }, t.titleMs);
+}
+
+// Hands the running game back. Everything that was held for the intro — the clock, the touch
+// gestures, the home framing — is released here and nowhere else.
+function begin() {
+  if (started) return;
+  started = true;
+  ctx.begin?.();
+}
 
 /* ── root ───────────────────────────────────────────────────────────────── */
 
@@ -105,9 +140,14 @@ function ensureRoot() {
   root.addEventListener('pointerdown', e => e.stopPropagation());
   root.addEventListener('click', onClick);
   addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    if (intro.guideOpen) closeGuide();
-    else if (card >= 0) finishCards();
+    if (e.key === 'Escape') {
+      if (intro.guideOpen) closeGuide();
+      else if (card >= 0) finishCards();
+      return;
+    }
+    if (card < 0 || intro.guideOpen) return;
+    if (e.key === 'ArrowRight') showCard(card + 1);
+    else if (e.key === 'ArrowLeft') showCard(card - 1);
   });
   return root;
 }
@@ -117,6 +157,7 @@ function onClick(e) {
   if (!t) return;
   const a = t.dataset.i;
   if (a === 'next') showCard(card + 1);
+  else if (a === 'back') showCard(card - 1);
   else if (a === 'skip') finishCards();
   else if (a === 'dot') showCard(+t.dataset.n);
   else if (a === 'why') { expanded = !expanded; sync(); }
@@ -128,6 +169,8 @@ function onClick(e) {
 
 function showCard(n) {
   if (n >= data.cards.length) return finishCards();
+  if (n < 0) return;
+  const back = n < card;
   card = n;
   const c = data.cards[n];
   const last = n === data.cards.length - 1;
@@ -138,26 +181,64 @@ function showCard(n) {
     el = document.createElement('div');
     el.className = 'intro-card';
     root.appendChild(el);
+    wireSwipe(el);
   }
   el.innerHTML = `
 <i class="eyebrow">${esc(c.eyebrow)}</i>
 <h2>${esc(c.title)}</h2>
 <p>${esc(fill(c.body))}</p>
 <div class="row">
+  ${n > 0 ? '<button class="step" data-i="back" aria-label="Previous card">‹</button>' : '<span class="step ghosted"></span>'}
   <div class="dots">${data.cards.map((_, i) =>
     `<button data-i="dot" data-n="${i}" class="${i === n ? 'on' : ''}" aria-label="Card ${i + 1}"></button>`).join('')}</div>
-  <button class="ghost" data-i="skip">Skip</button>
+  ${last ? '' : '<button class="ghost" data-i="skip">Skip</button>'}
   <button class="go" data-i="next">${last ? 'Start' : 'Next'}</button>
 </div>`;
-  el.classList.remove('in');
+  el.classList.remove('in', 'from-left', 'from-right');
+  el.classList.add(back ? 'from-left' : 'from-right');
   requestAnimationFrame(() => el.classList.add('in'));
+  beat(n + 1);
+}
+
+// Card n moves the camera to shot n+1 — shot 0 is the title hold. moveTo interrupts whatever is
+// already playing and interpolates from the frame it is actually on, so paging back mid-move
+// turns round on the spot instead of snapping.
+function beat(i) {
+  const shot = ctx.shots?.[i];
+  if (!shot || !ctx.camera) return;
+  ctx.camera.moveTo({ pos: shot.pos, look: shot.look, fov: shot.fov, ms: shot.ms || 4000, ease: 'inout' });
 }
 
 function finishCards() {
   card = -1;
   write(SEEN_KEY, '1');
-  root.querySelector('.intro-card')?.remove();
+  const el = root.querySelector('.intro-card');
+  if (el) { el.classList.remove('in'); setTimeout(() => el.remove(), 340); }
+  begin();
   sync();
+}
+
+// A drag across the card pages it, and so does a tap on its outer third. Both are cancelled by
+// anything that started on a control, so Next and the dots keep working normally.
+function wireSwipe(el) {
+  let x0 = 0, y0 = 0, id = null, live = false;
+
+  el.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    id = e.pointerId; x0 = e.clientX; y0 = e.clientY; live = true;
+  });
+  el.addEventListener('pointerup', e => {
+    if (!live || e.pointerId !== id) return;
+    live = false;
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.4) return showCard(card + (dx < 0 ? 1 : -1));
+    if (Math.hypot(dx, dy) > 10) return;
+    const r = el.getBoundingClientRect();
+    const u = (e.clientX - r.left) / r.width;
+    if (u > 0.72) showCard(card + 1);
+    else if (u < 0.28) showCard(card - 1);
+  });
+  el.addEventListener('pointercancel', () => { live = false; });
 }
 
 /* ── the objective chip ─────────────────────────────────────────────────── */
@@ -172,9 +253,11 @@ function current() {
   for (const o of data.objectives) {
     if (done.has(o.id)) continue;
     if (!DONE[o.id](sim)) return o;
-    if (!settle && latched === w) return o;
+    // A `look` step finished the moment the player opened the panel, so holding it back until
+    // next week just makes the chip look broken. Only the sim-driven ones queue.
+    if (!o.look && !settle && latched === w) return o;
     done.add(o.id);
-    latched = w;
+    if (!o.look) latched = w;
   }
   return data.standing;
 }
@@ -208,19 +291,42 @@ function paintChip(o) {
 ${expanded && !st.over ? `<p class="why">${esc(fill(o.why))}</p>` : ''}`;
 }
 
+// The coach mark follows the step: the dock button while the sheet is shut, and once the right
+// panel is open, the control inside it that actually does the thing.
 function paintCoach(o) {
-  const want = o && !ctx.sim.state.over && !document.body.classList.contains('sheet-open') ? o.dock : null;
-  const el = want ? document.querySelector(`#dock button[data-hud="${want}"]`) : null;
-  if (el === coached) return;
+  let el = null;
+  if (o && !ctx.sim.state.over) {
+    const open = document.body.dataset.panel;
+    if (!open) el = o.dock ? document.querySelector(`#dock button[data-hud="${o.dock}"]`) : null;
+    else if (open === o.dock) el = pickMark(o.mark);
+  }
+  // a sheet redraw leaves `coached` pointing at a detached node, so identity alone is not enough
+  const same = el === coached && (!coached || coached.isConnected);
+  if (same) return;
+  const moved = !coached || el?.dataset?.a !== coached.dataset?.a || el?.className !== coached.className;
   coached?.classList.remove('intro-coach');
   el?.classList.add('intro-coach');
   coached = el;
+  // pointing at a control below the fold is the same as not pointing at anything
+  if (el && moved && el.closest('#sheet')) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
 
-// panels.onStack and panels.onSim each hold ONE callback and the HUD already owns both, so the
-// sheet-open state has to be read off the body class instead of hooked.
+function pickMark(list) {
+  for (const sel of list || []) {
+    const el = document.querySelector(`#sheet ${sel}`);
+    if (el && !el.disabled) return el;
+  }
+  return null;
+}
+
+// panels.onStack and panels.onSim each hold ONE callback and the HUD already owns both, so which
+// sheet is open has to be read off the body instead of hooked.
 function watchSheet() {
-  new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(() => {
+    const open = document.body.dataset.panel;
+    if (open) seenPanel.add(open);
+    sync();
+  }).observe(document.body, { attributes: true, attributeFilter: ['class', 'data-panel'] });
 }
 
 function sync() {

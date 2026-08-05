@@ -226,7 +226,16 @@ export function beams(list, { color = '#8df0c8', width = 0.55, glow = 1, dust = 
     f.renderOrder = 21;
     grp.add(f);
   }
+  livePower(grp, () => FX.beam);
   return grp;
+}
+
+// A group built here owns its own materials, so its level can be driven per frame without
+// touching anything else on screen. `base` reads the knob, so a live tweak still wins.
+function livePower(grp, base) {
+  const mats = [];
+  grp.traverse(o => { if (o.material) mats.push(o.material); });
+  grp.userData.setPower = v => { for (const m of mats) setPower(m, base() * v); };
 }
 
 // ── engine trails ────────────────────────────────────────────────────────────
@@ -268,8 +277,28 @@ export function engineTrails(ship, { color = '#ffbe6a', length = 1, width = 1, p
   grp.add(mesh);
   for (const g of geos) g.dispose();
   grp.add(softPoints(fp, fc, fs, { soft: 2.2, power: FX.trail, max: 240, bucket: TRAIL_MATS }));
+  livePower(grp, () => FX.trail);
   ship.add(grp);
   return grp;
+}
+
+// A plume is combustion, not a decal. This is what stops a docked hull reading as a still: a fast
+// jitter for the burn, a slow one for the throttle, and a rare dip as the flow catches.
+export function flameLevel(t, phase, idle = false) {
+  const jit = 0.86 + 0.09 * Math.sin(t * 17.3 + phase * 5.1) + 0.05 * Math.sin(t * 41.7 + phase);
+  const swell = 1 + 0.13 * Math.sin(t * 1.7 + phase * 2.3);
+  const cough = Math.sin(t * 0.37 + phase * 6.1) > 0.985 ? 0.45 : 1;
+  return (idle ? 0.20 : 1) * jit * swell * cough;
+}
+
+// The rig's cutting head. Same idea, harsher: a mining laser flickers, and every so often it
+// cuts out for a beat and strikes back a little hot.
+export function beamLevel(t, phase) {
+  const cyc = (t * 0.11 + phase) % 1;
+  const out = cyc > 0.90 && cyc < 0.955 ? 0.06 : 1;
+  const restrike = cyc >= 0.955 && cyc < 0.985 ? 1.5 : 1;
+  const jit = 0.88 + 0.10 * Math.sin(t * 23.1 + phase * 3.7) + 0.06 * Math.sin(t * 7.9 + phase);
+  return out * restrike * jit;
 }
 
 // ── motes and debris ─────────────────────────────────────────────────────────

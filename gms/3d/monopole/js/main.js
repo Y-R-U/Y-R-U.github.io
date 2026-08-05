@@ -2,7 +2,7 @@ import { App } from './engine/app.js';
 import { Post } from './engine/post.js';
 import { Backdrop } from './world/backdrop.js';
 import { Lighting } from './world/lighting.js';
-import { World, ReachScene, coldOpenKeys, reachLighting, registerBackdropScenarios, registerStationScenarios, registerPlanetScenarios, registerBeltScenarios, registerFleetScenarios } from './world/scene.js';
+import { World, ReachScene, introShots, reachLighting, registerBackdropScenarios, registerStationScenarios, registerPlanetScenarios, registerBeltScenarios, registerFleetScenarios } from './world/scene.js';
 import { registerMaterialKnobs } from './world/materials.js';
 import { registerFxKnobs } from './world/fx.js';
 import { registerAtmosKnobs } from './world/atmos.js';
@@ -14,12 +14,14 @@ import { buildKnobs } from './ui/knobs.js';
 import { showroom, buildShowroom } from './showroom/index.js';
 import { registerEntries } from './showroom/entries.js';
 import { getScenario, allScenarios } from './scenarios.js';
-import { camera, flyBy } from './world/camera.js';
+import { camera } from './world/camera.js';
 import { createSimView } from './ui/simview.js';
 import { panels } from './ui/panels.js';
 import { buildHud } from './ui/hud.js';
 import { registerStoryEntries } from './ui/story.js';
+import { newRun } from './ui/storypool.js';
 import { intro } from './ui/intro.js';
+import { inspect } from './ui/inspect.js';
 import './ui/screens.js';
 
 const app = new App(document.getElementById('stage'));
@@ -52,6 +54,9 @@ registerEntries(app, world, backdrop);
 
 const sim = createSimView({ seed: 1001 });
 panels.attach({ sim });
+// which of each tactic's four real cases this run tells — reseeded whenever the run is
+newRun(sim.seed);
+sim.on(kind => { if (kind === 'reset') newRun(sim.seed); });
 registerStoryEntries();
 
 const params = new URLSearchParams(location.search);
@@ -77,6 +82,9 @@ const clock = {
   update(dt) {
     if (!reach) return;
     const speed = sim.speed;
+    // Pausing is a navigation aid, not a stasis field: the background layer keeps its own time
+    // and only takes the speed as a hint about how busy the system should look.
+    reach.setAmbientRate(speed > 0 ? Math.min(2.2, 0.8 + speed * 0.35) : 1);
     if (speed <= 0 || sim.over) { reach.setTickPhase(reach.phase || 0); return; }
     const gap = sim.tickSeconds / speed;
     clock.acc += dt;
@@ -153,34 +161,30 @@ if (live) {
     },
   });
 
-  camera.onTap((hit, hits) => {
-    const t = reach.siteAt(hit, hits);
-    if (!t) return;
-    if (t.kind === 'ship') return panels.open('assign', { ship: t.ship });
-    if (t.site === 'kestrel') return panels.open('assign', { ship: rigId(), dest: 'kestrel' });
-    if (t.site === 'ledger') return panels.open('holdings', { tab: 'station' });
-    if (t.site === 'ossian') return panels.open('market');
-    if (t.site === 'drayyard') return panels.open('quarterly');
-  });
+  // A tap identifies something; it does not commit the player to a panel. The card names it and
+  // offers the panel as one of its buttons.
+  inspect.attach({ sim, camera, reach });
+  camera.onTap((hit, hits) => inspect.show(reach.siteAt(hit, hits)));
 
-  // §1 beat 1 — down Ledger's spine, out, and round until the belt fills the frame.
+  // §1 beat 1. The clock does not start and the fingers do not reach the 3D until the briefing
+  // hands the game over — the intro owns the whole cold open now, one camera move per card.
+  const shots = introShots();
   camera.enable(true);
   camera.setTouchEnabled(false);
   sim.setSpeed(0);
-  hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
-  const skip = () => camera.stopFly();
-  addEventListener('pointerdown', function once(e) {
-    if (e.target.closest('#ui, #sheet, #knobs, #showroom, #intro')) return;
-    removeEventListener('pointerdown', once);
-    skip();
-  });
-  const coldOpen = flyBy(app, { ms: 11000, keys: coldOpenKeys() }).then(() => {
-    camera.setTouchEnabled(true);
-    camera.markHome(HOME());
-    if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
-  });
+  camera.setFrom(shots[0].pos, shots[0].look, shots[0].fov);
 
-  intro.start({ app, sim, panels, hud, camera, reach, showroom, coldOpen, skip });
+  intro.start({
+    app, sim, panels, hud, camera, reach, showroom, shots,
+    begin: () => {
+      camera.cancelMove();
+      camera.setTouchEnabled(true);
+      camera.markHome(HOME());
+      camera.resetView(1500);
+      hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
+      if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
+    },
+  });
 }
 
 // after the scenario, so --set=knob=value on the command line still wins
@@ -191,8 +195,6 @@ if (params.has('showroom')) showroom.open();
 if (params.has('sr')) showroom.run(params.get('sr'));
 if (params.has('speed')) sim.setSpeed(+params.get('speed'));
 if (params.has('panel')) panels.open(params.get('panel'));
-
-const rigId = () => (sim.state.ships.find(s => sim.shipDef(s)?.mine > 0) || sim.state.ships[0])?.id;
 
 app.start();
 document.getElementById('boot').classList.add('gone');

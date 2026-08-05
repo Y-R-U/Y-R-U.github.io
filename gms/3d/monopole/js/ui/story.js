@@ -9,18 +9,24 @@ import content from '../sim/content.js';
 import { definePanel, panels } from './panels.js';
 import { showroom } from '../showroom/index.js';
 import { esc, bandWord, lawStance, duration, credits } from './format.js';
+import { featured, alternatives, poolFor, markSeen } from './storypool.js';
 
 const opened = new Set();
 
-export function markRead(storyId) { if (storyId) opened.add(storyId); }
+export function markRead(storyId) {
+  if (!storyId) return;
+  opened.add(storyId);
+  markSeen(storyId);
+}
 
 // Everything the run has surfaced. Derived from the event log so it survives save/load, plus
-// whatever the player opened by hand this session.
+// whatever the player opened by hand this session. A logged tactic resolves through the pool,
+// because which of its four cases this run is telling is a UI decision, not a sim one.
 export function readStories(sim) {
   const seen = new Set(opened);
   for (const e of sim?.state?.log || []) {
     if (e.story) seen.add(e.story);
-    if (e.tactic) { const t = content.get('tactic', e.tactic); if (t?.story) seen.add(t.story); }
+    if (e.tactic) { const f = featured(e.tactic); if (f) seen.add(f); }
   }
   return seen;
 }
@@ -29,6 +35,7 @@ definePanel({
   id: 'story',
   title: 'The real case',
   group: 'dossier',
+  live: false,
   fixture: () => ({ story: 'bunnings_ryobi', tactic: 'exclusive_supply' }),
 
   render(props, api) {
@@ -87,6 +94,8 @@ definePanel({
       ${(story.links || []).map(l => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a></li>`).join('')}
     </ol>
   </section>
+
+  ${more(story, props.tactic)}
 </article>
 
 <div class="sheet-cta">
@@ -96,41 +105,69 @@ definePanel({
   },
 });
 
+// The other three cases behind the same tactic. A run only ever surfaces one of them on its own,
+// so this is how a reader who wants more of the same gets it without waiting for another game.
+function more(story, tactic) {
+  const rest = alternatives(story.id);
+  if (!rest.length) return '';
+  const t = tactic ? content.get('tactic', tactic) : content.get('tactic', story.tactic);
+  return `
+<section class="case-sec case-more">
+  <h2>More cases like this</h2>
+  <p class="dim">${esc(t ? `${t.name} has been run for real more than once. These are the other times.` : 'Other times this was done for real.')}</p>
+  ${rest.map(s => `
+    <button class="case-row band-${esc(s.band)}" data-open="story" data-swap
+      data-props='${esc(JSON.stringify({ story: s.id, tactic: s.tactic }))}'>
+      <b>${esc(s.title)}</b>
+      <s>${esc(bandWord(s.band))} · ${esc(s.who)} · ${esc(s.year)}</s>
+      <p>${esc(s.outcome)}</p>
+    </button>`).join('')}
+</section>`;
+}
+
 definePanel({
   id: 'dossier',
   title: 'Dossier',
   group: 'the cases',
+  live: false,
 
+  // Grouped by the tactic, not by the band: a tactic is the thing the player holds in their hand,
+  // and the four cases behind it are four answers to the same question. The band is a chip on the
+  // row. `all` reveals the whole library — the run only surfaces one case per tactic on its own,
+  // and somebody who wants to read the rest should not have to replay six times for them.
   render(props, api) {
     const seen = readStories(api.sim);
     const all = content.all('story');
-    const bands = [
-      ['legal', 'Legal', 'Done in the open, and it worked.'],
-      ['grey', 'Contested', 'Lawful or not depending on facts somebody has to prove.'],
-      ['illegal', 'Illegal', 'Over the line as the line stands today.'],
-    ];
+    const showAll = !!props.all;
 
     return `
 <div class="dossier">
   <p class="dossier-lede">
-    Every tactic in this game is one a real company used. <b>${seen.size}</b> of ${all.length} cases uncovered.
+    Every tactic in this game is one real companies used, and each one has four real cases behind it.
+    <b>${seen.size}</b> of ${all.length} uncovered in play.
   </p>
-  ${bands.map(([band, label, note]) => {
-    const rows = all.filter(s => s.band === band);
+  <div class="dossier-switch">
+    <button class="${showAll ? '' : 'on'}" data-open="dossier" data-swap data-props='{}'>Uncovered</button>
+    <button class="${showAll ? 'on' : ''}" data-open="dossier" data-swap data-props='{"all":true}'>Every case</button>
+  </div>
+  ${content.all('tactic').map(t => {
+    const rows = poolFor(t.id);
     if (!rows.length) return '';
+    const run = featured(t.id);
     return `
-    <section class="dossier-band band-${band}">
-      <h3><i></i>${esc(label)}<s>${rows.filter(r => seen.has(r.id)).length}/${rows.length}</s></h3>
-      <p class="dossier-note">${esc(note)}</p>
-      ${rows.map(s => seen.has(s.id) ? `
-        <button class="case-row" data-open="story" data-props='${esc(JSON.stringify({ story: s.id }))}'>
-          <b>${esc(s.title)}</b>
-          <s>${esc(s.who)} · ${esc(s.year)}</s>
+    <section class="dossier-band band-${esc(t.band)}">
+      <h3><i></i>${esc(t.name)}<s>${rows.filter(r => seen.has(r.id)).length}/${rows.length}</s></h3>
+      <p class="dossier-note">${esc(t.blurb)}</p>
+      ${rows.map(s => (showAll || seen.has(s.id)) ? `
+        <button class="case-row band-${esc(s.band)}" data-open="story"
+          data-props='${esc(JSON.stringify({ story: s.id, tactic: t.id }))}'>
+          <b>${esc(s.title)}${s.id === run && !seen.has(s.id) ? ' <em>this run</em>' : ''}</b>
+          <s>${esc(bandWord(s.band))} · ${esc(s.who)} · ${esc(s.year)}</s>
           <p>${esc(s.outcome)}</p>
         </button>` : `
         <div class="case-row locked">
           <b>Not yet uncovered</b>
-          <s>Unlocks with the tactic it belongs to</s>
+          <s>${s.id === run ? 'Unlocks with this tactic' : 'Read it from Every case'}</s>
         </div>`).join('')}
     </section>`;
   }).join('')}
@@ -162,8 +199,17 @@ export function registerStoryEntries() {
 function plate(story) {
   const cap = `<figcaption><span>${esc(story.credit || 'illustration')}</span></figcaption>`;
   if (story.image) {
-    return `<figure class="case-plate has-img"><img src="${esc(story.image)}" alt="">${cap}</figure>`;
+    // a plate that has not been generated yet must not leave a broken-image glyph in the middle
+    // of the sheet — drop the figure and let the composed card below stand in
+    return `<figure class="case-plate has-img"><img src="${esc(story.image)}" alt=""
+      onerror="this.closest('.case-plate').outerHTML=this.dataset.fb"
+      data-fb="${esc(motifPlate(story))}">${cap}</figure>`;
   }
+  return motifPlate(story);
+}
+
+function motifPlate(story) {
+  const cap = `<figcaption><span>${esc(story.credit || 'illustration')}</span></figcaption>`;
   return `
 <figure class="case-plate">
   <div class="plate-art">

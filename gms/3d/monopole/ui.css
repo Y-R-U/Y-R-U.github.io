@@ -526,6 +526,24 @@ h4.sec::after { content: ''; flex: 1 1 auto; height: 1px; background: var(--line
 .case-row p { font-size: 12px; line-height: 1.5; color: var(--dim); }
 .case-row.locked { border-left-color: var(--line2); opacity: .45; cursor: default; }
 .case-row.locked b { font-family: inherit; font-size: 12.5px; }
+/* the case this run happens to be telling, before it has been read */
+.case-row b em {
+  font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); vertical-align: 3px; margin-left: 6px;
+}
+
+/* uncovered / every case. Four real cases sit behind each tactic and a run only surfaces one,
+   so there has to be a way to read the rest without replaying the game six times. */
+.dossier-switch { display: flex; gap: 6px; margin: -8px 0 20px; }
+.dossier-switch button {
+  flex: 1 1 0; min-height: 36px; border-radius: 9px; cursor: pointer; font-size: 12px;
+  background: var(--glass2); border: 1px solid var(--line2); color: var(--dim);
+}
+.dossier-switch button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.case-more { border-top: 1px solid var(--line); padding-top: 14px; }
+.case-more .dim { font-size: 12px; line-height: 1.5; color: var(--faint); margin-bottom: 10px; }
+.case-more .case-row { margin-bottom: 7px; }
 
 /* ── landscape and desktop ─────────────────────────────────────────────── */
 
@@ -726,3 +744,77 @@ body[data-panel="gameover"] #showroom-btn { display: none; }
   .over-curve { grid-area: curve; }
   .over-verdict { grid-area: verdict; margin-top: 4px; }
 }
+
+/* ── the inspect card ───────────────────────────────────────────────────────
+   Tap anything in the Reach and this names it. It shares the lane with the
+   objective chip and hides it, because two stacked pills in the thumb zone is
+   one too many and the chip is the thing you can always get back. */
+
+#inspect {
+  position: fixed; inset: 0; z-index: 38; pointer-events: none;
+  font: 400 13px/1.5 system-ui, -apple-system, "Helvetica Neue", sans-serif; color: var(--ink);
+}
+#inspect > * { pointer-events: auto; }
+body.shotmode #inspect { display: none !important; }
+body.sheet-open #inspect { opacity: 0; pointer-events: none; }
+body.inspecting #intro .intro-chip { opacity: 0; transform: translateY(8px); pointer-events: none; }
+
+.ins-card {
+  position: absolute; left: 10px; right: 10px;
+  bottom: calc(var(--dock) + var(--ctrl) + 10px);
+  padding: 11px 12px 10px; border-radius: 13px;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line2); border-left: 2px solid var(--accent);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .45);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .24s ease, transform .24s ease;
+}
+.ins-card.in { opacity: 1; transform: none; }
+
+.ins-close {
+  position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 8px;
+  background: none; border: 0; color: var(--faint); font-size: 12px; cursor: pointer;
+}
+
+.ins-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline;
+  gap: 2px 8px; width: 100%; padding: 0 26px 0 0; text-align: left; cursor: pointer;
+  background: none; border: 0; color: inherit;
+}
+.ins-head .ins-kind {
+  grid-column: 1 / -1; font-style: normal; font-size: 9px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent); opacity: .85;
+}
+.ins-head b { grid-column: 1; margin-top: 3px; font: 400 17px/1.2 var(--serif); color: var(--ink); }
+.ins-head u { grid-column: 2; text-decoration: none; font-size: 9px; color: var(--faint); }
+.ins-head s {
+  grid-column: 1 / -1; text-decoration: none; margin-top: 2px;
+  font-size: 12px; line-height: 1.4; color: var(--dim);
+}
+
+.ins-body { max-height: 30vh; overflow-y: auto; overscroll-behavior: contain; margin-top: 9px; }
+.ins-body p { margin: 8px 0 0; font-size: 12px; line-height: 1.55; color: var(--dim); }
+.ins-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.ins-facts li {
+  display: flex; align-items: baseline; gap: 8px; padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+}
+.ins-facts s { text-decoration: none; flex: 0 0 auto; font-size: 11px; color: var(--faint); }
+/* a value can be a long list of module names, so it wraps rather than running off the card */
+.ins-facts em {
+  flex: 1 1 auto; min-width: 0; font-style: normal; font-family: var(--mono); font-size: 11.5px;
+  color: var(--ink); font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere;
+}
+
+.ins-row { display: flex; gap: 7px; margin-top: 10px; }
+.ins-row button {
+  flex: 1 1 auto; min-height: 38px; padding: 0 12px; border-radius: 9px; cursor: pointer;
+  font-size: 12.5px; background: var(--glass2); border: 1px solid var(--line2); color: var(--dim);
+}
+.ins-row button.go { background: var(--accent); border-color: var(--accent); color: #14100a; font-weight: 600; }
+.ins-row:empty { display: none; }
+
+@media (min-width: 700px) {
+  .ins-card { right: auto; width: min(400px, calc(100vw - 20px)); }
+}
+@media (prefers-reduced-motion: reduce) { #inspect * { transition: none !important; } }

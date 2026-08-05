@@ -3923,3 +3923,160 @@ lives in the top-*right* instead. `style.css` was not touched.
 79. **`tools/uishot.mjs` occasionally times out waiting for `window.__mono.ready` on the first run
     of a session** and is fine on an immediate retry. Same class of thing as gotcha 56 (the port
     clash) — retry before investigating.
+
+---
+
+# Session 14 — Aaron's fix list
+
+Ten items off a play session. Everything below is shipped and headlessly verified.
+
+## 1. Sheets scrolled themselves back to the top
+
+`panels.refresh()` runs on every tick and `draw()` rebuilds `root.innerHTML`, so anything the
+player had scrolled to jumped back to the top about once a second. Two changes in `panels.js`:
+
+- `draw()` carries `.sheet-body`'s `scrollTop` across a redraw **of the same panel id**.
+- A panel can now declare **`live: false`**, and `refresh()` skips it entirely. `story` and
+  `dossier` are both marked — they are long reads and nothing in them moves with the sim.
+
+**If you add a panel that is mostly prose, set `live: false` on it.**
+
+## 2–5. The cold open is now beat-driven
+
+The 11-second `flyBy` is gone. `js/main.js` no longer owns the intro at all: it places the camera
+on shot 0, leaves the clock at 0, and hands `intro.start()` a `shots` array and a `begin()`
+callback. **`begin()` is the only place the game starts** — it re-enables touch, marks home and
+sets speed 1. Nothing else may start the clock.
+
+- **`content/intro.js` gained `title`** (`name`, `sub`, `titleMs`). The cold open holds on the
+  name over the live scene for 2 s with **no card at all**, then card 0 arrives.
+- **`scene.js` `introShots()`** returns one absolute framing per beat — index 0 is the title hold,
+  index n+1 is where card n takes the camera. Absolute framings rather than a spline **because
+  paging backwards has to be the same operation as paging forwards**.
+- **`CameraRig.cancelMove()`** resolves the tween it replaces with `{ cut: true }`. Without it,
+  every interrupted beat leaked a pending promise. `moveTo` calls it on entry, so paging back
+  mid-move turns round from the frame the camera is actually on.
+- Skip is **not rendered on the last card** (the button is `Start` there), a `‹` back step is,
+  swipe left/right pages, tapping the outer 28 % of the card pages, and ← → do too.
+- Card copy tightened. Money tokens now go through `credits()` so they carry their unit.
+
+## 6. The world is alive while paused
+
+Pause stops the company, not the system. `ReachScene.setAmbientRate(r)` is fed from the clock
+(`0.8 + speed × 0.35`, floored at 0.35, never 0) and `this.t` advances on wall time regardless of
+`sim.speed`. Verified headlessly at speed 0: tenders move, flames change level, the rock turns.
+
+- **`js/world/traffic.js`** (new) — `beacons(list)` is every blinking lamp in the system in **one
+  Points draw call**, blink done in the vertex shader off `uTime` with a per-point rate/phase/kind.
+  `tenders(loops)` is **one InstancedMesh plus one Points** for any number of small craft running
+  closed CatmullRom loops. `beaconRing()` is a helper for dock collars.
+- **`fx.js`** gained `flameLevel(t, phase, idle)` and `beamLevel(t, phase)` — the jitter/swell/cough
+  model for a plume and the flicker/dropout/restrike model for a cutting beam — plus `livePower()`,
+  which hangs a `userData.setPower` on a fx group so its own materials can be driven per frame
+  without touching the knob.
+- **Docked hulls keep their plumes now**, at 0.20 of flying power. They used to be hidden at rest.
+  That is 2 extra draw calls per docked hull and it is what stops the scene reading as a still.
+- **Every hull carries navigation lights** — red to port, green to starboard, a white anti-collision
+  strobe on the spine, a steady amber at the stern. One Points call each, hung on
+  `avatar.obj.userData.nav` so a scrapped hull takes its lamps with it. `beacons()` takes a `max`
+  (framebuffer px) because a lamp at 150 m would otherwise cover a quarter of the screen; the nav
+  set runs at 22.
+
+Gate profile (`--preset=medium --dpr=1 --w=844 --h=390`), live game, camera near Ledger:
+**82 calls · 168 k tris · 60 fps.** Budgets are 150 / 350 k.
+
+## 7. The first mission walks the whole game
+
+`content/intro.js`'s objective chain went from 6 steps to 9 and now opens every dock panel once, in
+the order the game uses them: rig → market → ore → halide → sell → books → module → tactic →
+dossier.
+
+- An objective can carry **`mark`**, an ordered list of selectors *into the open sheet*. The coach
+  mark follows the player into the panel — `paintCoach` uses the dock button while the sheet is
+  shut and the first matching, non-disabled `mark` selector once it is open, and **scrolls it into
+  view**. The rig step's first selector is `.chip:not(.on)[data-ship^="ossa"]`, which only matches
+  while the rig is *not* selected, so the mark walks pick → loop → send on its own.
+- An objective can carry **`look: true`** — completes on the panel being opened, and is exempt from
+  the one-completion-a-week gate, which otherwise made a reading step look broken.
+- `#sheet .intro-coach` is a pulsing ring, not a colour change; the dock's is unchanged.
+
+## 8. Twenty-four real cases, four per tactic
+
+`content/stories.js` went 6 → **24**. Every story now carries **`tactic`**, and each of the six
+tactics has four cases behind it, deliberately spanning bands where the law does:
+
+| tactic | cases |
+|---|---|
+| exclusive_supply | bunnings_ryobi · cement_australia · lorain_journal · ticketmaster_venues |
+| vertical_integration | ford_rouge · carnegie_steel · essilor_luxottica · amazon_marketplace |
+| price_guarantee | bunnings_guarantee · booking_parity · amazon_price_parity · apple_ebooks |
+| brand_buyout | meta_instagram · questcor_synacthen · illumina_grail · google_adtech |
+| below_cost | boral_predatory · akzo_ecs · wanadoo_adsl · amazon_diapers |
+| spec_collusion | phoebus_cartel · lysine_adm · visy_amcor · detergent_concentrate |
+
+**`js/ui/storypool.js`** (new) decides which one a run tells. `newRun(seed)` picks per tactic,
+deterministic in the run seed, **preferring cases never read in any previous run** (persisted in
+`monopole.cases.v1`); once the whole pool has been read it opens back up so a long player keeps
+getting variety. `featured(tacticId)` is the answer and **all three call sites go through it** —
+`hud.react`'s unlock, the tactic card's "Read the real case", and `readStories()`'s log walk. The
+sim still emits `def.story`; which case is told is a UI decision and the sim never learns about it.
+
+- The story panel ends with **"More cases like this"** — the other three, `data-swap` so they
+  replace rather than deepen the stack.
+- The **Dossier is grouped by tactic, not by band** now, with an **Uncovered / Every case** switch.
+  A run surfaces one case per tactic; nobody should have to replay six times to read the rest.
+- **`tools/plates.mjs`** (new) generates any missing case plate through the mflux queue at
+  1024×432 to match the existing six, waits LTX out first, and converts with `sips`. The style tail
+  lives in the tool; the subject lives in each story's `imagePrompt`.
+- `plate()` has an `onerror` fallback to the composed SVG card, so a story whose plate has not been
+  generated yet renders a motif instead of a broken-image glyph.
+
+**Every source URL was HTTP-checked.** Five return 403 to automated requests (Britannica ×2,
+Justia ×2, NH DOJ) — they are canonical URLs that load in a real browser, not dead links.
+
+## 9. The showroom is tabbed
+
+`showroom/index.js` renders a group tab strip and one group at a time. **`step(±1)` stays inside
+the current group**, which is the whole point — sweeping 24 stories used to fall out into the fleet
+entries halfway through. `sync()` follows a jumped-to entry into its own tab. `showroom.setTab(g)`
+is scriptable.
+
+## 10. Tap anything and it tells you what it is
+
+**`js/ui/inspect.js`** (new) plus `#inspect` in `index.html`. `camera.onTap` no longer opens a
+panel — it shows a card with a kind, a name and one line, expandable to a fact table and a
+paragraph, with **View** (fly to it) / **Back** (return to exactly where you were) / the panel as
+a named action.
+
+- `ReachScene.siteAt` returns richer tags and prefers **specific before general** — a hull, then a
+  named rock, then the region — because the region proxies are 600 m spheres that swallow
+  everything inside them.
+- **Every rock in the belt has its own designation.** `tagOf` reads `hit.instanceId` off the
+  InstancedMesh, so a 400-rock field costs nothing extra. The number hashes from
+  `instanceId × 13 + bucketIndex`, where the bucket is the **child index, never a uuid** — a uuid
+  is regenerated per session and the name would change under the player. Under 10 m across it is a
+  `Chip`, not a catalogued `KB` body.
+- `CameraRig` gained `snapshot()`, `goTo(h, ms)` (factored out of `resetView`) and `focusPoint()`
+  for things with no Object3D of their own.
+
+## Gotchas — session 14
+
+80. **`content.get('module', id)` and `content.get('station', id)` are different tables.** Station
+    module ids live under `module`; `station` holds the two built stations. Using the wrong one
+    returns undefined and the inspect card silently read "0 modules".
+81. **`n >> 5` on a hash is signed.** An FNV hash is `>>> 0` and can exceed 2³¹, so `>>` goes
+    negative, `% 8` goes negative, and `'ABCDEFGH'[-3]` is `undefined` — which string-concatenates
+    into the designation as the literal text `undefined`. Use `>>>`.
+82. **A coach mark below the fold is the same as no coach mark.** The Mine run button was ringed
+    correctly and 400 px off screen. `scrollIntoView({ block: 'center' })` when the mark *moves*,
+    not on every sync, or it fights the player's own scrolling.
+83. **A sheet redraw detaches the node the coach class was on.** `el === coached` is true against a
+    node no longer in the document, so the class never gets reapplied. Check `coached.isConnected`.
+84. **`moveTo` used to strand the promise of the move it replaced.** Nothing awaited them before
+    this session so nothing broke; the intro awaits beats, and it would have hung. `cancelMove()`
+    settles with `{ cut: true }`.
+85. **The belt kit's `radius` is the largest instance scale axis, not an average.** Averaging the
+    decomposed scale under-reports a rock by roughly a third.
+86. **`--report` cannot use top-level `await`.** `Runtime.evaluate` wraps the expression in
+    `JSON.stringify(...)` and top-level await throws there. Park the result on a global from an
+    async IIFE in `--eval` and report the global.

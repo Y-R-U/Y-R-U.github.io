@@ -10,6 +10,7 @@ const after = new Set();
 let ctx = null;
 let current = null;
 let ui = null;
+let tab = 'scene';
 
 export const showroom = {
   register(e) {
@@ -49,12 +50,18 @@ export const showroom = {
     return true;
   },
 
+  // Stepping stays inside the tab you are standing in — sweeping thirty stories is the point of
+  // the tabs, and falling out of them into the fleet entries halfway through is not.
   step(dir) {
-    const ids = this.list().map(e => e.id);
+    const within = this.list().filter(e => e.group === (entries.get(current)?.group || tab));
+    const ids = (within.length ? within : this.list()).map(e => e.id);
     if (!ids.length) return;
     const i = ids.indexOf(current);
     this.run(ids[(i + dir + ids.length) % ids.length]);
   },
+
+  get tab() { return tab; },
+  setTab(g) { tab = g; ui?.rebuild(); },
 
   open() { ui?.open(); },
   close() { ui?.close(); },
@@ -77,19 +84,22 @@ export function buildShowroom(app) {
       byGroup.get(e.group).push(e);
     }
     if (!byGroup.size) { list.innerHTML = `<div class="empty">Nothing registered yet.</div>`; return; }
-    let html = '';
-    for (const g of GROUPS) {
-      const es = byGroup.get(g);
-      if (!es) continue;
-      html += `<h5>${g}</h5>` + es.map(e =>
-        `<button data-sr="${e.id}" class="${e.id === current ? 'on' : ''}">${e.label}${e.note ? `<i>${e.note}</i>` : ''}</button>`).join('');
-    }
-    list.innerHTML = html;
+    const live = GROUPS.filter(g => byGroup.has(g));
+    if (!byGroup.has(tab)) tab = live[0];
+    const es = byGroup.get(tab) || [];
+    list.innerHTML = `
+<div class="sr-tabs">${live.map(g =>
+      `<button data-tab="${g}" class="${g === tab ? 'on' : ''}">${g}<s>${byGroup.get(g).length}</s></button>`).join('')}</div>
+<div class="sr-items">${es.map(e =>
+      `<button data-sr="${e.id}" class="${e.id === current ? 'on' : ''}">${e.label}${e.note ? `<i>${e.note}</i>` : ''}</button>`).join('')}</div>`;
+    list.querySelector('.sr-tabs button.on')?.scrollIntoView({ inline: 'center', block: 'nearest' });
   };
 
   const sync = () => {
     const e = current && entries.get(current);
     title.textContent = e ? e.label : 'Showroom';
+    // following the entry into its own tab is what makes ← → readable after a jump
+    if (e && e.group !== tab) { tab = e.group; rebuild(); }
     list.querySelectorAll('[data-sr]').forEach(b => b.classList.toggle('on', b.dataset.sr === current));
   };
 
@@ -101,11 +111,14 @@ export function buildShowroom(app) {
     mini() { root.classList.add('mini'); },
     showList() {
       root.classList.remove('mini');
+      rebuild();
       list.querySelector(`[data-sr="${current}"]`)?.scrollIntoView({ block: 'center' });
     },
   };
 
   list.addEventListener('click', e => {
+    const g = e.target.closest('[data-tab]')?.dataset.tab;
+    if (g) { tab = g; rebuild(); return; }
     const id = e.target.closest('[data-sr]')?.dataset.sr;
     if (id) showroom.run(id);
   });

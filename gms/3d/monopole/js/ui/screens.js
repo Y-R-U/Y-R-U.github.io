@@ -4,6 +4,7 @@
 
 import content from '../sim/content.js';
 import { definePanel, panels } from './panels.js';
+import { featured } from './storypool.js';
 import {
   esc, cr, credits, crShort, delta, pct, tonnes, quarterOf, weekInQuarter, duration, arrow,
   shareCurve,
@@ -510,7 +511,7 @@ definePanel({
     wire(el, {
       focus: d => { props.focus = props.focus === d.id ? null : d.id; api.rerender(); },
       take: d => { api.sim.act({ type: 'tactic', tactic: d.id }); props.focus = d.id; api.rerender(); },
-      story: d => panels.open('story', { story: content.get('tactic', d.id).story, tactic: d.id }),
+      story: d => panels.open('story', { story: featured(d.id) || content.get('tactic', d.id).story, tactic: d.id }),
     });
   },
 });

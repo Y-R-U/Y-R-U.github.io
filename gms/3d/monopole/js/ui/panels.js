@@ -82,8 +82,15 @@ export const panels = {
   top() { return stack.length ? stack[stack.length - 1] : null; },
   depth() { return stack.length; },
 
-  // Re-render the visible sheet in place. Cheap enough to call on every tick.
-  refresh() { if (stack.length) draw(); },
+  // Re-render the visible sheet in place. Cheap enough to call on every tick — except on a panel
+  // that is a long read and does not move with the sim, where redrawing under the reader is worse
+  // than being one tick stale.
+  refresh() {
+    const top = stack[stack.length - 1];
+    if (!top) return;
+    if (registry.get(top.id)?.live === false) return;
+    draw();
+  },
 
   // Showroom: swap in the canned week-11 fixture, open one panel against it.
   showFixture(id, override = null) {
@@ -141,7 +148,11 @@ function draw() {
     console.error(`panel ${entry.id}:`, err);
   }
 
-  const wasOpen = root.querySelector('.sheet')?.dataset.panel === entry.id;
+  // A tick re-renders the visible sheet from scratch, so anything the player had scrolled to
+  // would jump back to the top mid-read. Carry the offset across when it is the same panel.
+  const prev = root.querySelector('.sheet');
+  const wasOpen = prev?.dataset.panel === entry.id;
+  const keepScroll = wasOpen ? prev.querySelector('.sheet-body')?.scrollTop || 0 : 0;
   root.innerHTML = `
     <div class="sheet ${wasOpen ? 'settled' : ''}" data-panel="${esc(entry.id)}" role="dialog" aria-label="${esc(def.title || entry.id)}">
       <div class="sheet-grab"><span></span></div>
@@ -163,6 +174,7 @@ function draw() {
   // scroll area a `position: sticky` row floats over the last lines of text and clips them. Lift
   // it out so the body scrolls above it and nothing is ever hidden.
   for (const cta of bodyEl.querySelectorAll('.sheet-cta')) sheet.appendChild(cta);
+  if (keepScroll) bodyEl.scrollTop = keepScroll;
   def.mount?.(sheet, entry.props, a);
   requestAnimationFrame(() => sheet.classList.add('settled'));
 }

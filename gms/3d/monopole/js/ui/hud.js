@@ -4,6 +4,7 @@
 import content from '../sim/content.js';
 import { panels } from './panels.js';
 import { esc, cr, crShort, delta, pct, pts, quarterLabel, weekLabel } from './format.js';
+import { featured } from './storypool.js';
 
 const ICON = {
   assign: '<path d="M2.5 8.4 15 2.2 9.6 15l-2-5.2z"/>',
@@ -171,7 +172,7 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
       // Thirteen weeks is the game's rhythm: the clock stops and the report is read. The panel has
       // to be on the stack BEFORE the hold — `refresh` hands the speed straight back if it is not.
       if (quarter) { panels.open('quarterly', { event: quarter }); sim.hold(); }
-      if (unlock) panels.open('story', { story: unlock.story, tactic: unlock.tactic });
+      if (unlock) panels.open('story', { story: featured(unlock.tactic) || unlock.story, tactic: unlock.tactic });
       hud.refresh();
     },
   };

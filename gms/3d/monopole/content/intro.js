@@ -2,65 +2,99 @@
 // `{token}` in any string is filled from js/ui/intro.js's NUMBERS, which reads content/balance.js,
 // so the copy cannot drift away from the sim when a number moves.
 
+// The cold open holds on the title for `titleMs` with no card on screen, then card 0 arrives and
+// the camera starts moving. Each card owns the beat of the same index in scene.js's introShots().
+export const title = Object.freeze({
+  name: 'Ferrous Line',
+  sub: 'Tamber Reach · week 0',
+  titleMs: 2000,
+});
+
 export const cards = Object.freeze([
   Object.freeze({
     id: 'who',
     eyebrow: 'Week 0 · Tamber Reach',
     title: 'You are Ferrous Line',
-    body: 'Two haulers, one mining rig, {cash} credits in the account and {debt} of debt against them. Everything you own is on screen behind this card.',
+    body: 'Two haulers, one mining rig, {cash} in the bank and {debt} owed against them. That is the whole company, and it is on screen behind this card.',
   }),
   Object.freeze({
     id: 'them',
     eyebrow: 'The incumbent',
-    title: 'Corvain Drayage moves everything',
-    body: 'They hold {rivalShare} of the freight in this system. You hold {playerShare}. The Reach is one pot of work — every tonne you carry is a tonne they do not.',
+    title: 'Corvain Drayage owns the run',
+    body: 'They move {rivalShare} of the freight here. You move {playerShare}. One pot of work — every tonne you carry is a tonne they lose.',
   }),
   Object.freeze({
     id: 'win',
     eyebrow: 'How this ends',
     title: 'Take a third of the Reach',
-    body: 'From week {fromWeek}, hold {duopoly} of the Reach for {holdWeeks} straight weeks and you are a duopoly. Hold {monopoly} and it is a monopoly. Run the cash down first and the bank closes you instead.',
+    body: 'From week {fromWeek}: hold {duopoly} for {holdWeeks} straight weeks and it is a duopoly, {monopoly} and it is yours. Run out of money first and the bank closes you.',
   }),
   Object.freeze({
     id: 'how',
     eyebrow: 'How you get there',
     title: 'Three ways to compete',
-    body: 'Some tactics are ordinary business. Some get argued about in court for a decade. Some are flatly illegal — and they work. The regulator is watching the whole time, and every dirty week adds heat.',
+    body: 'Some tactics are ordinary business. Some get argued in court for a decade. Some are flatly illegal — and they work. Every dirty week adds heat, and the regulator is reading.',
   }),
 ]);
 
-// The chain the objective chip walks. `dock` names the HUD dock button to pulse, or null.
-// The condition for each id lives in js/ui/intro.js — this file stays free of state.
+// The chain the objective chip walks, and the first mission's guided tour: between them these
+// steps open every panel in the dock once, in the order the game actually uses them.
+//
+// `dock` names the HUD dock button to pulse, or null. `mark` is an ordered list of selectors into
+// the open sheet — the first one that matches and is not disabled gets the same pulse, so the
+// coach follows the player *into* the panel instead of stopping at the door. The condition for
+// each id lives in js/ui/intro.js; this file stays free of state.
 export const objectives = Object.freeze([
   Object.freeze({
     id: 'rig', dock: 'assign',
+    // the rig chip only matches while it is *not* the selected ship, so the mark walks the panel
+    // in the order the player has to touch it: pick the rig, pick the loop, send
+    mark: Object.freeze(['.chip:not(.on)[data-ship^="ossa"]', '[data-a="send"]:not([disabled])', '[data-loop="mine"]']),
     label: 'Send the mining rig to Kestrel',
-    why: 'Nothing in the Reach is worth anything until you have cut the ore yourself — tap the belt, or open Assign, and put the rig on a mine run.',
+    why: 'Nothing here is worth anything until you have cut the ore yourself. Open Assign, pick the rig, and put it on the mine run.',
+  }),
+  Object.freeze({
+    id: 'market', look: true, dock: 'market',
+    label: 'See what the Reach pays',
+    why: 'Ossian is the only buyer in the system. Market shows what each of the three commodities is worth right now and which way it is moving — that is what decides what is worth carrying.',
   }),
   Object.freeze({
     id: 'ore', dock: null,
     label: 'Wait for the ore to reach Ledger',
-    why: 'The belt is a week out and a week back. Let the clock run at ×2 — the rig cuts on arrival and carries it home on its own.',
+    why: 'The belt is a week out and a week back. Let the clock run at ×2 — the rig cuts on arrival and brings it home on its own.',
   }),
   Object.freeze({
     id: 'halide', dock: 'refinery',
     label: 'Turn the ore into halide',
-    why: 'Ledger already has a refinery. It eats two tonnes of ore for every tonne of halide, and halide sells for a great deal more than rock.',
+    why: 'Ledger already has a refinery. Two tonnes of ore make one of halide, and halide is worth far more than rock.',
   }),
   Object.freeze({
     id: 'sell', dock: 'assign',
+    mark: Object.freeze(['[data-a="send"]:not([disabled])', '[data-loop="sell"]']),
     label: 'Sell a load at Ossian',
-    why: 'Ossian Orbitals is the only buyer in the system. Put a hauler on a sale run and the cargo turns into cash the week it docks.',
+    why: 'Put a hauler on the sale run. The cargo turns into cash the week it docks.',
+  }),
+  Object.freeze({
+    id: 'books', look: true, dock: 'holdings',
+    label: 'Read the books',
+    why: 'Holdings → Finance is cash, debt, the credit line and last week’s profit and loss. Wages run whether a hull is flying or tied up, so this is the number that quietly kills companies.',
   }),
   Object.freeze({
     id: 'module', dock: 'refinery',
+    mark: Object.freeze(['.sheet-cta .primary:not([disabled])', '.buy-btn:not([disabled])']),
     label: 'Buy your first station module',
-    why: 'A Coil Line draws halide into filament, and filament burns out in every lamp and drive coil in the Reach. It is the first decision that can actually hurt you.',
+    why: 'A Coil Line draws halide into filament, and filament burns out in every lamp and drive coil in the Reach. The first decision that can actually hurt you.',
   }),
   Object.freeze({
     id: 'tactic', dock: 'tactics',
+    mark: Object.freeze(['[data-a="take"]', '.tactic-head']),
     label: 'Take your first tactic',
-    why: 'Volume alone will not get you past Corvain. A tactic is how you change the rules of the market rather than just working harder inside them.',
+    why: 'Volume alone will not get you past Corvain. A tactic changes the rules of the market rather than just working harder inside them.',
+  }),
+  Object.freeze({
+    id: 'dossier', look: true, dock: 'dossier',
+    label: 'Read the case behind it',
+    why: 'Every tactic in this game is one a real company used. The Dossier holds the case — who did it, where, and what happened to them.',
   }),
 ]);
 
@@ -139,4 +173,4 @@ export const guide = Object.freeze({
   ]),
 });
 
-export default Object.freeze({ cards, objectives, standing, guide });
+export default Object.freeze({ title, cards, objectives, standing, guide });

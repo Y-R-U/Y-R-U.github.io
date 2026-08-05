@@ -4,7 +4,7 @@
 
 export default Object.freeze([
   Object.freeze({
-    id: 'bunnings_ryobi',
+    id: 'bunnings_ryobi', tactic: 'exclusive_supply',
     title: 'One shelf, one brand',
     band: 'legal',
     year: '2008',
@@ -27,7 +27,7 @@ export default Object.freeze([
   }),
 
   Object.freeze({
-    id: 'ford_rouge',
+    id: 'ford_rouge', tactic: 'vertical_integration',
     title: 'Ore in one end, cars out the other',
     band: 'legal',
     year: '1917–1928',
@@ -50,7 +50,7 @@ export default Object.freeze([
   }),
 
   Object.freeze({
-    id: 'bunnings_guarantee',
+    id: 'bunnings_guarantee', tactic: 'price_guarantee',
     title: 'A guarantee that cannot be claimed',
     band: 'legal',
     year: '2025',
@@ -73,7 +73,7 @@ export default Object.freeze([
   }),
 
   Object.freeze({
-    id: 'meta_instagram',
+    id: 'meta_instagram', tactic: 'brand_buyout',
     title: 'Buy it rather than beat it',
     band: 'grey',
     year: '2012–2026',
@@ -96,7 +96,7 @@ export default Object.freeze([
   }),
 
   Object.freeze({
-    id: 'boral_predatory',
+    id: 'boral_predatory', tactic: 'below_cost',
     title: 'Below cost, and still legal',
     band: 'grey',
     year: '1994–2003',
@@ -119,7 +119,7 @@ export default Object.freeze([
   }),
 
   Object.freeze({
-    id: 'phoebus_cartel',
+    id: 'phoebus_cartel', tactic: 'spec_collusion',
     title: 'The thousand-hour bulb',
     band: 'illegal',
     year: '1924–1940',
@@ -137,6 +137,407 @@ export default Object.freeze([
     links: Object.freeze([
       Object.freeze({ label: 'Markus Krajewski, The Great Lightbulb Conspiracy (IEEE Spectrum, 2014)', url: 'https://spectrum.ieee.org/the-great-lightbulb-conspiracy' }),
       Object.freeze({ label: 'Phoebus cartel — members, fine schedule, dissolution', url: 'https://en.wikipedia.org/wiki/Phoebus_cartel' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'cement_australia', tactic: 'exclusive_supply',
+    title: 'Buying the ash you will never use',
+    band: 'illegal',
+    year: '2002–2017',
+    who: 'Cement Australia & the ACCC',
+    where: 'South East Queensland',
+    body: Object.freeze([
+      'Flyash is the waste left when a coal power station burns coal, and processed it substitutes for a slice of the cement in concrete. Between 2002 and 2006 Cement Australia signed contracts with the operators of the Millmerran, Tarong, Tarong North and Swanbank power stations for far more flyash than it had any intention of processing.',
+      'The ACCC sued, and in 2013 the Federal Court found the contracts had the purpose and likely effect of substantially lessening competition in the South East Queensland market. Cement Australia was not buying the ash. It was buying the certainty that nobody else could get it, and it paid for the ash it left in the ground.',
+      'The penalty took another four years to settle. The trial judge ordered $17.1 million; the ACCC appealed as manifestly inadequate, and on 5 October 2017 the Full Federal Court raised it to $20.6 million. The distinction that matters is the one the Bunnings notification turns on: locking up a supply is lawful until the point where it forecloses the market, and that point is a question of fact a regulator has to prove.',
+    ]),
+    outcome: 'Illegal. Contracts to acquire flyash it did not need were held to substantially lessen competition; penalties raised on appeal to $20.6 million in 2017.',
+    image: 'assets/story/cement_australia.jpg',
+    imagePrompt: 'Illustration. Stylised flat industrial diagram: a power station stack feeding a silo through a single pipe, a padlock on the silo outlet, and three empty hoppers queued outside a closed gate. Slate grey and dust ochre, two hues, technical linework. No text, no logos, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'ACCC: Full Federal Court orders $20.6 million penalties against Cement Australia (2017)', url: 'https://www.accc.gov.au/media-release/full-federal-court-orders-206million-penalties-against-cement-australia-companies' }),
+      Object.freeze({ label: 'ACCC: Federal Court declares anticompetitive conduct by Cement Australia', url: 'https://www.accc.gov.au/media-release/federal-court-declares-anticompetitive-conduct-by-cement-australia' }),
+      Object.freeze({ label: 'ACCC v Cement Australia — case notes', url: 'https://www.australiancompetitionlaw.org/cases/2013cement.html' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'lorain_journal', tactic: 'exclusive_supply',
+    title: 'Advertise with them and you are finished with us',
+    band: 'illegal',
+    year: '1948–1951',
+    who: 'The Lorain Journal Co.',
+    where: 'Lorain, Ohio',
+    body: Object.freeze([
+      'The Lorain Journal was the only newspaper in a town of about 52,000 and carried roughly 99 per cent of the local advertising. In 1948 a small radio station, WEOL, opened eight miles away in Elyria. The Journal answered with a rule: it would refuse to print any advertisement from a local business that also bought time on WEOL.',
+      'For a shop that depended on the paper to reach the town, that was not a choice. The rule did not have to be enforced often to work, and it very nearly closed the station.',
+      'The United States sued and won, and on 11 December 1951 the Supreme Court affirmed unanimously in Lorain Journal Co. v. United States. A publisher may generally choose who it does business with, but a monopolist may not use that freedom as a weapon to destroy a competing medium. The case is still the standard citation for the idea that a refusal to deal can be an act of monopolisation, and it is the reason the exclusive-dealing line is drawn at coercion rather than at exclusivity.',
+    ]),
+    outcome: 'Illegal. The Supreme Court affirmed unanimously in 1951: a monopolist may not refuse to deal in order to destroy a competing medium.',
+    image: 'assets/story/lorain_journal.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: a folded broadsheet with a single column struck through, and a small radio mast beside it with its broadcast arcs cut short by the newspaper edge. Ink black, newsprint grey and one warm accent, two hues. No text, no mastheads, no logos, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Lorain Journal Co. v. United States, 342 U.S. 143 (1951)', url: 'https://supreme.justia.com/cases/federal/us/342/143/' }),
+      Object.freeze({ label: 'Lorain Journal Co. v. United States — overview', url: 'https://en.wikipedia.org/wiki/Lorain_Journal_Co._v._United_States' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'ticketmaster_venues', tactic: 'exclusive_supply',
+    title: 'The only way to sell the seat',
+    band: 'grey',
+    year: '2010–2026',
+    who: 'Live Nation Entertainment & Ticketmaster',
+    where: 'United States',
+    body: Object.freeze([
+      'Live Nation promotes tours, owns and operates venues, and through Ticketmaster sells the tickets. The 2010 merger that put the three together was allowed to proceed subject to a consent decree. In May 2024 the Department of Justice and a group of states sued to break it up, arguing that Ticketmaster held its position through long exclusive ticketing contracts with venues — commonly three to fourteen years, and terminable only for cause — rather than by being the better product.',
+      'The case went to trial in March 2026. Mid-trial the DOJ settled without a divestiture: future fully exclusive deals with major venues capped at four years, non-exclusive options required to be offered, and venues already locked into long contracts given the right to hold back up to a fifth of their primary tickets. Thirty-three states and the District of Columbia refused the settlement and carried on.',
+      'On 15 April 2026 the jury found for the states on every count, and they obtained more stringent remedies than the settlement the DOJ had accepted. Exclusive ticketing contracts were not unlawful in themselves; what a jury found unlawful was using them, at that scale and for that long, to hold a monopoly. The gap between the two outcomes in the same courtroom is a fair picture of how unsettled this line is.',
+    ]),
+    outcome: 'Contested, and largely lost. The DOJ settled mid-trial with contract-length limits; 33 states pressed on and won a jury verdict on all counts in April 2026.',
+    image: 'assets/story/ticketmaster_venues.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: a stadium bowl drawn in plan with a single turnstile on its perimeter and every other gate shuttered, one long chain running from the turnstile around the whole ring. Deep indigo and amber, two hues. No text, no logos, no real venue, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Live Nation and Ticketmaster antitrust verdict — New Hampshire DOJ', url: 'https://www.doj.nh.gov/news-and-media/live-nation-and-ticketmaster-antitrust-verdict' }),
+      Object.freeze({ label: 'Key takeaways from the states’ jury trial win (Paul, Weiss)', url: 'https://www.paulweiss.com/insights/client-memos/live-nationticketmaster-antitrust-verdict-key-takeaways-from-the-states-jury-trial-win' }),
+      Object.freeze({ label: 'United States v. Live Nation Entertainment — overview', url: 'https://en.wikipedia.org/wiki/Live_Nation_Entertainment' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'carnegie_steel', tactic: 'vertical_integration',
+    title: 'Own the ore, the boats and the rails',
+    band: 'legal',
+    year: '1892–1901',
+    who: 'Carnegie Steel Company',
+    where: 'Pittsburgh, Pennsylvania',
+    body: Object.freeze([
+      'Andrew Carnegie built his mills around one idea he had learned running a railroad: know your costs to the last cent, and then remove every cent somebody else is charging you. Carnegie Steel took leases on the Mesabi Range iron ore, bought a fleet of lake steamers to carry it, and bought the railroad that took it from the docks to the furnaces. Coke came from the H. C. Frick Coke Company, folded into the same group.',
+      'The effect was not that competitors disappeared. It was that Carnegie could keep cutting the price of steel through the depressions of the 1890s and still make money, because none of his input prices were set by anybody outside his own accounts. Rivals who bought ore and freight on the market could not follow him down.',
+      'It was lawful then and the same structure is broadly lawful now. Vertical integration removes a supplier’s leverage over you rather than removing a competitor, which is why it sits at the safe end of the range. It also concentrates risk: when Carnegie sold to J. P. Morgan in 1901 to form U.S. Steel, the buyer inherited an enormously capable works that was expensive to change, and U.S. Steel’s share of the market fell steadily for decades afterwards.',
+    ]),
+    outcome: 'Legal, and never challenged. Owning the inputs let Carnegie undercut everyone through the 1890s; the same integration was hard to turn once the market moved.',
+    image: 'assets/story/carnegie_steel.jpg',
+    imagePrompt: 'Illustration. Stylised isometric technical diagram: an ore seam, a lake steamer, a rail line and a blast furnace linked by one unbroken belt, drawn as a closed loop. Iron grey and rust orange, two hues, blueprint linework. No text, no logos, no identifiable real works, no people.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Carnegie Steel Company', url: 'https://en.wikipedia.org/wiki/Carnegie_Steel_Company' }),
+      Object.freeze({ label: 'Britannica: Andrew Carnegie', url: 'https://www.britannica.com/biography/Andrew-Carnegie' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'essilor_luxottica', tactic: 'vertical_integration',
+    title: 'The frame, the lens and the shop',
+    band: 'legal',
+    year: '2017–2018',
+    who: 'Essilor & Luxottica',
+    where: 'Paris and Milan',
+    body: Object.freeze([
+      'Luxottica made and licensed the frames — Ray-Ban, Oakley, Persol, and licensed lines for a long list of fashion houses — and sold them through its own retail chains. Essilor made the lenses that go in them, and the machines that cut the lenses. In 2017 they agreed to combine.',
+      'Regulators took the vertical question seriously. The European Commission ran a full Phase II inquiry into whether the merged company could use Luxottica’s must-have brands to push opticians onto Essilor lenses, or use Essilor’s lens position to push rival frame makers off the shelf. On 1 March 2018 it cleared the deal unconditionally, and the US clearance was unconditional as well. EssilorLuxottica was formed on 1 October 2018.',
+      'Owning every step is not by itself an offence, even when the steps run from the factory to the till. What changes the answer is a specific, provable foreclosure — and the Commission looked for one here and did not find enough of it. The follow-on is instructive: when EssilorLuxottica moved to buy the GrandVision retail chain in 2021, the Commission cleared that one only with retail divestments in Belgium, Italy and the Netherlands.',
+    ]),
+    outcome: 'Legal. Cleared unconditionally in the EU and US in 2018 after a full Phase II review. A later retail acquisition needed divestments.',
+    image: 'assets/story/essilor_luxottica.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: a spectacle frame, a lens blank and a shop awning drawn as three links of one closed chain on a plain ground. Cool slate and warm brass, two hues. No text, no brand marks, no logos, no faces, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'European Commission: Commission clears merger between Essilor and Luxottica (1 March 2018)', url: 'https://ec.europa.eu/commission/presscorner/detail/en/ip_18_1442' }),
+      Object.freeze({ label: 'EssilorLuxottica', url: 'https://en.wikipedia.org/wiki/EssilorLuxottica' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'amazon_marketplace', tactic: 'vertical_integration',
+    title: 'Landlord, shopkeeper and rival at once',
+    band: 'grey',
+    year: '2023–2027',
+    who: 'Amazon & the Federal Trade Commission',
+    where: 'United States',
+    body: Object.freeze([
+      'Amazon runs the marketplace that other sellers trade on, sells its own goods in the same aisles, and owns the fulfilment network that decides which listings get the fast-delivery badge. Every one of those businesses is lawful. The argument is about what they do to each other.',
+      'In September 2023 the FTC and nineteen attorneys general sued, alleging Amazon maintains an illegal monopoly in online marketplace services through a set of interlocking practices: anti-discounting rules that punish sellers for offering a lower price elsewhere, the placement of the Buy Box, search results the complaint says were degraded with paid listings, and the use of Prime eligibility to push sellers into Amazon’s own fulfilment.',
+      'Nothing has been decided. Amazon denies the characterisation and says the practices are ordinary retail competition that lowered prices. The bench trial before Judge John Chun in the Western District of Washington has moved several times and is currently listed for 29 March 2027 — a reminder that a structural question about a company this size takes the better part of a decade to answer, during which the structure keeps operating.',
+    ]),
+    outcome: 'Contested and undecided. Sued by the FTC and nineteen states in 2023; trial listed for March 2027. No court has ruled on the merits.',
+    image: 'assets/story/amazon_marketplace.jpg',
+    imagePrompt: 'Illustration. Stylised flat isometric graphic: a market hall where the building itself, one of the stalls and the delivery cart are drawn in the same solid colour while every other stall is an outline. Warm ochre and deep slate, two hues. No text, no logos, no faces, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'FTC: FTC sues Amazon for illegally maintaining monopoly power (Sept 2023)', url: 'https://www.ftc.gov/news-events/news/press-releases/2023/09/ftc-sues-amazon-illegally-maintaining-monopoly-power' }),
+      Object.freeze({ label: 'FTC v. Amazon.com Inc — docket 2:23-cv-01495', url: 'https://www.courtlistener.com/docket/67828404/federal-trade-commission-v-amazoncom-inc/' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'booking_parity', tactic: 'price_guarantee',
+    title: 'You may not be cheaper anywhere else',
+    band: 'grey',
+    year: '2015–2024',
+    who: 'Booking.com, Expedia and the European competition authorities',
+    where: 'European Union',
+    body: Object.freeze([
+      'A price parity clause is a promise a platform extracts from its suppliers: you will not offer a lower price than the one on my site. In hotel booking it came in two strengths. A wide clause stopped a hotel undercutting the platform anywhere at all. A narrow clause left other agents alone but stopped the hotel undercutting on its own website.',
+      'Regulators disliked them for a reason that is not obvious. The clause looks like a consumer guarantee, and reads like one in the advertising. What it actually does is remove the reward for cutting a commission — a rival platform that charges the hotel less cannot turn that into a lower price for the traveller, so the commission never has to fall. France, Italy and Austria banned both kinds outright; Germany went after the narrow ones as well; other states took undertakings that removed only the wide clause.',
+      'It has now been settled from two directions in the same year. In September 2024 the Court of Justice held that parity clauses, wide or narrow, are not ancillary restraints and so are not exempt from the prohibition on anticompetitive agreements. And after the Commission designated Booking a gatekeeper in May 2024, the Digital Markets Act prohibited both kinds across the European Economic Area from 14 November 2024. A guarantee is not automatically a benefit, and price-matching can be the thing that keeps prices up.',
+    ]),
+    outcome: 'Contested, and finally prohibited. Held not to be ancillary restraints by the CJEU in 2024, and banned across the EEA under the Digital Markets Act from November 2024.',
+    image: 'assets/story/booking_parity.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: three price tags on one horizontal rail, all clamped to the same height by a bar above them, with the lowest hook empty. Deep blue and warm sand, two hues. No text, no numerals, no logos, no faces, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'CJEU preliminary ruling: Booking.com parity clauses are not ancillary restraints (Sept 2024)', url: 'https://www.covcompetition.com/2024/10/ecjs-preliminary-ruling-booking-coms-parity-clauses-are-not-ancillary-restraints/' }),
+      Object.freeze({ label: 'Booking.com and Booking.com (Deutschland), Case C-264/23 — EUR-Lex', url: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A62023CC0264' }),
+      Object.freeze({ label: 'Most favoured nation clause', url: 'https://en.wikipedia.org/wiki/Most_favoured_nation' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'amazon_price_parity', tactic: 'price_guarantee',
+    title: 'Nobody undercuts the shelf',
+    band: 'grey',
+    year: '2013–2023',
+    who: 'Amazon, the Bundeskartellamt and the UK OFT',
+    where: 'Germany and the United Kingdom',
+    body: Object.freeze([
+      'Amazon’s marketplace terms once required third-party sellers not to offer their goods more cheaply on any other sales channel. The seller kept the freedom to price; what it lost was the freedom to price differently, which is the freedom that lets a cheaper channel win business.',
+      'Germany’s Bundeskartellamt opened proceedings in 2013 and Amazon dropped the clause across Europe that August, with the UK Office of Fair Trading closing its parallel case on the same basis. Amazon has since operated other rules with a family resemblance — most visibly the treatment of listings whose price is higher than elsewhere, which the FTC’s 2023 complaint characterises as an anti-discounting practice and Amazon characterises as showing customers the best price.',
+      'This is the same mechanism as the hotel parity clause, and it lands in the same grey band. Nobody has ever held that a retailer may not want to be the cheapest place to buy something. The unsettled question is whether a contract that removes a supplier’s ability to be cheaper anywhere else is competition on price or the removal of it, and the answer has depended on how much of the market the platform holds.',
+    ]),
+    outcome: 'Contested. Dropped across Europe in 2013 under German and UK pressure without a formal finding; successor practices are part of the FTC’s pending 2023 case.',
+    image: 'assets/story/amazon_price_parity.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: a row of shelf-edge tickets connected by a single taut wire so none can hang lower than the others. Warm ochre and deep slate, two hues. No text, no numerals, no logos, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Bundeskartellamt: Amazon abandons price parity clauses for good (26 Nov 2013)', url: 'https://www.bundeskartellamt.de/SharedDocs/Meldung/EN/Pressemitteilungen/2013/26_11_2013_Amazon-Verfahrenseinstellung.html' }),
+      Object.freeze({ label: 'FTC: FTC sues Amazon for illegally maintaining monopoly power (Sept 2023)', url: 'https://www.ftc.gov/news-events/news/press-releases/2023/09/ftc-sues-amazon-illegally-maintaining-monopoly-power' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'apple_ebooks', tactic: 'price_guarantee',
+    title: 'The clause that made everyone raise prices',
+    band: 'illegal',
+    year: '2010–2016',
+    who: 'Apple and five book publishers',
+    where: 'United States',
+    body: Object.freeze([
+      'Amazon sold new e-books at $9.99, often below what it paid, and publishers hated the anchor it set. In the weeks before the iPad launched in 2010, Apple signed agency contracts with five of the six largest US publishers. The publishers would set the price and Apple would take 30 per cent — and each contract carried a most-favoured-nation clause saying Apple’s store could not be undersold.',
+      'That clause is what turned five separate contracts into one agreement. Once signed, each publisher had to force Amazon onto agency terms too or watch its own titles sell more cheaply somewhere Apple was contractually entitled to match. Prices for the affected titles rose within weeks of the iPad going on sale.',
+      'The Department of Justice sued in 2012. The publishers all settled. Apple went to trial and lost: in July 2013 Judge Denise Cote held that Apple had orchestrated a horizontal conspiracy to raise prices, in violation of section 1 of the Sherman Act. The Second Circuit affirmed in June 2015, the Supreme Court declined to hear it in March 2016, and Apple paid $450 million, most of it back to the people who had bought the books. Nothing in the contracts said the word conspiracy; the MFN clause did the work on its own.',
+    ]),
+    outcome: 'Illegal. Apple lost at trial in 2013 and on appeal in 2015; certiorari denied in 2016 and $450 million paid, most of it back to e-book buyers.',
+    image: 'assets/story/apple_ebooks.jpg',
+    imagePrompt: 'Illustration. Stylised flat geometric graphic: five identical price tags tied by strings to a single ring at the centre, all pulled to the same height. Cool graphite and warm gold, two hues. No text, no numerals, no logos, no devices, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'United States v. Apple (2012) — the e-books case', url: 'https://en.wikipedia.org/wiki/United_States_v._Apple_(2012)' }),
+      Object.freeze({ label: 'DOJ Antitrust Division: U.S. v. Apple Inc., et al.', url: 'https://www.justice.gov/atr/case/us-v-apple-inc-et-al' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'questcor_synacthen', tactic: 'brand_buyout',
+    title: 'Buying the drug you will never make',
+    band: 'illegal',
+    year: '2013–2017',
+    who: 'Questcor Pharmaceuticals, later Mallinckrodt ARD',
+    where: 'United States',
+    body: Object.freeze([
+      'Questcor owned Acthar, the only adrenocorticotropic hormone therapy on the US market and the standard treatment for infantile spasms. Having bought the rights in 2001, it raised the price from about $40 a vial to over $34,000 — an increase of roughly 85,000 per cent.',
+      'In 2013 the one credible threat to that position was Synacthen Depot, a synthetic ACTH product already approved outside the United States, which Novartis was auctioning. Questcor outbid the firms that wanted to develop it and acquired the US rights. It did not bring Synacthen to market.',
+      'The FTC and a group of states sued, alleging the acquisition was an unlawful maintenance of monopoly: the point of buying the asset was that nobody else could use it. On 18 January 2017 Mallinckrodt, which had by then bought Questcor, agreed to pay $100 million and to license the Synacthen assets to a licensee the FTC approved, for development in infantile spasms and nephrotic syndrome. Acquiring a competitor’s asset is ordinary business. Acquiring it so that it is never used is where the line sits, and the difference is entirely one of purpose and effect.',
+    ]),
+    outcome: 'Illegal. Settled with the FTC and the states in January 2017 for $100 million plus a compulsory licence of the acquired assets.',
+    image: 'assets/story/questcor_synacthen.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: two identical vials, one on a lit pedestal and one sealed inside a locked glass case with a dust sheet over it. Clinical white, deep teal and one warm accent, two hues. No text, no brand marks, no logos, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'FTC: Mallinckrodt will pay $100 million to settle charges it illegally maintained its monopoly (Jan 2017)', url: 'https://www.ftc.gov/news-events/news/press-releases/2017/01/mallinckrodt-will-pay-100-million-settle-ftc-state-charges-it-illegally-maintained-its-monopoly' }),
+      Object.freeze({ label: 'FTC case file: Mallinckrodt ARD Inc. (Questcor Pharmaceuticals)', url: 'https://www.ftc.gov/legal-library/browse/cases-proceedings/1310172-mallinckrodt-ard-inc-questcor-pharmaceuticals' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'illumina_grail', tactic: 'brand_buyout',
+    title: 'Too small to review, too big to ignore',
+    band: 'grey',
+    year: '2021–2024',
+    who: 'Illumina, GRAIL and the European Commission',
+    where: 'European Union',
+    body: Object.freeze([
+      'GRAIL was developing a multi-cancer early detection blood test and had essentially no revenue. Illumina, which makes the sequencing machines such a test runs on, moved to buy it back in 2021. Because GRAIL earned so little, the deal fell under every merger notification threshold in the EU and in the member states — it was, on the numbers, too small to review.',
+      'The Commission took it anyway, accepting a referral under Article 22 of the Merger Regulation on the theory that a nascent competitor with no turnover can still matter. Illumina closed the deal while the review was running, and in July 2023 the Commission fined it €432 million for gun-jumping, with a symbolic €1,000 against GRAIL, and later ordered the acquisition unwound.',
+      'On 3 September 2024 the Court of Justice set the whole thing aside: the Commission had no jurisdiction to review a deal that qualified under no national merger law. Illumina had already begun divesting GRAIL by then, so the practical effect fell mainly on the fine and on the Commission’s policy. It is the cleanest illustration of the killer-acquisition problem there is — everyone agreed the deal might matter, and the machinery for looking at it did not reach.',
+    ]),
+    outcome: 'Contested, and the regulator lost on jurisdiction. The €432 million gun-jumping fine and the review itself were set aside by the Court of Justice in September 2024.',
+    image: 'assets/story/illumina_grail.jpg',
+    imagePrompt: 'Illustration. Stylised flat geometric graphic: a large rounded square reaching for a very small one that sits just outside a marked threshold line on the floor. Cool violet and pale mint, two hues. No text, no logos, no laboratory equipment, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'CJEU: Illumina/GRAIL judgment, C-611/22 P and C-625/22 P (3 Sept 2024) — Cleary Gottlieb', url: 'https://www.clearygottlieb.com/news-and-insights/publication-listing/illumina-grail-ecj-rules-european-commission-lacks-jurisdiction-to-review-merger-falling-below-eu-and-national-merger-thresholds' }),
+      Object.freeze({ label: 'Illumina/GRAIL — Linklaters case analysis', url: 'https://www.linklaters.com/en/insights/blogs/linkingcompetition/2024/september/copy-of-illumina-grail' }),
+      Object.freeze({ label: 'GRAIL (company)', url: 'https://en.wikipedia.org/wiki/Grail_(company)' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'google_adtech', tactic: 'brand_buyout',
+    title: 'The acquisitions were fine. What came after was not.',
+    band: 'grey',
+    year: '2007–2026',
+    who: 'Google & the Department of Justice',
+    where: 'Eastern District of Virginia',
+    body: Object.freeze([
+      'Google bought DoubleClick in 2007 and Admeld in 2011, and with them the tools that publishers use to sell advertising space and that advertisers use to buy it. Both purchases were reviewed and cleared at the time. Over the following fifteen years Google came to own the publisher ad server, the exchange the auction runs on, and a large share of the demand bidding into it.',
+      'The Department of Justice and a group of states sued in 2023. On 17 April 2025 Judge Leonie Brinkema held that Google had willfully monopolised the markets for publisher ad servers and ad exchanges in open-web display advertising, in part by tying its ad server to its exchange so a publisher that wanted the demand had to take the plumbing with it.',
+      'The part worth reading twice is what she did not find. The acquisitions themselves were held not to be anticompetitive — which narrowed the remedies available, since you cannot easily order the unwinding of a purchase that was lawful. The remedies phase ran through 2025 with the DOJ pressing for divestiture of the exchange and the ad server. Buying your way into a position is one question; what you are then allowed to do from inside it is a completely different one.',
+    ]),
+    outcome: 'Contested. The acquisitions were held lawful; the conduct built on them was held to be illegal monopolisation in April 2025, with remedies still being fought over.',
+    image: 'assets/story/google_adtech.jpg',
+    imagePrompt: 'Illustration. Stylised flat isometric graphic: an auction floor where the auctioneer’s box, the bidding desk and the seller’s desk are all joined by one solid pipe, drawn as a single object. Cool blue-grey and warm amber, two hues. No text, no logos, no screens, no faces, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'District court rules Google is a monopolist in ad tech — Simpson Thacher (April 2025)', url: 'https://www.stblaw.com/about-us/publications/view/2025/04/25/district-court-rules-google-is-a-monopolist-in-ad-tech' }),
+      Object.freeze({ label: 'DOJ Antitrust Division: United States v. Google LLC (ad tech)', url: 'https://www.justice.gov/atr/case/us-and-plaintiff-states-v-google-llc-2023' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'akzo_ecs', tactic: 'below_cost',
+    title: 'Leave our market or we will take yours',
+    band: 'illegal',
+    year: '1979–1991',
+    who: 'AKZO Chemie & Engineering and Chemical Supplies',
+    where: 'European Communities',
+    body: Object.freeze([
+      'Engineering and Chemical Supplies was a small British firm selling benzoyl peroxide as a flour additive. When it began selling the same chemical into plastics, which was AKZO’s main business, AKZO told it plainly what would happen if it did not withdraw: AKZO would come after its flour customers.',
+      'It did. From late 1980 AKZO offered ECS’s flour customers prices well under ECS’s own — by figures in the range of eleven to twenty-seven per cent — and under AKZO’s own average total costs, while holding its prices up for comparable customers who were not worth taking. The Commission fined it 10 million ECU, and the Court of Justice upheld the finding of abuse on 3 July 1991.',
+      'The judgment is the European test. Prices below average variable cost are presumed abusive; prices between average variable and average total cost are abusive if part of a plan to eliminate a competitor — and here the plan was on the record, because AKZO had said it out loud. Set beside Boral, which won in Australia in 2003 on almost the same facts minus the threat, the two cases show how much of predatory pricing law turns on evidence of intent rather than on the price itself.',
+    ]),
+    outcome: 'Illegal in Europe. A 10 million ECU fine upheld by the Court of Justice in 1991, and still the leading EU test for predatory pricing.',
+    image: 'assets/story/akzo_ecs.jpg',
+    imagePrompt: 'Illustration. Stylised flat chart: one price line dropping sharply only in the section of the grid where a small marker sits, and holding level everywhere else. Deep red and slate, two hues, technical linework. No text, no company names, no logos, no people.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'AKZO Chemie BV v Commission, Case C-62/86', url: 'https://en.wikipedia.org/wiki/AKZO_Chemie_BV_v_Commission' }),
+      Object.freeze({ label: 'Judgment of the Court, 3 July 1991 — EUR-Lex 61986CJ0062', url: 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A61986CJ0062' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'wanadoo_adsl', tactic: 'below_cost',
+    title: 'Cheap broadband while it mattered',
+    band: 'illegal',
+    year: '2001–2009',
+    who: 'Wanadoo Interactive, later France Télécom',
+    where: 'France',
+    body: Object.freeze([
+      'When consumer ADSL was new in France, Wanadoo — the internet arm of the incumbent telephone company — priced its retail broadband below what it cost to provide. Households got cheap broadband. Independent providers, who had no parent with a network and a telephone monopoly behind them, could not match the price and could not build a subscriber base while the market was being formed.',
+      'The Commission decided on 16 July 2003 that this was an abuse of a dominant position and fined Wanadoo €10.35 million. The Court of First Instance dismissed the appeal in its entirety in January 2007, and the Court of Justice dismissed the further appeal on 2 April 2009.',
+      'The 2009 judgment settled a point that matters more than the fine: in Europe, the Commission does not have to show the loss could later be recouped. That is the opposite of the American rule from Brooke Group, and it is why the same commercial behaviour can be lawful hard competition on one side of the Atlantic and an abuse on the other. There is no single worldwide answer to whether selling below cost is allowed.',
+    ]),
+    outcome: 'Illegal in Europe. A €10.35 million fine in 2003, upheld in 2007 and again in 2009 — and no proof of recoupment was required.',
+    image: 'assets/story/wanadoo_adsl.jpg',
+    imagePrompt: 'Illustration. Stylised flat chart: a subscriber line climbing steeply under a dashed cost line while two thinner lines flatten and stop short. Deep blue and warm red, two hues, technical linework. No text, no company names, no logos, no people.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Judgment: France Télécom v Commission, C-202/07 P (2 April 2009) — EUR-Lex', url: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A62007CJ0202' }),
+      Object.freeze({ label: 'Predatory pricing in the EU — the French broadband case (Dechert)', url: 'https://www.dechert.com/content/dam/dechert%20files/knowledge/onpoint/2009/4/predatory-pricing-in-the-eu-the-french-broadband-case/Antitrust_38_04-09_Predatory_Pricing_EU.pdf' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'amazon_diapers', tactic: 'below_cost',
+    title: 'The price war that ended in a purchase',
+    band: 'grey',
+    year: '2009–2011',
+    who: 'Amazon & Quidsi (Diapers.com)',
+    where: 'United States',
+    body: Object.freeze([
+      'Quidsi built Diapers.com into a fast-growing online seller of nappies and baby goods, and turned down Amazon’s approaches. What followed is the part that gets cited: as reported in Brad Stone’s account of the company and repeated in the antitrust literature, Amazon cut nappy prices hard, to levels that would have cost it very large sums across the category, and Quidsi watched its own growth projections collapse in front of an investor it was trying to raise from.',
+      'Quidsi sold. Amazon acquired it in late 2010 for roughly $545 million, the FTC reviewed the deal and let it proceed, and Amazon shut Diapers.com down in 2017.',
+      'No court has ever ruled on it, and Amazon has always described the pricing as competition. That is precisely why the case is worth reading: under the American Brooke Group test a plaintiff has to prove both below-cost pricing and a dangerous probability of recouping the loss, and against a company that can fund losses in one category out of many others, the second half is extremely hard to prove. Lina Khan’s 2017 note built its argument for rethinking the test largely on this episode. The tactic worked, and there was no forum in which it could be tested.',
+    ]),
+    outcome: 'Untested. Never litigated; the acquisition was reviewed and cleared. Amazon denies the conduct was predatory, and no court has ruled either way.',
+    image: 'assets/story/amazon_diapers.jpg',
+    imagePrompt: 'Illustration. Stylised flat chart: a small rising line meeting a broad falling band that swallows it, with a single handshake glyph at the point they meet. Warm ochre and slate, two hues, technical linework. No text, no logos, no products, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'Lina M. Khan, “Amazon’s Antitrust Paradox”, 126 Yale L.J. 710 (2017)', url: 'https://www.yalelawjournal.org/note/amazons-antitrust-paradox' }),
+      Object.freeze({ label: 'Quidsi', url: 'https://en.wikipedia.org/wiki/Quidsi' }),
+      Object.freeze({ label: 'Brooke Group Ltd. v. Brown & Williamson Tobacco Corp., 509 U.S. 209 (1993)', url: 'https://supreme.justia.com/cases/federal/us/509/209/' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'lysine_adm', tactic: 'spec_collusion',
+    title: 'The competitor is our friend',
+    band: 'illegal',
+    year: '1992–1996',
+    who: 'Archer Daniels Midland and three Asian lysine makers',
+    where: 'United States, Japan and South Korea',
+    body: Object.freeze([
+      'Lysine is an amino acid added to animal feed. From 1992 the handful of companies in the world who made it met to agree what it would cost and how much each of them would sell, and then met again to check that everyone had complied. The arrangement raised the price of a commodity input to livestock farming across three continents.',
+      'What makes this the best-documented cartel in history is Mark Whitacre. The head of ADM’s bioproducts division was also an FBI informant, and for nearly three years he recorded the meetings — on tape, on video, with the participants naming the numbers. The company mantra he reported hearing hundreds of times was: the competitor is our friend, and the customer is our enemy.',
+      'On 14 October 1996 ADM pleaded guilty in federal court in Chicago and paid a combined $100 million — $70 million on lysine and $30 million on citric acid — then the largest criminal antitrust fine ever imposed in the United States. Three executives went to prison, and so did Whitacre, on separate fraud charges he had committed while informing. Price fixing between competitors is the one part of competition law with no balancing test and no efficiency defence anywhere in the world. It is simply a crime.',
+    ]),
+    outcome: 'Illegal, and criminal. ADM pleaded guilty in 1996 and paid $100 million — then a record US antitrust fine — and executives were jailed.',
+    image: 'assets/story/lysine_adm.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: four chairs round a plain round table with a single reel-to-reel tape spool sitting in the centre where the papers should be. Muted olive and warm grey, two hues. No text, no logos, no faces, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'DOJ: Archer Daniels Midland to plead guilty and pay $100 million (Oct 1996)', url: 'https://www.justice.gov/archive/atr/public/press_releases/1996/0988.htm' }),
+      Object.freeze({ label: 'Lysine price-fixing conspiracy', url: 'https://en.wikipedia.org/wiki/Lysine_price-fixing_conspiracy' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'visy_amcor', tactic: 'spec_collusion',
+    title: 'Two companies, every box in the country',
+    band: 'illegal',
+    year: '2000–2007',
+    who: 'Visy & Amcor',
+    where: 'Australia',
+    body: Object.freeze([
+      'Between them, Visy and Amcor made almost every corrugated cardboard box sold in Australia. From about 2000 they agreed not to take each other’s customers and to move prices together, an arrangement run at the top of both companies and worth a great deal on a product that sits inside the cost of nearly everything on a supermarket shelf.',
+      'Amcor went to the ACCC first and received immunity under the leniency policy — which is exactly what the policy is designed to produce, because a cartel with two members is one confession away from collapsing. Visy settled. In November 2007 the Federal Court imposed penalties totalling $36 million for 37 contraventions, then by a wide margin the largest in Australian history, with Justice Heerey describing it as by far the most serious cartel case to come before the court.',
+      'Richard Pratt, Visy’s chairman, was found to have been knowingly concerned. No personal penalty was sought against him: he and his family owned the company, so the fine already fell on him. Criminal cartel offences did not exist in Australia until 2009, two years after this case — the conduct that produced the country’s largest ever civil penalty could not then have sent anyone to prison for it.',
+    ]),
+    outcome: 'Illegal. $36 million in penalties in 2007 across 37 contraventions, then a record in Australia. Amcor received immunity for reporting it first.',
+    image: 'assets/story/visy_amcor.jpg',
+    imagePrompt: 'Illustration. Stylised flat isometric graphic: two identical stacks of plain corrugated boxes with a single ruled line drawn between them across a map outline, and one box moved to the far side of the line. Kraft brown and slate, two hues. No text, no logos, no faces, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'ACCC v Visy Industries Holdings — case notes', url: 'https://www.australiancompetitionlaw.org/cases/visy2.html' }),
+      Object.freeze({ label: 'Visy — the cardboard cartel', url: 'https://en.wikipedia.org/wiki/Visy' }),
+    ]),
+  }),
+
+  Object.freeze({
+    id: 'detergent_concentrate', tactic: 'spec_collusion',
+    title: 'Everybody changes the formula on the same day',
+    band: 'illegal',
+    year: '2008–2016',
+    who: 'Colgate-Palmolive, PZ Cussons, Unilever and Woolworths',
+    where: 'Australia',
+    body: Object.freeze([
+      'Concentrated laundry detergent is cheaper to make, cheaper to package and cheaper to ship than the standard kind. Moving to it should have put downward pressure on the shelf price. In early 2009 the three suppliers stopped supplying standard concentrate to Woolworths and moved to ultra concentrates at the same time — and the ACCC alleged the savings were not passed on to shoppers.',
+      'The reason for doing it together is the whole mechanism. A single supplier switching alone risks looking dearer per pack beside the rivals it is competing with on the same shelf; if everyone switches at once, nobody is undercut and the saving stays with the manufacturers. Woolworths, the retailer, was knowingly concerned in the understanding rather than a victim of it.',
+      'In April 2016 the Federal Court ordered Colgate to pay $18 million, and in June 2016 ordered $9 million against Woolworths. Colgate paid a further $6 million over a separate understanding to share commercially sensitive information, including when prices would rise. Nothing about the technical change was wrong — concentrate is a better product. What was unlawful was agreeing on when to make it, because coordinating a specification is exactly the same act as coordinating a price.',
+    ]),
+    outcome: 'Illegal. $18 million against Colgate and $9 million against Woolworths in 2016, plus $6 million for a related information-sharing understanding.',
+    image: 'assets/story/detergent_concentrate.jpg',
+    imagePrompt: 'Illustration. Stylised flat graphic: three identical unbranded bottles shrinking to a smaller identical size in perfect step, with a shelf-edge ticket beneath them that does not move. Cool blue and warm grey, two hues. No text, no brand marks, no logos, no people, not a photograph.',
+    credit: 'illustration',
+    links: Object.freeze([
+      Object.freeze({ label: 'ACCC: Colgate ordered to pay $18 million penalty in laundry detergent cartel proceedings', url: 'https://www.accc.gov.au/media-release/colgate-ordered-to-pay-18-million-penalty-in-laundry-detergent-cartel-proceedings' }),
+      Object.freeze({ label: 'ACCC v Colgate-Palmolive Pty Ltd — case notes', url: 'https://www.australiancompetitionlaw.org/cases/2017colgate.html' }),
     ]),
   }),
 ]);

@@ -16,11 +16,33 @@ body.shotmode #intro { display: none !important; }
   bottom: calc(var(--dock) + var(--ctrl) + 10px);
 }
 
+/* ── the title hold ─────────────────────────────────────────────────────── */
+
+/* Nothing but the name over the live system. It sits on the upper third so the station and the
+   hulls keep the middle of the frame, which is the whole reason the beat exists. */
+.intro-title {
+  position: absolute; left: 0; right: 0; top: 19%; text-align: center;
+  pointer-events: none !important;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .9s ease, transform .9s ease;
+}
+.intro-title.in { opacity: 1; transform: none; }
+.intro-title b {
+  display: block; font: 400 clamp(30px, 9vw, 54px)/1.05 var(--serif);
+  letter-spacing: .02em; color: var(--ink);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .7), 0 0 60px rgba(0, 0, 0, .5);
+}
+.intro-title s {
+  display: block; margin-top: 10px; text-decoration: none;
+  font-size: 10px; letter-spacing: .32em; text-transform: uppercase; color: var(--accent);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .8);
+}
+
 /* ── first-run briefing ─────────────────────────────────────────────────── */
 
 .intro-card {
   max-height: min(44vh, 330px); overflow-y: auto; overscroll-behavior: contain;
-  padding: 14px 16px 12px; border-radius: 13px;
+  padding: 14px 16px 12px; border-radius: 13px; touch-action: pan-y;
   /* deliberately light: the fly-by behind this is the best-looking thing in the game */
   background: linear-gradient(180deg, rgba(6, 9, 14, .5), rgba(6, 9, 14, .84));
   backdrop-filter: blur(16px) saturate(1.1); -webkit-backdrop-filter: blur(16px) saturate(1.1);
@@ -29,6 +51,8 @@ body.shotmode #intro { display: none !important; }
   opacity: 0; transform: translateY(12px);
   transition: opacity .34s ease, transform .34s ease;
 }
+.intro-card.from-right { transform: translate(16px, 6px); }
+.intro-card.from-left { transform: translate(-16px, 6px); }
 .intro-card.in { opacity: 1; transform: none; }
 
 .intro-card .eyebrow {
@@ -45,7 +69,12 @@ body.shotmode #intro { display: none !important; }
 .intro-card .row {
   display: flex; align-items: center; gap: 8px; margin-top: 14px;
 }
-.intro-card .dots { display: flex; gap: 5px; flex: 1 1 auto; }
+.intro-card .row .step {
+  flex: 0 0 auto; width: 32px; min-height: 40px; padding: 0; border-radius: 9px; cursor: pointer;
+  background: none; border: 1px solid var(--line2); color: var(--dim); font: 400 17px/1 var(--serif);
+}
+.intro-card .row .step.ghosted { border-color: transparent; pointer-events: none; }
+.intro-card .dots { display: flex; gap: 5px; flex: 1 1 auto; justify-content: center; }
 .intro-card .dots button {
   width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
   background: rgba(255, 255, 255, .22); transition: background .2s, width .2s;
@@ -71,7 +100,8 @@ body.shotmode #intro { display: none !important; }
   transition: opacity .3s ease, transform .3s ease;
 }
 .intro-chip.in { opacity: 1; transform: none; }
-#intro.hidden-by-sheet .intro-chip { opacity: 0; transform: translateY(8px); pointer-events: none; }
+#intro.hidden-by-sheet .intro-chip,
+#intro.hidden-by-sheet .intro-card { opacity: 0; transform: translateY(8px); pointer-events: none; }
 
 .intro-chip .obj {
   display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 38px; text-align: left;
@@ -112,13 +142,24 @@ body.shotmode #intro { display: none !important; }
   border: 1px solid var(--line); border-left: 2px solid var(--accent);
 }
 
-/* ── the dock coach mark — scoped so it cannot leak past #dock ───────────── */
+/* ── the coach mark — scoped so it cannot leak past #dock or #sheet ──────── */
 
 #dock button.intro-coach { color: var(--accent); animation: intro-coach 1.7s ease-in-out infinite; }
+
+/* Inside a sheet the target is a real control with its own styling, so the mark is a ring round
+   it rather than a colour change — it has to read on a button that is already accent-filled. */
+#sheet .intro-coach {
+  position: relative; animation: intro-ring 1.7s ease-in-out infinite;
+  outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px;
+}
 
 @keyframes intro-coach {
   0%, 100% { transform: none; filter: none; }
   50% { transform: translateY(-2px); filter: drop-shadow(0 0 8px rgba(217, 139, 43, .6)); }
+}
+@keyframes intro-ring {
+  0%, 100% { outline-color: rgba(217, 139, 43, .95); outline-offset: 3px; }
+  50% { outline-color: rgba(217, 139, 43, .25); outline-offset: 6px; }
 }
 @keyframes intro-blip {
   0%, 100% { opacity: 1; }
