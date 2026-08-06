@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#070b0f">
+<meta name="description" content="WATERLINE — naval gunnery on a plotting table.">
+<title>WATERLINE</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<div id="hud">
+  <div id="perf"></div>
+</div>
+
+<!-- game UI mounts here; engine never writes into it -->
+<div id="ui"></div>
+
+<div id="boot">
+  <div class="logo">WATERLINE</div>
+  <div class="tag">fire control</div>
+  <div id="boot-status">warming…</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

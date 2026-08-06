@@ -1,0 +1,176 @@
+{
+  "_note": "Verified naval plate set. Every plate below was opened individually at full resolution and looked at; every crop rect was rendered with ffmpeg and looked at. crop is [x,y,w,h] as fractions of the SOURCE image. both:true = a UI trim applied to BOTH images. both:false = a reframe applied to the PLATE ONLY, and the scenario camera must be authored to match that framing. Every rect is 16:9 (+/-0.2%) in real pixels so compare.mjs's fit() does not crop it a second time — see REVIEW.md B4.",
+  "_verified": "2026-08-05, second pass. The first pass was triaged from 4x4 contact sheets at 440px/tile and was wrong: 4 of its 20 'clean' plates carried a full HUD, 2 were mislabelled, 2 carried copyright watermarks.",
+  "_sheet": "compare.mjs fit() = scale to fill 900x506 then centre-crop. Target aspect 1.77866.",
+  "refs": "../../../../gms/3d/aaa_refs/naval/refs",
+
+  "plates": {
+    "236390_05": {
+      "dir": "clean", "crop": null, "game": "War Thunder",
+      "use": "Yamato-class battleship bow-on at speed, sheets of spray tearing off the forecastle, funnel smoke, blue sky with cumulus. Bow-wave and spray VFX, painted-steel hull material."
+    },
+    "236390_09": {
+      "dir": "clean", "crop": null, "game": "War Thunder",
+      "use": "Battleship firing a full main-battery broadside, elevated 3/4 rear. Muzzle bloom, brown propellant smoke rolling downwind, wake. The best clean naval-gunnery plate on the board."
+    },
+    "236390_14": {
+      "dir": "contaminated", "crop": [0.04, 0.0, 0.96, 0.96], "both": true, "game": "War Thunder",
+      "use": "French battleship steaming under low sun, floatplane overhead, distant coast, funnel smoke. Open-ocean colour grade and horizon haze.",
+      "why_crop": "A faint two-line watermark sits in the bottom-left corner at roughly x 14-36, y 977-990. The trim removes the left 4% and bottom 4%; applied to BOTH images so the trim itself cannot become the tell. Verified by rendering the trimmed bottom-left corner at 2x contrast: gone.",
+      "caveat": "The plate has a hero warship. A shipless ocean render scored against it loses Composition. C1's sea_noon scenario should carry at least one distant silhouetted hull."
+    },
+    "242050_01": {
+      "dir": "clean", "crop": null, "game": "Assassin's Creed IV: Black Flag",
+      "use": "Storm at sea in heavy rain: an enemy man-o'-war firing a full broadside with round shot visibly mid-flight over a big rolling swell. The only plate on the board with projectiles in the air."
+    },
+    "494840_09": {
+      "dir": "clean", "crop": null, "game": "UBOAT",
+      "use": "Chart table under a single warm lamp, navigator plotting, dark room falling off to black. The lamp-on-a-lit-surface lighting model for the planning table."
+    },
+    "494840_10": {
+      "dir": "clean", "crop": [0.598958, 0.0, 0.401042, 0.400926], "both": false, "game": "UBOAT",
+      "use": "Night sea under a black sky: a torpedoed freighter burning on the horizon, its fire the only light source, rimming the swell orange all the way to camera.",
+      "why_crop": "No UI anywhere in this frame — the crop is a pure reframe. The uncropped shot is dominated by a surfaced U-boat filling the lower half, which an ocean/sky/light component has nothing to answer with. The rect is 770x433 at (1150,0) of a 1920x1080 source: it drops the submarine entirely and keeps sky, horizon, the burning hulk and the fire-lit water. One faint rigging line crosses the bottom-left corner. Verified by rendering. The scenario camera must be authored to this framing.",
+      "caveat": "Even cropped there is a distant burning ship. Put one on the horizon in the scenario or the comparison is not like for like. No press pack anywhere contains an empty night ocean."
+    },
+    "494840_11": {
+      "dir": "clean", "crop": null, "game": "UBOAT",
+      "use": "Dark painted-steel interior, red valve accents, small practical lights, grimy metal. Interior material read."
+    },
+    "494840_13": {
+      "dir": "clean", "crop": null, "game": "UBOAT",
+      "use": "Cutaway of the submarine's compartments under practical lighting. Secondary interior material reference. The black bands top and bottom are the game's cutaway framing, not letterbox."
+    },
+    "1172620_00": {
+      "dir": "clean", "crop": null, "game": "Sea of Thieves",
+      "use": "Five galleons in line under a bright blue sky on teal tropical water. Fleet silhouette spacing and daylight water. Stylised — read it for composition and light, not for water detail."
+    },
+    "1172620_02": {
+      "dir": "clean", "crop": null, "game": "Sea of Thieves",
+      "use": "Torch-lit stone vault with a table and gold. Warm firelight on a horizontal surface in a dark room. Secondary to 494840_09."
+    },
+    "1172620_07": {
+      "dir": "clean", "crop": null, "game": "Sea of Thieves",
+      "use": "Deck-level view down a galleon's gun deck as the broadside fires. Muzzle bloom and lit smoke cards doing all the work; the cheap-VFX-done-well target."
+    },
+    "1172620_12": {
+      "dir": "contaminated", "crop": [0.0, 0.5, 0.5, 0.5], "both": false, "game": "Sea of Thieves",
+      "use": "Close muzzle flash at a cannon's mouth: core bloom, cordite puff, ember sparks, painted wood lit by the flash.",
+      "why_crop": "The uncropped frame carries two pieces of readable text: the transom name 'THE UNBROKEN BOND' (approx x 547-728, y 483-527) and an Emissary banner reading 'SILVER SWO... VI' (approx x 1371-1700, y 421-524). Either identifies the game in one search. The rect is the bottom-left quadrant, 960x540 at (0,540), which excludes both. Verified by rendering."
+    },
+    "1272010_00": {
+      "dir": "contaminated", "crop": [0.15625, 0.12037, 0.704167, 0.703704], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "WW2 destroyer making smoke in a daylight convoy, escorts and a burning ship strung along the horizon. Realistic fleet-scale composition and haze.",
+      "why_crop": "Destroyer's HUD is on in every press shot: left menu (to x 230), an icon strip at x 0-290 y 360-440, three left dials (x 0-190), a top bearing tape (y to 110), a right binocular button (x 1845+), a bottom-centre bearing bar (y 1035+) and a chat log (x 1270+, y 915+). The rect 1352x760 at (300,130) is the largest 16:9 box that clears all of them. Verified: left edge, bottom edge and full frame each rendered and inspected. An earlier rect starting at x=250 leaked the amber icon strip."
+    },
+    "1272010_01": {
+      "dir": "contaminated", "crop": [0.15625, 0.12037, 0.704167, 0.703704], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "Burning freighters at dusk in rain: fire columns on the waterline, smoke going up into the murk, orange firelight rippling across a dark sea.",
+      "why_crop": "Same always-on HUD as 1272010_00, same rect. The rain at the top and the orange-lit water at the bottom — the two things the plate is for — are both inside it. Verified by rendering."
+    },
+    "1272010_02": {
+      "dir": "contaminated", "crop": [0.15625, 0.0, 0.833333, 0.833333], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "Red-lit night bridge: a row of bright portholes showing a grey sea and burning ships outside, brass and glass instruments in near-black, a glowing engine telegraph. The interior/exterior exposure problem (BUILD_PLAN 7.1) in one frame.",
+      "why_crop": "1600x900 at (300,0). Clears the left menu, the icon strip, the left dials and the chat log. The lettering that survives (TARGET BEARING, STOP/BACK/FULL) is in-world instrument art, not overlay UI. Verified by rendering."
+    },
+    "1272010_04": {
+      "dir": "contaminated", "crop": [0.15625, 0.037037, 0.729167, 0.728704], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "DRT plotting table seen from above: amber-lit paper, a mechanical bearing plotter, a parallel rule, pencilled fixes with times against them. The direct ancestor of our peg grid.",
+      "why_crop": "1400x787 at (300,40). Clears the left menu and icon strip, the right tool palette (x 1855+), the bottom tab bar (RADAR/DRT/OSC/...) at y 1035+ and the chat log. Verified by rendering."
+    },
+    "1272010_05": {
+      "dir": "contaminated", "crop": [0.15625, 0.12037, 0.704167, 0.703704], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "Torpedoed freighter at blue hour: a tall smoke column, tracer arcs, our own foredeck in the near foreground, convoy silhouettes on the horizon. Alternate night-sea / hit plate.",
+      "why_crop": "Same always-on HUD, same rect as 1272010_00. Verified by rendering."
+    },
+    "1272010_06": {
+      "dir": "contaminated", "crop": [0.15625, 0.12037, 0.704167, 0.703704], "both": false, "game": "Destroyer: The U-Boat Hunter",
+      "use": "A hit seen from our own bow rail: a freighter burning at close range, white-hot core, black smoke column, water lit orange all the way to the rail.",
+      "why_crop": "Same always-on HUD, same rect as 1272010_00. Verified by rendering."
+    },
+    "552990_08": {
+      "dir": "contaminated", "crop": [0.682292, 0.138889, 0.307292, 0.307407], "both": false, "game": "World of Warships",
+      "use": "Pure open-ocean sunset: banded cloud, a low sun, a specular glitter path running down the water to camera. No ships, no land, no VFX — the only shipless sky-and-water grade plate on the board, which makes it the right target for an ocean/sky/light component.",
+      "why_crop": "590x332 at (1310,150). Every other region of this frame holds HUD: the top-right ribbon block, range labels, a DETECTED marker at (1180-1245, 300-345), a 0.8 km marker at (1255-1300, 420-490), a Target-hits panel, the bottom-left ship panel, the consumables bar and the minimap. This rect is the largest 16:9 box that clears all of them. Verified by rendering and inspecting.",
+      "caveat": "590px wide, so it upscales 1.53x to the 900px sheet cell and will read soft. Do not read the Finish criterion off this plate."
+    },
+    "1489630_00": {
+      "dir": "clean", "crop": null, "game": "Carrier Command 2",
+      "use": "Dark red-lit bridge built around a glowing holographic plot table, instrument screens around the walls, a window band forward. Layout and emissive-table treatment.",
+      "caveat": "Source is 1920x1017 (1.888), not 16:9, so fit() centre-crops about 3% off each side — dark bulkhead only. Carrier Command 2's art outside these dark bridge shots is flat-shaded low-poly and would score badly; this plate is a layout and emissive reference, not a materials bar."
+    },
+    "1489630_15": {
+      "dir": "clean", "crop": null, "game": "Carrier Command 2",
+      "use": "The same bridge at night with the carrier's lit flight deck visible through the window — a bright exterior seen from a dark interior. Same 1920x1017 caveat as 1489630_00."
+    },
+    "2853730_08": {
+      "dir": "clean", "crop": null, "game": "Skull and Bones",
+      "use": "Storm-grey sea, two ships shelling a fort: one tall white splash column standing in mid-frame, incendiary tracer arcs overhead, a bright impact on the fort wall. The only clean shell-splash column on the board.",
+      "caveat": "The ordnance is fantasy (fire arrows, rockets), so read the splash column, the storm water and the sky — not the projectile VFX."
+    }
+  },
+
+  "shots": {
+    "sea_dusk":        "552990_08",
+    "sea_night":       "494840_10",
+    "sea_noon":        "236390_14",
+    "bridge_table":    "1489630_00",
+    "bridge_night":    "1489630_15",
+    "bridge_lamp":     "494840_09",
+    "bridge_plot":     "1272010_04",
+    "bridge_red":      "1272010_02",
+    "guns_fire":       "1172620_07",
+    "guns_broadside":  "236390_09",
+    "fleet_wide":      "1272010_00",
+    "splash_miss":     "2853730_08",
+    "hit_explode":     "1272010_06",
+    "night_burn":      "1272010_01",
+    "shell_flight":    "242050_01",
+    "window_out@0.0":  "1272010_02",
+    "window_out@1.0":  "236390_14",
+    "match_cut":       null
+  },
+
+  "shot_notes": {
+    "sea_dusk": "552990_08's rect is sky and water and nothing else, which is exactly what an ocean/sky/light component renders. It is small (590px) and will read soft; score grade, not sharpness.",
+    "sea_night": "494840_10 carries a reframe (both:false) even though it has no UI — the uncropped shot is dominated by a submarine the renderer will not have. Even cropped it has a distant burning hulk, so the scenario should place one on the horizon or the comparison is not like for like. No press pack anywhere contains an empty night ocean.",
+    "sea_noon": "236390_14 has a hero battleship. Put one distant silhouetted hull in the scenario or accept a Composition loss.",
+    "fleet_wide": "1272010_00 (realistic WW2 convoy, cropped) is the honest match for warships spread across an ocean. 1172620_00 is the stylised alternative if the game's grade lands closer to Sea of Thieves.",
+    "guns_fire": "1172620_07 is the wide gun-deck version; 1172620_12 (cropped) is the close muzzle-flash version. Pick one and keep it fixed across rounds.",
+    "shell_flight": "242050_01 is the only plate here with projectiles visibly in the air. It is a storm scene with a sailing ship, so it is a VFX/atmosphere target, not a framing target.",
+    "window_out": "Scored as a pair. @0.0 against 1272010_02 (dark bridge, bright portholes) and @1.0 against 236390_14 (bright open sea). Both are daylight-outside, so the pair is internally consistent.",
+    "match_cut": "No plate. No shipped game does the peg-becomes-shell cut. Score on the rubric alone per BUILD_PLAN 4.3.",
+    "GAPS": "No defensible plate exists for a pure empty ocean at any time of day, for a shell in flight from a rifled naval gun, or for a bridge-to-ocean transition. Every candidate for those is listed above with the mismatch stated. Do not substitute a plate that does not match the shot — record the gap instead."
+  },
+
+  "dropped": {
+    "552990_00": "World of Warships — HUD edge to edge. No 16:9 rect large enough to hold a subject clears the minimap, the range labels and the bottom bars.",
+    "552990_02": "World of Warships — the splash cluster is the best on the board, but I cropped it to the tightest 16:9 rect that holds it and looked: the minimap corner and the Target-hits panel both survive, plus a red capture marker at (1175,683).",
+    "552990_05": "World of Warships — previously promoted from contaminated as 'the best splash plate we have'. Cropped to the proposed rect and looked: two red-and-white capture buoys survive, and the only rect that excludes them is a 3:1 strip that fit() would then crop a second time. Not rescuable. This is the plate the whole set was rebuilt around and it does not survive being looked at.",
+    "552990_06": "World of Warships — HUD edge to edge, same as 552990_00.",
+    "552990_07": "World of Warships — HUD edge to edge, same as 552990_00.",
+    "1172620_05": "Sea of Thieves — previously the plate for sea_dusk, shell_flight and window_out@1.0. It is a 1918x1080 269KB trailer frame, visibly soft and upscaled, and the dominant element is a giant green-eyed skull cloud. It is not 'open sea, low-frequency swell'; the swell is high-frequency chop. Three shots were pointed at a blurry fantasy-VFX plate.",
+    "1172620_08": "Sea of Thieves — labelled 'bright deck, sky bounce'. It is the green-lit Fort of the Damned at night. The key light is a fantasy green; nothing we build looks like this.",
+    "1172620_09": "Sea of Thieves — carries a '(C) MICROSOFT 2021, (C)DISNEY.' watermark bottom-right, and the subject is a licensed character.",
+    "1172620_11": "Sea of Thieves — carries a '(C) 2023 MICROSOFT. (C) & (TM) LUCASFILM LTD.' watermark bottom-left.",
+    "1172620_03": "Sea of Thieves — ghost fleet, teal fantasy volumetrics. Not an art target.",
+    "2853730_00": "Skull and Bones — full HUD plus floating player nameplates and a '1226' damage number in the middle of the frame. The previously recorded rect [0.22,0.08,0.56,0.54] contains both. Nothing survives.",
+    "2853730_01": "Skull and Bones — captioned 'sky + water colour grade, clean horizon haze' and used for both sea_noon and fleet_wide. There is no clean horizon: it is a coastal cove with cliffs and a waterfall, and the ship is firing rockets. Mislabelled.",
+    "2853730_02": "Skull and Bones — full HUD, giant shark.",
+    "2853730_09": "Skull and Bones — lightning waterspout. Fantasy VFX, not naval gunnery.",
+    "2853730_10": "Skull and Bones — ghost ship, cyan volumetrics. Not an art target.",
+    "1286220_00": "Sea Power — 'v0.1.0.1.12884' version string plus a Tactical Display panel and a bottom status bar. Unrescuable, and the game was already triaged below the bar.",
+    "1069660_14": "Ultimate Admiral: Dreadnoughts — captioned 'ship ablaze'; it is a top-down dockyard. Mislabelled, and the game is below the bar.",
+    "311310_*": "Naval Action — fetched 2026-08-05 and rejected. Clean of UI, but flat lighting, plain skies and dated water. It would score 4-5 against Sea of Thieves and drag the gate down.",
+    "812140_*": "Assassin's Creed Odyssey — fetched and rejected. Ancient galleys and fire arrows; wrong ordnance era and wrong VFX language.",
+    "311560_*": "Assassin's Creed Rogue — fetched and rejected. 2014 assets, below the bar, and nothing better than 242050_01 for naval gunnery.",
+    "2208920_*": "Assassin's Creed Valhalla — fetched and rejected. Longships, wrong era, no gunnery.",
+    "2964090_*": "World of Warships: Legends — fetched specifically for a clean splash column and rejected. All six official screenshots are HUD-covered gameplay or menus.",
+    "1659420_*": "Uncharted: Legacy of Thieves — fetched and rejected. The press pack is characters and land, and it carries a 'CAPTURED ON PC' watermark.",
+    "344240_*": "Man O' War: Corsair — fetched, not promoted; below the bar.",
+    "8170_*": "Battlestations Pacific — 2009, far below the bar.",
+    "806950_*": "Victory At Sea Pacific — below the bar.",
+    "1434950_*": "HighFleet — kept only as plot-display UI language, never as an art target.",
+    "887570_*": "NEBULOUS: Fleet Command — kept only as plot-display UI language, never as an art target."
+  }
+}

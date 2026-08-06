@@ -1,0 +1,408 @@
+{
+  "gate": -2.0,
+  "components": [
+    {
+      "id": "C1",
+      "name": "Ocean, sky, exterior light",
+      "status": "closed",
+      "shots": [
+        {
+          "id": "sea_night",
+          "plate": "494840_10",
+          "game": "UBOAT",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 5.0,
+              "ref": 7.5,
+              "gap": -2.5
+            },
+            {
+              "r": 2,
+              "ours": 7,
+              "ref": 4,
+              "gap": 3.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": 0.0,
+              "note": "median of two critics"
+            }
+          ]
+        },
+        {
+          "id": "sea_dusk",
+          "plate": "552990_08",
+          "game": "World of Warships",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3.0,
+              "ref": 8.5,
+              "gap": -5.5
+            },
+            {
+              "r": 2,
+              "ours": 5,
+              "ref": 8,
+              "gap": -3.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -3.0,
+              "note": "both critics agreed exactly"
+            }
+          ]
+        },
+        {
+          "id": "sea_noon",
+          "plate": "236390_14",
+          "game": "War Thunder",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 4.0,
+              "ref": 8.5,
+              "gap": -4.5
+            },
+            {
+              "r": 2,
+              "ours": 4,
+              "ref": 8,
+              "gap": -4.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -4.0,
+              "note": "both critics agreed exactly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "name": "Bridge interior + planning table",
+      "status": "closed",
+      "shots": [
+        {
+          "id": "bridge_night",
+          "plate": "1489630_15",
+          "game": "Carrier Command 2",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0
+            },
+            {
+              "r": 2,
+              "ours": 3,
+              "ref": 7,
+              "gap": -4.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -1.25,
+              "note": "median of \u22122.0 / \u22120.5"
+            }
+          ]
+        },
+        {
+          "id": "bridge_table",
+          "plate": "1489630_00",
+          "game": "Carrier Command 2",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 4,
+              "ref": 7,
+              "gap": -3.0
+            },
+            {
+              "r": 2,
+              "ours": 4,
+              "ref": 7,
+              "gap": -3.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -2.25,
+              "note": "median of \u22122.0 / \u22122.5 \u2014 missed by 0.25"
+            }
+          ]
+        },
+        {
+          "id": "bridge_lamp",
+          "plate": "494840_09",
+          "game": "UBOAT",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3.5,
+              "ref": 8.5,
+              "gap": -5.0
+            },
+            {
+              "r": 2,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -4.5,
+              "note": "median of \u22124.0 / \u22125.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "name": "Ship kit + gunfire",
+      "status": "closed",
+      "shots": [
+        {
+          "id": "fleet_wide",
+          "plate": "1272010_00",
+          "game": "Destroyer: The U-Boat Hunter",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 4,
+              "ref": 8,
+              "gap": -4.0
+            },
+            {
+              "r": 2,
+              "ours": 4,
+              "ref": 8,
+              "gap": -4.0
+            },
+            {
+              "r": 3,
+              "ours": 4,
+              "ref": 7.5,
+              "gap": -3.5
+            }
+          ]
+        },
+        {
+          "id": "guns_fire",
+          "plate": "1172620_07",
+          "game": "Sea of Thieves",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0
+            },
+            {
+              "r": 2,
+              "ours": 4,
+              "ref": 9,
+              "gap": -5.0
+            },
+            {
+              "r": 3,
+              "ours": 4,
+              "ref": 8,
+              "gap": -4.0
+            }
+          ]
+        },
+        {
+          "id": "guns_broadside",
+          "plate": "236390_09",
+          "game": "War Thunder",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 2,
+              "ref": 8,
+              "gap": -6.0
+            },
+            {
+              "r": 2,
+              "ours": 4,
+              "ref": 8,
+              "gap": -4.0
+            },
+            {
+              "r": 3,
+              "ours": 3,
+              "ref": 8.5,
+              "gap": -5.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C4",
+      "name": "Impact VFX \u2014 splash, explosion, fire",
+      "status": "closed",
+      "shots": [
+        {
+          "id": "splash_miss",
+          "plate": "2853730_08",
+          "game": "Skull and Bones",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 4,
+              "ref": 9,
+              "gap": -5.0
+            },
+            {
+              "r": 2,
+              "ours": 5,
+              "ref": 8,
+              "gap": -3.0
+            },
+            {
+              "r": 3,
+              "ours": null,
+              "ref": null,
+              "gap": -3.5,
+              "note": "median of \u22122.0 / \u22125.0 \u2014 widest critic split on the project"
+            }
+          ]
+        },
+        {
+          "id": "hit_explode",
+          "plate": "1272010_06",
+          "game": "Destroyer: The U-Boat Hunter",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3,
+              "ref": 9,
+              "gap": -6.0
+            },
+            {
+              "r": 2,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0
+            },
+            {
+              "r": 3,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0,
+              "note": "falloff work real but insufficient \u2014 still +23 at 700px"
+            }
+          ]
+        },
+        {
+          "id": "night_burn",
+          "plate": "1272010_01",
+          "game": "Destroyer: The U-Boat Hunter",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3,
+              "ref": 9,
+              "gap": -6.0
+            },
+            {
+              "r": 2,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0
+            },
+            {
+              "r": 3,
+              "ours": 3,
+              "ref": 8,
+              "gap": -5.0,
+              "note": "flat across frame; 0.001% of pixels above 240"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C6",
+      "name": "Director, sequences, shell, match cut",
+      "status": "closed",
+      "shots": [
+        {
+          "id": "shell_flight",
+          "plate": "242050_01",
+          "game": "AC IV: Black Flag",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3.0,
+              "ref": 7.5,
+              "gap": -4.5
+            },
+            {
+              "r": 2,
+              "ours": 4.0,
+              "ref": 7.5,
+              "gap": -3.5
+            }
+          ]
+        },
+        {
+          "id": "window_out@0.0",
+          "plate": "1272010_02",
+          "game": "Destroyer: The U-Boat Hunter",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 2.5,
+              "ref": 7.5,
+              "gap": -5.0,
+              "note": "plate is crushed \u2014 82.7% of it in luma 0\u201316"
+            },
+            {
+              "r": 2,
+              "ours": 4.0,
+              "ref": 7.5,
+              "gap": -3.5
+            }
+          ]
+        },
+        {
+          "id": "window_out@1.0",
+          "plate": "236390_14",
+          "game": "War Thunder",
+          "rounds": [
+            {
+              "r": 1,
+              "ours": 3.0,
+              "ref": 7.5,
+              "gap": -4.5
+            },
+            {
+              "r": 2,
+              "ours": null,
+              "ref": null,
+              "gap": -3.25,
+              "note": "median of \u22122.0 / \u22124.5 \u2014 second on-gate shot contradicted"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

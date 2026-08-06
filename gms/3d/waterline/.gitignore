@@ -1,0 +1,8 @@
+# Blind-critic sheets: each one is our render side by side with a copyrighted press
+# screenshot. They must never be published, and they are 44 MB.
+critique/
+# Same reason — 1.7 MB of plate JPEGs inlined into one page.
+tools/progress.html
+# Answer keys for the blind scoring, plus 41 MB of development renders.
+.keys/
+shots/

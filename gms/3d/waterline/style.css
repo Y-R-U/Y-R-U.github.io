@@ -1,0 +1,293 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #070b0f; }
+body {
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  color: #dbe3e8; -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none; touch-action: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+#stage { position: fixed; inset: 0; }
+#stage canvas { display: block; width: 100%; height: 100%; }
+
+#ui {
+  position: fixed; z-index: 10;
+  inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  pointer-events: none;
+}
+#ui > * { pointer-events: auto; }
+
+#hud {
+  position: fixed; z-index: 20; pointer-events: none;
+  top: calc(env(safe-area-inset-top) + 8px); left: calc(env(safe-area-inset-left) + 8px);
+}
+/* the perf readout is a dev tool: once the game is actually running it is off unless asked for */
+body.wl-play:not(.wl-perf) #hud { display: none; }
+#perf {
+  background: rgba(6,10,14,.78); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.09); border-radius: 6px;
+  padding: 8px 10px 9px; min-width: 216px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.perf-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.perf-fps { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.perf-fps s { text-decoration: none; font-size: 10px; opacity: .5; margin-left: 3px; }
+.perf-verdict { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.perf-top.ok .perf-verdict { color: #7cc98d; }
+.perf-top.warn .perf-verdict { color: #e0b24e; }
+.perf-top.bad .perf-verdict { color: #e8705a; }
+.perf-bar { position: relative; height: 3px; margin: 7px 0 8px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
+.perf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; transition: width .2s; }
+.perf-bar i.ok { background: #4f9c62; } .perf-bar i.warn { background: #c9973a; } .perf-bar i.bad { background: #c9503a; }
+.perf-bar u { position: absolute; left: 100%; top: -2px; width: 1px; height: 7px; background: rgba(255,255,255,.45); }
+.perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; }
+.perf-grid b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.perf-grid s { text-decoration: none; opacity: .45; font-size: 10px; margin-left: 4px; }
+.perf-grid i { font-style: normal; opacity: .5; font-weight: 400; }
+.perf-grid .warn b { color: #e0b24e; }
+.perf-grid .bad b { color: #e8705a; }
+.perf-grid .warn s, .perf-grid .bad s { opacity: .7; }
+
+#boot {
+  position: fixed; inset: 0; z-index: 60; background: #070b0f;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .35s;
+}
+#boot.gone { opacity: 0; pointer-events: none; }
+#boot .logo { font: 300 clamp(28px, 9vw, 44px)/1 Optima, Palatino, Georgia, serif; letter-spacing: .24em; }
+#boot .tag { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .4; }
+#boot-status { font-size: 11px; opacity: .35; margin-top: 12px; }
+
+/* ── game UI ─────────────────────────────────────────────────────────────────────────────────
+   Everything lives inside #ui, which is already inset by the safe area, so nothing below repeats
+   env(). Touch targets are 44px because the game is played one-handed on a phone. */
+
+:root {
+  --amber: #ffa63c;
+  --plot: #9fd8e8;
+  --ink: #050a0e;
+  --panel: rgba(8,14,20,.86);
+  --edge: rgba(255,255,255,.14);
+  --hit: #e8552f;
+}
+
+.wl-btn, .hud button, .sheet button, .panel button {
+  min-height: 44px; padding: 0 16px; border-radius: 7px; cursor: pointer;
+  background: rgba(12,20,28,.82); color: #dbe3e8; border: 1px solid var(--edge);
+  font: inherit; letter-spacing: .06em; -webkit-tap-highlight-color: transparent;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.hud button:active, .sheet button:active, .panel button:active { background: rgba(26,38,50,.9); }
+.sheet button.on, .hud button.on { border-color: var(--amber); color: var(--amber); }
+.sheet button[disabled], .hud button[disabled], .panel button[disabled] { opacity: .32; cursor: default; }
+.sheet button.big, .panel button.primary {
+  background: linear-gradient(180deg, rgba(255,166,60,.22), rgba(255,166,60,.08));
+  border-color: rgba(255,166,60,.6); color: #ffd8a6; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .14em;
+}
+.sheet button.link, .panel button.danger {
+  background: none; border-color: transparent; color: #9fb3c0; text-decoration: underline;
+  text-underline-offset: 4px; padding: 0 8px;
+}
+.panel button.danger { color: #e8836a; }
+
+/* ── in-play HUD ───────────────────────────────────────────────────────────────────────────── */
+
+#ui > .hud { position: absolute; inset: 0; pointer-events: none; }
+.hud[hidden] { display: none; }
+.hud > * { pointer-events: auto; }
+
+.hud-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; }
+.hud-pause { min-width: 44px; padding: 0; font-size: 11px; opacity: .8; }
+/* both sit straight on top of a lit chart, so they carry their own contrast */
+.hud-who, .hud-read { text-shadow: 0 1px 6px rgba(0,0,0,.9), 0 0 18px rgba(0,0,0,.6); }
+.hud-who { flex: 1; padding: 6px 4px; pointer-events: none; }
+.hud-who b { display: block; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+.hud-who s { text-decoration: none; display: block; font-size: 11px; opacity: .5; margin-top: 2px; }
+.hud.waiting .hud-who b { color: var(--plot); }
+
+.hud-own { background: var(--panel); border: 1px solid var(--edge); border-radius: 8px; padding: 6px; pointer-events: none; max-width: min(48vw, 230px); }
+.hud-own-grid {
+  display: grid; grid-template-columns: repeat(var(--cols, 10), 1fr); gap: 1px;
+  width: min(30vw, 118px);
+}
+.hud-own-grid i {
+  aspect-ratio: 1; background: rgba(255,255,255,.05); border-radius: 1px;
+}
+.hud-own-grid i.ship { background: rgba(159,216,232,.34); }
+.hud-own-grid i.miss { background: rgba(120,170,200,.16); box-shadow: inset 0 0 0 1px rgba(160,200,220,.3); }
+.hud-own-grid i.hit, .hud-own-grid i.ship.hit { background: var(--hit); }
+.hud-own-grid i.sunk, .hud-own-grid i.ship.sunk { background: #6f1d10; }
+/* 2×2 so the panel stays as wide as the grid above it — as one flex row the sunk-length chips
+   pushed it to twice that on a phone. */
+.hud-roster { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; font-size: 10px; opacity: .65; margin-top: 5px; }
+.hud-roster b { color: #fff; }
+.hud-roster i { font-style: normal; opacity: .8; display: flex; align-items: center; gap: 3px; }
+.hud-roster u {
+  text-decoration: none; font-size: 9px; line-height: 12px; padding: 0 4px; border-radius: 3px;
+  background: rgba(159,216,232,.16); color: #cfe9f3;
+}
+.hud-roster i:last-child u { background: rgba(232,85,47,.24); color: #f4c3b4; }
+.hud-roster u.none { background: none; opacity: .4; padding: 0; }
+
+.hud-bar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; gap: 8px; padding: 10px;
+}
+.hud-read { flex: 1; min-width: 0; pointer-events: none; }
+.hud-read b { display: block; font-size: 15px; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+.hud-read s { text-decoration: none; display: block; font-size: 11px; opacity: .45; }
+.hud-read s.warn { color: var(--amber); opacity: .9; }
+.hud-ord { display: flex; gap: 6px; }
+.hud-ord button { padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 1px; }
+.hud-ord button i { font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+.hud-ord button u { text-decoration: none; font-size: 10px; opacity: .55; }
+.hud-fire {
+  min-width: 104px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em;
+  background: linear-gradient(180deg, rgba(255,166,60,.26), rgba(255,120,40,.1));
+  border-color: rgba(255,166,60,.65); color: #ffd8a6;
+}
+.hud-fire[disabled] { background: rgba(12,20,28,.7); border-color: var(--edge); color: #dbe3e8; }
+
+/* ── screens ───────────────────────────────────────────────────────────────────────────────── */
+
+.screen {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(6,10,14,.72), rgba(4,7,10,.94));
+  overflow: auto; padding: 16px;
+}
+.screen[hidden] { display: none; }
+
+.sheet, .panel {
+  width: min(420px, 100%); background: var(--panel); backdrop-filter: blur(10px);
+  border: 1px solid var(--edge); border-radius: 14px; padding: 20px 18px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.sheet.wide { width: min(560px, 100%); }
+.sheet h1, .panel h1 { font: 300 24px/1.1 Optima, Palatino, Georgia, serif; letter-spacing: .12em; text-transform: uppercase; }
+.panel h2 { font-size: 11px; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; opacity: .5; margin-top: -8px; }
+.sheet .hint, .sheet .why, .sheet .foot { font-size: 12px; opacity: .6; }
+.sheet .why.bad { color: #e8836a; opacity: 1; }
+
+.brand { text-align: center; }
+.brand h1 { font-size: clamp(30px, 9vw, 44px); letter-spacing: .26em; }
+.brand p { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .4; margin-top: 6px; }
+
+.menu { display: flex; flex-direction: column; gap: 8px; }
+.menu button { text-align: left; padding: 10px 16px; min-height: 52px; }
+.menu button b { display: block; font-size: 14px; letter-spacing: .1em; }
+.menu button s { text-decoration: none; display: block; font-size: 11px; opacity: .5; margin-top: 2px; }
+.menu button.big { min-height: 60px; font-size: 18px; text-align: center; }
+.menu button.link { min-height: 34px; text-align: center; }
+.menu button.off { opacity: .45; }
+.resume-line {
+  display: flex; align-items: center; gap: 10px; justify-content: space-between;
+  font-size: 11px; opacity: .6; margin: -2px 2px 6px; line-height: 1.35;
+}
+.resume-line button { min-height: 32px; padding: 0 8px; font-size: 11px; flex: none; }
+.foot { display: flex; justify-content: space-between; align-items: center; }
+
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row > label { width: 78px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .5; }
+.stepper { display: flex; align-items: center; gap: 4px; }
+.stepper button { min-width: 40px; padding: 0; }
+.stepper b { min-width: 26px; text-align: center; font-size: 17px; font-variant-numeric: tabular-nums; }
+.stepper span { font-size: 10px; opacity: .45; }
+.ships, .lengths, .tiers { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.ships button { padding: 0 10px; display: flex; align-items: center; gap: 6px; }
+.ships button i { font-style: normal; color: var(--plot); letter-spacing: -1px; }
+.ships button u { text-decoration: none; font-size: 10px; opacity: .5; }
+.ships em { font-size: 12px; opacity: .5; align-self: center; }
+.lengths button, .tiers button { min-width: 44px; padding: 0 10px; font-size: 12px; }
+.actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.actions .big { flex: 1; min-width: 130px; }
+
+.rungs { list-style: none; display: flex; flex-direction: column; gap: 4px; max-height: 46vh; overflow: auto; }
+.rungs li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; border: 1px solid transparent; }
+.rungs li b { width: 22px; text-align: center; opacity: .45; font-variant-numeric: tabular-nums; }
+.rungs li i { font-style: normal; font-size: 14px; letter-spacing: .06em; }
+.rungs li s { text-decoration: none; display: block; font-size: 11px; opacity: .45; }
+.rungs li.beaten b { color: var(--plot); opacity: .8; }
+.rungs li.now { border-color: rgba(255,166,60,.55); background: rgba(255,166,60,.08); }
+.rungs li.now b { color: var(--amber); opacity: 1; }
+
+/* placement */
+.board {
+  display: grid; grid-template-columns: repeat(var(--cols, 10), 1fr); gap: 2px;
+  width: min(100%, 46vh); margin: 0 auto; touch-action: none;
+}
+.board button {
+  min-height: 0; aspect-ratio: 1; padding: 0; border-radius: 2px;
+  background: rgba(159,216,232,.07); border: 1px solid rgba(159,216,232,.12);
+}
+.board button.ship { background: rgba(159,216,232,.42); border-color: rgba(159,216,232,.6); }
+.board button.ship.sel { background: rgba(255,166,60,.5); border-color: var(--amber); }
+.board button.ghost { background: rgba(255,166,60,.3); }
+.board button.bad { background: rgba(232,85,47,.35); }
+.board.nope { animation: nope .22s; }
+@keyframes nope { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.tray { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.tray button { padding: 0 10px; display: flex; align-items: center; gap: 6px; }
+.tray button i { font-style: normal; color: var(--plot); letter-spacing: -2px; font-size: 11px; }
+.tray button u { text-decoration: none; font-size: 11px; opacity: .5; }
+.tray button.done { opacity: .4; }
+.tray button.on { border-color: var(--amber); }
+
+/* panels, toasts, notes */
+.panel-body p { font-size: 13px; opacity: .75; line-height: 1.5; }
+.panel-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.panel-actions button { flex: 1; min-width: 110px; }
+.field { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.field span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .5; }
+.field select {
+  min-height: 44px; background: rgba(12,20,28,.9); color: #dbe3e8; font: inherit;
+  border: 1px solid var(--edge); border-radius: 7px; padding: 0 10px; flex: 1; max-width: 62%;
+}
+
+#ui > .toasts { position: absolute; left: 0; right: 0; bottom: 84px; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; pointer-events: none; }
+.toast {
+  background: rgba(8,14,20,.9); border: 1px solid var(--edge); border-radius: 20px;
+  padding: 9px 16px; font-size: 12px; opacity: 0; transform: translateY(6px);
+  transition: opacity .25s, transform .25s; max-width: 88vw; text-align: center;
+}
+.toast.on { opacity: 1; transform: none; }
+
+#ui > .notes { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; pointer-events: none; padding: 8px; }
+.note {
+  pointer-events: auto; display: flex; align-items: center; gap: 10px;
+  background: rgba(8,14,20,.9); border: 1px solid var(--edge); border-radius: 10px;
+  padding: 8px 8px 8px 14px; font-size: 12px; max-width: min(520px, 92vw);
+}
+.note button { background: none; border: 0; color: inherit; font-size: 18px; opacity: .5; min-width: 32px; cursor: pointer; }
+
+.caption {
+  position: absolute; left: 50%; top: 14%; transform: translateX(-50%);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  opacity: 0; transition: opacity .3s; text-shadow: 0 1px 4px rgba(0,0,0,.8); pointer-events: none;
+}
+.caption.on { opacity: .8; }
+
+/* Portrait: the readout will not fit beside four controls, so it takes its own line above them. */
+@media (max-width: 560px) {
+  .hud-bar { flex-wrap: wrap; row-gap: 6px; }
+  .hud-read { flex: 0 0 100%; display: flex; align-items: baseline; gap: 8px; }
+  .hud-read b { display: inline; }
+  .hud-read s { display: inline; }
+  .hud-ord { flex: 1; }
+  .hud-ord button { flex: 1; padding: 0 8px; }
+  .hud-fire { min-width: 92px; letter-spacing: .12em; }
+}
+
+/* Landscape on a phone has no vertical room to spare: the board panel shrinks and the bars thin. */
+@media (max-height: 460px) {
+  .hud-own-grid { width: min(22vw, 92px); }
+  .hud-top, .hud-bar { padding: 6px 8px; }
+  .sheet, .panel { padding: 14px; gap: 10px; }
+  .sheet h1, .panel h1 { font-size: 19px; }
+  .board { width: min(100%, 40vh); }
+  .rungs { max-height: 38vh; }
+}
+
+/* screenshot mode: nothing but the render */
+body.shotmode #hud, body.shotmode #ui { display: none !important; }
