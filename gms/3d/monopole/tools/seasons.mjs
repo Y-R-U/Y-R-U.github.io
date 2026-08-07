@@ -76,6 +76,7 @@ function policy(state, bands, loan) {
   // refinery to cook it, a line to draw it — and the next missing piece of the set is always the
   // best thing to spend on.
   const mods = state.sites.ledger.modules;
+  const coil = content.get('module', 'coilline');
   const rigs = state.ships.filter(sh => content.get('ship', sh.class).mine > 0).length;
   const haulers = state.ships.length - rigs;
   const refineries = mods.filter(m => m === 'refinery').length;
@@ -83,32 +84,51 @@ function policy(state, bands, loan) {
   const next = lines < refineries ? { module: 'coilline' }
     : rigs < refineries ? { ship: 'ossa' }
       : haulers < Math.max(1, Math.ceil(refineries / 2)) ? { ship: 'kite' }
-        : state.ships.length < FLEET ? { module: 'refinery' } : null;
+        : state.ships.length < FLEET ? { module: 'refinery', opens: true } : null;
   if (next && state.week >= 2) {
     const def = next.ship ? content.get('ship', next.ship) : content.get('module', next.module);
-    if (state.cash >= def.cost + floor) {
-      acts.push(next.ship
+    const first = lines < 1;
+    // A half-built set is the worst place to run out of money — a second refinery with no line
+    // behind it is 460 a week of upkeep for nearly nothing — so a new set only opens once the
+    // whole rig-refinery-line trio is covered.
+    const set = content.get('ship', 'ossa').cost + content.get('module', 'refinery').cost + coil.cost;
+    const ceiling = loan.maxDraw * (first ? 0.85 : 0.6);
+    const keep = first ? floor : Math.max(floor, state.lastCosts * 4);
+    // opening a new set is judged on what the whole trio will cost against cash plus the credit
+    // still available, not on this week's cash — otherwise it never opens one at all
+    const capacity = state.cash + Math.max(0, ceiling - state.debt);
+    if (!next.opens || capacity >= set + keep) {
+      const buy = next.ship
         ? { type: 'buyShip', class: next.ship }
-        : { type: 'buyModule', module: next.module, site: 'ledger' });
-      return acts;
+        : { type: 'buyModule', module: next.module, site: 'ledger' };
+      const short = (def.cost + keep - state.cash) / (1 - (loan.drawFee || 0));
+      if (short <= 0) { acts.push(buy); return acts; }
+      // The draw and the purchase go in the same tick, or the week's costs eat the money on the
+      // way past and the company borrows the same 17k forever without ever owning anything.
+      if (state.debt < ceiling) {
+        acts.push({ type: 'loan', amount: short }, buy);
+        return acts;
+      }
     }
-    if (state.debt < loan.maxDraw * 0.8) acts.push({ type: 'loan', amount: def.cost + floor - state.cash });
   }
   const want = state.tactics.offered.find(id => !state.tactics.owned.includes(id));
   if (want) {
     const t = content.get('tactic', want);
     const need = Math.max(costOf(state, t) + floor, t.unlock.cash || 0);
-    if (state.cash < need && state.debt < loan.maxDraw) acts.push({ type: 'loan', amount: need - state.cash });
+    if (state.cash < need && state.debt < loan.maxDraw) acts.push({ type: 'loan', amount: (need - state.cash) / (1 - (loan.drawFee || 0)) });
   }
+  // an expired tactic is a tactic you can run again, and a price war that is never relaunched
+  // measures the appetite for one week of it rather than for the strategy
   const pick = state.tactics.unlocked
-    .filter(id => !state.tactics.owned.includes(id))
+    .filter(id => !state.tactics.active.some(a => a.id === id))
     .map(id => content.get('tactic', id))
     .filter(t => bands.includes(t.band) && state.cash >= costOf(state, t) + floor && requirementsMet(state, t))
     .sort((a, c) => BAND_RISK[c.band] - BAND_RISK[a.band])[0];
   if (pick) acts.push({ type: 'tactic', tactic: pick.id });
   const excess = state.debt - (state.startDebt ?? b.start.debt);
-  if (excess > 0 && !acts.length && state.cash > 20000) {
-    acts.push({ type: 'repay', amount: Math.min(excess, state.cash - 20000) });
+  const cushion = Math.max(20000, state.lastCosts * 6);
+  if (excess > 0 && !acts.length && state.cash > cushion) {
+    acts.push({ type: 'repay', amount: Math.min(excess, state.cash - cushion) });
   }
   return acts;
 }

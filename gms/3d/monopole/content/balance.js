@@ -5,6 +5,7 @@
 // share.window, heat.threshold, offer.weekMin/weekMax. Everything else should hold.
 
 export default Object.freeze({
+  // ships is empty: the first act is buying a hull from the shipyard, and the cash covers it.
   start: Object.freeze({
     cash: 82000, debt: 42000, rep: 0.5, heat: 0,
     ships: Object.freeze([]),
@@ -15,7 +16,7 @@ export default Object.freeze({
   // debtLimit is the overdraft the bank tolerates past zero cash, NOT the credit line
   // (that is maxDraw). Small on purpose — it is the whole bust lever.
   loan: Object.freeze({
-    interestWeekly: 0.012, debtLimit: 26000,
+    interestWeekly: 0.012, debtLimit: 29000,
     drawFee: 0.02, maxDraw: 94000,
   }),
 
@@ -72,14 +73,14 @@ export default Object.freeze({
   // the strain dot product adds on top. safeRunway is weeks of costs that count as slack.
   shock: Object.freeze({
     graceWeeks: 4, cooldownWeeks: 4,
-    baseChance: 0.033, strainChance: 0.15,
+    baseChance: 0.033, strainChance: 0.22,
     // A flat weekly hazard makes surviving strictly worse: a well-run company is ground down by
     // nothing but time, and the live game has no week limit. The whole draw decays toward
     // ageFloor over ageWeeks as the company proves itself — strain still sets the shape, so
     // overextension is punished at week 60 exactly as hard relative to caution as at week 6.
     ageFloor: 0.40, ageWeeks: 38,
     safeRunway: 9, fleetNorm: 6, shareNorm: 0.35,
-    strain: Object.freeze({ leverage: 0.34, thin: 0.40, heat: 0.14, transit: 0.12 }),
+    strain: Object.freeze({ leverage: 0.42, thin: 0.52, heat: 0.14, transit: 0.12 }),
   }),
 
   warn: Object.freeze({
@@ -89,7 +90,7 @@ export default Object.freeze({
   // the week window in which the first exclusivity offer may arrive
   offer: Object.freeze({
     // priceMult is a floor under the market price, not a premium over it
-    weekMin: 13, weekMax: 18, brand: 'ryland', commodity: 'filament',
+    weekMin: 10, weekMax: 15, brand: 'ryland', commodity: 'filament',
     tactic: 'exclusive_supply', units: 6, priceMult: 1.02,
   }),
 
@@ -98,7 +99,7 @@ export default Object.freeze({
   // quarter. holdWeeks/checkFromWeek still give an early clinch: hold a tier that long before the
   // deadline and the season is called there and then.
   win: Object.freeze({
-    monopoly: 0.50, duopoly: 0.35, oligopoly: 0.22,
+    monopoly: 0.45, duopoly: 0.35, oligopoly: 0.22,
     seasonWeeks: 52, reviewEvery: 13,
     checkFromWeek: 30, holdWeeks: 4,
   }),
@@ -112,10 +113,15 @@ export default Object.freeze({
   // is the floor. A cartel left running is a near-certain conviction by construction — 14 heat a
   // week against a threshold of 34 that sheds 1.5 — so the ceiling is 1.0 on every difficulty.
   targets: Object.freeze({
+    // week 20, not 13: nothing sells until about week 7 and the trailing average needs six weeks
+    // after that, so a week-13 reading is mostly the seeded history rather than the company
     shareAtWeek: 20,
     offerByWeek13: 0.80,
     bustRate: Object.freeze({ min: 0.05, max: 0.18 }),
-    shareAtWeek13: Object.freeze({ min: 0.12, max: 0.25 }),
+    // the base start is the medium origin's shape — no fleet, the same opening purchase, the same
+    // single production line — so it carries the same band. The old 25% ceiling described a
+    // company that was handed three hulls and started selling in week two.
+    shareAtWeek13: Object.freeze({ min: 0.12, max: 0.28 }),
     greyReachable: 0.85,
     greyReachableByWeek16: 0.60,
     illegalTaken: 0.15,

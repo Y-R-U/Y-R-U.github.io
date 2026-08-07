@@ -38,7 +38,7 @@ const STYLES = [
   { id: 'standard', floor: 3000, coilWeek: 5, bands: LEGAL, extraRig: false, repayAbove: 22000, drawTo: 0.74 },
   { id: 'aggressive', floor: 500, coilWeek: 4, bands: ['legal', 'grey'], extraRig: true, drawTo: 1 },
   { id: 'greedy', floor: 500, coilWeek: 4, bands: ['legal', 'illegal'], extraRig: true, drawTo: 1 },
-  { id: 'reckless', floor: 0, coilWeek: 1, bands: ['legal', 'grey', 'illegal'], extraRig: true, sprawl: true, drawTo: 1 },
+  { id: 'reckless', floor: 1500, coilWeek: 1, bands: ['legal', 'grey', 'illegal'], extraRig: true, drawTo: 1, maxOut: true },
 ];
 
 function policy(state, style) {
@@ -80,6 +80,8 @@ function policy(state, style) {
 
   const loan = loanOf(state);
   const cap = loan.maxDraw * (style.drawTo ?? 1);
+  // the fee comes out of the proceeds, so a draw for exactly the shortfall lands short of it
+  const draw = need => (need - state.cash) / (1 - (loan.drawFee || 0));
   // every hull, not just a rig — a hauler bought at week 6 and never given a loop is 18k of
   // upkeep that earns nothing, and no player would leave it parked
   for (const sh of state.ships) {
@@ -88,40 +90,43 @@ function policy(state, style) {
   }
   const mods = state.sites.ledger.modules;
   const coil = content.get('module', 'coilline');
-  // The line comes before a third hull, and it is the one thing every stand-in borrows for.
-  // Six tonnes of filament is worth three loads of halide and rides in the same hold, so a hauler
-  // bought first is 18k spent moving cargo that does not exist yet.
-  if (!mods.includes('coilline') && state.week >= style.coilWeek) {
-    if (state.cash >= coil.cost + style.floor) { acts.push({ type: 'buyModule', module: 'coilline', site: 'ledger' }); return acts; }
-    if (state.debt < loan.maxDraw * 0.9) acts.push({ type: 'loan', amount: coil.cost + style.floor - state.cash });
-    return acts;
-  }
   // a lost hull is unrecoverable if nobody ever replaces it, and every stand-in would
   const miners = state.ships.filter(sh => content.get('ship', sh.class).mine > 0).length;
   // A rig with nothing to carry for it earns nothing and neither does a hauler with nothing to
-  // load, so getting back to one of each is existential and neither the coil reserve nor the
-  // style's own caution stands in the way of it. Only the third hull waits for the line.
+  // load, so getting back to one of each comes before everything, including the line, and neither
+  // the coil reserve nor the style's own caution stands in the way of it.
   const crippled = miners < 1 || state.ships.length - miners < 1;
+  // The line comes before a third hull, and it is the one thing every stand-in borrows for.
+  // Six tonnes of filament is worth three loads of halide and rides in the same hold, so a hauler
+  // bought first is 18k spent moving cargo that does not exist yet. The draw and the purchase go
+  // in the same tick, or the week's costs eat the money on the way past and the company borrows
+  // the same 17k forever without ever owning anything.
+  if (!mods.includes('coilline') && !crippled && state.week >= style.coilWeek) {
+    const buy = { type: 'buyModule', module: 'coilline', site: 'ledger' };
+    if (state.cash >= coil.cost + style.floor) { acts.push(buy); return acts; }
+    if (state.debt < loan.maxDraw * 0.9) {
+      acts.push({ type: 'loan', amount: draw(coil.cost + style.floor) }, buy);
+      return acts;
+    }
+  }
   const held = mods.includes('coilline') || crippled ? 0 : coil.cost;
   if (state.ships.length < (style.extraRig ? 4 : 3)) {
     const cls = miners < 1 ? 'ossa' : 'kite';
     const def = content.get('ship', cls);
     const line = crippled ? loan.maxDraw : cap;
     if (state.cash >= def.cost + style.floor + held) acts.push({ type: 'buyShip', class: cls });
-    else if (state.debt < line) acts.push({ type: 'loan', amount: def.cost + style.floor + held - state.cash });
+    else if (state.debt < line) acts.push({ type: 'loan', amount: draw(def.cost + style.floor + held) });
   }
-  if (style.sprawl) {
-    if (state.debt < cap) acts.push({ type: 'loan', amount: loan.maxDraw });
-    if (state.week === 3) acts.push({ type: 'buyShip', class: 'kite' });
-    if (state.week === 4) acts.push({ type: 'buyModule', module: 'bay', site: 'ledger' });
-    if (state.week === 5) acts.push({ type: 'buyModule', module: 'refinery', site: 'ledger' });
-  }
+  // maxOut draws the whole line at week two and never pays a credit of it back. It used to buy a
+  // Dock Bay and a refinery it had no ore to feed as well, which left it permanently overdrawn —
+  // and an unlock is gated on cash in hand, so it went whole games without being shown a tactic.
+  if (style.maxOut && state.debt < cap) acts.push({ type: 'loan', amount: loan.maxDraw });
   // a real player borrows against the credit line to take the deal, which is what it is for
   const want = state.tactics.offered.find(id => !state.tactics.owned.includes(id));
   if (want) {
     const t = content.get('tactic', want);
     const need = Math.max(costOf(state, t) + style.floor, t.unlock.cash || 0);
-    if (state.cash < need && state.debt < cap) acts.push({ type: 'loan', amount: need - state.cash });
+    if (state.cash < need && state.debt < cap) acts.push({ type: 'loan', amount: draw(need) });
   }
   // riskiest affordable band first, not content order — content order made a cheap early grey
   // tactic hide everything after it from every style that could take one (gotcha 62)

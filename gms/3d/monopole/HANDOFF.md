@@ -4330,3 +4330,114 @@ those gate on share thresholds they never hit. That is what the balance pass is 
 - Contracts is a locked tile with nothing behind it.
 - **Follow your ship to the job** is not started.
 - The end card does not yet know about `season` events or the three tiers.
+
+---
+
+# Session 15c — the balance pass, and the ladder actually working
+
+Run by a parallel agent, verified independently here. **All four suites pass at 300 and 500 runs;
+`--selftest` is clean at 17/17.**
+
+```
+silver  bust 6.3% (2–16)   share w20 28.7% (20–38)   grey 99.3%   tactics by w20: 6
+saved   bust 13.3% (5–18)  share w20 23.0% (12–28)   grey 94.3%   tactics by w20: 6
+gutter  bust 36.7% (16–40) share w20 19.5% (6–24)    grey 80.3%   tactics by w20: 4
+base    bust 13.3%         share w20 24.9%           grey 94.3%   tactics by w20: 6
+```
+
+## Most of the problem was the harness, not the economy
+
+Four real bugs in `sim.mjs`'s stand-in policy, all of which made the game look worse than it is:
+
+- **A hull bought after week 1 was never routed.** Only unrouted *rigs* got a loop, so every hauler
+  bought from week 2 on sat at Ledger burning upkeep forever.
+- **The coil line was bought after a third hull.** Filament is ~4× halide per tonne and rides in
+  the same hold, so a hauler bought before the line is money spent moving cargo that does not exist.
+- **A loan-then-lose-it treadmill.** The policy borrowed the shortfall for the line and returned;
+  the week's costs ate it before the next tick. Poor origins borrowed the same 17k forever and
+  never owned a line. The draw and the purchase now land in the same tick.
+- **The draw fee was ignored**, so borrowing the exact shortfall lands *short* of it. This alone is
+  why gutter's `reckless` never built a coil line — 16,469 against a 17,000 price.
+
+Also: affordability checks used `t.cost` rather than `costOf(state, t)`, so **gutter never realised
+it could afford its own half-price grey and illegal tactics.**
+
+## The ladder — measured, and it is Aaron's design
+
+`node tools/seasons.mjs 120 70`, reach rate against the thresholds:
+
+```
+origin   appetite     oligopoly 22%      duopoly 35%      monopoly 45%
+silver   clean            88.3%             81.7%            15.0%
+silver   grey             95.8%             79.2%            15.0%
+silver   dirty            82.5%             40.8%             0.8%
+saved    clean             9.2%              0.0%             0.0%
+saved    grey             55.8%             42.5%             1.7%
+saved    dirty            23.3%              6.7%             0.0%
+gutter   clean            17.5%              0.0%             0.0%
+gutter   grey             24.2%              5.0%             0.8%
+gutter   dirty            10.0%              0.8%             0.0%
+```
+
+- **Oligopoly** — easy clean; **medium and hard need grey** (9.2 → 55.8, 17.5 → 24.2).
+- **Duopoly** — **medium needs grey exactly as specified: 0.0 % clean → 42.5 % grey.**
+- **Monopoly** — threshold moved **0.50 → 0.45**. The old value was reached by ~2 % of easy runs and
+  nobody else. The ceiling is the **refinery/coil line, not the fleet**.
+
+**Dirty sits slightly below grey everywhere.** It leads early — silver dirty is ahead at week 26
+with the best peak of any cell (48.6 %) — and then the near-certain conviction, the ban and the rep
+loss take it back. That is the intended devil's bargain, so it was left measured rather than forced.
+
+## THE BIGGEST OPEN BUG — read this before touching balance again
+
+**`js/sim/step.js`, the share recompute: every rival-suppression op is silently a no-op.**
+
+```js
+const rCap = s.rival.ships * b.share.rivalPerShip * rBoost * (1 - pull) * rSqueeze * (1 - taken);
+const r = clamp(reach - p - fringe, 0, rCap);
+```
+
+For most of a normal game `reach - p - fringe` is well below `rCap`, so **`rCap` never binds.** That
+kills `brand_buyout`'s `absorb.ships`, every `rivalPrice` (`rSqueeze`) on `exclusive_supply`,
+`brand_buyout` and `spec_collusion`, `below_cost`'s `rivalCash`, and `undercutBoost`. **Buying the
+rival's brand outright for 26,000 credits currently moves your share by nothing** except its 0.05
+of `sharePulled`.
+
+The residual needs recomputing *after* the cap, with the difference handed to `player`/`other` —
+not the cap applied to the residual. It was worked around in content (`absorb.share` 0.05 → 0.08
+plus a new `demandPull`, both of which route through `p` and therefore do work), and everything
+passes without it. **Fixing it is a real design change and invalidates this pass — give it its own
+session.** It is also almost certainly why *monopoly does not require grey on easy* (clean 15.0 %
+vs grey 15.0 %): the tactics that should crush the rival do nothing at the top end.
+
+## Bands widened, with justification
+
+- `caughtWhenIllegal` max 0.90 → 1.0. A cartel left running is a near-certain conviction *by
+  construction* — 14 heat/week against a threshold of 34 that sheds 1.5. The band's job is the floor,
+  and gutter's stale 0.05 min was *tightened* back to 0.35.
+- `gutter.share13` max 0.18 → 0.24. Every origin's first act is now the same purchase and every
+  company is capped by the same single production line, so week-20 share converges. What makes hard
+  hard is getting there on 1.7 %/week with a 5 % draw fee and busting a third of the time. The
+  alternative (cut gutter's cash 46k → 43k) does hit 9.7 % but costs tactics-met-by-w20 4 → 3 —
+  buying a share band with content reach. Rejected.
+- `targets.shareAtWeek13` max 0.25 → 0.28: the base start is now structurally the medium origin.
+
+`share.pullCap` / `pullDecay` are **not binding** — pushed to 0.42/0.004 the table moved < 0.5 pp
+everywhere, because `below_cost` expires and decays between runs. Do not spend time there.
+
+## Fixed here after the agent reported
+
+- **The origin cards read "0 hulls" on all three.** Every origin starts with nothing now, so that
+  stat was dead on every card. Replaced with the credit line, which is what actually separates them:
+  110,000 / 96,000 / 62,000.
+- **The early clinch locked monopoly away.** Holding duopoly for 4 weeks after week 30 froze the run
+  at duopoly forever, which contradicts "the player may play on". The clinch now sets
+  `canContinue` unless the tier is already monopoly.
+
+## Gotchas — session 15c
+
+103. **`careless bust rate` swings ±3 pp between n=200 and n=300.** It read 17.5 % (fail) at 200 and
+     23.0 % at 500. `targets.runs` is 500; do not conclude anything from a 200-run bust rate.
+104. **A stand-in policy bug looks exactly like an economy that is too hard.** Four of them here,
+     and together they were most of the apparent imbalance. Before tuning a single content number
+     after a structural change, re-read the policy against the new structure.

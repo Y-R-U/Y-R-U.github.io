@@ -324,7 +324,9 @@ export function step(state, { actions = [], rng } = {}) {
     if (s.holdStreak >= w.holdWeeks && s.week < w.seasonWeeks) {
       s.over = tier;
       s.seasonTier = tier;
-      emit({ t: 'win', tier, share: s.share.player, week: s.week, early: true });
+      // clinching duopoly early must not lock monopoly away for the rest of the run
+      s.canContinue = tier !== 'monopoly';
+      emit({ t: 'win', tier, share: s.share.player, week: s.week, early: true, canContinue: s.canContinue });
     } else if (s.week === w.seasonWeeks) {
       s.seasonTier = tier;
       s.over = tier || 'alsoran';

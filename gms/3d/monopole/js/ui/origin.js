@@ -97,7 +97,7 @@ function originHtml() {
         <span><b>${esc(credits(o.start.cash))}</b><s>in hand</s></span>
         <span><b>${esc(credits(o.start.debt))}</b><s>owed</s></span>
         <span><b>${esc(pct(o.loan.interestWeekly, 1))}</b><s>a week</s></span>
-        <span><b>${o.start.ships.length}</b><s>${o.start.ships.length === 1 ? 'hull' : 'hulls'}</s></span>
+        <span><b>${esc(credits(o.loan.maxDraw))}</b><s>credit line</s></span>
       </div>
     </button>`).join('');
 
