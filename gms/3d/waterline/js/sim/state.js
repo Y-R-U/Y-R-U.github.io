@@ -175,12 +175,14 @@ export function placeFleet(game, side, placements) {
   return [ev];
 }
 
-// Force an exact layout, for framing a shot on the same board every round. Only legal before the
-// match starts: rewriting the `place` event once anyone is aiming would retroactively falsify a
-// stream a renderer may already be holding.
+// Force an exact layout, for framing a shot on the same board every round, and for the in-play
+// fleet editor. The guard that matters is the untouched-board one below — that is the actual cheat.
+// D33: AIM is legal while this side's board is still blank, i.e. before the enemy has resolved a
+// single shot on you. The `place` event is rewritten in situ, so a stream a renderer already holds
+// stays consistent with the board.
 export function setBoard(game, side, ships) {
   if (side !== 0 && side !== 1) throw new RulesError('side must be 0 or 1');
-  if (game.phase !== 'SETUP' && game.phase !== 'PLACING') throw new RulesError('setBoard after the match has started');
+  if (game.phase !== 'SETUP' && game.phase !== 'PLACING' && game.phase !== 'AIM') throw new RulesError('setBoard after the match has started');
   const p = game.players[side];
   if (p.board.some(v => v !== UNKNOWN)) throw new RulesError('setBoard after that side has been fired on');
   const why = validatePlacements(game.w, game.h, game.fleet, ships);

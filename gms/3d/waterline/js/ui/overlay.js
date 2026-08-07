@@ -5,6 +5,7 @@
 //   panel()  a choice that the player has to make — result, pause, settings. It waits for a tap.
 //   toast()  something that happened. It leaves on its own and blocks nothing.
 //   note()   a standing condition (no localStorage). Dismissible, never in the way.
+//   slate()  where and when you are. Title-card weight, still nothing to tap.
 
 import { UI } from '../config.js';
 import { register } from './flow.js';
@@ -22,6 +23,14 @@ export function buildOverlay(mount) {
   const notes = document.createElement('div');
   notes.className = 'notes';
   mount.appendChild(notes);
+
+  const slates = document.createElement('div');
+  slates.className = 'slates';
+  mount.appendChild(slates);
+
+  const cuts = document.createElement('div');
+  cuts.className = 'cuts';
+  mount.appendChild(cuts);
 
   let current = null;
   let resolve = null;
@@ -49,6 +58,10 @@ export function buildOverlay(mount) {
     },
 
     hide() { if (resolve) close(null); else { current = null; root.hidden = true; root.innerHTML = ''; } },
+
+    // A slate holds for 2.6 s and outlives a screen change otherwise — the hour of a match you have
+    // already left, sitting over the title.
+    clearSlates() { slates.innerHTML = ''; },
 
     // Returns the chosen action's `value`. A panel with no actions cannot be dismissed, so every
     // caller must give it at least one way out.
@@ -94,6 +107,44 @@ export function buildOverlay(mount) {
         setTimeout(() => el.remove(), 400);
       }, ms);
       return el;
+    },
+
+    // The hour the match is set at, over the settled bridge (D32). Not the dramatisation caption —
+    // that one is C6's, is gated by its own shouldShow(), and says something else entirely.
+    slate(line, sub, ms = 2600) {
+      const el = document.createElement('div');
+      el.className = 'slate';
+      el.innerHTML = '<b></b><i></i>';
+      el.querySelector('b').textContent = line;
+      el.querySelector('i').textContent = sub || '';
+      slates.appendChild(el);
+      requestAnimationFrame(() => el.classList.add('on'));
+      setTimeout(() => {
+        el.classList.remove('on');
+        setTimeout(() => el.remove(), 900);
+      }, ms);
+      return el;
+    },
+
+    // The controls that ride over a cutscene: a Skip, and the checkbox that stops it happening
+    // again. Not a panel — it must not wait for a tap, and it must not dim what it is sitting on.
+    cutscene({ label = 'Skip', option, checked = false, onSkip, onOption }) {
+      const el = document.createElement('div');
+      el.className = 'cut';
+      el.innerHTML = `
+        ${option ? `<label class="cut-opt"><input type="checkbox"><span></span></label>` : ''}
+        <button class="cut-skip"></button>`;
+      el.querySelector('.cut-skip').textContent = label;
+      el.querySelector('.cut-skip').onclick = () => onSkip?.();
+      if (option) {
+        const box = el.querySelector('input');
+        box.checked = !!checked;
+        el.querySelector('.cut-opt span').textContent = option;
+        box.onchange = () => onOption?.(box.checked);
+      }
+      cuts.appendChild(el);
+      requestAnimationFrame(() => el.classList.add('on'));
+      return { el, close() { el.remove(); } };
     },
 
     note(text) {

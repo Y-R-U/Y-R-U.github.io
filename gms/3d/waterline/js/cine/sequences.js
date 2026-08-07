@@ -35,14 +35,16 @@ export function registerSequences(director, world) {
 
   // The two interior poses everything else hangs off. atTable is the resting board view; atWindow
   // is a step forward, level with the sill, from which the fly-out leaves.
-  const atTable = () => table().add(v(-0.62, 1.80, -3.15));
+  // 1.30 is UI.camera.ceiling: the table is 0.95 above a deck with 2.68 of headroom, so 1.80 put
+  // every resting pose 7 cm INSIDE the deckhead (D31). It also makes the hand-over to C7's play
+  // pose nearly a no-op.
+  const atTable = () => table().add(v(-0.62, 1.30, -3.15));
   const tableLook = () => table().add(v(0.52, 1.00, 1.5));
   const atWindow = () => win().add(v(0.05, 0.02, -2.6));
 
-  // Outside, in the world the window looks at (+Z). Heights are ABOVE THE WATER, not above the
-  // deck: ROOM.deck is 18 m up, so the fly-out is a real 20 m drop.
-  const outNear = () => win().add(v(1.5, -1.5, 34));
-  const outWide = () => win().add(v(-24, -1.0, 122));
+  // Where bridge_return cuts in from, offset from the window and ABOVE THE WATER, not above the
+  // deck. It has to clear the flagship: 34 m out at sill height is inside her forward barrels.
+  const outNear = () => win().add(v(1.5, 5.5, 62));
 
   director.registerSequence('open_flyover', function* (rig, ctx) {
     const c = ctx.at || v(0, 0, 260);
@@ -65,15 +67,17 @@ export function registerSequences(director, world) {
     // the camera simply appearing in it
     rig.drift(0.22, 0.5, 0.19);
     rig.fov(52, 1500);
+    // the last waypoint is level with the middle of the glass, not 1.6 m above the sill: coming in
+    // over the header meant arriving looking DOWN into the room from inside its own roof (D31)
     rig.path([
       c.clone().add(v(40, 54, 90)),
-      w.clone().add(v(16, 12, 46)),
-      w.clone().add(v(3.2, 1.6, 12)),
-    ], 1500, { ease: EASE.inOut, look: [w.clone().add(v(0, 0.2, 2))] });
+      w.clone().add(v(16, 9, 46)),
+      w.clone().add(v(3.2, 0.2, 12)),
+    ], 1500, { ease: EASE.inOut, look: [w.clone().add(v(0, 0.0, 2))] });
     yield { until: 1500 };
 
     rig.exposure(CINE.exposure.exterior, CINE.exposure.interior, 1200, CINE.exposure.lagMs);
-    rig.move(w.clone().add(v(3.2, 1.6, 12)), atTable(), w.clone().add(v(0, 0.2, 2)), tableLook(), 1200, EASE.settle);
+    rig.move(w.clone().add(v(3.2, 0.2, 12)), atTable(), w.clone().add(v(0, 0.0, 2)), tableLook(), 1200, EASE.settle);
     rig.drift(0.06, 0.16, 0.13);
     yield { until: 1200 };
   });
@@ -84,17 +88,43 @@ export function registerSequences(director, world) {
     rig.fov(48);
     rig.exposure(CINE.exposure.interior, CINE.exposure.interior, 0);
     rig.drift(0.05, 0.14, 0.13);
-    rig.move(atTable().add(v(0.35, 0.42, -0.8)), atTable(), tableLook(), tableLook(), 900, EASE.settle);
+    rig.move(atTable().add(v(0.35, 0.10, -0.8)), atTable(), tableLook(), tableLook(), 900, EASE.settle);
     rig.on(() => rig.freeLook(true));
     yield { until: 900 };
   });
 
-  // Brief step 3. Out of the window, drop to the water, swing round to put the guns in frame.
+  // Brief step 3. Out of the window, then round onto the firing ship's bow so her guns go off in
+  // the lens. The last two beats are posed from ctx.gun, not from the window: an offset authored
+  // against the window anchor frames whatever happens to be 120 m out of it, which is sea.
   director.registerSequence('fire_out', function* (rig, ctx) {
     const short = ctx.pace !== 'full';
-    const gun = ctx.gun || v(0, 24, 40);
+    const gun = ctx.gun || v(0, 20, 36);
     const aim = ctx.aim || v(0, 8, 900);
-    const a = atTable(), b = atWindow(), o = outNear(), p = outWide();
+    const a = atTable(), b = atWindow(), w = win();
+
+    // A station off the muzzle, forward of it and up. `d` is scaled by the firing ship so the hull
+    // fills the same fraction of the frame whether she is a 36 m destroyer or a 115 m battleship;
+    // at fov 52 the frame is 0.98 × its distance wide, so 0.45 L lands about half a hull across it.
+    const bore = aim.clone().sub(gun).setY(0).normalize();
+    const beam = v(-bore.z, 0, bore.x);
+    // stand on the side the round is NOT drifting toward, so it leaves across the frame rather
+    // than straight down the lens. Both fleets face along Z, so `beam` is ±X and x is the test.
+    const sign = (aim.x - gun.x) * beam.x > 0 ? -1 : 1;
+    const d = Math.min(60, Math.max(30, (ctx.len || 90) * 0.45));
+    const stn = gun.clone()
+      .addScaledVector(beam, sign * d * 0.78)
+      .addScaledVector(bore, d * 0.30)
+      .add(v(0, d * 0.30, 0));
+    // Framed on the hull BEHIND the muzzle, not on the muzzle: aimed at the gun itself the ship
+    // runs out of one corner and half the frame is sea. The guns point roughly ahead, so backing
+    // down the bore is backing down the deck.
+    const hold = gun.clone().addScaledVector(bore, -d * 0.55);
+    // where the frame drifts to as the guns go — a point just down the bore. A fraction of the way
+    // to a target 900 m away swings the whole ship out of shot on the first frame.
+    const away = gun.clone().addScaledVector(bore, d * 0.5).add(v(0, d * 0.12, 0));
+    // still leaves through the glass: the transit is what motivates the exposure change instead of
+    // it reading as a fade (BUILD_PLAN §7.1 fallback, taken up front)
+    const o = w.clone().add(v(0, -1.4, 22)).lerp(stn, 0.20);
 
     rig.on(() => rig.freeLook(false));
     rig.exposure(CINE.exposure.interior, CINE.exposure.exterior, short ? 420 : 760, CINE.exposure.lagMs);
@@ -102,19 +132,19 @@ export function registerSequences(director, world) {
     rig.move(a, b, tableLook(), win().add(v(0.3, -0.6, 26)), short ? 260 : 520, EASE.inCubic);
     yield { until: short ? 260 : 520 };
 
-    // through the glass and out: the window frame passes the lens, which is what motivates the
-    // exposure change instead of it reading as a fade (BUILD_PLAN §7.1 fallback, taken up front)
     rig.fov(52, short ? 300 : 640);
-    rig.move(b, o, win().add(v(0.3, -0.6, 26)), gun.clone().add(v(0, -2, 26)), short ? 300 : 640, EASE.out);
+    rig.move(b, o, win().add(v(0.3, -0.6, 26)), hold, short ? 300 : 640, EASE.out);
     yield { until: short ? 300 : 640 };
 
     rig.drift(0.3, 0.7, 0.23);
-    rig.move(o, p, gun.clone().add(v(0, -2, 26)), gun, short ? 260 : 560, EASE.inOut);
+    rig.move(o, stn, hold, hold, short ? 260 : 560, EASE.inOut);
     yield { until: short ? 260 : 560 };
 
-    // the guns go off in our face
+    // the guns go off in our face. The flash is fired HERE rather than after the sequence returns:
+    // played out, it landed on the first frame of shell_chase and was never seen from this pose.
+    if (ctx.flash) rig.on(ctx.flash);
     rig.kick(0.9, 460, 19);
-    rig.pose(460, u => ({ look: _lerp(gun, aim, EASE.out(u) * 0.5) }));
+    rig.pose(460, u => ({ look: _lerp(hold, away, EASE.out(u) * 0.55) }));
     yield { until: 460 };
   });
 
@@ -214,6 +244,85 @@ export function registerSequences(director, world) {
     yield { until: short ? 300 : 620 };
   });
 
+  // P3 — appended, nothing above is touched. Out of the window, up over your own formation to watch
+  // the escorts take their new stations, then back to the board. The flagship does not move (D34),
+  // so the shot is you leaving your own ship and the rest of the fleet re-forming around you.
+  //
+  // Everything variable arrives in ctx: `centre` and `radius` are the bounding circle of the fleet
+  // over BOTH the old and the new stations, `aspect` is the viewport's. Solving the station from
+  // those is the only way the whole formation is in frame in portrait as well as landscape — a
+  // fixed pose that frames it at 16:9 crops a third of it away at 390×844.
+  director.registerSequence('fleet_reform', function* (rig, ctx) {
+    const c = v(ctx.cx || 0, 0, ctx.cz || 0);
+    const R = Math.max(120, ctx.radius || 260);
+    const aspect = ctx.aspect || 1.78;
+    const hold = Math.max(1200, ctx.ms || 2600);
+    const fov = aspect < 1 ? 70 : 54;
+    const tan = Math.tan((fov * Math.PI) / 360);
+    // The formation is widest across the line of sight, and half the frame subtends d·tan(fov/2)
+    // vertically and that × aspect horizontally — so in portrait the horizontal is what binds, by
+    // a factor of nearly four. Solving it is the only way the fleet is in frame at 390×844 as well
+    // as at 16:9; 0.95 puts the outermost hull on the frame edge rather than inside it.
+    const PHI = 30 * Math.PI / 180;                      // camera elevation above the fleet
+    const d = Math.min(900, Math.max(260, (R * 0.95) / (tan * Math.min(1, aspect) * Math.cos(PHI))));
+    // Stand on the far side of the fleet FROM the sun and look back across it into the sunset. D32
+    // is the reason: a dusk sea photographed away from the sun is orange water with nothing in
+    // frame to explain it, which is exactly the shot Aaron called broken.
+    let sx = -(ctx.sunX ?? 0.39), sz = -(ctx.sunZ ?? 0.92);
+    const sl = Math.hypot(sx, sz) || 1;
+    sx /= sl; sz /= sl;
+    const stn = c.clone().add(v(sx * d * Math.cos(PHI), d * Math.sin(PHI), sz * d * Math.cos(PHI)));
+    // raising the look point by `u` metres at range `dist` moves the scene down by u/(dist·tan)
+    // NDC, so this is "put the fleet 0.16 of a frame below centre" written as arithmetic — and
+    // what comes down into the top of the frame in its place is the horizon and the sun
+    const look = c.clone().add(v(0, 0.11 * d * tan, 0));
+    const w = win();
+
+    rig.on(() => rig.freeLook(false));
+    rig.fov(50, 600);
+    rig.exposure(CINE.exposure.interior, CINE.exposure.exterior, 760, CINE.exposure.lagMs);
+    rig.drift(0.1, 0.28, 0.18);
+    rig.move(atTable(), atWindow(), tableLook(), w.clone().add(v(0.2, -0.4, 30)), 620, EASE.inCubic);
+    yield { until: 620 };
+
+    // climb away from the glass on a curve — a straight lerp from the sill to a station 400 m up
+    // reads as a lift, not as a camera leaving a ship. The exit waypoint is always forward through
+    // the glass whichever side of the fleet the station ends up on.
+    const exit = w.clone().add(v(0, 8, 70));
+    rig.fov(fov, 1500);
+    rig.drift(0.24, 0.5, 0.15);
+    rig.path([
+      atWindow(),
+      exit,
+      exit.clone().lerp(stn, 0.45).add(v(0, 0.14 * d, 0)),
+      stn.clone().lerp(c, 0.06),
+    ], 1500, { ease: EASE.inOut, look: [w.clone().add(v(0.2, -0.4, 30)), look.clone().add(v(0, 30, 0)), look] });
+    yield { until: 1500 };
+
+    // the escorts get under way here, and the camera keeps closing a little so the formation is
+    // still settling into a frame that is still moving
+    if (ctx.start) rig.on(ctx.start);
+    rig.drift(0.5, 0.6, 0.09);
+    rig.move(stn.clone().lerp(c, 0.06), stn.clone().lerp(c, -0.04), look, look, hold, EASE.linear);
+    yield { until: hold };
+
+    rig.exposure(CINE.exposure.exterior, CINE.exposure.interior, 1100, CINE.exposure.lagMs);
+    rig.fov(48, 1300);
+    rig.drift(0.14, 0.3, 0.16);
+    const back = outNear();
+    rig.path([
+      stn.clone().lerp(c, -0.04),
+      stn.clone().lerp(back, 0.5).add(v(0, 0.10 * d, 0)),
+      back,
+    ], 1300, { ease: EASE.inOut, look: [look, win().add(v(0, -1, 30))] });
+    yield { until: 1300 };
+
+    rig.move(back, atTable(), win().add(v(0, -1, 30)), tableLook(), 820, EASE.settle);
+    rig.drift(0.05, 0.14, 0.13);
+    rig.on(() => rig.freeLook(true));
+    yield { until: 820 };
+  });
+
   registerShotSequences(director, world);
 
   // Everything C7 needs, published onto the hook main.js already built. A microtask, because
@@ -243,10 +352,25 @@ function buildPresenter(director, world) {
     return p ? p.clone() : new THREE.Vector3(0, 0, side ? 900 : -900);
   };
 
-  const gunPos = (side, shipId) => {
-    const a = fleet.gunFor?.(side, shipId);
-    if (!a) return new THREE.Vector3(0, 22, side ? 60 : -60);
-    return a.getWorldPosition(new THREE.Vector3());
+  // The ship that fires, trained onto the target, and the ONE anchor both the camera and the flash
+  // come from. Pass 1 looked a TARGET ship's id up in the FIRING side's list and separately asked
+  // for `gunFor(side, null)`, so the two could — and did — disagree.
+  //
+  // A turret's bore is local +X and the hull carries its own heading, so the training angle is
+  // atan2(−dz, dx) less the hull's rotation.y.
+  const gunner = (side, at) => {
+    const ship = fleet.firingShip?.(side) ?? null;
+    const anchor = ship?.handle.gunAnchors[0] ?? fleet.gunFor?.(side, null) ?? null;
+    if (ship && at) {
+      const o = ship.handle.object3D;
+      const p = o.getWorldPosition(new THREE.Vector3());
+      const face = Math.atan2(p.z - at.z, at.x - p.x) - o.rotation.y;
+      ship.handle.trainGuns(Math.max(-2.4, Math.min(2.4, wrap(face))));
+    }
+    const pos = anchor
+      ? anchor.getWorldPosition(new THREE.Vector3())
+      : new THREE.Vector3(0, 22, side ? FLEET_FALLBACK : -FLEET_FALLBACK);
+    return { ship, anchor, pos };
   };
 
   const api = {
@@ -263,7 +387,7 @@ function buildPresenter(director, world) {
       const sunkIds = events.filter(e => e.t === 'sunk');
       const first = results[0] || { r: shot.anchor.r, c: shot.anchor.c, hit: false };
       const target = cellPos(shot.at, first.r, first.c);
-      const gun = gunPos(shot.side, results.find(x => x.shipId != null)?.shipId ?? null);
+      const { ship: firer, anchor, pos: gun } = gunner(shot.side, target);
       const size = ORD_SIZE[shot.kind] ?? 1;
 
       if (mode === 'instant') {
@@ -273,9 +397,11 @@ function buildPresenter(director, world) {
       }
 
       if (mine) {
-        await director.play('fire_out', { gun, aim: target, size });
-        const flash = fleet.gunFor?.(shot.side, null);
-        if (flash) vfx.muzzle(flash, size);
+        await director.play('fire_out', {
+          gun, aim: target, size,
+          len: firer?.handle.length ?? 90,
+          flash: anchor ? () => { firer?.handle.fireGun(0); vfx.muzzle(anchor, size); } : null,
+        });
       } else {
         await director.play('enemy_volley', {
           own: cellPos(mySide, first.r, first.c).setY(14), foe: gun, at: target, size,
@@ -335,4 +461,6 @@ function buildPresenter(director, world) {
 }
 
 const ORD_SIZE = { shell: 1, heavy: 4, salvo: 9 };
+const FLEET_FALLBACK = 60;
+const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
 const wait = ms => new Promise(r => setTimeout(r, ms));

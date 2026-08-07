@@ -11,9 +11,11 @@
 import * as sim from '../sim/index.js';
 import * as net from '../net/multiplayer.js';
 import { buildTable } from '../world/table.js';
+import { GRADES } from '../world/sky.js';
 import { MODES, UI } from '../config.js';
 import { createAim } from './aim.js';
 import { createPresenter } from './present.js';
+import { buildLayoutPanel } from './layout.js';
 
 const TIERS = sim.TIER_NAMES;
 
@@ -47,7 +49,7 @@ export const flow = {
   busy: false,
 };
 
-let hook, app, save, hud, setup, ladderUI, overlay, aim, present;
+let hook, app, save, hud, setup, ladderUI, overlay, aim, present, layout;
 let table = null;                 // the table sized to THIS match
 let dramaSeed = 0;                // the seed the DISPLAYED enemy fleet is drawn from (§7)
 const tables = new Map();         // one per grid size; main.js builds the 10x10 one
@@ -78,11 +80,15 @@ function boot() {
     onCommit: shot => fire(shot),
   });
   present = createPresenter({ hook, getTable: () => table, settings });
+  // main.js is frozen and builds four UI modules; this is a fifth, so it is built from here. It
+  // lives inside #ui, which is what keeps aim.js from raycasting the chart under it.
+  layout = buildLayoutPanel(hud.root.parentNode);
 
   hud.bind({
     onArm: kind => armKind(kind),
     onConfirm: () => aim.commit(),
     onPause: () => pause(),
+    onFleet: () => openLayout(),
   });
   setup.bind({
     onResume: () => resumeMatch(),
@@ -117,6 +123,13 @@ function boot() {
   addEventListener('pagehide', saveMatch);
   addEventListener('beforeunload', saveMatch);
 
+  app.add({ update: dt => tickDusk(dt) });
+
+  // The env map is a render target, so a lost GL context takes it and three cannot re-upload a
+  // texture that has no pixels in JS. main.js read `sky.env` — a getter — once at boot and never
+  // again, so the reassignment has to happen from here.
+  app.onRestore(() => { app.scene.environment = hook.world.sky.refreshEnv(); });
+
   // main.js's hook.sim.* closes over a `game` that only its own newGame() sets, and a resumed match
   // never goes through it. That file is frozen, so the accessor is repointed here instead.
   const priorGame = hook.sim.game;
@@ -129,7 +142,9 @@ function boot() {
   showTitle();
 }
 
-const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true });
+const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true, flyout: 'on' });
+// A save written before P3 has no `flyout` key, so anything that is not an explicit 'off' is on.
+const flyoutOn = () => settings().flyout !== 'off';
 
 const label = (shot, cells) => `${coord(shot.r, shot.c, shot.kind)} · ${cells.length} cell${cells.length > 1 ? 's' : ''}`;
 
@@ -160,6 +175,10 @@ function go(name) {
   setup.hideAll();
   ladderUI.hide();
   overlay.hide();
+  overlay.clearSlates();
+  layout.close();
+  hud.cue(false);
+  document.body.classList.remove('wl-cine');
   hud.show(name === 'play');
   if (name !== 'play') aim.setActive(false);
 }
@@ -205,6 +224,8 @@ function showSettings() {
         options: [['auto', 'Auto (shorten as the match runs)'], ['full', 'Always full'], ['off', 'Off — stay on the table']] },
       { key: 'place', label: 'Fleet', type: 'select', value: s.place,
         options: [['auto', 'Auto-place'], ['manual', 'Place it myself']] },
+      { key: 'flyout', label: 'Fly-out', type: 'select', value: flyoutOn() ? 'on' : 'off',
+        options: [['on', 'Watch the fleet re-form'], ['off', 'Change the layout without it']] },
     ],
     actions: [
       { label: 'Reset progress', value: 'reset' },
@@ -285,7 +306,9 @@ function enterMatch(game, cfg, flyover) {
   const name = cfg.mode === 'ladder' ? cfg.name : TIERS[cfg.tier ?? 2];
 
   useTable(cfg.w, cfg.h);
-  playScene();
+  // Cinematics off means no flyover to open under a noon sky, so there is nothing for the blend to
+  // arrive from — it would be 4 s of the sky changing over a board already being played.
+  playScene(flyover && settings().cine !== 'off');
   go('play');
   present.reset();
   const v = refresh();
@@ -306,9 +329,11 @@ async function opening(flyover) {
   hud.setBusy(true);
   aim.release();
   await present.open(flyover);
+  if (flyover && settings().cine !== 'off') beginDusk();
   flow.busy = false;
   hud.setBusy(false);
   nextTurn();
+  maybeCue();
 }
 
 // Nobody else lays the fleets out, and every cinematic beat asks the fleet where a cell is.
@@ -316,8 +341,9 @@ async function opening(flyover) {
 // where the enemy's ships are, and that is exactly what D2's caption is for. It is drawn from its
 // own seed, which leaks nothing about the layout seed and is stored with the match so a resume
 // puts the enemy back where the player last saw them.
+// Runs whatever the cinematic setting is: side 0 carries the flagship the bridge is built into, so
+// skipping it leaves the room floating with nothing under it (D30).
 function layoutFleets(v) {
-  if (settings().cine === 'off') return;
   const f = hook.world.fleet;
   try {
     const mine = v.ships.map(s => ({ id: s.id, len: s.len, ...corner(s.cells) }));
@@ -333,6 +359,137 @@ const corner = cells => ({
   c: cells[0].c,
   dir: cells.length > 1 && cells[1].r === cells[0].r ? 'h' : 'v',
 });
+
+// ── the fleet layout editor, and the fly-out on save (D33) ───────────────────────────────────
+//
+// D33: `setBoard` is legal in AIM while your own board is untouched. The phase check was never the
+// cheat; being fired on is. So the panel is editable for what is in practice your whole first turn,
+// and after that it still opens — read-only, with the reason on screen. A dead control that gives
+// no reason is worse than no control.
+
+function layoutLocked() {
+  const g = flow.game, v = flow.view;
+  if (!g || !v) return 'No battle is running.';
+  if (g.phase !== 'AIM') return 'This battle is over.';
+  if (v.ownGrid.some(x => x !== sim.UNKNOWN)) {
+    return 'The enemy has your range. Your fleet is committed for the rest of this battle.';
+  }
+  // Turn 0 and busy is the opening flyover, not a shot — saying a round is in the air would be a
+  // lie, and the reason line is the whole point of the read-only panel.
+  if (flow.busy) {
+    return v.turns ? 'A shot is still in the air. The fleet can be moved once it lands.'
+      : 'Wait for the bridge to settle.';
+  }
+  if (g.sideToMove !== 0) return 'The enemy is firing. Wait for your move.';
+  return null;
+}
+
+function openLayout() {
+  const v = flow.view;
+  if (!v || flow.screen !== 'play' || layout.isOpen()) return;
+  save.patch('seen', { fleet: true });
+  hud.cue(false);
+  const why = layoutLocked();
+  aim.setActive(false);
+  layout.open({
+    w: v.w, h: v.h, fleet: [...v.fleet],
+    ships: v.ships.map(s => ({ len: s.len, ...corner(s.cells) })),
+    grid: v.ownGrid,
+    editable: !why,
+    reason: why || '',
+    onSave: list => { saveLayout(list); },
+    // `busy` means a beat or the fly-out closed it, and that owner restores the camera itself.
+    onClose: reason => { if (reason !== 'save' && !flow.busy) afterLayout(); },
+  });
+}
+
+// Everything the editor changed, committed in one call. The sim is the authority: if it refuses,
+// nothing in the world moves and the player is told why.
+async function saveLayout(list) {
+  const g = flow.game;
+  const before = flow.view.ships.map(s => corner(s.cells));
+  try { sim.setBoard(g, 0, list); }
+  catch (e) { overlay.toast(e.reason || e.message); afterLayout(); return; }
+  const v = refresh();
+  saveMatch();
+  const moved = list.some((s, i) => s.r !== before[i].r || s.c !== before[i].c || s.dir !== before[i].dir);
+  if (moved) await flyout(v);
+  else overlay.toast('Fleet unchanged');
+  afterLayout();
+}
+
+// Leave the bridge, watch the escorts take their new stations, come back. The flagship carries the
+// room and does not move (D34) — that is the shot, not a limitation.
+async function flyout(v) {
+  const fleet = hook.world.fleet;
+  const ms = UI.layout.reformMs;
+  const mine = v.ships.map(s => ({ id: s.id, len: s.len, ...corner(s.cells) }));
+  let move;
+  try { move = fleet.reform(0, { fleet: mine }, { ms }); }
+  catch (e) { console.warn('[waterline] reform', e); layoutFleets(v); return; }
+
+  const director = hook.cine?.director;
+  if (!flyoutOn() || settings().cine === 'off' || !director?.has?.('fleet_reform')) {
+    move.finish();
+    overlay.toast('Fleet re-formed');
+    return;
+  }
+
+  flow.busy = true;
+  hud.setBusy(true);
+  aim.setActive(false);
+  aim.release();
+  const controls = overlay.cutscene({
+    label: 'Skip',
+    option: "Don't show this again",
+    checked: !flyoutOn(),
+    onSkip: () => { try { director.skip(); } catch {} },
+    onOption: on => save.patch('settings', { flyout: on ? 'off' : 'on' }),
+  });
+  // The HUD is the room's instrument panel, not the film's — it has no business over a shot of the
+  // sea. One class, so the HUD's own state machine is untouched and it comes back as it was.
+  document.body.classList.add('wl-cine');
+  try {
+    const b = move.bounds;
+    const sun = hook.world.sky.sunDir;
+    await director.play('fleet_reform', {
+      cx: b.cx, cz: b.cz, radius: b.radius, ms,
+      aspect: app.camera.aspect || 1.78,
+      sunX: sun?.x, sunZ: sun?.z,
+      start: () => move.start(),
+    });
+  } catch (e) {
+    console.warn('[waterline] fly-out', e);
+  } finally {
+    document.body.classList.remove('wl-cine');
+    controls.close();
+    // Skipped or watched, the ships end on their new stations. This is the line that makes the two
+    // paths land the same board.
+    move.finish();
+  }
+}
+
+function afterLayout() {
+  flow.busy = false;
+  hud.setBusy(false);
+  if (flow.screen !== 'play') return;
+  aim.take();
+  aim.setActive(true);
+  try { app.quality.set('exposure', UI.aimExposure); } catch {}
+  refresh();
+}
+
+// Once per player, not once per match, and only while the box would actually do something. `seen`
+// is written when it is SHOWN, not when it is used: a player who ignored it once has been told.
+function maybeCue() {
+  if (save.get('seen', {}).fleet) return;
+  if (flow.screen !== 'play' || layoutLocked()) return;
+  setTimeout(() => {
+    if (flow.screen !== 'play' || layoutLocked() || save.get('seen', {}).fleet) return;
+    hud.cue(true);
+    save.patch('seen', { fleet: true });
+  }, UI.layout.cueDelayMs);
+}
 
 function build(opts, placements) {
   const g = hook.sim.newGame(opts);
@@ -426,12 +583,14 @@ function useTable(w, h) {
 
 // ── the scene the game is played in ──────────────────────────────────────────────────────────
 
-function playScene() {
-  const { sky, lighting, bridge, bridgeLights } = hook.world;
+// `fromNoon` opens the match under a midday sky for the flyover; `duskScene()` is still applied
+// first so the end state is reached by exactly one code path (D32).
+function playScene(fromNoon) {
+  const { bridge, bridgeLights } = hook.world;
+  dusking = null;
   try {
-    sky.setGrade('dusk');
-    sky.setSun(23, 1.9);
-    lighting.setGrade('dusk');
+    duskScene();
+    if (fromNoon) noonScene();
     bridge.setEnv(0.16);
     bridge.setHaze(0x2a2018, 0.055);
     bridge.setCrewRim(0x4a3a3c, 1.0);
@@ -449,6 +608,45 @@ function playScene() {
       if (o.name === 'ship') o.visible = false;
     }
   } catch (e) { console.warn('[waterline] play scene', e); }
+}
+
+// The look the match is played at and every bridge shot is authored against. setSun mutates
+// GRADES.dusk, which is why this runs before anything reads that grade as a blend target.
+function duskScene() {
+  const { sky, lighting, ocean } = hook.world;
+  sky.setGrade('dusk');
+  sky.setSun(23, 1.9);
+  lighting.setGrade('dusk');
+  ocean.setSeaState(null);
+}
+
+function noonScene() {
+  const { lighting, ocean } = hook.world;
+  lighting.setGrade('noon');
+  // Dusk's sea held across the whole opening: `state` indexes SEA_STATES, so a blended grade can
+  // only ever step between two of them, and that step doubles the wave height in one frame.
+  ocean.setSeaState(GRADES.dusk.sea.state);
+}
+
+// Aaron, on a phone: the flyover's orange water reads as broken because nothing in frame explains
+// it; from inside the bridge the same grade "looks amazing". So the sky states its hour and turns
+// (D32). Deliberately not awaited — the board is live behind it and a tap must land.
+let dusking = null;
+
+function beginDusk() {
+  const o = UI.opening;
+  overlay.slate(o.log, o.logNote, o.slateMs);
+  dusking = { el: 0, hold: o.holdMs / 1000, ms: o.blendMs / 1000 };
+}
+
+function tickDusk(dt) {
+  if (!dusking) return;
+  dusking.el += dt;
+  const u = (dusking.el - dusking.hold) / dusking.ms;
+  if (u <= 0) return;
+  if (u >= 1) { dusking = null; duskScene(); return; }
+  const t = u * u * (3 - 2 * u);
+  hook.world.sky.blend('noon', 'dusk', t);
 }
 
 function parkCamera() {
@@ -515,6 +713,8 @@ async function enemyTurn() {
 
 async function beat(events, by) {
   flow.busy = true;
+  layout.close();
+  hud.cue(false);
   aim.setActive(false);
   aim.release();
   hud.setBusy(true);
@@ -663,6 +863,11 @@ export function debugHandle() {
     fire: shot => fire(shot ?? aim.shot()),
     view: () => (flow.game ? sim.view(flow.game, 0) : null),
     title: () => showTitle(),
+    dusking: () => dusking,
+    openLayout: () => openLayout(),
+    layoutLocked: () => layoutLocked(),
+    layoutPanel: () => layout,
+    saveLayout: list => saveLayout(list),
     stored: () => storedMatch(),
     resume: () => resumeMatch(),
     persist: () => saveMatch(),

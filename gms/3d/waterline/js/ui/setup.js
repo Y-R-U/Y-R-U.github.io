@@ -30,6 +30,57 @@ function fitFleet(w, h, wanted) {
   return fleet;
 }
 
+// Rejection sampling, longest ship first, falling back to the sim's guaranteed-legal packing. The
+// packing alone is what `placeFleet(…, null)` falls back to and it lays every ship out in rows or,
+// rotated, in columns — as an auto-place preview that reads as a bug rather than as a fleet.
+// `randomPlacement` itself is internal to js/sim/, so the scatter is done here. The placement
+// screen and the in-play layout editor both call this; there is one scatter, not two.
+export function scatterFleet(w, h, fleet) {
+  const order = fleet.map((len, i) => ({ len, i })).sort((a, b) => b.len - a.len);
+  const out = new Array(fleet.length);
+  const occ = new Int8Array(w * h).fill(-1);
+  for (const { len, i } of order) {
+    let placed = null;
+    for (let t = 0; t < BOARD.placeTries && !placed; t++) {
+      const dir = Math.random() < 0.5 ? 'h' : 'v';
+      const r = Math.floor(Math.random() * (dir === 'h' ? h : h - len + 1));
+      const c = Math.floor(Math.random() * (dir === 'h' ? w - len + 1 : w));
+      if (freeAt(occ, w, h, len, r, c, dir)) placed = { len, r, c, dir };
+    }
+    if (!placed) return packFleet(w, h, fleet);
+    out[i] = placed;
+    for (const { r, c } of cellsOf(placed)) occ[r * w + c] = i;
+  }
+  return out;
+}
+
+export const cellsOf = s => Array.from({ length: s.len }, (_, k) => ({
+  r: s.dir === 'h' ? s.r : s.r + k,
+  c: s.dir === 'h' ? s.c + k : s.c,
+}));
+
+// placeFleet checks placements[i].len against fleet[i] and packedPlacement emits its own order, so
+// the result is matched back to the fleet slot by length rather than by position.
+function packFleet(w, h, fleet) {
+  const pool = sim.packedPlacement(sim.makeRng((Math.random() * 1e9) | 0), w, h, fleet);
+  return fleet.map(len => {
+    const i = pool.findIndex(p => p.len === len);
+    const p = pool.splice(i < 0 ? 0 : i, 1)[0];
+    return { len, r: p.r, c: p.c, dir: p.dir };
+  });
+}
+
+export function freeAt(occ, w, h, len, r, c, dir, skip = -1) {
+  for (let k = 0; k < len; k++) {
+    const rr = dir === 'h' ? r : r + k;
+    const cc = dir === 'h' ? c + k : c;
+    if (rr < 0 || cc < 0 || rr >= h || cc >= w) return false;
+    const on = occ[rr * w + cc];
+    if (on >= 0 && on !== skip) return false;
+  }
+  return true;
+}
+
 export function buildSetup(mount, opts = {}) {
   const root = document.createElement('div');
   root.className = 'screen screen-setup';
@@ -281,45 +332,8 @@ export function buildSetup(mount, opts = {}) {
       board.classList.add('nope');
     }
 
-    // Rejection sampling, longest ship first, falling back to the sim's guaranteed-legal packing.
-    // The packing alone is what `placeFleet(…, null)` falls back to and it lays every ship out in
-    // rows or, rotated, in columns — as an auto-place preview that reads as a bug rather than as a
-    // fleet. `randomPlacement` itself is internal to js/sim/, so the scatter is done here.
     function auto() {
-      const order = placing.fleet.map((len, i) => ({ len, i })).sort((a, b) => b.len - a.len);
-      const out = new Array(placing.fleet.length);
-      const occ = new Int8Array(placing.w * placing.h).fill(-1);
-      const stamp = (s, id) => {
-        for (let k = 0; k < s.len; k++) {
-          occ[(s.dir === 'h' ? s.r : s.r + k) * placing.w + (s.dir === 'h' ? s.c + k : s.c)] = id;
-        }
-      };
-      for (const { len, i } of order) {
-        let placed = null;
-        for (let t = 0; t < 400 && !placed; t++) {
-          const dir = Math.random() < 0.5 ? 'h' : 'v';
-          const r = Math.floor(Math.random() * (dir === 'h' ? placing.h : placing.h - len + 1));
-          const c = Math.floor(Math.random() * (dir === 'h' ? placing.w - len + 1 : placing.w));
-          if (fits(len, r, c, dir, occ)) placed = { len, r, c, dir };
-        }
-        if (!placed) { fallback(); return; }
-        out[i] = placed;
-        stamp(placed, i);
-      }
-      placing.ships = out;
-      placing.sel = -1;
-      paint();
-    }
-
-    // placeFleet checks placements[i].len against fleet[i] and packedPlacement emits its own order,
-    // so the result is matched back to the fleet slot by length rather than by position.
-    function fallback() {
-      const pool = sim.packedPlacement(sim.makeRng((Math.random() * 1e9) | 0), placing.w, placing.h, placing.fleet);
-      placing.ships = placing.fleet.map(len => {
-        const i = pool.findIndex(p => p.len === len);
-        const p = pool.splice(i < 0 ? 0 : i, 1)[0];
-        return { len, r: p.r, c: p.c, dir: p.dir };
-      });
+      placing.ships = scatterFleet(placing.w, placing.h, placing.fleet);
       placing.sel = -1;
       paint();
     }

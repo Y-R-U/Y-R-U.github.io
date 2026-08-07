@@ -9,6 +9,7 @@
 // different instruments the reference plates have and a repeated sprite does not.
 
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { getMaterial } from './materials/index.js';
 import { ATLAS_TILES, setEnvIntensity } from './materials/bridge.js';
 import { pumpTables } from './table.js';
@@ -23,6 +24,12 @@ import {
 import { bakeStatic } from './merge.js';
 
 export const ROOM = { w: 11.4, d: 7.2, h: 2.68, deck: 18, sill: 1.02, head: 2.18 };
+
+// The room's OUTSIDE. Every plate in the compartment faces inward, so before this the bridge was
+// invisible from the sea and the fly-in arrived in a room with no building around it. `pedestal` is
+// how far the house reaches below its own deck to meet the flagship's tower; `wing` is the
+// half-width of the open bridge wings, which is what makes the silhouette read as a bridge.
+const HOUSE = { skin: 0.24, pedestal: 1.95, wing: 7.60, eave: 0.55 };
 
 // Where the deckhead fixtures physically are. The geometry and the lamps that go with them are
 // both built from this, so a red practical can never end up lighting a place it is not mounted.
@@ -249,6 +256,59 @@ export function buildBridge(quality) {
     room.add(g);
     if (!glassPlane) glassPlane = g;
   });
+
+  // ── the house: what the room looks like from outside ──────────────────────────────────────
+  //
+  // Room space, so it turns with `setHeading` and rides the same bake. The side walls stop at the
+  // outboard end of the bay (BAY[0]) — the window run itself is already closed from outside by the
+  // sill and header boxes above, and a wall carried any further forward stands in the port view.
+
+  // GAP is not slack, it is the whole reason the shell works: every plate in the compartment is a
+  // single-sided plane, and a shell face flush against one of them z-fights across the entire
+  // surface. Measured — a flush roof striped the whole deckhead in bridge_night.
+  const T = HOUSE.skin, GAP = 0.08, bayZ = D / 2 - 1.35;
+  const wallY = [H + 2 * (T + GAP), H / 2];
+  const off = T / 2 + GAP;
+  const house = [
+    { p: [0, -off, (-(D / 2 + off) + (D / 2 + 0.15)) / 2], s: [W + 2 * off, T, D + off + 0.15] },
+    { p: [0, -(T + GAP + HOUSE.pedestal / 2), -0.2], s: [W - 1.0, HOUSE.pedestal, D + 1.6] },
+    { p: [0, wallY[1], -(D / 2 + off)], s: [W + 2 * off, wallY[0], T] },
+    { p: [0, H + off, (-(D / 2 + off) + (D / 2 + HOUSE.eave)) / 2],
+      s: [W + 2 * off + 2 * HOUSE.eave, T, D + off + HOUSE.eave] },
+  ];
+  for (const sx of [-1, 1]) {
+    house.push({ p: [sx * (W / 2 + off), wallY[1], (-(D / 2 + off) + bayZ) / 2], s: [T, wallY[0], D / 2 + off + bayZ] });
+    const wx = sx * (W / 2 + HOUSE.wing) / 2, ww = HOUSE.wing - W / 2;
+    house.push({ p: [wx, -off, 0.5], s: [ww, T, 5.0] });
+    house.push({ p: [sx * (HOUSE.wing - 0.09), 0.42, 0.5], s: [0.18, 0.95, 5.0] });
+    house.push({ p: [wx, 0.42, 2.91], s: [ww, 0.95, 0.18] });
+    house.push({ p: [wx, 0.42, -1.91], s: [ww, 0.95, 0.18] });
+    // the bracket the wing stands on, so it does not hang off the side of the house unsupported
+    house.push({ p: [sx * (W / 2 + 0.55), -0.70, 0.5], s: [1.5, 0.9, 3.4] });
+  }
+  // The bay's sill and header boxes are the compartment's own panel, so from outside the front of
+  // the bridge was a warm brown wheelhouse bolted to a grey warship. Skin them, on the segment's
+  // outboard face — 0.15 clears the 0.16-thick frame.
+  for (const sg of segs) {
+    const n = [Math.sin(sg.ry), Math.cos(sg.ry)];
+    for (const [cy, hgt] of [[(sill - T) / 2, sill + T], [(head + H + T) / 2, H + T - head]]) {
+      house.push({ p: [sg.mid[0] + n[0] * 0.15, cy, sg.mid[1] + n[1] * 0.15], ry: sg.ry, s: [sg.len + 0.10, hgt, 0.14] });
+    }
+  }
+  // On the SHIP's structure material, not the compartment's: the house is painted steel seen from
+  // outside in daylight, and the interior panel is a warm-lit bulkhead. That material reads vertex
+  // colours for its AO — a box without the attribute renders BLACK — and its plating has a real
+  // metre scale, so each part is unwrapped to its own size. Merged: one extra draw call.
+  const houseMesh = new THREE.Mesh(mergeGeometries(house.map(o => {
+    const g = tileUV(new THREE.BoxGeometry(o.s[0], o.s[1], o.s[2]),
+      Math.max(o.s[0], o.s[2]) / 2.6, Math.max(o.s[1], Math.min(o.s[0], o.s[2])) / 2.6);
+    g.setAttribute('color', new THREE.BufferAttribute(
+      new Float32Array(g.attributes.position.count * 3).fill(1), 3));
+    if (o.ry) g.rotateY(o.ry);
+    return g.translate(o.p[0], o.p[1], o.p[2]);
+  }), false), getMaterial('hull', 'turret'));
+  houseMesh.castShadow = houseMesh.receiveShadow = true;
+  room.add(houseMesh);
 
   // ── consoles ──────────────────────────────────────────────────────────────────────────────
 

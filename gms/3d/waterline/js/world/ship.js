@@ -300,7 +300,10 @@ function strut(a, b, r, seg = 6) {
 
 // ── superstructure ──────────────────────────────────────────────────────────────────────────
 
-function superstructure(S, kit, r, detail) {
+// `bridge`, when given, is the flagship's playable room: `{ deck, top }` in metres above the
+// waterline. The tower is built up to `deck` and stops — the room is the tier above it — and the
+// masts hang off `top` instead of off a director cap that would stand inside the room.
+function superstructure(S, kit, r, detail, bridge) {
   const parts = [];
   const glass = [];
   const ao = [];                            // deck footprints that want a contact shadow
@@ -321,9 +324,12 @@ function superstructure(S, kit, r, detail) {
   const tiers = detail > 1 ? 4 : detail ? 3 : 2;
   foot(uB, L * 0.16, B * 0.62);
   for (let i = 0; i < tiers; i++) {
-    const h = S.free * (0.62 - i * 0.06) * (0.85 + r() * 0.3);
-    parts.push(block(len, h, w, 0.90 - i * 0.02, S.stationX(uB, 1) - i * len * 0.06, y, 0, (r() - 0.5) * 0.02));
-    if (i === tiers - 2 && detail) {
+    let h = S.free * (0.62 - i * 0.06) * (0.85 + r() * 0.3);
+    const ry = (r() - 0.5) * 0.02;
+    const capped = bridge && y + h >= bridge.deck;
+    if (capped) h = bridge.deck - y;
+    if (h > 0.05) parts.push(block(len, h, w, 0.90 - i * 0.02, S.stationX(uB, 1) - i * len * 0.06, y, 0, ry));
+    if (!bridge && i === tiers - 2 && detail) {
       // bridge wings — a warship's widest point above the deck, and the shape that reads as a
       // bridge rather than as a chimney at any distance
       parts.push(block(len * 0.42, h * 0.32, B * 0.92, 0.98, S.stationX(uB, 1) - len * 0.1, y + h * 0.55, 0));
@@ -331,15 +337,19 @@ function superstructure(S, kit, r, detail) {
     }
     y += h;
     shelf(S.stationX(uB, 1) - i * len * 0.06, y, 0, len, w);
+    if (capped) break;
     w *= 0.80; len *= 0.80;
   }
   // director / rangefinder cap
-  parts.push(cyl(w * 0.34, w * 0.40, S.free * 0.34, 8, S.stationX(uB, 1) - len * 0.2, y, 0, { flatZ: 0.7 }));
-  const bridgeTop = y;
+  if (!bridge) parts.push(cyl(w * 0.34, w * 0.40, S.free * 0.34, 8, S.stationX(uB, 1) - len * 0.2, y, 0, { flatZ: 0.7 }));
+  const bridgeTop = bridge ? bridge.top : y;
   if (detail > 1) {
     // an inclined ladder up the bridge front: two decks of it, at human rise and human going
+    // on the flagship it stops at the tower head; run full height it climbs past the bridge
+    // windows and stands in the middle of the starboard view
     ladders.push({ x0: S.stationX(uB, 1) + L * 0.075, y0: dk(uB), z: B * 0.20,
-      x1: S.stationX(uB, 1) + L * 0.045, y1: dk(uB) + S.free * 1.20, w: 0.9 });
+      x1: S.stationX(uB, 1) + L * 0.045,
+      y1: Math.min(dk(uB) + S.free * 1.20, bridge ? bridge.deck - 0.5 : Infinity), w: 0.9 });
   }
 
   // funnels, raked aft, each one a different height and rake
@@ -416,7 +426,7 @@ function superstructure(S, kit, r, detail) {
     }
   }
 
-  return { parts, glass, ao, shelves, ladders };
+  return { parts, glass, ao, shelves, ladders, towerX: S.stationX(uB, 1) };
 }
 
 // Deck furniture, all merged into the structure mesh. Positions are seeded per ship so two ships
@@ -881,7 +891,8 @@ export function buildShip(kitId, quality, cells = 4, opts = {}) {
   };
 
   uvSeed = rng((opts.seed ?? 1013) * 7 + 3);
-  const { parts: superParts, glass, ao, shelves, ladders } = superstructure(S, kit, r, detail);
+  const { parts: superParts, glass, ao, shelves, ladders, towerX } =
+    superstructure(S, kit, r, detail, opts.bridge || null);
   const structure = [...superParts, ...furniture(S, kit, r, detail, ao, ladders)];
 
   // turret placement: a superfiring pair forward, the rest aft, never evenly spread
@@ -993,7 +1004,7 @@ export function buildShip(kitId, quality, cells = 4, opts = {}) {
     add(deckPlate(S, ao), getMaterial('hull', 'deck'));
     add(aoAttr(mergeGeometries(structure, false), structAO), getMaterial('hull', 'turret'));
     if (detail > 1) {
-      add(mergeGeometries(glass, false), windowMaterial(), false);
+      if (glass.length) add(mergeGeometries(glass, false), windowMaterial(), false);
       const rails = [railGeo(S), ladderGeo(S, ladders)].filter(Boolean);
       const rail = add(mergeGeometries(rails, false), getMaterial('hull', 'rail'), false);
       rail.receiveShadow = false;
@@ -1040,6 +1051,9 @@ export function buildShip(kitId, quality, cells = 4, opts = {}) {
   const handle = {
     object3D, length: L, beam: B, freeboard: S.free, kitId, cells, detail,
     gunAnchors, deckAnchor, turrets, shape: S,
+    // where the bridge tower stands, along the hull. The flagship is positioned by this rather
+    // than by its own centre, so the playable room lands over the tower and not over the funnels.
+    towerX,
 
     // t = 0 at the bow, 1 at the stern
     hullPoint(t2) {
@@ -1091,15 +1105,19 @@ export function buildShip(kitId, quality, cells = 4, opts = {}) {
       // aft so the trim follows the swell the hull is actually straddling
       const c = Math.cos(object3D.rotation.y), s2 = Math.sin(object3D.rotation.y);
       const d = L * 0.33;
-      const fwd = ocean.heightAt(p.x + c * d, p.z - s2 * d);
-      const aft = ocean.heightAt(p.x - c * d, p.z + s2 * d);
-      body.position.y = (fwd + aft) * 0.5 - damage * S.free * 0.30;
-      // rotation.x rolls (Y↔Z, and Z is athwartships); rotation.z trims (X↔Y, and X is the bow).
-      // Pass 1 had these the wrong way round, so a damaged ship pitched instead of listing and the
-      // fore-and-aft swell gradient heeled the hull sideways — which is most of why the waterline
-      // never lined up with the sea.
-      body.rotation.x = roll + Math.sin(t * 0.55 + heaveSeed) * 0.012;
-      body.rotation.z = Math.atan2(fwd - aft, d * 2) * 0.85;
+      // `moored` holds the hull rigid. The flagship carries the playable bridge, which is a fixed
+      // room in world space: half a metre of heave under it opens a seam at the deckhead.
+      if (!opts.moored) {
+        const fwd = ocean.heightAt(p.x + c * d, p.z - s2 * d);
+        const aft = ocean.heightAt(p.x - c * d, p.z + s2 * d);
+        body.position.y = (fwd + aft) * 0.5 - damage * S.free * 0.30;
+        // rotation.x rolls (Y↔Z, and Z is athwartships); rotation.z trims (X↔Y, and X is the bow).
+        // Pass 1 had these the wrong way round, so a damaged ship pitched instead of listing and the
+        // fore-and-aft swell gradient heeled the hull sideways — which is most of why the waterline
+        // never lined up with the sea.
+        body.rotation.x = roll + Math.sin(t * 0.55 + heaveSeed) * 0.012;
+        body.rotation.z = Math.atan2(fwd - aft, d * 2) * 0.85;
+      }
 
       if (wake && detail > 1) {
         const a = wake.geometry.attributes.position;

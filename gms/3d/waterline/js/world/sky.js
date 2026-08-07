@@ -267,15 +267,34 @@ function cloudTexture() {
 
 const listeners = new Set();
 let gradeName = 'noon';
+let mixed = null;
 let tune = { cover: 1, haze: 1, cloud: 1 };
 
-export function grade() { return GRADES[gradeName]; }
+export function grade() { return mixed ?? GRADES[gradeName]; }
 
 // lighting.js and ocean.js both need the palette and neither may depend on construction order.
-export function onGrade(fn) { listeners.add(fn); fn(GRADES[gradeName], gradeName); return () => listeners.delete(fn); }
+export function onGrade(fn) { listeners.add(fn); fn(grade(), gradeName); return () => listeners.delete(fn); }
+
+// A crossfade between two of the authored end states above — never a sun path. Hex strings go
+// through THREE.Color, so the mix happens in linear space exactly as `.set('#…')` would land it.
+// `state` indexes SEA_STATES and so has to stay whole. A key the target does not declare is
+// dropped rather than carried over, which leaves the consumer's own fallback — the thing the
+// target relies on — in charge.
+function mixValue(a, b, t, key) {
+  if (typeof b === 'number') return key === 'state' ? Math.round(a + (b - a) * t) : a + (b - a) * t;
+  if (typeof b === 'string') return new THREE.Color(a).lerp(new THREE.Color(b), t);
+  if (Array.isArray(b)) return b.map((v, i) => a[i] + (v - a[i]) * t);
+  return mixGrade(a, b, t);
+}
+
+function mixGrade(a, b, t) {
+  const o = {};
+  for (const k of Object.keys(b)) o[k] = k in a ? mixValue(a[k], b[k], t, k) : b[k];
+  return o;
+}
 
 function applyGrade() {
-  const g = GRADES[gradeName];
+  const g = grade();
   const u = skyUniforms();
   const az = g.azimuth * Math.PI / 180, el = g.elev * Math.PI / 180;
   u.uSunDir.value.set(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)).normalize();
@@ -346,7 +365,7 @@ export function buildSky(quality, renderer) {
   const envScene = new THREE.Scene();
   envScene.add(new THREE.Mesh(geo, mat));
   const pmrem = renderer ? new THREE.PMREMGenerator(renderer) : null;
-  let env = null, envDirty = true;
+  let env = null, envDirty = true, envGrade = null;
   const bg = new THREE.Color();
 
   const sky = {
@@ -358,6 +377,7 @@ export function buildSky(quality, renderer) {
       if (pmrem && envDirty) {
         if (env) { untrack(env); env.dispose(); }
         env = pmrem.fromScene(envScene, 0, 0.1, 20).texture;
+        envGrade = gradeName;
         // PMREM output is a 256-wide cube chain; nothing else in the game is close to this size
         track(env, { w: 256, h: 256 * 6, fmt: 'half', mips: true, label: 'sky:env' });
         envDirty = false;
@@ -371,9 +391,39 @@ export function buildSky(quality, renderer) {
     setGrade(name) {
       if (!GRADES[name]) throw new Error(`unknown sky grade: ${name}`);
       gradeName = name;
+      mixed = null;
       applyGrade();
       envDirty = true;
       return sky;
+    },
+
+    // Ease from one authored grade to another (D32). envDirty is deliberately left alone:
+    // regenerating the PMREM every frame of a four-second blend is a stall, and main.js reads
+    // scene.environment once at boot and never again. t >= 1 lands on the target exactly.
+    blend(from, to, t) {
+      if (!GRADES[from] || !GRADES[to]) throw new Error(`unknown sky grade: ${from} → ${to}`);
+      if (t >= 1) return sky.setGrade(to);
+      gradeName = to;
+      mixed = mixGrade(GRADES[from], GRADES[to], Math.max(0, t));
+      applyGrade();
+      return sky;
+    },
+
+    // A lost GL context takes the PMREM's render target with it, and three cannot re-upload a
+    // texture that has no pixels in JS. The caller must reassign scene.environment to what this
+    // returns — the old texture object is dead.
+    //
+    // Rebuilt under the grade the dead one was built from, NOT the current one: main.js reads
+    // scene.environment once at boot, under `noon`, and a match then runs under `dusk`. Rebuilding
+    // naively relights the whole bridge mauve, which is a bigger change than the damage.
+    refreshEnv() {
+      const wasName = gradeName, wasMix = mixed;
+      const swap = envGrade && (envGrade !== gradeName || mixed);
+      if (swap) { gradeName = envGrade; mixed = null; applyGrade(); }
+      envDirty = true;
+      const t = sky.env;
+      if (swap) { gradeName = wasName; mixed = wasMix; applyGrade(); }
+      return t;
     },
 
     // Kept because §2.2 declares it. Elevation drives the palette by picking the nearest authored

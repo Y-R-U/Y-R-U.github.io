@@ -70,21 +70,21 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
   --hit: #e8552f;
 }
 
-.wl-btn, .hud button, .sheet button, .panel button {
+.wl-btn, .hud button, .sheet button, .panel button, .lay-acts button {
   min-height: 44px; padding: 0 16px; border-radius: 7px; cursor: pointer;
   background: rgba(12,20,28,.82); color: #dbe3e8; border: 1px solid var(--edge);
   font: inherit; letter-spacing: .06em; -webkit-tap-highlight-color: transparent;
   transition: border-color .15s, color .15s, background .15s;
 }
-.hud button:active, .sheet button:active, .panel button:active { background: rgba(26,38,50,.9); }
+.hud button:active, .sheet button:active, .panel button:active, .lay-acts button:active { background: rgba(26,38,50,.9); }
 .sheet button.on, .hud button.on { border-color: var(--amber); color: var(--amber); }
-.sheet button[disabled], .hud button[disabled], .panel button[disabled] { opacity: .32; cursor: default; }
-.sheet button.big, .panel button.primary {
+.sheet button[disabled], .hud button[disabled], .panel button[disabled], .lay-acts button[disabled] { opacity: .32; cursor: default; }
+.sheet button.big, .panel button.primary, .lay-acts button.big {
   background: linear-gradient(180deg, rgba(255,166,60,.22), rgba(255,166,60,.08));
   border-color: rgba(255,166,60,.6); color: #ffd8a6; font-weight: 600;
   text-transform: uppercase; letter-spacing: .14em;
 }
-.sheet button.link, .panel button.danger {
+.sheet button.link, .panel button.danger, .lay-acts button.link {
   background: none; border-color: transparent; color: #9fb3c0; text-decoration: underline;
   text-underline-offset: 4px; padding: 0 8px;
 }
@@ -105,7 +105,37 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
 .hud-who s { text-decoration: none; display: block; font-size: 11px; opacity: .5; margin-top: 2px; }
 .hud.waiting .hud-who b { color: var(--plot); }
 
-.hud-own { background: var(--panel); border: 1px solid var(--edge); border-radius: 8px; padding: 6px; pointer-events: none; max-width: min(48vw, 230px); }
+/* during a cutscene the HUD steps out of the frame entirely */
+body.wl-cine .hud-top, body.wl-cine .hud-bar { opacity: 0; pointer-events: none; transition: opacity .4s; }
+.hud-top, .hud-bar { transition: opacity .5s; }
+
+.hud-own-slot { position: relative; pointer-events: none; }
+/* the box is the entry to the fleet editor, so it is a real control: 44px is met by the grid, and
+   the button resets the shared .hud button padding rather than inheriting a 16px gutter */
+.hud-own {
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 8px;
+  padding: 6px; max-width: min(48vw, 230px); pointer-events: auto;
+  display: block; text-align: left; min-height: 0; cursor: pointer;
+}
+.hud-own:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.hud-own:active { border-color: rgba(255,166,60,.7); }
+
+/* the first-time callout. pointer-events stay off so it can never eat the tap it is asking for */
+.hud-cue {
+  position: absolute; top: calc(100% + 9px); right: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,166,60,.14); border: 1px solid rgba(255,166,60,.55); border-radius: 8px;
+  padding: 7px 10px; max-width: min(62vw, 250px);
+  font-size: 11px; letter-spacing: .04em; color: #ffd8a6; line-height: 1.3;
+  opacity: 0; transform: translateY(-4px); transition: opacity .4s, transform .4s;
+}
+.hud-cue.on { opacity: 1; transform: none; animation: cue-breathe 2.4s ease-in-out infinite; }
+.hud-cue i {
+  position: absolute; top: -7px; right: 26px; width: 0; height: 0;
+  border: 6px solid transparent; border-bottom-color: rgba(255,166,60,.6); border-top: 0;
+}
+.hud-cue[hidden] { display: none; }
+@keyframes cue-breathe { 50% { border-color: rgba(255,166,60,.95); background: rgba(255,166,60,.22); } }
 .hud-own-grid {
   display: grid; grid-template-columns: repeat(var(--cols, 10), 1fr); gap: 1px;
   width: min(30vw, 118px);
@@ -232,6 +262,106 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
 .tray button.done { opacity: .4; }
 .tray button.on { border-color: var(--amber); }
 
+/* ── the fleet layout editor ───────────────────────────────────────────────────────────────────
+   Portrait first: the board takes whatever square fits between the heading and the buttons, and
+   the buttons stay on one thumb-reachable row at the bottom. */
+
+.screen-layout { padding: 10px; align-items: stretch; }
+.lay {
+  width: min(460px, 100%); margin: auto; background: var(--panel); backdrop-filter: blur(10px);
+  border: 1px solid var(--edge); border-radius: 14px; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px; max-height: 100%;
+}
+.lay-head h1 { font: 300 20px/1.1 Optima, Palatino, Georgia, serif; letter-spacing: .14em; text-transform: uppercase; }
+.lay-note { font-size: 12px; opacity: .62; margin-top: 4px; line-height: 1.4; }
+.lay-wrap { display: flex; justify-content: center; min-height: 0; }
+.lay-grid {
+  position: relative; width: min(100%, 62vh); aspect-ratio: var(--cols) / var(--rows);
+  touch-action: none; -webkit-tap-highlight-color: transparent;
+}
+.lay-cells {
+  position: absolute; inset: 0; display: grid; gap: 2px;
+  grid-template-columns: repeat(var(--cols), 1fr); grid-template-rows: repeat(var(--rows), 1fr);
+}
+.lay-cells i { background: rgba(159,216,232,.07); border-radius: 2px; }
+/* the cells the enemy has resolved on you. Only ever visible read-only — an editable layout is by
+   definition one nobody has fired at yet */
+.lay-cells i.miss { box-shadow: inset 0 0 0 2px rgba(160,200,220,.4); }
+.lay-cells i.hit { background: var(--hit); }
+.lay-cells i.sunk { background: #6f1d10; }
+.lay-ships { position: absolute; inset: 0; }
+.lay-ship {
+  position: absolute; padding: 2px; cursor: grab;
+  display: flex; align-items: center; justify-content: center;
+}
+/* the hull is the ::before so the 2px padding is a hit-slop margin rather than a visible gap */
+.lay-ship::before {
+  content: ''; position: absolute; inset: 2px; border-radius: 3px;
+  background: rgba(159,216,232,.42); border: 1px solid rgba(159,216,232,.7);
+  transition: background .12s, border-color .12s;
+}
+.lay-ship b {
+  position: relative; font-size: 11px; font-weight: 600; color: #06121a;
+  opacity: .75; pointer-events: none;
+}
+/* read-only: the hulls step back so the damage under them is what the eye lands on */
+.lay.ro .lay-ship { cursor: default; }
+.lay.ro .lay-ship::before { background: none; border-color: rgba(159,216,232,.65); }
+.lay.ro .lay-ship b { color: #cfe9f3; opacity: .9; }
+.lay-ship.sel { z-index: 2; }
+.lay-ship.sel::before { background: rgba(255,166,60,.5); border-color: var(--amber); }
+/* dashed, so a note about touching never reads as the solid amber of the selected ship */
+.lay-ship.touch::before { border-style: dashed; border-color: rgba(255,196,90,.95); }
+/* hatched, not just red: two overlapping hulls are one contiguous red block otherwise, and the
+   player cannot see that there are two of them */
+.lay-ship.bad::before {
+  border-color: #ff7a5c;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.22) 0 4px, transparent 4px 9px),
+    rgba(232,85,47,.62);
+}
+.lay-ship.sel.bad::before { border-color: var(--amber); border-width: 2px; }
+.lay-ship.held { z-index: 3; }
+.lay-ship.held::before { inset: 0; box-shadow: 0 6px 18px rgba(0,0,0,.6); }
+.lay-ship:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+
+.lay-rot {
+  position: absolute; z-index: 4; transform: translate(-50%, -50%);
+  min-height: 0; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  font-size: 19px; line-height: 1; display: grid; place-items: center;
+  background: rgba(255,166,60,.9); border: 1px solid #ffd8a6; color: #16100a; font-weight: 700;
+  box-shadow: 0 3px 12px rgba(0,0,0,.55);
+}
+.lay-grid.nope { animation: nope .22s; }
+
+.lay-status { font-size: 12px; opacity: .6; min-height: 30px; line-height: 1.35; }
+.lay-status.warn { color: #ffc45a; opacity: .95; }
+.lay-status.bad { color: #ff8f74; opacity: 1; }
+.lay-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.lay-acts button { flex: 1 1 30%; padding: 0 10px; }
+.lay-acts button.big { flex: 1 1 100%; order: 9; }
+.lay-acts button.link { flex: 0 0 auto; }
+
+/* the cutscene strip: skip, and the checkbox that stops it happening again */
+#ui > .cuts {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+  padding: 0 12px calc(12px + env(safe-area-inset-bottom)); pointer-events: none;
+}
+.cut {
+  pointer-events: auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  justify-content: center; background: rgba(8,14,20,.88); backdrop-filter: blur(8px);
+  border: 1px solid var(--edge); border-radius: 12px; padding: 8px 8px 8px 14px;
+  opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s;
+}
+.cut.on { opacity: 1; transform: none; }
+.cut-opt { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .8; cursor: pointer; min-height: 44px; }
+.cut-opt input { width: 20px; height: 20px; accent-color: var(--amber); }
+.cut-skip {
+  min-height: 44px; padding: 0 22px; border-radius: 7px; cursor: pointer; font: inherit;
+  background: rgba(12,20,28,.9); color: #ffd8a6; border: 1px solid rgba(255,166,60,.6);
+  letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+}
+
 /* panels, toasts, notes */
 .panel-body p { font-size: 13px; opacity: .75; line-height: 1.5; }
 .panel-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
@@ -261,6 +391,25 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
 }
 .note button { background: none; border: 0; color: inherit; font-size: 18px; opacity: .5; min-width: 32px; cursor: pointer; }
 
+#ui > .slates { position: absolute; left: 0; right: 0; top: 21%; display: flex; flex-direction: column;
+  align-items: center; pointer-events: none; }
+.slate {
+  text-align: center; opacity: 0; transform: translateY(-5px);
+  transition: opacity .8s ease, transform .8s ease;
+}
+.slate.on { opacity: 1; transform: none; }
+.slate b {
+  display: block; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 42px; font-weight: 500; letter-spacing: .16em; font-variant-numeric: tabular-nums;
+  color: #f2e4cf; text-shadow: 0 2px 14px rgba(0,0,0,.9), 0 0 34px rgba(0,0,0,.7);
+}
+.slate i {
+  display: block; margin-top: 7px; font-style: normal; font-size: 11px;
+  letter-spacing: .3em; text-transform: uppercase; opacity: .66;
+  text-shadow: 0 1px 8px rgba(0,0,0,.95);
+}
+@media (max-width: 560px) { .slate b { font-size: 34px; } }
+
 .caption {
   position: absolute; left: 50%; top: 14%; transform: translateX(-50%);
   font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
@@ -287,6 +436,10 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
   .sheet h1, .panel h1 { font-size: 19px; }
   .board { width: min(100%, 40vh); }
   .rungs { max-height: 38vh; }
+  .lay { padding: 10px; gap: 7px; }
+  .lay-head h1 { font-size: 16px; }
+  .lay-grid { width: min(100%, 46vh); }
+  .lay-status { min-height: 18px; }
 }
 
 /* screenshot mode: nothing but the render */

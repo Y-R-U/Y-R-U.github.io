@@ -681,6 +681,172 @@ thought. This one I introduced into my own reasoning by using the tool wrongly, 
 
 ---
 
+## D30 — the fleet frames are wrong, and it is why you never see your own guns fire
+
+Aaron played the shipped build and reported two things that turn out to be one bug: "firing weapon —
+you don't see a ship fire its weapons, appears to be just looking at water" and "the bridge is not in
+a ship, it is floating".
+
+Measured live, mid-match, from `fleet.ships[side][i].handle.object3D.getWorldPosition()`:
+
+| | authored intent | measured |
+|---|---|---|
+| your fleet (side 0) | z ≈ 450 ± 250 | **z 798 … 923** |
+| enemy fleet (side 1) | z ≈ −450 ± 250 | **z −9 … −152** |
+| the gun `fire_out` looks at | in frame | **859 m from the camera** |
+
+`fleet.layout()` calls `api.cellToWorld()`, which is `sides[side].localToWorld(local)` — a **world**
+position — and then assigns it as the handle's **local** position inside that same side group. Side 0
+double-counts the 450 m standoff; side 1 has a π rotation, so the standoff cancels instead. The net
+effect is that your own fleet is 850 m out the window and the enemy fleet is parked on top of the
+bridge.
+
+`fire_out` then flies to a pose 120 m off the window and looks at a gun 738 m away. There is nothing
+in frame but sea. Nothing was wrong with the sequence.
+
+**Ruling — the world layout, stated once so nothing has to infer it:**
+
+1. `layout()` places ships in **side-local** coordinates. `cellToWorld` stays as it is; it is
+   correct and other callers depend on it.
+2. **Your own side is centred on the bridge** (frame at z ≈ 0) and **the enemy is out the window**
+   (frame at +standoff, the direction the window faces). The bridge stands in its own formation.
+3. **The flagship is the bridge's own hull.** One ship of side 0 is pinned at the origin, bow +Z,
+   and the bridge room sits on its bridge tier. Every other ship of side 0 keeps clear of it.
+4. The three scored gunnery scenarios use `fleet.stage()`, not `layout()`, and must not move.
+
+## D31 — the resting bridge camera is 7 cm above the deckhead
+
+Aaron: "on the initial fly in it enters the roof of the bridge and shows inside the roof for a few
+seconds." He proposed glass or a temporary transparency. Neither is the fix.
+
+`ROOM.deck` 18 + `ROOM.h` 2.68 puts the deckhead at **20.68**. `sequences.js`'s `atTable()` is
+`table + (−0.62, 1.80, −3.15)`, and the table is at 18.95, so the pose is **20.75** — above the
+ceiling. `bridge_settle` starts higher still, at 21.17. Sampled live: the camera sits at 20.71–20.75
+for **~2.3 seconds** at the end of `open_flyover`, then C7's `aim.take()` hands it down to 20.27.
+
+`UI.camera.ceiling` is 1.30 and is right; C6's 1.80 is the outlier. **Ruling: `atTable()` drops to
+1.30 above the table**, which also makes the hand-over to the play pose nearly a no-op. Nothing
+becomes glass.
+
+## D32 — the match opens at noon and turns to dusk once you are on the bridge
+
+Aaron: the flyover's orange water with no sun in frame reads as broken; the same grade seen from
+inside the bridge "looks amazing". He is right, and the difference is that the flyover looks *down*,
+where a dusk sea has colour but no light source to explain it.
+
+**Ruling: `playScene()` opens at `noon`. After the camera settles on the bridge, a caption states
+the time and the grade eases to `dusk` over a few seconds.** The three grades are authored end
+states, not samples of a continuum (`sky.js:15`), so the transition is a lerp *between two authored
+grades* and must not be mistaken for a physical sun path. Two traps: `applyGrade()` fires the grade
+listeners, which is how `lighting.js` and `ocean.js` repaint — that is wanted — and reading
+`sky.env` with `envDirty` set regenerates the PMREM, which must **not** run every frame of the
+transition.
+
+## D33 — a mid-match layout change is legal only while your board is untouched
+
+Aaron wants the top-right own-grid panel to open a fleet editor. `sim.setBoard()` refuses outside
+`SETUP`/`PLACING`, and separately refuses once that side has been fired on.
+
+The second guard is the one that matters — it is the actual cheat. The phase check is incidental.
+**Ruling: `setBoard` may run in `AIM` provided `p.board` is still untouched**, i.e. before the enemy
+has resolved a single shot on you. Keep the untouched guard exactly as it is, keep the phase in
+`AIM` afterwards, and re-run `node sim.mjs 2000` — the sim is the one part of this project with a
+real gate on it.
+
+---
+
+## D34 — the flagship is rigid, and the room is the reason
+
+P1 put the bridge on a real hull. The room is fixed in world space and every `sequences.js`
+generator reads `table()` / `win()` at **compile** time, so a hull that heaves opens a seam at the
+deck and the deckhead every few seconds.
+
+**Ruling: the flagship is `moored` — no heave, no roll, no trim.** The cost is that her painted
+waterline no longer tracks the swell; the 2.5 m foam collar covers it and nothing rendered showed
+it. If a later pass wants the bridge to ride the sea, the camera anchors must become children of
+`body` and every generator that reads an anchor becomes frame-dependent. That is an architectural
+change, not a tuning one, and it needs its own brief.
+
+## D35 — a shell around a single-sided room needs a standoff, not a thickness
+
+P1's first exterior house had a roof coplanar with the room's ceiling plate. It z-fought across the
+whole surface and **striped the entire deckhead of `bridge_night`** — 9.85 mean against a 0.003
+noise floor. Invisible from outside; only shows from within.
+
+**Ruling: every face of the exterior shell stands 8 cm off the plate it covers (`GAP` in
+`bridge.js`).** Same family as the standing trap in `MANAGER.md` — the value looked configured and
+was defeated downstream — and it cost a full render cycle of the bridge trio to find.
+
+## D36 — a close camera beat cannot be steered by a fraction of a distant target
+
+`fire_out` used to move its look target `lerp(gun, aim, 0.5·u)` where `aim` is the objective, up to
+900 m away. From a camera 40 m off the subject that is **445 m of look travel in 460 ms** — the ship
+leaves frame on the beat's first frame.
+
+**Ruling: a look target inside a close beat is authored in metres from the subject, never as a
+fraction of the way to something far off.** P1's replacement frames `gun − bore · 0.55d`, i.e. back
+down the firing ship's own deck, which is what put the bow, both forward turrets and the bridge on
+the diagonal.
+
+Two harness traps found in the same pass, recorded here so nobody pays for them twice:
+
+- `Runtime.evaluate` with `awaitPromise: true` on `flow.fire()` **waits for the whole turn**, so any
+  screenshot timed off it lands after the sequence it meant to sample. Fire without awaiting and
+  time captures from `performance.now()`.
+- `tools/shot.mjs` settles a fixed number of **frames**, not a fixed amount of simulated time, so a
+  hull sits at a different point in its heave cycle run to run. That is the entire before/after
+  pixel difference in the gunnery trio, and it is why D13's same-code control is not optional.
+
+---
+
+## D37 — D32 is a rule about the camera, not about the opening
+
+"A dusk sea seen from above with no sun in frame reads as broken" is not a fact about the flyover.
+It applies to **any** beat that looks down at water, and P3's first bird's-eye reproduced the fault
+exactly — the same orange nothing Aaron filed in the first place.
+
+**Ruling: a beat that looks down at the sea stands on the far side of its subject from the sun and
+looks back across it.** `sky.sunDir` is the only input that needs. Every future overhead shot is
+bound by this, not just the two that exist.
+
+## D38 — a framing camera cannot be an authored pose on a mobile-first game
+
+Portrait's horizontal half-angle is `tan(fov/2) · 0.46` against landscape's `tan(fov/2) · 1.78`.
+A bird's-eye authored at 16:9 crops a third of its subject away at 390×844.
+
+**Ruling: any beat that has to *contain* something solves its station from that subject's bounding
+radius and the live viewport aspect**, arriving through `ctx`. `aim.js`'s `solve()` was the first
+instance and `fleet_reform` is the second; there will be more. An authored pose is only safe when
+what it frames is a direction rather than an object.
+
+## D39 — two overlapping hulls in one colour read as one hull
+
+P3's conflict state was a plain red fill and a player could not see that there were **two** ships in
+the same water — it looked like one oddly-shaped ship. It had to become a hatch.
+
+Recorded because of how it was found: by rendering the panel and looking at it, not by reasoning
+about it. Same family as D24 — a state that is correctly computed and unreadable has not been
+implemented.
+
+Two smaller findings from the same pass:
+
+- **Pointer capture belongs on a container that survives the repaint.** The editor rebuilds its ship
+  elements on every cell a drag crosses, so capture taken on the dragged element is lost the first
+  time it moves. Capture on the grid, which is never rebuilt.
+- **`document.querySelectorAll('button')` finds the hidden HUD.** `.hud[hidden] { display: none }`
+  does not remove it from the DOM, so a probe that identifies a screen by its buttons reports the
+  title screen as present while the page is on `play` — and reports a reload that never happened as
+  a successful resume. Identify a screen by `document.body.dataset.screen`, query inside
+  `.screen-setup`, and prove a reload with a marker on `window`. This is D28's family again: the
+  harness was the thing that was wrong.
+
+**`tools/adversarial_sim.mjs` G5 now flips HELD→BROKEN by design** — D33 is what broke it, and it is
+not a regression. G5b (rewriting an emitted `place` event in `PLACING` instead of appending a
+corrective one) was **already broken before P3**, verified against a control tree; D33 only makes it
+reachable more often. Neither should be read as new damage.
+
+---
+
 ## Standing rules for every agent on this project
 
 1. **Touch only `gms/3d/waterline/`.** The repo has unrelated uncommitted work in

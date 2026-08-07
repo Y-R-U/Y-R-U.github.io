@@ -24,9 +24,12 @@ export function buildHUD(mount, opts = {}) {
         <b data-turn>—</b>
         <s data-opponent></s>
       </div>
-      <div class="hud-own">
-        <div class="hud-own-grid" data-own></div>
-        <div class="hud-roster" data-roster></div>
+      <div class="hud-own-slot">
+        <button class="hud-own" data-fleet aria-label="Your fleet — open the layout">
+          <div class="hud-own-grid" data-own></div>
+          <div class="hud-roster" data-roster></div>
+        </button>
+        <div class="hud-cue" data-cue hidden aria-hidden="true"><i></i><span>Your fleet — tap to change it</span></div>
       </div>
     </div>
     <div class="hud-bar">
@@ -44,7 +47,7 @@ export function buildHUD(mount, opts = {}) {
   const rosterEl = q('[data-roster]');
   const fireEl = q('[data-fire]');
 
-  let handlers = { onArm: opts.onArm, onConfirm: opts.onConfirm, onPause: opts.onPause };
+  let handlers = { onArm: opts.onArm, onConfirm: opts.onConfirm, onPause: opts.onPause, onFleet: opts.onFleet };
   let kind = 'shell';
   let armed = null;
   let yours = false;
@@ -62,6 +65,7 @@ export function buildHUD(mount, opts = {}) {
   });
   fireEl.onclick = () => handlers.onConfirm?.(armed, kind);
   q('[data-pause]').onclick = () => handlers.onPause?.();
+  q('[data-fleet]').onclick = () => handlers.onFleet?.();
 
   function sync() {
     root.querySelectorAll('[data-kind]').forEach(b => b.classList.toggle('on', b.dataset.kind === kind));
@@ -115,6 +119,15 @@ export function buildHUD(mount, opts = {}) {
       hint.textContent = armed ? note || 'Tap again on the chart, or FIRE' : 'Tap the chart to aim';
       hint.classList.toggle('warn', !!(armed && note));
       sync();
+    },
+
+    // The first-time callout on the own-grid box. It has `pointer-events: none` and sits clear of
+    // the box, so it can never eat the tap it is asking for.
+    cue(on, text) {
+      const el = q('[data-cue]');
+      if (text) el.querySelector('span').textContent = text;
+      el.hidden = !on;
+      el.classList.toggle('on', !!on);
     },
 
     setTurn(text) { q('[data-turn]').textContent = text; },

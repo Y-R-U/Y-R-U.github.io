@@ -18,6 +18,8 @@ export class App {
     this.frames = 0;
     this.pending = new Set();
     this.parked = new Set();
+    this.restorers = new Set();
+    this.contextLost = false;
     this.quality = new Quality(pickDefaultPreset());
 
     // `antialias` is a context-creation flag, so the aa knob reloads the page for this one option
@@ -55,6 +57,39 @@ export class App {
     this.resize();
     addEventListener('resize', () => this.resize());
     addEventListener('orientationchange', () => setTimeout(() => this.resize(), 120));
+
+    // A backgrounded tab on a phone loses the GL context and gets it back empty. three re-uploads
+    // anything whose pixels still exist in JS; nothing that lived in a render target survives, and
+    // the sky's PMREM env map is exactly that — its absence is what makes the scene come back dark.
+    // three's own listeners are already on this canvas and already preventDefault; ours were added
+    // second, so `restored()` runs after initGLContext() has rebuilt the renderer's internals.
+    const canvas = this.renderer.domElement;
+    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); this.contextLost = true; });
+    canvas.addEventListener('webglcontextrestored', () => this.restored());
+  }
+
+  // Anything holding a GPU resource three cannot rebuild for it registers here.
+  onRestore(fn) { this.restorers.add(fn); return () => this.restorers.delete(fn); }
+
+  restored() {
+    this.contextLost = false;
+    // initGLContext() builds a NEW WebGLShadowMap, so the hook that splits the shadow pass from
+    // the main one is gone with the old object and the readout would merge the two passes.
+    const sm = this.renderer.shadowMap, smRender = sm.render.bind(sm);
+    sm.render = (...a) => { smRender(...a); if (!this.marked) { this.marked = true; this.stats.markShadow(); } };
+    this.renderer.info.autoReset = false;
+    this.renderer.shadowMap.needsUpdate = true;
+    // The timer-query extension object and every query in flight belonged to the dead context;
+    // a stale query never reports available and the drain loop then wedges.
+    this.stats.ext = this.stats.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+    this.stats.pending.length = 0;
+    this.stats.activeQuery = null;
+    this.stats.reset();
+    this.scene.traverse(o => { if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true; });
+    this.resize();
+    for (const fn of this.restorers) {
+      try { fn(this); } catch (e) { console.warn('[waterline] context restore', e); }
+    }
   }
 
   registerCoreKnobs() {

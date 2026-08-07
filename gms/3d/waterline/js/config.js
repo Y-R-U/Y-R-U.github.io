@@ -114,10 +114,23 @@ export const VFX = {
 export const FLEET = {
   grid: { w: 10, h: 10 },
   cellMetres: 55,          // one grid cell of OCEAN, not of ship. Ships are much shorter than this
-  standoff: 900,           // metres between the two fleets' frames
-  heroRange: 600,          // past this a laid-out ship drops from hero detail to mid
+  standoff: 900,           // metres from your own frame (the bridge, at z 0) to the enemy's
   markerScale: 2.4,        // radius of the red hit indicator on your own hull
   markerFade: 6,           // seconds before it fades
+  pull: 0.42,              // how far each ship is drawn toward its own formation's centre
+  ownPull: 0.04,           // your own side, which you are standing in the middle of
+
+  // The ship the bridge is built into. `cells` is a length in grid cells and does not have to be a
+  // whole one: L = cells × SHIP.cellMetres × 1.5, so 6.4 is a 115 m hull. It is sized so the
+  // forecastle and A/B turrets sit inside the down-angle the window sill allows, and so the beam
+  // puts the bridge wings (B × 0.92) a little wider than ROOM.w.
+  flagship: {
+    cells: 6.4,
+    seed: 20714,
+    drop: 1.25,            // metres the tower stops below ROOM.deck; the house laps over it
+    clear: 165,            // no other ship of yours comes closer than this to the bridge
+    gap: 95,               // nor closer than this to another
+  },
 };
 
 // C6 — the look-around beat. Brief step 2 / REVIEW.md B3: drag to pan, then EASE back to the
@@ -172,8 +185,19 @@ export const UI = {
   // The menu camera: the fleet at sea, turning. Nothing is scored here.
   menu: { radius: 88, height: 30, fov: 50, spin: 0.045 },
 
+  // D32 — the match opens at noon, because a dusk sea seen from above with no sun in frame reads
+  // as broken. Once the camera is on the bridge a slate states the hour and the sky eases to dusk.
+  // 1845 is what a log would read at the dusk grade's sun elevation: 2.6° above the horizon is
+  // roughly a quarter of an hour before it goes.
+  opening: { log: '1845', logNote: 'Hours · sunset', holdMs: 700, blendMs: 4200, slateMs: 3200 },
+
   // A stored match older than this is dropped rather than offered — nobody remembers the position.
   resumeMaxDays: 30,
+
+  // D33 — the own-grid box opens the fleet editor, and saving flies the camera out to watch the
+  // escorts re-form. `reformMs` is both how long the ships take and how long the bird's-eye beat
+  // holds; they are one number because the beat exists to cover the move.
+  layout: { reformMs: 3200, cueDelayMs: 1200 },
 };
 
 export const SEA_STATES = [

@@ -32,6 +32,56 @@ each review:
 Renders are recovered from `critique/<shot>_r<n>.png` using `.keys/` to pick our side, so history
 survives even though `shots/` only ever holds the latest render.
 
+## Phase 1.5 — Aaron's list after playing the shipped build
+
+Six items, filed 2026-08-07 after a phone test. Rulings are D30–D33; P1's own findings are D34–D36.
+One coder agent at a time.
+
+| | what | agent | state |
+|---|---|---|---|
+| 1 | opens at dusk with no sun in frame — start at noon, turn to dusk on the bridge | P2 | **done** — slate at 1845, 4.2 s blend |
+| 2 | the own-grid panel should open a fleet layout editor + fly-out cutscene | P3 | **done** — `js/ui/layout.js` + `fleet_reform` |
+| 3 | the fly-in shows the inside of the roof | P1 | **done** — camera was above the deckhead (D31) |
+| 4 | comes back dark after the tab sleeps | P2 | **done** — it was WebGL context loss |
+| 5 | you never see a ship fire | P1 | **done** — the fleet frames were wrong (D30) |
+| 6 | the bridge is floating, not in a ship | P1 | **done** — flagship pinned under the room |
+
+P1 accepted on pass 1. Verified independently: ten turns with shell/heavy/salvo, portrait, save and
+resume — zero console errors, 79 calls / 63 main, portrait camera 20.26 against a 20.68 deckhead.
+Open polish from P1 §7, all phase 2: the tower is short (4 m of it, and `ROOM.deck` is the lever but
+it drags `seaContacts()`), the tower roof outside the window is a bare plate, the house has no
+fittings, the starboard bay corner leaks a sliver of interior, and `bridge_table` moved 0.29 mean
+against a ~0.003 floor with no explanation.
+
+P2 accepted on pass 1. It reproduced the sleep bug before fixing it: luma 49.58 → 42.04, 53.6% of
+pixels moved on context loss; after the fix 0.645 against a no-loss control of 0.635. Verified
+independently — the restored frame is fully lit and the match plays on. Two traps it found are worth
+not rediscovering: **`sky.setSun()` permanently mutates `GRADES.dusk`**, so easing toward the
+*authored* dusk snapped the sun 153° on the last frame; and **`sea.state` indexes `SEA_STATES`**, so
+a blended grade throws or doubles the wave height in one frame — the ocean is pinned to dusk's state
+across the opening.
+
+Two of its three flagged gaps I closed myself rather than spend a pass: the slate and blend no longer
+run when cinematics are off, and `go()` now clears slates so one cannot outlive a screen change. The
+third — the blend at t=0 is a hair off pure noon because keys the target does not declare are dropped
+(`sea.hazePow`, `sea.glintCol`) — is left as phase 2.
+
+P3 accepted on pass 1. Rulings D37–D39. Verified independently with real touch events at 390×844:
+the box opens the panel, Shuffle then Save changes the board, the fly-out runs, the turn comes back
+in the state it left (turn 0, AIM, side 0, not busy), firing still works, the panel goes read-only
+once the enemy has fired, and a **genuine** reload (proved with a `window` marker, not by counting
+buttons) restores the edited layout identically. 97 calls / 80 main, 39.0 MB, zero console errors.
+
+Open from P3 §8, all phase 2: the fly-out ignores `PACE` (irrelevant while D33 keeps the editor on
+turn 0); the landscape fly-out has ~3% sky against portrait's 20%, from one shared look-lift
+constant; the fleet's framing circle is conservative for a strung-out formation; the rotate control
+can sit on top of a neighbouring hull at the board's far edge. **`cine: 'off'` also suppresses the
+fly-out** — a reading of "off — stay on the table", one line if Aaron wants it separate.
+
+**The biggest untested surface across all three passes: no finger has touched any of it.** Every
+drag and tap was a synthesised CDP event. Multi-touch, gesture cancellation and iOS Safari's pointer
+behaviour are unverified, and the layout editor is exactly where that matters.
+
 ## Where the queue stands
 
 | Component | Passes | Status |

@@ -13,7 +13,9 @@ import { SAVE_KEY } from './config.js';
 const VERSION = 2;
 
 const DEFAULTS = () => ({
-  settings: { cine: 'auto', place: 'auto', sound: true },
+  settings: { cine: 'auto', place: 'auto', sound: true, flyout: 'on' },
+  // First-time prompts that have been shown. Once per player, not once per match.
+  seen: {},
   ladder: null,      // sim LadderState — { rung, best, wins, losses, complete }
   memory: null,      // sim Memory — what the ladder's top tier has learned about this player
   stats: { games: 0, wins: 0, losses: 0, shots: 0, hits: 0, sunk: 0 },
@@ -46,6 +48,7 @@ const obj = x => x && typeof x === 'object' && !Array.isArray(x);
 function sane(d) {
   const def = DEFAULTS();
   if (!obj(d.settings)) d.settings = def.settings;
+  if (!obj(d.seen)) d.seen = def.seen;
   if (!obj(d.stats)) d.stats = def.stats;
   if (!obj(d.ladder) || !Number.isFinite(d.ladder.rung)) d.ladder = null;
   if (!obj(d.memory) || d.memory.v !== 1 || !obj(d.memory.boards)) d.memory = null;
