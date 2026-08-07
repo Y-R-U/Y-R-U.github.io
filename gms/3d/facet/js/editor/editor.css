@@ -1,0 +1,101 @@
+/* Level editor UI. Thumb-first: a bottom sheet, big targets, nothing that needs a mouse. */
+
+.ed-toggle {
+  position: fixed; top: 8px; right: 52px; z-index: 30;   /* second slot; see #audio-link */
+  width: 38px; height: 38px; font-size: 16px; cursor: pointer;
+  background: rgba(10,13,15,.8); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px; color: #dfe4e6;
+}
+.ed-toggle.on { background: #b9721f; border-color: #b9721f; color: #fff; }
+
+.ed-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: none; flex-direction: column;
+  max-height: min(56vh, 460px);
+  background: rgba(10,13,15,.92); backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.ed-sheet.open { display: flex; }
+
+.ed-tabs { display: flex; gap: 2px; padding: 6px 6px 0; flex: 0 0 auto; }
+.ed-tabs button {
+  flex: 1 1 auto; min-height: 40px; font-size: 12.5px; cursor: pointer;
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  color: #8d979b; letter-spacing: .04em;
+}
+.ed-tabs button.on { color: #f0d2ac; border-bottom-color: #b9721f; }
+.ed-tabs .ed-close { flex: 0 0 44px; font-size: 15px; }
+
+.ed-bar:empty { display: none; }
+.ed-bar { flex: 0 0 auto; padding: 8px 12px 0; }
+.ed-note, .ed-warn, .ed-ask {
+  border-radius: 6px; padding: 9px 10px; font-size: 12.5px; line-height: 1.45;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+}
+.ed-note { display: flex; align-items: center; gap: 8px; }
+.ed-note span { flex: 1 1 auto; }
+.ed-note button {
+  flex: 0 0 34px; min-height: 34px; cursor: pointer;
+  background: none; border: 0; color: #8d979b; font-size: 14px;
+}
+.ed-warn { background: rgba(232,112,90,.14); border-color: rgba(232,112,90,.45); color: #f2b7a6; }
+.ed-ask { background: rgba(185,114,31,.16); border-color: rgba(185,114,31,.5); color: #f0d2ac; }
+.ed-ask p { margin-bottom: 9px; }
+.ed-ask .ed-acts button { min-height: 44px; }
+
+.ed-body { flex: 1 1 auto; overflow-y: auto; padding: 2px 12px 14px; -webkit-overflow-scrolling: touch; }
+.ed-grp { padding-top: 12px; }
+.ed-grp + .ed-grp { border-top: 1px solid rgba(255,255,255,.07); margin-top: 10px; }
+.ed-grp h4 {
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  opacity: .45; font-weight: 500; margin-bottom: 8px;
+}
+.ed-hint { font-size: 11.5px; opacity: .5; margin-top: 6px; line-height: 1.5; }
+
+.ed-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ed-head b { font-size: 14px; }
+.ed-head span { font-size: 11px; opacity: .5; font-family: ui-monospace, Menlo, monospace; }
+
+.ed-chips, .ed-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.ed-chips button, .ed-acts button {
+  flex: 1 1 88px; min-height: 44px; padding: 8px 10px; font-size: 12.5px; cursor: pointer;
+  background: rgba(255,255,255,.05); color: #cfd6d9;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
+}
+.ed-chips button.on { background: #b9721f; border-color: #b9721f; color: #fff; }
+.ed-acts .ed-danger { color: #e8907a; border-color: rgba(232,112,90,.35); }
+
+.ed-big {
+  display: block; width: 100%; min-height: 52px; font-size: 14px; cursor: pointer;
+  background: rgba(185,114,31,.16); color: #f0d2ac;
+  border: 1px solid rgba(185,114,31,.5); border-radius: 8px;
+}
+.ed-big.armed { background: #b9721f; color: #fff; }
+
+.ed-slot { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ed-slot span { flex: 1 1 auto; font-size: 12.5px; }
+.ed-slot button {
+  min-height: 40px; padding: 6px 12px; font-size: 12px; cursor: pointer;
+  background: rgba(255,255,255,.05); color: #cfd6d9;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
+}
+.ed-slot .ed-danger { color: #e8907a; }
+
+.ed-body .row input[type=text], .ed-body .row input:not([type]) {
+  flex: 1 1 auto; min-height: 36px; background: rgba(255,255,255,.06); color: #dfe4e6;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 4px 8px;
+}
+.ed-body .row input[type=range] { min-height: 34px; }
+
+/* the player's thumb pads would swallow every tap meant for the editor */
+body.editing #touch { display: none !important; }
+body.shotmode .ed-toggle, body.shotmode .ed-sheet { display: none !important; }
+
+@media (min-width: 760px) {
+  .ed-sheet {
+    left: auto; right: 8px; bottom: 8px; width: 340px;
+    border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
+    max-height: min(72vh, 620px);
+  }
+}

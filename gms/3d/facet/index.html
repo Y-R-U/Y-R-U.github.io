@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1013">
+<meta name="description" content="FACET — low-poly isometric graphics test bed.">
+<title>FACET</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="js/editor/editor.css">
+<link rel="stylesheet" href="js/game/ui.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<div id="hud">
+  <div id="perf"></div>
+</div>
+
+<div id="game"></div>
+
+<div id="panel">
+  <button id="panel-toggle" aria-label="Toggle panel">⚙</button>
+  <div id="panel-body"></div>
+</div>
+
+<div id="boot">
+  <div class="logo">FACET</div>
+  <div class="tag">low-poly test bed</div>
+  <div id="boot-status">building…</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -100,6 +100,10 @@ const PROJECTS = [
     desc: "Three.js graphics test bed and level editor chasing Tiny Glade-grade visuals at 60fps on a phone. Walk the town, open the settings cog, change the time of day. Soft shadows, procedural sky and materials, a flowing creek, enterable houses, plus a built-in perf HUD, scene editor and a procedural audio lab. Nothing to win — it is for exploring and testing.",
     date: "2026-08-03", creator: "Opus 5" },
 
+  { name: "FACET",          path: "/gms/3d/facet/",     screenshot: "facet",          type: "app",
+    desc: "A low-poly isometric diorama that runs on a phone — a whole island on a cut slab, with a village, a windmill, a river and a sea, all built from flat-shaded triangles. Drag to orbit, pinch to zoom, and open the settings cog to swap between four palettes: meadow, autumn, dusk and frost. At dusk the windows light up and the chimneys smoke. Sibling to FORGE, chasing the opposite look: there are no textures at all, every colour lives in the geometry itself, and the entire world draws in sixteen calls.",
+    date: "2026-08-07", creator: "Opus 5" },
+
   // ══════════════════════════════════════════
   //  GAMES (sorted by date, oldest first)
   // ══════════════════════════════════════════
