@@ -10,6 +10,12 @@ const SHADOW_TYPE = {
   softhigh: THREE.PCFSoftShadowMap,
 };
 
+// How long we wait for `webglcontextrestored` after asking for the context back, before reloading,
+// and how long we give the UA to restore on its own first.
+const RESTORE_MS = 2500;
+const LOST_GRACE_MS = 400;
+const RELOAD_KEY = 'waterline:ctxReload';
+
 export class App {
   constructor(mount) {
     this.mount = mount;
@@ -19,6 +25,7 @@ export class App {
     this.pending = new Set();
     this.parked = new Set();
     this.restorers = new Set();
+    this.teardowns = new Set();
     this.contextLost = false;
     this.quality = new Quality(pickDefaultPreset());
 
@@ -64,15 +71,82 @@ export class App {
     // three's own listeners are already on this canvas and already preventDefault; ours were added
     // second, so `restored()` runs after initGLContext() has rebuilt the renderer's internals.
     const canvas = this.renderer.domElement;
-    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); this.contextLost = true; });
+    // Taken NOW, while the context is alive: getExtension() returns null on a lost context, so an
+    // extension fetched at recovery time is always null and restoreContext() is never called.
+    this.loseExt = this.renderer.getContext().getExtension('WEBGL_lose_context');
+    canvas.addEventListener('webglcontextlost', e => {
+      e.preventDefault();
+      this.contextLost = true;
+      // NOT synchronous: Chrome sets its "restore allowed" flag from event.defaultPrevented after
+      // every listener has run, so restoreContext() called from in here is a silent no-op.
+      setTimeout(() => this.recoverContext(), LOST_GRACE_MS);
+    });
     canvas.addEventListener('webglcontextrestored', () => this.restored());
+    // D40. Nothing on a phone calls restoreContext(), so `webglcontextrestored` never arrives on
+    // its own and the canvas stays black behind a live HUD until the player reloads. The page has
+    // to drive its own recovery, and returning to visible is when it matters.
+    addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.checkContext(); });
   }
 
   // Anything holding a GPU resource three cannot rebuild for it registers here.
   onRestore(fn) { this.restorers.add(fn); return () => this.restorers.delete(fn); }
 
+  // Anything that has to be flushed to storage before a recovery reload.
+  onTeardown(fn) { this.teardowns.add(fn); return () => this.teardowns.delete(fn); }
+
+  isLost() {
+    try { return this.renderer.getContext().isContextLost(); } catch { return false; }
+  }
+
+  checkContext() {
+    if (!this.isLost()) return false;
+    this.contextLost = true;
+    this.recoverContext();
+    return true;
+  }
+
+  recoverContext() {
+    if (this.recovering || this.reloading || !this.isLost()) return;
+    // A hidden tab cannot be recovered: a restore request while backgrounded is ignored, and a
+    // reload would spend the load on a page nobody is looking at. visibilitychange comes back here.
+    if (document.visibilityState === 'hidden') return;
+    this.recovering = true;
+    try { this.loseExt?.restoreContext(); } catch {}
+    this.restoreTimer = setTimeout(() => {
+      this.recovering = false;
+      // Backgrounded again while we waited: spend the reload when someone is looking at it.
+      if (document.visibilityState === 'hidden') return;
+      if (this.isLost()) this.reload();
+    }, RESTORE_MS);
+  }
+
+  // The match is saved on visibilitychange and resume works, so this costs a load screen. A black
+  // canvas costs the session.
+  reload() {
+    if (this.reloading) return;
+    // A device that is genuinely out of memory loses the context again on the way back up, and a
+    // reload loop never settles — that is worse than the black canvas. One per half-minute; after
+    // that each return to visible still retries the restore, which costs nothing.
+    let last = 0;
+    try { last = +sessionStorage.getItem(RELOAD_KEY) || 0; } catch {}
+    if (Date.now() - last < 30000) return;
+    try { sessionStorage.setItem(RELOAD_KEY, String(Date.now())); } catch {}
+    this.reloading = true;
+    for (const fn of this.teardowns) {
+      try { fn(this); } catch (e) { console.warn('[waterline] teardown', e); }
+    }
+    location.reload();
+  }
+
   restored() {
+    clearTimeout(this.restoreTimer);
+    this.recovering = false;
     this.contextLost = false;
+    try { this.rebuild(); }
+    catch (e) { console.warn('[waterline] context restore', e); this.reload(); }
+  }
+
+  rebuild() {
     // initGLContext() builds a NEW WebGLShadowMap, so the hook that splits the shadow pass from
     // the main one is gone with the old object and the readout would merge the two passes.
     const sm = this.renderer.shadowMap, smRender = sm.render.bind(sm);
@@ -160,6 +234,9 @@ export class App {
     const bootFrames = 20;
     const loop = () => {
       this.raf = requestAnimationFrame(loop);
+      // Every frame drawn into a dead context is wasted battery on a device that has just told us
+      // it is short of memory. recoverContext() is what gets us out of here.
+      if (this.contextLost) return;
       const dt = Math.min(this.clock.getDelta(), 0.1);
       this.stats.beginFrame();
       this.renderer.info.reset();
@@ -202,7 +279,10 @@ export class App {
       scenarios: [],
       ready: false,
     };
-    setInterval(() => { this.stats.texMB = totalMB(); }, 500);
+    setInterval(() => {
+      this.stats.texMB = totalMB();
+      if (document.visibilityState === 'visible') this.checkContext();
+    }, 500);
     return this.hook;
   }
 }

@@ -847,6 +847,75 @@ reachable more often. Neither should be read as new damage.
 
 ---
 
+## D40 — the context-loss fix proved the handler works, not that the situation is handled
+
+Aaron, after playing the shipped build: *"Returning to the website again after a while looked dark!?
+a refresh still needed?"* — the same report as before P2.
+
+P2's test called `ext.loseContext()` **and then `ext.restoreContext()`**. That is not what a phone
+does. Reproduced here without the manual restore, at 390×844:
+
+```
+after loseContext()                 lost: true,  frames 2072
+after a full hidden → visible trip  lost: true,  frames 2732     ← still lost
+```
+
+The rAF loop keeps running — 660 more frames — rendering into a dead context. The canvas is black,
+the HUD is intact, and nothing but a reload recovers it. `webglcontextrestored` **never fires**,
+because on a real device nothing calls `restoreContext()`; the UA restores when it feels like it, and
+often not at all.
+
+**Ruling: recovery is the page's job, not the browser's.** On returning to visible, the game checks
+`gl.isContextLost()` itself and drives the recovery — `restoreContext()` if the extension is there,
+and a reload if it is not or if the restore does not take within a short window. The match is already
+saved on `visibilitychange` and resume works, so a reload costs nothing but a load screen. A black
+canvas costs the session.
+
+This is D24 stated again in the sharpest possible form: **an assertion that passes is not evidence
+the effect works.** The handler was correct. The trigger did not exist.
+
+## D41 — a marker on a lit chart cannot be additive
+
+Aaron: *"I think it is meant to show a dark square where you have fired a shot? But I think that is a
+bit buggy... none of them show a dark square. the hits are showing though."*
+
+Nothing is buggy. Measured after five deliberate misses: `table:pegMiss` count 3, `visible: true`,
+drawn every frame. The problem is that it **cannot be seen**:
+
+- its material is `AdditiveBlending`, so it can only ever *add* light — a dark square is not
+  reachable from that material at any colour
+- it is a thin ring at `[0.20, 0.32, 0.44]`, ~4× dimmer than the hit mark's `[0.85, 0.24, 0.09]`
+- the chart it sits on is **already covered in thin cyan rings** — compass roses, depth contours. A
+  ring is the one shape that cannot read as a marker on this particular chart.
+
+**Ruling: a resolved-miss cell reads as a filled cell that is DARKER than the chart, not as a ring
+that is brighter.** That needs non-additive blending. Aaron's instinct — a dark square — is the
+correct design, and it is also what a real plot looks like: something laid on the chart, not glowing
+through it.
+
+The general form, worth more than the fix: **a marker must contrast with the artwork it lands on,
+not merely exist.** Nobody checked what the chart already looked like.
+
+## D42 — D38 was ruled and then not applied to the beat that needed it most
+
+Aaron: *"When we shoot, i can now see the ship/gun (on mobile) but it is very close, the guns barely
+show on the screen, so we don't see most of explosion? maybe zoom out just a little more?"*
+
+`fire_out` stations the camera at `d = clamp(len × 0.45, 30, 60)` — a constant fraction of the ship's
+length, with no aspect term. At `len` 115 that is ~52 m. Portrait's horizontal half-angle is
+`atan(tan(fov/2) · 0.46)` ≈ 12.6° at fov 52, so the frame is **~23 m wide** at that distance against
+a 115 m ship. Landscape is 1.78 aspect and gets ~89 m — nearly four times as much.
+
+D38 already ruled this: *any beat that has to contain something solves its station from that
+subject's bounding radius and the live viewport aspect.* It was applied to `fleet_reform` and not
+back-fitted to `fire_out`, which was written first.
+
+**Ruling: `fire_out` is bound by D38.** So is every future beat with a subject. When a ruling is
+made, the existing code it applies to is part of the ruling — check what else it lands on before
+closing the pass.
+
+---
+
 ## Standing rules for every agent on this project
 
 1. **Touch only `gms/3d/waterline/`.** The repo has unrelated uncommitted work in

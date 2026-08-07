@@ -102,26 +102,42 @@ export function registerSequences(director, world) {
     const aim = ctx.aim || v(0, 8, 900);
     const a = atTable(), b = atWindow(), w = win();
 
-    // A station off the muzzle, forward of it and up. `d` is scaled by the firing ship so the hull
-    // fills the same fraction of the frame whether she is a 36 m destroyer or a 115 m battleship;
-    // at fov 52 the frame is 0.98 × its distance wide, so 0.45 L lands about half a hull across it.
+    // A station off the muzzle, forward of it and up, solved from the ship's own extent and the
+    // live viewport aspect (D38, back-fitted per D42). The old station was a fixed fraction of the
+    // hull with no aspect term: at 390×844 the horizontal half-angle is atan(tan(fov/2)·0.46), a
+    // quarter of landscape's, so it framed 23 m of a 115 m ship and cropped the muzzle blast.
+    const len = ctx.len || 90;
+    const aspect = ctx.aspect || 1.78;
+    const fov = aspect < 1 ? 62 : 52;
+    const tan = Math.tan((fov * Math.PI) / 360);
+    // half of what the shot has to contain: the trained turrets, the muzzle blast and enough hull
+    // to read as a ship. The floor is for a 36 m destroyer, whose blast is the same size.
+    const halfW = Math.max(20, len * 0.24);
+    // the station stands |0.78, 0.30, 0.30| = 0.888 d off the muzzle, and half a frame subtends
+    // that range × tan(fov/2) × aspect horizontally
+    const fit = halfW / (tan * aspect) / 0.888;
     const bore = aim.clone().sub(gun).setY(0).normalize();
     const beam = v(-bore.z, 0, bore.x);
     // stand on the side the round is NOT drifting toward, so it leaves across the frame rather
     // than straight down the lens. Both fleets face along Z, so `beam` is ±X and x is the test.
     const sign = (aim.x - gun.x) * beam.x > 0 ? -1 : 1;
-    const d = Math.min(60, Math.max(30, (ctx.len || 90) * 0.45));
+    // never closer than the pose landscape already had, so the orientation that was never wrong
+    // keeps its intimacy and only a narrow frame pulls back
+    const d = Math.min(240, Math.max(Math.min(60, Math.max(30, len * 0.45)), fit));
     const stn = gun.clone()
       .addScaledVector(beam, sign * d * 0.78)
       .addScaledVector(bore, d * 0.30)
       .add(v(0, d * 0.30, 0));
+    // What one half-frame spans at the subject, in metres. Composition below is written in these
+    // rather than in `d`, so the muzzle sits the same fraction across the frame in both aspects.
+    const half = d * 0.888 * tan * aspect;
     // Framed on the hull BEHIND the muzzle, not on the muzzle: aimed at the gun itself the ship
     // runs out of one corner and half the frame is sea. The guns point roughly ahead, so backing
     // down the bore is backing down the deck.
-    const hold = gun.clone().addScaledVector(bore, -d * 0.55);
+    const hold = gun.clone().addScaledVector(bore, -half * 0.62);
     // where the frame drifts to as the guns go — a point just down the bore. A fraction of the way
     // to a target 900 m away swings the whole ship out of shot on the first frame.
-    const away = gun.clone().addScaledVector(bore, d * 0.5).add(v(0, d * 0.12, 0));
+    const away = gun.clone().addScaledVector(bore, half * 0.65).add(v(0, half * 0.155, 0));
     // still leaves through the glass: the transit is what motivates the exposure change instead of
     // it reading as a fade (BUILD_PLAN §7.1 fallback, taken up front)
     const o = w.clone().add(v(0, -1.4, 22)).lerp(stn, 0.20);
@@ -132,7 +148,7 @@ export function registerSequences(director, world) {
     rig.move(a, b, tableLook(), win().add(v(0.3, -0.6, 26)), short ? 260 : 520, EASE.inCubic);
     yield { until: short ? 260 : 520 };
 
-    rig.fov(52, short ? 300 : 640);
+    rig.fov(fov, short ? 300 : 640);
     rig.move(b, o, win().add(v(0.3, -0.6, 26)), hold, short ? 300 : 640, EASE.out);
     yield { until: short ? 300 : 640 };
 
@@ -400,6 +416,7 @@ function buildPresenter(director, world) {
         await director.play('fire_out', {
           gun, aim: target, size,
           len: firer?.handle.length ?? 90,
+          aspect: W().app.camera.aspect || 1.78,
           flash: anchor ? () => { firer?.handle.fireGun(0); vfx.muzzle(anchor, size); } : null,
         });
       } else {

@@ -260,6 +260,16 @@ export function prop(name) {
   return props.get(name);
 }
 
+function round(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+
 function markTexture(label, draw) {
   const S = 128;
   const cv = document.createElement('canvas');
@@ -348,14 +358,24 @@ export function make(name, quality) {
   }
 
   if (name === 'pegMiss') {
+    // D41: a resolved miss is a filled cell DARKER than the chart. Additive could only add light,
+    // and a ring is the one shape this chart cannot carry — it is already covered in cyan rings.
+    // The map's RGB is a two-level stencil, not a colour: the body renders at 0.42 of the instance
+    // colour and the rim at full, so one instance colour drives both.
     const tex = markTexture('table:missMark', (g, S) => {
-      g.lineWidth = S / 20;
-      g.beginPath(); g.arc(S / 2, S / 2, S * 0.30, 0, 7); g.stroke();
-      g.globalAlpha = 0.5;
-      g.beginPath(); g.arc(S / 2, S / 2, S * 0.09, 0, 7); g.fill();
+      const inset = S * 0.09, r = S * 0.10;
+      g.fillStyle = 'rgba(108,108,108,0.86)';
+      round(g, inset, inset, S - inset * 2, S - inset * 2, r);
+      g.fill();
+      g.strokeStyle = 'rgba(255,255,255,0.86)';
+      g.lineWidth = S / 26;
+      round(g, inset, inset, S - inset * 2, S - inset * 2, r);
+      g.stroke();
     });
+    // toneMapped false: flow.js moves the exposure between aiming and a cinematic, and a marker
+    // whose job is to be darker than the paper must not brighten with it.
     return new THREE.MeshBasicMaterial({
-      map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+      map: tex, transparent: true, depthWrite: false, fog: false, toneMapped: false,
     });
   }
 

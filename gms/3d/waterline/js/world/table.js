@@ -36,6 +36,11 @@ const MARKER = {
   hulk: [0.55, 0.11, 0.09],
 };
 
+// The resolved-miss square (D41). Not a glow and not tone mapped: this is the linear value that
+// reaches the frame buffer, and it has to land under the chart's own paper — #08171f lifted by a
+// 0.22 emissive term. `flash` is what the mark arrives at before it settles to `ink`.
+const MISS = { ink: [0.010, 0.017, 0.024], flash: 4.5 };
+
 const SHEEN = {
   holo: new THREE.Color(0.12, 0.26, 0.32),
   chart: new THREE.Color(0.26, 0.16, 0.065),
@@ -208,6 +213,9 @@ export function buildTable(w, h) {
   const reticle = overlay(4);
   const missMarks = overlay(w * h, getMaterial('table', 'pegMiss'));
   const hitMarks = overlay(w * h, getMaterial('table', 'pegHit'));
+  // Above the lamp pool (renderOrder 4), which is additive and would otherwise put light straight
+  // back into the one mark whose whole job is to be a dark hole in the chart.
+  missMarks.renderOrder = 5;
 
   // Physical markers. Cells the player has resolved get a peg standing on the chart; unknown
   // cells get nothing, because a hundred identical pegs is a checkerboard, not a plot.
@@ -253,6 +261,7 @@ export function buildTable(w, h) {
   let ghostCells = null;
   const pulses = [];
   const pegCell = [];                 // instance index → {r,c}, so a pulse can find its peg
+  const missCell = [];                // the same, for the miss squares
 
   const inDomain = (kind, r, c) => {
     const d = anchorDomain(board, KINDS.includes(kind) ? kind : 'shell');
@@ -351,6 +360,7 @@ export function buildTable(w, h) {
       const g = view?.grid;
       let np = 0, nm = 0, nh = 0;
       pegCell.length = 0;
+      missCell.length = 0;
       if (g) {
         for (let r = 0; r < h; r++) {
           for (let c = 0; c < w; c++) {
@@ -358,8 +368,8 @@ export function buildTable(w, h) {
             if (!st) continue;
             const p = cellToLocal(r, c);
             if (st === PEG.miss) {
-              setQuad(missMarks, nm++, p.x, p.z, pitch * 0.62, pitch * 0.62, 0.0016,
-                [0.20, 0.32, 0.44]);
+              missCell[nm] = { r, c };
+              setQuad(missMarks, nm++, p.x, p.z, pitch * 0.88, pitch * 0.88, 0.0016, MISS.ink);
             } else {
               const col = st === PEG.sunk ? MARKER.sunk : MARKER.hit;
               m.compose(v.set(p.x, p.y, p.z), q.identity(), s.set(1, 1, 1));
@@ -423,7 +433,7 @@ export function buildTable(w, h) {
     },
 
     pulse(r, c, kind = 'hit') {
-      pulses.push({ r, c, kind, t: 0 });
+      pulses.push({ r, c, kind, t: 0, wait: 0 });
     },
 
     // 'holo' — cold plot glass under the bridge lamps. 'chart' — warm lit paper under a chart lamp.
@@ -466,18 +476,37 @@ export function buildTable(w, h) {
       if (!pulses.length) return;
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
+        const miss = p.kind === 'miss';
+        // The presenter announces a result up to 2.6 s before flow.js repaints the table, so the
+        // mark a pulse is announcing does not exist yet when the pulse is queued. Waiting for it is
+        // what makes the announcement land ON the mark instead of on nothing.
+        const idx = miss
+          ? missCell.findIndex(mc => mc && mc.r === p.r && mc.c === p.c)
+          : pegCell.findIndex(pc => pc && pc.r === p.r && pc.c === p.c);
+        if (idx < 0) { if ((p.wait += dt) > 5) pulses.splice(i, 1); continue; }
         p.t += dt;
-        const u = p.t / 0.55;
+        const u = p.t / (miss ? 0.7 : 0.55);
         if (u >= 1) { pulses.splice(i, 1); continue; }
-        const idx = pegCell.findIndex(pc => pc && pc.r === p.r && pc.c === p.c);
-        if (idx < 0) continue;
+        if (miss) {
+          // Both curves end at exactly 1, so the last frame of the pulse IS the resting mark and
+          // nothing has to repaint the instance afterwards.
+          const e = (1 - u) * (1 - u);
+          const side = pitch * 0.88 * (1 + e * 0.55);
+          const at = cellToLocal(p.r, p.c);
+          m.compose(v.set(at.x, 0.0016, at.z), flat, s.set(side, side, 1));
+          missMarks.setMatrixAt(idx, m);
+          const g = 1 + (MISS.flash - 1) * e;
+          missMarks.setColorAt(idx, colour.setRGB(MISS.ink[0] * g, MISS.ink[1] * g, MISS.ink[2] * g));
+          missMarks.instanceMatrix.needsUpdate = true;
+          missMarks.instanceColor.needsUpdate = true;
+          continue;
+        }
         const k = 1 + Math.sin(u * Math.PI) * 1.6;
         const loc = cellToLocal(p.r, p.c);
         m.compose(v.set(loc.x, loc.y * k, loc.z), q.identity(), s.set(1, k, 1));
         pegs.setMatrixAt(idx, m);
-        const col = p.kind === 'miss' ? [0.5, 0.8, 1.1] : MARKER.hit;
         const b = 1 + Math.sin(u * Math.PI) * 2.5;
-        pegGlow.setXYZ(idx, col[0] * b, col[1] * b, col[2] * b);
+        pegGlow.setXYZ(idx, MARKER.hit[0] * b, MARKER.hit[1] * b, MARKER.hit[2] * b);
         pegs.instanceMatrix.needsUpdate = true;
         pegGlow.needsUpdate = true;
       }

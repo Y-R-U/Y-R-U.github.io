@@ -82,6 +82,37 @@ fly-out** — a reading of "off — stay on the table", one line if Aaron wants 
 drag and tap was a synthesised CDP event. Multi-touch, gesture cancellation and iOS Safari's pointer
 behaviour are unverified, and the layout editor is exactly where that matters.
 
+## Phase 1.6 — Aaron's second phone round
+
+Three defects, filed 2026-08-07 after playing the phase-1.5 build. Rulings D40–D42, all three
+reproduced by me before briefing. **P4 fixed all three on pass 1.**
+
+| | what | cause |
+|---|---|---|
+| 1 | still comes back dark, still needs a refresh | P2's handler was correct and **never fired** — nothing calls `restoreContext()` on a real device (D40) |
+| 2 | no dark square where a shot was fired | the marker is drawn and visible, and **additive**, so it cannot darken — a thin ring on a chart full of rings (D41) |
+| 3 | the firing camera is too close on mobile | `fire_out` had no aspect term; portrait framed **~23 m against a 115 m ship** (D42) |
+
+P4 found two Chrome behaviours my brief's prescription would have failed on, both invisible to a
+test that only asserts "the game came back": **`getExtension()` returns null on a lost context**, so
+fetching `WEBGL_lose_context` at recovery time can never work — it must be cached at construction;
+and **`restoreContext()` called from inside the `webglcontextlost` listener is a silent no-op**,
+because Chrome reads `defaultPrevented` after the listeners run. It also found a second dead handler
+of the same shape: **`pulse()` was a no-op for every newly resolved cell, hit as well as miss** — the
+presenter announces up to 2.6 s before the table repaints.
+
+Verified independently at 390×844: two unmistakable dark squares on the chart; the **played** (not
+posed) muzzle flash puts the whole flagship in frame at NDC (0.01, −0.02) with a 55.3 m frame width
+at the gun; context lost with no manual restore recovers in under 2 s with the match intact and no
+reload. A plain reload still lands on the title with Carry on / Discard, so the recovery's
+auto-resume is correctly scoped.
+
+`bridge_table` moved 0.52 against a 0.016 floor — expected and accepted, it is the miss cells.
+
+**Still true after four passes: no finger has touched any of this.** Every tap, drag and context
+loss has been synthesised in headless Chrome. iOS Safari is a different code path for all three of
+P4's fixes.
+
 ## Where the queue stands
 
 | Component | Passes | Status |

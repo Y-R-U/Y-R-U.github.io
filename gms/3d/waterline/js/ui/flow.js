@@ -122,6 +122,13 @@ function boot() {
   addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveMatch(); });
   addEventListener('pagehide', saveMatch);
   addEventListener('beforeunload', saveMatch);
+  // A reload driven from inside the page (D40's context recovery) is the one exit that must not
+  // rely on the browser firing either of those in time. It also leaves a note, so a player whose
+  // context died mid-match comes back to the match and not to the title screen.
+  app.onTeardown(() => {
+    saveMatch();
+    if (flow.screen === 'play' && flow.game) session(RECOVERED, '1');
+  });
 
   app.add({ update: dt => tickDusk(dt) });
 
@@ -139,7 +146,20 @@ function boot() {
   if (!save.available) {
     overlay.note('Private browsing: this session will play fine, but progress will not be saved.');
   }
-  showTitle();
+  const recovered = session(RECOVERED) === '1';
+  session(RECOVERED, null);
+  if (recovered && storedMatch()) resumeMatch(); else showTitle();
+}
+
+// sessionStorage, not save: this note must not outlive the tab that wrote it. Private browsing
+// throws on the getter as well as the setter.
+const RECOVERED = 'waterline:recovered';
+function session(key, value) {
+  try {
+    if (value === undefined) return sessionStorage.getItem(key);
+    if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key, value);
+  } catch {}
+  return null;
 }
 
 const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true, flyout: 'on' });
