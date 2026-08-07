@@ -1,1 +1,200 @@
-/* owned by the UI agent */
+/* Player HUD: bars, inventory, equipment, skills, toasts. Dark, thin, low-chrome. */
+
+#game {
+  position: fixed; inset: 0; z-index: 25; pointer-events: none;
+  --f-top: 8px;
+  --slot: 46px;
+  --gap: 4px;
+  --pad: 8px;
+  --panel: calc(var(--slot) * 5 + var(--gap) * 4 + var(--pad) * 2);
+  --line: rgba(255,255,255,.11);
+  --acc: #b9721f;
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+body.shotmode #game { display: none !important; }
+
+/* ── status bars ── */
+.f-bars {
+  position: absolute; top: var(--f-top); left: calc(8px + env(safe-area-inset-left, 0px));
+  width: 176px; padding: 7px 8px; display: grid; gap: 5px;
+  background: rgba(10,13,15,.74); backdrop-filter: blur(8px);
+  border: 1px solid var(--line); border-radius: 6px;
+}
+.f-bar {
+  position: relative; height: 12px; background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.08); border-radius: 2px; overflow: hidden;
+}
+.f-bar > i { position: absolute; inset: 0 auto 0 0; width: 100%; }
+.f-bar > s {
+  position: absolute; inset: 0; text-decoration: none; text-align: center;
+  font: 600 9.5px/12px ui-monospace, "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums; letter-spacing: .04em;
+  color: #eef1f2; text-shadow: 0 1px 2px rgba(0,0,0,.9);
+}
+.f-hp > i { background: linear-gradient(180deg, #d4574f, #9c3a34); }
+.f-mp > i { background: linear-gradient(180deg, #5f8fd6, #38609b); }
+
+/* ── the dock ── */
+.f-dock {
+  position: absolute; z-index: 2;
+  right: calc(8px + env(safe-area-inset-right, 0px));
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  width: var(--panel); max-width: calc(100vw - 16px);
+  pointer-events: auto; touch-action: pan-y;
+  display: flex; flex-direction: column;
+}
+.f-body {
+  max-height: calc(100vh - var(--f-top) - 76px); overflow-y: auto; overscroll-behavior: contain;
+  padding: var(--pad); background: rgba(10,13,15,.8); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0;
+}
+
+/* ── inventory ── */
+.f-head { display: flex; gap: var(--gap); margin-bottom: 6px; }
+.f-cycle, .f-trash {
+  height: 40px; display: flex; align-items: center; justify-content: center; gap: 5px;
+  background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 4px;
+  color: #dfe4e6; cursor: pointer; font: inherit; padding: 0 10px; touch-action: manipulation;
+}
+.f-cycle { flex: 1; }
+.f-cycle span { font-size: 15px; }
+.f-cycle b { font: 600 14px/1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.f-cycle u { text-decoration: none; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; opacity: .45; }
+.f-cycle i { font-style: normal; font-size: 16px; color: var(--acc); margin-left: auto; }
+.f-cycle:active { background: rgba(185,114,31,.28); border-color: var(--acc); }
+.f-trash { width: 44px; font-size: 14px; opacity: .55; }
+.f-trash.f-over { opacity: 1; color: #e8705a; border-color: #e8705a; background: rgba(232,112,90,.16); }
+
+.f-grid { display: grid; grid-template-columns: repeat(5, var(--slot)); gap: var(--gap); }
+.f-cap {
+  grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 9px; letter-spacing: .16em; text-transform: uppercase; opacity: .4;
+  padding-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.f-cap + .f-cap, .f-cap-pack { margin-top: 5px; }
+.f-cap i { font-style: normal; letter-spacing: 0; font-family: ui-monospace, Menlo, monospace; }
+
+.f-slot {
+  position: relative; width: var(--slot); height: var(--slot); padding: 0;
+  border: 1px solid var(--line); border-radius: 3px; cursor: pointer;
+  color: inherit; font: inherit; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+}
+.f-belt { background: rgba(255,255,255,.105); }
+.f-pack { background: rgba(0,0,0,.46); border-color: rgba(255,255,255,.07); }
+/* Emoji glyphs ignore `color`, so an item's tint has to reach the slot some other way. */
+.f-slot[style*="--tint"]::before {
+  content: ''; position: absolute; inset: 0; border-radius: 2px; pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, var(--tint), transparent 70%); opacity: .17;
+}
+.f-slot em { font-style: normal; font-size: 21px; line-height: var(--slot); display: block;
+  position: relative; text-shadow: 0 1px 3px rgba(0,0,0,.75); }
+.f-slot b {
+  position: absolute; right: 2px; bottom: 1px;
+  font: 600 10px/1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums;
+  color: #fff; text-shadow: 0 0 3px #000, 0 1px 2px #000;
+}
+.f-slot:active { border-color: var(--acc); }
+.f-slot.f-over { border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+
+/* ── equipment ── */
+.f-doll { display: grid; gap: 6px; }
+.f-drow { display: flex; gap: var(--gap); justify-content: center; }
+.f-eq {
+  width: var(--slot); padding: 0 0 1px; background: rgba(255,255,255,.055);
+  border: 1px solid var(--line); border-radius: 3px; color: inherit; font: inherit;
+  cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+}
+.f-eq > span { display: block; height: 30px; line-height: 30px; }
+.f-eq em { font-style: normal; font-size: 19px; text-shadow: 0 1px 3px rgba(0,0,0,.75); }
+.f-eq > i {
+  display: block; font-style: normal; font-size: 8px; letter-spacing: .03em;
+  opacity: .45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 1px;
+}
+.f-eq.f-empty { background: rgba(0,0,0,.38); border-style: dashed; border-color: rgba(255,255,255,.09); }
+.f-eq.f-no { opacity: .22; }
+.f-eq.f-over { border-color: var(--acc); border-style: solid; }
+.f-eq:not(.f-empty) > i { opacity: .7; }
+.f-foot {
+  display: flex; align-items: baseline; gap: 6px; margin-top: 9px; padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase; opacity: .5;
+}
+.f-foot b { font: 600 15px/1 ui-monospace, Menlo, monospace; letter-spacing: 0; opacity: 1; color: #dfe4e6; }
+.f-foot s { text-decoration: none; margin-left: auto; letter-spacing: .06em; }
+
+/* ── skills ── */
+.f-skills { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.f-sk {
+  padding: 6px 7px 7px; background: rgba(255,255,255,.05);
+  border: 1px solid var(--line); border-radius: 3px;
+}
+.f-sk span { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; }
+.f-sk b { font: 600 13px/1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; color: #e8edef; }
+.f-sk u {
+  display: block; text-decoration: none; height: 3px; margin-top: 6px;
+  background: rgba(0,0,0,.55); border-radius: 2px; overflow: hidden;
+}
+.f-sk u i { display: block; height: 100%; background: var(--acc); }
+
+/* ── tabs ── */
+.f-tabs { display: flex; }
+.f-tabs button {
+  flex: 1; height: 44px; font: 11.5px/1 inherit; letter-spacing: .04em; cursor: pointer;
+  color: #aab2b6; background: rgba(10,13,15,.86); border: 1px solid var(--line);
+  border-right: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.f-tabs button:first-child { border-radius: 0 0 0 6px; }
+.f-tabs button:last-child { border-right: 1px solid var(--line); border-radius: 0 0 6px 0; }
+.f-tabs button.on { color: #fff; background: rgba(185,114,31,.22); box-shadow: inset 0 -2px 0 var(--acc); }
+
+/* ── take control ── */
+.f-take {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  pointer-events: auto; touch-action: manipulation; cursor: pointer;
+  padding: 0 22px; height: 46px; font: 12px/1 inherit; letter-spacing: .18em; text-transform: uppercase;
+  color: #f2e5d4; background: rgba(10,13,15,.82); backdrop-filter: blur(8px);
+  border: 1px solid rgba(185,114,31,.6); border-radius: 4px;
+}
+.f-take:active { background: rgba(185,114,31,.35); }
+
+/* ── toasts ── */
+/* Left of the dock, which is tall and would otherwise cover them. */
+.f-toasts {
+  position: absolute; z-index: 3;
+  left: calc(8px + env(safe-area-inset-left, 0px));
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  max-width: min(320px, calc(100vw - var(--panel) - 26px));
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+}
+.f-toast {
+  pointer-events: auto; max-width: 100%; padding: 7px 10px;
+  font-size: 11.5px; color: #e7ecee;
+  background: rgba(10,13,15,.88); border: 1px solid var(--line);
+  border-left: 2px solid rgba(255,255,255,.3); border-radius: 3px;
+  transition: opacity .35s, transform .35s;
+}
+.f-toast.up { border-left-color: var(--acc); color: #f0d5ae; }
+.f-toast.out { opacity: 0; transform: translateY(4px); }
+
+/* ── drag ghost ── */
+.f-ghost {
+  position: fixed; left: 0; top: 0; width: var(--slot); height: var(--slot);
+  margin: calc(var(--slot) / -2) 0 0 calc(var(--slot) / -2);
+  display: none; place-items: center; pointer-events: none; z-index: 40;
+  background: rgba(10,13,15,.9); border: 1px solid var(--acc); border-radius: 3px;
+}
+.f-ghost.on { display: grid; }
+.f-ghost em { font-style: normal; font-size: 22px; }
+
+/* Short viewports — a landscape phone. Tighten, and let the grid scroll rather than grow. */
+@media (max-height: 620px) {
+  #game { --slot: 44px; --gap: 3px; --pad: 6px; }
+  /* No room to stack under the perf HUD on a landscape phone — sit beside it instead. */
+  .f-bars { width: 148px; padding: 5px 6px; top: 8px; left: var(--f-left); }
+  .f-toast:nth-last-child(n+3) { display: none; }
+  .f-tabs button { height: 40px; }
+  .f-take { height: 42px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .f-body { max-height: calc(100vh - var(--f-top) - 56px); }
+  .f-toasts { bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
+}

@@ -71,6 +71,7 @@ export class World {
     this.batch = new Batch(this.materials);
     this.dynamic = new THREE.Group();
     this.claims = [];
+    this.village = { plots: [], paths: [], centre: { x: 4, z: 2 } };
     const ctx = this.makeCtx(p, q);
     this.report = {};
     this.animated = [];
@@ -102,7 +103,7 @@ export class World {
     return {
       p, terrain: t, batch: this.batch, quality: q,
       detail: q.detail ?? 1, scatter: q.scatter ?? 1, life: q.life ?? 1,
-      village: { plots: [], paths: [], centre: { x: 4, z: 2 } },
+      village: this.village,
 
       // Claim a circle of ground. Later modules test against it so a tree never grows through a
       // roof and a chicken never stands in the millpond.

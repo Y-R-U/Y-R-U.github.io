@@ -31,11 +31,33 @@ class Inventory {
     this.game = game;
     this.beltSize = 5;
     this.packSize = 0;
+    this.forced = 0;
     this.slots = new Array(MAX_PACK + 10).fill(null);
   }
 
   get size() { return this.beltSize + this.packSize; }
   isBelt(i) { return i < this.beltSize; }
+
+  // The test cycler's override. Held here rather than in the UI so equipping something can't
+  // silently undo it — `Equipment.recompute` re-applies whatever is set.
+  setSize(n) {
+    this.forced = n || 0;
+    if (n) {
+      this.beltSize = Math.min(10, n);
+      this.packSize = Math.min(MAX_PACK, Math.max(0, n - 10));
+    } else {
+      this.game.equip.recompute();
+    }
+    this.game.emit('change');
+  }
+
+  dropAt(i) {
+    const s = this.slots[i];
+    if (!s) return false;
+    this.game.emit('drop', { index: i, id: s.id, qty: s.qty, pos: this.game.player.pos });
+    if (this.slots[i] === s) this.removeAt(i, s.qty);
+    return true;
+  }
 
   // Belt fills first, deliberately: the quick-use slots are the ones you want a potion to land in.
   add(id, qty = 1) {
@@ -165,8 +187,13 @@ class Equipment {
       armour += it.armour || 0;
     }
     const inv = this.game.inv;
-    inv.beltSize = Math.min(10, beltRows * 5);
-    inv.packSize = Math.min(MAX_PACK, packRows * 5);
+    if (inv.forced) {
+      inv.beltSize = Math.min(10, inv.forced);
+      inv.packSize = Math.min(MAX_PACK, Math.max(0, inv.forced - 10));
+    } else {
+      inv.beltSize = Math.min(10, beltRows * 5);
+      inv.packSize = Math.min(MAX_PACK, packRows * 5);
+    }
     this.game.player.armour = armour;
   }
 
@@ -186,6 +213,7 @@ class GameState {
     this.inv = new Inventory(this);
     this.equip = new Equipment(this);
     this.actors = [];
+    this.spawnPoint = null;
     this.interactables = new Map();
     this.listeners = new Map();
     this.controlled = false;

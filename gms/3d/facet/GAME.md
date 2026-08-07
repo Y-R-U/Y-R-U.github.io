@@ -60,7 +60,7 @@ ring6 … ring10  (right hand)
 legs        feet        ammo
 ```
 
-25 slots. `back` is cloak-or-backpack — it is the slot that grows the pack. `waist` is the belt
+26 slots. `back` is cloak-or-backpack — it is the slot that grows the pack. `waist` is the belt
 itself, and it is what takes the belt from 5 to 10. `gloves`, `shoulders` and `ammo` are there
 because a sword-and-staff game wants them and they cost nothing to add now.
 
@@ -126,7 +126,9 @@ Game.inv.add(itemId, qty)      // → true if it fit; fills belt before pack
 Game.inv.removeAt(i, qty)
 Game.inv.moveTo(from, to)
 Game.inv.useAt(i)              // eat/drink/equip depending on the item
-Game.equip.slots       // { head: itemId|null, … } — 25 keys, see above
+Game.inv.dropAt(i)             // emits 'drop' with the stack intact, then empties the slot
+Game.inv.setSize(n)            // test override; 0 hands the size back to equipment
+Game.equip.slots       // { head: itemId|null, … } — 26 keys, see above
 Game.equip.put(slot, itemId)
 Game.equip.take(slot)
 ```

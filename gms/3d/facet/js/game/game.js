@@ -15,6 +15,8 @@ export function startGame(app, world) {
   const params = new URLSearchParams(location.search);
   Game.world = world;
   Game.app = app;
+  const c = world.village?.centre || { x: 4, z: 2 };
+  Game.spawnPoint = new THREE.Vector3(c.x, world.terrain.heightAt(c.x, c.z), c.z);
 
   const parts = {
     ui: ui.mount?.(Game, app) || null,
