@@ -4080,3 +4080,136 @@ a named action.
 86. **`--report` cannot use top-level `await`.** `Runtime.evaluate` wraps the expression in
     `JSON.stringify(...)` and top-level await throws there. Park the result on a global from an
     async IIFE in `--eval` and report the global.
+
+---
+
+# Session 15 — the front of the game: a verdict, three origins, and a voice
+
+Aaron's note: the old opening was "visually nice" but not a sizzling start — you jumped straight
+into clicking menu items, with nothing making you care about the character, and it felt like the
+middle of a game rather than the beginning. This session replaces the whole front end.
+
+**Nothing in `js/world/` was touched.** A parallel agent owns the 3D quarters room.
+
+## 1. The cold open is a film about somebody else
+
+`content/verdict.js` + `js/ui/verdict.js` + `#verdict` in `index.html`.
+
+Eleven beats, ~46 s, **plays itself**. The Universal Alliance convicts the **Meridian Combine** —
+sixty-one years of buying yards, then lanes, then the people who set the tariffs; filament rationed
+to hold its price; the Kalsa beacon dark for nine days with 2,300 people in the ships that could not
+see it — and sentences it to divest to a tenth of itself over twelve years, lane by lane. Tamber
+Reach was released this year. Corvain took 71 % of it in nine weeks. **You got here late.**
+
+It never says "this gives you a chance". The player works that out, which is the whole point.
+
+- **There is no Next button.** A tap *advances* a beat and Skip cuts to the last framing, but doing
+  nothing runs the whole thing. A thin progress bar across the top says how much is left.
+- **Beat kinds** — `seal` · `record` · `stamp` · `sentence` · `land` — each with its own type
+  treatment. Prose sits in the lower third; only the seal and the GUILTY stamp own the frame centre.
+- **`?front=1` forces it, `?front=0` skips it**, and it is a showroom entry (`cold_open`). A player
+  with a save never sees it again.
+
+## 2. Three origins, and they are real sim changes
+
+`content/origins.js`. **Silver Spoon** (easy) · **Saved Up** (medium) · **Out of the Gutter** (hard).
+Each overrides `balance.start` and `balance.loan`, and gutter also carries `tacticCost` and
+`tacticUnlock` multipliers — its contacts are its whole inheritance, so the grey and illegal bands
+cost it ~half and unlock at ~a third of the usual share.
+
+| | cash | debt | rate/wk | hulls | measured bust | share w13 |
+|---|---|---|---|---|---|---|
+| silver | 44,000 | 30,000 | 0.5 % | 3 | 7.7 % | 25.8 % |
+| saved | 34,000 | 52,000 | 1.2 % | 3 | 10.0 % | 22.5 % |
+| gutter | 21,000 | 24,000 | 1.7 % | 2 | ~24 % | 10.4 % |
+
+`node sim.mjs 300 --origin=<id>` — **all three pass, and so does the base with no origin.**
+
+## 3. The voice engine — the piece everything later depends on
+
+`js/sim/voice.js` (pure, no DOM) + `content/voice.js` + `content/traits.js`.
+
+Every NPC line resolves against `(origin, gender, personality, traits)`. A table is an ordered
+variant list, **first match wins**, authored most-specific-first with a bare fallback last — so a
+beat needs 4–7 variants, not 3×3×5×9 of them.
+
+Aaron's own example works end to end:
+
+```
+Brann Otey: G’day love, after a hull?
+Wren Otey:  Don’t call me love.
+Brann Otey: Right you are. Board’s live, help yourself.
+```
+
+- **`{term}`** resolves from the NPC's *register* (`rough` mate/love/friend · `formal` sir/ma'am ·
+  `spacer` skip · `plain`) and the player's gender. `genderedFor` marks which genders get a gendered
+  word, so **"What's it to you" gets "friend" from the rough register and never trips the trait** —
+  but the formal register has no word for it, defaults to "sir", and *does*.
+- **`{lastTerm}`** is the word the NPC actually used, which is how the comeback quotes it back
+  instead of the table having to hard-code "love".
+- **Flags flow both ways.** A variant can set `flags: { snapped: true }` and the *next* beat matches
+  `when: { said: 'snapped' }` — so the broker reacts to how you spoke to him.
+- **`shouts` is a delivery rule, not copy.** `deliver()` uppercases the player's line; `voiced` is
+  false for NPC beats so the broker does not start shouting because you do.
+
+`node tools/voicecheck.mjs --show` — **1,620 resolutions across every combination, all clean**, and
+it asserts the four behaviours above directly.
+
+## 4. Character creation
+
+`js/ui/origin.js` + `front.css`. Origin card → name/company (rolled from `content/names.js`, editable,
+re-rollable) → gender (Male · Female · **What's it to you**) → an **Advanced** fold with personality
+(1 of 5) and traits (up to 3), both defaulted from the origin.
+
+**The sample exchange under the traits re-runs through the voice engine on every toggle.** That is
+what makes the traits legible — you can watch "Touchy about gender" turn a broker's greeting into a
+comeback before you commit to it. Tap "Another ›" to cycle the three conversations.
+
+## 5. Aaron's UI note — the dock coach mark
+
+Fixed. A colour change on a dock button reads as "that is just how it looks". `#dock button.intro-coach`
+now gets the same pulsing ring the in-sheet marks get, **plus an arrow pointing down at it**.
+
+## Gotchas — session 15
+
+87. **The HUD was drawing over the cold open.** "40.0k cr · Week 0 · 4.0% of the Reach" sitting on
+    top of an Alliance murder ruling killed the beat completely. `body.front` hides `#ui #hud
+    #panel #showroom-btn #intro`, set in `main.js` around the whole front sequence.
+88. **You cannot frame around Ledger during the verdict.** Ledger sits ~3° off the camera→Ossian
+    axis from every position that makes the gas giant look good, so it is always in shot. The fix
+    was not a camera move — beats 0–7 **hide `ledger`, `drayyard` and `kestrel`**, and the beat
+    marked `here: true` switches them on. A framing problem became the reveal.
+89. **Aiming at the planet's centre fills the frame.** Ossian reads as a flat orange bullseye that
+    breaks every composition rule in `CLAUDE.md`. The good framing holds it *off*-axis so the limb
+    runs off one edge. Do not trust radius arithmetic here — `radius: 4200` with `REACH` scale 0.34
+    did not predict what the camera actually saw. Shoot it and look.
+90. **Origin numbers cannot share one target band.** Holding easy/medium/hard to the medium bust and
+    share bands is wrong by construction. Each origin carries its own `targets`, and `sim.mjs` reads
+    them via `T(key)` when `--origin` is given.
+91. **Fleet size is not what kills the poor origins — interest is.** 3 %/wk compounds through the
+    harness's loan-drawing styles into a guaranteed death spiral: gutter busted 99 % *with the base
+    fleet*. Isolating the fleet term proved it was not the cause. But **hauler count is what drives
+    share** — `['ossa','ossa']` scores 0 % because nothing can carry.
+92. **Cash gates the *content*, not just the growth.** A poor origin could never afford the Coil
+    Line, so it shipped rock forever and never met a tactic (1 by week 20 against 6). Cheaper grey
+    *unlocks* fixed it where cheaper grey *prices* barely moved it.
+93. **`loanOf(state)` replaced `content.balance.loan` everywhere.** Three origins on three sets of
+    loan terms cannot use a mutable global — `js/ui/intro.js` caches `content.balance` at import and
+    would have gone stale. The terms live on the state; old saves fall back.
+94. **Order your string replacements longest-first.** `greyReachable` matched inside
+    `greyReachableByWeek16` and produced `T('greyReachable')ByWeek16`, a syntax error.
+95. **`.o-cta` sticky covered the conversation preview.** A sticky footer needs matching
+    `padding-bottom` on the scroller, not just a `z-index`.
+
+## What is deliberately NOT done
+
+- **The room and the terminal.** A parallel agent is building `js/world/room.js` +
+  `content/quarters.js`. Nothing here imports them yet.
+- **Starting with no ships.** Aaron wants the first real act to be buying a hull from the terminal
+  shipyard. Every origin still starts with a working fleet, because ripping that out before the
+  shipyard exists would break the whole objective chain and leave the game unplayable. The origins
+  are already the seam: drop `start.ships` to `[]` when the yard can sell one.
+- **Lenders and the shipyard as playable UI.** `origin.lenders` names them and `content/voice.js`
+  has their dialogue; nothing opens them yet.
+- **Follow-your-ship to the job.** Camera work on top of the existing mover.
+- Only three conversations exist. The engine is the deliverable; the script is thin on purpose.

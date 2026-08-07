@@ -15,12 +15,15 @@ import { showroom, buildShowroom } from './showroom/index.js';
 import { registerEntries } from './showroom/entries.js';
 import { getScenario, allScenarios } from './scenarios.js';
 import { camera } from './world/camera.js';
+import content from './sim/content.js';
 import { createSimView } from './ui/simview.js';
 import { panels } from './ui/panels.js';
 import { buildHud } from './ui/hud.js';
 import { registerStoryEntries } from './ui/story.js';
 import { newRun } from './ui/storypool.js';
 import { intro } from './ui/intro.js';
+import { verdict } from './ui/verdict.js';
+import { chooseOrigin } from './ui/origin.js';
 import { inspect } from './ui/inspect.js';
 import './ui/screens.js';
 
@@ -166,25 +169,74 @@ if (live) {
   inspect.attach({ sim, camera, reach });
   camera.onTap((hit, hits) => inspect.show(reach.siteAt(hit, hits)));
 
-  // §1 beat 1. The clock does not start and the fingers do not reach the 3D until the briefing
-  // hands the game over — the intro owns the whole cold open now, one camera move per card.
+  // The clock does not start and the fingers do not reach the 3D until the front of the game
+  // hands over. `begin()` is still the only place the company starts.
   const shots = introShots();
   camera.enable(true);
   camera.setTouchEnabled(false);
   sim.setSpeed(0);
-  camera.setFrom(shots[0].pos, shots[0].look, shots[0].fov);
 
-  intro.start({
-    app, sim, panels, hud, camera, reach, showroom, shots,
-    begin: () => {
-      camera.cancelMove();
-      camera.setTouchEnabled(true);
-      camera.markHome(HOME());
-      camera.resetView(1500);
-      hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
-      if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
-    },
+  const startGame = (profile = null) => {
+    intro.start({
+      app, sim, panels, hud, camera, reach, showroom, shots, profile,
+      // the ruling already did the framing the four cards used to do
+      cards: !profile,
+      begin: () => {
+        camera.cancelMove();
+        camera.setTouchEnabled(true);
+        camera.markHome(HOME());
+        camera.resetView(1500);
+        hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
+        if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
+      },
+    });
+  };
+
+  // A returning player with a save skips straight past the ruling and the origin — both are
+  // things you decide once. `?front=1` forces them back for testing, `?front=0` skips them.
+  const front = params.get('front');
+  const fresh = front === '1' || (front !== '0' && !hasSave());
+
+  showroom.register({
+    id: 'cold_open', group: 'misc', label: 'The verdict — cold open',
+    note: 'the Alliance ruling that opened the Reach',
+    run: () => { camera.setTouchEnabled(false); verdict.play({ camera }).then(() => camera.setTouchEnabled(true)); },
   });
+
+  if (!fresh) {
+    camera.setFrom(shots[0].pos, shots[0].look, shots[0].fov);
+    startGame();
+  } else {
+    const first = content.verdict.beats[0].shot;
+    camera.setFrom(first.pos, first.look, first.fov);
+    document.body.classList.add('front');
+    // The ruling happens somewhere else. Ledger, Dray Yard and the belt stay dark until the beat
+    // that names the Reach, which is what makes that line a reveal instead of a caption.
+    const local = ['ledger', 'drayyard', 'kestrel'].map(id => reach.sites[id]).filter(Boolean);
+    let here = false;
+    for (const o of local) o.visible = false;
+    const reveal = () => { if (!here) { here = true; for (const o of local) o.visible = true; } };
+
+    verdict.play({ camera, onBeat: b => { if (b.here) reveal(); } })
+      .finally(reveal)
+      .then(() => chooseOrigin({ seed: sim.seed }))
+      .then(profile => {
+        sim.reset(sim.seed, { origin: profile.origin, profile });
+        writeProfile(profile);
+        reach.seed(sim.state.ships);
+        document.body.classList.remove('front');
+        camera.moveTo({ ...shots[0], ms: 1400, ease: 'inout' });
+        startGame(profile);
+      });
+  }
+}
+
+function hasSave() {
+  try { return !!localStorage.getItem('monopole.save.v1'); } catch { return false; }
+}
+
+function writeProfile(p) {
+  try { localStorage.setItem('monopole.profile.v1', JSON.stringify(p)); } catch { /* private mode */ }
 }
 
 // after the scenario, so --set=knob=value on the command line still wins

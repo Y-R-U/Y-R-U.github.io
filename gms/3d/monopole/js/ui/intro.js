@@ -9,25 +9,32 @@ const SEEN_KEY = 'monopole.seen.v1';
 const SAVE_KEY = 'monopole.save.v1';
 
 const b = content.balance;
-const NUMBERS = {
-  cash: credits(b.start.cash),
-  debt: credits(b.start.debt),
-  playerShare: pct(b.start.share.player),
-  rivalShare: pct(b.start.share.rival),
-  duopoly: pct(b.win.duopoly),
-  monopoly: pct(b.win.monopoly),
-  holdWeeks: String(b.win.holdWeeks),
-  fromWeek: String(b.win.checkFromWeek),
-  heat: String(b.heat.threshold),
-  debtLimit: credits(b.loan.debtLimit),
-  interest: pct(b.loan.interestWeekly, 1),
-  feedWeeks: String(b.market.feedWeeks),
-  window: String(b.share.window),
-  mine: String(content.get('ship', 'ossa')?.mine ?? 0),
-  hold: String(content.get('ship', 'kite')?.hold ?? 0),
-};
 
-const fill = s => String(s).replace(/\{(\w+)\}/g, (m, k) => NUMBERS[k] ?? m);
+// Three origins run on three sets of loan terms, and the cash the player actually started with is
+// on the state — so these are read per call rather than frozen at import.
+function numbers() {
+  const st = ctx?.sim?.state;
+  const loan = st?.loan || b.loan;
+  return {
+    cash: credits(st ? st.cash : b.start.cash),
+    debt: credits(st?.startDebt ?? b.start.debt),
+    playerShare: pct(b.start.share.player),
+    rivalShare: pct(b.start.share.rival),
+    duopoly: pct(b.win.duopoly),
+    monopoly: pct(b.win.monopoly),
+    holdWeeks: String(b.win.holdWeeks),
+    fromWeek: String(b.win.checkFromWeek),
+    heat: String(b.heat.threshold),
+    debtLimit: credits(loan.debtLimit),
+    interest: pct(loan.interestWeekly, 1),
+    feedWeeks: String(b.market.feedWeeks),
+    window: String(b.share.window),
+    mine: String(content.get('ship', 'ossa')?.mine ?? 0),
+    hold: String(content.get('ship', 'kite')?.hold ?? 0),
+  };
+}
+
+const fill = s => { const n = numbers(); return String(s).replace(/\{(\w+)\}/g, (m, k) => n[k] ?? m); };
 
 // Every panel the player has opened this session. The tour's reading steps complete on being
 // looked at, which is the only honest test for "have you seen the Market yet".
@@ -72,8 +79,10 @@ export const intro = {
 
     const q = new URLSearchParams(location.search);
     const forced = q.get('intro');
-    const brief = forced === '1'
-      || (forced !== '0' && !read(SEEN_KEY) && !read(SAVE_KEY));
+    // A player who just watched the ruling and built a character does not then want four cards
+    // with a Next button; `cards: false` gives them the title hold and hands straight over.
+    const brief = opts.cards !== false && (forced === '1'
+      || (forced !== '0' && !read(SEEN_KEY) && !read(SAVE_KEY)));
 
     ctx.sim?.on(kind => {
       if (kind === 'speed') return;
@@ -97,9 +106,10 @@ export const intro = {
 // scene is the whole point of the beat, so the first card is not scheduled until it is up.
 function coldOpen(brief) {
   const t = data.title;
+  const p = ctx.profile;
   const el = document.createElement('div');
   el.className = 'intro-title';
-  el.innerHTML = `<b>${esc(t.name)}</b><s>${esc(t.sub)}</s>`;
+  el.innerHTML = `<b>${esc(p?.company || t.name)}</b><s>${esc(p ? `${p.name} · Tamber Reach · week 0` : t.sub)}</s>`;
   root.appendChild(el);
   requestAnimationFrame(() => el.classList.add('in'));
 

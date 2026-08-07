@@ -10,7 +10,15 @@ import { createRng } from './js/sim/rng.js';
 const nums = process.argv.slice(2).filter(a => /^\d+$/.test(a));
 const RUNS = parseInt(nums[0] || content.balance.targets.runs, 10);
 const WEEKS = parseInt(nums[1] || '30', 10);
+// --origin=silver|saved|gutter balances one difficulty; omitted runs the base numbers.
+const ORIGIN = (process.argv.find(a => a.startsWith('--origin=')) || '=').split('=')[1] || null;
 const TRACE = process.argv.includes('--trace');
+// Three difficulties cannot share one band — easy is supposed to bust less and grow faster. An
+// origin carries its own bust / share targets and they replace the base ones when it is selected.
+const ORIGIN_T = ORIGIN ? (content.get('origin', ORIGIN)?.targets || null) : null;
+const BUST_T = ORIGIN_T?.bust || content.balance.targets.bustRate;
+const SHARE_T = ORIGIN_T?.share13 || content.balance.targets.shareAtWeek13;
+const T = k => ORIGIN_T?.[k] ?? content.balance.targets[k];
 const BUSTS = process.argv.includes('--busts');
 const TRACE_SEED = parseInt((process.argv.find(a => a.startsWith('--seed=')) || '=1').split('=')[1], 10);
 
@@ -99,7 +107,7 @@ function policy(state, style) {
 
 function run(seed, opts = {}) {
   const rng = createRng(seed);
-  let state = newGame(seed);
+  let state = newGame(seed, 'tamber', ORIGIN);
   const style = opts.style || STYLES[seed % STYLES.length];
   const seen = {
     style: style.id, offerWeek: null, coilWeek: null, tacticWeek: null, unlockWeek: null,
@@ -355,7 +363,7 @@ console.log(`  coil line built in ${coilBuilt}/${RUNS} (median week ${pct(coilWe
 console.log('');
 console.log('player share at week 13:');
 console.log(`  p10 ${f(pct(share13, 0.1))}  p25 ${f(pct(share13, 0.25))}  median ${f(pct(share13, 0.5))}  p75 ${f(pct(share13, 0.75))}  p90 ${f(pct(share13, 0.9))}`);
-console.log(`  in band ${f(b.targets.shareAtWeek13.min, 0)}-${f(b.targets.shareAtWeek13.max, 0)}: ${share13.filter(v => v >= b.targets.shareAtWeek13.min && v <= b.targets.shareAtWeek13.max).length}/${share13.length}`);
+console.log(`  in band ${f(SHARE_T.min, 0)}-${f(SHARE_T.max, 0)}: ${share13.filter(v => v >= SHARE_T.min && v <= SHARE_T.max).length}/${share13.length}`);
 console.log('');
 console.log('cash:');
 console.log(`  week 13   p10 ${k(pct(cash13, 0.1))}  median ${k(pct(cash13, 0.5))}  p90 ${k(pct(cash13, 0.9))}`);
@@ -400,17 +408,17 @@ const careful = rate(['cautious', 'standard']);
 const careless = rate(['greedy', 'reckless']);
 const caughtRate = illegal.taken ? illegal.caught / illegal.taken : 0;
 const checks = [
-  ['offer in weeks 9-13', offerInWindow / RUNS, b.targets.offerByWeek13, v => v >= b.targets.offerByWeek13, f],
-  ['bust rate', busts / RUNS, b.targets.bustRate, v => v >= b.targets.bustRate.min && v <= b.targets.bustRate.max, f],
-  ['median share at week 13', medShare13, b.targets.shareAtWeek13, v => v >= b.targets.shareAtWeek13.min && v <= b.targets.shareAtWeek13.max, f],
-  ['grey tactic reachable', greyRate, b.targets.greyReachable, v => v >= b.targets.greyReachable, f],
-  ['grey reachable by week 16', grey.by16 / RUNS, b.targets.greyReachableByWeek16, v => v >= b.targets.greyReachableByWeek16, f],
-  ['illegal tactic taken', illegal.taken / RUNS, b.targets.illegalTaken, v => v >= b.targets.illegalTaken, f],
-  ['caught, of runs that went illegal', caughtRate, b.targets.caughtWhenIllegal, v => v >= b.targets.caughtWhenIllegal.min && v <= b.targets.caughtWhenIllegal.max, f],
+  ['offer in weeks 9-13', offerInWindow / RUNS, T('offerByWeek13'), v => v >= T('offerByWeek13'), f],
+  ['bust rate', busts / RUNS, BUST_T, v => v >= BUST_T.min && v <= BUST_T.max, f],
+  ['median share at week 13', medShare13, SHARE_T, v => v >= SHARE_T.min && v <= SHARE_T.max, f],
+  ['grey tactic reachable', greyRate, T('greyReachable'), v => v >= T('greyReachable'), f],
+  ['grey reachable by week 16', grey.by16 / RUNS, T('greyReachableByWeek16'), v => v >= T('greyReachableByWeek16'), f],
+  ['illegal tactic taken', illegal.taken / RUNS, T('illegalTaken'), v => v >= T('illegalTaken'), f],
+  ['caught, of runs that went illegal', caughtRate, T('caughtWhenIllegal'), v => v >= T('caughtWhenIllegal').min && v <= T('caughtWhenIllegal').max, f],
   ['median tactics met by week 20', pct(metBy20, 0.5), b.targets.tacticsByWeek20, v => v >= b.targets.tacticsByWeek20, String],
   ['investigated at least once', investigatedOnce / RUNS, b.targets.investigatedOnce, v => v >= b.targets.investigatedOnce, f],
-  ['careful bust rate', careful, b.targets.carefulBustMax, v => v <= b.targets.carefulBustMax, f],
-  ['careless bust rate', careless, b.targets.carelessBustMin, v => v >= b.targets.carelessBustMin, f],
+  ['careful bust rate', careful, T('carefulBustMax'), v => v <= T('carefulBustMax'), f],
+  ['careless bust rate', careless, T('carelessBustMin'), v => v >= T('carelessBustMin'), f],
 ];
 let pass = true;
 for (const [name, val, target, ok, fmt] of checks) {

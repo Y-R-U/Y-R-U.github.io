@@ -2,6 +2,7 @@
 // fires when one appears, when its wording changes, and every `repeatWeeks` while it stands.
 
 import content from './content.js';
+import { loanOf } from './state.js';
 
 const credits = n => `${Math.round(Math.abs(n)).toLocaleString('en-US')} credits`;
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -9,9 +10,10 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 function standing(state) {
   const b = content.balance;
   const w = b.warn;
+  const loan = loanOf(state);
   const out = [];
   const burn = Math.max(1, state.lastCosts || b.costs.overheadWeekly);
-  const room = state.cash + b.loan.debtLimit;
+  const room = state.cash + loan.debtLimit;
   const weeks = Math.floor(room / burn);
 
   if (room <= 0) {
@@ -23,10 +25,11 @@ function standing(state) {
     });
   }
 
-  if (state.debt >= b.start.debt + (b.loan.maxDraw - b.start.debt) * w.leverageFrac) {
+  const startDebt = state.startDebt ?? b.start.debt;
+  if (state.debt >= startDebt + (loan.maxDraw - startDebt) * w.leverageFrac) {
     out.push({
       id: 'leverage', level: 'debt',
-      body: `${credits(state.debt)} drawn against a line of ${credits(b.loan.maxDraw)}, costing ${credits(state.debt * b.loan.interestWeekly)} a week before you move a tonne. One bad quarter and the interest is the business.`,
+      body: `${credits(state.debt)} drawn against a line of ${credits(loan.maxDraw)}, costing ${credits(state.debt * loan.interestWeekly)} a week before you move a tonne. One bad quarter and the interest is the business.`,
     });
   }
 

@@ -7,11 +7,13 @@ import { newGame, clone } from '../sim/state.js';
 import { step } from '../sim/step.js';
 import { createRng } from '../sim/rng.js';
 
-export function createSimView({ seed = 1, state = null } = {}) {
+export function createSimView({ seed = 1, state = null, origin = null } = {}) {
   const listeners = new Set();
   const view = {
     seed,
-    state: state || newGame(seed),
+    origin,
+    profile: null,
+    state: state || newGame(seed, 'tamber', origin),
     events: [],
     pending: [],
     speed: 0,
@@ -71,9 +73,11 @@ export function createSimView({ seed = 1, state = null } = {}) {
       return r;
     },
 
-    reset(newSeed = view.seed) {
+    reset(newSeed = view.seed, opts = {}) {
       view.seed = newSeed;
-      view.state = newGame(newSeed);
+      if (opts.origin !== undefined) view.origin = opts.origin;
+      if (opts.profile !== undefined) view.profile = opts.profile;
+      view.state = newGame(newSeed, 'tamber', view.origin);
       view.rng = createRng(newSeed);
       view.pending = [];
       view.events = [];

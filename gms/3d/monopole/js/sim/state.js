@@ -24,8 +24,17 @@ export function migrate(state, from) {
   return { ...state, _migratedFrom: from };
 }
 
-export function newGame(seed = 1, systemId = 'tamber') {
-  const b = content.balance;
+// The loan terms an origin bought. Reading them off the state rather than off content.balance is
+// what lets three origins share one sim without a mutable global — and an old save with no
+// `loan` on it still resolves.
+export function loanOf(state) { return state?.loan || content.balance.loan; }
+
+export function newGame(seed = 1, systemId = 'tamber', originId = null) {
+  const base = content.balance;
+  const origin = originId ? content.get('origin', originId) : null;
+  const b = origin
+    ? { ...base, start: { ...base.start, ...origin.start }, loan: { ...base.loan, ...origin.loan } }
+    : base;
   const sys = content.get('system', systemId);
   if (!sys) throw new Error(`newGame: no system ${systemId}`);
   const prof = content.rival.profile;
@@ -59,6 +68,11 @@ export function newGame(seed = 1, systemId = 'tamber') {
 
   return {
     v: SAVE_VERSION, seed, system: systemId, week: 0,
+    origin: origin?.id || null,
+    loan: Object.freeze({ ...b.loan }),
+    startDebt: b.start.debt,
+    tacticCost: Object.freeze({ ...(origin?.tacticCost || {}) }),
+    tacticUnlock: Object.freeze({ ...(origin?.tacticUnlock || {}) }),
     cash: b.start.cash, debt: b.start.debt, rep: b.start.rep, heat: b.start.heat,
     ships, sites, market,
     contracts: [],
@@ -88,4 +102,4 @@ export function newGame(seed = 1, systemId = 'tamber') {
   };
 }
 
-export default { newGame, clone, serialise, deserialise, migrate, SAVE_VERSION };
+export default { newGame, clone, serialise, deserialise, migrate, loanOf, SAVE_VERSION };

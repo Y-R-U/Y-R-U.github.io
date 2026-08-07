@@ -3,6 +3,7 @@
 // as a live run — a fixture that is not real state is a fixture that hides bugs.
 
 import content from '../sim/content.js';
+import { loanOf } from '../sim/state.js';
 import { createSimView } from './simview.js';
 
 const SEED = 1001;
@@ -27,7 +28,7 @@ function policy(state) {
   if (want) {
     const t = content.get('tactic', want);
     const need = Math.max(t.cost + 3000, t.unlock.cash || 0);
-    if (state.cash < need && state.debt < content.balance.loan.maxDraw) {
+    if (state.cash < need && state.debt < loanOf(state).maxDraw) {
       acts.push({ type: 'loan', amount: need - state.cash });
     }
   }

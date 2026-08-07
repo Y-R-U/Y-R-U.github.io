@@ -66,10 +66,13 @@ export function computeMods(state) {
   return mods;
 }
 
-function meets(state, unlock) {
+// `band` is passed so an origin's contacts can lower the bar on the grey and illegal bands. A
+// gutter company hears about these long before it is big enough to be offered them.
+function meets(state, unlock, band) {
   if (!unlock) return true;
-  if (unlock.share != null && state.share.player < unlock.share) return false;
-  if (unlock.cash != null && state.cash < unlock.cash) return false;
+  const m = band ? (state.tacticUnlock?.[band] ?? 1) : 1;
+  if (unlock.share != null && state.share.player < unlock.share * m) return false;
+  if (unlock.cash != null && state.cash < unlock.cash * m) return false;
   if (unlock.modules) {
     const owned = state.sites.ledger?.modules || [];
     if (!unlock.modules.every(m => owned.includes(m))) return false;
@@ -103,11 +106,18 @@ export function checkUnlocks(state, emit) {
   }
   for (const def of content.all('tactic')) {
     if (state.tactics.unlocked.includes(def.id) || state.tactics.banned.includes(def.id)) continue;
-    if (!meets(state, def.unlock)) continue;
+    if (!meets(state, def.unlock, def.band)) continue;
     if (def.id === b.offer.tactic && !state.tactics.offered.includes(def.id)) continue;
     state.tactics.unlocked.push(def.id);
     emit({ t: 'unlock', tactic: def.id, band: def.band, story: def.story, name: def.name });
   }
+}
+
+// An origin that came up through the grey market pays less for the grey and illegal bands — the
+// contacts are the whole inheritance. Legal tactics are full price for everybody.
+export function costOf(state, def) {
+  const m = state.tacticCost?.[def.band] ?? 1;
+  return Math.round(def.cost * m);
 }
 
 export function activate(state, tacticId, emit) {
@@ -117,9 +127,10 @@ export function activate(state, tacticId, emit) {
   if (state.tactics.banned.includes(tacticId)) return false;
   if (state.tactics.active.some(a => a.id === tacticId)) return false;
   if (!requirementsMet(state, def)) return false;
-  if (state.cash < def.cost) return false;
+  const cost = costOf(state, def);
+  if (state.cash < cost) return false;
 
-  state.cash -= def.cost;
+  state.cash -= cost;
   const weeks = def.duration === 0 ? Infinity : def.duration * content.balance.tick.weeksPerQuarter;
   state.tactics.active.push({ id: tacticId, owner: 'player', weeksLeft: weeks, band: def.band });
   if (!state.tactics.owned.includes(tacticId)) state.tactics.owned.push(tacticId);
@@ -144,7 +155,7 @@ export function activate(state, tacticId, emit) {
     });
   }
 
-  emit({ t: 'tactic', tactic: tacticId, name: def.name, band: def.band, cost: def.cost, story: def.story });
+  emit({ t: 'tactic', tactic: tacticId, name: def.name, band: def.band, cost, story: def.story });
   return true;
 }
 

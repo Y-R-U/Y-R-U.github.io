@@ -3,6 +3,7 @@
 // js/sim/ directly, and never a blocking modal.
 
 import content from '../sim/content.js';
+import { loanOf } from '../sim/state.js';
 import { definePanel, panels } from './panels.js';
 import { featured } from './storypool.js';
 import {
@@ -266,7 +267,7 @@ function stationTab(st, api) {
 
 function financeTab(st, api) {
   const c = api.sim.last('cost');
-  const b = content.balance.loan;
+  const b = loanOf(st);
   const room = Math.max(0, b.maxDraw - st.debt);
   const net = c ? c.revenue - c.total : 0;
   return `

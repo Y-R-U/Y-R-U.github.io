@@ -2,7 +2,7 @@
 // The ten stages run in BUILD_PLAN §6 order. The 3D never reads state; it replays events.
 
 import content from './content.js';
-import { clone } from './state.js';
+import { clone, loanOf } from './state.js';
 import * as market from './market.js';
 import * as tactics from './tactics.js';
 import * as rival from './rival.js';
@@ -237,7 +237,7 @@ export function step(state, { actions = [], rng } = {}) {
   }
   modUpkeep *= b.costs.moduleUpkeepMult * mods.ownCost.upkeep;
   const fuel = fuelBill * b.costs.fuelMult;
-  const interest = s.debt * b.loan.interestWeekly;
+  const interest = s.debt * loanOf(s).interestWeekly;
   const costs = wages + modUpkeep + fuel + interest + b.costs.overheadWeekly;
   s.cash -= costs;
   s.lastCosts = costs;
@@ -293,7 +293,7 @@ export function step(state, { actions = [], rng } = {}) {
   warn.update(s, emit);
 
   // 10 — win / lose
-  if (s.cash < -b.loan.debtLimit) {
+  if (s.cash < -loanOf(s).debtLimit) {
     s.over = 'bust';
     emit({ t: 'lose', reason: 'bust', cash: Math.round(s.cash), week: s.week });
   } else if (s.convictions >= b.heat.revokeAt || (s.convictions > 1 && s.rep <= b.heat.revokeRep)) {
@@ -353,9 +353,9 @@ function applyActions(s, actions, emit) {
         tactics.activate(s, a.tactic, emit);
         break;
       case 'loan': {
-        const amt = Math.min(a.amount, content.balance.loan.maxDraw - s.debt);
+        const amt = Math.min(a.amount, loanOf(s).maxDraw - s.debt);
         if (amt <= 0) break;
-        const fee = amt * content.balance.loan.drawFee;
+        const fee = amt * loanOf(s).drawFee;
         s.debt += amt;
         s.cash += amt - fee;
         emit({ t: 'loan', amount: Math.round(amt), fee: Math.round(fee), debt: Math.round(s.debt) });

@@ -2,12 +2,14 @@
 // `{token}` in any string is filled from js/ui/intro.js's NUMBERS, which reads content/balance.js,
 // so the copy cannot drift away from the sim when a number moves.
 
-// The cold open holds on the title for `titleMs` with no card on screen, then card 0 arrives and
-// the camera starts moving. Each card owns the beat of the same index in scene.js's introShots().
+// The title hold over the live system. `name` and `sub` are defaults only — once the player has
+// been through character creation the company is theirs and js/ui/intro.js fills both from the
+// profile. The four briefing cards below are the pre-verdict opening and only run for a player who
+// never saw the Alliance ruling; the ruling does that job better and without a Next button.
 export const title = Object.freeze({
   name: 'Ferrous Line',
   sub: 'Tamber Reach · week 0',
-  titleMs: 2000,
+  titleMs: 2400,
 });
 
 export const cards = Object.freeze([

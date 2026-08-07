@@ -144,7 +144,24 @@ body.shotmode #intro { display: none !important; }
 
 /* ── the coach mark — scoped so it cannot leak past #dock or #sheet ──────── */
 
-#dock button.intro-coach { color: var(--accent); animation: intro-coach 1.7s ease-in-out infinite; }
+/* A colour change on a dock button reads as "that is just how it looks" — measured on a real
+   play session. The dock gets the same ring the sheet does, plus an arrow pointing down at it. */
+#dock button.intro-coach {
+  color: var(--accent); position: relative;
+  animation: intro-coach 1.7s ease-in-out infinite;
+  outline: 2px solid var(--accent); outline-offset: -3px; border-radius: 10px;
+}
+#dock button.intro-coach::after {
+  content: ''; position: absolute; left: 50%; top: -9px; width: 0; height: 0;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-top: 7px solid var(--accent);
+  animation: intro-point 1.7s ease-in-out infinite;
+}
+@keyframes intro-point {
+  0%, 100% { transform: translate(-50%, 0); opacity: 1; }
+  50% { transform: translate(-50%, -4px); opacity: .55; }
+}
 
 /* Inside a sheet the target is a real control with its own styling, so the mark is a ring round
    it rather than a colour change — it has to read on a button that is already accent-filled. */

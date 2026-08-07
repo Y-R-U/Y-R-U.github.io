@@ -12,6 +12,11 @@ import storyList from '../../content/stories.js';
 import rivalOptionList, { profile as rivalProfile, scoring as rivalScoring } from '../../content/rival.js';
 import eventList from '../../content/events.js';
 import balanceData from '../../content/balance.js';
+import originList from '../../content/origins.js';
+import traitData from '../../content/traits.js';
+import voiceData from '../../content/voice.js';
+import nameData from '../../content/names.js';
+import verdictData from '../../content/verdict.js';
 
 function deepFreeze(v) {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -31,6 +36,10 @@ const registry = {
   story: storyList,
   rivalOption: rivalOptionList,
   event: eventList,
+  origin: originList,
+  trait: traitData.traits,
+  personality: traitData.personalities,
+  gender: traitData.genders,
   palette: [],
   formation: [],
 };
@@ -65,6 +74,10 @@ export const content = {
   },
   balance: deepFreeze(balanceData),
   rival: deepFreeze({ options: rivalOptionList, profile: rivalProfile, scoring: rivalScoring }),
+  voice: deepFreeze(voiceData),
+  names: deepFreeze(nameData),
+  verdict: deepFreeze(verdictData),
+  traitRules: deepFreeze({ MAX_TRAITS: traitData.MAX_TRAITS }),
 };
 
 export default content;

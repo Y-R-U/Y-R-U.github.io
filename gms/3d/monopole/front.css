@@ -1,0 +1,214 @@
+/* The front of the game: the verdict cold open and the origin / character screen. Both sit over
+   the live system and both hand control back before the HUD ever appears. */
+
+#verdict, #origin {
+  position: fixed; inset: 0; z-index: 60; display: none;
+  font: 400 13px/1.55 system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  color: var(--ink);
+  opacity: 0; transition: opacity .42s ease;
+}
+#verdict.live, #origin.live { display: block; }
+#verdict.in, #origin.in { opacity: 1; }
+body.shotmode #verdict, body.shotmode #origin { display: none !important; }
+
+/* The cold open is a film. The company does not exist yet, so nothing that reports on it may be
+   on screen — the HUD quoting "40.0k cr · Week 0" over the Alliance ruling killed the whole beat. */
+body.front #ui,
+body.front #hud,
+body.front #panel,
+body.front #showroom-btn,
+body.front #intro { display: none !important; }
+
+/* ── the verdict ────────────────────────────────────────────────────────── */
+
+/* The scene behind this is the best thing in the game, so the plate is a vignette rather than a
+   panel — the copy has to sit on top of a real starfield without a card under it. */
+#verdict::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% 50%, transparent 32%, rgba(3, 5, 9, .72) 100%),
+    linear-gradient(180deg, rgba(3, 5, 9, .55), transparent 26%, transparent 62%, rgba(3, 5, 9, .78));
+}
+
+.v-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba(255, 255, 255, .07); }
+.v-bar span { display: block; height: 100%; background: var(--accent); opacity: .5; transition: width .5s linear; }
+
+.v-stage {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  padding: 0 26px; text-align: center;
+  opacity: 0; transform: translateY(9px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.v-stage.in { opacity: 1; transform: none; }
+
+/* Prose sits in the lower third so it never lands on the subject; the seal and the stamp are
+   the only beats that own the middle of the frame. */
+.v-record, .v-sentence, .v-land { align-self: end; margin-bottom: 15vh; }
+
+.v-over {
+  display: block; font-style: normal; font-size: 9.5px; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .9);
+}
+
+.v-seal h1 {
+  font: 400 clamp(26px, 8vw, 46px)/1.1 var(--serif); letter-spacing: .04em;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .8);
+}
+.v-mark { display: flex; gap: 7px; justify-content: center; margin-bottom: 22px; }
+.v-mark i {
+  width: 9px; height: 9px; border: 1px solid var(--accent); transform: rotate(45deg);
+  opacity: .8;
+}
+.v-mark i:nth-child(2) { background: var(--accent); }
+
+.v-record p, .v-sentence p {
+  max-width: 30ch; margin: 0 auto;
+  font: 400 clamp(17px, 5.2vw, 25px)/1.42 var(--serif);
+  text-shadow: 0 2px 22px rgba(0, 0, 0, .85);
+}
+.v-record.weight p { color: #f2e6d4; }
+.v-sentence p { max-width: 27ch; }
+.v-sentence { border-left: 2px solid var(--accent); padding-left: 18px; text-align: left; }
+.v-sentence .v-over { text-align: left; }
+
+.v-stamp b {
+  display: block; font: 400 clamp(44px, 16vw, 96px)/1 var(--serif);
+  letter-spacing: .06em; color: #f4ece0;
+  text-shadow: 0 0 70px rgba(217, 139, 43, .35), 0 3px 30px rgba(0, 0, 0, .9);
+}
+.v-stamp s {
+  display: block; margin-top: 14px; text-decoration: none;
+  font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--dim);
+}
+
+.v-land p {
+  max-width: 26ch; margin: 0 auto;
+  font: 400 clamp(19px, 6vw, 30px)/1.32 var(--serif);
+  text-shadow: 0 2px 26px rgba(0, 0, 0, .9);
+}
+
+.v-skip {
+  position: absolute; right: 14px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 9px 15px; border-radius: 999px; background: rgba(8, 11, 16, .5);
+  border: 1px solid var(--line2); color: var(--dim);
+  font: inherit; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+
+/* ── origin and character ───────────────────────────────────────────────── */
+
+#origin { background: linear-gradient(180deg, rgba(4, 6, 10, .78), rgba(4, 6, 10, .93)); }
+#origin .o-body {
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(26px + env(safe-area-inset-top, 0px)) 14px calc(26px + env(safe-area-inset-bottom, 0px));
+  /* the sticky Start button sits over the last card unless the scroll runs past it */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  -webkit-overflow-scrolling: touch;
+}
+
+.o-head { position: relative; text-align: center; margin: 8px 0 20px; }
+.o-head.tight { margin-bottom: 14px; }
+.o-head i {
+  display: block; font-style: normal; font-size: 9.5px; letter-spacing: .28em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 9px;
+}
+.o-head h2 { font: 400 clamp(23px, 7vw, 34px)/1.15 var(--serif); }
+.o-head p { color: var(--dim); margin-top: 8px; font-size: 13px; }
+.o-back {
+  position: absolute; left: 0; top: -2px; width: 38px; height: 38px;
+  background: none; border: 1px solid var(--line); border-radius: 10px;
+  color: var(--ink); font-size: 20px; line-height: 1;
+}
+
+.o-cards { display: grid; gap: 11px; }
+.o-card {
+  display: block; width: 100%; text-align: left; padding: 15px 16px 13px;
+  border-radius: 13px; border: 1px solid var(--line); border-left: 2px solid var(--accent);
+  background: linear-gradient(180deg, rgba(10, 14, 20, .72), rgba(6, 9, 14, .88));
+  color: var(--ink); font: inherit;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.o-card:active { transform: scale(.988); border-color: var(--line2); }
+.o-tier {
+  font-style: normal; font-size: 9px; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--accent);
+}
+.o-card h3 { font: 400 22px/1.2 var(--serif); margin: 7px 0 8px; }
+.o-lede { color: var(--ink); opacity: .9; margin-bottom: 11px; }
+.o-card ul { list-style: none; margin: 0 0 13px; padding: 0; display: grid; gap: 5px; }
+.o-card li { color: var(--dim); font-size: 12.5px; padding-left: 14px; position: relative; }
+.o-card li::before { content: '—'; position: absolute; left: 0; color: var(--accent); opacity: .7; }
+
+.o-nums { display: flex; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 10px; }
+.o-nums span { display: block; }
+.o-nums b { display: block; font-size: 13.5px; font-weight: 500; }
+.o-nums s {
+  display: block; text-decoration: none; font-size: 9px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--dim); margin-top: 2px;
+}
+
+.o-fields { display: grid; grid-template-columns: 1fr 1fr auto; gap: 9px; align-items: end; margin-bottom: 14px; }
+.o-field s { display: block; text-decoration: none; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-bottom: 5px; }
+.o-field input {
+  width: 100%; padding: 11px 12px; border-radius: 10px; box-sizing: border-box;
+  background: rgba(8, 11, 16, .7); border: 1px solid var(--line); color: var(--ink);
+  font: inherit; font-size: 15px;
+}
+.o-field input:focus { outline: none; border-color: var(--accent); }
+.o-reroll {
+  width: 42px; height: 42px; border-radius: 10px; background: rgba(8, 11, 16, .7);
+  border: 1px solid var(--line); color: var(--accent); font-size: 17px;
+}
+
+.o-row { margin-bottom: 15px; }
+.o-row > s {
+  display: flex; justify-content: space-between; align-items: baseline; text-decoration: none;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px;
+}
+.o-row > s em { font-style: normal; letter-spacing: .06em; text-transform: none; opacity: .8; }
+.o-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.o-chip {
+  padding: 9px 13px; border-radius: 999px; background: rgba(8, 11, 16, .6);
+  border: 1px solid var(--line); color: var(--dim); font: inherit; font-size: 12.5px;
+}
+.o-chip.on { background: var(--accent); border-color: var(--accent); color: #14100a; }
+.o-note { color: var(--dim); font-size: 12px; margin-top: 8px; font-style: italic; }
+
+.o-advanced {
+  display: flex; align-items: center; gap: 9px; width: 100%; margin-bottom: 15px;
+  padding: 11px 13px; border-radius: 10px; background: rgba(8, 11, 16, .5);
+  border: 1px solid var(--line); color: var(--ink); font: inherit; text-align: left;
+}
+.o-advanced b { font-weight: 500; }
+.o-advanced em { flex: 1; font-style: normal; color: var(--dim); font-size: 12px; }
+.o-advanced u { text-decoration: none; color: var(--accent); }
+
+.o-preview {
+  border-radius: 12px; border: 1px solid var(--line); padding: 12px 13px 13px;
+  background: rgba(8, 11, 16, .55); margin-bottom: 16px;
+}
+.o-preview-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.o-preview-head s { text-decoration: none; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+.o-cycle { background: none; border: none; color: var(--accent); font: inherit; font-size: 12px; padding: 0; }
+.o-npc { display: block; font-style: normal; font-size: 11px; color: var(--dim); margin-bottom: 9px; }
+.o-say { margin-bottom: 9px; font-size: 13.5px; line-height: 1.45; }
+.o-say s { display: block; text-decoration: none; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
+.o-say.npc { color: var(--dim); }
+.o-say.you { color: var(--ink); padding-left: 11px; border-left: 2px solid var(--accent); }
+
+.o-cta {
+  position: sticky; bottom: calc(-26px - env(safe-area-inset-bottom, 0px));
+  margin: 0 -14px calc(-26px - env(safe-area-inset-bottom, 0px));
+  padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent, rgba(4, 6, 10, .92) 34%);
+}
+.o-start {
+  width: 100%; padding: 15px; border-radius: 12px; border: none;
+  background: var(--accent); color: #14100a; font: inherit; font-size: 15px; font-weight: 600;
+  letter-spacing: .04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #verdict *, #origin * { animation: none !important; transition: none !important; }
+}

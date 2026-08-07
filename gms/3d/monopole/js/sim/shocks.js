@@ -2,6 +2,7 @@
 // Draw chance and card weights both read `exposure`, so overextension is what gets hit.
 
 import content from './content.js';
+import { loanOf } from './state.js';
 
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 const credits = n => `${Math.round(Math.abs(n)).toLocaleString('en-US')} credits`;
@@ -14,14 +15,16 @@ function siteName(state, id) {
 
 export function exposure(state) {
   const b = content.balance;
+  const loan = loanOf(state);
+  const startDebt = state.startDebt ?? b.start.debt;
   const burn = Math.max(1, state.lastCosts || b.costs.overheadWeekly);
-  const runway = (state.cash + b.loan.debtLimit) / burn;
+  const runway = (state.cash + loan.debtLimit) / burn;
   const ships = Math.max(1, state.ships.length);
   // leverage is what you drew *beyond* the founding loan — every company starts on b.start.debt,
   // so measuring against maxDraw would put the most cautious player at 0.75 in week one
   return {
     base: 1,
-    leverage: clamp((state.debt - b.start.debt) / Math.max(1, b.loan.maxDraw - b.start.debt), 0, 1),
+    leverage: clamp((state.debt - startDebt) / Math.max(1, loan.maxDraw - startDebt), 0, 1),
     thin: clamp(1 - runway / b.shock.safeRunway, 0, 1),
     transit: clamp(state.ships.filter(s => s.leg).length / ships, 0, 1),
     heat: clamp(state.heat / b.heat.threshold, 0, 1),
