@@ -15,6 +15,8 @@ import { showroom, buildShowroom } from './showroom/index.js';
 import { registerEntries } from './showroom/entries.js';
 import { getScenario, allScenarios } from './scenarios.js';
 import { camera } from './world/camera.js';
+import { RoomScene, roomShots, quartersLighting, registerRoomScenarios } from './world/room.js';
+import { updateShowcase } from './world/showcase.js';
 import content from './sim/content.js';
 import { createSimView } from './ui/simview.js';
 import { panels } from './ui/panels.js';
@@ -24,6 +26,8 @@ import { newRun } from './ui/storypool.js';
 import { intro } from './ui/intro.js';
 import { verdict } from './ui/verdict.js';
 import { chooseOrigin } from './ui/origin.js';
+import { quarters } from './ui/quarters.js';
+import { terminal } from './ui/terminal.js';
 import { inspect } from './ui/inspect.js';
 import './ui/screens.js';
 
@@ -47,6 +51,7 @@ registerBeltScenarios(app, world);
 registerStationScenarios(app, world);
 registerPlanetScenarios(app, world);
 registerFleetScenarios(app, world);
+registerRoomScenarios(app, world);
 // after the scenarios so the bloom knob's first apply finds a scene to rebuild the path for
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -68,6 +73,7 @@ const live = !shot && !params.has('sr');
 
 let reach = null;
 const hud = buildHud(sim, {
+  onQuarters: () => quarters.toggle(),
   onFocus: () => {
     camera.enable(true);
     camera.setTouchEnabled(true);
@@ -164,10 +170,34 @@ if (live) {
     },
   });
 
+  // Your quarters, parented into the live scene so what is in the window is the real station,
+  // the real planet and the real traffic. Hidden until you go in.
+  const room = new RoomScene(app, world, { tier: sim.state.quarters || 'dockbox' });
+  reach.group.add(room.group);
+  room.group.visible = false;
+  app.add({ update: dt => { room.update(dt); updateShowcase(dt); } });
+  quarters.attach({ app, camera, room, tierId: sim.state.quarters || 'dockbox', home: HOME });
+  terminal.attach({ app, world, camera, sim });
+
+  showroom.register({
+    id: 'terminal_live', group: 'misc', label: 'The terminal', note: 'the fullscreen room terminal',
+    run: () => quarters.enter('terminal').then(() => terminal.open()),
+  });
+
+  showroom.register({
+    id: 'quarters_live', group: 'misc', label: 'Your quarters', note: 'the room you actually live in',
+    run: () => quarters.enter(),
+  });
+
   // A tap identifies something; it does not commit the player to a panel. The card names it and
-  // offers the panel as one of its buttons.
+  // offers the panel as one of its buttons. The terminal is checked first — ReachScene.siteAt
+  // knows nothing about it and would report the station behind it.
   inspect.attach({ sim, camera, reach });
-  camera.onTap((hit, hits) => inspect.show(reach.siteAt(hit, hits)));
+  camera.onTap((hit, hits) => {
+    const term = hits?.find(h => h.object.userData?.terminal);
+    if (term && quarters.inside) return terminal.open();
+    inspect.show(reach.siteAt(hit, hits));
+  });
 
   // The clock does not start and the fingers do not reach the 3D until the front of the game
   // hands over. `begin()` is still the only place the company starts.
@@ -185,7 +215,8 @@ if (live) {
         camera.cancelMove();
         camera.setTouchEnabled(true);
         camera.markHome(HOME());
-        camera.resetView(1500);
+        // the handover must not yank the camera out of anywhere the player has already gone
+        if (!quarters.inside) camera.resetView(1500);
         hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
         if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
       },
@@ -204,8 +235,10 @@ if (live) {
   });
 
   if (!fresh) {
+    const saved = readProfile();
+    if (saved) { sim.profile = saved; sim.origin = saved.origin; }
     camera.setFrom(shots[0].pos, shots[0].look, shots[0].fov);
-    startGame();
+    startGame(saved);
   } else {
     const first = content.verdict.beats[0].shot;
     camera.setFrom(first.pos, first.look, first.fov);
@@ -233,6 +266,10 @@ if (live) {
 
 function hasSave() {
   try { return !!localStorage.getItem('monopole.save.v1'); } catch { return false; }
+}
+
+function readProfile() {
+  try { return JSON.parse(localStorage.getItem('monopole.profile.v1') || 'null'); } catch { return null; }
 }
 
 function writeProfile(p) {

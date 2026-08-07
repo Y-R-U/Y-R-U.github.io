@@ -4213,3 +4213,120 @@ now gets the same pulsing ring the in-sheet marks get, **plus an arrow pointing 
   has their dialogue; nothing opens them yet.
 - **Follow-your-ship to the job.** Camera work on top of the existing mover.
 - Only three conversations exist. The engine is the deliverable; the script is thin on purpose.
+
+---
+
+# Session 15b — the room, the terminal, and nothing is yours until you buy it
+
+Aaron's follow-up, verbatim: *"the ships can stay, but none are yours until you buy"*, and a
+three-tier win judged at a deadline — oligopoly / duopoly / monopoly, with the player free to play
+on. He also confirmed the read that hard mode should need the grey band.
+
+## 1. The quarters — a real room inside the real scene
+
+Built by a parallel agent. `content/quarters.js` (four tiers) + `js/world/kit/interior.js` +
+`js/world/room.js`. **It is not a skybox.** The room is a box placed inside `ReachScene.group` with
+a hole in one wall, so what is through the glass is the actual station, the actual Ossian and the
+actual traffic. Four tiers — rented dock box (free) → company berth → station suite → owner's cabin
+aboard your own hull — and an upgrade mostly changes **the view out of the window**, which is the
+whole point.
+
+The light rig is the load-bearing trick: three's directional key/fill are switched **off** inside
+the room's interior box and replaced by one analytic aperture source, so the hard-edged light shaft
+across the floor costs no shadow pass. The room's own cost is **12 draw calls, ~3k triangles,
+0.26 MB** against a 30 / 60k budget.
+
+`js/ui/quarters.js` owns going in and out, and it has to move three things together — the room's
+visibility, `app.camera.near` (1 outside, 0.28 inside) and `camera.rig.opt.distMin` (14 outside,
+0.30 inside). Leave `distMin` at 14 and the next thing that re-enables orbiting hauls the camera
+out through the back wall.
+
+## 2. The terminal — `js/ui/terminal.js`
+
+Tap the screen on the desk and it goes full-screen with a back-to-room. Everything that is about
+**you** rather than about the company lives here; the six company panels keep their dock.
+
+- **Ledger Yard.** Brann Otey greets you through the voice engine, then the board. Tap a hull and
+  it becomes a **3D turntable you can drag and pinch**, with the full spec sheet and a Buy button
+  over it. `js/world/showcase.js` borrows the stage and hands it back.
+- **Contacts.** The lenders your origin can actually call — Vosk for a gutter company, Reach Mutual
+  and the family trust otherwise — each with their own conversation, then draw/repay.
+- **Quarters.** Buy a better room. Rent is a real weekly line in `cost`.
+- **Contracts** is present and locked until you own a hull.
+
+**Purchases queue, they do not force a tick.** An earlier version called `sim.tick()` per
+transaction, which burned a week every time you bought anything and drifted the terminal out of
+step with the clock. `spendable()` subtracts everything already queued this week so two purchases
+cannot be committed against the same credits and silently dropped.
+
+## 3. Nobody starts with a fleet
+
+`start.ships` is `[]` for all three origins, and starting cash rose to cover a starter fleet — but
+deliberately **less than the fleet they used to be handed**, so the first purchase is a decision.
+Gutter lands just short of a rig *and* a hauler, which makes its first act a visit to a loan shark.
+
+The objective chain was rewritten to match: it now opens **go up to your quarters → buy your first
+hull → send the rig to Kestrel → …**, and the coach mark points at a new quarters button in the HUD
+controls row for those two steps.
+
+## 4. Three win tiers at a deadline — `js/sim/step.js`
+
+`tierFor(share)` against `win.oligopoly / duopoly / monopoly`. At `win.seasonWeeks` the Reach is
+re-surveyed and a `season` event fires carrying the tier and `canContinue: true`; playing on
+re-checks every `reviewEvery` weeks and only interrupts on an **improvement**. Holding duopoly or
+better for `holdWeeks` before the deadline still clinches it early.
+
+## 5. The bug that made the whole ladder impossible
+
+**Tactic share effects were being applied to the current share value, one line after an inertia
+term that pulls 65 % of the way back to a target computed only from delivered revenue.** So
+`absorb`'s +5 points and `below_cost`'s +1.2 points a week were transient bumps against a strong
+attractor and decayed within about two weeks. Measured: going grey or dirty bought **no share at
+all** over a 70-week season, while costing heat, fines and a much higher bust rate.
+
+They now accumulate into **`state.sharePulled`**, which moves the share *target* — it is added to
+the player's effective delivered value and multiplied out of the rival's capacity, capped at
+`share.pullCap` and eroding at `share.pullDecay` once the tactic stops. A conviction takes it back
+out of `sharePulled`, not just out of this week's reading.
+
+After the fix, silver measured clean 33.4 % / grey 35.3 % / dirty 37.4 % at week 70 — the ladder
+exists. It is still weak, and `saved` and `gutter` never reach the grey unlocks at all because
+those gate on share thresholds they never hit. That is what the balance pass is for.
+
+## Gotchas — session 15b
+
+96. **`begin()` yanked the camera out of the room.** The intro's handover does
+    `markHome(HOME()); resetView(1500)` about 2.4 s after load. Anything the player entered before
+    then got dragged back to the system framing. Guarded on `quarters.inside`.
+97. **Three different camera implementations produced byte-identical output.** That is the signal
+    from gotcha-class "isolate before tuning": identical output means the experiment never ran, not
+    that the hypothesis was wrong. `showcaseShip` was correct the whole time — a `resetView` from
+    §96 was landing after it. Isolating it (call it from `--eval` with nothing else running) proved
+    the framing was right in one shot, after three wasted rounds of rewriting it.
+98. **Writing `app.camera.position` loses to the orbit rig**, which re-places the camera from its
+    own spherical state every frame. Use `camera.setFrom` / `camera.focus`, which sync that state.
+99. **The backdrop's star flare and bloom quads are `depthTest: false`** and draw straight through
+    the room's ceiling and walls. Any interior anywhere in this game will hit it; the room dodges
+    it by tier framing rather than fixing it.
+100. **A near-camera additive must fade to zero with view distance.** The light shaft and the glass
+     sheen each pasted a translucent rectangle over the whole frame when the camera stood inside
+     their volume.
+101. **`sim.profile` can be null** on any path that skipped the front of the game, and the voice
+     engine dereferences it. `simview` now always carries a normalised profile.
+102. **`--pre` on `shot.mjs` is `JSON.stringify(expr)`** — a comma-separated expression is read as
+     `(value, replacer, space)`. Wrap the whole thing in parentheses.
+
+## What is still open
+
+- **The balance pass is mid-flight.** The zero-ship start destabilised a carefully tuned economy —
+  a company now earns nothing for ~6 weeks while fixed costs run, so the share trailing average
+  drains and every week-gated number moved. `offer.weekMin/weekMax` went 9–13 → 13–18,
+  `win.checkFromWeek` 26 → 30, and the share assertion now reads `targets.shareAtWeek` (20) instead
+  of a hardcoded week 13. **These were first guesses.**
+- **Monopoly at 0.50 looks unreachable by anyone** — the best measured season outcome was ~37 %
+  median and 57 % best case, for easy mode playing dirty. Either the threshold moves or the ceiling
+  does.
+- `balance.start.ships` (the no-origin base) still lists three hulls. Only the origins were emptied.
+- Contracts is a locked tile with nothing behind it.
+- **Follow your ship to the job** is not started.
+- The end card does not yet know about `season` events or the three tiers.

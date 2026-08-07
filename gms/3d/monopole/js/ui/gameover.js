@@ -29,6 +29,14 @@ const ENDINGS = {
     tone: 'lose', word: 'Bust', kicker: 'The company folded',
     line: st => `The bank stopped covering the overdraft at ${cr(st.cash)} credits. The hulls were sold where they sat, and ${THEM} bought two of them.`,
   },
+  oligopoly: {
+    tone: 'win', word: 'Oligopoly', kicker: 'One of the few',
+    line: st => `${pct(st.share.player, 0)} of Reach freight. ${THEM} is still the biggest name here, but there is no longer a version of this system that does not have you in it.`,
+  },
+  alsoran: {
+    tone: 'lose', word: 'Also-ran', kicker: 'The season closed without you',
+    line: st => `The Reach was re-surveyed and you were carrying ${pct(st.share.player, 0)} of it. Not nothing. Not enough for anyone to have to plan around.`,
+  },
   banned: {
     tone: 'lose', word: 'Struck off', kicker: 'The regulator finished it',
     line: () => `The licence is gone. Everything the company was carrying was carried by somebody else inside a fortnight, and the Reach did not notice.`,
@@ -199,7 +207,8 @@ definePanel({
 </div>
 
 <div class="sheet-cta over-cta">
-  <button class="primary" data-a="again">Play again</button>
+  ${st.canContinue ? '<button class="primary" data-a="on">Carry on trading</button>' : ''}
+  <button class="${st.canContinue ? '' : 'primary'}" data-a="again">Play again</button>
   <button data-open="dossier">Review the dossier</button>
   <button data-a="look">Keep looking around</button>
 </div>`;
@@ -210,6 +219,12 @@ definePanel({
       const t = e.target.closest('[data-a]');
       if (!t) return;
       if (t.dataset.a === 'look') return api.close();
+      if (t.dataset.a === 'on') {
+        api.sim.resume();
+        api.close();
+        api.sim.setSpeed(1);
+        return;
+      }
       if (t.dataset.a === 'again') {
         clearSave();
         api.sim.reset(newSeed());

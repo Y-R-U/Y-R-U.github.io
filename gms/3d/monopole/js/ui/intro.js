@@ -43,6 +43,8 @@ const seenPanel = new Set();
 // Each objective completes by observation. Every read here is a real field in js/sim/state.js;
 // the log-backed ones are monotonic on purpose so a step cannot un-finish itself.
 const DONE = {
+  quarters: () => seenPanel.has('__quarters'),
+  ship: sim => sim.state.ships.length > 0 || sim.queued().some(a => a.type === 'buyShip'),
   rig: sim => sim.state.ships.some(sh => (sim.shipDef(sh)?.mine || 0) > 0 && Array.isArray(sh.route) && sh.route.includes('kestrel'))
     || sim.queued().some(a => (a.type === 'assign' && a.to === 'kestrel') || (a.type === 'route' && a.legs?.includes('kestrel'))),
   market: () => seenPanel.has('market'),
@@ -307,7 +309,8 @@ function paintCoach(o) {
   let el = null;
   if (o && !ctx.sim.state.over) {
     const open = document.body.dataset.panel;
-    if (!open) el = o.dock ? document.querySelector(`#dock button[data-hud="${o.dock}"]`) : null;
+    if (o.quartersStep || o.id === 'ship') el = document.querySelector('[data-hud-quarters]');
+    else if (!open) el = o.dock ? document.querySelector(`#dock button[data-hud="${o.dock}"]`) : null;
     else if (open === o.dock) el = pickMark(o.mark);
   }
   // a sheet redraw leaves `coached` pointing at a detached node, so identity alone is not enough
@@ -335,6 +338,9 @@ function watchSheet() {
   new MutationObserver(() => {
     const open = document.body.dataset.panel;
     if (open) seenPanel.add(open);
+    // the quarters and the terminal are body classes, not sheets, so they are watched here too
+    if (document.body.classList.contains('in-quarters')) seenPanel.add('__quarters');
+    if (document.body.classList.contains('in-terminal')) seenPanel.add('__terminal');
     sync();
   }).observe(document.body, { attributes: true, attributeFilter: ['class', 'data-panel'] });
 }

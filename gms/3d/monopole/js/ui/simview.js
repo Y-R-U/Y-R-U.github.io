@@ -4,6 +4,7 @@
 
 import content from '../sim/content.js';
 import { newGame, clone } from '../sim/state.js';
+import { normalise } from '../sim/profile.js';
 import { step } from '../sim/step.js';
 import { createRng } from '../sim/rng.js';
 
@@ -12,7 +13,7 @@ export function createSimView({ seed = 1, state = null, origin = null } = {}) {
   const view = {
     seed,
     origin,
-    profile: null,
+    profile: normalise(null, seed),
     state: state || newGame(seed, 'tamber', origin),
     events: [],
     pending: [],
@@ -76,13 +77,25 @@ export function createSimView({ seed = 1, state = null, origin = null } = {}) {
     reset(newSeed = view.seed, opts = {}) {
       view.seed = newSeed;
       if (opts.origin !== undefined) view.origin = opts.origin;
-      if (opts.profile !== undefined) view.profile = opts.profile;
+      if (opts.profile) view.profile = normalise(opts.profile, newSeed);
       view.state = newGame(newSeed, 'tamber', view.origin);
       view.rng = createRng(newSeed);
       view.pending = [];
       view.events = [];
       view.emit('reset', view.state);
       return view.state;
+    },
+
+    // A season result is a verdict, not necessarily an ending — the player may carry on and try
+    // to improve it at a later review.
+    resume() {
+      if (!view.state.canContinue) return false;
+      view.state = clone(view.state);
+      view.state.over = null;
+      view.state.canContinue = false;
+      view.state.holdStreak = 0;
+      view.emit('reset', view.state);
+      return true;
     },
 
     load(s) {

@@ -17,6 +17,7 @@ import traitData from '../../content/traits.js';
 import voiceData from '../../content/voice.js';
 import nameData from '../../content/names.js';
 import verdictData from '../../content/verdict.js';
+import quartersList from '../../content/quarters.js';
 
 function deepFreeze(v) {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -37,6 +38,7 @@ const registry = {
   rivalOption: rivalOptionList,
   event: eventList,
   origin: originList,
+  quarters: quartersList,
   trait: traitData.traits,
   personality: traitData.personalities,
   gender: traitData.genders,

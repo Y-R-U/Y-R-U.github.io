@@ -6,8 +6,8 @@
 
 export default Object.freeze({
   start: Object.freeze({
-    cash: 40000, debt: 60000, rep: 0.5, heat: 0,
-    ships: Object.freeze(['kite', 'kite', 'ossa']),
+    cash: 82000, debt: 42000, rep: 0.5, heat: 0,
+    ships: Object.freeze([]),
     share: Object.freeze({ player: 0.04, rival: 0.71, other: 0.25 }),
   }),
 
@@ -16,7 +16,7 @@ export default Object.freeze({
   // (that is maxDraw). Small on purpose — it is the whole bust lever.
   loan: Object.freeze({
     interestWeekly: 0.012, debtLimit: 26000,
-    drawFee: 0.02, maxDraw: 80000,
+    drawFee: 0.02, maxDraw: 94000,
   }),
 
   costs: Object.freeze({
@@ -45,6 +45,11 @@ export default Object.freeze({
   share: Object.freeze({
     window: 6, inertia: 0.35, otherFloor: 0.10, otherDrift: -0.002,
     rivalPerShip: 4850, otherBase: 6600, undercutBoost: 1.06,
+    // Share taken by a tactic rather than by carrying freight. It accumulates into the share
+    // *target* while the tactic runs and erodes slowly once it stops — applying it to the current
+    // value instead let the inertia term claw 65% of it back the following week, which is why
+    // going grey used to buy nothing at all.
+    pullCap: 0.32, pullDecay: 0.005,
     reachTotal: 27600, reachDrift: 0.002,
   }),
 
@@ -57,8 +62,8 @@ export default Object.freeze({
 
   // threshold is heat points; heat accrues per week from active grey and illegal tactics.
   heat: Object.freeze({
-    threshold: 34, decayWeekly: 1.0,
-    investigateBase: 0.07, investigatePerPoint: 0.004,
+    threshold: 34, decayWeekly: 1.5,
+    investigateBase: 0.06, investigatePerPoint: 0.0016,
     repShield: 0.25, cooldownWeeks: 13,
     revokeAt: 3, revokeRep: 0.02,
   }),
@@ -84,12 +89,18 @@ export default Object.freeze({
   // the week window in which the first exclusivity offer may arrive
   offer: Object.freeze({
     // priceMult is a floor under the market price, not a premium over it
-    weekMin: 9, weekMax: 13, brand: 'ryland', commodity: 'filament',
+    weekMin: 13, weekMax: 18, brand: 'ryland', commodity: 'filament',
     tactic: 'exclusive_supply', units: 6, priceMult: 1.02,
   }),
 
+  // Three tiers, judged on the deadline. `seasonWeeks` is the date the Reach is re-surveyed and
+  // your standing is recorded; the player may keep playing after it and improve at any later
+  // quarter. holdWeeks/checkFromWeek still give an early clinch: hold a tier that long before the
+  // deadline and the season is called there and then.
   win: Object.freeze({
-    monopoly: 0.50, duopoly: 0.35, checkFromWeek: 26, holdWeeks: 4,
+    monopoly: 0.50, duopoly: 0.35, oligopoly: 0.22,
+    seasonWeeks: 52, reviewEvery: 13,
+    checkFromWeek: 30, holdWeeks: 4,
   }),
 
   tick: Object.freeze({
@@ -97,15 +108,18 @@ export default Object.freeze({
   }),
 
   // bustRate is a band, not a ceiling — a game you cannot lose has no decision in it.
-  // caughtWhenIllegal is measured over the runs that actually took an illegal tactic.
+  // caughtWhenIllegal is measured over the runs that actually took an illegal tactic, and its job
+  // is the floor. A cartel left running is a near-certain conviction by construction — 14 heat a
+  // week against a threshold of 34 that sheds 1.5 — so the ceiling is 1.0 on every difficulty.
   targets: Object.freeze({
+    shareAtWeek: 20,
     offerByWeek13: 0.80,
     bustRate: Object.freeze({ min: 0.05, max: 0.18 }),
     shareAtWeek13: Object.freeze({ min: 0.12, max: 0.25 }),
     greyReachable: 0.85,
     greyReachableByWeek16: 0.60,
     illegalTaken: 0.15,
-    caughtWhenIllegal: Object.freeze({ min: 0.35, max: 0.90 }),
+    caughtWhenIllegal: Object.freeze({ min: 0.35, max: 1.0 }),
     // an unlock is when the player is shown the tactic and its real-world story, so this is the
     // assertion that the educational payload is reachable at all
     tacticsByWeek20: 3,

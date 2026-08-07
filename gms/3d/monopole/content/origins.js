@@ -18,13 +18,13 @@ export default Object.freeze([
       'Doors open. You will be underestimated as harmless, which is not the same as being liked',
     ]),
     start: Object.freeze({
-      cash: 44000, debt: 30000, rep: 0.62,
-      ships: Object.freeze(['kite', 'kite', 'ossa']),
+      cash: 96000, debt: 30000, rep: 0.62,
+      ships: Object.freeze([]),
     }),
     loan: Object.freeze({ interestWeekly: 0.005, maxDraw: 110000, debtLimit: 38000, drawFee: 0.01 }),
     targets: Object.freeze({
       bust: Object.freeze({ min: 0.02, max: 0.16 }), share13: Object.freeze({ min: 0.20, max: 0.38 }),
-      caughtWhenIllegal: Object.freeze({ min: 0.35, max: 1.0 }), carelessBustMin: 0.15,
+      carelessBustMin: 0.15,
     }),
     lenders: Object.freeze(['halloway_trust', 'reach_mutual']),
     character: Object.freeze({ personality: 'warm', traits: Object.freeze(['posh', 'namedropper']) }),
@@ -43,10 +43,10 @@ export default Object.freeze([
       'Nobody owes you a favour and nobody is watching you either',
     ]),
     start: Object.freeze({
-      cash: 34000, debt: 52000, rep: 0.5,
-      ships: Object.freeze(['kite', 'kite', 'ossa']),
+      cash: 82000, debt: 44000, rep: 0.5,
+      ships: Object.freeze([]),
     }),
-    loan: Object.freeze({ interestWeekly: 0.012, maxDraw: 76000, debtLimit: 26000 }),
+    loan: Object.freeze({ interestWeekly: 0.012, maxDraw: 96000, debtLimit: 26000 }),
     targets: Object.freeze({
       bust: Object.freeze({ min: 0.05, max: 0.18 }), share13: Object.freeze({ min: 0.12, max: 0.28 }),
       offerByWeek13: 0.75, carelessBustMin: 0.15,
@@ -68,8 +68,8 @@ export default Object.freeze([
       'You already know who to ask about the things banks will not finance',
     ]),
     start: Object.freeze({
-      cash: 21000, debt: 24000, rep: 0.34,
-      ships: Object.freeze(['kite', 'ossa']),
+      cash: 46000, debt: 24000, rep: 0.34,
+      ships: Object.freeze([]),
     }),
     loan: Object.freeze({ interestWeekly: 0.017, maxDraw: 62000, debtLimit: 30000, drawFee: 0.05 }),
     // The contacts are the whole inheritance: a gutter company pays far less for the grey and
@@ -79,7 +79,7 @@ export default Object.freeze([
     targets: Object.freeze({
       bust: Object.freeze({ min: 0.16, max: 0.40 }), share13: Object.freeze({ min: 0.06, max: 0.18 }),
       offerByWeek13: 0.45, carefulBustMax: 0.26, greyReachable: 0.70, illegalTaken: 0.03,
-      caughtWhenIllegal: Object.freeze({ min: 0.05, max: 0.90 }), greyReachableByWeek16: 0.55,
+      greyReachableByWeek16: 0.55,
       carelessBustMin: 0.15,
     }),
     lenders: Object.freeze(['vosk', 'kestrel_credit']),

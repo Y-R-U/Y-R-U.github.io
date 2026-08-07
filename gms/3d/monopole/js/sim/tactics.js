@@ -139,8 +139,8 @@ export function activate(state, tacticId, emit) {
     if (op.op === 'lockBrand') state.locks[op.commodity] = op.owner === 'rival' ? 'rival' : 'player';
     if (op.op === 'absorb') {
       state.rival.ships = Math.max(1, state.rival.ships - (op.ships || 0));
-      state.share.player += op.share || 0;
-      state.share.rival = Math.max(0, state.share.rival - (op.share || 0));
+      // buying the brand moves the *target*, not this week's number, or the inertia term undoes it
+      state.sharePulled = (state.sharePulled || 0) + (op.share || 0);
     }
     if (op.op === 'rivalMood') state.rival.mood = op.set;
   }
@@ -198,6 +198,8 @@ export function rollInvestigation(state, rng, emit) {
 
   const pen = dirty.def.penalty;
   state.cash -= pen.fine;
+  // a conviction takes back what the tactic took, not just this week's reading
+  state.sharePulled = Math.max(0, (state.sharePulled || 0) - pen.shareLoss);
   state.share.player = Math.max(0, state.share.player - pen.shareLoss);
   state.share.rival = Math.min(1, state.share.rival + pen.shareLoss * 0.6);
   state.rep = Math.max(0, state.rep - pen.repLoss);

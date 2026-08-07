@@ -14,6 +14,7 @@ const ICON = {
   tactics: '<path d="M8 2.4v3.2M8 5.6 4.2 9M8 5.6 11.8 9"/><circle cx="8" cy="2.4" r="1.5"/><circle cx="4.2" cy="10.6" r="1.5"/><circle cx="11.8" cy="10.6" r="1.5"/>',
   dossier: '<path d="M3 3.2h4.2L8.4 5H13v7.8H3z"/><path d="M3 7.6h10"/>',
   focus: '<circle cx="8" cy="8" r="3.1"/><path d="M8 1.6v2M8 12.4v2M1.6 8h2M12.4 8h2"/>',
+  quarters: '<path d="M2.4 7.2 8 2.6l5.6 4.6V13a.6.6 0 0 1-.6.6H3a.6.6 0 0 1-.6-.6z"/><path d="M6.4 13.6V9.4h3.2v4.2"/>',
 };
 
 const DOCK = [
@@ -27,7 +28,7 @@ const DOCK = [
 
 const icon = k => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 
-export function buildHud(liveSim, { root = document.getElementById('ui'), onFocus = null } = {}) {
+export function buildHud(liveSim, { root = document.getElementById('ui'), onFocus = null, onQuarters = null } = {}) {
   const speeds = content.balance.tick.speeds;
   let sim = liveSim;
   let unsub = null;
@@ -50,6 +51,7 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
 
 <div id="controls">
   ${onFocus ? `<button class="hud-focus" data-hud-focus aria-label="Recentre">${icon('focus')}</button>` : ''}
+  ${onQuarters ? `<button class="hud-focus" data-hud-quarters aria-label="Your quarters">${icon('quarters')}</button>` : ''}
   <div id="speed" role="group" aria-label="Speed">
     ${speeds.map(v => `<button data-speed="${v}" aria-label="${v ? v + ' times' : 'Pause'}">${v ? '×' + v : '❙❙'}</button>`).join('')}
   </div>
@@ -85,6 +87,7 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
         : panels.open(id, b.dataset.tab ? { tab: b.dataset.tab } : {});
     }
     if (e.target.closest('[data-hud-focus]')) return onFocus?.();
+    if (e.target.closest('[data-hud-quarters]')) return onQuarters?.();
     const s = e.target.closest('[data-speed]');
     if (s) sim.setSpeed(+s.dataset.speed);
   });

@@ -48,6 +48,16 @@ export const cards = Object.freeze([
 // each id lives in js/ui/intro.js; this file stays free of state.
 export const objectives = Object.freeze([
   Object.freeze({
+    id: 'quarters', look: true, dock: null, quartersStep: true,
+    label: 'Go up to your quarters',
+    why: 'You have a rented room on Ledger with a terminal in it. Everything that is about you rather than about the company happens there — the yard, the people who lend money, and the room itself.',
+  }),
+  Object.freeze({
+    id: 'ship', dock: null,
+    label: 'Buy your first hull',
+    why: 'You own nothing that flies. Open the terminal, go to Ledger Yard, and pick something up. An Ossa-class rig is the only hull that can cut ore; a Kite-class hauler is the only thing that can carry a useful load. You want one of each, and you probably cannot afford both yet.',
+  }),
+  Object.freeze({
     id: 'rig', dock: 'assign',
     // the rig chip only matches while it is *not* the selected ship, so the mark walks the panel
     // in the order the player has to touch it: pick the rig, pick the loop, send

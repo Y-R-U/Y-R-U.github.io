@@ -2,9 +2,9 @@
 // The policy below is the harness's stand-in player, not part of the sim: it plays the §1 line.
 
 import content from './js/sim/content.js';
-import { newGame } from './js/sim/state.js';
+import { newGame, loanOf } from './js/sim/state.js';
 import { step } from './js/sim/step.js';
-import { requirementsMet } from './js/sim/tactics.js';
+import { requirementsMet, costOf } from './js/sim/tactics.js';
 import { createRng } from './js/sim/rng.js';
 
 const nums = process.argv.slice(2).filter(a => /^\d+$/.test(a));
@@ -31,74 +31,112 @@ const k = v => Math.round(v).toLocaleString('en-US');
 // for the cartel, which is the only way a stand-in ever reaches the illegal branch.
 const LEGAL = ['legal'];
 const BAND_RISK = { legal: 0, grey: 1, illegal: 2 };
+// drawTo is how much of the credit line the style will actually use. A cautious operator does not
+// draw the last of it to replace a hull, and that reluctance is most of what keeps it alive.
 const STYLES = [
-  { id: 'cautious', floor: 6000, coilWeek: 7, bands: LEGAL, extraRig: false, repayAbove: 15000 },
-  { id: 'standard', floor: 3000, coilWeek: 5, bands: LEGAL, extraRig: false, repayAbove: 22000 },
-  { id: 'aggressive', floor: 500, coilWeek: 4, bands: ['legal', 'grey'], extraRig: true },
-  { id: 'greedy', floor: 500, coilWeek: 4, bands: ['legal', 'illegal'], extraRig: true },
-  { id: 'reckless', floor: 0, coilWeek: 1, bands: ['legal', 'grey', 'illegal'], extraRig: true, sprawl: true },
+  { id: 'cautious', floor: 6000, coilWeek: 7, bands: LEGAL, extraRig: false, repayAbove: 15000, drawTo: 0.62 },
+  { id: 'standard', floor: 3000, coilWeek: 5, bands: LEGAL, extraRig: false, repayAbove: 22000, drawTo: 0.74 },
+  { id: 'aggressive', floor: 500, coilWeek: 4, bands: ['legal', 'grey'], extraRig: true, drawTo: 1 },
+  { id: 'greedy', floor: 500, coilWeek: 4, bands: ['legal', 'illegal'], extraRig: true, drawTo: 1 },
+  { id: 'reckless', floor: 0, coilWeek: 1, bands: ['legal', 'grey', 'illegal'], extraRig: true, sprawl: true, drawTo: 1 },
 ];
 
 function policy(state, style) {
   const acts = [];
+  // Nobody is handed a fleet any more: week 0 is a shopping trip, and borrowing to finish it is
+  // the intended opening move for the origins that cannot cover a rig and a hauler outright.
   if (state.week === 0) {
-    for (const sh of state.ships) {
-      const def = content.get('ship', sh.class);
-      acts.push({ type: 'route', ship: sh.id, legs: def.mine > 0 ? ['ledger', 'kestrel'] : ['ledger', 'ossian'] });
+    const acts = [];
+    const rig = content.get('ship', 'ossa');
+    const kite = content.get('ship', 'kite');
+    let cash = state.cash;
+    let debt = state.debt;
+    // a rig with nothing to carry its ore earns exactly nothing, so one of each is the minimum
+    // viable company and gets bought even if it takes the whole reserve. Extra hulls have to
+    // leave RUNWAY behind them — the company burns for ~6 weeks before the first load sells.
+    const RUNWAY = 15000;
+    const need = rig.cost + kite.cost + 12000;
+    if (cash < need && debt < loanOf(state).maxDraw * 0.7) {
+      const want = need - cash;
+      acts.push({ type: 'loan', amount: want });
+      cash += want;
+      debt += want;
     }
-    if (style.extraRig) acts.push({ type: 'loan', amount: 30000 });
+    if (cash >= rig.cost) { acts.push({ type: 'buyShip', class: 'ossa' }); cash -= rig.cost; }
+    if (cash >= kite.cost) { acts.push({ type: 'buyShip', class: 'kite' }); cash -= kite.cost; }
+    while (cash >= kite.cost + RUNWAY && acts.filter(a => a.type === 'buyShip').length < (style.extraRig ? 3 : 2)) {
+      acts.push({ type: 'buyShip', class: 'kite' });
+      cash -= kite.cost;
+    }
     return acts;
   }
-  if (style.extraRig && state.week === 1) {
-    acts.push({ type: 'buyShip', class: 'ossa' });
+  // week 1 routes whatever arrived in the yard
+  if (state.week === 1) {
+    return state.ships.map(sh => ({
+      type: 'route', ship: sh.id,
+      legs: content.get('ship', sh.class).mine > 0 ? ['ledger', 'kestrel'] : ['ledger', 'ossian'],
+    }));
+  }
+
+  const loan = loanOf(state);
+  const cap = loan.maxDraw * (style.drawTo ?? 1);
+  // every hull, not just a rig — a hauler bought at week 6 and never given a loop is 18k of
+  // upkeep that earns nothing, and no player would leave it parked
+  for (const sh of state.ships) {
+    if (sh.route) continue;
+    acts.push({ type: 'route', ship: sh.id, legs: content.get('ship', sh.class).mine > 0 ? ['ledger', 'kestrel'] : ['ledger', 'ossian'] });
+  }
+  const mods = state.sites.ledger.modules;
+  const coil = content.get('module', 'coilline');
+  // The line comes before a third hull, and it is the one thing every stand-in borrows for.
+  // Six tonnes of filament is worth three loads of halide and rides in the same hold, so a hauler
+  // bought first is 18k spent moving cargo that does not exist yet.
+  if (!mods.includes('coilline') && state.week >= style.coilWeek) {
+    if (state.cash >= coil.cost + style.floor) { acts.push({ type: 'buyModule', module: 'coilline', site: 'ledger' }); return acts; }
+    if (state.debt < loan.maxDraw * 0.9) acts.push({ type: 'loan', amount: coil.cost + style.floor - state.cash });
     return acts;
   }
-  const newRig = state.ships.find(sh => !sh.route && content.get('ship', sh.class).mine > 0);
-  if (newRig) acts.push({ type: 'route', ship: newRig.id, legs: ['ledger', 'kestrel'] });
   // a lost hull is unrecoverable if nobody ever replaces it, and every stand-in would
   const miners = state.ships.filter(sh => content.get('ship', sh.class).mine > 0).length;
-  if (state.ships.length < b.start.ships.length) {
+  // A rig with nothing to carry for it earns nothing and neither does a hauler with nothing to
+  // load, so getting back to one of each is existential and neither the coil reserve nor the
+  // style's own caution stands in the way of it. Only the third hull waits for the line.
+  const crippled = miners < 1 || state.ships.length - miners < 1;
+  const held = mods.includes('coilline') || crippled ? 0 : coil.cost;
+  if (state.ships.length < (style.extraRig ? 4 : 3)) {
     const cls = miners < 1 ? 'ossa' : 'kite';
     const def = content.get('ship', cls);
-    if (state.cash >= def.cost + style.floor) acts.push({ type: 'buyShip', class: cls });
-    else if (state.debt < b.loan.maxDraw) acts.push({ type: 'loan', amount: def.cost + style.floor - state.cash });
+    const line = crippled ? loan.maxDraw : cap;
+    if (state.cash >= def.cost + style.floor + held) acts.push({ type: 'buyShip', class: cls });
+    else if (state.debt < line) acts.push({ type: 'loan', amount: def.cost + style.floor + held - state.cash });
   }
   if (style.sprawl) {
-    if (state.debt < b.loan.maxDraw) acts.push({ type: 'loan', amount: b.loan.maxDraw });
+    if (state.debt < cap) acts.push({ type: 'loan', amount: loan.maxDraw });
     if (state.week === 3) acts.push({ type: 'buyShip', class: 'kite' });
     if (state.week === 4) acts.push({ type: 'buyModule', module: 'bay', site: 'ledger' });
     if (state.week === 5) acts.push({ type: 'buyModule', module: 'refinery', site: 'ledger' });
-    const idle = state.ships.find(sh => !sh.route && content.get('ship', sh.class).mine === 0);
-    if (idle) acts.push({ type: 'route', ship: idle.id, legs: ['ledger', 'ossian'] });
-  }
-
-  const mods = state.sites.ledger.modules;
-  const coil = content.get('module', 'coilline');
-  if (!mods.includes('coilline') && state.week >= style.coilWeek && state.cash >= coil.cost + style.floor) {
-    acts.push({ type: 'buyModule', module: 'coilline', site: 'ledger' });
-    return acts;
   }
   // a real player borrows against the credit line to take the deal, which is what it is for
   const want = state.tactics.offered.find(id => !state.tactics.owned.includes(id));
   if (want) {
     const t = content.get('tactic', want);
-    const need = Math.max(t.cost + style.floor, t.unlock.cash || 0);
-    if (state.cash < need && state.debt < b.loan.maxDraw) acts.push({ type: 'loan', amount: need - state.cash });
+    const need = Math.max(costOf(state, t) + style.floor, t.unlock.cash || 0);
+    if (state.cash < need && state.debt < cap) acts.push({ type: 'loan', amount: need - state.cash });
   }
   // riskiest affordable band first, not content order — content order made a cheap early grey
   // tactic hide everything after it from every style that could take one (gotcha 62)
   const pick = state.tactics.unlocked
     .filter(id => !state.tactics.owned.includes(id))
     .map(id => content.get('tactic', id))
-    .filter(t => style.bands.includes(t.band) && state.cash >= t.cost + style.floor && requirementsMet(state, t))
+    .filter(t => style.bands.includes(t.band) && state.cash >= costOf(state, t) + style.floor && requirementsMet(state, t))
     .sort((a, c) => BAND_RISK[c.band] - BAND_RISK[a.band])[0];
   if (pick) acts.push({ type: 'tactic', tactic: pick.id });
-  if (state.cash < style.floor && state.debt < b.loan.maxDraw) acts.push({ type: 'loan', amount: 15000 });
+  if (state.cash < style.floor && state.debt < cap) acts.push({ type: 'loan', amount: 15000 });
   // paying the line down is the only move that lowers shock exposure, so at least one stand-in
   // has to make it or the deck has nothing to reward. Only the draw ABOVE the founding loan, and
   // never in a week that already borrowed or bought — the two actions cancelled and churned the
   // 2% draw fee.
-  const excess = state.debt - b.start.debt;
+  const excess = state.debt - (state.startDebt ?? b.start.debt);
   if (style.repayAbove && excess > 0 && !acts.length && state.cash > style.repayAbove) {
     acts.push({ type: 'repay', amount: Math.min(excess, state.cash - style.repayAbove) });
   }
@@ -148,7 +186,7 @@ function run(seed, opts = {}) {
     seen.peakHeat = Math.max(seen.peakHeat, state.heat);
     for (const wn of state.warnings || []) seen.warnWeeks[wn.level] = (seen.warnWeeks[wn.level] || 0) + 1;
     if (opts.trace) trace.push({ week: state.week, events: r.events, snap: snapshot(state) });
-    if (state.week === 13) { seen.shareAt13 = state.share.player; seen.cashAt13 = state.cash; }
+    if (state.week === (b.targets.shareAtWeek || 13)) { seen.shareAt13 = state.share.player; seen.cashAt13 = state.cash; }
     if (state.over) break;
   }
   return { state, seen, trace };
@@ -186,9 +224,16 @@ if (process.argv.includes('--selftest')) {
   const fail = [];
   const ok = (name, cond) => { if (!cond) fail.push(name); console.log(`${cond ? 'ok  ' : 'FAIL'}  ${name}`); };
 
-  let st = newGame(7);
-  const before = JSON.stringify(st);
   const rng = createRng(7);
+  // no origin is handed a fleet any more, so a test that needs a hull has to buy one first
+  const withFleet = seed => {
+    const g = newGame(seed);
+    g.cash += 60000;
+    return step(g, { actions: [{ type: 'buyShip', class: 'kite' }, { type: 'buyShip', class: 'ossa' }], rng }).state;
+  };
+
+  let st = withFleet(7);
+  const before = JSON.stringify(st);
   const out = step(st, { actions: [{ type: 'route', ship: st.ships[0].id, legs: ['ledger', 'ossian'] }], rng });
   ok('step does not mutate its input state', JSON.stringify(st) === before);
   ok('step returns a new state object', out.state !== st);
@@ -235,7 +280,7 @@ if (process.argv.includes('--selftest')) {
   ok('warn carries the render contract', wev.every(e => e.id && e.level && typeof e.body === 'string'));
   ok('state.warnings is the standing set', Array.isArray(wr.state.warnings) && wr.state.warnings.length > 0);
 
-  st = newGame(13);
+  st = withFleet(13);
   st.ships[0].laidUp = 3;
   st.ships[0].route = ['ledger', 'ossian'];
   const lr = step(st, { actions: [], rng });
@@ -408,9 +453,9 @@ const careful = rate(['cautious', 'standard']);
 const careless = rate(['greedy', 'reckless']);
 const caughtRate = illegal.taken ? illegal.caught / illegal.taken : 0;
 const checks = [
-  ['offer in weeks 9-13', offerInWindow / RUNS, T('offerByWeek13'), v => v >= T('offerByWeek13'), f],
+  [`offer in weeks ${b.offer.weekMin}-${b.offer.weekMax}`, offerInWindow / RUNS, T('offerByWeek13'), v => v >= T('offerByWeek13'), f],
   ['bust rate', busts / RUNS, BUST_T, v => v >= BUST_T.min && v <= BUST_T.max, f],
-  ['median share at week 13', medShare13, SHARE_T, v => v >= SHARE_T.min && v <= SHARE_T.max, f],
+  [`median share at week ${b.targets.shareAtWeek || 13}`, medShare13, SHARE_T, v => v >= SHARE_T.min && v <= SHARE_T.max, f],
   ['grey tactic reachable', greyRate, T('greyReachable'), v => v >= T('greyReachable'), f],
   ['grey reachable by week 16', grey.by16 / RUNS, T('greyReachableByWeek16'), v => v >= T('greyReachableByWeek16'), f],
   ['illegal tactic taken', illegal.taken / RUNS, T('illegalTaken'), v => v >= T('illegalTaken'), f],

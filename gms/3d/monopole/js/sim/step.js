@@ -10,6 +10,16 @@ import * as shocks from './shocks.js';
 import * as warn from './warn.js';
 import { createRng } from './rng.js';
 
+const RANK = { alsoran: 0, oligopoly: 1, duopoly: 2, monopoly: 3 };
+
+function tierFor(share) {
+  const w = content.balance.win;
+  if (share >= w.monopoly) return 'monopoly';
+  if (share >= w.duopoly) return 'duopoly';
+  if (share >= w.oligopoly) return 'oligopoly';
+  return null;
+}
+
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 const total = obj => Object.values(obj || {}).reduce((a, b) => a + b, 0);
 
@@ -238,12 +248,14 @@ export function step(state, { actions = [], rng } = {}) {
   modUpkeep *= b.costs.moduleUpkeepMult * mods.ownCost.upkeep;
   const fuel = fuelBill * b.costs.fuelMult;
   const interest = s.debt * loanOf(s).interestWeekly;
-  const costs = wages + modUpkeep + fuel + interest + b.costs.overheadWeekly;
+  // rent, so a better room is a decision rather than a free reward for having cash
+  const rent = content.get('quarters', s.quarters || 'dockbox')?.upkeep || 0;
+  const costs = wages + modUpkeep + fuel + interest + b.costs.overheadWeekly + rent;
   s.cash -= costs;
   s.lastCosts = costs;
   emit({
     t: 'cost', wages: Math.round(wages), modules: Math.round(modUpkeep), fuel: Math.round(fuel),
-    interest: Math.round(interest), overhead: b.costs.overheadWeekly, total: Math.round(costs),
+    interest: Math.round(interest), overhead: b.costs.overheadWeekly, rent, total: Math.round(costs),
     cash: Math.round(s.cash), revenue: Math.round(revenue),
   });
 
@@ -258,10 +270,14 @@ export function step(state, { actions = [], rng } = {}) {
   // and every credit the player takes comes out of somebody.
   const rBoost = s.rival.undercutFor > 0 ? b.share.undercutBoost : 1;
   const pull = clamp(mods.pull, 0, 0.6);
-  const p = pV * (1 + pull);
+  if (s.sharePulled == null) s.sharePulled = 0;
+  s.sharePulled = clamp(mods.sharePull > 0 ? s.sharePulled + mods.sharePull : s.sharePulled - b.share.pullDecay,
+    0, b.share.pullCap);
+  const taken = s.sharePulled;
+  const p = pV * (1 + pull) + b.share.reachTotal * taken;
   // a rival paying more for the contested line moves less of it
   const rSqueeze = 1 / clamp(mods.rivalPrice[b.offer.commodity] ?? 1, 0.5, 2);
-  const rCap = s.rival.ships * b.share.rivalPerShip * rBoost * (1 - pull) * rSqueeze;
+  const rCap = s.rival.ships * b.share.rivalPerShip * rBoost * (1 - pull) * rSqueeze * (1 - taken);
   const fringe = b.share.otherBase * (1 + b.share.otherDrift * s.week);
   const reach = Math.max(b.share.reachTotal * (1 + b.share.reachDrift * s.week), p + fringe);
   const r = clamp(reach - p - fringe, 0, rCap);
@@ -271,7 +287,6 @@ export function step(state, { actions = [], rng } = {}) {
   for (const k of ['player', 'rival', 'other']) {
     s.share[k] += (target[k] - s.share[k]) * (1 - b.share.inertia);
   }
-  s.share.player = clamp(s.share.player + mods.sharePull, 0, 1);
   s.share.other = Math.max(s.share.other, b.share.otherFloor);
   s.share.rival = Math.max(0, s.share.rival);
   const sum = s.share.player + s.share.rival + s.share.other;
@@ -299,12 +314,28 @@ export function step(state, { actions = [], rng } = {}) {
   } else if (s.convictions >= b.heat.revokeAt || (s.convictions > 1 && s.rep <= b.heat.revokeRep)) {
     s.over = 'banned';
     emit({ t: 'lose', reason: 'banned', cash: Math.round(s.cash), week: s.week });
-  } else if (s.week >= b.win.checkFromWeek) {
-    const tier = s.share.player >= b.win.monopoly ? 'monopoly' : s.share.player >= b.win.duopoly ? 'duopoly' : null;
-    s.holdStreak = tier ? s.holdStreak + 1 : 0;
-    if (tier && s.holdStreak >= b.win.holdWeeks) {
+  } else {
+    const w = b.win;
+    const tier = tierFor(s.share.player);
+    // early clinch: hold duopoly or better long enough before the deadline and it is called there
+    if (s.week >= w.checkFromWeek && (tier === 'monopoly' || tier === 'duopoly')) s.holdStreak++;
+    else s.holdStreak = 0;
+
+    if (s.holdStreak >= w.holdWeeks && s.week < w.seasonWeeks) {
       s.over = tier;
-      emit({ t: 'win', tier, share: s.share.player, week: s.week });
+      s.seasonTier = tier;
+      emit({ t: 'win', tier, share: s.share.player, week: s.week, early: true });
+    } else if (s.week === w.seasonWeeks) {
+      s.seasonTier = tier;
+      s.over = tier || 'alsoran';
+      s.canContinue = true;
+      emit({ t: 'season', tier, share: s.share.player, week: s.week, canContinue: true });
+    } else if (s.week > w.seasonWeeks && s.week % w.reviewEvery === 0) {
+      // playing on: only an improvement is worth interrupting for
+      if (tier && RANK[tier] > RANK[s.seasonTier || '']) {
+        s.seasonTier = tier;
+        emit({ t: 'season', tier, share: s.share.player, week: s.week, canContinue: true, improved: true });
+      }
     }
   }
 
@@ -347,6 +378,14 @@ function applyActions(s, actions, emit) {
         const id = `${def.id}-${s.ships.length + 1}`;
         s.ships.push({ id, class: def.id, at: 'ledger', leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false, laidUp: 0 });
         emit({ t: 'ship', ship: id, class: def.id, name: def.name, cost: def.cost });
+        break;
+      }
+      case 'buyQuarters': {
+        const q = content.get('quarters', a.tier);
+        if (!q || s.quarters === a.tier || s.cash < q.cost) break;
+        s.cash -= q.cost;
+        s.quarters = a.tier;
+        emit({ t: 'quarters', tier: a.tier, name: q.name, cost: q.cost });
         break;
       }
       case 'tactic':
