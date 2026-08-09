@@ -23,7 +23,30 @@ const JUMP_V = -1075;
 const FALL_MULT = 1.32;
 const APEX_V = 220, APEX_GRAV = 0.72;      // a little hang time at the top
 const LOW_JUMP = 0.42;
+/**
+ * Floor under the variable-height cut, and a window before it can apply at all.
+ *
+ * A held jump clears 196px; releasing early used to leave 78px, and a touch
+ * "tap" has no hold length to read at all. Anything under a full press was
+ * therefore unusable on mobile. The cut still shortens a jump — it just cannot
+ * shorten it below ~150px, which is a height the level can be built against.
+ */
+const CUT_FLOOR = 745, CUT_AFTER = 0.055;
 const COYOTE = 0.10, BUFFER = 0.13;
+
+/**
+ * Lift — the lifestone's air jump.
+ *
+ * Rook is a scrawny teenager with a god's battery bolted to his chest; a second
+ * jump is the cheapest way to make that readable in the fingers rather than in
+ * dialogue. It is deliberately feeble at level 1 (a stumble upward, ~70px) and
+ * grows into a full second jump, because a traversal power that scales is a
+ * reason to come back to a corridor you could not clear an hour ago.
+ */
+const LIFT_MIN = 0.56, LIFT_MAX = 1.0;
+const LIFT_FULL_AT = 14;     // player level at which lift equals a ground jump
+const LIFT_TWO_AT = 12;      // …and at which there are two of them
+const LIFT_PUSH = 1.06;      // forward shove, as a fraction of run speed, for gaps
 const DASH_V = 1290, DASH_T = 0.155, DASH_CD = 0.46, DASH_IFRAME = 0.24;
 const WALL_SLIDE = 250, WALL_JUMP_X = 640, WALL_JUMP_Y = -940, WALL_STICK = 0.11;
 const MAXFALL = 1750;
@@ -72,7 +95,8 @@ export function createPlayer(world, x, y) {
 
   const d = e.data;
   d.state = 'idle';
-  d.coyote = 0; d.buffer = 0; d.jumpHeld = false; d.jumping = false;
+  d.coyote = 0; d.buffer = 0; d.jumpHeld = false; d.jumping = false; d.jumpT = 0;
+  d.liftLeft = 1; d.liftT = 0; d.liftEver = false;
   d.dashT = 0; d.dashCd = 0; d.dashDX = 1; d.dashDY = 0; d.canDash = true;
   d.wallT = 0; d.wallDir = 0;
   d.squash = 0; d.stretch = 0; d.lean = 0; d.leanV = 0;
@@ -148,6 +172,7 @@ export function updatePlayer(world, e, dt) {
   if (d.hurtT > 0) d.hurtT -= dt;
   if (d.castT > 0) d.castT -= dt;
   if (d.landT > 0) d.landT -= dt;
+  if (d.liftT > 0) d.liftT -= dt;
   if (jumpPressed) d.buffer = BUFFER;
 
   const wasGround = e.onGround;
@@ -212,10 +237,14 @@ export function updatePlayer(world, e, dt) {
   } else d.wallT -= dt;
 
   /* ---------------- jump ---------------- */
+  const lift = liftStats(world);
+  if (e.onGround || d.wallT > 0) d.liftLeft = lift.charges;
+  if (d.jumpT !== undefined) d.jumpT += dt;
   if (e.onGround) { d.coyote = COYOTE; d.canDash = true; }
   if (d.buffer > 0) {
     if (d.coyote > 0) {
-      e.vy = JUMP_V; d.buffer = 0; d.coyote = 0; d.jumping = true;
+      e.vy = JUMP_V; d.buffer = 0; d.coyote = 0; d.jumping = true; d.jumpT = 0;
+      d.jumpedEver = true;
       d.stretch = 1; d.squash = 0;
       d.state = 'jump';
       world.sfx('jump', e.x, e.y);
@@ -228,12 +257,19 @@ export function updatePlayer(world, e, dt) {
     } else if (d.wallT > 0) {
       e.vy = WALL_JUMP_Y; e.vx = -d.wallDir * WALL_JUMP_X;
       e.faceX = -d.wallDir;
-      d.buffer = 0; d.wallT = 0; d.jumping = true; d.stretch = 1;
+      d.buffer = 0; d.wallT = 0; d.jumping = true; d.jumpT = 0; d.stretch = 1;
       d.state = 'jump';
       world.sfx('jump', e.x, e.y);
+    } else if (d.liftLeft > 0 && d.dashT <= 0 && !aboutToLand(world, e)) {
+      doLift(world, e, lift, ax, speedMul);
     }
   }
-  if (d.jumping && !jumpHeld && e.vy < 0) { e.vy *= LOW_JUMP; d.jumping = false; }
+  // Never cut below a height the level can be built against, and never in the
+  // first few ms — a touch tap carries no hold length to read.
+  if (d.jumping && !jumpHeld && e.vy < 0 && d.jumpT > CUT_AFTER) {
+    e.vy = Math.max(e.vy, Math.min(e.vy * LOW_JUMP, -CUT_FLOOR));
+    d.jumping = false;
+  }
   if (e.vy > 0) d.jumping = false;
 
   /* ---------------- gravity ---------------- */
@@ -302,11 +338,84 @@ export function updatePlayer(world, e, dt) {
     stepChain(d.hair[i], headX + (i - 1) * 9, headY - 12, -e.vx * 0.30, world.gravity * 0.22, dt, 0.86, 0.7);
   }
 
+  // Teach the lift once per run, and teach it at the moment it is useful: the
+  // first time he is falling with a charge in hand and has not used one.
+  if (!d.liftTold && !d.liftEver && d.jumpedEver && !e.onGround && e.vy > 120 && d.liftLeft > 0) {
+    d.liftTold = true;
+    world.bus.emit('hint:tip', { text: 'Tap jump again in mid-air', value: 'LIFT', life: 4.5 });
+  }
+
   if (e.onGround) d.groundFoot = e.y + BODY_H * 0.5;
   blockedHint(world, e, dt, ax);
   autoAim(world, e, dt);
   d.aimAng = Math.atan2(world.input.aim.y - (e.y - BODY_H * 0.1), world.input.aim.x - e.x);
   world.input.setAimOrigin(e.x, e.y - BODY_H * 0.1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Lift — the air jump, and the arithmetic that says how high anything can get
+ * ------------------------------------------------------------------ */
+
+/** Strength and number of air jumps at the player's current level. */
+export function liftStats(world) {
+  const lv = world.playerLevel ? world.playerLevel() : 1;
+  const k = clampf((lv - 1) / (LIFT_FULL_AT - 1), 0, 1);
+  return { power: LIFT_MIN + (LIFT_MAX - LIFT_MIN) * k, charges: lv >= LIFT_TWO_AT ? 2 : 1, k, level: lv };
+}
+
+/** How far a launch at `v` px/s rises, honouring the apex-gravity cheat. */
+function riseFor(world, v) {
+  const g = world.gravity;
+  const gApex = g * APEX_GRAV;
+  if (v <= APEX_V) return v * v / (2 * gApex);
+  return (v * v - APEX_V * APEX_V) / (2 * g) + APEX_V * APEX_V / (2 * gApex);
+}
+
+/**
+ * Total height Rook can reach from standing, lifts included. The blocked hint
+ * is sized off this rather than a constant, so telling the player to jump can
+ * never outrun what he is actually able to do.
+ */
+export function jumpReach(world) {
+  const l = liftStats(world);
+  return riseFor(world, -JUMP_V) + riseFor(world, -JUMP_V * l.power) * l.charges;
+}
+
+/**
+ * Jump is buffered for 130ms, which is what makes landing-and-jumping feel
+ * good — but an early press on the way down would otherwise be spent on a lift
+ * one frame before the ground jump it was meant for. If he is falling with
+ * floor just below him, hold the press for the landing.
+ */
+function aboutToLand(world, e) {
+  if (e.vy <= 0) return false;
+  const y = e.y + e.h * 0.5 + 26;
+  return world.terrain.solidBox(e.x, y, e.w * 0.8, 50) || !!propBlocked(world, e.x, y, e.w * 0.8, 50);
+}
+
+function doLift(world, e, lift, ax, speedMul) {
+  const d = e.data;
+  e.vy = JUMP_V * lift.power;
+  // A shove in the held direction: the lift is for crossing gaps as much as
+  // for topping ledges, and from a standing fall there is no speed to keep.
+  if (ax !== 0) e.vx = approach(e.vx, ax * RUN * LIFT_PUSH * speedMul, 1400);
+  d.liftLeft--;
+  d.buffer = 0; d.jumping = true; d.jumpT = 0;
+  d.stretch = 1; d.squash = 0; d.liftT = 0.42;
+  d.state = 'jump';
+  world.sfx('lift', e.x, e.y);
+  world.R.fx.shake(0.05, 0.12);
+  // a flat ring of stone-light kicked downward — reads as "pushed off nothing"
+  world.P.emit({
+    x: e.x, y: e.y + BODY_H * 0.34, count: 20, vx: 0, vy: 1, vSpread: 0.55,
+    speed: 210 + lift.k * 160, speedVar: 130, life: 0.42, lifeVar: 0.2,
+    size: 16, sizeEnd: 2, color: [0.62, 0.88, 1, 0.85], color2: [0.2, 0.42, 0.8, 0],
+    drag: 3.6, add: true, glow: 0.25,
+  });
+  if (!d.liftEver) {
+    d.liftEver = true;
+    world.bus.emit('bark', { text: '…huh. It caught me.', priority: 2 });
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -320,7 +429,8 @@ export function updatePlayer(world, e, dt) {
 
 const HINT_DELAY = 0.9;      // long enough that brushing a crate says nothing
 const HINT_REPEAT = 6;       // seconds before the same advice is offered again
-const JUMPABLE = 170;        // a full jump clears 185 — see sim-test
+const SAFE = 0.82;           // margin on a plain jump — even a flick-tap clears this (measured 152)
+const SAFE_LIFT = 0.78;      // and a wider one on a jump that needs the lift timed
 
 /** Pretty names for the things most likely to be in the way. */
 const BLOCK_NAMES = {
@@ -348,15 +458,21 @@ function blockedHint(world, e, dt, ax) {
   const px = e.x + dir * (e.w * 0.5 + 8);
   const foot = d.groundFoot === undefined ? e.y + e.h * 0.5 : d.groundFoot;
   let clear = null, prop = null;
-  for (let y = foot - 6; y > foot - 460; y -= 8) {
+  for (let y = foot - 6; y > foot - 620; y -= 8) {
     const p = world.terrain.solidBox(px, y, 6, 6) ? null : propBlocked(world, px, y, 6, 6);
     if (p && !prop) prop = p;
     if (!p && !world.terrain.solidBox(px, y, 6, 6)) { clear = y; break; }
   }
   const height = clear === null ? 999 : foot - clear;
 
+  // Sized off what he can actually do at this level, not off a constant — the
+  // lift grows, so what counts as jumpable grows with it.
+  const plain = riseFor(world, -JUMP_V) * SAFE;
+  const withLift = jumpReach(world) * SAFE_LIFT;
+
   let text, action;
-  if (height <= JUMPABLE) { text = 'Jump it'; action = 'JUMP'; }
+  if (height <= plain) { text = 'Jump it'; action = 'JUMP'; }
+  else if (height <= withLift) { text = 'Jump, then jump again'; action = 'LIFT'; }
   else if (prop) { text = (BLOCK_NAMES[prop.id] || 'This') + ' — break it'; action = 'BREAK'; }
   else { text = 'Solid rock — blast through it'; action = 'BREAK'; }
   world.bus.emit('hint:blocked', { text, action, x: e.x, y: e.y, height: Math.round(height), prop });
@@ -540,12 +656,24 @@ export function renderPlayer(world, e, alpha) {
   R.spriteRaw(R.blob, 0, 0, 1, 1, hx - f * 2, hyy - 15, 38 * sx, 12, -lean * 0.6,
     RIM[0], RIM[1], RIM[2], 0.20, L.ACTORS, false, 1);
 
-  /* the lifestone */
-  const pulse = 0.8 + Math.sin(world.time * 3.1) * 0.10 + (casting ? 0.45 : 0);
+  /* the lifestone — also the air-jump gauge: spent, it goes to an ember of
+     itself, so "can I lift again?" is answered on the character, not in a HUD */
+  const liftK = d.liftT > 0 ? d.liftT / 0.42 : 0;
+  const spent = !e.onGround && d.liftLeft <= 0 ? 0.45 : 1;
+  const pulse = (0.8 + Math.sin(world.time * 3.1) * 0.10 + (casting ? 0.45 : 0)) * (spent + liftK * 1.6);
   const lx = leanX(chestY + 10), ly = chestY + 10;
-  R.spriteRaw(R.blob, 0, 0, 1, 1, lx, ly, 30 * pulse, 30 * pulse, 0, STONE[0], STONE[1], STONE[2], 0.38, L.FX, true, 1);
-  R.spriteRaw(R.disc, 0, 0, 1, 1, lx, ly, 6.5, 6.5, 0, 0.8, 0.95, 1, 1, L.FX, true, 1);
-  R.light({ x: lx, y: ly, radius: 250 + (casting ? 200 : 0), r: STONE[0], g: STONE[1], b: STONE[2], intensity: 0.75 + (casting ? 1.0 : 0), flicker: 0.05 });
+  R.spriteRaw(R.blob, 0, 0, 1, 1, lx, ly, 30 * pulse, 30 * pulse, 0, STONE[0], STONE[1], STONE[2], 0.38 * spent, L.FX, true, 1);
+  R.spriteRaw(R.disc, 0, 0, 1, 1, lx, ly, 6.5, 6.5, 0, 0.8, 0.95, 1, spent, L.FX, true, 1);
+  R.light({
+    x: lx, y: ly, radius: (250 + (casting ? 200 : 0)) * (spent + liftK), r: STONE[0], g: STONE[1], b: STONE[2],
+    intensity: (0.75 + (casting ? 1.0 : 0)) * spent + liftK * 1.4, flicker: 0.05,
+  });
+  // the shove itself: a flat ring under the feet, expanding as it fades
+  if (liftK > 0) {
+    const g2 = 1 - liftK;
+    R.spriteRaw(R.blob, 0, 0, 1, 1, x, y + H * 0.36, 60 + g2 * 190, 20 + g2 * 26, 0,
+      STONE[0], STONE[1], STONE[2], liftK * 0.5, L.FX, true, 1);
+  }
 
   if (e.burning > 0) {
     R.spriteRaw(R.blob, 0, 0, 1, 1, x, y - 10, 78, 150, 0, 1, 0.5, 0.18, 0.35, L.FX, true, 1);

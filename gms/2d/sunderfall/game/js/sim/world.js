@@ -34,6 +34,15 @@ export function createWorld(ctx, opts = {}) {
     debrisCap: opts.debrisCap || 900,
   };
 
+  /**
+   * The spell system owns levelling, and the sim must not hard-depend on it —
+   * sim-test.html runs with no spells at all. Ask, tolerate an absence.
+   */
+  world.playerLevel = () => {
+    const s = ctx.spellSystem || (ctx.spells && ctx.spells.system);
+    return (s && s.level) || 1;
+  };
+
   world.terrain = createTerrain(world, opts.terrain);
   world.debris = createDebrisSystem(world, world.debrisCap);
   world.props = createPropSystem(world);
@@ -599,7 +608,11 @@ export function createWorld(ctx, opts = {}) {
       // sits 500px down behind vertical masonry, so landing on it was a silent
       // softlock: no death, no respawn, nothing to do but reload.
       if (e.y > (e.kind === 'player' ? world.pitY : world.bounds.y1 + 600)) {
-        if (e.kind === 'player') { world.damage(e, 40, DAMAGE.IMPACT, { ignoreInvuln: true }); world.respawn(); }
+        if (e.kind === 'player') {
+          world.damage(e, 40, DAMAGE.IMPACT, { ignoreInvuln: true });
+          world.respawn();
+          bus.emit('player:pit', { x: e.x, y: e.y });
+        }
         else world.ents.despawn(e);
       }
     }
@@ -631,7 +644,10 @@ export function createWorld(ctx, opts = {}) {
       // Asymmetric on purpose: burn is a damage source the player *builds around*
       // (emberbolt is the starting spell), so it has to stay lethal on enemies
       // while a brush with your own fire costs a slice of health, not the run.
-      world.damage(e, (e.kind === 'player' ? 9 : 14) * e.power[STATUS.BURN] * dt, DAMAGE.FIRE, BURN_OPTS);
+      // 9/s was still enough to make catching fire a "drop everything and run"
+      // event, which meant leaving the destruction — the point of the game —
+      // behind you off screen. 3/s is felt over the ~2s it lasts and no more.
+      world.damage(e, (e.kind === 'player' ? 3 : 14) * e.power[STATUS.BURN] * dt, DAMAGE.FIRE, BURN_OPTS);
       if (world.frame % 3 === (e.slot & 3)) {
         P.emit({
           x: e.x + rng.spread(e.w * 0.4), y: e.y + rng.spread(e.h * 0.4), count: 1,

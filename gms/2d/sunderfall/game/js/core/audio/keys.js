@@ -110,7 +110,7 @@ const FLAT_CREATURE = {
 /** Direct aliases: names other modules are likely to reach for. */
 export const ALIAS = {
   step: 'player.step', footstep: 'player.step', 'player.footstep': 'player.step',
-  jump: 'player.jump', land: 'player.land', dash: 'player.dash',
+  jump: 'player.jump', land: 'player.land', dash: 'player.dash', lift: 'player.lift',
   hurt: 'player.hurt', death: 'player.death', die: 'player.death',
   'player.die': 'player.death', 'player.land.soft': 'player.land',
   cast: 'player.cast', heal: 'player.heal',

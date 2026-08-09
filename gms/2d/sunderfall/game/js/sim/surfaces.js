@@ -57,6 +57,16 @@ export function createSurfaces(world) {
         damage: d.damage || 0,
         damageType: d.damageType || 'impact',
         status: d.status === undefined ? null : d.status,
+        /**
+         * What a surface does to the PLAYER, as a fraction of what it does to
+         * everything else. Almost every burning cell in this game was lit by the
+         * player, and at parity the correct play was to set the world on fire and
+         * then run away from the best thing in the game — you never got to watch
+         * your own destruction. Fire is a hazard he walks around, not one that
+         * kills him for standing near it.
+         */
+        playerScale: d.playerScale === undefined ? 1 : d.playerScale,
+        playerStatus: d.playerStatus === undefined ? 1 : d.playerStatus,
         statusTime: d.statusTime || 1.2,
         statusPower: d.statusPower === undefined ? 1 : d.statusPower,
         max: d.max === undefined ? 1 : d.max,
@@ -347,8 +357,12 @@ export function createSurfaces(world) {
     world.queryBox(c.x, c.y, SCELL * 1.2, SCELL * 1.4, HURT_OPTS, hitBuf);
     for (let i = 0; i < hitBuf.length; i++) {
       const e = hitBuf[i];
-      if (k.damage > 0) world.damage(e, k.damage * dt * Math.min(1, c.amount), k.damageType, NO_FX);
-      if (k.status !== null) world.applyStatus(e, k.status, k.statusTime, k.statusPower * Math.min(1, c.amount));
+      const mine = e.kind === 'player';
+      const amt = Math.min(1, c.amount);
+      if (k.damage > 0) world.damage(e, k.damage * dt * amt * (mine ? k.playerScale : 1), k.damageType, NO_FX);
+      if (k.status !== null) {
+        world.applyStatus(e, k.status, k.statusTime * (mine ? k.playerStatus : 1), k.statusPower * amt);
+      }
     }
   }
   const HURT_OPTS = { targetable: true, sort: false, max: 12 };
@@ -369,12 +383,19 @@ export function createSurfaces(world) {
     id: 'fire', color: [1, 0.55, 0.2], color2: [0.5, 0.08, 0.02], add: true, light: 1.0,
     decay: 0.105, spread: 0.20, flow: 0, needsFuel: true, consumes: 0.9,
     damage: 16, damageType: 'fire', status: STATUS.BURN, statusTime: 1.6, max: 1.2,
+    // 16/s + a re-armed burn killed a 100hp player in four seconds, so the whole
+    // fire school played as "light it, then flee the screen". At 0.20 standing in
+    // his own fire costs ~3/s: it hurts, it is never the thing that kills him.
+    playerScale: 0.20, playerStatus: 0.5,
     light: 1.0, cap: 320,
   });
   S.define({
     id: 'acid', color: [0.45, 0.92, 0.22], color2: [0.1, 0.3, 0.05], add: false, light: 0.35,
     decay: 0.012, spread: 0, flow: 0.9, needsFuel: false, consumes: 0.5,
     damage: 18, damageType: 'acid', status: STATUS.CORRODE, statusTime: 3, max: 1,
+    // same argument, less generously: acid pools where you threw it and does not
+    // chase you, so wading through your own is more of a choice than fire is
+    playerScale: 0.40, playerStatus: 0.6,
   });
   S.define({
     id: 'slime', color: [0.35, 0.55, 0.30], color2: [0.1, 0.2, 0.1], add: false, light: 0.12,

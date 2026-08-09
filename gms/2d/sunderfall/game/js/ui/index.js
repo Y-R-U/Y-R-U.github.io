@@ -501,6 +501,19 @@ export function createUI(ctx) {
     offs.push(bus.on('hint:blocked', (e) => {
       api.toast(e.text, { kind: 'warn', value: e.action, life: 2.6 });
     }));
+    offs.push(bus.on('hint:tip', (e) => {
+      api.toast(e.text, { kind: e.kind || 'info', value: e.value || '', life: e.life || 3.6 });
+    }));
+    /* Rook talking to himself. The bubble tracks him rather than sitting where
+       he was, so a line survives the run he says it during. */
+    offs.push(bus.on('bark', (e) => {
+      const p = ctx.world && ctx.world.player;
+      if (!p || !p.alive || !e.text) return;
+      bubbles.say({
+        who: e.who || 'rook', text: e.text, size: 13.5,
+        ax: 60, ay: -170, anchor: () => ({ x: p.x, y: p.y - 40 }),
+      });
+    }));
     offs.push(bus.on('spell:unplaced', (e) => {
       const sp = SPELLS[e.id];
       api.toast((sp ? sp.name : e.id) + ' — no free circle' +

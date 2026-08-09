@@ -316,6 +316,19 @@ Object.assign(PLAYER_SFX, {
       vox(o, sr, rng, { dur: 0.18, f0: 200, f1: 260, amp: 0.22, breath: 0.85, growl: 0.05, formants: [[900, 1, 6], [2100, 0.4, 9]] });
     },
   },
+  // The air jump. Not a second grunt — the stone does this, the boy is a
+  // passenger, so it is a struck chime that bends upward with a soft rush under
+  // it and only a breath of him at the end.
+  'player.lift': {
+    dur: 0.6, gain: 0.40, prio: 5, rate: 0.05, max: 2, variants: 3, sr: 44100, send: 0.3,
+    gen(o, sr, rng) {
+      partial(o, sr, 520, 0.30, 0.26, { bendTo: 1180, bendTau: 0.10 });
+      partial(o, sr, 780, 0.16, 0.20, { bendTo: 1760, bendTau: 0.10 });
+      noiseBody(o, sr, rng, { dur: 0.30, f0: 700, f1: 3600, q: 1.4, amp: 0.42, a: 0.03, curve: 1.6 });
+      fm(o, sr, { carrier: 440, ratio: 2.01, index: 1.6, indexDecay: 0.12, decay: 0.24, amp: 0.12 });
+      vox(o, sr, rng, { dur: 0.14, f0: 230, f1: 300, amp: 0.16, breath: 0.9, growl: 0.03, formants: [[950, 1, 6]] });
+    },
+  },
   'player.land': {
     dur: 0.45, gain: 0.45, prio: 4, rate: 0.05, max: 3, variants: 3,
     gen(o, sr, rng) {

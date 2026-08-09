@@ -3094,3 +3094,84 @@ of flashing hard on every tick.
 - The iron gate at 6780 sits on the parapet and gates the *upper* route only; the ground route below
   it is clear. Fine as-is, but nobody has decided whether that upper route is meant to be a shortcut.
 - Nothing has been tuned for enemy pressure during traversal — the auto-walk runs with `noenemies`.
+
+---
+
+## Session — playtest-fixes-5 (mobile jump, the lift, own-fire, barks)
+
+Reported from mobile portrait: a rock the toast said to jump could not be jumped; the second
+Sunderwood ledge could not be reached; and fire from your own spells forced a permanent retreat, so
+the destruction — the point of the game — always happened off screen behind you.
+
+### The mobile jump was 78px, not 186px
+
+`ui/touch.js` fired jump on touch-**UP**, out of a tap-versus-drag test, and held it for three fixed
+ticks (~50ms). `player.js` then applied the variable-height cut, `vy *= 0.42`, the moment the button
+was not held. So every jump on mobile was a 50ms jump:
+
+| | before | after |
+|---|---|---|
+| flick tap (30ms) | 78px | **152px** |
+| tap (120ms) | 78px | **186px** |
+| held | 78px | 186px |
+| tap ×2 (lift, level 1) | — | **243px** |
+
+It also cost 100–300ms of input latency, because nothing happened until the finger lifted. Jump is
+now pressed on touch-DOWN and held for as long as the finger is down — real variable height, no
+latency — with `jumpMin` keeping a flick alive long enough for the fixed step to see it. `CUT_FLOOR`
+(745 px/s) stops the cut ever leaving less than ~150px, and `CUT_AFTER` (55ms) stops it applying
+before there is any hold to read.
+
+**This was the whole "impassable rock" report.** The level is built against 185; mobile had 78.
+
+### Lift — the lifestone's air jump
+
+Aaron's idea, and the right one: a magic-powered second jump that grows with level.
+`liftStats(world)` reads `world.playerLevel()` (which asks `ctx.spellSystem`, tolerating its
+absence so sim-test still runs) and returns power `0.56 → 1.0` across levels 1–14, with a second
+charge at 12. Measured reach: **230px at level 1, 370 at 14, 555 with both charges**. It also shoves
+forward in the held direction, because it is for gaps as much as for ledges.
+
+- `aboutToLand()` refuses a lift when he is falling with floor just below him, so the 130ms jump
+  buffer cannot spend an air jump one frame before the ground jump it was meant for.
+- The lifestone on his chest **is** the gauge — spent, it drops to 45% brightness and its light
+  shrinks; a lift throws a flat ring at his feet. No HUD element.
+- `hint:blocked` is now sized off `jumpReach(world)` rather than a constant, with a new middle tier:
+  ≤82% of a plain jump says "Jump it", ≤78% of full reach says "Jump, then jump again", above that
+  it is a break. The advice can no longer outrun what the player is able to do.
+- Teaching: one `hint:tip` toast the first time he is falling with a charge unspent, after his first
+  real jump. New `player.lift` sfx.
+
+### Own fire is now a hindrance, not a death sentence
+
+Fire did 16/s standing in it plus a re-armed 9/s burn — about 25/s, four seconds from full health.
+The correct play was to light everything and run away from the best thing in the game. Surfaces
+gained per-kind `playerScale` / `playerStatus`:
+
+- fire `0.20 / 0.5`, acid `0.40 / 0.6`
+- burn DoT on the player 9/s → **3/s**
+
+Measured: standing in continuously re-lit fire is now **3.4hp/s** (30s from full), and a direct 30
+fire hit still lands for exactly 30 — enemy fire attacks are untouched, only lingering surfaces and
+the DoT are scaled. Self-damage from your own spell *impacts* already returned 0 (`world.damage`
+line 210).
+
+### Rook talks — `sim/barks.js`
+
+He had one cinematic of voice and then went silent for the whole game. Barks are one line at a time
+on an 11s global cooldown (4s if the new line outranks the last), never repeating until the pool is
+exhausted, nothing in the first 4s of a run. Triggers: own fire ("This magic stuff sucks."), acid,
+big hits, low health, breaking something structural, a three-kill streak, level up, falling in the
+pit, and the first lift. Emits `bark`; `ui/index.js` turns it into a speech bubble anchored to a
+function that tracks him, so it survives the run it is said during.
+
+### Also
+
+`drawToasts` clamped its panel to `L.toast.w` but never trimmed the text, so a long line overprinted
+its own value badge — visible on 390px portrait. `fitText()` now ellipsises to the available width.
+
+### Verified
+
+Auto-walk (hold right, escalate to jump → air jump → cast when stalled) reaches the end of the level
+at x=8209 **with enemies active**, one blocking hint on the way (the acid wall, by design). Pause
+freezes the world (0 frames), death fires once, restart rebuilds 78 props at full hp and jumps 186px.

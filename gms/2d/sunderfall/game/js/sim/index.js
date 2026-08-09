@@ -1,4 +1,5 @@
 import { createWorld } from './world.js';
+import { createBarks } from './barks.js';
 import { buildLevel, createDemos, groundAt } from './level.js';
 import { MATERIAL, MAT, MATERIAL_NAMES, DAMAGE, DAMAGE_NAMES } from './materials.js';
 import { STATUS } from './status.js';
@@ -36,6 +37,8 @@ export async function createPlayScene(ctx) {
   world.buildCatalogue();
   world.props.loadDefs();
   ctx.world = world;
+  // Subscribes to the bus, so it is built once with the scene, not per run.
+  const barks = createBarks(world);
   if (typeof window !== 'undefined' && window.__sunderfall) window.__sunderfall.world = world;
 
   let statics = null;
@@ -260,6 +263,7 @@ export async function createPlayScene(ctx) {
 
       const px = 470;
       lastMark = -Infinity;
+      barks.reset();
       world.createPlayer(px, groundAt(px) - 120);
       cam.x = px; cam.y = groundAt(px) - 120 - leadPx();
       camInit = true;
@@ -284,6 +288,7 @@ export async function createPlayScene(ctx) {
 
     update(dt) {
       world.update(dt);
+      barks.update(dt);
       if (director) director.update(dt);
       updateCamera(dt);
       checkpoint();

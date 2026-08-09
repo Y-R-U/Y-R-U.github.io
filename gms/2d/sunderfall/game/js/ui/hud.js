@@ -332,6 +332,22 @@ const TOASTC = {
   info: C.ink, warn: C.ember, break: C.brass,
 };
 
+/**
+ * Trim to width with an ellipsis. The panel clamps to `L.toast.w`, so without
+ * this a long line simply ran on under the value badge and the two overprinted
+ * each other — which is what "Jump again in mid-air…" did on a 390px portrait.
+ */
+const TOAST_TXT = { weight: 600 };
+function fitText(c, text, size, opt, maxw) {
+  if (maxw <= 0 || measure(c, text, size, opt) <= maxw) return text;
+  let lo = 0, hi = text.length;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (measure(c, text.slice(0, mid) + '…', size, opt) <= maxw) lo = mid; else hi = mid - 1;
+  }
+  return text.slice(0, lo).replace(/\s+$/, '') + '…';
+}
+
 export function drawToasts(c, L, list, env) {
   if (!list.length) return;
   const portrait = L.mode === 'portrait';
@@ -348,8 +364,10 @@ export function drawToasts(c, L, list, env) {
     const slide = (1 - easeOutCubic(inK)) * -26;
     const y = L.toast.y + L.toast.dir * i * (hgt + gap) - (L.toast.dir < 0 ? hgt : 0);
     const col = TOASTC[t.kind] || C.ink;
-    const lw = measure(c, t.text, portrait ? 11 : 12, { weight: 600 });
+    const tsize = portrait ? 11 : 12;
     const vw = t.value ? measure(c, t.value, portrait ? 12 : 13, { weight: 800, track: 0.5 }) + 10 : 0;
+    const label = fitText(c, t.text, tsize, TOAST_TXT, L.toast.w - 44 - vw);
+    const lw = measure(c, label, tsize, TOAST_TXT);
     const w = Math.min(L.toast.w, 44 + lw + vw);
 
     c.save();
@@ -365,8 +383,7 @@ export function drawToasts(c, L, list, env) {
     glow(c, 16, hgt * 0.5, 12, col, 0.5);
     c.beginPath(); c.arc(16, hgt * 0.5, 4.5, 0, TAU);
     c.fillStyle = col; c.fill();
-    txt(c, t.text, 28, hgt * 0.5 + 0.5, portrait ? 11 : 12, A(C.ink, 0.95),
-      { base: 'middle', weight: 600 });
+    txt(c, label, 28, hgt * 0.5 + 0.5, tsize, A(C.ink, 0.95), { base: 'middle', weight: 600 });
     if (t.value) {
       txt(c, t.value, w - 9, hgt * 0.5 + 0.5, portrait ? 12 : 13, col,
         { base: 'middle', align: 'right', weight: 800, track: 0.5 });

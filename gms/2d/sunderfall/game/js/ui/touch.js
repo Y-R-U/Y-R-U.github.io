@@ -5,7 +5,7 @@
  *
  * Layout, portrait (DESIGN.md §6):
  *   left flank    analog stick that materialises wherever the thumb lands
- *   right flank   tap = jump, drag = aim (overriding the sim's auto-aim)
+ *   right flank   press = jump for as long as it is held, drag = aim (overriding auto-aim)
  *   bottom right  the cast circles, slot 1 largest, on a thumb arc
  *
  * Zones are registered stick -> act -> circles, because the engine resolves overlaps
@@ -15,7 +15,6 @@
 import { C, A, clamp01, easeOutCubic, txt } from './theme.js';
 
 const TAU = Math.PI * 2;
-const TAP_MS = 300;
 const TAP_PX = 14;
 
 export function createTouch(ctx, L, hooks) {
@@ -26,7 +25,14 @@ export function createTouch(ctx, L, hooks) {
   const stick = { active: false, ox: 0, oy: 0, x: 0, y: 0, r: 60, k: 0, id: -1 };
   const act = { id: -1, x: 0, y: 0, x0: 0, y0: 0, t0: 0, moved: false, flash: 0 };
   const aim = { active: false, x: 0, y: 0 };
-  let jumpTicks = 0;
+  /* Jump is pressed on touch-DOWN and held for as long as the finger is down.
+   *
+   * It used to fire on touch-UP, from a tap/drag arbitration, and hold for three
+   * ticks — so every mobile jump was 50ms long, which the variable-height cut in
+   * player.js then chopped to 42%. Mobile could clear ~78px where the keyboard
+   * cleared 196, and the level is built for 185. That is why "jump it" was a lie.
+   * jumpMin keeps a flick-tap alive long enough for the fixed step to see it. */
+  let jumpMin = 0, jumpDown = false, jumpRelease = false;
   let enabled = true;
 
   /* ---- zones ---- */
@@ -72,6 +78,9 @@ export function createTouch(ctx, L, hooks) {
       act.id = e.pointerId;
       act.x = act.x0 = p.x; act.y = act.y0 = p.y;
       act.t0 = performance.now(); act.moved = false;
+      act.flash = 1;
+      jumpDown = true; jumpRelease = false; jumpMin = 3;
+      input.setAction('jump', true);
     }
   }
 
@@ -90,11 +99,7 @@ export function createTouch(ctx, L, hooks) {
   function onUp(e) {
     if (e.pointerId === stick.id) { stick.active = false; stick.id = -1; }
     if (e.pointerId === act.id) {
-      const dt = performance.now() - act.t0;
-      if (!act.moved && dt < TAP_MS) {
-        jumpTicks = 3;                       // held across a couple of fixed ticks so it registers
-        act.flash = 1;
-      }
+      jumpRelease = true;
       act.id = -1;
       aim.active = false;
     }
@@ -114,14 +119,15 @@ export function createTouch(ctx, L, hooks) {
       // clear on BOTH transitions — re-enabling with a stale stick.id meant the
       // knob stayed stuck to a finger that had long since lifted
       stick.active = false; stick.id = -1;
-      act.id = -1; aim.active = false; jumpTicks = 0;
+      act.id = -1; aim.active = false;
+      jumpDown = false; jumpRelease = false; jumpMin = 0;
       input.setAction('jump', false);
     },
 
     update() {
-      if (jumpTicks > 0) {
-        input.setAction('jump', true);
-        if (--jumpTicks === 0) input.setAction('jump', false);
+      if (jumpDown) {
+        if (jumpMin > 0) jumpMin--;
+        if (jumpRelease && jumpMin <= 0) { jumpDown = false; input.setAction('jump', false); }
       }
       // A drag on the right flank must beat auto-aim. core/input.js rebuilds `aim` from
       // `pointerScreen` every tick, so writing that is the supported way in.
@@ -200,7 +206,7 @@ export function createTouch(ctx, L, hooks) {
       txt(c, 'HOLD TO MOVE', L.stickZone.x + L.stickZone.w * 0.5, y, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
       const ax = L.actZone.x + L.actZone.w * 0.5;
-      txt(c, 'TAP TO JUMP', ax, L.actZone.y + 30, 9.5, C.dim,
+      txt(c, 'HOLD TO JUMP · TAP AGAIN IN THE AIR', ax, L.actZone.y + 30, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
       txt(c, 'AIMS ITSELF · DRAG TO OVERRIDE', ax, L.actZone.y + 46, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
