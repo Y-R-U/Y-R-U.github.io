@@ -2997,3 +2997,38 @@ machine or a latched input — there is no console on a phone.
 `bus.emit` with no listener fails silently and looks exactly like working code. `ui:restart`,
 `ui:quit` and `ui:pause` were all dead on arrival. If a UI affordance "does nothing", check that
 something is actually listening before you debug the UI.
+
+## playtest-fixes-3 — framing, and it ships (2026-08-09)
+
+**Rook's Sunderwood line.** "Quiet's wrong." parses as "Quiet is wrong" and nobody read it as
+intended. Tried "No birds." (too oblique), settled on the user's own suggestion: **"Why is it so
+quiet?"** — the original idea, said plainly. It still sets up "That's not sunset." two seconds later.
+
+**Destruction was happening off camera.** Portrait shows 820 world px against landscape's 1920, so a
+cascade runs along a structure faster than the frame can follow and the player arrives at rubble.
+Two changes:
+
+- **Look-ahead.** `updateCamera` leads on velocity *and* on `faceX`, harder in portrait
+  (`0.32 / ±280` vs `0.22 / ±230`), so you see what you are about to walk into. The aim pull now
+  also fires for touch auto-aim, not just a mouse — with auto-aim that points at the thing you are
+  about to blow up, which is precisely what should be in frame.
+- **Off-screen destruction holds.** A prop waiting on `collapseIn`, or mid-`shattering`, freezes
+  that timer while it is more than 260px outside the view, up to `MAX_HOLD = 8s`. Only the
+  pre-break states hold — anything already `falling` keeps its physics, or a half-visible beam
+  would stop in mid-air. Verified: the showcase arch stayed intact for 3s after its pillar was
+  blown, and came down when the camera arrived.
+
+**Shipped.** `gms/2d/sunderfall/` committed and pushed to main, registered in `projects.js` as
+`wip: true` pointing at `/gms/2d/sunderfall/game/`, screenshot at `assets/screenshots/sunderfall.jpg`
+(the title card). `.gitignore` now also excludes `art/raw/`, `art/work/`, `docs/shots/` and
+`refs/sprites/` — ~110 MB of Flux working set, session screenshots and third-party reference that
+`game/assets` is already baked from. 12.4 MB / 182 files committed. Live and booting clean from
+`yru.br8t.com/gms/2d/sunderfall/game/`.
+
+### One defect spotted while shooting the promo image, NOT fixed
+
+At 1400×729 landscape there are **pale grey rectangular bands** floating in the mid-distance — see
+the first hero attempt: one around the burning tree line, another over the far bank on the left.
+They sit at a consistent world y, which smells like a band's own edge row being sampled (the
+`fillUnder`/`fillOver` seam family, A1 gotcha 4) rather than a stray sprite. Not visible in portrait
+at the framings tested. Worth chasing before anyone judges the art again.
