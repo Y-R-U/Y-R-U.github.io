@@ -408,11 +408,21 @@ async function boot() {
       await scenes.go('play');
     } finally { restarting = false; }
   });
-  bus.on('ui:quit', () => {
-    // there is no Thornmere hub yet — a clean boot is the honest stand-in
-    const q = new URLSearchParams(location.search);
-    q.set('nointro', '1');
-    location.search = q.toString();
+  /* The other death button. It used to reload the page, which happened to be a
+     total wipe — but nothing said so, so the two buttons read as the same thing
+     with different flavour text. Same wipe, done in place: no reload, no second
+     asset load, and the label now says what it costs. */
+  bus.on('ui:quit', async () => {
+    if (restarting) return;
+    restarting = true;
+    try {
+      if (ui && ui.reset) ui.reset();
+      const sys = ctx.spellSystem;
+      if (sys && sys.hardReset) sys.hardReset();
+      else if (sys && sys.softReset) sys.softReset();
+      R.fx.timeScale(1, 0);
+      await scenes.go('play');
+    } finally { restarting = false; }
   });
 
   scenes.register('gameover', {

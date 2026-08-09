@@ -23,6 +23,7 @@
 import { C, A, clamp01, clearGrads, txt, easeOutCubic } from './theme.js';
 import { createState, loadSettings, saveSettings, xpForLevel, SLOT_UNLOCK } from './state.js';
 import { createLayout } from './layout.js';
+import { createPicker } from './picker.js';
 import { drawCircle, circleFx, clearIconCache } from './circles.js';
 import { drawResources, drawBoss, drawToasts, drawScreenFx, drawLevelBurst, drawWash, addBite } from './hud.js';
 import { createBubbles, pushDamage, updateDamage, drawDamage, clearDamage, DMG } from './world.js';
@@ -155,9 +156,18 @@ export function createUI(ctx) {
   });
   mount.appendChild(overlays.root);
 
+  /* Swapping one spell used to mean opening the pause overlay. The circle you
+     tapped already says which slot you mean, so show only that slot's options. */
+  const picker = createPicker(ctx, L, st, {
+    spells: () => SPELLS,
+    assign(slot, id) { api.setSlot(slot, id); overlays.refreshPause(); },
+  });
+
   const touch = createTouch(ctx, L, {
-    onCirclePress(i) { pressCircle(i); },
+    onCirclePress(i, x, y) { pressCircle(i, x, y); },
     onCircleRelease(i) { st.slots[i].pressed = false; },
+    // the picker floats over everything and eats the tap that dismisses it
+    onPointerDown(x, y) { return picker.hit(x, y); },
   });
 
   /* The intro owns the screen and mounts in a sibling with no z-index, so the HUD — which needs a
@@ -202,8 +212,14 @@ export function createUI(ctx) {
       return;
     }
     if (assignMode) { api.setSlot(i, assignMode); assignMode = null; overlays.refreshPause(); return; }
-    if (!s.spell) { overlays.openLoadout(); return; }
-    if (i !== 0) { overlays.openLoadout(); return; }
+    // Nothing to swap to: the full loadout is the honest answer, since the
+    // player has learned exactly one spell and it is already placed.
+    const choices = (st.known ? st.known.length : 0) + (s.spellId && st.known.indexOf(s.spellId) < 0 ? 1 : 0);
+    if (i !== 0) {
+      if (choices > 1) picker.show(i); else overlays.openLoadout();
+      return;
+    }
+    if (!s.spell) { if (choices > 0) picker.show(i); else overlays.openLoadout(); return; }
     s.pressed = true;
     api.tryCast(0);
   }
@@ -222,6 +238,7 @@ export function createUI(ctx) {
     settings,
     layout: L,
     bubbles,
+    picker,
     get spells() { return SPELLS; },
     setSpells,
 
@@ -403,7 +420,7 @@ export function createUI(ctx) {
     get paused() { return paused; },
     /** True whenever something on top of the game must stop the world: the pause
      *  menu, the spell offer, the death screen. main.js gates the sim on this. */
-    get blocked() { return paused || overlays.blocking; },
+    get blocked() { return paused || overlays.blocking || picker.isOpen; },
 
     death(stats) {
       overlays.showDeath(Object.assign({ level: st.level, runTime: st.runTime, kills: st.kills, broken: st.broken }, stats));
@@ -414,7 +431,7 @@ export function createUI(ctx) {
     setTouch(v) { forceTouch = v; resize(); },
     /** Wipe the run mirror back to a fresh run — used by the death screen's Again. */
     reset() {
-      clearDamage(); bubbles.clear(); toasts.length = 0;
+      clearDamage(); bubbles.clear(); toasts.length = 0; picker.close();
       st.boss = null; burst.t = 0; fx.hurt = 0; fx.spend = 0;
       st.hp = st.maxHp; st.hpGhost = st.maxHp;
       st.focus = st.maxFocus;
@@ -748,6 +765,8 @@ export function createUI(ctx) {
     if (assignMode) drawAssignTargets();
     drawAutoTarget(toScreen);
     circleFx.draw(c);
+    picker.update(dt);
+    picker.draw(c, env);
 
     if (burst.t > 0) { drawLevelBurst(c, L, burst, env); burst.t -= dt; }
 

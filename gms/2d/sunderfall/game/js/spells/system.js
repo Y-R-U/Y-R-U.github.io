@@ -633,6 +633,23 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     syncCircles();
   };
 
+  /**
+   * The other end of the death screen: everything goes, back to the starting
+   * kit. Used to be done by reloading the page, which is why the two death
+   * buttons looked identical from the outside — one soft-reset, one reloaded,
+   * and nothing on screen said so.
+   */
+  S.hardReset = function () {
+    S.known.clear();
+    for (const c of S.circles) c.spellId = null;
+    S.level = 1; S.xp = 0; S.xpToNext = xpForLevel(1);
+    S.shards = 0;
+    S.focus = S.focusMax;
+    S.offer = null;
+    S.learn(o.startSpell || 'emberbolt', 1);
+    syncCircles();
+  };
+
   /** Death keeps knowledge, resets ranks — the roguelite rule from DESIGN §5. */
   S.softReset = function () {
     S.known.forEach((rank, id) => S.known.set(id, 1));

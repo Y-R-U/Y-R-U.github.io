@@ -67,6 +67,9 @@ export function createTouch(ctx, L, hooks) {
   function onDown(e) {
     if (!enabled) return;
     const p = local(e);
+    // The swap picker floats over the circles it belongs to, so it gets first
+    // refusal on every press — including the one that dismisses it.
+    if (hooks.onPointerDown && hooks.onPointerDown(p.x, p.y)) return;
     const ci = L.circleAt(p.x, p.y);
     if (ci >= 0) { hooks.onCirclePress(ci, p.x, p.y); return; }
     if (!L.touch) return;
@@ -206,9 +209,13 @@ export function createTouch(ctx, L, hooks) {
       txt(c, 'HOLD TO MOVE', L.stickZone.x + L.stickZone.w * 0.5, y, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
       const ax = L.actZone.x + L.actZone.w * 0.5;
-      txt(c, 'HOLD TO JUMP · TAP AGAIN IN THE AIR', ax, L.actZone.y + 30, 9.5, C.dim,
+      // three short lines, not two long ones — at 9.5px with tracking, anything
+      // over ~20 characters runs off the right edge of a 390px portrait
+      txt(c, 'HOLD TO JUMP', ax, L.actZone.y + 30, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
-      txt(c, 'AIMS ITSELF · DRAG TO OVERRIDE', ax, L.actZone.y + 46, 9.5, C.dim,
+      txt(c, 'TAP AGAIN IN THE AIR', ax, L.actZone.y + 46, 9.5, C.dim,
+        { align: 'center', base: 'middle', track: 2, weight: 700 });
+      txt(c, 'AIMS ITSELF · DRAG TO AIM', ax, L.actZone.y + 62, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
       c.restore();
       c.globalAlpha = 1;

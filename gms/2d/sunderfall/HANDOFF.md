@@ -3175,3 +3175,51 @@ its own value badge — visible on 390px portrait. `fitText()` now ellipsises to
 Auto-walk (hold right, escalate to jump → air jump → cast when stalled) reaches the end of the level
 at x=8209 **with enemies active**, one blocking hint on the way (the acid wall, by design). Pause
 freezes the world (0 frames), death fires once, restart rebuilds 78 props at full hp and jumps 186px.
+
+---
+
+## Session — playtest-fixes-6 (death buttons, swap picker, damage bars)
+
+### The two death buttons did nearly the same thing, and neither said so
+
+"Again" soft-reset (spells kept, ranks and level reset); "Back to Thornmere" reloaded the page,
+which — since nothing is persisted — was a total wipe. Two very different costs, no label
+difference, and the second one named a hub that does not exist.
+
+Now: **Again · Keep your spells** and **Start over · Forget everything**, with the death panel
+spelling out the difference. `ui:quit` no longer reloads: `S.hardReset()` clears known spells and
+circles, restores the starting kit, and the play scene re-enters in place — same wipe, no second
+asset load. The pause menu's two equivalents got the same labels.
+
+### Tapping a circle no longer opens the whole pause overlay — `ui/picker.js`
+
+The tap already says which circle you mean, so the picker shows only that circle's options as a grid
+over the thumb cluster, with the circle's current spell in the grid and marked. Tap one to swap, tap
+anywhere else to leave. Canvas, not DOM, because it has to live in the same geometry as the circles
+it belongs to. `ui.blocked` includes it, so the world stops while it is open.
+
+Falls back to the full loadout when there is nothing to choose between (one spell known). Exposed as
+`ui.picker` so a headless test can read item positions and tap them.
+
+### Damage bars on things that are a job — `props.drawBar`
+
+A prop shows a bar only if the hit that just landed would need **more than three of itself** to
+finish it — which means it scales with the player's damage instead of with a hand-picked list, and a
+crate that dies in two hits never shows one. On screen for 1.15s after the last hit and gone.
+
+- Props ≥150px tall carry the bar **inside** their own top; smaller ones float it 16px above.
+- A ghost bar trails the real value, so a big hit reads as a chunk taken rather than a slide.
+- Burn and acid attrition modify `p.hp` directly rather than going through `damage()`, so they do
+  not raise bars — otherwise everything on fire would wear one.
+
+### Also
+
+`touch.hint` ran off the right edge in portrait once "TAP AGAIN IN THE AIR" was added to it — three
+short lines now, not two long ones. At 9.5px with tracking, ~20 characters is the portrait limit.
+
+### Verified
+
+Picker opens on the tapped circle with the current spell marked, freezes the sim (0 frames), swaps
+on tap, dismisses on an outside tap. Bars: `oak_trunk` h=340 inside, `fence` h=79 above, a hit that
+would kill in one gets nothing. `softReset` keeps 4 known spells, `hardReset` drops to 1. Full
+auto-walk still reaches x=8206; pause/death/restart unchanged.

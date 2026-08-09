@@ -11,6 +11,15 @@ import { MAT, MATERIAL, DAMAGE, dmgType, resistOf, matByName } from './materials
  * down as a cascade instead of a single frame.
  */
 
+/**
+ * Temporary damage bars. A bar appears only while you are actually working on
+ * something and for a beat afterwards, so it reads as feedback on THIS hit
+ * rather than as a permanent HUD stapled to the scenery.
+ */
+const BAR_TIME = 1.15;       // seconds on screen after the last hit
+const BAR_MIN_HITS = 3;      // …only if the thing needs more than this many of them
+const BAR_BIG = 150;         // props at least this tall carry the bar inside themselves
+
 /** Gameplay config the art manifest does not carry. */
 const CONFIG = {
   wall_brick: { solid: true, chunks: 14 },
@@ -137,6 +146,7 @@ export function createPropSystem(world) {
         layer: o.layer === undefined ? world.LAYER.TERRAIN : o.layer,
         tint: o.tint || null,
         burn: 0, fuel: 1, charred: 0, acid: 0, wobble: 0, shatterT: 0, holdT: 0,
+        barT: 0, barGhost: 1,
         rot: 0, rotV: 0, vx: 0, vy: 0, fallT: 0, collapseIn: -1,
         grounded: o.grounded === undefined ? null : o.grounded,
         stable: true,
@@ -248,6 +258,12 @@ export function createPropSystem(world) {
       const hy = (o && o.hitY !== undefined) ? o.hitY : p.y;
       world.materialFx(p.material, hx, hy, (o && o.dirX) || 0, (o && o.dirY) || 0, 0.6 + applied * 0.006);
       p.wobble = Math.min(1, p.wobble + applied * 0.01);
+
+      // Show a health bar only for things that are a *job*: if this hit would
+      // need more than three of itself to finish the prop, the player deserves
+      // to know it is working. Anything that dies in a couple of hits reads fine
+      // from the crack states alone, and a bar over every crate is noise.
+      if (p.hp > 0 && applied > 0 && p.maxHp > applied * BAR_MIN_HITS) p.barT = BAR_TIME;
 
       const wasState = p.state;
       updateCrack(p);
@@ -455,6 +471,13 @@ export function createPropSystem(world) {
         if (!p.alive) { props.splice(i, 1); bucketsDirty = true; continue; }
 
         if (p.wobble > 0) p.wobble = Math.max(0, p.wobble - dt * 2.2);
+        if (p.barT > 0) {
+          p.barT -= dt;
+          // the ghost trails the real value, so a big hit reads as a chunk taken
+          const f = p.maxHp > 0 ? Math.max(0, p.hp / p.maxHp) : 0;
+          p.barGhost += (f - p.barGhost) * Math.min(1, dt * 4.5);
+          if (p.barGhost < f) p.barGhost = f;
+        }
 
         /**
          * Destruction is the signature mechanic and it was going off where
@@ -604,6 +627,7 @@ export function createPropSystem(world) {
           R.spriteRaw(R.blob, 0, 0, 1, 1, p.x, p.bottom - p.h * 0.35, p.w * 1.3 * f, p.h * 1.1 * f, 0,
             1, 0.5, 0.18, 0.35 * Math.min(1, p.burn), LAYER.FX, true, 1);
         }
+        if (p.barT > 0 && p.state !== 'settled' && p.state !== 'shattering') drawBar(R, LAYER, p);
       }
     },
 
@@ -627,6 +651,36 @@ export function createPropSystem(world) {
 
     clear() { props.length = 0; buckets.clear(); bucketsDirty = true; seq = 0; },
   };
+
+  /**
+   * The damage bar. Above the prop when it is small, inside its own top when it
+   * is big — a bar floating a metre over a five-metre wall belongs to nothing,
+   * and a bar inside a crate covers the crate.
+   */
+  function drawBar(R, LAYER, p) {
+    const a = Math.min(1, p.barT / 0.3) * Math.min(1, (BAR_TIME - p.barT) / 0.08 + 0.3);
+    const f = p.maxHp > 0 ? Math.max(0, Math.min(1, p.hp / p.maxHp)) : 0;
+    const big = p.h >= BAR_BIG;
+    const w = Math.max(38, Math.min(190, p.w * (big ? 0.62 : 0.92)));
+    const h = big ? 9 : 6;
+    const y = big ? p.top + Math.max(26, p.h * 0.14) : p.top - 16;
+    const UI = LAYER.UI_WORLD;
+
+    // frame first, then the ghost of what was just taken, then the real bar
+    R.spriteRaw(R.white, 0, 0, 1, 1, p.x, y, w + 4, h + 4, 0, 0.02, 0.02, 0.03, 0.72 * a, UI, false, 1);
+    R.spriteRaw(R.white, 0, 0, 1, 1, p.x, y, w, h, 0, 0.10, 0.09, 0.12, 0.9 * a, UI, false, 1);
+    if (p.barGhost > f + 0.002) {
+      const gw = w * (p.barGhost - f);
+      R.spriteRaw(R.white, 0, 0, 1, 1, p.x - w * 0.5 + w * f + gw * 0.5, y, gw, h, 0,
+        0.95, 0.88, 0.82, 0.55 * a, UI, false, 1);
+    }
+    if (f > 0) {
+      // gold while it is a job, red once it is nearly done
+      const k = Math.min(1, f * 2);
+      R.spriteRaw(R.white, 0, 0, 1, 1, p.x - w * 0.5 + w * f * 0.5, y, w * f, h, 0,
+        1, 0.30 + 0.52 * k, 0.16 + 0.26 * k, 0.95 * a, UI, false, 1);
+    }
+  }
 
   /**
    * Anything this prop was holding up goes now. A canopy in particular must be
