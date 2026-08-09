@@ -3032,3 +3032,65 @@ the first hero attempt: one around the burning tree line, another over the far b
 They sit at a consistent world y, which smells like a band's own edge row being sampled (the
 `fillUnder`/`fillOver` seam family, A1 gotcha 4) rather than a stray sprite. Not visible in portrait
 at the framings tested. Worth chasing before anyone judges the art again.
+
+## playtest-fixes-4 — the reason nothing was passable (2026-08-09)
+
+**`moveBody` abandoned the Y axis whenever X was blocked.** The header comment promised "separated
+per axis so a body sliding along a wall keeps its vertical speed"; the code `break`ed out of the
+whole substep loop. Hold a direction into anything solid and you could not rise or fall AT ALL —
+velocity integrated, position never moved. Rook was pinned to the first crate stack at x=539, and
+every "I can't get past this and I can't jump it" report traces here. It is not level-specific: it
+made **every wall in the game** a total pin for anyone holding the stick towards it. Blocking an
+axis now zeroes that axis and continues the solver; the Y branch does the same so landing no longer
+cancels the horizontal movement left in the frame.
+
+Auto-walk results as each blocker fell (hold right, jump when stalled, shoot when stalled):
+
+```
+539  →  2537  →  4853  →  5997  →  6265  →  past the wall, 6662+
+physics    ledge     arch     chasm     wall(2)
+```
+
+**Sunderwood ledges were solid boxes at fixed world y over ground that rises ~130px through the
+wood.** The first one ended up with its underside 8px BELOW Rook's head: he could not walk under it,
+and at 206px up he could not jump onto it (a full jump clears 185, measured). The whole wood was
+sealed by a rock slab at head height. They are all `oneWay` now — one-way cells never block
+horizontally, so a mistuned ledge height can no longer wall off a route; the worst case is a ledge
+you cannot reach yet. Heights re-stepped 150px apart so the climb works.
+
+**The arch's pillars and the acid wall's buttress are no longer solid.** An arch is a thing you walk
+under; in a side view its legs stand either side of the road, not across it. Solid, the arch was a
+385px unclimbable wall on the only path through Ruinreach, breakable only by chewing 40 fire casts
+through masonry that resists fire at 0.15.
+
+**The chasm was a silent softlock.** 500px wide with vertical masonry sides and a floor at y=520 —
+falling in meant no death, no respawn, nothing to do but reload. Now: narrowed to 340 (a running
+jump covers ~380, so losing your own bridge does not end the run), the bridge deck lowered from
+313px above the rim to *at* the rim so it is actually the road, `world.pitY` (300 here) respawns
+anyone who ends up down there, and a rolling checkpoint follows the player forward over safe ground
+so a fall does not send them back to Thornmere.
+
+**The acid wall is two courses, not three.** Three was 62 casts / 75 seconds with the starting
+spell and the bottom course still standing. Acid is the intended answer (masonry takes 2.2× from
+it); the fire fallback now has to be a fight rather than a chore. Knocking the top course down
+leaves climbable rubble, which is what makes it a gate you open rather than a wall of HP.
+
+### The general fix, which matters more than any of the above
+
+**`hint:blocked`.** Lean into something for 0.9s while actually pushing towards it and the game says
+what it is and what to do — "Jump it", "Brick wall — break it", "Solid rock — blast through it" —
+sized off a real probe of the obstacle, measured from the ground he last stood on (measuring
+mid-jump made a 335px pillar report 158 and advise an impossible jump). Jumping does not reset the
+timer, because jumping at a wall is exactly what a stuck player does. Gates are fine; silent gates
+are not.
+
+**Damage numbers no longer spam 0.** A burn tick is ~0.15hp, which `Math.round`ed to a screen full
+of zeroes. Fractions are banked and a number is thrown only once a whole point of health has gone;
+`api.damage` refuses anything under 1 outright. The hurt vignette now scales with the hit instead
+of flashing hard on every tick.
+
+### Still open
+
+- The iron gate at 6780 sits on the parapet and gates the *upper* route only; the ground route below
+  it is clear. Fine as-is, but nobody has decided whether that upper route is meant to be a shortcut.
+- Nothing has been tuned for enemy pressure during traversal — the auto-walk runs with `noenemies`.

@@ -25,6 +25,8 @@ export function createWorld(ctx, opts = {}) {
     cam: { x: 0, y: 0, zoom: 1 },
     halfW: 960, halfH: 540,
     bounds: { x0: -400, x1: 9000, y0: -2200, y1: 900 },
+    /** Below this the player is in a hole he cannot climb out of — see world.update. */
+    pitY: 1500,
     lastHits: [],
     debug: { aabb: false, grid: false, support: false, surfaces: false, rubble: false, player: false },
     stats: { entities: 0, props: 0, debris: 0, awake: 0, surfaceCells: 0, chunksDrawn: 0 },
@@ -593,7 +595,10 @@ export function createWorld(ctx, opts = {}) {
       }
 
       if (e.life > 0 && e.age > e.life) world.ents.despawn(e);
-      if (e.y > world.bounds.y1 + 600) {
+      // `pitY` is the line below which there is no way back up — the chasm floor
+      // sits 500px down behind vertical masonry, so landing on it was a silent
+      // softlock: no death, no respawn, nothing to do but reload.
+      if (e.y > (e.kind === 'player' ? world.pitY : world.bounds.y1 + 600)) {
         if (e.kind === 'player') { world.damage(e, 40, DAMAGE.IMPACT, { ignoreInvuln: true }); world.respawn(); }
         else world.ents.despawn(e);
       }

@@ -330,6 +330,7 @@ export function createUI(ctx) {
 
     damage(x, y, value, kind) {
       if (!settings.damageNumbers) return;
+      if (!(Math.abs(value) >= 1)) return;    // a floating "0" is noise, not feedback
       pushDamage(x, y, value, DMG_KIND[kind] != null ? DMG_KIND[kind] : DMG.NORMAL);
     },
 
@@ -461,12 +462,24 @@ export function createUI(ctx) {
    * Bus wiring
    * ---------------------------------------------------------------- */
   if (bus) {
+    /* Damage-over-time ticks every fixed step: a burn is ~0.15 hp a tick, which
+       `Math.round`ed to a screen full of 0s. Bank the fractions and only throw a
+       number once a whole point of health has actually gone. */
+    let dotBank = 0;
     offs.push(bus.on('player:damage', (e) => {
       if (e.hp != null) st.hp = e.hp;
       else if (e.amount != null) st.hp = Math.max(0, st.hp - e.amount);
       if (e.maxHp != null) st.maxHp = e.maxHp;
-      fx.hurt = Math.min(1, 0.5 + (e.amount || 0) / Math.max(1, st.maxHp) * 3);
-      if (e.amount != null && e.x != null) api.damage(e.x, e.y, Math.round(e.amount), 'player');
+      const amt = e.amount || 0;
+      // the screen pulse scales with the hit instead of flashing hard on a tick
+      fx.hurt = Math.max(fx.hurt, Math.min(1, Math.max(0.10, amt / Math.max(1, st.maxHp) * 6)));
+      if (e.amount != null && e.x != null) {
+        dotBank += amt;
+        if (dotBank >= 1) {
+          api.damage(e.x, e.y, Math.round(dotBank), 'player');
+          dotBank = 0;
+        }
+      }
     }));
     offs.push(bus.on('player:heal', (e) => {
       if (e.hp != null) st.hp = e.hp; else st.hp = Math.min(st.maxHp, st.hp + (e.amount || 0));
@@ -485,6 +498,9 @@ export function createUI(ctx) {
       if (e.damage != null && e.x != null) api.damage(e.x, e.y, Math.round(e.damage), e.crit ? 'crit' : 'hit');
     }));
     offs.push(bus.on('spell:learn', (e) => api.learn(e.id, e.rank)));
+    offs.push(bus.on('hint:blocked', (e) => {
+      api.toast(e.text, { kind: 'warn', value: e.action, life: 2.6 });
+    }));
     offs.push(bus.on('spell:unplaced', (e) => {
       const sp = SPELLS[e.id];
       api.toast((sp ? sp.name : e.id) + ' — no free circle' +

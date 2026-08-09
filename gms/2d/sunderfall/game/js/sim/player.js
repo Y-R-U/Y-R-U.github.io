@@ -1,6 +1,6 @@
 import { MAT, MATERIAL, DAMAGE } from './materials.js';
 import { STATUS } from './status.js';
-import { moveBody, cornerCorrect } from './physics.js';
+import { moveBody, cornerCorrect, propBlocked } from './physics.js';
 
 /**
  * Rook.
@@ -302,9 +302,64 @@ export function updatePlayer(world, e, dt) {
     stepChain(d.hair[i], headX + (i - 1) * 9, headY - 12, -e.vx * 0.30, world.gravity * 0.22, dt, 0.86, 0.7);
   }
 
+  if (e.onGround) d.groundFoot = e.y + BODY_H * 0.5;
+  blockedHint(world, e, dt, ax);
   autoAim(world, e, dt);
   d.aimAng = Math.atan2(world.input.aim.y - (e.y - BODY_H * 0.1), world.input.aim.x - e.x);
   world.input.setAimOrigin(e.x, e.y - BODY_H * 0.1);
+}
+
+/* ------------------------------------------------------------------ *
+ * "Why am I stuck?"
+ *
+ * Being blocked is fine — half this game is deciding what to break. Being
+ * blocked with no idea whether the answer is jump, break, or a bug is not.
+ * Lean into something for a second while actually pushing towards it and the
+ * game says which it is, sized off the obstacle rather than guessed.
+ * ------------------------------------------------------------------ */
+
+const HINT_DELAY = 0.9;      // long enough that brushing a crate says nothing
+const HINT_REPEAT = 6;       // seconds before the same advice is offered again
+const JUMPABLE = 170;        // a full jump clears 185 — see sim-test
+
+/** Pretty names for the things most likely to be in the way. */
+const BLOCK_NAMES = {
+  crate: 'Crates', barrel: 'Barrels', wall_brick: 'Brick wall', pillar_stone: 'Stone pillar',
+  arch_stone: 'Stone arch', boulder_big: 'Boulder', boulder_small: 'Boulder', gate_iron: 'Iron gate',
+  fence: 'Fence', stump: 'Stump', deadtree: 'Dead tree', tree_trunk: 'Tree', oak_trunk: 'Oak',
+  burnt_trunk: 'Burnt trunk', rocks_small: 'Rocks', skull_pile: 'Bones',
+};
+
+function blockedHint(world, e, dt, ax) {
+  const d = e.data;
+  const dir = e.onWall;
+  // Only while he is actually pushing into it — standing beside a wall is not
+  // stuck. Jumping does NOT reset the timer, because jumping at a wall is what
+  // a player does when they are stuck and it is exactly when they want telling.
+  if (!dir || Math.sign(ax) !== dir) { d.blockT = 0; return; }
+  d.blockT = (d.blockT || 0) + dt;
+  if (d.blockT < HINT_DELAY) return;
+  if (world.time - (d.blockHintAt || -99) < HINT_REPEAT) return;
+  d.blockHintAt = world.time;
+
+  // How tall is it, and is it a prop or the ground itself? Measured from the
+  // ground he last stood on, not from his current feet — measuring mid-jump
+  // made a 335px pillar report 158 and advise a jump that cannot work.
+  const px = e.x + dir * (e.w * 0.5 + 8);
+  const foot = d.groundFoot === undefined ? e.y + e.h * 0.5 : d.groundFoot;
+  let clear = null, prop = null;
+  for (let y = foot - 6; y > foot - 460; y -= 8) {
+    const p = world.terrain.solidBox(px, y, 6, 6) ? null : propBlocked(world, px, y, 6, 6);
+    if (p && !prop) prop = p;
+    if (!p && !world.terrain.solidBox(px, y, 6, 6)) { clear = y; break; }
+  }
+  const height = clear === null ? 999 : foot - clear;
+
+  let text, action;
+  if (height <= JUMPABLE) { text = 'Jump it'; action = 'JUMP'; }
+  else if (prop) { text = (BLOCK_NAMES[prop.id] || 'This') + ' — break it'; action = 'BREAK'; }
+  else { text = 'Solid rock — blast through it'; action = 'BREAK'; }
+  world.bus.emit('hint:blocked', { text, action, x: e.x, y: e.y, height: Math.round(height), prop });
 }
 
 const AUTO_AIM_RANGE = 820;

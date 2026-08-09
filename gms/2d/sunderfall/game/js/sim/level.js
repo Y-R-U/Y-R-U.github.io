@@ -10,7 +10,9 @@ import { MATERIAL } from './materials.js';
  *                     a pillared bridge over a chasm, walls that do not float
  */
 
-const CHASM_A = 5620, CHASM_B = 6120;
+// 340px, not 500: a running jump covers ~380px, so the gap is crossable on foot
+// if you bring the bridge down. At 500 destroying your own bridge ended the run.
+const CHASM_A = 5700, CHASM_B = 6040;
 
 export function groundAt(x) {
   if (x >= CHASM_A && x <= CHASM_B) return 520;
@@ -29,6 +31,9 @@ export function buildLevel(world) {
   const L = world.LAYER;
 
   world.bounds = { x0: -240, x1: 7700, y0: -1800, y1: 780 };
+  // The highest real ground in this level is y≈120, so anything past 300 means
+  // the player is down in the chasm with nothing to climb.
+  world.pitY = 300;
 
   /* ---------------- terrain ---------------- */
   T.hill(-600, 4500, groundAt, MATERIAL.ROCK, 1400, MATERIAL.EARTH, 70);
@@ -38,12 +43,27 @@ export function buildLevel(world) {
   T.box(CHASM_A - 40, groundAt(CHASM_A - 60), 40, 520, MATERIAL.MASONRY);
   T.box(CHASM_B, groundAt(CHASM_B + 60), 40, 520, MATERIAL.MASONRY);
 
-  // Sunderwood ledges
-  T.box(2560, -190, 300, 46, MATERIAL.ROCK);
-  T.box(2980, -350, 260, 44, MATERIAL.ROCK);
-  T.platform(3320, -520, 300, 22, MATERIAL.TIMBER, { oneWay: true });
-  T.box(3760, -430, 340, 48, MATERIAL.ROCK);
+  /**
+   * Sunderwood ledges — a climbing route, and every one of them is ONE-WAY.
+   *
+   * They used to be solid boxes at fixed world y while the ground under them
+   * rises ~130px through the wood, so the first ledge ended up with its
+   * underside 8px BELOW Rook's head: he could not walk under it and, at 206px
+   * up, could not jump onto it either. The whole Sunderwood was sealed off by a
+   * rock slab at head height, which is exactly the kind of thing you cannot see
+   * is blocking you. One-way cells never block horizontally, so a mistuned
+   * height can no longer wall the ground route off — the worst case is a ledge
+   * you cannot reach yet.
+   *
+   * Heights are stepped 150px apart because a full jump clears 185px (measured
+   * in `sim-test`, do not exceed ~165 without re-measuring).
+   */
+  T.platform(2560, -136, 300, 46, MATERIAL.ROCK, { oneWay: true });
+  T.platform(2980, -286, 260, 44, MATERIAL.ROCK, { oneWay: true });
+  T.platform(3320, -436, 300, 22, MATERIAL.TIMBER, { oneWay: true });
+  T.platform(3760, -430, 340, 48, MATERIAL.ROCK, { oneWay: true });
   T.platform(4180, -280, 280, 22, MATERIAL.TIMBER, { oneWay: true });
+  // Thornmere: 130px of head clearance over the ground below, so it stays solid.
   T.box(1560, -230, 240, 44, MATERIAL.ROCK);
 
   // Ruinreach: a raised platform and a broken parapet
@@ -104,8 +124,14 @@ export function buildLevel(world) {
   // the showcase arch: two buttresses, an arch, a wall course, a second arch
   const AX = 5100;
   const AS = 1.15;
-  const pl = place('pillar_stone', AX - 172, { scale: AS });
-  const pr = place('pillar_stone', AX + 172, { scale: AS });
+  // The pillars are NOT solid: an arch is a thing you walk under, and in a side
+  // view its legs stand either side of the road rather than across it. Solid,
+  // they were a 385px unclimbable wall on the only path through Ruinreach —
+  // break-to-pass with a starting fire spell that masonry resists at 0.15, i.e.
+  // forty casts to get through a doorway. They still carry the arch, still
+  // crack, and breaking one still brings the whole thing down on your head.
+  const pl = place('pillar_stone', AX - 172, { scale: AS, solid: false });
+  const pr = place('pillar_stone', AX + 172, { scale: AS, solid: false });
   const py = groundAt(AX) - 335 * AS;
   const a1 = placeAt('arch_stone', AX, py, { supportedBy: [pl, pr], scale: AS });
   const w1 = placeAt('wall_brick', AX - 106, py - 285 * AS, { supportedBy: [a1], scale: 0.9 });
@@ -116,18 +142,20 @@ export function buildLevel(world) {
   place('brazier', AX + 340);
   marks.arch = { pillars: [pl, pr], arch: a1, top: a2, walls: [w1, w2], x: AX, y: py };
 
-  // the bridge: a masonry deck on pillars over the chasm
+  // The bridge: a masonry deck on pillars over the chasm. Its walking surface is
+  // the rim, so it is the road — it used to float 313px above the only ground
+  // you could stand on, which made the chasm simply uncrossable.
   const deck = [];
   const bridgePillars = [];
-  const deckY = -170;
+  const deckY = groundAt(CHASM_A - 60) + 193 * 0.72;
   for (let i = 0; i < 3; i++) {
-    const x = CHASM_A + 55 + i * 195;
+    const x = CHASM_A + 40 + i * 130;
     const p = placeAt('pillar_stone', x, 520, { });
     p.grounded = true;
     bridgePillars.push(p);
   }
   for (let i = 0; i < 4; i++) {
-    const x = CHASM_A + 30 + i * 165;
+    const x = CHASM_A - 10 + i * 120;
     const sup = [];
     for (const p of bridgePillars) if (Math.abs(p.x - x) < 190) sup.push(p);
     const seg = placeAt('wall_brick', x, deckY, { scale: 0.72, supportedBy: sup });
@@ -138,10 +166,17 @@ export function buildLevel(world) {
 
   // the acid wall: a tall brick stack with a pillar buttress
   const WX = 6420;
-  const wb = place('pillar_stone', WX - 190);
+  // Buttress, not gate: it leans on the wall rather than standing across the
+  // road, so it does not need to be a second 335px thing to chew through.
+  const wb = place('pillar_stone', WX - 190, { solid: false });
+  // Two courses, not three. Masonry resists fire at 0.15, so with the starting
+  // emberbolt a three-course stack was 62 casts and 75 seconds of standing still
+  // — the acid this wall is built for is the intended answer, but the fallback
+  // has to be a fight rather than a chore. Knocking the top course down leaves
+  // climbable rubble, so this reads as a gate you open, not a wall of HP.
   const wallStack = [];
   let prev = null;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     const y = groundAt(WX) - i * 190;
     const seg = placeAt('wall_brick', WX, y, { supportedBy: prev ? [prev] : [], scale: 1 });
     if (i === 1) world.props.link(wb, seg);

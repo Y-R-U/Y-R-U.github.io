@@ -259,6 +259,7 @@ export async function createPlayScene(ctx) {
       scene.marks = marks;
 
       const px = 470;
+      lastMark = -Infinity;
       world.createPlayer(px, groundAt(px) - 120);
       cam.x = px; cam.y = groundAt(px) - 120 - leadPx();
       camInit = true;
@@ -285,6 +286,7 @@ export async function createPlayScene(ctx) {
       world.update(dt);
       if (director) director.update(dt);
       updateCamera(dt);
+      checkpoint();
     },
 
     render(alpha) {
@@ -315,6 +317,23 @@ export async function createPlayScene(ctx) {
 
     demo(name) { if (demos && demos[name]) demos[name](); },
   };
+
+  /**
+   * Rolling checkpoint. Falling in the chasm respawns you, and respawning at the
+   * far end of the level after every fall is its own kind of punishment — so the
+   * spawn point follows you forward whenever you are standing safely on ground.
+   * Forward only: it never moves back, and it never records a spot you were
+   * burning or falling in.
+   */
+  let lastMark = -Infinity;
+  function checkpoint() {
+    const p = world.player;
+    if (!p || !p.alive || p.killed || !p.onGround) return;
+    if (p.x < lastMark + 420 || p.y > 200) return;
+    if (p.burning > 0 || world.surfaces.amountAt('fire', p.x, p.y) > 0) return;
+    lastMark = p.x;
+    world.setPlayerSpawn(p.x, p.y);
+  }
 
   function updateCamera(dt) {
     const p = world.player;

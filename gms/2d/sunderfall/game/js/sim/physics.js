@@ -55,7 +55,7 @@ function oneWayFloorY(world, e, x, bottom, prevBottom) {
 export function moveBody(world, e, dt) {
   const dx = e.vx * dt, dy = e.vy * dt;
   const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / SUB));
-  const sx = dx / steps, sy = dy / steps;
+  let sx = dx / steps, sy = dy / steps;
   const stepUp = e.stepUp || 0;
 
   e.onGround = false;
@@ -78,9 +78,13 @@ export function moveBody(world, e, dt) {
         if (!climbed) {
           e.onWall = sx > 0 ? 1 : -1;
           e.hitX = e.onWall;
-          if (e.bounce > 0 && Math.abs(e.vx) > 30) e.vx = -e.vx * e.bounce;
-          else e.vx = 0;
-          break;
+          if (e.bounce > 0 && Math.abs(e.vx) > 30) { e.vx = -e.vx * e.bounce; sx = -sx * e.bounce; }
+          else { e.vx = 0; sx = 0; }
+          // Stop the axis, NOT the solver. This used to `break`, which abandoned
+          // the Y axis for this substep and every substep left in the frame — so
+          // a body holding a direction into a wall could not rise or fall at all.
+          // Walk into a crate while still holding right and you were pinned:
+          // vy integrated, y never moved, and the jump looked broken.
         }
       } else e.x = nx;
     }
@@ -96,9 +100,11 @@ export function moveBody(world, e, dt) {
         for (let k = 0; k < SUB + 2 && blockedFull(world, e, e.x, y); k++) y += dir;
         e.y = y;
         if (sy > 0) { e.onGround = true; e.hitY = 1; } else e.hitY = -1;
-        if (e.bounce > 0 && Math.abs(e.vy) > 60) e.vy = -e.vy * e.bounce;
-        else e.vy = 0;
-        break;
+        // same rule the other way round: landing or hitting your head stops the
+        // vertical axis, it does not cancel the horizontal movement you had left
+        if (e.bounce > 0 && Math.abs(e.vy) > 60) { e.vy = -e.vy * e.bounce; sy = -sy * e.bounce; }
+        else { e.vy = 0; sy = 0; }
+        continue;
       }
       if (sy > 0 && !e.ignoreOneWay) {
         const nb = ny + e.h * 0.5;
@@ -106,8 +112,9 @@ export function moveBody(world, e, dt) {
         if (f < Infinity) {
           e.y = f - e.h * 0.5;
           e.onGround = true; e.hitY = 1;
-          if (e.bounce > 0 && Math.abs(e.vy) > 60) e.vy = -e.vy * e.bounce; else e.vy = 0;
-          break;
+          if (e.bounce > 0 && Math.abs(e.vy) > 60) { e.vy = -e.vy * e.bounce; sy = -sy * e.bounce; }
+          else { e.vy = 0; sy = 0; }
+          continue;
         }
       }
       e.y = ny;
