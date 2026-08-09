@@ -3259,3 +3259,26 @@ Level 12 with `emberbolt:4 cinderwake:3` and 7 shards survives an Again as level
 shards, circles rebuilt with the right unlock state. Three ward lines on the first Again, zero on the
 second. Death panel is 367×540 in a 390×844 portrait with no overflow. Auto-walk still reaches the
 end of the level.
+
+---
+
+## Session — playtest-fixes-8 (the picker on desktop)
+
+The picker already opened on desktop — clicks reach `touch.js`'s pointer handler the same way taps
+do — but it **rendered off the bottom of the screen**, which is what "an info message I can't read
+because it goes below the screen" was. Measured at 1440×900: panel at `y=890`, height 139, viewport
+900.
+
+Cause: the placement clamped with `y = max(L.toast.y + 40, y)`. That was written for portrait, where
+toasts sit at the top and the panel must stay clear of them. In landscape `L.toast.y` is
+`h - pad - 30` — the bottom of the screen — so the clamp shoved the panel off the frame. It now
+clamps against the **viewport** on all four sides and only keeps clear of the resource cluster at the
+top. Verified fully on screen at 1440×900, 1280×720 and for circles 2/3/5.
+
+While in there, since desktop has the room:
+
+- **Rank badges** (`R3`) on any spell above rank 1, and the **circle number** of any spell already
+  placed elsewhere — so a swap can no longer silently empty another circle without you seeing it.
+- **Keys 1–5 open that circle's picker** instead of the whole pause overlay, matching the click.
+  Pressing the same number again closes it; a locked circle toasts its unlock level. (Note: `close()`
+  clears `slot`, so the toggle has to read the slot *before* closing — the first version reopened.)

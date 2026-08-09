@@ -48,14 +48,19 @@ export function createPicker(ctx, L, st, hooks) {
     const w = cols * cell + (cols - 1) * gap + padX * 2;
     const h = rows * cell + (rows - 1) * gap + padTop + padBot;
 
-    // sit above the circle that was tapped, then clamp into the safe area
+    // Sit above the circle that was tapped, then clamp so the whole panel is on
+    // screen. The clamp has to be against the viewport, not against the toast
+    // row: toasts live at the top in portrait and at the BOTTOM in landscape, so
+    // keeping clear of them put the panel at y=890 in a 900px-tall window — the
+    // desktop picker was opening entirely below the bottom edge.
     const geo = L.circles[slot];
+    const vw = L.w || 390, vh = L.h || 844;
+    const pad = (L.pad || 12) + 4;
     let x = geo.x - w * 0.5;
     let y = geo.y - geo.r - 18 - h;
-    const pad = (L.pad || 12) + 4;
-    const maxX = Math.max(pad, (L.w || 390) - w - pad);
-    x = Math.max(pad, Math.min(maxX, x));
-    y = Math.max(L.toast.y + 40, y);
+    x = Math.max(pad, Math.min(Math.max(pad, vw - w - pad), x));
+    const top = pad + (portrait ? 70 : 56);          // clear of the resource cluster
+    y = Math.max(top, Math.min(vh - h - pad, y));
     p.panel.x = x; p.panel.y = y; p.panel.w = w; p.panel.h = h;
 
     for (let i = 0; i < ids.length; i++) {
@@ -142,6 +147,18 @@ export function createPicker(ctx, L, st, hooks) {
         const name = (it.spell && it.spell.name) || it.id;
         txt(c, name, it.x, it.y + it.r * 0.72, 8, A(it.current ? C.ink : C.dim, 0.95),
           { align: 'center', base: 'middle', weight: 700, caps: true, track: 0.4 });
+        // rank matters more than the name once you have two of the same school
+        const rank = (st.ranks && st.ranks[it.id]) || 1;
+        if (rank > 1) {
+          txt(c, 'R' + rank, it.x + it.r * 0.74, it.y - it.r * 0.66, 8.5, A(C.gold, 0.95),
+            { align: 'center', base: 'middle', weight: 800 });
+        }
+        // where it already is, so you cannot silently swap two circles' spells
+        const inSlot = st.slots.findIndex((s2) => s2.spellId === it.id);
+        if (inSlot >= 0 && !it.current) {
+          txt(c, String(inSlot + 1), it.x - it.r * 0.74, it.y - it.r * 0.66, 8.5, A(C.brassL, 0.8),
+            { align: 'center', base: 'middle', weight: 800 });
+        }
       }
       c.restore();
       c.globalAlpha = 1;

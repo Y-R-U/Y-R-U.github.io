@@ -635,12 +635,20 @@ export function createUI(ctx) {
   }
   bindSpellSystem(ctx.spellSystem || (ctx.spells && ctx.spells.system));
 
-  /* keyboard: 1–5 opens the loadout on that circle */
+  /* keyboard: 1–5 opens that circle's picker, the same thing a click does */
   function onKey(e) {
-    if (e.key >= '1' && e.key <= '5' && !overlays.blocking) {
-      const i = +e.key - 1;
-      if (st.level >= st.slots[i].unlockLevel) { api.setPaused(true); overlays.openLoadout(); }
+    if (e.key < '1' || e.key > '5') return;
+    if (overlays.blocking) return;
+    const i = +e.key - 1;
+    // same key twice closes it; close() clears `slot`, so read it first
+    const wasOpen = picker.isOpen ? picker.state.slot : -1;
+    if (wasOpen >= 0) { picker.close(); if (wasOpen === i) return; }
+    if (st.level < st.slots[i].unlockLevel) {
+      api.toast('Circle ' + (i + 1) + ' opens at level ' + st.slots[i].unlockLevel, { kind: 'warn', value: 'LV' + st.slots[i].unlockLevel });
+      return;
     }
+    if (st.known.length > 1) picker.show(i);
+    else { api.setPaused(true); overlays.openLoadout(); }
   }
   window.addEventListener('keydown', onKey);
 
