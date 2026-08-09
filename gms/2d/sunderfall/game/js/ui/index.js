@@ -526,9 +526,13 @@ export function createUI(ctx) {
     offs.push(bus.on('bark', (e) => {
       const p = ctx.world && ctx.world.player;
       if (!p || !p.alive || !e.text) return;
+      const who = e.who || 'rook';
       bubbles.say({
-        who: e.who || 'rook', text: e.text, size: 13.5,
-        ax: 60, ay: -170, anchor: () => ({ x: p.x, y: p.y - 40 }),
+        who, text: e.text, size: 13.5,
+        // anyone who is not him speaks from the other side, so a two-hander
+        // (the ward, on the first Again) does not stack in one place
+        ax: who === 'rook' ? 60 : -60, ay: who === 'rook' ? -170 : -215,
+        anchor: () => ({ x: p.x, y: p.y - 40 }),
       });
     }));
     offs.push(bus.on('spell:unplaced', (e) => {

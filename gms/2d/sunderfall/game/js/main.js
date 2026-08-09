@@ -396,16 +396,40 @@ async function boot() {
      only way out of a dead run was reloading the page. `play` rebuilds the
      whole level in enter(), so re-entering it IS the restart. */
   let restarting = false;
+
+  /* The first time the ward is used, it explains itself — otherwise "Again"
+     silently hands back two thirds of a run and the player never learns that
+     the old man paid for it. Once per session; the ward speaks from around the
+     boy, which is where it lives. */
+  let wardTold = false;
+  const WARD_LINES = [
+    { at: 1400, who: 'vayne', text: 'I bound a ward to your life, boy. Before the rest of me went.' },
+    { at: 5200, who: 'vayne', text: 'It gives back what it can. Not all of it. Never all of it.' },
+    { at: 9200, who: 'rook', text: 'You could have led with that.' },
+  ];
+  function tellWard() {
+    if (wardTold) return;
+    wardTold = true;
+    for (const l of WARD_LINES) {
+      setTimeout(() => {
+        const p = ctx.world && ctx.world.player;
+        if (p && p.alive && scenes.name === 'play') bus.emit('bark', { who: l.who, text: l.text, priority: 3 });
+      }, l.at);
+    }
+  }
+
   bus.on('ui:restart', async () => {
     if (restarting) return;
     restarting = true;
     try {
       if (ui && ui.reset) ui.reset();
-      // roguelite rule from DESIGN §5: knowledge stays, ranks reset
+      // Vayne's ward (DESIGN §5, revised): spells and their ranks survive, and
+      // he keeps two thirds of his levels with a floor of 3.
       const sys = ctx.spellSystem;
       if (sys && sys.softReset) sys.softReset();
       R.fx.timeScale(1, 0);
       await scenes.go('play');
+      tellWard();
     } finally { restarting = false; }
   });
   /* The other death button. It used to reload the page, which happened to be a

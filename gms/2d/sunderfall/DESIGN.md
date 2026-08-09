@@ -132,9 +132,13 @@ the four art locations:
    bring down onto enemies. This is the section that must produce the screenshots.
 4. **The Glyphglade** — back to where Vayne died, now overrun. Boss: **the Seam**.
 
-Roguelite layer: death returns you to Thornmere with your spell *knowledge* intact but ranks reset;
-the level's mid-section rooms are drawn from a pool so it is not identical on a rerun. Keep this
-light — the handcrafted spine matters more than the shuffle.
+Roguelite layer — **Vayne's ward**. The old man bound a ward to Rook's life before it cost him his
+own, so death replays the day rather than ending it. It gives back what it can: every spell at the
+rank he took it to, his shards, and two thirds of his levels, never dropping him below level 3 —
+which is where the second cast circle opens, so a death is never a return to one-spell nothing. The
+death screen's other option, **Start over**, keeps nothing at all. The ward explains itself the
+first time it is used. The level's mid-section rooms are drawn from a pool so it is not identical on
+a rerun. Keep this light — the handcrafted spine matters more than the shuffle.
 
 ## 6. Controls
 

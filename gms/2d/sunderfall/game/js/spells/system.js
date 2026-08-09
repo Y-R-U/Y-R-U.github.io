@@ -650,12 +650,27 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     syncCircles();
   };
 
-  /** Death keeps knowledge, resets ranks — the roguelite rule from DESIGN §5. */
+  /**
+   * Vayne's ward — the "Again" path.
+   *
+   * The old man bound a ward to the boy's life before it cost him his own, so
+   * dying replays the day rather than ending it. It gives back what it can:
+   * every spell at the rank he had earned it to, and all but a third of what he
+   * had become. It cannot give back everything, and it never drops him below
+   * level 3 — which is where the second cast circle opens, so a death is never
+   * a return to one-spell nothing.
+   *
+   * It cannot promote: dying at level 2 leaves you at level 2, not at 3.
+   */
+  S.WARD_FLOOR = 3;
+  S.WARD_LOSS = 1 / 3;
   S.softReset = function () {
-    S.known.forEach((rank, id) => S.known.set(id, 1));
-    S.level = 1; S.xp = 0; S.xpToNext = xpForLevel(1);
+    const floor = Math.min(S.level, S.WARD_FLOOR);
+    S.level = Math.max(floor, S.level - Math.ceil(S.level * S.WARD_LOSS));
+    S.xp = 0; S.xpToNext = xpForLevel(S.level);
     S.focus = S.focusMax;
-    syncCircles();
+    S.offer = null;
+    syncCircles();          // ranks are untouched: the ward keeps what he learned
   };
 
   // starting kit

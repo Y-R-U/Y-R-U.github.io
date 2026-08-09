@@ -3223,3 +3223,39 @@ Picker opens on the tapped circle with the current spell marked, freezes the sim
 on tap, dismisses on an outside tap. Bars: `oak_trunk` h=340 inside, `fence` h=79 above, a hit that
 would kill in one gets nothing. `softReset` keeps 4 known spells, `hardReset` drops to 1. Full
 auto-walk still reaches x=8206; pause/death/restart unchanged.
+
+---
+
+## Session — playtest-fixes-7 (Vayne's ward)
+
+"Again" reset spell ranks to 1 and the player to level 1, which made it a much harsher option than
+its label implied. Aaron's call, and it gives the mechanic a reason to exist in the fiction: the old
+man bound a ward to the boy's life before it cost him his own, so dying replays the day.
+
+`S.softReset()` now:
+
+- **keeps every spell at the rank it was taken to** (it used to stamp them all back to 1)
+- **keeps shards**
+- **drops a third of his levels, floored at 3** — `max(min(level, 3), level - ceil(level/3))`
+
+Measured: 24→16, 12→8, 7→4, 5→3, 3→3, 2→2. The floor cannot promote, so dying at level 2 leaves
+you at level 2. Three is deliberate: `CIRCLE_UNLOCK` opens the second cast circle there, so a death
+is never a return to one-spell nothing.
+
+`Start over` is unchanged and is now the only total wipe. Death-screen copy says what the ward does;
+the buttons read **Again · Ward keeps most of it** and **Start over · Nothing kept**.
+
+**The ward explains itself the first time it is used.** `tellWard()` in main.js fires three lines
+after the restarted run loads — two from Vayne, one from Rook — once per session, and only while the
+play scene is up and he is alive. They go out as `bark` events, so they use the speech bubbles that
+already track him; anyone who is not Rook speaks from his other side so the exchange does not stack
+in one place.
+
+DESIGN §5's roguelite paragraph was rewritten to match — it still described the old rule.
+
+### Verified
+
+Level 12 with `emberbolt:4 cinderwake:3` and 7 shards survives an Again as level 8, same ranks, same
+shards, circles rebuilt with the right unlock state. Three ward lines on the first Again, zero on the
+second. Death panel is 367×540 in a 390×844 portrait with no overflow. Auto-walk still reaches the
+end of the level.

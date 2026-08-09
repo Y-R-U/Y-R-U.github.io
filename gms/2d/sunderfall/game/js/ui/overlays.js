@@ -213,8 +213,8 @@ export function createOverlays(ctx, L, st, api) {
       btn('Resume', 'Esc', '', () => api.togglePause()),
       btn('Loadout', '1–5', '', () => { rightTab = 'loadout'; buildRight(); }),
       btn('Settings', '', '', () => { rightTab = 'settings'; buildRight(); }),
-      btn('Restart run', 'Keep your spells', 'danger', () => api.restart()),
-      btn('Start over', 'Forget everything', 'danger', () => api.quit()),
+      btn('Restart run', 'Ward keeps most of it', 'danger', () => api.restart()),
+      btn('Start over', 'Nothing kept', 'danger', () => api.quit()),
     );
   }
 
@@ -406,7 +406,9 @@ export function createOverlays(ctx, L, st, api) {
           '<div><b>' + s.kills + '</b><span>Slain</span></div>' +
           '<div><b>' + s.broken + '</b><span>Broken</span></div>' +
         '</div>' +
-        '<p class="sf-sub">Again keeps every spell you learned, at rank 1. Starting over keeps nothing.</p>' +
+        '<p class="sf-sub">Vayne bound a ward to your life. It replays the day and gives back what it ' +
+          'can — every spell at the rank you took it to, and all but a third of what you had become. ' +
+          'Never below level 3.</p>' +
         '<div class="row"></div>' +
       '</div>';
     const row = death.querySelector('.row');
@@ -414,8 +416,8 @@ export function createOverlays(ctx, L, st, api) {
     const guard = (fn) => () => { if (performance.now() < armed) return; death.hidden = true; fn(); };
     // These two did visibly identical things for a long time — one soft-reset,
     // one reloaded the page — so say what each one costs, on the button.
-    row.appendChild(btn('Again', 'Keep your spells', '', guard(() => api.restart())));
-    row.appendChild(btn('Start over', 'Forget everything', 'danger', guard(() => api.quit())));
+    row.appendChild(btn('Again', 'Ward keeps most of it', '', guard(() => api.restart())));
+    row.appendChild(btn('Start over', 'Nothing kept', 'danger', guard(() => api.quit())));
     death.hidden = false;
     death.classList.add('arming');
     setTimeout(() => death.classList.remove('arming'), ARM_MS);
