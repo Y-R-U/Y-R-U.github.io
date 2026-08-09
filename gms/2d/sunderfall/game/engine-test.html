@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — engine test</title>
+<style>
+  html,body{margin:0;height:100%;background:#06060a;overflow:hidden;touch-action:none;
+    font:500 12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6f2;
+    -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  body{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #hud{position:absolute;top:0;left:0;padding:calc(8px + env(safe-area-inset-top)) 10px 8px calc(10px + env(safe-area-inset-left));
+    pointer-events:none;text-shadow:0 1px 3px #000;line-height:1.5}
+  #hud b{color:#ffc24d;font-weight:600}
+  #hud .bad{color:#ff7b6b}
+  #hud .ok{color:#7ee0a8}
+  #btns{position:absolute;right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));
+    display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  button{font:600 11px/1 ui-monospace,monospace;letter-spacing:.06em;color:#dfe6f2;background:#161622cc;
+    border:1px solid #2c2c3f;border-radius:6px;padding:7px 10px;cursor:pointer}
+  button.on{background:#3a2a12cc;border-color:#7a5a20;color:#ffc24d}
+  #tip{position:absolute;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    color:#6e6a80;pointer-events:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud"></div>
+<div id="btns">
+  <button id="b-boom">BOOM (space)</button>
+  <button id="b-stress">STRESS</button>
+  <button id="b-light">LIGHTS</button>
+  <button id="b-bloom">BLOOM</button>
+  <button id="b-fill">10K PARTICLES</button>
+</div>
+<div id="tip">drag to look · click for a shockwave</div>
+
+<script type="module">
+import { createRenderer, LAYER } from './js/gfx/renderer.js';
+import { createParticles } from './js/gfx/particles.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createBus } from './js/core/events.js';
+import { createRNG } from './js/core/rng.js';
+import { createLoop } from './js/core/loop.js';
+import { clamp, damp, lerp, TAU } from './js/core/math.js';
+
+const canvas = document.getElementById('game');
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const R = await createRenderer(canvas);
+const P = createParticles(R);
+const input = createInput(canvas, view, bus);
+const rng = createRNG('sunderwood-night');
+
+R.resize(view.w, view.h, view.dpr, view.worldW);
+view.onResize(() => R.resize(view.w, view.h, view.dpr, view.worldW));
+
+/* ---------------- scene look ---------------- */
+
+R.setAmbient(0.095, 0.125, 0.215);
+R.setHaze(0.24, 0.34, 0.54);
+R.setClearColor(0.030, 0.038, 0.070);
+R.fx.vignette(0.72);
+R.fx.bloom = 0.62;
+R.fx.threshold = 0.85;
+R.fx.knee = 0.30;
+R.fx.exposure = 1.0;
+R.fx.grain = 0.024;
+R.fx.saturation = 1.06;
+R.fx.contrast = 1.14;
+R.setLayer(LAYER.SKY, { haze: 0.0, shade: 0.35 });
+R.setLayer(LAYER.BG_FAR, { haze: 0.34, response: 0.14 });
+R.setLayer(LAYER.BG_MID, { haze: 0.15, response: 0.34 });
+R.setLayer(LAYER.BG_NEAR, { haze: 0.07, response: 0.70 });
+R.setLayer(LAYER.FG_OCCLUDE, { response: 0.28, mul: [0.42, 0.46, 0.58] });
+
+const MOON = { x: 660, y: -430 };
+R.fx.setRays(MOON.x, MOON.y, 0.22, 0.955, 1.25);
+
+/* ---------------- static sprite bank ---------------- */
+// SoA so the render loop is a flat walk with zero allocation.
+
+const CAPS = 40000;
+const bank = {
+  n: 0,
+  x: new Float32Array(CAPS), y: new Float32Array(CAPS),
+  w: new Float32Array(CAPS), h: new Float32Array(CAPS),
+  rot: new Float32Array(CAPS),
+  r: new Float32Array(CAPS), g: new Float32Array(CAPS), b: new Float32Array(CAPS), a: new Float32Array(CAPS),
+  layer: new Uint8Array(CAPS), add: new Uint8Array(CAPS), par: new Float32Array(CAPS),
+  tex: new Array(CAPS),
+  push(tex, x, y, w, h, rot, r, g, b, a, layer, add, par) {
+    const i = bank.n++;
+    bank.tex[i] = tex; bank.x[i] = x; bank.y[i] = y; bank.w[i] = w; bank.h[i] = h;
+    bank.rot[i] = rot; bank.r[i] = r; bank.g[i] = g; bank.b[i] = b; bank.a[i] = a;
+    bank.layer[i] = layer; bank.add[i] = add ? 1 : 0; bank.par[i] = par;
+  },
+};
+
+const KEY = { x: -120, y: 20 };   // the one warm source everything is composed around
+
+/**
+ * A tree is: tapered curving trunk, a lit rim strip on the side facing the key
+ * light, boughs, and a canopy of overlapping soft masses. The rim strip is the
+ * thing that stops a flat silhouette from reading as cardboard.
+ */
+function tree(x, groundY, h, trunkW, layer, par, tint, canopyR, canopyN) {
+  const lean = rng.range(-0.08, 0.08);
+  const toKey = KEY.x > x ? 1 : -1;
+  const rim = [tint[0] * 2.6 + 0.06, tint[1] * 2.1 + 0.04, tint[2] * 1.6 + 0.03];
+  let px = x, py = groundY, ang = lean;
+  const segs = 8;
+  for (let i = 0; i < segs; i++) {
+    const t = i / segs;
+    const segH = (h / segs) * 1.28;   // overlap hides the width steps
+    const wdt = lerp(trunkW, trunkW * 0.34, t * t * 0.7 + t * 0.3);
+    ang += rng.range(-0.055, 0.055);
+    const nx = px + Math.sin(ang) * segH;
+    const ny = py - Math.cos(ang) * segH;
+    const mx = (px + nx) * 0.5, my = (py + ny) * 0.5;
+    bank.push(R.white, mx, my, wdt, segH * 1.1, ang,
+      tint[0] * 0.72, tint[1] * 0.72, tint[2] * 0.8, 1, layer, false, par);
+    bank.push(R.white, mx + toKey * wdt * 0.40, my, wdt * 0.20, segH * 1.1, ang,
+      rim[0], rim[1], rim[2], 0.55, layer, false, par);
+    px = nx; py = ny;
+  }
+  // root flare so the trunk meets the ground instead of stopping at it
+  bank.push(R.blob, x, groundY - trunkW * 0.1, trunkW * 3.0, trunkW * 1.1, 0,
+    tint[0] * 0.6, tint[1] * 0.6, tint[2] * 0.7, 0.9, layer, false, par);
+
+  for (let i = 0; i < 4; i++) {
+    const t = 0.42 + i * 0.15;
+    const bx = x + Math.sin(lean) * h * t, by = groundY - h * t;
+    const dir = i % 2 ? 1 : -1;
+    const bl = rng.range(0.20, 0.42) * h;
+    const ba = dir * rng.range(0.5, 0.95);
+    bank.push(R.streak, bx + Math.sin(ba) * bl * 0.5, by - Math.cos(ba) * bl * 0.5,
+      trunkW * 0.30, bl, ba, tint[0] * 0.7, tint[1] * 0.7, tint[2] * 0.78, 1, layer, false, par);
+    // leaf clump on the bough end
+    const ex = bx + Math.sin(ba) * bl, ey = by - Math.cos(ba) * bl;
+    for (let j = 0; j < 3; j++) {
+      const s = canopyR * rng.range(0.30, 0.55);
+      bank.push(R.blob, ex + rng.spread(s * 0.5), ey + rng.spread(s * 0.4), s * 1.4, s, rng.angle(),
+        tint[0], tint[1], tint[2], rng.range(0.6, 0.95), layer, false, par);
+    }
+  }
+
+  const cx = x + Math.sin(lean) * h * 0.94, cy = groundY - h * 0.99;
+  for (let i = 0; i < canopyN; i++) {
+    const a2 = rng.angle();
+    const rad = Math.pow(rng.next(), 0.55);
+    const dx = Math.cos(a2) * rad * canopyR * 1.5;
+    const dy = Math.sin(a2) * rad * canopyR * 0.85 - rad * canopyR * 0.25;
+    const s = canopyR * rng.range(0.42, 0.85) * (1 - rad * 0.3);
+    // top of the canopy catches the moon, underside stays in shadow
+    const up = 1 - (dy / (canopyR * 0.9)) * 0.5;
+    const k = rng.range(0.85, 1.15) * up;
+    bank.push(R.blob, cx + dx, cy + dy, s * rng.range(1.1, 1.7), s, rng.angle(),
+      tint[0] * k, tint[1] * k, tint[2] * k * 1.05, rng.range(0.7, 1.0), layer, false, par);
+  }
+}
+
+function buildScene() {
+  bank.n = 0;
+
+  for (let i = 0; i < 300; i++) {
+    const s = rng.range(2, 7);
+    bank.push(R.blob, rng.range(-2600, 2600), rng.range(-1150, -300), s, s, 0,
+      rng.range(0.7, 1), rng.range(0.8, 1), 1, rng.range(0.2, 0.9), LAYER.SKY, true, 0.05);
+  }
+  bank.push(R.blob, MOON.x, MOON.y, 1250, 1250, 0, 0.55, 0.70, 1.0, 0.30, LAYER.SKY, true, 0.05);
+  bank.push(R.disc, MOON.x, MOON.y, 132, 132, 0, 1, 0.98, 0.93, 1, LAYER.SKY, true, 0.05);
+
+  // distant ridge crest — soft masses, kept small; giant blobs are a fill trap
+  for (let i = 0; i < 44; i++) {
+    const x = rng.range(-3400, 3400);
+    const s = rng.range(170, 380);
+    bank.push(R.blob, x, -250 + rng.range(-70, 40), s * 2.4, s * 1.2, 0,
+      0.30, 0.38, 0.56, rng.range(0.35, 0.7), LAYER.BG_FAR, false, 0.12);
+  }
+
+  for (let i = 0; i < 26; i++) {
+    const x = MOON.x + rng.spread(1500);
+    const s = rng.range(400, 900);
+    const k = 1 - Math.min(1, Math.abs(x - MOON.x) / 1700);
+    bank.push(R.blob, x, rng.range(-320, -60), s * 2.6, s * 0.9, 0,
+      0.34, 0.44, 0.66, 0.035 + k * 0.055, LAYER.BG_FAR, true, 0.12);
+  }
+
+  // three forest bands, each darker and less hazy than the one behind it
+  for (let i = 0; i < 44; i++) {
+    tree(rng.range(-3200, 3200), rng.range(-195, -150), rng.range(200, 285), rng.range(14, 22),
+      LAYER.BG_FAR, 0.20, [0.26, 0.33, 0.48], rng.range(52, 84), 10);
+  }
+  for (let i = 0; i < 30; i++) {
+    tree(rng.range(-2600, 2600), rng.range(-95, -45), rng.range(330, 440), rng.range(26, 40),
+      LAYER.BG_MID, 0.42, [0.115, 0.165, 0.265], rng.range(92, 132), 18);
+  }
+  for (let i = 0; i < 18; i++) {
+    tree(rng.range(-2200, 2200), rng.range(0, 46), rng.range(470, 600), rng.range(42, 66),
+      LAYER.BG_NEAR, 0.72, [0.062, 0.088, 0.155], rng.range(140, 195), 24);
+  }
+
+  // ground
+  for (let i = 0; i < 150; i++) {
+    const x = rng.range(-2600, 2600), y = rng.range(120, 320);
+    const s = rng.range(110, 420);
+    bank.push(R.blob, x, y, s * 2.0, s * 0.55, 0, 0.155, 0.145, 0.15, rng.range(0.35, 0.85), LAYER.TERRAIN, false, 1);
+  }
+  for (let i = 0; i < 70; i++) {
+    const x = rng.range(-2300, 2300), s = rng.range(40, 150);
+    bank.push(R.blob, x, rng.range(130, 300), s * 1.7, s, rng.range(-0.3, 0.3),
+      0.235, 0.225, 0.235, 1, LAYER.TERRAIN, false, 1);
+  }
+  for (let i = 0; i < 120; i++) {
+    const x = rng.range(-2500, 2500), y = rng.range(150, 520);
+    const s = rng.range(180, 520);
+    bank.push(R.blob, x, y, s * 2.2, s * 0.7, 0,
+      0.055, 0.05, 0.06, rng.range(0.25, 0.6), LAYER.TERRAIN_FRONT, false, 1);
+  }
+  for (let i = 0; i < 220; i++) {
+    const x = rng.range(-2500, 2500), y = rng.range(180, 460);
+    const s = rng.range(30, 110);
+    bank.push(R.blob, x, y, s * 1.9, s * 0.8, rng.range(-0.4, 0.4),
+      0.17, 0.155, 0.15, rng.range(0.4, 0.9), LAYER.TERRAIN_FRONT, false, 1);
+  }
+  for (let i = 0; i < 1100; i++) {
+    const x = rng.range(-2400, 2400);
+    const y = rng.range(95, 430);
+    const hh = rng.range(38, 135);
+    bank.push(R.streak, x, y - hh * 0.44, hh * 0.24, hh, rng.range(-0.5, 0.5),
+      0.20, 0.28, 0.165, rng.range(0.55, 1.0), LAYER.TERRAIN_FRONT, false, 1);
+  }
+
+  // foreground occluders: trunks that pass right through frame, plus foliage
+  // hanging in from the top edge. Both crush to near-black by layer config.
+  // deliberately no trunk near the fire — the key light must stay visible
+  for (const fx of [-2050, -1400, -760, 430, 1010, 1650, 2300]) {
+    tree(fx + rng.range(-80, 80), rng.range(300, 380), rng.range(1500, 2000), rng.range(115, 180),
+      LAYER.FG_OCCLUDE, 1.35, [0.055, 0.062, 0.09], rng.range(280, 380), 12);
+  }
+  for (let i = 0; i < 70; i++) {
+    const s = rng.range(130, 330);
+    bank.push(R.blob, rng.range(-2600, 2600), rng.range(-900, -680), s * 1.7, s, rng.angle(),
+      0.05, 0.058, 0.085, rng.range(0.7, 1), LAYER.FG_OCCLUDE, false, 1.35);
+  }
+
+  // moon shafts — explicit soft beams beat a radial blur with no occluders
+  for (let i = 0; i < 7; i++) {
+    const x = MOON.x - 900 + i * 260 + rng.range(-70, 70);
+    const len = rng.range(1500, 2200);
+    bank.push(R.blob, x, -420, rng.range(90, 210), len, 0.30 + rng.range(-0.04, 0.04),
+      0.42, 0.56, 0.92, rng.range(0.05, 0.115), LAYER.BG_NEAR, true, 0.55);
+  }
+  // mist bands
+  for (let i = 0; i < 14; i++) {
+    const s = rng.range(260, 560);
+    bank.push(R.blob, rng.range(-2800, 2800), rng.range(-40, 160), s * 2.8, s * 0.40, 0,
+      0.34, 0.44, 0.64, rng.range(0.02, 0.05), LAYER.BG_NEAR, true, 0.62);
+  }
+}
+buildScene();
+
+// ground crest — emitted as triangles so the horizon is a shaped edge, never a
+// ruled line, and so the tri path gets exercised alongside the sprite batcher
+const CREST_N = 90, CREST_X0 = -3200, CREST_DX = 6400 / (CREST_N - 1);
+const crest = new Float32Array(CREST_N);
+for (let i = 0; i < CREST_N; i++) {
+  const x = CREST_X0 + i * CREST_DX;
+  crest[i] = 132 + Math.sin(x * 0.0016) * 26 + Math.sin(x * 0.0053 + 2.1) * 14 + rng.range(-7, 7);
+}
+const GROUND_A = [0.235, 0.215, 0.20, 1];
+const GROUND_B = [0.115, 0.105, 0.115, 1];
+function drawGround() {
+  for (let i = 0; i < CREST_N - 1; i++) {
+    const x0 = CREST_X0 + i * CREST_DX, x1 = x0 + CREST_DX;
+    R.tri(x0, crest[i], GROUND_A, x1, crest[i + 1], GROUND_A, x1, 1000, GROUND_B, LAYER.TERRAIN);
+    R.tri(x0, crest[i], GROUND_A, x1, 1000, GROUND_B, x0, 1000, GROUND_B, LAYER.TERRAIN);
+  }
+}
+
+/* ---------------- dynamic props ---------------- */
+
+const fire = { x: KEY.x, y: KEY.y + 40 };
+const orbs = [];
+for (let i = 0; i < 10; i++) {
+  orbs.push({
+    a: rng.angle(), r: rng.range(260, 900), sp: rng.range(0.25, 0.75) * rng.sign(),
+    cy: rng.range(-560, -220), cx: rng.range(-1000, 1000), rise: rng.range(40, 110),
+    col: [rng.range(0.45, 1), rng.range(0.55, 1), rng.range(0.65, 1)],
+  });
+}
+for (const o of orbs) {
+  const m = Math.max(o.col[0], o.col[1], o.col[2]);
+  o.col[0] /= m; o.col[1] /= m; o.col[2] /= m;
+}
+
+// swirling leaves used for the sprite stress test
+const LEAF_N = 6000;
+const leaf = {
+  x: new Float32Array(LEAF_N), y: new Float32Array(LEAF_N), ph: new Float32Array(LEAF_N),
+  s: new Float32Array(LEAF_N), sp: new Float32Array(LEAF_N), lay: new Uint8Array(LEAF_N),
+  par: new Float32Array(LEAF_N), tint: new Float32Array(LEAF_N * 3),
+};
+const LEAF_LAYERS = [LAYER.BG_MID, LAYER.BG_NEAR, LAYER.ACTORS_BACK, LAYER.FX, LAYER.TERRAIN_FRONT];
+for (let i = 0; i < LEAF_N; i++) {
+  leaf.x[i] = rng.range(-2600, 2600);
+  leaf.y[i] = rng.range(-900, 240);
+  leaf.ph[i] = rng.angle();
+  leaf.s[i] = rng.range(6, 20);
+  leaf.sp[i] = rng.range(0.4, 1.6);
+  const li = rng.int(0, LEAF_LAYERS.length - 1);
+  leaf.lay[i] = LEAF_LAYERS[li];
+  leaf.par[i] = [0.42, 0.72, 0.95, 1, 1.12][li];
+  leaf.tint[i * 3] = rng.range(0.28, 0.52);
+  leaf.tint[i * 3 + 1] = rng.range(0.20, 0.36);
+  leaf.tint[i * 3 + 2] = rng.range(0.11, 0.22);
+}
+
+/* ---------------- state ---------------- */
+
+const cam = { x: 0, y: -230, zoom: 1 };
+view.setCamera(cam);
+let camTargetX = 0;
+let t = 0;
+const opt = { stress: false, lights: true, bloom: true, fill: false, scenery: true };
+const q = new URLSearchParams(location.search);
+if (q.has('stress')) opt.stress = true;
+if (q.has('fill')) opt.fill = true;
+if (q.has('nolights')) opt.lights = false;
+if (q.has('bare')) opt.scenery = false;   // hide procedural scenery to inspect real art
+
+function boom(wx, wy) {
+  wx = wx === undefined ? cam.x + rng.range(-300, 300) : wx;
+  wy = wy === undefined ? -160 : wy;
+  R.fx.shockwave(wx, wy, 1.0);
+  R.fx.shake(0.62, 0.55);
+  R.fx.chroma(0.9, 0.35);
+  R.fx.flash(1.0, 0.62, 0.28, 0.20, 0.11);
+  R.fx.timeScale(0.05, 0.06);
+  P.emit({
+    x: wx, y: wy, count: 320, speed: 900, speedVar: 620, life: 0.8, lifeVar: 0.45,
+    size: 26, sizeEnd: 2, color: [1, 0.92, 0.62, 1], color2: [1, 0.18, 0.04, 0],
+    gravity: 1100, drag: 2.4, add: true, glow: 0.55, stretch: 1.5, collide: true, bounce: 0.4,
+  });
+  P.emit({
+    x: wx, y: wy, count: 90, speed: 260, speedVar: 200, life: 1.9, lifeVar: 0.9,
+    size: 60, sizeEnd: 260, color: [0.55, 0.45, 0.42, 0.4], color2: [0.16, 0.18, 0.24, 0],
+    gravity: -80, drag: 1.5, fadeIn: 0.12,
+  });
+  P.emit({
+    x: wx, y: wy, count: 40, speed: 1500, speedVar: 500, life: 0.28, lifeVar: 0.12,
+    size: 14, sizeEnd: 1, color: [1, 1, 0.9, 1], color2: [1, 0.5, 0.2, 0],
+    add: true, stretch: 3.0, drag: 3.5,
+  });
+}
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { boom(); e.preventDefault(); }
+  if (e.code === 'KeyR') location.reload();
+});
+input.onTap((e) => boom(e.worldX, e.worldY));
+P.setTerrainQuery((x, y) => y > 118);
+
+/* ---------------- buttons ---------------- */
+
+const btn = (id, key, label) => {
+  const el = document.getElementById(id);
+  const sync = () => el.classList.toggle('on', !!opt[key]);
+  el.addEventListener('click', () => {
+    opt[key] = !opt[key];
+    if (key === 'lights') R.lights.enabled = opt.lights;
+    if (key === 'bloom') R.fx.bloom = opt.bloom ? 0.95 : 0;
+    sync();
+  });
+  sync();
+  return el;
+};
+document.getElementById('b-boom').addEventListener('click', () => boom());
+btn('b-stress', 'stress');
+btn('b-light', 'lights');
+btn('b-bloom', 'bloom');
+btn('b-fill', 'fill');
+
+/* ---------------- loop ---------------- */
+
+const hud = document.getElementById('hud');
+let hudTimer = 0;
+let extraDraw = null;   // test hook: fn(R, t) called inside the render pass
+
+function update(dt) {
+  input.update();
+  t += dt;
+
+  camTargetX += (input.held('right') ? 520 : 0) * dt - (input.held('left') ? 520 : 0) * dt;
+  if (input.pointerDown) camTargetX += (input.pointerScreen.x - view.w * 0.5) * dt * 0.9;
+  camTargetX = clamp(camTargetX, -1800, 1800);
+  cam.x = damp(cam.x, camTargetX + Math.sin(t * 0.11) * 90, 0.002, dt);
+  cam.y = damp(cam.y, -230 + Math.sin(t * 0.17) * 30, 0.004, dt);
+
+  // fire embers
+  P.emit({
+    x: fire.x + rng.spread(24), y: fire.y - 10, count: 3, vx: 0, vy: -1, vSpread: 0.55,
+    speed: 130, speedVar: 90, life: 1.7, lifeVar: 0.9, size: 9, sizeEnd: 1,
+    color: [1, 0.78, 0.36, 1], color2: [1, 0.22, 0.05, 0],
+    gravity: -110, drag: 0.9, add: true, glow: 0.4,
+  });
+  // fireflies
+  if (rng.next() < 0.35) {
+    P.emit({
+      x: cam.x + rng.spread(1200), y: rng.range(-360, 60), count: 1,
+      speed: 26, speedVar: 20, life: 5.5, lifeVar: 2.5, size: 7, sizeEnd: 5,
+      color: [0.85, 1, 0.5, 0], color2: [0.7, 1, 0.35, 0], add: true, glow: 0.5, fadeIn: 0.2,
+    });
+  }
+  // dust motes in the shafts
+  P.emit({
+    x: MOON.x - 600 + rng.range(-500, 900), y: rng.range(-900, 100), count: 2,
+    speed: 12, speedVar: 10, life: 6, lifeVar: 3, size: 4, sizeEnd: 2,
+    color: [0.7, 0.85, 1, 0.55], color2: [0.6, 0.8, 1, 0], add: true, fadeIn: 0.2,
+  });
+
+  if (opt.fill) {
+    const want = 10000 - P.count;
+    if (want > 0) {
+      P.emit({
+        x: cam.x + rng.spread(1400), y: rng.range(-700, 100), count: Math.min(400, want),
+        speed: 70, speedVar: 60, life: 5, lifeVar: 2.5, size: 6, sizeEnd: 3,
+        color: [1, 0.65, 0.3, 0.8], color2: [0.8, 0.25, 0.6, 0], add: true, drag: 0.4, fadeIn: 0.1,
+      });
+    }
+  }
+  P.update(dt);
+}
+
+function render(alpha) {
+  R.begin(cam);
+
+  // sky gradient — normal tris draw before additive quads in the same layer,
+  // so the stars and the moon still sit on top of this
+  // A bright band sits low, right behind the trunks — that is what the near
+  // silhouettes read against. The lowest band runs well past the ground so its
+  // bottom edge can never show as a ruled line.
+  const skyTop = [0.042, 0.058, 0.145, 1];
+  const skyMid = [0.105, 0.145, 0.275, 1];
+  const skyLow = [0.205, 0.25, 0.345, 1];
+  const skyFloor = [0.14, 0.155, 0.205, 1];
+  const L = -4200, Rr = 4200;
+  const band = (y0, c0, y1, c1) => {
+    R.tri(L, y0, c0, Rr, y0, c0, Rr, y1, c1, LAYER.SKY, { parallax: 0.05 });
+    R.tri(L, y0, c0, Rr, y1, c1, L, y1, c1, LAYER.SKY, { parallax: 0.05 });
+  };
+  band(-2400, skyTop, -840, skyMid);
+  band(-840, skyMid, -140, skyLow);
+  band(-140, skyLow, 1400, skyFloor);
+
+  if (opt.scenery) {
+    drawGround();
+    const n = bank.n;
+    for (let i = 0; i < n; i++) {
+      R.spriteRaw(bank.tex[i], 0, 0, 1, 1, bank.x[i], bank.y[i], bank.w[i], bank.h[i], bank.rot[i],
+        bank.r[i], bank.g[i], bank.b[i], bank.a[i], bank.layer[i], bank.add[i] === 1, bank.par[i]);
+    }
+  }
+
+
+
+  // bonfire
+  const fl = 0.86 + Math.sin(t * 13.3) * 0.08 + Math.sin(t * 27.1) * 0.05;
+  for (let i = 0; i < 5; i++) {
+    const k = i / 5;
+    const wob = Math.sin(t * (7 + i * 2.3) + i) * 14 * (1 - k);
+    R.sprite({
+      tex: R.blob, x: fire.x + wob, y: fire.y - 40 - k * 130 * fl,
+      w: (150 - k * 90) * fl, h: (210 - k * 110) * fl, rot: wob * 0.006,
+      r: 1, g: lerp(0.72, 0.35, k), b: lerp(0.32, 0.08, k), a: lerp(0.95, 0.35, k),
+      layer: LAYER.FX, add: true,
+    });
+  }
+  R.sprite({ tex: R.blob, x: fire.x, y: fire.y - 30, w: 700 * fl, h: 620 * fl, r: 1, g: 0.5, b: 0.18, a: 0.30, layer: LAYER.FX, add: true });
+  // fire pit: a ring of stones reads better than crossed logs at this size
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2;
+    const sx = fire.x + Math.cos(a) * 110;
+    const sy = fire.y + 46 + Math.sin(a) * 26;
+    const sz = 34 + (i % 3) * 9;
+    R.sprite({ tex: R.blob, x: sx, y: sy, w: sz * 1.7, h: sz, rot: a * 0.3,
+      r: 0.30, g: 0.27, b: 0.26, a: 1, layer: LAYER.ACTORS });
+  }
+  R.sprite({ tex: R.blob, x: fire.x, y: fire.y + 44, w: 320, h: 90, r: 0.09, g: 0.06, b: 0.05, a: 0.9, layer: LAYER.ACTORS });
+
+  // leaves
+  const leafN = opt.stress ? LEAF_N : 500;
+  for (let i = 0; i < leafN; i++) {
+    const ph = leaf.ph[i] + t * leaf.sp[i];
+    const x = leaf.x[i] + Math.sin(ph) * 190;
+    const y = leaf.y[i] + Math.cos(ph * 0.73) * 120 + Math.sin(t * 0.4 + i) * 20;
+    const s = leaf.s[i];
+    R.spriteRaw(R.streak, 0, 0, 1, 1, x, y, s * 0.55, s, ph * 1.7,
+      leaf.tint[i * 3], leaf.tint[i * 3 + 1], leaf.tint[i * 3 + 2], 0.8,
+      leaf.lay[i], false, leaf.par[i]);
+  }
+
+  P.render();
+  if (extraDraw) extraDraw(R, t);
+
+  // lights
+  if (opt.lights) {
+    R.light({ x: MOON.x, y: MOON.y, radius: 2100, r: 0.48, g: 0.62, b: 1.0, intensity: 0.30, soft: 1, parallax: 0.05 });
+    R.light({ x: fire.x, y: fire.y - 40, radius: 1250, r: 1.0, g: 0.68, b: 0.38, intensity: 2.3, flicker: 0.30 });
+    R.light({ x: fire.x, y: fire.y - 10, radius: 420, r: 1.0, g: 0.88, b: 0.62, intensity: 2.2, flicker: 0.20 });
+    for (let i = 0; i < orbs.length; i++) {
+      const o = orbs[i];
+      const a = o.a + t * o.sp;
+      const ox = o.cx + Math.cos(a) * o.r;
+      const oy = o.cy + Math.sin(a * 1.3) * o.rise;
+      R.light({ x: ox, y: oy, radius: 300, r: o.col[0], g: o.col[1], b: o.col[2], intensity: 0.55, flicker: 0.12 });
+      R.sprite({ tex: R.blob, x: ox, y: oy, w: 78, h: 78, r: o.col[0], g: o.col[1], b: o.col[2], a: 0.70, layer: LAYER.FX, add: true });
+      R.sprite({ tex: R.disc, x: ox, y: oy, w: 12, h: 12, r: 1, g: 1, b: 1, a: 1, layer: LAYER.FX, add: true });
+    }
+  }
+
+  R.end();
+}
+
+const loop = createLoop({
+  getTimeScale: () => R.fx.getTimeScale(),
+  update,
+  render(alpha, real) {
+    R.tick(real);
+    render(alpha);
+    hudTimer += real;
+    if (hudTimer > 0.2) {
+      hudTimer = 0;
+      const s = R.stats;
+      const fps = loop.fps;
+      const cls = fps > 55 ? 'ok' : fps > 30 ? '' : 'bad';
+      const dcls = s.drawCalls <= 120 ? 'ok' : 'bad';
+      hud.innerHTML =
+        `<b>SUNDERFALL engine test</b><br>` +
+        `fps <span class="${cls}">${fps.toFixed(1)}</span> · ${loop.ms.toFixed(1)} ms<br>` +
+        `draw calls <span class="${dcls}">${s.drawCalls}</span> / 120<br>` +
+        `sprites ${s.sprites} · tris ${s.tris}<br>` +
+        `particles ${P.count} / ${P.capacity}<br>` +
+        `lights ${s.lights}<br>` +
+        `${view.mode} ${view.w}×${view.h} @${view.dpr} · fb ${R.pixelW}×${R.pixelH}<br>` +
+        `worldW ${view.worldW} · ${R.hasFloat ? 'HDR' : 'LDR'}` +
+        (opt.stress ? ' · <b>STRESS</b>' : '');
+    }
+  },
+});
+loop.start();
+
+window.__t = {
+  R, P, view, input, loop, opt, boom, cam,
+  set(k, v) { opt[k] = v; if (k === 'lights') R.lights.enabled = v; if (k === 'bloom') R.fx.bloom = v ? 0.62 : 0; },
+  setExtraDraw(fn) { extraDraw = fn; },
+  stats: () => ({ fps: loop.fps, ...R.stats, particles: P.count }),
+};
+</script>
+</body>
+</html>

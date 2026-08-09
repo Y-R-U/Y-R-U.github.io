@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SUNDERFALL — Art Reference Lab</title>
+<link rel="stylesheet" href="lab.css">
+</head>
+<body>
+
+<header class="bar">
+  <a class="brand" href="./">
+    <span class="mark"></span>
+    <span class="wordmark">SUNDER<em>FALL</em></span>
+    <span class="tag">art reference lab</span>
+  </a>
+
+  <nav class="nav">
+    <a href="#levels">Levels</a>
+    <a href="#sheets">Spritesheets</a>
+    <a href="#destruct">Destructibles</a>
+  </nav>
+
+  <div class="bar-tools">
+    <button id="blind" class="tool" title="Hide every label and shuffle each pair — for unbiased A/B judging">Blind test</button>
+    <button id="pixel" class="tool" title="Toggle nearest-neighbour scaling">Pixel view</button>
+    <a class="play" href="game/">▶ Play</a>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Building a 2D roguelite that has to hold its own <em>next to these.</em></h1>
+  <p>
+    Every reference below is paired with an empty slot. As Sunderfall's art comes online, our version
+    drops into the slot on the right and the two sit side by side at the same size — no cherry-picking,
+    no flattering crops. Hit <strong>Blind test</strong> to strip the labels and randomise which side is
+    which when you want an honest verdict.
+  </p>
+  <div class="stats">
+    <div><b id="n-levels">0</b><span>scene references</span></div>
+    <div><b id="n-sheets">0</b><span>sheets &amp; animation</span></div>
+    <div><b id="n-ours">0</b><span>ours, so far</span></div>
+  </div>
+</section>
+
+<main>
+  <section id="levels" class="block">
+    <div class="block-head">
+      <h2>Scene &amp; level reference</h2>
+      <p>
+        Shipped games, official press shots. These set the bar for composition, parallax depth, palette
+        discipline and — most importantly — how a busy screen stays readable while you're fighting on it.
+      </p>
+    </div>
+    <div class="grid" id="grid-levels"></div>
+  </section>
+
+  <section id="sheets" class="block">
+    <div class="block-head">
+      <h2>Spritesheets &amp; animation</h2>
+      <p>
+        What we actually have to author. Real sheets (CC0/CC-BY, downloaded and unpacked) show frame
+        layout, cell size and how few frames a good action really needs; the animated previews show the
+        timing bar we're aiming at.
+      </p>
+    </div>
+    <div class="grid" id="grid-sheets"></div>
+  </section>
+
+  <section id="destruct" class="block">
+    <div class="block-head">
+      <h2>Destructibles — the thing that has to look expensive</h2>
+      <p>
+        Most of a level is static backdrop, but a deliberate subset of it must come apart. Every
+        destructible needs the full chain authored, not just an intact and a gone state:
+      </p>
+    </div>
+    <div class="chain">
+      <div class="stage"><b>intact</b><span>the normal prop, indistinguishable from set dressing until you hit it</span></div>
+      <div class="stage"><b>cracked</b><span>1–2 damage states, same silhouette, spalled edges and dust</span></div>
+      <div class="stage"><b>shattering</b><span>the break frames — the expensive 6–10 frames everything hinges on</span></div>
+      <div class="stage"><b>debris</b><span>chunks that become physics bodies, sized so they read at gameplay zoom</span></div>
+      <div class="stage"><b>settled</b><span>rubble that persists, occludes, and can be stood on</span></div>
+    </div>
+    <ul class="targets">
+      <li><b>Brick &amp; masonry</b> — walls, arches, buttresses. Breaks along mortar lines into rectangular chunks.</li>
+      <li><b>Rock</b> — conchoidal fracture, no straight edges, heavy dust plume.</li>
+      <li><b>Timber</b> — splinters and planks, burns rather than shatters.</li>
+      <li><b>Trees &amp; bushes</b> — hinge and topple as one piece, then settle; foliage bursts separately from the trunk.</li>
+      <li><b>Glass, crates, barrels, lanterns</b> — cheap breakables that make the world feel reactive everywhere.</li>
+    </ul>
+  </section>
+</main>
+
+<div id="lightbox" class="lightbox" hidden>
+  <button class="lb-close" aria-label="Close">✕</button>
+  <div class="lb-zoom">
+    <button data-z="1">1×</button><button data-z="2">2×</button><button data-z="4">4×</button>
+    <button data-z="fit" class="on">fit</button>
+  </div>
+  <div class="lb-stage"><img id="lb-img" alt=""></div>
+  <div class="lb-cap"><b id="lb-title"></b><span id="lb-src"></span><p id="lb-note"></p></div>
+</div>
+
+<footer>
+  <p>
+    Reference images are the property of their respective studios and artists and are used here, locally,
+    for style study and side-by-side comparison only. CC0 / CC-BY sheets are credited per card.
+    Nothing in <code>refs/</code> ships with the game.
+  </p>
+</footer>
+
+<script src="lab.js"></script>
+</body>
+</html>

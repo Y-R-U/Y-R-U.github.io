@@ -1,0 +1,5 @@
+# Raw Flux renders and intermediate keyed/preview files. Large, and fully
+# reproducible from src/*.json via tools/batch.py + tools/build_all.sh.
+raw/
+work/
+__pycache__/

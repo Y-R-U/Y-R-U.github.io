@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>SUNDERFALL — intro harness</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;
+    font:13px/1.4 'Avenir Next',system-ui,sans-serif;color:#cfcbc4}
+  #mount{position:fixed;inset:0}
+  #hud{position:fixed;left:0;right:0;bottom:0;z-index:9;display:none;gap:10px;align-items:center;
+    padding:10px 14px;background:rgba(8,8,11,.86);backdrop-filter:blur(8px);
+    border-top:1px solid rgba(255,255,255,.08)}
+  #hud.on{display:flex}
+  #hud input[type=range]{flex:1;accent-color:#ff8a3d}
+  #hud button{appearance:none;background:#191922;color:#ddd;border:1px solid #2c2c38;
+    border-radius:6px;padding:6px 11px;font:600 11px/1 inherit;letter-spacing:.08em;cursor:pointer}
+  #t{min-width:76px;font-variant-numeric:tabular-nums;color:#ffb648}
+  #err{position:fixed;left:0;top:0;right:0;z-index:20;padding:12px 16px;background:#3a0d0d;
+    color:#ffd7d7;font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;display:none}
+</style>
+</head>
+<body>
+<div id="mount"></div>
+<div id="hud">
+  <button id="pp">Pause</button>
+  <input id="scrub" type="range" min="0" max="76.2" step="0.05" value="0">
+  <span id="t">0.00 s</span>
+  <button id="re">Restart</button>
+</div>
+<pre id="err"></pre>
+
+<script type="module">
+import { runIntro } from './js/intro/index.js';
+import SCRIPT from './js/story/script.js';
+
+const q = new URLSearchParams(location.search);
+const mount = document.getElementById('mount');
+const errEl = document.getElementById('err');
+const show = (m) => { errEl.style.display = 'block'; errEl.textContent += m + '\n'; };
+window.addEventListener('error', (e) => show('ERROR ' + (e.error?.stack || e.message)));
+window.addEventListener('unhandledrejection', (e) => show('REJECT ' + (e.reason?.stack || e.reason)));
+
+let ready;
+window.__introReady = new Promise((r) => { ready = r; });
+
+// Deterministic scrub for the screenshot tool: `--eval "sfSeek(12.5)"`.
+window.sfSeek = async (t) => { const c = await window.__introReady; c.seek(Number(t)); return true; };
+window.sfPlay = async () => { const c = await window.__introReady; c.resume(); return true; };
+
+const hud = document.getElementById('hud');
+if (q.has('ui')) hud.classList.add('on');
+
+const done = runIntro(mount, {
+  debug: true,
+  skip: () => console.log('[harness] skipped'),
+  dprCap: q.has('dpr') ? Number(q.get('dpr')) : 2,
+  lowSpec: q.has('low') ? q.get('low') !== '0' : null,
+  // `?paused` never starts the clock at all — screenshot runs drive it with sfSeek()
+  autoStart: !q.has('paused'),
+});
+
+// runIntro attaches its controller to the host element once the build finishes.
+(async function poll() {
+  for (let i = 0; i < 900; i++) {
+    const host = mount.querySelector('.sf-intro');
+    if (host && host.__intro) {
+      const c = host.__intro;
+      ready(c);
+      wireHud(c);
+      if (q.has('t')) c.seek(Number(q.get('t')));
+      else if (q.has('paused')) c.seek(0);
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 40));
+  }
+  show('controller never appeared');
+})();
+
+done.then(() => console.log('[harness] intro resolved'));
+
+function wireHud(c) {
+  const scrub = document.getElementById('scrub');
+  const tl = document.getElementById('t');
+  scrub.max = String(SCRIPT.duration);
+  let playing = true;
+  document.getElementById('pp').onclick = (e) => {
+    e.stopPropagation();
+    playing = !playing;
+    playing ? c.resume() : c.pause();
+    e.target.textContent = playing ? 'Pause' : 'Play';
+  };
+  document.getElementById('re').onclick = (e) => { e.stopPropagation(); c.seek(0); c.resume(); playing = true; };
+  scrub.oninput = () => { c.seek(Number(scrub.value)); playing = false; document.getElementById('pp').textContent = 'Play'; };
+  scrub.onpointerdown = (e) => e.stopPropagation();
+  setInterval(() => {
+    tl.textContent = c.time.toFixed(2) + ' s';
+    if (playing) scrub.value = String(c.time);
+  }, 100);
+}
+</script>
+</body>
+</html>

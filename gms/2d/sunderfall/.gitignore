@@ -1,0 +1,16 @@
+# Reference material — third-party screenshots and asset packs, local study only.
+refs/_cand/
+refs/_oga/
+refs/_sheets/
+refs/levels/
+refs/sprites/
+
+# Art generation working set. `art/src` and `art/tools` are the scripts that
+# build the shipping atlases and DO ship; these two are the ~100 MB of Flux
+# output they were built from, and everything that matters is already baked
+# into game/assets. Regenerate with art/tools/flux.py.
+art/raw/
+art/work/
+
+# Session screenshots — evidence for the handoff, not needed to run or build.
+docs/shots/

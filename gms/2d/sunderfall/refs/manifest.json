@@ -1,0 +1,525 @@
+{
+ "levels": [
+  {
+   "file": "refs/levels/deadcells_02.jpg",
+   "title": "Dead Cells \u2014 Ramparts",
+   "source": "Motion Twin",
+   "note": "Rim-lit silhouettes over a bloom sun; the whole scene reads in three depth bands.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/deadcells_03.jpg",
+   "title": "Dead Cells \u2014 Toxic Sewers",
+   "source": "Motion Twin",
+   "note": "Sickly green key light, heavy vignette, tiles never repeat visibly.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/deadcells_04.jpg",
+   "title": "Dead Cells \u2014 Stilt Village",
+   "source": "Motion Twin",
+   "note": "Cool/warm split with vertical light shafts; foreground is nearly black.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/deadcells_05.jpg",
+   "title": "Dead Cells \u2014 Ossuary",
+   "source": "Motion Twin",
+   "note": "One glowing doorway carries the whole composition.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/deadcells_07.jpg",
+   "title": "Dead Cells \u2014 Combat readability",
+   "source": "Motion Twin",
+   "note": "Hit sparks and enemy tells stay legible against a busy background.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/hollowknight_00.jpg",
+   "title": "Hollow Knight \u2014 City of Tears",
+   "source": "Team Cherry",
+   "note": "Rain, parallax windows, muted blues; hand-inked line quality.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/hollowknight_01.jpg",
+   "title": "Hollow Knight \u2014 Greenpath",
+   "source": "Team Cherry",
+   "note": "Saturated teal on near-black; foliage silhouettes frame the play space.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/hollowknight_02.jpg",
+   "title": "Hollow Knight \u2014 Kingdom's Edge",
+   "source": "Team Cherry",
+   "note": "Crimson palette shift; the platform plane stays a clear readable line.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/hollowknight_07.jpg",
+   "title": "Hollow Knight \u2014 Resting Grounds",
+   "source": "Team Cherry",
+   "note": "Sparse props, huge negative space, lantern point-lights.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_wotw_00.jpg",
+   "title": "Ori and the Will of the Wisps \u2014 Wellspring",
+   "source": "Moon Studios",
+   "note": "Painterly multi-layer parallax; god rays and particulate air.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_wotw_03.jpg",
+   "title": "Ori and the Will of the Wisps \u2014 Luma Pools",
+   "source": "Moon Studios",
+   "note": "The bar for depth-of-field and colour separation between layers.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_wotw_05.jpg",
+   "title": "Ori and the Will of the Wisps \u2014 Silent Woods",
+   "source": "Moon Studios",
+   "note": "Moonlit blues, glowing hero as the only warm element.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_wotw_06.jpg",
+   "title": "Ori and the Will of the Wisps \u2014 Baur's Reach",
+   "source": "Moon Studios",
+   "note": "Backlit canopy; note how little detail the far layers carry.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_blindforest_02.jpg",
+   "title": "Ori and the Blind Forest \u2014 Ginso Tree",
+   "source": "Moon Studios",
+   "note": "Interior organic architecture, emissive veins as level signposting.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ori_blindforest_05.jpg",
+   "title": "Ori and the Blind Forest \u2014 Forest",
+   "source": "Moon Studios",
+   "note": "Dense foreground occluders that never hide the player.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/blasphemous2_00.jpg",
+   "title": "Blasphemous II \u2014 Moonlit ramparts",
+   "source": "The Game Kitchen",
+   "note": "Pixel art with painterly lighting; strong architectural verticals.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/blasphemous2_02.jpg",
+   "title": "Blasphemous II \u2014 Cathedral",
+   "source": "The Game Kitchen",
+   "note": "Ornate tiles read cleanly because value range is kept narrow.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/blasphemous2_04.jpg",
+   "title": "Blasphemous II \u2014 Interior hall",
+   "source": "The Game Kitchen",
+   "note": "Warm interior pocket inside a cold scene.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ninesols_00.jpg",
+   "title": "Nine Sols \u2014 Blossom",
+   "source": "Red Candle Games",
+   "note": "Hand-drawn 'taopunk'; flat colour blocks, confident line, pink/teal.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ninesols_05.jpg",
+   "title": "Nine Sols \u2014 Neon corridor",
+   "source": "Red Candle Games",
+   "note": "Emissive UI-like level geometry, high-contrast danger colours.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/ninesols_06.jpg",
+   "title": "Nine Sols \u2014 Boss arena",
+   "source": "Red Candle Games",
+   "note": "Arena framing: symmetrical set dressing, empty floor for the fight.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/skul_02.jpg",
+   "title": "Skul: The Hero Slayer \u2014 Castle",
+   "source": "SouthPAW Games",
+   "note": "Chunky readable pixel props, pink/gold accents, roguelite HUD.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/skul_05.jpg",
+   "title": "Skul: The Hero Slayer \u2014 Garden",
+   "source": "SouthPAW Games",
+   "note": "Effects-heavy combat that still reads; note the FX colour discipline.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/roguelegacy2_00.jpg",
+   "title": "Rogue Legacy 2 \u2014 Combat",
+   "source": "Cellar Door Games",
+   "note": "Roguelite HUD layout, projectile readability, room-scale composition.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/enderlilies_05.jpg",
+   "title": "ENDER LILIES \u2014 Ruins",
+   "source": "Live Wire / Binary Haze",
+   "note": "Watercolour backdrops behind crisp sprites; desaturated with one accent.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/enderlilies_06.jpg",
+   "title": "ENDER LILIES \u2014 Boss",
+   "source": "Live Wire / Binary Haze",
+   "note": "Fire lighting cast onto the ground plane and the character.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/grime_02.jpg",
+   "title": "GRIME \u2014 Living architecture",
+   "source": "Clover Bite",
+   "note": "Sculptural, surreal shapes; a masterclass in weird silhouettes.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/grime_05.jpg",
+   "title": "GRIME \u2014 Chalk hills",
+   "source": "Clover Bite",
+   "note": "Near-monochrome palette; depth carried purely by value.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/katanazero_01.jpg",
+   "title": "Katana ZERO \u2014 Club",
+   "source": "Askiisoft",
+   "note": "Neon noir pixel interiors; heavy colour grading and grain.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/katanazero_03.jpg",
+   "title": "Katana ZERO \u2014 Neon",
+   "source": "Askiisoft",
+   "note": "Purple/green complementaries, silhouette-first character reads.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/thelastfaith_00.jpg",
+   "title": "The Last Faith \u2014 Gothic exterior",
+   "source": "Kumi Souls Games",
+   "note": "Painted pixel gothic; oversized architecture dwarfing the player.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/thelastfaith_03.jpg",
+   "title": "The Last Faith \u2014 Cathedral square",
+   "source": "Kumi Souls Games",
+   "note": "Fog layers separating distance; muted stone palette.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/trine4_03.jpg",
+   "title": "Trine 4 \u2014 Autumn village",
+   "source": "Frozenbyte",
+   "note": "2.5D reference: physically-lit props, soft shadows, warm bounce.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/trine4_07.jpg",
+   "title": "Trine 4 \u2014 Golden forest",
+   "source": "Frozenbyte",
+   "note": "How far you can push atmospheric perspective in a side view.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/aeternanoctis_03.jpg",
+   "title": "Aeterna Noctis \u2014 Sky vista",
+   "source": "Aeternum Game Studios",
+   "note": "Big-sky vista; the play platform is a thin band across a huge scene.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/astralascent_03.jpg",
+   "title": "Astral Ascent \u2014 Garden",
+   "source": "Hibernian Workshop",
+   "note": "Clean modern pixel art, generous silhouette spacing for bullet-hell.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/noita_02.jpg",
+   "title": "Noita \u2014 Falling sand caves",
+   "source": "Nolla Games",
+   "note": "EVERY pixel is simulated and destructible \u2014 our destruction north star.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/noita_06.jpg",
+   "title": "Noita \u2014 Lava breach",
+   "source": "Nolla Games",
+   "note": "Material interaction: melted rock, flowing lava, emissive heat.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/noita_07.jpg",
+   "title": "Noita \u2014 Excavated tunnel",
+   "source": "Nolla Games",
+   "note": "What a player-carved cavity looks like after sustained digging.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/broforce_03.jpg",
+   "title": "Broforce \u2014 Collapsed structure",
+   "source": "Free Lives",
+   "note": "Chunky voxel-ish destruction: buildings shed tiles and fall.",
+   "kind": "level"
+  },
+  {
+   "file": "refs/levels/broforce_06.jpg",
+   "title": "Broforce \u2014 Mid-demolition",
+   "source": "Free Lives",
+   "note": "Debris, fire and structural collapse all at once, still readable.",
+   "kind": "level"
+  }
+ ],
+ "sprites": [
+  {
+   "file": "refs/sprites/sheet_explosion_a.png",
+   "title": "2D Explosion Animations #1",
+   "source": "Sinestesia (OpenGameArt)",
+   "license": "CC0",
+   "note": "8\u00d78 frame grid, 256px cells. Frame-by-frame smoke and fire \u2014 the format our destruction FX should ship in.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_explosion_b.png",
+   "title": "2D Explosion Animations #3",
+   "source": "Sinestesia (OpenGameArt)",
+   "license": "CC0",
+   "note": "Same grid, different dissipation curve. Note how the last two rows are almost pure smoke.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_explosion_c.png",
+   "title": "2D Explosion Animations #2 (set 2)",
+   "source": "Sinestesia (OpenGameArt)",
+   "license": "CC0",
+   "note": "Directional blast. Useful for wall-breach and barrel spells.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_pixelfx_a.png",
+   "title": "Pixel FX Pack \u2014 impact",
+   "source": "CodeManu (OpenGameArt)",
+   "license": "CC-BY",
+   "note": "Pixel-art FX at a sane cell size; the resolution band we should actually work at.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_pixelfx_b.png",
+   "title": "Pixel FX Pack \u2014 burst",
+   "source": "CodeManu (OpenGameArt)",
+   "license": "CC-BY",
+   "note": "Radial burst timing: 3 fast frames in, 6 slow frames out.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_pixelfx_c.png",
+   "title": "Pixel FX Pack \u2014 smoke",
+   "source": "CodeManu (OpenGameArt)",
+   "license": "CC-BY",
+   "note": "Smoke puffs for rubble and footfalls.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_magic_lightning.png",
+   "title": "Gothicvania Magic Pack \u2014 Lightning",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Single-row strip sheet. Spell FX at true pixel resolution.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_magic_firebomb.png",
+   "title": "Gothicvania Magic Pack \u2014 Fire bomb",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Projectile + detonation in one strip \u2014 the shape a 'break the wall' spell needs.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_magic_darkbolt.png",
+   "title": "Gothicvania Magic Pack \u2014 Dark bolt",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Travel loop then impact; note the tiny frame count that still reads.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_gothic_atlas.png",
+   "title": "Gothicvania Town \u2014 character atlas",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "A whole cast packed into one atlas \u2014 hero, enemies, props, all on one palette.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_gothic_tileset.png",
+   "title": "Gothicvania Town \u2014 tileset",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "The tile vocabulary a whole level is built from. Ours needs a damaged variant per tile.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_gothic_houses.png",
+   "title": "Gothicvania Town \u2014 buildings",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Destructible candidates: these read as brick/timber assemblies that could shed pieces.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/sheet_gothic_props.png",
+   "title": "Gothicvania Town \u2014 props",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Barrels, lamps, fences \u2014 the small breakables that sell a destructible world.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/scene_gothic_preview.png",
+   "title": "Gothicvania Town \u2014 assembled scene",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "The same tiles composed into a level, so we can judge tile \u2192 scene.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/layer_grotto_far.png",
+   "title": "Super Grotto \u2014 far parallax layer",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Parallax layer 1 of 4. Low contrast, low detail, cool shift.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/layer_grotto_mid.png",
+   "title": "Super Grotto \u2014 mid parallax layer",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Parallax layer 3 of 4 \u2014 where silhouette shapes start to bite.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/scene_grotto_demo.png",
+   "title": "Super Grotto \u2014 layers composited",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "All four layers stacked. This is the parallax depth budget we should copy.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/scene_fort_illusion.png",
+   "title": "Fort of Illusion \u2014 assembled scene",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Stone fort kit at 3\u00d7 \u2014 brick shapes we can plausibly shatter into chunks.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/scene_forest_illusion.png",
+   "title": "Forest of Illusion \u2014 assembled scene",
+   "source": "ansimuz (OpenGameArt)",
+   "license": "CC0",
+   "note": "Trees and bushes as discrete props \u2014 exactly the things a fire spell should fell.",
+   "kind": "sheet"
+  },
+  {
+   "file": "refs/sprites/z_chierit_demonslime_05.gif",
+   "title": "Boss: Demon Slime \u2014 idle/attack",
+   "source": "chierit (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Large boss frames, ~120px tall, heavy squash and anticipation. Animation quality bar for our bosses.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_chierit_demonslime_09.gif",
+   "title": "Boss: Demon Slime \u2014 ground slam",
+   "source": "chierit (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Impact frame holds for 2\u20133 ticks, then dust. Copy this timing.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_chierit_demonslime_11.gif",
+   "title": "Boss: Demon Slime \u2014 cast",
+   "source": "chierit (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Telegraph \u2192 release \u2192 recovery, all clearly separated in silhouette.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_chierit_fireknight_02.gif",
+   "title": "Elementals: Fire Knight \u2014 run",
+   "source": "chierit (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "8-frame run cycle with cape follow-through.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_chierit_fireknight_05.gif",
+   "title": "Elementals: Fire Knight \u2014 attack",
+   "source": "chierit (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Sword arc drawn as a smear frame \u2014 cheap, and it sells the speed.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_luizmelo_heroknight_00.gif",
+   "title": "Hero Knight \u2014 full animation set",
+   "source": "LuizMelo (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "The complete move list a platformer hero needs: idle, run, jump, 3-hit combo, block, roll, hurt, death.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_luizmelo_heroknight_01.gif",
+   "title": "Hero Knight \u2014 combat",
+   "source": "LuizMelo (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Note the low frame count per action; readability beats smoothness.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_luizmelo_huntress_00.gif",
+   "title": "Huntress \u2014 animation set",
+   "source": "LuizMelo (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Ranged-hero reference; bow draw and release poses.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_luizmelo_evilwizard_02.gif",
+   "title": "Evil Wizard \u2014 cast",
+   "source": "LuizMelo (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Caster silhouette: robe motion carries the whole animation.",
+   "kind": "anim"
+  },
+  {
+   "file": "refs/sprites/z_ansimuz_gothicvania_cemetery_03.gif",
+   "title": "Gothicvania Cemetery \u2014 in motion",
+   "source": "ansimuz (itch.io)",
+   "license": "preview \u2014 reference only",
+   "note": "Pixel scene running with parallax and animated props.",
+   "kind": "anim"
+  }
+ ]
+}

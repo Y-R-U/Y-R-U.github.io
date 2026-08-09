@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — enemy test</title>
+<style>
+  html,body{margin:0;height:100%;background:#06060a;overflow:hidden;touch-action:none;
+    font:500 11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6f2;
+    -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  body{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #hud{position:absolute;top:0;left:0;padding:calc(6px + env(safe-area-inset-top)) 10px 6px calc(10px + env(safe-area-inset-left));
+    pointer-events:none;text-shadow:0 1px 3px #000;line-height:1.5}
+  #hud b{color:#ffc24d;font-weight:600}
+  #hud .ok{color:#7ee0a8} #hud .bad{color:#ff7b6b} #hud .dim{color:#7b7a90}
+  #panel{position:absolute;right:calc(6px + env(safe-area-inset-right));top:calc(6px + env(safe-area-inset-top));
+    display:flex;flex-direction:column;gap:4px;align-items:stretch;max-height:94vh;overflow:auto;width:150px}
+  .row{display:flex;gap:4px;flex-wrap:wrap}
+  button,select{font:600 10px/1 ui-monospace,monospace;letter-spacing:.05em;color:#dfe6f2;background:#161622dd;
+    border:1px solid #2c2c3f;border-radius:5px;padding:6px 7px;cursor:pointer;flex:1 1 auto}
+  button.on{background:#3a2a12dd;border-color:#7a5a20;color:#ffc24d}
+  button.wide{flex:1 1 100%}
+  .lbl{color:#6e6a80;font-size:9px;letter-spacing:.1em;margin-top:4px}
+  #tip{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    color:#6e6a80;pointer-events:none;white-space:nowrap;text-shadow:0 1px 3px #000}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud"></div>
+<div id="panel">
+  <select id="pick"></select>
+  <div class="row">
+    <button id="b-spawn">SPAWN</button>
+    <button id="b-spawn5">×5</button>
+  </div>
+  <div class="row">
+    <button id="b-attack">ATTACK</button>
+    <button id="b-kill">KILL</button>
+  </div>
+  <div class="lbl">DAMAGE</div>
+  <div class="row" id="dmg"></div>
+  <div class="lbl">VIEW</div>
+  <div class="row">
+    <button id="b-sil" class="wide">SILHOUETTE</button>
+    <button id="b-aabb">AABB</button>
+    <button id="b-sup">SUPPORT</button>
+  </div>
+  <div class="lbl">BOSS</div>
+  <div class="row">
+    <button id="b-boss">SUMMON</button>
+    <button id="b-phase">PHASE+</button>
+  </div>
+  <div class="lbl">WORLD</div>
+  <div class="row">
+    <button id="b-dir">DIRECTOR</button>
+    <button id="b-clear">CLEAR</button>
+    <button id="b-rebuild" class="wide">REBUILD ARENA</button>
+  </div>
+</div>
+<div id="tip">A/D move · W jump · Shift dash · click = emberbolt stand-in · 1–9 spawn</div>
+
+<script type="module">
+import { createRenderer, LAYER } from './js/gfx/renderer.js';
+import { createParticles } from './js/gfx/particles.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createBus } from './js/core/events.js';
+import { createRNG } from './js/core/rng.js';
+import { createLoop } from './js/core/loop.js';
+import { createAssets } from './js/gfx/texture.js';
+import { clamp, damp } from './js/core/math.js';
+import { MATERIAL, DAMAGE_NAMES } from './js/sim/materials.js';
+
+import {
+  ENEMIES, ENEMY_IDS, spawnEnemy, createDirector, setSilhouette, initEnemies,
+  raiseCorpse, findCorpses, countEnemies,
+} from './js/enemies/index.js';
+import { startAction } from './js/enemies/base.js';
+
+const q = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const R = await createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve') });
+const P = createParticles(R);
+const input = createInput(canvas, view, bus);
+const rng = createRNG(q.get('seed') || 'enemy-test');
+const assets = createAssets(R.gl, '');
+await assets.loadManifest('assets/atlas.json').catch(() => {});
+
+R.resize(view.w, view.h, view.dpr, view.worldW);
+view.onResize(() => R.resize(view.w, view.h, view.dpr, view.worldW));
+
+/* ---------------------------------------------------------------- scene look */
+
+function applyLook() {
+  if (sil) {
+    R.setAmbient(1, 1, 1);
+    R.setHaze(1, 1, 1);
+    R.setClearColor(0.86, 0.87, 0.90);
+    R.fx.bloom = 0; R.fx.vignette(0); R.fx.grain = 0; R.fx.saturation = 0; R.fx.contrast = 1;
+    R.fx.exposure = 1;
+  } else {
+    R.setAmbient(0.105, 0.135, 0.225);
+    R.setHaze(0.24, 0.34, 0.54);
+    R.setClearColor(0.030, 0.038, 0.070);
+    R.fx.bloom = 0.62; R.fx.threshold = 0.85; R.fx.knee = 0.30;
+    R.fx.exposure = 1.0; R.fx.grain = 0.022; R.fx.saturation = 1.06; R.fx.contrast = 1.14;
+    R.fx.vignette(0.66);
+  }
+}
+
+/* -------------------------------------------------------------------- world */
+
+const audio = { stub: true, sfx() {}, music() {}, stop() {} };
+const ctx = { R, P, input, view, bus, rng, assets, audio, LAYER, DT: 1 / 60 };
+
+// The test-bed shim is the default because this harness has to stay deterministic
+// while B1-sim is still landing. `?sim=1` runs against the real world instead.
+let createWorld = null;
+if (q.has('sim')) {
+  try {
+    const sim = await import('./js/sim/index.js');
+    if (sim.createWorld) createWorld = (c) => sim.createWorld(c);
+  } catch (err) { console.warn('sim not available:', err.message); }
+}
+if (!createWorld) {
+  const tb = await import('./js/enemies/testbed/world.js');
+  createWorld = (c) => tb.createTestWorld(c);
+}
+
+const world = createWorld(ctx);
+initEnemies(world);
+window.__world = world;
+const KEY = { x: 260, y: -320 };
+const cam = { x: 0, y: -120, zoom: Number(q.get('zoom') || 1.6) };
+let focus = null;   // camera lock target for headless captures
+let camLock = false;
+
+/* ------------------------------------------------------------------- arena */
+
+const STAGE = q.has('stage') || q.has('lineup');
+
+/** A clean lit platform with nothing on it — the rig inspection rig. */
+function buildStage() {
+  const T = world.terrain;
+  T.box(-3000, 120, 9000, 900, MATERIAL.EARTH);
+  T.box(-3000, 400, 9000, 2200, MATERIAL.ROCK);
+}
+
+function buildArena() {
+  const T = world.terrain;
+  // main ground with a dip, a raised shelf and a real gap to jump
+  T.hill(-1400, 700, (x) => 120 + Math.sin(x * 0.0016) * 26, MATERIAL.EARTH);
+  T.hill(900, 2100, (x) => 120 + Math.sin(x * 0.0016) * 26, MATERIAL.EARTH);
+  T.hill(2100, 3200, () => 8, MATERIAL.ROCK);
+  T.box(-1400, 300, 4700, 2200, MATERIAL.ROCK);
+  T.box(-260, -40, 420, 40, MATERIAL.MASONRY);          // a shelf to perch on
+  T.box(1200, -160, 300, 34, MATERIAL.MASONRY);         // a high ledge
+  T.box(2100, 8, 40, 200, MATERIAL.ROCK);
+
+  // an arch on two buttresses: take out a pillar and the span comes down
+  const pl = world.addProp('pillar_stone', 480, 120);
+  const pr = world.addProp('pillar_stone', 800, 120);
+  world.addProp('arch_stone', 640, -212, { supportedBy: [pl, pr] });
+
+  world.addProp('wall_brick', -520, 120);
+  world.addProp('wall_brick', -520, -72, { supportedBy: [] });
+  world.addProp('crate', -140, 120);
+  world.addProp('crate', -190, 42);
+  world.addProp('barrel', 60, 120);
+  world.addProp('fence', 240, 120);
+  world.addProp('boulder_big', 1600, 120);
+  world.addProp('brazier', 1000, 120);
+  world.addProp('skull_pile', -700, 120);
+  world.addTree('tree_oak', -960, 122);
+  world.addTree('tree_young', 1380, 122);
+  world.addProp('bush', -300, 120);
+  world.addProp('ferns', 340, 120);
+  world.solveSupport();
+}
+
+function rebuild() {
+  location.reload();
+}
+
+(STAGE ? buildStage() : buildArena());
+const player = world.makePlayer ? world.makePlayer(0, 40) : world.player;
+world.setPlayerSpawn(0, 40);
+
+/* ---------------------------------------------------------------- test rig */
+
+let sil = q.has('sil') || q.has('silhouette');
+setSilhouette(sil);
+applyLook();
+
+let dirOn = !q.has('nodir') && q.has('director');
+const director = createDirector(world, {
+  movement: q.get('movement') || 'sunderwood',
+  pressure: true,
+  intensity: Number(q.get('intensity') || 1),
+  encounters: [
+    {
+      id: 'ruin-ambush', x: 900, w: 300,
+      waves: [
+        { delay: 0, spawn: [{ id: 'husk', n: 3, at: 'ahead', spread: 90 }] },
+        { delay: 2.2, spawn: [{ id: 'thornhound', n: 1, at: 'behind' }, { id: 'wispmaw', n: 1, at: 'above' }] },
+      ],
+    },
+  ],
+});
+
+const spawnList = ENEMY_IDS;
+const pick = document.getElementById('pick');
+for (const id of spawnList) {
+  const o = document.createElement('option');
+  o.value = id; o.textContent = `${id}  (${ENEMIES[id].hp}hp)`;
+  pick.appendChild(o);
+}
+pick.value = q.get('enemy') && ENEMIES[q.get('enemy')] ? q.get('enemy') : 'husk';
+
+function spawnAt(id, n, aroundX) {
+  const out = [];
+  const base = aroundX === undefined ? player.x + 280 : aroundX;
+  for (let i = 0; i < n; i++) {
+    const x = base + (i - (n - 1) / 2) * 110;
+    const def = ENEMIES[id];
+    let y = world.groundY(x, -500, 1600);
+    if (!Number.isFinite(y)) y = 120;
+    if (def.gravity === 0) y -= 190;
+    const e = spawnEnemy(world, id, x, y, { spawnIn: !q.has('nofade'), cd: q.has('idle') ? 9999 : 0.4 + i * 0.15 });
+    if (e) { if (q.has('idle')) e.data.frozen = true; out.push(e); }
+  }
+  return out;
+}
+
+function eachEnemy(fn) {
+  for (const e of world.entities.slice()) if (e.alive && e.kind === 'enemy') fn(e);
+}
+
+function forceAttack() {
+  eachEnemy((e) => {
+    const d = e.data;
+    if (!d.def || d.act) return;
+    const names = Object.keys(d.def.actions);
+    if (!names.length) return;
+    d.cd = 0;
+    d.attackIdx = ((d.attackIdx || 0) + 1) % names.length;
+    if (!d.target) d.target = world.player;
+    startAction(e, d, names[d.attackIdx]);
+  });
+}
+
+function damageAll(type) {
+  eachEnemy((e) => {
+    world.damage(e, 26, type, { src: player, hitX: e.x, hitY: e.y, dirX: Math.sign(e.x - player.x) || 1, dirY: -0.3, force: 160 });
+  });
+}
+
+function killAll() { eachEnemy((e) => world.kill(e, player)); }
+
+let boss = null;
+function summonBoss() {
+  if (boss && boss.alive) world.despawn(boss);
+  boss = spawnEnemy(world, 'theseam', 1600, -140, { arena: { x: 1000, y: 0, w: 2400, h: 1000 } });
+  return boss;
+}
+function bossPhase() {
+  if (!boss || !boss.alive) summonBoss();
+  const want = Math.min(4, (boss.data.bossPhase || 1) + 1);
+  const frac = want === 2 ? 0.70 : want === 3 ? 0.42 : 0.14;
+  boss.hp = boss.maxHp * frac;
+  boss.invuln = 0;
+}
+
+/* the player's stand-in offence, so AI reactions can actually be tested */
+function castBolt(tx, ty) {
+  const ox = player.x, oy = player.y - 8;
+  let dx = tx - ox, dy = ty - oy;
+  const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+  world.spawn({
+    kind: 'projectile', tag: 'emberbolt', team: 0, x: ox, y: oy, w: 10, h: 10,
+    vx: dx * 900, vy: dy * 900, gravity: 0, collides: false, trigger: true, owner: player, life: 1.4,
+    onUpdate(e) {
+      const h = world.sweep(e.px, e.py, e.x, e.y, { exclude: player, radius: 6 });
+      if (h) {
+        if (h.what === 'entity') world.damage(h.entity, 22, 'fire', { src: player, hitX: h.x, hitY: h.y, dirX: dx, dirY: dy, force: 260, status: 'burn', statusTime: 2.5 });
+        else if (h.what === 'prop') world.damageProp(h.prop, 26, 'fire', { src: player, hitX: h.x, hitY: h.y });
+        else world.terrain.damage(h.x, h.y, 22, 22, 'fire', {});
+        world.explode(h.x, h.y, { radius: 60, damage: 8, type: 'fire', force: 200, terrain: false, shake: 0.08, hitstop: 0, flash: 0, igniteChance: 0.5 });
+        world.despawn(e);
+      }
+      P.emit({ x: e.x, y: e.y, count: 1, speed: 20, life: 0.3, size: 10, sizeEnd: 1, color: [1, 0.8, 0.4, 1], color2: [1, 0.2, 0, 0], add: true, glow: 0.2 });
+    },
+    render(e, a, Rr) {
+      const x = e.px + (e.x - e.px) * a, y = e.py + (e.y - e.py) * a;
+      Rr.spriteRaw(Rr.blob, 0, 0, 1, 1, x, y, 26, 26, 0, 1, 0.7, 0.3, 0.9, LAYER.FX, true, 1);
+      Rr.light({ x, y, radius: 200, r: 1, g: 0.68, b: 0.35, intensity: 1.2 });
+    },
+  });
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+const $ = (id) => document.getElementById(id);
+$('b-spawn').onclick = () => spawnAt(pick.value, 1);
+$('b-spawn5').onclick = () => spawnAt(pick.value, 5);
+$('b-attack').onclick = forceAttack;
+$('b-kill').onclick = killAll;
+$('b-boss').onclick = summonBoss;
+$('b-phase').onclick = bossPhase;
+$('b-clear').onclick = () => { eachEnemy((e) => world.despawn(e)); };
+$('b-rebuild').onclick = rebuild;
+
+for (const t of DAMAGE_NAMES) {
+  const b = document.createElement('button');
+  b.textContent = t.slice(0, 4).toUpperCase();
+  b.onclick = () => damageAll(t);
+  $('dmg').appendChild(b);
+}
+
+const toggle = (id, get, set) => {
+  const el = $(id);
+  const sync = () => el.classList.toggle('on', !!get());
+  el.onclick = () => { set(!get()); sync(); };
+  sync();
+};
+toggle('b-sil', () => sil, (v) => { sil = v; setSilhouette(v); applyLook(); });
+toggle('b-aabb', () => world.debug.aabb, (v) => { world.debug.aabb = v; });
+toggle('b-sup', () => world.debug.support, (v) => { world.debug.support = v; });
+toggle('b-dir', () => dirOn, (v) => { dirOn = v; });
+
+window.addEventListener('keydown', (ev) => {
+  const n = Number(ev.key);
+  if (n >= 1 && n <= 9 && spawnList[n - 1]) { pick.value = spawnList[n - 1]; spawnAt(spawnList[n - 1], 1); }
+  if (ev.code === 'KeyG') { const c = findCorpses(world, player.x, player.y, 300); if (c[0]) raiseCorpse(world, c[0]); }
+  if (ev.code === 'KeyK') killAll();
+  if (ev.code === 'KeyT') forceAttack();
+  if (ev.code === 'KeyB') summonBoss();
+});
+input.onTap((e) => castBolt(e.worldX, e.worldY));
+
+/* ---------------------------------------------------------------- URL setup */
+
+if (q.has('lineup')) {
+  const ids = (q.get('lineup') === '' || q.get('lineup') === '1') ? ENEMY_IDS.filter((i) => i !== 'theseam') : q.get('lineup').split(',');
+  const gap = Number(q.get('gap') || 230);
+  ids.forEach((id, i) => {
+    const x = -((ids.length - 1) / 2) * gap + i * gap;
+    const def = ENEMIES[id];
+    spawnEnemy(world, id, x, def && def.gravity === 0 ? -60 : 120, { spawnIn: false, faceX: 1, cd: 999 });
+  });
+  cam.x = 0; cam.y = 42; camLock = true;
+  if (!q.has('zoom')) cam.zoom = Math.min(3.2, view.worldW / (ids.length * gap + 220));
+}
+if (q.has('enemy')) {
+  const made = spawnAt(q.get('enemy'), Number(q.get('n') || 1), Number(q.get('at') || (player.x + 300)));
+  if (q.has('focus') && made[0]) focus = made[0];
+}
+if (q.has('boss')) {
+  summonBoss();
+  const p = Number(q.get('boss')) || 1;
+  for (let i = 1; i < p; i++) bossPhase();
+  if (q.has('focus')) focus = boss;
+}
+if (q.has('attack')) setTimeout(forceAttack, 400);
+if (q.has('corpses')) { const es = spawnAt('husk', 3, player.x + 200); setTimeout(() => es.forEach((e) => world.kill(e)), 200); }
+
+/* -------------------------------------------------------------------- loop */
+
+view.setCamera(cam);
+let acc = 0;
+
+function update(dt) {
+  input.update();
+  if (dirOn) director.update(dt);
+  world.update(dt);
+
+  if (focus && focus.alive) {
+    // inspection framing: dead centre on the subject, no lag
+    cam.x = focus.x; cam.y = focus.y - focus.h * 0.05;
+  } else if (!camLock) {
+    const p = world.player;
+    const tx = p ? p.x + (p.vx * 0.28) : 0;
+    const ty = p ? p.y - 80 : -120;
+    cam.x = damp(cam.x, clamp(tx, -1400, 3000), 0.0015, dt);
+    cam.y = damp(cam.y, clamp(ty, -900, 260), 0.0025, dt);
+  }
+  P.update(dt);
+  acc += dt;
+}
+
+function render(alpha) {
+  R.begin(cam);
+  if (!sil) {
+    const L = -3000, Rr = 4200;
+    const band = (y0, c0, y1, c1) => {
+      R.tri(L, y0, c0, Rr, y0, c0, Rr, y1, c1, LAYER.SKY, { parallax: 0.05 });
+      R.tri(L, y0, c0, Rr, y1, c1, L, y1, c1, LAYER.SKY, { parallax: 0.05 });
+    };
+    band(-2400, [0.040, 0.055, 0.135, 1], -840, [0.10, 0.14, 0.27, 1]);
+    band(-840, [0.10, 0.14, 0.27, 1], -140, [0.20, 0.25, 0.34, 1]);
+    band(-140, [0.20, 0.25, 0.34, 1], 1600, [0.13, 0.15, 0.20, 1]);
+    R.light({ x: 700, y: -700, radius: 2400, r: 0.48, g: 0.62, b: 1.0, intensity: 0.30, soft: 1, parallax: 0.05 });
+    // one warm key per scene, per the art direction — without it nothing reads
+    const fl = 0.86 + Math.sin(acc * 13.3) * 0.07 + Math.sin(acc * 27.1) * 0.04;
+    R.light({ x: 1000, y: 60, radius: 1500, r: 1.0, g: 0.68, b: 0.38, intensity: 2.6 * fl, flicker: 0.28 });
+    R.light({ x: KEY.x, y: KEY.y, radius: 1700, r: 1.0, g: 0.74, b: 0.48, intensity: 1.5, soft: 1 });
+    for (let i = 0; i < 4; i++) {
+      const k = i / 4;
+      R.spriteRaw(R.blob, 0, 0, 1, 1, 1000 + Math.sin(acc * (7 + i * 2)) * 9, 76 - k * 90 * fl,
+        (110 - k * 66) * fl, (150 - k * 80) * fl, 0, 1, 0.72 - k * 0.35, 0.32 - k * 0.24,
+        0.9 - k * 0.55, LAYER.FX, true, 1);
+    }
+  }
+  if (STAGE && !sil) {
+    R.light({ x: cam.x - 340, y: -220, radius: 2400, r: 1.0, g: 0.78, b: 0.55, intensity: 0.52, soft: 1 });
+    R.light({ x: cam.x + 460, y: -160, radius: 2000, r: 0.45, g: 0.62, b: 1.0, intensity: 0.26, soft: 1 });
+    R.light({ x: cam.x, y: 240, radius: 1500, r: 0.5, g: 0.55, b: 0.7, intensity: 0.22, soft: 1 });
+  }
+  world.render(alpha);
+  P.render();
+  R.end();
+}
+
+const hud = document.getElementById('hud');
+let hudT = 0;
+const loop = createLoop({
+  getTimeScale: () => R.fx.getTimeScale(),
+  update,
+  render(alpha, real) {
+    R.tick(real);
+    render(alpha);
+    hudT += real;
+    if (hudT > 0.2) {
+      hudT = 0;
+      const s = R.stats;
+      const cls = loop.fps > 55 ? 'ok' : loop.fps > 30 ? '' : 'bad';
+      const ws = world.stats;
+      const b = boss && boss.alive ? boss.data : null;
+      hud.innerHTML =
+        `<b>SUNDERFALL enemy test</b>${world.isTestbed ? ' <span class="dim">[testbed world]</span>' : ''}<br>` +
+        `fps <span class="${cls}">${loop.fps.toFixed(0)}</span> · ${loop.ms.toFixed(1)}ms · draws ${s.drawCalls}<br>` +
+        `enemies ${countEnemies(world)} · ents ${world.count} · parts ${P.count}<br>` +
+        `props ${ws.props} · debris ${ws.debris} · surf ${ws.surfaceCells}<br>` +
+        `dir: ${dirOn ? 'on' : 'off'} · threat ${director.stats.threat.toFixed(1)} · spawned ${director.stats.spawned}<br>` +
+        (b ? `<b>THE SEAM</b> p${b.bossPhase} ${b.phaseName} · ${(boss.hp / boss.maxHp * 100).toFixed(0)}%<br>` : '') +
+        `<span class="dim">${view.mode} ${view.w}×${view.h}${sil ? ' · SILHOUETTE' : ''}</span>`;
+    }
+  },
+});
+loop.start();
+
+window.__enemy = {
+  world, R, P, view, input, loop, cam, director,
+  spawn: spawnAt, attack: forceAttack, kill: killAll, damage: damageAll,
+  boss: summonBoss, phase: bossPhase,
+  sil(v) { sil = v; setSilhouette(v); applyLook(); },
+  stats: () => ({ fps: loop.fps, ...R.stats, particles: P.count, enemies: countEnemies(world) }),
+};
+</script>
+</body>
+</html>

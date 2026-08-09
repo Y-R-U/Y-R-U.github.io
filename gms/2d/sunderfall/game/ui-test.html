@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — UI harness</title>
+<style>
+  html, body { margin:0; padding:0; width:100%; height:100%; background:#06060a; overflow:hidden;
+    -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent;
+    font:500 14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,system-ui,sans-serif; color:#ece7f5; }
+  body { position:fixed; inset:0; touch-action:none; }
+  #stage { position:absolute; inset:0; overflow:hidden; }
+  #game { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  #ui-root { position:absolute; inset:0; pointer-events:none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+  /* dev toolbar — never part of the deliverable, hidden with ?clean */
+  #bar { position:fixed; left:0; right:0; bottom:0; z-index:99; display:flex; flex-wrap:wrap; gap:4px;
+    padding:6px 8px; background:rgba(4,4,8,.86); border-top:1px solid #222; pointer-events:auto; }
+  #bar.hide { display:none; }
+  #bar button { font:600 10px/1 ui-sans-serif,system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase;
+    padding:6px 8px; color:#cfc9dd; background:#15141f; border:1px solid #2c2a3c; border-radius:4px; cursor:pointer; }
+  #bar button:hover { background:#241f33; border-color:#5a4a2c; color:#ffe1a3; }
+  #bar .sep { width:1px; background:#2c2a3c; margin:0 4px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="game"></canvas>
+  <div id="ui-root"></div>
+</div>
+<div id="bar"></div>
+
+<script type="module">
+import { createBus } from './js/core/events.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createRNG } from './js/core/rng.js';
+import { createUI } from './js/ui/index.js';
+import * as STORY from './js/story/script.js';
+
+const Q = new URLSearchParams(location.search);
+const num = (k, d) => (Q.has(k) ? +Q.get(k) : d);
+
+/* ------------------------------------------------------------------ *
+ * A painted backdrop, so the HUD is judged over the real art and not
+ * over a grey box. These are our own Flux-generated parallax layers.
+ * ------------------------------------------------------------------ */
+const canvas = document.getElementById('game');
+const g = canvas.getContext('2d');
+const SCENE = Q.get('scene') || 'sunderwood';
+const LAYERS = ['sky', 'far', 'mid', 'near', 'fg'];
+const imgs = {};
+let bgReady = false;
+
+function loadBg() {
+  let left = LAYERS.length;
+  for (const k of LAYERS) {
+    const im = new Image();
+    im.onload = im.onerror = () => { if (--left === 0) { bgReady = true; paintBg(); } };
+    im.src = 'assets/bg/' + SCENE + '_' + k + (k === 'sky' ? '.jpg' : '.png');
+    imgs[k] = im;
+  }
+}
+
+// composited once per resize; the frame loop only blits it
+const bgCv = document.createElement('canvas');
+const bg = bgCv.getContext('2d');
+
+function blitBg() {
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(bgCv, 0, 0);
+}
+
+function paintBg() {
+  const W = canvas.width, H = canvas.height;
+  bgCv.width = W; bgCv.height = H;
+  const g = bg;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.fillStyle = '#05050a';
+  g.fillRect(0, 0, W, H);
+  if (!bgReady) { blitBg(); return; }
+  const cover = (im, anchorBottom, scaleK) => {
+    if (!im.naturalWidth) return;
+    const k = (W / im.naturalWidth) * (scaleK || 1);
+    const w = im.naturalWidth * k, h = im.naturalHeight * k;
+    g.drawImage(im, (W - w) * 0.5, anchorBottom - h, w, h);
+  };
+  // sky fills, the rest hang from a common ground line
+  if (imgs.sky.naturalWidth) {
+    const k = Math.max(W / imgs.sky.naturalWidth, H / imgs.sky.naturalHeight);
+    g.drawImage(imgs.sky, (W - imgs.sky.naturalWidth * k) * 0.5, 0,
+      imgs.sky.naturalWidth * k, imgs.sky.naturalHeight * k);
+  }
+  // portrait shows ~820 world px against landscape's 1920, so the camera is zoomed well in
+  const z = view.mode === 'portrait' ? 2.35 : 1;
+  const ground = H * (view.mode === 'portrait' ? 0.86 : 1.0);
+  cover(imgs.far, ground * 0.92, 0.9 * z);
+  cover(imgs.mid, ground * 0.99, 1.0 * z);
+  cover(imgs.near, ground * 1.06, 1.1 * z);
+  cover(imgs.fg, ground * 1.2, 1.3 * z);
+  // a warm key light, the way the real renderer would
+  const gr = g.createRadialGradient(W * 0.62, H * 0.42, 0, W * 0.62, H * 0.42, W * 0.6);
+  gr.addColorStop(0, 'rgba(255,150,60,.20)');
+  gr.addColorStop(1, 'rgba(255,150,60,0)');
+  g.globalCompositeOperation = 'lighter';
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'source-over';
+  blitBg();
+}
+
+/* ------------------------------------------------------------------ *
+ * A minimal ctx — the real bus/viewport/input, no renderer.
+ * ------------------------------------------------------------------ */
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const input = createInput(canvas, view, bus);
+const rng = createRNG('ui-test');
+const cam = { x: 0, y: 0, zoom: 1 };
+view.setCamera(cam);
+
+let dpr = 1;
+function resize() {
+  dpr = view.dpr;
+  canvas.width = Math.round(view.w * dpr);
+  canvas.height = Math.round(view.h * dpr);
+  paintBg();
+}
+view.onResize(resize);
+
+const ctx = {
+  bus, view, input, rng,
+  R: null, P: null, assets: null,
+  audio: { stub: true, sfx() {}, play() {} },
+  story: STORY,
+  dom: { stage: document.getElementById('stage'), ui: document.getElementById('ui-root'), intro: null },
+  player: { x: 0, y: -60 },
+  debug: true,
+};
+window.__ctx = ctx;
+
+const ui = createUI(ctx);
+window.__ui = ui;
+resize();
+loadBg();
+
+/* ------------------------------------------------------------------ *
+ * Scenario
+ * ------------------------------------------------------------------ */
+const S = ui.state;
+const LV = num('lv', 8);
+
+function setup() {
+  ui.setLevel(LV, true);
+  S.maxHp = 100; S.hp = num('hp', 78); S.hpGhost = S.hp;
+  S.maxFocus = 100; S.focus = num('focus', 62);
+  S.xp = num('xp', 24); S.xpNext = 90;
+  S.kills = 37; S.broken = 118; S.runTime = 512;
+  for (const id of ['emberbolt', 'sparklash', 'stonepin', 'bloodtithe', 'galewrench',
+    'mirrorstep', 'blightbloom', 'bulwark', 'sunderquake']) {
+    if (S.known.indexOf(id) < 0) S.known.push(id);
+  }
+  S.ranks.emberbolt = 3; S.ranks.sparklash = 2; S.ranks.stonepin = 5; S.ranks.bloodtithe = 1;
+  ui.setSlot(0, 'emberbolt', 3);
+  ui.setSlot(1, 'sparklash', 2);
+  ui.setSlot(2, 'stonepin', 5);
+  if (LV >= 12) ui.setSlot(3, 'bloodtithe', 1);
+  if (LV >= 18) ui.setSlot(4, 'mirrorstep', 2);
+  // a spread of cooldown states so one screenshot shows the whole vocabulary
+  ui.setCooldown(1, 0.72, 1.1);
+  ui.setCooldown(2, 0.0, 1.2);
+  if (LV >= 12) ui.setCooldown(3, 2.1, 2.8);
+}
+setup();
+
+const ACTS = {
+  demo() { ui.setDemo(true); },
+  hurt() {
+    bus.emit('player:damage', { amount: 14, hp: Math.max(1, S.hp - 14), x: 0, y: -70 });
+  },
+  hits() {
+    for (let i = 0; i < 7; i++) {
+      setTimeout(() => {
+        const crit = i === 3;
+        bus.emit('spell:hit', { x: rng.range(-260, 320), y: rng.range(-180, -20), damage: crit ? 268 : rng.int(18, 74), crit });
+      }, i * 90);
+    }
+  },
+  dmgloop() {
+    setInterval(() => {
+      const crit = Math.random() < 0.18;
+      bus.emit('spell:hit', { x: rng.range(-420, 420), y: rng.range(-220, 40), damage: crit ? rng.int(180, 320) : rng.int(12, 88), crit });
+      if (Math.random() < 0.2) bus.emit('player:damage', { amount: 9, hp: S.hp, x: rng.range(-60, 60), y: -80 });
+    }, 110);
+  },
+  starve() { S.driven = true; S.focus = 5; },   // driven=true stops the mirror refilling it
+  fill() { S.driven = false; S.focus = S.maxFocus; },
+  levelup() { ui.levelUp(S.level + 1); },
+  unlock() { ui.levelUp(12, 'Cast circle 4 unlocked'); ui.setSlot(3, 'bloodtithe', 1); },
+  choice() {
+    ui.offerSpells(['sunderquake', 'acidrain', 'gravewake']);
+  },
+  choice2() { ui.offerSpells(['emberbolt', 'voidlash', 'stormcall']); },
+  pause() { ui.togglePause(); },
+  settings() { ui.setPaused(true); document.querySelectorAll('#sf-pause-menu .sf-btn')[2].click(); },
+  assign() { ui.setPaused(true); setTimeout(() => { const t = document.querySelector('.sf-grim .sf-tile:nth-child(5)'); if (t) t.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0, bubbles: true })); }, 60); },
+  death() { ui.death({}); },
+  boss() {
+    ui.boss({ name: 'The Seam', subtitle: 'the tear it comes through', hp: 8200, maxHp: 12000 });
+  },
+  bosshit() { if (S.boss) ui.bossDamage(Math.max(0, S.boss.hp - 900)); },
+  bossoff() { ui.boss(null); },
+  bubble() {
+    ui.say({ who: 'vayne', text: "The wards will hold. Not long.", dur: 4.5, x: 210, y: -120, ax: 40, ay: -150 });
+    setTimeout(() => ui.say({ who: 'rook', text: 'So get someone else.', dur: 4, x: -190, y: -100, ax: -30, ay: -170 }), 900);
+  },
+  toast() {
+    ui.toast('Spell shard', { kind: 'shard', value: '+1' });
+    setTimeout(() => ui.toast('Emberbolt rank 4', { kind: 'spell', value: 'R4' }), 400);
+    setTimeout(() => ui.toast('Barn collapsed', { kind: 'break', value: '+40 XP' }), 800);
+  },
+  cast() { ui.tryCast(0); },
+  touch() { ui.setTouch(!ui.layout.touch); },
+  reset() { ui.reset(); ui.setPaused(false); setup(); },
+};
+
+const bar = document.getElementById('bar');
+for (const k of Object.keys(ACTS)) {
+  const b = document.createElement('button');
+  b.textContent = k;
+  b.addEventListener('click', () => ACTS[k]());
+  bar.appendChild(b);
+}
+if (Q.has('clean')) bar.classList.add('hide');
+
+/* ---- URL-driven states, so a headless run can reach each one ---- */
+if (Q.has('touch')) ui.setTouch(Q.get('touch') !== '0');
+if (Q.has('demo')) ui.setDemo(true);
+const state = Q.get('state') || '';
+for (const s of state.split(',')) if (ACTS[s]) ACTS[s]();
+
+/* ---- freezing for screenshots ----
+ * Page.captureScreenshot never returns while ANY canvas element exists in this headless setup
+ * (not just an animating WebGL one — a static 2D canvas hangs it too). So `?flat=<seconds>`
+ * composites backdrop + UI canvas into one bitmap, pins it as the stage background, and removes
+ * both canvases. What is left is a plain DOM page that captures normally, with the DOM overlays
+ * (cards, pause, death) still live on top. */
+window.__flatten = function () {
+  const uicv = document.getElementById('sf-canvas');
+  blitBg();
+  ui.render(1);
+  if (uicv) g.drawImage(uicv, 0, 0);
+  // Mid-resolution JPEG. A full-res data URL as a CSS background wedges the software rasteriser
+  // for minutes; ~1500px decodes instantly and is only used as context behind a blurred scrim.
+  const small = document.createElement('canvas');
+  const k = Math.min(1, 1500 / canvas.width);
+  small.width = Math.round(canvas.width * k);
+  small.height = Math.round(canvas.height * k);
+  small.getContext('2d').drawImage(canvas, 0, 0, small.width, small.height);
+  const url = small.toDataURL('image/jpeg', 0.88);
+  document.getElementById('stage').style.background = 'url(' + url + ') center/100% 100% no-repeat';
+  canvas.remove();
+  if (uicv) uicv.remove();
+  window.__frozen = true;
+};
+
+const DT = 1 / 60;
+const STOP = Q.has('stop') ? +Q.get('stop') : 0;
+const FLAT = Q.has('flat') ? +Q.get('flat') : 0;
+const COMP = Q.has('comp');
+let acc = 0, prev = performance.now(), elapsed = 0;
+function frame(t) {
+  let real = (t - prev) / 1000; prev = t;
+  if (real > 0.25) real = 0.25;
+  elapsed += real;
+  acc += real;
+  let n = 0;
+  while (acc >= DT && n++ < 5) { acc -= DT; input.update(); ui.update(DT); }
+  blitBg();
+  ui.render(1);
+  // ?comp=1 folds the UI overlay into #game so `shot.mjs --canvas "#game"` grabs the whole picture
+  if (COMP) { const u = document.getElementById('sf-canvas'); if (u) g.drawImage(u, 0, 0); }
+  if (FLAT && elapsed >= FLAT) { window.__flatten(); return; }
+  if (STOP && elapsed >= STOP) { window.__frozen = true; return; }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

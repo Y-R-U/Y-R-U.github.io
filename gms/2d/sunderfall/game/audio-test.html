@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SUNDERFALL — audio bench</title>
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #141821; --edge: #232936; --ink: #cdd4e0; --dim: #7b8698;
+    --warm: #e8a15c; --cool: #6ea8d8; --good: #7fc98a; --bad: #e06a63; --mid: #d9b558;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 14px 16px 60px;
+  }
+  h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 2px; color: var(--warm); }
+  .sub { color: var(--dim); margin-bottom: 14px; font-size: 11px; }
+  .bar {
+    position: sticky; top: 0; z-index: 10; background: rgba(11,13,18,.94);
+    border: 1px solid var(--edge); border-radius: 6px; padding: 8px 10px; margin-bottom: 14px;
+    display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+    backdrop-filter: blur(6px);
+  }
+  .stat { color: var(--dim); }
+  .stat b { color: var(--ink); font-weight: 600; }
+  .meter { width: 120px; height: 8px; background: #0a0c10; border: 1px solid var(--edge); border-radius: 3px; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--good), var(--mid) 72%, var(--bad)); }
+  section { border: 1px solid var(--edge); border-radius: 6px; margin-bottom: 12px; background: var(--panel); }
+  section > h2 {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cool);
+    margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--edge); font-weight: 600;
+  }
+  .body { padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  button {
+    font: inherit; font-size: 11px; color: var(--ink); background: #1c2231; border: 1px solid #2c344a;
+    border-radius: 4px; padding: 5px 9px; cursor: pointer;
+  }
+  button:hover { background: #263049; border-color: #46527a; }
+  button:active { background: #313d5c; }
+  button.hot { border-color: #6b4a2a; color: var(--warm); }
+  button.big { padding: 7px 14px; font-size: 12px; }
+  label { color: var(--dim); font-size: 11px; display: inline-flex; gap: 6px; align-items: center; }
+  input[type=range] { width: 130px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 5px; padding: 10px 12px; }
+  .grid button { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  pre {
+    margin: 0; padding: 10px 12px; font-size: 11px; line-height: 1.5; color: var(--dim);
+    max-height: 420px; overflow: auto; white-space: pre;
+  }
+  pre b { color: var(--ink); }
+  .ok { color: var(--good); } .warn { color: var(--mid); } .err { color: var(--bad); }
+  .note { color: var(--dim); font-size: 11px; padding: 0 12px 10px; }
+</style>
+</head>
+<body>
+
+<h1>Sunderfall — audio bench</h1>
+<div class="sub">Everything below is synthesised at run time. No samples, no network. Click anywhere first — browsers block audio until you do.</div>
+
+<div class="bar">
+  <button id="unlock" class="big hot">▶ start audio</button>
+  <span class="stat">state <b id="s-state">none</b></span>
+  <span class="stat">voices <b id="s-voices">0</b>/<b id="s-cap">0</b></span>
+  <span class="stat">peak</span><span class="meter"><i id="s-peak"></i></span>
+  <span class="stat">sched <b id="s-cpu">0</b> ms</span>
+  <span class="stat">baked <b id="s-cached">0</b>/<b id="s-keys">0</b> (<b id="s-mb">0</b> MB, <b id="s-gen">0</b> ms)</span>
+  <span class="stat">music <b id="s-music">–</b> <b id="s-bpm">0</b>bpm</span>
+  <span class="stat">amb <b id="s-amb">–</b></span>
+  <span class="stat">fps <b id="s-fps">0</b></span>
+</div>
+
+<section>
+  <h2>mix</h2>
+  <div class="body" id="mixrow"></div>
+</section>
+
+<section>
+  <h2>listener — source placement</h2>
+  <div class="body">
+    <label>source x <input type="range" id="srcx" min="-4000" max="4000" value="0" step="10"><b id="srcxv">0</b></label>
+    <label>source y <input type="range" id="srcy" min="-1500" max="1500" value="0" step="10"><b id="srcyv">0</b></label>
+    <button onclick="T.fire('stone_break')">fire stone_break there</button>
+    <button onclick="T.fire('glass_break')">glass_break</button>
+    <button onclick="T.sweepPan()">sweep left → right</button>
+    <span class="stat">listener is at 0,0 with a 960-unit half-width</span>
+  </div>
+</section>
+
+<section>
+  <h2>materials — crack / break / debris / burn</h2>
+  <div class="body" id="matrow"></div>
+  <div class="note">Sweep plays each material's full chain in order, 9 materials, ~14 s.</div>
+</section>
+
+<section>
+  <h2>ambience beds</h2>
+  <div class="body" id="ambrow"></div>
+  <div class="note">Each bed is a live generative graph — layered wind, drone, insects, plus randomised one-shots. Leave one running for a minute; it will not repeat.</div>
+</section>
+
+<section>
+  <h2>music — adaptive</h2>
+  <div class="body" id="musrow"></div>
+  <div class="body">
+    <label>intensity <input type="range" id="heat" min="0" max="100" value="0"><b id="heatv">0</b>%</label>
+    <label>boss phase <input type="range" id="boss" min="0" max="100" value="0"><b id="bossv">0</b>%</label>
+    <button onclick="T.demoCombat()" class="hot">demo: explore → combat → back</button>
+  </div>
+  <div class="note">Intensity drives explore/tension/combat automatically with a dwell timer. Transitions land on the bar with a riser and a drum entry.</div>
+</section>
+
+<section>
+  <h2>stress</h2>
+  <div class="body" id="stressrow"></div>
+  <div class="note">The pool caps at 40 positional voices with priority stealing and per-key rate limits, so "200 debris impacts" is a rockslide, not a wall.</div>
+</section>
+
+<section>
+  <h2>offline verification</h2>
+  <div class="body">
+    <button class="big hot" onclick="T.verify()">run all checks</button>
+    <button onclick="T.verifyKeys()">keys only</button>
+    <button onclick="T.verifyContrasts()">contrasts</button>
+    <button onclick="T.verifyMix()">mix / clipping</button>
+    <button onclick="T.verifyAmbience()">ambience</button>
+    <button onclick="T.verifyMusic()">music</button>
+    <button onclick="T.dumpTable()">full key table</button>
+  </div>
+  <pre id="out">Nothing rendered yet. "run all checks" renders every sound offline and measures it — peak, RMS, spectral centroid, attack, clipping — then checks the mix, the four ambience beds and three music states.</pre>
+</section>
+
+<section id="board-section">
+  <h2>every sound <span id="keycount" style="color:var(--dim)"></span></h2>
+  <div id="board"></div>
+</section>
+
+<script type="module">
+import { createAudio } from './js/core/audio.js';
+import { createBank } from './js/core/audio/bank.js';
+import { createMix } from './js/core/audio/mix.js';
+import { createVoices } from './js/core/audio/voices.js';
+import { buildBed, BEDS, AMBIENT_SFX } from './js/core/audio/ambience.js';
+import { createMusic } from './js/core/audio/music.js';
+import { MATERIAL_SFX, WORLD_SFX } from './js/core/audio/sfx-materials.js';
+import { CREATURE_SFX, PLAYER_SFX } from './js/core/audio/sfx-creatures.js';
+import { SPELL_SFX } from './js/core/audio/sfx-spells.js';
+import { UI_SFX } from './js/core/audio/sfx-ui.js';
+import { analyse } from './js/core/audio/dsp.js';
+
+/* ---- a minimal fake ctx: a camera the audio can follow, and a bus ---- */
+const listeners = new Map();
+const bus = {
+  on(n, f) { (listeners.get(n) || listeners.set(n, []).get(n)).push(f); return () => {}; },
+  emit(n, p) { (listeners.get(n) || []).forEach(f => f(p)); },
+  once(n, f) { const off = bus.on(n, p => { off(); f(p); }); return off; },
+};
+let fakeTs = 1;
+const ctx = {
+  bus,
+  R: { cam: { x: 0, y: 0, zoom: 1 }, worldW: 1920, fx: { getTimeScale: () => fakeTs } },
+  view: { worldW: 1920 },
+};
+
+const audio = await createAudio(ctx);
+window.audio = audio;
+
+const $ = (id) => document.getElementById(id);
+const out = $('out');
+let src = { x: 0, y: 0 };
+
+/* ---- UI wiring ---- */
+
+$('unlock').onclick = async () => {
+  const ok = await audio.resume();
+  $('unlock').textContent = ok ? '● audio running' : '▶ start audio (blocked)';
+};
+
+function btn(label, fn, cls) {
+  const b = document.createElement('button');
+  b.textContent = label;
+  if (cls) b.className = cls;
+  b.onclick = fn;
+  return b;
+}
+
+// mix controls
+{
+  const row = $('mixrow');
+  for (const name of audio.volumeNames()) {
+    const l = document.createElement('label');
+    const i = document.createElement('input');
+    i.type = 'range'; i.min = 0; i.max = 100; i.value = Math.round(audio.getVolume(name) * 100);
+    const v = document.createElement('b');
+    v.textContent = i.value;
+    i.oninput = () => { audio.setVolume(name, i.value / 100); v.textContent = i.value; };
+    l.append(name + ' ', i, v);
+    row.append(l);
+  }
+  row.append(btn('mute', () => audio.toggleMute()));
+  row.append(btn('duck 0.6', () => audio.duck(0.6, 0.6)));
+  row.append(btn('hitstop', () => { audio.sfx('explosion.big', { x: 0, y: 0 }); audio.hitstop(0.06, 0.14); audio.duck(0.6, 0.5); }));
+  row.append(btn('stop all sfx', () => audio.stopAll(0.05)));
+}
+
+$('srcx').oninput = e => { src.x = +e.target.value; $('srcxv').textContent = src.x; };
+$('srcy').oninput = e => { src.y = +e.target.value; $('srcyv').textContent = src.y; };
+
+const MATS = ['stone', 'rock', 'wood', 'leaf', 'glass', 'metal', 'bone', 'dirt', 'flesh'];
+const MAT_EVENTS = {
+  stone: ['stone_crack', 'stone_break', 'stone_debris'],
+  rock: ['rock_crack', 'rock_break', 'rock_debris'],
+  wood: ['wood_crack', 'wood_break', 'wood_debris', 'wood_burn'],
+  leaf: ['leaf_rustle', 'leaf_burst', 'leaf_fall', 'leaf_burn'],
+  glass: ['glass_crack', 'glass_break', 'glass_tinkle'],
+  metal: ['metal_dent', 'metal_break', 'metal_clang'],
+  bone: ['bone_crack', 'bone_break', 'bone_clatter'],
+  dirt: ['dirt_crack', 'dirt_break', 'dirt_fall'],
+  flesh: ['flesh_hit', 'flesh_burst', 'gib', 'flesh_burn'],
+};
+{
+  const row = $('matrow');
+  for (const m of MATS) row.append(btn(m, () => playChain(MAT_EVENTS[m])));
+  row.append(btn('▶ sweep all', sweepMaterials, 'hot'));
+}
+
+function playChain(keys, gap = 420) {
+  keys.forEach((k, i) => setTimeout(() => audio.sfx(k, { x: src.x, y: src.y }), i * gap));
+}
+async function sweepMaterials() {
+  for (const m of MATS) {
+    playChain(MAT_EVENTS[m], 360);
+    await sleep(MAT_EVENTS[m].length * 360 + 300);
+  }
+}
+
+{
+  const row = $('ambrow');
+  for (const id of audio.ambiences()) row.append(btn(id, () => audio.ambience(id, 2)));
+  row.append(btn('off', () => audio.ambience(null, 1.5)));
+  row.append(btn('wind ×2.5', () => audio.setWind(2.5, 1)));
+  row.append(btn('wind ×1', () => audio.setWind(1, 2)));
+}
+
+{
+  const row = $('musrow');
+  for (const s of ['menu', 'explore', 'tension', 'combat', 'boss', 'victory']) {
+    row.append(btn(s, () => audio.music(s)));
+  }
+  row.append(btn('stop', () => audio.stopMusic(2)));
+}
+$('heat').oninput = e => { audio.setIntensity(e.target.value / 100); $('heatv').textContent = e.target.value; };
+$('boss').oninput = e => { audio.setBossPhase(e.target.value / 100); $('bossv').textContent = e.target.value; };
+
+{
+  const row = $('stressrow');
+  row.append(btn('50 debris', () => burst(50, ['stone_debris', 'rock_debris', 'wood_debris'], 260)));
+  row.append(btn('200 debris (collapse)', () => burst(200, ['stone_debris', 'rock_debris', 'dirt_fall', 'wood_debris'], 700), 'hot'));
+  row.append(btn('100 mixed', () => burst(100, audio.keys().filter(k => !audio.recipe(k).loop), 900)));
+  row.append(btn('full collapse', fullCollapse, 'hot'));
+  row.append(btn('sustained loops ×6', sustainedLoops));
+}
+
+function burst(n, pool, ms) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const k = pool[(Math.random() * pool.length) | 0];
+      audio.sfx(k, { x: (Math.random() - 0.5) * 2600, y: (Math.random() - 0.5) * 700, volume: 0.6 + Math.random() * 0.5 });
+    }, Math.random() * ms);
+  }
+}
+function fullCollapse() {
+  audio.sfx('collapse.start', { x: 400, y: 0 });
+  setTimeout(() => {
+    audio.sfx('collapse.land', { x: 400, y: 0 });
+    audio.duck(0.7, 0.8);
+    audio.hitstop(0.06, 0.12);
+    burst(220, ['stone_debris', 'rock_debris', 'dirt_fall', 'stone_crack'], 1400);
+  }, 1100);
+}
+const held = [];
+function sustainedLoops() {
+  if (held.length) { held.splice(0).forEach(h => h.stop(0.4)); return; }
+  for (let i = 0; i < 6; i++) {
+    held.push(audio.loop(['fire.loop', 'acid.loop', 'wood_burn', 'leaf_burn', 'slime.loop', 'flesh_burn'][i], {
+      x: (i - 2.5) * 700, y: 0, volume: 0.8,
+    }));
+  }
+}
+
+/* ---- the board: every key ---- */
+{
+  const board = $('board');
+  const keys = audio.keys().sort();
+  $('keycount').textContent = `(${keys.length})`;
+  const groups = new Map();
+  for (const k of keys) {
+    let g = 'material';
+    if (k.startsWith('spell.@')) g = 'spell — school generics';
+    else if (k.startsWith('spell.')) g = 'spell — ' + k.split('.')[1];
+    else if (k.startsWith('enemy.')) g = 'enemy — ' + k.split('.')[1];
+    else if (k.startsWith('player.')) g = 'player';
+    else if (k.startsWith('ui.')) g = 'ui';
+    else if (k.startsWith('amb.')) g = 'ambient one-shots';
+    else if (k.includes('.')) g = 'world';
+    (groups.get(g) || groups.set(g, []).get(g)).push(k);
+  }
+  for (const [g, list] of [...groups].sort()) {
+    const h = document.createElement('div');
+    h.style.cssText = 'grid-column:1/-1;color:var(--dim);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px';
+    h.textContent = g;
+    const wrap = document.createElement('div');
+    wrap.className = 'grid';
+    wrap.append(h);
+    for (const k of list) {
+      wrap.append(btn(k, () => {
+        const rec = audio.recipe(k);
+        if (rec.loop) {
+          const h = audio.loop(k, { x: src.x, y: src.y });
+          setTimeout(() => h.stop(0.4), 2600);
+        } else audio.sfx(k, { x: src.x, y: src.y });
+      }));
+    }
+    board.append(wrap);
+  }
+}
+
+/* ---- live readout ---- */
+let frames = 0, lastT = performance.now();
+function raf() {
+  frames++;
+  const now = performance.now();
+  if (now - lastT > 400) {
+    const s = audio.stats;
+    $('s-state').textContent = s.state;
+    $('s-voices').textContent = s.voices;
+    $('s-cap').textContent = s.cap;
+    $('s-cpu').textContent = s.cpuMs.toFixed(2);
+    $('s-cached').textContent = s.cached;
+    $('s-keys').textContent = s.keys;
+    $('s-mb').textContent = (s.bytes / 1048576).toFixed(2);
+    $('s-gen').textContent = Math.round(s.genMs);
+    $('s-music').textContent = s.music;
+    $('s-bpm').textContent = Math.round(s.bpm);
+    $('s-amb').textContent = s.ambience || '–';
+    $('s-fps').textContent = Math.round(frames * 1000 / (now - lastT));
+    $('s-peak').style.width = Math.min(100, s.peak * 100) + '%';
+    frames = 0; lastT = now;
+  }
+  requestAnimationFrame(raf);
+}
+raf();
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ================================================================== *
+ * Offline verification
+ * ================================================================== */
+
+const lines = [];
+function log(s, cls) {
+  lines.push(cls ? `<span class="${cls}">${s}</span>` : s);
+  out.innerHTML = lines.join('\n');
+  out.scrollTop = out.scrollHeight;
+  console.log('[VERIFY] ' + s.replace(/<[^>]+>/g, ''));
+}
+function clear() { lines.length = 0; out.innerHTML = ''; }
+
+function offlineBank() {
+  const b = createBank({ budgetBytes: 64 * 1024 * 1024 });
+  b.defineAll(MATERIAL_SFX); b.defineAll(WORLD_SFX); b.defineAll(CREATURE_SFX);
+  b.defineAll(PLAYER_SFX); b.defineAll(SPELL_SFX); b.defineAll(UI_SFX); b.defineAll(AMBIENT_SFX);
+  return b;
+}
+
+const pad = (s, n) => String(s).padEnd(n).slice(0, n);
+const num = (v, n = 6, d = 0) => String(typeof v === 'number' ? v.toFixed(d) : v).padStart(n);
+
+let cachedRows = null;
+function measureAll() {
+  if (cachedRows) return cachedRows;
+  const bank = offlineBank();
+  const rows = [];
+  for (const k of bank.keys()) {
+    const a = bank.inspect(k, 0);
+    if (a) rows.push(a);
+  }
+  cachedRows = rows;
+  return rows;
+}
+
+function verifyKeys() {
+  clear();
+  const t0 = performance.now();
+  const rows = measureAll();
+  const ms = performance.now() - t0;
+  let bad = 0, warn = 0;
+  const problems = [];
+  for (const a of rows) {
+    const issues = [];
+    if (a.rawPeak < 1.5e-3) issues.push('SILENT (raw peak ' + a.rawPeak.toExponential(1) + ')');
+    if (a.dur < 0.015) issues.push('too short ' + (a.dur * 1000).toFixed(0) + 'ms');
+    if (a.rawPeak > 12) issues.push('raw level runaway ' + a.rawPeak.toFixed(1));
+    if (a.mixPeak > 1.15) issues.push('mix peak ' + a.mixPeak.toFixed(2) + ' — will hit the limiter alone');
+    if (a.centroid === 0) issues.push('no spectral content');
+    if (issues.length) {
+      const fatal = issues.some(s => /SILENT|no spectral|too short/.test(s));
+      if (fatal) bad++; else warn++;
+      problems.push([fatal ? 'err' : 'warn', pad(a.key, 26) + ' ' + issues.join('; ')]);
+    }
+  }
+  log(`<b>KEYS</b>  ${rows.length} recipes rendered offline in ${ms.toFixed(0)} ms ` +
+      `(${(rows.reduce((s, a) => s + a.dur, 0)).toFixed(1)} s of audio)`);
+  for (const [cls, s] of problems) log('  ' + s, cls);
+  log(`  ${rows.length - bad - warn} clean · ${warn} warnings · ${bad} failures`, bad ? 'err' : warn ? 'warn' : 'ok');
+
+  // loudest / quietest in mix terms, so the balance is visible not guessed
+  const byMix = [...rows].sort((a, b) => b.mixPeak - a.mixPeak);
+  log('  loudest : ' + byMix.slice(0, 5).map(a => `${a.key} ${a.mixPeak.toFixed(2)}`).join('  '));
+  log('  quietest: ' + byMix.slice(-5).map(a => `${a.key} ${a.mixPeak.toFixed(2)}`).join('  '));
+  return { total: rows.length, bad, warn };
+}
+
+const CONTRASTS = [
+  ['glass_break brighter than stone_break', (m) => m.glass_break.centroid > m.stone_break.centroid * 2,
+    (m) => `${m.glass_break.centroid.toFixed(0)} Hz vs ${m.stone_break.centroid.toFixed(0)} Hz`],
+  ['glass_break is genuinely bright', (m) => m.glass_break.centroid > 3000,
+    (m) => `${m.glass_break.centroid.toFixed(0)} Hz`],
+  ['dirt_break is genuinely dull', (m) => m.dirt_break.centroid < 1200,
+    (m) => `${m.dirt_break.centroid.toFixed(0)} Hz`],
+  ['glass has far more high energy than earth', (m) => m.glass_break.hiRatio > m.dirt_break.hiRatio * 3,
+    (m) => `${m.glass_break.hiRatio.toFixed(3)} vs ${m.dirt_break.hiRatio.toFixed(3)}`],
+  ['metal rings and sustains', (m) => m.metal_dent.dur > 1.0,
+    (m) => `${m.metal_dent.dur.toFixed(2)} s tail`],
+  ['metal_dent rings longer than bone_crack', (m) => m.metal_dent.dur > m.bone_crack.dur * 3,
+    (m) => `${m.metal_dent.dur.toFixed(2)} s vs ${m.bone_crack.dur.toFixed(2)} s`],
+  ['glass_break has a long sparkle tail', (m) => m.glass_break.dur > 1.0,
+    (m) => `${m.glass_break.dur.toFixed(2)} s`],
+  ['stone_break is a low-mid event, not a hiss', (m) => m.stone_break.centroid < 2600,
+    (m) => `${m.stone_break.centroid.toFixed(0)} Hz`],
+  ['wood_break brighter than stone_break (splinters)', (m) => m.wood_break.centroid > m.stone_break.centroid,
+    (m) => `${m.wood_break.centroid.toFixed(0)} vs ${m.stone_break.centroid.toFixed(0)} Hz`],
+  ['storm impact is the fastest transient', (m) => m['spell.sparklash.impact'].attackMs < 6,
+    (m) => `${m['spell.sparklash.impact'].attackMs.toFixed(2)} ms to peak`],
+  ['earth impact is slower and lower than storm', (m) =>
+    m['spell.sunderquake.impact'].centroid < m['spell.sparklash.impact'].centroid,
+    (m) => `${m['spell.sunderquake.impact'].centroid.toFixed(0)} vs ${m['spell.sparklash.impact'].centroid.toFixed(0)} Hz`],
+  ['big explosion outlasts the small one', (m) => m['explosion.big'].dur > m['explosion.small'].dur * 1.4,
+    (m) => `${m['explosion.big'].dur.toFixed(2)} s vs ${m['explosion.small'].dur.toFixed(2)} s`],
+  ['stonewarden is deeper than sporeling', (m) => m['enemy.stonewarden.death'].centroid < m['enemy.sporeling.death'].centroid,
+    (m) => `${m['enemy.stonewarden.death'].centroid.toFixed(0)} vs ${m['enemy.sporeling.death'].centroid.toFixed(0)} Hz`],
+  ['every enemy tell rises into its own end', (m) => {
+    for (const id of ['husk', 'thornhound', 'stonewarden', 'wispmaw', 'theseam']) {
+      if (m[`enemy.${id}.tell`].attackMs < m[`enemy.${id}.tell`].dur * 1000 * 0.45) return false;
+    }
+    return true;
+  }, () => 'peak in the back half for all sampled tells'],
+  ['footsteps are quiet relative to breaks', (m) => m['player.step.stone'].mixPeak < m.stone_break.mixPeak * 0.55,
+    (m) => `${m['player.step.stone'].mixPeak.toFixed(2)} vs ${m.stone_break.mixPeak.toFixed(2)}`],
+  ['nothing clips before the mix', (m) => Object.values(m).every(a => a.clipped < a.n * 0.02),
+    () => 'all under 2% of samples at full scale'],
+];
+
+function verifyContrasts() {
+  clear();
+  const rows = measureAll();
+  const m = {};
+  for (const a of rows) m[a.key] = a;
+  log('<b>CONTRASTS</b>  a sound indistinguishable from another is a bug');
+  let fails = 0;
+  for (const [name, test, detail] of CONTRASTS) {
+    let ok = false, why = '';
+    try { ok = !!test(m); why = detail(m); } catch (e) { why = 'threw: ' + e.message; }
+    if (!ok) fails++;
+    log(`  ${ok ? 'PASS' : 'FAIL'}  ${pad(name, 46)} ${why}`, ok ? 'ok' : 'err');
+  }
+
+  // pairwise fingerprint distance across the material breaks
+  const mats = ['stone_break', 'rock_break', 'wood_break', 'leaf_burst', 'glass_break', 'metal_break', 'bone_break', 'dirt_break', 'flesh_burst'];
+  let closest = null;
+  for (let i = 0; i < mats.length; i++) for (let j = i + 1; j < mats.length; j++) {
+    const a = m[mats[i]], b = m[mats[j]];
+    const d = Math.hypot(
+      Math.log2(a.centroid / b.centroid) * 1.6,
+      Math.log2(a.dur / b.dur),
+      (a.hiRatio - b.hiRatio) * 3,
+      Math.log2(Math.max(1, a.zcr) / Math.max(1, b.zcr)),
+    );
+    if (!closest || d < closest.d) closest = { d, a: mats[i], b: mats[j] };
+  }
+  const distinct = closest.d > 0.45;
+  log(`  ${distinct ? 'PASS' : 'FAIL'}  ${pad('all nine material breaks are distinguishable', 46)} closest pair ${closest.a}/${closest.b} d=${closest.d.toFixed(2)}`,
+    distinct ? 'ok' : 'err');
+  if (!distinct) fails++;
+  log(`  ${CONTRASTS.length + 1 - fails}/${CONTRASTS.length + 1} passed`, fails ? 'err' : 'ok');
+  return { fails };
+}
+
+/** Render N simultaneous voices through the real mix graph and look for clipping. */
+async function verifyMix(n = 120) {
+  clear();
+  log('<b>MIX</b>  rendering ' + n + ' simultaneous voices through the real bus + limiter');
+  const SR = 44100;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const oc = new OAC(2, SR * 3, SR);
+  const bank = offlineBank();
+  const mix = createMix(oc, { storage: null });
+  const voices = createVoices(oc, mix, bank, { sfxCap: 40, uiCap: 8, ambCap: 10 });
+  voices.setListener(0, 0, 960);
+  const pool = bank.keys().filter(k => !bank.get(k).loop && bank.get(k).bus !== 'ui');
+  let played = 0;
+  for (let i = 0; i < n; i++) {
+    const k = pool[(Math.random() * pool.length) | 0];
+    if (voices.play(k, { x: (Math.random() - 0.5) * 1800, y: 0, volume: 1, delay: Math.random() * 0.8 })) played++;
+  }
+  const buf = await oc.startRendering();
+  const a = analyse(buf.getChannelData(0), SR);
+  const b = analyse(buf.getChannelData(1), SR);
+  const peak = Math.max(a.peak, b.peak);
+  const clipped = a.clipped + b.clipped;
+  log(`  requested ${n}, played ${played} (rate limits + 40-voice cap did the rest)`);
+  log(`  peak ${peak.toFixed(3)} (${(20 * Math.log10(peak)).toFixed(1)} dBFS)   rms ${a.rms.toFixed(3)}   clipped samples ${clipped}`);
+  const ok = peak <= 1.0 && clipped === 0;
+  log(`  ${ok ? 'PASS' : 'FAIL'}  limiter holds the master below full scale`, ok ? 'ok' : 'err');
+
+  // and the same again with the worst case: everything loud, all at the listener
+  const oc2 = new OAC(2, SR * 2, SR);
+  const mix2 = createMix(oc2, { storage: null });
+  const v2 = createVoices(oc2, mix2, bank, { sfxCap: 40, uiCap: 8, ambCap: 10 });
+  v2.setListener(0, 0, 960);
+  for (let i = 0; i < 60; i++) v2.play('explosion.big', { x: 0, y: 0, volume: 1, force: true, delay: i * 0.004 });
+  const buf2 = await oc2.startRendering();
+  const c = analyse(buf2.getChannelData(0), SR);
+  log(`  worst case (60 x explosion.big stacked): peak ${c.peak.toFixed(3)}  clipped ${c.clipped}`);
+  log(`  ${c.peak <= 1.0 ? 'PASS' : 'FAIL'}  no clipping under deliberate abuse`, c.peak <= 1.0 ? 'ok' : 'err');
+  return { peak, clipped };
+}
+
+async function verifyAmbience() {
+  clear();
+  log('<b>AMBIENCE</b>  6 s of each bed, rendered offline');
+  const SR = 32000;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const results = [];
+  for (const id of Object.keys(BEDS)) {
+    const oc = new OAC(1, SR * 6, SR);
+    const mix = createMix(oc, { storage: null });
+    const bed = buildBed(oc, mix.input('ambience'), BEDS[id], {});
+    bed.start(BEDS[id].level, 0.3);
+    const buf = await oc.startRendering();
+    const d = buf.getChannelData(0);
+    const all = analyse(d, SR);
+    const h1 = analyse(d.subarray(SR * 2, SR * 4), SR);
+    const h2 = analyse(d.subarray(SR * 4, SR * 6), SR);
+    const drift = Math.abs(h1.rms - h2.rms) / Math.max(1e-6, (h1.rms + h2.rms) / 2);
+    const cdrift = Math.abs(h1.centroid - h2.centroid) / Math.max(1, (h1.centroid + h2.centroid) / 2);
+    const alive = all.rms > 0.004;
+    const evolving = drift > 0.01 || cdrift > 0.01;
+    const quiet = all.peak < 0.9;
+    log(`  ${pad(id, 12)} rms ${all.rms.toFixed(4)}  peak ${all.peak.toFixed(3)}  centroid ${num(all.centroid, 5, 0)} Hz  ` +
+        `level drift ${(drift * 100).toFixed(1)}%  timbre drift ${(cdrift * 100).toFixed(1)}%`,
+      alive && evolving && quiet ? 'ok' : 'err');
+    if (!alive) log('    FAIL silent bed', 'err');
+    if (!evolving) log('    FAIL bed is static — it will read as a loop', 'err');
+    if (!quiet) log('    FAIL bed is too hot on its own', 'err');
+    results.push({ id, alive, evolving, quiet, rms: all.rms, centroid: all.centroid });
+  }
+  const ok = results.every(r => r.alive && r.evolving && r.quiet);
+  // beds must not all sound the same either
+  const cs = results.map(r => r.centroid).sort((a, b) => a - b);
+  const spread = cs[cs.length - 1] / Math.max(1, cs[0]);
+  log(`  centroid spread across beds ×${spread.toFixed(2)} ${spread > 1.25 ? '(distinct)' : '(TOO SIMILAR)'}`, spread > 1.25 ? 'ok' : 'err');
+  log(`  ${ok && spread > 1.25 ? 'PASS' : 'FAIL'}  four distinct, living beds`, ok && spread > 1.25 ? 'ok' : 'err');
+  return results;
+}
+
+async function verifyMusic() {
+  clear();
+  log('<b>MUSIC</b>  10 s of each state, rendered offline');
+  const SR = 32000;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const res = {};
+  for (const state of ['explore', 'tension', 'combat', 'boss']) {
+    const oc = new OAC(1, SR * 10, SR);
+    const mix = createMix(oc, { storage: null });
+    const music = createMusic(oc, mix, 4242);
+    music.set(state, { immediate: true });
+    // drive the scheduler forward by hand; offline currentTime does not advance
+    for (let t = 0; t < 10; t += 0.05) music.tick(t);
+    const buf = await oc.startRendering();
+    const a = analyse(buf.getChannelData(0), SR);
+    res[state] = a;
+    log(`  ${pad(state, 9)} rms ${a.rms.toFixed(4)}  peak ${a.peak.toFixed(3)}  centroid ${num(a.centroid, 5, 0)} Hz  ` +
+        `zcr ${num(a.zcr, 6, 0)}  clipped ${a.clipped}`, a.rms > 0.003 && a.peak <= 1 ? 'ok' : 'err');
+  }
+  const checks = [
+    ['every state produces audio', Object.values(res).every(a => a.rms > 0.003), ''],
+    ['combat is bigger than explore', res.combat.rms > res.explore.rms * 1.15,
+      `${res.combat.rms.toFixed(4)} vs ${res.explore.rms.toFixed(4)}`],
+    ['boss is the biggest', res.boss.rms >= res.combat.rms * 0.95,
+      `${res.boss.rms.toFixed(4)} vs ${res.combat.rms.toFixed(4)}`],
+    ['states are timbrally distinct', new Set(Object.values(res).map(a => Math.round(a.centroid / 40))).size >= 3,
+      Object.entries(res).map(([k, a]) => `${k} ${a.centroid.toFixed(0)}`).join(' · ')],
+    ['nothing clips', Object.values(res).every(a => a.clipped === 0 && a.peak <= 1), ''],
+    ['score leaves headroom for sfx', Object.values(res).every(a => a.peak < 0.7),
+      'loudest state peaks at ' + Math.max(...Object.values(res).map(a => a.peak)).toFixed(3)],
+  ];
+  let fails = 0;
+  for (const [name, ok, why] of checks) {
+    if (!ok) fails++;
+    log(`  ${ok ? 'PASS' : 'FAIL'}  ${pad(name, 34)} ${why}`, ok ? 'ok' : 'err');
+  }
+
+  // and the transition itself: explore for 6 bars, then combat — must not go quiet
+  const oc = new OAC(1, SR * 16, SR);
+  const mix = createMix(oc, { storage: null });
+  const music = createMusic(oc, mix, 99);
+  music.set('explore', { immediate: true });
+  for (let t = 0; t < 16; t += 0.05) {
+    if (Math.abs(t - 7) < 0.03) music.set('combat');
+    music.tick(t);
+  }
+  const buf = await oc.startRendering();
+  const d = buf.getChannelData(0);
+  let minRms = 1, at = 0;
+  for (let s = 5; s < 11; s += 0.25) {
+    const w = analyse(d.subarray((s * SR) | 0, ((s + 0.25) * SR) | 0), SR);
+    if (w.rms < minRms) { minRms = w.rms; at = s; }
+  }
+  const before = analyse(d.subarray(SR * 4, SR * 6), SR).rms;
+  const gap = minRms / Math.max(1e-6, before);
+  const ok = gap > 0.25;
+  log(`  transition explore→combat: quietest 250 ms window is ${(gap * 100).toFixed(0)}% of the pre-transition level (at t=${at.toFixed(2)}s)`);
+  log(`  ${ok ? 'PASS' : 'FAIL'}  the transition never crossfades through silence`, ok ? 'ok' : 'err');
+  if (!ok) fails++;
+
+  // the path the game actually uses: intensity, not explicit states
+  const oc2 = new OAC(1, SR * 20, SR);
+  const mix2 = createMix(oc2, { storage: null });
+  const mus2 = createMusic(oc2, mix2, 5);
+  mus2.set('explore', { immediate: true });
+  const seen = new Set();
+  for (let t = 0; t < 20; t += 0.05) {
+    mus2.setIntensity(t > 6 && t < 15 ? 1 : 0);
+    mus2.tick(t);
+    seen.add(mus2.state);
+  }
+  const buf2 = await oc2.startRendering();
+  const calm = analyse(buf2.getChannelData(0).subarray(SR * 3, SR * 6), SR).rms;
+  const hot = analyse(buf2.getChannelData(0).subarray(SR * 10, SR * 14), SR).rms;
+  const escalated = seen.has('combat') && hot > calm * 1.3;
+  log(`  intensity-driven: states visited [${[...seen].join(' → ')}]  calm rms ${calm.toFixed(4)} → hot rms ${hot.toFixed(4)}`);
+  log(`  ${escalated ? 'PASS' : 'FAIL'}  combat heat escalates and de-escalates on its own`, escalated ? 'ok' : 'err');
+  if (!escalated) fails++;
+  return { fails };
+}
+
+function dumpTable() {
+  clear();
+  const rows = measureAll().sort((a, b) => a.key.localeCompare(b.key));
+  log('<b>' + pad('key', 30) + num('dur', 7) + num('peak', 7) + num('rms', 7) + num('mix', 6) +
+      num('centroid', 10) + num('roll85', 8) + num('hi%', 6) + num('atk ms', 8) + '</b>');
+  for (const a of rows) {
+    log(pad(a.key, 30) + num(a.dur, 7, 2) + num(a.peak, 7, 2) + num(a.rms, 7, 3) + num(a.mixPeak, 6, 2) +
+        num(a.centroid, 10, 0) + num(a.rolloff85, 8, 0) + num(a.hiRatio * 100, 6, 1) + num(a.attackMs, 8, 1));
+  }
+}
+
+async function verify() {
+  const t0 = performance.now();
+  const k = verifyKeys();
+  const kl = lines.slice();
+  const c = verifyContrasts();
+  const cl = lines.slice();
+  const m = await verifyMix();
+  const ml = lines.slice();
+  const a = await verifyAmbience();
+  const al = lines.slice();
+  const mu = await verifyMusic();
+  const mul = lines.slice();
+  lines.length = 0;
+  lines.push(...kl, '', ...cl, '', ...ml, '', ...al, '', ...mul, '');
+  const fails = k.bad + c.fails + mu.fails + (m.clipped ? 1 : 0) + a.filter(r => !r.alive || !r.evolving).length;
+  log(`<b>SUMMARY</b>  ${k.total} keys · ${k.bad} silent/broken · ${k.warn} warnings · ${c.fails} contrast failures · ` +
+      `mix peak ${m.peak.toFixed(3)} · ${mu.fails} music failures · total ${fails} failures · ${(performance.now() - t0).toFixed(0)} ms`,
+    fails ? 'err' : 'ok');
+  console.log('[VERIFY] DONE failures=' + fails);
+  return fails;
+}
+
+async function demoCombat() {
+  await audio.resume();
+  audio.ambience('sunderwood', 1);
+  audio.music('explore');
+  audio.setIntensity(0);
+  await sleep(9000);
+  audio.setIntensity(1, true);
+  for (let i = 0; i < 14; i++) {
+    audio.sfx(['spell.emberbolt.cast', 'spell.emberbolt.impact', 'enemy.husk.hit', 'enemy.husk.attack', 'wood_break'][i % 5],
+      { x: (Math.random() - 0.5) * 1200, y: 0 });
+    await sleep(700);
+  }
+  audio.setIntensity(0);
+}
+
+async function sweepPan() {
+  for (let x = -3000; x <= 3000; x += 500) {
+    audio.sfx('metal_clang', { x, y: 0 });
+    await sleep(260);
+  }
+}
+
+const T = {
+  audio, verify, verifyKeys, verifyContrasts, verifyMix, verifyAmbience, verifyMusic, dumpTable,
+  demoCombat, sweepPan, sweepMaterials, burst, fullCollapse,
+  fire: (k) => audio.sfx(k, { x: src.x, y: src.y }),
+  hitstop: (s = 0.06, d = 0.12) => { fakeTs = s; setTimeout(() => { fakeTs = 1; }, d * 1000); },
+};
+window.T = T;
+window.__audioTest = T;
+console.log('[audio-test] ready. window.__audioTest.verify()');
+</script>
+</body>
+</html>

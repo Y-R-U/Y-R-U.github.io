@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — sim test</title>
+<style>
+  html,body{margin:0;height:100%;background:#06060a;overflow:hidden;touch-action:none;
+    font:500 12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6f2;
+    -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  body{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #hud{position:absolute;top:0;left:0;padding:calc(8px + env(safe-area-inset-top)) 10px 8px calc(10px + env(safe-area-inset-left));
+    pointer-events:none;text-shadow:0 1px 3px #000;line-height:1.5;white-space:pre}
+  #hud b{color:#ffc24d;font-weight:600}
+  #hud .bad{color:#ff7b6b}
+  #panel{position:absolute;right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));
+    display:flex;flex-direction:column;gap:5px;align-items:stretch;max-height:92%;overflow:auto}
+  button{font:600 11px/1 ui-monospace,monospace;letter-spacing:.05em;color:#dfe6f2;background:#161622cc;
+    border:1px solid #2c2c3f;border-radius:6px;padding:7px 9px;cursor:pointer;text-align:left}
+  button.on{background:#3a2a12cc;border-color:#7a5a20;color:#ffc24d}
+  .sep{height:6px}
+  .lab{color:#6e6a80;font-size:10px;letter-spacing:.14em;padding:2px 0 0 2px}
+  #tip{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    color:#6e6a80;pointer-events:none;white-space:nowrap;font-size:11px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud"></div>
+<div id="panel">
+  <div class="lab">DESTRUCTION</div>
+  <button data-demo="arch">collapse the arch</button>
+  <button data-demo="bridge">drop the bridge</button>
+  <button data-demo="wall">blow the wall</button>
+  <button data-demo="fire">ignite the tree line</button>
+  <button data-demo="acid">pour acid</button>
+  <button data-demo="tree">fell a tree</button>
+  <button data-demo="crates">smash the crates</button>
+  <button data-demo="quake">sunderquake (here)</button>
+  <div class="sep"></div>
+  <div class="lab">DEBUG</div>
+  <button data-dbg="aabb">AABBs</button>
+  <button data-dbg="grid">terrain grid</button>
+  <button data-dbg="support">support graph</button>
+  <button data-dbg="surfaces">surface cells</button>
+  <button data-dbg="rubble">rubble field</button>
+  <button data-dbg="player">controller</button>
+</div>
+<div id="tip">A/D move · Space jump · Shift dash · click = impact blast · right-click = fire blast</div>
+
+<script>window.__simHarness = true;</script>
+<script type="module">
+import { createRenderer, LAYER } from './js/gfx/renderer.js';
+import { createParticles } from './js/gfx/particles.js';
+import { createAssets } from './js/gfx/texture.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createBus } from './js/core/events.js';
+import { createRNG } from './js/core/rng.js';
+import { createLoop, DT } from './js/core/loop.js';
+import { createPlayScene } from './js/sim/index.js';
+
+const q = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const R = await createRenderer(canvas);
+const P = createParticles(R);
+const input = createInput(canvas, view, bus);
+const rng = createRNG(q.get('seed') || 'sunderfall-sim');
+const assets = createAssets(R.gl, '');
+
+R.resize(view.w, view.h, view.dpr, view.worldW);
+view.onResize(() => R.resize(view.w, view.h, view.dpr, view.worldW));
+
+const audio = { stub: true, sfx() {}, play() {}, music() {}, stopMusic() {} };
+const ctx = { R, P, input, view, bus, rng, assets, audio, LAYER, DT, debug: true };
+
+const scene = await createPlayScene(ctx);
+const world = ctx.world;
+if (q.has('zoom')) world.cam.zoom = parseFloat(q.get('zoom'));
+await scene.enter(ctx, {});
+
+/* ------------- scripted blasts, so the page is testable without hands ------------- */
+input.onTap(() => {});
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener('pointerdown', (e) => {
+  const w = view.toWorld(e.clientX, e.clientY);
+  const x = w.x, y = w.y;
+  if (e.button === 2) world.explode(x, y, { radius: 200, damage: 90, type: 'fire', force: 700, terrain: true, igniteChance: 1 });
+  else world.explode(x, y, { radius: 170, damage: 110, type: 'impact', force: 800, terrain: true });
+});
+
+for (const b of document.querySelectorAll('[data-demo]')) {
+  b.onclick = () => scene.demo(b.dataset.demo);
+}
+for (const b of document.querySelectorAll('[data-dbg]')) {
+  b.onclick = () => { const k = b.dataset.dbg; world.debug[k] = !world.debug[k]; b.classList.toggle('on', world.debug[k]); };
+}
+
+const hud = document.getElementById('hud');
+let acc = 0;
+const loop = createLoop({
+  getTimeScale: () => R.fx.getTimeScale(),
+  update(dt) { input.update(); scene.update(dt); P.update(dt); },
+  render(alpha, real) {
+    R.tick(real);
+    scene.render(alpha);
+    acc += real;
+    if (acc > 0.12) {
+      acc = 0;
+      const s = world.stats, st = R.stats, p = world.player;
+      hud.innerHTML =
+        `<b>${loop.fps.toFixed(0)} fps</b>  ${loop.ms.toFixed(1)}ms   draws ${st.drawCalls}  spr ${st.sprites}  lights ${st.lights}\n` +
+        `ents ${s.entities}  props ${s.props}  debris ${s.debris} (<b>${s.awake}</b> awake)  fluid ${s.surfaceCells}  parts ${P.count}\n` +
+        `chunks ${s.chunksDrawn}   ${p ? `rook ${p.data.state}  x ${p.x | 0} y ${p.y | 0}  vx ${p.vx | 0} vy ${p.vy | 0}` : ''}`;
+    }
+  },
+});
+loop.start();
+
+function fastForward(seconds) {
+  const n = Math.min(3600, Math.round(seconds * 60));
+  for (let i = 0; i < n; i++) { input.update(); scene.update(DT); P.update(DT); }
+}
+
+window.__sim = {
+  world, ctx, R, P, view, input, loop, scene,
+  demo: (n) => scene.demo(n),
+  fastForward,
+  stats: () => ({ ...world.stats, fps: loop.fps, draws: R.stats.drawCalls, parts: P.count }),
+  set(k, v) { world.debug[k] = v; },
+};
+
+for (const a of ['right', 'left', 'jump', 'dash']) if (q.has(a)) input.setAction(a, true);
+
+/* URL driving: ?demo=arch&t=3  — run a demo then fast-forward before the shot */
+const demo = q.get('demo');
+if (demo) {
+  const names = demo === 'all' ? ['crates', 'tree', 'fire', 'arch', 'bridge', 'acid'] : demo.split(',');
+  for (const n of names) scene.demo(n);
+}
+const t = parseFloat(q.get('t') || '0');
+if (t > 0) fastForward(t);
+if (q.has('auto')) {
+  const all = ['crates', 'tree', 'fire', 'arch', 'bridge', 'acid', 'wall', 'quake'];
+  let i = 0;
+  setInterval(() => scene.demo(all[i++ % all.length]), 4000);
+}
+for (const k of ['aabb', 'grid', 'support', 'surfaces', 'rubble', 'player']) {
+  if (q.has(k)) {
+    world.debug[k] = true;
+    const b = document.querySelector(`[data-dbg="${k}"]`);
+    if (b) b.classList.add('on');
+  }
+}
+</script>
+</body>
+</html>

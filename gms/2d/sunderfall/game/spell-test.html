@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — spell range</title>
+<style>
+  html,body{margin:0;height:100%;background:#05050a;overflow:hidden;touch-action:none;
+    font:500 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6f2;
+    -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  body{position:fixed;inset:0}
+  canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #hud{position:absolute;top:0;left:0;padding:8px 10px;pointer-events:none;text-shadow:0 1px 3px #000;line-height:1.6}
+  #hud b{color:#ffc24d;font-weight:600}
+  #hud .dim{color:#7c7a8c}
+  #panel{position:absolute;right:8px;top:8px;bottom:8px;width:210px;overflow:auto;
+    display:flex;flex-direction:column;gap:4px;padding:8px;background:#0c0c14cc;
+    border:1px solid #23232f;border-radius:8px;scrollbar-width:thin}
+  #panel h4{margin:6px 0 2px;font-size:10px;letter-spacing:.14em;color:#6d6a80;font-weight:600;text-transform:uppercase}
+  .sp{display:flex;align-items:center;gap:6px;padding:3px 5px;border:1px solid #22222e;border-radius:6px;
+    background:#12121c;cursor:pointer}
+  .sp:hover{background:#1c1c2a;border-color:#3a3a52}
+  .sp canvas{width:24px;height:24px;flex:none}
+  .sp span{flex:1;font-size:10.5px}
+  .sp .r{color:#ffc24d;font-size:9.5px}
+  #rank{display:flex;gap:3px;margin:4px 0}
+  #rank button{flex:1;padding:5px 0}
+  button{font:600 10px/1 ui-monospace,monospace;letter-spacing:.05em;color:#cfd6e4;background:#161622;
+    border:1px solid #2c2c3f;border-radius:5px;padding:6px 7px;cursor:pointer}
+  button.on{background:#3a2a12;border-color:#7a5a20;color:#ffc24d}
+  #tip{position:absolute;left:10px;bottom:8px;color:#5d5a70;pointer-events:none}
+  #bar{position:absolute;left:10px;bottom:26px;width:260px;height:9px;background:#12121c;border:1px solid #2a2a3a;border-radius:5px;overflow:hidden}
+  #bar i{display:block;height:100%;background:linear-gradient(90deg,#3f6fd0,#7fc4ff);width:100%}
+  #circles{position:absolute;left:10px;bottom:44px;display:flex;gap:5px}
+  .circ{width:38px;height:38px;border-radius:50%;border:2px solid #33334a;background:#0e0e18;
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .circ canvas{width:26px;height:26px}
+  .circ.locked{opacity:.28}
+  .circ i{position:absolute;inset:-2px;border-radius:50%;border:2px solid #ffc24d;clip-path:inset(0 0 0 0)}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud"></div>
+<div id="circles"></div>
+<div id="bar"><i></i></div>
+<div id="tip">click = cast selected · 1–5 cast circle · Q/E rank · A/D move · SPACE jump · R reset · X cast everything</div>
+<div id="panel"></div>
+
+<script type="module">
+import { createRenderer, LAYER } from './js/gfx/renderer.js';
+import { createParticles } from './js/gfx/particles.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createBus } from './js/core/events.js';
+import { createRNG } from './js/core/rng.js';
+import { createLoop, DT } from './js/core/loop.js';
+import { clamp, damp } from './js/core/math.js';
+import { createTestWorld } from './js/spells/testkit/shim.js';
+import { buildRange, spawnDummies, spawnDummy } from './js/spells/testkit/range.js';
+import { SPELLS } from './js/spells/registry.js';
+
+const q = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const R = await createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve') });
+const P = createParticles(R);
+const input = createInput(canvas, view, bus);
+const rng = createRNG(q.get('seed') || 'spellrange');
+
+const audioLog = [];
+const audio = {
+  stub: true,
+  sfx(key, at) { audioLog.push(key); if (audioLog.length > 400) audioLog.shift(); },
+  play() {}, music() {}, stopMusic() {}, setVolume() {}, resume() {}, unlock() {},
+};
+
+const ctx = { R, P, input, view, bus, rng, audio, assets: null, LAYER, DT, debug: false };
+
+R.resize(view.w, view.h, view.dpr, view.worldW);
+view.onResize(() => R.resize(view.w, view.h, view.dpr, view.worldW));
+
+/* ---------------- scene look: night forest, one warm key ---------------- */
+// brighter than the game will be: this is a proving range, and a spell that
+// cannot be judged in a still frame cannot be judged at all
+R.setAmbient(0.44, 0.47, 0.60);
+R.setHaze(0.26, 0.34, 0.52);
+R.setClearColor(0.035, 0.044, 0.078);
+R.fx.vignette(0.5);
+R.fx.bloom = 0.62; R.fx.threshold = 0.85; R.fx.knee = 0.30;
+R.fx.exposure = 1.0; R.fx.grain = 0.022; R.fx.saturation = 1.05; R.fx.contrast = 1.13;
+R.setLayer(LAYER.FG_OCCLUDE, { response: 0.26, mul: [0.42, 0.46, 0.58] });
+
+/* ---------------- backdrop, so the range is not a void ---------------- */
+const bank = [];
+const put = (tex, x, y, w, h, r, g, b, a, layer, add, rot) =>
+  bank.push({ tex, x, y, w, h, r, g, b, a, layer, add: !!add, rot: rot || 0 });
+function bg() {
+  for (let i = 0; i < 220; i++) {
+    const s = rng.range(2, 6);
+    put(R.blob, rng.range(-3000, 3200), rng.range(-1200, -420), s, s, rng.range(0.7, 1), 0.9, 1, rng.range(0.2, 0.8), LAYER.SKY, true);
+  }
+  put(R.blob, 900, -700, 1100, 1100, 0.55, 0.68, 1.0, 0.26, LAYER.SKY, true);
+  put(R.disc, 900, -700, 120, 120, 1, 0.97, 0.92, 1, LAYER.SKY, true);
+  for (let i = 0; i < 44; i++) {
+    const s = rng.range(180, 380);
+    put(R.blob, rng.range(-3200, 3400), -280 + rng.range(-70, 40), s * 2.4, s * 1.2, 0.28, 0.35, 0.52, rng.range(0.35, 0.7), LAYER.BG_FAR);
+  }
+  for (let i = 0; i < 60; i++) {                       // a band of distant trunks + canopy
+    const x = rng.range(-3000, 3200), h = rng.range(220, 440);
+    put(R.streak, x, rng.range(-60, 80) - h * 0.5, h * 0.14, h, 0.10, 0.14, 0.22, 1, LAYER.BG_MID);
+    const s = rng.range(90, 170);
+    put(R.blob, x + rng.range(-30, 30), rng.range(-70, 40) - h, s * 1.8, s, 0.085, 0.13, 0.20, rng.range(0.7, 1), LAYER.BG_MID);
+  }
+  for (let i = 0; i < 28; i++) {                       // near-black foreground foliage
+    const s = rng.range(140, 320);
+    put(R.blob, rng.range(-3000, 3200), rng.range(-900, -640), s * 1.7, s, 0.045, 0.05, 0.08, rng.range(0.7, 1), LAYER.FG_OCCLUDE, false, rng.angle());
+  }
+}
+bg();
+function drawBg() {
+  for (let i = 0; i < bank.length; i++) R.sprite(bank[i]);
+  // one cool fill from the moon, one warm key on the arch — the art direction
+  R.light({ x: 900, y: -700, radius: 3400, r: 0.62, g: 0.74, b: 1.0, intensity: 0.95 });
+  R.light({ x: 100, y: -40, radius: 1500, r: 1.0, g: 0.70, b: 0.40, intensity: 0.85, flicker: 0.05 });
+  R.light({ x: -1200, y: 40, radius: 1200, r: 0.66, g: 0.76, b: 1.0, intensity: 0.5 });
+  R.light({ x: 1700, y: 0, radius: 1200, r: 1.0, g: 0.74, b: 0.46, intensity: 0.55, flicker: 0.1 });
+}
+
+/* ---------------- world ---------------- */
+const world = createTestWorld(ctx, {});
+let range = buildRange(world, ctx);
+let dummies = spawnDummies(world, ctx);
+const player = world.makePlayer(parseFloat(q.get('px') || '-300'), -60);
+ctx.world = world;
+
+const system = SPELLS.createSystem(ctx, { manualInput: false });
+system.attachWorld(world);
+for (const s of SPELLS) system.learn(s.id, 1);
+system.level = 24;
+system.focusMax = 100; system.focus = 100;
+for (let i = 0; i < 5; i++) system.circles[i].unlocked = true;
+system.setSlot(0, 'emberbolt');
+system.autoEnabled = false;
+
+/* ---------------- test UI ---------------- */
+let selected = q.get('spell') || 'emberbolt';
+let rank = clamp(parseInt(q.get('rank') || '1', 10) || 1, 1, 5);
+const panel = document.getElementById('panel');
+const schools = ['fire', 'storm', 'earth', 'decay', 'void', 'life'];
+const rankRow = document.createElement('div');
+rankRow.id = 'rank';
+for (let r = 1; r <= 5; r++) {
+  const b = document.createElement('button');
+  b.textContent = 'R' + r;
+  b.onclick = () => { rank = r; syncUI(); };
+  b.dataset.rank = r;
+  rankRow.appendChild(b);
+}
+panel.appendChild(rankRow);
+const cards = [];
+for (const school of schools) {
+  const h = document.createElement('h4');
+  h.textContent = school;
+  panel.appendChild(h);
+  for (const def of SPELLS.filter((s) => s.school === school)) {
+    const el = document.createElement('div');
+    el.className = 'sp';
+    const c = document.createElement('canvas');
+    c.width = 48; c.height = 48;
+    def.icon(c.getContext('2d'), 48);
+    const s = document.createElement('span');
+    s.textContent = def.name;
+    el.appendChild(c); el.appendChild(s);
+    el.onclick = () => { selected = def.id; syncUI(); };
+    el.dataset.id = def.id;
+    panel.appendChild(el);
+    cards.push(el);
+  }
+}
+const extra = document.createElement('div');
+extra.style.cssText = 'display:flex;gap:4px;margin-top:8px;flex-wrap:wrap';
+const mkBtn = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.onclick = fn; extra.appendChild(b); return b; };
+mkBtn('RESET', () => reset());
+mkBtn('CAST ALL', () => castEverything());
+mkBtn('AUTO', function () { system.autoEnabled = !system.autoEnabled; this.classList.toggle('on', system.autoEnabled); });
+mkBtn('+DUMMY', () => spawnDummy(world, player.x + 260, world.groundY(player.x + 260, -400, 1200) || 0, { mobile: true }));
+mkBtn('+8s', () => fastForward(8));
+panel.appendChild(extra);
+
+function syncUI() {
+  for (const el of cards) el.classList.toggle('on', el.dataset.id === selected);
+  for (const b of rankRow.children) b.classList.toggle('on', +b.dataset.rank === rank);
+  for (const el of cards) {
+    if (el.dataset.id === selected) el.style.borderColor = '#7a5a20';
+    else el.style.borderColor = '#22222e';
+  }
+}
+syncUI();
+
+/* cast circles readout */
+const circlesEl = document.getElementById('circles');
+const circleIcons = [];
+for (let i = 0; i < 5; i++) {
+  const d = document.createElement('div');
+  d.className = 'circ';
+  const c = document.createElement('canvas');
+  c.width = 52; c.height = 52;
+  d.appendChild(c);
+  circlesEl.appendChild(d);
+  circleIcons.push({ el: d, c });
+}
+function drawCircles() {
+  for (let i = 0; i < 5; i++) {
+    const cc = system.circles[i];
+    const g = circleIcons[i].c.getContext('2d');
+    g.clearRect(0, 0, 52, 52);
+    if (cc.def) cc.def.icon(g, 52);
+    circleIcons[i].el.classList.toggle('locked', !cc.unlocked);
+    circleIcons[i].el.style.borderColor = cc.cd > 0 ? '#33334a' : (cc.def ? '#7a5a20' : '#33334a');
+  }
+}
+
+/* ---------------- input ---------------- */
+input.onTap((e) => cast(e.worldX, e.worldY));
+window.addEventListener('keydown', (ev) => {
+  if (ev.code === 'KeyR') { reset(); ev.preventDefault(); }
+  if (ev.code === 'KeyX') { castEverything(); ev.preventDefault(); }
+  if (ev.code === 'KeyQ') { rank = Math.max(1, rank - 1); syncUI(); }
+  if (ev.code === 'KeyE') { rank = Math.min(5, rank + 1); syncUI(); }
+  if (/^Digit[1-5]$/.test(ev.code)) {
+    const i = +ev.code.slice(5) - 1;
+    system.castSlot(i, true, false);
+  }
+});
+
+function cast(x, y) {
+  system.castSpell(selected, rank, { x, y, manual: true });
+}
+
+/** Everything at once, spread across the range. The frame-budget stress test. */
+function castEverything() {
+  for (let i = 0; i < SPELLS.length; i++) {
+    const x = player.x + (i - SPELLS.length * 0.5) * 150 + rng.range(-40, 40);
+    const gy = world.groundY(x, -600, 1600);
+    system.castSpell(SPELLS[i].id, rank, { x, y: Number.isNaN(gy) ? player.y : gy - 70, manual: true });
+  }
+}
+
+function reset() { location.reload(); }
+
+function fastForward(seconds) {
+  const n = Math.round(seconds / DT);
+  for (let i = 0; i < n; i++) world.step(DT);
+}
+
+/* ---------------- loop ---------------- */
+const cam = { x: 0, y: -160, zoom: 1 };
+view.setCamera(cam);
+const hud = document.getElementById('hud');
+const bar = document.querySelector('#bar i');
+let hudT = 0;
+
+let frozen = false;
+function update(dt) {
+  input.update();
+  if (frozen) return;
+  world.step(dt);
+  const tx = clamp(player.x + 220, -1500, 2100);
+  cam.x = damp(cam.x, tx, 0.004, dt);
+  cam.y = damp(cam.y, player.y - 150, 0.006, dt);
+}
+
+function render(alpha, real) {
+  R.tick(real);
+  R.begin(cam);
+  drawBg();
+  world.draw(alpha);
+  P.render();
+  R.end();
+}
+
+const loop = createLoop({
+  getTimeScale: () => R.fx.getTimeScale(),
+  update,
+  render(alpha, real) {
+    render(alpha, real);
+    hudT += real;
+    if (hudT > 0.2) {
+      hudT = 0;
+      const st = world.stats;
+      hud.innerHTML =
+        `<b>${loop.fps | 0}</b> fps · ${R.stats.drawCalls} draws · ${R.stats.sprites} spr · ${P.count} ptc<br>` +
+        `<span class="dim">ent</span> ${st.entities} <span class="dim">props</span> ${st.props} ` +
+        `<span class="dim">debris</span> ${st.debris} <span class="dim">fluid</span> ${st.surfaceCells}<br>` +
+        `<span class="dim">selected</span> <b>${selected}</b> R${rank} · ` +
+        `<span class="dim">focus</span> ${system.focus.toFixed(0)}/${system.focusMax}` +
+        (system.starving ? ' <b>STARVED</b>' : '') + '<br>' +
+        `<span class="dim">fire</span> ${world.surfaces.count('fire')} <span class="dim">acid</span> ${world.surfaces.count('acid')} ` +
+        `<span class="dim">rot</span> ${world.surfaces.count('rot')} <span class="dim">void</span> ${world.surfaces.count('void')} ` +
+        `<span class="dim">ash</span> ${world.surfaces.count('ash')}`;
+      bar.style.width = (system.focus / system.focusMax * 100) + '%';
+      drawCircles();
+    }
+  },
+});
+
+/* ---------------- headless entry points ---------------- */
+window.__spell = {
+  world, ctx, R, P, system, SPELLS, player, loop,
+  cast: (id, r, x, y) => system.castSpell(id, r || rank, { x, y, manual: true }),
+  select: (id, r) => { selected = id; if (r) rank = r; syncUI(); },
+  fastForward, castEverything,
+  audioKeys: () => Array.from(new Set(audioLog)),
+  stats: () => ({ fps: loop.fps, draws: R.stats.drawCalls, particles: P.count, ...world.stats }),
+};
+
+/**
+ * URL: ?spell=acidrain&rank=5&t=4
+ * Casts, fast-forwards `t` seconds, then FREEZES so a headless screenshot lands
+ * on exactly that moment — the page keeps rendering but the sim stops, because
+ * shot.mjs's own settle time would otherwise eat several seconds of the effect.
+ * Add &live to let it keep running.
+ */
+const autoSpell = q.get('spell');
+const autoT = parseFloat(q.get('t') || '0');
+const autoX = parseFloat(q.get('x') || '300');
+
+function aimPoint() {
+  const t = world.nearestEnemy(player.x + autoX, player.y - 40, 900);
+  if (t) return { x: t.x, y: t.y };
+  const gy = world.groundY(player.x + autoX, -600, 1600);
+  return { x: player.x + autoX, y: Number.isNaN(gy) ? player.y : gy - 70 };
+}
+
+if (q.has('all')) castEverything();
+else if (autoSpell) {
+  const a = aimPoint();
+  system.castSpell(autoSpell, rank, { x: a.x, y: a.y, manual: true });
+}
+if (autoSpell || q.has('all') || autoT > 0) {
+  cam.x = clamp(player.x + 220, -1500, 2100);
+  cam.y = player.y - 150;
+}
+if (autoT > 0) fastForward(autoT);
+if ((autoSpell || q.has('all')) && !q.has('live')) frozen = true;
+if (q.has('auto')) system.autoEnabled = true;
+
+loop.start();
+console.info('[spell-test] ready —', SPELLS.length, 'spells');
+</script>
+</body>
+</html>
