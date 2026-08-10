@@ -16,6 +16,9 @@ import { C, A, clamp01, easeOutCubic, txt } from './theme.js';
 
 const TAU = Math.PI * 2;
 const TAP_PX = 14;
+// how far off horizontal the movement stick has to be before it takes aim, and
+// how far it must come back before it gives it up again
+const STICK_AIM_ON = 0.50, STICK_AIM_OFF = 0.34;
 
 export function createTouch(ctx, L, hooks) {
   const input = ctx.input;
@@ -24,7 +27,9 @@ export function createTouch(ctx, L, hooks) {
 
   const stick = { active: false, ox: 0, oy: 0, x: 0, y: 0, r: 60, k: 0, id: -1 };
   const act = { id: -1, x: 0, y: 0, x0: 0, y0: 0, t0: 0, moved: false, flash: 0 };
-  const aim = { active: false, x: 0, y: 0 };
+  /* `dx, dy` is a unit direction, not a screen point — see input.setAimVector.
+   * `from` says which thumb owns it, because both can aim and the right one wins. */
+  const aim = { active: false, x: 0, y: 0, dx: 0, dy: 0, from: '' };
   /* Jump is pressed on touch-DOWN and held for as long as the finger is down.
    *
    * It used to fire on touch-UP, from a tap/drag arbitration, and hold for three
@@ -70,13 +75,19 @@ export function createTouch(ctx, L, hooks) {
     // The swap picker floats over the circles it belongs to, so it gets first
     // refusal on every press — including the one that dismisses it.
     if (hooks.onPointerDown && hooks.onPointerDown(p.x, p.y)) return;
-    const ci = L.circleAt(p.x, p.y);
+    // -2 = inside the thumb cluster but off every circle. It must NOT fall
+    // through to the jump flank behind it: "I tapped the button and he jumped"
+    // was every miss of a 44px target, plus the whole band under it.
+    const ci = L.clusterAt(p.x, p.y);
     if (ci >= 0) { hooks.onCirclePress(ci, p.x, p.y); return; }
     if (!L.touch) return;
     if (inRect(L.stickZone, p.x, p.y)) {
+      // the cluster disc can lap over the stick's edge; the stick still wins there
       stick.active = true; stick.id = e.pointerId;
       stick.ox = stick.x = p.x; stick.oy = stick.y = p.y;
       stick.r = Math.max(36, Math.min(L.stickZone.w, L.stickZone.h) * 0.36);
+    } else if (ci === -2) {
+      // swallowed: inside the cluster, off every circle, so it is a missed cast
     } else if (inRect(L.actZone, p.x, p.y)) {
       act.id = e.pointerId;
       act.x = act.x0 = p.x; act.y = act.y0 = p.y;
@@ -94,8 +105,16 @@ export function createTouch(ctx, L, hooks) {
     } else if (e.pointerId === act.id) {
       const p = local(e);
       act.x = p.x; act.y = p.y;
-      if (!act.moved && (Math.abs(p.x - act.x0) > TAP_PX || Math.abs(p.y - act.y0) > TAP_PX)) act.moved = true;
-      if (act.moved) { aim.active = true; aim.x = p.x; aim.y = p.y; }
+      if (!act.moved && (Math.abs(p.x - act.x0) > TAP_PX || Math.abs(p.y - act.y0) > TAP_PX)) {
+        act.moved = true;
+        // A drag is an aim, not a jump. Letting the hold stand meant every
+        // attempt to aim also launched him — and aiming DOWN launched him up.
+        jumpRelease = true;
+      }
+      if (act.moved) {
+        aim.active = true; aim.x = p.x; aim.y = p.y; aim.from = 'act';
+        aim.dx = p.x - act.x0; aim.dy = p.y - act.y0;
+      }
     }
   }
 
@@ -104,7 +123,7 @@ export function createTouch(ctx, L, hooks) {
     if (e.pointerId === act.id) {
       jumpRelease = true;
       act.id = -1;
-      aim.active = false;
+      if (aim.from === 'act') { aim.active = false; aim.from = ''; }
     }
     for (let i = 0; i < 5; i++) hooks.onCircleRelease(i);
   }
@@ -122,9 +141,10 @@ export function createTouch(ctx, L, hooks) {
       // clear on BOTH transitions — re-enabling with a stale stick.id meant the
       // knob stayed stuck to a finger that had long since lifted
       stick.active = false; stick.id = -1;
-      act.id = -1; aim.active = false;
+      act.id = -1; aim.active = false; aim.from = '';
       jumpDown = false; jumpRelease = false; jumpMin = 0;
       input.setAction('jump', false);
+      if (input.clearAimVector) input.clearAimVector();
     },
 
     update() {
@@ -132,13 +152,32 @@ export function createTouch(ctx, L, hooks) {
         if (jumpMin > 0) jumpMin--;
         if (jumpRelease && jumpMin <= 0) { jumpDown = false; input.setAction('jump', false); }
       }
-      // A drag on the right flank must beat auto-aim. core/input.js rebuilds `aim` from
-      // `pointerScreen` every tick, so writing that is the supported way in.
-      if (aim.active) {
-        input.pointerScreen.x = aim.x;
-        input.pointerScreen.y = aim.y;
-        // take aim authority off the sim's auto-aim for as long as the drag lasts
-        if (input.holdAim) input.holdAim();
+
+      /* Aiming down.
+       *
+       * The movement stick's vertical axis drove nothing at all — `up` and
+       * `down` were set and never read — while the only way to aim was a drag
+       * on the far side of the screen, which is the thumb that is also holding
+       * jump. So: push the stick down and the shot goes down. It only claims
+       * aim once the stick is properly off horizontal, so running left and
+       * right never steals auto-aim off an enemy, and it releases with
+       * hysteresis so a wobbling thumb does not flicker between the two. */
+      if (stick.active && L.touch && aim.from !== 'act') {
+        let dx = stick.x - stick.ox, dy = stick.y - stick.oy;
+        const m = Math.hypot(dx, dy);
+        if (m > stick.r) { dx = dx / m * stick.r; dy = dy / m * stick.r; }
+        const vy = dy / stick.r;
+        const on = aim.from === 'stick' ? Math.abs(vy) > STICK_AIM_OFF : Math.abs(vy) > STICK_AIM_ON;
+        if (on) { aim.active = true; aim.from = 'stick'; aim.dx = dx; aim.dy = dy; }
+        else if (aim.from === 'stick') { aim.active = false; aim.from = ''; }
+      } else if (aim.from === 'stick') {
+        aim.active = false; aim.from = '';
+      }
+
+      if (aim.active && input.setAimVector) {
+        input.setAimVector(aim.dx, aim.dy, aim.from);
+      } else if (input.clearAimVector) {
+        input.clearAimVector();
       }
     },
 
@@ -184,17 +223,34 @@ export function createTouch(ctx, L, hooks) {
         c.globalAlpha = 1;
       }
 
+      // Aim is a direction now, so the readout is an arrow out of the thumb that
+      // owns it — a crosshair sitting under the finger said "the shot goes
+      // HERE", which was exactly the lie that made aiming down feel broken.
       if (aim.active) {
+        const m = Math.hypot(aim.dx, aim.dy) || 1;
+        const ux = aim.dx / m, uy = aim.dy / m;
+        const ox = aim.from === 'stick' ? stick.ox : act.x0;
+        const oy = aim.from === 'stick' ? stick.oy : act.y0;
+        const len = 54;
         c.save();
-        c.globalAlpha = 0.85;
-        c.beginPath(); c.arc(aim.x, aim.y, 17, 0, TAU);
-        c.lineWidth = 1.8; c.strokeStyle = A(C.ember, 0.9); c.stroke();
+        c.globalAlpha = 0.9;
+        c.lineWidth = 2.2;
+        c.strokeStyle = A(C.ember, 0.85);
         c.beginPath();
-        c.moveTo(aim.x - 25, aim.y); c.lineTo(aim.x - 9, aim.y);
-        c.moveTo(aim.x + 9, aim.y); c.lineTo(aim.x + 25, aim.y);
-        c.moveTo(aim.x, aim.y - 25); c.lineTo(aim.x, aim.y - 9);
-        c.moveTo(aim.x, aim.y + 9); c.lineTo(aim.x, aim.y + 25);
-        c.lineWidth = 1.4; c.strokeStyle = A(C.emberL, 0.75); c.stroke();
+        c.moveTo(ox + ux * 22, oy + uy * 22);
+        c.lineTo(ox + ux * len, oy + uy * len);
+        c.stroke();
+        const hx = ox + ux * (len + 9), hy = oy + uy * (len + 9);
+        c.beginPath();
+        c.moveTo(hx, hy);
+        c.lineTo(hx - ux * 13 - uy * 8, hy - uy * 13 + ux * 8);
+        c.lineTo(hx - ux * 13 + uy * 8, hy - uy * 13 - ux * 8);
+        c.closePath();
+        c.fillStyle = A(C.emberL, 0.9); c.fill();
+        if (aim.from === 'act') {
+          c.beginPath(); c.arc(ox, oy, 16, 0, TAU);
+          c.lineWidth = 1.4; c.strokeStyle = A(C.ember, 0.35); c.stroke();
+        }
         c.restore();
         c.globalAlpha = 1;
       }
@@ -206,7 +262,12 @@ export function createTouch(ctx, L, hooks) {
       c.save();
       c.globalAlpha = k * 0.55;
       const y = L.stickZone.y + L.stickZone.h * 0.55;
-      txt(c, 'HOLD TO MOVE', L.stickZone.x + L.stickZone.w * 0.5, y, 9.5, C.dim,
+      const sx = L.stickZone.x + L.stickZone.w * 0.5;
+      txt(c, 'HOLD TO MOVE', sx, y, 9.5, C.dim,
+        { align: 'center', base: 'middle', track: 2, weight: 700 });
+      txt(c, 'PULL DOWN TO', sx, y + 16, 9.5, C.dim,
+        { align: 'center', base: 'middle', track: 2, weight: 700 });
+      txt(c, 'AIM DOWN', sx, y + 32, 9.5, C.dim,
         { align: 'center', base: 'middle', track: 2, weight: 700 });
       const ax = L.actZone.x + L.actZone.w * 0.5;
       // three short lines, not two long ones — at 9.5px with tracking, anything

@@ -483,6 +483,67 @@ function blockedHint(world, e, dt, ax) {
 }
 
 const AUTO_AIM_RANGE = 820;
+const AUTO_PROP_RANGE = 600;
+
+/**
+ * The blocker auto-aim.
+ *
+ * With no enemy up, aim used to default to a point 340px ahead at head height —
+ * which sails clean over a crate and misses anything below you entirely. Half
+ * this game is deciding what to break, so with nothing to fight the aim goes to
+ * the nearest thing that is actually in the way.
+ *
+ * Only SOLID props: fences and ferns are walked and shot straight through, so
+ * targeting one is targeting scenery. And never the structure holding him up —
+ * an auto-cast circle chewing through the bridge under his own feet is a death
+ * he never asked for. That means the prop underfoot, whatever props that up,
+ * and its siblings on the same supports: the bridge deck is four segments on
+ * shared pillars, so excluding only the one he stands on still had the aim
+ * quietly demolishing the span he was about to walk along.
+ */
+const propBuf = [];
+const safeBuf = [];
+function standingSet(world, e) {
+  safeBuf.length = 0;
+  if (!e.onGround) return safeBuf;
+  const stand = propBlocked(world, e.x, e.y + e.h * 0.5 + 4, e.w * 0.8, 10);
+  if (!stand) return safeBuf;
+  safeBuf.push(stand);
+  const sup = stand.supportedBy;
+  for (let i = 0; i < sup.length; i++) {
+    const s = sup[i];
+    if (safeBuf.indexOf(s) < 0) safeBuf.push(s);
+    for (let j = 0; j < s.supports.length; j++) {
+      const sib = s.supports[j];
+      if (safeBuf.indexOf(sib) < 0) safeBuf.push(sib);
+    }
+  }
+  return safeBuf;
+}
+
+function autoBlocker(world, e) {
+  if (!world.queryProps) return null;
+  const foot = e.y + e.h * 0.5;
+  const list = world.queryProps(e.x, e.y, AUTO_PROP_RANGE, propBuf);
+  if (!list.length) return null;
+  const safe = standingSet(world, e);
+
+  let best = null, bestScore = Infinity;
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i];
+    if (!p.solid || p.hp <= 0 || p.state === 'falling') continue;
+    if (safe.indexOf(p) >= 0) continue;
+    const dx = p.x - e.x, dy = p.y - (e.y - BODY_H * 0.1);
+    // behind him is not in the way; straight up or down still is
+    if (dx * e.faceX < -90 && Math.abs(dx) > 200) continue;
+    let score = Math.hypot(dx, dy);
+    // something whose top is above his feet is standing in the road, which
+    // beats a low kerb at the same distance
+    if (foot - p.top > 60) score *= 0.7;
+    if (score < bestScore) { bestScore = score; best = p; }
+  }
+  return best;
+}
 
 /**
  * Auto-aim. On touch there is no second stick: the thumbs are busy moving and
@@ -500,10 +561,14 @@ function autoAim(world, e, dt) {
   if (!input.aimIsManual || input.aimIsManual()) { input.autoTarget = null; return; }
   const d = e.data;
   const oy = e.y - BODY_H * 0.1;
-  const t = world.nearestEnemy ? world.nearestEnemy(e.x, oy, AUTO_AIM_RANGE) : null;
+  let t = world.nearestEnemy ? world.nearestEnemy(e.x, oy, AUTO_AIM_RANGE) : null;
   let tx, ty;
   if (t) { tx = t.x; ty = t.y - t.h * 0.12; }
-  else { tx = e.x + e.faceX * 340; ty = oy - 30; }
+  else {
+    t = autoBlocker(world, e);
+    if (t) { tx = t.x; ty = t.y; }
+    else { tx = e.x + e.faceX * 340; ty = oy - 30; }
+  }
   if (t !== d.aimTarget || d.aimX === undefined) {
     d.aimTarget = t; d.aimX = tx; d.aimY = ty;
   } else {

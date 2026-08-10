@@ -146,9 +146,20 @@ a rerun. Keep this light — the handcrafted spine matters more than the shuffle
 left-click or the slot-1 circle casts, E interacts, 1–5 select a circle to reassign, Esc pauses.
 
 **Mobile portrait:** left thumb virtual stick (appears where the thumb lands, not a fixed spot),
-right side has the cast circles arranged as a thumb-reachable arc; slot 1 is the big one. Aim is
-auto-assisted toward the nearest valid target, with drag-to-aim overriding it. Jump is a tap on the
-right side outside the circles. Everything within reach of one thumb; nothing important under it.
+right side has the cast circles arranged as a thumb-reachable arc; slot 1 is the big one. Jump is a
+press-and-hold on the right side outside the circles. Everything within reach of one thumb; nothing
+important under it.
+
+Aim is auto-assisted — nearest enemy, or with nothing to fight, the nearest thing standing in the
+way (never the thing he is standing on). Two gestures override it, and both take a **direction**
+rather than a screen point, because a thumb parked in the bottom-right corner cannot point at
+somewhere it is already sitting: **pull the movement stick off horizontal** to aim that way, or drag
+the right flank. The camera leans the way you aim.
+
+**Progress persists.** Level, XP, spells and their ranks, circle assignments, shards and the rolling
+checkpoint are written to localStorage, so closing the tab is not the end of the run. The *world* is
+not saved — a resume rebuilds the level intact and puts him back at his checkpoint. You keep the
+character, you replay the road. Dying and reloading still pays Vayne's ward; "Start over" wipes it.
 
 ## 7. Candidate: the playable prologue (post-v1, do not build yet)
 

@@ -6,6 +6,7 @@ import { createInput } from './core/input.js';
 import { createBus } from './core/events.js';
 import { createRNG } from './core/rng.js';
 import { createLoop, DT } from './core/loop.js';
+import { createProgress } from './core/progress.js';
 import { clamp, damp, lerp } from './core/math.js';
 
 export { LAYER, DT };
@@ -392,6 +393,30 @@ async function boot() {
   }
   scenes.register('play', playScene || createDemoScene(ctx));
 
+  /* Progress survives a refresh (core/progress.js). Booted here because the
+     spell system exists by now and the HUD mirrors it every tick, so restoring
+     the state is the whole of restoring the display. */
+  const progress = createProgress(ctx);
+  ctx.progress = progress;
+  const resumed = progress.boot();
+  if (resumed) {
+    // Said when he can actually read it — on the play screen, not over the
+    // intro, and not before the HUD it refers to is on.
+    const off = bus.on('scene:change', (e) => {
+      if (!e || e.name !== 'play') return;
+      off();
+      const S = ctx.spellSystem;
+      const lv = S ? S.level : 1;
+      setTimeout(() => {
+        if (ui && ui.toast) {
+          ui.toast(progress.wardOnBoot ? 'The ward held — level ' + lv : 'Picked up where you left off — level ' + lv,
+            { kind: 'good', value: 'LV' + lv, life: 4.5 });
+        }
+        bus.emit('bark', { who: 'rook', text: 'Right. Where was I.', priority: 1 });
+      }, 1500);
+    });
+  }
+
   /* The death screen's two buttons emitted these and nothing listened, so the
      only way out of a dead run was reloading the page. `play` rebuilds the
      whole level in enter(), so re-entering it IS the restart. */
@@ -429,6 +454,7 @@ async function boot() {
       if (sys && sys.softReset) sys.softReset();
       R.fx.timeScale(1, 0);
       await scenes.go('play');
+      progress.touch();
       tellWard();
     } finally { restarting = false; }
   });
@@ -444,8 +470,12 @@ async function boot() {
       const sys = ctx.spellSystem;
       if (sys && sys.hardReset) sys.hardReset();
       else if (sys && sys.softReset) sys.softReset();
+      // "Start over" means it: the save goes with it, or a refresh would hand
+      // back the run he just chose to throw away.
+      progress.clear();
       R.fx.timeScale(1, 0);
       await scenes.go('play');
+      progress.touch();
     } finally { restarting = false; }
   });
 

@@ -27,6 +27,7 @@ export function createLayout() {
 
     circles: [CIRC(), CIRC(), CIRC(), CIRC(), CIRC()],
     circleScale: 1,
+    cluster: { kind: 'disc', x: 0, y: 0, r: 0, w: 0, h: 0 },
 
     stickZone: R(),
     actZone: R(),        // jump on tap / aim on drag
@@ -116,6 +117,26 @@ export function createLayout() {
       c.hit.w = c.hit.h = (c.r + pad2) * 2;
     }
 
+    /* ---- the thumb cluster ----
+     * The cast circles are round and the jump flank is a rectangle behind them,
+     * so every near miss — and the whole band BELOW the big circle, which is
+     * where a thumb naturally lands — was a jump instead of a cast. Nobody with
+     * a thumb parked on the circles ever means "jump", so the cluster swallows
+     * the whole region and near misses snap to the nearest circle.
+     * Portrait: a disc around the arc centre. Landscape: the row's box, both
+     * carried to the bottom edge of the screen. */
+    if (portrait) {
+      L.cluster.kind = 'disc';
+      L.cluster.x = C[0].x; L.cluster.y = C[0].y;
+      L.cluster.r = 112 * L.circleScale + 27 * L.circleScale + 22;
+    } else {
+      L.cluster.kind = 'rect';
+      let x0 = Infinity, y0 = Infinity;
+      for (let i = 0; i < 5; i++) { x0 = Math.min(x0, C[i].x - C[i].r); y0 = Math.min(y0, C[i].y - C[i].r); }
+      L.cluster.x = x0 - 18; L.cluster.y = y0 - 18;
+      L.cluster.w = w - L.cluster.x; L.cluster.h = h - L.cluster.y;
+    }
+
     /* ---- touch regions ---- */
     const split = leftHanded ? w * 0.56 : w * 0.44;
     if (leftHanded) {
@@ -154,6 +175,37 @@ export function createLayout() {
       if (dx * dx + dy * dy <= rr * rr) return i;
     }
     return -1;
+  };
+
+  /** True if a point is inside the thumb cluster, circle or not. */
+  L.inCluster = function (x, y) {
+    const k = L.cluster;
+    if (k.kind === 'disc') {
+      const dx = x - k.x, dy = y - k.y;
+      return dx * dx + dy * dy <= k.r * k.r;
+    }
+    return x >= k.x && y >= k.y && x <= k.x + k.w && y <= k.y + k.h;
+  };
+
+  /**
+   * Cluster hit test: circle index, -2 for "inside the cluster but not on a
+   * circle" (swallow it — it is not a jump), or -1 for "not ours".
+   *
+   * Nearest-wins rather than first-wins, so the generous slack on neighbouring
+   * circles splits the gap between them down the middle instead of letting
+   * whichever is earlier in the array claim it.
+   */
+  L.clusterAt = function (x, y) {
+    const slack = L.mode === 'portrait' ? 16 : 12;
+    let best = -1, bestD = Infinity;
+    for (let i = 0; i < 5; i++) {
+      const c = L.circles[i];
+      const dx = x - c.x, dy = y - c.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d <= c.r + slack && d < bestD) { best = i; bestD = d; }
+    }
+    if (best >= 0) return best;
+    return L.inCluster(x, y) ? -2 : -1;
   };
 
   return L;

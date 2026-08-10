@@ -3349,3 +3349,103 @@ wall. That is a real design decision rather than a fix: a piercing bolt walks st
 wall and the arch, which are the two gates the last three sessions went into making legible. Worth
 doing, but it wants a gate-safe rule first (pierce only non-structural props? pierce but not through
 anything the support graph is holding up?). Flagged, not built.
+
+---
+
+## playtest-fixes-10 — aiming down, thumb misses, and progress that survives a refresh
+
+Round: *"there is a part of the map I think I need to go down, but I am finding it difficult to aim
+down on mobile"*, *"sometimes it feels like I click the buttons but it jumps instead"*, and *"if I
+refresh page I think I lose all progress? lets track progress so we can continue"*.
+
+### Aim is a direction now, not a screen point
+
+The old model: a drag on the right flank wrote `input.pointerScreen`, which the engine turned into a
+world point and aimed at. That is the wrong model for a thumb. **The aim flank is the bottom-right of
+the phone**, so "drag down" put the finger down-*and-right* of the caster and the shot went
+diagonally. Aiming straight down needed a finger where the caster already was — i.e. it was not
+possible, which is exactly what was reported.
+
+`input.setAimVector(dx, dy, src)` / `input.clearAimVector()` take a **direction**, anchored to
+`aimOrigin` (the caster, pushed every tick by player.js) and re-projected in `input.update()` because
+the caster moves and `aim` is world-space. `aimIsManual()` is true while a vector is live, so the
+sim's auto-aim stands down.
+
+Two thumbs can drive it, and the right one wins:
+
+- **The movement stick.** Its vertical axis drove *nothing at all* — `up`/`down` were set and never
+  read by anything — while the only way to aim was the far thumb, which is also the one holding jump.
+  Push the stick down and the shot goes down. It only claims aim past `STICK_AIM_ON = 0.50` of full
+  deflection and gives it back below `0.34`, so running left and right never steals auto-aim off an
+  enemy and a wobbling thumb does not flicker between the two.
+- **The right flank drag**, unchanged as a gesture, now relative to where the drag started.
+
+A drag on the right flank also **releases the jump** the moment it becomes a drag (`> TAP_PX`).
+Before, every attempt to aim also launched him — and aiming *down* launched him *up*. Measured: an
+aim drag now moves him 1px where a real jump is 186px, and a plain tap still jumps its full 186.
+
+Feedback for both: an ember arrow out of the owning thumb (touch.js) plus a dotted line and chevron
+from the caster in world space (`drawAimVector` in ui/index.js). The camera leans up to 250px the way
+you are aiming (sim/index.js) — aiming down at something you cannot see is the same as not being able
+to aim down.
+
+### Auto-aim now targets blockers
+
+With no enemy up, aim defaulted to a point 340px ahead at head height, which sails over a crate and
+misses anything below entirely. `autoBlocker()` in player.js picks the nearest **solid** prop instead
+(fences and ferns are walked and shot through — targeting one is targeting scenery).
+
+The trap here, and it is a real one: **never target the structure holding him up.** An auto-cast
+circle chewing through the bridge deck under his own feet is a death he never asked for. `standingSet()`
+excludes the prop underfoot, its supporters, *and its siblings on those supporters* — the bridge is
+four deck segments on shared pillars, and excluding only the one he stands on still had the aim
+quietly demolishing the span he was about to walk along. Verified: standing on deck segment 5810 the
+target is the acid wall at 6420, not the bridge.
+
+### The thumb cluster swallows its own misses
+
+Reported as "I click the buttons but it jumps instead". The cast circles are round, the jump flank is
+a rectangle behind them, so **every near miss — and the whole 82px band below the big circle, which
+is where a thumb naturally lands — was a jump**.
+
+`L.clusterAt(x, y)` returns a circle index, `-2` for "inside the cluster, off every circle" (swallow
+it), or `-1`. Near misses snap to the **nearest** circle within `r + 16` (nearest-wins, so the slack
+splits the gap between neighbours down the middle rather than letting the earlier index claim it).
+The cluster region is a disc around the arc centre in portrait, a box carried to the bottom-right
+corner in landscape. The stick still wins where the disc laps over it.
+
+```
+on circle 0            -> 0
+12px past its rim      -> 0     (snapped)
+55px under it          -> -2    (swallowed; used to jump)
+between circles 1 and 2-> 1     (nearest)
+mid-flank              -> -1    (still jumps)
+```
+
+### Progress survives a refresh — core/progress.js
+
+`sunderfall.progress.v1` in localStorage. Saved: level, XP, known spells **and their ranks**, which
+circle each sits in, shards, run stats, the rolling checkpoint, and hp. Debounced 1.2s, flushed on
+`pagehide` and on hidden `visibilitychange` (a phone rarely gives you an unload event and never gives
+you two). `S.serialize()` / `S.restore()` live on the spell system; the HUD is a pull-mirror of it,
+so restoring the state *is* restoring the display — no event ordering to get right.
+
+**Not saved: the state of the world.** Broken props, scorched ground, spent enemies. Serialising a
+destructible level is a much larger job and the game rebuilds it on every restart anyway, so a resume
+puts him back at his last checkpoint in an intact world. You keep the character, you replay the road.
+Say so if it ever surprises anyone.
+
+Two rules worth keeping:
+
+- **Refreshing on the death screen must not be cheaper than pressing Again.** The save is written the
+  moment he dies, before either button is pressed, so a reload from there would hand back the whole
+  run with the ward unpaid. The blob carries `dead: true` and `boot()` charges `softReset()` on the
+  way in. Verified: died at 12 → boots at 8, ranks intact, spawn back at the top of the road.
+- **"Start over" wipes the save**, or a refresh hands back the run the player just chose to throw away.
+
+Persistence is off for `?nosave`, `?noenemies` and `?demo`, so a regression run never measures
+whatever the last one left behind. **Use `&nosave` in every headless test from now on.**
+
+Tested with a genuine cold boot, not just a round-trip: `save2.js` loads the game in an iframe, earns
+levels, removes the iframe, then loads a second one — session two came up at level 9 with
+`emberbolt:3 cinderwake:2`, 4 shards and spawned at x=2600 instead of 470.

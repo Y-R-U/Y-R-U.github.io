@@ -261,11 +261,19 @@ export async function createPlayScene(ctx) {
       scene.demos = demos;
       scene.marks = marks;
 
-      const px = 470;
-      lastMark = -Infinity;
+      // A saved run comes back where it left off. `takeSpawn` is one-shot, so a
+      // death restart still starts at the top of the road.
+      const saved = ctx.progress && ctx.progress.takeSpawn ? ctx.progress.takeSpawn() : null;
+      const px = saved && saved.x > 470 ? saved.x : 470;
+      const py = saved && saved.x > 470 ? saved.y - 40 : groundAt(px) - 120;
+      lastMark = saved && saved.x > 470 ? px : -Infinity;
       barks.reset();
-      world.createPlayer(px, groundAt(px) - 120);
-      cam.x = px; cam.y = groundAt(px) - 120 - leadPx();
+      world.createPlayer(px, py);
+      if (ctx.progress && ctx.progress.resumeHp > 0 && world.player) {
+        world.player.hp = Math.min(world.player.maxHp || world.player.hp, ctx.progress.resumeHp);
+        ctx.progress.resumeHp = 0;
+      }
+      cam.x = px; cam.y = py - leadPx();
       camInit = true;
 
       P.setTerrainQuery(world.solidAt);
@@ -338,6 +346,8 @@ export async function createPlayScene(ctx) {
     if (p.burning > 0 || world.surfaces.amountAt('fire', p.x, p.y) > 0) return;
     lastMark = p.x;
     world.setPlayerSpawn(p.x, p.y);
+    // the same safe spot is what a refresh should come back to
+    if (ctx.progress) ctx.progress.mark(p.x, p.y);
   }
 
   function updateCamera(dt) {
@@ -361,6 +371,9 @@ export async function createPlayScene(ctx) {
     // a soil cross-section around a fifth of the frame.
     const lead = leadPx();
     let ty = p.y - lead;
+    // Deliberately aiming up or down leans the camera that way. Aiming down at
+    // something you cannot see is the same as not being able to aim down.
+    if (world.input.aimVec) ty += clamp(world.input.aimVec.y * 210, -170, 250);
     // Falling still buys a look-down — with the horizon this low there is very
     // little room under the player and you must be able to see what you land on.
     if (!p.onGround) ty = p.y - lead + clamp(p.vy * 0.10, world.halfH * -0.15, world.halfH * 0.34);

@@ -775,6 +775,7 @@ export function createUI(ctx) {
     circleFx.update(dt);
     for (let i = 0; i < 5; i++) drawCircle(c, st.slots[i], L.circles[i], env);
     if (assignMode) drawAssignTargets();
+    drawAimVector(toScreen);
     drawAutoTarget(toScreen);
     circleFx.draw(c);
     picker.update(dt);
@@ -805,6 +806,39 @@ export function createUI(ctx) {
       ' ax:' + (input ? input.axisX.toFixed(1) : '-') +
       ' z:' + (input && input.zoneCount ? input.zoneCount() : '-') +
       ' src:' + (input ? input.lastSource[0] : '-');
+  }
+
+  /* Manual aim needs to read in the WORLD, not just on the thumb: a dotted line
+     out of the caster and a chevron on the end, so "the shot goes down there"
+     is a thing you can see before you spend the focus. */
+  const _av = { x: 0, y: 0 };
+  function drawAimVector(toScreen) {
+    const v = input && input.aimVec;
+    if (!v) return;
+    const ps = playerScreen();
+    const ox = ps.x, oy = ps.y;
+    toScreen(input.aim.x, input.aim.y, _av);
+    const dx = _av.x - ox, dy = _av.y - oy;
+    const m = Math.hypot(dx, dy) || 1;
+    const ux = dx / m, uy = dy / m;
+    const end = Math.min(m, 210);
+    c.save();
+    c.setLineDash([3, 9]);
+    c.lineWidth = 2;
+    c.strokeStyle = A(C.ember, 0.5);
+    c.beginPath();
+    c.moveTo(ox + ux * 34, oy + uy * 34);
+    c.lineTo(ox + ux * end, oy + uy * end);
+    c.stroke();
+    c.setLineDash([]);
+    const hx = ox + ux * (end + 14), hy = oy + uy * (end + 14);
+    c.beginPath();
+    c.moveTo(hx, hy);
+    c.lineTo(hx - ux * 16 - uy * 9, hy - uy * 16 + ux * 9);
+    c.lineTo(hx - ux * 16 + uy * 9, hy - uy * 16 - ux * 9);
+    c.closePath();
+    c.fillStyle = A(C.emberL, 0.8); c.fill();
+    c.restore();
   }
 
   /* The sim's auto-aim is invisible unless we say what it locked on to. Four

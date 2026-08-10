@@ -91,6 +91,7 @@ export function createInput(canvas, view, bus) {
     for (const a of ACTIONS) { st[a].raw = 0; st[a].releaseLatch++; }
     input.axisX = input.axisY = 0;
     input.pointerDown = false;
+    input.aimVec = null;
     pointers.clear();
   });
 
@@ -155,7 +156,32 @@ export function createInput(canvas, view, bus) {
   let aimHoldUntil = 0;
   input.holdAim = (ms) => { aimHoldUntil = Math.max(aimHoldUntil, performance.now() + (ms || AIM_HOLD_MS)); };
   input.aimIsManual = () => input.lastSource === 'pointer' || input.lastSource === 'gamepad'
-    || performance.now() < aimHoldUntil;
+    || !!input.aimVec || performance.now() < aimHoldUntil;
+
+  /**
+   * Aim as a DIRECTION rather than a point.
+   *
+   * A screen point is the wrong model for a thumb. The aim flank is the
+   * bottom-right of the phone, so "drag down" put the finger down-and-RIGHT of
+   * the caster and the shot went diagonally — you could not aim straight down
+   * at all without putting a finger where the caster already is. A vector is
+   * anchored to the caster (`setAimOrigin`), so down is down wherever the thumb
+   * happens to be sitting.
+   *
+   * It has to be re-applied in `update()` rather than written once: the caster
+   * moves, the camera scrolls, and `aim` is world-space.
+   */
+  const AIM_VEC_RANGE = 460;
+  const aimVec = { x: 0, y: 0, src: '' };
+  input.aimVec = null;                    // the same object when live, null when not
+  input.setAimVector = (dx, dy, src) => {
+    const m = Math.hypot(dx, dy);
+    if (m < 0.0001) { input.aimVec = null; return; }
+    aimVec.x = dx / m; aimVec.y = dy / m; aimVec.src = src || 'touch';
+    input.aimVec = aimVec;
+    input.holdAim(120);                   // short: the vector itself holds authority
+  };
+  input.clearAimVector = () => { input.aimVec = null; };
 
   function updateAim(x, y, manual) {
     input.pointerScreen.x = x; input.pointerScreen.y = y;
@@ -333,10 +359,16 @@ export function createInput(canvas, view, bus) {
       // Only re-derive aim from the pointer while the pointer owns it. Without
       // this the auto-aim the sim wrote last tick was overwritten every frame by
       // wherever the last tap happened to land.
-      if (input.lastSource !== 'gamepad' && input.aimIsManual()) {
+      if (input.lastSource !== 'gamepad' && input.aimIsManual() && !input.aimVec) {
         input.aim.x = input.pointerWorld.x;
         input.aim.y = input.pointerWorld.y;
       }
+    }
+    // A direction beats both the pointer and the sim's auto-aim, and is
+    // re-projected every tick because the caster it hangs off keeps moving.
+    if (input.aimVec) {
+      input.aim.x = aimOrigin.x + aimVec.x * AIM_VEC_RANGE;
+      input.aim.y = aimOrigin.y + aimVec.y * AIM_VEC_RANGE;
     }
   };
 
@@ -359,6 +391,7 @@ export function createInput(canvas, view, bus) {
     stickPointer = -1;
     input.axisX = input.axisY = 0;
     input.pointerDown = false;
+    input.aimVec = null;
   };
 
   input.destroy = () => {

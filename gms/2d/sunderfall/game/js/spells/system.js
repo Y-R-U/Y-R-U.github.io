@@ -673,6 +673,62 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     syncCircles();          // ranks are untouched: the ward keeps what he learned
   };
 
+  /* ---------------------------------------------------------------- *
+   * Persistence.
+   *
+   * Everything the player earned rather than everything the system holds:
+   * level, XP, which spells he knows and to what rank, which circle each one
+   * sits in, and his shards. Cooldowns, focus and the offer are all run state
+   * and are deliberately left to rebuild themselves.
+   * ---------------------------------------------------------------- */
+  S.serialize = function () {
+    const known = {};
+    S.known.forEach((rank, id) => { known[id] = rank; });
+    return {
+      level: S.level, xp: S.xp, shards: S.shards, known,
+      slots: S.circles.map((c) => c.spellId || null),
+      stats: Object.assign({}, S.stats),
+    };
+  };
+
+  /** Returns false if there was nothing usable in the blob, leaving state alone. */
+  S.restore = function (d) {
+    if (!d || !d.known) return false;
+    const known = new Map();
+    for (const id in d.known) {
+      const def = byId.get(id);
+      if (!def) continue;                       // a spell that no longer exists
+      const r = Math.max(1, Math.min(def.levels || 5, d.known[id] | 0));
+      known.set(id, r);
+    }
+    if (!known.size) return false;
+    S.known = known;
+    S.level = Math.max(1, Math.min(MAX_LEVEL, d.level | 0 || 1));
+    S.xpToNext = xpForLevel(S.level);
+    S.xp = Math.max(0, Math.min(S.xpToNext - 1, d.xp | 0));
+    S.shards = Math.max(0, d.shards | 0);
+    for (let i = 0; i < SLOTS; i++) {
+      const id = d.slots && d.slots[i];
+      S.circles[i].spellId = id && S.known.has(id) ? id : null;
+    }
+    if (d.stats) for (const k in S.stats) if (typeof d.stats[k] === 'number') S.stats[k] = d.stats[k];
+    S.focus = S.focusMax;
+    S.offer = null;
+    syncCircles();
+    // A known spell with nowhere to live is invisible, so fill the free circles
+    // the restored level opens. Not autoAssign(): that shouts "learned but
+    // homeless" at you, which is the wrong thing to say about a spell you have
+    // been carrying for twenty minutes.
+    S.known.forEach((rank, id) => {
+      for (let i = 0; i < SLOTS; i++) if (S.circles[i].spellId === id) return;
+      for (let i = 0; i < SLOTS; i++) {
+        if (S.circles[i].unlocked && !S.circles[i].spellId) { S.setSlot(i, id); return; }
+      }
+    });
+    bus.emit('spell:slots', { circles: S.circles });
+    return true;
+  };
+
   // starting kit
   S.learn(o.startSpell || 'emberbolt', 1);
   syncCircles();
