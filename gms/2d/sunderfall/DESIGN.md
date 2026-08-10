@@ -180,5 +180,8 @@ gets built, the non-interactive cold open becomes its attract-mode fallback.
 ## 8. The five-second test
 
 Whatever the player sees first — intro or gameplay — must contain one moment good enough that a
-person scrolling past stops. Every agent should ask of their own work: *would this make someone stop?*
+person scrolling past stops. That moment has sound: the boot card ends on **tap to begin / sound
+on**, and that tap is what lets the cinematic's score start at all. A browser will not play audio
+until the page has been touched, and the intro's own first tap is the skip gesture, so without the
+gate the whole score plays at zero. One tap on a card the player is already reading buys it. Every agent should ask of their own work: *would this make someone stop?*
 If the honest answer is no, it is not done.

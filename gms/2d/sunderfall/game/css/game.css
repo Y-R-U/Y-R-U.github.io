@@ -115,6 +115,48 @@ body {
 }
 .boot-note.err { color: #ff6b6b; text-transform: none; letter-spacing: 0; max-width: 80vw; text-align: center; }
 
+/* The gate. A browser will not let the intro make a sound until someone has
+   touched the page, and the intro's own first tap is the skip gesture — so
+   without this the cinematic's whole score plays at zero for everyone. One tap
+   on the card they are already looking at buys it. */
+#boot-go {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 15px 34px;
+  background: rgba(255, 122, 47, .07);
+  border: 1px solid rgba(255, 122, 47, .38);
+  border-radius: 999px;
+  color: var(--ember);
+  font: 700 13px/1 inherit;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  animation: bootBreathe 2.6s ease-in-out infinite;
+  transition: background .2s, border-color .2s;
+}
+#boot-go small {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  color: var(--dim);
+}
+#boot-go:hover, #boot-go:focus-visible {
+  background: rgba(255, 122, 47, .15);
+  border-color: rgba(255, 122, 47, .7);
+}
+#boot-go:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+#boot[data-ready] .boot-bar { visibility: hidden; }
+
+@keyframes bootBreathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 122, 47, 0); }
+  50% { box-shadow: 0 0 26px 2px rgba(255, 122, 47, .22); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .boot-bar i { animation: none; width: 100%; }
+  #boot-go { animation: none; }
 }

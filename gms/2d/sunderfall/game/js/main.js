@@ -507,6 +507,13 @@ async function boot() {
   const params = new URLSearchParams(location.search);
   const skipIntro = params.has('nointro') || params.get('scene') === 'play';
   if (!skipIntro && mods.intro && mods.intro.runIntro) {
+    /* Every browser refuses to play audio until the page has been touched, and
+       the intro's own first tap is wired to skip — so the only gesture that
+       could unmute the cinematic also ends it, and the whole score has been
+       playing at zero for everyone. Spend one tap here, on a card they are
+       already reading, and hand the intro an audio context that is allowed to
+       make noise. */
+    const started = await waitForStart(bootEl, note);
     try {
       ctx.dom.intro.classList.add('active');
       bootEl.classList.add('gone');
@@ -516,7 +523,10 @@ async function boot() {
         bail = setTimeout(() => { console.warn('[main] intro watchdog fired'); res(); }, 90000);
       });
       await Promise.race([
-        mods.intro.runIntro(ctx.dom.intro, { skip: () => bus.emit('intro:done', { skipped: true }) }),
+        mods.intro.runIntro(ctx.dom.intro, {
+          armed: started,
+          skip: () => bus.emit('intro:done', { skipped: true }),
+        }),
         watchdog,
       ]);
       clearTimeout(bail);
@@ -538,6 +548,37 @@ async function boot() {
   window.__sunderfall = ctx;
   console.info('[sunderfall] engine up —', R.hasFloat ? 'HDR targets' : 'LDR fallback',
     '| worldW', view.worldW, '|', view.mode);
+}
+
+/**
+ * Hold the boot card until someone taps it, and report whether they did.
+ *
+ * The tap is the point: it is the user gesture that lets an AudioContext make
+ * a sound, and it has to happen before the intro builds its own. Automation
+ * passes `?autostart` and gets no gate — a headless run has no gesture to give
+ * and would sit here until the harness gave up.
+ */
+function waitForStart(bootEl, note) {
+  const btn = document.getElementById('boot-go');
+  if (!btn || new URLSearchParams(location.search).has('autostart')) return Promise.resolve(false);
+  return new Promise((res) => {
+    let done = false;
+    const go = () => {
+      if (done) return;
+      done = true;
+      btn.removeEventListener('click', go);
+      window.removeEventListener('keydown', onKey);
+      btn.hidden = true;
+      res(true);
+    };
+    const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') go(); };
+    note('');
+    bootEl.dataset.ready = '1';
+    btn.hidden = false;
+    btn.addEventListener('click', go);
+    window.addEventListener('keydown', onKey);
+    btn.focus({ preventScroll: true });
+  });
 }
 
 boot().catch((e) => {

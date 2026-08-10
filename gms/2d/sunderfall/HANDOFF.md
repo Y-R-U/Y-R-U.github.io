@@ -3449,3 +3449,72 @@ whatever the last one left behind. **Use `&nosave` in every headless test from n
 Tested with a genuine cold boot, not just a round-trip: `save2.js` loads the game in an iframe, earns
 levels, removes the iframe, then loads a second one — session two came up at level 9 with
 `emberbolt:3 cinderwake:2`, 4 shards and spawned at x=2600 instead of 470.
+
+---
+
+## playtest-fixes-11 — nobody had ever heard the intro
+
+Reported as "the intro is soundless, game has sound though". The intro is not missing sound. It has
+a complete procedural score — menace pulse, wind, a village drone, a bell, stone-on-bone knocks —
+already cue-driven off `story/script.js`. It was playing at zero for every player who has ever
+loaded the game, and here is why:
+
+- `IntroAudio` constructs with `master.gain.value = 0.0`, and only `arm()` raises it to 0.85.
+- `arm()` is called from the intro's own `keydown` / `pointerdown` handlers, which do not exist
+  until the intro is already running.
+- The intro auto-runs on page load. Nothing before it collects a gesture — the boot card dismisses
+  itself.
+- And the trap: `onPointer` is `armAudio(); if (storyT > 1.0) requestSkip();`. **The only gesture
+  that could unmute the cinematic also ends it**, one second in. Tap to hear it, and you skip it.
+
+So the working combination was "tap within the first second, then never tap again", which nobody
+does. This is also why every audio note in the docs said "nobody has heard it" — the score was fine.
+
+### The fix: the boot card is now the gate
+
+`#boot` gains a `tap to begin / sound on` button (`main.js waitForStart()`), shown once loading is
+done. That tap is a real user gesture, so the AudioContext the intro builds afterwards is allowed to
+start, and `runIntro` takes a new `armed` option that calls `audio.arm()` immediately rather than
+waiting for a tap it must not receive.
+
+The cold open is untouched — the player still lands straight in the fight, they just pass through a
+card they were already reading. Skip behaviour is unchanged: tap-to-skip after 1s still works, and
+now costs nothing, because the sound is already on.
+
+**`?autostart` skips the gate.** Automation has no gesture to give and would otherwise sit on the
+boot card until the harness gave up. `?nointro` and `?scene=play` never reach the gate at all.
+
+Verified with `gatetest.mjs` (raw CDP, `--autoplay-policy=document-user-activation-required`,
+instruments `AudioParam.setTargetAtTime` and counts source nodes per context before any page script
+runs):
+
+```
+BEFORE TAP  gate visible, intro not started, 1 audio context (the game's)
+AFTER TAP   gate hidden, intro active, 2 contexts both running,
+            new ramp to 0.85 (= IntroAudio.arm), 32 sources started by the intro context
+```
+
+32 oscillators/buffer sources in the first six seconds is the score genuinely generating, not merely
+being unmuted. Regression: `?autostart` → gate hidden, intro runs; `?nointro` and `?scene=play` →
+no gate, player exists. Both viewport sizes render the card correctly.
+
+### On the forge SFX library
+
+`/gms/3d/forge/audio/` was offered as a source of sounds. It is a procedural SFX lab — 53
+parameterised one-shots (`explosionBoom`, `glassBreak`, `stoneGrind`, `impactWood`…) behind a
+`play(eng, o)` contract built on forge's own `core.js` primitives.
+
+**Not worth porting.** Sunderfall's `core/audio/` is already more specialised than forge for exactly
+the thing this game is about: `keys.js` maps 10 materials × `crack` / `break` / `debris` / `burn` /
+`step`, each with variants, priority, rate limiting and a voice cap, and destruction drives it.
+Forge's generic `explosionBoom` would be a downgrade on a masonry wall that already has its own
+crack, break and debris layers. Revisit only if a specific sound is missing, and port that one.
+
+### Voice-over and music
+
+`docs/VOICE-AND-MUSIC.md` now holds every spoken line in the game — the 19 intro beats with their
+timecodes and direction, all 9 bark pools, the death-screen text — plus Suno prompts for narration
+and for each music state. The key facts a generation has to respect: the score is **D natural minor
+throughout**, the per-state tempos are fixed (menu 56 / explore 62 / tension 74 / combat 96 / boss
+104 / victory 68), and the boss loop's ♭II is a deliberate semitone clash. Any recorded track in
+another key will fight the live synth on every state change.

@@ -19,7 +19,7 @@ const DT = 1 / 60;
 export async function runIntro(mountEl, opts = {}) {
   const {
     skip = false, script = SCRIPT, autoStart = true, debug = false,
-    dprCap = 2, maxPixels = 2_300_000, lowSpec: forceLow = null,
+    dprCap = 2, maxPixels = 2_300_000, lowSpec: forceLow = null, armed = false,
   } = opts;
   const onSkip = typeof skip === 'function' ? skip : null;
   if (skip === true) return;
@@ -97,6 +97,10 @@ export async function runIntro(mountEl, opts = {}) {
   };
   const onPointer = () => { armAudio(); if (storyT > 1.0) requestSkip(); };
   const armAudio = () => { try { audio.arm(); } catch {} };
+  // The caller already collected a gesture, so the context is allowed to start.
+  // Without this the score waits for a tap that, once the intro is running,
+  // also skips it — which is why nobody has ever heard the cinematic.
+  if (armed) armAudio();
 
   skipBtn.addEventListener('click', (e) => { e.stopPropagation(); armAudio(); requestSkip(); });
   window.addEventListener('keydown', onKey, { passive: true });
