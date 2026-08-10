@@ -2,10 +2,15 @@ import { clamp } from './math.js';
 
 export const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'dash', 'cast', 'interact', 'pause'];
 
+/**
+ * A key may drive more than one action. Up is the case that matters: it has to
+ * stay on the analog axis (dash aims off it) AND jump, because DESIGN §6 has
+ * always said W jumps and every player reaches for up first on a platformer.
+ */
 const KEYMAP = {
   ArrowLeft: 'left', KeyA: 'left',
   ArrowRight: 'right', KeyD: 'right',
-  ArrowUp: 'up', KeyW: 'up',
+  ArrowUp: ['up', 'jump'], KeyW: ['up', 'jump'],
   ArrowDown: 'down', KeyS: 'down',
   Space: 'jump',
   ShiftLeft: 'dash', ShiftRight: 'dash',
@@ -73,7 +78,8 @@ export function createInput(canvas, view, bus) {
     if (!a) return;
     if (down && e.repeat) return;
     input.lastSource = 'keyboard';
-    set(a, SRC.KEY, down);
+    if (typeof a === 'string') set(a, SRC.KEY, down);
+    else for (let i = 0; i < a.length; i++) set(a[i], SRC.KEY, down);
     // space/arrows scroll the page otherwise
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
   };

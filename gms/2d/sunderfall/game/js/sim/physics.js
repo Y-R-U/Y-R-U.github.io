@@ -69,7 +69,9 @@ export function moveBody(world, e, dt) {
       if (blockedFull(world, e, nx, e.y)) {
         let climbed = false;
         if (stepUp > 0) {
-          for (let up = 2; up <= stepUp; up += 2) {
+          // 3px granularity: at the old 2px a 52px step-up cost 26 probe pairs
+          // per blocked substep, and landing 3px high is a frame of gravity.
+          for (let up = 3; up <= stepUp; up += 3) {
             if (!blockedFull(world, e, nx, e.y - up) && !blockedFull(world, e, e.x, e.y - up)) {
               e.y -= up; e.x = nx; climbed = true; break;
             }

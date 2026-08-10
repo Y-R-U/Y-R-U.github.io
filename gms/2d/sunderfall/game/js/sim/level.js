@@ -66,9 +66,13 @@ export function buildLevel(world) {
   // Thornmere: 130px of head clearance over the ground below, so it stays solid.
   T.box(1560, -230, 240, 44, MATERIAL.ROCK);
 
-  // Ruinreach: a raised platform and a broken parapet
+  // Ruinreach: a raised platform and a broken parapet.
+  // The parapet stub used to be 120px tall and sat in the middle of the walkway,
+  // which made a 144px step out of a piece of scenery — 8px under a standing
+  // jump, in the one place the region changes. Knee-high is what "broken" should
+  // look like anyway, and at 48 it is under the step-up, so it is walked over.
   T.box(4300, -300, 420, 60, MATERIAL.MASONRY);
-  T.box(4300, -420, 60, 120, MATERIAL.MASONRY);
+  T.box(4300, -348, 90, 48, MATERIAL.MASONRY);
   T.box(6560, -260, 460, 54, MATERIAL.MASONRY);
   T.box(6980, -470, 220, 40, MATERIAL.MASONRY);
 

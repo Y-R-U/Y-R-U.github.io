@@ -10,7 +10,7 @@
  */
 
 import { LAYER } from '../gfx/renderer.js';
-import { MAT, MATERIAL } from '../sim/materials.js';
+import { MAT, MATERIAL, DAMAGE } from '../sim/materials.js';
 import { SCHOOL, drawBolt, drawOrb, impact, emitDesc as E, setColor as col, colA, colB } from './fx.js';
 
 /* ------------------------------------------------------------------ *
@@ -58,7 +58,36 @@ function fieldDone(e) {
  * Projectiles
  * ------------------------------------------------------------------ */
 
-const SWEEP = { entities: true, props: true, terrain: true, team: -1, exclude: null, radius: 6, step: 6 };
+const SWEEP = { entities: true, props: true, terrain: true, team: -1, exclude: null, radius: 6, step: 6, soft: null };
+
+/**
+ * What a bolt leaves behind on something it passed straight through.
+ *
+ * Anything `solid: false` — fences, hedges, trunks, rock piles — no longer stops
+ * a projectile (world.sweep, `o.soft`). Rather than have the spell simply ignore
+ * it, it takes the shot's element across the whole object, which is both the
+ * physical answer ("it went through the hedge, so the hedge is on fire now") and
+ * a small reward for shooting through cover instead of around it.
+ */
+const SOFT_HIT = {
+  fire:  { type: DAMAGE.FIRE, dmg: 7, ignite: 0.8 },
+  storm: { type: DAMAGE.LIGHTNING, dmg: 9 },
+  earth: { type: DAMAGE.IMPACT, dmg: 8 },
+  decay: { type: DAMAGE.DECAY, dmg: 7 },
+  void:  { type: DAMAGE.VOID, dmg: 7 },
+  life:  { type: DAMAGE.LIFE, dmg: 0 },
+};
+
+const softBuf = [];
+function grazeSoft(w, list, school, scale) {
+  const k = SOFT_HIT[school] || SOFT_HIT.earth;
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i];
+    if (!p.alive) continue;
+    if (k.dmg > 0) w.damageProp(p, k.dmg * (scale || 1), k.type, { cause: 'graze' });
+    if (k.ignite && p.alive) w.igniteProp(p, k.ignite * (scale || 1));
+  }
+}
 const DMG = { src: null, hitX: 0, hitY: 0, dirX: 0, dirY: 0, force: 0, stagger: 0, status: null, statusTime: 0, statusPower: 1, crit: false };
 
 /** Shared damage-opts object. Reset every field; a stale `status` is a real bug. */
@@ -136,7 +165,10 @@ function projUpdate(e, dt) {
   SWEEP.radius = d._radius;
   SWEEP.team = -1;
   SWEEP.entities = true; SWEEP.props = true; SWEEP.terrain = true; SWEEP.step = 6;
+  softBuf.length = 0;
+  SWEEP.soft = softBuf;
   const hit = w.sweep(e.x, e.y, nx, ny, SWEEP);
+  if (softBuf.length) grazeSoft(w, softBuf, d._school, 1);
 
   // trail is emitted along the pre-hit path so it never floats past a wall
   if (d._trail) trailStep(w, e, dt);

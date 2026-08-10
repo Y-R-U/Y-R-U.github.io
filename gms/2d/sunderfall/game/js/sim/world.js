@@ -462,6 +462,22 @@ export function createWorld(ctx, opts = {}) {
 
   const RAY_DEFAULT = { entities: true, props: true, terrain: true, step: 6, team: -1 };
 
+  /**
+   * Whether a spell passes through a prop rather than stopping on it.
+   *
+   * `solid: false` alone is not enough: it means two different things in this
+   * codebase. Ferns and fences are non-solid because they are scenery you walk
+   * through; the arch pillars are non-solid because they stood across the road
+   * and had to stop blocking it. A stone pillar must still eat a bolt. So the
+   * test is non-solid AND made of something a bolt could plausibly go through.
+   */
+  const SOFT_MAT = [];
+  SOFT_MAT[MATERIAL.TIMBER] = 1;
+  SOFT_MAT[MATERIAL.FOLIAGE] = 1;
+  SOFT_MAT[MATERIAL.BONE] = 1;
+  SOFT_MAT[MATERIAL.GLASS] = 1;
+  const isSoftProp = (p) => !p.solid && SOFT_MAT[p.material] === 1;
+
   world.raycast = (x, y, dx, dy, maxDist, o) => {
     o = o || RAY_DEFAULT;
     const l = Math.hypot(dx, dy) || 1;
@@ -493,11 +509,25 @@ export function createWorld(ctx, opts = {}) {
       if (o.props !== false) {
         const p = world.props.at(px, py);
         if (p && p.state !== 'settled' && p.state !== 'gone') {
-          hit.what = 'prop'; hit.prop = p; hit.entity = null; hit.debris = null;
-          hit.x = px; hit.y = py; hit.material = p.material;
-          hit.nx = -dx / (len || 1); hit.ny = -dy / (len || 1);
-          hit.dist = len * t; hit.t = t;
-          return hit;
+          /**
+           * If it does not stop your body it does not stop your bolt.
+           *
+           * A fence, a hedge, a tree trunk and a pile of rocks are all
+           * `solid: false` — you walk straight through them — and they were
+           * still eating every spell aimed past them, which on a phone with
+           * auto-aim meant most of them. A caller that passes `o.soft` gets
+           * those props collected and the ray carries on; whatever is doing the
+           * shooting then decides what passing through one costs.
+           */
+          if (o.soft && isSoftProp(p)) {
+            if (o.soft.indexOf(p) < 0) o.soft.push(p);
+          } else {
+            hit.what = 'prop'; hit.prop = p; hit.entity = null; hit.debris = null;
+            hit.x = px; hit.y = py; hit.material = p.material;
+            hit.nx = -dx / (len || 1); hit.ny = -dy / (len || 1);
+            hit.dist = len * t; hit.t = t;
+            return hit;
+          }
         }
       }
       if (o.entities !== false) {

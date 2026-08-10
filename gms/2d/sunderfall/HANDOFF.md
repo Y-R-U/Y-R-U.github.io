@@ -3282,3 +3282,70 @@ While in there, since desktop has the room:
 - **Keys 1–5 open that circle's picker** instead of the whole pause overlay, matching the click.
   Pressing the same number again closes it; a locked circle toasts its unlock level. (Note: `close()`
   clears `slot`, so the toggle has to read the slot *before* closing — the first version reopened.)
+
+---
+
+## Session — playtest-fixes-9 (arrow keys jump, step-up, magic through scenery)
+
+### Up jumps
+
+`KEYMAP` mapped `ArrowUp`/`KeyW` to `up` only, and `up` drives the analog axis (dash aims off it),
+not jump. Jump was `Space` alone — while DESIGN §6 has always said W jumps. A key can now carry more
+than one action (`ArrowUp: ['up', 'jump']`), so up both jumps and keeps feeding `axisY`. Verified:
+Space, ArrowUp and KeyW each clear 186px, and `axisY` is still −1 with up held.
+
+### Getting stuck on scenery
+
+`stepUp` was **20px** — a kerb, a root or a fallen brick could stop Rook dead, which reads as a bug
+whatever the level says. Now **52**: anything ankle-to-knee is walked over, a crate (78) is still a
+jump. The probe loop went 2px → 3px granularity so the cost per blocked substep did not go up with
+it.
+
+A census of every place a walk-only run stops (`RIGHT` held, no jump, no cast) now reads:
+
+```
+538   crate         70px   flick-tap clears it
+1098  stump         78px   flick-tap clears it
+2117  boulder_small 78px   flick-tap clears it
+6265  wall_brick   374px   must be broken
+```
+
+That is the shape the game wants: traversal is free, the one hard stop is the thing you are meant to
+break. **A masonry stub at 4300 was the exception** — the "broken parapet" was 120px tall and stood
+in the middle of the walkway, making a 144px step in the one place the region changes, 8px under a
+standing jump. Knee-high is what "broken" should look like: 48 tall and under the step-up.
+
+Guard test: holding RIGHT into the acid wall for ten seconds still gets +84px and stops. The bigger
+step-up does not climb anything that is meant to gate.
+
+### Magic no longer stopped by things your body walks through
+
+`world.sweep` stopped on **any** prop, `solid` or not — and 52 of the level's 78 props are
+non-solid. Fences, hedges, ferns, trunks and bone piles were eating spells aimed past them, which
+with auto-aim on a phone is most of them.
+
+`o.soft` on a sweep collects pass-through props instead of stopping. The test is deliberately **not**
+`!p.solid` alone: `solid: false` means two different things here — scenery you walk through, and
+level-geometry overrides like the arch pillars, which are masonry and must still eat a bolt. So it
+is non-solid **and** made of TIMBER / FOLIAGE / BONE / GLASS. Confirmed classification:
+
+```
+PASSES   fence, bush, ferns, mushrooms, oak_trunk, tree_trunk, burnt_trunk,
+         deadtree, tree_foliage, tree_foliage_b, skull_pile, lantern
+STOPS    every solid prop, plus pillar_stone, rocks_small, brazier, wall_brick,
+         arch_stone, gate_iron, boulder_*
+```
+
+Passing through is not free for the prop: it takes the shot's **element across the whole object**
+(`grazeSoft` in spells/common.js) — fire ignites it, storm/decay/void/earth chip it. Measured: an
+emberbolt fired at a target past a fence reaches x=333 with the fence at 190, and leaves the fence at
+23/30 hp and burning. So shooting through cover both reaches the enemy and lights the cover, which is
+the answer to "it went through the hedge, so the hedge is on fire now".
+
+### Not done, deliberately
+
+Aaron also floated **rank upgrades that let spells pierce solid objects** — electrify/freeze a whole
+wall. That is a real design decision rather than a fix: a piercing bolt walks straight past the acid
+wall and the arch, which are the two gates the last three sessions went into making legible. Worth
+doing, but it wants a gate-safe rule first (pierce only non-structural props? pierce but not through
+anything the support graph is holding up?). Flagged, not built.

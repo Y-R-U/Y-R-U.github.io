@@ -88,7 +88,11 @@ function stepChain(c, ax, ay, gx, gy, dt, damp, stiff) {
 export function createPlayer(world, x, y) {
   const e = world.spawn({
     kind: 'player', team: 0, x, y, w: BODY_W, h: BODY_H,
-    hp: 100, material: MATERIAL.FLESH, stepUp: 20, mass: 1,
+    // Step-up doubles as the "do not get stuck on scenery" budget. At 20 a kerb,
+    // a root, a fallen brick or the crest of a slope could stop him dead, and
+    // being stopped by a pebble reads as a bug even when the level is fine.
+    // 52 walks over anything ankle-to-knee height; a crate (78) is still a jump.
+    hp: 100, material: MATERIAL.FLESH, stepUp: 52, mass: 1,
     layer: world.LAYER.ACTORS, flammable: 0.5,
   });
   if (!e) throw new Error('[sim] no entity slot for the player');
