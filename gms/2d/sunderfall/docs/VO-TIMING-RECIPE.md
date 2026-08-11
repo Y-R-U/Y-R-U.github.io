@@ -81,6 +81,30 @@ Then check every clip finishes before the next line is due:
 **When in doubt, cut wide.** A little bed before the word is inaudible under a fade. A
 clipped consonant is instantly audible and sounds broken.
 
+**6. Round-trip every cut.** This is the step that replaces having ears, and it is worth
+more than all the envelope work above: cut each clip out with ffmpeg, transcribe *that
+clip on its own*, and compare against the line you meant to cut. A clip whose first and
+last words come back right cannot be missing a syllable at either end.
+
+```python
+subprocess.run(['ffmpeg','-v','error','-y','-i',SRC,'-ss',f'{start:.3f}','-t',f'{length:.3f}',
+                '-ar','16000','-ac','1','c.wav'], check=True)
+got = mlx_whisper.transcribe('c.wav', path_or_hf_repo=MODEL,
+                             condition_on_previous_text=False)['text'].strip()
+```
+
+Compare on normalised words — lowercase, strip punctuation — and only assert the **first
+word, the last word, and the length within one**. Whisper will hand back "I'm" for "I am"
+and "gonna" for "going to", and those are the take telling you the truth: change the game's
+text to match the recording, not the other way round.
+
+Do it against the **shipped** file, after trimming and encoding, and it doubles as proof
+that neither operation moved the timeline.
+
+A second, cheaper trap this catches: when a line is generated but the model ran out of
+room, the round trip returns half of it. That is how `blocked[1]` was found to be a
+fragment rather than a line, and left unvoiced.
+
 ---
 
 ## Encoding
@@ -100,10 +124,22 @@ and the encoded file, which were identical. So measure timings on whichever you 
 
 ---
 
+## One take, or many files?
+
+One take, always. Twenty-two barks as twenty-two files is twenty-two requests, twenty-two
+decodes, and twenty-two chances for the generator to drift voice between them — Suno's
+consistency across a single continuation is the whole reason the barks sound like the same
+person as the intro. Ask for the extension to start a few seconds inside the previous take
+so the model has its own voice to copy, then simply never play that lead-in.
+
+Trimming that lead-in before shipping is worth it (it was 12% of the file here) — subtract
+the trim from every offset, and let step 6 prove the shift was exact.
+
 ## Playback
 
-Play the slice rather than pre-cutting 19 files: one decode per speaker, and the fade
-lengths stay tunable without re-encoding. See `game/js/intro/vo.js`.
+Play the slice rather than pre-cutting the lines into files: one decode per take, and the
+fade lengths stay tunable without re-encoding. See `game/js/intro/vo.js` for the cinematic
+and `game/js/core/audio/vo.js` for the barks.
 
 - Fade in ~0.10s, out ~0.18s. The bed makes a hard cut click.
 - Ask for `len + 0.03` in `start(when, offset, duration)` so the fade-out lands on real

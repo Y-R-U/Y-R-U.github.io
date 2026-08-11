@@ -3583,3 +3583,55 @@ FETCHED  ["rook.mp3 200","vayne.mp3 200"]
 19 clips, script order, offsets exact, rook lines from the 15.56s file and
 vayne lines from the 36.24s file
 ```
+
+---
+
+## playtest-fixes-13 — Rook talks during the game too
+
+The barks were the last unvoiced text in the build. They are voiced now, from a third Suno
+take generated as a *continuation of Rook's intro part* — which is why it is the same voice
+and not a stranger with the same lines. The take opens with the last three lines of the
+intro (the seed the model needed to copy itself); those seconds were trimmed off and every
+offset shifted to match.
+
+**Files**
+
+- `game/audio/vo/barks.mp3` — 44.8s, 21 lines, 249 KB (mono/32 kHz/VBR q8, from 1.1 MB)
+- `game/js/core/audio/vo.js` — new; loads the one take, plays `say(offset, length)` slices
+- `game/js/core/audio/mix.js` — new `voice` bus, wired straight to master
+- `game/js/core/audio.js` — creates the VO on context start, fetches on `resume()`,
+  exposes `audio.voice(at, len)` / `audio.stopVoice()` / `audio.speaking`
+- `game/js/sim/barks.js` — `LINES` entries are now `{ t, vo: [offset, length] }`
+
+**Why `voice` is its own bus.** `mix.duck()` pulls music and ambience down so a line is
+audible over them. A voice routed through the ducked stage ducks itself — the same trap the
+intro hit, documented in `intro/audio.js`. `voice` connects to `master` directly.
+
+**Why one file and not 22.** One fetch, one decode, and the fades stay tunable without
+re-encoding. `say()` also cuts any line still speaking, which matters because two barks
+inside the 4s priority cooldown would otherwise talk over each other.
+
+**Three lines were reworded to match what was actually recorded** — `selfBurn[2]`,
+`streak[0]`, `streak[1]`; the table is in `docs/VOICE-AND-MUSIC.md` §3. A bubble that
+disagrees with the voice reads as a bug, so the recording wins. `blocked[1]` — *"Right.
+Through it, then."* — is a fragment in the take and carries no `vo`; it plays as a silent
+bubble, which is exactly what every bark did yesterday.
+
+**Finding the timings** was the same problem as the intro and the same answer, plus one new
+step now written into `docs/VO-TIMING-RECIPE.md`: **round-trip every cut**. Slice it out
+with ffmpeg, transcribe that slice alone, compare first word / last word / length. All 21
+came back clean against the shipped file, which also proves the trim and the re-encode did
+not move the timeline. It is what caught `blocked[1]` being half a line, and what turned up
+"I'm" where the script said "I am".
+
+**Verified** (`scratchpad/barkvo.mjs`, play scene, headless):
+
+```
+STATE   {"scene":"play","audio":"running","fetched":["barks.mp3 200"]}
+BARK    emitted (t=5.5, alive=true)
+SLICES  [{"off":0.24,"dur":0.08,"len":44.83},{"off":33.22,"dur":1.85,"len":44.83}]
+```
+
+The second slice is `level[0]` — a real `player:level` event through barks.js, not a direct
+call. Still unrecorded anywhere in the build: nothing. Every line of text now has a voice
+except the one fragment above.

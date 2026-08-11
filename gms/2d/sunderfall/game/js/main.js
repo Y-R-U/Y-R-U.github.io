@@ -43,6 +43,7 @@ function stubAudio() {
   return {
     stub: true, ready: false, muted: false,
     play: noop, sfx: noop, music: noop, stopMusic: noop,
+    voice: () => false, stopVoice: noop,
     setVolume: noop, resume: noop, unlock: noop,
   };
 }

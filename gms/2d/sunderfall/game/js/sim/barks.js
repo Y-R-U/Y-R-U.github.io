@@ -15,6 +15,13 @@
  *
  * Emits `bark` on the bus; ui/index.js turns that into a speech bubble anchored
  * to him. Nothing here draws.
+ *
+ * `vo: [offset, length]` is where the line sits inside `audio/vo/barks.mp3` — one
+ * take with all of them in it, played a slice at a time by core/audio/vo.js. The
+ * text here is what the recording actually says, so the two never disagree; if a
+ * line is reworded the recording is wrong until it is regenerated, and the honest
+ * move is to drop its `vo` rather than play the old words under new ones. Timings
+ * came out of the take by the method in docs/VO-TIMING-RECIPE.md.
  */
 
 import { DAMAGE } from './materials.js';
@@ -24,44 +31,45 @@ const PRIORITY_CD = 4;      // …unless the new line is more important than the
 
 const LINES = {
   selfBurn: [
-    'This magic stuff sucks.',
-    'I set me on fire. Again.',
-    "That's my own fire. That's my own fire.",
-    'Nobody saw that.',
+    { t: 'This magic stuff sucks.', vo: [0.24, 2.00] },
+    { t: 'I set me on fire. Again.', vo: [3.18, 2.54] },
+    { t: "That's my own fire. My own fire!", vo: [5.94, 3.02] },
+    { t: 'Nobody saw that.', vo: [8.92, 1.54] },
   ],
   selfAcid: [
-    'It is eating my boots.',
-    'Was that meant to splash?',
+    { t: 'It is eating my boots.', vo: [10.70, 1.76] },
+    { t: 'Was that meant to splash?', vo: [12.48, 1.64] },
   ],
   hurt: [
-    "That's a lot of my blood.",
-    'Ow. Properly, ow.',
-    'Vayne. You picked wrong.',
+    { t: "That's a lot of my blood.", vo: [14.04, 1.71] },
+    { t: 'Ow. Properly, ow.', vo: [15.66, 1.92] },
+    { t: 'Vayne. You picked wrong.', vo: [17.50, 1.62] },
   ],
   low: [
-    'I am not built for this.',
-    'Still up. Barely.',
+    { t: 'I am not built for this.', vo: [19.38, 1.86] },
+    { t: 'Still up. Barely.', vo: [21.14, 1.34] },
   ],
   bigBreak: [
-    'Nothing in Thornmere ever broke like that.',
-    'Cass could never do that.',
-    'Oh, that is going to be a problem later.',
+    { t: 'Nothing in Thornmere ever broke like that.', vo: [22.74, 3.10] },
+    { t: 'Cass could never do that.', vo: [25.74, 1.56] },
+    { t: 'Oh, that is going to be a problem later.', vo: [27.24, 1.91] },
   ],
   streak: [
-    'Ha. Did you see that?',
-    'I am getting good at this. Worryingly good.',
+    { t: 'Did you see that?', vo: [29.07, 1.55] },
+    { t: "I'm getting good at this. Worryingly good.", vo: [30.58, 2.40] },
   ],
   level: [
-    'Something moved. In me, I mean.',
-    'It is getting easier to hold.',
+    { t: 'Something moved. In me, I mean.', vo: [33.22, 1.82] },
+    { t: 'It is getting easier to hold.', vo: [34.96, 1.69] },
   ],
   pit: [
-    'Not my finest.',
-    'The hole was quite obvious, in hindsight.',
+    { t: 'Not my finest.', vo: [36.60, 1.24] },
+    { t: 'The hole was quite obvious, in hindsight.', vo: [37.82, 2.66] },
   ],
   blocked: [
-    'It is a rock. I can deal with a rock.',
-    'Right. Through it, then.',
+    { t: 'It is a rock. I can deal with a rock.', vo: [40.62, 3.24] },
+    // the take ran out of room before this one; it plays silent until it is regenerated
+    { t: 'Right. Through it, then.' },
   ],
 };
 
@@ -92,10 +100,12 @@ export function createBarks(world) {
     if (t < 4) return;                                   // let a run start in silence
     const cd = priority > lastPri ? PRIORITY_CD : GLOBAL_CD;
     if (world.time - lastAt < cd) return;
-    const text = pick(trigger);
-    if (!text) return;
+    const line = pick(trigger);
+    if (!line) return;
     lastAt = world.time; lastPri = priority;
-    bus.emit('bark', { text, trigger, priority });
+    const audio = world.ctx && world.ctx.audio;
+    if (line.vo && audio && audio.voice) audio.voice(line.vo[0], line.vo[1]);
+    bus.emit('bark', { text: line.t, trigger, priority });
   }
 
   offs.push(bus.on('player:damage', (e) => {

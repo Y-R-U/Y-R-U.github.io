@@ -18,6 +18,7 @@ import { createBank } from './audio/bank.js';
 import { createResolver, MAT_SFX } from './audio/keys.js';
 import { createMix, DEFAULT_VOLUMES } from './audio/mix.js';
 import { createVoices } from './audio/voices.js';
+import { createVO } from './audio/vo.js';
 import { createAmbience, AMBIENT_SFX } from './audio/ambience.js';
 import { createMusic } from './audio/music.js';
 import { MATERIAL_SFX, WORLD_SFX } from './audio/sfx-materials.js';
@@ -61,7 +62,7 @@ export async function createAudio(ctx) {
   const keys = createResolver((k) => bank.has(k));
   const rng = makeRng(0x5EED);
 
-  let actx = null, mix = null, voices = null, amb = null, music = null;
+  let actx = null, mix = null, voices = null, amb = null, music = null, vo = null;
   let timer = 0, started = false, failed = false;
   let cpuMs = 0;
   let lastTs = 1, tsCool = 0;
@@ -94,6 +95,7 @@ export async function createAudio(ctx) {
     voices = createVoices(actx, mix, bank, { sfxCap: 40, uiCap: 8, ambCap: 10 });
     amb = createAmbience(actx, mix, voices, rng);
     music = createMusic(actx, mix, 0xB0A7);
+    vo = createVO(actx, mix, new URL('../../audio/vo/barks.mp3', import.meta.url).href);
     voices.setListener(listener.x, listener.y, listener.halfW);
     // Only the hot set is pre-baked. Baking all 231 keys costs 2.5 s of CPU and
     // produces ~75 MB of float, most of which the LRU would immediately throw away;
@@ -183,6 +185,8 @@ export async function createAudio(ctx) {
       applyWanted();
       startScheduler();
       warmIdle();
+      // 250 KB, wanted no earlier than the first bark ~15 s in, so never awaited
+      vo && vo.load();
       detachGestures();
     }
     return true;
@@ -254,6 +258,17 @@ export async function createAudio(ctx) {
       const r = keys.resolve(key);
       return r ? voices.loop(r, o) : DEAD_LOOP;
     },
+
+    /* -- recorded voice -- */
+
+    /**
+     * Speak seconds [at, at+len) of Rook's bark take. The offsets belong with the lines,
+     * in sim/barks.js; nothing else should be calling this. Returns false — harmlessly —
+     * if the take has not finished decoding yet.
+     */
+    voice(at, len, o) { return started && vo ? vo.say(at, len, o) : false; },
+    stopVoice(fade) { if (vo) vo.stop(fade); },
+    get speaking() { return !!(vo && vo.speaking); },
 
     stop(id, fade) { if (started) voices.stop(id, fade); },
     stopKey(key, fade) { if (started) voices.stopKey(keys.resolve(key), fade); },
@@ -338,6 +353,7 @@ export async function createAudio(ctx) {
     dispose() {
       if (timer) { clearInterval(timer); timer = 0; }
       detachGestures();
+      try { vo && vo.stop(0.05); } catch { /* ignore */ }
       try { voices && voices.stopAll(0.05); } catch { /* ignore */ }
       try { music && music.dispose(); } catch { /* ignore */ }
       try { amb && amb.stop(0.2); } catch { /* ignore */ }

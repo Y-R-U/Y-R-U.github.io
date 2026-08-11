@@ -23,7 +23,11 @@ either choice works without a clash.
 > **The intro is now voiced.** Two Suno takes (`game/audio/vo/vayne.mp3`, `rook.mp3`) cover all 19
 > lines in §2, cut to the timings in `story/script.js` as `vo: [offset, length]`. If you regenerate
 > either take, `docs/VO-TIMING-RECIPE.md` is how the timings were found — and it is not obvious,
-> because silence detection cannot work on Suno output. Still unvoiced: **the barks in §3**.
+> because silence detection cannot work on Suno output.
+>
+> **The barks are voiced too**, from a third take (`game/audio/vo/barks.mp3`) generated as a
+> continuation of Rook's, so it is the same voice. Twenty-one of the twenty-two lines in §3; the
+> exceptions and the wording changes are listed there.
 
 ---
 
@@ -235,10 +239,27 @@ It is a rock. I can deal with a rock.
 Right. Through it, then.
 ```
 
-If these get recorded, they want to be **individual files**, not one take — the game fires them one
-at a time from a shuffled pool. Suggested naming: `bark_selfBurn_1.mp3` … matching the trigger keys
-in `barks.js` (`selfBurn`, `selfAcid`, `hurt`, `low`, `bigBreak`, `streak`, `level`, `pit`,
-`blocked`).
+**These are recorded**, as one 45-second take at `game/audio/vo/barks.mp3` — not the individual
+files this section originally asked for. One file turned out to be strictly better: a single fetch
+and a single decode, and each line is played as a slice (`vo: [offset, length]` beside its text in
+`sim/barks.js`), so the cuts and the fades stay tunable without re-encoding anything.
+
+Three lines above differ from what was recorded, and **the text in the game follows the recording**,
+not this section — a bubble that disagrees with the voice reads as a bug:
+
+| written here | recorded, and now in `barks.js` |
+|---|---|
+| That's my own fire. That's my own fire. | That's my own fire. **My own fire!** |
+| Ha. Did you see that? | Did you see that? |
+| I am getting good at this. Worryingly good. | **I'm** getting good at this. Worryingly good. |
+
+The repeated *"That's my own fire"* was deliberately changed on the second half, because Suno kept
+switching voice on the repeat; it still shifts up in pitch, which reads as him panicking and is
+better than the flat read would have been.
+
+**One line is unvoiced:** `blocked[1]` — *"Right. Through it, then."* The take ran out of room and
+only *"Right."* survives, so it carries no `vo` and plays as a silent bubble. Anything regenerated
+for it wants to match the rest of the take's voice.
 
 ---
 

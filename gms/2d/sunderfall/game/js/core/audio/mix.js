@@ -4,16 +4,20 @@
  *
  *   voices ->  sfx  ---------\
  *              ui   ---------+->  master -> limiter -> soft clip -> analyser -> out
+ *   vo     ->  voice --------+
  *   music  ->  musicDuck ----+
  *   ambience-> ambDuck ------/
  *   (any)  ->  reverbSend -> convolver -> reverbReturn -^
+ *
+ * `voice` bypasses the duck stage deliberately: duck() exists to pull the score out from
+ * under a spoken line, and a voice routed through the thing being ducked ducks itself.
  */
 
 import { makeRng } from './dsp.js';
 
-export const BUSES = ['master', 'sfx', 'music', 'ambience', 'ui'];
+export const BUSES = ['master', 'sfx', 'music', 'ambience', 'ui', 'voice'];
 
-export const DEFAULT_VOLUMES = { master: 0.85, sfx: 1.0, music: 0.6, ambience: 0.55, ui: 0.8 };
+export const DEFAULT_VOLUMES = { master: 0.85, sfx: 1.0, music: 0.6, ambience: 0.55, ui: 0.8, voice: 1.0 };
 
 /** Rooms are generated, not sampled: exponentially-decaying noise with early reflections. */
 const ROOMS = {
@@ -94,7 +98,7 @@ export function createMix(actx, opts = {}) {
   else shaper.connect(actx.destination);
 
   const gains = {};
-  for (const b of ['sfx', 'music', 'ambience', 'ui']) {
+  for (const b of ['sfx', 'music', 'ambience', 'ui', 'voice']) {
     gains[b] = actx.createGain();
   }
   // separate duck stage so a duck never fights the user's volume slider
@@ -104,6 +108,7 @@ export function createMix(actx, opts = {}) {
   gains.ambience.connect(ambDuck); ambDuck.connect(master);
   gains.sfx.connect(master);
   gains.ui.connect(master);
+  gains.voice.connect(master);
 
   const reverbSend = actx.createGain();
   reverbSend.gain.value = 1;
