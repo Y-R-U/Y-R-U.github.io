@@ -450,3 +450,211 @@ Nothing in the game currently loads an audio file, so wiring recordings in is re
 Keep master levels low on anything generated for combat and boss. The procedural score deliberately
 compresses itself so that an explosion still has somewhere to go, and a loud rendered track will eat
 that headroom.
+
+---
+
+## 8. The stones — Keeper Ostrick
+
+The scene at 7500, where the road currently stops. It is the first time Rook speaks to another
+person since Vayne died, and it is the reason movement 4 happens: Ostrick leaves to fetch the
+elders, so Rook is holding the line alone because he was *told* to.
+
+The beat under the dialogue is that **this is the second adult in a row to hand him the job and walk
+away** — Vayne did it dying, Ostrick does it with a plan, which is worse. Rook's last two lines are
+the whole of his growth so far: he notices, and he admits the boring life he resented was fine.
+
+### 8a. The third voice
+
+**Keeper Ostrick** — sixties, a functionary. *Keeper* is a rank below *Elderman* and he knows
+exactly how far below. He does not disbelieve the magic; he disbelieves the **elevation**. Forty
+years of rites and service and Vayne turned him down, then melded a farm boy in a panic — so his
+outrage is procedural, not moral, and that is what makes it funny before it turns frightening.
+
+He is not a mentor and he is not a villain. He is petty, and then he is scared. No boom, no wisdom,
+no menace. Clipped and pedantic, faster than Vayne, harder than Rook. **26 characters/second**, no
+tremble — his bubble is rigid where Vayne's shakes.
+
+His crankiness breaks the moment Rook offers the power up. A man who has wanted a thing for forty
+years can tell the difference between a boast and a genuine attempt to give it away — and if Vayne
+handed it to whoever was standing there, then Vayne had no time left, which means the seam is far
+worse than the order has been told.
+
+### 8b. The scene
+
+| Who | Line | Direction |
+|---|---|---|
+| **Ostrick** | Don't touch the stones. | Re-cutting a ward line into a stone with a knife. Does not look up. |
+| **Ostrick** | Who melded you? | Now he looks up. |
+| **Rook** | Elderman Vayne. | Flat. |
+| **Ostrick** | No. | Not a question. A refusal to accept it. |
+| **Ostrick** | There's a Rite. There's a Naming. There's nine years of it. | Reciting regulations at a boy. |
+| **Ostrick** | You got a dying man's panic. | |
+| **Rook** | Yes. | He agrees. That is the joke. |
+| **Ostrick** | Vayne turned down forty years of me. | The real wound, finally out. |
+| **Ostrick** | And gave it to what was standing there. | Near-quote of Vayne's "You're what's here" — a stranger arriving at the same verdict. |
+| **Rook** | I had goats. Now I've got this. | Deadpan. Not self-pity, a list. |
+| **Rook** | Take it. Just take it. | **He never shouts.** This lands because it is flat. |
+| — | *(silence — hold it)* | |
+| **Ostrick** | …You'd give it up. | Thrown. Nobody who wanted it would say that. |
+| **Rook** | Yes. | |
+| **Ostrick** | Then he was out of time. | Quiet. The crankiness is gone. |
+| **Ostrick** | He'd never. Not unless there was none left. | |
+| **Ostrick** | The seam's open. | To himself. |
+| **Ostrick** | Boy. Keep the fire lit. | Sharp, decided, already moving. |
+| **Ostrick** | Nothing crosses the stones while it burns. | |
+| **Ostrick** | I'll bring the elders. | |
+| **Rook** | How long? | |
+| **Ostrick** | Learn something while you wait. | Over his shoulder. Not kind. |
+| — | *(he goes west, fast, and does not look back)* | |
+| **Rook** | That's the second one. | To nobody. |
+| **Rook** | The goats were fine. | Quieter. The end of the scene, and the first grown-up thing he has said. |
+
+"Keep the fire lit" is a mechanic, not a line: the brazier going out is what opens the Glyphglade, so
+movement 4 has a cause instead of just being further to the right.
+
+### 8c. Suno — Ostrick
+
+> **Style:** spoken word, no singing, older male voice, clipped and irritable and pedantic,
+> provincial rather than grand, close-mic'd and dry, no reverb, almost no music, one low sustained
+> drone and a faint crackling fire, no drums, no melody, D minor
+
+```
+[spoken, older man, clipped, irritable, pedantic]
+Don't touch the stones.
+
+Who melded you?
+
+[flat, refusing it]
+No.
+
+[reciting regulations, offended]
+There's a Rite. There's a Naming. There's nine years of it.
+You got a dying man's panic.
+
+[bitter, the real wound]
+Vayne turned down forty years of me.
+And gave it to what was standing there.
+
+[thrown, slower]
+You'd give it up.
+
+[quiet, frightened now]
+Then he was out of time.
+He'd never. Not unless there was none left.
+
+[to himself]
+The seam's open.
+
+[sharp, decided, already leaving]
+Boy. Keep the fire lit.
+Nothing crosses the stones while it burns.
+I'll bring the elders.
+
+[over his shoulder, not kind]
+Learn something while you wait.
+```
+
+Suno's defaults for an old man with a staff are **wise mentor** and **sneering villain**. Reject
+both. The target is *petty* — a man complaining about paperwork — right up until "Then he was out of
+time", where it should go quiet rather than dramatic.
+
+### 8d. Suno — Rook, take two
+
+Rook's scene lines **and** the new barks in §8e, as **one continuation of the existing Rook take**
+(`audio/vo/rook.mp3` → `barks.mp3`). That is what made the first batch of barks sound like the same
+person as the cinematic; a fresh generation will not match. Ask for the extension to start a few
+seconds inside the previous take so the model has its own voice to copy, then trim that lead-in and
+subtract it from every offset — the method is in `docs/VO-TIMING-RECIPE.md`.
+
+> **Style:** spoken word, no singing, teenage male voice, flat and deadpan and unimpressed, dry
+> close narration, almost no music, faint wind and distant crickets, D minor
+
+```
+[spoken, teenage boy, flat, deadpan, unimpressed]
+Elderman Vayne.
+
+Yes.
+
+I had goats. Now I've got this.
+Take it. Just take it.
+
+Yes.
+
+How long?
+
+[flat, to nobody]
+That's the second one.
+
+[quieter, almost to himself]
+The goats were fine.
+
+[muttering, to himself, walking]
+Yep. Still flammable.
+Every time. Every single time.
+
+Fine. That's fine.
+I've had worse. Recently.
+
+[strained, hurt]
+Not here. Not for this.
+Keep the fire lit, he said.
+
+[deadpan]
+Sorry. To whoever built that.
+That was somebody's wall.
+
+[uneasy]
+That's the stone. Not me.
+I don't like how easy that was.
+
+It fits better now. That's worse.
+Bigger. Great.
+
+Down again. Fine.
+Walls. Use the walls.
+
+I know what to do with rock now.
+
+[quiet, to nobody, a long walk]
+Nobody ever needed saving from a goat.
+Cass would hate this. Small mercy.
+I'd take the goats.
+Keep the fire lit.
+```
+
+Reject anything cute, wry or knowing — bored is still the target, and the new lines are *tired*
+rather than sad. "The goats were fine" is the one line in the game with any warmth in it and it must
+not be played for laughs.
+
+### 8e. Barks that unlock after the stones
+
+His voice should widen as the run goes on rather than being one flat pool from minute zero. These
+extend the pools in §3 and are gated on progress, so early Rook sulks and late Rook is grimly used
+to it.
+
+| trigger | line | note |
+|---|---|---|
+| `selfBurn` | Yep. Still flammable. | resigned where the early lines are outraged |
+| `selfBurn` | Every time. Every single time. | |
+| `hurt` | Fine. That's fine. | |
+| `hurt` | I've had worse. Recently. | |
+| `low` | Not here. Not for this. | |
+| `low` | Keep the fire lit, he said. | Ostrick callback — only after the stones |
+| `bigBreak` | Sorry. To whoever built that. | the first sign he thinks about consequences |
+| `bigBreak` | That was somebody's wall. | |
+| `streak` | That's the stone. Not me. | he is unnerved by his own competence |
+| `streak` | I don't like how easy that was. | |
+| `level` | It fits better now. That's worse. | |
+| `level` | Bigger. Great. | |
+| `pit` | Down again. Fine. | |
+| `pit` | Walls. Use the walls. | teaches the wall climb in his own voice |
+| `blocked` | I know what to do with rock now. | rhymes with the early "It is a rock. I can deal with a rock." |
+| `alone` | Nobody ever needed saving from a goat. | **new trigger** — fires on a long quiet stretch with nothing near him |
+| `alone` | Cass would hate this. Small mercy. | |
+| `alone` | I'd take the goats. | |
+| `alone` | Keep the fire lit. | him repeating an instruction to himself |
+
+Wiring: a line gets an optional `after` (player level, or a story flag for the Ostrick callbacks) and
+`pick()` filters the pool by it. `barks.js` already listens to `player:level`, so it can hold the
+number itself. The `alone` trigger needs one new condition — no bark and no enemy within a screen for
+~40s — and should sit at priority 1 so anything real interrupts it.

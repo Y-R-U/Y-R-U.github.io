@@ -132,6 +132,19 @@ the four art locations:
    bring down onto enemies. This is the section that must produce the screenshots.
 4. **The Glyphglade** — back to where Vayne died, now overrun. Boss: **the Seam**.
 
+**The seam between 3 and 4 is a scene, not a door.** At the standing stones — 7500, where the built
+level currently stops — Rook meets **Keeper Ostrick**, a cranky wizard who cannot believe Vayne
+would elevate a farm boy over forty years of his own service. Rook offers the power up, flatly, and
+that is what convinces him: Vayne must have been out of time. Ostrick leaves to fetch the elders and
+tells Rook to keep the brazier lit, because nothing crosses the stones while it burns. That does two
+jobs — it explains why a fifteen-year-old fights the Seam alone, and the fire going out is what
+opens movement 4, so the Glyphglade has a cause instead of just being further right. Full scene,
+both voices and the Suno prompts: `docs/VOICE-AND-MUSIC.md` §8.
+
+Needs a first pass at dialogue: `interact` is in `core/input.js`'s ACTIONS list and **nothing
+consumes it** — there is no NPC, no interactable, no conversation runner. The speaker/bubble half
+already exists (`story/script.js` SPEAKER + `ui/world.js` bubbles); Ostrick is a third entry there.
+
 Roguelite layer — **Vayne's ward**. The old man bound a ward to Rook's life before it cost him his
 own, so death replays the day rather than ending it. It gives back what it can: every spell at the
 rank he took it to, his shards, and two thirds of his levels, never dropping him below level 3 —
