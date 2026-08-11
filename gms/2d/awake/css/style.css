@@ -1840,17 +1840,26 @@ button.tag {
 }
 
 .monster-ref img {
-  width: 100%;
-  aspect-ratio: 3 / 5;
+  /* Height-led with auto width so the art keeps its own shape and the border
+     hugs it. contain, never cover: a cropped monster is the one thing this
+     panel exists to let you judge. Full size is a tap away instead. */
+  height: min(34vh, 280px);
+  width: auto;
+  max-width: 100%;
+  /* `auto <ratio>`: use the real ratio once decoded, fall back to the portrait
+     shape before then — plain width:auto collapses an undecoded image to 0px
+     and the row jumps as it loads. */
+  aspect-ratio: auto 3 / 5;
+  justify-self: center;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.45);
-  object-fit: cover;
+  object-fit: contain;
+  cursor: zoom-in;
 }
 
 .monster-ref-missing {
   display: grid;
-  aspect-ratio: 3 / 5;
   place-items: center;
   border: 1px dashed var(--line);
   border-radius: 8px;
@@ -1861,14 +1870,59 @@ button.tag {
 .monster-ref figcaption {
   color: var(--dim);
   font-size: 0.7rem;
+  text-align: center;
 }
-.monster-ref img,
 .monster-ref-missing {
-  max-height: 200px;
+  height: min(34vh, 280px);
 }
 
 .monster-card img {
   max-height: 150px;
+}
+
+.monster-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  /* minmax(0,...) not 1fr: a plain 1fr row floors at the image's intrinsic
+     height, so a tall portrait ref would overflow the viewport. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.92);
+  cursor: zoom-out;
+}
+
+.monster-lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: default;
+}
+
+.monster-lightbox-caption {
+  color: var(--dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.monster-lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--fg, #fff);
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 

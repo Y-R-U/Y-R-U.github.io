@@ -324,6 +324,41 @@
     return `${Math.round(bytes / 1024)} KB`;
   }
 
+  function openLightbox(src, label) {
+    const overlay = document.createElement("div");
+    overlay.className = "monster-lightbox";
+    const image = document.createElement("img");
+    image.src = src;
+    image.alt = label || "";
+    const caption = document.createElement("span");
+    caption.className = "monster-lightbox-caption";
+    caption.textContent = label || "";
+    const close = document.createElement("button");
+    close.className = "monster-lightbox-close";
+    close.type = "button";
+    close.textContent = "✕";
+    overlay.append(image, caption, close);
+
+    const dismiss = () => {
+      overlay.remove();
+      document.removeEventListener("keydown", onKey, true);
+    };
+    // Capture phase + stopPropagation: the game has its own Escape handler that
+    // closes the whole debug panel, and closing both at once loses your place.
+    const onKey = event => {
+      if (event.key !== "Escape") return;
+      event.stopPropagation();
+      dismiss();
+    };
+    // Anywhere outside the picture closes it; the picture itself must not,
+    // or a mistimed tap while looking closes the thing you opened.
+    overlay.addEventListener("click", event => {
+      if (event.target !== image) dismiss();
+    });
+    document.addEventListener("keydown", onKey, true);
+    document.body.append(overlay);
+  }
+
   function renderBrowser(host, ctx) {
     host.innerHTML = "";
     if (!monsters().length) {
@@ -412,8 +447,13 @@
       const figure = document.createElement("figure");
       figure.className = "monster-ref";
       figure.innerHTML = src
-        ? `<img src="${esc(ctx, src)}" alt="" loading="lazy"><figcaption>${esc(ctx, label)}</figcaption>`
+        // Not loading="lazy": only two images ever, both the point of this view,
+        // and the attack ref was reliably never triggering its lazy fetch.
+        ? `<img src="${esc(ctx, src)}" alt="" title="Tap to view full screen"><figcaption>${esc(ctx, label)}</figcaption>`
         : `<div class="monster-ref-missing">no image</div><figcaption>${esc(ctx, label)}</figcaption>`;
+      if (src) {
+        figure.querySelector("img").addEventListener("click", () => openLightbox(src, label));
+      }
       refs.append(figure);
     });
     section.append(refs);
