@@ -23,6 +23,7 @@ let audio = null;
 let armed = false;
 let unlocked = false;
 let started = null;
+let readyP = null;
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const beatsOf = () => content.verdict.beats;
@@ -85,6 +86,38 @@ export const verdict = {
       audio.load();
     } catch { audio = null; }
     return audio;
+  },
+
+  // Whether the track can actually be played, resolved once and cached. The gate holds its own
+  // button on this: 744 kB has to be in the buffer before a tap means anything, and a button that
+  // says "Play the ruling" before then is a button that does nothing when it is pressed.
+  ready() {
+    if (readyP) return readyP;
+    const a = this.arm();
+    if (!a) return (readyP = Promise.resolve(false));
+    readyP = new Promise(res => {
+      const t0 = performance.now();
+      let poll = 0;
+      const settle = v => {
+        clearInterval(poll);
+        a.removeEventListener('canplaythrough', ok);
+        a.removeEventListener('error', bad);
+        res(v);
+      };
+      const ok = () => settle(true);
+      const bad = () => settle(false);
+      a.addEventListener('canplaythrough', ok, { once: true });
+      a.addEventListener('error', bad, { once: true });
+      // readyState is polled as well as listened for. The event does not always arrive, and a
+      // browser still at readyState 0 after a couple of seconds is one that will not fetch until it
+      // is touched — iOS ignores `preload` on a media element until a gesture. Holding the button
+      // shut for that player would mean they could never choose sound at all.
+      poll = setInterval(() => {
+        if (a.readyState >= 4 || (a.readyState === 0 && performance.now() - t0 > 2500)) ok();
+      }, 200);
+      if (a.readyState >= 4) ok();
+    });
+    return readyP;
   },
 
   // Spend a real tap on the element. Browsers only allow sound from inside a gesture, so this has

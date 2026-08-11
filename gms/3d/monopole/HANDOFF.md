@@ -5124,3 +5124,57 @@ lands on so neither throws the camera back to where a drift began.
   but the comment in `content/verdict.js`. Swing past it and the planet leaves frame.
 - Everything in this session was judged on stills. Nobody has watched the sequence at speed on a
   real phone, and the punches are the one thing a still cannot show.
+
+---
+
+## Session 18e — the gate's button, and the origin picker
+
+Two things Aaron hit on the same run.
+
+### The gate says nothing it cannot do
+
+*"Ensure the start button doesn't show the word start until you can click on it — it looks too much
+like it should work but doesn't."*
+
+The gate now renders its sound button as dim, borderless, unpressable text reading `Fetching the
+recording…` and only swaps in **Play the ruling** when two things are true:
+
+1. `verdict.ready()` resolves — `canplaythrough`, or `readyState >= 4` off a 200 ms poll, because the
+   event is not always delivered. On `error` the button is **removed** and the quiet one becomes
+   `Begin`, so a broken fetch is a two-word change rather than a dead press.
+2. One rAF-pair has completed since the card went up. A main thread busy compiling the scene's
+   shaders cannot run a rAF either, so waiting for one is waiting for the page to be able to answer
+   at all. This is the half that covers the first-frame stall; the audio half almost never blocks.
+
+`Read it in silence` is enabled from the first frame throughout — the card always offers a way in.
+
+### The origin picker
+
+*"Left aligned on desktop… centre it, ~1/3 of the page. Only show the bold line, hide the three dash
+lines, make it expandable. All three should show without scrolling. Give them a brighter background
+so they pop."* All of that, plus the same on mobile:
+
+- The nine dashed edge lines are folded behind a per-card **What that means / Less** handle,
+  accordion-style — one open at a time, because three open is the scrolling this removed.
+- `#origin .o-body` centres into a ~500 px column at ≥720 px wide. The character screen inherits it,
+  which it wanted anyway.
+- The cards are brighter than the plate behind them with a real drop shadow, and the open one is
+  brighter still.
+- Everything tightened by a few px per row until three cards clear a 720-tall window. They fit with
+  about 20 px to spare, and on 390×844 with a lot more.
+- `.o-body` carries the stage as a class so the picker drops the 84 px band reserved for the
+  character screen's sticky Start.
+
+### Gotchas
+
+139. **`canplaythrough` fires almost immediately for this track even when throttled**, because the
+     file is 44 kbps and any real connection outruns it by an order of magnitude. The event is a
+     correctness guarantee, not a delay — do not expect to see the waiting state without stubbing
+     `verdict.ready()`.
+140. **`--flow=coldopen --sound` must wait for `#gate [data-g="sound"]` now**, not sleep 900 ms. The
+     attribute does not exist until the button is live, which is the point of the change.
+141. **`--slow` throttles the whole page, not just the audio** (150 kB/s; lower and three.js from
+     jsDelivr never arrives and the flow times out on `window.__mono.ready`).
+142. **The origin card is still a `<button>`** and the expander inside it is a `<span role="button">`.
+     A nested `<button>` would be invalid; delegation still works because `onClick` takes the
+     innermost `closest('[data-o]')`.

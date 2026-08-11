@@ -99,6 +99,17 @@ body.shotmode #roomnav { display: none !important; }
   height: 40px; margin-top: 10px; font-size: 12.5px; color: var(--dim);
   border: 1px solid transparent; background: none;
 }
+/* Waiting on the track. Nothing about this may look pressable — no border, no fill, no pointer —
+   and the ellipsis is what says it is going somewhere rather than broken. */
+.g-go[disabled] {
+  cursor: default; color: var(--dim); border-color: transparent; background: none;
+  font-size: 12.5px; letter-spacing: .1em;
+}
+.g-go[disabled]::after {
+  content: '…'; display: inline-block; width: 1.1em; text-align: left; overflow: hidden;
+  vertical-align: bottom; animation: g-wait 1.4s steps(4) infinite;
+}
+@keyframes g-wait { 0% { width: 0; } 100% { width: 1.1em; } }
 
 /* ── the verdict ────────────────────────────────────────────────────────── */
 
@@ -187,41 +198,66 @@ body.shotmode #roomnav { display: none !important; }
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   -webkit-overflow-scrolling: touch;
 }
+/* the picker has no Start under it, and that reserved band is the difference between three cards
+   fitting on a 720-tall window and the third one hanging off the bottom */
+#origin .o-body.origin { padding-bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
 
-.o-head { position: relative; text-align: center; margin: 8px 0 20px; }
+/* A choice between three things is a comparison, and a comparison you have to scroll to make is
+   not one — so on a wide screen the column narrows to the middle of the page rather than running
+   the cards out to arm's length. */
+@media (min-width: 720px) {
+  #origin .o-body { padding-left: max(14px, calc(50vw - 250px)); padding-right: max(14px, calc(50vw - 250px)); padding-top: 16px; }
+  .o-head { margin-bottom: 12px; }
+}
+
+.o-head { position: relative; text-align: center; margin: 4px 0 16px; }
 .o-head.tight { margin-bottom: 14px; }
 .o-head i {
   display: block; font-style: normal; font-size: 9.5px; letter-spacing: .28em;
   text-transform: uppercase; color: var(--accent); margin-bottom: 9px;
 }
 .o-head h2 { font: 400 clamp(23px, 7vw, 34px)/1.15 var(--serif); }
-.o-head p { color: var(--dim); margin-top: 8px; font-size: 13px; }
+.o-head p { color: var(--dim); margin-top: 6px; font-size: 13px; }
 .o-back {
   position: absolute; left: 0; top: -2px; width: 38px; height: 38px;
   background: none; border: 1px solid var(--line); border-radius: 10px;
   color: var(--ink); font-size: 20px; line-height: 1;
 }
 
-.o-cards { display: grid; gap: 11px; }
+.o-cards { display: grid; gap: 9px; }
+/* Lifted off the plate rather than painted on it: the page behind is a dark render, and a card
+   that shares its value reads as part of the background instead of as a thing to press. */
 .o-card {
-  display: block; width: 100%; text-align: left; padding: 15px 16px 13px;
-  border-radius: 13px; border: 1px solid var(--line); border-left: 2px solid var(--accent);
-  background: linear-gradient(180deg, rgba(10, 14, 20, .72), rgba(6, 9, 14, .88));
+  display: block; width: 100%; text-align: left; padding: 12px 15px 11px;
+  border-radius: 13px; border: 1px solid var(--line2); border-left: 2px solid var(--accent);
+  background: linear-gradient(180deg, rgba(24, 31, 43, .93), rgba(15, 20, 29, .96));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
   color: var(--ink); font: inherit;
-  transition: border-color .2s ease, transform .2s ease;
+  transition: border-color .2s ease, transform .2s ease, background .2s ease;
 }
-.o-card:active { transform: scale(.988); border-color: var(--line2); }
+.o-card:active { transform: scale(.988); border-color: var(--accent); }
+
+/* The three edges, folded away. They are what the card is really saying, so the handle has to look
+   like a control and not like a footnote — but nine dashed lines on screen at once is the whole
+   reason the third card used to be below the fold. */
+.o-why {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 9px;
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent);
+  border-bottom: 1px solid rgba(217, 139, 43, .3); padding-bottom: 2px;
+}
+.o-why u { text-decoration: none; font-size: 9px; opacity: .8; }
+.o-card.open { background: linear-gradient(180deg, rgba(30, 38, 52, .95), rgba(18, 24, 34, .97)); }
 .o-tier {
   font-style: normal; font-size: 9px; letter-spacing: .24em; text-transform: uppercase;
   color: var(--accent);
 }
-.o-card h3 { font: 400 22px/1.2 var(--serif); margin: 7px 0 8px; }
-.o-lede { color: var(--ink); opacity: .9; margin-bottom: 11px; }
-.o-card ul { list-style: none; margin: 0 0 13px; padding: 0; display: grid; gap: 5px; }
+.o-card h3 { font: 400 21px/1.2 var(--serif); margin: 5px 0 6px; }
+.o-lede { color: var(--ink); opacity: .9; margin-bottom: 8px; }
+.o-card ul { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 5px; }
 .o-card li { color: var(--dim); font-size: 12.5px; padding-left: 14px; position: relative; }
 .o-card li::before { content: '—'; position: absolute; left: 0; color: var(--accent); opacity: .7; }
 
-.o-nums { display: flex; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 10px; }
+.o-nums { display: flex; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 8px; }
 .o-nums span { display: block; }
 .o-nums b { display: block; font-size: 13.5px; font-weight: 500; }
 .o-nums s {

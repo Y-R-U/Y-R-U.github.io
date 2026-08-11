@@ -186,6 +186,11 @@ async function coldopen(S) {
   await load(S, SOUND ? '?front=1' : '?front=1&mute=1');
   if (SOUND) {
     await sleep(900);
+    await shot(S, 'gate_waiting');
+    // The gate does not offer sound until the track can play, so there is nothing to tap yet. On
+    // localhost that is over before the page has painted, which is why --slow exists.
+    await waitFor(S, `document.querySelector('#gate [data-g="sound"]')`, 60000);
+    if (args.slow) await S('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
     await shot(S, 'gate');
     await tapSel(S, '#gate [data-g="sound"]');
   }
@@ -304,6 +309,12 @@ async function room(S) {
   await tapSel(S, '#verdict [data-v="skip"]');
   await sleep(1600);
   await shot(S, 'origin_pick');
+  // the three edges are folded away, and unfolding one must not push the other two off screen
+  await tapSel(S, '#origin [data-o="why"]');
+  await sleep(300);
+  await shot(S, 'origin_why');
+  await tapSel(S, '#origin [data-o="why"]');
+  await sleep(300);
   await tapSel(S, '#origin [data-o="pick"]');
   await sleep(800);
   await shot(S, 'character');
@@ -596,8 +607,14 @@ async function load(S, query) {
   await S('Page.navigate', { url: url + '?front=0&intro=0' });
   await waitFor(S, `window.__mono && window.__mono.ready`, 20000);
   await S('Runtime.evaluate', { expression: `localStorage.clear()` });
+  // --slow makes the 744 kB ruling take about a minute to arrive, which is the only way to see the
+  // gate hold its own button shut. Lifted again as soon as the gate opens.
+  if (args.slow) {
+    await S('Network.enable');
+    await S('Network.emulateNetworkConditions', { offline: false, latency: 300, downloadThroughput: 150 * 1024, uploadThroughput: 150 * 1024 });
+  }
   await S('Page.navigate', { url: url + query });
-  await waitFor(S, `window.__mono && window.__mono.ready`, 20000);
+  await waitFor(S, `window.__mono && window.__mono.ready`, 60000);
 }
 
 async function waitFor(S, expr, timeout) {

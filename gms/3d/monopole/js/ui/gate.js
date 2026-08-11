@@ -12,6 +12,8 @@ import { verdict } from './verdict.js';
 let root = null;
 let asking = false;
 
+const painted = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
 function ensureRoot() {
   if (root) return root;
   root = document.getElementById('gate');
@@ -42,11 +44,32 @@ export const gate = {
           <i class="g-over">Universal Alliance · Competition Division</i>
           <h1>${esc(title)}</h1>
           <p>The ruling that opened Tamber Reach, read in full. ${esc(runs)}.</p>
-          <button class="g-go" data-g="sound">Play the ruling</button>
+          <button class="g-go" disabled>Fetching the recording</button>
           <button class="g-quiet" data-g="quiet">Read it in silence</button>
         </div>`;
       root.classList.add('live');
       requestAnimationFrame(() => root.classList.add('in'));
+
+      // The button does not say what it does until it does it. It is the first thing anyone touches
+      // in this game and there is nothing else on screen to blame, so a tap that goes nowhere reads
+      // as the game being broken. Two things have to be true before the word appears: the track can
+      // play, and a frame has actually been drawn since the card went up — the second one is what
+      // covers the first render, where the whole scene's shaders compile and the main thread is gone
+      // for long enough to swallow a tap. A blocked thread cannot run a rAF either, so waiting for
+      // one is waiting for the page to be able to answer.
+      Promise.all([painted(), verdict.ready()]).then(([, ok]) => {
+        const b = root.querySelector('.g-go');
+        if (!b) return;
+        if (!ok) {
+          b.remove();
+          const q = root.querySelector('.g-quiet');
+          if (q) q.textContent = 'Begin';
+          return;
+        }
+        b.disabled = false;
+        b.dataset.g = 'sound';
+        b.textContent = 'Play the ruling';
+      });
 
       const leave = sound => {
         asking = false;

@@ -17,6 +17,7 @@ let stage = 'origin';
 let advanced = false;
 let convo = 0;
 let seed = 1;
+let why = null;
 let resolveWith = null;
 
 export function chooseOrigin({ seed: s = Date.now() & 0xffff } = {}) {
@@ -25,6 +26,7 @@ export function chooseOrigin({ seed: s = Date.now() & 0xffff } = {}) {
   stage = 'origin';
   advanced = false;
   convo = 0;
+  why = null;
   profile = null;
   draw();
   root.classList.add('live');
@@ -64,6 +66,8 @@ function onClick(e) {
   const t = e.target.closest('[data-o]');
   if (!t) return;
   const a = t.dataset.o;
+  // One at a time: three cards open at once is the scrolling this was meant to remove.
+  if (a === 'why') { why = why === t.dataset.id ? null : t.dataset.id; return draw(); }
   if (a === 'pick') {
     profile = newProfile(t.dataset.id, seed);
     stage = 'character';
@@ -86,20 +90,30 @@ function onClick(e) {
 
 /* ── screen one: where you came from ────────────────────────────────────── */
 
+// Three cards that all have to be on screen at once, on a phone and on a desktop, because choosing
+// between them means comparing them — and a comparison you have to scroll to make is not one. What
+// that costs is the nine dashed lines: each card keeps its one-line lede and its four numbers, and
+// its three edges are a tap away on the card itself.
 function originHtml() {
-  const cards = content.all('origin').slice().sort((a, b) => a.order - b.order).map(o => `
-    <button class="o-card" data-o="pick" data-id="${esc(o.id)}">
+  const cards = content.all('origin').slice().sort((a, b) => a.order - b.order).map(o => {
+    const open = why === o.id;
+    return `
+    <button class="o-card${open ? ' open' : ''}" data-o="pick" data-id="${esc(o.id)}">
       <i class="o-tier">${esc(o.tier)}</i>
       <h3>${esc(o.name)}</h3>
       <p class="o-lede">${esc(o.lede)}</p>
-      <ul>${o.edge.map(e => `<li>${esc(e)}</li>`).join('')}</ul>
+      <span class="o-why" data-o="why" data-id="${esc(o.id)}" role="button" aria-expanded="${open}">
+        ${open ? 'Less' : 'What that means'}<u>${open ? '▴' : '▾'}</u>
+      </span>
+      ${open ? `<ul>${o.edge.map(e => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
       <div class="o-nums">
         <span><b>${esc(credits(o.start.cash))}</b><s>in hand</s></span>
         <span><b>${esc(credits(o.start.debt))}</b><s>owed</s></span>
         <span><b>${esc(pct(o.loan.interestWeekly, 1))}</b><s>a week</s></span>
         <span><b>${esc(credits(o.loan.maxDraw))}</b><s>credit line</s></span>
       </div>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 
   return `
     <div class="o-head">
@@ -189,7 +203,7 @@ function paintPreview() {
 
 function draw() {
   const keep = root.querySelector('.o-body')?.scrollTop || 0;
-  root.innerHTML = `<div class="o-body">${stage === 'origin' ? originHtml() : characterHtml()}</div>`;
+  root.innerHTML = `<div class="o-body ${stage}">${stage === 'origin' ? originHtml() : characterHtml()}</div>`;
   if (stage === 'character') { paintPreview(); root.querySelector('.o-body').scrollTop = keep; }
 }
 
