@@ -1994,3 +1994,16 @@ button.tag {
 .media-pane.room-shudder .room-fallback {
   animation: room-shudder 1.4s ease-in-out;
 }
+
+.variant-flags {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--line-hot);
+  border-radius: 999px;
+  color: var(--red);
+  font-size: 0.62rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

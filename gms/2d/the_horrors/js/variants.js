@@ -4,17 +4,19 @@
 window.MonsterVariants = {
   "clips": {
     "attack:bone_collector": {
-      "selected": "videos/monster_attack_bone_collector_v3.mp4",
+      "selected": "videos/monster_attack_bone_collector_v4.mp4",
       "variants": [
         {
           "bytes": 236955,
           "created": "2026-05-17 03:38:40",
           "file": "monster_attack_bone_collector.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 40.0,
+          "score": 0.3,
           "src": "videos/monster_attack_bone_collector.mp4",
           "start": "images/hallway.jpg"
         },
@@ -23,11 +25,14 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:36:39",
           "durationSecs": 232.4,
           "file": "monster_attack_bone_collector_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a stooped figure in a long dark travelling coat carrying a heavy worn leather bag is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 65.0,
+          "score": -22.3,
           "src": "videos/monster_attack_bone_collector_v2.mp4",
           "start": "images/monster_attack_bone_collector_start.jpg"
         },
@@ -35,28 +40,47 @@ window.MonsterVariants = {
           "bytes": 336585,
           "created": "2026-08-11 10:48:39",
           "file": "monster_attack_bone_collector_v3.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 3,
           "note": "recovered from disk",
           "prompt": "",
-          "score": 37.0,
+          "score": -37.4,
           "src": "videos/monster_attack_bone_collector_v3.mp4",
           "start": "images/monster_attack_bone_collector_start.jpg"
+        },
+        {
+          "bytes": 446830,
+          "created": "2026-08-11 19:32:38",
+          "durationSecs": 312.2,
+          "end": "images/monster_attack_bone_collector_end.jpg",
+          "file": "monster_attack_bone_collector_v4.mp4",
+          "flags": [],
+          "n": 4,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a stooped figure in a long dark travelling coat carrying a heavy worn leather bag rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 67.6,
+          "src": "videos/monster_attack_bone_collector_v4.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:crawling_thing": {
-      "selected": "videos/monster_attack_crawling_thing_v2.mp4",
+      "selected": "videos/monster_attack_crawling_thing_v3.mp4",
       "variants": [
         {
           "bytes": 148697,
           "created": "2026-05-17 03:45:41",
           "file": "monster_attack_crawling_thing.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 60,
+          "score": 20,
           "src": "videos/monster_attack_crawling_thing.mp4",
           "start": "images/hallway.jpg"
         },
@@ -65,28 +89,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:44:45",
           "durationSecs": 245.2,
           "file": "monster_attack_crawling_thing_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a long dark humanoid shape on all fours, limbs too long, crawling low along the floor is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 60,
+          "score": -20,
           "src": "videos/monster_attack_crawling_thing_v2.mp4",
           "start": "images/monster_attack_crawling_thing_start.jpg"
+        },
+        {
+          "bytes": 232104,
+          "created": "2026-08-11 19:42:04",
+          "durationSecs": 312.4,
+          "end": "images/monster_attack_crawling_thing_end.jpg",
+          "file": "monster_attack_crawling_thing_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a long dark humanoid shape on all fours, limbs too long, crawling low along the floor scrambles into view on all fours and races down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 59.4,
+          "src": "videos/monster_attack_crawling_thing_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:faceless_doctor": {
-      "selected": "videos/monster_attack_faceless_doctor_v3.mp4",
+      "selected": "videos/monster_attack_faceless_doctor_v4.mp4",
       "variants": [
         {
           "bytes": 176430,
           "created": "2026-05-17 03:31:40",
           "file": "monster_attack_faceless_doctor.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 35.4,
+          "score": -4.6,
           "src": "videos/monster_attack_faceless_doctor.mp4",
           "start": "images/hallway.jpg"
         },
@@ -95,11 +138,15 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:28:58",
           "durationSecs": 237.1,
           "file": "monster_attack_faceless_doctor_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive",
+            "runaway"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall slim figure in a long dark physician's coat with a brass stethoscope, a high collar, and only a smooth blank featureless shape above the collar is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 60,
+          "score": -50,
           "src": "videos/monster_attack_faceless_doctor_v2.mp4",
           "start": "images/monster_attack_faceless_doctor_start.jpg"
         },
@@ -107,28 +154,47 @@ window.MonsterVariants = {
           "bytes": 73066,
           "created": "2026-08-11 11:04:55",
           "file": "monster_attack_faceless_doctor_v3.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 3,
           "note": "recovered from disk",
           "prompt": "",
-          "score": 60,
+          "score": -20,
           "src": "videos/monster_attack_faceless_doctor_v3.mp4",
           "start": "images/monster_attack_faceless_doctor_start.jpg"
+        },
+        {
+          "bytes": 237909,
+          "created": "2026-08-11 19:23:07",
+          "durationSecs": 313.9,
+          "end": "images/monster_attack_faceless_doctor_end.jpg",
+          "file": "monster_attack_faceless_doctor_v4.mp4",
+          "flags": [],
+          "n": 4,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall slim figure in a long dark physician's coat with a brass stethoscope, a high collar, and only a smooth blank featureless shape above the collar rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 49.9,
+          "src": "videos/monster_attack_faceless_doctor_v4.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:hollow_one": {
-      "selected": "videos/monster_attack_hollow_one_v2.mp4",
+      "selected": "videos/monster_attack_hollow_one_v3.mp4",
       "variants": [
         {
           "bytes": 205337,
           "created": "2026-05-16 14:24:39",
           "file": "monster_attack_hollow_one.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 60,
+          "score": 20,
           "src": "videos/monster_attack_hollow_one.mp4",
           "start": "images/hallway.jpg"
         },
@@ -137,28 +203,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:21:07",
           "durationSecs": 224.2,
           "file": "monster_attack_hollow_one_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall figure in a long dark heavy coat with a deep dark hood pulled up so the face is completely hidden in shadow is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 65.6,
+          "score": -11.5,
           "src": "videos/monster_attack_hollow_one_v2.mp4",
           "start": "images/monster_attack_hollow_one_start.jpg"
+        },
+        {
+          "bytes": 203965,
+          "created": "2026-08-11 19:13:51",
+          "durationSecs": 318.5,
+          "end": "images/monster_attack_hollow_one_end.jpg",
+          "file": "monster_attack_hollow_one_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall figure in a long dark heavy coat with a deep dark hood pulled up so the face is completely hidden in shadow rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 66.1,
+          "src": "videos/monster_attack_hollow_one_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:lost_child": {
-      "selected": "videos/monster_attack_lost_child_v2.mp4",
+      "selected": "videos/monster_attack_lost_child_v3.mp4",
       "variants": [
         {
           "bytes": 206788,
           "created": "2026-05-16 13:59:42",
           "file": "monster_attack_lost_child.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 44.6,
+          "score": 4.9,
           "src": "videos/monster_attack_lost_child.mp4",
           "start": "images/hallway.jpg"
         },
@@ -167,28 +252,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:50:44",
           "durationSecs": 237.6,
           "file": "monster_attack_lost_child_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a small child of about eight in a dirty dark navy coat and dark hood, dark hair partly covering the face is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 68.3,
+          "score": -12.1,
           "src": "videos/monster_attack_lost_child_v2.mp4",
           "start": "images/monster_attack_lost_child_start.jpg"
+        },
+        {
+          "bytes": 328543,
+          "created": "2026-08-11 18:29:21",
+          "durationSecs": 324.5,
+          "end": "images/monster_attack_lost_child_end.jpg",
+          "file": "monster_attack_lost_child_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a small child of about eight in a dirty dark navy coat and dark hood, dark hair partly covering the face rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 69.0,
+          "src": "videos/monster_attack_lost_child_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:mourning_groom": {
-      "selected": "videos/monster_attack_mourning_groom_v2.mp4",
+      "selected": "videos/monster_attack_mourning_groom_v3.mp4",
       "variants": [
         {
           "bytes": 279201,
           "created": "2026-05-17 03:53:05",
           "file": "monster_attack_mourning_groom.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 48.1,
+          "score": 8.7,
           "src": "videos/monster_attack_mourning_groom.mp4",
           "start": "images/hallway.jpg"
         },
@@ -197,28 +301,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:08:48",
           "durationSecs": 233.1,
           "file": "monster_attack_mourning_groom_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall man in a formal black wedding suit with neatly combed dark hair and a small white boutonniere on his lapel, hollow eyes is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_mourning_groom_v2.mp4",
           "start": "images/monster_attack_mourning_groom_start.jpg"
+        },
+        {
+          "bytes": 338984,
+          "created": "2026-08-11 19:51:25",
+          "durationSecs": 313.2,
+          "end": "images/monster_attack_mourning_groom_end.jpg",
+          "file": "monster_attack_mourning_groom_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall man in a formal black wedding suit with neatly combed dark hair and a small white boutonniere on his lapel, hollow eyes rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_mourning_groom_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:pale_woman": {
-      "selected": "videos/monster_attack_pale_woman_v2.mp4",
+      "selected": "videos/monster_attack_pale_woman_v3.mp4",
       "variants": [
         {
           "bytes": 170777,
           "created": "2026-05-16 01:07:57",
           "file": "monster_attack_pale_woman.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 60,
+          "score": 20,
           "src": "videos/monster_attack_pale_woman.mp4",
           "start": "images/hallway.jpg"
         },
@@ -227,28 +350,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:35:32",
           "durationSecs": 222.6,
           "file": "monster_attack_pale_woman_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall pale-faced woman wrapped in a dark grey shawl over a long dark dress, with long dark hair down past her shoulders is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 52.2,
+          "score": -27.4,
           "src": "videos/monster_attack_pale_woman_v2.mp4",
           "start": "images/monster_attack_pale_woman_start.jpg"
+        },
+        {
+          "bytes": 321036,
+          "created": "2026-08-11 18:19:49",
+          "durationSecs": 319.5,
+          "end": "images/monster_attack_pale_woman_end.jpg",
+          "file": "monster_attack_pale_woman_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall pale-faced woman wrapped in a dark grey shawl over a long dark dress, with long dark hair down past her shoulders rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 61.9,
+          "src": "videos/monster_attack_pale_woman_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:paper_mask": {
-      "selected": "videos/monster_attack_paper_mask_v3.mp4",
+      "selected": "videos/monster_attack_paper_mask_v4.mp4",
       "variants": [
         {
           "bytes": 127389,
           "created": "2026-05-17 04:00:18",
           "file": "monster_attack_paper_mask.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 41.0,
+          "score": 0.9,
           "src": "videos/monster_attack_paper_mask.mp4",
           "start": "images/hallway.jpg"
         },
@@ -258,12 +400,14 @@ window.MonsterVariants = {
           "durationSecs": 218.0,
           "file": "monster_attack_paper_mask_v2.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "runaway"
           ],
           "n": 2,
           "note": "",
           "prompt": "a slim figure in a long dark coat whose whole face is covered by a flat folded sheet of white paper is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 20,
+          "score": -60,
           "src": "videos/monster_attack_paper_mask_v2.mp4",
           "start": "images/monster_attack_paper_mask_start.jpg"
         },
@@ -272,28 +416,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:49:39",
           "durationSecs": 238.1,
           "file": "monster_attack_paper_mask_v3.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 3,
           "note": "",
           "prompt": "a slim figure in a long dark coat whose whole face is covered by a flat folded sheet of white paper is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_paper_mask_v3.mp4",
           "start": "images/monster_attack_paper_mask_start.jpg"
+        },
+        {
+          "bytes": 219652,
+          "created": "2026-08-11 20:00:36",
+          "durationSecs": 306.1,
+          "end": "images/monster_attack_paper_mask_end.jpg",
+          "file": "monster_attack_paper_mask_v4.mp4",
+          "flags": [],
+          "n": 4,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a slim figure in a long dark coat whose whole face is covered by a flat folded sheet of white paper rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_paper_mask_v4.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:previous_tenant": {
-      "selected": "videos/monster_attack_previous_tenant_v2.mp4",
+      "selected": "videos/monster_attack_previous_tenant_v3.mp4",
       "variants": [
         {
           "bytes": 223062,
           "created": "2026-05-16 14:04:55",
           "file": "monster_attack_previous_tenant.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 44.5,
+          "score": 4.7,
           "src": "videos/monster_attack_previous_tenant.mp4",
           "start": "images/hallway.jpg"
         },
@@ -302,28 +465,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:58:15",
           "durationSecs": 226.4,
           "file": "monster_attack_previous_tenant_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a gaunt elderly man in a dark brown wool suit and dark waistcoat, neatly combed dark grey hair and hollow shadowed eyes is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 42.4,
+          "score": -34.6,
           "src": "videos/monster_attack_previous_tenant_v2.mp4",
           "start": "images/monster_attack_previous_tenant_start.jpg"
+        },
+        {
+          "bytes": 318808,
+          "created": "2026-08-11 18:38:52",
+          "durationSecs": 319.8,
+          "end": "images/monster_attack_previous_tenant_end.jpg",
+          "file": "monster_attack_previous_tenant_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a gaunt elderly man in a dark brown wool suit and dark waistcoat, neatly combed dark grey hair and hollow shadowed eyes rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 55.5,
+          "src": "videos/monster_attack_previous_tenant_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:red_lady": {
-      "selected": "videos/monster_attack_red_lady_v2.mp4",
+      "selected": "videos/monster_attack_red_lady_v3.mp4",
       "variants": [
         {
           "bytes": 187540,
           "created": "2026-05-17 04:07:37",
           "file": "monster_attack_red_lady.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 45.2,
+          "score": 5.7,
           "src": "videos/monster_attack_red_lady.mp4",
           "start": "images/hallway.jpg"
         },
@@ -332,28 +514,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:23:24",
           "durationSecs": 212.8,
           "file": "monster_attack_red_lady_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall woman in a long deep crimson red evening dress with dark hair worn up is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 49.8,
+          "score": -29.8,
           "src": "videos/monster_attack_red_lady_v2.mp4",
           "start": "images/monster_attack_red_lady_start.jpg"
+        },
+        {
+          "bytes": 240502,
+          "created": "2026-08-11 20:09:47",
+          "durationSecs": 304.5,
+          "end": "images/monster_attack_red_lady_end.jpg",
+          "file": "monster_attack_red_lady_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall woman in a long deep crimson red evening dress with dark hair worn up rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 59.7,
+          "src": "videos/monster_attack_red_lady_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:silent_companion": {
-      "selected": "videos/monster_attack_silent_companion_v2.mp4",
+      "selected": "videos/monster_attack_silent_companion_v3.mp4",
       "variants": [
         {
           "bytes": 177064,
           "created": "2026-05-16 14:17:32",
           "file": "monster_attack_silent_companion.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 34.2,
+          "score": -5.2,
           "src": "videos/monster_attack_silent_companion.mp4",
           "start": "images/hallway.jpg"
         },
@@ -362,28 +563,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:13:32",
           "durationSecs": 223.7,
           "file": "monster_attack_silent_companion_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a slim figure in a charcoal-grey dressing gown with long dark hair hanging over the face is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_silent_companion_v2.mp4",
           "start": "images/monster_attack_silent_companion_start.jpg"
+        },
+        {
+          "bytes": 265634,
+          "created": "2026-08-11 19:04:29",
+          "durationSecs": 319.4,
+          "end": "images/monster_attack_silent_companion_end.jpg",
+          "file": "monster_attack_silent_companion_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a slim figure in a charcoal-grey dressing gown with long dark hair hanging over the face rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_silent_companion_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:white_shadow": {
-      "selected": "videos/monster_attack_white_shadow_v2.mp4",
+      "selected": "videos/monster_attack_white_shadow_v3.mp4",
       "variants": [
         {
           "bytes": 176330,
           "created": "2026-05-16 14:10:55",
           "file": "monster_attack_white_shadow.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 48.5,
+          "score": 7.8,
           "src": "videos/monster_attack_white_shadow.mp4",
           "start": "images/hallway.jpg"
         },
@@ -392,28 +612,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:05:51",
           "durationSecs": 218.5,
           "file": "monster_attack_white_shadow_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall featureless jet-black humanoid silhouette like a perfect ink-cut shape, no face, no surface detail is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 60,
+          "score": -20,
           "src": "videos/monster_attack_white_shadow_v2.mp4",
           "start": "images/monster_attack_white_shadow_start.jpg"
+        },
+        {
+          "bytes": 235781,
+          "created": "2026-08-11 18:54:28",
+          "durationSecs": 319.6,
+          "end": "images/monster_attack_white_shadow_end.jpg",
+          "file": "monster_attack_white_shadow_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall featureless jet-black humanoid silhouette like a perfect ink-cut shape, no face, no surface detail rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_white_shadow_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:bone_collector": {
-      "selected": "videos/monster_release_bone_collector_v2.mp4",
+      "selected": "videos/monster_release_bone_collector_v3.mp4",
       "variants": [
         {
           "bytes": 213125,
           "created": "2026-05-17 03:35:10",
           "file": "monster_release_bone_collector.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 42.5,
+          "score": 2.7,
           "src": "videos/monster_release_bone_collector.mp4",
           "start": "images/hallway.jpg"
         },
@@ -426,14 +665,28 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "a stooped figure in a long dark travelling coat carrying a heavy worn leather bag is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 22.2,
+          "score": 20.2,
           "src": "videos/monster_release_bone_collector_v2.mp4",
           "start": "images/monster_release_bone_collector_start.jpg"
+        },
+        {
+          "bytes": 172739,
+          "created": "2026-08-11 19:27:22",
+          "durationSecs": 251.7,
+          "end": "images/monster_release_bone_collector_end.jpg",
+          "file": "monster_release_bone_collector_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a stooped figure in a long dark travelling coat carrying a heavy worn leather bag walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 25.7,
+          "src": "videos/monster_release_bone_collector_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:crawling_thing": {
-      "selected": "videos/monster_release_crawling_thing_v2.mp4",
+      "selected": "videos/monster_release_crawling_thing_v3.mp4",
       "variants": [
         {
           "bytes": 135228,
@@ -443,7 +696,7 @@ window.MonsterVariants = {
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 16.6,
+          "score": 16.4,
           "src": "videos/monster_release_crawling_thing.mp4",
           "start": "images/hallway.jpg"
         },
@@ -452,18 +705,34 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:40:40",
           "durationSecs": 238.1,
           "file": "monster_release_crawling_thing_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a long dark humanoid shape on all fours, limbs too long, crawling low along the floor is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 31.9,
+          "score": -7.9,
           "src": "videos/monster_release_crawling_thing_v2.mp4",
           "start": "images/monster_release_crawling_thing_start.jpg"
+        },
+        {
+          "bytes": 179212,
+          "created": "2026-08-11 19:36:48",
+          "durationSecs": 247.8,
+          "end": "images/monster_release_crawling_thing_end.jpg",
+          "file": "monster_release_crawling_thing_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a long dark humanoid shape on all fours, limbs too long, crawling low along the floor crawls into view on all fours at the far end of the corridor and creeps toward the camera, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 25.0,
+          "src": "videos/monster_release_crawling_thing_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:faceless_doctor": {
-      "selected": "videos/monster_release_faceless_doctor_v3.mp4",
+      "selected": "videos/monster_release_faceless_doctor_v4.mp4",
       "variants": [
         {
           "bytes": 135074,
@@ -483,12 +752,13 @@ window.MonsterVariants = {
           "durationSecs": 228.7,
           "file": "monster_release_faceless_doctor_v2.mp4",
           "flags": [
+            "driftstart",
             "static"
           ],
           "n": 2,
           "note": "",
           "prompt": "a tall slim figure in a long dark physician's coat with a brass stethoscope, a high collar, and only a smooth blank featureless shape above the collar is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": -25.2,
+          "score": -64.6,
           "src": "videos/monster_release_faceless_doctor_v2.mp4",
           "start": "images/monster_release_faceless_doctor_start.jpg"
         },
@@ -496,28 +766,46 @@ window.MonsterVariants = {
           "bytes": 130943,
           "created": "2026-08-11 10:52:44",
           "file": "monster_release_faceless_doctor_v3.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 3,
           "note": "recovered from disk",
           "prompt": "",
-          "score": 27.1,
+          "score": -12.1,
           "src": "videos/monster_release_faceless_doctor_v3.mp4",
           "start": "images/monster_release_faceless_doctor_start.jpg"
+        },
+        {
+          "bytes": 156764,
+          "created": "2026-08-11 19:17:51",
+          "durationSecs": 235.7,
+          "end": "images/monster_release_faceless_doctor_end.jpg",
+          "file": "monster_release_faceless_doctor_v4.mp4",
+          "flags": [],
+          "n": 4,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall slim figure in a long dark physician's coat with a brass stethoscope, a high collar, and only a smooth blank featureless shape above the collar walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 30.6,
+          "src": "videos/monster_release_faceless_doctor_v4.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:hollow_one": {
-      "selected": "videos/monster_release_hollow_one_v2.mp4",
+      "selected": "videos/monster_release_hollow_one_v3.mp4",
       "variants": [
         {
           "bytes": 133462,
           "created": "2026-05-16 14:21:02",
           "file": "monster_release_hollow_one.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 60,
+          "score": 20,
           "src": "videos/monster_release_hollow_one.mp4",
           "start": "images/hallway.jpg"
         },
@@ -526,28 +814,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:17:22",
           "durationSecs": 225.9,
           "file": "monster_release_hollow_one_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall figure in a long dark heavy coat with a deep dark hood pulled up so the face is completely hidden in shadow is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 41.7,
+          "score": -38.2,
           "src": "videos/monster_release_hollow_one_v2.mp4",
           "start": "images/monster_release_hollow_one_start.jpg"
+        },
+        {
+          "bytes": 178896,
+          "created": "2026-08-11 19:08:30",
+          "durationSecs": 239.7,
+          "end": "images/monster_release_hollow_one_end.jpg",
+          "file": "monster_release_hollow_one_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall figure in a long dark heavy coat with a deep dark hood pulled up so the face is completely hidden in shadow walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 37.0,
+          "src": "videos/monster_release_hollow_one_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:lost_child": {
-      "selected": "videos/monster_release_lost_child_v2.mp4",
+      "selected": "videos/monster_release_lost_child_v3.mp4",
       "variants": [
         {
           "bytes": 257439,
           "created": "2026-05-16 13:57:36",
           "file": "monster_release_lost_child.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 45.0,
+          "score": 5.1,
           "src": "videos/monster_release_lost_child.mp4",
           "start": "images/hallway.jpg"
         },
@@ -556,28 +863,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:42:58",
           "durationSecs": 219.5,
           "file": "monster_release_lost_child_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a small child of about eight in a dirty dark navy coat and dark hood, dark hair partly covering the face is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 23.8,
+          "score": -15.8,
           "src": "videos/monster_release_lost_child_v2.mp4",
           "start": "images/monster_release_lost_child_start.jpg"
+        },
+        {
+          "bytes": 140141,
+          "created": "2026-08-11 18:23:55",
+          "durationSecs": 242.6,
+          "end": "images/monster_release_lost_child_end.jpg",
+          "file": "monster_release_lost_child_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a small child of about eight in a dirty dark navy coat and dark hood, dark hair partly covering the face walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 30.9,
+          "src": "videos/monster_release_lost_child_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:mourning_groom": {
-      "selected": "videos/monster_release_mourning_groom_v2.mp4",
+      "selected": "videos/monster_release_mourning_groom_v3.mp4",
       "variants": [
         {
           "bytes": 252398,
           "created": "2026-05-17 03:49:23",
           "file": "monster_release_mourning_groom.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 69.2,
+          "score": 28.0,
           "src": "videos/monster_release_mourning_groom.mp4",
           "start": "images/hallway.jpg"
         },
@@ -586,28 +911,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:01:12",
           "durationSecs": 252.5,
           "file": "monster_release_mourning_groom_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall man in a formal black wedding suit with neatly combed dark hair and a small white boutonniere on his lapel, hollow eyes is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 27.1,
+          "score": -12.6,
           "src": "videos/monster_release_mourning_groom_v2.mp4",
           "start": "images/monster_release_mourning_groom_start.jpg"
+        },
+        {
+          "bytes": 170780,
+          "created": "2026-08-11 19:46:09",
+          "durationSecs": 242.7,
+          "end": "images/monster_release_mourning_groom_end.jpg",
+          "file": "monster_release_mourning_groom_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall man in a formal black wedding suit with neatly combed dark hair and a small white boutonniere on his lapel, hollow eyes walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 33.5,
+          "src": "videos/monster_release_mourning_groom_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:pale_woman": {
-      "selected": "videos/monster_release_pale_woman_v2.mp4",
+      "selected": "videos/monster_release_pale_woman_v3.mp4",
       "variants": [
         {
           "bytes": 332491,
           "created": "2026-05-16 01:04:32",
           "file": "monster_release_pale_woman.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 50.1,
+          "score": 10.5,
           "src": "videos/monster_release_pale_woman.mp4",
           "start": "images/hallway.jpg"
         },
@@ -616,28 +959,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:28:06",
           "durationSecs": 255.4,
           "file": "monster_release_pale_woman_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall pale-faced woman wrapped in a dark grey shawl over a long dark dress, with long dark hair down past her shoulders is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 42.7,
+          "score": 3.0,
           "src": "videos/monster_release_pale_woman_v2.mp4",
           "start": "images/monster_release_pale_woman_start.jpg"
+        },
+        {
+          "bytes": 171251,
+          "created": "2026-08-11 18:14:29",
+          "durationSecs": 244.7,
+          "end": "images/monster_release_pale_woman_end.jpg",
+          "file": "monster_release_pale_woman_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall pale-faced woman wrapped in a dark grey shawl over a long dark dress, with long dark hair down past her shoulders walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 24.7,
+          "src": "videos/monster_release_pale_woman_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:paper_mask": {
-      "selected": "videos/monster_release_paper_mask_v2.mp4",
+      "selected": "videos/monster_release_paper_mask_v3.mp4",
       "variants": [
         {
           "bytes": 177942,
           "created": "2026-05-17 03:56:42",
           "file": "monster_release_paper_mask.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 48.4,
+          "score": 8.0,
           "src": "videos/monster_release_paper_mask.mp4",
           "start": "images/hallway.jpg"
         },
@@ -646,28 +1007,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:12:23",
           "durationSecs": 214.6,
           "file": "monster_release_paper_mask_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a slim figure in a long dark coat whose whole face is covered by a flat folded sheet of white paper is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 18.8,
+          "score": -20.8,
           "src": "videos/monster_release_paper_mask_v2.mp4",
           "start": "images/monster_release_paper_mask_start.jpg"
+        },
+        {
+          "bytes": 247998,
+          "created": "2026-08-11 19:55:25",
+          "durationSecs": 237.7,
+          "end": "images/monster_release_paper_mask_end.jpg",
+          "file": "monster_release_paper_mask_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a slim figure in a long dark coat whose whole face is covered by a flat folded sheet of white paper walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 44.7,
+          "src": "videos/monster_release_paper_mask_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:previous_tenant": {
-      "selected": "videos/monster_release_previous_tenant_v2.mp4",
+      "selected": "videos/monster_release_previous_tenant_v3.mp4",
       "variants": [
         {
           "bytes": 203069,
           "created": "2026-05-16 14:02:13",
           "file": "monster_release_previous_tenant.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 50.6,
+          "score": 10.4,
           "src": "videos/monster_release_previous_tenant.mp4",
           "start": "images/hallway.jpg"
         },
@@ -676,28 +1055,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:54:24",
           "durationSecs": 218.9,
           "file": "monster_release_previous_tenant_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a gaunt elderly man in a dark brown wool suit and dark waistcoat, neatly combed dark grey hair and hollow shadowed eyes is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 27.2,
+          "score": -12.7,
           "src": "videos/monster_release_previous_tenant_v2.mp4",
           "start": "images/monster_release_previous_tenant_start.jpg"
+        },
+        {
+          "bytes": 166395,
+          "created": "2026-08-11 18:33:31",
+          "durationSecs": 247.9,
+          "end": "images/monster_release_previous_tenant_end.jpg",
+          "file": "monster_release_previous_tenant_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a gaunt elderly man in a dark brown wool suit and dark waistcoat, neatly combed dark grey hair and hollow shadowed eyes walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 34.0,
+          "src": "videos/monster_release_previous_tenant_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:red_lady": {
-      "selected": "videos/monster_release_red_lady_v2.mp4",
+      "selected": "videos/monster_release_red_lady_v3.mp4",
       "variants": [
         {
           "bytes": 269002,
           "created": "2026-05-17 04:04:00",
           "file": "monster_release_red_lady.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 48.5,
+          "score": 8.8,
           "src": "videos/monster_release_red_lady.mp4",
           "start": "images/hallway.jpg"
         },
@@ -710,24 +1107,40 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "a tall woman in a long deep crimson red evening dress with dark hair worn up is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 25.8,
+          "score": 26.0,
           "src": "videos/monster_release_red_lady_v2.mp4",
           "start": "images/monster_release_red_lady_start.jpg"
+        },
+        {
+          "bytes": 200956,
+          "created": "2026-08-11 20:04:41",
+          "durationSecs": 241.2,
+          "end": "images/monster_release_red_lady_end.jpg",
+          "file": "monster_release_red_lady_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall woman in a long deep crimson red evening dress with dark hair worn up walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 24.2,
+          "src": "videos/monster_release_red_lady_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:silent_companion": {
-      "selected": "videos/monster_release_silent_companion_v2.mp4",
+      "selected": "videos/monster_release_silent_companion_v3.mp4",
       "variants": [
         {
           "bytes": 180211,
           "created": "2026-05-16 14:14:14",
           "file": "monster_release_silent_companion.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 43.3,
+          "score": 3.5,
           "src": "videos/monster_release_silent_companion.mp4",
           "start": "images/hallway.jpg"
         },
@@ -736,28 +1149,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:09:46",
           "durationSecs": 233.8,
           "file": "monster_release_silent_companion_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a slim figure in a charcoal-grey dressing gown with long dark hair hanging over the face is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 29.4,
+          "score": -10.2,
           "src": "videos/monster_release_silent_companion_v2.mp4",
           "start": "images/monster_release_silent_companion_start.jpg"
+        },
+        {
+          "bytes": 137646,
+          "created": "2026-08-11 18:59:09",
+          "durationSecs": 278.2,
+          "end": "images/monster_release_silent_companion_end.jpg",
+          "file": "monster_release_silent_companion_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a slim figure in a charcoal-grey dressing gown with long dark hair hanging over the face walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 34.2,
+          "src": "videos/monster_release_silent_companion_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:white_shadow": {
-      "selected": "videos/monster_release_white_shadow_v2.mp4",
+      "selected": "videos/monster_release_white_shadow_v3.mp4",
       "variants": [
         {
           "bytes": 187174,
           "created": "2026-05-16 14:07:49",
           "file": "monster_release_white_shadow.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 45.6,
+          "score": 5.7,
           "src": "videos/monster_release_white_shadow.mp4",
           "start": "images/hallway.jpg"
         },
@@ -766,19 +1197,36 @@ window.MonsterVariants = {
           "created": "2026-08-11 10:02:10",
           "durationSecs": 231.4,
           "file": "monster_release_white_shadow_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall featureless jet-black humanoid silhouette like a perfect ink-cut shape, no face, no surface detail is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature stays clearly lit and readable against the corridor, the creature does not change shape, no other people, no gore",
-          "score": 33.3,
+          "score": -46.1,
           "src": "videos/monster_release_white_shadow_v2.mp4",
           "start": "images/monster_release_white_shadow_start.jpg"
+        },
+        {
+          "bytes": 194966,
+          "created": "2026-08-11 18:43:42",
+          "durationSecs": 286.2,
+          "end": "images/monster_release_white_shadow_end.jpg",
+          "file": "monster_release_white_shadow_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow period-neutral house hallway with off-white walls stands empty and completely still, then a tall featureless jet-black humanoid silhouette like a perfect ink-cut shape, no face, no surface detail walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 30.3,
+          "src": "videos/monster_release_white_shadow_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     }
   },
   "game": "the_horrors",
-  "generated": "2026-08-11 11:49:39",
+  "generated": "2026-08-11 20:09:47",
   "monsters": [
     {
       "attackRef": "ref/monster_pale_woman_attack.jpg",
@@ -870,8 +1318,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_bone_collector_v4.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_crawling_thing_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_crawling_thing_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -894,8 +1358,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_faceless_doctor_v4.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_hollow_one_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_hollow_one_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -910,6 +1390,14 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_lost_child_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_mourning_groom_v2.mp4": {
       "enabled": true,
       "fade": 0.4,
@@ -918,8 +1406,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_mourning_groom_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_pale_woman_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_pale_woman_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -942,8 +1446,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_paper_mask_v4.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_previous_tenant_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_previous_tenant_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -958,6 +1478,14 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_red_lady_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_silent_companion_v2.mp4": {
       "enabled": true,
       "fade": 0.4,
@@ -966,8 +1494,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_silent_companion_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_white_shadow_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_white_shadow_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,

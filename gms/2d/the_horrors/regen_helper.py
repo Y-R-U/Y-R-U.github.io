@@ -48,6 +48,9 @@ SEARCH_GLOB = os.path.expanduser("~/cc/yru/site/gms/2d/*/regen_config.json")
 GAME_PORTRAIT_WIDTH = 384
 GAME_PORTRAIT_HEIGHT = 640
 ALLOWED_RESOLUTIONS = {(384, 640), (576, 960)}
+# Kept in step with VIDEO_FRAMES in gen_monsters.py: the attack is the end of
+# the run and gets the extra second to make the charge read.
+MONSTER_FRAMES = {"release": 73, "attack": 97}
 
 # Image redo (still generation) runs on the mflux-queue warm server, which does
 # both txt2img (rooms / success end-frames) and multi-ref edit (monster-in-hallway
@@ -217,10 +220,15 @@ def apply_monster_prompts(project):
         monster = project.monsters.get(monster_id) if monster_id else None
         if not monster:
             continue
-        start = f"images/monster_{kind}_{monster_id}_start.jpg"
-        if os.path.exists(os.path.join(project.root, start)):
-            transition["start"] = start
-            transition["poster"] = start
+        # The composite is the clip's DESTINATION, not its opening shot: every
+        # event fires while the player is looking at the empty hallway, so that
+        # plate is the start and LTX is pinned to arrive at the composite.
+        end = f"images/monster_{kind}_{monster_id}_end.jpg"
+        if os.path.exists(os.path.join(project.root, end)):
+            transition["start"] = "images/hallway.jpg"
+            transition["end"] = end
+            transition["poster"] = end
+            transition["num_frames"] = MONSTER_FRAMES.get(kind, 73)
         video_prompt = monster.get(f"{kind}VideoPrompt")
         if video_prompt:
             transition["promptText"] = video_prompt
@@ -303,8 +311,8 @@ def build_image_meta(project):
         monster_id, variant = monster_id_from_transition(file_name)
         if not monster_id:
             continue
-        # Start-frame prompt: the event's own per-monster prompt already places
-        # the creature in the hallway and is hand-tuned in both games.
+        # End-frame prompt: the event's own per-monster prompt places the
+        # creature in the hallway and is hand-tuned in both games.
         start_prompt = transition.get("promptText", "")
         # Character-reference prompt: prefer a clean visual descriptor; the user
         # can edit it before re-rolling the saved monster reference.
@@ -313,10 +321,10 @@ def build_image_meta(project):
         meta[file_name] = {
             "kind": f"monster_{variant}",
             "imagePrompt": start_prompt,
-            "otherImage": f"images/monster_{variant}_{monster_id}_start.jpg",
-            "otherImagePng": f"original_files/monster_{variant}_{monster_id}_start.png",
+            "otherImage": f"images/monster_{variant}_{monster_id}_end.jpg",
+            "otherImagePng": f"original_files/monster_{variant}_{monster_id}_end.png",
             "videoFiles": [file_name],
-            "endFrame": False,
+            "endFrame": True,
             "monsterId": monster_id,
             # gen_monsters.py writes ref/monster_<id>.jpg (committed, so remote
             # debug can show it); older runs left a .png master beside it.
@@ -881,9 +889,13 @@ def process_monster_regen(project, local_job, transition, monster_id, kind, prom
     Deliberately additive — nothing already on disk is touched, and the clip the
     game plays only changes when a reviewer ticks the new variant."""
     render_options = dict(local_job.get("renderOptions") or {})
-    start_image = render_options.get("start_image") or f"images/monster_{kind}_{monster_id}_start.jpg"
-    if os.path.exists(os.path.join(project.root, start_image)):
-        render_options["start_image"] = start_image
+    # Opens on the hallway the player is already looking at, pinned to arrive at
+    # the composite. Image-Redo can override either end via renderOptions.
+    end_image = render_options.get("end_image") or f"images/monster_{kind}_{monster_id}_end.jpg"
+    if os.path.exists(os.path.join(project.root, end_image)):
+        render_options["end_image"] = end_image
+    render_options.setdefault("start_image", "images/hallway.jpg")
+    render_options.setdefault("num_frames", MONSTER_FRAMES.get(kind, 73))
     data, entry, number, out_file = next_variant_file(project, kind, monster_id)
     out_path = os.path.join(project.video_dir, out_file)
     temp = os.path.join(project.video_dir, f".regen_{out_file}")

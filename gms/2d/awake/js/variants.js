@@ -4,17 +4,19 @@
 window.MonsterVariants = {
   "clips": {
     "attack:alien": {
-      "selected": "videos/monster_attack_alien_v2.mp4",
+      "selected": "videos/monster_attack_alien_v3.mp4",
       "variants": [
         {
           "bytes": 242112,
           "created": "2026-05-15 02:08:00",
           "file": "monster_attack_alien.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 23.4,
+          "score": -12.0,
           "src": "videos/monster_attack_alien.mp4",
           "start": "images/hallway.jpg"
         },
@@ -23,28 +25,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 07:53:53",
           "durationSecs": 205.5,
           "file": "monster_attack_alien_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a sleek black-grey alien infiltrator with reflective eyes and a narrow insectile silhouette is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 54.7,
+          "score": -26.0,
           "src": "videos/monster_attack_alien_v2.mp4",
           "start": "images/monster_attack_alien_start.jpg"
+        },
+        {
+          "bytes": 334818,
+          "created": "2026-08-11 16:11:53",
+          "durationSecs": 296.9,
+          "end": "images/monster_attack_alien_end.jpg",
+          "file": "monster_attack_alien_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a sleek black-grey alien infiltrator with reflective eyes and a narrow insectile silhouette rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 50.4,
+          "src": "videos/monster_attack_alien_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:frost": {
-      "selected": "videos/monster_attack_frost_v3.mp4",
+      "selected": "videos/monster_attack_frost_v4.mp4",
       "variants": [
         {
           "bytes": 238474,
           "created": "2026-05-18 05:47:31",
           "file": "monster_attack_frost.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 29.7,
+          "score": -9.4,
           "src": "videos/monster_attack_frost.mp4",
           "start": "images/hallway.jpg"
         },
@@ -54,12 +75,14 @@ window.MonsterVariants = {
           "durationSecs": 219.5,
           "file": "monster_attack_frost_v2.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "runaway"
           ],
           "n": 2,
           "note": "",
           "prompt": "a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 30,
+          "score": -50,
           "src": "videos/monster_attack_frost_v2.mp4",
           "start": "images/monster_attack_frost_start.jpg"
         },
@@ -68,28 +91,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:46:45",
           "durationSecs": 229.8,
           "file": "monster_attack_frost_v3.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 3,
           "note": "",
           "prompt": "a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_frost_v3.mp4",
           "start": "images/monster_attack_frost_start.jpg"
+        },
+        {
+          "bytes": 414058,
+          "created": "2026-08-11 17:21:03",
+          "durationSecs": 332.0,
+          "end": "images/monster_attack_frost_end.jpg",
+          "file": "monster_attack_frost_v4.mp4",
+          "flags": [],
+          "n": 4,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals forms out of rolling vapour at the far end of the corridor and rushes down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_frost_v4.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:gene": {
-      "selected": "videos/monster_attack_gene_v2.mp4",
+      "selected": "videos/monster_attack_gene_v3.mp4",
       "variants": [
         {
           "bytes": 296156,
           "created": "2026-05-15 02:04:42",
           "file": "monster_attack_gene.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 32.4,
+          "score": -7.2,
           "src": "videos/monster_attack_gene.mp4",
           "start": "images/hallway.jpg"
         },
@@ -98,28 +140,48 @@ window.MonsterVariants = {
           "created": "2026-08-11 07:46:57",
           "durationSecs": 215.1,
           "file": "monster_attack_gene_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall bio-engineered humanoid hunter with pale synthetic armor plates and long predatory limbs is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 32.9,
+          "score": -41.1,
           "src": "videos/monster_attack_gene_v2.mp4",
           "start": "images/monster_attack_gene_start.jpg"
+        },
+        {
+          "bytes": 366268,
+          "created": "2026-08-11 16:03:32",
+          "durationSecs": 245.2,
+          "end": "images/monster_attack_gene_end.jpg",
+          "file": "monster_attack_gene_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a tall bio-engineered humanoid hunter with pale synthetic armor plates and long predatory limbs rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 56.4,
+          "src": "videos/monster_attack_gene_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:machine": {
-      "selected": "videos/monster_attack_machine_v2.mp4",
+      "selected": "videos/monster_attack_machine_v3.mp4",
       "variants": [
         {
           "bytes": 325786,
           "created": "2026-06-11 18:17:37",
           "file": "monster_attack_machine.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 41.0,
+          "score": -40.5,
           "src": "videos/monster_attack_machine.mp4",
           "start": "images/hallway.jpg"
         },
@@ -128,28 +190,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:08:40",
           "durationSecs": 220.7,
           "file": "monster_attack_machine_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "an autonomous maintenance rig with jointed repair arms, sensor lenses, and sparking tool claws is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 60,
+          "score": -20.5,
           "src": "videos/monster_attack_machine_v2.mp4",
           "start": "images/monster_attack_machine_start.jpg"
+        },
+        {
+          "bytes": 536563,
+          "created": "2026-08-11 16:30:35",
+          "durationSecs": 322.8,
+          "end": "images/monster_attack_machine_end.jpg",
+          "file": "monster_attack_machine_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then an autonomous maintenance rig with jointed repair arms, sensor lenses, and sparking tool claws rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 59.8,
+          "src": "videos/monster_attack_machine_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:mimic": {
-      "selected": "videos/monster_attack_mimic_v2.mp4",
+      "selected": "videos/monster_attack_mimic_v3.mp4",
       "variants": [
         {
           "bytes": 398157,
           "created": "2026-07-13 22:57:32",
           "file": "monster_attack_mimic.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 32.3,
+          "score": -7.0,
           "src": "videos/monster_attack_mimic.mp4",
           "start": "images/hallway.jpg"
         },
@@ -158,28 +239,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:30:58",
           "durationSecs": 219.1,
           "file": "monster_attack_mimic_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a false rescue worker in a clean emergency suit with a visor-glare face and unnaturally smooth posture is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_mimic_v2.mp4",
           "start": "images/monster_attack_mimic_start.jpg"
+        },
+        {
+          "bytes": 434224,
+          "created": "2026-08-11 17:00:50",
+          "durationSecs": 345.2,
+          "end": "images/monster_attack_mimic_end.jpg",
+          "file": "monster_attack_mimic_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a false rescue worker in a clean emergency suit with a visor-glare face and unnaturally smooth posture rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 65.5,
+          "src": "videos/monster_attack_mimic_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:mirror": {
-      "selected": "videos/monster_attack_mirror_v2.mp4",
+      "selected": "videos/monster_attack_mirror_v3.mp4",
       "variants": [
         {
           "bytes": 415224,
           "created": "2026-05-18 05:54:32",
           "file": "monster_attack_mirror.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 38.4,
+          "score": -0.9,
           "src": "videos/monster_attack_mirror.mp4",
           "start": "images/hallway.jpg"
         },
@@ -188,28 +288,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:00:52",
           "durationSecs": 229.5,
           "file": "monster_attack_mirror_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a duplicate astronaut with a reflective visor and mismatched body language, copying the viewer badly is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 60,
+          "score": -20,
           "src": "videos/monster_attack_mirror_v2.mp4",
           "start": "images/monster_attack_mirror_start.jpg"
+        },
+        {
+          "bytes": 422857,
+          "created": "2026-08-11 17:40:35",
+          "durationSecs": 319.8,
+          "end": "images/monster_attack_mirror_end.jpg",
+          "file": "monster_attack_mirror_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a duplicate astronaut with a reflective visor and mismatched body language, copying the viewer badly rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 66.8,
+          "src": "videos/monster_attack_mirror_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:parasite": {
-      "selected": "videos/monster_attack_parasite_v5.mp4",
+      "selected": "videos/monster_attack_parasite_v7.mp4",
       "variants": [
         {
           "bytes": 267165,
           "created": "2026-05-16 18:57:20",
           "file": "monster_attack_parasite.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 32.8,
+          "score": -7.1,
           "src": "videos/monster_attack_parasite.mp4",
           "start": "images/hallway.jpg"
         },
@@ -219,12 +338,14 @@ window.MonsterVariants = {
           "durationSecs": 212.8,
           "file": "monster_attack_parasite_v2.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "murky"
           ],
           "n": 2,
           "note": "",
           "prompt": "black root-like alien vines spreading across the floor and walls like a living cable mass is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": -2.7,
+          "score": -82.9,
           "src": "videos/monster_attack_parasite_v2.mp4",
           "start": "images/monster_attack_parasite_start.jpg"
         },
@@ -234,12 +355,14 @@ window.MonsterVariants = {
           "durationSecs": 221.2,
           "file": "monster_attack_parasite_v3.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "murky"
           ],
           "n": 3,
           "note": "",
           "prompt": "black root-like alien vines spreading across the floor and walls like a living cable mass is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": -8.9,
+          "score": -89.1,
           "src": "videos/monster_attack_parasite_v3.mp4",
           "start": "images/monster_attack_parasite_start.jpg"
         },
@@ -248,11 +371,14 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:41:43",
           "durationSecs": 224.5,
           "file": "monster_attack_parasite_v4.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 4,
           "note": "",
           "prompt": "black root-like alien vines spreading across the floor and walls like a living cable mass is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 59.7,
+          "score": -30.6,
           "src": "videos/monster_attack_parasite_v4.mp4",
           "start": "images/monster_attack_parasite_start.jpg"
         },
@@ -261,28 +387,64 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:54:07",
           "durationSecs": 184.7,
           "file": "monster_attack_parasite_v5.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 5,
           "note": "",
           "prompt": "black root-like alien vines spreading across the floor and walls like a living cable mass is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 61.0,
+          "score": -19.1,
           "src": "videos/monster_attack_parasite_v5.mp4",
           "start": "images/monster_attack_parasite_start.jpg"
+        },
+        {
+          "bytes": 596244,
+          "created": "2026-08-11 16:40:26",
+          "durationSecs": 326.2,
+          "end": "images/monster_attack_parasite_end.jpg",
+          "file": "monster_attack_parasite_v6.mp4",
+          "flags": [
+            "murky"
+          ],
+          "n": 6,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then black root-like alien vines spreading across the floor and walls like a living cable mass surges into view along the floor and walls and races down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 13.6,
+          "src": "videos/monster_attack_parasite_v6.mp4",
+          "start": "images/hallway.jpg"
+        },
+        {
+          "bytes": 635680,
+          "created": "2026-08-11 18:49:10",
+          "durationSecs": 330.7,
+          "end": "images/monster_attack_parasite_end.jpg",
+          "file": "monster_attack_parasite_v7.mp4",
+          "flags": [],
+          "n": 7,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then black root-like alien vines spreading across the floor and walls like a living cable mass surges into view along the floor and walls and races down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, the corridor ceiling lights stay visible in frame throughout and rim-light its wet black surfaces from above so its shape stays readable, the frame never falls dark, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 63.0,
+          "src": "videos/monster_attack_parasite_v7.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:radiant": {
-      "selected": "videos/monster_attack_radiant_v2.mp4",
+      "selected": "videos/monster_attack_radiant_v3.mp4",
       "variants": [
         {
           "bytes": 167227,
           "created": "2026-06-11 21:33:25",
           "file": "monster_attack_radiant.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 38.9,
+          "score": -40.6,
           "src": "videos/monster_attack_radiant.mp4",
           "start": "images/hallway.jpg"
         },
@@ -291,28 +453,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:53:21",
           "durationSecs": 215.9,
           "file": "monster_attack_radiant_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a glowing radiation silhouette in a damaged hazard suit, edges flaring with hot white light is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 60,
+          "score": -20,
           "src": "videos/monster_attack_radiant_v2.mp4",
           "start": "images/monster_attack_radiant_start.jpg"
+        },
+        {
+          "bytes": 397924,
+          "created": "2026-08-11 17:30:59",
+          "durationSecs": 339.4,
+          "end": "images/monster_attack_radiant_end.jpg",
+          "file": "monster_attack_radiant_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a glowing radiation silhouette in a damaged hazard suit, edges flaring with hot white light rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 70,
+          "src": "videos/monster_attack_radiant_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:shadow": {
-      "selected": "videos/monster_attack_shadow_v4.mp4",
+      "selected": "videos/monster_attack_shadow_v5.mp4",
       "variants": [
         {
           "bytes": 283303,
           "created": "2026-05-16 19:01:08",
           "file": "monster_attack_shadow.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 29.1,
+          "score": -11.0,
           "src": "videos/monster_attack_shadow.mp4",
           "start": "images/hallway.jpg"
         },
@@ -322,12 +503,14 @@ window.MonsterVariants = {
           "durationSecs": 229.7,
           "file": "monster_attack_shadow_v2.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "murky"
           ],
           "n": 2,
           "note": "",
           "prompt": "an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": -9.6,
+          "score": -89.8,
           "src": "videos/monster_attack_shadow_v2.mp4",
           "start": "images/monster_attack_shadow_start.jpg"
         },
@@ -337,12 +520,14 @@ window.MonsterVariants = {
           "durationSecs": 225.6,
           "file": "monster_attack_shadow_v3.mp4",
           "flags": [
+            "driftstart",
+            "noarrive",
             "murky"
           ],
           "n": 3,
           "note": "",
           "prompt": "an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": -9.9,
+          "score": -89.7,
           "src": "videos/monster_attack_shadow_v3.mp4",
           "start": "images/monster_attack_shadow_start.jpg"
         },
@@ -351,28 +536,48 @@ window.MonsterVariants = {
           "created": "2026-08-11 11:45:38",
           "durationSecs": 233.0,
           "file": "monster_attack_shadow_v4.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 4,
           "note": "",
           "prompt": "an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it fills the whole frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, hard corridor light keeps the creature clearly lit and readable the whole time, the creature does not change shape, the shot never goes black, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_shadow_v4.mp4",
           "start": "images/monster_attack_shadow_start.jpg"
+        },
+        {
+          "bytes": 489864,
+          "created": "2026-08-11 16:50:30",
+          "durationSecs": 328.0,
+          "end": "images/monster_attack_shadow_end.jpg",
+          "file": "monster_attack_shadow_v5.mp4",
+          "flags": [],
+          "n": 5,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 60.0,
+          "src": "videos/monster_attack_shadow_v5.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:siren": {
-      "selected": "videos/monster_attack_siren_v2.mp4",
+      "selected": "videos/monster_attack_siren_v3.mp4",
       "variants": [
         {
           "bytes": 502361,
           "created": "2026-06-11 18:06:47",
           "file": "monster_attack_siren.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 36.6,
+          "score": -42.7,
           "src": "videos/monster_attack_siren.mp4",
           "start": "images/hallway.jpg"
         },
@@ -381,28 +586,48 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:08:33",
           "durationSecs": 229.6,
           "file": "monster_attack_siren_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a humanoid emergency alarm host with flashing red beacon lights embedded in its suit and shoulders is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 45.6,
+          "score": -32.5,
           "src": "videos/monster_attack_siren_v2.mp4",
           "start": "images/monster_attack_siren_start.jpg"
+        },
+        {
+          "bytes": 384019,
+          "created": "2026-08-11 17:50:36",
+          "durationSecs": 330.2,
+          "end": "images/monster_attack_siren_end.jpg",
+          "file": "monster_attack_siren_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a humanoid emergency alarm host with flashing red beacon lights embedded in its suit and shoulders rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 44.4,
+          "src": "videos/monster_attack_siren_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:spore": {
-      "selected": "videos/monster_attack_spore_v2.mp4",
+      "selected": "videos/monster_attack_spore_v3.mp4",
       "variants": [
         {
           "bytes": 330749,
           "created": "2026-06-11 18:14:00",
           "file": "monster_attack_spore.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 42.6,
+          "score": -36.6,
           "src": "videos/monster_attack_spore.mp4",
           "start": "images/hallway.jpg"
         },
@@ -411,28 +636,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:23:50",
           "durationSecs": 219.7,
           "file": "monster_attack_spore_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a breathing spore mass of pale fungal bulbs and drifting dust motes gathering into a hunched shape is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 52.2,
+          "score": -27.0,
           "src": "videos/monster_attack_spore_v2.mp4",
           "start": "images/monster_attack_spore_start.jpg"
+        },
+        {
+          "bytes": 382293,
+          "created": "2026-08-11 18:10:23",
+          "durationSecs": 328.5,
+          "end": "images/monster_attack_spore_end.jpg",
+          "file": "monster_attack_spore_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a breathing spore mass of pale fungal bulbs and drifting dust motes gathering into a hunched shape erupts into view at the far end of the corridor and billows down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 56.2,
+          "src": "videos/monster_attack_spore_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:swarm": {
-      "selected": "videos/monster_attack_swarm_v2.mp4",
+      "selected": "videos/monster_attack_swarm_v3.mp4",
       "variants": [
         {
           "bytes": 346055,
           "created": "2026-06-11 21:30:56",
           "file": "monster_attack_swarm.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 39.0,
+          "score": -1.0,
           "src": "videos/monster_attack_swarm.mp4",
           "start": "images/hallway.jpg"
         },
@@ -441,28 +685,48 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:38:30",
           "durationSecs": 223.1,
           "file": "monster_attack_swarm_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a dense grey nanite cloud forming a rough human outline above the hallway floor is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 45.8,
+          "score": -34.2,
           "src": "videos/monster_attack_swarm_v2.mp4",
           "start": "images/monster_attack_swarm_start.jpg"
+        },
+        {
+          "bytes": 543177,
+          "created": "2026-08-11 17:10:56",
+          "durationSecs": 341.3,
+          "end": "images/monster_attack_swarm_end.jpg",
+          "file": "monster_attack_swarm_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a dense grey nanite cloud forming a rough human outline above the hallway floor boils into view at the far end of the corridor and streams down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 42.7,
+          "src": "videos/monster_attack_swarm_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:warden": {
-      "selected": "videos/monster_attack_warden_v2.mp4",
+      "selected": "videos/monster_attack_warden_v3.mp4",
       "variants": [
         {
           "bytes": 287232,
           "created": "2026-06-11 18:10:24",
           "file": "monster_attack_warden.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 35.3,
+          "score": -44.9,
           "src": "videos/monster_attack_warden.mp4",
           "start": "images/hallway.jpg"
         },
@@ -471,28 +735,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:16:24",
           "durationSecs": 224.2,
           "file": "monster_attack_warden_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a bulky containment security android with lockdown plating, clamp arms, and a cold visor slit is already filling the frame at the lens, it surges the last half-step into the camera, its mass swelling until it blacks out the frame, ending pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 57.7,
+          "score": -21.3,
           "src": "videos/monster_attack_warden_v2.mp4",
           "start": "images/monster_attack_warden_start.jpg"
+        },
+        {
+          "bytes": 421670,
+          "created": "2026-08-11 18:00:27",
+          "durationSecs": 330.7,
+          "end": "images/monster_attack_warden_end.jpg",
+          "file": "monster_attack_warden_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a bulky containment security android with lockdown plating, clamp arms, and a cold visor slit rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 58.6,
+          "src": "videos/monster_attack_warden_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "attack:zombie": {
-      "selected": "videos/monster_attack_zombie_v2.mp4",
+      "selected": "videos/monster_attack_zombie_v3.mp4",
       "variants": [
         {
           "bytes": 383583,
           "created": "2026-05-15 02:11:42",
           "file": "monster_attack_zombie.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 37.5,
+          "score": -2.5,
           "src": "videos/monster_attack_zombie.mp4",
           "start": "images/hallway.jpg"
         },
@@ -501,18 +784,35 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:01:14",
           "durationSecs": 216.0,
           "file": "monster_attack_zombie_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a reanimated crew member in a torn space uniform, helmet cracked, movements stiff and unnatural is already filling the frame at the lens, it surges the last half-step into the camera, head snapping forward, mouth opening wider, ending on the face pressed against the lens, violent fast jump scare impact, camera shakes hard, the creature does not change shape, no other people, no blood, no gore",
-          "score": 70,
+          "score": -10,
           "src": "videos/monster_attack_zombie_v2.mp4",
           "start": "images/monster_attack_zombie_start.jpg"
+        },
+        {
+          "bytes": 533103,
+          "created": "2026-08-11 16:20:59",
+          "durationSecs": 312.3,
+          "end": "images/monster_attack_zombie_end.jpg",
+          "file": "monster_attack_zombie_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a reanimated crew member in a torn space uniform, helmet cracked, movements stiff and unnatural rushes into view at the far end of the corridor and charges straight down the corridor at the camera, closing the distance fast and growing larger and larger in the frame, ending with it filling the whole frame pressed against the lens, mouth open and teeth bared, violent fast jump scare, the camera shakes hard as it arrives, it stays clearly lit and readable against the corridor the whole time, it does not change shape, the shot never goes black, only one creature, no other people, no blood, no gore",
+          "score": 63.3,
+          "src": "videos/monster_attack_zombie_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:alien": {
-      "selected": "videos/monster_release_alien_v2.mp4",
+      "selected": "videos/monster_release_alien_v3.mp4",
       "variants": [
         {
           "bytes": 179559,
@@ -522,7 +822,7 @@ window.MonsterVariants = {
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 18.2,
+          "score": 18.4,
           "src": "videos/monster_release_alien.mp4",
           "start": "images/hallway.jpg"
         },
@@ -531,28 +831,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 07:50:23",
           "durationSecs": 201.2,
           "file": "monster_release_alien_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a sleek black-grey alien infiltrator with reflective eyes and a narrow insectile silhouette is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 38.8,
+          "score": -1.0,
           "src": "videos/monster_release_alien_v2.mp4",
           "start": "images/monster_release_alien_start.jpg"
+        },
+        {
+          "bytes": 258717,
+          "created": "2026-08-11 16:06:52",
+          "durationSecs": 198.7,
+          "end": "images/monster_release_alien_end.jpg",
+          "file": "monster_release_alien_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a sleek black-grey alien infiltrator with reflective eyes and a narrow insectile silhouette walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 20.6,
+          "src": "videos/monster_release_alien_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:frost": {
-      "selected": "videos/monster_release_frost_v2.mp4",
+      "selected": "videos/monster_release_frost_v3.mp4",
       "variants": [
         {
           "bytes": 304656,
           "created": "2026-05-18 05:19:58",
           "file": "monster_release_frost.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 30.0,
+          "score": -10.1,
           "src": "videos/monster_release_frost.mp4",
           "start": "images/hallway.jpg"
         },
@@ -561,18 +879,35 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:42:10",
           "durationSecs": 219.0,
           "file": "monster_release_frost_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 33.0,
+          "score": -46.9,
           "src": "videos/monster_release_frost_v2.mp4",
           "start": "images/monster_release_frost_start.jpg"
+        },
+        {
+          "bytes": 448653,
+          "created": "2026-08-11 17:15:27",
+          "durationSecs": 267.5,
+          "end": "images/monster_release_frost_end.jpg",
+          "file": "monster_release_frost_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a translucent frost-covered figure forming from rolling cryogenic vapor and ice crystals forms out of rolling vapour at the far end of the corridor and advances toward the camera, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 31.0,
+          "src": "videos/monster_release_frost_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:gene": {
-      "selected": "videos/monster_release_gene_v2.mp4",
+      "selected": "videos/monster_release_gene_v3.mp4",
       "variants": [
         {
           "bytes": 241793,
@@ -591,28 +926,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 07:43:22",
           "durationSecs": 209.1,
           "file": "monster_release_gene_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a tall bio-engineered humanoid hunter with pale synthetic armor plates and long predatory limbs is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 32.2,
+          "score": -8.0,
           "src": "videos/monster_release_gene_v2.mp4",
           "start": "images/monster_release_gene_start.jpg"
+        },
+        {
+          "bytes": 296082,
+          "created": "2026-08-11 15:59:26",
+          "durationSecs": 137.2,
+          "end": "images/monster_release_gene_end.jpg",
+          "file": "monster_release_gene_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a tall bio-engineered humanoid hunter with pale synthetic armor plates and long predatory limbs walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 19.4,
+          "src": "videos/monster_release_gene_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:machine": {
-      "selected": "videos/monster_release_machine_v2.mp4",
+      "selected": "videos/monster_release_machine_v3.mp4",
       "variants": [
         {
           "bytes": 305041,
           "created": "2026-05-16 18:41:55",
           "file": "monster_release_machine.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 35.0,
+          "score": -4.7,
           "src": "videos/monster_release_machine.mp4",
           "start": "images/hallway.jpg"
         },
@@ -625,24 +978,40 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "an autonomous maintenance rig with jointed repair arms, sensor lenses, and sparking tool claws is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 28.6,
+          "score": 29.0,
           "src": "videos/monster_release_machine_v2.mp4",
           "start": "images/monster_release_machine_start.jpg"
+        },
+        {
+          "bytes": 409082,
+          "created": "2026-08-11 16:25:09",
+          "durationSecs": 248.0,
+          "end": "images/monster_release_machine_end.jpg",
+          "file": "monster_release_machine_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then an autonomous maintenance rig with jointed repair arms, sensor lenses, and sparking tool claws walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 18.5,
+          "src": "videos/monster_release_machine_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:mimic": {
-      "selected": "videos/monster_release_mimic_v2.mp4",
+      "selected": "videos/monster_release_mimic_v3.mp4",
       "variants": [
         {
           "bytes": 344279,
           "created": "2026-07-13 22:57:32",
           "file": "monster_release_mimic.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 31.6,
+          "score": -8.1,
           "src": "videos/monster_release_mimic.mp4",
           "start": "images/hallway.jpg"
         },
@@ -655,24 +1024,39 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "a false rescue worker in a clean emergency suit with a visor-glare face and unnaturally smooth posture is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 24.4,
+          "score": 27.1,
           "src": "videos/monster_release_mimic_v2.mp4",
           "start": "images/monster_release_mimic_start.jpg"
+        },
+        {
+          "bytes": 276127,
+          "created": "2026-08-11 16:55:04",
+          "end": "images/monster_release_mimic_end.jpg",
+          "file": "monster_release_mimic_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "recovered from disk",
+          "prompt": "",
+          "score": 21.7,
+          "src": "videos/monster_release_mimic_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:mirror": {
-      "selected": "videos/monster_release_mirror_v2.mp4",
+      "selected": "videos/monster_release_mirror_v3.mp4",
       "variants": [
         {
           "bytes": 349504,
           "created": "2026-05-18 05:26:47",
           "file": "monster_release_mirror.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 31.2,
+          "score": -8.4,
           "src": "videos/monster_release_mirror.mp4",
           "start": "images/hallway.jpg"
         },
@@ -681,28 +1065,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:57:02",
           "durationSecs": 220.3,
           "file": "monster_release_mirror_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a duplicate astronaut with a reflective visor and mismatched body language, copying the viewer badly is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 31.3,
+          "score": -7.8,
           "src": "videos/monster_release_mirror_v2.mp4",
           "start": "images/monster_release_mirror_start.jpg"
+        },
+        {
+          "bytes": 296079,
+          "created": "2026-08-11 17:35:14",
+          "durationSecs": 254.5,
+          "end": "images/monster_release_mirror_end.jpg",
+          "file": "monster_release_mirror_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a duplicate astronaut with a reflective visor and mismatched body language, copying the viewer badly walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 20.3,
+          "src": "videos/monster_release_mirror_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:parasite": {
-      "selected": "videos/monster_release_parasite_v2.mp4",
+      "selected": "videos/monster_release_parasite_v3.mp4",
       "variants": [
         {
           "bytes": 303235,
           "created": "2026-07-13 22:57:32",
           "file": "monster_release_parasite.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 24.3,
+          "score": -15.3,
           "src": "videos/monster_release_parasite.mp4",
           "start": "images/hallway.jpg"
         },
@@ -715,24 +1117,41 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "black root-like alien vines spreading across the floor and walls like a living cable mass is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 28.6,
+          "score": 29.1,
           "src": "videos/monster_release_parasite_v2.mp4",
           "start": "images/monster_release_parasite_start.jpg"
+        },
+        {
+          "bytes": 283364,
+          "created": "2026-08-11 16:34:55",
+          "durationSecs": 257.0,
+          "end": "images/monster_release_parasite_end.jpg",
+          "file": "monster_release_parasite_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then black root-like alien vines spreading across the floor and walls like a living cable mass spreads into view along the floor and walls at the far end of the corridor and creeps toward the camera, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 24.5,
+          "src": "videos/monster_release_parasite_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:radiant": {
-      "selected": "videos/monster_release_radiant_v2.mp4",
+      "selected": "videos/monster_release_radiant_v3.mp4",
       "variants": [
         {
           "bytes": 369190,
           "created": "2026-06-11 17:44:52",
           "file": "monster_release_radiant.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 59.3,
+          "score": -20.0,
           "src": "videos/monster_release_radiant.mp4",
           "start": "images/hallway.jpg"
         },
@@ -741,28 +1160,47 @@ window.MonsterVariants = {
           "created": "2026-08-11 08:49:41",
           "durationSecs": 225.8,
           "file": "monster_release_radiant_v2.mp4",
-          "flags": [],
+          "flags": [
+            "driftstart",
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a glowing radiation silhouette in a damaged hazard suit, edges flaring with hot white light is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 42.4,
+          "score": -37.9,
           "src": "videos/monster_release_radiant_v2.mp4",
           "start": "images/monster_release_radiant_start.jpg"
+        },
+        {
+          "bytes": 344505,
+          "created": "2026-08-11 17:25:18",
+          "durationSecs": 251.9,
+          "end": "images/monster_release_radiant_end.jpg",
+          "file": "monster_release_radiant_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a glowing radiation silhouette in a damaged hazard suit, edges flaring with hot white light walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 70,
+          "src": "videos/monster_release_radiant_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:shadow": {
-      "selected": "videos/monster_release_shadow_v2.mp4",
+      "selected": "videos/monster_release_shadow_v3.mp4",
       "variants": [
         {
           "bytes": 279172,
           "created": "2026-05-16 18:49:49",
           "file": "monster_release_shadow.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 29.3,
+          "score": -10.4,
           "src": "videos/monster_release_shadow.mp4",
           "start": "images/hallway.jpg"
         },
@@ -775,24 +1213,39 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "an empty pressure suit walking by itself, helmet dark, limbs hanging slightly wrong is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 29.1,
+          "score": 29.3,
           "src": "videos/monster_release_shadow_v2.mp4",
           "start": "images/monster_release_shadow_start.jpg"
+        },
+        {
+          "bytes": 232265,
+          "created": "2026-08-11 16:44:59",
+          "end": "images/monster_release_shadow_end.jpg",
+          "file": "monster_release_shadow_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "recovered from disk",
+          "prompt": "",
+          "score": 16.3,
+          "src": "videos/monster_release_shadow_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:siren": {
-      "selected": "videos/monster_release_siren_v2.mp4",
+      "selected": "videos/monster_release_siren_v3.mp4",
       "variants": [
         {
           "bytes": 340775,
           "created": "2026-06-11 17:48:33",
           "file": "monster_release_siren.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 34.4,
+          "score": -5.0,
           "src": "videos/monster_release_siren.mp4",
           "start": "images/hallway.jpg"
         },
@@ -801,28 +1254,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:04:43",
           "durationSecs": 226.8,
           "file": "monster_release_siren_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a humanoid emergency alarm host with flashing red beacon lights embedded in its suit and shoulders is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 29.8,
+          "score": -9.6,
           "src": "videos/monster_release_siren_v2.mp4",
           "start": "images/monster_release_siren_start.jpg"
+        },
+        {
+          "bytes": 347570,
+          "created": "2026-08-11 17:45:05",
+          "durationSecs": 269.9,
+          "end": "images/monster_release_siren_end.jpg",
+          "file": "monster_release_siren_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a humanoid emergency alarm host with flashing red beacon lights embedded in its suit and shoulders walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 22.7,
+          "src": "videos/monster_release_siren_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:spore": {
-      "selected": "videos/monster_release_spore_v2.mp4",
+      "selected": "videos/monster_release_spore_v3.mp4",
       "variants": [
         {
           "bytes": 300897,
           "created": "2026-06-11 17:55:50",
           "file": "monster_release_spore.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 31.2,
+          "score": -8.9,
           "src": "videos/monster_release_spore.mp4",
           "start": "images/hallway.jpg"
         },
@@ -831,28 +1302,46 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:20:10",
           "durationSecs": 223.5,
           "file": "monster_release_spore_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a breathing spore mass of pale fungal bulbs and drifting dust motes gathering into a hunched shape is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 29.6,
+          "score": -10.2,
           "src": "videos/monster_release_spore_v2.mp4",
           "start": "images/monster_release_spore_start.jpg"
+        },
+        {
+          "bytes": 321327,
+          "created": "2026-08-11 18:04:53",
+          "durationSecs": 261.1,
+          "end": "images/monster_release_spore_end.jpg",
+          "file": "monster_release_spore_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a breathing spore mass of pale fungal bulbs and drifting dust motes gathering into a hunched shape blooms into view at the far end of the corridor and billows toward the camera, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 22.9,
+          "src": "videos/monster_release_spore_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:swarm": {
-      "selected": "videos/monster_release_swarm_v2.mp4",
+      "selected": "videos/monster_release_swarm_v3.mp4",
       "variants": [
         {
           "bytes": 260016,
           "created": "2026-06-11 17:41:07",
           "file": "monster_release_swarm.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 35.0,
+          "score": -5.6,
           "src": "videos/monster_release_swarm.mp4",
           "start": "images/hallway.jpg"
         },
@@ -865,14 +1354,28 @@ window.MonsterVariants = {
           "n": 2,
           "note": "",
           "prompt": "a dense grey nanite cloud forming a rough human outline above the hallway floor is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 24.0,
+          "score": 25.0,
           "src": "videos/monster_release_swarm_v2.mp4",
           "start": "images/monster_release_swarm_start.jpg"
+        },
+        {
+          "bytes": 270119,
+          "created": "2026-08-11 17:05:11",
+          "durationSecs": 260.5,
+          "end": "images/monster_release_swarm_end.jpg",
+          "file": "monster_release_swarm_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a dense grey nanite cloud forming a rough human outline above the hallway floor boils into view at the far end of the corridor and drifts toward the camera, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 17.1,
+          "src": "videos/monster_release_swarm_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:warden": {
-      "selected": "videos/monster_release_warden_v2.mp4",
+      "selected": "videos/monster_release_warden_v3.mp4",
       "variants": [
         {
           "bytes": 296730,
@@ -882,7 +1385,7 @@ window.MonsterVariants = {
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 23.5,
+          "score": 23.7,
           "src": "videos/monster_release_warden.mp4",
           "start": "images/hallway.jpg"
         },
@@ -891,18 +1394,34 @@ window.MonsterVariants = {
           "created": "2026-08-11 09:12:39",
           "durationSecs": 245.2,
           "file": "monster_release_warden_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a bulky containment security android with lockdown plating, clamp arms, and a cold visor slit is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, its whole mass turning to face the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 31.9,
+          "score": -7.4,
           "src": "videos/monster_release_warden_v2.mp4",
           "start": "images/monster_release_warden_start.jpg"
+        },
+        {
+          "bytes": 318931,
+          "created": "2026-08-11 17:54:51",
+          "durationSecs": 255.3,
+          "end": "images/monster_release_warden_end.jpg",
+          "file": "monster_release_warden_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a bulky containment security android with lockdown plating, clamp arms, and a cold visor slit walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its whole mass turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 17.2,
+          "src": "videos/monster_release_warden_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     },
     "release:zombie": {
-      "selected": "videos/monster_release_zombie_v2.mp4",
+      "selected": "videos/monster_release_zombie_v3.mp4",
       "variants": [
         {
           "bytes": 258353,
@@ -912,7 +1431,7 @@ window.MonsterVariants = {
           "n": 1,
           "note": "original",
           "prompt": "",
-          "score": 27.5,
+          "score": 27.3,
           "src": "videos/monster_release_zombie.mp4",
           "start": "images/hallway.jpg"
         },
@@ -921,19 +1440,35 @@ window.MonsterVariants = {
           "created": "2026-08-11 07:57:34",
           "durationSecs": 217.9,
           "file": "monster_release_zombie_v2.mp4",
-          "flags": [],
+          "flags": [
+            "noarrive"
+          ],
           "n": 2,
           "note": "",
           "prompt": "a reanimated crew member in a torn space uniform, helmet cracked, movements stiff and unnatural is already standing at the far end of the corridor, it takes two slow deliberate steps toward the camera and stops, head turning to fix on the lens, the corridor lights flicker once, slow oppressive dread, camera holds still, the creature does not change shape, no other people, no gore",
-          "score": 33.2,
+          "score": -6.3,
           "src": "videos/monster_release_zombie_v2.mp4",
           "start": "images/monster_release_zombie_start.jpg"
+        },
+        {
+          "bytes": 272975,
+          "created": "2026-08-11 16:15:43",
+          "durationSecs": 228.8,
+          "end": "images/monster_release_zombie_end.jpg",
+          "file": "monster_release_zombie_v3.mp4",
+          "flags": [],
+          "n": 3,
+          "note": "",
+          "prompt": "the narrow sci-fi space-station corridor stands empty and completely still, then a reanimated crew member in a torn space uniform, helmet cracked, movements stiff and unnatural walks into view at the far end of the corridor and advances toward the camera with slow deliberate steps, stopping in the middle distance with its head turning to fix on the lens, the lights flicker once, slow oppressive dread, the camera holds still, it stays clearly lit and readable against the corridor the whole time, it does not change shape, only one creature, no other people, no gore",
+          "score": 20.9,
+          "src": "videos/monster_release_zombie_v3.mp4",
+          "start": "images/hallway.jpg"
         }
       ]
     }
   },
   "game": "awake",
-  "generated": "2026-08-11 11:54:07",
+  "generated": "2026-08-11 18:49:10",
   "monsters": [
     {
       "attackRef": "ref/monster_gene_attack.jpg",
@@ -1029,6 +1564,14 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_alien_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_frost_v2.mp4": {
       "enabled": true,
       "fade": 0.4,
@@ -1045,8 +1588,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_frost_v4.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_gene_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_gene_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1061,6 +1620,14 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_machine_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_mimic_v2.mp4": {
       "enabled": true,
       "fade": 0.4,
@@ -1069,8 +1636,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_mimic_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_mirror_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_mirror_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1109,8 +1692,32 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_parasite_v6.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_parasite_v7.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_radiant_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_radiant_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1141,8 +1748,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_shadow_v5.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_siren_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_siren_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1157,8 +1780,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_spore_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_swarm_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_swarm_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1173,8 +1812,24 @@ window.MonsterVariants = {
       "x": 0.5,
       "y": 0.4
     },
+    "videos/monster_attack_warden_v3.mp4": {
+      "enabled": false,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
     "videos/monster_attack_zombie_v2.mp4": {
       "enabled": true,
+      "fade": 0.4,
+      "lead": 1.0,
+      "scale": 2.6,
+      "x": 0.5,
+      "y": 0.4
+    },
+    "videos/monster_attack_zombie_v3.mp4": {
+      "enabled": false,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,

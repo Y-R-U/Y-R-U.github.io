@@ -94,15 +94,36 @@ Every monster gets four stills, each derived from the previous one, so the
 creature's identity survives the whole chain:
 
 ```
-ref/monster_<id>.jpg                    txt2img  full-body identity reference
-ref/monster_<id>_attack.jpg             edit(ref)  snarling close-up, teeth bared
-images/monster_release_<id>_start.jpg   edit(hallway, ref)         creature down the corridor
-images/monster_attack_<id>_start.jpg    edit(hallway, attack ref)  creature filling the lens
+ref/monster_<id>.jpg                  txt2img  full-body identity reference
+ref/monster_<id>_attack.jpg           edit(ref)  snarling close-up, teeth bared
+images/monster_release_<id>_end.jpg   edit(hallway, ref)         creature down the corridor
+images/monster_attack_<id>_end.jpg    edit(hallway, attack ref)  creature filling the lens
 ```
 
-The last two are the LTX start frames. Because the creature is already *in* the
-frame, the video prompt only has to describe **motion** — asking LTX to invent
-the creature as well as animate it is what made the old clips inconsistent.
+**The last two are the LTX _end_ frames, not start frames.** This is the point of
+the hub: every room's exit transition lands on the same empty hallway, so at the
+instant an event fires the player is looking at exactly `images/hallway.jpg`.
+Each event clip therefore *starts* on that plate and is pinned (`image_end`) to
+*arrive* at the composite:
+
+```
+hallway.jpg  ──────────────► monster_release_<id>_end.jpg   73 frames (3.0s)
+empty corridor               creature standing down the corridor
+
+hallway.jpg  ──────────────► monster_attack_<id>_end.jpg    97 frames (4.0s)
+empty corridor               creature filling the lens
+```
+
+The cut into the event is invisible because frame 0 *is* what was already on
+screen, and LTX only has to invent the journey between two frames it has been
+given. The video prompt describes that journey — how the creature enters and
+closes the distance — and nothing else. The attack gets the extra second because
+it is the end of the run.
+
+Getting this wrong is subtle and expensive: an earlier pass used the composites
+as *start* frames, which meant every event began with the monster already
+standing in a hallway the player had just seen empty. `check_monsters.py` now
+measures this directly and flags it as `driftstart`.
 
 ```
 python3 gen_monsters.py images                 # all stills (skips ones that exist)
@@ -157,9 +178,11 @@ pick variants and tune the zoom punch, and remembers all of it in
 
 ### Jump-scare punch-in
 
-LTX reliably stops the creature a step or two short of the lens. The punch
-rescues that: tick **Zoom punch-in**, press **Tap a spot**, tap the point on the
-preview that should end up filling the screen, and the clip scales toward it and
-fades to black over its last second. Scale and lead are sliders; **Test** replays
-it. New *attack* variants get the punch armed by default (centred a little above
-mid-frame); release clips are a slow reveal and stay off unless you turn them on.
+**Off by default now.** The punch existed because LTX used to stop the creature a
+step or two short of the lens; pinning `image_end` means the clip is guaranteed
+to arrive, and punching into an already-full-frame face just crops it.
+
+It is still there per-clip when a take lands short: tick **Zoom punch-in**, press
+**Tap a spot**, tap the point that should end up filling the screen, and the clip
+scales toward it and fades to black over its last second. Scale and lead are
+sliders; **Test** replays it.

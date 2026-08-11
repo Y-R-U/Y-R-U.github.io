@@ -4,10 +4,13 @@
 Cheap objective checks only — they catch the failure modes LTX actually has on
 this box, and leave taste to the reviewer in the debug panel:
 
-  dark      mean luminance collapsed (the render went black)
-  static    last frame ≈ first frame (the creature never moved)
-  runaway   huge frame-to-frame delta (tessellation / structure collapse)
-  tiny      suspiciously small file (encoder gave up)
+  dark       mean luminance collapsed (the render went black)
+  static     last frame ≈ first frame (the creature never moved)
+  runaway    huge frame-to-frame delta (tessellation / structure collapse)
+  tiny       suspiciously small file (encoder gave up)
+  driftstart opening frame is not the empty hallway — the player is looking at
+             that plate when the event fires, so anything else is a visible cut
+  noarrive   closing frame never reached the composite it was pinned to
 
 Frames are sampled with ffmpeg and compared with `sips`-free pure-python PPM
 parsing so there is no Pillow/numpy dependency.
@@ -27,8 +30,15 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 VARIANTS_PATH = os.path.join(HERE, "js", "variants.js")
 VIDEO_DIR = os.path.join(HERE, "videos")
-SAMPLE_WIDTH = 64
+# Fixed WxH, not scale=64:-1 — video frames (3:5) and the stills (768x1280,
+# 512x848) otherwise land on different heights and cannot be diffed at all.
+SAMPLE_SIZE = "64:106"
 MIN_BYTES = 60 * 1024
+HALLWAY_STILL = os.path.join(HERE, "images", "hallway.jpg")
+# Measured on known-good end-frame clips: matching frames diff at 3.9-7.3,
+# mismatched ones at 46-52. Anything in between is worth a human look.
+START_DRIFT_LIMIT = 18.0
+ARRIVE_LIMIT = 20.0
 
 
 def load_variants():
@@ -54,13 +64,17 @@ def duration(path):
 
 
 def frame_pixels(path, at_seconds, work_dir, tag):
-    """One frame as a flat list of (r, g, b), downsampled hard."""
+    """One frame as a flat list of (r, g, b), downsampled hard.
+
+    at_seconds=None reads a still image, so clip frames and reference stills
+    come back directly comparable.
+    """
     out = os.path.join(work_dir, f"{tag}.ppm")
-    result = subprocess.run(
-        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", f"{at_seconds:.3f}",
-         "-i", path, "-frames:v", "1", "-vf", f"scale={SAMPLE_WIDTH}:-1", "-pix_fmt", "rgb24", out],
-        capture_output=True, check=False,
-    )
+    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]
+    if at_seconds is not None:
+        cmd += ["-ss", f"{at_seconds:.3f}"]
+    cmd += ["-i", path, "-frames:v", "1", "-vf", f"scale={SAMPLE_SIZE}", "-pix_fmt", "rgb24", out]
+    result = subprocess.run(cmd, capture_output=True, check=False)
     if result.returncode != 0 or not os.path.exists(out):
         return []
     with open(out, "rb") as handle:
@@ -96,7 +110,7 @@ def mean_abs_diff(a, b):
     return total / (len(a) * 3)
 
 
-def score(path):
+def score(path, end_still=""):
     if not os.path.exists(path):
         return {"ok": False, "flags": ["missing"], "score": 0}
     size = os.path.getsize(path)
@@ -108,12 +122,23 @@ def score(path):
         flags.append("short")
         return {"ok": False, "flags": flags, "score": 0, "bytes": size}
     with tempfile.TemporaryDirectory() as work:
-        first = frame_pixels(path, 0.05, work, "first")
+        first = frame_pixels(path, 0.0, work, "first")
         mid = frame_pixels(path, length / 2, work, "mid")
-        last = frame_pixels(path, max(0, length - 0.12), work, "last")
+        last = frame_pixels(path, max(0, length - 0.08), work, "last")
+        # The two continuity checks the hub topology actually depends on.
+        hallway = frame_pixels(HALLWAY_STILL, None, work, "hallway") \
+            if os.path.exists(HALLWAY_STILL) else []
+        target = frame_pixels(end_still, None, work, "target") \
+            if end_still and os.path.exists(end_still) else []
+        drift = mean_abs_diff(first, hallway) if hallway else -1.0
+        arrive = mean_abs_diff(last, target) if target else -1.0
     lum = [luminance(f) for f in (first, mid, last)]
     travel = mean_abs_diff(first, last)
     step = max(mean_abs_diff(first, mid), mean_abs_diff(mid, last))
+    if drift >= 0 and drift > START_DRIFT_LIMIT:
+        flags.append("driftstart")
+    if arrive >= 0 and arrive > ARRIVE_LIMIT:
+        flags.append("noarrive")
     if max(lum) < 22:
         flags.append("dark")
     # A clip can start bright and still be unreadable where it matters: dark
@@ -137,6 +162,8 @@ def score(path):
         "luminance": [round(x, 1) for x in lum],
         "travel": round(travel, 1),
         "step": round(step, 1),
+        "drift": round(drift, 1),
+        "arrive": round(arrive, 1),
     }
 
 
@@ -150,9 +177,12 @@ def main():
     failures = []
     for clip_key in sorted(data["clips"]):
         entry = data["clips"][clip_key]
+        kind, _, monster_id = clip_key.partition(":")
+        default_end = os.path.join(HERE, "images", f"monster_{kind}_{monster_id}_end.jpg")
         scored = []
         for variant in entry["variants"]:
-            result = score(os.path.join(VIDEO_DIR, variant["file"]))
+            end_still = os.path.join(HERE, variant.get("end") or "") if variant.get("end") else default_end
+            result = score(os.path.join(VIDEO_DIR, variant["file"]), end_still)
             variant["score"] = result["score"]
             variant["flags"] = result["flags"]
             scored.append((result["score"], variant, result))
@@ -161,11 +191,11 @@ def main():
         scored.sort(key=lambda row: row[0], reverse=True)
         best = scored[0]
         # Selection is "newest clean take wins", NOT "highest score wins". The
-        # score rewards pixel travel, which systematically under-rates the v2+
-        # release clips: they are a deliberate two-step walk, where the v1 clips
-        # had the creature materialising out of nothing. Side-by-side last
-        # frames confirmed v2 reads better on identity and framing every time it
-        # scored lower. So only fall back to score when every take is flagged.
+        # score rewards pixel travel, which under-rates a deliberate slow walk-in
+        # against a creature that materialises out of nothing. The flags are the
+        # real gate — driftstart in particular fails every pre-end-frame clip,
+        # which is exactly right, since those open with the monster already on
+        # screen. Only fall back to score when every take is flagged.
         clean = [row for row in scored if row[2]["ok"]]
         choice = max(clean, key=lambda row: row[1]["n"]) if clean else best
         if args.select and choice[0] > 0 or (args.select and clean):

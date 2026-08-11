@@ -10,13 +10,17 @@ co-reside in 24 GB:
   stage images  every monster gets four stills, each derived from the last:
                   ref/monster_<id>.jpg          full-body identity reference
                   ref/monster_<id>_attack.jpg   snarling close-up, from the ref
-                  images/monster_release_<id>_start.jpg  ref composited into the hallway
-                  images/monster_attack_<id>_start.jpg   attack ref filling the hallway frame
+                  images/monster_release_<id>_end.jpg  ref composited into the hallway
+                  images/monster_attack_<id>_end.jpg   attack ref filling the hallway frame
 
-  stage videos  one LTX clip per monster per kind, started from the matching
-                still. Written as a numbered variant (`..._v3.mp4`) and appended
-                to js/variants.js, so nothing already on disk is overwritten and
-                the debug panel can compare every attempt side by side.
+  stage videos  one LTX clip per monster per kind. Every clip starts on the bare
+                hallway plate and is pinned (image_end) to arrive at the matching
+                composite, because the hub topology means the player is looking
+                at exactly that empty hallway when the event fires — so the cut
+                into the event is invisible and LTX only invents the journey.
+                Written as a numbered variant (`..._v3.mp4`) and appended to
+                js/variants.js, so nothing already on disk is overwritten and the
+                debug panel can compare every attempt side by side.
 
     python3 gen_monsters.py images                 # all stills
     python3 gen_monsters.py videos                 # one new variant per clip
@@ -58,8 +62,12 @@ REF_QUALITY = 85
 
 VIDEO_WIDTH = 384
 VIDEO_HEIGHT = 640
-VIDEO_FRAMES = 73
 VIDEO_FPS = 24
+# Every event clip starts on the empty hallway plate and ends on the composite,
+# because the hub topology guarantees the player is looking at exactly that
+# hallway when the event fires. The release is a slow walk-in; the attack is a
+# charge down the corridor and gets the extra second — it is the end of the run.
+VIDEO_FRAMES = {"release": 73, "attack": 97}
 
 LOG_PATH = os.path.join(HERE, "gen_monsters.log")
 
@@ -228,20 +236,23 @@ def stage_images(config, only, force, kinds):
             shrink_to_ref(attack_png, attack_jpg)
         attack_input = attack_png if os.path.exists(attack_png) else attack_jpg
 
-        # 3/4. hallway composites — the actual LTX start frames
+        # 3/4. hallway composites — the LTX *end* frames. The clip starts on the
+        # bare hallway plate (what the player is already looking at) and is
+        # pinned to arrive here, so these describe the destination, not the
+        # opening shot.
         for kind, prompt_key, source in (
             ("release", "releaseStartPrompt", ref_input),
             ("attack", "attackStartPrompt", attack_input),
         ):
             if kinds and kind not in kinds:
                 continue
-            start_png = os.path.join(master_dir, f"monster_{kind}_{mid}_start.png")
-            start_jpg = os.path.join(HERE, "images", f"monster_{kind}_{mid}_start.jpg")
-            if not force and os.path.exists(start_jpg):
+            end_png = os.path.join(master_dir, f"monster_{kind}_{mid}_end.png")
+            end_jpg = os.path.join(HERE, "images", f"monster_{kind}_{mid}_end.jpg")
+            if not force and os.path.exists(end_jpg):
                 continue
-            log(f"{mid}: {kind} start frame")
-            flux(monster[f"{kind}StartPrompt"], start_png, image_paths=[hallway, source])
-            shrink_to_ref(start_png, start_jpg)
+            log(f"{mid}: {kind} end frame")
+            flux(monster[f"{kind}StartPrompt"], end_png, image_paths=[hallway, source])
+            shrink_to_ref(end_png, end_jpg)
 
 
 # ── variants manifest ──────────────────────────────────────────────────
@@ -339,7 +350,8 @@ def adopt_orphan_variants(data):
             "created": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)),
             "bytes": stat.st_size,
             "prompt": "",
-            "start": f"images/monster_{kind}_{monster_id}_start.jpg",
+            "start": "images/hallway.jpg",
+            "end": f"images/monster_{kind}_{monster_id}_end.jpg",
             "note": "recovered from disk",
         })
         entry["variants"].sort(key=lambda variant: variant["n"])
@@ -358,7 +370,11 @@ def next_variant_number(entry):
 # or two short of the lens — so every new attack variant gets the punch-in armed
 # by default, aimed where the composited start frame puts the head. Release
 # clips are a slow reveal and stay off unless a reviewer turns them on.
-DEFAULT_ATTACK_ZOOM = {"enabled": True, "x": 0.5, "y": 0.4, "scale": 2.6, "lead": 1.0, "fade": 0.4}
+# Off by default now. The punch existed because LTX used to stop the creature a
+# step short of the lens; pinning image_end means the clip is guaranteed to
+# arrive, and punching into an already-full-frame face just crops it. Still
+# available per-clip in the debug panel.
+DEFAULT_ATTACK_ZOOM = {"enabled": False, "x": 0.5, "y": 0.4, "scale": 2.6, "lead": 1.0, "fade": 0.4}
 
 
 def arm_default_zoom(data, kind, src):
@@ -367,7 +383,7 @@ def arm_default_zoom(data, kind, src):
 
 
 # ── videos ─────────────────────────────────────────────────────────────
-def submit_video(config, monster, kind, start_image, frames):
+def submit_video(config, monster, kind, end_image, frames):
     prompt = monster[f"{kind}VideoPrompt"]
     payload = {
         "prompt": f"{prompt}, {config['common']}",
@@ -379,7 +395,11 @@ def submit_video(config, monster, kind, start_image, frames):
         "num_inference_steps": 20,
         "cfg_scale": 3.0,
         "negative_prompt": config["negative"],
-        "image": start_image,
+        # The first frame is the hallway the player is already looking at, so
+        # the cut into the event is invisible; the composite is pinned as the
+        # last frame, so LTX only has to invent the journey between the two.
+        "image": hallway_source(),
+        "image_end": end_image,
         "image_strength": 1.0,
         "tiling": "aggressive",
         "no_audio": True,
@@ -407,16 +427,17 @@ def stage_videos(config, only, kinds, frames):
         for kind in ("release", "attack"):
             if kinds and kind not in kinds:
                 continue
-            start_jpg = os.path.join(HERE, "images", f"monster_{kind}_{mid}_start.jpg")
-            if not os.path.exists(start_jpg):
-                log(f"{mid} {kind}: no start frame, skipping (run the images stage first)")
+            end_jpg = os.path.join(HERE, "images", f"monster_{kind}_{mid}_end.jpg")
+            if not os.path.exists(end_jpg):
+                log(f"{mid} {kind}: no end frame, skipping (run the images stage first)")
                 continue
             entry = data["clips"].setdefault(f"{kind}:{mid}", {"selected": "", "variants": []})
             number = next_variant_number(entry)
             out_file = f"monster_{kind}_{mid}_v{number}.mp4"
             out_path = os.path.join(HERE, "videos", out_file)
-            log(f"{mid} {kind}: rendering v{number}")
-            job_id, prompt = submit_video(config, monster, kind, start_jpg, frames)
+            clip_frames = frames or VIDEO_FRAMES[kind]
+            log(f"{mid} {kind}: rendering v{number} ({clip_frames}f)")
+            job_id, prompt = submit_video(config, monster, kind, end_jpg, clip_frames)
             job = wait_for_video(job_id)
             api_download(LTX_API, f"/api/jobs/{job_id}/file", out_path)
             entry["variants"].append({
@@ -426,7 +447,8 @@ def stage_videos(config, only, kinds, frames):
                 "created": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "bytes": os.path.getsize(out_path),
                 "prompt": prompt,
-                "start": f"images/monster_{kind}_{mid}_start.jpg",
+                "start": "images/hallway.jpg",
+                "end": f"images/monster_{kind}_{mid}_end.jpg",
                 "note": "",
                 "durationSecs": job.get("duration_secs"),
             })
@@ -441,7 +463,8 @@ def main():
     parser.add_argument("--only", default="", help="comma-separated monster ids")
     parser.add_argument("--kind", default="", help="release, attack, or both")
     parser.add_argument("--force", action="store_true", help="re-roll stills that already exist")
-    parser.add_argument("--frames", type=int, default=VIDEO_FRAMES)
+    parser.add_argument("--frames", type=int, default=0,
+                        help="override the per-kind frame count")
     args = parser.parse_args()
 
     config = load_config()

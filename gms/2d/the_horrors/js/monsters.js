@@ -492,8 +492,16 @@
       pick.className = "glass-button variant-pick";
       pick.type = "button";
       const zoomOn = zoomFor(item.src).enabled ? " · zoom" : "";
+      // check_monsters.py writes score/flags onto each variant. Surfacing them
+      // is the difference between "an older take" and "an older take that opens
+      // with the monster already on screen" — driftstart fails every clip made
+      // before the end-frame pipeline.
+      const flags = Array.isArray(item.flags) ? item.flags : [];
+      const badge = flags.length
+        ? `<em class="variant-flags">${esc(ctx, flags.join(" · "))}</em>`
+        : "";
       pick.innerHTML =
-        `<strong>v${esc(ctx, item.n)}${item.note ? ` — ${esc(ctx, item.note)}` : ""}</strong>` +
+        `<strong>v${esc(ctx, item.n)}${item.note ? ` — ${esc(ctx, item.note)}` : ""}${badge}</strong>` +
         `<small>${esc(ctx, item.file)}</small>` +
         `<small>${esc(ctx, sizeLabel(item.bytes))} | ${esc(ctx, item.created || "")}${esc(ctx, zoomOn)}</small>`;
       pick.addEventListener("click", () => {
