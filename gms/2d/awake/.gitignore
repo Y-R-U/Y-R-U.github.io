@@ -7,3 +7,6 @@ __pycache__/
 .debug_transition_metadata.json
 .image_previews/
 .scheduled_mimic_regen_state.json
+gen_monsters.log
+# Full-res reference masters stay local; the committed .jpg copies are what the game and debug panel load.
+ref/*.png

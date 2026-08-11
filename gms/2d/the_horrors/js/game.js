@@ -39,7 +39,10 @@
   let imagePollTimer = 0;
   let previewedTransition = null;
   let helperPoll = 0;
-  let debugFilter = "room";
+  let debugFilter = "monsters";
+  const Monsters = window.MonsterKit;
+  let zoomEditor = null;
+  let previewPunchStop = () => {};
   let debugMeta = loadDebugMeta();
   const cachedMedia = new Set();
   // Helper URL — derived from the page location so the same code works
@@ -102,6 +105,7 @@
     debugTrimEnd: $("debug-trim-end"),
     debugHelperStatus: $("debug-helper-status"),
     debugRefresh: $("debug-refresh"),
+    debugZoom: $("debug-zoom"),
     regenTitle: $("regen-title"),
     regenFile: $("regen-file"),
     regenCurrentRef: $("regen-current-ref"),
@@ -300,10 +304,15 @@
     }
     document.querySelectorAll("[data-debug-filter]").forEach(button => {
       button.addEventListener("click", () => {
-        debugFilter = button.dataset.debugFilter || "room";
+        debugFilter = button.dataset.debugFilter || "monsters";
         renderDebugList();
       });
     });
+    if (Monsters && els.debugZoom) {
+      zoomEditor = Monsters.mountZoomEditor(els.debugVideo, els.debugZoom, {
+        onZoomChange: () => renderDebugList(),
+      });
+    }
     els.debugNote.addEventListener("input", () => savePreviewMessage());
     els.debugTrimStart.addEventListener("change", () => savePreviewTrim(true));
     els.debugTrimEnd.addEventListener("change", () => savePreviewTrim(true));
@@ -995,12 +1004,10 @@
     if (state.scaredRooms.includes(roomId)) return false;
     const tier = scareTierForProgress();
     if (scareRoll(`scare:${roomId}:${state.turn}`) >= tier.chance) return false;
-    const clip = (Story.roomScares || {})[roomId];
-    if (!(await clipAvailable(clip))) return false;
     state.scaredRooms.push(roomId);
 
     const room = Story.rooms[roomId];
-    await playRoomScare(clip);
+    await playRoomScare();
     if (!tier.cost) {
       addHistory(`Something moved in the ${room.name}. You wait for your breathing to settle.`);
       renderGame(`Something moved in the ${room.name}.`);
@@ -1028,20 +1035,18 @@
     return true;
   }
 
-  async function playRoomScare(clip) {
+  // In-room scare clips are retired. The generated scare_<room>.mp4 files never
+  // read as the room you were standing in, so the beat is now played on the
+  // room still itself \u2014 a light-cut and a shudder \u2014 and the only videos the
+  // game shows are the five that earn their generation cost: room\u2192hallway,
+  // hallway\u2192room, monster release, monster attack, and the escape.
+  async function playRoomScare() {
     transitionLocked = true;
-    roomMediaToken += 1;
     clearTimeout(transitionTimer);
-    els.roomFallback.classList.remove("visible");
-    els.roomVideo.dataset.src = mediaSrc(clip);
-    els.roomVideo.src = mediaSrc(clip);
-    els.roomVideo.load();
-    await videoReady(els.roomVideo, 4200);
-    try { els.roomVideo.currentTime = 0; } catch (err) {}
     Audio.danger();
-    els.roomVideo.play().catch(() => {});
-    await waitForVideoWindow(els.roomVideo, 3600);
-    setRoomMedia(Story.rooms[state.currentRoom]);
+    els.mediaPane.classList.add("room-shudder");
+    await delay(1400);
+    els.mediaPane.classList.remove("room-shudder");
     transitionLocked = false;
   }
 
@@ -1491,8 +1496,10 @@
     els.eventOverlay.classList.add("video-reveal");
     setEventVideoChromeHidden(true);
     await delay(1000);
+    const endPunch = Monsters ? Monsters.punch(els.roomVideo, clip) : () => {};
     els.roomVideo.play().catch(() => {});
     await waitForVideoWindow(els.roomVideo, 3600);
+    endPunch();
     setEventVideoChromeHidden(false);
     els.eventOverlay.classList.remove("video-reveal");
     els.eventMessage.textContent = "You close the door and wait for the hallway to clear.";
@@ -1601,38 +1608,18 @@
       if (!list.length) return "";
       return list[state.turn % list.length];
     }
+    // Monster beats are versioned: the manifest (or a reviewer's local pick)
+    // decides which render of this monster's clip actually plays.
+    const threatId = state.threat && state.threat.id;
+    if (Monsters && threatId && (kind === "release" || kind === "attack")) {
+      const picked = Monsters.clip(kind, threatId);
+      if (picked) return picked;
+    }
     const group = videos[kind] || {};
-    return group[state.threat && state.threat.id] || group.default || "";
+    return group[threatId] || group.default || "";
   }
 
-  // Scare and death clips are generated in reviewed batches, so a file
-  // named in story.js may not be on disk yet — or may have been culled.
-  // Probe once per src and cache, so a missing clip degrades to "no
-  // scare happened" instead of a stalled cutscene.
-  const clipProbeCache = new Map();
 
-  function clipAvailable(src) {
-    if (!src) return Promise.resolve(false);
-    if (clipProbeCache.has(src)) return clipProbeCache.get(src);
-    const probe = new Promise(resolve => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.muted = true;
-      const settle = ok => {
-        clearTimeout(timer);
-        video.removeAttribute("src");
-        try { video.load(); } catch (err) {}
-        resolve(ok);
-      };
-      const timer = setTimeout(() => settle(false), 4000);
-      video.addEventListener("loadedmetadata", () => settle(true), { once: true });
-      video.addEventListener("error", () => settle(false), { once: true });
-      video.src = mediaSrc(src);
-      video.load();
-    });
-    clipProbeCache.set(src, probe);
-    return probe;
-  }
 
   function deathVideoFor() {
     const videos = Story.eventVideos || {};
@@ -1794,6 +1781,9 @@
       if (eventClip) els.endingVideo.src = mediaSrc(eventClip);
       els.endingVideo.currentTime = 0;
       if (eventClip) hideEndingButtonsDuringPlayback();
+      // The death ending plays the monster's attack clip \u2014 give it the same
+      // tap-to-zoom punch the reviewer set up in the debug panel.
+      if (eventClip && Monsters && !isSuccess) Monsters.punch(els.endingVideo, eventClip);
       els.endingVideo.play().catch(() => {});
       UI.showScreen("ending-screen");
     };
@@ -1999,8 +1989,13 @@
   function renderDebugList() {
     els.debugList.innerHTML = "";
     updateFilterButtons();
+    if (els.debugZoom) els.debugZoom.hidden = debugFilter !== "monsters";
     if (debugFilter === "mini") {
       renderMiniGameList();
+      return;
+    }
+    if (debugFilter === "monsters") {
+      renderMonsterBrowser();
       return;
     }
     const transitions = getDebugTransitions();
@@ -2064,6 +2059,54 @@
       els.debugVideo.poster = first.poster;
       renderPreviewText(first);
     }
+  }
+
+  // Monsters tab: MonsterKit owns the grid/detail/variant markup; game.js only
+  // supplies the preview surface, the toast, and the regen hand-off.
+  function renderMonsterBrowser() {
+    if (!Monsters) {
+      const empty = document.createElement("p");
+      empty.className = "debug-note";
+      empty.textContent = "Monster manifest did not load.";
+      els.debugList.append(empty);
+      return;
+    }
+    els.debugHelperStatus.textContent = helperOnline
+      ? els.debugHelperStatus.textContent
+      : "Local regen helper: offline \u2014 preview and picking still work";
+    Monsters.renderBrowser(els.debugList, {
+      escapeHtml: UI.escapeHtml,
+      toast: UI.toast,
+      helperOnline,
+      onPreview: (src, meta) => previewMonsterVariant(src, meta),
+      onRegen: (kind, monster) => openMonsterRegen(kind, monster),
+    });
+  }
+
+  function previewMonsterVariant(src, meta) {
+    previewPunchStop();
+    previewPunchStop = () => {};
+    previewedTransition = meta;
+    els.debugNote.value = meta.status || "";
+    els.debugPrompt.textContent = meta.promptText || "No prompt metadata for this clip.";
+    els.debugTrimStart.value = formatSeconds(0);
+    els.debugTrimEnd.value = formatSeconds(0);
+    els.debugVideo.poster = meta.poster || "images/hallway.jpg";
+    els.debugVideo.src = mediaSrc(src);
+    els.debugVideo.load();
+    if (zoomEditor) zoomEditor.setClip(src);
+  }
+
+  // Queue one more render of this monster beat. Reuses the existing Redo panel
+  // so resolution / length / prompt editing all behave the same as elsewhere.
+  function openMonsterRegen(kind, monster) {
+    const file = `monster_${kind}_${monster.id}.mp4`;
+    const transition = getDebugTransitions().find(item => item.file === file);
+    if (!transition) {
+      UI.toast("No helper row for this clip yet \u2014 refresh with the helper running.");
+      return;
+    }
+    openRegenPanel(Object.assign({}, transition, { monsterVariant: { kind, monsterId: monster.id } }));
   }
 
   function renderMiniGameList() {
@@ -2167,15 +2210,13 @@
       ["ending_death", "Hallway death videos"],
     ];
     if (debugFilter === "all") return groups;
+    // Monster clips have their own tab now; scare and death clips are retired
+    // from gameplay but stay reachable under ALL so nothing is orphaned.
     const map = {
       room: "room_transitions",
       possible: "possible_other_transition",
       other: "other_transition",
       ending: "ending_video",
-      release: "monster_release",
-      attack: "monster_attack",
-      scare: "room_scare",
-      death: "ending_death",
     };
     return groups.filter(([groupId]) => groupId === map[debugFilter]);
   }
@@ -2231,8 +2272,15 @@
       const result = await helperFetch("/status", { method: "GET" });
       helperOnline = true;
       debugTransitions = Array.isArray(result.transitions) ? result.transitions : [];
+      if (Monsters) {
+        Monsters.merge(result.variants);
+        Monsters.setHelper((path, body) => helperFetch(path.replace(/^\/api/, ""), {
+          method: "POST",
+          body: JSON.stringify(body),
+        }));
+      }
       helperMarkers = Array.isArray(result.markers)
-        ? result.markers.filter(marker => !/^monster_.*\.png$/i.test(marker.file || ""))
+        ? result.markers.filter(marker => !/^monster_/i.test(marker.file || ""))
         : [];
       renderHelperStatus(result);
     } catch (err) {

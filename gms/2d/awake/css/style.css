@@ -1670,3 +1670,273 @@ button.tag {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Monsters debug tab + jump-scare punch-in ─────────────────────────
+   Shared block, identical in awake/ and the_horrors/. Only palette
+   variables are referenced, so each game keeps its own colours. */
+
+.debug-video-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.scare-punch-fade {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2), #000 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zoom-marker {
+  position: absolute;
+  z-index: 7;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 2px solid var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px var(--red);
+  pointer-events: none;
+}
+
+.zoom-pick-layer {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  cursor: crosshair;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.zoom-marker::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.zoom-editor {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 10px 12px;
+}
+
+.zoom-editor.disabled {
+  opacity: 0.5;
+}
+
+.zoom-editor.armed {
+  border-color: var(--red);
+  box-shadow: 0 0 0 1px var(--red) inset;
+}
+
+.zoom-editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.zoom-editor-row .regen-checkbox {
+  margin-right: auto;
+}
+
+.zoom-editor-sliders {
+  display: grid;
+  gap: 6px;
+}
+
+.zoom-editor-sliders label {
+  display: grid;
+  gap: 3px;
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
+.zoom-editor-sliders b {
+  color: var(--gold);
+}
+
+.zoom-editor-sliders input[type="range"] {
+  width: 100%;
+  accent-color: var(--green);
+}
+
+.zoom-editor .debug-note {
+  margin: 0;
+}
+
+.monster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+.monster-card {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--glass);
+  padding: 8px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.monster-card:hover {
+  border-color: var(--green);
+}
+
+.monster-card img {
+  width: 100%;
+  aspect-ratio: 3 / 5;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  object-fit: cover;
+}
+
+.monster-card strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.monster-card small {
+  display: block;
+  color: var(--dim);
+  font-size: 0.68rem;
+}
+
+.monster-detail-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.monster-detail-head h3 {
+  margin: 0;
+}
+
+.monster-refs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.monster-ref {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.monster-ref img {
+  width: 100%;
+  aspect-ratio: 3 / 5;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  object-fit: cover;
+}
+
+.monster-ref-missing {
+  display: grid;
+  aspect-ratio: 3 / 5;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
+.monster-ref figcaption {
+  color: var(--dim);
+  font-size: 0.7rem;
+}
+.monster-ref img,
+.monster-ref-missing {
+  max-height: 200px;
+}
+
+.monster-card img {
+  max-height: 150px;
+}
+
+
+.monster-kind-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.variant-list {
+  display: grid;
+  gap: 8px;
+}
+
+.variant-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.variant-row.chosen .variant-pick {
+  border-color: var(--green);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.variant-pick {
+  display: grid;
+  min-height: 54px;
+  justify-items: start;
+  align-content: center;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.variant-pick strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.variant-pick small {
+  display: block;
+  color: var(--dim);
+  font-size: 0.68rem;
+}
+
+.variant-use.active {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.monster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Room scares no longer play a clip — the room still shudders instead. */
+@keyframes room-shudder {
+  0%, 100% { transform: none; filter: none; }
+  12% { transform: translate3d(-5px, 2px, 0) scale(1.015); filter: brightness(0.55); }
+  26% { transform: translate3d(4px, -3px, 0) scale(1.02); filter: brightness(1.15); }
+  44% { transform: translate3d(-3px, 1px, 0) scale(1.01); filter: brightness(0.4); }
+  70% { transform: translate3d(2px, 2px, 0) scale(1.012); filter: brightness(0.85); }
+}
+
+.media-pane.room-shudder .room-video,
+.media-pane.room-shudder .room-fallback {
+  animation: room-shudder 1.4s ease-in-out;
+}
