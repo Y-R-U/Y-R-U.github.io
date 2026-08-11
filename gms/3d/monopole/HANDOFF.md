@@ -5047,3 +5047,80 @@ come up under the fade instead of after it.
   390×844 in headless.
 - `assets/audio/verdict.mp3` is 758 kB, which is two thirds of everything else the game ships. It
   is fetched only on a fresh run and only when the gate is shown, but it is fetched before the tap.
+
+---
+
+## Session 18d — the cold open moves
+
+Aaron's note after hearing the wired ruling: *"on desktop it looks like it doesn't move for
+considerable time… it should slow move, then fast move up to something on a beat, then slow move,
+and then fast move on the next beat. Showing different things each time — different
+ships/stations/asteroids."*
+
+He was describing a real defect, not a preference. The sequence was **eight camera keys on one
+bearing**, each about 28 % nearer than the last, spread across twenty-two captions. On a phone that
+reads as a slow approach; on a 16:9 frame it reads as a still photograph, because closing 28 % over
+nine seconds changes nothing's position on screen — it only changes its size, slightly, and an
+`inout` ease spends the first and last third of that barely moving.
+
+### What it is now
+
+**Twenty-four beats, each with its own key, and the keys alternate.** `content/verdict.js` has three
+constructors and they are the whole grammar:
+
+- `punch(ms, hit, drift)` — arrive on the line in 550–1000 ms with an `out` ease, then creep to
+  `drift` at constant speed for whatever is left of the beat.
+- `glide(to)` — one `linear` move that takes the beat's whole run. The pull-outs and the long
+  sweeps.
+- `cut(to)` — instant. Still used exactly once, at the reveal.
+
+The rule is **punch in, glide out**. Every punch lands on a different subject; every glide leaves
+one. What actually produces the movement is not distance — it is a changed look target, a changed
+elevation and a changed lens. Two of the strongest moves in the piece barely change distance at all
+(`lanes` swings up over the back rank, `burns` rises from twelve degrees under the ranks to thirty
+over them across nine and a half seconds).
+
+Two new caption-less beats, `station` at 109.6 s and `rocks` at 114.0 s, cut the instrumental break
+into four moves instead of one. That stretch is now Ledger from underneath and then the ore rock
+filling the frame — the first time the game shows the player anything they will actually work with.
+
+### What made it possible to author
+
+`js/ui/verdict.js` grew `arm(camera, shot, total)`: it runs the punch, and when the punch's promise
+resolves it starts the drift for `total - ms` with a `linear` ease. A `moveSeq` token means a beat
+arriving early kills a drift that has not started yet, and `restOf(shot)` is what a cut or a skip
+lands on so neither throws the camera back to where a drift began.
+
+### Gotchas
+
+134. **`--flow=keys` is the tool for authoring camera keys, and `--flow=coldopen` cannot be.**
+     coldopen can only ever photograph a move in flight — a beat's final framing is on screen for
+     the frame before the next beat takes it — so a badly authored key looks exactly like an early
+     shutter there. `keys` stops the ruling, cuts to every key in turn (both ends of a punch) and
+     holds it. It found in one run that the `late` framing everyone had assumed was empty is
+     actually Ledger filling the frame, and that four keys were aimed at nothing.
+135. **A key aimed at a hull needs the fleet group's X and Z tilt, not just its yaw.** `showMeridian`
+     builds at `rotation.set(0.04, 0.62, 0.02)`, and those two small angles lift the back rank by
+     about 60 m. At the distance the close keys work at that is eleven degrees of frame — the ship
+     is above the top of a phone screen while the maths says it is dead centre. `--flow=keys` prints
+     the fleet's measured world box on start; check anchors against it.
+136. **The hulls are merged, so their positions no longer exist to be read.** `fleet()` bakes all
+     fifteen into a handful of meshes, which is why the anchors in `content/verdict.js` are the
+     `ranks` layout recomputed by hand. Change the count, the spacing or the formation and every
+     close key in the ruling points at empty space.
+137. **`--flow=coldopen` now takes two shots per beat**, `<id>` at 340 ms and `<id>_rest` near the
+     end, and the second one is timed from when the beat was *seen*, not from now. Sleeping the
+     beat's own length from after the first screenshot lands in the next beat — which is how a
+     frame captioned `burns` ended up filed as `ration_rest`.
+138. **`window.__mono.revealRuling()` exists for the tooling only.** It is the same closure the
+     `here: true` beat fires, hoisted out of `playRuling` so a script can stand in the second half
+     of the ruling without playing the first half.
+
+### Open
+
+- `twelve` is the weakest frame in the ruling — one small escort against a lot of black. It is a
+  punch so it reads as movement, but the composition is thin.
+- The band the camera bearing has to stay in (about −75° to −25°) is real and undocumented anywhere
+  but the comment in `content/verdict.js`. Swing past it and the planet leaves frame.
+- Everything in this session was judged on stills. Nobody has watched the sequence at speed on a
+  real phone, and the punches are the one thing a still cannot show.

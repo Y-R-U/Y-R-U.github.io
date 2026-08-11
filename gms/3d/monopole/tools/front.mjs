@@ -7,6 +7,7 @@
 //   node tools/front.mjs --flow=coldopen                    # every ruling beat, phone
 //   node tools/front.mjs --flow=coldopen --w=1280 --h=720   # the same on a desktop frame
 //   node tools/front.mjs --flow=coldopen --sound            # the recorded ruling, caption slip checked
+//   node tools/front.mjs --flow=keys                        # every camera key of the ruling, held
 //   node tools/front.mjs --flow=room                        # handover → room → terminal → back
 //   node tools/front.mjs --flow=look                        # the room's look-around limits
 //   node tools/front.mjs --flow=terminal                    # every application, the yard, a panel
@@ -169,7 +170,7 @@ async function main() {
   await S('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   mkdirSync(OUTDIR, { recursive: true });
 
-  await ({ coldopen, room, look, terminal, clock, back, yard, sale }[FLOW] || coldopen)(S);
+  await ({ coldopen, keys, room, look, terminal, clock, back, yard, sale }[FLOW] || coldopen)(S);
 
   await S('Browser.close').catch(() => {});
   cleanup(proc); server.close();
@@ -200,6 +201,7 @@ async function coldopen(S) {
     if (!id) { if (seen.size) break; await sleep(60); continue; }
     if (id !== last) {
       last = id;
+      const t0 = Date.now();
       if (seen.has(id)) { await sleep(60); continue; }
       seen.add(id);
       // With sound on, how late the caption was against the second it is authored for. Anything
@@ -211,10 +213,27 @@ async function coldopen(S) {
         if (t != null && at != null) { slip = Math.max(slip, Math.abs(t - at)); late = ` · at ${at}s heard ${t.toFixed(2)}s`; }
       }
       await sleep(340);
+      const n = String(seen.size - 1).padStart(2, '0');
       const cam = await evalJSON(S, CAM);
       const st = await evalJSON(S, `window.__mono.stats()`);
-      await shot(S, `beat${String(seen.size - 1).padStart(2, '0')}_${id}`,
+      await shot(S, `beat${n}_${id}`,
         `dist ${cam.dist} fov ${cam.fov} · ${st.calls} calls ${(st.tris / 1000).toFixed(0)}k tris ${st.texMB.toFixed(1)}MB${late}`);
+      // Most beats are two framings, not one: a fast move on to the line and a slow one away from
+      // it. A single shot 340 ms in catches the first mid-flight and never sees the second at all.
+      const hold = await evalJSON(S, `(() => {
+        const bs = window.__mono.verdictBeats || [];
+        const i = bs.findIndex(b => b.id === ${JSON.stringify(id)});
+        if (i < 0) return 0;
+        return ${SOUND ? 'bs[i + 1] ? (bs[i + 1].at - bs[i].at) * 1000 : 5000' : 'bs[i].ms'};
+      })()`);
+      // measured off when the beat was seen, not off now: four round trips and a PNG have already
+      // gone by, and sleeping the beat's own length from here lands in the beat after it
+      const wait = t0 + hold - 1200 - Date.now();
+      if (wait > 300) {
+        await sleep(wait);
+        const c2 = await evalJSON(S, CAM);
+        await shot(S, `beat${n}_${id}_rest`, `dist ${c2.dist} fov ${c2.fov} · settled`);
+      }
       continue;
     }
     await sleep(60);
@@ -224,6 +243,58 @@ async function coldopen(S) {
   if (SOUND) console.log(`  worst caption slip ${slip.toFixed(2)}s`);
   await sleep(1200);
   await shot(S, 'after_ruling');
+}
+
+// Every camera key in the ruling, cut to and held. `coldopen` can only ever photograph a move in
+// flight — the last key of a beat is on screen for the frame before the next beat takes it — so a
+// framing authored badly reads as "the shutter was early" there and is only visible here.
+async function keys(S) {
+  await load(S, '?front=1&mute=1');
+  await sleep(700);
+  await evalJSON(S, `(window.__mono.verdict.stop(), document.getElementById('verdict').classList.remove('live', 'in'), 1)`);
+  // The fleet is fifteen hulls merged into a handful of meshes, so its hulls have no positions to
+  // read any more. Its world box is the one thing that says where the keys can point.
+  const box = await evalJSON(S, `(() => {
+    const g = window.__mono.reach?.meridian;
+    if (!g) return null;
+    const b = { min: [1e9, 1e9, 1e9], max: [-1e9, -1e9, -1e9] };
+    g.updateMatrixWorld(true);
+    g.traverse(o => {
+      if (!o.isMesh) return;
+      o.geometry.computeBoundingBox();
+      const bb = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
+      for (let i = 0; i < 3; i++) {
+        b.min[i] = Math.min(b.min[i], bb.min.getComponent(i));
+        b.max[i] = Math.max(b.max[i], bb.max.getComponent(i));
+      }
+    });
+    return { min: b.min.map(Math.round), max: b.max.map(Math.round) };
+  })()`);
+  if (box) console.log(`  fleet box  min ${box.min.join(', ')}  max ${box.max.join(', ')}`);
+  const n = await evalJSON(S, `window.__mono.verdictBeats.length`);
+  for (let i = 0; i < n; i++) {
+    const b = await evalJSON(S, `(() => {
+      const beat = window.__mono.verdictBeats[${i}];
+      if (!beat.shot) return null;
+      if (beat.here) window.__mono.revealRuling();
+      const s = beat.shot;
+      const cam = window.__mono.camera;
+      cam.cancelMove();
+      cam.moveTo({ pos: s.pos, look: s.look, fov: s.fov, ms: 0 });
+      return { id: beat.id, drift: !!s.drift };
+    })()`);
+    if (!b) continue;
+    await sleep(240);
+    await shot(S, `${String(i).padStart(2, '0')}_${b.id}${b.drift ? '_hit' : ''}`);
+    if (!b.drift) continue;
+    await evalJSON(S, `(() => {
+      const s = window.__mono.verdictBeats[${i}].shot;
+      window.__mono.camera.moveTo({ pos: s.drift.pos, look: s.drift.look, fov: s.drift.fov ?? s.fov, ms: 0 });
+      return 1;
+    })()`);
+    await sleep(240);
+    await shot(S, `${String(i).padStart(2, '0')}_${b.id}_end`);
+  }
 }
 
 // The handover: skip the ruling, build a character, and see where the game actually puts you.

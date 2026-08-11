@@ -6,15 +6,26 @@
 //
 // `shot` is an absolute camera framing, not a spline, so a skip can cut straight to the last one.
 //
-// The eight camera keys are ONE approach. They open on Meridian's parked fleet at four kilometres,
-// where it is a row of scratches against the gas giant, and close on it a key at a time until a
-// single hull fills the frame. Each step is ~28 % nearer than the last, which is the smallest
-// change that reads as movement rather than a slow zoom — the first cut of this sequence closed by
-// 18 % across the whole ruling and looked like a still photograph for forty seconds.
+// ── how the camera moves ──────────────────────────────────────────────────────────────────────
 //
-// Nothing local is drawn for those beats: Ledger, the Dray Yard and the belt are switched off, and
+// Every beat is one of three things, and they alternate on purpose:
+//
+//   `punch(ms, hit, drift)`  arrives on the line — a fast move, usually under a second — and then
+//                            creeps for whatever is left of the beat. This is the one that reads.
+//   `glide(to)`              one slow move that takes the beat's whole run. These are the pull-outs
+//                            and the long sweeps; they only work next to a punch.
+//   `cut(to)`                instant. Used once, at the reveal.
+//
+// The rule the sequence is built on is **punch in, glide out**: a hard move toward a new subject on
+// the beat, then a slow one away from it. Everything in it was originally a single continuous
+// approach on one bearing, closing 28 % per key, and on a desktop frame that reads as a still
+// photograph — the subject barely changes size and nothing crosses the frame. Distance alone is not
+// movement. What moves is a changed look target, a changed elevation and a changed lens.
+//
+// Nothing local is drawn for the ruling: Ledger, the Dray Yard and the belt are switched off, and
 // the beat marked `here: true` cuts away and turns them all on at once. That cut is why the fleet
-// can be thrown away on the same frame without the player seeing it go.
+// can be thrown away on the same frame without the player seeing it go. Everything after it is
+// framed on the real system, so the last third gets a station, a rock field and a rival's yard.
 //
 // ── two clocks ────────────────────────────────────────────────────────────────────────────────
 //
@@ -31,9 +42,8 @@
 // The two are NOT derived from one another and must be edited together. `at` is the truth about a
 // file that already exists; `ms` is a judgement about reading.
 //
-// The prose is split far finer than the eight camera keys — twenty-two beats over eight framings.
-// A beat with no `shot` holds the move it is standing in, so the camera glides across a whole group
-// of captions in one continuous ease instead of pulsing once per line.
+// Every beat now carries its own key. One without a `shot` would hold the move it is standing in,
+// which is what the whole sequence used to do and is why it looked still.
 
 const D = [1540, 400, 3520];
 
@@ -45,31 +55,50 @@ export const meridian = Object.freeze({
   face: 0.62,
 });
 
-// The camera for one key of the approach: distance from the fleet, bearing around it, and how far
-// above its plane.
+// Five of the fifteen hulls in world space, so a key can be aimed at one ship rather than at the
+// formation's corner. They are the `ranks` layout in js/world/fleet.js run at the count and spacing
+// showMeridian() uses, through that group's own transform — change either and these point at empty
+// space. The group's small X and Z tilts matter: they lift the back rank about sixty metres, which
+// is eleven degrees of frame at the distance the close keys work at.
+const LEAD = Object.freeze([-2248, 275, 3197]);
+const CORE = Object.freeze([-2466, 392, 2664]);
+const FLANK = Object.freeze([-2970, 421, 2806]);
+const BACK = Object.freeze([-2930, 490, 2162]);
+const ESCORT = Object.freeze([-2693, 531, 1886]);
+
+// A camera key: how far off the hull it is looking at, what bearing round it, and how far above its
+// plane.
 //
-// Bearing is the load-bearing number and it barely moves — a bearing of about −45° is the one that
-// holds Ossian and the star behind the fleet, which is what backlights the hulls, and swinging away
-// from it takes the planet off the frame and leaves a black rectangle with some ships in it. The
-// parallax comes from the approach itself: three ranks separate hard as the camera closes on them.
-//
-// `ms` is left off almost everywhere on purpose. Omitted, the move takes exactly as long as the run
-// of captions it is under, in whichever clock is running — which is the only way one framing table
-// can serve a 137-second recording and a 66-second silent cut. Set it only to force a cut (`0`) or
-// a punch faster than its own beat.
-function approach(dist, az, el, fov, ms) {
+// Bearing has a band it has to stay in. The star sits at 148° and Ossian just under it, so a camera
+// bearing near −57° is looking straight into both and every hull is backlit; past about −75° or
+// −25° the planet leaves the frame and the fleet turns into scratches on black. Elevation has no
+// such limit and is where most of the movement in here comes from — dropping under the ranks and
+// rising back over them crosses far more of the frame than closing on them ever does.
+function eye(dist, az, el, fov, look = CORE) {
   const a = az * Math.PI / 180, e = el * Math.PI / 180;
-  const F = meridian.at;
   return Object.freeze({
     pos: Object.freeze([
-      Math.round(F[0] + dist * Math.sin(a) * Math.cos(e)),
-      Math.round(F[1] + dist * Math.sin(e)),
-      Math.round(F[2] + dist * Math.cos(a) * Math.cos(e)),
+      Math.round(look[0] + dist * Math.sin(a) * Math.cos(e)),
+      Math.round(look[1] + dist * Math.sin(e)),
+      Math.round(look[2] + dist * Math.cos(a) * Math.cos(e)),
     ]),
-    look: F,
-    fov, ms,
+    look, fov,
   });
 }
+
+// The same thing for the live system, where the subjects are at known places rather than round a
+// fleet: a station, a rock field, the rival's yard.
+const at = (pos, look, fov) => Object.freeze({ pos: Object.freeze(pos), look: Object.freeze(look), fov });
+
+// Omitting `ms` is what makes one framing table serve both clocks: the move then takes exactly as
+// long as the beat it is under, whether that beat is measured in the recording or in silence.
+const glide = to => Object.freeze({ ...to, ease: 'linear' });
+const cut = to => Object.freeze({ ...to, ms: 0 });
+const punch = (ms, hit, drift = null) => Object.freeze({ ...hit, ms, ease: 'out', drift });
+
+// Where the camera is standing when the gate's title card is over it, before the first beat starts
+// moving. It is a framing rather than beat 0's own shot because beat 0 now moves off it.
+export const opening = eye(4300, -57, 6, 38);
 
 // The recorded ruling. Timings in `at` are only true of this file — re-generate the voice and every
 // one of them has to be measured again.
@@ -89,93 +118,115 @@ export const beats = Object.freeze([
     // caption-before-line rule at its limit rather than an exception to it.
     id: 'seal', kind: 'seal', at: 0, ms: 2600,
     over: 'Universal Alliance', text: 'Competition Division',
-    shot: approach(4200, -57, 6, 38, 0),
+    shot: glide(eye(3450, -50, 10, 35)),
   }),
 
   // The case caption, then the size of the thing being sentenced — three numbers, delivered one at
-  // a time with air between them, so they are three cards rather than one line.
+  // a time with air between them, so they are three cards rather than one line. Each of the three
+  // gets its own subject: the rank, the formation from above, and then a single hull.
   Object.freeze({
     id: 'docket', kind: 'record', at: 7.6, ms: 3600,
     over: 'Finding 44 · 119',
     text: 'The Alliance v. the Meridian Combine',
-    shot: approach(3020, -57.6, 7.2, 39),
+    shot: punch(1000, eye(2600, -60, 14, 42), eye(2150, -55, 11, 42)),
   }),
-  Object.freeze({ id: 'years', kind: 'record', at: 16.0, ms: 1400, over: 'Finding 44 · 119', text: 'Sixty-one years.' }),
-  Object.freeze({ id: 'lanes', kind: 'record', at: 19.4, ms: 1400, over: 'Finding 44 · 119', text: 'Four hundred lanes.' }),
-  Object.freeze({ id: 'carrier', kind: 'record', at: 22.9, ms: 1900, over: 'Finding 44 · 119', text: 'One carrier.' }),
+  Object.freeze({
+    id: 'years', kind: 'record', at: 16.0, ms: 1400,
+    over: 'Finding 44 · 119', text: 'Sixty-one years.',
+    shot: punch(600, eye(880, -46, 6, 32, LEAD), eye(780, -41, 6, 32, LEAD)),
+  }),
+  Object.freeze({
+    id: 'lanes', kind: 'record', at: 19.4, ms: 1400,
+    over: 'Finding 44 · 119', text: 'Four hundred lanes.',
+    shot: punch(600, eye(900, -66, 26, 36, BACK), eye(840, -71, 24, 36, BACK)),
+  }),
+  Object.freeze({
+    id: 'carrier', kind: 'record', at: 22.9, ms: 1900,
+    over: 'Finding 44 · 119', text: 'One carrier.',
+    shot: punch(700, eye(190, -34, 5, 40, LEAD), eye(250, -26, 4, 40, LEAD)),
+  }),
 
   Object.freeze({
     id: 'method', kind: 'record', at: 27.0, ms: 3200,
     over: 'Findings of fact · 1 of 3',
     text: 'Meridian never out-carried anyone.',
-    shot: approach(2180, -58.2, 8.4, 40),
+    shot: glide(eye(1400, -50, 12, 40)),
   }),
   Object.freeze({
     id: 'bought', kind: 'record', at: 32.2, ms: 3800,
     over: 'Findings of fact · 1 of 3',
     text: 'It bought the yards, then the lanes, then the people who set the tariffs.',
+    shot: punch(800, eye(620, -62, 9, 38, FLANK), eye(540, -68, 8, 38, FLANK)),
   }),
 
   Object.freeze({
     id: 'wait', kind: 'record', at: 38.3, ms: 3000,
     over: 'Findings of fact · 2 of 3',
     text: 'Where it could not buy, it waited.',
-    shot: approach(1570, -58.8, 9.6, 41),
+    shot: glide(eye(1500, -58, 5, 40)),
   }),
   Object.freeze({
     id: 'dock', kind: 'record', at: 43.4, ms: 3400,
     over: 'Findings of fact · 2 of 3',
     text: 'A rival that cannot dock does not have to be beaten.',
+    shot: punch(800, eye(360, -50, 4, 40, BACK), eye(310, -43, 3, 40, BACK)),
   }),
 
+  // Under the ranks and back up over them. It is the biggest move in the ruling and it has the
+  // longest beat in the ruling to make it in — nine and a half seconds of one continuous rise.
   Object.freeze({
     id: 'ration', kind: 'record', at: 48.9, ms: 3400,
     over: 'Findings of fact · 3 of 3',
     text: 'Coil filament was rationed to hold its price.',
-    shot: approach(1130, -59.4, 10.8, 42),
+    shot: glide(eye(1250, -46, -12, 44)),
   }),
   Object.freeze({
     id: 'burns', kind: 'record', at: 54.5, ms: 4200,
     over: 'Findings of fact · 3 of 3',
     text: 'Every lamp, every drive coil and every relay beacon in the outer systems burns filament.',
+    shot: glide(eye(1900, -70, 30, 38)),
   }),
 
   Object.freeze({
     id: 'kalsa', kind: 'record', at: 64.0, ms: 3800, weight: true,
     over: 'Kalsa relay · the ninth year of the ration',
     text: 'The Kalsa beacon went dark and stayed dark for nine days.',
-    shot: approach(810, -60, 12, 43),
+    shot: punch(900, eye(700, -60, 8, 26, LEAD), eye(480, -46, 4, 27, LEAD)),
   }),
   Object.freeze({
     id: 'aboard', kind: 'record', at: 73.0, ms: 4200, weight: true,
     over: 'Kalsa relay · the ninth year of the ration',
     text: 'Two thousand three hundred people were aboard the ships that could not see it.',
+    shot: glide(eye(1150, -40, 14, 34)),
   }),
 
   // 80.6 is off the envelope, not off the transcript. The word lands 0.6 s later than the words
   // around it suggest, and a stamp is the one beat that must hit ON the voice rather than ahead of
-  // it — GUILTY arriving early reads as the caption spoiling the line.
+  // it — GUILTY arriving early reads as the caption spoiling the line. The move under it is the
+  // fastest in the sequence for the same reason.
   Object.freeze({
     id: 'guilty', kind: 'stamp', at: 80.6, ms: 2800,
     text: 'Guilty', sub: 'on all forty counts',
-    shot: approach(584, -60.6, 13.2, 29, 900),
+    shot: punch(550, eye(584, -60.6, 13.2, 29, meridian.at), eye(520, -55, 12, 29, meridian.at)),
   }),
 
   Object.freeze({
     id: 'sentence', kind: 'sentence', at: 85.7, ms: 3600,
     over: 'Order of divestiture',
     text: 'Meridian is reduced to one tenth of what it holds.',
-    shot: approach(420, -61.2, 14.4, 44),
+    shot: glide(eye(1700, -50, 24, 40)),
   }),
   Object.freeze({
     id: 'twelve', kind: 'sentence', at: 92.8, ms: 3400,
     over: 'Order of divestiture',
     text: 'Twelve years. Lane by lane, system by system,',
+    shot: punch(800, eye(760, -66, 16, 34, ESCORT), eye(700, -71, 15, 34, ESCORT)),
   }),
   Object.freeze({
     id: 'ready', kind: 'sentence', at: 98.2, ms: 3600,
     over: 'Order of divestiture',
     text: 'whether or not there is anyone ready to take them.',
+    shot: glide(eye(3000, -58, 30, 44)),
   }),
 
   // The cut. `ms: 0` is doing real work here — the fleet is thrown away on this frame, and only a
@@ -188,30 +239,42 @@ export const beats = Object.freeze([
   // the one musical event in the track and the one cut in the sequence are the same instant.
   Object.freeze({
     id: 'open', kind: 'blank', at: 104.05, ms: 900, here: true,
-    shot: Object.freeze({ pos: Object.freeze([520, 1480, 1980]), look: Object.freeze([260, 40, 460]), fov: 56, ms: 0 }),
+    shot: cut(at([520, 1480, 1980], [260, 40, 460], 56)),
   }),
   // Fifteen seconds of instrumental with no caption on it. It is the longest the player goes
-  // without being told anything and it is the best the game ever looks, so the camera has to be
-  // moving through all of it — a static frame that long reads as a hang, not a hold.
+  // without being told anything and it is the best the game ever looks, so it is four moves rather
+  // than one: down out of the reveal, on to Ledger, out to the rocks, and back off it all. A single
+  // fifteen-second ease over that distance reads as a hang, not a hold.
   Object.freeze({
     id: 'drift', kind: 'blank', at: 104.6, ms: 1800,
-    shot: Object.freeze({ pos: Object.freeze([-140, 700, 1180]), look: Object.freeze([200, 30, 380]), fov: 46 }),
+    shot: glide(at([-140, 700, 1180], [200, 30, 380], 46)),
+  }),
+  Object.freeze({
+    id: 'station', kind: 'blank', at: 109.6, ms: 1800,
+    shot: punch(900, at([110, 128, 268], [356, -24, -26], 42), at([300, 104, 318], [520, -16, -70], 42)),
+  }),
+  Object.freeze({
+    id: 'rocks', kind: 'blank', at: 114.0, ms: 2000,
+    shot: punch(900, at([-830, 108, -1040], [-1340, 40, -1470], 44), at([-1090, 70, -1290], [-1520, 46, -1652], 44)),
   }),
 
-  Object.freeze({ id: 'reach', kind: 'land', at: 119.6, ms: 3000, text: 'Tamber Reach was released this year.' }),
+  Object.freeze({
+    id: 'reach', kind: 'land', at: 119.6, ms: 3000,
+    text: 'Tamber Reach was released this year.',
+    shot: glide(at([-560, 980, 1420], [-680, 40, -520], 50)),
+  }),
   Object.freeze({
     id: 'corvain', kind: 'land', at: 123.5, ms: 3800,
     text: 'Corvain Drayage took seventy-one per cent of it in nine weeks.',
-    shot: Object.freeze({
-      pos: Object.freeze([D[0] - 980, D[1] - 90, D[2] - 1420]),
-      look: Object.freeze([D[0] - 260, D[1] - 60, D[2] - 640]), fov: 40,
-    }),
+    shot: punch(900,
+      at([D[0] - 980, D[1] - 90, D[2] - 1420], [D[0] - 260, D[1] - 60, D[2] - 640], 40),
+      at([D[0] - 660, D[1] - 48, D[2] - 960], [D[0] - 80, D[1] - 24, D[2] - 260], 40)),
   }),
   Object.freeze({
     id: 'late', kind: 'land', at: 131.4, ms: 3600, last: true,
     text: 'You got here late.',
-    shot: Object.freeze({ pos: Object.freeze([-150, 26, 250]), look: Object.freeze([130, 4, 60]), fov: 44 }),
+    shot: glide(at([-150, 26, 250], [130, 4, 60], 44)),
   }),
 ]);
 
-export default Object.freeze({ beats, meridian, track });
+export default Object.freeze({ beats, meridian, track, opening });

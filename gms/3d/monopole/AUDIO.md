@@ -40,11 +40,15 @@ Every caption's second is in `content/verdict.js` as `at`, and `tools/front.mjs 
 | 80.6 | guilty | **GUILTY** — on all forty counts |
 | 85.7 / 92.8 / 98.2 | sentence / twelve / ready | order of divestiture, in three cards |
 | **104.05** | open | **hard cut.** Fleet gone, Reach revealed, no caption |
-| 104.6 | drift | a nineteen-second camera move over the Reach |
+| 104.6 / 109.6 / 114.0 | drift / station / rocks | the instrumental, in three moves and no words |
 | 119.6 | reach | Tamber Reach was released this year. |
 | 123.5 | corvain | Corvain Drayage took seventy-one per cent of it in nine weeks. |
 | 131.4 | late | You got here late. |
 | 136.4 | — | hand over to the origin screen, audio fades out over 2.2 s |
+
+Two of those rows carry no words at all. `station` and `rocks` exist only to give the camera
+somewhere to go during the instrumental — a beat is the unit the camera moves on, so a fifteen-
+second stretch with nothing said in it needs beats in it or it is one fifteen-second ease.
 
 ### If you re-record it
 

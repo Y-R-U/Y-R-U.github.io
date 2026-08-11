@@ -248,20 +248,23 @@ if (live) {
     for (const o of local) o.visible = false;
     reach.showMeridian();
     verdictLighting(app.quality);
-    const first = content.verdict.beats[0].shot;
+    const first = content.verdict.opening;
     camera.setFrom(first.pos, first.look, first.fov);
+  };
+  const reveal = () => {
+    if (here) return;
+    here = true;
+    reach.hideMeridian();
+    reachLighting(app.quality);
+    for (const o of local) o.visible = true;
   };
   const playRuling = (sound = false) => {
     armRuling();
-    const reveal = () => {
-      if (here) return;
-      here = true;
-      reach.hideMeridian();
-      reachLighting(app.quality);
-      for (const o of local) o.visible = true;
-    };
     return verdict.play({ camera, sound, onBeat: b => { if (b.here) reveal(); } }).finally(reveal);
   };
+  // so tools/front.mjs --flow=keys can stand in both halves of the ruling and shoot the camera
+  // keys where they land, rather than wherever a move happened to be when the shutter went
+  Object.assign(window.__mono, { armRuling, revealRuling: reveal });
 
   showroom.register({
     id: 'cold_open', group: 'misc', label: 'The verdict — cold open',

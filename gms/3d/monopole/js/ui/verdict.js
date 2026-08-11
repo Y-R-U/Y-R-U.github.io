@@ -44,6 +44,29 @@ function span(i, sound) {
   return ms;
 }
 
+// Where a key ends up once it has finished doing everything it is going to do. A cut has to land
+// there and not on the framing the move started from, or skipping mid-drift throws the camera back.
+const restOf = s => (s.drift ? { pos: s.drift.pos, look: s.drift.look, fov: s.drift.fov ?? s.fov } : s);
+
+// One beat's camera work. A key with a `drift` arrives fast and then keeps going slowly for
+// whatever is left of the beat — which is the whole shape of the sequence: land on the line, then
+// creep. Without it every move is spread across its caption's whole run and a nine-second beat
+// crawls so slowly that the frame looks frozen.
+let moveSeq = 0;
+function arm(camera, s, total) {
+  const seq = ++moveSeq;
+  if (reduced()) return camera.moveTo({ ...restOf(s), ms: 0 });
+  const hit = s.ms != null ? Math.min(s.ms, total || s.ms) : total;
+  const move = camera.moveTo({ pos: s.pos, look: s.look, fov: s.fov, ms: hit, ease: s.ease || 'inout' });
+  const left = total - hit;
+  if (!s.drift || left < 400) return move;
+  return move.then(r => {
+    if (!playing || r?.cut || seq !== moveSeq) return;
+    const d = s.drift;
+    camera.moveTo({ pos: d.pos, look: d.look, fov: d.fov ?? s.fov, ms: left, ease: d.ease || 'linear' });
+  });
+}
+
 export const verdict = {
   get playing() { return playing; },
   get hasSound() { return !!audio && unlocked; },
@@ -109,7 +132,7 @@ export const verdict = {
         // fleet that the caller's reveal throws away on the same frame, and the player watches it
         // go — which is the one thing the hard cut in the middle of the ruling exists to hide.
         const last = beats[beats.length - 1].shot;
-        if (skipped && camera) camera.moveTo({ ...last, ms: 0 });
+        if (skipped && camera) camera.moveTo({ ...restOf(last), ms: 0 });
         root.classList.remove('in');
         setTimeout(() => { root.innerHTML = ''; root.classList.remove('live'); }, 420);
         resolve({ skipped });
@@ -121,10 +144,7 @@ export const verdict = {
         i = n;
         const b = beats[i];
         paint(b, progress(), i === beats.length - 1);
-        if (camera && b.shot) {
-          const ms = reduced() ? 0 : (b.shot.ms != null ? b.shot.ms : span(i, withSound));
-          camera.moveTo({ pos: b.shot.pos, look: b.shot.look, fov: b.shot.fov, ms, ease: 'inout' });
-        }
+        if (camera && b.shot) arm(camera, b.shot, span(i, withSound));
         onBeat?.(b, i);
       };
 
@@ -158,7 +178,7 @@ export const verdict = {
           // throws Meridian's fleet away — and its framing is taken as a cut, because easing
           // through three framings at once is how the player sees the fleet go.
           for (let k = i + 1; k < j; k++) {
-            if (camera && beats[k].shot) camera.moveTo({ ...beats[k].shot, ms: 0 });
+            if (camera && beats[k].shot) camera.moveTo({ ...restOf(beats[k].shot), ms: 0 });
             onBeat?.(beats[k], k);
           }
           show(j);
