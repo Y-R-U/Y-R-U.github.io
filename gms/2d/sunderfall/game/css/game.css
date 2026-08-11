@@ -149,6 +149,12 @@ body {
   border-color: rgba(255, 122, 47, .7);
 }
 #boot-go:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+/* An author `display` beats the UA sheet's `[hidden] { display: none }` whatever
+   the specificity, so the rule above was showing "tap to begin" from the very
+   first paint — breathing, styled, and dead, because main.js does not attach the
+   handler until the modules are up. It has to *look* unavailable until it is.
+   Everything in ui.css already guards this; only the boot card missed it. */
+#boot-go[hidden] { display: none; }
 #boot[data-ready] .boot-bar { visibility: hidden; }
 
 @keyframes bootBreathe {

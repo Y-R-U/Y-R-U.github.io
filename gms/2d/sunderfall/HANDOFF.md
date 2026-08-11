@@ -3746,3 +3746,20 @@ east ended with Rook pinned to the corner of a frame that had stopped moving —
 being stuck, which is how it was reported. Two standing stones and a lit brazier at 7500–7600, a rock
 face behind them too tall to jump, and a one-shot `hint:tip` at `marks.roadEnd`. `endSaid` resets in
 `enter()`.
+
+### "tap to begin" was on screen before it did anything
+
+Reported as "the start button looks too much like it should work but doesn't". `#boot-go` carries the
+`hidden` attribute until `waitForStart` attaches its handler — but `#boot-go { display: flex }` in
+game.css beat it. **An author `display` declaration always wins over the UA sheet's
+`[hidden] { display: none }`, whatever the specificity**, so the button rendered on the very first
+paint: styled, breathing, focusable and completely dead until the modules finished loading. On a
+throttled connection that is twelve seconds of a button that does nothing.
+
+`#boot-go[hidden] { display: none; }`. Every `hidden`-toggled element in ui.css already carries its
+own guard (`.sf-modal[hidden]`, `.sf-note[hidden]`, `.sf-levelup[hidden]`…); the boot card was the
+one that missed it. Worth grepping for whenever a `display` is added to something JS hides.
+
+`scratchpad/boot.mjs` samples the computed style every 100ms against `#boot[data-ready]` under a
+260KB/s throttle: the deployed build shows the button for the whole load, this one never shows it
+before the gate is armed.
