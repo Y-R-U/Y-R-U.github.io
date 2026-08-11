@@ -3518,3 +3518,68 @@ and for each music state. The key facts a generation has to respect: the score i
 throughout**, the per-state tempos are fixed (menu 56 / explore 62 / tension 74 / combat 96 / boss
 104 / victory 68), and the boss loop's ♭II is a deliberate semitone clash. Any recorded track in
 another key will fight the live synth on every state change.
+
+---
+
+## playtest-fixes-12 — the intro has a voice
+
+Two Suno takes arrived (one per character, each holding that character's whole part) and
+are now cut into the cinematic: `game/audio/vo/vayne.mp3` and `rook.mp3`, 253KB for the
+pair after re-encoding down from 1.2MB.
+
+**All 19 lines are in, verified end to end.** A full 80s headless run played every clip in
+script order, correct offsets, correct file per speaker, no overlaps.
+
+### Getting the timings was the hard part — see `docs/VO-TIMING-RECIPE.md`
+
+Short version, because two obvious approaches both fail on Suno output:
+
+- **Silence detection is useless** — there is a music bed under the voice, so there is no
+  silence. `silencedetect` found one gap in a 15s file containing seven lines.
+- **Energy thresholding is useless on its own** — the bed sits ~10dB under the voice and
+  changes level between sections, so any single threshold merges phrases or loses them.
+  Several parameter sets were tried; the counts that matched did so by coincidence and the
+  boundaries were wrong.
+- **Whisper drifts** — two runs put "Hold." at 1.20s and 3.40s. Its bias is consistently
+  *early*: measured onsets ran 0.2–0.6s after its word starts.
+
+What works: whisper for **which line and in what order**, then a
+**characters-per-second sanity check** (English is 11–22 cps; anything outside is a bad
+edge, not a short line), then the envelope for any line still in doubt. Lead-in is trimmed
+only where a measured onset is >0.3s later *and* cps stays ≤24 — which kept all of Rook's
+whisper timings (tight) and trimmed five of Vayne's (early).
+
+Clips are padded −0.10s at the front and +0.15s at the back. **Cut wide when unsure**: bed
+before a word disappears under the fade, a clipped consonant sounds broken.
+
+### How it plays
+
+`intro/vo.js` decodes each take once and plays sub-ranges — no pre-cut files, so the fade
+lengths stay tunable without re-encoding. A beat carries `vo: [offset, length]` in
+`story/script.js`, in seconds into that speaker's FILE, which is why `retime()` correctly
+leaves it alone.
+
+- Fades: 0.10s in, 0.18s out. The bed clicks on a hard cut.
+- `start(when, offset, len + 0.03)` — the tail keeps the fade-out on real samples.
+- **Voice is routed past `master`, not through it.** `duck()` pulls master down so the
+  score gets out of the way of a line; a voice inside master would duck itself. Both buses
+  fade together on skip, and `voice.stop()` runs on skip and on cleanup so a line never
+  outlives the cinematic.
+- Nothing waits on the fetch. If it 404s or the decode fails, `say()` is a no-op and the
+  cinematic plays exactly as it did before.
+
+Tightest margin in the whole cut is 0.31s (between "Holding it isn't wielding it." and
+"I'd have picked anyone else."). **If you retime the script, re-check that no clip runs
+into the next line** — the check is `beat[i].t + len[i] < beat[i+1].t`.
+
+### Test
+
+`votest.mjs` patches `AudioBufferSourceNode.prototype.start` before any page script runs
+and records every call that passes both an offset and a duration — the synthesised score
+plays whole buffers, so any such call is a VO clip. It taps the boot gate, then watches:
+
+```
+FETCHED  ["rook.mp3 200","vayne.mp3 200"]
+19 clips, script order, offsets exact, rook lines from the 15.56s file and
+vayne lines from the 36.24s file
+```

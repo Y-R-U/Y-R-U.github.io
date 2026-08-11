@@ -18,9 +18,12 @@ either choice works without a clash.
 
 > **The intro used to play silent.** Not for want of a score — it has a full one — but because a
 > browser refuses to play audio until the page has been touched, and the intro's own first tap was
-> wired to skip. The boot card now ends on *tap to begin / sound on*, which buys the gesture. Worth
-> knowing before generating anything: the cinematic already has music, so what it is missing is
-> **voice**, not score.
+> wired to skip. The boot card now ends on *tap to begin / sound on*, which buys the gesture.
+
+> **The intro is now voiced.** Two Suno takes (`game/audio/vo/vayne.mp3`, `rook.mp3`) cover all 19
+> lines in §2, cut to the timings in `story/script.js` as `vo: [offset, length]`. If you regenerate
+> either take, `docs/VO-TIMING-RECIPE.md` is how the timings were found — and it is not obvious,
+> because silence detection cannot work on Suno output. Still unvoiced: **the barks in §3**.
 
 ---
 

@@ -26,6 +26,13 @@ export class IntroAudio {
       this.verb.buffer = this._impulse(2.9, 2.6);
       this.wet.connect(this.verb); this.verb.connect(this.master);
 
+      /* Voice sits outside master on purpose: duck() pulls master down so the score
+         gets out of the way of a line, and a voice routed through master would duck
+         itself. Both buses still fade together on skip. */
+      this.voice = this.ctx.createGain();
+      this.voice.gain.value = 0.0;
+      this.voice.connect(this.ctx.destination);
+
       this.noiseBuf = this._noise(3.0);
       this.ok = true;
     } catch { this.ok = false; }
@@ -36,6 +43,7 @@ export class IntroAudio {
     this.armed = true;
     if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
     this.master.gain.setTargetAtTime(0.85, this.ctx.currentTime, 0.25);
+    this.voice.gain.setTargetAtTime(1.0, this.ctx.currentTime, 0.15);
   }
 
   get t() { return this.ctx.currentTime; }
@@ -275,6 +283,8 @@ export class IntroAudio {
     if (!this.ok) return;
     this.master.gain.cancelScheduledValues(this.t);
     this.master.gain.setTargetAtTime(0, this.t, sec * 0.35);
+    this.voice.gain.cancelScheduledValues(this.t);
+    this.voice.gain.setTargetAtTime(0, this.t, sec * 0.25);
   }
 
   dispose() {

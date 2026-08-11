@@ -11,7 +11,8 @@
 import { Stage } from './stage.js';
 import { Bubbles } from './bubbles.js';
 import { IntroAudio } from './audio.js';
-import SCRIPT, { shotAt } from '../story/script.js';
+import { Voice } from './vo.js';
+import SCRIPT, { shotAt, VOICES } from '../story/script.js';
 import { sat, clamp, ease } from './util.js';
 
 const DT = 1 / 60;
@@ -66,6 +67,12 @@ export async function runIntro(mountEl, opts = {}) {
   const uctx = ui.getContext('2d');
   const bubbles = new Bubbles();
   const audio = new IntroAudio();
+  /* The takes are ~250KB and the first line lands at 3.2s, so start fetching now and
+     never wait on it: say() is a no-op until its file has decoded. */
+  const voice = new Voice(audio);
+  const voFiles = {};
+  for (const who in VOICES) voFiles[who] = new URL('../../' + VOICES[who], import.meta.url).href;
+  voice.load(voFiles);
   let stage = null;
 
   /* ── lifecycle ────────────────────────────────────────────────────────── */
@@ -88,6 +95,7 @@ export async function runIntro(mountEl, opts = {}) {
     if (skipping || done) return;
     skipping = 0.0001;
     onSkip?.();
+    voice.stop();
     audio.fadeOut(0.4);
   };
 
@@ -128,6 +136,7 @@ export async function runIntro(mountEl, opts = {}) {
     window.removeEventListener('orientationchange', measure);
     host.removeEventListener('pointerdown', onPointer);
     try { stage?.dispose(); } catch {}
+    try { voice.stop(0.05); } catch {}
     try { audio.dispose(); } catch {}
     host.remove();
   }
@@ -168,6 +177,7 @@ export async function runIntro(mountEl, opts = {}) {
     for (const b of script.beats) {
       if (storyT >= b.t && storyT < b.t + b.dur && !live.some((l) => l.beat === b)) {
         live.push({ beat: b, spk: script.speakers[b.who], seed: (b.t * 7.3) % 10, layout: null, age: 0 });
+        if (b.vo) voice.say(b.who, b.vo[0], b.vo[1]);
       }
     }
     for (let i = live.length - 1; i >= 0; i--) {

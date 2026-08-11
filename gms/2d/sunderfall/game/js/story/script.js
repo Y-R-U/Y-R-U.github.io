@@ -9,6 +9,12 @@
  *   BEATS  — speech bubbles. `t` is when the bubble starts typing, `dur` how long it stays up.
  *   CUES   — one-shot stage directions, fired the frame time crosses `t` (see Stage.cue).
  *
+ * A beat's `vo: [offset, length]` is where that line sits inside its speaker's recording
+ * (VOICES below) — seconds into that FILE, not into the cinematic, which is why `retime`
+ * leaves it alone. intro/vo.js plays the slice and fades both ends, because the takes have
+ * a music bed under the voice and a hard cut would click. Every clip is short enough to
+ * finish before the next line starts; check that again if you retime anything.
+ *
  * The cut: we open COLD, mid-fight, on Vayne losing to the Darkness — the audience learns the
  * stakes eleven seconds before Rook does, which is the only reason his sulking plays as comedy.
  *
@@ -39,6 +45,12 @@ export const SPEAKER = {
   },
 };
 
+/** One recording per speaker, holding that character's whole part. */
+export const VOICES = {
+  vayne: 'audio/vo/vayne.mp3',
+  rook: 'audio/vo/rook.mp3',
+};
+
 export const SHOTS = [
   { id: 'battle',   scene: 'battle',   t:  0.0,  dur: 11.0 },  // cold open — the fight, no build-up
   { id: 'seal',     scene: 'seal',     t: 11.0,  dur:  7.4 },  // he closes it, and it costs him everything
@@ -53,35 +65,35 @@ export const SHOTS = [
 
 export const BEATS = [
   // cold open — one word, and only because a silent scream is worse
-  { t:  3.2, dur: 1.4, who: 'vayne', text: 'Hold.',                          anchor: 'vayne', ax:  40, ay: -170 },
+  { t:  3.2, dur: 1.4, who: 'vayne', text: 'Hold.',                          anchor: 'vayne', ax:  40, ay: -170, vo: [1.55, 0.52] },
 
   // Thornmere, dusk. Everything the last twenty seconds was not.
-  { t: 19.8, dur: 2.1, who: 'rook',  text: 'Cass gets the forge.',           anchor: 'rook',  ax:  55, ay: -195 },
-  { t: 22.0, dur: 2.1, who: 'rook',  text: 'Cass gets the name.',            anchor: 'rook',  ax:  55, ay: -195 },
-  { t: 24.2, dur: 2.3, who: 'rook',  text: 'I get the goats.',               anchor: 'rook',  ax:  55, ay: -195 },
+  { t: 19.8, dur: 2.1, who: 'rook',  text: 'Cass gets the forge.',           anchor: 'rook',  ax:  55, ay: -195, vo: [0.0, 1.21] },
+  { t: 22.0, dur: 2.1, who: 'rook',  text: 'Cass gets the name.',            anchor: 'rook',  ax:  55, ay: -195, vo: [1.96, 0.97] },
+  { t: 24.2, dur: 2.3, who: 'rook',  text: 'I get the goats.',               anchor: 'rook',  ax:  55, ay: -195, vo: [3.52, 1.07] },
 
   // the Sunderwood
-  { t: 27.6, dur: 1.9, who: 'rook',  text: 'Why is it so quiet?',            anchor: 'rook',  ax:  60, ay: -190 },
-  { t: 30.2, dur: 2.1, who: 'rook',  text: "That's not sunset.",             anchor: 'rook',  ax:  60, ay: -190 },
+  { t: 27.6, dur: 1.9, who: 'rook',  text: 'Why is it so quiet?',            anchor: 'rook',  ax:  60, ay: -190, vo: [6.04, 1.39] },
+  { t: 30.2, dur: 2.1, who: 'rook',  text: "That's not sunset.",             anchor: 'rook',  ax:  60, ay: -190, vo: [8.44, 1.07] },
 
   // the aftermath. We know exactly what he is looking at. He does not.
-  { t: 36.4, dur: 2.0, who: 'rook',  text: 'What is this?',                  anchor: 'rook',  ax: -55, ay: -190 },
+  { t: 36.4, dur: 2.0, who: 'rook',  text: 'What is this?',                  anchor: 'rook',  ax: -55, ay: -190, vo: [11.88, 0.91] },
 
-  { t: 38.8, dur: 2.7, who: 'vayne', text: 'The Darkness found the seam.',   anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 41.7, dur: 1.9, who: 'vayne', text: 'I pushed it back.',              anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 43.8, dur: 2.6, who: 'vayne', text: 'It cost me everything I had.',   anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 46.6, dur: 1.8, who: 'vayne', text: 'The wards will hold.',           anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 48.6, dur: 1.4, who: 'vayne', text: 'Not long.',                      anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 50.3, dur: 2.1, who: 'rook',  text: 'So get someone else.',           anchor: 'rook',  ax: -55, ay: -190 },
-  { t: 52.6, dur: 1.9, who: 'vayne', text: "You're what's here.",            anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 54.7, dur: 2.1, who: 'vayne', text: "That's the whole of it.",        anchor: 'vayne', ax:  45, ay: -155 },
+  { t: 38.8, dur: 2.7, who: 'vayne', text: 'The Darkness found the seam.',   anchor: 'vayne', ax:  45, ay: -155, vo: [4.76, 1.53] },
+  { t: 41.7, dur: 1.9, who: 'vayne', text: 'I pushed it back.',              anchor: 'vayne', ax:  45, ay: -155, vo: [7.44, 1.23] },
+  { t: 43.8, dur: 2.6, who: 'vayne', text: 'It cost me everything I had.',   anchor: 'vayne', ax:  45, ay: -155, vo: [11.37, 1.88] },
+  { t: 46.6, dur: 1.8, who: 'vayne', text: 'The wards will hold.',           anchor: 'vayne', ax:  45, ay: -155, vo: [14.6, 1.65] },
+  { t: 48.6, dur: 1.4, who: 'vayne', text: 'Not long.',                      anchor: 'vayne', ax:  45, ay: -155, vo: [17.14, 1.05] },
+  { t: 50.3, dur: 2.1, who: 'rook',  text: 'So get someone else.',           anchor: 'rook',  ax: -55, ay: -190, vo: [14.0, 1.29] },
+  { t: 52.6, dur: 1.9, who: 'vayne', text: "You're what's here.",            anchor: 'vayne', ax:  45, ay: -155, vo: [18.92, 0.97] },
+  { t: 54.7, dur: 2.1, who: 'vayne', text: "That's the whole of it.",        anchor: 'vayne', ax:  45, ay: -155, vo: [20.76, 1.59] },
 
   // the meld itself is silent — the picture carries it
-  { t: 61.8, dur: 2.2, who: 'vayne', text: 'You can hold magic now.',        anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 64.2, dur: 2.5, who: 'vayne', text: "Holding it isn't wielding it.",  anchor: 'vayne', ax:  45, ay: -155 },
+  { t: 61.8, dur: 2.2, who: 'vayne', text: 'You can hold magic now.',        anchor: 'vayne', ax:  45, ay: -155, vo: [24.47, 1.54] },
+  { t: 64.2, dur: 2.5, who: 'vayne', text: "Holding it isn't wielding it.",  anchor: 'vayne', ax:  45, ay: -155, vo: [26.36, 2.49] },
 
-  { t: 67.0, dur: 2.4, who: 'vayne', text: "I'd have picked anyone else.",   anchor: 'vayne', ax:  45, ay: -155 },
-  { t: 69.6, dur: 2.1, who: 'vayne', text: 'Grow up. Quickly.',              anchor: 'vayne', ax:  45, ay: -155 },
+  { t: 67.0, dur: 2.4, who: 'vayne', text: "I'd have picked anyone else.",   anchor: 'vayne', ax:  45, ay: -155, vo: [30.54, 1.95] },
+  { t: 69.6, dur: 2.1, who: 'vayne', text: 'Grow up. Quickly.',              anchor: 'vayne', ax:  45, ay: -155, vo: [33.8, 1.03] },
 ];
 
 export const CUES = [
