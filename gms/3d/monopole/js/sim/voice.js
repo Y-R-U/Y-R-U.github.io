@@ -83,10 +83,18 @@ export function line(id, profile, { vars = {}, said = null, register = 'plain', 
   };
 }
 
-export function npcSay(npcId, id, profile, vars = {}) {
+// `said` is normally the flags off the previous beat; a caller outside a conversation can pass
+// facts of its own instead — the yard sets `onSale` so the pitch can lead with the discount.
+export function npcSay(npcId, id, profile, vars = {}, said = null) {
   const npc = content.voice.npcs[npcId];
   if (!npc) throw new Error(`voice: no npc "${npcId}"`);
-  return line(id, profile, { vars, register: npc.register, voiced: false });
+  return line(id, profile, { vars, said, register: npc.register, voiced: false });
+}
+
+// The player's own half of a one-off exchange. Same rules as a `you` beat inside a conversation:
+// plain register, and delivered — a player who SHOUTS shouts at the broker too.
+export function playerSay(id, profile, vars = {}, said = null) {
+  return line(id, profile, { vars, said, register: 'plain', voiced: true });
 }
 
 // A conversation is a list of beats; each beat is a line table plus who is speaking. The player's
@@ -114,4 +122,4 @@ export function runConversation(id, profile, vars = {}) {
   return { npc, beats: out };
 }
 
-export default { line, npcSay, runConversation, pickVariant, fillTokens, getLines };
+export default { line, npcSay, playerSay, runConversation, pickVariant, fillTokens, getLines };

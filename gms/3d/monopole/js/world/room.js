@@ -141,7 +141,7 @@ export class RoomScene {
       c.traverse?.(n => n.geometry?.dispose());
       this.group.remove(c);
     }
-    this.screen = this.shaft = this.dust = this.terminal = null;
+    this.screen = this.shaft = this.dust = this.terminal = this.pane = null;
   }
 
   dispose() {
@@ -190,6 +190,19 @@ function build(room, spec) {
   }
 
   room.group.add(paneSheen(spec));
+
+  // A tap target across the glass. The sheen quad is additive and depth-write-off, so it is not
+  // something a finger can be asked to hit reliably; this is the same trick the station sites use
+  // — invisible material keeps it out of the render list while the raycaster still sees it.
+  const win = spec.win;
+  const pane = new THREE.Mesh(
+    new THREE.PlaneGeometry(win.w, win.h),
+    new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+  pane.position.set(win.x || 0, win.sill + win.h / 2, -spec.room.d / 2 + 0.02);
+  pane.name = 'quarters:window';
+  pane.userData.window = true;
+  room.group.add(pane);
+  room.pane = pane;
 
   const shaftLen = Math.min(spec.room.d * 1.9, 9);
   room.shaft = lightShaft(spec, shaftLen);
@@ -265,6 +278,21 @@ const siteEuler = s => new THREE.Euler(-(s.pitch || 0) * Math.PI / 180, -s.face 
 // World coordinates, because that is what the camera rig wants: the room's own placement is
 // baked in here rather than left for the caller to compose.
 
+// The widest half-angle, in degrees, any of `pts` sits at from a camera at `pos` aimed at `look` —
+// measured on the horizontal plane only, because that is the axis a phone held upright is short of.
+function halfAngleFor(pos, look, pts) {
+  const ax = look[0] - pos[0], az = look[2] - pos[2];
+  const aim = Math.atan2(ax, az);
+  let worst = 0;
+  for (const p of pts) {
+    let a = Math.atan2(p[0] - pos[0], p[2] - pos[2]) - aim;
+    while (a > Math.PI) a -= Math.PI * 2;
+    while (a < -Math.PI) a += Math.PI * 2;
+    worst = Math.max(worst, Math.abs(a));
+  }
+  return worst * 180 / Math.PI;
+}
+
 export function roomShots(tier) {
   const spec = tierSpec(tier);
   const { w, h, d } = spec.room;
@@ -273,12 +301,48 @@ export function roomShots(tier) {
   const tf = terminalFrame(spec, dk);
   const eye = Math.min(1.62, h - 0.62);
   const wy = win.sill + win.h * 0.46;
+  const wx = win.x || 0;
+  const wz = -d / 2 + 0.02;
+
+  // The whole window has to be in the default frame and most of the terminal with it, and on a
+  // phone held upright it is the horizontal angle that decides whether they fit — a vertical fov
+  // wide enough in landscape crops both edges away in portrait. So the framings are authored as a
+  // horizontal angle fitted to the actual geometry, and the vertical one is derived per device.
+  // `pivot` is where the look-around turns about: a hand's width in front of the eye, so a drag
+  // turns the head rather than walking the camera out through the wall.
+  const enterPos = [w * 0.18, eye, d * 0.44];
+  const enterLook = [-w * 0.035, win.sill + win.h * 0.12, -d * 0.45];
+  // The glass has to be whole and the screen has to be on the left of it. Fitting the whole screen
+  // as well costs eight degrees of horizontal angle, which on a phone held upright is twelve of
+  // vertical, and every one of those is floor — so the fit reaches the near edge of the screen and
+  // the look-around covers the rest.
+  const seeAtEnter = [
+    [wx - win.w / 2, 0, wz], [wx + win.w / 2, 0, wz],
+    [tf.pos[0] + tf.size[0] * 0.45, 0, tf.pos[2]],
+  ];
 
   const local = {
-    enter: { pos: [w * 0.30, eye, d * 0.40], look: [-w * 0.20, win.sill + win.h * 0.28, -d / 2 - 0.3], fov: 60 },
-    desk: { pos: [w * 0.30, 1.30, dk.zc + dk.len * 0.9], look: [dk.x0 + 0.24, 0.92, dk.zc - dk.len * 0.15], fov: 54 },
-    terminal: { pos: [tf.pos[0] + 0.74, tf.pos[1] + 0.20, tf.pos[2] + 0.62], look: tf.pos, fov: 40 },
-    window: { pos: [w * 0.16, win.sill + win.h * 0.60, -d / 2 + 1.85], look: [-w * 0.02, wy * 0.96, -d / 2 - 9], fov: 48 },
+    enter: {
+      pos: enterPos, look: enterLook,
+      hfov: Math.min(46, halfAngleFor(enterPos, enterLook, seeAtEnter) * 2 + 3),
+      pivot: 0.62, yaw: 0.46, pitch: 0.17,
+    },
+    desk: {
+      pos: [w * 0.24, 1.36, dk.zc + dk.len * 1.05], look: [dk.x0 + 0.30, 1.00, dk.zc - dk.len * 0.10],
+      hfov: 46, pivot: 0.52, yaw: 0.32, pitch: 0.15,
+    },
+    terminal: {
+      pos: [tf.pos[0] + 0.74, tf.pos[1] + 0.20, tf.pos[2] + 0.62], look: tf.pos,
+      hfov: 34, pivot: 0.40, yaw: 0.06, pitch: 0.04,
+    },
+    // Right up on the glass, close enough that the mullions run off frame — the point of this
+    // framing is what is outside, and a window held at arm's length is 1.7 wide for 1 tall, which
+    // on a phone means half the screen is the wall it is cut into.
+    window: {
+      pos: [wx + w * 0.07, win.sill + win.h * 0.54, -d / 2 + 0.62],
+      look: [wx - 1.35, win.sill + win.h * 0.26, -d / 2 - 9],
+      hfov: 46, pivot: 0.62, yaw: 0.28, pitch: 0.16,
+    },
   };
 
   const m = new THREE.Matrix4().compose(
@@ -290,7 +354,11 @@ export function roomShots(tier) {
 
   const out = {};
   for (const k of Object.keys(local)) {
-    out[k] = { pos: toWorld(local[k].pos), look: toWorld(local[k].look), fov: local[k].fov };
+    const s = local[k];
+    out[k] = {
+      pos: toWorld(s.pos), look: toWorld(s.look), hfov: s.hfov, fov: camera.fovForH(s.hfov),
+      pivot: s.pivot, yaw: s.yaw, pitch: s.pitch,
+    };
   }
   return out;
 }

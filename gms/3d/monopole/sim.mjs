@@ -20,6 +20,13 @@ const BUST_T = ORIGIN_T?.bust || content.balance.targets.bustRate;
 const SHARE_T = ORIGIN_T?.share13 || content.balance.targets.shareAtWeek13;
 const T = k => ORIGIN_T?.[k] ?? content.balance.targets[k];
 const BUSTS = process.argv.includes('--busts');
+// The yard discounts hulls and a broker can be talked down, so the price the live game charges is
+// below the board. --yardcut models that as one multiplier on every hull the stand-in buys; it is
+// the only way the harness can see a change that happens entirely in the UI.
+const YARDCUT_ARG = parseFloat((process.argv.find(a => a.startsWith('--yardcut=')) || '=').split('=')[1]);
+const YARDCUT = Number.isFinite(YARDCUT_ARG) ? YARDCUT_ARG : 1;
+const hullCost = def => Math.round(def.cost * YARDCUT);
+const buyHull = cls => ({ type: 'buyShip', class: cls, price: hullCost(content.get('ship', cls)) });
 const TRACE_SEED = parseInt((process.argv.find(a => a.startsWith('--seed=')) || '=1').split('=')[1], 10);
 
 const b = content.balance;
@@ -62,11 +69,11 @@ function policy(state, style) {
       cash += want;
       debt += want;
     }
-    if (cash >= rig.cost) { acts.push({ type: 'buyShip', class: 'ossa' }); cash -= rig.cost; }
-    if (cash >= kite.cost) { acts.push({ type: 'buyShip', class: 'kite' }); cash -= kite.cost; }
-    while (cash >= kite.cost + RUNWAY && acts.filter(a => a.type === 'buyShip').length < (style.extraRig ? 3 : 2)) {
-      acts.push({ type: 'buyShip', class: 'kite' });
-      cash -= kite.cost;
+    if (cash >= hullCost(rig)) { acts.push(buyHull('ossa')); cash -= hullCost(rig); }
+    if (cash >= hullCost(kite)) { acts.push(buyHull('kite')); cash -= hullCost(kite); }
+    while (cash >= hullCost(kite) + RUNWAY && acts.filter(a => a.type === 'buyShip').length < (style.extraRig ? 3 : 2)) {
+      acts.push(buyHull('kite'));
+      cash -= hullCost(kite);
     }
     return acts;
   }
@@ -114,8 +121,8 @@ function policy(state, style) {
     const cls = miners < 1 ? 'ossa' : 'kite';
     const def = content.get('ship', cls);
     const line = crippled ? loan.maxDraw : cap;
-    if (state.cash >= def.cost + style.floor + held) acts.push({ type: 'buyShip', class: cls });
-    else if (state.debt < line) acts.push({ type: 'loan', amount: draw(def.cost + style.floor + held) });
+    if (state.cash >= hullCost(def) + style.floor + held) acts.push(buyHull(cls));
+    else if (state.debt < line) acts.push({ type: 'loan', amount: draw(hullCost(def) + style.floor + held) });
   }
   // maxOut draws the whole line at week two and never pays a credit of it back. It used to buy a
   // Dock Bay and a refinery it had no ore to feed as well, which left it permanently overdrawn —

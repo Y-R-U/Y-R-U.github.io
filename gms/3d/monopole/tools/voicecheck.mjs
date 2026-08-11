@@ -6,7 +6,7 @@
 //   node tools/voicecheck.mjs --show   print a sample of real exchanges
 
 import content from '../js/sim/content.js';
-import { runConversation, getLines, pickVariant } from '../js/sim/voice.js';
+import { runConversation, npcSay, playerSay } from '../js/sim/voice.js';
 import { newProfile, normalise } from '../js/sim/profile.js';
 
 const show = process.argv.includes('--show');
@@ -43,6 +43,53 @@ for (const origin of origins) {
             }
           } catch (e) {
             fails.push(`${c} / ${origin}/${gender}/${personality}/[${traits}] threw: ${e.message}`);
+          }
+        }
+      }
+    }
+  }
+}
+
+// The sales floor belongs to no conversation — every one of its tables is reached through npcSay
+// or playerSay, so the sweep above never touched them. These are the flag shapes js/ui/yard.js
+// actually passes, against every broker.
+const YARD_VARS = { hull: 'Kite-class Hauler', price: '26,000 cr', cut: '15%', hold: 'held for 6 days' };
+const YARD = [
+  ['yard_connect', 'npc', [null]],
+  ['yard_pitch', 'npc', [null, { onSale: true }, { held: true }, { urgent: true },
+    { onSale: true, urgent: true }, { held: true, urgent: true }]],
+  ['yard_ask', 'you', [null]],
+  ['yard_push', 'you', [null]],
+  ['yard_deal', 'npc', [null, { hard: true }, { gendered: true, addressed: true }]],
+  ['yard_no', 'npc', [null, { hard: true }]],
+  ['yard_firm', 'npc', [null]],
+  ['yard_lapsed', 'npc', [null]],
+  ['yard_gone', 'npc', [null]],
+  ['yard_sold', 'npc', [{ first: true }, { first: false }]],
+];
+
+let yardChecks = 0;
+for (const origin of origins) {
+  for (const gender of genders) {
+    for (const personality of personalities) {
+      for (const traits of traitSets) {
+        const p = normalise({ ...newProfile(origin, 7), gender, personality, traits }, 7);
+        for (const b of content.voice.brokers) {
+          for (const [table, who, saids] of YARD) {
+            for (const said of saids) {
+              yardChecks++;
+              const where = `${table} / ${b} / ${origin}/${gender}/${personality}/[${traits}]`;
+              try {
+                const r = who === 'you'
+                  ? playerSay(table, p, YARD_VARS, said)
+                  : npcSay(b, table, p, YARD_VARS, said);
+                const left = r.text.match(/\{(\w+)\}/);
+                if (left) fails.push(`${where} left ${left[0]}`);
+                if (!r.text.trim()) fails.push(`${where} produced an empty line`);
+              } catch (e) {
+                fails.push(`${where} threw: ${e.message}`);
+              }
+            }
           }
         }
       }
@@ -89,7 +136,8 @@ if (show) {
   }
 }
 
-console.log(`\nvoicecheck: ${checks} conversation resolutions, ${Object.keys(content.voice.lines).length} tables`);
+console.log(`\nvoicecheck: ${checks} conversation resolutions, ${yardChecks} sales-floor resolutions, `
+  + `${Object.keys(content.voice.lines).length} tables`);
 if (fails.length) {
   console.error(`\nFAILED (${fails.length}):`);
   for (const f of fails.slice(0, 20)) console.error('  ' + f);

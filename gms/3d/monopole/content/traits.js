@@ -40,9 +40,10 @@ export const traits = Object.freeze([
 ]);
 
 export const genders = Object.freeze([
-  Object.freeze({ id: 'm', name: 'Male' }),
-  Object.freeze({ id: 'f', name: 'Female' }),
-  Object.freeze({ id: 'x', name: 'What’s it to you' }),
+  // `name` is the character-creation button; `filed` is what a licence prints in prose
+  Object.freeze({ id: 'm', name: 'Male', filed: 'Male' }),
+  Object.freeze({ id: 'f', name: 'Female', filed: 'Female' }),
+  Object.freeze({ id: 'x', name: 'What’s it to you', filed: 'Not stated' }),
 ]);
 
 export default Object.freeze({ personalities, traits, genders, MAX_TRAITS });

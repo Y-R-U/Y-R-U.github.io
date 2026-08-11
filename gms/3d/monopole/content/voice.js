@@ -19,28 +19,44 @@ export const registers = Object.freeze({
   spacer: Object.freeze({ m: 'skip', f: 'skip', x: 'skip', genderedFor: Object.freeze([]) }),
 });
 
+// `face` names a portrait in assets/faces. Whoever is on the yard desk this run is drawn from
+// `brokers` off the run seed — they all work the same board and read the same lines.
 export const npcs = Object.freeze({
   brann: Object.freeze({
-    id: 'brann', name: 'Brann Otey', role: 'Yard broker, Ledger', register: 'rough',
+    id: 'brann', name: 'Brann Otey', role: 'Yard broker, Ledger', register: 'rough', face: 'brann',
     blurb: 'Sells hulls. Has never once described one as slow.',
   }),
+  veya: Object.freeze({
+    id: 'veya', name: 'Veya Kald', role: 'Yard broker, Ledger', register: 'rough', face: 'veya',
+    blurb: 'Came up on the gantries. Knows exactly what she is selling you.',
+  }),
+  tolm: Object.freeze({
+    id: 'tolm', name: 'Tolm Ashe', role: 'Yard broker, Ledger', register: 'rough', face: 'tolm',
+    blurb: 'Talks about every hull as though he owned it personally.',
+  }),
+  hask: Object.freeze({
+    id: 'hask', name: 'Ravi Hask', role: 'Yard broker, Ledger', register: 'spacer', face: 'hask',
+    blurb: 'Forty years on this deck. Has sold the same Kite four times.',
+  }),
   vosk: Object.freeze({
-    id: 'vosk', name: 'Ilo Vosk', role: 'Private lender', register: 'rough',
+    id: 'vosk', name: 'Ilo Vosk', role: 'Private lender', register: 'rough', face: 'vosk',
     blurb: 'Lends fast, collects faster. Asks about your family and means it as a threat.',
   }),
   reach_mutual: Object.freeze({
-    id: 'reach_mutual', name: 'Adjunct Merrow', role: 'Reach Mutual, lending desk', register: 'formal',
+    id: 'reach_mutual', name: 'Adjunct Merrow', role: 'Reach Mutual, lending desk', register: 'formal', face: 'merrow',
     blurb: 'A bank. Reads the file before you sit down.',
   }),
   halloway_trust: Object.freeze({
-    id: 'halloway_trust', name: 'Mr Pell', role: 'The family trust', register: 'formal',
+    id: 'halloway_trust', name: 'Mr Pell', role: 'The family trust', register: 'formal', face: 'pell',
     blurb: 'Has known you since you were four and has never stopped mentioning it.',
   }),
   kestrel_credit: Object.freeze({
-    id: 'kestrel_credit', name: 'Sabe', role: 'Kestrel Credit Union', register: 'spacer',
+    id: 'kestrel_credit', name: 'Sabe', role: 'Kestrel Credit Union', register: 'spacer', face: 'sabe',
     blurb: 'Belt co-op money. Cheap, slow, and they want to see the rig.',
   }),
 });
+
+export const brokers = Object.freeze(['brann', 'veya', 'tolm', 'hask']);
 
 export const lines = Object.freeze({
   /* ── the yard ─────────────────────────────────────────────────────────── */
@@ -82,6 +98,120 @@ export const lines = Object.freeze({
     Object.freeze({ when: Object.freeze({ trait: 'posh' }),
       say: 'Dignity’s an extra. Board’s live.' }),
     Object.freeze({ say: 'Board’s live. Everything on it flies. Most of it twice.' }),
+  ]),
+
+  /* ── the sales floor ──────────────────────────────────────────────────── */
+
+  // `{hull}` is the class in front of you, `{price}` what it is quoted at, `{cut}` a discount the
+  // yard is already advertising. The pitch table is drawn on every hull the player swipes to.
+  yard_connect: Object.freeze([
+    Object.freeze({ when: Object.freeze({ origin: 'silver' }), say: 'Desk four. Go ahead, {term}.' }),
+    Object.freeze({ when: Object.freeze({ origin: 'gutter' }), say: 'Yard desk. You buying or looking?' }),
+    Object.freeze({ when: Object.freeze({ personality: 'warm' }), say: 'Ledger Yard, this is the desk. Take your time.' }),
+    Object.freeze({ say: 'Yard desk. Go ahead.' }),
+    Object.freeze({ say: 'Desk. You’re through, the board’s in front of you.' }),
+    Object.freeze({ say: 'Ledger, sales. What are we looking at.' }),
+  ]),
+
+  // `{hold}` is the window on whatever price is in front of them — the board's or the desk's.
+  yard_pitch: Object.freeze([
+    Object.freeze({ when: Object.freeze({ said: 'held' }),
+      say: 'The {hull}, at your number — {price}. {hold}, then it’s the board’s again.' }),
+    Object.freeze({ when: Object.freeze({ said: 'urgent' }),
+      say: 'The {hull}, {price}. I’ll be straight with you: {hold}.' }),
+    Object.freeze({ when: Object.freeze({ said: 'onSale', trait: 'haggler' }),
+      say: '{cut} off, {hold}, and no I can’t stretch it. You’d ask, so I’m saying it first.' }),
+    Object.freeze({ when: Object.freeze({ said: 'onSale' }),
+      say: 'That one’s {cut} off and I’d take it myself if I had the room. {hold}.' }),
+    Object.freeze({ when: Object.freeze({ said: 'onSale' }),
+      say: 'The {hull} — {cut} off at {price}. {hold}, and then it goes back up.' }),
+    Object.freeze({ when: Object.freeze({ trait: 'haggler' }),
+      say: 'The {hull}. {price}, and before you start — that already has my number in it.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'sly' }),
+      say: 'The {hull}. {price} on the board. What you do with that is your business.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'deadpan' }),
+      say: 'The {hull}. {price}. That’s the whole pitch.' }),
+    Object.freeze({ say: 'The {hull}. {price}, and it has never been laid up.' }),
+    Object.freeze({ say: 'The {hull}, {price}. Two owners, both of them careful.' }),
+    Object.freeze({ say: 'The {hull} at {price}. Surveyed last month, papers are clean.' }),
+  ]),
+
+  yard_ask: Object.freeze([
+    Object.freeze({ when: Object.freeze({ trait: 'haggler' }), say: 'That’s the board price. What’s the yard price?' }),
+    Object.freeze({ when: Object.freeze({ trait: 'posh' }), say: 'One imagines there is some latitude on that.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'hot' }), say: 'Come down or I walk.', flags: Object.freeze({ hard: true }) }),
+    Object.freeze({ when: Object.freeze({ trait: 'foulmouth' }), say: 'For that? Do me a favour.', flags: Object.freeze({ hard: true }) }),
+    Object.freeze({ when: Object.freeze({ trait: 'polite' }), say: 'Is there anything you can do on the price?' }),
+    Object.freeze({ when: Object.freeze({ personality: 'sly' }), say: 'And if I were paying today?' }),
+    Object.freeze({ when: Object.freeze({ personality: 'warm' }), say: 'Talk to me. Where can we get to on it?' }),
+    Object.freeze({ say: 'What’s your best on it?' }),
+    Object.freeze({ say: 'That’s the asking price. What’s the taking price?' }),
+  ]),
+
+  yard_push: Object.freeze([
+    Object.freeze({ when: Object.freeze({ trait: 'haggler' }), say: 'You went once. Go again and it’s sold.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'sly' }), say: 'I hear Dray Yard has two of these sitting.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'hot' }), say: 'Don’t make me stand here. Last number.', flags: Object.freeze({ hard: true }) }),
+    Object.freeze({ when: Object.freeze({ trait: 'foulmouth' }), say: 'That’s still daylight robbery and you know it.', flags: Object.freeze({ hard: true }) }),
+    Object.freeze({ when: Object.freeze({ trait: 'posh' }), say: 'I feel we are very nearly there.' }),
+    Object.freeze({ say: 'One more move and I sign today.' }),
+    Object.freeze({ say: 'Meet me once more and it’s done in front of you.' }),
+  ]),
+
+  yard_deal: Object.freeze([
+    Object.freeze({ when: Object.freeze({ said: 'hard' }), say: 'Fine. {price}. Don’t tell the floor, and {hold}.' }),
+    Object.freeze({ when: Object.freeze({ origin: 'silver' }), say: '{price}, for the family. {hold} — that is me being sentimental.' }),
+    Object.freeze({ when: Object.freeze({ trait: 'haggler' }), say: '{price}. You’ve had that out of me and it’s {hold}, not a day past.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'warm' }), say: '{price}, then. {hold}. Don’t make me chase you.' }),
+    Object.freeze({ say: '{price}. That’s me and the yard falling out, so take it — {hold}.' }),
+    Object.freeze({ say: '{price}, and I’ll write it down. {hold}, after that I never said it.' }),
+    Object.freeze({ say: 'Call it {price}. {hold}, then the board takes it back off me.' }),
+  ]),
+
+  yard_no: Object.freeze([
+    Object.freeze({ when: Object.freeze({ said: 'hard' }), say: 'Then walk. It’ll be gone Thursday.' }),
+    Object.freeze({ when: Object.freeze({ trait: 'polite' }), say: 'I wish there were. The yard sets it, not me.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'deadpan' }), say: 'No.' }),
+    Object.freeze({ say: 'Board price is the price. I don’t own the yard, I just stand in it.' }),
+    Object.freeze({ say: 'Not on that one. It’ll sell at that by Friday without my help.' }),
+  ]),
+
+  yard_firm: Object.freeze([
+    Object.freeze({ when: Object.freeze({ personality: 'hot' }), say: 'Shout at me all you like. It goes up, not down.' }),
+    Object.freeze({ when: Object.freeze({ trait: 'posh' }), say: 'We are not very nearly there. We were there, and you kept walking.' }),
+    Object.freeze({ say: 'I’ve moved once. Ask again and it goes back up.' }),
+    Object.freeze({ say: 'That’s twice. The number just got worse and that’s on you.' }),
+    Object.freeze({ say: 'No. And now I’ve had to take a bit back, because the yard watches me too.' }),
+  ]),
+
+  // The player let a price they had agreed run out.
+  yard_lapsed: Object.freeze([
+    Object.freeze({ when: Object.freeze({ trait: 'haggler' }),
+      say: 'You had my number on the {hull} and you sat on it. It’s {price} again.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'warm' }),
+      say: 'I did hold it as long as I could. The {hull}’s back to {price}, I’m sorry.' }),
+    Object.freeze({ when: Object.freeze({ personality: 'deadpan' }),
+      say: 'That price expired. {price}.' }),
+    Object.freeze({ say: 'That was last week’s number. The {hull} is {price} today.' }),
+    Object.freeze({ say: 'I can’t hold a price forever, {term}. Back to {price}.' }),
+  ]),
+
+  // The yard's own advertised discount came off the board while the player was elsewhere.
+  yard_gone: Object.freeze([
+    Object.freeze({ when: Object.freeze({ personality: 'sly' }),
+      say: 'Sale’s over. Between us, they always run them short for exactly this reason.' }),
+    Object.freeze({ say: 'That sale came off Tuesday. The {hull} is {price} now.' }),
+    Object.freeze({ say: 'You’ve just missed it. Back to {price} on that one.' }),
+    Object.freeze({ say: 'Board’s been redone since you last looked. {price}.' }),
+  ]),
+
+  yard_sold: Object.freeze([
+    Object.freeze({ when: Object.freeze({ said: 'first', origin: 'gutter' }),
+      say: 'Your first one. Nobody forgets their first, and nobody ever pays that little again.' }),
+    Object.freeze({ when: Object.freeze({ said: 'first' }), say: 'Your first. She’s on the pad by the end of the week.' }),
+    Object.freeze({ say: 'Sold. Handover’s a week, same as always.' }),
+    Object.freeze({ say: 'Done. I’ll have the yard walk her out to you.' }),
+    Object.freeze({ say: 'Signed. Pleasure — and you got that in under the wire.' }),
   ]),
 
   /* ── money ────────────────────────────────────────────────────────────── */
@@ -172,4 +302,4 @@ export const conversations = Object.freeze({
   }),
 });
 
-export default Object.freeze({ registers, npcs, lines, conversations });
+export default Object.freeze({ registers, npcs, brokers, lines, conversations });

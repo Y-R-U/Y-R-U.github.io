@@ -104,8 +104,13 @@ export default Object.freeze({
     checkFromWeek: 30, holdWeeks: 4,
   }),
 
+  // The clock only runs while the fleet is under way, so `tickSeconds` is how long a week takes to
+  // watch rather than how fast the game gets away from you. `orderLead` is the weeks a batch of
+  // orders costs when it goes out, and `commitMs` is the window several taps count as one batch —
+  // together they keep a visit to the terminal costing exactly the one tick it always did.
   tick: Object.freeze({
-    tickSeconds: 6, weeksPerQuarter: 13, speeds: Object.freeze([0, 1, 2, 4]), maxDwell: 3,
+    tickSeconds: 8, weeksPerQuarter: 13, speeds: Object.freeze([0, 1, 3]), maxDwell: 3,
+    orderLead: 1, commitMs: 1400, ffSeconds: 0.62, skipCap: 8,
   }),
 
   // bustRate is a band, not a ceiling — a game you cannot lose has no decision in it.

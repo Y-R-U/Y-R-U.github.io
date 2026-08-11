@@ -1,15 +1,15 @@
 /* The front of the game: the verdict cold open and the origin / character screen. Both sit over
    the live system and both hand control back before the HUD ever appears. */
 
-#verdict, #origin {
+#verdict, #origin, #gate {
   position: fixed; inset: 0; z-index: 60; display: none;
   font: 400 13px/1.55 system-ui, -apple-system, "Helvetica Neue", sans-serif;
   color: var(--ink);
   opacity: 0; transition: opacity .42s ease;
 }
-#verdict.live, #origin.live { display: block; }
-#verdict.in, #origin.in { opacity: 1; }
-body.shotmode #verdict, body.shotmode #origin { display: none !important; }
+#verdict.live, #origin.live, #gate.live { display: block; }
+#verdict.in, #origin.in, #gate.in { opacity: 1; }
+body.shotmode #verdict, body.shotmode #origin, body.shotmode #gate { display: none !important; }
 
 /* The cold open is a film. The company does not exist yet, so nothing that reports on it may be
    on screen — the HUD quoting "40.0k cr · Week 0" over the Alliance ruling killed the whole beat. */
@@ -29,8 +29,76 @@ body.in-terminal #inspect { display: none !important; }
 
 /* the objective chip stays — in the room it is the only thing telling you to tap the terminal,
    and the coach mark cannot ring a 3D object */
-body.in-quarters #intro .intro-chip { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+body.in-quarters #intro .intro-chip { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
 body.in-terminal #showroom-btn { display: none !important; }
+/* the showroom key would otherwise sit under the room's own buttons */
+body.in-quarters #showroom-btn { bottom: calc(126px + env(safe-area-inset-bottom, 0px)); }
+
+/* A company panel opened from the terminal has to sit ON the terminal. The sheet is normally the
+   layer under everything the front of the game puts up; in here it is the application. */
+body.in-terminal #sheet { z-index: 58; }
+body.in-terminal .sheet { bottom: 0; }
+
+/* ── the room's own controls ────────────────────────────────────────────── */
+
+/* The quarters hide the HUD on purpose, which left the room with no visible way out of it once the
+   game started opening in there. Two buttons, thumb-height, off the bottom edge. */
+#roomnav {
+  position: fixed; left: 10px; right: 10px; z-index: 41; display: none;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  gap: 8px; opacity: 0; transform: translateY(10px);
+  transition: opacity .3s ease, transform .3s ease;
+  font: 400 13px/1 system-ui, -apple-system, "Helvetica Neue", sans-serif;
+}
+#roomnav.live { display: flex; }
+#roomnav.in { opacity: 1; transform: none; }
+body.shotmode #roomnav { display: none !important; }
+
+.rn-btn {
+  flex: 1 1 0; min-width: 0; height: 46px; border-radius: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(180deg, rgba(12, 17, 24, .92), rgba(6, 9, 14, .96));
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border: 1px solid var(--line2); color: var(--ink); font: inherit;
+}
+.rn-btn svg { width: 18px; height: 18px; color: var(--accent); flex: none; }
+.rn-btn s { text-decoration: none; font-size: 13.5px; }
+.rn-btn.wide { flex: 2 1 0; border-color: rgba(217, 139, 43, .45); background: linear-gradient(180deg, rgba(46, 30, 12, .92), rgba(20, 13, 6, .96)); }
+.rn-btn.ghost { flex: 1 1 0; color: var(--dim); }
+.rn-btn.ghost svg { color: var(--dim); }
+
+/* ── the gate ───────────────────────────────────────────────────────────── */
+
+/* Sits over the fleet at four kilometres with the ruling already framed behind it, so the card is
+   a plate rather than a screen — the first thing you see is still the shot. */
+#gate { z-index: 62; background: linear-gradient(180deg, rgba(3, 5, 9, .62), rgba(3, 5, 9, .88)); }
+#gate .g-card {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center;
+  padding: 0 30px; text-align: center;
+}
+#gate h1 {
+  font: 400 clamp(34px, 11vw, 62px)/1 var(--serif); letter-spacing: .12em;
+  text-transform: uppercase; margin: 0 0 18px;
+  text-shadow: 0 2px 34px rgba(0, 0, 0, .85);
+}
+.g-over {
+  display: block; font-style: normal; font-size: 9.5px; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+#gate p { max-width: 30ch; color: var(--dim); margin: 0 0 30px; font-size: 13px; }
+.g-go, .g-quiet {
+  display: block; width: min(280px, 74vw); border-radius: 12px; cursor: pointer;
+  font: inherit; letter-spacing: .06em;
+}
+.g-go {
+  height: 50px; font-size: 14.5px; color: var(--ink);
+  border: 1px solid rgba(217, 139, 43, .5);
+  background: linear-gradient(180deg, rgba(46, 30, 12, .94), rgba(20, 13, 6, .97));
+}
+.g-quiet {
+  height: 40px; margin-top: 10px; font-size: 12.5px; color: var(--dim);
+  border: 1px solid transparent; background: none;
+}
 
 /* ── the verdict ────────────────────────────────────────────────────────── */
 
@@ -228,8 +296,9 @@ body.in-terminal #showroom-btn { display: none !important; }
 
 /* ── the terminal ───────────────────────────────────────────────────────── */
 
-/* Full screen, because that is what a terminal does when you sit down at it. On the hull screen
-   it goes see-through so the 3D turntable behind it is the subject. */
+/* Full screen, because that is what a terminal does when you sit down at it — and it has to read as
+   a screen rather than a menu: a masthead, a status strip, a grid of applications, and a key row
+   along the bottom that always has Room on it. The yard lends the frame away entirely — see .lent. */
 #terminal {
   position: fixed; inset: 0; z-index: 55; display: none;
   font: 400 13px/1.55 system-ui, -apple-system, "Helvetica Neue", sans-serif;
@@ -241,66 +310,101 @@ body.shotmode #terminal { display: none !important; }
 
 .t-frame {
   position: absolute; inset: 0; display: flex; flex-direction: column;
-  background: linear-gradient(180deg, rgba(5, 8, 12, .97), rgba(3, 5, 9, .99));
+  background:
+    radial-gradient(130% 62% at 50% 0%, rgba(30, 62, 74, .30), transparent 62%),
+    linear-gradient(180deg, rgba(5, 9, 13, .975), rgba(3, 5, 9, .99));
 }
-.t-frame.see-through { background: none; pointer-events: none; }
-.t-frame.see-through .t-bar,
-.t-frame.see-through .t-body > * { pointer-events: auto; }
-.t-frame.see-through .t-body { background: none; }
+/* the scanline. 3 px so it survives a 3× device pixel ratio without turning into a grey wash */
+.t-frame::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .022) 0 1px, transparent 1px 3px);
+}
 
 .t-bar {
-  display: flex; align-items: center; gap: 10px; flex: none;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(6, 9, 14, .96), rgba(6, 9, 14, .82));
+  display: flex; align-items: center; gap: 10px; flex: none; position: relative; z-index: 1;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 13px 9px;
+  background: linear-gradient(180deg, rgba(6, 9, 14, .96), rgba(6, 9, 14, .8));
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
 }
-.t-x {
-  padding: 8px 12px; border-radius: 9px; background: rgba(255, 255, 255, .05);
-  border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 12px; white-space: nowrap;
+.t-badge { display: flex; gap: 3px; flex: none; }
+.t-badge i { width: 6px; height: 6px; transform: rotate(45deg); border: 1px solid var(--accent); }
+.t-badge i:nth-child(2) { background: var(--accent); }
+.t-who { flex: 1; min-width: 0; }
+.t-who b { display: block; font-weight: 500; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-who s { display: block; text-decoration: none; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.t-clock { text-align: right; flex: none; }
+.t-clock b { display: block; font: 500 12.5px/1.25 var(--mono); }
+.t-clock s { display: block; text-decoration: none; font: 400 9px/1.2 var(--mono); color: var(--dim); }
+
+/* the readout the whole thing is for: three numbers, always in the same place */
+.t-strip {
+  display: flex; flex: none; position: relative; z-index: 1;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  background: rgba(10, 16, 22, .8);
 }
-.t-who { flex: 1; min-width: 0; text-align: center; }
-.t-who b { display: block; font-weight: 500; font-size: 14px; }
-.t-who s { display: block; text-decoration: none; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
-.t-cash { font-size: 15px; font-weight: 500; white-space: nowrap; }
-.t-cash s { text-decoration: none; font-size: 9px; color: var(--dim); margin-left: 3px; }
+.t-strip span { flex: 1 1 0; min-width: 0; padding: 7px 13px; }
+.t-strip span + span { border-left: 1px solid var(--line); }
+.t-strip s { display: block; text-decoration: none; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.t-strip b { display: block; font: 500 14.5px/1.35 var(--mono); }
+.t-strip b.owe { color: var(--down); }
 
 .t-body {
   flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
-  padding: 16px 14px calc(22px + env(safe-area-inset-bottom, 0px));
+  position: relative; z-index: 1;
+  padding: 15px 13px 20px;
 }
 
-.t-lede { margin-bottom: 16px; }
-.t-lede i { display: block; font-style: normal; font-size: 9px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; }
-.t-lede p { color: var(--dim); }
-.t-h { font: 400 12px/1 system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin: 18px 0 9px; }
-.t-hint { color: var(--dim); font-size: 12px; margin-top: 10px; font-style: italic; }
+/* ── the key row ────────────────────────────────────────────────────────
+   Room is on every screen, not only the home one. Getting back to where you are standing is not a
+   thing a player should have to navigate up a tree to do. */
+.t-keys {
+  display: flex; flex: none; gap: 1px; position: relative; z-index: 2;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--line2); background: rgba(8, 12, 17, .96);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.t-key {
+  flex: 1 1 0; min-width: 0; height: 52px; border: 0; background: none; cursor: pointer;
+  color: var(--dim); font: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.t-key.wide { flex: 2 1 0; }
+.t-key em { font-style: normal; font-size: 13px; line-height: 1; }
+.t-key s { text-decoration: none; font-size: 10px; letter-spacing: .04em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-key.on { color: var(--accent); }
+.t-key.ghost, .t-key[disabled] { opacity: .28; }
+.t-key:first-child { color: var(--ink); }
 
-.t-apps { display: grid; gap: 10px; }
-.t-app {
-  display: block; width: 100%; text-align: left; padding: 15px 16px;
-  border-radius: 12px; border: 1px solid var(--line); border-left: 2px solid var(--accent);
-  background: linear-gradient(180deg, rgba(11, 15, 21, .8), rgba(7, 10, 15, .9));
+/* ── the application grid ───────────────────────────────────────────────── */
+
+.t-title { font: 400 22px/1.2 var(--serif); margin: 0 0 14px; }
+/* the turntable screen names the hull on its own card; a second title floats over the 3D */
+
+.t-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 9px; margin-bottom: 6px; }
+.t-tile {
+  display: block; width: 100%; text-align: left; padding: 12px 12px 13px; cursor: pointer;
+  border-radius: 13px; border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(14, 20, 27, .82), rgba(7, 11, 16, .92));
   color: var(--ink); font: inherit;
 }
-.t-app b { display: block; font: 400 18px/1.2 var(--serif); margin-bottom: 4px; }
-.t-app s { display: block; text-decoration: none; color: var(--dim); font-size: 12.5px; }
-.t-app.locked { opacity: .42; border-left-color: var(--line2); }
-.t-app.flag { border-left-color: #e8b45a; box-shadow: 0 0 0 1px rgba(232, 180, 90, .18); }
-
-.t-list { display: grid; gap: 8px; }
-.t-row {
-  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
-  padding: 13px 14px; border-radius: 11px; border: 1px solid var(--line);
-  background: rgba(9, 13, 18, .7); color: var(--ink); font: inherit;
+.t-ico {
+  width: 34px; height: 34px; border-radius: 9px; margin-bottom: 9px;
+  display: grid; place-items: center;
+  background: rgba(217, 139, 43, .12); border: 1px solid rgba(217, 139, 43, .26);
 }
-.t-row[disabled] { opacity: .5; }
-.t-row.on { border-color: var(--accent); }
-.t-row-main { flex: 1; min-width: 0; }
-.t-row-main b { display: block; font-weight: 500; font-size: 14.5px; }
-.t-row-main s { display: block; text-decoration: none; color: var(--dim); font-size: 12px; margin-top: 2px; }
-.t-row em { font-style: normal; font-size: 14px; white-space: nowrap; }
-.t-row em.short { color: var(--dim); }
+.t-ico svg { width: 19px; height: 19px; color: var(--accent); }
+.t-ico.big { width: 46px; height: 46px; margin: 0; }
+.t-ico.big svg { width: 25px; height: 25px; }
+.t-tile-txt { min-width: 0; }
+.t-tile b { display: block; font: 400 15.5px/1.25 var(--serif); }
+.t-tile s { display: block; text-decoration: none; color: var(--dim); font-size: 11.5px; line-height: 1.4; margin-top: 3px; }
+.t-tile.locked { opacity: .38; }
+.t-tile.locked .t-ico { background: rgba(255, 255, 255, .04); border-color: var(--line); }
+.t-tile.locked .t-ico svg { color: var(--faint); }
+.t-tile.flag { border-color: rgba(232, 180, 90, .4); box-shadow: 0 0 0 1px rgba(232, 180, 90, .12); }
+
+.t-h { font: 400 12px/1 system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin: 18px 0 9px; }
+.t-hint { color: var(--dim); font-size: 12px; margin-top: 10px; font-style: italic; }
 
 .t-convo {
   border-radius: 11px; border: 1px solid var(--line); padding: 12px 13px;
@@ -312,28 +416,6 @@ body.shotmode #terminal { display: none !important; }
 .t-convo p s { display: block; text-decoration: none; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
 .t-convo p.npc { color: var(--dim); }
 .t-convo p.you { color: var(--ink); padding-left: 11px; border-left: 2px solid var(--accent); }
-
-.t-back { background: none; border: none; color: var(--accent); font: inherit; font-size: 13px; padding: 0 0 12px; }
-
-/* the hull sheet floats at the bottom so the turntable owns the frame */
-.t-hull {
-  margin-top: auto; padding: 14px 15px 15px; border-radius: 13px;
-  background: linear-gradient(180deg, rgba(6, 9, 14, .72), rgba(4, 6, 10, .93));
-  border: 1px solid var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-}
-.t-frame.see-through .t-body { display: flex; flex-direction: column; }
-.t-hull h2 { font: 400 22px/1.2 var(--serif); margin-bottom: 4px; }
-.t-spec { width: 100%; border-collapse: collapse; margin: 10px 0 13px; }
-.t-spec td { padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
-.t-spec td:first-child { color: var(--dim); }
-.t-spec td:last-child { text-align: right; }
-.t-buy { display: flex; align-items: center; gap: 12px; }
-.t-buy span { font-size: 16px; font-weight: 500; }
-.t-cta {
-  flex: 1; padding: 14px; border-radius: 11px; border: none;
-  background: var(--accent); color: #14100a; font: inherit; font-size: 14.5px; font-weight: 600;
-}
-.t-cta[disabled] { background: rgba(255, 255, 255, .08); color: var(--dim); }
 
 .t-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .t-chip {
@@ -347,3 +429,363 @@ body.shotmode #terminal { display: none !important; }
   background: var(--accent-soft); border: 1px solid rgba(217, 139, 43, .3);
   color: var(--accent); font-size: 12px;
 }
+
+/* A phone on its side has 390 px of height and the ruling's copy is authored for a tall frame —
+   at 15vh off the bottom, five lines of Optima reach the middle of the screen and land on the very
+   fleet the beat is about. Smaller type, closer to the edge, and a deeper plate under it. */
+@media (max-height: 470px) {
+  .v-record, .v-sentence, .v-land { margin-bottom: 5vh; }
+  .v-record p, .v-sentence p { font-size: clamp(14px, 2.5vw, 19px); max-width: 46ch; }
+  .v-land p { font-size: clamp(16px, 3vw, 23px); max-width: 40ch; }
+  .v-over { margin-bottom: 8px; }
+  .v-seal h1 { font-size: clamp(24px, 4.4vw, 38px); }
+  .v-mark { margin-bottom: 12px; }
+  .v-stamp b { font-size: clamp(40px, 9vw, 72px); }
+  .v-stamp s { margin-top: 8px; }
+  #verdict::before {
+    background:
+      radial-gradient(120% 90% at 50% 44%, transparent 30%, rgba(3, 5, 9, .70) 100%),
+      linear-gradient(180deg, rgba(3, 5, 9, .5), transparent 22%, transparent 48%, rgba(3, 5, 9, .88));
+  }
+}
+
+/* A phone on its side has 390 px of height and the masthead, the strip and the key row already
+   want 200 of it. Everything gets shorter and the tiles turn into rows, or the grid shows one and
+   a half applications and nothing else. */
+@media (max-height: 470px) {
+  .t-bar { padding-top: calc(6px + env(safe-area-inset-top, 0px)); padding-bottom: 5px; }
+  .t-strip span { padding: 4px 13px; }
+  .t-strip b { font-size: 13px; }
+  .t-body { padding: 11px 13px 14px; }
+  .t-title { font-size: 18px; margin-bottom: 9px; }
+  .t-h { margin: 11px 0 7px; }
+  .t-key { height: 42px; }
+  .t-tile { display: flex; align-items: center; gap: 11px; padding: 9px 11px; }
+  .t-ico { margin: 0; width: 30px; height: 30px; flex: none; }
+  .t-ico svg { width: 17px; height: 17px; }
+  .t-tile s { margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #roomnav { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .rn-btn { height: 40px; }
+}
+
+/* ── Ledger Yard, the sales floor ───────────────────────────────────────────
+   A rail, a chat and some labels over the live turntable. The layer takes no pointer events of
+   its own, because a drag on the ship has to be a drag on the ship — the only thing here that
+   swipes is the rail, and it swipes between hulls. */
+
+/* The sales floor is over the live turntable and the turntable has to keep every gesture, so the
+   terminal stands right down while the yard has the frame — including its own hit area, which is
+   the whole screen and was eating the drag that turns the hull. */
+body.in-yard #terminal.lent { pointer-events: none; }
+body.in-yard #terminal.lent .t-frame { opacity: 0; pointer-events: none; }
+
+#yard {
+  position: fixed; inset: 0; z-index: 57; display: none; pointer-events: none;
+  font: 400 13px/1.55 system-ui, -apple-system, "Helvetica Neue", sans-serif; color: var(--ink);
+  opacity: 0; transition: opacity .3s ease;
+}
+#yard.live { display: block; }
+#yard.in { opacity: 1; }
+#yard button, #yard .y-top, #yard .y-rail, #yard .y-sheet, #yard .y-chat { pointer-events: auto; }
+body.shotmode #yard { display: none !important; }
+
+.y-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; gap: 11px;
+  padding: calc(env(safe-area-inset-top, 0px) + 9px) 13px 11px;
+  background: linear-gradient(180deg, rgba(4, 7, 11, .92) 46%, transparent);
+}
+.y-out {
+  width: 34px; height: 34px; flex: none; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line2); background: rgba(6, 9, 14, .7); font-size: 17px; line-height: 1;
+}
+.y-where b { display: block; font-size: 13.5px; font-weight: 600; }
+.y-where s { text-decoration: none; display: block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.y-cash { margin-left: auto; font: 600 15px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.y-cash s { text-decoration: none; font-size: 10px; color: var(--faint); margin-left: 3px; }
+
+/* the labels that reach off the metal */
+.y-calls { position: absolute; inset: 0; opacity: 0; transition: opacity .18s linear; }
+.y-calls.on { opacity: 1; }
+.y-lead { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.y-lead line { stroke: var(--accent); stroke-width: 1; opacity: .8; }
+.y-lead circle { fill: none; stroke: var(--accent); stroke-width: 1.2; }
+.y-tag {
+  position: absolute; transform: translateY(-100%); padding: 5px 10px 6px; border-radius: 4px;
+  max-width: 62vw;
+  background: rgba(5, 8, 12, .88); border: 1px solid var(--line2); border-bottom: 2px solid var(--accent);
+  white-space: nowrap;
+}
+.y-tag.flip { transform: translate(-100%, -100%); }
+.y-tag b { display: block; font: 600 12.5px/1.2 var(--mono); }
+.y-tag s { text-decoration: none; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+
+.y-floor {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 0 10px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.y-rail { display: flex; align-items: stretch; gap: 8px; touch-action: pan-y; }
+.y-arrow {
+  width: 38px; flex: none; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--line); background: rgba(6, 9, 14, .78); color: var(--dim); font-size: 19px;
+}
+.y-card {
+  flex: 1 1 auto; min-width: 0; padding: 11px 14px 12px; border-radius: 13px;
+  background: linear-gradient(180deg, rgba(8, 12, 18, .8), rgba(4, 6, 10, .95));
+  border: 1px solid var(--line2); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.y-card u {
+  text-decoration: none; display: inline-block; margin-bottom: 5px; padding: 2px 8px 3px;
+  border-radius: 999px; background: var(--accent); color: #14100a;
+  font: 600 9.5px/1.4 inherit; letter-spacing: .09em; text-transform: uppercase;
+}
+.y-card u.deal { background: var(--up); }
+.y-card b { display: block; font: 400 20px/1.15 var(--serif); }
+.y-price { display: flex; align-items: baseline; gap: 7px; margin-top: 4px; }
+.y-price i { font-style: normal; font-size: 12.5px; color: var(--faint); text-decoration: line-through; }
+.y-price em { font: 600 19px/1 var(--mono); font-style: normal; font-variant-numeric: tabular-nums; }
+.y-price em.short { color: var(--down); }
+.y-price s { text-decoration: none; font-size: 10px; color: var(--faint); }
+
+/* the window on whatever price is showing. It only moves when a week does, so it is a deadline
+   rather than a ticking clock — the dot is what makes it read as live at a glance */
+.y-clock {
+  display: flex; align-items: center; gap: 6px; margin-top: 5px;
+  font-size: 10.5px; letter-spacing: .04em; color: var(--dim);
+}
+.y-clock::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%; flex: none;
+  background: var(--dim); opacity: .7;
+}
+.y-clock.hot { color: #f0b46a; }
+.y-clock.hot::before { background: var(--accent); opacity: 1; animation: y-pulse 1.6s ease-in-out infinite; }
+@keyframes y-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .y-clock.hot::before { animation: none; } }
+
+.y-dots { display: flex; justify-content: center; gap: 6px; }
+.y-dots button {
+  width: 22px; height: 4px; padding: 0; border: 0; border-radius: 2px; cursor: pointer;
+  background: rgba(255, 255, 255, .18);
+}
+.y-dots button.on { background: var(--accent); }
+
+.y-acts { display: flex; gap: 7px; }
+.y-ghost, .y-buy {
+  flex: 1 1 0; min-width: 0; height: 44px; border-radius: 12px; cursor: pointer;
+  font-size: 13px; font-weight: 500;
+}
+.y-ghost { border: 1px solid var(--line2); background: rgba(6, 9, 14, .78); color: var(--ink); }
+.y-ghost[disabled] { color: var(--faint); }
+.y-buy { flex: 0 0 33%; border: 0; background: var(--accent); color: #14100a; font-weight: 600; }
+.y-buy[disabled] { background: rgba(255, 255, 255, .09); color: var(--faint); }
+
+.y-sheet {
+  padding: 12px 14px 13px; border-radius: 13px; max-height: 40vh; overflow-y: auto;
+  background: rgba(5, 8, 12, .93); border: 1px solid var(--line);
+}
+.y-sheet table { width: 100%; border-collapse: collapse; }
+.y-sheet td { padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.y-sheet td:first-child { color: var(--dim); }
+.y-sheet td:last-child { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.y-sheet p { margin-top: 10px; font-size: 11.5px; line-height: 1.6; color: var(--faint); }
+
+/* the broker, collapsible to just the face and the name */
+.y-chat { border-radius: 13px; background: rgba(5, 8, 12, .93); border: 1px solid var(--line); overflow: hidden; }
+.y-chat-head {
+  width: 100%; display: flex; align-items: center; gap: 10px; cursor: pointer;
+  padding: 8px 12px; border: 0; background: none; text-align: left;
+}
+.y-face {
+  width: 34px; height: 34px; flex: none; border-radius: 999px;
+  background: #10161d center/cover no-repeat; border: 1px solid var(--line2);
+}
+.y-who { flex: 1 1 auto; min-width: 0; }
+.y-who b { display: block; font-size: 12.5px; font-weight: 600; }
+.y-who s { text-decoration: none; display: block; font-size: 10px; color: var(--faint); }
+.y-chat-head em { font-style: normal; color: var(--faint); }
+.y-log { display: none; max-height: 19vh; overflow-y: auto; padding: 0 12px 11px; }
+.y-chat.open .y-log { display: block; }
+.y-log p { margin-top: 9px; font-size: 12.5px; line-height: 1.5; }
+.y-log p s { display: block; text-decoration: none; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); margin-bottom: 2px; }
+.y-log p.npc { color: var(--dim); }
+.y-log p.you { color: var(--ink); padding-left: 10px; border-left: 2px solid var(--accent); }
+.y-log p.sys { color: var(--faint); font-style: italic; }
+.y-log p.deal { color: var(--up); }
+.y-log p.firm { color: var(--dim); }
+
+/* Sideways there is room to put the whole floor down one edge and leave the hull the rest of the
+   frame, which is the only reason to hold a phone that way in here. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .y-floor {
+    left: auto; width: min(46%, 430px); right: 8px;
+    top: calc(env(safe-area-inset-top, 0px) + 52px); bottom: 8px;
+    padding: 0; gap: 6px; justify-content: flex-end; overflow: hidden;
+  }
+  .y-card b { font-size: 17px; }
+  .y-card u { margin-bottom: 3px; }
+  .y-ghost, .y-buy { height: 38px; font-size: 12px; }
+  .y-sheet { flex: 0 1 auto; min-height: 0; max-height: none; overflow-y: auto; }
+  .y-chat { flex: none; }
+  .y-log { max-height: 26vh; }
+  .y-top { background: linear-gradient(180deg, rgba(4, 7, 11, .92) 62%, transparent); }
+}
+
+/* the knobs panel is a dev affordance and there is nothing on the sales floor it can help with */
+body.in-yard #panel, body.in-yard #showroom-btn { display: none !important; }
+
+/* ── the applications ───────────────────────────────────────────────────────
+   Banking, Identity, Quarters and Contracts each do one job, and each is laid out around that job
+   rather than around a two-column table. The shared pieces are here; nothing below is specific to
+   one screen unless its name says so. */
+
+.ap-hero { padding: 4px 0 16px; }
+.ap-hero i { font-style: normal; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.ap-hero b { display: block; margin-top: 6px; font: 600 34px/1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.ap-hero b.thin { color: var(--down); }
+.ap-hero b u { text-decoration: none; font-size: 13px; color: var(--faint); margin-left: 6px; }
+.ap-hero s { text-decoration: none; display: block; margin-top: 5px; font-size: 12px; color: var(--dim); }
+
+.ap-meter, .ap-gauge { padding: 12px 13px 13px; border-radius: 12px; background: var(--glass2); border: 1px solid var(--line); }
+.ap-meter-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ap-meter-top b { font-size: 12.5px; font-weight: 600; }
+.ap-meter-top em { font-style: normal; font: 500 12px/1 var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
+.ap-meter s, .ap-gauge s { text-decoration: none; display: block; margin-top: 7px; font-size: 11px; line-height: 1.5; color: var(--faint); }
+/* no overflow clip: the fill is rounded on its own, and the threshold marker is authored to stand
+   proud of the bar at either end — clipped, it is a 6 px sliver nobody reads as a mark */
+.ap-bar { position: relative; height: 6px; margin-top: 9px; border-radius: 3px; background: rgba(255, 255, 255, .07); }
+.ap-bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); transition: width .3s ease; }
+.ap-bar.good i { background: var(--up); }
+.ap-bar.warn i { background: var(--grey); }
+.ap-bar.bad i { background: var(--down); }
+.ap-bar u { position: absolute; top: -2px; width: 1px; height: 10px; background: rgba(255, 255, 255, .55); }
+.ap-meter.hot .ap-bar i { background: var(--down); }
+
+.ap-tiles { display: grid; gap: 7px; margin: 12px 0; }
+.ap-tiles.three { grid-template-columns: repeat(3, 1fr); }
+.ap-tiles.two { grid-template-columns: repeat(2, 1fr); }
+.ap-tile { padding: 10px 11px 11px; border-radius: 11px; background: var(--glass2); border: 1px solid var(--line); min-width: 0; }
+.ap-tile s { text-decoration: none; display: block; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.ap-tile b { display: block; margin-top: 5px; font: 600 16px/1.1 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ap-tile b u { text-decoration: none; font-size: 10px; color: var(--faint); margin-left: 3px; }
+.ap-tile.wide b { font: 500 13px/1.25 inherit; }
+.ap-tile.up b { color: var(--up); }
+.ap-tile.down b { color: var(--down); }
+
+.ap-block { margin: 14px 0; }
+.ap-block h4 { font-size: 9.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+
+.ap-bars { display: flex; align-items: flex-end; gap: 3px; height: 62px; }
+.ap-bars span { flex: 1 1 0; display: flex; align-items: flex-end; gap: 1px; height: 100%; }
+.ap-bars i { flex: 1 1 0; border-radius: 1px 1px 0 0; min-height: 1px; }
+.ap-bars i.in { background: var(--up); opacity: .85; }
+.ap-bars i.out { background: var(--down); opacity: .7; }
+
+.ap-split { list-style: none; display: grid; gap: 6px; }
+.ap-split li { display: grid; grid-template-columns: 96px 1fr auto; align-items: center; gap: 9px; font-size: 11.5px; }
+.ap-split s { text-decoration: none; color: var(--dim); }
+.ap-split i { display: block; height: 5px; border-radius: 3px; background: var(--them); min-width: 2px; }
+.ap-split em { font-style: normal; font: 500 11.5px/1 var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
+
+.ap-people { display: grid; gap: 8px; }
+.ap-person {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+  padding: 11px 12px; border-radius: 12px; background: var(--glass2); border: 1px solid var(--line);
+}
+.ap-face, .ap-mono {
+  width: 46px; height: 46px; flex: none; border-radius: 999px;
+  background: #10161d center/cover no-repeat; border: 1px solid var(--line2);
+}
+.ap-person-txt { flex: 1 1 auto; min-width: 0; }
+.ap-person-txt b { display: block; font-size: 13px; font-weight: 600; }
+.ap-person-txt s { text-decoration: none; display: block; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 1px 0 3px; }
+.ap-person-txt u { text-decoration: none; display: block; font-size: 11.5px; line-height: 1.45; color: var(--faint); }
+.ap-person em { font-style: normal; color: var(--faint); font-size: 17px; }
+
+/* the licence */
+.ap-licence {
+  padding: 15px 15px 16px; border-radius: 14px; position: relative; overflow: hidden;
+  background: linear-gradient(145deg, rgba(31, 46, 60, .55), rgba(8, 12, 18, .8));
+  border: 1px solid var(--line2);
+}
+.ap-licence::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .022) 0 2px, transparent 2px 7px);
+}
+.ap-lic-head { display: flex; align-items: center; gap: 12px; }
+.ap-mono {
+  display: flex; align-items: center; justify-content: center;
+  font: 600 16px/1 var(--mono); letter-spacing: .04em; color: var(--accent);
+  background: rgba(217, 139, 43, .12); border-color: rgba(217, 139, 43, .35);
+}
+.ap-lic-who { flex: 1 1 auto; min-width: 0; }
+.ap-lic-who b { display: block; font: 400 20px/1.15 var(--serif); }
+.ap-lic-who s { text-decoration: none; display: block; margin-top: 2px; font-size: 11.5px; color: var(--dim); }
+.ap-lic-seal { flex: none; width: 26px; height: 26px; color: rgba(217, 139, 43, .5); }
+.ap-lic-seal svg { width: 100%; height: 100%; }
+.ap-lic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin: 14px 0 12px; }
+.ap-lic-grid s { text-decoration: none; display: block; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.ap-lic-grid b { display: block; margin-top: 2px; font: 500 12.5px/1.3 var(--mono); }
+.ap-licence p { font-size: 12px; line-height: 1.6; color: var(--dim); position: relative; }
+
+.ap-traits { display: grid; gap: 7px; }
+.ap-traits span { padding: 9px 12px; border-radius: 10px; background: var(--glass2); border-left: 2px solid var(--accent); }
+.ap-traits b { display: block; font-size: 12.5px; font-weight: 600; }
+.ap-traits s { text-decoration: none; display: block; margin-top: 2px; font-size: 11.5px; color: var(--faint); }
+
+.ap-gauges { display: grid; gap: 8px; }
+
+/* the property board */
+.ap-lede { margin-bottom: 14px; }
+.ap-lede i { font-style: normal; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.ap-lede p { margin-top: 6px; font-size: 12.5px; line-height: 1.6; color: var(--dim); }
+
+.ap-props { display: grid; gap: 10px; }
+.ap-prop {
+  display: grid; grid-template-columns: 88px 1fr; gap: 13px; align-items: stretch;
+  padding: 12px; border-radius: 13px; background: var(--glass2); border: 1px solid var(--line);
+}
+.ap-prop.on { border-color: rgba(217, 139, 43, .45); background: rgba(217, 139, 43, .07); }
+.ap-plan { display: flex; align-items: center; justify-content: center; }
+.ap-floor {
+  position: relative; border: 1px solid var(--line2); border-radius: 2px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 9px);
+  min-height: 30px;
+}
+.ap-prop.on .ap-floor { border-color: rgba(217, 139, 43, .5); }
+.ap-glass { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); height: 2px; background: var(--accent); box-shadow: 0 0 6px rgba(217, 139, 43, .7); }
+.ap-desk { position: absolute; left: 2px; top: 22%; width: 5px; height: 34%; background: rgba(255, 255, 255, .3); }
+.ap-prop-top { display: flex; align-items: baseline; justify-content: space-between; gap: 9px; }
+.ap-prop-top b { font: 400 17px/1.2 var(--serif); }
+.ap-prop-top u { text-decoration: none; flex: none; font: 500 12.5px/1 var(--mono); color: var(--dim); }
+.ap-prop-top u.own { color: var(--accent); font-family: inherit; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.ap-prop-top u.short { color: var(--down); }
+.ap-prop-txt > s { text-decoration: none; display: block; margin-top: 4px; font-size: 11.5px; line-height: 1.5; color: var(--faint); }
+.ap-facts { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px 12px; margin: 9px 0 0; }
+.ap-facts li { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; }
+.ap-facts s { text-decoration: none; color: var(--faint); }
+.ap-facts em { font-style: normal; font-family: var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
+.ap-facts em.short { color: var(--down); }
+.ap-cta {
+  margin-top: 11px; width: 100%; height: 38px; border: 0; border-radius: 10px; cursor: pointer;
+  background: var(--accent); color: #14100a; font-size: 13px; font-weight: 600;
+}
+.ap-cta[disabled] { background: rgba(255, 255, 255, .07); color: var(--faint); font-weight: 400; }
+.ap-you { margin-top: 11px; font-size: 11.5px; color: var(--accent); }
+
+/* the supply desk */
+.ap-deals, .ap-watch { display: grid; gap: 9px; }
+.ap-deal, .ap-watcher { padding: 12px 13px 13px; border-radius: 12px; background: var(--glass2); border: 1px solid var(--line); }
+.ap-watcher.dim { opacity: .55; }
+.ap-deal-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ap-deal-top b { font-size: 13.5px; font-weight: 600; }
+.ap-deal-top u {
+  text-decoration: none; flex: none; padding: 2px 8px 3px; border-radius: 999px;
+  background: rgba(255, 255, 255, .07); color: var(--faint);
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+}
+.ap-deal-top u.live { background: var(--accent); color: #14100a; }
+.ap-watcher > s { text-decoration: none; display: block; margin: 6px 0 11px; font-size: 11.5px; line-height: 1.55; color: var(--faint); }
+.ap-empty { padding: 18px 14px; border-radius: 12px; border: 1px dashed var(--line2); text-align: center; font-size: 12px; color: var(--faint); }

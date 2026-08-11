@@ -4,6 +4,7 @@
 import { showroom } from '../showroom/index.js';
 import content from '../sim/content.js';
 import { esc } from './format.js';
+import { nav } from './nav.js';
 import { fixtureView, fixtureProps } from './fixture.js';
 
 const registry = new Map();
@@ -131,6 +132,11 @@ function draw() {
   const root = host.root;
   if (!root) return;
   const entry = stack[stack.length - 1];
+  // The sheets keep their own back stack, so history only needs to know whether any sheet is up:
+  // one entry, reconciled here, and every dismissal path — the key, the swipe, a panel closing
+  // itself — keeps the back button honest without any of them knowing about it.
+  if (entry && !nav.at('panel')) nav.push('panel', () => panels.closeAll());
+  else if (!entry && nav.at('panel')) nav.drop('panel');
   document.body.classList.toggle('sheet-open', !!entry);
   // whatever is on top is on the body, so a panel can restyle the shell around it (the end card
   // takes the whole screen) and get it back on every dismissal path for free

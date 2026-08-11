@@ -373,13 +373,18 @@ function applyActions(s, actions, emit) {
         emit({ t: 'module', module: m.id, name: m.name, site: site.id, cost: m.cost });
         break;
       }
+      // `price` is what the yard agreed to — a standing discount, or whatever the broker was
+      // talked down to. It can never be higher than the board, so haggling cannot cost the player.
       case 'buyShip': {
         const def = content.get('ship', a.class);
-        if (!def || s.cash < def.cost) break;
-        s.cash -= def.cost;
+        if (!def) break;
+        const asked = Number(a.price ?? def.cost);
+        const cost = Math.max(0, Math.min(def.cost, Math.round(Number.isFinite(asked) ? asked : def.cost)));
+        if (s.cash < cost) break;
+        s.cash -= cost;
         const id = `${def.id}-${s.ships.length + 1}`;
         s.ships.push({ id, class: def.id, at: 'ledger', leg: null, eta: 0, cargo: {}, route: null, routeIdx: 0, dwell: 0, arrived: false, laidUp: 0 });
-        emit({ t: 'ship', ship: id, class: def.id, name: def.name, cost: def.cost });
+        emit({ t: 'ship', ship: id, class: def.id, name: def.name, cost });
         break;
       }
       case 'buyQuarters': {

@@ -4441,3 +4441,609 @@ everywhere, because `below_cost` expires and decays between runs. Do not spend t
 104. **A stand-in policy bug looks exactly like an economy that is too hard.** Four of them here,
      and together they were most of the apparent imbalance. Before tuning a single content number
      after a structural change, re-read the policy against the new structure.
+
+---
+
+# Session 16 — Aaron's front-of-the-game fix list
+
+Aaron played the front and reported, verbatim: the cold open's ships were *"dots in the distance"*
+on phone **and** desktop and **"literally NOTHING happens over the next 4 or so story cards"**; the
+intro should end **in the room**, which should feel like a base you can get back out of ("click on
+window and a button — system view?"); the terminal needed a back button on every screen and a
+**transition** in and out rather than appearing from nowhere ("I noticed you have a zoom up on
+terminal view, but wasn't sure how we got there"); the room's look-around let you see through the
+walls; the terminal should **look like a computer terminal — icons and images** — and run the whole
+game, with the dock as a shortcut rather than the only route; and the home button on the system view
+was too small to find.
+
+All of it is done, and every claim below was checked by looking at a render.
+
+## `tools/front.mjs` — the new tool, and read this first
+
+Nothing here could be verified with `shot.mjs` (one scenario, one frame) or `uishot.mjs` (one
+loaded state). The front of the game is a *sequence*, and the bug Aaron reported was the absence of
+change across eleven of them. `tools/front.mjs` drives the real thing with real taps:
+
+```bash
+node tools/front.mjs --flow=coldopen                       # every ruling beat + dist/fov/draw calls
+node tools/front.mjs --flow=coldopen --w=844 --h=390 --dpr=1   # the perf-gate profile
+node tools/front.mjs --flow=room                           # ruling → origin → handover → terminal → system
+node tools/front.mjs --flow=terminal                       # room → glass → terminal → every screen → out
+node tools/front.mjs --flow=look                           # drag the room, print theta off centre
+```
+
+`--flow=coldopen` prints `dist` beside each frame. **That number is the whole diagnosis**: the old
+sequence went 2293 → 1879 across eight beats, an 18 % approach over thirty-five seconds, which is
+why it looked like a photograph.
+
+## 1. The ruling is now one approach onto a fleet
+
+`content/verdict.js` is rewritten around an `approach(dist, az, el, fov, ms)` helper. Eight beats,
+**4200 → 420**, each ~28 % nearer than the last. `ReachScene.showMeridian()` builds the subject: a
+15-hull `ranks` formation of the convicted carrier, in a new `meridian` palette (bone hulls, cold
+white running lights — it never had to advertise). It is built on demand and disposed at the reveal,
+so the live game and every scenario pay nothing for it.
+
+- **Bearing is the load-bearing number and it barely moves.** ≈ −45° holds Ossian and the star
+  *behind* the fleet, which is what backlights it. The first cut swung 24° for parallax, took the
+  planet off frame, and left a black rectangle with some ships in it. Parallax comes from the
+  approach — three ranks separate hard as you close on them.
+- **`verdictLighting()` in `scene.js` exists because the rim key is anchored to the world origin.**
+  `updateShipLighting` places it at `keyDir × rimDist`, and `rimDist` is 220 m — tuned for hulls near
+  Ledger. Four kilometres out the fleet got no key at all and rendered as flat black cut-outs. The
+  ruling pushes `rimDist/rimNear/rimFall` to 9000/12600/3400, **far outside those sliders' own
+  min/max**, which works because `quality.set` applies what it is given and only the panel UI reads
+  the range. `reachLighting()` goes back on at the reveal.
+- **The reveal is a hard cut (`ms: 0`)** and that is doing real work: the fleet is disposed on the
+  same frame, and only a cut hides that. Skip is a cut now too, for the same reason.
+- Beat durations are up ~15 %, per Aaron. Tap-to-advance and Skip were already right.
+
+Measured at the gate profile (844×390, dpr 1): **48 draw calls, 114k tris, 28.3 MB** during the
+ruling, against 150 / 350k / 60 MB. The live game after the reveal is *higher* (192k tris) — the
+fleet is not the peak.
+
+## 2. The camera bug this uncovered — `moveTo` with `ms <= 0` did not cut
+
+```js
+if (ms <= 0) { …set directly…; return Promise.resolve(this); }
+this.cancelMove();          // ← only reached by the ms > 0 path
+```
+
+An instant move left the tween it interrupted in `this.tween`, which put the camera straight back on
+the next frame. **The cut simply did not happen.** `cancelMove()` now runs before both branches.
+This has been latent since the rig was written; nothing used a cut mid-move until now.
+
+## 3. The game opens in your quarters
+
+`quarters.enter('enter', 2200)` replaces the system framing in the handover. The ruling's last
+framing is a hundred metres off the dock the rented box is cut into, so it is one continuous move.
+`begin()` no longer calls `cancelMove()` / `markHome(HOME())` when `quarters.inside` — either would
+have undone it mid-flight.
+
+`roomShots.enter` was re-framed (`pos x` 0.30 → 0.42 w, `look x` −0.20 → −0.30 w, fov 60 → 64). The
+old one put the terminal on the left edge, half out of shot, which is most of why nobody found it.
+
+## 4. `js/ui/roomnav.js` — the room's own two buttons
+
+The quarters hide the whole HUD on purpose, which left the room with **no visible exit** once the
+game started opening in there. Two thumb-height buttons: **Terminal** and **System view**. Tapping
+the glass in 3D (a new invisible-material tap plane, `userData.window`, same trick as the site
+proxies) walks you to the window framing, and the bar becomes **‹ The room** and **Out to the
+system**.
+
+It watches the body classes rather than being told when to appear. Four paths move the player in and
+out of the room — handover, HUD button, showroom, closing the terminal — and every one already moves
+`in-quarters`/`in-terminal`. Anything else leaves the bar showing over the star system.
+
+## 5. The look-around is leashed — `CameraRig.setLimit()`
+
+`{ theta, phi, spanTheta, spanPhi, distMin, distMax, recentre }`. Clamped on drag and on pinch;
+eased back to centre at `recentre` per second once the finger lifts. `quarters.applyLimits()` sets it
+from wherever the camera arrived, per framing (`LOOK` in `quarters.js`) — ±10° at the doorway, ±3°
+at the desk. Measured: a 320 px drag clamps at 0.175 rad and is back to **0.000 off centre** in
+2.6 s. `setLimit(null)` for the system, and **`showcase.js` drops it** — turning a hull is the one
+thing in the game that wants a full rotation.
+
+## 6. The terminal is a computer now — `js/ui/terminal.js` rewritten
+
+Masthead, a three-number status strip (credits / debt / share), a **grid of application tiles with
+icons and live status lines**, and a **key row with Room on every screen, not just home**. Twelve
+applications in three groups:
+
+| group | apps |
+|---|---|
+| Ledger Station | Ledger Yard · Contracts |
+| Your company | Assign · Holdings · Market · Refinery · Tactics · Dossier |
+| Personal | Banking · Identity · Quarters |
+
+- **The six company apps open the real bottom sheets**, raised over the terminal by
+  `body.in-terminal #sheet { z-index: 58 }`. One implementation, two doors into it — the dock is now
+  a shortcut, which is what Aaron asked for.
+- **Banking** is the old Contacts plus a real account table. **Identity** is new: the character sheet
+  the player built, plus the record — hulls, quarters, standing, and regulator interest, which is a
+  number about the person holding the licence rather than the company's books.
+- **The transition.** `terminal.open()` runs `quarters.enter('terminal', 760)` and only fades the
+  screen up on arrival; `close()` drops the screen first and pulls back to the room over 900 ms, so
+  it reads as one gesture rather than a dismissal followed by a camera move.
+- Tile status lines are read live, so the grid is a status board: *"You own nothing that flies"*,
+  *"42.0k cr out at 1.2%/wk"*, *"Corvain holds 71%"*.
+
+## 7. The home button
+
+`.hud-focus` went from a 34 px unlabelled circle to a 38 px labelled pill — **Centre** and **Room**,
+accent icons. `#controls` gained `left: 54px` to clear the showroom key, which it now shares a corner
+with. The row is showroom key + two pills + four speed buttons, and it was measured to fit at
+430 / 390 / 375 / 360 / 320: the speed pills give up padding at ≤419 and ≤380, and only under 336 do
+the labels go.
+
+## The showroom fixture was already broken — fixed here
+
+`fixtureView()` played thirteen weeks with **no ships**: `balance.start.ships` was emptied in 15b and
+the fixture's stand-in policy still only routed a fleet it was handed. Every panel fixture drew an
+empty company, and `PROPS.assign` reached into `ships[0]` and threw, so **`uishot.mjs --all-panels`
+died after four panels.** The policy now buys an Ossa and a Kite at week 0 and routes them at week 1.
+Both orientations are clean at 10/10 again.
+
+(HANDOFF 15c's note that "`balance.start.ships` still lists three hulls" is wrong — it is `[]`.)
+
+## Gotchas — session 16
+
+105. **`moveTo({ ms: 0 })` did not cancel the tween it replaced.** See §2. If a cut ever "doesn't
+     happen", look here first.
+106. **The ship kit's rim key is anchored to the world origin, not to the camera.** Anything drawn
+     more than a few hundred metres from Ledger gets no key light and renders as a black cut-out.
+     `rimDist` moves the key; `rimNear`/`rimFall` have to be widened with it or only one rank lights.
+107. **`quality.set` ignores a knob's own min/max** — those bound the slider, not the value. Useful
+     (§1) and dangerous in equal measure.
+108. **A leash set for the room silently clamps anything that borrows the camera afterwards.** The
+     yard's turntable was still on the desk's ±3° and the recentre was quietly dragging it back.
+     Whatever takes the camera must drop the limit and whatever restores the room must set it again.
+109. **CSS media queries do not beat later rules of equal specificity.** The whole landscape block
+     for the terminal was authored before `.t-hull` and did nothing at all until it was moved to the
+     end of the file. It rendered *identically* — which reads exactly like the query not matching.
+110. **A synthetic CDP touch lands at a viewport coordinate**, so tapping something below the fold
+     hits whatever is there instead, silently. `tapSel` in `front.mjs` scrolls first and refuses to
+     tap anything still off screen. Two "the button does nothing" hunts came from this.
+111. **`shots/front/coldopen/*` beat labels lag the camera reading by one** on short beats — the tool
+     samples the camera before it reads the DOM. The ids are right; do not read the pairing as a
+     camera that arrived late.
+
+## What is deliberately NOT done
+
+- **Contracts is still a locked tile with copy behind it**, not a screen. It explains that supply
+  agreements are offered rather than applied for, which is true of the sim.
+- **The §15c share-recompute bug is untouched** — every rival-suppression op is still a no-op
+  (HANDOFF 15c, "THE BIGGEST OPEN BUG"). It needs its own session and invalidates the balance pass.
+- **The four intro cards** (`content/intro.js`) still exist for a returning player with a save who
+  never sees the ruling. They were not re-timed.
+- **Follow your ship to the job** is still not started.
+
+---
+
+# Session 17 — Aaron's second play: the room, the clock, back, the yard, the applications
+
+Aaron played on his phone and reported five things. All five are done and every claim below was
+checked by looking at a render or at a number the tools printed.
+
+## 1. The room's look-around was a body slide, not a head turn
+
+**`js/world/camera.js` `CameraRig.pivotAt(d)` is the whole fix.** The rig is always in orbit form,
+and the room's framings orbited a point *out past the glass* — the `enter` shot's target was 4.8 m
+away through the window wall. A ten-degree drag therefore walked the eye 0.84 m sideways in a room
+1.5 m wide, which is exactly Aaron's "I still end up on the outside of the room".
+
+`pivotAt` re-targets the orbit centre to a point 0.62 m in front of the eye without moving the eye
+or the view direction, so the same drag is a head turn. `quarters.enter` calls it on arrival,
+**before `markHome`** — mark home first and `resetView` pulls the eye back onto the old centre.
+
+- **The drag direction had to flip with it.** Content follows the finger either way, but which sign
+  does that depends on where the centre is: around a hull the camera swings and the hull stays put;
+  around your own head the whole view turns and the same sign sends the room the other way.
+  `limit.invertX` is set by the room's leash and by nothing else. Measured: a 320 px drag left now
+  turns the view right and the window slides left with the finger.
+- The leash widened with it — ±26° of yaw at the doorway, up from ±10°, because there is no longer
+  a wall to walk through. `recentre` 1.7 → 1.1 so a look holds a moment before easing back.
+
+## 2. The framings are authored as a horizontal angle now — `camera.fovForH()`
+
+A phone held upright is 0.46 wide for 1 tall. A vertical fov that frames the room in landscape
+crops both edges away in portrait, which is why Aaron could not see the whole window. `roomShots`
+returns `hfov` and `roomShots` **fits it to the actual geometry** (`halfAngleFor`): the window
+corners plus the near edge of the terminal screen, plus 3° of margin. `quarters.resize()` re-takes
+the framing on a turn, because there is nothing sensible to interpolate towards.
+
+Fitting the *whole* terminal costs eight degrees of horizontal angle, which in portrait is twelve
+of vertical, and every one of those is floor — so the fit reaches the screen's near edge and the
+look-around covers the rest. Measured at 390×844: the glass is whole and about 80 % of the frame
+width, with the terminal on the left edge.
+
+`window` was re-framed right up on the glass (0.62 m off it) so the mullions run off frame — a
+window held at arm's length is 1.7 wide for 1 tall and on a phone half the screen is the wall it is
+cut into.
+
+## 3. Time is spent, not burned — `js/ui/clock.js`
+
+Aaron lost a quarter of a year looking around, and he was right to be annoyed: the old clock was a
+free timer at 6 s a week, so ninety seconds of reading was thirteen weeks. The clock now **holds
+unless something is actually happening**:
+
+| held because | what the player sees |
+|---|---|
+| `in-quarters` (the room *and* the terminal) | nothing — the HUD is hidden in there anyway |
+| `sheet-open` | nothing — reading a panel is reading |
+| `sim.speed <= 0` | "The clock is stopped · tap to move a week on" |
+| `!sim.work().busy` | "Nothing is under way · your fleet is idle at the dock" |
+
+`sim.work()` is the whole test: any ship in transit, any ship on a route, or a refinery with
+feedstock. It also returns `next`, the weeks to the nearest arrival, which is what **▸▸** runs to.
+
+- **Orders fast-forward themselves.** `clock.queued()` debounces on `act`, then `clock.spend(1, …)`
+  runs the week with a readout over the top of whatever is on screen. The debounce is what keeps
+  three taps in one visit to the terminal costing the same single week that one tap does — which is
+  what the old build did, so **this is not a balance change**.
+- `#ffbar` hangs off `document.body`, not off `#ui`. `#ui` is a stacking context at z-25 and the
+  terminal is z-60, so nothing inside `#ui` can ever draw over the desk — and the desk is exactly
+  where orders are placed.
+- Speeds are `[0, 1, 3]` plus **▸▸**; `tickSeconds` 6 → 8, because a week is now something you
+  choose to watch. `#speed.held` dims the speeds and pulses ▸▸.
+
+Measured with `tools/front.mjs --flow=clock`: twelve seconds in the room = week 0, twelve seconds at
+the terminal = week 0, twelve seconds on the system view with an idle fleet = no change, buying a
+hull = one week with the bar up, ▸▸ = straight to the arrival.
+
+## 4. Back walks the chain — `js/ui/nav.js`
+
+`system → room → terminal → t:<screen>`, plus one collapsed `panel` entry for the sheets. History is
+the source of truth **for going back and only for going back**: every screen that nests pushes an
+entry with the function that undoes it, and every back control in the UI calls `nav.back()` /
+`nav.backTo(id)` and lets `popstate` do the work. One code path, so the depths cannot drift.
+
+`nav.drop(id)` is the other half: the player left by some other door (a swipe on a sheet, the
+terminal's own Room key, a camera move), so the entry and everything above it comes off *without*
+running their exits and history winds back to match. `panels.draw()` reconciles with two lines,
+which is what makes every dismissal path keep the back button honest without any of them knowing.
+
+Depth 0 is a **card offering to carry on**, not a closed tab. Verified: five presses from five deep
+come apart in exactly the order they went together, and the sixth shows the gate.
+
+## 5. Ledger Yard is a sales floor — `js/ui/yard.js`, `content/yard.js`
+
+Opens straight onto the first hull on the turntable with the broker connecting. Over the live 3D:
+
+- **A rail with the name, the price and the badge**, and the rail is the only thing that swipes.
+  That is the whole answer to "make drag-to-turn work *and* slide between ships": a horizontal drag
+  over the hull has to mean turn the hull, so the pager lives somewhere else. `#yard` takes no
+  pointer events of its own and `#terminal.lent` stands all the way down — **its own hit area was
+  the whole screen and was eating the drag**, which is why the old hint lied.
+- **Labels reach off the metal.** `showcasePoint()` projects an anchor given as `{along, up, side}`
+  and the tag walks to whichever side has room, pinning to the edge if neither has. One at a time,
+  moved on every 3.4 s, faded out when the spin carries the anchor round the back.
+- **The 1.00 speed has a name.** `content/yard.js` `speedUnit` — *Alliance standard*, the cruise the
+  Reach's schedules were written to, which is a loaded Kite-class dock to dock. Every hull is quoted
+  against it on the callout and on the sheet.
+- **Discounts.** 42 % of hulls carry 10/15/20 % off, drawn off the run seed in four-week blocks so
+  they do not flicker and two players in a seed see the same yard. `buyShip` takes a `price` now,
+  clamped to at most the board price.
+- **Negotiation.** Two asks per hull, odds off the player's traits/personality/origin
+  (`haggler` +0.34 is the big one), 3–8 % off on a win, and pushing a broker who has already moved
+  costs 4 % of what you took. The rail's price updates and the badge turns green.
+- **The broker has a face.** `assets/faces/*.jpg` — nine portraits generated on the mflux queue by
+  `tools/faces.mjs`, four of them yard brokers picked per run. The lenders use theirs in Banking.
+- The turntable framing is derived from the **sweep radius**, not the hull length: it turns about
+  the group origin, so aiming at the bounding box centre swings the nose off the edge every time it
+  comes round broadside. `showcaseLighting()` is the hero_hull rig — the room's own rig is tuned for
+  an interior three metres across and rendered a hull at arm's length as a flat orange plank.
+
+## 6. The applications look like applications
+
+- **Banking** — a balance, a credit-line meter, in/out/net tiles, fourteen weeks of takings against
+  outgoings as paired bars, a where-it-went split, and the lenders as cards with their portraits.
+- **Identity** — a licence card with a monogram, a licence number and a seal; traits as noted
+  entries; standing and regulator interest as gauges with the investigation threshold marked.
+- **Quarters** — a property board. Every tier's floor is drawn **to scale** with the glass marked on
+  the window wall, beside the dimensions, the upkeep and a Take it CTA. A price beside a name told
+  the player nothing about what they were buying.
+- **Contracts** — no longer a dead end. What is running, and who is watching: Ryland's requirement
+  against your filament at Ledger as a meter, and Harrow behind it. **The tile is unlocked now** —
+  the screen is informative with no hull, which is exactly when a player wants to read it.
+
+## Balance
+
+`sim.mjs --yardcut=<f>` models the yard discount as one multiplier on every hull the stand-in buys —
+the only way the harness can see a change that happens entirely in the UI. The live average is about
+9 % (42 % of hulls × ~15 %, plus the haggle).
+
+At `--yardcut=0.91`, **base and all three origins pass every target.** The moves are small and in
+the expected direction: median share at w20 24.8 → 25.3, careful bust 3.5 → 2.0, careless bust
+23.0 → 28.5, illegal taken 17.4 → 25.2 (more cash reaches the cartel's cost gate, which is more
+content reach, not a failure). **No content numbers were changed.**
+
+Every scenario still renders inside the perf gate at 844×390 dpr 1 — the worst is `belt_work` at
+135 calls / 299k tris.
+
+## Gotchas — session 17
+
+112. **An orbit rig whose centre is across the room is a body slide.** Ten degrees of drag is most
+     of a metre of translation. If a look-around "goes through the wall", look at the target
+     distance before you touch the leash.
+113. **Which way a drag has to move `theta` depends on where the orbit centre is.** Both signs are
+     "content follows the finger"; they just disagree about which one that is.
+114. **A vertical fov is the wrong thing to author a mobile framing in.** Portrait is 0.46 wide for
+     1 tall, so the horizontal angle is the one the content has to fit into. `fovForH` derives the
+     other one per device.
+115. **`#ui` is a stacking context at z-25.** Nothing inside it can draw over the terminal at z-60
+     no matter what z-index it carries. Anything that must be visible everywhere hangs off `body`.
+116. **A fullscreen overlay eats gestures even when it is invisible.** `.t-frame` had
+     `pointer-events: none` and `opacity: 0`, but `#terminal` itself did not — and `#terminal` is
+     `inset: 0`. Two "the drag does nothing" hunts came from this.
+117. **`createRng` seeds built from `id.length` collide.** `kite` and `ossa` are both four
+     characters and drew identical yard offers. Use `hashSeed(id)`.
+118. **A turntable frames on its sweep radius, not its subject's bounding box.** The group turns
+     about its origin; the box centre is somewhere else, and the difference is the nose leaving the
+     frame twice a revolution.
+119. **`tapSel` will happily tap a `display: none` element at (0, 0).** `getBoundingClientRect` on a
+     hidden element is all zeros, which passes the on-screen check. A "the button did nothing" run
+     is worth checking against the screenshot before debugging the handler.
+
+## What is deliberately NOT done
+
+- **The §15c share-recompute bug is still untouched** — every rival-suppression op is still a no-op.
+  It needs its own session and invalidates the balance pass.
+- **The company panels were left alone.** Aaron's "most are just a list" was about the terminal's
+  own applications; Market, Holdings, Refinery, Tactics and Dossier already carry cards, bars and
+  meters. If he means those too, they are the next round.
+- **Order lead times are all one week.** `balance.tick.orderLead` exists so a hull can take longer
+  than a loan draw, but anything above 1 is a real balance change and the harness would have to
+  model it.
+- **The ship kit is still the ship kit.** The yard's lighting is the best rig it has; the hull's own
+  surface work is a v0.2 item, as recorded in Phase 1.
+
+---
+
+## Session 18 (2026-08-11) — three-way peer review of Session 17
+
+Three reviewers over disjoint file sets: clock/nav/HUD, yard/3D, terminal/sim. Everything below
+was found and fixed after Session 17 shipped, so §17's own claims were not all true as written.
+
+### The three that mattered
+
+1. **`nav.drop()` could swallow the end card.** It shortened the stack and called `history.go(-n)`
+   synchronously, so a `push` in the same turn landed on an entry the pending traversal then walked
+   straight off. `hud.react`'s end-of-run path is exactly that shape (`closeAll()` then
+   `open('gameover')`). Proved with a CDP probe: old code ended on `{"panel":"","path":["system"]}`,
+   new on `{"panel":"holdings","path":["system","panel"]}`. Fixed with `nav.rewind(n)`, which books
+   the steps and issues **one** `history.go` per task, clamped to `history.state.mono`.
+2. **`buyShip` accepted a non-finite price.** `Math.round(NaN)` survived every clamp, `cash < NaN`
+   is false so the affordability guard passed, and `cash -= NaN` poisoned the run. Now
+   `Number.isFinite` with the board price as the fallback. Behaviour-neutral: the 500-run figures
+   reproduce §17 exactly.
+3. **A finger on the screen during a camera move left the awaiting promise unsettled forever.**
+   Four sites did `this.tween = null` (`down`, `wheel`, `flyBy`, `stopFly`). Touch the screen during
+   the 760 ms walk-in and `terminal.open()`'s `arrive.then` never runs — **the terminal never
+   appears**. All four now go through `dropTween()`, which settles with `{cut:true}`.
+
+### The rest
+
+- **Every swipe on the yard rail leaked a merged hull geometry.** `World.clear()` empties
+  `object3D` without disposing; `setSubject` is the path that disposes. `clear()` had no other
+  caller and has been deleted rather than fixed.
+- **`deals` survived `sim.reset()`** — a new run inherited every price the previous run had talked
+  the broker down to, since game-over → new game does not reload the page. The offer cache was
+  keyed on block alone, so a new seed at week 0 also reused the old run's offers; now `seed:block`.
+- **A pinch on the hull whose second finger clipped the rail silently paged the board** (guarded on
+  `e.isPrimary`), and any finger lifting ended the swipe (now tracks its `pointerId`).
+- **The yard never re-framed on orientation change** — `quarters.resize()` bails while
+  `in-terminal` is on the body, which it always is behind the yard. It has its own `wireResize()`.
+- **The callout timer used `1/60` per frame**, so on a 120 Hz phone every label held 1.7 s instead
+  of the documented 3.4. Real elapsed time now, from `Y.calloutTiming`.
+- **`asked.flags` was computed and thrown away**, making every `{said:'hard'}` variant unreachable.
+- **The property board's floor plans were not to scale** despite §6 claiming they were: width was a
+  % of the plan column, height a % of a row sized by the text beside it. `aspect-ratio` now.
+- **`.ap-bar { overflow: hidden }` clipped the investigation-threshold marker** to a sliver.
+- **The clock zeroed its accumulator on hold**, so closing a panel restarted the week rather than
+  resuming it and snapped every hull in transit back to the start of its leg.
+- Deduplicated `spendable()` (two byte-identical copies) onto `sim.spendable()`; `npcSay`'s
+  hardcoded `voiced: false` meant a SHOUTS player did not shout at the broker — the player's own
+  asks go through the new `playerSay()`; the gender label moved into `content/traits.js` as
+  `filed`; `--yardcut=0` was swallowed by a `|| 1`; `tools/faces.mjs` had hit gotcha 117 again
+  (seven of nine portraits sharing a seed off `id.length`); ~55 dead lines of `.t-*` CSS removed.
+
+### Gotchas
+
+120. **`node --check foo.js` silently passes on broken ESM under Node 24.** The file must be `.mjs`
+     or the check is worthless. Copy to a scratch `.mjs` before checking.
+121. **`node sim.mjs 200` is below the resolution of the bust-split targets** — careless bust swings
+     ±3pp and reports ~17.5% against a 20% floor. `targets.runs` is 500 for a reason; never
+     conclude a regression from the 200-run smoke test.
+122. **A `history.go()` per stack entry is not the same as one `history.go(-n)`.** Browsers may
+     coalesce back-to-back traversals, leaving history shallower than the stack. Book the steps and
+     issue one call per task.
+123. **`World.clear()` was the only caller-facing method that leaked.** If a new stage-borrowing
+     screen needs to hand the frame back, `setSubject(null)` is the disposing path.
+
+### Deliberately not fixed (open questions)
+
+- **A negotiated price never expires.** Haggle in week 0 under a 20% sale, come back at week 8 when
+  the sale is gone, and the deal still stands — offers refresh every 4 weeks but `priceFor`
+  short-circuits on `deals`. Expiring it at the end of its offer block, or storing a *cut* rather
+  than an absolute price, is a balance change.
+- **`hardWin: +0.18` makes the second ask likelier than the first**, and it is allowed after the
+  first one won, so asking twice is always correct. `tries` caps it at 2 per hull.
+- **`buyShip` has no price floor** — zero mints a free hull. No caller can produce one; it is a
+  console-tamper surface only.
+- **Queued-but-uncommitted orders are lost on reload** — `save.js` persists `sim.state`, and
+  `view.pending` is UI-side. Flushing on `pagehide` would fix it, but that is new behaviour.
+- **Two of the four lenders speak in the wrong voice.** Pell (family trust) and Sabe (credit union,
+  `spacer` register) both get Adjunct Merrow's formal lines. Needs `halloway_first` and
+  `kestrel_first` conversations and a `conv` field per npc — new content, not a repair.
+- **`quarters.leave()`'s `nav.drop('room')` discards entries above `room` without running their
+  exits.** Unreachable today; a loaded gun for the next screen that nests there.
+- **`fovForH` clamps at 78° and in portrait the clamp bites** — an `hfov` of 46 at aspect 0.46
+  delivers ~41. The measured framing was signed off, so the fit in `roomShots` is silently
+  overridden in portrait. Worth knowing before authoring a new framing.
+
+---
+
+## Session 18b — limited-time sales
+
+Aaron's call after the review: a negotiated price must expire, because no salesperson gives a
+forever discount. **The countdown runs in game days, not real seconds** — he was explicit that
+reading must never cost you anything, which is the same rule §17's clock is built on.
+
+### The model
+
+One tick is a week, so a window quoted in days burns **seven at a time**. That makes a window of
+under a day mean exactly one thing: it does not survive the next tick, whenever the player chooses
+to take it. That is why the deep cuts are quoted in hours — the number is flavour, the rule is one
+tick.
+
+Windows are drawn from the band the cut falls in (`content/yard.js`), and the rule is the same for
+the board and for the desk: **the deeper the discount the shorter it stands.**
+
+| Cut | Board sale | A price you talked them into |
+|---|---|---|
+| ≤10% | 13–20 days | 6–9 days |
+| ≤15% | 5–9 days | 3–4 days (≤7%) |
+| deeper | 0.4–1.4 days | 0.5–1.0 days |
+
+The deal's band is chosen on **how far under the board price it ends up in total**, not on the one
+concession — so a second win stacked on a first is a price they hold for even less time.
+
+Offers still roll once per block off the run seed (so two players in the same seed see the same
+yard), but each now runs its own window from the block start and can be off the board long before
+the block turns over. `offerFor(id)` and `dealFor(id)` are the only readers; an expired window is
+simply not there rather than something every call site has to remember to check.
+
+### What the player sees
+
+A `.y-clock` chip under the price, hot at ≤2 days with a pulsing dot. The broker states the window
+when they quote it and when they agree it, and says so when it runs out — `yard_lapsed` for a
+price the player sat on, `yard_gone` for the board taking its sale back. Verified end to end by
+`node tools/front.mjs --flow=sale`: a two-push haggle to 21% under board bought *"Yours for 20
+hours"*, and three weeks later Hask opened with *"You had my number on the Kite-class Hauler and
+you sat on it. It's 18,000 cr again."*
+
+The voice tables roughly doubled — `yard_pitch` 4→11, `yard_deal` 3→7, `yard_firm` 1→5, plus the
+two new tables. `{hold}` is the new token and carries the window in words.
+
+### Balance
+
+`--yardcut` models the average discount that actually survives to a purchase. Expiry can only make
+that shallower, so the band that matters is 0.91 → 1.00, and **all three points pass**: 0.91
+(§17's figure), 0.96 and 1.00 are ALL TARGETS MET at 500 runs. No content numbers moved.
+
+### Gotchas
+
+124. **`tools/voicecheck.mjs` only ever swept `content.voice.conversations`.** Every sales-floor
+     table belongs to no conversation — they are reached through `npcSay`/`playerSay` — so they had
+     no coverage beyond "has a fallback". It now sweeps them too: 41,040 resolutions across every
+     broker × origin × gender × personality × trait set × flag shape.
+125. **A table authored most-specific-last never fires the specific line.** `pickVariant` is
+     first-match-wins, so `{said:'first', origin:'gutter'}` has to come *above* the bare
+     `{said:'first'}`. Caught in review, not by the sweep — the sweep only proves something
+     resolves, not that the right thing did.
+126. **Ticking more than a dozen weeks in a test flow crosses a quarter** and the results sheet
+     covers whatever you were looking at. `--flow=sale` ticks 3.
+
+### Open
+
+- **Asks do not reset when a deal lapses.** `tries` is 2 per hull per run, full stop, so letting a
+  price run out costs it permanently. That is the pressure working as intended, but it is the one
+  number here most likely to feel harsh in play — if it does, restoring a single ask on lapse is
+  the gentler version. Resetting both would make the discount farmable: the roll is seeded on the
+  week, so a patient player could re-ask until they got the deep cut.
+- `hardWin: +0.18` still makes the second ask likelier than the first (§18). Untouched.
+
+---
+
+## Session 18c — the ruling is read aloud
+
+Aaron put the cold open through Suno and came back with `Findings of Fact.mp3`: the whole Alliance
+ruling as spoken word over an orchestral bed. It is in the repo at `assets/audio/verdict.mp3` and
+the cold open now runs off it.
+
+### What the file changed
+
+It runs **2:17.8**, against the 49.4-second sequence that existed to be read in silence. Nearly
+three times as long, and it arrived with a **sixteen-second instrumental break** at 104.05 s that
+nothing in the brief asked for. Retiming was not a matter of stretching eleven beats:
+
+- **Twenty-two beats over the same eight camera framings.** A caption that was fine held for 5 s
+  is not fine held for 17 s, so the long ones were split — the docket into four cards, each finding
+  into two, the sentence into three. Nothing was rewritten; the prose is the same prose, cut where
+  the voice already pauses.
+- **A beat with no `shot` holds the move it is standing in.** That is what keeps eight framings
+  under twenty-two captions: `span()` in `js/ui/verdict.js` gives a camera key exactly as long as
+  the run of captions it is under, in whichever clock is running. Authoring `ms` on a shot is now
+  reserved for forcing a cut (`0`) or a punch faster than its own beat (`guilty`, 900).
+- **The break became the reveal.** The one hard cut in the sequence is bolted to the one musical
+  event in the track. At 104.05 s the arrangement comes in 12 dB on a single frame, the fleet is
+  thrown away, and the Reach is revealed with **nothing written over it** for fifteen seconds while
+  the camera makes one long move from 2,110 units out down to 1,090.
+
+### Two clocks, and only one of them ever runs
+
+Every beat carries `at` (seconds into the recording) **and** `ms` (how long it holds in silence).
+They are not derived from one another and must be edited together. Silence is not a degraded mode —
+it is the sequence that shipped before there was a voice, and it is what a muted tab, a failed
+fetch, a refused autoplay and `?mute=1` all get. The silent cut runs 66 s.
+
+With sound, **the file is the clock and nothing else keeps time.** Beats are never scheduled ahead;
+`follow()` compares `currentTime` against the next beat's `at` every frame. A decode stall, a
+scrub and a backgrounded tab all move the audio and the captions together because there is nothing
+to come apart. A tap seeks the recording rather than paging the text past it.
+
+### The gate
+
+Browsers will not make a sound until somebody has touched the page, so there is now one card before
+the ruling — title, what it is, how long it runs, and a "Read it in silence" out. It is the only
+thing in the front of the game that asks to be clicked and it earns that by also being the title
+card. `?mute=1` walks straight past it.
+
+It does **not** use the play-then-pause unlock trick. It starts the track for real and leaves it
+running, and `verdict.play()` adopts whatever is already going — a pause scheduled inside the
+gesture would race the `play()` that arrives a few hundred milliseconds later behind the card's
+fade, and whichever landed second would win. Running it straight through has no race, and the bars
+come up under the fade instead of after it.
+
+### Gotchas
+
+127. **Suno output cannot be timed by silence detection.** There is a bed under the voice, so
+     `ffmpeg silencedetect` finds one gap in a two-minute file. Energy thresholding alone fails
+     too — the bed sits ~10 dB under the voice and changes level between sections.
+128. **Whisper gets the words right and the clock wrong.** `mlx-whisper` never mis-ordered a line
+     across the whole track, and its starts run 0.3–0.9 s early with outliers past 1.5 s. Use it
+     for *what and in what order*, an RMS envelope over 50 ms hops for *where*.
+129. **Early is the correct direction to be wrong in.** A caption after its line reads as a bug; a
+     caption a third of a second before it reads as a record being followed. Whisper's early starts
+     are used as authored. Only `guilty` was pushed back to the measured onset (80.6, not 80.06) —
+     a stamp has to hit *on* the word.
+130. **`-map 0:a` is not optional when re-encoding Suno output.** It embeds cover art, and without
+     the map ffmpeg processes the picture stream and `volumedetect` reports `n_samples: 0`. The
+     re-encode itself does not move the timeline: cross-correlating the envelopes before and after
+     gives lag 0.00 s. 3.25 MB → 758 kB at mono 32 kHz `-q:a 8`.
+131. **`--flow=coldopen` used to sample by sleeping each beat's own `ms`** and slid a beat behind
+     every time the captions got shorter — four CDP round-trips and a PNG cost more than a 1.4 s
+     card. It now watches the stage `key` and shoots on change, and warns if it did not reach all
+     22 beats.
+132. **`tools/front.mjs --flow=coldopen --sound` is the regression test for the beat map.** It
+     lifts Chrome's autoplay policy, taps the gate, and prints each caption's authored second
+     against the second it was actually heard at. Worst slip today: **0.10 s**. Headless has no
+     speakers but it does decode, and `currentTime` runs in real time, which is all the sequence
+     needs.
+133. **Two front.mjs runs back to back can collide** — `PORT`/`CDP_PORT` are derived from the pid
+     and the second Chrome can race the first's shutdown. It shows up as `timed out waiting for
+     window.__mono`. Put a few seconds between them.
+
+### Open
+
+- **`?mute=1` is the tooling's door, not a player's.** There is no in-game mute, no volume, and no
+  memory of either — the gate's "Read it in silence" is a one-shot choice at the door. If sound
+  goes anywhere beyond this one file, that needs solving first.
+- **No audio system.** One `Audio` element playing one file against a fixed beat list is all there
+  is. The music beds in `AUDIO.md` need a mixer, crossfades, a volume control and a remembered
+  mute; that is its own session. Do not bolt a second element onto `verdict.js`.
+- **The gate is the first thing a new player sees and it has never been on a phone.** It reads at
+  390×844 in headless.
+- `assets/audio/verdict.mp3` is 758 kB, which is two thirds of everything else the game ships. It
+  is fetched only on a fresh run and only when the gate is shown, but it is fetched before the tap.

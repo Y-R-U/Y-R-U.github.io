@@ -164,8 +164,11 @@ body.shotmode #intro { display: none !important; }
 }
 
 /* Inside a sheet the target is a real control with its own styling, so the mark is a ring round
-   it rather than a colour change — it has to read on a button that is already accent-filled. */
-#sheet .intro-coach {
+   it rather than a colour change — it has to read on a button that is already accent-filled. The
+   room's own buttons and the terminal's tiles take the same treatment. */
+#sheet .intro-coach,
+#roomnav .intro-coach,
+#terminal .intro-coach {
   position: relative; animation: intro-ring 1.7s ease-in-out infinite;
   outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px;
 }

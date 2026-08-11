@@ -46,7 +46,6 @@ export class World {
     if (this.live && this.live.group === this.subject) this.live.update(dt);
   }
 
-  clear() { this.object3D.clear(); this.subject = null; }
 }
 
 // Materials are cached and shared by the kit; only the merged geometry is per-instance.
@@ -1241,6 +1240,30 @@ export class ReachScene {
     return o;
   }
 
+  // The convicted carrier's fleet, parked where the ruling's camera can walk up to it. Built on
+  // demand and thrown away at the reveal, so the live game never carries it — nothing but the
+  // cold open ever asks for it.
+  showMeridian() {
+    if (this.meridian) { this.meridian.visible = true; return this.meridian; }
+    const g = fleet('ranks', Array.from({ length: 15 }, (_, i) => ({
+      class: i % 5 === 4 ? 'escort' : 'hauler', palette: 'meridian', seed: i * 91 + 13,
+    })), { spacing: 1.9 });
+    const m = content.verdict.meridian;
+    g.position.set(...m.at);
+    g.rotation.set(0.04, m.face, 0.02);
+    g.name = 'meridian';
+    this.group.add(g);
+    this.meridian = g;
+    return g;
+  }
+
+  hideMeridian() {
+    if (!this.meridian) return;
+    this.group.remove(this.meridian);
+    disposeTree(this.meridian);
+    this.meridian = null;
+  }
+
   // The 3D never reads sim state. This is the whole seam: events in, geometry moves.
   react(events) { this.mover.apply(events); }
   seed(ships) { this.mover.seed(ships); }
@@ -1415,6 +1438,26 @@ export function reachLighting(q) {
   q.set('planetScatter', 1.3);
   q.set('flareSize', 24);
   q.set('bloomPower', 0.30);
+}
+
+// The ruling's own look. The ship kit's rim key is a point placed `rimDist` from the world origin
+// along the star's bearing, and it falls off exponentially past `rimNear` — tuned for hulls a
+// couple of hundred metres from Ledger. Meridian's fleet is four kilometres out, so on the live
+// numbers it gets no key at all and renders as flat black cut-outs. These three values move the
+// key out past the fleet and widen its falloff to swallow the whole formation.
+//
+// They are deliberately far outside the sliders' own min/max. `quality.set` applies what it is
+// given and only the panel UI reads the range, which is the one place in the engine where that
+// matters.
+export function verdictLighting(q) {
+  reachLighting(q);
+  q.set('rimDist', 9000);
+  q.set('rimNear', 12600);
+  q.set('rimFall', 3400);
+  q.set('rimPower', 2.6);
+  // enough haze between the ranks that the back row sits behind the front one
+  q.set('fogDensity', 0.00007);
+  q.set('fogTint', 0.75);
 }
 
 // ── fleet ────────────────────────────────────────────────────────────────────

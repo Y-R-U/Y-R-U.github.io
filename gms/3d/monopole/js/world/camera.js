@@ -111,15 +111,20 @@ export class CameraRig {
     while (to.theta - this.theta > Math.PI) to.theta -= Math.PI * 2;
     while (to.theta - this.theta < -Math.PI) to.theta += Math.PI * 2;
 
+    // Interrupting a move has to settle the one it replaces, or a caller awaiting the old
+    // destination hangs forever. `cut` says it never arrived — the intro reads it to tell a
+    // completed beat from one the player paged past.
+    //
+    // A cut needs this every bit as much as a move does: without it the tween it interrupted is
+    // still in `this.tween` and puts the camera straight back on the next frame, so the cut simply
+    // does not happen. That is what made the cold open's reveal land on the framing before it.
+    this.cancelMove();
+
     if (ms <= 0) {
       this.target.copy(to.target); this.dist = to.dist; this.phi = to.phi; this.theta = to.theta; this.fov = to.fov;
       this.copyWant(); this.place();
       return Promise.resolve(this);
     }
-    // Interrupting a move has to settle the one it replaces, or a caller awaiting the old
-    // destination hangs forever. `cut` says it never arrived — the intro reads it to tell a
-    // completed beat from one the player paged past.
-    this.cancelMove();
     return new Promise(resolve => {
       this.tween = {
         t0: performance.now(), ms, ease: EASE[ease] || EASE.inout, resolve,
@@ -136,7 +141,7 @@ export class CameraRig {
     const ts = keys.map((k, i) => (k.t === undefined ? i / (keys.length - 1) : k.t));
     const posCurve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
     const lookCurve = new THREE.CatmullRomCurve3(looks, false, 'catmullrom', 0.5);
-    this.tween = null;
+    this.dropTween();
     const handle = { stop: () => this.stopFly() };
     const p = new Promise(resolve => {
       this.fly = {
@@ -166,9 +171,16 @@ export class CameraRig {
   }
 
   cancelMove() {
+    this.fly = null;
+    return this.dropTween();
+  }
+
+  // A finger or a wheel takes the camera off a move, and that has to settle the move's promise for
+  // the same reason cancelMove does — a touch during the walk to the desk used to leave the
+  // terminal's `arrive.then` waiting on a tween nobody would ever finish.
+  dropTween() {
     const t = this.tween;
     this.tween = null;
-    this.fly = null;
     t?.resolve?.({ cut: true });
     return this;
   }
@@ -179,12 +191,57 @@ export class CameraRig {
     return this;
   }
 
+  // A leash on the orbit, for scenes that are a room rather than a system. Inside three metres of
+  // wall an unbounded drag is not a camera move, it is a hole in the set: a quarter turn puts the
+  // player's eye through the bulkhead and out into the station. `span` is how far either side of
+  // `theta`/`phi` a finger may go, and `recentre` is the per-second rate the framing eases back to
+  // the middle on once the finger lifts, which is what stops the room drifting off true over a
+  // session. Pass null for the star system, where the whole point is that you can go anywhere.
+  setLimit(l) {
+    this.limit = l || null;
+    if (l) this.clampWant();
+    return this;
+  }
+
+  // Put the orbit centre a short way in front of the eye without moving the eye. An orbit whose
+  // centre is across the room is a body slide — a ten-degree drag walks the camera the better part
+  // of a metre sideways and out through the wall — and that is not what looking around a room is.
+  // With the centre on the bridge of the nose the same drag is a head turn, which is why the room
+  // sets this on arrival and the star system never does.
+  pivotAt(d) {
+    const dir = this._v.subVectors(this.target, this.cam.position);
+    if (dir.lengthSq() < 1e-9) return this;
+    this.target.copy(this.cam.position).addScaledVector(dir.normalize(), d);
+    this.dist = d;
+    this.copyWant();
+    this.place();
+    return this;
+  }
+
+  // Framings are authored as a horizontal angle because that is the one the content has to fit
+  // into: a phone held upright is about 0.46 wide for 1 tall, so a vertical fov that frames a room
+  // in landscape crops most of it away in portrait.
+  fovForH(hfov) {
+    const a = this.cam.aspect || 1;
+    const v = 2 * Math.atan(Math.tan(hfov * Math.PI / 360) / a) * 180 / Math.PI;
+    return clamp(v, 24, 78);
+  }
+
+  clampWant() {
+    const L = this.limit;
+    if (!L) return;
+    this.want.theta = clamp(this.want.theta, L.theta - L.spanTheta, L.theta + L.spanTheta);
+    this.want.phi = clamp(this.want.phi,
+      Math.max(PHI_EPS, L.phi - L.spanPhi), Math.min(Math.PI - PHI_EPS, L.phi + L.spanPhi));
+    this.want.dist = clamp(this.want.dist, L.distMin ?? this.opt.distMin, L.distMax ?? this.opt.distMax);
+  }
+
   // Cutting a fly-by short has to settle its promise, or whatever was waiting on the fly to
   // finish never runs — that is how skipping the cold open used to leave the camera locked.
   stopFly() {
     const f = this.fly;
     this.fly = null;
-    this.tween = null;
+    this.dropTween();
     this.syncFromCamera(this.dist);
     if (this.homePending) this.markHome();
     f?.resolve?.(this);
@@ -265,7 +322,7 @@ export class CameraRig {
         this.gesture.pinch0 = this.spread();
         this.gesture.dist0 = this.want.dist;
       }
-      this.tween = null;
+      this.dropTween();
     };
 
     const move = e => {
@@ -280,6 +337,7 @@ export class CameraRig {
         const s = this.spread();
         if (s > 4 && g.pinch0 > 4) {
           this.want.dist = clamp(g.dist0 * Math.pow(g.pinch0 / s, this.opt.pinchSpeed), this.opt.distMin, this.opt.distMax);
+          this.clampWant();
         }
         return;
       }
@@ -290,8 +348,13 @@ export class CameraRig {
         g.mode = 'orbit';
       }
       const k = this.opt.orbitSpeed * (this.fov / 45);
-      this.want.theta -= dx * k;
+      // The scene has to follow the finger, and which sign does that depends on where the orbit
+      // centre is. Around a hull the camera swings and the hull stays put, so dragging left has to
+      // carry the camera right. Around your own head the whole view turns instead, and the same
+      // sign sends the room the other way — `invertX` is set by the framings that pivot on the eye.
+      this.want.theta += (this.limit?.invertX ? dx : -dx) * k;
       this.want.phi = clamp(this.want.phi + dy * k * (this.opt.invertY ? -1 : 1), PHI_EPS, Math.PI - PHI_EPS);
+      this.clampWant();
     };
 
     const up = e => {
@@ -315,7 +378,7 @@ export class CameraRig {
     el.addEventListener('wheel', e => {
       if (!this.active || !this.touch) return;
       e.preventDefault();
-      this.tween = null;
+      this.dropTween();
       this.want.dist = clamp(this.want.dist * (1 + Math.sign(e.deltaY) * 0.12), this.opt.distMin, this.opt.distMax);
     }, { passive: false });
   }
@@ -373,6 +436,13 @@ export class CameraRig {
       this.place();
       if (u >= 1) { const r = t.resolve; this.tween = null; r?.(this); }
       return;
+    }
+
+    // a limited scene walks its own framing back to the middle once the hand is off it
+    if (this.limit && !this.gesture) {
+      const r = 1 - Math.exp(-this.limit.recentre * Math.max(0.001, dt));
+      this.want.theta += (this.limit.theta - this.want.theta) * r;
+      this.want.phi += (this.limit.phi - this.want.phi) * r;
     }
 
     const a = 1 - Math.exp(-this.opt.damp * Math.max(0.001, dt));
@@ -459,6 +529,13 @@ export const camera = {
   snapshot() { return camera.rig?.snapshot() || null; },
   goTo(h, ms) { return camera.rig ? camera.rig.goTo(h, ms) : Promise.resolve(); },
   setTouchEnabled(on) { camera.rig?.setTouchEnabled(on); return camera; },
+  setLimit(l) { camera.rig?.setLimit(l); return camera; },
+  pivotAt(d) { camera.rig?.pivotAt(d); return camera; },
+  fovForH(hfov) {
+    if (camera.rig) return camera.rig.fovForH(hfov);
+    const a = (globalThis.innerWidth || 1) / (globalThis.innerHeight || 1);
+    return clamp(2 * Math.atan(Math.tan(hfov * Math.PI / 360) / a) * 180 / Math.PI, 24, 78);
+  },
   setFrom(pos, look, fov) { camera.rig?.setFrom(pos, look, fov); return camera; },
   onTap(fn) { if (camera.rig) camera.rig.onTap = fn; return camera; },
 };

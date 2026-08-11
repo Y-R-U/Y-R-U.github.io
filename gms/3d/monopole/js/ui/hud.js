@@ -46,20 +46,28 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
 <div id="sharebar"><i class="you"></i><i class="them"></i><i class="other"></i></div>
 
 <div id="feed">
+  <button id="clocknote" type="button"><em>▸▸</em><b></b><s></s></button>
   <div id="ticker"><span></span></div>
 </div>
 
 <div id="controls">
-  ${onFocus ? `<button class="hud-focus" data-hud-focus aria-label="Recentre">${icon('focus')}</button>` : ''}
-  ${onQuarters ? `<button class="hud-focus" data-hud-quarters aria-label="Your quarters">${icon('quarters')}</button>` : ''}
+  ${onFocus ? `<button class="hud-focus" data-hud-focus aria-label="Recentre on Ledger">${icon('focus')}<s>Centre</s></button>` : ''}
+  ${onQuarters ? `<button class="hud-focus" data-hud-quarters aria-label="Your quarters">${icon('quarters')}<s>Room</s></button>` : ''}
   <div id="speed" role="group" aria-label="Speed">
     ${speeds.map(v => `<button data-speed="${v}" aria-label="${v ? v + ' times' : 'Pause'}">${v ? '×' + v : '❙❙'}</button>`).join('')}
+    <button data-skip aria-label="Skip ahead">▸▸</button>
   </div>
 </div>
 
 <nav id="dock">
   ${DOCK.map(([id, label]) => `<button data-hud="${id}">${icon(id)}<s>${label}</s></button>`).join('')}
 </nav>`;
+
+  // #ui is a stacking context at z-25, so anything inside it loses to the terminal at z-60 no
+  // matter what z-index it carries. The fast-forward has to be visible from the desk — that is
+  // exactly where orders are placed — so it hangs off the body instead.
+  const ffbar = document.getElementById('ffbar') || document.body.appendChild(
+    Object.assign(document.createElement('div'), { id: 'ffbar', innerHTML: '<b></b><s></s><i></i>' }));
 
   const el = {
     cash: root.querySelector('.hud-cash em'),
@@ -74,7 +82,10 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
     tickline: root.querySelector('#tickline i'),
     speed: root.querySelector('#speed'),
     dock: root.querySelector('#dock'),
+    ff: ffbar,
+    note: root.querySelector('#clocknote'),
   };
+  let clock = null;
 
   el.feed.addEventListener('click', () => { for (const r of el.feed.querySelectorAll('.feed-row')) retire(r, 0); });
 
@@ -88,6 +99,10 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
     }
     if (e.target.closest('[data-hud-focus]')) return onFocus?.();
     if (e.target.closest('[data-hud-quarters]')) return onQuarters?.();
+    if (e.target.closest('[data-skip]') || e.target.closest('#clocknote')) {
+      if (sim.speed <= 0) sim.setSpeed(1);
+      return clock?.skip();
+    }
     const s = e.target.closest('[data-speed]');
     if (s) sim.setSpeed(+s.dataset.speed);
   });
@@ -132,6 +147,38 @@ export function buildHud(liveSim, { root = document.getElementById('ui'), onFocu
 
     // 0..1 through the current week. Component 12's clock drives this.
     setTickProgress(f) { el.tickline.style.width = (Math.max(0, Math.min(1, f)) * 100).toFixed(2) + '%'; },
+
+    attachClock(c) { clock = c; hud.setClock(c, 0); },
+
+    // Why the clock is or is not moving, said out loud. The old build ran a free timer and a
+    // quarter of a year could go by while the player read one screen; now the reason is on the
+    // glass and the same tap always does the useful thing.
+    setClock(c, f = 0) {
+      hud.setTickProgress(c.ff ? 1 - c.ff.left / Math.max(1, c.ff.of) : f);
+      const ff = c.ff;
+      el.ff.classList.toggle('on', !!ff);
+      if (ff) {
+        el.ff.querySelector('b').textContent = ff.label;
+        el.ff.querySelector('s').textContent = ff.left > 1 ? `${ff.left} weeks` : 'one week';
+        el.ff.querySelector('i').style.width = `${(1 - ff.left / Math.max(1, ff.of)) * 100}%`;
+        el.note.classList.remove('on');
+        return;
+      }
+      const why = c.holding;
+      const w = sim.work();
+      const say = {
+        idle: w.why === 'nofleet'
+          ? ['Nothing is under way', 'Buy a hull — the clock waits for you']
+          : ['Nothing is under way', 'Your fleet is idle at the dock'],
+        paused: ['The clock is stopped', 'Tap to move a week on'],
+      }[why];
+      el.note.classList.toggle('on', !!say);
+      el.speed.classList.toggle('held', !!say);
+      if (say) {
+        el.note.querySelector('b').textContent = say[0];
+        el.note.querySelector('s').textContent = say[1];
+      }
+    },
 
     ticker(text, ms = 5200) {
       el.tickerText.textContent = text;

@@ -19,8 +19,6 @@ export function createSimView({ seed = 1, state = null, origin = null } = {}) {
     pending: [],
     speed: 0,
     held: null,
-    speeds: content.balance.tick.speeds,
-    tickSeconds: content.balance.tick.tickSeconds,
     rng: createRng(seed),
     content,
 
@@ -104,6 +102,41 @@ export function createSimView({ seed = 1, state = null, origin = null } = {}) {
       view.events = [];
       view.emit('reset', view.state);
       return view.state;
+    },
+
+    // cash minus everything already queued this week, so two purchases cannot be committed against
+    // the same credits and silently dropped when the tick applies them
+    spendable() {
+      let spent = 0;
+      for (const a of view.pending) {
+        if (a.type === 'buyShip') spent += a.price ?? content.get('ship', a.class)?.cost ?? 0;
+        if (a.type === 'buyQuarters') spent += content.get('quarters', a.tier)?.cost || 0;
+        if (a.type === 'repay') spent += a.amount || 0;
+      }
+      return view.state.cash - spent;
+    },
+
+    // What the clock is waiting on. Weeks are spent on travel and on orders that take time, so
+    // this is the whole test for whether the clock has any business running.
+    work() {
+      const st = view.state;
+      let flying = 0, holding = 0, next = Infinity;
+      for (const s of st.ships) {
+        if (s.laidUp > 0) continue;
+        if (s.leg) { flying++; next = Math.min(next, s.eta); }
+        else if (s.route && s.route.length > 1) holding++;
+      }
+      const refining = Object.values(st.sites).some(site => site.owner === 'player'
+        && (site.modules || []).some(m => {
+          const cv = content.get('module', m)?.converts;
+          return cv && (site.stock[cv.from] || 0) > 0.5;
+        }));
+      const busy = flying + holding + (refining ? 1 : 0) > 0;
+      return {
+        busy, flying, holding, refining,
+        next: next === Infinity ? null : next,
+        why: busy ? null : st.ships.length ? 'fleet' : 'nofleet',
+      };
     },
 
     // Derived reads the panels want and should not each re-derive.

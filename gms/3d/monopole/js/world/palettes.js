@@ -15,6 +15,15 @@ const FACTIONS = {
     glass: '#0a1219', beam: '#7fd8f0', engine: '#8fd6ff',
     metal: 0.9, rough: 0.38,
   },
+  // The convicted carrier. Sixty-one years of paint: pale bone hulls gone grey, and a cold white
+  // running light rather than a company colour — it never had to advertise.
+  meridian: {
+    id: 'meridian', name: 'The Meridian Combine',
+    hull: '#8b8880', hullDark: '#33322f', panel: '#6f6d67', trim: '#8d7c4e',
+    accent: '#e8d8a8', strip: '#d8c894', window: '#f0e6cc',
+    glass: '#12130f', beam: '#f0e0b0', engine: '#eae2d0',
+    metal: 0.82, rough: 0.52,
+  },
   // Neutral rock/ice, so the belt kit does not have to belong to a company.
   reach: {
     id: 'reach', name: 'Kestrel Reach',

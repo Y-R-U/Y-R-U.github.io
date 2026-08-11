@@ -18,6 +18,7 @@ import voiceData from '../../content/voice.js';
 import nameData from '../../content/names.js';
 import verdictData from '../../content/verdict.js';
 import quartersList from '../../content/quarters.js';
+import yardData from '../../content/yard.js';
 
 function deepFreeze(v) {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -77,6 +78,7 @@ export const content = {
   balance: deepFreeze(balanceData),
   rival: deepFreeze({ options: rivalOptionList, profile: rivalProfile, scoring: rivalScoring }),
   voice: deepFreeze(voiceData),
+  yard: deepFreeze(yardData),
   names: deepFreeze(nameData),
   verdict: deepFreeze(verdictData),
   traitRules: deepFreeze({ MAX_TRAITS: traitData.MAX_TRAITS }),

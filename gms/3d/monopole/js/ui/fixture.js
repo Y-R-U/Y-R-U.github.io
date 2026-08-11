@@ -12,7 +12,11 @@ let cached = null;
 
 function policy(state) {
   const acts = [];
-  if (state.week === 0) {
+  // Nobody starts with a fleet any more, so the fixture has to go and buy one — without this it
+  // plays thirteen weeks with nothing flying, every panel draws an empty company, and Assign's
+  // fixture props reach into `ships[0]` and throw before the showroom can render it.
+  if (state.week === 0) return [{ type: 'buyShip', class: 'ossa' }, { type: 'buyShip', class: 'kite' }];
+  if (state.week === 1) {
     for (const sh of state.ships) {
       const def = content.get('ship', sh.class);
       acts.push({ type: 'route', ship: sh.id, legs: def.mine > 0 ? ['ledger', 'kestrel'] : ['ledger', 'ossian'] });
@@ -60,7 +64,7 @@ export function resetFixture() { cached = null; }
 
 // Per-panel props. A panel may override with its own `fixture(view, content)`.
 const PROPS = {
-  assign: v => ({ ship: (v.state.ships.find(s => v.shipDef(s).mine > 0) || v.state.ships[0]).id }),
+  assign: v => ({ ship: (v.state.ships.find(s => v.shipDef(s).mine > 0) || v.state.ships[0])?.id }),
   refinery: () => ({ site: 'ledger' }),
   market: () => ({ commodity: 'filament' }),
   quarterly: v => ({ event: v.last('quarter') }),

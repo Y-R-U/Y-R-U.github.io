@@ -309,7 +309,15 @@ function paintCoach(o) {
   let el = null;
   if (o && !ctx.sim.state.over) {
     const open = document.body.dataset.panel;
-    if (o.quartersStep || o.id === 'ship') el = document.querySelector('[data-hud-quarters]');
+    const body = document.body.classList;
+    // The mark has to ring something the player can actually see, and where that is depends on
+    // which of the three shells is up: the star system has the dock, the room has its own two
+    // buttons, and the terminal has the tile.
+    if (o.quartersStep || o.id === 'ship') {
+      el = body.contains('in-terminal') ? document.querySelector('#terminal [data-id="yard"]:not([disabled])')
+        : body.contains('in-quarters') ? document.querySelector('#roomnav [data-r="terminal"]')
+          : document.querySelector('[data-hud-quarters]');
+    } else if (body.contains('in-quarters') || body.contains('in-terminal')) el = null;
     else if (!open) el = o.dock ? document.querySelector(`#dock button[data-hud="${o.dock}"]`) : null;
     else if (open === o.dock) el = pickMark(o.mark);
   }

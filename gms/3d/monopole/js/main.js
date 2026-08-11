@@ -2,7 +2,7 @@ import { App } from './engine/app.js';
 import { Post } from './engine/post.js';
 import { Backdrop } from './world/backdrop.js';
 import { Lighting } from './world/lighting.js';
-import { World, ReachScene, introShots, reachLighting, registerBackdropScenarios, registerStationScenarios, registerPlanetScenarios, registerBeltScenarios, registerFleetScenarios } from './world/scene.js';
+import { World, ReachScene, introShots, reachLighting, verdictLighting, registerBackdropScenarios, registerStationScenarios, registerPlanetScenarios, registerBeltScenarios, registerFleetScenarios } from './world/scene.js';
 import { registerMaterialKnobs } from './world/materials.js';
 import { registerFxKnobs } from './world/fx.js';
 import { registerAtmosKnobs } from './world/atmos.js';
@@ -21,13 +21,18 @@ import content from './sim/content.js';
 import { createSimView } from './ui/simview.js';
 import { panels } from './ui/panels.js';
 import { buildHud } from './ui/hud.js';
+import { createClock } from './ui/clock.js';
 import { registerStoryEntries } from './ui/story.js';
 import { newRun } from './ui/storypool.js';
 import { intro } from './ui/intro.js';
 import { verdict } from './ui/verdict.js';
+import { gate } from './ui/gate.js';
 import { chooseOrigin } from './ui/origin.js';
 import { quarters } from './ui/quarters.js';
 import { terminal } from './ui/terminal.js';
+import { yard } from './ui/yard.js';
+import { roomnav } from './ui/roomnav.js';
+import { nav } from './ui/nav.js';
 import { inspect } from './ui/inspect.js';
 import './ui/screens.js';
 
@@ -82,37 +87,24 @@ const hud = buildHud(sim, {
   },
 });
 
-// ── the tick clock ───────────────────────────────────────────────────────────
-// One tick is one week. Speed only changes the wall-clock gap between whole ticks, so a run at ×4
-// resolves exactly the same as the same run at ×1 and a fast-forward can never desync.
-
-const clock = {
-  acc: 0,
-  update(dt) {
-    if (!reach) return;
-    const speed = sim.speed;
-    // Pausing is a navigation aid, not a stasis field: the background layer keeps its own time
-    // and only takes the speed as a hint about how busy the system should look.
-    reach.setAmbientRate(speed > 0 ? Math.min(2.2, 0.8 + speed * 0.35) : 1);
-    if (speed <= 0 || sim.over) { reach.setTickPhase(reach.phase || 0); return; }
-    const gap = sim.tickSeconds / speed;
-    clock.acc += dt;
-    // a backgrounded tab must not dump twenty weeks into one frame
-    let budget = 2;
-    while (clock.acc >= gap && budget-- > 0) { clock.acc -= gap; sim.tick(); }
-    if (clock.acc >= gap) clock.acc = 0;
-    const f = Math.max(0, Math.min(1, clock.acc / gap));
-    reach.setTickPhase(f);
-    hud.setTickProgress(f);
-  },
-};
+// One tick is one week, and a week only goes by when something is happening — see js/ui/clock.js.
+const clock = createClock({
+  sim,
+  scene: () => reach,
+  onState: (c, f) => { hud.setClock(c, f); },
+});
 app.add(clock);
+hud.attachClock(clock);
 
 // hud.react is already subscribed to the sim; this is the 3D's own subscription and nothing else
 // in here reads state.
 sim.on((kind, payload) => {
-  if (kind === 'tick') { reach?.react(payload.events); panels.refresh(); }
-  else if (kind === 'reset') { clock.acc = 0; reach?.seed(sim.state.ships); }
+  if (kind === 'tick') { reach?.react(payload.events); panels.refresh(); terminal.refresh(); }
+  else if (kind === 'reset') {
+    reach?.seed(sim.state.ships);
+    // a resumed save can be living somewhere else entirely, and the room is built once at boot
+    quarters.setTier(sim.state.quarters || 'dockbox');
+  }
 });
 
 // sweeping off a panel entry onto a scene must not leave the fixture sheet sitting over it
@@ -130,7 +122,8 @@ showroom.onAfterRun(() => {
 document.getElementById('sr-reset').onclick = () => { camera.setTouchEnabled(true); camera.resetView(); };
 
 Object.assign(window.__mono, {
-  world, backdrop, lighting, showroom, camera, sim, panels, hud,
+  world, backdrop, lighting, showroom, camera, sim, panels, hud, nav,
+  quarters, terminal, yard, verdict, verdictBeats: content.verdict.beats,
   reach: null,
   clock,
   scenarios: allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref })),
@@ -178,10 +171,12 @@ if (live) {
   app.add({ update: dt => { room.update(dt); updateShowcase(dt); } });
   quarters.attach({ app, camera, room, tierId: sim.state.quarters || 'dockbox', home: HOME });
   terminal.attach({ app, world, camera, sim });
+  yard.attach({ app, world, camera, sim, onLeave: () => nav.back() });
+  roomnav.attach({ onTerminal: () => terminal.open() });
 
   showroom.register({
     id: 'terminal_live', group: 'misc', label: 'The terminal', note: 'the fullscreen room terminal',
-    run: () => quarters.enter('terminal').then(() => terminal.open()),
+    run: () => quarters.enter().then(() => terminal.open()),
   });
 
   showroom.register({
@@ -190,12 +185,15 @@ if (live) {
   });
 
   // A tap identifies something; it does not commit the player to a panel. The card names it and
-  // offers the panel as one of its buttons. The terminal is checked first — ReachScene.siteAt
-  // knows nothing about it and would report the station behind it.
+  // offers the panel as one of its buttons. The two things in the room are checked first —
+  // ReachScene.siteAt knows nothing about either and would report the station behind them.
   inspect.attach({ sim, camera, reach });
   camera.onTap((hit, hits) => {
-    const term = hits?.find(h => h.object.userData?.terminal);
-    if (term && quarters.inside) return terminal.open();
+    if (quarters.inside) {
+      if (hits?.some(h => h.object.userData?.terminal)) return terminal.open();
+      if (hits?.some(h => h.object.userData?.window)) return roomnav.atWindow();
+      return;
+    }
     inspect.show(reach.siteAt(hit, hits));
   });
 
@@ -212,11 +210,17 @@ if (live) {
       // the ruling already did the framing the four cards used to do
       cards: !profile,
       begin: () => {
-        camera.cancelMove();
         camera.setTouchEnabled(true);
-        camera.markHome(HOME());
-        // the handover must not yank the camera out of anywhere the player has already gone
-        if (!quarters.inside) camera.resetView(1500);
+        // The handover must not yank the camera out of anywhere the player has already gone, and
+        // that now includes the room the front of the game hands over into — cancelling the move
+        // or re-homing on the system framing would both undo it mid-flight.
+        if (quarters.inside) {
+          quarters.applyLimits();
+        } else {
+          camera.cancelMove();
+          camera.markHome(HOME());
+          camera.resetView(1500);
+        }
         hud.ticker(sim.content.get('system', 'tamber').ticker, 9000);
         if (sim.speed === 0 && sim.week === 0) sim.setSpeed(1);
       },
@@ -228,11 +232,46 @@ if (live) {
   const front = params.get('front');
   const fresh = front === '1' || (front !== '0' && !hasSave());
 
+  // The ruling happens somewhere else. Ledger, Dray Yard and the belt stay dark for it, and what
+  // the camera walks up to instead is Meridian's own parked fleet — built for this and thrown away
+  // on the beat that names the Reach, which is why that beat is a hard cut. The switch back to the
+  // live lighting rides along: the ruling pushes the ship kit's rim key four kilometres out to
+  // reach the fleet at all, and the star system does not want it there.
+  let local = [];
+  let here = false;
+  // Split out of playRuling so the gate has something to stand on: the title card sits over the
+  // ruling's own first framing, four kilometres off the fleet, rather than over whatever the
+  // camera happened to be looking at while the scene built.
+  const armRuling = () => {
+    local = ['ledger', 'drayyard', 'kestrel'].map(id => reach.sites[id]).filter(Boolean);
+    here = false;
+    for (const o of local) o.visible = false;
+    reach.showMeridian();
+    verdictLighting(app.quality);
+    const first = content.verdict.beats[0].shot;
+    camera.setFrom(first.pos, first.look, first.fov);
+  };
+  const playRuling = (sound = false) => {
+    armRuling();
+    const reveal = () => {
+      if (here) return;
+      here = true;
+      reach.hideMeridian();
+      reachLighting(app.quality);
+      for (const o of local) o.visible = true;
+    };
+    return verdict.play({ camera, sound, onBeat: b => { if (b.here) reveal(); } }).finally(reveal);
+  };
+
   showroom.register({
     id: 'cold_open', group: 'misc', label: 'The verdict — cold open',
     note: 'the Alliance ruling that opened the Reach',
-    run: () => { camera.setTouchEnabled(false); verdict.play({ camera }).then(() => camera.setTouchEnabled(true)); },
+    run: () => { camera.setTouchEnabled(false); playRuling(true).then(() => camera.setTouchEnabled(true)); },
   });
+
+  // Back walks the chain the player walked in: a terminal screen, the terminal, the room, the
+  // system, and then a card offering to carry on rather than closing the game.
+  nav.start();
 
   if (!fresh) {
     const saved = readProfile();
@@ -240,25 +279,25 @@ if (live) {
     camera.setFrom(shots[0].pos, shots[0].look, shots[0].fov);
     startGame(saved);
   } else {
-    const first = content.verdict.beats[0].shot;
-    camera.setFrom(first.pos, first.look, first.fov);
     document.body.classList.add('front');
-    // The ruling happens somewhere else. Ledger, Dray Yard and the belt stay dark until the beat
-    // that names the Reach, which is what makes that line a reveal instead of a caption.
-    const local = ['ledger', 'drayyard', 'kestrel'].map(id => reach.sites[id]).filter(Boolean);
-    let here = false;
-    for (const o of local) o.visible = false;
-    const reveal = () => { if (!here) { here = true; for (const o of local) o.visible = true; } };
-
-    verdict.play({ camera, onBeat: b => { if (b.here) reveal(); } })
-      .finally(reveal)
+    // The ruling is read aloud, and a browser will not make a sound until somebody has touched the
+    // page — so the one card in the whole front of the game that asks to be tapped goes here, and
+    // `?mute=1` walks straight past it into the silent cut the tooling has always screenshotted.
+    const quiet = params.get('mute') === '1';
+    armRuling();
+    (quiet ? Promise.resolve(false) : gate.ask())
+      .then(sound => playRuling(sound))
       .then(() => chooseOrigin({ seed: sim.seed }))
       .then(profile => {
         sim.reset(sim.seed, { origin: profile.origin, profile });
         writeProfile(profile);
         reach.seed(sim.state.ships);
         document.body.classList.remove('front');
-        camera.moveTo({ ...shots[0], ms: 1400, ease: 'inout' });
+        // The ruling's last framing is a hundred metres off the dock the rented box is cut into,
+        // so going straight in from there is one continuous move rather than a cut. You end the
+        // front of the game standing in the room you live in, which is the thing the rest of it
+        // keeps sending you back to.
+        quarters.enter('enter', 2200);
         startGame(profile);
       });
   }

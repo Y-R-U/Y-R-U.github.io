@@ -99,11 +99,13 @@ body:not(.game) #feed { left: 10px; right: 54px; }
 
 /* ── bottom furniture ──────────────────────────────────────────────────── */
 
+/* left inset clears the showroom key, which shares this corner */
 #controls {
-  position: fixed; bottom: var(--dock); left: 8px; right: 8px; height: var(--ctrl); z-index: 26;
-  display: flex; align-items: center; justify-content: flex-end; gap: 8px; pointer-events: none;
+  position: fixed; bottom: var(--dock); left: 54px; right: 8px; height: var(--ctrl); z-index: 26;
+  display: flex; align-items: center; gap: 8px; pointer-events: none;
 }
 #controls > * { pointer-events: auto; }
+#speed { margin-left: auto; }
 #speed {
   display: flex; gap: 2px; padding: 3px; border-radius: 999px;
   background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -114,13 +116,72 @@ body:not(.game) #feed { left: 10px; right: 54px; }
   background: none; color: var(--faint); font: 600 11.5px/1 var(--mono);
 }
 #speed button.on { background: var(--accent); color: #14100a; }
-.hud-focus {
-  width: 34px; height: 34px; border-radius: 999px; cursor: pointer;
+#speed button[data-skip] { color: var(--accent); font-size: 13px; letter-spacing: -.06em; }
+#speed.held button[data-speed] { opacity: .45; }
+#speed.held button[data-skip] { background: var(--accent); color: #14100a; animation: skip-ask 1.9s ease-in-out infinite; }
+@keyframes skip-ask { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 139, 43, .5); } 55% { box-shadow: 0 0 0 6px rgba(217, 139, 43, 0); } }
+
+/* The clock is held far more often than it used to be — in your quarters, at the terminal, and any
+   week the fleet has nothing to do — so the reason rides in the message column, where it is out of
+   the thumb lane the objective chip already owns, and tapping it does the same thing ▸▸ does. */
+#clocknote {
+  display: none; align-items: center; gap: 8px; max-width: 100%; pointer-events: auto;
+  padding: 6px 13px 6px 10px; border-radius: 999px; cursor: pointer; text-align: left;
   background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--line); color: var(--dim);
-  display: grid; place-items: center;
+  border: 1px solid var(--line2); border-left: 2px solid var(--accent); color: var(--ink);
 }
-.hud-focus svg { width: 16px; height: 16px; }
+#clocknote.on { display: inline-flex; animation: feed-in .28s cubic-bezier(.22, .8, .3, 1) both; }
+body:not(.game) #clocknote, body.in-quarters #clocknote, body.in-terminal #clocknote,
+body.sheet-open #clocknote { display: none; }
+#clocknote em { font-style: normal; color: var(--accent); font: 600 12px/1 var(--mono); letter-spacing: -.08em; }
+#clocknote b { font-size: 12px; font-weight: 600; }
+#clocknote s { text-decoration: none; font-size: 11px; color: var(--faint); }
+
+/* Over the terminal as well as the system, because an order placed at the desk is exactly when a
+   week goes by and the player has to see it happen. */
+#ffbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 64; display: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 9px) 14px 9px;
+  background: linear-gradient(180deg, rgba(8, 11, 17, .96), rgba(8, 11, 17, .78));
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--line); pointer-events: none;
+}
+#ffbar.on { display: block; animation: ff-in .22s ease both; }
+#ffbar b { display: block; font-size: 12.5px; font-weight: 600; letter-spacing: .01em; }
+#ffbar s { text-decoration: none; display: block; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 2px; }
+#ffbar i { display: block; height: 2px; margin-top: 8px; border-radius: 2px; background: var(--accent); transition: width .18s linear; }
+@keyframes ff-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+/* These two are how you get home and how you get to your room, and as 34 px unlabelled circles on
+   dark glass at the bottom of a starfield nobody found either of them. They carry their word now,
+   they are a full thumb tall, and the accent edge separates them from the speed pills beside them. */
+.hud-focus {
+  height: 38px; padding: 0 13px 0 10px; border-radius: 999px; cursor: pointer;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line2); color: var(--ink);
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.hud-focus svg { width: 17px; height: 17px; color: var(--accent); flex: none; }
+.hud-focus s { text-decoration: none; font-size: 12.5px; letter-spacing: .01em; }
+
+/* The row is the showroom key, two labelled pills and four speed buttons on 390 px of phone. The
+   speed pills give up their padding first, and only under 336 — where nothing else works — do the
+   labels go, because an unlabelled circle being unfindable is the whole reason for the change. */
+@media (max-width: 419px) {
+  #speed button { min-width: 28px; }
+  .hud-focus { padding: 0 11px 0 9px; gap: 6px; }
+}
+@media (max-width: 380px) {
+  #controls { gap: 6px; }
+  #speed { gap: 1px; padding: 2px; }
+  #speed button { min-width: 25px; }
+  .hud-focus { padding: 0 9px 0 8px; gap: 5px; }
+  .hud-focus svg { width: 16px; height: 16px; }
+  .hud-focus s { font-size: 12px; }
+}
+@media (max-width: 335px) {
+  .hud-focus s { display: none; }
+  .hud-focus { padding: 0 10px; }
+}
 
 #dock {
   position: fixed; bottom: 0; left: 0; right: 0; height: var(--dock); z-index: 27;
@@ -818,3 +879,30 @@ body.inspecting #intro .intro-chip { opacity: 0; transform: translateY(8px); poi
   .ins-card { right: auto; width: min(400px, calc(100vw - 20px)); }
 }
 @media (prefers-reduced-motion: reduce) { #inspect * { transition: none !important; } }
+
+/* ── the back gate ──────────────────────────────────────────────────────────
+   The bottom of the navigation chain. A back press from the system view lands here rather than
+   closing the tab, and pressing back again from here does what a back button is supposed to do. */
+
+#navgate {
+  position: fixed; inset: 0; z-index: 66; display: none;
+  align-items: center; justify-content: center; padding: 22px;
+  background: rgba(4, 6, 10, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity .24s ease;
+}
+#navgate.live { display: flex; }
+#navgate.in { opacity: 1; }
+.ng-card {
+  width: min(360px, 100%); padding: 20px 20px 18px; border-radius: 16px; text-align: left;
+  background: var(--glass); border: 1px solid var(--line2);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .6);
+  transform: translateY(10px); transition: transform .26s cubic-bezier(.22, .8, .3, 1);
+}
+#navgate.in .ng-card { transform: none; }
+.ng-card i { font-style: normal; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.ng-card b { display: block; margin: 5px 0 8px; font: 400 24px/1.15 var(--serif); }
+.ng-card p { font-size: 12.5px; line-height: 1.6; color: var(--dim); }
+.ng-card button {
+  margin-top: 16px; width: 100%; height: 44px; border: 0; border-radius: 11px; cursor: pointer;
+  background: var(--accent); color: #14100a; font: 600 14px/1 inherit;
+}
