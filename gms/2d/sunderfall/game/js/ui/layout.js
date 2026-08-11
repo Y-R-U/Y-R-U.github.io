@@ -8,7 +8,9 @@
  */
 
 const R = () => ({ x: 0, y: 0, w: 0, h: 0 });
-const CIRC = () => ({ x: 0, y: 0, r: 0, hit: R() });
+/* `pipDir` is the screen-space angle (deg, y-down) the rank pips fan out along.
+   It points at whatever open space this circle has, which is not always down. */
+const CIRC = () => ({ x: 0, y: 0, r: 0, pipDir: 90, hit: R() });
 
 export function createLayout() {
   const L = {
@@ -99,15 +101,23 @@ export function createLayout() {
       const ax = leftHanded ? l + 62 * s : w - r - 62 * s;
       const ay = h - b - 92 * s;
       C[0].x = ax; C[0].y = ay; C[0].r = 44 * s;
+      // leaned off vertical so the far end of its own pip arc misses the last
+      // circle in the fan, which sits down and to the side of it
+      C[0].pipDir = leftHanded ? 112 : 68;
       // 63 against 44 + 21 = a 2px overlap on the big circle, and 30° apart is
       // ~9px of overlap on each other: a chain, with no gap anywhere in it.
       const RAD = 63 * s;
       const ANG = [120, 150, 180, 210];
       for (let i = 1; i < 5; i++) {
-        const a = (leftHanded ? 180 - ANG[i - 1] : ANG[i - 1]) * Math.PI / 180;
+        const deg = leftHanded ? 180 - ANG[i - 1] : ANG[i - 1];
+        const a = deg * Math.PI / 180;
         C[i].x = ax + Math.cos(a) * RAD;
         C[i].y = ay - Math.sin(a) * RAD;
         C[i].r = 21 * s;
+        /* Straight out from the arc's centre. On this fan every neighbour — and
+           the big circle — sits 105° or more off that heading, which is the only
+           direction with room for the pips now the discs touch. */
+        C[i].pipDir = -deg;
       }
     } else {
       L.circleScale = 1;
@@ -119,6 +129,10 @@ export function createLayout() {
         C[i].y = by + 3;
         C[i].r = 31;
       }
+      // a row: down is the free side, and the big one leans away from it so its
+      // end pip does not land on circle 2's rim
+      for (let i = 1; i < 5; i++) C[i].pipDir = 90;
+      C[0].pipDir = 78;
     }
     for (let i = 0; i < 5; i++) {
       const c = C[i], pad2 = i === 0 ? 10 : 7;

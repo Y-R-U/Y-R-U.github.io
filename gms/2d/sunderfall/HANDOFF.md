@@ -3763,3 +3763,35 @@ one that missed it. Worth grepping for whenever a `display` is added to somethin
 `scratchpad/boot.mjs` samples the computed style every 100ms against `#boot[data-ready]` under a
 260KB/s throttle: the deployed build shows the button for the whole load, this one never shows it
 before the gate is armed.
+
+### rank pips after the circles were packed together
+
+Packing the auto-circles into a touching chain (above) broke the rank readout, which nobody thought
+to check: the pips were pinned to the bottom arc of every circle, ~7px outside its own rim, and the
+neighbouring rim is now only ~12px away. Two or three pips per auto-circle were being drawn *inside*
+the disc next door, and circle 1 — drawn last and largest — buried the inner half of circles 2 and 3's
+fans completely.
+
+The fix is a `pipDir` on each layout circle: the screen-space heading its pips fan along, which the
+layout knows and the drawing code does not.
+
+- **Portrait.** Every auto-circle fans straight out from the arc's centre, `-deg` of its own position
+  on the fan. On this arrangement every neighbour *and* the big circle sits 105° or more off that
+  heading, and 105° is the only bearing with room. Circle 1 leans to 68° (112° left-handed) so the far
+  end of its own arc misses the last circle in the fan.
+- **Landscape.** Down for the row, 78° for the big one, same reason.
+
+Two numbers matter and both were derived, not guessed. A pip at radius `pr` clears a neighbour disc
+when `pr² + d² − 2·pr·d·cos φ > (r + ringW)²`; at `pr = r + 10` and the 32.6px spacing of the portrait
+fan that needs `φ > 45°`. And **the fans reach toward each other at their ends** — pushing `pr` out
+makes the join worse, not better — so the total spread is capped at 72°, which leaves ~10px between
+one fan's last pip and the next fan's first. The diamonds shrink to 2.5 to sit inside that.
+
+Cramped pips need to stay countable, hence the ramp: each rank is a step brighter and a step larger
+than the one before, `mix(school, white, 0.15 + t * 0.35)`. Half to white is the ceiling — past that
+storm and fire read as the same pale cream and the school colour is gone.
+
+`scratchpad/pips.mjs` fills all five circles with different schools at ranks 5/4/3/2/1 (set
+`S.level` and emit `player:level` first, or the spell system refuses to assign past circle 1) and
+captures a 4× clip of the cluster in both orientations. `tools/touchtest.mjs` still passes 9/9 —
+none of this touches the hit tests.

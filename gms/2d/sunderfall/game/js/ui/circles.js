@@ -345,27 +345,50 @@ export function drawCircle(c, slot, geo, env) {
     ringArc(c, r, 0, TAU, 3, A(C.blood, (1 - tDeny / 0.34) * 0.9));
   }
 
-  /* ---- rank pips, jewelled along the bottom arc ---- */
+  /* ---- rank pips, jewelled along an arc ----
+   *
+   * The arc used to be pinned to the bottom of every circle, which was fine when
+   * the circles were spread out. Packed tight they are not: a pip sits ~7px
+   * outside its own rim, and a neighbour's rim is only ~12px away, so on the
+   * portrait fan two or three pips per auto-circle were being drawn straight
+   * inside the disc next door — or buried under the big circle, which is drawn
+   * last and over the top of everything.
+   *
+   * So each circle fans its pips along `pipDir`, the one heading the layout
+   * knows is clear, and the auto-circles take a tighter step to stay inside it.
+   * That crowds them, hence the ramp: each rank is a step brighter than the one
+   * before, from the school's own colour up to near-white, so the count still
+   * reads at a glance when the diamonds are almost touching.
+   */
   if (spell) {
     const levels = spell.levels || 5;
-    const pr = r + (slot.i === 0 ? 8.5 : 7);
-    const step = 26, start = 90 + step * (levels - 1) * 0.5;
+    const big = slot.i === 0;
+    // clear of the auto-cast outer ring, which sits at r + ringW * 1.9
+    const pr = r + (big ? 8.5 : 10);
+    // 72° total is the widest fan whose end pip still clears the end pip of the
+    // fan next door; the diamonds shrink to fit that, and the ramp carries the count
+    const step = big ? 26 : Math.min(18, 72 / Math.max(1, levels - 1));
+    const start = (geo.pipDir == null ? 90 : geo.pipDir) + step * (levels - 1) * 0.5;
     for (let i = 0; i < levels; i++) {
       const a = (start - i * step) * Math.PI / 180;
       const px = Math.cos(a) * pr, py = Math.sin(a) * pr;
       const on = i < slot.rank;
-      const sz = (slot.i === 0 ? 3.6 : 3.0) * (on ? 1.12 : 0.86);
-      diamond(c, px, py, sz + 1.4);
+      const t = levels > 1 ? i / (levels - 1) : 0;
+      const sz = (big ? 3.6 : 2.5) * (on ? 1.02 + t * 0.2 : 0.86);
+      // each rank a step brighter than the last, but only halfway to white — far
+      // enough to tell two adjacent pips apart, near enough to keep the school's hue
+      const lit = mix(sc.css, '#ffffff', 0.15 + t * 0.35);
+      diamond(c, px, py, sz + (big ? 1.4 : 1.1));
       c.fillStyle = A(C.void, 0.9); c.fill();
       diamond(c, px, py, sz);
-      c.fillStyle = on ? mix(sc.css, '#ffffff', 0.25) : A(C.faint, 0.75);
+      c.fillStyle = on ? lit : A(C.faint, 0.75);
       c.fill();
       if (on) {
         c.save();
         c.globalCompositeOperation = 'lighter';
         c.globalAlpha = 0.5;
         diamond(c, px, py, sz * 1.9);
-        c.fillStyle = A(sc.css, 0.35); c.fill();
+        c.fillStyle = A(lit, 0.3); c.fill();
         c.restore();
       }
     }
