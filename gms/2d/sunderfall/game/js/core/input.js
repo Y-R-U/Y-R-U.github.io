@@ -282,6 +282,18 @@ export function createInput(canvas, view, bus) {
   canvas.addEventListener('pointermove', onMove);
   window.addEventListener('pointerup', onUp);
   window.addEventListener('pointercancel', onUp);
+  /* The up that never comes.
+   *
+   * `pressed` is a rising edge off `raw`, so an action stuck ON can never fire
+   * again — and a touch whose `pointerup` goes missing leaves exactly that. It
+   * is not hypothetical: level up while holding the cast circle and the choice
+   * modal opens under that thumb, the up is lost to it, and the main button is
+   * dead for the rest of the run. (Switching away and back cured it, because
+   * `blur` zeroes every action. That is the same repair as this one.)
+   *
+   * onDown captures every pointer to the canvas, so whenever the browser takes
+   * one away it must tell us here, whatever the reason. */
+  canvas.addEventListener('lostpointercapture', onUp);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   // Belt and braces against iOS scroll/zoom; css touch-action:none does the rest.
   canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
@@ -401,6 +413,7 @@ export function createInput(canvas, view, bus) {
     canvas.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
     window.removeEventListener('pointercancel', onUp);
+    canvas.removeEventListener('lostpointercapture', onUp);
   };
 
   if (bus) bus.on('view:change', () => { /* zones are rect functions, nothing to recompute */ });

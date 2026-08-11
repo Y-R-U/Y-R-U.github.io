@@ -44,6 +44,7 @@ export function createTouch(ctx, L, hooks) {
   const rects = {
     stick: () => L.stickZone,
     act: () => L.actZone,
+    cast: () => L.castZone,
   };
   function mount() {
     unmount();
@@ -51,9 +52,14 @@ export function createTouch(ctx, L, hooks) {
       offs.push(input.registerZone('ui.stick', rects.stick, 'move'));
       offs.push(input.registerZone('ui.act', rects.act, 'ui'));
     }
+    // Slot 0 claims the whole cast zone, not its own circle: it is the one zone
+    // here that fires a real action, and a press that misses the circle by a few
+    // px used to land on `ui.act` — an action nothing listens to — and silently
+    // do nothing at all. The later registrations win where they overlap, so the
+    // small circles still sit on top of the corner of it.
     for (let i = 0; i < 5; i++) {
       const geo = L.circles[i];
-      offs.push(input.registerZone('ui.slot' + i, () => geo.hit, i === 0 ? 'cast' : 'ui'));
+      offs.push(input.registerZone('ui.slot' + i, i === 0 ? rects.cast : () => geo.hit, i === 0 ? 'cast' : 'ui'));
     }
   }
   function unmount() { for (const o of offs) o(); offs.length = 0; }
@@ -75,19 +81,16 @@ export function createTouch(ctx, L, hooks) {
     // The swap picker floats over the circles it belongs to, so it gets first
     // refusal on every press — including the one that dismisses it.
     if (hooks.onPointerDown && hooks.onPointerDown(p.x, p.y)) return;
-    // -2 = inside the thumb cluster but off every circle. It must NOT fall
-    // through to the jump flank behind it: "I tapped the button and he jumped"
-    // was every miss of a 44px target, plus the whole band under it.
+    // Beside or under the big circle is a cast, not a jump — "I tapped the
+    // button and he jumped" was every miss of a 44px target. Above it is jump,
+    // and the circles are packed tight enough now to leave room for it.
     const ci = L.clusterAt(p.x, p.y);
     if (ci >= 0) { hooks.onCirclePress(ci, p.x, p.y); return; }
     if (!L.touch) return;
     if (inRect(L.stickZone, p.x, p.y)) {
-      // the cluster disc can lap over the stick's edge; the stick still wins there
       stick.active = true; stick.id = e.pointerId;
       stick.ox = stick.x = p.x; stick.oy = stick.y = p.y;
       stick.r = Math.max(36, Math.min(L.stickZone.w, L.stickZone.h) * 0.36);
-    } else if (ci === -2) {
-      // swallowed: inside the cluster, off every circle, so it is a missed cast
     } else if (inRect(L.actZone, p.x, p.y)) {
       act.id = e.pointerId;
       act.x = act.x0 = p.x; act.y = act.y0 = p.y;

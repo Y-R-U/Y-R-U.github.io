@@ -27,10 +27,10 @@ export function createLayout() {
 
     circles: [CIRC(), CIRC(), CIRC(), CIRC(), CIRC()],
     circleScale: 1,
-    cluster: { kind: 'disc', x: 0, y: 0, r: 0, w: 0, h: 0 },
 
     stickZone: R(),
     actZone: R(),        // jump on tap / aim on drag
+    castZone: R(),       // slot 1's real tap target — see below
     pauseBtn: R(),
 
     bubbleClamp: R(),    // speech bubbles are kept inside this
@@ -86,27 +86,36 @@ export function createLayout() {
     L.pauseBtn.x = w - r - pb;
     L.pauseBtn.y = t;
 
-    /* ---- cast circles ---- */
+    /* ---- cast circles ----
+     * Circles 2-5 auto-cast: in play they are a readout, and you only ever press
+     * one to swap the spell in it. They used to be spread on a 112px arc with a
+     * gap between each, which put circle 2 a clear 138px straight up from the
+     * big one — directly over the patch of screen a right thumb reaches for to
+     * jump. They are packed tight against circle 1 now, overlapping slightly and
+     * drawn under it, which is what buys that space back. */
     const C = L.circles;
     if (portrait) {
       const s = L.circleScale = Math.min(1, w / 390);
       const ax = leftHanded ? l + 62 * s : w - r - 62 * s;
       const ay = h - b - 92 * s;
       C[0].x = ax; C[0].y = ay; C[0].r = 44 * s;
-      const RAD = 112 * s;
-      const ANG = [98, 131, 164, 197];
+      // 63 against 44 + 21 = a 2px overlap on the big circle, and 30° apart is
+      // ~9px of overlap on each other: a chain, with no gap anywhere in it.
+      const RAD = 63 * s;
+      const ANG = [120, 150, 180, 210];
       for (let i = 1; i < 5; i++) {
         const a = (leftHanded ? 180 - ANG[i - 1] : ANG[i - 1]) * Math.PI / 180;
         C[i].x = ax + Math.cos(a) * RAD;
         C[i].y = ay - Math.sin(a) * RAD;
-        C[i].r = 27 * s;
+        C[i].r = 21 * s;
       }
     } else {
       L.circleScale = 1;
       const by = h - b - 60;
       C[0].x = w - r - 54; C[0].y = by; C[0].r = 46;
+      // same idea in a row: 74 against 46 + 31, then 59 against 31 + 31
       for (let i = 1; i < 5; i++) {
-        C[i].x = C[0].x - 108 - (i - 1) * 76;
+        C[i].x = C[0].x - 74 - (i - 1) * 59;
         C[i].y = by + 3;
         C[i].r = 31;
       }
@@ -117,25 +126,22 @@ export function createLayout() {
       c.hit.w = c.hit.h = (c.r + pad2) * 2;
     }
 
-    /* ---- the thumb cluster ----
-     * The cast circles are round and the jump flank is a rectangle behind them,
-     * so every near miss — and the whole band BELOW the big circle, which is
-     * where a thumb naturally lands — was a jump instead of a cast. Nobody with
-     * a thumb parked on the circles ever means "jump", so the cluster swallows
-     * the whole region and near misses snap to the nearest circle.
-     * Portrait: a disc around the arc centre. Landscape: the row's box, both
-     * carried to the bottom edge of the screen. */
-    if (portrait) {
-      L.cluster.kind = 'disc';
-      L.cluster.x = C[0].x; L.cluster.y = C[0].y;
-      L.cluster.r = 112 * L.circleScale + 27 * L.circleScale + 22;
-    } else {
-      L.cluster.kind = 'rect';
-      let x0 = Infinity, y0 = Infinity;
-      for (let i = 0; i < 5; i++) { x0 = Math.min(x0, C[i].x - C[i].r); y0 = Math.min(y0, C[i].y - C[i].r); }
-      L.cluster.x = x0 - 18; L.cluster.y = y0 - 18;
-      L.cluster.w = w - L.cluster.x; L.cluster.h = h - L.cluster.y;
-    }
+    /* ---- the cast zone ----
+     * Circle 1's tap target is not circle 1.
+     *
+     * A thumb's contact point sits lower than the player believes it does, so a
+     * press aimed at the bottom half of the circle lands a few px outside it —
+     * and outside meant nothing at all happened, because the cluster swallowed
+     * the miss so it could not even fall through to jump. Everything to the
+     * right of the circle and everything below it, out to the corner of the
+     * screen, casts. Above it stays jump, which is where the thumb wants it. */
+    const c0 = C[0];
+    const cpad = portrait ? 12 : 10;
+    const outer = c0.r + cpad;
+    if (leftHanded) { L.castZone.x = 0; L.castZone.w = c0.x + outer; }
+    else { L.castZone.x = c0.x - outer; L.castZone.w = w - L.castZone.x; }
+    L.castZone.y = c0.y - outer;
+    L.castZone.h = h - L.castZone.y;
 
     /* ---- touch regions ---- */
     const split = leftHanded ? w * 0.56 : w * 0.44;
@@ -167,33 +173,42 @@ export function createLayout() {
     return L;
   };
 
-  /** Index of the cast circle under a CSS-pixel point, or -1. */
+  /**
+   * Index of the cast circle under a CSS-pixel point, or -1. This is what a
+   * spell is dropped on in the loadout, so it keeps its slack even though the
+   * small circles are smaller than they were — and it has to be nearest-wins
+   * for the same reason `clusterAt` is: they overlap, and first-wins would hand
+   * the shared strip to whichever index came first.
+   */
   L.circleAt = function (x, y) {
+    let best = -1, bestD = Infinity;
     for (let i = 0; i < 5; i++) {
       const c = L.circles[i];
-      const dx = x - c.x, dy = y - c.y, rr = c.r + (i === 0 ? 10 : 7);
-      if (dx * dx + dy * dy <= rr * rr) return i;
+      const dx = x - c.x, dy = y - c.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d <= c.r + (i === 0 ? 10 : 12) && d < bestD) { best = i; bestD = d; }
     }
-    return -1;
+    return best;
   };
 
-  /** True if a point is inside the thumb cluster, circle or not. */
-  L.inCluster = function (x, y) {
-    const k = L.cluster;
-    if (k.kind === 'disc') {
-      const dx = x - k.x, dy = y - k.y;
-      return dx * dx + dy * dy <= k.r * k.r;
-    }
+  /** True if a point casts slot 1 by being beside or under the big circle. */
+  L.inCastZone = function (x, y) {
+    const k = L.castZone;
     return x >= k.x && y >= k.y && x <= k.x + k.w && y <= k.y + k.h;
   };
 
   /**
-   * Cluster hit test: circle index, -2 for "inside the cluster but not on a
-   * circle" (swallow it — it is not a jump), or -1 for "not ours".
+   * Cluster hit test: a circle index, or -1 for "not ours, let it jump".
    *
-   * Nearest-wins rather than first-wins, so the generous slack on neighbouring
-   * circles splits the gap between them down the middle instead of letting
+   * Nearest-wins rather than first-wins, so the slack on circles that now
+   * overlap each other splits the join down the middle instead of letting
    * whichever is earlier in the array claim it.
+   *
+   * This has to agree with the zones registered in ui/touch.js, because those
+   * are what actually fire the cast — all this side does is the presentation.
+   * They did not agree before: this granted 16px of slack past a circle the
+   * engine only knew as a 108px square, so a press in the ring between the two
+   * lit the button up and cast nothing.
    */
   L.clusterAt = function (x, y) {
     const slack = L.mode === 'portrait' ? 16 : 12;
@@ -205,7 +220,7 @@ export function createLayout() {
       if (d <= c.r + slack && d < bestD) { best = i; bestD = d; }
     }
     if (best >= 0) return best;
-    return L.inCluster(x, y) ? -2 : -1;
+    return L.inCastZone(x, y) ? 0 : -1;
   };
 
   return L;

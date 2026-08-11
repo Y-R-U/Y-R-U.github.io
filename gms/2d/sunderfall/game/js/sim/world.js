@@ -25,8 +25,10 @@ export function createWorld(ctx, opts = {}) {
     cam: { x: 0, y: 0, zoom: 1 },
     halfW: 960, halfH: 540,
     bounds: { x0: -400, x1: 9000, y0: -2200, y1: 900 },
-    /** Below this the player is in a hole he cannot climb out of — see world.update. */
+    /** Below this the player is in a hole he cannot climb out of — see world.inPit. */
     pitY: 1500,
+    /** Columns with no way out at any depth: `{x0, x1, lip}`. Levels declare these. */
+    pitZones: [],
     lastHits: [],
     debug: { aabb: false, grid: false, support: false, surfaces: false, rubble: false, player: false },
     stats: { entities: 0, props: 0, debris: 0, awake: 0, surfaceCells: 0, chunksDrawn: 0 },
@@ -574,6 +576,31 @@ export function createWorld(ctx, opts = {}) {
     return o;
   };
   world.setPlayerSpawn = (x, y) => { world.spawnX = x; world.spawnY = y; };
+
+  /**
+   * Has this body fallen somewhere it cannot get back out of?
+   *
+   * A depth alone is not enough. The chasm floor is 520px down behind cut-stone
+   * walls, but the bridge pillars STAND on that floor and top out 240px above
+   * the line — so bringing your own bridge down and landing on a stub left you
+   * part-way up a pillar in a shaft you cannot jump, with full health, no death
+   * and no respawn. Nothing to do but reload, which is the worst bug a level can
+   * have. A zone is the whole column: under its lip, at any height, is lost.
+   */
+  world.inPit = (x, y) => {
+    if (y > world.pitY) return true;
+    const z = world.pitZones;
+    for (let i = 0; i < z.length; i++) {
+      if (x >= z[i].x0 && x <= z[i].x1 && y > z[i].lip) return true;
+    }
+    return false;
+  };
+  /** True anywhere over a pit column, at any height — checkpoints stay out of these. */
+  world.overPit = (x) => {
+    const z = world.pitZones;
+    for (let i = 0; i < z.length; i++) if (x >= z[i].x0 && x <= z[i].x1) return true;
+    return false;
+  };
   world.respawn = () => {
     const p = world.player;
     if (!p) return;
@@ -599,6 +626,15 @@ export function createWorld(ctx, opts = {}) {
       if (pl.hitFlash > 0) pl.hitFlash = Math.max(0, pl.hitFlash - dt * 5);
       if (pl.invuln > 0) pl.invuln -= dt;
       updatePlayer(world, pl, dt);
+      /* The pit test lives here, not in the entity loop below — that loop skips
+       * the player, so the one check written for him never ran on him and the
+       * chasm was a silent softlock for the whole life of the level. */
+      if (!pl.killed && world.inPit(pl.x, pl.y)) {
+        const fx = pl.x, fy = pl.y;         // respawn moves him, so read where he FELL
+        world.damage(pl, 40, DAMAGE.IMPACT, { ignoreInvuln: true });
+        world.respawn();
+        bus.emit('player:pit', { x: fx, y: fy });
+      }
     }
 
     const live = world.ents.live;
@@ -634,17 +670,9 @@ export function createWorld(ctx, opts = {}) {
       }
 
       if (e.life > 0 && e.age > e.life) world.ents.despawn(e);
-      // `pitY` is the line below which there is no way back up — the chasm floor
-      // sits 500px down behind vertical masonry, so landing on it was a silent
-      // softlock: no death, no respawn, nothing to do but reload.
-      if (e.y > (e.kind === 'player' ? world.pitY : world.bounds.y1 + 600)) {
-        if (e.kind === 'player') {
-          world.damage(e, 40, DAMAGE.IMPACT, { ignoreInvuln: true });
-          world.respawn();
-          bus.emit('player:pit', { x: e.x, y: e.y });
-        }
-        else world.ents.despawn(e);
-      }
+      // anything else that leaves the world is simply gone; the player's own
+      // pit handling is up in the player branch, where it can actually reach him
+      if (e.y > world.bounds.y1 + 600) world.ents.despawn(e);
     }
 
     if (world.player && world.player.alive) tickStatus(world.player, dt);

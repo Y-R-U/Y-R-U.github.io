@@ -3408,18 +3408,20 @@ Reported as "I click the buttons but it jumps instead". The cast circles are rou
 a rectangle behind them, so **every near miss — and the whole 82px band below the big circle, which
 is where a thumb naturally lands — was a jump**.
 
-`L.clusterAt(x, y)` returns a circle index, `-2` for "inside the cluster, off every circle" (swallow
-it), or `-1`. Near misses snap to the **nearest** circle within `r + 16` (nearest-wins, so the slack
-splits the gap between neighbours down the middle rather than letting the earlier index claim it).
-The cluster region is a disc around the arc centre in portrait, a box carried to the bottom-right
-corner in landscape. The stick still wins where the disc laps over it.
+`L.clusterAt(x, y)` returns a circle index or `-1`. Near misses snap to the **nearest** circle within
+`r + 16` (nearest-wins, so the slack splits the join between neighbours down the middle rather than
+letting the earlier index claim it).
+
+**Superseded in part — see "The cast button was dead under the thumb" below.** The swallow-disc this
+describes solved the jumping but replaced it with a dead band, and `-2` is gone: everything beside
+and under circle 1 now casts, and everything above it jumps.
 
 ```
 on circle 0            -> 0
 12px past its rim      -> 0     (snapped)
-55px under it          -> -2    (swallowed; used to jump)
+55px under it          -> 0     (the cast zone; used to be -2, and did nothing at all)
 between circles 1 and 2-> 1     (nearest)
-mid-flank              -> -1    (still jumps)
+above circle 0         -> -1    (jumps — deliberately)
 ```
 
 ### Progress survives a refresh — core/progress.js
@@ -3642,3 +3644,105 @@ SLICES  [{"off":0.24,"dur":0.08,"len":44.83},{"off":33.22,"dur":1.85,"len":44.83
 The second slice is `level[0]` — a real `player:level` event through barks.js, not a direct
 call; `hint:blocked` twice gives `[40.62, 3.27]` and `[43.84, 1.02]`. **Every line of text
 in the build now has a voice.**
+
+---
+
+## playtest-fixes-14 — the cast button, the seams, and the chasm
+
+Four things off a phone playtest.
+
+### The cast button was dead under the thumb
+
+Reported as "the bottom half of the main button doesn't fire", then refined by the player to "it
+starts at a level-up, and switching the screen off and on fixes it". Both halves of that are real and
+they are two different bugs.
+
+**One: nothing fired outside a 108px square.** `api.tryCast(0)` emits `ui:cast`, and *nothing listens
+to `ui:cast`* — it is presentation only, the flash and the focus animation. The cast itself comes
+solely from `input.pressed('cast')`, which the engine raises from the `ui.slot0` zone. That zone was
+`L.circles[0].hit`: a 108×108 square on a 44px circle. Meanwhile `L.clusterAt` granted 16px of slack
+and the cluster disc swallowed everything within 161px. So the region between them — a ring around
+the circle and the whole band under it — **lit the button up and cast nothing**, and could not even
+fall through to jump. A thumb's contact point sits lower than the player believes it does, which is
+why it read as "the bottom half".
+
+Slot 0 now registers `L.castZone` instead: from the circle's top-left corner out to the bottom-right
+of the screen. Beside it and under it casts, above it jumps. The two hit tests agree because the
+zone is the authority and `clusterAt` defers to the same rect.
+
+**Two: a touch whose `pointerup` never arrives kills the button permanently.** `pressed` is a rising
+edge off `raw`, so an action stuck ON can never fire again. Level up while holding the cast circle —
+which is exactly what happens, because you levelled up by casting — and the choice modal opens under
+that thumb; the touch finishes on the modal and `cast` stays ZONE-held forever. `blur` zeroes every
+action, which is why turning the screen off and on cured it and made it look intermittent.
+
+Two fixes, because they cover different failures: `canvas.addEventListener('lostpointercapture', onUp)`
+catches the browser taking a touch away at all (every pointer is captured to the canvas in `onDown`),
+and the blocking-overlay branch of `ui/index.js` now calls `input.releaseAll()` rather than merely
+consuming — nothing in the world should be held while a modal is up.
+
+`scratchpad/touchtest.mjs` drives real touches over CDP at 390×844 and counts `spell:cast`. **Clear
+the cooldown before every tap** (`window.__ready()` in that script) or the results alternate 1,0,1,0
+and mean nothing — that cost a wrong conclusion once already. Against the deployed build it fails 5
+of 9 cases; against this one it passes all 9.
+
+### The small circles are packed against the big one
+
+The arc was `RAD 112`, `r 27`, at 98°–197°, which put circle 2 a clear 138px straight up from circle
+1 — over the patch of screen a right thumb reaches for to jump, and inside a swallow disc that ate
+the tap. Now `RAD 63`, `r 21`, at 120°/150°/180°/210°: a 2px overlap on the big circle and ~9px on
+each other, so it reads as one chain with no gap in it. Landscape got the same treatment in a row
+(74 then 59 apart). They are drawn back-to-front now so circle 1 sits on top.
+
+Circles 2–5 auto-cast, so their precision barely matters — they are a readout you occasionally press
+to swap a spell. That is what makes trading their size for jump room the right way round.
+
+### Backdrop seams — sim/index.js `seamCover`
+
+The bands tile and painted art does not wrap, so every join is a vertical break. Period is
+`worldW / parallax`: 1551px for the foreground canopy (under two portrait screens), 4129 for
+`*_near`, and every band has one at x=0 where the level starts.
+
+**Mirroring alternate tiles was tried first and is a trap.** It closes the join perfectly — and looks
+far worse, a Rorschach axis straight down the middle of the canopy. Screenshot it before you believe
+otherwise.
+
+What ships instead is a tree stood on each join, drawn into the band's own layer at the band's own
+parallax. That is what makes it work: it tracks the seam exactly however the camera moves, and the
+layer's haze, shade and colour multiply place it at the right depth for free. `SEAM` holds the
+horizon fraction and tree scale per layer; the foreground gets foliage at the band's *top* edge
+instead, because that is where its art is and where `fillOver` mirrors it. Covers are drawn once from
+`bandsA`, not per set — the two sets tile identically, and drawing both double-exposes them through
+the Ruinreach crossfade.
+
+### The chasm was a hard softlock
+
+Confirmed with the bridge destroyed and the player dropped in: `y=436, onGround=true, hp=100`, and it
+stays that way forever. Two causes.
+
+**The player-pit check never ran on the player.** It sat in `world.update`'s entity loop, which opens
+with `if (!e.alive || e.dead || e === world.player) continue` — so the branch written for `e.kind ===
+'player'` was unreachable for the whole life of the level. It is up in the player branch now.
+
+**`pitY` alone cannot describe that hole.** The chasm floor is at 520 and `pitY` is 300, but the
+bridge pillars *stand on that floor* and top out around 280 — so bringing your own bridge down and
+landing on a stub left you part-way up a pillar in a shaft you cannot jump, above the line, at full
+health. `world.pitZones` describes whole columns instead: `{x0, x1, lip}`, and `world.inPit(x, y)`
+takes either. The level declares one for the chasm at lip 190 (the deck's walking surface is y≈-70,
+well clear).
+
+`world.overPit(x)` exists for the other half of it: **the rolling checkpoint must never mark the
+bridge**. The deck is solid ground right up until you break it, and a checkpoint out there respawns
+you into thin air over the chasm, forever.
+
+Left alone deliberately: the 40 damage the pit deals is immediately undone by `respawn()` setting
+`hp = maxHp`. That is pre-existing and changing it changes the difficulty of a fall, which is not
+this session's call to make.
+
+### "Am I at the end of the map?"
+
+The camera clamps a screen short of `bounds.x1 = 7700` while the terrain runs on to 8200, so walking
+east ended with Rook pinned to the corner of a frame that had stopped moving — indistinguishable from
+being stuck, which is how it was reported. Two standing stones and a lit brazier at 7500–7600, a rock
+face behind them too tall to jump, and a one-shot `hint:tip` at `marks.roadEnd`. `endSaid` resets in
+`enter()`.

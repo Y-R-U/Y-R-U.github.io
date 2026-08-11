@@ -446,7 +446,12 @@ export async function createRenderer(canvas, opts = {}) {
       }
       const i0 = Math.floor(left / W), i1 = Math.floor(right / W);
       for (let i = i0; i <= i1; i++) {
-        pushSprite(layer, false, tex, 0, 0, 1, 1, (i + 0.5) * W, cy, W, H, 0, r, g, b, a, p);
+        // `mirror` flips alternate copies, so a tile always meets its neighbour
+        // on the edge it already matches and the join cannot show. Only for art
+        // with no silhouette in it — do this to a treeline and you get a
+        // Rorschach axis. See the seam covers in sim/index.js for the rest.
+        const flip = band.mirror && ((((i % 2) + 2) % 2) === 1);
+        pushSprite(layer, false, tex, flip ? 1 : 0, 0, flip ? 0 : 1, 1, (i + 0.5) * W, cy, W, H, 0, r, g, b, a, p);
       }
     },
 

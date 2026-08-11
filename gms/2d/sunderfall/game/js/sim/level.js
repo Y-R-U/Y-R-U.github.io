@@ -34,6 +34,10 @@ export function buildLevel(world) {
   // The highest real ground in this level is y≈120, so anything past 300 means
   // the player is down in the chasm with nothing to climb.
   world.pitY = 300;
+  // …except that the bridge pillars stand on the chasm floor and reach up past
+  // that line, so the whole shaft has to count, not just the bottom of it. The
+  // deck's walking surface is y≈-70, well clear of the lip.
+  world.pitZones = [{ x0: CHASM_A - 30, x1: CHASM_B + 30, lip: 190 }];
 
   /* ---------------- terrain ---------------- */
   T.hill(-600, 4500, groundAt, MATERIAL.ROCK, 1400, MATERIAL.EARTH, 70);
@@ -196,6 +200,17 @@ export function buildLevel(world) {
   place('deadtree', 7360);
   place('skull_pile', 7250);
   place('rocks_small', 7460);
+
+  // --- the end of the road ---
+  // The strip stops at 7700 and nothing said so. The camera clamps a screen
+  // short of that while Rook keeps walking into the corner of the frame, which
+  // reads as being stuck, not as an ending — so close it with something you can
+  // see coming: a lit pair of stones, then a rock face far too tall to jump.
+  T.box(7660, groundAt(7660) - 1000, 240, 1420, MATERIAL.ROCK);
+  place('standing_stone', 7500);
+  place('standing_stone', 7600);
+  place('brazier', 7550);
+  marks.roadEnd = 7360;
 
   world.props.solve();
 

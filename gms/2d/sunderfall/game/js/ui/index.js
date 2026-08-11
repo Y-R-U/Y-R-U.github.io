@@ -676,7 +676,15 @@ export function createUI(ctx) {
     }
 
     if (paused || overlays.blocking) {
-      if (input && input.consume) { input.consume('jump'); input.consume('cast'); input.consume('dash'); }
+      /* A modal opens over the canvas, which means it can open UNDER a thumb —
+       * the level-up choice does, because you levelled up by casting and the
+       * cast circle is where that thumb already is. The touch is then finished
+       * on the modal and its `pointerup` never reaches the canvas, so `cast`
+       * stayed held from its zone and, being held, could never rise again: the
+       * button was dead for the rest of the run. Nothing in the world should be
+       * held while a modal is up anyway, so let go of all of it. */
+      if (input && input.releaseAll) input.releaseAll();
+      else if (input && input.consume) { input.consume('jump'); input.consume('cast'); input.consume('dash'); }
       return;
     }
 
@@ -773,7 +781,8 @@ export function createUI(ctx) {
     }
 
     circleFx.update(dt);
-    for (let i = 0; i < 5; i++) drawCircle(c, st.slots[i], L.circles[i], env);
+    // back to front: the circles overlap now, and circle 1 is the one you press
+    for (let i = 4; i >= 0; i--) drawCircle(c, st.slots[i], L.circles[i], env);
     if (assignMode) drawAssignTargets();
     drawAimVector(toScreen);
     drawAutoTarget(toScreen);

@@ -60,6 +60,15 @@ export async function createPlayScene(ctx) {
   }
   const bandsA = ctx.assets.bands('sunderwood');
   const bandsB = ctx.assets.bands('ruinreach');
+  /* The sky's join is the one a tree cannot hide — it is a smooth cloud gradient
+   * and there is nothing to stand on it. It is also the join you look at longest:
+   * at parallax 0.05 the tile is 92,000 world px wide, so the single seam at x=0
+   * never leaves the frame for the whole level, it just drifts. Mirroring is
+   * exactly right for art this diffuse — the reflection has no shape to give it
+   * away, and the moon sits far enough into the tile never to be doubled. */
+  for (const b of bandsA.concat(bandsB)) {
+    if ((typeof b.layer === 'string' ? LAYER[b.layer] : b.layer) === LAYER.SKY) b.mirror = true;
+  }
 
   const cam = world.cam;
   let camInit = false;
@@ -178,10 +187,95 @@ export async function createPlayScene(ctx) {
     }
   }
 
+  /* ---------------- seam covers ----------------
+   *
+   * The bands tile and painted art does not wrap, so the join between two copies
+   * is a vertical break in the canopy and along the horizon. It is worst in the
+   * foreground: worldW/parallax is 1551 world px there, under two portrait
+   * screens, so you meet one every few seconds of walking.
+   *
+   * Mirroring alternate tiles closes the join exactly and was tried first — it
+   * looks far worse, a Rorschach axis straight down the middle of the canopy.
+   * So the join gets something stood on it instead. The cover is drawn into the
+   * band's own layer at the band's own parallax, which is what makes it work:
+   * it tracks the seam pixel for pixel however the camera moves, and the layer's
+   * haze, shade and colour multiply push it to the right depth for free.
+   */
+
+  // Where a band's own ground line sits in it, and how big a tree that depth
+  // wants. The sky needs neither — one join per 92,000 px of level.
+  const SEAM = {
+    [LAYER.BG_FAR]: { tree: 1.0, horizon: 0.60 },
+    [LAYER.BG_MID]: { tree: 1.5, horizon: 0.60 },
+    [LAYER.BG_NEAR]: { tree: 2.2, horizon: 0.59 },
+  };
+
+  const seamUV = new Map();
+  function seamFrame(name) {
+    if (seamUV.has(name)) return seamUV.get(name);
+    const f = ctx.assets.f(name);
+    let u = null;
+    if (f) {
+      const iw = 1 / f.tex.w, ih = 1 / f.tex.h;
+      u = { tex: f.tex, u0: f.sx * iw, v0: f.sy * ih, u1: (f.sx + f.sw) * iw, v1: (f.sy + f.sh) * ih, w: f.sw, h: f.sh };
+    }
+    seamUV.set(name, u);
+    return u;
+  }
+
+  /** Stable per-join noise — a cover that changed frame to frame would strobe. */
+  function seamNoise(i, salt) {
+    const n = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  }
+
+  function seamSprite(name, x, y, scale, flip, layer, p) {
+    const f = seamFrame(name);
+    if (!f) return;
+    R.spriteRaw(f.tex, flip ? f.u1 : f.u0, f.v0, flip ? f.u0 : f.u1, f.v1,
+      x, y, f.w * scale, f.h * scale, 0, 1, 1, 1, 1, layer, false, p);
+  }
+
+  function seamCover(band) {
+    if (!band.tex || band.tile === false) return;
+    const layer = typeof band.layer === 'string' ? LAYER[band.layer] : band.layer;
+    const canopy = layer === LAYER.FG_OCCLUDE;
+    const rec = SEAM[layer];
+    if (!rec && !canopy) return;
+    const p = band.parallax === undefined ? 1 : band.parallax;
+    const W = band.worldW || band.tex.w;
+    const H = band.worldH || band.tex.h;
+    const top = band.anchorY === undefined ? -H : band.anchorY;
+    const half = view.worldW * 0.5 + 600;
+    const i0 = Math.ceil((cam.x * p - half) / W), i1 = Math.floor((cam.x * p + half) / W);
+    for (let i = i0; i <= i1; i++) {
+      const x = i * W;
+      const flip = seamNoise(i, 1) > 0.5;
+      if (canopy) {
+        // The canopy hangs off the band's top edge and fillOver mirrors it
+        // upward, so the break shows in a strip either side of that edge — which
+        // is where the foliage goes, not down at the horizon.
+        const s = 1.7 + seamNoise(i, 2) * 0.5;
+        seamSprite('tree_foliage', x, top + 8, s, flip, layer, p);
+        seamSprite('tree_foliage_b', x + (flip ? 86 : -86), top - 104, s * 0.8, !flip, layer, p);
+      } else {
+        const gy = top + H * rec.horizon;
+        const s = rec.tree * (0.92 + seamNoise(i, 3) * 0.22);
+        const f = seamFrame('deadtree');
+        if (f) seamSprite('deadtree', x, gy - f.h * s * 0.5, s, flip, layer, p);
+        // the trunk alone leaves a straight cut where it meets the horizon
+        seamSprite('bush', x, gy - 16 * s, s * 0.85, !flip, layer, p);
+      }
+    }
+  }
+
   function drawBands() {
     const k = clamp((cam.x - RUIN_X) / RUIN_FADE, 0, 1);
     if (k < 1) for (const b of bandsA) { R.backdrop(b, { a: 1 - k }); fillUnder(b, 1 - k); fillOver(b, 1 - k); }
     if (k > 0) for (const b of bandsB) { R.backdrop(b, { a: k }); fillUnder(b, k); fillOver(b, k); }
+    // once, not per set: the two sets tile identically, so the covers land in the
+    // same place for both and drawing them twice only double-exposes them
+    for (const b of (bandsA.length ? bandsA : bandsB)) seamCover(b);
   }
 
   /* ---------------- debug overlays ---------------- */
@@ -267,6 +361,7 @@ export async function createPlayScene(ctx) {
       const px = saved && saved.x > 470 ? saved.x : 470;
       const py = saved && saved.x > 470 ? saved.y - 40 : groundAt(px) - 120;
       lastMark = saved && saved.x > 470 ? px : -Infinity;
+      endSaid = false;
       barks.reset();
       world.createPlayer(px, py);
       if (ctx.progress && ctx.progress.resumeHp > 0 && world.player) {
@@ -300,6 +395,7 @@ export async function createPlayScene(ctx) {
       if (director) director.update(dt);
       updateCamera(dt);
       checkpoint();
+      endOfRoad();
     },
 
     render(alpha) {
@@ -338,12 +434,34 @@ export async function createPlayScene(ctx) {
    * Forward only: it never moves back, and it never records a spot you were
    * burning or falling in.
    */
+  /**
+   * Say so when the strip runs out.
+   *
+   * The camera clamps a screen short of `bounds.x1` and the level's ground runs
+   * on past it, so walking east ended with Rook pinned to the corner of a frame
+   * that had stopped moving — which is indistinguishable from being stuck. The
+   * stones at 7500 and the rock face behind them are the visual answer; this is
+   * the one that removes the doubt.
+   */
+  let endSaid = false;
+  function endOfRoad() {
+    if (endSaid || !marks || marks.roadEnd == null) return;
+    const p = world.player;
+    if (!p || !p.alive || p.killed || p.x < marks.roadEnd) return;
+    endSaid = true;
+    bus.emit('hint:tip', { text: 'The road ends at the stones. Nothing built past them — yet.', value: 'END', life: 5.5 });
+  }
+
   let lastMark = -Infinity;
   function checkpoint() {
     const p = world.player;
     if (!p || !p.alive || p.killed || !p.onGround) return;
     if (p.x < lastMark + 420 || p.y > 200) return;
     if (p.burning > 0 || world.surfaces.amountAt('fire', p.x, p.y) > 0) return;
+    // Never on the bridge. The deck is solid ground right up until you break it,
+    // and a checkpoint out there respawns you into thin air over the chasm —
+    // fall, respawn, fall, for as long as you care to watch.
+    if (world.overPit(p.x)) return;
     lastMark = p.x;
     world.setPlayerSpawn(p.x, p.y);
     // the same safe spot is what a refresh should come back to
