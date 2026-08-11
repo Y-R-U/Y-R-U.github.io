@@ -316,7 +316,7 @@ window.MonsterVariants = {
       ]
     },
     "attack:parasite": {
-      "selected": "videos/monster_attack_parasite_v7.mp4",
+      "selected": "videos/monster_attack_parasite_v6.mp4",
       "variants": [
         {
           "bytes": 267165,
@@ -1468,7 +1468,7 @@ window.MonsterVariants = {
     }
   },
   "game": "awake",
-  "generated": "2026-08-11 18:49:10",
+  "generated": "2026-08-11 22:25:23",
   "monsters": [
     {
       "attackRef": "ref/monster_gene_attack.jpg",
@@ -1621,12 +1621,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_machine_v3.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "x": 0.5114462209302325,
+      "y": 0.4236186132116993
     },
     "videos/monster_attack_mimic_v2.mp4": {
       "enabled": true,
@@ -1693,12 +1693,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_parasite_v6.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "x": 0.5067950581395348,
+      "y": 0.3288720841835714
     },
     "videos/monster_attack_parasite_v7.mp4": {
       "enabled": false,
@@ -1749,12 +1749,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_shadow_v5.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
-      "lead": 1.0,
+      "lead": 1.5,
       "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "x": 0.5067950581395348,
+      "y": 0.3135077821790101
     },
     "videos/monster_attack_siren_v2.mp4": {
       "enabled": true,
@@ -1765,9 +1765,9 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_siren_v3.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
-      "lead": 1.0,
+      "lead": 0.5,
       "scale": 2.6,
       "x": 0.5,
       "y": 0.4
@@ -1781,7 +1781,7 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_spore_v3.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1797,12 +1797,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_swarm_v3.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
-      "lead": 1.0,
-      "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "lead": 1.5,
+      "scale": 3.0,
+      "x": 0.5021438953488372,
+      "y": 0.28149881966950746
     },
     "videos/monster_attack_warden_v2.mp4": {
       "enabled": true,

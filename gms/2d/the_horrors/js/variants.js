@@ -640,7 +640,7 @@ window.MonsterVariants = {
       ]
     },
     "release:bone_collector": {
-      "selected": "videos/monster_release_bone_collector_v3.mp4",
+      "selected": "videos/monster_release_bone_collector.mp4",
       "variants": [
         {
           "bytes": 213125,
@@ -793,7 +793,7 @@ window.MonsterVariants = {
       ]
     },
     "release:hollow_one": {
-      "selected": "videos/monster_release_hollow_one_v3.mp4",
+      "selected": "videos/monster_release_hollow_one.mp4",
       "variants": [
         {
           "bytes": 133462,
@@ -842,7 +842,7 @@ window.MonsterVariants = {
       ]
     },
     "release:lost_child": {
-      "selected": "videos/monster_release_lost_child_v3.mp4",
+      "selected": "videos/monster_release_lost_child.mp4",
       "variants": [
         {
           "bytes": 257439,
@@ -890,7 +890,7 @@ window.MonsterVariants = {
       ]
     },
     "release:mourning_groom": {
-      "selected": "videos/monster_release_mourning_groom_v3.mp4",
+      "selected": "videos/monster_release_mourning_groom.mp4",
       "variants": [
         {
           "bytes": 252398,
@@ -1034,7 +1034,7 @@ window.MonsterVariants = {
       ]
     },
     "release:previous_tenant": {
-      "selected": "videos/monster_release_previous_tenant_v3.mp4",
+      "selected": "videos/monster_release_previous_tenant.mp4",
       "variants": [
         {
           "bytes": 203069,
@@ -1176,7 +1176,7 @@ window.MonsterVariants = {
       ]
     },
     "release:white_shadow": {
-      "selected": "videos/monster_release_white_shadow_v3.mp4",
+      "selected": "videos/monster_release_white_shadow.mp4",
       "variants": [
         {
           "bytes": 187174,
@@ -1226,7 +1226,7 @@ window.MonsterVariants = {
     }
   },
   "game": "the_horrors",
-  "generated": "2026-08-11 20:09:47",
+  "generated": "2026-08-11 21:57:31",
   "monsters": [
     {
       "attackRef": "ref/monster_pale_woman_attack.jpg",
@@ -1335,12 +1335,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_crawling_thing_v3.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "x": 0.49981831395348836,
+      "y": 0.45434721722082183
     },
     "videos/monster_attack_faceless_doctor_v2.mp4": {
       "enabled": true,
@@ -1359,7 +1359,7 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_faceless_doctor_v4.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
       "lead": 1.0,
       "scale": 2.6,
@@ -1447,12 +1447,12 @@ window.MonsterVariants = {
       "y": 0.4
     },
     "videos/monster_attack_paper_mask_v4.mp4": {
-      "enabled": false,
+      "enabled": true,
       "fade": 0.4,
-      "lead": 1.0,
+      "lead": 2.5,
       "scale": 2.6,
-      "x": 0.5,
-      "y": 0.4
+      "x": 0.4951671511627907,
+      "y": 0.4671508022246229
     },
     "videos/monster_attack_previous_tenant_v2.mp4": {
       "enabled": true,
