@@ -10,6 +10,11 @@ import { createPlayer, updatePlayer, renderPlayer } from './player.js';
 
 export const GRAVITY = 3000;
 
+/* Seconds in a shaft with no upward progress before the ward pulls him out. Long
+   on purpose: it is the net under someone who never works out the wall climb,
+   not a timer on being down there. */
+const SHAFT_RESCUE = 25;
+
 export function createWorld(ctx, opts = {}) {
   const { R, P, input, view, bus, rng, assets, LAYER } = ctx;
 
@@ -25,10 +30,11 @@ export function createWorld(ctx, opts = {}) {
     cam: { x: 0, y: 0, zoom: 1 },
     halfW: 960, halfH: 540,
     bounds: { x0: -400, x1: 9000, y0: -2200, y1: 900 },
-    /** Below this the player is in a hole he cannot climb out of — see world.inPit. */
+    /** Below this is off the map — under every floor the level has. See world.inPit. */
     pitY: 1500,
-    /** Columns with no way out at any depth: `{x0, x1, lip}`. Levels declare these. */
+    /** Climbable shafts: `{x0, x1, lip}`. Levels declare these. See world.inShaft. */
     pitZones: [],
+    shaftT: 0, shaftBest: Infinity,
     lastHits: [],
     debug: { aabb: false, grid: false, support: false, surfaces: false, rubble: false, player: false },
     stats: { entities: 0, props: 0, debris: 0, awake: 0, surfaceCells: 0, chunksDrawn: 0 },
@@ -577,18 +583,24 @@ export function createWorld(ctx, opts = {}) {
   };
   world.setPlayerSpawn = (x, y) => { world.spawnX = x; world.spawnY = y; };
 
+  /** Off the map entirely — under every floor the level has. Nothing survives it. */
+  world.inPit = (x, y) => y > world.pitY;
+
   /**
-   * Has this body fallen somewhere it cannot get back out of?
+   * Down the chasm: a place, not a death.
    *
-   * A depth alone is not enough. The chasm floor is 520px down behind cut-stone
-   * walls, but the bridge pillars STAND on that floor and top out 240px above
-   * the line — so bringing your own bridge down and landing on a stub left you
-   * part-way up a pillar in a shaft you cannot jump, with full health, no death
-   * and no respawn. Nothing to do but reload, which is the worst bug a level can
-   * have. A zone is the whole column: under its lip, at any height, is lost.
+   * This used to teleport you out the instant you crossed the lip, because the
+   * shaft looked like a softlock — land on a bridge pillar stub with full health
+   * and there was nothing to do but reload. But the walls are 40px of cut stone
+   * running rim to floor, and a wall jump off one of them clears the rim in
+   * 9–13 hops from the very bottom. So the shaft is climbable and the way out is
+   * the climb, not a respawn. `player.js` teaches it while you stand in there.
+   *
+   * The rescue below is only for someone who never finds the climb: it counts
+   * time spent making no upward progress, and any real gain resets it, so it
+   * cannot fire on anyone who is actually getting out.
    */
-  world.inPit = (x, y) => {
-    if (y > world.pitY) return true;
+  world.inShaft = (x, y) => {
     const z = world.pitZones;
     for (let i = 0; i < z.length; i++) {
       if (x >= z[i].x0 && x <= z[i].x1 && y > z[i].lip) return true;
@@ -634,7 +646,16 @@ export function createWorld(ctx, opts = {}) {
         world.damage(pl, 40, DAMAGE.IMPACT, { ignoreInvuln: true });
         world.respawn();
         bus.emit('player:pit', { x: fx, y: fy });
-      }
+      } else if (!pl.killed && world.inShaft(pl.x, pl.y)) {
+        if (pl.y < world.shaftBest - 30) { world.shaftBest = pl.y; world.shaftT = 0; }
+        else world.shaftT += dt;
+        if (world.shaftT > SHAFT_RESCUE) {
+          const fx = pl.x, fy = pl.y;
+          world.damage(pl, 40, DAMAGE.IMPACT, { ignoreInvuln: true });
+          world.respawn();
+          bus.emit('player:pit', { x: fx, y: fy });
+        }
+      } else if (world.shaftBest !== Infinity) { world.shaftT = 0; world.shaftBest = Infinity; }
     }
 
     const live = world.ents.live;

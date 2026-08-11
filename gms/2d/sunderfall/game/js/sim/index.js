@@ -443,13 +443,19 @@ export async function createPlayScene(ctx) {
    * stones at 7500 and the rock face behind them are the visual answer; this is
    * the one that removes the doubt.
    */
+  /* Long, and it comes back. The first version said its piece for 5.5s in a
+     toast wide enough for about thirty characters — so it was both cut off and
+     gone by the time anyone who was mid-fight looked up. Short line, fourteen
+     seconds, and walking back west re-arms it so a second visit says it again. */
   let endSaid = false;
   function endOfRoad() {
-    if (endSaid || !marks || marks.roadEnd == null) return;
+    if (!marks || marks.roadEnd == null) return;
     const p = world.player;
-    if (!p || !p.alive || p.killed || p.x < marks.roadEnd) return;
+    if (!p || !p.alive || p.killed) return;
+    if (p.x < marks.roadEnd - 500) { endSaid = false; return; }
+    if (endSaid || p.x < marks.roadEnd) return;
     endSaid = true;
-    bus.emit('hint:tip', { text: 'The road ends at the stones. Nothing built past them — yet.', value: 'END', life: 5.5 });
+    bus.emit('hint:tip', { text: 'The road ends here — for now', value: 'END', life: 14 });
   }
 
   let lastMark = -Infinity;

@@ -31,12 +31,14 @@ export function buildLevel(world) {
   const L = world.LAYER;
 
   world.bounds = { x0: -240, x1: 7700, y0: -1800, y1: 780 };
-  // The highest real ground in this level is y≈120, so anything past 300 means
-  // the player is down in the chasm with nothing to climb.
-  world.pitY = 300;
-  // …except that the bridge pillars stand on the chasm floor and reach up past
-  // that line, so the whole shaft has to count, not just the bottom of it. The
-  // deck's walking surface is y≈-70, well clear of the lip.
+  // Under the chasm floor (520) and above the bottom of the world (780): the
+  // terrain runs 1400 deep everywhere else, so this line is only ever crossed by
+  // something falling out of the level altogether.
+  world.pitY = 640;
+  // The chasm shaft. Not a kill box — its walls are cut stone from rim to floor
+  // and a wall jump climbs them — but the level has to name it so checkpoints
+  // stay off the bridge and the stuck-in-there rescue knows where "in there" is.
+  // The deck's walking surface is y≈-70, well clear of the lip.
   world.pitZones = [{ x0: CHASM_A - 30, x1: CHASM_B + 30, lip: 190 }];
 
   /* ---------------- terrain ---------------- */

@@ -3795,3 +3795,57 @@ storm and fire read as the same pale cream and the school colour is gone.
 `S.level` and emit `player:level` first, or the spell system refuses to assign past circle 1) and
 captures a 4× clip of the cluster in both orientations. `tools/touchtest.mjs` still passes 9/9 —
 none of this touches the hit tests.
+
+## playtest-fixes-15 — the chasm is a place now, and the end hint stays put
+
+### the wall climb is a feature
+
+Reported: "you can kind of magic climb up the last stone wall by continually jumping while pressed up
+against it… I don't mind that, and perhaps it could help someone out of the pit?" Ruled a feature,
+not a bug. It falls out of `WALL_JUMP_Y = -940` with `WALL_STICK = 0.11`: kick off, hold back into the
+wall, catch it again on the way down, repeat. Nothing was added to make it work — what changed is that
+the level now depends on it and the game says so.
+
+### the chasm no longer teleports you out
+
+The previous session's fix for the softlock was to respawn anyone who crossed the shaft's lip. That
+was the safe fix, not the right one. Measured: the chasm walls are two 40px masonry columns running
+rim to floor, and from the very bottom (y≈435) a wall-jump chain clears the rim in **5–13 hops**. So
+the shaft was always escapable; the player just had no way to know.
+
+- `world.inPit` is now only `y > pitY` — off the map, under every floor the level has. `pitY` moved
+  from 300 to 640, below the chasm floor at 520.
+- `world.inShaft(x, y)` took over the zone test. Being in one is survivable.
+- **The rescue net**: 25s in a shaft *with no upward progress* respawns you. Any gain of 30px resets
+  the timer, so it cannot fire on someone who is actually climbing — it is only there for a player who
+  never finds the mechanic. `world.shaftBest` must reset when he leaves the shaft, or the next fall
+  inherits a baseline he cannot beat and the net fires on a successful climb. Guard on
+  `shaftBest !== Infinity`, not on `shaftT !== 0`.
+- **Two teaching moments.** `player.js` fires a one-shot `hint:tip` the first time he clings to any
+  wall ("Jump off the wall to climb"), and `blockedHint` now answers "Jump at the wall to climb out"
+  while he is inside a shaft — it used to measure 999px of solid rock and advise blasting through it,
+  which is the one thing that cannot get him out.
+
+`scratchpad/chasm.mjs` walks him off the rim with the bridge down, then climbs: 0 respawns, out in 5
+taps, both hints fired. Standing still at the bottom is rescued at 29s.
+
+### the end-of-road hint was unreadable and then gone
+
+"I saw the hint popup but was focused on something else, when I went to read it, it was gone." Two
+faults. The line was 59 characters and the portrait toast fits about thirty, so `fitText` was
+ellipsising it — nobody could have read it whole. And 5.5s is not long enough for a message that
+arrives while you are mid-fight.
+
+Now 28 characters ("The road ends here — for now"), **14s**, and `endSaid` clears when he walks 500px
+back west, so a second visit says it again. `scratchpad/endhint.mjs` checks all three.
+
+**Any new `hint:tip` must be measured against the toast, not against the sentence you wanted to
+write.** Portrait `L.toast.w` is `min(260, …)`, minus 44 of chrome and the width of `value`.
+
+### where the content actually stops
+
+For the record, since it was asked: **7700 is the end of what is built.** Movements 1–3 of the four in
+DESIGN.md exist — Thornmere edge, the Sunderwood, Ruinreach. Movement 4, the Glyphglade, does not.
+`theseam.js` and `director.spawnBoss` are written and wired to each other but **nothing calls
+`spawnBoss`**, there is no arena, and there is no win state or ending scene. The stones and the brazier
+at 7500–7600 are a wall, not a finale.

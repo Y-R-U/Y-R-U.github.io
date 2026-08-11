@@ -349,6 +349,14 @@ export function updatePlayer(world, e, dt) {
     world.bus.emit('hint:tip', { text: 'Tap jump again in mid-air', value: 'LIFT', life: 4.5 });
   }
 
+  // Same idea for the wall. Kicking off one and catching it again is how you get
+  // out of the chasm now that falling in no longer teleports you out of it, and
+  // nobody finds that on their own — so say it the first time he clings to one.
+  if (!d.wallTold && d.state === 'wall') {
+    d.wallTold = true;
+    world.bus.emit('hint:tip', { text: 'Jump off the wall to climb', value: 'CLIMB', life: 7 });
+  }
+
   if (e.onGround) d.groundFoot = e.y + BODY_H * 0.5;
   blockedHint(world, e, dt, ax);
   autoAim(world, e, dt);
@@ -475,7 +483,10 @@ function blockedHint(world, e, dt, ax) {
   const withLift = jumpReach(world) * SAFE_LIFT;
 
   let text, action;
-  if (height <= plain) { text = 'Jump it'; action = 'JUMP'; }
+  // In the chasm every wall reads as 999px of solid rock, and "blast through it"
+  // is the one thing that will not get him out. The walls are the way out.
+  if (world.inShaft(e.x, e.y)) { text = 'Jump at the wall to climb out'; action = 'CLIMB'; }
+  else if (height <= plain) { text = 'Jump it'; action = 'JUMP'; }
   else if (height <= withLift) { text = 'Jump, then jump again'; action = 'LIFT'; }
   else if (prop) { text = (BLOCK_NAMES[prop.id] || 'This') + ' — break it'; action = 'BREAK'; }
   else { text = 'Solid rock — blast through it'; action = 'BREAK'; }
