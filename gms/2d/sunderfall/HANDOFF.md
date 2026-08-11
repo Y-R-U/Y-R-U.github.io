@@ -3612,10 +3612,17 @@ re-encoding. `say()` also cuts any line still speaking, which matters because tw
 inside the 4s priority cooldown would otherwise talk over each other.
 
 **Three lines were reworded to match what was actually recorded** — `selfBurn[2]`,
-`streak[0]`, `streak[1]`; the table is in `docs/VOICE-AND-MUSIC.md` §3. A bubble that
-disagrees with the voice reads as a bug, so the recording wins. `blocked[1]` — *"Right.
-Through it, then."* — is a fragment in the take and carries no `vo`; it plays as a silent
-bubble, which is exactly what every bark did yesterday.
+`streak[0]`, `streak[1]`, `blocked[1]`; the table is in `docs/VOICE-AND-MUSIC.md` §3. A
+bubble that disagrees with the voice reads as a bug, so the recording wins.
+
+`blocked[1]` is the interesting one. The take ran out of room and *"Right. Through it,
+then."* only ever got as far as *"Right."*, so the line is now just **"Right!"** — which
+carries the pool on its own, sarcastic or committed depending on what stopped him. Two
+things about that clip: the round trip lied the first time, returning "Right." for a window
+that also contained the previous line's "rock", and the truth only came out when the
+fragment was transcribed completely alone. And its `/t/` is a **separate burst 0.8s after
+the vowel**, so a cut placed before it comes back as `'RAVEN'` — the clip has to run to the
+last sample of the file. Both are worth knowing before anyone re-cuts it.
 
 **Finding the timings** was the same problem as the intro and the same answer, plus one new
 step now written into `docs/VO-TIMING-RECIPE.md`: **round-trip every cut**. Slice it out
@@ -3633,5 +3640,5 @@ SLICES  [{"off":0.24,"dur":0.08,"len":44.83},{"off":33.22,"dur":1.85,"len":44.83
 ```
 
 The second slice is `level[0]` — a real `player:level` event through barks.js, not a direct
-call. Still unrecorded anywhere in the build: nothing. Every line of text now has a voice
-except the one fragment above.
+call; `hint:blocked` twice gives `[40.62, 3.27]` and `[43.84, 1.02]`. **Every line of text
+in the build now has a voice.**

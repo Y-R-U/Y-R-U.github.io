@@ -252,14 +252,16 @@ not this section — a bubble that disagrees with the voice reads as a bug:
 | That's my own fire. That's my own fire. | That's my own fire. **My own fire!** |
 | Ha. Did you see that? | Did you see that? |
 | I am getting good at this. Worryingly good. | **I'm** getting good at this. Worryingly good. |
+| Right. Through it, then. | **Right!** |
 
 The repeated *"That's my own fire"* was deliberately changed on the second half, because Suno kept
 switching voice on the repeat; it still shifts up in pitch, which reads as him panicking and is
 better than the flat read would have been.
 
-**One line is unvoiced:** `blocked[1]` — *"Right. Through it, then."* The take ran out of room and
-only *"Right."* survives, so it carries no `vo` and plays as a silent bubble. Anything regenerated
-for it wants to match the rest of the take's voice.
+The last of those is there because the take ran out of room mid-line — only *"Right."* got
+generated. Rather than regenerate or suppress it, the fragment **is** the line now: on its own,
+*"Right!"* reads as sarcasm or as resolve depending on what just stopped him, which is the same
+joke the pool was already telling. **Every line in the game is voiced.**
 
 ---
 

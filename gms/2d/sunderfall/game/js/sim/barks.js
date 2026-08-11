@@ -68,8 +68,12 @@ const LINES = {
   ],
   blocked: [
     { t: 'It is a rock. I can deal with a rock.', vo: [40.62, 3.24] },
-    // the take ran out of room before this one; it plays silent until it is regenerated
-    { t: 'Right. Through it, then.' },
+    /* "Right. Through it, then." never finished generating — the take ends on the one
+       word. It survives as the whole line because "Right!" reads as either sarcasm or
+       resolve depending on what just blocked him. The clip runs to the last sample of
+       the file, and it has to: the /t/ is a separate burst 0.8s in, and a cut before it
+       turns the word into a vowel with no consonant. */
+    { t: 'Right!', vo: [43.84, 0.99] },
   ],
 };
 
