@@ -10,37 +10,37 @@
       "id": "shuttle_cockpit",
       "title": "Cleared For Departure",
       "still": "interior of a small clean two-seat shuttle cockpit, wide curved canopy filling the view, calm blue instrument glow on the consoles, open starfield and a distant blue planet beyond the glass, empty pilot seat, no people",
-      "video": "the camera moves down the dim central hallway to the sealed door at the end, the door slides open onto warm cabin light, the camera walks through into a small shuttle cockpit and settles facing the wide curved canopy, open stars and a distant blue planet ahead through the glass"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto warm cabin light, the camera walks through into a small shuttle cockpit and settles facing the wide curved canopy, open stars and a distant blue planet ahead through the glass"
     },
     {
       "id": "escape_pod",
       "title": "Away Clean",
       "still": "view through the round viewport of a small escape pod looking back at a huge damaged orbital station drifting against black space, the station lit along one edge by a distant sun, calm quiet stars, no people",
-      "video": "the camera moves down the dim central hallway to the sealed door at the end, the door slides open onto the padded interior of a compact escape pod, the camera moves inside and turns to the round viewport as the station falls away behind, the damaged station shrinking against black space"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto the padded interior of a compact escape pod, the camera moves inside and turns to the round viewport as the station falls away behind, the damaged station shrinking against black space"
     },
     {
       "id": "dyson_sphere",
       "title": "The Inside Of A Star",
       "still": "the vast curved interior surface of a dyson sphere seen from inside, an impossibly huge structured landscape curving up and over the horizon on all sides, a small bright sun hanging at the centre, warm golden light across endless geometric terrain, immense scale, no people",
-      "video": "the camera moves down the dim central hallway to the sealed door at the end, the door slides open onto overwhelming golden light, the camera walks out onto a high platform inside a dyson sphere, the enormous curved inner surface rising up and over the horizon in every direction, a small sun burning at the centre"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto overwhelming golden light, the camera walks out onto a high platform inside a dyson sphere, the enormous curved inner surface rising up and over the horizon in every direction, a small sun burning at the centre"
     },
     {
       "id": "moonscape",
       "title": "Under The Rings",
       "still": "exotic alien moonscape of pale blue-grey dust and low smooth ridges, an enormous ringed gas giant filling half the black sky above the horizon, soft rim light across the ground, still and silent, no people",
-      "video": "the camera moves down the dim central hallway to the sealed airlock at the end, the airlock opens onto soft blue light, the camera walks out onto the surface of an alien moon, pale dust underfoot, an enormous ringed gas giant rising across the whole black sky ahead"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto soft blue light, the camera walks out onto the surface of an alien moon, pale dust underfoot, an enormous ringed gas giant rising across the whole black sky ahead"
     },
     {
       "id": "observation_deck",
       "title": "The Long View",
       "still": "vast curved observation window running the full height of a quiet empty deck, a huge ringed planet turning slowly beyond the glass, cool blue planetlight washing across the clean empty floor, calm and still, no people",
-      "video": "the camera moves down the dim central hallway to the sealed door at the end, the door slides open onto cool blue light, the camera walks out onto a vast quiet observation deck, a huge ringed planet turning slowly beyond the full-height curved window ahead"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto cool blue light, the camera walks out onto a vast quiet observation deck, a huge ringed planet turning slowly beyond the full-height curved window ahead"
     },
     {
       "id": "station_departure",
       "title": "Smaller Every Second",
       "still": "wide view of an enormous ring-shaped orbital station seen from outside and below, lit windows in long rows along its curve, a blue-green planet turning behind it, deep black space and scattered stars, calm and vast, no people",
-      "video": "the camera moves down the dim central hallway to the sealed door at the end, the door slides open onto bright white light, the camera moves out through the airlock into open space and turns slowly, the enormous ring station falling away behind against a blue-green planet"
+      "video": "the camera moves down the dim central hallway to the door at the far end of the hallway, the door opens onto bright white light, the camera moves forward out of the station into open space and turns slowly, the enormous ring station falling away behind against a blue-green planet"
     }
   ]
 }
