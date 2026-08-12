@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SUNDERFALL — story test</title>
+<style>
+  html,body{margin:0;height:100%;background:#06060a;overflow:hidden;touch-action:none;
+    font:500 12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6f2;
+    -webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  body{position:fixed;inset:0}
+  canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  canvas#shot{position:absolute;left:0;top:0;width:100%;height:100%;display:none;pointer-events:none}
+  #hud{position:absolute;top:0;left:0;padding:calc(8px + env(safe-area-inset-top)) 10px 8px calc(10px + env(safe-area-inset-left));
+    pointer-events:none;text-shadow:0 1px 3px #000;line-height:1.5;white-space:pre;z-index:9}
+  #hud b{color:#ffc24d;font-weight:600}
+  #panel{position:absolute;right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));
+    display:flex;flex-direction:column;gap:5px;align-items:stretch;max-height:92%;overflow:auto;z-index:9}
+  button{font:600 11px/1 ui-monospace,monospace;letter-spacing:.05em;color:#dfe6f2;background:#161622cc;
+    border:1px solid #2c2c3f;border-radius:6px;padding:7px 9px;cursor:pointer;text-align:left}
+  button.on{background:#3a2a12cc;border-color:#7a5a20;color:#ffc24d}
+  .sep{height:6px}
+  .lab{color:#6e6a80;font-size:10px;letter-spacing:.14em;padding:2px 0 0 2px}
+  #log{position:absolute;left:calc(10px + env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));
+    max-width:min(62vw,720px);max-height:44%;overflow:auto;white-space:pre;z-index:9;
+    text-shadow:0 1px 3px #000;font-size:11px;line-height:1.5;pointer-events:none}
+  #log .ok{color:#7de08a}
+  #log .bad{color:#ff7b6b}
+  #scrub{position:absolute;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    width:min(46vw,520px);z-index:9;accent-color:#ffc24d}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<canvas id="shot"></canvas>
+<div id="hud"></div>
+<div id="panel">
+  <div class="lab">SCENES</div>
+  <div id="scenebtns"></div>
+  <div class="sep"></div>
+  <div class="lab">RUNNER</div>
+  <button id="b-skip">skip (tap/any key too)</button>
+  <button id="b-here">move scene to me: on</button>
+  <button id="b-cast">spawn all three looks</button>
+  <button id="b-clear">clear npcs</button>
+  <div class="sep"></div>
+  <div class="lab">CHECKS</div>
+  <button id="b-self">run self-test</button>
+  <button id="b-takes">voice takes</button>
+</div>
+<input id="scrub" type="range" min="0" max="1" step="0.001" value="0">
+<div id="log"></div>
+
+<script>window.__simHarness = true;</script>
+<script type="module">
+import { createRenderer, LAYER } from './js/gfx/renderer.js';
+import { createParticles } from './js/gfx/particles.js';
+import { createAssets } from './js/gfx/texture.js';
+import { createViewport } from './js/core/viewport.js';
+import { createInput } from './js/core/input.js';
+import { createBus } from './js/core/events.js';
+import { createRNG } from './js/core/rng.js';
+import { createLoop, DT } from './js/core/loop.js';
+import { createAudio } from './js/core/audio.js';
+import { createPlayScene } from './js/sim/index.js';
+import { createUI } from './js/ui/index.js';
+import { createStoryRunner } from './js/story/runner.js';
+import * as STORY from './js/story/script.js';
+
+const q = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const bus = createBus();
+const view = createViewport(canvas, bus);
+const R = await createRenderer(canvas);
+const P = createParticles(R);
+const input = createInput(canvas, view, bus);
+const rng = createRNG(q.get('seed') || 'sunderfall-story');
+const assets = createAssets(R.gl, '');
+
+R.resize(view.w, view.h, view.dpr, view.worldW);
+view.onResize(() => R.resize(view.w, view.h, view.dpr, view.worldW));
+
+const ctx = { R, P, input, view, bus, rng, assets, LAYER, DT, debug: true, story: STORY };
+ctx.audio = await createAudio(ctx);
+const scene = await createPlayScene(ctx);
+const world = ctx.world;
+ctx.ui = await createUI(ctx);
+await scene.enter(ctx, {});
+
+/* ------------------------------------------------------------------ *
+ * Fixture scenes.
+ *
+ * scenes.js is SF-SCRIPT's and is loaded when it exists, but the harness carries its
+ * own so this page is never blocked on another agent — and `demo` is the only scene
+ * that fires EVERY cue in contract §3.3, which is what makes it worth keeping once the
+ * real ones land.
+ * ------------------------------------------------------------------ */
+const FIXTURES = {
+  demo: {
+    id: 'demo', duration: 26, letterbox: 0.10,
+    cast: [{ who: 'ostrick', x: 0, face: -1, enter: 'stand' },
+           { who: 'staff', x: 220, face: -1, enter: 'stand' }],
+    cam: { x: 0, y: -180, zoom: 1.15, ease: 1.2 },
+    beats: [
+      { t: 0.8, dur: 2.4, who: 'ostrick', text: "Don't touch the stones.", anchor: 'ostrick', ax: 40, ay: -170, take: 'ostrick', vo: null },
+      { t: 3.6, dur: 2.2, who: 'rook', text: 'I had goats.', anchor: 'rook', ax: -55, ay: -190, take: 'rook2', vo: null },
+      { t: 6.4, dur: 2.4, who: 'ostrick', text: 'Keep the fire lit, boy.', anchor: 'ostrick', ax: 40, ay: -170, take: 'ostrick', vo: null },
+      { t: 12.0, dur: 2.4, who: 'seam', text: "You're what's here.", anchor: 'world', ax: 140, ay: -300, take: 'vayne2', vo: null },
+      { t: 20.0, dur: 2.2, who: 'rook', text: 'East, then.', anchor: 'rook', ax: 55, ay: -190, take: 'rook2', vo: null },
+    ],
+    cues: [
+      { t: 0.0, fx: 'cam.hold' },
+      { t: 0.2, fx: 'audio.cue', key: 'tension' },
+      { t: 5.0, fx: 'rook.walk', x: -120 },
+      { t: 8.0, fx: 'ostrick.leave' },
+      { t: 9.0, fx: 'fire.snuff' },
+      { t: 9.2, fx: 'cam.shake', a: 6, d: 0.6 },
+      { t: 10.0, fx: 'gate.crack' },
+      { t: 11.0, fx: 'gate.open' },
+      { t: 11.8, fx: 'seam.speak' },
+      { t: 13.0, fx: 'rook.kneel' },
+      { t: 14.0, fx: 'seam.reveal' },
+      { t: 15.0, fx: 'staff.take' },
+      { t: 16.0, fx: 'rook.walk', x: 60 },
+      { t: 17.0, fx: 'ostrick.arrive' },
+      { t: 17.4, fx: 'elders.arrive' },
+      { t: 18.0, fx: 'cam.to', x: 60, y: -220, dur: 1.4 },
+      { t: 19.0, fx: 'boss.start' },
+      { t: 21.0, fx: 'not.a.real.cue' },
+      { t: 23.0, fx: 'fade.out', dur: 1.5 },
+      { t: 24.6, fx: 'fade.in', dur: 1.0 },
+    ],
+  },
+};
+
+/* The scenes on offer: SF-SCRIPT's, plus the fixtures. */
+let SCENES = { ...FIXTURES };
+try {
+  const m = await import('./js/story/scenes.js');
+  SCENES = { ...(m.SCENES || m.default || {}), ...FIXTURES };
+} catch (e) {
+  log('scenes.js not present — fixtures only', 'bad');
+}
+
+/* Scenes are authored at their real world x, and half of act two's level does not
+   exist yet. `here` rewrites a copy of the scene around the player so every one of
+   them can be looked at on real ground today. Off with ?here=0. */
+let here = q.get('here') !== '0';
+function localise(s) {
+  if (!here || !world.player) return s;
+  // +110 so Rook stands where the act would have left him: west of the camera,
+  // not on top of whoever the scene puts at cam.x + 40.
+  const dx = Math.round(world.player.x + 110 - (s.cam ? s.cam.x : world.player.x));
+  const shift = (o, keys) => { const c = { ...o }; for (const k of keys) if (typeof c[k] === 'number') c[k] += dx; return c; };
+  return {
+    ...s,
+    cam: s.cam ? shift(s.cam, ['x']) : s.cam,
+    cast: (s.cast || []).map((c) => shift(c, ['x'])),
+    cues: (s.cues || []).map((c) => shift(c, ['x'])),
+    beats: (s.beats || []).map((b) => (b.anchor === 'world' ? shift(b, ['ax']) : b)),
+  };
+}
+
+const story = createStoryRunner(ctx, world, { scenes: new Proxy({}, {
+  get: (_, id) => (typeof id === 'string' && SCENES[id] ? localise(SCENES[id]) : undefined),
+  has: (_, id) => typeof id === 'string' && !!SCENES[id],
+  ownKeys: () => Object.keys(SCENES),
+  getOwnPropertyDescriptor: () => ({ enumerable: true, configurable: true }),
+}) });
+
+/* ------------------------------------------------------------------ *
+ * Loop.
+ *
+ * Deliberately the same order sim/index.js uses: story.update BEFORE world.update,
+ * NPCs stepped once by the sim, story.render inside the world's begin/end pair.
+ * scene.update() already drives its own story runner and NPC tick, so the calls here
+ * are the harness's own runner — the pool ignores the second caller (npc.js `owner`).
+ * ------------------------------------------------------------------ */
+const loop = createLoop({
+  getTimeScale: () => R.fx.getTimeScale(),
+  update(dt) {
+    input.update();
+    story.update(dt);
+    scene.update(dt);
+    world.npcs.update(dt);
+    P.update(dt);
+    if (ctx.ui && ctx.ui.update) ctx.ui.update(dt);
+  },
+  render(alpha, real) {
+    R.tick(real);
+    R.begin(world.cam);
+    scene.renderWorld ? scene.renderWorld(alpha) : null;
+    R.end();
+    drawFrame(alpha);
+    if (ctx.ui && ctx.ui.render) ctx.ui.render(alpha);
+    composite();
+    hudTick(real);
+  },
+});
+
+/* scene.render owns R.begin/R.end, so the runner's own drawing has to go inside it.
+   Wrapping it is the least invasive way to get that without owning sim/index.js. */
+function drawFrame(alpha) {
+  const end = R.end;
+  R.end = function () {
+    world.npcs.render(alpha);
+    story.render(alpha);
+    R.end = end;
+    end.call(R);
+  };
+  scene.render(alpha);
+  R.end = end;
+}
+
+loop.start();
+
+/* ---- screenshot composite (GL + the UI's 2D canvas in one bitmap) ---- */
+const shotCv = document.getElementById('shot');
+const shotOn = q.has('shot');
+let sctx = null;
+if (shotOn) { shotCv.style.display = 'block'; sctx = shotCv.getContext('2d'); }
+function composite() {
+  if (!sctx) return;
+  const w = Math.round(view.w * view.dpr), h = Math.round(view.h * view.dpr);
+  if (shotCv.width !== w) { shotCv.width = w; shotCv.height = h; }
+  sctx.clearRect(0, 0, w, h);
+  sctx.drawImage(canvas, 0, 0, w, h);
+  const ui = document.getElementById('sf-canvas');
+  if (ui) sctx.drawImage(ui, 0, 0, w, h);
+}
+
+/* ---- hud / log ---- */
+const hud = document.getElementById('hud');
+const logEl = document.getElementById('log');
+const scrubEl = document.getElementById('scrub');
+let acc = 0;
+function hudTick(real) {
+  acc += real;
+  if (acc < 0.1) return;
+  acc = 0;
+  const p = world.player;
+  hud.innerHTML =
+    `<b>${loop.fps.toFixed(0)} fps</b>  draws ${R.stats.drawCalls}  npcs ${world.npcs.count}` +
+    `  ${world.npcs.driven ? 'sim-driven' : 'runner-driven'}\n` +
+    `scene <b>${story.current || '—'}</b>  t ${story.time.toFixed(1)}  ` +
+    `control ${world.playerControl}  camLock ${!!world.camLock}\n` +
+    `rook x ${p ? p.x | 0 : '—'}  cam ${world.cam.x | 0},${world.cam.y | 0}  zoom ${world.cam.zoom.toFixed(2)}`;
+  const s = SCENES[story.current];
+  if (s) { scrubEl.max = s.duration; scrubEl.value = story.time; }
+}
+function log(msg, cls) {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = msg;
+  logEl.appendChild(d);
+  logEl.scrollTop = 1e6;
+  console.log('[story-test] ' + msg);
+}
+
+/* ---- panel ---- */
+const btns = document.getElementById('scenebtns');
+for (const id of Object.keys(SCENES)) {
+  const b = document.createElement('button');
+  b.textContent = 'play ' + id;
+  b.onclick = () => play(id);
+  btns.appendChild(b);
+}
+document.getElementById('b-skip').onclick = () => story.skip();
+document.getElementById('b-here').onclick = (e) => {
+  here = !here;
+  e.target.textContent = 'move scene to me: ' + (here ? 'on' : 'off');
+};
+document.getElementById('b-cast').onclick = () => {
+  const p = world.player;
+  const x = p ? p.x : 0;
+  world.npcs.spawn('ostrick', x + 190, null, { face: -1 });
+  world.npcs.spawn('elder', x + 400, null, { face: -1 });
+  world.npcs.spawn('staff', x + 580, null, {});
+};
+document.getElementById('b-clear').onclick = () => world.npcs.clear();
+document.getElementById('b-takes').onclick = () => log('takes ' + JSON.stringify(ctx.audio.takes()));
+document.getElementById('b-self').onclick = () => selftest();
+scrubEl.oninput = () => scrub(+scrubEl.value);
+
+async function play(id) {
+  log('play ' + id);
+  const t0 = performance.now();
+  await story.play(id);
+  log('  ' + id + ' done in ' + ((performance.now() - t0) / 1000).toFixed(1) + 's  ' +
+    'control=' + world.playerControl + ' camLock=' + !!world.camLock);
+}
+
+/* Deterministic scrub: restart the scene and step it to t with no wall clock at all. */
+async function scrub(t) {
+  const id = story.current || q.get('scene') || Object.keys(SCENES)[0];
+  if (story.playing) story.skip();
+  story.play(id);
+  await Promise.resolve();
+  story.scrub(t);
+}
+
+/* ------------------------------------------------------------------ *
+ * Self-test. Everything a headless run needs to assert, in one call:
+ *   node tools/shot.mjs --url '…?shot=1&self=1' --console
+ * ------------------------------------------------------------------ */
+/**
+ * What the world looks like after a scene. Cue-for-cue equality is not enough on its
+ * own — a cue that only works when there is a clock running would still be listed as
+ * fired — so this samples the things the cues are supposed to have DONE.
+ */
+function fingerprint() {
+  const w = world;
+  let lit = 0;
+  for (const p of w.props.props) if (p.alive && p.def && p.def.light) lit++;
+  const g = w.marks && w.marks.gate;
+  return {
+    control: w.playerControl, camLock: !!w.camLock,
+    zoom: +(w.cam.zoom || 1).toFixed(3),
+    npcs: w.npcs.count,
+    litProps: lit,
+    gateSolid: g ? !!w.terrain.solidAtWorld(g.x, (g.y || 0) - 60) : null,
+  };
+}
+const playerX = () => (world.player ? world.player.x : 0);
+
+/** A freshly built level with Rook in a known spot. The only honest start for a test. */
+async function fresh() {
+  await scene.enter(ctx, {});
+  window.__story.goto(470);
+}
+
+async function selftest() {
+  logEl.innerHTML = '';
+  /* Hermetic: the loop is stopped for the whole run. Otherwise real frames slip
+     between the two plays of a scene — the sim moves Rook, and sim/act.js reacts to
+     `story:done` by advancing the act and sometimes moving him a long way — and the
+     comparison stops being about the runner at all. */
+  loop.stop();
+  const ids = q.get('self') && q.get('self') !== '1' ? q.get('self').split(',') : ['demo'];
+  let fails = 0;
+  const ok = (name, cond, extra) => {
+    if (!cond) fails++;
+    log((cond ? 'PASS  ' : 'FAIL  ') + name + (extra ? '   ' + extra : ''), cond ? 'ok' : 'bad');
+  };
+
+  for (const id of ids) {
+    if (!SCENES[id]) { ok(id + ' exists', false); continue; }
+    const dur = SCENES[id].duration;
+
+    /* Both runs start from a freshly built level. Rewinding the player is not enough:
+       `gate.open` carves terrain and drops props, and carving the same hole twice is
+       not the same as carving it once — so a second play in the same world can never
+       match the first no matter what the runner does. Rook is put back on the road
+       afterwards because `enter()` also rebuilds sim/act.js, which spawns him wherever
+       the act state it resumed into says he belongs. */
+    await fresh();
+
+    // 1. a full play: every cue fires, control comes back, nothing is left on stage
+    story.play(id);
+    await Promise.resolve();
+    ok(id + ' takes control', world.playerControl === false && world.camLock === true);
+    story.scrub(dur + 0.2);
+    const full = story.fired;
+    const fullPrint = fingerprint();
+    ok(id + ' full play returns control', world.playerControl === true && world.camLock === false);
+    ok(id + ' full play leaves no npc', world.npcs.count === 0, 'npcs=' + world.npcs.count);
+    ok(id + ' full play fired every cue', full.length === (SCENES[id].cues || []).length,
+      full.length + '/' + (SCENES[id].cues || []).length);
+
+    // 2. the same scene skipped at 0.5s must leave the same world state
+    const fullX = playerX();
+    const zoomBefore = world.cam.zoom;
+    await fresh();
+    story.play(id);
+    await Promise.resolve();
+    story.scrub(0.5);
+    story.skip();
+    const skipped = story.fired;
+    ok(id + ' skip returns control', world.playerControl === true && world.camLock === false);
+    ok(id + ' skip runs the same cues in the same order',
+      skipped.join(',') === full.join(','), skipped.length + ' vs ' + full.length);
+    ok(id + ' skip leaves no npc', world.npcs.count === 0, 'npcs=' + world.npcs.count);
+    ok(id + ' skip restores zoom', Math.abs(world.cam.zoom - zoomBefore) < 0.001, world.cam.zoom.toFixed(3));
+    const skipPrint = fingerprint();
+    ok(id + ' skip leaves the same world state',
+      JSON.stringify(skipPrint) === JSON.stringify(fullPrint),
+      JSON.stringify(skipPrint) + ' vs ' + JSON.stringify(fullPrint));
+    /* `boss.start` hands the player to sim/act.js, which moves him to the arena — so
+       for a scene containing it, where Rook ends up is that module's answer, not the
+       runner's, and the two paths legitimately differ. Reported, not asserted. */
+    const handsOver = (SCENES[id].cues || []).some((c) => c.fx === 'boss.start');
+    if (handsOver) log('INFO  ' + id + ' hands Rook to act.js at boss.start — ' +
+      (playerX() | 0) + ' vs ' + (fullX | 0));
+    else ok(id + ' skip leaves Rook in the same place',
+      Math.abs(playerX() - fullX) < 40, (playerX() | 0) + ' vs ' + (fullX | 0));
+
+    // 3. twice in a row leaks nothing
+    story.play(id); await Promise.resolve(); story.scrub(dur + 0.2);
+    story.play(id); await Promise.resolve(); story.scrub(dur + 0.2);
+    ok(id + ' played twice leaks no npc', world.npcs.count === 0, 'npcs=' + world.npcs.count);
+    ok(id + ' played twice leaves no letterbox', !story.playing);
+  }
+
+  // 3b. a real key event skips, and only once the scene has armed
+  await fresh();
+  story.play(ids[0]);
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' }));
+  ok('a key in the first half second does not skip', story.playing === true);
+  story.scrub(0.8);
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' }));
+  ok('a real key event skips an armed scene', story.playing === false);
+  ok('the skip listener is unhooked on finish', (() => {
+    const before = world.playerControl;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' }));
+    return before === world.playerControl && !story.playing;
+  })());
+
+  // 3c. nothing advances under a pause menu, and reset() still hands control back
+  await fresh();
+  story.play(ids[0]);
+  story.scrub(1.0);
+  ctx.ui.setPaused(true);
+  const tPaused = story.time;
+  story.scrub(tPaused + 2);
+  ok('the runner does not advance while ui.blocked', Math.abs(story.time - tPaused) < 0.001,
+    story.time.toFixed(2) + ' vs ' + tPaused.toFixed(2));
+  ctx.ui.setPaused(false);
+  story.reset();
+  ok('reset() ends the scene and restores control',
+    !story.playing && world.playerControl === true && world.camLock === false && world.npcs.count === 0);
+
+  // 4. input is never left held across the boundary
+  input.setAction('right', true);
+  story.play(ids[0]); await Promise.resolve();
+  ok('held input released on entry', input.held('right') === false);
+  story.skip();
+  ok('held input released on exit', input.held('right') === false);
+
+  // 5. a missing scene must not throw or take control
+  const r = await story.play('does-not-exist');
+  ok('unknown scene is a no-op', r === false && world.playerControl === true);
+
+  // 6. the voice takes: three of six are not on disk and nothing may care
+  const takes = ctx.audio.takes();
+  ok('audio.hasTake is honest about a missing take', ctx.audio.hasTake('rook2') === false,
+    JSON.stringify(takes));
+  ok('audio.voice on a missing take is false', ctx.audio.voice(0, 1, { take: 'rook2' }) === false);
+
+  loop.start();
+  log(fails ? fails + ' FAILURES' : 'all checks passed', fails ? 'bad' : 'ok');
+  return { fails };
+}
+
+window.__story = {
+  ctx, world, story, scene, R, P, input, view, loop, SCENES,
+  play, skip: () => story.skip(), scrub, selftest,
+  npcs: world.npcs,
+  state: () => ({
+    playing: story.playing, current: story.current, t: story.time,
+    control: world.playerControl, camLock: !!world.camLock,
+    npcs: world.npcs.count, fired: story.fired,
+    cam: { x: world.cam.x | 0, y: world.cam.y | 0, zoom: world.cam.zoom },
+  }),
+  /** Teleport Rook, for looking at a scene where its level will eventually be. */
+  goto(x) {
+    const p = world.player;
+    if (!p) return;
+    p.x = x; p.px = x; p.vx = 0;
+    const g = world.groundY(x, -600, 3000);
+    p.y = (Number.isFinite(g) ? g : 0) - p.h * 0.5 - 4;
+    p.py = p.y;
+    world.cam.x = x; world.cam.y = p.y - 200;
+  },
+};
+
+/* ---- URL driving ---- */
+if (q.has('zoom')) {
+  world.cam.zoom = +q.get('zoom');
+  world.halfW = view.worldW * 0.5 / world.cam.zoom;
+  world.halfH = view.worldH * 0.5 / world.cam.zoom;
+}
+if (q.has('goto')) window.__story.goto(+q.get('goto'));
+if (q.has('cast')) document.getElementById('b-cast').onclick();
+if (q.has('self')) { setTimeout(selftest, 250); }
+else if (q.has('scene')) {
+  const id = q.get('scene');
+  setTimeout(async () => {
+    story.play(id);
+    await Promise.resolve();
+    if (q.has('at')) story.scrub(+q.get('at'));
+    if (q.has('skipat')) { story.scrub(+q.get('skipat')); story.skip(); }
+  }, 200);
+}
+</script>
+</body>
+</html>

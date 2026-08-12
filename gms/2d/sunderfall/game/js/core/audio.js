@@ -27,6 +27,24 @@ import { SPELL_SFX } from './audio/sfx-spells.js';
 import { UI_SFX } from './audio/sfx-ui.js';
 import { makeRng, analyse } from './audio/dsp.js';
 
+/**
+ * Every voice recording in the game, keyed by **take** rather than by speaker: Rook has
+ * three (the cinematic, the barks, act two) and Vayne has two (his own, and the one the
+ * Seam wears). `story/scenes.js` names one of these per line.
+ *
+ * Only `barks` and the intro's two are on disk today. The other three are generated
+ * later and the game must not care: a take that 404s costs one console warning and
+ * nothing else, and `hasTake()` keeps answering false until the file exists.
+ */
+const VO_TAKES = {
+  barks: 'barks.mp3',
+  rook: 'rook.mp3',
+  vayne: 'vayne.mp3',
+  ostrick: 'ostrick.mp3',
+  rook2: 'rook2.mp3',
+  vayne2: 'vayne2.mp3',
+};
+
 /** Baked first, in this order, during idle time after the context starts. */
 const WARM = [
   'player.step.dirt', 'player.step.stone', 'player.step.wood', 'player.step.leaf',
@@ -95,7 +113,9 @@ export async function createAudio(ctx) {
     voices = createVoices(actx, mix, bank, { sfxCap: 40, uiCap: 8, ambCap: 10 });
     amb = createAmbience(actx, mix, voices, rng);
     music = createMusic(actx, mix, 0xB0A7);
-    vo = createVO(actx, mix, new URL('../../audio/vo/barks.mp3', import.meta.url).href);
+    const voUrls = {};
+    for (const k in VO_TAKES) voUrls[k] = new URL('../../audio/vo/' + VO_TAKES[k], import.meta.url).href;
+    vo = createVO(actx, mix, voUrls, { defaultTake: 'barks' });
     voices.setListener(listener.x, listener.y, listener.halfW);
     // Only the hot set is pre-baked. Baking all 231 keys costs 2.5 s of CPU and
     // produces ~75 MB of float, most of which the LRU would immediately throw away;
@@ -262,13 +282,26 @@ export async function createAudio(ctx) {
     /* -- recorded voice -- */
 
     /**
-     * Speak seconds [at, at+len) of Rook's bark take. The offsets belong with the lines,
-     * in sim/barks.js; nothing else should be calling this. Returns false — harmlessly —
-     * if the take has not finished decoding yet.
+     * Speak seconds [at, at+len) of a take: `voice(12.4, 1.8, { take: 'ostrick' })`.
+     * `take` defaults to `barks`, which is what every pre-existing caller means. The
+     * offsets belong with the lines — sim/barks.js and story/scenes.js. Returns false,
+     * harmlessly, if the take is missing or has not finished decoding.
      */
     voice(at, len, o) { return started && vo ? vo.say(at, len, o) : false; },
     stopVoice(fade) { if (vo) vo.stop(fade); },
     get speaking() { return !!(vo && vo.speaking); },
+
+    /**
+     * Would `voice(..., {take})` actually be heard? Asking is what starts the (lazy,
+     * non-blocking) fetch, so the honest answer is false on the first call for a take
+     * and true a moment later — and false forever for a file that is not on disk.
+     * sim/barks.js and the cutscene runner use this to decide whether a line has audio.
+     */
+    hasTake(name) { return !!(started && vo && vo.has(name)); },
+    /** Fetch a take ahead of the scene that needs it. Never throws, never blocks. */
+    loadTake(name) { return started && vo ? vo.load(name) : Promise.resolve(false); },
+    /** Introspection: { barks: 'ready', ostrick: 'missing', … } */
+    takes() { return vo ? vo.report() : {}; },
 
     stop(id, fade) { if (started) voices.stop(id, fade); },
     stopKey(key, fade) { if (started) voices.stopKey(keys.resolve(key), fade); },

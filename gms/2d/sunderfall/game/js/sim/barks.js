@@ -16,64 +16,100 @@
  * Emits `bark` on the bus; ui/index.js turns that into a speech bubble anchored
  * to him. Nothing here draws.
  *
- * `vo: [offset, length]` is where the line sits inside `audio/vo/barks.mp3` — one
- * take with all of them in it, played a slice at a time by core/audio/vo.js. The
- * text here is what the recording actually says, so the two never disagree; if a
- * line is reworded the recording is wrong until it is regenerated, and the honest
- * move is to drop its `vo` rather than play the old words under new ones. Timings
- * came out of the take by the method in docs/VO-TIMING-RECIPE.md.
+ * `vo: [offset, length]` is where the line sits inside its take — one recording
+ * with many lines in it, played a slice at a time by core/audio/vo.js. The text
+ * here is what the recording actually says, so the two never disagree; if a line
+ * is reworded the recording is wrong until it is regenerated, and the honest move
+ * is to drop its `vo` rather than play the old words under new ones. Timings came
+ * out of the take by the method in docs/VO-TIMING-RECIPE.md.
+ *
+ * Two things gate a line out of the pool:
+ *
+ *   `take`  — **every line in this game is voiced**, so a line whose recording has
+ *             not been generated is not selectable at all. `rook2` does not exist
+ *             yet (docs/SCRIPTS-ACT-TWO.md); those lines are dead weight until it
+ *             does, and that is on purpose — a silent bubble among voiced ones
+ *             reads as a bug, not as restraint.
+ *   `after` — a number is a player level, a string is a story flag (a scene id from
+ *             `story:done`). His voice widens as the run goes on: early Rook sulks,
+ *             late Rook is grimly used to it, and the Ostrick callbacks cannot fire
+ *             before he has met Ostrick.
  */
 
 import { DAMAGE } from './materials.js';
 
 const GLOBAL_CD = 11;       // seconds between any two barks
 const PRIORITY_CD = 4;      // …unless the new line is more important than the last
+const ALONE_GAP = 40;       // quiet enough, for long enough, that he starts talking to himself
 
 const LINES = {
   selfBurn: [
-    { t: 'This magic stuff sucks.', vo: [0.24, 2.00] },
-    { t: 'I set me on fire. Again.', vo: [3.18, 2.54] },
-    { t: "That's my own fire. My own fire!", vo: [5.94, 3.02] },
-    { t: 'Nobody saw that.', vo: [8.92, 1.54] },
+    { t: 'This magic stuff sucks.', take: 'barks', vo: [0.24, 2.00] },
+    { t: 'I set me on fire. Again.', take: 'barks', vo: [3.18, 2.54] },
+    { t: "That's my own fire. My own fire!", take: 'barks', vo: [5.94, 3.02] },
+    { t: 'Nobody saw that.', take: 'barks', vo: [8.92, 1.54] },
+    { t: 'Yep. Still flammable.', take: 'rook2', vo: null, after: 5 },
+    { t: 'Every time. Every single time.', take: 'rook2', vo: null, after: 5 },
   ],
   selfAcid: [
-    { t: 'It is eating my boots.', vo: [10.70, 1.76] },
-    { t: 'Was that meant to splash?', vo: [12.48, 1.64] },
+    { t: 'It is eating my boots.', take: 'barks', vo: [10.70, 1.76] },
+    { t: 'Was that meant to splash?', take: 'barks', vo: [12.48, 1.64] },
   ],
   hurt: [
-    { t: "That's a lot of my blood.", vo: [14.04, 1.71] },
-    { t: 'Ow. Properly, ow.', vo: [15.66, 1.92] },
-    { t: 'Vayne. You picked wrong.', vo: [17.50, 1.62] },
+    { t: "That's a lot of my blood.", take: 'barks', vo: [14.04, 1.71] },
+    { t: 'Ow. Properly, ow.', take: 'barks', vo: [15.66, 1.92] },
+    { t: 'Vayne. You picked wrong.', take: 'barks', vo: [17.50, 1.62] },
+    { t: "Fine. That's fine.", take: 'rook2', vo: null, after: 5 },
+    { t: "I've had worse. Recently.", take: 'rook2', vo: null, after: 5 },
   ],
   low: [
-    { t: 'I am not built for this.', vo: [19.38, 1.86] },
-    { t: 'Still up. Barely.', vo: [21.14, 1.34] },
+    { t: 'I am not built for this.', take: 'barks', vo: [19.38, 1.86] },
+    { t: 'Still up. Barely.', take: 'barks', vo: [21.14, 1.34] },
+    { t: 'Not here. Not for this.', take: 'rook2', vo: null, after: 5 },
+    { t: 'Keep the fire lit, he said.', take: 'rook2', vo: null, after: 'stones' },
   ],
   bigBreak: [
-    { t: 'Nothing in Thornmere ever broke like that.', vo: [22.74, 3.10] },
-    { t: 'Cass could never do that.', vo: [25.74, 1.56] },
-    { t: 'Oh, that is going to be a problem later.', vo: [27.24, 1.91] },
+    { t: 'Nothing in Thornmere ever broke like that.', take: 'barks', vo: [22.74, 3.10] },
+    { t: 'Cass could never do that.', take: 'barks', vo: [25.74, 1.56] },
+    { t: 'Oh, that is going to be a problem later.', take: 'barks', vo: [27.24, 1.91] },
+    { t: 'Sorry. To whoever built that.', take: 'rook2', vo: null, after: 6 },
+    { t: "That was somebody's wall.", take: 'rook2', vo: null, after: 6 },
   ],
   streak: [
-    { t: 'Did you see that?', vo: [29.07, 1.55] },
-    { t: "I'm getting good at this. Worryingly good.", vo: [30.58, 2.40] },
+    { t: 'Did you see that?', take: 'barks', vo: [29.07, 1.55] },
+    { t: "I'm getting good at this. Worryingly good.", take: 'barks', vo: [30.58, 2.40] },
+    { t: "That's the stone. Not me.", take: 'rook2', vo: null, after: 6 },
+    { t: "I don't like how easy that was.", take: 'rook2', vo: null, after: 6 },
   ],
   level: [
-    { t: 'Something moved. In me, I mean.', vo: [33.22, 1.82] },
-    { t: 'It is getting easier to hold.', vo: [34.96, 1.69] },
+    { t: 'Something moved. In me, I mean.', take: 'barks', vo: [33.22, 1.82] },
+    { t: 'It is getting easier to hold.', take: 'barks', vo: [34.96, 1.69] },
+    { t: "It fits better now. That's worse.", take: 'rook2', vo: null, after: 6 },
+    { t: 'Bigger. Great.', take: 'rook2', vo: null, after: 6 },
   ],
   pit: [
-    { t: 'Not my finest.', vo: [36.60, 1.24] },
-    { t: 'The hole was quite obvious, in hindsight.', vo: [37.82, 2.66] },
+    { t: 'Not my finest.', take: 'barks', vo: [36.60, 1.24] },
+    { t: 'The hole was quite obvious, in hindsight.', take: 'barks', vo: [37.82, 2.66] },
+    { t: 'Down again. Fine.', take: 'rook2', vo: null, after: 4 },
+    { t: 'Walls. Use the walls.', take: 'rook2', vo: null, after: 4 },
   ],
   blocked: [
-    { t: 'It is a rock. I can deal with a rock.', vo: [40.62, 3.24] },
+    { t: 'It is a rock. I can deal with a rock.', take: 'barks', vo: [40.62, 3.24] },
     /* "Right. Through it, then." never finished generating — the take ends on the one
        word. It survives as the whole line because "Right!" reads as either sarcasm or
        resolve depending on what just blocked him. The clip runs to the last sample of
        the file, and it has to: the /t/ is a separate burst 0.8s in, and a cut before it
        turns the word into a vowel with no consonant. */
-    { t: 'Right!', vo: [43.84, 0.99] },
+    { t: 'Right!', take: 'barks', vo: [43.84, 0.99] },
+    { t: 'I know what to do with rock now.', take: 'rook2', vo: null, after: 6 },
+  ],
+  // Nothing near him and nothing to say for forty seconds. The pool is entirely about the
+  // life he left, which is the only thing he thinks about when there is room to think.
+  alone: [
+    { t: 'Nobody ever needed saving from a goat.', take: 'rook2', vo: null, after: 3 },
+    { t: 'Cass would hate this. Small mercy.', take: 'rook2', vo: null, after: 4 },
+    { t: "I'd take the goats.", take: 'rook2', vo: null, after: 5 },
+    { t: 'Keep the fire lit.', take: 'rook2', vo: null, after: 'stones' },
   ],
 };
 
@@ -81,20 +117,50 @@ export function createBarks(world) {
   const bus = world.bus;
   const offs = [];
   const used = {};                       // trigger -> indices already spoken this cycle
+  const flags = {};                      // story flag -> true, from `story:done`
   let lastAt = -99, lastPri = 0;
   let t = 0;
   let kills = 0, killAt = -99;
   let lowSaid = false;
+  let level = 1;
+  let nearAt = 0;                        // last time anything hostile was on screen
+
+  const audio = () => (world.ctx && world.ctx.audio) || null;
+
+  /**
+   * Is this line's recording actually on disk? `audio.hasTake` is the authority when it
+   * exists; without it, a real `vo` is the only proof a take was ever generated, which is
+   * exactly the answer we want for the not-yet-recorded rook2 lines.
+   */
+  function voiced(line) {
+    const a = audio();
+    if (a && a.hasTake && a.hasTake(line.take)) return true;
+    return line.vo != null;
+  }
+
+  function unlocked(line) {
+    if (line.after == null) return true;
+    if (typeof line.after === 'number') {
+      const sys = world.ctx && world.ctx.spellSystem;   // survives a resume; `level` does not
+      return (sys && sys.level != null ? sys.level : level) >= line.after;
+    }
+    return !!flags[line.after];
+  }
 
   function pick(trigger) {
     const pool = LINES[trigger];
     if (!pool) return null;
+    const ok = [];
+    for (let i = 0; i < pool.length; i++) if (voiced(pool[i]) && unlocked(pool[i])) ok.push(i);
+    if (!ok.length) return null;
     let u = used[trigger];
-    if (!u || u.length >= pool.length) u = used[trigger] = [];
-    let i = (world.rng.next() * pool.length) | 0;
-    for (let n = 0; n < pool.length && u.indexOf(i) >= 0; n++) i = (i + 1) % pool.length;
-    u.push(i);
-    return pool[i];
+    // the cycle is over when every line he is currently allowed has been used, not every
+    // line in the pool — otherwise unlocking one line silently re-opens all the old ones
+    if (!u || ok.every((i) => u.indexOf(i) >= 0)) u = used[trigger] = [];
+    let k = (world.rng.next() * ok.length) | 0;
+    for (let n = 0; n < ok.length && u.indexOf(ok[k]) >= 0; n++) k = (k + 1) % ok.length;
+    u.push(ok[k]);
+    return pool[ok[k]];
   }
 
   /** priority 1 = flavour, 2 = worth interrupting flavour, 3 = always say it */
@@ -107,8 +173,8 @@ export function createBarks(world) {
     const line = pick(trigger);
     if (!line) return;
     lastAt = world.time; lastPri = priority;
-    const audio = world.ctx && world.ctx.audio;
-    if (line.vo && audio && audio.voice) audio.voice(line.vo[0], line.vo[1]);
+    const a = audio();
+    if (line.vo && a && a.voice) a.voice(line.vo[0], line.vo[1], { take: line.take });
     bus.emit('bark', { text: line.t, trigger, priority });
   }
 
@@ -139,13 +205,44 @@ export function createBarks(world) {
     if (++kills >= 3) { kills = 0; bark('streak', 1); }
   }));
 
-  offs.push(bus.on('player:level', () => bark('level', 1)));
+  offs.push(bus.on('player:level', (e) => { if (e && e.level) level = e.level; bark('level', 1); }));
   offs.push(bus.on('player:pit', () => bark('pit', 2)));
   offs.push(bus.on('hint:blocked', (e) => { if (e.action === 'BREAK') bark('blocked', 1); }));
+  offs.push(bus.on('story:done', (e) => { if (e && e.id) flags[e.id] = true; }));
+
+  /** Anything alive and hostile within a screen of him. */
+  function hostileNear() {
+    const p = world.player;
+    const list = world.entities;
+    if (!p || !list) return false;
+    const rx = world.halfW || 960, ry = (world.halfH || 540) * 1.2;
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      if (!e.alive || e.kind !== 'enemy') continue;
+      if (Math.abs(e.x - p.x) < rx && Math.abs(e.y - p.y) < ry) return true;
+    }
+    return false;
+  }
+
+  let scanIn = 0;
 
   return {
-    update(dt) { t += dt; },
-    reset() { t = 0; lastAt = -99; lastPri = 0; kills = 0; lowSaid = false; },
+    update(dt) {
+      t += dt;
+      // The empty stretches between encounters are the only time he is company for himself.
+      // Scanned twice a second because it walks every entity and nothing here is urgent.
+      scanIn -= dt;
+      if (scanIn > 0) return;
+      scanIn = 0.5;
+      if (!world.playerControl || hostileNear()) { nearAt = world.time; return; }
+      if (world.time - nearAt >= ALONE_GAP && world.time - lastAt >= ALONE_GAP) bark('alone', 1);
+    },
+    /** A resume comes back mid-act with scenes already seen; SF-ACT hands those back here. */
+    setFlag(id) { if (id) flags[id] = true; },
+    reset() {
+      t = 0; lastAt = -99; lastPri = 0; kills = 0; lowSaid = false;
+      nearAt = world.time; scanIn = 0;
+    },
     destroy() { for (const o of offs) o(); offs.length = 0; },
   };
 }

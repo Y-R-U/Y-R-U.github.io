@@ -6,7 +6,10 @@
  * Speech bubbles reuse the data shape from `story/script.js` (SPEAKER + BEATS), so a story beat can
  * be handed straight to `say()`: {who, text, dur, anchor|x|y}. Speaker style drives the bubble:
  * 'sharp' is Rook — hard angular panel, cold ink, clipped typing; 'shaky' is Vayne — a trembling
- * outline on parchment, lit from inside.
+ * outline on parchment, lit from inside; 'none' is the Seam, and it is the absence that does the
+ * work — no panel, no edge, no tail, no name, just letters hanging where a voice would be. A tail
+ * points at the body that is speaking, and there is no body, so drawing one would be the game
+ * agreeing that somebody is there.
  */
 
 import { C, A, txt, measure, numStr, clamp01, easeOutCubic, easeOutBack, FONT_UI, FONT_D } from './theme.js';
@@ -184,9 +187,11 @@ export function createBubbles(speakers) {
         bx = Math.min(Math.max(bx, cl.x + b.w * 0.5), cl.x + cl.w - b.w * 0.5);
         by = Math.min(Math.max(by, cl.y + b.h * 0.5), cl.y + cl.h - b.h * 0.5);
 
+        const bare = b.sp.style === 'none';
         const inK = clamp01(b.t / 0.22);
         const outK = clamp01((b.dur + 0.45 - b.t) / 0.4);
-        const s = easeOutBack(inK) * (0.75 + 0.25 * outK);
+        // The pop-in is a panel arriving. Nothing arrives here; it fades up in place.
+        const s = bare ? (0.985 + 0.015 * inK) : easeOutBack(inK) * (0.75 + 0.25 * outK);
         const alpha = clamp01(inK * 2) * outK;
         const shake = b.sp.jitter || 0;
 
@@ -200,6 +205,8 @@ export function createBubbles(speakers) {
         const edge = rgb(b.sp.edge, C.brass);
         const ink = rgb(b.sp.ink, C.ink);
         const sharp = b.sp.style === 'sharp';
+
+        if (bare) { drawBare(c, b, w2, h2, ink, edge, now); c.restore(); continue; }
 
         // tail first, so the body's stroke covers its join
         const tx = (tipX - bx) / s, ty = (tipY - by) / s;
@@ -271,3 +278,59 @@ export function createBubbles(speakers) {
 }
 
 const WRAP_OPT = { weight: 620 };
+
+/**
+ * The Seam's line: no panel, no edge, no tail, no name tag — just the letters.
+ *
+ * Drawn a character at a time so each one can drift on its own slow cycle. That
+ * is the whole trick and it is worth the per-glyph `measureText`: a block of text
+ * that moves as one is a caption, and letters that move independently are not
+ * coming from a mouth. It is also using Vayne's voice, so it is set in his serif
+ * at his pace — with none of his tremble, which is what is wrong with it.
+ *
+ * Centred rather than left-aligned: without a panel there is no margin to hang a
+ * ragged left edge off, and a ragged edge reads as a missing box.
+ */
+function drawBare(c, b, w2, h2, ink, edge, now) {
+  const cps = b.sp.cps || 30;
+  let budget = Math.floor(b.t * cps);
+  const lh = b.size * 1.5;
+  let ly = -h2 + 14 + lh * 0.5;
+  c.textBaseline = 'middle';
+  c.textAlign = 'left';
+  c.font = '600 ' + b.size.toFixed(1) + 'px ' + FONT_D;
+  const pulse = 0.55 + 0.45 * Math.sin(now * 1.9 + b.seed);
+  const a0 = c.globalAlpha;      // read once: multiplying and dividing it back per glyph drifts
+  for (let k = 0; k < b.lines.length; k++) {
+    const ln = b.lines[k];
+    if (budget <= 0) break;
+    const shown = budget >= ln.length ? ln : ln.slice(0, budget);
+    budget -= ln.length;
+    // centred on the FULL line, not on what has been typed so far — centring on
+    // `shown` re-centres every time a character lands, so the whole line shuffles
+    // sideways once per keystroke and the per-glyph drift is lost in it
+    let px = -c.measureText(ln).width * 0.5;
+    for (let i = 0; i < shown.length; i++) {
+      const ch = shown[i];
+      const cw = c.measureText(ch).width;
+      if (ch !== ' ') {
+        const dy = Math.sin(now * 0.85 + b.seed + (k * 7 + i) * 0.55) * b.size * 0.11;
+        c.shadowColor = edge;
+        c.shadowBlur = b.size * (0.5 + 0.35 * pulse);
+        c.fillStyle = ink;
+        c.fillText(ch, px, ly + dy);
+        // a second pass through the glow only, so the letters sit IN the air
+        // rather than on top of it
+        c.globalCompositeOperation = 'lighter';
+        c.globalAlpha = a0 * 0.18;
+        c.fillText(ch, px, ly + dy);
+        c.globalCompositeOperation = 'source-over';
+        c.globalAlpha = a0;
+      }
+      px += cw;
+    }
+    ly += lh;
+  }
+  c.shadowBlur = 0;
+  void w2;
+}

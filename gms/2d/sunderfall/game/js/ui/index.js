@@ -361,7 +361,10 @@ export function createUI(ctx) {
 
     boss(b) {
       if (!b) { if (st.boss) st.boss.closing = true; return; }
-      st.boss = Object.assign({ show: 0, ghost: b.hp, hitAt: -9, phases: [0.33, 0.66] }, b);
+      // `phases` present-but-undefined would overwrite the default via assign
+      const o = Object.assign({ show: 0, ghost: b.hp, hitAt: -9, phases: [0.33, 0.66] }, b);
+      if (!o.phases || !o.phases.length) o.phases = [0.33, 0.66];
+      st.boss = o;
     },
     bossDamage(hp) {
       if (!st.boss) return;
@@ -427,6 +430,26 @@ export function createUI(ctx) {
       if (touch) touch.setEnabled(false);
     },
 
+    /**
+     * victory(stats, { onStay }) — the end of act two.
+     *
+     * It blocks, which is what holds the world on its last frame (main.js gates
+     * the sim on `ui.blocked`). "Stay" hands the frame back rather than
+     * restarting anything, so the controls have to come back with it.
+     */
+    victory(stats, opts) {
+      overlays.showVictory(
+        Object.assign({ level: st.level, runTime: st.runTime, kills: st.kills, broken: st.broken }, stats),
+        {
+          onStay: () => {
+            if (touch) touch.setEnabled(true);
+            if (opts && opts.onStay) opts.onStay();
+          },
+        });
+      if (touch) touch.setEnabled(false);
+    },
+    get victoryOpen() { return overlays.victoryOpen; },
+
     /** For the harness and for a scene that wants the controls forced on or off. */
     setTouch(v) { forceTouch = v; resize(); },
     /** Wipe the run mirror back to a fresh run — used by the death screen's Again. */
@@ -439,6 +462,7 @@ export function createUI(ctx) {
       st.inCombat = false;
       // nothing may survive into the new run holding the screen
       overlays.hideDeath();
+      overlays.hideVictory();
       overlays.cancelChoice();
       overlays.closePause();
       assignMode = null;
@@ -555,6 +579,37 @@ export function createUI(ctx) {
       api.toast(e.text || e.name || 'Picked up', { kind: e.kind || 'shard', value: e.value ? String(e.value) : '' });
       if (e.kind === 'shard') st.shards++;
     }));
+    /* The boss bar. `ui.boss` / `ui.bossDamage` and the whole of `drawBoss` —
+       phase pips, ghost trail, hit flash — shipped months ago and no line of
+       code has ever called any of it, because nothing had ever spawned a boss.
+       These four handlers are the entire wiring. */
+    offs.push(bus.on('boss:spawn', (e) => {
+      const en = e && e.entity;
+      const d = en && en.data;
+      const b = {
+        name: (e && e.name) || (d && d.bossName) || 'THE SEAM',
+        subtitle: (d && d.phaseName) || '',
+        hp: en ? en.hp : (e && e.hp) || 1,
+        maxHp: en ? (en.maxHp || en.hp) : (e && e.hp) || 1,
+        entity: en || null,
+      };
+      // Thresholds belong to the unit, not to the HUD — a pip in the wrong place
+      // is worse than no pip. Taken from the event or the entity when either
+      // carries them; the Seam does neither (theseam.js keeps `PHASES` private),
+      // so sim/act.js overwrites `st.boss.phases` on this same event. Anything
+      // that says nothing gets the generic two-pip bar.
+      const ph = (e && e.phases) || (d && d.phaseAt);
+      if (ph && ph.length) b.phases = ph;
+      api.boss(b);
+    }));
+    offs.push(bus.on('boss:phase', (e) => {
+      if (!st.boss) return;
+      st.boss.subtitle = (e && e.name) || st.boss.subtitle;
+      st.boss.phase = e && e.phase;
+      st.boss.hitAt = now;
+    }));
+    offs.push(bus.on('boss:dead', () => api.boss(null)));
+
     offs.push(bus.on('story:beat', (e) => bubbles.say(e)));
     offs.push(bus.on('scene:change', (e) => {
       const play = e.name === 'play';
@@ -725,6 +780,11 @@ export function createUI(ctx) {
     }
 
     if (st.boss) {
+      /* There is no `enemy:damage` on the bus (ARCHITECTURE §4.6 never reserved
+         one) and adding one would mean a bus event per hit on every enemy in the
+         game. Polling the one entity that has a bar is cheaper and cannot drift. */
+      const be = st.boss.entity;
+      if (be && be.alive && be.hp !== st.boss.hp) api.bossDamage(be.hp);
       st.boss.show = clamp01(st.boss.show + (st.boss.closing ? -dt * 2 : dt * 1.6));
       st.boss.ghost += (st.boss.hp - st.boss.ghost) * Math.min(1, dt * 1.6);
       if (st.boss.ghost < st.boss.hp) st.boss.ghost = st.boss.hp;
@@ -770,7 +830,14 @@ export function createUI(ctx) {
 
     // expire toasts
     for (let i = toasts.length - 1; i >= 0; i--) if (now - toasts[i].at > toasts[i].life + 0.4) toasts.splice(i, 1);
+    /* The toast column moves out from under the boss bar while one is up —
+       `L.toast.yBoss` is where it goes, and the bar's own reveal drives the slide
+       so the two arrive together. Geometry lives in ui/layout.js. */
+    const bossPush = st.boss
+      ? Math.max(0, L.toast.yBoss - L.toast.y) * clamp01(st.boss.show) : 0;
+    if (bossPush > 0) { c.save(); c.translate(0, bossPush); }
     drawToasts(c, L, toasts, env);
+    if (bossPush > 0) c.restore();
 
     if (touch) {
       touch.render(c, dt, now);

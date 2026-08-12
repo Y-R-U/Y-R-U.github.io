@@ -424,12 +424,113 @@ export function createOverlays(ctx, L, st, api) {
     setTimeout(() => { const b = row.querySelector('button'); if (b) b.focus(); }, 60);
   }
 
+  /* ================= victory ================= */
+
+  /* Not a death screen with green text.
+   *
+   * The death screen is a slab: full scrim, blur, a blood-red title centred in
+   * the void, and the frame behind it is irrelevant because the frame behind it
+   * is where you died. This one is the opposite posture. The arena has just come
+   * down — it is the best the game ever looks — so the panel sits low, the scrim
+   * is a vignette rather than a curtain, there is no blur, and the last frame is
+   * the thing you are looking at. `ui.blocked` stops the sim for us, so it really
+   * is held, not paused-looking.
+   *
+   * The stylesheet is `ui/ui.css`, which this agent does not own (ACT-TWO-CONTRACT
+   * §2), so the handful of rules that differ from `.sf-death` are injected here.
+   * Fold them into ui.css whenever that file is next opened by its owner.
+   */
+  const VICTORY_CSS = `
+#sf-ui .sf-victory {
+  background: radial-gradient(130% 110% at 50% 25%, rgba(6,6,12,0) 0%, rgba(4,4,9,.55) 55%, rgba(2,2,5,.88) 100%);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  place-items: end center;
+}
+#sf-ui .sf-victory .sf-panel {
+  width: min(620px, 100%); text-align: center;
+  background: linear-gradient(180deg, rgba(11,10,18,.82), rgba(4,4,9,.95));
+  box-shadow: 0 0 0 1px rgba(183,138,74,.30), 0 -18px 60px rgba(0,0,0,.6);
+}
+#sf-ui .sf-victory .sf-title {
+  color: var(--goldL); text-shadow: 0 0 46px rgba(255,194,77,.35);
+  font-size: clamp(26px, 6vw, 46px);
+}
+#sf-ui .sf-victory .quote {
+  font-family: var(--dsp); font-style: italic; font-size: 15px; color: var(--bone);
+  margin: 6px 0 16px; opacity: .92;
+}
+#sf-ui .sf-victory .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+#sf-ui .sf-victory .grid div { padding: 9px 4px; background: rgba(255,255,255,.03); box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+#sf-ui .sf-victory .grid b { display: block; font-family: var(--dsp); font-size: 21px; color: var(--goldL); }
+#sf-ui .sf-victory .grid span { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+#sf-ui .sf-victory .row { display: flex; gap: 10px; }
+#sf-ui .sf-victory .row .sf-btn { justify-content: center; text-align: center; flex: 1; }
+#sf-ui .sf-victory .row .sf-btn::before { display: none; }
+@media (max-width: 560px) {
+  #sf-ui .sf-victory .grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  #sf-ui .sf-victory .grid b { font-size: 17px; }
+  #sf-ui .sf-victory .sf-sub { font-size: 12px; }
+}
+`;
+  if (!document.getElementById('sf-victory-css')) {
+    const s = el('style');
+    s.id = 'sf-victory-css';
+    s.textContent = VICTORY_CSS;
+    document.head.appendChild(s);
+  }
+
+  const victory = el('div', 'sf-modal sf-victory');
+  victory.hidden = true;
+  root.appendChild(victory);
+
+  /**
+   * showVictory(stats, { onStay })
+   *
+   * Two buttons and no third. `ui:restart` / `ui:quit` are the only two exits
+   * main.js listens for, and a "Continue" that emitted a third name would sit
+   * there doing nothing for months exactly like those two did — so **Again** is
+   * `api.quit()` (the existing total wipe, save included) and **Stay** is purely
+   * local: hide the panel, hand the controls back, walk around the wreckage.
+   */
+  function showVictory(s, opts) {
+    cancelChoice();
+    death.hidden = true;
+    victory.innerHTML =
+      '<div class="sf-panel">' +
+        '<h2 class="sf-title">The seam is closed</h2>' +
+        '<p class="quote">“Keep the fire lit,” he said, and left.</p>' +
+        '<div class="grid">' +
+          '<div><b>' + s.level + '</b><span>Level</span></div>' +
+          '<div><b>' + mmss(s.runTime) + '</b><span>Took</span></div>' +
+          '<div><b>' + s.kills + '</b><span>Slain</span></div>' +
+          '<div><b>' + s.broken + '</b><span>Broken</span></div>' +
+        '</div>' +
+        '<p class="sf-sub">You put it out the way Vayne did — by spending what you had. You are still ' +
+          'standing because the old man had already paid for it. The elders came when it was over ' +
+          'and had nothing to say.</p>' +
+        '<div class="row"></div>' +
+      '</div>';
+    const row = victory.querySelector('.row');
+    // longer than the death screen's: the boy just killed it, the thumb is still
+    // hammering the cast circle, and one of these buttons throws the run away
+    const armed = performance.now() + ARM_MS * 1.6;
+    const guard = (fn) => () => { if (performance.now() < armed) return; victory.hidden = true; fn(); };
+    row.appendChild(btn('Again', 'A clean run — nothing kept', 'danger', guard(() => api.quit())));
+    const stay = btn('Stay', 'Walk the wreckage', '', guard(() => { if (opts && opts.onStay) opts.onStay(); }));
+    row.appendChild(stay);
+    victory.hidden = false;
+    victory.classList.add('arming');
+    setTimeout(() => victory.classList.remove('arming'), ARM_MS * 1.6);
+    // focus the one that cannot destroy anything — Enter must never wipe a save
+    setTimeout(() => stay.focus(), 60);
+  }
+
   /* ================= public ================= */
 
   const o = {
     root,
-    get modal() { return !pause.hidden || !choice.hidden || !death.hidden; },
-    get blocking() { return !pause.hidden || !choice.hidden || !death.hidden; },
+    get modal() { return !pause.hidden || !choice.hidden || !death.hidden || !victory.hidden; },
+    get blocking() { return !pause.hidden || !choice.hidden || !death.hidden || !victory.hidden; },
     get choiceOpen() { return !choice.hidden; },
     get pauseOpen() { return !pause.hidden; },
 
@@ -452,6 +553,9 @@ export function createOverlays(ctx, L, st, api) {
     showLevelUp,
     showDeath,
     hideDeath() { death.hidden = true; },
+    showVictory,
+    hideVictory() { victory.hidden = true; },
+    get victoryOpen() { return !victory.hidden; },
     setFps(v) {
       // `?diag` forces it on without touching the saved setting
       fps.hidden = !api.settings.showFps && !DIAG_Q;

@@ -3849,3 +3849,72 @@ DESIGN.md exist — Thornmere edge, the Sunderwood, Ruinreach. Movement 4, the G
 `theseam.js` and `director.spawnBoss` are written and wired to each other but **nothing calls
 `spawnBoss`**, there is no arena, and there is no win state or ending scene. The stones and the brazier
 at 7500–7600 are a wall, not a finale.
+
+---
+
+## act-two — the game has an ending (2026-08-13)
+
+Four agents in parallel on disjoint file sets, coordinated by **`docs/ACT-TWO-CONTRACT.md`** (read that
+first; it is the work order and it explains why each piece is shaped as it is). Their full handoffs are
+**`docs/handoff/SF-{SCRIPT,STORY,LEVEL,ACT}.md`** and are not summarised away — go to them for APIs,
+gotchas and the reasoning. This section is the index and the orchestrator's own pass.
+
+The line above — *"7700 is the end of what is built"* — is now out of date. It isn't.
+
+### What exists that did not
+
+- **Movement 4.** `sim/glade.js` + `sim/level.js`: the breach, a scorched approach, the Glyphglade
+  (the intro's clearing, overrun, with Vayne's staff still standing) and the arena. `bounds.x1` 7700
+  → 11400.
+- **A dialogue system.** `story/runner.js` plays in-world cutscenes; `sim/npc.js` gives the game its
+  first NPCs (Ostrick, elders, the staff). `interact` had been in ACTIONS with nothing consuming it
+  since the project started.
+- **Four scenes**, `story/scenes.js`, 64 beats: `stones`, `fire`, `glade`, `after`.
+- **A boss fight that happens.** `theseam.js` was complete and had never been spawned by any line in
+  the repo. `sim/act.js` is the nine-state machine that gets you there; the boss bar in `ui/hud.js`
+  had also never been called.
+- **A win state** — victory screen in `ui/overlays.js`, `progress.act` persistence, `?act=<state>`.
+
+### The orchestrator's pass — five defects the agents left or filed
+
+1. **`runner.js`'s ground probe caught overhangs.** It searched down from `player.y - 1200`, and the
+   anti-wall-climb brow west of the stones hangs at y −1200…−2100 across x 7380–7900 — so entering the
+   scene mid-jump read **−1376 as "the ground"** and the safety clamp hauled a correct `cam.y` a
+   thousand pixels into the sky. `act.js` triggers that scene on `player.x > 7440`, one hop away.
+   Now reads `world.groundAt(x)`, the authored profile, which cannot see a ceiling.
+2. **The last frame of the game was its darkest.** The Seam *is* the arena's key light, so closing it
+   left the ending in a blue murk with the boy an invisible dot. Added **first light** (`sim/index.js`):
+   dawn rises over 14s from `boss:dead`, night → warm as a token lerp, and a finished save walks the
+   ruins in daylight. Tuned twice — the first pass raised ambient and haze together and produced a
+   sepia dust storm, because haze colour is what the distance bands fade *into*, so lifting its
+   luminance veils the frame and takes the contrast with it. Dawn is the same darkness with the blue
+   taken out and one warm key put in.
+3. **Terrain depth only ever looked up.** `depthAt` in `sim/terrain.js` measured distance to air
+   vertically, which is right for ground and wrong for a cliff: every cell below the rock face's brow
+   was "deep buried mass", so the face rendered as a **flat black slab 240px wide across the only road
+   in act two**. Depth is now distance to the nearest air in either direction; only cells already deep
+   pay for the sideways scan, and it runs on chunk build. The exposed-face caps now fade on the same
+   curve — they ignored depth entirely, so on a tall face they out-ran the wall behind them and drew a
+   glowing dotted outline round the cliff. Verified no regression at Thornmere, the Sunderwood, the
+   arch, the chasm and the acid wall.
+4. **Portrait boss bar over the toast stack** (SF-ACT filed it against `ui/layout.js`, which it did not
+   own). Layout now publishes `L.toast.yBoss` and the renderer lerps by the bar's own reveal; SF-ACT's
+   render-path stopgap is gone. The bar also moved down 20px — `drawBoss` stacks name and subtitle 24px
+   above the bar and at +34 the title sat across the focus readout.
+5. **`?act=won` cold-boots into an intact arena** by design (the world is never saved), which is fine,
+   but its toast is ellipsised at ~30 chars. Left as-is; noted here so the next reader knows it is
+   known.
+
+### Traps worth carrying forward
+
+- **An open modal stops the world.** `ui.blocked` halts `scenes.update`, so an unanswered level-up
+  offer freezes the sim entirely. It cost this session a false "the boss is invulnerable after phase 2"
+  diagnosis — HP frozen at exactly 1800 for twenty seconds, because time had stopped. Any headless run
+  must answer the spell offer and the death screen; SF-ACT's autopilot in `docs/handoff/SF-ACT.md` §10
+  does both and is worth pasting into any CDP session.
+- **Speech bubbles are on `#sf-canvas`, not the WebGL canvas.** `tools/shot.mjs --canvas` has never
+  captured one. Grab the page, not the canvas.
+- **No mp3s yet.** `ostrick.mp3`, `rook2.mp3`, `vayne2.mp3` do not exist; every new line is silent by
+  design and `vo: null` everywhere. `docs/SCRIPTS-ACT-TWO.md` is the generation brief and §4 is the
+  paste-the-offsets-in procedure. The 19 new barks are gated on their take being on disk and are
+  therefore **inert** — that is deliberate, not a bug to fix.

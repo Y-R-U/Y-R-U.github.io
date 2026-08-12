@@ -121,7 +121,8 @@ hiding behind is worth ten enemies that do not.
 ## 5. The level
 
 One long level, left to right with vertical excursions, ~35–50 minutes, in four movements matching
-the four art locations:
+the four art locations. The whole of it is one story: **Ostrick tells Rook to keep a fire lit, and
+the fire goes out.**
 
 1. **Thornmere edge** (dusk) — tutorial in disguise. Fences, crates, a barn. Teaches jump, dash,
    manual cast, and that things break. No real threat.
@@ -129,21 +130,40 @@ the four art locations:
    auto-cast circle, first spell choice.
 3. **Ruinreach** — collapsed medieval stonework. The destruction showcase: buttressed walls that
    genuinely collapse when you take out what supports them, bridges you can drop, arches you can
-   bring down onto enemies. This is the section that must produce the screenshots.
-4. **The Glyphglade** — back to where Vayne died, now overrun. Boss: **the Seam**.
+   bring down onto enemies. This is the section that must produce the screenshots. It ends at the
+   **standing stones** (x 7550) and a rock face that does not open.
+4. **The Glyphglade** — the breach east of the stones, the scorched approach, the clearing where
+   Vayne died, and the arena. Boss: **the Seam**.
 
-**The seam between 3 and 4 is a scene, not a door.** At the standing stones — 7500, where the built
-level currently stops — Rook meets **Keeper Ostrick**, a cranky wizard who cannot believe Vayne
-would elevate a farm boy over forty years of his own service. Rook offers the power up, flatly, and
-that is what convinces him: Vayne must have been out of time. Ostrick leaves to fetch the elders and
-tells Rook to keep the brazier lit, because nothing crosses the stones while it burns. That does two
-jobs — it explains why a fifteen-year-old fights the Seam alone, and the fire going out is what
-opens movement 4, so the Glyphglade has a cause instead of just being further right. Full scene,
-both voices and the Suno prompts: `docs/VOICE-AND-MUSIC.md` §8.
+**The seam between 3 and 4 is a scene, not a door**, and it is four scenes long:
 
-Needs a first pass at dialogue: `interact` is in `core/input.js`'s ACTIONS list and **nothing
-consumes it** — there is no NPC, no interactable, no conversation runner. The speaker/bubble half
-already exists (`story/script.js` SPEAKER + `ui/world.js` bubbles); Ostrick is a third entry there.
+- **The stones** (7440). Rook meets **Keeper Ostrick**, a functionary who cannot believe Vayne would
+  elevate a farm boy over forty years of his own service. Rook offers the power up, flatly, and that
+  is what convinces him — nobody who wanted it would give it away, so Vayne must have been out of
+  time. Ostrick leaves to fetch the elders and tells Rook to keep the brazier lit, because nothing
+  crosses the stones while it burns. **This is the second adult in a row to hand him the job and
+  walk away.**
+- **The vigil** (7550). Three growing waves at the brazier. He is holding ground because he was
+  told to.
+- **The fire** (7550). The flame bends *inward* — something is drinking it — and Rook's own fire
+  will not relight it, which is the first thing in the game he cannot do. The rock face cracks and
+  opens: whatever is behind it has been leaning on it since the intro. So movement 4 has a cause
+  instead of just being further right.
+- **The glade** (8700). Back where Vayne died, with the ward circle still burnt into the ground and
+  the staff still standing. **The Seam speaks in Vayne's voice** — it has none of its own and uses
+  the last one it heard, and it gets him wrong: too even, no tremble, it repeats itself, and it says
+  *Rook*, which Vayne never did. Rook takes the staff and walks east; the way closes behind him at
+  9620.
+
+He wins the way Vayne won — by spending what he has — and survives it because the old man already
+paid for that. **The after scene** is the elders arriving too late and saying nothing at all while
+Ostrick offers the only apology a functionary has: there is a Rite, there is a Naming, if the boy
+wants it. Rook says *"No."* — Ostrick's own word from the stones, handed back — and goes home to
+feed the goats.
+
+Every line of it, with the Suno takes: **`docs/SCRIPTS-ACT-TWO.md`**. The data the game plays is
+`game/js/story/scenes.js`; the sequencing is `sim/act.js`; `docs/ACT-TWO-CONTRACT.md` is how the
+four pieces fit together.
 
 Roguelite layer — **Vayne's ward**. The old man bound a ward to Rook's life before it cost him his
 own, so death replays the day rather than ending it. It gives back what it can: every spell at the

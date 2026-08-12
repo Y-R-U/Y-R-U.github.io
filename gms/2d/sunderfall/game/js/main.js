@@ -37,13 +37,22 @@ async function tryImport(paths) {
   return null;
 }
 
-/** Silent no-op audio so nothing has to null-check ctx.audio. */
+/**
+ * Silent no-op audio so nothing has to null-check ctx.audio.
+ *
+ * This is the object a machine with no working AudioContext runs the whole game
+ * on, so every method the game calls has to exist here — a missing one is a
+ * TypeError on the boot path of the user least equipped to report it. The take
+ * methods are act two's: `sim/barks.js` asks `hasTake()` before it will select a
+ * line, because a silent line in a pool of voiced ones reads as a bug.
+ */
 function stubAudio() {
   const noop = () => {};
   return {
     stub: true, ready: false, muted: false,
     play: noop, sfx: noop, music: noop, stopMusic: noop,
     voice: () => false, stopVoice: noop,
+    hasTake: () => false, loadTake: () => Promise.resolve(false), takes: () => ({}),
     setVolume: noop, resume: noop, unlock: noop,
   };
 }
@@ -506,7 +515,12 @@ async function boot() {
 
   // the intro owns its own canvas and resolves when done or skipped
   const params = new URLSearchParams(location.search);
-  const skipIntro = params.has('nointro') || params.get('scene') === 'play';
+  /* `?act=<state>` jumps into the middle of act two (sim/act.js owns the list).
+     Sitting through 76 seconds of act-one cinematic to get there helps nobody,
+     so it implies `?nointro` — unless the state asked for IS the start. */
+  const actJump = params.get('act');
+  const skipIntro = params.has('nointro') || params.get('scene') === 'play' ||
+    (!!actJump && actJump !== 'road');
   if (!skipIntro && mods.intro && mods.intro.runIntro) {
     /* Every browser refuses to play audio until the page has been touched, and
        the intro's own first tap is wired to skip — so the only gesture that

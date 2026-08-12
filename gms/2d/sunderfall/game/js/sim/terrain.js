@@ -499,6 +499,28 @@ export function createTerrain(world, opts = {}) {
         cn++;
       };
 
+      /**
+       * How far this cell is from the nearest air, capped at RAMP_DEPTH. Drives
+       * the darkening that makes ground read as mass.
+       *
+       * It used to look only upward, but "the surface" is not always above you: a
+       * cliff is exposed sideways, so every cell below its brow was called deep
+       * buried mass and the rock face at the end of the road rendered as a flat
+       * black slab — 240px wide, across the only road in act two. Cells that are
+       * already deep vertically pay for a sideways scan; flat ground never
+       * reaches the test, and it all runs on chunk build, not per frame.
+       */
+      const depthAt = (cx, cy) => {
+        let d = 0;
+        for (let k = 1; k <= RAMP_DEPTH; k++) { if (T.filled(cx, cy - k)) d = k; else break; }
+        if (d >= RAMP_DEPTH) {
+          for (let k = 1; k < d; k++) {
+            if (!T.filled(cx - k, cy) || !T.filled(cx + k, cy)) { d = k; break; }
+          }
+        }
+        return d;
+      };
+
       for (let cy = cy0; cy < cy1; cy++) {
         let run = -1, runMat = -1, runShade = -1;
         for (let cx = cx0; cx <= cx1; cx++) {
@@ -510,8 +532,7 @@ export function createTerrain(world, opts = {}) {
             // depth below the surface, capped — drives the vertical darkening.
             // 24 cells, not 12: portrait shows ~570px of sub-ground and a ramp
             // that bottomed out after 192px left the lower half of it flat.
-            dep = 0;
-            for (let k = 1; k <= RAMP_DEPTH; k++) { if (T.filled(cx, cy - k)) dep = k; else break; }
+            dep = depthAt(cx, cy);
             shadeBucket = dep | (char[i] > 40 ? 32 : 0);
           }
           if (has && run >= 0 && m === runMat && shadeBucket === runShade) continue;
@@ -563,7 +584,15 @@ export function createTerrain(world, opts = {}) {
           const mm = MAT[m];
           const ch2 = char[i] / 255;
           const grass = (flag[i] & FLAG.GRASS) !== 0 && !up;
-          const nz = 0.85 + hash2i(cx * 3, cy * 5) * 0.3;
+          /* Caps used to ignore depth entirely, which is harmless on a ground line
+             — that is all depth 0 — but on a tall face the wall behind them is
+             darkened to a third and the cap is not, so the exposed edges read as a
+             glowing dotted outline round the cliff. Fade them on the same curve as
+             the body they are capping; a cap must never out-run its wall. */
+          const cdep = depthAt(cx, cy);
+          const ct = (1 - cdep / RAMP_DEPTH) * (1 - cdep / RAMP_DEPTH);
+          const cf = 0.34 + 0.66 * ct;
+          const nz = (0.85 + hash2i(cx * 3, cy * 5) * 0.3) * cf;
           let r = mm.body[0] * 1.85 * nz, g = mm.body[1] * 1.80 * nz, b = mm.body[2] * 1.75 * nz;
           if (grass) { r = 0.20 * nz; g = 0.34 * nz; b = 0.17 * nz; }
           if (ch2 > 0.15) { const t = Math.min(1, ch2); r = r * (1 - t) + 0.05 * t; g = g * (1 - t) + 0.045 * t; b = b * (1 - t) + 0.05 * t; }

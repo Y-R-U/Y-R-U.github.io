@@ -37,6 +37,21 @@ export function createProgress(ctx) {
     dead: false,         // saved mid-death-screen: the ward has not been paid yet
     wardOnBoot: false,
     dirty: false,
+
+    /* Act two's place in the story. The world is deliberately not saved (see the
+     * header) but *where in the story he is* is not world state, it is progress,
+     * and losing it meant a refresh during the boss put him back on the road with
+     * the gate shut.
+     *
+     *   state — the act machine's current state; sim/act.js re-enters it on boot
+     *   seen  — cutscene ids played THROUGH TO THE END. A scene interrupted by a
+     *           death is not in here, so it replays; one he actually watched does
+     *           not. That distinction is the whole reason this is a set and not a
+     *           high-water mark.
+     *   wins  — how many times this save has closed the seam.
+     */
+    act: { state: 'road', seen: Object.create(null), wins: 0 },
+    actOnBoot: null,     // what was on disk, or null — sim/act.js consumes it
   };
 
   function hasStorage() {
@@ -71,6 +86,7 @@ export function createProgress(ctx) {
       hp: p && p.alive ? Math.round(p.hp) : 0,
       maxHp: p ? Math.round(p.maxHp || 0) : 0,
       dead: !!P.dead,
+      act: { state: P.act.state, seen: Object.assign({}, P.act.seen), wins: P.act.wins | 0 },
     };
   }
 
@@ -98,9 +114,28 @@ export function createProgress(ctx) {
     P.touch();
   };
 
+  /**
+   * The act machine moved, or watched a scene to the end.
+   * `seen` is merged, never replaced — a rewind must not un-see a cutscene.
+   */
+  P.setAct = function (state, seenId) {
+    if (state) P.act.state = state;
+    if (seenId) P.act.seen[seenId] = 1;
+    P.touch();
+  };
+  P.recordWin = function () {
+    P.act.wins = (P.act.wins | 0) + 1;
+    P.act.state = 'won';
+    flush();
+  };
+
   P.clear = function () {
     P.lastMark.x = 0; P.lastMark.y = 0;
     P.resumeAt = null; P.resumeHp = 0;
+    // "Nothing kept" includes the story. Leaving the act state behind would put
+    // a brand-new run at the boss with an unbuilt arena.
+    P.act = { state: 'road', seen: Object.create(null), wins: 0 };
+    P.actOnBoot = null;
     if (!enabled) return;
     if (timer) { clearTimeout(timer); timer = 0; }
     try { localStorage.removeItem(KEY); } catch { /* nothing to do */ }
@@ -129,6 +164,12 @@ export function createProgress(ctx) {
      * pressed, so a reload from there would hand back the whole run with the
      * ward unpaid. Charge it on the way in instead. */
     if (d.dead && S.softReset) { S.softReset(); P.wardOnBoot = true; }
+    if (d.act && typeof d.act.state === 'string') {
+      P.act.state = d.act.state;
+      P.act.wins = d.act.wins | 0;
+      if (d.act.seen) for (const k in d.act.seen) P.act.seen[k] = 1;
+      P.actOnBoot = P.act.state;
+    }
     if (d.mark && d.mark.x > 0 && !d.dead) {
       P.resumeAt = { x: d.mark.x, y: d.mark.y };
       P.lastMark.x = d.mark.x; P.lastMark.y = d.mark.y;

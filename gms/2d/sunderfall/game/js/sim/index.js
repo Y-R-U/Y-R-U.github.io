@@ -1,6 +1,11 @@
 import { createWorld } from './world.js';
 import { createBarks } from './barks.js';
 import { buildLevel, createDemos, groundAt } from './level.js';
+// Namespace import as well as the named one: `openGate` / `sealArena` are
+// SF-LEVEL's and may not exist yet, and a named import of a missing export is a
+// link-time SyntaxError that would take the whole game down with it.
+import * as levelMod from './level.js';
+import { createAct, ACT_STATES } from './act.js';
 import { MATERIAL, MAT, MATERIAL_NAMES, DAMAGE, DAMAGE_NAMES } from './materials.js';
 import { STATUS } from './status.js';
 import { CELL } from './terrain.js';
@@ -58,6 +63,47 @@ export async function createPlayScene(ctx) {
   } catch (err) {
     console.warn('[sunderfall] enemies module unavailable —', err.message);
   }
+
+  /* Act two's three optional neighbours. Each is another agent's file and none
+     of them existed when this wiring was written, so every one is probed the way
+     the enemies module is: absent means the game plays exactly as it did before,
+     minus that feature. Never a hard import. */
+  let story = null;
+  let npcFactory = null;
+  try {
+    const m = await import('../story/runner.js');
+    if (m.createStoryRunner) story = m.createStoryRunner(ctx, world);
+  } catch (err) {
+    if (!/Failed to fetch|not found|404|Cannot find|Importing a module script failed/i.test(String(err))) {
+      console.warn('[sunderfall] story/runner.js exists but threw:', err);
+    }
+  }
+  try {
+    const m = await import('./npc.js');
+    npcFactory = m.createNpcs || m.createNPCs || null;
+  } catch (err) {
+    if (!/Failed to fetch|not found|404|Cannot find|Importing a module script failed/i.test(String(err))) {
+      console.warn('[sunderfall] sim/npc.js exists but threw:', err);
+    }
+  }
+  const act = createAct(ctx, world, { story, level: levelMod });
+  if (typeof window !== 'undefined' && window.__sunderfall) {
+    /* Both published for the same reason `world` is: `?act=` is a shipped feature
+       for retiming scenes once the mp3s land, and a person doing that needs
+       `act.set()` and the runner's `skip()`/`scrub()` from the console.
+       `storyRunner`, NOT `story` — `ctx.story` is already `story/script.js` (the
+       SPEAKER table `ui/index.js` resolves bubble styles from) and overwriting it
+       with the runner leaves every speaker falling back to the default bubble. */
+    window.__sunderfall.act = act;
+    window.__sunderfall.storyRunner = story;
+  }
+
+  /* `?act=<state>` drops a tester straight into any state, cold. One-shot: after
+     the first build the machine's own state governs, or every death during a
+     `?act=boss` session would re-run the arrival instead of the rewind. */
+  const wantAct = query.get('act');
+  let actJump = wantAct && ACT_STATES.indexOf(wantAct) >= 0 ? wantAct : null;
+  if (wantAct && !actJump) console.warn('[act] unknown ?act=' + wantAct + ' — expected one of', ACT_STATES.join(', '));
   const bandsA = ctx.assets.bands('sunderwood');
   const bandsB = ctx.assets.bands('ruinreach');
   /* The sky's join is the one a tree cannot hide — it is a smooth cloud gradient
@@ -101,13 +147,66 @@ export async function createPlayScene(ctx) {
   const moonKey = rgb('moon', [0.68, 0.76, 1.0]);
   const moonFill = rgb('moonfill', [0.58, 0.66, 0.88]);
 
+  /**
+   * First light.
+   *
+   * The Seam is the arena's key light — a 1500px violet source with the whole
+   * place graded around it — so closing it drops the last scene of the game into
+   * a blue murk with the boy an invisible dot in the corner of it. The frame the
+   * victory screen holds on was measurably the darkest in the build.
+   *
+   * The game opens at dusk and runs one night, so dawn is the one lighting change
+   * the story actually asks for, and it costs nothing but a lerp: the palette has
+   * been cool for forty minutes, which is what makes a warm frame land. It rises
+   * over the `after` scene rather than snapping, because the silence at the top of
+   * that scene is long enough to watch it happen.
+   *
+   * Everything below is expressed as night → dawn pairs so there is one place to
+   * tune it, and `?dawn=1` forces it on for looking at.
+   */
+  const DAWN_RISE = 14;
+  const NIGHT = {
+    amb: [0.200, 0.226, 0.290], haze: [0.30, 0.375, 0.520], clear: [0.042, 0.050, 0.078],
+    key: [0.68, 0.76, 1.0], keyI: 0.55, fill: [0.58, 0.66, 0.88], fillI: 0.20,
+    far: [0.80, 0.84, 0.94], mid: [0.72, 0.76, 0.88], near: [0.62, 0.66, 0.80], fg: [0.34, 0.38, 0.50],
+  };
+  /* Warmer, not brighter. The first pass lifted ambient and haze together and the
+     result was a sepia dust storm: haze colour is what the distance bands fade
+     *into*, so raising its luminance veils the whole frame and takes the contrast
+     with it. Dawn here is the same darkness with the blue taken out and one warm
+     key put in — it has to sit beside forty minutes of night without looking like
+     a different game. */
+  const DAWN = {
+    amb: [0.258, 0.232, 0.240], haze: [0.40, 0.325, 0.335], clear: [0.155, 0.112, 0.122],
+    key: [1.0, 0.72, 0.47], keyI: 0.80, fill: [0.86, 0.55, 0.42], fillI: 0.26,
+    far: [0.92, 0.82, 0.79], mid: [0.86, 0.76, 0.73], near: [0.76, 0.66, 0.63], fg: [0.38, 0.32, 0.34],
+  };
+  let dawn = query.has('dawn') ? 1 : 0;
+  let dawnRising = false;
+  const mix3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  const graded = (key) => mix3(NIGHT[key], DAWN[key], dawn);
+
+  /* The god rays lean over with the sun and get a touch stronger — they are the
+     only cue that the light now has a direction it did not have all night. */
+  function setRays() {
+    R.fx.setRays(cam.x + 500 - dawn * 1400, -820, 0.20 + dawn * 0.10, 0.955, 1.2 + dawn * 0.5);
+  }
+
+  /* Subscribed once with the scene, not per run: enter() runs again on every
+     restart and a listener made there leaks one per death.
+     It waits: the tear's own death flash is 0.7s of white and the shockwave runs
+     past that, so a sunrise starting on the same frame is invisible. It begins in
+     the silence at the top of the `after` scene, which is written long enough to
+     watch it happen in. */
+  bus.on('boss:dead', () => setTimeout(() => { dawnRising = true; }, 2600));
+
   function look() {
     // Ambient carries the whole night. The engine squares colours, so 0.30 here
     // is a far darker 0.09 in linear — it reads as moonlight, not daylight.
     // Blue must not run away from red: at 4:1 the frame collapses to one hue.
-    R.setAmbient(...triple('amb', [0.200, 0.226, 0.290]));
-    R.setHaze(...triple('haze', [0.30, 0.375, 0.520]));
-    R.setClearColor(...triple('clear', [0.042, 0.050, 0.078]));
+    R.setAmbient(...triple('amb', graded('amb')));
+    R.setHaze(...triple('haze', graded('haze')));
+    R.setClearColor(...triple('clear', graded('clear')));
     R.fx.vignette(Number(query.get('vig') ?? 0.52));
     R.fx.bloom = 0.58;
     R.fx.threshold = 0.86;
@@ -120,12 +219,12 @@ export async function createPlayScene(ctx) {
     R.fx.saturation = Number(query.get('sat') ?? 1.0);
     R.fx.grain = 0.020;
     R.setLayer(LAYER.SKY, { haze: 0, shade: 0.42, response: 0.10 });
-    R.setLayer(LAYER.BG_FAR, { haze: 0.34, response: 0.20, shade: 0.75, mul: [0.80, 0.84, 0.94] });
-    R.setLayer(LAYER.BG_MID, { haze: 0.16, response: 0.40, shade: 0.88, mul: [0.72, 0.76, 0.88] });
-    R.setLayer(LAYER.BG_NEAR, { haze: 0.07, response: 0.72, mul: [0.62, 0.66, 0.80] });
+    R.setLayer(LAYER.BG_FAR, { haze: 0.34, response: 0.20, shade: 0.75, mul: graded('far') });
+    R.setLayer(LAYER.BG_MID, { haze: 0.16, response: 0.40, shade: 0.88, mul: graded('mid') });
+    R.setLayer(LAYER.BG_NEAR, { haze: 0.07, response: 0.72, mul: graded('near') });
     R.setLayer(LAYER.TERRAIN, { response: 1.30 });
     R.setLayer(LAYER.TERRAIN_FRONT, { response: 1.15 });
-    R.setLayer(LAYER.FG_OCCLUDE, { response: 0.22, mul: [0.34, 0.38, 0.50] });
+    R.setLayer(LAYER.FG_OCCLUDE, { response: 0.22, mul: graded('fg') });
   }
 
   function drawStatics() {
@@ -341,9 +440,15 @@ export async function createPlayScene(ctx) {
   /* ---------------- scene ---------------- */
   const scene = {
     world,
+    act,
+    story,
 
     async enter() {
       sizeView();
+      // A restart is a fresh night, unless a finished save is walking the ruins.
+      const done = ctx.progress && ctx.progress.act && ctx.progress.act.state === 'won';
+      dawn = query.has('dawn') || done ? 1 : 0;
+      dawnRising = false;
       look();
       // a restart must not inherit a stick that was still held when he died
       if (ctx.input.releaseAll) ctx.input.releaseAll();
@@ -377,7 +482,7 @@ export async function createPlayScene(ctx) {
       if (!offView) offView = bus.on('view:change', sizeView);
 
       // one warm key light per scene, the discipline the art direction asks for
-      R.fx.setRays(cam.x + 500, -820, 0.20, 0.955, 1.2);
+      setRays();
 
       if (enemyMod && !noEnemies) {
         enemyMod.initEnemies(world);
@@ -386,13 +491,54 @@ export async function createPlayScene(ctx) {
         scene.enemies = enemyMod;
       }
 
+      // NPCs are not entities — nothing may shoot Ostrick (§3.4) — so they are
+      // built here and ticked by hand below.
+      if (npcFactory && !world.npcs) world.npcs = npcFactory(world);
+      if (world.npcs && world.npcs.clear) world.npcs.clear();
+      if (story && story.reset) story.reset();
+
+      /* Last, because it needs the built level, the player and the director, and
+         because it may move the boy somewhere else entirely. enter() runs again
+         on every restart; the act machine is built once and rebuilt here, which
+         is how the story survives a death. */
+      act.rebuild({
+        marks, director, story, level: levelMod,
+        state: actJump || undefined,
+      });
+      actJump = null;
+
+      /* `sim/barks.js` gates its Ostrick callbacks on story flags it only ever
+         sets from `story:done` — so a player who reloads after the stones scene
+         loses those lines for the rest of the run, because the scene will never
+         be played again to emit it. The act machine already knows which scenes
+         have been watched; hand them over (SF-SCRIPT handoff, request 4). */
+      if (barks.setFlag && ctx.progress && ctx.progress.act) {
+        for (const id in ctx.progress.act.seen) barks.setFlag(id);
+      }
+
       bus.emit('sim:ready', { world });
     },
 
     update(dt) {
+      /* NPCs first, and before the runner, because `npcs.update(dt)` with no
+         source is what CLAIMS the tick — the runner calls `update(dt, 'story')`
+         as a fallback for story-test.html and defers to us once we have claimed
+         it. Ticking them after the runner would double-step them on the first
+         frame of the first scene, before ownership had been taken. */
+      if (dawnRising && dawn < 1) {
+        dawn = Math.min(1, dawn + dt / DAWN_RISE);
+        look();                     // ambient/haze/clear are set state, not per-draw
+        setRays();
+        if (dawn >= 1) dawnRising = false;
+      }
+      if (world.npcs && world.npcs.update) world.npcs.update(dt);
+      // §3.2: before world.update. A cutscene that ran after the world would be
+      // reacting to a frame the player has already seen.
+      if (story && story.update) story.update(dt);
       world.update(dt);
       barks.update(dt);
       if (director) director.update(dt);
+      act.update(dt);
       updateCamera(dt);
       checkpoint();
       endOfRoad();
@@ -403,6 +549,7 @@ export async function createPlayScene(ctx) {
       drawBands();
       drawStatics();
       world.render(alpha);
+      if (world.npcs && world.npcs.render) world.npcs.render(alpha);
 
       // Moonlight: one huge soft cool source that travels with the view, plus a
       // second wider fill under it. Without this the terrain reads as pure black
@@ -411,11 +558,22 @@ export async function createPlayScene(ctx) {
       // Colours are squared, so (0.46, 0.60, 1) is really (0.21, 0.36, 1) — a 5:1
       // blue-to-red key over a blue ambient, which is what left the warm soil art
       // rendering blue-grey. Moonlight is cool but it is not monochrome.
-      R.light({ x: cam.x + 520, y: cam.y - world.halfH * 0.85, radius: 3200, ...moonKey, intensity: 0.55, soft: 1 });
+      //
+      // At dawn the same two lights turn over and warm up rather than being
+      // replaced: the key is still the only thing carrying the terrain, so
+      // crossfading to a second pair would double-light the frame for a few
+      // seconds in the middle.
+      const kc = graded('key'), fc = graded('fill');
+      R.light({ x: cam.x + 520, y: cam.y - world.halfH * (0.85 - dawn * 0.22), radius: 3200,
+        r: kc[0], g: kc[1], b: kc[2], intensity: NIGHT.keyI + (DAWN.keyI - NIGHT.keyI) * dawn, soft: 1 });
       // The fill sits just above the horizon. At +0.35 it was buried inside the
       // soil, and once the sub-ground was textured that lit the dirt from
       // within — the mass glowed brighter than the sky behind it.
-      R.light({ x: cam.x, y: cam.y + world.halfH * 0.06, radius: 2600, ...moonFill, intensity: 0.20, soft: 1 });
+      R.light({ x: cam.x, y: cam.y + world.halfH * 0.06, radius: 2600,
+        r: fc[0], g: fc[1], b: fc[2], intensity: NIGHT.fillI + (DAWN.fillI - NIGHT.fillI) * dawn, soft: 1 });
+      // Letterbox and washes sit over everything the world drew, and under the
+      // HUD canvas, which is a separate element entirely.
+      if (story && story.render) story.render(alpha);
       drawDebug();
       R.end();
     },
@@ -449,6 +607,9 @@ export async function createPlayScene(ctx) {
      seconds, and walking back west re-arms it so a second visit says it again. */
   let endSaid = false;
   function endOfRoad() {
+    // Only while the road really is the end of it. Once act two has started the
+    // rock face is a door, and "the road ends here" is a lie in a toast.
+    if (act.state !== 'road') return;
     if (!marks || marks.roadEnd == null) return;
     const p = world.player;
     if (!p || !p.alive || p.killed) return;
@@ -477,6 +638,11 @@ export async function createPlayScene(ctx) {
   function updateCamera(dt) {
     const p = world.player;
     if (!p) return;
+    /* ACT-TWO-CONTRACT §3.2 step 3: while a cutscene has the camera, this
+       function does not touch cam.x/cam.y at all. Damping toward the player from
+       here while the runner damps toward the shot produces a camera that creeps
+       off its mark — which reads as a bug in the runner, not in this file. */
+    if (world.camLock) return;
     if (!camInit) { cam.x = p.x; cam.y = p.y; camInit = true; }
     // Look-ahead. Portrait shows 820 world px against landscape's 1920, so the
     // same lead is worth less than half as much there and destruction kept

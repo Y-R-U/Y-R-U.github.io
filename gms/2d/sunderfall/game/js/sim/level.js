@@ -1,14 +1,20 @@
 import { MATERIAL } from './materials.js';
+import { REGION, cliff, gladeProfile, buildGlyphglade, gladeDecals, openGate, sealArena } from './glade.js';
 
 /**
- * The test level: three movements in one strip so every system has something
- * to prove itself against.
+ * The level: four movements in one strip so every system has something to prove
+ * itself against.
  *
  *   x     0 .. 2400   Thornmere edge — flat-ish ground, trees, crates, a fence
  *   x  2400 .. 4500   the Sunderwood — verticality, a tree line to set alight
  *   x  4500 .. 7600   Ruinreach — the destruction showcase: a buttressed arch,
  *                     a pillared bridge over a chasm, walls that do not float
+ *   x  7600 .. 11160  movement four — the stones, the breach, the Glyphglade
+ *                     and the arena. Geometry lives in `glade.js`; this file
+ *                     owns the ground profile and the marks.
  */
+
+export { openGate, sealArena };
 
 // 340px, not 500: a running jump covers ~380px, so the gap is crossable on foot
 // if you bring the bridge down. At 500 destroying your own bridge ended the run.
@@ -21,7 +27,11 @@ export function groundAt(x) {
   y += Math.sin(x * 0.0031 + 1.7) * 12;
   if (x > 2400 && x < 4500) y -= 40 + Math.sin((x - 2400) * 0.0022) * 90;
   if (x >= 4500) y = 20 + Math.sin(x * 0.0009) * 14;
-  if (x > 7100) y += (x - 7100) * 0.18;
+  // The road's dip toward the stones. It used to run at +0.18 forever, which
+  // past 8000 put the ground below the bottom of the terrain grid; it now stops
+  // where movement four's own profile takes over, so the two joins are flush.
+  if (x > 7100) y += (Math.min(x, REGION.climbA) - 7100) * 0.18;
+  y += gladeProfile(x);
   return y;
 }
 
@@ -30,7 +40,13 @@ export function buildLevel(world) {
   const rng = world.rng;
   const L = world.LAYER;
 
-  world.bounds = { x0: -240, x1: 7700, y0: -1800, y1: 780 };
+  world.groundAt = groundAt;
+
+  // x1 is 240 past the arena's east cliff so the camera can frame the far side
+  // of the fight; the cliff itself is what actually stops him, because the
+  // terrain grid runs out at 11264 and there is no ground past it. y0 drops to
+  // -2100 for the arena's gallery and the seal's overhang.
+  world.bounds = { x0: -240, x1: REGION.x1, y0: -2100, y1: 780 };
   // Under the chasm floor (520) and above the bottom of the world (780): the
   // terrain runs 1400 deep everywhere else, so this line is only ever crossed by
   // something falling out of the level altogether.
@@ -44,6 +60,11 @@ export function buildLevel(world) {
   /* ---------------- terrain ---------------- */
   T.hill(-600, 4500, groundAt, MATERIAL.ROCK, 1400, MATERIAL.EARTH, 70);
   T.hill(4500, 8200, groundAt, MATERIAL.ROCK, 1400, MATERIAL.MASONRY, 54);
+  // Past the gate the crust turns back to earth — the approach and the glade are
+  // burnt forest floor, not paving — and then to masonry again for the arena,
+  // which is a floor somebody laid. The grid ends at 11264; 11300 is clamped.
+  T.hill(8200, REGION.arenaA, groundAt, MATERIAL.ROCK, 1400, MATERIAL.EARTH, 60);
+  T.hill(REGION.arenaA, 11300, groundAt, MATERIAL.ROCK, 1400, MATERIAL.MASONRY, 54);
 
   // chasm walls are cut stone, so the bridge above reads as built, not natural
   T.box(CHASM_A - 40, groundAt(CHASM_A - 60), 40, 520, MATERIAL.MASONRY);
@@ -120,9 +141,12 @@ export function buildLevel(world) {
     if (i % 2) place('bush', x + 90);
     if (i % 3 === 0) place('ferns', x - 70);
   }
-  placeAt('crate', 2700, -190);
-  placeAt('barrel', 3060, -350);
-  placeAt('mushrooms', 3420, -520);
+  // Bottoms flush with the ledge tops above (-136 / -286 / -436). At -190/-350/
+  // -520 they were floating 50-80px clear, so `solve()` found all three
+  // unsupported on frame one and toppled them before anyone reached the wood.
+  placeAt('crate', 2700, -136);
+  placeAt('barrel', 3060, -286);
+  placeAt('mushrooms', 3420, -436);
   placeAt('deadtree', 3880, -430);
   place('boulder_big', 4320);
   place('skull_pile', 4200);
@@ -203,16 +227,37 @@ export function buildLevel(world) {
   place('skull_pile', 7250);
   place('rocks_small', 7460);
 
-  // --- the end of the road ---
-  // The strip stops at 7700 and nothing said so. The camera clamps a screen
-  // short of that while Rook keeps walking into the corner of the frame, which
-  // reads as being stuck, not as an ending — so close it with something you can
-  // see coming: a lit pair of stones, then a rock face far too tall to jump.
-  T.box(7660, groundAt(7660) - 1000, 240, 1420, MATERIAL.ROCK);
-  place('standing_stone', 7500);
-  place('standing_stone', 7600);
-  place('brazier', 7550);
+  // --- the stones, and the rock face behind them ---
+  // The strip used to stop at 7700 and nothing said so. The camera clamped a
+  // screen short of that while Rook kept walking into the corner of the frame,
+  // which reads as being stuck, not as an ending — so it is closed with
+  // something you can see coming: a lit pair of stones, then a rock face.
+  //
+  // The face used to stop 1000px up, which nothing could reach while the world
+  // ended at 7700. With the world running on to 11400 that top was a shortcut
+  // over the whole of act two, so it is a capped cliff now (see `cliff`) and
+  // NOBREAK on top of that — acid and void both eat ROCK, and this is a door
+  // the story opens, not one you chew.
+  cliff(T, REGION.faceA, REGION.faceB, groundAt(REGION.faceA) + 420, -1300, 7380, REGION.faceB);
+  const stoneA = place('standing_stone', 7500);
+  const stoneB = place('standing_stone', 7600);
+  const vigilFire = place('brazier', 7550);
   marks.roadEnd = 7360;
+  marks.stones = { x: 7550, brazier: vigilFire, a: 7500, b: 7600, stones: [stoneA, stoneB] };
+  marks.gate = { x: REGION.gateX, y: groundAt(REGION.gateX), w: REGION.gateW, open: false };
+  marks.seal = { x: REGION.sealX, closed: false };
+
+  // --- movement four ---
+  const four = buildGlyphglade(world, marks);
+  marks.glade = { x: REGION.gladeX, staffX: REGION.staffX, ring: four.ring, a: REGION.gladeA, b: REGION.gladeB };
+  marks.arena = four.arena;
+  marks.approach = { a: REGION.climbA, b: REGION.climbB };
+
+  // The cue table calls `world.openGate()` / `world.sealArena()`; the contract
+  // also exports them as `(world, marks)`. Bind both so neither caller has to
+  // know which shape it got.
+  world.openGate = () => openGate(world, marks);
+  world.sealArena = () => sealArena(world, marks);
 
   world.props.solve();
 
@@ -263,6 +308,7 @@ export function buildLevel(world) {
     statics.rot = statics.rot || [];
     statics.rot[k] = rng.range(-0.42, 0.42);
   }
+  gladeDecals(world, statics, marks);
   for (let i = 0; i < statics.n; i++) if (statics.rot && statics.rot[i] === undefined) statics.rot[i] = 0;
 
   return { marks, statics };

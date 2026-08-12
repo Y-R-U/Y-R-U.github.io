@@ -43,12 +43,64 @@ export const SPEAKER = {
     jitter: 1.5,
     glow: 1,
   },
+  ostrick: {
+    name: 'Keeper Ostrick',
+    // Rigid, because he is: the same hard panel as Rook's, in office colours, and not a
+    // pixel of tremble anywhere. He is faster than Vayne and slower than the boy.
+    style: 'sharp',
+    ink: [0.94, 0.90, 0.79],
+    fill: [0.055, 0.065, 0.060],
+    edge: [0.72, 0.64, 0.36],
+    cps: 26,
+    jitter: 0,
+    glow: 0,
+  },
+  seam: {
+    // The Seam has no bubble. Every other speaker in the game gets a panel with an edge
+    // and a tail pointing at a body; this one is bare letters hanging in the air, and the
+    // missing panel is the whole effect — there is nobody there to point at.
+    // `style: 'none'` is the flag for that; ui/world.js currently only branches on 'sharp',
+    // so until it learns 'none' this falls back to the round parchment shape with the
+    // tremble switched off, which is itself the tell. Do not give it a name: a name tag
+    // would be the game agreeing that somebody is speaking.
+    name: '',
+    style: 'none',
+    ink: [0.86, 0.80, 0.72],
+    fill: [0.055, 0.035, 0.070],
+    edge: [0.62, 0.42, 0.86],
+    cps: 19,                        // Vayne's pace, because it is Vayne's voice
+    jitter: 0,                      // …and none of his tremble. That is what is wrong with it.
+    glow: 0.7,
+  },
 };
 
-/** One recording per speaker, holding that character's whole part. */
+/**
+ * The intro's two recordings, one per speaker, each holding that character's whole part.
+ *
+ * `intro/index.js` fetches every entry in here on boot, so it must stay the intro's two —
+ * anything else added would be four 404s under the cold open. Act two's takes live in
+ * TAKES below.
+ */
 export const VOICES = {
   vayne: 'audio/vo/vayne.mp3',
   rook: 'audio/vo/rook.mp3',
+};
+
+/**
+ * Every recording in the game, keyed by **take**, not by speaker: Rook has two (the
+ * cinematic and everything after it) and so does Vayne (his own, and the Seam wearing it).
+ * A beat's `take` names one of these; its `vo: [offset, length]` is seconds into that file.
+ *
+ * `rook2` and `vayne2` do not exist on disk yet. Nothing may assume a take is there —
+ * see `audio.hasTake(name)`.
+ */
+export const TAKES = {
+  vayne: 'audio/vo/vayne.mp3',
+  rook: 'audio/vo/rook.mp3',
+  barks: 'audio/vo/barks.mp3',
+  ostrick: 'audio/vo/ostrick.mp3',
+  rook2: 'audio/vo/rook2.mp3',
+  vayne2: 'audio/vo/vayne2.mp3',
 };
 
 export const SHOTS = [

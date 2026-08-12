@@ -7,9 +7,19 @@ Text is copied verbatim from the source, so this file and the game agree:
 | Content | Source of truth |
 |---|---|
 | Intro cinematic lines | `game/js/story/script.js` → `BEATS` |
+| Act two's four scenes | `game/js/story/scenes.js` → `SCENES` |
 | Rook's in-game barks | `game/js/sim/barks.js` → `LINES` |
 | Death screen | `game/js/ui/overlays.js` → `showDeath()` |
 | Music keys and tempos | `game/js/core/audio/music.js` → `STATES` |
+
+> **Act two has its own file.** The stones scene below (§8) is where it started; the finished
+> thing — all four in-world scenes as Who/Line/Direction tables, and the three Suno takes that
+> record them (`ostrick.mp3`, `rook2.mp3`, `vayne2.mp3`) — is
+> **[`SCRIPTS-ACT-TWO.md`](SCRIPTS-ACT-TWO.md)**, and that file is complete on its own. Generate
+> from there, not from here. Two of the three takes must be generated as *continuations* of the
+> intro's takes or the voices will not match, and the Seam's is the hardest generation in the
+> project: it is Vayne's voice with the life taken out of it, and Suno's instinct is to hand back
+> a demon.
 
 **Nothing in the game is a recorded audio file today.** Every sound — score, spells, wind, the bell
 over the title — is synthesised at runtime. So anything generated here is *additive*: it either
@@ -654,7 +664,15 @@ to it.
 | `alone` | I'd take the goats. | |
 | `alone` | Keep the fire lit. | him repeating an instruction to himself |
 
-Wiring: a line gets an optional `after` (player level, or a story flag for the Ostrick callbacks) and
-`pick()` filters the pool by it. `barks.js` already listens to `player:level`, so it can hold the
-number itself. The `alone` trigger needs one new condition — no bark and no enemy within a screen for
-~40s — and should sit at priority 1 so anything real interrupts it.
+**Wired, 2026-08-12.** All nineteen are in `sim/barks.js` with `after` gating: a number is a player
+level, a string is a story flag set from `story:done`, so both Ostrick callbacks need the stones
+scene to have happened. The level is read from `ctx.spellSystem.level` when it is there rather than
+counted from `player:level` events, because a resume restores the level without emitting one.
+`alone` fires at priority 1 after 40s with no bark and nothing hostile within a screen, scanned
+twice a second.
+
+**They do not fire yet, and that is correct.** Every line in this game is voiced, so `pick()` drops
+any line whose take is not on disk — it asks `ctx.audio.hasTake(take)`, and where that does not
+exist it falls back to "does this line have real offsets", which is the same answer. The nineteen
+lines above carry `take: 'rook2'` and stay out of the pool until `audio/vo/rook2.mp3` is generated
+(§3b of `SCRIPTS-ACT-TWO.md`). One silent line among voiced ones reads as a bug, not as restraint.

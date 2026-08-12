@@ -25,7 +25,7 @@ export function createLayout() {
     xpRing: { x: 0, y: 0, r: 0 },
 
     boss: R(),
-    toast: { x: 0, y: 0, dir: 1, w: 250 },
+    toast: { x: 0, y: 0, yBoss: 0, dir: 1, w: 250 },
 
     circles: [CIRC(), CIRC(), CIRC(), CIRC(), CIRC()],
     circleScale: 1,
@@ -71,7 +71,9 @@ export function createLayout() {
     if (portrait) {
       L.boss.w = w - l - r;
       L.boss.x = l;
-      L.boss.y = L.focus.y + L.focus.h + 34;
+      // 34 put the bar's own title — drawBoss stacks name and subtitle 24px above
+      // the bar — straight across the focus readout's value text.
+      L.boss.y = L.focus.y + L.focus.h + 54;
       L.boss.h = 12;
     } else {
       const availL = L.hp.x + L.hp.w + 96;
@@ -169,13 +171,22 @@ export function createLayout() {
     L.stickZone.y = t + 70; L.stickZone.h = h - L.stickZone.y;
     L.actZone.y = t + 110; L.actZone.h = h - L.actZone.y - 0;
 
-    /* ---- toasts ---- */
+    /* ---- toasts ----
+     * `yBoss` is where the column starts while a boss bar is up. In portrait the two
+     * were laid out independently — toasts at `focus + 22`, the bar at `focus + 34` —
+     * so the stack grew straight down through the bar. Nothing ever caught it because
+     * nothing in the game had ever spawned a boss until act two. Publishing both
+     * positions keeps the arithmetic here and lets the renderer lerp between them by
+     * the bar's own reveal, so they slide rather than jump. */
     if (portrait) {
       L.toast.x = l; L.toast.y = L.focus.y + L.focus.h + 22; L.toast.dir = 1;
       L.toast.w = Math.min(260, w - l - r);
+      L.toast.yBoss = L.boss.y + L.boss.h + 26;
     } else {
       L.toast.x = l; L.toast.y = h - b - 30; L.toast.dir = -1;
       L.toast.w = 280;
+      // landscape stacks up from the bottom and the bar is at the top: no conflict
+      L.toast.yBoss = L.toast.y;
     }
 
     L.bubbleClamp.x = l + 8;
