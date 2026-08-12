@@ -161,19 +161,32 @@ def stage_stills(config, only, reroll):
 
 
 # ── videos ─────────────────────────────────────────────────────────────
-def stage_videos(config, only, frames):
+def stage_videos(config, only, frames, alt=None):
     hallway = hallway_source()
     for ending in config["endings"]:
         eid = ending["id"]
         if only and eid not in only:
             continue
+        if ending.get("accepted") and alt is not None:
+            log(f"clip {eid}: accepted take {ending['accepted']}, not re-rendering")
+            continue
         plate = plate_path(eid)
         if not os.path.exists(plate):
             log(f"clip {eid}: no destination plate, run `stills` first — skipping")
             continue
+        # A different phrasing beats a different seed when the prompt itself is
+        # what is failing: --alt selects one of the alternates authored per
+        # ending rather than re-rolling the wording that already did not work.
+        prompt_text = ending["video"]
+        if alt is not None:
+            variants = ending.get("videoAlts") or []
+            if alt >= len(variants):
+                log(f"clip {eid}: no alt {alt}, skipping")
+                continue
+            prompt_text = variants[alt]
         target, n = next_video_path(eid)
         payload = {
-            "prompt": f"{ending['video']}, {config['videoCommon']}",
+            "prompt": f"{prompt_text}, {config['videoCommon']}",
             "width": VIDEO_WIDTH,
             "height": VIDEO_HEIGHT,
             "num_frames": frames or config.get("frames", 145),
@@ -191,7 +204,7 @@ def stage_videos(config, only, frames):
             "tiling": "aggressive",
             "no_audio": True,
         }
-        log(f"clip {eid} v{n}: submitting")
+        log(f"clip {eid} v{n}{'' if alt is None else f' alt{alt}'}: submitting")
         job_id = api_post(LTX_API, "/api/generate", payload)["job_id"]
         while True:
             job = api_get(LTX_API, f"/api/jobs/{job_id}")
@@ -218,7 +231,9 @@ h2 small { color: #8a93a0; font-weight: 400; }
 .blurb { margin: 0 0 10px; color: #8a93a0; font-size: 13px; max-width: 70ch; }
 .row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
 figure { margin: 0; }
-figcaption { font-size: 12px; color: #8a93a0; margin-top: 4px; text-align: center; }
+figcaption { font-size: 12px; color: #8a93a0; margin-top: 4px; text-align: center;
+              max-width: 190px; }
+.alt { color: #d8b46a; }
 img, video { display: block; width: 190px; border-radius: 8px;
              border: 1px solid #232830; background: #000; }
 .plate { border-color: #3a4250; }
@@ -236,20 +251,36 @@ def stage_review(config):
     for ending in config["endings"]:
         eid = ending["id"]
         plate = f"images/ending_escape_{eid}_end.jpg"
-        takes = []
+        # Takes at or below supersededThrough were reviewed and rejected; they
+        # stay on disk but fold away so the page shows what is actually up for
+        # review. `accepted` marks a take already chosen — nothing to compare.
+        cut = ending.get("supersededThrough", 0)
+        accepted = ending.get("accepted", "")
+        takes, old = [], []
         n = 1
         while True:
             rel = f"videos/ending_escape_{eid}_v{n}.mp4"
             if not os.path.exists(os.path.join(HERE, rel)):
                 break
             kb = os.path.getsize(os.path.join(HERE, rel)) // 1024
-            takes.append(
-                f'<figure><video src="../{rel}" controls preload="metadata" '
-                f'poster="../{plate}"></video>'
-                f'<figcaption>v{n} &middot; {kb} KB</figcaption></figure>')
+            mark = " &check; in use" if accepted == f"v{n}" else ""
+            # Name the phrasing rather than the take number: three alts per
+            # ending is unreviewable if they are only labelled v3/v4/v5.
+            start = ending.get("altsFrom", 0)
+            labels = config.get("altLabels", [])
+            if start and n >= start and (n - start) < len(labels):
+                mark += f'<br><span class="alt">{labels[n - start]}</span>'
+            fig = (f'<figure><video src="../{rel}" controls preload="metadata" '
+                   f'poster="../{plate}"></video>'
+                   f'<figcaption>v{n} &middot; {kb} KB{mark}</figcaption></figure>')
+            (old if (n <= cut and accepted != f"v{n}") else takes).append(fig)
             n += 1
         if not takes:
             takes.append('<figcaption>no takes yet</figcaption>')
+        if old:
+            takes.append(f'<details><summary>{len(old)} rejected take'
+                         f'{"s" if len(old) > 1 else ""}</summary>'
+                         f'<div class="row">{"".join(old)}</div></details>')
         rows.append(
             f'<section><h2>{ending["title"]} <small>{eid}</small></h2>'
             f'<p class="blurb">{ending["video"]}</p><div class="row">'
@@ -278,6 +309,8 @@ def main():
     parser.add_argument("--only", default="")
     parser.add_argument("--frames", type=int, default=0)
     parser.add_argument("--reroll", action="store_true")
+    parser.add_argument("--alt", type=int, default=None,
+                        help="render videoAlts[N] instead of the main video prompt")
     args = parser.parse_args()
 
     config = load_config()
@@ -295,7 +328,7 @@ def main():
         unload(MFLUX_API)
         time.sleep(5)
     if args.stage in {"videos", "all"}:
-        stage_videos(config, only, args.frames)
+        stage_videos(config, only, args.frames, args.alt)
     if args.stage in {"videos", "all", "review"}:
         stage_review(config)
     log("done")
