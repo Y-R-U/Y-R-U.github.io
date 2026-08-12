@@ -1,0 +1,40 @@
+{
+  "_note": "Escape endings. Every clip starts on images/hallway.jpg and is pinned to a generated destination plate as image_end, exactly like the monster event clips. The room-transition `common` in regen_config.json cannot be reused here: it says 'preserve exact architecture, empty environment', which fights a clip whose whole job is to leave the building.",
+  "_common_note": "Two separate strings on purpose. The first attempt used one shared `common` carrying 'walk through an open doorway', which Flux painted INTO the destination plate — every ending arrived at a view framed by a doorframe, so the clip stopped on the threshold instead of walking out. The still must describe only where you end up; the doorway belongs to the video alone.",
+  "stillCommon": "realistic cinematic landscape photograph, vertical mobile portrait framing, warm natural daylight, calm peaceful hopeful, wide open outdoor view filling the entire frame edge to edge, standing outside in the open air, no doorway, no door frame, no window, no window frame, no interior, no walls, no people, no readable text, no watermark",
+  "videoCommon": "realistic cinematic vertical mobile portrait shot, smooth forward camera walk through an open doorway and all the way out into the open air, the doorway passing out of frame behind the camera, warm natural daylight, calm relieved hopeful ending, no people, no readable text, no logos, no watermark, no creature, professional atmospheric game footage",
+  "negative": "person, face, body, creature, readable text, logo, watermark, cartoon, painting, melting architecture, collapsing room, explosion, gore, sci-fi, futuristic, neon, hologram, night, darkness, horror, menacing, tessellated pattern, repeating texture, mosaic tile, grid pattern, kaleidoscope, fractal artifact",
+  "frames": 145,
+  "endings": [
+    {
+      "id": "dawn_drive",
+      "title": "The Gate Was Open",
+      "still": "wide open gravel drive leading away from an old country house at sunrise, tall iron gate standing open at the far end, soft pink and gold dawn sky over flat green fields, long dewy shadows, calm empty peaceful morning, no people",
+      "video": "the camera walks down the dim central hallway to the heavy front door, the door swings open and floods the hallway with pink-gold sunrise light, the camera walks out across the front step and down the gravel drive toward the open iron gate and the bright open fields beyond"
+    },
+    {
+      "id": "morning_meadow",
+      "title": "Grass To The Horizon",
+      "still": "sunlit summer wildflower meadow stretching to a distant treeline, tall grass and white and yellow flowers, warm high morning sun, soft blue sky with a few clouds, calm empty peaceful, no people",
+      "video": "the camera walks down the dim central hallway to the door at the end, the door opens onto blinding warm summer daylight, the camera walks out of the house and into a sunlit wildflower meadow, tall grass brushing past the lens, the house left behind"
+    },
+    {
+      "id": "sunset_lane",
+      "title": "The Long Way Home",
+      "still": "quiet country lane between tall hedgerows at golden sunset, warm orange light raking low along the road, long soft shadows, distant hills, calm empty peaceful evening, no people",
+      "video": "the camera walks down the dim central hallway to the front door, the door opens onto low warm orange sunset light, the camera walks out of the house and away down a quiet country lane between tall hedgerows, the golden evening light growing warmer"
+    },
+    {
+      "id": "lake_dawn",
+      "title": "Still Water",
+      "still": "calm misty lake at first light, pale gold and silver water perfectly still, low mist lying on the surface, soft treeline on the far bank, quiet cool dawn, calm empty peaceful, no people",
+      "video": "the camera walks down the dim central hallway to the door at the end, the door opens onto soft pale dawn light, the camera walks out of the house and down to the edge of a calm misty lake at first light, still gold water opening out ahead"
+    },
+    {
+      "id": "garden_sunrise",
+      "title": "The Walled Garden",
+      "still": "old walled garden in full summer bloom at sunrise, deep flower borders in pink white and blue, warm low golden light across brick walls, an open wooden gate in the far wall, calm empty peaceful, no people",
+      "video": "the camera walks down the dim central hallway to the garden door, the door opens onto warm golden sunrise light, the camera walks out into an old walled garden in full bloom, deep flower borders on both sides, toward an open wooden gate in the far wall"
+    }
+  ]
+}
