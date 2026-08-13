@@ -72,7 +72,7 @@ export const SCENES = {
       { t: 13.3, dur: 2.4, who: 'ostrick', text: "You got a dying man's panic.",
         anchor: 'ostrick', ax: 40, ay: -170, take: 'ostrick', vo: [11.64, 2.06] },
       { t: 16.1, dur: 1.3, who: 'rook',    text: 'Yes.',
-        anchor: 'rook', ax: -55, ay: -190, take: 'rook2', vo: [40.435, 0.55] },
+        anchor: 'rook', ax: -55, ay: -190, take: 'rook2', vo: [40.295, 0.55] },
       { t: 18.0, dur: 2.8, who: 'ostrick', text: 'Vayne turned down forty years of me.',
         anchor: 'ostrick', ax: 40, ay: -170, take: 'ostrick', vo: [15.46, 2.685] },
       { t: 21.0, dur: 2.6, who: 'ostrick', text: 'And gave it to what was standing there.',
@@ -314,7 +314,7 @@ export const SCENES = {
       { t: 44.6, dur: 2.2, who: 'rook', text: "Nobody's fed the goats.",
         anchor: 'rook', ax: 55, ay: -190, take: 'rook2', vo: [102.78, 1.28] },
       { t: 48.6, dur: 1.6, who: 'ostrick', text: '…Boy.',
-        anchor: 'ostrick', ax: -40, ay: -170, take: 'ostrick', vo: [51.26, 0.82] },
+        anchor: 'ostrick', ax: -40, ay: -170, take: 'ostrick', vo: [50.62, 0.82] },
     ],
     cues: [
       { t: 0.0,  fx: 'cam.hold' },
