@@ -81,6 +81,40 @@ Then check every clip finishes before the next line is due:
 **When in doubt, cut wide.** A little bed before the word is inaudible under a fade. A
 clipped consonant is instantly audible and sounds broken.
 
+**5b. Listen in two bands, or you will cut every final s off.**
+
+This cost a whole review round on act two. A voice-band envelope (250-3400Hz) is the right
+tool for finding phrases and useless for finding where a word *ends*, because /s/ and /z/
+live at 4-9kHz and are quiet. Every walk-out therefore stops in front of the trailing
+fricative: "burns" arrived without its s, "stones" without its es, "goats" as "goat".
+Measure a second envelope at **3.5-9.5kHz** and treat a word as over only when *both* bands
+have fallen to their own floors (the sibilance floor sits closer, ~5dB, than the voice one).
+A leading fricative goes the same way — "Sorry" lost its S off the front.
+
+**The fade-out finishes what the cut started.** An s is only ~0.12s long, so a 0.16s fade
+over the end of a clip erases it even when the cut is correct. Keep the fade at ~0.09s and
+give every clip ~0.18s of real tail past its last word, so the fade lands on bed.
+
+**Do not pad from whisper's reported edge — cut wide from it.** The drift is 0.2-0.6s in
+*either* direction, so the report is not a floor. "Walls." is spoken at 72.56 and reported
+at 72.74; padding 0.06s back from the report still missed the word. Take 0.18s. Under an
+0.08s fade-in a little bed is inaudible, and it is the only thing that reliably keeps a
+leading consonant.
+
+**Whisper runs late as well as early.** Ostrick's last "Boy." is spoken at 50.94-51.30 and
+reported at 51.32-51.96 — wholly past the word — so walking outward from the reported start
+found only silence and the clip opened on its last 40ms. When a window holds no energy,
+slide it to where the energy is: ask which shift of that window is loudest, which needs no
+threshold at all. Guard it hard (only fire when the window is genuinely empty, i.e. its peak
+is >10dB under the neighbourhood peak), or it will happily slide a *correct* window onto a
+louder syllable — an unguarded version ate "Don't touch" off the front of the first line.
+
+**Clips may overlap in the source, and forcing them apart is a bug.** They are played at
+different beat times and never together. A pass that pushed each clip clear of the last one
+cost "Fine." and "Walls." their first word: trimming one tail moved the next head, and the
+correction cascaded down the file. Clamp each clip against its own neighbouring *words* and
+let the ranges overlap.
+
 **6. Round-trip every cut.** This is the step that replaces having ears, and it is worth
 more than all the envelope work above: cut each clip out with ffmpeg, transcribe *that
 clip on its own*, and compare against the line you meant to cut. A clip whose first and
@@ -94,7 +128,11 @@ got = mlx_whisper.transcribe('c.wav', path_or_hf_repo=MODEL,
 ```
 
 Compare on normalised words — lowercase, strip punctuation — and only assert the **first
-word, the last word, and the length within one**. Whisper will hand back "I'm" for "I am"
+word, the last word, and the length within one**. **Never widen the homophone allowances to
+make a failure go away**: "bye" was added as an alias for "boy" to get a green run, and it
+was hiding a clip that opened on the last 40ms of the word. The allowance list is for proper
+nouns the model cannot know (Vayne, Cass); anything that could disguise a clipped word
+belongs in the failure list, where a human can listen to it. Whisper will hand back "I'm" for "I am"
 and "gonna" for "going to", and those are the take telling you the truth: change the game's
 text to match the recording, not the other way round.
 
