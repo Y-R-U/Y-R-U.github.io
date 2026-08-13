@@ -48,8 +48,8 @@ const LINES = {
     { t: 'I set me on fire. Again.', take: 'barks', vo: [3.18, 2.54] },
     { t: "That's my own fire. My own fire!", take: 'barks', vo: [5.94, 3.02] },
     { t: 'Nobody saw that.', take: 'barks', vo: [8.92, 1.54] },
-    { t: 'Yep. Still flammable.', take: 'rook2', vo: [0.84, 1.64], after: 5 },
-    { t: 'Every time. Every single time.', take: 'rook2', vo: [3.01, 2.05], after: 5 },
+    { t: 'Yep. Still flammable.', take: 'rook2', vo: [0.72, 1.82], after: 5 },
+    { t: 'Every time. Every single time.', take: 'rook2', vo: [2.92, 2.2], after: 5 },
   ],
   selfAcid: [
     { t: 'It is eating my boots.', take: 'barks', vo: [10.70, 1.76] },
@@ -59,39 +59,39 @@ const LINES = {
     { t: "That's a lot of my blood.", take: 'barks', vo: [14.04, 1.71] },
     { t: 'Ow. Properly, ow.', take: 'barks', vo: [15.66, 1.92] },
     { t: 'Vayne. You picked wrong.', take: 'barks', vo: [17.50, 1.62] },
-    { t: "Fine. That's fine.", take: 'rook2', vo: [5.12, 1.145], after: 5 },
-    { t: "I've had worse. Recently.", take: 'rook2', vo: [6.275, 1.53], after: 5 },
+    { t: "Fine. That's fine.", take: 'rook2', vo: [5.08, 1.24], after: 5 },
+    { t: "I've had worse. Recently.", take: 'rook2', vo: [6.22, 1.6], after: 5 },
   ],
   low: [
     { t: 'I am not built for this.', take: 'barks', vo: [19.38, 1.86] },
     { t: 'Still up. Barely.', take: 'barks', vo: [21.14, 1.34] },
-    { t: 'Not here. Not for this.', take: 'rook2', vo: [7.815, 1.765], after: 5 },
-    { t: 'Keep the fire lit, he said.', take: 'rook2', vo: [9.95, 1.35], after: 'stones' },
+    { t: 'Not here. Not for this.', take: 'rook2', vo: [7.74, 2.12], after: 5 },
+    { t: 'Keep the fire lit, he said.', take: 'rook2', vo: [9.84, 1.52], after: 'stones' },
   ],
   bigBreak: [
     { t: 'Nothing in Thornmere ever broke like that.', take: 'barks', vo: [22.74, 3.10] },
     { t: 'Cass could never do that.', take: 'barks', vo: [25.74, 1.56] },
     { t: 'Oh, that is going to be a problem later.', take: 'barks', vo: [27.24, 1.91] },
-    { t: 'Sorry. To whoever built that.', take: 'rook2', vo: [11.65, 1.29], after: 6 },
-    { t: "That was somebody's wall.", take: 'rook2', vo: [13.34, 1.29], after: 6 },
+    { t: 'Sorry. To whoever built that.', take: 'rook2', vo: [11.54, 1.52], after: 6 },
+    { t: "That was somebody's wall.", take: 'rook2', vo: [13.22, 1.56], after: 6 },
   ],
   streak: [
     { t: 'Did you see that?', take: 'barks', vo: [29.07, 1.55] },
     { t: "I'm getting good at this. Worryingly good.", take: 'barks', vo: [30.58, 2.40] },
-    { t: "That's the stone. Not me.", take: 'rook2', vo: [15.42, 1.515], after: 6 },
-    { t: "I don't like how easy that was.", take: 'rook2', vo: [16.945, 1.455], after: 6 },
+    { t: "That's the stone. Not me.", take: 'rook2', vo: [15.3, 1.8], after: 6 },
+    { t: "I don't like how easy that was.", take: 'rook2', vo: [17.02, 1.44], after: 6 },
   ],
   level: [
     { t: 'Something moved. In me, I mean.', take: 'barks', vo: [33.22, 1.82] },
     { t: 'It is getting easier to hold.', take: 'barks', vo: [34.96, 1.69] },
-    { t: "It fits better now. That's worse.", take: 'rook2', vo: [18.54, 1.72], after: 6 },
-    { t: 'Bigger. Great.', take: 'rook2', vo: [20.55, 0.77], after: 6 },
+    { t: "It fits better now. That's worse.", take: 'rook2', vo: [18.42, 1.94], after: 6 },
+    { t: 'Bigger. Great.', take: 'rook2', vo: [20.44, 1.05], after: 6 },
   ],
   pit: [
     { t: 'Not my finest.', take: 'barks', vo: [36.60, 1.24] },
     { t: 'The hole was quite obvious, in hindsight.', take: 'barks', vo: [37.82, 2.66] },
-    { t: 'Down again. Fine.', take: 'rook2', vo: [21.46, 1.15], after: 4 },
-    { t: 'Walls. Use the walls.', take: 'rook2', vo: [22.7, 1.54], after: 4 },
+    { t: 'Down again. Fine.', take: 'rook2', vo: [21.36, 1.43], after: 4 },
+    { t: 'Walls. Use the walls.', take: 'rook2', vo: [22.76, 1.62], after: 4 },
   ],
   blocked: [
     { t: 'It is a rock. I can deal with a rock.', take: 'barks', vo: [40.62, 3.24] },
@@ -101,15 +101,15 @@ const LINES = {
        the file, and it has to: the /t/ is a separate burst 0.8s in, and a cut before it
        turns the word into a vowel with no consonant. */
     { t: 'Right!', take: 'barks', vo: [43.84, 0.99] },
-    { t: 'I know what to do with rock now.', take: 'rook2', vo: [24.52, 1.5], after: 6 },
+    { t: 'I know what to do with rock now.', take: 'rook2', vo: [24.4, 1.68], after: 6 },
   ],
   // Nothing near him and nothing to say for forty seconds. The pool is entirely about the
   // life he left, which is the only thing he thinks about when there is room to think.
   alone: [
-    { t: 'Nobody ever needed saving from a goat.', take: 'rook2', vo: [28.14, 1.88], after: 3 },
-    { t: 'Cass would hate this. Small mercy.', take: 'rook2', vo: [31.06, 1.83], after: 4 },
-    { t: "I'd take the goats.", take: 'rook2', vo: [33.16, 0.96], after: 5 },
-    { t: 'Keep the fire lit.', take: 'rook2', vo: [34.3, 0.95], after: 'stones' },
+    { t: 'Nobody ever needed saving from a goat.', take: 'rook2', vo: [28.04, 2.13], after: 3 },
+    { t: 'Cass would hate this. Small mercy.', take: 'rook2', vo: [31.04, 1.9], after: 4 },
+    { t: "I'd take the goats.", take: 'rook2', vo: [33.04, 1.19], after: 5 },
+    { t: 'Keep the fire lit.', take: 'rook2', vo: [34.16, 1.1], after: 'stones' },
   ],
 };
 

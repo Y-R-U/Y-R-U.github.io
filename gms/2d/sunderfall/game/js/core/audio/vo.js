@@ -24,7 +24,11 @@
  */
 
 const FADE_IN = 0.08;
-const FADE_OUT = 0.16;
+// 0.16 faded out over the whole of a final /s/ — "burns", "stones" and "goats" all arrived
+// with the s gone even where the cut was right, because a sibilant is only ~0.12s long and
+// quiet to begin with. Every clip now carries real tail past its last word, so this only has
+// to cover the bed.
+const FADE_OUT = 0.09;
 const DUCK = 0.45;         // how far the score and the wood get out of the way
 
 export function createVO(actx, mix, takes, o = {}) {
