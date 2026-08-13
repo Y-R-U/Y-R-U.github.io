@@ -1,0 +1,159 @@
+{
+  "overdraw": {
+    "text": "Whitewall draws above the covenant.",
+    "campaign": "light", "story": "L10"
+  },
+  "wagon.eighth": {
+    "text": "A wagon leaves Whitewall every eighth day.",
+    "campaign": "light", "story": "L11"
+  },
+  "cousin": {
+    "text": "Whitewall has a cousin here nobody can place.",
+    "campaign": "light", "story": "L16"
+  },
+  "count.never.holds": {
+    "text": "The count never holds at both ends.",
+    "campaign": "light", "story": "L17"
+  },
+  "raiders.east": {
+    "text": "Blackstone raids the east water stands.",
+    "campaign": "light", "story": "L18"
+  },
+  "shaft.dry": {
+    "text": "The shaft they died for is dry.",
+    "campaign": "light", "story": "L19"
+  },
+  "unseen": {
+    "text": "You scouted the Black Keep and nobody saw you.",
+    "campaign": "light", "story": "L20"
+  },
+  "vail.dead": {
+    "text": "The Vail is dead before it reaches Blackstone.",
+    "campaign": "light", "story": "L21"
+  },
+  "thirty.years": {
+    "text": "Thirty years of overdraw, signed every year.",
+    "campaign": "light", "story": "L22",
+    "supersedes": "overdraw"
+  },
+  "strike.won": {
+    "text": "Whitewall holds the Black Keep. That should be the end of it.",
+    "campaign": "light", "story": "L23"
+  },
+
+  "fostered": {
+    "text": "You were fostered out of Longacre.",
+    "campaign": "dark", "story": "D02"
+  },
+  "walls.wrong.way": {
+    "text": "Both towns walled the north against nobody.",
+    "campaign": "dark", "story": "D06"
+  },
+  "yield.falls": {
+    "text": "The yield falls every month and nobody says the word.",
+    "campaign": "dark", "story": "D06"
+  },
+  "wagon.watched": {
+    "text": "Blackstone has counted that wagon for a year.",
+    "campaign": "dark", "story": "D07",
+    "supersedes": "wagon.eighth"
+  },
+  "vail.arrives.dead": {
+    "text": "Blackstone drinks what arrives dead.",
+    "campaign": "dark", "story": "D08",
+    "supersedes": "vail.dead"
+  },
+  "vail.alive.above": {
+    "text": "The Vail is alive above Longacre.",
+    "campaign": "dark", "story": "D09",
+    "supersedes": "vail.arrives.dead"
+  },
+  "ansel.nobody": {
+    "text": "Ansel belongs to nobody.",
+    "campaign": "dark", "story": "D14",
+    "supersedes": "cousin"
+  },
+  "raid.water": {
+    "text": "They came for water. You shot at people carrying buckets.",
+    "campaign": "dark", "story": "D16",
+    "supersedes": "raiders.east"
+  },
+  "sela.face": {
+    "text": "Someone wore Sela's face on purpose.",
+    "campaign": "dark", "story": "D17",
+    "supersedes": "shaft.dry"
+  },
+  "sign.kept": {
+    "text": "Nim kept your sign. They knew, and stayed.",
+    "campaign": "dark", "story": "D18",
+    "supersedes": "unseen"
+  },
+  "seam.west": {
+    "text": "The seam turns and runs west.",
+    "campaign": "dark", "story": "D19",
+    "supersedes": "yield.falls"
+  },
+  "strike.undone": {
+    "text": "The keep changed hands twice in a winter. Neither town gained a thing.",
+    "campaign": "dark", "story": "D21",
+    "supersedes": "strike.won"
+  },
+
+  "vermin.field": {
+    "text": "Longacre buries its vermin in one field.",
+    "campaign": "neutral", "story": "N02"
+  },
+  "prices.both": {
+    "text": "Longacre keeps both towns' prices on one post.",
+    "campaign": "neutral", "story": "N04"
+  },
+  "boundary.moves": {
+    "text": "Longacre's boundary posts move, two paces at a time.",
+    "campaign": "neutral", "story": "N04"
+  },
+  "ansel.you": {
+    "text": "Ansel is a face the Household keeps. You are wearing it.",
+    "campaign": "neutral", "story": "N08",
+    "supersedes": "ansel.nobody"
+  },
+  "covenant.wrong": {
+    "text": "The covenant number was always wrong.",
+    "campaign": "neutral", "story": "N09",
+    "supersedes": "thirty.years"
+  },
+  "count.by.design": {
+    "text": "The count never holds because you are the one loading it.",
+    "campaign": "neutral", "story": "N10",
+    "supersedes": "count.never.holds"
+  },
+  "wagon.longacre": {
+    "text": "Half the wagon is Longacre produce.",
+    "campaign": "neutral", "story": "N11",
+    "supersedes": "wagon.watched"
+  },
+  "sela.was.you": {
+    "text": "You were the captive. The confession was the plan.",
+    "campaign": "neutral", "story": "N14",
+    "supersedes": "sela.face"
+  },
+  "root.longacre": {
+    "text": "The root of the Forge is under Longacre.",
+    "campaign": "neutral", "story": "N16",
+    "supersedes": ["vermin.field", "seam.west", "boundary.moves"]
+  },
+  "household": {
+    "text": "The kitchen staff kept the best seam. Both orders walked away from it.",
+    "campaign": "neutral", "story": "N17",
+    "supersedes": "walls.wrong.way"
+  },
+  "fostered.policy": {
+    "text": "You were not placed. You were posted.",
+    "campaign": "neutral", "story": "N17",
+    "supersedes": "fostered"
+  },
+  "prices.raids": {
+    "text": "Longacre set the prices that caused the raids.",
+    "campaign": "neutral", "story": "N19",
+    "supersedes": ["raid.water", "strike.undone", "prices.both"]
+  }
+}

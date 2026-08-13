@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1013">
+<meta name="description" content="FORGE — a three-town magic RPG.">
+<title>FORGE</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="js/editor/editor.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<div id="hud">
+  <div id="perf"></div>
+</div>
+
+<a id="audio-link" href="audio/index.html" title="Audio lab" aria-label="Audio lab">♪</a>
+
+<div id="panel">
+  <button id="panel-toggle" aria-label="Toggle panel">⚙</button>
+  <div id="panel-body"></div>
+</div>
+
+<div id="touch">
+  <div id="stick" class="pad"><i></i></div>
+  <div id="fire" class="pad"></div>
+</div>
+
+<div id="boot">
+  <div class="logo">FORGE</div>
+  <div class="tag">a valley, three towns</div>
+  <div id="boot-status">warming…</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

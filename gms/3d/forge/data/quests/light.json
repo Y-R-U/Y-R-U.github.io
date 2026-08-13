@@ -1,0 +1,165 @@
+[
+  {
+    "id": "light.01",
+    "story": "L01",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "The Granary",
+    "summary": "Something is in the grain.",
+    "giver": "bel",
+    "prereq": ["all"],
+    "steps": [
+      { "id": "first", "do": ["kill", "grain_rat", 1], "in": "wwa.granary",
+        "text": "Cull the rodent",
+        "onDone": [["dialogue", "light.01.first"]] },
+
+      { "id": "rest", "do": ["kill", "grain_rat", 7], "in": "wwa.granary",
+        "text": "Cull the rodents",
+        "recover": [["respawn", "grain_rat", 7]] },
+
+      { "id": "lamp", "do": ["interact", "wwa.granary.lamp", 1], "in": "wwa.granary",
+        "verb": "kindle",
+        "text": "Relight the lamp",
+        "hint": "Cast at the lamp bracket by the door.",
+        "recover": [["arm", "wwa.granary.lamp"]] },
+
+      { "id": "out", "do": ["talk", "bel", "light.01.out"],
+        "text": "Speak to Bel outside",
+        "recover": [["moveTo", "wwa.granary"]] }
+    ],
+    "reward": { "items": [["rat_tail", 8]] },
+    "onDone": [["flag", "wwa.granary.clear", true], ["unlock", "light.02"], ["unlock", "light.05"]]
+  },
+
+  {
+    "id": "light.02",
+    "story": "L02",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "Line and Water",
+    "summary": "Rell wants five silverling.",
+    "giver": "rell",
+    "prereq": ["quest", "light.01", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "rell", "light.02.in"],
+        "text": "Speak to Rell at the fish steps" },
+
+      { "id": "catch", "do": ["gather", "silverling", 5], "in": "reach.light",
+        "text": "Catch five silverling",
+        "hint": "The steps below the dock. Hold the work button.",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "back", "do": ["talk", "rell", "light.02.out"],
+        "text": "Take them back to Rell",
+        "recover": [["moveTo", "wwa.fishsteps"]] }
+    ],
+    "onDone": [["unlock", "light.03"], ["unlock", "light.04"]]
+  },
+
+  {
+    "id": "light.03",
+    "story": "L03",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "Market Day",
+    "summary": "Sell the catch. Not at the first price.",
+    "giver": "rell",
+    "prereq": ["quest", "light.02", "done"],
+    "steps": [
+      { "id": "walk", "do": ["goto", "wwa.market"],
+        "text": "Go up to the market",
+        "recover": [["moveTo", "wwa.market"]] },
+
+      { "id": "ask", "do": ["talk", "wick_ww", "light.03.price"],
+        "text": "Ask what they are paying" },
+
+      { "id": "sell", "do": ["deliver", "silverling", 5, "wick_ww"], "via": "sell", "in": "wwa.market",
+        "text": "Sell five silverling",
+        "recover": [["grant", "silverling", 5]] },
+
+      { "id": "tails", "do": ["deliver", "rat_tail", 8, "wick_ww"], "via": "sell", "in": "wwa.market",
+        "text": "Sell the tails",
+        "optional": true,
+        "recover": [["grant", "rat_tail", 8]] }
+    ],
+    "reward": { "bonus": { "xp": { "barter": 40 } } },
+    "onDone": [["flag", "sold.once", true], ["unlock", "light.06"]]
+  },
+
+  {
+    "id": "light.04",
+    "story": "L04",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "Cook's Hands",
+    "summary": "Cook three. Feed three.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.02", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "marrin", "light.04.in"],
+        "text": "Speak to Marrin in the kitchen" },
+
+      { "id": "cook", "do": ["gather", "cooked_silverling", 3], "via": "craft", "in": "wwa.kitchen",
+        "text": "Cook three silverling",
+        "hint": "The hearth in the temple kitchen.",
+        "recover": [["grant", "silverling", 3]] },
+
+      { "id": "feed", "do": ["interact", "wwa.temple.hand", 3],
+        "text": "Feed the temple hands",
+        "recover": [["arm", "wwa.temple.hand"]] },
+
+      { "id": "back", "do": ["talk", "marrin", "light.04.out"],
+        "text": "Tell Marrin it is done" }
+    ],
+    "onDone": [["unlock", "light.06"]]
+  },
+
+  {
+    "id": "light.05",
+    "story": "L05",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "Standing Watch",
+    "summary": "One night on the north gate.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.01", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.05.in"],
+        "text": "Take the watch from Kesta" },
+
+      { "id": "watch",
+        "all": [["survive", "wwa.northgate", 90], ["kill", "mire_rat", 2]],
+        "after": 21, "before": 5,
+        "text": "Hold the north gate",
+        "hint": "Two strays come up the road. Turn them back.",
+        "recover": [["moveTo", "wwa.northgate"], ["respawn", "mire_rat", 2]] },
+
+      { "id": "off", "do": ["talk", "kesta", "light.05.out"],
+        "text": "Hand the watch back" }
+    ],
+    "onDone": [["unlock", "light.06"]]
+  },
+
+  {
+    "id": "light.06",
+    "story": "L06",
+    "campaign": "light", "act": 1, "town": "light",
+    "title": "The Even Hand",
+    "summary": "The covenant is read at High.",
+    "giver": "alder",
+    "prereq": ["all",
+      ["quest", "light.03", "done"],
+      ["quest", "light.04", "done"],
+      ["quest", "light.05", "done"]],
+    "steps": [
+      { "id": "come", "do": ["goto", "wwa.temple"],
+        "after": 12, "before": 14, "onDay": 8,
+        "text": "Attend the reading at High",
+        "recover": [["moveTo", "wwa.temple"]] },
+
+      { "id": "read", "do": ["talk", "alder", "light.06.reading"],
+        "text": "Hear the covenant read" },
+
+      { "id": "cord", "do": ["interact", "wwa.temple.font", 1],
+        "text": "Take the apprentice's cord",
+        "recover": [["arm", "wwa.temple.font"]] }
+    ],
+    "reward": { "items": [["apprentice_cord", 1]] },
+    "onDone": [["flag", "light.act1.done", true], ["act", 2], ["unlock", "light.07"]]
+  }
+]

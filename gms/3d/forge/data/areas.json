@@ -1,0 +1,10 @@
+[
+  { "id": "wwa", "town": "light", "label": "Whitewall", "shape": { "k": "circle", "x": -520, "z": -60, "r": 120 } },
+  { "id": "wwa.granary", "town": "light", "parent": "wwa", "label": "the granary", "shape": { "k": "rect", "x0": -556, "z0": -34, "x1": -538, "z1": -14 } },
+  { "id": "wwa.fishsteps", "town": "light", "parent": "wwa", "label": "the fish steps", "shape": { "k": "circle", "x": -498, "z": -14, "r": 14 } },
+  { "id": "wwa.market", "town": "light", "parent": "wwa", "label": "Sanctum Yard", "shape": { "k": "rect", "x0": -534, "z0": -80, "x1": -506, "z1": -56 } },
+  { "id": "wwa.kitchen", "town": "light", "parent": "wwa", "label": "the temple kitchen", "shape": { "k": "rect", "x0": -512, "z0": -98, "x1": -498, "z1": -86 } },
+  { "id": "wwa.temple", "town": "light", "parent": "wwa", "label": "the Sanctum", "hearth": true, "shape": { "k": "circle", "x": -520, "z": -96, "r": 20 } },
+  { "id": "wwa.northgate", "town": "light", "parent": "wwa", "label": "the north gate", "shape": { "k": "circle", "x": -520, "z": -138, "r": 18 } },
+  { "id": "reach.light", "town": "light", "label": "the Whitewall reach", "shape": { "k": "rect", "x0": -560, "z0": -30, "x1": -430, "z1": 10 } }
+]

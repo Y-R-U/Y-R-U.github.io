@@ -1,0 +1,53 @@
+[
+  {
+    "id": "sandbox.01",
+    "story": "S01",
+    "campaign": "sandbox", "town": "light",
+    "title": "Vermin Contract",
+    "summary": "The granary posts a standing bounty.",
+    "giver": "board_ww",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "cull", "weight": 3 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "cull", "do": ["kill", "grain_rat", 6], "in": "wwa",
+        "text": "Clear six grain rats" },
+      { "id": "claim", "do": ["deliver", "rat_tail", 6, "board_ww"],
+        "text": "Claim at the post",
+        "recover": [["grant", "rat_tail", 6]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.05",
+    "story": "S05",
+    "campaign": "sandbox", "town": "light",
+    "title": "Panel Repair",
+    "summary": "Two panels down on the yard fence.",
+    "giver": "board_ww",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "mend", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "mend", "do": ["interact", "wwa.fence.panel", 2], "verb": "mend",
+        "text": "Mend the fence panels" }
+    ]
+  },
+
+  {
+    "id": "sandbox.19",
+    "story": "S19",
+    "campaign": "sandbox", "town": "light",
+    "title": "Lamp Round",
+    "summary": "Nine lamps, lit before the Low bell.",
+    "giver": "board_ww",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "kindle", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "round", "do": ["interact", "wwa.lamp", 9], "verb": "kindle",
+        "after": 18, "before": 21, "within": 900,
+        "text": "Light the round before Low" }
+    ]
+  }
+]

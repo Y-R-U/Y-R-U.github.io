@@ -1,0 +1,96 @@
+{
+  "light.01.first": {
+    "cam": "close",
+    "lines": [
+      ["bel", "That is one.", "There will be seven more in there."]
+    ]
+  },
+
+  "light.01.out": {
+    "cam": "two",
+    "once": true,
+    "lines": [
+      ["bel", "You have been getting away with talent.", "That stops being enough this year."],
+      ["bel", "Learn the craft. Earn your own keep.", "Do that and the rest follows."],
+      ["player", "It was only rats."],
+      ["bel", "It was dark and you did it anyway.", "That is the part I am talking about."]
+    ]
+  },
+
+  "light.02.in": {
+    "lines": [
+      ["rell", "Five silverling, off the steps below.", "Nothing clever. Just five."],
+      ["rell", "The line is magic. So is the patience."]
+    ]
+  },
+
+  "light.02.out": {
+    "lines": [
+      ["rell", "Five, and not a weed among them.", "Take them up to the yard."]
+    ]
+  },
+
+  "light.03.price": {
+    "cam": "two",
+    "lines": [
+      ["wick_ww", "Five marks the lot.", "That is what the post says."],
+      ["player", "The post is from Tuesday."]
+    ],
+    "choices": [
+      { "say": "Five is fine.", "goto": "light.03.take" },
+      { "say": "Seven.", "goto": "light.03.push" },
+      { "say": "I will come back.", "goto": null }
+    ]
+  },
+
+  "light.03.take": {
+    "lines": [
+      ["wick_ww", "Five it is.", "Lay them on the slab."]
+    ],
+    "sets": [["flag", "light.03.haggled", false]]
+  },
+
+  "light.03.push": {
+    "lines": [
+      ["wick_ww", "Six, and you carry your own crate.", "That is the last of it."],
+      ["player", "Six is fine."]
+    ],
+    "sets": [["flag", "light.03.haggled", true]]
+  },
+
+  "light.04.in": {
+    "lines": [
+      ["marrin", "Three fish, three hands, one hearth.", "Do not let it catch."],
+      ["marrin", "Cold heart, low flame. That is all it is."]
+    ]
+  },
+
+  "light.04.out": {
+    "lines": [
+      ["marrin", "They ate. That is the whole of it.", "Come back when you can do six."]
+    ]
+  },
+
+  "light.05.in": {
+    "lines": [
+      ["kesta", "The gate is yours until the bell.", "Two strays usually come up the road."],
+      ["kesta", "Turn them back. Do not chase them."]
+    ]
+  },
+
+  "light.05.out": {
+    "lines": [
+      ["kesta", "Quiet night, then.", "You did not sit down once. Good."]
+    ]
+  },
+
+  "light.06.reading": {
+    "cam": "wide",
+    "once": true,
+    "lines": [
+      ["alder", "The draw is measured and the draw is even.", "So it was written, so it is read."],
+      ["alder", "Whitewall takes what Whitewall is owed.", "No more, and never in the dark."],
+      ["alder", "Come up. The font is uncovered."]
+    ]
+  }
+}
