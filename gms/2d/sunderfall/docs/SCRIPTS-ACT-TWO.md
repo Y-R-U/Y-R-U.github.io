@@ -173,13 +173,51 @@ Bracketed lines are performance direction, which Suno reads as instruction rathe
 Generate several of each and reject on tone before anything else. The failure modes are
 predictable and named under each.
 
+### How these three are laid out, and why
+
+**One take per character, but written in scene order with the other speakers' turns left as
+silence.** Every lyrics block below runs the whole of act two front to back from that character's
+seat: their own lines in the order the game plays them, and a `[2s PAUSE]` wherever somebody else
+is talking or something is happening on stage. The game already plays a take a slice at a time
+(`vo: [offset, length]`), so it puts the conversation back together at runtime — the recording
+never needs to contain both halves of it.
+
+This buys two things at once:
+
+- **One voice per character for the whole game.** A scene generated per-scene is a different
+  performance each time, and act two cuts between the stones and the ending inside an hour of play.
+- **A cut boundary at every turn change.** `[2s PAUSE]` is the only reliable silence in a Suno take
+  — the music bed means silence detection cannot find anything else (`docs/VO-TIMING-RECIPE.md`) —
+  so a marked gap is a landmark to measure from as well as a place to cut.
+
+Three things to know before generating:
+
+- **A pause is not just for turn changes.** It also marks stage business the take has to leave room
+  for: the brazier going out, the failed cast, the walk to the staff. The rule is *every point where
+  this character is silent for a beat*, whatever the reason.
+- **Suno does not honour "2s" literally.** It will give you *a* gap, not a measured one, and
+  occasionally it gives you nothing. That is survivable — the gap is a cutting aid, not a timing
+  spec, and the game's beat timings are independent of it. What is *not* survivable is Suno reading
+  the tag aloud: check the first generation for a voice saying "two second pause". If it does,
+  re-ask with the bare tag `[pause]`, which it treats as structure more reliably.
+- **Two of this character's own lines in a row have no pause between them**, deliberately — they are
+  one breath in the game too. Those are the hard cuts, and they are the ones to round-trip first.
+  If a run of them comes back genuinely inseparable, ask again with a `[2s PAUSE]` between every
+  line; you lose the run-on rhythm inside a turn, which is a real cost but a smaller one than a
+  clip that plays a sentence and a half.
+
 ### 3a. `game/audio/vo/ostrick.mp3` — Keeper Ostrick, one take
 
-Both his scenes in one recording: the stones first, then the four lines from the ending. He is a
+Both his scenes in one recording: the stones first, then the seven lines from the ending. He is a
 **functionary**, not a mentor and not a villain. Sixties, provincial, clipped and pedantic, faster
 than Vayne and harder than Rook. Forty years of rites and service, and Vayne turned him down and
 melded a farm boy in a panic — his outrage is *procedural*, not moral, which is what makes it
 funny before it turns frightening.
+
+The pauses are Rook's turns. Ostrick is not really listening in the first scene — he talks *at* a
+boy — so the gaps before his replies should sound like a man waiting to speak rather than a man
+considering an answer. That inverts at "You'd give it up", which is the one time in the game
+something Rook says stops him.
 
 > **Style:** spoken word, no singing, older male voice, clipped and irritable and pedantic,
 > provincial rather than grand, close-mic'd and dry, no reverb, almost no music, one low sustained
@@ -191,6 +229,8 @@ Don't touch the stones.
 
 Who melded you?
 
+[2s PAUSE]
+
 [flat, refusing it]
 No.
 
@@ -198,12 +238,18 @@ No.
 There's a Rite. There's a Naming. There's nine years of it.
 You got a dying man's panic.
 
+[2s PAUSE]
+
 [bitter, the real wound]
 Vayne turned down forty years of me.
 And gave it to what was standing there.
 
-[thrown, slower]
+[2s PAUSE]
+
+[after a long silence, thrown, slower]
 You'd give it up.
+
+[2s PAUSE]
 
 [quiet, frightened now]
 Then he was out of time.
@@ -217,12 +263,22 @@ Boy. Keep the fire lit.
 Nothing crosses the stones while it burns.
 I'll bring the elders.
 
+[2s PAUSE]
+
 [over his shoulder, not kind]
 Learn something while you wait.
+
+[2s PAUSE]
+
+[2s PAUSE]
+
+[2s PAUSE]
 
 [out of breath, having run, much older suddenly]
 Boy.
 What rite did you—
+
+[2s PAUSE]
 
 [quiet, conceding]
 Yes.
@@ -231,12 +287,21 @@ Yes.
 There's a Rite. There's a Naming.
 If you want it.
 
+[2s PAUSE]
+
 [carefully, no authority left in it]
 Then what will you do?
+
+[2s PAUSE]
 
 [calling after him, not expecting an answer]
 Boy.
 ```
+
+**The three stacked pauses are the scene break** — everything between "Learn something while you
+wait" and "Boy" is the rest of the game: the vigil, the fire going out, the breach, the glade and
+the boss. It is the one landmark in this file you can find by ear, so measure the ending's offsets
+forward from it rather than counting all the way from the front.
 
 Suno's defaults for an old man with a staff are **wise mentor** and **sneering villain**. Reject
 both. The target is *petty* — a man complaining about paperwork — right up until "Then he was out
@@ -252,6 +317,14 @@ built into the beat timings; do not ask Suno to perform them.
 
 Every new Rook line in the game — all four scenes, in scene order — followed by the nineteen new
 barks from `VOICE-AND-MUSIC.md` §8e.
+
+**This is the long one: 33 lines of dialogue and 19 barks.** It will not come out of one extend.
+Take it in passes and keep extending — the four scenes first, then the barks — and if the barks
+end up in a separate file rather than on the end of this one, say so and they become a fourth
+take: `rook3` is two lines, one in `game/js/core/audio.js` (`VO_TAKES`) and one in
+`game/js/story/script.js` (`TAKES`), plus `take: 'rook3'` on the bark lines. Do not force them
+into `rook2` at the cost of a rushed extend — a bark in the wrong voice is worse than a bark that
+arrives a week later.
 
 > ⚠ **This must be generated as a CONTINUATION of `game/audio/vo/rook.mp3`, not as a fresh
 > generation.** A new generation will not be the same boy, and the game cuts between the intro's
@@ -272,109 +345,222 @@ barks from `VOICE-AND-MUSIC.md` §8e.
 [spoken, teenage boy, flat, deadpan, unimpressed]
 Elderman Vayne.
 
+[2s PAUSE]
+
 Yes.
+
+[2s PAUSE]
 
 I had goats. Now I've got this.
 Take it. Just take it.
 
+[2s PAUSE]
+
 Yes.
+
+[2s PAUSE]
 
 How long?
 
-[flat, to nobody]
+[2s PAUSE]
+
+[flat, to nobody, he has already gone]
 That's the second one.
 
 [quieter, almost to himself]
 The goats were fine.
+
+[2s PAUSE]
+
+[2s PAUSE]
 
 [watching something wrong happen, still bored]
 That's not the wind.
 It's bending in.
 Something's drinking it.
 
+[2s PAUSE]
+
 [flat, to nobody]
 He said keep it lit.
 Fine. I can do fire.
+
+[2s PAUSE]
 
 [it did not work]
 It won't take.
 That's never happened.
 
+[2s PAUSE]
+
 Something's been leaning on that.
+
+[2s PAUSE]
 
 [out of options, not brave]
 I'm not standing here in the dark.
 East, then.
+
+[2s PAUSE]
+
+[2s PAUSE]
 
 [quiet, recognising a place]
 I know these stones.
 The circle's still burnt in.
 This is where he did it.
 
+[2s PAUSE]
+
 [kneeling, small, to a dead man]
 You left this standing.
 The fire went out.
 
+[2s PAUSE]
+
 [not hope, barely a question]
 Vayne.
 
+[2s PAUSE]
+
 [counting, quiet]
 He only said that once.
+
+[2s PAUSE]
+
 He never called me that. I was boy.
+
+[2s PAUSE]
 
 [awake now, not raised]
 You've got his voice. You haven't got him.
 
+[2s PAUSE]
+
 [level, one word]
 Stop.
+
+[2s PAUSE]
 
 He held this.
 It won't help. I'm taking it anyway.
 You don't get to keep him.
 
+[2s PAUSE]
+
+[2s PAUSE]
+
+[2s PAUSE]
+
 [exhausted, flat, after everything]
 Is that it?
 The stone's gone out.
 
+[2s PAUSE]
+
 It's done.
+
+[2s PAUSE]
 
 [flat, final, the same word he was refused with]
 No.
 
+[2s PAUSE]
+
 [the last line, deadpan, no warmth and no joke]
 Nobody's fed the goats.
+```
 
-[muttering, to himself, walking]
+**The three stacked pauses near the end are the boss fight.** Everything before them is a boy who
+still thinks somebody is coming to help; everything after is a boy who has just found out nobody
+was. If the take carries on at the same energy through them, ask again and split there — the last
+five lines can be their own extend, and they should sound like they cost something.
+
+The other two stacked pairs are the vigil (after "The goats were fine") and the walk east through
+the breach (after "East, then"). Those matter less; they are gameplay, not a change in him.
+
+Then the barks, which are **not** part of the conversation — one line, said to nobody, dropped into
+the middle of a fight. They can go on the end of the same extend, or into `rook3` (above). Every
+one gets a pause on both sides because every one is cut on its own:
+
+```
+[muttering to himself, mid-fight, unimpressed]
 Yep. Still flammable.
+
+[2s PAUSE]
+
 Every time. Every single time.
 
+[2s PAUSE]
+
 Fine. That's fine.
+
+[2s PAUSE]
+
 I've had worse. Recently.
+
+[2s PAUSE]
 
 [strained, hurt]
 Not here. Not for this.
+
+[2s PAUSE]
+
 Keep the fire lit, he said.
+
+[2s PAUSE]
 
 [deadpan]
 Sorry. To whoever built that.
+
+[2s PAUSE]
+
 That was somebody's wall.
+
+[2s PAUSE]
 
 [uneasy]
 That's the stone. Not me.
+
+[2s PAUSE]
+
 I don't like how easy that was.
 
+[2s PAUSE]
+
 It fits better now. That's worse.
+
+[2s PAUSE]
+
 Bigger. Great.
 
+[2s PAUSE]
+
 Down again. Fine.
+
+[2s PAUSE]
+
 Walls. Use the walls.
+
+[2s PAUSE]
 
 I know what to do with rock now.
 
+[2s PAUSE]
+
 [quiet, to nobody, a long walk]
 Nobody ever needed saving from a goat.
+
+[2s PAUSE]
+
 Cass would hate this. Small mercy.
+
+[2s PAUSE]
+
 I'd take the goats.
+
+[2s PAUSE]
+
 Keep the fire lit.
 ```
 
@@ -417,14 +603,36 @@ like a kind old man reading from a card.**
 [spoken, elderly man, flat, even, no breath, no tremble, reading aloud from a card]
 You're what's here.
 
+[2s PAUSE]
+
 You're what's here.
+
+[2s PAUSE]
 
 That's the whole of it.
 
+[2s PAUSE]
+
 Rook.
 
+[2s PAUSE]
+
 Grow up. Quickly.
+
+[2s PAUSE]
+
+You're what's here.
 ```
+
+**Every line here gets a pause, including the two that are consecutive in the scene.** For the other
+two takes the gaps are turn changes; here they are the performance. The brief above already asks for
+an identical gap between every sentence, so the pauses and the direction are asking for the same
+thing, and a take that varies its gaps has already failed.
+
+The one thing to watch: a pause is a place where a performer *reacts*, and this one must not.
+Nothing after a gap may come back at a different pitch, a different pace, or with a breath in front
+of it. If the take sounds like it is answering Rook, it is wrong even if every individual line is
+flat — it is not in a conversation, it is playing back the only recording it has.
 
 **Suno's instinct here is a demon voice, and it will ruin the scene.** Reject, without listening
 twice, anything that arrives:
@@ -440,11 +648,13 @@ If a take is too expressive but otherwise right, the fix that has worked is aski
 `[monotone]` and `[no emotion, no inflection, robotic pacing but a human voice]` and nothing else
 in the bracket.
 
-**On the three "You're what's here."** — the line appears three times in the scene. Prefer to cut
-**one** slice and point all three beats at it. An identical waveform played three times is not a
-shortcut, it is the correct reading: the thing is replaying a recording, and a human ear catches
-sameness at that resolution instantly. The lyrics ask for two so that there is a spare if the
-first read is poor.
+**On the three "You're what's here."** — the line appears three times in the scene and all three are
+in the lyrics, in place. Cut **one** slice anyway and point all three beats at it. An identical
+waveform played three times is not a shortcut, it is the correct reading: the thing is replaying a
+recording, and a human ear catches sameness at that resolution instantly. Having all three in the
+take just means you get to choose the best read of it — and if any two of them come back audibly
+different, that is the strongest possible signal the performance is reacting and the take should go
+back.
 
 `Rook.` is the single most important word in the take and it is one syllable, so it is the one
 most likely to be swallowed or merged into the line before it. Check it survived the generation
@@ -471,6 +681,14 @@ with any tenderness at all the scene inverts and becomes a ghost story.
    position, the envelope for local checks, the 11–22 cps sanity rule to catch bad boundaries, and
    **never let either one decide alone.** Remember the continuation trim: subtract it from every
    offset in `rook2` and `vayne2`.
+
+   The `[2s PAUSE]` gaps change the shape of this job: they are the only real silences in the file,
+   so find them first and use them as landmarks. Whisper's timestamps drift 0.2–0.6s and usually
+   early, but they drift *locally* — anchored to the nearest gap rather than to the front of the
+   file, they are good enough to place a line, and the envelope then finds its actual edges inside a
+   two-second window instead of a two-minute one. Measure the stacked pauses too and write them
+   down; those are the scene breaks, and they are how you know a whisper result is in the right
+   scene at all.
 
 3. **Paste the offsets in.** Each scene in `game/js/story/scenes.js` has a
    `── VO: <take> ──` comment at the top of its beats marking the block; every line's `vo: null`
