@@ -433,7 +433,7 @@ async function boot() {
   let restarting = false;
 
   /* The first time the ward is used, it explains itself — otherwise "Again"
-     silently hands back two thirds of a run and the player never learns that
+     silently hands back nearly all of a run and the player never learns that
      the old man paid for it. Once per session; the ward speaks from around the
      boy, which is where it lives. */
   let wardTold = false;
@@ -458,8 +458,9 @@ async function boot() {
     restarting = true;
     try {
       if (ui && ui.reset) ui.reset();
-      // Vayne's ward (DESIGN §5, revised): spells and their ranks survive, and
-      // he keeps two thirds of his levels with a floor of 3.
+      // Vayne's ward (DESIGN §5, revised twice): spells and their ranks survive,
+      // and he loses exactly one level, with a floor of 3. See S.softReset for why
+      // it is a flat level rather than the fraction it started as.
       const sys = ctx.spellSystem;
       if (sys && sys.softReset) sys.softReset();
       R.fx.timeScale(1, 0);

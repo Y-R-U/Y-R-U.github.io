@@ -3980,3 +3980,32 @@ death at the boss → `approach` x 7470; the same again on a second death; `?act
 8600; one keypress leaves the scene playing and two end it; playing into `approach` the honest way
 and dying west of the open gate still rewinds to the road; teleporting east of 7930 first banks the
 ruins.
+
+---
+
+## 2026-08-14 (later) — the ward costs one level, flat
+
+Same playthrough. Aaron liked losing progression on death but not what it turned into:
+
+> *"if you e.g. get to level 7 or so, and get kicked back to level 3, you quickly gain a bunch of
+> levels + the upgrades that go along with it… I want them to restart but get stronger, but it was
+> a little too rapid."*
+
+He is describing a feedback loop, not just a number being too big. `S.WARD_LOSS` was `1/3`, so
+dying at 7 dropped him to 5 — and a level-5 character re-walking a road built for a level-7 one
+earns those two straight back in a couple of minutes. So the punishment refunded itself almost at
+once **and** paid a burst of level-up offers on the way, which is the opposite of a cost.
+
+`WARD_LOSS` is now a flat `1`. It cannot be farmed, and it costs the same at level 4 as at level 20.
+`WARD_FLOOR` is untouched at 3 (the second cast circle), and the ward still cannot promote.
+
+| from | 1 | 2 | 3 | 4 | 5 | 7 | 12 | 20 |
+|---|---|---|---|---|---|---|---|---|
+| to | 1 | 2 | 3 | 3 | 4 | 6 | 11 | 19 |
+
+Verified by `scratchpad/ward.mjs` over CDP against the live `spellSystem`, 8 levels, 0 console
+errors. XP still resets to 0 on the way through, so the current level's progress goes with it.
+
+Copy that quoted the old fraction is updated in three places — the death screen (`ui/overlays.js`),
+`main.js`'s two comments, and `DESIGN.md` §5. **If this changes again, grep for "third" first**; the
+number was written out in prose in every one of them.

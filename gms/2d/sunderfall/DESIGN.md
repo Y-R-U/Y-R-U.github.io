@@ -167,10 +167,21 @@ four pieces fit together.
 
 Roguelite layer — **Vayne's ward**. The old man bound a ward to Rook's life before it cost him his
 own, so death replays the day rather than ending it. It gives back what it can: every spell at the
-rank he took it to, his shards, and two thirds of his levels, never dropping him below level 3 —
-which is where the second cast circle opens, so a death is never a return to one-spell nothing. The
-death screen's other option, **Start over**, keeps nothing at all. The ward explains itself the
-first time it is used. The level's mid-section rooms are drawn from a pool so it is not identical on
+rank he took it to, his shards, and **all but one level** of what he had become, never dropping him
+below level 3 — which is where the second cast circle opens, so a death is never a return to
+one-spell nothing. The death screen's other option, **Start over**, keeps nothing at all. The ward
+explains itself the first time it is used.
+
+*Revised 2026-08-14.* The ward used to take a **third** of his levels, and that was too generous in
+a way that is not obvious: dying at 7 dropped him to 5, and a level-5 character re-walking a road
+built for a level-7 one earns those two back in a couple of minutes. Every restart therefore came
+with a burst of level-up offers and the loss paid itself back almost immediately. A flat level
+cannot be farmed that way, and it costs the same whether he dies at 4 or at 20. Restarting should
+make him stronger — just not that fast.
+
+*And death rewinds the road too*, not just the character (`REWIND_AT` in `sim/act.js`). Groundhog:
+back to the top, with one banked waypoint at the ruins once he has walked through the breach in the
+rock face. The level's mid-section rooms are drawn from a pool so it is not identical on
 a rerun. Keep this light — the handcrafted spine matters more than the shuffle.
 
 ## 6. Controls

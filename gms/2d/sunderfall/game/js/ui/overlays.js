@@ -407,8 +407,8 @@ export function createOverlays(ctx, L, st, api) {
           '<div><b>' + s.broken + '</b><span>Broken</span></div>' +
         '</div>' +
         '<p class="sf-sub">Vayne bound a ward to your life. It replays the day and gives back what it ' +
-          'can — every spell at the rank you took it to, and all but a third of what you had become. ' +
-          'Never below level 3.</p>' +
+          'can — every spell at the rank you took it to, and all but one level of what you had ' +
+          'become. Never below level 3. The road, though, you walk again.</p>' +
         '<div class="row"></div>' +
       '</div>';
     const row = death.querySelector('.row');

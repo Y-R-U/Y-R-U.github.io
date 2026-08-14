@@ -655,18 +655,25 @@ export function createSpellSystem(ctx, SPELLS, opts) {
    *
    * The old man bound a ward to the boy's life before it cost him his own, so
    * dying replays the day rather than ending it. It gives back what it can:
-   * every spell at the rank he had earned it to, and all but a third of what he
-   * had become. It cannot give back everything, and it never drops him below
-   * level 3 — which is where the second cast circle opens, so a death is never
-   * a return to one-spell nothing.
+   * every spell at the rank he had earned it to, and all but one level of what
+   * he had become. It never drops him below level 3 — which is where the second
+   * cast circle opens, so a death is never a return to one-spell nothing.
+   *
+   * **A flat level, not a fraction.** It used to take a third, which meant dying
+   * at 7 dropped you to 5 — and a level-5 character walking a road built for a
+   * level-7 one re-earns those two levels in a couple of minutes, so the loss
+   * paid itself back almost at once and every restart handed out a burst of
+   * level-up offers. Aaron's call: the point of a restart is to come back
+   * stronger, just not that fast. One level is a real cost that cannot be
+   * farmed, and it stays one level whether you die at 4 or at 20.
    *
    * It cannot promote: dying at level 2 leaves you at level 2, not at 3.
    */
   S.WARD_FLOOR = 3;
-  S.WARD_LOSS = 1 / 3;
+  S.WARD_LOSS = 1;          // levels, flat — see above
   S.softReset = function () {
     const floor = Math.min(S.level, S.WARD_FLOOR);
-    S.level = Math.max(floor, S.level - Math.ceil(S.level * S.WARD_LOSS));
+    S.level = Math.max(floor, S.level - S.WARD_LOSS);
     S.xp = 0; S.xpToNext = xpForLevel(S.level);
     S.focus = S.focusMax;
     S.offer = null;
