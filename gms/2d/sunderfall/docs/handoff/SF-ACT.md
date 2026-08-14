@@ -128,10 +128,17 @@ progress.actOnBoot               // what was on disk, or null
   so it replays; watching it to the end retires it. That is the "seen to the end" vs "was on
   screen when I died" distinction from the brief, and it falls out of *where* `setAct(null, id)`
   is called rather than needing any death-time bookkeeping.
-- **Death rewinds to the start of the current state.** `player:died` re-writes the act state as
-  it stands and bumps `epoch` so any in-flight scene promise is ignored. The restart's
-  `enter()` → `rebuild()` re-enters that same state cold, which places him at its `ENTRY_X`.
-  Dying to the boss puts him back in the arena, not at the stones.
+- **Death rewinds to the top of the road** *(revised 2026-08-14, Aaron's ruling — it used to rewind
+  to the start of the state he died in)*. `player:died` records the act state as it stands and bumps
+  `epoch` so any in-flight scene promise is ignored; the restart's `enter()` → `rebuild()` then
+  applies `REWIND_AT`, which is groundhog: back to `road`, walk the night again. Scenes already
+  watched stay `seen`, so a replay is the fight and not the story.
+  **One waypoint moves it, and only one.** Once `player.x` has passed the *east* side of the
+  breach — `wallX()`, gate + half its width + 40 — `wallPassed` latches, is saved as
+  `progress.act.wall`, and every death from then on stops at the ruins (x 7470) in state
+  `approach` instead. Opening the wall is deliberately not enough: the vigil is what opens it, and
+  dying two steps short of the gap must not bank a run he never got the good of. `catchUp()` also
+  sets the latch for `?act=approach` and later, since those place him east of the breach anyway.
 - **`rebuild()` trusts `progress.act.state`, not its own local copy.** This is load-bearing:
   "Start over" and the victory screen's **Again** both call `progress.clear()` and nothing else,
   so a machine reading its own memory restarted a brand-new run in `won`, on a victory screen, in

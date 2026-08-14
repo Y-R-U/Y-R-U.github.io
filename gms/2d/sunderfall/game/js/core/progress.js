@@ -49,8 +49,12 @@ export function createProgress(ctx) {
      *           not. That distinction is the whole reason this is a set and not a
      *           high-water mark.
      *   wins  — how many times this save has closed the seam.
+     *   wall  — he has been through the breach in the rock face. Death rewinds
+     *           to the top of the road until this is true and to the ruins on
+     *           the near side of the breach after it, so it is the one thing a
+     *           run banks permanently. `sim/act.js` owns when it is set.
      */
-    act: { state: 'road', seen: Object.create(null), wins: 0 },
+    act: { state: 'road', seen: Object.create(null), wins: 0, wall: false },
     actOnBoot: null,     // what was on disk, or null — sim/act.js consumes it
   };
 
@@ -86,7 +90,7 @@ export function createProgress(ctx) {
       hp: p && p.alive ? Math.round(p.hp) : 0,
       maxHp: p ? Math.round(p.maxHp || 0) : 0,
       dead: !!P.dead,
-      act: { state: P.act.state, seen: Object.assign({}, P.act.seen), wins: P.act.wins | 0 },
+      act: { state: P.act.state, seen: Object.assign({}, P.act.seen), wins: P.act.wins | 0, wall: !!P.act.wall },
     };
   }
 
@@ -123,6 +127,12 @@ export function createProgress(ctx) {
     if (seenId) P.act.seen[seenId] = 1;
     P.touch();
   };
+  /** He walked through the breach. One way, and it outlives every death. */
+  P.setWall = function () {
+    if (P.act.wall) return;
+    P.act.wall = true;
+    flush();
+  };
   P.recordWin = function () {
     P.act.wins = (P.act.wins | 0) + 1;
     P.act.state = 'won';
@@ -134,7 +144,7 @@ export function createProgress(ctx) {
     P.resumeAt = null; P.resumeHp = 0;
     // "Nothing kept" includes the story. Leaving the act state behind would put
     // a brand-new run at the boss with an unbuilt arena.
-    P.act = { state: 'road', seen: Object.create(null), wins: 0 };
+    P.act = { state: 'road', seen: Object.create(null), wins: 0, wall: false };
     P.actOnBoot = null;
     if (!enabled) return;
     if (timer) { clearTimeout(timer); timer = 0; }
@@ -167,6 +177,7 @@ export function createProgress(ctx) {
     if (d.act && typeof d.act.state === 'string') {
       P.act.state = d.act.state;
       P.act.wins = d.act.wins | 0;
+      P.act.wall = !!d.act.wall;
       if (d.act.seen) for (const k in d.act.seen) P.act.seen[k] = 1;
       P.actOnBoot = P.act.state;
     }

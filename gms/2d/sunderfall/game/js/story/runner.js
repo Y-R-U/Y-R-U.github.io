@@ -53,7 +53,14 @@ function loadScenes() {
   return scenesJob;
 }
 
-const SKIP_ARM = 0.55;      // a tap in the first half second is the tap that started it
+/* A cutscene begins the instant the fight before it ends, and the player is
+   still mashing the cast button when it does. At 0.55s and one tap, Aaron lost
+   the whole fire scene to a stray thumb and never saw it start — and a skipped
+   scene is retired for good, so it does not come back. It now takes a second
+   deliberate press inside SKIP_ASK, which a mash cannot supply by accident
+   because the first press is what puts the prompt on screen. */
+const SKIP_ARM = 1.2;       // dead time: taps this early are the fight, not a skip
+const SKIP_ASK = 2.4;       // how long "press again" stays live
 const LB_SPEED = 3.2;       // letterbox bars in/out, fraction of screen per second
 const WALK_AX = 0.55;       // scripted-walk stick deflection: a walk, not a sprint
 
@@ -115,7 +122,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
     const promise = new Promise((r) => { resolve = r; });
     A = {
       id, scene, promise, resolve,
-      t: 0, cueIdx: 0, beatIdx: 0, done: false, skipped: false,
+      t: 0, cueIdx: 0, beatIdx: 0, done: false, skipped: false, skipAsk: 0,
       cast: [],
       fired: [],
       lb: 0, lbTarget: scene.letterbox || 0,
@@ -136,7 +143,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
       panTo(scene.cam || { x: cam.x, y: cam.y }, 1 / Math.max(0.05, (scene.cam && scene.cam.ease) || 1));
       armSkip();
 
-      if (ctx.ui && ctx.ui.toast) ctx.ui.toast('Tap to skip', { kind: 'info', value: 'SKIP', life: 2.6 });
+      if (ctx.ui && ctx.ui.toast) ctx.ui.toast('Tap twice to skip', { kind: 'info', value: 'SKIP', life: 2.6 });
       bus.emit('story:scene', { id });
     } catch (e) {
       console.error('[story] scene setup failed', e);
@@ -222,7 +229,9 @@ export function createStoryRunner(ctx, world, opts = {}) {
   function armSkip() {
     disarmSkip();
     if (input.onTap) offTap = input.onTap(() => requestSkip());
-    keyHook = () => requestSkip();
+    // `repeat` is the killer on a keyboard: a movement key still held from the
+    // fight fires keydown thirty times a second, so any hold was an instant skip.
+    keyHook = (e) => { if (!e || !e.repeat) requestSkip(); };
     window.addEventListener('keydown', keyHook, { passive: true });
   }
   function disarmSkip() {
@@ -232,6 +241,11 @@ export function createStoryRunner(ctx, world, opts = {}) {
   function requestSkip() {
     if (!A || A.t < SKIP_ARM) return;
     if (ctx.ui && ctx.ui.blocked) return;
+    if (A.skipAsk <= 0) {
+      A.skipAsk = SKIP_ASK;
+      if (ctx.ui && ctx.ui.toast) ctx.ui.toast('Again to skip', { kind: 'info', value: 'SKIP', life: SKIP_ASK });
+      return;
+    }
     skip();
   }
 
@@ -596,6 +610,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
     if (!A || (ctx.ui && ctx.ui.blocked)) return;
 
     A.t += dt;
+    if (A.skipAsk > 0) A.skipAsk -= dt;
     const s = A.scene;
 
     const cues = s.cues || [];
@@ -689,9 +704,10 @@ export function createStoryRunner(ctx, world, opts = {}) {
       R.spriteRaw(R.white, 0, 0, 1, 1, 0, 0, hw * 2.2, hh * 2.2, 0, 0, 0, 0, A.fade, UI, false, 0);
     }
 
-    // "tap to skip", drawn rather than written: two chevrons in the bottom bar, breathing.
+    // "tap to skip", drawn rather than written: two chevrons in the bottom bar,
+    // breathing — and burning steadily once the first press has asked for the second.
     if (A.t > SKIP_ARM) {
-      const a = 0.34 + Math.sin(world.time * 3.4) * 0.12;
+      const a = A.skipAsk > 0 ? 0.9 : 0.34 + Math.sin(world.time * 3.4) * 0.12;
       const bx = hw - 74, by = hh - Math.max(26, hh * A.lb * 0.5);
       for (let i = 0; i < 2; i++) {
         const ox = i * 15;

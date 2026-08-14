@@ -3918,3 +3918,65 @@ The line above — *"7700 is the end of what is built"* — is now out of date. 
   design and `vo: null` everywhere. `docs/SCRIPTS-ACT-TWO.md` is the generation brief and §4 is the
   paste-the-offsets-in procedure. The 19 new barks are gated on their take being on disk and are
   therefore **inert** — that is deliberate, not a bug to fix.
+
+---
+
+## 2026-08-14 — death sends you back to the start (Aaron's ruling), and a cutscene can no longer be skipped by accident
+
+First real playthrough of the finished act two. Two things came out of it.
+
+### 1. Respawn is groundhog again, with one waypoint
+
+Death used to rewind to the start of the **act state** you died in, so dying to the boss put you back
+in the arena. Aaron played it and asked for the old behaviour back: *"It should kick you back to
+start, a bit like a groundhog restart."* The world is rebuilt intact on every restart anyway, so
+replaying the road is what the game was always shaped for.
+
+The one concession is a single waypoint, and it is a strict one — his words: *"the re-start zone
+should only set to that spot if I have **PASSED** the large wall."*
+
+| you died | you wake at | act state |
+|---|---|---|
+| anywhere before you walked through the breach | the top of the road, x 470 | `road` |
+| any time after | the ruins west of the breach, x 7470 | `approach` |
+| after the seam is closed | unchanged | `won` |
+
+Opening the wall is deliberately **not** enough. The vigil is what opens it, and dying two steps
+short of the gap would otherwise bank a run you never got the good of — so the latch is `player.x`
+crossing the *east* side of the breach (`wallX()` = gate x + half its width + 40 = 7930). It is one
+way, it is saved as `progress.act.wall`, and it survives every subsequent death. A toast says so the
+moment it fires, or it is an invisible rule.
+
+`REWIND_AT` and `rewind()` in `sim/act.js` are the whole of it; `act.set(state, { x })` grew an
+override so the rewind can land somewhere other than the state's `ENTRY_X`. **`?act=` is untouched**
+— it is a debug jump and still lands cold exactly where it says, which is what `rebuild()`'s `jump`
+branch protects.
+
+Note that a *refresh* now rewinds the same way, since both arrive through `rebuild()`. That is one
+code path rather than three, and it is honest: the world could never have been resumed anyway.
+
+### 2. A stray thumb ate the fire scene
+
+Aaron reached the wall, died near it, and never saw the second Vayne cutscene — *"maybe the cut
+scene was just way easy to skip so it was skipped before I even noticed it had started?"* He was
+right, and this is the mechanism:
+
+- a cutscene starts the instant the fight before it ends, and the player is still mashing cast;
+- `SKIP_ARM` was 0.55s and **one** tap skipped;
+- a skipped scene is `seen`, and `seen` is forever.
+
+So one leftover tap silently retired a scene for the rest of that save. On a keyboard it was worse:
+`keydown` **auto-repeats**, so any key still held from the fight fired thirty skip requests a second.
+
+`story/runner.js` now wants a deliberate double press — the first arms `A.skipAsk` for 2.4s, puts
+"Again to skip" on screen and burns the chevrons steady; only a second press inside that window
+calls `skip()`. `SKIP_ARM` is up to 1.2s and `e.repeat` is ignored. `story.skip()` itself is
+unchanged, so `story-test.html` and `tools/level4.mjs` still end a scene in one call.
+
+### Verified
+
+`scratchpad/respawn.mjs`, raw CDP, seven checks, 0 console errors: death in the vigil → road x 470;
+death at the boss → `approach` x 7470; the same again on a second death; `?act=glade` still lands at
+8600; one keypress leaves the scene playing and two end it; playing into `approach` the honest way
+and dying west of the open gate still rewinds to the road; teleporting east of 7930 first banks the
+ruins.

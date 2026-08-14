@@ -21,9 +21,12 @@
  * 2. **A cutscene is "seen" only when it finishes.** Dying under one leaves it
  *    unseen, so it replays; watching it to the end retires it forever. That is
  *    recorded in `core/progress.js`, not here, because it has to survive a tab.
- * 3. **Death rewinds to the start of the current state, not to the road.** The
+ * 3. **Death rewinds to the top of the road, not to the state he died in.** It
+ *    is a groundhog restart, by Aaron's ruling — he walks the night again, and
+ *    the only thing that moves it forward is having been through the breach in
+ *    the rock face, after which the rewind stops at the ruins beside it. The
  *    ward (main.js) decides what is left of the character; this decides where in
- *    the story he wakes up.
+ *    the story he wakes up. See REWIND_AT.
  */
 
 import { groundAt } from './level.js';
@@ -57,6 +60,24 @@ const ENTRY_X = {
   boss: 9760,       // past the plug and past the 9620 trigger, inside the bowl
   won: 10100,
 };
+
+/**
+ * Where death sends him, by Aaron's ruling: back to the top of the road, and he
+ * walks the night again. Groundhog, not a rolling checkpoint — cutscenes he has
+ * already watched stay watched, so a replay is the fight, not the story.
+ *
+ * One waypoint moves that, and only one. Once he has actually walked *through*
+ * the breach in the rock face, the rewind stops at the ruins on its western
+ * side instead. Opening the wall is not enough — the vigil is what opens it and
+ * dying two steps short of the gap would otherwise bank a run he never got the
+ * good of. `wallPassed` is the latch, and it is saved, because a phone that
+ * discards the tab must not quietly take it back.
+ */
+const REWIND_AT = { approach: 7470 };   // the ruins, west of the breach at 7650–7890
+
+/** Far enough east that he is out the other side, not standing in the gap. */
+const wallX = (marks) => ((marks && marks.gate && marks.gate.x) || 7770)
+  + ((marks && marks.gate && marks.gate.w) || 240) * 0.5 + 40;
 
 /** Contract §3.5 shapes, used only if `sim/level.js` ever stops publishing one. */
 const FALLBACK_MARKS = {
@@ -101,6 +122,7 @@ export function createAct(ctx, world, opts) {
 
   let gateOpen = false;
   let sealed = false;
+  let wallPassed = false;    // he has been through the breach at least once, ever
   let bossEnt = null;
   let stubbedLevel = false;
 
@@ -113,6 +135,8 @@ export function createAct(ctx, world, opts) {
   const warn = (k, msg) => { if (!warned[k]) { warned[k] = 1; console.warn('[act] ' + msg); } };
 
   const idx = (s) => ACT_STATES.indexOf(s);
+  /** How far back a death or a refresh throws him. See REWIND_AT. */
+  const rewind = (s) => (s === 'won' ? 'won' : wallPassed ? 'approach' : 'road');
   const seen = (id) => { const P = prog(); return !!(P && P.act.seen[id]); };
 
   /* ------------------------------------------------------------------ *
@@ -301,10 +325,20 @@ export function createAct(ctx, world, opts) {
     }
   }
 
+  function markWallPassed() {
+    if (wallPassed) return;
+    wallPassed = true;
+    const P = prog();
+    if (P && P.setWall) P.setWall();
+    bus.emit('hint:tip', { text: "You'll wake at the ruins now", value: 'WARD', life: 8 });
+  }
+
   /** Everything the states before `name` did to the world, done at once. */
   function catchUp(name) {
     const i = idx(name);
-    if (i >= idx('approach')) openGate();
+    // Arriving at `approach` or later cold — `?act=`, or the rewind below — means
+    // the breach is behind him whether he walked it this run or not.
+    if (i >= idx('approach')) { openGate(); wallPassed = true; }
     if (i >= idx('boss')) sealArena();
     if (i >= idx('won') && marks.arena) {
       // He won here. The world rebuilds intact on every boot (progress.js only
@@ -429,6 +463,8 @@ export function createAct(ctx, world, opts) {
     const p = world.player;
     if (!p || !p.alive || p.killed) return;
 
+    if (!wallPassed && p.x > wallX(marks)) markWallPassed();
+
     switch (state) {
       case 'road':
         // 60px west of the first standing stone, so the scene starts as he
@@ -471,9 +507,9 @@ export function createAct(ctx, world, opts) {
     const st = ctx.ui && ctx.ui.state && ctx.ui.state.boss;
     if (st) st.phases = SEAM_PHASES;
   }));
-  /* Death rewinds the story to the START of the state he died in — not to the
-     road, and not past a cutscene he never got to the end of. `state` is left
-     exactly where it is; the restart's `rebuild` re-enters it. */
+  /* Record where he was, not where he is going: `rebuild` is what applies
+     REWIND_AT, and it needs to know which side of the breach the run had got to.
+     A cutscene he never reached the end of is still unseen and still replays. */
   offs.push(bus.on('player:died', () => {
     epoch++;
     busy = false;
@@ -505,7 +541,8 @@ export function createAct(ctx, world, opts) {
       state = next;
       entered = 0;
       catchUp(next);
-      if (next !== 'road' || (o2 && o2.place)) placePlayer(ENTRY_X[next]);
+      const at = o2 && o2.x != null ? o2.x : ENTRY_X[next];
+      if (next !== 'road' || (o2 && o2.place)) placePlayer(at);
       const P = prog();
       if (P) P.setAct(next, null);
       onEnter(next, true);
@@ -545,15 +582,20 @@ export function createAct(ctx, world, opts) {
          and nothing else. Reading the local copy there restarted a brand-new run
          in `won`, on a victory screen, in an arena it had never walked to. */
       const P = prog();
+      if (P && P.act && P.act.wall) wallPassed = true;
       const saved = P && P.act && P.act.state;
-      const want = (deps && deps.state) || saved || state;
+      /* `?act=` is a debug jump and lands exactly where it says. Everything else
+         arriving here — a death, a refresh, a tab iOS threw away — is a rewind,
+         and REWIND_AT decides how far back it goes. */
+      const jump = deps && deps.state;
+      const want = jump || rewind(saved || state);
       if (idx(want) <= 0) {
         state = 'road';
         entered = 0;
         if (P) P.setAct('road', null);
         onEnter('road', true);
       } else {
-        act.set(want);
+        act.set(want, jump ? null : { x: REWIND_AT[want] });
       }
     },
 
