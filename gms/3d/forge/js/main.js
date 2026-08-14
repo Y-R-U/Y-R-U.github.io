@@ -18,8 +18,11 @@ import { Slate } from './game/slate.js';
 import { gameHost } from './game/ui.js';
 import { bootMode, playing } from './game/boot.js';
 import { blank } from './game/save.js';
-import { hasSave } from './game/savestore.js';
+import { hasSave, load } from './game/savestore.js';
+import { install as installFailure, watchBoot, fail, RELOAD } from './game/failure.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+installFailure();
 
 const app = new App(document.getElementById('stage'));
 app.expose();
@@ -87,7 +90,10 @@ if (shot) {
   if (!params.has('hud')) document.body.classList.add('shotmode');
 } else if (playing(mode)) {
   player.enabled = true;
-  play();
+  // Never armed under ?shot= or in the editor: a bar appearing over a slow software render would
+  // be in the PNG.
+  watchBoot(() => window.__forge?.ready);
+  play().catch(e => fail(`The game could not start: ${e.message}. ${RELOAD}`));
 }
 
 // Stand-in NPCs until Track D places the cast: the nearest wandering figures answer to the cast
@@ -105,8 +111,12 @@ function targets() {
 async function play() {
   const host = gameHost();
   const fresh = !hasSave();
-  const campaign = fresh
-    ? await new Slate({ host, doc: blank(0) }).show()
+  // The slate is first run *and* chapter select: a save whose campaign is finished comes back to
+  // it to pick the next one, on the same character. Any other save goes straight into the world.
+  const doc = fresh ? blank(0) : load()?.doc;
+  const between = !!doc && doc.campaign.done.includes(doc.campaign.current);
+  const campaign = fresh || between
+    ? await new Slate({ host, doc: doc || blank(0) }).show()
     : null;
   const session = app.add(new Session(app, player, {
     fresh,

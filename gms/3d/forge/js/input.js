@@ -1,8 +1,11 @@
 // Keyboard + mouse on desktop, floating stick + attack half on touch.
 // Screen halves: one moves, one looks and attacks. `flip` swaps them for left-handers.
+// Sprint is Shift on a keyboard and a push past full stick deflection on touch.
 
 const STICK_R = 62;
 const TAP_MS = 400, TAP_PX = 16;
+// Two thresholds, or a thumb resting on the rim flickers between walk and run every frame.
+const SPRINT_ON = STICK_R * 1.55, SPRINT_OFF = STICK_R * 1.35;
 
 export class Input {
   constructor() {
@@ -11,6 +14,7 @@ export class Input {
     this.attack = false;
     this.attackEdge = false;
     this.sprint = false;
+    this.stickSprint = false;
     this.flip = false;
 
     this.keys = new Set();
@@ -33,14 +37,21 @@ export class Input {
       if (e.code === 'Space') { this.attackEdge = true; e.preventDefault(); }
     });
     addEventListener('keyup', e => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); this.stickId = this.lookId = null; this.hideStick(); });
+    addEventListener('blur', () => {
+      this.keys.clear();
+      this.stickId = this.lookId = null;
+      this.stickSprint = false;
+      this.hideStick();
+    });
 
     const down = e => this.onDown(e);
     for (const id of ['stage', 'touch']) document.getElementById(id)?.addEventListener('pointerdown', down);
     addEventListener('pointermove', e => this.onMove(e), { passive: false });
     addEventListener('pointerup', e => this.onUp(e));
     addEventListener('pointercancel', e => this.onUp(e));
-    addEventListener('contextmenu', e => { if (e.target.closest('#touch, #stage')) e.preventDefault(); });
+    // #game is in here for the two long-presses that live over text — the school dial and the
+    // quest tracker — which otherwise raise the context menu on Android.
+    addEventListener('contextmenu', e => { if (e.target.closest('#touch, #stage, #game')) e.preventDefault(); });
   }
 
   moveSide(clientX) {
@@ -78,6 +89,7 @@ export class Input {
       const k = Math.min(1, len / STICK_R);
       this.move.x = (vx / len) * k;
       this.move.y = -(vy / len) * k;
+      this.stickSprint = len > (this.stickSprint ? SPRINT_OFF : SPRINT_ON);
       this.showStick(p.x0, p.y0, (vx / len) * k * STICK_R, (vy / len) * k * STICK_R);
       e.preventDefault();
     } else if (e.pointerId === this.lookId) {
@@ -93,6 +105,7 @@ export class Input {
     if (e.pointerId === this.stickId) {
       this.stickId = null;
       this.move.x = this.move.y = 0;
+      this.stickSprint = false;
       this.hideStick();
     }
     if (e.pointerId === this.lookId) {
@@ -104,6 +117,7 @@ export class Input {
   showStick(cx, cy, dx, dy) {
     const k = this.el.knob;
     if (!k) return;
+    k.classList.toggle('sprint', this.stickSprint);
     k.style.display = 'block';
     k.style.left = `${cx}px`;
     k.style.top = `${cy}px`;
@@ -112,7 +126,9 @@ export class Input {
   }
 
   hideStick() {
-    if (this.el.knob) this.el.knob.style.display = 'none';
+    if (!this.el.knob) return;
+    this.el.knob.style.display = 'none';
+    this.el.knob.classList.remove('sprint');
   }
 
   // Called once per frame by the player; keyboard folds into the same vector the stick fills.
@@ -125,7 +141,7 @@ export class Input {
       this.move.x = x / l * Math.min(1, Math.hypot(x, y));
       this.move.y = y / l * Math.min(1, Math.hypot(x, y));
     }
-    this.sprint = k.has('ShiftLeft') || k.has('ShiftRight');
+    this.sprint = k.has('ShiftLeft') || k.has('ShiftRight') || this.stickSprint;
     const out = { mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y, attack: this.attackEdge, sprint: this.sprint };
     this.look.x = this.look.y = 0;
     this.attackEdge = false;

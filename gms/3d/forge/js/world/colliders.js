@@ -139,8 +139,9 @@ export function wallBox(cx, cz, hw, hd, y0, y1, cos, sin, ox, oz) {
 // Buildings are solid and have no doorway gap: the door hotspot is the only way in, and a gap
 // you could walk through would put you inside an empty shell.
 
-// stepUp 0.93 is 1.5 × the old 0.62 and must stay above the 0.66 house plinth, or every front
-// doorstep in the game is unclimbable.
+// stepUp governs one thing: the bridge deck, the only box built with it as its `rise`. Buildings
+// are rise 0 and kerbs carry their own 2.25, so no doorstep is ever climbed with it. It is copied
+// into the box at build time, so setStepUp only bites on the next collider rebuild.
 const WALK = { stepUp: 0.93, cell: 12 };
 let W = null;
 

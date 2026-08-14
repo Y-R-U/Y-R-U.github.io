@@ -46,6 +46,7 @@
 
   "light.04.in": {
     "lines": [
+      ["marrin", "Three off the slab. Take them."],
       ["marrin", "Three fish, three hands, one hearth.", "Do not let it catch."],
       ["marrin", "Cold heart, low flame. That is all it is."]
     ]
@@ -203,7 +204,7 @@
     "lines": [
       ["player", "Nine marks a sack. The temple's price."],
       ["hana", "It is a fair price and I do not want it."],
-      ["hana", "I want the leat cleared before Thursday."]
+      ["hana", "I want the leat cleared before the eighth."]
     ],
     "choices": [
       { "say": "Take the coin.", "goto": null, "sets": [["flag", "light.14.offered.coin", true]] },

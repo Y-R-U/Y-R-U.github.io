@@ -66,7 +66,8 @@
 
   "dark.03.out": {
     "lines": [
-      ["sela", "Eight. In the dark, in dead water."],
+      ["sela", "Eleven. In the dark, in dead water."],
+      ["sela", "Eight go up to the Board.", "Three stay down here. Do not mention it."],
       ["sela", "Whitewall would call that a miracle."],
       ["sela", "Here it is a night's work."]
     ]
@@ -241,7 +242,7 @@
   "dark.12.price": {
     "cam": "two",
     "lines": [
-      ["player", "Iron for grain. An honest weight."],
+      ["player", "Blackstone coin for Longacre grain.", "An honest weight."],
       ["hana", "It is honest and I do not want it."],
       ["hana", "I want the leat cleared before the eighth."]
     ],
@@ -270,7 +271,7 @@
     "cam": "close",
     "once": true,
     "lines": [
-      ["hana", "A Whitewall lad did these three last year."],
+      ["hana", "A Whitewall hand did these three last year."],
       ["hana", "Cleared the leat in an afternoon."],
       ["player", "I remember."],
       ["hana", "I expect you do."]
@@ -449,7 +450,8 @@
     "lines": [
       ["sela", "Feed everybody before they go up."],
       ["player", "With what?"],
-      ["sela", "There is enough.", "For once in this winter, there is enough."]
+      ["sela", "Eight went down the ladder. Six did not."],
+      ["sela", "Somebody was thinking. Bake them."]
     ]
   },
 

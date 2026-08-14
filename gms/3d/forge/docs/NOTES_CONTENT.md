@@ -259,8 +259,11 @@ Honest list, for the playtest.
 2. **L22 is `unseen` at 01:00 in a town that has a night watch the player served on.** If being
    seen is easy, the campaign's best scene becomes a stealth-fail loop. It has a `recover` and a
    retry, but the failure needs to be forgiving or the step needs its `unseen` dropped.
-3. **L18 is the difficulty cliff.** Two `hollow` at level 10 in an act banded 5–8, and they are the
-   first `people`-geo enemies the player meets. Expect to re-count them, or to want §3.1's raider.
+3. **L18 is the difficulty cliff.** ~~Two `hollow` at level 10~~ — **stale, corrected in the
+   content-fix pass.** The pack has not used `hollow` in L18 since the purpose-built `raider`
+   landed (`js/sim/tables.js:13-15`); the fix shipped and the cliff survived it, because four
+   raiders is still 44 taps at Kindle 3. L18 is now split into `crows` (sour_crow ×4, 20 taps) and
+   `fight` (raider ×**3**, 33 taps). Anyone chasing a Hollow here will not find one.
 4. **L23 asks for 8 kills, a `goto` and a 120 s hold, all inside Blackstone at night.** It is the
    longest step chain in the campaign and there is no checkpoint inside it.
 5. **The Act 4 walk is long.** L21 sends the player from Whitewall to the Blackstone reach and back
@@ -686,10 +689,12 @@ in this pack now depend on it. Whatever sets `player.wornId` (`SYSTEMS.md` §8.3
 
 ### 8.7 What will not survive first contact with a player, Neutral edition
 
-1. **The graft steps are a hard dependency on Hearth Ash and on the Graft cooldown.** Nine of them,
-   with `SYSTEMS.md`'s 3 s channel and a "no aware NPC within 22 m" precondition. If ash is scarce
-   or the channel is easy to interrupt, the whole of Acts 2 and 3 is a supply problem rather than a
-   spy story. §8.6 (h).
+1. ~~**The graft steps are a hard dependency on Hearth Ash.**~~ **Dismissed by the data in the
+   content-fix pass.** A graft is free at any `hearth: true` area with `town: 'neutral'`
+   (`session.js:467,576`), i.e. `lac.barn` — and **seven of the nine graft steps are `"in":
+   "lac.barn"`**. Only `neutral.13.graft` (`heath.blackspan`) and `neutral.25.swap` (`heath.ford`)
+   cost ash, and the N07 and N12 rewards grant five. Not a supply problem. The Graft *channel* and
+   the 22 m precondition are still worth playtesting; the ash is not. §8.6 (h) is likewise moot.
 2. **N25 crosses the valley twice in eight steps** — Whitewall's kitchen, the ford, Blackstone's
    kitchen — and `STORY.md` calls it "the same day". I did not author a `within`, because failing
    the campaign's best exercise on a clock would be miserable, but that means the "same day"
@@ -723,10 +728,16 @@ in this pack now depend on it. Whatever sets `player.wornId` (`SYSTEMS.md` §8.3
 ```
 lac.mill.hatch        lac.westfield.spit    lac.westfield.thorn  lac.westfield.pear
 lac.westfield.seam    lac.westfield.mark    lac.barn.table       lac.barn.crate
-lac.barn.hearth       lac.moot.ledger       lac.cotts.slate      lac.stables.plot
+lac.barn.hearth       lac.moot.ledger       lac.stables.plot     wwa.board
 wwa.market.stall      wwa.market.kerb       wwa.cells.hinge      bst.chantry.slate
 bst.levels.chest
 ```
+
+`lac.cotts.slate` was on this list until the content-fix pass and is **not** an id the corpus uses —
+`neutral.20.find` is a plain `goto lac.cotts`. `wwa.board` replaces it: Whitewall's notice board is
+now a declared area (`areas.json`), it is the giver of the five Whitewall board posts and the
+delivery target of `sandbox.01.claim`, and it is the one build item those six lint warnings were
+pointing at.
 
 `lac.westfield.post`, `lac.cross.post`, `lac.leat`, `lac.mill.crate`, `lac.millbridge.crate`,
 `lac.henhouse.hen`, `wwa.temple.font`, `wwa.fence.panel`, `wwa.lamp`, `bst.levels.prop`,

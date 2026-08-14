@@ -19,7 +19,7 @@
 
   "neutral.02.in": {
     "lines": [
-      ["sedge", "Rodents in the seed store. Fourteen."],
+      ["sedge", "Rodents in the seed store. Eight."],
       ["sedge", "Kill them and keep the tails."],
       ["sedge", "Not the midden. The west field."]
     ]
@@ -240,7 +240,7 @@
       ["alder", "Nine measures drawn. Nine returned."],
       ["alder", "That is the whole of it, and it is enough."],
       ["player", "As it is given, so it is given back."],
-      ["alder", "Good lad. You have a Sanctum voice."]
+      ["alder", "Good. You have a Sanctum voice."]
     ]
   },
 
@@ -403,7 +403,8 @@
       ["bel", "A quarter of an hour and she gave it up."],
       ["alder", "People do, when they are frightened."],
       ["alder", "Tell the muster. We move in the spring."],
-      ["player", "A true thing, said on purpose."]
+      ["player", "A true thing, said on purpose."],
+      ["player", "Dob sat in this chair.", "I asked him the questions."]
     ]
   },
 
@@ -484,6 +485,7 @@
     "lines": [
       ["hana", "Sit. Sedge on your left, Wick opposite."],
       ["hana", "Dob has the pot. That is all of us."],
+      ["hana", "Fen is on the water. He gets told after."],
       ["player", "This is the Household?"],
       ["hana", "Six chairs and a long table. Yes."]
     ]

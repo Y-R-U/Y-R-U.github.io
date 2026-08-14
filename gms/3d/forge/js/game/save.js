@@ -61,7 +61,7 @@ export function blank(seed = (Date.now() & 0x7fffffff)) {
     at: null,
     ledger: { day: 0, sold: {} },
     daily: { day: 0, standing: {}, mended: [], reforgeT: null },
-    board: { day: -1, ids: [] },
+    board: { day: -1, town: null, ids: [] },
     settings: { flip: false, haptics: true, aimAssist: 1, uiScale: 1, holdAssist: false,
       factionMarks: false, motion: 1, volume: 0.8, mute: false, ambience: 1 },
     onboard: {},
@@ -141,21 +141,7 @@ export function clampAll(raw, warnings = [], { defs = null, items = null, truths
   d.atlas = { ferry: arr(raw.atlas?.ferry).filter(x => FACTIONS.includes(x)),
     nodes: arr(raw.atlas?.nodes).filter(x => typeof x === 'number') };
 
-  d.quests = {};
-  for (const [id, rec] of Object.entries(obj(raw.quests))) {
-    if (defs && !defs[id]) { warnings.push(`quest ${id} no longer exists, dropped`); continue; }
-    if (!rec || typeof rec !== 'object') continue;
-    d.quests[id] = {
-      s: ['active', 'turnin', 'done', 'failed', 'cooling'].includes(rec.s) ? rec.s : 'active',
-      i: Math.max(0, Math.round(num(rec.i, 0))),
-      c: obj(rec.c),
-      t: num(rec.t, 0),
-      e: 0,                                   // real-seconds step timer, dies on load
-      scene: str(rec.scene),
-      ...(rec.readyOn != null ? { readyOn: num(rec.readyOn, 0) } : {}),
-      ...(rec.why ? { why: str(rec.why) } : {}),
-    };
-  }
+  d.quests = clampQuests(raw.quests, defs, warnings);
   d.tracked = d.quests[str(raw.tracked)] ? raw.tracked : null;
   d.flags = obj(raw.flags);
 
@@ -176,7 +162,8 @@ export function clampAll(raw, warnings = [], { defs = null, items = null, truths
   d.daily = { day: num(raw.daily?.day, 0), standing: obj(raw.daily?.standing),
     mended: arr(raw.daily?.mended).filter(x => typeof x === 'string'),
     reforgeT: raw.daily?.reforgeT == null ? null : num(raw.daily.reforgeT, 0) };
-  d.board = { day: num(raw.board?.day, -1), ids: arr(raw.board?.ids).filter(x => typeof x === 'string') };
+  d.board = { day: num(raw.board?.day, -1), town: FACTIONS.includes(raw.board?.town) ? raw.board.town : null,
+    ids: arr(raw.board?.ids).filter(x => typeof x === 'string') };
 
   const st = obj(raw.settings);
   d.settings = {
@@ -191,6 +178,38 @@ export function clampAll(raw, warnings = [], { defs = null, items = null, truths
   };
   d.onboard = obj(raw.onboard);
   return d;
+}
+
+// The quest block, checked against the definitions. Split out because the packs load *after* the
+// save does — `session.reconcile()` runs this a second time once `defs` actually exist, which is
+// the only moment either check can do anything.
+export function clampQuests(raw, defs = null, warnings = []) {
+  const out = {};
+  for (const [id, rec] of Object.entries(obj(raw))) {
+    if (defs && !defs[id]) { warnings.push(`quest ${id} no longer exists, dropped`); continue; }
+    if (!rec || typeof rec !== 'object') continue;
+    const s = ['active', 'turnin', 'done', 'failed', 'cooling'].includes(rec.s) ? rec.s : 'active';
+    let i = Math.max(0, Math.round(num(rec.i, 0)));
+    const steps = defs?.[id]?.steps?.filter(st => !st.optional).length ?? 0;
+    // Editing a quest down a step used to leave the save pointing past the end: active for ever,
+    // the tracker drawing the title as its objective, `retry` refusing because it never failed,
+    // and everything gated behind it locked. Clamped at the top as well as the bottom.
+    if (s === 'active' && steps && i >= steps) {
+      warnings.push(`quest ${id} was on step ${i + 1} of ${steps}, moved back to the last one`);
+      i = steps - 1;
+    }
+    out[id] = {
+      s,
+      i,
+      c: obj(rec.c),
+      t: num(rec.t, 0),
+      e: 0,                                   // real-seconds step timer, dies on load
+      scene: str(rec.scene),
+      ...(rec.readyOn != null ? { readyOn: num(rec.readyOn, 0) } : {}),
+      ...(rec.why ? { why: str(rec.why) } : {}),
+    };
+  }
+  return out;
 }
 
 export const itemCount = (doc, id) => doc.items.find(e => e.id === id)?.n || 0;
@@ -218,7 +237,7 @@ export function rollDay(doc, day) {
     ...doc,
     ledger: { day, sold: {} },
     daily: { day, standing: {}, mended: [], reforgeT: doc.daily.reforgeT },
-    board: { day: -1, ids: [] },
+    board: { day: -1, town: null, ids: [] },
   };
 }
 

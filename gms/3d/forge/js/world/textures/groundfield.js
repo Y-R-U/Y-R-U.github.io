@@ -4,10 +4,13 @@
 
 import * as THREE from 'three';
 import { heightAt } from '../terrain.js';
+import { X0, X1, Z0, Z1 } from '../field.js';
 import { track } from '../../engine/budget.js';
 
-const X0 = -160, X1 = 160, Z0 = -120, Z1 = 130;
-const W = 256, H = 200;
+// 1.41 m/texel over the 1440 × 720 m world. The skirt falls off as exp2(-(y - groundY) / 0.5),
+// so a height error of e metres scales it by 2^(-2e): at this density the p99 bilinear error
+// against heightAt is 0.043 m — 6% — and a 5 m house wall still spans four texels.
+const W = 1024, H = 512;
 
 let tex = null;
 
@@ -26,7 +29,7 @@ export function groundField() {
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
   tex.generateMipmaps = false;
   tex.needsUpdate = true;
-  track(tex, { w: W, h: H, fmt: 'rgb', mips: false, label: 'terrain:heightfield' });
+  track(tex, { w: W, h: H, fmt: 'r', mult: 2, mips: false, label: 'terrain:heightfield' });
   return { tex, grid: GRID };
 }
 

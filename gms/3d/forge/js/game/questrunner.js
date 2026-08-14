@@ -5,14 +5,42 @@
 // copy that would have to be kept in step.
 
 import { normaliseQuests, normaliseDialogue, normaliseAreas } from './questdef.js';
-import { step, offered, progress, rewardFor, boardRoll } from './quest.js';
+import { step, offered, progress, rewardFor, boardRoll, finishes } from './quest.js';
 import { areasAt, centreOf } from './areas.js';
 import { DAY_ROLL } from './clock.js';
 import { itemCount, addItem } from './save.js';
 import { award } from './journal.js';
+import { applyStanding, newStanding, FACTIONS } from '../sim/faction.js';
 import { el, clear } from './ui.js';
 
 const tAt = (day, hour) => DAY_ROLL + 24 * day + ((hour - DAY_ROLL + 24) % 24);
+
+export const offerId = id => `offer.${id}`;
+
+// The packs put the giver's brief in step 0 as a `talk` at the giver, so taking the job and being
+// told what it is are one conversation.
+export function briefOf(def) {
+  const first = def.steps?.find(s => !s.optional);
+  return first?.objectives.find(o => o.k === 'talk' && o.npc === def.giver && o.node)?.node || null;
+}
+
+// RUNTIME §2.2's offered → active transition, drawn with the pieces the dialogue box already has:
+// a node with no lines is a pure branch point, so the offer is two replies and no bubble.
+export function offerNode(def) {
+  return {
+    id: offerId(def.id),
+    cam: 'two',
+    lines: [],
+    choices: [
+      { say: `${def.title} — take it on.`, goto: briefOf(def), if: null, sets: [['accept', def.id]] },
+      { say: 'Not now.', goto: null, if: null, sets: null },
+    ],
+    once: false,
+    sets: [],
+    mark: null,
+    next: null,
+  };
+}
 
 export class QuestRunner {
   constructor({ host, clock, dialogue, doc, journal, world = {} }) {
@@ -34,7 +62,12 @@ export class QuestRunner {
   get state() { return { quests: this.doc.quests, tracked: this.doc.tracked }; }
 
   async load(base = 'data') {
-    const get = async p => (await fetch(`${base}/${p}`)).json();
+    // A 404 used to surface three frames later as a JSON parse error naming nothing.
+    const get = async p => {
+      const r = await fetch(`${base}/${p}`);
+      if (!r.ok) throw new Error(`${base}/${p} (${r.status})`);
+      return r.json();
+    };
     const packs = await get('quests/index.json');
     this.areas = normaliseAreas(await get('areas.json')).areas;
     this.truths = await get('truths.json');
@@ -44,6 +77,7 @@ export class QuestRunner {
         Object.assign(this.dialoguePack, normaliseDialogue(await get(`dialogue/${pack}.json`), { pack }).nodes);
       } catch { /* a quest pack need not have dialogue */ }
     }
+    this.buildOffers();
     this.dialogue?.load(this.dialoguePack);
     this.rollBoard();
     this.draw();
@@ -72,6 +106,29 @@ export class QuestRunner {
 
   get offers() { return offered(this.defs, this.state, this.ctx()); }
 
+  buildOffers() {
+    for (const def of Object.values(this.defs)) {
+      if (def.giver) this.dialoguePack[offerId(def.id)] = offerNode(def);
+    }
+  }
+
+  // The job this NPC has for you: the first quest they give that is offered, and — for a board
+  // template — posted today.
+  offerFrom(npc) {
+    for (const id of this.offers) {
+      const def = this.defs[id];
+      if (def?.giver !== npc) continue;
+      if (def.board && !this.doc.board.ids.includes(id)) continue;
+      return id;
+    }
+    return null;
+  }
+
+  offerSceneFor(npc) {
+    const id = this.offerFrom(npc);
+    return id && this.dialoguePack[offerId(id)] ? offerId(id) : null;
+  }
+
   emit(event) {
     const r = step(this.defs, this.state, event, this.ctx());
     this.doc.quests = r.state.quests;
@@ -84,23 +141,29 @@ export class QuestRunner {
 
   accept(id, force = false) { return this.emit({ t: 'accept', id, force }); }
   retry(id) { return this.emit({ t: 'retry', id }); }
+  abandon(id) { return this.emit({ t: 'abandon', id }); }
   resetStep(id) { return this.emit({ t: 'reset', id }); }
   track(id) { return this.emit({ t: 'track', id }); }
 
   apply(e) {
     const d = this.doc;
     switch (e[0]) {
+      case 'accept': this.accept(e[1]); break;
+      // `cooling` is a repeatable finishing, so it is a job done and it pays the same Standing.
+      case 'quest':
+        if (e[2] === 'done' || e[2] === 'cooling') this.standing('quest', { faction: this.defs[e[1]]?.town });
+        break;
       case 'xp': d.schools[e[1]] = (d.schools[e[1]] || 0) + e[2]; break;
       case 'mk': d.purse.marks += e[1]; break;
       case 'item': addItem(d, e[1], e[2]); break;
       case 'truth': this.awardTruth(e[1]); break;
-      case 'flag': d.flags[e[1]] = e[2] === undefined ? true : e[2]; break;
-      case 'unlock': d.flags[`unlocked.${e[1]}`] = true; break;
+      case 'flag': d.flags[e[1]] = e[2] === undefined ? true : e[2]; this.finish(e); break;
+      case 'unlock': d.flags[`unlocked.${e[1]}`] = true; this.finish(e); break;
       case 'act': d.campaign.act = e[1]; break;
       case 'dialogue': this.dialogue?.play(e[1]); break;
       case 'wait': this.waitFor(e[1], e[2]); break;
       case 'merge': this.merge(e.slice(1)); break;
-      case 'recover': for (const a of e[1]) this.world[a[0]]?.(...a.slice(1)); break;
+      case 'recover': this.recover(e[1]); break;
       case 'sound': this.world.sound?.(e[1]); break;
       default: break;
     }
@@ -114,6 +177,38 @@ export class QuestRunner {
     if (!to || names.length < 2) return;
     const merged = this.doc.campaign.merged || (this.doc.campaign.merged = {});
     for (const from of names.slice(0, -1)) if (from !== to) merged[from] = to;
+  }
+
+  // SYSTEMS §7.1: the town you work for thinks better of you, and its opposite a little worse.
+  // The daily caps live on `daily.standing` so they roll over with the day; `standing` itself is
+  // the flat three-faction map the save carries.
+  standing(action, { faction, amount = 0 } = {}) {
+    const d = this.doc;
+    const st = applyStanding(
+      { ...d.standing, caps: { ...newStanding().caps, ...d.daily.standing } },
+      action,
+      { faction: faction || d.campaign.current, amount },
+    );
+    for (const f of FACTIONS) d.standing[f] = st[f];
+    d.daily.standing = st.caps;
+  }
+
+  // `campaign.done` is the ladder — it is what the slate reads. The `unlocked.*` flags are still
+  // written for the packs' own bookkeeping and are nobody's gate.
+  finish(effect) {
+    const f = finishes(effect, this.doc.campaign.current);
+    const done = this.doc.campaign.done;
+    if (f && !done.includes(f)) done.push(f);
+  }
+
+  // §9.4's Reset this step. A verb the world does not implement is a broken promise, not a
+  // no-op, so it says so rather than failing quietly.
+  recover(list) {
+    for (const a of list || []) {
+      const fn = this.world[a[0]];
+      if (fn) fn(...a.slice(1));
+      else console.warn(`recover: this world has no ${a[0]}()`);
+    }
   }
 
   awardTruth(id, scene = null) {
@@ -138,10 +233,24 @@ export class QuestRunner {
     return 0;
   }
 
-  rollBoard(town = 'light') {
+  // Which board the player is reading: the town they are standing in, and the campaign's own town
+  // when they are out in the countryside between the three.
+  boardTown() {
+    for (const a of this.here) {
+      const town = this.areas[a]?.town;
+      if (town) return town;
+    }
+    return this.doc.campaign.current;
+  }
+
+  // Keyed on the town as well as the day, so walking Whitewall → Blackstone on one day re-rolls
+  // instead of serving Whitewall's posts at Blackstone's board. `boardRoll` is deterministic in
+  // (seed, town, day), so walking back gives the first board back unchanged.
+  rollBoard(town = this.boardTown()) {
     const day = this.clock?.day ?? 0;
-    if (this.doc.board.day === day) return this.doc.board.ids;
-    this.doc.board = { day, ids: boardRoll(this.defs, this.doc.seed, day, town) };
+    const b = this.doc.board;
+    if (b.day === day && b.town === town) return b.ids;
+    this.doc.board = { day, town, ids: boardRoll(this.defs, this.doc.seed, day, town) };
     return this.doc.board.ids;
   }
 
@@ -172,6 +281,7 @@ export class QuestRunner {
       this.here = now;
       for (const a of entered) this.emit({ t: 'enter', area: a });
       for (const a of left) this.emit({ t: 'leave', area: a });
+      if (entered.length || left.length) this.rollBoard();
     }
     this.emit({ t: 'tick', dt });
   }

@@ -112,12 +112,44 @@ test('within, unseen and a fail predicate all fail the step', () => {
   assert.equal(r.state.quests.q.s, 'failed');
 });
 
-test('retry restarts a failed quest and runs its recover list', () => {
-  const defs = pack([one('q', ['goto', 'ridge'], { unseen: true, recover: [['moveTo', 'ridge']] })]);
-  let { state } = drive(defs, [{ t: 'accept', id: 'q' }, { t: 'seen', by: 'watch' }]);
+// The fixture is three steps deep on purpose: a one-step quest cannot tell "runs step 0's recover"
+// apart from "puts the whole quest back", and that is exactly how the second one went missing.
+test('retry restarts a failed quest and puts back every step the player walked through', () => {
+  const defs = pack([{
+    id: 'q', title: 'T', summary: 's', giver: 'g',
+    steps: [
+      { id: 'a', do: ['goto', 'ridge'], text: 'go', recover: [['moveTo', 'ridge']] },
+      { id: 'b', do: ['gather', 'silverling', 2], text: 'fish', recover: [['grant', 'silverling', 2]] },
+      { id: 'c', do: ['goto', 'camp'], text: 'back', unseen: true, recover: [['moveTo', 'camp']] },
+      { id: 'd', do: ['goto', 'home'], text: 'home', recover: [['moveTo', 'home']] },
+    ],
+  }]);
+  const { state } = drive(defs, [
+    { t: 'accept', id: 'q' },
+    { t: 'enter', area: 'ridge' },
+    { t: 'gather', kind: 'silverling', n: 2 },
+    { t: 'seen', by: 'watch' },
+  ]);
+  assert.equal(state.quests.q.s, 'failed');
+  assert.equal(state.quests.q.i, 2, 'it failed on the third step');
+
   const r = step(defs, state, { t: 'retry', id: 'q' }, {});
   assert.equal(r.state.quests.q.s, 'active');
-  assert.deepEqual(r.effects.find(e => e[0] === 'recover'), ['recover', [['moveTo', 'ridge']]]);
+  assert.equal(r.state.quests.q.i, 0);
+  assert.deepEqual(r.effects.filter(e => e[0] === 'recover'), [
+    ['recover', [['moveTo', 'camp']]],
+    ['recover', [['grant', 'silverling', 2]]],
+    ['recover', [['moveTo', 'ridge']]],
+  ], 'deepest first, so step 0\'s move is the one that lands last — and step 3 was never reached');
+});
+
+test('retry is a no-op on a quest that has not failed', () => {
+  const defs = pack([one('q', ['goto', 'ridge'], { recover: [['moveTo', 'ridge']] })]);
+  const { state } = drive(defs, [{ t: 'accept', id: 'q' }]);
+  const r = step(defs, state, { t: 'retry', id: 'q' }, {});
+  assert.equal(r.state.quests.q.s, 'active');
+  assert.deepEqual(r.effects, [], 'no recover, no wipe — the journal button is not the only guard');
+  assert.deepEqual(step(defs, state, { t: 'retry', id: 'nope' }, {}).effects, []);
 });
 
 test('reset clears the current step counts and runs recover', () => {

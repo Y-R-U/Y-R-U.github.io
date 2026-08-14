@@ -106,7 +106,7 @@ export class Player {
       v => { this.collide = !!v; });
     q.register({ key: 'walkRadius', label: 'Walker radius', type: 'range', min: 0, max: 1, step: 0.02, default: 0.34, group: 'Controls' },
       v => { this.walkRadius = v; });
-    // Must stay above the 0.66 house plinth or every front doorstep is unclimbable.
+    // Reaches exactly one thing today, the bridge deck — see colliders.js.
     q.register({ key: 'stepUp', label: 'Step-up height', type: 'range', min: 0.1, max: 1.2, step: 0.02, default: 0.93, group: 'Controls' },
       v => setStepUp(v));
     q.register({ key: 'stepEase', label: 'Step-up ease rate', type: 'range', min: 4, max: 40, step: 1, default: 16, group: 'Controls' },

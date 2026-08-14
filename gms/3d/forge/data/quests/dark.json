@@ -16,11 +16,11 @@
         "recover": [["moveTo", "bst.bailey"]] },
 
       { "id": "clear",
-        "all": [["kill", "mire_rat", 10], ["kill", "creek_crab", 4]],
+        "all": [["kill", "mire_rat", 6], ["kill", "creek_crab", 4]],
         "in": "bst.levels",
         "text": "Clear the store",
         "hint": "The crabs are in the standing water. Break the shell first.",
-        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 10], ["respawn", "creek_crab", 4]] },
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 6], ["respawn", "creek_crab", 4]] },
 
       { "id": "out", "do": ["talk", "kesta", "dark.01.out"],
         "text": "Report the store clear" }
@@ -67,10 +67,10 @@
       { "id": "brief", "do": ["talk", "sela", "dark.03.in"],
         "text": "Take the line off Sela" },
 
-      { "id": "fish", "do": ["gather", "blackeel", 8], "in": "reach.dark",
+      { "id": "fish", "do": ["gather", "blackeel", 11], "in": "reach.dark",
         "after": 21, "before": 5,
-        "text": "Take eight eels off the reach",
-        "hint": "The day fish are gone. Everything here works nights.",
+        "text": "Take eleven eels off the reach",
+        "hint": "Eight for the Reeve. Three are ours.",
         "recover": [["moveTo", "stand.dry"]] },
 
       { "id": "out", "do": ["talk", "sela", "dark.03.out"],
@@ -284,11 +284,11 @@
         "recover": [["arm", "bst.levels.fall"], ["moveTo", "bst.levels"]] },
 
       { "id": "clear",
-        "all": [["kill", "mire_rat", 10], ["kill", "rat_knot", 4]],
+        "all": [["kill", "mire_rat", 5], ["kill", "rat_knot", 5]],
         "in": "bst.levels",
         "text": "Clear the gallery",
         "hint": "Knots come out of the sumps. Do not let them ring you.",
-        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 10], ["respawn", "rat_knot", 4]] },
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 5], ["respawn", "rat_knot", 5]] },
 
       { "id": "shore", "do": ["interact", "bst.levels.prop", 5], "in": "bst.levels",
         "verb": "mend",
@@ -349,6 +349,7 @@
       { "id": "load", "do": ["interact", "bst.board.yield", 3], "in": "bst.board",
         "verb": "barter",
         "text": "Weigh and load the yield",
+        "onDone": [["item", "iron_shard", 5]],
         "recover": [["arm", "bst.board.yield"], ["moveTo", "bst.board"]] },
 
       { "id": "road", "do": ["goto", "lac.square"],
@@ -420,7 +421,7 @@
       { "id": "out", "do": ["talk", "hana", "dark.13.out"],
         "text": "Take the grain off Hana" }
     ],
-    "reward": { "items": [["wheatglass", 8]] },
+    "reward": { "items": [["wheatglass", 14]] },
     "onDone": [["flag", "dark.grain", true], ["unlock", "dark.14"], ["unlock", "dark.15"]]
   },
 
@@ -464,10 +465,12 @@
       { "id": "brief", "do": ["talk", "ossa", "dark.24.in"],
         "text": "Take the contract off the Board" },
 
-      { "id": "cull", "do": ["kill", "mire_rat", 20], "in": "bst.levels",
-        "text": "Cull twenty in the workings",
-        "hint": "The sumps on the third level. They breed in the warm water.",
-        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 20]] },
+      { "id": "cull",
+        "all": [["kill", "mire_rat", 8], ["kill", "rat_knot", 12]],
+        "in": "bst.levels",
+        "text": "Cull in the workings until you have twenty tails",
+        "hint": "The sumps on the third level. Knots come up with them.",
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 8], ["respawn", "rat_knot", 12]] },
 
       { "id": "claim", "do": ["deliver", "rat_tail", 20, "ossa"], "via": "sell", "in": "bst.board",
         "text": "Claim before the horn",
@@ -607,7 +610,8 @@
     "giver": "corve",
     "prereq": ["all",
       ["quest", "dark.07", "done"],
-      ["quest", "dark.17", "done"]],
+      ["quest", "dark.17", "done"],
+      ["quest", "dark.18", "done"]],
     "steps": [
       { "id": "brief", "do": ["talk", "corve", "dark.19.in"],
         "text": "Take the order to break the floor" },

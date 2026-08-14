@@ -14,16 +14,20 @@ test('the first ninety seconds arrive in the taught order', () => {
   const ctx = { target: true };
   assert.equal(next(ctx, {}).id, 'look');
   ctx.looked = true;
-  assert.equal(next(ctx, {}).id, 'cast');
-  ctx.cast = true;
   assert.equal(next(ctx, {}).id, 'move');
   ctx.moved = true;
+  assert.equal(next(ctx, {}).id, 'cast');
+  ctx.cast = true;
   ctx.cleared = true;
   assert.equal(next(ctx, {}).id, 'door');
 });
 
-test('nothing is taught before there is a reason to use it', () => {
-  assert.equal(next({ looked: true }, {}), null, 'no target, no cast prompt');
+test('a player who only walks is still taught the stick', () => {
+  // The whole script used to stall here: `move` was gated behind `cast`, which was gated behind
+  // an NPC standing within 4 m, so a cold start with nobody in range taught nothing but `look`.
+  const alone = { looked: true };
+  assert.equal(next(alone, {}).id, 'move');
+  assert.equal(next({ looked: true, moved: true }, {}), null, 'no target, no cast prompt');
   assert.equal(next({ looked: true, cast: true, moved: true }, {}), null, 'the room is not clear yet');
 });
 
@@ -38,5 +42,6 @@ test('a gesture already performed is retired without ever being shown', () => {
 });
 
 test('a flag from a previous save suppresses the prompt forever', () => {
-  assert.equal(next({ target: true }, { look: true }), null, 'nothing else is armed yet');
+  assert.equal(next({}, { look: true }).id, 'move', 'look is gone, the next one is not');
+  assert.equal(next({}, { look: true, move: true }), null, 'nothing else is armed yet');
 });

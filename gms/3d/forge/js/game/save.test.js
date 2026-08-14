@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blank, normalise, clampAll, rollDay, checkPosition, addItem, itemCount,
+import { blank, normalise, clampAll, clampQuests, rollDay, checkPosition, addItem, itemCount,
   SAVE_VERSION, POSITION, GROUND_TOLERANCE } from './save.js';
 import { Autosave } from './savestore.js';
 import { SCHOOLS } from '../sim/schools.js';
@@ -106,6 +106,25 @@ test('a quest that no longer exists is dropped so it cannot block a prereq', () 
   assert.deepEqual(Object.keys(r.doc.quests), ['light.01']);
   assert.equal(r.doc.tracked, null);
   assert.match(r.warnings.join(' '), /cut\.99/);
+});
+
+// Editing a quest under a live save is a daily event while the packs are being written, and a
+// `rec.i` past the end used to brick it silently: active for ever, nothing to finish, no warning.
+test('a quest that lost a step is moved back onto its last one, out loud', () => {
+  const defs = { q: { steps: [{ id: 'a' }, { id: 'b' }, { id: 'c', optional: true }] } };
+  const warnings = [];
+  const out = clampQuests({
+    q: { s: 'active', i: 4 },
+    done: { s: 'done', i: 9 },
+    low: { s: 'active', i: -3 },
+  }, { ...defs, done: defs.q, low: defs.q }, warnings);
+
+  assert.equal(out.q.i, 1, 'the last required step, and optional steps do not count');
+  assert.equal(out.q.s, 'active');
+  assert.match(warnings.join(' '), /q was on step 5 of 2/);
+  assert.equal(out.done.i, 9, 'a finished quest keeps its index; nothing reads it');
+  assert.equal(out.low.i, 0, 'and the bottom is still clamped');
+  assert.equal(warnings.length, 1, 'one warning, for the one quest that was actually stuck');
 });
 
 test('an unknown item is dropped and named', () => {

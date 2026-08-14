@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { ZONE_IDS, zone } from './zones.js';
-import { getMaterial } from './materials.js';
+import { getEnvIntensity, onEnvIntensity } from './materials.js';
 import { rng, span } from './details.js';
 import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
@@ -517,6 +517,7 @@ export class People {
       this.geoB[id] = figureGeometry(id, 1);
       this.mat[id] = robeMaterial(id, this.uniforms);
     }
+    onEnvIntensity(() => this.applyEnv());
 
     this.spawn();
     this.buildMeshes();
@@ -687,18 +688,15 @@ export class People {
       v => { this.uniforms.uEye.value = v; });
   }
 
+  applyEnv() {
+    const v = getEnvIntensity() * this.envScale;
+    for (const id of ZONE_IDS) this.mat[id].envMapIntensity = v;
+  }
+
   update(dt, app) {
     this.time = this.freeze ?? (this.time + dt) % 600;
     this.uniforms.uTime.value = this.time;
     if (app?.scene?.fog) this.uniforms.uRimCol.value.copy(app.scene.fog.color);
-
-    // lighting.js drives env intensity through materials.js only, and an untracked material
-    // sits at 1.0 while the whole town is at ~0.3 — which blows the robes out to white.
-    const env = getMaterial('neutral', 'crest').envMapIntensity * this.envScale;
-    if (env !== this.env) {
-      this.env = env;
-      for (const id of ZONE_IDS) this.mat[id].envMapIntensity = env;
-    }
 
     const m4 = new THREE.Matrix4();
     const q = new THREE.Quaternion();

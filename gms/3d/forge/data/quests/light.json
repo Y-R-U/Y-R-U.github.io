@@ -93,7 +93,8 @@
     "prereq": ["quest", "light.02", "done"],
     "steps": [
       { "id": "brief", "do": ["talk", "marrin", "light.04.in"],
-        "text": "Speak to Marrin in the kitchen" },
+        "text": "Speak to Marrin in the kitchen",
+        "onDone": [["item", "silverling", 3]] },
 
       { "id": "cook", "do": ["gather", "cooked_silverling", 3], "via": "craft", "in": "wwa.kitchen",
         "text": "Cook three silverling",
@@ -528,12 +529,14 @@
         "text": "Get down to the east stands",
         "recover": [["moveTo", "wwa.eastgate"]] },
 
-      { "id": "fight",
-        "all": [["kill", "raider", 4], ["kill", "sour_crow", 4]],
-        "in": "reach.east",
-        "text": "Drive them off the stands",
-        "hint": "The crows come down first. The staffs come after.",
-        "recover": [["moveTo", "stand.east"], ["respawn", "raider", 4], ["respawn", "sour_crow", 4]] },
+      { "id": "crows", "do": ["kill", "sour_crow", 4], "in": "reach.east",
+        "text": "Break the crows off the stands",
+        "recover": [["moveTo", "stand.east"], ["respawn", "sour_crow", 4]] },
+
+      { "id": "fight", "do": ["kill", "raider", 3], "in": "reach.east",
+        "text": "Drive the staffs off",
+        "hint": "Their bolt is slow. Move between the stands.",
+        "recover": [["moveTo", "stand.east"], ["respawn", "raider", 3]] },
 
       { "id": "hold", "do": ["survive", "reach.east", 60],
         "text": "Hold the stands until they break",
@@ -544,62 +547,6 @@
     ],
     "onDone": [["flag", "light.raid.held", true],
       ["unlock", "light.19"], ["unlock", "light.26"], ["unlock", "light.27"]]
-  },
-
-  {
-    "id": "light.19",
-    "story": "L19",
-    "campaign": "light", "act": 4, "town": "light",
-    "title": "The Captive",
-    "summary": "Question the Delver. She calls herself Sela.",
-    "giver": "alder",
-    "prereq": ["quest", "light.18", "done"],
-    "steps": [
-      { "id": "brief", "do": ["talk", "alder", "light.19.in"],
-        "text": "Alder wants you in the room" },
-
-      { "id": "down", "do": ["goto", "wwa.cells"],
-        "text": "Go down to the gate cells",
-        "recover": [["moveTo", "wwa.northgate"]] },
-
-      { "id": "ask", "do": ["talk", "sela", "light.19.ask"],
-        "text": "Ask her what they came for" },
-
-      { "id": "press", "do": ["talk", "sela", "light.19.more"],
-        "text": "Hear the rest of it" },
-
-      { "id": "out", "do": ["talk", "alder", "light.19.out"],
-        "text": "Tell Alder what she said" }
-    ],
-    "onDone": [["unlock", "light.20"]]
-  },
-
-  {
-    "id": "light.20",
-    "story": "L20",
-    "campaign": "light", "act": 4, "town": "light",
-    "title": "The Shaft's Mouth",
-    "summary": "Scout the Black Keep. Do not be seen.",
-    "giver": "kesta",
-    "prereq": ["quest", "light.19", "done"],
-    "steps": [
-      { "id": "brief", "do": ["talk", "kesta", "light.20.in"],
-        "text": "Take the scouting from Kesta" },
-
-      { "id": "climb", "do": ["goto", "ridge.dark"], "unseen": true,
-        "text": "Get onto the ridge unseen",
-        "hint": "Dim first, then move. The Watch reads light.",
-        "recover": [["moveTo", "heath.blackspan"]] },
-
-      { "id": "watch", "do": ["interact", "ridge.dark.mark", 3], "in": "ridge.dark",
-        "verb": "glamour", "unseen": true,
-        "text": "Mark what goes down the shaft",
-        "recover": [["arm", "ridge.dark.mark"], ["moveTo", "ridge.dark"]] },
-
-      { "id": "out", "do": ["talk", "kesta", "light.20.out"],
-        "text": "Bring the count home" }
-    ],
-    "onDone": [["unlock", "light.21"]]
   },
 
   {
@@ -661,6 +608,62 @@
   },
 
   {
+    "id": "light.19",
+    "story": "L19",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "The Captive",
+    "summary": "Question the Delver. She calls herself Sela.",
+    "giver": "alder",
+    "prereq": ["quest", "light.18", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "alder", "light.19.in"],
+        "text": "Alder wants you in the room" },
+
+      { "id": "down", "do": ["goto", "wwa.cells"],
+        "text": "Go down to the gate cells",
+        "recover": [["moveTo", "wwa.northgate"]] },
+
+      { "id": "ask", "do": ["talk", "sela", "light.19.ask"],
+        "text": "Ask her what they came for" },
+
+      { "id": "press", "do": ["talk", "sela", "light.19.more"],
+        "text": "Hear the rest of it" },
+
+      { "id": "out", "do": ["talk", "alder", "light.19.out"],
+        "text": "Tell Alder what she said" }
+    ],
+    "onDone": [["unlock", "light.20"]]
+  },
+
+  {
+    "id": "light.20",
+    "story": "L20",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "The Shaft's Mouth",
+    "summary": "Scout the Black Keep. Do not be seen.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.19", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.20.in"],
+        "text": "Take the scouting from Kesta" },
+
+      { "id": "climb", "do": ["goto", "ridge.dark"], "unseen": true,
+        "text": "Get onto the ridge unseen",
+        "hint": "Dim first, then move. The Watch reads light.",
+        "recover": [["moveTo", "heath.blackspan"]] },
+
+      { "id": "watch", "do": ["interact", "ridge.dark.mark", 3], "in": "ridge.dark",
+        "verb": "glamour", "unseen": true,
+        "text": "Mark what goes down the shaft",
+        "recover": [["arm", "ridge.dark.mark"], ["moveTo", "ridge.dark"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.20.out"],
+        "text": "Bring the count home" }
+    ],
+    "onDone": [["unlock", "light.21"]]
+  },
+
+  {
     "id": "light.21",
     "story": "L21",
     "campaign": "light", "act": 4, "town": "dark",
@@ -703,13 +706,19 @@
       ["quest", "light.11", "done"],
       ["quest", "light.21", "done"]],
     "steps": [
+      { "id": "home", "do": ["goto", "wwa.market"],
+        "text": "Get back inside the walls",
+        "hint": "Fen will put you off at the fish steps. Walk up from there.",
+        "recover": [["moveTo", "wwa.market"]] },
+
       { "id": "night", "do": ["goto", "wwa.almonry"],
-        "after": 1, "before": 4, "unseen": true,
+        "after": 1, "before": 4,
         "text": "Get into the Almonry after one",
+        "hint": "Wait for the bell. The Yard empties after it.",
         "recover": [["moveTo", "wwa.market"]] },
 
       { "id": "ward", "do": ["interact", "wwa.almonry.door", 1], "in": "wwa.almonry",
-        "verb": "ward",
+        "verb": "ward", "unseen": true,
         "text": "Ward the door behind you",
         "recover": [["arm", "wwa.almonry.door"]] },
 
@@ -778,11 +787,16 @@
         "recover": [["moveTo", "lac.ashgate"]] },
 
       { "id": "climb",
-        "all": [["kill", "watchman", 4], ["kill", "hollow", 4], ["kill", "raider", 4]],
+        "all": [["kill", "hollow", 4], ["kill", "raider", 4]],
         "in": "bst.switchback",
         "text": "Fight up the switchback",
         "hint": "Lancet windows above you. Keep to the wall.",
-        "recover": [["moveTo", "bst.westgate"], ["respawn", "watchman", 4], ["respawn", "hollow", 4], ["respawn", "raider", 4]] },
+        "recover": [["moveTo", "bst.westgate"], ["respawn", "hollow", 4], ["respawn", "raider", 4]] },
+
+      { "id": "gate", "do": ["kill", "watchman", 4], "in": "bst.middle",
+        "text": "Break the gate guard",
+        "hint": "Four of them, and they are rested. You are not.",
+        "recover": [["moveTo", "bst.middle"], ["respawn", "watchman", 4]] },
 
       { "id": "take", "do": ["goto", "bst.keep"],
         "text": "Take the keep",

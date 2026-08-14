@@ -926,9 +926,13 @@ This is the screen as it renders, with the catalogue's own wording — the wides
 
 `REVIEW.md` §6.2 asks that Dob's reveal live in the UI rather than in a line of dialogue. The
 journal's **cast** strip (bottom of the Truths tab, deferred with the Neutral campaign) shows one
-portrait per known face. When N24 resolves, "Cousin Ansel" and "Kettle" merge into one portrait with
-two struck-through names above the third. That is the whole implementation, and it is one effect:
-`['merge', 'ansel', 'kettle', 'dob']`.
+portrait per known face. When **N20** resolves, "Cousin Ansel" merges into Dob's portrait with the
+old name struck through above the new one. That is the whole implementation, and it is one effect:
+`['merge', 'ansel', 'dob']`.
+
+(This paragraph named N24 and a third character called "Kettle" until the content-fix pass. N24 is
+"What Feeds on It", the brood mother; the merge is `neutral.20.onDone`. Kettle was cut in revision 3
+and appears in no cast, quest or dialogue file. STORY §7 Act 4 always had it right.)
 
 ---
 

@@ -3,9 +3,10 @@
 
 import { evalPred } from './predicate.js';
 import { questById, rewardXp, rewardMk, questXp, QUEST_WEIGHT, BOARD_SIZE, BOARD_ALWAYS } from '../sim/campaign.js';
-import { levelFor } from '../sim/xp.js';
+import { levelFor, grantXp } from '../sim/xp.js';
 import { streamFor, roll } from '../sim/rng.js';
 import { inWindow } from './predicate.js';
+import { FACTIONS } from '../sim/schools.js';
 
 export const blankState = () => ({ quests: {}, tracked: null });
 
@@ -100,15 +101,26 @@ export function rewardFor(def, ctx = {}) {
   return { xp, mk, items: def.reward.items, truths: def.reward.truths };
 }
 
+// SYSTEMS §3.3: nothing in the game pays raw XP. A turn-in has no source to out-level and no
+// streak — the level pair is deliberately equal, so `tierMul` is 1 — which leaves the affinity row,
+// the ±15% that is the whole mechanical payoff of wearing another town's face.
+function xpFx(school, base, ctx) {
+  const level = levelFor(ctx.schools?.[school] || 0);
+  return ['xp', school, grantXp({
+    base, school, playerLevel: level, sourceLevel: level, streak: 0,
+    faction: ctx.campaign?.current, worn: ctx.worn ?? null,
+  })];
+}
+
 function payout(def, rec, ctx, fx) {
   const r = rewardFor(def, ctx);
-  for (const [school, n] of Object.entries(r.xp)) fx.push(['xp', school, n]);
+  for (const [school, n] of Object.entries(r.xp)) fx.push(xpFx(school, n, ctx));
   if (r.mk) fx.push(['mk', r.mk]);
   for (const [id, n] of r.items) fx.push(['item', id, n]);
   for (const id of r.truths) fx.push(['truth', id]);
   const opt = optional(def);
   if (opt.length && opt.every(s => complete(s, countsFor(rec, s))) && def.reward.bonus) {
-    for (const [school, n] of Object.entries(def.reward.bonus.xp || {})) fx.push(['xp', school, n]);
+    for (const [school, n] of Object.entries(def.reward.bonus.xp || {})) fx.push(xpFx(school, n, ctx));
     if (def.reward.bonus.mk) fx.push(['mk', def.reward.bonus.mk]);
   }
   for (const e of def.onDone) fx.push(e);
@@ -197,11 +209,15 @@ export function step(defs, state, event, ctx = {}) {
     if (!tracked || quests[tracked]?.s === 'done') { tracked = event.id; fx.push(['track', event.id]); }
   } else if (event.t === 'retry') {
     const def = defs[event.id];
-    if (def && quests[event.id]?.s === 'failed') {
+    const rec = quests[event.id];
+    if (def && rec?.s === 'failed') {
       quests[event.id] = { s: 'active', i: 0, c: {}, t: ctx.hour ?? 0, e: 0 };
       fx.push(['quest', event.id, 'active']);
-      const first = required(def)[0];
-      if (first?.recover) fx.push(['recover', first.recover]);
+      // Going back to step 0 means every step the player got through has to be put back, not only
+      // the first: they may have spent, moved or broken what steps 1–n needed. Deepest first, so
+      // step 0's own `moveTo` is the one that lands last and the player restarts where it says.
+      const walked = required(def).slice(0, (rec.i || 0) + 1).reverse();
+      for (const s of walked) if (s.recover) fx.push(['recover', s.recover]);
       enterStep(def, quests[event.id], ctx, fx);
     }
   } else if (event.t === 'reset') {
@@ -232,6 +248,19 @@ export function step(defs, state, event, ctx = {}) {
     if (tracked) fx.push(['track', tracked]);
   }
   return { state: { quests, tracked }, effects: fx };
+}
+
+// STORY §11's ladder, read off the effects the packs already author. Which campaign an effect
+// finishes, or null. `<faction>.done` is the canonical signal because it is the only one all three
+// carry — Neutral ends on a flag and unlocks nothing. `unlock <faction>` says the same thing from
+// the other side: the campaign you are in has just handed over the next one.
+export function finishes(effect, current = null) {
+  if (effect[0] === 'flag' && effect[2] !== false) {
+    const f = String(effect[1]).replace(/\.done$/, '');
+    if (f !== effect[1] && FACTIONS.includes(f)) return f;
+  }
+  if (effect[0] === 'unlock' && FACTIONS.includes(effect[1])) return current;
+  return null;
 }
 
 export function offered(defs, state, ctx = {}) {

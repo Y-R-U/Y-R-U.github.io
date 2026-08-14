@@ -19,6 +19,7 @@ export class JournalScreen {
     this.onClose = onClose;
     this.tab = 'quests';
     this.selected = null;
+    this.dropping = null;
     this.jumpTo = null;
     this.root = el('div', 'g-journal');
     this.open_ = false;
@@ -101,7 +102,7 @@ export class JournalScreen {
         if (r.need > 1) sub.append(el('i', null, `${r.have}/${r.need}`));
         row.append(sub);
       }
-      row.onclick = () => { this.selected = r.id; this.draw(); };
+      row.onclick = () => { this.selected = r.id; this.dropping = null; this.draw(); };
       list.append(row);
     }
     body.append(list);
@@ -138,9 +139,23 @@ export class JournalScreen {
         live && this.quests.state.tracked !== this.selected);
       add('Reset step', () => { this.quests.resetStep(this.selected); this.draw(); }, rec.s === 'active');
       if (rec.s === 'failed') add('Try again', () => { this.quests.retry(this.selected); this.draw(); });
+      if (live || rec.s === 'failed') {
+        add(this.dropping === this.selected ? 'Sure?' : 'Give up', () => this.abandonSelected());
+      }
       pane.append(acts);
     }
     body.append(pane);
+  }
+
+  // The way out of a quest that has stopped being possible. Two taps rather than a dialog box:
+  // the first arms the button, the second gives up, and choosing another quest disarms it.
+  abandonSelected() {
+    if (this.dropping !== this.selected) { this.dropping = this.selected; this.draw(); return false; }
+    this.quests.abandon(this.selected);
+    this.dropping = null;
+    this.selected = null;
+    this.draw();
+    return true;
   }
 
   drawTruths(body, j, defs) {

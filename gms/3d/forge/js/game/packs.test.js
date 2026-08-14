@@ -5,6 +5,7 @@ import { run } from './dialogue.js';
 import { lintAll } from '../../tools/lintQuests.mjs';
 import { ACTS, QUESTS } from '../sim/campaign.js';
 import { blankSchools } from '../sim/schools.js';
+import { grantXp } from '../sim/xp.js';
 
 const { errors, warnings, defs, dialogue, areas, truths } = lintAll();
 
@@ -106,16 +107,25 @@ test('Act 1 pays exactly the act budget in sim/campaign.js', () => {
   assert.equal(g.marks, ACTS.find(a => a.id === 'L1').mk);
 });
 
-test('Act 1 XP matches what STORY §8.1 publishes', () => {
+// §8.1 publishes the base a quest is worth; what the player banks is that base through SYSTEMS
+// §3.3's `grantXp`, which is the affinity row — Whitewall pays +15% on its own schools and −15%
+// on the two it is bad at. Rounded per award, not on the total.
+const banked = (school, ...bases) => bases.reduce((n, base) =>
+  n + grantXp({ base, school, playerLevel: 1, sourceLevel: 1, faction: 'light' }), 0);
+
+test('Act 1 XP matches what STORY §8.1 publishes, through the affinity row', () => {
   const { g } = playAct1();
   // L06 pays every trained school, so the leads carry their own quest plus the finale share.
-  assert.equal(g.schools.cull, 157 + 110);
-  assert.equal(g.schools.line, 157 + 110);
-  assert.equal(g.schools.barter, 78 + 40 + 110, 'including the optional tails bonus');
-  assert.equal(g.schools.hearth, 78 + 110);
-  assert.equal(g.schools.ward, 157 + 110);
-  assert.equal(g.schools.kindle, 157 + 157 + 110);
+  assert.equal(g.schools.cull, banked('cull', 157, 110));
+  assert.equal(g.schools.line, banked('line', 157, 110));
+  assert.equal(g.schools.barter, banked('barter', 78, 40, 110), 'including the optional tails bonus');
+  assert.equal(g.schools.hearth, banked('hearth', 78, 110));
+  assert.equal(g.schools.ward, banked('ward', 157, 110));
+  assert.equal(g.schools.kindle, banked('kindle', 157, 157, 110));
   assert.equal(g.schools.glamour, 0, 'Glamour is not trained in Act 1');
+
+  assert.equal(g.schools.cull, 267, 'Cull is nobody\'s affinity, so it is the published base');
+  assert.equal(g.schools.hearth, 216, 'Hearth is Whitewall\'s own: 90 + 126, not 78 + 110');
 });
 
 test('the act gates in order — nothing is offered before its prereq', () => {

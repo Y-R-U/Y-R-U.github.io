@@ -6,6 +6,7 @@
   { "id": "wwa.southgate", "town": "light", "parent": "wwa", "label": "the south gate", "shape": { "k": "circle", "x": -520, "z": 32, "r": 10 } },
   { "id": "wwa.market", "town": "light", "parent": "wwa", "label": "Sanctum Yard", "shape": { "k": "rect", "x0": -550, "z0": -86, "x1": -490, "z1": -36 } },
   { "id": "wwa.spire", "town": "light", "parent": "wwa.market", "label": "the Lantern Spire", "shape": { "k": "circle", "x": -520, "z": -60, "r": 10 } },
+  { "id": "wwa.board", "town": "light", "parent": "wwa.market", "label": "the Yard post", "shape": { "k": "circle", "x": -536, "z": -46, "r": 5 } },
   { "id": "wwa.temple", "town": "light", "parent": "wwa", "label": "the Sanctum", "shape": { "k": "rect", "x0": -537, "z0": -32, "x1": -503, "z1": -6 } },
   { "id": "wwa.kitchen", "town": "light", "parent": "wwa", "label": "the temple kitchen", "hearth": true, "shape": { "k": "rect", "x0": -500, "z0": -32, "x1": -482, "z1": -14 } },
   { "id": "wwa.cloister", "town": "light", "parent": "wwa", "label": "the Cloister", "shape": { "k": "rect", "x0": -602, "z0": -126, "x1": -564, "z1": -96 } },

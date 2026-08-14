@@ -5,14 +5,14 @@
     "campaign": "sandbox", "town": "light",
     "title": "Vermin Contract",
     "summary": "The granary posts a standing bounty.",
-    "giver": "board_ww",
+    "giver": "wwa.board",
     "prereq": ["quest", "light.01", "done"],
     "board": { "school": "cull", "weight": 3 },
     "repeat": { "every": 1 },
     "steps": [
       { "id": "cull", "do": ["kill", "grain_rat", 6], "in": "wwa",
         "text": "Clear six grain rats" },
-      { "id": "claim", "do": ["deliver", "rat_tail", 6, "board_ww"],
+      { "id": "claim", "do": ["deliver", "rat_tail", 6, "wwa.board"],
         "text": "Claim at the post",
         "recover": [["grant", "rat_tail", 6]] }
     ]
@@ -61,7 +61,7 @@
     "campaign": "sandbox",
     "title": "Kitchen Order",
     "summary": "Three hot meals. Every board, every day.",
-    "giver": "hana",
+    "giver": "marrin",
     "prereq": ["quest", "light.01", "done"],
     "board": { "school": "hearth", "weight": 1 },
     "repeat": { "every": 1 },
@@ -70,9 +70,9 @@
         "verb": "hearth",
         "text": "Cook three meals",
         "recover": [["grant", "mudbream", 3]] },
-      { "id": "serve", "do": ["deliver", "cooked_mudbream", 3, "lac.barn"], "in": "lac.barn",
-        "text": "Take them to the barn",
-        "recover": [["grant", "cooked_mudbream", 3], ["moveTo", "lac.barn"]] }
+      { "id": "serve", "do": ["deliver", "cooked_mudbream", 3, "wwa.kitchen"], "in": "wwa.kitchen",
+        "text": "Take them up to the kitchen that ordered them",
+        "recover": [["grant", "cooked_mudbream", 3], ["moveTo", "wwa.kitchen"]] }
     ]
   },
 
@@ -82,7 +82,7 @@
     "campaign": "sandbox", "town": "light",
     "title": "Panel Repair",
     "summary": "Two panels down on the yard fence.",
-    "giver": "board_ww",
+    "giver": "wwa.board",
     "prereq": ["quest", "light.01", "done"],
     "board": { "school": "mend", "weight": 2 },
     "repeat": { "every": 1 },
@@ -116,7 +116,7 @@
     "campaign": "sandbox", "town": "light",
     "title": "Kerb and Course",
     "summary": "Six stones, set true along the yard.",
-    "giver": "board_ww",
+    "giver": "wwa.board",
     "prereq": ["quest", "light.01", "done"],
     "board": { "school": "setting", "weight": 2 },
     "repeat": { "every": 1 },
@@ -264,7 +264,7 @@
     "campaign": "sandbox", "town": "light",
     "title": "Strays on the Road",
     "summary": "Casters on the march road again.",
-    "giver": "board_ww",
+    "giver": "wwa.board",
     "prereq": ["quest", "light.18", "done"],
     "board": { "school": "kindle", "weight": 2 },
     "repeat": { "every": 1 },
@@ -347,13 +347,13 @@
     "campaign": "sandbox", "town": "light",
     "title": "Lamp Round",
     "summary": "Nine lamps, lit before the Low bell.",
-    "giver": "board_ww",
+    "giver": "wwa.board",
     "prereq": ["quest", "light.01", "done"],
     "board": { "school": "kindle", "weight": 1 },
     "repeat": { "every": 1 },
     "steps": [
       { "id": "round", "do": ["interact", "wwa.lamp", 9], "verb": "kindle",
-        "after": 18, "before": 21, "within": 900,
+        "after": 18, "before": 21, "within": 180,
         "text": "Light the round before Low" }
     ]
   },
@@ -374,7 +374,7 @@
         "text": "Cook two, and do not dawdle",
         "recover": [["grant", "mudbream", 2]] },
       { "id": "carry", "do": ["deliver", "cooked_mudbream", 2, "lac.millbridge"], "in": "lac.millbridge",
-        "within": 600,
+        "within": 90,
         "text": "Get them to the bridge hot",
         "recover": [["grant", "cooked_mudbream", 2], ["moveTo", "lac.mill"]] }
     ]

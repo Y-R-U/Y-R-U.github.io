@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { ZONE_IDS, zone } from './zones.js';
-import { getMaterial } from './materials.js';
+import { onEnvIntensity } from './materials.js';
 import { rng, span } from './details.js';
 import { heightAt, waterY, CENTERS, nearCamera, zoneAt } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
@@ -642,6 +642,11 @@ export class Vermin {
     this.depth = new Map();
     this.meshes = new Map();
 
+    onEnvIntensity(v => {
+      this.env = v;
+      for (const m of this.mat.values()) m.envMapIntensity = v;
+    });
+
     this.spawn();
     this.ao = contactDisc(POOL);
     this.object3D.add(this.ao);
@@ -846,14 +851,6 @@ export class Vermin {
     this.time = (this.time + dt) % 600;
     this.uniforms.uTime.value = this.time;
     if (!this.count) { this.ao.count = 0; return; }
-
-    // lighting.js drives env intensity through materials.js only, and an untracked material sits
-    // at 1.0 while the whole town is at ~0.3.
-    const env = getMaterial('neutral', 'crest').envMapIntensity;
-    if (env !== this.env) {
-      this.env = env;
-      for (const m of this.mat.values()) m.envMapIntensity = env;
-    }
 
     const m4 = new THREE.Matrix4();
     const q = new THREE.Quaternion();

@@ -5,12 +5,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { blankState, step, offered } from '../js/game/quest.js';
+import { blankState, step, offered, finishes } from '../js/game/quest.js';
+import { slate } from '../js/game/towns.js';
 import { blankSchools, SCHOOLS } from '../js/sim/schools.js';
 import { ACTS } from '../js/sim/campaign.js';
-import { lintAll } from './lintQuests.mjs';
+import { lintAll, travelErrors, failRetryErrors, itemFlowErrors } from './lintQuests.mjs';
 
-const { defs, dialogue, truths } = lintAll();
+const { defs, dialogue, truths, areas } = lintAll();
 
 // One synthetic world event per objective, carrying whatever the step's modifiers demand.
 function eventsFor(s) {
@@ -43,7 +44,7 @@ function clockFor(s, clock) {
 // One save played straight through the ladder: Light, then Dark on the character Light left
 // behind. Dark is unreachable from a blank save by design, so its test has to walk in the door.
 function playThrough(campaigns) {
-  const g = { schools: blankSchools(), marks: 0, items: {}, flags: {}, truths: [], acts: [] };
+  const g = { schools: blankSchools(), marks: 0, items: {}, flags: {}, truths: [], acts: [], done: [] };
   const clock = { hour: 4, day: 0 };
   let state = blankState();
   const order = [];
@@ -68,6 +69,11 @@ function playThrough(campaigns) {
       if (e[0] === 'item') g.items[e[1]] = (g.items[e[1]] || 0) + e[2];
       if (e[0] === 'flag') g.flags[e[1]] = e[2] === undefined ? true : e[2];
       if (e[0] === 'unlock') g.flags[`unlocked.${e[1]}`] = true;
+      // The ladder itself: `questrunner.finish()` writes the same list into `campaign.done`, and
+      // `towns.slate()` reads it. Mirroring the flags alone proved the packs authored a signal
+      // nothing was listening to.
+      const fin = finishes(e, current);
+      if (fin && !g.done.includes(fin)) g.done.push(fin);
       if (e[0] === 'truth') g.truths.push(e[1]);
       if (e[0] === 'act') g.acts.push(e[1]);
     }
@@ -171,6 +177,11 @@ test('finishing Light unlocks Dark and leaves the ledger answered', () => {
   assert.equal(g.flags['unlocked.dark'], true);
   assert.equal(g.flags['echo.white_cord'], true);
   assert.equal(g.flags['light.ledger.read'], true);
+  // The slate is the only thing that reads the ladder, so this is the assertion that matters.
+  assert.deepEqual(g.done, ['light']);
+  const panels = slate({ campaign: { done: g.done } });
+  assert.equal(panels[2].playable, true, 'Blackstone lights');
+  assert.equal(panels[1].playable, false, 'and Longacre still has nothing to teach you');
 });
 
 // Dark is not playable from a blank save and must not be: it opens on the character Light left.
@@ -197,6 +208,8 @@ test('finishing Dark unlocks Neutral and grants the Short Rope', () => {
   assert.equal(g.flags['dark.done'], true);
   assert.equal(g.flags['unlocked.neutral'], true);
   assert.equal(g.flags['echo.short_rope'], true);
+  assert.deepEqual(g.done, ['light', 'dark']);
+  assert.equal(slate({ campaign: { done: g.done } })[1].playable, true, 'Longacre opens');
 });
 
 // §8.5's whole argument for the three-play ladder: Dark strikes seven Truths the player earned
@@ -272,9 +285,11 @@ test('a step that needs a face does not advance without one', () => {
   assert.equal(worn.state.quests['neutral.08'].i, i + 1, 'and it is open to Ansel');
 });
 
-// §8.5's Neutral row says seven. Ten Truths the first two campaigns handed the player are struck
-// by this one — see NOTES_CONTENT §8.6b. The list is the assertion, not the count.
-test('Neutral strikes ten Truths the first two campaigns left standing', () => {
+// Eleven Truths the first two campaigns handed the player are struck by this one — see
+// NOTES_CONTENT §8.6b. The list is the assertion, not the count. `cousin` is on it because
+// `ansel.you` supersedes both `ansel.nobody` and `ansel.nobody`'s own parent, so the chain closes
+// whether or not the player took the two optional quests that hold its middle links.
+test('Neutral strikes eleven Truths the first two campaigns left standing', () => {
   const held = new Set([...truthsFrom('light'), ...truthsFrom('dark'), ...truthsFrom('neutral')]);
   const struck = Object.entries(truths)
     .filter(([id, t]) => t.campaign === 'neutral' && held.has(id))
@@ -282,9 +297,82 @@ test('Neutral strikes ten Truths the first two campaigns left standing', () => {
   for (const id of struck) assert.ok(held.has(id), `${id} is struck but was never earned`);
   const earlier = [...new Set(struck)].filter(id => truths[id].campaign !== 'neutral').sort();
   assert.deepEqual(earlier, [
-    'ansel.nobody', 'count.never.holds', 'fostered', 'raid.water', 'seam.west', 'sela.face',
-    'strike.undone', 'thirty.years', 'wagon.watched', 'walls.wrong.way',
+    'ansel.nobody', 'count.never.holds', 'cousin', 'fostered', 'raid.water', 'seam.west',
+    'sela.face', 'strike.undone', 'thirty.years', 'wagon.watched', 'walls.wrong.way',
   ]);
+});
+
+// The harness above never walks — `clockFor` hands the player any hour they ask for — so a step
+// whose window shuts while the player is still crossing the valley passes every other gate in this
+// file. light.22 shipped that way and it killed the trilogy.
+test('every timed step can be walked to inside its own window', () => {
+  assert.deepEqual(travelErrors(defs, areas), []);
+});
+
+// The counterpart: the check has to be able to see the bug. This is light.22 as it shipped —
+// accepted from the journal on the Blackstone reach, with a three-hour window on the first step.
+test('the travel check fails a window that cannot be walked to', () => {
+  const broken = {
+    'x.01': { ...defs['light.21'], id: 'x.01' },
+    'x.02': {
+      id: 'x.02', giver: null, town: 'light', prereq: ['quest', 'x.01', 'done'],
+      steps: [{
+        id: 'night', after: 1, before: 4, within: null, in: null, recover: [],
+        objectives: [{ k: 'goto', area: 'wwa.almonry' }],
+      }],
+    },
+  };
+  const found = travelErrors(broken, areas);
+  assert.equal(found.length, 1);
+  assert.match(found[0], /^x\.02\.night: 1001 m from reach\.dark/);
+});
+
+// `retry` runs the *first* step's recover and nothing else, so a `fail` predicate reading state
+// that recover cannot reach fails again on the first event after the retry. Both of the corpus's
+// two `fail` steps shipped that way.
+test('every fail predicate can be retried out of', () => {
+  assert.deepEqual(failRetryErrors(defs), []);
+});
+
+test('the fail-retry check sees both shapes of the soft-lock', () => {
+  const step = (id, fail, recover = null) => ({ id, fail, recover, optional: false, objectives: [] });
+  const found = failRetryErrors({
+    // neutral.06 as it shipped: a flag nothing clears.
+    'x.01': { id: 'x.01', steps: [step('brief', null), step('apart', ['flag', 'x.met', true])] },
+    // neutral.15 as it shipped: a counter the runtime never resets.
+    'x.02': { id: 'x.02', steps: [step('yard', ['damageDealt', '>', 0])] },
+    // and the shape that would be safe: the first step's recover is the only one retry runs. It
+    // needs a `flag` recover verb, which the world adapter does not have yet.
+    'x.03': {
+      id: 'x.03',
+      steps: [step('brief', null, [['flag', 'x.met', false]]), step('apart', ['flag', 'x.met', true])],
+    },
+  });
+  assert.equal(found.length, 2);
+  assert.match(found[0], /^x\.01\.apart: fails on flag x\.met/);
+  assert.match(found[1], /^x\.02\.yard: fails on `damageDealt`/);
+});
+
+// The harness plays one order and never spends anything, so a quest that gives away what its
+// sibling needs finishes here and strands a real player.
+test('no quest spends what a sibling quest also needs', () => {
+  assert.deepEqual(itemFlowErrors(defs), []);
+});
+
+test('the item-flow check sees a double-spend of a shared parent', () => {
+  const q = (id, prereq, steps, reward = []) => ({
+    id, prereq, steps, board: null, reward: { items: reward, truths: [] }, onDone: [],
+  });
+  const gather = (kind, n, via = null) => ({ id: 'g', via, onDone: [], objectives: [{ k: 'gather', kind, n }] });
+  const deliver = (item, n) => ({ id: 'd', via: 'sell', onDone: [], objectives: [{ k: 'deliver', item, n }] });
+  // dark.03 catches eight; dark.04 sells all eight and dark.05 cooks three of the same eight.
+  const found = itemFlowErrors({
+    'x.03': q('x.03', ['all'], [gather('blackeel', 8)]),
+    'x.04': q('x.04', ['quest', 'x.03', 'done'], [deliver('blackeel', 8)]),
+    'x.05': q('x.05', ['quest', 'x.03', 'done'], [gather('cooked_blackeel', 3, 'craft')]),
+  });
+  assert.equal(found.length, 2);
+  assert.match(found[0], /^x\.04: spends blackeel, but only 8 are supplied .* against 11 spent between it and x\.05/);
 });
 
 test('the ladder plays end to end on one save and ends on the Long Furrow', () => {
@@ -293,6 +381,9 @@ test('the ladder plays end to end on one save and ends on the Long Furrow', () =
   assert.equal(g.flags['neutral.done'], true);
   assert.equal(g.flags['echo.long_furrow'], true);
   assert.equal(g.flags['trilogy.done'], true);
+  // Neutral unlocks nothing, so a ladder keyed on `unlock` alone could never close it.
+  assert.deepEqual(g.done, ['light', 'dark', 'neutral']);
+  assert.ok(slate({ campaign: { done: g.done } })[0].trilogy);
   assert.equal(g.truths.length, 0, 'Truths land in dialogue, never in a turn-in payout');
   assert.equal(per.neutral.order.at(-1), 'neutral.21');
   // 1 mk of rounding across five acts, the same as Light's 889 against 890.

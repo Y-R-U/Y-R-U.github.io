@@ -4,6 +4,7 @@
 import { el, clear } from './ui.js';
 import { sheetOf } from './sheet.js';
 import { markOf, nameOf } from './towns.js';
+import { storageHealthy, storageError } from './savestore.js';
 
 const clock2 = h => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
 const cap = s => s.replace(/^./, c => c.toUpperCase());
@@ -77,8 +78,11 @@ export class Menu {
     this.root.append(m);
 
     const c = this.o.clock;
-    this.root.append(el('p', null,
-      `saved · Day ${c.day}, ${clock2(c.hour)} · ${nameOf(this.o.doc().campaign.current)}`));
+    const where = `Day ${c.day}, ${clock2(c.hour)} · ${nameOf(this.o.doc().campaign.current)}`;
+    // The editor says this in six places and the game said it in none: private-mode Safari and a
+    // full quota both let a whole session play out and keep nothing.
+    if (storageHealthy()) this.root.append(el('p', null, `saved · ${where}`));
+    else this.root.append(el('p', 'warn', `Not saving — ${storageError()}. ${where}`));
   }
 
   drawWait() {

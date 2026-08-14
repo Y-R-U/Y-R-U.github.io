@@ -9,6 +9,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { outputSpaceTarget } from './aa.js';
+import { track, untrack } from './budget.js';
 
 export class Post {
   constructor(app) {
@@ -17,6 +18,9 @@ export class Post {
     this.gtao = null;
     this.enabled = false;
     this.samples = 0;
+    this.tracked = [];
+    this.depthKey = {};
+    this.gtaoDepthKey = {};
   }
 
   registerKnobs(q) {
@@ -48,7 +52,37 @@ export class Post {
     this.composer.addPass(this.fxaa);
   }
 
+  // Five full-resolution targets plus their depth attachments. Untracked, enabling AO made the
+  // memory readout fall — the aa target it replaces is freed — while real memory climbed.
+  account() {
+    this.release();
+    if (!this.composer) return;
+    const n = this.samples ? this.samples + 1 : 1;
+    const keep = (key, o) => { track(key, { mips: false, ...o }); this.tracked.push(key); };
+
+    const c = this.composer.renderTarget1;
+    for (const rt of [c, this.composer.renderTarget2]) {
+      keep(rt.texture, { w: rt.width, h: rt.height, mult: n, label: `post composer ${this.samples ? 'msaa' + this.samples : '1×'}` });
+    }
+    keep(this.depthKey, { w: c.width, h: c.height, mult: 2 * (this.samples || 1), label: 'post composer depth' });
+
+    const g = this.gtao;
+    if (!g) return;
+    // GTAO's three buffers are RGBA half-float — 8 bytes a pixel, so mult 2 over rgba.
+    for (const [rt, label] of [[g.gtaoRenderTarget, 'ao'], [g.pdRenderTarget, 'denoise'], [g.normalRenderTarget, 'normal']]) {
+      if (rt) keep(rt.texture, { w: rt.width, h: rt.height, mult: 2, label: `post gtao ${label}` });
+    }
+    const d = g.normalRenderTarget;
+    if (d) keep(this.gtaoDepthKey, { w: d.width, h: d.height, label: 'post gtao depth' });
+  }
+
+  release() {
+    for (const k of this.tracked) untrack(k);
+    this.tracked.length = 0;
+  }
+
   dispose() {
+    this.release();
     if (!this.composer) return;
     this.composer.renderTarget1.dispose();
     this.composer.renderTarget2.dispose();
@@ -71,9 +105,12 @@ export class Post {
       const q = this.app.quality;
       this.gtao.blendIntensity = q.get('aoStrength') ?? 1.1;
       this.gtao.updateGtaoMaterial({ radius: q.get('aoRadius') ?? 0.6, distanceExponent: 1, thickness: 1, scale: 1 });
-      // GTAO renders its depth/normal prepass at full res regardless, so "half" only halves the
-      // AO buffer itself — still the bulk of the cost on a phone.
+      // GTAO renders the scene into its normal buffer whatever that buffer's size, so "half"
+      // halves the fill and not the geometry — still the bulk of the cost on a phone.
       this.gtao.setSize(...this.bufferSize(mode));
+      this.account();
+    } else {
+      this.dispose();
     }
     this.app.aa.apply();
   }
@@ -90,5 +127,6 @@ export class Post {
     this.composer.setSize(s.x, s.y);
     this.fxaa.uniforms.resolution.value.set(1 / s.x, 1 / s.y);
     if (this.gtao) this.gtao.setSize(...this.bufferSize(this.app.quality.get('ao')));
+    this.account();
   }
 }

@@ -11,20 +11,22 @@ import { Market } from './market.js';
 import { Audio } from './audio.js';
 import { gameHost, el } from './ui.js';
 import { nearestAnchor } from './areas.js';
-import { blank, rollDay, checkPosition, POSITION, addItem, itemCount } from './save.js';
+import { blank, rollDay, checkPosition, POSITION, addItem, itemCount, clampQuests } from './save.js';
 import { appendLog } from './journal.js';
 import { pins, basicOf, unlocked, outclassed, levelIn } from './sheet.js';
 import * as vitals from './vitals.js';
 import { next as nextPrompt, settle, HOLD } from './onboard.js';
 import { quote, rows as wareRows } from './sale.js';
-import { nameOf } from './towns.js';
+import { nameOf, started } from './towns.js';
 import { FOOTSTEP_EVERY, RANGE } from './sounds.js';
 import { focusCost, canCast, idOf, SPELLS } from '../sim/spells.js';
+import { grantXp } from '../sim/xp.js';
 import { transactionXp, itemTier } from '../sim/economy.js';
 import {
   FACTIONS, GRAFT, SUSPICION, WATCH_WEIGHT, BLOCKED,
   newGraft, graftBlocked, startGraft, tickGraft, endGraft, graftEvent, breakGraft,
 } from '../sim/faction.js';
+import { fail, RELOAD } from './failure.js';
 import * as store from './savestore.js';
 import { Autosave } from './savestore.js';
 
@@ -33,6 +35,29 @@ const STUCK_SECONDS = 4;
 const STUCK_METRES = 0.15;
 const REACH = 400;
 const ASH = 'hearth_ash';
+
+// What the player is told when `recover` asks the world for something it cannot do yet. §9.4's
+// promise is that Reset this step puts the world back; when it cannot, it says so.
+const NO_HOOK = {
+  moveTo: 'There is nowhere to put you back.',
+  respawn: 'Nothing has come back yet.',
+  arm: 'It will not go back the way it was.',
+};
+
+// Every verb `recover` dispatches on — `tools/lintQuests.mjs` RECOVER is the same table — built in
+// one place so the contract test can prove the world the game hands the runner covers it.
+export function questWorld(world, hooks) {
+  return {
+    ...world,
+    sound: id => hooks.sound(id),
+    uiBusy: () => hooks.uiBusy(),
+    grant: (item, n = 1) => hooks.grant(item, n),
+    flag: (key, value = true) => hooks.flag(key, value),
+    moveTo: area => hooks.moveTo(area),
+    respawn: (kind, n = 1) => (world.respawn ? world.respawn(kind, n) : hooks.missing('respawn', kind, n)),
+    arm: id => (world.arm ? world.arm(id) : hooks.missing('arm', id)),
+  };
+}
 
 export class Session {
   constructor(app, player, opts = {}) {
@@ -44,6 +69,7 @@ export class Session {
     this.advanceRequest = false;
     this.host = gameHost();
     this.notices = [];
+    this.gaps = [];
     this.ob = { looked: false, moved: false, cast: false, doorUsed: false, contextUsed: false, channelled: false };
     this.stuck = 0;
     this.lost = 0;
@@ -61,7 +87,11 @@ export class Session {
 
     const loaded = opts.fresh ? null : store.load();
     this.doc = loaded?.doc || blank(opts.seed);
+    // Picking a different town off the slate is starting the next chapter on the same character:
+    // the acts start again from one, and `start()` opens on that campaign's first quest.
+    this.switched = !!opts.campaign && opts.campaign !== this.doc.campaign.current;
     if (opts.campaign) { this.doc.campaign.current = opts.campaign; this.doc.faction = opts.campaign; }
+    if (this.switched) this.doc.campaign.act = 1;
     if (loaded?.error) this.notices.push(loaded.error);
     if (loaded?.warnings?.length) this.notices.push(...loaded.warnings);
 
@@ -94,8 +124,15 @@ export class Session {
     });
 
     this.quests = new QuestRunner({
-      host: this.host, clock: this.clock, dialogue: this.dialogue,
-      doc: this.doc, world: { ...this.world, sound: id => this.audio.play(id), uiBusy: () => this.uiBusy },
+      host: this.host, clock: this.clock, dialogue: this.dialogue, doc: this.doc,
+      world: questWorld(this.world, {
+        sound: id => this.audio.play(id),
+        uiBusy: () => this.uiBusy,
+        grant: (item, n) => this.regrant(item, n),
+        flag: (key, value) => { this.doc.flags[key] = value; },
+        moveTo: area => this.recoverTo(area),
+        missing: (verb, ...args) => this.noHook(verb, args),
+      }),
     });
     this.quests.onSave = () => { this.canGraft = undefined; this.autosave.flush(); };
 
@@ -165,14 +202,34 @@ export class Session {
 
   async start(params = new URLSearchParams()) {
     this.dialogue.names = await fetch('data/cast.json').then(r => r.json()).catch(() => ({}));
-    await this.quests.load();
+    // Without the packs there is no game, so this is the one failure that stops rather than
+    // degrades — and it names the file, because the usual cause is a typo in one of them.
+    try {
+      await this.quests.load();
+    } catch (e) {
+      fail(`The quest packs did not load — ${e.message}. ${RELOAD}`);
+      throw e;
+    }
+    this.reconcile();
     this.restorePosition();
     const want = params.get('quest');
     if (want && this.quests.defs[want]) this.jumpTo(want);
+    else if (this.switched || !started(this.doc)) this.beginCampaign();
     this.doc.onboard = settle(this.obCtx(), this.doc.onboard);
     for (const bed of ['day', 'dusk', 'wind']) this.audio.ambience(bed, true);
     if (this.notices.length) this.notice(`This save was made by an older build. ${this.notices.length} things were adjusted.`);
     return this;
+  }
+
+  // §5.2's untrusted-input pass, minus the half of it that needs the quest definitions: those load
+  // after the document does, so the checks that need them run here instead of in `normalise`.
+  reconcile() {
+    const warnings = [];
+    this.doc.quests = clampQuests(this.doc.quests, this.quests.defs, warnings);
+    if (this.doc.tracked && !this.doc.quests[this.doc.tracked]) this.doc.tracked = null;
+    for (const w of warnings) console.warn(`save: ${w}`);
+    this.notices.push(...warnings);
+    return warnings;
   }
 
   get uiBusy() { return this.journal.open || this.menu.open || this.market.open; }
@@ -219,16 +276,14 @@ export class Session {
   // rather than as an error. It is never reported to the player.
   spawnAtHearth(area) {
     const areas = this.quests.areas || {};
-    const home = Object.values(areas).find(a => a.hearth)
+    const town = this.doc.campaign.current;
+    const home = Object.values(areas).find(a => a.hearth && a.town === town)
+      || Object.values(areas).find(a => a.hearth)
       || (area && areas[area] ? areas[area] : null)
       || Object.values(areas)[0];
-    if (!home || !this.player?.pos) return;
-    const at = nearestAnchor({ [home.id]: home }, 0, 0);
     // The anchors are authored against the finished valley; Track A's world is still the demo,
     // and walking a player 500 m into terrain that does not exist yet is worse than not moving.
-    if (!this.reachable(at)) return;
-    const y = this.world.groundAt?.(at.x, at.z, 0);
-    this.player.pos.set(at.x, Number.isFinite(y) ? y : this.player.pos.y, at.z);
+    this.placeAtArea(home?.id);
   }
 
   // An anchor further away than the whole valley is an anchor from a world that is not loaded.
@@ -238,17 +293,39 @@ export class Session {
       && Math.hypot(at.x - p.x, at.z - p.z) < REACH;
   }
 
+  // `far` is for the two moves that are the point of the move: a new game, and `recover`'s
+  // `moveTo`. Both are putting the player somewhere specific, so the REACH gate — which exists to
+  // stop a *stale stored position* dragging him across a world that has moved — does not apply.
+  placeAtArea(id, { far = false } = {}) {
+    const a = id && this.quests.areas?.[id];
+    if (!a || !this.player?.pos) return false;
+    const at = nearestAnchor({ [a.id]: a }, 0, 0);
+    const y = this.world.groundAt?.(at.x, at.z, 0);
+    if (!Number.isFinite(y) || (!far && !this.reachable(at))) return false;
+    this.player.pos.set(at.x, y, at.z);
+    return true;
+  }
+
+  startAreaOf(id) {
+    const first = this.quests.defs[id]?.steps.find(s => !s.optional);
+    return first?.in || first?.objectives.find(o => o.area)?.area || null;
+  }
+
   // §2.6's authoring loop: start any quest with its prereqs waived, standing in the right place.
   jumpTo(id) {
     this.quests.accept(id, true);
-    const def = this.quests.defs[id];
-    const area = def?.steps[0]?.in || def?.steps[0]?.objectives[0]?.area;
-    const a = area && this.quests.areas[area];
-    if (!a || !this.player?.pos) return;
-    const at = nearestAnchor({ [a.id]: a }, 0, 0);
-    if (!this.reachable(at)) return;
-    const y = this.world.groundAt?.(at.x, at.z, 0);
-    this.player.pos.set(at.x, Number.isFinite(y) ? y : this.player.pos.y, at.z);
+    this.placeAtArea(this.startAreaOf(id), { far: true });
+  }
+
+  // RUNTIME §7: a new game opens *inside* its first quest — the granary, tracker already reading
+  // `Cull the rodent` — not wherever the player mesh happens to default to. Whichever quest the
+  // chosen campaign opens with is the one that is handed over.
+  beginCampaign() {
+    const id = this.quests.offers.find(q => this.quests.defs[q]?.campaign === this.doc.campaign.current);
+    if (!id) return null;
+    this.quests.accept(id);
+    this.placeAtArea(this.startAreaOf(id), { far: true });
+    return id;
   }
 
   bind() {
@@ -404,8 +481,10 @@ export class Session {
     this.act(kind);
   }
 
+  // A live step's node comes first: talking never gets ahead of the quest it belongs to. Only when
+  // this NPC has nothing to say about a quest you are on does their offer come up.
   talk(npc) {
-    const node = this.quests.sceneFor(npc);
+    const node = this.quests.sceneFor(npc) || this.quests.offerSceneFor(npc);
     if (node && this.dialogue.play(node)) return;
     this.quests.emit({ t: 'talk', npc });
     this.audio.play('uiBlip');
@@ -601,7 +680,7 @@ export class Session {
     const r = endGraft(this.graft, { reason });
     this.graft = r.graft;
     this.wear(null);
-    if (r.xp) this.quests.apply(['xp', 'glamour', Math.round(r.xp)]);
+    if (r.xp) this.gainXp('glamour', r.xp);
     this.audio.play(reason === 'expire' ? 'uiBlip' : 'uiConfirm');
     this.hud.say(reason === 'expire' ? 'Your own face, back again.' : 'You put your own face on.');
     this.autosave.mark();
@@ -662,8 +741,9 @@ export class Session {
     for (const line of q.lines) {
       addItem(this.doc, line.id, -line.n);
       this.quests.emit({ t: 'deliver', item: line.id, n: line.n, to: stall.vendor, via: 'sell' });
-      this.quests.apply(['xp', 'barter', transactionXp(itemTier(all.find(r => r.id === line.id).value), line.marks)]);
+      this.gainXp('barter', transactionXp(itemTier(all.find(r => r.id === line.id).value), line.marks));
     }
+    this.quests.standing('sell', { faction: stall.town, amount: q.marks });
     this.audio.play('uiConfirm');
     this.flash(`+${q.marks} mk`);
     this.autosave.flush();
@@ -686,6 +766,38 @@ export class Session {
     const y = this.world.groundAt?.(at.x, at.z, p.y);
     p.set(at.x, Number.isFinite(y) ? y : p.y, at.z);
     this.stuck = 0;
+  }
+
+  // The one door XP comes through outside the reducer. `sourceLevel` is only meaningful where
+  // there is a source to out-level — a kill, a fishing spot — so it defaults to the player's own
+  // level, which makes `tierMul` 1 and leaves the affinity row doing the work.
+  gainXp(school, base, { sourceLevel = null, streak = 0 } = {}) {
+    const playerLevel = levelIn(this.doc, school);
+    this.quests.apply(['xp', school, grantXp({
+      base, school, playerLevel, sourceLevel: sourceLevel ?? playerLevel, streak,
+      faction: this.doc.faction, worn: this.doc.worn,
+    })]);
+  }
+
+  // §9.4's `recover`, the four verbs the packs use 326 times. `grant` tops the stack up to what
+  // the step needs instead of adding to it, so resetting a step twice cannot mint items.
+  regrant(item, n = 1) {
+    addItem(this.doc, item, Math.max(0, n - itemCount(this.doc, item)));
+    return true;
+  }
+
+  recoverTo(area) {
+    return this.placeAtArea(area, { far: true }) || this.noHook('moveTo', [area]);
+  }
+
+  // A verb the world cannot carry out yet — there is no enemy spawner and no armable-object
+  // registry. Never a silent no-op: the player is told the reset did nothing, the console names
+  // the hook that is missing, and `gaps` is the list the tests and the panel read.
+  noHook(verb, args) {
+    this.gaps.push([verb, ...args]);
+    console.warn(`recover: the world has no ${verb}() — ${verb}(${args.join(', ')}) did nothing`);
+    this.hud?.say(NO_HOOK[verb] || 'Nothing to put back.');
+    return false;
   }
 
   // §9.4: pushing the stick and going nowhere for four seconds. Detected rather than waited for,

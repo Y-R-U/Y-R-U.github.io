@@ -114,7 +114,7 @@
   "ansel.you": {
     "text": "Ansel is a face the Household keeps. You are wearing it.",
     "campaign": "neutral", "story": "N08",
-    "supersedes": "ansel.nobody"
+    "supersedes": ["ansel.nobody", "cousin"]
   },
   "covenant.wrong": {
     "text": "The covenant number was always wrong.",
@@ -132,7 +132,7 @@
     "supersedes": "wagon.watched"
   },
   "sela.was.you": {
-    "text": "You were the captive. The confession was the plan.",
+    "text": "The Household wore that face into that cell before you did.",
     "campaign": "neutral", "story": "N14",
     "supersedes": "sela.face"
   },

@@ -44,18 +44,21 @@
       { "id": "brief", "do": ["talk", "sedge", "neutral.02.in"],
         "text": "Take the job off Granny Sedge" },
 
-      { "id": "cull", "do": ["kill", "grain_rat", 14], "in": "lac.granary",
+      { "id": "cull",
+        "all": [["kill", "grain_rat", 6], ["kill", "rat_knot", 2]],
+        "in": "lac.granary",
         "text": "Clear the seed store",
-        "recover": [["moveTo", "lac.granary"], ["respawn", "grain_rat", 14]] },
+        "hint": "Six loose, and something knotted behind the sacks.",
+        "recover": [["moveTo", "lac.granary"], ["respawn", "grain_rat", 6], ["respawn", "rat_knot", 2]] },
 
       { "id": "dig", "do": ["interact", "lac.westfield.spit", 2], "in": "lac.westfield",
         "verb": "forage",
         "text": "Turn two spits at the west fence",
         "recover": [["arm", "lac.westfield.spit"], ["moveTo", "lac.westfield"]] },
 
-      { "id": "bury", "do": ["deliver", "rat_tail", 14, "lac.westfield"], "in": "lac.westfield",
+      { "id": "bury", "do": ["deliver", "rat_tail", 8, "lac.westfield"], "in": "lac.westfield",
         "text": "Bury them where she said",
-        "recover": [["grant", "rat_tail", 14], ["moveTo", "lac.westfield"]] },
+        "recover": [["grant", "rat_tail", 8], ["moveTo", "lac.westfield"]] },
 
       { "id": "out", "do": ["talk", "sedge", "neutral.02.out"],
         "text": "Ask why it is never the midden" }
@@ -210,9 +213,9 @@
         "text": "Serve the buyer at the gate" },
 
       { "id": "apart", "do": ["survive", "lac.square", 60],
-        "fail": ["flag", "neutral.06.met", true],
+        "unseen": true,
         "text": "Keep them apart until they are done",
-        "hint": "Slowly. A hurried tray moves people about.",
+        "hint": "Slowly, and behind them. A tray one of them watches is a tray they both follow.",
         "recover": [["moveTo", "lac.square"]] },
 
       { "id": "out", "do": ["talk", "hana", "neutral.06.out"],
@@ -350,8 +353,9 @@
         "text": "Take the Whitewall face again" },
 
       { "id": "attend", "do": ["goto", "wwa.temple"], "worn": "light",
-        "after": 12, "before": 14, "onDay": 8,
+        "after": 11, "before": 14, "onDay": 8,
         "text": "Be at the reading at High",
+        "hint": "Come up early. A face that arrives late is a face they look at.",
         "recover": [["moveTo", "wwa.market"]] },
 
       { "id": "count", "do": ["interact", "wwa.temple.font", 4], "in": "wwa.temple",
@@ -405,7 +409,9 @@
     "title": "The Eighth Day, From the Cart",
     "summary": "Ride the covered wagon. You loaded it.",
     "giver": "hana",
-    "prereq": ["quest", "neutral.09", "done"],
+    "prereq": ["all",
+      ["quest", "neutral.09", "done"],
+      ["quest", "neutral.10", "done"]],
     "steps": [
       { "id": "brief", "do": ["talk", "hana", "neutral.11.in"],
         "text": "Hear what goes on the cart" },
@@ -521,6 +527,11 @@
         "verb": "graft",
         "text": "Take the Whitewall face" },
 
+      { "id": "catch", "do": ["gather", "snowbarb", 3], "in": "reach.light", "worn": "light",
+        "text": "Take three snowbarb off the Whitewall reach",
+        "hint": "Marrin will not cook with anything else.",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
       { "id": "supper", "do": ["gather", "cooked_snowbarb", 3], "via": "craft", "in": "wwa.kitchen",
         "worn": "light", "verb": "hearth",
         "text": "Cook a Sanctum supper",
@@ -535,6 +546,10 @@
       { "id": "swap", "do": ["interact", "self", 1], "in": "heath.ford",
         "verb": "graft",
         "text": "Change faces at the ford" },
+
+      { "id": "cut", "do": ["gather", "gravecap", 3], "in": "heath", "worn": "dark",
+        "text": "Cut three caps off the heath on the way",
+        "recover": [["moveTo", "heath.crag"]] },
 
       { "id": "pot", "do": ["gather", "cooked_gravecap", 3], "via": "craft", "in": "bst.kitchen",
         "worn": "dark", "verb": "hearth",
@@ -610,9 +625,9 @@
         "recover": [["arm", "wwa.cells.hinge"], ["moveTo", "wwa.cells"]] },
 
       { "id": "yard", "do": ["goto", "wwa.market"],
-        "fail": ["damageDealt", ">", 0],
-        "text": "Cross the yard without touching anyone",
-        "hint": "A body would change the story you planted.",
+        "unseen": true,
+        "text": "Cross the yard without being seen or touched",
+        "hint": "A body would change the story you planted. So would a witness.",
         "recover": [["moveTo", "wwa.cells"]] },
 
       { "id": "panel", "do": ["interact", "wwa.fence.panel", 2], "in": "wwa",
@@ -643,9 +658,12 @@
       { "id": "brief", "do": ["talk", "sedge", "neutral.24.in"],
         "text": "Ask Sedge what is in the field" },
 
-      { "id": "clear", "do": ["kill", "grain_rat", 16], "in": "lac.westfield",
+      { "id": "clear",
+        "all": [["kill", "grain_rat", 6], ["kill", "blight_boar", 3]],
+        "in": "lac.westfield",
         "text": "Clear the strips along the fence",
-        "recover": [["moveTo", "lac.westfield"], ["respawn", "grain_rat", 16]] },
+        "hint": "The boars came up for the same reason the voles did.",
+        "recover": [["moveTo", "lac.westfield"], ["respawn", "grain_rat", 6], ["respawn", "blight_boar", 3]] },
 
       { "id": "mother", "do": ["kill", "brood_mother", 1], "in": "lac.westfield",
         "text": "Deal with what has been eating them",
@@ -764,10 +782,10 @@
         "recover": [["arm", "lac.westfield.mark"], ["moveTo", "lac.westfield"]] },
 
       { "id": "voles",
-        "all": [["kill", "grain_rat", 12], ["kill", "rat_knot", 4]],
+        "all": [["kill", "grain_rat", 6], ["kill", "rat_knot", 3]],
         "in": "fields",
         "text": "Try it on the strips",
-        "recover": [["moveTo", "fields"], ["respawn", "grain_rat", 12], ["respawn", "rat_knot", 4]] },
+        "recover": [["moveTo", "fields"], ["respawn", "grain_rat", 6], ["respawn", "rat_knot", 3]] },
 
       { "id": "out", "do": ["talk", "sedge", "neutral.18.out"],
         "text": "Tell Sedge what it did" }
@@ -853,12 +871,14 @@
       { "id": "posture", "do": ["talk", "hana", "neutral.21.posture"],
         "text": "Tell Hana what the valley is for" },
 
-      { "id": "hold",
-        "all": [["kill", "watchman", 10], ["kill", "champion_3", 1]],
-        "in": "lac.millbridge",
+      { "id": "hold", "do": ["kill", "watchman", 10], "in": "lac.millbridge",
         "text": "Keep them off the root",
         "hint": "Your fields, their bolts. Both at once.",
-        "recover": [["moveTo", "lac.millbridge"], ["respawn", "watchman", 10], ["respawn", "champion_3", 1]] },
+        "recover": [["moveTo", "lac.millbridge"], ["respawn", "watchman", 10]] },
+
+      { "id": "champion", "do": ["kill", "champion_3", 1], "in": "lac.millbridge",
+        "text": "Whoever is left standing comes for the bridge",
+        "recover": [["moveTo", "lac.millbridge"], ["respawn", "champion_3", 1]] },
 
       { "id": "stand", "do": ["survive", "lac.millbridge", 120],
         "text": "Stand on the bridge until it is over",

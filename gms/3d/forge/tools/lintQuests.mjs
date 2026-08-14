@@ -100,7 +100,11 @@ export function lintAll(root = ROOT) {
     if (def.board && !def.board.school) warnings.push(`${p}: a board post with no `+'`board.school`'+` pays nothing`);
     errors.push(...findLevelTerms(def.prereq, `${p}.prereq`));
 
-    if (def.giver && !nodeOwners[def.giver]) warnings.push(`${p}: giver ${def.giver} has no dialogue node`);
+    // A board post is given by the board, which is a place rather than a person, so an area id is
+    // a legitimate giver and does not need to speak.
+    if (def.giver && !nodeOwners[def.giver] && !areaId(def.giver)) {
+      warnings.push(`${p}: giver ${def.giver} has no dialogue node`);
+    }
     if (def.turnin && !nodeOwners[def.turnin]) warnings.push(`${p}: turnin ${def.turnin} has no dialogue node`);
     if (def.town && !Object.values(areas).some(a => a.town === def.town)) {
       warnings.push(`${p}: town ${def.town} has no areas`);
@@ -186,6 +190,9 @@ export function lintAll(root = ROOT) {
   errors.push(...unwiredTruths(defs, dialogue, truths, played));
   errors.push(...lockedOutNodes(defs, dialogue));
   errors.push(...missingCampaignQuests(defs));
+  errors.push(...travelErrors(defs, areas));
+  errors.push(...failRetryErrors(defs));
+  errors.push(...itemFlowErrors(defs));
   // A school column that no enemy in the quest can pay is a silent hole in the XP economy, not a
   // style note — it reads as a trained school and awards nothing. Kept in `errors` so it gates.
   errors.push(...schoolPayErrors(defs));
@@ -339,6 +346,220 @@ function unwiredTruths(defs, dialogue, truths, played) {
   return out;
 }
 
+// Two quests unlocked by the same parent both spend what the parent handed over, and whichever the
+// player does second has nothing to spend. D03→D04/D05 shipped that way and so did L02→L03/L04.
+// The recovery is a second fishing trip the quest text never mentions, so the player reads it as a
+// bug. Each quest's net flow per item: gathers and drops and granted rewards in, deliveries and the
+// raw ingredient a craft eats out. A quest may then spend only what it and its prereq ancestors
+// supply, shared with every other consumer whose own prereqs are satisfied by that same set — those
+// can all be finished first. Board posts are excluded: a standing order is filled from the player's
+// own stock, which is what their `recover` grant says.
+export function itemFlowErrors(defs) {
+  const out = [];
+  const flowOf = def => {
+    const net = {};
+    const add = (id, n) => { net[id] = (net[id] || 0) + n; };
+    for (const [id, n] of def.reward.items) add(id, n);
+    for (const e of def.onDone) if (e[0] === 'item') add(e[1], e[2]);
+    for (const s of def.steps) {
+      for (const e of s.onDone || []) if (e[0] === 'item') add(e[1], e[2]);
+      for (const o of s.objectives) {
+        if (o.k === 'gather') {
+          add(o.kind, o.n);
+          if (s.via === 'craft' && o.kind.startsWith('cooked_')) add(o.kind.slice(7), -o.n);
+        }
+        if (o.k === 'deliver') add(o.item, -o.n);
+        if (o.k === 'kill') for (const [id, n] of ENEMIES[o.kind]?.drops || []) add(id, n * o.n);
+      }
+    }
+    return net;
+  };
+
+  const cache = {};
+  const ancestorsOf = id => {
+    if (cache[id]) return cache[id];
+    const found = cache[id] = new Set();
+    const walk = p => {
+      if (!Array.isArray(p)) return;
+      if (p[0] === 'quest' && defs[p[1]]) { found.add(p[1]); for (const a of ancestorsOf(p[1])) found.add(a); }
+      if (['all', 'any', 'not'].includes(p[0])) p.slice(1).forEach(walk);
+    };
+    walk(defs[id].prereq);
+    return found;
+  };
+
+  const flow = {};
+  for (const d of Object.values(defs)) flow[d.id] = flowOf(d);
+
+  for (const item of new Set(Object.values(flow).flatMap(Object.keys))) {
+    const spenders = Object.keys(flow).filter(id => (flow[id][item] || 0) < 0 && !defs[id].board);
+    for (const id of spenders) {
+      const reach = new Set([...ancestorsOf(id), id]);
+      const supply = [...reach].reduce((n, q) => n + Math.max(0, flow[q][item] || 0), 0);
+      const rivals = spenders.filter(q => [...ancestorsOf(q)].every(a => reach.has(a)));
+      const demand = rivals.reduce((n, q) => n - Math.min(0, flow[q][item] || 0), 0);
+      if (demand <= supply) continue;
+      const others = rivals.filter(q => q !== id);
+      out.push(`${id}: spends ${item}, but only ${supply} are supplied by it and its prereqs `
+        + `against ${demand} spent${others.length ? ` between it and ${others.join(', ')}` : ''} — `
+        + 'whichever quest goes second has nothing to spend');
+    }
+  }
+  return out;
+}
+
+// `unseen` and `within` fail on an *event*, so a retry starts clean. A `fail` predicate is read
+// against *state*, and the only state a retry can touch is whatever the quest's **first** step's
+// `recover` changes (`quest.js` `retry` runs `required(def)[0].recover` and nothing else). A `fail`
+// term the first step's recover cannot clear survives the retry meant to clear it, so the quest
+// fails again on the next event, forever — and if that quest gates an act, the campaign ends there.
+//
+// `hour` moves on its own and `worn` is re-grafted at will, so both clear themselves. A `flag`
+// clears only if the first step says so. Everything else — `damageDealt`, `truth`, `quest`, `item`,
+// `level`, `attunement`, `standing`, `mk`, `act`, `campaign`, `day` — is monotonic or unreachable
+// from `recover`, and belongs in `require` rather than `fail`.
+const SELF_CLEARING = new Set(['hour', 'worn']);
+const WHY_STUCK = {
+  damageDealt: 'a session-cumulative counter that nothing writes or resets — it would need '
+    + 'QuestRunner to zero `damage` in `enterStep` before it could mean "during this step"',
+  truth: 'Truths are never revoked',
+  quest: 'a quest state only ever moves forward',
+  item: '`recover` can `grant` an item but never take one away',
+  day: 'the calendar only moves forward',
+};
+
+export function failRetryErrors(defs) {
+  const out = [];
+  const terms = p => {
+    const found = [];
+    const walk = q => {
+      if (!Array.isArray(q) || typeof q[0] !== 'string') return;
+      if (['all', 'any', 'not'].includes(q[0])) { q.slice(1).forEach(walk); return; }
+      found.push(q);
+    };
+    walk(p);
+    return found;
+  };
+
+  for (const def of Object.values(defs)) {
+    const first = def.steps.find(s => !s.optional);
+    const cleared = new Set((first?.recover || [])
+      .filter(a => a[0] === 'flag' && a[2] === false).map(a => a[1]));
+    for (const s of def.steps) {
+      if (!s.fail) continue;
+      const sp = `${def.id}.${s.id}`;
+      for (const t of terms(s.fail)) {
+        if (SELF_CLEARING.has(t[0])) continue;
+        if (t[0] === 'flag') {
+          // `["flag", k]` and `["flag", k, true]` both fail on the flag being set.
+          if (t[2] === false || cleared.has(t[1])) continue;
+          out.push(`${sp}: fails on flag ${t[1]}, which retry cannot clear — ` + (RECOVER.flag
+            ? `add ["flag", "${t[1]}", false] to \`${def.id}.${first?.id}\`'s recover, which is the only one retry runs`
+            : '`recover` has no `flag` verb, so no step can unset it. Use an `unseen`/`within` event '
+              + 'failure, or ask for a `flag` recover verb first'));
+          continue;
+        }
+        out.push(`${sp}: fails on \`${t[0]}\`, which retry cannot clear — ${WHY_STUCK[t[0]] || 'it is monotonic'}. `
+          + 'Use `require`, an `unseen`/`within` event failure, or a flag the first step\'s recover resets');
+      }
+    }
+  }
+  return out;
+}
+
+// STORY §4: one real minute is one game hour, and js/player.js walks at 5 m/s. So 300 m of walking
+// costs a whole game hour, a cross-valley trip costs three and a half, and a two-hour window at the
+// far end of one is not a window at all. `accept` fires the step's `wait`, so the clock is already
+// at `after` when the player starts walking — nothing re-fires it and `stepOpen` just stops
+// crediting, which is a silent soft-lock. This is the check that would have caught light.22.
+const M_PER_GAME_HOUR = 300;
+const WALK_MPS = 5;
+const TRAVEL_BUDGET = 0.75;
+
+const areaCentre = s => s.k === 'circle'
+  ? { x: s.x, z: s.z }
+  : { x: (s.x0 + s.x1) / 2, z: (s.z0 + s.z1) / 2 };
+
+export function travelErrors(defs, areas) {
+  const out = [];
+  const at = id => (areas[id]?.shape ? areaCentre(areas[id].shape) : null);
+  const gap = (a, b) => {
+    const p = at(a), q = at(b);
+    return p && q ? Math.hypot(p.x - q.x, p.z - q.z) : null;
+  };
+  const enclosing = id => {
+    const bits = id.split('.');
+    for (let i = bits.length - 1; i > 0; i--) {
+      const a = bits.slice(0, i).join('.');
+      if (areas[a]) return a;
+    }
+    return null;
+  };
+  const townHome = {};
+  for (const a of Object.values(areas)) if (a.town && !a.parent) townHome[a.town] ||= a.id;
+
+  const where = s => {
+    if (s.in) return s.in;
+    for (const o of s.objectives) {
+      if ((o.k === 'goto' || o.k === 'survive') && areas[o.area]) return o.area;
+      if (o.k === 'deliver' && o.to && areas[o.to]) return o.to;
+      if (o.k === 'escort' && areas[o.area]) return o.area;
+      if (o.k === 'interact' && enclosing(o.id)) return enclosing(o.id);
+    }
+    return (s.recover || []).find(a => a[0] === 'moveTo')?.[1] || null;
+  };
+  const endsAt = d => {
+    for (let i = d.steps.length - 1; i >= 0; i--) { const a = where(d.steps[i]); if (a) return a; }
+    return null;
+  };
+  const prereqOf = p => {
+    const found = [];
+    const walk = q => {
+      if (!Array.isArray(q)) return;
+      if (q[0] === 'quest' && defs[q[1]]) found.push(q[1]);
+      if (['all', 'any', 'not'].includes(q[0])) q.slice(1).forEach(walk);
+    };
+    walk(p);
+    return found;
+  };
+
+  for (const d of Object.values(defs)) {
+    // A quest with a giver is accepted by talking to them (`questrunner.offerFrom`), so the clock
+    // starts wherever the giver stands. One without a giver is accepted from the journal, so it
+    // starts wherever the previous quest left the player.
+    const start = d.giver
+      ? townHome[d.town] || null
+      : prereqOf(d.prereq).map(q => endsAt(defs[q])).filter(Boolean)
+        .sort((a, b) => (gap(b, townHome[d.town]) ?? 0) - (gap(a, townHome[d.town]) ?? 0))[0] || null;
+
+    let prev = null;
+    for (const s of d.steps) {
+      const here = where(s);
+      const from = prev || start;
+      const m = from && here ? gap(from, here) : null;
+      if (m != null && m > 0) {
+        if (s.after !== null && s.after !== undefined) {
+          const window = ((s.before ?? 24) - s.after + 24) % 24 || 24;
+          const need = m / M_PER_GAME_HOUR;
+          if (need > window * TRAVEL_BUDGET) {
+            out.push(`${d.id}.${s.id}: ${Math.round(m)} m from ${from} is ${need.toFixed(2)} game hours `
+              + `of walking into a ${window} h window — the wait fires on accept, so the window closes en route`);
+          }
+        }
+        if (s.within) {
+          const need = m / WALK_MPS;
+          if (need > s.within * TRAVEL_BUDGET) {
+            out.push(`${d.id}.${s.id}: ${Math.round(m)} m from ${from} is ${Math.round(need)} s of walking `
+              + `against a \`within\` of ${s.within} s, before any of the work`);
+          }
+        }
+      }
+      if (here) prev = here;
+    }
+  }
+  return out;
+}
+
 const boxOf = s => s.k === 'circle'
   ? { x0: s.x - s.r, x1: s.x + s.r, z0: s.z - s.r, z1: s.z + s.r }
   : { x0: Math.min(s.x0, s.x1), x1: Math.max(s.x0, s.x1), z0: Math.min(s.z0, s.z1), z1: Math.max(s.z0, s.z1) };
@@ -382,17 +603,19 @@ function truthErrors(truths) {
       if (!truths[p]) out.push(`truth ${id}: supersedes unknown truth ${p}`);
       if (p === id) out.push(`truth ${id}: supersedes itself`);
     }
-    const seen = new Set([id]);
-    let walk = parents(id);
-    while (walk.length) {
-      const next = [];
-      for (const p of walk) {
-        if (seen.has(p)) { out.push(`truth ${id}: supersession cycle through ${p}`); continue; }
-        seen.add(p);
-        next.push(...parents(p));
-      }
-      walk = next;
-    }
+    // A Truth may supersede both a link and that link's own parent — that is how a chain stays
+    // whole when the quest holding the middle link is optional. A diamond is not a cycle, so the
+    // walk tracks the current path rather than everything it has ever seen.
+    const done = new Set();
+    const walk = (at, path) => {
+      if (path.has(at)) { out.push(`truth ${id}: supersession cycle through ${at}`); return; }
+      if (done.has(at)) return;
+      done.add(at);
+      path.add(at);
+      for (const p of parents(at)) walk(p, path);
+      path.delete(at);
+    };
+    walk(id, new Set());
   }
   return out;
 }

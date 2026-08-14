@@ -300,8 +300,8 @@ late across four hundred metres, which is the whole political situation in one s
 | N09 Weigh the Temple | **High on an eighth day** | advance on accept |
 | N11 The Eighth Day | **an eighth day** | advance on accept |
 | S16 Price Round | all three markets inside one game day | 24 real minutes; a real challenge, not a wait |
-| S19 Lamp Round | must finish before 21:00 | accepted only between 18:00 and 20:00 |
-| S20 A Meal for the Bridge | freshness timer, not a clock gate | — |
+| S19 Lamp Round | `after: 18, before: 21`, and a `within` of **180 s** — three game hours, the length of the window it sits inside | the window is the gate; `stepOpen` refuses credit outside it rather than failing |
+| S20 A Meal for the Bridge | a `within` of **90 s** on the carry, against a 180 m walk that takes 36 | freshness pressure, not a clock gate |
 
 **The eighth day is a fiction, not a wait.** The wagon quest is offered when it is due, and
 accepting it advances to the next eighth day. The player learns that the wagon runs on a cycle
@@ -311,7 +311,7 @@ without ever being made to count.
 
 ## 5. Act structure — the Light campaign
 
-**Whitewall. Five acts, 24 quests.** The player is a young adult in the apprentice hall who has been
+**Whitewall. Five acts, 28 quests.** The player is a young adult in the apprentice hall who has been
 getting away with being talented and unserious.
 
 Emotional spine: *earnest competence → unease → warmth from an unexpected place → fear of the enemy
@@ -434,7 +434,7 @@ just took.
 
 ## 6. The Dark campaign
 
-**Blackstone. Five acts, 22 quests.** A genuine mirror. Not a re-skin, and — since revision 2 — not
+**Blackstone. Five acts, 25 quests.** A genuine mirror. Not a re-skin, and — since revision 2 — not
 a second tutorial either, because it is the same person.
 
 Emotional spine: *garrison boredom → being told who you are → the arithmetic that will not work →
@@ -551,7 +551,7 @@ player experience.
 
 ## 7. The Neutral campaign
 
-**Longacre. Five acts, 21 quests plus an epilogue screen.** Not a third stranger's story — a
+**Longacre. Five acts, 26 quests plus an epilogue screen.** Not a third stranger's story — a
 homecoming. The player has been away since they were an infant and has spent two campaigns being
 extremely useful to two towns that were not theirs.
 
@@ -945,6 +945,15 @@ that chain is three links rather than two; and `root.longacre` and `prices.raids
 parents. **This table is the spec for `data/truths.json`** — sixteen entries to add, four to amend,
 none to remove.
 
+Since the content-fix pass, `ansel.you` also supersedes **`cousin`** directly, in addition to
+`ansel.nobody`. L16 and D14 are optional quests, so without that second edge a player who skipped
+either finished the trilogy with a one-legged chain on the Truths tab. A Truth may supersede both a
+link and that link's own parent; a diamond is not a cycle, and it is how a chain stays whole when
+its middle link is skippable. `sign.kept` (D18) and `count.by.design` (N10) had the mirror problem —
+they are the *only* things that strike a mandatory Truth — and were closed the other way, by making
+D18 and N10 load-bearing in `dark.19` and `neutral.11`'s prereqs. Both quests' `onDone` already
+unlocked those two, so only `prereq` was out of step.
+
 #### The eleven chains
 
 ```
@@ -952,6 +961,7 @@ overdraw ──► thirty.years ──► covenant.wrong                     L10
 vail.dead ──► vail.arrives.dead ──► vail.alive.above             L21 · D08 · D09
 wagon.eighth ──► wagon.watched ──► wagon.longacre                L11 · D07 · N11
 cousin ──► ansel.nobody ──► ansel.you                            L16 · D14 · N08
+   └────────────────────────►┘   (L16 and D14 are optional)
 shaft.dry ──► sela.face ──► sela.was.you                         L19 · D17 · N14
 yield.falls ──► seam.west ──┐                                    D06 · D19
 vermin.field ───────────────┤                                    N02
@@ -968,7 +978,7 @@ fostered ──► fostered.policy                                     D02 · N1
 Eleven connected components, which is what `journal.js` `truthChains()` groups on. Nine of them run
 across two or three campaigns, which is the structural argument for the three-playthrough ladder
 stated as data: **finishing Dark strikes seven Truths the player earned as Light, and finishing
-Neutral strikes seven more.**
+Neutral strikes eleven more.**
 
 **One rendering case is new and should be checked before content is authored.** `prices.raids`
 supersedes three Truths, two of which supersede one each, so that component is three deep *and*
@@ -978,11 +988,11 @@ writing is a straight three-link chain.
 
 #### Where the strikes land
 
-| Campaign | Truths earned | Truths it strikes | Notes |
+| Campaign | Truths earned | Truths it strikes | of which stood at campaign start |
 |---|---|---|---|
-| Light | 10 | 1 (`thirty.years` over `overdraw`) | Light is where the false picture is assembled. Only the ledger overturns anything, and it overturns Light's own |
-| Dark | 12 | 7 | Dark Act 4 is the demolition: every Truth the player formed on the far bank in Light Act 4 is struck within one act |
-| Neutral | 12 | 7 | including every terminal of the war chain, so the last thing the player learns is that a price chalked on a post caused all of it |
+| Light | 10 | 1 (`thirty.years` over `overdraw`) | 1 — Light is where the false picture is assembled. Only the ledger overturns anything, and it overturns Light's own |
+| Dark | 12 | 9 | 7 — Dark Act 4 is the demolition: every Truth the player formed on the far bank in Light Act 4 is struck within one act |
+| Neutral | 12 | 14 | 11 — including every terminal of the war chain, so the last thing the player learns is that a price chalked on a post caused all of it |
 
 That Light-Act-4-to-Dark-Act-4 correspondence is deliberate and should survive editing. L18, L19,
 L20 and L21 are the four things the player becomes certain of on the enemy's bank; D16, D17, D18 and
@@ -1166,6 +1176,15 @@ Runtime is the harness's number, not this document's. It is now **7.01 hours** a
 and 6.19 hours if the sandbox board is ignored entirely; the twelve quests added in revision 3
 raised it from 6.37, which is honest — the earlier 10.25-hour figure was an artefact of a walking
 allowance the world's geography cannot supply. `SYSTEMS.md` §11 carries the per-act numbers.
+
+**7.01 hours does not include the walking, and it should be quoted as ≈8.1 hours.** `soak.mjs`
+allows `2 × 80 / 5 = 32 s` of travel per job, about **50 minutes** across 94 jobs. Chaining every
+step's actual location through `data/areas.json` in play order gives a critical path of
+**32,959 m**, which at the player's 5 m/s is **110 minutes of walking** — a little over twice what
+the harness allows, so the true figure is about **an hour longer than the headline**. The walking is
+worth stating on its own because it is not evenly spread: Light Act 1 is 672 m over six quests and
+Neutral Act 3 is 5,790 m over seven. 300 m of walking costs a whole game hour, so a cross-valley
+trip is 3.5 game hours and the valley is only 1,040 m wide.
 
 **Light Acts 1 and 2 were deliberately left alone at six and six.** They are the signed-off first
 playable at twelve quests, and the twelve-quest figure was the argument that won Act 1 its sixth

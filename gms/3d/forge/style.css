@@ -4,7 +4,14 @@ body {
   font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   color: #dfe4e6; -webkit-font-smoothing: antialiased; overscroll-behavior: none;
 }
-#stage { position: fixed; inset: 0; }
+/* The canvas is a look-drag surface, not a document: without this iOS double-tap-zooms and
+   pinch-zooms the page out from under the camera. */
+#stage {
+  position: fixed; inset: 0;
+  touch-action: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
 #stage canvas { display: block; width: 100%; height: 100%; }
 
 /* ── perf HUD ── */
@@ -80,7 +87,11 @@ body {
 .row:not(.range) > span { margin-bottom: 0; }
 
 /* ── touch ── */
-#touch { position: fixed; inset: 0; pointer-events: none; z-index: 15; display: none; }
+#touch {
+  position: fixed; inset: 0; pointer-events: none; z-index: 15; display: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
 .pad { position: absolute; top: 0; bottom: 0; width: 50%; pointer-events: auto; touch-action: none; }
 #stick { left: 0; } #fire { right: 0; }
 /* the stick floats to wherever the thumb lands, so it is fixed-positioned and driven from JS */
@@ -94,6 +105,9 @@ body {
   background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34);
   transform: translate(var(--dx, 0), var(--dy, 0));
 }
+/* Sprint is a push past full deflection, so the ring is the only thing that can tell you it took. */
+#stick i.sprint { border-color: rgba(185,114,31,.85); }
+#stick i.sprint::after { background: rgba(185,114,31,.42); border-color: rgba(185,114,31,.9); }
 #fire::after {
   content: ''; position: absolute; right: 26px; bottom: 26px; width: 66px; height: 66px;
   border: 2px solid rgba(255,255,255,.2); border-radius: 50%;

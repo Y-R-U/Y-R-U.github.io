@@ -5,6 +5,15 @@
   z-index: 40;
   font: 15px/1.45 system-ui, -apple-system, sans-serif;
   color: #e8e3d8;
+  /* iOS ignores user-scalable=no, so double-tap zoom and pinch are only off if the UI says so.
+     The two range inputs and the two round buttons override this with `none`. */
+  touch-action: manipulation;
+  /* Two deliberate long-presses live over text (the dial at 400 ms, the tracker at 500 ms), and
+     without these iOS raises the selection magnifier and the copy callout on both. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #game .g-track {
@@ -33,16 +42,23 @@
 
 #game .g-scene {
   position: absolute;
-  left: 16px;
-  right: 16px;
+  z-index: 1;
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb) + 12px);
   bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  max-height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 60px);
   display: flex;
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
 }
+body.flip #game .g-scene {
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+}
 
 #game .g-bubble {
+  flex: 0 0 auto;
   background: rgba(16, 18, 21, .92);
   border: 1px solid rgba(255, 255, 255, .09);
   border-radius: 10px;
@@ -52,18 +68,28 @@
 }
 #game .g-bubble header {
   display: flex;
-  font: 600 calc(10px * var(--ui))/1.6 system-ui, sans-serif;
+  font: 600 calc(11px * var(--ui))/1.6 system-ui, sans-serif;
   letter-spacing: .12em;
   text-transform: uppercase;
-  opacity: .45;
+  opacity: .62;
 }
 #game .g-bubble header i { margin-left: auto; font-style: normal; }
 #game .g-bubble p { margin: 0; min-height: 1.45em; }
 #game .g-bubble .g-next { float: right; color: #b9721f; }
 
-#game .g-choices { display: flex; flex-direction: column; }
+/* Four 44px choices plus the bubble overflow 390px of landscape, so the list is what gives. */
+#game .g-choices {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+}
 #game .g-choices button {
-  min-height: calc(44px * var(--ui));
+  flex: 0 0 auto;
+  min-height: var(--tap);
   pointer-events: auto;
   text-align: left;
   padding: 0 14px;
@@ -89,7 +115,7 @@
 }
 #game .g-card p { margin: 0; font-size: calc(19px * var(--ui)); }
 #game .g-card button {
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   min-width: 160px;
   font: inherit;
   color: #14161a;
@@ -117,7 +143,7 @@
   flex: 0 0 auto;
 }
 #game .g-tabs button {
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   padding: 0 16px;
   font: 600 11px/1 system-ui, sans-serif;
   letter-spacing: .1em;
@@ -143,7 +169,7 @@
 #game .g-jrow {
   display: block;
   width: 100%;
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   padding: 6px 10px;
   text-align: left;
   font: inherit;
@@ -183,7 +209,7 @@
 #game .g-jsteps i { margin-left: auto; font-style: normal; color: #b9721f; }
 #game .g-jacts { display: flex; gap: 8px; margin-top: 16px; }
 #game .g-jacts button {
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   flex: 1 1 0;
   font: inherit;
   color: inherit;
@@ -224,9 +250,20 @@
 /* ── HUD ─────────────────────────────────────────────────────────────────── */
 /* Every dimension is scaled by --ui, which Settings' text-size slider writes (§9.1). */
 
-#game { --ui: 1; --gold: #b9721f; font-size: calc(15px * var(--ui)); }
+#game {
+  --ui: 1;
+  --gold: #b9721f;
+  font-size: calc(15px * var(--ui));
+  /* 44px is a floor, not a scalable: uiScale goes down to 0.85 and 44 × 0.85 = 37.4. */
+  --tap: max(44px, calc(44px * var(--ui)));
+  /* Width the bottom thumb cluster owns: 26px offset + dial 60 + gap 30 + act 76. Anything
+     bottom-anchored and full-width has to stop short of this or it lands on both buttons. */
+  --thumb: calc(26px + 166px * var(--ui));
+}
 
-#game .g-hud { position: absolute; inset: 0; }
+/* Explicit paint order. The bubble is appended to the host after the HUD, so at z-index auto it
+   won over both primary buttons and swallowed their taps. */
+#game .g-hud { position: absolute; inset: 0; z-index: 2; }
 
 #game .g-vitals {
   position: absolute;
@@ -255,8 +292,8 @@
 #game .g-bar i { display: block; height: 100%; background: #d8d2c4; transition: width .18s linear; }
 #game .g-vital em {
   font-style: normal;
-  font-size: calc(10px * var(--ui));
-  opacity: .6;
+  font-size: calc(11px * var(--ui));
+  opacity: .82;
   font-variant-numeric: tabular-nums;
 }
 #game .g-hp i { background: #c05a4a; }
@@ -289,12 +326,14 @@
 #game .g-chip.rang { animation: g-ring 3s ease-out 1; }
 @keyframes g-ring { 0% { background: var(--gold); color: #14161a; } 100% { background: rgba(10, 11, 13, .5); } }
 
+/* The only way into pause, journal and settings on touch, so it gets the floor even though the
+   glyph inside it stays 17px. */
 #game .g-cog {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 4px);
   right: calc(env(safe-area-inset-right, 0px) + 6px);
-  width: calc(38px * var(--ui));
-  height: calc(38px * var(--ui));
+  width: max(44px, calc(38px * var(--ui)));
+  height: max(44px, calc(38px * var(--ui)));
   font-size: calc(17px * var(--ui));
   color: inherit;
   background: none;
@@ -332,10 +371,10 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 #game .g-dial b, #game .g-act b { font: 600 calc(13px * var(--ui))/1 system-ui, sans-serif; }
 #game .g-act b { font-size: calc(24px * var(--ui)); font-weight: 400; }
 #game .g-dial em, #game .g-act em {
-  font: 600 calc(9px * var(--ui))/1 system-ui, sans-serif;
+  font: 600 calc(10px * var(--ui))/1 system-ui, sans-serif;
   font-style: normal;
   letter-spacing: .1em;
-  opacity: .6;
+  opacity: .85;
 }
 #game .g-act.off { opacity: .3; }
 #game .g-act.big { transform: scale(1.12); }
@@ -348,8 +387,8 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 #game .g-radial { position: absolute; inset: 0; pointer-events: auto; background: rgba(10, 11, 13, .55); }
 #game .g-radial button {
   position: absolute;
-  width: calc(78px * var(--ui));
-  height: calc(48px * var(--ui));
+  width: max(78px, calc(78px * var(--ui)));
+  height: max(44px, calc(48px * var(--ui)));
   margin: calc(-24px * var(--ui)) 0 0 calc(-39px * var(--ui));
   font: 600 calc(11px * var(--ui))/1 system-ui, sans-serif;
   letter-spacing: .06em;
@@ -361,23 +400,34 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 }
 #game .g-radial button.on { background: var(--gold); color: #14161a; border-color: var(--gold); }
 
+/* The whole tutorial reads through this. It was 12px at 55% over a moving sky, which against a
+   pale dusk is about 1.5:1 — a text-shadow only helps on a dark background, so the line carries
+   its own plate instead. Inset by the thumb width on both sides so neither layout can put it
+   under the two round buttons. */
 #game .g-prompt {
   position: absolute;
-  left: 0;
-  right: 0;
+  z-index: 3;
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb));
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb));
   bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: calc(6px * var(--ui));
-  font-size: calc(12px * var(--ui));
-  opacity: .55;
+  font-size: calc(14px * var(--ui));
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
   transition: opacity .4s;
 }
+#game .g-prompt > span {
+  padding: calc(5px * var(--ui)) calc(13px * var(--ui));
+  border-radius: calc(15px * var(--ui));
+  background: rgba(10, 11, 13, .78);
+  border: 1px solid rgba(255, 255, 255, .1);
+  text-align: center;
+}
 #game .g-prompt.gone { opacity: 0; }
 #game .g-prompt button {
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   padding: 0 calc(16px * var(--ui));
   font: inherit;
   color: inherit;
@@ -414,6 +464,10 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 
 /* ── sheets: pause, settings, character, market, slate ───────────────────── */
 
+/* Everything full-screen sits above the HUD and the dialogue bubble regardless of append order;
+   the rotate card (z 5) stays above all of them. */
+#game .g-dim, #game .g-pause, #game .g-journal, #game .g-sheet, #game .g-card, #game .g-slate { z-index: 4; }
+
 #game .g-dim { position: absolute; inset: 0; background: rgba(6, 7, 9, .6); pointer-events: auto; }
 
 #game .g-pause {
@@ -438,7 +492,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
   background: rgba(16, 18, 21, .94);
 }
 #game .g-pause button {
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   font: inherit;
   color: inherit;
   background: none;
@@ -450,6 +504,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 #game .g-pause button.gap { border-top: 1px solid rgba(255, 255, 255, .18); }
 #game .g-pause button:disabled { opacity: .3; }
 #game .g-pause p { margin: 0; font-size: calc(11px * var(--ui)); opacity: .45; }
+#game .g-pause p.warn { opacity: 1; color: #e0a99e; max-width: calc(300px * var(--ui)); text-align: center; }
 
 #game .g-sheet {
   position: absolute;
@@ -470,7 +525,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 }
 #game .g-head button {
   min-width: calc(48px * var(--ui));
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   font-size: calc(15px * var(--ui));
   color: inherit;
   background: none;
@@ -509,7 +564,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
   display: flex;
   align-items: center;
   gap: calc(10px * var(--ui));
-  min-height: calc(34px * var(--ui));
+  min-height: max(44px, calc(34px * var(--ui)));
   padding: 0 calc(4px * var(--ui));
   font: inherit;
   font-size: calc(13px * var(--ui));
@@ -542,7 +597,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 #game .g-till b { margin-left: auto; font-size: calc(15px * var(--ui)); font-variant-numeric: tabular-nums; }
 #game .g-till button {
   min-width: calc(104px * var(--ui));
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   font: inherit;
   font-weight: 600;
   letter-spacing: .1em;
@@ -558,7 +613,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
   display: flex;
   align-items: center;
   gap: calc(14px * var(--ui));
-  min-height: calc(44px * var(--ui));
+  min-height: var(--tap);
   font-size: calc(13px * var(--ui));
   border-bottom: 1px solid rgba(255, 255, 255, .06);
 }
@@ -587,10 +642,20 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
   font: 300 calc(30px * var(--ui))/1 Optima, Palatino, Georgia, serif;
   letter-spacing: .24em;
 }
-#game .g-panels { display: flex; gap: calc(24px * var(--ui)); }
+/* Three 200px panels at uiScale 1.4 want 907px against 726px of safe landscape width, so they
+   shrink rather than clip. */
+#game .g-panels {
+  display: flex;
+  gap: calc(24px * var(--ui));
+  width: 100%;
+  padding: 0 calc(env(safe-area-inset-left, 0px) + 12px) 0 calc(env(safe-area-inset-right, 0px) + 12px);
+  justify-content: center;
+}
 #game .g-panel {
-  width: calc(200px * var(--ui));
-  height: calc(178px * var(--ui));
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(200px * var(--ui));
+  height: min(calc(178px * var(--ui)), 48vh);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -632,3 +697,69 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 
 #game .g-dial.g-nudge { animation: g-nudge .5s ease-out 1; }
 @keyframes g-nudge { 40% { transform: scale(1.14); border-color: var(--gold); } }
+
+/* ── the opening beat ────────────────────────────────────────────────────── */
+
+/* Deliberately not a card: the world stays visible and running behind it, it takes the same
+   bottom band and the same thumb clearance as the dialogue bubble, and it is dismissed by a tap
+   anywhere on it or by waiting. */
+#game .g-open {
+  position: absolute;
+  z-index: 3;
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb) + 12px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  padding: calc(11px * var(--ui)) calc(16px * var(--ui)) calc(13px * var(--ui));
+  border-radius: 10px;
+  background: rgba(16, 18, 21, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .5s;
+}
+body.flip #game .g-open {
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+}
+#game .g-open.in { opacity: 1; }
+#game .g-open b {
+  display: block;
+  font: 600 calc(10px * var(--ui))/1.7 system-ui, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .5;
+}
+#game .g-open p { margin: 0; font-size: calc(16px * var(--ui)); }
+#game .g-open i {
+  float: right;
+  font-style: normal;
+  color: var(--gold);
+  font-size: calc(15px * var(--ui));
+}
+
+/* ── the running status line ─────────────────────────────────────────────── */
+
+/* Non-modal by construction: no dim, no button, no pointer-events. Top centre is the only band
+   with nothing in it — vitals own the left, the day chip and the cog own the right. */
+#game .g-toast {
+  position: absolute;
+  z-index: 3;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 56%;
+  padding: calc(6px * var(--ui)) calc(13px * var(--ui));
+  border-radius: calc(15px * var(--ui));
+  font-size: calc(12px * var(--ui));
+  text-align: center;
+  background: rgba(10, 11, 13, .82);
+  border: 1px solid rgba(255, 255, 255, .12);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s;
+}
+#game .g-toast.in { opacity: 1; }
+/* A save that is not happening is the one status worth colouring. */
+#game .g-toast.warn { border-color: rgba(192, 90, 74, .7); color: #f0cdc6; }

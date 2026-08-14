@@ -16,12 +16,10 @@ export function configure(quality) {
   const anisoChanged = next.aniso !== cfg.aniso;
   Object.assign(cfg, next);
   // three only writes sampler state when the version changes, so without needsUpdate the knob
-  // moved the number on the object and nothing else
-  if (anisoChanged) {
-    for (const set of cache.values()) for (const t of Object.values(set)) setAniso(t);
-    for (const t of foreign) setAniso(t);
-  }
-  if (capChanged && cache.size) { dropAll(); onRebuild?.(); }
+  // moved the number on the object and nothing else. The baked sets cannot take that route —
+  // their source canvases are gone after the first upload — so anisotropy re-bakes them.
+  if (anisoChanged) for (const t of foreign) setAniso(t);
+  if ((capChanged || anisoChanged) && cache.size) { dropAll(); onRebuild?.(); }
 }
 
 function setAniso(t) {
@@ -43,11 +41,21 @@ function canvas(S) {
   return c;
 }
 
+// three calls onUpdate once the pixels are on the GPU. Resizing the canvas to 1×1 there drops
+// its backing store — 36 MB across the 36 baked surfaces, held for nothing on a phone. Safe only
+// because nothing re-uploads a baked texture: every path that needs the pixels again (texCap,
+// anisotropy) goes through dropAll() and re-runs the generator.
+export function releaseCanvas(t) {
+  t.onUpdate = null;
+  if (t.image?.width > 1) t.image.width = t.image.height = 1;
+}
+
 function makeTex(cv, label, srgb) {
   const t = new THREE.CanvasTexture(cv);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
   t.anisotropy = cfg.aniso;
+  t.onUpdate = releaseCanvas;
   t.needsUpdate = true;
   return track(t, { w: cv.width, h: cv.height, fmt: 'rgba', mips: true, label });
 }

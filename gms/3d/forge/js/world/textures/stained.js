@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { track } from '../../engine/budget.js';
+import { releaseCanvas } from './bake.js';
 import { zone } from '../zones.js';
 
 const S = 512;
@@ -24,6 +25,7 @@ export function stainedTexture(zoneId) {
   t.colorSpace = THREE.SRGBColorSpace;
   t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
   t.anisotropy = 4;
+  t.onUpdate = releaseCanvas;
   track(t, { w: S, h: S, fmt: 'rgba', mips: true, label: `stained:${zoneId}` });
   cache.set(zoneId, t);
   return t;
