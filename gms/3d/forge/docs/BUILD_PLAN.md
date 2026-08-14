@@ -56,7 +56,7 @@ From `WORLD.md §5`. **Strictly ordered. Do not start a phase until the previous
 | A4 | Terrain rebuild | `terrain.js` | real countryside between towns; the flatten mask releases (it currently never does) |
 | A5 | River and roads | `terrain.js`, `water.js` | a meandering river across 1440 m, four crossings, roads joining three towns |
 | A6 | Document schema v3 | `editor/scene.js`, `editor/build.js`, `world/*` | new types build; v2 documents migrate; `normalise()` still rejects junk |
-| A7 | LOD, culling, streaming | new `world/stream.js`, `build.js` | budget held while traversing; editor shows a live triangle readout |
+| A7 | LOD, culling, streaming | new `world/stream.js`, `build.js` | **done** — budget held: worst frame of a 333-sample traverse is 224.5k of 350k, 0 samples over. `WORLD.md §6.7`, `docs/NOTES_WORLD_A7.md` |
 | A8 | Author the three towns | `editor/townGen.mjs` (new, node-only), `data/world.json` (new, committed) | generate → hand-tune in the editor → freeze |
 | A9 | Gate re-verification | — | headed at `--preset=medium --dpr=1 --w=844 --h=390`, **and Aaron's actual phone** |
 
@@ -152,7 +152,8 @@ trust fps and the counts.
 | C0–C1 — sim modules + soak harness | **done** — balance regenerated from the harness, not asserted |
 | Story revisions 1–4 | **done** — 79 story quests, 34 Truths in 11 chains |
 | A6 — document schema v3 | **done** — six new types build (mill, barn, pen, cross, arcade, retaining), `blk` / `lod` / `town` added and computed, v1 → v2 → v3 migrates, 11 new schema tests. **The `districts` → `towns` rename is deferred**, see below |
-| A7–A9, Track D | not started |
+| A7 — LOD, culling, streaming | **done** — `js/world/stream.js`, per-block detail/proxy on `blk`, chunked contact-AO and roads, camera-centred foliage. Gate profile **115k–228k total against 350k**; traverse worst frame **224.5k**, 0 of 333 samples over. `?shot=` determinism held. **The `street_dusk` seam is diagnosed** — see below |
+| A8–A9, Track D | not started |
 
 ### Where the interruption left things — read before resuming
 
@@ -166,9 +167,14 @@ arc-length bank ribbon carries it, `RIVER_CP` is **frozen** against `data/areas.
 the roads exist for the first time, and four of the five scenario cameras were broken by absolute
 y (not by the towns moving) and are re-framed.
 
-**Two things A5 left open.** The `street_dusk` vertical seam is still there at 7.1 % — three more
-causes ruled out, all recorded. And `contactAO` is 20.1 k triangles drawn in every scenario, which
-nobody has looked at; it is A7's.
+**Two things A5 left open, both closed at A7.** `contactAO` is bucketed into 120 m cells and now
+costs 3.6–5.9k. And the `street_dusk` seam is **diagnosed**: it is the road texture's tile wrap
+sampled through the triplanar Y plane, appearing at every 2.4 m of world x — the lines at x = ±2.4
+are there too, at 3.2 and 3.8 luminance units against the 8.9 at x = 0. It is not the terrain, not
+the noise lattice and not `townAt`; the ±520 render A2 asked for was run and shows nothing. The
+"7.1 % step" everyone was quoting is the road's specular hump, not the line. **The fix is in
+`js/world/textures/`, which A7 did not own** — see `docs/NOTES_WORLD_A7.md` for the full table and
+the two candidate fixes.
 
 **A6 deferred the rename.** `districts` → `towns` and `dist` → `town` reach into `editor.js`,
 `panel.js` and `colliders.js`, which this pass did not own. v3 adds `town` as a **string id

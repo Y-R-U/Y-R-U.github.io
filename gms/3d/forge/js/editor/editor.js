@@ -2,7 +2,7 @@
 // The sheet in ui.js is a view onto this and owns no state of its own.
 
 import * as THREE from 'three';
-import { footprint, tall, typeBox, makeObject, districtFor, newSeed } from './scene.js';
+import { footprint, tall, typeBox, makeObject, districtFor, newSeed, blockOf } from './scene.js';
 import { dispose } from './build.js';
 import { saveScene, clearScene, saveSlot, storageHealthy, storageError } from './store.js';
 import { buildSheet } from './ui.js';
@@ -311,10 +311,12 @@ class Editor {
     this.ui.sync();
   }
 
-  // Settle a drag: the object may have crossed into another district's batch.
+  // Settle a drag: the object may have crossed into another district's batch, or into another
+  // 60 m block within the same one. `blk` is derived, never authored — see scene.js.
   commit() {
     const o = this.selected;
     if (!o) return;
+    o.blk = blockOf(o.x, o.z);
     const di = districtFor(this.doc, o.x);
     if (di !== o.dist) {
       const from = o.dist;

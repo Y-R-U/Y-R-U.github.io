@@ -43,8 +43,11 @@ export function rollStandingDay(st, day) {
 }
 
 // Returns a new state; never mutates. `amount` is only read by the sell and vermin actions.
+// The save document's `standing` is the flat `{light, neutral, dark}` map with the daily caps kept
+// in `daily.standing`, so the caps block is filled in rather than required.
 export function applyStanding(st, action, { faction, amount = 0 } = {}) {
-  const next = { ...st, caps: { ...st.caps, [faction]: { ...st.caps[faction] } } };
+  const caps = st.caps || newStanding().caps;
+  const next = { ...st, caps: { ...caps, [faction]: { ...caps[faction] } } };
   let delta = 0;
   switch (action) {
     case 'quest': delta = STANDING.quest; break;
@@ -84,13 +87,19 @@ export const SUSPICION = {
   wrongProjectile: 25, ownField: 8, strikeCitizen: 40, seenChannelling: 100, wrongBuilding: 30,
   decay: -3, decayIndoors: -8,
   breakAt: 100, voluntaryUnder: 40,
+  radius: 6, holdRadius: 10,
+  ticks: [40, 70, 90],
 };
 
 export const graftDuration = glamourLevel => 180 + 30 * glamourLevel;
 export const GRAFT = { channel: 3.0, uninterruptibleAfter: 1.0, focus: 30, cooldown: 20, cooldownAfterBreak: 120, losRadius: 22 };
 
-export function suspicionRate({ watchmen = 0, watchWeight = 1, glamour = 1, indoorsLongacre = false, rateKnob = 1 }) {
-  if (watchmen <= 0) return (indoorsLongacre ? SUSPICION.decayIndoors : SUSPICION.decay) * rateKnob;
+// `nearby` is a Watchman between `radius` and `holdRadius`: too far to accrue, too close to relax.
+export function suspicionRate({ watchmen = 0, nearby = 0, watchWeight = 1, glamour = 1, indoorsLongacre = false, rateKnob = 1 }) {
+  if (watchmen <= 0) {
+    if (nearby > 0) return 0;
+    return (indoorsLongacre ? SUSPICION.decayIndoors : SUSPICION.decay) * rateKnob;
+  }
   const base = SUSPICION.perWatchman * watchWeight * (1 - glamour / 24);
   return base * (watchmen >= 2 ? SUSPICION.twoOrMore : 1) * rateKnob;
 }
@@ -118,3 +127,67 @@ export function graftXp(secondsHeld, suspicion) {
   if (suspicion >= SUSPICION.voluntaryUnder) return 0;
   return Math.min(1600, 400 + 25 * secondsHeld);
 }
+
+// ── the Graft itself ──────────────────────────────────────────────────────────
+// One state object, no timers, no clock. The caller ticks it with a real dt and reacts to the
+// event names it returns. `free` marks the 20 s Graft a Break hands back: no ash, and no XP.
+
+export const newGraft = () => ({ worn: null, left: 0, held: 0, susp: 0, cd: 0, free: false });
+
+export const BLOCKED = {
+  granted: 'Nobody has shown you how.',
+  cooldown: 'Not yet.',
+  ash: 'You have no Hearth Ash.',
+  worn: 'You are already wearing one.',
+  seen: 'Someone is watching.',
+};
+
+export function graftBlocked(g, { granted = false, ash = 0, seen = false } = {}) {
+  if (!granted) return 'granted';
+  if (g.worn) return 'worn';
+  if (g.cd > 0) return 'cooldown';
+  if (ash < 1) return 'ash';
+  if (seen) return 'seen';
+  return null;
+}
+
+export function startGraft(g, faction, { glamour = 0, durationMul = 1, seconds = null, free = false } = {}) {
+  return {
+    ...g,
+    worn: faction,
+    left: seconds ?? graftDuration(glamour) * durationMul,
+    held: 0,
+    susp: 0,
+    free,
+  };
+}
+
+export function tickGraft(g, dt, ctx = {}) {
+  const out = { ...g };
+  const events = [];
+  if (out.cd > 0) {
+    out.cd = Math.max(0, out.cd - dt);
+    if (out.cd === 0) events.push('ready');
+  }
+  if (!out.worn) return { graft: out, events };
+  out.held += dt;
+  out.left = Math.max(0, out.left - dt);
+  const was = out.susp;
+  out.susp = stepSuspicion(out.susp, dt, ctx);
+  for (const m of SUSPICION.ticks) if (was < m && out.susp >= m) events.push(`tick${m}`);
+  if (out.susp >= SUSPICION.breakAt) events.push('break');
+  else if (out.left <= 0) events.push('expire');
+  return { graft: out, events };
+}
+
+// Every exit runs through here. A Break scores 0 because `graftXp` already refuses anything at
+// suspicion 40 or above, and the free Graft scores 0 because being caught should not pay.
+export function endGraft(g, { reason = 'voluntary' } = {}) {
+  const long = reason === 'break';
+  return {
+    graft: { ...newGraft(), cd: Math.max(g.cd, long ? GRAFT.cooldownAfterBreak : GRAFT.cooldown) },
+    xp: g.free ? 0 : graftXp(g.held, g.susp),
+  };
+}
+
+export const graftEvent = (g, event) => ({ ...g, susp: suspicionEvent(g.susp, event) });

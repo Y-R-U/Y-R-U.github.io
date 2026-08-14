@@ -54,7 +54,7 @@ export function roof(S, cfg, tileM, seed = 3) {
     for (let px = 0; px < S; px++) {
       const u = px / S;
       const gn = f.grain.at(u * 4, v * 4);
-      const fn = f.fine.at(u * 1.7, v * 1.7);
+      const fn = f.fine.at(u * 2, v * 2);
       const cn = f.coarse.at(u, v);
       let h, shade, rough = baseRough, t;
 
@@ -78,7 +78,7 @@ export function roof(S, cfg, tileM, seed = 3) {
         shade = (0.6 + 0.4 * course) * (0.82 + 0.18 * gapU);
         rough += (gn - 0.5) * 0.24;
       } else {
-        const strand = f.fine.at(u * 9 + cn * 0.4, v * 0.9);
+        const strand = f.fine.at(u * 9 + cn * 0.4, v);
         const lip = Math.pow(smoothstep(0.55, 1, fv), 1.6);
         h = strand * 0.55 + lip * 0.7 + (gn - 0.5) * 0.25;
         t = strand;
@@ -163,9 +163,9 @@ export function wood(S, cfg, seed = 5) {
     const pf = v * planks, p = Math.floor(pf), fv = pf - p;
     for (let px = 0; px < S; px++) {
       const u = px / S;
-      const warp = f.warp.at(u * 1.3, v * 2.0);
+      const warp = f.warp.at(u, v * 2);
       // rings: a slowly drifting sawtooth across the plank gives grain that follows the board
-      const ring = Math.abs((((fv * 2.2 + warp * 1.8 + f.coarse.at(u * 0.9, v * 3) * 1.4) * 7) % 1) - 0.5) * 2;
+      const ring = Math.abs((((fv * 2.2 + warp * 1.8 + f.coarse.at(u, v * 3) * 1.4) * 7) % 1) - 0.5) * 2;
       const gn = f.grain.at(u * 6, v * 2);
       const gap = smoothstep(0, 0.05, Math.min(fv, 1 - fv));
 
@@ -201,12 +201,12 @@ export function road(S, z, tileM, seed = 9) {
     for (let px = 0; px < S; px++) {
       const u = px / S;
       const gn = f.grain.at(u * 5, v * 5);
-      const cn = f.coarse.at(u * 1.3, v * 1.3);
+      const cn = f.coarse.at(u, v);
       const fn = f.fine.at(u * 2, v * 2);
       let h, k, col;
 
       if (kind === 'dirt') {
-        const [d1, , did] = voronoi(u * 1.4 + 5.5, v * 1.4 + 2.2, cells * 3, seed + 17, 0.95);
+        const [d1, , did] = voronoi(u + 5.5, v + 2.2, cells * 4, seed + 17, 0.95);
         const stone = smoothstep(0.15, 0.045, d1) * (did > 0.62 ? 1 : 0);
         const gravel = smoothstep(0.66, 0.9, fn);
         const patch = smoothstep(0.3, 0.78, cn);
@@ -222,7 +222,7 @@ export function road(S, z, tileM, seed = 9) {
         h = edge * (0.5 + 0.5 * dome) - (1 - edge) * 0.4;
         mixRgb(shadeC, light, clamp(0.15 + id * 0.85 + (cn - 0.5) * 0.4, 0, 1), cell);
         if (kind === 'marbleCobble') {
-          const vein = smoothstep(0.46, 0.54, f.warp.at(u * 2.2 + id, v * 2.2));
+          const vein = smoothstep(0.46, 0.54, f.warp.at(u * 2 + id, v * 2));
           mixRgb(cell, tint, vein * 0.35, cell);
         }
         mixRgb(tint, cell, edge, out);
@@ -263,7 +263,7 @@ export function ground(S, z, tileM, seed = 13) {
     for (let px = 0; px < S; px++) {
       const u = px / S;
       const cn = f.coarse.at(u, v);
-      const fn = f.fine.at(u * 2.4, v * 2.4);
+      const fn = f.fine.at(u * 2, v * 2);
       const gn = f.grain.at(u * 8, v * 8);
 
       // clumps: voronoi cells are the tufts, f2-f1 is the parting between them
@@ -282,7 +282,7 @@ export function ground(S, z, tileM, seed = 13) {
 
       // pebbles only where the turf has worn back to soil
       if (wear > 0.35) {
-        const [s1, s2, sid] = voronoi(u * 1.7 + 3.1, v * 1.7 + 7.7, stones, seed + 71, 0.9);
+        const [s1, s2, sid] = voronoi(u + 3.1, v + 7.7, Math.round(stones * 1.7), seed + 71, 0.9);
         const pebble = smoothstep(0.16, 0.05, s1) * smoothstep(0.35, 0.6, wear) * (sid > 0.55 ? 1 : 0);
         if (pebble > 0.01) {
           mixRgb(out, soil, pebble * 0.6, out);

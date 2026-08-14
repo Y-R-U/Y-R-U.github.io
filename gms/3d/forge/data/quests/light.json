@@ -529,11 +529,11 @@
         "recover": [["moveTo", "wwa.eastgate"]] },
 
       { "id": "fight",
-        "all": [["kill", "hollow", 2], ["kill", "sour_crow", 6]],
+        "all": [["kill", "raider", 4], ["kill", "sour_crow", 4]],
         "in": "reach.east",
         "text": "Drive them off the stands",
         "hint": "The crows come down first. The staffs come after.",
-        "recover": [["moveTo", "stand.east"], ["respawn", "hollow", 2], ["respawn", "sour_crow", 6]] },
+        "recover": [["moveTo", "stand.east"], ["respawn", "raider", 4], ["respawn", "sour_crow", 4]] },
 
       { "id": "hold", "do": ["survive", "reach.east", 60],
         "text": "Hold the stands until they break",
@@ -778,11 +778,11 @@
         "recover": [["moveTo", "lac.ashgate"]] },
 
       { "id": "climb",
-        "all": [["kill", "watchman", 4], ["kill", "hollow", 4]],
+        "all": [["kill", "watchman", 4], ["kill", "hollow", 4], ["kill", "raider", 4]],
         "in": "bst.switchback",
         "text": "Fight up the switchback",
         "hint": "Lancet windows above you. Keep to the wall.",
-        "recover": [["moveTo", "bst.westgate"], ["respawn", "watchman", 4], ["respawn", "hollow", 4]] },
+        "recover": [["moveTo", "bst.westgate"], ["respawn", "watchman", 4], ["respawn", "hollow", 4], ["respawn", "raider", 4]] },
 
       { "id": "take", "do": ["goto", "bst.keep"],
         "text": "Take the keep",

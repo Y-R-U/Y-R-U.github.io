@@ -1,0 +1,505 @@
+{
+  "dark.01.in": {
+    "cam": "two",
+    "lines": [
+      ["kesta", "Garrison duty. You, me, and a mop."],
+      ["kesta", "The store under the keep is flooded.", "Something got in while it was full."],
+      ["kesta", "Clear it before the water goes down."]
+    ]
+  },
+
+  "dark.01.out": {
+    "cam": "two",
+    "lines": [
+      ["kesta", "Ten rats and a bucket of crabs."],
+      ["player", "Is this what taking a town is?"],
+      ["kesta", "For the first month, yes.", "Nobody writes that part down."]
+    ]
+  },
+
+  "dark.02.ask": {
+    "cam": "two",
+    "lines": [
+      ["sela", "What month were you born?"],
+      ["player", "Why?"],
+      ["sela", "Because I know, and you do not."]
+    ],
+    "choices": [
+      { "say": "The third. I think.", "goto": "dark.02.guess", "sets": [["flag", "dark.02.guessed", true]] },
+      { "say": "Nobody ever told me.", "goto": "dark.02.told" },
+      { "say": "You are a prisoner. Sit down.", "goto": null, "sets": [["flag", "dark.02.hard", true]] }
+    ]
+  },
+
+  "dark.02.guess": {
+    "lines": [
+      ["sela", "You think. Nobody guesses that."],
+      ["sela", "You were not born in Whitewall."]
+    ]
+  },
+
+  "dark.02.told": {
+    "lines": [
+      ["sela", "No. They would not have."],
+      ["sela", "You were not born in Whitewall."]
+    ]
+  },
+
+  "dark.02.robe": {
+    "cam": "close",
+    "once": true,
+    "mark": "fostered",
+    "lines": [
+      ["sela", "Longacre. Fostered out as an infant."],
+      ["sela", "Placed in the hall at Whitewall to grow.", "They did the same to me, going east."],
+      ["player", "That is not true."],
+      ["sela", "Then take the robe off and say it again."]
+    ]
+  },
+
+  "dark.03.in": {
+    "lines": [
+      ["sela", "The day fish went years ago."],
+      ["sela", "We work after the horn.", "Eight eels, and nobody looks at us."]
+    ]
+  },
+
+  "dark.03.out": {
+    "lines": [
+      ["sela", "Eight. In the dark, in dead water."],
+      ["sela", "Whitewall would call that a miracle."],
+      ["sela", "Here it is a night's work."]
+    ]
+  },
+
+  "dark.04.in": {
+    "lines": [
+      ["ossa", "You have eels. We have a rate."],
+      ["ossa", "Read it, then sell at it.", "There is no second number."]
+    ]
+  },
+
+  "dark.04.out": {
+    "cam": "two",
+    "lines": [
+      ["player", "Longacre would pay more than that."],
+      ["ossa", "Longacre is not here."],
+      ["ossa", "The Board is, and so are you.", "That is what the rate is measuring."]
+    ]
+  },
+
+  "dark.05.in": {
+    "lines": [
+      ["sela", "Three eels. Eight in the shift."],
+      ["player", "That is not enough fish."],
+      ["sela", "It is enough water.", "Cut them small and let the pot sit."]
+    ]
+  },
+
+  "dark.05.out": {
+    "lines": [
+      ["sela", "Eight bowls. Nobody asked for more."],
+      ["sela", "That is not manners.", "That is arithmetic."]
+    ]
+  },
+
+  "dark.06.in": {
+    "lines": [
+      ["corve", "The tally is read at the shift change."],
+      ["corve", "Walk the north curtain first.", "Nim will talk your ear off. Let him."]
+    ]
+  },
+
+  "dark.06.wall": {
+    "cam": "wide",
+    "once": true,
+    "mark": "walls.wrong.way",
+    "lines": [
+      ["nim", "Best wall in the valley, this one."],
+      ["nim", "Twelve feet, and it faces north."],
+      ["player", "What is north?"],
+      ["nim", "Moor. Sheep. Weather."],
+      ["nim", "Whitewall built theirs facing north too.", "Two walls, and nothing ever came."]
+    ]
+  },
+
+  "dark.06.tally": {
+    "cam": "wide",
+    "once": true,
+    "mark": "yield.falls",
+    "lines": [
+      ["corve", "Nine hundred weight last month."],
+      ["corve", "Eight hundred and twenty this month."],
+      ["corve", "That is the tally. Back to work."],
+      ["player", "Nobody said anything."],
+      ["corve", "There is nothing to say twice."]
+    ]
+  },
+
+  "dark.07.in": {
+    "lines": [
+      ["corve", "The fourth level runs west, and it thins."],
+      ["corve", "Follow it while it still goes somewhere.", "Mark it as you cut."]
+    ]
+  },
+
+  "dark.07.wheels": {
+    "cam": "close",
+    "once": true,
+    "mark": "wagon.watched",
+    "lines": [
+      ["corve", "Hold the lamp still. Listen."],
+      ["player", "Cartwheels."],
+      ["corve", "Eighth day. Always the eighth day."],
+      ["corve", "We are under the Drove Road here.", "I have counted that wagon for a year."],
+      ["corve", "Five shards out of forty feet.", "Write that down and go up."]
+    ]
+  },
+
+  "dark.08.in": {
+    "lines": [
+      ["sela", "The town drinks out of the cistern."],
+      ["sela", "The cistern drinks out of the river.", "Come and see what the river is."]
+    ]
+  },
+
+  "dark.08.out": {
+    "cam": "close",
+    "mark": "vail.arrives.dead",
+    "lines": [
+      ["player", "Nothing took the line. Nothing at all."],
+      ["sela", "Three jars of that and no fish."],
+      ["sela", "We have been drinking it all week.", "We drink it every week."]
+    ]
+  },
+
+  "dark.09.in": {
+    "lines": [
+      ["sela", "West, to the ford. Bring a cup."],
+      ["player", "We are walking to a ford to drink?"],
+      ["sela", "We are walking to a ford to find out."]
+    ]
+  },
+
+  "dark.09.out": {
+    "cam": "wide",
+    "mark": "vail.alive.above",
+    "lines": [
+      ["player", "It is clean. There are fish in it."],
+      ["sela", "Above Longacre it is alive."],
+      ["sela", "Below Blackstone it is not."],
+      ["sela", "Everything between is somebody's doing."]
+    ]
+  },
+
+  "dark.23.in": {
+    "lines": [
+      ["corve", "The fourth level broke into something."],
+      ["corve", "Nobody has propped it in forty years.", "Whatever is in there has had it all."]
+    ]
+  },
+
+  "dark.23.out": {
+    "lines": [
+      ["corve", "Shored, and the roof is still up."],
+      ["corve", "We forgot this gallery was here."],
+      ["corve", "A town that forgets ground is short of it."]
+    ]
+  },
+
+  "dark.10.in": {
+    "lines": [
+      ["sela", "The shift comes up at one, wanting fed."],
+      ["player", "With what?"],
+      ["sela", "Whatever goes in a pot.", "Gallery cap counts. Do not tell them."]
+    ]
+  },
+
+  "dark.10.out": {
+    "lines": [
+      ["sela", "They ate it, and nobody asked."],
+      ["sela", "That is the whole trick of this town.", "Nobody asks."]
+    ]
+  },
+
+  "dark.11.in": {
+    "lines": [
+      ["ossa", "Load the month and take it west."],
+      ["ossa", "Sell it, buy grain, come back."],
+      ["ossa", "Do not come back with the month."]
+    ]
+  },
+
+  "dark.11.out": {
+    "cam": "two",
+    "lines": [
+      ["hana", "Blackstone. You look thin."],
+      ["hana", "Sit down. I have your numbers already.", "Your Reeve chalks them on his own board."]
+    ]
+  },
+
+  "dark.12.price": {
+    "cam": "two",
+    "lines": [
+      ["player", "Iron for grain. An honest weight."],
+      ["hana", "It is honest and I do not want it."],
+      ["hana", "I want the leat cleared before the eighth."]
+    ],
+    "choices": [
+      { "say": "We have nothing else to trade.", "goto": "dark.12.flat" },
+      { "say": "Name the work.", "goto": "dark.12.work", "sets": [["flag", "dark.12.took.work", true]] },
+      { "say": "Then we buy elsewhere.", "goto": null, "sets": [["flag", "dark.12.walked", true]] }
+    ]
+  },
+
+  "dark.12.flat": {
+    "lines": [
+      ["hana", "You have hands. Everyone has hands."],
+      ["hana", "That is the whole of my price."]
+    ]
+  },
+
+  "dark.12.work": {
+    "lines": [
+      ["hana", "The leat. A crate. The hen."],
+      ["hana", "And the mill hurdle, since you are here."]
+    ]
+  },
+
+  "dark.12.terms": {
+    "cam": "close",
+    "once": true,
+    "lines": [
+      ["hana", "A Whitewall lad did these three last year."],
+      ["hana", "Cleared the leat in an afternoon."],
+      ["player", "I remember."],
+      ["hana", "I expect you do."]
+    ]
+  },
+
+  "dark.13.out": {
+    "cam": "close",
+    "lines": [
+      ["hana", "Eight sacks. More than we agreed."],
+      ["player", "Why?"],
+      ["hana", "Your town is hungry. Mine is not."],
+      ["hana", "Mind the ford going back."]
+    ]
+  },
+
+  "dark.14.in": {
+    "lines": [
+      ["ansel", "You are Blackstone. I can hear it."],
+      ["ansel", "Ansel. I buy for a house up the valley."],
+      ["player", "Which house?"],
+      ["ansel", "The one that pays. Read the post first."]
+    ]
+  },
+
+  "dark.14.out": {
+    "cam": "two",
+    "mark": "ansel.nobody",
+    "lines": [
+      ["player", "You told Whitewall you were theirs."],
+      ["ansel", "Did I? People hear a hall in a voice."],
+      ["ansel", "I have never once said which one."],
+      ["ansel", "Bring eels next time. They pay better."]
+    ]
+  },
+
+  "dark.24.in": {
+    "lines": [
+      ["ossa", "Tails. Twenty, at four marks each."],
+      ["ossa", "After the horn it is two.", "A rate is not a promise."]
+    ]
+  },
+
+  "dark.24.out": {
+    "lines": [
+      ["ossa", "Twenty, paid at the posted rate."],
+      ["player", "You would pay less tomorrow."],
+      ["ossa", "I would pay less in an hour.", "That is what posting a rate is for."]
+    ]
+  },
+
+  "dark.15.in": {
+    "lines": [
+      ["fen", "Four crates over, four crates back."],
+      ["fen", "Count them on. Count them off."]
+    ]
+  },
+
+  "dark.15.out": {
+    "lines": [
+      ["player", "Five came off. Four went on."],
+      ["fen", "Then you counted wrong at one end."],
+      ["player", "Whitewall's man said that as well."],
+      ["fen", "He would. The count never holds."]
+    ]
+  },
+
+  "dark.16.in": {
+    "lines": [
+      ["sela", "Barrels. Six of them. The east stands."],
+      ["player", "That is where the raid was."],
+      ["sela", "That is where the water is."]
+    ]
+  },
+
+  "dark.16.out": {
+    "cam": "close",
+    "mark": "raid.water",
+    "lines": [
+      ["sela", "Six barrels, and nobody woke up."],
+      ["player", "Last time there was smoke."],
+      ["sela", "Last time you were on the bank."],
+      ["sela", "They were carrying buckets.", "You were told it was a raid."]
+    ]
+  },
+
+  "dark.17.ask": {
+    "cam": "two",
+    "lines": [
+      ["sela", "I have been down the level all week."],
+      ["player", "You were in a cell in Whitewall."],
+      ["sela", "I was propping the third gallery."]
+    ],
+    "choices": [
+      { "say": "Then who did we take?", "goto": "dark.17.who" },
+      { "say": "I questioned you myself.", "goto": "dark.17.who", "sets": [["flag", "dark.17.pressed", true]] },
+      { "say": "One of us is lying.", "goto": null }
+    ]
+  },
+
+  "dark.17.who": {
+    "lines": [
+      ["sela", "Somebody with my face and my name."],
+      ["sela", "Somebody who told you the shaft is dry."]
+    ]
+  },
+
+  "dark.17.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "sela.face",
+    "lines": [
+      ["player", "The shaft is dry."],
+      ["sela", "Yes. That is why nobody checked."],
+      ["sela", "A true thing, said on purpose."],
+      ["sela", "Work out who gains by that one."]
+    ]
+  },
+
+  "dark.18.in": {
+    "lines": [
+      ["nim", "There is a mark on the ridge. An old one."],
+      ["nim", "I did not scrape it off.", "Come and tell me what it says."]
+    ]
+  },
+
+  "dark.18.out": {
+    "cam": "two",
+    "mark": "sign.kept",
+    "lines": [
+      ["player", "That is a Whitewall scout's sign."],
+      ["nim", "Three months old. I know."],
+      ["player", "You knew the strike was coming."],
+      ["nim", "Everybody knew. Where would we go?"]
+    ]
+  },
+
+  "dark.19.in": {
+    "lines": [
+      ["corve", "Break the floor of the bottom level."],
+      ["player", "There is nothing under the bottom."],
+      ["corve", "Then it will be a short morning."]
+    ]
+  },
+
+  "dark.19.out": {
+    "cam": "wide",
+    "once": true,
+    "mark": "seam.west",
+    "lines": [
+      ["corve", "That is not a bottom. That is a bend."],
+      ["player", "It turns west."],
+      ["corve", "It turns west, and it widens."],
+      ["corve", "Sixty years we sank straight down.", "It was going sideways the whole time."]
+    ]
+  },
+
+  "dark.20.in": {
+    "lines": [
+      ["corve", "Everything below. Grain first, then tools."],
+      ["corve", "If they take the head, we still eat."]
+    ]
+  },
+
+  "dark.20.out": {
+    "cam": "two",
+    "lines": [
+      ["torr", "My forge is in eleven pieces down a ladder."],
+      ["corve", "It will be twelve by morning."],
+      ["torr", "Whitewall never took the Levels."],
+      ["torr", "They took a roof and called it a town."]
+    ]
+  },
+
+  "dark.25.in": {
+    "lines": [
+      ["sela", "Feed everybody before they go up."],
+      ["player", "With what?"],
+      ["sela", "There is enough.", "For once in this winter, there is enough."]
+    ]
+  },
+
+  "dark.25.out": {
+    "cam": "close",
+    "lines": [
+      ["player", "That was Longacre flour."],
+      ["sela", "It was."],
+      ["sela", "Nobody down here is going to say so.", "Eat, and get up the ladder."]
+    ]
+  },
+
+  "dark.21.in": {
+    "lines": [
+      ["corve", "Up through the alleys, not the switchback."],
+      ["corve", "They never mapped the undercroft.", "They held a roof and nothing under it."]
+    ]
+  },
+
+  "dark.21.out": {
+    "cam": "two",
+    "once": true,
+    "mark": "strike.undone",
+    "lines": [
+      ["kesta", "You. Of all of them, you."],
+      ["player", "Take the west road, Kesta."],
+      ["kesta", "We held this for eleven days."],
+      ["sela", "We held it for sixty years."],
+      ["sela", "Twice in a winter, and neither of you", "has gained a single thing."]
+    ]
+  },
+
+  "dark.22.in": {
+    "lines": [
+      ["sela", "Take a lamp. We are going west."],
+      ["player", "How far west?"],
+      ["sela", "Until it stops. Nobody has been."]
+    ]
+  },
+
+  "dark.22.out": {
+    "cam": "wide",
+    "once": true,
+    "lines": [
+      ["sela", "It stops here. Sixty metres of rock up."],
+      ["player", "What is above us?"],
+      ["sela", "A field. Turnips, I think."],
+      ["sela", "Two hundred years of two towns arguing."],
+      ["sela", "And it ends under somebody's turnips."],
+      ["sela", "Tie this to your belt. Short rope.", "The long ones do not come back."]
+    ]
+  }
+}

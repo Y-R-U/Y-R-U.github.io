@@ -99,10 +99,21 @@ export class QuestRunner {
       case 'act': d.campaign.act = e[1]; break;
       case 'dialogue': this.dialogue?.play(e[1]); break;
       case 'wait': this.waitFor(e[1], e[2]); break;
+      case 'merge': this.merge(e.slice(1)); break;
       case 'recover': for (const a of e[1]) this.world[a[0]]?.(...a.slice(1)); break;
       case 'sound': this.world.sound?.(e[1]); break;
       default: break;
     }
+  }
+
+  // RUNTIME §4.4: the faces the player knew separately turn out to be one person. The last id is
+  // who they really are; the ones before it become aliases of them. The journal's cast strip is
+  // still deferred, so today this records the reveal rather than drawing it.
+  merge(names) {
+    const to = names[names.length - 1];
+    if (!to || names.length < 2) return;
+    const merged = this.doc.campaign.merged || (this.doc.campaign.merged = {});
+    for (const from of names.slice(0, -1)) if (from !== to) merged[from] = to;
   }
 
   awardTruth(id, scene = null) {

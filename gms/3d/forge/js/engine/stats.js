@@ -140,6 +140,7 @@ export class Stats {
       dpr: this.renderer.getPixelRatio(),
       verdict: v.label,
       load: v.load,
+      blocks: this.blocks?.() || null,
     };
   }
 
@@ -173,7 +174,8 @@ export class Stats {
         ${cell(s.texMB ? s.texMB.toFixed(0) + 'MB' : '—', 'tex mem', s.texMB, BUDGETS.texMB)}
         ${cell(s.programs, 'shaders')}
         ${cell(s.hitchMs.toFixed(0), 'ms worst frame', s.hitchMs, BUDGET * 3)}
-      </div>`;
+      </div>
+      ${s.blocks ? `<div class="perf-grid"><div><b>${s.blocks.detail}·${s.blocks.proxy}·${s.blocks.culled}</b><s>blocks detail·proxy·culled of ${s.blocks.blocks}</s></div></div>` : ''}`;
   }
 }
 

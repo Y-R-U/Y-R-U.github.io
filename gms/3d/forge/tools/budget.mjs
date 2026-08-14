@@ -149,6 +149,102 @@ const PER_OBJECT = `(() => {
   return { demoTypes: by, spec };
 })()`;
 
+// Drives the camera along a list of stations inside the page and reads renderer.info after each
+// render, so a whole traverse costs one navigation instead of one per sample. Batched because a
+// software render is ~50 ms and a single evaluate over 400 of them outlives the CDP timeout.
+const RUN = stations => `(() => {
+  const f = window.__forge, app = f.app, T = f.demo.terrain;
+  const out = [];
+  for (const s of ${JSON.stringify(stations)}) {
+    app.camera.position.set(s[0], T.surfaceY(s[0], s[1]) + 6, s[1]);
+    app.camera.lookAt(s[2], T.surfaceY(s[2], s[3]) + 1.5, s[3]);
+    app.camera.updateMatrixWorld();
+    for (const sys of app.systems) if (sys.update) sys.update(1 / 60, app);
+    app.renderer.info.reset();
+    app.marked = false;
+    app.renderer.render(app.scene, app.camera);
+    const r = app.renderer.info.render;
+    const sc = app.stats.shadowCalls | 0, st = app.stats.shadowTris | 0;
+    out.push({ x: s[0], z: s[1], yaw: s[4], calls: r.calls, tris: r.triangles,
+      shadowCalls: sc, shadowTris: st, mainCalls: r.calls - sc, mainTris: r.triangles - st,
+      blocks: { ...f.demo.stream.counts } });
+  }
+  return out;
+})()`;
+
+// Every registered road, walked at `step` metres, looking `AHEAD` down the line and then at the
+// same point swung to either side. Five hand-picked cameras are not a budget; the worst frame on
+// the way between them is (WORLD.md §5 Phase 7).
+const AHEAD = 22;
+
+function stationsFrom(paths, step, yaws) {
+  const out = [];
+  for (const pts of paths) {
+    let carry = 0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (!len) continue;
+      const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
+      for (let t = carry; t < len; t += step) {
+        const x = a[0] + ux * t, z = a[1] + uz * t;
+        for (let k = 0; k < yaws; k++) {
+          const ang = (k / yaws) * Math.PI * 2;
+          const dx = ux * Math.cos(ang) - uz * Math.sin(ang);
+          const dz = ux * Math.sin(ang) + uz * Math.cos(ang);
+          out.push([x, z, x + dx * AHEAD, z + dz * AHEAD, Math.round(ang * 57.3)]);
+        }
+      }
+      carry = (carry - len) % step;
+      if (carry < 0) carry += step;
+    }
+  }
+  return out;
+}
+
+async function traverse() {
+  const { S, base, close } = await open({ w: W, h: H, dpr: DPR });
+  await S('Page.navigate', { url: `${base}/index.html?shot=street_dusk&preset=${PRESET}&dpr=${DPR}${args.set ? '&' + args.set : ''}` });
+  await waitFor(S, `window.__forge && window.__forge.ready`, 20000);
+  await evalJSON(S, `(()=>{__forge.app.quality.set('shadowRate','every frame');return 1})()`);
+  await settle(S, 30);
+
+  const paths = await evalJSON(S, `window.__forge.demo.terrain.paths.map(p => p.pts)`);
+  const stations = stationsFrom(paths, +(args.step || 20), +(args.yaws || 3));
+  console.log(`${paths.length} paths, ${stations.length} samples at ${args.step || 20} m × ${args.yaws || 3} yaws`);
+
+  const rows = [];
+  for (let i = 0; i < stations.length; i += 40) {
+    rows.push(...await evalJSON(S, RUN(stations.slice(i, i + 40))));
+    process.stdout.write(`\r  ${rows.length}/${stations.length}`);
+  }
+  console.log('');
+  await close();
+
+  const worst = f => rows.reduce((a, b) => (f(b) > f(a) ? b : a));
+  const pct = (f, p) => rows.map(f).sort((a, b) => a - b)[Math.floor(rows.length * p)];
+  const wt = worst(r => r.tris), wc = worst(r => r.calls);
+  const over = rows.filter(r => r.tris > 350e3).length;
+
+  console.log(`\nworst total   ${k(wt.tris)} tris (${k(wt.mainTris)} main + ${k(wt.shadowTris)} shadow) at (${wt.x.toFixed(0)}, ${wt.z.toFixed(0)}) yaw ${wt.yaw}`);
+  console.log(`worst calls   ${wc.calls} (${wc.mainCalls} main) at (${wc.x.toFixed(0)}, ${wc.z.toFixed(0)}) yaw ${wc.yaw}`);
+  console.log(`p50 / p95     ${k(pct(r => r.tris, 0.5))} / ${k(pct(r => r.tris, 0.95))} tris · ${pct(r => r.calls, 0.5)} / ${pct(r => r.calls, 0.95)} calls`);
+  console.log(`over the 350k gate: ${over} of ${rows.length} samples (${(over / rows.length * 100).toFixed(1)}%)`);
+
+  mkdirSync(dirname(OUT), { recursive: true });
+  writeFileSync(OUT, JSON.stringify({
+    generated: new Date().toISOString().slice(0, 10),
+    stage: args.stage || 'unlabelled',
+    profile: { preset: PRESET, dpr: DPR, w: W, h: H, headed: false, shadowRate: 'every frame' },
+    mode: 'traverse',
+    step: +(args.step || 20), yaws: +(args.yaws || 3),
+    worst: { tris: wt, calls: wc },
+    gate: { budget: 350e3, over, samples: rows.length },
+    rows,
+  }, null, 2) + '\n');
+  console.log(`\n→ ${OUT}`);
+}
+
 async function main() {
   const { S, base, close } = await open({ w: W, h: H, dpr: DPR });
   const shots = args.shot ? [args.shot] : await listScenarios(S, base);
@@ -156,8 +252,11 @@ async function main() {
   let perObject = null;
 
   for (const shot of shots) {
-    await S('Page.navigate', { url: `${base}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}` });
+    await S('Page.navigate', { url: `${base}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}${args.set ? '&' + args.set : ''}` });
     await waitFor(S, `window.__forge && window.__forge.ready`, 15000);
+    // A reduced shadow rate makes the captured frame bimodal, so half these runs used to report
+    // a shadow pass of zero. The budget wants the frame that rebuilds the map.
+    await evalJSON(S, `(()=>{__forge.app.quality.set('shadowRate','every frame');return 1})()`);
     await settle(S, 45);
 
     const stats = await evalJSON(S, `window.__forge.stats()`);
@@ -219,4 +318,4 @@ async function main() {
 
 const k = n => (n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n));
 
-main().catch(e => { console.error(e); process.exit(1); });
+(args.traverse ? traverse() : main()).catch(e => { console.error(e); process.exit(1); });

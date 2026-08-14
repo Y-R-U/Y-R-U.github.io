@@ -260,6 +260,9 @@ class Windows {
 
     scene.traverse(o => {
       if (!o.isMesh || !o.geometry?.attributes?.position) return;
+      // A block's proxy set carries the same windows as its detail set. Both are in the graph at
+      // once, so without this every house past `lodDetail` claims a second point light.
+      for (let a = o; a; a = a.parent) if (a.name.endsWith(':proxy')) return;
       const mats = [].concat(o.material);
       const geo = o.geometry;
       const idx = geo.index;

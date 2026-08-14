@@ -31,6 +31,11 @@ const CHZ = [Z0, -200, -20, 160, Z1];
 // ribbon sinks a few centimetres to let the world mesh win the coincident pixels.
 const RIB_HOLE = 16, RIB_OVER = 30;
 
+// Cell size for the contact-AO decals and the run length of one road ribbon segment, both in
+// metres. Coarser than the 60 m building blocks on purpose: these are one draw call each and a
+// tighter grid buys culled triangles at a worse price in calls.
+const AOC = 120, ROAD_SEG = 110;
+
 // index of the axis node at (or just below) a chunk boundary — the boundaries are span endpoints,
 // so this lands exactly on one
 function span(arr, v) {
@@ -413,18 +418,6 @@ export class Terrain {
     return mesh;
   }
 
-  // Distance cull on top of three's frustum cull. Driven off viewDist so the high and ultra
-  // presets do not show the world ending.
-  update(dt, app) {
-    if (!this.chunks) return;
-    const r = (app.quality.get('viewDist') || 180) * (this.cullK ?? 1.6);
-    const c = app.camera.position;
-    for (const m of this.chunks) {
-      const s = m.geometry.boundingSphere;
-      m.visible = c.distanceTo(s.center) < r + s.radius;
-    }
-  }
-
   // Stations spaced along *arc length*, not along x. On a bend where dz/dx is 1.5 a 2.6 m x-step
   // is a 4.7 m real step and the bank goes faceted. Built once and shared by the bank ribbon and
   // the water surface, so their cross-sections line up exactly.
@@ -701,73 +694,104 @@ export class Terrain {
       }
       return a;
     };
+    this.roadSegs = [];
     for (const { pts, halfWidth, zoneId } of this.paths) {
       const line = resample(pts, 2.2);
-      const pos = [], col = [], idx = [], nrm = [];
-      for (let i = 0; i < line.length; i++) {
-        const p = line[i];
-        const q = line[Math.min(i + 1, line.length - 1)];
-        const o = line[Math.max(i - 1, 0)];
-        let nx = -(q[1] - o[1]), nz = q[0] - o[0];
-        const l = Math.hypot(nx, nz) || 1;
-        nx /= l; nz /= l;
-        // WORLD.md §4.4's 9 m half-width is the open-country figure. Inside a town the King's
-        // Road is the High Street, and an 18 m carriageway between two rows of frontages is a
-        // motorway.
-        const town = 1 - 0.55 * townAt(p[0], p[1]).m;
-        const hwL = halfWidth * town * (1 + 0.17 * fbm(p[0] * 0.09 + 1.303, p[1] * 0.09 + 2.718, 2, 7));
-        const hwR = halfWidth * town * (1 + 0.17 * fbm(p[0] * 0.09 + 41.71, p[1] * 0.09 + 0.905, 2, 7));
-        for (let c = 0; c <= CROSS; c++) {
-          const t = c / CROSS * 2 - 1;
-          const hw = lerp(hwL, hwR, (t + 1) / 2);
-          const x = p[0] + nx * t * hw, z = p[1] + nz * t * hw;
-          pos.push(x, this.surfaceY(x, z) + 0.06, z);
-          // The ribbon's own normals came from computeVertexNormals, which reads its centre
-          // station column as a crease and lights a hairline down the middle of every road. It is
-          // a decal on the ground; light it as the ground.
-          const gx = (this.surfaceY(x - 1, z) - this.surfaceY(x + 1, z)) / 2;
-          const gz = (this.surfaceY(x, z - 1) - this.surfaceY(x, z + 1)) / 2;
-          const nl = Math.hypot(gx, 1, gz);
-          nrm.push(gx / nl, 1 / nl, gz / nl);
-          // ends fade out too, or the ribbon stops dead in a straight polygon edge; the fade
-          // width is itself noisy so the margin is worn rather than a clean band
-          const end = Math.min(smoothstep(0, 4, i), smoothstep(0, 4, line.length - 1 - i));
-          const f0 = 0.30 + 0.16 * fbm(x * 0.22 + 3.606, z * 0.22 + 1.144, 2, 13);
-          col.push(1, 1, 1, (1 - smoothstep(f0, 1.0, Math.abs(t))) * end * deckFade(x, z));
-        }
+      // The King's Road is 1110 m in one mesh, so its bounding sphere caught every frustum. Cut
+      // into ROAD_SEG runs sharing a station, which costs one duplicated row per join.
+      const per = Math.max(2, Math.round(ROAD_SEG / 2.2));
+      for (let a0 = 0; a0 < line.length - 1; a0 += per) {
+        this.roadSeg(line.slice(a0, Math.min(line.length, a0 + per + 1)), a0, line.length, halfWidth, zoneId, deckFade);
       }
-      const row = CROSS + 1;
-      for (let s = 0; s < line.length - 1; s++) {
-        for (let c = 0; c < CROSS; c++) {
-          const p = s * row + c;
-          idx.push(p, p + 1, p + row, p + 1, p + row + 1, p + row);
-        }
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
-      geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
-      geo.setIndex(idx);
-
-      const mat = getMaterial(zoneId, 'road');
-      mat.vertexColors = true;
-      mat.transparent = true;
-      mat.depthWrite = false;
-      mat.needsUpdate = true;
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.name = 'road';
-      mesh.renderOrder = 1;
-      mesh.receiveShadow = true;
-      this.object3D.add(mesh);
     }
   }
 
+  roadSeg(line, i0, total, halfWidth, zoneId, deckFade) {
+    const CROSS = 6;
+    const pos = [], col = [], idx = [], nrm = [];
+    for (let i = 0; i < line.length; i++) {
+      const p = line[i];
+      const q = line[Math.min(i + 1, line.length - 1)];
+      const o = line[Math.max(i - 1, 0)];
+      let nx = -(q[1] - o[1]), nz = q[0] - o[0];
+      const l = Math.hypot(nx, nz) || 1;
+      nx /= l; nz /= l;
+      // WORLD.md §4.4's 9 m half-width is the open-country figure. Inside a town the King's
+      // Road is the High Street, and an 18 m carriageway between two rows of frontages is a
+      // motorway.
+      const town = 1 - 0.55 * townAt(p[0], p[1]).m;
+      const hwL = halfWidth * town * (1 + 0.17 * fbm(p[0] * 0.09 + 1.303, p[1] * 0.09 + 2.718, 2, 7));
+      const hwR = halfWidth * town * (1 + 0.17 * fbm(p[0] * 0.09 + 41.71, p[1] * 0.09 + 0.905, 2, 7));
+      for (let c = 0; c <= CROSS; c++) {
+        const t = c / CROSS * 2 - 1;
+        const hw = lerp(hwL, hwR, (t + 1) / 2);
+        const x = p[0] + nx * t * hw, z = p[1] + nz * t * hw;
+        pos.push(x, this.surfaceY(x, z) + 0.06, z);
+        // The ribbon's own normals came from computeVertexNormals, which reads its centre
+        // station column as a crease and lights a hairline down the middle of every road. It is
+        // a decal on the ground; light it as the ground.
+        const gx = (this.surfaceY(x - 1, z) - this.surfaceY(x + 1, z)) / 2;
+        const gz = (this.surfaceY(x, z - 1) - this.surfaceY(x, z + 1)) / 2;
+        const nl = Math.hypot(gx, 1, gz);
+        nrm.push(gx / nl, 1 / nl, gz / nl);
+        // ends fade out too, or the ribbon stops dead in a straight polygon edge; the fade
+        // width is itself noisy so the margin is worn rather than a clean band. The index is the
+        // one into the whole road, not into this segment, or every join would fade to nothing.
+        const gi = i0 + i;
+        const end = Math.min(smoothstep(0, 4, gi), smoothstep(0, 4, total - 1 - gi));
+        const f0 = 0.30 + 0.16 * fbm(x * 0.22 + 3.606, z * 0.22 + 1.144, 2, 13);
+        col.push(1, 1, 1, (1 - smoothstep(f0, 1.0, Math.abs(t))) * end * deckFade(x, z));
+      }
+    }
+    const row = CROSS + 1;
+    for (let s = 0; s < line.length - 1; s++) {
+      for (let c = 0; c < CROSS; c++) {
+        const p = s * row + c;
+        idx.push(p, p + 1, p + row, p + 1, p + row + 1, p + row);
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+    geo.setIndex(idx);
+    geo.computeBoundingSphere();
+
+    const mat = getMaterial(zoneId, 'road');
+    mat.vertexColors = true;
+    mat.transparent = true;
+    mat.depthWrite = false;
+    mat.needsUpdate = true;
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.name = 'road';
+    mesh.renderOrder = 1;
+    mesh.receiveShadow = true;
+    this.object3D.add(mesh);
+    this.roadSegs.push(mesh);
+  }
+
   // A soft dark collar on the ground at every base. This is the single thing that stops a
-  // building reading as a sticker; it costs one transparent draw call for the whole scene.
-  // Runs last, after scatter has registered its trees.
+  // building reading as a sticker. Runs last, after scatter has registered its trees.
+  // Split on AOC-metre cells: as one map-spanning mesh it was 20.1 k triangles drawn in every
+  // scenario, never culled — the third largest line in the budget (WORLD.md §6.5).
   finish() {
-    const pos = [], col = [], idx = [];
-    const push = (outline, strength, pad) => {
+    const old = this.decals;
+    if (old) { this.object3D.remove(old); old.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); }
+    this.decals = new THREE.Group();
+    this.decals.name = 'decalChunks';
+    this.object3D.add(this.decals);
+    this.decalChunks = [];
+
+    const cells = new Map();
+    const cell = (x, z) => {
+      const k = `${Math.floor(x / AOC)},${Math.floor(z / AOC)}`;
+      let c = cells.get(k);
+      if (!c) cells.set(k, c = { pos: [], col: [], idx: [] });
+      return c;
+    };
+
+    const push = (c, outline, strength, pad) => {
+      const { pos, col, idx } = c;
       const n = outline.length;
       const base = pos.length / 3;
       let cx = 0, cz = 0;
@@ -801,11 +825,12 @@ export class Terrain {
           out.push([fp.x + lx * c - lz * s, fp.z + lx * s + lz * c]);
         }
       }
-      push(out, 0.55 * fp.ao, 2.85);
+      push(cell(fp.x, fp.z), out, 0.55 * fp.ao, 2.85);
     }
 
     // props get a filled disc, not a ring — a tree trunk does not shade its own footprint
     for (const d of this.propDecals) {
+      const { pos, col, idx } = cell(d.x, d.z);
       const n = 7, base = pos.length / 3;
       pos.push(d.x, this.surfaceY(d.x, d.z) + 0.05, d.z);
       col.push(0, 0, 0, d.s);
@@ -818,31 +843,32 @@ export class Terrain {
       for (let i = 0; i < n; i++) idx.push(base, base + 1 + ((i + 1) % n), base + 1 + i);
     }
 
-    this.decalMat = null;
-    if (!idx.length) return;
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
-    geo.setIndex(idx);
     // Straight multiplicative darkening: dst * (1 - srcAlpha). Immune to whatever the lit
     // pipeline would otherwise do to a "black quad with alpha".
-    const mat = new THREE.MeshBasicMaterial({
+    const mat = this.decalMat = new THREE.MeshBasicMaterial({
       vertexColors: true, transparent: true, depthWrite: false, toneMapped: false, fog: false,
       blending: THREE.CustomBlending, blendSrc: THREE.ZeroFactor,
       blendDst: THREE.OneMinusSrcAlphaFactor, blendEquation: THREE.AddEquation,
     });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.name = 'contactAO';
-    mesh.renderOrder = 2;
-    this.object3D.add(mesh);
-    this.decalMat = mat;
+    for (const c of cells.values()) {
+      if (!c.idx.length) continue;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(c.pos, 3));
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(c.col, 4));
+      geo.setIndex(c.idx);
+      geo.computeBoundingSphere();
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.name = 'contactAO';
+      mesh.renderOrder = 2;
+      this.decals.add(mesh);
+      this.decalChunks.push(mesh);
+    }
+    if (!this.decalChunks.length) this.decalMat = null;
   }
 
   registerKnobs(q) {
     q.register({ key: 'groundAO', label: 'Contact shade', type: 'range', min: 0, max: 1.6, step: 0.05, default: 1, group: 'World' },
       v => { if (this.decalMat) this.decalMat.opacity = v; });
-    q.register({ key: 'groundCull', label: 'Ground cull × view distance', type: 'range', min: 0.8, max: 4, step: 0.1, default: 1.6, group: 'World' },
-      v => { this.cullK = v; });
     // The two knobs that change vertex counts rather than shader constants, so they cannot take
     // effect without rebuilding. `rebuild: true` is what tells main.js to.
     q.register({ key: 'riverRes', label: 'River station spacing (m)', type: 'range', min: 2, max: 14, step: 0.5, default: 5, group: 'World', rebuild: true },
@@ -861,9 +887,11 @@ export class Terrain {
       o.traverse(c => { if (c.isMesh) c.geometry.dispose(); });
     }
     this.chunks = null;
+    this.roadSegs = null;
+    this.decalChunks = null;
     this.st = null;
     this.hgrid = null;
-    this.ground = this.banks = this.waterGroup = this.water = null;
+    this.ground = this.banks = this.waterGroup = this.water = this.decals = null;
   }
 }
 

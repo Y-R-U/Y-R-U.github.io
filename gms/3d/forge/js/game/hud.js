@@ -8,11 +8,12 @@ import { pins, cycle, basicOf } from './sheet.js';
 import { low } from './vitals.js';
 import { lastBell } from './clock.js';
 import { SUSPICION } from '../sim/faction.js';
+import { SPELLS } from '../sim/spells.js';
 
 const BELL_NAME = { rising: 'Rising', high: 'High', setting: 'Setting', low: 'Low' };
 const HORN_NAME = { rising: 'First', high: 'Second', setting: 'Third', low: '' };
 
-export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑' };
+export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑', graft: '◑' };
 
 const LONG_PRESS = 400;
 const CHANNEL_AFTER = 350;
@@ -282,7 +283,7 @@ export class Hud {
       ? `Day ${s.day}` : `Day ${s.day} · ${names[bell.id]}`;
     if (chip !== this.was.chip) { this.was.chip = chip; this.chip.textContent = chip; }
 
-    const spell = basicOf(s.school, s.faction);
+    const spell = this.context.kind === 'graft' ? SPELLS.graft : basicOf(s.school, s.faction);
     const dial = `${short(s.school)}|${spell ? Math.round(spell.cost) : ''}`;
     if (dial !== this.was.dial) {
       this.was.dial = dial;

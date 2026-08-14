@@ -1,6 +1,6 @@
 {
   "generated": "2026-08-14",
-  "stage": "unlabelled",
+  "stage": "A7-before",
   "profile": {
     "preset": "medium",
     "dpr": 1,
@@ -12,21 +12,21 @@
   "scenarios": {
     "wall_day": {
       "reported": {
-        "calls": 88,
-        "mainCalls": 64,
-        "shadowCalls": 24,
-        "tris": 227656,
-        "mainTris": 144738,
-        "shadowTris": 82918,
+        "calls": 66,
+        "mainCalls": 66,
+        "shadowCalls": 0,
+        "tris": 239024,
+        "mainTris": 239024,
+        "shadowTris": 0,
         "texMB": 54.2
       },
       "walked": {
-        "drawnTris": 144726,
-        "residentTris": 340826.3333333333,
-        "drawnMeshes": 59
+        "drawnTris": 239012,
+        "residentTris": 391072.3333333333,
+        "drawnMeshes": 61
       },
       "reconcile": {
-        "mainTris": 144738,
+        "mainTris": 239024,
         "deltaTris": -12,
         "deltaPct": -0.01
       },
@@ -67,65 +67,65 @@
         },
         "roads": {
           "tris": 14724,
-          "meshes": 29,
-          "drawnTris": 2148,
-          "drawnMeshes": 4,
+          "meshes": 11,
+          "drawnTris": 11196,
+          "drawnMeshes": 7,
           "parts": {
             "road": {
               "tris": 14724,
-              "meshes": 29,
-              "drawnTris": 2148,
-              "drawnMeshes": 4
+              "meshes": 11,
+              "drawnTris": 11196,
+              "drawnMeshes": 7
             }
           }
         },
         "decals": {
           "tris": 20079,
-          "meshes": 38,
-          "drawnTris": 4355,
-          "drawnMeshes": 5,
+          "meshes": 1,
+          "drawnTris": 20079,
+          "drawnMeshes": 1,
           "parts": {
             "contactAO": {
               "tris": 20079,
-              "meshes": 38,
-              "drawnTris": 4355,
-              "drawnMeshes": 5
+              "meshes": 1,
+              "drawnTris": 20079,
+              "drawnMeshes": 1
             }
           }
         },
         "buildings": {
-          "tris": 167792,
-          "meshes": 109,
-          "drawnTris": 64419,
-          "drawnMeshes": 17,
+          "tris": 150678,
+          "meshes": 16,
+          "drawnTris": 98091,
+          "drawnMeshes": 9,
           "parts": {
             "wall": {
-              "tris": 85656,
-              "meshes": 28,
-              "drawnTris": 28452,
-              "drawnMeshes": 4
+              "tris": 75524,
+              "meshes": 3,
+              "drawnTris": 47656,
+              "drawnMeshes": 2
             },
             "trim": {
-              "tris": 66790,
-              "meshes": 28,
-              "drawnTris": 30776,
-              "drawnMeshes": 4
+              "tris": 62902,
+              "meshes": 3,
+              "drawnTris": 43858,
+              "drawnMeshes": 2
             },
             "glass": {
-              "tris": 4020,
-              "meshes": 23,
-              "drawnTris": 1791,
-              "drawnMeshes": 4
+              "tris": 3822,
+              "meshes": 3,
+              "drawnTris": 2153,
+              "drawnMeshes": 2
             },
             "roof": {
-              "tris": 7636,
-              "meshes": 24,
-              "drawnTris": 2812,
-              "drawnMeshes": 4
+              "tris": 4740,
+              "meshes": 3,
+              "drawnTris": 3836,
+              "drawnMeshes": 2
             },
             "crest": {
               "tris": 1926,
-              "meshes": 3,
+              "meshes": 1,
               "drawnTris": 0,
               "drawnMeshes": 0
             },
@@ -138,76 +138,76 @@
           }
         },
         "foliage": {
-          "tris": 34296,
-          "meshes": 11,
-          "drawnTris": 34296,
-          "drawnMeshes": 11,
+          "tris": 101656,
+          "meshes": 33,
+          "drawnTris": 70138,
+          "drawnMeshes": 22,
           "parts": {
             "grass": {
-              "tris": 19744,
-              "meshes": 1,
-              "drawnTris": 19744,
-              "drawnMeshes": 1
+              "tris": 63360,
+              "meshes": 3,
+              "drawnTris": 42240,
+              "drawnMeshes": 2
             },
             "flower": {
-              "tris": 768,
-              "meshes": 1,
-              "drawnTris": 768,
-              "drawnMeshes": 1
+              "tris": 2304,
+              "meshes": 3,
+              "drawnTris": 1536,
+              "drawnMeshes": 2
             },
             "bush": {
-              "tris": 4080,
-              "meshes": 1,
-              "drawnTris": 4080,
-              "drawnMeshes": 1
+              "tris": 12240,
+              "meshes": 3,
+              "drawnTris": 8160,
+              "drawnMeshes": 2
             },
             "rock": {
-              "tris": 2040,
-              "meshes": 1,
-              "drawnTris": 2040,
-              "drawnMeshes": 1
+              "tris": 6120,
+              "meshes": 3,
+              "drawnTris": 4080,
+              "drawnMeshes": 2
             },
             "cone": {
-              "tris": 504,
-              "meshes": 1,
-              "drawnTris": 504,
-              "drawnMeshes": 1
+              "tris": 3640,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "bark0": {
-              "tris": 728,
-              "meshes": 1,
-              "drawnTris": 728,
-              "drawnMeshes": 1
+              "tris": 1176,
+              "meshes": 3,
+              "drawnTris": 1064,
+              "drawnMeshes": 2
             },
             "bark1": {
-              "tris": 616,
-              "meshes": 1,
-              "drawnTris": 616,
-              "drawnMeshes": 1
+              "tris": 1400,
+              "meshes": 3,
+              "drawnTris": 1232,
+              "drawnMeshes": 2
             },
             "bark2": {
-              "tris": 784,
-              "meshes": 1,
-              "drawnTris": 784,
-              "drawnMeshes": 1
+              "tris": 1568,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "leaf0": {
-              "tris": 1846,
-              "meshes": 1,
-              "drawnTris": 1846,
-              "drawnMeshes": 1
+              "tris": 2974,
+              "meshes": 3,
+              "drawnTris": 2686,
+              "drawnMeshes": 2
             },
             "leaf1": {
-              "tris": 1254,
-              "meshes": 1,
-              "drawnTris": 1254,
-              "drawnMeshes": 1
+              "tris": 3018,
+              "meshes": 3,
+              "drawnTris": 2640,
+              "drawnMeshes": 2
             },
             "leaf2": {
-              "tris": 1932,
-              "meshes": 1,
-              "drawnTris": 1932,
-              "drawnMeshes": 1
+              "tris": 3856,
+              "meshes": 3,
+              "drawnTris": 3588,
+              "drawnMeshes": 2
             }
           }
         },
@@ -273,21 +273,21 @@
     },
     "street_dusk": {
       "reported": {
-        "calls": 81,
-        "mainCalls": 57,
-        "shadowCalls": 24,
-        "tris": 157761,
-        "mainTris": 105517,
-        "shadowTris": 52244,
+        "calls": 44,
+        "mainCalls": 44,
+        "shadowCalls": 0,
+        "tris": 180357,
+        "mainTris": 180357,
+        "shadowTris": 0,
         "texMB": 54.2
       },
       "walked": {
-        "drawnTris": 105505,
-        "residentTris": 335992.3333333333,
-        "drawnMeshes": 54
+        "drawnTris": 180345,
+        "residentTris": 391072.3333333333,
+        "drawnMeshes": 41
       },
       "reconcile": {
-        "mainTris": 105517,
+        "mainTris": 180357,
         "deltaTris": -12,
         "deltaPct": -0.01
       },
@@ -328,65 +328,65 @@
         },
         "roads": {
           "tris": 14724,
-          "meshes": 29,
-          "drawnTris": 2988,
+          "meshes": 11,
+          "drawnTris": 10020,
           "drawnMeshes": 5,
           "parts": {
             "road": {
               "tris": 14724,
-              "meshes": 29,
-              "drawnTris": 2988,
+              "meshes": 11,
+              "drawnTris": 10020,
               "drawnMeshes": 5
             }
           }
         },
         "decals": {
           "tris": 20079,
-          "meshes": 38,
-          "drawnTris": 3595,
-          "drawnMeshes": 5,
+          "meshes": 1,
+          "drawnTris": 20079,
+          "drawnMeshes": 1,
           "parts": {
             "contactAO": {
               "tris": 20079,
-              "meshes": 38,
-              "drawnTris": 3595,
-              "drawnMeshes": 5
+              "meshes": 1,
+              "drawnTris": 20079,
+              "drawnMeshes": 1
             }
           }
         },
         "buildings": {
-          "tris": 167792,
-          "meshes": 109,
+          "tris": 150678,
+          "meshes": 16,
           "drawnTris": 33780,
-          "drawnMeshes": 17,
+          "drawnMeshes": 5,
           "parts": {
             "wall": {
-              "tris": 85656,
-              "meshes": 28,
+              "tris": 75524,
+              "meshes": 3,
               "drawnTris": 18760,
-              "drawnMeshes": 4
+              "drawnMeshes": 1
             },
             "trim": {
-              "tris": 66790,
-              "meshes": 28,
+              "tris": 62902,
+              "meshes": 3,
               "drawnTris": 13046,
-              "drawnMeshes": 4
+              "drawnMeshes": 1
             },
             "glass": {
-              "tris": 4020,
-              "meshes": 23,
+              "tris": 3822,
+              "meshes": 3,
               "drawnTris": 362,
-              "drawnMeshes": 4
+              "drawnMeshes": 1
             },
             "roof": {
-              "tris": 7636,
-              "meshes": 24,
+              "tris": 4740,
+              "meshes": 3,
               "drawnTris": 1024,
-              "drawnMeshes": 4
+              "drawnMeshes": 1
             },
             "crest": {
               "tris": 1926,
-              "meshes": 3,
+              "meshes": 1,
               "drawnTris": 0,
               "drawnMeshes": 0
             },
@@ -399,74 +399,74 @@
           }
         },
         "foliage": {
-          "tris": 29462,
-          "meshes": 11,
-          "drawnTris": 29462,
-          "drawnMeshes": 11,
+          "tris": 101656,
+          "meshes": 33,
+          "drawnTris": 80786,
+          "drawnMeshes": 14,
           "parts": {
             "grass": {
-              "tris": 16288,
-              "meshes": 1,
-              "drawnTris": 16288,
-              "drawnMeshes": 1
+              "tris": 63360,
+              "meshes": 3,
+              "drawnTris": 63360,
+              "drawnMeshes": 3
             },
             "flower": {
-              "tris": 756,
-              "meshes": 1,
-              "drawnTris": 756,
+              "tris": 2304,
+              "meshes": 3,
+              "drawnTris": 768,
               "drawnMeshes": 1
             },
             "bush": {
-              "tris": 3920,
-              "meshes": 1,
-              "drawnTris": 3920,
-              "drawnMeshes": 1
+              "tris": 12240,
+              "meshes": 3,
+              "drawnTris": 8160,
+              "drawnMeshes": 2
             },
             "rock": {
-              "tris": 2040,
-              "meshes": 1,
+              "tris": 6120,
+              "meshes": 3,
               "drawnTris": 2040,
               "drawnMeshes": 1
             },
             "cone": {
-              "tris": 952,
-              "meshes": 1,
+              "tris": 3640,
+              "meshes": 3,
               "drawnTris": 952,
               "drawnMeshes": 1
             },
             "bark0": {
-              "tris": 336,
-              "meshes": 1,
+              "tris": 1176,
+              "meshes": 3,
               "drawnTris": 336,
               "drawnMeshes": 1
             },
             "bark1": {
-              "tris": 616,
-              "meshes": 1,
+              "tris": 1400,
+              "meshes": 3,
               "drawnTris": 616,
               "drawnMeshes": 1
             },
             "bark2": {
-              "tris": 672,
-              "meshes": 1,
+              "tris": 1568,
+              "meshes": 3,
               "drawnTris": 672,
               "drawnMeshes": 1
             },
             "leaf0": {
-              "tris": 840,
-              "meshes": 1,
+              "tris": 2974,
+              "meshes": 3,
               "drawnTris": 840,
               "drawnMeshes": 1
             },
             "leaf1": {
-              "tris": 1386,
-              "meshes": 1,
+              "tris": 3018,
+              "meshes": 3,
               "drawnTris": 1386,
               "drawnMeshes": 1
             },
             "leaf2": {
-              "tris": 1656,
-              "meshes": 1,
+              "tris": 3856,
+              "meshes": 3,
               "drawnTris": 1656,
               "drawnMeshes": 1
             }
@@ -534,21 +534,21 @@
     },
     "gate_night": {
       "reported": {
-        "calls": 61,
-        "mainCalls": 38,
-        "shadowCalls": 23,
-        "tris": 158462,
-        "mainTris": 95588,
-        "shadowTris": 62874,
+        "calls": 43,
+        "mainCalls": 29,
+        "shadowCalls": 14,
+        "tris": 185560,
+        "mainTris": 121966,
+        "shadowTris": 63594,
         "texMB": 54.2
       },
       "walked": {
-        "drawnTris": 95576,
-        "residentTris": 336672.3333333333,
-        "drawnMeshes": 37
+        "drawnTris": 121954,
+        "residentTris": 391072.3333333333,
+        "drawnMeshes": 28
       },
       "reconcile": {
-        "mainTris": 95588,
+        "mainTris": 121966,
         "deltaTris": -12,
         "deltaPct": -0.01
       },
@@ -589,67 +589,67 @@
         },
         "roads": {
           "tris": 14724,
-          "meshes": 29,
-          "drawnTris": 1464,
+          "meshes": 11,
+          "drawnTris": 2064,
           "drawnMeshes": 3,
           "parts": {
             "road": {
               "tris": 14724,
-              "meshes": 29,
-              "drawnTris": 1464,
+              "meshes": 11,
+              "drawnTris": 2064,
               "drawnMeshes": 3
             }
           }
         },
         "decals": {
           "tris": 20079,
-          "meshes": 38,
-          "drawnTris": 4148,
-          "drawnMeshes": 5,
+          "meshes": 1,
+          "drawnTris": 20079,
+          "drawnMeshes": 1,
           "parts": {
             "contactAO": {
               "tris": 20079,
-              "meshes": 38,
-              "drawnTris": 4148,
-              "drawnMeshes": 5
+              "meshes": 1,
+              "drawnTris": 20079,
+              "drawnMeshes": 1
             }
           }
         },
         "buildings": {
-          "tris": 167792,
-          "meshes": 109,
-          "drawnTris": 43528,
-          "drawnMeshes": 11,
+          "tris": 150678,
+          "meshes": 16,
+          "drawnTris": 51999,
+          "drawnMeshes": 6,
           "parts": {
             "wall": {
-              "tris": 85656,
-              "meshes": 28,
-              "drawnTris": 20464,
-              "drawnMeshes": 2
+              "tris": 75524,
+              "meshes": 3,
+              "drawnTris": 27868,
+              "drawnMeshes": 1
             },
             "trim": {
-              "tris": 66790,
-              "meshes": 28,
-              "drawnTris": 18720,
-              "drawnMeshes": 2
+              "tris": 62902,
+              "meshes": 3,
+              "drawnTris": 19044,
+              "drawnMeshes": 1
             },
             "glass": {
-              "tris": 4020,
-              "meshes": 23,
-              "drawnTris": 1366,
-              "drawnMeshes": 2
+              "tris": 3822,
+              "meshes": 3,
+              "drawnTris": 1669,
+              "drawnMeshes": 1
             },
             "roof": {
-              "tris": 7636,
-              "meshes": 24,
-              "drawnTris": 812,
-              "drawnMeshes": 2
+              "tris": 4740,
+              "meshes": 3,
+              "drawnTris": 904,
+              "drawnMeshes": 1
             },
             "crest": {
               "tris": 1926,
-              "meshes": 3,
-              "drawnTris": 1578,
-              "drawnMeshes": 2
+              "meshes": 1,
+              "drawnTris": 1926,
+              "drawnMeshes": 1
             },
             "doorLeaves": {
               "tris": 1764,
@@ -660,74 +660,74 @@
           }
         },
         "foliage": {
-          "tris": 30142,
-          "meshes": 11,
-          "drawnTris": 30142,
+          "tris": 101656,
+          "meshes": 33,
+          "drawnTris": 31518,
           "drawnMeshes": 11,
           "parts": {
             "grass": {
-              "tris": 19984,
-              "meshes": 1,
-              "drawnTris": 19984,
+              "tris": 63360,
+              "meshes": 3,
+              "drawnTris": 21120,
               "drawnMeshes": 1
             },
             "flower": {
-              "tris": 768,
-              "meshes": 1,
+              "tris": 2304,
+              "meshes": 3,
               "drawnTris": 768,
               "drawnMeshes": 1
             },
             "bush": {
-              "tris": 3840,
-              "meshes": 1,
-              "drawnTris": 3840,
+              "tris": 12240,
+              "meshes": 3,
+              "drawnTris": 4080,
               "drawnMeshes": 1
             },
             "rock": {
-              "tris": 2040,
-              "meshes": 1,
+              "tris": 6120,
+              "meshes": 3,
               "drawnTris": 2040,
               "drawnMeshes": 1
             },
             "cone": {
-              "tris": 2184,
-              "meshes": 1,
+              "tris": 3640,
+              "meshes": 3,
               "drawnTris": 2184,
               "drawnMeshes": 1
             },
             "bark0": {
-              "tris": 112,
-              "meshes": 1,
+              "tris": 1176,
+              "meshes": 3,
               "drawnTris": 112,
               "drawnMeshes": 1
             },
             "bark1": {
-              "tris": 168,
-              "meshes": 1,
+              "tris": 1400,
+              "meshes": 3,
               "drawnTris": 168,
               "drawnMeshes": 1
             },
             "bark2": {
-              "tris": 112,
-              "meshes": 1,
+              "tris": 1568,
+              "meshes": 3,
               "drawnTris": 112,
               "drawnMeshes": 1
             },
             "leaf0": {
-              "tris": 288,
-              "meshes": 1,
+              "tris": 2974,
+              "meshes": 3,
               "drawnTris": 288,
               "drawnMeshes": 1
             },
             "leaf1": {
-              "tris": 378,
-              "meshes": 1,
+              "tris": 3018,
+              "meshes": 3,
               "drawnTris": 378,
               "drawnMeshes": 1
             },
             "leaf2": {
-              "tris": 268,
-              "meshes": 1,
+              "tris": 3856,
+              "meshes": 3,
               "drawnTris": 268,
               "drawnMeshes": 1
             }
@@ -795,23 +795,23 @@
     },
     "town_night": {
       "reported": {
-        "calls": 90,
+        "calls": 81,
         "mainCalls": 66,
-        "shadowCalls": 24,
-        "tris": 163351,
-        "mainTris": 111369,
-        "shadowTris": 51982,
+        "shadowCalls": 15,
+        "tris": 293364,
+        "mainTris": 240960,
+        "shadowTris": 52404,
         "texMB": 54.2
       },
       "walked": {
-        "drawnTris": 111357,
-        "residentTris": 335398.3333333333,
+        "drawnTris": 240948,
+        "residentTris": 391072.3333333333,
         "drawnMeshes": 62
       },
       "reconcile": {
-        "mainTris": 111369,
+        "mainTris": 240960,
         "deltaTris": -12,
-        "deltaPct": -0.01
+        "deltaPct": 0
       },
       "systems": {
         "ground": {
@@ -850,65 +850,65 @@
         },
         "roads": {
           "tris": 14724,
-          "meshes": 29,
-          "drawnTris": 3600,
-          "drawnMeshes": 6,
+          "meshes": 11,
+          "drawnTris": 11196,
+          "drawnMeshes": 7,
           "parts": {
             "road": {
               "tris": 14724,
-              "meshes": 29,
-              "drawnTris": 3600,
-              "drawnMeshes": 6
+              "meshes": 11,
+              "drawnTris": 11196,
+              "drawnMeshes": 7
             }
           }
         },
         "decals": {
           "tris": 20079,
-          "meshes": 38,
-          "drawnTris": 3665,
-          "drawnMeshes": 5,
+          "meshes": 1,
+          "drawnTris": 20079,
+          "drawnMeshes": 1,
           "parts": {
             "contactAO": {
               "tris": 20079,
-              "meshes": 38,
-              "drawnTris": 3665,
-              "drawnMeshes": 5
+              "meshes": 1,
+              "drawnTris": 20079,
+              "drawnMeshes": 1
             }
           }
         },
         "buildings": {
-          "tris": 167792,
-          "meshes": 109,
-          "drawnTris": 34368,
-          "drawnMeshes": 18,
+          "tris": 150678,
+          "meshes": 16,
+          "drawnTris": 98679,
+          "drawnMeshes": 10,
           "parts": {
             "wall": {
-              "tris": 85656,
-              "meshes": 28,
-              "drawnTris": 18760,
-              "drawnMeshes": 4
+              "tris": 75524,
+              "meshes": 3,
+              "drawnTris": 47656,
+              "drawnMeshes": 2
             },
             "trim": {
-              "tris": 66790,
-              "meshes": 28,
-              "drawnTris": 13046,
-              "drawnMeshes": 4
+              "tris": 62902,
+              "meshes": 3,
+              "drawnTris": 43858,
+              "drawnMeshes": 2
             },
             "glass": {
-              "tris": 4020,
-              "meshes": 23,
-              "drawnTris": 362,
-              "drawnMeshes": 4
+              "tris": 3822,
+              "meshes": 3,
+              "drawnTris": 2153,
+              "drawnMeshes": 2
             },
             "roof": {
-              "tris": 7636,
-              "meshes": 24,
-              "drawnTris": 1024,
-              "drawnMeshes": 4
+              "tris": 4740,
+              "meshes": 3,
+              "drawnTris": 3836,
+              "drawnMeshes": 2
             },
             "crest": {
               "tris": 1926,
-              "meshes": 3,
+              "meshes": 1,
               "drawnTris": 0,
               "drawnMeshes": 0
             },
@@ -921,76 +921,76 @@
           }
         },
         "foliage": {
-          "tris": 28868,
-          "meshes": 11,
-          "drawnTris": 28868,
-          "drawnMeshes": 11,
+          "tris": 101656,
+          "meshes": 33,
+          "drawnTris": 70138,
+          "drawnMeshes": 22,
           "parts": {
             "grass": {
-              "tris": 15968,
-              "meshes": 1,
-              "drawnTris": 15968,
-              "drawnMeshes": 1
+              "tris": 63360,
+              "meshes": 3,
+              "drawnTris": 42240,
+              "drawnMeshes": 2
             },
             "flower": {
-              "tris": 744,
-              "meshes": 1,
-              "drawnTris": 744,
-              "drawnMeshes": 1
+              "tris": 2304,
+              "meshes": 3,
+              "drawnTris": 1536,
+              "drawnMeshes": 2
             },
             "bush": {
-              "tris": 3840,
-              "meshes": 1,
-              "drawnTris": 3840,
-              "drawnMeshes": 1
+              "tris": 12240,
+              "meshes": 3,
+              "drawnTris": 8160,
+              "drawnMeshes": 2
             },
             "rock": {
-              "tris": 2040,
-              "meshes": 1,
-              "drawnTris": 2040,
-              "drawnMeshes": 1
+              "tris": 6120,
+              "meshes": 3,
+              "drawnTris": 4080,
+              "drawnMeshes": 2
             },
             "cone": {
-              "tris": 952,
-              "meshes": 1,
-              "drawnTris": 952,
-              "drawnMeshes": 1
+              "tris": 3640,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "bark0": {
-              "tris": 336,
-              "meshes": 1,
-              "drawnTris": 336,
-              "drawnMeshes": 1
+              "tris": 1176,
+              "meshes": 3,
+              "drawnTris": 1064,
+              "drawnMeshes": 2
             },
             "bark1": {
-              "tris": 560,
-              "meshes": 1,
-              "drawnTris": 560,
-              "drawnMeshes": 1
+              "tris": 1400,
+              "meshes": 3,
+              "drawnTris": 1232,
+              "drawnMeshes": 2
             },
             "bark2": {
-              "tris": 672,
-              "meshes": 1,
-              "drawnTris": 672,
-              "drawnMeshes": 1
+              "tris": 1568,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "leaf0": {
-              "tris": 840,
-              "meshes": 1,
-              "drawnTris": 840,
-              "drawnMeshes": 1
+              "tris": 2974,
+              "meshes": 3,
+              "drawnTris": 2686,
+              "drawnMeshes": 2
             },
             "leaf1": {
-              "tris": 1260,
-              "meshes": 1,
-              "drawnTris": 1260,
-              "drawnMeshes": 1
+              "tris": 3018,
+              "meshes": 3,
+              "drawnTris": 2640,
+              "drawnMeshes": 2
             },
             "leaf2": {
-              "tris": 1656,
-              "meshes": 1,
-              "drawnTris": 1656,
-              "drawnMeshes": 1
+              "tris": 3856,
+              "meshes": 3,
+              "drawnTris": 3588,
+              "drawnMeshes": 2
             }
           }
         },
@@ -1056,23 +1056,23 @@
     },
     "creek_day": {
       "reported": {
-        "calls": 91,
-        "mainCalls": 67,
-        "shadowCalls": 24,
-        "tris": 114790,
-        "mainTris": 86982,
-        "shadowTris": 27808,
+        "calls": 69,
+        "mainCalls": 69,
+        "shadowCalls": 0,
+        "tris": 242428,
+        "mainTris": 242428,
+        "shadowTris": 0,
         "texMB": 54.2
       },
       "walked": {
-        "drawnTris": 86970,
-        "residentTris": 334222.3333333333,
-        "drawnMeshes": 62
+        "drawnTris": 242416,
+        "residentTris": 391072.3333333333,
+        "drawnMeshes": 64
       },
       "reconcile": {
-        "mainTris": 86982,
+        "mainTris": 242428,
         "deltaTris": -12,
-        "deltaPct": -0.01
+        "deltaPct": 0
       },
       "systems": {
         "ground": {
@@ -1111,65 +1111,65 @@
         },
         "roads": {
           "tris": 14724,
-          "meshes": 29,
-          "drawnTris": 3000,
-          "drawnMeshes": 5,
+          "meshes": 11,
+          "drawnTris": 11196,
+          "drawnMeshes": 7,
           "parts": {
             "road": {
               "tris": 14724,
-              "meshes": 29,
-              "drawnTris": 3000,
-              "drawnMeshes": 5
+              "meshes": 11,
+              "drawnTris": 11196,
+              "drawnMeshes": 7
             }
           }
         },
         "decals": {
           "tris": 20079,
-          "meshes": 38,
-          "drawnTris": 5870,
-          "drawnMeshes": 8,
+          "meshes": 1,
+          "drawnTris": 20079,
+          "drawnMeshes": 1,
           "parts": {
             "contactAO": {
               "tris": 20079,
-              "meshes": 38,
-              "drawnTris": 5870,
-              "drawnMeshes": 8
+              "meshes": 1,
+              "drawnTris": 20079,
+              "drawnMeshes": 1
             }
           }
         },
         "buildings": {
-          "tris": 167792,
-          "meshes": 109,
-          "drawnTris": 8084,
-          "drawnMeshes": 14,
+          "tris": 150678,
+          "meshes": 16,
+          "drawnTris": 98679,
+          "drawnMeshes": 10,
           "parts": {
             "wall": {
-              "tris": 85656,
-              "meshes": 28,
-              "drawnTris": 3236,
-              "drawnMeshes": 3
+              "tris": 75524,
+              "meshes": 3,
+              "drawnTris": 47656,
+              "drawnMeshes": 2
             },
             "trim": {
-              "tris": 66790,
-              "meshes": 28,
-              "drawnTris": 3044,
-              "drawnMeshes": 3
+              "tris": 62902,
+              "meshes": 3,
+              "drawnTris": 43858,
+              "drawnMeshes": 2
             },
             "glass": {
-              "tris": 4020,
-              "meshes": 23,
-              "drawnTris": 80,
-              "drawnMeshes": 3
+              "tris": 3822,
+              "meshes": 3,
+              "drawnTris": 2153,
+              "drawnMeshes": 2
             },
             "roof": {
-              "tris": 7636,
-              "meshes": 24,
-              "drawnTris": 548,
-              "drawnMeshes": 3
+              "tris": 4740,
+              "meshes": 3,
+              "drawnTris": 3836,
+              "drawnMeshes": 2
             },
             "crest": {
               "tris": 1926,
-              "meshes": 3,
+              "meshes": 1,
               "drawnTris": 0,
               "drawnMeshes": 0
             },
@@ -1182,76 +1182,76 @@
           }
         },
         "foliage": {
-          "tris": 27692,
-          "meshes": 11,
-          "drawnTris": 27692,
-          "drawnMeshes": 11,
+          "tris": 101656,
+          "meshes": 33,
+          "drawnTris": 70138,
+          "drawnMeshes": 22,
           "parts": {
             "grass": {
-              "tris": 15032,
-              "meshes": 1,
-              "drawnTris": 15032,
-              "drawnMeshes": 1
+              "tris": 63360,
+              "meshes": 3,
+              "drawnTris": 42240,
+              "drawnMeshes": 2
             },
             "flower": {
-              "tris": 736,
-              "meshes": 1,
-              "drawnTris": 736,
-              "drawnMeshes": 1
+              "tris": 2304,
+              "meshes": 3,
+              "drawnTris": 1536,
+              "drawnMeshes": 2
             },
             "bush": {
-              "tris": 3860,
-              "meshes": 1,
-              "drawnTris": 3860,
-              "drawnMeshes": 1
+              "tris": 12240,
+              "meshes": 3,
+              "drawnTris": 8160,
+              "drawnMeshes": 2
             },
             "rock": {
-              "tris": 2040,
-              "meshes": 1,
-              "drawnTris": 2040,
-              "drawnMeshes": 1
+              "tris": 6120,
+              "meshes": 3,
+              "drawnTris": 4080,
+              "drawnMeshes": 2
             },
             "cone": {
-              "tris": 896,
-              "meshes": 1,
-              "drawnTris": 896,
-              "drawnMeshes": 1
+              "tris": 3640,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "bark0": {
-              "tris": 280,
-              "meshes": 1,
-              "drawnTris": 280,
-              "drawnMeshes": 1
+              "tris": 1176,
+              "meshes": 3,
+              "drawnTris": 1064,
+              "drawnMeshes": 2
             },
             "bark1": {
-              "tris": 560,
-              "meshes": 1,
-              "drawnTris": 560,
-              "drawnMeshes": 1
+              "tris": 1400,
+              "meshes": 3,
+              "drawnTris": 1232,
+              "drawnMeshes": 2
             },
             "bark2": {
-              "tris": 672,
-              "meshes": 1,
-              "drawnTris": 672,
-              "drawnMeshes": 1
+              "tris": 1568,
+              "meshes": 3,
+              "drawnTris": 1456,
+              "drawnMeshes": 2
             },
             "leaf0": {
-              "tris": 700,
-              "meshes": 1,
-              "drawnTris": 700,
-              "drawnMeshes": 1
+              "tris": 2974,
+              "meshes": 3,
+              "drawnTris": 2686,
+              "drawnMeshes": 2
             },
             "leaf1": {
-              "tris": 1260,
-              "meshes": 1,
-              "drawnTris": 1260,
-              "drawnMeshes": 1
+              "tris": 3018,
+              "meshes": 3,
+              "drawnTris": 2640,
+              "drawnMeshes": 2
             },
             "leaf2": {
-              "tris": 1656,
-              "meshes": 1,
-              "drawnTris": 1656,
-              "drawnMeshes": 1
+              "tris": 3856,
+              "meshes": 3,
+              "drawnTris": 3588,
+              "drawnMeshes": 2
             }
           }
         },

@@ -1,0 +1,633 @@
+{
+  "neutral.01.in": {
+    "cam": "two",
+    "lines": [
+      ["hana", "You will want the small door. It sticks."],
+      ["player", "You knew I was coming."],
+      ["hana", "I knew you would come home eventually.", "Everyone does. Push harder."]
+    ]
+  },
+
+  "neutral.01.out": {
+    "cam": "two",
+    "lines": [
+      ["hana", "Sacks in the far bay. Mind the step."],
+      ["player", "That is all you want to say to me?"],
+      ["hana", "There is a supper in the barn shortly.", "You can carry the chairs."]
+    ]
+  },
+
+  "neutral.02.in": {
+    "lines": [
+      ["sedge", "Rodents in the seed store. Fourteen."],
+      ["sedge", "Kill them and keep the tails."],
+      ["sedge", "Not the midden. The west field."]
+    ]
+  },
+
+  "neutral.02.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "vermin.field",
+    "lines": [
+      ["sedge", "Two spits down, and cover them well."],
+      ["player", "Why never the midden?"],
+      ["sedge", "Because we have always used the field."],
+      ["sedge", "Two hundred years of them under there.", "Best soil in the valley, and no wonder."]
+    ]
+  },
+
+  "neutral.03.in": {
+    "lines": [
+      ["fen", "Above the ford. The stretch nobody works."],
+      ["player", "Why does nobody work it?"],
+      ["fen", "Because it is ours, and we say so."]
+    ]
+  },
+
+  "neutral.03.out": {
+    "lines": [
+      ["fen", "Eight, and not a small one among them."],
+      ["fen", "Do not tell Whitewall what comes out", "of that water. They would want a share."]
+    ]
+  },
+
+  "neutral.04.in": {
+    "lines": [
+      ["wick_ww", "Sell first. Then we chalk the post."],
+      ["wick_ww", "Their number, their number, then ours."]
+    ]
+  },
+
+  "neutral.04.post": {
+    "cam": "close",
+    "once": true,
+    "mark": "prices.both",
+    "lines": [
+      ["player", "Why do we keep both their prices?"],
+      ["wick_ww", "So ours can sit between them."],
+      ["wick_ww", "A number in the middle is never asked", "about. That is the whole of the trick."]
+    ]
+  },
+
+  "neutral.04.out": {
+    "cam": "two",
+    "once": true,
+    "mark": "boundary.moves",
+    "lines": [
+      ["wick_ww", "One more. The west field post."],
+      ["player", "It is in the ground already."],
+      ["wick_ww", "Two paces west of where it was."],
+      ["wick_ww", "We shift it a little most years."],
+      ["wick_ww", "Nobody has ever mentioned the field", "getting bigger, and nobody ever will."]
+    ]
+  },
+
+  "neutral.05.in": {
+    "lines": [
+      ["sedge", "Flour off the west field. Bake with it."],
+      ["sedge", "Then eat it, and pay attention."]
+    ]
+  },
+
+  "neutral.05.out": {
+    "cam": "close",
+    "lines": [
+      ["player", "One loaf, and the work came easier."],
+      ["sedge", "Good bread does that."],
+      ["player", "Not like that, it does not."],
+      ["sedge", "Not today. Ask me in the spring."]
+    ]
+  },
+
+  "neutral.22.in": {
+    "lines": [
+      ["hana", "The whole village eats in the barn once", "a year. This year you cook it."],
+      ["player", "For how many?"],
+      ["hana", "Everyone. Start with the honey."]
+    ]
+  },
+
+  "neutral.22.out": {
+    "cam": "wide",
+    "lines": [
+      ["hana", "Sit at the end table. Go on."],
+      ["player", "I would rather keep serving."],
+      ["hana", "I know you would. Sit anyway."],
+      ["hana", "You will want to remember sitting there."]
+    ]
+  },
+
+  "neutral.06.in": {
+    "cam": "two",
+    "lines": [
+      ["hana", "Whitewall is in the yard.", "Blackstone is at the gate."],
+      ["hana", "Take the tea out. Slowly."],
+      ["player", "What if they see each other?"],
+      ["hana", "Then they both go home in a temper", "and buy nothing."],
+      ["hana", "And the hens want doing after."],
+      ["player", "You always say that."],
+      ["hana", "Because the hens always want doing."]
+    ]
+  },
+
+  "neutral.06.white": {
+    "lines": [
+      ["ivo", "Steward Ivo. Whitewall Almonry."],
+      ["ivo", "I am told your flour is the best here.", "I am not told which field it is off."],
+      ["player", "It is a field. There are several."],
+      ["ivo", "Quite. I never write the field down."]
+    ]
+  },
+
+  "neutral.06.black": {
+    "lines": [
+      ["ossa", "Ossa. Blackstone. I will not keep you."],
+      ["ossa", "Weight, price, and a cart. In that order."],
+      ["player", "There is another buyer in the yard."],
+      ["ossa", "Then I will stand here and watch hens."]
+    ]
+  },
+
+  "neutral.06.out": {
+    "cam": "two",
+    "lines": [
+      ["hana", "Both paid. Neither one the wiser."],
+      ["player", "That was a farce."],
+      ["hana", "That is how a village stays a village."]
+    ]
+  },
+
+  "neutral.07.in": {
+    "lines": [
+      ["sedge", "Pear onto thorn. Cut clean, bind hard."],
+      ["sedge", "The thorn does not know it is a pear.", "It feeds what it is holding regardless."]
+    ]
+  },
+
+  "neutral.07.out": {
+    "cam": "close",
+    "once": true,
+    "lines": [
+      ["sedge", "Now the same thing, on your own face."],
+      ["player", "People cannot do that."],
+      ["sedge", "We can. Ash in the cloth. Hold still."],
+      ["sedge", "Three counts, and do not breathe out."],
+      ["sedge", "There. Say something in his voice."],
+      ["sedge", "The Watch reads faces, not clothes.", "Remember that and you will be fine."]
+    ]
+  },
+
+  "neutral.08.in": {
+    "cam": "two",
+    "lines": [
+      ["hana", "There has always been a cousin", "in Whitewall that nobody can place."],
+      ["hana", "Dob was him for eleven years."],
+      ["player", "And now it is me."],
+      ["hana", "Now it is you. His name is Ansel."]
+    ]
+  },
+
+  "neutral.08.kesta": {
+    "cam": "two",
+    "lines": [
+      ["kesta", "Ansel. You still owe me a drink."],
+      ["player", "I owe half the yard a drink."],
+      ["kesta", "You do. Where were you at harvest?"],
+      ["kesta", "Never mind. Nobody stays anywhere."]
+    ]
+  },
+
+  "neutral.08.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "ansel.you",
+    "lines": [
+      ["hana", "Nobody looked twice."],
+      ["player", "Kesta asked after my harvest."],
+      ["hana", "Then Ansel had a harvest. Good."],
+      ["hana", "He is not a lie. He is a post,", "and the house keeps somebody in it."]
+    ]
+  },
+
+  "neutral.23.in": {
+    "lines": [
+      ["fen", "Eels at first light, both towns by noon."],
+      ["player", "In whose face?"],
+      ["fen", "Your own. A cart out of here is a cart.", "Nobody has ever stopped one."]
+    ]
+  },
+
+  "neutral.23.out": {
+    "cam": "two",
+    "lines": [
+      ["player", "Two towns and nobody asked me anything."],
+      ["fen", "They never do. We feed them."],
+      ["fen", "A face is for watching with.", "Trading we do as ourselves."]
+    ]
+  },
+
+  "neutral.09.in": {
+    "lines": [
+      ["wick_ww", "The covenant is read at High."],
+      ["wick_ww", "Nine measures drawn, nine returned.", "Stand in white and count it yourself."]
+    ]
+  },
+
+  "neutral.09.read": {
+    "cam": "wide",
+    "lines": [
+      ["alder", "Nine measures drawn. Nine returned."],
+      ["alder", "That is the whole of it, and it is enough."],
+      ["player", "As it is given, so it is given back."],
+      ["alder", "Good lad. You have a Sanctum voice."]
+    ]
+  },
+
+  "neutral.09.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "covenant.wrong",
+    "lines": [
+      ["player", "Eleven measures. I counted four times."],
+      ["wick_ww", "Eleven. Same as my grandfather had."],
+      ["player", "Then the ledger was never the lie."],
+      ["wick_ww", "No. The number they read out was.", "It has been wrong since before the wall."]
+    ]
+  },
+
+  "neutral.10.in": {
+    "lines": [
+      ["fen", "Three crates over. Take four off."],
+      ["player", "There will only be three on board."],
+      ["fen", "There is always one already aboard."]
+    ]
+  },
+
+  "neutral.10.out": {
+    "cam": "two",
+    "once": true,
+    "mark": "count.by.design",
+    "lines": [
+      ["player", "Four off, three on. It never holds."],
+      ["fen", "It has not held in forty years."],
+      ["player", "Because you load it that way."],
+      ["fen", "Because we load it that way.", "One crate a crossing. Nobody misses one."]
+    ]
+  },
+
+  "neutral.11.in": {
+    "lines": [
+      ["hana", "The wagon goes up the Drove Road", "on the eighth, and it goes covered."],
+      ["hana", "Four of ours go on it at the barn.", "You will want to be up there when it goes."]
+    ]
+  },
+
+  "neutral.11.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "wagon.longacre",
+    "lines": [
+      ["dob", "Sacking, then sacks. Have a look."],
+      ["player", "Half of this came out of our barn."],
+      ["dob", "A bit over half, most eighth days."],
+      ["dob", "Whitewall calls it their surplus."],
+      ["dob", "They are not lying. They just never", "asked whose barn it stood in first."]
+    ]
+  },
+
+  "neutral.12.in": {
+    "lines": [
+      ["sedge", "An eastern face wants eastern ash."],
+      ["sedge", "Three caps off the heath.", "Burn them down in your own hearth."]
+    ]
+  },
+
+  "neutral.12.out": {
+    "cam": "close",
+    "lines": [
+      ["sedge", "Hold it. Do not talk yet."],
+      ["sedge", "Her jaw sits further forward than that."],
+      ["player", "How do you know her jaw?"],
+      ["sedge", "I fostered her out. Same as you."]
+    ]
+  },
+
+  "neutral.13.in": {
+    "cam": "two",
+    "lines": [
+      ["nim", "Sela. They had you up top all week."],
+      ["player", "I was. I am not now."],
+      ["nim", "Good. Nobody props the fourth properly."],
+      ["nim", "Mind the ladder. Third rung is a liar."]
+    ]
+  },
+
+  "neutral.13.out": {
+    "cam": "two",
+    "lines": [
+      ["nim", "Best shift I have had in a month."],
+      ["player", "Get some sleep, Nim."],
+      ["nim", "You never call me that."],
+      ["nim", "Sela calls me boy. Everyone does."],
+      ["player", "Then get some sleep, boy."],
+      ["nim", "That is more like it. Goodnight."]
+    ]
+  },
+
+  "neutral.25.in": {
+    "lines": [
+      ["dob", "Two suppers today. One at each end."],
+      ["dob", "Whitewall salts late. Blackstone salts", "first and never again."],
+      ["dob", "Cook both and you can be both."]
+    ]
+  },
+
+  "neutral.25.out": {
+    "cam": "two",
+    "lines": [
+      ["player", "Marrin asked where I learned it."],
+      ["dob", "And you said your mother, and she", "smiled, and that was the end of it."],
+      ["dob", "Knowing what a town eats is the work."],
+      ["dob", "The face is only what they look at."]
+    ]
+  },
+
+  "neutral.14.in": {
+    "cam": "two",
+    "lines": [
+      ["hana", "They will want somebody to question."],
+      ["player", "And it should be me."],
+      ["hana", "It should be somebody who can be", "frightened well and then let go."],
+      ["hana", "Tell them the truth. The shaft is dry."],
+      ["player", "That will send them over the water."],
+      ["hana", "Yes. Onto a hole in the ground."]
+    ]
+  },
+
+  "neutral.14.ask": {
+    "cam": "two",
+    "lines": [
+      ["alder", "You are Sela, off the fourth level."],
+      ["bel", "She is shaking. Fetch her a blanket."],
+      ["alder", "Nobody here is going to hurt you."]
+    ],
+    "choices": [
+      { "say": "The shaft is dry.", "goto": "neutral.14.dry", "sets": [["flag", "neutral.14.told", true]] },
+      { "say": "I only carry props.", "goto": "neutral.14.slow" },
+      { "say": "You will not let me go.", "goto": null }
+    ]
+  },
+
+  "neutral.14.dry": {
+    "lines": [
+      ["alder", "Dry. You are certain of that."],
+      ["player", "Sixty years down, and dry."],
+      ["alder", "Thank you. That was kindly done."]
+    ]
+  },
+
+  "neutral.14.slow": {
+    "lines": [
+      ["alder", "Props, to a shaft that gives nothing."],
+      ["player", "It is dry. Everyone down there knows."],
+      ["alder", "Then it was kind of you to say so."]
+    ]
+  },
+
+  "neutral.14.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "sela.was.you",
+    "lines": [
+      ["bel", "A quarter of an hour and she gave it up."],
+      ["alder", "People do, when they are frightened."],
+      ["alder", "Tell the muster. We move in the spring."],
+      ["player", "A true thing, said on purpose."]
+    ]
+  },
+
+  "neutral.15.in": {
+    "cam": "close",
+    "lines": [
+      ["dob", "Window. Quietly. Take the wire."],
+      ["player", "How did you get in here?"],
+      ["dob", "I did not. I am delivering bread."],
+      ["dob", "Nobody marked. Not one of them."]
+    ]
+  },
+
+  "neutral.15.out": {
+    "cam": "two",
+    "lines": [
+      ["dob", "Not a bruise on anybody. Good."],
+      ["player", "They will think she walked out."],
+      ["dob", "They will think she was let out,", "and spend a month arguing about who."]
+    ]
+  },
+
+  "neutral.24.in": {
+    "lines": [
+      ["sedge", "Something in the west field is eating well."],
+      ["player", "Eating what?"],
+      ["sedge", "What we bury. Clear it off the strips", "before anybody puts a spade in."]
+    ]
+  },
+
+  "neutral.24.out": {
+    "cam": "close",
+    "lines": [
+      ["player", "That was not a rat."],
+      ["sedge", "No. It has had two hundred years of them."],
+      ["sedge", "We feed the field. The field feeds back.", "You do not always like what it feeds."]
+    ]
+  },
+
+  "neutral.16.in": {
+    "lines": [
+      ["sedge", "A foot down, along the fence line."],
+      ["sedge", "Six spits. Lift the chalk out first."]
+    ]
+  },
+
+  "neutral.16.out": {
+    "cam": "wide",
+    "once": true,
+    "mark": "root.longacre",
+    "lines": [
+      ["player", "That is not chalk. That is glass."],
+      ["sedge", "It runs the whole length of the fence."],
+      ["player", "Blackstone dug sixty years for this."],
+      ["sedge", "Blackstone dug sixty years towards it."],
+      ["sedge", "We have buried rats on top of it since", "before either of those walls went up."]
+    ]
+  },
+
+  "neutral.26.in": {
+    "lines": [
+      ["fen", "One more turn above the ford."],
+      ["fen", "You know what you are standing on now."]
+    ]
+  },
+
+  "neutral.26.out": {
+    "cam": "two",
+    "lines": [
+      ["player", "Twice the size of Whitewall's."],
+      ["fen", "Water off the root. Always has been."],
+      ["fen", "That is why nobody else works it,", "and why nobody has ever asked why not."]
+    ]
+  },
+
+  "neutral.17.table": {
+    "cam": "wide",
+    "lines": [
+      ["hana", "Sit. Sedge on your left, Wick opposite."],
+      ["hana", "Dob has the pot. That is all of us."],
+      ["player", "This is the Household?"],
+      ["hana", "Six chairs and a long table. Yes."]
+    ]
+  },
+
+  "neutral.17.seam": {
+    "cam": "close",
+    "once": true,
+    "mark": "household",
+    "lines": [
+      ["sedge", "Two orders came up this valley arguing."],
+      ["sedge", "One took the high ground, one took the", "deep ground. Both walked past us."],
+      ["sedge", "The kitchen staff stayed where the food", "was, which was on top of the seam."],
+      ["player", "You kept the best of it by standing still."],
+      ["sedge", "We kept it by never once mentioning it."]
+    ]
+  },
+
+  "neutral.17.out": {
+    "cam": "two",
+    "once": true,
+    "mark": "fostered.policy",
+    "lines": [
+      ["player", "And me. Why send me away at all?"],
+      ["hana", "A house that only knows itself is no use."],
+      ["hana", "You were not placed. You were posted."],
+      ["player", "For twenty years."],
+      ["hana", "And you came back knowing both towns", "better than either town knows itself."]
+    ]
+  },
+
+  "neutral.18.in": {
+    "lines": [
+      ["sedge", "A bright core and a hollow, one cast."],
+      ["player", "Those are opposite things."],
+      ["sedge", "They are two things. You have two hands."]
+    ]
+  },
+
+  "neutral.18.out": {
+    "cam": "close",
+    "lines": [
+      ["sedge", "Neither wall could hold that for a second."],
+      ["sedge", "Whitewall would call it bad manners."],
+      ["sedge", "Blackstone would call it showing off."],
+      ["player", "And you call it?"],
+      ["sedge", "Work. Go and try it on the voles."]
+    ]
+  },
+
+  "neutral.19.in": {
+    "lines": [
+      ["wick_ww", "Four seasons on the post. Read them back."],
+      ["wick_ww", "Then I will show you what happened", "in the fortnight after each one."]
+    ]
+  },
+
+  "neutral.19.out": {
+    "cam": "close",
+    "once": true,
+    "mark": "prices.raids",
+    "lines": [
+      ["player", "Water went up in the spring."],
+      ["wick_ww", "And Blackstone came for the east stands."],
+      ["player", "Grain went up after the harvest."],
+      ["wick_ww", "And Whitewall marched on the keep."],
+      ["player", "We set both of those numbers."],
+      ["wick_ww", "We set both of them. On a post,", "in chalk, and the rain takes it by winter."]
+    ]
+  },
+
+  "neutral.20.ask": {
+    "cam": "two",
+    "lines": [
+      ["dob", "Go on. You have been circling all week."]
+    ],
+    "choices": [
+      { "say": "Who were you before Ansel?", "goto": "neutral.20.before" },
+      { "say": "How many faces this year?", "goto": "neutral.20.count" },
+      { "say": "Which one is left?", "goto": null, "sets": [["flag", "neutral.20.blunt", true]] }
+    ]
+  },
+
+  "neutral.20.before": {
+    "lines": [
+      ["dob", "A boy in the cott row with big hands."],
+      ["dob", "Then Ansel, for eleven years."],
+      ["dob", "Then a carter out of Blackstone."]
+    ]
+  },
+
+  "neutral.20.count": {
+    "lines": [
+      ["dob", "Four. Five, if the carter counts twice."],
+      ["dob", "He had two names and both of them worked."]
+    ]
+  },
+
+  "neutral.20.out": {
+    "cam": "close",
+    "once": true,
+    "lines": [
+      ["dob", "You want me to say which one is real."],
+      ["player", "Is one of them?"],
+      ["dob", "Dob is the one who stayed."],
+      ["dob", "That is not the same as real.", "It is what I have, and I like it."]
+    ]
+  },
+
+  "neutral.21.in": {
+    "cam": "two",
+    "lines": [
+      ["hana", "Whitewall is on the Drove Road."],
+      ["hana", "Blackstone is coming up from the ford."],
+      ["player", "They will meet at Millbridge."],
+      ["hana", "On top of it. Of course they will."]
+    ]
+  },
+
+  "neutral.21.posture": {
+    "cam": "close",
+    "lines": [
+      ["hana", "One morning, and three ways to spend it."],
+      ["hana", "Say it plainly. I will do the rest."]
+    ],
+    "choices": [
+      { "say": "Tend. Show them the root, all of it.", "goto": null,
+        "sets": [["flag", "neutral.posture.tend", true]] },
+      { "say": "Take. Let them break on the bridge.", "goto": null,
+        "sets": [["flag", "neutral.posture.take", true]] },
+      { "say": "Keep. Stop it, and tell nobody.", "goto": null,
+        "sets": [["flag", "neutral.posture.keep", true]] }
+    ]
+  },
+
+  "neutral.21.out": {
+    "cam": "wide",
+    "once": true,
+    "lines": [
+      ["hana", "Both of them went home. That is rare."],
+      ["player", "And the field?"],
+      ["hana", "The field is a field. Ask me next year."],
+      ["hana", "Straw braid for your belt. It is a long", "furrow, and you are on it now."],
+      ["hana", "The chairs want putting away. Go on."]
+    ]
+  }
+}

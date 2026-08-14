@@ -11,15 +11,20 @@ import { Market } from './market.js';
 import { Audio } from './audio.js';
 import { gameHost, el } from './ui.js';
 import { nearestAnchor } from './areas.js';
-import { blank, rollDay, checkPosition, POSITION, addItem } from './save.js';
+import { blank, rollDay, checkPosition, POSITION, addItem, itemCount } from './save.js';
 import { appendLog } from './journal.js';
-import { pins, basicOf, unlocked, outclassed } from './sheet.js';
+import { pins, basicOf, unlocked, outclassed, levelIn } from './sheet.js';
 import * as vitals from './vitals.js';
 import { next as nextPrompt, settle, HOLD } from './onboard.js';
 import { quote, rows as wareRows } from './sale.js';
+import { nameOf } from './towns.js';
 import { FOOTSTEP_EVERY, RANGE } from './sounds.js';
-import { focusCost } from '../sim/spells.js';
+import { focusCost, canCast, idOf, SPELLS } from '../sim/spells.js';
 import { transactionXp, itemTier } from '../sim/economy.js';
+import {
+  FACTIONS, GRAFT, SUSPICION, WATCH_WEIGHT, BLOCKED,
+  newGraft, graftBlocked, startGraft, tickGraft, endGraft, graftEvent, breakGraft,
+} from '../sim/faction.js';
 import * as store from './savestore.js';
 import { Autosave } from './savestore.js';
 
@@ -27,6 +32,7 @@ const LOOK_SCALE = 0.6;
 const STUCK_SECONDS = 4;
 const STUCK_METRES = 0.15;
 const REACH = 400;
+const ASH = 'hearth_ash';
 
 export class Session {
   constructor(app, player, opts = {}) {
@@ -47,6 +53,11 @@ export class Session {
     this.prompt = null;
     this.promptT = 0;
     this.stick = 0;
+    // A Graft is combat-timescale (SYSTEMS §9.2): it never crosses a load, so it is built here and
+    // never read back off the document.
+    this.graft = newGraft();
+    this.suspicion = 0;
+    this.knob = { duration: 1, suspicion: 1, channel: GRAFT.channel };
 
     const loaded = opts.fresh ? null : store.load();
     this.doc = loaded?.doc || blank(opts.seed);
@@ -54,6 +65,7 @@ export class Session {
     if (loaded?.error) this.notices.push(loaded.error);
     if (loaded?.warnings?.length) this.notices.push(...loaded.warnings);
 
+    this.doc.worn = null;
     this.clock = new WorldClock(player);
     this.clock.load(this.doc.clock);
     this.doc = rollDay(this.doc, this.clock.day);
@@ -85,7 +97,7 @@ export class Session {
       host: this.host, clock: this.clock, dialogue: this.dialogue,
       doc: this.doc, world: { ...this.world, sound: id => this.audio.play(id), uiBusy: () => this.uiBusy },
     });
-    this.quests.onSave = () => this.autosave.flush();
+    this.quests.onSave = () => { this.canGraft = undefined; this.autosave.flush(); };
 
     this.journal = new JournalScreen({
       host: this.host,
@@ -143,6 +155,12 @@ export class Session {
     this.q = q;
     this.clock.registerKnobs(q);
     this.audio.registerKnobs(q, this.doc.settings);
+    q.register({ key: 'graftDuration', label: 'Graft duration ×', type: 'range', min: 0.1, max: 3, step: 0.05, default: 1, group: 'Graft' },
+      v => { this.knob.duration = v; });
+    q.register({ key: 'graftSuspicion', label: 'Suspicion rate ×', type: 'range', min: 0, max: 3, step: 0.05, default: 1, group: 'Graft' },
+      v => { this.knob.suspicion = v; });
+    q.register({ key: 'graftChannel', label: 'Graft channel (s)', type: 'range', min: 0.2, max: 6, step: 0.1, default: GRAFT.channel, group: 'Graft' },
+      v => { this.knob.channel = v; });
   }
 
   async start(params = new URLSearchParams()) {
@@ -367,14 +385,22 @@ export class Session {
     const t = this.context;
     if (t?.kind === 'talk') return this.talk(t.id);
     if (t?.kind === 'trade') return this.market.show(t.stall);
+    if (t?.kind === 'graft') return this.graftTap();
     this.audio.play('uiConfirm');
     if (t?.id) this.quests.emit({ t: 'interact', id: t.id, verb: this.school });
   }
 
   channel(phase, kind) {
-    if (phase === 'start') { this.audio.play(kind === 'work' ? 'lineCast' : 'cast'); return; }
+    if (phase === 'start') {
+      if (kind === 'graft') return this.graftStart();
+      this.audio.play(kind === 'work' ? 'lineCast' : 'cast');
+      return;
+    }
+    // A pointercancel is a phone call, not a mistake: nothing was charged, so nothing is taken.
+    if (phase === 'cancel') { if (kind === 'graft') this.graftFail(null); return; }
     if (phase !== 'release') return;
     this.ob.channelled = true;
+    if (kind === 'graft') return this.graftRelease();
     this.act(kind);
   }
 
@@ -395,7 +421,233 @@ export class Session {
     this.ob.cast = true;
     this.audio.play('cast');
     this.buzz(6);
-    this.quests.emit({ t: 'cast', school: this.school });
+    this.suspect(this.tell(spell));
+    this.quests.emit({ t: 'cast', school: this.school, spell: idOf(spell) });
+  }
+
+  // ── the Graft, SYSTEMS §8.3 ─────────────────────────────────────────────
+
+  // What a cast gives away while you are wearing someone else's face. A spell with no `factionId`
+  // is nobody's in particular, and the worn faction's own bolt is the point of the disguise.
+  tell(spell) {
+    const worn = this.graft.worn;
+    if (!worn || !spell?.factionId || spell.factionId === worn) return null;
+    return spell.factionId === this.doc.faction ? 'ownField' : 'wrongProjectile';
+  }
+
+  suspect(event) {
+    if (!event || !this.graft.worn) return;
+    this.graft = graftEvent(this.graft, event);
+    this.suspicion = this.graft.susp;
+    if (this.graft.susp >= SUSPICION.breakAt) this.onBreak();
+  }
+
+  graftGranted() {
+    const done = Object.entries(this.doc.quests)
+      .filter(([, r]) => r.s === 'done')
+      .map(([id]) => this.quests.defs[id]?.story)
+      .filter(Boolean);
+    return canCast('graft', { schools: this.doc.schools, grasp: 0, standingBand: null, questsDone: done })
+      || this.graftAsked();
+  }
+
+  // N07's fifth step *is* the first Graft, and N07 is what grants the spell — so the grant cannot
+  // only come from the quest being done or the campaign never starts. A live step asking for a
+  // graft is the lesson, and the lesson grants it.
+  graftAsked() {
+    for (const [id, rec] of Object.entries(this.doc.quests)) {
+      if (rec.s !== 'active') continue;
+      const steps = this.quests.defs[id]?.steps.filter(s => !s.optional);
+      if (steps?.[rec.i]?.verb === 'graft') return true;
+    }
+    return false;
+  }
+
+  // STORY §12: Hearth Ash is free at any Longacre hearth, which is the Tithe Barn and nowhere else.
+  atHomeHearth() {
+    return this.quests.here.some(a => {
+      const area = this.quests.areas[a];
+      return area?.hearth && area.town === 'neutral';
+    });
+  }
+
+  blocked() {
+    return graftBlocked(this.graft, {
+      granted: this.graftGranted(),
+      ash: itemCount(this.doc, ASH) + (this.atHomeHearth() ? 1 : 0),
+      seen: this.watch().seen,
+    });
+  }
+
+  // Every Watchman inside line-of-sight range, split into the band that raises suspicion and the
+  // band that merely stops it falling. Kesta counts double and Warden Alder barely counts.
+  watch() {
+    const out = { n: 0, hold: 0, weight: 1, seen: false };
+    const p = this.player?.pos;
+    if (!p) return out;
+    const list = [
+      ...(this.world.watch?.() || []),
+      ...(this.world.targets?.() || []).filter(t => t.kind === 'watch'),
+    ];
+    let heaviest = 0;
+    for (const w of list) {
+      const d = Math.hypot(w.x - p.x, w.z - p.z);
+      if (d > GRAFT.losRadius) continue;
+      out.seen = true;
+      if (d <= SUSPICION.radius) {
+        out.n++;
+        heaviest = Math.max(heaviest, w.weight ?? WATCH_WEIGHT[w.id] ?? WATCH_WEIGHT.watch);
+      } else if (d <= SUSPICION.holdRadius) out.hold++;
+    }
+    if (out.n) out.weight = heaviest;
+    return out;
+  }
+
+  indoorsHome() {
+    if (!this.player?.floorY) return false;
+    return this.quests.here.some(a => this.quests.areas[a]?.town === 'neutral');
+  }
+
+  graftStart() {
+    const why = this.blocked();
+    if (why) { this.hud.finish(false); this.audio.play('uiError'); this.hud.say(BLOCKED[why]); return; }
+    this.audio.play('cast');
+  }
+
+  graftTap() {
+    if (this.graft.worn) return this.unGraft();
+    this.audio.play('uiError');
+    this.hud.say('Hold it. Three counts.');
+  }
+
+  // Focus and the ash are spent on completion, never on the attempt: SYSTEMS §8.3 prices a Graft
+  // at one Hearth Ash and nothing in the game makes ash, so a channel broken by a phone call must
+  // not eat one. A failed channel costs the short cooldown and that is all.
+  graftFail(text) {
+    if (this.graft.worn) return;
+    this.dropFace();
+    if (!text) return;
+    this.graft = { ...this.graft, cd: GRAFT.cooldown };
+    this.audio.play('uiError');
+    this.hud.say(text);
+  }
+
+  graftRelease() {
+    if (this.graft.worn) return;
+    if (this.hud.charge < 1) return this.graftFail('The channel broke.');
+    const why = this.blocked();
+    if (why) { this.audio.play('uiError'); this.hud.say(BLOCKED[why]); return; }
+    this.chooseFace();
+  }
+
+  // The whole of spell selection. A Graft borrows one of the two sides and never Longacre, which
+  // is the face you already have — so it is two buttons, not a spellbook.
+  faces() { return FACTIONS.filter(f => f !== 'neutral' && f !== this.doc.faction); }
+
+  chooseFace() {
+    if (this.face) return;
+    const card = el('div', 'g-prompt g-faces');
+    // `.g-prompt` is a 55%-opacity hint sitting on the bottom edge, which is not what a choice
+    // looks like. The rule belongs in game.css beside it; game.css is not mine this pass.
+    card.style.cssText = 'opacity:1; flex-direction:row; justify-content:center; bottom:24%';
+    card.append(el('span', null, 'Whose face?'));
+    for (const f of this.faces()) {
+      const b = el('button', null, nameOf(f));
+      b.onclick = () => { this.dropFace(); this.graftInto(f); };
+      card.append(b);
+    }
+    this.host.append(card);
+    this.face = card;
+    this.faceT = setTimeout(() => this.graftFail('The moment passed.'), 8000);
+  }
+
+  dropFace() {
+    clearTimeout(this.faceT);
+    this.face?.remove();
+    this.face = null;
+  }
+
+  graftInto(faction) {
+    const why = this.blocked();
+    if (why) { this.audio.play('uiError'); this.hud.say(BLOCKED[why]); return false; }
+    const after = vitals.spend(this.vitals, focusCost(SPELLS.graft, { guttered: this.vitals.guttered > 0 }), this.limits);
+    if (!after.spent) { this.audio.play('uiError'); return false; }
+    this.vitals = after;
+    if (!this.atHomeHearth()) addItem(this.doc, ASH, -1);
+    this.graft = startGraft(this.graft, faction, {
+      glamour: levelIn(this.doc, 'glamour'),
+      durationMul: this.knob.duration,
+    });
+    this.wear(faction);
+    this.audio.play('uiConfirm');
+    this.buzz(16);
+    this.hud.say(`${nameOf(faction)}, until they look twice.`);
+    this.quests.emit({ t: 'interact', id: 'self', verb: this.school, spell: 'graft' });
+    this.autosave.mark();
+    return true;
+  }
+
+  // `setZone` takes the APPEARANCE id (SYSTEMS §8.3) — it is what swaps the robe and the bolt
+  // colour. The true faction never moves off `doc.faction`.
+  wear(faction) {
+    this.doc.worn = faction;
+    this.suspicion = this.graft.susp;
+    this.player?.setZone?.(faction || this.doc.faction);
+    this.quests.draw();
+  }
+
+  unGraft(reason = 'voluntary') {
+    if (!this.graft.worn) return 0;
+    const r = endGraft(this.graft, { reason });
+    this.graft = r.graft;
+    this.wear(null);
+    if (r.xp) this.quests.apply(['xp', 'glamour', Math.round(r.xp)]);
+    this.audio.play(reason === 'expire' ? 'uiBlip' : 'uiConfirm');
+    this.hud.say(reason === 'expire' ? 'Your own face, back again.' : 'You put your own face on.');
+    this.autosave.mark();
+    return r.xp;
+  }
+
+  // §8.3's comeback: the punishment lands and the game immediately hands back the other faction
+  // for twenty seconds, with no ash and no channel.
+  onBreak() {
+    const worn = this.graft.worn;
+    if (!worn) return;
+    const b = breakGraft(this.doc.standing, worn);
+    for (const f of FACTIONS) this.doc.standing[f] = b.standing[f];
+    const r = endGraft(this.graft, { reason: 'break' });
+    this.graft = startGraft(r.graft, b.freeGraft.faction, { seconds: b.freeGraft.seconds, free: true });
+    this.wear(this.graft.worn);
+    this.world.aggro?.(b.aggroRadius, this.player?.pos);
+    this.audio.play('uiError');
+    this.buzz(40);
+    this.hud.say(`They have you. ${nameOf(b.freeGraft.faction)}, and be quick.`);
+    this.autosave.mark();
+  }
+
+  graftTick(dt) {
+    const near = this.watch();
+    // §8.3's precondition holds for the whole channel, not just its first frame: a Watchman who
+    // walks into line of sight while you are mid-cast ends it.
+    if (!this.graft.worn && this.hud.held && this.context?.kind === 'graft' && near.seen) {
+      this.hud.finish(false);
+      this.graftFail('Someone saw you.');
+    }
+    const r = tickGraft(this.graft, dt, {
+      watchmen: near.n,
+      nearby: near.hold,
+      watchWeight: near.weight,
+      glamour: levelIn(this.doc, 'glamour'),
+      indoorsLongacre: this.indoorsHome(),
+      rateKnob: this.knob.suspicion,
+    });
+    this.graft = r.graft;
+    this.suspicion = r.graft.susp;
+    for (const e of r.events) {
+      if (e === 'break') this.onBreak();
+      else if (e === 'expire') this.unGraft('expire');
+      else if (e.startsWith('tick')) this.audio.play('uiBlip');
+    }
   }
 
   // ── the market ──────────────────────────────────────────────────────────
@@ -480,9 +732,20 @@ export class Session {
 
   // ── the context button's target ─────────────────────────────────────────
 
+  // Dialling Glamour is the spell selection: with Graft granted, your own face becomes the thing
+  // the context button acts on, which is exactly how the pack authors it — `interact("self", 1)`.
+  selfTarget() {
+    const p = this.player?.pos;
+    if (!p || this.school !== 'glamour') return null;
+    // The grant walks every quest record, so it is cached and dropped when a quest state moves.
+    if (this.canGraft === undefined) this.canGraft = this.graftGranted();
+    if (!this.canGraft) return null;
+    return { id: 'self', kind: 'graft', label: this.graft.worn ? 'unveil' : 'graft', x: p.x, z: p.z, range: 1 };
+  }
+
   retarget() {
     const p = this.player?.pos;
-    const list = p ? (this.world.targets?.() || []) : [];
+    const list = p ? [...(this.world.targets?.() || []), this.selfTarget()].filter(Boolean) : [];
     let best = null, cost = Infinity;
     for (const t of list) {
       const d = Math.hypot(t.x - p.x, t.z - p.z);
@@ -519,9 +782,11 @@ export class Session {
       t: this.clock.t,
       day: this.clock.day,
       suspicion: this.suspicion || 0,
-      buffs: 0,
+      channelSeconds: this.context?.kind === 'graft' ? this.knob.channel : 1.2,
+      graft: this.graft,
+      buffs: this.graft.worn ? 1 : 0,
       holdAssist: this.doc.settings.holdAssist,
-      prompt: this.uiBusy || this.dialogue.active ? null : this.prompt,
+      prompt: this.uiBusy || this.dialogue.active || this.face ? null : this.prompt,
     };
   }
 
@@ -537,6 +802,7 @@ export class Session {
 
     this.limits = vitals.limits(this.doc.schools);
     this.vitals = vitals.tick(this.vitals, dt, this.limits);
+    this.graftTick(dt);
     this.retarget();
     this.watchStuck(dt);
     this.footsteps(dt);

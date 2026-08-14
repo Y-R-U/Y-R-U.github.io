@@ -1,13 +1,18 @@
 // Every authored number that is data rather than formula. No logic lives here.
 // SYSTEMS.md §3.2, §5.1, §6.1–6.6, §7.3.
 
+// `geo` names the rig in js/world/, not the animal: the six that said 'rat' are three different
+// creatures and js/world/vermin.js builds all three from one parameterised quadruped.
 export const ENEMIES = {
   grain_rat:   { level: 1,  hp: 10,   armour: 0,  damage: 5.1,  geo: 'rat',     xp: { cull: 40,  kindle: 12 },              drops: [['rat_tail', 1]], mk: 2 },
   mire_rat:    { level: 3,  hp: 52,   armour: 6,  damage: 10.3, geo: 'rat',     xp: { cull: 95,  kindle: 26 },              drops: [['rat_tail', 1]], mk: 4 },
   rat_knot:    { level: 4,  hp: 80,   armour: 0,  damage: 12.9, geo: 'rat',     xp: { cull: 60,  kindle: 18 },              drops: [['rat_tail', 1]], mk: 3, pack: 4 },
   sour_crow:   { level: 5,  hp: 112,  armour: 4,  damage: 15.5, geo: 'chicken', xp: { cull: 180, kindle: 60 },              drops: [['crow_quill', 1]], mk: 8 },
-  creek_crab:  { level: 4,  hp: 80,   armour: 18, damage: 12.9, geo: 'rat',     xp: { cull: 130, kindle: 40, ward: 20 },    drops: [['crab_shell', 1]], mk: 7 },
-  blight_boar: { level: 8,  hp: 226,  armour: 20, damage: 23.3, geo: 'rat',     xp: { cull: 340, kindle: 120, ward: 60 },   drops: [['boar_tusk', 1]], mk: 18 },
+  creek_crab:  { level: 4,  hp: 80,   armour: 18, damage: 12.9, geo: 'crab',    xp: { cull: 130, kindle: 40, ward: 20 },    drops: [['crab_shell', 1]], mk: 7 },
+  blight_boar: { level: 8,  hp: 226,  armour: 20, damage: 23.3, geo: 'boar',    xp: { cull: 340, kindle: 120, ward: 60 },   drops: [['boar_tusk', 1]], mk: 18 },
+  // STORY §L18: the raid on the east water stands is robed casters with black staffs, and until
+  // now no such enemy existed, so the quest pack substituted a Hollow four levels early.
+  raider:      { level: 8,  hp: 226,  armour: 21, damage: 23.3, geo: 'people',  xp: { cull: 180, kindle: 250, ward: 90 },   drops: [['staff_shard', 1]], mk: 20 },
   hollow:      { level: 10, hp: 316,  armour: 22, damage: 28.5, geo: 'people',  xp: { kindle: 420, ward: 140 },             drops: [['hollow_ash', 1]], mk: 24, immune: ['cull'] },
   watchman:    { level: 12, hp: 416,  armour: 26, damage: 33.7, geo: 'people',  xp: { kindle: 700, ward: 280, glamour: 60 }, drops: [['watch_seal', 1]], mk: 34 },
   brood_mother:{ level: 6,  hp: 900,  armour: 12, damage: 26.0, geo: 'rat',     xp: { cull: 900, kindle: 300, ward: 120 },  drops: [['brood_sac', 1]], mk: 60, boss: true },
@@ -88,7 +93,7 @@ for (const r of Object.values(ROCK)) raw[r.item] = r.value;
 
 export const ITEM_VALUE = {
   ...raw,
-  rat_tail: 3, crow_quill: 9, crab_shell: 14, boar_tusk: 40,
+  rat_tail: 3, crow_quill: 9, crab_shell: 14, boar_tusk: 40, staff_shard: 50,
   hollow_ash: 60, watch_seal: 110, brood_sac: 180, champion_token: 500,
   thread: 4, hearth_ash: 0,
 };
@@ -135,6 +140,8 @@ export const SHOP = {
   coarse_line: { price: 40, charm: 1, school: 'line' },
   whetted_core: { price: 40, charm: 1, school: 'kindle' },
   warm_cord: { price: 55, charm: 1, school: 'ward' },
+  // Free at any Longacre hearth; this is the away-from-home price (STORY §12).
+  hearth_ash: { price: 350 },
 };
 
 export const FERRY = { adjacent: 12, endToEnd: 30, trustedMul: 0.5, swornMul: 0 };
@@ -155,7 +162,7 @@ export const REGION_ENEMIES = {
   whitewall_low:      ['grain_rat', 'mire_rat'],
   river:              ['mire_rat', 'rat_knot', 'creek_crab'],
   fields:             ['rat_knot', 'sour_crow'],
-  whitewall_upper:    ['sour_crow', 'blight_boar'],
+  whitewall_upper:    ['sour_crow', 'blight_boar', 'raider'],
   blackstone_approach:['hollow', 'blight_boar', 'watchman'],
   blackstone_town:    ['watchman', 'hollow'],
   finale:             ['champion_1', 'champion_2', 'champion_3'],

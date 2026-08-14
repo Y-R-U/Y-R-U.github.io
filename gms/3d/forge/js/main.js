@@ -139,3 +139,7 @@ applyParams();
 app.start();
 document.getElementById('boot').classList.add('gone');
 window.__forge.ready = true;
+
+import { Vermin } from './world/vermin.js';
+window.__forge.vermin = app.add(new Vermin(demo.terrain));
+refreshPanel();

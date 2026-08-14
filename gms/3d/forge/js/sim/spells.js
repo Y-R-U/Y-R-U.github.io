@@ -62,14 +62,20 @@ export function tierUnlocked(tier, schoolLevel, grasp, standingBand) {
   return !g.standing || standingBand === g.standing;
 }
 
+// A spell carrying a `quest` is story-granted and skips the tier gate entirely (SYSTEMS §2.3:
+// Graft arrives from N07, and Glamour level then scales its duration, not its availability).
+// Gating it on tier 4 as well would make it uncastable until Glamour 17 / Sworn, which is four
+// acts after the campaign starts asking for it.
 export function canCast(id, { schools, grasp, standingBand, questsDone = [] }) {
   const s = SPELLS[id];
   if (!s) return false;
-  if (s.quest && !questsDone.includes(s.quest)) return false;
+  if (s.quest) return questsDone.includes(s.quest);
   return tierUnlocked(s.tier, schools[s.school] || 1, grasp, standingBand);
 }
 
 export const factionBolt = faction => faction === 'dark' ? SPELLS.bolt_dark : SPELLS.bolt_light;
+
+export const idOf = spell => Object.keys(SPELLS).find(k => SPELLS[k] === spell) || null;
 
 export const focusCost = (spell, { charge = 1, guttered = false, factionCostMul = 1 } = {}) =>
   spell.cost * charge * factionCostMul * (guttered ? 1.6 : 1);

@@ -55,7 +55,7 @@ export const QUESTS = [
   { id: 'L10', act: 'L2', title: 'Two Ledgers', w: 'chore', schools: ['barter'],
     work: [['interact', 4], ['talk', 2]] },
   { id: 'L11', act: 'L2', title: 'Escort West', w: 'main', schools: ['ward'],
-    work: [['escort', 500], ['kill', 'rat_knot', 4]] },
+    work: [['escort', 500], ['kill', 'rat_knot', 4], ['absorb', 8, 14]] },
   { id: 'L12', act: 'L2', title: 'The Fish Are Wrong', w: 'finale', schools: ['hearth'],
     work: [['catch', 'whitewall', 4], ['cook', 'chalk_trout', 4]] },
 
@@ -90,7 +90,7 @@ export const QUESTS = [
   { id: 'L28', act: 'L5', title: 'Two Hundred Bowls', w: 'chore', schools: ['hearth'],
     work: [['catch', 'whitewall', 8], ['cook', 'chalk_trout', 14], ['interact', 4]] },
   { id: 'L23', act: 'L5', title: 'The Strike on Blackstone', w: 'main', schools: ['kindle', 'cull', 'ward'],
-    work: [['travel', 573], ['kill', 'hollow', 6], ['kill', 'watchman', 6], ['survive', 240], ['absorb', 12, 20]] },
+    work: [['travel', 573], ['kill', 'hollow', 6], ['kill', 'raider', 4], ['kill', 'watchman', 6], ['survive', 240], ['absorb', 12, 20]] },
   { id: 'L24', act: 'L5', title: 'The Covenant, Read Again', w: 'finale', xpAll: true,
     work: [['talk', 5]], echo: 'white_cord', unlocks: 'dark' },
 
@@ -138,14 +138,14 @@ export const QUESTS = [
   { id: 'D18', act: 'D4', title: 'The Watcher on the Ridge', w: 'main', schools: ['ward'],
     work: [['travel', 400], ['interact', 3], ['kill', 'hollow', 4]] },
   { id: 'D19', act: 'D4', title: 'Below the Bottom', w: 'finale', schools: ['setting', 'cull'],
-    work: [['rock', 'obsidian', 6], ['kill', 'hollow', 8]] },
+    work: [['rock', 'obsidian', 6], ['kill', 'blight_boar', 4], ['kill', 'mire_rat', 8]] },
 
   { id: 'D20', act: 'D5', title: 'Everything Down', w: 'main', schools: ['setting', 'barter'],
     work: [['interact', 10], ['travel', 200], ['sell', 'obsidian_core', 6]] },
   { id: 'D25', act: 'D5', title: 'Feeding the Retake', w: 'chore', schools: ['hearth'],
     work: [['cook', 'blackeel', 12], ['interact', 6]] },
   { id: 'D21', act: 'D5', title: 'The Night We Came Back Up', w: 'main', schools: ['kindle', 'cull', 'ward'],
-    work: [['kill', 'watchman', 12], ['survive', 300], ['absorb', 12, 30]] },
+    work: [['kill', 'watchman', 6], ['kill', 'raider', 4], ['survive', 300], ['absorb', 12, 30]] },
   { id: 'D22', act: 'D5', title: 'What the Root Is', w: 'finale', schools: ['setting'],
     work: [['travel', 800], ['rock', 'obsidian', 4]], echo: 'short_rope', unlocks: 'neutral' },
 

@@ -29,17 +29,21 @@ const args = parseArgs();
 
 const PORT = 8731 + (process.pid % 200);   // 8600 is kept free for the long-lived dev server
 const CDP_PORT = 9431 + (process.pid % 200);
-const W = +(args.w || 1600), H = +(args.h || 900);
+// --all renders every scenario, and 3200 × 1800 software-rendered over a 1440 m world does not
+// finish in a usable time. A sweep gets the smaller profile unless it is asked for otherwise.
+const W = +(args.w || (args.all ? 1280 : 1600)), H = +(args.h || (args.all ? 720 : 900));
 const PRESET = args.preset || 'high';
-const DPR = args.dpr || 2;
+const DPR = args.dpr || (args.all ? 1 : 2);
 const HEADED = !!args.headed || !!args.perf;
 const OUTDIR = resolve(ROOT, args.outdir || 'shots');
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript',
   '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg' };
 
+// Walks up from `port` until one is free. Several agents run these tools at once and pid % 200
+// collides often enough that a fixed port made a run die with EADDRINUSE.
 function serve(port) {
-  return new Promise(res => {
+  return new Promise((res, rej) => {
     const s = http.createServer((req, rp) => {
       let p = join(ROOT, decodeURIComponent(req.url.split('?')[0]));
       if (!existsSync(p) || statSync(p).isDirectory()) p = join(p, 'index.html');
@@ -47,13 +51,16 @@ function serve(port) {
       rp.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' });
       createReadStream(p).pipe(rp);
     });
-    s.listen(port, () => res(s));
+    let tries = 0;
+    s.on('error', e => (e.code === 'EADDRINUSE' && ++tries < 60 ? s.listen(port + tries) : rej(e)));
+    s.on('listening', () => res(s));
+    s.listen(port);
   });
 }
 
-async function chrome(w, h, headed) {
+async function chrome(w, h, headed, cdpPort) {
   const flags = [
-    `--remote-debugging-port=${CDP_PORT}`,
+    `--remote-debugging-port=${cdpPort}`,
     `--user-data-dir=/tmp/forge-cdp-${process.pid}`,
     `--window-size=${w},${h}`,
     '--no-first-run', '--no-default-browser-check', '--disable-extensions',
@@ -65,7 +72,7 @@ async function chrome(w, h, headed) {
   const proc = spawn(CHROME, flags, { stdio: 'ignore', detached: false });
   for (let i = 0; i < 80; i++) {
     try {
-      const r = await fetch(`http://127.0.0.1:${CDP_PORT}/json/version`);
+      const r = await fetch(`http://127.0.0.1:${cdpPort}/json/version`);
       return { proc, ws: (await r.json()).webSocketDebuggerUrl };
     } catch { await sleep(150); }
   }
@@ -74,6 +81,18 @@ async function chrome(w, h, headed) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const logs = [];
+
+// Chrome given a busy --remote-debugging-port does not fail loudly: /json/version answers from
+// whoever already owns it, and this run would attach to another agent's browser.
+function freePort(start) {
+  return new Promise((res, rej) => {
+    const s = http.createServer();
+    let tries = 0;
+    s.on('error', e => (e.code === 'EADDRINUSE' && ++tries < 60 ? s.listen(start + tries) : rej(e)));
+    s.on('listening', () => { const { port } = s.address(); s.close(() => res(port)); });
+    s.listen(start);
+  });
+}
 
 class CDP {
   constructor(url) { this.id = 0; this.pending = new Map(); this.url = url; }
@@ -105,7 +124,8 @@ class CDP {
 // is served from. Exported so other tools (tools/budget.mjs) do not re-implement any of this.
 export async function open({ w = 1600, h = 900, dpr = 2, mobile = false, headed = false } = {}) {
   const server = await serve(PORT);
-  const { proc, ws } = await chrome(w, h, headed);
+  const port = server.address().port;
+  const { proc, ws } = await chrome(w, h, headed, await freePort(CDP_PORT));
   PROC = proc;
   const cdp = new CDP(ws);
   await cdp.connect();
@@ -142,7 +162,7 @@ export async function open({ w = 1600, h = 900, dpr = 2, mobile = false, headed 
   }
 
   return {
-    S, logs, base: `http://127.0.0.1:${PORT}`,
+    S, logs, base: `http://127.0.0.1:${port}`,
     async close() {
       await S('Browser.close').catch(() => {});
       cleanup(proc);
@@ -158,7 +178,9 @@ async function main() {
   mkdirSync(OUTDIR, { recursive: true });
   const results = [];
 
-  for (const shot of shots) {
+  for (const [i, shot] of shots.entries()) {
+    const t0 = Date.now();
+    if (shots.length > 1) process.stdout.write(`[${i + 1}/${shots.length}] ${shot} … `);
     const url = `${base}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}${args.hud ? '&hud=1' : ''}${args.set ? '&' + args.set : ''}`;
     await S('Page.navigate', { url });
     await waitFor(S, `window.__forge && window.__forge.ready`, 15000);
@@ -185,7 +207,7 @@ async function main() {
     if (args.eval) console.log('  eval:', JSON.stringify(await evalJSON(S, args.eval)));
     for (const l of logs.splice(0)) console.log('  ' + l);
     // calls/tris are the total the GPU drew; the bracket is the main pass alone (total − shadow)
-    console.log(`${shot}  ${stats.fps.toFixed(0)}fps  gpu ${fmt(stats.gpuP95)}ms  cpu ${fmt(stats.cpuP95)}ms  ${stats.calls} calls (${stats.mainCalls} main)  ${(stats.tris / 1000).toFixed(0)}k tris (${(stats.mainTris / 1000).toFixed(0)}k main)  → ${png}`);
+    console.log(`${shot}  ${stats.fps.toFixed(0)}fps  gpu ${fmt(stats.gpuP95)}ms  cpu ${fmt(stats.cpuP95)}ms  ${stats.calls} calls (${stats.mainCalls} main)  ${(stats.tris / 1000).toFixed(0)}k tris (${(stats.mainTris / 1000).toFixed(0)}k main)  ${((Date.now() - t0) / 1000).toFixed(0)}s  → ${png}`);
   }
 
   await close();

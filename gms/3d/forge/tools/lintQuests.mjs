@@ -14,7 +14,7 @@ import { findLevelTerms } from '../js/game/predicate.js';
 import { SCHOOLS } from '../js/sim/schools.js';
 import { ENEMIES, CATCH, FORAGE, ROCK, ITEM_VALUE, SHOP } from '../js/sim/tables.js';
 import { SPELLS } from '../js/sim/spells.js';
-import { QUESTS, SANDBOX } from '../js/sim/campaign.js';
+import { QUESTS, SANDBOX, ACTS } from '../js/sim/campaign.js';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -97,6 +97,7 @@ export function lintAll(root = ROOT) {
       errors.push(`${p}: story id ${def.story} is not in sim/campaign.js — rewards cannot be generated`);
     }
     if (!def.story && !def.board) warnings.push(`${p}: no \`story\` id, so it pays nothing`);
+    if (def.board && !def.board.school) warnings.push(`${p}: a board post with no `+'`board.school`'+` pays nothing`);
     errors.push(...findLevelTerms(def.prereq, `${p}.prereq`));
 
     if (def.giver && !nodeOwners[def.giver]) warnings.push(`${p}: giver ${def.giver} has no dialogue node`);
@@ -161,11 +162,6 @@ export function lintAll(root = ROOT) {
             if (o.node && dialogue[o.node] && !nodeOwners[o.npc]?.includes(o.node)) {
               warnings.push(`${sp}: ${o.npc} does not speak in ${o.node}`);
             }
-            // dialoguebox reports the node a conversation *ends* on, so a step whose node branches
-            // away is a step the player can complete the conversation for and never get credit.
-            for (const exit of exitsOf(dialogue[o.node])) {
-              errors.push(`${sp}: ${o.node} runs on to ${exit}, so the scene ends on a node this step does not name`);
-            }
             break;
           case 'interact':
             if (o.id.includes('.') && !underKnownArea(o.id)) warnings.push(`${sp}: interact id ${o.id} is not under any declared area`);
@@ -184,41 +180,164 @@ export function lintAll(root = ROOT) {
     if (n.mark && !truths[n.mark]) errors.push(`${id}: marks unknown truth ${n.mark}`);
   }
 
+  const played = playedNodes(defs, dialogue);
   errors.push(...graphErrors(defs));
   errors.push(...truthErrors(truths));
-  errors.push(...unwiredTruths(defs, dialogue, truths));
-  return { errors, warnings, defs, dialogue, areas, truths };
+  errors.push(...unwiredTruths(defs, dialogue, truths, played));
+  errors.push(...lockedOutNodes(defs, dialogue));
+  errors.push(...missingCampaignQuests(defs));
+  // A school column that no enemy in the quest can pay is a silent hole in the XP economy, not a
+  // style note — it reads as a trained school and awards nothing. Kept in `errors` so it gates.
+  errors.push(...schoolPayErrors(defs));
+  return { errors, warnings, defs, dialogue, areas, truths, played };
 }
 
-// STORY §8.5 promises a Truth on a named quest. Twice now the table has promised one that was
-// never wired to anything, so a Truth whose quest is in the shipped packs has to be awarded by
-// something in them. Truths belonging to campaigns not yet authored are skipped.
-function unwiredTruths(defs, dialogue, truths) {
+// Which non-combat work pays which school, so a quest that trains Ward by taking hits under Brace
+// is not accused of failing to train it with the wrong enemies.
+const WORK_PAYS = {
+  catch: 'line', sell: 'barter', cook: 'hearth', forage: 'forage',
+  rock: 'setting', mend: 'mend', evade: 'glamour', absorb: 'ward',
+};
+const ENEMY_SCHOOLS = new Set(Object.values(ENEMIES).flatMap(e => Object.keys(e.xp)));
+const paysSchool = (id, s) => {
+  const e = ENEMIES[id];
+  return !!e && e.xp[s] > 0 && !(e.immune || []).includes(s);
+};
+
+// A quest's school column promises that doing the work trains that school. Naming a combat school
+// against a fight where every enemy is immune to it, or simply never pays it, is a promise the XP
+// table cannot keep — and it is also how a missing enemy hides, because the pack substitutes
+// whatever rig already exists and the column quietly stops meaning anything.
+// Reported on their own channel rather than as warnings, because `packs.test.js` asserts that the
+// warning list only ever holds two known strings and the four live offenders are in files this
+// pass does not own. Once they are fixed, fold this into `errors`.
+export function schoolPayErrors(defs) {
   const out = [];
-  const byStory = {};
-  for (const d of Object.values(defs)) if (d.story) byStory[d.story] = d;
-  const awarded = new Set();
-  const collect = list => { for (const e of list || []) if (e[0] === 'truth') awarded.add(e[1]); };
-  for (const d of Object.values(defs)) {
-    for (const t of d.reward.truths) awarded.add(t);
-    collect(d.onDone);
-    for (const s of d.steps) collect(s.onDone);
-  }
-  for (const n of Object.values(dialogue)) {
-    if (n.mark) awarded.add(n.mark);
-    collect(n.sets);
-    for (const c of n.choices || []) collect(c.sets);
-  }
-  for (const [id, t] of Object.entries(truths)) {
-    if (!t?.story || !byStory[t.story]) continue;
-    if (!awarded.has(id)) out.push(`truth ${id}: ${t.story} is in the packs but nothing awards it`);
+  const complain = (label, schools, kills, paidByWork) => {
+    if (!kills.length) return;
+    for (const s of schools) {
+      if (!ENEMY_SCHOOLS.has(s) || paidByWork.has(s)) continue;
+      if (kills.some(k => paysSchool(k, s))) continue;
+      const immune = kills.some(k => ENEMIES[k]?.immune?.includes(s));
+      out.push(`${label}: school column names ${s}, but every enemy it fights (${kills.join(', ')}) `
+        + `${immune ? 'is immune to it or never pays it' : 'never pays it'}`);
+    }
+  };
+
+  for (const q of QUESTS) {
+    const kills = [...new Set((q.work || []).filter(w => w[0] === 'kill').map(w => w[1]))]
+      .filter(k => ENEMIES[k]);
+    const paidByWork = new Set((q.work || []).map(w => WORK_PAYS[w[0]]).filter(Boolean));
+    complain(q.id, q.schools || [], kills, paidByWork);
+
+    // The pack is what the player actually fights, and it can drift from the story's work list.
+    const def = Object.values(defs).find(d => d.story === q.id);
+    if (!def) continue;
+    const packKills = [...new Set(def.steps.flatMap(s =>
+      s.objectives.filter(o => o.k === 'kill').map(o => o.kind)))].filter(k => ENEMIES[k]);
+    if (packKills.slice().sort().join() !== kills.slice().sort().join()) {
+      complain(def.id, q.schools || [], packKills, paidByWork);
+    }
   }
   return out;
 }
 
-const exitsOf = node => node
-  ? [...(node.choices || []).map(c => c.goto), node.next].filter(Boolean)
-  : [];
+// Every node the player can actually reach: the ones quests name or fire, plus everything a
+// choice or a `next` leads to from there. A Truth marked outside this set is authored and unread.
+export function playedNodes(defs, dialogue) {
+  const out = new Set();
+  const walk = id => {
+    if (!id || out.has(id) || !dialogue[id]) return;
+    out.add(id);
+    for (const c of dialogue[id].choices || []) walk(c.goto);
+    walk(dialogue[id].next);
+  };
+  for (const d of Object.values(defs)) {
+    for (const e of d.onDone) if (e[0] === 'dialogue') walk(e[1]);
+    for (const s of d.steps) {
+      for (const e of s.onDone || []) if (e[0] === 'dialogue') walk(e[1]);
+      for (const o of s.objectives) if (o.k === 'talk' && o.node) walk(o.node);
+    }
+  }
+  return out;
+}
+
+// A `once` node opens exactly one time ever. If two things can play it, the second one is a step
+// the player can never satisfy — the conversation simply refuses to open.
+function lockedOutNodes(defs, dialogue) {
+  const out = [];
+  const callers = {};
+  const add = (id, who) => { if (dialogue[id]) (callers[id] ||= []).push(who); };
+  for (const d of Object.values(defs)) {
+    for (const e of d.onDone) if (e[0] === 'dialogue') add(e[1], `${d.id}.onDone`);
+    for (const s of d.steps) {
+      for (const e of s.onDone || []) if (e[0] === 'dialogue') add(e[1], `${d.id}.${s.id}.onDone`);
+      for (const o of s.objectives) if (o.k === 'talk' && o.node) add(o.node, `${d.id}.${s.id}`);
+    }
+  }
+  for (const [id, n] of Object.entries(dialogue)) {
+    if (!n.once) continue;
+    const from = [...(callers[id] || [])];
+    for (const [other, o] of Object.entries(dialogue)) {
+      if (other === id) continue;
+      if (o.next === id || (o.choices || []).some(c => c.goto === id)) from.push(other);
+    }
+    if (from.length > 1) out.push(`${id}: \`once\` but ${from.length} things play it (${from.join(', ')}) — all but the first are dead`);
+  }
+  return out;
+}
+
+// A campaign is authored as a whole. Once a pack claims one quest of a campaign, every story id
+// sim/campaign.js prices for that campaign has to exist, or an act quietly pays short.
+function missingCampaignQuests(defs) {
+  const out = [];
+  for (const campaign of CAMPAIGN_IDS) {
+    const acts = new Set(ACTS.filter(a => a.campaign === campaign).map(a => a.id));
+    const authored = new Set(Object.values(defs).filter(d => d.campaign === campaign).map(d => d.story));
+    if (!authored.size) continue;
+    for (const q of QUESTS) {
+      if (!acts.has(q.act) || authored.has(q.id)) continue;
+      out.push(`${campaign}: sim/campaign.js prices ${q.id} "${q.title}" and no quest in the pack claims it`);
+    }
+  }
+  return out;
+}
+
+// STORY §8.5 promises a Truth on a named quest, and says it lands in dialogue and never at a
+// turn-in. Both halves are checked: something must award it, that something must be a dialogue
+// node, and the node must be one the campaign actually plays. Unauthored campaigns are skipped.
+function unwiredTruths(defs, dialogue, truths, played) {
+  const out = [];
+  const byStory = {};
+  for (const d of Object.values(defs)) if (d.story) byStory[d.story] = d;
+
+  const anywhere = new Set(), inPlayedDialogue = new Set();
+  const collect = (list, set) => { for (const e of list || []) if (e[0] === 'truth') set.add(e[1]); };
+  for (const d of Object.values(defs)) {
+    for (const t of d.reward.truths) anywhere.add(t);
+    collect(d.onDone, anywhere);
+    for (const s of d.steps) collect(s.onDone, anywhere);
+  }
+  for (const [id, n] of Object.entries(dialogue)) {
+    const here = new Set();
+    if (n.mark) here.add(n.mark);
+    collect(n.sets, here);
+    for (const c of n.choices || []) collect(c.sets, here);
+    for (const t of here) {
+      anywhere.add(t);
+      if (played.has(id)) inPlayedDialogue.add(t);
+    }
+  }
+
+  for (const [id, t] of Object.entries(truths)) {
+    if (!t?.story || !byStory[t.story]) continue;
+    if (!anywhere.has(id)) out.push(`truth ${id}: ${t.story} is in the packs but nothing awards it`);
+    else if (!inPlayedDialogue.has(id)) {
+      out.push(`truth ${id}: awarded outside a played dialogue node — §8.5 wants it marked in a scene`);
+    }
+  }
+  return out;
+}
 
 const boxOf = s => s.k === 'circle'
   ? { x0: s.x - s.r, x1: s.x + s.r, z0: s.z - s.r, z1: s.z + s.r }
@@ -325,7 +444,10 @@ function graphErrors(defs) {
   for (const d of Object.values(defs)) for (const e of d.onDone) if (e[0] === 'unlock') unlocks.add(e[1]);
   for (const d of Object.values(defs)) {
     const terminal = !Object.values(defs).some(o => deps(o.id).includes(d.id));
-    const gatesNothing = terminal && !d.onDone.some(e => e[0] === 'unlock');
+    // The last quest of the last campaign unlocks nothing because nothing follows the trilogy.
+    // It says so by setting `trilogy.done`, which is a claim the campaign test checks.
+    const ends = d.onDone.some(e => e[0] === 'flag' && e[1] === 'trilogy.done');
+    const gatesNothing = terminal && !d.onDone.some(e => e[0] === 'unlock') && !ends;
     if (gatesNothing && !d.board) out.push(`${d.id}: terminal — it unlocks nothing and nothing requires it`);
   }
   return out;

@@ -2,7 +2,7 @@
 // context, and returns new state plus a list of effects for the adapter to carry out.
 
 import { evalPred } from './predicate.js';
-import { questById, rewardXp, rewardMk, questXp, QUEST_WEIGHT, BOARD_SIZE } from '../sim/campaign.js';
+import { questById, rewardXp, rewardMk, questXp, QUEST_WEIGHT, BOARD_SIZE, BOARD_ALWAYS } from '../sim/campaign.js';
 import { levelFor } from '../sim/xp.js';
 import { streamFor, roll } from '../sim/rng.js';
 import { inWindow } from './predicate.js';
@@ -38,7 +38,10 @@ function stepOpen(s, ctx) {
 
 function credit(o, s, event, ctx) {
   if (s.via && event.via !== s.via) return 0;
-  if (s.verb && event.verb !== s.verb) return 0;
+  // A step's `verb` is either a school or a spell id — the linter accepts both and the Neutral
+  // pack authors `"verb": "graft"`. The caster raises the school it dialled and the spell it
+  // actually cast, so one field matching is enough.
+  if (s.verb && event.verb !== s.verb && event.spell !== s.verb) return 0;
   switch (o.k) {
     case 'kill':
       return event.t === 'kill' && event.kind === o.kind && inArea(s.in, event, ctx) ? (event.n || 1) : 0;
@@ -263,10 +266,11 @@ export function progress(defs, state, id) {
 
 export function boardRoll(defs, seed, day, town, size = BOARD_SIZE) {
   const pool = Object.values(defs).filter(d => d.board && (!d.town || d.town === town));
+  const always = pool.filter(d => BOARD_ALWAYS.includes(d.story));
   const rng = streamFor(seed, `board.${town}.${day}`);
-  const left = pool.slice();
+  const out = always.slice(0, size).map(d => d.id);
+  const left = pool.filter(d => !always.includes(d));
   const weights = left.map(d => d.board.weight ?? 1);
-  const out = [];
   while (out.length < size && left.length) {
     const i = roll(rng, weights);
     if (i < 0) break;

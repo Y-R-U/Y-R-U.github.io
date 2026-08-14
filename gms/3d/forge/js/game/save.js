@@ -39,7 +39,7 @@ export function blank(seed = (Date.now() & 0x7fffffff)) {
     created: Date.now(),
     played: 0,
     clock: { t: 4 },
-    campaign: { current: 'light', act: 1, done: [], echoes: [], postures: {} },
+    campaign: { current: 'light', act: 1, done: [], echoes: [], postures: {}, merged: {} },
     faction: 'light',
     worn: null,
     schools: blankSchools(),
@@ -99,6 +99,8 @@ export function clampAll(raw, warnings = [], { defs = null, items = null, truths
     done: arr(c.done).filter(x => FACTIONS.includes(x)),
     echoes: arr(c.echoes).filter(x => typeof x === 'string'),
     postures: obj(c.postures),
+    // RUNTIME §4.4's one-portrait-two-names reveal. Defaults to {}, which is v1 behaviour.
+    merged: Object.fromEntries(Object.entries(obj(c.merged)).filter(([, v]) => typeof v === 'string')),
   };
   d.faction = FACTIONS.includes(raw.faction) ? raw.faction : 'light';
   // A Graft is combat-timescale (SYSTEMS §9.2): you are never reloaded mid-disguise.

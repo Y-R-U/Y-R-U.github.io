@@ -545,7 +545,7 @@ export class Scatter {
     this.object3D.name = 'scatter';
     this.meshes = [];
     this.trees = [];
-    this.treeSets = [];
+    this.sets = [];
     this.density = 1;
     this.treeStyle = TUNING.tree.style;
   }
@@ -958,12 +958,12 @@ export class Scatter {
         mesh.computeBoundingSphere();
         this.object3D.add(mesh);
         this.meshes.push(mesh);
-        if (name === 'trunk' || CROWNS.includes(name)) this.treeSets.push({ mesh, items: k.items, name });
+        this.sets.push({ mesh, items: k.items, name, tree: name === 'trunk' || CROWNS.includes(name) });
       }
     }
 
-    this.applyTreeStyle(this.treeStyle);
-    this.applyDensity(quality?.get('foliage') ?? 1);
+    this.density = quality?.get('foliage') ?? this.density;
+    this.repack();
     if (new URLSearchParams(location.search).has('dev')) this.devScenarios();
   }
 
@@ -1010,22 +1010,39 @@ export class Scatter {
     for (const m of this.meshes) m.count = Math.max(0, Math.min(m.userData.max, Math.round(m.userData.max * f)));
   }
 
-  // Every tree carries an instance in every crown variant, so switching silhouette is a repack of
-  // 66 matrices per zone rather than a rebuild. Anything not wanted by the current style ends up
-  // with count 0 and is never drawn, so only one crown's triangles are ever paid for.
-  applyTreeStyle(style) {
-    this.treeStyle = style;
+  // WORLD.md §6.4's player-centred foliage. One instanced mesh per zone per kind spans the whole
+  // 1440 m map, so its bounding sphere catches every frustum and three's cull never fires; keeping
+  // only the instances inside `r` is what takes street_dusk's grass from 63 k to a town's worth.
+  // Cheap enough to be called on a movement threshold, not per frame.
+  focus(x, z, r) {
+    this.focusAt = { x, z, r };
+    this.repack();
+  }
+
+  // One pass over the source instances, writing whichever of them the tree style and the focus
+  // radius both accept. Every tree carries an instance in every crown variant, so switching
+  // silhouette is a repack rather than a rebuild and only one crown's triangles are ever paid for.
+  repack() {
+    const style = this.treeStyle;
     const mix = style === 'mixed';
     const pick = mix ? TUNING.tree.conifer : style;
-    for (const { mesh, items, name } of this.treeSets) {
+    const f = this.focusAt;
+    const r2 = f ? f.r * f.r : Infinity;
+    for (const { mesh, items, name, tree } of this.sets) {
       let n = 0;
       for (const it of items) {
-        if (style === 'none') break;
-        const con = mix ? it.con : style !== 'broadleaf';
-        const want = name === 'trunk' ? con
-          : BROAD.test(name) ? !con && +name[4] === it.sp
-            : con && (name === pick || (name === 'sprig' && pick === 'spire'));
-        if (!want) continue;
+        if (tree) {
+          if (style === 'none') break;
+          const con = mix ? it.con : style !== 'broadleaf';
+          const want = name === 'trunk' ? con
+            : BROAD.test(name) ? !con && +name[4] === it.sp
+              : con && (name === pick || (name === 'sprig' && pick === 'spire'));
+          if (!want) continue;
+        }
+        if (f) {
+          const dx = it.m.elements[12] - f.x, dz = it.m.elements[14] - f.z;
+          if (dx * dx + dz * dz > r2) continue;
+        }
         mesh.setMatrixAt(n, it.m);
         mesh.setColorAt(n, it.c);
         n++;
@@ -1039,6 +1056,11 @@ export class Scatter {
       mesh.computeBoundingSphere();
     }
     this.applyDensity(this.density);
+  }
+
+  applyTreeStyle(style) {
+    this.treeStyle = style;
+    if (this.sets.length) this.repack();
   }
 
   registerKnobs(q) {

@@ -1,0 +1,873 @@
+[
+  {
+    "id": "neutral.01",
+    "story": "N01",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "Coming Home",
+    "summary": "Walk in as yourself. Open the mill.",
+    "giver": "hana",
+    "prereq": ["quest", "dark.22", "done"],
+    "steps": [
+      { "id": "gate", "do": ["goto", "lac.ashgate"],
+        "text": "Walk into Longacre by the Ash Gate",
+        "hint": "West off the heath. Nobody will stop you.",
+        "recover": [["moveTo", "heath.ford"]] },
+
+      { "id": "in", "do": ["talk", "hana", "neutral.01.in"],
+        "text": "Find the miller" },
+
+      { "id": "mill", "do": ["goto", "lac.mill"],
+        "text": "Follow her down to the mill",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "open", "do": ["interact", "lac.mill.hatch", 2], "in": "lac.mill",
+        "verb": "setting",
+        "text": "Open the mill",
+        "hint": "The hatch, then the leat gate. It sticks.",
+        "recover": [["arm", "lac.mill.hatch"], ["moveTo", "lac.mill"]] },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.01.out"],
+        "text": "Ask her what she wants doing" }
+    ],
+    "onDone": [["flag", "neutral.home", true], ["unlock", "neutral.02"], ["unlock", "neutral.03"]]
+  },
+
+  {
+    "id": "neutral.02",
+    "story": "N02",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "The Seed Store",
+    "summary": "Cull them. Bury them in the west field.",
+    "giver": "sedge",
+    "prereq": ["quest", "neutral.01", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.02.in"],
+        "text": "Take the job off Granny Sedge" },
+
+      { "id": "cull", "do": ["kill", "grain_rat", 14], "in": "lac.granary",
+        "text": "Clear the seed store",
+        "recover": [["moveTo", "lac.granary"], ["respawn", "grain_rat", 14]] },
+
+      { "id": "dig", "do": ["interact", "lac.westfield.spit", 2], "in": "lac.westfield",
+        "verb": "forage",
+        "text": "Turn two spits at the west fence",
+        "recover": [["arm", "lac.westfield.spit"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "bury", "do": ["deliver", "rat_tail", 14, "lac.westfield"], "in": "lac.westfield",
+        "text": "Bury them where she said",
+        "recover": [["grant", "rat_tail", 14], ["moveTo", "lac.westfield"]] },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.02.out"],
+        "text": "Ask why it is never the midden" }
+    ],
+    "onDone": [["flag", "neutral.vermin.buried", true], ["unlock", "neutral.05"]]
+  },
+
+  {
+    "id": "neutral.03",
+    "story": "N03",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "The Quiet Stretch",
+    "summary": "Fish above the ford. Nobody asks.",
+    "giver": "fen",
+    "prereq": ["quest", "neutral.01", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "neutral.03.in"],
+        "text": "Take a line off Fen" },
+
+      { "id": "fish", "do": ["gather", "ford_eel", 8], "in": "stand.quiet",
+        "text": "Work the stretch above the ford",
+        "hint": "Nobody else fishes it. Nobody ever has.",
+        "recover": [["moveTo", "stand.quiet"]] },
+
+      { "id": "out", "do": ["talk", "fen", "neutral.03.out"],
+        "text": "Bring the eels down to the bridge" }
+    ],
+    "onDone": [["unlock", "neutral.04"]]
+  },
+
+  {
+    "id": "neutral.04",
+    "story": "N04",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "Market Post",
+    "summary": "Sell, then chalk both towns' prices.",
+    "giver": "wick_ww",
+    "prereq": ["quest", "neutral.03", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "wick_ww", "neutral.04.in"],
+        "text": "Take the morning off Wick" },
+
+      { "id": "sell", "do": ["deliver", "ford_eel", 8, "wick_ww"], "via": "sell", "in": "lac.square",
+        "text": "Sell the eels at the cross",
+        "recover": [["grant", "ford_eel", 8], ["moveTo", "lac.square"]] },
+
+      { "id": "chalk", "do": ["interact", "lac.cross.post", 3], "in": "lac.square",
+        "verb": "barter",
+        "text": "Chalk all three numbers on the post",
+        "recover": [["arm", "lac.cross.post"], ["moveTo", "lac.square"]] },
+
+      { "id": "why", "do": ["talk", "wick_ww", "neutral.04.post"],
+        "text": "Ask why we keep their numbers" },
+
+      { "id": "boundary", "do": ["interact", "lac.westfield.post", 2], "in": "lac.westfield",
+        "verb": "setting",
+        "text": "Re-set the west field post",
+        "hint": "Two paces west of the hole it came out of.",
+        "recover": [["arm", "lac.westfield.post"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "out", "do": ["talk", "wick_ww", "neutral.04.out"],
+        "text": "Ask how long that has been going on" }
+    ],
+    "onDone": [["flag", "neutral.post.chalked", true], ["unlock", "neutral.06"]]
+  },
+
+  {
+    "id": "neutral.05",
+    "story": "N05",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "A Loaf From the West Field",
+    "summary": "Bake with west-field flour. Notice.",
+    "giver": "sedge",
+    "prereq": ["quest", "neutral.02", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.05.in"],
+        "text": "Take a sack off Sedge" },
+
+      { "id": "glean", "do": ["gather", "wheatglass", 6], "in": "lac.westfield",
+        "text": "Glean the west field",
+        "recover": [["moveTo", "lac.westfield"]] },
+
+      { "id": "bake", "do": ["gather", "cooked_wheatglass", 2], "via": "craft", "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Bake two loaves in the barn",
+        "recover": [["grant", "wheatglass", 6]] },
+
+      { "id": "eat", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Eat one, and pay attention" },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.05.out"],
+        "text": "Tell Sedge what you felt" }
+    ],
+    "onDone": [["flag", "neutral.loaf", true], ["unlock", "neutral.22"]]
+  },
+
+  {
+    "id": "neutral.22",
+    "story": "N22",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "Harvest Supper",
+    "summary": "The village eats in the barn. Cook it.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.05", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.22.in"],
+        "text": "Take the supper off Hana" },
+
+      { "id": "gather",
+        "all": [["gather", "field_honey", 4], ["gather", "tuber", 4]],
+        "in": "fields",
+        "text": "Bring in honey and roots off the strips",
+        "recover": [["moveTo", "fields"]] },
+
+      { "id": "cook", "do": ["gather", "cooked_wheatglass", 6], "via": "craft", "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Bake for the whole village",
+        "recover": [["grant", "wheatglass", 6]] },
+
+      { "id": "lay", "do": ["interact", "lac.barn.table", 4], "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Lay the four long tables",
+        "recover": [["arm", "lac.barn.table"], ["moveTo", "lac.barn"]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_wheatglass", 6, "lac.barn"], "in": "lac.barn",
+        "text": "Serve the barn",
+        "recover": [["grant", "cooked_wheatglass", 6], ["moveTo", "lac.barn"]] },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.22.out"],
+        "text": "Sit down when Hana tells you to" }
+    ],
+    "onDone": [["flag", "neutral.supper", true], ["unlock", "neutral.07"]]
+  },
+
+  {
+    "id": "neutral.06",
+    "story": "N06",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "Two Guests",
+    "summary": "Two buyers, one hour. Keep them apart.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.04", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.06.in"],
+        "text": "Take the tea tray off Hana" },
+
+      { "id": "white", "do": ["talk", "ivo", "neutral.06.white"],
+        "text": "Serve the buyer in the yard" },
+
+      { "id": "black", "do": ["talk", "ossa", "neutral.06.black"],
+        "text": "Serve the buyer at the gate" },
+
+      { "id": "apart", "do": ["survive", "lac.square", 60],
+        "fail": ["flag", "neutral.06.met", true],
+        "text": "Keep them apart until they are done",
+        "hint": "Slowly. A hurried tray moves people about.",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.06.out"],
+        "text": "Count the takings with Hana" }
+    ],
+    "onDone": [["unlock", "neutral.07"]]
+  },
+
+  {
+    "id": "neutral.07",
+    "story": "N07",
+    "campaign": "neutral", "act": 1, "town": "neutral",
+    "title": "Grafting",
+    "summary": "A pear onto a thorn. Then your face.",
+    "giver": "sedge",
+    "prereq": ["all",
+      ["quest", "neutral.05", "done"],
+      ["quest", "neutral.06", "done"]],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.07.in"],
+        "text": "Take the knife off Sedge" },
+
+      { "id": "stock", "do": ["interact", "lac.westfield.thorn", 2], "in": "lac.westfield",
+        "verb": "forage",
+        "text": "Cut the thorn back to good wood",
+        "recover": [["arm", "lac.westfield.thorn"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "scion", "do": ["interact", "lac.westfield.pear", 2], "in": "lac.westfield",
+        "verb": "forage",
+        "text": "Bind the pear into the cut",
+        "hint": "Bark to bark. The thorn does the rest.",
+        "recover": [["arm", "lac.westfield.pear"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "ash", "do": ["interact", "lac.barn.hearth", 1], "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Take ash out of your own hearth",
+        "recover": [["arm", "lac.barn.hearth"], ["moveTo", "lac.barn"]] },
+
+      { "id": "face", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Do it to your own face",
+        "hint": "Three counts. Do not breathe out." },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.07.out"],
+        "text": "Say something in the other voice" }
+    ],
+    "reward": { "items": [["hearth_ash", 3]] },
+    "onDone": [["flag", "neutral.act1.done", true], ["flag", "graft.known", true], ["act", 2],
+      ["unlock", "neutral.08"], ["unlock", "neutral.23"]]
+  },
+
+  {
+    "id": "neutral.08",
+    "story": "N08",
+    "campaign": "neutral", "act": 2, "town": "light",
+    "title": "A Cousin Called Ansel",
+    "summary": "Take the Whitewall face. Walk in.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.07", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.08.in"],
+        "text": "Hear who you are going to be" },
+
+      { "id": "graft", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take the Whitewall face" },
+
+      { "id": "yard", "do": ["goto", "wwa.market"], "worn": "light",
+        "text": "Walk into Sanctum Yard as Ansel",
+        "hint": "Do not hurry. A cousin has been here before.",
+        "recover": [["moveTo", "march.west"]] },
+
+      { "id": "trade", "do": ["interact", "wwa.market.stall", 2], "in": "wwa.market",
+        "worn": "light", "verb": "barter",
+        "text": "Buy something, badly, in front of people",
+        "recover": [["arm", "wwa.market.stall"], ["moveTo", "wwa.market"]] },
+
+      { "id": "kesta", "do": ["talk", "kesta", "neutral.08.kesta"], "worn": "light",
+        "text": "Let Kesta greet you" },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.08.out"],
+        "text": "Come home and take it off" }
+    ],
+    "onDone": [["flag", "neutral.ansel", true], ["unlock", "neutral.09"], ["unlock", "neutral.10"]]
+  },
+
+  {
+    "id": "neutral.23",
+    "story": "N23",
+    "campaign": "neutral", "act": 2, "town": "neutral",
+    "title": "The Ford Run",
+    "summary": "Both towns before the bell. Own face.",
+    "giver": "fen",
+    "prereq": ["quest", "neutral.07", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "neutral.23.in"],
+        "text": "Load the morning's catch" },
+
+      { "id": "catch", "do": ["gather", "ford_eel", 8], "in": "reach.neutral",
+        "after": 4, "before": 7,
+        "text": "Take eight off the reach before first light",
+        "recover": [["moveTo", "stand.quiet"]] },
+
+      { "id": "west", "do": ["deliver", "ford_eel", 4, "wick_ww"], "via": "sell",
+        "in": "wwa.market", "worn": null, "before": 12,
+        "text": "Sell four in Whitewall, as yourself",
+        "hint": "Nobody stops a Longacre cart. They never have.",
+        "recover": [["grant", "ford_eel", 4], ["moveTo", "wwa.market"]] },
+
+      { "id": "east", "do": ["deliver", "ford_eel", 4, "ossa"], "via": "sell",
+        "in": "bst.board", "worn": null,
+        "text": "Sell four in Blackstone, as yourself",
+        "recover": [["grant", "ford_eel", 4], ["moveTo", "bst.board"]] },
+
+      { "id": "out", "do": ["talk", "fen", "neutral.23.out"],
+        "text": "Bring the cart back to the bridge" }
+    ],
+    "onDone": [["unlock", "neutral.10"]]
+  },
+
+  {
+    "id": "neutral.09",
+    "story": "N09",
+    "campaign": "neutral", "act": 2, "town": "light",
+    "title": "Weigh the Temple",
+    "summary": "Stand in white. Count the font.",
+    "giver": "wick_ww",
+    "prereq": ["quest", "neutral.08", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "wick_ww", "neutral.09.in"],
+        "text": "Take the tally slate off Wick" },
+
+      { "id": "graft", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take the Whitewall face again" },
+
+      { "id": "attend", "do": ["goto", "wwa.temple"], "worn": "light",
+        "after": 12, "before": 14, "onDay": 8,
+        "text": "Be at the reading at High",
+        "recover": [["moveTo", "wwa.market"]] },
+
+      { "id": "count", "do": ["interact", "wwa.temple.font", 4], "in": "wwa.temple",
+        "worn": "light", "verb": "barter",
+        "text": "Count the draw as it is poured",
+        "hint": "Four measures. Count them, not the words.",
+        "recover": [["arm", "wwa.temple.font"], ["moveTo", "wwa.temple"]] },
+
+      { "id": "read", "do": ["talk", "alder", "neutral.09.read"], "worn": "light",
+        "text": "Say the words back with the rest of them" },
+
+      { "id": "out", "do": ["talk", "wick_ww", "neutral.09.out"],
+        "text": "Give Wick the real number" }
+    ],
+    "onDone": [["flag", "neutral.covenant.weighed", true], ["unlock", "neutral.11"]]
+  },
+
+  {
+    "id": "neutral.10",
+    "story": "N10",
+    "campaign": "neutral", "act": 2, "town": "neutral",
+    "title": "A Crate Both Ways",
+    "summary": "Load the ferry so it cannot hold.",
+    "giver": "fen",
+    "prereq": ["quest", "neutral.08", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "neutral.10.in"],
+        "text": "Take a turn on the ferry" },
+
+      { "id": "load", "do": ["interact", "lac.millbridge.crate", 3], "in": "lac.millbridge",
+        "verb": "barter",
+        "text": "Put three crates aboard",
+        "recover": [["arm", "lac.millbridge.crate"], ["moveTo", "lac.millbridge"]] },
+
+      { "id": "off", "do": ["interact", "lac.mill.crate", 3], "in": "lac.mill",
+        "verb": "barter",
+        "text": "Take four crates off at the mill",
+        "hint": "One was already aboard. It always is.",
+        "recover": [["arm", "lac.mill.crate"], ["moveTo", "lac.mill"]] },
+
+      { "id": "out", "do": ["talk", "fen", "neutral.10.out"],
+        "text": "Give Fen a number he can write down" }
+    ],
+    "onDone": [["unlock", "neutral.11"]]
+  },
+
+  {
+    "id": "neutral.11",
+    "story": "N11",
+    "campaign": "neutral", "act": 2, "town": "light",
+    "title": "The Eighth Day, From the Cart",
+    "summary": "Ride the covered wagon. You loaded it.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.09", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.11.in"],
+        "text": "Hear what goes on the cart" },
+
+      { "id": "load", "do": ["interact", "lac.barn.crate", 4], "in": "lac.barn",
+        "verb": "barter",
+        "text": "Load four of ours into the barn cart",
+        "recover": [["arm", "lac.barn.crate"], ["moveTo", "lac.barn"]] },
+
+      { "id": "graft", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take the Whitewall face" },
+
+      { "id": "spur", "do": ["goto", "road.spur.light"], "worn": "light",
+        "after": 5, "before": 9, "onDay": 8,
+        "text": "Meet the wagon at the spur",
+        "hint": "It goes on the eighth day and no other.",
+        "recover": [["moveTo", "road.drove"]] },
+
+      { "id": "ride", "do": ["escort", "wagon", "road.drove"], "worn": "light",
+        "text": "Ride it up the Drove Road",
+        "recover": [["moveTo", "road.spur.light"]] },
+
+      { "id": "out", "do": ["talk", "dob", "neutral.11.out"],
+        "text": "Ask the driver what is under the sacking" }
+    ],
+    "onDone": [["flag", "neutral.act2.done", true], ["act", 3], ["unlock", "neutral.12"]]
+  },
+
+  {
+    "id": "neutral.12",
+    "story": "N12",
+    "campaign": "neutral", "act": 3, "town": "neutral",
+    "title": "A Face Called Sela",
+    "summary": "Take the face you are going to need.",
+    "giver": "sedge",
+    "prereq": ["quest", "neutral.11", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.12.in"],
+        "text": "Ask Sedge for an eastern face" },
+
+      { "id": "reagents", "do": ["gather", "gravecap", 3], "in": "heath",
+        "text": "Cut three caps off the heath",
+        "hint": "A face wants ash off its own ground.",
+        "recover": [["moveTo", "heath.crag"]] },
+
+      { "id": "burn", "do": ["interact", "lac.barn.hearth", 2], "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Burn them down in your own hearth",
+        "recover": [["arm", "lac.barn.hearth"], ["moveTo", "lac.barn"]] },
+
+      { "id": "face", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take the face and hold it" },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.12.out"],
+        "text": "Let Sedge look at what you made" }
+    ],
+    "reward": { "items": [["hearth_ash", 2]] },
+    "onDone": [["flag", "neutral.sela.face", true], ["unlock", "neutral.13"]]
+  },
+
+  {
+    "id": "neutral.13",
+    "story": "N13",
+    "campaign": "neutral", "act": 3, "town": "dark",
+    "title": "Down the Ladder",
+    "summary": "Walk the Levels as a Delver.",
+    "giver": "nim",
+    "prereq": ["quest", "neutral.12", "done"],
+    "steps": [
+      { "id": "graft", "do": ["interact", "self", 1], "in": "heath.blackspan",
+        "verb": "graft",
+        "text": "Put Sela's face on at the span",
+        "hint": "Not before the span. Somebody uses that road." },
+
+      { "id": "down", "do": ["goto", "bst.levels"], "worn": "dark",
+        "text": "Go down the ladder",
+        "recover": [["moveTo", "bst.bailey"]] },
+
+      { "id": "meet", "do": ["talk", "nim", "neutral.13.in"], "worn": "dark",
+        "text": "Let Nim introduce himself" },
+
+      { "id": "prop", "do": ["interact", "bst.levels.prop", 4], "in": "bst.levels",
+        "worn": "dark", "verb": "setting",
+        "text": "Prop the gallery like a Delver would",
+        "recover": [["arm", "bst.levels.prop"], ["moveTo", "bst.levels"]] },
+
+      { "id": "cut", "do": ["gather", "obsidian_core", 3], "in": "bst.levels",
+        "worn": "dark",
+        "text": "Cut three cores off the new seam",
+        "recover": [["moveTo", "bst.levels"]] },
+
+      { "id": "out", "do": ["talk", "nim", "neutral.13.out"], "worn": "dark",
+        "text": "Say goodnight to Nim" }
+    ],
+    "onDone": [["flag", "neutral.levels.walked", true], ["unlock", "neutral.25"], ["unlock", "neutral.14"]]
+  },
+
+  {
+    "id": "neutral.25",
+    "story": "N25",
+    "campaign": "neutral", "act": 3, "town": "neutral",
+    "title": "Both Kitchens",
+    "summary": "Two suppers, two faces, one day.",
+    "giver": "dob",
+    "prereq": ["quest", "neutral.13", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "dob", "neutral.25.in"],
+        "text": "Take Dob's exercise" },
+
+      { "id": "white", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take the Whitewall face" },
+
+      { "id": "supper", "do": ["gather", "cooked_snowbarb", 3], "via": "craft", "in": "wwa.kitchen",
+        "worn": "light", "verb": "hearth",
+        "text": "Cook a Sanctum supper",
+        "hint": "Marrin salts late. Everyone there does.",
+        "recover": [["grant", "snowbarb", 3]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_snowbarb", 3, "marrin"], "in": "wwa.kitchen",
+        "worn": "light",
+        "text": "Serve it and let her taste it",
+        "recover": [["grant", "cooked_snowbarb", 3], ["moveTo", "wwa.kitchen"]] },
+
+      { "id": "swap", "do": ["interact", "self", 1], "in": "heath.ford",
+        "verb": "graft",
+        "text": "Change faces at the ford" },
+
+      { "id": "pot", "do": ["gather", "cooked_gravecap", 3], "via": "craft", "in": "bst.kitchen",
+        "worn": "dark", "verb": "hearth",
+        "text": "Cook a shift pot",
+        "hint": "Cut them small and let the pot sit.",
+        "recover": [["grant", "gravecap", 3]] },
+
+      { "id": "shift", "do": ["deliver", "cooked_gravecap", 3, "bst.barracks"], "in": "bst.barracks",
+        "worn": "dark",
+        "text": "Feed the shift coming up",
+        "recover": [["grant", "cooked_gravecap", 3], ["moveTo", "bst.barracks"]] },
+
+      { "id": "out", "do": ["talk", "dob", "neutral.25.out"],
+        "text": "Tell Dob which one nearly caught you" }
+    ],
+    "onDone": [["unlock", "neutral.14"]]
+  },
+
+  {
+    "id": "neutral.14",
+    "story": "N14",
+    "campaign": "neutral", "act": 3, "town": "light",
+    "title": "Wearing Sela",
+    "summary": "Be taken on purpose. Tell them true.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.13", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.14.in"],
+        "text": "Hear the plan and agree to it" },
+
+      { "id": "graft", "do": ["interact", "self", 1], "in": "lac.barn",
+        "verb": "graft",
+        "text": "Take Sela's face" },
+
+      { "id": "stands", "do": ["goto", "reach.east"], "worn": "dark",
+        "text": "Stand where Whitewall is looking",
+        "recover": [["moveTo", "march.west"]] },
+
+      { "id": "wait", "do": ["survive", "reach.east", 60], "worn": "dark",
+        "text": "Wait for the picket to come",
+        "hint": "Do not fight. Being taken is the job.",
+        "recover": [["moveTo", "stand.east"]] },
+
+      { "id": "cell", "do": ["goto", "wwa.cells"], "worn": "dark",
+        "text": "Let them walk you in",
+        "recover": [["moveTo", "wwa.eastgate"]] },
+
+      { "id": "ask", "do": ["talk", "alder", "neutral.14.ask"], "worn": "dark",
+        "text": "Answer the Warden" },
+
+      { "id": "out", "do": ["talk", "alder", "neutral.14.out"], "worn": "dark",
+        "text": "Let them believe you" }
+    ],
+    "onDone": [["flag", "neutral.taken", true], ["unlock", "neutral.15"]]
+  },
+
+  {
+    "id": "neutral.15",
+    "story": "N15",
+    "campaign": "neutral", "act": 3, "town": "light",
+    "title": "Out Through the Wall",
+    "summary": "Break out without marking anyone.",
+    "giver": "dob",
+    "prereq": ["quest", "neutral.14", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "dob", "neutral.15.in"],
+        "text": "Take the wire off Dob at the window" },
+
+      { "id": "hinge", "do": ["interact", "wwa.cells.hinge", 3], "in": "wwa.cells",
+        "verb": "mend",
+        "text": "Take the cell door off its hinges",
+        "hint": "Mend it open. A broken door is a story.",
+        "recover": [["arm", "wwa.cells.hinge"], ["moveTo", "wwa.cells"]] },
+
+      { "id": "yard", "do": ["goto", "wwa.market"],
+        "fail": ["damageDealt", ">", 0],
+        "text": "Cross the yard without touching anyone",
+        "hint": "A body would change the story you planted.",
+        "recover": [["moveTo", "wwa.cells"]] },
+
+      { "id": "panel", "do": ["interact", "wwa.fence.panel", 2], "in": "wwa",
+        "verb": "mend",
+        "text": "Put the fence panel back",
+        "recover": [["arm", "wwa.fence.panel"], ["moveTo", "wwa.market"]] },
+
+      { "id": "home", "do": ["goto", "lac.westfield"],
+        "text": "Get home before the face goes",
+        "recover": [["moveTo", "march.west"]] },
+
+      { "id": "out", "do": ["talk", "dob", "neutral.15.out"],
+        "text": "Sit down on the fence with Dob" }
+    ],
+    "onDone": [["flag", "neutral.act3.done", true], ["act", 4],
+      ["unlock", "neutral.24"], ["unlock", "neutral.16"]]
+  },
+
+  {
+    "id": "neutral.24",
+    "story": "N24",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "What Feeds on It",
+    "summary": "Clear the field before you dig it.",
+    "giver": "sedge",
+    "prereq": ["quest", "neutral.15", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.24.in"],
+        "text": "Ask Sedge what is in the field" },
+
+      { "id": "clear", "do": ["kill", "grain_rat", 16], "in": "lac.westfield",
+        "text": "Clear the strips along the fence",
+        "recover": [["moveTo", "lac.westfield"], ["respawn", "grain_rat", 16]] },
+
+      { "id": "mother", "do": ["kill", "brood_mother", 1], "in": "lac.westfield",
+        "text": "Deal with what has been eating them",
+        "hint": "Two hundred years of feeding. It is large.",
+        "recover": [["moveTo", "lac.westfield"], ["respawn", "brood_mother", 1]] },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.24.out"],
+        "text": "Ask her how long she has known" }
+    ],
+    "onDone": [["flag", "neutral.field.clear", true], ["unlock", "neutral.16"]]
+  },
+
+  {
+    "id": "neutral.16",
+    "story": "N16",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "The West Field",
+    "summary": "Dig where the vermin are buried.",
+    "giver": "sedge",
+    "prereq": ["all",
+      ["quest", "neutral.02", "done"],
+      ["quest", "neutral.15", "done"]],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.16.in"],
+        "text": "Take a spade off Sedge" },
+
+      { "id": "dig", "do": ["interact", "lac.westfield.spit", 6], "in": "lac.westfield",
+        "verb": "setting",
+        "text": "Open six spits along the fence line",
+        "recover": [["arm", "lac.westfield.spit"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "chalk", "do": ["gather", "stone_chip", 6], "in": "lac.westfield",
+        "text": "Lift the chalk out of the way",
+        "recover": [["moveTo", "lac.westfield"]] },
+
+      { "id": "bare", "do": ["interact", "lac.westfield.seam", 3], "in": "lac.westfield",
+        "verb": "forage",
+        "text": "Bare what is under it",
+        "hint": "A foot down. It has always been a foot down.",
+        "recover": [["arm", "lac.westfield.seam"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.16.out"],
+        "text": "Stand in the hole and say it" }
+    ],
+    "onDone": [["flag", "neutral.root", true], ["unlock", "neutral.26"], ["unlock", "neutral.17"]]
+  },
+
+  {
+    "id": "neutral.26",
+    "story": "N26",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "The Quiet Stretch, Again",
+    "summary": "Fish it knowing what is under it.",
+    "giver": "fen",
+    "prereq": ["quest", "neutral.16", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "neutral.26.in"],
+        "text": "Take the line off Fen one more time" },
+
+      { "id": "fish", "do": ["gather", "ford_eel", 6], "in": "stand.quiet",
+        "text": "Work the stretch above the ford",
+        "recover": [["moveTo", "stand.quiet"]] },
+
+      { "id": "out", "do": ["talk", "fen", "neutral.26.out"],
+        "text": "Ask why the fish are that size" }
+    ],
+    "onDone": [["unlock", "neutral.17"]]
+  },
+
+  {
+    "id": "neutral.17",
+    "story": "N17",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "What the Household Is",
+    "summary": "Sit at the barn table.",
+    "giver": "hana",
+    "prereq": ["quest", "neutral.16", "done"],
+    "steps": [
+      { "id": "sit", "do": ["goto", "lac.barn"],
+        "text": "Come to the barn when they send for you",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "table", "do": ["talk", "hana", "neutral.17.table"],
+        "text": "Sit down and let them talk" },
+
+      { "id": "seam", "do": ["talk", "sedge", "neutral.17.seam"],
+        "text": "Hear what the kitchen staff kept" },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.17.out"],
+        "text": "Ask what you were for" }
+    ],
+    "onDone": [["flag", "neutral.household", true], ["unlock", "neutral.18"], ["unlock", "neutral.19"]]
+  },
+
+  {
+    "id": "neutral.18",
+    "story": "N18",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "Both Cores",
+    "summary": "One bolt, a bright core and a hollow.",
+    "giver": "sedge",
+    "prereq": ["quest", "neutral.17", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "neutral.18.in"],
+        "text": "Take the two-core cast off Sedge" },
+
+      { "id": "bright", "do": ["interact", "lac.westfield.mark", 2], "in": "lac.westfield",
+        "verb": "kindle",
+        "text": "Set a bright core on the mark",
+        "recover": [["arm", "lac.westfield.mark"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "hollow", "do": ["interact", "lac.westfield.mark", 2], "in": "lac.westfield",
+        "verb": "cull",
+        "text": "Put a hollow in the middle of it",
+        "hint": "Both at once. That is the whole difficulty.",
+        "recover": [["arm", "lac.westfield.mark"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "voles",
+        "all": [["kill", "grain_rat", 12], ["kill", "rat_knot", 4]],
+        "in": "fields",
+        "text": "Try it on the strips",
+        "recover": [["moveTo", "fields"], ["respawn", "grain_rat", 12], ["respawn", "rat_knot", 4]] },
+
+      { "id": "out", "do": ["talk", "sedge", "neutral.18.out"],
+        "text": "Tell Sedge what it did" }
+    ],
+    "onDone": [["flag", "neutral.two.cores", true], ["unlock", "neutral.21"]]
+  },
+
+  {
+    "id": "neutral.19",
+    "story": "N19",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "The Two Wars You Started",
+    "summary": "Trace the year back through the post.",
+    "giver": "wick_ww",
+    "prereq": ["quest", "neutral.17", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "wick_ww", "neutral.19.in"],
+        "text": "Let Wick show you the year" },
+
+      { "id": "post", "do": ["interact", "lac.cross.post", 4], "in": "lac.square",
+        "verb": "barter",
+        "text": "Read four seasons off the post",
+        "recover": [["arm", "lac.cross.post"], ["moveTo", "lac.square"]] },
+
+      { "id": "hall", "do": ["goto", "lac.moot"],
+        "text": "Follow him into the Moot Hall",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "ledger", "do": ["interact", "lac.moot.ledger", 4], "in": "lac.moot",
+        "verb": "barter",
+        "text": "Match each number to what followed it",
+        "hint": "Water, grain, the raid, the strike. In order.",
+        "recover": [["arm", "lac.moot.ledger"], ["moveTo", "lac.moot"]] },
+
+      { "id": "out", "do": ["talk", "wick_ww", "neutral.19.out"],
+        "text": "Say out loud what the post did" }
+    ],
+    "onDone": [["flag", "neutral.prices.read", true], ["unlock", "neutral.20"]]
+  },
+
+  {
+    "id": "neutral.20",
+    "story": "N20",
+    "campaign": "neutral", "act": 4, "town": "neutral",
+    "title": "Nobody's Face",
+    "summary": "Ask Dob who Dob is.",
+    "giver": "dob",
+    "prereq": ["quest", "neutral.19", "done"],
+    "steps": [
+      { "id": "find", "do": ["goto", "lac.cotts"],
+        "text": "Find Dob in the cott row",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "ask", "do": ["talk", "dob", "neutral.20.ask"],
+        "text": "Ask him" },
+
+      { "id": "out", "do": ["talk", "dob", "neutral.20.out"],
+        "text": "Sit with the answer" }
+    ],
+    "onDone": [["flag", "neutral.act4.done", true], ["act", 5],
+      ["merge", "ansel", "dob"], ["unlock", "neutral.21"]]
+  },
+
+  {
+    "id": "neutral.21",
+    "story": "N21",
+    "campaign": "neutral", "act": 5, "town": "neutral",
+    "title": "Both Towns Marching",
+    "summary": "They meet at Millbridge. Take a posture.",
+    "giver": "hana",
+    "prereq": ["all",
+      ["quest", "neutral.18", "done"],
+      ["quest", "neutral.19", "done"],
+      ["quest", "neutral.20", "done"]],
+    "steps": [
+      { "id": "brief", "do": ["talk", "hana", "neutral.21.in"],
+        "text": "Hear which way both of them are coming" },
+
+      { "id": "bridge", "do": ["goto", "lac.millbridge"],
+        "text": "Get to Millbridge before either of them",
+        "recover": [["moveTo", "lac.mill"]] },
+
+      { "id": "posture", "do": ["talk", "hana", "neutral.21.posture"],
+        "text": "Tell Hana what the valley is for" },
+
+      { "id": "hold",
+        "all": [["kill", "watchman", 10], ["kill", "champion_3", 1]],
+        "in": "lac.millbridge",
+        "text": "Keep them off the root",
+        "hint": "Your fields, their bolts. Both at once.",
+        "recover": [["moveTo", "lac.millbridge"], ["respawn", "watchman", 10], ["respawn", "champion_3", 1]] },
+
+      { "id": "stand", "do": ["survive", "lac.millbridge", 120],
+        "text": "Stand on the bridge until it is over",
+        "recover": [["moveTo", "lac.millbridge"]] },
+
+      { "id": "out", "do": ["talk", "hana", "neutral.21.out"],
+        "text": "Walk back up the lane with Hana" }
+    ],
+    "onDone": [["flag", "neutral.done", true], ["flag", "echo.long_furrow", true],
+      ["flag", "trilogy.done", true]]
+  }
+]

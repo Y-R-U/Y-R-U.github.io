@@ -1269,7 +1269,7 @@ sills) costs 80 % of what the walls themselves do. And **frustum culling current
 nothing**: a district merges into five meshes spanning the whole district, so their bounding
 spheres intersect every frustum and 301.3k of the 301.8k resident triangles are drawn in `wall_day`.
 That is the strongest argument in this document for §6.3's per-block partition — the culling is not
-underperforming, it is structurally absent.
+underperforming, it is structurally absent. **Phase 7 partitioned it; §6.7 carries the result.**
 
 Now the projection. Standing in Longacre's market square, medium preset, 844 × 390.
 
@@ -1303,7 +1303,8 @@ at 80** over a world one twenty-first the area, and the shadow camera fits a rad
 frustum, so it is not obvious that 60 m buys the 49 % reduction assumed. And the decal row assumes
 2k for a resident town; the demo's 82 objects already cost **8.8k**, which puts a 160-object town at
 ~17k. Between them that is up to 120k of unbudgeted triangles against 34k of margin. Re-derive both
-at Phase 7 from a real traverse before any content is authored against this table.
+at Phase 7 from a real traverse before any content is authored against this table. **Done — §6.7.
+Neither row survived: the decal one was low, the shadow one was pessimistic.**
 
 Texture memory: 54.2 MB today against a 60 MB budget. The new work adds **nothing** — every new
 object type reuses the existing `getMaterial` surfaces, and stained glass is already built lazily
@@ -1347,6 +1348,49 @@ give:
   game has a real problem that no frame-rate number will show.
 - **The town swap.** Time-slicing a 200k-triangle merge over 90 frames sounds fine and will
   probably produce a 4 ms CPU spike on one of them. CPU p95 budget is 6 ms.
+
+### 6.7 Measured at Phase 7 — the projection replaced
+
+`docs/BUDGET_A7.json` and `docs/TRAVERSE_A7.json`, at the gate profile with `shadowRate` forced to
+every frame. `js/world/stream.js` now owns visibility: 60 m per-block detail/proxy on A6's `blk`,
+distance culling for the ground, road and decal chunks, and a camera-centred foliage repack.
+`docs/NOTES_WORLD_A7.md` is the working record.
+
+| scenario | main, A6 | main, A7 | shadow, A7 | **total, A7** | calls, A7 |
+|---|---|---|---|---|---|
+| `wall_day` | 239.0k | 144.7k | 82.9k | **227.7k** | 88 |
+| `street_dusk` | 180.4k | 105.5k | 52.2k | **157.8k** | 81 |
+| `gate_night` | 122.0k | 95.6k | 62.9k | **158.5k** | 61 |
+| `town_night` | 241.0k | 111.4k | 52.0k | **163.4k** | 90 |
+| `creek_day` | 242.4k | 87.0k | 27.8k | **114.8k** | 91 |
+| Gate | | | | 350k | 150 |
+
+With `streaming` off — which also clears `frustumCulled`, so it is the cost with nothing culled at
+all — every scenario measures **383k main + 186k shadow = 569k**, within 1 % of each other. That
+is what the resident world costs and what the phase bought its margin against.
+
+**§6.5's two unsupported rows, re-derived.** The decal row budgeted 2k for a resident town; the
+demo's 82 objects cost 20.1k as one map-spanning mesh and **3.6–5.9k** once bucketed into 120 m
+cells, so the row was low but the fix is cheap and the 160-object town lands near 8k, not 17k. The
+shadow row budgeted 110k at `shadowDist` 60; the measurement is **28–83k**, so the row was
+*pessimistic* once the casters cull — the 216k it was compared against was a world where nothing
+culled at all.
+
+**The traverse.** `node tools/budget.mjs --traverse` walks every registered road at 25 m and three
+yaws — 333 samples — and records the worst frame, not the mean:
+
+| | |
+|---|---|
+| worst total | **224.5k** (142.6k main + 81.9k shadow) at (−520, −142) |
+| worst calls | **100** (76 main) |
+| p50 / p95 triangles | 55.4k / 171.9k |
+| samples over the 350k gate | **0 of 333** |
+
+**36 % of margin at the worst frame on the whole road network**, against the 11 % this section
+projected. Two caveats attach to that and are recorded in `NOTES_WORLD_A7.md`: `scatter.js` still
+*places* against the five scenario cameras, so the countryside is cheap because it is bare; and
+the demo town is 27 objects against §6.3's 160, so the detail blocks will grow at A8 even though
+the block count within the cull radius will not.
 
 ---
 

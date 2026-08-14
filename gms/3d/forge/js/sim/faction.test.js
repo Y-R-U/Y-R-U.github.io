@@ -5,6 +5,7 @@ import {
   band, bandOf, newStanding, applyStanding, rollStandingDay, enterCampaign, STANDING,
   suspicionRate, stepSuspicion, suspicionEvent, graftDuration, graftXp, breakGraft,
   WATCH_WEIGHT, SUSPICION, GRAFT,
+  newGraft, graftBlocked, startGraft, tickGraft, endGraft, graftEvent,
 } from './faction.js';
 import { xpToReach } from './xp.js';
 import { GLAMOUR_XP_EVADE } from './tables.js';
@@ -145,4 +146,135 @@ test('a voluntary un-Graft pays 400 + 25/s, capped at 1600, and nothing above su
 
 test('§2.3 — 68 evasions at enemy level 5 reach Glamour 12 with no disguise at all', () => {
   assert.equal(Math.ceil(xpToReach(12) / (GLAMOUR_XP_EVADE * 5)), 68);
+});
+
+// ── the Graft state machine ───────────────────────────────────────────────────
+
+// Runs the machine at 20 Hz for `seconds`, as the session ticks it, and reports what it did.
+function hold(g, seconds, ctx = {}, dt = 0.05) {
+  const events = [];
+  let cur = g;
+  for (let t = 0; t < seconds && !events.includes('break') && !events.includes('expire'); t += dt) {
+    const r = tickGraft(cur, dt, ctx);
+    cur = r.graft;
+    events.push(...r.events);
+  }
+  return { graft: cur, events, susp: cur.susp, held: cur.held };
+}
+
+test('a fresh character cannot Graft, and every refusal names itself', () => {
+  const g = newGraft();
+  assert.equal(graftBlocked(g, {}), 'granted');
+  assert.equal(graftBlocked(g, { granted: true }), 'ash');
+  assert.equal(graftBlocked(g, { granted: true, ash: 1 }), null);
+  assert.equal(graftBlocked(g, { granted: true, ash: 1, seen: true }), 'seen');
+  assert.equal(graftBlocked({ ...g, cd: 4 }, { granted: true, ash: 1 }), 'cooldown');
+  assert.equal(graftBlocked({ ...g, worn: 'light' }, { granted: true, ash: 1 }), 'worn');
+});
+
+test('the cast sets the face and the clock, and an empty room never spends it', () => {
+  const g = startGraft(newGraft(), 'light', { glamour: 12 });
+  assert.equal(g.worn, 'light');
+  assert.equal(g.left, 540);
+  const r = hold(g, 300);
+  assert.equal(r.susp, 0, 'suspicion floors at 0 with nobody watching');
+  assert.equal(r.events.length, 0);
+  assert.ok(Math.abs(r.graft.left - 240) < 0.01);
+});
+
+test('a Graft expires on its own clock and pays the un-Graft XP if it was clean', () => {
+  const g = startGraft(newGraft(), 'dark', { glamour: 0 });
+  assert.equal(g.left, 180);
+  const r = hold(g, 200);
+  assert.ok(r.events.includes('expire'));
+  const out = endGraft(r.graft, { reason: 'expire' });
+  assert.equal(out.xp, 1600, 'held past 48 s, so it is at the cap');
+  assert.equal(out.graft.worn, null);
+  assert.equal(out.graft.cd, GRAFT.cooldown);
+});
+
+test('the ticks fire once each at 40, 70 and 90 on the way to a Break', () => {
+  const ctx = { watchmen: 1, watchWeight: WATCH_WEIGHT.kesta, glamour: 12 };
+  const r = hold(startGraft(newGraft(), 'light', { glamour: 12 }), 200, ctx);
+  assert.deepEqual(r.events, ['tick40', 'tick70', 'tick90', 'break']);
+});
+
+test('a Break costs the long cooldown and the free Graft that follows it pays nothing', () => {
+  const caught = { ...startGraft(newGraft(), 'dark', { glamour: 12 }), held: 90, susp: 100 };
+  const b = breakGraft(newStanding(), caught.worn);
+  const out = endGraft(caught, { reason: 'break' });
+  assert.equal(out.xp, 0, 'graftXp already refuses anything at suspicion 40 or above');
+  assert.equal(out.graft.cd, GRAFT.cooldownAfterBreak);
+  const free = startGraft(out.graft, b.freeGraft.faction, { seconds: b.freeGraft.seconds, free: true });
+  assert.equal(free.worn, 'light');
+  assert.equal(free.left, 20);
+  assert.equal(free.cd, 120, 'the free 20 s runs while the 120 s cooldown is still counting');
+  const done = hold(free, 30);
+  assert.ok(done.events.includes('expire'));
+  assert.equal(endGraft(done.graft).xp, 0, 'being caught is not an XP source');
+});
+
+test('an instantaneous tell can Break a Graft on its own', () => {
+  let g = { ...startGraft(newGraft(), 'light', { glamour: 12 }), susp: 80 };
+  g = graftEvent(g, 'wrongProjectile');
+  assert.equal(g.susp, 100);
+  g = graftEvent(g, 'ownField');
+  assert.equal(g.susp, 100, 'suspicion clamps at the maximum');
+});
+
+test('a Watchman between 6 m and 10 m stops the decay without starting the climb', () => {
+  assert.equal(suspicionRate({ watchmen: 0, nearby: 1 }), 0);
+  assert.equal(suspicionRate({ watchmen: 0, nearby: 0 }), SUSPICION.decay);
+  assert.equal(suspicionRate({ watchmen: 0 }), SUSPICION.decay, 'the old call shape is unchanged');
+});
+
+// The numbers the balance argument rests on. Measured, never asserted from the spec text.
+test('§8.3 measured — how long a Grafted player survives a Watchman', () => {
+  const at = (glamour, weight, watchmen = 1) =>
+    +(hold(startGraft(newGraft(), 'light', { glamour }), 1000,
+      { watchmen, watchWeight: weight, glamour }).held).toFixed(2);
+
+  assert.equal(at(12, WATCH_WEIGHT.watch), 50.05);     // one generic Watchman, Glamour 12
+  assert.equal(at(12, WATCH_WEIGHT.kesta), 25);        // Kesta, Glamour 12
+  assert.equal(at(12, WATCH_WEIGHT.alder), 83.35);     // Warden Alder, Glamour 12
+  assert.equal(at(12, WATCH_WEIGHT.kesta, 2), 13.9);   // Kesta and a friend, Glamour 12
+  assert.equal(at(20, WATCH_WEIGHT.watch), 150.05);    // one generic Watchman, Glamour 20
+  assert.equal(at(20, WATCH_WEIGHT.watch, 2), 83.35);  // two of them, Glamour 20
+
+  // The rhythm §8.3 is aiming at: 20 s beside a Watchman, 20 s away, and the whole 9-minute face
+  // runs out before suspicion ever does.
+  let g = startGraft(newGraft(), 'light', { glamour: 12 });
+  const seen = [];
+  let peak = 0;
+  while (g.left > 0 && !seen.includes('break')) {
+    for (const ctx of [{ watchmen: 1, glamour: 12 }, { watchmen: 0 }]) {
+      const r = hold(g, 20, ctx);
+      g = r.graft;
+      peak = Math.max(peak, r.susp);
+      seen.push(...r.events);
+    }
+  }
+  assert.equal(Math.round(peak), 40, 'the ring shows, and never gets past the first tick');
+  assert.ok(seen.includes('expire') && !seen.includes('break'), 'the clock runs out, not the disguise');
+});
+
+test('§8.3 measured — the duration ladder is the reason to train Glamour', () => {
+  const mins = l => +(graftDuration(l) / 60).toFixed(1);
+  assert.deepEqual([mins(0), mins(12), mins(17), mins(20)], [3, 9, 11.5, 13]);
+  // Every Glamour level is 30 s of face and 1/24th off the suspicion rate.
+  assert.equal(graftDuration(13) - graftDuration(12), 30);
+  assert.equal(+(suspicionRate({ watchmen: 1, glamour: 20 }) / suspicionRate({ watchmen: 1, glamour: 12 })).toFixed(3), 0.333);
+});
+
+test('the duration knob scales the face and nothing else', () => {
+  assert.equal(startGraft(newGraft(), 'light', { glamour: 12, durationMul: 0.5 }).left, 270);
+  assert.equal(suspicionRate({ watchmen: 1, glamour: 12, rateKnob: 2 }), 4);
+});
+
+test('a Graft cannot be re-cast until its cooldown has run', () => {
+  const out = endGraft(startGraft(newGraft(), 'light', { glamour: 12 }));
+  assert.equal(graftBlocked(out.graft, { granted: true, ash: 9 }), 'cooldown');
+  const later = hold(out.graft, 21).graft;
+  assert.equal(later.cd, 0);
+  assert.equal(graftBlocked(later, { granted: true, ash: 9 }), null);
 });

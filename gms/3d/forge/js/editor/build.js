@@ -1,14 +1,15 @@
-// Scene document → geometry. A district is one static batch; an object under edit is left out
-// of it and rebuilt on its own.
+// Scene document → geometry. A district is built as a set of 60 m blocks, each of which merges
+// into a `base` / `detail` / `proxy` triple that js/world/stream.js switches between; an object
+// under edit is left out and rebuilt on its own.
 
 import * as THREE from 'three';
-import { wallRun, tower, house, beginBatch, endBatch, dressing } from '../world/buildings.js';
+import { wallRun, tower, house, beginBatch, endBatch, dressing, emitBatch } from '../world/buildings.js';
 import {
-  T, taperBox, rng, span, addRubble, addSteps, roofSlab, gableShape, extrude, addChimney,
+  Batch, T, taperBox, rng, span, addRubble, addSteps, roofSlab, gableShape, extrude, addChimney,
 } from '../world/details.js';
 import { zone } from '../world/zones.js';
 import { heightAt, waterY } from '../world/terrain.js';
-import { footprint } from './scene.js';
+import { footprint, blockOf } from './scene.js';
 
 // v3's six new types. Each is a `dressing` batch of the shared kit rather than a builder in
 // buildings.js, because none of them has an interior or a door — they are furniture for a town,
@@ -39,6 +40,7 @@ export class SceneBuilder {
     this.object3D = new THREE.Group();
     this.object3D.name = 'scene';
     this.groups = [];
+    this.blocks = [];
     this.held = 0;
     this.doc = null;
   }
@@ -49,6 +51,7 @@ export class SceneBuilder {
     this.doc = doc;
     for (const g of this.groups) { this.object3D.remove(g); dispose(g); }
     this.groups = [];
+    this.blocks = [];
     for (let i = 0; i < doc.districts.length; i++) this.district(i, register);
   }
 
@@ -59,6 +62,7 @@ export class SceneBuilder {
     const d = this.doc.districts[di];
     const old = this.groups[di];
     if (old) { this.object3D.remove(old); dispose(old); }
+    this.blocks = this.blocks.filter(b => b.di !== di);
 
     const g = new THREE.Group();
     g.name = `district${di}`;
@@ -67,44 +71,107 @@ export class SceneBuilder {
 
     if (register && d.road && d.roadWidth > 0) T2.addPath(d.road, d.roadWidth, d.zone);
 
-    beginBatch();
-    const beds = [], masses = [], here = this.objectsIn(di);
+    // Seating and footprint registration run over the whole district in document order, before
+    // anything is partitioned: scatter walks terrain.footprints with its own RNG, so reordering
+    // them re-rolls every clump in the world.
+    const here = this.objectsIn(di);
+    const seats = new Map();
     for (const o of here) {
       const [hw, hd] = footprint(o);
-      const r = T2.range(o.x, o.z, hw, hd, o.ry);
+      seats.set(o.id, { r: T2.range(o.x, o.z, hw, hd, o.ry), hw, hd });
       if (register) T2.addFootprint(o.x, o.z, hw, hd, o.ry);
-      if (o.id === this.held) continue;
-      if (o.type === 'mass') {
-        masses.push(massRec(o, r));
-      } else {
-        const b = BUILDERS[o.type](o.zone, { ...o.p, seed: o.seed });
-        b.position.set(o.x, r.hi, o.z);
-        b.rotation.y = o.ry;
-        b.userData.sceneId = o.id;
-        g.add(b);
-        beds.push({ x: o.x, z: o.z, hw, hd, rot: o.ry, top: r.hi, bot: r.lo });
+    }
+
+    const cells = new Map();
+    const cellOf = (x, z) => {
+      const k = blockOf(x, z);
+      let c = cells.get(k);
+      if (!c) cells.set(k, c = { key: k, objects: [], dress: new Batch(d.zone) });
+      return c;
+    };
+
+    for (const o of here) if (o.id !== this.held) cellOf(o.x, o.z).objects.push(o);
+
+    // One RNG stream feeds the whole district's dressing, in the order seedDocument recorded, but
+    // each piece is routed to the block it stands in so it culls with that block.
+    const R = rng(d.dressSeed);
+    for (const o of here) {
+      if (o.id === this.held || o.type === 'mass') continue;
+      const s = seats.get(o.id);
+      foundation(cellOf(o.x, o.z).dress, { x: o.x, z: o.z, hw: s.hw, hd: s.hd, rot: o.ry, top: s.r.hi, bot: s.r.lo });
+    }
+    for (const k of d.kerbs) kerb(cellOf(k.x, k.z).dress, R, k);
+    if (d.bridge) bridge(cellOf(d.bridge.x, d.bridge.z).dress, R, d.bridge);
+    for (const o of here) {
+      if (o.rubble && o.type === 'wallRun' && o.id !== this.held) {
+        wallRubble(cellOf(o.x, o.z).dress, rng(o.rubbleSeed || o.seed), o);
       }
     }
 
-    for (const m of masses) g.add(dressing(m.zone, b => plainHouse(b, rng(m.seed), zone(m.zone), m), m.seed));
-
-    g.add(dressing(d.zone, b => {
-      const R = rng(d.dressSeed);
-      for (const bd of beds) foundation(b, bd);
-      for (const k of d.kerbs) kerb(b, R, k);
-      if (d.bridge) bridge(b, R, d.bridge);
-      for (const o of here) {
-        if (o.rubble && o.type === 'wallRun' && o.id !== this.held) wallRubble(b, rng(o.rubbleSeed || o.seed), o);
-      }
-    }, d.dressSeed));
-
-    const merged = endBatch(this.object3D);
-    if (merged) g.add(merged);
+    for (const c of cells.values()) this.blocks.push(this.block(g, di, d, c, seats));
 
     if (register && d.bridge) {
       T2.addFootprint(d.bridge.x, d.bridge.z, 6.3, 13.5, d.bridge.ry || 0, { ao: 0.28, grow: 4.5 });
       T2.addReflection(d.bridge.x, d.bridge.z, 11.4, 4.05);
     }
+  }
+
+  // Two merged sets per 60 m block, the same buildings at two costs. Exactly one is ever visible,
+  // so a block costs one set of draw calls however far away it is; stream.js flips `.visible` and
+  // nothing rebuilds. The infill and the ground dressing are in both — carrying them in a third
+  // always-on set halved the triangles but doubled the calls, which is the wrong trade.
+  block(g, di, d, c, seats) {
+    const rec = { di, key: c.key, detail: null, proxy: null, c: new THREE.Vector3(), r: 0 };
+    const lod = (name, fill) => {
+      beginBatch();
+      const holder = new THREE.Group();
+      holder.name = `blk${c.key}:${name}`;
+      g.add(holder);
+      fill(holder);
+      const merged = endBatch(this.object3D);
+      if (merged) holder.add(merged);
+      rec[name] = holder;
+    };
+
+    const full = (holder, o) => {
+      const b = BUILDERS[o.type](o.zone, { ...o.p, seed: o.seed });
+      b.position.set(o.x, seats.get(o.id).r.hi, o.z);
+      b.rotation.y = o.ry;
+      b.userData.sceneId = o.id;
+      holder.add(b);
+    };
+    const stub = (holder, o) => {
+      const m = proxyRec(o, seats.get(o.id).r);
+      if (m) holder.add(dressing(o.zone, b => proxyPart(b, rng(o.seed), zone(o.zone), m), o.seed));
+    };
+
+    // `lod` on the object overrides the distance rule by picking which builder both sets get.
+    const level = (holder, near) => {
+      for (const o of c.objects) {
+        const want = o.type === 'mass' ? 'mass' : o.lod === 'full' ? 'full' : o.lod === 'proxy' ? 'proxy' : (near ? 'full' : 'proxy');
+        if (want === 'mass') {
+          const m = massRec(o, seats.get(o.id).r);
+          holder.add(dressing(o.zone, b => plainHouse(b, rng(o.seed), zone(o.zone), m), o.seed));
+        } else if (want === 'full') full(holder, o);
+        else stub(holder, o);
+      }
+    };
+
+    // The dressing's geometry is built once — its RNG stream has already been consumed — and
+    // cloned for the second set.
+    lod('detail', holder => { level(holder, true); holder.add(emitBatch(d.zone, cloneBatch(c.dress))); });
+    lod('proxy', holder => { level(holder, false); holder.add(emitBatch(d.zone, c.dress)); });
+
+    const box = new THREE.Box3();
+    for (const name of ['detail', 'proxy']) {
+      rec[name].updateMatrixWorld(true);
+      box.expandByObject(rec[name]);
+    }
+    if (!box.isEmpty()) {
+      box.getCenter(rec.c);
+      rec.r = box.getSize(new THREE.Vector3()).length() / 2;
+    }
+    return rec;
   }
 
   // A standalone, unmerged copy of one object, built at the origin so the editor can drag it by
@@ -133,8 +200,6 @@ export class SceneBuilder {
   // picked up. A merely selected object still gets one, or it reads as floating while you edit it.
   refreshDecals(opacity = 1, skip = 0) {
     const T2 = this.terrain;
-    const old = T2.object3D.getObjectByName('contactAO');
-    if (old) { T2.object3D.remove(old); old.geometry.dispose(); old.material.dispose(); }
     T2.decalRings.length = 0;
     for (const o of this.doc.objects) {
       if (o.id === skip) continue;
@@ -142,7 +207,7 @@ export class SceneBuilder {
       T2.decalRings.push({ x: o.x, z: o.z, hw, hd, rot: o.ry, ao: 1, grow: 0.6 });
     }
     for (const d of this.doc.districts) {
-      if (d.bridge) T2.decalRings.push({ x: d.bridge.x, z: d.bridge.z, hw: 6.3, hd: 13.5, rot: 0, ao: 0.28, grow: 4.5 });
+      if (d.bridge) T2.decalRings.push({ x: d.bridge.x, z: d.bridge.z, hw: 6.3, hd: 13.5, rot: d.bridge.ry || 0, ao: 0.28, grow: 4.5 });
     }
     T2.finish();
     if (T2.decalMat) T2.decalMat.opacity = opacity;
@@ -155,6 +220,51 @@ export class SceneBuilder {
 }
 
 const massRec = (o, r) => ({ zone: o.zone, seed: o.seed, x: o.x, z: o.z, rot: o.ry, ...o.p, top: r.hi, bot: r.lo });
+
+function cloneBatch(src) {
+  const b = new Batch(src.zoneId);
+  for (const [surface, arr] of src.parts) b.parts.set(surface, arr.map(g => g.clone()));
+  return b;
+}
+
+// The silhouette a block shows past `lodDetail`. Anything that reads as a building becomes the
+// same plain gabled block a `mass` already is; the two shapes that plainly are not — a tower and
+// a wall — get their own two-primitive stand-in. Ground furniture (pen, cross) has no silhouette
+// at 70 m and is simply dropped.
+function proxyRec(o, r) {
+  const p = o.p;
+  const base = { x: o.x, z: o.z, rot: o.ry, top: r.hi, bot: r.lo };
+  switch (o.type) {
+    case 'house': case 'mill': case 'barn': return { ...base, kind: 'block', w: p.w, d: p.d, h: p.h };
+    case 'arcade': return { ...base, kind: 'block', w: p.length, d: p.depth, h: p.height };
+    case 'tower': return { ...base, kind: 'tower', radius: p.radius, height: p.height, sides: p.sides };
+    case 'wallRun': return { ...base, kind: 'wall', length: p.length, height: p.height, thickness: p.thickness };
+    case 'retaining': return { ...base, kind: 'wall', length: p.length, height: p.height, thickness: p.height * p.batter * 2 + 1.8 };
+    default: return null;
+  }
+}
+
+function proxyPart(b, R, z, m) {
+  if (m.kind === 'block') return plainHouse(b, R, z, m);
+  const foot = m.top - (m.bot - 0.75);
+  const at = T(m.x, m.top, m.z, m.rot);
+  if (m.kind === 'tower') {
+    const n = Math.max(6, Math.min(12, m.sides | 0 || 8));
+    const h = m.height + foot;
+    // The roof has to reach where the real one does. tower() puts its lathe roof 2.4 m above the
+    // machicolation and rises `radius · pitch` again; a cone stopping at the shaft left a 3.4 m
+    // gap, which at 110 m was the entire part of a campanile that clears the roofs in front of it.
+    const pitch = z.edges === 'sharp' ? 2.6 : z.edges === 'curved' ? 1.2 : 0.9;
+    const cone = m.radius * pitch + 2.4;
+    b.add('wall', new THREE.CylinderGeometry(m.radius * 1.05, m.radius * 1.25, h, n), at.clone().multiply(T(0, h / 2 - foot, 0)));
+    b.add('trim', new THREE.CylinderGeometry(m.radius * 1.26, m.radius * 1.1, 0.9, n), at.clone().multiply(T(0, m.height + 0.45, 0)));
+    b.add('roof', new THREE.ConeGeometry(m.radius * 1.2, cone, n), at.clone().multiply(T(0, m.height + 0.9 + cone / 2, 0)));
+  } else {
+    const h = m.height + foot;
+    b.add('wall', taperBox(m.length, m.thickness, h, m.length, m.thickness + 1.5), at.clone().multiply(T(0, h / 2 - foot, 0)));
+    b.add('trim', new THREE.BoxGeometry(m.length, 0.5, m.thickness + 1.4), at.clone().multiply(T(0, m.height + 0.25, 0)));
+  }
+}
 
 // Replays the pre-v2 shared district stream — masses, then kerbs, bridge and wall rubble — to
 // record the seed each of them was standing on. Once stamped, the objects are independent and

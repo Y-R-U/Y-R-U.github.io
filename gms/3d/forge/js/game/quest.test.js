@@ -2,6 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { normaliseQuests } from './questdef.js';
 import { blankState, step, offered, progress, rewardFor, boardRoll } from './quest.js';
+import { BOARD_ALWAYS } from '../sim/campaign.js';
+import { canCast } from '../sim/spells.js';
+import { levelFor } from '../sim/xp.js';
+import { newGraft, graftBlocked, startGraft, tickGraft, endGraft } from '../sim/faction.js';
+import { blank, addItem, itemCount } from './save.js';
+import { lintAll } from '../../tools/lintQuests.mjs';
 
 const pack = raw => {
   const r = normaliseQuests(raw, { pack: '' });
@@ -61,6 +67,13 @@ test('`via` and `verb` are what make sell, craft and cast dress down onto the ei
   const cast = pack([one('q', ['interact', 'lamp', 1], { verb: 'kindle' })]);
   assert.equal(drive(cast, [{ t: 'accept', id: 'q' }, { t: 'interact', id: 'lamp' }]).state.quests.q.s, 'active');
   assert.equal(drive(cast, [{ t: 'accept', id: 'q' }, { t: 'interact', id: 'lamp', verb: 'kindle' }]).state.quests.q.s, 'done');
+
+  // A `verb` may name a spell instead of a school — the linter accepts both and the Neutral pack
+  // authors `"verb": "graft"`. The caster raises the school it dialled and the spell it cast.
+  const spell = pack([one('q', ['interact', 'self', 1], { verb: 'graft' })]);
+  assert.equal(drive(spell, [{ t: 'accept', id: 'q' }, { t: 'interact', id: 'self', verb: 'glamour' }]).state.quests.q.s, 'active');
+  assert.equal(drive(spell, [{ t: 'accept', id: 'q' },
+    { t: 'interact', id: 'self', verb: 'glamour', spell: 'graft' }]).state.quests.q.s, 'done');
 });
 
 test('a step with `all` holds parallel objectives', () => {
@@ -241,6 +254,163 @@ test('the board is a pure function of seed, day and town', () => {
   assert.equal(new Set(a).size, 3, 'no quest is posted twice');
   assert.deepEqual(boardRoll(defs, 99, 12, 'light'), a, 'same seed and day, same board');
   assert.notDeepEqual(boardRoll(defs, 99, 13, 'light'), a);
+});
+
+test('BOARD_ALWAYS is posted on every board, every day, without being drawn twice', () => {
+  const defs = pack([1, 2, 3, 4, 5].map(i => ({
+    id: `s${i}`, story: `S0${i}`, title: 'T', summary: 's', board: { school: 'cull' },
+    steps: [{ id: 's', do: ['goto', 'x'], text: 't' }],
+  })));
+  assert.deepEqual(BOARD_ALWAYS, ['S02', 'S04'], 'the fixture is named after the real pair');
+  for (const town of ['light', 'neutral', 'dark']) {
+    for (let day = 0; day < 24; day++) {
+      const board = boardRoll(defs, 7, day, town);
+      assert.equal(board.length, 3);
+      assert.equal(new Set(board).size, 3, 'an always-posted quest is not also drawn');
+      assert.ok(board.includes('s2') && board.includes('s4'), `${town} day ${day}`);
+    }
+  }
+});
+
+test('an always-posted quest that is not on this town board is not forced onto it', () => {
+  const defs = pack([
+    { id: 'far', story: 'S02', title: 'T', summary: 's', town: 'dark', board: { school: 'cull' },
+      steps: [{ id: 's', do: ['goto', 'x'], text: 't' }] },
+    { id: 'near', title: 'T', summary: 's', board: { school: 'cull' },
+      steps: [{ id: 's', do: ['goto', 'x'], text: 't' }] },
+  ]);
+  assert.deepEqual(boardRoll(defs, 7, 1, 'light'), ['near']);
+  assert.deepEqual(boardRoll(defs, 7, 1, 'dark').sort(), ['far', 'near']);
+});
+
+// ── the Graft acceptance run ──────────────────────────────────────────────────
+// Plays the real N07 → N08 chain out of the shipped pack, with the disguise driven by the same
+// `sim/faction.js` calls `session.js` makes and in the same order. Everything js/game/*.test.js
+// cannot reach is the DOM plumbing around them — audio, the charge ring, the two-button card.
+function grafter() {
+  const { defs, areas } = lintAll();
+  const doc = blank(1);
+  doc.campaign.current = 'neutral';
+  doc.faction = 'neutral';
+  let state = blankState();
+  let graft = newGraft();
+  let here = [];
+
+  const p = {
+    doc, defs,
+    get worn() { return graft.worn; },
+    at(...a) { here = a; return p; },
+    send(event) {
+      const ctx = { quests: state.quests, flags: doc.flags, truths: [], schools: doc.schools,
+        standing: doc.standing, items: Object.fromEntries(doc.items.map(e => [e.id, e.n])),
+        marks: 0, campaign: doc.campaign, worn: doc.worn, day: 0, hour: 12, areas: here, seen: [] };
+      const r = step(defs, state, event, ctx);
+      state = r.state;
+      for (const e of r.effects) if (e[0] === 'item') addItem(doc, e[1], e[2]);
+      doc.quests = state.quests;
+      return r.effects;
+    },
+    // session.graftGranted()
+    granted() {
+      const done = Object.entries(state.quests).filter(([, r]) => r.s === 'done')
+        .map(([id]) => defs[id]?.story).filter(Boolean);
+      if (canCast('graft', { schools: doc.schools, grasp: 0, standingBand: null, questsDone: done })) return true;
+      return Object.entries(state.quests).some(([id, rec]) => rec.s === 'active'
+        && defs[id]?.steps.filter(s => !s.optional)[rec.i]?.verb === 'graft');
+    },
+    homeHearth() { return here.some(a => areas[a]?.hearth && areas[a].town === 'neutral'); },
+    // session.blocked()
+    blocked() {
+      return graftBlocked(graft, { granted: p.granted(),
+        ash: itemCount(doc, 'hearth_ash') + (p.homeHearth() ? 1 : 0), seen: false });
+    },
+    // session.graftInto()
+    graftInto(f) {
+      const why = p.blocked();
+      if (why) return why;
+      if (!p.homeHearth()) addItem(doc, 'hearth_ash', -1);
+      graft = startGraft(graft, f, { glamour: levelFor(doc.schools.glamour) });
+      doc.worn = graft.worn;
+      p.send({ t: 'interact', id: 'self', verb: 'glamour', spell: 'graft' });
+      return null;
+    },
+    unGraft() { const r = endGraft(graft); graft = r.graft; doc.worn = null; return r.xp; },
+    wait(s) { for (let t = 0; t < s; t += 0.5) graft = tickGraft(graft, 0.5, { watchmen: 0 }).graft; return p; },
+    on(id) { const r = state.quests[id]; return defs[id].steps.filter(s => !s.optional)[r.i]?.id; },
+    quest(id) { return state.quests[id]?.s; },
+  };
+  return p;
+}
+
+test('N07 grants the spell with the step that asks for it, and the barn hearth pays for it', () => {
+  const p = grafter();
+  p.send({ t: 'accept', id: 'neutral.07', force: true });
+  p.at('lac', 'lac.westfield');
+  p.send({ t: 'talk', npc: 'sedge', node: 'neutral.07.in' });
+  p.send({ t: 'interact', id: 'lac.westfield.thorn', verb: 'forage', n: 2 });
+  p.send({ t: 'interact', id: 'lac.westfield.pear', verb: 'forage', n: 2 });
+  p.at('lac', 'lac.barn');
+  p.send({ t: 'interact', id: 'lac.barn.hearth', verb: 'hearth' });
+  assert.equal(p.on('neutral.07'), 'face', 'the fifth step is the first Graft');
+
+  // The bootstrap: N07 is what grants Graft and N07 has not finished, so the grant has to come
+  // from the live step. And N07 pays its three ash on completion, so there is none in the bag.
+  assert.equal(itemCount(p.doc, 'hearth_ash'), 0);
+  assert.equal(p.granted(), true, 'a live step asking for a graft is the lesson that grants it');
+  assert.equal(p.blocked(), null, 'STORY §12: ash is free at a Longacre hearth');
+
+  assert.equal(p.graftInto('light'), null);
+  assert.equal(p.worn, 'light');
+  assert.equal(p.on('neutral.07'), 'out', 'the interact(self) with verb graft credited the step');
+  p.send({ t: 'talk', npc: 'sedge', node: 'neutral.07.out' });
+  assert.equal(p.quest('neutral.07'), 'done');
+  assert.equal(itemCount(p.doc, 'hearth_ash'), 3, 'and the barn charged nothing for the lesson');
+});
+
+test('a worn: light step advances because the player grafted, and not because they walked in', () => {
+  const p = grafter();
+  p.send({ t: 'accept', id: 'neutral.07', force: true });
+  p.at('lac', 'lac.westfield');
+  p.send({ t: 'talk', npc: 'sedge', node: 'neutral.07.in' });
+  p.send({ t: 'interact', id: 'lac.westfield.thorn', verb: 'forage', n: 2 });
+  p.send({ t: 'interact', id: 'lac.westfield.pear', verb: 'forage', n: 2 });
+  p.at('lac', 'lac.barn');
+  p.send({ t: 'interact', id: 'lac.barn.hearth', verb: 'hearth' });
+  p.graftInto('light');
+  p.send({ t: 'talk', npc: 'sedge', node: 'neutral.07.out' });
+
+  p.send({ t: 'accept', id: 'neutral.08' });
+  assert.equal(p.quest('neutral.08'), 'active', 'the prereq is N07 done, and it is');
+  p.send({ t: 'talk', npc: 'hana', node: 'neutral.08.in' });
+  assert.equal(p.blocked(), 'worn', 'the Whitewall face from N07 is still on');
+  p.unGraft();
+  assert.equal(p.blocked(), 'cooldown');
+  p.wait(21);
+  assert.equal(p.blocked(), null);
+  assert.equal(p.graftInto('light'), null);
+  assert.equal(p.on('neutral.08'), 'yard');
+
+  // The control. Take the face off and Sanctum Yard is just a square you are standing in.
+  p.unGraft();
+  p.at('wwa', 'wwa.market');
+  p.send({ t: 'enter', area: 'wwa.market' });
+  assert.equal(p.worn, null);
+  assert.equal(p.on('neutral.08'), 'yard', 'no face, no infiltration');
+
+  // Now with one on. Same event, same place, and the step opens.
+  p.wait(21);
+  p.at('lac', 'lac.barn');
+  assert.equal(p.graftInto('light'), null);
+  p.at('wwa', 'wwa.market');
+  p.send({ t: 'enter', area: 'wwa.market' });
+  assert.equal(p.on('neutral.08'), 'trade', 'walked into Sanctum Yard as Ansel');
+
+  // And the two steps behind it are gated the same way.
+  p.send({ t: 'interact', id: 'wwa.market.stall', verb: 'barter', n: 2 });
+  assert.equal(p.on('neutral.08'), 'kesta');
+  p.unGraft();
+  p.send({ t: 'talk', npc: 'kesta', node: 'neutral.08.kesta' });
+  assert.equal(p.on('neutral.08'), 'kesta', 'Kesta does not talk to a face she has not been told about');
 });
 
 test('the reducer never mutates the state it was given', () => {

@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { Terrain, CAMERAS, setCameras, heightAt, TOWNS } from './terrain.js';
 import { Scatter } from './scatter.js';
+import { Stream } from './stream.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { SceneBuilder } from '../editor/build.js';
 import { demoScene } from '../editor/demoScene.js';
@@ -50,12 +51,15 @@ export class Demo {
     this.scatter.build();
     this.terrain.finish();
     this.object3D.add(this.terrain.object3D, this.scatter.object3D);
+    this.stream = new Stream(this);
     this.registerScenarios();
   }
 
-  registerKnobs(q) {
+  registerKnobs(q, app) {
     this.terrain.registerKnobs(q);
     this.scatter.registerKnobs(q);
+    this.stream.registerKnobs(q);
+    if (app) app.stats.blocks = () => this.stream.counts;
   }
 
   // For quality.onRebuild. Only the terrain's own meshes are rebuilt: the occupancy grid, the
@@ -64,9 +68,10 @@ export class Demo {
     this.terrain.teardown();
     this.terrain.build();
     this.terrain.finish();
+    this.stream.reset();
   }
 
-  update(dt, app) { this.terrain.update(dt, app); }
+  update(dt, app) { this.stream.update(dt, app); }
 
   registerScenarios() {
     for (const s of SHOTS.concat(devShots(this.doc))) {

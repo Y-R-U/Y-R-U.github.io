@@ -63,6 +63,10 @@ export function dressing(zoneId, fn, s = 0) {
   return finish(b, g, zoneId);
 }
 
+// A Batch the caller filled itself. The district dressing feeds several per-block batches from one
+// RNG stream, so it cannot use `dressing`'s one-callback-one-batch shape without re-rolling it.
+export function emitBatch(zoneId, b) { return finish(b, new THREE.Group(), zoneId); }
+
 function finish(b, g, zoneId) {
   if (pending) pending.push({ group: g, zoneId, parts: b.parts });
   else b.build(g);

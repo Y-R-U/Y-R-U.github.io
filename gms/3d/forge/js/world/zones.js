@@ -60,6 +60,13 @@ export const ZONES = {
     hood: { inner: '#2b2d31', eyes: ['#e8f0f6', '#8fa6bb'] },
     // ── fowl ──
     fowl: { body: '#ddd1b6', dark: '#6f6047', comb: '#c0463f', beak: '#e0b657', leg: '#dbb277' },
+    // ── vermin ── one rig for all three towns; `ear`, `tail` and `bulk` are what turn a granary
+    // rat into a field vole into a shaft rat without a second mesh. `label` is the town's name
+    // for the animal.
+    vermin: {
+      label: 'granary rat', fur: '#9a8a72', dark: '#4a4034', belly: '#cabfa8',
+      nose: '#c98f8c', claw: '#d9bda3', ear: 1.0, tail: 1.0, bulk: 1.0,
+    },
     // ── interior ──
     wood: { base: '#cbb190', dark: '#a98f6f', roughness: 0.6 },
     // `pattern` names the stained-glass design; `cloth` is the room's one accent; `glow` scales
@@ -118,6 +125,10 @@ export const ZONES = {
     robe: '#9c8a72', staff: 'pitchfork',
     hood: { inner: '#241a11', eyes: ['#9aa84e', '#4a3418'] },
     fowl: { body: '#96602f', dark: '#33200f', comb: '#a8382f', beak: '#c99a4e', leg: '#b58c52' },
+    vermin: {
+      label: 'field vole', fur: '#8a6f45', dark: '#3c3120', belly: '#bda87b',
+      nose: '#b07a68', claw: '#c0a173', ear: 0.60, tail: 0.42, bulk: 1.14,
+    },
     wood: { base: '#8a6f4f', dark: '#6b563d', roughness: 0.75 },
     spell: { core: '#ffe6a8', edge: '#b3541b', bloom: '#5f6b2a', void: '#2b2a14', flare: 1 },
     interior: {
@@ -168,6 +179,10 @@ export const ZONES = {
     robe: '#3c3a3e', staff: 'dark', staffTip: { shape: 'spike', len: 0.28, wide: 0.032, shade: 0.20 },
     hood: { inner: '#050507', eyes: ['#e02a20', '#4c060a'] },
     fowl: { body: '#56535e', dark: '#1b1a21', comb: '#7a2436', beak: '#8f8264', leg: '#7d7259' },
+    vermin: {
+      label: 'shaft rat', fur: '#565058', dark: '#201e24', belly: '#7d766b',
+      nose: '#8a4a4c', claw: '#95897a', ear: 1.18, tail: 1.12, bulk: 0.92,
+    },
     wood: { base: '#4a382a', dark: '#31251b', roughness: 0.55 },
     spell: { core: '#e4d2ff', edge: '#5a2b96', bloom: '#8e1430', void: '#080309', flare: 1 },
     interior: {

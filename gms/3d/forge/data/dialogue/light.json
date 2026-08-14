@@ -34,7 +34,7 @@
     "cam": "two",
     "lines": [
       ["wick_ww", "Five marks the lot.", "That is what the post says."],
-      ["player", "The post is from Tuesday."],
+      ["player", "The post is three days old."],
       ["wick_ww", "So it is.", "Six, and you carry your own crate."]
     ],
     "choices": [
@@ -401,7 +401,6 @@
   "light.22.out": {
     "cam": "close",
     "mark": "thirty.years",
-    "once": true,
     "lines": [
       ["player", "Thirty years. Signed every year."],
       ["kesta", "By Alder?"],
