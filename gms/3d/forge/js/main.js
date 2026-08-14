@@ -47,6 +47,7 @@ app.post.registerKnobs(app.quality);
 
 buildPanel(app);
 
+window.__forge.demo = demo;
 window.__forge.people = people;
 window.__forge.chickens = chickens;
 window.__forge.player = player;
@@ -62,6 +63,18 @@ buildEditor(app, demo, controls);
 const params = new URLSearchParams(location.search);
 const mode = bootMode(params);
 const shot = mode === 'shot' ? getScenario(params.get('shot')) : null;
+
+// `rebuild: true` knobs change vertex counts, so they only take effect once the world is built
+// again. Debounced because they are sliders: dragging one fires on every step and a rebuild is
+// ~200 ms. Never under ?shot= — the render must be the world the scenario asked for, and a
+// rebuild landing between setup and capture would make the shot non-reproducible.
+if (!shot) {
+  let pending = 0;
+  app.quality.onRebuild(() => {
+    clearTimeout(pending);
+    pending = setTimeout(() => { demo.rebuild(); }, 220);
+  });
+}
 
 // The one boot decision: under ?shot= and in the editor no game system is constructed at all, so
 // a scenario's `time` stays the last word and the render stays reproducible.

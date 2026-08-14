@@ -376,7 +376,7 @@ which is `SYSTEMS.md` §10.2's rule made mechanical.
 | `flag` | key, value? | world flag equals value (default `true`) |
 | `truth` | id | the Truth is in the journal, in any campaign |
 | `level` | school, n | `levelFor(xp[school]) >= n` |
-| `attunement` | n | sum of school levels ≥ n |
+| `attunement` | n | Grasp — sum of school levels — ≥ n. The **term id** is the last survival of the retired name; it evaluates `xp.js` `grasp()` and renaming it is a data migration, not a rename |
 | `standing` | faction, n | ≥ n |
 | `item` | id, n | carried count ≥ n |
 | `mk` | n | carried marks ≥ n |
@@ -784,8 +784,14 @@ objective in 13 px with the count right-aligned.
 
 - Only one quest is tracked. Switching is one tap in the journal.
 - On a step change the two lines cross-fade over 0.25 s. No pop-ups, no banners, no toast.
-- The tracker hides entirely during dialogue, in menus, and for 3 s after the last combat hit.
+- The tracker hides entirely during dialogue and in menus.
 - A step with `all:` shows the first incomplete objective, with `2/3` after the title.
+
+**Built in `questrunner.js`, which owns the two lines and rebuilds them only when they change.** Two
+divergences. The tracker does **not** hide for 3 s after a combat hit — there is no combat yet to
+hang that off, and it is a line in `draw()`'s `hidden` term when there is. And §9.4's lost-player
+chevron lives here rather than being a separate widget: after 90 s on one step it appends a rotated
+`➤` to the objective line, aimed at the centre of the step's area and re-quantised to 5°.
 
 ### 4.2 The journal screen
 
@@ -815,6 +821,14 @@ Three tabs. Reachable from the pause menu and from a long-press on the tracker.
 Left column scrolls; right pane is the selected quest. `●` tracked, `○` active, `✓` done, `✕`
 failed. Board quests are labelled and sort last. Done quests collapse to one line.
 
+**Built, with the three buttons resolved differently — diverged from spec.** They are **Track**,
+**Reset step** and, on a failed quest only, **Try again**. `Show me` moved to the pause menu's
+`I am stuck`, because a player who cannot find the objective is not already in the journal looking
+at it; §9.4 is where that decision belongs and this pane should not offer it twice. The header's
+right-hand stamp names a **part of the day** — `Day 131 · Afternoon` — from a seven-name list, not
+the four bells the HUD chip shows: the journal is the player writing things down, and a written note
+says "afternoon", not "after the High bell".
+
 ### 4.3 Truths
 
 `STORY.md` §10 calls Truths "the real carryover" and `SYSTEMS.md` §9 has no field for them. They are
@@ -837,55 +851,76 @@ overturns, and awarding it stamps the old one. There is no per-Truth code:
                   "campaign": "light", "story": "L22", "supersedes": "overdraw" },
 "root.longacre": { "text": "The root of the Forge is under Longacre.",
                    "campaign": "neutral", "story": "N16",
-                   "supersedes": ["vermin.field", "seam.west"] }
+                   "supersedes": ["vermin.field", "seam.west", "boundary.moves"] }
 ```
 
 `js/game/journal.js` `truthChains()` groups known Truths into **connected components**, not linear
 chains: `supersedes` takes an array, so one Truth can overturn two and the block still renders once
-with both struck lines above it. Within a block, struck lines come first in the order they were
-learned and the line that still stands is last. A Truth is struck only when the Truth that overturns
-it is actually in the journal — the catalogue never strikes anything on its own.
+with both struck lines above it. A Truth is struck only when the Truth that overturns it is actually
+in the journal — the catalogue never strikes anything on its own.
+
+**A block is ordered by lineage, not by the day each line was learned — diverged from spec.** This
+section used to say "struck lines come first in the order they were learned". Day order is right for
+a straight chain and wrong for a wide one: the two arms of `prices.raids` were learned alternately
+(Day 32 `raiders.east`, 37 `strike.won`, 78 `raid.water`, 83 `strike.undone`), so on screen a
+correction sat two rows below the line it corrected with an unrelated Truth between them. That
+breaks the one promise this screen makes. `truthChains()` therefore walks each block one arm at a
+time, oldest arm first, and a Truth that overturns several waits until every line it overturns is
+already above it. Straight chains are unaffected. The cost, accepted: the Day stamps inside a wide
+block are no longer monotonic.
 
 **Thirty-four Truths, in eleven chains.** `STORY.md` §8.5 is the catalogue and `data/truths.json`
 carries it verbatim: Light 10, Dark 12, Neutral 12, of which **23 are overturned** across the
 trilogy. The nine recontextualisation moments this section used to list as unwired (D06, D07, D16,
 D18, D21, N08, N10, N14, N17) now all award a Truth. Two chains are three deep *and* three wide —
 `prices.raids` strikes three at once and `root.longacre` strikes three, one of them already the head
-of its own chain — and both render correctly (verified on screen at 844 × 390; the block is five and
-six rows tall, which fits).
+of its own chain.
+
+**Both wide chains have now been looked at on screen**, at 844 × 390 with the real catalogue: the
+`prices.raids` block is six rows and 167 px, `root.longacre` five rows and 139 px, against 408 px of
+list. At `uiScale` 1.4 the six-row block is 219 px and still nothing wraps — the longest Truth in the
+catalogue fits on one line. All 34 known is 1160 px and scrolls. The full record, including how to
+repeat the check, is in `docs/NOTES_RUNTIME_B6-B7.md`.
 
 **Recontextualisation is a strikethrough, not a note in a design document.** `STORY.md` §5's
 contract table becomes this screen, and it is the only place the player can see the trilogy's
 structure:
 
+This is the screen as it renders, with the catalogue's own wording — the widest block last:
+
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────┐
-│  ✕     QUESTS          TRUTHS  (14)          LOG                                   │
+│  ✕     QUESTS          TRUTHS  (34)          LOG                Day 131 · Afternoon│
 ├────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                    │
-│  ◐  A wagon leaves Whitewall every eighth day.                            Day 24   │
+│  ○  ~~Whitewall draws above the covenant.~~                              Day 24    │
+│  ○  ~~Thirty years of overdraw, signed every year.~~                     Day 36    │
+│  ●  The covenant number was always wrong.                                Day 117   │
 │                                                                                    │
-│  ◐  ~~Blackstone attacked the water-stands unprovoked.~~                  Day 31   │
-│  ◑  They came for water. The ones who ran were carrying buckets.          Day 78   │
+│  ○  ~~The Vail is dead before it reaches Blackstone.~~                   Day 35    │
+│  ◐  ~~Blackstone drinks what arrives dead.~~                             Day 70    │
+│  ◐  The Vail is alive above Longacre.                                    Day 71    │
 │                                                                                    │
-│  ○  Whitewall draws above the covenant.                                   Day 22   │
-│                                                                                    │
-│  ○  The Water is dead before it reaches Blackstone.                       Day 40   │
-│                                                                                    │
-│  ●  ~~A Delver broke and gave up the shaft.~~                             Day 33   │
-│  ●  Someone let themselves be taken, and told the truth on purpose.       Day 81   │
+│  ○  ~~Blackstone raids the east water stands.~~                          Day 32    │
+│  ◐  ~~They came for water. You shot at people carrying buckets.~~        Day 78    │
+│  ○  ~~Whitewall holds the Black Keep. That should be the end of it.~~    Day 37    │
+│  ◐  ~~The keep changed hands twice in a winter. Neither town gained…~~   Day 83    │
+│  ●  ~~Longacre keeps both towns' prices on one post.~~                   Day 112   │
+│  ●  Longacre set the prices that caused the raids.                       Day 127   │
 │                                                                                    │
 │  ────────────────────────────────────────────────────────────────────────────────  │
-│  ○ Whitewall    ◐ Blackstone    ● Longacre        14 of 34 known                   │
+│  ○ Whitewall    ◐ Blackstone    ● Longacre        34 of 34 known                   │
 └────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 - The old Truth is **kept and struck through**, with the new one directly under it. Deleting it
   would erase the thing the mechanic is about.
-- Campaign origin is a **filled/half/open ring**, not a colour — see §9.2.
-- The count `14 of 34` is the only completionist pressure in the game and it is deliberate; a player
-  who sees `14 of 34` after finishing Light knows there is a shape they have not seen.
-- Tapping a Truth jumps the Log tab to the scene that granted it.
+- Campaign origin is a **filled/half/open ring**, not a colour — see §9.2. Three rings, `○ ◐ ●`,
+  and the ring is the Truth's *own* campaign, not the one the player happened to be playing.
+- The count is the only completionist pressure in the game and it is deliberate; a player who sees
+  `14 of 34` after finishing Light knows there is a shape they have not seen.
+- Tapping a Truth jumps the Log tab to the scene that granted it. Only Truths that carry a `scene`
+  stamp are tappable; one awarded outside dialogue simply is not.
 
 ### 4.4 The one-portrait-two-names device
 
@@ -1031,7 +1066,7 @@ already the gutter behaviour, so it reads as intended.
 | Derived | From |
 |---|---|
 | every school **level** | `levelFor(xp)` — a save can never disagree with itself |
-| Attunement | sum of levels |
+| Grasp | sum of levels — `xp.js` `grasp(schools)` |
 | `HpMax`, `FocusMax`, regen, power, crit | Ward / Hearth / school levels |
 | quest **availability** | `prereq` predicates against the live state |
 | board contents | `rng(seed ^ day ^ town)` |
@@ -1421,12 +1456,21 @@ HUD.
 └────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Seven rows, 44 px each. Settings holds the accessibility knobs from §9 and a link to the developer
+Six rows, 44 px each. Settings holds the accessibility knobs from §9 and a toggle for the developer
 panel. `Wait until…` is §1.5. `I am stuck` is §9.4. The save line is the reassurance that replaces a
 save button.
 
 Opening the pause menu pauses the clock and the sim and dims the render to 40% — it does not stop
 rendering, because a black screen on a phone reads as a crash.
+
+**Built in `menu.js`, which owns pause, Settings and the character sheet between them.** Four notes.
+The sketch above and the "seven rows" it used to claim disagreed with each other; it is **six**.
+`Wait until…` is *disabled*, not hidden, when the session says you cannot wait — a row that vanishes
+teaches nothing, a row that is greyed teaches that waiting exists and is not allowed here. Both
+`Wait until…` and `I am stuck` open **in place** with a Back row rather than as a second overlay, so
+there is only ever one sheet on screen. And the developer panel is a **toggle in Settings**, not a
+link: §6.4 made play the default for a bare `index.html`, so this is the way back to the knobs
+without reloading into `?editor=1`.
 
 ---
 
@@ -1434,13 +1478,22 @@ rendering, because a black screen on a phone reads as a crash.
 
 Six gestures, zero teaching today: floating stick, look-drag, tap-to-cast, channel-hold, school
 dial, context button. The method is **gate by insufficiency** — each control is introduced at the
-moment the previous one stops being enough — and the text budget for the whole thing is **nine
-lines of four to six words**, printed one at a time, bottom-centre, 12 px, 55% opacity, fading after
-4 s or on first use.
+moment the previous one stops being enough — and the text budget for the whole thing is **seven
+prompts of four to six words**, plus the one `left-handed?` side line, printed one at a time,
+bottom-centre, 12 px, 55% opacity, fading after 4 s or on first use.
 
 The onboarding script is data (`js/game/onboard.js`, one array of `{ when, show, until }`), and every
 prompt is suppressed forever once its `onboard` flag is set (§5.2), including across a New Game —
 because a returning player teaching themselves the stick again is insulting.
+
+**Built, and the script is seven prompts, not nine lines — diverged from spec.** The six gestures
+plus `Walk at the door.` is seven; the missing two were never written because there was nothing left
+to teach. `PROMPTS` carries `{ id, text, when, until }`, `next(ctx, done)` returns the earliest
+prompt whose `when` is armed and whose `until` has not fired, and `settle(ctx, done)` retires
+anything the player has already done **without ever showing it** — which is the mechanism behind the
+New Game rule above, not a special case in the session. The whole module is pure and node-tested;
+the HUD draws whatever `next()` hands it, and `left-handed?` is a `side: true` flag on the `move`
+prompt rather than a second entry in the script.
 
 ### The first ninety seconds
 
@@ -1508,9 +1561,25 @@ listening session. `js/game/audio.js`'s sound map is checked against it by a nod
 id in the `bad` bucket fails the test.** `pickupCoin`, `explosionBoom`, `explosionCrack` and
 `impactThud` are rejected and the game may not use them.
 
+**Built as two files: pure `sounds.js`, adapter `audio.js`.** The map, the beds, the voice cap and
+the attenuation curve are data in `sounds.js`; `audio.js` is the engine, the listener position and
+the tick. Three notes. The voice cap is enforced as **"over twelve voices, refuse anything quieter
+than half"** rather than "drop the quietest pending one-shot" — there is no pending queue to sort, a
+one-shot either fires now or never, and the effect is the one the sketch wanted: a footstep loses to
+a bolt. The bench's tuning parameters are validated by a node test as well as its `bad` bucket —
+every override has to name a parameter the sound actually has and sit inside its declared range, so
+a typo in the map fails the build rather than silently doing nothing. And the one line worth
+carrying forward from the listening session, recorded at the top of `sounds.js`: **every sound that
+survived was filtered noise, and every one that was rejected leaned on oscillators playing pitched
+notes.** A new effect starts as noise.
+
 ### 8.2 The MVP sound list, and nothing more
 
-Eighteen sounds. Every one is an existing id; nothing new is synthesised for the first playable.
+Nineteen rows below. As built that is **23 events — 18 one-shots and 5 ambience beds — over 21
+distinct bench ids**: the footstep row is four ids, the bell and the shift horn are one id twice,
+and a level-up is `uiConfirm` four semitones up. Every one is an existing id; nothing new is
+synthesised for the first playable. Earlier drafts of this section said "eighteen sounds", which
+was never the row count nor the id count.
 
 | Event | Id | Bucket | Note |
 |---|---|---|---|
@@ -1554,6 +1623,20 @@ ambience beds do the job), combat voice, crowd, weather, and a coin sound (`pick
 | Haptics | `haptics` | toggle, on | `navigator.vibrate` where it exists. It does not exist in Safari on iOS, so it is decoration — see §9.3. |
 | Aim assist | `aimAssist` | 0 – 2, default 1 | scales the cone width in `acquire()` |
 | Flip | `flip` | toggle | promoted out of the quality panel to the top of Settings (§7) |
+
+**Built as the Settings sheet, in this order:** left-handed layout, text size, reduced motion, hold
+assist, aim assist, faction marks on people, haptics, volume, mute, ambience, developer panel. Three
+divergences. **Motion is a `Reduced motion` toggle, not a 0–1 slider** — it maps to `motion` 1/0,
+because nobody can tell 0.6 from 0.7 of a camera ease and the setting exists to be found, not tuned;
+the knob is still a float, so a partial value from `prefers-reduced-motion` or a hand-edited save
+survives. **`uiScale` is offered at 0.85 – 1.4 but `save.js` clamps it to 0.8 – 1.6**, deliberately
+wider, so a save written by a future slider is repaired rather than rejected. And every setting is
+written straight through to the save doc on change; there is no apply step and no cancel, which is
+correct for a phone.
+
+`--ui` is set on the `#game` host, not on `:root`. `game.css` declares `--ui: 1` on `#game` itself,
+so anything setting the scale further up the tree is silently overridden — worth knowing before
+debugging a text-size slider that appears to do nothing.
 
 ### 9.2 Colour
 
@@ -1602,6 +1685,12 @@ hue, it is broken.
 
 Nothing in the game is discoverable by sound alone.
 
+**Built on the HUD, three calls wide:** `pulse('bell')` restarts the chip's animation and prints the
+bell name, `bite(on)` inverts the charge ring and grows the context button 12%, and `edge(angle)`
+moves the screen-edge notch. All three are visual-only and none of them is a setting, which is the
+point. The suspicion ring is the fourth and it is drawn continuously from `s.suspicion`, thickening
+from 2 px to 6 px as it fills — above `SUSPICION.showAbove` only, so a clean player never sees it.
+
 ### 9.4 Failure states
 
 **A level-3 player walks into a level-40 area.** `SYSTEMS.md` §4.4's `tierMul` answers XP and not
@@ -1610,8 +1699,9 @@ survival; at Ward 1 the player has 48 HP and a Watchman does 42.9. Four layers, 
 1. **Gate.** The two far towns are locked behind Standing `Trusted`, which `SYSTEMS.md` §7.1 already
    grants ("district gates unlocked"). The gate is a Watch patrol on the bridge who turns you back in
    dialogue — no damage, no invisible wall, and it is the same NPC class you later fight.
-2. **Telegraph.** Crossing into a band more than 6 levels above `attunement / 10` prints one calm
-   line, once per session: `The Watch keeps this road.` No skull icons, no red border.
+2. **Telegraph.** Crossing into a band more than 6 levels above `grasp / 10` prints one calm line,
+   once per session: `The Watch keeps this road.` No skull icons, no red border. Built as
+   `sheet.js` `outclassed(doc, bandLevel)`, pure, with `OVER_LEVEL = 6` as the one number.
 3. **Band the countryside low.** The open ground and the creek between the towns carry band 1–12
    only, per `REVIEW.md` S6. Wandering is safe; the *towns* are the danger.
 4. **The gutter is already gentle.** No XP loss, no corpse run (`SYSTEMS.md` §4.3). A player who
@@ -1624,8 +1714,15 @@ pause menu's `I am stuck`:
 | Stuck | Detection | Fix |
 |---|---|---|
 | In geometry | position moved < 0.15 m for 4 s while the stick is > 0.5 | `Free yourself` — teleport to the nearest road or hearth anchor, no cost. Also offered automatically as a one-line prompt when detected, because a player wedged in a wall will not think to open a menu. |
-| Cannot find the objective | 90 s active on a step with no progress event | the tracker gains a compass chevron pointing at the step's area. At 3 minutes, `Show me` appears in the journal and draws a ground line for 20 s. Neither is ever forced. |
+| Cannot find the objective | 90 s active on a step with no progress event | the tracker gains a compass chevron pointing at the step's area (§4.1). `Show me where` in the pause menu opens the journal on the step. Neither is ever forced. |
 | The quest itself is broken | the step's target does not exist in the world | `Reset this step` runs the step's `recover` action list (§2.4): move the player, respawn the kind, re-grant the item, re-arm the trigger. Every step that can strand a player is required to declare one, and `tools/lintQuests.mjs` warns on any `deliver` / `escort` / `goto` step without one. |
+
+**Built as `session.js` `free()` / `watchStuck()` and the pause menu's three rows.** The automatic
+offer is a card with one button and an eight-second life, never a teleport that just happens. Two
+divergences. `Show me where` **opens the journal on the quest; it does not draw a ground line for
+20 s** — the line needs per-step world anchors that do not exist until Track D places the cast, and
+the chevron already answers the same question with the data that does exist. And `Show me where` and
+`Reset this step` are **disabled with no tracked quest** rather than hidden, for the §6.7 reason.
 
 **A save cannot be read.** `.broken` backup, then New Game or Load a copy. Never a silent overwrite,
 never a crash to a black screen.
@@ -1636,7 +1733,7 @@ only by rotating back. The editor and `?shot=` ignore orientation entirely.
 
 **A phone call arrives mid-channel.** `visibilitychange → hidden` pauses everything and autosaves.
 The channel is cancelled with a full Focus refund on resume — an interrupted 3 s Graft that ate 30
-Focus and a Cinder Token because someone rang is exactly the kind of thing that gets a game deleted.
+Focus because someone rang is exactly the kind of thing that gets a game deleted.
 
 ---
 
@@ -1658,6 +1755,13 @@ green with zero setup — there is no `package.json`, so the glob has to be quot
 | `game/journal.js` | Truths, supersession chains, the log, the quest list | `award(journal, id, defs, stamp)`, `truthChains(journal, defs)`, `count`, `appendLog`, `logScenes`, `questList` |
 | `game/areas.js` | containment | `contains(area, x, z)`, `areasAt(areas, x, z)`, `nearestAnchor(areas, x, z)` |
 | `game/save.js` | `SAVE_VERSION`, `MIGRATIONS`, `normalise`, `clampAll`, `blank` | `normalise(raw, opts) → {doc, error, warnings}`, `blank(seed)`, `rollDay(doc, day)`, `checkPosition(at, world)`, `addItem`, `itemCount` |
+| `game/vitals.js` | Health and Focus, the overdraw rule, the gutter | `limits`, `blank`, `tick`, `spend`, `hurt`, `low`, `down`, `gutter` |
+| `game/sheet.js` | the character sheet and the dial, as data; which schools are open | `sheetOf(doc, ctx)`, `unlocked`, `isUnlocked`, `pins`, `cycle`, `schoolRows`, `basicOf`, `outclassed`, `levelIn` |
+| `game/sale.js` | what a market sale would fetch, priced against one shared ledger | `rows(doc, ctx)`, `quote(rows, picked, doc, opts)` |
+| `game/sounds.js` | the sound map, the beds, the voice cap, the attenuation curve | `SOUNDS`, `AMBIENCE`, `atten`, `ids`, `VOICE_CAP`, `RANGE` |
+| `game/onboard.js` | the §7 script, one data array | `PROMPTS`, `next(ctx, done)`, `settle(ctx, done)` |
+| `game/towns.js` | town ids, display names, faction marks, the §6.4 slate state table | `TOWNS`, `nameOf`, `markOf`, `townOf`, `slate(doc)`, `started` |
+| `game/boot.js` | the one boot decision | `bootMode(params)`, `playing(mode)`, `devRow(mode)` |
 
 Plus Track C's `js/sim/` modules, which these import and never reimplement: `rng`, `xp`, `schools`,
 `spells`, `combat`, `tables`, `gather`, `economy`, `faction`, `campaign`. **`campaign.js` is the
@@ -1674,13 +1778,17 @@ Impure, thin, no numbers of their own.
 | `game/questrunner.js` | loading the packs, translating world events to `game/quest` events, applying effects, giver markers | `load()`, `emit(event)`, `accept(id)`, `track(id)`, `resetStep(id)`, `state` |
 | `game/dialoguebox.js` | the bubble, the choice rows, the camera handoff, the transcript | `play(nodeId)`, `close()`, `active` |
 | `game/journalscreen.js` | the journal screen | `show(tab)`, `close()`, `toggle()`, `showTruth(id)` |
-| `game/hud.js` | vitals, tracker, dial, context button, charge ring, edge notch | `update(dt)`, `setContext(kind, label)`, `pulse(kind)` |
-| `game/menu.js` | pause, settings, character sheet | `open()`, `close()` |
+| `game/hud.js` | vitals, day chip, dial, context button, charge ring, suspicion ring, edge notch, the §7 prompt | `update(dt)`, `setContext(kind, label)`, `pulse(kind)`, `bite(on)`, `edge(angle)`, `say(text)`, `show(on)` |
+| `game/menu.js` | pause, settings, character sheet | `show(view)`, `close()`, `toggle()`, `open` |
 | `game/slate.js` | first run and faction select | `show()` → resolves the chosen campaign |
-| `game/market.js` | the sell panel; every number from `sim/economy` | `open(marketId)`, `close()` |
-| `game/audio.js` | the `audio/` bridge, the sound map, attenuation, the voice cap | `unlock()`, `play(id, {at, level})`, `ambience(id, on)`, `registerKnobs(q)` |
-| `game/onboard.js` | the §7 script, one data array | `tick(ctx)`, `mark(id)` |
-| `game/ui.js` | DOM helpers, `--ui` scale, safe areas, the sheet/overlay primitives | `el()`, `sheet()`, `overlay()`, `setScale(n)` |
+| `game/market.js` | the sell panel; every number from `sale.js` | `show(stall)`, `close()`, `open` |
+| `game/audio.js` | the `audio/` bridge, attenuation, the voice cap, the beds | `unlock()`, `play(event, {at, level})`, `strikes(n)`, `ambience(id, on)`, `at(x, z)`, `tick(dt, ctx)`, `registerKnobs(q)` |
+| `game/ui.js` | the `#game` host and its stylesheet, injected on demand; DOM helpers | `gameHost()`, `el()`, `clear()` |
+
+The tracker is not in `hud.js` — `questrunner.js` owns it, because it is a rendering of quest state
+and nothing else on the HUD is (§4.1). `ui.js` is smaller than §10.2 first drew it: there is no
+`sheet()`, `overlay()` or `setScale()`, because a sheet is a class in the file that needs one and
+the scale is one `style.setProperty` in `session.js`.
 | `game/savestore.js` | read/write/slots for the save, built on `js/kv.js`, plus the §5.7 write scheduler | `load()`, `save(doc)`, `slots()`, `saveSlot()`, `loadSlot()`, `deleteSlot()`, `new Autosave(snapshot)` |
 
 Plus the adapters `SYSTEMS.md` §0.1 names: `cast.js`, `enemies.js`, `nodes.js`.
@@ -1728,16 +1836,21 @@ side under the bare-noun / compound rule from §1.1.
 | `journal.js` | `journalscreen.js` | §4 |
 | `save.js` | `savestore.js` | §5 |
 | `areas.js` | — | containment |
-| — | `session.js`, `ui.js` | boot, tick order, DOM host |
+| `vitals.js`, `sheet.js`, `sale.js`, `towns.js` | `hud.js`, `menu.js`, `market.js`, `slate.js` | §6 |
+| `onboard.js` | `hud.js` (draws the prompt) | §7 |
+| `sounds.js` | `audio.js` | §8 |
+| — | `session.js`, `ui.js`, `boot.js` | boot, tick order, DOM host |
 
 `data/cast.json` is one file beyond §10.3's list: a bubble needs a display name above it and there
 was nowhere else for one. `game.css` and the `#game` host are **injected from `ui.js`** rather than
 added to `index.html` — `index.html` belongs to no track, and injecting keeps the `?shot=` guarantee
 provable (under `?shot=` there is no session, so there is no host, no stylesheet and no knobs).
 
-**Deferred, deliberately:** `body.playing` hiding the dev row. §10.4 is right that `#perf`,
-`.ed-toggle` and `#audio-link` should go in play mode, but hiding them now takes the editor toggle
-and the perf readout away from Track A mid-build. It belongs with B6.
+**`body.playing` hiding the dev row landed with B6**, as this section said it would. `ui.js`
+`gameHost()` adds the class when it injects the host, so it is on exactly when a session exists;
+`boot.js` `devRow(mode)` is the pure statement of the same rule, and `?editor=1` and `?shot=` keep
+`#perf`, `.ed-toggle` and `#audio-link` untouched. Settings → Developer panel brings the knobs back
+without leaving play.
 
 **Files that do not change, and that is the point:** `js/world/lighting.js` (the clock writes the
 existing `time` knob), `js/world/zones.js` (frozen; the faction marks are UI glyphs),
@@ -1797,7 +1910,7 @@ clock and quest-primitive sections. This table is the audit against their revise
 
 | # | Needs | Owner |
 |---|---|---|
-| 1 | Truth ids and one-line texts for `data/truths.json`, and which Truth supersedes which — §4.3 renders the strikethrough, it does not author the pairs | `STORY.md` §5 / §7 |
+| ~~1~~ | ~~Truth ids and one-line texts, and which supersedes which~~ — **closed.** `STORY.md` §8.5 authored all 34 and `data/truths.json` carries them; verified field by field, including every `supersedes` in both directions | — |
 | 2 | Area ids for `data/areas.json`. This document assumes `wwa.*`, `lac.*`, `bst.*`, `reach.light` | `WORLD.md` §3, once the town plans are authored |
 | 3 | `WORLD.md` still calls the towns Lumen / Fallowmere / Umbral; canonical is Whitewall / Longacre / Blackstone, and `WORLD.md` §1.3's coordinates are what §5.3's spawn anchors need | `WORLD.md` §1.3 |
 | 4 | Whether `nightRate` should be turned on after the first playable is measured | owner call, one knob |

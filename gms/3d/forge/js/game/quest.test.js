@@ -251,3 +251,16 @@ test('the reducer never mutates the state it was given', () => {
   step(defs, s1, { t: 'kill', kind: 'grain_rat' }, {});
   assert.equal(JSON.stringify(s1), snapshot);
 });
+
+// The bug this guards: a step opens a branching node, the player picks a branch, and
+// dialoguebox reports the node the conversation *ended* on — so the step never advanced.
+test('a talk step is credited by any node the conversation visited, not just the last', () => {
+  const defs = pack([one('q', ['talk', 'bel', 'ask'])]);
+  let { state } = drive(defs, [{ t: 'accept', id: 'q' }]);
+  ({ state } = drive(defs, [{ t: 'talk', npc: 'bel', node: 'take', nodes: ['ask', 'take'] }], {}, state));
+  assert.equal(state.quests.q.s, 'done', 'the branch the player picked still credits the node the step named');
+
+  let other = drive(defs, [{ t: 'accept', id: 'q' }]).state;
+  ({ state: other } = drive(defs, [{ t: 'talk', npc: 'bel', node: 'take', nodes: ['greet', 'take'] }], {}, other));
+  assert.notEqual(other.quests.q.s, 'done', 'a conversation that never opened the node must not credit it');
+});

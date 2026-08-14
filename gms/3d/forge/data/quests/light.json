@@ -160,6 +160,668 @@
         "recover": [["arm", "wwa.temple.font"]] }
     ],
     "reward": { "items": [["apprentice_cord", 1]] },
-    "onDone": [["flag", "light.act1.done", true], ["act", 2], ["unlock", "light.07"]]
+    "onDone": [["flag", "light.act1.done", true], ["act", 2],
+      ["unlock", "light.07"], ["unlock", "light.09"]]
+  },
+
+  {
+    "id": "light.07",
+    "story": "L07",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "Low Water",
+    "summary": "Rell's catches are down. Walk the reach.",
+    "giver": "rell",
+    "prereq": ["quest", "light.06", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "rell", "light.07.in"],
+        "text": "Hear Rell out at the steps" },
+
+      { "id": "walk", "do": ["goto", "reach.light"],
+        "text": "Walk the Whitewall reach",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "count", "do": ["interact", "reach.light.stand", 6], "in": "reach.light",
+        "verb": "forage",
+        "text": "Count the dry stands",
+        "hint": "Six stands between the spring and the low water.",
+        "recover": [["arm", "reach.light.stand"], ["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "back", "do": ["talk", "rell", "light.07.out"],
+        "text": "Give Rell the count" }
+    ],
+    "onDone": [["flag", "light.reach.walked", true], ["unlock", "light.08"], ["unlock", "light.12"]]
+  },
+
+  {
+    "id": "light.08",
+    "story": "L08",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "What the Weed Says",
+    "summary": "A visitor wants weed at three depths.",
+    "giver": "sedge",
+    "prereq": ["quest", "light.07", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sedge", "light.08.in"],
+        "text": "Take the jars from the herbalist" },
+
+      { "id": "shallow", "do": ["gather", "weed", 3], "in": "wwa.fishsteps",
+        "text": "Weed off the fish steps",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "upper", "do": ["gather", "weed", 3], "in": "stand.chalk",
+        "text": "Weed at the chalk stand",
+        "recover": [["moveTo", "stand.chalk"]] },
+
+      { "id": "deep", "do": ["gather", "weed", 3], "in": "stand.low",
+        "text": "Weed at the low stand",
+        "recover": [["moveTo", "stand.low"]] },
+
+      { "id": "back", "do": ["talk", "sedge", "light.08.out"],
+        "text": "Take the three jars back" }
+    ],
+    "onDone": [["unlock", "light.12"]]
+  },
+
+  {
+    "id": "light.09",
+    "story": "L09",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "The Temple Draw",
+    "summary": "Carry the week's draw to the Almonry.",
+    "giver": "ivo",
+    "prereq": ["quest", "light.06", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "ivo", "light.09.in"],
+        "text": "Take the order from Steward Ivo" },
+
+      { "id": "lift", "do": ["interact", "wwa.temple.font", 1], "in": "wwa.temple",
+        "verb": "ward",
+        "text": "Ward the draw and lift it",
+        "hint": "A held ward keeps the week's draw in the jar.",
+        "recover": [["arm", "wwa.temple.font"]] },
+
+      { "id": "pell", "do": ["talk", "pell", "light.09.pell"],
+        "text": "Pass the works yard" },
+
+      { "id": "carry", "do": ["goto", "wwa.almonry"],
+        "text": "Carry it up to the Almonry",
+        "recover": [["moveTo", "wwa.temple"], ["arm", "wwa.temple.font"]] },
+
+      { "id": "shelf", "do": ["interact", "wwa.almonry.shelf", 1], "in": "wwa.almonry",
+        "verb": "setting",
+        "text": "Set it on the Store shelf",
+        "recover": [["arm", "wwa.almonry.shelf"]] },
+
+      { "id": "out", "do": ["talk", "ivo", "light.09.out"],
+        "text": "Tell Ivo it is stored" }
+    ],
+    "onDone": [["unlock", "light.10"], ["unlock", "light.11"]]
+  },
+
+  {
+    "id": "light.10",
+    "story": "L10",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "Two Ledgers",
+    "summary": "Count the shelf against Ivo's tally.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.09", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.10.in"],
+        "text": "Hear what Kesta noticed" },
+
+      { "id": "shelf", "do": ["interact", "wwa.almonry.shelf", 4], "in": "wwa.almonry",
+        "verb": "barter",
+        "text": "Count what is on the shelf",
+        "recover": [["arm", "wwa.almonry.shelf"]] },
+
+      { "id": "tally", "do": ["interact", "wwa.almonry.tally", 1], "in": "wwa.almonry",
+        "text": "Read the tally board",
+        "recover": [["arm", "wwa.almonry.tally"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.10.out"],
+        "text": "Say the two numbers out loud" }
+    ],
+    "onDone": [["flag", "light.ledger.suspect", true], ["unlock", "light.22"]]
+  },
+
+  {
+    "id": "light.11",
+    "story": "L11",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "Escort West",
+    "summary": "Walk the covered wagon. Ask nothing.",
+    "giver": "alder",
+    "prereq": ["quest", "light.09", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "alder", "light.11.in"],
+        "text": "Take the order from Alder" },
+
+      { "id": "meet", "do": ["goto", "road.spur.light"],
+        "after": 5, "before": 9, "onDay": 8,
+        "text": "Meet the wagon at the spur",
+        "hint": "It goes on the eighth day and no other.",
+        "recover": [["moveTo", "wwa.northgate"]] },
+
+      { "id": "walk",
+        "all": [["escort", "wagon", "road.drove"], ["kill", "rat_knot", 4]],
+        "text": "Walk it up the Drove Road",
+        "hint": "Knots come off the moor at the milestones.",
+        "recover": [["moveTo", "road.spur.light"], ["respawn", "rat_knot", 4]] },
+
+      { "id": "out", "do": ["talk", "alder", "light.11.out"],
+        "text": "Report back, and ask nothing" }
+    ],
+    "onDone": [["unlock", "light.13"], ["unlock", "light.22"]]
+  },
+
+  {
+    "id": "light.12",
+    "story": "L12",
+    "campaign": "light", "act": 2, "town": "light",
+    "title": "The Fish Are Wrong",
+    "summary": "Cook one off the low stand. It burns cold.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.07", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "marrin", "light.12.in"],
+        "text": "Hear Marrin out in the kitchen" },
+
+      { "id": "take", "do": ["gather", "silverling", 1], "in": "stand.low",
+        "text": "Take one fish off the low stand",
+        "recover": [["moveTo", "stand.low"]] },
+
+      { "id": "cook", "do": ["gather", "cooked_silverling", 1], "via": "craft", "in": "wwa.kitchen",
+        "verb": "hearth",
+        "text": "Cook it on the temple hearth",
+        "recover": [["grant", "silverling", 1]] },
+
+      { "id": "out", "do": ["talk", "marrin", "light.12.out"],
+        "text": "Ask Marrin what that was" }
+    ],
+    "onDone": [["flag", "light.act2.done", true], ["act", 3], ["unlock", "light.13"]]
+  },
+
+  {
+    "id": "light.13",
+    "story": "L13",
+    "campaign": "light", "act": 3, "town": "light",
+    "title": "Down the Valley",
+    "summary": "Take coin down King's Road and buy grain.",
+    "giver": "alder",
+    "prereq": ["quest", "light.11", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "alder", "light.13.in"],
+        "text": "Take the temple's coin" },
+
+      { "id": "road", "do": ["goto", "march.west"],
+        "text": "Take King's Road east",
+        "recover": [["moveTo", "wwa.eastgate"]] },
+
+      { "id": "arrive", "do": ["goto", "lac.square"],
+        "text": "Walk into Longacre",
+        "hint": "Over Downs Bridge, then over Millbridge.",
+        "recover": [["moveTo", "march.downsbridge"]] },
+
+      { "id": "ask", "do": ["talk", "hana", "light.13.out"],
+        "text": "Ask after the miller" }
+    ],
+    "onDone": [["unlock", "light.14"]]
+  },
+
+  {
+    "id": "light.14",
+    "story": "L14",
+    "campaign": "light", "act": 3, "town": "neutral",
+    "title": "The Miller's Price",
+    "summary": "Haggle. She takes work, not coin.",
+    "giver": "hana",
+    "prereq": ["quest", "light.13", "done"],
+    "steps": [
+      { "id": "price", "do": ["talk", "hana", "light.14.price"],
+        "text": "Put a price to Hana" },
+
+      { "id": "terms", "do": ["talk", "hana", "light.14.terms"],
+        "text": "Hear what she wants instead" },
+
+      { "id": "follow", "do": ["goto", "lac.mill"],
+        "text": "Follow her into the mill",
+        "recover": [["moveTo", "lac.square"]] }
+    ],
+    "onDone": [["unlock", "light.15"], ["unlock", "light.16"]]
+  },
+
+  {
+    "id": "light.15",
+    "story": "L15",
+    "campaign": "light", "act": 3, "town": "neutral",
+    "title": "Three Chores for Hana",
+    "summary": "The leat, a crate, and the missing hen.",
+    "giver": "hana",
+    "prereq": ["quest", "light.14", "done"],
+    "steps": [
+      { "id": "chores",
+        "all": [["interact", "lac.leat", 4],
+          ["interact", "lac.mill.crate", 3],
+          ["escort", "hen", "lac.henhouse"]],
+        "text": "Do Hana's three chores",
+        "hint": "The hen is under the cotts. It always is.",
+        "recover": [["moveTo", "lac.leat"], ["arm", "lac.leat"],
+          ["arm", "lac.mill.crate"], ["arm", "lac.henhouse.hen"]] },
+
+      { "id": "post", "do": ["interact", "lac.westfield.post", 2], "in": "lac.westfield",
+        "verb": "setting",
+        "text": "Re-set the west field's gatepost",
+        "hint": "Sedge wants it back two paces. Do not ask.",
+        "recover": [["arm", "lac.westfield.post"], ["moveTo", "lac.westfield"]] },
+
+      { "id": "out", "do": ["talk", "hana", "light.15.out"],
+        "text": "Take the grain off Hana" }
+    ],
+    "reward": { "items": [["wheatglass", 6]] },
+    "onDone": [["flag", "light.grain", true], ["unlock", "light.17"], ["unlock", "light.25"]]
+  },
+
+  {
+    "id": "light.16",
+    "story": "L16",
+    "campaign": "light", "act": 3, "town": "neutral",
+    "title": "A Cousin in the Crowd",
+    "summary": "A Whitewall face nobody back home knows.",
+    "giver": "ansel",
+    "prereq": ["quest", "light.14", "done"],
+    "steps": [
+      { "id": "meet", "do": ["talk", "ansel", "light.16.in"],
+        "text": "Hear the cousin out" },
+
+      { "id": "cross", "do": ["goto", "lac.cross"],
+        "text": "Let him show you the cross",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "read", "do": ["interact", "lac.cross.post", 3], "in": "lac.square",
+        "verb": "barter",
+        "text": "Read all three towns' prices",
+        "recover": [["arm", "lac.cross.post"]] },
+
+      { "id": "fish", "do": ["gather", "mudbream", 4], "in": "reach.neutral",
+        "text": "Fish the reach with him",
+        "recover": [["moveTo", "lac.millbridge"]] },
+
+      { "id": "out", "do": ["talk", "ansel", "light.16.out"],
+        "text": "Ask which hall he trained in" }
+    ],
+    "onDone": [["unlock", "light.17"]]
+  },
+
+  {
+    "id": "light.25",
+    "story": "L25",
+    "campaign": "light", "act": 3, "town": "light",
+    "title": "Bread for the Road",
+    "summary": "Bake the first loaf off Longacre grain.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.15", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "marrin", "light.25.in"],
+        "text": "Give Marrin the grain" },
+
+      { "id": "bake", "do": ["gather", "cooked_wheatglass", 3], "via": "craft", "in": "wwa.kitchen",
+        "verb": "hearth",
+        "text": "Bake three loaves",
+        "recover": [["grant", "wheatglass", 3]] },
+
+      { "id": "carry", "do": ["deliver", "cooked_wheatglass", 1, "hana"], "in": "lac.mill",
+        "text": "Carry one back down to Hana",
+        "recover": [["grant", "cooked_wheatglass", 1], ["moveTo", "lac.mill"]] },
+
+      { "id": "out", "do": ["talk", "hana", "light.25.out"],
+        "text": "See what Hana makes of it" }
+    ],
+    "onDone": [["unlock", "light.17"]]
+  },
+
+  {
+    "id": "light.17",
+    "story": "L17",
+    "campaign": "light", "act": 3, "town": "neutral",
+    "title": "What Fen Carries",
+    "summary": "Ferry three crates. Count them both ends.",
+    "giver": "fen",
+    "prereq": ["quest", "light.15", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "light.17.in"],
+        "text": "Take a turn on the ferry" },
+
+      { "id": "load", "do": ["interact", "lac.millbridge.crate", 3], "in": "lac.millbridge",
+        "verb": "barter",
+        "text": "Count three crates aboard",
+        "recover": [["arm", "lac.millbridge.crate"]] },
+
+      { "id": "cross", "do": ["escort", "fen", "reach.neutral"],
+        "text": "Cross with the load",
+        "recover": [["moveTo", "lac.millbridge"]] },
+
+      { "id": "count", "do": ["interact", "lac.mill.crate", 3], "in": "lac.mill",
+        "verb": "barter",
+        "text": "Count them off at the far end",
+        "recover": [["arm", "lac.mill.crate"]] },
+
+      { "id": "out", "do": ["talk", "fen", "light.17.out"],
+        "text": "Ask Fen about the fourth" }
+    ],
+    "onDone": [["flag", "light.act3.done", true], ["act", 4], ["unlock", "light.18"]]
+  },
+
+  {
+    "id": "light.18",
+    "story": "L18",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "Smoke on the East Wind",
+    "summary": "Drive the raid off the east water stands.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.17", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.18.in"],
+        "text": "Muster with Kesta at the gate" },
+
+      { "id": "ride", "do": ["goto", "reach.east"],
+        "text": "Get down to the east stands",
+        "recover": [["moveTo", "wwa.eastgate"]] },
+
+      { "id": "fight",
+        "all": [["kill", "hollow", 2], ["kill", "sour_crow", 6]],
+        "in": "reach.east",
+        "text": "Drive them off the stands",
+        "hint": "The crows come down first. The staffs come after.",
+        "recover": [["moveTo", "stand.east"], ["respawn", "hollow", 2], ["respawn", "sour_crow", 6]] },
+
+      { "id": "hold", "do": ["survive", "reach.east", 60],
+        "text": "Hold the stands until they break",
+        "recover": [["moveTo", "stand.east"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.18.out"],
+        "text": "Count what they left behind" }
+    ],
+    "onDone": [["flag", "light.raid.held", true],
+      ["unlock", "light.19"], ["unlock", "light.26"], ["unlock", "light.27"]]
+  },
+
+  {
+    "id": "light.19",
+    "story": "L19",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "The Captive",
+    "summary": "Question the Delver. She calls herself Sela.",
+    "giver": "alder",
+    "prereq": ["quest", "light.18", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "alder", "light.19.in"],
+        "text": "Alder wants you in the room" },
+
+      { "id": "down", "do": ["goto", "wwa.cells"],
+        "text": "Go down to the gate cells",
+        "recover": [["moveTo", "wwa.northgate"]] },
+
+      { "id": "ask", "do": ["talk", "sela", "light.19.ask"],
+        "text": "Ask her what they came for" },
+
+      { "id": "press", "do": ["talk", "sela", "light.19.more"],
+        "text": "Hear the rest of it" },
+
+      { "id": "out", "do": ["talk", "alder", "light.19.out"],
+        "text": "Tell Alder what she said" }
+    ],
+    "onDone": [["unlock", "light.20"]]
+  },
+
+  {
+    "id": "light.20",
+    "story": "L20",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "The Shaft's Mouth",
+    "summary": "Scout the Black Keep. Do not be seen.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.19", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.20.in"],
+        "text": "Take the scouting from Kesta" },
+
+      { "id": "climb", "do": ["goto", "ridge.dark"], "unseen": true,
+        "text": "Get onto the ridge unseen",
+        "hint": "Dim first, then move. The Watch reads light.",
+        "recover": [["moveTo", "heath.blackspan"]] },
+
+      { "id": "watch", "do": ["interact", "ridge.dark.mark", 3], "in": "ridge.dark",
+        "verb": "glamour", "unseen": true,
+        "text": "Mark what goes down the shaft",
+        "recover": [["arm", "ridge.dark.mark"], ["moveTo", "ridge.dark"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.20.out"],
+        "text": "Bring the count home" }
+    ],
+    "onDone": [["unlock", "light.21"]]
+  },
+
+  {
+    "id": "light.26",
+    "story": "L26",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "Feeding the Picket",
+    "summary": "The stands are held day and night now.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.18", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "light.26.in"],
+        "text": "Take the picket's order" },
+
+      { "id": "catch", "do": ["gather", "silverling", 3], "in": "reach.light",
+        "text": "Take three fish off the steps",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "cook", "do": ["gather", "cooked_silverling", 3], "via": "craft", "in": "wwa.kitchen",
+        "verb": "hearth",
+        "text": "Cook three hot meals",
+        "recover": [["grant", "silverling", 3]] },
+
+      { "id": "carry", "do": ["deliver", "cooked_silverling", 3, "reach.east"], "in": "reach.east",
+        "text": "Carry them out before they cool",
+        "recover": [["grant", "cooked_silverling", 3], ["moveTo", "stand.east"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.26.out"],
+        "text": "Sit down with the picket a minute" }
+    ],
+    "onDone": [["unlock", "light.21"]]
+  },
+
+  {
+    "id": "light.27",
+    "story": "L27",
+    "campaign": "light", "act": 4, "town": "light",
+    "title": "The Crab Stands",
+    "summary": "Nobody has worked the east water since.",
+    "giver": "rell",
+    "prereq": ["quest", "light.18", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "rell", "light.27.in"],
+        "text": "Rell will not go down there himself" },
+
+      { "id": "clear", "do": ["kill", "creek_crab", 9], "in": "reach.east",
+        "text": "Clear the crabs off three stands",
+        "hint": "Their shell turns a bolt. Break it first.",
+        "recover": [["moveTo", "stand.east"], ["respawn", "creek_crab", 9]] },
+
+      { "id": "work", "do": ["gather", "silverling", 4], "in": "reach.east",
+        "text": "Work the stands, to prove they hold",
+        "recover": [["moveTo", "stand.east"]] },
+
+      { "id": "out", "do": ["talk", "rell", "light.27.out"],
+        "text": "Give Rell his water back" }
+    ],
+    "onDone": [["unlock", "light.21"]]
+  },
+
+  {
+    "id": "light.21",
+    "story": "L21",
+    "campaign": "light", "act": 4, "town": "dark",
+    "title": "The Dry Stand",
+    "summary": "Take a reading on the Blackstone reach.",
+    "giver": "fen",
+    "prereq": ["quest", "light.20", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "light.21.in"],
+        "text": "Fen will row you past the gorge" },
+
+      { "id": "down", "do": ["goto", "reach.dark"],
+        "text": "Go downriver past Blackstone",
+        "recover": [["moveTo", "heath.blackspan"]] },
+
+      { "id": "read", "do": ["interact", "reach.dark.reading", 3], "in": "reach.dark",
+        "verb": "forage",
+        "text": "Take three readings",
+        "recover": [["arm", "reach.dark.reading"], ["moveTo", "stand.dry"]] },
+
+      { "id": "draw", "do": ["gather", "foul_water", 3], "in": "reach.dark",
+        "text": "Draw what the line brings up",
+        "hint": "Nothing else will take. That is the reading.",
+        "recover": [["moveTo", "stand.dry"]] },
+
+      { "id": "out", "do": ["talk", "fen", "light.21.out"],
+        "text": "Say what colour the water is" }
+    ],
+    "onDone": [["flag", "light.act4.done", true], ["act", 5], ["unlock", "light.22"]]
+  },
+
+  {
+    "id": "light.22",
+    "story": "L22",
+    "campaign": "light", "act": 5, "town": "light",
+    "title": "Ivo's Room",
+    "summary": "Into the Almonry at one in the morning.",
+    "prereq": ["all",
+      ["quest", "light.10", "done"],
+      ["quest", "light.11", "done"],
+      ["quest", "light.21", "done"]],
+    "steps": [
+      { "id": "night", "do": ["goto", "wwa.almonry"],
+        "after": 1, "before": 4, "unseen": true,
+        "text": "Get into the Almonry after one",
+        "recover": [["moveTo", "wwa.market"]] },
+
+      { "id": "ward", "do": ["interact", "wwa.almonry.door", 1], "in": "wwa.almonry",
+        "verb": "ward",
+        "text": "Ward the door behind you",
+        "recover": [["arm", "wwa.almonry.door"]] },
+
+      { "id": "read", "do": ["interact", "wwa.almonry.ledger", 4], "in": "wwa.almonry",
+        "text": "Read thirty years of it",
+        "hint": "Four hands, and the same hand signs them all.",
+        "recover": [["arm", "wwa.almonry.ledger"]] },
+
+      { "id": "lock", "do": ["interact", "wwa.almonry.lock", 1], "in": "wwa.almonry",
+        "verb": "mend",
+        "text": "Mend the lock you broke",
+        "recover": [["arm", "wwa.almonry.lock"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.22.out"],
+        "text": "Tell one person. Only one" }
+    ],
+    "onDone": [["flag", "light.ledger.read", true], ["unlock", "light.23"], ["unlock", "light.28"]]
+  },
+
+  {
+    "id": "light.28",
+    "story": "L28",
+    "campaign": "light", "act": 5, "town": "light",
+    "title": "Two Hundred Bowls",
+    "summary": "Feed the muster the night before it goes.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.22", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "marrin", "light.28.in"],
+        "text": "Marrin is cooking for two hundred" },
+
+      { "id": "catch", "do": ["gather", "silverling", 6], "in": "reach.light",
+        "text": "Bring in six off the steps",
+        "recover": [["moveTo", "wwa.fishsteps"]] },
+
+      { "id": "cook", "do": ["gather", "cooked_silverling", 6], "via": "craft", "in": "wwa.kitchen",
+        "verb": "hearth",
+        "text": "Cook until the pots are full",
+        "recover": [["grant", "silverling", 6]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_silverling", 6, "wwa.market"], "in": "wwa.market",
+        "text": "Serve the muster in the Yard",
+        "recover": [["grant", "cooked_silverling", 6], ["moveTo", "wwa.market"]] },
+
+      { "id": "out", "do": ["talk", "marrin", "light.28.out"],
+        "text": "Sit down with Marrin after" }
+    ],
+    "onDone": [["unlock", "light.23"]]
+  },
+
+  {
+    "id": "light.23",
+    "story": "L23",
+    "campaign": "light", "act": 5, "town": "dark",
+    "title": "The Strike on Blackstone",
+    "summary": "Take the Black Keep. Hold it till morning.",
+    "giver": "alder",
+    "prereq": ["quest", "light.22", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "alder", "light.23.in"],
+        "text": "March east with the muster" },
+
+      { "id": "march", "do": ["goto", "heath.blackspan"],
+        "after": 21, "before": 5,
+        "text": "Cross Blackspan in the dark",
+        "recover": [["moveTo", "lac.ashgate"]] },
+
+      { "id": "climb",
+        "all": [["kill", "watchman", 4], ["kill", "hollow", 4]],
+        "in": "bst.switchback",
+        "text": "Fight up the switchback",
+        "hint": "Lancet windows above you. Keep to the wall.",
+        "recover": [["moveTo", "bst.westgate"], ["respawn", "watchman", 4], ["respawn", "hollow", 4]] },
+
+      { "id": "take", "do": ["goto", "bst.keep"],
+        "text": "Take the keep",
+        "recover": [["moveTo", "bst.bailey"]] },
+
+      { "id": "hold", "do": ["survive", "bst.bailey", 120],
+        "text": "Hold the bailey until morning",
+        "recover": [["moveTo", "bst.bailey"]] },
+
+      { "id": "out", "do": ["talk", "kesta", "light.23.out"],
+        "text": "Stand at the mouth of the shaft" }
+    ],
+    "onDone": [["flag", "light.keep.held", true], ["unlock", "light.24"]]
+  },
+
+  {
+    "id": "light.24",
+    "story": "L24",
+    "campaign": "light", "act": 5, "town": "light",
+    "title": "The Covenant, Read Again",
+    "summary": "Publish the ledger, or hold it.",
+    "giver": "alder",
+    "prereq": ["quest", "light.23", "done"],
+    "steps": [
+      { "id": "come", "do": ["goto", "wwa.temple"],
+        "after": 12, "before": 14, "onDay": 8,
+        "text": "Attend the reading at High",
+        "recover": [["moveTo", "wwa.temple"]] },
+
+      { "id": "read", "do": ["talk", "alder", "light.24.reading"],
+        "text": "Hear the covenant read again" },
+
+      { "id": "choose", "do": ["talk", "alder", "light.24.choice"],
+        "text": "Answer him" },
+
+      { "id": "words", "do": ["talk", "alder", "light.24.answer"],
+        "text": "Say the words" }
+    ],
+    "onDone": [["flag", "light.done", true], ["flag", "echo.white_cord", true],
+      ["unlock", "dark"]]
   }
 ]

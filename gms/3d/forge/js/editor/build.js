@@ -10,7 +10,16 @@ import { zone } from '../world/zones.js';
 import { heightAt, waterY } from '../world/terrain.js';
 import { footprint } from './scene.js';
 
-const BUILDERS = { wallRun, tower, house };
+// v3's six new types. Each is a `dressing` batch of the shared kit rather than a builder in
+// buildings.js, because none of them has an interior or a door — they are furniture for a town,
+// not architecture. Nothing here branches on zone: the materials do that.
+const kit = fn => (zoneId, p) => dressing(zoneId, b => fn(b, rng(p.seed || 1), p), p.seed || 1);
+
+const BUILDERS = {
+  wallRun, tower, house,
+  mill: kit(mill), barn: kit(barn), pen: kit(pen),
+  cross: kit(cross), arcade: kit(arcade), retaining: kit(retaining),
+};
 
 // Shared with colliders.js, which used to carry its own copy of these and drift from them.
 export const BRIDGE = {
@@ -56,7 +65,7 @@ export class SceneBuilder {
     this.object3D.add(g);
     this.groups[di] = g;
 
-    if (register && d.road) T2.addPath(d.road, d.roadWidth, d.zone);
+    if (register && d.road && d.roadWidth > 0) T2.addPath(d.road, d.roadWidth, d.zone);
 
     beginBatch();
     const beds = [], masses = [], here = this.objectsIn(di);
@@ -93,7 +102,7 @@ export class SceneBuilder {
     if (merged) g.add(merged);
 
     if (register && d.bridge) {
-      T2.addFootprint(d.bridge.x, d.bridge.z, 6.3, 13.5, 0, { ao: 0.28, grow: 4.5 });
+      T2.addFootprint(d.bridge.x, d.bridge.z, 6.3, 13.5, d.bridge.ry || 0, { ao: 0.28, grow: 4.5 });
       T2.addReflection(d.bridge.x, d.bridge.z, 11.4, 4.05);
     }
   }
@@ -258,30 +267,167 @@ function plainHouse(b, R, z, { x, z: zz, w, d, h, rot, top, bot }) {
   }
 }
 
-function bridge(b, R, { x, z: cz, halfSpan }) {
+// `ry` turns the deck to face the water. It used to be built axis-aligned in z, which was fine
+// while the creek ran along x; the Vail crosses Millbridge at 45° and an unrotated deck spans
+// dry land beside the channel.
+function bridge(b, R, { x, z: cz, halfSpan, deck: high, ry = 0 }) {
   const wy = waterY(x);
-  const deck = wy + BRIDGE.deck;
+  const deck = wy + (high || BRIDGE.deck);
   const len = halfSpan * 2 + BRIDGE.overhang * 2;
   const w = BRIDGE.w;
   const bedY = wy - 2.85;
   const px = BRIDGE.parapetX();
+  const base = T(x, 0, cz, ry);
+  const at = (lx, y, lz) => base.clone().multiply(T(lx, y, lz));
+  const cos = Math.cos(ry), sin = Math.sin(ry);
 
   for (const s of [-1, 1]) {
-    const az = cz + s * (halfSpan + 3.9);
-    const gh = heightAt(x, cz + s * (halfSpan + 8.25));
+    const d = s * (halfSpan + 8.25);
+    const gh = heightAt(x - sin * d, cz + cos * d);
     const abut = deck - Math.min(bedY, gh - 1.5);
-    b.add('wall', taperBox(w, 7.8, abut, w + 1.65, 9.9), T(x, deck - abut / 2, az));
+    b.add('wall', taperBox(w, 7.8, abut, w + 1.65, 9.9), at(0, deck - abut / 2, s * (halfSpan + 3.9)));
   }
   for (const s of [-1, 1]) {
-    b.add('wall', taperBox(3.0, 2.25, deck - bedY, 4.2, 3.3), T(x, bedY + (deck - bedY) / 2, cz + s * 4.35));
+    b.add('wall', taperBox(3.0, 2.25, deck - bedY, 4.2, 3.3), at(0, bedY + (deck - bedY) / 2, s * 4.35));
   }
-  b.add('wall', new THREE.BoxGeometry(w, 0.83, len), T(x, deck - 0.42, cz));
-  b.add('trim', new THREE.BoxGeometry(w + 0.75, 0.3, len + 0.6), T(x, deck + 0.09, cz));
+  b.add('wall', new THREE.BoxGeometry(w, 0.83, len), at(0, deck - 0.42, 0));
+  b.add('trim', new THREE.BoxGeometry(w + 0.75, 0.3, len + 0.6), at(0, deck + 0.09, 0));
   for (const s of [-1, 1]) {
-    b.add('wall', new THREE.BoxGeometry(BRIDGE.parapetT, 1.28, len), T(x + s * px, deck + 0.75, cz));
-    b.add('trim', new THREE.BoxGeometry(0.93, 0.24, len), T(x + s * px, deck + 1.5, cz));
+    b.add('wall', new THREE.BoxGeometry(BRIDGE.parapetT, 1.28, len), at(s * px, deck + 0.75, 0));
+    b.add('trim', new THREE.BoxGeometry(0.93, 0.24, len), at(s * px, deck + 1.5, 0));
   }
   for (const s of [-1, 1]) {
-    addRubble(b, R, { m: T(x, bedY + 0.3, cz + s * (halfSpan + 3.9)), length: w, offset: s * 2.4, count: 8, size: 0.83, surface: 'wall' });
+    addRubble(b, R, { m: at(0, bedY + 0.3, s * (halfSpan + 3.9)), length: w, offset: s * 2.4, count: 8, size: 0.83, surface: 'wall' });
+  }
+}
+
+// --- v3 object types -------------------------------------------------------------------------
+
+function gabled(b, R, { w, d, h, thatch = false, over = 0.68 }) {
+  const ridgeX = w >= d;
+  const spanW = ridgeX ? d : w, ridgeLen = ridgeX ? w : d;
+  const rise = spanW * 0.55;
+  const th = thatch ? 0.75 : 0.45;
+  b.add('wall', new THREE.BoxGeometry(w, h, d), T(0, h / 2, 0));
+  const roof = roofSlab({ w: spanW, d: ridgeLen, rise, over, th, profile: 'flat' });
+  if (ridgeX) roof.rotateY(Math.PI / 2);
+  b.add('roof', roof, T(0, h, 0), true);
+  const gm = ridgeX
+    ? [T(w / 2, h, 0, Math.PI / 2), T(-w / 2, h, 0, -Math.PI / 2)]
+    : [T(0, h, d / 2), T(0, h, -d / 2, Math.PI)];
+  for (const q of gm) b.add('wall', extrude(gableShape(spanW, rise, over, 'flat', th), 0.18), q);
+  b.add('trim', new THREE.BoxGeometry(ridgeLen + 1.05, 0.27, 0.54),
+    ridgeX ? T(0, h + rise - 0.09, 0) : T(0, h + rise - 0.09, 0, Math.PI / 2));
+  return rise;
+}
+
+// A gabled house with an overshot wheel on its +x face and the launder that feeds it.
+function mill(b, R, { w, d, h, wheel }) {
+  gabled(b, R, { w, d, h });
+  const hub = w / 2 + 0.9;
+  const spokes = 12;
+  for (let i = 0; i < spokes; i++) {
+    const a = (i / spokes) * Math.PI * 2;
+    b.add('wood', new THREE.BoxGeometry(0.28, wheel * 2 - 0.5, 0.9),
+      T(hub, wheel + 0.6, 0).multiply(T(0, 0, 0, 0, 0, a)));
+    b.add('wood', new THREE.BoxGeometry(0.5, 0.9, 1.5),
+      T(hub + 0.1, wheel + 0.6 + Math.cos(a) * (wheel - 0.2), Math.sin(a) * (wheel - 0.2)));
+  }
+  for (const s of [-1, 1]) {
+    b.add('trim', new THREE.CylinderGeometry(wheel, wheel, 0.22, 20),
+      T(hub + s * 0.7, wheel + 0.6, 0, 0, 0, Math.PI / 2));
+  }
+  b.add('wood', new THREE.BoxGeometry(5.4, 0.5, 1.8), T(hub + 2.4, wheel * 2 + 0.5, 0));
+  addChimney(b, R, { m: T(span(R, -w * 0.2, w * 0.2), h + 1.2, 0), w: 1.28, h: 3.0, surface: 'wall', cap: 'trim' });
+}
+
+// Long, tall, no windows, and a cart-sized opening in the middle of each long side.
+function barn(b, R, { w, d, h }) {
+  gabled(b, R, { w, d, h, thatch: true, over: 1.05 });
+  const dw = Math.min(6, w * 0.3), dh = Math.min(h - 0.6, 6.6);
+  for (const s of [-1, 1]) {
+    b.add('wood', new THREE.BoxGeometry(dw, dh, 0.24), T(0, dh / 2, s * (d / 2 + 0.06)));
+    b.add('trim', new THREE.BoxGeometry(dw + 0.8, 0.34, 0.5), T(0, dh + 0.17, s * (d / 2 + 0.1)));
+  }
+  const posts = Math.max(2, Math.round(w / 5));
+  for (let i = 0; i <= posts; i++) {
+    const x = -w / 2 + (w * i) / posts;
+    if (Math.abs(x) < dw / 2 + 0.6) continue;
+    for (const s of [-1, 1]) b.add('wood', new THREE.BoxGeometry(0.36, h, 0.2), T(x, h / 2, s * (d / 2 + 0.05)));
+  }
+}
+
+function pen(b, R, { w, d, h }) {
+  const put = (x, z) => b.add('wood', new THREE.BoxGeometry(0.22, h + 0.3, 0.22), T(x, (h + 0.3) / 2, z));
+  const rail = (x, z, len, ry) => {
+    for (const y of [h * 0.45, h * 0.92]) {
+      b.add('wood', new THREE.BoxGeometry(len, 0.14, 0.1), T(x, y + span(R, -0.04, 0.04), z, ry));
+    }
+  };
+  const nx = Math.max(2, Math.round(w / 3.2)), nz = Math.max(2, Math.round(d / 3.2));
+  for (let i = 0; i <= nx; i++) {
+    const x = -w / 2 + (w * i) / nx;
+    put(x, -d / 2); put(x, d / 2);
+    if (i < nx) { rail(x + w / nx / 2, -d / 2, w / nx, 0); rail(x + w / nx / 2, d / 2, w / nx, 0); }
+  }
+  for (let i = 1; i < nz; i++) {
+    const z = -d / 2 + (d * i) / nz;
+    put(-w / 2, z); put(w / 2, z);
+  }
+  for (let i = 0; i < nz; i++) {
+    const z = -d / 2 + (d * (i + 0.5)) / nz;
+    rail(-w / 2, z, d / nz, Math.PI / 2); rail(w / 2, z, d / nz, Math.PI / 2);
+  }
+}
+
+// Stepped octagonal base, a tapering shaft, a head. The one thing every market square has.
+function cross(b, R, { steps, height, radius }) {
+  let y = 0;
+  for (let i = 0; i < steps; i++) {
+    const r = radius * (1 - i / (steps + 1.6));
+    b.add('trim', new THREE.CylinderGeometry(r, r + 0.06, 0.28, 8), T(0, y + 0.14, 0));
+    y += 0.28;
+  }
+  b.add('wall', new THREE.CylinderGeometry(0.52, 0.72, 0.9, 8), T(0, y + 0.45, 0));
+  y += 0.9;
+  b.add('wall', new THREE.CylinderGeometry(0.26, 0.44, height, 8), T(0, y + height / 2, 0));
+  y += height;
+  b.add('trim', new THREE.CylinderGeometry(0.62, 0.30, 0.7, 8), T(0, y + 0.35, 0));
+  b.add('trim', new THREE.BoxGeometry(0.34, 1.1, 0.34), T(0, y + 1.2, 0));
+  b.add('trim', new THREE.BoxGeometry(1.0, 0.3, 0.3), T(0, y + 1.35, 0));
+}
+
+// A run of piers under a flat lean-to: the market frontage, and the cheapest way to make a
+// street read as a street rather than a row of boxes.
+function arcade(b, R, { length, height, depth, bays }) {
+  const pitch = length / bays;
+  const pw = Math.min(1.2, pitch * 0.22);
+  for (let i = 0; i <= bays; i++) {
+    const x = -length / 2 + pitch * i;
+    b.add('wall', taperBox(pw, depth * 0.55, height, pw * 1.5, depth * 0.75), T(x, height / 2, 0));
+  }
+  b.add('wall', new THREE.BoxGeometry(length + pw, 0.75, depth * 0.6), T(0, height + 0.375, 0));
+  b.add('trim', new THREE.BoxGeometry(length + pw + 0.5, 0.26, depth * 0.7), T(0, height + 0.88, 0));
+  // the arch heads, as a chamfer block between each pair of piers
+  for (let i = 0; i < bays; i++) {
+    const x = -length / 2 + pitch * (i + 0.5);
+    b.add('wall', taperBox(pitch - pw, depth * 0.5, 0.6, pitch - pw * 2.6, depth * 0.5), T(x, height - 0.3, 0));
+  }
+  for (const s of [-1, 1]) {
+    b.add('wall', new THREE.BoxGeometry(pw, height + 0.75, depth * 0.55), T(s * (length / 2), (height + 0.75) / 2, -depth * 0.24));
+  }
+}
+
+// Holds a terrace up. Battered face, a coping course, and buttresses every 8 m — the thing
+// Blackstone's three levels need if the ground between them is not to read as a grass ramp.
+function retaining(b, R, { length, height, batter }) {
+  const foot = height * batter + 0.9;
+  b.add('wall', taperBox(length, foot * 2, height, length, 1.2), T(0, height / 2, 0));
+  b.add('trim', new THREE.BoxGeometry(length + 0.4, 0.34, 1.6), T(0, height + 0.17, 0));
+  const n = Math.max(1, Math.round(length / 8));
+  for (let i = 0; i <= n; i++) {
+    const x = -length / 2 + (length * i) / n;
+    b.add('wall', taperBox(1.1, foot * 2 + 1.1, height * 0.82, 1.1, 0.9),
+      T(x, height * 0.41, -foot * 0.4 + span(R, -0.05, 0.05)));
   }
 }

@@ -49,12 +49,13 @@ export class Colliders {
 
     for (const d of doc.districts) {
       if (d.bridge) {
-        const { x, z, halfSpan } = d.bridge;
-        const deck = waterY(x) + BRIDGE.deck + BRIDGE.trimTop;
+        const { x, z, halfSpan, ry = 0 } = d.bridge;
+        const deck = waterY(x) + (d.bridge.deck || BRIDGE.deck) + BRIDGE.trimTop;
         const half = halfSpan + BRIDGE.overhang + 0.3;
-        put(x, z, BRIDGE.w / 2 - 0.9, half, 0, deck - 1.125, deck, WALK.stepUp);
+        put(x, z, BRIDGE.w / 2 - 0.9, half, ry, deck - 1.125, deck, WALK.stepUp);
         for (const s of [-1, 1]) {
-          put(x + s * BRIDGE.parapetX(), z, BRIDGE.parapetT / 2 + 0.15, half, 0, deck - 0.3, deck + 1.155, 0);
+          const o = s * BRIDGE.parapetX();
+          put(x + o * Math.cos(ry), z - o * Math.sin(ry), BRIDGE.parapetT / 2 + 0.15, half, ry, deck - 0.3, deck + 1.155, 0);
         }
       }
       // A kerb is a retaining wall with a flight of steps cut into it, so it stays walkable well

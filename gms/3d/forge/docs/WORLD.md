@@ -90,6 +90,12 @@ Light in the west, Dark in the east, Neutral literally in the middle and literal
 elevation profile alone tells you where you are: **west is up and pale, east is up and black, the
 middle is down and green.** That is the navigation backbone and it costs nothing.
 
+These are live at A4. `js/world/field.js` `TOWNS` carries exactly these centres and footprints, and
+its `pad` is **metres above the valley floor at the town's own x** — literally the "+22 / +2 / +30"
+in the table above, plus 9 m per terrace for Blackstone. It used to be an absolute height, under
+which Longacre's `pad: [5]` sat *below* `waterY(0) = 4.84` and only the "nothing outside the
+channel may sit below the river surface" clamp hid it. `data/areas.json` assumes these centres.
+
 ### 1.4 The countryside between them
 
 Named regions, because "the bit between the towns" is how you end up with 500 m of empty grass.
@@ -645,17 +651,32 @@ small fbm/sine wobble for the sub-100 m wiggle. Sines cannot be made to pass thr
 point on purpose; a spline can, which is what makes the river a *designed* feature rather than a
 lucky one.
 
+**Corrected at A5, and the doc was the thing that was wrong.** The list this section proposed is
+*not* the river. `data/areas.json` places 89 areas — six fish stands, four reaches, the mill leat,
+the Whitespring and all four crossings — by evaluating `creekZ` from `js/world/field.js` at each x,
+**wobble included**. That makes the code's spline the contract; moving a control point moves
+fishing water into dry fields. The list below is what shipped, verbatim:
+
 ```js
 export const RIVER_CP = [
-  [-780,-60],[-700,-10],[-600, 50],[-520,112],[-430,142],[-340,118],[-262, 48],
-  [-180, 10],[-100, 34],[ -30, 86],[  40,124],[ 130,166],[ 220,150],[ 300, 84],
-  [ 380, 16],[ 452,-26],[ 530, -4],[ 620, 62],[ 720,150],[ 790,190],
+  [-880,236],[-820,220],[-700,190],[-600,158],[-500,120],[-400, 90],[-286, 40],
+  [-180, 30],[ -80, 62],[ -34,118],[  60,140],[ 140,110],[ 200, 60],[ 260, 20],[ 330,  4],
+  [ 400, 30],[ 480, 72],[ 560,110],[ 660,150],[ 780,182],[ 880,205],
 ];
-export const creekZ = x => splineAt(RIVER_CP, x) + 9*fbm(x*0.011, 0.3, 2, 17);
+export const creekZ = x => splineAt(RIVER_CP, x) + 7*fbm(x*0.0091 + 1.234, 0.777, 2, 17);
 ```
 
-Amplitude goes from ±10 m to **±100 m** — the river genuinely crosses the line of travel rather
-than paralleling it.
+It runs from z = +236 at the head to z = +4 at its southern turn and back to +205 — **232 m of
+z range**, which is the ±100 m amplitude this section was arguing for and more. It crosses the
+King's Road four times.
+
+Two things a successor needs to know about it. The control points run past the map edge to
+x = ±880 so the spline is well-defined at X0 and X1. And the phase offsets are irrational: value
+noise has zero gradient at every lattice node, so an integer offset puts a node on x = 0 for every
+octave at once — see the `street_dusk` seam in `docs/NOTES_WORLD_A2-A5.md`.
+
+**Do not re-derive the control points from `areas.json`.** Its z values already contain the wobble;
+pinning control points to them and adding the wobble again double-counts it.
 
 **`creekHalf` becomes authorable per reach** — 3.5 m at the head in the Downs, 13 m at the Hollow
 Ford, 4.5 m in the Blackstone gorge.
@@ -678,10 +699,24 @@ Four, each a different type, because four identical stone bridges is one landmar
 
 | name | x | type | notes |
 |---|---|---|---|
-| **Downs Bridge** | −286 | two-arch stone, 24 m span | the existing `bridge()` builder, ×1.5, two piers |
-| **Millbridge** | −34 | single-arch stone, 18 m, is the town's south gate | the road crosses *into* Longacre here |
-| **Hollow Ford** | +252 | no structure — a shallowed, widened channel | 26 m wide, 0.45 m deep, stepping stones, wade-able |
-| **Blackspan** | +348 | single high arch, 30 m span, 14 m above the water | over the head of the gorge |
+| name | x | z | type | notes |
+|---|---|---|---|---|
+| **Downs Bridge** | −286 | 38 | two-arch stone, 24 m span | the existing `bridge()` builder, ×1.5, two piers |
+| **Millbridge** | −34 | 119 | single-arch stone, 18 m, is the town's south gate | the road crosses *into* Longacre here |
+| **Hollow Ford** | **+200** | 62 | no structure — a shallowed, widened channel | 28 m wide, 0.45 m deep, stepping stones, wade-able |
+| **Blackspan** | **+400** | 30 | single high arch, 30 m span, 14 m above the water | over the head of the gorge |
+
+**The x figures for the ford and the span were wrong** — 252 and 348 here against 200 and 400 in
+the code, and `areas.json` places `heath.ford` and `heath.blackspan` on the code's. Corrected to the
+code. The z column is new and is `creekZ(x)`, wobble included; the bridge builders take it from
+`creekZ` at build time rather than from a literal, so a bridge always meets the water.
+
+`bridge()` also gained **`ry`**. It built the deck axis-aligned in z, which was fine while the
+creek ran roughly along x; the Vail crosses Millbridge at 45° and the unrotated deck spanned dry
+land beside the channel.
+
+Blackspan's 14 m was not tuned to — with the gorge built as the *absence* of a flood plain rather
+than a deeper one, the measured rim at x = 400 is **14.51 m above the water**.
 
 **How a ford works mechanically.** No new system: `CHANNEL(x)` drops to 0.45 m across a 40 m band,
 `creekHalf(x)` widens to 13, and the road ribbon (`addPath`) runs straight through. The player walks
@@ -691,25 +726,47 @@ a splash are `SYSTEMS.md`'s call. There is one thing to check: `heightAt`'s chan
 (`h = wy − CHANNEL·(1 − (d/half)^1.7)`) already handles a shallow channel correctly; nothing else
 in `heightAt` needs to know a ford exists.
 
-Between the Hollow Ford and Blackspan the road runs 110 m along the **south** bank, round the base
-of Ashen Crag. That is deliberate: ford → south bank → high bridge is a three-beat sequence and it
-is the most memorable 25 seconds of the King's Road.
+Between the Hollow Ford and Blackspan the road runs **~210 m** along the **south** bank, round the
+base of Ashen Crag. (110 m here was measured against the wrong crossing positions.) That is
+deliberate: ford → south bank → high bridge is a three-beat sequence and it is the most memorable
+40 seconds of the King's Road.
 
 ### 4.4 Roads
 
 Two, both splines, both registered with `terrain.addPath()`.
 
-- **The King's Road** — Whitewall east gate (−400, −66) → Longacre (in the south gate, up the High
-  Street, out the Ash Gate) → Blackstone west gate (405, −80). 1078 m, half-width 9 m outside towns
-  (`roadWidth` 18), 1.17 sinuosity.
-- **The Drove Road** — a northern bypass across the moor, Whitewall north gate to Blackstone north gate,
-  1088 m, half-width 4 m, unmetalled. It exists so there is a second way to travel and a reason for
-  the North Moor to have anything in it.
-- **Spurs** — three, one per town, joining the two roads. Plus farm tracks around Longacre.
+Built at A5 in `js/world/field.js` `ROADS`, as Catmull-Rom control-point lists. `AT(x)` control
+points take their z from `creekZ(x)` at build time, so a road always meets the water where the
+water actually is. Gate positions come from `data/areas.json`, which is why they differ by a few
+metres from the figures this section first carried.
+
+- **The King's Road** — Whitewall east gate (**−408, −66**) → Downs Bridge → the south bank →
+  Millbridge → the market square → the Ash Gate → the Hollow Ford → the south bank round Ashen
+  Crag → Blackspan → Blackstone west gate (**411, −80**). **Measured 1110 m**, against the 1078 m
+  predicted here — 3 % out, so §1.1's 101 s / 115 s journey times stand. Half-width 9 m outside
+  towns, tapering to 4 m inside one: the King's Road *is* Longacre's High Street, and an 18 m
+  carriageway between two rows of frontages is a motorway.
+- **The Drove Road** — a northern bypass across the moor, (−470, −248) → the hillfort → the beacon
+  at (−40, −280) → (470, −242). **946 m**, half-width 4 m, unmetalled. It exists so there is a
+  second way to travel and a reason for the North Moor to have anything in it. It is shorter than
+  the 1088 m predicted here because `areas.json`'s `road.drove` stops at ±470 and the last leg to
+  each north gate is a spur.
+- **Spurs** — three, one per town, joining the two roads: Whitewall's north gate → the Drove
+  (133 m), Longacre north → the beacon (214 m), Blackstone's north gate → the Drove (99 m).
 - **Milestones** every 100 m on the King's Road: a small carved stone with a direction. This is the
   navigation aid instead of a minimap and it costs about 12 `mass` objects.
 
 ### 4.5 What has to change in the terrain code
+
+> **Done at A4/A5.** What landed, against what this section asked for: the region profile, the
+> towns-as-data mask and the `slopeAt` cache are all in. `heightAt` split into **`landAt` + `carve`**
+> — the world mesh is built from `landAt`, which has no channel in it, and `carve` is added back by
+> both the bank ribbon's vertices and `surfaceY`, so the two agree by construction and the river
+> contributes **zero** to the `surfaceY` / `heightAt` disagreement. The arc-length bank ribbon and
+> the ten-segment water mesh are built. `addPath` is unchanged and takes the road lines from
+> `ROADS`. **Not done:** ridge-and-furrow in Longacre's fields, and per-patch occupancy grids at
+> GS 1 (`GS` is still a flat 2 — A3's holding position). Numbers in `docs/NOTES_WORLD_A2-A5.md`.
+
 
 **`heightAt(x, z)`** — currently `wild()` + a town-pad flattener + the creek cut, all analytic and
 all evaluated per vertex.

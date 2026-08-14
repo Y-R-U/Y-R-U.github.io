@@ -29,6 +29,12 @@ const STORY_IDS = new Set([...QUESTS, ...SANDBOX].map(q => q.id));
 
 const known = (set, id) => set.has(id) || (id.startsWith('cooked_') && set.has(id.slice(7)));
 
+// The playable box from js/world/terrain.js — the mesh inset 40 m. Copied rather than imported
+// because terrain.js pulls in three.
+const PLAY = { x0: -680, x1: 680, z0: -360, z1: 280 };
+const CAMPAIGN_IDS = ['light', 'dark', 'neutral'];
+const RECOVER = { moveTo: 'area', respawn: 'enemy', grant: 'item', arm: 'object', sound: 'any' };
+
 const readJson = p => JSON.parse(readFileSync(p, 'utf8'));
 
 export function lintAll(root = ROOT) {
@@ -78,8 +84,8 @@ export function lintAll(root = ROOT) {
     return false;
   };
 
-  const speakers = new Set();
-  for (const n of Object.values(dialogue)) for (const l of n.lines) speakers.add(l[0]);
+  errors.push(...areaGeometryErrors(areas));
+
   const nodeOwners = {};
   for (const [id, n] of Object.entries(dialogue)) {
     for (const l of n.lines) (nodeOwners[l[0]] ||= []).push(id);
@@ -105,6 +111,9 @@ export function lintAll(root = ROOT) {
     for (const e of def.onDone) {
       if (e[0] === 'truth' && !truths[e[1]]) errors.push(`${p}.onDone: unknown truth ${e[1]}`);
       if (e[0] === 'dialogue' && !dialogue[e[1]]) errors.push(`${p}.onDone: unknown dialogue node ${e[1]}`);
+      if (e[0] === 'unlock' && !defs[e[1]] && !CAMPAIGN_IDS.includes(e[1])) {
+        errors.push(`${p}.onDone: unlocks ${e[1]}, which is neither a quest nor a campaign`);
+      }
     }
 
     for (const s of def.steps) {
@@ -116,6 +125,18 @@ export function lintAll(root = ROOT) {
       for (const e of s.onDone || []) {
         if (e[0] === 'dialogue' && !dialogue[e[1]]) errors.push(`${sp}.onDone: unknown dialogue node ${e[1]}`);
         if (e[0] === 'truth' && !truths[e[1]]) errors.push(`${sp}.onDone: unknown truth ${e[1]}`);
+      }
+      // A recover action that names nothing is a "Reset this step" button that does nothing, and
+      // the player only ever presses it when already stuck.
+      for (const a of s.recover || []) {
+        const want = RECOVER[a[0]];
+        if (!want) { errors.push(`${sp}.recover: ${a[0]} is not one of ${Object.keys(RECOVER).join(' | ')}`); continue; }
+        if (want === 'area' && !areaId(a[1])) errors.push(`${sp}.recover: moveTo unknown area ${a[1]}`);
+        if (want === 'enemy' && !ENEMIES[a[1]]) errors.push(`${sp}.recover: respawn unknown enemy ${a[1]}`);
+        if (want === 'item' && !known(ITEMS, a[1])) errors.push(`${sp}.recover: grant unknown item ${a[1]}`);
+        if (want === 'object' && !areaId(a[1]) && !underKnownArea(a[1])) {
+          errors.push(`${sp}.recover: arm ${a[1]} is not under any declared area`);
+        }
       }
       for (const o of s.objectives) {
         switch (o.k) {
@@ -140,6 +161,11 @@ export function lintAll(root = ROOT) {
             if (o.node && dialogue[o.node] && !nodeOwners[o.npc]?.includes(o.node)) {
               warnings.push(`${sp}: ${o.npc} does not speak in ${o.node}`);
             }
+            // dialoguebox reports the node a conversation *ends* on, so a step whose node branches
+            // away is a step the player can complete the conversation for and never get credit.
+            for (const exit of exitsOf(dialogue[o.node])) {
+              errors.push(`${sp}: ${o.node} runs on to ${exit}, so the scene ends on a node this step does not name`);
+            }
             break;
           case 'interact':
             if (o.id.includes('.') && !underKnownArea(o.id)) warnings.push(`${sp}: interact id ${o.id} is not under any declared area`);
@@ -160,7 +186,68 @@ export function lintAll(root = ROOT) {
 
   errors.push(...graphErrors(defs));
   errors.push(...truthErrors(truths));
+  errors.push(...unwiredTruths(defs, dialogue, truths));
   return { errors, warnings, defs, dialogue, areas, truths };
+}
+
+// STORY §8.5 promises a Truth on a named quest. Twice now the table has promised one that was
+// never wired to anything, so a Truth whose quest is in the shipped packs has to be awarded by
+// something in them. Truths belonging to campaigns not yet authored are skipped.
+function unwiredTruths(defs, dialogue, truths) {
+  const out = [];
+  const byStory = {};
+  for (const d of Object.values(defs)) if (d.story) byStory[d.story] = d;
+  const awarded = new Set();
+  const collect = list => { for (const e of list || []) if (e[0] === 'truth') awarded.add(e[1]); };
+  for (const d of Object.values(defs)) {
+    for (const t of d.reward.truths) awarded.add(t);
+    collect(d.onDone);
+    for (const s of d.steps) collect(s.onDone);
+  }
+  for (const n of Object.values(dialogue)) {
+    if (n.mark) awarded.add(n.mark);
+    collect(n.sets);
+    for (const c of n.choices || []) collect(c.sets);
+  }
+  for (const [id, t] of Object.entries(truths)) {
+    if (!t?.story || !byStory[t.story]) continue;
+    if (!awarded.has(id)) out.push(`truth ${id}: ${t.story} is in the packs but nothing awards it`);
+  }
+  return out;
+}
+
+const exitsOf = node => node
+  ? [...(node.choices || []).map(c => c.goto), node.next].filter(Boolean)
+  : [];
+
+const boxOf = s => s.k === 'circle'
+  ? { x0: s.x - s.r, x1: s.x + s.r, z0: s.z - s.r, z1: s.z + s.r }
+  : { x0: Math.min(s.x0, s.x1), x1: Math.max(s.x0, s.x1), z0: Math.min(s.z0, s.z1), z1: Math.max(s.z0, s.z1) };
+
+const centre = s => s.k === 'circle' ? { x: s.x, z: s.z } : { x: (s.x0 + s.x1) / 2, z: (s.z0 + s.z1) / 2 };
+
+const holds = (s, x, z) => s.k === 'circle'
+  ? (x - s.x) ** 2 + (z - s.z) ** 2 <= s.r * s.r
+  : x >= Math.min(s.x0, s.x1) && x <= Math.max(s.x0, s.x1)
+    && z >= Math.min(s.z0, s.z1) && z <= Math.max(s.z0, s.z1);
+
+// areas.json is the contract the world is built to satisfy, so an area outside the playable box
+// is a place the world agent cannot build and the player cannot reach.
+function areaGeometryErrors(areas) {
+  const out = [];
+  for (const a of Object.values(areas)) {
+    if (!a.shape) continue;
+    const b = boxOf(a.shape);
+    if (b.x0 < PLAY.x0 || b.x1 > PLAY.x1 || b.z0 < PLAY.z0 || b.z1 > PLAY.z1) {
+      out.push(`areas.json: ${a.id} leaves the playable box (${b.x0},${b.z0})–(${b.x1},${b.z1})`);
+    }
+    const parent = a.parent && areas[a.parent];
+    if (parent?.shape) {
+      const c = centre(a.shape);
+      if (!holds(parent.shape, c.x, c.z)) out.push(`areas.json: ${a.id} is not inside its parent ${a.parent}`);
+    }
+  }
+  return out;
 }
 
 // A supersession chain is the whole point of the Truths tab, so a broken link is an error.
@@ -204,6 +291,13 @@ function graphErrors(defs) {
     walk(defs[id].prereq);
     return [...found];
   };
+
+  for (const d of Object.values(defs)) {
+    for (const dep of deps(d.id)) {
+      const o = defs[dep];
+      if (o.campaign === d.campaign && o.act > d.act) out.push(`${d.id}: act ${d.act} waits on ${dep}, which is act ${o.act}`);
+    }
+  }
 
   const seen = {}, stack = new Set();
   const cycle = id => {

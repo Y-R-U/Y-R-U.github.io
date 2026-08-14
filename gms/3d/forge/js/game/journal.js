@@ -34,13 +34,18 @@ export function award(journal, id, defs, { day = 0, campaign = null, quest = nul
 export function truthChains(journal, defs = {}) {
   const held = new Map(journal.truths.map(t => [t.id, t]));
   const linked = new Map(journal.truths.map(t => [t.id, new Set()]));
+  const parents = new Map(journal.truths.map(t => [t.id, []]));
+  const children = new Map(journal.truths.map(t => [t.id, []]));
   const struck = new Set();
+  const dayOf = id => held.get(id).day;
   for (const t of journal.truths) {
     for (const p of parentsOf(defs[t.id])) {
       if (!held.has(p)) continue;
       struck.add(p);
       linked.get(t.id).add(p);
       linked.get(p).add(t.id);
+      parents.get(t.id).push(p);
+      children.get(p).push(t.id);
     }
   }
 
@@ -50,28 +55,43 @@ export function truthChains(journal, defs = {}) {
   const chains = [];
   for (const t of journal.truths) {
     if (seen.has(t.id)) continue;
-    const group = [], queue = [t.id];
+    const ids = [], queue = [t.id];
     seen.add(t.id);
     while (queue.length) {
       const id = queue.shift();
-      const cur = held.get(id);
-      group.push({
-        id,
-        text: defs[id]?.text ?? id,
-        day: cur.day,
-        // The ring is the Truth's own campaign, not the one the player happened to be in.
-        campaign: defs[id]?.campaign ?? cur.campaign,
-        earned: cur.campaign,
-        scene: cur.scene ?? null,
-        struck: struck.has(id),
-      });
+      ids.push(id);
       for (const n of linked.get(id)) if (!seen.has(n)) { seen.add(n); queue.push(n); }
     }
-    // Struck lines first in the order they were learned, the line that still stands last.
-    group.sort((a, b) => (a.struck === b.struck ? a.day - b.day : b.struck - a.struck));
-    chains.push(group);
+    chains.push(order(ids, parents, children, dayOf).map(id => ({
+      id,
+      text: defs[id]?.text ?? id,
+      day: dayOf(id),
+      // The ring is the Truth's own campaign, not the one the player happened to be in.
+      campaign: defs[id]?.campaign ?? held.get(id).campaign,
+      earned: held.get(id).campaign,
+      scene: held.get(id).scene ?? null,
+      struck: struck.has(id),
+    })));
   }
   return chains.sort((a, b) => a[0].day - b[0].day);
+}
+
+// Each correction has to sit directly under the line it corrects, or a wide block reads as a pile
+// of unrelated struck lines. So a block is walked lineage-first — one arm at a time, oldest arm
+// first — rather than sorted by the day it was learned, and a Truth that overturns several waits
+// until every line it overturns is already above it.
+function order(ids, parents, children, dayOf) {
+  const byDay = list => [...list].sort((a, b) => dayOf(a) - dayOf(b));
+  const out = [], done = new Set();
+  const walk = id => {
+    if (done.has(id) || parents.get(id).some(p => !done.has(p))) return;
+    done.add(id);
+    out.push(id);
+    byDay(children.get(id)).forEach(walk);
+  };
+  byDay(ids.filter(id => !parents.get(id).length)).forEach(walk);
+  for (const id of byDay(ids)) if (!done.has(id)) { done.add(id); out.push(id); }
+  return out;
 }
 
 export const count = (journal, defs = {}) => ({

@@ -2,9 +2,14 @@
 // `objects`; build.js turns a document into geometry and nothing else reads the world from code.
 
 import { ZONE_IDS } from '../world/zones.js';
-import { CENTERS } from '../world/terrain.js';
+import { CENTERS } from '../world/field.js';
 
-export const SCENE_VERSION = 2;
+export const SCENE_VERSION = 3;
+
+// A 60 m spatial grid over the world, assigned at load rather than authored: one less thing for a
+// human to get wrong, and it re-derives correctly the moment a building is moved.
+export const BLK = 60;
+export const blockOf = (x, z) => ((Math.floor(z / BLK) + 512) << 10) + Math.floor(x / BLK) + 512;
 
 const num = (v, def) => (Number.isFinite(+v) ? +v : def);
 
@@ -60,6 +65,65 @@ export const TYPES = {
     label: 'Block', params: MASS_SIZE,
     plan: p => [p.w / 2, p.d / 2], margin: [0.45, 0.45],
     tall: p => p.h + Math.min(p.w, p.d),
+  },
+  // v3. Every one of these is the same kit — taperBox, roofSlab, gableShape, the shared
+  // materials — arranged differently. None of them has zone-specific geometry; `zones.js` is
+  // still the only place a zone differs.
+  mill: {
+    label: 'Mill', params: [
+      { key: 'w', label: 'Width', min: 8, max: 24, step: 0.5, def: 13 },
+      { key: 'd', label: 'Depth', min: 8, max: 20, step: 0.5, def: 11 },
+      { key: 'h', label: 'Height', min: 8, max: 24, step: 0.5, def: 13.5 },
+      { key: 'wheel', label: 'Wheel radius', min: 1.5, max: 6, step: 0.1, def: 3.3 },
+    ],
+    plan: p => [p.w / 2 + p.wheel * 0.5, p.d / 2], margin: [0.75, 0.75],
+    tall: p => p.h + Math.min(p.w, p.d),
+  },
+  barn: {
+    label: 'Barn', params: [
+      { key: 'w', label: 'Width', min: 12, max: 48, step: 0.5, def: 27 },
+      { key: 'd', label: 'Depth', min: 8, max: 24, step: 0.5, def: 15 },
+      { key: 'h', label: 'Eaves', min: 5, max: 18, step: 0.5, def: 8.5 },
+    ],
+    plan: p => [p.w / 2, p.d / 2], margin: [0.9, 0.9],
+    tall: p => p.h + p.d * 0.7,
+  },
+  pen: {
+    label: 'Pen', params: [
+      { key: 'w', label: 'Width', min: 4, max: 40, step: 0.5, def: 16 },
+      { key: 'd', label: 'Depth', min: 4, max: 40, step: 0.5, def: 12 },
+      { key: 'h', label: 'Rail height', min: 0.9, max: 2.4, step: 0.05, def: 1.5 },
+    ],
+    plan: p => [p.w / 2, p.d / 2], margin: [0.3, 0.3],
+    tall: p => p.h + 0.6,
+  },
+  cross: {
+    label: 'Market cross', params: [
+      { key: 'steps', label: 'Steps', min: 2, max: 6, step: 1, def: 4 },
+      { key: 'height', label: 'Shaft height', min: 3, max: 12, step: 0.25, def: 6.5 },
+      { key: 'radius', label: 'Base radius', min: 1.5, max: 6, step: 0.1, def: 3.2 },
+    ],
+    plan: p => [p.radius, p.radius], margin: [0.9, 0.9],
+    tall: p => p.height + p.steps * 0.28 + 1.2,
+  },
+  arcade: {
+    label: 'Arcade', params: [
+      { key: 'length', label: 'Length', min: 6, max: 60, step: 0.5, def: 21 },
+      { key: 'height', label: 'Height', min: 3.6, max: 12, step: 0.25, def: 5.4 },
+      { key: 'depth', label: 'Depth', min: 2, max: 8, step: 0.25, def: 3.6 },
+      { key: 'bays', label: 'Bays', min: 2, max: 12, step: 1, def: 5 },
+    ],
+    plan: p => [p.length / 2, p.depth / 2], margin: [0.45, 0.45],
+    tall: p => p.height + 1.2,
+  },
+  retaining: {
+    label: 'Retaining wall', params: [
+      { key: 'length', label: 'Length', min: 6, max: 120, step: 1, def: 36 },
+      { key: 'height', label: 'Height', min: 1.5, max: 14, step: 0.25, def: 9 },
+      { key: 'batter', label: 'Batter', min: 0, max: 0.4, step: 0.01, def: 0.12 },
+    ],
+    plan: p => [p.length / 2, p.height * p.batter + 0.9], margin: [0.6, 0.9],
+    tall: p => p.height + 0.9,
   },
 };
 
@@ -131,6 +195,10 @@ export const cloneScene = doc => JSON.parse(JSON.stringify(doc));
 // v1 had no per-object seeds and fast-forwarded one shared RNG per district (`dressSkip`), so
 // detail depended on build order. Nothing can recover the old look from the data alone; the
 // migration gives every object a stable seed and says so.
+// v2 → v3 adds the six new object types, `blk` and `lod`, and `town` as a stable string id
+// alongside `dist`. `dist` stays: it is an index into `districts`, which the editor still owns,
+// and renaming it reaches into editor.js, panel.js and colliders.js — files this pass does not
+// own. `town` is what A8 and the streaming pass should read.
 const MIGRATIONS = {
   1: raw => ({
     ...raw,
@@ -138,7 +206,14 @@ const MIGRATIONS = {
     districts: (raw.districts || []).map(d => ({ ...d, dressSeed: num(d.seed, 0) })),
     objects: (raw.objects || []).map((o, i) => ({ ...o, seed: num(o.seed, i * 2654435 + 1) })),
   }),
+  2: raw => ({
+    ...raw,
+    version: 3,
+    objects: (raw.objects || []).map(o => ({ ...o, lod: o?.lod || 'auto' })),
+  }),
 };
+
+const LODS = ['full', 'proxy', 'auto'];
 
 // An imported file is untrusted: keep only fields the builder understands, drop anything that
 // would throw halfway through a build, and say what was lost rather than quietly eating it.
@@ -153,7 +228,9 @@ export function normalise(raw) {
   for (let from = Math.max(1, Math.floor(v)); from < SCENE_VERSION; from++) {
     if (!MIGRATIONS[from]) return fail(`no migration from v${from}`);
     raw = MIGRATIONS[from](raw);
-    warnings.push(`upgraded v${from} → v${from + 1}; object detail was re-seeded`);
+    warnings.push(from === 1
+      ? 'upgraded v1 → v2; object detail was re-seeded'
+      : `upgraded v${from} → v${from + 1}`);
   }
 
   const districts = (Array.isArray(raw.districts) ? raw.districts : []).map((d, i) => district(
@@ -167,7 +244,9 @@ export function normalise(raw) {
       kerbs: Array.isArray(d.kerbs)
         ? d.kerbs.map(k => ({ x: num(k?.x, 0), z: num(k?.z, 0), len: num(k?.len, 4), side: Math.sign(num(k?.side, 1)) || 1, top: num(k?.top, 0) }))
         : [],
-      bridge: d.bridge ? { x: num(d.bridge.x, 0), z: num(d.bridge.z, 0), halfSpan: num(d.bridge.halfSpan, 5.6) } : null,
+      bridge: d.bridge
+        ? { x: num(d.bridge.x, 0), z: num(d.bridge.z, 0), halfSpan: num(d.bridge.halfSpan, 5.6), deck: num(d.bridge.deck, 0), ry: num(d.bridge.ry, 0) }
+        : null,
     },
   ));
   if (!districts.length) districts.push(...emptyScene().districts);
@@ -187,11 +266,16 @@ export function normalise(raw) {
     for (const s of TYPES[o.type].params) p[s.key] = num(o.p?.[s.key], s.def);
     if (o.type === 'house' && p.w < HOUSE_MIN_W) narrow++;
     const id = Number.isInteger(+o.id) && +o.id > 0 && !used.has(+o.id) ? +o.id : 0;
+    const dist = Math.min(districts.length - 1, Math.max(0, num(o.dist, 0) | 0));
+    const x = num(o.x, 0), z = num(o.z, 0);
     const obj = {
       id,
-      dist: Math.min(districts.length - 1, Math.max(0, num(o.dist, 0) | 0)),
+      dist,
+      town: districts[dist].zone,
+      blk: blockOf(x, z),
+      lod: LODS.includes(o.lod) ? o.lod : 'auto',
       zone: o.zone, type: o.type,
-      x: num(o.x, 0), z: num(o.z, 0), ry: num(o.ry, 0),
+      x, z, ry: num(o.ry, 0),
       seed: (num(o.seed, 0) | 0) || newSeed(),
       p,
     };

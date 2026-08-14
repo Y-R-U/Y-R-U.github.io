@@ -21,6 +21,7 @@ export class DialogueBox {
     this.pack = {};
     this.scene = null;
     this.seen = [];
+    this.nodes = [];
     this.root = el('div', 'g-scene');
     this.held = 0;
     this.frameYaw = 0;
@@ -34,8 +35,9 @@ export class DialogueBox {
   play(nodeId) {
     const scene = open(this.pack, nodeId, { ...this.ctx(), seen: this.seen });
     if (!scene) return false;
-    if (!this.scene) this.begin(scene);
+    if (!this.scene) { this.begin(scene); this.nodes = []; }
     this.scene = scene;
+    this.nodes.push(nodeId);
     if (!this.seen.includes(nodeId)) this.seen.push(nodeId);
     this.frame(scene.node.cam);
     this.draw();
@@ -114,7 +116,7 @@ export class DialogueBox {
   end(node) {
     const speaker = node.lines.find(l => l[0] !== 'player')?.[0] || null;
     this.close();
-    this.onDone({ node: node.id, npc: speaker });
+    this.onDone({ node: node.id, nodes: this.nodes || [node.id], npc: speaker });
   }
 
   close() {

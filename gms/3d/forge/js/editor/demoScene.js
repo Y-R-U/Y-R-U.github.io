@@ -6,18 +6,21 @@
 
 import { rng, span } from '../world/details.js';
 import { ZONE_IDS } from '../world/zones.js';
-import { CENTERS, creekZ, nearCamera } from '../world/terrain.js';
+import { TOWNS, creekZ, nearCamera, CROSSINGS } from '../world/terrain.js';
 import { SCENE_VERSION, district, footprint } from './scene.js';
 import { seedDocument } from './build.js';
 
 export function demoScene(terrain) {
   const doc = { version: SCENE_VERSION, name: 'Demo', districts: [], objects: [] };
-  const skips = ZONE_IDS.map((zone, di) => layout(doc, terrain, zone, di, CENTERS[di]));
+  const skips = ZONE_IDS.map((zone, di) => layout(doc, terrain, zone, di, TOWNS[di]));
   doc.objects.forEach((o, i) => { o.id = i + 1; });
   return seedDocument(doc, skips);
 }
 
-function layout(doc, terrain, zone, di, cx) {
+// The demo town is a placeholder A8 replaces, but it has to sit on its town's pad or every
+// scenario camera looks at empty countryside. Everything here is (cx, tz)-relative.
+function layout(doc, terrain, zone, di, town) {
+  const cx = town.cx, tz = town.cz;
   let draws = 0;
   const stream = rng(0x2f1a71 + di * 977);
   const R = () => { draws++; return stream(); };
@@ -31,10 +34,9 @@ function layout(doc, terrain, zone, di, cx) {
     return o;
   };
 
-  const cz = creekZ(cx);
   const road = [
-    [cx - 3.0, -27], [cx - 1.4, -15], [cx + 2.0, 1], [cx + 1.4, 17],
-    [cx - 1.8, 31], [cx - 0.6, cz - 9], [cx - 0.2, cz + 10],
+    [cx - 3.0, tz - 27], [cx - 1.4, tz - 15], [cx + 2.0, tz + 1], [cx + 1.4, tz + 17],
+    [cx - 1.8, tz + 31], [cx - 0.9, tz + 47],
   ];
   const roadX = zz => {
     for (let i = 0; i < road.length - 1; i++) {
@@ -44,21 +46,21 @@ function layout(doc, terrain, zone, di, cx) {
     return zz < road[0][1] ? road[0][0] : road[road.length - 1][0];
   };
 
-  put('wallRun', cx, -34, 0, { length: 56, height: 9, thickness: 2.4 }, { rubble: true });
+  put('wallRun', cx, tz - 34, 0, { length: 56, height: 9, thickness: 2.4 }, { rubble: true });
   for (const s of [-1, 1]) {
-    put('tower', cx + s * 26, -34, 0, { radius: 4.5, height: 20 + s * 1.6, sides: 12 });
+    put('tower', cx + s * 26, tz - 34, 0, { radius: 4.5, height: 20 + s * 1.6, sides: 12 });
   }
 
   // a thin campanile inside the town — the cheapest break in a low roofline
-  const camX = cx + (di === 1 ? 11.5 : -12.5), camZ = -3 + di * 4;
+  const camX = cx + (di === 1 ? 11.5 : -12.5), camZ = tz - 3 + di * 4;
   put('tower', camX, camZ, span(R, 0, 3), { radius: 2.3, height: 23 + di * 1.5, sides: 8 }, { fp: [3.2, 3.2] });
 
   // Terraced rows either side of the street: detailed frontage, cheap blocks behind.
   // Nothing north of -19: the strip between the town and the wall is the raking corridor
   // wall_day and gate_night both look down, and it is what makes the wall read as a wall.
   const rows = [
-    { side: -1, z0: -19, z1: 33, setback: span(R, 0.6, 1.4), real: 1 },
-    { side: 1, z0: -17, z1: 31, setback: span(R, 1.1, 2.2), real: 1 },
+    { side: -1, z0: tz - 19, z1: tz + 33, setback: span(R, 0.6, 1.4), real: 1 },
+    { side: 1, z0: tz - 17, z1: tz + 31, setback: span(R, 1.1, 2.2), real: 1 },
   ];
   for (const row of rows) {
     const plan = [];
@@ -112,19 +114,29 @@ function layout(doc, terrain, zone, di, cx) {
     const w = span(R, 5.5, 9), d = span(R, 5.5, 8);
     const side = k % 2 ? 1 : -1;
     const x = cx + side * span(R, 17, 24);
-    const z = -13 + k * 7.5 + span(R, -2.5, 2.5);
+    const z = tz - 13 + k * 7.5 + span(R, -2.5, 2.5);
     const h = span(R, 4.2, 8.2);
     put('mass', x, z, span(R, -0.5, 0.5), { w, d, h });
   }
 
   // the hall: one big mass so the town has a centre of gravity
-  const hallX = cx + (di === 1 ? -13.5 : 13), hallZ = 14 + span(R, -3, 3);
+  const hallX = cx + (di === 1 ? -13.5 : 13), hallZ = tz + 14 + span(R, -3, 3);
   put('house', hallX, hallZ, span(R, -0.2, 0.2) + (di === 1 ? 0.35 : -0.35),
     { w: 14.5, d: 10.5, h: 10.5 }, { fp: [8, 6] });
 
+  // One stone crossing per district, at its real x — the Vail does not pass through the middle
+  // of every town, so a bridge at `cx` was a bridge over dry land the moment the towns moved.
+  const cross = CROSSINGS.filter(c => c.kind === 'bridge')[di];
+  // Longacre's High Street *is* the King's Road, and two overlapping transparent ribbons put a
+  // 7 % luminance edge down the middle of street_dusk where their noisy widths disagreed. The
+  // polyline stays — the kerbs and the frontages are laid out against it — but only the towns the
+  // King's Road terminates outside of surface their own street.
   doc.districts.push(district(zone, cx, {
-    seed: 0x2f1a71 + di * 977, road, kerbs,
-    bridge: { x: cx - 0.6, z: cz, halfSpan: 5.6 },
+    seed: 0x2f1a71 + di * 977, road, kerbs, roadWidth: di === 1 ? 0 : 3.6,
+    bridge: {
+      x: cross.x, z: creekZ(cross.x), halfSpan: cross.halfSpan, deck: cross.deck ?? 0,
+      ry: -Math.atan2(creekZ(cross.x + 4) - creekZ(cross.x - 4), 8),
+    },
   }));
   return draws;
 }

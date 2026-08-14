@@ -54,7 +54,11 @@ function credit(o, s, event, ctx) {
     case 'escort':
       return event.t === 'escort' && event.npc === o.npc && (!o.path || event.path === o.path) ? 1 : 0;
     case 'talk':
-      return event.t === 'talk' && event.npc === o.npc && (!o.node || event.node === o.node) ? 1 : 0;
+      // `nodes` is the whole conversation, not just where it ended: a branching node hands off to
+      // whichever branch the player picked, so matching only the last node fails every step that
+      // opens a choice.
+      return event.t === 'talk' && event.npc === o.npc
+        && (!o.node || event.node === o.node || !!event.nodes?.includes(o.node)) ? 1 : 0;
     case 'survive':
       return event.t === 'tick' && inArea(o.area, event, ctx) ? (event.dt || 0) : 0;
     default: return 0;

@@ -74,8 +74,8 @@ export class Session {
           { day: this.clock.day, scene, line });
         this.doc.log = j.log;
       },
-      done: ({ node, npc }) => {
-        this.quests.emit({ t: 'talk', npc, node });
+      done: ({ node, nodes, npc }) => {
+        this.quests.emit({ t: 'talk', npc, node, nodes });
         this.quests.draw();
         this.autosave.mark();
       },

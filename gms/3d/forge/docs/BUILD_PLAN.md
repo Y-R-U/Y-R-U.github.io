@@ -76,8 +76,8 @@ From `RUNTIME.md §10`. Mostly independent of Track A and can run alongside it f
 | B3 | Dialogue | non-modal, movement off, look-drag live, clock still running; the `[speaker, line1, line2?]` format makes a third line unwriteable |
 | B4 | Journal — Quests / Truths / Log | recontextualisation renders as strikethrough with the superseding Truth beneath |
 | B5 | Save | versioned, migrations, mid-quest state, position with a scene-revision + ground check |
-| B6 | HUD, menus, market panel, faction select | including the Longacre slate that answers before Neutral is unlocked |
-| B7 | Onboarding, audio, accessibility | 18 sounds via `audio/js/core.js`; a node test fails if the game uses an id from the bench's `bad` bucket |
+| B6 | HUD, menus, market panel, faction select | **done** — including the Longacre slate that answers before Neutral is unlocked |
+| B7 | Onboarding, audio, accessibility | **done** — 23 events over 21 bench ids via `audio/js/core.js`; a node test fails if the game uses an id from the bench's `bad` bucket, or sets a parameter the sound does not have |
 
 **`?shot=` determinism is a hard constraint on all of Track B.** The critic harness depends on it.
 No game session may start under `?shot=` or in the editor.
@@ -145,36 +145,46 @@ trust fps and the counts.
 | A1 — the scale pass, K = 1.5 | **done** — kit at K, 21/21 doors pass, 4/4 loft climbs pass, `docs/BUDGET.json` |
 | A2 — camera fit + ceiling collider | **done** — see `docs/NOTES_WORLD_A2-A5.md`, `docs/CAMFIT.json`, `docs/PHONE_TEST.md` |
 | A3 — world extents | **done** — the old ±145 / −100..108 box, `GS` 1 → 2, collider broad phase |
-| A4 — terrain rebuild | **interrupted mid-phase** — see below. Renders correctly; countryside exists and the town mask releases |
-| A5 — river and roads | **interrupted mid-phase** — the Vail spline, ford and gorge exist; roads not verified |
+| A4 — terrain rebuild | **done** — the world mesh is built from `landAt` (no channel) and the ribbon carries the trench; `surfaceY` vs `heightAt` **p90 0.9 cm, p99 15 cm, max 0.48 m** against A3's 6.57 m. Towns at §1.3's z. `js/world/field.js` is the pure, node-testable field; `tools/fieldprobe.mjs` measures it |
+| A5 — river and roads | **done** — `RIVER_CP` frozen against `data/areas.json`, four crossings built and rotated, **five roads: King's Road 1110 m, Drove 946 m, three spurs**. Segmented water + arc-length bank ribbon. The five scenario cameras re-framed |
 | B0–B5 — storage, clock, quest engine, dialogue, journal, save | **done** — 256 tests, two linters clean |
-| B6–B7 — HUD, menus, onboarding, audio, accessibility | **interrupted after the screens were built and verified**, before the doc updates |
+| B6–B7 — HUD, menus, onboarding, audio, accessibility | **done** — screens built and verified, `RUNTIME.md` reconciled, wide Truth chains render-checked |
 | C0–C1 — sim modules + soak harness | **done** — balance regenerated from the harness, not asserted |
 | Story revisions 1–4 | **done** — 79 story quests, 34 Truths in 11 chains |
-| A6–A9, Track D | not started |
+| A6 — document schema v3 | **done** — six new types build (mill, barn, pen, cross, arcade, retaining), `blk` / `lod` / `town` added and computed, v1 → v2 → v3 migrates, 11 new schema tests. **The `districts` → `towns` rename is deferred**, see below |
+| A7–A9, Track D | not started |
 
 ### Where the interruption left things — read before resuming
 
 Two build agents were terminated mid-work by a session limit. **The tree is healthy**: all five
 scenarios render, 256 tests pass, both linters are clean. But two phases are part-finished.
 
-**A4/A5 — one real breakage, already fixed.** The agent was converting `CHANNEL` from a constant
-into `CHANNEL(x)` (a function, so the river can be 0.45 m deep at the ford and 4.5 m in the gorge)
-and was interrupted between the definition and the call sites. Two callers still used it as a
-scalar, which put `NaN` through `heightAt` and flattened the whole world — `terrain.js:231` and
-`terrain.js:639`, both now `CHANNEL(x)`. **Anything else that phase touched is unverified.** The
-river, ford, gorge, weir and the town mask all exist and render; the roads do not appear to be
-joined up yet, and the scenario cameras are still framed for the old 290 m world so they now look
-out over empty countryside. Re-framing them is part of finishing A5.
+**A4/A5 — finished.** Read `docs/NOTES_WORLD_A2-A5.md` from "A4/A5 resumed" for the working
+record; it carries every measurement and the four bugs that only a render found. In short: the
+field moved to a pure `js/world/field.js`, the world mesh is built without the channel term and an
+arc-length bank ribbon carries it, `RIVER_CP` is **frozen** against `data/areas.json`'s 89 areas,
+the roads exist for the first time, and four of the five scenario cameras were broken by absolute
+y (not by the towns moving) and are re-framed.
 
-**B6/B7 — code done, docs not.** Its last words were "All screens verified. Now the mandatory doc
-updates." So `docs/RUNTIME.md` has **not** been updated with the B6/B7 divergences, and it still
-carries three stale Truth counts (lines ~849, ~876, ~1315 say 18 or 31; the real figure is **34**,
-per `STORY.md` §8.5, which is the spec for `data/truths.json`: 16 entries to add, 4 to amend).
-The two widest Truth chains — three deep and three wide, `prices.raids` and `root.longacre` — have
-**not** been render-checked in the journal. Do that before content authoring.
+**Two things A5 left open.** The `street_dusk` vertical seam is still there at 7.1 % — three more
+causes ruled out, all recorded. And `contactAO` is 20.1 k triangles drawn in every scenario, which
+nobody has looked at; it is A7's.
 
-**Nothing is committed.** The entire project is untracked in git.
+**A6 deferred the rename.** `districts` → `towns` and `dist` → `town` reach into `editor.js`,
+`panel.js` and `colliders.js`, which this pass did not own. v3 adds `town` as a **string id
+alongside** `dist`, plus `blk` (a 60 m spatial grid, computed at load) and `lod`. A7 should read
+`town` and `blk`; whoever owns the editor can retire `dist`.
+
+**B6/B7 — closed out.** The code was done and browser-verified; the documentation has now caught up.
+`docs/RUNTIME.md` §§4.1–4.3, 6.7, 7, 8, 9.1, 9.3, 9.4, 10.1–10.2 and 10.6 carry the divergences,
+each labelled and reasoned rather than silently rewritten. Truth counts read 34 throughout, and
+`data/truths.json` was verified field by field against `STORY.md` §8.5 — 34 entries, 11 connected
+components, Light 10 · Dark 12 · Neutral 12, nothing left to apply. The two widest chains have been
+render-checked at 844 × 390 and at `uiScale` 1.4: they fit and read, but the ordering inside a wide
+block was wrong and is fixed in `journal.js`. **`docs/NOTES_RUNTIME_B6-B7.md` is the record.**
+
+**Committed** at `923b775` on branch `claude/forge-game-checkpoint`, tree clean, 256 tests green. Not
+on `main` — the repo auto-deploys from `main` and this is in-progress work.
 
 ## Decisions taken while managing the build
 

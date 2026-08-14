@@ -101,12 +101,30 @@ test('the shipped catalogue chains cleanly and every link resolves', () => {
   assert.deepEqual(overdraw.map(r => r.id), ['overdraw', 'thirty.years', 'covenant.wrong']);
 
   // The widest components: three deep and three wide, with one Truth striking three at once.
+  // Each arm stays together, so every correction sits directly under the line it corrects — by
+  // day alone the two arms of `prices.raids` interleave and the pairs stop reading as pairs.
   const raids = chains.find(c => c.some(r => r.id === 'prices.raids'));
-  assert.equal(raids.length, 6);
-  assert.equal(raids[raids.length - 1].id, 'prices.raids');
+  assert.deepEqual(raids.map(r => r.id), ['raiders.east', 'raid.water', 'strike.won',
+    'strike.undone', 'prices.both', 'prices.raids']);
   const root = chains.find(c => c.some(r => r.id === 'root.longacre'));
-  assert.equal(root.length, 5);
-  assert.equal(root[root.length - 1].id, 'root.longacre');
+  assert.deepEqual(root.map(r => r.id),
+    ['yield.falls', 'seam.west', 'vermin.field', 'boundary.moves', 'root.longacre']);
+});
+
+test('a wide block orders by lineage, not by the day each line was learned', () => {
+  // Two arms learned alternately: 1 → 3 and 2 → 4, both overturned by 5.
+  const wide = {
+    p1: { text: 'p1', campaign: 'light' },
+    p2: { text: 'p2', campaign: 'light' },
+    c1: { text: 'c1', campaign: 'dark', supersedes: 'p1' },
+    c2: { text: 'c2', campaign: 'dark', supersedes: 'p2' },
+    end: { text: 'end', campaign: 'neutral', supersedes: ['c1', 'c2'] },
+  };
+  const j = ['p1', 'p2', 'c1', 'c2', 'end']
+    .reduce((acc, id, i) => award(acc, id, wide, { day: (i + 1) * 10 }), blankJournal());
+  const chain = truthChains(j, wide)[0];
+  assert.deepEqual(chain.map(r => r.id), ['p1', 'c1', 'p2', 'c2', 'end']);
+  assert.deepEqual(chain.map(r => r.struck), [true, true, true, true, false]);
 });
 
 test('the log keeps the last 200 lines, grouped by scene and day', () => {

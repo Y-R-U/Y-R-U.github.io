@@ -9,19 +9,24 @@ import { SceneBuilder } from '../editor/build.js';
 import { demoScene } from '../editor/demoScene.js';
 import { loadScene } from '../editor/store.js';
 
-// Positions are offsets from the town the shot belongs to, so the five framings survive the towns
-// moving. They were absolute and had to be re-derived by hand when A4 pushed the towns 520 m apart.
+// x and z are offsets from the town the shot belongs to and **y is height above the ground at
+// that point**, not an absolute. Both matter: the towns moved 520 m apart and then 60–80 m in z,
+// and Blackstone's pad is 48 m up. Absolute y was why four of the five framings came out either
+// buried in the grass or staring at the floor — `frameCamera` clamps the eye to ground + 2.2,
+// and every authored y was below the new ground.
 const SHOTS = [
   { id: 'wall_day', label: 'Wall + tower, midday', zone: 'light', time: 10.5,
-    at: 0, pos: [-48, 15, -62], look: [14, 7, -31], keep: 13, ref: '2198150_03' },
+    at: 0, pos: [-48, 9, -62], look: [14, 5, -31], keep: 13, ref: '2198150_03' },
   { id: 'street_dusk', label: 'Street at dusk', zone: 'neutral', time: 17.6,
     at: 1, pos: [0, 3.2, 44], look: [0, 4, -26], keep: 10, ref: '2198150_05' },
   { id: 'gate_night', label: 'Gatehouse at night', zone: 'dark', time: 21.5,
-    at: 2, pos: [-18, 5.5, -14], look: [0, 9, -34], keep: 11, ref: '2198150_08' },
+    at: 2, pos: [-18, 5.5, -8], look: [0, 9, -34], keep: 11, ref: '2198150_08' },
   { id: 'town_night', label: 'District at night', zone: 'neutral', time: 21,
-    at: 1, pos: [40, 30, 46], look: [0, 4, -16], keep: 10, ref: '2198150_04' },
+    at: 1, pos: [40, 26, 46], look: [0, 4, -16], keep: 10, ref: '2198150_04' },
+  // Millbridge, from the south bank looking up the Vail into Longacre. The old framing looked at
+  // z = +160, which was the creek's line in the 290 m world and is 70 m of dry water meadow now.
   { id: 'creek_day', label: 'Creek through the zones', zone: 'neutral', time: 8.5,
-    at: 1, pos: [-58, 16, 208], look: [4, 2, 160], keep: 10, ref: '2198150_05' },
+    at: 1, pos: [-4, 9, 112], look: [-40, 1, 78], keep: 10, ref: '2198150_05' },
 ].map(s => ({
   ...s,
   pos: [s.pos[0] + TOWNS[s.at].cx, s.pos[1], s.pos[2] + TOWNS[s.at].cz],
@@ -39,6 +44,7 @@ export class Demo {
     this.builder = new SceneBuilder(this.terrain);
     this.object3D.add(this.builder.object3D);
     this.builder.buildAll(this.doc, true);
+    this.terrain.addRoads();
     for (const [x, z] of CAMERAS) this.terrain.mark(x, z, 3.5);
     this.terrain.build();
     this.scatter.build();
@@ -52,6 +58,14 @@ export class Demo {
     this.scatter.registerKnobs(q);
   }
 
+  // For quality.onRebuild. Only the terrain's own meshes are rebuilt: the occupancy grid, the
+  // footprints and the scatter come from the scene document and do not change with a world knob.
+  rebuild() {
+    this.terrain.teardown();
+    this.terrain.build();
+    this.terrain.finish();
+  }
+
   update(dt, app) { this.terrain.update(dt, app); }
 
   registerScenarios() {
@@ -59,8 +73,10 @@ export class Demo {
       defineScenario({
         ...s,
         setup: app => {
-          const y = heightAt(s.pos[0], s.pos[2]);
-          frameCamera(app, { pos: [s.pos[0], Math.max(s.pos[1], y + 2.2), s.pos[2]], look: s.look, fov: s.fov });
+          const g = this.terrain.surfaceY.bind(this.terrain);
+          const y = g(s.pos[0], s.pos[2]) + s.pos[1];
+          const look = [s.look[0], g(s.look[0], s.look[2]) + s.look[1], s.look[2]];
+          frameCamera(app, { pos: [s.pos[0], Math.max(y, g(s.pos[0], s.pos[2]) + 2.2), s.pos[2]], look, fov: s.fov });
           app.quality.set('time', s.time);
         },
       });
