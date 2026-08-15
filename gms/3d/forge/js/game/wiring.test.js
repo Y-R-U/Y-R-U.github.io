@@ -354,6 +354,12 @@ test('every recover verb the linter validates is callable on the world the sessi
   later.respawn('grain_rat', 7);
   later.arm('lamp');
   assert.deepEqual(grown, [['respawn', 'grain_rat', 7], ['arm', 'lamp']], 'and a world that grows them wins');
+
+  // Having an `arm` is not the same as having the object. Nothing places `lac.henhouse.hen`, and a
+  // reset that quietly does nothing is the failure §9.4 exists to prevent.
+  calls.length = 0;
+  questWorld({ arm: () => false }, hooks).arm('lac.henhouse.hen');
+  assert.deepEqual(calls, [['missing', 'arm', 'lac.henhouse.hen']]);
 });
 
 test('`recover` runs the whole action list through the world', () => {

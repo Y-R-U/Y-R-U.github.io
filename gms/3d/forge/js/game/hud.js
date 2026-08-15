@@ -13,7 +13,7 @@ import { SPELLS } from '../sim/spells.js';
 const BELL_NAME = { rising: 'Rising', high: 'High', setting: 'Setting', low: 'Low' };
 const HORN_NAME = { rising: 'First', high: 'Second', setting: 'Third', low: '' };
 
-export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑', graft: '◑' };
+export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑', graft: '◑', interact: '✧' };
 
 const LONG_PRESS = 400;
 const CHANNEL_AFTER = 350;

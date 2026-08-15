@@ -8,6 +8,7 @@ import { rng, span } from './details.js';
 import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
+import { crowd } from './roster.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -654,8 +655,20 @@ export class People {
     col.needsUpdate = true;
   }
 
+  // A named body stands where it was placed, faces where it was pointed, and never wanders.
+  place(spec) {
+    const a = {
+      kind: 'idle', heading: 0, speed: 0, turn: 0.09, phase: 0, gait: 0,
+      scale: 1, tone: 1, warm: 0, vi: 0, zi: 0, ...spec,
+    };
+    this.agents.unshift(a);
+    this.setCrowd(this.crowdN ?? 36);
+    return a;
+  }
+
   setCrowd(n) {
-    this.active = this.agents.slice(0, Math.min(n, POOL));
+    this.crowdN = n;
+    this.active = crowd(this.agents, n).slice(0, POOL);
     const col = new THREE.Color();
     this.meshes.forEach((mesh, mi) => {
       const list = this.active.filter(a => a.zi === (mi >> 1) && a.vi === (mi & 1)).slice(0, MAX_PER_MESH);

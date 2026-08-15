@@ -33,6 +33,14 @@ export function roster(agents, count, cam = null, cap = Infinity) {
   return held.concat(rest).slice(0, Math.min(cap, Math.max(count | 0, held.length)));
 }
 
+// Same invariant on the people rig: a named NPC is a fixed body a quest sends you to, so the crowd
+// knob sizes the wanderers around it rather than competing with it.
+export function crowd(agents, count) {
+  const held = [], rest = [];
+  for (const a of agents) (a.npc ? held : rest).push(a);
+  return held.concat(rest.slice(0, Math.max(0, count | 0)));
+}
+
 // One mesh per (kind, zone), each carrying `perMesh` bodies. Filled in roster order, so a seat is
 // never taken from a fight by a wanderer standing nearer the camera.
 export function buckets(active, perMesh) {

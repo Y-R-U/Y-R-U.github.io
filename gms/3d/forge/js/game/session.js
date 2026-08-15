@@ -57,7 +57,9 @@ export function questWorld(world, hooks) {
     flag: (key, value = true) => hooks.flag(key, value),
     moveTo: area => hooks.moveTo(area),
     respawn: (kind, n = 1) => (world.respawn ? world.respawn(kind, n) : hooks.missing('respawn', kind, n)),
-    arm: id => (world.arm ? world.arm(id) : hooks.missing('arm', id)),
+    // A world that has an `arm` but not this object is still a broken promise — `lac.henhouse.hen`
+    // is an escort target, not a prop, and nothing places it.
+    arm: id => world.arm?.(id) || hooks.missing('arm', id),
   };
 }
 
@@ -478,7 +480,9 @@ export class Session {
     if (t?.kind === 'trade') return this.market.show(t.stall);
     if (t?.kind === 'graft') return this.graftTap();
     this.audio.play('uiConfirm');
-    if (t?.id) this.quests.emit({ t: 'interact', id: t.id, verb: this.school });
+    if (!t?.id) return;
+    this.world.interact?.(t.id, this.school);
+    this.quests.emit({ t: 'interact', id: t.id, verb: this.school });
   }
 
   channel(phase, kind) {
@@ -975,7 +979,8 @@ export class Session {
       if (c < cost) { cost = c; best = t; }
     }
     this.context = best;
-    this.hud.setContext(best?.kind || null, best?.label || '');
+    const wants = best?.kind === 'interact' ? this.quests.verbFor(best.id) : null;
+    this.hud.setContext(best?.kind || null, wants || best?.label || '');
   }
 
   obCtx() {

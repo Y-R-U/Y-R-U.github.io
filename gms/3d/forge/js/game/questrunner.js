@@ -277,6 +277,22 @@ export class QuestRunner {
     return null;
   }
 
+  // Which school a live step wants dialled at this object. `quest.js` refuses credit for a cast of
+  // the wrong one, so the context button says which it is instead of failing silently.
+  verbFor(id) {
+    for (const [qid, rec] of Object.entries(this.doc.quests)) {
+      if (rec.s !== 'active') continue;
+      const def = this.defs[qid];
+      if (!def) continue;
+      const reqs = def.steps.filter(s => !s.optional);
+      for (const s of [reqs[rec.i], ...def.steps.filter(s => s.optional)]) {
+        if (!s?.verb) continue;
+        if (s.objectives.some(o => o.k === 'interact' && o.id === id)) return s.verb;
+      }
+    }
+    return null;
+  }
+
   // The only world events wired today: where the player is, and time passing. Kills, gathers,
   // deliveries and interactions call `emit` from their own systems as those land.
   update(dt, pos) {

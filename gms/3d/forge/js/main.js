@@ -16,6 +16,9 @@ import { Input } from './input.js';
 import { Session } from './game/session.js';
 import { Vermin } from './world/vermin.js';
 import { Spawner } from './game/spawner.js';
+import { Props } from './world/props.js';
+import { Cast } from './world/cast.js';
+import { loadPlacements } from './game/placement.js';
 import { Slate } from './game/slate.js';
 import { gameHost } from './game/ui.js';
 import { bootMode, playing } from './game/boot.js';
@@ -55,6 +58,16 @@ const spells = app.add(new Spells(player, demo.terrain));
 const vermin = app.add(new Vermin(demo.terrain));
 const spawner = app.add(new Spawner({ rig: vermin, player, ground: (x, z) => groundAt(x, z, 0) }));
 
+// Top-level await, above app.start() and above the boot overlay lifting: props are world geometry
+// rather than game state, so they are in `?shot=` and in the editor too, and every render and every
+// perf number is of the world the game actually shows. Missing files lose the props, not the game.
+const placed = await loadPlacements().catch(e => {
+  console.warn(`props: nothing placed — ${e.message}`);
+  return { props: [], cast: [] };
+});
+const props = app.add(new Props(demo.terrain, placed.props));
+const cast = new Cast(people, placed.cast);
+
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
 
@@ -68,6 +81,8 @@ window.__forge.doors = doors;
 window.__forge.spells = spells;
 window.__forge.vermin = vermin;
 window.__forge.spawner = spawner;
+window.__forge.props = props;
+window.__forge.cast = cast;
 window.__forge.walk = { walkStep, groundAt };
 window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
@@ -108,16 +123,10 @@ if (shot) {
   play().catch(e => fail(`The game could not start: ${e.message}. ${RELOAD}`));
 }
 
-// Stand-in NPCs until Track D places the cast: the nearest wandering figures answer to the cast
-// ids, so the context button and `talk` are real. Walking figures carry no cached x.
-const CAST = ['bel', 'rell', 'wick_ww', 'marrin', 'sedge', 'alder'];
+// The placed cast and the placed props. The ambient crowd is still there and still nameless — a
+// wandering figure no longer answers to Bel.
 function targets() {
-  const out = [];
-  const idle = people.active?.filter(a => a.x !== undefined) || [];
-  idle.slice(0, CAST.length).forEach((a, i) => {
-    out.push({ id: CAST[i], kind: 'talk', label: 'talk', x: a.x, z: a.z, range: 4 });
-  });
-  return out;
+  return props.targets().concat(cast.targets());
 }
 
 // Can the player's cast reach that creature? Deliberately the bolt's own question, asked the same
@@ -151,6 +160,8 @@ async function play() {
       groundAt: (x, z, y) => groundAt(x, z, y),
       walkStep,
       targets,
+      interact: (id, verb) => props.use(id, verb),
+      arm: id => props.arm(id),
       doorIndex: () => (doors.state === 'in' ? doors.activeIndex ?? null : null),
       jumpDoor: i => { doors.jump(i); return true; },
       tick: dt => spawner.tick(dt),
