@@ -13,7 +13,8 @@ import { SPELLS } from '../sim/spells.js';
 const BELL_NAME = { rising: 'Rising', high: 'High', setting: 'Setting', low: 'Low' };
 const HORN_NAME = { rising: 'First', high: 'Second', setting: 'Third', low: '' };
 
-export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑', graft: '◑', interact: '✧' };
+export const GLYPH = { work: '✦', talk: '❝', trade: '⇄', line: '▸', climb: '↑', graft: '◑', interact: '✧',
+  cook: '♨', eat: '✚', give: '⇢' };
 
 const LONG_PRESS = 400;
 const CHANNEL_AFTER = 350;
@@ -213,7 +214,13 @@ export class Hud {
   }
 
   // §9.3: the bite window is a visual as well as a sound — the ring inverts and the button grows.
-  bite(on) { this.act.classList.toggle('big', !!on); this.inverted = !!on; }
+  // The charge clock restarts so the inverted ring drains over the strike window rather than
+  // carrying the cast's own elapsed time into it.
+  bite(on) {
+    this.act.classList.toggle('big', !!on);
+    this.inverted = !!on;
+    if (this.held) this.held.t = 0;
+  }
 
   pulse(kind) {
     if (kind === 'bell') {

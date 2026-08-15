@@ -59,7 +59,7 @@ export function propIds(defs) {
   return out;
 }
 
-// Three results, not one. In series and sharing a rejection, losing props.json also lost
+// Four results, not one. In series and sharing a rejection, losing props.json also lost
 // cast_at.json and every named NPC in the game behind a single warning that named neither.
 export async function loadPlacements(base = 'data') {
   const errors = [];
@@ -74,8 +74,8 @@ export async function loadPlacements(base = 'data') {
     }
   };
   const { normaliseAreas } = await import('./questdef.js');
-  const [table, propFile, castFile] = await Promise.all([
-    get('areas.json', null), get('props.json', []), get('cast_at.json', []),
+  const [table, propFile, castFile, nodeFile] = await Promise.all([
+    get('areas.json', null), get('props.json', []), get('cast_at.json', []), get('gather.json', []),
   ]);
   // Without the areas nothing has an anchor, and reporting that once beats sixty-six unknown-area
   // errors saying the same thing.
@@ -83,7 +83,8 @@ export async function loadPlacements(base = 'data') {
   const empty = { placed: [], errors: [] };
   const props = table ? placeAll(propFile, areas) : empty;
   const cast = table ? placeAll(castFile, areas) : empty;
-  errors.push(...props.errors, ...cast.errors);
+  const nodes = table ? placeAll(nodeFile, areas) : empty;
+  errors.push(...props.errors, ...cast.errors, ...nodes.errors);
   for (const e of errors) console.warn(`placement: ${e}`);
-  return { areas, props: props.placed, cast: cast.placed, errors };
+  return { areas, props: props.placed, cast: cast.placed, nodes: nodes.placed, errors };
 }

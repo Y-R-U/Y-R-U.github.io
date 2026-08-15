@@ -11,6 +11,7 @@ import { Market } from './market.js';
 import { Audio } from './audio.js';
 import { gameHost, el } from './ui.js';
 import { nearestAnchor, lineage } from './areas.js';
+import { pickContext } from './context.js';
 import { blank, rollDay, checkPosition, POSITION, addItem, itemCount, clampQuests } from './save.js';
 import { acquire, power, critChance, resolveHit, damageTaken } from '../sim/combat.js';
 import { ENEMIES, PERISHABLE } from '../sim/tables.js';
@@ -18,7 +19,11 @@ import { appendLog } from './journal.js';
 import { pins, basicOf, unlocked, outclassed, levelIn } from './sheet.js';
 import * as vitals from './vitals.js';
 import { next as nextPrompt, settle, HOLD } from './onboard.js';
-import { quote, rows as wareRows } from './sale.js';
+import { quote, rows as wareRows, itemName } from './sale.js';
+import {
+  KIND, COOK_SECONDS, NodeSet, harvest, newRun, tickRun, strike, cookChoice, cookOne, eat,
+  handovers, gatherWants, rawOf, gatherEvent, cookEvent, deliverEvent,
+} from './gathering.js';
 import { nameOf, started } from './towns.js';
 import { FOOTSTEP_EVERY, RANGE } from './sounds.js';
 import { focusCost, canCast, idOf, SPELLS } from '../sim/spells.js';
@@ -37,6 +42,16 @@ const STUCK_SECONDS = 4;
 const STUCK_METRES = 0.15;
 const REACH = 400;
 const ASH = 'hearth_ash';
+const HEAL_SECONDS = 3;
+const HOLD_RANGE = 5;
+
+// The three ways a cast comes back with nothing. `nothing` is a strike inside the window that the
+// catch table simply did not answer.
+const MISS = {
+  early: 'Too soon — the line comes back empty.',
+  late: 'Too late — the line has gone slack.',
+  nothing: 'Gone.',
+};
 
 // What the player is told when `recover` asks the world for something it cannot do yet. §9.4's
 // promise is that Reset this step puts the world back; when it cannot, it says so.
@@ -88,6 +103,12 @@ export class Session {
     this.graft = newGraft();
     this.suspicion = 0;
     this.knob = { duration: 1, suspicion: 1, channel: GRAFT.channel };
+    this.nodes = new NodeSet(this.world.gatherNodes?.() || []);
+    this.run = null;
+    this.working = null;
+    this.cooking = null;
+    this.healing = null;
+    this.buffs = [];
 
     const loaded = opts.fresh ? null : store.load();
     this.doc = loaded?.doc || blank(opts.seed);
@@ -479,23 +500,41 @@ export class Session {
     if (t?.kind === 'talk') return this.talk(t.id);
     if (t?.kind === 'trade') return this.market.show(t.stall);
     if (t?.kind === 'graft') return this.graftTap();
+    if (t?.kind === 'give') return this.give(t.give);
+    if (t?.kind === 'eat') return this.eatOne();
+    if (t?.kind === 'work' || t?.kind === 'cook') return this.workTap();
     this.audio.play('uiConfirm');
     if (!t?.id) return;
     this.world.interact?.(t.id, this.school);
     this.quests.emit({ t: 'interact', id: t.id, verb: this.school });
   }
 
+  // The hold ends on the kind that *started* it. `kind` here is whatever the context happens to be
+  // when the HUD fires, and the context changes under a held thumb all the time — a delivery target
+  // appearing, or walking out of range, which arrives as `cancel, null`. Dispatching on that let a
+  // fire keep cooking and a line keep casting with nothing held, because `workStop` never ran.
   channel(phase, kind) {
     if (phase === 'start') {
+      this.holdKind = kind;
       if (kind === 'graft') return this.graftStart();
-      this.audio.play(kind === 'work' ? 'lineCast' : 'cast');
+      if (kind === 'work' || kind === 'cook') return this.workStart();
+      this.audio.play('cast');
       return;
     }
+    const held = this.holdKind ?? kind;
+    this.holdKind = null;
+    // Belt and braces: a run, a cook or an armed patch is a gather hold whatever either kind says.
+    const gathering = !!(this.run || this.cooking || this.working);
     // A pointercancel is a phone call, not a mistake: nothing was charged, so nothing is taken.
-    if (phase === 'cancel') { if (kind === 'graft') this.graftFail(null); return; }
+    if (phase === 'cancel') {
+      if (held === 'graft') this.graftFail(null);
+      if (gathering || held === 'work' || held === 'cook') this.workStop();
+      return;
+    }
     if (phase !== 'release') return;
     this.ob.channelled = true;
-    if (kind === 'graft') return this.graftRelease();
+    if (held === 'graft') return this.graftRelease();
+    if (gathering || held === 'work' || held === 'cook') return this.workRelease();
     this.act(kind);
   }
 
@@ -586,6 +625,238 @@ export class Session {
   streakOf(key) {
     if (this.streakKey !== key) { this.streakKey = key; this.streakN = 0; }
     return this.streakN++;
+  }
+
+  // ── gathering, SYSTEMS §6 ───────────────────────────────────────────────
+
+  nodeAt(id) { return id ? this.nodes.get(id) : null; }
+
+  held() { return Object.fromEntries(this.doc.items.map(e => [e.id, e.n])); }
+
+  // 0.9 s to strike on a thumb, 0.6 s on a mouse. `pointer: coarse` is the only test that gets a
+  // touch laptop and a desktop with a touchscreen the right way round.
+  touch() { return typeof matchMedia === 'function' ? matchMedia('(pointer: coarse)').matches : true; }
+
+  // A node costs its own school's tier-1 spell — this is fishing magic, not a button. §6.2 prices
+  // a cast that draws no bite at full: no refund.
+  spendFocus(kind) {
+    const after = vitals.spend(this.vitals, focusCost(SPELLS[KIND[kind].spell],
+      { guttered: this.vitals.guttered > 0 }), this.limits);
+    if (!after.spent) { this.audio.play('uiError'); this.hud.say('Nothing left to cast with.'); return false; }
+    this.vitals = after;
+    return true;
+  }
+
+  // Says so out loud rather than answering quietly: a button that does nothing is the worst
+  // feedback there is.
+  nodeReady(node) {
+    if (node.state === 'ready') return true;
+    this.audio.play('uiError');
+    this.hud.say('Nothing here yet.');
+    return false;
+  }
+
+  setNode(node) {
+    if (node) this.world.nodeState?.(node.id, node.state);
+  }
+
+  // The tap. Fishing and cooking are holds and say so; a patch or a seam is one action, so a tap
+  // works the pick as well as the hold does.
+  workTap() {
+    if (this.run || this.cooking || this.working) return this.workRelease();
+    const node = this.nodeAt(this.context?.id);
+    if (!node) return;
+    if (node.kind === 'fish') { this.audio.play('uiBlip'); this.hud.say('Hold the button to cast.'); return; }
+    if (node.kind === 'hearth') { this.audio.play('uiBlip'); this.hud.say('Hold it over the fire.'); return; }
+    if (!this.nodeReady(node) || !this.spendFocus(node.kind)) return;
+    this.takeFrom(node);
+  }
+
+  workStart() {
+    const node = this.nodeAt(this.context?.id);
+    if (!node) { this.hud.finish(false); return; }
+    if (node.kind === 'hearth') { this.cooking = { id: node.id, t: 0 }; this.audio.play('cast'); return; }
+    if (!this.nodeReady(node)) { this.hud.finish(false); return; }
+    if (node.kind !== 'fish') { this.working = node.id; this.audio.play('cast'); return; }
+    if (!this.spendFocus('fish')) { this.hud.finish(false); return; }
+    this.setNode(this.nodes.begin(node.id, this.doc.played));
+    this.run = newRun(node, levelIn(this.doc, 'line'), { touch: this.touch() });
+    this.audio.play('lineCast', { at: node });
+  }
+
+  workRelease() {
+    const run = this.run, patch = this.nodeAt(this.working);
+    this.workStop();
+    if (run) {
+      const r = strike(run, Math.random);
+      if (r.caught) return this.landed(this.nodeAt(run.node), r.caught);
+      this.audio.play('uiError');
+      this.hud.say(MISS[r.why] || MISS.nothing);
+      return;
+    }
+    if (patch && this.nodeReady(patch) && this.spendFocus(patch.kind)) this.takeFrom(patch);
+  }
+
+  // Ends the hold without working anything: a pointercancel is a phone call. The line coming in
+  // puts a fishing spot straight back, because a spot is never used up.
+  workStop() {
+    this.hud.bite(false);
+    if (this.run) { this.setNode(this.nodes.release(this.run.node)); this.run = null; }
+    this.cooking = null;
+    this.working = null;
+  }
+
+  takeFrom(node) {
+    const levels = { forage: levelIn(this.doc, 'forage'), setting: levelIn(this.doc, 'setting') };
+    const got = harvest(node, Math.random, levels);
+    if (!got) { this.audio.play('uiError'); return; }
+    this.setNode(this.nodes.begin(node.id, this.doc.played));
+    this.setNode(this.nodes.finish(node.id, this.doc.played, Math.random, levels.forage));
+    this.landed(node, got);
+  }
+
+  // Everything a node yields lands the same way. The event carries the *node's* area, not the
+  // player's: a fish taken off the chalk stand credits a step scoped to the chalk stand however
+  // far up the bank the player is standing.
+  landed(node, got) {
+    addItem(this.doc, got.item, got.n, got.perishable ? Date.now() : undefined);
+    this.gainXp(got.school, got.xp, {
+      sourceLevel: got.sourceLevel, streak: this.streakOf(`${got.school}:${node.id}`),
+    });
+    this.audio.play('uiConfirm');
+    this.buzz(14);
+    this.flash(`+${got.n} ${itemName(got.item)}`);
+    this.quests.emit(gatherEvent(node, got));
+    this.autosave.mark();
+  }
+
+  // §6.4. The cook steps are authored `via: "craft"`, so the event says so or the reducer refuses
+  // it — a fish cooked at a fire is not a fish caught.
+  cookOnce() {
+    const node = this.nodeAt(this.cooking?.id);
+    if (!node) return;
+    const raw = cookChoice(gatherWants(this.quests.defs, this.doc.quests, this.quests.ctx()),
+      this.held(), levelIn(this.doc, 'hearth'));
+    if (!raw) { this.audio.play('uiError'); this.hud.say('Nothing to cook.'); this.hud.finish(false); return; }
+    if (!this.spendFocus('hearth')) { this.hud.finish(false); return; }
+    const r = cookOne(Math.random, raw, levelIn(this.doc, 'hearth'));
+    addItem(this.doc, raw, -1);
+    this.gainXp('hearth', r.xp, { sourceLevel: r.sourceLevel, streak: this.streakOf('hearth') });
+    if (r.burnt) {
+      this.audio.play('uiError');
+      this.hud.say(`${itemName(raw)}, burnt.`);
+      this.autosave.mark();
+      return;
+    }
+    addItem(this.doc, r.item, 1);
+    this.audio.play('uiConfirm');
+    this.buzz(10);
+    this.flash(`+1 ${itemName(r.item)}`);
+    this.quests.emit(cookEvent(node, r.item));
+    this.autosave.mark();
+  }
+
+  cookedInBag() { return this.doc.items.find(e => e.n > 0 && rawOf(e.id))?.id || null; }
+
+  // The other half of Hearth. Dialling it with cooked food in the bag makes your own hands the
+  // thing the context button acts on, which is also what `neutral.05`'s `interact self` asks for.
+  eatOne() {
+    const id = this.cookedInBag();
+    const r = id && eat(id, levelIn(this.doc, 'hearth'));
+    if (!r) { this.audio.play('uiError'); return; }
+    addItem(this.doc, id, -1);
+    this.healing = { rate: r.heal / HEAL_SECONDS, left: r.heal };
+    if (r.buff) {
+      this.buffs = [...this.buffs.filter(b => b.family !== r.buff.family),
+        { family: r.buff.family, left: r.buff.seconds }].slice(-r.slots);
+    }
+    this.audio.play('uiConfirm');
+    this.buzz(12);
+    this.hud.say(`${itemName(id)}. That will hold.`);
+    this.quests.emit({ t: 'interact', id: 'self', verb: 'hearth' });
+    this.autosave.mark();
+  }
+
+  // §6.4's dish families. Only the two that are a limit are live: Ward and Kindle power are held
+  // and shown on the HUD and change no damage — see NOTES_GATHER.md.
+  buffed(l) {
+    let out = l;
+    for (const b of this.buffs) {
+      if (b.family === 'focus') out = { ...out, regen: out.regen * 1.25 };
+      if (b.family === 'hp') out = { ...out, hp: Math.round(out.hp * 1.12) };
+    }
+    return out;
+  }
+
+  // The last way a hold can outlive the thing it is working: walking from one fishing spot to
+  // another swaps the target without changing the button's kind or its label, so `setContext`
+  // returns early and no cancel is ever fired. HOLD_RANGE is the node's own 3.6 m reach plus slack,
+  // so a step sideways does not put the line down.
+  strayed() {
+    const node = this.nodeAt(this.run?.node || this.cooking?.id || this.working);
+    const p = this.player?.pos;
+    if (!node || !p) return false;
+    return Math.hypot(node.x - p.x, node.z - p.z) > HOLD_RANGE;
+  }
+
+  gatherTick(dt) {
+    for (const id of this.nodes.tick(this.doc.played)) this.world.nodeState?.(id, 'ready');
+    if (this.healing) {
+      const step = Math.min(this.healing.left, this.healing.rate * dt);
+      this.vitals = { ...this.vitals, hp: Math.min(this.limits.hp, this.vitals.hp + step) };
+      this.healing.left -= step;
+      if (this.healing.left <= 0) this.healing = null;
+    }
+    if (this.buffs.length) this.buffs = this.buffs.map(b => ({ ...b, left: b.left - dt })).filter(b => b.left > 0);
+    if (this.strayed()) { this.hud.finish(false); this.workStop(); }
+    if (this.cooking) {
+      this.cooking.t += dt;
+      if (this.cooking.t >= COOK_SECONDS) { this.cooking.t = 0; this.cookOnce(); }
+      return;
+    }
+    if (!this.run) return;
+    const r = tickRun(this.run, dt, Math.random);
+    this.run = r.run;
+    const at = this.nodeAt(this.run.node);
+    if (r.event === 'bite') { this.hud.bite(true); this.audio.play('bite', { at }); this.buzz(20); }
+    else if (r.event === 'lost') { this.hud.bite(false); this.audio.play('uiBlip'); }
+    else if (r.event === 'recast') {
+      if (this.spendFocus('fish')) this.audio.play('lineCast', { at });
+      else this.hud.finish(false);
+    }
+  }
+
+  // The hand-overs a live step is waiting for right here. A target that is an area is handed over
+  // by standing in it, so it sits on the player at zero distance and `yields` like the eat target
+  // does — without that it wins every tie and hides the fire, the seams and the stall it is
+  // standing on top of. A target that is a person or a prop sits on their body and takes the place
+  // of talking to them, which is the point: carrying Hana's loaves to Hana is not small talk.
+  giveTargets(from) {
+    const p = this.player?.pos;
+    if (!p || !this.doc.items.length) return [];
+    const body = id => from.find(t => t.id === id) || null;
+    const out = [];
+    const list = handovers(this.quests.defs, this.doc.quests, this.quests.ctx(),
+      { held: this.held(), here: this.quests.here, at: body });
+    for (const h of list) {
+      if (out.some(o => o.id === h.to)) continue;
+      out.push({
+        id: h.to, kind: 'give', label: 'give', give: h, yields: !h.body,
+        x: h.body ? h.body.x : p.x, z: h.body ? h.body.z : p.z, range: h.body ? 3.6 : 1,
+      });
+    }
+    return out;
+  }
+
+  give(h) {
+    const n = h ? Math.min(h.n, itemCount(this.doc, h.item)) : 0;
+    if (n <= 0) { this.audio.play('uiError'); return; }
+    addItem(this.doc, h.item, -n);
+    this.audio.play('uiConfirm');
+    this.buzz(12);
+    this.flash(`${n} ${itemName(h.item)}`);
+    this.quests.emit(deliverEvent({ ...h, n }));
+    this.autosave.mark();
   }
 
   // The enemy's side. Driven from here rather than from the frame loop so that everything that
@@ -960,7 +1231,11 @@ export class Session {
   // the context button acts on, which is exactly how the pack authors it — `interact("self", 1)`.
   selfTarget() {
     const p = this.player?.pos;
-    if (!p || this.school !== 'glamour') return null;
+    if (!p) return null;
+    if (this.school === 'hearth' && this.cookedInBag()) {
+      return { id: 'self', kind: 'eat', label: 'eat', x: p.x, z: p.z, range: 1, yields: true };
+    }
+    if (this.school !== 'glamour') return null;
     // The grant walks every quest record, so it is cached and dropped when a quest state moves.
     if (this.canGraft === undefined) this.canGraft = this.graftGranted();
     if (!this.canGraft) return null;
@@ -969,15 +1244,14 @@ export class Session {
 
   retarget() {
     const p = this.player?.pos;
-    const list = p ? [...(this.world.targets?.() || []), this.selfTarget()].filter(Boolean) : [];
-    let best = null, cost = Infinity;
-    for (const t of list) {
-      const d = Math.hypot(t.x - p.x, t.z - p.z);
-      if (d > (t.range || 4)) continue;
-      // The same cost function the aim picker uses, so the button and the bolt agree on "nearest".
-      const c = d * 0.06;
-      if (c < cost) { cost = c; best = t; }
-    }
+    const from = p ? (this.world.targets?.() || []) : [];
+    const give = p ? this.giveTargets(from) : [];
+    // A hand-over replaces whatever else that body offers: carrying Hana's loaves to Hana should
+    // not open her small talk instead.
+    const list = p
+      ? [...give, ...from.filter(t => !give.some(g => g.id === t.id)), this.selfTarget()]
+      : [];
+    const best = pickContext(list, p);
     this.context = best;
     const wants = best?.kind === 'interact' ? this.quests.verbFor(best.id) : null;
     this.hud.setContext(best?.kind || null, wants || best?.label || '');
@@ -995,6 +1269,15 @@ export class Session {
     return this.ctxOb;
   }
 
+  // What the charge ring is measuring this frame. On a bite it measures the strike window, and
+  // `hud.bite` inverts it, so the ring drains as the fish decides.
+  channelSeconds() {
+    if (this.context?.kind === 'graft') return this.knob.channel;
+    if (this.run) return this.run.phase === 'bite' ? this.run.window : this.run.wait;
+    if (this.cooking) return COOK_SECONDS;
+    return 1.2;
+  }
+
   hudState() {
     return {
       doc: this.doc,
@@ -1007,9 +1290,9 @@ export class Session {
       t: this.clock.t,
       day: this.clock.day,
       suspicion: this.suspicion || 0,
-      channelSeconds: this.context?.kind === 'graft' ? this.knob.channel : 1.2,
+      channelSeconds: this.channelSeconds(),
       graft: this.graft,
-      buffs: this.graft.worn ? 1 : 0,
+      buffs: this.buffs.length + (this.graft.worn ? 1 : 0),
       holdAssist: this.doc.settings.holdAssist,
       prompt: this.uiBusy || this.dialogue.active || this.face ? null : this.prompt,
     };
@@ -1025,9 +1308,10 @@ export class Session {
     if (this.advanceRequest) { this.advanceRequest = false; this.dialogue.next(); }
     this.dialogue.tick(dt);
 
-    this.limits = vitals.limits(this.doc.schools);
+    this.limits = this.buffed(vitals.limits(this.doc.schools));
     this.vitals = vitals.tick(this.vitals, dt, this.limits);
     this.combat(dt);
+    this.gatherTick(dt);
     this.graftTick(dt);
     this.retarget();
     this.watchStuck(dt);

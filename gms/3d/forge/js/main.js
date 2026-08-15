@@ -18,7 +18,9 @@ import { Vermin } from './world/vermin.js';
 import { Spawner } from './game/spawner.js';
 import { Props } from './world/props.js';
 import { Cast } from './world/cast.js';
+import { Nodes } from './world/nodes.js';
 import { loadPlacements } from './game/placement.js';
+import { buildNodes } from './game/gathering.js';
 import { Slate } from './game/slate.js';
 import { gameHost } from './game/ui.js';
 import { bootMode, playing } from './game/boot.js';
@@ -69,10 +71,15 @@ const spawner = app.add(new Spawner({
 // own and warns; this catch is for a file that parses and then throws on its way through.
 const placed = await loadPlacements().catch(e => {
   console.warn(`props: nothing placed — ${e.message}`);
-  return { props: [], cast: [] };
+  return { props: [], cast: [], nodes: [], areas: {} };
 });
 const props = app.add(new Props(demo.terrain, placed.props));
 const cast = new Cast(people, placed.cast);
+// The pure records carry the catch table and the areas the event will name; `Nodes` draws them and
+// answers the context button off js/world/nodestate.js, and the session works them.
+const gather = buildNodes(placed.nodes, placed.areas);
+for (const e of gather.errors) console.warn(`gather: ${e}`);
+const nodes = app.add(new Nodes(demo.terrain, gather.nodes));
 
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -89,6 +96,7 @@ window.__forge.vermin = vermin;
 window.__forge.spawner = spawner;
 window.__forge.props = props;
 window.__forge.cast = cast;
+window.__forge.nodes = nodes;
 window.__forge.walk = { walkStep, groundAt };
 window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
@@ -129,10 +137,10 @@ if (shot) {
   play().catch(e => fail(`The game could not start: ${e.message}. ${RELOAD}`));
 }
 
-// The placed cast and the placed props. The ambient crowd is still there and still nameless — a
-// wandering figure no longer answers to Bel.
+// The placed cast, the placed props and the gather nodes. The ambient crowd is still there and
+// still nameless — a wandering figure no longer answers to Bel.
 function targets() {
-  return props.targets().concat(cast.targets());
+  return props.targets().concat(cast.targets(), nodes.targets());
 }
 
 // Can the player's cast reach that creature? Deliberately the bolt's own question, asked the same
@@ -168,6 +176,8 @@ async function play() {
       targets,
       interact: (id, verb) => props.use(id, verb),
       arm: id => props.arm(id),
+      gatherNodes: () => gather.nodes,
+      nodeState: (id, state) => nodes.setState(id, state),
       doorIndex: () => (doors.state === 'in' ? doors.activeIndex ?? null : null),
       jumpDoor: i => { doors.jump(i); return true; },
       tick: dt => spawner.tick(dt),

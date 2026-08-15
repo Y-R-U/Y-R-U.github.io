@@ -105,6 +105,15 @@ function leaded(z, m) {
   m.needsUpdate = true;
 }
 
+// A seam is the rock it is cut from, not the town it stands in. On `trim` the same chalk came out
+// a pale cone in Whitewall and a dark boulder in Longacre, and iron and obsidian were one stone
+// drawn twice — and the quests want them told apart.
+const ROCK = {
+  chalk: { color: '#bcb6a1', roughness: 0.94, metalness: 0 },
+  iron_glass: { color: '#7a6650', roughness: 0.62, metalness: 0.18 },
+  obsidian: { color: '#26232e', roughness: 0.24, metalness: 0.35 },
+};
+
 const SURFACE = {
   wall: (z, m) => textured(m, z, 'wall', 'triplanar', 'wall'),
   trim: (z, m) => { textured(m, z, 'wall', 'triplanar', 'trim'); m.color.copy(tint(z.stone.base, z.trim)); },
@@ -113,7 +122,13 @@ const SURFACE = {
   ground: (z, m) => textured(m, z, 'ground', 'triplanar', 'ground'),
   wood: (z, m) => textured(m, z, 'wood', 'triplanar', 'wood'),
   crest: (z, m) => { m.color.set(z.crest.color); m.roughness = 0.42; m.metalness = z.crest.metalness || 0; },
+  // Leaf, for the things that grow and are not scattered: a flat colour off the zone's own bush
+  // row, because the masonry and timber sets both make a herb read as debris.
+  bush: (z, m) => { m.color.set(z.foliage.bush[0]); m.roughness = 0.88; },
   glass: (z, m) => { m.emissiveIntensity = 0; leaded(z, m); },
+  ...Object.fromEntries(Object.entries(ROCK).map(([id, r]) => [`rock:${id}`, (z, m) => {
+    m.color.set(r.color); m.roughness = r.roughness; m.metalness = r.metalness;
+  }])),
 };
 
 function textured(m, z, set, mode, varyKey) {

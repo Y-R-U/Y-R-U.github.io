@@ -86,10 +86,16 @@ export const PERISHABLE = new Set([
   ...Object.values(FORAGE).flat().map(e => e.id),
 ]);
 
+export const COOKED_MUL = 2.4;
+
 const raw = {};
 for (const list of Object.values(CATCH)) for (const e of list) raw[e.id] = e.value;
 for (const list of Object.values(FORAGE)) for (const e of list) raw[e.id] = e.value;
 for (const r of Object.values(ROCK)) raw[r.item] = r.value;
+// §6.4 already says a cooked dish is worth 2.4× its raw, and `cookedValue` computes it — but the
+// market panel only lists what ITEM_VALUE prices, so without this a cooked fish is uncarriable
+// wealth. Generated, never authored: no cooked price is a number anyone chose.
+for (const id of PERISHABLE) raw[`cooked_${id}`] = Math.round(raw[id] * COOKED_MUL);
 
 export const ITEM_VALUE = {
   ...raw,
@@ -98,7 +104,6 @@ export const ITEM_VALUE = {
   thread: 4, hearth_ash: 0,
 };
 
-export const COOKED_MUL = 2.4;
 export const BURNT_VALUE = 1;
 // 1.8 put Hearth at 400 cooks to cap against Kindle's 150 kills, and the critical path only
 // ever serves about 17 cooks. 4.0 puts a level-appropriate cook on the §2.3 yardstick of ~350.

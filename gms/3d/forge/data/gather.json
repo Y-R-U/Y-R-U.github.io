@@ -1,0 +1,31 @@
+[
+  { "id": "wwa.fishsteps.spot", "kind": "fish", "area": "wwa.fishsteps", "at": [0.75, 0.45], "ry": 3.14, "quality": 1 },
+  { "id": "stand.chalk.spot", "kind": "fish", "area": "stand.chalk", "at": [0.5, 0.6], "ry": 3.14 },
+  { "id": "stand.low.spot", "kind": "fish", "area": "stand.low", "at": [0.4, 0.55], "ry": 3.14 },
+  { "id": "stand.east.spot", "kind": "fish", "area": "stand.east", "at": [0.85, 0.25], "ry": 3.14 },
+  { "id": "stand.quiet.spot", "kind": "fish", "area": "stand.quiet", "at": [-0.3, -0.45], "ry": 0, "quality": 1 },
+  { "id": "heath.ford.spot", "kind": "fish", "area": "heath.ford", "at": [0.55, 0.7], "ry": 3.14, "region": "longacre", "quality": 2 },
+  { "id": "stand.dry.spot", "kind": "fish", "area": "stand.dry", "at": [0.35, -0.7], "ry": 0, "quality": 1 },
+
+  { "id": "downs.pasture.patch", "kind": "forage", "area": "downs.pasture", "at": [-0.6, -0.35], "ry": 0, "region": "whitewall" },
+  { "id": "reach.light.patch", "kind": "forage", "area": "reach.light", "at": [-0.75, 0.2], "ry": 0 },
+  { "id": "fields.north.patch", "kind": "forage", "area": "fields.northfield", "at": [-0.45, 0.75], "ry": 0, "region": "longacre" },
+  { "id": "fields.high.patch", "kind": "forage", "area": "fields.high", "at": [0.3, -0.4], "ry": 0, "region": "longacre" },
+  { "id": "fields.east.patch", "kind": "forage", "area": "fields.east", "at": [0, 0.85], "ry": 0, "region": "longacre" },
+  { "id": "lac.westfield.patch", "kind": "forage", "area": "lac.westfield", "at": [-0.55, -0.9], "ry": 0 },
+  { "id": "lac.westfield.strip", "kind": "forage", "area": "lac.westfield", "at": [0, -0.65], "ry": 0 },
+  { "id": "heath.stones.patch", "kind": "forage", "area": "heath.stones", "at": [-0.9, 0], "ry": 0, "region": "blackstone" },
+  { "id": "heath.crag.patch", "kind": "forage", "area": "heath.crag", "at": [-0.35, -0.8], "ry": 0, "region": "blackstone" },
+  { "id": "heath.burner.patch", "kind": "forage", "area": "heath.burner", "at": [-0.55, -0.7], "ry": 0, "region": "blackstone" },
+
+  { "id": "downs.pasture.chalk", "kind": "rock", "rock": "chalk", "area": "downs.pasture", "at": [-0.5, -0.6], "ry": 0 },
+  { "id": "lac.westfield.chalk", "kind": "rock", "rock": "chalk", "area": "lac.westfield", "at": [-0.35, -0.75], "ry": 0 },
+  { "id": "heath.crag.seam", "kind": "rock", "rock": "iron_glass", "area": "heath.crag", "at": [-0.35, -0.6], "ry": 0 },
+  { "id": "bst.levels.seam", "kind": "rock", "rock": "iron_glass", "area": "bst.levels", "at": [-0.25, 0.85], "ry": 0 },
+  { "id": "bst.levels.face", "kind": "rock", "rock": "obsidian", "area": "bst.levels", "at": [0.3, 0.7], "ry": 0 },
+  { "id": "bst.levels.vein", "kind": "rock", "rock": "obsidian", "area": "bst.levels", "at": [-0.3, 0.25], "ry": 0 },
+
+  { "id": "wwa.kitchen.fire", "kind": "hearth", "area": "wwa.kitchen", "at": [0.5, 0], "ry": 0 },
+  { "id": "lac.barn.fire", "kind": "hearth", "area": "lac.barn", "at": [-0.55, -0.9], "ry": 0 },
+  { "id": "bst.kitchen.fire", "kind": "hearth", "area": "bst.kitchen", "at": [0.85, -0.9], "ry": 0 }
+]
