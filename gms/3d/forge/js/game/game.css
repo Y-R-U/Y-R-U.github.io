@@ -39,6 +39,13 @@
   font-size: calc(13px * var(--ui));
 }
 #game .g-track span i { margin-left: auto; font-style: normal; color: #b9721f; }
+/* inline-block or the rotation is silently dropped: transform does not apply to inline boxes */
+#game .g-track .g-chev {
+  display: inline-block;
+  text-decoration: none;
+  color: #b9721f;
+  line-height: 1;
+}
 
 #game .g-scene {
   position: absolute;

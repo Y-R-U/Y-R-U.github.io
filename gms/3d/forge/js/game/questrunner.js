@@ -17,6 +17,12 @@ const tAt = (day, hour) => DAY_ROLL + 24 * day + ((hour - DAY_ROLL + 24) % 24);
 
 export const offerId = id => `offer.${id}`;
 
+// The chevron is a CSS rotation of ➤, and two things flip it: the camera looks along
+// +(sin camYaw, cos camYaw), so screen-clockwise runs opposite the world bearing, and ➤ already
+// points 90° clockwise of "ahead" at rotate(0).
+export const chevronDeg = (at, pos, camYaw = 0) =>
+  camYaw * 180 / Math.PI - Math.atan2(at.x - pos.x, at.z - pos.z) * 180 / Math.PI - 90;
+
 // The packs put the giver's brief in step 0 as a `talk` at the giver, so taking the job and being
 // told what it is are one conversation.
 export function briefOf(def) {
@@ -318,6 +324,7 @@ export class QuestRunner {
 
   // §9.4: after 90 s on one step with nothing to show for it, the tracker grows a chevron. It is
   // never forced and it never becomes a quest arrow — it points, once you are already lost.
+  // The angle is a CSS rotation, not a world bearing — see chevronDeg.
   lost(dt, pos, camYaw = 0) {
     const id = this.doc.tracked;
     const p = id ? progress(this.defs, this.state, id) : null;
@@ -328,8 +335,7 @@ export class QuestRunner {
     const a = this.areas[p.area];
     if (!a) return;
     const at = centreOf(a);
-    const deg = (Math.atan2(at.x - pos.x, at.z - pos.z) - camYaw) * 180 / Math.PI;
-    const next = Math.round(deg / 5) * 5;
+    const next = Math.round(chevronDeg(at, pos, camYaw) / 5) * 5;
     if (next !== this.chevron) { this.chevron = next; this.draw(); }
   }
 }
