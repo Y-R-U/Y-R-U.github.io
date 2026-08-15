@@ -37,6 +37,16 @@ function stepOpen(s, ctx) {
   return evalPred(s.require, ctx);
 }
 
+// The steps an event can be credited to right now: the live required one plus the optional ones,
+// less anything its own hour window, worn face, day or predicate has shut. `advance()` runs this
+// and so does the context button's label, because a button offering a verb the reducer will refuse
+// lights the lamp and credits nothing.
+export function openSteps(def, rec, ctx) {
+  if (rec?.s !== 'active') return [];
+  const cur = required(def)[rec.i];
+  return [...(cur ? [cur] : []), ...optional(def)].filter(s => stepOpen(s, ctx));
+}
+
 function credit(o, s, event, ctx) {
   if (s.via && event.via !== s.via) return 0;
   // A step's `verb` is either a school or a spell id — the linter accepts both and the Neutral
@@ -168,9 +178,7 @@ function advance(def, rec, event, ctx, fx) {
     }
   }
 
-  const live = [...(cur ? [cur] : []), ...optional(def)];
-  for (const s of live) {
-    if (!stepOpen(s, ctx)) continue;
+  for (const s of openSteps(def, rec, ctx)) {
     const before = countsFor(rec, s);
     const after = applyEvent(s, before, event, ctx);
     if (after === before) continue;

@@ -59,10 +59,11 @@ function pointIn(shape, rng) {
 }
 
 export class Spawner {
-  constructor({ rig, player = null, ground = null, rng = Math.random, cap = HOSTILE_CAP } = {}) {
+  constructor({ rig, player = null, ground = null, blocked = null, rng = Math.random, cap = HOSTILE_CAP } = {}) {
     this.rig = rig;
     this.player = player;
     this.ground = ground;
+    this.blocked = blocked;
     this.rng = rng;
     this.cap = cap;
     this.armed = false;
@@ -150,6 +151,11 @@ export class Spawner {
       if (pos && Math.hypot(p.x - pos.x, p.z - pos.z) > SPAWN_RADIUS) continue;
       if (this.inNested(area, p.x, p.z)) continue;
       if (this.ground && !Number.isFinite(this.ground(p.x, p.z))) continue;
+      // An area is a rectangle on the map and a building standing in it is not a hole in that
+      // rectangle, so a fifth of the granary's rats used to start inside the massing, where
+      // `world.sight()` correctly refuses every approach from every distance. The chase ejects
+      // them eventually; the first fight in the game should not need it to.
+      if (this.blocked && this.blocked(p.x, p.z)) continue;
       const a = this.rig.add({ enemy, x: p.x, z: p.z, home: [p.x, p.z], area });
       if (!a) return null;
       arm(a, enemy);

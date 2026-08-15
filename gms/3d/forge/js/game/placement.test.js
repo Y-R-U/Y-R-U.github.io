@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { placeAll, propIds, anchor } from './placement.js';
+import { placeAll, propIds, anchor, loadPlacements } from './placement.js';
 import { contains } from './areas.js';
 import { step, blankState } from './quest.js';
 import { lintAll } from '../../tools/lintQuests.mjs';
@@ -164,4 +164,37 @@ test('Bel is close enough to the granary to be found from it', () => {
   const g = AREAS['wwa.granary'];
   const c = { x: (g.shape.x0 + g.shape.x1) / 2, z: (g.shape.z0 + g.shape.z1) / 2 };
   assert.ok(Math.hypot(bel.x - c.x, bel.z - c.z) < 20, 'the opening quest cannot end in a search');
+});
+
+// Moving data/props.json aside used to take data/cast_at.json and all eighteen named NPCs with it:
+// three awaits in series behind one rejection, and one console warning naming only the first file.
+test('losing one placement file does not take the others down with it', async () => {
+  const realFetch = globalThis.fetch, realWarn = console.warn;
+  const said = [];
+  const serve = miss => async url => {
+    const name = String(url).split('/').pop();
+    if (name === miss) return { ok: false, status: 404 };
+    return { ok: true, json: async () => read(`data/${name}`) };
+  };
+  console.warn = m => said.push(m);
+  try {
+    globalThis.fetch = serve('props.json');
+    const noProps = await loadPlacements();
+    assert.equal(noProps.props.length, 0);
+    assert.equal(noProps.cast.length, AT.placed.length, 'the named cast is still placed');
+    assert.ok(said.some(m => m.includes('props.json')), `nothing said which file: ${said}`);
+
+    globalThis.fetch = serve('cast_at.json');
+    const noCast = await loadPlacements();
+    assert.equal(noCast.props.length, PROPS.placed.length, 'and the props are still placed');
+    assert.equal(noCast.cast.length, 0);
+
+    globalThis.fetch = serve('areas.json');
+    const noAreas = await loadPlacements();
+    assert.deepEqual([noAreas.props.length, noAreas.cast.length], [0, 0], 'nothing has an anchor');
+    assert.equal(noAreas.errors.length, 1, 'and it says so once rather than sixty-six times');
+  } finally {
+    globalThis.fetch = realFetch;
+    console.warn = realWarn;
+  }
 });

@@ -3,13 +3,17 @@
 // the buildings use, so a prop takes its look from its zone and nowhere else.
 //
 // Everything in a zone merges onto the three surfaces the kit uses — wood, trim, crest — so the
-// valley's forty-eight props are nine meshes, plus one instanced glow per zone that has a lamp.
+// valley's forty-eight props are nine meshes, plus a flame and a halo per zone that has a lamp.
+// The rules for what a prop's state is and when it changes are in propstate.js, which a node test
+// can load; this file is the three side of that split.
 
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Batch, T, taperBox, rng, span } from './details.js';
 import { ZONE_IDS, zone } from './zones.js';
 import { zoneAt, heightAt } from './terrain.js';
 import { groundAt, collidersReady } from './colliders.js';
+import { hasState, findProp, propItem, targetList, useProp, armProp } from './propstate.js';
 
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 const cyl = (r, h, seg = 6, r2 = r) => new THREE.CylinderGeometry(r, r2, h, seg);
@@ -19,12 +23,21 @@ const at = (m, x, y, z, ry = 0, rx = 0, rz = 0) => m.clone().multiply(T(x, y, z,
 // Each builder draws its type around a local origin on the ground, +z facing the way the entry's
 // `ry` points. `glow` is the only piece of state the geometry carries: where a lit lamp burns.
 const KIT = {
+  // A hanging lantern, and the cage is deliberately open: the old solid housing was a 0.3 m box
+  // with the flame inside it, so "lit" was the few pixels that escaped between the trim bands.
   lamp(b, m, R, v, out) {
-    b.add('wood', box(0.18, 2.3, 0.18), at(m, 0, 1.15, 0));
-    b.add('crest', box(0.07, 0.07, 0.52), at(m, 0, 2.2, 0.26));
-    b.add('trim', taperBox(0.3, 0.3, 0.38, 0.22, 0.22), at(m, 0, 1.95, 0.5));
-    b.add('crest', new THREE.ConeGeometry(0.22, 0.16, 4).rotateY(Math.PI / 4), at(m, 0, 2.22, 0.5));
-    out.glow = [0, 1.98, 0.5];
+    b.add('wood', box(0.17, 2.2, 0.17), at(m, 0, 1.1, 0));
+    b.add('trim', taperBox(0.14, 0.14, 0.13, 0.28, 0.28), at(m, 0, 2.26, 0));
+    b.add('crest', box(0.06, 0.06, 0.62), at(m, 0, 2.24, 0.31));
+    b.add('crest', box(0.05, 0.05, 0.44), at(m, 0, 2.05, 0.16, 0, 0.78));
+    b.add('crest', cyl(0.035, 0.16, 5), at(m, 0, 2.15, 0.56));
+    b.add('crest', new THREE.ConeGeometry(0.09, 0.12, 4).rotateY(Math.PI / 4), at(m, 0, 2.13, 0.56));
+    b.add('trim', taperBox(0.16, 0.16, 0.16, 0.44, 0.44), at(m, 0, 1.99, 0.56));
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      b.add('trim', box(0.055, 0.38, 0.055), at(m, sx * 0.16, 1.72, 0.56 + sz * 0.16));
+    }
+    b.add('trim', taperBox(0.42, 0.42, 0.13, 0.32, 0.32), at(m, 0, 1.47, 0.56));
+    out.glow = [0, 1.75, 0.56];
     if (v === 'deep') b.add('trim', taperBox(1.0, 1.0, 0.3, 1.4, 1.4), at(m, 0, 0.15, 0));
   },
 
@@ -92,11 +105,21 @@ const KIT = {
   },
 
   board(b, m, R, v) {
+    // Stood on edge in a rack: five 0.05 m boards flat on shaded grass read as a smudge, not slate.
     if (v === 'slate') {
-      for (let i = 0; i < 5; i++) {
-        b.add('trim', box(0.66, 0.05, 0.44), at(m, span(R, -0.2, 0.2), 0.04 + i * 0.06, span(R, -0.15, 0.15), span(R, -0.3, 0.3)));
+      for (const sx of [-1, 1]) {
+        b.add('wood', box(0.11, 1.0, 0.11), at(m, sx * 0.8, 0.5, -0.24));
+        b.add('wood', box(0.11, 0.84, 0.11), at(m, sx * 0.8, 0.4, 0.22, 0, -0.5));
       }
-      b.add('wood', box(0.14, 1.1, 0.14), at(m, 0.6, 0.55, 0, 0.3));
+      b.add('wood', box(1.74, 0.1, 0.1), at(m, 0, 0.92, -0.24));
+      b.add('wood', box(1.74, 0.09, 0.14), at(m, 0, 0.14, 0.1));
+      for (let i = 0; i < 5; i++) {
+        const h = span(R, 0.72, 0.94);
+        b.add('trim', box(span(R, 0.42, 0.64), h, 0.05),
+          at(m, span(R, -0.52, 0.52), h / 2 + 0.04, 0.06 - i * 0.09, span(R, -0.07, 0.07), -0.32));
+      }
+      b.add('trim', box(0.7, 0.05, 0.52), at(m, -0.25, 0.03, 0.66, span(R, -0.4, 0.4)));
+      b.add('crest', box(0.5, 0.05, 0.05), at(m, 0.14, 0.66, 0.24, 0, 0, 0.12));
       return;
     }
     if (v === 'lectern') {
@@ -200,7 +223,10 @@ const KIT = {
   },
 };
 
-const GLOW_SEG = 6;
+// The halo is nested additive shells rather than one ball: front faces only, so each shell adds
+// its gain once and the overlaps step the brightness down toward the edge. A single sphere is a
+// hard-edged octagon in the sky.
+const CORE_R = 0.13, HALO_R = [0.17, 0.23, 0.29, 0.35, 0.41], HALO_GAIN = 0.06;
 
 export class Props {
   constructor(terrain, entries = []) {
@@ -233,10 +259,8 @@ export class Props {
       const before = count(b);
       kit(b, T(e.x, y, e.z, e.ry), rng(hash(e.id)), e.variant || '', out);
       tris += count(b) - before;
-      const item = {
-        id: e.id, kit: e.kit, area: e.area, zoneId, label: e.label || 'use',
-        kind: e.kind || 'interact', x: e.x, y, z: e.z, range: e.range || 3.6,
-      };
+      const item = propItem(e, y, zoneId);
+      if (hasState(e.kit) !== !!out.glow) console.warn(`props: the ${e.kit} kit and propstate disagree about ${e.id} having a lit state`);
       if (out.glow) {
         const p = new THREE.Vector3(...out.glow).applyMatrix4(T(e.x, y, e.z, e.ry));
         item.glow = p;
@@ -252,28 +276,41 @@ export class Props {
     }
     this.buildGlow(glow);
     this.tris = tris;
-    // Nothing here moves, so the context button gets the same array every frame rather than 48
-    // fresh objects.
-    this.list = this.items.map(i => ({ id: i.id, kind: i.kind, label: i.label, x: i.x, z: i.z, range: i.range }));
+    this.list = targetList(this.items);
   }
 
-  // One instanced sphere per zone, drawn only while something in that zone is alight. A lamp the
-  // player has just lit has to look lit or "relight the lamp" has no answer on screen.
+  // Two instanced spheres per zone, both drawn only while something in that zone is alight: a hard
+  // flame inside the cage, and an additive halo wide enough to survive daylight. The flame on its
+  // own is about ten pixels at nine metres on the 844-wide frame, which is why "relight the lamp"
+  // had no answer on screen at noon.
   buildGlow(glow) {
     this.glow = [];
     for (const [zoneId, items] of glow) {
-      const mat = new THREE.MeshBasicMaterial({ color: zone(zoneId).window.litColor, toneMapped: false });
-      const mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, GLOW_SEG, GLOW_SEG - 2), mat, items.length);
-      mesh.name = `props:glow:${zoneId}`;
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      mesh.count = 0;
-      mesh.visible = false;
-      mesh.frustumCulled = false;
-      this.object3D.add(mesh);
-      this.glow.push({ mesh, items });
+      const lit = new THREE.Color(zone(zoneId).window.litColor);
+      const core = this.glowMesh(`props:glow:${zoneId}`, new THREE.SphereGeometry(CORE_R, 10, 8), items.length,
+        new THREE.MeshBasicMaterial({ color: lit, toneMapped: false }));
+      const halo = this.glowMesh(`props:halo:${zoneId}`,
+        mergeGeometries(HALO_R.map(r => new THREE.SphereGeometry(r, 14, 10))), items.length,
+        new THREE.MeshBasicMaterial({
+          color: lit.clone().multiplyScalar(HALO_GAIN), toneMapped: false,
+          transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
+      halo.renderOrder = 3;
+      this.glow.push({ core, halo, items });
     }
     this.drawGlow();
+  }
+
+  glowMesh(name, geo, n, mat) {
+    const mesh = new THREE.InstancedMesh(geo, mat, n);
+    mesh.name = name;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.count = 0;
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    this.object3D.add(mesh);
+    return mesh;
   }
 
   drawGlow() {
@@ -285,31 +322,28 @@ export class Props {
         if (!this.lit.has(it.id)) continue;
         s.setScalar(this.glowLevel);
         m4.compose(it.glow, q, s);
-        g.mesh.setMatrixAt(n++, m4);
+        g.core.setMatrixAt(n, m4);
+        g.halo.setMatrixAt(n++, m4);
       }
-      g.mesh.count = n;
-      g.mesh.visible = n > 0 && this.glowLevel > 0;
-      g.mesh.instanceMatrix.needsUpdate = true;
+      for (const mesh of [g.core, g.halo]) {
+        mesh.count = n;
+        mesh.visible = n > 0 && this.glowLevel > 0;
+        mesh.instanceMatrix.needsUpdate = true;
+      }
     }
   }
 
-  find(id) { return this.items.find(i => i.id === id) || null; }
+  find(id) { return findProp(this.items, id); }
 
-  // The context button acted on this prop. A lamp answers to Kindle and to nothing else, which is
-  // also the school every step that names one asks for; nothing else in the kit has state.
   use(id, verb) {
-    const it = this.find(id);
-    if (!it?.glow || verb !== 'kindle' || this.lit.has(id)) return false;
-    this.lit.add(id);
+    if (!useProp(this.items, this.lit, id, verb)) return false;
     this.drawGlow();
     return true;
   }
 
-  // §9.4's `recover: arm` — put the object back the way the step found it.
   arm(id) {
-    const it = this.find(id);
-    if (!it) return false;
-    if (this.lit.delete(id)) this.drawGlow();
+    if (!armProp(this.items, this.lit, id)) return false;
+    this.drawGlow();
     return true;
   }
 

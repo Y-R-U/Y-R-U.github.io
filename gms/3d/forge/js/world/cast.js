@@ -11,15 +11,20 @@ export class Cast {
   constructor(people, entries = []) {
     this.people = people;
     this.bodies = new Map();
+    this.unseated = [];
     for (const e of entries) {
       const zi = e.town ? ZONE_IDS.indexOf(e.town) : zoneAt(e.x, e.z);
       const h = hash(e.id);
-      this.bodies.set(e.id, people.place({
+      const body = people.place({
         npc: e.id, x: e.x, z: e.z, heading: e.ry || 0,
         zi: zi < 0 ? 1 : zi, vi: h & 1,
         phase: (h >>> 3) % 40, gait: ((h >>> 7) % 628) / 100,
         scale: 0.94 + ((h >>> 11) % 14) / 100, tone: 0.9 + ((h >>> 15) % 20) / 100,
-      }));
+      });
+      // The rig refuses a body it has no mesh seat for. Nothing the player cannot see is offered
+      // as a target: an id in `targets()` with no figure under it is the failure this prevents.
+      if (body) this.bodies.set(e.id, body);
+      else this.unseated.push(e.id);
     }
   }
 

@@ -200,6 +200,37 @@ test('finishing a job raises that town\'s Standing and costs you a little with i
   assert.equal(doc.standing.neutral, 0, 'Longacre is nobody\'s opposite');
 });
 
+// The context button's label and the reducer read the same shipped step, so they must not disagree
+// about whether it is open. When they did, the button read KINDLE at two in the afternoon on an
+// 18:00 step, props.use() lit the lamp, and nothing was credited.
+test('the button offers no verb at an hour, or behind a face, the reducer will refuse', () => {
+  const q = shipped();
+  q.clock = { day: 0, hour: 14 };
+  q.doc.quests['sandbox.19'] = { s: 'active', i: 0, c: {}, t: 0, e: 0 };
+
+  assert.equal(q.verbFor('wwa.lamp'), null, 'the round is lit between 18:00 and 21:00, not at 14:00');
+  q.emit({ t: 'interact', id: 'wwa.lamp', verb: 'kindle' });
+  assert.deepEqual(q.doc.quests['sandbox.19'].c, {}, 'which is exactly what the press would have paid');
+
+  q.clock.hour = 19;
+  assert.equal(q.verbFor('wwa.lamp'), 'kindle', 'and inside the window it asks for Kindle again');
+  q.emit({ t: 'interact', id: 'wwa.lamp', verb: 'kindle' });
+  assert.deepEqual(q.doc.quests['sandbox.19'].c.round, [1]);
+
+  const n = shipped();
+  n.clock = { day: 0, hour: 12 };
+  n.here = ['wwa', 'wwa.temple'];        // the step is scoped `in: wwa.temple`, which is the reducer's own gate
+  n.doc.quests['neutral.09'] = { s: 'active', i: 3, c: {}, t: 0, e: 0 };
+  assert.equal(n.verbFor('wwa.temple.font'), null, 'counting the font wants the Whitewall face on');
+  for (let i = 0; i < 4; i++) n.emit({ t: 'interact', id: 'wwa.temple.font', verb: 'barter' });
+  assert.equal(n.doc.quests['neutral.09'].i, 3, 'four taps, nothing');
+
+  n.doc.worn = 'light';
+  assert.equal(n.verbFor('wwa.temple.font'), 'barter');
+  for (let i = 0; i < 4; i++) n.emit({ t: 'interact', id: 'wwa.temple.font', verb: 'barter' });
+  assert.equal(n.doc.quests['neutral.09'].i, 4, 'and with it on, four taps finish the step');
+});
+
 // `store.load()` runs before the packs do, so `normalise` is handed no `defs` and neither
 // definition-dependent check can fire. This is the pass that actually happens.
 test('the session re-checks the save against the packs once they have loaded', () => {

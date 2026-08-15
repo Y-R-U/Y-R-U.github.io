@@ -8,7 +8,7 @@ import { rng, span } from './details.js';
 import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
-import { crowd } from './roster.js';
+import { crowdSeats, crowdSeatsLeft, PER_CROWD_MESH as MAX_PER_MESH } from './roster.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -488,7 +488,6 @@ function roadX(pts, z) {
 }
 
 const POOL = 120;
-const MAX_PER_MESH = 32;
 
 export class People {
   constructor(terrain) {
@@ -655,12 +654,18 @@ export class People {
     col.needsUpdate = true;
   }
 
-  // A named body stands where it was placed, faces where it was pointed, and never wanders.
+  // A named body stands where it was placed, faces where it was pointed, and never wanders. The
+  // rig has the last word the same way Vermin.add() does: a named body with nowhere to be drawn is
+  // an invisible quest-giver, which is worse than one that was never placed.
   place(spec) {
     const a = {
       kind: 'idle', heading: 0, speed: 0, turn: 0.09, phase: 0, gait: 0,
       scale: 1, tone: 1, warm: 0, vi: 0, zi: 0, ...spec,
     };
+    if (a.npc && crowdSeatsLeft(this.agents, a.zi, a.vi, MAX_PER_MESH) <= 0) {
+      console.warn(`people: ${a.npc} has no seat left in mesh ${a.zi}/${a.vi} and was not placed`);
+      return null;
+    }
     this.agents.unshift(a);
     this.setCrowd(this.crowdN ?? 36);
     return a;
@@ -668,10 +673,11 @@ export class People {
 
   setCrowd(n) {
     this.crowdN = n;
-    this.active = crowd(this.agents, n).slice(0, POOL);
+    const { active, lists } = crowdSeats(this.agents, n, POOL, this.meshes.length, MAX_PER_MESH);
+    this.active = active;
     const col = new THREE.Color();
     this.meshes.forEach((mesh, mi) => {
-      const list = this.active.filter(a => a.zi === (mi >> 1) && a.vi === (mi & 1)).slice(0, MAX_PER_MESH);
+      const list = lists[mi];
       mesh.count = list.length;
       mesh.userData.list = list;
       const ic = mesh.instanceColor;

@@ -5,7 +5,7 @@
 // copy that would have to be kept in step.
 
 import { normaliseQuests, normaliseDialogue, normaliseAreas } from './questdef.js';
-import { step, offered, progress, rewardFor, boardRoll, finishes } from './quest.js';
+import { step, offered, progress, rewardFor, boardRoll, finishes, openSteps } from './quest.js';
 import { areasAt, centreOf } from './areas.js';
 import { DAY_ROLL } from './clock.js';
 import { itemCount, addItem } from './save.js';
@@ -278,15 +278,16 @@ export class QuestRunner {
   }
 
   // Which school a live step wants dialled at this object. `quest.js` refuses credit for a cast of
-  // the wrong one, so the context button says which it is instead of failing silently.
+  // the wrong one, so the context button says which it is instead of failing silently — and it
+  // asks `openSteps` rather than reading the step list itself, so a step shut by its hour window or
+  // by the face being worn offers no verb at all.
   verbFor(id) {
+    const ctx = this.ctx();
     for (const [qid, rec] of Object.entries(this.doc.quests)) {
-      if (rec.s !== 'active') continue;
       const def = this.defs[qid];
       if (!def) continue;
-      const reqs = def.steps.filter(s => !s.optional);
-      for (const s of [reqs[rec.i], ...def.steps.filter(s => s.optional)]) {
-        if (!s?.verb) continue;
+      for (const s of openSteps(def, rec, ctx)) {
+        if (!s.verb) continue;
         if (s.objectives.some(o => o.k === 'interact' && o.id === id)) return s.verb;
       }
     }

@@ -56,11 +56,17 @@ const spells = app.add(new Spells(player, demo.terrain));
 // `app.add` is only for the knobs: the session ticks the spawner, not the frame loop, and it stays
 // inert until `play()` arms it, which never happens under ?shot= or in the editor.
 const vermin = app.add(new Vermin(demo.terrain));
-const spawner = app.add(new Spawner({ rig: vermin, player, ground: (x, z) => groundAt(x, z, 0) }));
+const spawner = app.add(new Spawner({
+  rig: vermin, player,
+  ground: (x, z) => groundAt(x, z, 0),
+  // A step against itself: the walker is only pushed when it began inside a collider.
+  blocked: (x, z) => walkStep(x, z, x, z, groundAt(x, z, 0)).hit,
+}));
 
 // Top-level await, above app.start() and above the boot overlay lifting: props are world geometry
 // rather than game state, so they are in `?shot=` and in the editor too, and every render and every
-// perf number is of the world the game actually shows. Missing files lose the props, not the game.
+// perf number is of the world the game actually shows. `loadPlacements` settles each file on its
+// own and warns; this catch is for a file that parses and then throws on its way through.
 const placed = await loadPlacements().catch(e => {
   console.warn(`props: nothing placed — ${e.message}`);
   return { props: [], cast: [] };

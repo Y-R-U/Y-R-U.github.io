@@ -530,14 +530,32 @@ test('nothing the world hooks close over is declared after the frame loop starts
   const hooks = src.slice(opens, src.indexOf('\n    },', opens));
   assert.ok(hooks.includes('spawner.tick'), 'the spawner is no longer ticked from the world hooks');
 
-  // `function` is hoisted and initialised; only these three have a dead zone.
+  // `function` is hoisted and initialised, so naming one is safe — but its body is not, and two
+  // hooks are bare function references. Bodies run to the first `}` in column 1, which is what a
+  // top-level declaration in this file ends with.
+  const bodies = new Map();
+  for (const m of src.matchAll(/^(?:async )?function\s+([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/gm)) {
+    bodies.set(m[1], src.slice(m.index + m[0].length, src.indexOf('\n}', m.index)));
+  }
+  for (const fn of ['targets', 'sight']) {
+    assert.ok(bodies.has(fn) && hooks.includes(fn), `main.js no longer hands over \`${fn}\` — rewrite this test`);
+  }
+
+  // `const|let|class` are the three with a dead zone.
   const at = new Map();
   for (const m of src.matchAll(/^(?:const|let|class)\s+([A-Za-z_$][\w$]*)/gm)) at.set(m[1], m.index);
-  for (const m of hooks.matchAll(/[A-Za-z_$][\w$]*/g)) {
-    const where = at.get(m[0]);
-    if (where === undefined) continue;
-    assert.ok(where < starts, `main.js hands the session \`${m[0]}\`, which it declares after app.start()`);
+  const seen = new Set();
+  for (const queue = [hooks]; queue.length;) {
+    for (const m of queue.pop().matchAll(/[A-Za-z_$][\w$]*/g)) {
+      if (seen.has(m[0])) continue;
+      seen.add(m[0]);
+      if (bodies.has(m[0])) queue.push(bodies.get(m[0]));
+      const where = at.get(m[0]);
+      if (where === undefined) continue;
+      assert.ok(where < starts, `main.js hands the session \`${m[0]}\`, which it declares after app.start()`);
+    }
   }
+  assert.ok(seen.has('EYE'), 'the scan stopped at the hook names instead of reading sight()');
 });
 
 test('a spell with nothing to aim hits nothing', () => {
@@ -546,6 +564,29 @@ test('a spell with nothing to aim hits nothing', () => {
   assert.equal(g.strike({ coef: 0, cone: 1, range: 9 }), null, 'a Line cast is not a bolt');
   assert.equal(g.strike({ coef: 1 }), null, 'and a spell with no cone must not hit the whole world');
   assert.ok(g.strike({ coef: 1, cone: Math.PI, range: 9 }), 'a bolt does');
+});
+
+// Measured over 3000 real place() calls against the live colliders: 632 rats landed inside a walk
+// box and 624 of those had no standable point with a clear line to them at any distance out to
+// 26 m. `place()` refused a point inside a nested planned area and never asked the colliders.
+test('a rat is never left somewhere the player cannot get a line to it', () => {
+  const wall = { x0: -556, z0: -34, x1: -548, z1: -14 };
+  const inside = (x, z) => x > wall.x0 && x < wall.x1 && z > wall.z0 && z < wall.z1;
+
+  const loose = spawner();
+  loose.tick(0.001, centreOf(GRANARY));
+  assert.ok(loose.foes().some(f => inside(f.x, f.z)), 'this rng really does put rats in that corner');
+
+  const s = spawner(['light.01'], { blocked: inside });
+  s.tick(0.001, centreOf(GRANARY));
+  assert.equal(s.foes().length, 8, 'and the nest still fills — the retry loop finds open ground');
+  for (const f of s.foes()) {
+    assert.equal(inside(f.x, f.z), false, `a rat at ${f.x.toFixed(1)}, ${f.z.toFixed(1)} is inside the massing`);
+    assert.ok(contains(GRANARY, f.x, f.z));
+  }
+
+  const src = readFileSync(new URL('../main.js', import.meta.url), 'utf8');
+  assert.match(src, /new Spawner\(\{[\s\S]*?blocked:/, 'the game builds a spawner that never asks');
 });
 
 test('the live cap is honoured however many nests are in reach', () => {

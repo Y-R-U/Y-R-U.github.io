@@ -41,6 +41,32 @@ export function crowd(agents, count) {
   return held.concat(rest.slice(0, Math.max(0, count | 0)));
 }
 
+// One InstancedMesh per (zone, variant) on the people rig, and this many bodies in it.
+export const PER_CROWD_MESH = 32;
+
+// The people rig's `seatsLeft`. Being in `active` is not a seat: `crowd()` only promises a named
+// body is at the front of the list, and a bucket with more than PER_CROWD_MESH named bodies in it
+// draws the overflow nowhere. People.place() asks this first, so an unseatable NPC is refused out
+// loud instead of becoming an invisible quest-giver.
+export function crowdSeatsLeft(agents, zi, vi, perMesh = PER_CROWD_MESH) {
+  let n = 0;
+  for (const a of agents) if (a.npc && a.zi === zi && a.vi === vi) n++;
+  return perMesh - n;
+}
+
+// Everything People.setCrowd() decides: who is active at this knob setting, and what each mesh
+// draws. Here rather than in people.js because people.js imports three, and the last time this
+// lived there it was reverted to a bare slice with the suite still green — at `crowd = 0` that
+// emptied `active` and every named body in the valley went with it.
+export function crowdSeats(agents, count, pool, meshes, perMesh = PER_CROWD_MESH) {
+  const active = crowd(agents, count).slice(0, pool);
+  const lists = [];
+  for (let mi = 0; mi < meshes; mi++) {
+    lists.push(active.filter(a => a.zi === (mi >> 1) && a.vi === (mi & 1)).slice(0, perMesh));
+  }
+  return { active, lists };
+}
+
 // One mesh per (kind, zone), each carrying `perMesh` bodies. Filled in roster order, so a seat is
 // never taken from a fight by a wanderer standing nearer the camera.
 export function buckets(active, perMesh) {

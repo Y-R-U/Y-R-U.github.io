@@ -331,3 +331,228 @@ footprint, nothing at or under the waterline, no two targets within 3 m.**
 5. **A8 will move things.** The offsets are area-relative, so most of it follows for free; the three
    in §6 that were nudged around demo massing will need re-authoring, and `wwa.board` wants putting
    back on `wwa.board`.
+
+---
+
+# Follow-up: the review's eight findings
+
+Everything below is a second pass over the wave above, against `docs/REVIEW_PROPS.md`. The builder's
+text is unchanged; this is what was done to it.
+
+**Tests: 393 → 404, 0 failing.** `node tools/lintQuests.mjs` 0 errors, the same one pre-existing
+`light.06` warning. `node tools/lintText.mjs` clean. Gate unmoved: `wall_day` **70 / 150k**,
+`street_dusk` 60 / 108k, `gate_night` 43 / 100k, `town_night` 72 / 117k, `creek_day` 73 / 93k
+(93k was 92k — the new lantern cages and the slate rack). The 48 props went **3,362 → 3,758
+triangles**, still 9 merged meshes.
+
+---
+
+## 1. The boot tripwire now follows the hoisted helpers
+
+`combat.test.js`'s scan built a map of `const|let|class` positions and walked the identifiers in the
+`world: { … }` block. `targets` and `sight` are `function` declarations, so they were in no map and
+the scan stopped at their names.
+
+It now also builds a map of top-level `function` bodies and walks the hooks **transitively**: any
+identifier naming one pushes that body onto the queue, and every `const|let|class` reached anywhere
+in the closure is checked against `app.start()`. Two extra assertions keep the scan honest — that
+`targets` and `sight` are still hoisted functions the hooks name, and that the walk reached `EYE`,
+which only exists inside `sight`'s body. Without that last line the test could quietly stop
+descending again and stay green.
+
+**Proved by rebuilding the reviewer's bug.** `targets()` → `…concat(LATE)`, `const LATE = [];`
+immediately after `app.start()`:
+
+```
+392 pass, 1 fail
+AssertionError: main.js hands the session `LATE`, which it declares after app.start()
+  at js/game/combat.test.js:555
+```
+
+Restored afterwards.
+
+## 2. `verbFor` and the reducer now read the same function
+
+`quest.js` exports `openSteps(def, rec, ctx)` — the live required step plus the optional ones, less
+anything its own `after`/`before`/`worn`/`onDay`/`require` has shut. `advance()` iterates it instead
+of assembling that list and filtering with `stepOpen` itself, and `verbFor` calls the same function.
+There is no second copy to keep in step.
+
+New test in `wiring.test.js`, driven through the real runner, the real reducer and the shipped packs:
+
+| | button | reducer |
+|---|---|---|
+| `sandbox.19/round`, 14:00 | **null** | four taps credit `{}` |
+| `sandbox.19/round`, 19:00 | `kindle` | credits `{"round":[1]}` |
+| `neutral.09/count`, no face | **null** | four taps leave `i` at 3 |
+| `neutral.09/count`, `worn: light` | `barter` | four taps finish the step |
+
+Reverted `verbFor` to its old body → red on *"the round is lit between 18:00 and 21:00, not at
+14:00"*. Restored.
+
+Confirmed live over CDP in a real session: `verbFor('wwa.lamp')` is `null` at 14:00 and `kindle` at
+19:00, and the granary lamp's own step still puts **KINDLE** on the button.
+
+**Two things I deliberately did not change.**
+
+- `verbFor` still does not apply a step's `in`. That is a per-event area test inside `credit()`, not
+  part of "is this step open", and folding it into `openSteps` would change what the reducer does.
+  In practice they agree: the button only appears within 3.6 m of a prop, and `placement.test.js`
+  pins every prop inside every area a step scopes it to. A prop within range of a player standing
+  just outside its area would still be a button that credits nothing. Unproven either way — I did
+  not find a case in the shipped 48.
+- `props.use()` still lights a lamp whenever Kindle is dialled, including when no step wants it
+  (step 0 of `light.01`, say). That is world state, not quest feedback; the button reads the prop's
+  own label there, not a verb, so it is no longer a claim that anything will be credited.
+
+## 3. The lamp
+
+**The head.** The solid `taperBox(0.30, 0.30, 0.38, …)` housing is gone. The lantern is now an open
+cage — a tray skirt, four corner bars, a pitched roof with a finial, a hanger — on a bracket arm
+with a diagonal stay. The flame is inside it and visible from every side, which is the actual fix:
+there is nothing left to occlude.
+
+**The lit state.** A hard core sphere (r 0.13) plus a halo that is five nested additive spheres
+merged into one geometry (r 0.17 → 0.41, gain 0.06 each). Front faces only, so each shell adds its
+gain once and the overlaps step the brightness down toward the edge — a single additive sphere is a
+hard-edged octagon in the sky, which is what the first attempt looked like. Both meshes stay
+`visible = false` until something in that zone is alight, so nothing changed in the gate numbers.
+
+**Looked at the PNGs**, not the numbers: unlit and lit at 9 m in daylight on the 844 × 390 profile,
+a 2 m close-up of both, night, and a **real gameplay frame** — mobile profile, new game, player
+walked to the lamp, `act('cast')` through the real context button path. The lit lamp is a ~30 px
+warm disc against the grass where the review measured an 8 × 14 px chip. Night still reads as a
+candle in a lantern.
+
+Honest limits: the halo is faceted spheres, not a radial falloff, so at 2 m you can see the shell
+steps and the glow swallows the fixture; and `propGlow = 3` is still a beach ball. That knob is an
+art knob and 1 is what the game ships.
+
+## 4. `bst.intake.draw`
+
+`at: [-0.25, 0.45] → [0.62, -0.7]`, `ry: 0 → 5.88`. The bearing is measured, not guessed: a probe
+swept 32 headings at 4 m for the deepest water and found it at 5.88 rad, so the gate faces the
+river.
+
+| | before | after |
+|---|---|---|
+| terrain across its own 2.7 m frame | +2.16 m to −1.10 m | **0.59 m** total spread |
+| base above the waterline | cantilevered over the channel | **2.87 m**, on the bank shelf |
+| inside a collider box | — | no |
+
+**Rendered from four bearings and looked at all four.** The frame, the gate panel, the wheel and
+both abutments stand on ground; the gorge and the river are below and in shot from the approach.
+This is the best the circle offers: everywhere within 4 m of the waterline inside `bst.intake` has
+at least 1.5 m of relief across a 2.7 m frame, so a sluice literally at the water's edge would be
+half-buried again.
+
+## 5. The spawner asks the colliders
+
+`Spawner` takes a `blocked` hook and `place()`'s retry loop skips a point it rejects. `main.js`
+passes `(x, z) => walkStep(x, z, x, z, groundAt(x, z, 0)).hit` — a step against itself, which only
+pushes when the walker began inside a box.
+
+Measured in the live world, 1200 real `place()` calls into `wwa.granary`, then the review's own
+reachability sweep on every result (32 headings × 13 radii to 26 m for a standable point with a
+clear line):
+
+```
+before   placed 1200   inside a walk box 258   unreachable 256   21.3 %
+after    placed 1200   inside a walk box   0   unreachable   0    0.0 %
+```
+
+The nest still fills: 1200 of 1200 placed, so the retry loop finds open ground rather than handing
+back a short nest.
+
+Test in `combat.test.js` blocks a strip across the granary, asserts eight rats and none of them in
+it, and asserts first that the same rng really does put rats there without the hook — otherwise the
+fixture proves nothing. It also reads `main.js` to check the game builds a spawner that asks.
+Reverted twice — the check in `place()`, then the hook in `main.js` — red both times.
+
+## 6. A named body now holds a seat or is refused
+
+`roster.js` gains `PER_CROWD_MESH` (32, moved out of `people.js`), `crowdSeatsLeft()` and
+`crowdSeats()`. `People.place()` refuses a named body whose `(zone, variant)` mesh is full, warns,
+and returns null — the same shape as `Vermin.add()`. `Cast` skips a refused body and records the id
+on `cast.unseated`, so nothing can be in `targets()` with no figure under it. That is the guarantee
+§3 claimed; the old code only guaranteed a place in `active`.
+
+Live: 18 named, 18 seated, `unseated: []`.
+
+## 7. Two placements
+
+**The Yard post.** `at: [-0.45, 0.3] → [-0.03, -0.48]`, `ry: 3.14 → 0.07`. Openness measured as the
+minimum clear distance over 16 headings, capped at 6 m: **2.0 m at the old spot** — the review's 3 m
+alley — and **6 m or more at the new one**. Rendered from three bearings: it stands on the paved
+yard in front of the hall with standing room all round. Still anchored in `wwa.market`; `wwa.board`'s
+own 5 m circle is still under demo massing, so putting it back there is still A8's.
+
+**`board:slate`.** Five 0.05 m boards stacked flat became a rack: two uprights and a top rail with
+five slates of staggered width and height stood on edge against it, one loose slate flat on the
+ground, and a chalk band. Rendered at 3.6 m and 8 m, before and after. At 8 m it is now an object
+standing out of the grass instead of a dark smear on it.
+
+## 8. Minors
+
+**The comment.** `placement.js`'s file-top block now claims only what the coordinate system
+provides — that moving an area moves what is anchored in it — and says outright that nothing here
+reads a step's `in`, that `wwa.board` is already anchored outside its own id, and that
+`placement.test.js` is what holds the property. `main.js`'s comment about the `loadPlacements`
+catch was also wrong after the change below, and now says what the catch is actually for.
+
+**The three fetches.** `loadPlacements()` runs them in parallel and settles each on its own, so
+losing `props.json` no longer takes `cast_at.json` and all eighteen named NPCs with it. A missing
+`areas.json` is reported once instead of as 66 unknown-area errors. New test stubs `fetch` and 404s
+each file in turn; reverted to the serial version → red.
+
+## 9. The two coverage gaps
+
+**`setCrowd`.** The invariant no longer lives one call away from its test: `crowdSeats()` in
+`roster.js` decides both `active` and what each mesh draws, and `setCrowd` is a driver over it.
+Three tests, three reverts, all red:
+
+| reverted | went red on |
+|---|---|
+| `crowdSeats` back to a bare `agents.slice()` | *n0 is out of the world at crowd = 0* |
+| `setCrowd` doing its own slicing again (**the reviewer's exact revert**) | the source check |
+| `place()` no longer asking for a seat | *place() places named bodies it has no seat for* |
+
+The middle one is a source read of `people.js`, which is not something to do lightly — but
+`people.js` imports `three` and there is no other way to pin that the rig uses the function, and
+this is the exact revert that stayed 393/0 green while `crowd = 0` deleted eighteen bodies.
+
+**`props.js`.** Split the way `roster.js` splits `vermin.js`: `js/world/propstate.js` holds
+`LIT_VERB`, `hasState`, `findProp`, `propItem`, `targetList`, `useProp` and `armProp`, and
+`props.js` is the three-side driver. `js/world/propstate.test.js` drives those against the real
+`data/props.json` and the real packs — the Kindle guard, that no other kit has state, that `arm`
+answers true for an unlit lamp and false for `lac.henhouse.hen`, and the label defaults. Deleting
+the school check now fails with *"barter lit the lamp"*. `props.js` also warns if a kit and
+`propstate` ever disagree about a prop having a lit state.
+
+**Still uncovered, and not fixable without a headless-three harness:** every kit builder's
+geometry, `drawGlow()`, and the `Batch` merge. The renders are the only check on those.
+
+---
+
+## What I could not verify
+
+- **No real phone.** Desktop Chrome over CDP throughout, including the mobile-profile run.
+- **I did not re-render the 33-combination kit sheet.** Only the four props I touched, plus one
+  other (below). "The whole kit looks right" is still unproven, exactly as §6 says.
+- **`lac.millbridge.crate` is inside a collider box.** Found by a machine sweep, not by the brief.
+  It has a standable point with a clear line, its base matches `groundAt` to 0.0 m, and the render
+  shows it on grass beside the bridge approach — the box is the bridge abutment, not a building.
+  Left alone; worth an eye in A8. It is the only one of the 48 that trips that test.
+- **`demo.rebuild()` still does not re-seat a prop**, and I still did not test it.
+- **The 90 s chevron against a prop step** is still untested.
+- **The `in` residual in `verbFor`** — described in §2 above. I could not construct a shipped case
+  where it bites, and I did not prove there is none.
+- **Timings.** Headless renders here are software-rendered, so only calls and triangles are quoted.
+
+## Machine sweep over the placed set, after the changes
+
+48 props, 18 cast, against the live world: **0** at or under the waterline, **0** with no standable
+point holding a clear line inside their own context range, **0** pairs of targets within 4 m, max
+|base − `groundAt`| under 0.2 m, and 1 prop inside a collider box (the bridge crate above). Both
+boot paths clean: new game 48 props / 18 cast / boot overlay gone, save flushed and reloaded with no
+slate and the same counts, **no console output on either**.

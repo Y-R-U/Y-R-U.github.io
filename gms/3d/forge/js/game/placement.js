@@ -1,9 +1,10 @@
 // Where an authored prop or a named NPC actually stands. Pure: authored entries plus the area
 // table in, world positions out.
 //
-// `at` is a fraction of the anchor area's own extent, never a world coordinate. A prop therefore
-// cannot be authored outside the area a quest looks for it in, and if A8 moves or resizes an area
-// everything standing in it moves with it.
+// `at` is a fraction of the anchor area's own extent, never a world coordinate, so moving or
+// resizing an area moves everything anchored in it. That is the whole guarantee: nothing here
+// reads a step's `in`, and `wwa.board` is already anchored outside its own id, so "a prop stands
+// in every area a quest looks for it in" is placement.test.js's promise and not this file's.
 
 import { contains } from './areas.js';
 
@@ -58,16 +59,31 @@ export function propIds(defs) {
   return out;
 }
 
+// Three results, not one. In series and sharing a rejection, losing props.json also lost
+// cast_at.json and every named NPC in the game behind a single warning that named neither.
 export async function loadPlacements(base = 'data') {
-  const get = async p => {
-    const r = await fetch(`${base}/${p}`);
-    if (!r.ok) throw new Error(`${base}/${p} (${r.status})`);
-    return r.json();
+  const errors = [];
+  const get = async (p, fallback) => {
+    try {
+      const r = await fetch(`${base}/${p}`);
+      if (!r.ok) throw new Error(`${base}/${p} (${r.status})`);
+      return await r.json();
+    } catch (e) {
+      errors.push(e.message);
+      return fallback;
+    }
   };
   const { normaliseAreas } = await import('./questdef.js');
-  const areas = normaliseAreas(await get('areas.json')).areas;
-  const props = placeAll(await get('props.json'), areas);
-  const cast = placeAll(await get('cast_at.json'), areas);
-  for (const e of [...props.errors, ...cast.errors]) console.warn(`placement: ${e}`);
-  return { areas, props: props.placed, cast: cast.placed, errors: [...props.errors, ...cast.errors] };
+  const [table, propFile, castFile] = await Promise.all([
+    get('areas.json', null), get('props.json', []), get('cast_at.json', []),
+  ]);
+  // Without the areas nothing has an anchor, and reporting that once beats sixty-six unknown-area
+  // errors saying the same thing.
+  const areas = table ? normaliseAreas(table).areas : {};
+  const empty = { placed: [], errors: [] };
+  const props = table ? placeAll(propFile, areas) : empty;
+  const cast = table ? placeAll(castFile, areas) : empty;
+  errors.push(...props.errors, ...cast.errors);
+  for (const e of errors) console.warn(`placement: ${e}`);
+  return { areas, props: props.placed, cast: cast.placed, errors };
 }
