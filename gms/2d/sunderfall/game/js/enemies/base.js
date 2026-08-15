@@ -155,6 +155,15 @@ function baseUpdate(e, dt) {
     if (e.onGround) e.vx *= Math.exp(-dt * 6);
     return;
   }
+  /* A cutscene owns the frame (story/runner.js sets this). Enemies left over
+     from the fight before it kept swinging at a boy with no control, and a
+     wind-up that survived the boundary landed on someone who could not dodge.
+     Held, not despawned: whatever was on the road is still there afterwards. */
+  if (_w && _w.storyLock) {
+    cancelAction(e, d);
+    if (e.onGround) e.vx *= Math.exp(-dt * 6);
+    return;
+  }
   if (root > 0) e.vx = 0;
 
   advanceAction(e, d, def, dt);
@@ -193,7 +202,12 @@ function advanceAction(e, d, def, dt) {
   d.actT += dt;
 
   if (d.phase === 0) {
-    d.tellK = Math.min(1, d.actT / a.wind);
+    /* `windFor` lets an action shorten its own telegraph as a fight escalates —
+       the Seam's beam warns for 1.7s in phase one and 1.0s in the unmaking, so
+       later phases are read faster rather than dodged less. Falls back to the
+       constant, which is what every other action uses. */
+    const wind = a.windFor ? a.windFor(d) : a.wind;
+    d.tellK = Math.min(1, d.actT / wind);
     // The tell is not only colour: a wind-up throws its own gathering particles.
     if (a.windFx !== false && !silhouette() && Math.random() < 0.55) {
       const c = a.tell;
@@ -207,7 +221,7 @@ function advanceAction(e, d, def, dt) {
       });
     }
     if (a.onWind) a.onWind(_w, e, d, d.tellK);
-    if (d.actT >= a.wind) {
+    if (d.actT >= wind) {
       d.phase = 1; d.actT = 0; d.tellK = 1; d.state = 'attack';
       if (a.sfx) _w.ctx.audio.sfx(a.sfx, { x: e.x, y: e.y });
       if (a.fire) a.fire(_w, e, d);

@@ -51,7 +51,11 @@ const SEAM_PHASES = [0.72, 0.44, 0.16];
  */
 const ENTRY_X = {
   road: 470,
-  stones: 7380,     // west of the stones, facing them — the scene frames from here
+  /* Close enough to Ostrick (7570) that a tighter cutscene frame holds them
+     both. At 7380 he stood 190px west of the camera, which at the scene's zoom
+     put the player character at the very edge of the shot, in shadow, behind the
+     dead tree — the one figure the audience needs to see. */
+  stones: 7455,
   vigil: 7470,
   fire: 7470,
   approach: 7990,   // through the breach, at the foot of the scorched track

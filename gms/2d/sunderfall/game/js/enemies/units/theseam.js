@@ -21,6 +21,19 @@ const DARK = [0.045, 0.035, 0.075];
 const LIMB = [0.075, 0.055, 0.115];
 const EDGE = [0.55, 0.35, 0.95];
 const TELL = [1.0, 0.45, 0.85];
+/* The beam warns in RED and strikes in violet, and they must never be the same
+   colour — the whole point of the telegraph is that you can tell at a glance
+   whether the line on the ground can still hurt you. */
+const LASH_TELL = [1.0, 0.22, 0.22];
+const LASH_LOCK = 0.55;       // fraction of the wind-up it keeps tracking for
+const LASH_REACH = 1500;
+
+/** Point the beam at the player's centre of mass, or straight out if he is gone. */
+function aimLash(e, d) {
+  const t = d.target;
+  if (!t) { d.beamA = 0.4 * (e.faceX || 1); return; }
+  d.beamA = Math.atan2((t.y - t.h * 0.15) - e.y, t.x - e.x);
+}
 
 const ARMS = ['a', 'b', 'c', 'd'];
 const SEGS = 5;
@@ -74,43 +87,78 @@ export default defineEnemy({
   parts,
 
   actions: {
-    /* the sweeping beam — present in every phase, faster and wider as it goes */
+    /**
+     * The beam. Aimed, telegraphed, then fired down one line — it does not sweep.
+     *
+     * It used to: 0.68s of wind-up and then a 75-degree arc dragged across the
+     * arena over 1.35 seconds, ticking damage down the whole ray six times a
+     * second. Aaron played it and could not beat it, and the reason is that an
+     * arc that wide has no outside. Running was wrong (the arc catches up),
+     * standing was wrong, and there was nothing to read — the wind-up pointed at
+     * where the sweep *started*, not where it would be when it reached you.
+     *
+     * His fix, and it is the right one: *"have the beam not sweep, instead have
+     * a red haze indicating where the beam will shoot like a second or 2 before
+     * it does, red beam could pulse like a countdown."* So:
+     *
+     *   - it tracks him for the first 55% of the wind and then COMMITS. The line
+     *     drawn for the last ~0.7s is exactly the line it fires down.
+     *   - the haze is red while it is a threat and violet only once it is real,
+     *     so the warning can never be mistaken for the attack.
+     *   - it pulses faster as the countdown runs out (see `render`).
+     *   - one hard hit instead of a shower of small ones. Stepping out of the
+     *     line is now a complete answer, which is what makes the telegraph mean
+     *     something — and it still eats terrain, so cover is spent, not free.
+     *
+     * Phase shortens the warning rather than widening the attack: 1.7s at the
+     * start down to 1.0s at the unmaking. Later phases are read faster, not
+     * dodged less.
+     */
     lash: {
-      wind: 0.68, active: 1.35, recover: 0.7, cooldown: 3.1,
-      tell: TELL, sfx: 'seam_lash',
+      wind: 1.7, active: 0.42, recover: 0.7, cooldown: 3.1,
+      tell: LASH_TELL, sfx: 'seam_lash',
+      windFor: (d) => 1.7 - (d.bossPhase - 1) * 0.23,
       onStart(world, e, d) {
-        const t = d.target;
-        const from = t ? Math.atan2(t.y - e.y, t.x - e.x) : 0.4;
-        d.beamA = from - 0.55 * Math.sign(t ? t.x - e.x : 1);
-        d.beamTo = from + 0.75 * Math.sign(t ? t.x - e.x : 1);
+        aimLash(e, d);
+        d.beamOn = 0;
+        d.lashWind = 0.001;      // >0 means "the warning line is up", read by render
+        d.lashHit = 0;
+      },
+      onWind(world, e, d, k) {
+        // Tracking, then committed. The commit is the whole mechanic: a line that
+        // followed you to the last frame would be a hitscan with extra steps.
+        if (k < LASH_LOCK) aimLash(e, d);
+        d.lashWind = Math.max(0.001, k);
         d.beamOn = 0;
       },
-      onWind(world, e, d, k) { d.beamOn = k * 0.35; },
       fire(world, e, d) {
         d.beamOn = 1;
-        world.R.fx.shake(0.3, 0.4);
-        world.R.fx.chroma(0.7, 0.4);
+        d.lashWind = 0;
+        d.lashHit = 0;
+        world.R.fx.shake(0.45, 0.45);
+        world.R.fx.chroma(0.9, 0.4);
       },
       during(world, e, d, dt) {
-        const span = d.beamTo - d.beamA;
-        d.beamA += span * dt / 1.35;
+        // Two passes, not a stream: one on the frame it lands and one late, so a
+        // player who walks into a beam that is already up is still hit.
         d.beamT = (d.beamT || 0) - dt;
-        if (d.beamT > 0) return;
-        d.beamT = 0.06;
+        if (d.lashHit >= 2 || (d.lashHit > 0 && d.beamT > 0)) return;
+        d.beamT = 0.2;
+        d.lashHit++;
         const dx = Math.cos(d.beamA), dy = Math.sin(d.beamA);
-        const reach = 1500;
-        for (let s = 90; s < reach; s += 90) {
+        const dmg = d.lashHit === 1 ? 26 + d.bossPhase * 3 : 8;
+        for (let s = 90; s < LASH_REACH; s += 90) {
           const bx = e.x + dx * s, by = e.y + dy * s;
-          world.damageArea(bx, by, 62, 9, 'void', {
-            src: e, team: e.team === 1 ? 0 : 1, falloff: 0, force: 180, props: true, dirX: dx, dirY: dy,
+          world.damageArea(bx, by, 58, dmg, 'void', {
+            src: e, team: e.team === 1 ? 0 : 1, falloff: 0, force: 220, props: true, dirX: dx, dirY: dy,
           });
           if (world.solidAt(bx, by)) {
-            world.terrain.damage(bx, by, 34, 32, 'void', {});
+            world.terrain.damage(bx, by, 40, 38, 'void', {});
             break;
           }
         }
       },
-      onEnd(world, e, d) { d.beamOn = 0; },
+      onEnd(world, e, d) { d.beamOn = 0; d.lashWind = 0; },
     },
 
     /* an arm comes out of the tear and slams the ground where you are standing */
@@ -243,6 +291,7 @@ export default defineEnemy({
     d.armI = 0;
     d.armReach = 0;
     d.beamOn = 0;
+    d.lashWind = 0;
     d.open = 0.2;
     d.wob = 0;
     d.birthCount = 3;
@@ -389,6 +438,25 @@ export default defineEnemy({
     R.light({ x, y, radius: 1500 * grow, r: 0.55, g: 0.3, b: 1, intensity: 1.5 + d.bossPhase * 0.25, flicker: 0.14 });
     R.light({ x, y, radius: 420, r: 0.95, g: 0.8, b: 1, intensity: 2.2 * pulse, flicker: 0.2 });
 
+    /* The warning. Aaron asked for "a red haze indicating where the beam will
+       shoot ... could pulse like a countdown", and that is exactly this: a soft
+       red wash along the committed line, over a hairline that says precisely
+       where the edge is, blinking from about 3Hz to 13Hz as the wind-up runs
+       out. Red, never violet — violet is the beam, and by then it is too late. */
+    if (d.lashWind > 0 && d.beamOn <= 0) {
+      const k = Math.min(1, d.lashWind);
+      const dx = Math.cos(d.beamA), dy = Math.sin(d.beamA);
+      const ex = x + dx * LASH_REACH, ey = y + dy * LASH_REACH;
+      const blink = 0.5 + 0.5 * Math.sin(t * (3 + k * 10) * 6.283);
+      const a = (0.22 + 0.42 * k) * (0.5 + 0.5 * blink);
+      R.line(x, y, ex, ey, 46 + k * 54, { r: 1, g: 0.14, b: 0.16, a: a * 0.7 }, LAYER.FX, { add: true, tex: R.blob });
+      R.line(x, y, ex, ey, 4, { r: 1, g: 0.55, b: 0.5, a: 0.4 + 0.5 * k }, LAYER.FX, { add: true });
+      // once it is locked the line stops tracking, and it has to LOOK locked
+      if (k >= LASH_LOCK) {
+        R.line(x, y, ex, ey, 9 + k * 8, { r: 1, g: 0.25, b: 0.25, a: 0.18 * blink }, LAYER.FX, { add: true, tex: R.blob });
+      }
+    }
+
     // the beam
     if (d.beamOn > 0) {
       const dx = Math.cos(d.beamA), dy = Math.sin(d.beamA);
@@ -518,5 +586,5 @@ function countAdds(world) {
 }
 
 function cancelActionSoft(d) {
-  d.act = null; d.phase = 0; d.actT = 0; d.tellK = 0; d.beamOn = 0; d.armReach = 0;
+  d.act = null; d.phase = 0; d.actT = 0; d.tellK = 0; d.beamOn = 0; d.lashWind = 0; d.armReach = 0;
 }

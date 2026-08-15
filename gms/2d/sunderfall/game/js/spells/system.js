@@ -249,6 +249,34 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     }
   };
 
+  /**
+   * Put the character at a level. Tools only — the debug panel's ± and any
+   * harness that needs a level-N build without farming one.
+   *
+   * Going UP runs the real path: `addXp` is handed exactly the shortfall, so the
+   * circle unlock, the sound and the every-other-level spell offer all happen as
+   * they would in play, which is what makes the panel worth trusting. Going down
+   * has no play equivalent to imitate, so it is a plain assignment — and it
+   * emits nothing, because `player:level` is what fires the HUD's level-up burst
+   * and a burst on the way down is a lie. The HUD is a pull-mirror and picks the
+   * new level up on its next tick either way.
+   */
+  S.setLevel = function (n) {
+    const want = Math.max(1, Math.min(MAX_LEVEL, n | 0));
+    if (want > S.level) {
+      let guard = 0;
+      while (S.level < want && guard++ < MAX_LEVEL) S.addXp(S.xpToNext - S.xp, 'kill');
+    } else if (want < S.level) {
+      S.level = want;
+      S.xp = 0;
+      S.xpToNext = xpForLevel(want);
+      S.offer = null;
+      syncCircles();
+      bus.emit('spell:slots', { circles: S.circles });
+    }
+    return S.level;
+  };
+
   /* ---------------- pick 1 of 3 ---------------- */
 
   function makeOffer() {
@@ -535,6 +563,8 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     for (let i = 0; i < PENDING.length; i++) {
       const p = PENDING[i];
       if (!p.live) continue;
+      // a wind-up caught by a scene boundary is dropped, not delivered into it
+      if (w && w.storyLock) { p.live = false; continue; }
       p.t += dt;
       if (w && p.caster.alive) {
         const o = castOrigin(w, p.caster);
@@ -547,6 +577,12 @@ export function createSpellSystem(ctx, SPELLS, opts) {
     }
 
     if (!w || !w.player || !w.player.alive) return;
+
+    /* A cutscene is playing (story/runner.js). Cooldowns and focus still tick —
+     * the scene is a rest, not a freeze — but nothing may be cast through it.
+     * `world.playerControl` was never the right gate: auto-cast slots 2-5 read
+     * no input at all, so they kept firing straight through the conversation. */
+    if (w.storyLock) { S.starving = false; return; }
 
     if (S.manualEnabled && ctx.input.pressed('cast')) S.castSlot(0, true, false);
 

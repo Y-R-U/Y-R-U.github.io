@@ -562,6 +562,15 @@ async function boot() {
   setTimeout(() => bootEl.remove(), 600);
 
   window.__sunderfall = ctx;
+
+  /* The review panel. Hidden unless `?debug` (or Backquote), and built last so
+     every seam it reads — the act machine, the spell system, progress — already
+     exists. Its own comments say why it is not part of ui/overlays.js. */
+  try {
+    const { createDebug } = await import('./core/debug.js');
+    createDebug(ctx);
+  } catch (e) { console.warn('[main] debug panel failed', e); }
+
   console.info('[sunderfall] engine up —', R.hasFloat ? 'HDR targets' : 'LDR fallback',
     '| worldW', view.worldW, '|', view.mode);
 }

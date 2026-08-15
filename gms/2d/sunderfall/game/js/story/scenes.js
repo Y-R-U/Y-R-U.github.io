@@ -56,7 +56,7 @@ export const SCENES = {
     cast: [
       { who: 'ostrick', x: 7570, face: -1, enter: 'stand' },
     ],
-    cam: { x: 7530, y: -180, zoom: 1.15, ease: 1.2 },       // ground 104 − 284
+    cam: { x: 7505, y: -180, zoom: 1.45, ease: 1.2 },       // ground 104 − 284; between Rook (~7450) and Ostrick (7570)
     beats: [
       // ── VO: ostrick + rook2 — paste [offset, length] into the vo column ──
       { t: 0.6,  dur: 2.5, who: 'ostrick', text: "Don't touch the stones.",
@@ -130,7 +130,7 @@ export const SCENES = {
     duration: 29,
     letterbox: 0.10,
     cast: [],
-    cam: { x: 7560, y: -190, zoom: 1.2, ease: 1.6 },        // ground 110 − 300
+    cam: { x: 7560, y: -190, zoom: 1.5, ease: 1.6 },        // ground 110 − 300
     beats: [
       // ── VO: rook2 — paste [offset, length] into the vo column ──
       { t: 0.8,  dur: 1.9, who: 'rook', text: "That's not the wind.",
@@ -198,7 +198,7 @@ export const SCENES = {
     // The glade plateau is 195px HIGHER than the stones (ground -91, not +104), which is the
     // whole reason cam.y cannot be eyeballed: -200 here framed the same picture as -200 there
     // and left the ring stones and the staff sitting in the bottom fifth of the screen.
-    cam: { x: 8780, y: -370, zoom: 1.1, ease: 1.0 },        // ground -91 − 279
+    cam: { x: 8780, y: -370, zoom: 1.4, ease: 1.0 },        // ground -91 − 279
     beats: [
       // ── VO: rook2 + vayne2 — paste [offset, length] into the vo column ──
       { t: 1.2,  dur: 2.0, who: 'rook', text: 'I know these stones.',
@@ -281,7 +281,7 @@ export const SCENES = {
       // spawned west and off-screen; he does not move until `ostrick.arrive`
       { who: 'ostrick', x: 9350, face: 1, enter: 'west' },
     ],
-    cam: { x: 10250, y: -220, zoom: 1.05, ease: 0.8 },      // ground 98 − 318
+    cam: { x: 10250, y: -220, zoom: 1.3, ease: 0.8 },      // ground 98 − 318
     beats: [
       // ── VO: rook2 + ostrick — paste [offset, length] into the vo column ──
       // 0 → 6.2 is nothing. It is the longest silence in the game and it is the point.

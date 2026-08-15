@@ -4009,3 +4009,111 @@ errors. XP still resets to 0 on the way through, so the current level's progress
 Copy that quoted the old fraction is updated in three places — the death screen (`ui/overlays.js`),
 `main.js`'s two comments, and `DESIGN.md` §5. **If this changes again, grep for "third" first**; the
 number was written out in prose in every one of them.
+
+---
+
+## 2026-08-16 — cutscenes stop the fight, a review panel, and the beam is telegraphed
+
+Aaron's second playthrough, four things.
+
+### 1. `world.storyLock` — a cutscene now owns the frame
+
+> *"it needs to pause the rest of the game and prob my spells… my spells were going off
+> constantly distracting from the conversation."*
+
+`world.playerControl = false` was never enough and could not have been: **auto-cast slots 2–5 read
+no input at all**. `spells/system.js` ticks from a conductor entity inside `world.update`, so it ran
+straight through every scene and Rook machine-gunned the scenery through his own conversation with
+Ostrick. Enemies left over from the road were the same story in reverse — `stones` only turns the
+director's *pressure* off, it never cleared the ones already on the map, so they kept swinging at a
+boy who could not dodge.
+
+`story/runner.js` now sets `world.storyLock` for the life of a scene, and two files read it:
+
+- `spells/system.js` — no manual cast, no auto-cast, and a wind-up caught by the boundary is
+  dropped rather than delivered into the scene. Cooldowns and focus still tick: a scene is a rest,
+  not a freeze.
+- `enemies/base.js` — every enemy holds like a stun (action cancelled, velocity bled off) and is
+  **held, not despawned**, so whatever was on the road is still there afterwards.
+
+### 2. The HUD steps aside, and the shot is tighter
+
+The bars and the cast circles stayed up through every scene, which crowded the conversation and
+invited a tap on a circle `storyLock` had just made inert. `ui/index.js` skips them while a scene is
+playing — bubbles, toasts and damage numbers deliberately stay, since the scene speaks through them.
+
+**Hidden, not faded, and that is not laziness.** Every HUD drawer sets `globalAlpha` *absolutely*
+(`ui/circles.js`, `ui/touch.js`, `ui/hud.js`), so an outer alpha is wiped by the first one to draw —
+a fade there is silently ignored. The letterbox slides in on the same frame, so it reads as the
+scene taking the screen.
+
+On zoom, two changes, because the authored numbers were only ever right for one orientation:
+
+- authored zooms up (stones 1.15→1.45, fire 1.2→1.5, glade 1.1→1.4, after 1.05→1.3);
+- **`PORTRAIT_ZOOM = 1.35` in `story/runner.js`.** Portrait shows 820 world px across and ~1775
+  down against landscape's 1920×1080, so the *same* zoom puts a 170px character at 16% of a
+  landscape frame and under 10% of a portrait one. Cutscene zoom is authored for landscape and
+  scaled for portrait; play is untouched.
+
+And `ENTRY_X.stones` moved 7380 → 7455. At the old spot Rook stood 190px west of the camera, which
+at the tighter zoom put the *player character* at the edge of the shot, unlit, behind the dead tree.
+`cam.x` came back to 7505 to sit between the two of them.
+
+### 3. `?debug` — the review panel (`core/debug.js`)
+
+> *"I think I'll need a debug panel that will allow me to skip to certain parts of the game… once I
+> can easily review each section more thoroughly with debug tools I can give more feedback."*
+
+A corner tab, `?debug` or Backquote, six sections: **Jump to** (all nine act states), **Replay a
+cutscene** (four), **Level** (± 1, +5, max, live readout), **Rook** (heal, focus, godmode, learn a
+spell, kill me), **The Seam** (beam now, grasp now, kill, set HP) and **Save** (wipe + reload).
+
+Three things about it are load-bearing:
+
+- **It never sets `ui.blocked`**, so it is not part of `ui/overlays.js`. `ui.blocked` halts
+  `scenes.update` — a panel that paused the sim could not be used to watch anything.
+- **Replaying a scene deletes its `seen` flag first**, or the button is a no-op the second time.
+- **Levelling *up* goes through `addXp`**, so the circle unlock, the sound and the every-other-level
+  offer all happen exactly as in play. Down is a plain assignment and emits nothing, because
+  `player:level` is what fires the level-up burst and a burst on the way down is a lie.
+  `spellSystem.setLevel(n)` is the new seam.
+- "learn a spell" exists because levelling alone opens **empty** circles: in play the offer fills
+  them, but a reviewer who jumps to 12 wants the loadout, not five stacked prompts.
+
+### 4. The beam is aimed and telegraphed, not swept
+
+> *"The Boss Beam is very tough… have the beam not sweep, instead have a red haze indicating where
+> the beam will shoot like a second or 2 before it does, red beam could pulse like a countdown."*
+
+It was 0.68s of wind-up and then a **75° arc** dragged across the arena over 1.35s, ticking damage
+down the whole ray six times a second. The reason it was unbeatable is that an arc that wide has no
+outside: running is wrong because the arc catches up, standing is wrong, and there was nothing to
+read — the wind-up pointed at where the sweep *started*, not where it would be when it arrived.
+
+Now: it tracks for the first 55% of the wind-up and then **commits**, and the line you can see for
+the last ~0.7s is exactly the line it fires down. Red while it is a threat, violet only once it is
+real, pulsing from ~3Hz to ~13Hz as the countdown runs out. One hard hit (26 + 3/phase) instead of a
+shower of small ones — stepping out of the line is now a complete answer, which is what makes a
+telegraph mean anything. It still eats terrain, so cover is spent, not free.
+
+Phase shortens the **warning**, not the dodge: 1.7s at the widening down to 1.0s at the unmaking.
+That needed a new hook in `enemies/base.js` — `action.windFor(d)` overrides the constant `wind`, and
+every other action still uses the constant.
+
+### Verified — and one trap worth the space
+
+`scratchpad/review.mjs`, raw CDP, 9 checks, 0 console errors: the panel mounts and builds 6 sections
+/ 29 buttons; `setLevel` up to 7 opens 3 circles and down to 6 does not promote; the − button drops
+exactly one; nothing casts through a cutscene; the HUD's bright-pixel count in the top strip falls
+668 vs 4226; the beam warns 1.6s, on an angle that stops changing, before it fires.
+
+**The first three versions of the cast test passed while proving nothing.** `setLevel(1→12)` fires a
+spell offer on every even level, an open modal sets `ui.blocked`, and `ui.blocked` halts
+`scenes.update` — so the world was frozen and *of course* nothing cast. The fix is two-part and both
+halves matter: answer the offer before measuring, and A/B `storyLock` on the **same frame** (0 casts
+locked, 2 unlocked) rather than comparing against a "normal play" control taken elsewhere, which is
+confounded by range and cooldowns. This is the same `ui.blocked` trap that faked a boss-invulnerable
+bug in the August 13 session. Any headless run that measures anything over time must first prove
+`world.frame` is advancing.
+
+Regressions all green: `checkscenes`, `level4 walk`, `level4 seal`, and the respawn suite.

@@ -59,6 +59,16 @@ function loadScenes() {
    scene is retired for good, so it does not come back. It now takes a second
    deliberate press inside SKIP_ASK, which a mash cannot supply by accident
    because the first press is what puts the prompt on screen. */
+/**
+ * Portrait needs more zoom than landscape for the same shot, and it is not
+ * a small difference. A portrait phone shows 820 world px across and about 1775
+ * down; landscape shows 1920 across and 1080 down. So the same authored zoom
+ * puts a 170px-tall character at 16% of a landscape frame and **under 10%** of a
+ * portrait one, stranded at the bottom of a screen's worth of empty sky. Scene
+ * zoom is authored for landscape and scaled here — cutscenes only, never play.
+ */
+const PORTRAIT_ZOOM = 1.35;
+
 const SKIP_ARM = 1.2;       // dead time: taps this early are the fight, not a skip
 const SKIP_ASK = 2.4;       // how long "press again" stays live
 const LB_SPEED = 3.2;       // letterbox bars in/out, fraction of screen per second
@@ -104,6 +114,9 @@ export function createStoryRunner(ctx, world, opts = {}) {
     world.halfH = halfH();
   }
 
+  const sceneZoom = (scene) => ((scene.cam && scene.cam.zoom) || cam.zoom || 1)
+    * (view.mode === 'portrait' ? PORTRAIT_ZOOM : 1);
+
   /* ---- scene lifecycle ------------------------------------------------ */
 
   async function play(id) {
@@ -128,7 +141,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
       lb: 0, lbTarget: scene.letterbox || 0,
       fade: 0, fadeTo: 0, fadeSpeed: 1,
       camFrom: { x: cam.x, y: cam.y }, camTo: null, camT: 0, camDur: 1,
-      zoom0: cam.zoom || 1, zoomTo: (scene.cam && scene.cam.zoom) || cam.zoom || 1,
+      zoom0: cam.zoom || 1, zoomTo: sceneZoom(scene),
       rookWalk: null, kneel: false,
       seam: 0, seamAt: { x: 0, y: 0 },
     };
@@ -136,6 +149,12 @@ export function createStoryRunner(ctx, world, opts = {}) {
     try {
       world.playerControl = false;
       world.camLock = true;
+      /* A cutscene owns the frame. `playerControl` was never enough: auto-cast
+         slots 2-5 read no input at all, so Rook stood machine-gunning the
+         scenery straight through his own conversation with Ostrick — and the
+         enemies left over from the road kept swinging at a boy who could not
+         dodge. `spells/system.js` and `enemies/base.js` both read this. */
+      world.storyLock = true;
       if (input.releaseAll) input.releaseAll();
       if (ctx.audio && ctx.audio.stopVoice) ctx.audio.stopVoice(0.1);
 
@@ -163,7 +182,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
   function spawnCast(scene) {
     const list = scene.cast || [];
     const sc = scene.cam || {};
-    const hw = (view.worldW || 1920) * 0.5 / (sc.zoom || 1);
+    const hw = (view.worldW || 1920) * 0.5 / sceneZoom(scene);
     for (const c of list) {
       const enter = c.enter || 'stand';
       const wings = enter === 'west' ? -1 : enter === 'east' ? 1 : 0;
@@ -196,6 +215,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
     } finally {
       world.playerControl = true;
       world.camLock = false;
+      world.storyLock = false;
       cam.zoom = a.zoom0;
       sizeWorld();
       if (input.releaseAll) input.releaseAll();
@@ -743,6 +763,7 @@ export function createStoryRunner(ctx, world, opts = {}) {
       if (baseAmbient && R.setAmbient) R.setAmbient(baseAmbient[0], baseAmbient[1], baseAmbient[2]);
       world.camLock = false;
       world.playerControl = true;
+      world.storyLock = false;
     },
 
     /* Test hook: run the scene forward to `t` in fixed steps without waiting for a

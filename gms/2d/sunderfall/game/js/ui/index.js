@@ -467,6 +467,7 @@ export function createUI(ctx) {
       overlays.closePause();
       assignMode = null;
       paused = false;
+      cinema = false;
       if (touch) touch.setEnabled(true);
     },
 
@@ -531,6 +532,12 @@ export function createUI(ctx) {
       api.levelUp(e.level || st.level + 1, unlock);
     }));
     offs.push(bus.on('player:died', () => api.death({})));
+    /* A cutscene owns the frame. The bars and the cast circles stay up through
+       one otherwise, which both crowds a conversation and invites a tap on a
+       circle that `world.storyLock` has already made inert. Bubbles, toasts and
+       damage numbers are deliberately NOT faded — the scene speaks through them. */
+    offs.push(bus.on('story:scene', () => { cinema = true; }));
+    offs.push(bus.on('story:done', () => { cinema = false; }));
     offs.push(bus.on('spell:cast', (e) => {
       const i = e.slot != null ? e.slot : st.slots.findIndex((s) => s.spellId === e.id);
       if (i >= 0) api.onCast(i, e);
@@ -801,6 +808,8 @@ export function createUI(ctx) {
   let hintT = 4.5;
   let fpsAcc = 0, fpsN = 0, fpsShown = 0;
 
+  let cinema = false;                // true while a cutscene owns the frame
+
   function render() {
     if (!visible) return;
     const t = performance.now() / 1000;
@@ -818,9 +827,18 @@ export function createUI(ctx) {
     fx.hurt = Math.max(0, fx.hurt - dt * 2.4);
     fx.spend = Math.max(0, fx.spend - dt * 3);
 
+    /* Hidden outright rather than faded. Every HUD drawer sets `globalAlpha`
+       absolutely (see ui/circles.js, ui/touch.js, ui/hud.js), so an outer alpha
+       is wiped by the first one that draws — a fade here would be silently
+       ignored. The letterbox slides in and the camera pans on the same frame, so
+       the HUD leaving with them reads as the scene taking the screen. */
+    const hud = !cinema;
+
     drawWash(c, L);
-    if (st.boss) drawBoss(c, L, st.boss, env);
-    drawResources(c, L, st, env);
+    if (hud) {
+      if (st.boss) drawBoss(c, L, st.boss, env);
+      drawResources(c, L, st, env);
+    }
 
     const toScreen = (view && view.toScreen) ? view.toScreen : fallbackToScreen;
     bubbles.update(dt);
@@ -839,7 +857,7 @@ export function createUI(ctx) {
     drawToasts(c, L, toasts, env);
     if (bossPush > 0) c.restore();
 
-    if (touch) {
+    if (touch && hud) {
       touch.render(c, dt, now);
       if (hintT > 0 && !paused) {
         hintT -= dt;
@@ -848,12 +866,14 @@ export function createUI(ctx) {
     }
 
     circleFx.update(dt);
-    // back to front: the circles overlap now, and circle 1 is the one you press
-    for (let i = 4; i >= 0; i--) drawCircle(c, st.slots[i], L.circles[i], env);
-    if (assignMode) drawAssignTargets();
-    drawAimVector(toScreen);
-    drawAutoTarget(toScreen);
-    circleFx.draw(c);
+    if (hud) {
+      // back to front: the circles overlap now, and circle 1 is the one you press
+      for (let i = 4; i >= 0; i--) drawCircle(c, st.slots[i], L.circles[i], env);
+      if (assignMode) drawAssignTargets();
+      drawAimVector(toScreen);
+      drawAutoTarget(toScreen);
+      circleFx.draw(c);
+    }
     picker.update(dt);
     picker.draw(c, env);
 
