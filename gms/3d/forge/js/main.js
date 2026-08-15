@@ -14,6 +14,8 @@ import * as stairs from './world/stairs.js';
 import { walkStep, groundAt } from './world/colliders.js';
 import { Input } from './input.js';
 import { Session } from './game/session.js';
+import { Vermin } from './world/vermin.js';
+import { Spawner } from './game/spawner.js';
 import { Slate } from './game/slate.js';
 import { gameHost } from './game/ui.js';
 import { bootMode, playing } from './game/boot.js';
@@ -45,6 +47,14 @@ app.add(player);
 // After the player: it reads the staff position the swing just produced.
 const spells = app.add(new Spells(player, demo.terrain));
 
+// Declared before anything can start a frame. On a resume `play()` reaches `new Session` with no
+// await, so app.start()'s first — synchronous — frame calls world.tick, and hooks closing over a
+// `const` declared further down throw a temporal dead zone ReferenceError that aborts this file.
+// `app.add` is only for the knobs: the session ticks the spawner, not the frame loop, and it stays
+// inert until `play()` arms it, which never happens under ?shot= or in the editor.
+const vermin = app.add(new Vermin(demo.terrain));
+const spawner = app.add(new Spawner({ rig: vermin, player, ground: (x, z) => groundAt(x, z, 0) }));
+
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
 
@@ -56,6 +66,8 @@ window.__forge.chickens = chickens;
 window.__forge.player = player;
 window.__forge.doors = doors;
 window.__forge.spells = spells;
+window.__forge.vermin = vermin;
+window.__forge.spawner = spawner;
 window.__forge.walk = { walkStep, groundAt };
 window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
@@ -108,6 +120,19 @@ function targets() {
   return out;
 }
 
+// Can the player's cast reach that creature? Deliberately the bolt's own question, asked the same
+// way — horizontal, from the chest, against the same collider set with the same padding as
+// `Spells.reach()` — so damage cannot land somewhere the bolt visibly stops.
+const EYE = 1.35;
+function sight(from, to) {
+  const c = player.colliders;
+  if (!c) return true;
+  const dx = to.x - from.x, dz = to.z - from.z;
+  const d = Math.hypot(dx, dz);
+  if (d < 0.01) return true;
+  return c.hit(from.x, from.y + EYE, from.z, dx / d, 0, dz / d, d, 0.12) >= d - 1e-3;
+}
+
 async function play() {
   const host = gameHost();
   const fresh = !hasSave();
@@ -128,6 +153,15 @@ async function play() {
       targets,
       doorIndex: () => (doors.state === 'in' ? doors.activeIndex ?? null : null),
       jumpDoor: i => { doors.jump(i); return true; },
+      tick: dt => spawner.tick(dt),
+      freeze: v => { vermin.frozen = v; },
+      foes: () => spawner.foes(),
+      sight,
+      hit: (foe, damage) => spawner.hit(foe, damage),
+      strikes: () => spawner.take(),
+      aggro: (radius, pos) => spawner.aggro(radius, pos),
+      respawn: (kind, n) => spawner.respawn(kind, n),
+      watch: () => spawner.watch(),
     },
   }));
   window.__forge.game = session;
@@ -135,6 +169,8 @@ async function play() {
   applyParams();
   refreshPanel();
   await session.start(params);
+  // The areas and the quest packs are the spawn plan, so nothing is placed until they have loaded.
+  spawner.arm(session.quests.areas, session.quests.defs, () => session.doc.quests);
 }
 
 // Re-applied once the session's knobs exist: in play mode they are registered after the slate,
@@ -149,7 +185,3 @@ applyParams();
 app.start();
 document.getElementById('boot').classList.add('gone');
 window.__forge.ready = true;
-
-import { Vermin } from './world/vermin.js';
-window.__forge.vermin = app.add(new Vermin(demo.terrain));
-refreshPanel();

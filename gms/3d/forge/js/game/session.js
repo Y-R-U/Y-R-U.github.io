@@ -10,8 +10,10 @@ import { Menu } from './menu.js';
 import { Market } from './market.js';
 import { Audio } from './audio.js';
 import { gameHost, el } from './ui.js';
-import { nearestAnchor } from './areas.js';
+import { nearestAnchor, lineage } from './areas.js';
 import { blank, rollDay, checkPosition, POSITION, addItem, itemCount, clampQuests } from './save.js';
+import { acquire, power, critChance, resolveHit, damageTaken } from '../sim/combat.js';
+import { ENEMIES, PERISHABLE } from '../sim/tables.js';
 import { appendLog } from './journal.js';
 import { pins, basicOf, unlocked, outclassed, levelIn } from './sheet.js';
 import * as vitals from './vitals.js';
@@ -99,6 +101,10 @@ export class Session {
     this.clock = new WorldClock(player);
     this.clock.load(this.doc.clock);
     this.doc = rollDay(this.doc, this.clock.day);
+    // Read here and not in `start()`: the session is in the frame loop while `start()` is still
+    // fetching the packs, and `doc.played` counting those frames made every new game look like a
+    // save in progress — so `beginCampaign()` never ran and light.01 was never accepted.
+    this.resumed = started(this.doc);
 
     this.limits = vitals.limits(this.doc.schools);
     this.vitals = vitals.blank(this.doc.schools, this.doc.vitals);
@@ -214,7 +220,7 @@ export class Session {
     this.restorePosition();
     const want = params.get('quest');
     if (want && this.quests.defs[want]) this.jumpTo(want);
-    else if (this.switched || !started(this.doc)) this.beginCampaign();
+    else if (this.switched || !this.resumed) this.beginCampaign();
     this.doc.onboard = settle(this.obCtx(), this.doc.onboard);
     for (const bed of ['day', 'dusk', 'wind']) this.audio.ambience(bed, true);
     if (this.notices.length) this.notice(`This save was made by an older build. ${this.notices.length} things were adjusted.`);
@@ -413,13 +419,21 @@ export class Session {
     this.host.append(n);
   }
 
-  pause(reason = 'menu') { this.pauses.add(reason); this.paused = true; this.clock.pause(); }
+  // The rig moves creatures from its own place in the frame loop, which this flag does not reach:
+  // without `freeze` a rat caught mid-chase keeps walking at chase speed behind an open menu.
+  pause(reason = 'menu') {
+    this.pauses.add(reason);
+    this.paused = true;
+    this.clock.pause();
+    this.world.freeze?.(true);
+  }
 
   resume(reason = 'menu') {
     this.pauses.delete(reason);
     if (this.pauses.size) return;
     this.paused = false;
     this.clock.resume();
+    this.world.freeze?.(false);
   }
 
   // ── settings ────────────────────────────────────────────────────────────
@@ -501,7 +515,101 @@ export class Session {
     this.audio.play('cast');
     this.buzz(6);
     this.suspect(this.tell(spell));
+    this.strike(spell);
     this.quests.emit({ t: 'cast', school: this.school, spell: idOf(spell) });
+  }
+
+  // ── the seam ────────────────────────────────────────────────────────────
+
+  // A cast picks one target out of the world's living creatures with §4.6's cone-and-range picker
+  // and tells the world what it took. Spells with no `coef` — Line, Forage, the Ward braces — pass
+  // straight through: they are cast at the world, not at anything in it.
+  //
+  // One target only, so `split_bolt`'s second target and the `radius` of `cinderfall` and `bloom`
+  // resolve as a single hit and `ember`'s burning ground does not exist. None of them is reachable
+  // at tier 1; all of them are in NOTES_COMBAT.md's gap list.
+  strike(spell) {
+    const p = this.player?.pos;
+    if (!spell?.coef || spell.cone == null || spell.range == null || !p) return null;
+    // What the bolt can reach, not what the cone covers: without this the damage lands on a rat
+    // 14 m away through a wall the bolt visibly stops 2.8 m in front of.
+    const live = (this.world.foes?.() || []).filter(f => this.world.sight?.(p, f) !== false);
+    const target = acquire(live, this.player.camYaw ?? 0, p, spell);
+    if (!target) return null;
+    const level = levelIn(this.doc, this.school);
+    const r = resolveHit({
+      power: power(level),
+      coef: spell.coef,
+      armour: target.armour || 0,
+      critChance: critChance(level),
+      rng: Math.random,
+    });
+    const killed = this.world.hit?.(target, r.damage)?.killed;
+    this.audio.play(killed ? 'kill' : 'impact', { at: target });
+    if (killed) this.kill(target);
+    return { ...r, target, killed: !!killed };
+  }
+
+  // SYSTEMS §3.2's kill payout, the same one `tools/soak.mjs` models: every school the row pays
+  // and is not immune to, its drops, its marks, and the vermin bounty toward Standing.
+  kill(target) {
+    const e = ENEMIES[target.enemy];
+    if (!e) return;
+    const streak = this.streakOf(`cull:${target.enemy}`);
+    for (const [school, base] of Object.entries(e.xp)) {
+      if (e.immune?.includes(school)) continue;
+      this.gainXp(school, base, { sourceLevel: e.level, streak });
+    }
+    for (const [item, n] of e.drops || []) addItem(this.doc, item, n);
+    this.doc.purse.marks += e.mk || 0;
+    this.quests.standing('vermin', { faction: this.doc.campaign.current });
+    this.buzz(18);
+    // Where the body belongs, not where the player stands: the corpse's own area and the areas
+    // that contain it. A rat shot from the granary doorway counts and one lured out into the
+    // street still counts, but a rat that never entered the granary cannot tick a granary step
+    // because the player happens to be standing in one. Only a creature nothing placed — no area
+    // of its own — falls back to the player's.
+    const where = lineage(this.quests.areas, target.area);
+    this.quests.emit({
+      t: 'kill', kind: target.enemy, area: target.area || null,
+      areas: where.length ? where : this.quests.here,
+    });
+    this.autosave.mark();
+  }
+
+  // One action is one source key however many schools it pays, or a rat paying both Cull and
+  // Kindle would reset its own streak. `tools/soak.mjs` counts them the same way.
+  streakOf(key) {
+    if (this.streakKey !== key) { this.streakKey = key; this.streakN = 0; }
+    return this.streakN++;
+  }
+
+  // The enemy's side. Driven from here rather than from the frame loop so that everything that
+  // pauses the game — a menu, a hidden tab, portrait — also stops the creatures.
+  combat(dt) {
+    this.world.tick?.(dt);
+    for (const blow of this.world.strikes?.() || []) {
+      this.vitals = vitals.hurt(this.vitals, damageTaken(blow.damage, this.limits.ward));
+      this.audio.play('impact', { at: blow, level: 0.7 });
+      this.buzz(24);
+      if (vitals.down(this.vitals)) { this.gutter(); return; }
+    }
+  }
+
+  // SYSTEMS §5.3: the staff goes out and you wake at the hearth, 8% of your carried marks and half
+  // your unbanked perishables lighter. No XP loss, no corpse run — §9.4 calls it a lesson.
+  gutter() {
+    const loss = vitals.gutter(this.doc, this.doc.campaign.echoes?.includes('white_cord'));
+    this.doc.purse.marks = Math.max(0, this.doc.purse.marks - loss.marks);
+    for (const e of this.doc.items) if (PERISHABLE.has(e.id)) e.n = Math.floor(e.n * loss.perishables);
+    this.doc.items = this.doc.items.filter(e => e.n > 0);
+    this.spawnAtHearth(this.quests.here[0]);
+    this.vitals = vitals.blank(this.doc.schools, { hp: null, focus: 0 });
+    this.audio.play('uiError');
+    this.buzz(60);
+    this.hud.say('The staff goes out. You wake at the hearth.');
+    this.autosave.flush();
+    return loss;
   }
 
   // ── the Graft, SYSTEMS §8.3 ─────────────────────────────────────────────
@@ -914,6 +1022,7 @@ export class Session {
 
     this.limits = vitals.limits(this.doc.schools);
     this.vitals = vitals.tick(this.vitals, dt, this.limits);
+    this.combat(dt);
     this.graftTick(dt);
     this.retarget();
     this.watchStuck(dt);

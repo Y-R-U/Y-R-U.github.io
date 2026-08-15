@@ -9,12 +9,13 @@ import { heightAt, waterY, CENTERS, nearCamera, zoneAt } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { paint } from './tree.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
+import { ACT, ACT_T, STATE } from '../sim/foes.js';
+import { roster, buckets, seatsLeft, PER_MESH } from './roster.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
 
 const PART = { body: 0, head: 1, tail: 2, limb: 3, prop: 4 };
-const ACT = { none: 0, attack: 1, hurt: 2, die: 3 };
 
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3();
 function faceNormal(a, b, c) {
@@ -510,7 +511,7 @@ vec3 verm(vec3 p, float part, vec3 pivot, vec3 gait, vec4 self, float seed, out 
   vec3 piv = vec3(0.0, uKind.x, uKind.y);
   mat3 bodyR = rotX(-uAct.x * lung + uAct.y * wind + 0.9 * flin)
              * rotZ(uGait.z * spd * sin(g) * mv + uAct.w * dead);
-  vec3 bodyT = vec3(0.0, (bob + breath) * sz - uKind.x * 0.55 * dead, (uAct.z * lung - uAct.z * 0.7 * flin) * sz);
+  vec3 bodyT = vec3(0.0, (bob + breath) * sz - uKind.x * 0.25 * dead, (uAct.z * lung - uAct.z * 0.7 * flin) * sz);
   outR = bodyR * R;
   return bodyR * (q - piv) + piv + bodyT;
 }
@@ -587,10 +588,6 @@ function contactDisc(count) {
 }
 
 const POOL = 48;
-const PER_MESH = 16;
-const ATTACK_T = 1.15;
-const HURT_T = 0.45;
-const DIE_T = 1.30;
 const ROAM = 4.5;
 
 // Which rig each bestiary row wears, and how big. Six table entries, one parameterised rig, and
@@ -621,6 +618,7 @@ export class Vermin {
     this.scale = 1;
     this.pose = 'live';
     this.phase = 0.4;
+    this.frozen = false;
 
     // uGait = ref speed, body bob, sway, leg swing · uHead = lunge reach, lunge pitch, flinch,
     // death drop · uAct = lunge pitch, windup crouch, lunge push, death roll ·
@@ -636,6 +634,7 @@ export class Vermin {
       uSeed: { value: 0 },
     };
 
+    this.rand = rng(0x51c07d);
     this.map = furMap();
     this.geo = new Map();
     this.mat = new Map();
@@ -758,6 +757,34 @@ export class Vermin {
     this.agents.sort((a, b) => (b.dev ? 1 : 0) - (a.dev ? 1 : 0));
   }
 
+  // A creature the spawner owns. It joins the same pool as the ambient nests but carries an AI
+  // state, which is what keeps it in the active set — see assign().
+  add(spec) {
+    const c = CREATURES[spec.enemy];
+    if (!c) return null;
+    const zi = zoneAt(spec.x, spec.z);
+    if (seatsLeft(this.agents, c.kind, zi) <= 0) return null;
+    const R = this.rand;
+    const a = {
+      enemy: spec.enemy, kind: c.kind, zi,
+      x: spec.x, z: spec.z, home: spec.home || [spec.x, spec.z],
+      heading: span(R, 0, TAU), speed: 0, cyc: span(R, 0, 4), seed: R(),
+      scale: span(R, 0.88, 1.12), tone: span(R, 0.88, 1.12), run: KINDS[c.kind].run,
+      act: 0, at: 0, wait: span(R, 0.2, 3.5),
+    };
+    this.agents.push(a);
+    this.assign();
+    return a;
+  }
+
+  remove(a) {
+    const i = this.agents.indexOf(a);
+    if (i < 0) return false;
+    this.agents.splice(i, 1);
+    this.assign();
+    return true;
+  }
+
   setContact(v) {
     const g = this.ao.geometry;
     const pos = g.getAttribute('position'), col = g.getAttribute('color');
@@ -773,20 +800,9 @@ export class Vermin {
   }
 
   assign(cam) {
-    let src = this.agents;
-    if (cam) {
-      const cx = cam.position.x, cz = cam.position.z;
-      src = this.agents.slice().sort((a, b) =>
-        ((a.x - cx) ** 2 + (a.z - cz) ** 2) - ((b.x - cx) ** 2 + (b.z - cz) ** 2));
-    }
-    this.active = src.slice(0, this.count | 0);
+    this.active = roster(this.agents, this.count, cam, POOL);
     for (const m of this.meshes.values()) { m.count = 0; m.userData.list = null; }
-    const byMesh = new Map();
-    for (const a of this.active) {
-      const key = `${a.kind}:${a.zi}`;
-      const list = byMesh.get(key) || byMesh.set(key, []).get(key);
-      if (list.length < PER_MESH) list.push(a);
-    }
+    const byMesh = buckets(this.active, PER_MESH);
     const col = new THREE.Color();
     for (const [key, list] of byMesh) {
       const [kind, zi] = key.split(':');
@@ -805,8 +821,9 @@ export class Vermin {
 
   registerKnobs(q) {
     const U = this.uniforms;
-    // Default 0: nothing places vermin yet, and the gate profile has no headroom to carry a
-    // population nobody asked for. The dev scenarios raise it themselves.
+    // Ambient nests only: the gate profile has no headroom for a population nobody asked for, so
+    // the default is none and the dev scenarios raise it themselves. A creature the spawner owns
+    // is pinned into the draw list by roster() whatever this says.
     q.register({ key: 'vermin', label: 'Vermin', type: 'range', min: 0, max: POOL, step: 2, default: 0, group: 'Vermin' },
       v => this.setCount(v));
     q.register({ key: 'verminScale', label: 'Vermin size', type: 'range', min: 0.5, max: 2.0, step: 0.05, default: 1, group: 'Vermin' },
@@ -838,7 +855,12 @@ export class Vermin {
   choose(a) {
     const r = Math.random();
     if (r < 0.30) { a.act = ACT.none; a.speed = 0; a.wait = (0.4 + Math.random() * 1.6) / Math.max(0.15, this.life); }
-    else if (r < 0.40) { a.act = ACT.attack; a.at = 0; a.speed = 0; }
+    // The wait matters for a spawner creature: foes.js clears the act when it ends, so without one
+    // here the ambient branch would pick a new act on the very next frame.
+    else if (r < 0.40) {
+      a.act = ACT.attack; a.at = 0; a.speed = 0;
+      a.wait = (0.4 + Math.random() * 2.0) / Math.max(0.15, this.life);
+    }
     else {
       a.act = ACT.none;
       a.heading += (Math.random() - 0.5) * 3.0;
@@ -848,9 +870,11 @@ export class Vermin {
   }
 
   update(dt, app) {
+    // Set by the session's pause: this system is in the frame loop, which pause does not gate.
+    if (this.frozen) return;
     this.time = (this.time + dt) % 600;
     this.uniforms.uTime.value = this.time;
-    if (!this.count) { this.ao.count = 0; return; }
+    if (!this.active.length) { this.ao.count = 0; return; }
 
     const m4 = new THREE.Matrix4();
     const q = new THREE.Quaternion();
@@ -860,7 +884,7 @@ export class Vermin {
     const tilt = new THREE.Quaternion();
     const up = new THREE.Vector3();
     const T = this.terrain;
-    const pinned = POSES.indexOf(this.pose);
+    const posed = POSES.indexOf(this.pose);
     let ai = 0;
 
     for (const mesh of this.meshes.values()) {
@@ -872,28 +896,36 @@ export class Vermin {
       for (let i = 0; i < list.length; i++) {
         const a = list[i];
 
-        if (pinned > 0) {
-          a.act = Math.max(0, pinned - 2);
+        // A creature in a fight is driven from js/sim/foes.js — its heading and speed are already
+        // this frame's, so the ambient wander must not have another go at them. Its act clock is
+        // js/sim/foes.js's for every state it owns, idle included, so only a creature the spawner
+        // has never touched (`a.state` unset) has its act advanced here.
+        const fighting = !!a.state && a.state !== STATE.idle;
+        if (posed > 0) {
+          a.act = Math.max(0, posed - 2);
           a.at = this.phase;
-          a.speed = pinned === 2 ? K.run * 0.55 : 0;
+          a.speed = posed === 2 ? K.run * 0.55 : 0;
           a.cyc = this.phase * 2;
-        } else if (a.act) {
-          a.at += dt / (a.act === ACT.attack ? ATTACK_T : a.act === ACT.hurt ? HURT_T : DIE_T);
-          if (a.at >= 1) {
-            if (a.act === ACT.die) a.at = 1;
-            else { a.act = ACT.none; a.at = 0; a.wait = (0.4 + Math.random() * 2.0) / Math.max(0.15, this.life); }
+        } else if (!fighting) {
+          if (a.act) {
+            if (!a.state) a.at += dt / ACT_T[a.act];
+            if (a.at >= 1) {
+              if (a.act === ACT.die) a.at = 1;
+              else { a.act = ACT.none; a.at = 0; a.wait = (0.4 + Math.random() * 2.0) / Math.max(0.15, this.life); }
+            }
+          } else {
+            a.wait -= dt * this.life;
+            if (a.wait <= 0) this.choose(a);
           }
-        } else {
-          a.wait -= dt * this.life;
-          if (a.wait <= 0) this.choose(a);
         }
 
-        if (a.speed > 0.01 && pinned <= 0) {
+        if (a.speed > 0.01 && posed <= 0) {
           const wx = a.x + Math.sin(a.heading) * a.speed * dt;
           const wz = a.z + Math.cos(a.heading) * a.speed * dt;
           const step = collidersReady() ? walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.14) : { x: wx, z: wz, hit: false };
           const dx = step.x - a.home[0], dz = step.z - a.home[1];
-          if (dx * dx + dz * dz > ROAM * ROAM || step.hit) a.heading += Math.PI * 0.79;
+          // A chase leaves home and does not turn round at a wall: giving up is the AI's call.
+          if (!fighting && (dx * dx + dz * dz > ROAM * ROAM || step.hit)) a.heading += Math.PI * 0.79;
           else {
             a.cyc += Math.hypot(step.x - a.x, step.z - a.z) / (2 * K.stride * a.scale * this.scale);
             a.x = step.x; a.z = step.z;
@@ -918,7 +950,11 @@ export class Vermin {
               T.surfaceY(a.x, a.z - 0.4) - T.surfaceY(a.x, a.z + 0.4)).normalize();
             tilt.setFromUnitVectors(UP, up);
           }
-          pos.set(a.x, gy + 0.03, a.z);
+          // The disc rides 3 cm up so it cannot z-fight the ground, but a body rolling onto its
+          // side comes down through that plane and the disc paints a dark band across it. It
+          // settles flat over the death roll — the same 0…0.42 window the shader rolls in.
+          const lift = a.act === ACT.die ? 0.03 - 0.026 * Math.min(1, a.at / 0.42) : 0.03;
+          pos.set(a.x, gy + lift, a.z);
           scl.set(K.contact * sc, 1, K.contact * sc);
           m4.compose(pos, tilt, scl);
           this.ao.setMatrixAt(ai++, m4);

@@ -19,6 +19,14 @@ export function areasAt(areas, x, z) {
   return [...out];
 }
 
+// An area and every declared parent above it, innermost first. `[]` for an area nobody declared.
+export function lineage(areas, id) {
+  const out = [];
+  let cur = areas?.[id];
+  while (cur && !out.includes(cur.id)) { out.push(cur.id); cur = areas[cur.parent]; }
+  return out;
+}
+
 export function centreOf(area) {
   const s = area?.shape;
   if (!s) return null;
