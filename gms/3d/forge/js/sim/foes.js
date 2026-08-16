@@ -13,14 +13,21 @@ export const STATE = {
   idle: 'idle', alert: 'alert', chase: 'chase', attack: 'attack', dying: 'dying', dead: 'dead',
 };
 
-// Vermin do not charge. They are in the grain because the grain is there, and they turn on you
-// when you hurt one — which is what makes L01 a hunt in the dark rather than eight rats at once.
-// Anything with a grudge comes at you on sight.
+// Three ways a creature can treat you. Most of the bestiary defends its ground: it engages inside
+// `notice` and no further. `CHARGES` comes at you from `charge` instead. `PASSIVE` never starts
+// anything at all — grain rats are the one creature the game drops you *into a nest of*, at level 1,
+// before it has taught you to cast, so they are the one creature that has to be provoked first.
+// That is what makes L01 a hunt in the dark rather than eight rats at once.
 export const CHARGES = new Set(['blight_boar', 'raider', 'hollow', 'watchman',
   'champion_1', 'champion_2', 'champion_3', 'brood_mother']);
+export const PASSIVE = new Set(['grain_rat']);
 
 export const AI = {
   notice: 7,
+  // How far a `CHARGES` creature comes at you unprovoked. Separate from `notice` because a rat you
+  // hit and then walked away from should lose you long before a champion does, and it must stay
+  // under `leash` or a charger re-engages on the same frame it gives up.
+  charge: 26,
   reach: 1.3,
   leash: 26,
   alert: 0.35,
@@ -54,7 +61,8 @@ export function arm(a, enemy) {
   a.bite = e.damage;
   a.hp = a.maxHp = e.hp;
   a.state = STATE.idle;
-  a.hostile = CHARGES.has(enemy);
+  a.charges = CHARGES.has(enemy);
+  a.hostile = !PASSIVE.has(enemy);
   a.since = 0;
   a.cool = 0;
   a.bit = false;
@@ -112,8 +120,13 @@ export function think(a, dt, { px, pz, run = 1 }) {
   const dx = px - a.x, dz = pz - a.z;
   const d = Math.hypot(dx, dz);
 
+  // `hostile` decides whether there is a fight at all and the radius only decides when it starts.
+  // A `PASSIVE` creature stays idle at any distance until `hurt` or the alarm says otherwise, so
+  // standing in a grain rat nest is not provoking it. A creature that hunts you by nature closes
+  // from `charge`; one that merely has a grudge waits until you are inside `notice`, so a rat can
+  // be walked away from and a champion cannot.
   if (a.state === STATE.idle) {
-    if (d > AI.leash || (!a.hostile && d > AI.notice)) return 0;
+    if (!a.hostile || d > (a.charges ? AI.charge : AI.notice)) return 0;
     a.state = STATE.alert;
     a.since = 0;
     a.speed = 0;

@@ -804,9 +804,11 @@
         "text": "Take the keep",
         "recover": [["moveTo", "bst.bailey"]] },
 
-      { "id": "hold", "do": ["survive", "bst.bailey", 120],
+      { "id": "hold", "all": [["survive", "bst.bailey", 120], ["kill", "watchman", 4]],
+        "in": "bst.bailey",
         "text": "Hold the bailey until morning",
-        "recover": [["moveTo", "bst.bailey"]] },
+        "hint": "The barracks is below you. They come up in fours.",
+        "recover": [["moveTo", "bst.bailey"], ["respawn", "watchman", 4]] },
 
       { "id": "out", "do": ["talk", "kesta", "light.23.out"],
         "text": "Stand at the mouth of the shaft" }

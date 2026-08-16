@@ -11,9 +11,10 @@ import { Spawner, planFrom, WATCHERS, PER_AREA } from './spawner.js';
 import { contains, centreOf } from './areas.js';
 import { QuestRunner } from './questrunner.js';
 import { blank, itemCount } from './save.js';
-import { STATE, AI, isLive } from '../sim/foes.js';
+import { STATE, AI, isLive, carry } from '../sim/foes.js';
 import { limits } from './vitals.js';
 import { ENEMIES, DESPAWN_RADIUS } from '../sim/tables.js';
+import { next as nextPrompt, PROMPTS } from './onboard.js';
 import { lintAll } from '../../tools/lintQuests.mjs';
 import { fakeDom } from './fakedom.js';
 
@@ -506,6 +507,192 @@ test('nothing the world hooks close over is declared after the frame loop starts
     }
   }
   assert.ok(seen.has('EYE'), 'the scan stopped at the hook names instead of reading sight()');
+});
+
+// `critChance(1)` is 0.06 and a crit is 13 damage against a grain rat's 10 HP, so an unpinned
+// Math.random decided whether the opening bolt killed outright — three runs in sixty came out the
+// other way. Both branches are driven below; neither is left to chance.
+const NEVER_CRIT = () => 0.99;
+const ALWAYS_CRIT = () => 0.001;
+
+// The opening two minutes, through the real thing: a real Session's real start() puts the player
+// where a new game puts him, a real Spawner fills the nest around him, and session.update() runs
+// the frame. Nothing here manufactures a state — the numbers below were read off the same seams in
+// the browser (docs/NOTES_SAFE_START.md).
+async function newGameInTheGranary({ rng = NEVER_CRIT } = {}) {
+  localStorage.clear();
+  const player = body();
+  const s = spawner();
+  const g = new Session(app(), player, {
+    fresh: true,
+    rng,
+    world: {
+      groundAt: () => 4,
+      // js/world/vermin.js cannot be imported here — it wants three — and it is what walks a
+      // chasing body at the speed think() set. `carry` is the same four lines robed.js and
+      // chicken.js call, without the colliders, so a chase closes here the way it closes there.
+      tick: dt => {
+        s.tick(dt, player.pos);
+        for (const f of s.live) {
+          const w = carry(f, dt);
+          if (w) { f.x = w.x; f.z = w.z; }
+        }
+      },
+      foes: () => s.foes(),
+      hit: (f, d) => s.hit(f, d),
+      strikes: () => s.take(),
+      aggro: (r, p) => s.aggro(r, p),
+    },
+  });
+  await g.start();
+  return { g, s, player, run: n => { for (let i = 0; i < n; i++) g.update(1 / 60); } };
+}
+
+test('a new game puts the player in the granary, which is where the rats are', async () => {
+  const { g, s, player, run } = await newGameInTheGranary();
+  const at = centreOf(GRANARY);
+  assert.deepEqual([player.pos.x, player.pos.z], [at.x, at.z],
+    'beginCampaign no longer opens inside light.01 — the rest of this file assumes it does');
+  run(60);
+  assert.equal(s.foes().length, 8, 'the nest filled around him');
+  assert.ok(s.foes().every(f => Math.hypot(f.x - player.pos.x, f.z - player.pos.z) < AI.notice * 2),
+    'and it is close enough for this to be a test of anything');
+});
+
+// Aaron started a fresh game and was killed by rats before touching a control. Guttered at 6.6 s,
+// measured in the browser: six of the eight passive rats engaged on proximity because `hostile`
+// only widened the engage range instead of gating engagement at all.
+// Read the LOWEST hit points of the minute, not the last: the first draft of this test asserted
+// the final number, and with the bug put back it still passed — the player was mauled to death at
+// 5 s and `gutter()` had handed him a full bar and a hearth to wake at long before the last frame.
+test('standing in the nest costs nothing until the player starts the fight', async () => {
+  const { g, s, player } = await newGameInTheGranary();
+  const full = g.limits.hp;
+  const hearth = [];
+  g.spawnAtHearth = a => hearth.push(a);
+  const from = { x: player.pos.x, z: player.pos.z };
+
+  let low = full;
+  for (let i = 0; i < 60 * 60; i++) { g.update(1 / 60); low = Math.min(low, g.vitals.hp); }
+
+  assert.equal(low, full, `a minute of standing in the grain cost ${(full - low).toFixed(1)} HP`);
+  assert.equal(hearth.length, 0, 'he was killed and woken at the hearth');
+  assert.deepEqual([player.pos.x, player.pos.z], [from.x, from.z], 'and he never moved');
+  assert.equal(s.foes().filter(f => f.hostile).length, 0, 'nothing in the nest has a grudge');
+  assert.equal(s.foes().filter(f => f.state !== STATE.idle).length, 0);
+});
+
+// The other half of it: passive is not harmless. The nest still turns on you, and standing in it
+// afterwards still kills you — 9 s of it in the browser.
+test('one bolt wakes the nest, and refusing to fight it still gutters you', async () => {
+  const { g, s, run } = await newGameInTheGranary();
+  run(60);
+  const hearth = [];
+  g.spawnAtHearth = a => hearth.push(a);
+
+  const hit = g.strike({ coef: 1, cone: Math.PI, range: 40 });
+  assert.ok(hit?.target, 'the bolt found a rat');
+  const woke = s.live.filter(f => f.hostile).length;
+  assert.ok(woke >= 2, 'hitting one rat has to wake the ones beside it');
+  assert.ok(woke < 8, `all ${woke} of them woke — AI.alarm is meant to be a pull, not the nest`);
+
+  const full = g.limits.hp;
+  for (let i = 0; i < 60 * 30 && !hearth.length; i++) g.update(1 / 60);
+  assert.ok(g.vitals.hp < full || hearth.length, 'a woken nest never landed a blow');
+  assert.equal(hearth.length, 1, 'thirty seconds of standing still in a fight you started is a gutter');
+});
+
+// The other side of the coin the test above pins. This is the run that used to turn the suite red
+// three times in sixty: the same opening bolt, one crit, and the nest is a rat lighter before it
+// has woken. `Session` takes the rng so this is a case that can be chosen rather than waited for.
+test('the same opening bolt crits, and the rng that decides it is the session\'s, not the global one', async () => {
+  let draws = 0;
+  const { g, s, run } = await newGameInTheGranary({ rng: () => { draws++; return ALWAYS_CRIT(); } });
+  run(60);
+  assert.equal(s.foes().length, 8);
+  draws = 0;
+  const hit = g.strike({ coef: 1, cone: Math.PI, range: 40 });
+  assert.equal(draws, 1, 'session.rng never reached resolveHit — strike() is back on the global one');
+  assert.equal(hit.crit, true);
+  assert.equal(hit.killed, true, 'a crit is 13 against a grain rat\'s 10 HP');
+  assert.equal(s.foes().length, 7, 'and thirty seconds of a seven-rat nest is not the same fight');
+});
+
+// A creature with a grudge charges on sight and a creature without one never does, so the prompt
+// that teaches the tap cannot be gated on anything the context button can see: there is nothing to
+// press in the granary, and the granary is where the whole game teaches you to cast.
+test('the granary arms `Tap to cast`, which it never used to', async () => {
+  const { g, run } = await newGameInTheGranary();
+  run(60);
+  assert.equal(g.obCtx().foe, true, 'eight rats in bolt range and nothing to cast at');
+  assert.equal(g.context, null, '`target` is the context button, and the granary offers it nothing');
+  assert.equal(nextPrompt(g.obCtx(), { look: true, move: true }).id, 'cast');
+
+  g.world.foes = () => [];
+  assert.equal(g.obCtx().foe, false);
+  assert.equal(nextPrompt(g.obCtx(), { look: true, move: true }), null, 'an empty room teaches nothing');
+});
+
+// The prompt used to answer on range alone while `strike()` also asked the colliders, so a player
+// indoors with rats across town was told to tap, spent the focus, retired the prompt for good and
+// hit nothing. Kindle reaches 26 m and `wwa` plans rats across the whole town, so this is reachable
+// in the real game, not a contrivance.
+test('the cast prompt and the bolt agree about a creature behind a wall', async () => {
+  const { g, run } = await newGameInTheGranary();
+  run(60);
+  assert.equal(g.obCtx().foe, true, 'the room is full of rats with a clear line');
+
+  g.world.sight = () => false;
+  assert.equal(g.strike({ coef: 1, cone: Math.PI, range: 40 }), null, 'the bolt stops at the wall');
+  assert.equal(g.obCtx().foe, false, 'and the prompt no longer arms for something it cannot hit');
+});
+
+// `foe` costs a collider raycast per creature, so `obCtx` stops asking for it once the cast prompt
+// is retired. That is only safe while `cast` is the one prompt reading it.
+test('nothing but the cast prompt reads `foe`', () => {
+  for (const p of PROMPTS) {
+    const src = `${p.when}${p.until}`;
+    assert.equal(src.includes('.foe'), p.id === 'cast', `${p.id} reads ctx.foe — obCtx stops supplying it`);
+  }
+});
+
+// `survive` is the one verb with no way to fail loudly: the step still completes if nothing ever
+// comes, so a step whose whole text is "hold" quietly becomes a wait. Both of these ran to zero
+// damage over 60 runs each while all 535 tests stayed green.
+test('a raider in the 7-26 m band still comes for you', () => {
+  const at = centreOf(SHIPPED.areas['reach.east']);
+  let seen = 0;
+  for (let seed = 1; seed <= 20; seed++) {
+    let n = seed;
+    const s = spawner(['light.18'], { rng: () => ((n = (n * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff) });
+    s.tick(0.001, at);
+    const band = s.foes().filter(f => f.enemy === 'raider')
+      .map(f => [f, Math.hypot(f.x - at.x, f.z - at.z)])
+      .filter(([, d]) => d > AI.notice && d <= AI.charge);
+    s.tick(1 / 60, at);
+    for (const [f, d] of band) {
+      seen++;
+      assert.notEqual(f.state, STATE.idle, `a raider ${d.toFixed(1)} m away is standing still`);
+    }
+  }
+  assert.ok(seen >= 10, `only ${seen} raiders landed in the band — this test proved nothing`);
+});
+
+test('holding the east water stands is still a fight', () => {
+  const at = centreOf(SHIPPED.areas['reach.east']);
+  let bloodied = 0;
+  for (let seed = 1; seed <= 8; seed++) {
+    let n = seed;
+    const s = spawner(['light.18'], { rng: () => ((n = (n * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff) });
+    let dmg = 0;
+    for (let i = 0; i < 60 * 60; i++) {                 // light.18's own 60 s hold, standing still
+      s.tick(1 / 60, at);
+      for (const f of s.live) { const w = carry(f, 1 / 60); if (w) { f.x = w.x; f.z = w.z; } }
+      for (const b of s.take()) dmg += b.damage;
+    }
+    if (dmg > 0) bloodied++;
+  }
+  assert.ok(bloodied >= 6, `only ${bloodied} of 8 holds took a blow — the raiders are not coming`);
 });
 
 test('a spell with nothing to aim hits nothing', () => {

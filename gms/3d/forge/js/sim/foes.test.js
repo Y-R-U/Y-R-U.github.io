@@ -28,8 +28,65 @@ test('vermin wait to be provoked and everything with a grudge charges', () => {
   for (const id of CHARGES) assert.ok(ENEMIES[id], `${id} is not an enemy`);
 });
 
-test('a rat ignores you until you are close, then closes and bites', () => {
+// This test used to walk a *passive* rat from idle to alert at 4 m and call that correct, which is
+// the bug it was written over: `hostile` only widened the engage range instead of deciding whether
+// there was a fight at all, so eight rats mobbed a level-1 player the moment he was put in the
+// granary. See docs/NOTES_SAFE_START.md.
+test('a rat you have not touched never starts a fight, at any distance', () => {
   const a = rat(0, 0);
+  for (const d of [AI.notice + 2, 4, AI.reach, 0]) {
+    assert.equal(run(a, [0, d], 1 / 60, 600), 0, `a passive rat at ${d} m dealt damage`);
+    assert.equal(a.state, STATE.idle, `a passive rat at ${d} m left idle`);
+  }
+  assert.equal(a.hostile, false);
+});
+
+// Gating on `hostile` also has to keep the long radius for the things that hunt you, or every
+// robed enemy in the game freezes: js/world/robed.js has no wander at all, so an idle one never
+// moves, and the spawner drops most of them in the 7–26 m band. Four `survive` steps and the Drove
+// Road escort went to zero damage the pass this was missed. See docs/REVIEW_SAFE_START.md.
+test('a creature that hunts you closes from `charge`, and a grudge alone does not', () => {
+  const boar = arm({ x: 0, z: 0 }, 'blight_boar');
+  assert.equal(boar.charges, true);
+  run(boar, [0, AI.charge - 0.5], 1 / 60, 1);
+  assert.equal(boar.state, STATE.alert, `a boar at ${AI.charge - 0.5} m left idle`);
+  run(boar, [0, AI.charge - 0.5], 1 / 60, Math.ceil(AI.alert * 60) + 1);
+  assert.equal(boar.state, STATE.chase);
+  assert.ok(boar.speed > 0, 'and it comes');
+
+  const far = arm({ x: 0, z: 0 }, 'blight_boar');
+  run(far, [0, AI.charge + 1], 1 / 60, 600);
+  assert.equal(far.state, STATE.idle, 'a charge is its own radius, not the whole leash');
+  assert.ok(AI.charge <= AI.leash, 'a charge past the leash re-engages on the frame it gives up');
+
+  const knot = arm({ x: 0, z: 0 }, 'rat_knot');
+  assert.equal(knot.charges, false);
+  knot.hostile = true;
+  run(knot, [0, AI.notice + 2], 1 / 60, 600);
+  assert.equal(knot.state, STATE.idle, 'a rat you hit and outran is not a champion');
+});
+
+// Passive is one creature, not a class. L01 stands the player in eight grain rats at 52 HP before
+// teaching the tap; nothing else in the game is met that way, and making all vermin unprovokable
+// took `light.05`'s two strays and the Drove Road knots with it.
+test('the grain is the one nest that waits to be provoked', () => {
+  const mire = arm({ x: 0, z: 0 }, 'mire_rat');
+  assert.equal(mire.hostile, true);
+  run(mire, [0, AI.notice - 1], 1 / 60, 1);
+  assert.equal(mire.state, STATE.alert, 'a mire rat you walked up to left idle');
+
+  const far = arm({ x: 0, z: 0 }, 'mire_rat');
+  run(far, [0, AI.notice + 2], 1 / 60, 600);
+  assert.equal(far.state, STATE.idle, 'but it does not cross the field for you');
+
+  assert.equal(rat().hostile, false, 'and the granary is the exception');
+});
+
+test('a rat that has been provoked closes and bites', () => {
+  const a = rat(0, 0);
+  a.hostile = true;
+  a.state = STATE.idle;
+
   run(a, [0, AI.notice + 2], 1 / 60, 30);
   assert.equal(a.state, STATE.idle, 'out of sight is out of mind');
 

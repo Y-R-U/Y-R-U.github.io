@@ -120,6 +120,8 @@ export class Spawner {
   registerKnobs(q) {
     q.register({ key: 'foeNotice', label: 'Creature sight (m)', type: 'range', min: 1, max: 20, step: 0.5, default: AI.notice, group: 'Combat' },
       v => { AI.notice = v; });
+    q.register({ key: 'foeCharge', label: 'Charge sight (m)', type: 'range', min: 1, max: AI.leash, step: 0.5, default: AI.charge, group: 'Combat' },
+      v => { AI.charge = v; });
     q.register({ key: 'foeRespawn', label: 'Respawn (s)', type: 'range', min: 5, max: 240, step: 5, default: RESPAWN.common, group: 'Combat' },
       v => { this.respawnSeconds = v; });
     q.register({ key: 'foeCap', label: 'Live creatures', type: 'range', min: 0, max: HOSTILE_CAP, step: 1, default: HOSTILE_CAP, group: 'Combat' },

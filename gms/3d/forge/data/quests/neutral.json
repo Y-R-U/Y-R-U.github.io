@@ -213,7 +213,7 @@
         "text": "Serve the buyer at the gate" },
 
       { "id": "apart", "do": ["survive", "lac.square", 60],
-        "unseen": true,
+        "unseen": true, "unopposed": true,
         "text": "Keep them apart until they are done",
         "hint": "Slowly, and behind them. A tray one of them watches is a tray they both follow.",
         "recover": [["moveTo", "lac.square"]] },
@@ -588,7 +588,7 @@
         "text": "Stand where Whitewall is looking",
         "recover": [["moveTo", "march.west"]] },
 
-      { "id": "wait", "do": ["survive", "reach.east", 60], "worn": "dark",
+      { "id": "wait", "do": ["survive", "reach.east", 60], "worn": "dark", "unopposed": true,
         "text": "Wait for the picket to come",
         "hint": "Do not fight. Being taken is the job.",
         "recover": [["moveTo", "stand.east"]] },

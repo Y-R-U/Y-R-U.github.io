@@ -22,6 +22,15 @@ test('the first ninety seconds arrive in the taught order', () => {
   assert.equal(next(ctx, {}).id, 'door');
 });
 
+// `target` is the context button's target and the granary has none — no prop, no NPC, no node,
+// eight rats. The room the game teaches casting in was the room that never armed the prompt.
+test('a creature in bolt range arms the cast prompt on its own', () => {
+  const walked = { looked: true, moved: true };
+  assert.equal(next(walked, {}), null, 'an empty room teaches nothing');
+  assert.equal(next({ ...walked, foe: true }, {}).id, 'cast');
+  assert.equal(next({ ...walked, foe: true, cast: true }, {}), null, 'and it retires on the first tap');
+});
+
 test('a player who only walks is still taught the stick', () => {
   // The whole script used to stall here: `move` was gated behind `cast`, which was gated behind
   // an NPC standing within 4 m, so a cold start with nobody in range taught nothing but `look`.

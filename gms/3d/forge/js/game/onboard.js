@@ -24,7 +24,9 @@ export const OPENING = [
 export const PROMPTS = [
   { id: 'look', text: 'Drag to look.', when: () => true, until: c => c.looked },
   { id: 'move', text: 'Drag to move.', when: () => true, until: c => c.moved, side: true },
-  { id: 'cast', text: 'Tap to cast.', when: c => c.target, until: c => c.cast },
+  // `foe` before `target`: the granary is eight rats and nothing the context button can touch, so
+  // the one room whose whole task is casting was the one room that never taught it.
+  { id: 'cast', text: 'Tap to cast.', when: c => c.foe || c.target, until: c => c.cast },
   { id: 'door', text: 'Walk at the door.', when: c => c.cleared, until: c => c.doorUsed },
   { id: 'context', text: 'The button acts.', when: c => !!c.contextKind, until: c => c.contextUsed },
   { id: 'channel', text: 'Hold to cast the line.', when: c => c.contextKind === 'work', until: c => c.channelled },

@@ -471,8 +471,7 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 
 /* ── sheets: pause, settings, character, market, slate ───────────────────── */
 
-/* Everything full-screen sits above the HUD and the dialogue bubble regardless of append order;
-   the rotate card (z 5) stays above all of them. */
+/* Everything full-screen sits above the HUD and the dialogue bubble regardless of append order. */
 #game .g-dim, #game .g-pause, #game .g-journal, #game .g-sheet, #game .g-card, #game .g-slate { z-index: 4; }
 
 #game .g-dim { position: absolute; inset: 0; background: rgba(6, 7, 9, .6); pointer-events: auto; }
@@ -687,20 +686,119 @@ body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px
 
 /* ── portrait ────────────────────────────────────────────────────────────── */
 
-#game .g-rotate {
-  position: absolute;
-  inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: calc(14px * var(--ui));
-  background: #0d1013;
-  pointer-events: auto;
-  z-index: 5;
+/* Portrait is a first-class orientation (docs/NOTES_PORTRAIT.md). It buys height and loses width,
+   which inverts every landscape assumption in this file: anything that sat *beside* the thumb
+   cluster has to sit *above* it, and anything in three columns has to be in fewer.
+
+   Gated on width too: `orientation: portrait` alone is true of any window taller than it is wide,
+   and an 890 × 900 desktop took the phone layout. 560px clears the widest phone in portrait (430)
+   and stops short of the narrowest tablet (744). Deliberately not the aspect the camera keys off —
+   that is about the frustum, this is about whether it is a phone in a hand. */
+@media (orientation: portrait) and (max-width: 560px) {
+  /* Landscape reserves the cluster's width; portrait reserves its height instead, so --thumb
+     stops being a horizontal inset and --stack takes over. */
+  #game {
+    --thumb: 0px;
+    --cog: max(44px, calc(38px * var(--ui)));
+    /* 26px offset + dial 60 + its 8px margin + the 10px gap + act 76, then the cog's own 16px gap
+       and height above them, then 14px of air. */
+    --stack: calc(40px + 170px * var(--ui) + var(--cog));
+  }
+
+  /* Side by side the cluster is 26 + 60·ui + 30·ui + 76·ui wide, which at uiScale 1.4 is 258px of
+     a 390px screen and crosses the midline the move stick owns. Stacked it never can. */
+  #game .g-right, body.flip #game .g-right {
+    flex-direction: column;
+    gap: calc(10px * var(--ui));
+  }
+  #game .g-right { align-items: flex-end; }
+  body.flip #game .g-right { align-items: flex-start; }
+
+  /* Still the only touch route to pause, and in the top corner it is 818px from where a portrait
+     grip pivots the thumb. It joins the top of the button column instead — 220px, and top rather
+     than bottom because the act button has to keep the rest position. */
+  #game .g-cog {
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 26px + 170px * var(--ui));
+    right: calc(env(safe-area-inset-right, 0px) + 26px);
+    /* At the top of the frame it sat against sky; down here it sits against sunlit pavement. */
+    opacity: .85;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  }
+  body.flip #game .g-cog {
+    right: auto;
+    left: calc(env(safe-area-inset-left, 0px) + 26px);
+  }
+
+  /* Landscape fits the vitals and the day chip on one row; 390px does not, and at uiScale 1.4
+     they overlap. The chip drops under the vitals and the tracker under the chip, cleared by a
+     scaled height — a fixed one left 3px at uiScale 1.4, which is a Chrome font metric. */
+  #game .g-chip {
+    top: calc(env(safe-area-inset-top, 0px) + 14px + 44px * var(--ui));
+    right: calc(env(safe-area-inset-right, 0px) + 6px);
+  }
+  /* 46% of 390px is narrower than the 190px the objective line asks for, so the block overflowed
+     itself rather than wrapping. */
+  #game .g-track {
+    top: calc(env(safe-area-inset-top, 0px) + 26px + 66px * var(--ui));
+    max-width: 78%;
+  }
+
+  #game .g-scene,
+  #game .g-open,
+  body.flip #game .g-scene,
+  body.flip #game .g-open {
+    left: calc(env(safe-area-inset-left, 0px) + 12px);
+    right: calc(env(safe-area-inset-right, 0px) + 12px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--stack));
+  }
+  #game .g-scene { max-height: calc(100% - env(safe-area-inset-top, 0px) - var(--stack) - 90px); }
+  #game .g-prompt { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--stack) + 6px); }
+
+  #game .g-toast { max-width: 78%; }
+
+  /* Three panels across 390px is 114px each. There is height to spend instead. */
+  #game .g-panels { flex-direction: column; align-items: center; gap: calc(12px * var(--ui)); }
+  #game .g-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: calc(300px * var(--ui));
+    height: auto;
+    padding: calc(11px * var(--ui)) calc(14px * var(--ui));
+  }
+
+  /* A 38% master list is 148px. Stack the two panes instead of splitting the width. */
+  #game .g-jbody { flex-direction: column; }
+  #game .g-jlist {
+    flex: 0 0 auto;
+    max-height: 34%;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .09);
+  }
+
+  /* A skill row is 158px × --ui wide, so three columns never fit 390px, two fit at uiScale 1 and
+     only one fits at 1.4. Let the track count fall out of the row width rather than pick it. */
+  #game .g-cols { grid-template-columns: repeat(auto-fit, minmax(calc(158px * var(--ui)), 1fr)); }
+
+  /* The sparkline is the one column in a ware row that carries no number, and the rest are sized
+     to leave the name a line of its own once --ui pushes them past the width. */
+  #game .g-ware { flex-wrap: wrap; gap: calc(6px * var(--ui)); }
+  #game .g-ware > span { min-width: calc(70px * var(--ui)); }
+  #game .g-ware .g-spark { display: none; }
+  #game .g-ware .g-pips { flex-basis: calc(38px * var(--ui)); }
+  #game .g-ware .g-n { flex-basis: calc(30px * var(--ui)); }
+  #game .g-ware .g-unit { flex-basis: calc(46px * var(--ui)); }
+  #game .g-ware .g-tot { flex-basis: calc(44px * var(--ui)); }
+  #game .g-ware .g-tick { flex-basis: calc(20px * var(--ui)); }
+
+  #game .g-till { flex-wrap: wrap; gap: calc(10px * var(--ui)); padding-left: calc(12px * var(--ui)); padding-right: calc(12px * var(--ui)); }
+  #game .g-till button { flex: 0 0 auto; }
+
+  /* Chrome gives a range input an intrinsic 129px, which with a 40% label and the value cell is
+     357px of a 340px row. */
+  #game .g-set label > span { flex: 0 0 34%; }
+  #game .g-set input[type=range] { min-width: 0; }
 }
-#game .g-rotate u { text-decoration: none; font-size: calc(40px * var(--ui)); opacity: .5; }
-@media (orientation: portrait) { #game .g-rotate { display: flex; } }
 
 #game .g-dial.g-nudge { animation: g-nudge .5s ease-out 1; }
 @keyframes g-nudge { 40% { transform: scale(1.14); border-color: var(--gold); } }

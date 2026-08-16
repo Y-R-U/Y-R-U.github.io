@@ -1,0 +1,7300 @@
+{
+  "generated": "2026-08-16",
+  "stage": "portrait_control_L",
+  "profile": {
+    "preset": "medium",
+    "dpr": 1,
+    "w": 844,
+    "h": 390,
+    "headed": false,
+    "shadowRate": "every frame"
+  },
+  "mode": "traverse",
+  "step": 20,
+  "yaws": 3,
+  "worst": {
+    "tris": {
+      "x": -488.42537608090925,
+      "z": -66.56595160303411,
+      "yaw": 0,
+      "calls": 122,
+      "tris": 286762,
+      "shadowCalls": 30,
+      "shadowTris": 129140,
+      "mainCalls": 92,
+      "mainTris": 157622,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    "calls": {
+      "x": -81.54705949361608,
+      "z": 108.55197035160481,
+      "yaw": 240,
+      "calls": 139,
+      "tris": 165071,
+      "shadowCalls": 30,
+      "shadowTris": 46896,
+      "mainCalls": 109,
+      "mainTris": 118175,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 15,
+        "culled": 29
+      }
+    }
+  },
+  "gate": {
+    "budget": 350000,
+    "over": 0,
+    "samples": 426
+  },
+  "rows": [
+    {
+      "x": -520,
+      "z": -143,
+      "yaw": 0,
+      "calls": 137,
+      "tris": 264766,
+      "shadowCalls": 34,
+      "shadowTris": 99954,
+      "mainCalls": 103,
+      "mainTris": 164812,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -143,
+      "yaw": 120,
+      "calls": 70,
+      "tris": 168240,
+      "shadowCalls": 24,
+      "shadowTris": 91388,
+      "mainCalls": 46,
+      "mainTris": 76852,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -143,
+      "yaw": 240,
+      "calls": 94,
+      "tris": 196984,
+      "shadowCalls": 23,
+      "shadowTris": 80960,
+      "mainCalls": 71,
+      "mainTris": 116024,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -123,
+      "yaw": 0,
+      "calls": 129,
+      "tris": 255324,
+      "shadowCalls": 36,
+      "shadowTris": 100730,
+      "mainCalls": 93,
+      "mainTris": 154594,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -123,
+      "yaw": 120,
+      "calls": 78,
+      "tris": 191869,
+      "shadowCalls": 26,
+      "shadowTris": 94722,
+      "mainCalls": 52,
+      "mainTris": 97147,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -123,
+      "yaw": 240,
+      "calls": 106,
+      "tris": 232187,
+      "shadowCalls": 25,
+      "shadowTris": 93492,
+      "mainCalls": 81,
+      "mainTris": 138695,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -103,
+      "yaw": 0,
+      "calls": 129,
+      "tris": 231814,
+      "shadowCalls": 36,
+      "shadowTris": 101352,
+      "mainCalls": 93,
+      "mainTris": 130462,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -520,
+      "z": -103,
+      "yaw": 120,
+      "calls": 84,
+      "tris": 202743,
+      "shadowCalls": 28,
+      "shadowTris": 98076,
+      "mainCalls": 56,
+      "mainTris": 104667,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -520,
+      "z": -103,
+      "yaw": 240,
+      "calls": 112,
+      "tris": 242729,
+      "shadowCalls": 28,
+      "shadowTris": 97036,
+      "mainCalls": 84,
+      "mainTris": 145693,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -520.9938837346737,
+      "z": -83.05504638793744,
+      "yaw": 0,
+      "calls": 122,
+      "tris": 236407,
+      "shadowCalls": 34,
+      "shadowTris": 107516,
+      "mainCalls": 88,
+      "mainTris": 128891,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -520.9938837346737,
+      "z": -83.05504638793744,
+      "yaw": 120,
+      "calls": 93,
+      "tris": 222916,
+      "shadowCalls": 28,
+      "shadowTris": 104548,
+      "mainCalls": 65,
+      "mainTris": 118368,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -520.9938837346737,
+      "z": -83.05504638793744,
+      "yaw": 240,
+      "calls": 124,
+      "tris": 272837,
+      "shadowCalls": 28,
+      "shadowTris": 103508,
+      "mainCalls": 96,
+      "mainTris": 169329,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -508.2537834089247,
+      "z": -68.65075668178493,
+      "yaw": 0,
+      "calls": 124,
+      "tris": 282138,
+      "shadowCalls": 32,
+      "shadowTris": 127516,
+      "mainCalls": 92,
+      "mainTris": 154622,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -508.2537834089247,
+      "z": -68.65075668178493,
+      "yaw": 120,
+      "calls": 108,
+      "tris": 266682,
+      "shadowCalls": 32,
+      "shadowTris": 128380,
+      "mainCalls": 76,
+      "mainTris": 138302,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -508.2537834089247,
+      "z": -68.65075668178493,
+      "yaw": 240,
+      "calls": 100,
+      "tris": 240807,
+      "shadowCalls": 31,
+      "shadowTris": 100844,
+      "mainCalls": 69,
+      "mainTris": 139963,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 18,
+        "culled": 21
+      }
+    },
+    {
+      "x": -488.42537608090925,
+      "z": -66.56595160303411,
+      "yaw": 0,
+      "calls": 122,
+      "tris": 286762,
+      "shadowCalls": 30,
+      "shadowTris": 129140,
+      "mainCalls": 92,
+      "mainTris": 157622,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -488.42537608090925,
+      "z": -66.56595160303411,
+      "yaw": 120,
+      "calls": 114,
+      "tris": 269804,
+      "shadowCalls": 31,
+      "shadowTris": 119040,
+      "mainCalls": 83,
+      "mainTris": 150764,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -488.42537608090925,
+      "z": -66.56595160303411,
+      "yaw": 240,
+      "calls": 107,
+      "tris": 248445,
+      "shadowCalls": 31,
+      "shadowTris": 103952,
+      "mainCalls": 76,
+      "mainTris": 144493,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -468.4288568765812,
+      "z": -66.2926128060454,
+      "yaw": 0,
+      "calls": 119,
+      "tris": 276447,
+      "shadowCalls": 28,
+      "shadowTris": 114088,
+      "mainCalls": 91,
+      "mainTris": 162359,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -468.4288568765812,
+      "z": -66.2926128060454,
+      "yaw": 120,
+      "calls": 114,
+      "tris": 238398,
+      "shadowCalls": 31,
+      "shadowTris": 105882,
+      "mainCalls": 83,
+      "mainTris": 132516,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -468.4288568765812,
+      "z": -66.2926128060454,
+      "yaw": 240,
+      "calls": 107,
+      "tris": 259641,
+      "shadowCalls": 31,
+      "shadowTris": 113210,
+      "mainCalls": 76,
+      "mainTris": 146431,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 17,
+        "culled": 21
+      }
+    },
+    {
+      "x": -448.42935648938305,
+      "z": -66.15132856658802,
+      "yaw": 0,
+      "calls": 110,
+      "tris": 244935,
+      "shadowCalls": 28,
+      "shadowTris": 105386,
+      "mainCalls": 82,
+      "mainTris": 139549,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 17,
+        "culled": 22
+      }
+    },
+    {
+      "x": -448.42935648938305,
+      "z": -66.15132856658802,
+      "yaw": 120,
+      "calls": 117,
+      "tris": 262692,
+      "shadowCalls": 28,
+      "shadowTris": 103786,
+      "mainCalls": 89,
+      "mainTris": 158906,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 17,
+        "culled": 22
+      }
+    },
+    {
+      "x": -448.42935648938305,
+      "z": -66.15132856658802,
+      "yaw": 240,
+      "calls": 106,
+      "tris": 250728,
+      "shadowCalls": 28,
+      "shadowTris": 102864,
+      "mainCalls": 78,
+      "mainTris": 147864,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 17,
+        "culled": 22
+      }
+    },
+    {
+      "x": -428.429905163649,
+      "z": -66.0031844826937,
+      "yaw": 0,
+      "calls": 104,
+      "tris": 234500,
+      "shadowCalls": 27,
+      "shadowTris": 106324,
+      "mainCalls": 77,
+      "mainTris": 128176,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 15,
+        "culled": 23
+      }
+    },
+    {
+      "x": -428.429905163649,
+      "z": -66.0031844826937,
+      "yaw": 120,
+      "calls": 115,
+      "tris": 258140,
+      "shadowCalls": 28,
+      "shadowTris": 102476,
+      "mainCalls": 87,
+      "mainTris": 155664,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 15,
+        "culled": 23
+      }
+    },
+    {
+      "x": -428.429905163649,
+      "z": -66.0031844826937,
+      "yaw": 240,
+      "calls": 108,
+      "tris": 248913,
+      "shadowCalls": 28,
+      "shadowTris": 104460,
+      "mainCalls": 80,
+      "mainTris": 144453,
+      "blocks": {
+        "blocks": 47,
+        "detail": 9,
+        "proxy": 15,
+        "culled": 23
+      }
+    },
+    {
+      "x": 517,
+      "z": -107,
+      "yaw": 0,
+      "calls": 85,
+      "tris": 189320,
+      "shadowCalls": 19,
+      "shadowTris": 66328,
+      "mainCalls": 66,
+      "mainTris": 122992,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 517,
+      "z": -107,
+      "yaw": 120,
+      "calls": 91,
+      "tris": 187828,
+      "shadowCalls": 20,
+      "shadowTris": 66308,
+      "mainCalls": 71,
+      "mainTris": 121520,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 517,
+      "z": -107,
+      "yaw": 240,
+      "calls": 58,
+      "tris": 160374,
+      "shadowCalls": 19,
+      "shadowTris": 66096,
+      "mainCalls": 39,
+      "mainTris": 94278,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.2407961200845,
+      "z": -87.27860649371982,
+      "yaw": 0,
+      "calls": 84,
+      "tris": 187219,
+      "shadowCalls": 19,
+      "shadowTris": 66348,
+      "mainCalls": 65,
+      "mainTris": 120871,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.2407961200845,
+      "z": -87.27860649371982,
+      "yaw": 120,
+      "calls": 95,
+      "tris": 190125,
+      "shadowCalls": 21,
+      "shadowTris": 66576,
+      "mainCalls": 74,
+      "mainTris": 123549,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.2407961200845,
+      "z": -87.27860649371982,
+      "yaw": 240,
+      "calls": 61,
+      "tris": 165880,
+      "shadowCalls": 20,
+      "shadowTris": 66328,
+      "mainCalls": 41,
+      "mainTris": 99552,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 521.5676835461468,
+      "z": -67.47156123058058,
+      "yaw": 0,
+      "calls": 84,
+      "tris": 184843,
+      "shadowCalls": 19,
+      "shadowTris": 66348,
+      "mainCalls": 65,
+      "mainTris": 118495,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 521.5676835461468,
+      "z": -67.47156123058058,
+      "yaw": 120,
+      "calls": 101,
+      "tris": 202986,
+      "shadowCalls": 21,
+      "shadowTris": 66576,
+      "mainCalls": 80,
+      "mainTris": 136410,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 521.5676835461468,
+      "z": -67.47156123058058,
+      "yaw": 240,
+      "calls": 68,
+      "tris": 177696,
+      "shadowCalls": 21,
+      "shadowTris": 66576,
+      "mainCalls": 47,
+      "mainTris": 111120,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 518.2653849915699,
+      "z": -47.83760014986862,
+      "yaw": 0,
+      "calls": 73,
+      "tris": 164095,
+      "shadowCalls": 19,
+      "shadowTris": 66368,
+      "mainCalls": 54,
+      "mainTris": 97727,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 518.2653849915699,
+      "z": -47.83760014986862,
+      "yaw": 120,
+      "calls": 98,
+      "tris": 197822,
+      "shadowCalls": 21,
+      "shadowTris": 66596,
+      "mainCalls": 77,
+      "mainTris": 131226,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": 518.2653849915699,
+      "z": -47.83760014986862,
+      "yaw": 240,
+      "calls": 73,
+      "tris": 178999,
+      "shadowCalls": 21,
+      "shadowTris": 66596,
+      "mainCalls": 52,
+      "mainTris": 112403,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 1,
+        "culled": 42
+      }
+    },
+    {
+      "x": -408,
+      "z": -66,
+      "yaw": 0,
+      "calls": 97,
+      "tris": 174922,
+      "shadowCalls": 26,
+      "shadowTris": 80044,
+      "mainCalls": 71,
+      "mainTris": 94878,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 17,
+        "culled": 23
+      }
+    },
+    {
+      "x": -408,
+      "z": -66,
+      "yaw": 120,
+      "calls": 126,
+      "tris": 231516,
+      "shadowCalls": 32,
+      "shadowTris": 89440,
+      "mainCalls": 94,
+      "mainTris": 142076,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 17,
+        "culled": 23
+      }
+    },
+    {
+      "x": -408,
+      "z": -66,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 180886,
+      "shadowCalls": 25,
+      "shadowTris": 84460,
+      "mainCalls": 60,
+      "mainTris": 96426,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 17,
+        "culled": 23
+      }
+    },
+    {
+      "x": -391.65742637779493,
+      "z": -54.47096925080582,
+      "yaw": 0,
+      "calls": 102,
+      "tris": 166926,
+      "shadowCalls": 25,
+      "shadowTris": 66122,
+      "mainCalls": 77,
+      "mainTris": 100804,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 21,
+        "culled": 22
+      }
+    },
+    {
+      "x": -391.65742637779493,
+      "z": -54.47096925080582,
+      "yaw": 120,
+      "calls": 122,
+      "tris": 217833,
+      "shadowCalls": 31,
+      "shadowTris": 82125,
+      "mainCalls": 91,
+      "mainTris": 135708,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 21,
+        "culled": 22
+      }
+    },
+    {
+      "x": -391.65742637779493,
+      "z": -54.47096925080582,
+      "yaw": 240,
+      "calls": 83,
+      "tris": 174945,
+      "shadowCalls": 25,
+      "shadowTris": 77281,
+      "mainCalls": 58,
+      "mainTris": 97664,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 21,
+        "culled": 22
+      }
+    },
+    {
+      "x": -375.5394329025312,
+      "z": -42.63165866613608,
+      "yaw": 0,
+      "calls": 103,
+      "tris": 158714,
+      "shadowCalls": 24,
+      "shadowTris": 64758,
+      "mainCalls": 79,
+      "mainTris": 93956,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 22,
+        "culled": 21
+      }
+    },
+    {
+      "x": -375.5394329025312,
+      "z": -42.63165866613608,
+      "yaw": 120,
+      "calls": 125,
+      "tris": 217943,
+      "shadowCalls": 29,
+      "shadowTris": 79115,
+      "mainCalls": 96,
+      "mainTris": 138828,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 22,
+        "culled": 21
+      }
+    },
+    {
+      "x": -375.5394329025312,
+      "z": -42.63165866613608,
+      "yaw": 240,
+      "calls": 81,
+      "tris": 174003,
+      "shadowCalls": 24,
+      "shadowTris": 75767,
+      "mainCalls": 57,
+      "mainTris": 98236,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 22,
+        "culled": 21
+      }
+    },
+    {
+      "x": -359.7704811392603,
+      "z": -30.330697283343603,
+      "yaw": 0,
+      "calls": 101,
+      "tris": 117342,
+      "shadowCalls": 23,
+      "shadowTris": 23424,
+      "mainCalls": 78,
+      "mainTris": 93918,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -359.7704811392603,
+      "z": -30.330697283343603,
+      "yaw": 120,
+      "calls": 119,
+      "tris": 142825,
+      "shadowCalls": 26,
+      "shadowTris": 38807,
+      "mainCalls": 93,
+      "mainTris": 104018,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -359.7704811392603,
+      "z": -30.330697283343603,
+      "yaw": 240,
+      "calls": 78,
+      "tris": 94970,
+      "shadowCalls": 23,
+      "shadowTris": 26772,
+      "mainCalls": 55,
+      "mainTris": 68198,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -344.37272193737886,
+      "z": -17.56855933775873,
+      "yaw": 0,
+      "calls": 88,
+      "tris": 95963,
+      "shadowCalls": 17,
+      "shadowTris": 20766,
+      "mainCalls": 71,
+      "mainTris": 75197,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -344.37272193737886,
+      "z": -17.56855933775873,
+      "yaw": 120,
+      "calls": 120,
+      "tris": 143074,
+      "shadowCalls": 28,
+      "shadowTris": 39981,
+      "mainCalls": 92,
+      "mainTris": 103093,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -344.37272193737886,
+      "z": -17.56855933775873,
+      "yaw": 240,
+      "calls": 79,
+      "tris": 93330,
+      "shadowCalls": 23,
+      "shadowTris": 26612,
+      "mainCalls": 56,
+      "mainTris": 66718,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -329.28711567104284,
+      "z": -4.437812630479401,
+      "yaw": 0,
+      "calls": 99,
+      "tris": 94003,
+      "shadowCalls": 16,
+      "shadowTris": 20686,
+      "mainCalls": 83,
+      "mainTris": 73317,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 25,
+        "culled": 19
+      }
+    },
+    {
+      "x": -329.28711567104284,
+      "z": -4.437812630479401,
+      "yaw": 120,
+      "calls": 115,
+      "tris": 139814,
+      "shadowCalls": 28,
+      "shadowTris": 39255,
+      "mainCalls": 87,
+      "mainTris": 100559,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 25,
+        "culled": 19
+      }
+    },
+    {
+      "x": -329.28711567104284,
+      "z": -4.437812630479401,
+      "yaw": 240,
+      "calls": 67,
+      "tris": 84716,
+      "shadowCalls": 20,
+      "shadowTris": 22104,
+      "mainCalls": 47,
+      "mainTris": 62612,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 25,
+        "culled": 19
+      }
+    },
+    {
+      "x": -314.2929820400153,
+      "z": 8.797584656438595,
+      "yaw": 0,
+      "calls": 98,
+      "tris": 86807,
+      "shadowCalls": 12,
+      "shadowTris": 12696,
+      "mainCalls": 86,
+      "mainTris": 74111,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 27,
+        "culled": 18
+      }
+    },
+    {
+      "x": -314.2929820400153,
+      "z": 8.797584656438595,
+      "yaw": 120,
+      "calls": 111,
+      "tris": 120256,
+      "shadowCalls": 25,
+      "shadowTris": 28507,
+      "mainCalls": 86,
+      "mainTris": 91749,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 27,
+        "culled": 18
+      }
+    },
+    {
+      "x": -314.2929820400153,
+      "z": 8.797584656438595,
+      "yaw": 240,
+      "calls": 64,
+      "tris": 72272,
+      "shadowCalls": 17,
+      "shadowTris": 12724,
+      "mainCalls": 47,
+      "mainTris": 59548,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 27,
+        "culled": 18
+      }
+    },
+    {
+      "x": -299.6342850848729,
+      "z": 22.396240424975804,
+      "yaw": 0,
+      "calls": 88,
+      "tris": 84400,
+      "shadowCalls": 11,
+      "shadowTris": 12016,
+      "mainCalls": 77,
+      "mainTris": 72384,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -299.6342850848729,
+      "z": 22.396240424975804,
+      "yaw": 120,
+      "calls": 108,
+      "tris": 105580,
+      "shadowCalls": 23,
+      "shadowTris": 17122,
+      "mainCalls": 85,
+      "mainTris": 88458,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -299.6342850848729,
+      "z": 22.396240424975804,
+      "yaw": 240,
+      "calls": 62,
+      "tris": 75714,
+      "shadowCalls": 15,
+      "shadowTris": 13344,
+      "mainCalls": 47,
+      "mainTris": 62370,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -286.6571493161928,
+      "z": 37.581074420918334,
+      "yaw": 0,
+      "calls": 97,
+      "tris": 82910,
+      "shadowCalls": 17,
+      "shadowTris": 10392,
+      "mainCalls": 80,
+      "mainTris": 72518,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -286.6571493161928,
+      "z": 37.581074420918334,
+      "yaw": 120,
+      "calls": 100,
+      "tris": 98732,
+      "shadowCalls": 17,
+      "shadowTris": 15512,
+      "mainCalls": 83,
+      "mainTris": 83220,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -286.6571493161928,
+      "z": 37.581074420918334,
+      "yaw": 240,
+      "calls": 64,
+      "tris": 71378,
+      "shadowCalls": 16,
+      "shadowTris": 11968,
+      "mainCalls": 48,
+      "mainTris": 59410,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 26,
+        "culled": 19
+      }
+    },
+    {
+      "x": -272.4250552306363,
+      "z": 51.56973082330487,
+      "yaw": 0,
+      "calls": 107,
+      "tris": 83543,
+      "shadowCalls": 19,
+      "shadowTris": 9202,
+      "mainCalls": 88,
+      "mainTris": 74341,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -272.4250552306363,
+      "z": 51.56973082330487,
+      "yaw": 120,
+      "calls": 84,
+      "tris": 88355,
+      "shadowCalls": 16,
+      "shadowTris": 13816,
+      "mainCalls": 68,
+      "mainTris": 74539,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -272.4250552306363,
+      "z": 51.56973082330487,
+      "yaw": 240,
+      "calls": 67,
+      "tris": 75364,
+      "shadowCalls": 17,
+      "shadowTris": 12458,
+      "mainCalls": 50,
+      "mainTris": 62906,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -262,
+      "z": 56,
+      "yaw": 0,
+      "calls": 109,
+      "tris": 85792,
+      "shadowCalls": 19,
+      "shadowTris": 8994,
+      "mainCalls": 90,
+      "mainTris": 76798,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -262,
+      "z": 56,
+      "yaw": 120,
+      "calls": 56,
+      "tris": 56395,
+      "shadowCalls": 15,
+      "shadowTris": 11756,
+      "mainCalls": 41,
+      "mainTris": 44639,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -262,
+      "z": 56,
+      "yaw": 240,
+      "calls": 80,
+      "tris": 98312,
+      "shadowCalls": 16,
+      "shadowTris": 11984,
+      "mainCalls": 64,
+      "mainTris": 86328,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 25,
+        "culled": 20
+      }
+    },
+    {
+      "x": -242.08599202572714,
+      "z": 55.297346797315576,
+      "yaw": 0,
+      "calls": 109,
+      "tris": 87324,
+      "shadowCalls": 24,
+      "shadowTris": 13038,
+      "mainCalls": 85,
+      "mainTris": 74286,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -242.08599202572714,
+      "z": 55.297346797315576,
+      "yaw": 120,
+      "calls": 54,
+      "tris": 50636,
+      "shadowCalls": 17,
+      "shadowTris": 10968,
+      "mainCalls": 37,
+      "mainTris": 39668,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -242.08599202572714,
+      "z": 55.297346797315576,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 90371,
+      "shadowCalls": 17,
+      "shadowTris": 10968,
+      "mainCalls": 68,
+      "mainTris": 79403,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 26,
+        "culled": 20
+      }
+    },
+    {
+      "x": -222.26823045417513,
+      "z": 52.613854833321085,
+      "yaw": 0,
+      "calls": 112,
+      "tris": 90462,
+      "shadowCalls": 25,
+      "shadowTris": 15098,
+      "mainCalls": 87,
+      "mainTris": 75364,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -222.26823045417513,
+      "z": 52.613854833321085,
+      "yaw": 120,
+      "calls": 57,
+      "tris": 50117,
+      "shadowCalls": 17,
+      "shadowTris": 9280,
+      "mainCalls": 40,
+      "mainTris": 40837,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -222.26823045417513,
+      "z": 52.613854833321085,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 85091,
+      "shadowCalls": 16,
+      "shadowTris": 8836,
+      "mainCalls": 69,
+      "mainTris": 76255,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 25,
+        "culled": 21
+      }
+    },
+    {
+      "x": -202.29123784410757,
+      "z": 52.11859501937193,
+      "yaw": 0,
+      "calls": 113,
+      "tris": 95714,
+      "shadowCalls": 24,
+      "shadowTris": 16206,
+      "mainCalls": 89,
+      "mainTris": 79508,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 24,
+        "culled": 23
+      }
+    },
+    {
+      "x": -202.29123784410757,
+      "z": 52.11859501937193,
+      "yaw": 120,
+      "calls": 66,
+      "tris": 55051,
+      "shadowCalls": 18,
+      "shadowTris": 7244,
+      "mainCalls": 48,
+      "mainTris": 47807,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 24,
+        "culled": 23
+      }
+    },
+    {
+      "x": -202.29123784410757,
+      "z": 52.11859501937193,
+      "yaw": 240,
+      "calls": 77,
+      "tris": 77218,
+      "shadowCalls": 18,
+      "shadowTris": 7244,
+      "mainCalls": 59,
+      "mainTris": 69974,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 24,
+        "culled": 23
+      }
+    },
+    {
+      "x": -182.3056283386631,
+      "z": 52.80817833077233,
+      "yaw": 0,
+      "calls": 121,
+      "tris": 106624,
+      "shadowCalls": 26,
+      "shadowTris": 19630,
+      "mainCalls": 95,
+      "mainTris": 86994,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 21,
+        "culled": 25
+      }
+    },
+    {
+      "x": -182.3056283386631,
+      "z": 52.80817833077233,
+      "yaw": 120,
+      "calls": 72,
+      "tris": 64942,
+      "shadowCalls": 21,
+      "shadowTris": 13532,
+      "mainCalls": 51,
+      "mainTris": 51410,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 21,
+        "culled": 25
+      }
+    },
+    {
+      "x": -182.3056283386631,
+      "z": 52.80817833077233,
+      "yaw": 240,
+      "calls": 78,
+      "tris": 84492,
+      "shadowCalls": 22,
+      "shadowTris": 14170,
+      "mainCalls": 56,
+      "mainTris": 70322,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 21,
+        "culled": 25
+      }
+    },
+    {
+      "x": -162.4812124928626,
+      "z": 55.33238768246609,
+      "yaw": 0,
+      "calls": 124,
+      "tris": 114847,
+      "shadowCalls": 26,
+      "shadowTris": 23410,
+      "mainCalls": 98,
+      "mainTris": 91437,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -162.4812124928626,
+      "z": 55.33238768246609,
+      "yaw": 120,
+      "calls": 72,
+      "tris": 72317,
+      "shadowCalls": 20,
+      "shadowTris": 17220,
+      "mainCalls": 52,
+      "mainTris": 55097,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -162.4812124928626,
+      "z": 55.33238768246609,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 93850,
+      "shadowCalls": 25,
+      "shadowTris": 19610,
+      "mainCalls": 60,
+      "mainTris": 74240,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -143.3510470110203,
+      "z": 61.07074426662741,
+      "yaw": 0,
+      "calls": 122,
+      "tris": 113672,
+      "shadowCalls": 25,
+      "shadowTris": 22650,
+      "mainCalls": 97,
+      "mainTris": 91022,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 17,
+        "culled": 28
+      }
+    },
+    {
+      "x": -143.3510470110203,
+      "z": 61.07074426662741,
+      "yaw": 120,
+      "calls": 79,
+      "tris": 81894,
+      "shadowCalls": 21,
+      "shadowTris": 18544,
+      "mainCalls": 58,
+      "mainTris": 63350,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 17,
+        "culled": 28
+      }
+    },
+    {
+      "x": -143.3510470110203,
+      "z": 61.07074426662741,
+      "yaw": 240,
+      "calls": 92,
+      "tris": 94128,
+      "shadowCalls": 25,
+      "shadowTris": 20618,
+      "mainCalls": 67,
+      "mainTris": 73510,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 17,
+        "culled": 28
+      }
+    },
+    {
+      "x": -125.13181610165736,
+      "z": 69.2981831410163,
+      "yaw": 0,
+      "calls": 127,
+      "tris": 149553,
+      "shadowCalls": 25,
+      "shadowTris": 41638,
+      "mainCalls": 102,
+      "mainTris": 107915,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -125.13181610165736,
+      "z": 69.2981831410163,
+      "yaw": 120,
+      "calls": 86,
+      "tris": 107262,
+      "shadowCalls": 22,
+      "shadowTris": 34792,
+      "mainCalls": 64,
+      "mainTris": 72470,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -125.13181610165736,
+      "z": 69.2981831410163,
+      "yaw": 240,
+      "calls": 98,
+      "tris": 127232,
+      "shadowCalls": 27,
+      "shadowTris": 36776,
+      "mainCalls": 71,
+      "mainTris": 90456,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -107.82210603637414,
+      "z": 79.29913653841457,
+      "yaw": 0,
+      "calls": 113,
+      "tris": 151551,
+      "shadowCalls": 25,
+      "shadowTris": 45576,
+      "mainCalls": 88,
+      "mainTris": 105975,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 13,
+        "culled": 29
+      }
+    },
+    {
+      "x": -107.82210603637414,
+      "z": 79.29913653841457,
+      "yaw": 120,
+      "calls": 85,
+      "tris": 113749,
+      "shadowCalls": 21,
+      "shadowTris": 38250,
+      "mainCalls": 64,
+      "mainTris": 75499,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 13,
+        "culled": 29
+      }
+    },
+    {
+      "x": -107.82210603637414,
+      "z": 79.29913653841457,
+      "yaw": 240,
+      "calls": 102,
+      "tris": 137606,
+      "shadowCalls": 27,
+      "shadowTris": 42378,
+      "mainCalls": 75,
+      "mainTris": 95228,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 13,
+        "culled": 29
+      }
+    },
+    {
+      "x": -92.21615068402299,
+      "z": 91.72290461810397,
+      "yaw": 0,
+      "calls": 91,
+      "tris": 113364,
+      "shadowCalls": 23,
+      "shadowTris": 42914,
+      "mainCalls": 68,
+      "mainTris": 70450,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -92.21615068402299,
+      "z": 91.72290461810397,
+      "yaw": 120,
+      "calls": 83,
+      "tris": 108067,
+      "shadowCalls": 20,
+      "shadowTris": 37824,
+      "mainCalls": 63,
+      "mainTris": 70243,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -92.21615068402299,
+      "z": 91.72290461810397,
+      "yaw": 240,
+      "calls": 130,
+      "tris": 157676,
+      "shadowCalls": 28,
+      "shadowTris": 43614,
+      "mainCalls": 102,
+      "mainTris": 114062,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 14,
+        "culled": 29
+      }
+    },
+    {
+      "x": -81.54705949361608,
+      "z": 108.55197035160481,
+      "yaw": 0,
+      "calls": 65,
+      "tris": 73784,
+      "shadowCalls": 16,
+      "shadowTris": 16034,
+      "mainCalls": 49,
+      "mainTris": 57750,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 15,
+        "culled": 29
+      }
+    },
+    {
+      "x": -81.54705949361608,
+      "z": 108.55197035160481,
+      "yaw": 120,
+      "calls": 86,
+      "tris": 106671,
+      "shadowCalls": 21,
+      "shadowTris": 35816,
+      "mainCalls": 65,
+      "mainTris": 70855,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 15,
+        "culled": 29
+      }
+    },
+    {
+      "x": -81.54705949361608,
+      "z": 108.55197035160481,
+      "yaw": 240,
+      "calls": 139,
+      "tris": 165071,
+      "shadowCalls": 30,
+      "shadowTris": 46896,
+      "mainCalls": 109,
+      "mainTris": 118175,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 15,
+        "culled": 29
+      }
+    },
+    {
+      "x": -71.9628133620634,
+      "z": 126.03999508408506,
+      "yaw": 0,
+      "calls": 72,
+      "tris": 81565,
+      "shadowCalls": 16,
+      "shadowTris": 17038,
+      "mainCalls": 56,
+      "mainTris": 64527,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 17,
+        "culled": 29
+      }
+    },
+    {
+      "x": -71.9628133620634,
+      "z": 126.03999508408506,
+      "yaw": 120,
+      "calls": 80,
+      "tris": 90975,
+      "shadowCalls": 18,
+      "shadowTris": 21664,
+      "mainCalls": 62,
+      "mainTris": 69311,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 17,
+        "culled": 29
+      }
+    },
+    {
+      "x": -71.9628133620634,
+      "z": 126.03999508408506,
+      "yaw": 240,
+      "calls": 131,
+      "tris": 140384,
+      "shadowCalls": 29,
+      "shadowTris": 34730,
+      "mainCalls": 102,
+      "mainTris": 105654,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 17,
+        "culled": 29
+      }
+    },
+    {
+      "x": -56.190497314156815,
+      "z": 137.80422749754266,
+      "yaw": 0,
+      "calls": 97,
+      "tris": 108483,
+      "shadowCalls": 18,
+      "shadowTris": 22042,
+      "mainCalls": 79,
+      "mainTris": 86441,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 16,
+        "culled": 30
+      }
+    },
+    {
+      "x": -56.190497314156815,
+      "z": 137.80422749754266,
+      "yaw": 120,
+      "calls": 68,
+      "tris": 76066,
+      "shadowCalls": 16,
+      "shadowTris": 17038,
+      "mainCalls": 52,
+      "mainTris": 59028,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 16,
+        "culled": 30
+      }
+    },
+    {
+      "x": -56.190497314156815,
+      "z": 137.80422749754266,
+      "yaw": 240,
+      "calls": 119,
+      "tris": 131704,
+      "shadowCalls": 27,
+      "shadowTris": 33112,
+      "mainCalls": 92,
+      "mainTris": 98592,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 16,
+        "culled": 30
+      }
+    },
+    {
+      "x": -40.515953044814964,
+      "z": 127.61319833961417,
+      "yaw": 0,
+      "calls": 136,
+      "tris": 170620,
+      "shadowCalls": 28,
+      "shadowTris": 49412,
+      "mainCalls": 108,
+      "mainTris": 121208,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -40.515953044814964,
+      "z": 127.61319833961417,
+      "yaw": 120,
+      "calls": 56,
+      "tris": 74287,
+      "shadowCalls": 16,
+      "shadowTris": 18446,
+      "mainCalls": 40,
+      "mainTris": 55841,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -40.515953044814964,
+      "z": 127.61319833961417,
+      "yaw": 240,
+      "calls": 90,
+      "tris": 121568,
+      "shadowCalls": 22,
+      "shadowTris": 40188,
+      "mainCalls": 68,
+      "mainTris": 81380,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -27.555568056301574,
+      "z": 112.40507174636181,
+      "yaw": 0,
+      "calls": 133,
+      "tris": 170712,
+      "shadowCalls": 29,
+      "shadowTris": 49862,
+      "mainCalls": 104,
+      "mainTris": 120850,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -27.555568056301574,
+      "z": 112.40507174636181,
+      "yaw": 120,
+      "calls": 60,
+      "tris": 75521,
+      "shadowCalls": 16,
+      "shadowTris": 18446,
+      "mainCalls": 44,
+      "mainTris": 57075,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -27.555568056301574,
+      "z": 112.40507174636181,
+      "yaw": 240,
+      "calls": 104,
+      "tris": 141249,
+      "shadowCalls": 24,
+      "shadowTris": 41278,
+      "mainCalls": 80,
+      "mainTris": 99971,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": -13.674672615017336,
+      "z": 98.03125736100532,
+      "yaw": 0,
+      "calls": 132,
+      "tris": 187472,
+      "shadowCalls": 29,
+      "shadowTris": 58456,
+      "mainCalls": 103,
+      "mainTris": 129016,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": -13.674672615017336,
+      "z": 98.03125736100532,
+      "yaw": 120,
+      "calls": 66,
+      "tris": 95130,
+      "shadowCalls": 17,
+      "shadowTris": 33134,
+      "mainCalls": 49,
+      "mainTris": 61996,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": -13.674672615017336,
+      "z": 98.03125736100532,
+      "yaw": 240,
+      "calls": 119,
+      "tris": 171575,
+      "shadowCalls": 29,
+      "shadowTris": 57736,
+      "mainCalls": 90,
+      "mainTris": 113839,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": -2.866646784091522,
+      "z": 81.77592245795694,
+      "yaw": 0,
+      "calls": 127,
+      "tris": 204066,
+      "shadowCalls": 29,
+      "shadowTris": 68256,
+      "mainCalls": 98,
+      "mainTris": 135810,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": -2.866646784091522,
+      "z": 81.77592245795694,
+      "yaw": 120,
+      "calls": 98,
+      "tris": 146017,
+      "shadowCalls": 24,
+      "shadowTris": 64454,
+      "mainCalls": 74,
+      "mainTris": 81563,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": -2.866646784091522,
+      "z": 81.77592245795694,
+      "yaw": 240,
+      "calls": 106,
+      "tris": 169047,
+      "shadowCalls": 25,
+      "shadowTris": 64460,
+      "mainCalls": 81,
+      "mainTris": 104587,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": 0.35236174728935427,
+      "z": 62.04869894539265,
+      "yaw": 0,
+      "calls": 108,
+      "tris": 186740,
+      "shadowCalls": 31,
+      "shadowTris": 68698,
+      "mainCalls": 77,
+      "mainTris": 118042,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 0.35236174728935427,
+      "z": 62.04869894539265,
+      "yaw": 120,
+      "calls": 114,
+      "tris": 192284,
+      "shadowCalls": 25,
+      "shadowTris": 66094,
+      "mainCalls": 89,
+      "mainTris": 126190,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 0.35236174728935427,
+      "z": 62.04869894539265,
+      "yaw": 240,
+      "calls": 113,
+      "tris": 179372,
+      "shadowCalls": 27,
+      "shadowTris": 66336,
+      "mainCalls": 86,
+      "mainTris": 113036,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 1.9607954968266958,
+      "z": 42.11936697460418,
+      "yaw": 0,
+      "calls": 105,
+      "tris": 179128,
+      "shadowCalls": 30,
+      "shadowTris": 65858,
+      "mainCalls": 75,
+      "mainTris": 113270,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 1.9607954968266958,
+      "z": 42.11936697460418,
+      "yaw": 120,
+      "calls": 120,
+      "tris": 200467,
+      "shadowCalls": 27,
+      "shadowTris": 70252,
+      "mainCalls": 93,
+      "mainTris": 130215,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 1.9607954968266958,
+      "z": 42.11936697460418,
+      "yaw": 240,
+      "calls": 120,
+      "tris": 188271,
+      "shadowCalls": 29,
+      "shadowTris": 70494,
+      "mainCalls": 91,
+      "mainTris": 117777,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": -0.1774530159527795,
+      "z": 22.27183675979052,
+      "yaw": 0,
+      "calls": 98,
+      "tris": 165376,
+      "shadowCalls": 28,
+      "shadowTris": 63968,
+      "mainCalls": 70,
+      "mainTris": 101408,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": -0.1774530159527795,
+      "z": 22.27183675979052,
+      "yaw": 120,
+      "calls": 130,
+      "tris": 204477,
+      "shadowCalls": 28,
+      "shadowTris": 70200,
+      "mainCalls": 102,
+      "mainTris": 134277,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": -0.1774530159527795,
+      "z": 22.27183675979052,
+      "yaw": 240,
+      "calls": 124,
+      "tris": 189468,
+      "shadowCalls": 30,
+      "shadowTris": 70442,
+      "mainCalls": 94,
+      "mainTris": 119026,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 15.635822325922172,
+      "z": 15.217583496092503,
+      "yaw": 0,
+      "calls": 120,
+      "tris": 188568,
+      "shadowCalls": 27,
+      "shadowTris": 74440,
+      "mainCalls": 93,
+      "mainTris": 114128,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 8,
+        "culled": 31
+      }
+    },
+    {
+      "x": 15.635822325922172,
+      "z": 15.217583496092503,
+      "yaw": 120,
+      "calls": 120,
+      "tris": 188260,
+      "shadowCalls": 30,
+      "shadowTris": 75414,
+      "mainCalls": 90,
+      "mainTris": 112846,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 8,
+        "culled": 31
+      }
+    },
+    {
+      "x": 15.635822325922172,
+      "z": 15.217583496092503,
+      "yaw": 240,
+      "calls": 113,
+      "tris": 181701,
+      "shadowCalls": 30,
+      "shadowTris": 69660,
+      "mainCalls": 83,
+      "mainTris": 112041,
+      "blocks": {
+        "blocks": 47,
+        "detail": 8,
+        "proxy": 8,
+        "culled": 31
+      }
+    },
+    {
+      "x": 35.6076150901257,
+      "z": 14.188739970350346,
+      "yaw": 0,
+      "calls": 118,
+      "tris": 181902,
+      "shadowCalls": 27,
+      "shadowTris": 70026,
+      "mainCalls": 91,
+      "mainTris": 111876,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 35.6076150901257,
+      "z": 14.188739970350346,
+      "yaw": 120,
+      "calls": 126,
+      "tris": 198007,
+      "shadowCalls": 29,
+      "shadowTris": 70988,
+      "mainCalls": 97,
+      "mainTris": 127019,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 35.6076150901257,
+      "z": 14.188739970350346,
+      "yaw": 240,
+      "calls": 116,
+      "tris": 190736,
+      "shadowCalls": 28,
+      "shadowTris": 68182,
+      "mainCalls": 88,
+      "mainTris": 122554,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 55.600438065754666,
+      "z": 13.655707237581494,
+      "yaw": 0,
+      "calls": 115,
+      "tris": 172352,
+      "shadowCalls": 25,
+      "shadowTris": 57336,
+      "mainCalls": 90,
+      "mainTris": 115016,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 55.600438065754666,
+      "z": 13.655707237581494,
+      "yaw": 120,
+      "calls": 124,
+      "tris": 199161,
+      "shadowCalls": 29,
+      "shadowTris": 73006,
+      "mainCalls": 95,
+      "mainTris": 126155,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 55.600438065754666,
+      "z": 13.655707237581494,
+      "yaw": 240,
+      "calls": 115,
+      "tris": 197060,
+      "shadowCalls": 28,
+      "shadowTris": 70200,
+      "mainCalls": 87,
+      "mainTris": 126860,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 9,
+        "culled": 31
+      }
+    },
+    {
+      "x": 75.59874685205557,
+      "z": 13.516412639229177,
+      "yaw": 0,
+      "calls": 114,
+      "tris": 167556,
+      "shadowCalls": 24,
+      "shadowTris": 55894,
+      "mainCalls": 90,
+      "mainTris": 111662,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 75.59874685205557,
+      "z": 13.516412639229177,
+      "yaw": 120,
+      "calls": 124,
+      "tris": 175565,
+      "shadowCalls": 28,
+      "shadowTris": 59870,
+      "mainCalls": 96,
+      "mainTris": 115695,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 75.59874685205557,
+      "z": 13.516412639229177,
+      "yaw": 240,
+      "calls": 110,
+      "tris": 171984,
+      "shadowCalls": 26,
+      "shadowTris": 57120,
+      "mainCalls": 84,
+      "mainTris": 114864,
+      "blocks": {
+        "blocks": 47,
+        "detail": 6,
+        "proxy": 10,
+        "culled": 31
+      }
+    },
+    {
+      "x": 95.55503331377164,
+      "z": 14.69903991486204,
+      "yaw": 0,
+      "calls": 114,
+      "tris": 166983,
+      "shadowCalls": 27,
+      "shadowTris": 55676,
+      "mainCalls": 87,
+      "mainTris": 111307,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": 95.55503331377164,
+      "z": 14.69903991486204,
+      "yaw": 120,
+      "calls": 126,
+      "tris": 181230,
+      "shadowCalls": 27,
+      "shadowTris": 58642,
+      "mainCalls": 99,
+      "mainTris": 122588,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": 95.55503331377164,
+      "z": 14.69903991486204,
+      "yaw": 240,
+      "calls": 99,
+      "tris": 166192,
+      "shadowCalls": 24,
+      "shadowTris": 56658,
+      "mainCalls": 75,
+      "mainTris": 109534,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 11,
+        "culled": 31
+      }
+    },
+    {
+      "x": 115.31841314750503,
+      "z": 17.730231730948944,
+      "yaw": 0,
+      "calls": 105,
+      "tris": 145313,
+      "shadowCalls": 24,
+      "shadowTris": 45100,
+      "mainCalls": 81,
+      "mainTris": 100213,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 12,
+        "culled": 30
+      }
+    },
+    {
+      "x": 115.31841314750503,
+      "z": 17.730231730948944,
+      "yaw": 120,
+      "calls": 129,
+      "tris": 179136,
+      "shadowCalls": 27,
+      "shadowTris": 57688,
+      "mainCalls": 102,
+      "mainTris": 121448,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 12,
+        "culled": 30
+      }
+    },
+    {
+      "x": 115.31841314750503,
+      "z": 17.730231730948944,
+      "yaw": 240,
+      "calls": 98,
+      "tris": 151158,
+      "shadowCalls": 24,
+      "shadowTris": 55704,
+      "mainCalls": 74,
+      "mainTris": 95454,
+      "blocks": {
+        "blocks": 47,
+        "detail": 5,
+        "proxy": 12,
+        "culled": 30
+      }
+    },
+    {
+      "x": 134.71863642088587,
+      "z": 22.519488657832202,
+      "yaw": 0,
+      "calls": 98,
+      "tris": 121021,
+      "shadowCalls": 23,
+      "shadowTris": 42984,
+      "mainCalls": 75,
+      "mainTris": 78037,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": 134.71863642088587,
+      "z": 22.519488657832202,
+      "yaw": 120,
+      "calls": 131,
+      "tris": 163905,
+      "shadowCalls": 27,
+      "shadowTris": 49020,
+      "mainCalls": 104,
+      "mainTris": 114885,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": 134.71863642088587,
+      "z": 22.519488657832202,
+      "yaw": 240,
+      "calls": 87,
+      "tris": 139278,
+      "shadowCalls": 22,
+      "shadowTris": 44952,
+      "mainCalls": 65,
+      "mainTris": 94326,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 14,
+        "culled": 30
+      }
+    },
+    {
+      "x": 153.26133729209272,
+      "z": 30.00208339066035,
+      "yaw": 0,
+      "calls": 87,
+      "tris": 101570,
+      "shadowCalls": 19,
+      "shadowTris": 33476,
+      "mainCalls": 68,
+      "mainTris": 68094,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": 153.26133729209272,
+      "z": 30.00208339066035,
+      "yaw": 120,
+      "calls": 127,
+      "tris": 154658,
+      "shadowCalls": 26,
+      "shadowTris": 46742,
+      "mainCalls": 101,
+      "mainTris": 107916,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": 153.26133729209272,
+      "z": 30.00208339066035,
+      "yaw": 240,
+      "calls": 84,
+      "tris": 120550,
+      "shadowCalls": 25,
+      "shadowTris": 44012,
+      "mainCalls": 59,
+      "mainTris": 76538,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 13,
+        "culled": 30
+      }
+    },
+    {
+      "x": 171.12501287888887,
+      "z": 38.82993520988678,
+      "yaw": 0,
+      "calls": 76,
+      "tris": 80595,
+      "shadowCalls": 18,
+      "shadowTris": 17466,
+      "mainCalls": 58,
+      "mainTris": 63129,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": 171.12501287888887,
+      "z": 38.82993520988678,
+      "yaw": 120,
+      "calls": 123,
+      "tris": 127209,
+      "shadowCalls": 25,
+      "shadowTris": 30928,
+      "mainCalls": 98,
+      "mainTris": 96281,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": 171.12501287888887,
+      "z": 38.82993520988678,
+      "yaw": 240,
+      "calls": 82,
+      "tris": 98795,
+      "shadowCalls": 23,
+      "shadowTris": 26852,
+      "mainCalls": 59,
+      "mainTris": 71943,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": 185.86712998215614,
+      "z": 52.321493218648804,
+      "yaw": 0,
+      "calls": 72,
+      "tris": 66778,
+      "shadowCalls": 17,
+      "shadowTris": 12380,
+      "mainCalls": 55,
+      "mainTris": 54398,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 12,
+        "culled": 33
+      }
+    },
+    {
+      "x": 185.86712998215614,
+      "z": 52.321493218648804,
+      "yaw": 120,
+      "calls": 119,
+      "tris": 116508,
+      "shadowCalls": 24,
+      "shadowTris": 27148,
+      "mainCalls": 95,
+      "mainTris": 89360,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 12,
+        "culled": 33
+      }
+    },
+    {
+      "x": 185.86712998215614,
+      "z": 52.321493218648804,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 86219,
+      "shadowCalls": 23,
+      "shadowTris": 22710,
+      "mainCalls": 62,
+      "mainTris": 63509,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 12,
+        "culled": 33
+      }
+    },
+    {
+      "x": 202.399887842047,
+      "z": 63.30083727145253,
+      "yaw": 0,
+      "calls": 76,
+      "tris": 67314,
+      "shadowCalls": 18,
+      "shadowTris": 10602,
+      "mainCalls": 58,
+      "mainTris": 56712,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 202.399887842047,
+      "z": 63.30083727145253,
+      "yaw": 120,
+      "calls": 105,
+      "tris": 104334,
+      "shadowCalls": 25,
+      "shadowTris": 22192,
+      "mainCalls": 80,
+      "mainTris": 82142,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 202.399887842047,
+      "z": 63.30083727145253,
+      "yaw": 240,
+      "calls": 87,
+      "tris": 88563,
+      "shadowCalls": 24,
+      "shadowTris": 20172,
+      "mainCalls": 63,
+      "mainTris": 68391,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 221.8187859316442,
+      "z": 67.68149477106739,
+      "yaw": 0,
+      "calls": 83,
+      "tris": 69794,
+      "shadowCalls": 19,
+      "shadowTris": 11122,
+      "mainCalls": 64,
+      "mainTris": 58672,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 221.8187859316442,
+      "z": 67.68149477106739,
+      "yaw": 120,
+      "calls": 76,
+      "tris": 66564,
+      "shadowCalls": 20,
+      "shadowTris": 14774,
+      "mainCalls": 56,
+      "mainTris": 51790,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 221.8187859316442,
+      "z": 67.68149477106739,
+      "yaw": 240,
+      "calls": 101,
+      "tris": 96412,
+      "shadowCalls": 24,
+      "shadowTris": 17888,
+      "mainCalls": 77,
+      "mainTris": 78524,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 241.52186352284022,
+      "z": 64.94317907924005,
+      "yaw": 0,
+      "calls": 81,
+      "tris": 70114,
+      "shadowCalls": 18,
+      "shadowTris": 10078,
+      "mainCalls": 63,
+      "mainTris": 60036,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 241.52186352284022,
+      "z": 64.94317907924005,
+      "yaw": 120,
+      "calls": 54,
+      "tris": 44442,
+      "shadowCalls": 17,
+      "shadowTris": 7674,
+      "mainCalls": 37,
+      "mainTris": 36768,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 241.52186352284022,
+      "z": 64.94317907924005,
+      "yaw": 240,
+      "calls": 114,
+      "tris": 106416,
+      "shadowCalls": 22,
+      "shadowTris": 17412,
+      "mainCalls": 92,
+      "mainTris": 89004,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 258.544,
+      "z": 56.7741861636623,
+      "yaw": 0,
+      "calls": 80,
+      "tris": 70748,
+      "shadowCalls": 17,
+      "shadowTris": 9426,
+      "mainCalls": 63,
+      "mainTris": 61322,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 258.544,
+      "z": 56.7741861636623,
+      "yaw": 120,
+      "calls": 59,
+      "tris": 52304,
+      "shadowCalls": 18,
+      "shadowTris": 9562,
+      "mainCalls": 41,
+      "mainTris": 42742,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 258.544,
+      "z": 56.7741861636623,
+      "yaw": 240,
+      "calls": 109,
+      "tris": 97712,
+      "shadowCalls": 21,
+      "shadowTris": 14426,
+      "mainCalls": 88,
+      "mainTris": 83286,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 275.9848560483402,
+      "z": 46.98747949421452,
+      "yaw": 0,
+      "calls": 78,
+      "tris": 64836,
+      "shadowCalls": 16,
+      "shadowTris": 8890,
+      "mainCalls": 62,
+      "mainTris": 55946,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 275.9848560483402,
+      "z": 46.98747949421452,
+      "yaw": 120,
+      "calls": 61,
+      "tris": 53600,
+      "shadowCalls": 19,
+      "shadowTris": 10218,
+      "mainCalls": 42,
+      "mainTris": 43382,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 275.9848560483402,
+      "z": 46.98747949421452,
+      "yaw": 240,
+      "calls": 105,
+      "tris": 89420,
+      "shadowCalls": 19,
+      "shadowTris": 7458,
+      "mainCalls": 86,
+      "mainTris": 81962,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": 294.40527774686257,
+      "z": 39.315237304935,
+      "yaw": 0,
+      "calls": 79,
+      "tris": 69585,
+      "shadowCalls": 16,
+      "shadowTris": 11164,
+      "mainCalls": 63,
+      "mainTris": 58421,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 294.40527774686257,
+      "z": 39.315237304935,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 52712,
+      "shadowCalls": 20,
+      "shadowTris": 10210,
+      "mainCalls": 45,
+      "mainTris": 42502,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 294.40527774686257,
+      "z": 39.315237304935,
+      "yaw": 240,
+      "calls": 105,
+      "tris": 87315,
+      "shadowCalls": 19,
+      "shadowTris": 8240,
+      "mainCalls": 86,
+      "mainTris": 79075,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 313.9781813926021,
+      "z": 35.28328717834415,
+      "yaw": 0,
+      "calls": 80,
+      "tris": 70945,
+      "shadowCalls": 16,
+      "shadowTris": 10466,
+      "mainCalls": 64,
+      "mainTris": 60479,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 313.9781813926021,
+      "z": 35.28328717834415,
+      "yaw": 120,
+      "calls": 67,
+      "tris": 56674,
+      "shadowCalls": 18,
+      "shadowTris": 9110,
+      "mainCalls": 49,
+      "mainTris": 47564,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 313.9781813926021,
+      "z": 35.28328717834415,
+      "yaw": 240,
+      "calls": 101,
+      "tris": 88500,
+      "shadowCalls": 21,
+      "shadowTris": 10250,
+      "mainCalls": 80,
+      "mainTris": 78250,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 12,
+        "culled": 35
+      }
+    },
+    {
+      "x": 333.905146029148,
+      "z": 33.738578359984366,
+      "yaw": 0,
+      "calls": 81,
+      "tris": 82795,
+      "shadowCalls": 16,
+      "shadowTris": 15858,
+      "mainCalls": 65,
+      "mainTris": 66937,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 333.905146029148,
+      "z": 33.738578359984366,
+      "yaw": 120,
+      "calls": 72,
+      "tris": 68516,
+      "shadowCalls": 16,
+      "shadowTris": 9622,
+      "mainCalls": 56,
+      "mainTris": 58894,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 333.905146029148,
+      "z": 33.738578359984366,
+      "yaw": 240,
+      "calls": 86,
+      "tris": 81535,
+      "shadowCalls": 18,
+      "shadowTris": 10098,
+      "mainCalls": 68,
+      "mainTris": 71437,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 10,
+        "culled": 36
+      }
+    },
+    {
+      "x": 353.6005767770291,
+      "z": 36.26322560730978,
+      "yaw": 0,
+      "calls": 69,
+      "tris": 66548,
+      "shadowCalls": 12,
+      "shadowTris": 7640,
+      "mainCalls": 57,
+      "mainTris": 58908,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 353.6005767770291,
+      "z": 36.26322560730978,
+      "yaw": 120,
+      "calls": 96,
+      "tris": 89645,
+      "shadowCalls": 16,
+      "shadowTris": 9622,
+      "mainCalls": 80,
+      "mainTris": 80023,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 353.6005767770291,
+      "z": 36.26322560730978,
+      "yaw": 240,
+      "calls": 68,
+      "tris": 71100,
+      "shadowCalls": 17,
+      "shadowTris": 12146,
+      "mainCalls": 51,
+      "mainTris": 58954,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 371.64087236142814,
+      "z": 44.85593796657818,
+      "yaw": 0,
+      "calls": 61,
+      "tris": 67718,
+      "shadowCalls": 13,
+      "shadowTris": 9120,
+      "mainCalls": 48,
+      "mainTris": 58598,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 371.64087236142814,
+      "z": 44.85593796657818,
+      "yaw": 120,
+      "calls": 95,
+      "tris": 97096,
+      "shadowCalls": 16,
+      "shadowTris": 10600,
+      "mainCalls": 79,
+      "mainTris": 86496,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 371.64087236142814,
+      "z": 44.85593796657818,
+      "yaw": 240,
+      "calls": 73,
+      "tris": 83647,
+      "shadowCalls": 17,
+      "shadowTris": 14038,
+      "mainCalls": 56,
+      "mainTris": 69609,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 8,
+        "culled": 38
+      }
+    },
+    {
+      "x": 390.37190512929425,
+      "z": 41.10602210437125,
+      "yaw": 0,
+      "calls": 75,
+      "tris": 87460,
+      "shadowCalls": 19,
+      "shadowTris": 19200,
+      "mainCalls": 56,
+      "mainTris": 68260,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 390.37190512929425,
+      "z": 41.10602210437125,
+      "yaw": 120,
+      "calls": 47,
+      "tris": 53883,
+      "shadowCalls": 10,
+      "shadowTris": 8682,
+      "mainCalls": 37,
+      "mainTris": 45201,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 390.37190512929425,
+      "z": 41.10602210437125,
+      "yaw": 240,
+      "calls": 94,
+      "tris": 88977,
+      "shadowCalls": 16,
+      "shadowTris": 10664,
+      "mainCalls": 78,
+      "mainTris": 78313,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 402.1338661399744,
+      "z": 25.268710388370007,
+      "yaw": 0,
+      "calls": 83,
+      "tris": 94275,
+      "shadowCalls": 18,
+      "shadowTris": 20742,
+      "mainCalls": 65,
+      "mainTris": 73533,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 402.1338661399744,
+      "z": 25.268710388370007,
+      "yaw": 120,
+      "calls": 53,
+      "tris": 65207,
+      "shadowCalls": 13,
+      "shadowTris": 10220,
+      "mainCalls": 40,
+      "mainTris": 54987,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 402.1338661399744,
+      "z": 25.268710388370007,
+      "yaw": 240,
+      "calls": 80,
+      "tris": 88289,
+      "shadowCalls": 14,
+      "shadowTris": 11288,
+      "mainCalls": 66,
+      "mainTris": 77001,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 406.38081672415933,
+      "z": 5.76523356731311,
+      "yaw": 0,
+      "calls": 75,
+      "tris": 93887,
+      "shadowCalls": 18,
+      "shadowTris": 21488,
+      "mainCalls": 57,
+      "mainTris": 72399,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 406.38081672415933,
+      "z": 5.76523356731311,
+      "yaw": 120,
+      "calls": 60,
+      "tris": 76118,
+      "shadowCalls": 15,
+      "shadowTris": 16242,
+      "mainCalls": 45,
+      "mainTris": 59876,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 406.38081672415933,
+      "z": 5.76523356731311,
+      "yaw": 240,
+      "calls": 86,
+      "tris": 101053,
+      "shadowCalls": 17,
+      "shadowTris": 16552,
+      "mainCalls": 69,
+      "mainTris": 84501,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 6,
+        "culled": 40
+      }
+    },
+    {
+      "x": 409.02530490433656,
+      "z": -14.058357278118491,
+      "yaw": 0,
+      "calls": 75,
+      "tris": 90491,
+      "shadowCalls": 20,
+      "shadowTris": 21888,
+      "mainCalls": 55,
+      "mainTris": 68603,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 5,
+        "culled": 41
+      }
+    },
+    {
+      "x": 409.02530490433656,
+      "z": -14.058357278118491,
+      "yaw": 120,
+      "calls": 64,
+      "tris": 86258,
+      "shadowCalls": 18,
+      "shadowTris": 21386,
+      "mainCalls": 46,
+      "mainTris": 64872,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 5,
+        "culled": 41
+      }
+    },
+    {
+      "x": 409.02530490433656,
+      "z": -14.058357278118491,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 100979,
+      "shadowCalls": 18,
+      "shadowTris": 17444,
+      "mainCalls": 67,
+      "mainTris": 83535,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 5,
+        "culled": 41
+      }
+    },
+    {
+      "x": 410.54486309259835,
+      "z": -33.997795320718154,
+      "yaw": 0,
+      "calls": 68,
+      "tris": 86650,
+      "shadowCalls": 19,
+      "shadowTris": 21652,
+      "mainCalls": 49,
+      "mainTris": 64998,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 4,
+        "culled": 42
+      }
+    },
+    {
+      "x": 410.54486309259835,
+      "z": -33.997795320718154,
+      "yaw": 120,
+      "calls": 73,
+      "tris": 92830,
+      "shadowCalls": 19,
+      "shadowTris": 21886,
+      "mainCalls": 54,
+      "mainTris": 70944,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 4,
+        "culled": 42
+      }
+    },
+    {
+      "x": 410.54486309259835,
+      "z": -33.997795320718154,
+      "yaw": 240,
+      "calls": 83,
+      "tris": 100326,
+      "shadowCalls": 18,
+      "shadowTris": 17444,
+      "mainCalls": 65,
+      "mainTris": 82882,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 4,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.206768464924,
+      "z": -53.9848113301366,
+      "yaw": 0,
+      "calls": 61,
+      "tris": 87592,
+      "shadowCalls": 19,
+      "shadowTris": 22406,
+      "mainCalls": 42,
+      "mainTris": 65186,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.206768464924,
+      "z": -53.9848113301366,
+      "yaw": 120,
+      "calls": 76,
+      "tris": 98742,
+      "shadowCalls": 19,
+      "shadowTris": 22640,
+      "mainCalls": 57,
+      "mainTris": 76102,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.206768464924,
+      "z": -53.9848113301366,
+      "yaw": 240,
+      "calls": 86,
+      "tris": 106584,
+      "shadowCalls": 17,
+      "shadowTris": 17478,
+      "mainCalls": 69,
+      "mainTris": 89106,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.06443864597117,
+      "z": -73.9838787030313,
+      "yaw": 0,
+      "calls": 57,
+      "tris": 77619,
+      "shadowCalls": 19,
+      "shadowTris": 22426,
+      "mainCalls": 38,
+      "mainTris": 55193,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.06443864597117,
+      "z": -73.9838787030313,
+      "yaw": 120,
+      "calls": 73,
+      "tris": 97909,
+      "shadowCalls": 19,
+      "shadowTris": 22660,
+      "mainCalls": 54,
+      "mainTris": 75249,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 411.06443864597117,
+      "z": -73.9838787030313,
+      "yaw": 240,
+      "calls": 84,
+      "tris": 106016,
+      "shadowCalls": 18,
+      "shadowTris": 18218,
+      "mainCalls": 66,
+      "mainTris": 87798,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -470,
+      "z": -248,
+      "yaw": 0,
+      "calls": 53,
+      "tris": 53273,
+      "shadowCalls": 9,
+      "shadowTris": 6734,
+      "mainCalls": 44,
+      "mainTris": 46539,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -470,
+      "z": -248,
+      "yaw": 120,
+      "calls": 117,
+      "tris": 116197,
+      "shadowCalls": 21,
+      "shadowTris": 20808,
+      "mainCalls": 96,
+      "mainTris": 95389,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -470,
+      "z": -248,
+      "yaw": 240,
+      "calls": 34,
+      "tris": 40193,
+      "shadowCalls": 9,
+      "shadowTris": 6734,
+      "mainCalls": 25,
+      "mainTris": 33459,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -450.7376684949792,
+      "z": -253.37646246613897,
+      "yaw": 0,
+      "calls": 44,
+      "tris": 48810,
+      "shadowCalls": 9,
+      "shadowTris": 6204,
+      "mainCalls": 35,
+      "mainTris": 42606,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -450.7376684949792,
+      "z": -253.37646246613897,
+      "yaw": 120,
+      "calls": 117,
+      "tris": 112356,
+      "shadowCalls": 20,
+      "shadowTris": 19654,
+      "mainCalls": 97,
+      "mainTris": 92702,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -450.7376684949792,
+      "z": -253.37646246613897,
+      "yaw": 240,
+      "calls": 33,
+      "tris": 37067,
+      "shadowCalls": 9,
+      "shadowTris": 6204,
+      "mainCalls": 24,
+      "mainTris": 30863,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -431.5128924132186,
+      "z": -258.8904524064933,
+      "yaw": 0,
+      "calls": 43,
+      "tris": 46782,
+      "shadowCalls": 9,
+      "shadowTris": 5376,
+      "mainCalls": 34,
+      "mainTris": 41406,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 18,
+        "culled": 29
+      }
+    },
+    {
+      "x": -431.5128924132186,
+      "z": -258.8904524064933,
+      "yaw": 120,
+      "calls": 113,
+      "tris": 107006,
+      "shadowCalls": 18,
+      "shadowTris": 16874,
+      "mainCalls": 95,
+      "mainTris": 90132,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 18,
+        "culled": 29
+      }
+    },
+    {
+      "x": -431.5128924132186,
+      "z": -258.8904524064933,
+      "yaw": 240,
+      "calls": 31,
+      "tris": 32507,
+      "shadowCalls": 9,
+      "shadowTris": 5376,
+      "mainCalls": 22,
+      "mainTris": 27131,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 18,
+        "culled": 29
+      }
+    },
+    {
+      "x": -412.19424013731214,
+      "z": -264.0642159345277,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 43496,
+      "shadowCalls": 9,
+      "shadowTris": 4822,
+      "mainCalls": 31,
+      "mainTris": 38674,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 16,
+        "culled": 31
+      }
+    },
+    {
+      "x": -412.19424013731214,
+      "z": -264.0642159345277,
+      "yaw": 120,
+      "calls": 109,
+      "tris": 103459,
+      "shadowCalls": 17,
+      "shadowTris": 15752,
+      "mainCalls": 92,
+      "mainTris": 87707,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 16,
+        "culled": 31
+      }
+    },
+    {
+      "x": -412.19424013731214,
+      "z": -264.0642159345277,
+      "yaw": 240,
+      "calls": 30,
+      "tris": 29939,
+      "shadowCalls": 7,
+      "shadowTris": 3122,
+      "mainCalls": 23,
+      "mainTris": 26817,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 16,
+        "culled": 31
+      }
+    },
+    {
+      "x": -392.7075463860857,
+      "z": -268.55794262188186,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 41110,
+      "shadowCalls": 7,
+      "shadowTris": 3540,
+      "mainCalls": 30,
+      "mainTris": 37570,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -392.7075463860857,
+      "z": -268.55794262188186,
+      "yaw": 120,
+      "calls": 105,
+      "tris": 95250,
+      "shadowCalls": 16,
+      "shadowTris": 10264,
+      "mainCalls": 89,
+      "mainTris": 84986,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -392.7075463860857,
+      "z": -268.55794262188186,
+      "yaw": 240,
+      "calls": 28,
+      "tris": 25691,
+      "shadowCalls": 7,
+      "shadowTris": 2702,
+      "mainCalls": 21,
+      "mainTris": 22989,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -372.96855270937783,
+      "z": -271.72574013417983,
+      "yaw": 0,
+      "calls": 34,
+      "tris": 38988,
+      "shadowCalls": 3,
+      "shadowTris": 1554,
+      "mainCalls": 31,
+      "mainTris": 37434,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -372.96855270937783,
+      "z": -271.72574013417983,
+      "yaw": 120,
+      "calls": 98,
+      "tris": 86736,
+      "shadowCalls": 13,
+      "shadowTris": 5642,
+      "mainCalls": 85,
+      "mainTris": 81094,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -372.96855270937783,
+      "z": -271.72574013417983,
+      "yaw": 240,
+      "calls": 22,
+      "tris": 16985,
+      "shadowCalls": 7,
+      "shadowTris": 2476,
+      "mainCalls": 15,
+      "mainTris": 14509,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -353.0029768552816,
+      "z": -271.8084718971963,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 41494,
+      "shadowCalls": 2,
+      "shadowTris": 764,
+      "mainCalls": 35,
+      "mainTris": 40730,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -353.0029768552816,
+      "z": -271.8084718971963,
+      "yaw": 120,
+      "calls": 96,
+      "tris": 86468,
+      "shadowCalls": 13,
+      "shadowTris": 5642,
+      "mainCalls": 83,
+      "mainTris": 80826,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -353.0029768552816,
+      "z": -271.8084718971963,
+      "yaw": 240,
+      "calls": 18,
+      "tris": 15490,
+      "shadowCalls": 7,
+      "shadowTris": 2476,
+      "mainCalls": 11,
+      "mainTris": 13014,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -333.28171524442786,
+      "z": -268.5585227587142,
+      "yaw": 0,
+      "calls": 38,
+      "tris": 38266,
+      "shadowCalls": 3,
+      "shadowTris": 1428,
+      "mainCalls": 35,
+      "mainTris": 36838,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -333.28171524442786,
+      "z": -268.5585227587142,
+      "yaw": 120,
+      "calls": 89,
+      "tris": 78133,
+      "shadowCalls": 10,
+      "shadowTris": 3244,
+      "mainCalls": 79,
+      "mainTris": 74889,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -333.28171524442786,
+      "z": -268.5585227587142,
+      "yaw": 240,
+      "calls": 11,
+      "tris": 11318,
+      "shadowCalls": 1,
+      "shadowTris": 112,
+      "mainCalls": 10,
+      "mainTris": 11206,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -313.71296874176625,
+      "z": -264.4337445972804,
+      "yaw": 0,
+      "calls": 39,
+      "tris": 43356,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 37,
+      "mainTris": 42040,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -313.71296874176625,
+      "z": -264.4337445972804,
+      "yaw": 120,
+      "calls": 87,
+      "tris": 77679,
+      "shadowCalls": 10,
+      "shadowTris": 3084,
+      "mainCalls": 77,
+      "mainTris": 74595,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -313.71296874176625,
+      "z": -264.4337445972804,
+      "yaw": 240,
+      "calls": 11,
+      "tris": 10950,
+      "shadowCalls": 1,
+      "shadowTris": 112,
+      "mainCalls": 10,
+      "mainTris": 10838,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -293.86598215127003,
+      "z": -262.10474321195267,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 41745,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 35,
+      "mainTris": 40429,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": -293.86598215127003,
+      "z": -262.10474321195267,
+      "yaw": 120,
+      "calls": 83,
+      "tris": 80718,
+      "shadowCalls": 10,
+      "shadowTris": 6446,
+      "mainCalls": 73,
+      "mainTris": 74272,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": -293.86598215127003,
+      "z": -262.10474321195267,
+      "yaw": 240,
+      "calls": 12,
+      "tris": 10687,
+      "shadowCalls": 1,
+      "shadowTris": 112,
+      "mainCalls": 11,
+      "mainTris": 10575,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": -273.8852102429656,
+      "z": -262.6163419453399,
+      "yaw": 0,
+      "calls": 39,
+      "tris": 40733,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 37,
+      "mainTris": 39417,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -273.8852102429656,
+      "z": -262.6163419453399,
+      "yaw": 120,
+      "calls": 79,
+      "tris": 74636,
+      "shadowCalls": 5,
+      "shadowTris": 3460,
+      "mainCalls": 74,
+      "mainTris": 71176,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -273.8852102429656,
+      "z": -262.6163419453399,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 11239,
+      "shadowCalls": 0,
+      "shadowTris": 0,
+      "mainCalls": 13,
+      "mainTris": 11239,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -272.2435555555556,
+      "z": -262.74192592592595,
+      "yaw": 0,
+      "calls": 39,
+      "tris": 40733,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 37,
+      "mainTris": 39417,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -272.2435555555556,
+      "z": -262.74192592592595,
+      "yaw": 120,
+      "calls": 79,
+      "tris": 74636,
+      "shadowCalls": 5,
+      "shadowTris": 3460,
+      "mainCalls": 74,
+      "mainTris": 71176,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -272.2435555555556,
+      "z": -262.74192592592595,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 11239,
+      "shadowCalls": 0,
+      "shadowTris": 0,
+      "mainCalls": 13,
+      "mainTris": 11239,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -252.37015828590228,
+      "z": -264.96974116591105,
+      "yaw": 0,
+      "calls": 38,
+      "tris": 40221,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 36,
+      "mainTris": 38905,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -252.37015828590228,
+      "z": -264.96974116591105,
+      "yaw": 120,
+      "calls": 77,
+      "tris": 76522,
+      "shadowCalls": 4,
+      "shadowTris": 3600,
+      "mainCalls": 73,
+      "mainTris": 72922,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -252.37015828590228,
+      "z": -264.96974116591105,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 11851,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 10535,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -232.58084625794393,
+      "z": -267.86281324260864,
+      "yaw": 0,
+      "calls": 38,
+      "tris": 41125,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 36,
+      "mainTris": 39809,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -232.58084625794393,
+      "z": -267.86281324260864,
+      "yaw": 120,
+      "calls": 72,
+      "tris": 74049,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 69,
+      "mainTris": 72149,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -232.58084625794393,
+      "z": -267.86281324260864,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 11419,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 10103,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -212.81235271126903,
+      "z": -270.89691535272874,
+      "yaw": 0,
+      "calls": 35,
+      "tris": 35138,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 33,
+      "mainTris": 33822,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -212.81235271126903,
+      "z": -270.89691535272874,
+      "yaw": 120,
+      "calls": 67,
+      "tris": 65905,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 64,
+      "mainTris": 64005,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -212.81235271126903,
+      "z": -270.89691535272874,
+      "yaw": 240,
+      "calls": 14,
+      "tris": 11106,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 12,
+      "mainTris": 9790,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": -193.00415504618394,
+      "z": -273.65641351486835,
+      "yaw": 0,
+      "calls": 36,
+      "tris": 35738,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 34,
+      "mainTris": 34422,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -193.00415504618394,
+      "z": -273.65641351486835,
+      "yaw": 120,
+      "calls": 64,
+      "tris": 65086,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 61,
+      "mainTris": 63186,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -193.00415504618394,
+      "z": -273.65641351486835,
+      "yaw": 240,
+      "calls": 14,
+      "tris": 11106,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 12,
+      "mainTris": 9790,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": -173.11614130361093,
+      "z": -275.7540029126828,
+      "yaw": 0,
+      "calls": 42,
+      "tris": 39683,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 40,
+      "mainTris": 38367,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -173.11614130361093,
+      "z": -275.7540029126828,
+      "yaw": 120,
+      "calls": 61,
+      "tris": 63965,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 58,
+      "mainTris": 62065,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -173.11614130361093,
+      "z": -275.7540029126828,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 14414,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 13098,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -153.16500512719716,
+      "z": -277.1480225801056,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 39223,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 38,
+      "mainTris": 37907,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -153.16500512719716,
+      "z": -277.1480225801056,
+      "yaw": 120,
+      "calls": 62,
+      "tris": 65905,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 59,
+      "mainTris": 64005,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -153.16500512719716,
+      "z": -277.1480225801056,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 15206,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 13890,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -133.19749165382632,
+      "z": -278.2850222684626,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 38631,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 38,
+      "mainTris": 37315,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -133.19749165382632,
+      "z": -278.2850222684626,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 68069,
+      "shadowCalls": 3,
+      "shadowTris": 1900,
+      "mainCalls": 62,
+      "mainTris": 66169,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -133.19749165382632,
+      "z": -278.2850222684626,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 14606,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 13290,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -113.21686260937436,
+      "z": -279.16159300040374,
+      "yaw": 0,
+      "calls": 41,
+      "tris": 39703,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 39,
+      "mainTris": 38387,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -113.21686260937436,
+      "z": -279.16159300040374,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 69024,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 63,
+      "mainTris": 67708,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -113.21686260937436,
+      "z": -279.16159300040374,
+      "yaw": 240,
+      "calls": 14,
+      "tris": 14630,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 12,
+      "mainTris": 13314,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -93.2261155744136,
+      "z": -279.7646921936774,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 39507,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 38,
+      "mainTris": 38191,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -93.2261155744136,
+      "z": -279.7646921936774,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 63528,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 63,
+      "mainTris": 62212,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -93.2261155744136,
+      "z": -279.7646921936774,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 14330,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 11,
+      "mainTris": 13014,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -73.22888247170417,
+      "z": -280.0875960964389,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 33093,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 35,
+      "mainTris": 31777,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -73.22888247170417,
+      "z": -280.0875960964389,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 63528,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 63,
+      "mainTris": 62212,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -73.22888247170417,
+      "z": -280.0875960964389,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 14330,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 11,
+      "mainTris": 13014,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -53.22908553575571,
+      "z": -280.1271451406053,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 32846,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 35,
+      "mainTris": 31530,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -53.22908553575571,
+      "z": -280.1271451406053,
+      "yaw": 120,
+      "calls": 63,
+      "tris": 64360,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 61,
+      "mainTris": 63044,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -53.22908553575571,
+      "z": -280.1271451406053,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 19592,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 18276,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -33.23076379670573,
+      "z": -279.88290159204604,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 33298,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 38,
+      "mainTris": 31982,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -33.23076379670573,
+      "z": -279.88290159204604,
+      "yaw": 120,
+      "calls": 64,
+      "tris": 65214,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 62,
+      "mainTris": 63898,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -33.23076379670573,
+      "z": -279.88290159204604,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 20276,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 18960,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -13.238374670534643,
+      "z": -279.3372889969746,
+      "yaw": 0,
+      "calls": 38,
+      "tris": 32452,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 36,
+      "mainTris": 31136,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -13.238374670534643,
+      "z": -279.3372889969746,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 66652,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 63,
+      "mainTris": 65336,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": -13.238374670534643,
+      "z": -279.3372889969746,
+      "yaw": 240,
+      "calls": 17,
+      "tris": 20548,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 15,
+      "mainTris": 19232,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 6,
+        "culled": 41
+      }
+    },
+    {
+      "x": 6.745698307679791,
+      "z": -278.5418105111224,
+      "yaw": 0,
+      "calls": 40,
+      "tris": 34374,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 38,
+      "mainTris": 33058,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 6.745698307679791,
+      "z": -278.5418105111224,
+      "yaw": 120,
+      "calls": 66,
+      "tris": 67374,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 64,
+      "mainTris": 66058,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 6.745698307679791,
+      "z": -278.5418105111224,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 20000,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 18684,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 26.72098552001099,
+      "z": -277.5492007927377,
+      "yaw": 0,
+      "calls": 42,
+      "tris": 35010,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 40,
+      "mainTris": 33694,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 26.72098552001099,
+      "z": -277.5492007927377,
+      "yaw": 120,
+      "calls": 69,
+      "tris": 69368,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 67,
+      "mainTris": 68052,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 26.72098552001099,
+      "z": -277.5492007927377,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 20000,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 18684,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 7,
+        "culled": 40
+      }
+    },
+    {
+      "x": 46.687747030226,
+      "z": -276.39736154279603,
+      "yaw": 0,
+      "calls": 41,
+      "tris": 34710,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 39,
+      "mainTris": 33394,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 46.687747030226,
+      "z": -276.39736154279603,
+      "yaw": 120,
+      "calls": 71,
+      "tris": 69042,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 69,
+      "mainTris": 67726,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 46.687747030226,
+      "z": -276.39736154279603,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 20056,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 18740,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 66.64662618091302,
+      "z": -275.1159398356347,
+      "yaw": 0,
+      "calls": 43,
+      "tris": 39322,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 41,
+      "mainTris": 38006,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 66.64662618091302,
+      "z": -275.1159398356347,
+      "yaw": 120,
+      "calls": 73,
+      "tris": 68732,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 71,
+      "mainTris": 67416,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 66.64662618091302,
+      "z": -275.1159398356347,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 13286,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 11970,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 86.5985177643065,
+      "z": -273.7298242468913,
+      "yaw": 0,
+      "calls": 47,
+      "tris": 40710,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 45,
+      "mainTris": 39394,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 86.5985177643065,
+      "z": -273.7298242468913,
+      "yaw": 120,
+      "calls": 73,
+      "tris": 68426,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 71,
+      "mainTris": 67110,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 86.5985177643065,
+      "z": -273.7298242468913,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 13062,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 11746,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 8,
+        "culled": 39
+      }
+    },
+    {
+      "x": 106.54450999168945,
+      "z": -272.261161864709,
+      "yaw": 0,
+      "calls": 46,
+      "tris": 39227,
+      "shadowCalls": 3,
+      "shadowTris": 1596,
+      "mainCalls": 43,
+      "mainTris": 37631,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 106.54450999168945,
+      "z": -272.261161864709,
+      "yaw": 120,
+      "calls": 66,
+      "tris": 65946,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 64,
+      "mainTris": 64630,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 106.54450999168945,
+      "z": -272.261161864709,
+      "yaw": 240,
+      "calls": 17,
+      "tris": 13906,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 15,
+      "mainTris": 12590,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 126.47873553306597,
+      "z": -270.64256758383783,
+      "yaw": 0,
+      "calls": 50,
+      "tris": 39733,
+      "shadowCalls": 4,
+      "shadowTris": 1656,
+      "mainCalls": 46,
+      "mainTris": 38077,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 126.47873553306597,
+      "z": -270.64256758383783,
+      "yaw": 120,
+      "calls": 67,
+      "tris": 65904,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 65,
+      "mainTris": 64588,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 126.47873553306597,
+      "z": -270.64256758383783,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 12782,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 11466,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 146.38972556762576,
+      "z": -268.7589775654124,
+      "yaw": 0,
+      "calls": 49,
+      "tris": 39273,
+      "shadowCalls": 4,
+      "shadowTris": 1676,
+      "mainCalls": 45,
+      "mainTris": 37597,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 146.38972556762576,
+      "z": -268.7589775654124,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 63490,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 63,
+      "mainTris": 62174,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 146.38972556762576,
+      "z": -268.7589775654124,
+      "yaw": 240,
+      "calls": 15,
+      "tris": 12438,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 11122,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 166.28203324597604,
+      "z": -266.68672120598893,
+      "yaw": 0,
+      "calls": 50,
+      "tris": 39874,
+      "shadowCalls": 4,
+      "shadowTris": 1676,
+      "mainCalls": 46,
+      "mainTris": 38198,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 166.28203324597604,
+      "z": -266.68672120598893,
+      "yaw": 120,
+      "calls": 62,
+      "tris": 61996,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 60,
+      "mainTris": 60680,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 166.28203324597604,
+      "z": -266.68672120598893,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 12782,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 14,
+      "mainTris": 11466,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 186.1638038956501,
+      "z": -264.51533070725964,
+      "yaw": 0,
+      "calls": 47,
+      "tris": 35002,
+      "shadowCalls": 5,
+      "shadowTris": 2152,
+      "mainCalls": 42,
+      "mainTris": 32850,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 186.1638038956501,
+      "z": -264.51533070725964,
+      "yaw": 120,
+      "calls": 61,
+      "tris": 60097,
+      "shadowCalls": 3,
+      "shadowTris": 1596,
+      "mainCalls": 58,
+      "mainTris": 58501,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 186.1638038956501,
+      "z": -264.51533070725964,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 10922,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 11,
+      "mainTris": 9606,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 206.04511454188616,
+      "z": -262.3397173489318,
+      "yaw": 0,
+      "calls": 50,
+      "tris": 37680,
+      "shadowCalls": 7,
+      "shadowTris": 3926,
+      "mainCalls": 43,
+      "mainTris": 33754,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 206.04511454188616,
+      "z": -262.3397173489318,
+      "yaw": 120,
+      "calls": 62,
+      "tris": 60297,
+      "shadowCalls": 3,
+      "shadowTris": 1596,
+      "mainCalls": 59,
+      "mainTris": 58701,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 206.04511454188616,
+      "z": -262.3397173489318,
+      "yaw": 240,
+      "calls": 13,
+      "tris": 10842,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 11,
+      "mainTris": 9526,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 225.93632494943512,
+      "z": -260.2569378138521,
+      "yaw": 0,
+      "calls": 53,
+      "tris": 45679,
+      "shadowCalls": 7,
+      "shadowTris": 3966,
+      "mainCalls": 46,
+      "mainTris": 41713,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 225.93632494943512,
+      "z": -260.2569378138521,
+      "yaw": 120,
+      "calls": 65,
+      "tris": 59693,
+      "shadowCalls": 4,
+      "shadowTris": 1796,
+      "mainCalls": 61,
+      "mainTris": 57897,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 225.93632494943512,
+      "z": -260.2569378138521,
+      "yaw": 240,
+      "calls": 14,
+      "tris": 10994,
+      "shadowCalls": 3,
+      "shadowTris": 1516,
+      "mainCalls": 11,
+      "mainTris": 9478,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 245.84630847283196,
+      "z": -258.36278066572237,
+      "yaw": 0,
+      "calls": 52,
+      "tris": 45035,
+      "shadowCalls": 7,
+      "shadowTris": 4022,
+      "mainCalls": 45,
+      "mainTris": 41013,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 245.84630847283196,
+      "z": -258.36278066572237,
+      "yaw": 120,
+      "calls": 67,
+      "tris": 60217,
+      "shadowCalls": 5,
+      "shadowTris": 2076,
+      "mainCalls": 62,
+      "mainTris": 58141,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 245.84630847283196,
+      "z": -258.36278066572237,
+      "yaw": 240,
+      "calls": 16,
+      "tris": 12960,
+      "shadowCalls": 3,
+      "shadowTris": 1516,
+      "mainCalls": 13,
+      "mainTris": 11444,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 265.77700164968917,
+      "z": -256.69998942204916,
+      "yaw": 0,
+      "calls": 54,
+      "tris": 49002,
+      "shadowCalls": 7,
+      "shadowTris": 4210,
+      "mainCalls": 47,
+      "mainTris": 44792,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 265.77700164968917,
+      "z": -256.69998942204916,
+      "yaw": 120,
+      "calls": 64,
+      "tris": 58293,
+      "shadowCalls": 6,
+      "shadowTris": 2680,
+      "mainCalls": 58,
+      "mainTris": 55613,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 265.77700164968917,
+      "z": -256.69998942204916,
+      "yaw": 240,
+      "calls": 19,
+      "tris": 15532,
+      "shadowCalls": 5,
+      "shadowTris": 2400,
+      "mainCalls": 14,
+      "mainTris": 13132,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 278.1359310699588,
+      "z": -255.74228395061726,
+      "yaw": 0,
+      "calls": 51,
+      "tris": 47947,
+      "shadowCalls": 7,
+      "shadowTris": 4210,
+      "mainCalls": 44,
+      "mainTris": 43737,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 278.1359310699588,
+      "z": -255.74228395061726,
+      "yaw": 120,
+      "calls": 70,
+      "tris": 64943,
+      "shadowCalls": 6,
+      "shadowTris": 2680,
+      "mainCalls": 64,
+      "mainTris": 62263,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 278.1359310699588,
+      "z": -255.74228395061726,
+      "yaw": 240,
+      "calls": 22,
+      "tris": 16388,
+      "shadowCalls": 5,
+      "shadowTris": 2400,
+      "mainCalls": 17,
+      "mainTris": 13988,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 298.08237790323744,
+      "z": -254.2798817203784,
+      "yaw": 0,
+      "calls": 49,
+      "tris": 51136,
+      "shadowCalls": 7,
+      "shadowTris": 4422,
+      "mainCalls": 42,
+      "mainTris": 46714,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 298.08237790323744,
+      "z": -254.2798817203784,
+      "yaw": 120,
+      "calls": 72,
+      "tris": 68367,
+      "shadowCalls": 8,
+      "shadowTris": 5990,
+      "mainCalls": 64,
+      "mainTris": 62377,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 298.08237790323744,
+      "z": -254.2798817203784,
+      "yaw": 240,
+      "calls": 19,
+      "tris": 15150,
+      "shadowCalls": 5,
+      "shadowTris": 2612,
+      "mainCalls": 14,
+      "mainTris": 12538,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 318.03397150597215,
+      "z": -252.88933481981684,
+      "yaw": 0,
+      "calls": 49,
+      "tris": 52716,
+      "shadowCalls": 6,
+      "shadowTris": 4066,
+      "mainCalls": 43,
+      "mainTris": 48650,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 318.03397150597215,
+      "z": -252.88933481981684,
+      "yaw": 120,
+      "calls": 75,
+      "tris": 76860,
+      "shadowCalls": 8,
+      "shadowTris": 6354,
+      "mainCalls": 67,
+      "mainTris": 70506,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 318.03397150597215,
+      "z": -252.88933481981684,
+      "yaw": 240,
+      "calls": 19,
+      "tris": 19858,
+      "shadowCalls": 5,
+      "shadowTris": 2976,
+      "mainCalls": 14,
+      "mainTris": 16882,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 2,
+        "culled": 45
+      }
+    },
+    {
+      "x": 337.98855121494563,
+      "z": -251.54223943415454,
+      "yaw": 0,
+      "calls": 53,
+      "tris": 55982,
+      "shadowCalls": 5,
+      "shadowTris": 3942,
+      "mainCalls": 48,
+      "mainTris": 52040,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 337.98855121494563,
+      "z": -251.54223943415454,
+      "yaw": 120,
+      "calls": 79,
+      "tris": 76925,
+      "shadowCalls": 9,
+      "shadowTris": 7262,
+      "mainCalls": 70,
+      "mainTris": 69663,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 337.98855121494563,
+      "z": -251.54223943415454,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 23130,
+      "shadowCalls": 5,
+      "shadowTris": 3448,
+      "mainCalls": 15,
+      "mainTris": 19682,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 4,
+        "culled": 43
+      }
+    },
+    {
+      "x": 357.9441469401699,
+      "z": -250.21024956693546,
+      "yaw": 0,
+      "calls": 54,
+      "tris": 55428,
+      "shadowCalls": 5,
+      "shadowTris": 4278,
+      "mainCalls": 49,
+      "mainTris": 51150,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 357.9441469401699,
+      "z": -250.21024956693546,
+      "yaw": 120,
+      "calls": 80,
+      "tris": 82017,
+      "shadowCalls": 9,
+      "shadowTris": 7598,
+      "mainCalls": 71,
+      "mainTris": 74419,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 357.9441469401699,
+      "z": -250.21024956693546,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 25450,
+      "shadowCalls": 5,
+      "shadowTris": 3784,
+      "mainCalls": 15,
+      "mainTris": 21666,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 377.89828270813473,
+      "z": -248.85663411720313,
+      "yaw": 0,
+      "calls": 54,
+      "tris": 57432,
+      "shadowCalls": 5,
+      "shadowTris": 4474,
+      "mainCalls": 49,
+      "mainTris": 52958,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 377.89828270813473,
+      "z": -248.85663411720313,
+      "yaw": 120,
+      "calls": 80,
+      "tris": 84025,
+      "shadowCalls": 9,
+      "shadowTris": 7794,
+      "mainCalls": 71,
+      "mainTris": 76231,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 377.89828270813473,
+      "z": -248.85663411720313,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 27442,
+      "shadowCalls": 5,
+      "shadowTris": 3980,
+      "mainCalls": 15,
+      "mainTris": 23462,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 397.84708828217515,
+      "z": -247.4267971173085,
+      "yaw": 0,
+      "calls": 53,
+      "tris": 60649,
+      "shadowCalls": 7,
+      "shadowTris": 5612,
+      "mainCalls": 46,
+      "mainTris": 55037,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 397.84708828217515,
+      "z": -247.4267971173085,
+      "yaw": 120,
+      "calls": 78,
+      "tris": 87739,
+      "shadowCalls": 11,
+      "shadowTris": 12316,
+      "mainCalls": 67,
+      "mainTris": 75423,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 397.84708828217515,
+      "z": -247.4267971173085,
+      "yaw": 240,
+      "calls": 22,
+      "tris": 32169,
+      "shadowCalls": 4,
+      "shadowTris": 4208,
+      "mainCalls": 18,
+      "mainTris": 27961,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 417.79258352957777,
+      "z": -245.95127865974897,
+      "yaw": 0,
+      "calls": 47,
+      "tris": 59507,
+      "shadowCalls": 7,
+      "shadowTris": 6502,
+      "mainCalls": 40,
+      "mainTris": 53005,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 417.79258352957777,
+      "z": -245.95127865974897,
+      "yaw": 120,
+      "calls": 81,
+      "tris": 94712,
+      "shadowCalls": 12,
+      "shadowTris": 13296,
+      "mainCalls": 69,
+      "mainTris": 81416,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 417.79258352957777,
+      "z": -245.95127865974897,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 40273,
+      "shadowCalls": 3,
+      "shadowTris": 4312,
+      "mainCalls": 17,
+      "mainTris": 35961,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 437.7362855073686,
+      "z": -244.45170900381876,
+      "yaw": 0,
+      "calls": 44,
+      "tris": 59819,
+      "shadowCalls": 7,
+      "shadowTris": 6918,
+      "mainCalls": 37,
+      "mainTris": 52901,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 437.7362855073686,
+      "z": -244.45170900381876,
+      "yaw": 120,
+      "calls": 85,
+      "tris": 101682,
+      "shadowCalls": 12,
+      "shadowTris": 13896,
+      "mainCalls": 73,
+      "mainTris": 87786,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 437.7362855073686,
+      "z": -244.45170900381876,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 42485,
+      "shadowCalls": 3,
+      "shadowTris": 4728,
+      "mainCalls": 17,
+      "mainTris": 37757,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 457.67869346686086,
+      "z": -242.93501725268231,
+      "yaw": 0,
+      "calls": 43,
+      "tris": 61027,
+      "shadowCalls": 9,
+      "shadowTris": 7746,
+      "mainCalls": 34,
+      "mainTris": 53281,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 457.67869346686086,
+      "z": -242.93501725268231,
+      "yaw": 120,
+      "calls": 97,
+      "tris": 106259,
+      "shadowCalls": 17,
+      "shadowTris": 15632,
+      "mainCalls": 80,
+      "mainTris": 90627,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 457.67869346686086,
+      "z": -242.93501725268231,
+      "yaw": 240,
+      "calls": 20,
+      "tris": 44253,
+      "shadowCalls": 3,
+      "shadowTris": 5156,
+      "mainCalls": 17,
+      "mainTris": 39097,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": -520,
+      "z": -142,
+      "yaw": 0,
+      "calls": 63,
+      "tris": 148002,
+      "shadowCalls": 22,
+      "shadowTris": 79800,
+      "mainCalls": 41,
+      "mainTris": 68202,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -142,
+      "yaw": 120,
+      "calls": 130,
+      "tris": 260997,
+      "shadowCalls": 28,
+      "shadowTris": 95986,
+      "mainCalls": 102,
+      "mainTris": 165011,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -520,
+      "z": -142,
+      "yaw": 240,
+      "calls": 105,
+      "tris": 223368,
+      "shadowCalls": 28,
+      "shadowTris": 97026,
+      "mainCalls": 77,
+      "mainTris": 126342,
+      "blocks": {
+        "blocks": 47,
+        "detail": 7,
+        "proxy": 16,
+        "culled": 24
+      }
+    },
+    {
+      "x": -521.3041304611834,
+      "z": -161.95732986103405,
+      "yaw": 0,
+      "calls": 53,
+      "tris": 101688,
+      "shadowCalls": 18,
+      "shadowTris": 38712,
+      "mainCalls": 35,
+      "mainTris": 62976,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 18,
+        "culled": 25
+      }
+    },
+    {
+      "x": -521.3041304611834,
+      "z": -161.95732986103405,
+      "yaw": 120,
+      "calls": 125,
+      "tris": 216070,
+      "shadowCalls": 28,
+      "shadowTris": 73969,
+      "mainCalls": 97,
+      "mainTris": 142101,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 18,
+        "culled": 25
+      }
+    },
+    {
+      "x": -521.3041304611834,
+      "z": -161.95732986103405,
+      "yaw": 240,
+      "calls": 102,
+      "tris": 201181,
+      "shadowCalls": 28,
+      "shadowTris": 75009,
+      "mainCalls": 74,
+      "mainTris": 126172,
+      "blocks": {
+        "blocks": 47,
+        "detail": 4,
+        "proxy": 18,
+        "culled": 25
+      }
+    },
+    {
+      "x": -522.0371203775138,
+      "z": -181.94125826109234,
+      "yaw": 0,
+      "calls": 44,
+      "tris": 66131,
+      "shadowCalls": 13,
+      "shadowTris": 22892,
+      "mainCalls": 31,
+      "mainTris": 43239,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -522.0371203775138,
+      "z": -181.94125826109234,
+      "yaw": 120,
+      "calls": 116,
+      "tris": 161913,
+      "shadowCalls": 25,
+      "shadowTris": 47959,
+      "mainCalls": 91,
+      "mainTris": 113954,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -522.0371203775138,
+      "z": -181.94125826109234,
+      "yaw": 240,
+      "calls": 96,
+      "tris": 149376,
+      "shadowCalls": 26,
+      "shadowTris": 49189,
+      "mainCalls": 70,
+      "mainTris": 100187,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 19,
+        "culled": 26
+      }
+    },
+    {
+      "x": -522.46276272754,
+      "z": -201.92498760561352,
+      "yaw": 0,
+      "calls": 37,
+      "tris": 48916,
+      "shadowCalls": 10,
+      "shadowTris": 9648,
+      "mainCalls": 27,
+      "mainTris": 39268,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 18,
+        "culled": 27
+      }
+    },
+    {
+      "x": -522.46276272754,
+      "z": -201.92498760561352,
+      "yaw": 120,
+      "calls": 118,
+      "tris": 158590,
+      "shadowCalls": 24,
+      "shadowTris": 45643,
+      "mainCalls": 94,
+      "mainTris": 112947,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 18,
+        "culled": 27
+      }
+    },
+    {
+      "x": -522.46276272754,
+      "z": -201.92498760561352,
+      "yaw": 240,
+      "calls": 92,
+      "tris": 132878,
+      "shadowCalls": 23,
+      "shadowTris": 36438,
+      "mainCalls": 69,
+      "mainTris": 96440,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 18,
+        "culled": 27
+      }
+    },
+    {
+      "x": -514.3506724107169,
+      "z": -219.67759856905516,
+      "yaw": 0,
+      "calls": 44,
+      "tris": 53349,
+      "shadowCalls": 9,
+      "shadowTris": 9064,
+      "mainCalls": 35,
+      "mainTris": 44285,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 19,
+        "culled": 27
+      }
+    },
+    {
+      "x": -514.3506724107169,
+      "z": -219.67759856905516,
+      "yaw": 120,
+      "calls": 138,
+      "tris": 165071,
+      "shadowCalls": 27,
+      "shadowTris": 45495,
+      "mainCalls": 111,
+      "mainTris": 119576,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 19,
+        "culled": 27
+      }
+    },
+    {
+      "x": -514.3506724107169,
+      "z": -219.67759856905516,
+      "yaw": 240,
+      "calls": 44,
+      "tris": 60850,
+      "shadowCalls": 14,
+      "shadowTris": 19804,
+      "mainCalls": 30,
+      "mainTris": 41046,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 19,
+        "culled": 27
+      }
+    },
+    {
+      "x": -498.7042906161734,
+      "z": -232.08274052689234,
+      "yaw": 0,
+      "calls": 51,
+      "tris": 51795,
+      "shadowCalls": 9,
+      "shadowTris": 7400,
+      "mainCalls": 42,
+      "mainTris": 44395,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 20,
+        "culled": 27
+      }
+    },
+    {
+      "x": -498.7042906161734,
+      "z": -232.08274052689234,
+      "yaw": 120,
+      "calls": 129,
+      "tris": 127412,
+      "shadowCalls": 23,
+      "shadowTris": 23172,
+      "mainCalls": 106,
+      "mainTris": 104240,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 20,
+        "culled": 27
+      }
+    },
+    {
+      "x": -498.7042906161734,
+      "z": -232.08274052689234,
+      "yaw": 240,
+      "calls": 35,
+      "tris": 43016,
+      "shadowCalls": 10,
+      "shadowTris": 7984,
+      "mainCalls": 25,
+      "mainTris": 35032,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 20,
+        "culled": 27
+      }
+    },
+    {
+      "x": -481.5671235866175,
+      "z": -242.3406000349541,
+      "yaw": 0,
+      "calls": 48,
+      "tris": 52386,
+      "shadowCalls": 9,
+      "shadowTris": 7400,
+      "mainCalls": 39,
+      "mainTris": 44986,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -481.5671235866175,
+      "z": -242.3406000349541,
+      "yaw": 120,
+      "calls": 121,
+      "tris": 122311,
+      "shadowCalls": 22,
+      "shadowTris": 22600,
+      "mainCalls": 99,
+      "mainTris": 99711,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": -481.5671235866175,
+      "z": -242.3406000349541,
+      "yaw": 240,
+      "calls": 34,
+      "tris": 42555,
+      "shadowCalls": 9,
+      "shadowTris": 7400,
+      "mainCalls": 25,
+      "mainTris": 35155,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 19,
+        "culled": 28
+      }
+    },
+    {
+      "x": 0,
+      "z": -70,
+      "yaw": 0,
+      "calls": 67,
+      "tris": 81374,
+      "shadowCalls": 21,
+      "shadowTris": 20972,
+      "mainCalls": 46,
+      "mainTris": 60402,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 13,
+        "culled": 31
+      }
+    },
+    {
+      "x": 0,
+      "z": -70,
+      "yaw": 120,
+      "calls": 113,
+      "tris": 121060,
+      "shadowCalls": 25,
+      "shadowTris": 30680,
+      "mainCalls": 88,
+      "mainTris": 90380,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 13,
+        "culled": 31
+      }
+    },
+    {
+      "x": 0,
+      "z": -70,
+      "yaw": 240,
+      "calls": 122,
+      "tris": 124607,
+      "shadowCalls": 30,
+      "shadowTris": 31732,
+      "mainCalls": 92,
+      "mainTris": 92875,
+      "blocks": {
+        "blocks": 47,
+        "detail": 3,
+        "proxy": 13,
+        "culled": 31
+      }
+    },
+    {
+      "x": -2.253602827265425,
+      "z": -89.87253844672452,
+      "yaw": 0,
+      "calls": 56,
+      "tris": 72889,
+      "shadowCalls": 16,
+      "shadowTris": 16866,
+      "mainCalls": 40,
+      "mainTris": 56023,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -2.253602827265425,
+      "z": -89.87253844672452,
+      "yaw": 120,
+      "calls": 113,
+      "tris": 119856,
+      "shadowCalls": 25,
+      "shadowTris": 30386,
+      "mainCalls": 88,
+      "mainTris": 89470,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -2.253602827265425,
+      "z": -89.87253844672452,
+      "yaw": 240,
+      "calls": 119,
+      "tris": 121244,
+      "shadowCalls": 29,
+      "shadowTris": 30584,
+      "mainCalls": 90,
+      "mainTris": 90660,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -4.598418229920788,
+      "z": -109.73447230623978,
+      "yaw": 0,
+      "calls": 47,
+      "tris": 60044,
+      "shadowCalls": 14,
+      "shadowTris": 11086,
+      "mainCalls": 33,
+      "mainTris": 48958,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -4.598418229920788,
+      "z": -109.73447230623978,
+      "yaw": 120,
+      "calls": 110,
+      "tris": 114554,
+      "shadowCalls": 24,
+      "shadowTris": 24728,
+      "mainCalls": 86,
+      "mainTris": 89826,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -4.598418229920788,
+      "z": -109.73447230623978,
+      "yaw": 240,
+      "calls": 116,
+      "tris": 118462,
+      "shadowCalls": 27,
+      "shadowTris": 29972,
+      "mainCalls": 89,
+      "mainTris": 88490,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 14,
+        "culled": 31
+      }
+    },
+    {
+      "x": -7.304735696001587,
+      "z": -129.54994644214852,
+      "yaw": 0,
+      "calls": 39,
+      "tris": 50580,
+      "shadowCalls": 12,
+      "shadowTris": 10460,
+      "mainCalls": 27,
+      "mainTris": 40120,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 15,
+        "culled": 31
+      }
+    },
+    {
+      "x": -7.304735696001587,
+      "z": -129.54994644214852,
+      "yaw": 120,
+      "calls": 104,
+      "tris": 104790,
+      "shadowCalls": 20,
+      "shadowTris": 17164,
+      "mainCalls": 84,
+      "mainTris": 87626,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 15,
+        "culled": 31
+      }
+    },
+    {
+      "x": -7.304735696001587,
+      "z": -129.54994644214852,
+      "yaw": 240,
+      "calls": 109,
+      "tris": 105446,
+      "shadowCalls": 22,
+      "shadowTris": 18254,
+      "mainCalls": 87,
+      "mainTris": 87192,
+      "blocks": {
+        "blocks": 47,
+        "detail": 1,
+        "proxy": 15,
+        "culled": 31
+      }
+    },
+    {
+      "x": -10.605436755565645,
+      "z": -149.27517099795506,
+      "yaw": 0,
+      "calls": 25,
+      "tris": 38108,
+      "shadowCalls": 5,
+      "shadowTris": 7872,
+      "mainCalls": 20,
+      "mainTris": 30236,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -10.605436755565645,
+      "z": -149.27517099795506,
+      "yaw": 120,
+      "calls": 96,
+      "tris": 100454,
+      "shadowCalls": 18,
+      "shadowTris": 15882,
+      "mainCalls": 78,
+      "mainTris": 84572,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -10.605436755565645,
+      "z": -149.27517099795506,
+      "yaw": 240,
+      "calls": 105,
+      "tris": 100895,
+      "shadowCalls": 19,
+      "shadowTris": 15894,
+      "mainCalls": 86,
+      "mainTris": 85001,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -14.289748284790397,
+      "z": -168.93265120933447,
+      "yaw": 0,
+      "calls": 22,
+      "tris": 29768,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 20,
+      "mainTris": 28452,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -14.289748284790397,
+      "z": -168.93265120933447,
+      "yaw": 120,
+      "calls": 85,
+      "tris": 88121,
+      "shadowCalls": 13,
+      "shadowTris": 11106,
+      "mainCalls": 72,
+      "mainTris": 77015,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -14.289748284790397,
+      "z": -168.93265120933447,
+      "yaw": 240,
+      "calls": 102,
+      "tris": 95784,
+      "shadowCalls": 19,
+      "shadowTris": 15318,
+      "mainCalls": 83,
+      "mainTris": 80466,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -18.259405453754294,
+      "z": -188.53458507601044,
+      "yaw": 0,
+      "calls": 19,
+      "tris": 26180,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 17,
+      "mainTris": 24864,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -18.259405453754294,
+      "z": -188.53458507601044,
+      "yaw": 120,
+      "calls": 84,
+      "tris": 81649,
+      "shadowCalls": 12,
+      "shadowTris": 8484,
+      "mainCalls": 72,
+      "mainTris": 73165,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -18.259405453754294,
+      "z": -188.53458507601044,
+      "yaw": 240,
+      "calls": 95,
+      "tris": 87682,
+      "shadowCalls": 14,
+      "shadowTris": 10466,
+      "mainCalls": 81,
+      "mainTris": 77216,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 15,
+        "culled": 32
+      }
+    },
+    {
+      "x": -22.463575289419946,
+      "z": -208.0875878050552,
+      "yaw": 0,
+      "calls": 18,
+      "tris": 23940,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 16,
+      "mainTris": 22624,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -22.463575289419946,
+      "z": -208.0875878050552,
+      "yaw": 120,
+      "calls": 83,
+      "tris": 76285,
+      "shadowCalls": 11,
+      "shadowTris": 6306,
+      "mainCalls": 72,
+      "mainTris": 69979,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -22.463575289419946,
+      "z": -208.0875878050552,
+      "yaw": 240,
+      "calls": 88,
+      "tris": 77878,
+      "shadowCalls": 12,
+      "shadowTris": 6530,
+      "mainCalls": 76,
+      "mainTris": 71348,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 13,
+        "culled": 34
+      }
+    },
+    {
+      "x": -26.995179958146537,
+      "z": -227.56717720347567,
+      "yaw": 0,
+      "calls": 18,
+      "tris": 22988,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 16,
+      "mainTris": 21672,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -26.995179958146537,
+      "z": -227.56717720347567,
+      "yaw": 120,
+      "calls": 68,
+      "tris": 62129,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 66,
+      "mainTris": 60813,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -26.995179958146537,
+      "z": -227.56717720347567,
+      "yaw": 240,
+      "calls": 84,
+      "tris": 72578,
+      "shadowCalls": 10,
+      "shadowTris": 5422,
+      "mainCalls": 74,
+      "mainTris": 67156,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 11,
+        "culled": 36
+      }
+    },
+    {
+      "x": -31.74952626774614,
+      "z": -246.9938120350443,
+      "yaw": 0,
+      "calls": 17,
+      "tris": 21916,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 15,
+      "mainTris": 20600,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -31.74952626774614,
+      "z": -246.9938120350443,
+      "yaw": 120,
+      "calls": 64,
+      "tris": 59085,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 62,
+      "mainTris": 57769,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -31.74952626774614,
+      "z": -246.9938120350443,
+      "yaw": 240,
+      "calls": 73,
+      "tris": 67543,
+      "shadowCalls": 3,
+      "shadowTris": 1752,
+      "mainCalls": 70,
+      "mainTris": 65791,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 10,
+        "culled": 37
+      }
+    },
+    {
+      "x": -36.60623965985223,
+      "z": -266.3951528232041,
+      "yaw": 0,
+      "calls": 15,
+      "tris": 20092,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 13,
+      "mainTris": 18776,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": -36.60623965985223,
+      "z": -266.3951528232041,
+      "yaw": 120,
+      "calls": 48,
+      "tris": 51017,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 46,
+      "mainTris": 49701,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": -36.60623965985223,
+      "z": -266.3951528232041,
+      "yaw": 240,
+      "calls": 67,
+      "tris": 62020,
+      "shadowCalls": 2,
+      "shadowTris": 1316,
+      "mainCalls": 65,
+      "mainTris": 60704,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 9,
+        "culled": 38
+      }
+    },
+    {
+      "x": 520,
+      "z": -174,
+      "yaw": 0,
+      "calls": 36,
+      "tris": 53388,
+      "shadowCalls": 10,
+      "shadowTris": 9204,
+      "mainCalls": 26,
+      "mainTris": 44184,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 3,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520,
+      "z": -174,
+      "yaw": 120,
+      "calls": 74,
+      "tris": 170313,
+      "shadowCalls": 19,
+      "shadowTris": 58784,
+      "mainCalls": 55,
+      "mainTris": 111529,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 3,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520,
+      "z": -174,
+      "yaw": 240,
+      "calls": 93,
+      "tris": 177975,
+      "shadowCalls": 19,
+      "shadowTris": 58784,
+      "mainCalls": 74,
+      "mainTris": 119191,
+      "blocks": {
+        "blocks": 47,
+        "detail": 2,
+        "proxy": 3,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.965703788875,
+      "z": -193.97525331357852,
+      "yaw": 0,
+      "calls": 34,
+      "tris": 51280,
+      "shadowCalls": 9,
+      "shadowTris": 8462,
+      "mainCalls": 25,
+      "mainTris": 42818,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.965703788875,
+      "z": -193.97525331357852,
+      "yaw": 120,
+      "calls": 62,
+      "tris": 79451,
+      "shadowCalls": 17,
+      "shadowTris": 16428,
+      "mainCalls": 45,
+      "mainTris": 63023,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.965703788875,
+      "z": -193.97525331357852,
+      "yaw": 240,
+      "calls": 85,
+      "tris": 98037,
+      "shadowCalls": 17,
+      "shadowTris": 16428,
+      "mainCalls": 68,
+      "mainTris": 81609,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.1412269237394,
+      "z": -213.65512541274697,
+      "yaw": 0,
+      "calls": 27,
+      "tris": 46036,
+      "shadowCalls": 7,
+      "shadowTris": 6128,
+      "mainCalls": 20,
+      "mainTris": 39908,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.1412269237394,
+      "z": -213.65512541274697,
+      "yaw": 120,
+      "calls": 45,
+      "tris": 64498,
+      "shadowCalls": 16,
+      "shadowTris": 15404,
+      "mainCalls": 29,
+      "mainTris": 49094,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 520.1412269237394,
+      "z": -213.65512541274697,
+      "yaw": 240,
+      "calls": 97,
+      "tris": 103013,
+      "shadowCalls": 17,
+      "shadowTris": 15904,
+      "mainCalls": 80,
+      "mainTris": 87109,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 506.3245820693312,
+      "z": -227.90979117991074,
+      "yaw": 0,
+      "calls": 44,
+      "tris": 55852,
+      "shadowCalls": 8,
+      "shadowTris": 6352,
+      "mainCalls": 36,
+      "mainTris": 49500,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 506.3245820693312,
+      "z": -227.90979117991074,
+      "yaw": 120,
+      "calls": 25,
+      "tris": 43299,
+      "shadowCalls": 8,
+      "shadowTris": 6352,
+      "mainCalls": 17,
+      "mainTris": 36947,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 506.3245820693312,
+      "z": -227.90979117991074,
+      "yaw": 240,
+      "calls": 95,
+      "tris": 99688,
+      "shadowCalls": 17,
+      "shadowTris": 15848,
+      "mainCalls": 78,
+      "mainTris": 83840,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 488.46284430306673,
+      "z": -236.6735087218822,
+      "yaw": 0,
+      "calls": 46,
+      "tris": 58736,
+      "shadowCalls": 9,
+      "shadowTris": 7882,
+      "mainCalls": 37,
+      "mainTris": 50854,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 488.46284430306673,
+      "z": -236.6735087218822,
+      "yaw": 120,
+      "calls": 18,
+      "tris": 41689,
+      "shadowCalls": 3,
+      "shadowTris": 5492,
+      "mainCalls": 15,
+      "mainTris": 36197,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    },
+    {
+      "x": 488.46284430306673,
+      "z": -236.6735087218822,
+      "yaw": 240,
+      "calls": 84,
+      "tris": 92240,
+      "shadowCalls": 17,
+      "shadowTris": 15848,
+      "mainCalls": 67,
+      "mainTris": 76392,
+      "blocks": {
+        "blocks": 47,
+        "detail": 0,
+        "proxy": 5,
+        "culled": 42
+      }
+    }
+  ]
+}

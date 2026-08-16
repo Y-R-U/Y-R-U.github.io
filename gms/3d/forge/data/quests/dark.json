@@ -537,9 +537,11 @@
         "text": "Fill six barrels",
         "recover": [["arm", "reach.east.barrel"], ["moveTo", "stand.east"]] },
 
-      { "id": "hold", "do": ["survive", "reach.east", 90], "unseen": true,
+      { "id": "hold", "all": [["survive", "reach.east", 90], ["kill", "creek_crab", 4]],
+        "in": "reach.east", "unseen": true,
         "text": "Wait out the picket's round",
-        "recover": [["moveTo", "stand.east"]] },
+        "hint": "Nothing on two legs comes. Nobody has worked these stands since the raid.",
+        "recover": [["moveTo", "stand.east"], ["respawn", "creek_crab", 4]] },
 
       { "id": "out", "do": ["talk", "sela", "dark.16.out"],
         "text": "Walk the water home" }
@@ -726,9 +728,11 @@
         "text": "Take the keep back",
         "recover": [["moveTo", "bst.bailey"]] },
 
-      { "id": "hold", "do": ["survive", "bst.bailey", 120],
+      { "id": "hold", "all": [["survive", "bst.bailey", 120], ["kill", "watchman", 4]],
+        "in": "bst.bailey",
         "text": "Hold the bailey until the horn",
-        "recover": [["moveTo", "bst.bailey"]] },
+        "hint": "Kesta's people rally at the gatehouse and come back.",
+        "recover": [["moveTo", "bst.bailey"], ["respawn", "watchman", 4]] },
 
       { "id": "out", "do": ["talk", "sela", "dark.21.out"],
         "text": "Stand in front of Kesta" }

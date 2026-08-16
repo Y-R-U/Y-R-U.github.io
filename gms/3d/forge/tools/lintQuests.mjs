@@ -15,6 +15,7 @@ import { SCHOOLS } from '../js/sim/schools.js';
 import { ENEMIES, CATCH, FORAGE, ROCK, ITEM_VALUE, SHOP } from '../js/sim/tables.js';
 import { SPELLS } from '../js/sim/spells.js';
 import { QUESTS, SANDBOX, ACTS } from '../js/sim/campaign.js';
+import { planFrom } from '../js/game/spawner.js';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -196,7 +197,35 @@ export function lintAll(root = ROOT) {
   // A school column that no enemy in the quest can pay is a silent hole in the XP economy, not a
   // style note — it reads as a trained school and awards nothing. Kept in `errors` so it gates.
   errors.push(...schoolPayErrors(defs));
+  errors.push(...emptyHoldErrors(defs, areas));
   return { errors, warnings, defs, dialogue, areas, truths, played };
+}
+
+// A `survive` step is a last stand, and `planFrom` is the only thing that decides whether anything
+// is standing there. It reads `kill` objectives and it reads them per quest, so a hold whose own
+// quest asks for no kills in its own hold area is an empty field for the whole duration unless some
+// unrelated quest happens to be active at the same moment. Five of the nine shipped that way.
+//
+// Asked of `planFrom` itself rather than of the objective list, so the rule cannot drift from what
+// the spawner actually does with `s.in || o.area` and `PER_AREA`. A step that is meant to stage
+// nothing says so with `"unopposed": true` — an author's claim in the data, not a name the linter
+// knows.
+export function emptyHoldErrors(defs, areas) {
+  const out = [];
+  for (const def of Object.values(defs)) {
+    const mine = planFrom({ [def.id]: def }, areas);
+    for (const s of def.steps) {
+      for (const o of s.objectives) {
+        if (o.k !== 'survive' || s.unopposed) continue;
+        const area = s.in || o.area;
+        if (mine.get(area)?.size) continue;
+        out.push(`${def.id}.${s.id}: survive ${o.seconds}s in ${area}, and ${def.id} plans no enemy `
+          + `there — add a \`kill\` objective with \`"in": "${area}"\`, or mark the step `
+          + '`"unopposed": true` if the hold is meant to stage nothing');
+      }
+    }
+  }
+  return out;
 }
 
 // Which non-combat work pays which school, so a quest that trains Ward by taking hits under Brace

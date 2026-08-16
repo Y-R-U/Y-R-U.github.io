@@ -8,7 +8,10 @@ export function getScenario(id) { return registry.get(id); }
 export function allScenarios() { return [...registry.values()]; }
 
 export function frameCamera(app, { pos, look, fov = 55 }) {
-  app.camera.fov = fov;
+  // Through the knob, not app.setFov: `fov` is registered with quality, and usePreset() re-applies
+  // every knob from its own settings. A direct write is stomped back to 55 the moment --preset or
+  // any other param is applied, which happens after the scenario has run.
+  app.quality.set('fov', fov);
   app.camera.position.set(...pos);
   app.camera.lookAt(...look);
   app.camera.updateProjectionMatrix();

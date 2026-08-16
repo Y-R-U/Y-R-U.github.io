@@ -19,8 +19,10 @@ const SIGS = {
 
 // `onDay` is the eighth-day gate: n means the last day of every n-day cycle. STORY.md §4's
 // "the eighth day is a fiction, not a wait" — the step advances the clock to it on accept.
+// `unopposed` is a `survive` step claiming it is meant to stage nothing; the linter takes it as an
+// answer and errors on every other empty hold.
 export const STEP_MODIFIERS = ['in', 'after', 'before', 'onDay', 'within', 'via', 'verb', 'worn',
-  'unseen', 'require', 'fail', 'optional', 'hidden', 'recover'];
+  'unseen', 'unopposed', 'require', 'fail', 'optional', 'hidden', 'recover'];
 
 const VIA = ['sell', 'craft', 'gather'];
 const CAMPAIGNS = ['light', 'neutral', 'dark', 'sandbox'];
@@ -75,6 +77,7 @@ function step(raw, path, errors, warnings) {
     verb: raw.verb ?? null,
     worn: raw.worn === undefined ? undefined : raw.worn,
     unseen: !!raw.unseen,
+    unopposed: !!raw.unopposed,
     require: raw.require ?? null,
     fail: raw.fail ?? null,
     optional: !!raw.optional,

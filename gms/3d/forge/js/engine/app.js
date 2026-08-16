@@ -3,6 +3,7 @@ import { Stats } from './stats.js';
 import { Quality } from './quality.js';
 import { AA, wantsNativeAA } from './aa.js';
 import { totalMB, breakdown } from './budget.js';
+import { fovFor, FOV_MINOR } from './fov.js';
 
 const SHADOW_TYPE = {
   hard: THREE.BasicShadowMap,
@@ -35,7 +36,8 @@ export class App {
     mount.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(55, 1, 0.1, 2000);
+    this.fovMinor = FOV_MINOR;
+    this.camera = new THREE.PerspectiveCamera(FOV_MINOR, 1, 0.1, 2000);
     this.camera.position.set(18, 9, 26);
     this.camera.lookAt(0, 3, 0);
 
@@ -86,6 +88,9 @@ export class App {
     q.register({ key: 'exposure', label: 'Exposure', type: 'range', min: 0.4, max: 2.0, step: 0.02, default: 1.0, group: 'Renderer' },
       v => { this.renderer.toneMappingExposure = v; });
 
+    q.register({ key: 'fov', label: 'Field of view (short axis)', type: 'range', min: 40, max: 75, step: 1, default: FOV_MINOR, group: 'Renderer' },
+      v => this.setFov(v));
+
     this.aa.registerKnobs(q);
   }
 
@@ -106,9 +111,22 @@ export class App {
     this.renderer.setPixelRatio(capped * scale);
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
+    this.applyFov();
     this.aa?.resize();
     this.post?.resize();
+  }
+
+  // `minor` is the field on the short axis of the viewport; fov.js turns it into the vertical one
+  // three actually wants. Scenarios reach it through the `fov` knob rather than calling this, or
+  // the next usePreset() re-applies the knob's value over the top of theirs.
+  setFov(minor) {
+    this.fovMinor = minor;
+    this.applyFov();
+  }
+
+  applyFov() {
+    this.camera.fov = fovFor(this.camera.aspect, this.fovMinor);
+    this.camera.updateProjectionMatrix();
   }
 
   start() {

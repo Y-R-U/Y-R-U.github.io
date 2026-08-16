@@ -82,6 +82,11 @@ export class Session {
     this.app = app;
     this.player = player;
     this.world = opts.world || {};
+    // The one source of chance on the combat side of the seam, injectable the way `Spawner` already
+    // takes one: a crit is 1.3× and a level-1 bolt is 8 of a grain rat's 10 HP, so an unseeded 6 %
+    // decides whether the opening shot of L01 kills outright, and a test that cannot pin it is a
+    // test that fails one run in sixteen.
+    this.rng = opts.rng || Math.random;
     this.paused = false;
     this.pauses = new Set();
     this.advanceRequest = false;
@@ -212,7 +217,6 @@ export class Session {
       onSell: list => this.sell(list),
     });
 
-    this.rotate();
     this.autosave = new Autosave(() => this.snapshot());
     this.bind();
     this.applySettings();
@@ -406,8 +410,6 @@ export class Session {
       if (document.hidden) { this.pause('hidden'); this.autosave.flush(); } else this.resume('hidden');
     });
     addEventListener('pagehide', () => this.autosave.flush());
-    addEventListener('orientationchange', () => this.rotate());
-    addEventListener('resize', () => this.rotate());
   }
 
   escape() {
@@ -421,17 +423,6 @@ export class Session {
     this.pause('journal');
     this.autosave.flush();
     this.journal.show();
-  }
-
-  // No screen.orientation.lock in Safari on iOS, so the card is CSS and the pause is here.
-  rotate() {
-    if (!this.rotateCard) {
-      this.rotateCard = el('div', 'g-rotate');
-      this.rotateCard.append(el('u', null, '⟳'), el('p', null, 'Turn the phone sideways.'));
-      this.host.append(this.rotateCard);
-    }
-    const portrait = innerHeight > innerWidth;
-    if (portrait) this.pause('portrait'); else this.resume('portrait');
   }
 
   notice(text) {
@@ -575,10 +566,7 @@ export class Session {
   strike(spell) {
     const p = this.player?.pos;
     if (!spell?.coef || spell.cone == null || spell.range == null || !p) return null;
-    // What the bolt can reach, not what the cone covers: without this the damage lands on a rat
-    // 14 m away through a wall the bolt visibly stops 2.8 m in front of.
-    const live = (this.world.foes?.() || []).filter(f => this.world.sight?.(p, f) !== false);
-    const target = acquire(live, this.player.camYaw ?? 0, p, spell);
+    const target = acquire(this.visibleFoes(), this.player.camYaw ?? 0, p, spell);
     if (!target) return null;
     const level = levelIn(this.doc, this.school);
     const r = resolveHit({
@@ -586,7 +574,7 @@ export class Session {
       coef: spell.coef,
       armour: target.armour || 0,
       critChance: critChance(level),
-      rng: Math.random,
+      rng: this.rng,
     });
     const killed = this.world.hit?.(target, r.damage)?.killed;
     this.audio.play(killed ? 'kill' : 'impact', { at: target });
@@ -689,7 +677,7 @@ export class Session {
     const run = this.run, patch = this.nodeAt(this.working);
     this.workStop();
     if (run) {
-      const r = strike(run, Math.random);
+      const r = strike(run, this.rng);
       if (r.caught) return this.landed(this.nodeAt(run.node), r.caught);
       this.audio.play('uiError');
       this.hud.say(MISS[r.why] || MISS.nothing);
@@ -709,10 +697,10 @@ export class Session {
 
   takeFrom(node) {
     const levels = { forage: levelIn(this.doc, 'forage'), setting: levelIn(this.doc, 'setting') };
-    const got = harvest(node, Math.random, levels);
+    const got = harvest(node, this.rng, levels);
     if (!got) { this.audio.play('uiError'); return; }
     this.setNode(this.nodes.begin(node.id, this.doc.played));
-    this.setNode(this.nodes.finish(node.id, this.doc.played, Math.random, levels.forage));
+    this.setNode(this.nodes.finish(node.id, this.doc.played, this.rng, levels.forage));
     this.landed(node, got);
   }
 
@@ -740,7 +728,7 @@ export class Session {
       this.held(), levelIn(this.doc, 'hearth'));
     if (!raw) { this.audio.play('uiError'); this.hud.say('Nothing to cook.'); this.hud.finish(false); return; }
     if (!this.spendFocus('hearth')) { this.hud.finish(false); return; }
-    const r = cookOne(Math.random, raw, levelIn(this.doc, 'hearth'));
+    const r = cookOne(this.rng, raw, levelIn(this.doc, 'hearth'));
     addItem(this.doc, raw, -1);
     this.gainXp('hearth', r.xp, { sourceLevel: r.sourceLevel, streak: this.streakOf('hearth') });
     if (r.burnt) {
@@ -816,7 +804,7 @@ export class Session {
       return;
     }
     if (!this.run) return;
-    const r = tickRun(this.run, dt, Math.random);
+    const r = tickRun(this.run, dt, this.rng);
     this.run = r.run;
     const at = this.nodeAt(this.run.node);
     if (r.event === 'bite') { this.hud.bite(true); this.audio.play('bite', { at }); this.buzz(20); }
@@ -911,7 +899,7 @@ export class Session {
   }
 
   // The enemy's side. Driven from here rather than from the frame loop so that everything that
-  // pauses the game — a menu, a hidden tab, portrait — also stops the creatures.
+  // pauses the game — a menu, the journal, the market, a hidden tab — also stops the creatures.
   combat(dt) {
     this.world.tick?.(dt);
     for (const blow of this.world.strikes?.() || []) {
@@ -1308,9 +1296,30 @@ export class Session {
     this.hud.setContext(best?.kind || null, wants || best?.label || '');
   }
 
+  // What the bolt can reach, not what the cone covers: without this the damage lands on a rat 14 m
+  // away through a wall the bolt visibly stops 2.8 m in front of.
+  visibleFoes() {
+    const p = this.player?.pos;
+    if (!p) return [];
+    return (this.world.foes?.() || []).filter(f => this.world.sight?.(p, f) !== false);
+  }
+
+  // Range and line of sight — the two gates `strike()` applies before its cone, so the prompt can
+  // no longer arm for a rat through a wall and teach the tap with a bolt that hits nothing. Not the
+  // cone as well: measured over 40 granary fills it flips six times in thirty seconds of turning,
+  // and a teaching prompt that blinks teaches nothing.
+  foeNear() {
+    const p = this.player?.pos;
+    const range = basicOf(this.school, this.doc.worn || this.doc.faction)?.range;
+    if (!p || !range) return false;
+    return this.visibleFoes().some(f => Math.hypot(f.x - p.x, f.z - p.z) <= range);
+  }
+
   obCtx() {
     this.ctxOb = {
       ...this.ob,
+      // A raycast per creature, so it is not asked once the only prompt that reads it is retired.
+      foe: !(this.ob.cast || this.doc.onboard.cast) && this.foeNear(),
       target: !!this.context,
       contextKind: this.context?.kind || null,
       cleared: !!this.doc.flags['wwa.granary.clear'],
