@@ -1,0 +1,5 @@
+[
+  { "id": "hen",   "body": "fowl",  "area": "lac.cotts",        "at": [-0.8, 0.94], "ry": 1.2 },
+  { "id": "wagon", "body": "wagon", "area": "road.spur.light",  "at": [0.1, 0.24],  "ry": 0.2 },
+  { "id": "cart",  "body": "wagon", "area": "heath",            "at": [-0.31, 0.33], "ry": 1.9 }
+]

@@ -10,7 +10,7 @@ import { Menu } from './menu.js';
 import { Market } from './market.js';
 import { Audio } from './audio.js';
 import { gameHost, el } from './ui.js';
-import { nearestAnchor, lineage } from './areas.js';
+import { nearestAnchor, lineage, contains } from './areas.js';
 import { pickContext } from './context.js';
 import { blank, rollDay, checkPosition, POSITION, addItem, itemCount, clampQuests } from './save.js';
 import { acquire, power, critChance, resolveHit, damageTaken } from '../sim/combat.js';
@@ -25,6 +25,7 @@ import {
   handovers, gatherWants, rawOf, gatherEvent, cookEvent, deliverEvent,
 } from './gathering.js';
 import { nameOf, started } from './towns.js';
+import { escortActors, escortWants, escortEvent, newEscort, stepEscort } from './escort.js';
 import { FOOTSTEP_EVERY, RANGE } from './sounds.js';
 import { focusCost, canCast, idOf, SPELLS } from '../sim/spells.js';
 import { grantXp } from '../sim/xp.js';
@@ -72,8 +73,6 @@ export function questWorld(world, hooks) {
     flag: (key, value = true) => hooks.flag(key, value),
     moveTo: area => hooks.moveTo(area),
     respawn: (kind, n = 1) => (world.respawn ? world.respawn(kind, n) : hooks.missing('respawn', kind, n)),
-    // A world that has an `arm` but not this object is still a broken promise — `lac.henhouse.hen`
-    // is an escort target, not a prop, and nothing places it.
     arm: id => world.arm?.(id) || hooks.missing('arm', id),
   };
 }
@@ -105,6 +104,8 @@ export class Session {
     this.knob = { duration: 1, suspicion: 1, channel: GRAFT.channel };
     this.nodes = new NodeSet(this.world.gatherNodes?.() || []);
     this.run = null;
+    this.escorts = {};
+    this.shown = '';
     this.working = null;
     this.cooking = null;
     this.healing = null;
@@ -826,6 +827,50 @@ export class Session {
     }
   }
 
+  // ── escort, the eighth verb ──────────────────────────────────────────────
+
+  // `world.escort` owns the bodies; js/game/escort.js owns the rules. Arrival is judged on the
+  // actor's own position, so walking to the destination without it credits nothing — and an actor
+  // left far enough behind for long enough stops following until you come back for it.
+  escortTick(dt) {
+    const w = this.world.escort;
+    const p = this.player?.pos;
+    if (!w || !p) return;
+    const wanted = escortActors(this.quests.defs, this.doc.quests);
+    const key = wanted.join();
+    if (key !== this.shown) {
+      for (const npc of this.shown ? this.shown.split(',') : []) {
+        if (!wanted.includes(npc)) { w.show(npc, false); w.park(npc); }
+      }
+      for (const npc of wanted) w.show(npc, true);
+      this.shown = key;
+    }
+
+    const live = escortWants(this.quests.defs, this.doc.quests, this.quests.ctx());
+    for (const npc of Object.keys(this.escorts)) {
+      if (!live.some(l => l.npc === npc)) delete this.escorts[npc];
+    }
+    for (const l of live) {
+      const at = w.at(l.npc);
+      if (!at) continue;
+      const st = this.escorts[l.npc] || (this.escorts[l.npc] = newEscort(l.npc, l.path));
+      const r = stepEscort(st, dt, {
+        px: p.x, pz: p.z, ax: at.x, az: at.z, speed: w.speed(l.npc),
+        inPath: !l.path || contains(this.quests.areas[l.path], at.x, at.z),
+      });
+      this.escorts[l.npc] = r.state;
+      w.move(l.npc, r.x, r.z, r.heading);
+      if (r.event === 'arrive') {
+        this.quests.emit(escortEvent(r.state));
+        this.audio.play('uiConfirm');
+        this.autosave.mark();
+      } else if (r.event === 'lost') {
+        this.hud.say(`${this.dialogue.names[l.npc] || l.npc} is not with you.`);
+        this.audio.play('uiError');
+      } else if (r.event === 'found') this.audio.play('uiBlip');
+    }
+  }
+
   // The hand-overs a live step is waiting for right here. A target that is an area is handed over
   // by standing in it, so it sits on the player at zero distance and `yields` like the eat target
   // does — without that it wins every tie and hides the fire, the seams and the stall it is
@@ -1312,6 +1357,7 @@ export class Session {
     this.vitals = vitals.tick(this.vitals, dt, this.limits);
     this.combat(dt);
     this.gatherTick(dt);
+    this.escortTick(dt);
     this.graftTick(dt);
     this.retarget();
     this.watchStuck(dt);

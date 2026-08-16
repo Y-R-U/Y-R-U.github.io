@@ -12,10 +12,13 @@ import { Doors } from './world/doors.js';
 import { Spells } from './world/spell.js';
 import * as stairs from './world/stairs.js';
 import { walkStep, groundAt } from './world/colliders.js';
+import { waterY } from './world/terrain.js';
 import { Input } from './input.js';
 import { Session } from './game/session.js';
 import { Vermin } from './world/vermin.js';
-import { Spawner } from './game/spawner.js';
+import { Robed } from './world/robed.js';
+import { Escorts } from './world/escorts.js';
+import { Spawner, rigFor } from './game/spawner.js';
 import { Props } from './world/props.js';
 import { Cast } from './world/cast.js';
 import { Nodes } from './world/nodes.js';
@@ -58,11 +61,16 @@ const spells = app.add(new Spells(player, demo.terrain));
 // `app.add` is only for the knobs: the session ticks the spawner, not the frame loop, and it stays
 // inert until `play()` arms it, which never happens under ?shot= or in the editor.
 const vermin = app.add(new Vermin(demo.terrain));
+// The robed enemies share the crowd's cloth uniforms, so the wind and cloth knobs reach both and
+// one shader program serves every hood in the valley.
+const robed = app.add(new Robed(demo.terrain, people.uniforms));
 const spawner = app.add(new Spawner({
-  rig: vermin, player,
+  rig: rigFor({ rat: vermin, crab: vermin, boar: vermin, people: robed }),
+  player,
   ground: (x, z) => groundAt(x, z, 0),
-  // A step against itself: the walker is only pushed when it began inside a collider.
-  blocked: (x, z) => walkStep(x, z, x, z, groundAt(x, z, 0)).hit,
+  // A step against itself: the walker is only pushed when it began inside a collider. The creek
+  // runs through lac.millbridge and the first Watchman placed there was standing in it.
+  blocked: (x, z) => walkStep(x, z, x, z, groundAt(x, z, 0)).hit || groundAt(x, z, 0) < waterY(x) + 0.3,
 }));
 
 // Top-level await, above app.start() and above the boot overlay lifting: props are world geometry
@@ -71,7 +79,7 @@ const spawner = app.add(new Spawner({
 // own and warns; this catch is for a file that parses and then throws on its way through.
 const placed = await loadPlacements().catch(e => {
   console.warn(`props: nothing placed — ${e.message}`);
-  return { props: [], cast: [], nodes: [], areas: {} };
+  return { props: [], cast: [], nodes: [], escorts: [], areas: {} };
 });
 const props = app.add(new Props(demo.terrain, placed.props));
 const cast = new Cast(people, placed.cast);
@@ -80,6 +88,7 @@ const cast = new Cast(people, placed.cast);
 const gather = buildNodes(placed.nodes, placed.areas);
 for (const e of gather.errors) console.warn(`gather: ${e}`);
 const nodes = app.add(new Nodes(demo.terrain, gather.nodes));
+const escorts = app.add(new Escorts(demo.terrain, placed.escorts, { cast, chickens }));
 
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -93,10 +102,12 @@ window.__forge.player = player;
 window.__forge.doors = doors;
 window.__forge.spells = spells;
 window.__forge.vermin = vermin;
+window.__forge.robed = robed;
 window.__forge.spawner = spawner;
 window.__forge.props = props;
 window.__forge.cast = cast;
 window.__forge.nodes = nodes;
+window.__forge.escorts = escorts;
 window.__forge.walk = { walkStep, groundAt };
 window.__forge.stairs = stairs;
 window.__forge.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, ref: s.ref, zone: s.zone }));
@@ -175,20 +186,21 @@ async function play() {
       walkStep,
       targets,
       interact: (id, verb) => props.use(id, verb),
-      arm: id => props.arm(id),
+      arm: id => props.arm(id) || escorts.arm(id),
       gatherNodes: () => gather.nodes,
       nodeState: (id, state) => nodes.setState(id, state),
       doorIndex: () => (doors.state === 'in' ? doors.activeIndex ?? null : null),
       jumpDoor: i => { doors.jump(i); return true; },
       tick: dt => spawner.tick(dt),
-      freeze: v => { vermin.frozen = v; },
+      freeze: v => { vermin.frozen = v; robed.frozen = v; },
       foes: () => spawner.foes(),
       sight,
       hit: (foe, damage) => spawner.hit(foe, damage),
       strikes: () => spawner.take(),
       aggro: (radius, pos) => spawner.aggro(radius, pos),
       respawn: (kind, n) => spawner.respawn(kind, n),
-      watch: () => spawner.watch(),
+      watch: () => spawner.watch().concat(cast.watch()),
+      escort: escorts,
     },
   }));
   window.__forge.game = session;

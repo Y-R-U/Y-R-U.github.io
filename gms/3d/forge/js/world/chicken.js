@@ -9,6 +9,7 @@ import { heightAt, waterY, CENTERS, nearCamera, zoneAt } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { paint } from './tree.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
+import { penned } from './roster.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -593,16 +594,32 @@ export class Chickens {
     this.assign();
   }
 
+  // A bird the escort runtime owns: pinned, so the flock knob cannot take its seat.
+  add(spec) {
+    if (this.agents.filter(a => a.pin).length >= PER_MESH) return null;
+    const R = this.rand || (this.rand = rng(0x7c31a9));
+    const a = {
+      zi: zoneAt(spec.x, spec.z), x: spec.x, z: spec.z, home: [spec.x, spec.z], pin: true,
+      heading: spec.heading || 0, speed: 0, cyc: span(R, 0, 4), seed: R(),
+      scale: 1, tone: 1, act: 0, at: 0, wait: span(R, 0.3, 5),
+    };
+    this.agents.unshift(a);
+    this.assign();
+    return a;
+  }
+
+  remove(a) {
+    const i = this.agents.indexOf(a);
+    if (i < 0) return false;
+    this.agents.splice(i, 1);
+    this.assign();
+    return true;
+  }
+
   // Slots went to the first N agents in spawn order, so a bird could stand two metres in front of
   // you and never be drawn while one across the map held its slot.
   assign(cam) {
-    let src = this.agents;
-    if (cam) {
-      const cx = cam.position.x, cz = cam.position.z;
-      src = this.agents.slice().sort((a, b) =>
-        ((a.x - cx) ** 2 + (a.z - cz) ** 2) - ((b.x - cx) ** 2 + (b.z - cz) ** 2));
-    }
-    this.active = src.slice(0, this.flockN ?? 24);
+    this.active = penned(this.agents, this.flockN ?? 24, cam, POOL);
     const col = new THREE.Color();
     this.meshes.forEach((mesh, zi) => {
       const list = this.active.filter(a => a.zi === zi).slice(0, PER_MESH);
@@ -698,32 +715,40 @@ export class Chickens {
       for (let i = 0; i < list.length; i++) {
         const a = list[i];
 
-        // Test hook: pins every bird to one pose so a still can be taken at a chosen phase.
+        // Test hook: pins every bird to one pose so a still can be taken at a chosen phase. A
+        // pinned bird is a hen being driven home — js/game/escort.js owns its position, heading
+        // and speed — so neither the pose clock nor the wander gets a say in what it does.
         if (this.hold) Object.assign(a, this.hold);
-        else if (a.act) {
-          a.at += dt / (a.act === 1 ? PECK_T : FLAP_T);
-          // A startle is a burst of wing and then a short scurry away, not a flap on the spot.
-          a.speed = a.act === 2 && a.at > 0.28 && a.at < 0.80 ? SCURRY * (0.80 - a.at) * 2.4 : 0;
-          if (a.at >= 1) {
-            a.act = 0; a.at = 0; a.speed = 0;
-            a.wait = (0.5 + Math.random() * 2.4) / Math.max(0.15, this.life);
+        else if (!a.pin) {
+          if (a.act) {
+            a.at += dt / (a.act === 1 ? PECK_T : FLAP_T);
+            // A startle is a burst of wing and then a short scurry away, not a flap on the spot.
+            a.speed = a.act === 2 && a.at > 0.28 && a.at < 0.80 ? SCURRY * (0.80 - a.at) * 2.4 : 0;
+            if (a.at >= 1) {
+              a.act = 0; a.at = 0; a.speed = 0;
+              a.wait = (0.5 + Math.random() * 2.4) / Math.max(0.15, this.life);
+            }
+          } else {
+            a.wait -= dt * this.life;
+            if (a.wait <= 0) this.choose(a);
           }
-        } else {
-          a.wait -= dt * this.life;
-          if (a.wait <= 0) this.choose(a);
+
+          if (a.speed > 0.01) {
+            const wx = a.x + Math.sin(a.heading) * a.speed * dt;
+            const wz = a.z + Math.cos(a.heading) * a.speed * dt;
+            const step = collidersReady() ? walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.16) : { x: wx, z: wz, hit: false };
+            const dx = step.x - a.home[0], dz = step.z - a.home[1];
+            if (dx * dx + dz * dz > ROAM * ROAM || step.hit) a.heading += Math.PI * 0.83;
+            else {
+              a.cyc += Math.hypot(step.x - a.x, step.z - a.z) / (2 * STRIDE);
+              a.x = step.x; a.z = step.z;
+            }
+          }
         }
 
-        if (a.speed > 0.01) {
-          const wx = a.x + Math.sin(a.heading) * a.speed * dt;
-          const wz = a.z + Math.cos(a.heading) * a.speed * dt;
-          const step = collidersReady() ? walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.16) : { x: wx, z: wz, hit: false };
-          const dx = step.x - a.home[0], dz = step.z - a.home[1];
-          if (dx * dx + dz * dz > ROAM * ROAM || step.hit) a.heading += Math.PI * 0.83;
-          else {
-            a.cyc += Math.hypot(step.x - a.x, step.z - a.z) / (2 * STRIDE);
-            a.x = step.x; a.z = step.z;
-          }
-        }
+        // A pinned bird is carried rather than walked, so its stride comes from how far it moved.
+        if (a.pin) a.cyc += Math.hypot(a.x - (a.lx ?? a.x), a.z - (a.lz ?? a.z)) / (2 * STRIDE);
+        a.lx = a.x; a.lz = a.z;
 
         const fall = T ? T.surfaceY(a.x, a.z) : heightAt(a.x, a.z);
         const want = collidersReady() ? groundAt(a.x, a.z, a.y ?? fall) : fall;

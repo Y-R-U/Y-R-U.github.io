@@ -26,10 +26,22 @@ export function seatsLeft(agents, kind, zi) {
 export function roster(agents, count, cam = null, cap = Infinity) {
   const held = [], rest = [];
   for (const a of agents) (pinned(a) ? held : rest).push(a);
-  if (cam) {
-    const cx = cam.position.x, cz = cam.position.z;
-    rest.sort((a, b) => ((a.x - cx) ** 2 + (a.z - cz) ** 2) - ((b.x - cx) ** 2 + (b.z - cz) ** 2));
-  }
+  if (cam) nearestFirst(rest, cam);
+  return held.concat(rest).slice(0, Math.min(cap, Math.max(count | 0, held.length)));
+}
+
+function nearestFirst(list, cam) {
+  const cx = cam.position.x, cz = cam.position.z;
+  list.sort((a, b) => ((a.x - cx) ** 2 + (a.z - cz) ** 2) - ((b.x - cx) ** 2 + (b.z - cz) ** 2));
+}
+
+// The fowl rig's draw list. A bird the world is walking home is pinned the way a fighting creature
+// is: the flock knob sizes the ambience around it rather than competing with it, and at `flock = 0`
+// the escorted hen is still drawn.
+export function penned(agents, count, cam = null, cap = Infinity) {
+  const held = [], rest = [];
+  for (const a of agents) (a.pin ? held : rest).push(a);
+  if (cam) nearestFirst(rest, cam);
   return held.concat(rest).slice(0, Math.min(cap, Math.max(count | 0, held.length)));
 }
 

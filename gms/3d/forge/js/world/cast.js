@@ -2,6 +2,7 @@
 // that Bel is the same body every time you look.
 
 import { ZONE_IDS } from './zones.js';
+import { WATCH_WEIGHT } from '../sim/faction.js';
 // field.js, not terrain.js: the same zoneAt with no renderer import, so a node test can reach it.
 import { zoneAt } from './field.js';
 
@@ -33,6 +34,19 @@ export class Cast {
   targets(range = 4) {
     const out = [];
     for (const [id, a] of this.bodies) out.push({ id, kind: 'talk', label: 'talk', x: a.x, z: a.z, range });
+    return out;
+  }
+
+  // Two of the named cast are the Watch as far as a Graft is concerned, and `WATCH_WEIGHT` is the
+  // only list of them: Kesta counts double, Warden Alder barely counts. Same shape the spawner's
+  // `watch()` returns, and deliberately not a `targets()` entry — this is a body that notices you,
+  // not one the context button offers.
+  watch() {
+    const out = [];
+    for (const [id, a] of this.bodies) {
+      const weight = WATCH_WEIGHT[id];
+      if (weight) out.push({ id, kind: 'watch', x: a.x, z: a.z, weight });
+    }
     return out;
   }
 }

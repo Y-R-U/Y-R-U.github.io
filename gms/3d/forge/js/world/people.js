@@ -9,14 +9,12 @@ import { heightAt, waterY, creekZ, CENTERS, nearCamera } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { crowdSeats, crowdSeatsLeft, PER_CROWD_MESH as MAX_PER_MESH } from './roster.js';
+import { SEG, HSEG, SHOULDER, FIGURE } from './figure.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
-const SEG = 10;
-const HSEG = 8;
-const SHOULDER = 1.22;
 
-const hemAmp = y => Math.pow(Math.max(0, (SHOULDER - y) / SHOULDER), 1.5);
+const hemAmp = (y, top) => Math.pow(Math.max(0, (top - y) / top), 1.5);
 const hash = n => { const s = Math.sin(n * 127.1) * 43758.5453; return s - Math.floor(s); };
 
 // Darker means cooler: the red channel falls away faster than the blue.
@@ -31,7 +29,7 @@ function faceNormal(a, b, c) {
 
 const NO_EYE = [0, 0, 0];
 
-class Build {
+export class Build {
   constructor() { this.p = []; this.n = []; this.c = []; this.k = []; this.e = []; this.tris = 0; }
   vert(v, n) {
     this.p.push(v.p[0], v.p[1], v.p[2]);
@@ -57,23 +55,11 @@ class Build {
   }
 }
 
-// hem / shin / knee / waist / chest. `sh` is baked ambient occlusion, not lighting: dark at the
-// ground, dark in the waist pinch, dark again where the cowl overhangs. `f` is the fold depth, so
-// the waist creases tight and the hem swings loose. The shoulder flare is the hood's mantle ring,
-// not a robe ring — the chest ring is narrow and lives entirely inside the mantle.
-const ROBE = [
-  { y: 0.00, r: 0.402, sh: 0.36, f: 0.155 },
-  { y: 0.31, r: 0.302, sh: 0.72, f: 0.138 },
-  { y: 0.67, r: 0.270, sh: 0.86, f: 0.122 },
-  { y: 0.98, r: 0.216, sh: 0.62, f: 0.088 },
-  { y: 1.10, r: 0.196, sh: 0.70, f: 0.070 },
-];
-
 // Alternating radial push (cos at half the segment count hits ±1 exactly on every vertex),
 // phase-rotated per ring so the fold lines wander down the body instead of running vertical.
 // The 2- and 3-lobe terms stop the outline being a regular polygon and scallop the hem.
-function robeVert(i, j, seed) {
-  const R = ROBE[i];
+function robeVert(i, j, seed, F) {
+  const R = F.robe[i];
   const a = (((j % SEG) + SEG) % SEG) / SEG * TAU;
   const ph = seed + i * 0.66;
   const fold = Math.cos(SEG * 0.5 * a + ph) * R.f
@@ -88,31 +74,19 @@ function robeVert(i, j, seed) {
     p: [r * Math.cos(a), y, r * Math.sin(a)],
     n: [Math.cos(a), i === 0 ? -0.06 : 0.18, Math.sin(a)],
     c: tone(R.sh * (1 + 0.18 * fn - 0.07 * Math.abs(fn))),
-    k: hemAmp(R.y),
+    k: hemAmp(R.y, F.shoulder),
   };
 }
 
-function robe(B, seed) {
-  const v = (i, j) => robeVert(i, j, seed);
-  for (let i = 0; i < ROBE.length - 1; i++) {
+export function robe(B, seed, F = FIGURE) {
+  const v = (i, j) => robeVert(i, j, seed, F);
+  for (let i = 0; i < F.robe.length - 1; i++) {
     for (let j = 0; j < SEG; j++) B.flatQuad(v(i, j), v(i + 1, j), v(i + 1, j + 1), v(i, j + 1));
   }
-  const hub = { p: [0, -0.20, 0], n: [0, -1, 0], c: tone(0.12), k: 1 };
+  const hub = { p: [0, -0.20 * F.shoulder / SHOULDER, 0], n: [0, -1, 0], c: tone(0.12), k: 1 };
   for (let j = 0; j < SEG; j++) B.flatTri(v(0, j), v(0, j + 1), hub);
 }
 
-// mantle / chin / eye / brow, then a point that leans forward over the opening. The mantle is a
-// draped collar and not just the top of the body: it carries the whole shoulder line at 0.302, its
-// front pair dives 21 cm to a V on the chest, and `hang` scallops its edge off the fold term so it
-// is a drape rather than a brim. The cowl above it is deliberately narrow, because the opening has
-// to be most of the cowl's width before the front reads as a hood instead of a hole in a bucket.
-const HOOD = [
-  { y: 1.115, r: 0.302, sh: 0.50, ny: -0.30, dz: 0.010, dx: 0.000, aw: 12, dy: -0.215, lr: 1.00, trim: 1.10, hang: 0.9 },
-  { y: 1.235, r: 0.222, sh: 0.64, ny: -0.02, dz: 0.022, dx: 0.006, aw: 40, dy: 0.020, lr: 1.00, trim: 1.34, hang: 0 },
-  { y: 1.400, r: 0.216, sh: 0.72, ny: 0.12, dz: 0.014, dx: 0.012, aw: 43, dy: 0, lr: 0.99, trim: 1.34, hang: 0 },
-  { y: 1.565, r: 0.192, sh: 0.84, ny: 0.44, dz: 0.030, dx: 0.020, aw: 28, dy: -0.030, lr: 0.84, trim: 1.26, hang: 0 },
-];
-const APEX = [0.020, 1.688, 0.118];
 
 // The opening spans two whole bands of the one column that straddles +z. `aw` is its half-angle at
 // that ring, measured from dead front, so the boundary vertices slide round the ring's own circle
@@ -123,12 +97,12 @@ const MOUTH = 1;
 // back. That front-to-back gradient plus `trim` is what stops this being a hole in a smooth surface.
 const SIDE = [1.10, 1, 1, 1.10, 0.90, 0.78, 0.74, 0.78];
 const RIM = 0.024;       // how far the fabric edge folds back into the hood before the cavity starts
-const CAVITY = 0.270;    // mouth centre to the black point at the back of the hood
 const SKY = [0.11, 0.11, 0.07, 0.03, 0.03, 0.07];   // skylight reaching each cavity vertex, chin to brow
 const TRIM_AO = [0.95, 0.95, 1.35, 1.85, 1.85, 1.35];
 
-function hood(B, seed, cav, eyes) {
-  const rings = HOOD.map((R, i) => {
+export function hood(B, seed, cav, eyes, F = FIGURE) {
+  const grow = F.cavity / FIGURE.cavity;
+  const rings = F.hood.map((R, i) => {
     const out = [];
     for (let j = 0; j < HSEG; j++) {
       const L = j === MOUTH || j === MOUTH + 1;
@@ -146,10 +120,10 @@ function hood(B, seed, cav, eyes) {
     }
     return out;
   });
-  const apex = { p: APEX, n: [0, 1, 0], c: tone(0.90), k: 0 };
+  const apex = { p: F.apex, n: [0, 1, 0], c: tone(0.90), k: 0 };
   // The hub has to sit below the mantle ring, not level with it: a flat disc leaves a slit between
   // the collar's edge and the robe that you see the sky through from any camera near shoulder height.
-  const under = { p: [0, 0.880, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
+  const under = { p: [0, F.under, 0], n: [0, -1, 0], c: tone(0.10), k: 0 };
   const top = rings.length - 1;
 
   for (let i = 0; i < top; i++) {
@@ -182,8 +156,8 @@ function hood(B, seed, cav, eyes) {
     const f = TRIM_AO[k];
     return { p: v.p, n: v.n, k: 0, c: [v.c[0] * f, v.c[1] * f, v.c[2] * f] };
   });
-  const in3 = loop.map((v, k) => ({ p: step(v, RIM), n: v.n, k: 0, c: cav(SKY[k]) }));
-  const back = { p: [C[0] + inw.x * CAVITY, C[1] + inw.y * CAVITY, C[2] + inw.z * CAVITY],
+  const in3 = loop.map((v, k) => ({ p: step(v, RIM * grow), n: v.n, k: 0, c: cav(SKY[k]) }));
+  const back = { p: [C[0] + inw.x * F.cavity, C[1] + inw.y * F.cavity, C[2] + inw.z * F.cavity],
     n: [-inw.x, -inw.y, -inw.z], c: cav(0.03), k: 0 };
 
   for (let k = 0; k < 6; k++) {
@@ -195,7 +169,7 @@ function hood(B, seed, cav, eyes) {
   if (eyes) {
     const eb = [C[0] + inw.x * 0.055, C[1] + inw.y * 0.055, C[2] + inw.z * 0.055];
     for (const s of [-1, 1]) {
-      const v = (dx, dy, e) => ({ p: [eb[0] + dx * s, eb[1] + dy, eb[2]], n: [0, 0.2, 1],
+      const v = (dx, dy, e) => ({ p: [eb[0] + dx * s * grow, eb[1] + dy * grow, eb[2]], n: [0, 0.2, 1],
         c: cav(0.06), k: 0, e });
       const t = [v(0.010, 0.004, eyes[1]), v(0.046, 0.020, eyes[1]), v(0.026, 0.034, eyes[0])];
       if (s < 0) t.reverse();
@@ -204,7 +178,7 @@ function hood(B, seed, cav, eyes) {
   }
 }
 
-function tube(B, pts, radii, seg, shade, k) {
+export function tube(B, pts, radii, seg, shade, k) {
   const axis = new THREE.Vector3().subVectors(
     new THREE.Vector3(...pts[pts.length - 1]), new THREE.Vector3(...pts[0])).normalize();
   const up = Math.abs(axis.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
@@ -233,15 +207,14 @@ const STOUT = new THREE.Matrix4().makeScale(1.055, 0.935, 1.055);
 // The cavity has to land on the zones.js colour whatever the fabric is, and vertexColors multiplies
 // the material tint — so divide it back out. Every interior value is far darker than every robe, so
 // the ratio never wants to exceed 1.
-function cavityTone(zoneId) {
-  const base = robeColor(zone(zoneId).robe);
+export function cavityTone(zoneId, base = robeColor(zone(zoneId).robe)) {
   const inner = new THREE.Color(zone(zoneId).hood.inner);
   const ch = (a, b) => s => Math.min(1, a * s / Math.max(b, 1e-4));
   const r = ch(inner.r, base.r), g = ch(inner.g, base.g), b = ch(inner.b, base.b);
   return s => [r(s), g(s), b(s)];
 }
 
-function eyeTones(zoneId) {
+export function eyeTones(zoneId) {
   return zone(zoneId).hood.eyes.map(hex => {
     const c = new THREE.Color(hex);
     return [c.r, c.g, c.b];
@@ -401,7 +374,7 @@ function patchVertex(shader, uniforms, withNormal) {
 // anything below clips both and collapses the value gap between the two zones.
 const ROBE_CEIL = 0.70;
 
-function robeColor(hex) {
+export function robeColor(hex) {
   const c = new THREE.Color(hex);
   const s = { r: 0, g: 0, b: 0 };
   c.getRGB(s, THREE.SRGBColorSpace);
@@ -413,10 +386,10 @@ function robeColor(hex) {
   return c;
 }
 
-function robeMaterial(zoneId, uniforms) {
+export function robeMaterial(zoneId, uniforms, { color, name = `robe:${zoneId}` } = {}) {
   const m = new THREE.MeshStandardMaterial({
-    color: robeColor(zone(zoneId).robe), roughness: 0.94, metalness: 0,
-    vertexColors: true, name: `robe:${zoneId}`,
+    color: color || robeColor(zone(zoneId).robe), roughness: 0.94, metalness: 0,
+    vertexColors: true, name,
   });
   m.onBeforeCompile = shader => {
     patchVertex(shader, uniforms, true);
@@ -428,7 +401,7 @@ function robeMaterial(zoneId, uniforms) {
   return m;
 }
 
-function robeDepth(uniforms) {
+export function robeDepth(uniforms) {
   const m = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
   m.onBeforeCompile = shader => patchVertex(shader, uniforms, false);
   m.customProgramCacheKey = () => 'robeDepth';
@@ -442,7 +415,7 @@ const AO_CORE = 0.46;   // the robe hides everything inside this, so the ramp ha
 // Same recipe terrain.js proves works for its own ground decals: dst * (1 - srcAlpha), with the
 // strength in the alpha channel. A CircleGeometry cannot do this — its only interior vertex is the
 // centre, so the alpha ramps linearly from under the hem and the visible ring is nearly clear.
-function aoDisc() {
+export function aoDisc() {
   const pos = [0, 0, 0], col = [0, 0, 0, 1], idx = [];
   for (let ring = 0; ring < 2; ring++) {
     for (let j = 0; j < AO_SEG; j++) {

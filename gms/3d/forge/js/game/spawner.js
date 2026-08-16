@@ -17,6 +17,16 @@ const EMPTY = [];
 // the player is what `session.watch()` counts against a Graft.
 export const WATCHERS = new Set(['watchman']);
 
+// One rig per `geo` in the bestiary, so a new row with an existing rig needs no wiring and a row
+// naming a rig nobody handed over is refused here rather than drawn by nothing.
+export function rigFor(rigs) {
+  const of = enemy => rigs[ENEMIES[enemy]?.geo] || null;
+  return {
+    add: spec => of(spec.enemy)?.add(spec) ?? null,
+    remove: a => of(a.enemy)?.remove(a) ?? false,
+  };
+}
+
 // A nest is not a crowd. Eight is L01's own number — Bel says "eight of them, at a guess" — and it
 // is also under the 16 instances one (kind, zone) InstancedMesh can carry.
 export const PER_AREA = 8;
@@ -138,9 +148,8 @@ export class Spawner {
     return false;
   }
 
-  // The rig has the last word: it answers null for a row it has no body for — the `geo: 'people'`
-  // and `geo: 'chicken'` enemies — because an enemy you cannot see is worse than one that is
-  // missing.
+  // The rig has the last word: it answers null for a row it has no body for, or for one whose mesh
+  // is full, because an enemy you cannot see is worse than one that is missing.
   place(area, enemy, pos) {
     const shape = this.areas[area]?.shape;
     if (!shape) return null;
