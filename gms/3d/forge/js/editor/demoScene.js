@@ -1,7 +1,7 @@
-// The scene, as a document. Whitewall is authored — see whitewall.js — and Longacre and
-// Blackstone are still a district of seeded jitter each, which A8 replaces one town at a time.
-// The output is ordinary data either way, and once it has run the editor treats it like any
-// other scene.
+// The scene, as a document. Whitewall and Longacre are authored — see whitewall.js and
+// longacre.js — and Blackstone is still a district of seeded jitter, which A8 replaces one town
+// at a time. The output is ordinary data either way, and once it has run the editor treats it
+// like any other scene.
 //
 // Call it after `setCameras()`: the layout skips anything standing inside a scenario keep-out.
 
@@ -11,33 +11,45 @@ import { TOWNS, creekZ, nearCamera, CROSSINGS } from '../world/terrain.js';
 import { SCENE_VERSION, district, footprint } from './scene.js';
 import { seedDocument } from './build.js';
 import { whitewall, ROAD, ROAD_WIDTH, PAVED } from './whitewall.js';
+import { longacre, PAVED as LAC_PAVED } from './longacre.js';
+
+// What each authored town contributes to the document. `road` is the street the district
+// surfaces on its own: Longacre's is null because the King's Road *is* its High Street, and two
+// overlapping transparent ribbons put a 7 % luminance edge down the middle of street_dusk where
+// their noisy widths disagreed.
+const AUTHORED = {
+  light: { objects: whitewall, paved: PAVED, road: ROAD, roadWidth: ROAD_WIDTH },
+  neutral: { objects: longacre, paved: LAC_PAVED, road: null, roadWidth: 0 },
+};
 
 export function demoScene(terrain) {
   const doc = { version: SCENE_VERSION, name: 'Demo', districts: [], objects: [] };
   const skips = ZONE_IDS.map((zone, di) => (
-    zone === 'light' ? authored(doc, terrain, zone, di) : layout(doc, terrain, zone, di, TOWNS[di])
+    AUTHORED[zone] ? authored(doc, terrain, zone, di) : layout(doc, terrain, zone, di, TOWNS[di])
   ));
   doc.objects.forEach((o, i) => { o.id = i + 1; });
   return seedDocument(doc, skips);
 }
 
-// Whitewall's paved ground belongs to the town rather than to the scene document, so a saved
-// scene gets it too — the generator is skipped on that path and the Yard would come back a lawn.
-// A surface, not a footprint: paving has no building on it to shade the ground, and the scatter
-// mask on its own cannot change the colour of the ground it is masking.
-export function paveLight(terrain) {
-  for (const r of PAVED) terrain.addPatch(r, 'light');
+// An authored town's surfaced ground belongs to the town rather than to the scene document, so a
+// saved scene gets it too — the generator is skipped on that path and Sanctum Yard and the market
+// square would both come back lawns. A surface, not a footprint: paving has no building on it to
+// shade the ground, and the scatter mask on its own cannot change the colour of the ground it is
+// masking.
+export function paveTowns(terrain) {
+  for (const [zone, t] of Object.entries(AUTHORED)) for (const r of t.paved) terrain.addPatch(r, zone);
 }
 
 // An authored town draws nothing from the district's RNG stream, so seedDocument starts it at
 // zero — which is what the 0 returned here says.
 function authored(doc, terrain, zone, di) {
-  for (const o of whitewall()) {
+  const t = AUTHORED[zone];
+  for (const o of t.objects()) {
     if (!nearCamera(o.x, o.z)) doc.objects.push({ id: 0, dist: di, zone, seed: 0, ...o });
   }
-  paveLight(terrain);
+  for (const r of t.paved) terrain.addPatch(r, zone);
   doc.districts.push(district(zone, TOWNS[di].cx, {
-    seed: 0x2f1a71 + di * 977, road: ROAD, roadWidth: ROAD_WIDTH, kerbs: [], bridge: bridgeFor(di),
+    seed: 0x2f1a71 + di * 977, road: t.road, roadWidth: t.roadWidth, kerbs: [], bridge: bridgeFor(di),
   }));
   return 0;
 }
@@ -52,7 +64,7 @@ function bridgeFor(di) {
   };
 }
 
-// Longacre and Blackstone, still seeded. Everything here is (cx, tz)-relative.
+// Blackstone, still seeded. Everything here is (cx, tz)-relative.
 function layout(doc, terrain, zone, di, town) {
   const cx = town.cx, tz = town.cz;
   let draws = 0;
@@ -86,7 +98,7 @@ function layout(doc, terrain, zone, di, town) {
   }
 
   // a thin campanile inside the town — the cheapest break in a low roofline
-  const camX = cx + (di === 1 ? 11.5 : -12.5), camZ = tz - 3 + di * 4;
+  const camX = cx - 12.5, camZ = tz - 3 + di * 4;
   put('tower', camX, camZ, span(R, 0, 3), { radius: 2.3, height: 23 + di * 1.5, sides: 8 }, { fp: [3.2, 3.2] });
 
   // Terraced rows either side of the street: detailed frontage, cheap blocks behind.
@@ -154,16 +166,11 @@ function layout(doc, terrain, zone, di, town) {
   }
 
   // the hall: one big mass so the town has a centre of gravity
-  const hallX = cx + (di === 1 ? -13.5 : 13), hallZ = tz + 14 + span(R, -3, 3);
-  put('house', hallX, hallZ, span(R, -0.2, 0.2) + (di === 1 ? 0.35 : -0.35),
-    { w: 14.5, d: 10.5, h: 10.5 }, { fp: [8, 6] });
+  const hallX = cx + 13, hallZ = tz + 14 + span(R, -3, 3);
+  put('house', hallX, hallZ, span(R, -0.2, 0.2) - 0.35, { w: 14.5, d: 10.5, h: 10.5 }, { fp: [8, 6] });
 
-  // Longacre's High Street *is* the King's Road, and two overlapping transparent ribbons put a
-  // 7 % luminance edge down the middle of street_dusk where their noisy widths disagreed. The
-  // polyline stays — the kerbs and the frontages are laid out against it — but only the towns the
-  // King's Road terminates outside of surface their own street.
   doc.districts.push(district(zone, cx, {
-    seed: 0x2f1a71 + di * 977, road, kerbs, roadWidth: di === 1 ? 0 : 3.6, bridge: bridgeFor(di),
+    seed: 0x2f1a71 + di * 977, road, kerbs, roadWidth: 3.6, bridge: bridgeFor(di),
   }));
   return draws;
 }

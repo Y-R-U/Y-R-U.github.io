@@ -259,11 +259,13 @@ export class SceneBuilder {
   }
 }
 
-// A proxy set is never seen closer than stream.js's 70 m detail radius, where a 0.27 m ridge cap
-// and a 1.53 m window surround are a pixel or two of slightly different stone. Folding the
-// dressing back into the wall there takes a distant block from four merged meshes to three.
-// `glass` stays its own surface: it is what lights a distant town up after dark.
-const PROXY_FOLD = { trim: 'wall', crest: 'wall' };
+// A proxy set is never seen closer than stream.js's `lodDetail`, where a 0.27 m ridge cap and a
+// 1.53 m window surround are a pixel or two of slightly different stone. Folding every dressing
+// surface back into the wall there takes a distant block from four merged meshes to two.
+// `glass` is in the fold: measured at 87 changed pixels of 921,600 on a night view from 225 m,
+// against 14 draw calls across three towns. Near windows still light up — they are in the detail
+// set. docs/NOTES_A8_LONGACRE.md §1.
+const PROXY_FOLD = { trim: 'wall', crest: 'wall', glass: 'wall' };
 
 const massRec = (o, r) => ({ zone: o.zone, seed: o.seed, x: o.x, z: o.z, rot: o.ry, ...o.p, top: r.hi, bot: r.lo });
 
@@ -495,6 +497,20 @@ function mill(b, R, { w, d, h, wheel }) {
   }
   b.add('wood', new THREE.BoxGeometry(5.4, 0.5, 1.8), T(hub + 2.4, wheel * 2 + 0.5, 0));
   addChimney(b, R, { m: T(span(R, -w * 0.2, w * 0.2), h + 1.2, 0), w: 1.28, h: 3.0, surface: 'wall', cap: 'trim' });
+
+  // Without these, three of a mill's four faces are blank: gabled() emits no opening anywhere and
+  // the wheel and its launder are both on +x. That is 11.5 m of blank stone at Longacre's size,
+  // on the face you walk up to. `barn()` already makes the same trade with its cart doors. They
+  // go on ±z, so they can never land on the wheel. The lucam is the hoist housing sacks come up
+  // into, and the stub is the beam it swings from.
+  const side = d / 2;
+  const dw = Math.min(3.0, w * 0.2), dh = Math.min(h - 2.4, 3.9);
+  for (const s of [-1, 1]) {
+    b.add('wood', new THREE.BoxGeometry(dw, dh, 0.24), T(0, dh / 2, s * (side + 0.06)));
+  }
+  b.add('wood', new THREE.BoxGeometry(dw * 0.8, dh * 0.75, 0.3), T(0, h - dh * 0.5, side + 0.1));
+  b.add('wall', new THREE.BoxGeometry(dw + 1.0, 2.7, 2.6), T(0, h + 1.35, side - 0.9));
+  b.add('wood', new THREE.BoxGeometry(0.4, 0.4, 3.4), T(0, h + 2.3, side + 1.1));
 }
 
 // Long, tall, no windows, and a cart-sized opening in the middle of each long side.

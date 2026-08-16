@@ -7,7 +7,7 @@ import { Scatter } from './scatter.js';
 import { Stream } from './stream.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { SceneBuilder, shadowOnly } from '../editor/build.js';
-import { demoScene, paveLight } from '../editor/demoScene.js';
+import { demoScene, paveTowns } from '../editor/demoScene.js';
 import { loadScene } from '../editor/store.js';
 
 // x and z are offsets from the town the shot belongs to and **y is height above the ground at
@@ -117,12 +117,44 @@ const WHITEWALL_SHOTS = [
     pos: [-566, 20, 66], look: [-512, -2, 124] },
 ];
 
+// A8's Longacre framings. Same rules: absolute coordinates, `y` above the ground, ?dev=1 only,
+// never in SHOTS. Three of the five scored plates already stand in this town — street_dusk on
+// Mill Lane, town_night over the square and creek_day at Millbridge — so these are the places
+// those three do not reach.
+const LONGACRE_SHOTS = [
+  { id: 'lac_air', label: 'Longacre from the north-west', time: 10, fov: 60,
+    pos: [-150, 80, -110], look: [10, 0, 40] },
+  { id: 'lac_cross', label: 'The market cross and the price post', time: 11,
+    pos: [16, 2.8, 36], look: [0, 4, 24] },
+  { id: 'lac_barn', label: 'The Tithe Barn across the market place', time: 9,
+    pos: [-2, 3, 2], look: [0, 9, -30] },
+  { id: 'lac_plat', label: 'The barn plat and the Household\'s table', time: 16,
+    pos: [-15, 2.8, -43], look: [8, 1.6, -50] },
+  { id: 'lac_high', label: 'The High Street, east to the Ash Gate', time: 12,
+    pos: [38, 2.8, 18], look: [112, 4, 20] },
+  { id: 'lac_moot', label: 'The Moot Hall from Mill Lane', time: 15,
+    pos: [-1, 3, 76], look: [-17, 7, 58] },
+  { id: 'lac_forge', label: 'The forge and the Back Lane', time: 13,
+    pos: [-44, 3, 42], look: [-62, 5, 56] },
+  { id: 'lac_seed', label: 'The seed store', time: 10,
+    pos: [38, 3, 44], look: [59, 13, 55] },
+  { id: 'lac_cotts', label: 'The cott row on the North Lane', time: 17,
+    pos: [-88, 2.8, -42], look: [-44, 6, -47] },
+  { id: 'lac_mill', label: 'The Mill and the wheel, from the south bank', time: 8,
+    pos: [-6, 2.5, 152], look: [-2, 10, 120] },
+  { id: 'lac_bridge', label: 'Millbridge on the King\'s Road', time: 8.5,
+    pos: [-64, 2.5, 138], look: [-30, 4, 118] },
+  { id: 'lac_field', label: 'The West Field', time: 11,
+    pos: [-88, 3, 20], look: [-124, 2, 22] },
+];
+
 // Working framings for the door kit, off unless ?dev=1 — --all lists whatever is registered,
 // and the critic scores exactly the five above. Derived from the scene rather than hardcoded so
 // they follow the layout.
 function devShots(doc) {
   if (!new URLSearchParams(location.search).has('dev')) return [];
-  const out = WHITEWALL_SHOTS.map(s => ({ zone: 'light', ...s }));
+  const out = [...WHITEWALL_SHOTS.map(s => ({ zone: 'light', ...s })),
+    ...LONGACRE_SHOTS.map(s => ({ zone: 'neutral', ...s }))];
   for (const [di, d] of doc.districts.entries()) {
     const h = doc.objects.find(o => o.dist === di && o.type === 'house');
     if (!h) continue;
@@ -144,7 +176,7 @@ function startScene(terrain, report) {
     const saved = loadScene();
     if (saved) {
       report(saved);
-      if (saved.doc) { paveLight(terrain); return saved.doc; }
+      if (saved.doc) { paveTowns(terrain); return saved.doc; }
     }
   }
   return demoScene(terrain);
