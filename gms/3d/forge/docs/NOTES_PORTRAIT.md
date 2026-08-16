@@ -250,6 +250,13 @@ orientation change: the camera is in the same place in landscape (`d10loft_void_
 simply does not aim high enough to see out. Portrait's top frame edge is 33.5° above horizontal
 instead of 12.6°, so it does.
 
+**Amended by §10.** Two things above are no longer current. The four rooms are fixed, so the
+default-pitch worst is now 36.2 % landscape / 43.9 % portrait (door 21 and doors 10/13/19/21) —
+*higher*, because the arm is shorter in those four and a nearer ceiling fills more frame. Every
+other cell of the table is unmoved to the decimal. And "four rooms are broken" is true only of the
+**room centre**, which is all `frameFill` measures: off-centre the camera gets above the gable in
+**all 23 lofts**, including every 4.05 m one. §10.
+
 For the spread, and because a worst case with nothing beside it is not evidence:
 `shots/fx/rooms/d27gnd_P.png` is the lowest ground floor in the game (3.57 m, Blackstone) and
 `d20gnd_P.png` a mid one (4.46 m); at 31.3 % and 26.8 % they read as low-beamed rooms with the
@@ -270,7 +277,7 @@ ceiling's underside there must clear the 2.59 m eye. For a gable that is
 | **C. Re-split ground against loft in `interior.js`** | two constants: the 0.52 ground share and the loft's 3.00 clamp floor | interior proportions of every `twoUp` house. **barely works.** Doors 13/19/21 have 6.81 m to split between two floors, so the best even split is 3.40/3.41: past the bare 3.26–3.33 m, short of the 3.52–3.59 m that also clears the camera radius, and with both floors pinned at the 3.40 clamp minimum. Door 10 has room to spare (7.58 m) and would be fixed properly |
 | **D. Reduce the indoor pitch in portrait** | nothing visible in the good rooms | **actively harmful.** The eye is `heightIn + distIn·sin(p)`, so *less* pitch lowers the eye but raises the ceiling's share of the frame (§3.2's PITCH_MIN column), and *more* pitch raises the eye straight into the ceiling. §6 already killed the outdoor version |
 | **E. Raise the `twoUp` threshold from 6.6 to ~7.6** | the four worst houses (7.29–7.58 m of wall, against 8.29 for the next one up) lose their upstairs and gain a single room at the 4.70 m one-storey cap | one constant in `interior.js`, no geometry — but it deletes walkable space and leaves the exterior's second window row promising a floor that is not there |
-| **F. Step the arm's ceiling collider to follow the gable** | ~10 lines in `doors.js wallColliders`: the single full-height lid box becomes a central strip at the ridge plus flanking boxes at the eaves | `doors.js` only. Nothing the player sees changes except that the camera reels in a little sooner in the four lowest lofts, which is what it already does near their walls (`fullFrac` there is 37 %) |
+| **F. Step the arm's ceiling collider to follow the gable** | **taken — see §10.** Priced at ~10 lines; cost +36/−4 in `doors.js` plus a 42-line three-free `gablelid.js` so node can test it, and 8 tests | `doors.js` + one new sibling module. Two clauses of the estimate were wrong: the flat lid must **stay** underneath rather than be replaced, and "nothing the player sees changes" is false — the arm reels in by 4 cm at the default pitch in the 19 sound lofts and by 0.81 m in the four low ones |
 
 **I would take F, and accept the ceiling band.** F is the only option that fixes the only thing
 that is actually broken, and it fixes it for landscape too. It touches no geometry, no `K`, no
@@ -282,7 +289,24 @@ camera going through one gable in four houses is.
 The ceiling band itself I would leave alone. 43 % of the frame sounds bad written down and does
 not look bad rendered: it is a beamed loft ceiling in a store room, the window, the stair and the
 player stay legible, and buying it back costs either exterior geometry across three towns or a
-zoom on every doorway (§6). **This is Aaron's call and F is not applied.**
+zoom on every doorway (§6).
+
+**Aaron took F on 2026-08-17 and it is applied. §10.** What it actually cost, against the
+estimate above:
+
+| | estimated | actual |
+|---|---|---|
+| lines | ~10 in `doors.js wallColliders` | +36/−4 in `doors.js`, 42 in a new `js/world/gablelid.js`, 8 tests in `gablelid.test.js` |
+| shape | one central strip + two flanking boxes | one flat lid (kept) + a central band + 3–7 flanking pairs, sized by a `lidDrop` knob |
+| the four bad lofts | fixed | fixed at the room centre in both orientations, 0 of 52 rooms; **not** fixed within ~0.5 m of their eaves, where the eye is already through the gable |
+| the other 19 lofts | untouched | also fixed — they were also broken, off-centre, which §3.2 could not see |
+| what the player sees | "nothing changes" | at the default pitch: nothing in the 19 (arm 1.879 → 1.834 m), a lot in the four (1.833 → 1.025 m). At max look-down the 19 lose 10 % of arm |
+| perf | not considered | traverse worst station unchanged to the triangle; 5 collider boxes indoors becomes 14–20 |
+| `camfit` re-run + two renders | yes | yes, plus an off-centre probe `camfit` does not do and 18 renders |
+
+The ceiling band was left alone, as recommended. It moved by itself in the four low lofts —
+40.3 → 43.9 % portrait in door 10 — because a shorter arm puts a nearer ceiling in more of the
+frame. Every other room is unchanged to the decimal.
 
 ---
 
@@ -493,6 +517,12 @@ reason there is no regression surface, is that landscape is unchanged from what 
 
 Aaron to apply; the current row is now wrong.
 
+**Amended by §10.** The row's last sentence — "four lofts let the camera through the ceiling and
+that is pre-existing" — describes a bug that has since been fixed, and understated it while it
+stood: it was every loft, off-centre. Replace that sentence with: *"The camera arm's ceiling
+collider follows a loft's gable rather than sitting flat at the ridge (`js/world/gablelid.js`), or
+the camera reaches through the roof — pre-existing, and portrait is what made it visible."*
+
 > | Orientation | **Portrait first, landscape everywhere.** Both are first class on phone and desktop; there is no rotate prompt. `js/engine/fov.js` holds the 55° field on whichever axis of the viewport is *shorter*, which leaves **landscape bit-for-bit what shipped**: every landscape aspect keeps exactly its 55° vertical, so 16:9 still reads 85.6° horizontal and the 844 × 390 gate still reads the 96.8° the K = 1.5 derivation assumes. A phone in portrait gets that same frustum transposed — 96.8° vertical, 55° horizontal, the same solid angle, near-plane reach and shadow fit — so rotating the device rescales nothing, bar the 21 : 9 phones that reach the 100° cap and rescale by 2 %. The rig is orientation-independent: no arm, height, pitch or clamp differs. Portrait costs street width, 7.2 m in frame at the player against 15.7 m, and gives the ceiling a quarter to two-fifths of an interior frame. **Roofs were not raised; four lofts let the camera through the ceiling and that is pre-existing — see `docs/NOTES_PORTRAIT.md` §3.** |
 
 ---
@@ -694,9 +724,256 @@ Each revert reddened only its own test, so none of them is passing for a second 
 - **`docs/AUDIT_MOBILE.md` and `docs/PHONE_TEST.md`** still describe the rotate prompt and still
   say "phone on the same wifi, landscape". The review's finding 8, not in this brief's list, and
   they are stale in a way that will mislead whoever runs the phone pass.
-- **The four broken lofts.** §3.3 option F is ten lines in `doors.js`. It was not applied because
-  the brief reserved the interior decision for Aaron, and because a collider change wants its own
-  `camfit` run and its own pair of renders rather than being smuggled in at the end of a docs pass.
+- ~~**The four broken lofts.** §3.3 option F is ten lines in `doors.js`.~~ **Done — §10.** It was
+  more than four lofts and more than ten lines.
 - **`pickDefaultPreset()`** still branches on `innerWidth < 820`. Unchanged, pre-existing, and now
   deliberately *not* the same number as the CSS gate — the preset is about how fast the device is
   and the gate is about how the HUD should be laid out.
+
+---
+
+## 10. Option F applied — the gable lid, 2026-08-17
+
+Aaron took §3.3's recommendation. The arm's ceiling collider now follows a loft's gable instead of
+sitting flat at the ridge. Nothing else moved: no geometry, no `K`, no `zones.js`, no authored
+town, no editor, no exterior, and the 29 ground floors come out of `camfit` byte-identical.
+
+| file | change |
+|---|---|
+| `js/world/gablelid.js` | **new, 42 lines, three-free.** `gableUnder()` is the underside `stairs.js` actually builds; `lidBands()` is where the collider's lid sits under it |
+| `js/world/doors.js` | `wallColliders`'s one lid line becomes `lidBoxes()`, which keeps that box and adds the bands under it. `lidDrop` knob, and the `gableRise` / `lidBands` imports |
+| `js/world/gablelid.test.js` | **new, 8 tests** |
+| `docs/CAMFIT_PORTRAIT_F.json` | the re-run, written alongside `CAMFIT_PORTRAIT.json` rather than over it |
+
+### 10.1 What the shape had to be, and why §3.3's shape does not work
+
+§3.3 says "the single full-height lid box becomes a central strip at the ridge plus flanking boxes
+at the eaves". Three things about that turned out to be wrong, and each one was found by building
+it and measuring, not by reading.
+
+**A box the eye is *inside* is a catastrophe, not a shorter arm.** `colliders.js slab` returns
+`t0 = 0` for a ray that starts inside a box, for *every* direction at once, and `player.js` then
+takes `max(armMin, 0 − 0.06)` — the camera lands 0.40 m from the back of the head and stays there
+whichever way you look. The eye indoors is `deck + heightIn` = 2.05 m, and in door 10's loft the
+gable is **1.90 m at the eaves**: a flanking box lidded at the eaves would swallow the eye over the
+last 0.5 m of walkable floor. So every band has to stop `camRadius + 0.08 m` clear of the eye, and
+past that point *no collider can help at all* — the eye is inside the roof and the only fixes are
+geometry or a tighter walkable inset, neither of which is in `doors.js`. 60 of door 10's 320 grid
+spots are like that, 17–20 of 272–304 in doors 13/19/21, and **none at all** in the other 19 lofts.
+
+**The flat lid has to stay.** The first build replaced it with the bands, as §3.3 describes. Past
+where the bands stop the outer band then had *no* lid, and the camera could climb to the ridge
+there: worst overshoot went from 0.947 m to **1.206 m** — the change made it worse. The flat box at
+`I.top` is still the first thing `lidBoxes` emits, for every room, and the bands go under it.
+
+**A band lidded at the lowest ceiling it spans is too conservative.** That is the obvious choice —
+it makes the box a strict superset of the roof void, so no escape is possible at all — but it pays
+for it in arm. Standing at the centre of door 10's loft with the camera swung straight across the
+gable, where the geometry allows 1.861 m bare and 1.378 m with the camera's own radius kept clear:
+flat lid 2.100 m (0.128 m **above** the ceiling — the bug), outer-edge bands 1.094 m, inner-edge
+bands **1.270 m**. Each band is therefore lidded at the ceiling over its **inner** edge, which
+under-covers by `lidDrop` at the outer one; that is still safe as long as the drop is no more than
+`camRadius`, because the arm already keeps that clearance off any box. Identical escape numbers,
+and over door 10's whole floor at the default pitch the mean arm goes 1.022 → 1.144 m. `lidDrop`
+defaults to 0.20 m against a 0.26 m radius, and is the knob.
+
+The last band, past where the ceiling comes down to the eye, is flat at that clearance. It is worth
+its cost and I priced both ways in door 10's loft at the default pitch: with it, mean arm 0.94 m and
+24.0 % of samples above the gable, deepest 0.37 m; without it, 1.29 m and 31.1 %, deepest 0.72 m.
+
+### 10.2 The four bad lofts — `camfit`, both orientations
+
+`node tools/camfit.mjs --json=docs/CAMFIT_PORTRAIT_F.json`, against `CAMFIT_PORTRAIT.json`. Headings
+of 12, at the room centre, at the default pitch, that put the eye in the ceiling:
+
+| | landscape | portrait | ceiling share L | ceiling share P | `fullFrac` | `coreZ` |
+|---|---|---|---|---|---|---|
+| door 10 loft | 6 → **0** | 6 → **0** | 34.5 → 35.8 % | 40.3 → 43.9 % | 0.379 → 0.037 | 0.781 → 0.063 |
+| door 13 loft | 2 → **0** | 2 → **0** | 32.8 → 32.8 % | 42.8 → 43.9 % | 0.370 → 0.103 | 0.781 → 0.250 |
+| door 19 loft | 2 → **0** | 2 → **0** | 33.2 → 33.4 % | 43.0 → 43.9 % | 0.371 → 0.103 | 0.781 → 0.250 |
+| door 21 loft | 6 → **0** | 6 → **0** | 34.7 → 36.2 % | 40.3 → 43.9 % | 0.370 → 0.089 | 0.750 → 0.143 |
+
+`rooms where the eye reaches the ceiling and the player sees through the roof: 0 of 52`, in both
+orientations. That line read 4 of 52 before.
+
+### 10.3 The good rooms — did it get claustrophobic?
+
+**Ground floors: no, and provably.** All 29 are byte-identical between the two `camfit` JSONs —
+every field, including `fullFrac`, `coreX`, `coreZ`, `minArm` and all four ceiling shares. The
+median stays `fullFrac` 0.764, `coreX` 0.794, `coreZ` 0.781, ceiling 0.2 % landscape / 26.8 %
+portrait. `shots/fx/roomsF_before/d10gnd_P.png` and `shots/fx/roomsF/d10gnd_P.png` are visually
+indistinguishable, as they should be.
+
+**Lofts: `fullFrac` says yes, and `fullFrac` is the wrong number.** Median loft `fullFrac` 0.772 →
+0.623 looks alarming, but it blends the default pitch with `pitchMaxIn`, and all of the loss is in
+the second. Median mean arm over the walkable floor × 12 headings, by pitch:
+
+| | default 0.26 | max look-down 0.50 | looking up −0.35 |
+|---|---|---|---|
+| the 19 sound lofts | 1.879 → **1.834 m** | 1.902 → 1.711 m | 1.885 → 1.885 m |
+| the 4 low lofts | 1.833 → **1.025 m** | 1.630 → 0.709 m | 1.841 → 1.841 m |
+
+So in the 19 the player will not notice at the pitch they play at (−2.4 %), loses a tenth of the arm
+only while dragging the camera fully down, and loses nothing looking up. In the four low ones the
+arm halves, and it should: door 10's loft is 3.13 m at the ridge and 1.85 m at the eaves against a
+2.05 m eye, and the long arm it had was a camera in the roof. Median loft ceiling share is unchanged
+at 39.0 % portrait / 24.0 % landscape, and the median *room* looking up is unchanged at 51.2 % /
+45.2 %.
+
+### 10.4 The survey §3 could not do — and where §3 is wrong
+
+`camfit frameFill` measures the room centre. A scratch probe swept the whole walkable floor × 12
+headings × three pitches against the real collider set, testing the camera centre against the
+gable underside rather than against `I.top`:
+
+| | before | after |
+|---|---|---|
+| lofts with the camera above the gable somewhere | **23 of 23** | **4 of 23** |
+| samples above the gable | 38 842 of 333 828 (11.64 %) | 6 517 (**1.95 %**) |
+| worst overshoot | 0.971 m | **0.453 m** |
+| a 4.05 m loft (door 3), all pitches / at max look-down | 5.3 % / 15.9 % of samples, 0.31 m | **0.00 %** |
+| a 3.68 m loft (door 20), all pitches / at max look-down | 19.3 % / 45.6 %, 0.65 m | **0.00 %** |
+| door 10 loft, default pitch | 56.3 %, 0.72 m | 24.0 %, 0.37 m |
+
+**§3.2's "four rooms are broken" is a room-centre statement.** Every loft in the game let the
+camera through the gable somewhere on its floor, the 4.05 m ones included, at max indoor pitch near
+the eaves. `shots/fx/roomsF_before/d03loft_P.png` is door 3 — the *largest* loft in the world,
+10.4 × 6.4 m with a 4.05 m ridge — standing 4 m off the ridge line: blue sky across the top third
+and the player cut off at the waist by the ceiling slab. `shots/fx/roomsF/d03loft_P.png` is the same
+stance after. That is the strongest evidence in this pass that F was the right call and that the
+case for it was understated.
+
+Two smaller corrections. `camfit`'s own `escaped` and `poke` columns still measure the *flat ridge*,
+so they read `0 of 52` and `0.000 m` before **and** after — §9.7's third point, still true, and the
+reason the off-centre survey had to be a separate probe. And §3.3's target derivation
+(`roomH2 ≥ 3.26–3.33 m`) is right for what it measures and only measures the centre.
+
+### 10.5 What is still broken, and cannot be fixed from here
+
+In doors 10, 13, 19 and 21's lofts the camera can still get above the gable for 14–19 % of
+(stance × heading × pitch) samples, worst overshoot 0.453 m, all of it in the band within about
+0.5 m of the eaves where **the eye itself is above the gable** — a 2.05 m eye under an 1.85 m
+ceiling. A collider there would swallow the eye (§10.1). Two other floors bound the residual and
+neither is in `doors.js`: `armMin` is 0.40 m, so at max look-down the camera sits 0.24 m above the
+eye however hard the lid pushes, which alone accounts for up to 4 cm of overshoot in *every* loft;
+and `interior.js`'s 0.42 m walkable inset is what lets the player stand under a 1.85 m ceiling in
+the first place. Looking up (`PITCH_MIN`) the four keep an unchanged 2.6 % escape rate: there the
+camera is *below* the eye, below anything a lid can reach.
+
+The honest one-line summary is: **F fixes the bug everywhere the player's own head is under the
+ceiling, and nowhere it is not.** Option C or E, or a larger walkable inset, is what closes the
+rest; none of them is a collider change.
+
+### 10.6 The stairs
+
+`autoStair` defaults true and the climb has its own arm rule (`climb.js` drives `distIn` to
+0.70–1.50 and `heightIn` to 1.55), so a lid placed off the standing eye could bite mid-flight.
+Driven up **and** down in seven loft houses — 10, 13, 19, 21, 3, 0, 14 — sampling every frame:
+
+- every climb completes, lands on the right level, and takes the same number of frames as at HEAD
+  (110–118, identical);
+- `minArm` during a climb is 0.803–0.823 m in every house, before and after, and that is
+  `climb.js`'s own `TIGHT + room·0.7` — **the arm never reaches `armMin` on a stair, in either
+  build**, so the bands never bite during the scripted walk;
+- the camera never goes above the gable on a stair. On the way *down* in door 10 it used to come
+  within 0.064 m of it; it is now 0.252 m clear;
+- the only difference is where the arm settles after the hand-back on the deck: 2.10 → 1.274 m
+  (door 10), 2.10 → 1.380 (13), 2.10 → 1.604 (21), and 2.10 → **2.10** in doors 3, 0 and 14. That is
+  the intended reel-in, in exactly the rooms that needed it.
+
+A full round trip — walk in through the door, climb, descend, walk out — was driven at doors 10, 13
+and 3: `state` returns to `out`, `indoor` to 0, `colliders.extra` to empty, the arm to 2.404 m
+outdoors, no console errors, and the one `minArm` of 0.40 in the sequence (door 13, in the doorway)
+is present at HEAD too.
+
+### 10.7 Renders
+
+Before in `shots/fx/roomsF_before/`, after in `shots/fx/roomsF/`, same stances, same build, both
+orientations at 390 × 844 and 844 × 390. (`shots/` is gitignored, as `shots/fx/rooms/` already was.)
+Each is reported with the camera's height above the gable at that instant.
+
+| | before | after |
+|---|---|---|
+| `d10loft_void_P` | arm 2.10, **+0.132 m above the gable** — sky across the top, floorboards through the player | arm 1.257, −0.322 m. Sloping ceiling in the top 44 %, far wall, stair rail, whole player |
+| `d10loft_void_L` | arm 2.10, +0.132 — reads correct only because landscape does not aim high enough | arm 1.257, −0.322. A tighter but plainly correct loft |
+| `d13loft_void_P` | arm 2.10, +0.055 — sky across the top fifth | arm 1.555, −0.238. Ceiling boards where the sky was |
+| `d13loft_void_L` | arm 2.10, +0.055 | arm 1.555, −0.238. Clean loft, stair well, rail |
+| `d10loft_down_P` (pitch 0.50) | arm 1.644, **+0.209** — the slab flattens into a pale plane across the top half | arm 1.064, −0.217. Proper gable |
+| `d03loft_P` / `_L` (a *sound* 4.05 m loft) | arm 2.10, **+0.252** — blue sky, player cut off at the waist | arm 1.324, −0.256. Whole player, boards, window patch on the floor |
+| `d10loft_up_P` / `_L` (`PITCH_MIN`) | arm 2.10, −1.145 | **identical**, arm 2.10. Landscape is 75 % ceiling, which is §3.2's inversion and is untouched |
+| `d10gnd_P` / `_L` (control) | arm 2.10 | **identical** |
+| `d10loft_eaves_P` (the residual) | arm 2.10, −0.293 | arm 0.40, −0.252 — the worst frame the change produces: correct, but the player's head fills the bottom third |
+
+`d10loft_eaves_P` is the one to look at before signing this off. Standing 2.6 m off the ridge in
+door 10's loft, the ceiling is 2.30 m and the eye is 2.05 m with a 0.26 m camera radius — there is
+no headroom, so the arm is on its floor and the frame is a face-cam. It is not a bug and it is not
+sky, but it is the price, and it only happens in those four rooms.
+
+### 10.8 Tests, and the revert-to-red evidence
+
+`node --test` **577 pass / 0 fail** (569 before, 8 new). Each revert was applied to the working tree
+and the suite re-run.
+
+| test | reverting | result |
+|---|---|---|
+| the gable underside is the one `stairs.js` builds | — | **stays green** unless `gableCeiling`'s slab moves. It pins `gablelid.js`'s 3.05 / 1.90 m against what `camfit` raycasts off the built mesh, which is the one number the whole fix is aimed at |
+| no lid band comes down onto the eye | `CLR` 0.08 → 0 | **red** |
+| a band never stands more than the camera radius above the ceiling it covers | — | **stays green** at the default drop; it is the invariant the drop knob is bounded by |
+| a step taller than the camera radius stops containing the slope | bands lidded at their **outer** edge instead of their inner one | **red** |
+| the arm cannot put the camera above a loft gable anywhere the bands can reach | `lidBands` returns nothing | **red** |
+| " | the flat clearance band past the slope dropped | **red** |
+| the flat ridge lid alone is what let it through | — | **stays green.** It is the negative control: it asserts the *old* collider set fails the test above, so a green suite cannot mean the sweep is vacuous |
+| `doors.js` builds its loft lid out of `gablelid.js` | `lidBoxes` back to the single flat box | **red** |
+| " | band lids read in the wrong frame (`oy + lid`, deck dropped) | **red** |
+| " | `doors.js` stops importing `gablelid.js` | **red** |
+| the loft step is a knob and rebuilding it mid-climb is refused | the `!this.climb.running` guard removed | **red** |
+
+The sweep test is the load-bearing one: it rebuilds the room's whole collider set the way
+`lidBoxes` lays it out, rays it with `colliders.js slab`'s own maths and `player.js`'s
+`max(armMin, clear − 0.06)`, over 175 room shapes bracketing `interior.js`'s 3.00–4.05 m clamp and
+`stairFits`'s minimum, × the walkable floor × 12 headings × three pitches. It asserts the camera
+ends under the gable wherever the collider — not `armMin` — is what stopped it, and within the
+boarding's own thickness where `armMin` is.
+
+Two things it does **not** prove, said plainly. The maths lives in `gablelid.js` because `doors.js`
+imports `three` and node cannot reach it — the split `propstate.js` / `nodestate.js` / `roster.js`
+already established and `split.test.js` polices. So the wiring between the two is held by a
+source-shape assertion, not by execution: three of the reverts above prove that assertion bites,
+but a fourth way of breaking the wiring that still matched the regexes would slip through. And
+`slab` is re-implemented in the test rather than imported, because `colliders.js` reaches `three`
+through `terrain.js`; the *fix* is the band placement and that is real, but a change to `slab`
+itself would not be caught here.
+
+`node tools/lintQuests.mjs` — 99 quests, 405 steps, 175 nodes, the one known `light.06` warning.
+`node tools/lintText.mjs` — 175 nodes, 705 lines, longest 43/46, clean.
+
+### 10.9 Perf
+
+`node tools/budget.mjs --traverse --step=25 --w=844 --h=390 --preset=medium --dpr=1`, the gate
+profile: worst **316 605 triangles** (186.0k main + 130.6k shadow) at (−512.444, −71.095) yaw 0 and
+worst **139 calls** (109 main) at (−81.547, 108.552) yaw 240, 0 of 348 samples over the 350k gate.
+Every one of those figures is identical to `docs/TRAVERSE_PT25_L.json` — the same station, the same
+counts, the same block breakdown. Nothing was going to move: interiors only exist while you are
+inside one, and a collider is not drawn.
+
+What did move is the indoor slab-test count. `colliders.extra` goes from 5 boxes to 14 in the four
+low lofts, 18 in a 4.05 m one and 20 in a 3.68 m one — the 3.68s take the most because they are the
+only ones with a full run of sloped bands *and* a flat clearance band on the end. It is still 5 in
+the six houses with no loft. Indoors `interiorOnly` is set, so those boxes are the
+*entire* collider set the arm rays against — 20 slab tests on one ray a frame, against the 550 the
+outdoor path culls down from.
+
+(Note: `budget.mjs --traverse` writes `docs/BUDGET_LATEST.json`, which at HEAD holds a *scenario*
+run, not a traverse. It was overwritten by this and restored from git.)
+
+### 10.10 Still open
+
+- The residual in the four low lofts, §10.5. It needs `interior.js` or geometry, not `doors.js`.
+- **The player's head goes through the gable near the eaves** in doors 10, 13, 19 and 21 — the
+  camera aim at 2.05 m under an 1.85 m ceiling. That is what makes the residual unfixable from a
+  collider, and it is worth someone deciding whether the *visible* player mesh clips too, which
+  this pass did not check.
+- `lidDrop` is registered but no preset carries it, deliberately: it is a dev knob, and a preset
+  that set it above `camRadius` would silently reopen the bug. `gablelid.test.js` asserts that the
+  0.20 default is inside the radius and that 0.6 is not, so the trade is documented in a test rather
+  than in a comment.

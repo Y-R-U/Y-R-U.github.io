@@ -6,6 +6,8 @@ import { getMaterial } from './materials.js';
 import { Colliders, wallBox } from './colliders.js';
 import { Interior } from './interior.js';
 import { Climb } from './climb.js';
+import { gableRise } from './stairs.js';
+import { lidBands } from './gablelid.js';
 
 const OUT = 3.10;     // where you are taken to before the door opens
 const IN = 2.35;      // where you end up on the other side
@@ -37,6 +39,7 @@ export class Doors {
     this.since = 0;
     this.radius = 2.25;
     this.secs = 1.9;
+    this.lidDrop = 0.20;
     this.enabled = true;
     this.env = { power: 1, glow: 1, shaft: 0.45, day: 1, sunColor: new THREE.Color(1, 1, 1), t: 0 };
     this.refresh();
@@ -61,6 +64,10 @@ export class Doors {
       v => { this.climb.enabled = !!v; if (!v) this.climb.stop(); });
     q.register({ key: 'stairPace', label: 'Stair walk speed', type: 'range', min: 0.8, max: 4, step: 0.1, default: 2.2, group: 'Interiors' },
       v => { this.climb.pace = v; });
+    // Not rebuilt mid-climb: the climb drops heightIn to 1.55 and the steps are placed off it, so
+    // a rebuild there would leave boxes the eye is inside of once the climb restores it.
+    q.register({ key: 'lidDrop', label: 'Loft ceiling step (m)', type: 'range', min: 0.05, max: 0.6, step: 0.05, default: 0.20, group: 'Interiors' },
+      v => { this.lidDrop = v; if (this.state === 'in' && !this.climb.running) this.wallColliders(this.active); });
   }
 
   // Skips the walk and drops the player inside, for renders and tests. -1 does nothing.
@@ -381,11 +388,36 @@ export class Doors {
       wallBox(0, I.rz + th, I.rx + th, th, y0, y1, cs, sn, ox, oz),
       wallBox(I.rx + th, 0, th, I.rz + th, y0, y1, cs, sn, ox, oz),
       wallBox(-I.rx - th, 0, th, I.rz + th, y0, y1, cs, sn, ox, oz),
-      // The shell has a lid too. At max indoor pitch the eye plus its radius reaches 3.32 m above
-      // the floor and the smallest room is 3.40 m, so without this the camera leaves through the
-      // boards on any room near the minimum.
-      wallBox(0, 0, I.rx + th, I.rz + th, oy + I.top, oy + I.top + 0.3, cs, sn, ox, oz),
+      ...this.lidBoxes(I, oy, y1, th, cs, sn, ox, oz),
     ];
+  }
+
+  // The shell has a lid too. At max indoor pitch the eye plus its radius reaches 3.32 m above the
+  // floor and the smallest room is 3.40 m, so without one the camera leaves through the boards on
+  // any room near the minimum.
+  //
+  // Over a loft that lid is a gable, not a slab: stairs.js drops it to `ceil2 − gableRise` at the
+  // eaves, 1.90 m in the lowest one, so a single box at the ridge is up to 1.28 m above the
+  // ceiling the player can see and the arm sails straight through it. gablelid.js's bands follow
+  // the slope, and go *under* the flat lid rather than instead of it — the band past where they
+  // stop would otherwise lose the one lid it had.
+  lidBoxes(I, oy, y1, th, cs, sn, ox, oz) {
+    const out = [wallBox(0, 0, I.rx + th, I.rz + th, oy + I.top, oy + I.top + 0.3, cs, sn, ox, oz)];
+    if (!I.loft) return out;
+    const alongX = I.rx >= I.rz, run = Math.max(I.rx, I.rz) + th;
+    const P = this.player;
+    const bands = lidBands(I.roomH2, gableRise(I), Math.min(I.rx, I.rz), th,
+      P.heightIn, P.camRadius, this.lidDrop);
+    for (const { u0, u1, lid } of bands) {
+      const y0 = oy + I.deck + lid;
+      if (!u0) { out.push(wallBox(0, 0, alongX ? run : u1, alongX ? u1 : run, y0, y1, cs, sn, ox, oz)); continue; }
+      const c = (u0 + u1) / 2, h = (u1 - u0) / 2;
+      for (const s of [-1, 1]) {
+        out.push(wallBox(alongX ? 0 : s * c, alongX ? s * c : 0,
+          alongX ? run : h, alongX ? h : run, y0, y1, cs, sn, ox, oz));
+      }
+    }
+    return out;
   }
 
   // The sun direction in the active house's own frame, which is the frame the room is built in.
