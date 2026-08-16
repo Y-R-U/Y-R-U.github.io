@@ -5,21 +5,36 @@ Measured against the corpus on 2026-08-16, not estimated. Every number here came
 
 ## Where the game actually stands
 
-99 quests, 405 steps, 389 objectives. Seven of the eight primitives are live:
+99 quests, 405 steps, 389 objectives. All eight primitives are live:
 
 | primitive | objectives | distinct ids | state |
 |---|---|---|---|
 | `talk` | 165 | 17 | **works** — 18 named NPCs are fixed bodies (`data/cast_at.json`) |
 | `interact` | 82 | 48 | **works** — all 48 props placed (`data/props.json`); one `self` id left (`dark.02 robe`) |
 | `goto` | 49 | 28 | **works** — `areasAt` drives it off `data/areas.json` |
-| `kill` | 12 | 8 | **works** for the 6 creature-rigged ids; `raider`/`hollow`/`watchman` need a people-rigged spawn |
-| `survive` | 7 | 4 | **works** in principle — untested, and needs enemies that can threaten |
+| `kill` | 12 | 8 | **works** — all 8 ids bodied, humanoids as cloak variants (`js/world/robed.js`) |
+| `survive` | 7 | 4 | **works** — `survive reach.east 60` completed live |
 | `gather` | 48 | 24 | **works** — 26 nodes (`data/gather.json`), fishing, forage, mining, cooking |
 | `deliver` | 24 | 13 | **works** — selling, plus a hand-over for the 11 non-sell targets |
-| `escort` | 6 | 3 | no escort actors |
+| `escort` | 6 | 3 | **works** — `fen`, `hen`, `wagon`, `cart` (`data/escorts.json`) |
 
-**Roughly 380 of 389 objectives now resolve.** `light.01` and `light.26` complete end to end. What
-is left is `escort`, the three people-rigged `kill` ids, and the `survive` steps that need them.
+**0 objectives in the corpus are unproducible by the runtime.**
+
+**Count quests, not objectives.** Objective coverage is a misleading measure, because one blocked
+step stops everything downstream of it in the unlock ladder. Measured with `campaign.test.mjs`'s
+own `playThrough()`, varying only which events the harness is allowed to manufacture:
+
+| harness may manufacture | story quests finished |
+|---|---|
+| everything — what the suite used to do | 79 / 79 |
+| only kills a rig can body | 18 / 79 |
+| only events the runtime can produce at all | **4 / 79** |
+| …the same honest gate, now | **79 / 79** |
+
+The floor was **4**, not 18. Two causes: `sour_crow` had no rig, and four `kill` objectives named
+no area, so `planFrom` (`s.in || o.area`) planned them nowhere — the ladder died at `light.05`, the
+second quest in the game. `whyNoEvent()` now gates every manufactured event and the ladder tests
+assert on it, so deleting a single `in` field turns 11 tests red.
 
 ## What is not missing, contrary to earlier notes
 

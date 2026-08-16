@@ -9,9 +9,9 @@ import { rng, span } from './details.js';
 import { heightAt } from './terrain.js';
 import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
-import { ACT, STATE } from '../sim/foes.js';
+import { ACT, STATE, carry } from '../sim/foes.js';
 import { roster, buckets, seatsLeft, PER_MESH } from './roster.js';
-import { FOES, shapeOf, lampAt, LAMP_STAFF } from './foeshape.js';
+import { FOES, shapeOf, lampAt, lampCount, carriesLamp, LAMP_STAFF } from './foeshape.js';
 import {
   Build, robe, hood, tube, cavityTone, eyeTones, robeColor, robeMaterial, robeDepth, aoDisc,
 } from './people.js';
@@ -84,12 +84,13 @@ function foeGeometry(id) {
 }
 
 const POOL = 24;
-// props.js's numbers for a lit lantern, which that wave measured against daylight at nine metres:
-// a hard core and five nested additive shells. A Watchman has to be seen further off than a lamp
-// post does, so it is the same recipe one size up.
+// props.js's lit lantern — a hard core and five nested additive shells — with a wider, softer
+// halo. Against props.js's `0.13, [0.17, 0.23, 0.29, 0.35, 0.41], 0.06` the core is 12% smaller
+// and the gain 8% lower and only the outer three shells grew: a Watchman has to read as a light
+// from further off than a lamp post does, and a bigger hard core reads as a bulb at four metres.
 const LAMP_R = 0.115, HALO_R = [0.17, 0.23, 0.30, 0.38, 0.47], HALO_GAIN = 0.055;
 
-// Where the ?dev=1 turntable stands each variant, relative to the dev site.
+// The order the ?dev=1 turntable stands the variants in.
 const DEV_ROW = Object.keys(FOES);
 
 export class Robed {
@@ -268,9 +269,7 @@ export class Robed {
         m4.compose(pos, q, scl);
         mesh.setMatrixAt(i, m4);
 
-        if (a.enemy === 'watchman' && a.act !== ACT.die) {
-          lamps.push(new THREE.Vector3(...lampAt(FOES.watchman)).applyMatrix4(m4));
-        }
+        if (carriesLamp(a)) lamps.push(new THREE.Vector3(...lampAt(FOES.watchman)).applyMatrix4(m4));
 
         if (ai < POOL) {
           if (T) {
@@ -305,13 +304,12 @@ export class Robed {
     }
   }
 
-  // js/sim/foes.js sets the heading and the speed; carrying the body along them is the rig's job,
-  // exactly as vermin.js does it. No wander and no leash turn: giving up is the AI's call.
+  // js/sim/foes.js decides the heading and the speed and `carry` applies them; this puts the
+  // colliders on top. No wander and no leash turn: giving up is the AI's call.
   walk(a, dt) {
-    if (!(a.speed > 0.01) || a.act === ACT.die) return;
-    const wx = a.x + Math.sin(a.heading) * a.speed * dt;
-    const wz = a.z + Math.cos(a.heading) * a.speed * dt;
-    const step = collidersReady() ? walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.34) : { x: wx, z: wz };
+    const w = carry(a, dt);
+    if (!w) return;
+    const step = collidersReady() ? walkStep(a.x, a.z, w.x, w.z, a.y ?? 0, 0.34) : w;
     a.x = step.x;
     a.z = step.z;
   }
@@ -327,15 +325,15 @@ export class Robed {
   drawLamps(at) {
     const m4 = new THREE.Matrix4();
     const s = new THREE.Vector3(), q = new THREE.Quaternion();
+    const n = lampCount(at.length, this.lampLevel, PER_MESH);
     for (const mesh of [this.lampCore, this.lampHalo]) {
-      const n = Math.min(at.length, PER_MESH);
       for (let i = 0; i < n; i++) {
         s.setScalar(this.lampLevel);
         m4.compose(at[i], q, s);
         mesh.setMatrixAt(i, m4);
       }
       mesh.count = n;
-      mesh.visible = n > 0 && this.lampLevel > 0;
+      mesh.visible = n > 0;
       mesh.instanceMatrix.needsUpdate = true;
     }
   }
@@ -350,10 +348,12 @@ export class Robed {
     return { tris, drawn: drawn + (this.ao.count ? 1 : 0) + (this.lampCore.count ? 2 : 0) };
   }
 
-  // Only with ?dev=1: --all must keep rendering exactly the five scenarios the critic scores.
-  devScenarios() {
-    const site = { x: 0, z: 44 };
-    const stand = i => ({ x: site.x - 5.6 + i * 2.4, z: site.z });
+  // The turntable row, built by the foe_* scenarios that frame it and by nothing else. It used to
+  // be built in the constructor, which put six enemies between people.js's dev cameras and the
+  // crowd: `people_day` and `people_dusk` came back 29% changed against the pre-wave tree.
+  devRow(stand) {
+    if (this.rowBuilt) return;
+    this.rowBuilt = true;
     for (const [i, id] of DEV_ROW.entries()) {
       const p = stand(i);
       this.agents.push({
@@ -363,9 +363,16 @@ export class Robed {
       });
     }
     this.assign();
+  }
+
+  // Only with ?dev=1: --all must keep rendering exactly the five scenarios the critic scores.
+  devScenarios() {
+    const site = { x: 0, z: 44 };
+    const stand = i => ({ x: site.x - 5.6 + i * 2.4, z: site.z });
     const shot = (id, label, opts) => defineScenario({
       id, label, zone: 'neutral',
       setup: app => {
+        this.devRow(stand);
         const gy = heightAt(opts.at.x, opts.at.z);
         frameCamera(app, {
           pos: [opts.at.x + opts.dx, gy + opts.h, opts.at.z + opts.dz],

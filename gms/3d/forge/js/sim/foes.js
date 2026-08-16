@@ -37,6 +37,14 @@ export const AI = {
 
 export const isLive = f => f.state !== STATE.dying && f.state !== STATE.dead;
 
+// Where a body ends up after a frame of the heading and speed `think` set, or null if it is not
+// going anywhere. The rigs put the colliders on top of this; it is here because vermin.js, robed.js
+// and chicken.js each had the same four lines and none of them could be reached from a node test.
+export function carry(a, dt) {
+  if (!(a.speed > 0.01) || a.act === ACT.die) return null;
+  return { x: a.x + Math.sin(a.heading) * a.speed * dt, z: a.z + Math.cos(a.heading) * a.speed * dt };
+}
+
 export function arm(a, enemy) {
   const e = ENEMIES[enemy];
   if (!e) return null;

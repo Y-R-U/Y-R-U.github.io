@@ -81,7 +81,7 @@ function playAct1() {
   send({ t: 'talk', npc: 'kesta', node: 'light.05.in' });
   at(23);
   send({ t: 'tick', dt: 90, areas: ['wwa.northgate'] });
-  send({ t: 'kill', kind: 'mire_rat', n: 2 });
+  send({ t: 'kill', kind: 'mire_rat', n: 2, area: 'wwa.northgate' });
   send({ t: 'talk', npc: 'kesta', node: 'light.05.out' });
 
   at(12.5, 7);

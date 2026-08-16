@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { ACT, ACT_T, AI, STATE, arm, hurt, think, isLive, CHARGES } from './foes.js';
+import { ACT, ACT_T, AI, STATE, arm, hurt, think, isLive, carry, CHARGES } from './foes.js';
 import { ENEMIES } from './tables.js';
 import { resolveHit, power, tapsToKill } from './combat.js';
 
@@ -99,4 +99,21 @@ test('a level-1 Kindle bolt kills a grain rat in the number of taps the table sa
   }
   assert.equal(n, taps);
   assert.equal(a.state, STATE.dying);
+});
+
+// Three rigs had a copy of these four lines and no node test could reach any of them: setting
+// `SPEED` to 0, or dropping the position write, left the whole suite green while nothing in the
+// world could follow or chase you.
+test('a body is carried along the heading and the speed think() gave it', () => {
+  const a = { x: 10, z: -4, heading: 0, speed: 3, act: ACT.none };
+  const north = carry(a, 0.5);
+  assert.deepEqual([+north.x.toFixed(6), +north.z.toFixed(6)], [10, -2.5], 'heading 0 is +z');
+
+  const east = carry({ ...a, heading: Math.PI / 2 }, 0.5);
+  assert.deepEqual([+east.x.toFixed(6), +east.z.toFixed(6)], [11.5, -4]);
+  assert.equal(Math.hypot(east.x - a.x, east.z - a.z).toFixed(4), (3 * 0.5).toFixed(4));
+
+  assert.equal(carry({ ...a, speed: 0 }, 0.5), null, 'a standing body is not moved');
+  assert.equal(carry({ ...a, speed: 0.005 }, 0.5), null, 'and neither is a rounding error');
+  assert.equal(carry({ ...a, act: ACT.die }, 0.5), null, 'a body going over does not keep walking');
 });

@@ -25,7 +25,7 @@ import {
   handovers, gatherWants, rawOf, gatherEvent, cookEvent, deliverEvent,
 } from './gathering.js';
 import { nameOf, started } from './towns.js';
-import { escortActors, escortWants, escortEvent, newEscort, stepEscort } from './escort.js';
+import { ESCORT, escortActors, escortWants, escortEvent, newEscort, stepEscort } from './escort.js';
 import { FOOTSTEP_EVERY, RANGE } from './sounds.js';
 import { focusCost, canCast, idOf, SPELLS } from '../sim/spells.js';
 import { grantXp } from '../sim/xp.js';
@@ -105,7 +105,7 @@ export class Session {
     this.nodes = new NodeSet(this.world.gatherNodes?.() || []);
     this.run = null;
     this.escorts = {};
-    this.shown = '';
+    this.shown = new Set();
     this.working = null;
     this.cooking = null;
     this.healing = null;
@@ -837,14 +837,20 @@ export class Session {
     const p = this.player?.pos;
     if (!w || !p) return;
     const wanted = escortActors(this.quests.defs, this.doc.quests);
-    const key = wanted.join();
-    if (key !== this.shown) {
-      for (const npc of this.shown ? this.shown.split(',') : []) {
-        if (!wanted.includes(npc)) { w.show(npc, false); w.park(npc); }
-      }
-      for (const npc of wanted) w.show(npc, true);
-      this.shown = key;
+    for (const npc of this.shown) {
+      if (wanted.includes(npc)) continue;
+      // A repeatable board job goes straight to `cooling` the moment it credits, and the player is
+      // necessarily inside 30 m or the escort would have been lost — so taking the body away here
+      // deleted the hen at the hen house door and snapped Fen back to Millbridge while they
+      // watched. It waits until nobody is near enough to see it happen.
+      const at = w.at(npc);
+      if (at && Math.hypot(at.x - p.x, at.z - p.z) < ESCORT.lose) continue;
+      // Park before hiding: hiding the hen takes its agent away, and `park` has nothing to move.
+      w.park(npc);
+      w.show(npc, false);
+      this.shown.delete(npc);
     }
+    for (const npc of wanted) if (!this.shown.has(npc)) { w.show(npc, true); this.shown.add(npc); }
 
     const live = escortWants(this.quests.defs, this.doc.quests, this.quests.ctx());
     for (const npc of Object.keys(this.escorts)) {

@@ -184,6 +184,14 @@ async function main() {
     const url = `${base}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}${args.hud ? '&hud=1' : ''}${args.set ? '&' + args.set : ''}`;
     await S('Page.navigate', { url });
     await waitFor(S, `window.__forge && window.__forge.ready`, 15000);
+    // A typo, or a dev-only id without --set=dev=1, used to render the default camera pointing at
+    // a wall and write the PNG anyway. Every render check made that way is worthless and says so
+    // nowhere.
+    const ids = await evalJSON(S, `window.__forge.scenarios.map(s=>s.id)`);
+    if (!ids.includes(shot)) {
+      throw new Error(`unknown scenario "${shot}" — this page registered ${ids.join(', ')}`
+        + `${args.set ? '' : '. The foe_*, people_*, fowl_* and vermin_* ones need --set=dev=1'}`);
+    }
     // A reduced shadow rate makes captured frames bimodal — calls and triangles depend on whether
     // the frame you landed on rebuilt the map. Perf runs measure the worst case, not the luck.
     if (args.perf) await evalJSON(S, `(()=>{__forge.app.quality.set('shadowRate','every frame');return 1})()`);

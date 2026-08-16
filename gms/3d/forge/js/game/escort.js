@@ -10,11 +10,24 @@ export const ESCORT = {
   grace: 6,         // …but only after this many seconds of it
   hurry: 12,        // past this it breaks into a hurry, which is what keeps a walk from being a wait
   hurryMul: 1.5,
-  // Three of the four authored destinations already contain the actor's start — `reach.neutral` is
-  // the whole Longacre bank and Fen stands on it — so arriving is being inside the area *and*
-  // having been walked this far from where the escort began.
+  // Arriving is being inside the destination *and* having been walked this far from where the
+  // escort began. Fen stands 2.6 m from the edge of `lac.mill`, so without it the ferry crossing
+  // credits for two steps sideways.
   travel: 12,
 };
+
+// How fast each body walks to keep up. The player walks at 5 m/s and sprints at 8.5, so everything
+// here falls behind a sprint and closes again once the gap passes `hurry`. Here rather than in
+// js/world/escorts.js because that file imports three and nothing could check these numbers.
+export const SPEED = { person: 4.7, fowl: 3.6, wagon: 3.8 };
+
+// What an escorted body's own animation runs at while it is being carried — a walk cycle, not the
+// speed it travels at, which is the caller's business. `heading` is null on a frame the rules did
+// not move it, which is how a crowd figure is told to stand still instead of drifting.
+export function carriedGait(body, heading) {
+  if (heading === null || heading === undefined) return 0;
+  return body === 'fowl' ? 0.46 : SPEED[body] * 0.4;
+}
 
 export const newEscort = (npc, path) => ({ npc, path, phase: 'wait', from: null, away: 0 });
 

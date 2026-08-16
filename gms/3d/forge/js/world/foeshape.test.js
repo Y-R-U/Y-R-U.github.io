@@ -1,10 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FOES, isRobed, shapeOf, silhouette, lampAt, LAMP_STAFF, CAGE } from './foeshape.js';
+import {
+  FOES, isRobed, shapeOf, silhouette, lampAt, lampCount, carriesLamp, LAMP_STAFF, CAGE,
+} from './foeshape.js';
 import { FIGURE } from './figure.js';
 import { ZONE_IDS } from './zones.js';
 import { ENEMIES } from '../sim/tables.js';
+import { ACT } from '../sim/foes.js';
+import { PER_MESH } from './roster.js';
 
 const PEOPLE = Object.keys(ENEMIES).filter(id => ENEMIES[id].geo === 'people');
 
@@ -74,4 +78,18 @@ test('the shared profile is only stretched, never rewritten', () => {
   assert.deepEqual(S.robe.map(r => r.y), FIGURE.robe.map(r => r.y));
   assert.deepEqual(S.hood.map(r => r.r), FIGURE.hood.map(r => r.r));
   assert.equal(S.cavity, FIGURE.cavity);
+});
+
+// The rig ran `visible = n > 0 && this.lampLevel > 0` and left `count` alone, so `cost()` went on
+// reporting two draws with the knob at zero. One answer, read by both.
+test('the Watch carries a light, and the knob turning it off turns the draws off with it', () => {
+  const w = { enemy: 'watchman', act: ACT.none };
+  assert.equal(carriesLamp(w), true);
+  assert.equal(carriesLamp({ ...w, act: ACT.attack }), true, 'it does not put the lamp down to swing');
+  assert.equal(carriesLamp({ ...w, act: ACT.die }), false, 'a body going over is not still holding it up');
+  assert.equal(carriesLamp({ enemy: 'raider', act: ACT.none }), false);
+
+  assert.equal(lampCount(8, 1, PER_MESH), 8);
+  assert.equal(lampCount(8, 0, PER_MESH), 0, 'the knob at 0 has to mean no draw, not an invisible one');
+  assert.equal(lampCount(PER_MESH + 4, 1, PER_MESH), PER_MESH);
 });

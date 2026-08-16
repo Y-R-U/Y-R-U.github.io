@@ -83,11 +83,19 @@ export const WATCH_WEIGHT = { kesta: 2.0, alder: 0.6, watch: 1.0 };
 
 export const SUSPICION = {
   max: 100, showAbove: 10,
-  perWatchman: 4, twoOrMore: 1.8,
+  // The second Watchman costs 1.8× (SYSTEMS §8.3) and every one after it costs the same 0.8 again.
+  // It used to be a flat "two or more", so two, three and eight all Broke a face at the same
+  // moment; the cap is what stops a cordon making a Break instant.
+  perWatchman: 4, perExtra: 0.8, crowdCap: 3.4,
   wrongProjectile: 25, ownField: 8, strikeCitizen: 40, seenChannelling: 100, wrongBuilding: 30,
   decay: -3, decayIndoors: -8,
   breakAt: 100, voluntaryUnder: 40,
-  radius: 6, holdRadius: 10,
+  // The three distances are one mechanic read from three sides, and they have to nest: `radius` is
+  // close enough to read a face, `holdRadius` is `GRAFT.losRadius` — if they can see you well
+  // enough to stop you casting one, you do not get to cool off — and past that they cannot see you
+  // at all. At 6 m the accrual band was inside melee range, so a Watchman that noticed your face
+  // was already biting you and one standing across the street noticed nothing.
+  radius: 12, holdRadius: 22,
   ticks: [40, 70, 90],
 };
 
@@ -101,7 +109,8 @@ export function suspicionRate({ watchmen = 0, nearby = 0, watchWeight = 1, glamo
     return (indoorsLongacre ? SUSPICION.decayIndoors : SUSPICION.decay) * rateKnob;
   }
   const base = SUSPICION.perWatchman * watchWeight * (1 - glamour / 24);
-  return base * (watchmen >= 2 ? SUSPICION.twoOrMore : 1) * rateKnob;
+  const crowd = Math.min(SUSPICION.crowdCap, 1 + SUSPICION.perExtra * (watchmen - 1));
+  return base * crowd * rateKnob;
 }
 
 export function stepSuspicion(susp, dt, ctx) {
@@ -172,6 +181,14 @@ export function tickGraft(g, dt, ctx = {}) {
   if (!out.worn) return { graft: out, events };
   out.held += dt;
   out.left = Math.max(0, out.left - dt);
+  // §8.3's comeback is twenty seconds of cover. It is handed back in front of the Watchmen who took
+  // the last face, so accruing on it Broke it again before it expired: four Breaks in 58 s standing
+  // still, −50 Standing across both towns each time, `aggro(30)` each time, and 0 XP either way.
+  // The player never touched a control. A free face cannot be caught; it can only run out.
+  if (out.free) {
+    if (out.left <= 0) events.push('expire');
+    return { graft: out, events };
+  }
   const was = out.susp;
   out.susp = stepSuspicion(out.susp, dt, ctx);
   for (const m of SUSPICION.ticks) if (was < m && out.susp >= m) events.push(`tick${m}`);

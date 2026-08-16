@@ -61,6 +61,53 @@ test('no js/world module builds a context target where no node test can reach it
     'move it into a sibling module that does not import three, the way propstate.js and nodestate.js do');
 });
 
+// The rule above catches one authored shape. The wave after it put nine rules the game depends on
+// into two new three-side files — the follow speeds, whether a body moves at all, whether the Watch
+// has a light, whether a hen exists — and every one of them could be deleted with the suite green,
+// because none of them is a context target.
+//
+// The tell those nine share is not a shape in the source, it is a *dependency*: a js/world module
+// that imports from js/sim or js/game is one the game drives, and its rules belong where a node
+// test can reach them. That set is four files and it is computed, not listed, so a fifth rig cannot
+// ship without a row here. Each row names the node-side module its rules live in and one call that
+// proves it still delegates. Nothing textual and nothing to false-positive on.
+const DRIVEN = {
+  'vermin.js': ['./bestiary.js', /CREATURES\[spec\.enemy\]/, /roster\(this\.agents/],
+  'robed.js': ['./foeshape.js', /carry\(a, dt\)/, /lampCount\(at\.length, this\.lampLevel, PER_MESH\)/,
+    /mesh\.visible = n > 0;/, /if \(carriesLamp\(a\)\)/, /if \(this\.frozen\) return;/,
+    /zi: 0, state: STATE\.idle,/],
+  'chicken.js': ['./bestiary.js', /carry\(a, dt\)/, /penned\(this\.agents/, /if \(this\.frozen\) return;/],
+  // A body's own three lines — the position write, the bird coming into existence, the walk home —
+  // are the one thing that cannot be lifted out, so they are pinned where they are. Each of these
+  // three deletions leaves the whole suite green and the feature gone.
+  'escorts.js': ['../game/escort.js', /SPEED\[this\.entry\(npc\)\?\.body\]/,
+    /carriedGait\(b\.body, heading\)/, /b\.agent\.x = x;\s*b\.agent\.z = z;/,
+    /b\.group\.position\.set\(x, this\.groundY\(x, z\), z\)/,
+    /if \(on\) b\.agent = this\.chickens\?\.add\(/,
+    /park\(npc\) \{[^}]*this\.move\(npc, b\.home\.x, b\.home\.z, b\.home\.ry\)/],
+};
+
+test('every js/world module the game drives keeps its rules where a node test can reach them', () => {
+  const bad = threeSide();
+  const driven = [];
+  for (const name of readdirSync(JS + '/world')) {
+    const path = `${JS}/world/${name}`;
+    if (!name.endsWith('.js') || name.endsWith('.test.js') || !bad.has(path)) continue;
+    const src = strip(readFileSync(path, 'utf8'));
+    if (importsOf(src).some(i => i.startsWith('../sim/') || i.startsWith('../game/'))) driven.push(name);
+  }
+  assert.deepEqual(driven.sort(), Object.keys(DRIVEN).sort(),
+    'a three-side world module the game drives, with no row saying where its rules live');
+
+  for (const [name, [rules, ...calls]] of Object.entries(DRIVEN)) {
+    const src = strip(readFileSync(`${JS}/world/${name}`, 'utf8'));
+    assert.ok(importsOf(src).includes(rules), `${name} no longer reads ${rules}`);
+    for (const call of calls) {
+      assert.match(src, call, `${name}: the rule ${call} came back inline, where nothing can test it`);
+    }
+  }
+});
+
 // The check above only proves the shape is absent. These prove the two files that used to hold it
 // still delegate, so the rules cannot quietly come back inline under a different shape.
 test('props.js and nodes.js answer the button out of their rules modules', () => {

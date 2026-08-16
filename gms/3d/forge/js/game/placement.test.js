@@ -12,6 +12,7 @@ import { step, blankState } from './quest.js';
 import { lintAll } from '../../tools/lintQuests.mjs';
 import { crowd } from '../world/roster.js';
 import { Cast } from '../world/cast.js';
+import { SUSPICION, WATCH_WEIGHT, suspicionRate } from '../sim/faction.js';
 
 const read = f => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
 const SHIPPED = lintAll();
@@ -56,6 +57,34 @@ test('an `at` outside the anchor is refused rather than clamped', () => {
   const r = placeAll([{ id: 'x', area: 'r', at: [3, 0] }], { r: rect });
   assert.equal(r.placed.length, 0);
   assert.match(r.errors[0], /outside/);
+});
+
+// A `worn` step whose work stands inside a watcher's suspicion radius is a timer, and no author
+// of one has ever been told. neutral.09 counts four measures at a font 5.3 m from Warden Alder and
+// then says the covenant back to him face to face; nothing anywhere recorded that as a clock.
+test('a disguised step done under a watcher is a timer, and there is time on it', () => {
+  const watchers = AT.placed.filter(c => WATCH_WEIGHT[c.id]);
+  const rows = [];
+  for (const def of Object.values(SHIPPED.defs)) {
+    for (const s of def.steps) {
+      if (s.worn === undefined) continue;
+      for (const o of s.objectives) {
+        const p = o.k === 'interact' && PROPS.placed.find(x => x.id === o.id);
+        if (!p) continue;
+        for (const w of watchers) {
+          const gap = Math.hypot(p.x - w.x, p.z - w.z);
+          if (gap > SUSPICION.radius) continue;
+          const rate = suspicionRate({ watchmen: 1, watchWeight: WATCH_WEIGHT[w.id], glamour: 0 });
+          rows.push({ at: `${def.id}.${s.id}`, who: w.id, gap, seconds: SUSPICION.breakAt / rate });
+        }
+      }
+    }
+  }
+  assert.deepEqual(rows.map(r => `${r.at} under ${r.who} at ${r.gap.toFixed(1)} m`),
+    ['neutral.09.count under alder at 5.3 m'],
+    'a disguised step moved into, or out of, a watcher radius — price the new one');
+  // Worst case, Glamour 0. The ladder actually arrives at N09 on Glamour 10, which is 71 s.
+  assert.ok(rows[0].seconds >= 40, `${rows[0].seconds.toFixed(0)} s to count four measures and speak`);
 });
 
 test('every named NPC the packs talk to has a body', () => {

@@ -11,6 +11,7 @@ import { centreOf, contains } from './areas.js';
 import { ENEMIES } from '../sim/tables.js';
 import { STATE, isLive, AI } from '../sim/foes.js';
 import { FOES } from '../world/foeshape.js';
+import { FOWL, RIGS, bodied, unbodied } from '../world/bestiary.js';
 import { seatsLeft, PER_MESH } from '../world/roster.js';
 import { SUSPICION, WATCH_WEIGHT, GRAFT, startGraft } from '../sim/faction.js';
 import { Cast } from '../world/cast.js';
@@ -47,6 +48,25 @@ function robedRig() {
   return r;
 }
 
+// js/world/chicken.js's `add()` with the geometry taken out, refusing the same way.
+function fowlRig() {
+  const r = {
+    agents: [],
+    add(spec) {
+      if (spec.enemy && !FOWL[spec.enemy]) return null;
+      const a = { ...spec, kind: spec.enemy, zi: 0, pin: true, run: FOWL[spec.enemy]?.run, act: 0, at: 0, speed: 0, heading: 0 };
+      r.agents.push(a);
+      return a;
+    },
+    remove(a) {
+      const i = r.agents.indexOf(a);
+      if (i >= 0) r.agents.splice(i, 1);
+      return i >= 0;
+    },
+  };
+  return r;
+}
+
 const verminRig = () => {
   const r = { agents: [], add(spec) { const a = { ...spec, kind: 'rat', zi: 0, run: 1.9, act: 0, at: 0, speed: 0, heading: 0 }; r.agents.push(a); return a; }, remove(a) { const i = r.agents.indexOf(a); if (i >= 0) r.agents.splice(i, 1); return i >= 0; } };
   return r;
@@ -61,7 +81,9 @@ function world(defs, rigs) {
   return s.arm(SHIPPED.areas, Object.fromEntries(defs.map(id => [id, SHIPPED.defs[id]])));
 }
 
-const rigs = () => ({ rat: verminRig(), crab: verminRig(), boar: verminRig(), people: robedRig() });
+const rigs = () => ({
+  rat: verminRig(), crab: verminRig(), boar: verminRig(), people: robedRig(), chicken: fowlRig(),
+});
 
 test('rigFor sends a row to the rig its `geo` names, and refuses one nobody handed over', () => {
   const r = rigs();
@@ -70,8 +92,31 @@ test('rigFor sends a row to the rig its `geo` names, and refuses one nobody hand
   assert.equal(r.people.agents.length, 1);
   assert.ok(rig.add({ enemy: 'grain_rat', x: 0, z: 0 }));
   assert.equal(r.rat.agents.length, 1);
-  assert.equal(rig.add({ enemy: 'sour_crow', x: 0, z: 0 }), null, 'no chicken rig was handed over');
+  assert.ok(rig.add({ enemy: 'sour_crow', x: 0, z: 0 }), 'a sour crow goes to the fowl rig');
+  assert.equal(r.chicken.agents.length, 1);
   assert.equal(rig.add({ enemy: 'no_such_thing', x: 0, z: 0 }), null);
+  assert.equal(rigFor({ rat: verminRig() }).add({ enemy: 'sour_crow', x: 0, z: 0 }), null,
+    'and a geo nobody handed over is refused rather than drawn by nothing');
+});
+
+// The hole the ladder test could not see: `light.18` asks for four sour crows and the only rig that
+// could carry one was never handed over, so the step could not be finished and the two campaigns
+// behind it could not be started. Sixty-one story quests hung on this one row.
+test('every row in the bestiary has a rig that can body it', () => {
+  assert.deepEqual(unbodied(), []);
+  assert.equal(bodied('sour_crow'), true);
+  assert.equal(bodied('no_such_thing'), false);
+
+  const where = 'reach.east';
+  const at = centreOf(SHIPPED.areas[where]);
+  const r = rigs();
+  const s = new Spawner({ rig: rigFor(r), rng: () => 0.5 });
+  s.arm(SHIPPED.areas, {});
+  const f = s.place(where, 'sour_crow', at);
+  assert.ok(f, 'the spawner placed no sour crow');
+  assert.equal(f.hp, ENEMIES.sour_crow.hp, 'and it was armed off its own bestiary row');
+  assert.equal(r.chicken.agents.length, 1);
+  assert.ok(contains(SHIPPED.areas[where], f.x, f.z));
 });
 
 // The gap this wave exists to close. Every one of the six, through the real Spawner.place().
@@ -167,14 +212,32 @@ test('the named cast carries the other half of the Watch', () => {
   assert.equal(cast.targets().length, 3, 'they are all still people you can talk to');
 });
 
-test('js/main.js hands the spawner a people rig and merges the cast into world.watch()', () => {
+// `bodied()` is what tools/campaign.test.mjs believes about the world. It is a belief about a file
+// no node test can import, so this is the join: every geo RIGS claims a table for is a geo main.js
+// really hands over, and no more.
+test('js/main.js hands the spawner exactly the rigs js/world/bestiary.js claims', () => {
   const main = src('main.js');
-  assert.match(main, /rigFor\(\{[^}]*people:\s*robed/, 'the spawner is back on the vermin rig alone');
+  const literal = main.match(/rigFor\(\{([^}]*)\}\)/)?.[1];
+  assert.ok(literal, 'main.js no longer builds the rig table with a rigFor({…}) literal');
+  const wired = [...literal.matchAll(/(\w+)\s*:/g)].map(m => m[1]).sort();
+  assert.deepEqual(wired, Object.keys(RIGS).sort(),
+    'a geo with a table here and no rig there is an enemy the spawner silently refuses');
+});
+
+test('js/main.js merges the cast into world.watch() and pauses every rig', () => {
+  const main = src('main.js');
   assert.match(main, /watch: \(\) => spawner\.watch\(\)\.concat\(cast\.watch\(\)\)/);
-  assert.match(main, /freeze: v => \{ vermin\.frozen = v; robed\.frozen = v; \}/, 'a pause has to stop both rigs');
+  assert.match(main, /freeze: v => \{ vermin\.frozen = v; robed\.frozen = v; chickens\.frozen = v; \}/,
+    'a pause has to stop every rig the spawner can place a body on');
   const robed = src('world/robed.js');
   assert.match(robed, /if \(!FOES\[spec\.enemy\]\) return null;/, 'the rig no longer refuses a row it has no body for');
   assert.match(robed, /seatsLeft\(this\.agents, spec\.enemy, 0\) <= 0\) return null/);
+  // The two doubles above stand in for rigs that import three. These hold the real files to the
+  // same shape, so the doubles cannot quietly stop describing them.
+  const fowl = src('world/chicken.js');
+  assert.match(fowl, /const foe = spec\.enemy \? FOWL\[spec\.enemy\] : null;[\s\S]{0,80}if \(spec\.enemy && !foe\) return null;/);
+  assert.match(fowl, /a\.pin && a\.zi === zi\)\.length >= PER_MESH\) return null/);
+  assert.match(fowl, /if \(a\.enemy\) this\.foeStep\(a, dt\);/, 'a hostile crow is not being carried');
 });
 
 // ── the Graft, end to end ──────────────────────────────────────────────────
@@ -185,16 +248,17 @@ const body = () => ({ pos: { x: 0, y: 4, z: 0, set(x, y, z) { this.x = x; this.y
 async function onTheBridge(watchers) {
   localStorage.clear();
   let aggroed = null;
+  const alarms = [];
   const s = new Session(app(), body(), {
     fresh: true,
-    world: { watch: () => watchers(), aggro: (r, p) => { aggroed = r; } },
+    world: { watch: () => watchers(), aggro: (r, p) => { aggroed = r; alarms.push(r); } },
   });
   await s.start();
   s.doc.quests['neutral.07'] = { s: 'done', i: 0, c: {} };   // N07 is what grants the spell
   const at = centreOf(s.quests.areas['lac.millbridge']);
   s.player.pos.set(at.x, 4, at.z);
   s.quests.here = ['lac.millbridge', 'lac'];
-  return { s, at, seen: () => aggroed };
+  return { s, at, seen: () => aggroed, alarms };
 }
 
 test('a Watchman on the bridge is seen, and seeing you stops a Graft being cast', async () => {
@@ -237,6 +301,28 @@ test('wearing a face in front of the Watch runs suspicion up to a Break', async 
   assert.equal(s.graft.free, true);
   assert.equal(s.doc.standing.light, 15, 'a Break costs 25 Standing with the town you were wearing');
   assert.equal(seen(), 30, 'and the Break wakes everything inside 30 m');
+});
+
+// The whole reason a Break is survivable: it is one event, not a metronome. Measured on the tree
+// as it stood, standing still beside eight Watchmen: four Breaks in 58 s, both towns down 50
+// Standing, four `aggro(30)` calls and no XP for any of it.
+test('a Break happens once, however long you stand in the field that caused it', async () => {
+  const spawn = world(['neutral.21'], rigs());
+  const { s, at, alarms } = await onTheBridge(() => spawn.watch());
+  spawn.tick(0.001, at);
+  for (const f of spawn.foes()) { f.x = at.x + 2; f.z = at.z; }
+
+  s.doc.standing.light = 40;
+  s.doc.standing.dark = 40;
+  s.graft = startGraft(s.graft, 'light', { glamour: 0 });
+  s.doc.worn = 'light';
+
+  for (let i = 0; i < 30 * 120; i++) s.graftTick(1 / 30);
+  assert.equal(alarms.length, 1, `${alarms.length} Breaks in two minutes of standing still`);
+  assert.equal(s.doc.standing.light, 15);
+  assert.equal(s.doc.standing.dark, 40, 'the free face costs the other town nothing');
+  assert.equal(s.graft.worn, null, 'the twenty seconds ran out and gave the player their own face');
+  assert.equal(s.doc.worn, null);
 });
 
 test('with nobody watching, the same graft runs its course instead', async () => {

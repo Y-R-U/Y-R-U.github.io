@@ -7,6 +7,7 @@ import {
   WATCH_WEIGHT, SUSPICION, GRAFT,
   newGraft, graftBlocked, startGraft, tickGraft, endGraft, graftEvent,
 } from './faction.js';
+import { AI } from './foes.js';
 import { xpToReach } from './xp.js';
 import { GLAMOUR_XP_EVADE } from './tables.js';
 
@@ -222,10 +223,53 @@ test('an instantaneous tell can Break a Graft on its own', () => {
   assert.equal(g.susp, 100, 'suspicion clamps at the maximum');
 });
 
-test('a Watchman between 6 m and 10 m stops the decay without starting the climb', () => {
+test('a Watchman between 12 m and 22 m stops the decay without starting the climb', () => {
   assert.equal(suspicionRate({ watchmen: 0, nearby: 1 }), 0);
   assert.equal(suspicionRate({ watchmen: 0, nearby: 0 }), SUSPICION.decay);
   assert.equal(suspicionRate({ watchmen: 0 }), SUSPICION.decay, 'the old call shape is unchanged');
+});
+
+// The three distances are one mechanic and they only read as one if they nest. At `radius: 6` the
+// band a Watchman read your face in was inside its own melee reach, so the two events the disguise
+// loop is built out of — being noticed and being bitten — were the same event.
+test('the detection bands nest, and noticing you is not the same as reaching you', () => {
+  assert.ok(SUSPICION.radius < SUSPICION.holdRadius);
+  assert.equal(SUSPICION.holdRadius, GRAFT.losRadius,
+    'you cannot cool off anywhere they can see you well enough to refuse you a Graft');
+  assert.ok(SUSPICION.radius > AI.reach * 1.7 * 4, `${SUSPICION.radius} m is melee, not a street`);
+  assert.ok(SUSPICION.radius > AI.notice, 'the Watch reads a face at least as far as it sees a body');
+});
+
+// The old multiplier was a flat "two or more", so a cordon of eight cost exactly what a pair did.
+test('every Watchman past the first costs the same again, up to the cap', () => {
+  const at = n => suspicionRate({ watchmen: n, glamour: 12 });
+  assert.equal(at(1), 2);
+  assert.equal(+at(2).toFixed(2), 3.6, 'SYSTEMS §8.3 prices the second at 1.8x');
+  assert.ok(at(3) > at(2) && at(4) > at(3), 'three and four used to cost what two did');
+  assert.equal(at(9), at(4), 'and a crowd cannot make a Break instant');
+  assert.equal(+(at(9) / at(1)).toFixed(2), SUSPICION.crowdCap);
+});
+
+// Four Breaks in 58 s standing still, measured on the real Session: each one hands the other face
+// back into the same field, which Breaks it again 14.5 s later. −50 Standing a lap, both towns, no
+// XP, no input.
+test('the free Graft a Break hands back cannot itself be Broken', () => {
+  const b = breakGraft(newStanding(), 'light');
+  let g = startGraft(newGraft(), b.freeGraft.faction, { seconds: b.freeGraft.seconds, free: true });
+  const events = [];
+  for (let i = 0; i < 600 && g.worn; i++) {
+    const r = tickGraft(g, 1 / 30, { watchmen: 8, watchWeight: WATCH_WEIGHT.kesta, glamour: 0 });
+    g = r.graft;
+    events.push(...r.events);
+  }
+  assert.equal(g.susp, 0, 'a face you did not choose does not accrue');
+  assert.ok(events.includes('expire') && !events.includes('break'), 'it runs out; it is not caught');
+  assert.equal(+g.held.toFixed(1), 20);
+
+  // And a face the player chose is still perfectly catchable in the same field.
+  const own = tickGraft(startGraft(newGraft(), 'light', { glamour: 0 }), 1,
+    { watchmen: 8, watchWeight: WATCH_WEIGHT.kesta, glamour: 0 });
+  assert.ok(own.graft.susp > 0);
 });
 
 // The numbers the balance argument rests on. Measured, never asserted from the spec text.

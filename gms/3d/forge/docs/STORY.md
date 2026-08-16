@@ -181,12 +181,30 @@ posted rate. Blackstone quests are *quota* quests where Whitewall's are *schedul
 
 All three towns are built and walkable from the first launch. There is no gate lock and no invisible
 wall. What stops a level-4 player living in Blackstone is **that nobody there will speak to them**:
-below Trusted standing, foreign vendors quote and refuse, foreign quest-givers have no lines, and
-the Watch shadows you at a distance without attacking. Hostiles live on the roads and in the
-countryside, never inside a friendly town, so the danger is legible and avoidable.
+below Trusted standing, foreign vendors quote and refuse, and foreign quest-givers have no lines.
+Hostiles live on the roads and in the countryside, never inside a *friendly* town, so the danger is
+legible and avoidable.
 
-The telegraph is a Watch patrol standing on each bridge. Walk past it and nothing happens. That is
-the point: the valley is open, and being unwelcome is a social fact rather than a loading screen.
+The valley is open, and being unwelcome is a social fact rather than a loading screen.
+
+**Two kinds of Watch, and only one of them is built.** This section used to say the Watch shadows
+you at a distance without attacking, and that a patrol stands on each bridge which you can walk
+past. That describes an ambient, non-combat Watch — the pressure the Neutral disguise campaign is
+supposed to be played against — and **nothing in the shipped game places one**. `planFrom` reads
+`kill` objectives and nothing else, so every Watchman the world can put in front of the player was
+asked for by a quest that asks you to kill it, and all three of those are pitched battles inside a
+town that is under attack at that moment: *Break the gate guard* (L23), *Fight up the switchback*
+(D21), *Keep them off the root* (N21). Not one asks you to avoid one. `js/sim/foes.js` `CHARGES`
+puts `watchman` in with the things that come at you on sight, and it is right to: taking it out
+would turn those three fights into free kills on ten stationary bodies.
+
+The only thing behaving as the old text described is `Cast.watch()` — Kesta at weight 2.0 and Warden
+Alder at 0.6, two named people who raise suspicion and cannot attack, because a `Cast` body has no
+combat state at all. **That is the shape the ambient patrol should take when it is built**: placed
+non-combat bodies with a `WATCH_WEIGHT` entry, standing where `escorts.json` stands its actors. It
+gives the bridge patrol literally — walk past it and nothing happens — and it gives the Neutral
+campaign something to hide from, without touching a number in `js/sim`. Until then, the two live
+sources of suspicion in the whole valley are Kesta and Alder, and the Watch is an enemy, not a mood.
 
 ---
 

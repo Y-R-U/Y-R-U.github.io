@@ -1006,14 +1006,14 @@ makes the headline mechanic feel metered; charging reagents keeps a real cost wi
 
 | Event | Suspicion |
 |---|---|
-| Within 6 m of a Watchman | `+4/s × watchWeight × (1 − Glamour/24)` |
-| Two or more Watchmen | the above × 1.8 |
+| Within 12 m of a Watchman | `+4/s × watchWeight × (1 − Glamour/24)` |
+| Each Watchman past the first | the above × `1 + 0.8 × (n − 1)`, capped at 3.4 — so two cost 1.8× and a cordon of eight is not instant |
 | Casting the **wrong** faction's projectile while Grafted | +25 instantly |
 | Casting a Neutral **field** while Grafted | +8 |
 | Striking a citizen | +40 |
 | Seen mid-channel | +100, instant Break |
 | Entering a building your worn faction may not | +30 |
-| Decay, no Watchman within 10 m | −3/s |
+| Decay, no Watchman within 22 m | −3/s |
 | Decay, inside a Longacre building | −8/s |
 
 `watchWeight` is **per NPC**, default 1.0. STORY asks that Kesta specifically be the hardest person
@@ -1027,6 +1027,18 @@ topping up and letting suspicion decay. That rhythm *is* "playing both sides", m
 cooldown — **and you immediately Graft free into the other faction for 20 s**, no token, no channel.
 The punishment comes with a weapon swap. A comeback reads as power; a pure punishment reads as a
 mechanic you avoid using.
+
+**The free face cannot itself be caught.** It is handed back standing in front of the Watchmen who
+took the last one, so a face that accrued would Break again before its twenty seconds were up, and
+again after that: measured at four Breaks in 58 s of standing still, −50 Standing across both towns
+each lap and no XP for any of it. It accrues nothing and it can only run out. The comeback is the
+twenty seconds; what the player does with them is the mechanic.
+
+The three distances are one thing seen from three sides and they nest: **12 m** is close enough to
+read a face, **22 m** is `GRAFT.losRadius` — anywhere they can see you well enough to refuse you a
+Graft is somewhere suspicion does not fall — and past 22 m they cannot see you at all. The old 6 m
+put the whole accrual band inside a Watchman's own melee reach, so the two events the disguise loop
+is built out of, being noticed and being bitten, were the same event.
 
 ### 8.4 Is Neutral actually more powerful? The honest arithmetic
 

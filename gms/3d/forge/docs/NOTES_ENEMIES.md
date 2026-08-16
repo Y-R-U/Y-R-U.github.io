@@ -491,3 +491,318 @@ the property has less headroom than it looks. Widening the Hollow to 2.10 is the
 5. **Pull `vermin.js`'s `add()` into the same pinned-from-birth shape** as `Robed.add`. One line,
    and it removes a 1.5 s window where a freshly spawned rat is not drawn.
 6. **The `watch: '#4a4a50'` diff in §8**, if the Watch should have an authored coat.
+
+---
+
+# 12. The review's findings, fixed
+
+Answering `docs/REVIEW_ENEMIES.md`. Tests **480 → 494, 0 failing**. `lintQuests` 0 errors and the
+same one pre-existing `light.06` warning; `lintText` clean. The gate is unchanged to the pixel —
+§12.9.
+
+## 12.1 The honest playable-quest count, before and after
+
+The number that matters, measured three ways with the *same* harness — `tools/campaign.test.mjs`'s
+own `playThrough()`, differing only in which events it is allowed to manufacture:
+
+| what the harness may manufacture | story quests finished |
+|---|---|
+| everything, as the shipped suite did | **79 / 79** |
+| only kills a rig can body — the review's experiment, reproduced exactly | **18 / 79** |
+| only events the running game can produce at all — every verb gated | **4 / 79** |
+| …the same gate, after this pass | **79 / 79** |
+
+**Before: 4. After: 79.** The review's 18 is right as far as it goes and I reproduced it to the
+quest — `light.18` stuck on step 2, Light finishing 18 of 28, Dark and Neutral finishing none. It
+stops at 18 rather than 4 because it gates only *"can a rig body this enemy"*. Gate the other half
+of the same question — *"is this enemy planned anywhere at all"* — and the ladder dies at
+**`light.05`, the second quest in the game**, which is why the honest floor is four.
+
+**Two blockers, not one.**
+
+1. **`sour_crow` had no rig.** As disclosed in §9 and as the review measured. Fixed in §12.2.
+2. **Four `kill` objectives name no area, so the spawner plans them nowhere.**
+   `js/game/spawner.js` `planFrom` reads `s.in || o.area` and skips a kill objective that has
+   neither, so nothing of that kind is ever placed and the step waits for a body that cannot exist.
+   All four are `all:` steps that pair a kill with a `survive` or an `escort`, where the author put
+   the place on the *other* objective:
+
+   | step | asks for | now scoped to |
+   |---|---|---|
+   | `light.05.watch` "Hold the north gate" | `mire_rat ×2` | `wwa.northgate` |
+   | `light.11.walk` "Walk it up the Drove Road" | `rat_knot ×4` | `road.drove` |
+   | `sandbox.13.walk` "Walk the cart…" | `rat_knot ×3` | `heath` |
+   | `sandbox.14.hold` "Hold the north gate" | `mire_rat ×4` | `wwa.northgate` |
+
+   One `"in"` field each, in `data/quests/*.json`. Each names the place the step's own text, its
+   `recover: moveTo` and its sibling objective already name, so the kill is now both *planned* and
+   *credited* there. §7's live run recorded `light.11`'s escort half crediting `c.walk [1, 0]` — the
+   `0` is this bug, seen and not recognised.
+
+**After: every objective in the corpus is one the runtime can produce an event for — 0 exceptions**,
+and the ladder finishes 79/79 with every verb gated. The twenty sandbox jobs still read as "not
+finished" in that harness because a repeatable board post credits into `cooling` rather than `done`;
+that is true of the manufactured baseline too and is not a gap.
+
+**Proved live, over CDP, in a real session** — `?quest=light.18`, stepped to the `crows` step,
+standing in `reach.east`:
+
+```
+placed        {"by":{"sour_crow":4,"raider":3},"total":7,"fowlAgents":4,"drawn":4}
+one crow      {"enemy":"sour_crow","zi":3,"scale":1.85,"hp":112,"state":"idle","run":3.9,"pin":true}
+four kills    {"i":3,"step":"fight","c":"{\"crows\":[4]}"}
+console       []
+```
+
+`light.18` crosses the step that ended the unlock ladder. `shots/enemies_fix/crow_chase.png` and
+`crow_death.png` are that session.
+
+## 12.2 The crow, and where "can this be bodied" now lives
+
+**`js/world/bestiary.js` is new and pure.** It holds `CREATURES` (lifted out of `vermin.js`, which
+imports three), the new `FOWL`, `RIGS` — the `geo → rules table` map `js/main.js` has to match — and
+`bodied(enemy)`. That last one is the whole point: *"can the world ever put this enemy in front of
+the player"* is what decides whether a `kill` objective can be finished, and until now no node test
+could ask it, because half the answer was inside a file that imports three.
+
+`FOWL.sour_crow` is `{ zone: 'dark', shade: 0.38, scale: 1.85, run: 3.9 }` — Blackstone's own
+plumage darkened, the same way `FOES` derives a raider from dark's robe. `js/world/zones.js` is
+untouched and no `watch:` key was added; the review confirmed the derived colour reads and it does.
+
+**On the rig.** `Chickens.add()` takes a `spec.enemy` and refuses a row that is not in `FOWL`; the
+crow gets its own mesh — a fourth "zone" — so it keeps its colour wherever it spawns, for the reason
+`foeshape.js` gives about the Watch. The seat cap is now per mesh rather than global, so a crow
+cannot refuse a hen. **The poses came free**: `js/sim/foes.js` numbers `ACT.attack` 1 and `ACT.hurt`
+2, which are exactly the fowl shader's peck and startle-flap, so a crow pecks when it bites and
+flaps when it is hit with no second animation system. Only the fall had no counterpart — it is a
+1.48 rad roll about the bird's own axis on the instance matrix, pivoting at its feet.
+
+**`Chickens` now honours `frozen`**, and `main.js`'s `freeze` reaches all three rigs. Without it a
+hostile crow coasts on its last speed behind an open menu, which is the bug this wave already fixed
+once in `robed.js`.
+
+`sour_crow` is deliberately **not** in `CHARGES` — a bird at the water stands is not a thing that
+comes at you on sight, and `hurt()` makes it hostile the moment you hit one. Verified live:
+`hostile: false` at 13 m, and it fights once struck.
+
+## 12.3 `tools/campaign.test.mjs` cannot hide this again
+
+`whyNoEvent(o, s)` is now the gate every manufactured event passes through, and `eventsFor` asserts
+on it, so **the ladder tests themselves fail** — not just a side check. It answers for `kill`: the
+row exists, a rig in `RIGS` bodies it, and `planFrom` can place it somewhere. The other verbs are
+gated by the tests that own the data they need (`gathering.test.js`, `placement.test.js`,
+`escort.test.js`, `lintQuests` for every area id) and the comment says so; `eventsFor`'s `default`
+still throws, so a new objective kind has to be classified here before it can be manufactured at all.
+
+Two tests beside it: one walks **every** objective in the corpus, including the twenty sandbox jobs
+the ladder never plays, and one is the counterpart proving the check can see both shapes of the hole
+it exists for. And `enemies.test.js` now parses `main.js`'s `rigFor({…})` literal and asserts its
+keys are exactly `Object.keys(RIGS)` — that is the join between what the pure side believes about
+the world and what `main.js` actually hands over, which is the thing nothing was checking.
+
+Reverted and confirmed red, case by case:
+
+| revert | red |
+|---|---|
+| `chicken` out of `RIGS` | ✓ 13, incl. all three campaign ladders |
+| `main.js` drops `chicken: chickens` | ✓ 1 — the rigFor-keys test alone, which is the point |
+| `light.05.watch` loses its `"in"` | ✓ 11, incl. all three campaign ladders |
+| `whyNoEvent` always answering null | ✓ 1 — the counterpart |
+
+`js/game/packs.test.js` had to change one line: it sent `{t:'kill', kind:'mire_rat', n:2}` with no
+area, which is not an event the runtime emits. It carries `area: 'wwa.northgate'` now. That test was
+a small instance of the same disease.
+
+## 12.4 The Break loop, and the detection envelope
+
+**The loop.** `tickGraft` now returns early on a `free` graft: it accrues nothing and can only run
+out. §8.3's comeback is *twenty seconds of cover*; it is handed back standing in front of the
+Watchmen who took the last face, so accruing on it Broke it again before it expired — the review's
+four Breaks in 58 s, −50 Standing across both towns a lap, four `aggro(30)` calls, 0 XP, no input.
+A face the player chose is still perfectly catchable in the same field; a face they were given is
+not. `docs/SYSTEMS.md` §8.3 says so now.
+
+**The envelope, judged whole.** The three distances are one mechanic read from three sides and they
+have to nest. They did not: at `radius: 6` the band in which a Watchman read your face was *inside
+its own melee reach* (`AI.reach × 1.7` = 2.2 m), so the two events the disguise loop is built out of
+— being noticed and being bitten — were the same event, and a Watchman across the street noticed
+nothing. Chosen:
+
+| | was | now | why |
+|---|---|---|---|
+| `SUSPICION.radius` | 6 | **12** | close enough to read a face across a street, and 5× a Watchman's own reach, so noticing you and reaching you are separate things again. It is also the radius `pointIn` scatters a deployment over, so walking *into* the Watch is what gets you read |
+| `SUSPICION.holdRadius` | 10 | **22** | `= GRAFT.losRadius`. If they can see you well enough to refuse you a Graft, you do not get to cool off. Two numbers that mean the same thing now *are* the same number |
+| `twoOrMore: 1.8` | flat | **`perExtra: 0.8`, `crowdCap: 3.4`** | it saturated at two — 2, 3 and 8 Watchmen all Broke a face at 14.5 s. Each one past the first now costs the same 0.8 the second did; two still cost exactly 1.8× (SYSTEMS §8.3's published number, and the existing `at(12, kesta, 2) = 13.9 s` test is untouched), four and up cap at 3.4× so a cordon is fast and not instant |
+
+**`perWatchman: 4` is unchanged and deliberately so.** `faction.test.js`'s §8.3 balance table and its
+rhythm test — 20 s beside a Watchman, 20 s away, peak suspicion 40, the nine-minute face runs out
+before the disguise does — are tuned against that 4, and they describe the intended play pattern.
+The pattern was never reachable because of the geometry, not the rate. I changed the geometry.
+
+**`neutral.09` is covered, and it is not a 42-second timer.** The font is **5.26 m** from Warden
+Alder, so the step really is a clock and nothing said so. The review's 42 s is glamour 0; the ladder
+arrives at N09 on **Glamour 10**, measured by playing it, which is **71 s** to count four measures
+and then say the covenant back to Alder face to face. The new test in `placement.test.js` walks
+every `worn` step with an `interact` objective, finds every watcher inside `SUSPICION.radius` of the
+prop, and asserts the list is exactly `neutral.09.count under alder at 5.3 m` with at least 40 s on
+it at the worst case. Moving Alder off the font goes red; so would putting a new disguised step
+under Kesta.
+
+## 12.5 The dev scenarios, and a render check that cannot lie
+
+`Robed`'s six bodies were pushed from the **constructor**, so they stood in every `?dev=1` scenario.
+The row is built by the `foe_*` setups now and by nothing else. Measured against the pre-wave tree
+`b31413f`, same command both sides:
+
+| scenario | review measured | now | self-noise, same tree |
+|---|---|---|---|
+| `people_day` | 29.4 % | **1.02 %** | 0.18 % |
+| `people_dusk` | 29.3 % | **1.24 %** | — |
+| `people_macro` | 7.1 % | **2.57 %** | **5.76 %** |
+| `vermin_play` | 1.8 % | **0.78 %** | — |
+| `fowl_yard` | 0.009 % | **0.03 %** | — |
+
+Every one is now at or under the noise floor, and I read `people_day` against the pre-wave PNG side
+by side: same eight townspeople, same framing, no enemies. The crowd's art record is a record again.
+
+`robed.js:92`'s *"relative to the dev site"* was false — it is a literal `{ x: 0, z: 44 }` — and the
+comment is gone with the code it described.
+
+**`tools/shot.mjs` fails loudly on an unknown id.** It listed the scenarios the page registered and
+wrote the PNG anyway, so any typo produced a plausible render of a wall. It now throws, names what
+the page did register, and says the `foe_*`/`people_*`/`fowl_*`/`vermin_*` ones need `--set=dev=1`.
+`node tools/shot.mjs --shot=nope_at_all` exits 1.
+
+## 12.6 Escort: the comment, the crossing, and the vanishing hen
+
+**The comment was wrong and is gone.** *One* of the four destinations contained its actor's start,
+not three. It no longer does, so the sentence that justified `ESCORT.travel` had to be replaced
+rather than corrected: the rule now earns its place on a different fact, which is that Fen stands
+**2.6 m** from the edge of his destination. A test pins that 2.6 m so the comment cannot drift.
+
+**The crossing.** `reach.neutral` is the whole 300 × 152 m Longacre bank and Fen stands in the
+middle of it, so the "crossing" credited after 11.6 m in whatever direction the player happened to
+be. `light.17`, `dark.15` and `sandbox.18` now escort him to **`lac.mill`** — which is where the
+*very next step of each of those quests* counts the crates off ("Count them off at the far end",
+`in: lac.mill`). Arrival is now inside a 20 × 16 m box 17.7 m away, in the direction of the crate the
+player has to walk to anyway, and `ESCORT.travel` stops the two-steps-sideways credit.
+
+**Honest caveat on the fiction.** Fen is written as a ferryman — *"Three crates over, three crates
+back"* — but the authored geography does not support a water crossing here: I probed the terrain and
+the channel at Millbridge runs z ≈ 113–131, putting `lac.millbridge`, Fen and `lac.mill` all on the
+**south** bank. Either the mill wants moving to the far side or the word "cross" wants softening.
+I did not invent an area on the north bank to make the fiction true; that is Aaron's call, and it is
+the one thing in this section I have changed the meaning of rather than fixed.
+
+**A finished repeatable no longer deletes its actor in front of you.** `escortActors` lists only
+`active`/`turnin`, and a board job goes straight to `cooling` when it credits — with the player
+necessarily inside 30 m, or the escort would have been lost. `escortTick` now defers the hide and
+the park until the actor is further than `ESCORT.lose` from the player, and **parks before hiding**,
+because hiding the hen takes its agent away and leaves `park()` nothing to move (the review's latent
+ordering bug, fixed in passing). `this.shown` is a `Set` rather than a joined string.
+
+## 12.7 Test coverage on the three-side files
+
+Nine mutations left all 480 green. **Seven of the nine are now caught.**
+
+The rules themselves moved to where a node test can reach them, the way `roster.js` did:
+
+| rule | now in | reads |
+|---|---|---|
+| the follow speeds | `js/game/escort.js` `SPEED` | `escorts.js` imports it; `escort.test.js` imports the same table instead of restating it at line 21 |
+| the carried walk cycle | `js/game/escort.js` `carriedGait` | one rule for both body kinds |
+| "carry a body along the heading and speed `think` set" | `js/sim/foes.js` `carry` | `robed.js` and `chicken.js` both had a copy; now neither does |
+| who holds a lamp, and how many are drawn | `js/world/foeshape.js` `carriesLamp` / `lampCount` | `drawLamps` **and** `cost()` read the same answer, which also fixes the review's §11 — the readout claimed two draws with the knob at 0 |
+
+**`js/world/split.test.js` has a second rule.** The tell those nine mutations share is not a shape in
+the source, it is a *dependency*: a `js/world` module that imports from `js/sim` or `js/game` is one
+the game drives, and its rules belong where a test can reach them. That set is **computed, not
+listed** — today it is exactly `vermin.js`, `robed.js`, `chicken.js`, `escorts.js` — and each needs a
+row in `DRIVEN` naming the node-side module its rules live in plus the calls that prove it still
+delegates. A fifth rig cannot ship without a row. Adding a row for a file that is not driven goes
+red, and so does dropping one. Nothing textual, nothing to false-positive on; the heuristics
+`NOTES_GATHER.md` §"why not a broader rule" measured and rejected are not repeated here — I
+re-measured one of them ("a bare numeric table exported from a three-side world module") and it
+fires on `buildings.js` `TUNING` and `tree.js` `CROWN` on the current tree, so it is out.
+
+| the review's nine | caught by |
+|---|---|
+| `SPEED` all → 0 | ✓ 3 tests — the speeds are node-side now |
+| `SPEED.fowl` 3.6 → 0.05 | ✓ 2 |
+| `move()` drops the position write | ✓ 1 — pinned in `DRIVEN` |
+| `show()` never creates the bird | ✓ 1 — pinned in `DRIVEN` |
+| `drawLamps` sets `visible = false` | ✓ 1 — pinned in `DRIVEN` |
+| frozen branch clears the lamps | ✓ 1 — pinned in `DRIVEN` |
+| `add()` drops `state: STATE.idle` | ✓ 1 — pinned in `DRIVEN` |
+| **`park()` does nothing** | **still green** |
+| **`walk()` never moves a body** | **still green** |
+
+**The two that got away, and why.** Both mutations are *an early `return` inserted above code that
+is still there*. A source-shape assertion reads the text, and the text is unchanged, so no check of
+this kind can ever see them. What would: a browser-side smoke test over CDP that boots a session,
+walks an actor and reads its position back — the same driver §12.1's live run uses. That is a new
+tool rather than a fix, and I did not build it. It is the honest next step for this whole class.
+
+## 12.8 The two wrong claims in these notes
+
+**"33.7 against 70 HP" (§9) was a ward-2 character.** The review's arithmetic is right and this note
+was wrong. `hpMax = 34 + 14·ward + 4·hearth` and `damageTaken = raw · 100/(100 + 10·ward)`, so at the
+level `neutral.21` actually happens a Watchman is **13.0 per bite into 322 HP at ward 16 — 25 bites
+— and 11.2 into 394 at ward 20, 36 bites.** `champion_3` is 10–15. **I retuned nothing.** The Watch
+is arguably soft rather than overtuned, and softening or hardening it on the strength of one
+corrected sum, with nobody having played N21, would be guessing. What was actually wrong was the
+*detection* half, and that is what §12.4 changed.
+
+**`robed.js:87`'s "the same recipe one size up" was false.** `props.js` is `0.13`,
+`[0.17, 0.23, 0.29, 0.35, 0.41]`, `0.06`; the Watch lamp is `0.115`,
+`[0.17, 0.23, 0.30, 0.38, 0.47]`, `0.055`. The core is **12 % smaller** and the gain **8 % lower**;
+only the outer three shells grew. It is the same recipe with a *wider, softer* halo, which is both
+true and a better description of what it is for — a bigger hard core reads as a bulb at four metres.
+The comment says that now, with the numbers in it.
+
+## 12.9 The design call on the Watch: `CHARGES` stays, STORY §2 is amended
+
+Aaron's call, implemented. `js/sim/foes.js` is untouched and `watchman` is still in `CHARGES`.
+`docs/STORY.md` §2 now says plainly that the section described **two** kinds of Watch and that only
+one of them is built: every Watchman the world can place was asked for by a `kill` objective, all
+three of those are pitched battles in a town under attack, and taking `watchman` out of `CHARGES`
+would turn them into free kills on ten stationary bodies. The ambient non-combat patrol — the thing
+the disguise loop is supposed to be played against — is recorded as **unbuilt**, together with the
+shape it should take when it is built: placed non-combat bodies with a `WATCH_WEIGHT` entry, exactly
+what `Cast.watch()` already returns and what `escorts.json` already places, which gives STORY's
+bridge patrol literally and costs nothing in `js/sim`.
+
+## 12.10 Cost, and what I could not verify
+
+`node tools/shot.mjs --all --preset=medium --dpr=1 --w=844 --h=390`, main pass, against the numbers
+the review left:
+
+| scenario | gate | now |
+|---|---|---|
+| `wall_day` | 79 / 154,176 | **79 / 154,176** — and 0 pixels differ |
+| `street_dusk` | 64 / 110,285 | **64 / 110,285** — 1 pixel |
+| `gate_night` | 48 / 101,586 | **48 / 101,586** — 0 pixels |
+| `town_night` | 79 / 120,331 | **79 / 120,331** — 4 pixels |
+| `creek_day` | 82 / 96,420 | **82 / 96,420** |
+
+The crow's fourth fowl mesh costs nothing at the gate: an `InstancedMesh` with `count = 0` is not
+drawn, and no session arms one under `?shot=`.
+
+**Not verified.**
+
+- **No real phone.** Desktop Chrome over CDP at 844 × 390 throughout, same as the wave.
+- **The crow's chase was not photographed at melee range.** I proved it places, arms off its own
+  bestiary row, holds `hostile: false` until struck, dies with the roll pose and is removed on the
+  corpse clock; the frames I captured are at 10–25 m (`shots/enemies_fix/crow_chase.png`,
+  `crow_death.png`). Its `run: 3.9` against `AI.chase` is 3.3 m/s, so a walking player at 5.0 outruns
+  it. That is a deliberate choice for a level-5 bird and it is untested against a player.
+- **Nobody has played the retuned suspicion envelope.** 12 m and 22 m are reasoned from the geometry
+  they have to nest with, not from play. The two numbers most likely to want another pass are
+  `holdRadius: 22` inside a building — in the Whitewall temple it means you cannot shed suspicion
+  anywhere Alder can see you — and `crowdCap: 3.4`.
+- **The escort still has no pathfinding**, and `lac.mill` is a building footprint rather than the
+  open ground the other three routes cross. Fen is *carried*, not walked, so he cannot jam — but he
+  can be carried over ground he should not be on if the player takes an odd line. Untested; the
+  authored line, bridge crate → mill crate, is clear.
+- **`park()` doing nothing and `Robed.walk()` never moving** are still unguarded — §12.7.
+- **`docs/REMAINING.md` is still stale.** Unchanged from §9.

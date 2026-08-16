@@ -234,6 +234,7 @@
     "steps": [
       { "id": "walk",
         "all": [["escort", "cart", "heath.ford"], ["kill", "rat_knot", 3]],
+        "in": "heath",
         "text": "Walk the cart and keep the knots off it",
         "recover": [["moveTo", "heath.ford"], ["respawn", "rat_knot", 3]] }
     ]
@@ -252,6 +253,7 @@
     "steps": [
       { "id": "hold",
         "all": [["survive", "wwa.northgate", 90], ["kill", "mire_rat", 4]],
+        "in": "wwa.northgate",
         "after": 21, "before": 5,
         "text": "Hold the north gate",
         "recover": [["moveTo", "wwa.northgate"], ["respawn", "mire_rat", 4]] }
@@ -335,7 +337,7 @@
         "verb": "barter",
         "text": "Load the crossings",
         "recover": [["arm", "lac.millbridge.crate"], ["moveTo", "lac.millbridge"]] },
-      { "id": "cross", "do": ["escort", "fen", "reach.neutral"],
+      { "id": "cross", "do": ["escort", "fen", "lac.mill"],
         "text": "Run the shift",
         "recover": [["moveTo", "lac.millbridge"]] }
     ]

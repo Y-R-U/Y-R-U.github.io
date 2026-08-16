@@ -125,6 +125,7 @@
 
       { "id": "watch",
         "all": [["survive", "wwa.northgate", 90], ["kill", "mire_rat", 2]],
+        "in": "wwa.northgate",
         "after": 21, "before": 5,
         "text": "Hold the north gate",
         "hint": "Two strays come up the road. Turn them back.",
@@ -306,6 +307,7 @@
 
       { "id": "walk",
         "all": [["escort", "wagon", "road.drove"], ["kill", "rat_knot", 4]],
+        "in": "road.drove",
         "text": "Walk it up the Drove Road",
         "hint": "Knots come off the moor at the milestones.",
         "recover": [["moveTo", "road.spur.light"], ["respawn", "rat_knot", 4]] },
@@ -498,7 +500,7 @@
         "text": "Count three crates aboard",
         "recover": [["arm", "lac.millbridge.crate"]] },
 
-      { "id": "cross", "do": ["escort", "fen", "reach.neutral"],
+      { "id": "cross", "do": ["escort", "fen", "lac.mill"],
         "text": "Cross with the load",
         "recover": [["moveTo", "lac.millbridge"]] },
 

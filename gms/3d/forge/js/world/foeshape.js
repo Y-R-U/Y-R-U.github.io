@@ -3,6 +3,7 @@
 // "the spawner cannot place a Watchman" is invisible from every side except this one.
 
 import { FIGURE } from './figure.js';
+import { ACT } from '../sim/foes.js';
 
 // `tall`/`wide`/`hem`/`hood`/`mantle` stretch the shared profile; `scale` is the whole body
 // afterwards; `run` is what js/sim/foes.js chases at. `stone` lifts the robe toward the same zone's
@@ -54,6 +55,11 @@ export function shapeOf(v, base = FIGURE) {
 // makes a Watchman visible across a street is hanging off the end of a stick.
 export const lampAt = v =>
   [-0.255 * (v.wide ?? 1), (LAMP_STAFF + 0.12) * (v.tall ?? 1), 0.045 * (v.wide ?? 1)];
+
+// Who is carrying a light, and how many of those lights are drawn. `cost()` and `drawLamps` both
+// read the second one, or the readout goes on claiming two draws the knob has already put out.
+export const carriesLamp = a => a.enemy === 'watchman' && a.act !== ACT.die;
+export const lampCount = (wanted, level, cap) => (level > 0 ? Math.min(wanted, cap) : 0);
 
 // Height and shoulder width of a finished body, for the silhouette check: a variant nobody can
 // tell from another at fifteen metres is not a variant.

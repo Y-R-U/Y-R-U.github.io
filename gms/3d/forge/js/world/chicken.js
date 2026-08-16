@@ -10,6 +10,8 @@ import { walkStep, groundAt, collidersReady } from './colliders.js';
 import { paint } from './tree.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { penned } from './roster.js';
+import { FOWL } from './bestiary.js';
+import { ACT, STATE, carry } from '../sim/foes.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -259,8 +261,22 @@ function flatCol(hex) {
 const FALLBACK = { body: '#8a5a34', dark: '#4a2c19', comb: '#a8382f', beak: '#d8b064', leg: '#c79a5c' };
 const fowlOf = id => zone(id).fowl || FALLBACK;
 
-function chickenGeometry(zoneId) {
-  const f = fowlOf(zoneId);
+const darken = (hex, s) => `#${new THREE.Color(hex).multiplyScalar(s).getHexString()}`;
+
+// One mesh per plumage. The three zones, then the hostile rows, which keep their own colour
+// wherever they spawn for the reason foeshape.js gives: an enemy you have to recognise in three
+// towns cannot be three colours. The comb survives the darkening — it is the only saturated mark
+// on the bird, and a sour crow reads as carrion because of it.
+const KEYS = [...ZONE_IDS, ...Object.keys(FOWL)];
+function paletteOf(key) {
+  const foe = FOWL[key];
+  if (!foe) return fowlOf(key);
+  const f = fowlOf(foe.zone);
+  return { ...f, body: darken(f.body, foe.shade), dark: darken(f.dark, foe.shade), leg: darken(f.leg, foe.shade) };
+}
+
+function chickenGeometry(key) {
+  const f = paletteOf(key);
   const B = new Build();
   const col = shade(f.body, f.dark);
   const comb = flatCol(f.comb)(1);
@@ -469,6 +485,7 @@ export class Chickens {
     this.recount = 0;
     this.life = 1;
     this.scale = 1;
+    this.frozen = false;
 
     // uGait = stride, body bob, sway, leg swing · uHead = hold fraction, stabilise, thrust pitch,
     // idle look · uAct = peck reach, tail lift, wing beat, hop
@@ -487,7 +504,7 @@ export class Chickens {
     this.depth.onBeforeCompile = s => patch(s, this.uniforms, false);
     this.depth.customProgramCacheKey = () => 'fowlDepth';
 
-    for (const id of ZONE_IDS) {
+    for (const id of KEYS) {
       this.geo[id] = chickenGeometry(id);
       const m = new THREE.MeshStandardMaterial({
         map: this.map, vertexColors: true, roughness: 0.78, metalness: 0, name: `fowl:${id}`,
@@ -497,7 +514,7 @@ export class Chickens {
       this.mat[id] = m;
     }
 
-    onEnvIntensity(v => { for (const id of ZONE_IDS) this.mat[id].envMapIntensity = v; });
+    onEnvIntensity(v => { for (const id of KEYS) this.mat[id].envMapIntensity = v; });
 
     this.spawn();
     this.buildMeshes();
@@ -560,7 +577,7 @@ export class Chickens {
   }
 
   buildMeshes() {
-    this.meshes = ZONE_IDS.map(id => {
+    this.meshes = KEYS.map(id => {
       const m = new THREE.InstancedMesh(this.geo[id], this.mat[id], PER_MESH);
       m.name = `chickens:${id}`;
       m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -594,15 +611,22 @@ export class Chickens {
     this.assign();
   }
 
-  // A bird the escort runtime owns: pinned, so the flock knob cannot take its seat.
+  // Two callers, both pinned so the flock knob cannot take the seat: js/game/escort.js walking a
+  // hen home, and js/game/spawner.js placing a sour crow. Pinned from birth for the reason
+  // robed.js is — `arm()` only runs after this returns, and an unpinned body goes undrawn until
+  // the next re-assign.
   add(spec) {
-    if (this.agents.filter(a => a.pin).length >= PER_MESH) return null;
+    const foe = spec.enemy ? FOWL[spec.enemy] : null;
+    if (spec.enemy && !foe) return null;
+    const zi = foe ? KEYS.indexOf(spec.enemy) : zoneAt(spec.x, spec.z);
+    if (this.agents.filter(a => a.pin && a.zi === zi).length >= PER_MESH) return null;
     const R = this.rand || (this.rand = rng(0x7c31a9));
     const a = {
-      zi: zoneAt(spec.x, spec.z), x: spec.x, z: spec.z, home: [spec.x, spec.z], pin: true,
+      zi, x: spec.x, z: spec.z, home: spec.home || [spec.x, spec.z], pin: true,
       heading: spec.heading || 0, speed: 0, cyc: span(R, 0, 4), seed: R(),
-      scale: 1, tone: 1, act: 0, at: 0, wait: span(R, 0.3, 5),
+      scale: foe?.scale ?? 1, tone: 1, act: 0, at: 0, wait: span(R, 0.3, 5),
     };
+    if (foe) Object.assign(a, { enemy: spec.enemy, kind: spec.enemy, run: foe.run, state: STATE.idle });
     this.agents.unshift(a);
     this.assign();
     return a;
@@ -679,6 +703,19 @@ export class Chickens {
     at('fowl_close', 'Chicken close-up', 1.1, 0.45, 36);
     at('fowl_yard', 'Chicken yard', 6.0, 2.6, 42);
     at('fowl_far', 'Chickens at 30 m', 21, 8, 40);
+
+    // The crow beside a yard bird, which is the only comparison that says whether the scale reads.
+    // Placed in the setup, not here: a body built at boot stands in every other rig's dev shot.
+    for (const [id, t] of [['foe_sour_crow', 10.5], ['foe_sour_crow_night', 22]]) {
+      defineScenario({
+        id, label: `sour crow at 3 m${t > 20 ? ', at night' : ''}`, zone: 'neutral',
+        setup: app => {
+          if (!this.crowShown) this.crowShown = this.add({ enemy: 'sour_crow', x: a.x + 1.1, z: a.z });
+          frameCamera(app, { pos: [a.x + 2.2, gy + 1.1, a.z + 2.4], look: [a.x + 0.5, gy + 0.35, a.z], fov: 40 });
+          app.quality.set('time', t);
+        },
+      });
+    }
   }
 
   choose(a) {
@@ -693,7 +730,20 @@ export class Chickens {
     }
   }
 
+  // Same division robed.js has: js/sim/foes.js decides the heading and the speed, `carry` applies
+  // them, and the rig puts the colliders on top.
+  foeStep(a, dt) {
+    const w = carry(a, dt);
+    if (!w) return;
+    const step = collidersReady() ? walkStep(a.x, a.z, w.x, w.z, a.y ?? 0, 0.16) : w;
+    a.x = step.x;
+    a.z = step.z;
+  }
+
   update(dt, app) {
+    // Frozen leaves the frame exactly as it was. A hostile crow's speed comes from the session's
+    // spawner tick, which stops with the menu, so without this it would coast on the last one.
+    if (this.frozen) return;
     this.time = (this.time + dt) % 600;
     this.uniforms.uTime.value = this.time;
 
@@ -746,15 +796,21 @@ export class Chickens {
           }
         }
 
+        if (a.enemy) this.foeStep(a, dt);
+
         // A pinned bird is carried rather than walked, so its stride comes from how far it moved.
-        if (a.pin) a.cyc += Math.hypot(a.x - (a.lx ?? a.x), a.z - (a.lz ?? a.z)) / (2 * STRIDE);
+        if (a.pin) a.cyc += Math.hypot(a.x - (a.lx ?? a.x), a.z - (a.lz ?? a.z)) / (2 * STRIDE * a.scale);
         a.lx = a.x; a.lz = a.z;
 
         const fall = T ? T.surfaceY(a.x, a.z) : heightAt(a.x, a.z);
         const want = collidersReady() ? groundAt(a.x, a.z, a.y ?? fall) : fall;
         const gy = a.y = a.y === undefined ? want : a.y + (want - a.y) * (1 - Math.exp(-12 * dt));
 
-        e.set(0, a.heading, 0);
+        // js/sim/foes.js's ACT numbers land on the shader's own: attack is 1, which is the peck,
+        // and hurt is 2, which is the startle flap. Only the fall has no counterpart, so it rides
+        // the instance matrix — a roll about the bird's own axis, pivoting at its feet.
+        const drop = a.act === ACT.die ? Math.min(1, a.at / 0.45) ** 2 : 0;
+        e.set(0, a.heading, 1.48 * drop);
         q.setFromEuler(e);
         pos.set(a.x, gy, a.z);
         scl.setScalar(a.scale * this.scale);
@@ -795,8 +851,8 @@ export class Chickens {
 
   cost() {
     const per = {};
-    for (const id of ZONE_IDS) per[id] = this.geo[id].userData.tris;
-    const birds = this.meshes.reduce((s, m, i) => s + m.count * per[ZONE_IDS[i]], 0);
+    for (const id of KEYS) per[id] = this.geo[id].userData.tris;
+    const birds = this.meshes.reduce((s, m, i) => s + m.count * per[KEYS[i]], 0);
     return { per, birds, contact: this.ao.count * AO_SEG * 3, drawn: this.meshes.filter(m => m.count).length + 1 };
   }
 }

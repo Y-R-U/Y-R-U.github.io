@@ -7,10 +7,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  ESCORT, escortActors, escortWants, escortEvent, escortActorOf, newEscort, stepEscort,
+  ESCORT, SPEED, carriedGait, escortActors, escortWants, escortEvent, escortActorOf, newEscort,
+  stepEscort,
 } from './escort.js';
 import { step } from './quest.js';
-import { placeAll } from './placement.js';
+import { placeAll, anchor } from './placement.js';
 import { contains, centreOf } from './areas.js';
 import { lintAll } from '../../tools/lintQuests.mjs';
 
@@ -18,7 +19,6 @@ const SHIPPED = lintAll();
 const read = f => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
 const ESCORTS = read('data/escorts.json');
 const CAST_AT = read('data/cast_at.json');
-const SPEED = { hen: 3.6, wagon: 3.8, cart: 3.8, fen: 4.7 };
 
 // Every escort objective in the shipped packs, and where each one is going.
 function corpus() {
@@ -34,6 +34,8 @@ function corpus() {
 const placed = placeAll(ESCORTS, SHIPPED.areas);
 const bodyOf = npc => placed.placed.find(e => e.id === npc)
   || (CAST_AT.some(c => c.id === npc) ? { id: npc, body: 'person' } : null);
+// js/world/escorts.js keys the speeds by body kind, and it is the same table this reads.
+const speedOf = npc => SPEED[bodyOf(npc).body];
 
 test('every escort the corpus asks for has an actor with a body', () => {
   assert.deepEqual(placed.errors, []);
@@ -43,12 +45,18 @@ test('every escort the corpus asks for has an actor with a body', () => {
   for (const e of placed.placed) assert.ok(asked.includes(e.id), `${e.id} has a body and nothing escorts it`);
 });
 
+// All four, Fen included. His crossing used to end in `reach.neutral` — the whole 300 × 152 m
+// Longacre bank, which he stands in the middle of — so it credited after 11.6 m in whatever
+// direction the player happened to be, inside two seconds. `lac.mill` is where the step after it
+// counts the crates off.
 test('every escort destination is a declared area the actor does not already stand in', () => {
+  const at = npc => placed.placed.find(e => e.id === npc)
+    || CAST_AT.map(c => ({ ...c, ...anchor(SHIPPED.areas[c.area], c.at) })).find(c => c.id === npc);
   for (const o of corpus()) {
     const area = SHIPPED.areas[o.path];
     assert.ok(area, `${o.quest}/${o.step} escorts to ${o.path}, which is not an area`);
-    const body = placed.placed.find(e => e.id === o.npc);
-    if (!body) continue;   // Fen starts inside `reach.neutral`; that is what ESCORT.travel is for
+    const body = at(o.npc);
+    assert.ok(body, `${o.npc} is escorted and stands nowhere`);
     assert.equal(contains(area, body.x, body.z), false,
       `${o.npc} starts inside ${o.path}, so the walk would be over before it began`);
   }
@@ -59,6 +67,24 @@ test('a body is only ever placed once, and inside the area it is anchored to', (
     assert.ok(contains(SHIPPED.areas[e.area], e.x, e.z), `${e.id} lands outside ${e.area}`);
     assert.ok(['fowl', 'wagon'].includes(e.body), `${e.id} wants a body kind nothing builds`);
   }
+});
+
+// These used to live in js/world/escorts.js, which imports three, so setting the whole table to 0
+// — nothing in the world follows you again, ever — left all 480 tests green.
+test('every escorted body keeps up with a walk and falls behind a sprint', () => {
+  const WALK = 5.0, SPRINT = 8.5;
+  for (const [body, mps] of Object.entries(SPEED)) {
+    assert.ok(mps > 0, `${body} does not move`);
+    assert.ok(mps * ESCORT.hurryMul > WALK, `${body} at ${mps} m/s cannot catch a walking player`);
+    assert.ok(mps < SPRINT, `${body} at ${mps} m/s can never be lost, so the grace rule is dead`);
+  }
+  for (const npc of ['cart', 'fen', 'hen', 'wagon']) {
+    assert.ok(speedOf(npc) > 0, `${npc} has a body kind with no speed`);
+  }
+  // The walk cycle the body plays while it is carried, which is not the speed it is carried at.
+  assert.equal(carriedGait('fowl', 0), 0.46);
+  assert.equal(carriedGait('person', 1.2), SPEED.person * 0.4);
+  assert.equal(carriedGait('person', null), 0, 'a frame the rules did not move it is a frame stood still');
 });
 
 // ── which actor is walking, and when ───────────────────────────────────────
@@ -155,7 +181,7 @@ test('an abandoned escort does not silently complete when you arrive without it'
 
   // Sprint the 63 m from the cotts to the hen house and stand in the doorway.
   const run = drive(newEscort('hen', 'lac.henhouse'), {
-    from: { x: home.x, z: home.z }, path: house, speed: SPEED.hen,
+    from: { x: home.x, z: home.z }, path: house, speed: speedOf('hen'),
     frames: Math.ceil(d / (8.5 / 30)),
     walk: p => { p.x += dx / d * 8.5 / 30; p.z += dz / d * 8.5 / 30; },
   });
@@ -165,13 +191,13 @@ test('an abandoned escort does not silently complete when you arrive without it'
 
   // Now keep going and leave it: the walk is over and standing in the hen house does not end it.
   const gone = drive(run.state, {
-    from: { x: run.player.x, z: run.player.z }, at: { ...run.actor }, path: house, speed: SPEED.hen,
+    from: { x: run.player.x, z: run.player.z }, at: { ...run.actor }, path: house, speed: speedOf('hen'),
     frames: 900, walk: straight(1, 0, 8.5),
   });
   assert.equal(gone.state.phase, 'lost');
 
   const back = stepEscort(gone.state, 1 / 30, {
-    px: to.x, pz: to.z, ax: gone.actor.x, az: gone.actor.z, inPath: false, speed: SPEED.hen,
+    px: to.x, pz: to.z, ax: gone.actor.x, az: gone.actor.z, inPath: false, speed: speedOf('hen'),
   });
   assert.equal(back.event, null);
   assert.equal(back.state.phase, 'lost', 'the hen is still under the cotts and the step is still open');
@@ -190,7 +216,7 @@ test('walking the hen home completes the step through the real reducer', () => {
   const dx = to.x - home.x, dz = to.z - home.z;
   const d = Math.hypot(dx, dz);
   const r = drive(newEscort('hen', 'lac.henhouse'), {
-    from: { x: home.x, z: home.z }, path: house, speed: SPEED.hen, frames: 3000,
+    from: { x: home.x, z: home.z }, path: house, speed: speedOf('hen'), frames: 3000,
     walk: p => { if (Math.hypot(to.x - p.x, to.z - p.z) > 0.5) { p.x += dx / d * 3.0 / 30; p.z += dz / d * 3.0 / 30; } },
   });
   assert.equal(r.state.phase, 'done');
@@ -209,24 +235,35 @@ test('walking the hen home completes the step through the real reducer', () => {
   assert.equal(wrong.state.quests['sandbox.12'].s, 'active');
 });
 
-// `reach.neutral` is the whole Longacre bank and Fen is standing on it before the step begins.
-test('a destination the actor already stands in still has to be walked into', () => {
-  const reach = SHIPPED.areas['reach.neutral'];
-  const fen = CAST_AT.find(c => c.id === 'fen');
-  assert.ok(fen, 'Fen is no longer placed by data/cast_at.json');
-  const bridge = centreOf(SHIPPED.areas['lac.millbridge']);
-  assert.ok(contains(reach, bridge.x, bridge.z), 'this test only means something if he starts inside it');
+// Fen stands 2.6 m from the edge of `lac.mill`, which is what `ESCORT.travel` is for: a step off
+// the bridge is not a ferry crossing, and the walk has to be a directed one into the mill yard
+// rather than 12 m in whatever direction the player happens to stand.
+test('a destination a step away still has to be walked properly into', () => {
+  const mill = SHIPPED.areas['lac.mill'];
+  const fenAt = anchor(SHIPPED.areas['lac.millbridge'], CAST_AT.find(c => c.id === 'fen').at);
+  assert.equal(contains(mill, fenAt.x, fenAt.z), false);
+  const gap = Math.min(...[[mill.shape.x0, fenAt.z], [mill.shape.x1, fenAt.z]]
+    .map(([x, z]) => Math.hypot(x - fenAt.x, z - fenAt.z)));
+  assert.ok(gap < ESCORT.travel, `${gap.toFixed(1)} m — the comment in escort.js says 2.6`);
 
-  const one = stepEscort({ ...newEscort('fen', 'reach.neutral'), phase: 'follow', from: { x: bridge.x, z: bridge.z } },
-    1 / 30, { px: bridge.x + 1, pz: bridge.z, ax: bridge.x, az: bridge.z, inPath: true, speed: SPEED.fen });
+  const one = stepEscort({ ...newEscort('fen', 'lac.mill'), phase: 'follow', from: { ...fenAt } },
+    1 / 30, { px: fenAt.x + 1, pz: fenAt.z, ax: fenAt.x, az: fenAt.z, inPath: true, speed: speedOf('fen') });
   assert.notEqual(one.event, 'arrive', 'standing next to him finished the crossing');
 
-  const r = drive(newEscort('fen', 'reach.neutral'), {
-    from: { x: bridge.x, z: bridge.z }, path: reach, speed: SPEED.fen, frames: 900,
-    walk: p => { p.z -= 3.0 / 30; },
+  // The player walks to the crate the next step counts off at, and Fen comes with them.
+  const crate = { x: -11, z: 112 };
+  const d = Math.hypot(crate.x - fenAt.x, crate.z - fenAt.z);
+  const r = drive(newEscort('fen', 'lac.mill'), {
+    from: { ...fenAt }, path: mill, speed: speedOf('fen'), frames: 900,
+    walk: p => {
+      if (Math.hypot(crate.x - p.x, crate.z - p.z) < 0.5) return;
+      p.x += (crate.x - fenAt.x) / d * 3.0 / 30;
+      p.z += (crate.z - fenAt.z) / d * 3.0 / 30;
+    },
   });
   assert.equal(r.state.phase, 'done');
-  const walked = Math.hypot(r.actor.x - bridge.x, r.actor.z - bridge.z);
+  assert.ok(contains(mill, r.actor.x, r.actor.z), 'he stopped short of the mill');
+  const walked = Math.hypot(r.actor.x - fenAt.x, r.actor.z - fenAt.z);
   assert.ok(walked >= ESCORT.travel, `he arrived after ${walked.toFixed(1)} m and the rule is ${ESCORT.travel}`);
 });
 
@@ -245,6 +282,46 @@ test('every `arm` the packs ask for names a prop or an escort actor', () => {
       `recover: arm ${id} names nothing the world can put back`);
   }
   assert.equal(escortActorOf('lac.henhouse.hen'), 'hen');
+});
+
+// A board job goes straight to `cooling` when it credits, so `escortActors` drops its actor on the
+// very next tick — and the player is necessarily inside 30 m, or the escort would have been lost.
+// Measured: the hen popped out of existence at the hen house door and Fen snapped 11 m back to
+// Millbridge, both while the player was looking at them.
+test('a repeatable escort that has just credited does not clear its actor in front of you', async () => {
+  const { fakeDom } = await import('./fakedom.js');
+  fakeDom();
+  const { Session } = await import('./session.js');
+  localStorage.clear();
+
+  const home = placed.placed.find(e => e.id === 'hen');
+  const bird = { x: -84.4, z: 14.0 };                       // where sandbox.12 leaves it
+  const log = [];
+  const escort = {
+    at: () => bird,
+    speed: () => speedOf('hen'),
+    show: (npc, on) => log.push(`show ${npc} ${on}`),
+    park: npc => { log.push(`park ${npc}`); bird.x = home.x; bird.z = home.z; },
+    move: () => true,
+  };
+  const player = { pos: { x: bird.x + 2, y: 4, z: bird.z, set(x, y, z) { this.x = x; this.y = y; this.z = z; } }, camYaw: 0 };
+  const s = new Session({ quality: { register() {}, get() {} } }, player, { fresh: true, world: { escort } });
+  await s.start();
+
+  s.doc.quests['sandbox.12'] = { s: 'active', i: 0, c: {} };
+  s.escortTick(1 / 30);
+  assert.deepEqual(log.splice(0), ['show hen true']);
+
+  s.doc.quests['sandbox.12'] = { s: 'cooling', i: 0, c: {} };
+  for (let i = 0; i < 60; i++) s.escortTick(1 / 30);
+  assert.deepEqual(log.splice(0), [], 'the hen went away while the player was standing over it');
+  assert.deepEqual(bird, { x: -84.4, z: 14.0 });
+
+  player.pos.set(bird.x + ESCORT.lose + 1, 4, bird.z);
+  s.escortTick(1 / 30);
+  assert.deepEqual(log.splice(0), ['park hen', 'show hen false'],
+    'park runs first — hiding the hen takes its agent away and leaves park nothing to move');
+  assert.deepEqual(bird, { x: home.x, z: home.z });
 });
 
 test('the session drives the escort through the pure rules and nothing else', () => {

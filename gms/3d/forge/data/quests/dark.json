@@ -499,7 +499,7 @@
         "text": "Count four crates aboard",
         "recover": [["arm", "lac.millbridge.crate"], ["moveTo", "lac.millbridge"]] },
 
-      { "id": "cross", "do": ["escort", "fen", "reach.neutral"],
+      { "id": "cross", "do": ["escort", "fen", "lac.mill"],
         "text": "Cross with the load",
         "recover": [["moveTo", "lac.millbridge"]] },
 

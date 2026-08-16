@@ -3,17 +3,13 @@
 
 import * as THREE from 'three';
 import { Batch, T } from './details.js';
-import { escortActorOf } from '../game/escort.js';
+import { escortActorOf, carriedGait, SPEED } from '../game/escort.js';
 import { ZONE_IDS } from './zones.js';
 import { zoneAt, heightAt } from './terrain.js';
 import { groundAt, collidersReady } from './colliders.js';
 
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 const at = (m, x, y, z, ry = 0, rx = 0, rz = 0) => m.clone().multiply(T(x, y, z, ry, rx, rz));
-
-// How fast each body will walk to keep up. The player walks at 5 m/s and sprints at 8.5, so
-// everything here falls behind a sprint and closes again once the gap passes ESCORT.hurry.
-export const SPEED = { person: 4.7, fowl: 3.6, wagon: 3.8 };
 
 // A two-wheeled cart with the shafts forward along +z, loaded and roped. Built at the origin and
 // carried by its own Group, which is the whole reason it is not one of props.js's merged kits.
@@ -122,8 +118,8 @@ export class Escorts {
       b.agent.z = z;
       if (heading !== null && heading !== undefined) b.agent.heading = heading;
       // A crowd figure drifts its own heading when idle; an escorted one is being led.
-      if (b.body === 'person') { b.agent.turn = 0; b.agent.speed = heading === null ? 0 : SPEED.person * 0.4; }
-      if (b.body === 'fowl') b.agent.speed = heading === null ? 0 : 0.46;
+      if (b.body === 'person') b.agent.turn = 0;
+      b.agent.speed = carriedGait(b.body, heading);
       return true;
     }
     if (!b.group) return false;

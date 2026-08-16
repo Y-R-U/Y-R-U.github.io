@@ -11,6 +11,7 @@ import { paint } from './tree.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { ACT, ACT_T, STATE } from '../sim/foes.js';
 import { roster, buckets, seatsLeft, PER_MESH } from './roster.js';
+import { CREATURES } from './bestiary.js';
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -589,17 +590,6 @@ function contactDisc(count) {
 
 const POOL = 48;
 const ROAM = 4.5;
-
-// Which rig each bestiary row wears, and how big. Six table entries, one parameterised rig, and
-// no zone named anywhere: a rat picks up its town from the ground it spawns on.
-export const CREATURES = {
-  grain_rat: { kind: 'rat', scale: 1.00 },
-  mire_rat: { kind: 'rat', scale: 1.22 },
-  rat_knot: { kind: 'rat', scale: 0.86 },
-  brood_mother: { kind: 'rat', scale: 2.40 },
-  creek_crab: { kind: 'crab', scale: 1.00 },
-  blight_boar: { kind: 'boar', scale: 1.00 },
-};
 
 const POSES = ['live', 'idle', 'move', 'attack', 'hurt', 'die'];
 

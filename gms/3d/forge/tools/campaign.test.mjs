@@ -9,13 +9,37 @@ import { blankState, step, offered, finishes } from '../js/game/quest.js';
 import { slate } from '../js/game/towns.js';
 import { blankSchools, SCHOOLS } from '../js/sim/schools.js';
 import { ACTS } from '../js/sim/campaign.js';
+import { ENEMIES } from '../js/sim/tables.js';
+import { bodied } from '../js/world/bestiary.js';
 import { lintAll, travelErrors, failRetryErrors, itemFlowErrors } from './lintQuests.mjs';
 
 const { defs, dialogue, truths, areas } = lintAll();
 
+// Why the running game could never emit this objective's event, or null.
+//
+// This is the whole promise of the file. For years the harness manufactured a `kill` for every kill
+// objective whether or not anything in the world could produce one, and a bestiary row with no rig
+// — `sour_crow` — hid sixty-one unfinishable quests and two whole campaigns behind a green suite.
+// The other verbs are gated by tests that own the data they need: gathering.test.js for `gather`,
+// placement.test.js for `interact` and `talk`, escort.test.js for `escort`, lintQuests for every
+// area id. Kill is the one nothing else could see, so it is checked here. A verb added later has to
+// be classified — `eventsFor`'s `default` throws on an objective kind this file does not know.
+export function whyNoEvent(o, s, can = bodied) {
+  if (o.k !== 'kill') return null;
+  if (!ENEMIES[o.kind]) return `no bestiary row for ${o.kind}`;
+  if (!can(o.kind)) return `no rig in js/main.js can body ${o.kind} (geo: ${ENEMIES[o.kind].geo})`;
+  // js/game/spawner.js `planFrom` reads `s.in || o.area` and skips a kill that names neither, so
+  // nothing of that kind is ever placed and the step waits on a body that cannot exist.
+  const where = s.in || o.area;
+  if (!where || !areas[where]) return `nothing plans ${o.kind} anywhere — the step names no area`;
+  return null;
+}
+
 // One synthetic world event per objective, carrying whatever the step's modifiers demand.
-function eventsFor(s) {
+function eventsFor(s, qid = '') {
   return s.objectives.map(o => {
+    const why = whyNoEvent(o, s);
+    assert.equal(why, null, `${qid}.${s.id}: ${why}`);
     const base = { via: s.via ?? undefined, verb: s.verb ?? undefined, area: s.in ?? undefined };
     switch (o.k) {
       case 'kill': return { ...base, t: 'kill', kind: o.kind, n: o.n };
@@ -85,7 +109,7 @@ function playThrough(campaigns) {
     for (const s of defs[id].steps) {
       Object.assign(clock, clockFor(s, clock));
       worn = s.worn;
-      for (const e of eventsFor(s)) send(e);
+      for (const e of eventsFor(s, id)) send(e);
     }
     worn = undefined;
     assert.equal(state.quests[id].s, 'done', `${id} did not finish`);
@@ -164,6 +188,32 @@ function assertCampaign(campaign, want) {
 
 test('a blank save is offered exactly one quest, and it is the granary', () => {
   assert.deepEqual(offered(defs, blankState(), {}), ['light.01']);
+});
+
+// The ladder below only plays the three campaigns; the twenty sandbox jobs are never walked, so
+// they need the same question asked of them directly.
+test('every objective in the corpus is one the running game can produce an event for', () => {
+  const bad = [];
+  for (const d of Object.values(defs)) {
+    for (const s of d.steps) {
+      for (const o of s.objectives) {
+        const why = whyNoEvent(o, s);
+        if (why) bad.push(`${d.id}.${s.id}: ${why}`);
+      }
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
+// And the counterpart: the check has to be able to see both shapes of the hole. The first is
+// light.18 as it shipped for months; the second is light.05's night watch, which asked for two
+// mire rats and named no area for them.
+test('the check sees an enemy no rig bodies, and a kill with nowhere to be planned', () => {
+  const kill = { k: 'kill', kind: 'mire_rat', n: 2 };
+  assert.match(whyNoEvent(kill, { id: 'x', in: 'wwa.northgate' }, () => false),
+    /no rig in js\/main\.js can body mire_rat/);
+  assert.match(whyNoEvent(kill, { id: 'x', in: null }), /nothing plans mire_rat anywhere/);
+  assert.equal(whyNoEvent(kill, { id: 'x', in: 'wwa.northgate' }), null);
 });
 
 // Reachable · act-ordered · on budget · ten Truths, all of them in dialogue (STORY §8.5).

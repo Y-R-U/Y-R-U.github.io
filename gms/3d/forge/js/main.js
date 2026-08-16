@@ -65,7 +65,7 @@ const vermin = app.add(new Vermin(demo.terrain));
 // one shader program serves every hood in the valley.
 const robed = app.add(new Robed(demo.terrain, people.uniforms));
 const spawner = app.add(new Spawner({
-  rig: rigFor({ rat: vermin, crab: vermin, boar: vermin, people: robed }),
+  rig: rigFor({ rat: vermin, crab: vermin, boar: vermin, people: robed, chicken: chickens }),
   player,
   ground: (x, z) => groundAt(x, z, 0),
   // A step against itself: the walker is only pushed when it began inside a collider. The creek
@@ -192,7 +192,7 @@ async function play() {
       doorIndex: () => (doors.state === 'in' ? doors.activeIndex ?? null : null),
       jumpDoor: i => { doors.jump(i); return true; },
       tick: dt => spawner.tick(dt),
-      freeze: v => { vermin.frozen = v; robed.frozen = v; },
+      freeze: v => { vermin.frozen = v; robed.frozen = v; chickens.frozen = v; },
       foes: () => spawner.foes(),
       sight,
       hit: (foe, damage) => spawner.hit(foe, damage),
